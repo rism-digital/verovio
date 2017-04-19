@@ -252,7 +252,6 @@ int Staff::AlignVertically(FunctorParams *functorParams)
 
     // Set the pointer of the m_alignment
     m_staffAlignment = alignment;
-    //alignment->SetYRel(-params->m_staffIdx * params->m_doc->GetDrawingStaffSize(100));
 
     std::vector<Object *>::iterator it;
     it = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(VERSE));

@@ -101,30 +101,17 @@ void Page::LayOutHorizontally()
     // After this:
     // - each LayerElement object will have its Alignment pointer initialized
     Functor alignHorizontally(&Object::AlignHorizontally);
-    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally);
     Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
+    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally);
     this->Process(&alignHorizontally, &alignHorizontallyParams, &alignHorizontallyEnd);
 
     // Align the content of the page using system aligners
     // After this:
     // - each Staff object will then have its StaffAlignment pointer initialized
-    AlignVerticallyParams alignVerticallyParams(doc);
     Functor alignVertically(&Object::AlignVertically);
-    this->Process(&alignVertically, &alignVerticallyParams);
-
-    /*
-    // Set the Y position of each StaffAlignment
-    // Adjust the Y shift to make sure there is a minimal space (staffMargin) between each staff
-    Functor setAlignmentPosY(&Object::SetAligmentYPos);
-    SetAligmentYPosParams setAligmentYPosParams(doc, &setAlignmentY);
-    this->Process(&setAlignmentPosY, &setAligmentYPosParams);
-
-    // Integrate the Y shift of the staves
-    // Once the m_yShift have been calculated, move all positions accordingly
-    Functor integrateBoundingBoxYShift(&Object::IntegrateBoundingBoxYShift);
-    IntegrateBoundingBoxYShiftParams integrateBoundingBoxYShiftParams(&integrateBoundingBoxYShift);
-    this->Process(&integrateBoundingBoxYShift, &integrateBoundingBoxYShiftParams);
-    */
+    Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
+    AlignVerticallyParams alignVerticallyParams(doc, &alignVerticallyEnd);
+    this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
@@ -223,9 +210,10 @@ void Page::LayOutVertically()
     // Align the content of the page using system aligners
     // After this:
     // - each Staff object will then have its StaffAlignment pointer initialized
-    AlignVerticallyParams alignVerticallyParams(doc);
     Functor alignVertically(&Object::AlignVertically);
-    this->Process(&alignVertically, &alignVerticallyParams);
+    Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
+    AlignVerticallyParams alignVerticallyParams(doc, &alignVerticallyEnd);
+    this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Adjust the position of outside articulations
     FunctorDocParams adjustArticParams(doc);
@@ -263,15 +251,9 @@ void Page::LayOutVertically()
 
     // Set the Y position of each StaffAlignment
     // Adjust the Y shift to make sure there is a minimal space (staffMargin) between each staff
-    Functor setAlignmentY(&Object::SetAligmentYPos);
-    SetAligmentYPosParams setAligmentYPosParams(doc, &setAlignmentY);
-    this->Process(&setAlignmentY, &setAligmentYPosParams);
-
-    // Integrate the Y shift of the staves
-    // Once the m_yShift have been calculated, move all positions accordingly
-    Functor integrateBoundingBoxYShift(&Object::IntegrateBoundingBoxYShift);
-    IntegrateBoundingBoxYShiftParams integrateBoundingBoxYShiftParams(&integrateBoundingBoxYShift);
-    this->Process(&integrateBoundingBoxYShift, &integrateBoundingBoxYShiftParams);
+    Functor adjustYPos(&Object::AdjustYPos);
+    AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
+    this->Process(&adjustYPos, &adjustYPosParams);
 
     // Adjust system Y position
     AlignSystemsParams alignSystemsParams;

@@ -1143,7 +1143,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     if (chord) {
         chord->GetCrossStaffOverflows(current, params->m_staffAlignment, skipAbove, skipBelow);
     }
-    
+
     StaffAlignment *alignment = params->m_staffAlignment;
     Layer *crossLayer = NULL;
     Staff *crossStaff = current->GetCrossStaff(crossLayer);

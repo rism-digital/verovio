@@ -127,17 +127,15 @@ public:
     /**
      * See Object::AlignVertically
      */
+    ///@{
     virtual int AlignVertically(FunctorParams *functorParams);
+    virtual int AlignVerticallyEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
-     * See Object::SetAligmentYPos
+     * See Object::AdjustYPos
      */
-    virtual int SetAligmentYPos(FunctorParams *functorParams);
-
-    /**
-     * See Object::IntegrateBoundingBoxYShift
-     */
-    virtual int IntegrateBoundingBoxYShift(FunctorParams *functorParams);
+    virtual int AdjustYPos(FunctorParams *functorParams);
 
     /**
      * See Object::AlignSystems
