@@ -449,9 +449,9 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         stemMod = stem ? stem->GetStemMod() : STEMMODIFIER_NONE;
         stemPoint = childNote->GetDrawingStemStart(childNote);
     }
-    
+
     if (bTrem->HasMeasperf()) {
-        switch(bTrem->GetMeasperf()) {
+        switch (bTrem->GetMeasperf()) {
             case (DUR_8): stemMod = STEMMODIFIER_1slash; break;
             case (DUR_16): stemMod = STEMMODIFIER_2slash; break;
             case (DUR_32): stemMod = STEMMODIFIER_3slash; break;
@@ -531,9 +531,9 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
         chord->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
 
-        CalcStemParams calcDrawingStemDirParams(this->m_doc);
-        Functor calcDrawingStemDir(&Object::CalcStem);
-        chord->Process(&calcDrawingStemDir, &calcDrawingStemDirParams);
+        CalcStemParams calcStemParams(this->m_doc);
+        Functor calcStem(&Object::CalcStem);
+        chord->Process(&calcStem, &calcStemParams);
     }
 
     chord->ResetDrawingList();
@@ -1112,7 +1112,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     drawingDur = ((note->GetColored() == BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
 
     int radius = note->GetDrawingRadius(m_doc, staffSize, drawingCueSize);
-        
+
     noteXShift = -radius;
 
     /************** Noteheads: **************/
@@ -1144,7 +1144,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (!inChord) {
         Accid *accid = note->GetDrawingAccid();
         if (accid && (accid->GetFunc() == accidLog_FUNC_edit)) {
-              accid->SetDrawingXRel(noteXShift);
+            accid->SetDrawingXRel(noteXShift);
         }
 
         if (note->GetDots()) {

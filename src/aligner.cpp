@@ -100,7 +100,6 @@ StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) const
 StaffAlignment::StaffAlignment() : Object()
 {
     m_yRel = 0;
-    m_yShift = 0;
     m_verseCount = 0;
     m_staff = NULL;
 
@@ -137,10 +136,10 @@ int StaffAlignment::GetStaffSize() const
     return m_staff ? m_staff->m_drawingStaffSize : 100;
 }
 
-void StaffAlignment::SetYShift(int yShift)
+void StaffAlignment::SetYRel(int yRel)
 {
-    if (yShift < m_yShift) {
-        m_yShift = yShift;
+    if (yRel < m_yRel) {
+        m_yRel = yRel;
     }
 }
 
@@ -179,9 +178,9 @@ int StaffAlignment::CalcOverflowAbove(BoundingBox *box)
     if (box->Is(FLOATING_POSITIONER)) {
         FloatingPositioner *positioner = dynamic_cast<FloatingPositioner *>(box);
         assert(positioner);
-        return positioner->GetContentTop();
+        return positioner->GetContentTop() - this->GetYRel();
     }
-    return box->GetSelfTop();
+    return box->GetSelfTop() - this->GetYRel();
 }
 
 int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
@@ -189,9 +188,9 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
     if (box->Is(FLOATING_POSITIONER)) {
         FloatingPositioner *positioner = dynamic_cast<FloatingPositioner *>(box);
         assert(positioner);
-        return -(positioner->GetContentBottom() + m_staffHeight);
+        return -(positioner->GetContentBottom() + m_staffHeight - this->GetYRel());
     }
-    return -(box->GetSelfBottom() + m_staffHeight);
+    return -(box->GetSelfBottom() + m_staffHeight - this->GetYRel());
 }
 
 void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY)
@@ -731,12 +730,12 @@ GraceAligner *Alignment::GetGraceAligner()
     }
     return m_graceAligner;
 }
-    
+
 AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, int staffN)
 {
     ArrayOfObjects::iterator iter;
     AlignmentReference *reference = NULL;
-    
+
     for (iter = m_children.begin(); iter != m_children.end(); iter++) {
         reference = dynamic_cast<AlignmentReference *>(*iter);
         if (reference->GetN() == staffN) {
@@ -755,7 +754,7 @@ void Alignment::AddToAccidSpace(Accid *accid)
 
     // Do not added them if no @accid (e.g., @accid.ges only)
     if (!accid->HasAccid()) return;
-    
+
     AlignmentReference *reference = this->GetReferenceWithElement(accid);
     assert(reference);
     reference->AddToAccidSpace(accid);
@@ -770,7 +769,7 @@ AlignmentReference::AlignmentReference() : Object(), AttCommon()
     RegisterAttClass(ATT_COMMON);
 
     Reset();
-    
+
     this->SetAsReferenceObject();
 }
 
@@ -779,7 +778,7 @@ AlignmentReference::AlignmentReference(int staffN) : Object(), AttCommon()
     RegisterAttClass(ATT_COMMON);
 
     Reset();
-    
+
     this->SetAsReferenceObject();
     this->SetN(staffN);
 }
@@ -1060,9 +1059,21 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int StaffAlignment::SetAligmentYPos(FunctorParams *functorParams)
+int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
 {
-    SetAligmentYPosParams *params = dynamic_cast<SetAligmentYPosParams *>(functorParams);
+    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    assert(params);
+
+    SetYRel(-params->m_cumulatedShift);
+
+    params->m_cumulatedShift += m_staffHeight + params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
+{
+    AdjustYPosParams *params = dynamic_cast<AdjustYPosParams *>(functorParams);
     assert(params);
 
     int maxOverlfowAbove;
@@ -1077,34 +1088,21 @@ int StaffAlignment::SetAligmentYPos(FunctorParams *functorParams)
         if (m_overlap) maxOverlfowAbove += m_overlap;
     }
 
-    // Is the maximum the overflow (+ overlap) shift, or the default ?
-    int shift = std::max(maxOverlfowAbove, params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100));
-
     // Add a margin
-    shift += params->m_doc->GetBottomMargin(STAFF) * params->m_doc->GetDrawingUnit(this->GetStaffSize())
+    maxOverlfowAbove += params->m_doc->GetBottomMargin(STAFF) * params->m_doc->GetDrawingUnit(this->GetStaffSize())
         / PARAM_DENOMINATOR;
 
-    // Shift, including the previous staff height
-    SetYShift(-shift - params->m_previousStaffHeight);
+    // Is the maximum the overflow (+ overlap) shift, or the default ?
+    maxOverlfowAbove -= params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+    // Is the maximum the overflow (+ overlap) shift, or the default ?
+    int shift = std::max(0, maxOverlfowAbove);
 
-    params->m_previousStaffHeight = m_staffHeight;
+    params->m_cumulatedShift += shift;
+
+    SetYRel(GetYRel() - params->m_cumulatedShift);
+
     params->m_previousOverflowBelow = m_overflowBelow;
     params->m_previousVerseCount = this->GetVerseCount();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int StaffAlignment::IntegrateBoundingBoxYShift(FunctorParams *functorParams)
-{
-    IntegrateBoundingBoxYShiftParams *params = dynamic_cast<IntegrateBoundingBoxYShiftParams *>(functorParams);
-    assert(params);
-
-    // integrates the m_yShift into the m_yRel
-    m_yRel += m_yShift + params->m_shift;
-
-    // cumulate the shift value
-    params->m_shift += m_yShift;
-    m_yShift = 0;
 
     return FUNCTOR_CONTINUE;
 }
@@ -1233,6 +1231,16 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Alignment::AdjustAccidX(FunctorParams *functorParams)
+{
+    AdjustAccidXParams *params = dynamic_cast<AdjustAccidXParams *>(functorParams);
+    assert(params);
+
+    if (this->m_graceAligner) this->m_graceAligner->Process(params->m_functor, functorParams);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
 {
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
@@ -1290,26 +1298,28 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
         if (m_accidSpace.at(i)->GetDrawingOctaveAccid() != NULL) {
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i)->GetDrawingOctaveAccid(), params->m_doc, staffSize);
-            int minXRel = std::min(
-                m_accidSpace.at(i)->GetDrawingXRel(), m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingXRel());
-            m_accidSpace.at(i)->SetDrawingXRel(minXRel);
-            m_accidSpace.at(i)->GetDrawingOctaveAccid()->SetDrawingXRel(minXRel);
+            int dist = m_accidSpace.at(i)->GetDrawingX() - m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingX();
+            if (dist > 0)
+                m_accidSpace.at(i)->SetDrawingXRel(m_accidSpace.at(i)->GetDrawingXRel() - dist);
+            else if (dist < 0)
+                m_accidSpace.at(i)->GetDrawingOctaveAccid()->SetDrawingXRel(
+                    m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingXRel() + dist);
         }
     }
 
     int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
     // Zig-zag processing
     for (i = 0, j = count - 1; i < middle; i++, j--) {
-        // bottom one - but skip octaves
-        if (!m_accidSpace.at(i)->GetDrawingOctaveAccid() && !m_accidSpace.at(i)->GetDrawingOctave())
-            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
+        // top one - but skip octaves
+        if (!m_accidSpace.at(j)->GetDrawingOctaveAccid() && !m_accidSpace.at(j)->GetDrawingOctave())
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize);
 
         // Break with odd number of elements once the middle is reached
         if (i == j) break;
 
-        // top one - but skip octaves
-        if (!m_accidSpace.at(j)->GetDrawingOctaveAccid() && !m_accidSpace.at(j)->GetDrawingOctave())
-            this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize);
+        // bottom one - but skip octaves
+        if (!m_accidSpace.at(i)->GetDrawingOctaveAccid() && !m_accidSpace.at(i)->GetDrawingOctave())
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
     }
 
     return FUNCTOR_SIBLINGS;

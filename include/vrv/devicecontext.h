@@ -152,14 +152,14 @@ public:
     virtual void StartGraphic(Object *object, std::string gClass, std::string gId) = 0;
     virtual void EndGraphic(Object *object, View *view) = 0;
     ///@}
-    
+
     /**
      * @name Method for starting and ending a graphic custom graphic that do not correspond to an Object
      * For example, the method can be used for grouping shapes in <g></g> in SVG
      */
     ///@{
-    virtual void StartCustomGraphic(std::string name, std::string gClass = "", std::string gId = "") {};
-    virtual void EndCustomGraphic() {};
+    virtual void StartCustomGraphic(std::string name, std::string gClass = "", std::string gId = ""){};
+    virtual void EndCustomGraphic(){};
     ///@}
 
     /**

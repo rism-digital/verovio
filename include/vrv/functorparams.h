@@ -60,7 +60,7 @@ public:
 //----------------------------------------------------------------------------
 // Child classes of FunctorParams
 //----------------------------------------------------------------------------
-    
+
 /**
  * This is a basic FunctorParams with only the doc pointer for cases where
  * it is the only parameter needed.
@@ -72,7 +72,7 @@ public:
     FunctorDocParams(Doc *doc) { m_doc = doc; }
     Doc *m_doc;
 };
-    
+
 //----------------------------------------------------------------------------
 // AddLayerElementToFlatListParams
 //----------------------------------------------------------------------------
@@ -267,6 +267,36 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustYPosParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the previous staff height
+ * member 1: the extra staff height
+ * member 2  the previous verse count
+ * member 3: the cumulated shift
+ * member 4: the doc
+ * member 5: the functor to be redirected to SystemAligner
+ **/
+
+class AdjustYPosParams : public FunctorParams {
+public:
+    AdjustYPosParams(Doc *doc, Functor *functor)
+    {
+        m_previousOverflowBelow = 0;
+        m_previousVerseCount = 0;
+        m_cumulatedShift = 0;
+        m_doc = doc;
+        m_functor = functor;
+    }
+    int m_previousOverflowBelow;
+    int m_previousVerseCount;
+    int m_cumulatedShift;
+    Doc *m_doc;
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
 // AlignHorizontallyParams
 //----------------------------------------------------------------------------
 
@@ -350,24 +380,30 @@ public:
  * member 0: the systemAligner
  * member 1: the staffIdx
  * member 2: the staffN
- * member 3: the doc
+ * member 3: the cumulated shift for the default alignment
+ * member 4: the end functor (for redirecting from measure)
+ * member 5: the doc
 **/
 
 class AlignVerticallyParams : public FunctorParams {
 public:
-    AlignVerticallyParams(Doc *doc)
+    AlignVerticallyParams(Doc *doc, Functor *functorEnd)
     {
         m_systemAligner = NULL;
         m_staffIdx = 0;
         m_staffN = 0;
+        m_cumulatedShift = 0;
+        m_functorEnd = functorEnd;
         m_doc = doc;
     }
     SystemAligner *m_systemAligner;
     int m_staffIdx;
     int m_staffN;
+    int m_cumulatedShift;
+    Functor *m_functorEnd;
     Doc *m_doc;
 };
-    
+
 //----------------------------------------------------------------------------
 // CalcChordNoteHeads
 //----------------------------------------------------------------------------
@@ -735,26 +771,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// IntegrateBoundingBoxYShiftParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the cumulated shift
- * member 1: the functor to be redirected to SystemAligner
-**/
-
-class IntegrateBoundingBoxYShiftParams : public FunctorParams {
-public:
-    IntegrateBoundingBoxYShiftParams(Functor *functor)
-    {
-        m_shift = 0;
-        m_functor = functor;
-    }
-    int m_shift;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
 // JustifyXParams
 //----------------------------------------------------------------------------
 
@@ -1070,35 +1086,6 @@ public:
     double m_previousTime;
     int m_previousXRel;
     int m_longestActualDur;
-    Doc *m_doc;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
-// SetAligmentYPosParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the previous staff height
- * member 1: the extra staff height
- * member 2  the previous verse count
- * member 3: the doc
- * member 4: the functor to be redirected to SystemAligner
-**/
-
-class SetAligmentYPosParams : public FunctorParams {
-public:
-    SetAligmentYPosParams(Doc *doc, Functor *functor)
-    {
-        m_previousStaffHeight = 0;
-        m_previousOverflowBelow = 0;
-        m_previousVerseCount = 0;
-        m_doc = doc;
-        m_functor = functor;
-    }
-    int m_previousStaffHeight;
-    int m_previousOverflowBelow;
-    int m_previousVerseCount;
     Doc *m_doc;
     Functor *m_functor;
 };

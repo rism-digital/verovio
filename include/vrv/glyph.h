@@ -41,7 +41,7 @@ public:
     ///@}
 
     /** Get the bounds of the glyph */
-    void GetBoundingBox(int *x, int *y, int *w, int *h);
+    void GetBoundingBox(int &x, int &y, int &w, int &h);
 
     /**
      * Set the bounds of the glyph

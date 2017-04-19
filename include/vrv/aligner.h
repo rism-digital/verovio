@@ -131,11 +131,8 @@ public:
     /**
      * @name Setter and getter for y
      */
-    void SetYRel(int yRel) { m_yRel = yRel; }
+    void SetYRel(int yRel);
     int GetYRel() const { return m_yRel; }
-
-    void SetYShift(int yShift);
-    int GetYShift() const { return m_yShift; }
 
     /**
      * @name Set and get verse count.
@@ -206,19 +203,19 @@ public:
     //----------//
 
     /**
-     * See Object::SetAligmentYPos
+     * See Object::AlignVertically
      */
-    virtual int SetAligmentYPos(FunctorParams *functorParams);
+    virtual int AlignVerticallyEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustYPos
+     */
+    virtual int AdjustYPos(FunctorParams *functorParams);
 
     /**
      * See Object::CalcStaffOverlap
      */
     virtual int CalcStaffOverlap(FunctorParams *functorParams);
-
-    /**
-     * See Object::IntegrateBoundingBoxYShift
-     */
-    virtual int IntegrateBoundingBoxYShift(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustFloatingPostioners
@@ -248,7 +245,7 @@ private:
      * Stores the position relative to the system.
      */
     int m_yRel;
-    int m_yShift;
+    // int m_yShift;
     /**
      * Stores the number of verse of the staves attached to the aligner
      */
@@ -351,12 +348,14 @@ public:
     bool HasGraceAligner() const { return (m_graceAligner != NULL); }
 
     /**
-     *
+     * Return the AlignmentReference holding the element.
+     * If staffN is provided, uses the AlignmentReference->GetN() to accelerate the search.
      */
     AlignmentReference *GetReferenceWithElement(LayerElement *element, int staffN = VRV_UNSET);
-    
+
     /**
-     *
+     * Add an accidental to the accidSpace of the AlignmentReference holding it.
+     * The Alignment has to have a AlignmentReference holding it.
      */
     void AddToAccidSpace(Accid *accid);
 
@@ -409,6 +408,11 @@ public:
     virtual int AdjustXPos(FunctorParams *functorParams);
     virtual int AdjustXPosEnd(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * See Object::AjustAccidX
+     */
+    virtual int AdjustAccidX(FunctorParams *);
 
 private:
     /**
@@ -477,7 +481,7 @@ public:
     virtual void AddChild(Object *object);
 
     /**
-     *
+     * Add an accidental to the accidSpace of the AlignmentReference.
      */
     void AddToAccidSpace(Accid *accid);
 
@@ -506,7 +510,7 @@ public:
     //
 private:
     /**
-     *
+     * The accid space of the AlignmentReference.
      */
     std::vector<Accid *> m_accidSpace;
 };

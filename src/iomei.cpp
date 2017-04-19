@@ -2740,7 +2740,7 @@ bool MeiInput::ReadMeiBTrem(Object *parent, pugi::xml_node bTrem)
     ReadLayerElement(bTrem, vrvBTrem);
 
     vrvBTrem->ReadTremmeasured(bTrem);
-    
+
     parent->AddChild(vrvBTrem);
     return ReadMeiLayerChildren(vrvBTrem, bTrem, vrvBTrem);
 }
@@ -2814,7 +2814,7 @@ bool MeiInput::ReadMeiFTrem(Object *parent, pugi::xml_node fTrem)
 
     vrvFTrem->ReadSlashcount(fTrem);
     vrvFTrem->ReadTremmeasured(fTrem);
-    
+
     parent->AddChild(vrvFTrem);
     return ReadMeiLayerChildren(vrvFTrem, fTrem, vrvFTrem);
 }

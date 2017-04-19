@@ -237,13 +237,13 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
     // GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(),
     // currentBrush.GetOpacity()).c_str();
 }
-    
+
 void SvgDeviceContext::StartCustomGraphic(std::string name, std::string gClass, std::string gId)
 {
     if (gClass.length() > 0) {
         name.append(" " + gClass);
     }
-    
+
     m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = name.c_str();
@@ -251,7 +251,6 @@ void SvgDeviceContext::StartCustomGraphic(std::string name, std::string gClass, 
         m_currentNode.append_attribute("id") = gId.c_str();
     }
 }
-
 
 void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std::string gId)
 {
@@ -310,13 +309,12 @@ void SvgDeviceContext::EndGraphic(Object *object, View *view)
     m_currentNode = m_svgNodeStack.back();
 }
 
-    
 void SvgDeviceContext::EndCustomGraphic()
 {
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
-    
+
 void SvgDeviceContext::EndResumedGraphic(Object *object, View *view)
 {
     DrawSvgBoundingBox(object, view);
@@ -744,7 +742,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         if (glyph->GetHorizAdvX() > 0)
             x += glyph->GetHorizAdvX() * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
         else {
-            glyph->GetBoundingBox(&gx, &gy, &w, &h);
+            glyph->GetBoundingBox(gx, gy, w, h);
             x += w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
         }
     }
@@ -831,7 +829,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
                     assert(fontPoint);
                     Point p;
                     int x, y, w, h;
-                    glyph->GetBoundingBox(&x, &y, &w, &h);
+                    glyph->GetBoundingBox(x, y, w, h);
                     int smuflGlyphFontSize = object->GetBoundingBoxGlyphFontSize();
 
                     p.x = object->GetSelfLeft() - x * smuflGlyphFontSize / glyph->GetUnitsPerEm();

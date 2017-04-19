@@ -101,9 +101,17 @@ void Page::LayOutHorizontally()
     // After this:
     // - each LayerElement object will have its Alignment pointer initialized
     Functor alignHorizontally(&Object::AlignHorizontally);
-    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally);
     Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
+    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally);
     this->Process(&alignHorizontally, &alignHorizontallyParams, &alignHorizontallyEnd);
+
+    // Align the content of the page using system aligners
+    // After this:
+    // - each Staff object will then have its StaffAlignment pointer initialized
+    Functor alignVertically(&Object::AlignVertically);
+    Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
+    AlignVerticallyParams alignVerticallyParams(doc, &alignVerticallyEnd);
+    this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
@@ -133,14 +141,14 @@ void Page::LayOutHorizontally()
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
 
-    CalcStemParams calcDrawingStemDirParams(doc);
-    Functor calcDrawingStemDir(&Object::CalcStem);
-    this->Process(&calcDrawingStemDir, &calcDrawingStemDirParams);
+    CalcStemParams calcStemParams(doc);
+    Functor calcStem(&Object::CalcStem);
+    this->Process(&calcStem, &calcStemParams);
 
     FunctorDocParams calcChordNoteHeadsParams(doc);
     Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
     this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
-    
+
     // Render it for filling the bounding box
     BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
     // Do not do the layout in this view - otherwise we will loop...
@@ -194,7 +202,7 @@ void Page::LayOutVertically()
     // Reset the vertical alignment
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
     this->Process(&resetVerticalAlignment, NULL);
-    
+
     FunctorDocParams calcLegerLinesParams(doc);
     Functor calcLedgerLines(&Object::CalcLedgerLines);
     this->Process(&calcLedgerLines, &calcLegerLinesParams);
@@ -202,9 +210,10 @@ void Page::LayOutVertically()
     // Align the content of the page using system aligners
     // After this:
     // - each Staff object will then have its StaffAlignment pointer initialized
-    AlignVerticallyParams alignVerticallyParams(doc);
     Functor alignVertically(&Object::AlignVertically);
-    this->Process(&alignVertically, &alignVerticallyParams);
+    Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
+    AlignVerticallyParams alignVerticallyParams(doc, &alignVerticallyEnd);
+    this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Adjust the position of outside articulations
     FunctorDocParams adjustArticParams(doc);
@@ -242,15 +251,9 @@ void Page::LayOutVertically()
 
     // Set the Y position of each StaffAlignment
     // Adjust the Y shift to make sure there is a minimal space (staffMargin) between each staff
-    Functor setAlignmentY(&Object::SetAligmentYPos);
-    SetAligmentYPosParams setAligmentYPosParams(doc, &setAlignmentY);
-    this->Process(&setAlignmentY, &setAligmentYPosParams);
-
-    // Integrate the Y shift of the staves
-    // Once the m_yShift have been calculated, move all positions accordingly
-    Functor integrateBoundingBoxYShift(&Object::IntegrateBoundingBoxYShift);
-    IntegrateBoundingBoxYShiftParams integrateBoundingBoxYShiftParams(&integrateBoundingBoxYShift);
-    this->Process(&integrateBoundingBoxYShift, &integrateBoundingBoxYShiftParams);
+    Functor adjustYPos(&Object::AdjustYPos);
+    AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
+    this->Process(&adjustYPos, &adjustYPosParams);
 
     // Adjust system Y position
     AlignSystemsParams alignSystemsParams;
@@ -279,16 +282,16 @@ void Page::JustifyHorizontally()
     justifyXParams.m_systemFullWidth = doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar;
     this->Process(&justifyX, &justifyXParams);
 }
-    
+
 void Page::LayOutPitchPos()
 {
     Doc *doc = dynamic_cast<Doc *>(GetParent());
     assert(doc);
-    
+
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
-    
+
     // Set the pitch / pos alignement
     // Once View::CalculateRestPosY will be move to Staff we will not need to pass a view anymore
     View view;
@@ -296,10 +299,10 @@ void Page::LayOutPitchPos()
     SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc, &view);
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
-    
-    CalcStemParams calcDrawingStemDirParams(doc);
-    Functor calcDrawingStemDir(&Object::CalcStem);
-    this->Process(&calcDrawingStemDir, &calcDrawingStemDirParams);
+
+    CalcStemParams calcStemParams(doc);
+    Functor calcStem(&Object::CalcStem);
+    this->Process(&calcStem, &calcStemParams);
 }
 
 int Page::GetContentHeight() const
