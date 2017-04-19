@@ -1193,6 +1193,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     int top = 0;
     int bot = 0;
     pair<int, hum::HTp> oclef;
+    pair<int, hum::HTp> omet;
 
     hum::HTp part = partstart;
     while (part && !part->getLine()->isData()) {
@@ -1201,6 +1202,9 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
         else if (part->compare(0, 6, "*oclef") == 0) {
             m_oclef.emplace_back(partnumber, part);
+        }
+        else if (part->compare(0, 6, "*omet") == 0) {
+            m_omet.emplace_back(partnumber, part);
         }
         else if (part->compare(0, 3, "*k[") == 0) {
             keysig = *part;
@@ -1417,6 +1421,7 @@ void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, hum::HTp partstar
 
 void HumdrumInput::setMeterSymbol(StaffDef *part, const std::string &metersig)
 {
+
     if (metersig == "C") {
         // This is used more strictly for C mensuration.
         part->SetMeterSym(METERSIGN_common);
@@ -1430,7 +1435,21 @@ void HumdrumInput::setMeterSymbol(StaffDef *part, const std::string &metersig)
     else if (metersig == "C|") {
         // This is used more strictly for Cut-C mensuration.
         part->SetMeterSym(METERSIGN_cut);
+    } else if (metersig == "*omet(C)") {
+        // This is used more strictly for C mensuration.
+        part->SetMeterSym(METERSIGN_common);
     }
+    else if (metersig == "*omet(c)") {
+        part->SetMeterSym(METERSIGN_common);
+    }
+    else if (metersig == "*omet(c|)") {
+        part->SetMeterSym(METERSIGN_cut);
+    }
+    else if (metersig == "*omet*C|)") {
+        // This is used more strictly for Cut-C mensuration.
+        part->SetMeterSym(METERSIGN_cut);
+    }
+
 }
 
 //////////////////////////////
@@ -6121,8 +6140,8 @@ std::vector<int> HumdrumInput::getStaffLayerCounts(void)
 
 void HumdrumInput::setupSystemMeasure(int startline, int endline)
 {
-    if (m_oclef.size()) {
-        storeOriginalClefApp();
+    if (m_oclef.size() || m_omet.size()) {
+        storeOriginalClefMensurationApp();
     }
 
     if (m_infile[startline].getDurationFromStart() > 0) {
@@ -6171,8 +6190,8 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 
 //////////////////////////////
 //
-// HumdrumInput::storeOriginalClefApp -- If there are any original clefs, create
-//   an app for them.
+// HumdrumInput::storeOriginalClefMensurationApp -- If there are any original 
+// clefs or mensuration signs, create an app for them.
 //
 // <app>
 //    <lem></lem>
@@ -6186,9 +6205,9 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 // </app>
 //
 
-void HumdrumInput::storeOriginalClefApp(void)
+void HumdrumInput::storeOriginalClefMensurationApp(void)
 {
-    if (m_oclef.empty()) {
+    if (m_oclef.empty() || m_omet.empty()) {
         return;
     }
 
@@ -6207,15 +6226,33 @@ void HumdrumInput::storeOriginalClefApp(void)
 
     StaffGrp *staffgrp = new StaffGrp;
     scoredef->AddChild(staffgrp);
+	int i, j;
 
-    for (int i = 0; i < (int)m_oclef.size(); i++) {
-        StaffDef *staffdef = new StaffDef;
-        staffgrp->AddChild(staffdef);
-        setClef(staffdef, *m_oclef[i].second);
-        staffdef->SetN(m_oclef[i].first);
-    }
+	if (m_oclef.size() > 0) {
+    	for (i = 0; i < (int)m_oclef.size(); i++) {
+        	StaffDef *staffdef = new StaffDef;
+        	staffgrp->AddChild(staffdef);
+        	setClef(staffdef, *m_oclef[i].second);
+        	staffdef->SetN(m_oclef[i].first);
+			for (j = 0; j < (int)m_omet.size(); j++) {
+				if (m_omet[j].first != m_oclef[i].first) {
+					continue;
+				}
+				setMeterSymbol(staffdef, *m_omet[j].second);
+			}
+    	}
+	} else if (m_omet.size() > 0) {
+		// No oclefs, just omets.
+    	for (i = 0; i < (int)m_oclef.size(); i++) {
+        	StaffDef *staffdef = new StaffDef;
+        	staffgrp->AddChild(staffdef);
+			setMeterSymbol(staffdef, *m_omet[i].second);
+        	staffdef->SetN(m_omet[i].first);
+    	}
+	}
 
     m_oclef.clear();
+    m_omet.clear();
 }
 
 //////////////////////////////

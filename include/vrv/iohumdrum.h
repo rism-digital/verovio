@@ -301,7 +301,7 @@ protected:
     hum::HTp getDecrescendoEnd(hum::HTp token);
     hum::HTp getCrescendoEnd(hum::HTp token);
     int getMeasureDifference(hum::HTp starttok, hum::HTp endtok);
-    void storeOriginalClefApp(void);
+    void storeOriginalClefMensurationApp(void);
     void addSpace(std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HumNum duration);
     void setLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
     void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
@@ -445,6 +445,9 @@ private:
 
     // m_oclef == temporary variable for printing "original-clef" <app>
     std::vector<std::pair<int, hum::HTp> > m_oclef;
+
+    // m_omet == temporary variable for printing "original-mensuration" <app>
+    std::vector<std::pair<int, hum::HTp> > m_omet;
 
     // m_staffstates == state variables for each staff.
     std::vector<humaux::StaffStateVariables> m_staffstates;
