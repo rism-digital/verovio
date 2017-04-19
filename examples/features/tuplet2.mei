@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Placement of tuplet brackets</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-20</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio allows to chose whether tuplet brackets should be shown above or below the staff.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000020885215">
+                        <staffGrp xml:id="m-000000023194415">
+                            <staffDef xml:id="staffdef-000000060262739" clef.shape="G" clef.line="2" meter.count="2" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-000000082573170" n="1" right="end">
+                            <staff xml:id="staff-000000182376662" n="1">
+                                <!-- kern: =1-  4cc  12ddL  12ccJ  12b  == -->
+                                <layer xml:id="layer-000000101160635" n="1">
+                                    <note xml:id="note-000000044002560" dur="4" oct="5" pname="c" accid.ges="n">
+                                    </note>
+                                    <tuplet xml:id="tuplet-000000150376651" num="3" numbase="2" bracket.place="above" bracket.visible="true" num.format="count">
+                                        <beam xml:id="beam-000000006872564">
+                                            <note xml:id="note-000000187312984" dur="8" oct="5" pname="d" accid.ges="n">
+                                            </note>
+                                            <note xml:id="note-000000192189158" dur="8" oct="5" pname="c" accid.ges="n">
+                                            </note>
+                                        </beam>
+                                        <note xml:id="note-000000197593688" dur="8" oct="4" pname="b" accid.ges="n">
+                                        </note>
+                                    </tuplet>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
