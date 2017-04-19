@@ -292,7 +292,7 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bo
         if (!glyph) {
             continue;
         }
-        glyph->GetBoundingBox(&g_x, &g_y, &g_w, &g_h);
+        glyph->GetBoundingBox(g_x, g_y, g_w, g_h);
 
         int x_off = x + g_x * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
         // because we are in the drawing context, y position is already flipped

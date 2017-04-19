@@ -911,7 +911,7 @@ int StaffAlignment::CalcStaffOverlap(FunctorParams *functorParams)
                 int overflowAbove = this->CalcOverflowAbove(*i);
                 int spacing = std::max(params->m_previous->m_overflowBelow, this->m_overflowAbove);
                 if (spacing < (overflowBelow + overflowAbove)) {
-                    // LogDebug("Overlap %d", (overflowBelow + overflowAbove) - spacing);
+                    //LogDebug("Overlap %d", (overflowBelow + overflowAbove) - spacing);
                     this->SetOverlap((overflowBelow + overflowAbove) - spacing);
                 }
                 i++;
@@ -1300,26 +1300,26 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
         if (m_accidSpace.at(i)->GetDrawingOctaveAccid() != NULL) {
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i)->GetDrawingOctaveAccid(), params->m_doc, staffSize);
-            int minXRel = std::min(
-                m_accidSpace.at(i)->GetDrawingXRel(), m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingXRel());
-            m_accidSpace.at(i)->SetDrawingXRel(minXRel);
-            m_accidSpace.at(i)->GetDrawingOctaveAccid()->SetDrawingXRel(minXRel);
+            int dist = m_accidSpace.at(i)->GetDrawingX() - m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingX();
+            if (dist > 0) m_accidSpace.at(i)->SetDrawingXRel(m_accidSpace.at(i)->GetDrawingXRel() - dist);
+            else if (dist < 0) m_accidSpace.at(i)->GetDrawingOctaveAccid()->SetDrawingXRel(m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingXRel() + dist);
         }
     }
 
     int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
     // Zig-zag processing
     for (i = 0, j = count - 1; i < middle; i++, j--) {
+        // top one - but skip octaves
+        if (!m_accidSpace.at(j)->GetDrawingOctaveAccid() && !m_accidSpace.at(j)->GetDrawingOctave())
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize);
+
+        // Break with odd number of elements once the middle is reached
+        if (i == j) break;
+        
         // bottom one - but skip octaves
         if (!m_accidSpace.at(i)->GetDrawingOctaveAccid() && !m_accidSpace.at(i)->GetDrawingOctave())
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
 
-        // Break with odd number of elements once the middle is reached
-        if (i == j) break;
-
-        // top one - but skip octaves
-        if (!m_accidSpace.at(j)->GetDrawingOctaveAccid() && !m_accidSpace.at(j)->GetDrawingOctave())
-            this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize);
     }
 
     return FUNCTOR_SIBLINGS;

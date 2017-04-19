@@ -355,7 +355,7 @@ bool BoundingBox::GetGlyph2PointRectangles(
     assert(fontPoint2);
     Point p1, p2;
     int x, y, w, h;
-    glyph->GetBoundingBox(&x, &y, &w, &h);
+    glyph->GetBoundingBox(x, y, w, h);
 
     int selfLeft = this->GetSelfLeft();
     int selfRight = this->GetSelfRight();
@@ -441,7 +441,7 @@ bool BoundingBox::GetGlyph1PointRectangles(
     assert(fontPoint);
     Point p;
     int x, y, w, h;
-    glyph->GetBoundingBox(&x, &y, &w, &h);
+    glyph->GetBoundingBox(x, y, w, h);
 
     int selfLeft = this->GetSelfLeft();
     int selfRight = this->GetSelfRight();
@@ -662,12 +662,18 @@ int BoundingBox::Intersects(FloatingPositioner *curve, int margin) const
 // Static methods for BoundingBox
 //----------------------------------------------------------------------------
 
-void BoundingBox::SwapPoints(Point *x1, Point *x2)
+void BoundingBox::SwapPoints(Point &p1, Point &p2)
 {
-    Point a;
-    a = *x1;
-    *x1 = *x2;
-    *x2 = a;
+    Point tmp = p1;
+    p1 = p2;
+    p2 = tmp;
+}
+    
+void BoundingBox::Swap(int &v1, int &v2)
+{
+    int tmp = v1;
+    v1 = v2;
+    v2 = tmp;
 }
 
 Point BoundingBox::CalcPositionAfterRotation(Point point, float rot_alpha, Point center)

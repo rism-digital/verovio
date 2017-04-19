@@ -266,7 +266,7 @@ bool Chord::HasCrossStaff()
 
     this->GetCrossStaffExtremes(staffAbove, staffBelow);
 
-    return (staffAbove != staffBelow);
+    return ((staffAbove != NULL) || (staffBelow != NULL));
 }
 
 Point Chord::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
