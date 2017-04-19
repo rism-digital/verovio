@@ -1064,6 +1064,8 @@ int StaffAlignment::SetAligmentYPos(FunctorParams *functorParams)
 {
     SetAligmentYPosParams *params = dynamic_cast<SetAligmentYPosParams *>(functorParams);
     assert(params);
+    
+    //this->SetYRel(0);
 
     int maxOverlfowAbove;
     if (params->m_previousVerseCount > 0) {

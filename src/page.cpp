@@ -112,17 +112,19 @@ void Page::LayOutHorizontally()
     Functor alignVertically(&Object::AlignVertically);
     this->Process(&alignVertically, &alignVerticallyParams);
 
+    /*
     // Set the Y position of each StaffAlignment
     // Adjust the Y shift to make sure there is a minimal space (staffMargin) between each staff
-    Functor setAlignmentY(&Object::SetAligmentYPos);
+    Functor setAlignmentPosY(&Object::SetAligmentYPos);
     SetAligmentYPosParams setAligmentYPosParams(doc, &setAlignmentY);
-    this->Process(&setAlignmentY, &setAligmentYPosParams);
+    this->Process(&setAlignmentPosY, &setAligmentYPosParams);
 
     // Integrate the Y shift of the staves
     // Once the m_yShift have been calculated, move all positions accordingly
     Functor integrateBoundingBoxYShift(&Object::IntegrateBoundingBoxYShift);
     IntegrateBoundingBoxYShiftParams integrateBoundingBoxYShiftParams(&integrateBoundingBoxYShift);
     this->Process(&integrateBoundingBoxYShift, &integrateBoundingBoxYShiftParams);
+    */
 
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
