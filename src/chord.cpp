@@ -265,6 +265,10 @@ void Chord::GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignm
     assert(element);
     assert(alignment);
 
+    // Only flags and stems need to be skipped
+    if (!element->Is({ FLAG, STEM })) return;
+
+    // Nothing to do if there is not cross-staff
     if (!this->HasCrossStaff()) return;
 
     Staff *staff = alignment->GetStaff();
