@@ -20,7 +20,12 @@ namespace vrv {
 /**
  * This class models the MEI <rend>
  */
-class Rend : public TextElement, public AttColor, public AttHorizontalalign, public AttLang, public AttTypography {
+class Rend : public TextElement,
+             public AttColor,
+             public AttHorizontalalign,
+             public AttLang,
+             public AttTypography,
+             public AttWhitespace {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
