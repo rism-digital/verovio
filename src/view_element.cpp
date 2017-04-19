@@ -1139,14 +1139,9 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
     }
 
-    /************** Accidentals/dots/peripherals: **************/
+    /************** dots/peripherals: **************/
 
     if (!inChord) {
-        Accid *accid = note->GetDrawingAccid();
-        if (accid && (accid->GetFunc() == accidLog_FUNC_edit)) {
-            accid->SetDrawingXRel(noteXShift);
-        }
-
         if (note->GetDots()) {
             int xDot;
             if (note->GetActualDur() < DUR_2
