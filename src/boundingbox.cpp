@@ -668,7 +668,7 @@ void BoundingBox::SwapPoints(Point &p1, Point &p2)
     p1 = p2;
     p2 = tmp;
 }
-    
+
 void BoundingBox::Swap(int &v1, int &v2)
 {
     int tmp = v1;

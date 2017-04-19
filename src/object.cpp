@@ -1125,10 +1125,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    LayerElement *current = dynamic_cast<LayerElement *>(this);
-    assert(current);
-
-    if (!current->HasUpdatedBB()) {
+    if (!this->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
         // assert(false); // quite drastic but this should never happen. If nothing has to be drawn
         // LogDebug("Un-updated bounding box for '%s' '%s'", current->GetClassName().c_str(),
@@ -1137,17 +1134,27 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    LayerElement *current = dynamic_cast<LayerElement *>(this);
+    assert(current);
+
+    bool skipAbove = false;
+    bool skipBelow = false;
+    Chord *chord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+    if (chord) {
+        chord->GetCrossStaffOverflows(current, params->m_staffAlignment, skipAbove, skipBelow);
+    }
+
     int staffSize = params->m_staffAlignment->GetStaffSize();
 
     int overflowAbove = params->m_staffAlignment->CalcOverflowAbove(current);
-    if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+    if (!skipAbove && (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2)) {
         // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
         params->m_staffAlignment->SetOverflowAbove(overflowAbove);
         params->m_staffAlignment->AddBBoxAbove(current);
     }
 
     int overflowBelow = params->m_staffAlignment->CalcOverflowBelow(current);
-    if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+    if (!skipBelow && (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2)) {
         // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
         params->m_staffAlignment->SetOverflowBelow(overflowBelow);
         params->m_staffAlignment->AddBBoxBelow(current);

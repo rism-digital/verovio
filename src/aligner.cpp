@@ -911,7 +911,7 @@ int StaffAlignment::CalcStaffOverlap(FunctorParams *functorParams)
                 int overflowAbove = this->CalcOverflowAbove(*i);
                 int spacing = std::max(params->m_previous->m_overflowBelow, this->m_overflowAbove);
                 if (spacing < (overflowBelow + overflowAbove)) {
-                    //LogDebug("Overlap %d", (overflowBelow + overflowAbove) - spacing);
+                    // LogDebug("Overlap %d", (overflowBelow + overflowAbove) - spacing);
                     this->SetOverlap((overflowBelow + overflowAbove) - spacing);
                 }
                 i++;
@@ -1301,8 +1301,11 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i)->GetDrawingOctaveAccid(), params->m_doc, staffSize);
             int dist = m_accidSpace.at(i)->GetDrawingX() - m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingX();
-            if (dist > 0) m_accidSpace.at(i)->SetDrawingXRel(m_accidSpace.at(i)->GetDrawingXRel() - dist);
-            else if (dist < 0) m_accidSpace.at(i)->GetDrawingOctaveAccid()->SetDrawingXRel(m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingXRel() + dist);
+            if (dist > 0)
+                m_accidSpace.at(i)->SetDrawingXRel(m_accidSpace.at(i)->GetDrawingXRel() - dist);
+            else if (dist < 0)
+                m_accidSpace.at(i)->GetDrawingOctaveAccid()->SetDrawingXRel(
+                    m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingXRel() + dist);
         }
     }
 
@@ -1315,11 +1318,10 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
 
         // Break with odd number of elements once the middle is reached
         if (i == j) break;
-        
+
         // bottom one - but skip octaves
         if (!m_accidSpace.at(i)->GetDrawingOctaveAccid() && !m_accidSpace.at(i)->GetDrawingOctave())
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
-
     }
 
     return FUNCTOR_SIBLINGS;

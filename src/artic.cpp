@@ -268,7 +268,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
 
     LayerElement *parent = NULL;
     Note *parentNote = NULL;
-    Chord *parentChord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD));
+    Chord *parentChord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, 2));
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     data_STAFFREL place = STAFFREL_NONE;
     bool drawingCueSize = false;

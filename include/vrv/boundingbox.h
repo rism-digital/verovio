@@ -149,7 +149,7 @@ public:
      * This is useful for example when switching to the device context world.
      */
     static void Swap(int &v1, int &v2);
-    
+
     /**
      * Swap the points passed as reference.
      * This is useful for example when calculating bezier positions.

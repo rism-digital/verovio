@@ -15,8 +15,7 @@
 
 namespace vrv {
 
-#define ledgermin(a, b) (((a) < (b)) ? (a) : (b))
-#define ledgermax(a, b) (((a) > (b)) ? (a) : (b))
+class StaffAlignment;
 
 //----------------------------------------------------------------------------
 // Chord
@@ -89,6 +88,11 @@ public:
      * Return the cross staff above or below (if  any).
      */
     void GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow);
+
+    /**
+     *
+     */
+    void GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignment, bool &skipAbove, bool &skipBelow);
 
     /**
      * Return true if the chord has some cross staff notes.
