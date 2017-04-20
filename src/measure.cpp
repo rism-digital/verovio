@@ -372,7 +372,9 @@ int Measure::AlignHorizontally(FunctorParams *functorParams)
     params->m_measureAligner = &m_measureAligner;
 
     m_leftBarLine.SetAlignment(m_measureAligner.GetLeftBarLineAlignment());
+    m_measureAligner.GetLeftBarLineAlignment()->AddLayerElementRef(&m_leftBarLine);
     m_rightBarLine.SetAlignment(m_measureAligner.GetRightBarLineAlignment());
+    m_measureAligner.GetRightBarLineAlignment()->AddLayerElementRef(&m_rightBarLine);
 
     assert(params->m_measureAligner);
 

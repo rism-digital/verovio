@@ -57,6 +57,9 @@ enum AlignmentType {
     ALIGNMENT_MEASURE_END
 };
 
+#define BARLINE_REFERENCES -1
+#define TSTAMP_REFERENCES -2
+
 //----------------------------------------------------------------------------
 // SystemAligner
 //----------------------------------------------------------------------------

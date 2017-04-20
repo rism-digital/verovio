@@ -667,10 +667,10 @@ void Alignment::AddLayerElementRef(LayerElement *element)
     int layerN = 0;
 
     // -1 will be used for barlines attributes
-    int staffN = -1;
+    int staffN = BARLINE_REFERENCES;
     // -2 will be used for timestamps
     if (element->Is(TIMESTAMP_ATTR))
-        staffN = -2;
+        staffN = TSTAMP_REFERENCES;
     else {
         Layer *layerRef = NULL;
         Staff *staffRef = element->GetCrossStaff(layerRef);
@@ -1133,7 +1133,8 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
         std::vector<AttComparison *> filters;
         for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
 
-            int graceMaxPos = this->GetXRel();
+            // Rescue value, used at the end of a measure without a barline
+            int graceMaxPos = this->GetXRel() - params->m_doc->GetDrawingUnit(100);
             // If we have a rightDefault, then this is (quite likely) the next note / chord
             // Get its minimum left and make it the max right position of the grace group
             if (params->m_rightDefaultAlignment) {
@@ -1143,9 +1144,15 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
                     graceMaxPos = minLeft
                         - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75) / PARAM_DENOMINATOR;
             }
+            // This happens when grace notes are at the end of a measure before a barline
             else {
-                // This happens when grace notes are at the end of a measure before a barline
-                graceMaxPos -= params->m_doc->GetDrawingUnit(100);
+                int minLeft, maxRight;
+                assert(measureAligner->GetRightBarLineAlignment());
+                // staffN -1 is barline
+                measureAligner->GetRightBarLineAlignment()->GetLeftRight(BARLINE_REFERENCES, minLeft, maxRight);
+                if (minLeft != -VRV_UNSET)
+                    graceMaxPos = minLeft
+                        - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75) / PARAM_DENOMINATOR;
             }
 
             params->m_graceMaxPos = graceMaxPos;
