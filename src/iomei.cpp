@@ -1005,6 +1005,7 @@ void MeiOutput::WriteMeiBTrem(pugi::xml_node currentNode, BTrem *bTrem)
     assert(bTrem);
 
     WriteLayerElement(currentNode, bTrem);
+    bTrem->WriteTremmeasured(currentNode);
 }
 
 void MeiOutput::WriteMeiChord(pugi::xml_node currentNode, Chord *chord)
@@ -1054,6 +1055,7 @@ void MeiOutput::WriteMeiFTrem(pugi::xml_node currentNode, FTrem *fTrem)
 
     WriteLayerElement(currentNode, fTrem);
     fTrem->WriteSlashcount(currentNode);
+    fTrem->WriteTremmeasured(currentNode);
 }
 
 void MeiOutput::WriteMeiKeySig(pugi::xml_node currentNode, KeySig *keySig)
@@ -1220,6 +1222,7 @@ void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
     rend->WriteCommon(currentNode);
     rend->WriteLang(currentNode);
     rend->WriteTypography(currentNode);
+    rend->WriteWhitespace(currentNode);
 }
 
 void MeiOutput::WriteMeiText(pugi::xml_node element, Text *text)
@@ -2737,6 +2740,8 @@ bool MeiInput::ReadMeiBTrem(Object *parent, pugi::xml_node bTrem)
     BTrem *vrvBTrem = new BTrem();
     ReadLayerElement(bTrem, vrvBTrem);
 
+    vrvBTrem->ReadTremmeasured(bTrem);
+
     parent->AddChild(vrvBTrem);
     return ReadMeiLayerChildren(vrvBTrem, bTrem, vrvBTrem);
 }
@@ -2809,6 +2814,7 @@ bool MeiInput::ReadMeiFTrem(Object *parent, pugi::xml_node fTrem)
     ReadLayerElement(fTrem, vrvFTrem);
 
     vrvFTrem->ReadSlashcount(fTrem);
+    vrvFTrem->ReadTremmeasured(fTrem);
 
     parent->AddChild(vrvFTrem);
     return ReadMeiLayerChildren(vrvFTrem, fTrem, vrvFTrem);
@@ -3099,6 +3105,7 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
     vrvRend->ReadHorizontalalign(rend);
     vrvRend->ReadLang(rend);
     vrvRend->ReadTypography(rend);
+    vrvRend->ReadWhitespace(rend);
 
     parent->AddChild(vrvRend);
     return ReadMeiTextChildren(vrvRend, rend);

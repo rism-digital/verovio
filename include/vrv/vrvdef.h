@@ -192,6 +192,7 @@ class BeamElementCoord;
 class BoundingBox;
 class FloatingPositioner;
 class LayerElement;
+class LedgerLine;
 class Note;
 class Object;
 class Point;
@@ -211,8 +212,6 @@ typedef std::vector<std::tuple<Alignment *, Alignment *, int> > ArrayOfAdjustmen
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
-typedef std::map<Staff *, std::vector<char> > MapOfLedgerLineFlags;
-
 typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
 
 typedef std::vector<std::pair<Object *, data_MEASUREBEAT> > ArrayOfObjectBeatPairs;
@@ -224,6 +223,8 @@ typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfSpannin
 typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
 
 typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
+
+typedef std::vector<LedgerLine> ArrayOfLedgerLines;
 
 //----------------------------------------------------------------------------
 // Global defines
@@ -254,7 +255,7 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 /** Define the maximum levels between a beam and its notes **/
 #define MAX_BEAM_DEPTH -1
 
-/** Define the maximum levels between a beam and its notes **/
+/** Define the maximum levels between a chord and its children **/
 #define MAX_CHORD_DEPTH -1
 
 /** Define the maximum levels between a fTrem and its notes **/
@@ -348,24 +349,6 @@ enum ArticPartType { ARTIC_PART_INSIDE = 0, ARTIC_PART_OUTSIDE };
 //----------------------------------------------------------------------------
 
 #define OCTAVE_OFFSET 4
-
-// The next four macros were tuned using the Leipzig font.
-
-// Width (in half-drawing units) of an accidental; used to prevent overlap on complex chords
-#define ACCID_WIDTH 4
-
-// Height
-#define ACCID_HEIGHT 12
-
-// Only keeps track of this much of the top of flats so that their bottom can be drawn more concisely
-// This can also be thought of as height(sharp)*F_B_H_M = height(flat)
-#define FLAT_BOTTOM_HEIGHT_MULTIPLIER .75
-
-// Ignores this much of the top/right of an accid for same purposes (empty space in top right of drawing)
-#define FLAT_CORNER_HEIGHT_IGNORE .25
-#define FLAT_CORNER_WIDTH_IGNORE .5
-#define NATURAL_CORNER_HEIGHT_IGNORE .25
-#define NATURAL_CORNER_WIDTH_IGNORE .5
 
 // in half staff spaces (but should be 6 in two-voice notation)
 #define STANDARD_STEMLENGTH 7

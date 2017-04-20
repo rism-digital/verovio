@@ -98,12 +98,12 @@ void Glyph::SetBoundingBox(double x, double y, double w, double h)
     m_height = (int)(10.0 * h);
 }
 
-void Glyph::GetBoundingBox(int *x, int *y, int *w, int *h)
+void Glyph::GetBoundingBox(int &x, int &y, int &w, int &h)
 {
-    (*x) = m_x;
-    (*y) = m_y;
-    (*w) = m_width;
-    (*h) = m_height;
+    x = m_x;
+    y = m_y;
+    w = m_width;
+    h = m_height;
 }
 
 void Glyph::SetAnchor(std::string anchorStr, double x, double y)

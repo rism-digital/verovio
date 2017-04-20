@@ -451,7 +451,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     int penWidth = m_doc->GetDrawingStemWidth(100);
     y1 -= penWidth;
     y2 += penWidth;
-    BoundingBox::SwapY(&y1, &y2);
+    BoundingBox::Swap(y1, y2);
 
     int ymed, xdec, fact;
 
@@ -764,6 +764,19 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     DrawStaffDef(dc, staff, measure);
 
+    if (staff->GetLedgerLinesAbove()) {
+        DrawLedgerLines(dc, staff, staff->GetLedgerLinesAbove(), false, false);
+    }
+    if (staff->GetLedgerLinesBelow()) {
+        DrawLedgerLines(dc, staff, staff->GetLedgerLinesBelow(), true, false);
+    }
+    if (staff->GetLedgerLinesAboveCue()) {
+        DrawLedgerLines(dc, staff, staff->GetLedgerLinesAboveCue(), false, true);
+    }
+    if (staff->GetLedgerLinesBelowCue()) {
+        DrawLedgerLines(dc, staff, staff->GetLedgerLinesBelowCue(), true, true);
+    }
+
     DrawStaffChildren(dc, staff, staff, measure);
 
     DrawStaffDefCautionary(dc, staff, measure);
@@ -783,35 +796,76 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     assert(measure);
     assert(system);
 
-    int j, x1, x2, yy;
+    int j, x1, x2, y;
 
-    yy = staff->GetDrawingY();
-
-    // x1 = system->m_systemLeftMar;
-    // x2 = m_doc->m_drawingPageWidth - m_doc->m_drawingPageLeftMar - m_doc->m_drawingPageRightMar -
-    // system->m_systemRightMar;
+    y = staff->GetDrawingY();
 
     x1 = measure->GetDrawingX();
     x2 = x1 + measure->GetWidth();
 
-    // dc->SetPen(m_currentColour, ToDeviceContextX(m_doc->m_style->m_staffLineWidth), AxSOLID);
-    int lineWidth = (int)(m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize));
-    if (true) lineWidth = lineWidth * MENSURAL_LINEWIDTH_FACTOR; // ??DON'T DO IF NOT MENSURAL NOTATION!
+    int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
     dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
-    // dc->SetPen(m_currentColour, ToDeviceContextX(m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize)),
-    // AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     for (j = 0; j < staff->m_drawingLines; j++) {
-        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(yy), ToDeviceContextX(x2), ToDeviceContextY(yy));
+        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
         // For drawing rectangles instead of lines
-        yy -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     }
-
-    staff->m_drawingHeight = staff->GetDrawingY() - yy;
 
     dc->ResetPen();
     dc->ResetBrush();
+
+    return;
+}
+
+void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *lines, bool below, bool cueSize)
+{
+    assert(dc);
+    assert(staff);
+    assert(lines);
+
+    std::string gClass = "above";
+    int y = staff->GetDrawingY();
+    int x = staff->GetDrawingX();
+    int ySpace = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
+    if (below) {
+        gClass = "below";
+        y -= ySpace * (staff->m_drawingLines - 1);
+        ySpace = -ySpace;
+    }
+    y += ySpace;
+
+    if (cueSize) {
+        gClass += " cue";
+    }
+
+    dc->StartCustomGraphic("ledgerLines", gClass);
+
+    // HARDCODED
+    int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize) * 1.75;
+    if (cueSize) lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize) * 1.25;
+
+    dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
+    dc->SetBrush(m_currentColour, AxSOLID);
+
+    ArrayOfLedgerLines::iterator iter;
+    std::list<std::pair<short, short> >::iterator iterDashes;
+
+    // First add the dash
+    for (iter = lines->begin(); iter != lines->end(); iter++) {
+        for (iterDashes = (*iter).m_dashes.begin(); iterDashes != (*iter).m_dashes.end(); iterDashes++) {
+            dc->DrawLine(ToDeviceContextX(x + iterDashes->first), ToDeviceContextY(y),
+                ToDeviceContextX(x + iterDashes->second), ToDeviceContextY(y));
+        }
+        y += ySpace;
+    }
+
+    dc->ResetPen();
+    dc->ResetBrush();
+
+    dc->EndCustomGraphic();
 
     return;
 }

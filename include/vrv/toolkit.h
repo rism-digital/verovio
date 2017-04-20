@@ -149,6 +149,13 @@ public:
     void RedoLayout();
 
     /**
+     * Redo the layout of the pitch postitions of the current drawing page.
+     * Only the note vertical positions are recalculated with this method.
+     * RedoLayout() needs to be called for a full recalculation.
+     */
+    void RedoPagePitchPosLayout();
+
+    /**
      * Return the page on which the element is the ID (xml:id) is rendered.
      * This takes into account the current layout options.
      * Returns 0 if no element is found.

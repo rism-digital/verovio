@@ -57,7 +57,7 @@ void View::DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, in
 {
     assert(dc); // DC cannot be NULL
 
-    BoundingBox::SwapY(&y1, &y2);
+    BoundingBox::Swap(y1, y2);
 
     // dc->SetPen(m_currentColour, 0, AxSOLID );
     // dc->SetBrush(AxWHITE, AxTRANSPARENT);
@@ -77,7 +77,7 @@ void View::DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2
 {
     assert(dc);
 
-    BoundingBox::SwapY(&y1, &y2);
+    BoundingBox::Swap(y1, y2);
 
     dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
@@ -158,7 +158,7 @@ void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize)
     dc->ResetBrush();
 }
 
-void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin)
+void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph)
 {
     assert(dc);
 
@@ -171,7 +171,7 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staf
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
 
-    dc->DrawMusicText(str, ToDeviceContextX(x), ToDeviceContextY(y));
+    dc->DrawMusicText(str, ToDeviceContextX(x), ToDeviceContextY(y), setBBGlyph);
 
     dc->ResetFont();
     dc->ResetBrush();
@@ -179,7 +179,8 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staf
     return;
 }
 
-void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize, bool dimin)
+void View::DrawSmuflString(
+    DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize, bool dimin, bool setBBGlyph)
 {
     assert(dc);
 
@@ -194,7 +195,7 @@ void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool
         xDC -= extend.m_width / 2;
     }
 
-    dc->DrawMusicText(s, xDC, ToDeviceContextY(y));
+    dc->DrawMusicText(s, xDC, ToDeviceContextY(y), setBBGlyph);
 
     dc->ResetFont();
     dc->ResetBrush();

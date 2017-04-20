@@ -310,6 +310,17 @@ Object *Object::DetachChild(int idx)
     return child;
 }
 
+bool Object::HasChild(Object *child) const
+{
+    ArrayOfObjects::const_iterator iter;
+
+    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+        if ((child == (*iter)) || (*iter)->HasChild(child)) return true;
+    }
+
+    return false;
+}
+
 Object *Object::Relinquish(int idx)
 {
     if (idx >= (int)m_children.size()) {
@@ -1114,10 +1125,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    LayerElement *current = dynamic_cast<LayerElement *>(this);
-    assert(current);
-
-    if (!current->HasUpdatedBB()) {
+    if (!this->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
         // assert(false); // quite drastic but this should never happen. If nothing has to be drawn
         // LogDebug("Un-updated bounding box for '%s' '%s'", current->GetClassName().c_str(),
@@ -1126,20 +1134,38 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    int staffSize = params->m_staffAlignment->GetStaffSize();
+    LayerElement *current = dynamic_cast<LayerElement *>(this);
+    assert(current);
 
-    int overflowAbove = params->m_staffAlignment->CalcOverflowAbove(current);
-    if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-        // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
-        params->m_staffAlignment->SetOverflowAbove(overflowAbove);
-        params->m_staffAlignment->AddBBoxAbove(current);
+    bool skipAbove = false;
+    bool skipBelow = false;
+    Chord *chord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+    if (chord) {
+        chord->GetCrossStaffOverflows(current, params->m_staffAlignment, skipAbove, skipBelow);
     }
 
-    int overflowBelow = params->m_staffAlignment->CalcOverflowBelow(current);
-    if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+    StaffAlignment *alignment = params->m_staffAlignment;
+    Layer *crossLayer = NULL;
+    Staff *crossStaff = current->GetCrossStaff(crossLayer);
+    if (crossStaff) {
+        alignment = crossStaff->GetAlignment();
+        assert(alignment);
+    }
+
+    int staffSize = alignment->GetStaffSize();
+
+    int overflowAbove = alignment->CalcOverflowAbove(current);
+    if (!skipAbove && (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2)) {
+        // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
+        alignment->SetOverflowAbove(overflowAbove);
+        alignment->AddBBoxAbove(current);
+    }
+
+    int overflowBelow = alignment->CalcOverflowBelow(current);
+    if (!skipBelow && (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2)) {
         // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
-        params->m_staffAlignment->SetOverflowBelow(overflowBelow);
-        params->m_staffAlignment->AddBBoxBelow(current);
+        alignment->SetOverflowBelow(overflowBelow);
+        alignment->AddBBoxBelow(current);
     }
 
     // do not go further down the tree in this case since the bounding box of the first element is already taken

@@ -48,6 +48,9 @@ verovio.vrvToolkit.loadData = Module.cwrap('vrvToolkit_loadData', 'number', ['nu
 // void redoLayout(Toolkit *ic)
 verovio.vrvToolkit.redoLayout = Module.cwrap('vrvToolkit_redoLayout', null, ['number']);
 
+// void redoPagePitchPosLayout(Toolkit *ic)
+verovio.vrvToolkit.redoPagePitchPosLayout = Module.cwrap('vrvToolkit_redoPagePitchPosLayout', null, ['number']);
+
 // char *renderData(Toolkit *ic, const char *data, const char *options )
 verovio.vrvToolkit.renderData = Module.cwrap('vrvToolkit_renderData', 'string', ['number', 'string', 'string']);
 
@@ -131,6 +134,10 @@ verovio.toolkit.prototype.loadData = function (data) {
 
 verovio.toolkit.prototype.redoLayout = function () {
 	verovio.vrvToolkit.redoLayout(this.ptr);
+}
+
+verovio.toolkit.prototype.redoPagePitchPosLayout = function () {
+	verovio.vrvToolkit.redoPagePitchPosLayout(this.ptr);
 }
 
 verovio.toolkit.prototype.renderData = function (data, options) {

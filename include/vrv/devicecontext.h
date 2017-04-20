@@ -103,7 +103,7 @@ public:
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle) = 0;
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius) = 0;
     virtual void DrawText(const std::string &text, const std::wstring wtext = L"") = 0;
-    virtual void DrawMusicText(const std::wstring &text, int x, int y) = 0;
+    virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false) = 0;
     virtual void DrawSpline(int n, Point points[]) = 0;
     virtual void DrawBackgroundImage(int x = 0, int y = 0) = 0;
     ///@}
@@ -151,6 +151,15 @@ public:
     ///@{
     virtual void StartGraphic(Object *object, std::string gClass, std::string gId) = 0;
     virtual void EndGraphic(Object *object, View *view) = 0;
+    ///@}
+
+    /**
+     * @name Method for starting and ending a graphic custom graphic that do not correspond to an Object
+     * For example, the method can be used for grouping shapes in <g></g> in SVG
+     */
+    ///@{
+    virtual void StartCustomGraphic(std::string name, std::string gClass = "", std::string gId = ""){};
+    virtual void EndCustomGraphic(){};
     ///@}
 
     /**

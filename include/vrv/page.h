@@ -88,6 +88,11 @@ public:
     void JustifyVertically();
 
     /**
+     * Lay out the pitch positions and stems (without redoing the entire layout)
+     */
+    void LayOutPitchPos();
+
+    /**
      * Return the height of the content by looking at the last system of the page.
      * This is used for adjusting the page height when this is the expected behaviour,
      * typically with the --adjust-page-height option in the commandline tool

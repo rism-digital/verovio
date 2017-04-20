@@ -13,9 +13,11 @@
 
 namespace vrv {
 
+class Accid;
 class AlignmentReference;
 class FloatingObject;
 class GraceAligner;
+class LedgerLine;
 class MeasureAligner;
 class Note;
 class StaffAlignment;
@@ -129,11 +131,8 @@ public:
     /**
      * @name Setter and getter for y
      */
-    void SetYRel(int yRel) { m_yRel = yRel; }
+    void SetYRel(int yRel);
     int GetYRel() const { return m_yRel; }
-
-    void SetYShift(int yShift);
-    int GetYShift() const { return m_yShift; }
 
     /**
      * @name Set and get verse count.
@@ -204,19 +203,19 @@ public:
     //----------//
 
     /**
-     * See Object::SetAligmentYPos
+     * See Object::AlignVertically
      */
-    virtual int SetAligmentYPos(FunctorParams *functorParams);
+    virtual int AlignVerticallyEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustYPos
+     */
+    virtual int AdjustYPos(FunctorParams *functorParams);
 
     /**
      * See Object::CalcStaffOverlap
      */
     virtual int CalcStaffOverlap(FunctorParams *functorParams);
-
-    /**
-     * See Object::IntegrateBoundingBoxYShift
-     */
-    virtual int IntegrateBoundingBoxYShift(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustFloatingPostioners
@@ -246,7 +245,7 @@ private:
      * Stores the position relative to the system.
      */
     int m_yRel;
-    int m_yShift;
+    // int m_yShift;
     /**
      * Stores the number of verse of the staves attached to the aligner
      */
@@ -349,6 +348,18 @@ public:
     bool HasGraceAligner() const { return (m_graceAligner != NULL); }
 
     /**
+     * Return the AlignmentReference holding the element.
+     * If staffN is provided, uses the AlignmentReference->GetN() to accelerate the search.
+     */
+    AlignmentReference *GetReferenceWithElement(LayerElement *element, int staffN = VRV_UNSET);
+
+    /**
+     * Add an accidental to the accidSpace of the AlignmentReference holding it.
+     * The Alignment has to have a AlignmentReference holding it.
+     */
+    void AddToAccidSpace(Accid *accid);
+
+    /**
      * Compute "ideal" horizontal space to allow for a given time interval, ignoring the need
      * to keep consecutive symbols from overlapping or nearly overlapping: we assume spacing
      * will be increased as necessary later to avoid that. For modern notation (CMN), ideal space
@@ -398,12 +409,17 @@ public:
     virtual int AdjustXPosEnd(FunctorParams *functorParams);
     ///@}
 
+    /**
+     * See Object::AjustAccidX
+     */
+    virtual int AdjustAccidX(FunctorParams *);
+
 private:
     /**
      * Retrieve the AlignmentReference with staffN.
      * Create and add it as child if not found.
      */
-    AlignmentReference *GetAlignmentReference(int staffN, int layerN);
+    AlignmentReference *GetAlignmentReference(int staffN);
 
 public:
     //
@@ -453,32 +469,50 @@ public:
     */
     ///@{
     AlignmentReference();
-    AlignmentReference(int staffN, int layerN);
+    AlignmentReference(int staffN);
     virtual ~AlignmentReference();
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
     ///@}
 
     /**
-     * Return the layer number in the alignment reference.
-     * For cross staff references, the layer number is negative (e.g., layer@n="2" it "-2").
-     */
-    int GetLayerN() const { return m_layerN; }
-
-    /**
      * Override the method of adding AlignmentReference children
      */
     virtual void AddChild(Object *object);
+
+    /**
+     * Add an accidental to the accidSpace of the AlignmentReference.
+     */
+    void AddToAccidSpace(Accid *accid);
+
+    /**
+     * See Object::AjustAccidX
+     */
+    void AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int staffSize);
 
     //----------//
     // Functors //
     //----------//
 
+    /**
+     * See Object::AdjustGraceXPos
+     */
+    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+
+    /**
+     * See Object::AjustAccidX
+     */
+    virtual int AdjustAccidX(FunctorParams *);
+
+private:
+    //
+public:
+    //
 private:
     /**
-     * The layer number in the alignment reference.
+     * The accid space of the AlignmentReference.
      */
-    int m_layerN;
+    std::vector<Accid *> m_accidSpace;
 };
 
 //----------------------------------------------------------------------------

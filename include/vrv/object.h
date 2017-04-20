@@ -315,6 +315,12 @@ public:
     Object *DetachChild(int idx);
 
     /**
+     * Return true if the object has the child Object as child (reference of direct).
+     * Processes in depth-first.
+     */
+    bool HasChild(Object *child) const;
+
+    /**
      * Look for a child with the specified uuid (returns NULL if not found)
      * This method is a wrapper for the Object::FindByUuid functor.
      */
@@ -557,6 +563,11 @@ public:
     virtual int CalcStem(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Set the note head flipped positions
+     */
+    virtual int CalcChordNoteHeads(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.
      * The functor is redirected from the MeasureAligner and then from the appropriate
      * alignment to the GraceAligner
@@ -571,6 +582,8 @@ public:
      * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight
      */
     virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
+
+    virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Lay out the X positions of the staff content looking at the bounding boxes.
@@ -601,7 +614,10 @@ public:
      * Align vertically the content of a page.
      * For each Staff, instanciate its StaffAlignment.
      */
+    ///@{
     virtual int AlignVertically(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AlignVerticallyEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
@@ -614,10 +630,9 @@ public:
     virtual int CalcStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Correct the Y alignment once the content of a system has been aligned and laid out
-     * See System::IntegrateBoundingBoxYShift for actual implementation
+     * Set the note head flipped positions and calc the ledger lines
      */
-    virtual int IntegrateBoundingBoxYShift(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CalcLedgerLines(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Reset the verticall alignment environment for various types for object.
@@ -627,7 +642,7 @@ public:
     /**
      * Set the position of the StaffAlignment.
      */
-    virtual int SetAligmentYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
