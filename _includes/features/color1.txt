@@ -5,9 +5,22 @@
       <note xml:id="d414233e2598" pname="f" oct="4" dur="8" stem.dir="up"/>
       <beatRpt color="purple" xml:id="d414233e2636" rend="1"/>
       <note dur="4" oct="4" pname="g" xml:id="d414233e2644"/>
-      <note dur="4" oct="4" pname="g" xml:id="d414233e2665"/>
+      <note dur="4" oct="4" pname="g" xml:id="d414233e2665">
+        <artic color="rgb(243,107,10)" artic="marc" place="below"/>
+      </note>
     </layer>
   </staff>
+  <tempo tstamp="1">
+    <rend color="hsl(0,100%,50%)">A</rend>
+    <rend color="hsl(35,100%,50%)">n</rend>
+    <rend color="hsl(70,100%,50%)">d</rend>
+    <rend color="hsl(105,100%,50%)">a</rend>
+    <rend color="hsl(140,100%,50%)">n</rend>
+    <rend color="hsl(175,100%,50%)">t</rend>
+    <rend color="hsl(210,100%,50%)">i</rend>
+    <rend color="hsl(245,100%,50%)">n</rend>
+    <rend color="hsl(280,100%,50%)">o</rend>
+  </tempo>
   <tie color="hsl(240,85%,35%)" startid="#d414233e2644" endid="#d414233e2665"/>
   <hairpin color="rgb(24,231,76)" form="cres" place="above" startid="#d414233e2598" endid="#d414233e2665"/>
 </measure>
