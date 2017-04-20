@@ -81,6 +81,9 @@ context-menus:
         if (show_xml) {
             $('#show_notation').trigger("click");
         }
+        if ( !init_overlay) {
+            vrvToolkit.redoPagePitchPosLayout();
+        }
         svg = vrvToolkit.renderPage(page, {});
         $("#svg_output").html(svg);
         //d3.select("#svg_output").select("svg").selectAll(".note").on("mousedown", select);

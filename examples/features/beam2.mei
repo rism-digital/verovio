@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Interaction grace note beams and regular beams</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-20</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio adjusts beam length, stem length and direction to avoid collisions between grace note beams and regular beams.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000096579695">
+                        <staffGrp xml:id="m-000000026589808">
+                            <staffDef xml:id="staffdef-000000003571241" clef.shape="G" clef.line="2" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-000000107063819" n="1" right="rptend">
+                            <staff xml:id="staff-000000117933418" n="1">
+                                <layer xml:id="layer-000000194306913" n="1">
+                                    <beam xml:id="beam-000000037908159">
+                                        <note xml:id="note-000000178787016" dur="8" oct="4" pname="f" accid.ges="n" />
+                                            <beam xml:id="beam-100000037908159">
+                                                <note stem.dir="up" grace="unacc" xml:id="note-100000178787016" dur="16" oct="4" pname="f" accid.ges="n" />
+                                                <note stem.dir="up" grace="unacc" xml:id="note-100000114264071" dur="16" oct="4" pname="g" accid.ges="n" />
+                                            </beam>
+                                        <note xml:id="note-000000114264071" dur="8" oct="4" pname="g" accid.ges="n" />
+                                    </beam>
+
+                                    <beam xml:id="beam-000006037908159">
+                                        <note xml:id="note-000060178787016" dur="8" oct="4" pname="f" accid.ges="n" />
+                                            <beam xml:id="beam-100060037908159">
+                                                <note stem.dir="down" grace="unacc" xml:id="note-100700178787016" dur="16" oct="4" pname="f" accid.ges="n" />
+                                                <note stem.dir="down" grace="unacc" xml:id="note-100800114264071" dur="16" oct="4" pname="g" accid.ges="n" />
+                                            </beam>
+                                        <note xml:id="note-000600114264071" dur="8" oct="4" pname="g" accid.ges="n" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

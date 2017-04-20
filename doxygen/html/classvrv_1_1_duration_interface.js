@@ -2,7 +2,7 @@ var classvrv_1_1_duration_interface =
 [
     [ "DurationInterface", "classvrv_1_1_duration_interface.html#abcb2f792eeb999beb3a5f247c812d274", null ],
     [ "~DurationInterface", "classvrv_1_1_duration_interface.html#a2010593a7681cd4a3e34c3a9098ed9aa", null ],
-    [ "GetActualDur", "classvrv_1_1_duration_interface.html#a2663805f1c369c86238729773f138047", null ],
+    [ "GetActualDur", "classvrv_1_1_duration_interface.html#a74149eeb70f90f1f6414a10720fb328a", null ],
     [ "GetInterfaceAlignmentDuration", "classvrv_1_1_duration_interface.html#ad72f9c1aa9ae69505d47d7da4698f6c6", null ],
     [ "GetInterfaceAlignmentMensuralDuration", "classvrv_1_1_duration_interface.html#a131e7317854f0bb184405e59f906ef82", null ],
     [ "GetNoteOrChordDur", "classvrv_1_1_duration_interface.html#aec84ae43f7d2b25df6e3b9f05aa4bea7", null ],
