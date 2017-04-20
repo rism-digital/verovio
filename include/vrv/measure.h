@@ -8,7 +8,7 @@
 #ifndef __VRV_MEASURE_H__
 #define __VRV_MEASURE_H__
 
-#include "aligner.h"
+#include "horizontalaligner.h"
 #include "atts_shared.h"
 #include "barline.h"
 #include "object.h"

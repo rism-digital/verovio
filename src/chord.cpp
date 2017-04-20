@@ -14,7 +14,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
+#include "verticalaligner.h"
+#include "horizontalaligner.h"
 #include "artic.h"
 #include "doc.h"
 #include "editorial.h"
