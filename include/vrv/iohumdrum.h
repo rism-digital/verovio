@@ -332,7 +332,10 @@ protected:
     void embedQstampInClass(vrv::Note *note, hum::HTp token, const std::string &tstring);
     void embedBase40PitchInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
-    bool getTypeOption(void) { return m_type; }
+    int getTypeOption(void) { return m_type; }
+    void setTypeOption(int value) { m_type = value; }
+    void setTypeOptionOn(void) { m_type = -1; }
+    void setTypeOptionOff(void) { m_type = 0; }
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
