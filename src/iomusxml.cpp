@@ -344,6 +344,7 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
     for (pugi::xpath_node_set::const_iterator it = words.begin(); it != words.end(); ++it) {
         pugi::xml_node textNode = it->node();
         std::string textStr = GetContent(textNode);
+        std::string textAlign = GetAttributeValue(textNode, "halign");
         std::string textColor = GetAttributeValue(textNode, "color");
         std::string textFont = GetAttributeValue(textNode, "font-family");
         std::string textStyle = GetAttributeValue(textNode, "font-style");
@@ -356,6 +357,7 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
             if (words.size() > 1 && !lang.empty()) {
                 rend->SetLang(lang.c_str());
             }
+            if (!textAlign.empty()) rend->SetHalign(rend->AttHorizontalalign::StrToHorizontalalignment(textAlign.c_str()));
             if (!textColor.empty()) rend->SetColor(textColor.c_str());
             if (!textFont.empty()) rend->SetFontfam(textFont.c_str());
             if (!textStyle.empty()) rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textStyle.c_str()));
