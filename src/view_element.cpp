@@ -715,7 +715,8 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         const std::list<int> *dotLocs = &iter->second;
         std::list<int>::const_iterator intIter;
         for (intIter = dotLocs->begin(); intIter != dotLocs->end(); intIter++) {
-            DrawDotsPart(dc, x, y + (*intIter) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), 1, staff);
+            DrawDotsPart(
+                dc, x, y + (*intIter) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(), staff);
         }
     }
 
@@ -1374,7 +1375,8 @@ void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Sta
     }
     for (i = 0; i < dots; i++) {
         DrawDot(dc, x, y, staff->m_drawingStaffSize);
-        x += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        // HARDCODED
+        x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
     }
 }
 

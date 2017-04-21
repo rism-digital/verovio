@@ -118,7 +118,7 @@ public:
     void SetFlippedNotehead(bool flippedNotehead) { m_flippedNotehead = flippedNotehead; }
     bool GetFlippedNotehead() const { return m_flippedNotehead; }
     ///}
-                 
+
     /**
      * Get the drawing radius of the note head taking into accound the note duration
      */
@@ -215,7 +215,7 @@ private:
      * The drawing location of the note
      */
     int m_drawingLoc;
-                 
+
     /**
      * A fling indicating if the note head is flipped
      */
