@@ -14,6 +14,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "verticalaligner.h"
+#include "horizontalaligner.h"
 #include "artic.h"
 #include "doc.h"
 #include "editorial.h"
@@ -259,14 +261,41 @@ void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow)
     }
 }
 
+void Chord::GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignment, bool &skipAbove, bool &skipBelow)
+{
+    assert(element);
+    assert(alignment);
+
+    // Only flags and stems need to be skipped
+    if (!element->Is({ FLAG, STEM })) return;
+
+    // Nothing to do if there is not cross-staff
+    if (!this->HasCrossStaff()) return;
+
+    Staff *staff = alignment->GetStaff();
+    assert(staff);
+
+    Staff *staffAbove = NULL;
+    Staff *staffBelow = NULL;
+    this->GetCrossStaffExtremes(staffAbove, staffBelow);
+    if (staffAbove && (staffAbove != staff)) {
+        skipAbove = true;
+    }
+    if (staffBelow && (staffBelow != staff)) {
+        skipBelow = true;
+    }
+}
+
 bool Chord::HasCrossStaff()
 {
+    if (m_crossStaff) return true;
+
     Staff *staffAbove = NULL;
     Staff *staffBelow = NULL;
 
     this->GetCrossStaffExtremes(staffAbove, staffBelow);
 
-    return (staffAbove != staffBelow);
+    return ((staffAbove != NULL) || (staffBelow != NULL));
 }
 
 Point Chord::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)

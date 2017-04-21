@@ -215,26 +215,27 @@ int System::AlignVertically(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::SetAligmentYPos(FunctorParams *functorParams)
+int System::AlignVerticallyEnd(FunctorParams *functorParams)
 {
-    SetAligmentYPosParams *params = dynamic_cast<SetAligmentYPosParams *>(functorParams);
+    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    params->m_previousStaffHeight = 0;
-    params->m_previousVerseCount = 0;
-    params->m_previousOverflowBelow = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+    params->m_cumulatedShift = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
 
-    m_systemAligner.Process(params->m_functor, params);
+    m_systemAligner.Process(params->m_functorEnd, params);
 
     return FUNCTOR_SIBLINGS;
 }
 
-int System::IntegrateBoundingBoxYShift(FunctorParams *functorParams)
+int System::AdjustYPos(FunctorParams *functorParams)
 {
-    IntegrateBoundingBoxYShiftParams *params = dynamic_cast<IntegrateBoundingBoxYShiftParams *>(functorParams);
+    AdjustYPosParams *params = dynamic_cast<AdjustYPosParams *>(functorParams);
     assert(params);
 
-    params->m_shift = 0;
+    params->m_previousOverflowBelow = 0;
+    params->m_previousVerseCount = 0;
+    params->m_cumulatedShift = 0;
+
     m_systemAligner.Process(params->m_functor, params);
 
     return FUNCTOR_SIBLINGS;

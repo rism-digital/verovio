@@ -252,7 +252,7 @@ void View::DrawHairpin(
     int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
 
     // We calculate points for cresc by default. Start/End have to be swapped
-    if (form == hairpinLog_FORM_dim) BoundingBox::SwapY(&startY, &endY);
+    if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);
 
     // int y1 = GetHairpinY(hairpin->GetPlace(), staff);
     int y1 = hairpin->GetDrawingY();

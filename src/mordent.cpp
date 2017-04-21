@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
+#include "horizontalaligner.h"
 
 namespace vrv {
 

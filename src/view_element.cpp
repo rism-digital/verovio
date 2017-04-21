@@ -531,9 +531,9 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
         chord->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
 
-        CalcStemParams calcDrawingStemDirParams(this->m_doc);
-        Functor calcDrawingStemDir(&Object::CalcStem);
-        chord->Process(&calcDrawingStemDir, &calcDrawingStemDirParams);
+        CalcStemParams calcStemParams(this->m_doc);
+        Functor calcStem(&Object::CalcStem);
+        chord->Process(&calcStem, &calcStemParams);
     }
 
     chord->ResetDrawingList();
@@ -1139,14 +1139,9 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
     }
 
-    /************** Accidentals/dots/peripherals: **************/
+    /************** dots/peripherals: **************/
 
     if (!inChord) {
-        Accid *accid = note->GetDrawingAccid();
-        if (accid && (accid->GetFunc() == accidLog_FUNC_edit)) {
-            accid->SetDrawingXRel(noteXShift);
-        }
-
         if (note->GetDots()) {
             int xDot;
             if (note->GetActualDur() < DUR_2

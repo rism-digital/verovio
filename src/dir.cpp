@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
+#include "verticalaligner.h"
 #include "editorial.h"
 #include "text.h"
 #include "vrv.h"

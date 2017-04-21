@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        aligner.cpp
+// Name:        horizontalaligner.cpp
 // Author:      Laurent Pugin
 // Created:     2013
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "aligner.h"
+#include "horizontalaligner.h"
 
 //----------------------------------------------------------------------------
 
@@ -28,188 +28,6 @@
 #include "vrv.h"
 
 namespace vrv {
-
-//----------------------------------------------------------------------------
-// SystemAligner
-//----------------------------------------------------------------------------
-
-SystemAligner::SystemAligner() : Object()
-{
-    Reset();
-}
-
-SystemAligner::~SystemAligner()
-{
-}
-
-void SystemAligner::Reset()
-{
-    Object::Reset();
-    m_bottomAlignment = NULL;
-    m_bottomAlignment = GetStaffAlignment(0, NULL, NULL);
-}
-
-StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff, Doc *doc)
-{
-    // The last one is always the bottomAlignment (unless if not created)
-    if (m_bottomAlignment) {
-        // remove it temporarily
-        this->m_children.pop_back();
-    }
-
-    if (idx < GetChildCount()) {
-        this->m_children.push_back(m_bottomAlignment);
-        return dynamic_cast<StaffAlignment *>(m_children.at(idx));
-    }
-    // check that we are searching for the next one (not a gap)
-    assert(idx == GetChildCount());
-    // LogDebug("Creating staff alignment");
-
-    // This is the first time we are looking for it (e.g., first staff)
-    // We create the StaffAlignment
-    StaffAlignment *alignment = new StaffAlignment();
-    alignment->SetStaff(staff, doc);
-    alignment->SetParent(this);
-    m_children.push_back(alignment);
-
-    if (m_bottomAlignment) {
-        this->m_children.push_back(m_bottomAlignment);
-    }
-
-    return alignment;
-}
-
-StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) const
-{
-    StaffAlignment *alignment = NULL;
-    int i;
-    for (i = 0; i < this->GetChildCount(); i++) {
-        alignment = dynamic_cast<StaffAlignment *>(m_children.at(i));
-        assert(alignment);
-
-        if ((alignment->GetStaff()) && (alignment->GetStaff()->GetN() == staffN)) return alignment;
-    }
-    LogDebug("Staff alignment for staff %d not found", staffN);
-    return NULL;
-}
-
-//----------------------------------------------------------------------------
-// StaffAlignment
-//----------------------------------------------------------------------------
-
-StaffAlignment::StaffAlignment() : Object()
-{
-    m_yRel = 0;
-    m_yShift = 0;
-    m_verseCount = 0;
-    m_staff = NULL;
-
-    m_overflowAbove = 0;
-    m_overflowBelow = 0;
-    m_staffHeight = 0;
-    m_overlap = 0;
-}
-
-StaffAlignment::~StaffAlignment()
-{
-    ClearPositioners();
-}
-
-void StaffAlignment::ClearPositioners()
-{
-    ArrayOfFloatingPositioners::iterator iter;
-    for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
-        delete *iter;
-    }
-    m_floatingPositioners.clear();
-}
-
-void StaffAlignment::SetStaff(Staff *staff, Doc *doc)
-{
-    m_staff = staff;
-    if (staff && doc) {
-        m_staffHeight = (staff->m_drawingLines - 1) * doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    }
-}
-
-int StaffAlignment::GetStaffSize() const
-{
-    return m_staff ? m_staff->m_drawingStaffSize : 100;
-}
-
-void StaffAlignment::SetYShift(int yShift)
-{
-    if (yShift < m_yShift) {
-        m_yShift = yShift;
-    }
-}
-
-void StaffAlignment::SetOverflowAbove(int overflowAbove)
-{
-    if (overflowAbove > m_overflowAbove) {
-        m_overflowAbove = overflowAbove;
-    }
-}
-
-void StaffAlignment::SetOverlap(int overlap)
-{
-    if (overlap > m_overlap) {
-        m_overlap = overlap;
-    }
-}
-
-void StaffAlignment::SetOverflowBelow(int overflowBottom)
-{
-    if (overflowBottom > m_overflowBelow) {
-        m_overflowBelow = overflowBottom;
-    }
-}
-
-void StaffAlignment::SetVerseCount(int verse_count)
-{
-    // if 0, then assume 1;
-    verse_count = std::max(verse_count, 1);
-    if (verse_count > m_verseCount) {
-        m_verseCount = verse_count;
-    }
-}
-
-int StaffAlignment::CalcOverflowAbove(BoundingBox *box)
-{
-    if (box->Is(FLOATING_POSITIONER)) {
-        FloatingPositioner *positioner = dynamic_cast<FloatingPositioner *>(box);
-        assert(positioner);
-        return positioner->GetContentTop();
-    }
-    return box->GetSelfTop();
-}
-
-int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
-{
-    if (box->Is(FLOATING_POSITIONER)) {
-        FloatingPositioner *positioner = dynamic_cast<FloatingPositioner *>(box);
-        assert(positioner);
-        return -(positioner->GetContentBottom() + m_staffHeight);
-    }
-    return -(box->GetSelfBottom() + m_staffHeight);
-}
-
-void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY)
-{
-    auto item = std::find_if(m_floatingPositioners.begin(), m_floatingPositioners.end(),
-        [object](FloatingPositioner *positioner) { return positioner->GetObject() == object; });
-    if (item != m_floatingPositioners.end()) {
-        // LogDebug("Found it!");
-    }
-    else {
-        FloatingPositioner *box = new FloatingPositioner(object);
-        m_floatingPositioners.push_back(box);
-        item = m_floatingPositioners.end() - 1;
-    }
-    (*item)->SetObjectXY(objectX, objectY);
-    // LogDebug("BB %d", item->second.m_contentBB_x1);
-    object->SetCurrentFloatingPositioner((*item));
-}
 
 //----------------------------------------------------------------------------
 // HorizontalAligner
@@ -668,10 +486,10 @@ void Alignment::AddLayerElementRef(LayerElement *element)
     int layerN = 0;
 
     // -1 will be used for barlines attributes
-    int staffN = -1;
+    int staffN = BARLINE_REFERENCES;
     // -2 will be used for timestamps
     if (element->Is(TIMESTAMP_ATTR))
-        staffN = -2;
+        staffN = TSTAMP_REFERENCES;
     else {
         Layer *layerRef = NULL;
         Staff *staffRef = element->GetCrossStaff(layerRef);
@@ -882,230 +700,29 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
-
-int StaffAlignment::CalcStaffOverlap(FunctorParams *functorParams)
+    
+int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
 {
-    CalcStaffOverlapParams *params = dynamic_cast<CalcStaffOverlapParams *>(functorParams);
+    SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
     assert(params);
-
-    // This is the bottom alignment (or something is wrong)
-    if (!this->m_staff) return FUNCTOR_STOP;
-
-    if (params->m_previous == NULL) {
-        params->m_previous = this;
-        return FUNCTOR_SIBLINGS;
-    }
-
-    ArrayOfBoundingBoxes::iterator iter;
-    // go through all the elements of the top staff that have an overflow below
-    for (iter = params->m_previous->m_overflowBelowBBoxes.begin();
-         iter != params->m_previous->m_overflowBelowBBoxes.end(); iter++) {
-        auto i = m_overflowAboveBBoxes.begin();
-        auto end = m_overflowAboveBBoxes.end();
-        while (i != end) {
-            // find all the elements from the bottom staff that have an overflow at the top with an horizontal overap
-            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
-            if (i != end) {
-                // calculate the vertical overlap and see if this is more than the expected space
-                int overflowBelow = params->m_previous->CalcOverflowBelow(*iter);
-                int overflowAbove = this->CalcOverflowAbove(*i);
-                int spacing = std::max(params->m_previous->m_overflowBelow, this->m_overflowAbove);
-                if (spacing < (overflowBelow + overflowAbove)) {
-                    // LogDebug("Overlap %d", (overflowBelow + overflowAbove) - spacing);
-                    this->SetOverlap((overflowBelow + overflowAbove) - spacing);
-                }
-                i++;
-            }
-        }
-    }
-
-    params->m_previous = this;
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
-{
-    AdjustFloatingPostionersParams *params = dynamic_cast<AdjustFloatingPostionersParams *>(functorParams);
-    assert(params);
-
-    int staffSize = this->GetStaffSize();
-
-    if (params->m_classId == SYL) {
-        if (this->GetVerseCount() > 0) {
-            FontInfo *lyricFont = params->m_doc->GetDrawingLyricFont(m_staff->m_drawingStaffSize);
-            int descender = params->m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
-            int height = params->m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
-            int margin
-                = params->m_doc->GetBottomMargin(SYL) * params->m_doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
-            this->SetOverflowBelow(this->m_overflowBelow + this->GetVerseCount() * (height - descender + margin));
-            // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep them
-            // and check if they are some lyrics in order to know if the overlap needs to be calculated or not.
-            m_overflowBelowBBoxes.clear();
-        }
-        return FUNCTOR_SIBLINGS;
-    }
-
-    ArrayOfFloatingPositioners::iterator iter;
-    for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
-        assert((*iter)->GetObject());
-        if (!(*iter)->GetObject()->Is(params->m_classId)) continue;
-
-        // for slurs and ties we do not need to adjust them, only add them to the overflow boxes if required
-        if ((params->m_classId == SLUR) || (params->m_classId == TIE)) {
-
-            int overflowAbove = this->CalcOverflowAbove((*iter));
-            if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-                // LogMessage("%sparams->m_doctop overflow: %d", current->GetUuid().c_str(), overflowAbove);
-                this->SetOverflowAbove(overflowAbove);
-                this->m_overflowAboveBBoxes.push_back((*iter));
-            }
-
-            int overflowBelow = this->CalcOverflowBelow((*iter));
-            if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-                // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
-                this->SetOverflowBelow(overflowBelow);
-                this->m_overflowBelowBBoxes.push_back((*iter));
-            }
-            continue;
-        }
-
-        // This sets the default position (without considering any overflowing box)
-        (*iter)->CalcDrawingYRel(params->m_doc, this, NULL);
-
-        ArrayOfBoundingBoxes *overflowBoxes = &m_overflowBelowBBoxes;
-        // above?
-        if ((*iter)->GetDrawingPlace() == STAFFREL_above) {
-            overflowBoxes = &m_overflowAboveBBoxes;
-        }
-        auto i = overflowBoxes->begin();
-        auto end = overflowBoxes->end();
-        while (i != end) {
-            // find all the overflowing elements from the staff that overlap horizonatally
-            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
-            if (i != end) {
-                // update the yRel accordingly
-                (*iter)->CalcDrawingYRel(params->m_doc, this, *i);
-                i++;
-            }
-        }
-        //  Now update the staffAlignment max overflow (above or below) and add the positioner to the list of
-        //  overflowing elements
-        if ((*iter)->GetDrawingPlace() == STAFFREL_above) {
-            int overflowAbove = this->CalcOverflowAbove((*iter));
-            overflowBoxes->push_back((*iter));
-            this->SetOverflowAbove(overflowAbove);
-        }
-        else {
-            int overflowBelow = this->CalcOverflowBelow((*iter));
-            overflowBoxes->push_back((*iter));
-            this->SetOverflowBelow(overflowBelow);
-        }
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
-{
-    AdjustFloatingPostionerGrpsParams *params = dynamic_cast<AdjustFloatingPostionerGrpsParams *>(functorParams);
-    assert(params);
-
-    ArrayOfFloatingPositioners positioners;
-    // make a temporary copy of positionners with a classId desired and that have a drawing grpId
-    std::copy_if(m_floatingPositioners.begin(), m_floatingPositioners.end(), std::back_inserter(positioners),
-        [params](FloatingPositioner *positioner) {
-            assert(positioner->GetObject());
-            // search in the desired classIds
-            return (
-                (std::find(params->m_classIds.begin(), params->m_classIds.end(), positioner->GetObject()->GetClassId())
-                    != params->m_classIds.end())
-                && (positioner->GetObject()->GetDrawingGrpId() != 0));
-        });
-
-    // A vector for storing a pair with the grpId and the min or max YRel
-    std::vector<std::pair<int, int> > grpIdYRel;
-
-    ArrayOfFloatingPositioners::iterator iter;
-    for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
-        int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
-        // Look if we already have a pair for this grpId
-        auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
-            [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
-        // if not, then just add a new pair with the YRel of the current positioner
-        if (i == grpIdYRel.end()) {
-            grpIdYRel.push_back(std::make_pair(currentGrpId, (*iter)->GetDrawingYRel()));
-        }
-        // else, adjust the min or max YRel of the pair if necessary
-        else {
-            if ((*iter)->GetDrawingPlace() == STAFFREL_above) {
-                if ((*iter)->GetDrawingYRel() < (*i).second) (*i).second = (*iter)->GetDrawingYRel();
-            }
-            else {
-                if ((*iter)->GetDrawingYRel() > (*i).second) (*i).second = (*iter)->GetDrawingYRel();
-            }
-        }
-    }
-
-    // Now go through all the positioners again and ajust the YRel with the value of the pair
-    for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
-        int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
-        auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
-            [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
-        // We must have find it
-        assert(i != grpIdYRel.end());
-        (*iter)->SetDrawingYRel((*i).second);
-    }
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int StaffAlignment::SetAligmentYPos(FunctorParams *functorParams)
-{
-    SetAligmentYPosParams *params = dynamic_cast<SetAligmentYPosParams *>(functorParams);
-    assert(params);
-
-    int maxOverlfowAbove;
-    if (params->m_previousVerseCount > 0) {
-        maxOverlfowAbove = params->m_previousOverflowBelow + m_overflowAbove;
-    }
-    else {
-        // The maximum between the overflow below of the previous staff and the overflow above of the current
-        maxOverlfowAbove = std::max(params->m_previousOverflowBelow, m_overflowAbove);
-
-        // If we have some overlap, add it
-        if (m_overlap) maxOverlfowAbove += m_overlap;
-    }
-
-    // Is the maximum the overflow (+ overlap) shift, or the default ?
-    int shift = std::max(maxOverlfowAbove, params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100));
-
-    // Add a margin
-    shift += params->m_doc->GetBottomMargin(STAFF) * params->m_doc->GetDrawingUnit(this->GetStaffSize())
-        / PARAM_DENOMINATOR;
-
-    // Shift, including the previous staff height
-    SetYShift(-shift - params->m_previousStaffHeight);
-
-    params->m_previousStaffHeight = m_staffHeight;
-    params->m_previousOverflowBelow = m_overflowBelow;
-    params->m_previousVerseCount = this->GetVerseCount();
-
+    
+    // We start a new MeasureAligner
+    // Reset the previous time position and x_rel to 0;
+    params->m_previousTime = 0.0;
+    params->m_previousXRel = 0;
+    
     return FUNCTOR_CONTINUE;
 }
 
-int StaffAlignment::IntegrateBoundingBoxYShift(FunctorParams *functorParams)
+
+int MeasureAligner::JustifyX(FunctorParams *functorParams)
 {
-    IntegrateBoundingBoxYShiftParams *params = dynamic_cast<IntegrateBoundingBoxYShiftParams *>(functorParams);
+    JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
     assert(params);
-
-    // integrates the m_yShift into the m_yRel
-    m_yRel += m_yShift + params->m_shift;
-
-    // cumulate the shift value
-    params->m_shift += m_yShift;
-    m_yShift = 0;
-
+    
+    params->m_leftBarLineX = GetLeftBarLineAlignment()->GetXRel();
+    params->m_rightBarLineX = GetRightBarLineAlignment()->GetXRel();
+    
     return FUNCTOR_CONTINUE;
 }
 
@@ -1135,7 +752,8 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
         std::vector<AttComparison *> filters;
         for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
 
-            int graceMaxPos = this->GetXRel();
+            // Rescue value, used at the end of a measure without a barline
+            int graceMaxPos = this->GetXRel() - params->m_doc->GetDrawingUnit(100);
             // If we have a rightDefault, then this is (quite likely) the next note / chord
             // Get its minimum left and make it the max right position of the grace group
             if (params->m_rightDefaultAlignment) {
@@ -1145,9 +763,15 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
                     graceMaxPos = minLeft
                         - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75) / PARAM_DENOMINATOR;
             }
+            // This happens when grace notes are at the end of a measure before a barline
             else {
-                // This happens when grace notes are at the end of a measure before a barline
-                graceMaxPos -= params->m_doc->GetDrawingUnit(100);
+                int minLeft, maxRight;
+                assert(measureAligner->GetRightBarLineAlignment());
+                // staffN -1 is barline
+                measureAligner->GetRightBarLineAlignment()->GetLeftRight(BARLINE_REFERENCES, minLeft, maxRight);
+                if (minLeft != -VRV_UNSET)
+                    graceMaxPos = minLeft
+                        - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75) / PARAM_DENOMINATOR;
             }
 
             params->m_graceMaxPos = graceMaxPos;
@@ -1241,7 +865,80 @@ int Alignment::AdjustAccidX(FunctorParams *functorParams)
     if (this->m_graceAligner) this->m_graceAligner->Process(params->m_functor, functorParams);
 
     return FUNCTOR_CONTINUE;
+}    
+
+int Alignment::HorizontalSpaceForDuration(
+                                          double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
+{
+    /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
+     that interval gets the space a semibreve would ordinarily get. */
+    if (maxActualDur < DUR_1) intervalTime /= pow(2.0, DUR_1 - maxActualDur);
+    int intervalXRel;
+    intervalXRel = pow(intervalTime, spacingNonLinear) * spacingLinear * 10.0; // numbers are experimental constants
+    return intervalXRel;
 }
+
+int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
+{
+    SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
+    assert(params);
+    
+    // Do not set an x pos for anything before the barline (including it)
+    if (this->m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
+    
+    int intervalXRel = 0;
+    double intervalTime = (m_time - params->m_previousTime);
+    
+    if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
+        intervalTime = 0.0;
+    }
+    
+    if (intervalTime > 0.0) {
+        intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
+                                                  params->m_doc->GetSpacingLinear(), params->m_doc->GetSpacingNonLinear());
+        // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
+    }
+    
+    if (m_graceAligner) {
+        m_graceAligner->SetGraceAligmentXPos(params->m_doc);
+    }
+    
+    SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);
+    params->m_previousTime = m_time;
+    params->m_previousXRel = m_xRel;
+    
+    return FUNCTOR_CONTINUE;
+}
+
+int Alignment::JustifyX(FunctorParams *functorParams)
+{
+    JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
+    assert(params);
+    
+    if (m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) {
+        // Nothing to do for all left scoreDef elements and the left barline
+    }
+    else if (m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) {
+        // All elements up to the next barline, move them but also take into account the leftBarlineX
+        SetXRel(ceil((((double)this->m_xRel - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
+                     + params->m_leftBarLineX));
+    }
+    else {
+        //  Now more the right barline and all right scoreDef elements
+        int shift = this->m_xRel - params->m_rightBarLineX;
+        this->m_xRel
+        = ceil(((double)params->m_rightBarLineX - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
+        + params->m_leftBarLineX + shift;
+    }
+    
+    // Finally, when reaching the end of the measure, update the measureXRel for the next measure
+    if (m_type == ALIGNMENT_MEASURE_END) {
+        params->m_measureXRel += this->m_xRel;
+    }
+    
+    return FUNCTOR_CONTINUE;
+}
+
 
 int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
 {
@@ -1300,125 +997,31 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
         if (m_accidSpace.at(i)->GetDrawingOctaveAccid() != NULL) {
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i)->GetDrawingOctaveAccid(), params->m_doc, staffSize);
-            int minXRel = std::min(
-                m_accidSpace.at(i)->GetDrawingXRel(), m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingXRel());
-            m_accidSpace.at(i)->SetDrawingXRel(minXRel);
-            m_accidSpace.at(i)->GetDrawingOctaveAccid()->SetDrawingXRel(minXRel);
+            int dist = m_accidSpace.at(i)->GetDrawingX() - m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingX();
+            if (dist > 0)
+                m_accidSpace.at(i)->SetDrawingXRel(m_accidSpace.at(i)->GetDrawingXRel() - dist);
+            else if (dist < 0)
+                m_accidSpace.at(i)->GetDrawingOctaveAccid()->SetDrawingXRel(
+                    m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingXRel() + dist);
         }
     }
 
     int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
     // Zig-zag processing
     for (i = 0, j = count - 1; i < middle; i++, j--) {
-        // bottom one - but skip octaves
-        if (!m_accidSpace.at(i)->GetDrawingOctaveAccid() && !m_accidSpace.at(i)->GetDrawingOctave())
-            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
+        // top one - but skip octaves
+        if (!m_accidSpace.at(j)->GetDrawingOctaveAccid() && !m_accidSpace.at(j)->GetDrawingOctave())
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize);
 
         // Break with odd number of elements once the middle is reached
         if (i == j) break;
 
-        // top one - but skip octaves
-        if (!m_accidSpace.at(j)->GetDrawingOctaveAccid() && !m_accidSpace.at(j)->GetDrawingOctave())
-            this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize);
+        // bottom one - but skip octaves
+        if (!m_accidSpace.at(i)->GetDrawingOctaveAccid() && !m_accidSpace.at(i)->GetDrawingOctave())
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
     }
 
     return FUNCTOR_SIBLINGS;
-}
-
-int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
-{
-    SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
-    assert(params);
-
-    // We start a new MeasureAligner
-    // Reset the previous time position and x_rel to 0;
-    params->m_previousTime = 0.0;
-    params->m_previousXRel = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Alignment::HorizontalSpaceForDuration(
-    double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
-{
-    /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
-       that interval gets the space a semibreve would ordinarily get. */
-    if (maxActualDur < DUR_1) intervalTime /= pow(2.0, DUR_1 - maxActualDur);
-    int intervalXRel;
-    intervalXRel = pow(intervalTime, spacingNonLinear) * spacingLinear * 10.0; // numbers are experimental constants
-    return intervalXRel;
-}
-
-int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
-{
-    SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
-    assert(params);
-
-    // Do not set an x pos for anything before the barline (including it)
-    if (this->m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
-
-    int intervalXRel = 0;
-    double intervalTime = (m_time - params->m_previousTime);
-
-    if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
-        intervalTime = 0.0;
-    }
-
-    if (intervalTime > 0.0) {
-        intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
-            params->m_doc->GetSpacingLinear(), params->m_doc->GetSpacingNonLinear());
-        // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
-    }
-
-    if (m_graceAligner) {
-        m_graceAligner->SetGraceAligmentXPos(params->m_doc);
-    }
-
-    SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);
-    params->m_previousTime = m_time;
-    params->m_previousXRel = m_xRel;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int MeasureAligner::JustifyX(FunctorParams *functorParams)
-{
-    JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
-    assert(params);
-
-    params->m_leftBarLineX = GetLeftBarLineAlignment()->GetXRel();
-    params->m_rightBarLineX = GetRightBarLineAlignment()->GetXRel();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Alignment::JustifyX(FunctorParams *functorParams)
-{
-    JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
-    assert(params);
-
-    if (m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) {
-        // Nothing to do for all left scoreDef elements and the left barline
-    }
-    else if (m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) {
-        // All elements up to the next barline, move them but also take into account the leftBarlineX
-        SetXRel(ceil((((double)this->m_xRel - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
-            + params->m_leftBarLineX));
-    }
-    else {
-        //  Now more the right barline and all right scoreDef elements
-        int shift = this->m_xRel - params->m_rightBarLineX;
-        this->m_xRel
-            = ceil(((double)params->m_rightBarLineX - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
-            + params->m_leftBarLineX + shift;
-    }
-
-    // Finally, when reaching the end of the measure, update the measureXRel for the next measure
-    if (m_type == ALIGNMENT_MEASURE_END) {
-        params->m_measureXRel += this->m_xRel;
-    }
-
-    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

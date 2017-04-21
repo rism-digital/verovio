@@ -1222,6 +1222,7 @@ void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
     rend->WriteCommon(currentNode);
     rend->WriteLang(currentNode);
     rend->WriteTypography(currentNode);
+    rend->WriteWhitespace(currentNode);
 }
 
 void MeiOutput::WriteMeiText(pugi::xml_node element, Text *text)
@@ -2539,8 +2540,11 @@ bool MeiInput::ReadMeiLayer(Object *parent, pugi::xml_node layer)
     vrvLayer->ReadCommon(layer);
     vrvLayer->ReadTyped(layer);
 
-    if (!vrvLayer->HasN() || (vrvLayer->GetN() == 0)) {
-        LogWarning("No @n on <layer> or a value of 0 might yield unpredictable results");
+    if (!vrvLayer->HasN()) {
+        LogWarning("No @n on <layer>, 1 is set");
+    }
+    else if (vrvLayer->GetN() == 0) {
+        LogWarning("Value @n='1' on <layer> might yield unpredictable results");
     }
 
     parent->AddChild(vrvLayer);
@@ -3104,6 +3108,7 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
     vrvRend->ReadHorizontalalign(rend);
     vrvRend->ReadLang(rend);
     vrvRend->ReadTypography(rend);
+    vrvRend->ReadWhitespace(rend);
 
     parent->AddChild(vrvRend);
     return ReadMeiTextChildren(vrvRend, rend);
