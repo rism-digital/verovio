@@ -614,7 +614,10 @@ public:
      * Align vertically the content of a page.
      * For each Staff, instanciate its StaffAlignment.
      */
+    ///@{
     virtual int AlignVertically(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AlignVerticallyEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
@@ -632,12 +635,6 @@ public:
     virtual int CalcLedgerLines(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Correct the Y alignment once the content of a system has been aligned and laid out
-     * See System::IntegrateBoundingBoxYShift for actual implementation
-     */
-    virtual int IntegrateBoundingBoxYShift(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Reset the verticall alignment environment for various types for object.
      */
     virtual int ResetVerticalAlignment(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -645,7 +642,7 @@ public:
     /**
      * Set the position of the StaffAlignment.
      */
-    virtual int SetAligmentYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.

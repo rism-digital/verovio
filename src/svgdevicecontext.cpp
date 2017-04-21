@@ -290,6 +290,15 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
             m_currentNode.append_attribute("font-weight")
                 = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
     }
+
+    if (object->HasAttClass(ATT_WHITESPACE)) {
+        AttWhitespace *att = dynamic_cast<AttWhitespace *>(object);
+        assert(att);
+        if (att->HasSpace()) {
+            m_currentNode.append_attribute("xml:space") = att->GetSpace().c_str();
+            ;
+        }
+    }
 }
 
 void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
@@ -693,7 +702,6 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
     }
     textChild.append_attribute("class") = "text";
-    textChild.append_attribute("xml:space") = "preserve";
     textChild.append_child(pugi::node_pcdata).set_value(svgText.c_str());
 }
 

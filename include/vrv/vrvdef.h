@@ -255,7 +255,7 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 /** Define the maximum levels between a beam and its notes **/
 #define MAX_BEAM_DEPTH -1
 
-/** Define the maximum levels between a beam and its notes **/
+/** Define the maximum levels between a chord and its children **/
 #define MAX_CHORD_DEPTH -1
 
 /** Define the maximum levels between a fTrem and its notes **/

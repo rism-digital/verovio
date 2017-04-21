@@ -40,7 +40,7 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Layer();
+    Layer(int n = 1);
     virtual ~Layer();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Layer"; }

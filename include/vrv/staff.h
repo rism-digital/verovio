@@ -39,7 +39,7 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Staff(int n = -1);
+    Staff(int n = 1);
     virtual ~Staff();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Staff"; }
