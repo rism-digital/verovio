@@ -2540,8 +2540,11 @@ bool MeiInput::ReadMeiLayer(Object *parent, pugi::xml_node layer)
     vrvLayer->ReadCommon(layer);
     vrvLayer->ReadTyped(layer);
 
-    if (!vrvLayer->HasN() || (vrvLayer->GetN() == 0)) {
-        LogWarning("No @n on <layer> or a value of 0 might yield unpredictable results");
+    if (!vrvLayer->HasN()) {
+        LogWarning("No @n on <layer>, 1 is set");
+    }
+    else if (vrvLayer->GetN() == 0) {
+        LogWarning("Value @n='1' on <layer> might yield unpredictable results");
     }
 
     parent->AddChild(vrvLayer);

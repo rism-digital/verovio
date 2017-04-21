@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
+#include "verticalaligner.h"
 #include "editorial.h"
 #include "smufl.h"
 #include "text.h"

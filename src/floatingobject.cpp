@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
+#include "verticalaligner.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"

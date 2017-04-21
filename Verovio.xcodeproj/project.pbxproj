@@ -15,11 +15,12 @@
 		40ABF1FF1E5DF23B00F32F41 /* expansion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */; };
 		40D0D5E21E3BD7FE00E6BF5C /* turn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40D0D5E01E3BD7FE00E6BF5C /* turn.cpp */; };
 		40F910081E2799740081B7BB /* trill.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40F910071E2799740081B7BB /* trill.cpp */; };
+		4D09D3ED1EA8AD8500A420E6 /* horizontalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */; };
 		4D09FAED1D78B8C40099FDFE /* atts_midi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29051940BCC100C76319 /* atts_midi.cpp */; };
 		4D1031861DECB83E0098EA1C /* atts_externalsymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */; };
 		4D1031871DECB83E0098EA1C /* atts_externalsymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */; };
 		4D1031881DECB83E0098EA1C /* atts_externalsymbols.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1031851DECB83E0098EA1C /* atts_externalsymbols.h */; };
-		4D1693F51E3A44F300569BF4 /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
+		4D1693F51E3A44F300569BF4 /* verticalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* verticalaligner.cpp */; };
 		4D1693F61E3A44F300569BF4 /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
 		4D1693F71E3A44F300569BF4 /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
 		4D1693F81E3A44F300569BF4 /* beam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBA188539540037FD8E /* beam.cpp */; };
@@ -279,7 +280,7 @@
 		4DF9D29A1C1B3F0A0069E8C8 /* attconverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2961C1B3F0A0069E8C8 /* attconverter.cpp */; };
 		4DF9D29B1C1B3F0A0069E8C8 /* attconverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2961C1B3F0A0069E8C8 /* attconverter.cpp */; };
 		4DF9D29C1C1B3F0A0069E8C8 /* attconverter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF9D2971C1B3F0A0069E8C8 /* attconverter.h */; };
-		8F086EE2188539540037FD8E /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
+		8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* verticalaligner.cpp */; };
 		8F086EE4188539540037FD8E /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
 		8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
 		8F086EE6188539540037FD8E /* beam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBA188539540037FD8E /* beam.cpp */; };
@@ -354,12 +355,12 @@
 		8F3DD36318854B390051330C /* view_graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDD188539540037FD8E /* view_graph.cpp */; };
 		8F3DD36418854B390051330C /* view_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDE188539540037FD8E /* view_page.cpp */; };
 		8F3DD36518854B390051330C /* view_tuplet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDF188539540037FD8E /* view_tuplet.cpp */; };
-		8F3DD36718854B410051330C /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
+		8F3DD36718854B410051330C /* verticalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* verticalaligner.cpp */; };
 		8F3DD36818854B410051330C /* doc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBD188539540037FD8E /* doc.cpp */; };
 		8F3DD36A18854B410051330C /* toolkit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBF188539540037FD8E /* toolkit.cpp */; };
 		8F3DD36C18854B410051330C /* object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ECD188539540037FD8E /* object.cpp */; };
 		8F3DD36E18854B410051330C /* vrv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EE1188539540037FD8E /* vrv.cpp */; };
-		8F59293418854BF800FE51AD /* aligner.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59290D18854BF800FE51AD /* aligner.h */; };
+		8F59293418854BF800FE51AD /* verticalaligner.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59290D18854BF800FE51AD /* verticalaligner.h */; };
 		8F59293618854BF800FE51AD /* barline.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59290F18854BF800FE51AD /* barline.h */; };
 		8F59293718854BF800FE51AD /* bboxdevicecontext.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291018854BF800FE51AD /* bboxdevicecontext.h */; };
 		8F59293818854BF800FE51AD /* beam.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291118854BF800FE51AD /* beam.h */; };
@@ -460,8 +461,10 @@
 		40D0D5E11E3BD7FE00E6BF5C /* turn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = turn.h; path = include/vrv/turn.h; sourceTree = "<group>"; };
 		40F910061E2799640081B7BB /* trill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = trill.h; path = include/vrv/trill.h; sourceTree = "<group>"; };
 		40F910071E2799740081B7BB /* trill.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = trill.cpp; path = src/trill.cpp; sourceTree = "<group>"; };
+		4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = horizontalaligner.cpp; path = src/horizontalaligner.cpp; sourceTree = "<group>"; };
 		4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_externalsymbols.cpp; path = libmei/atts_externalsymbols.cpp; sourceTree = "<group>"; };
 		4D1031851DECB83E0098EA1C /* atts_externalsymbols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_externalsymbols.h; path = libmei/atts_externalsymbols.h; sourceTree = "<group>"; };
+		4D14600F1EA8A913007DB90C /* horizontalaligner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = horizontalaligner.h; path = include/vrv/horizontalaligner.h; sourceTree = "<group>"; };
 		4D1694601E3A44F300569BF4 /* Verovio-Humdrum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Verovio-Humdrum"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D1BE7661C688F5A0086DC0E /* Binasc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Binasc.cpp; path = src/midi/Binasc.cpp; sourceTree = "<group>"; };
 		4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEvent.cpp; path = src/midi/MidiEvent.cpp; sourceTree = "<group>"; };
@@ -611,7 +614,7 @@
 		4DF9D2961C1B3F0A0069E8C8 /* attconverter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = attconverter.cpp; path = libmei/attconverter.cpp; sourceTree = "<group>"; };
 		4DF9D2971C1B3F0A0069E8C8 /* attconverter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attconverter.h; path = libmei/attconverter.h; sourceTree = "<group>"; };
 		8F086EA9188534680037FD8E /* Verovio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Verovio; sourceTree = BUILT_PRODUCTS_DIR; };
-		8F086EB6188539540037FD8E /* aligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = aligner.cpp; path = src/aligner.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		8F086EB6188539540037FD8E /* verticalaligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = verticalaligner.cpp; path = src/verticalaligner.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086EB8188539540037FD8E /* barline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = barline.cpp; path = src/barline.cpp; sourceTree = "<group>"; };
 		8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bboxdevicecontext.cpp; path = src/bboxdevicecontext.cpp; sourceTree = "<group>"; };
 		8F086EBA188539540037FD8E /* beam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = beam.cpp; path = src/beam.cpp; sourceTree = "<group>"; };
@@ -652,7 +655,7 @@
 		8F086EE0188539540037FD8E /* view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view.cpp; path = src/view.cpp; sourceTree = "<group>"; };
 		8F086EE1188539540037FD8E /* vrv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vrv.cpp; path = src/vrv.cpp; sourceTree = "<group>"; };
 		8F086F4D18853CA90037FD8E /* liblibverovio.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = liblibverovio.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		8F59290D18854BF800FE51AD /* aligner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = aligner.h; path = include/vrv/aligner.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		8F59290D18854BF800FE51AD /* verticalaligner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = verticalaligner.h; path = include/vrv/verticalaligner.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		8F59290F18854BF800FE51AD /* barline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = barline.h; path = include/vrv/barline.h; sourceTree = "<group>"; };
 		8F59291018854BF800FE51AD /* bboxdevicecontext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bboxdevicecontext.h; path = include/vrv/bboxdevicecontext.h; sourceTree = "<group>"; };
 		8F59291118854BF800FE51AD /* beam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = beam.h; path = include/vrv/beam.h; sourceTree = "<group>"; };
@@ -968,8 +971,6 @@
 				4DA144881C2AB24400CB7CEE /* textelements */,
 				4DC34B9E19BC33A0006175CD /* interfaces */,
 				8F086F3918853A190037FD8E /* view */,
-				8F086EB6188539540037FD8E /* aligner.cpp */,
-				8F59290D18854BF800FE51AD /* aligner.h */,
 				4D422103199805F700963292 /* att.cpp */,
 				4D4220FF199805E400963292 /* att.h */,
 				4D9234F11A586AE100763251 /* attcomparison.h */,
@@ -981,16 +982,20 @@
 				4DF28A041A754DF000BA9F7D /* floatingobject.cpp */,
 				4D95D4F41D7185DE00B2B856 /* floatingobject.h */,
 				4DF440791D3D085600152B7E /* functorparams.h */,
+				4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */,
+				4D14600F1EA8A913007DB90C /* horizontalaligner.h */,
 				8F086ECD188539540037FD8E /* object.cpp */,
 				8F59292418854BF800FE51AD /* object.h */,
-				8F086EE1188539540037FD8E /* vrv.cpp */,
-				8F59293218854BF800FE51AD /* vrv.h */,
-				8F59293318854BF800FE51AD /* vrvdef.h */,
 				4D1D733B1A1D0390001E08F6 /* smufl.h */,
 				4DA80D951A6ACF5D0089802D /* style.cpp */,
 				4DA80D941A6940120089802D /* style.h */,
 				8F086EBF188539540037FD8E /* toolkit.cpp */,
 				8F59291618854BF800FE51AD /* toolkit.h */,
+				8F086EB6188539540037FD8E /* verticalaligner.cpp */,
+				8F59290D18854BF800FE51AD /* verticalaligner.h */,
+				8F086EE1188539540037FD8E /* vrv.cpp */,
+				8F59293218854BF800FE51AD /* vrv.h */,
+				8F59293318854BF800FE51AD /* vrvdef.h */,
 			);
 			name = source;
 			sourceTree = "<group>";
@@ -1135,7 +1140,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D9C53111B52E4AE0003C6EC /* checked.h in Headers */,
-				8F59293418854BF800FE51AD /* aligner.h in Headers */,
+				8F59293418854BF800FE51AD /* verticalaligner.h in Headers */,
 				8F59293618854BF800FE51AD /* barline.h in Headers */,
 				4D50B53A1C1B40C90081D56E /* atttypes.h in Headers */,
 				8F59293718854BF800FE51AD /* bboxdevicecontext.h in Headers */,
@@ -1330,7 +1335,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D1693F51E3A44F300569BF4 /* aligner.cpp in Sources */,
+				4D1693F51E3A44F300569BF4 /* verticalaligner.cpp in Sources */,
 				4D1693F61E3A44F300569BF4 /* barline.cpp in Sources */,
 				4D1693F71E3A44F300569BF4 /* bboxdevicecontext.cpp in Sources */,
 				4D1693F81E3A44F300569BF4 /* beam.cpp in Sources */,
@@ -1452,7 +1457,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8F086EE2188539540037FD8E /* aligner.cpp in Sources */,
+				8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */,
 				8F086EE4188539540037FD8E /* barline.cpp in Sources */,
 				8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */,
 				8F086EE6188539540037FD8E /* beam.cpp in Sources */,
@@ -1546,6 +1551,7 @@
 				4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */,
 				4D422104199805F800963292 /* att.cpp in Sources */,
 				4D4221061998A8CE00963292 /* atts_mensural.cpp in Sources */,
+				4D09D3ED1EA8AD8500A420E6 /* horizontalaligner.cpp in Sources */,
 				4D9A9C19199F561200028D93 /* verse.cpp in Sources */,
 				4DF289FF1A7545E500BA9F7D /* timeinterface.cpp in Sources */,
 				4DF9D29A1C1B3F0A0069E8C8 /* attconverter.cpp in Sources */,
@@ -1566,7 +1572,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8F3DD36718854B410051330C /* aligner.cpp in Sources */,
+				8F3DD36718854B410051330C /* verticalaligner.cpp in Sources */,
 				8F3DD36818854B410051330C /* doc.cpp in Sources */,
 				8F3DD36A18854B410051330C /* toolkit.cpp in Sources */,
 				4D1694781E3A455200569BF4 /* tool-musicxml2hum.cpp in Sources */,
