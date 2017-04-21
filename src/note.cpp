@@ -123,6 +123,9 @@ void Note::AddChild(Object *child)
     else if (child->Is(ARTIC)) {
         assert(dynamic_cast<Artic *>(child));
     }
+    else if (child->Is(DOTS)) {
+        assert(dynamic_cast<Dots *>(child));
+    }
     else if (child->Is(STEM)) {
         assert(dynamic_cast<Stem *>(child));
     }
@@ -141,9 +144,10 @@ void Note::AddChild(Object *child)
     }
 
     child->SetParent(this);
+
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is(STEM))
+    if (child->Is({ DOTS, STEM }))
         m_children.insert(m_children.begin(), child);
     else
         m_children.push_back(child);
@@ -196,6 +200,12 @@ bool Note::IsClusterExtreme() const
         return true;
     else
         return false;
+}
+
+void Note::SetCluster(ChordCluster *cluster, int position)
+{
+    m_cluster = cluster;
+    m_clusterPosition = position;
 }
 
 int Note::GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) const
@@ -393,6 +403,55 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int Note::CalcDots(FunctorParams *functorParams)
+{
+    CalcDotsParams *params = dynamic_cast<CalcDotsParams *>(functorParams);
+    assert(params);
+
+    // We currently have no dots object with mensural notes
+    if (this->IsMensural()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+
+    if (this->m_crossStaff) staff = this->m_crossStaff;
+
+    Dots *dots = NULL;
+
+    if (this->IsChordTone()) {
+        dots = params->m_chordDots;
+    }
+    else if (this->HasDots()) {
+        dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+        params->m_chordDrawingX = this->GetDrawingX();
+
+        std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
+        int loc = this->GetDrawingLoc();
+
+        // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
+        if ((loc % 2) == 0) {
+            loc += 1;
+        }
+        dotLocs->push_back(loc);
+    }
+    else {
+        return FUNCTOR_SIBLINGS;
+    }
+    assert(dots);
+
+    bool drawingCueSize = this->IsCueSize();
+    int staffSize = staff->m_drawingStaffSize;
+
+    int radius = this->GetDrawingRadius(params->m_doc, staffSize, drawingCueSize);
+    int xRel = dots->GetDrawingXRel();
+    xRel = std::max(xRel, this->GetDrawingX() - params->m_chordDrawingX + radius);
+    dots->SetDrawingXRel(xRel);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int Note::CalcLedgerLines(FunctorParams *functorParams)
 {
     FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
@@ -443,9 +502,9 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM));
+    Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM, 1));
     Flag *currentFlag = NULL;
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG));
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG, 1));
 
     if ((this->GetActualDur() > DUR_1) && !this->IsChordTone() && !this->IsMensural()) {
         if (!currentStem) {
@@ -479,6 +538,24 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     }
 
     if (!this->IsChordTone()) SetDrawingStem(currentStem);
+
+    /************ dots ***********/
+
+    Dots *currentDots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+
+    if (this->GetDots() > 0) {
+        if (!currentDots) {
+            currentDots = new Dots();
+            this->AddChild(currentDots);
+        }
+        currentDots->AttAugmentdots::operator=(*this);
+    }
+    // This will happen only if the duration has changed
+    else if (currentDots) {
+        if (this->DeleteChild(currentDots)) {
+            currentDots = NULL;
+        }
+    }
 
     return FUNCTOR_CONTINUE;
 };

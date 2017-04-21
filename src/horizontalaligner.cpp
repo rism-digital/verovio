@@ -700,29 +700,28 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
-    
+
 int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
 {
     SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
     assert(params);
-    
+
     // We start a new MeasureAligner
     // Reset the previous time position and x_rel to 0;
     params->m_previousTime = 0.0;
     params->m_previousXRel = 0;
-    
+
     return FUNCTOR_CONTINUE;
 }
-
 
 int MeasureAligner::JustifyX(FunctorParams *functorParams)
 {
     JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
     assert(params);
-    
+
     params->m_leftBarLineX = GetLeftBarLineAlignment()->GetXRel();
     params->m_rightBarLineX = GetRightBarLineAlignment()->GetXRel();
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -865,10 +864,10 @@ int Alignment::AdjustAccidX(FunctorParams *functorParams)
     if (this->m_graceAligner) this->m_graceAligner->Process(params->m_functor, functorParams);
 
     return FUNCTOR_CONTINUE;
-}    
+}
 
 int Alignment::HorizontalSpaceForDuration(
-                                          double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
+    double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
 {
     /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
      that interval gets the space a semibreve would ordinarily get. */
@@ -882,31 +881,31 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
 {
     SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
     assert(params);
-    
+
     // Do not set an x pos for anything before the barline (including it)
     if (this->m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
-    
+
     int intervalXRel = 0;
     double intervalTime = (m_time - params->m_previousTime);
-    
+
     if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         intervalTime = 0.0;
     }
-    
+
     if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
-                                                  params->m_doc->GetSpacingLinear(), params->m_doc->GetSpacingNonLinear());
+            params->m_doc->GetSpacingLinear(), params->m_doc->GetSpacingNonLinear());
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
-    
+
     if (m_graceAligner) {
         m_graceAligner->SetGraceAligmentXPos(params->m_doc);
     }
-    
+
     SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);
     params->m_previousTime = m_time;
     params->m_previousXRel = m_xRel;
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -914,31 +913,30 @@ int Alignment::JustifyX(FunctorParams *functorParams)
 {
     JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
     assert(params);
-    
+
     if (m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) {
         // Nothing to do for all left scoreDef elements and the left barline
     }
     else if (m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         // All elements up to the next barline, move them but also take into account the leftBarlineX
         SetXRel(ceil((((double)this->m_xRel - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
-                     + params->m_leftBarLineX));
+            + params->m_leftBarLineX));
     }
     else {
         //  Now more the right barline and all right scoreDef elements
         int shift = this->m_xRel - params->m_rightBarLineX;
         this->m_xRel
-        = ceil(((double)params->m_rightBarLineX - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
-        + params->m_leftBarLineX + shift;
+            = ceil(((double)params->m_rightBarLineX - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
+            + params->m_leftBarLineX + shift;
     }
-    
+
     // Finally, when reaching the end of the measure, update the measureXRel for the next measure
     if (m_type == ALIGNMENT_MEASURE_END) {
         params->m_measureXRel += this->m_xRel;
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
-
 
 int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
 {

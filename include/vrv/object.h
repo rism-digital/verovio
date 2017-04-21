@@ -558,7 +558,7 @@ public:
     virtual int SetAlignmentPitchPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Set the drawing stems positions, including for beams.
+     * Set the drawing stem positions, including for beams.
      */
     virtual int CalcStem(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
@@ -566,6 +566,11 @@ public:
      * Set the note head flipped positions
      */
     virtual int CalcChordNoteHeads(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Set the drawing dot positions, including for chords.
+     */
+    virtual int CalcDots(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.

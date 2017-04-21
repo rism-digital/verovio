@@ -101,6 +101,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(DOT)) {
         DrawDot(dc, element, layer, staff, measure);
     }
+    else if (element->Is(DOTS)) {
+        DrawDots(dc, element, layer, staff, measure);
+    }
     else if (element->Is(FTREM)) {
         DrawFTrem(dc, element, layer, staff, measure);
     }
@@ -538,50 +541,6 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     chord->ResetDrawingList();
 
-    int staffSize = staff->m_drawingStaffSize;
-    bool drawingCueSize = chord->IsCueSize();
-    int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
-    int fullUnit = m_doc->GetDrawingUnit(staffSize);
-
-    Beam *inBeam = chord->IsInBeam();
-
-    /************ Dots ************/
-
-    chord->m_dots.clear();
-
-    if (chord->GetDots()) {
-        int numDots = chord->GetDots();
-
-        // Set the x value...
-        int dotsX;
-
-        // make sure all the dots are at the same X position
-        if (chord->GetDur() < DUR_2
-            || (chord->GetDur() > DUR_8 && !inBeam && (chord->GetDrawingStemDir() == STEMDIRECTION_up))) {
-            dotsX = chord->GetDrawingX() + (fullUnit * 7 / 2);
-        }
-        else {
-            dotsX = chord->GetDrawingX() + (fullUnit * 5 / 2);
-        }
-
-        // Notes in clusters: If the stem points up and we have a note on the (incorrect) right side of the stem, add a
-        // note diameter to the dot
-        // positioning to avoid overlapping.
-        if ((chord->GetDrawingStemDir() == STEMDIRECTION_up) && (chord->m_clusters.size() > 0)) dotsX += (radius * 2);
-
-        // Prep where the dots will go by preventing overlaps and using space efficiently
-        for (ListOfObjects::reverse_iterator rit = chord->GetList(chord)->rbegin();
-             rit != chord->GetList(chord)->rend(); rit++) {
-            Note *note = dynamic_cast<Note *>(*rit);
-            PrepareChordDots(dc, chord, dotsX, note->GetDrawingY(), numDots, staff);
-        }
-
-        // And then draw them
-        std::list<int> *dotsList = &chord->m_dots;
-        for (std::list<int>::iterator it = dotsList->begin(); it != dotsList->end(); ++it)
-            DrawDots(dc, dotsX, *it, numDots, staff);
-    }
-
     /************ Draw children (notes, accidentals, etc) ************/
 
     DrawLayerChildren(dc, chord, layer, staff, measure);
@@ -728,7 +687,37 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         y = dot->m_drawingNote->GetDrawingY();
     }
 
-    DrawDots(dc, x, y, 1, staff);
+    DrawDotsPart(dc, x, y, 1, staff);
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    Dots *dots = dynamic_cast<Dots *>(element);
+    assert(dots);
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    MapOfDotLocs::const_iterator iter;
+    const MapOfDotLocs *map = dots->GetMapOfDotLocs();
+    for (iter = map->begin(); iter != map->end(); iter++) {
+        Staff *dotStaff = (iter->first) ? iter->first : staff;
+        int y = dotStaff->GetDrawingY()
+            - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (dotStaff->m_drawingLines - 1);
+        int x = dots->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        const std::list<int> *dotLocs = &iter->second;
+        std::list<int>::const_iterator intIter;
+        for (intIter = dotLocs->begin(); intIter != dotLocs->end(); intIter++) {
+            DrawDotsPart(dc, x, y + (*intIter) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), 1, staff);
+        }
+    }
 
     dc->EndGraphic(element, this);
 }
@@ -1097,10 +1086,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (note->m_crossStaff) staff = note->m_crossStaff;
 
-    Chord *inChord = note->IsChordTone();
-    Beam *inBeam = note->IsInBeam();
     bool drawingCueSize = note->IsCueSize();
-
     int staffSize = staff->m_drawingStaffSize;
     int noteY = element->GetDrawingY();
     int noteX = element->GetDrawingX();
@@ -1139,22 +1125,11 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
     }
 
-    /************** dots/peripherals: **************/
+    /************ Draw children (accidentals, etc) ************/
 
-    if (!inChord) {
-        if (note->GetDots()) {
-            int xDot;
-            if (note->GetActualDur() < DUR_2
-                || (note->GetActualDur() > DUR_8 && !inBeam && (note->GetDrawingStemDir() == STEMDIRECTION_up))) {
-                xDot = noteX + m_doc->GetDrawingUnit(staffSize) * 7 / 2;
-            }
-            else {
-                xDot = noteX + m_doc->GetDrawingUnit(staffSize) * 5 / 2;
-            }
+    DrawLayerChildren(dc, note, layer, staff, measure);
 
-            DrawDots(dc, xDot, noteY, note->GetDots(), staff);
-        }
-    }
+    /************** peripherals: **************/
 
     if (note->GetDrawingTieAttr()) {
         System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
@@ -1163,8 +1138,6 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         dc->EndGraphic(note->GetDrawingTieAttr(), this);
         if (system) system->AddToDrawingList(note->GetDrawingTieAttr());
     }
-
-    DrawLayerChildren(dc, note, layer, staff, measure);
 
     if (note->HasFermata()) {
         DrawFermataAttr(dc, element, layer, staff);
@@ -1392,7 +1365,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     dc->ResetBrush();
 }
 
-void View::DrawDots(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff)
+void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff)
 {
     int i;
 
@@ -1466,64 +1439,6 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
             DrawSmuflCode(dc, x, y, SMUFL_E4C1_fermataBelow, staff->m_drawingStaffSize, false);
         }
     }
-}
-
-// skips "skip" lines before drawing "n" ledger lines
-void View::DrawLedgerLines(
-    DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n)
-{
-    // various variables
-    int ledgerY;
-    int staffY = staff->GetDrawingY();
-    int staffSize = staff->m_drawingStaffSize;
-    int betweenLines = m_doc->GetDrawingDoubleUnit(staffSize);
-    bool drawingCueSize = element->IsCueSize();
-    int ledge = m_doc->GetDrawingLedgerLineLength(staffSize, drawingCueSize);
-    int noteDiameter = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize);
-
-    // prep start and end positions of ledger line depending on stem direction and doubleLength
-    int xLedgerStart, xLedgerEnd;
-    if (doubleLength) {
-        Chord *chord = dynamic_cast<Chord *>(element);
-        assert(chord);
-        if (chord->GetDrawingStemDir() == STEMDIRECTION_down) {
-            xLedgerStart = element->GetDrawingX() - ledge - noteDiameter;
-            xLedgerEnd = element->GetDrawingX() + ledge;
-        }
-        else {
-            xLedgerStart = element->GetDrawingX() - ledge;
-            xLedgerEnd = element->GetDrawingX() + ledge + noteDiameter;
-        }
-    }
-    else {
-        xLedgerStart = element->GetDrawingX() - ledge;
-        xLedgerEnd = element->GetDrawingX() + ledge;
-    }
-
-    // prep initial Y position
-    if (aboveStaff) {
-        ledgerY = (skip * betweenLines) + staffY;
-    }
-    else {
-        ledgerY = staffY - m_doc->GetDrawingStaffSize(staffSize) - (skip * betweenLines);
-        betweenLines = -m_doc->GetDrawingDoubleUnit(staffSize);
-    }
-
-    // add one line's distance to get it off the edge of the staff
-    ledgerY += betweenLines;
-
-    dc->SetPen(m_currentColour, ToDeviceContextX(m_doc->GetDrawingStaffLineWidth(staffSize)), AxSOLID);
-    dc->SetBrush(m_currentColour, AxTRANSPARENT);
-
-    // draw the lines
-    for (int i = 0; i < n; i++) {
-        dc->DrawLine(ToDeviceContextX(xLedgerStart), ToDeviceContextY(ledgerY), ToDeviceContextX(xLedgerEnd),
-            ToDeviceContextY(ledgerY));
-        ledgerY += betweenLines;
-    }
-
-    dc->ResetPen();
-    dc->ResetBrush();
 }
 
 void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff)
@@ -1633,7 +1548,7 @@ void View::DrawRestQuarter(DeviceContext *dc, int x, int y, int valeur, unsigned
 
     if (dots) {
         if (valeur < DUR_16) y += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        DrawDots(dc, (x + 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)), y, dots, staff);
+        DrawDotsPart(dc, (x + 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)), y, dots, staff);
     }
 }
 
@@ -1672,7 +1587,7 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned c
         DrawHorizontalLine(dc, x1, x2, y1, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize));
 
     if (dots) {
-        DrawDots(dc, (x2 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)), y2, dots, staff);
+        DrawDotsPart(dc, (x2 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)), y2, dots, staff);
     }
 }
 
@@ -1719,57 +1634,6 @@ int View::GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place)
         if (distance < 0) distance = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + distance;
         return y - distance - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
-}
-
-void View::PrepareChordDots(DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff)
-{
-    std::list<int> *dotsList = &chord->m_dots;
-    int fullUnit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int doubleUnit = fullUnit * 2;
-
-    // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
-    if (IsOnStaffLine(y, staff)) {
-        // defaults to the space above the staffline first
-        // if that position is not on the list already, we're good to go
-        if (std::find(dotsList->begin(), dotsList->end(), y + fullUnit) == dotsList->end()) {
-            y += fullUnit;
-        }
-        // if it is on the list, we should try the spot a doubleUnit below
-        else if (std::find(dotsList->begin(), dotsList->end(), y - fullUnit) == dotsList->end()) {
-            y -= fullUnit;
-        }
-        // otherwise, any other space looks weird so let's not draw it
-        else {
-            return;
-        }
-    }
-    // similar if it's not on a staff line
-    else {
-        // see if the optimal place exists already
-        if (std::find(dotsList->begin(), dotsList->end(), y) == dotsList->end()) {
-        }
-        // if it does, then look up a space first
-        else if (std::find(dotsList->begin(), dotsList->end(), y + doubleUnit) == dotsList->end()) {
-            y += doubleUnit;
-        }
-        // then look down a space
-        else if (std::find(dotsList->begin(), dotsList->end(), y - doubleUnit) == dotsList->end()) {
-            y -= doubleUnit;
-        }
-        // otherwise let's not draw it
-        else {
-            return;
-        }
-    }
-
-    // finally, make sure it's not outside the acceptable extremes of the chord
-    int yMax, yMin;
-    chord->GetYExtremes(yMax, yMin);
-    if (y > (yMax + fullUnit)) return;
-    if (y < (yMin - fullUnit)) return;
-
-    // if it's not, add it to the dots list and go back to DrawChord
-    dotsList->push_back(y);
 }
 
 } // namespace vrv

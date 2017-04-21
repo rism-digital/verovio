@@ -152,25 +152,6 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         DrawMensuralStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
     }
 
-    /************** Ledger lines: **************/
-
-    int staffTop = staffY + m_doc->GetDrawingUnit(staffSize);
-    int staffBot = staffY - m_doc->GetDrawingStaffSize(staffSize) - m_doc->GetDrawingUnit(staffSize);
-
-    // if the note is not in the staff
-    if (!isIn(noteY, staffTop, staffBot)) {
-        int distance, highestNewLine, numLines;
-        bool aboveStaff = (noteY > staffTop);
-
-        distance = (aboveStaff ? (noteY - staffY) : staffY - m_doc->GetDrawingStaffSize(staffSize) - noteY);
-        highestNewLine
-            = ((distance % m_doc->GetDrawingDoubleUnit(staffSize) > 0) ? (distance - m_doc->GetDrawingUnit(staffSize))
-                                                                       : distance);
-        numLines = highestNewLine / m_doc->GetDrawingDoubleUnit(staffSize);
-
-        DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
-    }
-
     /************** Augmentation dots **************/
 
     if (note->GetDots()) {
@@ -181,7 +162,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         else
             xDot = xStem + mensDrawingUnit * 5 / 2;
 
-        DrawDots(dc, xDot, noteY, note->GetDots(), staff);
+        DrawDotsPart(dc, xDot, noteY, note->GetDots(), staff);
     }
 
     /************** accidental **************/

@@ -13,13 +13,7 @@
 
 namespace vrv {
 
-//class Accid;
-//class AlignmentReference;
 class FloatingObject;
-//class GraceAligner;
-//class LedgerLine;
-//class MeasureAligner;
-//class Note;
 class StaffAlignment;
 class SystemAligner;
 class TimestampAttr;
