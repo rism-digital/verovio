@@ -96,6 +96,11 @@ public:
      */
     virtual void SetMdivXPathQuery(std::string &xPathQuery) {}
 
+    /**
+     * Set Humdrum import type option (Humdrum only)
+     */
+    virtual void SetTypeOption(int value) {}
+
 private:
     /**
      * Init values (called by the constructors)

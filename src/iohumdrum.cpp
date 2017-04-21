@@ -1435,7 +1435,8 @@ void HumdrumInput::setMeterSymbol(StaffDef *part, const std::string &metersig)
     else if (metersig == "C|") {
         // This is used more strictly for Cut-C mensuration.
         part->SetMeterSym(METERSIGN_cut);
-    } else if (metersig == "*omet(C)") {
+    }
+    else if (metersig == "*omet(C)") {
         // This is used more strictly for C mensuration.
         part->SetMeterSym(METERSIGN_common);
     }
@@ -1449,7 +1450,6 @@ void HumdrumInput::setMeterSymbol(StaffDef *part, const std::string &metersig)
         // This is used more strictly for Cut-C mensuration.
         part->SetMeterSym(METERSIGN_cut);
     }
-
 }
 
 //////////////////////////////
@@ -5059,7 +5059,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     int line = token->getLineIndex();
     int field = token->getFieldIndex();
     colorNote(note, tstring, line, field);
-    if (getTypeOption()) {
+    if (GetTypeOption()) {
         embedQstampInClass(note, token, tstring);
         embedBase40PitchInClass(note, tstring);
         embedTieInformation(note, tstring);
@@ -5332,32 +5332,32 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             if (dashbegin && dashend) {
                 syl->SetWordpos(sylLog_WORDPOS_m);
                 syl->SetCon(sylLog_CON_d);
-                if (getTypeOption()) {
+                if (GetTypeOption()) {
                     appendTypeTag(syl, "m");
                 }
             }
             else if (dashbegin) {
                 syl->SetWordpos(sylLog_WORDPOS_t);
-                if (getTypeOption()) {
+                if (GetTypeOption()) {
                     appendTypeTag(syl, "t");
                 }
             }
             else if (dashend) {
                 syl->SetWordpos(sylLog_WORDPOS_i);
                 syl->SetCon(sylLog_CON_d);
-                if (getTypeOption()) {
+                if (GetTypeOption()) {
                     appendTypeTag(syl, "i");
                 }
             }
             else if (extender) {
                 syl->SetWordpos(sylLog_WORDPOS_t);
                 syl->SetCon(sylLog_CON_u);
-                if (getTypeOption()) {
+                if (GetTypeOption()) {
                     appendTypeTag(syl, "t");
                 }
             }
             else {
-                if (getTypeOption()) {
+                if (GetTypeOption()) {
                     appendTypeTag(syl, "t");
                 }
             }
@@ -6179,7 +6179,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         m_measure->SetN(measurenumber);
     }
 
-    if (getTypeOption()) {
+    if (GetTypeOption()) {
         stringstream measuretag;
         measuretag << "m-" << measurenumber;
         appendTypeTag(m_measure, measuretag.str());
@@ -6190,7 +6190,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 
 //////////////////////////////
 //
-// HumdrumInput::storeOriginalClefMensurationApp -- If there are any original 
+// HumdrumInput::storeOriginalClefMensurationApp -- If there are any original
 // clefs or mensuration signs, create an app for them.
 //
 // <app>
@@ -6226,30 +6226,31 @@ void HumdrumInput::storeOriginalClefMensurationApp(void)
 
     StaffGrp *staffgrp = new StaffGrp;
     scoredef->AddChild(staffgrp);
-	int i, j;
+    int i, j;
 
-	if (m_oclef.size() > 0) {
-    	for (i = 0; i < (int)m_oclef.size(); i++) {
-        	StaffDef *staffdef = new StaffDef;
-        	staffgrp->AddChild(staffdef);
-        	setClef(staffdef, *m_oclef[i].second);
-        	staffdef->SetN(m_oclef[i].first);
-			for (j = 0; j < (int)m_omet.size(); j++) {
-				if (m_omet[j].first != m_oclef[i].first) {
-					continue;
-				}
-				setMeterSymbol(staffdef, *m_omet[j].second);
-			}
-    	}
-	} else if (m_omet.size() > 0) {
-		// No oclefs, just omets.
-    	for (i = 0; i < (int)m_oclef.size(); i++) {
-        	StaffDef *staffdef = new StaffDef;
-        	staffgrp->AddChild(staffdef);
-			setMeterSymbol(staffdef, *m_omet[i].second);
-        	staffdef->SetN(m_omet[i].first);
-    	}
-	}
+    if (m_oclef.size() > 0) {
+        for (i = 0; i < (int)m_oclef.size(); i++) {
+            StaffDef *staffdef = new StaffDef;
+            staffgrp->AddChild(staffdef);
+            setClef(staffdef, *m_oclef[i].second);
+            staffdef->SetN(m_oclef[i].first);
+            for (j = 0; j < (int)m_omet.size(); j++) {
+                if (m_omet[j].first != m_oclef[i].first) {
+                    continue;
+                }
+                setMeterSymbol(staffdef, *m_omet[j].second);
+            }
+        }
+    }
+    else if (m_omet.size() > 0) {
+        // No oclefs, just omets.
+        for (i = 0; i < (int)m_oclef.size(); i++) {
+            StaffDef *staffdef = new StaffDef;
+            staffgrp->AddChild(staffdef);
+            setMeterSymbol(staffdef, *m_omet[i].second);
+            staffdef->SetN(m_omet[i].first);
+        }
+    }
 
     m_oclef.clear();
     m_omet.clear();

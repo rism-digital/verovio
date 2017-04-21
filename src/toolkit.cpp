@@ -426,6 +426,7 @@ bool Toolkit::LoadData(const std::string &data)
 
         Doc tempdoc;
         HumdrumInput *tempinput = new HumdrumInput(&tempdoc, "");
+        tempinput->SetTypeOption(GetHumType());
 
         if (GetOutputFormat() == HUMDRUM) {
             tempinput->SetOutputFormat("humdrum");
@@ -476,6 +477,7 @@ bool Toolkit::LoadData(const std::string &data)
         // Now convert Humdrum into MEI:
         Doc tempdoc;
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        tempinput->SetTypeOption(GetHumType());
         if (!tempinput->ImportString(conversion.str())) {
             LogError("Error importing Humdrum data");
             delete tempinput;
