@@ -458,8 +458,10 @@ int Chord::CalcDots(FunctorParams *functorParams)
         // finally, make sure it's not outside the acceptable extremes of the chord.
         // however, this does take into account cross-staff chords because it looks only at the top and bottom notes.
         // when it would be necessary to look at top and bottom for each staff
-        if (loc > this->GetTopNote()->GetDrawingLoc() + 1) continue;
-        if (loc < this->GetBottomNote()->GetDrawingLoc() - 1) continue;
+        if (!this->HasCrossStaff()) {
+            if (loc > this->GetTopNote()->GetDrawingLoc() + 1) continue;
+            if (loc < this->GetBottomNote()->GetDrawingLoc() - 1) continue;
+        }
 
         // if it's not, add it to the dots list and go back to DrawChord
         dotLocs->push_back(loc);

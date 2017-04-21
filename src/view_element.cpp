@@ -716,7 +716,7 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         std::list<int>::const_iterator intIter;
         for (intIter = dotLocs->begin(); intIter != dotLocs->end(); intIter++) {
             DrawDotsPart(
-                dc, x, y + (*intIter) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(), staff);
+                dc, x, y + (*intIter) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(), dotStaff);
         }
     }
 
