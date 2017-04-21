@@ -1203,7 +1203,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         else if (part->compare(0, 6, "*oclef") == 0) {
             m_oclef.emplace_back(partnumber, part);
         }
-        else if (part->compare(0, 6, "*omet") == 0) {
+        else if (part->compare(0, 5, "*omet") == 0) {
             m_omet.emplace_back(partnumber, part);
         }
         else if (part->compare(0, 3, "*k[") == 0) {
@@ -1445,7 +1445,7 @@ void HumdrumInput::setMeterSymbol(StaffDef *part, const std::string &metersig)
     else if (metersig == "*omet(c|)") {
         part->SetMeterSym(METERSIGN_cut);
     }
-    else if (metersig == "*omet*C|)") {
+    else if (metersig == "*omet(C|)") {
         // This is used more strictly for Cut-C mensuration.
         part->SetMeterSym(METERSIGN_cut);
     }

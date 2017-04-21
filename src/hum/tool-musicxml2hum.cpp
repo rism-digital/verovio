@@ -274,23 +274,7 @@ void Tool_musicxml2hum::setOptions(int argc, char** argv) {
 
 
 void Tool_musicxml2hum::setOptions(const vector<string>& argvlist) {
-	int tempargc = (int)argvlist.size();
-	char* tempargv[tempargc+1];
-	tempargv[tempargc] = NULL;
-
-	int i;
-	for (i=0; i<tempargc; i++) {
-		tempargv[i] = new char[argvlist[i].size() + 1];
-		strcpy(tempargv[i], argvlist[i].c_str());
-	}
-
-	setOptions(tempargc, tempargv);
-
-	for (i=0; i<tempargc; i++) {
-		if (tempargv[i] != NULL) {
-			delete [] tempargv[i];
-		}
-	}
+	m_options.process(argvlist);
 }
 
 

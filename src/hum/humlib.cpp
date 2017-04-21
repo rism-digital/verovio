@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Apr  4 06:55:53 PDT 2017
+// Last Modified: Thu Apr 20 09:35:35 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -16210,7 +16210,7 @@ void Options::setOptions(int argc, char** argv) {
 }
 
 
-void Options::setOptions(vector<string>& argv) {
+void Options::setOptions(const vector<string>& argv) {
 	m_processedQ = 0;
 	m_argv = argv;
 }
@@ -16370,7 +16370,7 @@ bool Options::process(int argc, char** argv, int error_check, int suppress) {
 }
 
 
-bool Options::process(vector<string>& argv, int error_check, int suppress) {
+bool Options::process(const vector<string>& argv, int error_check, int suppress) {
 	setOptions(argv);
 	xverify(error_check, suppress);
 	return !hasParseError();
