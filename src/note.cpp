@@ -101,6 +101,7 @@ void Note::Reset()
     m_playingOffset = 0.0;
 
     m_drawingLoc = 0;
+    m_flippedNotehead = false;
 }
 
 void Note::AddChild(Object *child)
@@ -399,6 +400,8 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
             this->SetDrawingXRel(-2 * radius + params->m_doc->GetDrawingStemWidth(staffSize));
         }
     }
+    
+    this->SetFlippedNotehead(flippedNotehead);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -417,13 +420,30 @@ int Note::CalcDots(FunctorParams *functorParams)
     assert(staff);
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
+    
+    bool drawingCueSize = this->IsCueSize();
+    int staffSize = staff->m_drawingStaffSize;
 
     Dots *dots = NULL;
+    Chord *chord = this->IsChordTone();
+    
+    // The shift to the left when a stem flag requires it
+    int flagShift = 0;
 
-    if (this->IsChordTone()) {
+    if (chord) {
         dots = params->m_chordDots;
+        
+        // Stem up, shorter than 4th and not in beam
+        if ((params->m_chordStemDir == STEMDIRECTION_up) && (this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
+            // Shift according to the flag width if the top note is not flipped
+            if ((this == chord->GetTopNote()) && !this->GetFlippedNotehead()) {
+                // HARDCODED
+                flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
+            }
+        }
     }
     else if (this->HasDots()) {
+        // For single notes we need here to set the dot loc
         dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
         params->m_chordDrawingX = this->GetDrawingX();
 
@@ -435,19 +455,22 @@ int Note::CalcDots(FunctorParams *functorParams)
             loc += 1;
         }
         dotLocs->push_back(loc);
+        
+        // Stem up, shorter than 4th and not in beam
+        if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
+            // HARDCODED
+            flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
+        }
     }
     else {
         return FUNCTOR_SIBLINGS;
     }
     assert(dots);
 
-    bool drawingCueSize = this->IsCueSize();
-    int staffSize = staff->m_drawingStaffSize;
 
     int radius = this->GetDrawingRadius(params->m_doc, staffSize, drawingCueSize);
-    int xRel = dots->GetDrawingXRel();
-    xRel = std::max(xRel, this->GetDrawingX() - params->m_chordDrawingX + radius);
-    dots->SetDrawingXRel(xRel);
+    int xRel = this->GetDrawingX() - params->m_chordDrawingX + radius + flagShift;
+    dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
 
     return FUNCTOR_SIBLINGS;
 }
@@ -637,6 +660,9 @@ int Note::ResetDrawing(FunctorParams *functorParams)
     LayerElement::ResetDrawing(functorParams);
 
     this->ResetDrawingTieAttr();
+    
+    m_drawingLoc = 0;
+    m_flippedNotehead = false;
 
     return FUNCTOR_CONTINUE;
 };
@@ -646,6 +672,7 @@ int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
     LayerElement::ResetHorizontalAlignment(functorParams);
 
     m_drawingLoc = 0;
+    m_flippedNotehead = false;
 
     return FUNCTOR_CONTINUE;
 }

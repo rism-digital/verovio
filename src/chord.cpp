@@ -401,6 +401,7 @@ int Chord::CalcDots(FunctorParams *functorParams)
 
     params->m_chordDots = dots;
     params->m_chordDrawingX = this->GetDrawingX();
+    params->m_chordStemDir = this->GetDrawingStemDir();
 
     ListOfObjects::reverse_iterator rit;
     ListOfObjects *notes = this->GetList(this);

@@ -3,9 +3,9 @@ FontName: Leipzig
 FullName: Leipzig
 FamilyName: Leipzig
 Weight: Regular
-Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.23
-UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoA-Version 5.2.13 - adding (very)short/long fermata and breath comma+AAoA-Version 5.2.14 - adding mensural stems+AAoA-Version 5.2.15 - changing ascent/descent to 750/250+AAoA-Version 5.2.16 - adding mensural rests+AAoA-Version 5.2.17 - correcting mensural rests position+AAoA-Version 5.2.18 - adding accid square brackets and reviewing bow directions+AAoA-Version 5.2.19 - adding some quartertone accidentals (Gould and Stein-Zimmermann)+AAoA-Version 5.2.20 - adding some anchor points (accidentals)+AAoA-Version 5.2.21 - adding stem flags (16th to 256th)+AAoA-Version 5.2.22 - fixing anchor point names+AAoA-Version 5.2.23 - adding anchor points to all accidentals"
-Version: 5.2.23
+Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.24
+UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoA-Version 5.2.13 - adding (very)short/long fermata and breath comma+AAoA-Version 5.2.14 - adding mensural stems+AAoA-Version 5.2.15 - changing ascent/descent to 750/250+AAoA-Version 5.2.16 - adding mensural rests+AAoA-Version 5.2.17 - correcting mensural rests position+AAoA-Version 5.2.18 - adding accid square brackets and reviewing bow directions+AAoA-Version 5.2.19 - adding some quartertone accidentals (Gould and Stein-Zimmermann)+AAoA-Version 5.2.20 - adding some anchor points (accidentals)+AAoA-Version 5.2.21 - adding stem flags (16th to 256th)+AAoA-Version 5.2.22 - fixing anchor point names+AAoA-Version 5.2.23 - adding anchor points to all accidentals+AAoA-Version 5.2.24 - changing 8th flags"
+Version: 5.2.24
 ItalicAngle: 0
 UnderlinePosition: -50
 UnderlineWidth: 50
@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1491891335
+ModificationTime: 1492762538
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -50,7 +50,7 @@ NameList: Adobe Glyph List
 DisplaySize: -72
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 57906 18 7
+WinInfo: 57852 18 7
 BeginPrivate: 0
 EndPrivate
 TeXData: 1 0 0 346030 173015 115343 0 1048576 115343 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
@@ -2327,51 +2327,55 @@ EndChar
 
 StartChar: uniE240
 Encoding: 57920 57920 40
-Width: 274
+Width: 277
 VWidth: 2048
 Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-206 -558 m 0
- 230 -524 255 -464 255 -406 c 0
- 255 -301 175 -233 87 -206 c 0
- 69 -201 40 -197 0 -190 c 1
- 0 0 l 1
+179 -646 m 4
+ 194 -617 207.544921875 -590.924804688 225 -544 c 4
+ 243.321289062 -494.745117188 255 -435.702338819 255 -406 c 4
+ 255 -301 175 -233 87 -206 c 4
+ 69 -201 40 -197 0 -190 c 5
+ 0 0 l 5
  22 0 l 6
- 30 0 55 -61 93 -95 c 0
- 97 -98 91 -92 154 -151 c 0
- 216 -209 276 -288 276 -392 c 0
- 276 -463 244 -540 209 -582 c 1
- 203 -587 199 -589 196 -589 c 0
- 193 -589 191 -587 191 -584 c 1
- 195 -574 l 130
- 196 -571 200 -565 206 -558 c 0
+ 30 0 55 -61 93 -95 c 4
+ 97 -98 91 -92 154 -151 c 4
+ 216 -209 276 -288 276 -392 c 4
+ 276 -429.524498136 263.319335938 -498.071289062 241 -555 c 4
+ 221.088867188 -605.786132812 198 -654 175 -687 c 5
+ 169 -692 165 -694 162 -694 c 4
+ 159 -694 157 -692 157 -689 c 5
+ 161 -679 l 134
+ 162.172413793 -676.068965517 174.764380825 -654.188863739 179 -646 c 4
 EndSplineSet
 EndChar
 
 StartChar: uniE241
 Encoding: 57921 57921 41
-Width: 274
+Width: 277
 VWidth: 2048
 Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-206 558 m 0
- 230 524 255 464 255 406 c 0
- 255 301 175 233 87 206 c 0
- 69 201 40 197 0 190 c 1
- 0 0 l 1
- 29 0 l 6
- 37 0 55 61 93 95 c 0
- 97 98 91 92 154 151 c 0
- 216 209 276 288 276 392 c 0
- 276 463 244 540 209 582 c 1
- 203 587 199 589 196 589 c 0
- 193 589 191 587 191 584 c 1
- 195 574 l 130
- 196 571 200 565 206 558 c 0
+179 646 m 4
+ 194 617 207.544921875 590.924804688 225 544 c 4
+ 243.321289062 494.745117188 255 435.702148438 255 406 c 4
+ 255 301 175 233 87 206 c 4
+ 69 201 40 197 0 190 c 5
+ 0 0 l 5
+ 22 0 l 6
+ 30 0 55 61 93 95 c 4
+ 97 98 91 92 154 151 c 4
+ 216 209 276 288 276 392 c 4
+ 276 429.524414062 263.319335938 498.071289062 241 555 c 4
+ 221.088867188 605.786132812 198 654 175 687 c 5
+ 169 692 165 694 162 694 c 4
+ 159 694 157 692 157 689 c 5
+ 161 679 l 134
+ 162.172851562 676.069335938 174.764648438 654.188476562 179 646 c 4
 EndSplineSet
 EndChar
 
@@ -11313,14 +11317,14 @@ SplineSet
  69 -391 40 -387 0 -380 c 1
  0 -190 l 1
  0 0 l 1
- 22 0 l 6
+ 22 0 l 2
  30 0 55 -61 93 -95 c 0
  97 -98 91 -92 154 -151 c 0
  216 -209 276 -288 276 -392 c 0
  276 -424.173824029 269.428891394 -457.579730921 258.985227468 -488.402524651 c 1
  269.665147983 -517.053645727 276 -548.207062026 276 -582 c 0
  276 -653 244 -730 209 -772 c 0
- 203 -777 199 -779 196 -779 c 0
+ 203 -777 199 -779 196 -779 c 4
  193 -779 191 -777 191 -774 c 2
  195 -764 l 2
  196 -761 200.872922339 -755.662445736 206 -748 c 0

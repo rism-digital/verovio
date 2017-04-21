@@ -103,9 +103,25 @@ public:
     bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}
 
-    ChordCluster *GetCluster() const { return m_cluster; }
+    /**
+     * @name Setter and getter for the chord cluster and the position of the note
+     */
+    ///@{
     void SetCluster(ChordCluster *cluster, int position);
+    ChordCluster *GetCluster() const { return m_cluster; }
+    ///}
 
+    /**
+     * @name Setter and getter for the flipped note head flag
+     */
+    ///@{
+    void SetFlippedNotehead(bool flippedNotehead) { m_flippedNotehead = flippedNotehead; }
+    bool GetFlippedNotehead() const { return m_flippedNotehead; }
+    ///}
+                 
+    /**
+     * Get the drawing radius of the note head taking into accound the note duration
+     */
     int GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) const;
 
     /**
@@ -199,6 +215,11 @@ private:
      * The drawing location of the note
      */
     int m_drawingLoc;
+                 
+    /**
+     * A fling indicating if the note head is flipped
+     */
+    bool m_flippedNotehead;
 
     /**
      * flags for determining clusters in chord (cluster this belongs to)

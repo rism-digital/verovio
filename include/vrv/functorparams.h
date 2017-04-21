@@ -426,10 +426,12 @@ public:
     {
         m_chordDots = NULL;
         m_chordDrawingX = 0;
+        m_chordStemDir = STEMDIRECTION_NONE;
         m_doc = doc;
     }
     Dots *m_chordDots;
     int m_chordDrawingX;
+    data_STEMDIRECTION m_chordStemDir;
     Doc *m_doc;
 };
 
