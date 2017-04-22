@@ -1838,7 +1838,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             Harm *harm = new Harm;
             Text *text = new Text;
             string datatype = token->getDataType();
-            if (datatype.compare(0, 8, "**cdata-")) {
+            if (datatype.compare(0, 8, "**cdata-") == 0) {
                 string subdatatype = datatype.substr(8);
                 if (!subdatatype.empty()) {
                     appendTypeTag(harm, subdatatype);
