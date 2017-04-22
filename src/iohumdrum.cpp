@@ -2759,14 +2759,56 @@ int HumdrumInput::getDirection(const string &token, const std::string &target)
 
 //////////////////////////////
 //
-// HumdrumInput::embedBase40PitchInClass --
+// HumdrumInput::embedPitchInformationInClass --
 //
 
-void HumdrumInput::embedBase40PitchInClass(Note *note, const std::string &token)
+void HumdrumInput::embedPitchInformationInClass(Note *note, const std::string &token)
 {
+    if (token.find("r") != string::npos) {
+        return;
+    }
+    if (token == ".") {
+        return;
+    }
     int base40 = hum::Convert::kernToBase40(token);
+    int base40chroma = base40 % 40;
+    int oct = base40 / 40;
+    int acc = hum::Convert::base40ToAccidental(base40);
+    int base12chroma = hum::Convert::base40ToMidiNoteNumber(base40) % 12;
+    int base7chroma = hum::Convert::base40ToDiatonic(base40) % 7;
+    string pname;
+    switch (base7chroma) {
+        case 0: pname = "c"; break;
+        case 1: pname = "d"; break;
+        case 2: pname = "e"; break;
+        case 3: pname = "f"; break;
+        case 4: pname = "g"; break;
+        case 5: pname = "a"; break;
+        case 6: pname = "b"; break;
+    }
+
+    string accid;
+    switch (acc) {
+        case 0: accid = "n"; break;
+        case 1: accid = "s"; break;
+        case -1: accid = "f"; break;
+        case 2: accid = "ss"; break;
+        case -2: accid = "ff"; break;
+        case 3: accid = "sss"; break;
+        case -3: accid = "fff"; break;
+    }
+
     stringstream ss;
-    ss << "b40-" << base40;
+    ss << "pname-" << pname;
+    ss << " ";
+    ss << "acc-" << accid;
+    ss << " ";
+    ss << "oct-" << oct;
+    ss << " ";
+    ss << "b40c-" << base40chroma;
+    ss << " ";
+    ss << "b12c-" << base12chroma;
+    ss << " ";
     appendTypeTag(note, ss.str());
 }
 
@@ -5074,7 +5116,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     colorNote(note, tstring, line, field);
     if (GetTypeOption()) {
         embedQstampInClass(note, token, tstring);
-        embedBase40PitchInClass(note, tstring);
+        embedPitchInformationInClass(note, tstring);
         embedTieInformation(note, tstring);
     }
 
