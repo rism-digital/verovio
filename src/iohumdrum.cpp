@@ -479,6 +479,9 @@ bool HumdrumInput::convertHumdrum(void)
         if (it->isDataType("**mxhm")) {
             m_harm = true;
         }
+        else if (it->getDataType().compare(0, 7, "**cdata") == 0) {
+            m_harm = true;
+        }
     }
 
     if (kernstarts.size() == 0) {
@@ -1016,6 +1019,9 @@ void HumdrumInput::prepareVerses(void)
                 ss[i].verse = true;
             }
             else if (line.token(j)->isDataType("**silbe")) {
+                ss[i].verse = true;
+            }
+            else if (line.token(j)->getDataType().compare(0, 7, "**vdata") == 0) {
                 ss[i].verse = true;
             }
         }
@@ -1826,11 +1832,18 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             if (token->isNull()) {
                 continue;
             }
-            if (!token->isDataType("**mxhm")) {
+            if (!(token->isDataType("**mxhm") || (token->getDataType().compare(0, 7, "**cdata") == 0))) {
                 continue;
             }
             Harm *harm = new Harm;
             Text *text = new Text;
+            string datatype = token->getDataType();
+            if (datatype.compare(0, 8, "**cdata-")) {
+                string subdatatype = datatype.substr(8);
+                if (!subdatatype.empty()) {
+                    appendTypeTag(harm, subdatatype);
+                }
+            }
             std::string content = cleanHarmString(*token);
             text->SetText(UTF8to16(content));
             harm->AddChild(text);
@@ -5292,7 +5305,8 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
                 break;
             }
         }
-        else if (line.token(i)->isDataType("**text") || line.token(i)->isDataType("**silbe")) {
+        else if (line.token(i)->isDataType("**text") || line.token(i)->isDataType("**silbe")
+            || (line.token(i)->getDataType().compare(0, 7, "**vdata") == 0)) {
             versenum++;
             if (line.token(i)->isNull()) {
                 continue;
@@ -5302,19 +5316,28 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             appendElement(note, verse);
             verse->SetN(versenum);
             Syl *syl = new Syl;
+            string datatype = line.token(i)->getDataType();
+            if (datatype.compare(0, 8, "**vdata-") == 0) {
+                string subdatatype = datatype.substr(8);
+                if (!subdatatype.empty()) {
+                    appendTypeTag(syl, subdatatype);
+                }
+            }
             setLocationId(syl, line.token(i), -1);
             appendElement(verse, syl);
             std::string content = *line.token(i);
             bool dashbegin = false;
             bool dashend = false;
             bool extender = false;
-            for (int z = 1; z < content.size() - 1; z++) {
-                // Use underscore for elision symbol
-                // (later use @con="b" when verovio allows it).
-                // Also possibly make elision symbols optional.
-                if ((content[z] == ' ') && (content[z + 1] != '\'')) {
-                    // the later condition is to not elide "ma 'l"
-                    content[z] = '_';
+            if (datatype.compare(0, 7, "**vdata") != 0) {
+                for (int z = 1; z < content.size() - 1; z++) {
+                    // Use underscore for elision symbol
+                    // (later use @con="b" when verovio allows it).
+                    // Also possibly make elision symbols optional.
+                    if ((content[z] == ' ') && (content[z + 1] != '\'')) {
+                        // the later condition is to not elide "ma 'l"
+                        content[z] = '_';
+                    }
                 }
             }
             if (content.back() == '-') {
