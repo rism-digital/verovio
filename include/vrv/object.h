@@ -645,7 +645,7 @@ public:
     virtual int ResetVerticalAlignment(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Set the position of the StaffAlignment.
+     * Adjust the position of the StaffAlignment.
      */
     virtual int AdjustYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
