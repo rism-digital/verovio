@@ -60,6 +60,9 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     m_leftBarLine.SetLeft();
 
     Reset();
+    
+    if (!measureMusic)
+        this->SetRight(BARRENDITION_invis);
 }
 
 Measure::~Measure()
