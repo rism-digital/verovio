@@ -8,10 +8,10 @@
 #ifndef __VRV_ATT_COMPARISON_H__
 #define __VRV_ATT_COMPARISON_H__
 
-#include "aligner.h"
 #include "artic.h"
 #include "atts_shared.h"
 #include "durationinterface.h"
+#include "horizontalaligner.h"
 #include "note.h"
 #include "object.h"
 

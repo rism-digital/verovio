@@ -89,6 +89,8 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
     int verticalMargin = 1 * doc->GetDrawingStemWidth(staffSize);
     int horizontalMargin = 2 * doc->GetDrawingStemWidth(staffSize);
 
+    if (element->Is(NOTE)) horizontalMargin = 3 * doc->GetDrawingStemWidth(staffSize);
+
     if (!this->VerticalSelfOverlap(element, verticalMargin)) return false;
 
     if (element->Is(ACCID)) {

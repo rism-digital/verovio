@@ -19,10 +19,12 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "functorparams.h"
+#include "horizontalaligner.h"
 #include "layer.h"
 #include "note.h"
 #include "smufl.h"
 #include "staff.h"
+#include "verticalaligner.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -55,8 +57,6 @@ Chord::Chord()
     RegisterAttClass(ATT_VISIBILITY);
 
     Reset();
-
-    m_drawingLedgerLines.clear();
 }
 
 Chord::~Chord()
@@ -86,8 +86,7 @@ void Chord::ClearClusters() const
     std::list<ChordCluster *>::iterator iter;
     for (iter = m_clusters.begin(); iter != m_clusters.end(); ++iter) {
         for (std::vector<Note *>::iterator clIter = (*iter)->begin(); clIter != (*iter)->end(); ++clIter) {
-            (*clIter)->m_cluster = NULL;
-            (*clIter)->m_clusterPosition = 0;
+            (*clIter)->SetCluster(NULL, 0);
         }
         delete *iter;
     }
@@ -98,6 +97,9 @@ void Chord::AddChild(Object *child)
 {
     if (child->Is(ARTIC)) {
         assert(dynamic_cast<Artic *>(child));
+    }
+    else if (child->Is(DOTS)) {
+        assert(dynamic_cast<Dots *>(child));
     }
     else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
@@ -116,7 +118,7 @@ void Chord::AddChild(Object *child)
     child->SetParent(this);
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is(STEM))
+    if (child->Is({ DOTS, STEM }))
         m_children.insert(m_children.begin(), child);
     else
         m_children.push_back(child);
@@ -157,17 +159,15 @@ void Chord::FilterList(ListOfObjects *childList)
         curPitch = curNote->GetDiatonicPitch();
 
         if ((curPitch - lastPitch < 2) && (curNote->GetCrossStaff(layer1) == lastNote->GetCrossStaff(layer2))) {
-            if (!lastNote->m_cluster) {
+            if (!lastNote->GetCluster()) {
                 curCluster = new ChordCluster();
                 m_clusters.push_back(curCluster);
                 curCluster->push_back(lastNote);
-                lastNote->m_cluster = curCluster;
-                lastNote->m_clusterPosition = (int)curCluster->size();
+                lastNote->SetCluster(curCluster, (int)curCluster->size());
             }
             assert(curCluster);
             curCluster->push_back(curNote);
-            curNote->m_cluster = curCluster;
-            curNote->m_clusterPosition = (int)curCluster->size();
+            curNote->SetCluster(curCluster, (int)curCluster->size());
         }
 
         lastNote = curNote;
@@ -261,14 +261,41 @@ void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow)
     }
 }
 
+void Chord::GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignment, bool &skipAbove, bool &skipBelow)
+{
+    assert(element);
+    assert(alignment);
+
+    // Only flags and stems need to be skipped
+    if (!element->Is({ FLAG, STEM })) return;
+
+    // Nothing to do if there is not cross-staff
+    if (!this->HasCrossStaff()) return;
+
+    Staff *staff = alignment->GetStaff();
+    assert(staff);
+
+    Staff *staffAbove = NULL;
+    Staff *staffBelow = NULL;
+    this->GetCrossStaffExtremes(staffAbove, staffBelow);
+    if (staffAbove && (staffAbove != staff)) {
+        skipAbove = true;
+    }
+    if (staffBelow && (staffBelow != staff)) {
+        skipBelow = true;
+    }
+}
+
 bool Chord::HasCrossStaff()
 {
+    if (m_crossStaff) return true;
+
     Staff *staffAbove = NULL;
     Staff *staffBelow = NULL;
 
     this->GetCrossStaffExtremes(staffAbove, staffBelow);
 
-    return (staffAbove != staffBelow);
+    return ((staffAbove != NULL) || (staffBelow != NULL));
 }
 
 Point Chord::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
@@ -360,11 +387,94 @@ int Chord::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Chord::CalcDots(FunctorParams *functorParams)
+{
+    CalcDotsParams *params = dynamic_cast<CalcDotsParams *>(functorParams);
+    assert(params);
+
+    if (!this->HasDots()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    Dots *dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+    assert(dots);
+
+    params->m_chordDots = dots;
+    params->m_chordDrawingX = this->GetDrawingX();
+    params->m_chordStemDir = this->GetDrawingStemDir();
+
+    ListOfObjects::reverse_iterator rit;
+    ListOfObjects *notes = this->GetList(this);
+    assert(notes);
+
+    assert(this->GetTopNote());
+    assert(this->GetBottomNote());
+
+    for (rit = notes->rbegin(); rit != notes->rend(); rit++) {
+        Note *note = dynamic_cast<Note *>(*rit);
+        assert(note);
+
+        Layer *layer = NULL;
+        Staff *staff = note->GetCrossStaff(layer);
+
+        std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
+        int loc = note->GetDrawingLoc();
+
+        // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
+        if ((loc % 2) == 0) {
+            // defaults to the space above the staffline first
+            // if that position is not on the list already, we're good to go
+            if (std::find(dotLocs->begin(), dotLocs->end(), loc + 1) == dotLocs->end()) {
+                loc += 1;
+            }
+            // if it is on the list, we should try the spot a doubleUnit below
+            else if (std::find(dotLocs->begin(), dotLocs->end(), loc - 1) == dotLocs->end()) {
+                loc -= 1;
+            }
+            // otherwise, any other space looks weird so let's not draw it
+            else {
+                continue;
+            }
+        }
+        // similar if it's not on a staff line
+        else {
+            // see if the optimal place exists already
+            if (std::find(dotLocs->begin(), dotLocs->end(), loc) == dotLocs->end()) {
+            }
+            // if it does, then look up a space first
+            else if (std::find(dotLocs->begin(), dotLocs->end(), loc + 2) == dotLocs->end()) {
+                loc += 2;
+            }
+            // then look down a space
+            else if (std::find(dotLocs->begin(), dotLocs->end(), loc - 2) == dotLocs->end()) {
+                loc -= 2;
+            }
+            // otherwise let's not draw it
+            else {
+                continue;
+            }
+        }
+
+        // finally, make sure it's not outside the acceptable extremes of the chord.
+        // however, this does take into account cross-staff chords because it looks only at the top and bottom notes.
+        // when it would be necessary to look at top and bottom for each staff
+        if (!this->HasCrossStaff()) {
+            if (loc > this->GetTopNote()->GetDrawingLoc() + 1) continue;
+            if (loc < this->GetBottomNote()->GetDrawingLoc() - 1) continue;
+        }
+
+        // if it's not, add it to the dots list and go back to DrawChord
+        dotLocs->push_back(loc);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM));
+    Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM, 1));
     Flag *currentFlag = NULL;
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG));
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG, 1));
 
     if (this->GetActualDur() > DUR_1) {
         if (!currentStem) {
@@ -406,6 +516,24 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
         Note *note = dynamic_cast<Note *>(*it);
         assert(note);
         note->SetDrawingStem(currentStem);
+    }
+
+    /************ dots ***********/
+
+    Dots *currentDots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+
+    if (this->GetDots() > 0) {
+        if (!currentDots) {
+            currentDots = new Dots();
+            this->AddChild(currentDots);
+        }
+        currentDots->AttAugmentdots::operator=(*this);
+    }
+    // This will happen only if the duration has changed
+    else if (currentDots) {
+        if (this->DeleteChild(currentDots)) {
+            currentDots = NULL;
+        }
     }
 
     return FUNCTOR_CONTINUE;

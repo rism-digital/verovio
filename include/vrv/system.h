@@ -8,10 +8,10 @@
 #ifndef __VRV_SYSTEM_H__
 #define __VRV_SYSTEM_H__
 
-#include "aligner.h"
 #include "drawinginterface.h"
 #include "editorial.h"
 #include "object.h"
+#include "verticalaligner.h"
 
 namespace vrv {
 
@@ -127,17 +127,15 @@ public:
     /**
      * See Object::AlignVertically
      */
+    ///@{
     virtual int AlignVertically(FunctorParams *functorParams);
+    virtual int AlignVerticallyEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
-     * See Object::SetAligmentYPos
+     * See Object::AdjustYPos
      */
-    virtual int SetAligmentYPos(FunctorParams *functorParams);
-
-    /**
-     * See Object::IntegrateBoundingBoxYShift
-     */
-    virtual int IntegrateBoundingBoxYShift(FunctorParams *functorParams);
+    virtual int AdjustYPos(FunctorParams *functorParams);
 
     /**
      * See Object::AlignSystems

@@ -13,10 +13,10 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
 #include "editorial.h"
 #include "smufl.h"
 #include "text.h"
+#include "verticalaligner.h"
 #include "vrv.h"
 
 namespace vrv {

@@ -15,6 +15,7 @@ namespace vrv {
 
 class DeviceContext;
 class Layer;
+class LedgerLine;
 class StaffAlignment;
 class StaffDef;
 class Syl;
@@ -38,12 +39,17 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Staff(int n = -1);
+    Staff(int n = 1);
     virtual ~Staff();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Staff"; }
     virtual ClassId GetClassId() const { return STAFF; }
     ///@}
+
+    /**
+     * Delete all the legder line arrays.
+     */
+    void ClearLedgerLines();
 
     /**
      * @name Methods for adding allowed content
@@ -74,6 +80,25 @@ public:
      * Getter for the StaffAlignment
      */
     StaffAlignment *GetAlignment() const { return m_staffAlignment; }
+
+    /**
+     * Return the ledger line arrays (NULL if none)
+     */
+    ///@{
+    ArrayOfLedgerLines *GetLedgerLinesAbove() { return m_ledgerLinesAbove; }
+    ArrayOfLedgerLines *GetLedgerLinesAboveCue() { return m_ledgerLinesAboveCue; }
+    ArrayOfLedgerLines *GetLedgerLinesBelow() { return m_ledgerLinesBelow; }
+    ArrayOfLedgerLines *GetLedgerLinesBelowCue() { return m_ledgerLinesBelowCue; }
+    ///@}
+
+    /**
+     * Add the ledger lines above or below.
+     * If necessary creates the ledger line array.
+     */
+    ///@{
+    void AddLegerLineAbove(int count, short left, short right, bool cueSize);
+    void AddLegerLineBelow(int count, short left, short right, bool cueSize);
+    ///@}
 
     //----------//
     // Functors //
@@ -109,6 +134,12 @@ public:
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
 
+private:
+    /**
+     * Add the ledger line dashes to the legderline array.
+     */
+    void AddLegerLines(ArrayOfLedgerLines *lines, int count, short left, short right);
+
 public:
     /**
      * Number of lines copied from the staffDef for fast access when drawing
@@ -121,15 +152,13 @@ public:
     int m_drawingNotationType;
 
     /**
-     * Total drawing height from top of the top line to bottom of the bottom line
-     */
-    int m_drawingHeight;
-
-    /**
      * The drawing staff size (scale), from the staffDef
      */
     int m_drawingStaffSize;
 
+    /**
+     * A vector of all the spanning elements overlapping with the previous measure
+     */
     std::vector<Object *> m_timeSpanningElements;
 
     /**
@@ -145,6 +174,59 @@ private:
      * A pointer to a StaffAlignment for aligning the staves
      */
     StaffAlignment *m_staffAlignment;
+
+    /**
+     * A pointer to the legder lines (above / below and normal / cue)
+     */
+    ///@{
+    ArrayOfLedgerLines *m_ledgerLinesAbove;
+    ArrayOfLedgerLines *m_ledgerLinesBelow;
+    ArrayOfLedgerLines *m_ledgerLinesAboveCue;
+    ArrayOfLedgerLines *m_ledgerLinesBelowCue;
+    ///@}
+};
+
+//----------------------------------------------------------------------------
+// LedgerLine
+//----------------------------------------------------------------------------
+
+/**
+ * This is a class with no MEI equivalent for representing legder lines.
+ * A ledger line is represented by a list of dashes.
+ * Each dash is represented by a pair of points (left - right).
+ */
+class LedgerLine {
+public:
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    LedgerLine();
+    virtual ~LedgerLine();
+    virtual void Reset();
+    ///@}
+
+    /**
+     * Add a dash to the ledger line object.
+     * If necessary merges overlapping dashes.
+     */
+    void AddDash(short left, short right);
+
+protected:
+    //
+private:
+    //
+public:
+    /**
+     * A list of dashes relative to the staff position.
+     */
+    std::list<std::pair<short, short> > m_dashes;
+
+protected:
+    //
+private:
+    //
 };
 
 } // namespace vrv

@@ -558,9 +558,19 @@ public:
     virtual int SetAlignmentPitchPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Set the drawing stems positions, including for beams.
+     * Set the drawing stem positions, including for beams.
      */
     virtual int CalcStem(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Set the note head flipped positions
+     */
+    virtual int CalcChordNoteHeads(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Set the drawing dot positions, including for chords.
+     */
+    virtual int CalcDots(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.
@@ -609,7 +619,10 @@ public:
      * Align vertically the content of a page.
      * For each Staff, instanciate its StaffAlignment.
      */
+    ///@{
     virtual int AlignVertically(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AlignVerticallyEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
@@ -622,10 +635,9 @@ public:
     virtual int CalcStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Correct the Y alignment once the content of a system has been aligned and laid out
-     * See System::IntegrateBoundingBoxYShift for actual implementation
+     * Set the note head flipped positions and calc the ledger lines
      */
-    virtual int IntegrateBoundingBoxYShift(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CalcLedgerLines(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Reset the verticall alignment environment for various types for object.
@@ -633,9 +645,9 @@ public:
     virtual int ResetVerticalAlignment(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Set the position of the StaffAlignment.
+     * Adjust the position of the StaffAlignment.
      */
-    virtual int SetAligmentYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.

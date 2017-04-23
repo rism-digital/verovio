@@ -13,12 +13,12 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "staff.h"
 #include "syl.h"
+#include "verticalaligner.h"
 #include "vrv.h"
 
 namespace vrv {

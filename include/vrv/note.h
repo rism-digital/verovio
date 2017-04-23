@@ -91,14 +91,38 @@ public:
     Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; }
     ///@}
 
+    void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
+    int GetDrawingLoc() const { return m_drawingLoc; }
+
     /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{
     Chord *IsChordTone() const;
-    int GetDrawingDur();
+    int GetDrawingDur() const;
     bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}
+
+    /**
+     * @name Setter and getter for the chord cluster and the position of the note
+     */
+    ///@{
+    void SetCluster(ChordCluster *cluster, int position);
+    ChordCluster *GetCluster() const { return m_cluster; }
+    ///}
+
+    /**
+     * @name Setter and getter for the flipped note head flag
+     */
+    ///@{
+    void SetFlippedNotehead(bool flippedNotehead) { m_flippedNotehead = flippedNotehead; }
+    bool GetFlippedNotehead() const { return m_flippedNotehead; }
+    ///}
+
+    /**
+     * Get the drawing radius of the note head taking into accound the note duration
+     */
+    int GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) const;
 
     /**
      * Returns a single integer representing pitch and octave.
@@ -122,6 +146,21 @@ public:
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcChordNoteHeads
+     */
+    virtual int CalcChordNoteHeads(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcDots
+     */
+    virtual int CalcDots(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcLedgerLines
+     */
+    virtual int CalcLedgerLines(FunctorParams *functorParams);
 
     /**
     * See Object::PrepareLayerElementParts
@@ -153,16 +192,14 @@ public:
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+
 private:
     //
 public:
-    /** drawing stem length */
-    int d_stemLen;
-
-    /** flags for determining clusters in chord **/
-    ChordCluster *m_cluster; // cluster this belongs to
-    int m_clusterPosition; // 1-indexed position in said cluster; 0 if does not have position
-
     double m_playingOnset;
     double m_playingOffset;
 
@@ -173,6 +210,26 @@ private:
      * The note with the initial attribute owns the Tie object and takes care of deleting it
      */
     Tie *m_drawingTieAttr;
+
+    /**
+     * The drawing location of the note
+     */
+    int m_drawingLoc;
+
+    /**
+     * A fling indicating if the note head is flipped
+     */
+    bool m_flippedNotehead;
+
+    /**
+     * flags for determining clusters in chord (cluster this belongs to)
+     **/
+    ChordCluster *m_cluster;
+
+    /**
+     * Position in the cluster (1-indexed position in said cluster; 0 if does not have position)
+     */
+    int m_clusterPosition;
 };
 
 //----------------------------------------------------------------------------

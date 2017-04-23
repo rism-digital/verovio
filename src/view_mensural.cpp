@@ -152,25 +152,6 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         DrawMensuralStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
     }
 
-    /************** Ledger lines: **************/
-
-    int staffTop = staffY + m_doc->GetDrawingUnit(staffSize);
-    int staffBot = staffY - m_doc->GetDrawingStaffSize(staffSize) - m_doc->GetDrawingUnit(staffSize);
-
-    // if the note is not in the staff
-    if (!isIn(noteY, staffTop, staffBot)) {
-        int distance, highestNewLine, numLines;
-        bool aboveStaff = (noteY > staffTop);
-
-        distance = (aboveStaff ? (noteY - staffY) : staffY - m_doc->GetDrawingStaffSize(staffSize) - noteY);
-        highestNewLine
-            = ((distance % m_doc->GetDrawingDoubleUnit(staffSize) > 0) ? (distance - m_doc->GetDrawingUnit(staffSize))
-                                                                       : distance);
-        numLines = highestNewLine / m_doc->GetDrawingDoubleUnit(staffSize);
-
-        DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
-    }
-
     /************** Augmentation dots **************/
 
     if (note->GetDots()) {
@@ -181,7 +162,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         else
             xDot = xStem + mensDrawingUnit * 5 / 2;
 
-        DrawDots(dc, xDot, noteY, note->GetDots(), staff);
+        DrawDotsPart(dc, xDot, noteY, note->GetDots(), staff);
     }
 
     /************** accidental **************/
@@ -306,8 +287,8 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     baseStem = m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
     flagStemHeight = m_doc->GetDrawingDoubleUnit(staffSize);
     if (drawingCueSize) {
-        baseStem = m_doc->GetGraceSize(baseStem);
-        flagStemHeight = m_doc->GetGraceSize(flagStemHeight);
+        baseStem = m_doc->GetCueSize(baseStem);
+        flagStemHeight = m_doc->GetCueSize(flagStemHeight);
     }
 
     nbFlags = (mensural_black ? drawingDur - DUR_2 : drawingDur - DUR_4);
@@ -353,8 +334,8 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     int stemY2 = y2;
     if (nbFlags > 0) {
         // if we have flags, shorten the stem to make sure we have a nice overlap with the flag glyph
-        int shortener = (drawingCueSize) ? m_doc->GetGraceSize(m_doc->GetDrawingUnit(staffSize))
-                                         : m_doc->GetDrawingUnit(staffSize);
+        int shortener
+            = (drawingCueSize) ? m_doc->GetCueSize(m_doc->GetDrawingUnit(staffSize)) : m_doc->GetDrawingUnit(staffSize);
         stemY2 = (dir == STEMDIRECTION_up) ? y2 - shortener : y2 + shortener;
     }
 
@@ -383,7 +364,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     // Store the start and end values
     StemmedDrawingInterface *interface = object->GetStemmedDrawingInterface();
     assert(interface);
-    //assert(false);
+    // assert(false);
     // interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
     // interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
     interface->SetDrawingStemDir(dir);

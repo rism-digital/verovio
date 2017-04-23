@@ -12,7 +12,6 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "aligner.h"
 #include "attcomparison.h"
 #include "barline.h"
 #include "beam.h"
@@ -22,6 +21,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "functorparams.h"
+#include "horizontalaligner.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -571,7 +571,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         else
             type = ALIGNMENT_ACCID;
     }
-    else if (this->Is({ FLAG, STEM })) {
+    else if (this->Is({ DOTS, FLAG, STEM })) {
         // Refer to the note parent (if any?)
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
@@ -706,7 +706,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         if (chord && !m_crossStaff) {
             yRel -= chord->GetDrawingYRel();
         }
-
+        note->SetDrawingLoc(loc);
         this->SetDrawingYRel(yRel);
     }
     else if (this->Is(REST)) {
@@ -749,7 +749,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     if (params->m_graceCumulatedXShift == VRV_UNSET) params->m_graceCumulatedXShift = 0;
 
-    LogDebug("Aligning %s", this->GetClassName().c_str());
+    // LogDebug("Aligning %s", this->GetClassName().c_str());
 
     // With non grace alignment we do not need to do this
     this->ResetCachedDrawingX();
@@ -772,7 +772,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     int selfLeft = this->GetSelfLeft()
         - params->m_doc->GetLeftMargin(this->GetClassId())
-            * params->m_doc->GetDrawingUnit(params->m_doc->GetGraceSize(100)) / PARAM_DENOMINATOR;
+            * params->m_doc->GetDrawingUnit(params->m_doc->GetCueSize(100)) / PARAM_DENOMINATOR;
 
     params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
 
@@ -874,9 +874,14 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
             if (note) m_drawingCueSize = note->IsCueSize();
         }
     }
-    else if (this->Is({ FLAG, STEM })) {
-        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
-        if (note) m_drawingCueSize = note->IsCueSize();
+    else if (this->Is({ DOTS, FLAG, STEM })) {
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_NOTE_DEPTH));
+        if (note)
+            m_drawingCueSize = note->IsCueSize();
+        else {
+            Chord *chord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+            if (chord) m_drawingCueSize = chord->IsCueSize();
+        }
     }
 
     return FUNCTOR_CONTINUE;

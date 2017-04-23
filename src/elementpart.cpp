@@ -25,6 +25,42 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// Dots
+//----------------------------------------------------------------------------
+
+Dots::Dots() : LayerElement("dots-"), vrv::AttAugmentdots()
+{
+    RegisterAttClass(ATT_AUGMENTDOTS);
+
+    Reset();
+}
+
+Dots::~Dots()
+{
+}
+
+void Dots::Reset()
+{
+    LayerElement::Reset();
+    ResetAugmentdots();
+}
+
+std::list<int> *Dots::GetDotLocsForStaff(Staff *staff)
+{
+    return &m_dotLocsByStaff[staff];
+    /*
+    if (m_dotLocsByStaff.count(staff) == 0)
+        m_dotLocsByStaff[staff] =
+
+    auto item = std::find_if(m_dotLocsByStaff.begin(), m_dotLocsByStaff.end(),
+                             [staff](MapOfDotLocs dotLocs) { return (staff == dotLocs. .first) });
+    if (item != m_dotLocsByStaff.end()) {
+        // LogDebug("Found it!");
+    }
+    */
+}
+
+//----------------------------------------------------------------------------
 // Flag
 //----------------------------------------------------------------------------
 
@@ -129,6 +165,26 @@ void Stem::AddChild(Object *child)
 // Functors methods
 //----------------------------------------------------------------------------
 
+int Dots::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    m_dotLocsByStaff.clear();
+
+    return FUNCTOR_CONTINUE;
+};
+
+int Flag::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    m_drawingNbFlags = 0;
+
+    return FUNCTOR_CONTINUE;
+};
+
 int Stem::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
@@ -153,7 +209,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
     else {
         baseStem = -params->m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
-        if (drawingCueSize) baseStem = params->m_doc->GetGraceSize(baseStem);
+        if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);
     }
     // Even if a stem length is given we add the length of the chord content
     // Also, the given stem length is understood as being mesured from the center of the note.
@@ -226,16 +282,6 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-
-int Flag::ResetDrawing(FunctorParams *functorParams)
-{
-    // Call parent one too
-    LayerElement::ResetDrawing(functorParams);
-
-    m_drawingNbFlags = 0;
-
-    return FUNCTOR_CONTINUE;
-};
 
 int Stem::ResetDrawing(FunctorParams *functorParams)
 {

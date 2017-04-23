@@ -8,6 +8,7 @@
 #ifndef __VRV_REST_H__
 #define __VRV_REST_H__
 
+#include "atts_mensural.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "positioninterface.h"
@@ -25,7 +26,8 @@ class Rest : public LayerElement,
              public DurationInterface,
              public PositionInterface,
              public AttColor,
-             public AttRelativesize {
+             public AttRelativesize,
+             public AttRestVisMensural {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

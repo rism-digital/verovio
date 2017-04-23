@@ -15,8 +15,7 @@
 
 namespace vrv {
 
-#define ledgermin(a, b) (((a) < (b)) ? (a) : (b))
-#define ledgermax(a, b) (((a) > (b)) ? (a) : (b))
+class StaffAlignment;
 
 //----------------------------------------------------------------------------
 // Chord
@@ -91,6 +90,11 @@ public:
     void GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow);
 
     /**
+     *
+     */
+    void GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignment, bool &skipAbove, bool &skipBelow);
+
+    /**
      * Return true if the chord has some cross staff notes.
      */
     bool HasCrossStaff();
@@ -127,6 +131,11 @@ public:
     virtual int CalcStem(FunctorParams *functorParams);
 
     /**
+     * See Object::CalcDots
+     */
+    virtual int CalcDots(FunctorParams *functorParams);
+
+    /**
      * See Object::PrepareLayerElementParts
      */
     virtual int PrepareLayerElementParts(FunctorParams *functorParams);
@@ -145,15 +154,6 @@ protected:
 
 public:
     mutable std::list<ChordCluster *> m_clusters;
-
-    /**
-     * Number of ledger lines for the chord where:
-     * Staff * is each staff for which the chord has notes and maps to:
-     * a four char vector acting as a 2D array (2x2) where:
-     * [0][x] is single-length, [1][x] is double-length
-     * [x][0] is below staff, [x][1] is above staff
-     */
-    MapOfLedgerLineFlags m_drawingLedgerLines;
 
     /**
      * Positions of dots in the chord to avoid overlapping

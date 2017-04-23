@@ -1156,6 +1156,7 @@ void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
     WritePositionInterface(currentNode, rest);
     rest->WriteColor(currentNode);
     rest->WriteRelativesize(currentNode);
+    rest->WriteRestVisMensural(currentNode);
 }
 
 void MeiOutput::WriteMeiProport(pugi::xml_node currentNode, Proport *proport)
@@ -1222,6 +1223,7 @@ void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
     rend->WriteCommon(currentNode);
     rend->WriteLang(currentNode);
     rend->WriteTypography(currentNode);
+    rend->WriteWhitespace(currentNode);
 }
 
 void MeiOutput::WriteMeiText(pugi::xml_node element, Text *text)
@@ -2539,8 +2541,11 @@ bool MeiInput::ReadMeiLayer(Object *parent, pugi::xml_node layer)
     vrvLayer->ReadCommon(layer);
     vrvLayer->ReadTyped(layer);
 
-    if (!vrvLayer->HasN() || (vrvLayer->GetN() == 0)) {
-        LogWarning("No @n on <layer> or a value of 0 might yield unpredictable results");
+    if (!vrvLayer->HasN()) {
+        LogWarning("No @n on <layer>, 1 is set");
+    }
+    else if (vrvLayer->GetN() == 0) {
+        LogWarning("Value @n='1' on <layer> might yield unpredictable results");
     }
 
     parent->AddChild(vrvLayer);
@@ -2740,7 +2745,7 @@ bool MeiInput::ReadMeiBTrem(Object *parent, pugi::xml_node bTrem)
     ReadLayerElement(bTrem, vrvBTrem);
 
     vrvBTrem->ReadTremmeasured(bTrem);
-    
+
     parent->AddChild(vrvBTrem);
     return ReadMeiLayerChildren(vrvBTrem, bTrem, vrvBTrem);
 }
@@ -2814,7 +2819,7 @@ bool MeiInput::ReadMeiFTrem(Object *parent, pugi::xml_node fTrem)
 
     vrvFTrem->ReadSlashcount(fTrem);
     vrvFTrem->ReadTremmeasured(fTrem);
-    
+
     parent->AddChild(vrvFTrem);
     return ReadMeiLayerChildren(vrvFTrem, fTrem, vrvFTrem);
 }
@@ -2980,6 +2985,7 @@ bool MeiInput::ReadMeiRest(Object *parent, pugi::xml_node rest)
     ReadPositionInterface(rest, vrvRest);
     vrvRest->ReadColor(rest);
     vrvRest->ReadRelativesize(rest);
+    vrvRest->ReadRestVisMensural(rest);
 
     parent->AddChild(vrvRest);
     return true;
@@ -3104,6 +3110,7 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
     vrvRend->ReadHorizontalalign(rend);
     vrvRend->ReadLang(rend);
     vrvRend->ReadTypography(rend);
+    vrvRend->ReadWhitespace(rend);
 
     parent->AddChild(vrvRend);
     return ReadMeiTextChildren(vrvRend, rend);

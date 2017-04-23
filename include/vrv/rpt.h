@@ -93,7 +93,7 @@ private:
 /**
  * This class models the MEI <fTrem>
  */
-class FTrem : public LayerElement, public ObjectListInterface, public AttSlashcount, public AttTremmeasured  {
+class FTrem : public LayerElement, public ObjectListInterface, public AttSlashcount, public AttTremmeasured {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
