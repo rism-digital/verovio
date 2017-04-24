@@ -372,16 +372,21 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
 
 void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
 {
-    std::string mm = GetContent(metronome.select_single_node("per-minute").node());
-    if (atoi(mm.c_str())) tempo->SetMm(mm.c_str());
+    std::string tempoText = "M.M.";
+    if (metronome.select_single_node("per-minute").node()) {
+        std::string mm = GetContent(metronome.select_single_node("per-minute").node());
+        if (atoi(mm.c_str())) tempo->SetMm(mm.c_str());
+        tempoText = tempoText + StringFormat(" = %s", mm.c_str());
+    }
     if (metronome.select_single_node("beat-unit").node()) {
         tempo->SetMmUnit(ConvertTypeToDur(GetContent(metronome.select_single_node("beat-unit").node())));
     }
     if (metronome.select_single_node("beat-unit-dot")) {
         tempo->SetMmDots((int)metronome.select_nodes("beat-unit-dot").size());
     }
+    if (GetAttributeValue(metronome, "parentheses") == "yes") tempoText = "(" + tempoText + ")";
     Text *text = new Text();
-    text->SetText(UTF8to16(StringFormat("M.M. = %s", mm.c_str())));
+    text->SetText(UTF8to16(tempoText));
     tempo->AddChild(text);
 }
 
@@ -1384,30 +1389,30 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         }
 
         // articulation
-        pugi::xpath_node articulations = notations.node().select_single_node("articulations");
         std::vector<data_ARTICULATION> artics;
-        if (articulations) {
+        pugi::xpath_node_set articulations = node.select_nodes("notations/articulations");
+        for (pugi::xpath_node_set::const_iterator it = articulations.begin(); it != articulations.end(); ++it) {
             Artic *artic = new Artic();
-            if (articulations.node().select_single_node("accent")) artics.push_back(ARTICULATION_acc);
-            if (articulations.node().select_single_node("detached-legato")) artics.push_back(ARTICULATION_ten_stacc);
-            if (articulations.node().select_single_node("spiccato")) artics.push_back(ARTICULATION_spicc);
-            if (articulations.node().select_single_node("staccatissimo")) artics.push_back(ARTICULATION_stacciss);
-            if (articulations.node().select_single_node("staccato")) artics.push_back(ARTICULATION_stacc);
-            if (articulations.node().select_single_node("strong-accent")) artics.push_back(ARTICULATION_marc);
-            if (articulations.node().select_single_node("tenuto")) artics.push_back(ARTICULATION_ten);
+            if (it->node().select_single_node("accent")) artics.push_back(ARTICULATION_acc);
+            if (it->node().select_single_node("detached-legato")) artics.push_back(ARTICULATION_ten_stacc);
+            if (it->node().select_single_node("spiccato")) artics.push_back(ARTICULATION_spicc);
+            if (it->node().select_single_node("staccatissimo")) artics.push_back(ARTICULATION_stacciss);
+            if (it->node().select_single_node("staccato")) artics.push_back(ARTICULATION_stacc);
+            if (it->node().select_single_node("strong-accent")) artics.push_back(ARTICULATION_marc);
+            if (it->node().select_single_node("tenuto")) artics.push_back(ARTICULATION_ten);
             artic->SetArtic(artics);
             element->AddChild(artic);
-        }
-        pugi::xpath_node technical = notations.node().select_single_node("technical");
-        if (technical) {
             artics.clear();
+        }
+        pugi::xpath_node_set technical = node.select_nodes("notations/technical");
+        for (pugi::xpath_node_set::const_iterator it = technical.begin(); it != technical.end(); ++it) {
             Artic *artic = new Artic();
-            if (technical.node().select_single_node("down-bow")) artics.push_back(ARTICULATION_dnbow);
-            if (technical.node().select_single_node("harmonic")) artics.push_back(ARTICULATION_harm);
-            if (technical.node().select_single_node("open-string")) artics.push_back(ARTICULATION_open);
-            if (technical.node().select_single_node("snap-pizzicato")) artics.push_back(ARTICULATION_snap);
-            if (technical.node().select_single_node("stopped")) artics.push_back(ARTICULATION_stop);
-            if (technical.node().select_single_node("up-bow")) artics.push_back(ARTICULATION_upbow);
+            if (it->node().select_single_node("down-bow")) artics.push_back(ARTICULATION_dnbow);
+            if (it->node().select_single_node("harmonic")) artics.push_back(ARTICULATION_harm);
+            if (it->node().select_single_node("open-string")) artics.push_back(ARTICULATION_open);
+            if (it->node().select_single_node("snap-pizzicato")) artics.push_back(ARTICULATION_snap);
+            if (it->node().select_single_node("stopped")) artics.push_back(ARTICULATION_stop);
+            if (it->node().select_single_node("up-bow")) artics.push_back(ARTICULATION_upbow);
             artic->SetArtic(artics);
             element->AddChild(artic);
         }
@@ -1666,6 +1671,8 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Measure *measure, int
 {
     assert(node);
     assert(measure);
+    
+    
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1727,7 +1734,7 @@ data_BOOLEAN MusicXmlInput::ConvertWordToBool(std::string value)
 data_DURATION MusicXmlInput::ConvertTypeToDur(std::string value)
 {
     if (value == "maxima") return DURATION_maxima; // this is a mensural MEI value
-    if (value == "longa") return DURATION_long;
+    if (value == "long") return DURATION_long; // mensural MEI value longa isn't supported
     if (value == "breve") return DURATION_breve;
     if (value == "whole") return DURATION_1;
     if (value == "half") return DURATION_2;
