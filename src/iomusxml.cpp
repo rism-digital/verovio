@@ -357,7 +357,8 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
             if (words.size() > 1 && !lang.empty()) {
                 rend->SetLang(lang.c_str());
             }
-            if (!textAlign.empty()) rend->SetHalign(rend->AttHorizontalalign::StrToHorizontalalignment(textAlign.c_str()));
+            if (!textAlign.empty())
+                rend->SetHalign(rend->AttHorizontalalign::StrToHorizontalalignment(textAlign.c_str()));
             if (!textColor.empty()) rend->SetColor(textColor.c_str());
             if (!textFont.empty()) rend->SetFontfam(textFont.c_str());
             if (!textStyle.empty()) rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textStyle.c_str()));
@@ -636,22 +637,28 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     staffDef->SetClefDisPlace(PLACE_above);
             }
             // key sig
-            pugi::xpath_node keyFifths;
-            xpath = StringFormat("key[@number='%d']/fifths", i + 1);
-            keyFifths = it->select_single_node(xpath.c_str());
-            if (!keyFifths) {
-                keyFifths = it->select_single_node("key/fifths");
+            pugi::xpath_node key;
+            xpath = StringFormat("key[@number='%d']", i + 1);
+            key = it->select_single_node(xpath.c_str());
+            if (!key) {
+                key = it->select_single_node("key");
             }
-            if (keyFifths && HasContent(keyFifths.node())) {
-                int key = atoi(keyFifths.node().text().as_string());
-                std::string value;
-                if (key < 0)
-                    value = StringFormat("%df", abs(key));
-                else if (key > 0)
-                    value = StringFormat("%ds", key);
-                else
-                    value = "0";
-                staffDef->SetKeySig(staffDef->AttKeySigDefaultLog::StrToKeysignature(value));
+            if (key) {
+                if (key.node().select_single_node("fifths")) {
+                    int fifths = atoi(key.node().select_single_node("fifths").node().text().as_string());
+                    std::string keySig;
+                    if (fifths < 0)
+                        keySig = StringFormat("%df", abs(fifths));
+                    else if (fifths > 0)
+                        keySig = StringFormat("%ds", fifths);
+                    else
+                        keySig = "0";
+                    staffDef->SetKeySig(staffDef->AttKeySigDefaultLog::StrToKeysignature(keySig));
+                }
+                if (key.node().select_single_node("mode")) {
+                    staffDef->SetKeyMode(staffDef->AttKeySigDefaultLog::StrToMode(
+                        key.node().select_single_node("mode").node().text().as_string()));
+                }
             }
             // staff details
             pugi::xpath_node staffDetails;
@@ -696,10 +703,13 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 }
                 pugi::xpath_node beats = time.node().select_single_node("beats");
                 if (beats && HasContent(beats.node())) {
-                    m_meterCount = beats.node().text().as_int(); //staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
+                    m_meterCount
+                        = beats.node()
+                              .text()
+                              .as_int(); // staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
                     // this is a little "hack", until libMEI is fixed
                     std::string compound = beats.node().text().as_string();
-                    if (compound.find("+")!=std::string::npos) {
+                    if (compound.find("+") != std::string::npos) {
                         m_meterCount += atoi(compound.substr(compound.find("+")).c_str());
                         LogWarning("Compound time is not supported");
                     }
@@ -719,8 +729,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 transpose = it->select_single_node("transpose");
             }
             if (transpose) {
-                staffDef->SetTransDiat(atof(GetContentOfChild(transpose.node(), "diatonic").c_str()));
-                staffDef->SetTransSemi(atof(GetContentOfChild(transpose.node(), "chromatic").c_str()));
+                staffDef->SetTransDiat(atoi(GetContentOfChild(transpose.node(), "diatonic").c_str()));
+                staffDef->SetTransSemi(atoi(GetContentOfChild(transpose.node(), "chromatic").c_str()));
             }
             // ppq
             pugi::xpath_node divisions = it->select_single_node("divisions");
@@ -1414,6 +1424,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             if (it->node().select_single_node("stopped")) artics.push_back(ARTICULATION_stop);
             if (it->node().select_single_node("up-bow")) artics.push_back(ARTICULATION_upbow);
             artic->SetArtic(artics);
+            artic->SetType("technical");
             element->AddChild(artic);
         }
 
@@ -1671,8 +1682,16 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Measure *measure, int
 {
     assert(node);
     assert(measure);
-    
-    
+
+    if (HasAttributeWithValue(node, "new-system", "yes")) {
+        LogWarning("System breaks not supported");
+        // enter system break
+    }
+
+    if (HasAttributeWithValue(node, "new-page", "yes")) {
+        // enter system break
+        LogWarning("Page breaks not supported");
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
