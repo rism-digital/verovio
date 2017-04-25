@@ -13,7 +13,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "verticalaligner.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -29,6 +28,7 @@
 #include "timeinterface.h"
 #include "trill.h"
 #include "turn.h"
+#include "verticalaligner.h"
 #include "vrv.h"
 
 namespace vrv {

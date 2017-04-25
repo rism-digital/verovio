@@ -12,7 +12,6 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "horizontalaligner.h"
 #include "attcomparison.h"
 #include "barline.h"
 #include "beam.h"
@@ -22,6 +21,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "functorparams.h"
+#include "horizontalaligner.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -566,7 +566,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         else
             type = ALIGNMENT_ACCID;
     }
-    else if (this->Is({ FLAG, STEM })) {
+    else if (this->Is({ DOTS, FLAG, STEM })) {
         // Refer to the note parent (if any?)
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
@@ -864,9 +864,14 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
             if (note) m_drawingCueSize = note->IsCueSize();
         }
     }
-    else if (this->Is({ FLAG, STEM })) {
-        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
-        if (note) m_drawingCueSize = note->IsCueSize();
+    else if (this->Is({ DOTS, FLAG, STEM })) {
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_NOTE_DEPTH));
+        if (note)
+            m_drawingCueSize = note->IsCueSize();
+        else {
+            Chord *chord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+            if (chord) m_drawingCueSize = chord->IsCueSize();
+        }
     }
 
     return FUNCTOR_CONTINUE;

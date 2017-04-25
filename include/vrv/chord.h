@@ -131,6 +131,11 @@ public:
     virtual int CalcStem(FunctorParams *functorParams);
 
     /**
+     * See Object::CalcDots
+     */
+    virtual int CalcDots(FunctorParams *functorParams);
+
+    /**
      * See Object::PrepareLayerElementParts
      */
     virtual int PrepareLayerElementParts(FunctorParams *functorParams);
