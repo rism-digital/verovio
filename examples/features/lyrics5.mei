@@ -1,0 +1,1146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Hyphen removal</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-25</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio removes hyphens between syllables if there is not enough space. The words are displayed as if they were not divided.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+              <titleStmt>
+                <title xml:lang="de" type="main">Liebes-A-B-C</title>
+               <respStmt>
+                <persName role="Composer">Pohlenz, August</persName>
+                <persName role="Lyricist">Gerhard, Wilhelm</persName>
+                <persName role="Collector">Erk, Ludwig</persName>
+                <persName role="digital editor">2011/02/05/</persName>
+               </respStmt>
+              </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000103631599">
+                        <staffGrp xml:id="m-000000056201434" symbol="bracket">
+                            <staffDef xml:id="staffdef-000000114200010" clef.shape="G" clef.line="2" key.sig="1f" meter.count="3" meter.unit="8" n="1" lines="5" />
+                            <staffDef xml:id="staffdef-000000100277922" clef.shape="G" clef.line="2" key.sig="1f" meter.count="3" meter.unit="8" n="2" lines="5" />
+                            <staffDef xml:id="staffdef-000000108040016" clef.shape="F" clef.line="4" key.sig="1f" meter.count="3" meter.unit="8" n="3" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-000000144726345" n="1">
+                            <staff xml:id="staff-000000013766465" n="1">
+                                <!-- kern: =1-  8f/  8e/  8f/  =2 -->
+                                <layer xml:id="layer-000000057941939" n="1">
+                                    <note xml:id="note-000000161091626" dur="8" oct="4" pname="f" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000134336174" n="1">
+                                            <syl xml:id="syl-000000138518326">A</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000080998886" n="2">
+                                            <syl xml:id="syl-000000058393168">E</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000114823300" n="3">
+                                            <syl xml:id="syl-000000106413032">I</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000154708477" n="4">
+                                            <syl xml:id="syl-000000012178193">M</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000078532369" n="5">
+                                            <syl xml:id="syl-000000050081378">Q</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000016462257" n="6">
+                                            <syl xml:id="syl-000000085268068">U</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000176834760" n="7">
+                                            <syl xml:id="syl-000000159198959" con="d" wordpos="i">Yp</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000015727102" dur="8" oct="4" pname="e" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000184923136" n="1">
+                                            <syl xml:id="syl-000000164821217">B</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000078165417" n="2">
+                                            <syl xml:id="syl-000000110430094">F</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000002745311" n="3">
+                                            <syl xml:id="syl-000000184300334">K</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000172836420" n="4">
+                                            <syl xml:id="syl-000000175333369">N</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000155171046" n="5">
+                                            <syl xml:id="syl-000000055634247">R</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000074843925" n="6">
+                                            <syl xml:id="syl-000000120677107">V</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000084882371" n="7">
+                                            <syl xml:id="syl-000000044632779" con="d" wordpos="m">si</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000089113136" dur="8" oct="4" pname="f" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000069396460" n="1">
+                                            <syl xml:id="syl-000000047942937">C</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000204649600" n="2">
+                                            <syl xml:id="syl-000000136033291">G</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000053965108" n="3">
+                                            <syl xml:id="syl-000000109234431">und</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000204939574" n="4">
+                                            <syl xml:id="syl-000000070412240">O</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000101505350" n="5">
+                                            <syl xml:id="syl-000000039418357">S</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000095848228" n="6">
+                                            <syl xml:id="syl-000000093686062">W</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000161756064" n="7">
+                                            <syl xml:id="syl-000000134634037" wordpos="t">lon</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000088988473" n="2">
+                                <!-- kern: =1-  *^  8f/L  8e/  8f/J  *v  =2 -->
+                                <layer xml:id="layer-000000076805193" n="1">
+                                    <beam xml:id="beam-000000012461900">
+                                        <note xml:id="note-000000067509482" dur="8" oct="4" pname="f" accid.ges="n" stem.dir="up" />
+                                        <note xml:id="note-000000116259986" dur="8" oct="4" pname="e" accid.ges="n" stem.dir="up" />
+                                        <note xml:id="note-000000200974426" dur="8" oct="4" pname="f" accid.ges="n" stem.dir="up" />
+                                    </beam>
+                                </layer>
+                                <!-- kern: 4c\  8c\  *v -->
+                                <layer xml:id="layer-000000000154457" n="2">
+                                    <note xml:id="note-000000018991868" dur="4" oct="4" pname="c" accid.ges="n" stem.dir="down" />
+                                    <note xml:id="note-000000194017858" dur="8" oct="4" pname="c" accid.ges="n" stem.dir="down" />
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000121655620" n="3">
+                                <!-- kern: =1-  *^  8A/L  8G/  8A/J  *v  =2 -->
+                                <layer xml:id="layer-000000118976524" n="1">
+                                    <beam xml:id="beam-000000116415146">
+                                        <note xml:id="note-000000017013082" dur="8" oct="3" pname="a" accid.ges="n" stem.dir="up" />
+                                        <note xml:id="note-000000108802481" dur="8" oct="3" pname="g" accid.ges="n" stem.dir="up" />
+                                        <note xml:id="note-000000060974427" dur="8" oct="3" pname="a" accid.ges="n" stem.dir="up" />
+                                    </beam>
+                                </layer>
+                                <!-- kern: 4F\  8F\  *v -->
+                                <layer xml:id="layer-000000018001602" n="2">
+                                    <note xml:id="note-000000187227316" dur="4" oct="3" pname="f" accid.ges="n" stem.dir="down" />
+                                    <note xml:id="note-000000021718785" dur="8" oct="3" pname="f" accid.ges="n" stem.dir="down" />
+                                </layer>
+                            </staff>
+                            <tempo xml:id="tempo-000000046840157" staff="1" tstamp="1.000000">Allegretto</tempo>
+                            <dynam xml:id="dynam-000000080258893" staff="2" tstamp="1.000000">p</dynam>
+                        </measure>
+                        <measure xml:id="measure-000000170159634" n="2">
+                            <staff xml:id="staff-000000096435253" n="1">
+                                <!-- kern: =2  4g/  8r  =3 -->
+                                <layer xml:id="layer-000000139899130" n="1">
+                                    <note xml:id="note-000000004834490" dur="4" oct="4" pname="g" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000078398296" n="1">
+                                            <syl xml:id="syl-000000158946798">D,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000128296362" n="2">
+                                            <syl xml:id="syl-000000203374546">H,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000097625932" n="3">
+                                            <syl xml:id="syl-000000121544580">L,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000069522915" n="4">
+                                            <syl xml:id="syl-000000025780072">P,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000190080023" n="5">
+                                            <syl xml:id="syl-000000078281687">T,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000213797002" n="6">
+                                            <syl xml:id="syl-000000116581176">X,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000177777913" n="7">
+                                            <syl xml:id="syl-000000119395804">Z,</syl>
+                                        </verse>
+                                    </note>
+                                    <rest xml:id="rest-000000182297265" dur="8" />
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000081392141" n="2">
+                                <!-- kern: =2  4e/ 4g/  8r  =3 -->
+                                <layer xml:id="layer-000000055223764" n="1">
+                                    <chord xml:id="chord-000000003374356" dur="4" stem.dir="up">
+                                        <note xml:id="note-000000019244776" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-000000035914674" oct="4" pname="g" accid.ges="n" />
+                                    </chord>
+                                    <rest xml:id="rest-000000175029514" dur="8" />
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000010639051" n="3">
+                                <!-- kern: =2  4C\ 4c\  8r  =3 -->
+                                <layer xml:id="layer-000000097950540" n="1">
+                                    <chord xml:id="chord-000000208525480" dur="4" stem.dir="down">
+                                        <note xml:id="note-000000209192266" oct="3" pname="c" accid.ges="n" />
+                                        <note xml:id="note-000000034192835" oct="4" pname="c" accid.ges="n" />
+                                    </chord>
+                                    <rest xml:id="rest-000000012365672" dur="8" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-000000168192404" n="3">
+                            <staff xml:id="staff-000000070419167" n="1">
+                                <!-- kern: =3  8g/  8f/  8g/  =4 -->
+                                <layer xml:id="layer-000000044800623" n="1">
+                                    <note xml:id="note-000000056305803" dur="8" oct="4" pname="g" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000150344556" n="1">
+                                            <syl xml:id="syl-000000111698673">wenn</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000007152865" n="2">
+                                            <syl xml:id="syl-000000173876271">wärst</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000035016373" n="3">
+                                            <syl xml:id="syl-000000109673497" con="d" wordpos="i">Aeug</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000068054160" n="4">
+                                            <syl xml:id="syl-000000036476727">gleich</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000200816226" n="5">
+                                            <syl xml:id="syl-000000133014118" con="d" wordpos="i">Schei</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000214408360" n="6">
+                                            <syl xml:id="syl-000000083750215">mach'</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000193766888" n="7">
+                                            <syl xml:id="syl-000000195894389">nun</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000196134214" dur="8" oct="4" pname="f" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000040343275" n="1">
+                                            <syl xml:id="syl-000000088849012">ich</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000019890180" n="2">
+                                            <syl xml:id="syl-000000145801467">du</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000092293990" n="3">
+                                            <syl xml:id="syl-000000057651701" wordpos="t">lein</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000108695260" n="4">
+                                            <syl xml:id="syl-000000191644681" con="d" wordpos="i">ei</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000114617445" n="5">
+                                            <syl xml:id="syl-000000082578520" wordpos="t">den</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000187518756" n="6">
+                                            <syl xml:id="syl-000000195493565" con="d" wordpos="i">ei</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000106249068" n="7">
+                                            <syl xml:id="syl-000000095436756">geh'</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000021867952" dur="8" oct="4" pname="g" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000100230707" n="1">
+                                            <syl xml:id="syl-000000091334968">dich</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000078631750" n="2">
+                                            <syl xml:id="syl-000000002395970">doch</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000100657921" n="3">
+                                            <syl xml:id="syl-000000184816227">so</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000066420230" n="4">
+                                            <syl xml:id="syl-000000062814302" wordpos="t">ner</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000144355725" n="5">
+                                            <syl xml:id="syl-000000174399101">thut</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000055843614" n="6">
+                                            <syl xml:id="syl-000000113280204" wordpos="t">nen</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000114867452" n="7">
+                                            <syl xml:id="syl-000000204230602">zu</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000056705268" n="2">
+                                <!-- kern: =3  8e/ 8g/L  8d/ 8f/  8e/ 8g/J  =4 -->
+                                <layer xml:id="layer-000000125042182" n="1">
+                                    <beam xml:id="beam-000000056469365">
+                                        <chord xml:id="chord-000000107600668" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000048456340" oct="4" pname="e" accid.ges="n" />
+                                            <note xml:id="note-000000079920883" oct="4" pname="g" accid.ges="n" />
+                                        </chord>
+                                        <chord xml:id="chord-000000194011108" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000005532635" oct="4" pname="d" accid.ges="n" />
+                                            <note xml:id="note-000000000961252" oct="4" pname="f" accid.ges="n" />
+                                        </chord>
+                                        <chord xml:id="chord-000000049646776" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000115974095" oct="4" pname="e" accid.ges="n" />
+                                            <note xml:id="note-000000120461689" oct="4" pname="g" accid.ges="n" />
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000206956867" n="3">
+                                <!-- kern: =3  4C\ 4c\  8C\ 8c\  =4 -->
+                                <layer xml:id="layer-000000166788122" n="1">
+                                    <chord xml:id="chord-000000097568747" dur="4" stem.dir="down">
+                                        <note xml:id="note-000000019429744" oct="3" pname="c" accid.ges="n" />
+                                        <note xml:id="note-000000138204828" oct="4" pname="c" accid.ges="n" />
+                                    </chord>
+                                    <chord xml:id="chord-000000090246727" dur="8" stem.dir="down">
+                                        <note xml:id="note-000000009042493" oct="3" pname="c" accid.ges="n" />
+                                        <note xml:id="note-000000150096092" oct="4" pname="c" accid.ges="n" />
+                                    </chord>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-000000015983155" n="4">
+                            <staff xml:id="staff-000000088119730" n="1">
+                                <!-- kern: =4  4a/  8r  =5 -->
+                                <layer xml:id="layer-000000063373100" n="1">
+                                    <note xml:id="note-000000174566279" dur="4" oct="4" pname="a" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000043292621" n="1">
+                                            <syl xml:id="syl-000000051631627">seh',</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000199148302" n="2">
+                                            <syl xml:id="syl-000000017506222">da!</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000213773211" n="3">
+                                            <syl xml:id="syl-000000146224249">hell</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000111936473" n="4">
+                                            <syl xml:id="syl-000000120633661">Fee</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000104760193" n="5">
+                                            <syl xml:id="syl-000000197473301">weh.</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000077524007" n="6">
+                                            <syl xml:id="syl-000000067658694">Knix,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000134530280" n="7">
+                                            <syl xml:id="syl-000000179635759">Bett!</syl>
+                                        </verse>
+                                    </note>
+                                    <rest xml:id="rest-000000033305536" dur="8" />
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000123582500" n="2">
+                                <!-- kern: =4  4f/ 4a/  8r  =5 -->
+                                <layer xml:id="layer-000000131916908" n="1">
+                                    <chord xml:id="chord-000000065367358" dur="4" stem.dir="up">
+                                        <note xml:id="note-000000191302146" oct="4" pname="f" accid.ges="n" />
+                                        <note xml:id="note-000000002654895" oct="4" pname="a" accid.ges="n" />
+                                    </chord>
+                                    <rest xml:id="rest-000000167908772" dur="8" />
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000004897483" n="3">
+                                <!-- kern: =4  4F\ 4c\  8r  =5 -->
+                                <layer xml:id="layer-000000034472162" n="1">
+                                    <chord xml:id="chord-000000197287138" dur="4" stem.dir="down">
+                                        <note xml:id="note-000000090179078" oct="3" pname="f" accid.ges="n" />
+                                        <note xml:id="note-000000160566023" oct="4" pname="c" accid.ges="n" />
+                                    </chord>
+                                    <rest xml:id="rest-000000105197740" dur="8" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-000000035143050" n="5">
+                            <staff xml:id="staff-000000062537627" n="1">
+                                <!-- kern: =5  8a/  8a/  8dd\  =6 -->
+                                <layer xml:id="layer-000000059209420" n="1">
+                                    <note xml:id="note-000000203548284" dur="8" oct="4" pname="a" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000094574643" n="1">
+                                            <syl xml:id="syl-000000163382798">dich,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000047624402" n="2">
+                                            <syl xml:id="syl-000000056174219" con="d" wordpos="i">Drück</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000094999053" n="3">
+                                            <syl xml:id="syl-000000209745633" con="d" wordpos="i">glänz</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000165291031" n="4">
+                                            <syl xml:id="syl-000000061520661" con="d" wordpos="i">fes</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000026858333" n="5">
+                                            <syl xml:id="syl-000000006953577" con="d" wordpos="i">Hal</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000138664632" n="6">
+                                            <syl xml:id="syl-000000087217980">drückt</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000032161245" n="7">
+                                            <syl xml:id="syl-000000012415807">Bricht</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000214034140" dur="8" oct="4" pname="a" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000021938932" n="1">
+                                            <syl xml:id="syl-000000004694656" con="d" wordpos="i">mei</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000181928487" n="2">
+                                            <syl xml:id="syl-000000084867771" wordpos="t">te</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000187284149" n="3">
+                                            <syl xml:id="syl-000000117925961" wordpos="t">ten</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000058438183" n="4">
+                                            <syl xml:id="syl-000000126285034" wordpos="t">selst</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000159455177" n="5">
+                                            <syl xml:id="syl-000000118330193" wordpos="t">te</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000208811237" n="6">
+                                            <syl xml:id="syl-000000072686012">dir</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000186592654" n="7">
+                                            <syl xml:id="syl-000000092371106">doch</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000153712481" dur="8" oct="5" pname="d" accid.ges="n" stem.dir="down">
+                                        <verse xml:id="verse-000000022852590" n="1">
+                                            <syl xml:id="syl-000000113419172" wordpos="t">ne</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000021444308" n="2">
+                                            <syl xml:id="syl-000000066738673">mein</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000019225823" n="3">
+                                            <syl xml:id="syl-000000146881778">in</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000134055529" n="4">
+                                            <syl xml:id="syl-000000146183516">du</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000123761957" n="5">
+                                            <syl xml:id="syl-000000014565941">mit</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000160025408" n="6">
+                                            <syl xml:id="syl-000000038524518">ein</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000000333661" n="7">
+                                            <syl xml:id="syl-000000024393029">die</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000091411912" n="2">
+                                <!-- kern: =5  8r  8c/ 8d/ 8f#/L  8c/ 8d/ 8f#/J  =6 -->
+                                <layer xml:id="layer-000000173456786" n="1">
+                                    <rest xml:id="rest-000000079151499" dur="8" />
+                                    <beam xml:id="beam-000000147881144">
+                                        <chord xml:id="chord-000000155574299" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000175916516" oct="4" pname="c" accid.ges="n" />
+                                            <note xml:id="note-000000188149267" oct="4" pname="d" accid.ges="n" />
+                                            <note xml:id="note-000000055073707" accid="s" oct="4" pname="f" />
+                                        </chord>
+                                        <chord xml:id="chord-000000058343372" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000036031748" oct="4" pname="c" accid.ges="n" />
+                                            <note xml:id="note-000000209960311" oct="4" pname="d" accid.ges="n" />
+                                            <note xml:id="note-000000057828310" oct="4" pname="f" accid.ges="s" />
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000050205600" n="3">
+                                <!-- kern: =5  4DD/ 4D/  8r  =6 -->
+                                <layer xml:id="layer-000000184069348" n="1">
+                                    <chord xml:id="chord-000000203340013" dur="4" stem.dir="up">
+                                        <note xml:id="note-000000030126016" oct="2" pname="d" accid.ges="n" />
+                                        <note xml:id="note-000000166065398" oct="3" pname="d" accid.ges="n" />
+                                    </chord>
+                                    <rest xml:id="rest-000000191401586" dur="8" />
+                                </layer>
+                            </staff>
+                            <hairpin xml:id="hairpin-000000036721966" staff="1" tstamp="1.000000" tstamp2="0m+3.0" form="cres" />
+                        </measure>
+                        <measure xml:id="measure-000000170716187" n="6">
+                            <staff xml:id="staff-000000063413638" n="1">
+                                <!-- kern: =6  8.cc\  16b-\  8b-\  =7 -->
+                                <layer xml:id="layer-000000112944738" n="1">
+                                    <note xml:id="note-000000101427747" dots="1" dur="8" oct="5" pname="c" accid.ges="n" stem.dir="down">
+                                        <verse xml:id="verse-000000023634924" n="1">
+                                            <syl xml:id="syl-000000162451421" con="d" wordpos="i">sü</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000037448500" n="2">
+                                            <syl xml:id="syl-000000184234290" con="d" wordpos="i">treu</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000127435472" n="3">
+                                            <syl xml:id="syl-000000122546835" con="d" wordpos="i">Lie</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000070865518" n="4">
+                                            <syl xml:id="syl-000000042342164">Herz</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000192912004" n="5">
+                                            <syl xml:id="syl-000000001242668">Herz</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000028497260" n="6">
+                                            <syl xml:id="syl-000000064600581" con="d" wordpos="i">jun</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000108785571" n="7">
+                                            <syl xml:id="syl-000000206269828">Nacht</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000158866141" dur="16" oct="4" pname="b" accid.ges="f" stem.dir="down">
+                                        <verse xml:id="verse-000000096813471" n="1">
+                                            <syl xml:id="syl-000000210411256" wordpos="t">sse</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000059741482" n="2">
+                                            <syl xml:id="syl-000000126491405" wordpos="t">er</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000070483503" n="3">
+                                            <syl xml:id="syl-000000064268681" con="d" wordpos="m">bes</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000210955583" n="4">
+                                            <syl xml:id="syl-000000034997410">und</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000089337175" n="5">
+                                            <syl xml:id="syl-000000184089330">und</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000004533759" n="6">
+                                            <syl xml:id="syl-000000177979854" wordpos="t">ger</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000073946214" n="7">
+                                            <syl xml:id="syl-000000065238901">schon</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000122009295" dur="8" oct="4" pname="b" accid.ges="f" stem.dir="down">
+                                        <verse xml:id="verse-000000192843312" n="1">
+                                            <syl xml:id="syl-000000135239857">Lust,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000165274867" n="2">
+                                            <syl xml:id="syl-000000004595635">Arm,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000174799433" n="3">
+                                            <syl xml:id="syl-000000096444696" wordpos="t">pracht</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000091472469" n="4">
+                                            <syl xml:id="syl-000000209002044">Sinn,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000137618015" n="5">
+                                            <syl xml:id="syl-000000106093647">Mund</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000032291668" n="6">
+                                            <syl xml:id="syl-000000056958244">Fant</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000069318130" n="7">
+                                            <syl xml:id="syl-000000019935773">ein,</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000211643350" n="2">
+                                <!-- kern: =6  8r  8B-/ 8d/ 8g/L  8B-/ 8d/ 8g/J  =7 -->
+                                <layer xml:id="layer-000000008006383" n="1">
+                                    <rest xml:id="rest-000000130817905" dur="8" />
+                                    <beam xml:id="beam-000000062773217">
+                                        <chord xml:id="chord-000000185492393" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000068643843" oct="3" pname="b" accid.ges="f" />
+                                            <note xml:id="note-000000068857494" oct="4" pname="d" accid.ges="n" />
+                                            <note xml:id="note-000000008964289" oct="4" pname="g" accid.ges="n" />
+                                        </chord>
+                                        <chord xml:id="chord-000000124213333" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000084637843" oct="3" pname="b" accid.ges="f" />
+                                            <note xml:id="note-000000015071293" oct="4" pname="d" accid.ges="n" />
+                                            <note xml:id="note-000000114901150" oct="4" pname="g" accid.ges="n" />
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000212634050" n="3">
+                                <!-- kern: =6  4GG/  8r  =7 -->
+                                <layer xml:id="layer-000000126339390" n="1">
+                                    <note xml:id="note-000000169052663" dur="4" oct="2" pname="g" accid.ges="n" stem.dir="up" />
+                                    <rest xml:id="rest-000000147257186" dur="8" />
+                                </layer>
+                            </staff>
+                            <hairpin xml:id="hairpin-000000059845627" staff="1" tstamp="1.000000" tstamp2="0m+3.0" form="dim" />
+                        </measure>
+                        <measure xml:id="measure-000000191375341" n="7">
+                            <staff xml:id="staff-000000200171274" n="1">
+                                <!-- kern: =7  8g/  8g/  8cc\  =8 -->
+                                <layer xml:id="layer-000000187265741" n="1">
+                                    <note xml:id="note-000000023289389" dur="8" oct="4" pname="g" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000153247162" n="1">
+                                            <syl xml:id="syl-000000147920609">klopft</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000044509994" n="2">
+                                            <syl xml:id="syl-000000110926672" con="d" wordpos="i">Hol</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000185097459" n="3">
+                                            <syl xml:id="syl-000000088190772">mir</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000049348345" n="4">
+                                            <syl xml:id="syl-000000039449943" con="d" wordpos="i">Grüb</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000050501636" n="5">
+                                            <syl xml:id="syl-000000095463999">treu</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000145680750" n="6">
+                                            <syl xml:id="syl-000000110262666" con="d" wordpos="i">zärt</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000198610349" n="7">
+                                            <syl xml:id="syl-000000210318237">kann</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000178235608" dur="8" oct="4" pname="g" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000080932859" n="1">
+                                            <syl xml:id="syl-000000022422564">die</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000111628903" n="2">
+                                            <syl xml:id="syl-000000105273828" wordpos="t">de,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000209675796" n="3">
+                                            <syl xml:id="syl-000000000440325">aus</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000147404547" n="4">
+                                            <syl xml:id="syl-000000091094653" wordpos="t">chen</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000014496759" n="5">
+                                            <syl xml:id="syl-000000122387985">an</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000175364254" n="6">
+                                            <syl xml:id="syl-000000140461515" wordpos="t">lich</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000044500535" n="7">
+                                            <syl xml:id="syl-000000166692582">ja</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000190628863" dur="8" oct="5" pname="c" accid.ges="n" stem.dir="down">
+                                        <verse xml:id="verse-000000068449162" n="1">
+                                            <syl xml:id="syl-000000018082758" con="d" wordpos="i">em</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000019825899" n="2">
+                                            <syl xml:id="syl-000000139177566">dich</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000008468206" n="3">
+                                            <syl xml:id="syl-000000161729214">der</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000001818005" n="4">
+                                            <syl xml:id="syl-000000060945609">in</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000010518902" n="5">
+                                            <syl xml:id="syl-000000053295211">dem</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000084465336" n="6">
+                                            <syl xml:id="syl-000000122213165">die</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000210780397" n="7">
+                                            <syl xml:id="syl-000000097116691">nicht</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000030727450" n="2">
+                                <!-- kern: =7  8r  8B-/ 8c/ 8e/L  8B-/ 8c/ 8e/J  =8 -->
+                                <layer xml:id="layer-000000140412522" n="1">
+                                    <rest xml:id="rest-000000043491011" dur="8" />
+                                    <beam xml:id="beam-000000164741845">
+                                        <chord xml:id="chord-000000065522837" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000012722403" oct="3" pname="b" accid.ges="f" />
+                                            <note xml:id="note-000000150816109" oct="4" pname="c" accid.ges="n" />
+                                            <note xml:id="note-000000091402131" oct="4" pname="e" accid.ges="n" />
+                                        </chord>
+                                        <chord xml:id="chord-000000100574782" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000075995965" oct="3" pname="b" accid.ges="f" />
+                                            <note xml:id="note-000000155674010" oct="4" pname="c" accid.ges="n" />
+                                            <note xml:id="note-000000133765652" oct="4" pname="e" accid.ges="n" />
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000181193495" n="3">
+                                <!-- kern: =7  4CC/ 4C/  8r  =8 -->
+                                <layer xml:id="layer-000000213443249" n="1">
+                                    <chord xml:id="chord-000000184007036" dur="4" stem.dir="up">
+                                        <note xml:id="note-000000015059049" oct="2" pname="c" accid.ges="n" />
+                                        <note xml:id="note-000000123869649" oct="3" pname="c" accid.ges="n" />
+                                    </chord>
+                                    <rest xml:id="rest-000000106546702" dur="8" />
+                                </layer>
+                            </staff>
+                            <hairpin xml:id="hairpin-000000058965144" staff="1" tstamp="1.000000" tstamp2="0m+3.0" form="cres" />
+                        </measure>
+                        <measure xml:id="measure-000000158565729" n="8">
+                            <staff xml:id="staff-000000015541400" n="1">
+                                <!-- kern: =8  8.b-\  16a/  8a/  =9 -->
+                                <layer xml:id="layer-000000064257911" n="1">
+                                    <note xml:id="note-000000013185781" dots="1" dur="8" oct="4" pname="b" accid.ges="f" stem.dir="down">
+                                        <verse xml:id="verse-000000207863984" n="1">
+                                            <syl xml:id="syl-000000043583829" con="d" wordpos="m">pör</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000168843247" n="2">
+                                            <syl xml:id="syl-000000063562863" con="d" wordpos="i">lie</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000054655841" n="3">
+                                            <syl xml:id="syl-000000121973949" con="d" wordpos="i">Wim</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000004313651" n="4">
+                                            <syl xml:id="syl-000000129336814">Wang'</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000010335821" n="5">
+                                            <syl xml:id="syl-000000197464869" con="d" wordpos="i">Lie</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000122095591" n="6">
+                                            <syl xml:id="syl-000000139988354" con="d" wordpos="i">Schwwa</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000120673095" n="7">
+                                            <syl xml:id="syl-000000069163203">bei</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000134037384" dur="16" oct="4" pname="a" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000055970546" n="1">
+                                            <syl xml:id="syl-000000099135958" wordpos="t">te</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000098792960" n="2">
+                                            <syl xml:id="syl-000000193676266" con="d" wordpos="m">be</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000210630836" n="3">
+                                            <syl xml:id="syl-000000160423660" wordpos="t">pern</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000004791750" n="4">
+                                            <syl xml:id="syl-000000004308848">und</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000115425345" n="5">
+                                            <syl xml:id="syl-000000131800122" con="d" wordpos="m">bes</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000053428242" n="6">
+                                            <syl xml:id="syl-000000105558886" con="d" wordpos="m">nen</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000190110000" n="7">
+                                            <syl xml:id="syl-000000152606716">dir</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000010178848" dur="8" oct="4" pname="a" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000136208438" n="1">
+                                            <syl xml:id="syl-000000037654806">Brust,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000015792173" n="2">
+                                            <syl xml:id="syl-000000204831290">warm!</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000045500664" n="3">
+                                            <syl xml:id="syl-000000010733151">Nacht,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000175681233" n="4">
+                                            <syl xml:id="syl-000000099223493">Kinn,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000143511677" n="5">
+                                            <syl xml:id="syl-000000161886519" wordpos="t">bund,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000039469309" n="6">
+                                            <syl xml:id="syl-000000002986208" wordpos="t">hand,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000046306159" n="7">
+                                            <syl xml:id="syl-000000019547363">sein,</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000070300005" n="2">
+                                <!-- kern: =8  8r  8A/ 8c/ 8f/L  8A/ 8c/ 8f/J  =9 -->
+                                <layer xml:id="layer-000000199826717" n="1">
+                                    <rest xml:id="rest-000000037963798" dur="8" />
+                                    <beam xml:id="beam-000000040169865">
+                                        <chord xml:id="chord-000000180824248" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000209035669" oct="3" pname="a" accid.ges="n" />
+                                            <note xml:id="note-000000194004201" oct="4" pname="c" accid.ges="n" />
+                                            <note xml:id="note-000000104190009" oct="4" pname="f" accid.ges="n" />
+                                        </chord>
+                                        <chord xml:id="chord-000000063315499" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000065447965" oct="3" pname="a" accid.ges="n" />
+                                            <note xml:id="note-000000042838887" oct="4" pname="c" accid.ges="n" />
+                                            <note xml:id="note-000000156670460" oct="4" pname="f" accid.ges="n" />
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000201438223" n="3">
+                                <!-- kern: =8  4FF/  8r  =9 -->
+                                <layer xml:id="layer-000000130736759" n="1">
+                                    <note xml:id="note-000000202199351" dur="4" oct="2" pname="f" accid.ges="n" stem.dir="up" />
+                                    <rest xml:id="rest-000000186377647" dur="8" />
+                                </layer>
+                            </staff>
+                            <hairpin xml:id="hairpin-000000121699141" staff="1" tstamp="1.000000" tstamp2="0m+2.5" form="dim" />
+                        </measure>
+                        <measure xml:id="measure-000000129477379" n="9">
+                            <staff xml:id="staff-000000193564468" n="1">
+                                <!-- kern: =9  8f/  8e/  8f/  =10 -->
+                                <layer xml:id="layer-000000023391095" n="1">
+                                    <note xml:id="note-000000144638028" dur="8" oct="4" pname="f" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000194611683" n="1">
+                                            <syl xml:id="syl-000000006213435">wird</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000077594319" n="2">
+                                            <syl xml:id="syl-000000175652336" con="d" wordpos="i">Schätz</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000128033518" n="3">
+                                            <syl xml:id="syl-000000080724412" con="d" wordpos="i">tra</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000205544504" n="4">
+                                            <syl xml:id="syl-000000144285844" con="d" wordpos="i">Ro</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000098566982" n="5">
+                                            <syl xml:id="syl-000000046396304" con="d" wordpos="i">sa</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000154504642" n="6">
+                                            <syl xml:id="syl-000000022293822" con="d" wordpos="i">a</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000160199692" n="7">
+                                            <syl xml:id="syl-000000175986965">wenn</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000038931328" dur="8" oct="4" pname="e" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000195315861" n="1">
+                                            <syl xml:id="syl-000000030188149">mir</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000130459877" n="2">
+                                            <syl xml:id="syl-000000058362597" wordpos="t">chen,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000211728278" n="3">
+                                            <syl xml:id="syl-000000136766947" wordpos="t">fen</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000196602337" n="4">
+                                            <syl xml:id="syl-000000177145407" con="d" wordpos="m">sen</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000204920687" n="5">
+                                            <syl xml:id="syl-000000182468437" wordpos="t">ge</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000058636366" n="6">
+                                            <syl xml:id="syl-000000021161115" wordpos="t">ber</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000160839988" n="7">
+                                            <syl xml:id="syl-000000200020240">ich</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000069552569" dur="8" oct="4" pname="f" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000094684843" n="1">
+                                            <syl xml:id="syl-000000082785638">so</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000066410635" n="2">
+                                            <syl xml:id="syl-000000116299502">ach</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000073346040" n="3">
+                                            <syl xml:id="syl-000000071285944">wie</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000027082757" n="4">
+                                            <syl xml:id="syl-000000128113780" wordpos="t">glut,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000009610684" n="5">
+                                            <syl xml:id="syl-000000036004137">mir</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000124848926" n="6">
+                                            <syl xml:id="syl-000000029634521">nur</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000124931986" n="7">
+                                            <syl xml:id="syl-000000137140475">auch</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000015043558" n="2">
+                                <!-- kern: =9  8A/ 8f/L  8B-/ 8e/  8c/ 8f/J  =10 -->
+                                <layer xml:id="layer-000000082634393" n="1">
+                                    <beam xml:id="beam-000000058580401">
+                                        <chord xml:id="chord-000000154295822" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000163379962" oct="3" pname="a" accid.ges="n" />
+                                            <note xml:id="note-000000154445406" oct="4" pname="f" accid.ges="n" />
+                                        </chord>
+                                        <chord xml:id="chord-000000100456193" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000015605925" oct="3" pname="b" accid.ges="f" />
+                                            <note xml:id="note-000000081031537" oct="4" pname="e" accid.ges="n" />
+                                        </chord>
+                                        <chord xml:id="chord-000000177673561" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000083531934" oct="4" pname="c" accid.ges="n" />
+                                            <note xml:id="note-000000111169820" oct="4" pname="f" accid.ges="n" />
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000078262457" n="3">
+                                <!-- kern: =9  8FF/L  8GG/  8AA/J  =10 -->
+                                <layer xml:id="layer-000000120398572" n="1">
+                                    <beam xml:id="beam-000000179720846">
+                                        <note xml:id="note-000000132512577" dur="8" oct="2" pname="f" accid.ges="n" stem.dir="up" />
+                                        <note xml:id="note-000000198354826" dur="8" oct="2" pname="g" accid.ges="n" stem.dir="up" />
+                                        <note xml:id="note-000000210700386" dur="8" oct="2" pname="a" accid.ges="n" stem.dir="up" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-000000040853599" n="10">
+                            <staff xml:id="staff-000000166590097" n="1">
+                                <!-- kern: =10  8.ee\  16dd\  8dd\  =11 -->
+                                <layer xml:id="layer-000000039055937" n="1">
+                                    <note xml:id="note-000000142142400" dots="1" dur="8" oct="5" pname="e" accid.ges="n" stem.dir="down">
+                                        <verse xml:id="verse-000000126519642" n="1">
+                                            <syl xml:id="syl-000000192065880">wohl</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000070804233" n="2">
+                                            <syl xml:id="syl-000000086055228">wärst</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000190561694" n="3">
+                                            <syl xml:id="syl-000000013290006" con="d" wordpos="i">bli</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000099352307" n="4">
+                                            <syl xml:id="syl-000000145698290" con="d" wordpos="i">Li</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000203834956" n="5">
+                                            <syl xml:id="syl-000000188203562">nie</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000068535108" n="6">
+                                            <syl xml:id="syl-000000174086992" con="d" wordpos="i">ern</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000137983401" n="7">
+                                            <syl xml:id="syl-000000019430211" con="d" wordpos="i">Flü</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000150692084" dur="16" oct="5" pname="d" accid.ges="n" stem.dir="down">
+                                        <verse xml:id="verse-000000154395923" n="1">
+                                            <syl xml:id="syl-000000127787190">und</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000094520507" n="2">
+                                            <syl xml:id="syl-000000112512505">du</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000155594832" n="3">
+                                            <syl xml:id="syl-000000091517917" con="d" wordpos="m">tzes</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000149736140" n="4">
+                                            <syl xml:id="syl-000000193975828" con="d" wordpos="m">lien</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000186279740" n="5">
+                                            <syl xml:id="syl-000000201934625" con="d" wordpos="i">A</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000188524616" n="6">
+                                            <syl xml:id="syl-000000135851689" wordpos="t">sten</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000140651547" n="7">
+                                            <syl xml:id="syl-000000195308579" wordpos="t">gel</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000141664170" dur="8" oct="5" pname="d" accid.ges="n" stem.dir="down">
+                                        <verse xml:id="verse-000000034600887" n="1">
+                                            <syl xml:id="syl-000000213291288">weh,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000154857334" n="2">
+                                            <syl xml:id="syl-000000151780738">da!</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000110238654" n="3">
+                                            <syl xml:id="syl-000000146917191" wordpos="t">schnell,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000106466485" n="4">
+                                            <syl xml:id="syl-000000098845437">schnee,</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000007816413" n="5">
+                                            <syl xml:id="syl-000000159205820">de!</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000030914123" n="6">
+                                            <syl xml:id="syl-000000097384497">Blicks</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000159506806" n="7">
+                                            <syl xml:id="syl-000000127061976">hätt'!</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000205329685" n="2">
+                                <!-- kern: =10  8r  8B-/ 8d/ 8g/L  8B-/ 8d/ 8g/J  =11 -->
+                                <layer xml:id="layer-000000200347022" n="1">
+                                    <rest xml:id="rest-000000192797026" dur="8" />
+                                    <beam xml:id="beam-000000001544385">
+                                        <chord xml:id="chord-000000186676611" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000000204574" oct="3" pname="b" accid.ges="f" />
+                                            <note xml:id="note-000000002316509" oct="4" pname="d" accid.ges="n" />
+                                            <note xml:id="note-000000064114433" oct="4" pname="g" accid.ges="n" />
+                                        </chord>
+                                        <chord xml:id="chord-000000178729731" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000010465174" oct="3" pname="b" accid.ges="f" />
+                                            <note xml:id="note-000000009270409" oct="4" pname="d" accid.ges="n" />
+                                            <note xml:id="note-000000115206378" oct="4" pname="g" accid.ges="n" />
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000184545111" n="3">
+                                <!-- kern: =10  4BB-/  8r  =11 -->
+                                <layer xml:id="layer-000000102343952" n="1">
+                                    <note xml:id="note-000000175163508" dur="4" oct="2" pname="b" accid.ges="f" stem.dir="up" />
+                                    <rest xml:id="rest-000000202495648" dur="8" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-000000012278893" n="11">
+                            <staff xml:id="staff-000000018560852" n="1">
+                                <!-- kern: =11  8cc\  8g/  8a/  =12 -->
+                                <layer xml:id="layer-000000119559706" n="1">
+                                    <note xml:id="note-000000039538647" dur="8" oct="5" pname="c" accid.ges="n" stem.dir="down">
+                                        <verse xml:id="verse-000000094609831" n="1">
+                                            <syl xml:id="syl-000000110544101">wenn</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000081206603" n="2">
+                                            <syl xml:id="syl-000000113527356">wärst</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000004255910" n="3">
+                                            <syl xml:id="syl-000000017889051" con="d" wordpos="i">Aeug</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000057612377" n="4">
+                                            <syl xml:id="syl-000000205598894" con="d" wordpos="i">rei</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000188439221" n="5">
+                                            <syl xml:id="syl-000000203868242" con="d" wordpos="i">Schei</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000167355250" n="6">
+                                            <syl xml:id="syl-000000180360996">mach'</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000213722862" n="7">
+                                            <syl xml:id="syl-000000159003746">Geh'</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000118794107" dur="8" oct="4" pname="g" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000057009733" n="1">
+                                            <syl xml:id="syl-000000170129285">ich</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000101529484" n="2">
+                                            <syl xml:id="syl-000000015538404">du</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000155386762" n="3">
+                                            <syl xml:id="syl-000000030450859" wordpos="t">lein</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000198716416" n="4">
+                                            <syl xml:id="syl-000000060242620" con="d" wordpos="m">zen</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000084534372" n="5">
+                                            <syl xml:id="syl-000000208767797" wordpos="t">den</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000096589495" n="6">
+                                            <syl xml:id="syl-000000096757059">ihm</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000088587169" n="7">
+                                            <syl xml:id="syl-000000034143640">nur</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-000000164997586" dur="8" oct="4" pname="a" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000068794530" n="1">
+                                            <syl xml:id="syl-000000024485291">dich</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000184577656" n="2">
+                                            <syl xml:id="syl-000000156544704">mir</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000020801963" n="3">
+                                            <syl xml:id="syl-000000008259451">so</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000175204078" n="4">
+                                            <syl xml:id="syl-000000025365541" wordpos="t">de</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000124972375" n="5">
+                                            <syl xml:id="syl-000000171704901">thut</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000008665337" n="6">
+                                            <syl xml:id="syl-000000038937776">den</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000019706890" n="7">
+                                            <syl xml:id="syl-000000071728585">zu</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000137614019" n="2">
+                                <!-- kern: =11  8r  8B-/ 8c/ 8e/L  8B-/ 8c/ 8e/J  =12 -->
+                                <layer xml:id="layer-000000150655012" n="1">
+                                    <rest xml:id="rest-000000175580316" dur="8" />
+                                    <beam xml:id="beam-000000121101753">
+                                        <chord xml:id="chord-000000186918812" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000205404536" oct="3" pname="b" accid.ges="f" />
+                                            <note xml:id="note-000000154084083" oct="4" pname="c" accid.ges="n" />
+                                            <note xml:id="note-000000040664828" oct="4" pname="e" accid.ges="n" />
+                                        </chord>
+                                        <chord xml:id="chord-000000124477804" dur="8" stem.dir="up">
+                                            <note xml:id="note-000000019896366" oct="3" pname="b" accid.ges="f" />
+                                            <note xml:id="note-000000035022885" oct="4" pname="c" accid.ges="n" />
+                                            <note xml:id="note-000000004368955" oct="4" pname="e" accid.ges="n" />
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000038939598" n="3">
+                                <!-- kern: =11  4C/  8r  =12 -->
+                                <layer xml:id="layer-000000199847767" n="1">
+                                    <note xml:id="note-000000177011187" dur="4" oct="3" pname="c" accid.ges="n" stem.dir="up" />
+                                    <rest xml:id="rest-000000117928762" dur="8" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-000000116045117" n="12" right="end">
+                            <staff xml:id="staff-000000155046216" n="1">
+                                <!-- kern: =12  4f/  8r  == -->
+                                <layer xml:id="layer-000000153247113" n="1">
+                                    <note xml:id="note-000000147095386" dur="4" oct="4" pname="f" accid.ges="n" stem.dir="up">
+                                        <verse xml:id="verse-000000048978075" n="1">
+                                            <syl xml:id="syl-000000044034714">seh'!</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000202358877" n="2">
+                                            <syl xml:id="syl-000000075799027">nah'!</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000174572586" n="3">
+                                            <syl xml:id="syl-000000149306135">hell.</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000042678815" n="4">
+                                            <syl xml:id="syl-000000043320733">Fee!</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000083799121" n="5">
+                                            <syl xml:id="syl-000000092066070">weh.</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000006249961" n="6">
+                                            <syl xml:id="syl-000000031147550">Knix!</syl>
+                                        </verse>
+                                        <verse xml:id="verse-000000099283444" n="7">
+                                            <syl xml:id="syl-000000062054631">Bett!</syl>
+                                        </verse>
+                                    </note>
+                                    <rest xml:id="rest-000000040660745" dur="8" />
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000105096722" n="2">
+                                <!-- kern: =12  4A/ 4c/ 4f/  8r  == -->
+                                <layer xml:id="layer-000000055854823" n="1">
+                                    <chord xml:id="chord-000000086921502" dur="4" stem.dir="up">
+                                        <note xml:id="note-000000171322550" oct="3" pname="a" accid.ges="n" />
+                                        <note xml:id="note-000000072039078" oct="4" pname="c" accid.ges="n" />
+                                        <note xml:id="note-000000009515532" oct="4" pname="f" accid.ges="n" />
+                                    </chord>
+                                    <rest xml:id="rest-000000154768029" dur="8" />
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000055322122" n="3">
+                                <!-- kern: =12  4FF/ 4F/  8r  == -->
+                                <layer xml:id="layer-000000154075198" n="1">
+                                    <chord xml:id="chord-000000106082998" dur="4" stem.dir="up">
+                                        <note xml:id="note-000000096028688" oct="2" pname="f" accid.ges="n" />
+                                        <note xml:id="note-000000120210260" oct="3" pname="f" accid.ges="n" />
+                                    </chord>
+                                    <rest xml:id="rest-000000021231445" dur="8" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
