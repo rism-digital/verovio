@@ -29,6 +29,7 @@
 #include "editorial.h"
 #include "ending.h"
 #include "expansion.h"
+#include "fb.h"
 #include "fermata.h"
 #include "functorparams.h"
 #include "hairpin.h"
@@ -3083,6 +3084,10 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
             bool trimRight = (!xmlElement.next_sibling());
             success = ReadMeiText(parent, xmlElement, trimLeft, trimRight);
         }
+        // figured bass
+        else if (elementName == "fb") {
+            success = ReadMeiFb(parent, xmlElement);
+        }
         // unknown
         else {
             LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
@@ -3131,6 +3136,48 @@ bool MeiInput::ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, b
     return true;
 }
 
+bool MeiInput::ReadMeiFb(Object *parent, pugi::xml_node fb)
+{
+    bool success = true;
+    pugi::xml_node xmlElement;
+    std::string elementName;
+    
+    Fb *vrvFb = new Fb();
+    
+    parent->AddChild(vrvFb);
+    
+    int i = 0;
+    for (xmlElement = fb.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
+        if (!success) {
+            break;
+        }
+        elementName = std::string(xmlElement.name());
+        if (elementName == "f") {
+            success = ReadMeiFigure(vrvFb, xmlElement);
+        }
+
+        // unknown
+        else {
+            LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
+        }
+        i++;
+    }
+    return success;
+}
+
+bool MeiInput::ReadMeiFigure(Object *parent, pugi::xml_node figure)
+{
+    Figure *vrvFigure = new Figure();
+    
+    assert(figure.text());
+    
+    std::wstring str = UTF8to16(figure.text().as_string());
+    vrvFigure->SetText(str);
+    
+    parent->AddChild(vrvFigure);
+    return true;
+}
+    
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
     interface->ReadAugmentdots(element);

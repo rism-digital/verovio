@@ -1154,6 +1154,10 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, int x, int y, boo
             // cast to EditorialElement check in DrawLayerEditorialElement
             DrawTextEditorialElement(dc, dynamic_cast<EditorialElement *>(current), x, y, setX, setY);
         }
+        else if (current->Is(FB)) {
+            // do nothing
+            LogWarning("Should do a Figured Bass");
+        }
         else {
             assert(false);
         }

@@ -48,6 +48,8 @@ class Dynam;
 class Ending;
 class Expan;
 class Expansion;
+class Fb;
+class Figure;
 class Fermata;
 class FloatingElement;
 class FTrem;
@@ -465,6 +467,8 @@ private:
     ///@{
     bool ReadMeiRend(Object *parent, pugi::xml_node rend);
     bool ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight);
+    bool ReadMeiFb(Object *parent, pugi::xml_node fb);
+    bool ReadMeiFigure(Object *parent, pugi::xml_node figure);
     ///@}
 
     /**

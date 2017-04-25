@@ -396,6 +396,10 @@
 		8F59295818854BF800FE51AD /* view.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59293118854BF800FE51AD /* view.h */; };
 		8F59295918854BF800FE51AD /* vrv.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59293218854BF800FE51AD /* vrv.h */; };
 		8F59295A18854BF800FE51AD /* vrvdef.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59293318854BF800FE51AD /* vrvdef.h */; };
+		8F7DD0551EAF3682001B072A /* fb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DD0531EAF3682001B072A /* fb.cpp */; };
+		8F7DD0561EAF3682001B072A /* fb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DD0531EAF3682001B072A /* fb.cpp */; };
+		8F7DD0571EAF3682001B072A /* fb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DD0531EAF3682001B072A /* fb.cpp */; };
+		8F7DD0581EAF3682001B072A /* fb.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F7DD0541EAF3682001B072A /* fb.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -691,6 +695,8 @@
 		8F59293118854BF800FE51AD /* view.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = view.h; path = include/vrv/view.h; sourceTree = "<group>"; };
 		8F59293218854BF800FE51AD /* vrv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrv.h; path = include/vrv/vrv.h; sourceTree = "<group>"; };
 		8F59293318854BF800FE51AD /* vrvdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrvdef.h; path = include/vrv/vrvdef.h; sourceTree = "<group>"; };
+		8F7DD0531EAF3682001B072A /* fb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fb.cpp; path = src/fb.cpp; sourceTree = "<group>"; };
+		8F7DD0541EAF3682001B072A /* fb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fb.h; path = src/fb.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -812,6 +818,8 @@
 				4DB726C71B8BB0F30040231B /* text.h */,
 				4DA144891C2AB28700CB7CEE /* textelement.cpp */,
 				4DA1448C1C2AB29400CB7CEE /* textelement.h */,
+				8F7DD0531EAF3682001B072A /* fb.cpp */,
+				8F7DD0541EAF3682001B072A /* fb.h */,
 			);
 			name = textelements;
 			sourceTree = "<group>";
@@ -1149,6 +1157,7 @@
 				4DF9D29C1C1B3F0A0069E8C8 /* attconverter.h in Headers */,
 				8F59293918854BF800FE51AD /* clef.h in Headers */,
 				4D1D733E1A1D08CD001E08F6 /* glyph.h in Headers */,
+				8F7DD0581EAF3682001B072A /* fb.h in Headers */,
 				8F59293A18854BF800FE51AD /* devicecontext.h in Headers */,
 				8F59293B18854BF800FE51AD /* doc.h in Headers */,
 				8F59293C18854BF800FE51AD /* durationinterface.h in Headers */,
@@ -1426,6 +1435,7 @@
 				4D1694421E3A44F300569BF4 /* chord.cpp in Sources */,
 				4D1694431E3A44F300569BF4 /* view.cpp in Sources */,
 				4D1694651E3A455100569BF4 /* GridSide.cpp in Sources */,
+				8F7DD0561EAF3682001B072A /* fb.cpp in Sources */,
 				4D1694441E3A44F300569BF4 /* vrv.cpp in Sources */,
 				4D1694451E3A44F300569BF4 /* mrest.cpp in Sources */,
 				4D1694461E3A44F300569BF4 /* textdirinterface.cpp in Sources */,
@@ -1549,6 +1559,7 @@
 				4D983005192E959E00320037 /* main.cpp in Sources */,
 				4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */,
 				4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */,
+				8F7DD0551EAF3682001B072A /* fb.cpp in Sources */,
 				4D422104199805F800963292 /* att.cpp in Sources */,
 				4D4221061998A8CE00963292 /* atts_mensural.cpp in Sources */,
 				4D09D3ED1EA8AD8500A420E6 /* horizontalaligner.cpp in Sources */,
@@ -1598,6 +1609,7 @@
 				8F3DD34018854B2E0051330C /* clef.cpp in Sources */,
 				8F3DD34218854B2E0051330C /* durationinterface.cpp in Sources */,
 				4DDBBB5C1C7AE45900054AFF /* dynam.cpp in Sources */,
+				8F7DD0571EAF3682001B072A /* fb.cpp in Sources */,
 				4D1694641E3A454400569BF4 /* GridPart.cpp in Sources */,
 				8F3DD34418854B2E0051330C /* keysig.cpp in Sources */,
 				4D1BE7741C688F5A0086DC0E /* MidiMessage.cpp in Sources */,
