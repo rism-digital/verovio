@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Slashes on grace notes</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-25</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio renders single grace notes with or without slashes, as appropriate.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000060462560">
+                        <staffGrp xml:id="m-000000176290030">
+                            <staffDef xml:id="staffdef-000000175268530" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000141390882">
+                        <measure xml:id="measure-L3" n="1" right="end">
+                            <staff xml:id="staff-L3F1" n="1">
+                                <layer xml:id="layer-L3F1" n="1">
+                                    <note xml:id="note-L4F1" dur="32" oct="4" pname="g" accid.ges="n" grace="acc" />
+                                    <note xml:id="note-L5F1" dur="2" oct="4" pname="c" accid.ges="n">
+                                        <verse xml:id="verse-L5F2" n="1">
+                                            <syl xml:id="syl-L5F2">acc</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L6F1" dur="32" oct="4" pname="f" accid.ges="n" grace="unacc" />
+                                    <note xml:id="note-L7F1" dur="2" oct="4" pname="d" accid.ges="n">
+                                        <verse xml:id="verse-L7F2" n="1">
+                                            <syl xml:id="syl-L7F2">unacc</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

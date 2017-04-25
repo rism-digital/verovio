@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Autodetection of partial layer</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-25</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Staff layers are mapped into regions of partial layers. In this case the first half of the measure is treated as a single layer, and the second half as two layers.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000059219395">
+                        <staffGrp xml:id="m-000000100313057" symbol="brace" barthru="true">
+                            <staffDef xml:id="staffdef-000000028743191" clef.shape="G" clef.line="2" key.sig="3s" n="1" lines="5" />
+                            <staffDef xml:id="staffdef-000000047235602" clef.shape="F" clef.line="4" key.sig="3s" n="2" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000214490948">
+                        <measure xml:id="measure-L4" n="1">
+                            <staff xml:id="staff-L4F2" n="1">
+                                <layer xml:id="layer-L4F2" n="1">
+                                    <space xml:id="space-L6F2" dots="1" dur="4" />
+                                    <note xml:id="note-L9F2" dur="4" oct="5" pname="c">
+                                        <accid xml:id="accid-L9F2" accid.ges="s" />
+                                    </note>
+                                    <note xml:id="note-L10F2" dur="8" oct="4" pname="b">
+                                        <accid xml:id="accid-L10F2" accid.ges="n" />
+                                    </note>
+                                </layer>
+                                <layer xml:id="layer-L6F3" n="2">
+                                    <beam xml:id="beam-000000023174907">
+                                        <note xml:id="note-L6F3" dur="8" oct="4" pname="f">
+                                            <accid xml:id="accid-L6F3" accid.ges="s" />
+                                        </note>
+                                        <note xml:id="note-L7F3" dur="8" oct="5" pname="c">
+                                            <accid xml:id="accid-L7F3" accid.ges="s" />
+                                        </note>
+                                        <note xml:id="note-L8F3" dur="8" oct="4" pname="a">
+                                            <accid xml:id="accid-L8F3" accid.ges="n" />
+                                            <artic xml:id="artic-000000143164212" artic="stacc" />
+                                        </note>
+                                    </beam>
+                                    <note xml:id="note-L9F3" dur="4" oct="4" pname="a">
+                                        <accid xml:id="accid-L9F3" accid.ges="n" />
+                                    </note>
+                                    <note xml:id="note-L10F3" dur="8" oct="4" pname="g">
+                                        <accid xml:id="accid-L10F3" accid.ges="s" />
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-L4F1" n="2">
+                                <layer xml:id="layer-L4F1" n="1">
+                                    <chord xml:id="chord-L6F1" dur="4">
+                                        <note xml:id="note-L6F1S1" oct="3" pname="a">
+                                            <accid xml:id="accid-L6F1S1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L6F1S2" oct="4" pname="c">
+                                            <accid xml:id="accid-L6F1S2" accid.ges="s" />
+                                        </note>
+                                    </chord>
+                                    <chord xml:id="chord-L8F1" dur="8">
+                                        <note xml:id="note-L8F1S1" oct="3" pname="f">
+                                            <accid xml:id="accid-L8F1S1" accid.ges="s" />
+                                        </note>
+                                        <note xml:id="note-L8F1S2" oct="4" pname="d">
+                                            <accid xml:id="accid-L8F1S2" accid="s" />
+                                        </note>
+                                    </chord>
+                                    <chord xml:id="chord-L9F1" dots="1" dur="4">
+                                        <note xml:id="note-L9F1S1" oct="3" pname="e">
+                                            <accid xml:id="accid-L9F1S1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L9F1S2" oct="4" pname="e">
+                                            <accid xml:id="accid-L9F1S2" accid.ges="n" />
+                                        </note>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <slur xml:id="slur-000000045810090" staff="1" startid="#note-L9F2" endid="#note-L10F2" />
+                            <slur xml:id="slur-000000210092080" staff="1" startid="#note-L6F3" endid="#note-L7F3" />
+                            <slur xml:id="slur-000000149328555" staff="1" startid="#note-L9F3" endid="#note-L10F3" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
