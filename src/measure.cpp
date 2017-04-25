@@ -86,6 +86,7 @@ void Measure::Reset()
 
     m_timestampAligner.Reset();
     m_xAbs = VRV_UNSET;
+    m_xAbs2 = VRV_UNSET;
     m_drawingXRel = 0;
 
     // by default, we have a single barLine on the right (none on the left)
@@ -94,6 +95,7 @@ void Measure::Reset()
 
     if (!m_measuredMusic) {
         m_xAbs = VRV_UNSET;
+        m_xAbs2 = VRV_UNSET;
     }
 
     m_drawingEnding = NULL;
@@ -128,6 +130,8 @@ void Measure::AddChild(Object *child)
 
 int Measure::GetDrawingX() const
 {
+    if (m_xAbs != VRV_UNSET) return m_xAbs;
+    
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
 
     System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
@@ -196,6 +200,8 @@ int Measure::GetRightBarLineRight() const
 
 int Measure::GetWidth() const
 {
+    if (this->m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
+    
     assert(m_measureAligner.GetRightAlignment());
     return m_measureAligner.GetRightAlignment()->GetXRel();
 }

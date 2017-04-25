@@ -211,6 +211,8 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 
 int LayerElement::GetDrawingX() const
 {
+    if (m_xAbs != VRV_UNSET) return m_xAbs;
+    
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
 
     if (!m_alignment) {

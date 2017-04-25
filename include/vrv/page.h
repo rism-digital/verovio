@@ -66,6 +66,12 @@ public:
      * This will be done only if m_layoutDone is false or force is true.
      */
     void LayOut(bool force = false);
+    
+    /**
+     * Do the layout for a transcription page (with layout information).
+     * This only calculates positioning or layer element parts using provided layout of parents.
+     */
+    void LayOutTranscription(bool force = false);
 
     /**
      * Lay out the content of the page (measures and their content) horizontally

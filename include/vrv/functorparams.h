@@ -1146,11 +1146,12 @@ public:
  * member 3: the previous measure (for setting cautionary scoreDef)
  * member 4: the current system (for setting the system scoreDef)
  * member 5: the flag indicating whereas full labels have to be drawn
+ * member 6: the doc
 **/
 
 class SetCurrentScoreDefParams : public FunctorParams {
 public:
-    SetCurrentScoreDefParams(ScoreDef *upcomingScoreDef)
+    SetCurrentScoreDefParams(Doc *doc, ScoreDef *upcomingScoreDef)
     {
         m_currentScoreDef = NULL;
         m_currentStaffDef = NULL;
@@ -1158,6 +1159,7 @@ public:
         m_previousMeasure = NULL;
         m_currentSystem = NULL;
         m_drawLabels = false;
+        m_doc = doc;
     }
     ScoreDef *m_currentScoreDef;
     StaffDef *m_currentStaffDef;
@@ -1165,6 +1167,7 @@ public:
     Measure *m_previousMeasure;
     System *m_currentSystem;
     bool m_drawLabels;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------

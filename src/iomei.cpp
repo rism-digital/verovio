@@ -624,7 +624,7 @@ void MeiOutput::WriteMeiSystem(pugi::xml_node currentNode, System *system)
     currentNode.append_attribute("system.rightmar") = StringFormat("%d", system->m_systemRightMar).c_str();
     // y positions
     if (system->m_yAbs != VRV_UNSET) {
-        currentNode.append_attribute("uly") = StringFormat("%d", system->m_yAbs).c_str();
+        currentNode.append_attribute("uly") = StringFormat("%d", system->m_yAbs / DEFINITION_FACTOR).c_str();
     }
     system->WriteCommon(currentNode);
     system->WriteTyped(currentNode);
@@ -747,6 +747,10 @@ void MeiOutput::WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure)
     measure->WriteMeasureLog(currentNode);
     measure->WritePointing(currentNode);
     measure->WriteTyped(currentNode);
+    if ((measure->m_xAbs != VRV_UNSET) && (measure->m_xAbs2 != VRV_UNSET)) {
+        currentNode.append_attribute("ulx") = StringFormat("%d", measure->m_xAbs / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("lrx") = StringFormat("%d", measure->m_xAbs2 / DEFINITION_FACTOR).c_str();
+    }
 }
 
 void MeiOutput::WriteControlElement(pugi::xml_node currentNode, ControlElement *controlElement)
@@ -870,7 +874,7 @@ void MeiOutput::WriteMeiStaff(pugi::xml_node currentNode, Staff *staff)
     staff->WriteTyped(currentNode);
     // y position
     if (staff->m_yAbs != VRV_UNSET) {
-        currentNode.append_attribute("uly") = StringFormat("%d", staff->m_yAbs).c_str();
+        currentNode.append_attribute("uly") = StringFormat("%d", staff->m_yAbs / DEFINITION_FACTOR).c_str();
     }
 }
 
@@ -936,7 +940,7 @@ void MeiOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *elem
     element->WriteCommon(currentNode);
     element->WriteTyped(currentNode);
     if (element->m_xAbs != VRV_UNSET) {
-        currentNode.append_attribute("ulx") = StringFormat("%d", element->m_xAbs).c_str();
+        currentNode.append_attribute("ulx") = StringFormat("%d", element->m_xAbs / DEFINITION_FACTOR).c_str();
     }
 }
 
@@ -1924,19 +1928,19 @@ bool MeiInput::ReadMeiPage(pugi::xml_node page)
     SetMeiUuid(page, vrvPage);
 
     if (page.attribute("page.height")) {
-        vrvPage->m_pageHeight = atoi(page.attribute("page.height").value());
+        vrvPage->m_pageHeight = atoi(page.attribute("page.height").value()) * DEFINITION_FACTOR;
     }
     if (page.attribute("page.width")) {
-        vrvPage->m_pageWidth = atoi(page.attribute("page.width").value());
+        vrvPage->m_pageWidth = atoi(page.attribute("page.width").value()) * DEFINITION_FACTOR;
     }
     if (page.attribute("page.leftmar")) {
-        vrvPage->m_pageLeftMar = atoi(page.attribute("page.leftmar").value());
+        vrvPage->m_pageLeftMar = atoi(page.attribute("page.leftmar").value()) * DEFINITION_FACTOR;
     }
     if (page.attribute("page.rightmar")) {
-        vrvPage->m_pageRightMar = atoi(page.attribute("page.rightmar").value());
+        vrvPage->m_pageRightMar = atoi(page.attribute("page.rightmar").value()) * DEFINITION_FACTOR;
     }
     if (page.attribute("page.topmar")) {
-        vrvPage->m_pageTopMar = atoi(page.attribute("page.topmar").value());
+        vrvPage->m_pageTopMar = atoi(page.attribute("page.topmar").value()) * DEFINITION_FACTOR;
     }
     if (page.attribute("surface")) {
         vrvPage->m_surface = page.attribute("surface").value();
@@ -1993,7 +1997,7 @@ bool MeiInput::ReadMeiSystem(Object *parent, pugi::xml_node system)
     if (system.attribute("system.rightmar")) {
         vrvSystem->m_systemRightMar = atoi(system.attribute("system.rightmar").value());
     }
-    if (system.attribute("uly")) {
+    if (system.attribute("uly") && (this->m_doc->GetType() == Transcription)) {
         vrvSystem->m_yAbs = atoi(system.attribute("uly").value()) * DEFINITION_FACTOR;
     }
 
@@ -2215,6 +2219,11 @@ bool MeiInput::ReadMeiMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadMeasureLog(measure);
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);
+    
+    if (measure.attribute("ulx") && measure.attribute("lrx") && (this->m_doc->GetType() == Transcription)) {
+        vrvMeasure->m_xAbs = atoi(measure.attribute("ulx").value()) * DEFINITION_FACTOR;
+        vrvMeasure->m_xAbs2 = atoi(measure.attribute("lrx").value()) * DEFINITION_FACTOR;
+    }
 
     // This could be moved to an AddMeasure method for consistency with AddLayerElement
     parent->AddChild(vrvMeasure);
@@ -2498,7 +2507,7 @@ bool MeiInput::ReadMeiStaff(Object *parent, pugi::xml_node staff)
     vrvStaff->ReadCommon(staff);
     vrvStaff->ReadTyped(staff);
 
-    if (staff.attribute("uly")) {
+    if (staff.attribute("uly") && (this->m_doc->GetType() == Transcription)) {
         vrvStaff->m_yAbs = atoi(staff.attribute("uly").value()) * DEFINITION_FACTOR;
     }
 
@@ -2666,7 +2675,7 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
 
 bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
 {
-    if (element.attribute("ulx")) {
+    if (element.attribute("ulx") && (this->m_doc->GetType() == Transcription)) {
         object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITION_FACTOR;
     }
 
@@ -2753,7 +2762,7 @@ bool MeiInput::ReadMeiBTrem(Object *parent, pugi::xml_node bTrem)
 bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
 {
     Chord *vrvChord = new Chord();
-    SetMeiUuid(chord, vrvChord);
+    ReadLayerElement(chord, vrvChord);
 
     ReadDurationInterface(chord, vrvChord);
     vrvChord->ReadColor(chord);

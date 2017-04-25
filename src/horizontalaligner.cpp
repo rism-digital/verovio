@@ -182,7 +182,7 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
         assert(end);
         int dist = std::get<2>(*iter);
         if ((start->GetXRel() >= end->GetXRel()) || (dist == 0)) {
-            LogDebug("Trying to ajdust alignment at the same position or with a distance of 0;");
+            LogDebug("Trying to adjust alignment at the same position or with a distance of 0;");
             continue;
         }
         // We need to store them because they are going to be changed in the loop below

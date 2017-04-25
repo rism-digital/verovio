@@ -80,6 +80,71 @@ void Page::LayOut(bool force)
     m_layoutDone = true;
 }
 
+void Page::LayOutTranscription(bool force)
+{
+    if (m_layoutDone && !force) {
+        return;
+    }
+    
+    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    assert(doc);
+    
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
+
+    // Reset the horizontal alignment
+    Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
+    this->Process(&resetHorizontalAlignment, NULL);
+    
+    // Reset the vertical alignment
+    Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
+    this->Process(&resetVerticalAlignment, NULL);
+    
+    
+    // Align the content of the page using measure aligners
+    // After this:
+    // - each LayerElement object will have its Alignment pointer initialized
+    Functor alignHorizontally(&Object::AlignHorizontally);
+    Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
+    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally);
+    this->Process(&alignHorizontally, &alignHorizontallyParams, &alignHorizontallyEnd);
+    
+    // Align the content of the page using system aligners
+    // After this:
+    // - each Staff object will then have its StaffAlignment pointer initialized
+    Functor alignVertically(&Object::AlignVertically);
+    Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
+    AlignVerticallyParams alignVerticallyParams(doc, &alignVerticallyEnd);
+    this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
+    
+    // Set the pitch / pos alignement
+    // Once View::CalculateRestPosY will be move to Staff we will not need to pass a view anymore
+    View view;
+    view.SetDoc(doc);
+    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc, &view);
+    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
+    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+    
+    CalcStemParams calcStemParams(doc);
+    Functor calcStem(&Object::CalcStem);
+    this->Process(&calcStem, &calcStemParams);
+    
+    FunctorDocParams calcChordNoteHeadsParams(doc);
+    Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
+    this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
+    
+    CalcDotsParams calcDotsParams(doc);
+    Functor calcDots(&Object::CalcDots);
+    this->Process(&calcDots, &calcDotsParams);
+    
+    FunctorDocParams calcLegerLinesParams(doc);
+    Functor calcLedgerLines(&Object::CalcLedgerLines);
+    this->Process(&calcLedgerLines, &calcLegerLinesParams);
+    
+    m_layoutDone = true;
+}
+    
 void Page::LayOutHorizontally()
 {
     Doc *doc = dynamic_cast<Doc *>(GetParent());

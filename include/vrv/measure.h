@@ -306,9 +306,12 @@ public:
 public:
     /**
      * The X absolute position of the measure for facsimile (transcription) encodings.
-     * This is the top left position of the measure.
+     * This is the left and right position of the measure.
      */
+    ///@{
     int m_xAbs;
+    int m_xAbs2;
+    ///@}
 
     /**
      * The measure aligner that holds the x positions of the content of the measure
