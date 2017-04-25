@@ -128,6 +128,7 @@ enum ClassId {
     CLEF,
     CUSTOS,
     DOT,
+    DOTS,
     FLAG,
     FTREM,
     KEYSIG,
@@ -225,6 +226,8 @@ typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
 typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
 
 typedef std::vector<LedgerLine> ArrayOfLedgerLines;
+
+typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
 
 //----------------------------------------------------------------------------
 // Global defines

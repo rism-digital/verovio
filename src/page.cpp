@@ -149,6 +149,10 @@ void Page::LayOutHorizontally()
     Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
     this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
 
+    CalcDotsParams calcDotsParams(doc);
+    Functor calcDots(&Object::CalcDots);
+    this->Process(&calcDots, &calcDotsParams);
+
     // Render it for filling the bounding box
     BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
     // Do not do the layout in this view - otherwise we will loop...

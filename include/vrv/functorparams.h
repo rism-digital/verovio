@@ -20,6 +20,7 @@ class AttComparison;
 class BoundaryStartInterface;
 class Chord;
 class Clef;
+class Dots;
 class Ending;
 class FileOutputStream;
 class KeySig;
@@ -409,6 +410,30 @@ public:
 //----------------------------------------------------------------------------
 
 // Use FunctorDocParams
+
+//----------------------------------------------------------------------------
+// CalcDotsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the chord dots object when processing chord notes
+ * member 7: the doc
+ **/
+
+class CalcDotsParams : public FunctorParams {
+public:
+    CalcDotsParams(Doc *doc)
+    {
+        m_chordDots = NULL;
+        m_chordDrawingX = 0;
+        m_chordStemDir = STEMDIRECTION_NONE;
+        m_doc = doc;
+    }
+    Dots *m_chordDots;
+    int m_chordDrawingX;
+    data_STEMDIRECTION m_chordStemDir;
+    Doc *m_doc;
+};
 
 //----------------------------------------------------------------------------
 // CalcMaxMeasureDurationParams

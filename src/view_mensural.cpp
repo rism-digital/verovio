@@ -46,10 +46,6 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
-    int staffSize = staff->m_drawingStaffSize;
-    // Mensural noteheads are usually quite a bit smaller than CMN noteheads for the same size
-    // staff; use _pseudoStaffSize_ to force this for fonts that don't consider that fact.
-    int pseudoStaffSize = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
     int noteY = element->GetDrawingY();
     int xNote, xStem;
     int drawingDur;
@@ -63,7 +59,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     drawingDur = note->GetDrawingDur();
 
-    int radius = m_doc->GetGlyphWidth(SMUFL_E93C_mensuralNoteheadMinimaWhite, pseudoStaffSize, false) / 2;
+    int radius = m_doc->GetGlyphWidth(SMUFL_E93C_mensuralNoteheadMinimaWhite, staff->m_drawingStaffSize, false) / 2;
 
     if (drawingDur > DUR_1) {
         // ledge = m_doc->GetDrawingLedgerLineLength(pseudoStaffSize, false);
@@ -78,7 +74,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     Stem *stem = note->GetDrawingStem();
 
-    verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
+    verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
     if (stem && stem->HasStemDir()) {
         note->SetDrawingStemDir(stem->GetStemDir());
     }
@@ -111,7 +107,6 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
             int sbStaffSize
                 = 0.8 * staff->m_drawingStaffSize; // FIXME: should be pseudoStaffSize, but that's too small; why??
             // LogDebug("<DrawDiamond SB: pseudoStaffSize=%d m_drawing=%d sb=%d 2*sb=%d (int)(1.2*sb)=%d",
-            //  pseudoStaffSize, staff->m_drawingStaffSize, sbStaffSize, 2*sbStaffSize, (int)(1.2*sbStaffSize));
             DrawDiamond(dc, xNote, noteY, 2 * sbStaffSize, (int)(1.2 * sbStaffSize), !note->GetColored());
         }
         else {
@@ -120,7 +115,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
             else
                 charCode = SMUFL_E939_mensuralNoteheadSemibrevisVoid;
 
-            DrawSmuflCode(dc, xNote, noteY, charCode, pseudoStaffSize, false);
+            DrawSmuflCode(dc, xNote, noteY, charCode, staff->m_drawingStaffSize, false);
         }
     }
     // Shorter values
@@ -146,42 +141,23 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
                 else
                     charCode = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
             }
-            DrawSmuflCode(dc, xNote, noteY, charCode, pseudoStaffSize, false);
+            DrawSmuflCode(dc, xNote, noteY, charCode, staff->m_drawingStaffSize, false);
         }
 
         DrawMensuralStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
     }
 
-    /************** Ledger lines: **************/
-
-    int staffTop = staffY + m_doc->GetDrawingUnit(staffSize);
-    int staffBot = staffY - m_doc->GetDrawingStaffSize(staffSize) - m_doc->GetDrawingUnit(staffSize);
-
-    // if the note is not in the staff
-    if (!isIn(noteY, staffTop, staffBot)) {
-        int distance, highestNewLine, numLines;
-        bool aboveStaff = (noteY > staffTop);
-
-        distance = (aboveStaff ? (noteY - staffY) : staffY - m_doc->GetDrawingStaffSize(staffSize) - noteY);
-        highestNewLine
-            = ((distance % m_doc->GetDrawingDoubleUnit(staffSize) > 0) ? (distance - m_doc->GetDrawingUnit(staffSize))
-                                                                       : distance);
-        numLines = highestNewLine / m_doc->GetDrawingDoubleUnit(staffSize);
-
-        DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
-    }
-
     /************** Augmentation dots **************/
 
     if (note->GetDots()) {
-        int mensDrawingUnit = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * m_doc->GetDrawingUnit(staffSize));
+        int mensDrawingUnit = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
         int xDot;
         if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && (note->GetDrawingStemDir() == STEMDIRECTION_up)))
             xDot = xStem + mensDrawingUnit * 7 / 2;
         else
             xDot = xStem + mensDrawingUnit * 5 / 2;
 
-        DrawDots(dc, xDot, noteY, note->GetDots(), staff);
+        DrawDotsPart(dc, xDot, noteY, note->GetDots(), staff);
     }
 
     /************** accidental **************/
@@ -190,7 +166,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     if (accid) {
         int xAccid = xNote;
         if (accid->GetFunc() != accidLog_FUNC_edit) {
-            xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staffSize, false);
+            xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false);
         }
 
         assert(false);
@@ -482,33 +458,30 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
-    // Mensural noteheads are usually quite a bit smaller than CMN noteheads for the same size
-    // staff; use _pseudoStaffSize_ to force this for fonts that don't consider that fact.
-    int pseudoStaffSize = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
     int xn, xLeft, xRight, yTop, yBottom, y3, y4;
     // int yy2, y5; // unused
     int verticalCenter, up, height;
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     bool fillNotehead = (mensural_black || note->GetColored()) && !(mensural_black && note->GetColored());
-    height = m_doc->GetDrawingBeamWidth(pseudoStaffSize, false) / 2;
+    height = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) / 2;
     xn = element->GetDrawingX();
 
     // Calculate size of the rectangle
-    xLeft = xn - m_doc->GetDrawingBrevisWidth(pseudoStaffSize);
-    xRight = xn + m_doc->GetDrawingBrevisWidth(pseudoStaffSize);
+    xLeft = xn - m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+    xRight = xn + m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
     if (note->GetActualDur() == DUR_MX) {
         // Maxima is three times the width of brevis
-        xLeft -= m_doc->GetDrawingBrevisWidth(pseudoStaffSize);
-        xRight += m_doc->GetDrawingBrevisWidth(pseudoStaffSize);
+        xLeft -= m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+        xRight += m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
     }
-    yTop = y + m_doc->GetDrawingUnit(pseudoStaffSize);
-    yBottom = y - m_doc->GetDrawingUnit(pseudoStaffSize);
+    yTop = y + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    yBottom = y - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     y3 = yTop;
     y4 = yBottom;
     if (!mensural_black) {
-        y3 += (int)m_doc->GetDrawingUnit(pseudoStaffSize) / 2; // partie d'encadrement qui depasse
-        y4 -= (int)m_doc->GetDrawingUnit(pseudoStaffSize) / 2;
+        y3 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2; // partie d'encadrement qui depasse
+        y4 -= (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
     }
 
     if (!fillNotehead) {
@@ -520,12 +493,12 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
         DrawFilledRectangle(dc, xLeft, yTop, xRight, yBottom);
     }
 
-    DrawVerticalLine(dc, y3, y4, xLeft, m_doc->GetDrawingStemWidth(pseudoStaffSize)); // corset lateral
-    DrawVerticalLine(dc, y3, y4, xRight, m_doc->GetDrawingStemWidth(pseudoStaffSize));
+    DrawVerticalLine(dc, y3, y4, xLeft, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)); // corset lateral
+    DrawVerticalLine(dc, y3, y4, xRight, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
 
     // stem
     if (note->GetActualDur() < DUR_BR) {
-        verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(pseudoStaffSize) * 2;
+        verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
         up = (y < verticalCenter) ? true : false;
         if (note->GetDrawingStemDir() != STEMDIRECTION_NONE) {
             if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
@@ -537,14 +510,14 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
         }
 
         if (!up) {
-            y3 = yTop - m_doc->GetDrawingUnit(pseudoStaffSize) * 8;
+            y3 = yTop - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 8;
             yBottom = yTop;
         }
         else {
-            y3 = yTop + m_doc->GetDrawingUnit(pseudoStaffSize) * 6;
+            y3 = yTop + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
             yBottom = yTop;
         }
-        DrawVerticalLine(dc, yBottom, y3, xRight, m_doc->GetDrawingStemWidth(pseudoStaffSize));
+        DrawVerticalLine(dc, yBottom, y3, xRight, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
     }
 
     return;
