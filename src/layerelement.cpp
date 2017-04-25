@@ -12,7 +12,7 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "aligner.h"
+#include "horizontalaligner.h"
 #include "attcomparison.h"
 #include "barline.h"
 #include "beam.h"

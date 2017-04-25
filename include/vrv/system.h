@@ -8,7 +8,7 @@
 #ifndef __VRV_SYSTEM_H__
 #define __VRV_SYSTEM_H__
 
-#include "aligner.h"
+#include "verticalaligner.h"
 #include "drawinginterface.h"
 #include "editorial.h"
 #include "object.h"
