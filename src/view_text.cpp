@@ -17,6 +17,7 @@
 
 #include "devicecontext.h"
 #include "doc.h"
+#include "fb.h"
 #include "style.h"
 #include "text.h"
 #include "vrv.h"
@@ -27,6 +28,33 @@ namespace vrv {
 // View - TextElement
 //----------------------------------------------------------------------------
 
+void View::DrawFb(DeviceContext *dc, Fb *element, int x, int y, bool &setX, bool &setY)
+{
+    assert(element);
+    
+    Object *current;
+    for (current = element->GetFirst(); current; current = element->GetNext()) {
+        if (current->Is(FIGURE)) {
+            F *figure = dynamic_cast<F *>(current);
+            assert(figure);
+            DrawF(dc, figure, x, y, setX, setY);
+        }
+        else {
+            assert(false);
+        }
+    }
+    
+}
+
+void View::DrawF(DeviceContext *dc, F *figure, int x, int y, bool &setX, bool &setY)
+{
+    assert(dc);
+    assert(figure);
+    
+    dc->DrawText(UTF16to8(figure->GetText()), figure->GetText());
+
+}
+    
 void View::DrawTextElement(DeviceContext *dc, TextElement *element, int x, int y, bool &setX, bool &setY)
 {
     assert(dc);

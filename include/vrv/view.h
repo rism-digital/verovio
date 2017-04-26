@@ -25,6 +25,8 @@ class Doc;
 class Dynam;
 class EditorialElement;
 class Ending;
+class Fb;
+class F;
 class Fermata;
 class Hairpin;
 class Harm;
@@ -278,6 +280,16 @@ protected:
     void DrawTextElement(DeviceContext *dc, TextElement *element, int x, int y, bool &setX, bool &setY);
     ///@}
 
+    /**
+     * @name Container for Figured Bass
+     * Defined in view_text.cpp
+     */
+    ///@{
+    void DrawFb(DeviceContext *dc, Fb *element, int x, int y, bool &setX, bool &setY);
+    void DrawF(DeviceContext *dc, F *figure, int x, int y, bool &setX, bool &setY);
+
+    ///@}
+    
     /**
      * @name Methods for drawing LayerElement child classes.
      * They are base drawing methods that are called directly from DrawLayerElement

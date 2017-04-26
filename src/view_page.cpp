@@ -21,6 +21,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "fb.h"
 #include "functorparams.h"
 #include "keysig.h"
 #include "layer.h"
@@ -1155,8 +1156,7 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, int x, int y, boo
             DrawTextEditorialElement(dc, dynamic_cast<EditorialElement *>(current), x, y, setX, setY);
         }
         else if (current->Is(FB)) {
-            // do nothing
-            LogWarning("Should do a Figured Bass");
+            DrawFb(dc, dynamic_cast<Fb *>(current), x, y, setX, setY);
         }
         else {
             assert(false);
