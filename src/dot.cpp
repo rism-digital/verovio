@@ -41,7 +41,7 @@ void Dot::Reset()
     PositionInterface::Reset();
     ResetColor();
     ResetDotLog();
-    
+
     m_drawingNote = NULL;
 }
 

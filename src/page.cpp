@@ -223,6 +223,12 @@ void Page::LayOutHorizontally()
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
+    // Adjust the x position of the LayerElement where multiple layer collide
+    // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
+    Functor adjustLayers(&Object::AdjustLayers);
+    AdjustLayersParams adjustLayersParams(doc, &adjustLayers, doc->m_scoreDef.GetStaffNs());
+    this->Process(&adjustLayers, &adjustLayersParams);
+
     // Adjust the X position of the accidentals, including in chords
     Functor adjustAccidX(&Object::AdjustAccidX);
     AdjustAccidXParams adjustAccidXParams(doc, &adjustAccidX);

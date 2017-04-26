@@ -188,6 +188,28 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustLayersParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the doc
+ * member 1: a pointer to the functor for passing it to the system aligner
+**/
+
+class AdjustLayersParams : public FunctorParams {
+public:
+    AdjustLayersParams(Doc *doc, Functor *functor, const std::vector<int> &staffNs)
+    {
+        m_doc = doc;
+        m_functor = functor;
+        m_staffNs = staffNs;
+    }
+    std::vector<int> m_staffNs;
+    Doc *m_doc;
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
 // AdjustFloatingPostionerGrpsParams
 //----------------------------------------------------------------------------
 
@@ -244,7 +266,7 @@ public:
 
 class AdjustXPosParams : public FunctorParams {
 public:
-    AdjustXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
+    AdjustXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
     {
         m_minPos = 0;
         m_upcomingMinPos = VRV_UNSET;
@@ -309,6 +331,7 @@ public:
  * member 4: the functor for passing it to the TimeStampAligner
  * member 5: a flag indicating whereas we are processing the caution scoreDef
  * member 6: a flag indicating is we are in the first measure (for the scoreDef role)
+ * member 7: a flag indicating if we had mutliple layer alignment reference in the measure
 **/
 
 class AlignHorizontallyParams : public FunctorParams {
@@ -322,6 +345,7 @@ public:
         m_functor = functor;
         m_scoreDefRole = NONE;
         m_isFirstMeasure = false;
+        m_hasMultipleLayer = false;
     }
     MeasureAligner *m_measureAligner;
     double m_time;
@@ -330,6 +354,7 @@ public:
     Functor *m_functor;
     ElementScoreDefRole m_scoreDefRole;
     bool m_isFirstMeasure;
+    bool m_hasMultipleLayer;
 };
 
 //----------------------------------------------------------------------------

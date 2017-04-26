@@ -325,7 +325,7 @@ void LayerElement::SetDrawingYRel(int drawingYRel)
 void LayerElement::CenterDrawingX()
 {
     if (this->m_xAbs != VRV_UNSET) return;
-    
+
     SetDrawingXRel(0);
 
     Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
@@ -612,7 +612,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
 
     if (m_alignment->GetType() != ALIGNMENT_GRACENOTE) {
-        m_alignment->AddLayerElementRef(this);
+        if (m_alignment->AddLayerElementRef(this)) params->m_hasMultipleLayer = true;
     }
     // For grace note aligner do not add them to the reference list because they will be processed by their original
     // hierarchy from the GraceAligner

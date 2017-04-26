@@ -211,9 +211,14 @@ public:
     virtual int SetAlignmentXPos(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustLayers
+     */
+    virtual int AdjustLayers(FunctorParams *functorParams);
+
+    /**
      * See Object::AjustAccidX
      */
-    virtual int AdjustAccidX(FunctorParams *);
+    virtual int AdjustAccidX(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustGraceXPos
@@ -351,6 +356,11 @@ private:
      * in DrawMeasure
      */
     Ending *m_drawingEnding;
+
+    /**
+     * A flag indicating if the measure has AlignmentReference with multiple layers
+     */
+    bool m_hasAlignmentRefWithMultipleLayers;
 };
 
 } // namespace vrv

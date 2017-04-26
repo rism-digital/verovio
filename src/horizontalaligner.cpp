@@ -478,7 +478,7 @@ void Alignment::SetXRel(int xRel)
     m_xRel = xRel;
 }
 
-void Alignment::AddLayerElementRef(LayerElement *element)
+bool Alignment::AddLayerElementRef(LayerElement *element)
 {
     assert(element->IsLayerElement());
 
@@ -515,8 +515,10 @@ void Alignment::AddLayerElementRef(LayerElement *element)
         }
     }
     AlignmentReference *alignmentRef = GetAlignmentReference(staffN);
-    alignmentRef->AddChild(element);
     element->SetAlignmentLayerN(layerN);
+    alignmentRef->AddChild(element);
+
+    return alignmentRef->HasMultipleLayer();
 }
 
 bool Alignment::IsOfType(const std::vector<AlignmentType> &types)
@@ -612,11 +614,21 @@ void AlignmentReference::Reset()
     ResetCommon();
 
     m_accidSpace.clear();
+    m_multipleLayer = false;
 }
 
 void AlignmentReference::AddChild(Object *child)
 {
-    assert(dynamic_cast<LayerElement *>(child));
+    LayerElement *childElement = dynamic_cast<LayerElement *>(child);
+    assert(childElement);
+
+    ArrayOfObjects::iterator childrenIter;
+    // Check if the we will have a reference with multiple layers
+    for (childrenIter = m_children.begin(); childrenIter != m_children.end(); childrenIter++) {
+        LayerElement *element = dynamic_cast<LayerElement *>(*childrenIter);
+        if (childElement->GetAlignmentLayerN() != element->GetAlignmentLayerN()) break;
+    }
+    if (!m_children.empty() && (childrenIter != m_children.end())) m_multipleLayer = true;
 
     // Specical case where we do not set the parent because the reference will not have ownership
     // Children will be treated as relinquished objects in the desctructor
@@ -936,6 +948,16 @@ int Alignment::JustifyX(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+int AlignmentReference::AdjustLayers(FunctorParams *functorParams)
+{
+    AdjustLayersParams *params = dynamic_cast<AdjustLayersParams *>(functorParams);
+    assert(params);
+
+    if (m_multipleLayer) LogDebug("Multiple layers!");
+
+    return FUNCTOR_SIBLINGS;
 }
 
 int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)

@@ -42,7 +42,7 @@ public:
      * Use to set the alignment for the Measure BarLine members.
      * This is as special case where we need to add to the measure aligner.
      */
-    void SetAlignment(Alignment *alignment);
+    bool SetAlignment(Alignment *alignment);
 
     /*
      * Return true if the barLine type requires repetition dots to be drawn.
