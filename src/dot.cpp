@@ -22,9 +22,11 @@ namespace vrv {
 // Dot
 //----------------------------------------------------------------------------
 
-Dot::Dot() : LayerElement("dot-"), PositionInterface()
+Dot::Dot() : LayerElement("dot-"), PositionInterface(), AttColor(), AttDotLog()
 {
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_DOTLOG);
 
     Reset();
 }
@@ -37,6 +39,9 @@ void Dot::Reset()
 {
     LayerElement::Reset();
     PositionInterface::Reset();
+    ResetColor();
+    ResetDotLog();
+    
     m_drawingNote = NULL;
 }
 
