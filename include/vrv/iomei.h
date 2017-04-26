@@ -48,8 +48,8 @@ class Dynam;
 class Ending;
 class Expan;
 class Expansion;
+class F;
 class Fb;
-class Figure;
 class Fermata;
 class FloatingElement;
 class FTrem;
@@ -238,8 +238,8 @@ private:
      * @name Methods for writing TextElement
      */
     ///@{
+    void WriteMeiF(pugi::xml_node currentNode, F *figure);
     void WriteMeiFb(pugi::xml_node currentNode, Fb *fb);
-    void WriteMeiFigure(pugi::xml_node currentNode, Figure *figure);
     void WriteMeiRend(pugi::xml_node currentNode, Rend *rend);
     void WriteMeiText(pugi::xml_node currentNode, Text *text);
     ///@}
@@ -469,8 +469,8 @@ private:
     ///@{
     bool ReadMeiRend(Object *parent, pugi::xml_node rend);
     bool ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight);
+    bool ReadMeiF(Object *parent, pugi::xml_node figure);
     bool ReadMeiFb(Object *parent, pugi::xml_node fb);
-    bool ReadMeiFigure(Object *parent, pugi::xml_node figure);
     ///@}
 
     /**

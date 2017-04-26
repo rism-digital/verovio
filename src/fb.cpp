@@ -39,7 +39,7 @@ namespace vrv {
     void Fb::AddChild(Object *child)
     {
         if (child->Is(FIGURE)) {
-            assert(dynamic_cast<Figure *>(child));
+            assert(dynamic_cast<F *>(child));
         }
         else {
             LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
@@ -55,16 +55,16 @@ namespace vrv {
     // Figure
     //----------------------------------------------------------------------------
     
-    Figure::Figure() : TextElement("f-")
+    F::F() : TextElement("f-")
     {
         Reset();
     }
     
-    Figure::~Figure()
+    F::~F()
     {
     }
     
-    void Figure::Reset()
+    void F::Reset()
     {
         TextElement::Reset();
     }

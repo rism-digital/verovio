@@ -408,13 +408,13 @@ bool MeiOutput::WriteObject(Object *object)
     }
 
     // Text elements
+    else if (object->Is(FIGURE)) {
+        m_currentNode = m_currentNode.append_child("f");
+        WriteMeiF(m_currentNode, dynamic_cast<F *>(object));
+    }
     else if (object->Is(FB)) {
         m_currentNode = m_currentNode.append_child("fb");
         WriteMeiFb(m_currentNode, dynamic_cast<Fb *>(object));
-    }
-    else if (object->Is(FIGURE)) {
-        m_currentNode = m_currentNode.append_child("f");
-        WriteMeiFigure(m_currentNode, dynamic_cast<Figure *>(object));
     }
     else if (object->Is(REND)) {
         m_currentNode = m_currentNode.append_child("rend");
@@ -794,6 +794,17 @@ void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteTimeSpanningInterface(currentNode, dynam);
 };
 
+void MeiOutput::WriteMeiF(pugi::xml_node currentNode, F *figure)
+{
+    assert(figure);
+    
+    if (!figure->GetText().empty()) {
+        pugi::xml_node nodechild = currentNode.append_child(pugi::node_pcdata);
+        // nodechild.text() =  UTF16to8(EscapeSMuFL(text->GetText()).c_str()).c_str();
+        nodechild.text() = UTF16to8(figure->GetText()).c_str();
+    }
+};
+    
 void MeiOutput::WriteMeiFb(pugi::xml_node currentNode, Fb *fb)
 {
     assert(fb);
@@ -810,16 +821,6 @@ void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
     fermata->WritePlacement(currentNode);
 };
 
-void MeiOutput::WriteMeiFigure(pugi::xml_node currentNode, Figure *figure)
-{
-    assert(figure);
-    
-    if (!figure->GetText().empty()) {
-        pugi::xml_node nodechild = currentNode.append_child(pugi::node_pcdata);
-        // nodechild.text() =  UTF16to8(EscapeSMuFL(text->GetText()).c_str()).c_str();
-        nodechild.text() = UTF16to8(figure->GetText()).c_str();
-    }
-};
     
 void MeiOutput::WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
 {
@@ -3160,6 +3161,19 @@ bool MeiInput::ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, b
     return true;
 }
 
+bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node figure)
+{
+    F *vrvF = new F();
+    
+    assert(figure.text());
+    
+    std::wstring str = UTF8to16(figure.text().as_string());
+    vrvF->SetText(str);
+    
+    parent->AddChild(vrvF);
+    return true;
+}
+
 bool MeiInput::ReadMeiFb(Object *parent, pugi::xml_node fb)
 {
     bool success = true;
@@ -3177,9 +3191,8 @@ bool MeiInput::ReadMeiFb(Object *parent, pugi::xml_node fb)
         }
         elementName = std::string(xmlElement.name());
         if (elementName == "f") {
-            success = ReadMeiFigure(vrvFb, xmlElement);
+            success = ReadMeiF(vrvFb, xmlElement);
         }
-
         // unknown
         else {
             LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
@@ -3188,20 +3201,7 @@ bool MeiInput::ReadMeiFb(Object *parent, pugi::xml_node fb)
     }
     return success;
 }
-
-bool MeiInput::ReadMeiFigure(Object *parent, pugi::xml_node figure)
-{
-    Figure *vrvFigure = new Figure();
-    
-    assert(figure.text());
-
-    std::wstring str = UTF8to16(figure.text().as_string());
-    vrvFigure->SetText(str);
-    
-    parent->AddChild(vrvFigure);
-    return true;
-}
-    
+ 
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
     interface->ReadAugmentdots(element);

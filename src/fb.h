@@ -54,17 +54,17 @@ namespace vrv {
     /**
      * This if the Figure class
      */
-    class Figure : public TextElement {
+    class F : public TextElement {
     public:
         /**
          * @name Constructors, destructors, reset and class name methods
          * Reset method reset all attribute classes
          */
         ///@{
-        Figure();
-        virtual ~Figure();
+        F();
+        virtual ~F();
         virtual void Reset();
-        virtual std::string GetClassName() const { return "Figure"; }
+        virtual std::string GetClassName() const { return "F"; }
         virtual ClassId GetClassId() const { return FIGURE; }
         ///@}
         
