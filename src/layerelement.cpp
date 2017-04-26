@@ -324,6 +324,8 @@ void LayerElement::SetDrawingYRel(int drawingYRel)
 
 void LayerElement::CenterDrawingX()
 {
+    if (this->m_xAbs != VRV_UNSET) return;
+    
     SetDrawingXRel(0);
 
     Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
