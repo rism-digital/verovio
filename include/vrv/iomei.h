@@ -238,6 +238,8 @@ private:
      * @name Methods for writing TextElement
      */
     ///@{
+    void WriteMeiFb(pugi::xml_node currentNode, Fb *fb);
+    void WriteMeiFigure(pugi::xml_node currentNode, Figure *figure);
     void WriteMeiRend(pugi::xml_node currentNode, Rend *rend);
     void WriteMeiText(pugi::xml_node currentNode, Text *text);
     ///@}

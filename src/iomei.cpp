@@ -408,6 +408,14 @@ bool MeiOutput::WriteObject(Object *object)
     }
 
     // Text elements
+    else if (object->Is(FB)) {
+        m_currentNode = m_currentNode.append_child("fb");
+        WriteMeiFb(m_currentNode, dynamic_cast<Fb *>(object));
+    }
+    else if (object->Is(FIGURE)) {
+        m_currentNode = m_currentNode.append_child("f");
+        WriteMeiFigure(m_currentNode, dynamic_cast<Figure *>(object));
+    }
     else if (object->Is(REND)) {
         m_currentNode = m_currentNode.append_child("rend");
         WriteMeiRend(m_currentNode, dynamic_cast<Rend *>(object));
@@ -786,6 +794,11 @@ void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteTimeSpanningInterface(currentNode, dynam);
 };
 
+void MeiOutput::WriteMeiFb(pugi::xml_node currentNode, Fb *fb)
+{
+    assert(fb);
+};
+    
 void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
 {
     assert(fermata);
@@ -797,6 +810,17 @@ void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
     fermata->WritePlacement(currentNode);
 };
 
+void MeiOutput::WriteMeiFigure(pugi::xml_node currentNode, Figure *figure)
+{
+    assert(figure);
+    
+    if (!figure->GetText().empty()) {
+        pugi::xml_node nodechild = currentNode.append_child(pugi::node_pcdata);
+        // nodechild.text() =  UTF16to8(EscapeSMuFL(text->GetText()).c_str()).c_str();
+        nodechild.text() = UTF16to8(figure->GetText()).c_str();
+    }
+};
+    
 void MeiOutput::WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
 {
     assert(hairpin);
@@ -3170,7 +3194,7 @@ bool MeiInput::ReadMeiFigure(Object *parent, pugi::xml_node figure)
     Figure *vrvFigure = new Figure();
     
     assert(figure.text());
-    
+
     std::wstring str = UTF8to16(figure.text().as_string());
     vrvFigure->SetText(str);
     
