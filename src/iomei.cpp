@@ -1047,6 +1047,8 @@ void MeiOutput::WriteMeiDot(pugi::xml_node currentNode, Dot *dot)
 
     WriteLayerElement(currentNode, dot);
     WritePositionInterface(currentNode, dot);
+    dot->WriteColor(currentNode);
+    dot->WriteDotLog(currentNode);
 }
 
 void MeiOutput::WriteMeiFTrem(pugi::xml_node currentNode, FTrem *fTrem)
@@ -2807,6 +2809,8 @@ bool MeiInput::ReadMeiDot(Object *parent, pugi::xml_node dot)
     ReadLayerElement(dot, vrvDot);
 
     ReadPositionInterface(dot, vrvDot);
+    vrvDot->ReadColor(dot);
+    vrvDot->ReadDotLog(dot);
 
     parent->AddChild(vrvDot);
     return true;
