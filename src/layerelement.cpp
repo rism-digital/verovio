@@ -212,7 +212,7 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 int LayerElement::GetDrawingX() const
 {
     if (m_xAbs != VRV_UNSET) return m_xAbs;
-    
+
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
 
     if (!m_alignment) {
@@ -492,10 +492,21 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     AlignmentType type = ALIGNMENT_DEFAULT;
 
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+    Note *noteParent = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_NOTE_DEPTH));
+    Rest *restParent = dynamic_cast<Rest *>(this->GetFirstParent(REST, MAX_NOTE_DEPTH));
+
     if (chordParent) {
         m_alignment = chordParent->GetAlignment();
     }
-
+    else if (noteParent) {
+        m_alignment = noteParent->GetAlignment();
+    }
+    else if (restParent) {
+        m_alignment = restParent->GetAlignment();
+    }
+    else if (this->Is({ DOTS, FLAG, STEM })) {
+        assert(false);
+    }
     // We do not align these (formely container). Any other?
     else if (this->Is({ BEAM, FTREM, TUPLET })) {
         return FUNCTOR_CONTINUE;
@@ -561,18 +572,8 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         type = ALIGNMENT_DOT;
     }
     else if (this->Is(ACCID)) {
-        // Refer to the note parent (if any?)
-        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
-        if (note)
-            m_alignment = note->GetAlignment();
-        else
-            type = ALIGNMENT_ACCID;
-    }
-    else if (this->Is({ DOTS, FLAG, STEM })) {
-        // Refer to the note parent (if any?)
-        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
-        assert(note);
-        m_alignment = note->GetAlignment();
+        // accid within note was already taken into account by noteParent
+        type = ALIGNMENT_ACCID;
     }
     else if (this->Is({ ARTIC, ARTIC_PART, SYL })) {
         // Refer to the note parent
@@ -724,6 +725,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             // See above for notes
             int staffLoc = 4;
             if (rest->HasLoc()) staffLoc = rest->GetLoc();
+            rest->SetDrawingLoc(staffLoc);
             this->SetDrawingYRel(params->m_view->CalculateRestPosY(
                 staffY, rest->GetActualDur(), staffLoc, hasMultipleLayer, isFirstLayer));
         }
@@ -732,6 +734,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 = PitchInterface::CalcLoc(rest->GetPloc(), rest->GetOloc(), layerY->GetClefLocOffset(layerElementY));
             // Override it if we have a @loc ?
             if (rest->HasLoc()) loc = rest->GetLoc();
+            rest->SetDrawingLoc(loc);
             this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
         }
     }

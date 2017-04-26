@@ -118,7 +118,7 @@ void Staff::AddChild(Object *child)
 int Staff::GetDrawingY() const
 {
     if (m_yAbs != VRV_UNSET) return m_yAbs;
-    
+
     if (!m_staffAlignment) return 0;
 
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;

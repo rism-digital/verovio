@@ -924,7 +924,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         DrawRestBreve(dc, mRest->GetDrawingX(), y, staff);
     }
     else
-        DrawRestWhole(dc, mRest->GetDrawingX(), y, DUR_1, 0, false, staff);
+        DrawRestWhole(dc, mRest->GetDrawingX(), y, DUR_1, false, staff);
 
     if (mRest->HasFermata()) {
         DrawFermataAttr(dc, element, layer, staff);
@@ -1179,9 +1179,15 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         case DUR_LG: DrawRestLong(dc, x, y, staff); break;
         case DUR_BR: DrawRestBreve(dc, x, y, staff); break;
         case DUR_1:
-        case DUR_2: DrawRestWhole(dc, x, y, drawingDur, rest->GetDots(), drawingCueSize, staff); break;
-        default: DrawRestQuarter(dc, x, y, drawingDur, rest->GetDots(), drawingCueSize, staff);
+        case DUR_2: DrawRestWhole(dc, x, y, drawingDur, drawingCueSize, staff); break;
+        default: DrawRestQuarter(dc, x, y, drawingDur, drawingCueSize, staff);
     }
+
+    /************ Draw children (dots) ************/
+
+    DrawLayerChildren(dc, rest, layer, staff, measure);
+
+    /************** peripherals: **************/
 
     if (rest->HasFermata()) {
         DrawFermataAttr(dc, element, layer, staff);
@@ -1543,18 +1549,13 @@ void View::DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff)
     DrawFilledRectangle(dc, x1, y2, x2, y1);
 }
 
-void View::DrawRestQuarter(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff)
+void View::DrawRestQuarter(DeviceContext *dc, int x, int y, int valeur, bool cueSize, Staff *staff)
 {
     int y2 = y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     DrawSmuflCode(dc, x, y2, SMUFL_E4E5_restQuarter + (valeur - DUR_4), staff->m_drawingStaffSize, cueSize);
-
-    if (dots) {
-        if (valeur < DUR_16) y += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        DrawDotsPart(dc, (x + 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)), y, dots, staff);
-    }
 }
 
-void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff)
+void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSize, Staff *staff)
 {
     int x1, x2, y1, y2, vertic;
     y1 = y;
@@ -1587,10 +1588,6 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned c
     if (y > (int)staff->GetDrawingY()
         || y < staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize))
         DrawHorizontalLine(dc, x1, x2, y1, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize));
-
-    if (dots) {
-        DrawDotsPart(dc, (x2 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)), y2, dots, staff);
-    }
 }
 
 //----------------------------------------------------------------------------

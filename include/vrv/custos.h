@@ -36,6 +36,20 @@ public:
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+
 private:
     //
 public:

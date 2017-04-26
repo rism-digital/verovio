@@ -1021,8 +1021,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
                 layer->SetDrawingStemDir(STEMDIRECTION_down);
             }
         }
-        if (params->m_doc->GetType() != Transcription)
-            layer->SetDrawingStaffDefValues(params->m_currentStaffDef);
+        if (params->m_doc->GetType() != Transcription) layer->SetDrawingStaffDefValues(params->m_currentStaffDef);
         return FUNCTOR_CONTINUE;
     }
 

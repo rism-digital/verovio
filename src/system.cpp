@@ -100,7 +100,7 @@ void System::AddChild(Object *child)
 int System::GetDrawingX() const
 {
     if (m_xAbs != VRV_UNSET) return m_xAbs;
-    
+
     m_cachedDrawingX = 0;
     return m_drawingXRel;
 }
@@ -108,7 +108,7 @@ int System::GetDrawingX() const
 int System::GetDrawingY() const
 {
     if (m_yAbs != VRV_UNSET) return m_yAbs;
-    
+
     m_cachedDrawingY = 0;
     return m_drawingYRel;
 }

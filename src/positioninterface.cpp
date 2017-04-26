@@ -31,6 +31,8 @@ void PositionInterface::Reset()
 {
     ResetStaffloc();
     ResetStafflocPitched();
+
+    m_drawingLoc = 0;
 }
 
 bool PositionInterface::HasIdenticalPositionInterface(PositionInterface *otherPositionInterface)
@@ -48,6 +50,20 @@ bool PositionInterface::HasIdenticalPositionInterface(PositionInterface *otherPo
         return false;
     }
     return true;
+}
+
+//----------------------------------------------------------------------------
+// Interface pseudo functor (redirected)
+//----------------------------------------------------------------------------
+
+int PositionInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
+{
+    m_drawingLoc = 0;
+}
+
+int PositionInterface::InterfaceResetHorizontalAlignment(FunctorParams *functorParams, Object *object)
+{
+    m_drawingLoc = 0;
 }
 
 } // namespace vrv

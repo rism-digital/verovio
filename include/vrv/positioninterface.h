@@ -12,6 +12,8 @@
 
 namespace vrv {
 
+class FunctorParams;
+
 //----------------------------------------------------------------------------
 // PositionInterface
 //----------------------------------------------------------------------------
@@ -35,16 +37,43 @@ public:
     ///@}
 
     /**
+     * @name Setter and getter for the drawing staff loc.
+     * This is set by the SetAlignmentPitchPos functor.
+     */
+    ///@{
+    void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
+    int GetDrawingLoc() const { return m_drawingLoc; }
+    ///@}
+
+    /**
      * Inteface comparison operator.
      * Checks if the LayerElement has a PositionInterface and compares attributes
      */
     bool HasIdenticalPositionInterface(PositionInterface *otherPitchInterface);
+
+    //-----------------//
+    // Pseudo functors //
+    //-----------------//
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int InterfaceResetHorizontalAlignment(FunctorParams *functorParams, Object *object);
 
 private:
     //
 public:
     //
 private:
+    /**
+     * The drawing location of the object
+     */
+    int m_drawingLoc;
 };
 
 } // namespace vrv

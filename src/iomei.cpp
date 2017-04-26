@@ -2219,7 +2219,7 @@ bool MeiInput::ReadMeiMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadMeasureLog(measure);
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);
-    
+
     if (measure.attribute("ulx") && measure.attribute("lrx") && (this->m_doc->GetType() == Transcription)) {
         vrvMeasure->m_xAbs = atoi(measure.attribute("ulx").value()) * DEFINITION_FACTOR;
         vrvMeasure->m_xAbs2 = atoi(measure.attribute("lrx").value()) * DEFINITION_FACTOR;

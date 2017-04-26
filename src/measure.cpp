@@ -60,9 +60,8 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     m_leftBarLine.SetLeft();
 
     Reset();
-    
-    if (!measureMusic)
-        this->SetRight(BARRENDITION_invis);
+
+    if (!measureMusic) this->SetRight(BARRENDITION_invis);
 }
 
 Measure::~Measure()
@@ -131,7 +130,7 @@ void Measure::AddChild(Object *child)
 int Measure::GetDrawingX() const
 {
     if (m_xAbs != VRV_UNSET) return m_xAbs;
-    
+
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
 
     System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
@@ -201,7 +200,7 @@ int Measure::GetRightBarLineRight() const
 int Measure::GetWidth() const
 {
     if (this->m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
-    
+
     assert(m_measureAligner.GetRightAlignment());
     return m_measureAligner.GetRightAlignment()->GetXRel();
 }
