@@ -1047,6 +1047,8 @@ void MeiOutput::WriteMeiDot(pugi::xml_node currentNode, Dot *dot)
 
     WriteLayerElement(currentNode, dot);
     WritePositionInterface(currentNode, dot);
+    dot->WriteColor(currentNode);
+    dot->WriteDotLog(currentNode);
 }
 
 void MeiOutput::WriteMeiFTrem(pugi::xml_node currentNode, FTrem *fTrem)
@@ -1156,6 +1158,7 @@ void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
     WritePositionInterface(currentNode, rest);
     rest->WriteColor(currentNode);
     rest->WriteRelativesize(currentNode);
+    rest->WriteRestVisMensural(currentNode);
 }
 
 void MeiOutput::WriteMeiProport(pugi::xml_node currentNode, Proport *proport)
@@ -2806,6 +2809,8 @@ bool MeiInput::ReadMeiDot(Object *parent, pugi::xml_node dot)
     ReadLayerElement(dot, vrvDot);
 
     ReadPositionInterface(dot, vrvDot);
+    vrvDot->ReadColor(dot);
+    vrvDot->ReadDotLog(dot);
 
     parent->AddChild(vrvDot);
     return true;
@@ -2984,6 +2989,7 @@ bool MeiInput::ReadMeiRest(Object *parent, pugi::xml_node rest)
     ReadPositionInterface(rest, vrvRest);
     vrvRest->ReadColor(rest);
     vrvRest->ReadRelativesize(rest);
+    vrvRest->ReadRestVisMensural(rest);
 
     parent->AddChild(vrvRest);
     return true;
