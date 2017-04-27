@@ -1178,16 +1178,14 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
-    if (drawingDur > DUR_2) {
-        x -= m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize) / 2;
-    }
-
     switch (drawingDur) {
         case DUR_LG: DrawRestLong(dc, x, y, staff); break;
         case DUR_BR: DrawRestBreve(dc, x, y, staff); break;
         case DUR_1:
         case DUR_2: DrawRestWhole(dc, x, y, drawingDur, drawingCueSize, staff); break;
-        default: DrawRestQuarter(dc, x, y, drawingDur, drawingCueSize, staff);
+        default:
+            y += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            DrawSmuflCode(dc, x, y, rest->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize);
     }
 
     /************ Draw children (dots) ************/
@@ -1554,12 +1552,6 @@ void View::DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff)
 
     y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
     DrawFilledRectangle(dc, x1, y2, x2, y1);
-}
-
-void View::DrawRestQuarter(DeviceContext *dc, int x, int y, int valeur, bool cueSize, Staff *staff)
-{
-    int y2 = y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    DrawSmuflCode(dc, x, y2, SMUFL_E4E5_restQuarter + (valeur - DUR_4), staff->m_drawingStaffSize, cueSize);
 }
 
 void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSize, Staff *staff)

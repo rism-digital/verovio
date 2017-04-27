@@ -53,9 +53,15 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
-                 
+
     /**
-     *
+     * Get the SMuFL glyph or a rest considering its actual duration.
+     * This is valid only for CMN and for duration shorter than half notes.
+     */
+    wchar_t GetRestGlyph() const;
+
+    /**
+     * Get the default loc for a doc when neither oloc or loc are provided.
      */
     int GetDefaultLoc(bool hasMultipleLayer, bool isFirstLayer);
 

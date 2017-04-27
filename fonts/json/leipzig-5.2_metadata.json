@@ -1292,6 +1292,36 @@
                 -2.936
             ]
         },
+        "uniE4EB": {
+            "bBoxNE": [
+                2.564,
+                2.708
+            ],
+            "bBoxSW": [
+                -0.004,
+                -3.82
+            ]
+        },
+        "uniE4EC": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniE4ED": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "uniE500": {
             "bBoxNE": [
                 2.032,
@@ -2641,6 +2671,15 @@
         },
         "uniE4EA": {
             "codepoint": "0XE4EA"
+        },
+        "uniE4EB": {
+            "codepoint": "0XE4EB"
+        },
+        "uniE4EC": {
+            "codepoint": "0XE4EC"
+        },
+        "uniE4ED": {
+            "codepoint": "0XE4ED"
         },
         "uniE500": {
             "codepoint": "0XE500"
