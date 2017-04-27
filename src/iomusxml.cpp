@@ -1019,7 +1019,12 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
             octave->SetDis(
                 octave->AttOctavedisplacement::StrToOctaveDis(GetAttributeValue(xmlShift.node(), "size").c_str()));
             m_octDis[staffN] = (atoi(GetAttributeValue(xmlShift.node(), "size").c_str()) + 2) / 8;
-            if (HasAttributeWithValue(xmlShift.node(), "type", "down")) m_octDis[staffN] = -1 * m_octDis[staffN];
+            if (HasAttributeWithValue(xmlShift.node(), "type", "down")) {
+                octave->SetDisPlace(PLACE_below);
+                m_octDis[staffN] = -1 * m_octDis[staffN];
+            }
+            else
+                octave->SetDisPlace(PLACE_above);
             m_controlElements.push_back(std::make_pair(measureNum, octave));
             m_octaveStack.push_back(octave);
         }
