@@ -567,10 +567,8 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int x = element->GetDrawingX();
     int sym = 0;
     bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
-                          || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
-                          || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black)
-        ? true
-        : false;
+        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
+        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
 
@@ -612,12 +610,23 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     // mensural clefs
     if (isMensural) {
-        if (sym == SMUFL_E050_gClef)
-            sym = SMUFL_E901_mensuralGclefPetrucci;
-        else if (sym == SMUFL_E05C_cClef)
-            sym = SMUFL_E909_mensuralCclefPetrucciPosMiddle;
-        else if (sym == SMUFL_E062_fClef)
-            sym = SMUFL_E904_mensuralFclefPetrucci;
+        if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
+            if (sym == SMUFL_E050_gClef)
+                // G clef doesn't exist in black notation, so should never get here, but just in case.
+                sym = SMUFL_E901_mensuralGclefPetrucci;
+            else if (sym == SMUFL_E05C_cClef)
+                sym = SMUFL_E906_chantCclef;
+            else if (sym == SMUFL_E062_fClef)
+                sym = SMUFL_E902_chantFclef;
+        }
+        else {
+            if (sym == SMUFL_E050_gClef)
+                sym = SMUFL_E901_mensuralGclefPetrucci;
+            else if (sym == SMUFL_E05C_cClef)
+                sym = SMUFL_E909_mensuralCclefPetrucciPosMiddle;
+            else if (sym == SMUFL_E062_fClef)
+                sym = SMUFL_E904_mensuralFclefPetrucci;
+        }
     }
 
     if (sym == 0) {
@@ -1155,6 +1164,11 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Rest *rest = dynamic_cast<Rest *>(element);
     assert(rest);
+
+    if (rest->IsMensural()) {
+        DrawMensuralRest(dc, element, layer, staff, measure);
+        return;
+    }
 
     if (rest->m_crossStaff) staff = rest->m_crossStaff;
 
