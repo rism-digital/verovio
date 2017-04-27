@@ -1335,24 +1335,28 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         pugi::xpath_node_set lyrics = node.select_nodes("lyric");
         for (pugi::xpath_node_set::const_iterator it = lyrics.begin(); it != lyrics.end(); ++it) {
             pugi::xml_node lyric = it->node();
-            pugi::xpath_node textNode = lyric.select_single_node("text");
-            if (textNode) {
-                int lyricNumber = atoi(GetAttributeValue(lyric, "number").c_str());
-                lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
-                std::string lyricColor = GetAttributeValue(lyric, "color");
-                Verse *verse = new Verse();
-                verse->SetN(lyricNumber);
-                if (!lyricColor.empty()) verse->SetColor(lyricColor.c_str());
+            int lyricNumber = atoi(GetAttributeValue(lyric, "number").c_str());
+            lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
+            std::string lyricName = GetAttributeValue(lyric, "name");
+            std::string lyricColor = GetAttributeValue(lyric, "color");
+            Verse *verse = new Verse();
+            verse->SetN(lyricNumber);
+            if (!lyricColor.empty()) verse->SetColor(lyricColor.c_str());
+            // if (!lyricName.empty()) verse->SetLabel(lyricName.c_str());
+            for (pugi::xml_node textNode = lyric.child("text"); textNode; textNode = textNode.next_sibling("text")) {
                 if (GetAttributeValue(lyric, "print-object") != "no") {
                     // std::string textColor = GetAttributeValue(textNode.node(), "color");
-                    std::string textStyle = GetAttributeValue(textNode.node(), "font-style");
-                    std::string textWeight = GetAttributeValue(textNode.node(), "font-weight");
-                    std::string lang = GetAttributeValue(textNode.node(), "xml:lang");
-                    std::string textStr = GetContentOfChild(lyric, "text");
+                    std::string textStyle = GetAttributeValue(textNode, "font-style");
+                    std::string textWeight = GetAttributeValue(textNode, "font-weight");
+                    std::string lang = GetAttributeValue(textNode, "xml:lang");
+                    std::string textStr = GetContent(textNode);
                     Syl *syl = new Syl();
                     if (!lang.empty()) syl->SetLang(lang.c_str());
                     if (lyric.select_single_node("extend")) {
                         syl->SetCon(sylLog_CON_u);
+                    }
+                    if (textNode.next_sibling("elision")) {
+                        syl->SetCon(sylLog_CON_b);
                     }
                     if (GetContentOfChild(lyric, "syllabic") == "begin") {
                         syl->SetCon(sylLog_CON_d);
@@ -1374,8 +1378,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                     syl->AddChild(text);
                     verse->AddChild(syl);
                 }
-                note->AddChild(verse);
             }
+            note->AddChild(verse);
         }
 
         // ties
