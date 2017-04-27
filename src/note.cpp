@@ -432,6 +432,7 @@ int Note::CalcDots(FunctorParams *functorParams)
 
     if (chord) {
         dots = params->m_chordDots;
+        assert(dots);
 
         // Stem up, shorter than 4th and not in beam
         if ((params->m_chordStemDir == STEMDIRECTION_up) && (this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
@@ -445,6 +446,7 @@ int Note::CalcDots(FunctorParams *functorParams)
     else if (this->HasDots()) {
         // For single notes we need here to set the dot loc
         dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+        assert(dots);
         params->m_chordDrawingX = this->GetDrawingX();
 
         std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
@@ -465,7 +467,6 @@ int Note::CalcDots(FunctorParams *functorParams)
     else {
         return FUNCTOR_SIBLINGS;
     }
-    assert(dots);
 
     int radius = this->GetDrawingRadius(params->m_doc, staffSize, drawingCueSize);
     int xRel = this->GetDrawingX() - params->m_chordDrawingX + radius + flagShift;

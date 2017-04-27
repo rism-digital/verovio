@@ -40,7 +40,6 @@ class StaffDef;
 class Syl;
 class System;
 class SystemAligner;
-class View;
 
 //----------------------------------------------------------------------------
 // FunctorParams
@@ -188,6 +187,28 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustLayersParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the doc
+ * member 1: a pointer to the functor for passing it to the system aligner
+**/
+
+class AdjustLayersParams : public FunctorParams {
+public:
+    AdjustLayersParams(Doc *doc, Functor *functor, const std::vector<int> &staffNs)
+    {
+        m_doc = doc;
+        m_functor = functor;
+        m_staffNs = staffNs;
+    }
+    std::vector<int> m_staffNs;
+    Doc *m_doc;
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
 // AdjustFloatingPostionerGrpsParams
 //----------------------------------------------------------------------------
 
@@ -244,7 +265,7 @@ public:
 
 class AdjustXPosParams : public FunctorParams {
 public:
-    AdjustXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
+    AdjustXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
     {
         m_minPos = 0;
         m_upcomingMinPos = VRV_UNSET;
@@ -309,6 +330,7 @@ public:
  * member 4: the functor for passing it to the TimeStampAligner
  * member 5: a flag indicating whereas we are processing the caution scoreDef
  * member 6: a flag indicating is we are in the first measure (for the scoreDef role)
+ * member 7: a flag indicating if we had mutliple layer alignment reference in the measure
 **/
 
 class AlignHorizontallyParams : public FunctorParams {
@@ -322,6 +344,7 @@ public:
         m_functor = functor;
         m_scoreDefRole = NONE;
         m_isFirstMeasure = false;
+        m_hasMultipleLayer = false;
     }
     MeasureAligner *m_measureAligner;
     double m_time;
@@ -330,6 +353,7 @@ public:
     Functor *m_functor;
     ElementScoreDefRole m_scoreDefRole;
     bool m_isFirstMeasure;
+    bool m_hasMultipleLayer;
 };
 
 //----------------------------------------------------------------------------
@@ -1072,18 +1096,15 @@ public:
 
 /**
  * member 0: a pointer doc
- * member 1: a pointer to the view
  **/
 
 class SetAlignmentPitchPosParams : public FunctorParams {
 public:
-    SetAlignmentPitchPosParams(Doc *doc, View *view)
+    SetAlignmentPitchPosParams(Doc *doc)
     {
         m_doc = doc;
-        m_view = view;
     }
     Doc *m_doc;
-    View *m_view;
 };
 
 //----------------------------------------------------------------------------
@@ -1146,11 +1167,12 @@ public:
  * member 3: the previous measure (for setting cautionary scoreDef)
  * member 4: the current system (for setting the system scoreDef)
  * member 5: the flag indicating whereas full labels have to be drawn
+ * member 6: the doc
 **/
 
 class SetCurrentScoreDefParams : public FunctorParams {
 public:
-    SetCurrentScoreDefParams(ScoreDef *upcomingScoreDef)
+    SetCurrentScoreDefParams(Doc *doc, ScoreDef *upcomingScoreDef)
     {
         m_currentScoreDef = NULL;
         m_currentStaffDef = NULL;
@@ -1158,6 +1180,7 @@ public:
         m_previousMeasure = NULL;
         m_currentSystem = NULL;
         m_drawLabels = false;
+        m_doc = doc;
     }
     ScoreDef *m_currentScoreDef;
     StaffDef *m_currentStaffDef;
@@ -1165,6 +1188,7 @@ public:
     Measure *m_previousMeasure;
     System *m_currentSystem;
     bool m_drawLabels;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------

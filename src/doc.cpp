@@ -440,7 +440,7 @@ void Doc::CollectScoreDefs(bool force)
     }
 
     ScoreDef upcomingScoreDef = m_scoreDef;
-    SetCurrentScoreDefParams setCurrentScoreDefParams(&upcomingScoreDef);
+    SetCurrentScoreDefParams setCurrentScoreDefParams(this, &upcomingScoreDef);
     Functor setCurrentScoreDef(&Object::SetCurrentScoreDef);
 
     // First process the current scoreDef in order to fill the staffDef with
@@ -976,6 +976,9 @@ int Doc::CalcMusicFontSize()
 int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
+
+    if (this->GetType() == Transcription) return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
+
     int contentHeight = m_drawingPage->GetContentHeight();
     return (contentHeight + m_drawingPageTopMar * 2) / DEFINITION_FACTOR;
 }
@@ -983,9 +986,11 @@ int Doc::GetAdjustedDrawingPageHeight() const
 int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
+
+    if (this->GetType() == Transcription) return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
+
     int contentWidth = m_drawingPage->GetContentWidth();
     return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar) / DEFINITION_FACTOR;
-    ;
 }
 
 //----------------------------------------------------------------------------

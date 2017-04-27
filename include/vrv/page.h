@@ -68,6 +68,12 @@ public:
     void LayOut(bool force = false);
 
     /**
+     * Do the layout for a transcription page (with layout information).
+     * This only calculates positioning or layer element parts using provided layout of parents.
+     */
+    void LayOutTranscription(bool force = false);
+
+    /**
      * Lay out the content of the page (measures and their content) horizontally
      */
     void LayOutHorizontally();

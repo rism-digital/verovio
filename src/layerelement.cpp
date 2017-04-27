@@ -211,6 +211,8 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 
 int LayerElement::GetDrawingX() const
 {
+    if (m_xAbs != VRV_UNSET) return m_xAbs;
+
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
 
     if (!m_alignment) {
@@ -322,6 +324,8 @@ void LayerElement::SetDrawingYRel(int drawingYRel)
 
 void LayerElement::CenterDrawingX()
 {
+    if (this->m_xAbs != VRV_UNSET) return;
+
     SetDrawingXRel(0);
 
     Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
@@ -490,10 +494,21 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     AlignmentType type = ALIGNMENT_DEFAULT;
 
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+    Note *noteParent = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_NOTE_DEPTH));
+    Rest *restParent = dynamic_cast<Rest *>(this->GetFirstParent(REST, MAX_NOTE_DEPTH));
+
     if (chordParent) {
         m_alignment = chordParent->GetAlignment();
     }
-
+    else if (noteParent) {
+        m_alignment = noteParent->GetAlignment();
+    }
+    else if (restParent) {
+        m_alignment = restParent->GetAlignment();
+    }
+    else if (this->Is({ DOTS, FLAG, STEM })) {
+        assert(false);
+    }
     // We do not align these (formely container). Any other?
     else if (this->Is({ BEAM, FTREM, TUPLET })) {
         return FUNCTOR_CONTINUE;
@@ -559,18 +574,8 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         type = ALIGNMENT_DOT;
     }
     else if (this->Is(ACCID)) {
-        // Refer to the note parent (if any?)
-        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
-        if (note)
-            m_alignment = note->GetAlignment();
-        else
-            type = ALIGNMENT_ACCID;
-    }
-    else if (this->Is({ DOTS, FLAG, STEM })) {
-        // Refer to the note parent (if any?)
-        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
-        assert(note);
-        m_alignment = note->GetAlignment();
+        // accid within note was already taken into account by noteParent
+        type = ALIGNMENT_ACCID;
     }
     else if (this->Is({ ARTIC, ARTIC_PART, SYL })) {
         // Refer to the note parent
@@ -607,7 +612,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
 
     if (m_alignment->GetType() != ALIGNMENT_GRACENOTE) {
-        m_alignment->AddLayerElementRef(this);
+        if (m_alignment->AddLayerElementRef(this)) params->m_hasMultipleLayer = true;
     }
     // For grace note aligner do not add them to the reference list because they will be processed by their original
     // hierarchy from the GraceAligner
@@ -663,11 +668,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         }
         else {
             // do something for accid that are not children of a note - e.g., mensural?
-            int loc
-                = PitchInterface::CalcLoc(accid->GetPloc(), accid->GetOloc(), layerY->GetClefLocOffset(layerElementY));
-            // Override it if we have a @loc ?
-            if (accid->HasLoc()) loc = accid->GetLoc();
-            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, accid->CalcDrawingLoc(layerY, layerElementY)));
         }
     }
     else if (this->Is(CHORD)) {
@@ -684,10 +685,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     else if (this->Is({ CUSTOS, DOT })) {
         PositionInterface *interface = dynamic_cast<PositionInterface *>(this);
         assert(interface);
-        int loc = PitchInterface::CalcLoc(
-            interface->GetPloc(), interface->GetOloc(), layerY->GetClefLocOffset(layerElementY));
-        if (interface->HasLoc()) loc = interface->GetLoc();
-        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, interface->CalcDrawingLoc(layerY, layerElementY)));
     }
     else if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
@@ -707,8 +705,15 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     else if (this->Is(REST)) {
         Rest *rest = dynamic_cast<Rest *>(this);
         assert(rest);
-        // Automatically calculate rest position, if so requested
-        if (rest->GetPloc() == PITCHNAME_NONE) {
+        int loc = 0;
+        if (rest->HasPloc() && rest->HasOloc()) {
+            loc = PitchInterface::CalcLoc(rest->GetPloc(), rest->GetOloc(), layerY->GetClefLocOffset(layerElementY));
+        }
+        else if (rest->HasLoc()) {
+            loc = rest->GetLoc();
+        }
+        // Automatically calculate rest position
+        else {
             // Limitation: GetLayerCount does not take into account editorial markup
             bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
             bool isFirstLayer = false;
@@ -717,21 +722,10 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 assert(firstLayer);
                 if (firstLayer->GetN() == layerY->GetN()) isFirstLayer = true;
             }
-            // We should change this and use the new PitchInterface::CalcLoc (or similar method)
-            // to calculate a loc if none if provided. The use Staff::CalcPitchPosYRel to calculate the y.
-            // See above for notes
-            int staffLoc = 4;
-            if (rest->HasLoc()) staffLoc = rest->GetLoc();
-            this->SetDrawingYRel(params->m_view->CalculateRestPosY(
-                staffY, rest->GetActualDur(), staffLoc, hasMultipleLayer, isFirstLayer));
+            loc = rest->GetDefaultLoc(hasMultipleLayer, isFirstLayer);
         }
-        else {
-            int loc
-                = PitchInterface::CalcLoc(rest->GetPloc(), rest->GetOloc(), layerY->GetClefLocOffset(layerElementY));
-            // Override it if we have a @loc ?
-            if (rest->HasLoc()) loc = rest->GetLoc();
-            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
-        }
+        rest->SetDrawingLoc(loc);
+        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
 
     return FUNCTOR_CONTINUE;
