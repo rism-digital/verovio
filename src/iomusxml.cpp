@@ -655,6 +655,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                         keySig = "0";
                     staffDef->SetKeySig(staffDef->AttKeySigDefaultLog::StrToKeysignature(keySig));
                 }
+                else if (key.node().select_single_node("key-step")) {
+                    staffDef->SetKeySig(KEYSIGNATURE_mixed);
+                }
                 if (key.node().select_single_node("mode")) {
                     staffDef->SetKeyMode(staffDef->AttKeySigDefaultLog::StrToMode(
                         key.node().select_single_node("mode").node().text().as_string()));
