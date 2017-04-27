@@ -118,10 +118,7 @@ void Page::LayOutTranscription(bool force)
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Set the pitch / pos alignement
-    // Once View::CalculateRestPosY will be move to Staff we will not need to pass a view anymore
-    View view;
-    view.SetDoc(doc);
-    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc, &view);
+    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
 
@@ -198,10 +195,7 @@ void Page::LayOutHorizontally()
     }
 
     // Set the pitch / pos alignement
-    // Once View::CalculateRestPosY will be move to Staff we will not need to pass a view anymore
-    View view;
-    view.SetDoc(doc);
-    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc, &view);
+    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
 
@@ -218,6 +212,8 @@ void Page::LayOutHorizontally()
     this->Process(&calcDots, &calcDotsParams);
 
     // Render it for filling the bounding box
+    View view;
+    view.SetDoc(doc);
     BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);
@@ -367,10 +363,7 @@ void Page::LayOutPitchPos()
     assert(this == doc->GetDrawingPage());
 
     // Set the pitch / pos alignement
-    // Once View::CalculateRestPosY will be move to Staff we will not need to pass a view anymore
-    View view;
-    view.SetDoc(doc);
-    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc, &view);
+    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc);
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
 

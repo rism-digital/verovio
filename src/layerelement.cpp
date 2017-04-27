@@ -668,11 +668,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         }
         else {
             // do something for accid that are not children of a note - e.g., mensural?
-            int loc
-                = PitchInterface::CalcLoc(accid->GetPloc(), accid->GetOloc(), layerY->GetClefLocOffset(layerElementY));
-            // Override it if we have a @loc ?
-            if (accid->HasLoc()) loc = accid->GetLoc();
-            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, accid->CalcDrawingLoc(layerY, layerElementY)));
         }
     }
     else if (this->Is(CHORD)) {
@@ -689,10 +685,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     else if (this->Is({ CUSTOS, DOT })) {
         PositionInterface *interface = dynamic_cast<PositionInterface *>(this);
         assert(interface);
-        int loc = PitchInterface::CalcLoc(
-            interface->GetPloc(), interface->GetOloc(), layerY->GetClefLocOffset(layerElementY));
-        if (interface->HasLoc()) loc = interface->GetLoc();
-        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, interface->CalcDrawingLoc(layerY, layerElementY)));
     }
     else if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
@@ -712,8 +705,15 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     else if (this->Is(REST)) {
         Rest *rest = dynamic_cast<Rest *>(this);
         assert(rest);
-        // Automatically calculate rest position, if so requested
-        if (rest->GetPloc() == PITCHNAME_NONE) {
+        int loc = 0;
+        if (rest->HasPloc() && rest->HasOloc()) {
+            loc = PitchInterface::CalcLoc(rest->GetPloc(), rest->GetOloc(), layerY->GetClefLocOffset(layerElementY));
+        }
+        else if (rest->HasLoc()) {
+            loc = rest->GetLoc();
+        }
+        // Automatically calculate rest position
+        else {
             // Limitation: GetLayerCount does not take into account editorial markup
             bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
             bool isFirstLayer = false;
@@ -722,23 +722,10 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 assert(firstLayer);
                 if (firstLayer->GetN() == layerY->GetN()) isFirstLayer = true;
             }
-            // We should change this and use the new PitchInterface::CalcLoc (or similar method)
-            // to calculate a loc if none if provided. The use Staff::CalcPitchPosYRel to calculate the y.
-            // See above for notes
-            int staffLoc = 4;
-            if (rest->HasLoc()) staffLoc = rest->GetLoc();
-            rest->SetDrawingLoc(staffLoc);
-            this->SetDrawingYRel(params->m_view->CalculateRestPosY(
-                staffY, rest->GetActualDur(), staffLoc, hasMultipleLayer, isFirstLayer));
+            loc = rest->GetDefaultLoc(hasMultipleLayer, isFirstLayer);
         }
-        else {
-            int loc
-                = PitchInterface::CalcLoc(rest->GetPloc(), rest->GetOloc(), layerY->GetClefLocOffset(layerElementY));
-            // Override it if we have a @loc ?
-            if (rest->HasLoc()) loc = rest->GetLoc();
-            rest->SetDrawingLoc(loc);
-            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
-        }
+        rest->SetDrawingLoc(loc);
+        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
 
     return FUNCTOR_CONTINUE;

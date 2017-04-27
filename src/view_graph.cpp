@@ -160,6 +160,8 @@ void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize)
 void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph)
 {
     assert(dc);
+    
+    if (code == 0) return;
 
     dc->SetBackground(AxBLUE);
     dc->SetBackgroundMode(AxTRANSPARENT);

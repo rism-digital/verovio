@@ -530,7 +530,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     // For cross staff chords we need to re-calculate the stem because the staff position might have changed
     if (chord->HasCrossStaff()) {
-        SetAlignmentPitchPosParams setAlignmentPitchPosParams(this->m_doc, this);
+        SetAlignmentPitchPosParams setAlignmentPitchPosParams(this->m_doc);
         Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
         chord->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
 
@@ -1178,13 +1178,6 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
-    // Temporary fix for rest within tuplet because drawing tuplet requires m_drawingStemXXX to be set
-    // element->m_drawingStemStart.x = element->m_drawingStemEnd.x = element->GetDrawingX() -
-    // (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) /
-    // 2);
-    // element->m_drawingStemEnd.y = element->GetDrawingY();
-    // element->m_drawingStemStart.y = element->GetDrawingY();
-
     if (drawingDur > DUR_2) {
         x -= m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize) / 2;
     }
@@ -1530,7 +1523,7 @@ void View::DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff)
     int x1, x2, y1, y2;
     y1 = y;
     x1 = x;
-    x2 = x + (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3);
+    x2 = x + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     // look if one line or between line
     if ((y - staff->GetDrawingY()) % m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))
@@ -1553,7 +1546,7 @@ void View::DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff)
 
     y1 = y;
     x1 = x;
-    x2 = x + (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3);
+    x2 = x + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     // look if on line or between line
     if ((y - staff->GetDrawingY()) % m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))

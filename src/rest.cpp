@@ -79,6 +79,37 @@ void Rest::AddChild(Object *child)
         m_children.push_back(child);
     Modify();
 }
+    
+int Rest::GetDefaultLoc(bool hasMultipleLayer, bool isFirstLayer)
+{
+    int loc = 4;
+    
+    switch (this->GetActualDur()) {
+        case DUR_MX: loc -= 0; break;
+        case DUR_LG: loc -= 0; break;
+        case DUR_BR: loc += 0; break;
+        case DUR_1: loc += 2; break;
+        case DUR_2: loc += 0; break;
+        case DUR_4: loc -= 2; break;
+        case DUR_8: loc -= 2; break;
+        case DUR_16: loc -= 2; break;
+        case DUR_32: loc -= 2; break;
+        case DUR_64: loc -= 3; break;
+        case DUR_128: loc -= 3; break;
+        case DUR_256: loc -= 4; break;
+        default:
+            loc -= 1;
+            break;
+    }
+    if (hasMultipleLayer) {
+        if (isFirstLayer)
+            loc += 2;
+        else
+            loc -= 2;
+    }
+    
+    return loc;
+}
 
 //----------------------------------------------------------------------------
 // Functors methods

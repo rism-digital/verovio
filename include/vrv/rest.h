@@ -53,6 +53,11 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
+                 
+    /**
+     *
+     */
+    int GetDefaultLoc(bool hasMultipleLayer, bool isFirstLayer);
 
     //----------//
     // Functors //

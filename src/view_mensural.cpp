@@ -190,22 +190,14 @@ void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *lay
     Rest *rest = dynamic_cast<Rest *>(element);
     assert(rest);
 
-    // Mensural symbols are usually somewhat smaller than CMN symbols for the same size
-    // staff; use _pseudoStaffSize_ to force this for fonts that don't consider that fact.
-    int pseudoStaffSize = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
-
     bool drawingCueSize = rest->IsCueSize();
     int drawingDur = rest->GetActualDur();
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
-    if (drawingDur > DUR_2) {
-        x -= m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize) / 2;
-    }
-
     switch (drawingDur) {
         case DUR_MX: charCode = SMUFL_E9F0_mensuralRestMaxima; break;
-        case DUR_LG: charCode = SMUFL_E9F1_mensuralRestLongaPerfecta; break;
+        case DUR_LG: charCode = SMUFL_E9F2_mensuralRestLongaImperfecta; break;
         case DUR_BR: charCode = SMUFL_E9F3_mensuralRestBrevis; break;
         case DUR_1: charCode = SMUFL_E9F4_mensuralRestSemibrevis; break;
         case DUR_2: charCode = SMUFL_E9F5_mensuralRestMinima; break;
@@ -213,9 +205,9 @@ void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *lay
         case DUR_8: charCode = SMUFL_E9F7_mensuralRestFusa; break;
         case DUR_16: charCode = SMUFL_E9F8_mensuralRestSemifusa; break;
         default:
-            charCode = SMUFL_E04B_segnoSerpent2; // This should never happen
+            charCode = 0; // This should never happen
     }
-    DrawSmuflCode(dc, x, y, charCode, pseudoStaffSize, false);
+    DrawSmuflCode(dc, x, y, charCode, staff->m_drawingStaffSize, drawingCueSize);
 }
 
 void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

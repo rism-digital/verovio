@@ -717,40 +717,6 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 // View - Staff
 //----------------------------------------------------------------------------
 
-int View::CalculateRestPosY(Staff *staff, char duration, int location, bool hasMultipleLayer, bool isFirstLayer)
-{
-    assert(staff); // Pointer to staff cannot be NULL
-
-    int staff_space = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int offset = 9;
-
-    switch (duration) {
-        case DUR_LG: offset -= 1; break;
-        case DUR_BR: offset += 0; break;
-        case DUR_1: offset += 2; break;
-        case DUR_2: offset += 0; break;
-        case DUR_4: offset -= 2; break;
-        case DUR_8: offset -= 2; break;
-        case DUR_16: offset -= 2; break;
-        case DUR_32: offset -= 2; break;
-        case DUR_64: offset -= 3; break;
-        case DUR_128: offset -= 3; break;
-        case DUR_256: offset -= 4; break;
-        default:
-            offset -= 1;
-            break; // Signal an error, put the clef up high
-    }
-    if (hasMultipleLayer) {
-        if (isFirstLayer)
-            offset += 2;
-        else
-            offset -= 2;
-    }
-
-    return (location + offset - 17) * staff_space;
-    // -17 is a magic number copied from above
-}
-
 void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *system)
 {
     assert(dc);

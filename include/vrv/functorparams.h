@@ -40,7 +40,6 @@ class StaffDef;
 class Syl;
 class System;
 class SystemAligner;
-class View;
 
 //----------------------------------------------------------------------------
 // FunctorParams
@@ -1097,18 +1096,15 @@ public:
 
 /**
  * member 0: a pointer doc
- * member 1: a pointer to the view
  **/
 
 class SetAlignmentPitchPosParams : public FunctorParams {
 public:
-    SetAlignmentPitchPosParams(Doc *doc, View *view)
+    SetAlignmentPitchPosParams(Doc *doc)
     {
         m_doc = doc;
-        m_view = view;
     }
     Doc *m_doc;
-    View *m_view;
 };
 
 //----------------------------------------------------------------------------

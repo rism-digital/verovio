@@ -13,6 +13,8 @@
 namespace vrv {
 
 class FunctorParams;
+class Layer;
+class LayerElement;
 
 //----------------------------------------------------------------------------
 // PositionInterface
@@ -44,6 +46,8 @@ public:
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
     int GetDrawingLoc() const { return m_drawingLoc; }
     ///@}
+    
+    int CalcDrawingLoc(Layer *layer, LayerElement *element);
 
     /**
      * Inteface comparison operator.

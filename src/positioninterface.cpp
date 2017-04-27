@@ -9,6 +9,13 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
+#include "layer.h"
+#include "pitchinterface.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -50,6 +57,21 @@ bool PositionInterface::HasIdenticalPositionInterface(PositionInterface *otherPo
         return false;
     }
     return true;
+}
+    
+int PositionInterface::CalcDrawingLoc(Layer *layer, LayerElement *element)
+{
+    assert(layer);
+    
+    m_drawingLoc = 0;
+    if (this->HasPloc() && this->HasOloc()) {
+        m_drawingLoc = PitchInterface::CalcLoc(this->GetPloc(), this->GetOloc(), layer->GetClefLocOffset(element));
+    }
+    else if (this->HasLoc()) {
+        m_drawingLoc = this->GetLoc();
+    }
+    return m_drawingLoc;
+    
 }
 
 //----------------------------------------------------------------------------
