@@ -165,9 +165,19 @@ wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_EXPLICIT accid)
 // Functor methods
 //----------------------------------------------------------------------------
 
+int Accid::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+    PositionInterface::InterfaceResetDrawing(functorParams, this);
+
+    return FUNCTOR_CONTINUE;
+};
+
 int Accid::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     LayerElement::ResetHorizontalAlignment(functorParams);
+    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
 
     m_isDrawingOctave = false;
     m_drawingOctave = NULL;

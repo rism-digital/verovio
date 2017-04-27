@@ -117,11 +117,10 @@ void View::DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2,
 
 /* Draw an empty ("void") diamond with its top lefthand point at (x1, y1). */
 
-void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill)
+void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill, int linewidth)
 {
     Point p[4];
 
-    int linewidth = 40; // This should be made a parameter for DrawDiammond
     dc->SetPen(m_currentColour, linewidth, AxSOLID);
     if (fill)
         dc->SetBrush(m_currentColour, AxSOLID);
@@ -161,6 +160,8 @@ void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize)
 void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph)
 {
     assert(dc);
+    
+    if (code == 0) return;
 
     dc->SetBackground(AxBLUE);
     dc->SetBackgroundMode(AxTRANSPARENT);

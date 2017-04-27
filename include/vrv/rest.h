@@ -41,12 +41,47 @@ public:
     virtual ClassId GetClassId() const { return REST; }
     ///@}
 
+    /**
+     * Add an element to a rest.
+     * Only Dots elements will be actually added to the rest.
+     */
+    virtual void AddChild(Object *object);
+
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
 
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
+                 
+    /**
+     *
+     */
+    int GetDefaultLoc(bool hasMultipleLayer, bool isFirstLayer);
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::CalcDots
+     */
+    virtual int CalcDots(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareLayerElementParts
+     */
+    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
 private:
     //

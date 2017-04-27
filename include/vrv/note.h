@@ -91,8 +91,14 @@ public:
     Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; }
     ///@}
 
+    /**
+     * @name Setter and getter for the drawing staff loc.
+     * This is set by the SetAlignmentPitchPos functor.
+     */
+    ///@{
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
     int GetDrawingLoc() const { return m_drawingLoc; }
+    ///@}
 
     /**
      * Overriding functions to return information from chord parent if any

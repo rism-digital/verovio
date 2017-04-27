@@ -337,7 +337,7 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
         case 'Z': duration = DURATION_256; break;
 
         default:
-            LogWarning("DarmsInput: Unkown note duration: %c", data[pos]);
+            LogWarning("DarmsInput: Unknown note duration: %c", data[pos]);
             return 0;
             break;
     }
