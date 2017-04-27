@@ -916,7 +916,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, i
             fermata->SetForm(fermataVis_FORM_inv);
             fermata->SetPlace(STAFFREL_below);
         }
-        else {
+        else if (HasAttributeWithValue(xmlFermata.node(), "type", "upright")) {
             fermata->SetForm(fermataVis_FORM_norm);
             fermata->SetPlace(STAFFREL_above);
         }
@@ -1475,7 +1475,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             fermata->SetForm(fermataVis_FORM_inv);
             fermata->SetPlace(STAFFREL_below);
         }
-        else {
+        else if (HasAttributeWithValue(xmlFermata.node(), "type", "upright")) {
             fermata->SetForm(fermataVis_FORM_norm);
             fermata->SetPlace(STAFFREL_above);
         }
