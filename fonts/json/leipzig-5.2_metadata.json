@@ -30,7 +30,7 @@
         "tupletBracketThickness": "0.16"
     },
     "fontName": "Leipzig-5.2",
-    "fontVersion": "5.2.25",
+    "fontVersion": "5.2.26",
     "glyphBBoxes": {
         "uniE003": {
             "bBoxNE": [
@@ -1264,22 +1264,22 @@
         },
         "uniE4E8": {
             "bBoxNE": [
-                1.608,
+                1.596,
                 1.652
             ],
             "bBoxSW": [
-                0.016,
+                0.004,
                 -1.94
             ]
         },
         "uniE4E9": {
             "bBoxNE": [
-                1.932,
-                2.608
+                1.92,
+                1.652
             ],
             "bBoxSW": [
-                0.02,
-                -1.916
+                0.008,
+                -2.872
             ]
         },
         "uniE4EA": {

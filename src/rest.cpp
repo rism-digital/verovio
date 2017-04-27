@@ -94,8 +94,8 @@ int Rest::GetDefaultLoc(bool hasMultipleLayer, bool isFirstLayer)
         case DUR_8: loc -= 2; break;
         case DUR_16: loc -= 2; break;
         case DUR_32: loc -= 2; break;
-        case DUR_64: loc -= 3; break;
-        case DUR_128: loc -= 3; break;
+        case DUR_64: loc -= 2; break;
+        case DUR_128: loc -= 2; break;
         case DUR_256: loc -= 4; break;
         default:
             loc -= 1;
