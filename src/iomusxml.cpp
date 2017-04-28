@@ -1102,6 +1102,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, i
     assert(measure);
 
     std::string placeStr = GetAttributeValue(node, "placement");
+    std::string typeStr = GetAttributeValue(node, "type");
 
     std::string harmText = GetContentOfChild(node, "root/root-step");
     pugi::xpath_node alter = node.select_single_node("root/root-alter");
@@ -1118,6 +1119,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, i
     Harm *harm = new Harm();
     Text *text = new Text();
     if (!placeStr.empty()) harm->SetPlace(harm->AttPlacement::StrToStaffrel(placeStr.c_str()));
+    if (!typeStr.empty()) harm->SetType(typeStr.c_str());
     text->SetText(UTF8to16(harmText));
     harm->AddChild(text);
     m_controlElements.push_back(std::make_pair(measureNum, harm));
@@ -1293,6 +1295,12 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                 }
                 accid->SetAccidGes(ConvertAlterToAccid(std::atof(alterStr.c_str())));
             }
+        }
+        
+        // notehead
+        pugi::xpath_node notehead = node.select_single_node("notehead");
+        if (notehead) {
+            // if (HasAttributeWithValue(notehead.node(), "parentheses", "yes")) note->SetEnclose(ENCLOSURE_paren);
         }
 
         // look at the next note to see if we are starting or ending a chord
