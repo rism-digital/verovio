@@ -731,6 +731,88 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int LayerElement::AdjustLayers(FunctorParams *functorParams)
+{
+    AdjustLayersParams *params = dynamic_cast<AdjustLayersParams *>(functorParams);
+    assert(params);
+
+    // Check if we are starting a new layer content - if yes copy the current elements to previous
+    if (!params->m_current.empty() && (this->GetAlignmentLayerN() != params->m_currentLayerN)) {
+        params->m_previous.reserve(params->m_previous.size() + params->m_current.size());
+        params->m_previous.insert(params->m_previous.end(), params->m_current.begin(), params->m_current.end());
+        params->m_current.clear();
+    }
+
+    params->m_currentLayerN = this->GetAlignmentLayerN();
+
+    // These are the only ones we want to keep for further collision detection
+    // Eventually  we also need stem for overlapping voices
+    if (this->Is({ DOTS, NOTE }) && this->HasUpdatedBB()) params->m_current.push_back(this);
+
+    // We are processing the first layer, nothing to do yet
+    if (params->m_previous.empty()) return FUNCTOR_SIBLINGS;
+
+    if (this->Is(NOTE)) {
+        params->m_currentNote = dynamic_cast<Note *>(this);
+        assert(params->m_currentNote);
+        if (!params->m_currentNote->IsChordTone())
+            params->m_currentChord = NULL;
+    }
+    else if (this->Is(CHORD)) {
+        params->m_currentChord = dynamic_cast<Chord *>(this);
+        assert(params->m_currentChord);
+    }
+
+    // Eventually we also want to have stem for overlapping voices
+    if (this->Is({ NOTE, DOTS })) {
+
+        Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+        assert(staff);
+
+        std::vector<LayerElement *>::iterator iter;
+        for (iter = params->m_previous.begin(); iter != params->m_previous.end(); iter++) {
+
+            int verticalMargin = 0; // 1 * params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            int horizontalMargin = 2 * params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+
+            if (this->Is(NOTE) && (*iter)->Is(NOTE)) {
+                assert(params->m_currentNote);
+                Note *previousNote = dynamic_cast<Note *>(*iter);
+                assert(previousNote);
+                // Unisson, look at the duration for the note heads
+                if (params->m_currentNote->IsUnissonWith(previousNote, false)) {
+                    if ((params->m_currentNote->GetDrawingDur() == DUR_2) && (previousNote->GetDrawingDur() == DUR_2))
+                        continue;
+                    else if ((params->m_currentNote->GetDrawingDur() > DUR_2)
+                        && (previousNote->GetDrawingDur() > DUR_2))
+                        continue;
+                    // Reduce the margin to 0 for whole notes unisson
+                    else if ((params->m_currentNote->GetDrawingDur() == DUR_1)
+                        && (previousNote->GetDrawingDur() == DUR_1))
+                        horizontalMargin = 0;
+                }
+                else if ((previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc()) > 1)
+                    continue;
+            }
+
+            // Nothing to do if we have no vertical overlapping
+            if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
+
+            int xRelShift = this->HorizontalLeftOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
+
+            // Move the appropriate parent to the left
+            if (xRelShift > 0) {
+                if (params->m_currentChord)
+                    params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + xRelShift);
+                else
+                    params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + xRelShift);
+            }
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 {
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);

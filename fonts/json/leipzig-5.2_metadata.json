@@ -30,7 +30,7 @@
         "tupletBracketThickness": "0.16"
     },
     "fontName": "Leipzig-5.2",
-    "fontVersion": "5.2.26",
+    "fontVersion": "5.2.27",
     "glyphBBoxes": {
         "uniE003": {
             "bBoxNE": [
@@ -2974,6 +2974,36 @@
         }
     },
     "glyphsWithAnchors": {
+        "uniE0A2": {
+            "cutOutNW": [
+                0.06,
+                0.244
+            ],
+            "cutOutSE": [
+                1.568,
+                -0.232
+            ]
+        },
+        "uniE0A3": {
+            "cutOutNW": [
+                0.14,
+                0.24
+            ],
+            "cutOutSE": [
+                1.076,
+                -0.24
+            ]
+        },
+        "uniE0A4": {
+            "cutOutNW": [
+                0.144,
+                0.24
+            ],
+            "cutOutSE": [
+                1.088,
+                -0.244
+            ]
+        },
         "uniE260": {
             "cutOutNE": [
                 0.096,

@@ -180,6 +180,11 @@ public:
     virtual int AlignHorizontally(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustLayers
+     */
+    virtual int AdjustLayers(FunctorParams *functorParams);
+
+    /**
      * See Object::AdjustGraceXPos
      */
     ///@{
