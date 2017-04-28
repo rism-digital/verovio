@@ -1110,7 +1110,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         else
             fontNo = SMUFL_E0A2_noteheadWhole;
 
-        DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
+        DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
     }
     // Other values
     else {
@@ -1119,7 +1119,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         else
             fontNo = SMUFL_E0A4_noteheadBlack;
 
-        DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
+        DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
     }
 
     /************ Draw children (accidentals, etc) ************/
@@ -1530,7 +1530,7 @@ void View::DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff)
 
     y1 = y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     y2 = y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    
+
     DrawFilledRectangle(dc, x1, y2, x2, y1);
 }
 

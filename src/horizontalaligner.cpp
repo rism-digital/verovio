@@ -955,9 +955,15 @@ int AlignmentReference::AdjustLayers(FunctorParams *functorParams)
     AdjustLayersParams *params = dynamic_cast<AdjustLayersParams *>(functorParams);
     assert(params);
 
-    if (m_multipleLayer) LogDebug("Multiple layers!");
+    if (!m_multipleLayer) return FUNCTOR_SIBLINGS;
 
-    return FUNCTOR_SIBLINGS;
+    params->m_currentLayerN = VRV_UNSET;
+    params->m_currentNote = NULL;
+    params->m_currentChord = NULL;
+    params->m_current.clear();
+    params->m_previous.clear();
+
+    return FUNCTOR_CONTINUE;
 }
 
 int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)

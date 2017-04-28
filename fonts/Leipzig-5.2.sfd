@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1493356342
+ModificationTime: 1493373982
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -62,8 +62,8 @@ Encoding: 57507 57507 0
 Width: 314
 VWidth: 2048
 Flags: HW
-AnchorPoint: "cutOutSW" 252 -79 basechar 0
-AnchorPoint: "cutOutNW" 59 88 basechar 0
+AnchorPoint: "cutOutSE" 269 -60 basechar 0
+AnchorPoint: "cutOutNW" 35 60 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -434,16 +434,16 @@ Encoding: 57506 57506 11
 Width: 405
 VWidth: 2048
 Flags: HW
-AnchorPoint: "cutOutSW" 366 -90 basechar 0
-AnchorPoint: "cutOutNW" 52 100 basechar 0
+AnchorPoint: "cutOutSE" 392 -58 basechar 0
+AnchorPoint: "cutOutNW" 15 61 basechar 0
 LayerCount: 2
 Fore
 SplineSet
-198 133 m 4
+198 133 m 0
  300 133 405 88 405 0 c 0
  405 -92 307 -133 198 -133 c 0
  97 -133 0 -87 0 0 c 256
- 0 88 93 133 198 133 c 4
+ 0 88 93 133 198 133 c 0
 293 -21 m 0
  293 -7 290 8 285 23 c 0
  278 43 267 61 252 77 c 0
@@ -459,7 +459,6 @@ SplineSet
  259 -101 272 -91 280 -76 c 128
  288 -61 293 -42 293 -21 c 0
 EndSplineSet
-Validated: 1
 EndChar
 
 StartChar: uniE0A4
@@ -467,8 +466,8 @@ Encoding: 57508 57508 12
 Width: 314
 VWidth: 2048
 Flags: HMW
-AnchorPoint: "cutOutNW" 65 89 basechar 0
-AnchorPoint: "cutOutSW" 248 -83 basechar 0
+AnchorPoint: "cutOutSE" 272 -61 basechar 0
+AnchorPoint: "cutOutNW" 36 60 basechar 0
 LayerCount: 2
 Fore
 SplineSet
