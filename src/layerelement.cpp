@@ -755,6 +755,8 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
     if (this->Is(NOTE)) {
         params->m_currentNote = dynamic_cast<Note *>(this);
         assert(params->m_currentNote);
+        if (!params->m_currentNote->IsChordTone())
+            params->m_currentChord = NULL;
     }
     else if (this->Is(CHORD)) {
         params->m_currentChord = dynamic_cast<Chord *>(this);
