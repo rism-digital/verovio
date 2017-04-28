@@ -8,10 +8,10 @@
 #ifndef __VRV_SYSTEM_H__
 #define __VRV_SYSTEM_H__
 
-#include "verticalaligner.h"
 #include "drawinginterface.h"
 #include "editorial.h"
 #include "object.h"
+#include "verticalaligner.h"
 
 namespace vrv {
 

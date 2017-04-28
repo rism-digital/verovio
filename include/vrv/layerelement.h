@@ -142,6 +142,7 @@ public:
     /**
      * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff.
      * Also set the corresponding m_crossLayer to layer if a cross staff is found.
+     * Return NULL if there is no cross-staff in the element or a parent.
      */
     Staff *GetCrossStaff(Layer *&layer) const;
 

@@ -15,6 +15,72 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// Dots
+//----------------------------------------------------------------------------
+
+/**
+ * This class models a group of dots as a layer element part and has not direct MEI equivlatent.
+ */
+class Dots : public LayerElement, public AttAugmentdots {
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    Dots();
+    virtual ~Dots();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Dots"; }
+    virtual ClassId GetClassId() const { return DOTS; }
+    ///@}
+
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() const { return true; }
+
+    std::list<int> *GetDotLocsForStaff(Staff *staff);
+
+    const MapOfDotLocs *GetMapOfDotLocs() const { return &m_dotLocsByStaff; }
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::CalcStem
+     */
+    // virtual int CalcStem(FunctorParams *functorParams);
+
+    /**
+     * Overwritten version of Save that avoids anything to be written
+     */
+    ///@{
+    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
+private:
+    //
+public:
+    //
+private:
+    /**
+     *
+     */
+    MapOfDotLocs m_dotLocsByStaff;
+    // data_STEMDIRECTION m_drawingStemDir;
+    /**
+     *
+     */
+    // int m_drawingStemLen;
+};
+
+//----------------------------------------------------------------------------
 // Flag
 //----------------------------------------------------------------------------
 

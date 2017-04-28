@@ -182,7 +182,7 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
         assert(end);
         int dist = std::get<2>(*iter);
         if ((start->GetXRel() >= end->GetXRel()) || (dist == 0)) {
-            LogDebug("Trying to ajdust alignment at the same position or with a distance of 0;");
+            LogDebug("Trying to adjust alignment at the same position or with a distance of 0;");
             continue;
         }
         // We need to store them because they are going to be changed in the loop below
@@ -478,7 +478,7 @@ void Alignment::SetXRel(int xRel)
     m_xRel = xRel;
 }
 
-void Alignment::AddLayerElementRef(LayerElement *element)
+bool Alignment::AddLayerElementRef(LayerElement *element)
 {
     assert(element->IsLayerElement());
 
@@ -515,8 +515,10 @@ void Alignment::AddLayerElementRef(LayerElement *element)
         }
     }
     AlignmentReference *alignmentRef = GetAlignmentReference(staffN);
-    alignmentRef->AddChild(element);
     element->SetAlignmentLayerN(layerN);
+    alignmentRef->AddChild(element);
+
+    return alignmentRef->HasMultipleLayer();
 }
 
 bool Alignment::IsOfType(const std::vector<AlignmentType> &types)
@@ -612,11 +614,21 @@ void AlignmentReference::Reset()
     ResetCommon();
 
     m_accidSpace.clear();
+    m_multipleLayer = false;
 }
 
 void AlignmentReference::AddChild(Object *child)
 {
-    assert(dynamic_cast<LayerElement *>(child));
+    LayerElement *childElement = dynamic_cast<LayerElement *>(child);
+    assert(childElement);
+
+    ArrayOfObjects::iterator childrenIter;
+    // Check if the we will have a reference with multiple layers
+    for (childrenIter = m_children.begin(); childrenIter != m_children.end(); childrenIter++) {
+        LayerElement *element = dynamic_cast<LayerElement *>(*childrenIter);
+        if (childElement->GetAlignmentLayerN() != element->GetAlignmentLayerN()) break;
+    }
+    if (!m_children.empty() && (childrenIter != m_children.end())) m_multipleLayer = true;
 
     // Specical case where we do not set the parent because the reference will not have ownership
     // Children will be treated as relinquished objects in the desctructor
@@ -700,29 +712,28 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
-    
+
 int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
 {
     SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
     assert(params);
-    
+
     // We start a new MeasureAligner
     // Reset the previous time position and x_rel to 0;
     params->m_previousTime = 0.0;
     params->m_previousXRel = 0;
-    
+
     return FUNCTOR_CONTINUE;
 }
-
 
 int MeasureAligner::JustifyX(FunctorParams *functorParams)
 {
     JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
     assert(params);
-    
+
     params->m_leftBarLineX = GetLeftBarLineAlignment()->GetXRel();
     params->m_rightBarLineX = GetRightBarLineAlignment()->GetXRel();
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -865,10 +876,10 @@ int Alignment::AdjustAccidX(FunctorParams *functorParams)
     if (this->m_graceAligner) this->m_graceAligner->Process(params->m_functor, functorParams);
 
     return FUNCTOR_CONTINUE;
-}    
+}
 
 int Alignment::HorizontalSpaceForDuration(
-                                          double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
+    double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
 {
     /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
      that interval gets the space a semibreve would ordinarily get. */
@@ -882,31 +893,31 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
 {
     SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
     assert(params);
-    
+
     // Do not set an x pos for anything before the barline (including it)
     if (this->m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
-    
+
     int intervalXRel = 0;
     double intervalTime = (m_time - params->m_previousTime);
-    
+
     if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         intervalTime = 0.0;
     }
-    
+
     if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
-                                                  params->m_doc->GetSpacingLinear(), params->m_doc->GetSpacingNonLinear());
+            params->m_doc->GetSpacingLinear(), params->m_doc->GetSpacingNonLinear());
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
-    
+
     if (m_graceAligner) {
         m_graceAligner->SetGraceAligmentXPos(params->m_doc);
     }
-    
+
     SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);
     params->m_previousTime = m_time;
     params->m_previousXRel = m_xRel;
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -914,31 +925,40 @@ int Alignment::JustifyX(FunctorParams *functorParams)
 {
     JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
     assert(params);
-    
+
     if (m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) {
         // Nothing to do for all left scoreDef elements and the left barline
     }
     else if (m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         // All elements up to the next barline, move them but also take into account the leftBarlineX
         SetXRel(ceil((((double)this->m_xRel - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
-                     + params->m_leftBarLineX));
+            + params->m_leftBarLineX));
     }
     else {
         //  Now more the right barline and all right scoreDef elements
         int shift = this->m_xRel - params->m_rightBarLineX;
         this->m_xRel
-        = ceil(((double)params->m_rightBarLineX - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
-        + params->m_leftBarLineX + shift;
+            = ceil(((double)params->m_rightBarLineX - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
+            + params->m_leftBarLineX + shift;
     }
-    
+
     // Finally, when reaching the end of the measure, update the measureXRel for the next measure
     if (m_type == ALIGNMENT_MEASURE_END) {
         params->m_measureXRel += this->m_xRel;
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 
+int AlignmentReference::AdjustLayers(FunctorParams *functorParams)
+{
+    AdjustLayersParams *params = dynamic_cast<AdjustLayersParams *>(functorParams);
+    assert(params);
+
+    if (m_multipleLayer) LogDebug("Multiple layers!");
+
+    return FUNCTOR_SIBLINGS;
+}
 
 int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
 {

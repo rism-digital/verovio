@@ -504,6 +504,11 @@ public:
     /**
      * Adjust the position the outside articulations.
      */
+    virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position the outside articulations.
+     */
     virtual int AdjustArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
@@ -558,7 +563,7 @@ public:
     virtual int SetAlignmentPitchPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Set the drawing stems positions, including for beams.
+     * Set the drawing stem positions, including for beams.
      */
     virtual int CalcStem(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
@@ -566,6 +571,11 @@ public:
      * Set the note head flipped positions
      */
     virtual int CalcChordNoteHeads(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Set the drawing dot positions, including for chords.
+     */
+    virtual int CalcDots(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.
@@ -583,6 +593,9 @@ public:
      */
     virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
 
+    /**
+     * Adjust the x position of accidental.
+     */
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
@@ -640,7 +653,7 @@ public:
     virtual int ResetVerticalAlignment(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Set the position of the StaffAlignment.
+     * Adjust the position of the StaffAlignment.
      */
     virtual int AdjustYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 

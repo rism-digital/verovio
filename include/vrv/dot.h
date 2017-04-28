@@ -19,7 +19,7 @@ class Note;
 // Dot
 //----------------------------------------------------------------------------
 
-class Dot : public LayerElement, public PositionInterface {
+class Dot : public LayerElement, public PositionInterface, public AttColor, public AttDotLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -51,6 +51,11 @@ public:
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
 private:
     //

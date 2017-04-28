@@ -101,6 +101,7 @@ void Note::Reset()
     m_playingOffset = 0.0;
 
     m_drawingLoc = 0;
+    m_flippedNotehead = false;
 }
 
 void Note::AddChild(Object *child)
@@ -123,6 +124,9 @@ void Note::AddChild(Object *child)
     else if (child->Is(ARTIC)) {
         assert(dynamic_cast<Artic *>(child));
     }
+    else if (child->Is(DOTS)) {
+        assert(dynamic_cast<Dots *>(child));
+    }
     else if (child->Is(STEM)) {
         assert(dynamic_cast<Stem *>(child));
     }
@@ -141,9 +145,10 @@ void Note::AddChild(Object *child)
     }
 
     child->SetParent(this);
+
     // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is(STEM))
+    if (child->Is({ DOTS, STEM }))
         m_children.insert(m_children.begin(), child);
     else
         m_children.push_back(child);
@@ -196,6 +201,12 @@ bool Note::IsClusterExtreme() const
         return true;
     else
         return false;
+}
+
+void Note::SetCluster(ChordCluster *cluster, int position)
+{
+    m_cluster = cluster;
+    m_clusterPosition = position;
 }
 
 int Note::GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) const
@@ -390,6 +401,77 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
         }
     }
 
+    this->SetFlippedNotehead(flippedNotehead);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Note::CalcDots(FunctorParams *functorParams)
+{
+    CalcDotsParams *params = dynamic_cast<CalcDotsParams *>(functorParams);
+    assert(params);
+
+    // We currently have no dots object with mensural notes
+    if (this->IsMensural()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+
+    if (this->m_crossStaff) staff = this->m_crossStaff;
+
+    bool drawingCueSize = this->IsCueSize();
+    int staffSize = staff->m_drawingStaffSize;
+
+    Dots *dots = NULL;
+    Chord *chord = this->IsChordTone();
+
+    // The shift to the left when a stem flag requires it
+    int flagShift = 0;
+
+    if (chord) {
+        dots = params->m_chordDots;
+        assert(dots);
+
+        // Stem up, shorter than 4th and not in beam
+        if ((params->m_chordStemDir == STEMDIRECTION_up) && (this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
+            // Shift according to the flag width if the top note is not flipped
+            if ((this == chord->GetTopNote()) && !this->GetFlippedNotehead()) {
+                // HARDCODED
+                flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
+            }
+        }
+    }
+    else if (this->HasDots()) {
+        // For single notes we need here to set the dot loc
+        dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+        assert(dots);
+        params->m_chordDrawingX = this->GetDrawingX();
+
+        std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);
+        int loc = this->GetDrawingLoc();
+
+        // if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
+        if ((loc % 2) == 0) {
+            loc += 1;
+        }
+        dotLocs->push_back(loc);
+
+        // Stem up, shorter than 4th and not in beam
+        if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
+            // HARDCODED
+            flagShift += params->m_doc->GetGlyphWidth(SMUFL_E240_flag8thUp, staffSize, drawingCueSize) * 0.8;
+        }
+    }
+    else {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    int radius = this->GetDrawingRadius(params->m_doc, staffSize, drawingCueSize);
+    int xRel = this->GetDrawingX() - params->m_chordDrawingX + radius + flagShift;
+    dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
+
     return FUNCTOR_SIBLINGS;
 }
 
@@ -443,9 +525,9 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM));
+    Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM, 1));
     Flag *currentFlag = NULL;
-    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG));
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG, 1));
 
     if ((this->GetActualDur() > DUR_1) && !this->IsChordTone() && !this->IsMensural()) {
         if (!currentStem) {
@@ -479,6 +561,24 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     }
 
     if (!this->IsChordTone()) SetDrawingStem(currentStem);
+
+    /************ dots ***********/
+
+    Dots *currentDots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+
+    if (this->GetDots() > 0) {
+        if (!currentDots) {
+            currentDots = new Dots();
+            this->AddChild(currentDots);
+        }
+        currentDots->AttAugmentdots::operator=(*this);
+    }
+    // This will happen only if the duration has changed
+    else if (currentDots) {
+        if (this->DeleteChild(currentDots)) {
+            currentDots = NULL;
+        }
+    }
 
     return FUNCTOR_CONTINUE;
 };
@@ -561,6 +661,9 @@ int Note::ResetDrawing(FunctorParams *functorParams)
 
     this->ResetDrawingTieAttr();
 
+    m_drawingLoc = 0;
+    m_flippedNotehead = false;
+
     return FUNCTOR_CONTINUE;
 };
 
@@ -569,6 +672,7 @@ int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
     LayerElement::ResetHorizontalAlignment(functorParams);
 
     m_drawingLoc = 0;
+    m_flippedNotehead = false;
 
     return FUNCTOR_CONTINUE;
 }

@@ -141,7 +141,6 @@ public:
      * Defined in view_element.cpp
      */
     ///@{
-    int CalculateRestPosY(Staff *staff, char duration, int location, bool hasMultipleLayer, bool isFirstLayer);
     int CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave);
     ///@}
 
@@ -230,6 +229,7 @@ protected:
     void DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawDurationElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
@@ -257,17 +257,14 @@ protected:
      */
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
-    void DrawDots(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff);
+    void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff);
     void DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
-    void DrawLedgerLines(
-        DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
     void DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
     void DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     void DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smulfCode, int num, bool line, Staff *staff);
     void DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff);
     void DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff);
-    void DrawRestQuarter(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
-    void DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
+    void DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSize, Staff *staff);
     ///@}
 
     /**
@@ -349,6 +346,7 @@ protected:
     ///@{
     void DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawProport(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
 
     /**
@@ -392,7 +390,7 @@ protected:
     void DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
-    void DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill);
+    void DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill, int linewidth);
     void DrawDot(DeviceContext *dc, int x, int y, int staffSize);
     ///@}
 
@@ -440,11 +438,6 @@ private:
      * Find the nearest unit position in the direction indicated by place.
      */
     int GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place);
-
-    /**
-     * Make sure dots on chords are vertically aligned correctly
-     */
-    void PrepareChordDots(DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff);
 
 public:
     /** Document */
