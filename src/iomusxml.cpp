@@ -1704,13 +1704,13 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Measure *measure, int
     assert(measure);
 
     if (HasAttributeWithValue(node, "new-system", "yes")) {
-        LogWarning("System breaks not supported");
+        // LogWarning("System breaks not supported");
         // enter system break
     }
 
     if (HasAttributeWithValue(node, "new-page", "yes")) {
+        // LogWarning("Page breaks not supported");
         // enter system break
-        LogWarning("Page breaks not supported");
     }
 }
 
