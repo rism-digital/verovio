@@ -192,19 +192,6 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    /************** mensural resizing - to be removed **************/
-
-    bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
-        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
-        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
-
-    // Mensural accidentals may be quite a bit smaller than CMN accidentals; use _pseudoStaffSize_ to force this.
-    int pseudoStaffSize;
-    if (isMensural)
-        pseudoStaffSize = (int)(TEMP_MACCID_SIZE_FACTOR * staff->m_drawingStaffSize);
-    else
-        pseudoStaffSize = staff->m_drawingStaffSize;
-
     /************** editorial accidental **************/
 
     std::wstring accidStr = accid->GetSymbolStr();
@@ -1523,10 +1510,6 @@ void View::DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff)
     x1 = x;
     x2 = x + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-    // look if one line or between line
-    if ((y - staff->GetDrawingY()) % m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))
-        y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-
     y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     DrawFilledRectangle(dc, x1, y2, x2, y1);
 
@@ -1542,15 +1525,12 @@ void View::DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff)
 {
     int x1, x2, y1, y2;
 
-    y1 = y;
     x1 = x;
     x2 = x + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-    // look if on line or between line
-    if ((y - staff->GetDrawingY()) % m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))
-        y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-
-    y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+    y1 = y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    y2 = y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    
     DrawFilledRectangle(dc, x1, y2, x2, y1);
 }
 
