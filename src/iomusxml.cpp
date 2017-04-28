@@ -274,6 +274,20 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId)
     }
 }
 
+void MusicXmlInput::FillSpace(vrv::Layer *layer, int dur) {
+    std::string durStr;
+    while (dur != 0) {
+        float quaters = (double)dur / (double)m_ppq;
+        if (quaters > 1) quaters = (int)quaters;
+        durStr = std::to_string(int (4/quaters));
+        
+        Space *space = new Space();
+        space->SetDur(space->AttDurationMusical::StrToDuration(durStr));
+        AddLayerElement(layer, space);
+        dur -= m_ppq * quaters;
+    }
+}
+
 void MusicXmlInput::GenerateUuid(pugi::xml_node node)
 {
     int nr = std::rand();
@@ -788,6 +802,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, i
     // LogDebug("Measure %s", GetAttributeValue(node, "number").c_str());
     // assert(m_elementStack.empty());
     m_elementStack.clear();
+    
+    // reset measure time
+    m_durTotal = 0;
 
     // read the content of the measure
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
@@ -865,6 +882,17 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, in
 {
     assert(node);
     assert(measure);
+    
+    m_durTotal -= atoi(GetContentOfChild(node, "duration").c_str());
+    
+    pugi::xpath_node nextNote = node.next_sibling("note");
+    if (nextNote && m_durTotal > 0) {
+        // We need a <space> if a note follows that starts not at the beginning of the measure
+        Layer *layer = new Layer();
+        if (!node.select_single_node("voice")) layer = SelectLayer(nextNote.node(), measure);
+        LogWarning("bar: %i, %i ", measureNum, m_durTotal);
+        FillSpace(layer, m_durTotal);
+    }
 }
 
 void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, int measureNum)
@@ -1074,6 +1102,8 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, i
     assert(node);
     assert(measure);
 
+    m_durTotal += atoi(GetContentOfChild(node, "duration").c_str());
+
     Layer *layer = SelectLayer(node, measure);
 
     pugi::xpath_node prevNote = node.select_single_node("preceding-sibling::note[1]");
@@ -1081,11 +1111,7 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, i
     if (nextNote) {
         // We need a <space> if a note follows
         if (!node.select_single_node("voice")) layer = SelectLayer(nextNote.node(), measure);
-        std::string durStr = std::to_string(4 * m_ppq / atoi(GetContentOfChild(node, "duration").c_str()));
-        Space *space = new Space();
-        space->SetDur(space->AttDurationMusical::StrToDuration(durStr));
-        if (4 * m_ppq % atoi(GetContentOfChild(node, "duration").c_str()) != 0) space->SetDots(1);
-        AddLayerElement(layer, space);
+        FillSpace(layer, atoi(GetContentOfChild(node, "duration").c_str()));
     }
     else if (!prevNote && !node.select_single_node("preceding-sibling::backup")) {
         // If there is no previous or following note in the first layer, the measure seems to be empty
@@ -1139,6 +1165,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
 
     LayerElement *element = NULL;
 
+    // add duration to measure time
+    m_durTotal += atoi(GetContentOfChild(node, "duration").c_str());
+    
     // for measure repeats add a single <mRpt> and return
     if (m_mRpt) {
         MRpt *mRpt = dynamic_cast<MRpt *>((*layer).GetFirst(MRPT));
