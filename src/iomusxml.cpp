@@ -889,7 +889,6 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, in
         // We need a <space> if a note follows that starts not at the beginning of the measure
         Layer *layer = new Layer();
         if (!node.select_single_node("voice")) layer = SelectLayer(nextNote.node(), measure);
-        LogWarning("bar: %i, %i ", measureNum, m_durTotal);
         FillSpace(layer, m_durTotal);
     }
 }
@@ -1165,7 +1164,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     LayerElement *element = NULL;
 
     // add duration to measure time
-    m_durTotal += atoi(GetContentOfChild(node, "duration").c_str());
+    if (!node.select_single_node("chord")) m_durTotal += atoi(GetContentOfChild(node, "duration").c_str());
 
     // for measure repeats add a single <mRpt> and return
     if (m_mRpt) {
