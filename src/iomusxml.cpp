@@ -171,11 +171,11 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     assert(i >= 0);
 
     // we just need to add a measure
-    if (i == section->GetChildCount()) {
+    if (i == section->GetChildCount(MEASURE)) {
         section->AddChild(measure);
     }
     // otherwise copy the content to the corresponding existing measure
-    else if (section->GetChildCount() > i) {
+    else if (section->GetChildCount(MEASURE) > i) {
         Measure *existingMeasure = dynamic_cast<Measure *>(section->GetChild(i));
         assert(existingMeasure);
         Object *current;
@@ -1291,7 +1291,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                     accid = new Accid();
                     note->AddChild(accid);
                 }
-                accid->SetAccidGes((data_ACCIDENTAL_IMPLICIT)ConvertAlterToAccid(alterStr));
+                accid->SetAccidGes(ConvertAlterToAccid(std::atof(alterStr.c_str())));
             }
         }
 
@@ -1727,15 +1727,19 @@ data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAccidentalToAccid(std::string val
     return ACCIDENTAL_EXPLICIT_NONE;
 }
 
-data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAlterToAccid(std::string value)
+data_ACCIDENTAL_IMPLICIT MusicXmlInput::ConvertAlterToAccid(float value)
 {
-    if (value == "1") return ACCIDENTAL_EXPLICIT_s;
-    if (value == "-1") return ACCIDENTAL_EXPLICIT_f;
-    if (value == "2") return ACCIDENTAL_EXPLICIT_x;
-    if (value == "-2") return ACCIDENTAL_EXPLICIT_ff;
-    if (value == "0") return ACCIDENTAL_EXPLICIT_n;
-    LogWarning("Unsupported alter value '%s'", value.c_str());
-    return ACCIDENTAL_EXPLICIT_NONE;
+    if (value == -2) return ACCIDENTAL_IMPLICIT_ff;
+    if (value == -1.5) return ACCIDENTAL_IMPLICIT_fd;
+    if (value == -1) return ACCIDENTAL_IMPLICIT_f;
+    if (value == -0.5) return ACCIDENTAL_IMPLICIT_fu;
+    if (value == 0) return ACCIDENTAL_IMPLICIT_n;
+    if (value == 0.5) return ACCIDENTAL_IMPLICIT_sd;
+    if (value == 1) return ACCIDENTAL_IMPLICIT_s;
+    if (value == 1.5) return ACCIDENTAL_IMPLICIT_su;
+    if (value == 2) return ACCIDENTAL_IMPLICIT_ss;
+    LogWarning("Unsupported alter value '%d'", value);
+    return ACCIDENTAL_IMPLICIT_NONE;
 }
 
 data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repeat)
