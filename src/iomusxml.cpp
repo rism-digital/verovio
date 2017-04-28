@@ -1449,7 +1449,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         // articulation
         std::vector<data_ARTICULATION> artics;
         for (pugi::xml_node articulations = notations.node().child("articulations"); articulations;
-             articulations = articulation.next_sibling("articulations")) {
+             articulations = articulations.next_sibling("articulations")) {
             Artic *artic = new Artic();
             if (articulations.select_single_node("accent")) artics.push_back(ARTICULATION_acc);
             if (articulations.select_single_node("detached-legato")) artics.push_back(ARTICULATION_ten_stacc);
