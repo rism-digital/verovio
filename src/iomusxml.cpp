@@ -274,13 +274,14 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId)
     }
 }
 
-void MusicXmlInput::FillSpace(vrv::Layer *layer, int dur) {
+void MusicXmlInput::FillSpace(vrv::Layer *layer, int dur)
+{
     std::string durStr;
     while (dur != 0) {
         float quaters = (double)dur / (double)m_ppq;
         if (quaters > 1) quaters = (int)quaters;
-        durStr = std::to_string(int (4/quaters));
-        
+        durStr = std::to_string(int(4 / quaters));
+
         Space *space = new Space();
         space->SetDur(space->AttDurationMusical::StrToDuration(durStr));
         AddLayerElement(layer, space);
@@ -802,7 +803,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, i
     // LogDebug("Measure %s", GetAttributeValue(node, "number").c_str());
     // assert(m_elementStack.empty());
     m_elementStack.clear();
-    
+
     // reset measure time
     m_durTotal = 0;
 
@@ -882,9 +883,9 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, in
 {
     assert(node);
     assert(measure);
-    
+
     m_durTotal -= atoi(GetContentOfChild(node, "duration").c_str());
-    
+
     pugi::xpath_node nextNote = node.next_sibling("note");
     if (nextNote && m_durTotal > 0) {
         // We need a <space> if a note follows that starts not at the beginning of the measure
@@ -1167,7 +1168,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
 
     // add duration to measure time
     m_durTotal += atoi(GetContentOfChild(node, "duration").c_str());
-    
+
     // for measure repeats add a single <mRpt> and return
     if (m_mRpt) {
         MRpt *mRpt = dynamic_cast<MRpt *>((*layer).GetFirst(MRPT));
@@ -1325,7 +1326,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                 accid->SetAccidGes(ConvertAlterToAccid(std::atof(alterStr.c_str())));
             }
         }
-        
+
         // notehead
         pugi::xpath_node notehead = node.select_single_node("notehead");
         if (notehead) {
@@ -1449,29 +1450,29 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
 
         // articulation
         std::vector<data_ARTICULATION> artics;
-        pugi::xpath_node_set articulations = node.select_nodes("notations/articulations");
-        for (pugi::xpath_node_set::const_iterator it = articulations.begin(); it != articulations.end(); ++it) {
+        for (pugi::xml_node articulations = notations.node().child("articulations"); articulations;
+             articulations = articulation.next_sibling("articulations")) {
             Artic *artic = new Artic();
-            if (it->node().select_single_node("accent")) artics.push_back(ARTICULATION_acc);
-            if (it->node().select_single_node("detached-legato")) artics.push_back(ARTICULATION_ten_stacc);
-            if (it->node().select_single_node("spiccato")) artics.push_back(ARTICULATION_spicc);
-            if (it->node().select_single_node("staccatissimo")) artics.push_back(ARTICULATION_stacciss);
-            if (it->node().select_single_node("staccato")) artics.push_back(ARTICULATION_stacc);
-            if (it->node().select_single_node("strong-accent")) artics.push_back(ARTICULATION_marc);
-            if (it->node().select_single_node("tenuto")) artics.push_back(ARTICULATION_ten);
+            if (articulations.select_single_node("accent")) artics.push_back(ARTICULATION_acc);
+            if (articulations.select_single_node("detached-legato")) artics.push_back(ARTICULATION_ten_stacc);
+            if (articulations.select_single_node("spiccato")) artics.push_back(ARTICULATION_spicc);
+            if (articulations.select_single_node("staccatissimo")) artics.push_back(ARTICULATION_stacciss);
+            if (articulations.select_single_node("staccato")) artics.push_back(ARTICULATION_stacc);
+            if (articulations.select_single_node("strong-accent")) artics.push_back(ARTICULATION_marc);
+            if (articulations.select_single_node("tenuto")) artics.push_back(ARTICULATION_ten);
             artic->SetArtic(artics);
             element->AddChild(artic);
             artics.clear();
         }
-        pugi::xpath_node_set technical = node.select_nodes("notations/technical");
-        for (pugi::xpath_node_set::const_iterator it = technical.begin(); it != technical.end(); ++it) {
+        for (pugi::xml_node technical = notations.node().child("technical"); technical;
+             technical = technical.next_sibling("technical")) {
             Artic *artic = new Artic();
-            if (it->node().select_single_node("down-bow")) artics.push_back(ARTICULATION_dnbow);
-            if (it->node().select_single_node("harmonic")) artics.push_back(ARTICULATION_harm);
-            if (it->node().select_single_node("open-string")) artics.push_back(ARTICULATION_open);
-            if (it->node().select_single_node("snap-pizzicato")) artics.push_back(ARTICULATION_snap);
-            if (it->node().select_single_node("stopped")) artics.push_back(ARTICULATION_stop);
-            if (it->node().select_single_node("up-bow")) artics.push_back(ARTICULATION_upbow);
+            if (technical.select_single_node("down-bow")) artics.push_back(ARTICULATION_dnbow);
+            if (technical.select_single_node("harmonic")) artics.push_back(ARTICULATION_harm);
+            if (technical.select_single_node("open-string")) artics.push_back(ARTICULATION_open);
+            if (technical.select_single_node("snap-pizzicato")) artics.push_back(ARTICULATION_snap);
+            if (technical.select_single_node("stopped")) artics.push_back(ARTICULATION_stop);
+            if (technical.select_single_node("up-bow")) artics.push_back(ARTICULATION_upbow);
             artic->SetArtic(artics);
             artic->SetType("technical");
             element->AddChild(artic);
