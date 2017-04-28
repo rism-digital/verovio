@@ -58,11 +58,11 @@ bool PositionInterface::HasIdenticalPositionInterface(PositionInterface *otherPo
     }
     return true;
 }
-    
+
 int PositionInterface::CalcDrawingLoc(Layer *layer, LayerElement *element)
 {
     assert(layer);
-    
+
     m_drawingLoc = 0;
     if (this->HasPloc() && this->HasOloc()) {
         m_drawingLoc = PitchInterface::CalcLoc(this->GetPloc(), this->GetOloc(), layer->GetClefLocOffset(element));
@@ -71,7 +71,6 @@ int PositionInterface::CalcDrawingLoc(Layer *layer, LayerElement *element)
         m_drawingLoc = this->GetLoc();
     }
     return m_drawingLoc;
-    
 }
 
 //----------------------------------------------------------------------------

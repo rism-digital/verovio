@@ -1100,10 +1100,7 @@ public:
 
 class SetAlignmentPitchPosParams : public FunctorParams {
 public:
-    SetAlignmentPitchPosParams(Doc *doc)
-    {
-        m_doc = doc;
-    }
+    SetAlignmentPitchPosParams(Doc *doc) { m_doc = doc; }
     Doc *m_doc;
 };
 

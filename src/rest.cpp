@@ -17,6 +17,7 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "functorparams.h"
+#include "smufl.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -79,11 +80,26 @@ void Rest::AddChild(Object *child)
         m_children.push_back(child);
     Modify();
 }
-    
+
+wchar_t Rest::GetRestGlyph() const
+{
+    int symc = 0;
+    switch (this->GetActualDur()) {
+        case DUR_4: symc = SMUFL_E4E5_restQuarter; break;
+        case DUR_8: symc = SMUFL_E4E6_rest8th; break;
+        case DUR_16: symc = SMUFL_E4E7_rest16th; break;
+        case DUR_32: symc = SMUFL_E4E8_rest32nd; break;
+        case DUR_64: symc = SMUFL_E4E9_rest64th; break;
+        case DUR_128: symc = SMUFL_E4EA_rest128th; break;
+        case DUR_256: symc = SMUFL_E4EB_rest256th; break;
+    }
+    return symc;
+}
+
 int Rest::GetDefaultLoc(bool hasMultipleLayer, bool isFirstLayer)
 {
     int loc = 4;
-    
+
     switch (this->GetActualDur()) {
         case DUR_MX: loc -= 0; break;
         case DUR_LG: loc -= 0; break;
@@ -94,12 +110,10 @@ int Rest::GetDefaultLoc(bool hasMultipleLayer, bool isFirstLayer)
         case DUR_8: loc -= 2; break;
         case DUR_16: loc -= 2; break;
         case DUR_32: loc -= 2; break;
-        case DUR_64: loc -= 3; break;
-        case DUR_128: loc -= 3; break;
-        case DUR_256: loc -= 4; break;
-        default:
-            loc -= 1;
-            break;
+        case DUR_64: loc -= 2; break;
+        case DUR_128: loc -= 2; break;
+        case DUR_256: loc -= 2; break;
+        default: loc -= 1; break;
     }
     if (hasMultipleLayer) {
         if (isFirstLayer)
@@ -107,7 +121,7 @@ int Rest::GetDefaultLoc(bool hasMultipleLayer, bool isFirstLayer)
         else
             loc -= 2;
     }
-    
+
     return loc;
 }
 
@@ -172,11 +186,28 @@ int Rest::CalcDots(FunctorParams *functorParams)
     if ((loc % 2) == 0) {
         loc += 1;
     }
+
+    switch (this->GetActualDur()) {
+        case DUR_1: loc += 2; break;
+        case DUR_2: loc += 0; break;
+        case DUR_4: loc += 2; break;
+        case DUR_8: loc += 2; break;
+        case DUR_16: loc += 2; break;
+        case DUR_32: loc += 4; break;
+        case DUR_64: loc += 4; break;
+        case DUR_128: loc += 6; break;
+        case DUR_256: loc += 6; break;
+        default: break;
+    }
+
     dotLocs->push_back(loc);
 
     // HARDCODED
     int xRel = params->m_doc->GetDrawingUnit(staffSize) * 1.5;
     if (drawingCueSize) xRel = params->m_doc->GetCueSize(xRel);
+    if (this->GetDur() > DUR_2) {
+        xRel = params->m_doc->GetGlyphWidth(this->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize);
+    }
     dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
 
     return FUNCTOR_SIBLINGS;
