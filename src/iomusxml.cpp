@@ -721,10 +721,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 }
                 pugi::xpath_node beats = time.node().select_single_node("beats");
                 if (beats && HasContent(beats.node())) {
-                    m_meterCount
-                        = beats.node()
-                              .text()
-                              .as_int(); // staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
+                    m_meterCount = beats.node().text().as_int();
+                    // staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
                     // this is a little "hack", until libMEI is fixed
                     std::string compound = beats.node().text().as_string();
                     if (compound.find("+") != std::string::npos) {
