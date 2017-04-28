@@ -879,13 +879,17 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     int y = staff->GetDrawingY() - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
     int x = element->GetDrawingX();
 
-    if (meterSig->GetSym() == METERSIGN_common) {
+    if (meterSig->GetForm() == meterSigVis_FORM_invis) return;
+    else if (meterSig->GetSym() == METERSIGN_common) {
         DrawSmuflCode(dc, element->GetDrawingX(), y, SMUFL_E08A_timeSigCommon, staff->m_drawingStaffSize, false);
         x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5; // step forward because we have a symbol
     }
     else if (meterSig->GetSym() == METERSIGN_cut) {
         DrawSmuflCode(dc, element->GetDrawingX(), y, SMUFL_E08B_timeSigCutCommon, staff->m_drawingStaffSize, false);
         x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5; // step forward because we have a symbol
+    }
+    else if (meterSig->GetForm() == meterSigVis_FORM_num) {
+        DrawMeterSigFigures(dc, x, staff->GetDrawingY(), meterSig->GetCount(), NONE, staff);
     }
     else if (meterSig->GetCount()) {
         DrawMeterSigFigures(dc, x, staff->GetDrawingY(), meterSig->GetCount(), meterSig->GetUnit(), staff);
@@ -1457,7 +1461,7 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
         yden = ynum - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2);
     }
     else
-        ynum = yCenter - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
+        ynum = yCenter - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2);
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
@@ -1530,7 +1534,7 @@ void View::DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff)
 
     y1 = y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     y2 = y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    
+
     DrawFilledRectangle(dc, x1, y2, x2, y1);
 }
 
