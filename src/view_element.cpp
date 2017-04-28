@@ -882,12 +882,13 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     if (meterSig->GetForm() == meterSigVis_FORM_invis) {
         // just skip
     }
-    else if (meterSig->GetSym() == METERSIGN_common) {
-        DrawSmuflCode(dc, element->GetDrawingX(), y, SMUFL_E08A_timeSigCommon, staff->m_drawingStaffSize, false);
-        x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5; // step forward because we have a symbol
-    }
-    else if (meterSig->GetSym() == METERSIGN_cut) {
-        DrawSmuflCode(dc, element->GetDrawingX(), y, SMUFL_E08B_timeSigCutCommon, staff->m_drawingStaffSize, false);
+    else if (meterSig->HasSym()) {
+        if (meterSig->GetSym() == METERSIGN_common) {
+            DrawSmuflCode(dc, element->GetDrawingX(), y, SMUFL_E08A_timeSigCommon, staff->m_drawingStaffSize, false);
+        }
+        else if (meterSig->GetSym() == METERSIGN_cut) {
+            DrawSmuflCode(dc, element->GetDrawingX(), y, SMUFL_E08B_timeSigCutCommon, staff->m_drawingStaffSize, false);
+        }
         x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5; // step forward because we have a symbol
     }
     else if (meterSig->GetForm() == meterSigVis_FORM_num) {
