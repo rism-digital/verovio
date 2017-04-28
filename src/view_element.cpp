@@ -879,7 +879,9 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     int y = staff->GetDrawingY() - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
     int x = element->GetDrawingX();
 
-    if (meterSig->GetForm() == meterSigVis_FORM_invis) return;
+    if (meterSig->GetForm() == meterSigVis_FORM_invis) {
+        // just skip
+    }
     else if (meterSig->GetSym() == METERSIGN_common) {
         DrawSmuflCode(dc, element->GetDrawingX(), y, SMUFL_E08A_timeSigCommon, staff->m_drawingStaffSize, false);
         x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5; // step forward because we have a symbol
