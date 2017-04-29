@@ -563,7 +563,7 @@ AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, in
             return reference;
         }
         else if (staffN == VRV_UNSET) {
-            if ((*iter)->HasChild(element)) return reference;
+            if ((*iter)->HasChild(element, 1)) return reference;
         }
     }
     return reference;
@@ -641,6 +641,9 @@ void AlignmentReference::AddChild(Object *child)
 void AlignmentReference::AddToAccidSpace(Accid *accid)
 {
     assert(accid);
+    
+    if (std::find(m_accidSpace.begin(), m_accidSpace.end(), accid) != m_accidSpace.end())
+        return;
 
     m_accidSpace.push_back(accid);
 }
