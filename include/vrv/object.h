@@ -318,7 +318,7 @@ public:
      * Return true if the object has the child Object as child (reference of direct).
      * Processes in depth-first.
      */
-    bool HasChild(Object *child) const;
+    bool HasChild(Object *child, int deepness = UNLIMITED_DEPTH) const;
 
     /**
      * Look for a child with the specified uuid (returns NULL if not found)

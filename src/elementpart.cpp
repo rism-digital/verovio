@@ -174,8 +174,7 @@ int Dots::ResetDrawing(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 };
-    
-    
+
 int Dots::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     LayerElement::ResetHorizontalAlignment(functorParams);
