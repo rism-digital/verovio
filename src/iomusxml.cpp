@@ -280,6 +280,8 @@ void MusicXmlInput::FillSpace(vrv::Layer *layer, int dur)
     while (dur != 0) {
         float quaters = (double)dur / (double)m_ppq;
         if (quaters > 1) quaters = (int)quaters;
+        // limit space for now
+        if (quaters > 2) quaters = 2;
         durStr = std::to_string(int(4 / quaters));
 
         Space *space = new Space();
