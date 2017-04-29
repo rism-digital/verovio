@@ -499,7 +499,7 @@ int Object::GetChildIndex(const Object *child)
 void Object::Modify(bool modified)
 {
     // if we have a parent and a new modification, propagate it
-    if (m_parent && !m_isModified && modified) {
+    if (m_parent && modified) {
         m_parent->Modify();
     }
     m_isModified = modified;
