@@ -641,9 +641,8 @@ void AlignmentReference::AddChild(Object *child)
 void AlignmentReference::AddToAccidSpace(Accid *accid)
 {
     assert(accid);
-    
-    if (std::find(m_accidSpace.begin(), m_accidSpace.end(), accid) != m_accidSpace.end())
-        return;
+
+    if (std::find(m_accidSpace.begin(), m_accidSpace.end(), accid) != m_accidSpace.end()) return;
 
     m_accidSpace.push_back(accid);
 }

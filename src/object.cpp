@@ -315,9 +315,12 @@ bool Object::HasChild(Object *child, int deepness) const
     ArrayOfObjects::const_iterator iter;
 
     for (iter = m_children.begin(); iter != m_children.end(); iter++) {
-        if (child == (*iter)) return true;
-        else if (deepness == 0) return false;
-        else if ((*iter)->HasChild(child, deepness - 1)) return true;
+        if (child == (*iter))
+            return true;
+        else if (deepness == 0)
+            return false;
+        else if ((*iter)->HasChild(child, deepness - 1))
+            return true;
     }
 
     return false;

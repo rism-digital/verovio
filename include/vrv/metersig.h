@@ -41,9 +41,9 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
-    
+
     /** Convert rendition to form */
-    meterSigVis_FORM meterSigDefaultVisToMeterSigVis (meterSigDefaultVis_METERREND rend);
+    meterSigVis_FORM meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_METERREND rend);
 
 private:
     //
