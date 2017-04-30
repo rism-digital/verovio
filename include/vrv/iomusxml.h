@@ -218,6 +218,13 @@ private:
     void PrintMetronome(pugi::xml_node metronome, Tempo *tempo);
 
     /*
+     * @name Helper methods for filling in space elements
+     */
+    ///@{
+    ///@}
+    void FillSpace(vrv::Layer *layer, int dur);
+    
+    /*
      * @name Helper method for generating additional IDs
      */
     ///@{
@@ -229,7 +236,7 @@ private:
      */
     ///@{
     data_ACCIDENTAL_EXPLICIT ConvertAccidentalToAccid(std::string value);
-    data_ACCIDENTAL_EXPLICIT ConvertAlterToAccid(std::string value);
+    data_ACCIDENTAL_IMPLICIT ConvertAlterToAccid(float value);
     data_BARRENDITION ConvertStyleToRend(std::string value, bool repeat);
     data_BOOLEAN ConvertWordToBool(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
@@ -249,6 +256,8 @@ private:
     bool m_mRpt = false;
     /* MIDI ticks */
     int m_ppq;
+    /* meaure time */
+    int m_durTotal = 0;
     /* meter count */
     int m_meterCount = 0;
     /* LastElementID **/
