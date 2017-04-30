@@ -68,7 +68,7 @@ public:
      * See Object::ResetHorizontalAlignment
      */
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
-    
+
 private:
     //
 public:
