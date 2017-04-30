@@ -191,19 +191,33 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the doc
- * member 1: a pointer to the functor for passing it to the system aligner
+ * member 0: the list of staffN in the top-level scoreDef
+ * member 1: the current layerN set in the AlignmentRef (negative values for cross-staff)
+ * member 2: the elements for the previous layer(s)
+ * member 3: the elements of the current layer
+ * member 4: the current note
+ * member 5: the current chord (if any)
+ * member 6: the doc
+ * member 7: a pointer to the functor for passing it to the system aligner
 **/
 
 class AdjustLayersParams : public FunctorParams {
 public:
     AdjustLayersParams(Doc *doc, Functor *functor, const std::vector<int> &staffNs)
     {
+        m_currentLayerN = VRV_UNSET;
+        m_currentNote = NULL;
+        m_currentChord = NULL;
         m_doc = doc;
         m_functor = functor;
         m_staffNs = staffNs;
     }
     std::vector<int> m_staffNs;
+    int m_currentLayerN;
+    std::vector<LayerElement *> m_previous;
+    std::vector<LayerElement *> m_current;
+    Note *m_currentNote;
+    Chord *m_currentChord;
     Doc *m_doc;
     Functor *m_functor;
 };
@@ -1100,10 +1114,7 @@ public:
 
 class SetAlignmentPitchPosParams : public FunctorParams {
 public:
-    SetAlignmentPitchPosParams(Doc *doc)
-    {
-        m_doc = doc;
-    }
+    SetAlignmentPitchPosParams(Doc *doc) { m_doc = doc; }
     Doc *m_doc;
 };
 

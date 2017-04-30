@@ -274,7 +274,7 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
     for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
         assert((*iter)->GetObject());
         if (!(*iter)->GetObject()->Is(params->m_classId)) continue;
-        
+
         // Skip not updated bounding boxes
         if (!(*iter)->HasUpdatedBB()) continue;
 

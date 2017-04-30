@@ -1183,7 +1183,7 @@
             <glyph glyph-code="E4E8" smufl-name="rest32nd"/>
             <glyph glyph-code="E4E9" smufl-name="rest64th"/>
             <glyph glyph-code="E4EA" smufl-name="rest128th"/>
-            <!--<glyph glyph-code="E4EB" smufl-name="rest256th"/>-->
+            <glyph glyph-code="E4EB" smufl-name="rest256th"/>
             <!--<glyph glyph-code="E4EC" smufl-name="rest512th"/>-->
             <!--<glyph glyph-code="E4ED" smufl-name="rest1024th"/>-->
             <!--<glyph glyph-code="E4EE" smufl-name="restHBar"/>-->

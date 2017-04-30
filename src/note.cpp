@@ -203,6 +203,19 @@ bool Note::IsClusterExtreme() const
         return false;
 }
 
+bool Note::IsUnissonWith(Note *note, bool ignoreAccid)
+{
+    if (!ignoreAccid) {
+        Accid *accid = this->GetDrawingAccid();
+        Accid *noteAccid = note->GetDrawingAccid();
+        data_ACCIDENTAL_EXPLICIT accidVal = (accid) ? accid->GetAccid() : ACCIDENTAL_EXPLICIT_NONE;
+        data_ACCIDENTAL_EXPLICIT noteAccidVal = (noteAccid) ? noteAccid->GetAccid() : ACCIDENTAL_EXPLICIT_NONE;
+        if (accidVal != noteAccidVal) return false;
+    }
+
+    return ((this->GetPname() == note->GetPname()) && (this->GetOct() == note->GetOct()));
+}
+
 void Note::SetCluster(ChordCluster *cluster, int position)
 {
     m_cluster = cluster;
@@ -500,7 +513,7 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
     // HARDCODED
     int leftExtender = 2.5 * params->m_doc->GetDrawingStemWidth(staffSize);
     int rightExtender = 2.5 * params->m_doc->GetDrawingStemWidth(staffSize);
-    if (drawingCueSize || (this->GetDrawingDur() > DUR_8)) {
+    if (drawingCueSize || (this->GetDrawingDur() >= DUR_8)) {
         leftExtender = 1.75 * params->m_doc->GetDrawingStemWidth(staffSize);
         rightExtender = 1.25 * params->m_doc->GetDrawingStemWidth(staffSize);
     }

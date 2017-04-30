@@ -110,6 +110,12 @@ public:
     ///@}
 
     /**
+     * Return true if the note is a unisson.
+     * If ignoreAccid is set to true then only @pname and @oct are compared.
+     */
+    bool IsUnissonWith(Note *note, bool ignoreAccid = false);
+
+    /**
      * @name Setter and getter for the chord cluster and the position of the note
      */
     ///@{
