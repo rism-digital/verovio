@@ -40,11 +40,10 @@ public:
     ///@}
     
     /**
-     * Check if the part of a chord needs to be taken into account as overflow above or below in case of cross-staff
-     * chord.
+     * Check if the slur needs to be taken into account as overflow above or below in case of cross-staff end points.
+     * This methods assumes staff@n to be greater for the staff below.
      */
-    void GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignment, bool &skipAbove, bool &skipBelow);
-    
+    void GetCrossStaffOverflows(StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow);
 
     //----------//
     // Functors //
