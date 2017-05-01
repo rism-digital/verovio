@@ -75,9 +75,9 @@ public:
     //----------//
 
     /**
-     * See Object::AdjustArtic
+     * See Object::CalcArtic
      */
-    virtual int AdjustArtic(FunctorParams *functorParams);
+    virtual int CalcArtic(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareLayerElementParts
