@@ -3226,6 +3226,10 @@ bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node figure)
 {
     F *vrvF = new F();
     
+    if (!figure.text()) {
+        return true;
+    }
+    
     assert(figure.text());
     
     std::wstring str = UTF8to16(figure.text().as_string());

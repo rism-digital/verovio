@@ -285,8 +285,8 @@ protected:
      * Defined in view_text.cpp
      */
     ///@{
-    void DrawFb(DeviceContext *dc, Fb *element, int x, int y, bool &setX, bool &setY);
-    void DrawF(DeviceContext *dc, F *figure, int x, int y, bool &setX, bool &setY);
+    void DrawFb(DeviceContext *dc, Fb *element, int x, int y);
+    void DrawF(DeviceContext *dc, F *figure, int x, int y);
 
     ///@}
     

@@ -1155,9 +1155,6 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, int x, int y, boo
             // cast to EditorialElement check in DrawLayerEditorialElement
             DrawTextEditorialElement(dc, dynamic_cast<EditorialElement *>(current), x, y, setX, setY);
         }
-        else if (current->Is(FB)) {
-            DrawFb(dc, dynamic_cast<Fb *>(current), x, y, setX, setY);
-        }
         else {
             assert(false);
         }

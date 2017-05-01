@@ -28,30 +28,20 @@ namespace vrv {
 // View - TextElement
 //----------------------------------------------------------------------------
 
-void View::DrawFb(DeviceContext *dc, Fb *element, int x, int y, bool &setX, bool &setY)
-{
-    assert(element);
-    
-    Object *current;
-    for (current = element->GetFirst(); current; current = element->GetNext()) {
-        if (current->Is(FIGURE)) {
-            F *figure = dynamic_cast<F *>(current);
-            assert(figure);
-            DrawF(dc, figure, x, y, setX, setY);
-        }
-        else {
-            assert(false);
-        }
-    }
-    
-}
-
-void View::DrawF(DeviceContext *dc, F *figure, int x, int y, bool &setX, bool &setY)
+void View::DrawF(DeviceContext *dc, F *figure, int x, int y)
 {
     assert(dc);
     assert(figure);
     
+    bool setX = false, setY = false;
+    
+    //dc->DrawText(UTF16to8(figure->GetText()), figure->GetText());
+    
+    dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
+    //DrawTextChildren(dc, figure, x, y, setX, setY);
+    //DrawText(dc, dynamic_cast<TextElement *>(figure), x, y, setX, setY);
     dc->DrawText(UTF16to8(figure->GetText()), figure->GetText());
+    dc->EndText();
 
 }
     
