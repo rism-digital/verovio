@@ -259,7 +259,7 @@ void ArticPart::AddSlurPositioner(FloatingPositioner *positioner, bool start)
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Artic::AdjustArtic(FunctorParams *functorParams)
+int Artic::CalcArtic(FunctorParams *functorParams)
 {
     FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
     assert(params);

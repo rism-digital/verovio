@@ -710,12 +710,6 @@ void SvgDeviceContext::DrawRotatedText(const std::string &text, int x, int y, do
     // TODO
 }
 
-std::string FilenameLookup(unsigned char c)
-{
-    std::string glyph;
-    return glyph;
-}
-
 void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph)
 {
     assert(m_fontStack.top());

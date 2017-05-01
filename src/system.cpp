@@ -317,9 +317,9 @@ int System::JustifyX(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::CalcStaffOverlap(FunctorParams *functorParams)
+int System::AdjustStaffOverlap(FunctorParams *functorParams)
 {
-    CalcStaffOverlapParams *params = dynamic_cast<CalcStaffOverlapParams *>(functorParams);
+    AdjustStaffOverlapParams *params = dynamic_cast<AdjustStaffOverlapParams *>(functorParams);
     assert(params);
 
     params->m_previous = NULL;
