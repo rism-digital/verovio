@@ -245,7 +245,7 @@ int StaffAlignment::CalcStaffOverlap(FunctorParams *functorParams)
 
     params->m_previous = this;
 
-    return FUNCTOR_SIBLINGS;
+    return FUNCTOR_CONTINUE;
 }
 
 int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
@@ -281,14 +281,19 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
         // for slurs and ties we do not need to adjust them, only add them to the overflow boxes if required
         if ((params->m_classId == SLUR) || (params->m_classId == TIE)) {
 
-            int overflowAbove = this->CalcOverflowAbove((*iter));
+            bool skipAbove = false;
+            bool skipBelow = false;
+
+            int overflowAbove = 0;
+            if (!skipAbove) overflowAbove = this->CalcOverflowAbove((*iter));
             if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
                 // LogMessage("%sparams->m_doctop overflow: %d", current->GetUuid().c_str(), overflowAbove);
                 this->SetOverflowAbove(overflowAbove);
                 this->m_overflowAboveBBoxes.push_back((*iter));
             }
 
-            int overflowBelow = this->CalcOverflowBelow((*iter));
+            int overflowBelow = 0;
+            if (!skipBelow) overflowBelow = this->CalcOverflowBelow((*iter));
             if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
                 // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
                 this->SetOverflowBelow(overflowBelow);
@@ -330,7 +335,7 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
         }
     }
 
-    return FUNCTOR_SIBLINGS;
+    return FUNCTOR_CONTINUE;
 }
 
 int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
