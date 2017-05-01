@@ -1003,7 +1003,12 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     AttCommonNComparison comparisonFirstLayer(LAYER, layerN);
     m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByAttComparison(&comparisonFirstLayer, 1));
     if (!m_crossLayer) {
-        // We should actually just pick the first one
+        // Just try to pick the first one...
+        m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByType(LAYER));
+
+    }
+    if (!m_crossLayer) {
+        // Nothing we can do
         LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
             durElement->GetStaff().at(0), this->GetUuid().c_str());
         m_crossStaff = NULL;

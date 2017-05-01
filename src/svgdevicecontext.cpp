@@ -352,7 +352,7 @@ void SvgDeviceContext::StartPage()
     // a graphic for definition scaling
     m_currentNode = m_currentNode.append_child("svg");
     m_svgNodeStack.push_back(m_currentNode);
-    m_currentNode.append_attribute("id") = "definition-scale";
+    m_currentNode.append_attribute("class") = "definition-scale";
     m_currentNode.append_attribute("viewBox")
         = StringFormat("0 0 %d %d", m_width * DEFINITION_FACTOR, m_height * DEFINITION_FACTOR).c_str();
 
