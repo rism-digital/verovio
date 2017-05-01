@@ -509,7 +509,7 @@ public:
     /**
      * Adjust the position the outside articulations.
      */
-    virtual int AdjustArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position the outside articulations with slur.
@@ -640,7 +640,7 @@ public:
     /**
      * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
      */
-    virtual int CalcStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Set the note head flipped positions and calc the ledger lines

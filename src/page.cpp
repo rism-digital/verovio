@@ -286,9 +286,9 @@ void Page::LayOutVertically()
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Adjust the position of outside articulations
-    FunctorDocParams adjustArticParams(doc);
-    Functor adjustArtic(&Object::AdjustArtic);
-    this->Process(&adjustArtic, &adjustArticParams);
+    FunctorDocParams calcArticParams(doc);
+    Functor calcArtic(&Object::CalcArtic);
+    this->Process(&calcArtic, &calcArticParams);
 
     // Render it for filling the bounding box
     View view;
@@ -315,8 +315,8 @@ void Page::LayOutVertically()
     this->Process(&adjustFloatingPostioners, &adjustFloatingPostionersParams);
 
     // Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes params.clear();
-    Functor calcStaffOverlap(&Object::CalcStaffOverlap);
-    CalcStaffOverlapParams calcStaffOverlapParams(&calcStaffOverlap);
+    Functor calcStaffOverlap(&Object::AdjustStaffOverlap);
+    AdjustStaffOverlapParams calcStaffOverlapParams(&calcStaffOverlap);
     this->Process(&calcStaffOverlap, &calcStaffOverlapParams);
 
     // Set the Y position of each StaffAlignment
