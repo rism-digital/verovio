@@ -403,6 +403,8 @@ private:
     bool ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef);
     bool ReadMeiMeasure(Object *parent, pugi::xml_node measure);
     bool ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeiFb(Object *parent, pugi::xml_node fb);
+    bool ReadMeiFbChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiStaff(Object *parent, pugi::xml_node staff);
     bool ReadMeiStaffChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiLayer(Object *parent, pugi::xml_node layer);
@@ -470,7 +472,6 @@ private:
     bool ReadMeiRend(Object *parent, pugi::xml_node rend);
     bool ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight);
     bool ReadMeiF(Object *parent, pugi::xml_node figure);
-    bool ReadMeiFb(Object *parent, pugi::xml_node fb);
     ///@}
 
     /**

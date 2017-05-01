@@ -2543,6 +2543,40 @@ bool MeiInput::ReadMeiTurn(Object *parent, pugi::xml_node turn)
     return true;
 }
 
+bool MeiInput::ReadMeiFb(Object *parent, pugi::xml_node fb)
+{
+    pugi::xml_node xmlElement;
+    std::string elementName;
+    
+    Fb *vrvFb = new Fb();
+    
+    parent->AddChild(vrvFb);
+    return ReadMeiFbChildren(vrvFb, fb);
+}
+
+bool MeiInput::ReadMeiFbChildren(Object *parent, pugi::xml_node parentNode)
+{
+    assert(dynamic_cast<Fb *>(parent) || dynamic_cast<EditorialElement *>(parent));
+
+    bool success = true;
+    pugi::xml_node current;
+    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+        // editorial
+        else if (IsEditorialElementName(current.name())) {
+            success = ReadMeiEditorialElement(parent, current, EDITORIAL_STAFF);
+        }
+        // content
+        else if (std::string(current.name()) == "f") {
+            success = ReadMeiF(parent, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <staff>", current.name());
+        }
+    }
+    return success;
+}
+
 bool MeiInput::ReadMeiStaff(Object *parent, pugi::xml_node staff)
 {
     Staff *vrvStaff = new Staff();
@@ -3199,34 +3233,6 @@ bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node figure)
     
     parent->AddChild(vrvF);
     return true;
-}
-
-bool MeiInput::ReadMeiFb(Object *parent, pugi::xml_node fb)
-{
-    bool success = true;
-    pugi::xml_node xmlElement;
-    std::string elementName;
-    
-    Fb *vrvFb = new Fb();
-    
-    parent->AddChild(vrvFb);
-    
-    int i = 0;
-    for (xmlElement = fb.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
-        if (!success) {
-            break;
-        }
-        elementName = std::string(xmlElement.name());
-        if (elementName == "f") {
-            success = ReadMeiF(vrvFb, xmlElement);
-        }
-        // unknown
-        else {
-            LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
-        }
-        i++;
-    }
-    return success;
 }
  
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
