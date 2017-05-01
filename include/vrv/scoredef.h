@@ -47,7 +47,12 @@ public:
     virtual ClassId GetClassId() const { return SCOREDEF_ELEMENT; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual ScoreDefInterface *GetScoreDefInterface() { return dynamic_cast<ScoreDefInterface *>(this); }
+    ///@}
 
     /**
      * @name Methods for checking the presence of clef, key signature, etc. information.

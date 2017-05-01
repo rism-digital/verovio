@@ -33,7 +33,12 @@ public:
     virtual ClassId GetClassId() const { return DOT; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+    ///@}
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }

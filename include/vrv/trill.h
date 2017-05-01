@@ -37,7 +37,12 @@ public:
     virtual ClassId GetClassId() const { return TRILL; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    ///@}
 
     //----------//
     // Functors //

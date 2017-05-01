@@ -53,11 +53,16 @@ public:
     virtual ClassId GetClassId() const { return CHORD; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
     virtual StemmedDrawingInterface *GetStemmedDrawingInterface()
     {
         return dynamic_cast<StemmedDrawingInterface *>(this);
     }
+    ///@}
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
