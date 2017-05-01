@@ -245,7 +245,7 @@ int StaffAlignment::CalcStaffOverlap(FunctorParams *functorParams)
 
     params->m_previous = this;
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
@@ -275,8 +275,9 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
         assert((*iter)->GetObject());
         if (!(*iter)->GetObject()->Is(params->m_classId)) continue;
 
-        // Skip not updated bounding boxes
-        if (!(*iter)->HasUpdatedBB()) continue;
+        // Skip if no content bounding box is available
+        if (!(*iter)->HasContentBB())
+            continue;
 
         // for slurs and ties we do not need to adjust them, only add them to the overflow boxes if required
         if ((params->m_classId == SLUR) || (params->m_classId == TIE)) {
@@ -335,7 +336,7 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
         }
     }
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
