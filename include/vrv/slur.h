@@ -38,6 +38,13 @@ public:
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
     ///@}
+    
+    /**
+     * Check if the part of a chord needs to be taken into account as overflow above or below in case of cross-staff
+     * chord.
+     */
+    void GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignment, bool &skipAbove, bool &skipBelow);
+    
 
     //----------//
     // Functors //
