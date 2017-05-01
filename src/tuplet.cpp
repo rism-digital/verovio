@@ -18,6 +18,7 @@
 #include "editorial.h"
 #include "note.h"
 #include "rest.h"
+#include "space.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -64,6 +65,9 @@ void Tuplet::AddChild(Object *child)
     }
     else if (child->Is(REST)) {
         assert(dynamic_cast<Rest *>(child));
+    }
+    else if (child->Is(SPACE)) {
+        assert(dynamic_cast<Space *>(child));
     }
     else if (child->Is(TUPLET)) {
         assert(dynamic_cast<Tuplet *>(child));

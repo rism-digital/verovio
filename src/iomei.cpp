@@ -1596,6 +1596,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "rest") {
             return true;
         }
+        else if (element == "space") {
+            return true;
+        }
         else if (element == "tuplet") {
             return true;
         }
@@ -1686,7 +1689,10 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "note") {
             return true;
         }
-        if (element == "rest") {
+        else if (element == "rest") {
+            return true;
+        }
+        else if (element == "space") {
             return true;
         }
         else {
