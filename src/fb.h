@@ -78,6 +78,8 @@ namespace vrv {
         std::wstring GetText() const { return m_text; }
         ///@}
         
+        virtual void AddChild(Object *object);
+        
     private:
         //
     public:

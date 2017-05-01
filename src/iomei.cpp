@@ -3236,7 +3236,7 @@ bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node figure)
     vrvF->SetText(str);
     
     parent->AddChild(vrvF);
-    return true;
+    return ReadMeiTextChildren(vrvF, figure);
 }
  
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)

@@ -38,9 +38,7 @@ void View::DrawF(DeviceContext *dc, F *figure, int x, int y)
     //dc->DrawText(UTF16to8(figure->GetText()), figure->GetText());
     
     dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
-    //DrawTextChildren(dc, figure, x, y, setX, setY);
-    //DrawText(dc, dynamic_cast<TextElement *>(figure), x, y, setX, setY);
-    dc->DrawText(UTF16to8(figure->GetText()), figure->GetText());
+    DrawTextChildren(dc, figure, x, y, setX, setY);
     dc->EndText();
 
 }

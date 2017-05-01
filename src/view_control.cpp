@@ -1630,11 +1630,20 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     dc->EndGraphic(dynam, this);
 }
 
-void View::DrawFb(DeviceContext *dc, Fb *element, int x, int y)
+void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y)
 {
     assert(element);
     
     int offset = 0;
+    
+    FontInfo *fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+    int descender = -m_doc->GetTextGlyphDescender(L'q', fontDim, false);
+    int height = m_doc->GetTextGlyphHeight(L'1', fontDim, false);
+    
+    fontDim->SetPointSize(m_doc->GetDrawingLyricFont((staff)->m_drawingStaffSize)->GetPointSize());
+    
+    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetFont(fontDim);
     
     Object *current;
     for (current = element->GetFirst(); current; current = element->GetNext()) {
@@ -1646,8 +1655,11 @@ void View::DrawFb(DeviceContext *dc, Fb *element, int x, int y)
         else {
             assert(false);
         }
-        offset -= 300;
+        offset -= (descender + height);
     }
+    
+    dc->ResetFont();
+    dc->ResetBrush();
     
 }
     
@@ -1718,7 +1730,6 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
     dc->StartGraphic(harm, "", harm->GetUuid());
 
-    
     FontInfo dirTxt;
 
     // If we have not timestamp
@@ -1738,23 +1749,24 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
         int y = harm->GetDrawingY();
         
-
-        dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
-
-        dc->SetBrush(m_currentColour, AxSOLID);
-        dc->SetFont(&dirTxt);
-        
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
-            DrawFb(dc, dynamic_cast<Fb *>(harm->GetFirst()), x, y);
+            DrawFb(dc, *staffIter, dynamic_cast<Fb *>(harm->GetFirst()), x, y);
         } else {
+            dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+            
+            dc->SetBrush(m_currentColour, AxSOLID);
+            dc->SetFont(&dirTxt);
+            
             dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
             DrawTextChildren(dc, harm, x, y, setX, setY);
             dc->EndText();
+            
+            dc->ResetFont();
+            dc->ResetBrush();
+            
         }
         
-        dc->ResetFont();
-        dc->ResetBrush();
-        
+
     }
     
     dc->EndGraphic(harm, this);
