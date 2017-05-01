@@ -36,7 +36,12 @@ public:
     virtual ClassId GetClassId() const { return FERMATA; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    ///@}
 
     //----------//
     // Functors //

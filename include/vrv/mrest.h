@@ -39,7 +39,12 @@ public:
     virtual ClassId GetClassId() const { return MREST; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+    ///@}
 
     //----------//
     // Functors //

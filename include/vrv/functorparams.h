@@ -110,12 +110,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustArticParams
-//----------------------------------------------------------------------------
-
-// Use FunctorDocParams
-
-//----------------------------------------------------------------------------
 // AdjustArticWithSlursParams
 //----------------------------------------------------------------------------
 
@@ -236,6 +230,26 @@ public:
     AdjustFloatingPostionerGrpsParams(Doc *doc) { m_doc = doc; }
     std::vector<ClassId> m_classIds;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustStaffOverlapParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the previous staff alignment
+ * member 1: a pointer to the functor for passing it to the system aligner
+**/
+
+class AdjustStaffOverlapParams : public FunctorParams {
+public:
+    AdjustStaffOverlapParams(Functor *functor)
+    {
+        m_previous = NULL;
+        m_functor = functor;
+    }
+    StaffAlignment *m_previous;
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------
@@ -444,6 +458,12 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// CalcArticParams
+//----------------------------------------------------------------------------
+
+// Use FunctorDocParams
+
+//----------------------------------------------------------------------------
 // CalcChordNoteHeads
 //----------------------------------------------------------------------------
 
@@ -500,26 +520,6 @@ public:
 //----------------------------------------------------------------------------
 
 // Use FunctorDocParams
-
-//----------------------------------------------------------------------------
-// CalcStaffOverlapParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the previous staff alignment
- * member 1: a pointer to the functor for passing it to the system aligner
-**/
-
-class CalcStaffOverlapParams : public FunctorParams {
-public:
-    CalcStaffOverlapParams(Functor *functor)
-    {
-        m_previous = NULL;
-        m_functor = functor;
-    }
-    StaffAlignment *m_previous;
-    Functor *m_functor;
-};
 
 //----------------------------------------------------------------------------
 // CalcStemParams
