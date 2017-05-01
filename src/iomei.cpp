@@ -798,11 +798,7 @@ void MeiOutput::WriteMeiF(pugi::xml_node currentNode, F *figure)
 {
     assert(figure);
     
-    if (!figure->GetText().empty()) {
-        pugi::xml_node nodechild = currentNode.append_child(pugi::node_pcdata);
-        // nodechild.text() =  UTF16to8(EscapeSMuFL(text->GetText()).c_str()).c_str();
-        nodechild.text() = UTF16to8(figure->GetText()).c_str();
-    }
+    WriteTextElement(currentNode, figure);
 };
     
 void MeiOutput::WriteMeiFb(pugi::xml_node currentNode, Fb *fb)
@@ -3225,15 +3221,6 @@ bool MeiInput::ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, b
 bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node figure)
 {
     F *vrvF = new F();
-    
-    if (!figure.text()) {
-        return true;
-    }
-    
-    assert(figure.text());
-    
-    std::wstring str = UTF8to16(figure.text().as_string());
-    vrvF->SetText(str);
     
     parent->AddChild(vrvF);
     return ReadMeiTextChildren(vrvF, figure);

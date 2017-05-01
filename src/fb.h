@@ -69,15 +69,9 @@ namespace vrv {
         ///@}
         
         /**
-         * @name Set and get the text content.
-         * The text content is a std::wstring that needs to be converted to UTF16.
-         * See MeiInput::ReadText and MeiInput ::WriteText
+         * Add an element (text, rend. etc.) to a rend.
+         * Only supported elements will be actually added to the child list.
          */
-        ///@{
-        void SetText(std::wstring text) { m_text = text; }
-        std::wstring GetText() const { return m_text; }
-        ///@}
-        
         virtual void AddChild(Object *object);
         
     private:
@@ -85,8 +79,6 @@ namespace vrv {
     public:
         //
     protected:
-        /** The text content */
-        std::wstring m_text;
         
     private:
     };
