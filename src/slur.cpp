@@ -81,21 +81,27 @@ void Slur::GetCrossStaffOverflows(StaffAlignment *alignment, curvature_CURVEDIR 
     else
         endStaff = this->GetEnd()->GetCrossStaff(layer);
     
-    // No cross-staff endpoints, nothing to skip
-    if (!startStaff && !endStaff) return;
+    // No cross-staff endpoints, check if the slur itself crosses staves
+    if (!startStaff) {
+        startStaff = dynamic_cast<Staff*>(this->GetStart()->GetFirstParent(STAFF));
+        assert(startStaff);
+    }
+    if (!endStaff) {
+        endStaff = dynamic_cast<Staff*>(this->GetEnd()->GetFirstParent(STAFF));
+        assert(endStaff);
+    }
 
-    if (cuvreDir == curvature_CURVEDIR_above) {
-        if (startStaff && (startStaff->GetN() < alignment->GetStaff()->GetN()))
-            skipAbove = true;
-        if (endStaff && (endStaff->GetN() < alignment->GetStaff()->GetN()))
-            skipAbove = true;
-    }
-    else {
-        if (startStaff && (startStaff->GetN() > alignment->GetStaff()->GetN()))
-            skipBelow = true;
-        if (endStaff && (endStaff->GetN() > alignment->GetStaff()->GetN()))
-            skipBelow = true;
-    }
+
+    if (startStaff && (startStaff->GetN() < alignment->GetStaff()->GetN()))
+        skipAbove = true;
+    if (endStaff && (endStaff->GetN() < alignment->GetStaff()->GetN()))
+        skipAbove = true;
+
+    if (startStaff && (startStaff->GetN() > alignment->GetStaff()->GetN()))
+        skipBelow = true;
+    if (endStaff && (endStaff->GetN() > alignment->GetStaff()->GetN()))
+        skipBelow = true;
+
 }
 
 } // namespace vrv
