@@ -49,7 +49,7 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
     assert(dc);
     
     std::size_t prev_pos = 0, pos;
-    while ((pos = s.find_first_of(L"♮♭♯", prev_pos)) != std::wstring::npos) {
+    while ((pos = s.find_first_of(L"\u266D\u266E\u266F", prev_pos)) != std::wstring::npos) {
         // If pos if > than the previous, it is the substring to exctrace
         if (pos > prev_pos) {
             std::wstring substr = s.substr(prev_pos, pos - prev_pos);
@@ -61,11 +61,11 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
             // Then the accidental
             std::wstring accid = s.substr(pos, 1);
             std::wstring smufl_accid;
-            if (accid == L"♭") {
+            if (accid == L"\u266D") { // MUSIC FLAT SIGN
                 smufl_accid.push_back(0xE260);
-            } else if (accid == L"♮") {
+            } else if (accid == L"\u266E") { // MUSIC FLAT SIGN
                 smufl_accid.push_back(0xE261);
-            } else if (accid == L"♯") {
+            } else if (accid == L"\u266F") { // MUSIC SHARP SIGN
                 smufl_accid.push_back(0xE262);
             } else {
                 smufl_accid.push_back(0xE26D);
