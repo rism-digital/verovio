@@ -43,8 +43,13 @@ public:
     virtual ClassId GetClassId() const { return TEMPO; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    ///@}
 
     /**
      * Add an element (text, rend. etc.) to a tempo.

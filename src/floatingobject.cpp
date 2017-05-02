@@ -307,6 +307,9 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         if (curve) {
             assert(curve->m_object);
         }
+        int margin = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize)
+        / PARAM_DENOMINATOR;
+        
         if (this->m_place == STAFFREL_above) {
             if (curve && curve->m_object->Is({ SLUR, TIE })) {
                 int shift = this->Intersects(curve, doc->GetDrawingUnit(staffSize));
@@ -316,10 +319,11 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
-            yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1();
-            yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize)
-                / PARAM_DENOMINATOR;
-            this->SetDrawingYRel(yRel);
+            if (this->VerticalContentOverlap(horizOverlapingBBox, margin))
+            {
+                yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
+                this->SetDrawingYRel(yRel);
+            }
         }
         else {
             if (curve && curve->m_object->Is({ SLUR, TIE })) {
@@ -330,11 +334,11 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
-            yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
-                + GetContentY2();
-            yRel
-                += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
-            this->SetDrawingYRel(yRel);
+            if (this->VerticalContentOverlap(horizOverlapingBBox, margin))
+            {
+                yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight() + GetContentY2() + margin;
+                this->SetDrawingYRel(yRel);
+            }
         }
     }
     return true;
