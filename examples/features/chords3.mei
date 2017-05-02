@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Chords with notational features on individual notes</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-27</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Lyrics, accents, dynamics, and other notational features are rendered also if they are attached on individual notes in a chord.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000186257490">
+                        <staffGrp xml:id="m-000000103587894">
+                            <staffDef xml:id="staffdef-000000036750238" clef.shape="G" clef.line="2" meter.count="2" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-000000200059717" n="1" right="end">
+                            <staff xml:id="staff-000000093523743" n="1">
+                                <!-- kern: =1-  2c/ 2e/  == -->
+                                <layer xml:id="layer-000000110269042" n="1">
+                                    <chord xml:id="chord-000000013408255" dur="2" stem.dir="up">
+                                        <note xml:id="note-000000081520660" oct="4" pname="c" accid.ges="n">
+                                           <verse xml:id="verse-000000171899404" n="1">
+                                                <syl xml:id="syl-000000103544483">hello</syl>
+                                            </verse>
+                                        </note>
+                                        <note xml:id="note-000000002322922" oct="4" pname="e" accid.ges="n">
+                                           <verse xml:id="verse-000002171899404" n="1">
+                                                <syl xml:id="syl-000020103544483">hello</syl>
+                                            </verse>
+                                        </note>
+                                    </chord>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

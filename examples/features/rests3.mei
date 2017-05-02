@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-model href="https://raw.githubusercontent.com/music-encoding/music-encoding/master/schemata/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://raw.githubusercontent.com/music-encoding/music-encoding/master/schemata/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     meiversion="3.0.0">
+   <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Vertical placement of rests</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-27</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio renders the vertical placement of rests starting from a default position in the middle of the staff.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+   </meiHead>
+   <music>
+      <body>
+         <mdiv>
+            <score>
+               <scoreDef meter.count="4" meter.unit="4" key.sig="0">
+                  <staffGrp>
+                     <staffDef n="1" xml:id="P1" lines="5" clef.line="2" clef.shape="G"/>
+                  </staffGrp>
+               </scoreDef>
+               <section>
+                  <measure n="1" xml:id="d1e52">
+                     <staff n="1">
+                        <layer n="1">
+                           <rest xml:id="d1e79" dur="1" ploc="d" oloc="5"/>
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure n="2" xml:id="d1e89">
+                     <staff n="1">
+                        <layer n="1">
+                           <rest xml:id="d1e91" dur="1" ploc="b" oloc="4"/>
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure n="3" xml:id="d1e101">
+                     <staff n="1">
+                        <layer n="1">
+                           <rest xml:id="d1e103" dur="1" ploc="g" oloc="4"/>
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure n="4" xml:id="d1e113">
+                     <staff n="1">
+                        <layer n="1">
+                           <rest xml:id="d1e115" dur="1" ploc="e" oloc="4"/>
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure n="5" xml:id="d1e125">
+                     <staff n="1">
+                        <layer n="1">
+                           <rest xml:id="d1e127" dur="2" ploc="d" oloc="5"/>
+                           <rest xml:id="d1e139" dur="2" ploc="b" oloc="4"/>
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure n="5" xml:id="d1e176">
+                     <staff n="1">
+                        <layer n="1">
+                           <rest xml:id="d1e203" dur="2" ploc="g" oloc="4"/>
+                           <rest xml:id="d1e215" dur="2" ploc="e" oloc="4"/>
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure n="6" xml:id="d1e227">
+                     <staff n="1">
+                        <layer n="1">
+                           <rest xml:id="d1e229" dur="4" ploc="d" oloc="5"/>
+                           <rest xml:id="d1e241" dur="4" ploc="b" oloc="4"/>
+                           <rest xml:id="d1e253" dur="4" ploc="g" oloc="4"/>
+                           <rest xml:id="d1e265" dur="4" ploc="e" oloc="4"/>
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure n="7" xml:id="d1e277">
+                     <staff n="1">
+                        <layer n="1">
+                           <rest xml:id="d1e279" dur="8" ploc="d" oloc="5"/>
+                           <rest xml:id="d1e291" dur="8" ploc="b" oloc="4"/>
+                           <rest xml:id="d1e303" dur="8" ploc="g" oloc="4"/>
+                           <rest xml:id="d1e315" dur="8" ploc="e" oloc="4"/>
+                           <rest xml:id="d1e327" dur="16" ploc="d" oloc="5"/>
+                           <rest xml:id="d1e339" dur="16" ploc="b" oloc="4"/>
+                           <rest xml:id="d1e351" dur="16" ploc="g" oloc="4"/>
+                           <rest xml:id="d1e363" dur="16" ploc="e" oloc="4"/>
+                           <rest xml:id="d1e375" dur="32" ploc="d" oloc="5"/>
+                           <rest xml:id="d1e387" dur="32" ploc="b" oloc="4"/>
+                           <rest xml:id="d1e399" dur="32" ploc="g" oloc="4"/>
+                           <rest xml:id="d1e412" dur="32" ploc="e" oloc="4"/>
+                           <rest xml:id="d1e424" dur="64" ploc="d" oloc="5"/>
+                           <rest xml:id="d1e436" dur="64" ploc="b" oloc="4"/>
+                           <rest xml:id="d1e448" dur="64" ploc="g" oloc="4"/>
+                           <rest xml:id="d1e460" dur="64" ploc="e" oloc="4"/>
+                           <rest xml:id="d1e472" dur="128" ploc="d" oloc="5"/>
+                           <rest xml:id="d1e484" dur="128" ploc="b" oloc="4"/>
+                           <rest xml:id="d1e496" dur="128" ploc="g" oloc="4"/>
+                           <rest xml:id="d1e508" dur="128" ploc="e" oloc="4"/>
+                        </layer>
+                     </staff>
+                  </measure>
+               </section>
+            </score>
+         </mdiv>
+      </body>
+   </music>
+</mei>
