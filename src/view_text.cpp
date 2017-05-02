@@ -48,21 +48,44 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
 {
     assert(dc);
     
-    std::wistringstream iss(s);
-    std::wstring token;
-    while (std::getline(iss, token, L'♮')) {
-        dc->DrawText(UTF16to8(token), token);
-        // no _
-        if (iss.eof()) break;
+    std::size_t prev_pos = 0, pos;
+    while ((pos = s.find_first_of(L"♮♭♯", prev_pos)) != std::wstring::npos) {
+        // If pos if > than the previous, it is the substring to exctrace
+        if (pos > prev_pos) {
+            std::wstring substr = s.substr(prev_pos, pos - prev_pos);
+            dc->DrawText(UTF16to8(substr), substr);
+        }
         
-        FontInfo vrvTxt;
-        vrvTxt.SetFaceName("VerovioText");
-        dc->SetFont(&vrvTxt);
-        std::wstring str;
-        str.push_back(VRV_TEXT_E551);
-        dc->DrawText(UTF16to8(str), str);
-        dc->ResetFont();
+        // if it is the same or we still have space, it is the accidental
+        if (pos == prev_pos || pos < s.length()) {
+            // Then the accidental
+            std::wstring accid = s.substr(pos, 1);
+            std::wstring smufl_accid;
+            if (accid == L"♭") {
+                smufl_accid.push_back(0xE260);
+            } else if (accid == L"♮") {
+                smufl_accid.push_back(0xE261);
+            } else if (accid == L"♯") {
+                smufl_accid.push_back(0xE262);
+            } else {
+                smufl_accid.push_back(0xE26D);
+            }
+            
+            FontInfo vrvTxt;
+            vrvTxt.SetFaceName("VerovioText");
+            dc->SetFont(&vrvTxt);
+            dc->DrawText(UTF16to8(smufl_accid), smufl_accid);
+            dc->ResetFont();
+        }
+        // Skip the accidental and continue
+        prev_pos = pos + 1;
     }
+    // Print the remainder of the string, or the full string if no accid
+    if (prev_pos < s.length()) {
+        std::wstring substr = s.substr(prev_pos, std::wstring::npos);
+        dc->DrawText(UTF16to8(substr), substr);
+    }
+
 }
     
 void View::DrawTextElement(DeviceContext *dc, TextElement *element, int x, int y, bool &setX, bool &setY)
