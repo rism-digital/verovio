@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Left/right repeats at line ends</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-27</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>If a measure with a right repeat is adjacent to a measure with a left repeat, Verovio renders a single thick barline and correctly splits the right/left repeat if a line break occurs between the two measures.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000000818941817">
+                        <staffGrp xml:id="m-0000001088448929">
+                            <staffDef xml:id="staffdef-0000001225993501" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000001797093798">
+                        <pb/>
+                        <measure xml:id="measure-L4" n="1">
+                            <staff xml:id="staff-L4F1" n="1">
+                                <layer xml:id="layer-L4F1" n="1">
+                                    <note xml:id="note-L5F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <fermata staff="1" tstamp="2.0"></fermata>
+                        </measure>
+                        <measure xml:id="measure-L6" n="2" left="rptstart" right="rptend">
+                            <staff xml:id="staff-L6F1" n="1">
+                                <layer xml:id="layer-L6F1" n="1">
+                                    <note xml:id="note-L7F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <scoreDef key.sig="3f"/>
+                        <measure xml:id="measure-L8" n="3" left="rptstart">
+                            <staff xml:id="staff-L8F1" n="1">
+                                <layer xml:id="layer-L8F1" n="1">
+                                    <note xml:id="note-L9F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L10" n="4" left="rptstart" right="rptend">
+                            <staff xml:id="staff-L10F1" n="1">
+                                <layer xml:id="layer-L10F1" n="1">
+                                    <note xml:id="note-L11F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L12" n="5" left="rptstart">
+                            <staff xml:id="staff-L12F1" n="1">
+                                <layer xml:id="layer-L12F1" n="1">
+                                    <note xml:id="note-L13F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <sb/>
+                        <measure xml:id="measure-L14" n="6" left="rptstart">
+                            <staff xml:id="staff-L14F1" n="1">
+                                <layer xml:id="layer-L14F1" n="1">
+                                    <note xml:id="note-L15F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L16" n="7" left="rptstart">
+                            <staff xml:id="staff-L16F1" n="1">
+                                <layer xml:id="layer-L16F1" n="1">
+                                    <note xml:id="note-L17F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L18" n="8" left="rptboth">
+                            <staff xml:id="staff-L18F1" n="1">
+                                <layer xml:id="layer-L18F1" n="1">
+                                    <note xml:id="note-L19F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L20" n="9" left="rptstart">
+                            <staff xml:id="staff-L20F1" n="1">
+                                <layer xml:id="layer-L20F1" n="1">
+                                    <note xml:id="note-L21F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <sb/>
+                        <measure xml:id="measure-L22" n="10">
+                            <staff xml:id="staff-L22F1" n="1">
+                                <layer xml:id="layer-L22F1" n="1">
+                                    <note xml:id="note-L23F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L24" n="11" left="rptboth">
+                            <staff xml:id="staff-L24F1" n="1">
+                                <layer xml:id="layer-L24F1" n="1">
+                                    <note xml:id="note-L25F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L26" n="12" right="end">
+                            <staff xml:id="staff-L26F1" n="1">
+                                <layer xml:id="layer-L26F1" n="1">
+                                    <note xml:id="note-L27F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

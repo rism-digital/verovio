@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Tempi/directives collisions</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-27</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio avoids collisions between tempo indications and performing directives.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef midi.bpm="140">
+                        <staffGrp>
+                            <staffGrp label="Piano" symbol="brace" barthru="true">
+                                <staffDef n="1" clef.shape="G" clef.line="2" key.mode="major" key.sig="3f" meter.count="4" meter.unit="4" meter.sym="common" lines="5" />
+                                <staffDef n="2" clef.shape="F" clef.line="4" key.mode="major" key.sig="3f" meter.count="4" meter.unit="4" meter.sym="common" lines="5" />
+                            </staffGrp>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <chord dur="2">
+                                        <artic artic="acc" />
+                                        <note oct="4" pname="b" />
+                                        <note oct="5" pname="d" />
+                                        <note oct="5" pname="f" />
+                                        <note oct="5" pname="g" />
+                                        <note oct="5" pname="b" />
+                                    </chord>
+                                    <rest dur="2" />
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="5">
+                                    <rest dur="8" />
+                                    <beam>
+                                        <note dur="16" oct="4" pname="a">
+                                            <accid accid.ges="f" />
+                                            <artic artic="acc" />
+                                        </note>
+                                        <note dur="16" oct="4" pname="g" />
+                                    </beam>
+                                    <beam>
+                                        <note dur="16" oct="4" pname="f">
+                                            <artic artic="acc" />
+                                        </note>
+                                        <note dur="16" oct="4" pname="d" />
+                                        <note dur="16" oct="4" pname="e">
+                                            <accid accid.ges="f" />
+                                        </note>
+                                        <note dur="16" oct="4" pname="d" />
+                                    </beam>
+                                    <beam>
+                                        <note dur="16" oct="3" pname="b">
+                                            <artic artic="acc" />
+                                        </note>
+                                        <note dur="16" oct="3" pname="g" />
+                                        <note dur="16" oct="3" pname="a">
+                                            <accid accid.ges="f" />
+                                        </note>
+                                        <note dur="16" oct="3" pname="g" />
+                                    </beam>
+                                    <beam>
+                                        <note dur="16" oct="3" pname="f">
+                                            <artic artic="acc" />
+                                        </note>
+                                        <note dur="16" oct="3" pname="d" />
+                                        <note dur="16" oct="3" pname="e">
+                                            <accid accid.ges="f" />
+                                        </note>
+                                        <note dur="16" oct="3" pname="d" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <tempo place="above" staff="1" tstamp="1" xml:lang="it" midi.bpm="160">
+                                <rend fontweight="bold">Allegro con fuoco</rend>
+                            </tempo>
+                            <dynam staff="1" tstamp="1">f</dynam>
+                            <dir staff="2" tstamp="1" xml:lang="it">
+                                <rend fontstyle="italic">legatissimo</rend>
+                            </dir>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
