@@ -33,11 +33,19 @@ enum DocType { Raw = 0, Rendering, Transcription };
 class Doc : public Object {
 
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
     Doc();
     virtual ~Doc();
     virtual ClassId GetClassId() const { return DOC; }
+    ///@}
 
+    /**
+     * Add a page to the document
+     */
     virtual void AddChild(Object *object);
 
     /*

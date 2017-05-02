@@ -26,12 +26,17 @@ class Glyph;
  */
 class BoundingBox {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
     BoundingBox();
     virtual ~BoundingBox(){};
     virtual ClassId GetClassId() const;
     bool Is(ClassId classId) const { return (this->GetClassId() == classId); }
     bool Is(const std::vector<ClassId> &classIds) const;
+    ///@}
 
     /**
      * @name Methods for updating the bounding boxes and for providing information about their status.
