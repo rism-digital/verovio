@@ -57,6 +57,12 @@ public:
      * Refreshes the views from Doc.
      */
     virtual void Refresh();
+    
+    /**
+     * Generate a document scoreDef when none is provided.
+     * This only looks at the content first system of the document.
+     */
+    bool GenerateDocumentScoreDef();
 
     /**
      * Getter and setter for the DocType.

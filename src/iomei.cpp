@@ -1787,6 +1787,12 @@ bool MeiInput::ReadMei(pugi::xml_node root)
             m_doc->ConvertToPageBasedDoc();
         }
     }
+    
+    if (success && !m_hasScoreDef) {
+        LogMessage("No scoreDef provided, trying to generate one...");
+        success = m_doc->GenerateDocumentScoreDef();
+    }
+    
     return success;
 }
 
@@ -2048,6 +2054,8 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
                     System *system = dynamic_cast<System *>(parent);
                     assert(system);
                     unmeasured = new Measure(false);
+                    if (m_doc->GetType() == Transcription)
+                        unmeasured->UpgradePageBasedMEI(system);
                     system->AddChild(unmeasured);
                 }
                 else {
