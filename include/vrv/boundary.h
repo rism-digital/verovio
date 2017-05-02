@@ -21,8 +21,7 @@ class Object;
 //----------------------------------------------------------------------------
 
 /**
- * This class is an interface for elements having a single time point, such as tempo, reh, etc..
- * It is not an abstract class but should not be instantiated directly.
+ * This class models an end milestone element and has no MEI equivalent.
  */
 class BoundaryEnd : public SystemElement {
 public:
@@ -94,8 +93,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class is an interface for elements having a single time point, such as tempo, reh, etc..
- * It is not an abstract class but should not be instantiated directly.
+ * This class is an interface for container elements that have to be turned to milestones in a page-base representation.
  */
 class BoundaryStartInterface {
 public:

@@ -1,10 +1,16 @@
 #!/bin/bash
 
-./generate_ff.sh $1
+font="VerovioText-1.0.sfd"
+
+shopt -s expand_aliases
+[[ -f ~/.bash_profile ]] && source ~/.bash_profile
+
+#./generate_ff.sh $1
+fontforge generate_ff.py $font
 
 # base64
-font=${1%.sfd}.woff
-w=`base64 $font`
+woffFont=${1%.sfd}.woff
+w=`base64 $woffFont`
 
 # output
 cat woff-1.txt > woff.xml 
