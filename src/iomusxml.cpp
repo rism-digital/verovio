@@ -735,8 +735,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 }
                 pugi::xpath_node beatType = time.node().select_single_node("beat-type");
                 if (beatType && HasContent(beatType.node())) {
-                    staffDef->SetMeterUnit(
-                        staffDef->AttMeterSigDefaultLog::StrToInt(beatType.node().text().as_string()));
+                    m_meterUnit = beatType.node().text().as_int();
+                    staffDef->SetMeterUnit(m_meterUnit);
                 }
             }
             // transpose

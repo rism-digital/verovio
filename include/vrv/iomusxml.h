@@ -258,8 +258,9 @@ private:
     int m_ppq;
     /* meaure time */
     int m_durTotal = 0;
-    /* meter count */
+    /* meter signature */
     int m_meterCount = 0;
+    int m_meterUnit = 0;
     /* LastElementID **/
     std::string m_ID;
     /* The stack for piling open LayerElements (beams, tuplets, chords, etc.)  */
