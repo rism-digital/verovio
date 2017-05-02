@@ -382,7 +382,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
     if (stemDir == STEMDIRECTION_up) stem->SetDrawingYRel(yMin - this->GetDrawingY());
     // And to the top note when down
     else
-        stem->SetDrawingYRel(0);
+        stem->SetDrawingYRel(yMax - this->GetDrawingY());
 
     return FUNCTOR_CONTINUE;
 }

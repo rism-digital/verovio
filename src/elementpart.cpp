@@ -175,6 +175,15 @@ int Dots::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 };
 
+int Dots::ResetHorizontalAlignment(FunctorParams *functorParams)
+{
+    LayerElement::ResetHorizontalAlignment(functorParams);
+
+    m_dotLocsByStaff.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Flag::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too

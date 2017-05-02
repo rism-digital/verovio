@@ -40,7 +40,6 @@ class StaffDef;
 class Syl;
 class System;
 class SystemAligner;
-class View;
 
 //----------------------------------------------------------------------------
 // FunctorParams
@@ -109,12 +108,6 @@ public:
     Functor *m_functor;
     Doc *m_doc;
 };
-
-//----------------------------------------------------------------------------
-// AdjustArticParams
-//----------------------------------------------------------------------------
-
-// Use FunctorDocParams
 
 //----------------------------------------------------------------------------
 // AdjustArticWithSlursParams
@@ -188,6 +181,42 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustLayersParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the list of staffN in the top-level scoreDef
+ * member 1: the current layerN set in the AlignmentRef (negative values for cross-staff)
+ * member 2: the elements for the previous layer(s)
+ * member 3: the elements of the current layer
+ * member 4: the current note
+ * member 5: the current chord (if any)
+ * member 6: the doc
+ * member 7: a pointer to the functor for passing it to the system aligner
+**/
+
+class AdjustLayersParams : public FunctorParams {
+public:
+    AdjustLayersParams(Doc *doc, Functor *functor, const std::vector<int> &staffNs)
+    {
+        m_currentLayerN = VRV_UNSET;
+        m_currentNote = NULL;
+        m_currentChord = NULL;
+        m_doc = doc;
+        m_functor = functor;
+        m_staffNs = staffNs;
+    }
+    std::vector<int> m_staffNs;
+    int m_currentLayerN;
+    std::vector<LayerElement *> m_previous;
+    std::vector<LayerElement *> m_current;
+    Note *m_currentNote;
+    Chord *m_currentChord;
+    Doc *m_doc;
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
 // AdjustFloatingPostionerGrpsParams
 //----------------------------------------------------------------------------
 
@@ -201,6 +230,26 @@ public:
     AdjustFloatingPostionerGrpsParams(Doc *doc) { m_doc = doc; }
     std::vector<ClassId> m_classIds;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustStaffOverlapParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the previous staff alignment
+ * member 1: a pointer to the functor for passing it to the system aligner
+**/
+
+class AdjustStaffOverlapParams : public FunctorParams {
+public:
+    AdjustStaffOverlapParams(Functor *functor)
+    {
+        m_previous = NULL;
+        m_functor = functor;
+    }
+    StaffAlignment *m_previous;
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------
@@ -244,7 +293,7 @@ public:
 
 class AdjustXPosParams : public FunctorParams {
 public:
-    AdjustXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
+    AdjustXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
     {
         m_minPos = 0;
         m_upcomingMinPos = VRV_UNSET;
@@ -309,6 +358,7 @@ public:
  * member 4: the functor for passing it to the TimeStampAligner
  * member 5: a flag indicating whereas we are processing the caution scoreDef
  * member 6: a flag indicating is we are in the first measure (for the scoreDef role)
+ * member 7: a flag indicating if we had mutliple layer alignment reference in the measure
 **/
 
 class AlignHorizontallyParams : public FunctorParams {
@@ -322,6 +372,7 @@ public:
         m_functor = functor;
         m_scoreDefRole = NONE;
         m_isFirstMeasure = false;
+        m_hasMultipleLayer = false;
     }
     MeasureAligner *m_measureAligner;
     double m_time;
@@ -330,6 +381,7 @@ public:
     Functor *m_functor;
     ElementScoreDefRole m_scoreDefRole;
     bool m_isFirstMeasure;
+    bool m_hasMultipleLayer;
 };
 
 //----------------------------------------------------------------------------
@@ -406,6 +458,12 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// CalcArticParams
+//----------------------------------------------------------------------------
+
+// Use FunctorDocParams
+
+//----------------------------------------------------------------------------
 // CalcChordNoteHeads
 //----------------------------------------------------------------------------
 
@@ -462,26 +520,6 @@ public:
 //----------------------------------------------------------------------------
 
 // Use FunctorDocParams
-
-//----------------------------------------------------------------------------
-// CalcStaffOverlapParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the previous staff alignment
- * member 1: a pointer to the functor for passing it to the system aligner
-**/
-
-class CalcStaffOverlapParams : public FunctorParams {
-public:
-    CalcStaffOverlapParams(Functor *functor)
-    {
-        m_previous = NULL;
-        m_functor = functor;
-    }
-    StaffAlignment *m_previous;
-    Functor *m_functor;
-};
 
 //----------------------------------------------------------------------------
 // CalcStemParams
@@ -1072,18 +1110,12 @@ public:
 
 /**
  * member 0: a pointer doc
- * member 1: a pointer to the view
  **/
 
 class SetAlignmentPitchPosParams : public FunctorParams {
 public:
-    SetAlignmentPitchPosParams(Doc *doc, View *view)
-    {
-        m_doc = doc;
-        m_view = view;
-    }
+    SetAlignmentPitchPosParams(Doc *doc) { m_doc = doc; }
     Doc *m_doc;
-    View *m_view;
 };
 
 //----------------------------------------------------------------------------
@@ -1146,11 +1178,12 @@ public:
  * member 3: the previous measure (for setting cautionary scoreDef)
  * member 4: the current system (for setting the system scoreDef)
  * member 5: the flag indicating whereas full labels have to be drawn
+ * member 6: the doc
 **/
 
 class SetCurrentScoreDefParams : public FunctorParams {
 public:
-    SetCurrentScoreDefParams(ScoreDef *upcomingScoreDef)
+    SetCurrentScoreDefParams(Doc *doc, ScoreDef *upcomingScoreDef)
     {
         m_currentScoreDef = NULL;
         m_currentStaffDef = NULL;
@@ -1158,6 +1191,7 @@ public:
         m_previousMeasure = NULL;
         m_currentSystem = NULL;
         m_drawLabels = false;
+        m_doc = doc;
     }
     ScoreDef *m_currentScoreDef;
     StaffDef *m_currentStaffDef;
@@ -1165,6 +1199,7 @@ public:
     Measure *m_previousMeasure;
     System *m_currentSystem;
     bool m_drawLabels;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------

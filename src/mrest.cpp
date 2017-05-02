@@ -36,4 +36,25 @@ void MRest::Reset()
     ResetRelativesize();
 }
 
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int MRest::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+    PositionInterface::InterfaceResetDrawing(functorParams, this);
+
+    return FUNCTOR_CONTINUE;
+};
+
+int MRest::ResetHorizontalAlignment(FunctorParams *functorParams)
+{
+    LayerElement::ResetHorizontalAlignment(functorParams);
+    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

@@ -41,12 +41,57 @@ public:
     virtual ClassId GetClassId() const { return REST; }
     ///@}
 
-    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+    /**
+     * Add an element to a rest.
+     * Only Dots elements will be actually added to the rest.
+     */
+    virtual void AddChild(Object *object);
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    ///@}
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
+
+    /**
+     * Get the SMuFL glyph or a rest considering its actual duration.
+     * This is valid only for CMN and for duration shorter than half notes.
+     */
+    wchar_t GetRestGlyph() const;
+
+    /**
+     * Get the default loc for a doc when neither oloc or loc are provided.
+     */
+    int GetDefaultLoc(bool hasMultipleLayer, bool isFirstLayer);
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::CalcDots
+     */
+    virtual int CalcDots(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareLayerElementParts
+     */
+    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
 private:
     //

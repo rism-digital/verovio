@@ -99,12 +99,16 @@ void System::AddChild(Object *child)
 
 int System::GetDrawingX() const
 {
+    if (m_xAbs != VRV_UNSET) return m_xAbs;
+
     m_cachedDrawingX = 0;
     return m_drawingXRel;
 }
 
 int System::GetDrawingY() const
 {
+    if (m_yAbs != VRV_UNSET) return m_yAbs;
+
     m_cachedDrawingY = 0;
     return m_drawingYRel;
 }
@@ -313,9 +317,9 @@ int System::JustifyX(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::CalcStaffOverlap(FunctorParams *functorParams)
+int System::AdjustStaffOverlap(FunctorParams *functorParams)
 {
-    CalcStaffOverlapParams *params = dynamic_cast<CalcStaffOverlapParams *>(functorParams);
+    AdjustStaffOverlapParams *params = dynamic_cast<AdjustStaffOverlapParams *>(functorParams);
     assert(params);
 
     params->m_previous = NULL;

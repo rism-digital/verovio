@@ -65,12 +65,17 @@ public:
     virtual ClassId GetClassId() const { return NOTE; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
     virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
     virtual StemmedDrawingInterface *GetStemmedDrawingInterface()
     {
         return dynamic_cast<StemmedDrawingInterface *>(this);
     }
+    ///@}
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
@@ -91,8 +96,14 @@ public:
     Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; }
     ///@}
 
+    /**
+     * @name Setter and getter for the drawing staff loc.
+     * This is set by the SetAlignmentPitchPos functor.
+     */
+    ///@{
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
     int GetDrawingLoc() const { return m_drawingLoc; }
+    ///@}
 
     /**
      * Overriding functions to return information from chord parent if any
@@ -102,6 +113,12 @@ public:
     int GetDrawingDur() const;
     bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}
+
+    /**
+     * Return true if the note is a unisson.
+     * If ignoreAccid is set to true then only @pname and @oct are compared.
+     */
+    bool IsUnissonWith(Note *note, bool ignoreAccid = false);
 
     /**
      * @name Setter and getter for the chord cluster and the position of the note

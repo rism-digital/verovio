@@ -318,7 +318,7 @@ public:
      * Return true if the object has the child Object as child (reference of direct).
      * Processes in depth-first.
      */
-    bool HasChild(Object *child) const;
+    bool HasChild(Object *child, int deepness = UNLIMITED_DEPTH) const;
 
     /**
      * Look for a child with the specified uuid (returns NULL if not found)
@@ -504,7 +504,12 @@ public:
     /**
      * Adjust the position the outside articulations.
      */
-    virtual int AdjustArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position the outside articulations.
+     */
+    virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position the outside articulations with slur.
@@ -588,6 +593,9 @@ public:
      */
     virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
 
+    /**
+     * Adjust the x position of accidental.
+     */
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
@@ -632,7 +640,7 @@ public:
     /**
      * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
      */
-    virtual int CalcStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Set the note head flipped positions and calc the ledger lines

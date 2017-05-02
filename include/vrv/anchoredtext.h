@@ -36,7 +36,12 @@ public:
     virtual ClassId GetClassId() const { return ANCHORED_TEXT; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
+    ///@}
 
     /**
      * Add an element (text, rend. etc.) to a tempo.

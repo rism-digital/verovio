@@ -60,9 +60,8 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     m_leftBarLine.SetLeft();
 
     Reset();
-    
-    if (!measureMusic)
-        this->SetRight(BARRENDITION_invis);
+
+    if (!measureMusic) this->SetRight(BARRENDITION_invis);
 }
 
 Measure::~Measure()
@@ -86,6 +85,7 @@ void Measure::Reset()
 
     m_timestampAligner.Reset();
     m_xAbs = VRV_UNSET;
+    m_xAbs2 = VRV_UNSET;
     m_drawingXRel = 0;
 
     // by default, we have a single barLine on the right (none on the left)
@@ -94,9 +94,11 @@ void Measure::Reset()
 
     if (!m_measuredMusic) {
         m_xAbs = VRV_UNSET;
+        m_xAbs2 = VRV_UNSET;
     }
 
     m_drawingEnding = NULL;
+    m_hasAlignmentRefWithMultipleLayers = false;
 }
 
 void Measure::AddChild(Object *child)
@@ -128,6 +130,8 @@ void Measure::AddChild(Object *child)
 
 int Measure::GetDrawingX() const
 {
+    if (m_xAbs != VRV_UNSET) return m_xAbs;
+
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
 
     System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
@@ -196,6 +200,8 @@ int Measure::GetRightBarLineRight() const
 
 int Measure::GetWidth() const
 {
+    if (this->m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
+
     assert(m_measureAligner.GetRightAlignment());
     return m_measureAligner.GetRightAlignment()->GetXRel();
 }
@@ -360,6 +366,8 @@ int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
     Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
     m_timestampAligner.Process(&resetHorizontalAlignment, NULL);
 
+    m_hasAlignmentRefWithMultipleLayers = false;
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -373,11 +381,10 @@ int Measure::AlignHorizontally(FunctorParams *functorParams)
 
     // point to it
     params->m_measureAligner = &m_measureAligner;
+    params->m_hasMultipleLayer = false;
 
-    m_leftBarLine.SetAlignment(m_measureAligner.GetLeftBarLineAlignment());
-    m_measureAligner.GetLeftBarLineAlignment()->AddLayerElementRef(&m_leftBarLine);
-    m_rightBarLine.SetAlignment(m_measureAligner.GetRightBarLineAlignment());
-    m_measureAligner.GetRightBarLineAlignment()->AddLayerElementRef(&m_rightBarLine);
+    if (m_leftBarLine.SetAlignment(m_measureAligner.GetLeftBarLineAlignment())) params->m_hasMultipleLayer = true;
+    if (m_rightBarLine.SetAlignment(m_measureAligner.GetRightBarLineAlignment())) params->m_hasMultipleLayer = true;
 
     assert(params->m_measureAligner);
 
@@ -398,6 +405,8 @@ int Measure::AlignHorizontallyEnd(FunctorParams *functorParams)
     // Next scoreDef will be INTERMEDIATE_SCOREDEF (See Layer::AlignHorizontally)
     params->m_isFirstMeasure = false;
 
+    if (params->m_hasMultipleLayer) m_hasAlignmentRefWithMultipleLayers = true;
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -410,6 +419,31 @@ int Measure::AlignVertically(FunctorParams *functorParams)
     params->m_staffIdx = 0;
 
     return FUNCTOR_CONTINUE;
+}
+
+int Measure::AdjustLayers(FunctorParams *functorParams)
+{
+    AdjustLayersParams *params = dynamic_cast<AdjustLayersParams *>(functorParams);
+    assert(params);
+
+    if (!m_hasAlignmentRefWithMultipleLayers) return FUNCTOR_SIBLINGS;
+
+    std::vector<int>::iterator iter;
+    std::vector<AttComparison *> filters;
+    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
+        filters.clear();
+        // Create ad comparison object for each type / @n
+        std::vector<int> ns;
+        // -1 for barline attributes that need to be taken into account each time
+        ns.push_back(-1);
+        ns.push_back(*iter);
+        AttCommonNComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
+        filters.push_back(&matchStaff);
+
+        m_measureAligner.Process(params->m_functor, params, NULL, &filters);
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 int Measure::AdjustAccidX(FunctorParams *functorParams)

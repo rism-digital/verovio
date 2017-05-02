@@ -49,8 +49,13 @@ public:
     /** Override the method since it is align to the staff */
     virtual bool IsRelativeToStaff() const { return true; }
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    ///@}
 
     /**
      * Add an element (text, rend. etc.) to a syl.
