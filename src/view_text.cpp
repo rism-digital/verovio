@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <sstream>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -41,6 +42,27 @@ void View::DrawF(DeviceContext *dc, F *figure, int x, int y)
     DrawTextChildren(dc, figure, x, y, setX, setY);
     dc->EndText();
 
+}
+
+void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
+{
+    assert(dc);
+    
+    std::wistringstream iss(s);
+    std::wstring token;
+    while (std::getline(iss, token, L'♮')) {
+        dc->DrawText(UTF16to8(token), token);
+        // no _
+        if (iss.eof()) break;
+        
+        FontInfo vrvTxt;
+        vrvTxt.SetFaceName("VerovioText");
+        dc->SetFont(&vrvTxt);
+        std::wstring str;
+        str.push_back(VRV_TEXT_E551);
+        dc->DrawText(UTF16to8(str), str);
+        dc->ResetFont();
+    }
 }
     
 void View::DrawTextElement(DeviceContext *dc, TextElement *element, int x, int y, bool &setX, bool &setY)
@@ -91,6 +113,9 @@ void View::DrawText(DeviceContext *dc, Text *text, int x, int y, bool &setX, boo
     // '_' are produce with the SibMEI plugin
     if (text->GetFirstParent(SYL)) {
         DrawLyricString(dc, x, y, text->GetText());
+    }
+    else if (text->GetFirstParent(HARM)) {
+        DrawHarmString(dc, x, y, text->GetText());
     }
     else {
         dc->DrawText(UTF16to8(text->GetText()), text->GetText());
