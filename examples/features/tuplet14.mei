@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+ <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Tuplets on rests (2)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-02</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Numbers and brackets of tuplets containing only rests, when the other tuplet notes carry beams, are displayed appropriately.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+ </meiHead>
+ <music>
+  <body>
+   <mdiv>
+    <score>
+     <scoreDef xml:id="scoredef-000000176844426">
+      <staffGrp xml:id="m-000000184953556">
+       <staffDef xml:id="staffdef-000000031840020" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5" />
+      </staffGrp>
+     </scoreDef>
+     <section xml:id="section-000000089094457">
+      <measure xml:id="measure-L5" n="1">
+       <staff xml:id="staff-L5F1" n="1">
+        <layer xml:id="layer-L5F1" n="1">
+         <beam xml:id="beam-000000091151767">
+          <tuplet xml:id="tuplet-000000187676009" num="3" numbase="2" bracket.visible="false" num.format="count">
+           <note xml:id="note-L6F1" dur="8" oct="4" pname="c" accid.ges="n" />
+           <note xml:id="note-L7F1" dur="8" oct="4" pname="d" accid.ges="n" />
+           <note xml:id="note-L8F1" dur="8" oct="4" pname="e" accid.ges="n" />
+          </tuplet>
+         </beam>
+         <beam xml:id="beam-000000034448905">
+          <tuplet xml:id="tuplet-000000021163507" num="3" numbase="2" bracket.visible="false" num.format="count">
+           <rest xml:id="rest-L9F1" dur="8" />
+           <rest xml:id="rest-L10F1" dur="8" />
+           <rest xml:id="rest-L11F1" dur="8" />
+          </tuplet>
+         </beam>
+         <beam xml:id="beam-000000032443929">
+          <tuplet xml:id="tuplet-000000039026813" num="3" numbase="2" bracket.visible="false" num.format="count">
+           <note xml:id="note-L12F1" dur="8" oct="4" pname="c" accid.ges="n" />
+           <rest xml:id="rest-L13F1" dur="8" />
+           <note xml:id="note-L14F1" dur="8" oct="4" pname="d" accid.ges="n" />
+          </tuplet>
+         </beam>
+         <beam xml:id="beam-000000094031661">
+          <tuplet xml:id="tuplet-000000056912280" num="3" numbase="2" bracket.visible="false" num.format="count">
+           <rest xml:id="rest-L15F1" dur="8" />
+           <note xml:id="note-L16F1" dur="8" oct="4" pname="e" accid.ges="n" />
+           <rest xml:id="rest-L17F1" dur="8" />
+          </tuplet>
+         </beam>
+        </layer>
+       </staff>
+      </measure>
+      <measure xml:id="measure-L18" right="end">
+       <staff xml:id="staff-L18F1" n="1">
+        <layer xml:id="layer-L18F1" n="1">
+         <beam xml:id="beam-000000146212304">
+          <tuplet xml:id="tuplet-000000024657746" num="3" numbase="2" bracket.visible="false" num.format="count">
+           <rest xml:id="rest-L19F1" dur="8" />
+           <note xml:id="note-L20F1" dur="8" oct="4" pname="d" accid.ges="n" />
+           <note xml:id="note-L21F1" dur="8" oct="4" pname="e" accid.ges="n" />
+          </tuplet>
+         </beam>
+         <beam xml:id="beam-000000066625643">
+          <tuplet xml:id="tuplet-000000079223481" num="3" numbase="2" bracket.visible="false" num.format="count">
+           <note xml:id="note-L22F1" dur="8" oct="4" pname="c" accid.ges="n" />
+           <note xml:id="note-L23F1" dur="8" oct="4" pname="d" accid.ges="n" />
+           <rest xml:id="rest-L24F1" dur="8" />
+          </tuplet>
+         </beam>
+         <beam xml:id="beam-000000088927177">
+          <tuplet xml:id="tuplet-000000165203975" num="3" numbase="2" bracket.visible="false" num.format="count">
+           <rest xml:id="rest-L25F1" dur="8" />
+           <rest xml:id="rest-L26F1" dur="8" />
+           <note xml:id="note-L27F1" dur="8" oct="4" pname="e" accid.ges="n" />
+          </tuplet>
+         </beam>
+         <beam xml:id="beam-000000087645973">
+          <tuplet xml:id="tuplet-000000106836414" num="3" numbase="2" bracket.visible="false" num.format="count">
+           <note xml:id="note-L28F1" dur="8" oct="4" pname="c" accid.ges="n" />
+           <rest xml:id="rest-L29F1" dur="8" />
+           <rest xml:id="rest-L30F1" dur="8" />
+          </tuplet>
+         </beam>
+        </layer>
+       </staff>
+      </measure>
+     </section>
+    </score>
+   </mdiv>
+  </body>
+ </music>
+</mei>

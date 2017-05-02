@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Portato rendering</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-02</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>In the portato articulation, i.e., the combination of a slur and a staccato dot, the slur is always placed further away from the note than the staccato.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000112780939">
+                        <staffGrp xml:id="m-000000032367625">
+                            <staffDef xml:id="staffdef-000000161844267" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000208077463">
+                        <measure xml:id="measure-L3" n="1">
+                            <staff xml:id="staff-L3F1" n="1">
+                                <layer xml:id="layer-L3F1" n="1">
+                                    <note xml:id="note-L5F1" dur="1" oct="5" pname="c" accid.ges="n" />
+                                </layer>
+                                <layer xml:id="layer-L5F2" n="2">
+                                    <note xml:id="note-L5F2" dur="4" oct="4" pname="c" accid.ges="n">
+                                        <artic xml:id="artic-000000198081862" artic="stacc" />
+                                    </note>
+                                    <note xml:id="note-L6F2" dur="4" oct="4" pname="c" accid.ges="n">
+                                        <artic xml:id="artic-000000133469279" artic="stacc" />
+                                    </note>
+                                    <note xml:id="note-L7F2" dur="4" oct="4" pname="d" accid.ges="n">
+                                        <artic xml:id="artic-000000084992878" artic="stacc" />
+                                    </note>
+                                    <note xml:id="note-L8F2" dur="4" oct="4" pname="d" accid.ges="n">
+                                        <artic xml:id="artic-000000001501884" artic="stacc" />
+                                    </note>
+                                </layer>
+                            </staff>
+                            <slur xml:id="slur-000000025838557" staff="1" startid="#note-L5F2" endid="#note-L6F2" />
+                            <slur xml:id="slur-000000118448082" staff="1" startid="#note-L7F2" endid="#note-L8F2" />
+                        </measure>
+                        <measure xml:id="measure-L10" n="2" right="end">
+                            <staff xml:id="staff-L10F1" n="1">
+                                <layer xml:id="layer-L10F1" n="1">
+                                    <note xml:id="note-L11F1" dur="4" oct="4" pname="a" accid.ges="n">
+                                        <artic xml:id="artic-000000171461397" artic="stacc" />
+                                    </note>
+                                    <note xml:id="note-L12F1" dur="4" oct="4" pname="a" accid.ges="n">
+                                        <artic xml:id="artic-000000024156372" artic="stacc" />
+                                    </note>
+                                    <note xml:id="note-L13F1" dur="4" oct="4" pname="b" accid.ges="n">
+                                        <artic xml:id="artic-000000117655412" artic="stacc" />
+                                    </note>
+                                    <note xml:id="note-L14F1" dur="4" oct="4" pname="b" accid.ges="n">
+                                        <artic xml:id="artic-000000160300793" artic="stacc" />
+                                    </note>
+                                </layer>
+                            </staff>
+                            <slur xml:id="slur-000000113304089" staff="1" startid="#note-L11F1" endid="#note-L12F1" />
+                            <slur xml:id="slur-000000091303315" staff="1" startid="#note-L13F1" endid="#note-L14F1" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

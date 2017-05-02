@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+ <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Tuplets on rests (1)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-02</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Tuplet numbers and brackets are diplayed correctly also when a tuplet only contains rests.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+ </meiHead>
+ <music>
+  <body>
+   <mdiv>
+    <score>
+     <scoreDef xml:id="scoredef-000000079380399">
+      <staffGrp xml:id="m-000000086260025">
+       <staffDef xml:id="staffdef-000000006036808" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5" />
+      </staffGrp>
+     </scoreDef>
+     <section xml:id="section-000000154942876">
+      <measure xml:id="measure-L4" n="1">
+       <staff xml:id="staff-L4F1" n="1">
+        <layer xml:id="layer-L4F1" n="1">
+         <tuplet xml:id="tuplet-000000133514302" num="3" numbase="2" bracket.visible="true" num.format="count">
+          <note xml:id="note-L5F1" dur="8" oct="4" pname="c" accid.ges="n" />
+          <note xml:id="note-L6F1" dur="8" oct="4" pname="d" accid.ges="n" />
+          <note xml:id="note-L7F1" dur="8" oct="4" pname="e" accid.ges="n" />
+         </tuplet>
+         <tuplet xml:id="tuplet-000000038004609" num="3" numbase="2" bracket.visible="true" num.format="count">
+          <rest xml:id="rest-L8F1" dur="8" />
+          <rest xml:id="rest-L9F1" dur="8" />
+          <rest xml:id="rest-L10F1" dur="8" />
+         </tuplet>
+         <tuplet xml:id="tuplet-000000130726293" num="3" numbase="2" bracket.visible="true" num.format="count">
+          <note xml:id="note-L11F1" dur="8" oct="4" pname="c" accid.ges="n" />
+          <rest xml:id="rest-L12F1" dur="8" />
+          <note xml:id="note-L13F1" dur="8" oct="4" pname="d" accid.ges="n" />
+         </tuplet>
+         <tuplet xml:id="tuplet-000000145832446" num="3" numbase="2" bracket.visible="true" num.format="count">
+          <rest xml:id="rest-L14F1" dur="8" />
+          <note xml:id="note-L15F1" dur="8" oct="4" pname="e" accid.ges="n" />
+          <rest xml:id="rest-L16F1" dur="8" />
+         </tuplet>
+        </layer>
+       </staff>
+      </measure>
+      <measure xml:id="measure-L17" right="end">
+       <staff xml:id="staff-L17F1" n="1">
+        <layer xml:id="layer-L17F1" n="1">
+         <tuplet xml:id="tuplet-000000178516366" num="3" numbase="2" bracket.visible="true" num.format="count">
+          <rest xml:id="rest-L18F1" dur="8" />
+          <note xml:id="note-L19F1" dur="8" oct="4" pname="d" accid.ges="n" />
+          <note xml:id="note-L20F1" dur="8" oct="4" pname="e" accid.ges="n" />
+         </tuplet>
+         <tuplet xml:id="tuplet-000000035207472" num="3" numbase="2" bracket.visible="true" num.format="count">
+          <note xml:id="note-L21F1" dur="8" oct="4" pname="c" accid.ges="n" />
+          <note xml:id="note-L22F1" dur="8" oct="4" pname="d" accid.ges="n" />
+          <rest xml:id="rest-L23F1" dur="8" />
+         </tuplet>
+         <tuplet xml:id="tuplet-000000130891704" num="3" numbase="2" bracket.visible="true" num.format="count">
+          <rest xml:id="rest-L24F1" dur="8" />
+          <rest xml:id="rest-L25F1" dur="8" />
+          <note xml:id="note-L26F1" dur="8" oct="4" pname="e" accid.ges="n" />
+         </tuplet>
+         <tuplet xml:id="tuplet-000000177114044" num="3" numbase="2" bracket.visible="true" num.format="count">
+          <note xml:id="note-L27F1" dur="8" oct="4" pname="c" accid.ges="n" />
+          <rest xml:id="rest-L28F1" dur="8" />
+          <rest xml:id="rest-L29F1" dur="8" />
+         </tuplet>
+        </layer>
+       </staff>
+      </measure>
+     </section>
+    </score>
+   </mdiv>
+  </body>
+ </music>
+</mei>
