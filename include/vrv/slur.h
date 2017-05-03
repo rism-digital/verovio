@@ -31,8 +31,20 @@ public:
     virtual ClassId GetClassId() const { return SLUR; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    ///@}
+
+    /**
+     * Check if the slur needs to be taken into account as overflow above or below in case of cross-staff end points.
+     * This methods assumes staff@n to be greater for the staff below.
+     */
+    void GetCrossStaffOverflows(
+        StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow);
 
     //----------//
     // Functors //

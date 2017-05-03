@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "floatingobject.h"
 #include "functorparams.h"
+#include "slur.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -207,47 +208,6 @@ void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, Object
 // Functors methods
 //----------------------------------------------------------------------------
 
-int StaffAlignment::CalcStaffOverlap(FunctorParams *functorParams)
-{
-    CalcStaffOverlapParams *params = dynamic_cast<CalcStaffOverlapParams *>(functorParams);
-    assert(params);
-
-    // This is the bottom alignment (or something is wrong)
-    if (!this->m_staff) return FUNCTOR_STOP;
-
-    if (params->m_previous == NULL) {
-        params->m_previous = this;
-        return FUNCTOR_SIBLINGS;
-    }
-
-    ArrayOfBoundingBoxes::iterator iter;
-    // go through all the elements of the top staff that have an overflow below
-    for (iter = params->m_previous->m_overflowBelowBBoxes.begin();
-         iter != params->m_previous->m_overflowBelowBBoxes.end(); iter++) {
-        auto i = m_overflowAboveBBoxes.begin();
-        auto end = m_overflowAboveBBoxes.end();
-        while (i != end) {
-            // find all the elements from the bottom staff that have an overflow at the top with an horizontal overap
-            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
-            if (i != end) {
-                // calculate the vertical overlap and see if this is more than the expected space
-                int overflowBelow = params->m_previous->CalcOverflowBelow(*iter);
-                int overflowAbove = this->CalcOverflowAbove(*i);
-                int spacing = std::max(params->m_previous->m_overflowBelow, this->m_overflowAbove);
-                if (spacing < (overflowBelow + overflowAbove)) {
-                    // LogDebug("Overlap %d", (overflowBelow + overflowAbove) - spacing);
-                    this->SetOverlap((overflowBelow + overflowAbove) - spacing);
-                }
-                i++;
-            }
-        }
-    }
-
-    params->m_previous = this;
-
-    return FUNCTOR_SIBLINGS;
-}
-
 int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
 {
     AdjustFloatingPostionersParams *params = dynamic_cast<AdjustFloatingPostionersParams *>(functorParams);
@@ -275,20 +235,32 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
         assert((*iter)->GetObject());
         if (!(*iter)->GetObject()->Is(params->m_classId)) continue;
 
-        // Skip not updated bounding boxes
-        if (!(*iter)->HasUpdatedBB()) continue;
+        // Skip if no content bounding box is available
+        if (!(*iter)->HasContentBB())
+            continue;
 
         // for slurs and ties we do not need to adjust them, only add them to the overflow boxes if required
         if ((params->m_classId == SLUR) || (params->m_classId == TIE)) {
 
-            int overflowAbove = this->CalcOverflowAbove((*iter));
+            bool skipAbove = false;
+            bool skipBelow = false;
+            
+            if ((*iter)->GetObject()->Is(SLUR)) {
+                Slur *slur = dynamic_cast<Slur*>((*iter)->GetObject());
+                assert(slur);
+                slur->GetCrossStaffOverflows(this, (*iter)->m_cuvreDir, skipAbove, skipBelow);
+            }
+
+            int overflowAbove = 0;
+            if (!skipAbove) overflowAbove = this->CalcOverflowAbove((*iter));
             if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
                 // LogMessage("%sparams->m_doctop overflow: %d", current->GetUuid().c_str(), overflowAbove);
                 this->SetOverflowAbove(overflowAbove);
                 this->m_overflowAboveBBoxes.push_back((*iter));
             }
 
-            int overflowBelow = this->CalcOverflowBelow((*iter));
+            int overflowBelow = 0;
+            if (!skipBelow) overflowBelow = this->CalcOverflowBelow((*iter));
             if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
                 // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
                 this->SetOverflowBelow(overflowBelow);
@@ -383,6 +355,47 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
         assert(i != grpIdYRel.end());
         (*iter)->SetDrawingYRel((*i).second);
     }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
+{
+    AdjustStaffOverlapParams *params = dynamic_cast<AdjustStaffOverlapParams *>(functorParams);
+    assert(params);
+
+    // This is the bottom alignment (or something is wrong)
+    if (!this->m_staff) return FUNCTOR_STOP;
+
+    if (params->m_previous == NULL) {
+        params->m_previous = this;
+        return FUNCTOR_SIBLINGS;
+    }
+
+    ArrayOfBoundingBoxes::iterator iter;
+    // go through all the elements of the top staff that have an overflow below
+    for (iter = params->m_previous->m_overflowBelowBBoxes.begin();
+         iter != params->m_previous->m_overflowBelowBBoxes.end(); iter++) {
+        auto i = m_overflowAboveBBoxes.begin();
+        auto end = m_overflowAboveBBoxes.end();
+        while (i != end) {
+            // find all the elements from the bottom staff that have an overflow at the top with an horizontal overap
+            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
+            if (i != end) {
+                // calculate the vertical overlap and see if this is more than the expected space
+                int overflowBelow = params->m_previous->CalcOverflowBelow(*iter);
+                int overflowAbove = this->CalcOverflowAbove(*i);
+                int spacing = std::max(params->m_previous->m_overflowBelow, this->m_overflowAbove);
+                if (spacing < (overflowBelow + overflowAbove)) {
+                    // LogDebug("Overlap %d", (overflowBelow + overflowAbove) - spacing);
+                    this->SetOverlap((overflowBelow + overflowAbove) - spacing);
+                }
+                i++;
+            }
+        }
+    }
+
+    params->m_previous = this;
 
     return FUNCTOR_SIBLINGS;
 }

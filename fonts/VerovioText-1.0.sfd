@@ -4,23 +4,24 @@ FullName: VerovioText
 FamilyName: VerovioText
 Weight: Regular
 Copyright: 
-Version: 1.0
+UComments: "Version 1.0.2 - Adding accidentals"
+Version: 1.0.2
 ItalicAngle: 0
 UnderlinePosition: -102
 UnderlineWidth: 102
 Ascent: 1638
 Descent: 410
-sfntRevision: 0x00010000
+InvalidEm: 0
 LayerCount: 2
-Layer: 0 0 "Back"  1
-Layer: 1 0 "Fore"  0
+Layer: 0 0 "Back" 1
+Layer: 1 0 "Fore" 0
 XUID: [1021 638 1292611596 2672637]
 FSType: 8
 OS2Version: 3
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1413579002
-ModificationTime: 1451245203
+ModificationTime: 1493712391
 PfmFamily: 81
 TTFWeight: 400
 TTFWidth: 5
@@ -55,20 +56,20 @@ OS2CodePages: 00000001.00000000
 OS2UnicodeRanges: 00000000.10000000.00000000.00000000
 MarkAttachClasses: 1
 DEI: 91125
-LangName: 1033 "" "" "" "FontForge 2.0 : VerovioText : 17-10-2014" "" "Version 1.0" 
+LangName: 1033 "" "" "" "FontForge 2.0 : VerovioText : 17-10-2014" "" "Version 1.0"
 Encoding: UnicodeBmp
 UnicodeInterp: none
 NameList: Adobe Glyph List
 DisplaySize: -72
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 57800 10 4
+WinInfo: 57889 13 6
 BeginPrivate: 3
 BlueScale 8 0.039625
 BlueShift 2 27
 ExpansionFactor 4 0.06
 EndPrivate
-BeginChars: 65536 29
+BeginChars: 65536 32
 
 StartChar: .notdef
 Encoding: 0 -1 0
@@ -218,7 +219,7 @@ LayerCount: 2
 Fore
 SplineSet
 230 227.5 m 0
- 100 227.5 0 298.75 0 423.75 c 0
+ 100 227.5 0 298.75 0 423.75 c 4
  0 546.25 110 821.25 466.25 821.25 c 0
  537.5 821.25 596.25 801.25 637.5 765 c 1
  637.5 2413.75 l 1
@@ -294,7 +295,7 @@ SplineSet
  916.25 1912.5 768.75 1971.25 681.25 1988.75 c 1
  681.25 626.25 l 2
  681.25 431.25 427.5 242.5 222.5 242.5 c 0
- 97.5 242.5 0 315 0 435 c 0
+ 97.5 242.5 0 315 0 435 c 4
  0 632.5 202.5 818.75 456.25 818.75 c 0
  522.5 818.75 578.75 801.25 620 765 c 1
  620 2482.5 l 2
@@ -334,7 +335,7 @@ SplineSet
  906.25 1675 786.25 1715 678.75 1722.5 c 1
  678.75 626.25 l 2
  678.75 431.25 425 242.5 222.5 242.5 c 0
- 97.5 242.5 0 315 0 435 c 0
+ 97.5 242.5 0 315 0 435 c 4
  0 632.5 202.5 818.75 456.25 818.75 c 0
  520 818.75 578.75 801.25 620 765 c 1
  620 2495 l 1
@@ -987,6 +988,104 @@ Encoding: 57822 57822 28
 Width: 921
 Flags: HW
 LayerCount: 2
+EndChar
+
+StartChar: uniE260
+Encoding: 57952 57952 29
+Width: 611
+Flags: HWO
+LayerCount: 2
+Fore
+SplineSet
+112.5 837.5 m 1
+ 192.5 877.5 247.5 905 345 905 c 0
+ 410 905 432.5 897.5 480 872.5 c 0
+ 512.5 855 540 822.5 547.5 777.5 c 2
+ 557.5 715 l 1
+ 557.5 645 517.5 572.5 445 492.5 c 0
+ 387.5 430 347.5 382.5 282.5 322.5 c 2
+ 62.5 125 l 1
+ 62.5 1735 l 1
+ 112.5 1735 l 1
+ 112.5 837.5 l 1
+287.5 827.5 m 1
+ 207.5 827.5 167.5 802.5 112.5 755 c 1
+ 112.5 270 l 1
+ 190 347.5 247.5 417.5 290 480 c 0
+ 342.5 560 370 627.5 370 690 c 0
+ 370 712.5 372.5 730 372.5 740 c 0
+ 372.5 775 365 792.5 345 815 c 1
+ 325 822.5 l 1
+ 287.5 827.5 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniE261
+Encoding: 57953 57953 30
+Width: 507
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+62.5 92.5 m 1
+ 62.5 1440 l 1
+ 107.5 1440 l 1
+ 107.5 962.5 l 1
+ 455 1017.5 l 1
+ 455 572.5 455 130 455 -315 c 1
+ 412.5 -315 l 1
+ 412.5 150 l 1
+ 62.5 92.5 l 1
+107.5 312.5 m 1
+ 412.5 355 l 1
+ 412.5 795 l 1
+ 107.5 747.5 l 1
+ 107.5 312.5 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniE262
+Encoding: 57954 57954 31
+Width: 612
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+402.5 1027.5 m 1
+ 402.5 1450 l 1
+ 445 1450 l 1
+ 445 1040 l 1
+ 555 1075 l 1
+ 555 847.5 l 1
+ 445 812.5 l 1
+ 445 400 l 1
+ 555 430 l 1
+ 555 202.5 l 1
+ 445 170 l 1
+ 445 -217.5 l 1
+ 402.5 -217.5 l 1
+ 402.5 157.5 l 1
+ 212.5 102.5 l 1
+ 212.5 -285 l 1
+ 170 -285 l 1
+ 170 87.5 l 1
+ 62.5 55 l 1
+ 62.5 280 l 1
+ 170 315 l 1
+ 170 732.5 l 1
+ 62.5 697.5 l 1
+ 62.5 927.5 l 1
+ 170 960 l 1
+ 170 1382.5 l 1
+ 212.5 1382.5 l 1
+ 212.5 975 l 1
+ 402.5 1027.5 l 1
+212.5 745 m 1
+ 212.5 327.5 l 1
+ 402.5 382.5 l 1
+ 402.5 802.5 l 1
+ 212.5 745 l 1
+EndSplineSet
 EndChar
 EndChars
 EndSplineFont

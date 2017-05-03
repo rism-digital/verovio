@@ -47,9 +47,13 @@ public:
      */
     virtual void AddChild(Object *object);
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
-
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    ///@}
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }

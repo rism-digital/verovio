@@ -53,11 +53,16 @@ public:
     virtual ClassId GetClassId() const { return CHORD; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
     virtual StemmedDrawingInterface *GetStemmedDrawingInterface()
     {
         return dynamic_cast<StemmedDrawingInterface *>(this);
     }
+    ///@}
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
@@ -90,7 +95,8 @@ public:
     void GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow);
 
     /**
-     *
+     * Check if the part of a chord needs to be taken into account as overflow above or below in case of cross-staff
+     * chord.
      */
     void GetCrossStaffOverflows(LayerElement *element, StaffAlignment *alignment, bool &skipAbove, bool &skipBelow);
 

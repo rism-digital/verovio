@@ -18,6 +18,7 @@ namespace vrv {
 class Ending;
 class ControlElement;
 class ScoreDef;
+class System;
 class TimestampAttr;
 
 //----------------------------------------------------------------------------
@@ -166,6 +167,11 @@ public:
      * Return the first staff of each staffGrp according to the scoreDef
      */
     std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
+    
+    /**
+     * Custom method for upgrading page-based unmeasured transcription data
+     */
+    void UpgradePageBasedMEI(System *system);
 
     //----------//
     // Functors //

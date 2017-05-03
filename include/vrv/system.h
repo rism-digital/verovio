@@ -154,9 +154,9 @@ public:
     virtual int JustifyX(FunctorParams *functorParams);
 
     /**
-     * See Object::CalcStaffOverlap
+     * See Object::AdjustStaffOverlap
      */
-    virtual int CalcStaffOverlap(FunctorParams *functorParams);
+    virtual int AdjustStaffOverlap(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustFloatingPostioners

@@ -38,7 +38,12 @@ public:
     virtual ClassId GetClassId() const { return TURN; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    ///@}
 
     //----------//
     // Functors //

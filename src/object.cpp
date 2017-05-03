@@ -1088,8 +1088,6 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
         params->m_staffAlignment = currentStaff->GetAlignment();
 
-        // currentStaff->GetAlignment()->SetMaxHeight(currentStaff->m_contentBB_y1);
-
         return FUNCTOR_CONTINUE;
     }
 
@@ -1132,10 +1130,6 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     if (!this->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
-        // assert(false); // quite drastic but this should never happen. If nothing has to be drawn
-        // LogDebug("Un-updated bounding box for '%s' '%s'", current->GetClassName().c_str(),
-        // current->GetUuid().c_str());
-        // then the BB should be set to empty with  Object::SetEmptyBB()
         return FUNCTOR_CONTINUE;
     }
 
@@ -1173,9 +1167,6 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         alignment->AddBBoxBelow(current);
     }
 
-    // do not go further down the tree in this case since the bounding box of the first element is already taken
-    // into
-    // account?
     return FUNCTOR_CONTINUE;
 }
 
