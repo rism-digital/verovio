@@ -41,7 +41,7 @@ void Dot::Reset()
     PositionInterface::Reset();
     ResetColor();
     ResetDotLog();
-    
+
     m_drawingNote = NULL;
 }
 
@@ -63,9 +63,18 @@ int Dot::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
+    PositionInterface::InterfaceResetDrawing(functorParams, this);
 
     this->m_drawingNote = NULL;
     return FUNCTOR_CONTINUE;
 };
+
+int Dot::ResetHorizontalAlignment(FunctorParams *functorParams)
+{
+    LayerElement::ResetHorizontalAlignment(functorParams);
+    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
+
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

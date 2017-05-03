@@ -182,7 +182,7 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
         assert(end);
         int dist = std::get<2>(*iter);
         if ((start->GetXRel() >= end->GetXRel()) || (dist == 0)) {
-            LogDebug("Trying to ajdust alignment at the same position or with a distance of 0;");
+            LogDebug("Trying to adjust alignment at the same position or with a distance of 0;");
             continue;
         }
         // We need to store them because they are going to be changed in the loop below
@@ -478,7 +478,7 @@ void Alignment::SetXRel(int xRel)
     m_xRel = xRel;
 }
 
-void Alignment::AddLayerElementRef(LayerElement *element)
+bool Alignment::AddLayerElementRef(LayerElement *element)
 {
     assert(element->IsLayerElement());
 
@@ -515,8 +515,10 @@ void Alignment::AddLayerElementRef(LayerElement *element)
         }
     }
     AlignmentReference *alignmentRef = GetAlignmentReference(staffN);
-    alignmentRef->AddChild(element);
     element->SetAlignmentLayerN(layerN);
+    alignmentRef->AddChild(element);
+
+    return alignmentRef->HasMultipleLayer();
 }
 
 bool Alignment::IsOfType(const std::vector<AlignmentType> &types)
@@ -561,7 +563,7 @@ AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, in
             return reference;
         }
         else if (staffN == VRV_UNSET) {
-            if ((*iter)->HasChild(element)) return reference;
+            if ((*iter)->HasChild(element, 1)) return reference;
         }
     }
     return reference;
@@ -612,11 +614,21 @@ void AlignmentReference::Reset()
     ResetCommon();
 
     m_accidSpace.clear();
+    m_multipleLayer = false;
 }
 
 void AlignmentReference::AddChild(Object *child)
 {
-    assert(dynamic_cast<LayerElement *>(child));
+    LayerElement *childElement = dynamic_cast<LayerElement *>(child);
+    assert(childElement);
+
+    ArrayOfObjects::iterator childrenIter;
+    // Check if the we will have a reference with multiple layers
+    for (childrenIter = m_children.begin(); childrenIter != m_children.end(); childrenIter++) {
+        LayerElement *element = dynamic_cast<LayerElement *>(*childrenIter);
+        if (childElement->GetAlignmentLayerN() != element->GetAlignmentLayerN()) break;
+    }
+    if (!m_children.empty() && (childrenIter != m_children.end())) m_multipleLayer = true;
 
     // Specical case where we do not set the parent because the reference will not have ownership
     // Children will be treated as relinquished objects in the desctructor
@@ -629,6 +641,8 @@ void AlignmentReference::AddChild(Object *child)
 void AlignmentReference::AddToAccidSpace(Accid *accid)
 {
     assert(accid);
+
+    if (std::find(m_accidSpace.begin(), m_accidSpace.end(), accid) != m_accidSpace.end()) return;
 
     m_accidSpace.push_back(accid);
 }
@@ -934,6 +948,22 @@ int Alignment::JustifyX(FunctorParams *functorParams)
     if (m_type == ALIGNMENT_MEASURE_END) {
         params->m_measureXRel += this->m_xRel;
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int AlignmentReference::AdjustLayers(FunctorParams *functorParams)
+{
+    AdjustLayersParams *params = dynamic_cast<AdjustLayersParams *>(functorParams);
+    assert(params);
+
+    if (!m_multipleLayer) return FUNCTOR_SIBLINGS;
+
+    params->m_currentLayerN = VRV_UNSET;
+    params->m_currentNote = NULL;
+    params->m_currentChord = NULL;
+    params->m_current.clear();
+    params->m_previous.clear();
 
     return FUNCTOR_CONTINUE;
 }

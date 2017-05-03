@@ -211,6 +211,8 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 
 int LayerElement::GetDrawingX() const
 {
+    if (m_xAbs != VRV_UNSET) return m_xAbs;
+
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
 
     if (!m_alignment) {
@@ -322,6 +324,8 @@ void LayerElement::SetDrawingYRel(int drawingYRel)
 
 void LayerElement::CenterDrawingX()
 {
+    if (this->m_xAbs != VRV_UNSET) return;
+
     SetDrawingXRel(0);
 
     Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
@@ -490,10 +494,21 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     AlignmentType type = ALIGNMENT_DEFAULT;
 
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+    Note *noteParent = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_NOTE_DEPTH));
+    Rest *restParent = dynamic_cast<Rest *>(this->GetFirstParent(REST, MAX_NOTE_DEPTH));
+
     if (chordParent) {
         m_alignment = chordParent->GetAlignment();
     }
-
+    else if (noteParent) {
+        m_alignment = noteParent->GetAlignment();
+    }
+    else if (restParent) {
+        m_alignment = restParent->GetAlignment();
+    }
+    else if (this->Is({ DOTS, FLAG, STEM })) {
+        assert(false);
+    }
     // We do not align these (formely container). Any other?
     else if (this->Is({ BEAM, FTREM, TUPLET })) {
         return FUNCTOR_CONTINUE;
@@ -559,18 +574,8 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         type = ALIGNMENT_DOT;
     }
     else if (this->Is(ACCID)) {
-        // Refer to the note parent (if any?)
-        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
-        if (note)
-            m_alignment = note->GetAlignment();
-        else
-            type = ALIGNMENT_ACCID;
-    }
-    else if (this->Is({ DOTS, FLAG, STEM })) {
-        // Refer to the note parent (if any?)
-        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
-        assert(note);
-        m_alignment = note->GetAlignment();
+        // accid within note was already taken into account by noteParent
+        type = ALIGNMENT_ACCID;
     }
     else if (this->Is({ ARTIC, ARTIC_PART, SYL })) {
         // Refer to the note parent
@@ -607,7 +612,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
 
     if (m_alignment->GetType() != ALIGNMENT_GRACENOTE) {
-        m_alignment->AddLayerElementRef(this);
+        if (m_alignment->AddLayerElementRef(this)) params->m_hasMultipleLayer = true;
     }
     // For grace note aligner do not add them to the reference list because they will be processed by their original
     // hierarchy from the GraceAligner
@@ -663,11 +668,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         }
         else {
             // do something for accid that are not children of a note - e.g., mensural?
-            int loc
-                = PitchInterface::CalcLoc(accid->GetPloc(), accid->GetOloc(), layerY->GetClefLocOffset(layerElementY));
-            // Override it if we have a @loc ?
-            if (accid->HasLoc()) loc = accid->GetLoc();
-            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, accid->CalcDrawingLoc(layerY, layerElementY)));
         }
     }
     else if (this->Is(CHORD)) {
@@ -684,10 +685,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     else if (this->Is({ CUSTOS, DOT })) {
         PositionInterface *interface = dynamic_cast<PositionInterface *>(this);
         assert(interface);
-        int loc = PitchInterface::CalcLoc(
-            interface->GetPloc(), interface->GetOloc(), layerY->GetClefLocOffset(layerElementY));
-        if (interface->HasLoc()) loc = interface->GetLoc();
-        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, interface->CalcDrawingLoc(layerY, layerElementY)));
     }
     else if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
@@ -707,8 +705,15 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     else if (this->Is(REST)) {
         Rest *rest = dynamic_cast<Rest *>(this);
         assert(rest);
-        // Automatically calculate rest position, if so requested
-        if (rest->GetPloc() == PITCHNAME_NONE) {
+        int loc = 0;
+        if (rest->HasPloc() && rest->HasOloc()) {
+            loc = PitchInterface::CalcLoc(rest->GetPloc(), rest->GetOloc(), layerY->GetClefLocOffset(layerElementY));
+        }
+        else if (rest->HasLoc()) {
+            loc = rest->GetLoc();
+        }
+        // Automatically calculate rest position
+        else {
             // Limitation: GetLayerCount does not take into account editorial markup
             bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
             bool isFirstLayer = false;
@@ -717,24 +722,94 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 assert(firstLayer);
                 if (firstLayer->GetN() == layerY->GetN()) isFirstLayer = true;
             }
-            // We should change this and use the new PitchInterface::CalcLoc (or similar method)
-            // to calculate a loc if none if provided. The use Staff::CalcPitchPosYRel to calculate the y.
-            // See above for notes
-            int staffLoc = 4;
-            if (rest->HasLoc()) staffLoc = rest->GetLoc();
-            this->SetDrawingYRel(params->m_view->CalculateRestPosY(
-                staffY, rest->GetActualDur(), staffLoc, hasMultipleLayer, isFirstLayer));
+            loc = rest->GetDefaultLoc(hasMultipleLayer, isFirstLayer);
         }
-        else {
-            int loc
-                = PitchInterface::CalcLoc(rest->GetPloc(), rest->GetOloc(), layerY->GetClefLocOffset(layerElementY));
-            // Override it if we have a @loc ?
-            if (rest->HasLoc()) loc = rest->GetLoc();
-            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
-        }
+        rest->SetDrawingLoc(loc);
+        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::AdjustLayers(FunctorParams *functorParams)
+{
+    AdjustLayersParams *params = dynamic_cast<AdjustLayersParams *>(functorParams);
+    assert(params);
+
+    // Check if we are starting a new layer content - if yes copy the current elements to previous
+    if (!params->m_current.empty() && (this->GetAlignmentLayerN() != params->m_currentLayerN)) {
+        params->m_previous.reserve(params->m_previous.size() + params->m_current.size());
+        params->m_previous.insert(params->m_previous.end(), params->m_current.begin(), params->m_current.end());
+        params->m_current.clear();
+    }
+
+    params->m_currentLayerN = this->GetAlignmentLayerN();
+
+    // These are the only ones we want to keep for further collision detection
+    // Eventually  we also need stem for overlapping voices
+    if (this->Is({ DOTS, NOTE }) && this->HasUpdatedBB()) params->m_current.push_back(this);
+
+    // We are processing the first layer, nothing to do yet
+    if (params->m_previous.empty()) return FUNCTOR_SIBLINGS;
+
+    if (this->Is(NOTE)) {
+        params->m_currentNote = dynamic_cast<Note *>(this);
+        assert(params->m_currentNote);
+        if (!params->m_currentNote->IsChordTone()) params->m_currentChord = NULL;
+    }
+    else if (this->Is(CHORD)) {
+        params->m_currentChord = dynamic_cast<Chord *>(this);
+        assert(params->m_currentChord);
+    }
+
+    // Eventually we also want to have stem for overlapping voices
+    if (this->Is({ NOTE, DOTS })) {
+
+        Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+        assert(staff);
+
+        std::vector<LayerElement *>::iterator iter;
+        for (iter = params->m_previous.begin(); iter != params->m_previous.end(); iter++) {
+
+            int verticalMargin = 0; // 1 * params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            int horizontalMargin = 2 * params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+
+            if (this->Is(NOTE) && (*iter)->Is(NOTE)) {
+                assert(params->m_currentNote);
+                Note *previousNote = dynamic_cast<Note *>(*iter);
+                assert(previousNote);
+                // Unisson, look at the duration for the note heads
+                if (params->m_currentNote->IsUnissonWith(previousNote, false)) {
+                    if ((params->m_currentNote->GetDrawingDur() == DUR_2) && (previousNote->GetDrawingDur() == DUR_2))
+                        continue;
+                    else if ((params->m_currentNote->GetDrawingDur() > DUR_2)
+                        && (previousNote->GetDrawingDur() > DUR_2))
+                        continue;
+                    // Reduce the margin to 0 for whole notes unisson
+                    else if ((params->m_currentNote->GetDrawingDur() == DUR_1)
+                        && (previousNote->GetDrawingDur() == DUR_1))
+                        horizontalMargin = 0;
+                }
+                else if ((previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc()) > 1)
+                    continue;
+            }
+
+            // Nothing to do if we have no vertical overlapping
+            if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
+
+            int xRelShift = this->HorizontalLeftOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
+
+            // Move the appropriate parent to the left
+            if (xRelShift > 0) {
+                if (params->m_currentChord)
+                    params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + xRelShift);
+                else
+                    params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + xRelShift);
+            }
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
@@ -928,7 +1003,12 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     AttCommonNComparison comparisonFirstLayer(LAYER, layerN);
     m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByAttComparison(&comparisonFirstLayer, 1));
     if (!m_crossLayer) {
-        // We should actually just pick the first one
+        // Just try to pick the first one...
+        m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByType(LAYER));
+
+    }
+    if (!m_crossLayer) {
+        // Nothing we can do
         LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
             durElement->GetStaff().at(0), this->GetUuid().c_str());
         m_crossStaff = NULL;

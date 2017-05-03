@@ -21,6 +21,7 @@
 #include "layer.h"
 #include "note.h"
 #include "rest.h"
+#include "space.h"
 #include "smufl.h"
 #include "staff.h"
 #include "tuplet.h"
@@ -336,6 +337,9 @@ void Beam::AddChild(Object *child)
     else if (child->Is(REST)) {
         assert(dynamic_cast<Rest *>(child));
     }
+    else if (child->Is(SPACE)) {
+        assert(dynamic_cast<Space *>(child));
+    }
     else if (child->Is(TUPLET)) {
         assert(dynamic_cast<Tuplet *>(child));
     }
@@ -481,49 +485,46 @@ void Beam::InitCoords(ListOfObjects *childList)
             m_drawingParams.m_beamHasChord = true;
         }
 
-        // Can it happen? With rests?
-        if (currentDur > DUR_4) {
-            m_beamElementCoords.at(elementCount)->m_element = current;
-            current->m_beamElementCoord = m_beamElementCoords.at(elementCount);
-            m_beamElementCoords.at(elementCount)->m_dur = currentDur;
+        m_beamElementCoords.at(elementCount)->m_element = current;
+        current->m_beamElementCoord = m_beamElementCoords.at(elementCount);
+        m_beamElementCoords.at(elementCount)->m_dur = currentDur;
 
-            // Look at beam breaks
-            m_beamElementCoords.at(elementCount)->m_breaksec = 0;
-            AttBeamsecondary *beamsecondary = dynamic_cast<AttBeamsecondary *>(current);
-            if (beamsecondary && beamsecondary->HasBreaksec()) {
-                if (!m_drawingParams.m_changingDur) m_drawingParams.m_changingDur = true;
-                m_beamElementCoords.at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();
-            }
+        // Look at beam breaks
+        m_beamElementCoords.at(elementCount)->m_breaksec = 0;
+        AttBeamsecondary *beamsecondary = dynamic_cast<AttBeamsecondary *>(current);
+        if (beamsecondary && beamsecondary->HasBreaksec()) {
+            if (!m_drawingParams.m_changingDur) m_drawingParams.m_changingDur = true;
+            m_beamElementCoords.at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();
+        }
 
-            // Skip rests
-            if (current->Is({ NOTE, CHORD })) {
-                // look at the stemDir to see if we have multiple stem Dir
-                if (!m_drawingParams.m_hasMultipleStemDir) {
-                    StemmedDrawingInterface *interface = current->GetStemmedDrawingInterface();
-                    assert(interface);
-                    Stem *stem = interface->GetDrawingStem();
-                    currentStemDir = STEMDIRECTION_NONE;
-                    if (stem) {
-                        assert(dynamic_cast<AttStems *>(stem));
-                        currentStemDir = (dynamic_cast<AttStems *>(stem))->GetStemDir();
+        // Skip rests
+        if (current->Is({ NOTE, CHORD })) {
+            // look at the stemDir to see if we have multiple stem Dir
+            if (!m_drawingParams.m_hasMultipleStemDir) {
+                StemmedDrawingInterface *interface = current->GetStemmedDrawingInterface();
+                assert(interface);
+                Stem *stem = interface->GetDrawingStem();
+                currentStemDir = STEMDIRECTION_NONE;
+                if (stem) {
+                    assert(dynamic_cast<AttStems *>(stem));
+                    currentStemDir = (dynamic_cast<AttStems *>(stem))->GetStemDir();
+                }
+                if (currentStemDir != STEMDIRECTION_NONE) {
+                    if ((m_drawingParams.m_stemDir != STEMDIRECTION_NONE)
+                        && (m_drawingParams.m_stemDir != currentStemDir)) {
+                        m_drawingParams.m_hasMultipleStemDir = true;
                     }
-                    if (currentStemDir != STEMDIRECTION_NONE) {
-                        if ((m_drawingParams.m_stemDir != STEMDIRECTION_NONE)
-                            && (m_drawingParams.m_stemDir != currentStemDir)) {
-                            m_drawingParams.m_hasMultipleStemDir = true;
-                        }
-                        m_drawingParams.m_stemDir = currentStemDir;
-                    }
+                    m_drawingParams.m_stemDir = currentStemDir;
                 }
             }
-            // keep the shortest dur in the beam
-            m_drawingParams.m_shortestDur = std::max(currentDur, m_drawingParams.m_shortestDur);
-            // check if we have more than duration in the beam
-            if (!m_drawingParams.m_changingDur && currentDur != lastDur) m_drawingParams.m_changingDur = true;
-            lastDur = currentDur;
-
-            elementCount++;
         }
+        // keep the shortest dur in the beam
+        m_drawingParams.m_shortestDur = std::max(currentDur, m_drawingParams.m_shortestDur);
+        // check if we have more than duration in the beam
+        if (!m_drawingParams.m_changingDur && currentDur != lastDur) m_drawingParams.m_changingDur = true;
+        lastDur = currentDur;
+
+        elementCount++;
 
         iter++;
         if (iter == childList->end()) {

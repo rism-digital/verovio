@@ -41,6 +41,20 @@ public:
 
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
 
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+
 private:
     //
 public:

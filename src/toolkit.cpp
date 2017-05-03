@@ -772,6 +772,10 @@ void Toolkit::ResetLogBuffer()
 
 void Toolkit::RedoLayout()
 {
+    if (m_doc.GetType() == Transcription) {
+        return;
+    }
+
     m_doc.SetPageHeight(this->GetPageHeight());
     m_doc.SetPageWidth(this->GetPageWidth());
     m_doc.SetPageRightMar(this->GetBorder());
@@ -806,14 +810,10 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
 
     // Adjusting page width and height according to the options
     int width = m_pageWidth;
-    if (m_noLayout) {
-        width = m_doc.GetAdjustedDrawingPageWidth();
-    }
-
     int height = m_pageHeight;
-    if (m_adjustPageHeight || m_noLayout) {
-        height = m_doc.GetAdjustedDrawingPageHeight();
-    }
+
+    if (m_noLayout) width = m_doc.GetAdjustedDrawingPageWidth();
+    if (m_adjustPageHeight || m_noLayout) height = m_doc.GetAdjustedDrawingPageHeight();
 
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options

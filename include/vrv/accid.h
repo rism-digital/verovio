@@ -72,6 +72,11 @@ public:
     //----------//
 
     /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /**
      * See Object::ResetHorizontalAlignment
      */
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);

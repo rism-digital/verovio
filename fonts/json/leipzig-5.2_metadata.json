@@ -30,7 +30,7 @@
         "tupletBracketThickness": "0.16"
     },
     "fontName": "Leipzig-5.2",
-    "fontVersion": "5.2.25",
+    "fontVersion": "5.2.28",
     "glyphBBoxes": {
         "uniE003": {
             "bBoxNE": [
@@ -1264,22 +1264,22 @@
         },
         "uniE4E8": {
             "bBoxNE": [
-                1.608,
+                1.596,
                 1.652
             ],
             "bBoxSW": [
-                0.016,
+                0.004,
                 -1.94
             ]
         },
         "uniE4E9": {
             "bBoxNE": [
-                1.932,
-                2.608
+                1.92,
+                1.652
             ],
             "bBoxSW": [
-                0.02,
-                -1.916
+                0.008,
+                -2.872
             ]
         },
         "uniE4EA": {
@@ -1290,6 +1290,36 @@
             "bBoxSW": [
                 0.028,
                 -2.936
+            ]
+        },
+        "uniE4EB": {
+            "bBoxNE": [
+                2.564,
+                2.708
+            ],
+            "bBoxSW": [
+                -0.004,
+                -3.82
+            ]
+        },
+        "uniE4EC": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniE4ED": {
+            "bBoxNE": [
+                0.0,
+                0.0
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
             ]
         },
         "uniE500": {
@@ -2642,6 +2672,15 @@
         "uniE4EA": {
             "codepoint": "0XE4EA"
         },
+        "uniE4EB": {
+            "codepoint": "0XE4EB"
+        },
+        "uniE4EC": {
+            "codepoint": "0XE4EC"
+        },
+        "uniE4ED": {
+            "codepoint": "0XE4ED"
+        },
         "uniE500": {
             "codepoint": "0XE500"
         },
@@ -2935,6 +2974,36 @@
         }
     },
     "glyphsWithAnchors": {
+        "uniE0A2": {
+            "cutOutNW": [
+                0.06,
+                0.244
+            ],
+            "cutOutSE": [
+                1.568,
+                -0.232
+            ]
+        },
+        "uniE0A3": {
+            "cutOutNW": [
+                0.14,
+                0.24
+            ],
+            "cutOutSE": [
+                1.076,
+                -0.24
+            ]
+        },
+        "uniE0A4": {
+            "cutOutNW": [
+                0.144,
+                0.24
+            ],
+            "cutOutSE": [
+                1.088,
+                -0.244
+            ]
+        },
         "uniE260": {
             "cutOutNE": [
                 0.096,
@@ -2974,9 +3043,9 @@
             ]
         },
         "uniE264": {
-            "cutOutNW": [
+            "cutOutNE": [
                 0.856,
-                0.568
+                0.56
             ],
             "cutOutSE": [
                 1.232,
@@ -3069,7 +3138,7 @@
         },
         "uniE271": {
             "cutOutNE": [
-                0.532,
+                0.188,
                 0.58
             ],
             "cutOutSE": [
@@ -3089,7 +3158,7 @@
         },
         "uniE273": {
             "cutOutNE": [
-                0.076,
+                0.08,
                 0.772
             ],
             "cutOutSW": [

@@ -103,8 +103,9 @@ public:
     /**
      * Add the LayerElement to the appropriate AlignmentReference child.
      * Looks at the cross-staff situation (@staff or parent @staff).
+     * Return true if the AlignmentReference holds more than one layer
      */
-    void AddLayerElementRef(LayerElement *element);
+    bool AddLayerElementRef(LayerElement *element);
 
     /**
      * @name Set and get the type of the alignment
@@ -280,9 +281,19 @@ public:
      */
     void AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int staffSize);
 
+    /**
+     * Return true if the reference has elements from multiple layers.
+     */
+    bool HasMultipleLayer() const { return m_multipleLayer; }
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::AdjustLayers
+     */
+    virtual int AdjustLayers(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustGraceXPos
@@ -303,6 +314,11 @@ private:
      * The accid space of the AlignmentReference.
      */
     std::vector<Accid *> m_accidSpace;
+
+    /**
+     *
+     */
+    bool m_multipleLayer;
 };
 
 //----------------------------------------------------------------------------

@@ -211,9 +211,14 @@ public:
     virtual int SetAlignmentXPos(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustLayers
+     */
+    virtual int AdjustLayers(FunctorParams *functorParams);
+
+    /**
      * See Object::AjustAccidX
      */
-    virtual int AdjustAccidX(FunctorParams *);
+    virtual int AdjustAccidX(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustGraceXPos
@@ -306,9 +311,12 @@ public:
 public:
     /**
      * The X absolute position of the measure for facsimile (transcription) encodings.
-     * This is the top left position of the measure.
+     * This is the left and right position of the measure.
      */
+    ///@{
     int m_xAbs;
+    int m_xAbs2;
+    ///@}
 
     /**
      * The measure aligner that holds the x positions of the content of the measure
@@ -348,6 +356,11 @@ private:
      * in DrawMeasure
      */
     Ending *m_drawingEnding;
+
+    /**
+     * A flag indicating if the measure has AlignmentReference with multiple layers
+     */
+    bool m_hasAlignmentRefWithMultipleLayers;
 };
 
 } // namespace vrv

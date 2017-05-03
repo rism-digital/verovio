@@ -318,7 +318,7 @@ public:
      * Return true if the object has the child Object as child (reference of direct).
      * Processes in depth-first.
      */
-    bool HasChild(Object *child) const;
+    bool HasChild(Object *child, int deepness = UNLIMITED_DEPTH) const;
 
     /**
      * Look for a child with the specified uuid (returns NULL if not found)
@@ -504,6 +504,11 @@ public:
     /**
      * Adjust the position the outside articulations.
      */
+    virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position the outside articulations.
+     */
     virtual int AdjustArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
@@ -588,6 +593,9 @@ public:
      */
     virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
 
+    /**
+     * Adjust the x position of accidental.
+     */
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**

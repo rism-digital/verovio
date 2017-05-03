@@ -6711,7 +6711,7 @@ AttStaffloc::~AttStaffloc()
 
 void AttStaffloc::ResetStaffloc()
 {
-    m_loc = 0;
+    m_loc = VRV_UNSET;
 }
 
 bool AttStaffloc::ReadStaffloc(pugi::xml_node element)
@@ -6737,7 +6737,7 @@ bool AttStaffloc::WriteStaffloc(pugi::xml_node element)
 
 bool AttStaffloc::HasLoc() const
 {
-    return (m_loc != 0);
+    return (m_loc != VRV_UNSET);
 }
 
 /* include <attloc> */

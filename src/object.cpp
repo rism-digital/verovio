@@ -310,12 +310,17 @@ Object *Object::DetachChild(int idx)
     return child;
 }
 
-bool Object::HasChild(Object *child) const
+bool Object::HasChild(Object *child, int deepness) const
 {
     ArrayOfObjects::const_iterator iter;
 
     for (iter = m_children.begin(); iter != m_children.end(); iter++) {
-        if ((child == (*iter)) || (*iter)->HasChild(child)) return true;
+        if (child == (*iter))
+            return true;
+        else if (deepness == 0)
+            return false;
+        else if ((*iter)->HasChild(child, deepness - 1))
+            return true;
     }
 
     return false;
@@ -494,7 +499,7 @@ int Object::GetChildIndex(const Object *child)
 void Object::Modify(bool modified)
 {
     // if we have a parent and a new modification, propagate it
-    if (m_parent && !m_isModified && modified) {
+    if (m_parent && modified) {
         m_parent->Modify();
     }
     m_isModified = modified;
@@ -1021,7 +1026,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
                 layer->SetDrawingStemDir(STEMDIRECTION_down);
             }
         }
-        layer->SetDrawingStaffDefValues(params->m_currentStaffDef);
+        if (params->m_doc->GetType() != Transcription) layer->SetDrawingStaffDefValues(params->m_currentStaffDef);
         return FUNCTOR_CONTINUE;
     }
 
