@@ -9,7 +9,7 @@ mkdir -p target/classes/META-INF/lib
 
 swig -c++ -java -package org.rismch.verovio -outdir src/main/java/org/rismch/verovio verovio.i
 
-SRCFILES=`LS ../src/*.cpp`
+SRCFILES=`\ls ../src/*.cpp`
 
 FILES="$SRCFILES \
  ../src/pugi/pugixml.cpp \
