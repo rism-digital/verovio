@@ -45,6 +45,12 @@ show_all_tests: true
         
         set_options();
         
+        // Set the title
+        var xml = $.parseXML( data )
+        $(xml).find('annot').each(function(){
+          $(div + '-meiTitle').html("MEI Description: " + $(this).text());
+        });
+        
         console.time("loading");
         try {
             vrvToolkit.loadData(data);
@@ -112,9 +118,7 @@ show_all_tests: true
                   {% for f in t.files %}
                       {% assign id = f.name | remove:'.mei' %}
                       <h4 class="test-xmlfile">{{ f.name }}</h4>
-                      <p>
-                          MEI Description: {{ f.description }}
-                      </p>
+                        <p id="{{ id }}-meiTitle"></p>
                     
                     
                       {% if f.comment %}
