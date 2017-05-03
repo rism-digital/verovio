@@ -21,6 +21,7 @@
 #include "glyph.h"
 #include "keysig.h"
 #include "layer.h"
+#include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
@@ -135,6 +136,44 @@ Score *Doc::CreateScoreBuffer()
 void Doc::Refresh()
 {
     RefreshViews();
+}
+    
+bool Doc::GenerateDocumentScoreDef()
+{
+    Measure *measure = dynamic_cast<Measure*>(this->FindChildByType(MEASURE));
+    if (!measure) {
+        LogError("No measure found for generating a scoreDef");
+        return false;
+    }
+    
+    ArrayOfObjects staves;
+    AttComparison matchType(STAFF);
+    measure->FindAllChildByAttComparison(&staves, &matchType);
+    
+    if (staves.empty()) {
+        LogError("No staff found for generating a scoreDef");
+        return false;
+    }
+    
+    m_scoreDef.Reset();
+    StaffGrp *staffGrp = new StaffGrp();
+    ArrayOfObjects::iterator iter;
+    for (iter = staves.begin(); iter != staves.end(); iter++) {
+        Staff *staff = dynamic_cast<Staff*>(*iter);
+        assert(staff);
+        StaffDef *staffDef = new StaffDef();
+        staffDef->SetN(staff->GetN());
+        staffDef->SetLines(5);
+        if (!measure->IsMeasuredMusic())
+            staffDef->SetNotationtype(NOTATIONTYPE_mensural);
+        staffGrp->AddChild(staffDef);
+
+    }
+    m_scoreDef.AddChild(staffGrp);
+    
+    LogMessage("ScoreDef generated");
+    
+    return true;
 }
 
 void Doc::ExportMIDI(MidiFile *midiFile)
