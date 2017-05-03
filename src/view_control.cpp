@@ -1630,10 +1630,13 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     dc->EndGraphic(dynam, this);
 }
 
-void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y)
+void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, int x, int y)
 {
-    assert(element);
+    assert(dc);
+    assert(fb);
     
+    dc->StartGraphic(fb, "", fb->GetUuid());
+
     int offset = 0;
     
     FontInfo *fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
@@ -1646,7 +1649,7 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y)
     dc->SetFont(fontDim);
     
     Object *current;
-    for (current = element->GetFirst(); current; current = element->GetNext()) {
+    for (current = fb->GetFirst(); current; current = fb->GetNext()) {
         if (current->Is(FIGURE)) {
             F *figure = dynamic_cast<F *>(current);
             assert(figure);
@@ -1661,6 +1664,7 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y)
     dc->ResetFont();
     dc->ResetBrush();
     
+    dc->EndGraphic(fb, this);
 }
     
 void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, System *system)
