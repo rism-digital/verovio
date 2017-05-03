@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Collision between tuplet bracket and staff</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-20</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio avoids collisions between a horizontal tuplet bracket and the staff lines.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000057697791">
+                        <staffGrp xml:id="m-000000109827556">
+                            <staffDef xml:id="staffdef-000000109547499" clef.shape="G" clef.line="2" key.sig="0" meter.count="4" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-000000127085119" n="1" right="end">
+                            <staff xml:id="staff-000000097318141" n="1">
+                                <!-- kern: =1-  4g  3c  3c  3c  4g  == -->
+                                <layer xml:id="layer-000000102460316" n="1">
+                                    <note xml:id="note-000000198142847" dur="4" oct="4" pname="g" accid.ges="n" />
+                                    <tuplet xml:id="tuplet-000000083944848" num="3" numbase="2" bracket.visible="true">
+                                        <note xml:id="note-000000179067748" dur="2" oct="4" pname="c" accid.ges="n" />
+                                        <note xml:id="note-000000108057730" dur="2" oct="4" pname="c" accid.ges="n" />
+                                        <note xml:id="note-000000214099568" dur="2" oct="4" pname="c" accid.ges="n" />
+                                    </tuplet>
+                                    <note xml:id="note-000000047843824" dur="4" oct="4" pname="g" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

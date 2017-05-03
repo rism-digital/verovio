@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Adding space to beams</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-27</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio allows spaces to be added in beams (and tuplets).</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef meter.count="4" meter.unit="4" n="1" lines="5" clef.shape="G" clef.line="2"/>
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure n="1">
+              <staff n="1">
+                <layer n="1">
+                  <beam>
+                    <note dur="8" oct="4" pname="c" accid.ges="n" />
+                    <space dur="8"/>
+                    <note dur="8" oct="4" pname="d" accid.ges="n" />
+                    <space dur="8"/>
+                    <note dur="8" oct="4" pname="e" accid.ges="n" />
+                    <space dur="8"/>
+                    <note dur="8" oct="4" pname="f" accid.ges="n" />
+                    <space dur="8"/>
+                  </beam>
+                </layer>
+              </staff>
+            </measure>
+            <measure>
+              <staff n="1">
+                <layer n="1">
+                  <tuplet num="3" numbase="2">
+                    <note dur="4" oct="4" pname="g" accid.ges="n" />
+                    <space dur="4"/>
+                    <note dur="4" oct="4" pname="d" accid.ges="n" />
+                  </tuplet>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

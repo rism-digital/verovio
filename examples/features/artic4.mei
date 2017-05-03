@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Articulation and stave spacing interaction</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-02</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>When two notes from different staves carrying articulation signs are close to each other, Verovio increases the stave separation to clarify which note the articulation is attached to.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+           <work>
+            <titleStmt>
+                <title>Piano Sonata no. 7 in D major</title>
+                <respStmt>
+                    <persName role="Composer">Beethoven, Ludwig van</persName>
+                </respStmt>
+            </titleStmt>
+           </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000123576437" midi.bpm="240">
+                        <staffGrp xml:id="m-000000052945047" symbol="brace" barthru="true">
+                            <staffDef xml:id="staffdef-000000106049730" clef.shape="G" clef.line="2" key.sig="2s" meter.count="4" meter.unit="4" n="1" lines="5" />
+                            <staffDef xml:id="staffdef-000000044923582" clef.shape="G" clef.line="2" key.sig="2s" meter.count="4" meter.unit="4" n="2" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000101882128">
+                        <measure xml:id="measure-L14" n="173">
+                            <staff xml:id="staff-L14F2" n="1">
+                                <layer xml:id="layer-L14F2" n="1">
+                                    <beam xml:id="beam-000000029652812">
+                                        <note xml:id="note-L15F2" dur="8" oct="3" pname="a" accid.ges="n" />
+                                        <note xml:id="note-L16F2" dur="8" oct="4" pname="d" accid.ges="n" />
+                                        <note xml:id="note-L18F2" dur="8" accid="n" oct="4" pname="f" />
+                                        <note xml:id="note-L19F2" dur="8" oct="4" pname="d" accid.ges="n" />
+                                    </beam>
+                                    <beam xml:id="beam-000000202733853">
+                                        <note xml:id="note-L20F2" dur="8" oct="3" pname="a" accid.ges="n" />
+                                        <note xml:id="note-L21F2" dur="8" oct="4" pname="d" accid.ges="n" />
+                                        <note xml:id="note-L22F2" dur="8" oct="4" pname="f" accid.ges="n" />
+                                        <note xml:id="note-L23F2" dur="8" oct="4" pname="d" accid.ges="n" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-L14F1" n="2">
+                                <layer xml:id="layer-L14F1" n="1">
+                                    <rest xml:id="rest-L15F1" dur="4" />
+                                    <clef xml:id="clef-000000094462939" shape="G" line="2" />
+                                    <note xml:id="note-L18F1" dur="4" accid="s" oct="4" pname="g">
+                                        <artic xml:id="artic-000000019077658" artic="stacc" />
+                                    </note>
+                                    <note xml:id="note-L20F1" dur="4" oct="4" pname="a" accid.ges="n">
+                                        <artic xml:id="artic-000000044411989" artic="stacc" />
+                                    </note>
+                                    <note xml:id="note-L22F1" dur="4" oct="5" pname="c" accid.ges="s">
+                                        <artic xml:id="artic-000000022442081" artic="stacc" />
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L24" n="174">
+                            <staff xml:id="staff-L24F2" n="1">
+                                <layer xml:id="layer-L24F2" n="1">
+                                    <beam xml:id="beam-000000085813612">
+                                        <note xml:id="note-L25F2" dur="8" oct="3" pname="a" accid.ges="n" />
+                                        <note xml:id="note-L26F2" dur="8" oct="4" pname="d" accid.ges="n" />
+                                        <note xml:id="note-L27F2" dur="8" accid="n" oct="4" pname="f" />
+                                        <note xml:id="note-L28F2" dur="8" oct="4" pname="d" accid.ges="n" />
+                                    </beam>
+                                    <beam xml:id="beam-000000134301484">
+                                        <note xml:id="note-L29F2" dur="8" oct="3" pname="a" accid.ges="n" />
+                                        <note xml:id="note-L30F2" dur="8" oct="4" pname="d" accid.ges="n" />
+                                        <note xml:id="note-L31F2" dur="8" oct="4" pname="f" accid.ges="n" />
+                                        <note xml:id="note-L32F2" dur="8" oct="4" pname="d" accid.ges="n" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-L24F1" n="2">
+                                <layer xml:id="layer-L24F1" n="1">
+                                    <note xml:id="note-L25F1" dur="4" oct="5" pname="d" accid.ges="n">
+                                        <artic xml:id="artic-000000188301808" artic="stacc" />
+                                    </note>
+                                    <note xml:id="note-L27F1" dur="4" oct="5" pname="e" accid.ges="n">
+                                        <artic xml:id="artic-000000060657713" artic="stacc" />
+                                    </note>
+                                    <note xml:id="note-L29F1" dur="4" accid="n" oct="5" pname="f">
+                                        <artic xml:id="artic-000000113616076" artic="stacc" />
+                                    </note>
+                                    <note xml:id="note-L31F1" dur="4" accid="s" oct="5" pname="g">
+                                        <artic xml:id="artic-000000108553556" artic="stacc" />
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L33" n="175">
+                            <staff xml:id="staff-L33F2" n="1">
+                                <layer xml:id="layer-L33F2" n="1">
+                                    <beam xml:id="beam-000000032253202">
+                                        <note xml:id="note-L34F2" dur="8" oct="3" pname="a" accid.ges="n" />
+                                        <note xml:id="note-L35F2" dur="8" oct="4" pname="c" accid.ges="s" />
+                                        <note xml:id="note-L36F2" dur="8" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L37F2" dur="8" oct="4" pname="c" accid.ges="s" />
+                                    </beam>
+                                    <beam xml:id="beam-000000125269070">
+                                        <note xml:id="note-L38F2" dur="8" oct="3" pname="a" accid.ges="n" />
+                                        <note xml:id="note-L39F2" dur="8" oct="4" pname="c" accid.ges="s" />
+                                        <note xml:id="note-L40F2" dur="8" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L41F2" dur="8" oct="4" pname="c" accid.ges="s" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-L33F1" n="2">
+                                <layer xml:id="layer-L33F1" n="1">
+                                    <note xml:id="note-L34F1" dur="4" oct="5" pname="a" accid.ges="n">
+                                        <artic xml:id="artic-000000015754435" artic="stacc" />
+                                    </note>
+                                    <rest xml:id="rest-L36F1" dur="4" />
+                                    <rest xml:id="rest-L38F1" dur="2" />
+                                    <clef xml:id="clef-000000074491428" shape="F" line="4" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L43" n="176">
+                            <staff xml:id="staff-L43F2" n="1">
+                                <layer xml:id="layer-L43F2" n="1">
+                                    <beam xml:id="beam-000000025471031">
+                                        <note xml:id="note-L44F2" dur="8" oct="3" pname="a" accid.ges="n" />
+                                        <note xml:id="note-L45F2" dur="8" oct="4" pname="c" accid.ges="s" />
+                                        <note xml:id="note-L46F2" dur="8" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L47F2" dur="8" oct="4" pname="c" accid.ges="s" />
+                                    </beam>
+                                    <beam xml:id="beam-000000140492457">
+                                        <note xml:id="note-L48F2" dur="8" oct="3" pname="a" accid.ges="n" />
+                                        <note xml:id="note-L49F2" dur="8" oct="4" pname="c" accid.ges="s" />
+                                        <note xml:id="note-L50F2" dur="8" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L51F2" dur="8" oct="4" pname="c" accid.ges="s" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-L43F1" n="2">
+                                <layer xml:id="layer-L43F1" n="1">
+                                    <note xml:id="note-L44F1" dur="4" oct="2" pname="a" accid.ges="n">
+                                        <artic xml:id="artic-000000078486030" artic="stacc" />
+                                    </note>
+                                    <rest xml:id="rest-L46F1" dur="4" />
+                                    <rest xml:id="rest-L48F1" dur="2" />
+                                    <clef xml:id="clef-000000153126054" shape="G" line="2" />
+                                </layer>
+                            </staff>
+                            <dynam xml:id="dynam-000000044882259" staff="2" tstamp="1.000000">sf</dynam>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

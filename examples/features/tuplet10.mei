@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Nested tuplets</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-24</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio appropriately separates numbers and brackets belonging to different, nested tuplets.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                            <staffDef n="1" clef.shape="G" clef.line="2" meter.count="2" meter.unit="4" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1" right="end">
+                            <staff n="1">
+                                <layer n="1">
+                                    <beam>
+                                        <tuplet num="3" numbase="2" bracket.visible="true">
+                                            <note dur="8" oct="4" pname="b" />
+                                            <note dur="8" oct="4" pname="b" />
+                                            <beam>
+                                                <tuplet num="15" numbase="4" bracket.visible="true">
+                                                    <note dur="8" oct="4" pname="b" />
+                                                    <note dur="8" oct="4" pname="b" />
+                                                    <note dur="8" oct="4" pname="b" />
+                                                    <note dur="8" oct="4" pname="b" />
+                                                    <note dur="8" oct="4" pname="b" />
+                                                </tuplet>
+                                            </beam>
+                                            <beam>
+                                                <note dur="8" oct="4" pname="b" />
+                                                <note dur="8" oct="4" pname="b" />
+                                            </beam>
+                                        </tuplet>
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

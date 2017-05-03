@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Tuplet bracket on whole notes</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-20</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio renders correctly tuplet numbers and brackets on whole notes.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000144253680">
+                        <staffGrp xml:id="m-000000065311600">
+                            <staffDef xml:id="staffdef-000000113182663" clef.shape="G" clef.line="2" meter.count="2" meter.unit="1" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-000000020017654" n="1" right="end">
+                            <staff xml:id="staff-000000201841397" n="1">
+                                <!-- kern: =1-  3%2e  3%2f  3%2g  == -->
+                                <layer xml:id="layer-000000183198981" n="1">
+                                    <tuplet xml:id="tuplet-000000177974005" num="3" numbase="2" bracket.visible="true" num.format="count">
+                                        <note xml:id="note-000000193881854" dur="1" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-000000195396030" dur="1" oct="4" pname="f" accid.ges="n" />
+                                        <note xml:id="note-000000089091621" dur="1" oct="4" pname="g" accid.ges="n" />
+                                    </tuplet>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

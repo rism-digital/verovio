@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Display of original and editorial clefs</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-25</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio renders an editorial clef, while the original clef is documented with an alternative encoding ("app" element).</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000077967534">
+                        <staffGrp xml:id="m-000000002469308">
+                            <staffDef xml:id="staffdef-000000055236933" clef.shape="G" clef.line="2" clef.dis="8" clef.dis.place="below" meter.count="2" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <app xml:id="app-000000009965778">
+                            <lem xml:id="lem-000000205863148" />
+                            <rdg xml:id="rdg-000000131028115" label="original-clef">
+                                <scoreDef xml:id="scoredef-000000159808936">
+                                    <staffGrp xml:id="m-000000050991729">
+                                        <staffDef xml:id="staffdef-000000172027595" clef.shape="C" clef.line="4" n="1" />
+                                    </staffGrp>
+                                </scoreDef>
+                            </rdg>
+                        </app>
+                        <measure xml:id="measure-000000110565293" n="1" right="end">
+                            <staff xml:id="staff-000000125743275" n="1">
+                                <!-- kern: =1-  16ELL  16F  16G  16AJJ  16BLL  16c  16d  16eJJ  == -->
+                                <layer xml:id="layer-000000028567593" n="1">
+                                    <beam xml:id="beam-000000172940446">
+                                        <note xml:id="note-000000205716475" dur="16" oct="3" pname="e" accid.ges="n" />
+                                        <note xml:id="note-000000028135419" dur="16" oct="3" pname="f" accid.ges="n" />
+                                        <note xml:id="note-000000210851554" dur="16" oct="3" pname="g" accid.ges="n" />
+                                        <note xml:id="note-000000004563882" dur="16" oct="3" pname="a" accid.ges="n" />
+                                    </beam>
+                                    <beam xml:id="beam-000000040012021">
+                                        <note xml:id="note-000000104918836" dur="16" oct="3" pname="b" accid.ges="n" />
+                                        <note xml:id="note-000000072057461" dur="16" oct="4" pname="c" accid.ges="n" />
+                                        <note xml:id="note-000000103730248" dur="16" oct="4" pname="d" accid.ges="n" />
+                                        <note xml:id="note-000000067063585" dur="16" oct="4" pname="e" accid.ges="n" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
