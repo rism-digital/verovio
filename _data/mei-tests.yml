@@ -1,0 +1,233 @@
+---
+show_all_tests: false
+tests:
+- section_name: Shared
+  sections:
+  - id: '1'
+    version-check: 0.9.10-dev-8a635ad
+    name: Tempi and directives
+    files:
+    - name: dir1.mei
+    - name: dir2.mei
+    - name: dir3.mei
+    - name: tempo1.mei
+    - name: tempo2.mei
+  - id: '2'
+    version-check: 0.9.10-dev-8a635ad
+    name: Colors
+    files:
+    - name: color1.mei
+- section_name: Common Music Notation
+  sections:
+  - id: '3'
+    version-check: 0.9.10-dev-8a635ad
+    name: Measure elements
+    files:
+    - name: layer1.mei
+    - name: space.mei
+    - name: spacing.mei
+  - id: '4'
+    version-check: 0.9.10-dev-8a635ad
+    name: Score and barlines
+    files:
+    - name: barlines.mei
+    - name: score.mei
+    - name: score2.mei
+    - name: time-sign.mei
+  - id: '5'
+    version-check: 0.9.10-dev-8a635ad
+    name: Score changes
+    files:
+    - name: clef-changes.mei
+    - name: key-change.mei
+    - name: scoredef-changes.mei
+    - name: scoredef-changes2.mei
+  - id: '6'
+    version-check: 0.9.10-dev-8a635ad
+    name: Notes and chords
+    files:
+    - name: basics.mei
+    - name: dots.mei
+    - name: notes.mei
+    - name: unison1.mei
+    - name: unison2.mei
+    - name: chords.mei
+    - name: chords2.mei
+    - name: chords3.mei
+  - id: '7'
+    version-check: 0.9.10-dev-8a635ad
+    name: Grace notes
+    files:
+    - name: gracenotes.mei
+    - name: gracenotes2.mei
+  - id: '8'
+    version-check: 0.9.10-dev-8a635ad
+    name: Cross-staff notation
+    files:
+    - name: cross-staff.mei
+    - name: cross-staff2.mei
+    - name: cross-staff3.mei
+  - id: '9'
+    version-check: 0.9.10-dev-8a635ad
+    name: Rests
+    files:
+    - name: rests.mei
+    - name: rests2.mei
+    - name: rests3.mei
+  - id: '10'
+    version-check: 0.9.10-dev-8a635ad
+    name: Beams
+    files:
+    - name: beam-breaks.mei
+    - name: beam2.mei
+    - name: beam3.mei
+    - name: beam4.mei
+    - name: beam5.mei
+  - id: '11'
+    version-check: 0.9.10-dev-8a635ad
+    name: Ties and slurs
+    files:
+    - name: slur1.mei
+    - name: slur2.mei
+    - name: slur3.mei
+    - name: slur4.mei
+    - name: tie-chords1.mei
+    - name: tie-chords2.mei
+    - name: tie-chords3.mei
+    - name: tie.mei
+  - id: '12'
+    version-check: 0.9.10-dev-8a635ad
+    name: Dynamics and hairpins
+    files:
+    - name: dynam1.mei
+    - name: dynam2.mei
+    - name: dynam3.mei
+    - name: dynam4.mei
+    - name: hairpin1.mei
+    - name: hairpin2.mei
+  - id: '13'
+    version-check: 0.9.10-dev-8a635ad
+    name: Tuplets
+    files:
+    - name: tuplet.mei
+    - name: tuplet11.mei
+    - name: tuplet12.mei
+    - name: tuplet13.mei
+    - name: tuplet14.mei
+    - name: tuplet2.mei
+    - name: tuplet3.mei
+    - name: tuplet4.mei
+    - name: tuplet5.mei
+    - name: tuplet6.mei
+    - name: tuplet8.mei
+    - name: tupletspan.mei
+  - id: '14'
+    version-check: 0.9.10-dev-8a635ad
+    name: Articulations
+    files:
+    - name: artic1.mei
+    - name: artic2.mei
+    - name: artic3.mei
+    - name: artic4.mei
+  - id: '15'
+    version-check: 0.9.10-dev-8a635ad
+    name: Tremolos
+    files:
+    - name: btrem.mei
+    - name: ftrem.mei
+  - id: '16'
+    version-check: 0.9.10-dev-8a635ad
+    name: Fermatas
+    files:
+    - name: fermata1.mei
+    - name: fermata2.mei
+    - name: fermata3.mei
+  - id: '17'
+    version-check: 0.9.10-dev-8a635ad
+    name: Octave shifts
+    files:
+    - name: octave-shift1.mei
+    - name: octave-shift2.mei
+    - name: octave-shift3.mei
+  - id: '18'
+    version-check: 0.9.10-dev-8a635ad
+    name: Piano pedals
+    files:
+    - name: piano-pedal.mei
+  - id: '19'
+    version-check: 0.9.10-dev-8a635ad
+    name: Structural repetitions
+    files:
+    - name: endings.mei
+    - name: endings2.mei
+    - name: endings3.mei
+  - id: '20'
+    version-check: 0.9.10-dev-8a635ad
+    name: Low-level repetitions
+    files:
+    - name: beatrpt1.mei
+    - name: beatrpt2.mei
+    - name: mrpt.mei
+    - name: mrpt2.mei
+    - name: multirpt.mei
+- section_name: Mensural notation
+  sections:
+  - id: '21'
+    version-check: 0.9.10-dev-8a635ad
+    name: Mensural notation
+    files:
+    - name: mensural.mei
+- section_name: Common Music Notation Ornaments
+  sections:
+  - id: '22'
+    version-check: 0.9.10-dev-8a635ad
+    name: Trills
+    files:
+    - name: trills.mei
+- section_name: Critical apparatus
+  sections:
+  - id: '23'
+    version-check: 0.9.10-dev-8a635ad
+    name: Apps and readings
+    files:
+    - name: app-nested.mei
+    - name: app.mei
+    - name: app2.mei
+- section_name: Editorial markup
+  sections:
+  - id: '24'
+    version-check: 0.9.10-dev-8a635ad
+    name: Editorial and choice markup
+    files:
+    - name: choice.mei
+    - name: editorial1.mei
+    - name: editorial2.mei
+- section_name: Harmony
+  sections:
+  - id: '25'
+    version-check: 0.9.10-dev-8a635ad
+    name: Indications of harmony
+    files:
+    - name: harm.mei
+    - name: harm2.mei
+    - name: harm3.mei
+  - id: '26'
+    version-check: 0.9.10-dev-8a635ad
+    name: Figured bass
+    files:
+    - name: 
+- section_name: Vocal text
+  sections:
+  - id: '27'
+    version-check: 0.9.10-dev-8a635ad
+    name: Lyrics
+    files:
+    - name: lyrics1.mei
+    - name: lyrics2.mei
+    - name: lyrics3.mei
+    - name: lyrics4.mei
+    - name: lyrics5.mei
+    - name: lyrics6.mei
+    - name: lyrics7.mei
+    - name: lyrics8.mei
+    - name: multilingual.mei
