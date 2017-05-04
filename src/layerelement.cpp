@@ -1,4 +1,4 @@
- /////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // Name:        layerelement.cpp
 // Author:      Laurent Pugin
 // Created:     2011
@@ -483,8 +483,7 @@ int LayerElement::ResetVerticalAlignment(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
-    
+
 int LayerElement::ApplyPPUFactor(FunctorParams *functorParams)
 {
     ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
@@ -915,14 +914,13 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     return FUNCTOR_SIBLINGS;
 }
-    
-    
+
 int LayerElement::AdjustXRelForTranscription(FunctorParams *functorParams)
 {
     if (this->m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
-    
+
     if (!this->HasUpdatedBB()) return FUNCTOR_CONTINUE;
-    
+
     this->SetDrawingXRel(-this->GetSelfX1());
 
     return FUNCTOR_CONTINUE;
@@ -1030,7 +1028,6 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     if (!m_crossLayer) {
         // Just try to pick the first one...
         m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByType(LAYER));
-
     }
     if (!m_crossLayer) {
         // Nothing we can do

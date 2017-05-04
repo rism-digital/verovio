@@ -801,15 +801,15 @@ void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
 void MeiOutput::WriteMeiF(pugi::xml_node currentNode, F *figure)
 {
     assert(figure);
-    
+
     WriteTextElement(currentNode, figure);
 };
-    
+
 void MeiOutput::WriteMeiFb(pugi::xml_node currentNode, Fb *fb)
 {
     assert(fb);
 };
-    
+
 void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
 {
     assert(fermata);
@@ -821,7 +821,6 @@ void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
     fermata->WritePlacement(currentNode);
 };
 
-    
 void MeiOutput::WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
 {
     assert(hairpin);
@@ -1844,12 +1843,12 @@ bool MeiInput::ReadMei(pugi::xml_node root)
             m_doc->ConvertToPageBasedDoc();
         }
     }
-    
+
     if (success && !m_hasScoreDef) {
         LogMessage("No scoreDef provided, trying to generate one...");
         success = m_doc->GenerateDocumentScoreDef();
     }
-    
+
     return success;
 }
 
@@ -1997,7 +1996,7 @@ bool MeiInput::ReadMeiPage(pugi::xml_node page)
 {
     Page *vrvPage = new Page();
     SetMeiUuid(page, vrvPage);
-    
+
     if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
         vrvPage->UpgradePageBasedMEI(m_doc);
     }
@@ -2023,13 +2022,13 @@ bool MeiInput::ReadMeiPage(pugi::xml_node page)
 
     m_doc->AddChild(vrvPage);
     bool success = ReadMeiPageChildren(vrvPage, page);
-    
+
     if (success && (m_doc->GetType() == Transcription) && (vrvPage->GetPPUFactor() != 1.0)) {
         ApplyPPUFactorParams applyPPUFactorParams;
         Functor applyPPUFactor(&Object::ApplyPPUFactor);
         vrvPage->Process(&applyPPUFactor, &applyPPUFactorParams);
     }
-    
+
     return success;
 }
 
@@ -2588,9 +2587,9 @@ bool MeiInput::ReadMeiFb(Object *parent, pugi::xml_node fb)
 {
     pugi::xml_node xmlElement;
     std::string elementName;
-    
+
     Fb *vrvFb = new Fb();
-    
+
     parent->AddChild(vrvFb);
     return ReadMeiFbChildren(vrvFb, fb);
 }
@@ -3268,11 +3267,11 @@ bool MeiInput::ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, b
 bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node figure)
 {
     F *vrvF = new F();
-    
+
     parent->AddChild(vrvF);
     return ReadMeiTextChildren(vrvF, figure);
 }
- 
+
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
     interface->ReadAugmentdots(element);

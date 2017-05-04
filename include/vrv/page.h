@@ -52,7 +52,7 @@ public:
      * Return the number of system (children are System object only)
      */
     int GetSystemCount() const { return (int)m_children.size(); }
-    
+
     /**
      * @name Get and set the pixel per unit factor.
      */
@@ -123,7 +123,7 @@ public:
      *
      */
     int GetContentWidth() const;
-    
+
     /**
      * Custom method for upgrading page-based page transcription data
      */
@@ -132,7 +132,7 @@ public:
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * Apply the Pixel Per Unit factor of the page to its elements.
      */
@@ -177,7 +177,7 @@ private:
      * the force parameter is set.
      */
     bool m_layoutDone;
-    
+
     /**
      *
      */

@@ -78,11 +78,11 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
 
     dc->EndPage();
 }
-    
+
 double View::GetPPUFactor() const
 {
     if (!m_currentPage) return 1.0;
-    
+
     return m_currentPage->GetPPUFactor();
 }
 
