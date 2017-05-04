@@ -21,6 +21,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "fb.h"
 #include "functorparams.h"
 #include "keysig.h"
 #include "layer.h"
@@ -76,6 +77,13 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     }
 
     dc->EndPage();
+}
+    
+double View::GetPPUFactor() const
+{
+    if (!m_currentPage) return 1.0;
+    
+    return m_currentPage->GetPPUFactor();
 }
 
 void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)

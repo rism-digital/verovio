@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "floatingobject.h"
 #include "functorparams.h"
+#include "slur.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -243,6 +244,12 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
 
             bool skipAbove = false;
             bool skipBelow = false;
+            
+            if ((*iter)->GetObject()->Is(SLUR)) {
+                Slur *slur = dynamic_cast<Slur*>((*iter)->GetObject());
+                assert(slur);
+                slur->GetCrossStaffOverflows(this, (*iter)->m_cuvreDir, skipAbove, skipBelow);
+            }
 
             int overflowAbove = 0;
             if (!skipAbove) overflowAbove = this->CalcOverflowAbove((*iter));

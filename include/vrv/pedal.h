@@ -36,7 +36,12 @@ public:
     virtual ClassId GetClassId() const { return PEDAL; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    ////@}
 
     //----------//
     // Functors //

@@ -48,7 +48,18 @@ public:
     virtual void AddChild(Object *object);
     ///@}
 
+    /**
+     * Return the number of system (children are System object only)
+     */
     int GetSystemCount() const { return (int)m_children.size(); }
+    
+    /**
+     * @name Get and set the pixel per unit factor.
+     */
+    ///@{
+    double GetPPUFactor() const { return m_PPUFactor; }
+    void SetPPUFactor(double PPUFactor) { m_PPUFactor = PPUFactor; }
+    ///@}
 
     /**
      * Return the index position of the page in its document parent
@@ -112,10 +123,20 @@ public:
      *
      */
     int GetContentWidth() const;
+    
+    /**
+     * Custom method for upgrading page-based page transcription data
+     */
+    void UpgradePageBasedMEI(Doc *doc);
 
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     * Apply the Pixel Per Unit factor of the page to its elements.
+     */
+    virtual int ApplyPPUFactor(FunctorParams *);
 
 private:
     /**
@@ -156,6 +177,11 @@ private:
      * the force parameter is set.
      */
     bool m_layoutDone;
+    
+    /**
+     *
+     */
+    double m_PPUFactor;
 };
 
 } // namespace vrv

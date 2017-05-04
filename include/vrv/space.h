@@ -34,7 +34,12 @@ public:
     virtual ClassId GetClassId() const { return SPACE; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    ///@}
 
 private:
     //

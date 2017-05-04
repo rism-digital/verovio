@@ -173,6 +173,11 @@ public:
      * See Object::ResetHorizontalAlignment
      */
     virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+    
+    /**
+     * See Object::ApplyPPUFactor
+     */
+    virtual int ApplyPPUFactor(FunctorParams *functorParams);
 
     /**
      * See Object::AlignHorizontally
@@ -195,6 +200,11 @@ public:
      * See Object::AdjustXPos
      */
     virtual int AdjustXPos(FunctorParams *functorParams);
+    
+    /**
+     * See Object::AdjustXRelForTranscription
+     */
+    virtual int AdjustXRelForTranscription(FunctorParams *);
 
     /**
      * See Object::PrepareDrawingCueSize
