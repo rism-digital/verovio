@@ -826,7 +826,7 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
     SvgDeviceContext svg(width, height);
 
     // set scale and border from user options
-    svg.SetUserScale((double)m_scale / 100, (double)m_scale / 100);
+    svg.SetUserScale(m_view.GetPPUFactor() * (double)m_scale / 100, m_view.GetPPUFactor() * (double)m_scale / 100);
 
     // debug BB?
     svg.SetDrawBoundingBoxes(m_showBoundingBoxes);

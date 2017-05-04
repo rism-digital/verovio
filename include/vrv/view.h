@@ -137,6 +137,11 @@ public:
      * Defined in view_page.cpp
      */
     void DrawCurrentPage(DeviceContext *dc, bool background = true);
+    
+    /**
+     * Return the pixel per unit factor of the current page (if any, 1.0 otherwise)
+     */
+    double GetPPUFactor() const;
 
     /**
      * @name Methods for calculating drawing positions

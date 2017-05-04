@@ -199,6 +199,11 @@ public:
      * See Object::ResetHorizontalAlignment
      */
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    
+    /**
+     * See Object::ApplyPPUFactor
+     */
+    virtual int ApplyPPUFactor(FunctorParams *functorParams);
 
     /**
      * See Object::AlignHorizontally

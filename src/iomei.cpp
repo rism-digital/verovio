@@ -1552,6 +1552,7 @@ MeiInput::MeiInput(Doc *doc, std::string filename) : FileInputStream(doc)
     //
     m_hasScoreDef = false;
     m_readingScoreBased = false;
+    m_version = MEI_UNDEFINED;
 }
 
 MeiInput::~MeiInput()
@@ -1773,6 +1774,13 @@ bool MeiInput::ReadMei(pugi::xml_node root)
         m_doc->m_header.reset();
         // copy the complete header into the master document
         m_doc->m_header.append_copy(current);
+        if (root.attribute("meiversion")) {
+            std::string version = std::string(root.attribute("meiversion").value());
+            if (version == "2013")
+                m_version = MEI_2013;
+            else if (version == "3.0.0")
+                m_version = MEI_3_0_0;
+        }
     }
     // music
     pugi::xml_node music;
@@ -1989,6 +1997,10 @@ bool MeiInput::ReadMeiPage(pugi::xml_node page)
 {
     Page *vrvPage = new Page();
     SetMeiUuid(page, vrvPage);
+    
+    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
+        vrvPage->UpgradePageBasedMEI(m_doc);
+    }
 
     if (page.attribute("page.height")) {
         vrvPage->m_pageHeight = atoi(page.attribute("page.height").value()) * DEFINITION_FACTOR;
@@ -2010,7 +2022,15 @@ bool MeiInput::ReadMeiPage(pugi::xml_node page)
     }
 
     m_doc->AddChild(vrvPage);
-    return ReadMeiPageChildren(vrvPage, page);
+    bool success = ReadMeiPageChildren(vrvPage, page);
+    
+    if (success && (m_doc->GetType() == Transcription) && (vrvPage->GetPPUFactor() != 1.0)) {
+        ApplyPPUFactorParams applyPPUFactorParams;
+        Functor applyPPUFactor(&Object::ApplyPPUFactor);
+        vrvPage->Process(&applyPPUFactor, &applyPPUFactorParams);
+    }
+    
+    return success;
 }
 
 bool MeiInput::ReadMeiPageChildren(Object *parent, pugi::xml_node parentNode)
@@ -2103,7 +2123,7 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
                     System *system = dynamic_cast<System *>(parent);
                     assert(system);
                     unmeasured = new Measure(false);
-                    if (m_doc->GetType() == Transcription)
+                    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013))
                         unmeasured->UpgradePageBasedMEI(system);
                     system->AddChild(unmeasured);
                 }

@@ -384,6 +384,17 @@ int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+    
+int Measure::ApplyPPUFactor(FunctorParams *functorParams)
+{
+    ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
+    assert(params);
+
+    if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
+    if (m_xAbs2 != VRV_UNSET) m_xAbs2 /= params->m_page->GetPPUFactor();
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Measure::AlignHorizontally(FunctorParams *functorParams)
 {
