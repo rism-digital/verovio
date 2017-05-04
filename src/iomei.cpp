@@ -29,6 +29,7 @@
 #include "editorial.h"
 #include "ending.h"
 #include "expansion.h"
+#include "fb.h"
 #include "fermata.h"
 #include "functorparams.h"
 #include "hairpin.h"
@@ -407,6 +408,14 @@ bool MeiOutput::WriteObject(Object *object)
     }
 
     // Text elements
+    else if (object->Is(FIGURE)) {
+        m_currentNode = m_currentNode.append_child("f");
+        WriteMeiF(m_currentNode, dynamic_cast<F *>(object));
+    }
+    else if (object->Is(FB)) {
+        m_currentNode = m_currentNode.append_child("fb");
+        WriteMeiFb(m_currentNode, dynamic_cast<Fb *>(object));
+    }
     else if (object->Is(REND)) {
         m_currentNode = m_currentNode.append_child("rend");
         WriteMeiRend(m_currentNode, dynamic_cast<Rend *>(object));
@@ -789,6 +798,18 @@ void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteTimeSpanningInterface(currentNode, dynam);
 };
 
+void MeiOutput::WriteMeiF(pugi::xml_node currentNode, F *figure)
+{
+    assert(figure);
+    
+    WriteTextElement(currentNode, figure);
+};
+    
+void MeiOutput::WriteMeiFb(pugi::xml_node currentNode, Fb *fb)
+{
+    assert(fb);
+};
+    
 void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
 {
     assert(fermata);
@@ -800,6 +821,7 @@ void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
     fermata->WritePlacement(currentNode);
 };
 
+    
 void MeiOutput::WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
 {
     assert(hairpin);
@@ -1580,6 +1602,33 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     if (IsEditorialElementName(element)) {
         return true;
     }
+    // filter for harm
+    else if (filterParent->Is(HARM)) {
+        if (element == "") {
+            return true;
+        }
+        else if (element == "rend") {
+            return true;
+        }
+        else if (element == "fb") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for any other control element
+    else if (filterParent->IsControlElement()) {
+        if (element == "") {
+            return true;
+        }
+        else if (element == "rend") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for beam
     else if (filterParent->Is(BEAM)) {
         if (element == "beam") {
@@ -2353,7 +2402,7 @@ bool MeiInput::ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText)
     ReadTextDirInterface(anchoredText, vrvAnchoredText);
 
     parent->AddChild(vrvAnchoredText);
-    return ReadMeiTextChildren(vrvAnchoredText, anchoredText);
+    return ReadMeiTextChildren(vrvAnchoredText, anchoredText, vrvAnchoredText);
 }
 
 bool MeiInput::ReadMeiDir(Object *parent, pugi::xml_node dir)
@@ -2366,7 +2415,7 @@ bool MeiInput::ReadMeiDir(Object *parent, pugi::xml_node dir)
     vrvDir->ReadLang(dir);
 
     parent->AddChild(vrvDir);
-    return ReadMeiTextChildren(vrvDir, dir);
+    return ReadMeiTextChildren(vrvDir, dir, vrvDir);
 }
 
 bool MeiInput::ReadMeiDynam(Object *parent, pugi::xml_node dynam)
@@ -2378,7 +2427,7 @@ bool MeiInput::ReadMeiDynam(Object *parent, pugi::xml_node dynam)
     ReadTimeSpanningInterface(dynam, vrvDynam);
 
     parent->AddChild(vrvDynam);
-    return ReadMeiTextChildren(vrvDynam, dynam);
+    return ReadMeiTextChildren(vrvDynam, dynam, vrvDynam);
 }
 
 bool MeiInput::ReadMeiFermata(Object *parent, pugi::xml_node fermata)
@@ -2419,7 +2468,7 @@ bool MeiInput::ReadMeiHarm(Object *parent, pugi::xml_node harm)
     vrvHarm->ReadLang(harm);
 
     parent->AddChild(vrvHarm);
-    return ReadMeiTextChildren(vrvHarm, harm);
+    return ReadMeiTextChildren(vrvHarm, harm, vrvHarm);
 }
 
 bool MeiInput::ReadMeiMordent(Object *parent, pugi::xml_node mordent)
@@ -2490,7 +2539,7 @@ bool MeiInput::ReadMeiTempo(Object *parent, pugi::xml_node tempo)
     vrvTempo->ReadMmtempo(tempo);
 
     parent->AddChild(vrvTempo);
-    return ReadMeiTextChildren(vrvTempo, tempo);
+    return ReadMeiTextChildren(vrvTempo, tempo, vrvTempo);
 }
 
 bool MeiInput::ReadMeiTie(Object *parent, pugi::xml_node tie)
@@ -2533,6 +2582,40 @@ bool MeiInput::ReadMeiTurn(Object *parent, pugi::xml_node turn)
 
     parent->AddChild(vrvTurn);
     return true;
+}
+
+bool MeiInput::ReadMeiFb(Object *parent, pugi::xml_node fb)
+{
+    pugi::xml_node xmlElement;
+    std::string elementName;
+    
+    Fb *vrvFb = new Fb();
+    
+    parent->AddChild(vrvFb);
+    return ReadMeiFbChildren(vrvFb, fb);
+}
+
+bool MeiInput::ReadMeiFbChildren(Object *parent, pugi::xml_node parentNode)
+{
+    assert(dynamic_cast<Fb *>(parent) || dynamic_cast<EditorialElement *>(parent));
+
+    bool success = true;
+    pugi::xml_node current;
+    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+        // editorial
+        else if (IsEditorialElementName(current.name())) {
+            success = ReadMeiEditorialElement(parent, current, EDITORIAL_STAFF);
+        }
+        // content
+        else if (std::string(current.name()) == "f") {
+            success = ReadMeiF(parent, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <staff>", current.name());
+        }
+    }
+    return success;
 }
 
 bool MeiInput::ReadMeiStaff(Object *parent, pugi::xml_node staff)
@@ -3070,7 +3153,7 @@ bool MeiInput::ReadMeiSyl(Object *parent, pugi::xml_node syl)
     vrvSyl->ReadSylLog(syl);
 
     parent->AddChild(vrvSyl);
-    return ReadMeiTextChildren(vrvSyl, syl);
+    return ReadMeiTextChildren(vrvSyl, syl, vrvSyl);
 }
 
 bool MeiInput::ReadMeiTuplet(Object *parent, pugi::xml_node tuplet)
@@ -3110,7 +3193,7 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
             break;
         }
         elementName = std::string(xmlElement.name());
-        if (!IsAllowed(elementName, filter) && filter) {
+        if (filter && !IsAllowed(elementName, filter)) {
             std::string meiElementName = filter->GetClassName();
             std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
             LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
@@ -3129,6 +3212,10 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
             bool trimLeft = (i == 0);
             bool trimRight = (!xmlElement.next_sibling());
             success = ReadMeiText(parent, xmlElement, trimLeft, trimRight);
+        }
+        // figured bass
+        else if (elementName == "fb") {
+            success = ReadMeiFb(parent, xmlElement);
         }
         // unknown
         else {
@@ -3178,6 +3265,14 @@ bool MeiInput::ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, b
     return true;
 }
 
+bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node figure)
+{
+    F *vrvF = new F();
+    
+    parent->AddChild(vrvF);
+    return ReadMeiTextChildren(vrvF, figure);
+}
+ 
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
     interface->ReadAugmentdots(element);

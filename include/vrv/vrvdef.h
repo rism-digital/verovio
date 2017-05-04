@@ -135,6 +135,8 @@ enum ClassId {
     CUSTOS,
     DOT,
     DOTS,
+    FB,
+    FIGURE,
     FLAG,
     FTREM,
     KEYSIG,

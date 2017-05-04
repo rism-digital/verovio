@@ -21,6 +21,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "fb.h"
 #include "functorparams.h"
 #include "keysig.h"
 #include "layer.h"

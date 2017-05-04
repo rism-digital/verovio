@@ -25,6 +25,8 @@ class Doc;
 class Dynam;
 class EditorialElement;
 class Ending;
+class Fb;
+class F;
 class Fermata;
 class Hairpin;
 class Harm;
@@ -282,6 +284,16 @@ protected:
     ///@}
 
     /**
+     * @name Container for Figured Bass
+     * Defined in view_text.cpp
+     */
+    ///@{
+    void DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y);
+    void DrawF(DeviceContext *dc, F *figure, int x, int y);
+
+    ///@}
+    
+    /**
      * @name Methods for drawing LayerElement child classes.
      * They are base drawing methods that are called directly from DrawLayerElement
      * Because some elements draw their children recursively (e.g., Note) they must all
@@ -390,6 +402,7 @@ protected:
         DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph = false);
     void DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle = 0.0);
     void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
+    void DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100,
         bool dimin = false, bool setBBGlyph = false);
     void DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
