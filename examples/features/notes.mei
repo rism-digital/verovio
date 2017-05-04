@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Hidden notes</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-19</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio can hide single notes in the score.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000135139321">
+                        <staffGrp xml:id="m-000000189927468">
+                            <staffDef xml:id="staffdef-000000091268498" clef.shape="G" clef.line="2" key.sig="5f" meter.count="2" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-000000002076833" n="1" left="invis" right="end">
+                            <staff xml:id="staff-000000127704284" n="1">
+                                <!-- kern: =1-  4r  4g  4r  == -->
+                                <layer xml:id="layer-000000130744376" n="1">
+                                    <rest xml:id="rest-000000115463183" dur="4" />
+                                    <note xml:id="note-000000123493251" visible="false" dur="4" accid="n" oct="4" pname="g" />
+                                    <rest xml:id="rest-000000008138177" dur="4" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

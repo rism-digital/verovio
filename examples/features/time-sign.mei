@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Support for invisible or one-number meter</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-27</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports the display of single-number time signatures, and also offers the possibility of rendering the time signature invisible.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+   <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef n="1" clef.shape="G" clef.line="2" key.mode="major" key.sig="0" meter.count="3" meter.unit="8" lines="5"/>
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure n="1">
+              <staff n="1">
+                <layer n="1">
+                  <beam>
+                    <note dur="8" oct="4" pname="g"/>
+                    <note dur="8" oct="4" pname="a"/>
+                    <note dur="8" oct="4" pname="e"/>
+                  </beam>
+                </layer>
+              </staff>
+            </measure>
+            <scoreDef n="1" meter.count="3" meter.unit="8" meter.rend="num"/>
+            <measure n="1">
+              <staff n="1">
+                <layer n="1">
+                  <beam>
+                    <note dur="8" oct="4" pname="g"/>
+                    <note dur="8" oct="4" pname="a"/>
+                    <note dur="8" oct="4" pname="e"/>
+                  </beam>
+                </layer>
+              </staff>
+            </measure>
+            <scoreDef n="1" meter.count="3" meter.unit="8" meter.rend="invis"/>
+            <measure n="1" right="end">
+              <staff n="1">
+                <layer n="1">
+                  <beam>
+                    <note dur="8" oct="4" pname="g"/>
+                    <note dur="8" oct="4" pname="a"/>
+                    <note dur="8" oct="4" pname="e"/>
+                  </beam>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

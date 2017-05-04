@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Horizontal beams</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-25</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio correctly renders any note sequence requiring flat, i.e., horizontal beams.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000170365610">
+                        <staffGrp xml:id="m-000000085556223">
+                            <staffDef xml:id="staffdef-000000203150059" clef.shape="G" clef.line="2" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-000000058797970" n="0">
+                            <staff xml:id="staff-000000018741566" n="1">
+                                <!-- kern: **kern  *clefG2  8c 8eL  8eJ  = -->
+                                <layer xml:id="layer-000000168412238" n="1">
+                                    <beam xml:id="beam-000000121039000">
+                                        <chord xml:id="chord-000000205974326" dur="8">
+                                            <note xml:id="note-000000066866521" oct="4" pname="c" accid.ges="n" />
+                                            <note xml:id="note-000000047434375" oct="4" pname="e" accid.ges="n" />
+                                        </chord>
+                                        <note xml:id="note-000000083617581" dur="8" oct="4" pname="e" accid.ges="n" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-000000047391993" n="32758" right="invis">
+                            <staff xml:id="staff-000000184827178" n="1">
+                                <!-- kern: =  8c 8eL  8e  8c  8eJ  =- -->
+                                <layer xml:id="layer-000000055290302" n="1">
+                                    <beam xml:id="beam-000000047941741">
+                                        <chord xml:id="chord-000000020981674" dur="8">
+                                            <note xml:id="note-000000022191845" oct="4" pname="c" accid.ges="n" />
+                                            <note xml:id="note-000000175186199" oct="4" pname="e" accid.ges="n" />
+                                        </chord>
+                                        <note xml:id="note-000000154371598" dur="8" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-000000148455326" dur="8" oct="4" pname="c" accid.ges="n" />
+                                        <note xml:id="note-000000142162997" dur="8" oct="4" pname="e" accid.ges="n" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

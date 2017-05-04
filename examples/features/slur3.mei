@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Slur and directives interactions</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-02</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Slurs are rendered so that they allow the appropriate placement of other elements, e.g., of directives.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000188337930">
+                        <staffGrp xml:id="m-000000126708108">
+                            <staffDef xml:id="staffdef-000000138400236" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-000000008631046" n="1">
+                            <staff xml:id="staff-000000128013955" n="1">
+                                <!-- kern: =1-  (4e;  !LO:TX:a:t=a tempo  4d)  (4dd  4ff  =2 -->
+                                <layer xml:id="layer-000000181435885" n="1">
+                                    <note xml:id="note-000000180893861" dur="4" fermata="above" oct="4" pname="e" accid.ges="n" />
+                                    <note xml:id="note-000000090536214" dur="4" oct="4" pname="d" accid.ges="n" />
+                                    <note xml:id="note-000000034369893" dur="4" oct="5" pname="d" accid.ges="n" />
+                                    <note xml:id="note-000000196438972" dur="4" oct="5" pname="f" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <slur xml:id="slur-000000149996563" staff="1" startid="#note-000000180893861" endid="#note-000000090536214" />
+                            <dir xml:id="dir-000000061187850" place="above" staff="1" tstamp="2.000000">a tempo</dir>
+                            <slur xml:id="slur-000000152719493" staff="1" startid="#note-000000034369893" endid="#note-000000110366772" />
+                        </measure>
+                        <measure xml:id="measure-000000008455271" n="2">
+                            <staff xml:id="staff-000000054799387" n="1">
+                                <!-- kern: =2  4aa  4ccc  4eee  4ggg  =3 -->
+                                <layer xml:id="layer-000000172312836" n="1">
+                                    <note xml:id="note-000000180150118" dur="4" oct="5" pname="a" accid.ges="n" />
+                                    <note xml:id="note-000000045841001" dur="4" oct="6" pname="c" accid.ges="n" />
+                                    <note xml:id="note-000000147326350" dur="4" oct="6" pname="e" accid.ges="n" />
+                                    <note xml:id="note-000000065334585" dur="4" oct="6" pname="g" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-000000069986426" n="3" right="end">
+                            <staff xml:id="staff-000000078106584" n="1">
+                                <!-- kern: =3  1bbb)  == -->
+                                <layer xml:id="layer-000000195358964" n="1">
+                                    <note xml:id="note-000000110366772" dur="1" oct="6" pname="b" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

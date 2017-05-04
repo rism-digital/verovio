@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Avoiding crowded articulations</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-27</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio appropriately shifts articulations when the music becomes crowded.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000001603930524">
+                        <staffGrp xml:id="staffgrp-0000001370702411">
+                            <staffDef xml:id="staffdef-0000001817130544" n="1" clef.shape="G" clef.line="2" meter.count="3" meter.unit="4" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000001307147261">
+                        <measure xml:id="measure-L1" n="0">
+                            <staff xml:id="staff-0000000260404022" n="1">
+                                <layer xml:id="layer-L1F1N1" n="1">
+                                    <beam xml:id="beam-L4F1-L5F1">
+                                        <note xml:id="note-L4F1" dur="8" oct="4" pname="e">
+                                            <accid xml:id="accid-L4F1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L5F1" dur="8" oct="4" pname="f">
+                                            <accid xml:id="accid-L5F1" accid.ges="n" />
+                                        </note>
+                                    </beam>
+                                    <beam xml:id="beam-L6F1-L7F1">
+                                        <note xml:id="note-L6F1" dur="8" oct="4" pname="e">
+                                            <accid xml:id="accid-L6F1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L7F1" dur="8" oct="4" pname="f">
+                                            <accid xml:id="accid-L7F1" accid.ges="n" />
+                                        </note>
+                                    </beam>
+                                    <beam xml:id="beam-L8F1-L9F1">
+                                        <note xml:id="note-L8F1" dur="8" oct="4" pname="e">
+                                            <accid xml:id="accid-L8F1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L9F1" dur="8" oct="4" pname="f">
+                                            <accid xml:id="accid-L9F1" accid.ges="n" />
+                                        </note>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <fermata xml:id="fermata-L4F1" staff="1" tstamp="1.000000" place="above" />
+                            <fermata xml:id="fermata-L5F1" staff="1" tstamp="1.500000" place="above" />
+                            <fermata xml:id="fermata-L6F1" staff="1" tstamp="2.000000" place="above" />
+                            <fermata xml:id="fermata-L7F1" staff="1" tstamp="2.500000" place="above" />
+                            <fermata xml:id="fermata-L8F1" staff="1" tstamp="3.000000" place="above" />
+                            <fermata xml:id="fermata-L9F1" staff="1" tstamp="3.500000" place="above" />
+                        </measure>
+                        <scoreDef xml:id="scoredef-0000001092694853" meter.count="6" meter.unit="8" />
+                        <measure xml:id="measure-L10" n="2" right="end">
+                            <staff xml:id="staff-L10F1N1" n="1">
+                                <layer xml:id="layer-L10F1N1" n="1">
+                                    <beam xml:id="beam-L12F1-L14F1">
+                                        <note xml:id="note-L12F1" dur="8" oct="4" pname="e">
+                                            <accid xml:id="accid-L12F1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L13F1" dur="8" oct="4" pname="f">
+                                            <accid xml:id="accid-L13F1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L14F1" dur="8" oct="4" pname="e">
+                                            <accid xml:id="accid-L14F1" accid.ges="n" />
+                                        </note>
+                                    </beam>
+                                    <beam xml:id="beam-L15F1-L17F1">
+                                        <note xml:id="note-L15F1" dur="8" oct="4" pname="f">
+                                            <accid xml:id="accid-L15F1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L16F1" dur="8" oct="4" pname="e">
+                                            <accid xml:id="accid-L16F1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L17F1" dur="8" oct="4" pname="f">
+                                            <accid xml:id="accid-L17F1" accid.ges="n" />
+                                        </note>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <fermata xml:id="fermata-L12F1" staff="1" tstamp="1.000000" place="above" />
+                            <fermata xml:id="fermata-L13F1" staff="1" tstamp="2.000000" place="above" />
+                            <fermata xml:id="fermata-L14F1" staff="1" tstamp="3.000000" place="above" />
+                            <fermata xml:id="fermata-L15F1" staff="1" tstamp="4.000000" place="above" />
+                            <fermata xml:id="fermata-L16F1" staff="1" tstamp="5.000000" place="above" />
+                            <fermata xml:id="fermata-L17F1" staff="1" tstamp="6.000000" place="above" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
