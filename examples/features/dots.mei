@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Dot placememt with various note duration</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-20</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio adjusts the dot position according to the note duration and to double stemmed situations.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application isodate="2017-02-21T10:16:12" version="0.9.14-dev-204a0ac-dirty">
+                    <name>Verovio</name>
+                    <p>Transcoded from Humdrum</p>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp symbol="bracket">
+                            <staffDef clef.shape="G" clef.line="2" n="1" lines="5" />
+                            <staffDef clef.shape="G" clef.line="2" n="2" lines="5" />
+                            <staffDef clef.shape="G" clef.line="2" n="3" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="1" oct="5" pname="d" dots="1"/>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <note dur="1" oct="4" pname="g" dots="1"/>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note dur="1" oct="5" pname="d" dots="1"/>
+                                </layer>
+                                <layer n="2">
+                                    <note dur="1" oct="4" pname="g" dots="1"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="2">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="1" oct="5" pname="e" dots="1"/>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <note dur="1" oct="4" pname="f" dots="1"/>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note dur="1" oct="5" pname="e" dots="1"/>
+                                </layer>
+                                <layer n="2">
+                                    <note dur="1" oct="4" pname="f" dots="1"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="3">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="4" oct="5" pname="d" dots="1"/>
+                                    <note dur="4" oct="5" pname="e" dots="1"/>
+                                    <note dur="8" oct="5" pname="d" dots="1"/>
+                                    <note dur="8" oct="5" pname="e" dots="1"/>
+                                    <note dur="16" oct="5" pname="d" dots="1"/>
+                                    <note dur="16" oct="5" pname="e" dots="1"/>
+                                    <chord dur="16" dots="1">
+                                        <note pname="c" oct="5"/>
+                                        <note pname="e" oct="5"/>
+                                    </chord>
+                                    <chord dur="16" dots="1">
+                                        <note pname="d" oct="5"/>
+                                        <note pname="e" oct="5"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <note dur="4" oct="4" pname="g" dots="1"/>
+                                    <note dur="4" oct="4" pname="f" dots="1"/>
+                                    <note dur="8" oct="4" pname="g" dots="1"/>
+                                    <note dur="8" oct="4" pname="f" dots="1"/>
+                                    <note dur="16" oct="4" pname="g" dots="1"/>
+                                    <note dur="16" oct="4" pname="f" dots="1"/>
+                                    <chord dur="16" dots="1">
+                                        <note pname="c" oct="4"/>
+                                        <note pname="e" oct="4"/>
+                                    </chord>
+                                    <chord dur="16" dots="1">
+                                        <note pname="d" oct="4"/>
+                                        <note pname="e" oct="4"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note dur="4" oct="5" pname="d" dots="1"/>
+                                    <note dur="4" oct="5" pname="e" dots="1"/>
+                                    <note dur="8" oct="5" pname="d" dots="1"/>
+                                    <note dur="8" oct="5" pname="e" dots="1"/>
+                                    <note dur="16" oct="5" pname="d" dots="1"/>
+                                    <note dur="16" oct="5" pname="e" dots="1"/>
+                                    <chord dur="16" dots="1">
+                                        <note pname="c" oct="5"/>
+                                        <note pname="e" oct="5"/>
+                                    </chord>
+                                    <chord dur="16" dots="1">
+                                        <note pname="d" oct="5"/>
+                                        <note pname="e" oct="5"/>
+                                    </chord>
+                                </layer>
+                                <layer n="2">
+                                    <note dur="4" oct="4" pname="g" dots="1"/>
+                                    <note dur="4" oct="4" pname="f" dots="1"/>
+                                    <note dur="8" oct="4" pname="g" dots="1"/>
+                                    <note dur="8" oct="4" pname="f" dots="1"/>
+                                    <note dur="16" oct="4" pname="g" dots="1"/>
+                                    <note dur="16" oct="4" pname="f" dots="1"/>
+                                    <chord dur="16" dots="1">
+                                        <note pname="c" oct="4"/>
+                                        <note pname="e" oct="4"/>
+                                    </chord>
+                                    <chord dur="16" dots="1">
+                                        <note pname="d" oct="4"/>
+                                        <note pname="e" oct="4"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
