@@ -2605,7 +2605,7 @@ bool MeiInput::ReadMeiFbChildren(Object *parent, pugi::xml_node parentNode)
         if (!success) break;
         // editorial
         else if (IsEditorialElementName(current.name())) {
-            success = ReadMeiEditorialElement(parent, current, EDITORIAL_STAFF);
+            success = ReadMeiEditorialElement(parent, current, EDITORIAL_TEXT);
         }
         // content
         else if (std::string(current.name()) == "f") {

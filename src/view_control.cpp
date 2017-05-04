@@ -1630,7 +1630,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     dc->EndGraphic(dynam, this);
 }
 
-void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y)
+void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y, bool &setX, bool &setY)
 {
     assert(element);
     
@@ -1648,9 +1648,12 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y)
     Object *current;
     for (current = element->GetFirst(); current; current = element->GetNext()) {
         if (current->Is(FIGURE)) {
-            F *figure = dynamic_cast<F *>(current);
-            assert(figure);
-            DrawF(dc, figure, x, y + offset);
+            // dynamic_cast assert in DrawF
+            DrawF(dc, dynamic_cast<F *>(current), x, y + offset, setX, setY);
+        }
+        else if (current->IsEditorialElement()) {
+            // cast to EditorialElement check in DrawLayerEditorialElement
+            DrawTextEditorialElement(dc, dynamic_cast<EditorialElement *>(current), x, y + offset, setX, setY);
         }
         else {
             assert(false);
@@ -1750,7 +1753,8 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         int y = harm->GetDrawingY();
         
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
-            DrawFb(dc, *staffIter, dynamic_cast<Fb *>(harm->GetFirst()), x, y);
+            LogDebug("Fb y: %d", y);
+            DrawFb(dc, *staffIter, dynamic_cast<Fb *>(harm->GetFirst()), x, y, setX, setY);
         } else {
             dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
             

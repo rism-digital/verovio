@@ -29,16 +29,13 @@ namespace vrv {
 // View - TextElement
 //----------------------------------------------------------------------------
 
-void View::DrawF(DeviceContext *dc, F *figure, int x, int y)
+void View::DrawF(DeviceContext *dc, F *figure, int x, int y, bool &setX, bool &setY)
 {
     assert(dc);
     assert(figure);
     
-    bool setX = false, setY = false;
-    
-    //dc->DrawText(UTF16to8(figure->GetText()), figure->GetText());
-    
     dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
+    LogDebug("F y: %d", y);
     DrawTextChildren(dc, figure, x, y, setX, setY);
     dc->EndText();
 
