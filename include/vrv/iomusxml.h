@@ -26,6 +26,8 @@ namespace vrv {
 class ControlElement;
 class Dir;
 class Dynam;
+class F;
+class Fb;
 class Hairpin;
 class Harm;
 class Layer;
@@ -135,6 +137,7 @@ private:
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, int measureNum);
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, int measureNum);
     void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, int measureNum);
+    void ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, int measureNum);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, int measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, int measureNum);
     void ReadMusicXmlNote(pugi::xml_node, Measure *measure, int measureNum);

@@ -21,6 +21,7 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "fb.h"
 #include "fermata.h"
 #include "hairpin.h"
 #include "harm.h"
@@ -821,6 +822,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, i
         else if (IsElement(*it, "direction")) {
             ReadMusicXmlDirection(*it, measure, measureNum);
         }
+        else if (IsElement(*it, "figured-bass")) {
+            ReadMusicXmlFigures(*it, measure, measureNum);
+        }
         else if (IsElement(*it, "forward")) {
             ReadMusicXmlForward(*it, measure, measureNum);
         }
@@ -1094,6 +1098,31 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     // other cases
     if (words.size() == 0 && !dynam && !metronome && !xmlShift && !xmlPedal && !wedge) {
         LogWarning("Unsupported direction-type '%s'", type.node().first_child().name());
+    }
+}
+
+void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, int measureNum)
+{
+    assert(node);
+    assert(measure);
+
+    if (GetAttributeValue(node, "print-object") != "no") {
+        Harm *harm = new Harm();
+        Fb *fb = new Fb();
+
+        std::string textColor = GetAttributeValue(node, "color");
+        std::string textStyle = GetAttributeValue(node, "font-style");
+        std::string textWeight = GetAttributeValue(node, "font-weight");
+        for (pugi::xml_node figure = node.child("figure"); figure; figure = figure.next_sibling("figure")) {
+            std::string textStr = GetContent(figure.select_single_node("figure-number").node());
+            F *f = new F();
+            Text *text = new Text();
+            text->SetText(UTF8to16(textStr));
+            f->AddChild(text);
+            fb->AddChild(f);
+        }
+        harm->AddChild(fb);
+        measure->AddChild(harm);
     }
 }
 
