@@ -274,7 +274,7 @@ void Tool_musicxml2hum::setOptions(int argc, char** argv) {
 
 
 void Tool_musicxml2hum::setOptions(const vector<string>& argvlist) {
-	m_options.process(argvlist);
+    m_options.process(argvlist);
 }
 
 
@@ -1022,8 +1022,18 @@ int Tool_musicxml2hum::addLyrics(GridStaff* staff, MxmlEvent* event) {
 			while (child) {
 				if (nodeType(child, "syllabic")) {
 					syllabic = child.child_value();
+					child = child.next_sibling();
+					continue;
 				} else if (nodeType(child, "text")) {
 					text = cleanSpaces(child.child_value());
+				} else if (nodeType(child, "elision")) {
+					finaltext += " ";
+					child = child.next_sibling();
+					continue;
+				} else {
+					// such as <extend>
+					child = child.next_sibling();
+					continue;
 				}
 				// escape text which would otherwise be reinterpreated
 				// as Humdrum syntax.
@@ -1035,19 +1045,19 @@ int Tool_musicxml2hum::addLyrics(GridStaff* staff, MxmlEvent* event) {
 					}
 				}
 				child = child.next_sibling();
-			}
-			if (syllabic == "middle" ) {
-				finaltext += "-";
-				finaltext += text;
-				finaltext += "-";
-			} else if (syllabic == "end") {
-				finaltext += "-";
-				finaltext += text;
-			} else if (syllabic == "begin") {
-				finaltext += text;
-				finaltext += "-";
-			} else {
-				finaltext += text;
+				if (syllabic == "middle" ) {
+					finaltext += "-";
+					finaltext += text;
+					finaltext += "-";
+				} else if (syllabic == "end") {
+					finaltext += "-";
+					finaltext += text;
+				} else if (syllabic == "begin") {
+					finaltext += text;
+					finaltext += "-";
+				} else {
+					finaltext += text;
+				}
 			}
 		}
 
