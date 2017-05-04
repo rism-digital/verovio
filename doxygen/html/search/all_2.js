@@ -1,15 +1,16 @@
 var searchData=
 [
+  ['calcartic',['CalcArtic',['../classvrv_1_1_artic.html#ad23ab8262ea35f49b518c661c5078789',1,'vrv::Artic::CalcArtic()'],['../classvrv_1_1_object.html#aeafa32ecabeffb9ce6d3e8372ab7160b',1,'vrv::Object::CalcArtic()']]],
   ['calcbezieratposition',['CalcBezierAtPosition',['../classvrv_1_1_bounding_box.html#a91eb3e2ee9b00bc764283fe1710e199b',1,'vrv::BoundingBox']]],
   ['calcchordnoteheads',['CalcChordNoteHeads',['../classvrv_1_1_note.html#ad056c8566782223ddbd1f6da4281771d',1,'vrv::Note::CalcChordNoteHeads()'],['../classvrv_1_1_object.html#a277607c9a525f437a721e8c526963d44',1,'vrv::Object::CalcChordNoteHeads()']]],
+  ['calcdots',['CalcDots',['../classvrv_1_1_chord.html#a4260532e67b95993b013a4d5b63949e2',1,'vrv::Chord::CalcDots()'],['../classvrv_1_1_note.html#ad31936d93922bf87540780a67d8569eb',1,'vrv::Note::CalcDots()'],['../classvrv_1_1_object.html#a30538b76016036369786f42be54482c2',1,'vrv::Object::CalcDots()'],['../classvrv_1_1_rest.html#af19bb53fe6642d20ddb9a66e92f7b163',1,'vrv::Rest::CalcDots()']]],
+  ['calcdotsparams',['CalcDotsParams',['../classvrv_1_1_calc_dots_params.html',1,'vrv']]],
   ['calcledgerlines',['CalcLedgerLines',['../classvrv_1_1_note.html#a67c593777c501900d80826cfcf7ed535',1,'vrv::Note::CalcLedgerLines()'],['../classvrv_1_1_object.html#aa102c1e31b16c63319763a5fc1c8351c',1,'vrv::Object::CalcLedgerLines()']]],
   ['calcloc',['CalcLoc',['../classvrv_1_1_pitch_interface.html#ac6d9b7ec74dba44097241bb60b365284',1,'vrv::PitchInterface']]],
   ['calcmaxmeasureduration',['CalcMaxMeasureDuration',['../classvrv_1_1_layer.html#abfa39c6f3c24f566388219fcc94ba219',1,'vrv::Layer::CalcMaxMeasureDuration()'],['../classvrv_1_1_layer_element.html#a901cc82df3ccc9d41d7833459d9ee3e2',1,'vrv::LayerElement::CalcMaxMeasureDuration()'],['../classvrv_1_1_measure.html#ae16da1362db2e64a14fe959922e92cde',1,'vrv::Measure::CalcMaxMeasureDuration()'],['../classvrv_1_1_object.html#ade83951cbefb443049938380b46df228',1,'vrv::Object::CalcMaxMeasureDuration()']]],
   ['calcmaxmeasuredurationparams',['CalcMaxMeasureDurationParams',['../classvrv_1_1_calc_max_measure_duration_params.html',1,'vrv']]],
   ['calcpitchposyrel',['CalcPitchPosYRel',['../classvrv_1_1_staff.html#a807cc990002cfb0f520cf43b72a893e8',1,'vrv::Staff']]],
   ['calcpositionafterrotation',['CalcPositionAfterRotation',['../classvrv_1_1_bounding_box.html#a98acbd56bdb3e5379fab4d9c999d2140',1,'vrv::BoundingBox']]],
-  ['calcstaffoverlap',['CalcStaffOverlap',['../classvrv_1_1_staff_alignment.html#a54c6f078f11b09e893ff45f23d6eb365',1,'vrv::StaffAlignment::CalcStaffOverlap()'],['../classvrv_1_1_object.html#aa34160a1458792b8680d0c075de7b759',1,'vrv::Object::CalcStaffOverlap()'],['../classvrv_1_1_system.html#a0ee2e3474da69b75315e3797d623e980',1,'vrv::System::CalcStaffOverlap()']]],
-  ['calcstaffoverlapparams',['CalcStaffOverlapParams',['../classvrv_1_1_calc_staff_overlap_params.html',1,'vrv']]],
   ['calcstem',['CalcStem',['../classvrv_1_1_beam.html#a68e2b6e3f79c497e1f9ff3fa6f76af48',1,'vrv::Beam::CalcStem()'],['../classvrv_1_1_chord.html#a820f37e84596cb5f2810faf19075de14',1,'vrv::Chord::CalcStem()'],['../classvrv_1_1_stem.html#aae4fef92faa5f1d61b1ecab89d3f8e92',1,'vrv::Stem::CalcStem()'],['../classvrv_1_1_note.html#aa0505ca9921082084eb7aa32e38cda96',1,'vrv::Note::CalcStem()'],['../classvrv_1_1_object.html#a0b93f8b6e02c8ba98a03db67fe5d5d10',1,'vrv::Object::CalcStem()'],['../classvrv_1_1_f_trem.html#a3499df150aa0a0c368444f06e2de2cce',1,'vrv::FTrem::CalcStem()']]],
   ['calcstemparams',['CalcStemParams',['../classvrv_1_1_calc_stem_params.html',1,'vrv']]],
   ['calcthickbezier',['CalcThickBezier',['../classvrv_1_1_bounding_box.html#ae087d56d7ff270c908e3a723be01f6e7',1,'vrv::BoundingBox']]],

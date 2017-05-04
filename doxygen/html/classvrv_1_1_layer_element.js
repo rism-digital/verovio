@@ -4,6 +4,7 @@ var classvrv_1_1_layer_element =
     [ "LayerElement", "classvrv_1_1_layer_element.html#a67caad7e656705f17649e1ed757b094c", null ],
     [ "~LayerElement", "classvrv_1_1_layer_element.html#a7bd87c91c7e394f0299a6b9a3b6d6d9a", null ],
     [ "AdjustGraceXPos", "classvrv_1_1_layer_element.html#ac7edd83b4e5ccb384a51ee21587409cf", null ],
+    [ "AdjustLayers", "classvrv_1_1_layer_element.html#a1a9024f996b4f7295a9b124f809bab63", null ],
     [ "AdjustXPos", "classvrv_1_1_layer_element.html#aad11c8d0fb029a782acddd5d043de3ff", null ],
     [ "AlignHorizontally", "classvrv_1_1_layer_element.html#aa9313165677a808adb9ac9084aa012d2", null ],
     [ "CalcMaxMeasureDuration", "classvrv_1_1_layer_element.html#a901cc82df3ccc9d41d7833459d9ee3e2", null ],

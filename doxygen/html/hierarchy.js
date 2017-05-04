@@ -16,6 +16,7 @@ var hierarchy =
       [ "vrv::ArticPart", "classvrv_1_1_artic_part.html", null ]
     ] ],
     [ "AttAugmentdots", null, [
+      [ "vrv::Dots", "classvrv_1_1_dots.html", null ],
       [ "vrv::DurationInterface", "classvrv_1_1_duration_interface.html", [
         [ "vrv::Chord", "classvrv_1_1_chord.html", null ],
         [ "vrv::Ligature", "classvrv_1_1_ligature.html", null ],
@@ -52,6 +53,7 @@ var hierarchy =
       [ "vrv::ArticPart", "classvrv_1_1_artic_part.html", null ],
       [ "vrv::BeatRpt", "classvrv_1_1_beat_rpt.html", null ],
       [ "vrv::Chord", "classvrv_1_1_chord.html", null ],
+      [ "vrv::Dot", "classvrv_1_1_dot.html", null ],
       [ "vrv::Fermata", "classvrv_1_1_fermata.html", null ],
       [ "vrv::Hairpin", "classvrv_1_1_hairpin.html", null ],
       [ "vrv::Mordent", "classvrv_1_1_mordent.html", null ],
@@ -119,6 +121,7 @@ var hierarchy =
         [ "vrv::Clef", "classvrv_1_1_clef.html", null ],
         [ "vrv::Custos", "classvrv_1_1_custos.html", null ],
         [ "vrv::Dot", "classvrv_1_1_dot.html", null ],
+        [ "vrv::Dots", "classvrv_1_1_dots.html", null ],
         [ "vrv::Flag", "classvrv_1_1_flag.html", null ],
         [ "vrv::FTrem", "classvrv_1_1_f_trem.html", null ],
         [ "vrv::KeySig", "classvrv_1_1_key_sig.html", null ],
@@ -186,6 +189,9 @@ var hierarchy =
     ] ],
     [ "AttDistances", null, [
       [ "vrv::StaffDef", "classvrv_1_1_staff_def.html", null ]
+    ] ],
+    [ "AttDotLog", null, [
+      [ "vrv::Dot", "classvrv_1_1_dot.html", null ]
     ] ],
     [ "AttDurationMusical", null, [
       [ "vrv::DurationInterface", "classvrv_1_1_duration_interface.html", null ]
@@ -274,6 +280,9 @@ var hierarchy =
     [ "AttMeterSigLog", null, [
       [ "vrv::MeterSig", "classvrv_1_1_meter_sig.html", null ]
     ] ],
+    [ "AttMeterSigVis", null, [
+      [ "vrv::MeterSig", "classvrv_1_1_meter_sig.html", null ]
+    ] ],
     [ "AttMiditempo", null, [
       [ "vrv::ScoreDefInterface", "classvrv_1_1_score_def_interface.html", null ],
       [ "vrv::Tempo", "classvrv_1_1_tempo.html", null ]
@@ -353,6 +362,9 @@ var hierarchy =
       [ "vrv::Mensur", "classvrv_1_1_mensur.html", null ],
       [ "vrv::MRest", "classvrv_1_1_m_rest.html", null ],
       [ "vrv::Note", "classvrv_1_1_note.html", null ],
+      [ "vrv::Rest", "classvrv_1_1_rest.html", null ]
+    ] ],
+    [ "AttRestVisMensural", null, [
       [ "vrv::Rest", "classvrv_1_1_rest.html", null ]
     ] ],
     [ "AttScalable", null, [
@@ -489,6 +501,9 @@ var hierarchy =
       [ "vrv::MRest", "classvrv_1_1_m_rest.html", null ],
       [ "vrv::Note", "classvrv_1_1_note.html", null ]
     ] ],
+    [ "AttWhitespace", null, [
+      [ "vrv::Rend", "classvrv_1_1_rend.html", null ]
+    ] ],
     [ "vrv::BeamDrawingParams", "classvrv_1_1_beam_drawing_params.html", null ],
     [ "vrv::BeamElementCoord", "classvrv_1_1_beam_element_coord.html", null ],
     [ "vrv::BoundaryStartInterface", "classvrv_1_1_boundary_start_interface.html", [
@@ -546,14 +561,17 @@ var hierarchy =
       [ "vrv::AdjustFloatingPostionerGrpsParams", "classvrv_1_1_adjust_floating_postioner_grps_params.html", null ],
       [ "vrv::AdjustFloatingPostionersParams", "classvrv_1_1_adjust_floating_postioners_params.html", null ],
       [ "vrv::AdjustGraceXPosParams", "classvrv_1_1_adjust_grace_x_pos_params.html", null ],
+      [ "vrv::AdjustLayersParams", "classvrv_1_1_adjust_layers_params.html", null ],
+      [ "vrv::AdjustStaffOverlapParams", "classvrv_1_1_adjust_staff_overlap_params.html", null ],
       [ "vrv::AdjustSylSpacingParams", "classvrv_1_1_adjust_syl_spacing_params.html", null ],
       [ "vrv::AdjustXPosParams", "classvrv_1_1_adjust_x_pos_params.html", null ],
+      [ "vrv::AdjustYPosParams", "classvrv_1_1_adjust_y_pos_params.html", null ],
       [ "vrv::AlignHorizontallyParams", "classvrv_1_1_align_horizontally_params.html", null ],
       [ "vrv::AlignMeasuresParams", "classvrv_1_1_align_measures_params.html", null ],
       [ "vrv::AlignSystemsParams", "classvrv_1_1_align_systems_params.html", null ],
       [ "vrv::AlignVerticallyParams", "classvrv_1_1_align_vertically_params.html", null ],
+      [ "vrv::CalcDotsParams", "classvrv_1_1_calc_dots_params.html", null ],
       [ "vrv::CalcMaxMeasureDurationParams", "classvrv_1_1_calc_max_measure_duration_params.html", null ],
-      [ "vrv::CalcStaffOverlapParams", "classvrv_1_1_calc_staff_overlap_params.html", null ],
       [ "vrv::CalcStemParams", "classvrv_1_1_calc_stem_params.html", null ],
       [ "vrv::CastOffEncodingParams", "classvrv_1_1_cast_off_encoding_params.html", null ],
       [ "vrv::CastOffPagesParams", "classvrv_1_1_cast_off_pages_params.html", null ],
@@ -568,7 +586,6 @@ var hierarchy =
       [ "vrv::FunctorDocParams", "classvrv_1_1_functor_doc_params.html", null ],
       [ "vrv::GenerateMIDIParams", "classvrv_1_1_generate_m_i_d_i_params.html", null ],
       [ "vrv::GetAlignmentLeftRightParams", "classvrv_1_1_get_alignment_left_right_params.html", null ],
-      [ "vrv::IntegrateBoundingBoxYShiftParams", "classvrv_1_1_integrate_bounding_box_y_shift_params.html", null ],
       [ "vrv::JustifyXParams", "classvrv_1_1_justify_x_params.html", null ],
       [ "vrv::PrepareBoundariesParams", "classvrv_1_1_prepare_boundaries_params.html", null ],
       [ "vrv::PrepareCrossStaffParams", "classvrv_1_1_prepare_cross_staff_params.html", null ],
@@ -583,7 +600,6 @@ var hierarchy =
       [ "vrv::PrepareTimestampsParams", "classvrv_1_1_prepare_timestamps_params.html", null ],
       [ "vrv::ReplaceDrawingValuesInStaffDefParams", "classvrv_1_1_replace_drawing_values_in_staff_def_params.html", null ],
       [ "vrv::SaveParams", "classvrv_1_1_save_params.html", null ],
-      [ "vrv::SetAligmentYPosParams", "classvrv_1_1_set_aligment_y_pos_params.html", null ],
       [ "vrv::SetAlignmentPitchPosParams", "classvrv_1_1_set_alignment_pitch_pos_params.html", null ],
       [ "vrv::SetAlignmentXPosParams", "classvrv_1_1_set_alignment_x_pos_params.html", null ],
       [ "vrv::SetCautionaryScoreDefParams", "classvrv_1_1_set_cautionary_score_def_params.html", null ],

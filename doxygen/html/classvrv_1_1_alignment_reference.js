@@ -8,6 +8,8 @@ var classvrv_1_1_alignment_reference =
     [ "AdjustAccidWithAccidSpace", "classvrv_1_1_alignment_reference.html#a715bbd898df2de1b3ff0c9f7cd047146", null ],
     [ "AdjustAccidX", "classvrv_1_1_alignment_reference.html#ad026819add9faa3b43b1257af1d4e90c", null ],
     [ "AdjustGraceXPos", "classvrv_1_1_alignment_reference.html#a1d1d8ec73574cab1273446e88f72d021", null ],
+    [ "AdjustLayers", "classvrv_1_1_alignment_reference.html#a235100af5d136b53d38e75262a8ab901", null ],
     [ "GetClassId", "classvrv_1_1_alignment_reference.html#a62d722004288cf230d54c2b02e4b4619", null ],
+    [ "HasMultipleLayer", "classvrv_1_1_alignment_reference.html#a9c1895942dd54bf9ac12b788dbf7570c", null ],
     [ "Reset", "classvrv_1_1_alignment_reference.html#aadc2d7cae6429e02e91766794b4667a2", null ]
 ];

@@ -3,7 +3,7 @@ var classvrv_1_1_artic =
     [ "Artic", "classvrv_1_1_artic.html#aaa00075555eb6279bf17ef2bfa967f98", null ],
     [ "~Artic", "classvrv_1_1_artic.html#a3c96bf603ee31f3ea031f4a8a2ac0584", null ],
     [ "AddChild", "classvrv_1_1_artic.html#aeb5e296694574e4e4be6434e94603acb", null ],
-    [ "AdjustArtic", "classvrv_1_1_artic.html#adcdab0ebbd513631481f06ace96baaa7", null ],
+    [ "CalcArtic", "classvrv_1_1_artic.html#ad23ab8262ea35f49b518c661c5078789", null ],
     [ "GetClassId", "classvrv_1_1_artic.html#a4714c7d0a8b6739daa5a84352e953206", null ],
     [ "GetClassName", "classvrv_1_1_artic.html#ac993bfadffd73b30fe6b372399d2d352", null ],
     [ "GetInsidePart", "classvrv_1_1_artic.html#a6ab241c9e4f4afd5d9d5152afa7c835b", null ],

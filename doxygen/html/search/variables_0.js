@@ -7,7 +7,6 @@ var searchData=
   ['m_5fbottommargindefault',['m_bottomMarginDefault',['../classvrv_1_1_style.html#a1c6f28259d5bbbeb61c0f3fa69bc9850',1,'vrv::Style']]],
   ['m_5fcacheddrawingx',['m_cachedDrawingX',['../classvrv_1_1_bounding_box.html#a4961ebaf8f99abe31ee894345cd84a16',1,'vrv::BoundingBox']]],
   ['m_5fchildren',['m_children',['../classvrv_1_1_object.html#a3f896d8fcccd24f2d443db940aa086e5',1,'vrv::Object']]],
-  ['m_5fcluster',['m_cluster',['../classvrv_1_1_note.html#af2c2dbc2bd4daaadd559e1e3e9639449',1,'vrv::Note']]],
   ['m_5fcontent',['m_content',['../classvrv_1_1_annot.html#a184f9b0fe1d935528b12ecf31e974d4c',1,'vrv::Annot']]],
   ['m_5fcrossstaff',['m_crossStaff',['../classvrv_1_1_layer_element.html#af61467813ceb6c74c05b55484007c48b',1,'vrv::LayerElement']]],
   ['m_5fcurrentcolour',['m_currentColour',['../classvrv_1_1_view.html#ae6aac368e2134e991fb7a1a5e93f59df',1,'vrv::View']]],

@@ -4,8 +4,9 @@ var classvrv_1_1_measure =
     [ "~Measure", "classvrv_1_1_measure.html#a8d4529908c3720683e20a001b5881336", null ],
     [ "AddChild", "classvrv_1_1_measure.html#a81e1e232db13e677d6114a4b21033157", null ],
     [ "AddTimestamp", "classvrv_1_1_measure.html#a67df4d10c89fedc0a403cb7169170d0a", null ],
-    [ "AdjustAccidX", "classvrv_1_1_measure.html#a9b19368a480e341deecc359b6eb808a4", null ],
+    [ "AdjustAccidX", "classvrv_1_1_measure.html#afcfbbf264d2da532a19945d12f9dbe3d", null ],
     [ "AdjustGraceXPos", "classvrv_1_1_measure.html#aad4e143d91b129999b2cf020925b40b1", null ],
+    [ "AdjustLayers", "classvrv_1_1_measure.html#a65d7eae484556ea7e423a516f975060d", null ],
     [ "AdjustSylSpacingEnd", "classvrv_1_1_measure.html#ae14b75d9c98a3737a1993baea142a126", null ],
     [ "AdjustXPos", "classvrv_1_1_measure.html#a0dbda8c45a7eec4faeeb76181fb13572", null ],
     [ "AlignHorizontally", "classvrv_1_1_measure.html#aa3b562577b2c8ee3703bef304dc848d9", null ],
@@ -65,5 +66,6 @@ var classvrv_1_1_measure =
     [ "m_drawingXRel", "classvrv_1_1_measure.html#a0f66f8a9a11ea45c967fbb796b21d91f", null ],
     [ "m_measureAligner", "classvrv_1_1_measure.html#a39f4319275584a57b898dcbfcbed760e", null ],
     [ "m_timestampAligner", "classvrv_1_1_measure.html#a680391bcbb2cbc1cc3859a22194133e5", null ],
-    [ "m_xAbs", "classvrv_1_1_measure.html#a01d1317a4566fcddf833550820277d91", null ]
+    [ "m_xAbs", "classvrv_1_1_measure.html#a01d1317a4566fcddf833550820277d91", null ],
+    [ "m_xAbs2", "classvrv_1_1_measure.html#ac8572f7f5fc2b99d09d5f4fc5e3e42e2", null ]
 ];

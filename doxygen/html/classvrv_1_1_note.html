@@ -107,15 +107,6 @@ Inheritance diagram for vrv::Note:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8f681874ac5c6e434eac390455ae68f4"><td class="memItemLeft" align="right" valign="top"><a id="a8f681874ac5c6e434eac390455ae68f4"></a>
-virtual <a class="el" href="classvrv_1_1_duration_interface.html">DurationInterface</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetDurationInterface</b> ()</td></tr>
-<tr class="separator:a8f681874ac5c6e434eac390455ae68f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9fe7c87d2ca44ee1d7eddf14e39b7b4c"><td class="memItemLeft" align="right" valign="top"><a id="a9fe7c87d2ca44ee1d7eddf14e39b7b4c"></a>
-virtual <a class="el" href="classvrv_1_1_pitch_interface.html">PitchInterface</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetPitchInterface</b> ()</td></tr>
-<tr class="separator:a9fe7c87d2ca44ee1d7eddf14e39b7b4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71274e9a15a5002858728613005ef147"><td class="memItemLeft" align="right" valign="top"><a id="a71274e9a15a5002858728613005ef147"></a>
-virtual <a class="el" href="classvrv_1_1_stemmed_drawing_interface.html">StemmedDrawingInterface</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetStemmedDrawingInterface</b> ()</td></tr>
-<tr class="separator:a71274e9a15a5002858728613005ef147"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58b9d65399c6c4483ea27d7fbe1ed692"><td class="memItemLeft" align="right" valign="top"><a id="a58b9d65399c6c4483ea27d7fbe1ed692"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_note.html#a58b9d65399c6c4483ea27d7fbe1ed692">HasToBeAligned</a> () const</td></tr>
 <tr class="memdesc:a58b9d65399c6c4483ea27d7fbe1ed692"><td class="mdescLeft">&#160;</td><td class="mdescRight">Override the method since alignment is required. <br /></td></tr>
@@ -123,27 +114,21 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="memitem:a777cd96f58898204059f5f08dbf2a736"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_note.html#a777cd96f58898204059f5f08dbf2a736">AddChild</a> (<a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
 <tr class="memdesc:a777cd96f58898204059f5f08dbf2a736"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrv_1_1_add.html">Add</a> an element (a verse or an accid) to a note.  <a href="#a777cd96f58898204059f5f08dbf2a736">More...</a><br /></td></tr>
 <tr class="separator:a777cd96f58898204059f5f08dbf2a736"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a28b46326ae7c510b1daaee0a243d325e"><td class="memItemLeft" align="right" valign="top"><a id="a28b46326ae7c510b1daaee0a243d325e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDrawingLoc</b> (int drawingLoc)</td></tr>
-<tr class="separator:a28b46326ae7c510b1daaee0a243d325e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab6a03a24edabc295b5c5c7aa6319e274"><td class="memItemLeft" align="right" valign="top"><a id="ab6a03a24edabc295b5c5c7aa6319e274"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingLoc</b> () const</td></tr>
-<tr class="separator:ab6a03a24edabc295b5c5c7aa6319e274"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c99aad1e5fbcb7713c46cf88bb63328"><td class="memItemLeft" align="right" valign="top"><a id="a0c99aad1e5fbcb7713c46cf88bb63328"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingRadius</b> (<a class="el" href="classvrv_1_1_doc.html">Doc</a> *doc, int staffSize, bool isCueSize) const</td></tr>
-<tr class="separator:a0c99aad1e5fbcb7713c46cf88bb63328"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40bd7cfa491712c99ed6d1bb22fe880f"><td class="memItemLeft" align="right" valign="top"><a id="a40bd7cfa491712c99ed6d1bb22fe880f"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_note.html#a40bd7cfa491712c99ed6d1bb22fe880f">GetDiatonicPitch</a> () const</td></tr>
-<tr class="memdesc:a40bd7cfa491712c99ed6d1bb22fe880f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a single integer representing pitch and octave. <br /></td></tr>
-<tr class="separator:a40bd7cfa491712c99ed6d1bb22fe880f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f569dd14639313902bcdcf1fe6d9f22"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_note.html#a3f569dd14639313902bcdcf1fe6d9f22">IsUnissonWith</a> (<a class="el" href="classvrv_1_1_note.html">Note</a> *note, bool ignoreAccid=false)</td></tr>
+<tr class="memdesc:a3f569dd14639313902bcdcf1fe6d9f22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the note is a unisson.  <a href="#a3f569dd14639313902bcdcf1fe6d9f22">More...</a><br /></td></tr>
+<tr class="separator:a3f569dd14639313902bcdcf1fe6d9f22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0505ca9921082084eb7aa32e38cda96"><td class="memItemLeft" align="right" valign="top"><a id="aa0505ca9921082084eb7aa32e38cda96"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_note.html#aa0505ca9921082084eb7aa32e38cda96">CalcStem</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:aa0505ca9921082084eb7aa32e38cda96"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#a0b93f8b6e02c8ba98a03db67fe5d5d10" title="Set the drawing stems positions, including for beams. ">Object::CalcStem</a>. <br /></td></tr>
+<tr class="memdesc:aa0505ca9921082084eb7aa32e38cda96"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#a0b93f8b6e02c8ba98a03db67fe5d5d10" title="Set the drawing stem positions, including for beams. ">Object::CalcStem</a>. <br /></td></tr>
 <tr class="separator:aa0505ca9921082084eb7aa32e38cda96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad056c8566782223ddbd1f6da4281771d"><td class="memItemLeft" align="right" valign="top"><a id="ad056c8566782223ddbd1f6da4281771d"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_note.html#ad056c8566782223ddbd1f6da4281771d">CalcChordNoteHeads</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="memdesc:ad056c8566782223ddbd1f6da4281771d"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#a277607c9a525f437a721e8c526963d44" title="Set the note head flipped positions. ">Object::CalcChordNoteHeads</a>. <br /></td></tr>
 <tr class="separator:ad056c8566782223ddbd1f6da4281771d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad31936d93922bf87540780a67d8569eb"><td class="memItemLeft" align="right" valign="top"><a id="ad31936d93922bf87540780a67d8569eb"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_note.html#ad31936d93922bf87540780a67d8569eb">CalcDots</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:ad31936d93922bf87540780a67d8569eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#a30538b76016036369786f42be54482c2" title="Set the drawing dot positions, including for chords. ">Object::CalcDots</a>. <br /></td></tr>
+<tr class="separator:ad31936d93922bf87540780a67d8569eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67c593777c501900d80826cfcf7ed535"><td class="memItemLeft" align="right" valign="top"><a id="a67c593777c501900d80826cfcf7ed535"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_note.html#a67c593777c501900d80826cfcf7ed535">CalcLedgerLines</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="memdesc:a67c593777c501900d80826cfcf7ed535"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#aa102c1e31b16c63319763a5fc1c8351c" title="Set the note head flipped positions and calc the ledger lines. ">Object::CalcLedgerLines</a>. <br /></td></tr>
@@ -194,6 +179,16 @@ virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><b>GetCla
 <tr class="memitem:a88b7a68ecd32a24add5288d9e883730a"><td class="memItemLeft" align="right" valign="top"><a id="a88b7a68ecd32a24add5288d9e883730a"></a>
 virtual ClassId&#160;</td><td class="memItemRight" valign="bottom"><b>GetClassId</b> () const</td></tr>
 <tr class="separator:a88b7a68ecd32a24add5288d9e883730a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Getter to interfaces</div></td></tr>
+<tr class="memitem:a8f681874ac5c6e434eac390455ae68f4"><td class="memItemLeft" align="right" valign="top"><a id="a8f681874ac5c6e434eac390455ae68f4"></a>
+virtual <a class="el" href="classvrv_1_1_duration_interface.html">DurationInterface</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetDurationInterface</b> ()</td></tr>
+<tr class="separator:a8f681874ac5c6e434eac390455ae68f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fe7c87d2ca44ee1d7eddf14e39b7b4c"><td class="memItemLeft" align="right" valign="top"><a id="a9fe7c87d2ca44ee1d7eddf14e39b7b4c"></a>
+virtual <a class="el" href="classvrv_1_1_pitch_interface.html">PitchInterface</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetPitchInterface</b> ()</td></tr>
+<tr class="separator:a9fe7c87d2ca44ee1d7eddf14e39b7b4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71274e9a15a5002858728613005ef147"><td class="memItemLeft" align="right" valign="top"><a id="a71274e9a15a5002858728613005ef147"></a>
+virtual <a class="el" href="classvrv_1_1_stemmed_drawing_interface.html">StemmedDrawingInterface</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetStemmedDrawingInterface</b> ()</td></tr>
+<tr class="separator:a71274e9a15a5002858728613005ef147"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Setter and getter for tie attribute and other pointers</div></td></tr>
 <tr class="memitem:a72a6d0881e4198532f4f6898e9d1b182"><td class="memItemLeft" align="right" valign="top"><a id="a72a6d0881e4198532f4f6898e9d1b182"></a>
 <a class="el" href="classvrv_1_1_accid.html">Accid</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingAccid</b> ()</td></tr>
@@ -207,6 +202,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDrawingTieAttr</b>
 <tr class="memitem:a8ff01edf9a31714dcdd364d31e89c450"><td class="memItemLeft" align="right" valign="top"><a id="a8ff01edf9a31714dcdd364d31e89c450"></a>
 <a class="el" href="classvrv_1_1_tie.html">Tie</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingTieAttr</b> () const</td></tr>
 <tr class="separator:a8ff01edf9a31714dcdd364d31e89c450"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Setter and getter for the drawing staff loc.</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p>This is set by the SetAlignmentPitchPos functor. </p>
+</div></td></tr>
+<tr class="memitem:a28b46326ae7c510b1daaee0a243d325e"><td class="memItemLeft" align="right" valign="top"><a id="a28b46326ae7c510b1daaee0a243d325e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDrawingLoc</b> (int drawingLoc)</td></tr>
+<tr class="separator:a28b46326ae7c510b1daaee0a243d325e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6a03a24edabc295b5c5c7aa6319e274"><td class="memItemLeft" align="right" valign="top"><a id="ab6a03a24edabc295b5c5c7aa6319e274"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingLoc</b> () const</td></tr>
+<tr class="separator:ab6a03a24edabc295b5c5c7aa6319e274"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader"></div></td></tr>
 <tr class="memitem:abfcac1365637007ca58537cbae8fa306"><td class="memItemLeft" align="right" valign="top"><a id="abfcac1365637007ca58537cbae8fa306"></a>
 <a class="el" href="classvrv_1_1_chord.html">Chord</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_note.html#abfcac1365637007ca58537cbae8fa306">IsChordTone</a> () const</td></tr>
@@ -218,7 +222,29 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingDur</b> () c
 <tr class="memitem:a1a7d0a9ea9cb70585ce2b438e41dd4a5"><td class="memItemLeft" align="right" valign="top"><a id="a1a7d0a9ea9cb70585ce2b438e41dd4a5"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsClusterExtreme</b> () const</td></tr>
 <tr class="separator:a1a7d0a9ea9cb70585ce2b438e41dd4a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader"></div></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Setter and getter for the chord cluster and the position of the note</div></td></tr>
+<tr class="memitem:a5dbdadeb93f4e6cf0f15dabc238b8349"><td class="memItemLeft" align="right" valign="top"><a id="a5dbdadeb93f4e6cf0f15dabc238b8349"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetCluster</b> (ChordCluster *cluster, int position)</td></tr>
+<tr class="separator:a5dbdadeb93f4e6cf0f15dabc238b8349"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecc23a1f92c40bb4e4f1dc1da58ab8aa"><td class="memItemLeft" align="right" valign="top"><a id="aecc23a1f92c40bb4e4f1dc1da58ab8aa"></a>
+ChordCluster *&#160;</td><td class="memItemRight" valign="bottom"><b>GetCluster</b> () const</td></tr>
+<tr class="separator:aecc23a1f92c40bb4e4f1dc1da58ab8aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Setter and getter for the flipped note head flag</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p>} </p>
+</div></td></tr>
+<tr class="memitem:a9bd4ecffc2b79ff14134ca3c4da8ebbe"><td class="memItemLeft" align="right" valign="top"><a id="a9bd4ecffc2b79ff14134ca3c4da8ebbe"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetFlippedNotehead</b> (bool flippedNotehead)</td></tr>
+<tr class="separator:a9bd4ecffc2b79ff14134ca3c4da8ebbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a520f34e67cd0e66c90216e942720b646"><td class="memItemLeft" align="right" valign="top"><a id="a520f34e67cd0e66c90216e942720b646"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>GetFlippedNotehead</b> () const</td></tr>
+<tr class="separator:a520f34e67cd0e66c90216e942720b646"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c99aad1e5fbcb7713c46cf88bb63328"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_note.html#a0c99aad1e5fbcb7713c46cf88bb63328">GetDrawingRadius</a> (<a class="el" href="classvrv_1_1_doc.html">Doc</a> *doc, int staffSize, bool isCueSize) const</td></tr>
+<tr class="memdesc:a0c99aad1e5fbcb7713c46cf88bb63328"><td class="mdescLeft">&#160;</td><td class="mdescRight">}  <a href="#a0c99aad1e5fbcb7713c46cf88bb63328">More...</a><br /></td></tr>
+<tr class="separator:a0c99aad1e5fbcb7713c46cf88bb63328"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40bd7cfa491712c99ed6d1bb22fe880f"><td class="memItemLeft" align="right" valign="top"><a id="a40bd7cfa491712c99ed6d1bb22fe880f"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_note.html#a40bd7cfa491712c99ed6d1bb22fe880f">GetDiatonicPitch</a> () const</td></tr>
+<tr class="memdesc:a40bd7cfa491712c99ed6d1bb22fe880f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a single integer representing pitch and octave. <br /></td></tr>
+<tr class="separator:a40bd7cfa491712c99ed6d1bb22fe880f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4270768391433ba58acea66a16b3cbf4"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrv_1_1_point.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_note.html#a4270768391433ba58acea66a16b3cbf4">GetStemUpSE</a> (<a class="el" href="classvrv_1_1_doc.html">Doc</a> *doc, int staffSize, bool graceSize)</td></tr>
 <tr class="memdesc:a4270768391433ba58acea66a16b3cbf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the stem up / stem down attachment point.  <a href="#a4270768391433ba58acea66a16b3cbf4">More...</a><br /></td></tr>
 <tr class="separator:a4270768391433ba58acea66a16b3cbf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -262,6 +288,10 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_layer_element.html#aa9313165677a808adb9ac9084aa012d2">AlignHorizontally</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="memdesc:aa9313165677a808adb9ac9084aa012d2 inherit pub_methods_classvrv_1_1_layer_element"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#ac3beb8d8246e880f20c92c4e3725545a" title="Align horizontally the content of a page. ">Object::AlignHorizontally</a>. <br /></td></tr>
 <tr class="separator:aa9313165677a808adb9ac9084aa012d2 inherit pub_methods_classvrv_1_1_layer_element"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a9024f996b4f7295a9b124f809bab63 inherit pub_methods_classvrv_1_1_layer_element"><td class="memItemLeft" align="right" valign="top"><a id="a1a9024f996b4f7295a9b124f809bab63"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_layer_element.html#a1a9024f996b4f7295a9b124f809bab63">AdjustLayers</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a1a9024f996b4f7295a9b124f809bab63 inherit pub_methods_classvrv_1_1_layer_element"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#acd47b579ea43282b32c8c585308d9857" title="Adjust the position the outside articulations. ">Object::AdjustLayers</a>. <br /></td></tr>
+<tr class="separator:a1a9024f996b4f7295a9b124f809bab63 inherit pub_methods_classvrv_1_1_layer_element"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aad11c8d0fb029a782acddd5d043de3ff inherit pub_methods_classvrv_1_1_layer_element"><td class="memItemLeft" align="right" valign="top"><a id="aad11c8d0fb029a782acddd5d043de3ff"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_layer_element.html#aad11c8d0fb029a782acddd5d043de3ff">AdjustXPos</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="memdesc:aad11c8d0fb029a782acddd5d043de3ff inherit pub_methods_classvrv_1_1_layer_element"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#adacbf7e25c213d82303c739fec53828a" title="Lay out the X positions of the staff content looking at the bounding boxes. ">Object::AdjustXPos</a>. <br /></td></tr>
@@ -474,9 +504,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <a class="el" href="classvrv_1_1_object.html">Object</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ac846569894fc8b08083e5a8526ba5834">DetachChild</a> (int idx)</td></tr>
 <tr class="memdesc:ac846569894fc8b08083e5a8526ba5834 inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Detach the child at the idx position (NULL if not found) The parent pointer is set to NULL. <br /></td></tr>
 <tr class="separator:ac846569894fc8b08083e5a8526ba5834 inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea651aedbf03550e9a7c1fc1a134d087 inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#aea651aedbf03550e9a7c1fc1a134d087">HasChild</a> (<a class="el" href="classvrv_1_1_object.html">Object</a> *child) const</td></tr>
-<tr class="memdesc:aea651aedbf03550e9a7c1fc1a134d087 inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the object has the child <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> as child (reference of direct).  <a href="classvrv_1_1_object.html#aea651aedbf03550e9a7c1fc1a134d087">More...</a><br /></td></tr>
-<tr class="separator:aea651aedbf03550e9a7c1fc1a134d087 inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb80a1297dbe6a0652008895a001572b inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#afb80a1297dbe6a0652008895a001572b">HasChild</a> (<a class="el" href="classvrv_1_1_object.html">Object</a> *child, int deepness=UNLIMITED_DEPTH) const</td></tr>
+<tr class="memdesc:afb80a1297dbe6a0652008895a001572b inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the object has the child <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> as child (reference of direct).  <a href="classvrv_1_1_object.html#afb80a1297dbe6a0652008895a001572b">More...</a><br /></td></tr>
+<tr class="separator:afb80a1297dbe6a0652008895a001572b inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb33c539f02ad052953cbd6290407bfa inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="aeb33c539f02ad052953cbd6290407bfa"></a>
 <a class="el" href="classvrv_1_1_object.html">Object</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#aeb33c539f02ad052953cbd6290407bfa">FindChildByUuid</a> (std::string uuid, int deepness=UNLIMITED_DEPTH, bool direction=FORWARD)</td></tr>
 <tr class="memdesc:aeb33c539f02ad052953cbd6290407bfa inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Look for a child with the specified uuid (returns NULL if not found) This method is a wrapper for the <a class="el" href="classvrv_1_1_object.html#a3a8ac50b3a292c42c0b24d7c7a6cd3b1" title="Find a Object with a specified uuid. ">Object::FindByUuid</a> functor. <br /></td></tr>
@@ -543,8 +573,29 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memdesc:a3eb3c52e16525ed1a559a825fa85e00e inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the minimum left and maximum right for an alignment.  <a href="classvrv_1_1_object.html#a3eb3c52e16525ed1a559a825fa85e00e">More...</a><br /></td></tr>
 <tr class="separator:a3eb3c52e16525ed1a559a825fa85e00e inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08855458e45646f3831f2edf7c8a77e0 inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="a08855458e45646f3831f2edf7c8a77e0"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>AdjustAccidX</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a08855458e45646f3831f2edf7c8a77e0">AdjustAccidX</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
+<tr class="memdesc:a08855458e45646f3831f2edf7c8a77e0 inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adjust the x position of accidental. <br /></td></tr>
 <tr class="separator:a08855458e45646f3831f2edf7c8a77e0 inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab07299113bca877d821a79246e887bd2 inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="ab07299113bca877d821a79246e887bd2"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ab07299113bca877d821a79246e887bd2">AlignSystems</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
+<tr class="memdesc:ab07299113bca877d821a79246e887bd2 inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Align the system by adjusting the m_drawingYRel position looking at the <a class="el" href="classvrv_1_1_system_aligner.html" title="This class aligns the content of a system It contains a vector of StaffAlignment. ...">SystemAligner</a>. <br /></td></tr>
+<tr class="separator:ab07299113bca877d821a79246e887bd2 inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56434ce48d536c537485260bec7ef6c2 inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="a56434ce48d536c537485260bec7ef6c2"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a56434ce48d536c537485260bec7ef6c2">AdjustStaffOverlap</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
+<tr class="memdesc:a56434ce48d536c537485260bec7ef6c2 inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes. <br /></td></tr>
+<tr class="separator:a56434ce48d536c537485260bec7ef6c2 inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8cc3cee5e4463a0434de0fa42ab1d1cb inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="a8cc3cee5e4463a0434de0fa42ab1d1cb"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a8cc3cee5e4463a0434de0fa42ab1d1cb">AdjustYPos</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
+<tr class="memdesc:a8cc3cee5e4463a0434de0fa42ab1d1cb inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adjust the position of the <a class="el" href="classvrv_1_1_staff_alignment.html" title="This class stores an alignement position staves will point to. ">StaffAlignment</a>. <br /></td></tr>
+<tr class="separator:a8cc3cee5e4463a0434de0fa42ab1d1cb inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45993175bb6a94cbbd0a5b69251e25eb inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="a45993175bb6a94cbbd0a5b69251e25eb"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a45993175bb6a94cbbd0a5b69251e25eb">SetOverflowBBoxes</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a45993175bb6a94cbbd0a5b69251e25eb inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows. <br /></td></tr>
+<tr class="separator:a45993175bb6a94cbbd0a5b69251e25eb inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70161897776b5acbaf0dddaa1ddd9def inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="a70161897776b5acbaf0dddaa1ddd9def"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a70161897776b5acbaf0dddaa1ddd9def">SetOverflowBBoxesEnd</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a70161897776b5acbaf0dddaa1ddd9def inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows. <br /></td></tr>
+<tr class="separator:a70161897776b5acbaf0dddaa1ddd9def inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d2903e69118df1b627cb99ecd036948 inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="a4d2903e69118df1b627cb99ecd036948"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a4d2903e69118df1b627cb99ecd036948">PrepareProcessingLists</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
 <tr class="memdesc:a4d2903e69118df1b627cb99ecd036948 inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds a tree of ints (<a class="el" href="structvrv_1_1_int_tree.html" title="Generic int map recursive structure for storing hierachy of values For example, we want to process al...">IntTree</a>) with the staff/layer/verse numbers and for staff/layer to be then processed. <br /></td></tr>
@@ -669,10 +720,10 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memitem:ad628dce30da1167aa84313ea7a4f5612 inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="ad628dce30da1167aa84313ea7a4f5612"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>SaveEnd</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="separator:ad628dce30da1167aa84313ea7a4f5612 inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b400f3d27479c0a45865bb97d21a879 inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="a6b400f3d27479c0a45865bb97d21a879"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a6b400f3d27479c0a45865bb97d21a879">AdjustArtic</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
-<tr class="memdesc:a6b400f3d27479c0a45865bb97d21a879 inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adjust the position the outside articulations. <br /></td></tr>
-<tr class="separator:a6b400f3d27479c0a45865bb97d21a879 inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeafa32ecabeffb9ce6d3e8372ab7160b inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="aeafa32ecabeffb9ce6d3e8372ab7160b"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#aeafa32ecabeffb9ce6d3e8372ab7160b">CalcArtic</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
+<tr class="memdesc:aeafa32ecabeffb9ce6d3e8372ab7160b inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adjust the position the outside articulations. <br /></td></tr>
+<tr class="separator:aeafa32ecabeffb9ce6d3e8372ab7160b inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f7c68b80209c30180004962bff3c8f0 inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="a0f7c68b80209c30180004962bff3c8f0"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a0f7c68b80209c30180004962bff3c8f0">AdjustArticWithSlurs</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
 <tr class="memdesc:a0f7c68b80209c30180004962bff3c8f0 inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adjust the position the outside articulations with slur. <br /></td></tr>
@@ -710,30 +761,9 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>AdjustSylSpaci
 <tr class="memitem:a318b62923fa869781ad0effd2ff40648 inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a318b62923fa869781ad0effd2ff40648">AlignVertically</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
 <tr class="memdesc:a318b62923fa869781ad0effd2ff40648 inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Align vertically the content of a page.  <a href="classvrv_1_1_object.html#a318b62923fa869781ad0effd2ff40648">More...</a><br /></td></tr>
 <tr class="separator:a318b62923fa869781ad0effd2ff40648 inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab07299113bca877d821a79246e887bd2 inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="ab07299113bca877d821a79246e887bd2"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ab07299113bca877d821a79246e887bd2">AlignSystems</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
-<tr class="memdesc:ab07299113bca877d821a79246e887bd2 inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Align the system by adjusting the m_drawingYRel position looking at the <a class="el" href="classvrv_1_1_system_aligner.html" title="This class aligns the content of a system It contains a vector of StaffAlignment. ...">SystemAligner</a>. <br /></td></tr>
-<tr class="separator:ab07299113bca877d821a79246e887bd2 inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa34160a1458792b8680d0c075de7b759 inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="aa34160a1458792b8680d0c075de7b759"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#aa34160a1458792b8680d0c075de7b759">CalcStaffOverlap</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
-<tr class="memdesc:aa34160a1458792b8680d0c075de7b759 inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes. <br /></td></tr>
-<tr class="separator:aa34160a1458792b8680d0c075de7b759 inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adf3a9f8bee394a7ebdef611943dd913a inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="adf3a9f8bee394a7ebdef611943dd913a"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#adf3a9f8bee394a7ebdef611943dd913a">IntegrateBoundingBoxYShift</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
-<tr class="memdesc:adf3a9f8bee394a7ebdef611943dd913a inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correct the Y alignment once the content of a system has been aligned and laid out See <a class="el" href="classvrv_1_1_system.html#a64bc44d4eecab49c8756ccfe797fadc0" title="See Object::IntegrateBoundingBoxYShift. ">System::IntegrateBoundingBoxYShift</a> for actual implementation. <br /></td></tr>
-<tr class="separator:adf3a9f8bee394a7ebdef611943dd913a inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81d3dfd023881e0aa95e01f50d615720 inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="a81d3dfd023881e0aa95e01f50d615720"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a81d3dfd023881e0aa95e01f50d615720">SetAligmentYPos</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
-<tr class="memdesc:a81d3dfd023881e0aa95e01f50d615720 inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the position of the <a class="el" href="classvrv_1_1_staff_alignment.html" title="This class stores an alignement position staves will point to. ">StaffAlignment</a>. <br /></td></tr>
-<tr class="separator:a81d3dfd023881e0aa95e01f50d615720 inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45993175bb6a94cbbd0a5b69251e25eb inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="a45993175bb6a94cbbd0a5b69251e25eb"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a45993175bb6a94cbbd0a5b69251e25eb">SetOverflowBBoxes</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a45993175bb6a94cbbd0a5b69251e25eb inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows. <br /></td></tr>
-<tr class="separator:a45993175bb6a94cbbd0a5b69251e25eb inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70161897776b5acbaf0dddaa1ddd9def inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="a70161897776b5acbaf0dddaa1ddd9def"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a70161897776b5acbaf0dddaa1ddd9def">SetOverflowBBoxesEnd</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a70161897776b5acbaf0dddaa1ddd9def inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows. <br /></td></tr>
-<tr class="separator:a70161897776b5acbaf0dddaa1ddd9def inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7456561dbdda3f5d7f47e520c3819cd3 inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top"><a id="a7456561dbdda3f5d7f47e520c3819cd3"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>AlignVerticallyEnd</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
+<tr class="separator:a7456561dbdda3f5d7f47e520c3819cd3 inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1c070a008b1db58a5036c27c2fb8307 inherit pub_methods_classvrv_1_1_object"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#aa1c070a008b1db58a5036c27c2fb8307">ReplaceDrawingValuesInStaffDef</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *)</td></tr>
 <tr class="memdesc:aa1c070a008b1db58a5036c27c2fb8307 inherit pub_methods_classvrv_1_1_object"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replace the drawing values a staffDef.  <a href="classvrv_1_1_object.html#aa1c070a008b1db58a5036c27c2fb8307">More...</a><br /></td></tr>
 <tr class="separator:aa1c070a008b1db58a5036c27c2fb8307 inherit pub_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1020,13 +1050,6 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~PitchInterface</b
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:af2c2dbc2bd4daaadd559e1e3e9639449"><td class="memItemLeft" align="right" valign="top"><a id="af2c2dbc2bd4daaadd559e1e3e9639449"></a>
-ChordCluster *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_note.html#af2c2dbc2bd4daaadd559e1e3e9639449">m_cluster</a></td></tr>
-<tr class="memdesc:af2c2dbc2bd4daaadd559e1e3e9639449"><td class="mdescLeft">&#160;</td><td class="mdescRight">flags for determining clusters in chord <br /></td></tr>
-<tr class="separator:af2c2dbc2bd4daaadd559e1e3e9639449"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a59c0210d052cd5c327101ed6d50c2ec1"><td class="memItemLeft" align="right" valign="top"><a id="a59c0210d052cd5c327101ed6d50c2ec1"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>m_clusterPosition</b></td></tr>
-<tr class="separator:a59c0210d052cd5c327101ed6d50c2ec1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb6e4036ff5bd948c196f00dde236ff4"><td class="memItemLeft" align="right" valign="top"><a id="acb6e4036ff5bd948c196f00dde236ff4"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><b>m_playingOnset</b></td></tr>
 <tr class="separator:acb6e4036ff5bd948c196f00dde236ff4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1060,9 +1083,12 @@ Additional Inherited Members</h2></td></tr>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>SeedUuid</b> (unsigned int seed=0)</td></tr>
 <tr class="separator:a8c269609416ebdb3b948df8aac3134e1 inherit pub_static_methods_classvrv_1_1_object"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_static_methods_classvrv_1_1_bounding_box"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classvrv_1_1_bounding_box')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classvrv_1_1_bounding_box.html">vrv::BoundingBox</a></td></tr>
-<tr class="memitem:a03c7599c94a2202fd36c24a924afb7cf inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#a03c7599c94a2202fd36c24a924afb7cf">SwapPoints</a> (<a class="el" href="classvrv_1_1_point.html">Point</a> *x1, <a class="el" href="classvrv_1_1_point.html">Point</a> *x2)</td></tr>
-<tr class="memdesc:a03c7599c94a2202fd36c24a924afb7cf inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap the points passed as reference.  <a href="classvrv_1_1_bounding_box.html#a03c7599c94a2202fd36c24a924afb7cf">More...</a><br /></td></tr>
-<tr class="separator:a03c7599c94a2202fd36c24a924afb7cf inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a5b0a558c2799d3216a62a352eec938 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#a6a5b0a558c2799d3216a62a352eec938">Swap</a> (int &amp;v1, int &amp;v2)</td></tr>
+<tr class="memdesc:a6a5b0a558c2799d3216a62a352eec938 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap values.  <a href="classvrv_1_1_bounding_box.html#a6a5b0a558c2799d3216a62a352eec938">More...</a><br /></td></tr>
+<tr class="separator:a6a5b0a558c2799d3216a62a352eec938 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a316a3efda8b19590914f3c4e736d2323 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#a316a3efda8b19590914f3c4e736d2323">SwapPoints</a> (<a class="el" href="classvrv_1_1_point.html">Point</a> &amp;p1, <a class="el" href="classvrv_1_1_point.html">Point</a> &amp;p2)</td></tr>
+<tr class="memdesc:a316a3efda8b19590914f3c4e736d2323 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap the points passed as reference.  <a href="classvrv_1_1_bounding_box.html#a316a3efda8b19590914f3c4e736d2323">More...</a><br /></td></tr>
+<tr class="separator:a316a3efda8b19590914f3c4e736d2323 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a98acbd56bdb3e5379fab4d9c999d2140 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a id="a98acbd56bdb3e5379fab4d9c999d2140"></a>
 static <a class="el" href="classvrv_1_1_point.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#a98acbd56bdb3e5379fab4d9c999d2140">CalcPositionAfterRotation</a> (<a class="el" href="classvrv_1_1_point.html">Point</a> point, float rot_alpha, <a class="el" href="classvrv_1_1_point.html">Point</a> center)</td></tr>
 <tr class="memdesc:a98acbd56bdb3e5379fab4d9c999d2140 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the position of a point after a rotation of rot_alpha around the center. <br /></td></tr>
@@ -1075,9 +1101,6 @@ static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#ae087d56d7ff270c908e3a723be01f6e7">CalcThickBezier</a> (const <a class="el" href="classvrv_1_1_point.html">Point</a> bezier[4], int thickness, float angle, <a class="el" href="classvrv_1_1_point.html">Point</a> *topBezier, <a class="el" href="classvrv_1_1_point.html">Point</a> *bottomBezier)</td></tr>
 <tr class="memdesc:ae087d56d7ff270c908e3a723be01f6e7 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the position of the bezier above and below for a thick bezier. <br /></td></tr>
 <tr class="separator:ae087d56d7ff270c908e3a723be01f6e7 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae1dfaf62bcd9253e2ae59a29de330694 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#ae1dfaf62bcd9253e2ae59a29de330694">SwapY</a> (int *y1, int *y2)</td></tr>
-<tr class="memdesc:ae1dfaf62bcd9253e2ae59a29de330694 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap values passed as reference.  <a href="classvrv_1_1_bounding_box.html#ae1dfaf62bcd9253e2ae59a29de330694">More...</a><br /></td></tr>
-<tr class="separator:ae1dfaf62bcd9253e2ae59a29de330694 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9a22cf5d306abb22ff5f557e81bd9af inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a id="ae9a22cf5d306abb22ff5f557e81bd9af"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#ae9a22cf5d306abb22ff5f557e81bd9af">ApproximateBezierBoundingBox</a> (const <a class="el" href="classvrv_1_1_point.html">Point</a> bezier[4], <a class="el" href="classvrv_1_1_point.html">Point</a> &amp;pos, int &amp;width, int &amp;height, int &amp;minYPos, int &amp;maxYPos)</td></tr>
 <tr class="memdesc:ae9a22cf5d306abb22ff5f557e81bd9af inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">Approximate the bounding box of a bezier taking into accound the height and the width. <br /></td></tr>
@@ -1172,6 +1195,43 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>m_cachedDrawingY</b></
 
 </div>
 </div>
+<a id="a0c99aad1e5fbcb7713c46cf88bb63328"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c99aad1e5fbcb7713c46cf88bb63328">&#9670;&nbsp;</a></span>GetDrawingRadius()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int vrv::Note::GetDrawingRadius </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrv_1_1_doc.html">Doc</a> *&#160;</td>
+          <td class="paramname"><em>doc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>staffSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>isCueSize</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>} </p>
+<p>Get the drawing radius of the note head taking into accound the note duration </p>
+
+</div>
+</div>
 <a id="a4270768391433ba58acea66a16b3cbf4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4270768391433ba58acea66a16b3cbf4">&#9670;&nbsp;</a></span>GetStemUpSE()</h2>
 
@@ -1219,6 +1279,37 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>m_cachedDrawingY</b></
 
 </div>
 </div>
+<a id="a3f569dd14639313902bcdcf1fe6d9f22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f569dd14639313902bcdcf1fe6d9f22">&#9670;&nbsp;</a></span>IsUnissonWith()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool vrv::Note::IsUnissonWith </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrv_1_1_note.html">Note</a> *&#160;</td>
+          <td class="paramname"><em>note</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>ignoreAccid</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return true if the note is a unisson. </p>
+<p>If ignoreAccid is set to true then only  and  are compared. </p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="note_8h_source.html">note.h</a></li>
 </ul>
@@ -1228,7 +1319,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>m_cachedDrawingY</b></
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_note.html">Note</a></li>
-    <li class="footer">Generated on Thu Apr 13 2017 14:48:43 by
+    <li class="footer">Generated on Tue May 2 2017 07:46:07 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

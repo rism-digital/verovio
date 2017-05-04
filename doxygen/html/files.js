@@ -1,7 +1,6 @@
 var files =
 [
     [ "accid.h", "accid_8h_source.html", null ],
-    [ "aligner.h", "aligner_8h_source.html", null ],
     [ "anchoredtext.h", "anchoredtext_8h_source.html", null ],
     [ "artic.h", "artic_8h_source.html", null ],
     [ "att.h", "att_8h_source.html", null ],
@@ -35,6 +34,7 @@ var files =
     [ "glyph.h", "glyph_8h_source.html", null ],
     [ "hairpin.h", "hairpin_8h_source.html", null ],
     [ "harm.h", "harm_8h_source.html", null ],
+    [ "horizontalaligner.h", "horizontalaligner_8h_source.html", null ],
     [ "io.h", "io_8h_source.html", null ],
     [ "iohumdrum.h", "iohumdrum_8h_source.html", null ],
     [ "iomei.h", "iomei_8h_source.html", null ],
@@ -84,6 +84,7 @@ var files =
     [ "tuplet.h", "tuplet_8h_source.html", null ],
     [ "turn.h", "turn_8h_source.html", null ],
     [ "verse.h", "verse_8h_source.html", null ],
+    [ "verticalaligner.h", "verticalaligner_8h_source.html", null ],
     [ "view.h", "view_8h_source.html", null ],
     [ "vrv.h", "vrv_8h_source.html", null ],
     [ "vrvdef.h", "vrvdef_8h_source.html", null ]

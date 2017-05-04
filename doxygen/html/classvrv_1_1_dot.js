@@ -9,5 +9,6 @@ var classvrv_1_1_dot =
     [ "PreparePointersByLayer", "classvrv_1_1_dot.html#a0cd770f3f7b664c506b702be5ae114f3", null ],
     [ "Reset", "classvrv_1_1_dot.html#a573879ea0cb5a2aa550fb99faf7f0a52", null ],
     [ "ResetDrawing", "classvrv_1_1_dot.html#a8284f4468b749572fd757975ccaa5acd", null ],
+    [ "ResetHorizontalAlignment", "classvrv_1_1_dot.html#ad9646c30e98336c512bc195c87d535be", null ],
     [ "m_drawingNote", "classvrv_1_1_dot.html#a5fd307f78948cc3b6528877df704beea", null ]
 ];

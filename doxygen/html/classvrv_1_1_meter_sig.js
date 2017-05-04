@@ -8,5 +8,6 @@ var classvrv_1_1_meter_sig =
     [ "GetClassName", "classvrv_1_1_meter_sig.html#a6ed6b7343b2688e4dd4eb9c8b6ff1ebc", null ],
     [ "HasToBeAligned", "classvrv_1_1_meter_sig.html#a4f11053c4d675bf745d2ce0d9da6ed20", null ],
     [ "Init", "classvrv_1_1_meter_sig.html#a942eb1e25385e638f23e282075f6a226", null ],
+    [ "meterSigDefaultVisToMeterSigVis", "classvrv_1_1_meter_sig.html#a43ea7c68ebbe51989fe7eb2c22912b5f", null ],
     [ "Reset", "classvrv_1_1_meter_sig.html#ae6ca88828841d660bdc908132b230e6b", null ]
 ];

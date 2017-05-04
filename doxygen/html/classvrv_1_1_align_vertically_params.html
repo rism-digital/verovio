@@ -88,7 +88,7 @@ $(document).ready(function(){initNavTree('classvrv_1_1_align_vertically_params.h
 </div><!--header-->
 <div class="contents">
 
-<p>member 0: the systemAligner member 1: the staffIdx member 2: the staffN member 3: the doc  
+<p>member 0: the systemAligner member 1: the staffIdx member 2: the staffN member 3: the cumulated shift for the default alignment member 4: the end functor (for redirecting from measure) member 5: the doc  
  <a href="classvrv_1_1_align_vertically_params.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="functorparams_8h_source.html">functorparams.h</a>&gt;</code></p>
@@ -104,9 +104,9 @@ Inheritance diagram for vrv::AlignVerticallyParams:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa5266026fa05a200c7409fe5707d92e9"><td class="memItemLeft" align="right" valign="top"><a id="aa5266026fa05a200c7409fe5707d92e9"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>AlignVerticallyParams</b> (<a class="el" href="classvrv_1_1_doc.html">Doc</a> *doc)</td></tr>
-<tr class="separator:aa5266026fa05a200c7409fe5707d92e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6fd5c258b83e421e0b41dda51ac8be2"><td class="memItemLeft" align="right" valign="top"><a id="ac6fd5c258b83e421e0b41dda51ac8be2"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>AlignVerticallyParams</b> (<a class="el" href="classvrv_1_1_doc.html">Doc</a> *doc, <a class="el" href="classvrv_1_1_functor.html">Functor</a> *functorEnd)</td></tr>
+<tr class="separator:ac6fd5c258b83e421e0b41dda51ac8be2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -119,12 +119,18 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>m_staffIdx</b></td></t
 <tr class="memitem:a4f03b93dfa2b4d45f3f76bd666fdac8e"><td class="memItemLeft" align="right" valign="top"><a id="a4f03b93dfa2b4d45f3f76bd666fdac8e"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>m_staffN</b></td></tr>
 <tr class="separator:a4f03b93dfa2b4d45f3f76bd666fdac8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e407dbb28a97b5fd13c25c1efad424b"><td class="memItemLeft" align="right" valign="top"><a id="a4e407dbb28a97b5fd13c25c1efad424b"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>m_cumulatedShift</b></td></tr>
+<tr class="separator:a4e407dbb28a97b5fd13c25c1efad424b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ac97fa83bcb8ca7290983218f6b5f5b"><td class="memItemLeft" align="right" valign="top"><a id="a5ac97fa83bcb8ca7290983218f6b5f5b"></a>
+<a class="el" href="classvrv_1_1_functor.html">Functor</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_functorEnd</b></td></tr>
+<tr class="separator:a5ac97fa83bcb8ca7290983218f6b5f5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56bf3f8f55ebcd38c160d12d1e53e902"><td class="memItemLeft" align="right" valign="top"><a id="a56bf3f8f55ebcd38c160d12d1e53e902"></a>
 <a class="el" href="classvrv_1_1_doc.html">Doc</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_doc</b></td></tr>
 <tr class="separator:a56bf3f8f55ebcd38c160d12d1e53e902"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>member 0: the systemAligner member 1: the staffIdx member 2: the staffN member 3: the doc </p>
+<div class="textblock"><p>member 0: the systemAligner member 1: the staffIdx member 2: the staffN member 3: the cumulated shift for the default alignment member 4: the end functor (for redirecting from measure) member 5: the doc </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="functorparams_8h_source.html">functorparams.h</a></li>
 </ul>
@@ -134,7 +140,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>m_staffN</b></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_align_vertically_params.html">AlignVerticallyParams</a></li>
-    <li class="footer">Generated on Thu Apr 13 2017 14:48:39 by
+    <li class="footer">Generated on Tue May 2 2017 07:46:03 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

@@ -9,6 +9,7 @@ var searchData=
   ['dir',['Dir',['../classvrv_1_1_dir.html',1,'vrv']]],
   ['doc',['Doc',['../classvrv_1_1_doc.html',1,'vrv']]],
   ['dot',['Dot',['../classvrv_1_1_dot.html',1,'vrv']]],
+  ['dots',['Dots',['../classvrv_1_1_dots.html',1,'vrv']]],
   ['drag',['Drag',['../classvrv_1_1_toolkit.html#aa956c1056f02604d11c926fd348ae989',1,'vrv::Toolkit']]],
   ['drawcurrentpage',['DrawCurrentPage',['../classvrv_1_1_view.html#a1ab1a369039358ad7b6440c62b442ceb',1,'vrv::View']]],
   ['drawinglistinterface',['DrawingListInterface',['../classvrv_1_1_drawing_list_interface.html',1,'vrv']]],

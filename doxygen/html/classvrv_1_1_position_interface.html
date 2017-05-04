@@ -108,9 +108,20 @@ Inheritance diagram for vrv::PositionInterface:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:aab1a8c7f3f3fa7fb5680db989030b1db"><td class="memItemLeft" align="right" valign="top"><a id="aab1a8c7f3f3fa7fb5680db989030b1db"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>CalcDrawingLoc</b> (<a class="el" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element)</td></tr>
+<tr class="separator:aab1a8c7f3f3fa7fb5680db989030b1db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a932d3221b8cd285116ffde54bc7a17e8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_position_interface.html#a932d3221b8cd285116ffde54bc7a17e8">HasIdenticalPositionInterface</a> (<a class="el" href="classvrv_1_1_position_interface.html">PositionInterface</a> *otherPitchInterface)</td></tr>
 <tr class="memdesc:a932d3221b8cd285116ffde54bc7a17e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inteface comparison operator.  <a href="#a932d3221b8cd285116ffde54bc7a17e8">More...</a><br /></td></tr>
 <tr class="separator:a932d3221b8cd285116ffde54bc7a17e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1aab8fb785b348dcf88714338863bc78"><td class="memItemLeft" align="right" valign="top"><a id="a1aab8fb785b348dcf88714338863bc78"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_position_interface.html#a1aab8fb785b348dcf88714338863bc78">InterfaceResetDrawing</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams, <a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
+<tr class="memdesc:a1aab8fb785b348dcf88714338863bc78"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#a69ad18810d5249e8bb56be54884d2b50" title="Reset the drawing values before calling PrepareDrawing after changes. ">Object::ResetDrawing</a>. <br /></td></tr>
+<tr class="separator:a1aab8fb785b348dcf88714338863bc78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac74c74fcf22d5ae9e9286623353da322"><td class="memItemLeft" align="right" valign="top"><a id="ac74c74fcf22d5ae9e9286623353da322"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_position_interface.html#ac74c74fcf22d5ae9e9286623353da322">InterfaceResetHorizontalAlignment</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams, <a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
+<tr class="memdesc:ac74c74fcf22d5ae9e9286623353da322"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#a69ad18810d5249e8bb56be54884d2b50" title="Reset the drawing values before calling PrepareDrawing after changes. ">Object::ResetDrawing</a>. <br /></td></tr>
+<tr class="separator:ac74c74fcf22d5ae9e9286623353da322"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Constructors, destructors, reset methods</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>Reset method resets all attribute classes </p>
 </div></td></tr>
@@ -126,6 +137,15 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Reset</b> ()<
 <tr class="memitem:ae5d7e19319bcf359fc2119512e720004"><td class="memItemLeft" align="right" valign="top">virtual InterfaceId&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_position_interface.html#ae5d7e19319bcf359fc2119512e720004">IsInterface</a> ()</td></tr>
 <tr class="memdesc:ae5d7e19319bcf359fc2119512e720004"><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual method returning the InterfaceId of the interface.  <a href="#ae5d7e19319bcf359fc2119512e720004">More...</a><br /></td></tr>
 <tr class="separator:ae5d7e19319bcf359fc2119512e720004"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Setter and getter for the drawing staff loc.</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p>This is set by the SetAlignmentPitchPos functor. </p>
+</div></td></tr>
+<tr class="memitem:a3bdb6437c6e8739beea47e4bb978493f"><td class="memItemLeft" align="right" valign="top"><a id="a3bdb6437c6e8739beea47e4bb978493f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDrawingLoc</b> (int drawingLoc)</td></tr>
+<tr class="separator:a3bdb6437c6e8739beea47e4bb978493f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48e070408ebae29ba2e89806fe4b5ff8"><td class="memItemLeft" align="right" valign="top"><a id="a48e070408ebae29ba2e89806fe4b5ff8"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingLoc</b> () const</td></tr>
+<tr class="separator:a48e070408ebae29ba2e89806fe4b5ff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classvrv_1_1_interface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrv_1_1_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrv_1_1_interface.html">vrv::Interface</a></td></tr>
 <tr class="memitem:a57c9a4f18b81a07ef0d14dc040f84257 inherit pub_methods_classvrv_1_1_interface"><td class="memItemLeft" align="right" valign="top"><a id="a57c9a4f18b81a07ef0d14dc040f84257"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_interface.html#a57c9a4f18b81a07ef0d14dc040f84257">RegisterInterfaceAttClass</a> (AttClassId attClassId)</td></tr>
@@ -206,7 +226,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_position_interface.html">PositionInterface</a></li>
-    <li class="footer">Generated on Thu Apr 13 2017 14:48:43 by
+    <li class="footer">Generated on Tue May 2 2017 07:46:07 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

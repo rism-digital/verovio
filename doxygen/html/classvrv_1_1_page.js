@@ -15,6 +15,7 @@ var classvrv_1_1_page =
     [ "LayOut", "classvrv_1_1_page.html#a29a3f02e9620a674f4f1f1ebdf818089", null ],
     [ "LayOutHorizontally", "classvrv_1_1_page.html#a81afdc28b7093b3c034b30b9d2177d7a", null ],
     [ "LayOutPitchPos", "classvrv_1_1_page.html#a801f4b7752db01eb9201e355fe4aa000", null ],
+    [ "LayOutTranscription", "classvrv_1_1_page.html#a0c2dafbc00b0f3185a4ee416f019498f", null ],
     [ "LayOutVertically", "classvrv_1_1_page.html#ab16b3f4c2bcc87738e77032c393d638d", null ],
     [ "Reset", "classvrv_1_1_page.html#ac858909c078a4a4c7c3879aad83e45d7", null ],
     [ "m_drawingScoreDef", "classvrv_1_1_page.html#a93ad65400a74b61fa5ab692018038361", null ],

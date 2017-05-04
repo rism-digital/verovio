@@ -5,7 +5,7 @@ var classvrv_1_1_glyph =
     [ "Glyph", "classvrv_1_1_glyph.html#a01b0c469a9de1943c2e4379645ea1317", null ],
     [ "~Glyph", "classvrv_1_1_glyph.html#a614386b61204b49e28a369d51c6431d3", null ],
     [ "GetAnchor", "classvrv_1_1_glyph.html#a162dab467a0210110400eefe1412ce45", null ],
-    [ "GetBoundingBox", "classvrv_1_1_glyph.html#a707057dbabada77f71f75e1b4cf1cfd1", null ],
+    [ "GetBoundingBox", "classvrv_1_1_glyph.html#aa1680eb7e1403b16a86a9b2d4b4585f4", null ],
     [ "GetCodeStr", "classvrv_1_1_glyph.html#a9b2879e91a774ec78623387d6192b555", null ],
     [ "GetHorizAdvX", "classvrv_1_1_glyph.html#ad7a4bed8780d5a024574853975040084", null ],
     [ "GetPath", "classvrv_1_1_glyph.html#a73c308789e1a3b282783597060ff01db", null ],

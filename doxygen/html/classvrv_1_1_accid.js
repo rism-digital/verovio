@@ -11,6 +11,7 @@ var classvrv_1_1_accid =
     [ "GetSymbolStr", "classvrv_1_1_accid.html#a5cc5d4c6956dff578e41c78e71d0acc1", null ],
     [ "HasToBeAligned", "classvrv_1_1_accid.html#ae3d87e4ad6aeb055f64ea9bd3a71d404", null ],
     [ "Reset", "classvrv_1_1_accid.html#a77f0229943afc71686a9a5ad48866ab6", null ],
+    [ "ResetDrawing", "classvrv_1_1_accid.html#ab1e149e8a0d529ab74e6247a6ebc2ed2", null ],
     [ "ResetHorizontalAlignment", "classvrv_1_1_accid.html#a31dd8a56288fb35ead86ddd8fd82b74b", null ],
     [ "SetDrawingOctave", "classvrv_1_1_accid.html#a4cb3352991cd14e4289e0a4c71c247ee", null ],
     [ "SetDrawingOctaveAccid", "classvrv_1_1_accid.html#a7f576b52c610c48fbe26aeb7fa5c86e1", null ]

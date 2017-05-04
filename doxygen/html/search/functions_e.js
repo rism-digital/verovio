@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['save',['Save',['../classvrv_1_1_artic_part.html#adbf5d8ae4c2bb3222842f33c3c5d9961',1,'vrv::ArticPart::Save()'],['../classvrv_1_1_flag.html#a82e80def83d663169416ba589fafce81',1,'vrv::Flag::Save()'],['../classvrv_1_1_stem.html#a85e737a4827ede4cc5621048db5f0b8e',1,'vrv::Stem::Save()'],['../classvrv_1_1_measure.html#a53146c5860c0e95b6510108dbc5493d8',1,'vrv::Measure::Save()'],['../classvrv_1_1_object.html#a9ed5a5a188e80752f5f553f0267059dd',1,'vrv::Object::Save(FileOutputStream *output)'],['../classvrv_1_1_object.html#a8ec6663670b4b6522cb4892babf36742',1,'vrv::Object::Save(FunctorParams *functorParams)']]],
+  ['save',['Save',['../classvrv_1_1_artic_part.html#adbf5d8ae4c2bb3222842f33c3c5d9961',1,'vrv::ArticPart::Save()'],['../classvrv_1_1_dots.html#a4454529ca358ddefdf610c417d6d28bc',1,'vrv::Dots::Save()'],['../classvrv_1_1_flag.html#a82e80def83d663169416ba589fafce81',1,'vrv::Flag::Save()'],['../classvrv_1_1_stem.html#a85e737a4827ede4cc5621048db5f0b8e',1,'vrv::Stem::Save()'],['../classvrv_1_1_measure.html#a53146c5860c0e95b6510108dbc5493d8',1,'vrv::Measure::Save()'],['../classvrv_1_1_object.html#a9ed5a5a188e80752f5f553f0267059dd',1,'vrv::Object::Save(FileOutputStream *output)'],['../classvrv_1_1_object.html#a8ec6663670b4b6522cb4892babf36742',1,'vrv::Object::Save(FunctorParams *functorParams)']]],
   ['savefile',['SaveFile',['../classvrv_1_1_toolkit.html#a968a2feb41a558700a2e9061489ce90a',1,'vrv::Toolkit']]],
   ['searchalignmentattime',['SearchAlignmentAtTime',['../classvrv_1_1_horizontal_aligner.html#a1b3764dfcb51917eca727e2e55c402b2',1,'vrv::HorizontalAligner']]],
-  ['setaligmentypos',['SetAligmentYPos',['../classvrv_1_1_staff_alignment.html#ae7bd328453964356db5606f39f799f0e',1,'vrv::StaffAlignment::SetAligmentYPos()'],['../classvrv_1_1_object.html#a81d3dfd023881e0aa95e01f50d615720',1,'vrv::Object::SetAligmentYPos()'],['../classvrv_1_1_system.html#a8157619b0b1f921dab8ad800bf95a91d',1,'vrv::System::SetAligmentYPos()']]],
-  ['setalignment',['SetAlignment',['../classvrv_1_1_bar_line.html#a70df30f78536cb17a7381478310792f7',1,'vrv::BarLine']]],
+  ['setalignment',['SetAlignment',['../classvrv_1_1_bar_line.html#a9b25f3c724cbe2f6ca61609a6f835aff',1,'vrv::BarLine']]],
   ['setalignmentpitchpos',['SetAlignmentPitchPos',['../classvrv_1_1_layer_element.html#ab0a34f0dd2758cbbda5dcbf1e800a419',1,'vrv::LayerElement::SetAlignmentPitchPos()'],['../classvrv_1_1_object.html#a1009aeee85e83052adcbcd8dc2af050d',1,'vrv::Object::SetAlignmentPitchPos()']]],
   ['setalignmentxpos',['SetAlignmentXPos',['../classvrv_1_1_alignment.html#a28b3741b1abb5e4eb9bba5d6172c5210',1,'vrv::Alignment::SetAlignmentXPos()'],['../classvrv_1_1_measure_aligner.html#ab727c9924c45bddee7ddf241d91299c6',1,'vrv::MeasureAligner::SetAlignmentXPos()'],['../classvrv_1_1_measure.html#aa57855e655555f27ad52e1d750cf76b5',1,'vrv::Measure::SetAlignmentXPos()'],['../classvrv_1_1_object.html#a3a00186419e955ee211440092e955f14',1,'vrv::Object::SetAlignmentXPos()']]],
   ['setanchor',['SetAnchor',['../classvrv_1_1_glyph.html#a009d8cbbd328a087d26cec6c411de075',1,'vrv::Glyph']]],
@@ -40,6 +39,6 @@ var searchData=
   ['splitartic',['SplitArtic',['../classvrv_1_1_artic.html#ab6b401bb7dfd502eccd21bf9614bc905',1,'vrv::Artic']]],
   ['stackgraceelement',['StackGraceElement',['../classvrv_1_1_grace_aligner.html#adafd1105e2839665f24976d256653ad8',1,'vrv::GraceAligner']]],
   ['strtostr',['StrToStr',['../classvrv_1_1_att.html#a65b7bc2210f5f4dad29bac63eafbcf4d',1,'vrv::Att']]],
-  ['swappoints',['SwapPoints',['../classvrv_1_1_bounding_box.html#a03c7599c94a2202fd36c24a924afb7cf',1,'vrv::BoundingBox']]],
-  ['swapy',['SwapY',['../classvrv_1_1_bounding_box.html#ae1dfaf62bcd9253e2ae59a29de330694',1,'vrv::BoundingBox']]]
+  ['swap',['Swap',['../classvrv_1_1_bounding_box.html#a6a5b0a558c2799d3216a62a352eec938',1,'vrv::BoundingBox']]],
+  ['swappoints',['SwapPoints',['../classvrv_1_1_bounding_box.html#a316a3efda8b19590914f3c4e736d2323',1,'vrv::BoundingBox']]]
 ];

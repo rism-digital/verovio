@@ -7,6 +7,7 @@ var searchData=
   ['dir',['Dir',['../classvrv_1_1_dir.html',1,'vrv']]],
   ['doc',['Doc',['../classvrv_1_1_doc.html',1,'vrv']]],
   ['dot',['Dot',['../classvrv_1_1_dot.html',1,'vrv']]],
+  ['dots',['Dots',['../classvrv_1_1_dots.html',1,'vrv']]],
   ['drawinglistinterface',['DrawingListInterface',['../classvrv_1_1_drawing_list_interface.html',1,'vrv']]],
   ['durationinterface',['DurationInterface',['../classvrv_1_1_duration_interface.html',1,'vrv']]],
   ['dynam',['Dynam',['../classvrv_1_1_dynam.html',1,'vrv']]]

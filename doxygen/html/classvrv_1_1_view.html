@@ -177,9 +177,6 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>ToLogicalY</b> (int i)
 <tr><td colspan="2"><div class="groupHeader">Methods for calculating drawing positions</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>Defined in view_element.cpp </p>
 </div></td></tr>
-<tr class="memitem:a8282b897544eada43b1036e5141097f3"><td class="memItemLeft" align="right" valign="top"><a id="a8282b897544eada43b1036e5141097f3"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateRestPosY</b> (<a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, char duration, int location, bool hasMultipleLayer, bool isFirstLayer)</td></tr>
-<tr class="separator:a8282b897544eada43b1036e5141097f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2112e69dbe8de940f486983ebfcdd21c"><td class="memItemLeft" align="right" valign="top"><a id="a2112e69dbe8de940f486983ebfcdd21c"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>CalculatePitchCode</b> (<a class="el" href="classvrv_1_1_layer.html">Layer</a> *layer, int y_n, int x_pos, int *octave)</td></tr>
 <tr class="separator:a2112e69dbe8de940f486983ebfcdd21c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -356,6 +353,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawCustos</b> (<a cl
 <tr class="memitem:a85a2b586e641814ad20f2bd520e773f2"><td class="memItemLeft" align="right" valign="top"><a id="a85a2b586e641814ad20f2bd520e773f2"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawDot</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element, <a class="el" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure)</td></tr>
 <tr class="separator:a85a2b586e641814ad20f2bd520e773f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a703a4f8e82214c2625a3dc11780fc86a"><td class="memItemLeft" align="right" valign="top"><a id="a703a4f8e82214c2625a3dc11780fc86a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawDots</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element, <a class="el" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure)</td></tr>
+<tr class="separator:a703a4f8e82214c2625a3dc11780fc86a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a34c710188868cba6cfb43733b0304180"><td class="memItemLeft" align="right" valign="top"><a id="a34c710188868cba6cfb43733b0304180"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawDurationElement</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element, <a class="el" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure)</td></tr>
 <tr class="separator:a34c710188868cba6cfb43733b0304180"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -420,15 +420,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawText</b> (<a clas
 <tr class="memitem:ad1a94949350f4b7cc5b6ec55898fab23"><td class="memItemLeft" align="right" valign="top"><a id="ad1a94949350f4b7cc5b6ec55898fab23"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawAcciaccaturaSlash</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element)</td></tr>
 <tr class="separator:ad1a94949350f4b7cc5b6ec55898fab23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d3925f25bdd36d3fd5beb9c6b1f16b2"><td class="memItemLeft" align="right" valign="top"><a id="a3d3925f25bdd36d3fd5beb9c6b1f16b2"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawDots</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, int x, int y, unsigned char dots, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff)</td></tr>
-<tr class="separator:a3d3925f25bdd36d3fd5beb9c6b1f16b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ad1c6e3713eaade221683df44ab8a0e"><td class="memItemLeft" align="right" valign="top"><a id="a4ad1c6e3713eaade221683df44ab8a0e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawDotsPart</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, int x, int y, unsigned char dots, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff)</td></tr>
+<tr class="separator:a4ad1c6e3713eaade221683df44ab8a0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69f5b6d68cddb570a82eb2fd24831ded"><td class="memItemLeft" align="right" valign="top"><a id="a69f5b6d68cddb570a82eb2fd24831ded"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawFermataAttr</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element, <a class="el" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff)</td></tr>
 <tr class="separator:a69f5b6d68cddb570a82eb2fd24831ded"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a6ca418fcc317a5925de154c12d0e06"><td class="memItemLeft" align="right" valign="top"><a id="a1a6ca418fcc317a5925de154c12d0e06"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawLedgerLines</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, bool aboveStaff, bool doubleLength, int skip, int n)</td></tr>
-<tr class="separator:a1a6ca418fcc317a5925de154c12d0e06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa33a36bdc73dc4b73b1e3ccb78fcf4d5"><td class="memItemLeft" align="right" valign="top"><a id="aa33a36bdc73dc4b73b1e3ccb78fcf4d5"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawLigatureNote</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element, <a class="el" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff)</td></tr>
 <tr class="separator:aa33a36bdc73dc4b73b1e3ccb78fcf4d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -444,12 +441,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawRestBreve</b> (<a
 <tr class="memitem:a9a9123a815b17c607e616ae83ac737ae"><td class="memItemLeft" align="right" valign="top"><a id="a9a9123a815b17c607e616ae83ac737ae"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawRestLong</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, int x, int y, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff)</td></tr>
 <tr class="separator:a9a9123a815b17c607e616ae83ac737ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f9f3ff84a05e46d4c25b30086052987"><td class="memItemLeft" align="right" valign="top"><a id="a6f9f3ff84a05e46d4c25b30086052987"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawRestQuarter</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff)</td></tr>
-<tr class="separator:a6f9f3ff84a05e46d4c25b30086052987"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1f060244afcaeae6bfb85584da3e344"><td class="memItemLeft" align="right" valign="top"><a id="ab1f060244afcaeae6bfb85584da3e344"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawRestWhole</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff)</td></tr>
-<tr class="separator:ab1f060244afcaeae6bfb85584da3e344"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f45eacfee346913271c93c6f0d2cfae"><td class="memItemLeft" align="right" valign="top"><a id="a7f45eacfee346913271c93c6f0d2cfae"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawRestWhole</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, int x, int y, int valeur, bool cueSize, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff)</td></tr>
+<tr class="separator:a7f45eacfee346913271c93c6f0d2cfae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Top level method for drawing TextElement.</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>This can be called recursively for text elements containing other text elements.</p>
 <p>Defined in view_text.cpp </p>
@@ -541,6 +535,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawMensur</b> (<a cl
 <tr class="memitem:a651558f192674df0282bd069fb7a8e9c"><td class="memItemLeft" align="right" valign="top"><a id="a651558f192674df0282bd069fb7a8e9c"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawMensuralNote</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element, <a class="el" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure)</td></tr>
 <tr class="separator:a651558f192674df0282bd069fb7a8e9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0551726ca37d8101339cc7f333631334"><td class="memItemLeft" align="right" valign="top"><a id="a0551726ca37d8101339cc7f333631334"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawMensuralRest</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element, <a class="el" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure)</td></tr>
+<tr class="separator:a0551726ca37d8101339cc7f333631334"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad0095a78977a0f62eb9bdbe247b602fd"><td class="memItemLeft" align="right" valign="top"><a id="ad0095a78977a0f62eb9bdbe247b602fd"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawProport</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element, <a class="el" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure)</td></tr>
 <tr class="separator:ad0095a78977a0f62eb9bdbe247b602fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -611,9 +608,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawFilledRectangle</
 <tr class="memitem:a91c2eb84f422eec8085474a75b9aed82"><td class="memItemLeft" align="right" valign="top"><a id="a91c2eb84f422eec8085474a75b9aed82"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawObliquePolygon</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, int x1, int y1, int x2, int y2, int height)</td></tr>
 <tr class="separator:a91c2eb84f422eec8085474a75b9aed82"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0c0645cd4e0f21584adebd82724f34d"><td class="memItemLeft" align="right" valign="top"><a id="ae0c0645cd4e0f21584adebd82724f34d"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawDiamond</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, int x1, int y1, int height, int width, bool fill)</td></tr>
-<tr class="separator:ae0c0645cd4e0f21584adebd82724f34d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92d7d53a19088ce4bf4192bb1c79785f"><td class="memItemLeft" align="right" valign="top"><a id="a92d7d53a19088ce4bf4192bb1c79785f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawDiamond</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, int x1, int y1, int height, int width, bool fill, int linewidth)</td></tr>
+<tr class="separator:a92d7d53a19088ce4bf4192bb1c79785f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a784d025847a1a702695bba8bd704e176"><td class="memItemLeft" align="right" valign="top"><a id="a784d025847a1a702695bba8bd704e176"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawDot</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, int x, int y, int staffSize)</td></tr>
 <tr class="separator:a784d025847a1a702695bba8bd704e176"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -812,7 +809,7 @@ Protected Attributes</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_view.html">View</a></li>
-    <li class="footer">Generated on Thu Apr 13 2017 14:48:48 by
+    <li class="footer">Generated on Tue May 2 2017 07:46:09 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

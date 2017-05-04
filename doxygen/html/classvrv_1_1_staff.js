@@ -1,6 +1,6 @@
 var classvrv_1_1_staff =
 [
-    [ "Staff", "classvrv_1_1_staff.html#a86d88fff2ea1f7120109a849a9554ac7", null ],
+    [ "Staff", "classvrv_1_1_staff.html#a49e12a89a175f2fcfd38cef978463455", null ],
     [ "~Staff", "classvrv_1_1_staff.html#a37cd8e05822ef95c7edf9ea7340d425f", null ],
     [ "AddChild", "classvrv_1_1_staff.html#a8756c96787854aca70ceefbd09067341", null ],
     [ "AddLegerLineAbove", "classvrv_1_1_staff.html#acc9cdcd50dfe3e2b243f28775d9cfe5c", null ],

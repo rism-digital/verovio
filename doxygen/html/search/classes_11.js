@@ -7,7 +7,6 @@ var searchData=
   ['scoredefelement',['ScoreDefElement',['../classvrv_1_1_score_def_element.html',1,'vrv']]],
   ['scoredefinterface',['ScoreDefInterface',['../classvrv_1_1_score_def_interface.html',1,'vrv']]],
   ['section',['Section',['../classvrv_1_1_section.html',1,'vrv']]],
-  ['setaligmentyposparams',['SetAligmentYPosParams',['../classvrv_1_1_set_aligment_y_pos_params.html',1,'vrv']]],
   ['setalignmentpitchposparams',['SetAlignmentPitchPosParams',['../classvrv_1_1_set_alignment_pitch_pos_params.html',1,'vrv']]],
   ['setalignmentxposparams',['SetAlignmentXPosParams',['../classvrv_1_1_set_alignment_x_pos_params.html',1,'vrv']]],
   ['setcautionaryscoredefparams',['SetCautionaryScoreDefParams',['../classvrv_1_1_set_cautionary_score_def_params.html',1,'vrv']]],

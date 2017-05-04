@@ -4,13 +4,13 @@ var searchData=
   ['initfonts',['InitFonts',['../classvrv_1_1_resources.html#adf153b2fb62a2d1e2e45d566d13eaae7',1,'vrv::Resources']]],
   ['inittextfont',['InitTextFont',['../classvrv_1_1_resources.html#a98512f7778b6d75518d415b587c2878f',1,'vrv::Resources']]],
   ['insertchild',['InsertChild',['../classvrv_1_1_object.html#ac14929dac6e5b5e699d16ba7fc258d9d',1,'vrv::Object']]],
-  ['integrateboundingboxyshift',['IntegrateBoundingBoxYShift',['../classvrv_1_1_staff_alignment.html#aa5037cf2d494f7b8b021dbafd84d6b29',1,'vrv::StaffAlignment::IntegrateBoundingBoxYShift()'],['../classvrv_1_1_object.html#adf3a9f8bee394a7ebdef611943dd913a',1,'vrv::Object::IntegrateBoundingBoxYShift()'],['../classvrv_1_1_system.html#a64bc44d4eecab49c8756ccfe797fadc0',1,'vrv::System::IntegrateBoundingBoxYShift()']]],
   ['interfacefillstaffcurrenttimespanning',['InterfaceFillStaffCurrentTimeSpanning',['../classvrv_1_1_time_spanning_interface.html#a7eb9ec4141167667a95edb3e91b72c6a',1,'vrv::TimeSpanningInterface']]],
   ['interfaceprepareboundaries',['InterfacePrepareBoundaries',['../classvrv_1_1_boundary_start_interface.html#a84eb67543e0dbfd9ce29039935231eca',1,'vrv::BoundaryStartInterface']]],
   ['interfacepreparetimepointing',['InterfacePrepareTimePointing',['../classvrv_1_1_time_point_interface.html#af12c0fb8fe5605633e3ceeb75806d798',1,'vrv::TimePointInterface']]],
   ['interfacepreparetimespanning',['InterfacePrepareTimeSpanning',['../classvrv_1_1_time_spanning_interface.html#afdd5ee6c76457751a32e0f26310331d0',1,'vrv::TimeSpanningInterface']]],
   ['interfacepreparetimestamps',['InterfacePrepareTimestamps',['../classvrv_1_1_time_point_interface.html#aad4fd22f92288ae7c9f8a7b2500ee6a5',1,'vrv::TimePointInterface::InterfacePrepareTimestamps()'],['../classvrv_1_1_time_spanning_interface.html#acb8a7bb12dfeffb584dd52840fc11ac4',1,'vrv::TimeSpanningInterface::InterfacePrepareTimestamps()']]],
-  ['interfaceresetdrawing',['InterfaceResetDrawing',['../classvrv_1_1_boundary_start_interface.html#a96d71aa252b0356881df01923675fa74',1,'vrv::BoundaryStartInterface::InterfaceResetDrawing()'],['../classvrv_1_1_time_point_interface.html#a28c0d2e97af7e3b9a28898175dff2867',1,'vrv::TimePointInterface::InterfaceResetDrawing()'],['../classvrv_1_1_time_spanning_interface.html#a662b369eb4ed6068d8b9da4de73108ed',1,'vrv::TimeSpanningInterface::InterfaceResetDrawing()']]],
+  ['interfaceresetdrawing',['InterfaceResetDrawing',['../classvrv_1_1_boundary_start_interface.html#a96d71aa252b0356881df01923675fa74',1,'vrv::BoundaryStartInterface::InterfaceResetDrawing()'],['../classvrv_1_1_position_interface.html#a1aab8fb785b348dcf88714338863bc78',1,'vrv::PositionInterface::InterfaceResetDrawing()'],['../classvrv_1_1_time_point_interface.html#a28c0d2e97af7e3b9a28898175dff2867',1,'vrv::TimePointInterface::InterfaceResetDrawing()'],['../classvrv_1_1_time_spanning_interface.html#a662b369eb4ed6068d8b9da4de73108ed',1,'vrv::TimeSpanningInterface::InterfaceResetDrawing()']]],
+  ['interfaceresethorizontalalignment',['InterfaceResetHorizontalAlignment',['../classvrv_1_1_position_interface.html#ac74c74fcf22d5ae9e9286623353da322',1,'vrv::PositionInterface']]],
   ['intersects',['Intersects',['../classvrv_1_1_bounding_box.html#afe052a34bcc63f00f33db090736ef744',1,'vrv::BoundingBox']]],
   ['isboundaryelement',['IsBoundaryElement',['../classvrv_1_1_object.html#a5b1d528341ef806d382cdd1c27911021',1,'vrv::Object']]],
   ['iscentered',['IsCentered',['../classvrv_1_1_artic.html#a0f3c3112f20c06ce5f18d8a97c9ecea7',1,'vrv::Artic']]],
@@ -31,5 +31,6 @@ var searchData=
   ['isonstaff',['IsOnStaff',['../classvrv_1_1_time_point_interface.html#a11824d7f91a23984c3655671971c3592',1,'vrv::TimePointInterface']]],
   ['isrelativetostaff',['IsRelativeToStaff',['../classvrv_1_1_artic_part.html#aec8bd805c864c11bbb25637fd85bf646',1,'vrv::ArticPart::IsRelativeToStaff()'],['../classvrv_1_1_layer_element.html#a96557dae7229251dbdadfeb15f0d8b91',1,'vrv::LayerElement::IsRelativeToStaff()'],['../classvrv_1_1_syl.html#a05ccd19d32fd60fa4be0bcd627000345',1,'vrv::Syl::IsRelativeToStaff()']]],
   ['isspanningmeasures',['IsSpanningMeasures',['../classvrv_1_1_time_spanning_interface.html#a8889df0c70dd8ad214c556b776aa0511',1,'vrv::TimeSpanningInterface']]],
-  ['issymbolonly',['IsSymbolOnly',['../classvrv_1_1_dynam.html#a240b3048c78b08eb6084c52167574032',1,'vrv::Dynam']]]
+  ['issymbolonly',['IsSymbolOnly',['../classvrv_1_1_dynam.html#a240b3048c78b08eb6084c52167574032',1,'vrv::Dynam']]],
+  ['isunissonwith',['IsUnissonWith',['../classvrv_1_1_note.html#a3f569dd14639313902bcdcf1fe6d9f22',1,'vrv::Note']]]
 ];

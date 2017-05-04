@@ -8,5 +8,5 @@ var classvrv_1_1_bar_line =
     [ "HasRepetitionDots", "classvrv_1_1_bar_line.html#a2d9659dbb8cf0f9eaefa85d28859bf83", null ],
     [ "HasToBeAligned", "classvrv_1_1_bar_line.html#a9c4e16bbd0716287717220396b11b758", null ],
     [ "Reset", "classvrv_1_1_bar_line.html#af5652cfb6a6ceac082aff24efe345e82", null ],
-    [ "SetAlignment", "classvrv_1_1_bar_line.html#a70df30f78536cb17a7381478310792f7", null ]
+    [ "SetAlignment", "classvrv_1_1_bar_line.html#a9b25f3c724cbe2f6ca61609a6f835aff", null ]
 ];
