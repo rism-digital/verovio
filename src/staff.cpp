@@ -22,6 +22,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "note.h"
+#include "page.h"
 #include "syl.h"
 #include "system.h"
 #include "timeinterface.h"
@@ -240,6 +241,16 @@ int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Staff::ApplyPPUFactor(FunctorParams *functorParams)
+{
+    ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
+    assert(params);
+
+    if (m_yAbs != VRV_UNSET) m_yAbs /= params->m_page->GetPPUFactor();
+
+    return FUNCTOR_CONTINUE;
+}
+    
 int Staff::AlignVertically(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);

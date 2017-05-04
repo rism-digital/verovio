@@ -456,6 +456,23 @@ public:
     Functor *m_functorEnd;
     Doc *m_doc;
 };
+    
+//----------------------------------------------------------------------------
+// ApplyPPUFactorParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current page
+ */
+
+class ApplyPPUFactorParams : public FunctorParams {
+public:
+    ApplyPPUFactorParams()
+    {
+        m_page = NULL;
+    }
+    Page *m_page;
+};
 
 //----------------------------------------------------------------------------
 // CalcArticParams
