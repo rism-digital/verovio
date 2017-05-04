@@ -1630,11 +1630,12 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     dc->EndGraphic(dynam, this);
 }
 
-void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y, bool &setX, bool &setY)
+void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, int x, int y, bool &setX, bool &setY)
 {
-    assert(element);
+    assert(dc);
+    assert(fb);
     
-    int offset = 0;
+    dc->StartGraphic(fb, "", fb->GetUuid());
     
     FontInfo *fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
     int descender = -m_doc->GetTextGlyphDescender(L'q', fontDim, false);
@@ -1645,25 +1646,32 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y, bo
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(fontDim);
     
+    
     Object *current;
-    for (current = element->GetFirst(); current; current = element->GetNext()) {
+    for (current = fb->GetFirst(); current; current = fb->GetNext()) {
+        
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
         if (current->Is(FIGURE)) {
             // dynamic_cast assert in DrawF
-            DrawF(dc, dynamic_cast<F *>(current), x, y + offset, setX, setY);
+            DrawF(dc, dynamic_cast<F *>(current), x, y, setX, setY);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawLayerEditorialElement
-            DrawTextEditorialElement(dc, dynamic_cast<EditorialElement *>(current), x, y + offset, setX, setY);
+            DrawFbEditorialElement(dc, dynamic_cast<EditorialElement *>(current), x, y, setX, setY);
         }
         else {
             assert(false);
         }
-        offset -= (descender + height);
+        dc->EndText();
+        
+        y -= (descender + height);
     }
+    
     
     dc->ResetFont();
     dc->ResetBrush();
     
+    dc->EndGraphic(fb, this);
 }
     
 void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, System *system)
