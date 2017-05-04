@@ -35,7 +35,7 @@ svg:not(:root){
     height: 2px;
 }
 
-.home-row {
+.home-row-flex {
     display: flex;
     align-items: center;
 }
@@ -167,6 +167,20 @@ code.panel-header {
 
 .carousel-description {
     display: none;
+}
+
+.carousel-indicators {
+  bottom:-50px;
+}
+
+.carousel-indicators li {
+  border-color:#999;
+  background-color:#ccc;
+}
+
+.carousel-inner {
+   margin-bottom:50px;
+   border:  2px solid #ccc;
 }
 
 // Fixing image within tables

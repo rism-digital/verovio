@@ -153,12 +153,6 @@
                                     <note xml:id="d23378e674" pname="e" oct="3" dur="2" stem.dir="down"/>
                                 </layer>
                             </staff>
-                            <dir tstamp="3" place="above" staff="1">
-                                <rend fontfam="PlainBlackWide" fontsize="18">Jesu, meines Herzens Freud</rend>
-                            </dir>
-                            <dir tstamp="3" place="above" staff="1">
-                                <rend fontfam="Times New Roman" fontsize="11" fontweight="bold">Johann Flitner</rend>
-                            </dir>
                         </measure>
                     </section>
                 </score>

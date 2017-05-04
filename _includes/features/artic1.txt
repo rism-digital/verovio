@@ -1,0 +1,31 @@
+<section>
+  <measure label="1" n="1">
+    <staff n="1">
+      <layer n="1">
+        <note dur="4" oct="4" pname="g" artic="acc"/>
+        <note dur="4" oct="4" pname="g" artic="stacc"/>
+        <note dur="4" oct="4" pname="g" artic="ten"/>
+        <note dur="4" oct="4" pname="g" artic="stacciss"/>
+      </layer>
+    </staff>
+  </measure>
+  <measure n="2">
+    <staff n="1">
+      <layer n="1">
+        <note dur="4" oct="4" pname="g" artic="marc"/>
+        <note dur="4" oct="4" pname="g" artic="marc-stacc"/>
+        <note dur="4" oct="4" pname="g" artic="spicc"/>
+        <note dur="4" oct="4" pname="g" artic="ten-stacc"/>
+      </layer>
+    </staff>
+  </measure>
+  <measure n="3" right="invis">
+    <staff n="1">
+      <layer n="1">
+        <note dur="4" oct="4" pname="g" artic="dnbow"/>
+        <note dur="4" oct="4" pname="g" artic="upbow"/>
+        <note dur="4" oct="4" pname="g" artic="harm"/>
+      </layer>
+    </staff>
+  </measure>
+</section>

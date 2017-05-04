@@ -12,5 +12,7 @@ var searchData=
   ['timestampaligner',['TimestampAligner',['../classvrv_1_1_timestamp_aligner.html',1,'vrv']]],
   ['timestampattr',['TimestampAttr',['../classvrv_1_1_timestamp_attr.html',1,'vrv']]],
   ['toolkit',['Toolkit',['../classvrv_1_1_toolkit.html',1,'vrv']]],
-  ['tuplet',['Tuplet',['../classvrv_1_1_tuplet.html',1,'vrv']]]
+  ['trill',['Trill',['../classvrv_1_1_trill.html',1,'vrv']]],
+  ['tuplet',['Tuplet',['../classvrv_1_1_tuplet.html',1,'vrv']]],
+  ['turn',['Turn',['../classvrv_1_1_turn.html',1,'vrv']]]
 ];

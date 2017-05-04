@@ -4,17 +4,16 @@ verovio-light: true
 title: Verovio
 active: home
 projects:
-    - [["http://www.marenzio.org", "mode"], ["http://beethovens-werkstatt.de/prototyp-2-0/", "bw"],["http://dme.mozarteum.at", "dme"]]
-    - [["http://mith.us/ema/omas", "omas"],["http://freischuetz-digital.de", "freischuetz"],["http://simssa.ca/", "simssa"]]
-    - [["http://oerc.ox.ac.uk/", "oerc"],["http://www.kb.dk/en/nb/dcm/projekter/mermeid.html", "mermeid"],["http://scorelib.huma-num.fr/", "neuma"]]
-    - [["http://ncodamusic.org/", "ncoda"], ["http://www.rism.info", "rism"], ["http://kern.ccarh.org", "ccarh"]]
-    - [["http://en.chopin.nifc.pl/institute/library/archives", "nifc"], [], []]
-movies:
-    - ["choice", "editor"]
+    - [["http://www.marenzio.org", "mode"], ["http://beethovens-werkstatt.de/prototyp-2-0/", "bw"], ["http://mith.us/ema/omas", "omas"]]
+    - [["http://freischuetz-digital.de", "freischuetz"],["http://simssa.ca/", "simssa"], ["http://oerc.ox.ac.uk/", "oerc"]]
+    - [["http://www.kb.dk/en/nb/dcm/projekter/mermeid.html", "mermeid"],["http://scorelib.huma-num.fr/", "neuma"], [ "http://ncodamusic.org/", "ncoda"]]
+    - [["http://www.rism.info", "rism"], ["http://kern.ccarh.org", "ccarh"], ["http://en.chopin.nifc.pl/institute/library/archives", "nifc"]]
+    - [["http://dme.mozarteum.at/DME/main/index.php", "dme"], ["http://www.oeaw.ac.at/ikm/forschung/digital-musicology/digitale-musikanalyse-mit-mei/", "oeaw"], ["http://www.gluck-gesamtausgabe.de/impressum.html", "gga"]]
+    - [["http://opac.sbn.it/opacsbn/opac/iccu/musica.jsp", "iccu"],["http://www.tassomusic.org/", "tasso"], []]
 ---
-<div class="row home-row">
-    <div class="col-md-5 col-sm-12 home-panel">
-        <div class="panel-body">
+<div class="row home-row home-row-flex">
+    <div class="col-md-5 col-sm-12">
+        <div class="panel-body home-panel">
             <p>
                 Verovio is a fast, portable and lightweight <strong>open-source</strong> library for engraving <strong>Music Encoding Initiative</strong> (MEI) music scores into SVG.
             </p>
@@ -48,19 +47,95 @@ movies:
     </div>
 </div>
 
+<div class="row home-row home-row-flex">
+    <div class="col-sm-6 hidden-xs">
+        <div id="video-carousel" class="carousel slide" data-ride="carousel" data-interval="11000">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+                <li data-target="#video-carousel" data-slide-to="0"></li>
+                <li data-target="#video-carousel" data-slide-to="1"></li>
+                <li data-target="#video-carousel" data-slide-to="2"></li>
+                <li data-target="#video-carousel" data-slide-to="2"></li>
+            </ol>
 
-<div class="row home-row">
-<!--
-    <div class="col-xs-12">
-        <div class="panel-body">
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner" role="listbox">
+                <div class="item">
+                    <video autoplay="false" loop="true" class="img-responsive">
+                        <source src="/movies/editor.webm" type="video/webm"/>
+                        <source src="/movies/editor.mp4" type="video/mp4"/>
+                    </video>
+                </div>
+                <div class="item">
+                    <video autoplay="false" loop="true" class="img-responsive">
+                        <source src="/movies/reflow.webm" type="video/webm"/>
+                        <source src="/movies/reflow.mp4" type="video/mp4"/>
+                    </video>
+                </div>
+                <div class="item">
+                    <video autoplay="false" loop="true" class="img-responsive">
+                        <source src="/movies/layout.webm" type="video/webm"/>
+                        <source src="/movies/layout.mp4" type="video/mp4"/>
+                    </video>
+                </div>
+                <div class="item">
+                    <video autoplay="false" loop="true" class="img-responsive">
+                        <source src="/movies/choice.webm" type="video/webm"/>
+                        <source src="/movies/choice.mp4" type="video/mp4"/>
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xs-12">
+        <div class="panel-body home-panel">
             <p>
-                Verovio is designed to be usable in a wide range of technical environments (C++, JavaScript, Python). It is available under the <a href="http://www.gnu.org/copyleft/lgpl.html" target="_blank">LGPLv3 license</a>
+                The SVG output of Verovio is designed as an <strong>intermediate reflowable layer</strong> that facilitates the development of <strong>interactive applications</strong>, such as music notation editors or interactive digital editions.
             </p>
+            <table align="center">
+                <tr>
+                    <td>
+                        <img src="{{ site.baseurl }}/images/interaction.png" style="padding: 10px;" class="img-responsive"/>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 </div>
-<div class="row">
--->
+
+<div class="row home-row">
+    <div class="col-lg-4 col-sm-12">
+        <p>
+            Verovio is developed by the <a href="http://rism-ch.org/" target="_blank">Swiss RISM Office</a> and is supported by the Swiss National Science Foundation and the Salzburg Mozarteum Foundation. 
+        </p>
+        <p>
+            The source code is available on <a href="https://github.com/rism-ch/verovio">GitHub</a> under the <a href="http://www.gnu.org/copyleft/lgpl.html" target="_blank">LGPLv3 license</a>.
+        </p>
+    </div>
+    <div class="col-lg-8 col-sm-12">
+        <table align="center">
+            <tr>
+                <td>
+                    <a href="http://www.rism-ch.org" target="_blank">
+                        <img alt="RISM logo" src="{{ site.baseurl }}/images/rism-ch.png" style="padding: 10px" class="img-responsive"/>
+                    </a>
+                </td>
+                <td>
+                    <a href="http://www.snf.ch" target="_blank">
+                        <img alt="SNF logo" src="{{ site.baseurl }}/images/snf.png" style="padding: 10px" class="img-responsive"/>
+                    </a>
+                </td>
+                <td>
+                    <a href="http://www.mozarteum.at" target="_blank">
+                        <img alt="SNF logo" src="{{ site.baseurl }}/images/mozarteum.png" style="padding: 10px;" class="img-responsive"/>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="row home-row home-row-flex">
     <div class="col-sm-4 hidden-xs">
         <img src="{{ site.baseurl }}/images/mobiles.png" class="img-responsive"/>
     </div>
@@ -75,36 +150,6 @@ movies:
         </div>
     </div>
 </div>
-
-<div class="row home-row">
-    <div class="col-sm-6 hidden-xs">
-        <div id="video" class="panel-body panel-video">
-            <video autoplay="false" loop="true" class="img-responsive window-shadow hidden">
-                <source src="/movies/editor.webm" type="video/webm"/>
-                <source src="/movies/editor.mp4" type="video/mp4"/>
-            </video>
-            <video autoplay="false" loop="true" class="img-responsive window-shadow hidden">
-                <source src="/movies/choice.webm" type="video/webm"/>
-                <source src="/movies/choice.mp4" type="video/mp4"/>
-            </video>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xs-12">
-        <div class="panel-body home-panel">
-            <p>
-                The SVG output of Verovio is designed as an <strong>intermediate layer</strong> that facilitates the development of <strong>interactive applications</strong>, such as music notation editors or interactive digital editions.
-            </p>
-            <table align="center">
-                <tr>
-                    <td>
-                        <img src="{{ site.baseurl }}/images/interaction.png" style="padding: 10px;" class="img-responsive"/>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </div>
-</div>
-
 
 <div class="row home-row">
     <div class="col-xs-12">
@@ -149,33 +194,13 @@ movies:
         </table>
     </div>
 </div>
-<div class="row">
-    <div class="col-xs-12">
-        <p>
-            Verovio is developed by the <a href="http://rism-ch.org/" target="_blank">Swiss RISM Office</a> and is supported by the Swiss National Science Foundation. It is available under the <a href="http://www.gnu.org/copyleft/lgpl.html" target="_blank">LGPLv3 license</a>.
-        </p>
-        <table align="center">
-            <tr>
-                <td>
-                    <a href="http://www.rism-ch.org" target="_blank">
-                        <img alt="RISM logo" src="{{ site.baseurl }}/images/rism_header_72a.png" style="padding: 20px 0px;" class="img-responsive"/>
-                    </a>
-                </td>
-                <td>
-                    <a href="http://www.snf.ch" target="_blank">
-                        <img alt="SNF logo" src="{{ site.baseurl }}/images/snf.png" style="padding: 20px" class="img-responsive"/>
-                    </a>
-                </td>
-            </tr>
-        </table>
-    </div>
-</div>
 
 <script type="text/javascript">
 //<![CDATA[
     $( document ).ready(function() {
-        rand = Math.floor( Math.random() * 2);
-        $('#video video').eq(rand).removeClass("hidden").attr("autoplay", "true");
+        rand = Math.floor( Math.random() * 4);
+        $('#video-carousel .carousel-indicators li').eq(rand).addClass("active");
+        $('#video-carousel .carousel-inner div').eq(rand).addClass("active");
     });
 //]]>
 </script>

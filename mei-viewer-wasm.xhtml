@@ -1,0 +1,643 @@
+---
+layout: viewer
+title: Verovio MEI Viewer
+active: mei-viewer
+midiplayer: true
+verovio-wasm: true
+downloads:
+    - name: "Brahms Op 51/1"
+      description: "String quartet, 7 pages - 640Kb"
+      link: "Brahms_StringQuartet_Op51_No1.mei"
+    - name: "Chopin op.10/9"
+      description: "Etude, 3 pages - 400Kb"
+      link: "Chopin_Etude_op.10_no.9.mei"
+    - name: "Marenzio Madrigal a 5"
+      description: "Lib. 6, S’io parto, 4 pages - 119Kb"
+      link: "Marenzio_Sesto_a_5_01.mei"
+    - name: "Hummel Concerto"
+      description: "Orchestra score, 121 pages - 7Mb"
+      link: "Hummel_Concerto_for_trumpet.mei"
+      hidden: true
+    - name: "Schubert Lied"
+      description: "Der Lindenbaum, 2 pages - 130Kb"
+      link: "Schubert_Lindenbaum.mei"
+    - name: "Krebs Trio in Eb"
+      description: "Organ score, 6 pages - 380Kb"
+      link: "Krebs_Trio_Eb_2.mei"
+    - name: "Ahle, Jesu, meines Herzens Freud"
+      description: "Choral, 1 page - 70Kb"
+      link: "Ahle_Jesu_meines_Herzens_Freud.mei"
+
+#    - name: "Guami Canzona 24"
+#      description: "8 voices and b.c., 10 pages - 235Kb"
+#      link: "Guami_Canzona_24.mei"
+#    - name: "Chopin op.6/1"
+#      description: "Mazurka in F-sharp Minor, 3 pages - 270Kb"
+#      link: "Chopin_Mazurka_op.6.1.mei"
+#    - name: "Beethoven Op 18/1"
+#      description: "String quartet, 18 pages - 1.1Mb"
+#      link: "Beethoven_op.18_1.mei"
+---
+
+<script type="text/javascript">
+//<![CDATA[
+    var page = 1;
+    var zoom = 40;
+    var pageHeight = 2970;
+    var pageWidth = 2100;
+    var spacingSystem = 2;
+    var swipe_pages = false;
+    var format = 'mei';
+    var outputFilename = 'output.mei'
+    var ids = [];
+
+    // reload cookies
+    if ( $.cookie('zoom') ) zoom = $.cookie('zoom');
+    console.log(zoom);
+
+    function set_options( ) {
+        pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
+        pageWidth = ($(".row-offcanvas").width()) * 100 / zoom ; // - $( "#sidbar" ).width();
+        border = 50;
+        options = {
+                    inputFormat: format,
+                    pageHeight: pageHeight,
+                    pageWidth: pageWidth,
+                    border: border,
+                    scale: zoom,
+                    spacingSystem: spacingSystem,
+                    adjustPageHeight: 1,
+                    ignoreLayout: 1
+                };
+        //console.log( options );
+        vrvToolkit.setOptions( options );
+    }
+
+    function upload_file() {
+
+        $('#submit-btn').popover('hide');
+        var f = $("#mei_files").prop('files')[0];
+        var reader = new FileReader();
+
+        // Closure to capture the file information.
+        reader.onload = (function(theFile) {
+            return function(e) {
+                $('.row-offcanvas').toggleClass('active');
+                load_data(e.target.result);
+            };
+        })(f);
+
+        // Read in the image file as a data URL.
+        reader.readAsText(f);
+    };
+
+    function load_data(data) {
+
+        set_options();
+
+        console.time("loading");
+        try {
+            vrvToolkit.loadData(data);
+
+            if (vrvToolkit.getPageCount() == 0) {
+                $("#overlay").hide().css("cursor", "auto");
+                log = vrvToolkit.getLog();
+                $('#err').text(log).html();
+                $('#errorDialog').modal();
+            }
+            else {
+                $("#total_text").html(vrvToolkit.getPageCount());
+                page = 1;
+                load_page();
+                $("#play-button").show();
+            }
+        }
+        catch(err) {
+            $("#overlay").hide().css("cursor", "auto");
+            $('#err').html(err);
+            $('#errorDialog').modal();
+        }
+        console.timeEnd("loading");
+    }
+
+    function load_page() {
+        $("#overlay").hide().css("cursor", "auto");
+        $("#jump_text").val(page);
+
+        svg = vrvToolkit.renderPage(page, {});
+        $("#svg_output").html(svg);
+
+        adjust_page_height();
+    };
+
+    function next_page() {
+        if (page >= vrvToolkit.getPageCount()) {
+            return;
+        }
+
+        page = page + 1;
+        load_page();
+    };
+
+    function prev_page() {
+        if (page <= 1) {
+            return;
+        }
+
+        page = page - 1;
+        load_page();
+    };
+
+    function first_page() {
+        page = 1;
+        load_page();
+    };
+
+    function last_page() {
+        page = vrvToolkit.getPageCount();
+        load_page();
+    };
+
+    function apply_zoom() {
+        console.log("apply zoom")
+        if (vrvToolkit === undefined) return;
+        
+        $.cookie('zoom', zoom, { expires: 30 });
+        set_options();
+        var measure = 0;
+        if (page != 1) {
+            measure = $("#svg_output .measure").attr("id");
+        }
+
+        vrvToolkit.redoLayout();
+
+        $("#total_text").html(vrvToolkit.getPageCount());
+        page = 1;
+        if (measure != 0) {
+            page = vrvToolkit.getPageWithElement(measure);
+        }
+        load_page();
+    }
+
+    function zoom_out() {
+        if (zoom < 20) {
+            return;
+        }
+
+        zoom = zoom / 2;
+        apply_zoom();
+    }
+
+    function zoom_in() {
+        if (zoom > 80) {
+            return;
+        }
+
+        zoom = zoom * 2;
+        apply_zoom();
+    }
+
+    function do_page_enter(e) {
+        key = e.keyCode || e.which;
+        if (key == 13) {
+
+            text = $("#jump_text").val();
+
+            if (text <= vrvToolkit.getPageCount() && text > 0) {
+                page = Number(text);
+                load_page();
+            } else {
+                $("#jump_text").val(page);
+            }
+
+        }
+    }
+
+    function do_zoom_enter(e) {
+        key = e.keyCode || e.which;
+        if (key == 13) {
+            text = $("#zoom_text").val();
+            zoom_val = Number(text.replace("%", ""));
+            if (zoom_val < 10) zoom_val = 10;
+            else if (zoom_val > 160) zoom_val = 160;
+            zoom = zoom_val;
+            apply_zoom();
+        }
+    }
+
+    function adjust_page_height() {
+        // adjust the height of the panel
+        if ( $('#svg_panel svg') ) {
+            zoomed_height = pageHeight * zoom / 100;
+            if ( zoomed_height < $('#svg_panel svg').height() ) {
+                zoomed_height = $('#svg_panel svg').height();
+            }
+            $('#svg_output').height( zoomed_height ); // slighly more for making sure we have no scroll bar
+            //$('#svg_panel svg').height(pageHeight * zoom / 100 );
+            //$('#svg_panel svg').width(pageWidth * zoom / 100 );
+        }
+
+        // also update the zoom control
+        $("#zoom_text").val(zoom + "%");
+
+        // enable the swipe (or not)
+        enable_swipe( ( $('#svg_panel svg') && ( $('#svg_panel svg').width() <= $('#svg_panel').width() ) ) );
+    }
+
+    function swipe_prev(event, direction, distance, duration, fingerCount) {
+          prev_page();
+     }
+
+     function swipe_next(event, direction, distance, duration, fingerCount) {
+         next_page();
+     }
+
+     function swipe_zoom_in(event, target) {
+         zoom_in();
+     }
+
+     function swipe_zoom_out(event, target) {
+         zoom_out();
+     }
+
+    function enable_swipe( pages ) {
+        if ( pages && !swipe_pages ) {
+            $("#svg_output").swipe( "destroy" );
+            $("#svg_output").swipe( { swipeLeft: swipe_next, swipeRight: swipe_prev, tap: swipe_zoom_in, doubleTap: swipe_zoom_out, allowPageScroll:"auto"} );
+            swipe_pages = true;
+        }
+        // zoom only
+        else if ( !pages && swipe_pages ) {
+            $("#svg_output").swipe( "destroy" );
+            $("#svg_output").swipe( { tap: swipe_zoom_in, doubleTap: swipe_zoom_out, allowPageScroll:"auto"} );
+            swipe_pages = false;
+        }
+    }
+
+    function getParameterByName(name) {
+        var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
+
+    function play_midi() {
+        var base64midi = vrvToolkit.renderToMidi();
+        var song = 'data:audio/midi;base64,' + base64midi;
+        $("#player").show();
+        $("#play-button").hide();
+        $("#player").midiPlayer.play(song);
+    }
+
+    var midiUpdate = function(time) {
+        var vrvTime = Math.max(0, 2 * time - 800);
+        var elementsattime = vrvToolkit.getElementsAtTime(vrvTime);
+        if (elementsattime.page > 0) {
+            if (elementsattime.page != page) {
+                page = elementsattime.page;
+                load_page();
+            }
+            if ((elementsattime.notes.length > 0) && (ids != elementsattime.notes)) {
+                ids.forEach(function(noteid) {
+                    if ($.inArray(noteid, elementsattime.notes) == -1) {
+                        $("#" + noteid ).attr("fill", "#000");
+                        $("#" + noteid ).attr("stroke", "#000");
+                        //$("#" + noteid ).removeClassSVG("highlighted");
+                    }
+                });
+                ids = elementsattime.notes;
+                ids.forEach(function(noteid) {
+                    if ($.inArray(noteid, elementsattime.notes) != -1) {
+                    //console.log(noteid);
+                        $("#" + noteid ).attr("fill", "#c00");
+                        $("#" + noteid ).attr("stroke", "#c00");;
+                        //$("#" + noteid ).addClassSVG("highlighted");
+                    }
+                });
+            }
+        }
+    }
+
+    var midiStop = function() {
+        ids.forEach(function(noteid) {
+            $("#" + noteid ).attr("fill", "#000");
+            $("#" + noteid ).attr("stroke", "#000");
+            //$("#" + noteid ).removeClassSVG("highlighted");
+        });
+        $("#player").hide();
+        $("#play-button").show();
+    }
+
+    $.fn.addClassSVG = function(className){
+        $(this).attr('class', function(index, existingClassNames) {
+            return existingClassNames + ' ' + className;
+        });
+        return this;
+    };
+
+    $.fn.removeClassSVG = function(className){
+        $(this).attr('class', function(index, existingClassNames) {
+            //var re = new RegExp(className, 'g');
+            //return existingClassNames.replace(re, '');
+        });
+        return this;
+    };
+
+//]]>
+</script>
+
+<!-- modal -->
+<div class="modal fade" id="errorDialog" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="glyphicon glyphicon-remove"> </span></button>
+                <h4 class="modal-title" id="myModalLabel">Error</h4>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" role="alert">Sorry, Verovio failed to process the MEI data</div>
+                <div id="errDiv">
+                    <pre id="err"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- sidebar -->
+<div class="sidebar-offcanvas sidebar-right" id="sidebar" role="navigation">
+    <div class="sidebar-panel">
+        <div class="row">
+            <div class="col-xs-12">
+                <h4>Navigation</h4>
+            </div>
+        </div>
+        <div class="row sidebar-row">
+            <div class="col-xs-12">
+                <button class="btn btn-default btn-sm pull-left popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="On mobile devices, you can swipe left or right to change page and tap or double tap to zoom-in or zoom-out. On desktops, you can use [ctrl+] left or right arrows and +/- keys.">
+                    <span class="glyphicon glyphicon-question-sign"/>
+                </button>
+            </div>
+        </div>
+        <div class="row sidebar-row">
+            <div class="col-md-12">
+                <p>
+                    Go to page [1-<span id="total_text">1</span>]:
+                </p>
+                <div class="input-group input-group-sm" style="width: 20px;">
+                    <span class="input-group-btn">
+                        <button onclick="first_page()" class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-fast-backward"/>
+                        </button>
+                        <button onclick="prev_page()" class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-backward"/>
+                        </button>
+                    </span>
+                    <input type="text" class="form-control" placeholder="0" id="jump_text" style="width: 45px !important;" onkeypress="do_page_enter(event)"/>
+                    <span class="input-group-btn">
+                        <button onclick="next_page()" class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-forward"/>
+                        </button>
+                        <button onclick="last_page()" class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-fast-forward"/>
+                        </button>
+                    </span>
+                </div>
+                <p></p>
+                <p><em>(Swipe or click left- or right-key to change screen)</em></p>
+                <!-- /input-group -->
+            </div>
+            <!-- /.col-lg-6 -->
+        </div>
+        <div class="row sidebar-row">
+            <div class="col-md-6">
+                <p>
+                    Zoom:
+                </p>
+                <div class="input-group input-group-sm" style="width: 20px;">
+                    <span class="input-group-btn">
+                        <button onclick="zoom_out()" class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-zoom-out"/>
+                        </button>
+                    </span>
+                    <input type="text" class="form-control" style="width:60px !important;" placeholder="100%" id="zoom_text" onkeypress="do_zoom_enter(event)"/>
+                    <span class="input-group-btn">
+                        <button onclick="zoom_in()" class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-zoom-in"/>
+                        </button>
+                    </span>
+                </div>
+                <!-- /input-group -->
+            </div>
+            <!-- /.col-md-6 -->
+        </div>
+    </div>
+
+    <div class="sidebar-panel">
+        <div class="row">
+            <div class="col-xs-12">
+                <h4>Examples</h4>
+            </div>
+        </div>
+        <div id="downloads_panel_body">
+            <div class="row">
+                <div class="col-md-12">
+                    {% for d in page.downloads %}
+                    <div {% if d.hidden == true %}class="hidden-sm hidden-xs"{% endif %}>
+                        <p>
+                        <a href="{{ site.baseurl }}/{{ page.name }}?file=examples/downloads/{{ d.link }}">{{ d.name }}</a><br/>
+                         {{ d.description }}
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- /.col-md-6 -->
+            </div>
+            <!-- /.row -->
+        </div>
+    </div>
+
+    <div class="hidden-xs hidden-sm sidebar-panel">
+        <div class="row">
+            <div class="col-xs-12">
+                <h4>Select MEI file</h4>
+            </div>
+        </div>
+
+        <div id="options_panel_body">
+            <form id="upload_form" onsubmit="upload_file( $('#upload_form') ); return false" class="form-inline" role="form">
+                <div class="row">
+                    <div class="col-md-12">
+                        <input type="file" id="mei_files" onchange="$('#submit-btn').popover('show');" name="file" style="margin: 4px 0px 8px 0px;"/>
+                    </div>
+                    <div class="col-md-12">
+                        <button type="submit" id="submit-btn" class="btn btn-default btn-sm popover-btn" data-container="body" data-toggle="popover" data-placement="left" data-content="Click to display the MEI file!" data-trigger="manual">Render</button>
+                    </div>
+                </div>
+
+                <!--><div id="log_panel" style="display: none">
+                    <hr class="panel"/>
+                    <p id="log_p"></p>
+                </div>
+                -->
+
+            </form>
+        </div>
+    </div>
+
+    <div class="sidebar-panel">
+        <p>This viewer uses the latest development version <a href="" id="version">[version]</a> and might be unstable.</p>
+        <p>Do you need the old MEI viewer? It is available <a href="{{ site.baseurl }}/mei-viewer-old.xhtml">here</a>.</p>
+    </div>
+
+</div>
+
+
+
+
+
+
+<div id="page-content-wrapper">
+    <!-- top navbar -->
+    <div id="navbar" class="navbar navbar-default navbar-with-sidebar">
+        <button type="button" class="navbar-toggle sidebar-toggle" data-toggle="offcanvas" data-target=".sidebar-nav">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+        </button>
+        <div class="btn-group">
+            <button id="play-button" onclick="play_midi();" class="btn btn-sm btn-default" type="button" style="display: none;">
+                <span class="glyphicon glyphicon-volume-up"/>
+            </button>
+        </div>
+
+        <button type="button" id="mei_download" class="navbar-toggle menu-download" style="display: none;">
+            <span class="glyphicon glyphicon-download"></span><span> MEI</span>
+        </button>
+        <a class="navbar-brand logo-nav" href="{{ site.baseurl }}/index.xhtml">
+            <img src="{{ site.baseurl }}/images/verovio-fadded-50.png" />
+        </a>
+        <div style="clear: both;"></div>
+        <hr/>
+    </div>
+
+    <div id="svg_panel" style="background-color: #fff;">
+        <div id="player" style="z-index: 20; position: absolute; display: none;"></div>
+        <div id="svg_output" style="overflow:hidden;" />
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+//<![CDATA[
+    $( document ).ready(function() {
+
+        $(window).keyup(function(event){
+            // We need to make sure not to capture event on text fields
+            if ( $(event.target).hasClass('form-control') ) {
+                return;
+            }
+            if ( event.ctrlKey && (event.keyCode == 37) ) {
+                first_page();
+            }
+            else if ( event.keyCode == 37 ) {
+                prev_page();
+            }
+            else if ( event.ctrlKey && (event.keyCode == 39) ) {
+                last_page();
+            }
+            else if ( event.keyCode == 39 ) {
+                next_page();
+            }
+            else if ( event.keyCode == 107 ) {
+                zoom_in();
+            }
+            else if ( event.keyCode == 109 ) {
+                zoom_out();
+            }
+        });
+
+        $(window).resize(function(){
+            apply_zoom();
+        });
+
+        $( "#toggle_log" ).click(function() {
+            log = !log;
+            $( "#log_panel_body" ).toggle();
+            // toggle icon
+            $("span", this).toggleClass("glyphicon-chevron-down glyphicon-chevron-left");
+        });
+
+        $( "#mei_download" ).click(function() {
+            outputFilename = outputFilename.replace(/\.[^\.]+$/, '.mei');
+            saveAs(new Blob([vrvToolkit.getMEI(-1, true)], {type: "text/xml;charset=utf-8"}), outputFilename);
+        });
+
+        // Set the popover for the btn
+        $( ".popover-btn" ).popover( );
+
+        // Adjust the size of the svg_output and the zoom according to the div (screen) size
+        width = $('#svg_panel').width();
+
+        zoom = Math.min( Math.floor( 100 * width / 2100 ), zoom );
+        //$("#svg_output").height( zoom * 30 ); // slighly more for making sure we have no scroll bar (3000 for default height of 2970)
+
+        // Init the swipe
+        enable_swipe( true );
+
+        $("#overlay").show();
+        
+        $(".row-offcanvas").on('transitionend webkitTransitionEnd oTransitionEnd mozTransitionend MSTransitionEnd',
+            function() { apply_zoom();
+        });
+        $("#player").midiPlayer({
+            color: "#c00",
+            onUnpdate: midiUpdate,
+            onStop: midiStop,
+            width: 250
+        });
+    });
+    
+    //var vrvToolkit;
+    
+    // Preload the WASM module - 
+    var Module = {
+      noInitialRun: false,
+      onRuntimeInitialized: function() {
+          // Load the default file or the file passed in the URL
+          
+          var file = getParameterByName("file");
+
+          if (!file || (file.length == 0)) {
+              file = "examples/downloads/Chopin_Etude_op.10_no.9.mei";
+          }
+
+          vrvToolkit = new verovio.toolkit();
+          console.log("Loaded!");
+          console.log(vrvToolkit.getVersion());
+
+          $.ajax({
+              url: file
+              , dataType: "text"
+              , success: function(data) {
+                  outputFilename = file.replace(/^.*[\\\/]/, '')
+                  load_data( data );
+              }
+          });
+      }
+    };
+    
+
+    var xhr=new XMLHttpRequest();
+    xhr.open( 'GET','{{ site.baseurl }}/javascript/develop/verovio.wasm',true );
+    xhr.responseType='arraybuffer';
+    xhr.onload=function(){
+        Module.wasmBinary=xhr.response;
+        var script=document.createElement( 'script' );
+        script.src="{{ site.baseurl }}/javascript/develop/verovio-toolkit-wasm.js";
+        document.body.appendChild(script);
+    };
+    xhr.send( null );
+    
+//]]>
+</script>

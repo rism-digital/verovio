@@ -1,0 +1,22 @@
+<section>
+  <measure label="1" n="1">
+    <staff n="1">
+      <layer n="1">
+        <note dur="4" oct="4" pname="e" artic="stacc ten"/>
+        <note dur="4" oct="4" pname="g" artic="stacc ten"/>
+        <note dur="4" oct="4" pname="b" artic="stacc ten"/>
+        <note dur="4" oct="5" pname="e" artic="stacc ten"/>
+      </layer>
+    </staff>
+  </measure>
+  <measure n="2">
+    <staff n="1">
+      <layer n="1">
+        <note dur="4" oct="4" pname="e" artic="stacc marc"/>
+        <note dur="4" oct="4" pname="g" artic="stacc marc"/>
+        <note dur="4" oct="4" pname="b" artic="stacc marc"/>
+        <note dur="4" oct="5" pname="e" artic="stacc marc"/>
+      </layer>
+    </staff>
+  </measure>
+</section>

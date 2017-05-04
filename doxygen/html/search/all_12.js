@@ -11,7 +11,8 @@ var searchData=
   ['timespanninginterface',['TimeSpanningInterface',['../classvrv_1_1_time_spanning_interface.html',1,'vrv']]],
   ['timestampaligner',['TimestampAligner',['../classvrv_1_1_timestamp_aligner.html',1,'vrv']]],
   ['timestampattr',['TimestampAttr',['../classvrv_1_1_timestamp_attr.html',1,'vrv']]],
-  ['toolkit',['Toolkit',['../classvrv_1_1_toolkit.html#ad009ed5b8852f67843a34c4b6fd1e3c7',1,'vrv::Toolkit']]],
-  ['toolkit',['Toolkit',['../classvrv_1_1_toolkit.html',1,'vrv']]],
-  ['tuplet',['Tuplet',['../classvrv_1_1_tuplet.html',1,'vrv']]]
+  ['toolkit',['Toolkit',['../classvrv_1_1_toolkit.html',1,'vrv::Toolkit'],['../classvrv_1_1_toolkit.html#ad009ed5b8852f67843a34c4b6fd1e3c7',1,'vrv::Toolkit::Toolkit()']]],
+  ['trill',['Trill',['../classvrv_1_1_trill.html',1,'vrv']]],
+  ['tuplet',['Tuplet',['../classvrv_1_1_tuplet.html',1,'vrv']]],
+  ['turn',['Turn',['../classvrv_1_1_turn.html',1,'vrv']]]
 ];

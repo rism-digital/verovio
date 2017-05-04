@@ -30,7 +30,7 @@
                                     <chord dur="4" stem.dir="down">
                                         <note pname="d" oct="6"/>
                                         <note pname="b" oct="5"/>
-                                        <note pname="g" oct="5" accid.ges="s">
+                                        <note pname="g" oct="5">
                                             <accid accid="s"/>
                                         </note>
                                         <note pname="e" oct="5"/>
@@ -42,7 +42,7 @@
                             <staff n="2">
                                 <layer n="1">
                                     <chord dur="4" stem.dir="up">
-                                        <note pname="g" oct="4" accid.ges="s">
+                                        <note pname="g" oct="4">
                                             <accid accid="s"/>
                                         </note>
                                         <note pname="b" oct="3"/>
@@ -66,7 +66,7 @@
                                     <beam>
                                         <note pname="e" oct="5" dur="8" stem.dir="down" xml:id="n3"/>
                                         <chord dur="8" stem.dir="down">
-                                            <note pname="g" oct="5" accid.ges="s">
+                                            <note pname="g" oct="5">
                                                 <accid accid="s"/>
                                             </note>
                                             <note pname="d" oct="5">
@@ -110,7 +110,7 @@
                                     <beam>
                                         <note pname="a" oct="3" dur="16" stem.dir="up"/>
                                         <note pname="a" oct="4" dur="16" stem.dir="up"/>
-                                        <note pname="g" oct="4" dur="16" stem.dir="up" accid.ges="s">
+                                        <note pname="g" oct="4" dur="16" stem.dir="up">
                                             <accid accid="s"/>
                                         </note>
                                         <note pname="a" oct="4" dur="16" stem.dir="up"/>

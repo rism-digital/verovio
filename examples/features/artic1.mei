@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Articulation example</title>
+            </titleStmt>
+            <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                            <staffDef n="1" clef.shape="G" lines="5" clef.line="2"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section label="feature-example">
+                        <measure label="1" n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="4" oct="4" pname="g" artic="acc"/>
+                                    <note dur="4" oct="4" pname="g" artic="stacc"/>
+                                    <note dur="4" oct="4" pname="g" artic="ten"/>
+                                    <note dur="4" oct="4" pname="g" artic="stacciss"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="2">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="4" oct="4" pname="g" artic="marc"/>
+                                    <note dur="4" oct="4" pname="g" artic="marc-stacc"/>
+                                    <note dur="4" oct="4" pname="g" artic="spicc"/>
+                                    <note dur="4" oct="4" pname="g" artic="ten-stacc"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="3" right="invis">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="4" oct="4" pname="g" artic="dnbow"/>
+                                    <note dur="4" oct="4" pname="g" artic="upbow"/>
+                                    <note dur="4" oct="4" pname="g" artic="harm"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

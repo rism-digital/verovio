@@ -1,0 +1,8 @@
+<measure n="1" right="dbl">
+  <staff n="1">
+    <layer n="1">
+      <note dur="4" oct="4" pname="g" stem.dir="down"/>
+    </layer>
+  </staff>
+  <trill staff="1" tstamp="1"/>
+</measure>

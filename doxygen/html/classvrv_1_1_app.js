@@ -4,9 +4,9 @@ var classvrv_1_1_app =
     [ "App", "classvrv_1_1_app.html#a5f309fa01beb42fdba4cc65cb6311d4a", null ],
     [ "~App", "classvrv_1_1_app.html#a03151f608ed89d30ee7fff04fd506bc5", null ],
     [ "AddChild", "classvrv_1_1_app.html#adf95cef5fe23595f282c5132632ad586", null ],
-    [ "GetClassName", "classvrv_1_1_app.html#a729b08c5738d282723c92f0a5ac69fc2", null ],
+    [ "GetClassId", "classvrv_1_1_app.html#a7634a60d7072b0721f55f7ca022c42cf", null ],
+    [ "GetClassName", "classvrv_1_1_app.html#a8d1d561a48a1d30f53b25f6a159b6393", null ],
     [ "GetLevel", "classvrv_1_1_app.html#a07dd8b721f08e752c19884426a183633", null ],
-    [ "Is", "classvrv_1_1_app.html#a81a373a24ded86eaaeabc3d0eea8597f", null ],
     [ "Reset", "classvrv_1_1_app.html#ab257604e5582c2d2961a202ec83e09ba", null ],
     [ "m_level", "classvrv_1_1_app.html#a06f4d332dfccd1af6fffe54fe90f1701", null ]
 ];

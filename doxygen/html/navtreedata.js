@@ -20,16 +20,17 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 ".html",
-"classvrv_1_1_beam.html",
-"classvrv_1_1_device_context.html#a3daa36caa26ceb3b6226e93b3676db6a",
-"classvrv_1_1_fill_staff_current_time_spanning_params.html#abe8c03cfd6c463d39fd8cf2b33be343e",
-"classvrv_1_1_interface.html#adaf168ce6b150aef8967391bf4f20e5f",
-"classvrv_1_1_mensur.html#ae1e3e06e3b476be67059851600a3aa3f",
-"classvrv_1_1_page.html#aaab394087268b7ac653d6d935bd306c6",
-"classvrv_1_1_set_current_score_def_params.html#a10934c7ebfd2e38b2f94a7cb4ded02ae",
-"classvrv_1_1_svg_device_context.html#aa9b9c3d319fb507ad296bad981e60653",
-"classvrv_1_1_toolkit.html#aeda33e694a8e690ab4c8e790690b8083",
-"ligature_8h_source.html"
+"classvrv_1_1_att.html#a586246d73f9d6870abf3fea849e79d10",
+"classvrv_1_1_bounding_box.html#ae79b9324168608f36cb71c8ca4174220",
+"classvrv_1_1_doc.html#a3c048b3f32e3dd208250740f350b646e",
+"classvrv_1_1_floating_object.html#a598b5443645caf3544285c9b99bfcdbb",
+"classvrv_1_1_humdrum_input.html#acb0b63c26d6546e970bfdd82a5ca4291",
+"classvrv_1_1_measure.html#a680391bcbb2cbc1cc3859a22194133e5",
+"classvrv_1_1_object.html#a7c0a63c225e76daa84e102b7d531d645",
+"classvrv_1_1_rdg.html#ac3cad7c428be4125ce816a64bc0b082b",
+"classvrv_1_1_staff_def_drawing_interface.html#a9aaf5432c024a82344ee3afdad491fdd",
+"classvrv_1_1_text.html#ac8b56c524e22c536a37c696f22837412",
+"classvrv_1_1_view.html#a44e0a55904272dff67142ea68937b6b8"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

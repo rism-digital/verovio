@@ -1,0 +1,51 @@
+<measure n="1">
+  <staff n="1">
+    <layer n="1">
+      <beam>
+        <note dots="1" dur="8" oct="4" pname="a" stem.dir="up">
+          <verse xml:lang="de" n="1">
+            <syl con="d" wordpos="i">Stil</syl>
+          </verse>
+          <verse xml:lang="en" n="2">
+            <syl con="d" wordpos="i">Sil</syl>
+          </verse>
+          <verse xml:lang="sv" n="3">
+            <syl con="d" wordpos="i">Stil</syl>
+          </verse>
+        </note>
+        <note dur="16" oct="4" pname="b" stem.dir="up"/>
+      </beam>
+      <note dur="8" oct="4" pname="a" stem.dir="up">
+        <verse xml:lang="de" n="1">
+          <syl>le</syl>
+        </verse>
+        <verse xml:lang="en" n="2">
+          <syl wordpos="t">ent</syl>
+        </verse>
+        <verse xml:lang="sv" n="3">
+          <syl>la</syl>
+        </verse>
+      </note>
+      <note dur="4" oct="4" pname="f" accid.ges="s" stem.dir="up">
+        <verse xml:lang="de" n="1">
+          <syl>Nacht!</syl>
+        </verse>
+        <verse xml:lang="en" n="2">
+          <syl>night,</syl>
+        </verse>
+        <verse xml:lang="sv" n="3">
+          <syl>natt,</syl>
+        </verse>
+      </note>
+      <rest dur="8" ploc="e" oloc="4"/>
+    </layer>
+    <layer n="2">
+      <beam>
+        <note dots="1" dur="8" oct="4" pname="f" accid.ges="s" stem.dir="down"/>
+        <note dur="16" oct="4" pname="g" stem.dir="down"/>
+      </beam>
+      <note dur="8" oct="4" pname="f" accid.ges="s" stem.dir="down"/>
+      <note dur="4" oct="4" pname="d" stem.dir="down"/>
+    </layer>
+  </staff>
+</measure>
