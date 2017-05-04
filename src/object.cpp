@@ -1123,6 +1123,10 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    if (this->Is(FB)) {
+        return FUNCTOR_CONTINUE;
+    }
+
     if (this->Is(SYL)) {
         // We don't want to add the syl to the overflow since lyrics require a full line anyway
         return FUNCTOR_CONTINUE;
