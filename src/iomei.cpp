@@ -2604,7 +2604,7 @@ bool MeiInput::ReadMeiFbChildren(Object *parent, pugi::xml_node parentNode)
         if (!success) break;
         // editorial
         else if (IsEditorialElementName(current.name())) {
-            success = ReadMeiEditorialElement(parent, current, EDITORIAL_TEXT);
+            success = ReadMeiEditorialElement(parent, current, EDITORIAL_FB);
         }
         // content
         else if (std::string(current.name()) == "f") {
@@ -3763,6 +3763,9 @@ bool MeiInput::ReadMeiEditorialChildren(Object *parent, pugi::xml_node parentNod
     }
     else if (level == EDITORIAL_TEXT) {
         return ReadMeiTextChildren(parent, parentNode, filter);
+    }
+    else if (level == EDITORIAL_FB) {
+        return ReadMeiFbChildren(parent, parentNode);
     }
     else {
         return false;

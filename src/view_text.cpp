@@ -29,22 +29,22 @@ namespace vrv {
 // View - TextElement
 //----------------------------------------------------------------------------
 
-void View::DrawF(DeviceContext *dc, F *figure, int x, int y, bool &setX, bool &setY)
+void View::DrawF(DeviceContext *dc, F *f, int x, int y, bool &setX, bool &setY)
 {
     assert(dc);
-    assert(figure);
-    
-    dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
-    LogDebug("F y: %d", y);
-    DrawTextChildren(dc, figure, x, y, setX, setY);
-    dc->EndText();
+    assert(f);
 
+    dc->StartTextGraphic(f, "", f->GetUuid());
+
+    DrawTextChildren(dc, f, x, y, setX, setY);
+
+    dc->EndTextGraphic(f, this);
 }
 
 void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
 {
     assert(dc);
-    
+
     std::size_t prev_pos = 0, pos;
     while ((pos = s.find_first_of(L"\u266D\u266E\u266F", prev_pos)) != std::wstring::npos) {
         // If pos if > than the previous, it is the substring to exctrace
@@ -52,7 +52,7 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
             std::wstring substr = s.substr(prev_pos, pos - prev_pos);
             dc->DrawText(UTF16to8(substr), substr);
         }
-        
+
         // if it is the same or we still have space, it is the accidental
         if (pos == prev_pos || pos < s.length()) {
             // Then the accidental
@@ -60,14 +60,17 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
             std::wstring smufl_accid;
             if (accid == L"\u266D") { // MUSIC FLAT SIGN
                 smufl_accid.push_back(0xE260);
-            } else if (accid == L"\u266E") { // MUSIC FLAT SIGN
+            }
+            else if (accid == L"\u266E") { // MUSIC FLAT SIGN
                 smufl_accid.push_back(0xE261);
-            } else if (accid == L"\u266F") { // MUSIC SHARP SIGN
+            }
+            else if (accid == L"\u266F") { // MUSIC SHARP SIGN
                 smufl_accid.push_back(0xE262);
-            } else {
+            }
+            else {
                 smufl_accid.push_back(0xE26D);
             }
-            
+
             FontInfo vrvTxt;
             vrvTxt.SetFaceName("VerovioText");
             dc->SetFont(&vrvTxt);
@@ -82,14 +85,18 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
         std::wstring substr = s.substr(prev_pos, std::wstring::npos);
         dc->DrawText(UTF16to8(substr), substr);
     }
-
 }
-    
+
 void View::DrawTextElement(DeviceContext *dc, TextElement *element, int x, int y, bool &setX, bool &setY)
 {
     assert(dc);
     assert(element);
 
+    if (element->Is(FIGURE)) {
+        F *f = dynamic_cast<F *>(element);
+        assert(f);
+        DrawF(dc, f, x, y, setX, setY);
+    }
     if (element->Is(REND)) {
         Rend *rend = dynamic_cast<Rend *>(element);
         assert(rend);

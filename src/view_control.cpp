@@ -1758,7 +1758,6 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         int y = harm->GetDrawingY();
 
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
-            LogDebug("Fb y: %d", y);
             DrawFb(dc, *staffIter, dynamic_cast<Fb *>(harm->GetFirst()), x, y, setX, setY);
         }
         else {

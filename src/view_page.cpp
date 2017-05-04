@@ -1134,6 +1134,26 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, int x, int y, boo
     }
 }
 
+void View::DrawFbChildren(DeviceContext *dc, Object *parent, int x, int y, bool &setX, bool &setY)
+{
+    assert(dc);
+    assert(parent);
+
+    Object *current;
+    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+        if (current->IsTextElement()) {
+            DrawTextElement(dc, dynamic_cast<TextElement *>(current), x, y, setX, setY);
+        }
+        else if (current->IsEditorialElement()) {
+            // cast to EditorialElement check in DrawLayerEditorialElement
+            DrawFbEditorialElement(dc, dynamic_cast<EditorialElement *>(current), x, y, setX, setY);
+        }
+        else {
+            assert(false);
+        }
+    }
+}
+
 //----------------------------------------------------------------------------
 // View - Editorial
 //----------------------------------------------------------------------------
@@ -1214,6 +1234,21 @@ void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element
     dc->StartTextGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
         DrawTextChildren(dc, element, x, y, setX, setY);
+    }
+    dc->EndTextGraphic(element, this);
+}
+
+void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY)
+{
+    assert(element);
+    if (element->Is(APP))
+        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_FB);
+    else if (element->Is(CHOICE))
+        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_FB);
+
+    dc->StartTextGraphic(element, "", element->GetUuid());
+    if (element->m_visibility == Visible) {
+        DrawFbChildren(dc, element, x, y, setX, setY);
     }
     dc->EndTextGraphic(element, this);
 }
