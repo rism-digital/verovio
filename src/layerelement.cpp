@@ -30,6 +30,7 @@
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
+#include "page.h"
 #include "rest.h"
 #include "rpt.h"
 #include "space.h"
@@ -211,7 +212,8 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 
 int LayerElement::GetDrawingX() const
 {
-    if (m_xAbs != VRV_UNSET) return m_xAbs;
+    // Since m_xAbs is the left position, we adjust the XRel accordingly in AdjustXRelForTranscription
+    if (m_xAbs != VRV_UNSET) return m_xAbs + this->GetDrawingXRel();
 
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
 
@@ -478,6 +480,16 @@ int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 int LayerElement::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     // Nothing to do since m_drawingYRel is reset in ResetHorizontalAlignment and set in SetAlignmentPitchPos
+
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::ApplyPPUFactor(FunctorParams *functorParams)
+{
+    ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
+    assert(params);
+
+    if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
 
     return FUNCTOR_CONTINUE;
 }
@@ -903,6 +915,17 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int LayerElement::AdjustXRelForTranscription(FunctorParams *functorParams)
+{
+    if (this->m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
+
+    if (!this->HasUpdatedBB()) return FUNCTOR_CONTINUE;
+
+    this->SetDrawingXRel(-this->GetSelfX1());
+
+    return FUNCTOR_CONTINUE;
+}
+
 int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
 {
     if (this->IsGraceNote()) {
@@ -1005,7 +1028,6 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     if (!m_crossLayer) {
         // Just try to pick the first one...
         m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByType(LAYER));
-
     }
     if (!m_crossLayer) {
         // Nothing we can do

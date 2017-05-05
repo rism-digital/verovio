@@ -198,6 +198,19 @@ int System::ResetVerticalAlignment(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int System::ApplyPPUFactor(FunctorParams *functorParams)
+{
+    ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
+    assert(params);
+
+    if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
+    if (m_yAbs != VRV_UNSET) m_yAbs /= params->m_page->GetPPUFactor();
+    m_systemLeftMar *= params->m_page->GetPPUFactor();
+    m_systemRightMar *= params->m_page->GetPPUFactor();
+
+    return FUNCTOR_CONTINUE;
+}
+
 int System::AlignHorizontally(FunctorParams *functorParams)
 {
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);

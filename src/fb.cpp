@@ -18,75 +18,78 @@
 #include "vrv.h"
 
 namespace vrv {
-    
-    //----------------------------------------------------------------------------
-    // Fb
-    //----------------------------------------------------------------------------
-    
-    Fb::Fb() : Object("fb-")
-    {
-        
-        Reset();
+
+//----------------------------------------------------------------------------
+// Fb
+//----------------------------------------------------------------------------
+
+Fb::Fb() : Object("fb-")
+{
+
+    Reset();
+}
+
+Fb::~Fb()
+{
+}
+
+void Fb::Reset()
+{
+    Object::Reset();
+}
+
+void Fb::AddChild(Object *child)
+{
+    if (child->Is(FIGURE)) {
+        assert(dynamic_cast<F *>(child));
     }
-    
-    Fb::~Fb()
-    {
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
     }
-    
-    void Fb::Reset()
-    {
-        Object::Reset();
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
     }
-    
-    void Fb::AddChild(Object *child)
-    {
-        if (child->Is(FIGURE)) {
-            assert(dynamic_cast<F *>(child));
-        }
-        else {
-            LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-            assert(false);
-        }
-        
-        child->SetParent(this);
-        m_children.push_back(child);
-        Modify();
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
+}
+
+//----------------------------------------------------------------------------
+// Figure
+//----------------------------------------------------------------------------
+
+F::F() : TextElement("f-")
+{
+    Reset();
+}
+
+F::~F()
+{
+}
+
+void F::Reset()
+{
+    TextElement::Reset();
+}
+
+void F::AddChild(Object *child)
+{
+    if (child->Is(TEXT)) {
+        assert(dynamic_cast<Text *>(child));
     }
-    
-    //----------------------------------------------------------------------------
-    // Figure
-    //----------------------------------------------------------------------------
-    
-    F::F() : TextElement("f-")
-    {
-        Reset();
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
     }
-    
-    F::~F()
-    {
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
     }
-    
-    void F::Reset()
-    {
-        TextElement::Reset();
-    }
-    
-    void F::AddChild(Object *child)
-    {
-        if (child->Is(TEXT)) {
-            assert(dynamic_cast<Text *>(child));
-        }
-        else if (child->IsEditorialElement()) {
-            assert(dynamic_cast<EditorialElement *>(child));
-        }
-        else {
-            LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-            assert(false);
-        }
-        
-        child->SetParent(this);
-        m_children.push_back(child);
-        Modify();
-    }
-    
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
+}
+
 } // namespace vrv

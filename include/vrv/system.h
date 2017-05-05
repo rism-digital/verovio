@@ -120,6 +120,11 @@ public:
     virtual int ResetVerticalAlignment(FunctorParams *functorParams);
 
     /**
+     * See Object::ApplyPPUFactor
+     */
+    virtual int ApplyPPUFactor(FunctorParams *functorParams);
+
+    /**
      * See Object::AlignHorizontally
      */
     virtual int AlignHorizontally(FunctorParams *functorParams);

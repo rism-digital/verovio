@@ -261,17 +261,17 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 void Measure::UpgradePageBasedMEI(System *system)
 {
     assert(!this->IsMeasuredMusic());
-    
+
     if (system->m_yAbs == VRV_UNSET) return;
     if (system->m_systemRightMar == VRV_UNSET) return;
     if (system->m_systemRightMar == VRV_UNSET) return;
-    
-    Page *page = dynamic_cast<Page*>(system->GetFirstParent(PAGE));
+
+    Page *page = dynamic_cast<Page *>(system->GetFirstParent(PAGE));
     assert(page);
     this->m_xAbs = system->m_systemLeftMar;
     this->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;
 }
-    
+
 //----------------------------------------------------------------------------
 // Measure functor methods
 //----------------------------------------------------------------------------
@@ -381,6 +381,17 @@ int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
     m_timestampAligner.Process(&resetHorizontalAlignment, NULL);
 
     m_hasAlignmentRefWithMultipleLayers = false;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::ApplyPPUFactor(FunctorParams *functorParams)
+{
+    ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
+    assert(params);
+
+    if (m_xAbs != VRV_UNSET) m_xAbs /= params->m_page->GetPPUFactor();
+    if (m_xAbs2 != VRV_UNSET) m_xAbs2 /= params->m_page->GetPPUFactor();
 
     return FUNCTOR_CONTINUE;
 }

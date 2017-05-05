@@ -1123,7 +1123,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (this->Is(FB)) {
+    if (this->Is(FB) || this->Is(FIGURE)) {
         return FUNCTOR_CONTINUE;
     }
 

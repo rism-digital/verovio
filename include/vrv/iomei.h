@@ -179,6 +179,7 @@ private:
     void WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp);
     void WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef);
     void WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure);
+    void WriteMeiFb(pugi::xml_node currentNode, Fb *fb);
     void WriteMeiStaff(pugi::xml_node currentNode, Staff *staff);
     void WriteMeiLayer(pugi::xml_node currentNode, Layer *layer);
     ///@}
@@ -238,8 +239,7 @@ private:
      * @name Methods for writing TextElement
      */
     ///@{
-    void WriteMeiF(pugi::xml_node currentNode, F *figure);
-    void WriteMeiFb(pugi::xml_node currentNode, Fb *fb);
+    void WriteMeiF(pugi::xml_node currentNode, F *f);
     void WriteMeiRend(pugi::xml_node currentNode, Rend *rend);
     void WriteMeiText(pugi::xml_node currentNode, Text *text);
     ///@}
@@ -469,9 +469,9 @@ private:
      * @name Methods for reading MEI text elements
      */
     ///@{
+    bool ReadMeiF(Object *parent, pugi::xml_node f);
     bool ReadMeiRend(Object *parent, pugi::xml_node rend);
     bool ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight);
-    bool ReadMeiF(Object *parent, pugi::xml_node figure);
     ///@}
 
     /**
@@ -500,7 +500,6 @@ private:
     bool ReadMeiSupplied(Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL);
     bool ReadMeiUnclear(Object *parent, pugi::xml_node unclear, EditorialLevel level, Object *filter = NULL);
     bool ReadMeiEditorialChildren(Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL);
-    ///@}
     ///@}
 
     /**
@@ -562,13 +561,29 @@ private:
 public:
     //
 private:
+    /**
+     * The full filename of the file being read
+     */
     std::string m_filename;
 
-    /** A vector for storing xpath queries for selecting <app> children */
+    /**
+     * The version of the file being read
+     */
+    MEIVersion m_version;
+
+    /**
+     * A vector for storing xpath queries for selecting <app> children
+     */
     std::vector<std::string> m_appXPathQueries;
-    /** A vector the storing xpath queries for selecting <choice> children */
+
+    /**
+     * A vector the storing xpath queries for selecting <choice> children
+     */
     std::vector<std::string> m_choiceXPathQueries;
-    /** A string for storing the xpath query for selecting a <mdiv> */
+
+    /**
+     * A string for storing the xpath query for selecting a <mdiv>
+     */
     std::string m_mdivXPathQuery;
 
     /**

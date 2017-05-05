@@ -5,9 +5,9 @@ dir="./tests/pae/"
 d=`date`
 echo "<h1>Plain and Easy tests - $d</h1>" > pae-tests.html
 
-for i in `LS $dir`; do
+for i in `\ls $dir`; do
     echo "<h2>${i//_/ }</h2>" >> pae-tests.html
-    for k in `LS $dir/$i/*.pae`; do
+    for k in `\ls $dir/$i/*.pae`; do
         l=${k##*/}
         echo "<h3>${l//_/ }</h3>" >> pae-tests.html
         echo $k

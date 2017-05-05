@@ -762,6 +762,13 @@ void MeiOutput::WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure)
     }
 }
 
+void MeiOutput::WriteMeiFb(pugi::xml_node currentNode, Fb *fb)
+{
+    assert(fb);
+
+    WriteXmlId(currentNode, fb);
+};
+
 void MeiOutput::WriteControlElement(pugi::xml_node currentNode, ControlElement *controlElement)
 {
     assert(controlElement);
@@ -798,18 +805,6 @@ void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteTimeSpanningInterface(currentNode, dynam);
 };
 
-void MeiOutput::WriteMeiF(pugi::xml_node currentNode, F *figure)
-{
-    assert(figure);
-    
-    WriteTextElement(currentNode, figure);
-};
-    
-void MeiOutput::WriteMeiFb(pugi::xml_node currentNode, Fb *fb)
-{
-    assert(fb);
-};
-    
 void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
 {
     assert(fermata);
@@ -821,7 +816,6 @@ void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
     fermata->WritePlacement(currentNode);
 };
 
-    
 void MeiOutput::WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
 {
     assert(hairpin);
@@ -1241,6 +1235,13 @@ void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textEl
     textElement->WriteTyped(currentNode);
 }
 
+void MeiOutput::WriteMeiF(pugi::xml_node currentNode, F *figure)
+{
+    assert(figure);
+
+    WriteTextElement(currentNode, figure);
+};
+
 void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
 {
     assert(rend);
@@ -1552,6 +1553,7 @@ MeiInput::MeiInput(Doc *doc, std::string filename) : FileInputStream(doc)
     //
     m_hasScoreDef = false;
     m_readingScoreBased = false;
+    m_version = MEI_UNDEFINED;
 }
 
 MeiInput::~MeiInput()
@@ -1773,6 +1775,13 @@ bool MeiInput::ReadMei(pugi::xml_node root)
         m_doc->m_header.reset();
         // copy the complete header into the master document
         m_doc->m_header.append_copy(current);
+        if (root.attribute("meiversion")) {
+            std::string version = std::string(root.attribute("meiversion").value());
+            if (version == "2013")
+                m_version = MEI_2013;
+            else if (version == "3.0.0")
+                m_version = MEI_3_0_0;
+        }
     }
     // music
     pugi::xml_node music;
@@ -1836,12 +1845,12 @@ bool MeiInput::ReadMei(pugi::xml_node root)
             m_doc->ConvertToPageBasedDoc();
         }
     }
-    
+
     if (success && !m_hasScoreDef) {
         LogMessage("No scoreDef provided, trying to generate one...");
         success = m_doc->GenerateDocumentScoreDef();
     }
-    
+
     return success;
 }
 
@@ -1990,6 +1999,10 @@ bool MeiInput::ReadMeiPage(pugi::xml_node page)
     Page *vrvPage = new Page();
     SetMeiUuid(page, vrvPage);
 
+    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
+        vrvPage->UpgradePageBasedMEI(m_doc);
+    }
+
     if (page.attribute("page.height")) {
         vrvPage->m_pageHeight = atoi(page.attribute("page.height").value()) * DEFINITION_FACTOR;
     }
@@ -2010,7 +2023,15 @@ bool MeiInput::ReadMeiPage(pugi::xml_node page)
     }
 
     m_doc->AddChild(vrvPage);
-    return ReadMeiPageChildren(vrvPage, page);
+    bool success = ReadMeiPageChildren(vrvPage, page);
+
+    if (success && (m_doc->GetType() == Transcription) && (vrvPage->GetPPUFactor() != 1.0)) {
+        ApplyPPUFactorParams applyPPUFactorParams;
+        Functor applyPPUFactor(&Object::ApplyPPUFactor);
+        vrvPage->Process(&applyPPUFactor, &applyPPUFactorParams);
+    }
+
+    return success;
 }
 
 bool MeiInput::ReadMeiPageChildren(Object *parent, pugi::xml_node parentNode)
@@ -2103,7 +2124,7 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
                     System *system = dynamic_cast<System *>(parent);
                     assert(system);
                     unmeasured = new Measure(false);
-                    if (m_doc->GetType() == Transcription)
+                    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013))
                         unmeasured->UpgradePageBasedMEI(system);
                     system->AddChild(unmeasured);
                 }
@@ -2566,11 +2587,9 @@ bool MeiInput::ReadMeiTurn(Object *parent, pugi::xml_node turn)
 
 bool MeiInput::ReadMeiFb(Object *parent, pugi::xml_node fb)
 {
-    pugi::xml_node xmlElement;
-    std::string elementName;
-    
     Fb *vrvFb = new Fb();
-    
+    SetMeiUuid(fb, vrvFb);
+
     parent->AddChild(vrvFb);
     return ReadMeiFbChildren(vrvFb, fb);
 }
@@ -2585,7 +2604,7 @@ bool MeiInput::ReadMeiFbChildren(Object *parent, pugi::xml_node parentNode)
         if (!success) break;
         // editorial
         else if (IsEditorialElementName(current.name())) {
-            success = ReadMeiEditorialElement(parent, current, EDITORIAL_STAFF);
+            success = ReadMeiEditorialElement(parent, current, EDITORIAL_FB);
         }
         // content
         else if (std::string(current.name()) == "f") {
@@ -3215,6 +3234,15 @@ bool MeiInput::ReadTextElement(pugi::xml_node element, TextElement *object)
     return true;
 }
 
+bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node f)
+{
+    F *vrvF = new F();
+    ReadTextElement(f, vrvF);
+
+    parent->AddChild(vrvF);
+    return ReadMeiTextChildren(vrvF, f);
+}
+
 bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
 {
     Rend *vrvRend = new Rend();
@@ -3245,14 +3273,6 @@ bool MeiInput::ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, b
     return true;
 }
 
-bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node figure)
-{
-    F *vrvF = new F();
-    
-    parent->AddChild(vrvF);
-    return ReadMeiTextChildren(vrvF, figure);
-}
- 
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
     interface->ReadAugmentdots(element);
@@ -3744,6 +3764,9 @@ bool MeiInput::ReadMeiEditorialChildren(Object *parent, pugi::xml_node parentNod
     }
     else if (level == EDITORIAL_TEXT) {
         return ReadMeiTextChildren(parent, parentNode, filter);
+    }
+    else if (level == EDITORIAL_FB) {
+        return ReadMeiFbChildren(parent, parentNode);
     }
     else {
         return false;
