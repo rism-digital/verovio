@@ -762,6 +762,13 @@ void MeiOutput::WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure)
     }
 }
 
+void MeiOutput::WriteMeiFb(pugi::xml_node currentNode, Fb *fb)
+{
+    assert(fb);
+
+    WriteXmlId(currentNode, fb);
+};
+
 void MeiOutput::WriteControlElement(pugi::xml_node currentNode, ControlElement *controlElement)
 {
     assert(controlElement);
@@ -796,18 +803,6 @@ void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteControlElement(currentNode, dynam);
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
-};
-
-void MeiOutput::WriteMeiF(pugi::xml_node currentNode, F *figure)
-{
-    assert(figure);
-
-    WriteTextElement(currentNode, figure);
-};
-
-void MeiOutput::WriteMeiFb(pugi::xml_node currentNode, Fb *fb)
-{
-    assert(fb);
 };
 
 void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
@@ -1239,6 +1234,13 @@ void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textEl
     textElement->WriteCommon(currentNode);
     textElement->WriteTyped(currentNode);
 }
+
+void MeiOutput::WriteMeiF(pugi::xml_node currentNode, F *figure)
+{
+    assert(figure);
+
+    WriteTextElement(currentNode, figure);
+};
 
 void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
 {
@@ -2585,10 +2587,8 @@ bool MeiInput::ReadMeiTurn(Object *parent, pugi::xml_node turn)
 
 bool MeiInput::ReadMeiFb(Object *parent, pugi::xml_node fb)
 {
-    pugi::xml_node xmlElement;
-    std::string elementName;
-
     Fb *vrvFb = new Fb();
+    SetMeiUuid(fb, vrvFb);
 
     parent->AddChild(vrvFb);
     return ReadMeiFbChildren(vrvFb, fb);
@@ -3234,6 +3234,15 @@ bool MeiInput::ReadTextElement(pugi::xml_node element, TextElement *object)
     return true;
 }
 
+bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node f)
+{
+    F *vrvF = new F();
+    ReadTextElement(f, vrvF);
+
+    parent->AddChild(vrvF);
+    return ReadMeiTextChildren(vrvF, f);
+}
+
 bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
 {
     Rend *vrvRend = new Rend();
@@ -3262,14 +3271,6 @@ bool MeiInput::ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, b
 
     parent->AddChild(vrvText);
     return true;
-}
-
-bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node figure)
-{
-    F *vrvF = new F();
-
-    parent->AddChild(vrvF);
-    return ReadMeiTextChildren(vrvF, figure);
 }
 
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
