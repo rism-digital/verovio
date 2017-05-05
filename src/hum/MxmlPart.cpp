@@ -76,6 +76,7 @@ void MxmlPart::clear(void) {
 	m_maxstaff = 0;
 	m_verseCount.resize(0);
 	m_harmonyCount = 0;
+	m_editorialAccidental = false;
 }
 
 
@@ -271,6 +272,18 @@ int MxmlPart::getHarmonyCount(void) const {
 
 //////////////////////////////
 //
+// MxmlPart::hasEditorialAccidental -- Return true if part contains an editorial
+//    accidental (represented as parentheses around the accidental in MusicXML.
+//
+
+bool MxmlPart::hasEditorialAccidental(void) const {
+	return m_editorialAccidental;
+}
+
+
+
+//////////////////////////////
+//
 // MxmlPart::getVerseCount -- Return the number of verses in the part.
 //
 
@@ -301,6 +314,17 @@ int MxmlPart::getVerseCount(int staffindex) const {
 
 void MxmlPart::receiveHarmonyCount(int count) {
 	m_harmonyCount = count;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlPart::receiveEditorialAccidental --
+//
+
+void MxmlPart::receiveEditorialAccidental(void) {
+	m_editorialAccidental = true;
 }
 
 

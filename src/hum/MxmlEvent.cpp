@@ -221,15 +221,31 @@ void MxmlEvent::reportHarmonyCountToOwner(int count) {
 }
 
 
+
 //////////////////////////////
 //
 // MxmlEvent::reportMeasureStyleToOwner --
+//
 
 void MxmlEvent::reportMeasureStyleToOwner (MeasureStyle style) {
 	if (!m_owner) {
 		return;
 	}
 	m_owner->receiveMeasureStyleFromChild(style);
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::reportEditorialAccidentalToOwner --
+//
+
+void MxmlEvent::reportEditorialAccidentalToOwner(void) {
+	if (!m_owner) {
+		return;
+	}
+	m_owner->receiveEditorialAccidentalFromChild();
 }
 
 
@@ -1168,6 +1184,7 @@ string MxmlEvent::getKernPitch(void) {
 	int octave = 4;
 	bool explicitQ    = false;
 	bool naturalQ     = false;
+	bool editorialQ   = false;
 	// bool sharpQ       = false;
 	// bool flatQ        = false;
 	// bool doubleflatQ  = false;
@@ -1211,6 +1228,13 @@ string MxmlEvent::getKernPitch(void) {
 					// doublesharpQ = true;
 					explicitQ = true;
 				}
+				xml_attribute paren = child.attribute("parentheses");
+				if (paren) {
+					if (strcmp(paren.value(), "yes") == 0) {
+						editorialQ = 1;
+						reportEditorialAccidentalToOwner();
+					}
+				}
 			}
 			child = child.next_sibling();
 		}
@@ -1249,6 +1273,10 @@ string MxmlEvent::getKernPitch(void) {
 		output += 'n';
 	} else if (explicitQ) {
 		output += 'X';
+	}
+
+	if (editorialQ) {
+		output += "i";
 	}
 
 	return output;

@@ -146,6 +146,13 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 		out << "!!!RDF**kern: > = slur below" << endl;
 	}
 
+	for (int i=0; i<(int)partdata.size(); i++) {
+		if (partdata[i].hasEditorialAccidental()) {
+			out << "!!!RDF**kern: i = editorial accidental" << endl;
+			break;
+		}
+	}
+
 	return status;
 }
 
