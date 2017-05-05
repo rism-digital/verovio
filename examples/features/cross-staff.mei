@@ -7,11 +7,20 @@
             <titleStmt>
                 <title>Cross-staff notation example</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-04</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports basic cross-staff notation with displacement encoding. This means that the cross-staff elements (i.e., notes) have to be encoded in the logical staff with an additional "staff" attribute indicating the cross-staff position.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

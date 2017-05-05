@@ -7,11 +7,20 @@
             <titleStmt>
                 <title>Dynamic example</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-04</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports "dynam" elements. Horizontal positioning can be specified; dynamics with corresponding SMuFL code are centered by default under the horizontal alignment points.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

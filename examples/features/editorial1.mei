@@ -7,11 +7,20 @@
             <titleStmt>
                 <title>Editorial markup example</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-04</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports several editorial markup elements. They all remain invisible in the output. However, they are preserved in the SVG structure for further interaction. Nested editorial markup is also supported.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>
