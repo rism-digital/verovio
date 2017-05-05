@@ -346,7 +346,8 @@ void SvgDeviceContext::StartPage()
     m_currentNode = m_currentNode.append_child("style");
     m_currentNode.append_attribute("type") = "text/css";
     m_currentNode.append_child(pugi::node_pcdata)
-        .set_value("g.page-margin{font-family:Times;} g.tempo{font-weight:bold;} g.dir, g.dynam {font-style:italic;}");
+        .set_value(
+            "g.page-margin{font-family:Times;} g.fb, g.tempo{font-weight:bold;} g.dir, g.dynam {font-style:italic;}");
     m_currentNode = m_svgNodeStack.back();
 
     // a graphic for definition scaling

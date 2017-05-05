@@ -307,9 +307,9 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         if (curve) {
             assert(curve->m_object);
         }
-        int margin = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize)
-        / PARAM_DENOMINATOR;
-        
+        int margin
+            = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+
         if (this->m_place == STAFFREL_above) {
             if (curve && curve->m_object->Is({ SLUR, TIE })) {
                 int shift = this->Intersects(curve, doc->GetDrawingUnit(staffSize));
@@ -319,8 +319,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
-            if (this->VerticalContentOverlap(horizOverlapingBBox, margin))
-            {
+            if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
                 yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
                 this->SetDrawingYRel(yRel);
             }
@@ -334,9 +333,9 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
-            if (this->VerticalContentOverlap(horizOverlapingBBox, margin))
-            {
-                yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight() + GetContentY2() + margin;
+            if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
+                yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
+                    + GetContentY2() + margin;
                 this->SetDrawingYRel(yRel);
             }
         }

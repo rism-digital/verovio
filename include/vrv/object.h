@@ -471,6 +471,12 @@ public:
      */
     virtual int FindTimeSpanningLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
+    /**
+     * Retrieve the minimum left and maximum right for an alignment.
+     * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight
+     */
+    virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
+
     ///@}
 
     /**
@@ -502,29 +508,9 @@ public:
     ///@{
 
     /**
-     * Adjust the position the outside articulations.
+     * Reset the horizontal alignment environment for various types for object.
      */
-    virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Adjust the position the outside articulations.
-     */
-    virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Adjust the position the outside articulations with slur.
-     */
-    virtual int AdjustArticWithSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Adjust the position of all floating positionner, staff by staff.
-     */
-    virtual int AdjustFloatingPostioners(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Adjust the position of all floating positionner that are grouped, staff by staff.
-     */
-    virtual int AdjustFloatingPostionerGrps(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ResetHorizontalAlignment(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Align horizontally the content of a page.
@@ -545,11 +531,6 @@ public:
     virtual int AlignMeasures(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int AlignMeasuresEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
-
-    /**
-     * Reset the horizontal alignment environment for various types for object.
-     */
-    virtual int ResetHorizontalAlignment(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Set the position of the Alignment.
@@ -578,6 +559,11 @@ public:
     virtual int CalcDots(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Adjust the position the outside articulations.
+     */
+    virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.
      * The functor is redirected from the MeasureAligner and then from the appropriate
      * alignment to the GraceAligner
@@ -586,12 +572,6 @@ public:
     virtual int AdjustGraceXPos(FunctorParams *) { return FUNCTOR_CONTINUE; };
     virtual int AdjustGraceXPosEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
     ///@}
-
-    /**
-     * Retrieve the minimum left and maximum right for an alignment.
-     * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight
-     */
-    virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
 
     /**
      * Adjust the x position of accidental.
@@ -624,6 +604,11 @@ public:
     ///@{
 
     /**
+     * Reset the verticall alignment environment for various types for object.
+     */
+    virtual int ResetVerticalAlignment(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Align vertically the content of a page.
      * For each Staff, instanciate its StaffAlignment.
      */
@@ -633,24 +618,34 @@ public:
     ///@}
 
     /**
-     * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
-     */
-    virtual int AlignSystems(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
-     */
-    virtual int AdjustStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Set the note head flipped positions and calc the ledger lines
      */
     virtual int CalcLedgerLines(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Reset the verticall alignment environment for various types for object.
+     * Adjust the position the outside articulations.
      */
-    virtual int ResetVerticalAlignment(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position the outside articulations with slur.
+     */
+    virtual int AdjustArticWithSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position of all floating positionner, staff by staff.
+     */
+    virtual int AdjustFloatingPostioners(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position of all floating positionner that are grouped, staff by staff.
+     */
+    virtual int AdjustFloatingPostionerGrps(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
+     */
+    virtual int AdjustStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of the StaffAlignment.
@@ -666,6 +661,28 @@ public:
      * Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
      */
     virtual int SetOverflowBBoxesEnd(FunctorParams *functorParams);
+
+    /**
+     * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
+     */
+    virtual int AlignSystems(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    ///@}
+
+    /**
+     * @name Functors for aligning the content vertically.
+     */
+    ///@{
+
+    /**
+     * Apply the Pixel Per Unit factor of the page to its elements.
+     */
+    virtual int ApplyPPUFactor(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the X/YRel positions taking into account the bounding boxes
+     */
+    virtual int AdjustXRelForTranscription(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 

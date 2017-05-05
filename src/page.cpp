@@ -50,6 +50,7 @@ void Page::Reset()
     m_pageLeftMar = 0;
     m_pageRightMar = 0;
     m_pageTopMar = 0;
+    m_PPUFactor = 1.0;
 }
 
 void Page::AddChild(Object *child)
@@ -133,6 +134,17 @@ void Page::LayOutTranscription(bool force)
     CalcDotsParams calcDotsParams(doc);
     Functor calcDots(&Object::CalcDots);
     this->Process(&calcDots, &calcDotsParams);
+
+    // Render it for filling the bounding box
+    View view;
+    view.SetDoc(doc);
+    BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
+    // Do not do the layout in this view - otherwise we will loop...
+    view.SetPage(this->GetIdx(), false);
+    view.DrawCurrentPage(&bBoxDC, false);
+
+    Functor adjustXRelForTranscription(&Object::AdjustXRelForTranscription);
+    this->Process(&adjustXRelForTranscription, NULL);
 
     FunctorDocParams calcLegerLinesParams(doc);
     Functor calcLedgerLines(&Object::CalcLedgerLines);
@@ -314,10 +326,10 @@ void Page::LayOutVertically()
     AdjustFloatingPostionersParams adjustFloatingPostionersParams(doc, &adjustFloatingPostioners);
     this->Process(&adjustFloatingPostioners, &adjustFloatingPostionersParams);
 
-    // Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes params.clear();
-    Functor calcStaffOverlap(&Object::AdjustStaffOverlap);
-    AdjustStaffOverlapParams calcStaffOverlapParams(&calcStaffOverlap);
-    this->Process(&calcStaffOverlap, &calcStaffOverlapParams);
+    // Adjust the overlap of the staff aligmnents by looking at the overflow bounding boxes params.clear();
+    Functor adjustStaffOverlap(&Object::AdjustStaffOverlap);
+    AdjustStaffOverlapParams adjustStaffOverlapParams(&adjustStaffOverlap);
+    this->Process(&adjustStaffOverlap, &adjustStaffOverlapParams);
 
     // Set the Y position of each StaffAlignment
     // Adjust the Y shift to make sure there is a minimal space (staffMargin) between each staff
@@ -436,6 +448,30 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
             }
         }
     }
+}
+
+void Page::UpgradePageBasedMEI(Doc *doc)
+{
+    // Once we have the GetPPU in Page through LibMEI, call this from Doc::SetDrawingPage and
+    // use m_unit instead of DEFAULT_UNIT - For the upgraded call Page->SetPPU(12.5);
+
+    m_PPUFactor = 25.0 / 2.0 / DEFAULT_UNIT;
+    // LogDebug("PPUFactor: %f", m_PPUFactor);
+}
+
+int Page::ApplyPPUFactor(FunctorParams *functorParams)
+{
+    ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
+    assert(params);
+
+    params->m_page = this;
+    this->m_pageWidth /= params->m_page->GetPPUFactor();
+    this->m_pageHeight /= params->m_page->GetPPUFactor();
+    this->m_pageTopMar /= params->m_page->GetPPUFactor();
+    this->m_pageLeftMar /= params->m_page->GetPPUFactor();
+    this->m_pageRightMar /= params->m_page->GetPPUFactor();
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

@@ -625,9 +625,11 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     bool cueSize = false;
     if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
-        cueSize = true;
-        // HARDCODED
-        x -= m_doc->GetGlyphWidth(sym, staff->m_drawingStaffSize, cueSize) * 1.35;
+        if (m_doc->GetType() != Transcription) {
+            cueSize = true;
+            // HARDCODED
+            x -= m_doc->GetGlyphWidth(sym, staff->m_drawingStaffSize, cueSize) * 1.35;
+        }
     }
 
     dc->StartGraphic(element, "", element->GetUuid());

@@ -46,19 +46,20 @@ void Slur::Reset()
     ResetColor();
     ResetCurvature();
 }
-    
-void Slur::GetCrossStaffOverflows(StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow)
+
+void Slur::GetCrossStaffOverflows(
+    StaffAlignment *alignment, curvature_CURVEDIR cuvreDir, bool &skipAbove, bool &skipBelow)
 {
     assert(alignment);
-    
+
     if (!this->GetStart() || !this->GetEnd() || !alignment->GetStaff()) return;
-    
+
     Layer *layer = NULL;
-    
+
     // If the starting point is a chord we need to select the appropriate extreme staff
     Staff *startStaff = NULL;
     if (this->GetStart()->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord*>(this->GetStart());
+        Chord *chord = dynamic_cast<Chord *>(this->GetStart());
         assert(chord);
         Staff *staffAbove = NULL;
         Staff *staffBelow = NULL;
@@ -67,11 +68,11 @@ void Slur::GetCrossStaffOverflows(StaffAlignment *alignment, curvature_CURVEDIR 
     }
     else
         startStaff = this->GetStart()->GetCrossStaff(layer);
-    
+
     // Same for the end point
     Staff *endStaff = NULL;
     if (this->GetEnd()->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord*>(this->GetEnd());
+        Chord *chord = dynamic_cast<Chord *>(this->GetEnd());
         assert(chord);
         Staff *staffAbove = NULL;
         Staff *staffBelow = NULL;
@@ -80,28 +81,22 @@ void Slur::GetCrossStaffOverflows(StaffAlignment *alignment, curvature_CURVEDIR 
     }
     else
         endStaff = this->GetEnd()->GetCrossStaff(layer);
-    
+
     // No cross-staff endpoints, check if the slur itself crosses staves
     if (!startStaff) {
-        startStaff = dynamic_cast<Staff*>(this->GetStart()->GetFirstParent(STAFF));
+        startStaff = dynamic_cast<Staff *>(this->GetStart()->GetFirstParent(STAFF));
         assert(startStaff);
     }
     if (!endStaff) {
-        endStaff = dynamic_cast<Staff*>(this->GetEnd()->GetFirstParent(STAFF));
+        endStaff = dynamic_cast<Staff *>(this->GetEnd()->GetFirstParent(STAFF));
         assert(endStaff);
     }
 
+    if (startStaff && (startStaff->GetN() < alignment->GetStaff()->GetN())) skipAbove = true;
+    if (endStaff && (endStaff->GetN() < alignment->GetStaff()->GetN())) skipAbove = true;
 
-    if (startStaff && (startStaff->GetN() < alignment->GetStaff()->GetN()))
-        skipAbove = true;
-    if (endStaff && (endStaff->GetN() < alignment->GetStaff()->GetN()))
-        skipAbove = true;
-
-    if (startStaff && (startStaff->GetN() > alignment->GetStaff()->GetN()))
-        skipBelow = true;
-    if (endStaff && (endStaff->GetN() > alignment->GetStaff()->GetN()))
-        skipBelow = true;
-
+    if (startStaff && (startStaff->GetN() > alignment->GetStaff()->GetN())) skipBelow = true;
+    if (endStaff && (endStaff->GetN() > alignment->GetStaff()->GetN())) skipBelow = true;
 }
 
 } // namespace vrv

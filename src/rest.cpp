@@ -206,7 +206,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     int xRel = params->m_doc->GetDrawingUnit(staffSize) * 1.5;
     if (drawingCueSize) xRel = params->m_doc->GetCueSize(xRel);
     if (this->GetDur() > DUR_2) {
-        xRel = params->m_doc->GetGlyphWidth(this->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize);
+        xRel = params->m_doc->GetGlyphWidth(this->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize) / 2;
     }
     dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
 
