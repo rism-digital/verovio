@@ -295,6 +295,7 @@ protected:
     void processSlurs(hum::HTp token);
     int getSlurEndIndex(hum::HTp token, std::string targetid, std::vector<bool> &indexused);
     void addHarmFloatsForMeasure(int startine, int endline);
+	void addFiguredBassForMeasure(int startline, int endline);
     void processDynamics(hum::HTp token, int staffindex);
     void processDirection(hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum frac = 0);
@@ -375,6 +376,7 @@ protected:
     static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
     std::string cleanHarmString(const std::string &content);
+	std::vector<std::string> cleanFBString(const std::string &content);
 
 private:
     std::string m_filename; // Filename to read/was read.
@@ -462,6 +464,11 @@ private:
     // the file to convert contains **mxhm spines that should be
     // converted into <harm> element in the MEI conversion.
     bool m_harm;
+
+    // m_fb == state variable for keeping track of whether or not
+    // the file to convert contains **Bnum spines that should be
+    // converted into <harm> element in the MEI conversion.
+    bool m_fb;
 
     // m_leftbarstyle is a barline left-hand style to store in the next measure.
     // When processing a measure, this variable should be checked and used

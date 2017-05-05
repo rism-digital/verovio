@@ -47,6 +47,7 @@
 #include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
+#include "fb.h"
 #include "fermata.h"
 #include "hairpin.h"
 #include "harm.h"
@@ -482,6 +483,13 @@ bool HumdrumInput::convertHumdrum(void)
         else if (it->getDataType().compare(0, 7, "**cdata") == 0) {
             m_harm = true;
         }
+		if (it->isDataType("**fb")) {
+			m_fb = true;
+		}
+		if (it->isDataType("**Bnum")) {
+			// older name
+			m_fb = true;
+		}
     }
 
     if (kernstarts.size() == 0) {
@@ -1805,7 +1813,62 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
         addHarmFloatsForMeasure(startline, endline);
     }
 
+    if (m_fb) {
+        addFiguredBassForMeasure(startline, endline);
+    }
+
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addFiguredBassForMeasure --
+//
+
+void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
+{
+    if (!m_measure) {
+        return;
+    }
+    hum::HumdrumFile &infile = m_infile;
+    for (int i = startline; i < endline; i++) {
+        if (!infile[i].isData()) {
+            continue;
+        }
+        int track = 0;
+        for (int j = 0; j < infile[i].getFieldCount(); j++) {
+            hum::HTp token = infile.token(i, j);
+            if (token->isDataType("**kern")) {
+                track = token->getTrack();
+            }
+            if (token->isNull()) {
+                continue;
+            }
+            if (!(token->isDataType("**fb") || token->isDataType("**Bnum"))) {
+                continue;
+            }
+            Harm *harm = new Harm;
+            Text *text = new Text;
+            string datatype = token->getDataType();
+            harm->SetPlace(STAFFREL_below);
+
+            std::vector<std::string> content = cleanFBString(*token);
+
+			for (int k=0; k<(int)content.size(); k++) {
+
+            	text->SetText(UTF8to16(content[k]));
+            	harm->AddChild(text);
+
+			}
+
+           	m_measure->AddChild(harm);
+          	int staffindex = m_rkern[track];
+           	hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+           	harm->SetTstamp(tstamp.getFloat());
+           	setStaff(harm, staffindex + 1);
+           	setLocationId(harm, token);
+        }
+    }
 }
 
 //////////////////////////////
@@ -1855,6 +1918,38 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             setLocationId(harm, token);
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::cleanFBString --
+//
+
+vector<string> HumdrumInput::cleanFBString(const std::string &content)
+{
+
+	vector<string> output(1);
+
+    for (int i = 0; i < (int)content.size(); i++) {
+        if (content[i] == ' ') {
+            output.resize(output.size() + 1);
+            continue;
+        }
+        if (content[i] == '-') {
+            output.back() += "\u266D"; // unicode flat
+        }
+        else if (content[i] == '#') {
+            output.back() += "\u266F"; // unicode sharp
+		}
+        else if (content[i] == 'n') {
+            output.back() += "\u266E"; // unicode natural
+        }
+        else {
+            output.back() += content[i];
+        }
+    }
+
+    return output;
 }
 
 //////////////////////////////
