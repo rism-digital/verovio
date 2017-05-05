@@ -1861,6 +1861,11 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
                 text->SetText(UTF8to16(content[k]));
                 f->AddChild(text);
                 fb->AddChild(f);
+                if (content.size() == 1) {
+                    setLocationId(f, token);
+                } else {
+                    setLocationIdNSuffix(f, token, k + 1);
+                }
             }
 
             m_measure->AddChild(harm);
@@ -1869,6 +1874,7 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
             harm->SetTstamp(tstamp.getFloat());
             setStaff(harm, staffindex + 1);
             setLocationId(harm, token);
+            setLocationId(fb, token);
         }
     }
 }
