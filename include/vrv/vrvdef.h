@@ -25,9 +25,9 @@ namespace vrv {
 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 9
-#define VERSION_REVISION 13
+#define VERSION_REVISION 14
 // Adds "-dev" in the version number - should be set to false for releases
-#define VERSION_DEV false
+#define VERSION_DEV true
 
 //----------------------------------------------------------------------------
 // Object defines
@@ -35,7 +35,7 @@ namespace vrv {
 
 /**
  * The ClassIds are used to identify Object child classes through the Object::Is virtual method.
- * Each Object child class has to have its own id and has to override the Is() method.
+ * Each Object child class has to have its own id and has to override the GetClassId() method.
  * Base classes (e.g., LayerElement) that are never instanciated have boundary ids
  * used for checking if an Object is child of a base class. See for example
  * Object::IsLayerElement.
@@ -48,6 +48,7 @@ enum ClassId {
     FLOATING_POSITIONER,
     //
     ALIGNMENT,
+    ALIGNMENT_REFERENCE,
     CLEF_ATTR,
     DOC,
     GRACE_ALIGNER,
@@ -90,6 +91,7 @@ enum ClassId {
     SYSTEM_ELEMENT,
     BOUNDARY_END,
     ENDING,
+    EXPANSION,
     PB,
     SB,
     SECTION,
@@ -102,12 +104,14 @@ enum ClassId {
     FERMATA,
     HAIRPIN,
     HARM,
+    MORDENT,
     OCTAVE,
     PEDAL,
     SLUR,
     TEMPO,
     TIE,
     TRILL,
+    TURN,
     CONTROL_ELEMENT_max,
     // Ids for LayerElement child classes
     LAYER_ELEMENT,
@@ -124,6 +128,10 @@ enum ClassId {
     CLEF,
     CUSTOS,
     DOT,
+    DOTS,
+    FB,
+    FIGURE,
+    FLAG,
     FTREM,
     KEYSIG,
     LIGATURE,
@@ -138,6 +146,7 @@ enum ClassId {
     PROPORT,
     REST,
     SPACE,
+    STEM,
     SYL,
     TIMESTAMP_ATTR,
     TUPLET,
@@ -180,11 +189,13 @@ enum InterfaceId {
 // Typedefs
 //----------------------------------------------------------------------------
 
+class Alignment;
 class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
 class FloatingPositioner;
 class LayerElement;
+class LedgerLine;
 class Note;
 class Object;
 class Point;
@@ -194,15 +205,15 @@ class TimeSpanningInterface;
 
 typedef std::vector<Object *> ArrayOfObjects;
 
-typedef std::list<Object *> ListOfObjects;
+typedef std::vector<Object *> ListOfObjects;
 
 typedef std::vector<AttComparison *> ArrayOfAttComparisons;
 
 typedef std::vector<Note *> ChordCluster;
 
-typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
+typedef std::vector<std::tuple<Alignment *, Alignment *, int> > ArrayOfAdjustmentTuples;
 
-typedef std::map<Staff *, std::vector<char> > MapOfLedgerLineFlags;
+typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
 typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
 
@@ -216,6 +227,10 @@ typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
 
 typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
 
+typedef std::vector<LedgerLine> ArrayOfLedgerLines;
+
+typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
+
 //----------------------------------------------------------------------------
 // Global defines
 //----------------------------------------------------------------------------
@@ -223,7 +238,7 @@ typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
 #define DEFINITION_FACTOR 10
 #define PARAM_DENOMINATOR 10
 
-#define is_in(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
+#define isIn(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
 
 /**
  * Codes returned by Functors.
@@ -245,7 +260,7 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 /** Define the maximum levels between a beam and its notes **/
 #define MAX_BEAM_DEPTH -1
 
-/** Define the maximum levels between a beam and its notes **/
+/** Define the maximum levels between a chord and its children **/
 #define MAX_CHORD_DEPTH -1
 
 /** Define the maximum levels between a fTrem and its notes **/
@@ -295,6 +310,19 @@ enum EditorialLevel {
 };
 
 //----------------------------------------------------------------------------
+// The used SMuFL glyph anchors
+//----------------------------------------------------------------------------
+
+enum SMuFLGlyphAnchor {
+    SMUFL_stemDownNW = 0,
+    SMUFL_stemUpSE,
+    SMUFL_cutOutNE,
+    SMUFL_cutOutNW,
+    SMUFL_cutOutSE,
+    SMUFL_cutOutSW
+};
+
+//----------------------------------------------------------------------------
 // Types for layer element
 //----------------------------------------------------------------------------
 
@@ -326,24 +354,6 @@ enum ArticPartType { ARTIC_PART_INSIDE = 0, ARTIC_PART_OUTSIDE };
 //----------------------------------------------------------------------------
 
 #define OCTAVE_OFFSET 4
-
-// The next four macros were tuned using the Leipzig font.
-
-// Width (in half-drawing units) of an accidental; used to prevent overlap on complex chords
-#define ACCID_WIDTH 4
-
-// Height
-#define ACCID_HEIGHT 12
-
-// Only keeps track of this much of the top of flats so that their bottom can be drawn more concisely
-// This can also be thought of as height(sharp)*F_B_H_M = height(flat)
-#define FLAT_BOTTOM_HEIGHT_MULTIPLIER .75
-
-// Ignores this much of the top/right of an accid for same purposes (empty space in top right of drawing)
-#define FLAT_CORNER_HEIGHT_IGNORE .25
-#define FLAT_CORNER_WIDTH_IGNORE .5
-#define NATURAL_CORNER_HEIGHT_IGNORE .25
-#define NATURAL_CORNER_WIDTH_IGNORE .5
 
 // in half staff spaces (but should be 6 in two-voice notation)
 #define STANDARD_STEMLENGTH 7

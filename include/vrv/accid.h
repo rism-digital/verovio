@@ -13,11 +13,19 @@
 
 namespace vrv {
 
+class AlignmentReference;
+
 //----------------------------------------------------------------------------
 // Accid
 //----------------------------------------------------------------------------
 
-class Accid : public LayerElement, public PositionInterface, public AttAccidental, public AttAccidLog, public AttColor {
+class Accid : public LayerElement,
+              public PositionInterface,
+              public AttAccidental,
+              public AttAccidentalPerformed,
+              public AttAccidLog,
+              public AttColor,
+              public AttEnclosingchars {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -28,7 +36,7 @@ public:
     virtual ~Accid();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Accid"; }
-    virtual ClassId Is() const { return ACCID; }
+    virtual ClassId GetClassId() const { return ACCID; }
     ///@}
 
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
@@ -36,25 +44,74 @@ public:
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
+    /**
+     * @name Set and get drawing octave flag
+     */
+    ///@{
+    void SetDrawingOctave(bool isDrawingOctave) { m_isDrawingOctave = isDrawingOctave; }
+    bool GetDrawingOctave() const { return m_isDrawingOctave; }
+    void SetDrawingOctaveAccid(Accid *drawingOctave) { m_drawingOctave = drawingOctave; }
+    Accid *GetDrawingOctaveAccid() const { return m_drawingOctave; }
+    ///@}
+
+    /**
+     * Retrieve SMuFL string for the accidental.
+     * This will include brackets
+     */
+    std::wstring GetSymbolStr() const;
+
+    bool AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids);
+
+    /**
+     * @name Method used for drawing accidentals on ornaments
+     */
+    static wchar_t GetAccidGlyph(data_ACCIDENTAL_EXPLICIT);
+
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::PreparePointersByLayer
+     * See Object::ResetDrawing
      */
-    virtual int PreparePointersByLayer(FunctorParams *functorParams);
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
 private:
     //
 public:
-    /**
-     * Indicates if is cue size for accid object created for @accid.
-     * See Note::PreparePointersByLayer and View::DrawAccid
-     */
-    bool m_drawingCueSize;
-
+    //
 private:
+    Accid *m_drawingOctave;
+    bool m_isDrawingOctave;
+};
+
+//----------------------------------------------------------------------------
+// AccidSpaceSort
+//----------------------------------------------------------------------------
+
+/**
+ * Sort Object by drawing Y value or by layerN
+ */
+class AccidSpaceSort {
+
+public:
+    AccidSpaceSort() {}
+
+    bool operator()(const Accid *first, const Accid *second) const
+    {
+        if (first->GetDrawingY() < second->GetDrawingY())
+            return true;
+        else if (first->GetDrawingY() > second->GetDrawingY())
+            return false;
+        // with unissons, look at the layer @n
+        else
+            return (first->GetAlignmentLayerN() < second->GetAlignmentLayerN());
+    }
 };
 
 } // namespace vrv

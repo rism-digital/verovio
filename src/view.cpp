@@ -16,6 +16,7 @@
 
 #include "doc.h"
 #include "page.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -71,7 +72,10 @@ void View::SetPage(int pageIdx, bool doLayout)
         m_doc->CollectScoreDefs();
         // if we once deal with multiple views, it would be better
         // to redo the layout only when necessary?
-        m_currentPage->LayOut();
+        if (m_doc->GetType() == Transcription)
+            m_currentPage->LayOutTranscription();
+        else
+            m_currentPage->LayOut();
     }
 
     m_currentElement = NULL;

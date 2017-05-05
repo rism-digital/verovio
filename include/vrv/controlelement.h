@@ -8,6 +8,7 @@
 #ifndef __VRV_CONTROL_ELEMENT_H__
 #define __VRV_CONTROL_ELEMENT_H__
 
+#include "atts_shared.h"
 #include "devicecontextbase.h"
 #include "floatingobject.h"
 
@@ -21,7 +22,7 @@ namespace vrv {
  * This class represents elements appearing within a measure.
  * It is not an abstract class but should not be instanciated directly.
  */
-class ControlElement : public FloatingObject {
+class ControlElement : public FloatingObject, public AttCommon, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -32,8 +33,13 @@ public:
     ControlElement(std::string classid);
     virtual ~ControlElement();
     virtual void Reset();
-    virtual ClassId Is() const { return CONTROL_ELEMENT; }
+    virtual ClassId GetClassId() const { return CONTROL_ELEMENT; }
     ///@}
+
+    /**
+     * Check if the ControlElement has a Rend child and return its @halign equivalent (if any)
+     */
+    char GetAlignment();
 
     //----------//
     // Functors //

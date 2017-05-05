@@ -8,6 +8,10 @@
 #ifndef __VRV_NOTE_H__
 #define __VRV_NOTE_H__
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "accid.h"
 #include "atts_mensural.h"
 #include "atts_shared.h"
@@ -35,22 +39,15 @@ typedef std::vector<Note *> ChordCluster;
  * This class models the MEI <note> element.
  */
 
-// embellishments
-// for the moment only the trill is implemented
-// to be change to MEI Att
-#define EMB_NONE 0
-#define EMB_TRILL 1
-#define EMB_MORDENT 2
-
 class Note : public LayerElement,
              public StemmedDrawingInterface,
              public DurationInterface,
              public PitchInterface,
-             public AttAccidentalPerformed,
              public AttColor,
              public AttColoration,
              public AttGraced,
              public AttNoteLogMensural,
+             public AttRelativesize,
              public AttStems,
              public AttStemsCmn,
              public AttTiepresent,
@@ -65,15 +62,20 @@ public:
     virtual ~Note();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Note"; }
-    virtual ClassId Is() const { return NOTE; }
+    virtual ClassId GetClassId() const { return NOTE; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
     virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
     virtual StemmedDrawingInterface *GetStemmedDrawingInterface()
     {
         return dynamic_cast<StemmedDrawingInterface *>(this);
     }
+    ///@}
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
@@ -88,39 +90,99 @@ public:
      * @name Setter and getter for tie attribute and other pointers
      */
     ///@{
-    void ResetDrawingAccid();
+    Accid *GetDrawingAccid();
     void ResetDrawingTieAttr();
     void SetDrawingTieAttr();
     Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; }
     ///@}
 
     /**
-     * @name Setter and getter for the Algnment the grace note is pointing to (NULL by default)
+     * @name Setter and getter for the drawing staff loc.
+     * This is set by the SetAlignmentPitchPos functor.
      */
     ///@{
-    Alignment *GetGraceAlignment();
-    void SetGraceAlignment(Alignment *graceAlignment);
-    bool HasGraceAlignment() const { return (m_graceAlignment != NULL); }
-    void ResetGraceAlignment() { m_graceAlignment = NULL; }
+    void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
+    int GetDrawingLoc() const { return m_drawingLoc; }
     ///@}
 
     /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{
-    Chord *IsChordTone();
-    int GetDrawingDur();
+    Chord *IsChordTone() const;
+    int GetDrawingDur() const;
     bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}
+
+    /**
+     * Return true if the note is a unisson.
+     * If ignoreAccid is set to true then only @pname and @oct are compared.
+     */
+    bool IsUnissonWith(Note *note, bool ignoreAccid = false);
+
+    /**
+     * @name Setter and getter for the chord cluster and the position of the note
+     */
+    ///@{
+    void SetCluster(ChordCluster *cluster, int position);
+    ChordCluster *GetCluster() const { return m_cluster; }
+    ///}
+
+    /**
+     * @name Setter and getter for the flipped note head flag
+     */
+    ///@{
+    void SetFlippedNotehead(bool flippedNotehead) { m_flippedNotehead = flippedNotehead; }
+    bool GetFlippedNotehead() const { return m_flippedNotehead; }
+    ///}
+
+    /**
+     * Get the drawing radius of the note head taking into accound the note duration
+     */
+    int GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) const;
 
     /**
      * Returns a single integer representing pitch and octave.
      */
     int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; }
 
+    /**
+     * Get the stem up / stem down attachment point.
+     * If necessary look at the glyph anchor (if any).
+     */
+    ///@{
+    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize);
+    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::CalcStem
+     */
+    virtual int CalcStem(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcChordNoteHeads
+     */
+    virtual int CalcChordNoteHeads(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcDots
+     */
+    virtual int CalcDots(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcLedgerLines
+     */
+    virtual int CalcLedgerLines(FunctorParams *functorParams);
+
+    /**
+    * See Object::PrepareLayerElementParts
+    */
+    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareTieAttr
@@ -147,28 +209,14 @@ public:
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+
 private:
     //
 public:
-    /** embellishment on this note **/
-    unsigned int m_embellishment; // To be changed to Att
-
-    /** drawing stem length */
-    int d_stemLen;
-
-    /** flags for determining clusters in chord **/
-    ChordCluster *m_cluster; // cluster this belongs to
-    int m_clusterPosition; // 1-indexed position in said cluster; 0 if does not have position
-
-    /** other information necessary for notes in chords **/
-    Accid *m_drawingAccid;
-
-    /**
-     * Flag indicating if the drawing accid is an attribute.
-     * If yes, then it is owned by the Note and will be deleted
-     */
-    bool m_isDrawingAccidAttr;
-
     double m_playingOnset;
     double m_playingOffset;
 
@@ -179,10 +227,49 @@ private:
      * The note with the initial attribute owns the Tie object and takes care of deleting it
      */
     Tie *m_drawingTieAttr;
+
     /**
-     * An alignment for grace notes
+     * The drawing location of the note
      */
-    Alignment *m_graceAlignment;
+    int m_drawingLoc;
+
+    /**
+     * A fling indicating if the note head is flipped
+     */
+    bool m_flippedNotehead;
+
+    /**
+     * flags for determining clusters in chord (cluster this belongs to)
+     **/
+    ChordCluster *m_cluster;
+
+    /**
+     * Position in the cluster (1-indexed position in said cluster; 0 if does not have position)
+     */
+    int m_clusterPosition;
+};
+
+//----------------------------------------------------------------------------
+// DiatonicSort
+//----------------------------------------------------------------------------
+
+/**
+ * Unary predicate for comparing object types.
+ * This is used for example in std::find_if.
+ * See Object::GetFirst or Object::GetNext
+ */
+class DiatonicSort {
+
+public:
+    DiatonicSort() {}
+
+    bool operator()(const Object *first, const Object *second) const
+    {
+        const Note *n1 = dynamic_cast<const Note *>(first);
+        const Note *n2 = dynamic_cast<const Note *>(second);
+        assert(n1 && n2);
+        return (n1->GetDiatonicPitch() < n2->GetDiatonicPitch());
+    }
 };
 
 } // namespace vrv

@@ -26,7 +26,7 @@
 
 namespace vrv {
 
-enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM };
+enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM, MIDI };
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -147,6 +147,13 @@ public:
      * For example with a new page (sceen) height or a new zoom level.
      */
     void RedoLayout();
+
+    /**
+     * Redo the layout of the pitch postitions of the current drawing page.
+     * Only the note vertical positions are recalculated with this method.
+     * RedoLayout() needs to be called for a full recalculation.
+     */
+    void RedoPagePitchPosLayout();
 
     /**
      * Return the page on which the element is the ID (xml:id) is rendered.

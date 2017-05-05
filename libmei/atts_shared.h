@@ -3563,8 +3563,8 @@ public:
     std::string GetHeadRotation() const { return m_headRotation; }
     bool HasHeadRotation() const;
     //
-    void SetHeadShape(std::string headShape_) { m_headShape = headShape_; }
-    std::string GetHeadShape() const { return m_headShape; }
+    void SetHeadShape(data_HEADSHAPE_list headShape_) { m_headShape = headShape_; }
+    data_HEADSHAPE_list GetHeadShape() const { return m_headShape; }
     bool HasHeadShape() const;
     //
     void SetHeadVisible(data_BOOLEAN headVisible_) { m_headVisible = headVisible_; }
@@ -3588,7 +3588,7 @@ private:
      **/
     std::string m_headRotation;
     /** Used to override the head shape normally used for the given duration. **/
-    std::string m_headShape;
+    data_HEADSHAPE_list m_headShape;
     /**
      * Indicates if a feature should be rendered when the notation is presented
      * graphically or sounded when it is presented in an aural form.

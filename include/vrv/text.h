@@ -20,7 +20,12 @@ namespace vrv {
 /**
  * This class models the MEI <rend>
  */
-class Rend : public TextElement, public AttColor, public AttCommon, public AttLang, public AttTypography {
+class Rend : public TextElement,
+             public AttColor,
+             public AttHorizontalalign,
+             public AttLang,
+             public AttTypography,
+             public AttWhitespace {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -31,7 +36,7 @@ public:
     virtual ~Rend();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Rend"; }
-    virtual ClassId Is() const { return REND; }
+    virtual ClassId GetClassId() const { return REND; }
     ///@}
 
     /**
@@ -65,7 +70,7 @@ public:
     virtual ~Text();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Text"; }
-    virtual ClassId Is() const { return TEXT; }
+    virtual ClassId GetClassId() const { return TEXT; }
     ///@}
 
     /**

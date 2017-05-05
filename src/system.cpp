@@ -29,8 +29,11 @@ namespace vrv {
 // System
 //----------------------------------------------------------------------------
 
-System::System() : Object("system-"), DrawingListInterface()
+System::System() : Object("system-"), DrawingListInterface(), AttCommon(), AttTyped()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
+
     // We set parent to it because we want to access the parent doc from the aligners
     m_systemAligner.SetParent(this);
 
@@ -50,6 +53,8 @@ void System::Reset()
 {
     Object::Reset();
     DrawingListInterface::Reset();
+    ResetCommon();
+    ResetTyped();
 
     if (m_drawingScoreDef) {
         delete m_drawingScoreDef;
@@ -60,10 +65,8 @@ void System::Reset()
     m_systemRightMar = 0;
     m_xAbs = VRV_UNSET;
     m_drawingXRel = 0;
-    m_drawingX = 0;
     m_yAbs = VRV_UNSET;
     m_drawingYRel = 0;
-    m_drawingY = 0;
     m_drawingTotalWidth = 0;
     m_drawingJustifiableWidth = 0;
     m_drawingLabelsWidth = 0;
@@ -72,10 +75,10 @@ void System::Reset()
 
 void System::AddChild(Object *child)
 {
-    if (child->Is() == MEASURE) {
+    if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));
     }
-    else if (child->Is() == SCOREDEF) {
+    else if (child->Is(SCOREDEF)) {
         assert(dynamic_cast<ScoreDef *>(child));
     }
     else if (child->IsSystemElement()) {
@@ -94,9 +97,32 @@ void System::AddChild(Object *child)
     Modify();
 }
 
-int System::GetVerticalSpacing() const
+int System::GetDrawingX() const
 {
-    return 0; // arbitrary generic value
+    if (m_xAbs != VRV_UNSET) return m_xAbs;
+
+    m_cachedDrawingX = 0;
+    return m_drawingXRel;
+}
+
+int System::GetDrawingY() const
+{
+    if (m_yAbs != VRV_UNSET) return m_yAbs;
+
+    m_cachedDrawingY = 0;
+    return m_drawingYRel;
+}
+
+void System::SetDrawingXRel(int drawingXRel)
+{
+    ResetCachedDrawingX();
+    m_drawingXRel = drawingXRel;
+}
+
+void System::SetDrawingYRel(int drawingYRel)
+{
+    ResetCachedDrawingY();
+    m_drawingYRel = drawingYRel;
 }
 
 int System::GetHeight() const
@@ -121,7 +147,7 @@ void System::SetDrawingAbbrLabelsWidth(int width)
     }
 }
 
-void System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, int x, int y)
+void System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY)
 {
     assert(object);
 
@@ -129,7 +155,7 @@ void System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, in
     if (m_systemAligner.GetChildCount() == 1) return;
     StaffAlignment *alignment = m_systemAligner.GetStaffAlignmentForStaffN(staffN);
     assert(alignment);
-    alignment->SetCurrentFloatingPositioner(object, x, y);
+    alignment->SetCurrentFloatingPositioner(object, objectX, objectY);
 }
 
 void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
@@ -156,8 +182,7 @@ int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
 
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
-    m_drawingXRel = 0;
-    m_drawingX = 0;
+    SetDrawingXRel(0);
     m_drawingLabelsWidth = 0;
     m_drawingAbbrLabelsWidth = 0;
 
@@ -166,8 +191,7 @@ int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 
 int System::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    m_drawingYRel = 0;
-    m_drawingY = 0;
+    SetDrawingYRel(0);
 
     m_systemAligner.Reset();
 
@@ -195,26 +219,27 @@ int System::AlignVertically(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::SetAligmentYPos(FunctorParams *functorParams)
+int System::AlignVerticallyEnd(FunctorParams *functorParams)
 {
-    SetAligmentYPosParams *params = dynamic_cast<SetAligmentYPosParams *>(functorParams);
+    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    params->m_previousStaffHeight = 0;
-    params->m_previousVerseCount = 0;
-    params->m_previousOverflowBelow = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+    params->m_cumulatedShift = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
 
-    m_systemAligner.Process(params->m_functor, params);
+    m_systemAligner.Process(params->m_functorEnd, params);
 
     return FUNCTOR_SIBLINGS;
 }
 
-int System::IntegrateBoundingBoxYShift(FunctorParams *functorParams)
+int System::AdjustYPos(FunctorParams *functorParams)
 {
-    IntegrateBoundingBoxYShiftParams *params = dynamic_cast<IntegrateBoundingBoxYShiftParams *>(functorParams);
+    AdjustYPosParams *params = dynamic_cast<AdjustYPosParams *>(functorParams);
     assert(params);
 
-    params->m_shift = 0;
+    params->m_previousOverflowBelow = 0;
+    params->m_previousVerseCount = 0;
+    params->m_cumulatedShift = 0;
+
     m_systemAligner.Process(params->m_functor, params);
 
     return FUNCTOR_SIBLINGS;
@@ -225,7 +250,7 @@ int System::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = dynamic_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    m_drawingXRel = this->m_systemLeftMar + this->GetDrawingLabelsWidth();
+    SetDrawingXRel(this->m_systemLeftMar + this->GetDrawingLabelsWidth());
     params->m_shift = 0;
     params->m_justifiableWidth = 0;
 
@@ -248,7 +273,7 @@ int System::AlignSystems(FunctorParams *functorParams)
     AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
     assert(params);
 
-    this->m_drawingYRel = params->m_shift;
+    SetDrawingYRel(params->m_shift);
 
     assert(m_systemAligner.GetBottomAlignment());
 
@@ -262,8 +287,10 @@ int System::JustifyX(FunctorParams *functorParams)
     JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
     assert(params);
 
-    assert(m_parent);
-    assert(m_parent->m_parent);
+    assert(GetParent());
+    assert(GetParent()->GetParent());
+
+    Object *parent = GetParent();
 
     params->m_measureXRel = 0;
     int margins = this->m_systemLeftMar + this->m_systemRightMar;
@@ -279,8 +306,8 @@ int System::JustifyX(FunctorParams *functorParams)
 
     // Check if we are on the last page and on the last system - do no justify it if ratio > 1.25
     // Eventually we should make this a parameter
-    if ((m_parent->GetIdx() == m_parent->m_parent->GetChildCount() - 1)
-        && (this->GetIdx() == m_parent->GetChildCount() - 1)) {
+    if ((parent->GetIdx() == parent->GetParent()->GetChildCount() - 1)
+        && (this->GetIdx() == parent->GetChildCount() - 1)) {
         // HARDCODED
         if (params->m_justifiableRatio > 1.25) {
             return FUNCTOR_STOP;
@@ -290,9 +317,9 @@ int System::JustifyX(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int System::CalcStaffOverlap(FunctorParams *functorParams)
+int System::AdjustStaffOverlap(FunctorParams *functorParams)
 {
-    CalcStaffOverlapParams *params = dynamic_cast<CalcStaffOverlapParams *>(functorParams);
+    AdjustStaffOverlapParams *params = dynamic_cast<AdjustStaffOverlapParams *>(functorParams);
     assert(params);
 
     params->m_previous = NULL;
@@ -313,19 +340,23 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = SLUR;
     m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = FERMATA;
-    m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = TRILL;
-    m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = OCTAVE;
+    params->m_classId = DYNAM;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = HAIRPIN;
     m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = DYNAM;
-    m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = TEMPO;
+    params->m_classId = OCTAVE;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = DIR;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = MORDENT;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = TURN;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = TRILL;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = FERMATA;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = TEMPO;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = PEDAL;
     m_systemAligner.Process(params->m_functor, params);
@@ -381,33 +412,6 @@ int System::UnCastOff(FunctorParams *functorParams)
     // Use the MoveChildrenFrom method that moves and relinquishes them
     // See Object::Relinquish
     params->m_currentSystem->MoveChildrenFrom(this);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::SetDrawingXY(FunctorParams *functorParams)
-{
-    SetDrawingXYParams *params = dynamic_cast<SetDrawingXYParams *>(functorParams);
-    assert(params);
-
-    params->m_currentSystem = this;
-
-    // Second pass where we do just process layer elements
-    if (params->m_processLayerElements) return FUNCTOR_CONTINUE;
-
-    // Here we set the appropriate y value to be used for drawing
-    // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_yAbs
-    if (this->m_yAbs == VRV_UNSET) {
-        assert(params->m_doc->GetType() == Raw);
-        this->SetDrawingX(this->m_drawingXRel);
-        this->SetDrawingY(this->m_drawingYRel);
-    }
-    else {
-        assert(params->m_doc->GetType() == Transcription);
-        this->SetDrawingX(this->m_xAbs);
-        this->SetDrawingY(this->m_yAbs);
-    }
 
     return FUNCTOR_CONTINUE;
 }

@@ -115,6 +115,11 @@ void vrvToolkit_redoLayout(Toolkit *tk)
     tk->RedoLayout();
 }
 
+void vrvToolkit_redoPagePitchPosLayout(Toolkit *tk)
+{
+    tk->RedoPagePitchPosLayout();
+}
+    
 const char *vrvToolkit_renderData(Toolkit *tk, const char *data, const char *options)
 {
     tk->ResetLogBuffer();

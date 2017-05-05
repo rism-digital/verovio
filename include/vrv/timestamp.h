@@ -27,7 +27,7 @@ public:
     virtual ~TimestampAttr();
     virtual void Reset();
     virtual std::string GetClassName() const { return "TimestampAttr"; }
-    virtual ClassId Is() const { return TIMESTAMP_ATTR; }
+    virtual ClassId GetClassId() const { return TIMESTAMP_ATTR; }
     ///@}
 
     /**

@@ -29,18 +29,22 @@ class StaffDef;
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
 */
-class Layer : public Object, public DrawingListInterface, public ObjectListInterface, public AttCommon {
+class Layer : public Object,
+              public DrawingListInterface,
+              public ObjectListInterface,
+              public AttCommon,
+              public AttTyped {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method resets all attribute classes
      */
     ///@{
-    Layer();
+    Layer(int n = 1);
     virtual ~Layer();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Layer"; }
-    virtual ClassId Is() const { return LAYER; }
+    virtual ClassId GetClassId() const { return LAYER; }
     ///@}
 
     /**
@@ -72,7 +76,7 @@ public:
      * Return the clef offset for the position x.
      * The method uses Layer::GetClef first to find the clef before test.
      */
-    int GetClefOffset(LayerElement *test);
+    int GetClefLocOffset(LayerElement *test);
 
     /**
      * @name Set and get the stem direction of the layer.
@@ -145,15 +149,14 @@ public:
     virtual int PrepareProcessingLists(FunctorParams *functorParams);
 
     /**
-     * See Object::SetDrawingXY
-     */
-    virtual int SetDrawingXY(FunctorParams *functorParams);
-
-    /**
      * See Object::PrepareRpt
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
 
+    /**
+     * See Object::AdjustSylSpacing
+     */
+    virtual int AdjustSylSpacing(FunctorParams *functorParams);
     /**
      * See Object::CalcMaxMeasureDuration
      */

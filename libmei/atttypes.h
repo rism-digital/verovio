@@ -298,6 +298,29 @@ enum data_GRACE {
 };
 
 /**
+ * MEI data.HEADSHAPE.list
+ */
+enum data_HEADSHAPE_list {
+    HEADSHAPE_list_NONE = 0,
+    HEADSHAPE_list_quarter,
+    HEADSHAPE_list_half,
+    HEADSHAPE_list_whole,
+    HEADSHAPE_list_backslash,
+    HEADSHAPE_list_circle,
+    HEADSHAPE_list_plus,
+    HEADSHAPE_list_diamond,
+    HEADSHAPE_list_isotriangle,
+    HEADSHAPE_list_oval,
+    HEADSHAPE_list_piewedge,
+    HEADSHAPE_list_rectangle,
+    HEADSHAPE_list_rtriangle,
+    HEADSHAPE_list_semicircle,
+    HEADSHAPE_list_slash,
+    HEADSHAPE_list_square,
+    HEADSHAPE_list_x,
+};
+
+/**
  * MEI data.HORIZONTALALIGNMENT
  */
 enum data_HORIZONTALALIGNMENT {

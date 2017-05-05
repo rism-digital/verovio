@@ -22,13 +22,14 @@ namespace vrv {
 // Rend
 //----------------------------------------------------------------------------
 
-Rend::Rend() : TextElement("rend-"), AttColor(), AttCommon(), AttLang(), AttTypography()
+Rend::Rend() : TextElement("rend-"), AttColor(), AttHorizontalalign(), AttLang(), AttTypography(), AttWhitespace()
 
 {
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_HORIZONTALALIGN);
     RegisterAttClass(ATT_LANG);
     RegisterAttClass(ATT_TYPOGRAPHY);
+    RegisterAttClass(ATT_WHITESPACE);
 
     Reset();
 }
@@ -41,17 +42,18 @@ void Rend::Reset()
 {
     TextElement::Reset();
     ResetColor();
-    ResetCommon();
+    ResetHorizontalalign();
     ResetLang();
     ResetTypography();
+    ResetWhitespace();
 }
 
 void Rend::AddChild(Object *child)
 {
-    if (child->Is() == REND) {
+    if (child->Is(REND)) {
         assert(dynamic_cast<Rend *>(child));
     }
-    else if (child->Is() == TEXT) {
+    else if (child->Is(TEXT)) {
         assert(dynamic_cast<Text *>(child));
     }
     else if (child->IsEditorialElement()) {

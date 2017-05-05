@@ -19,7 +19,7 @@ class Note;
 // Dot
 //----------------------------------------------------------------------------
 
-class Dot : public LayerElement, public PositionInterface {
+class Dot : public LayerElement, public PositionInterface, public AttColor, public AttDotLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -30,10 +30,15 @@ public:
     virtual ~Dot();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Dot"; }
-    virtual ClassId Is() const { return DOT; }
+    virtual ClassId GetClassId() const { return DOT; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+    ///@}
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
@@ -51,6 +56,11 @@ public:
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
 private:
     //

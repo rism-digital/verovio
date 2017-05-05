@@ -34,11 +34,16 @@ public:
     virtual ~Octave();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Octave"; }
-    virtual ClassId Is() const { return OCTAVE; }
+    virtual ClassId GetClassId() const { return OCTAVE; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    ///@}
 
     //----------//
     // Functors //

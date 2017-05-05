@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Dec 26 16:35:10 PST 2016
+// Last Modified: Mon Feb 27 21:12:02 PST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -161,32 +161,37 @@ bool Convert::hasKernSlurEnd(const string& kerndata) {
 //////////////////////////////
 //
 // Convert::getKernSlurStartElisionLevel -- Returns the number of
-//   '&' characters before the last '(' character in a kern token.
+//   '&' characters before the given '(' character in a kern token.
 //   Returns -1 if no '(' character in string.
 //
 
-int Convert::getKernSlurStartElisionLevel(const string& kerndata) {
+int Convert::getKernSlurStartElisionLevel(const string& kerndata, int index) {
 	bool foundSlurStart = false;
 	int output = 0;
-	for (int i=(int)kerndata.size()-1; i >=0; i--) {
+	int count = 0;
+	int target = index + 1;
+	for (int i=0; i<(int)kerndata.size(); i++) {
 		char ch = kerndata[i];
 		if (ch == '(') {
+			count++;
+		}
+		if (count == target) {
 			foundSlurStart = true;
-			continue;
-		}
-		if (!foundSlurStart) {
-			continue;
-		}
-		if (ch == '&') {
-			output++;
-		} else {
-			return output;
+			for (int j=i-1; j>=0; j--) {
+				ch = kerndata[j];
+				if (ch == '&') {
+					output++;
+				} else {
+					break;
+				}
+			}
+			break;
 		}
 	}
-	if (foundSlurStart) {
-		return output;
-	} else {
+	if (!foundSlurStart) {
 		return -1;
+	} else {
+		return output;
 	}
 }
 
@@ -199,28 +204,33 @@ int Convert::getKernSlurStartElisionLevel(const string& kerndata) {
 //   Returns -1 if no ')' character in string.
 //
 
-int Convert::getKernSlurEndElisionLevel(const string& kerndata) {
+int Convert::getKernSlurEndElisionLevel(const string& kerndata, int index) {
 	bool foundSlurEnd = false;
 	int output = 0;
-	for (int i=(int)kerndata.size()-1; i >=0; i--) {
+	int count = 0;
+	int target = index + 1;
+	for (int i=0; i<(int)kerndata.size(); i++) {
 		char ch = kerndata[i];
 		if (ch == ')') {
+			count++;
+		}
+		if (count == target) {
 			foundSlurEnd = true;
-			continue;
-		}
-		if (!foundSlurEnd) {
-			continue;
-		}
-		if (ch == '&') {
-			output++;
-		} else {
-			return output;
+			for (int j=i-1; j>=0; j--) {
+				ch = kerndata[j];
+				if (ch == '&') {
+					output++;
+				} else {
+					break;
+				}
+			}
+			break;
 		}
 	}
-	if (foundSlurEnd) {
-		return output;
-	} else {
+	if (!foundSlurEnd) {
 		return -1;
+	} else {
+		return output;
 	}
 }
 
@@ -1470,6 +1480,32 @@ string Convert::keyNumberToKern(int number) {
 
 
 
+//////////////////////////////
+//
+// Convert::base7ToBase40 -- Convert a base7 value to a base-40 value
+//   (without accidentals).  Negative values are not allowed, but not
+//   checked for.
+//
+
+int Convert::base7ToBase40(int base7) {
+	int octave = base7 / 7;
+	int b7pc = base7 % 7;
+	int b40pc = 0;
+	switch (b7pc) {
+		case 0: b40pc =  0; break; // C
+		case 1: b40pc =  6; break; // D
+		case 2: b40pc = 12; break; // E
+		case 3: b40pc = 17; break; // F
+		case 4: b40pc = 23; break; // G
+		case 5: b40pc = 29; break; // A
+		case 6: b40pc = 35; break; // B
+	}
+	return octave * 40 + 2 + b40pc;
+}
+
+
+
+
 
 //////////////////////////////
 //
@@ -1634,7 +1670,7 @@ string Convert::durationToRecip(HumNum duration, HumNum scale) {
 		return output;
 	}
 
-	// now decide if the rhythm can be represented simply with two dots.
+	// now decide if the rhythm can be represented simply with three dots.
 	HumNum test3dot = (duration * 8) / 15;
 	if (test3dot.getNumerator() == 1) {
 		// single dot works
@@ -4828,7 +4864,12 @@ string HumRegex::getMatch(int index) {
 //
 
 int HumRegex::getMatchInt(int index) {
-	return stoi(m_matches.str(index));
+	string value = m_matches.str(index);
+	if (value.size() > 0) {
+		return stoi(value);
+	} else {
+		return 0;
+	}
 }
 
 
@@ -4864,7 +4905,7 @@ string HumRegex::getSuffix(void) {
 //
 
 int HumRegex::getMatchStartIndex(int index) {
-	return m_matches.position(index);
+	return (int)m_matches.position(index);
 }
 
 
@@ -4888,7 +4929,7 @@ int HumRegex::getMatchEndIndex(int index) {
 //
 
 int HumRegex::getMatchLength(int index) {
-	return m_matches.length(index);
+	return (int)m_matches.length(index);
 }
 
 
@@ -5601,7 +5642,7 @@ void HumdrumFileBase::readFromHttpUri(const string& webaddress) {
 
 //////////////////////////////
 //
-// readFromHttpUri -- Read a Humdrum file from an http:// web address
+// readStringFromHttpUri -- Read a Humdrum file from an http:// web address
 //
 
 void HumdrumFileBase::readStringFromHttpUri(stringstream& inputdata,
@@ -5643,7 +5684,7 @@ void HumdrumFileBase::readStringFromHttpUri(stringstream& inputdata,
 
 	#define URI_BUFFER_SIZE (10000)
 	char buffer[URI_BUFFER_SIZE];
-	int message_len;
+	unsigned int message_len;
 	stringstream header;
 	int foundcontent   = 0;
 	int newlinecounter = 0;
@@ -5676,7 +5717,7 @@ void HumdrumFileBase::readStringFromHttpUri(stringstream& inputdata,
 
 	header << ends; // necessary?
 	while (header.getline(buffer, URI_BUFFER_SIZE)) {
-		int len = strlen(buffer);
+		int len = (int)strlen(buffer);
 		for (i=0; i<len; i++) {
 			buffer[i] = std::tolower(buffer[i]);
 		}
@@ -5722,7 +5763,7 @@ void HumdrumFileBase::readStringFromHttpUri(stringstream& inputdata,
 			if (foundcontent) {
 				inputdata.write(buffer, message_len);
 			} else {
-				for (i=0; i<message_len; i++) {
+				for (i=0; i<(int)message_len; i++) {
 					if (foundcontent) {
 						inputdata << buffer[i];
 					} else {
@@ -5778,7 +5819,7 @@ void HumdrumFileBase::readStringFromHttpUri(stringstream& inputdata,
 int HumdrumFileBase::getChunk(int socket_id, stringstream& inputdata,
 		char* buffer, int bufsize) {
 	int chunksize = 0;
-	int message_len;
+	unsigned int message_len;
 	char digit[2] = {0};
 	int founddigit = 0;
 
@@ -5786,7 +5827,7 @@ int HumdrumFileBase::getChunk(int socket_id, stringstream& inputdata,
 	while ((message_len = ::read(socket_id, buffer, 1)) != 0) {
 		if (isxdigit(buffer[0])) {
 			digit[0] = buffer[0];
-			chunksize = (chunksize << 4) | strtol(digit, NULL, 16);
+			chunksize = (chunksize << 4) | (int)strtol(digit, NULL, 16);
 			founddigit = 1;
 		} else if (founddigit) {
 			break;
@@ -5832,7 +5873,7 @@ int HumdrumFileBase::getFixedDataSize(int socket_id, int datalength,
 		if (readcount + readsize > datalength) {
 			readsize = datalength - readcount;
 		}
-		message_len = ::read(socket_id, buffer, readsize);
+		message_len = (int)::read(socket_id, buffer, readsize);
 		if (message_len == 0) {
 			// shouldn't happen, but who knows...
 			break;
@@ -8031,6 +8072,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 			int rindex = rtracks[track];
 			for (k=0; k<subcount; k++) {
 				string subtok = infile[i].token(j)->getSubtoken(k);
+				int b40 = Convert::kernToBase40(subtok);
 				int diatonic = Convert::kernToBase7(subtok);
 				if (diatonic < 0) {
 					// Deal with extra-low notes later.
@@ -8059,6 +8101,182 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 						gdstates[rindex][diatonic] = -1000 + accid;
 					}
 					continue;
+				}
+
+				size_t loc;
+				// check for accidentals on trills, mordents and turns.
+				if (subtok.find("t") != string::npos) {
+					// minor second trill
+					int trillnote     = b40 + 5;
+					int trilldiatonic = Convert::base40ToDiatonic(trillnote);
+					int trillaccid    = Convert::base40ToAccidental(trillnote);
+					if (dstates[rindex][trilldiatonic] != trillaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"trillAccidental", to_string(trillaccid));
+						dstates[rindex][trilldiatonic] = -1000 + trillaccid;
+					}
+				} else if (subtok.find("T") != string::npos) {
+					// major second trill
+					int trillnote     = b40 + 6;
+					int trilldiatonic = Convert::base40ToDiatonic(trillnote);
+					int trillaccid    = Convert::base40ToAccidental(trillnote);
+					if (dstates[rindex][trilldiatonic] != trillaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"trillAccidental", to_string(trillaccid));
+						dstates[rindex][trilldiatonic] = -1000 + trillaccid;
+					}
+				} else if (subtok.find("M") != string::npos) {
+					// major second upper mordent
+					int auxnote     = b40 + 6;
+					int auxdiatonic = Convert::base40ToDiatonic(auxnote);
+					int auxaccid    = Convert::base40ToAccidental(auxnote);
+					if (dstates[rindex][auxdiatonic] != auxaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"mordentUpperAccidental", to_string(auxaccid));
+						dstates[rindex][auxdiatonic] = -1000 + auxaccid;
+					}
+				} else if (subtok.find("m") != string::npos) {
+					// minor second upper mordent
+					int auxnote     = b40 + 5;
+					int auxdiatonic = Convert::base40ToDiatonic(auxnote);
+					int auxaccid    = Convert::base40ToAccidental(auxnote);
+					if (dstates[rindex][auxdiatonic] != auxaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"mordentUpperAccidental", to_string(auxaccid));
+						dstates[rindex][auxdiatonic] = -1000 + auxaccid;
+					}
+				} else if (subtok.find("W") != string::npos) {
+					// major second upper mordent
+					int auxnote     = b40 - 6;
+					int auxdiatonic = Convert::base40ToDiatonic(auxnote);
+					int auxaccid    = Convert::base40ToAccidental(auxnote);
+					if (dstates[rindex][auxdiatonic] != auxaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"mordentLowerAccidental", to_string(auxaccid));
+						dstates[rindex][auxdiatonic] = -1000 + auxaccid;
+					}
+				} else if (subtok.find("w") != string::npos) {
+					// minor second upper mordent
+					int auxnote     = b40 - 5;
+					int auxdiatonic = Convert::base40ToDiatonic(auxnote);
+					int auxaccid    = Convert::base40ToAccidental(auxnote);
+					if (dstates[rindex][auxdiatonic] != auxaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"mordentLowerAccidental", to_string(auxaccid));
+						dstates[rindex][auxdiatonic] = -1000 + auxaccid;
+					}
+
+				} else if ((loc = subtok.find("$")) != string::npos) {
+
+					int turndiatonic = Convert::base40ToDiatonic(b40);
+					// int turnaccid = Convert::base40ToAccidental(b40);
+					// inverted turn
+					int lowerint = 0;
+					int upperint = 0;
+					if (loc < subtok.size()-1) {
+						if (subtok[loc+1] == 's') {
+							lowerint = -5;
+						} else if (subtok[loc+1] == 'S') {
+							lowerint = -6;
+						}
+					}
+					if (loc < subtok.size()-2) {
+						if (subtok[loc+2] == 's') {
+							upperint = +5;
+						} else if (subtok[loc+2] == 'S') {
+							upperint = +6;
+						}
+					}
+					int lowerdiatonic = turndiatonic - 1;
+					// Maybe also need to check for forced accidental state...
+					int loweraccid = dstates[rindex][lowerdiatonic];
+					int lowerb40 = Convert::base7ToBase40(lowerdiatonic) + loweraccid;
+					int upperdiatonic = turndiatonic + 1;
+					// Maybe also need to check for forced accidental state...
+					int upperaccid = dstates[rindex][upperdiatonic];
+					int upperb40 = Convert::base7ToBase40(upperdiatonic) + upperaccid;
+					if (lowerint == 0) {
+						// need to calculate lower interval (but it will not appear
+						// below the inverted turn, just calculating for performance
+						// rendering.
+						lowerint = lowerb40 - b40;
+						lowerb40 = b40 + lowerint;
+					}
+					if (upperint == 0) {
+						// need to calculate upper interval (but it will not appear
+						// above the inverted turn, just calculating for performance
+						// rendering.
+						upperint = upperb40 - b40;
+						upperb40 = b40 + upperint;
+					}
+					int uacc = Convert::base40ToAccidental(b40 + upperint);
+					int bacc = Convert::base40ToAccidental(b40 + lowerint);
+					if (uacc != upperaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"turnUpperAccidental", to_string(uacc));
+						dstates[rindex][upperdiatonic] = -1000 + uacc;
+					}
+					if (bacc != loweraccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"turnLowerAccidental", to_string(bacc));
+						dstates[rindex][lowerdiatonic] = -1000 + bacc;
+					}
+
+				} else if ((loc = subtok.find("S")) != string::npos) {
+
+					int turndiatonic = Convert::base40ToDiatonic(b40);
+					// int turnaccid = Convert::base40ToAccidental(b40);
+					// regular turn
+					int lowerint = 0;
+					int upperint = 0;
+					if (loc < subtok.size()-1) {
+						if (subtok[loc+1] == 's') {
+							upperint = +5;
+						} else if (subtok[loc+1] == 'S') {
+							upperint = +6;
+						}
+					}
+					if (loc < subtok.size()-2) {
+						if (subtok[loc+2] == 's') {
+							lowerint = -5;
+						} else if (subtok[loc+2] == 'S') {
+							lowerint = -6;
+						}
+					}
+					int lowerdiatonic = turndiatonic - 1;
+					// Maybe also need to check for forced accidental state...
+					int loweraccid = dstates[rindex][lowerdiatonic];
+					int lowerb40 = Convert::base7ToBase40(lowerdiatonic) + loweraccid;
+					int upperdiatonic = turndiatonic + 1;
+					// Maybe also need to check for forced accidental state...
+					int upperaccid = dstates[rindex][upperdiatonic];
+					int upperb40 = Convert::base7ToBase40(upperdiatonic) + upperaccid;
+					if (lowerint == 0) {
+						// need to calculate lower interval (but it will not appear
+						// below the inverted turn, just calculating for performance
+						// rendering.
+						lowerint = lowerb40 - b40;
+						lowerb40 = b40 + lowerint;
+					}
+					if (upperint == 0) {
+						// need to calculate upper interval (but it will not appear
+						// above the inverted turn, just calculating for performance
+						// rendering.
+						upperint = upperb40 - b40;
+						upperb40 = b40 + upperint;
+					}
+					int uacc = Convert::base40ToAccidental(b40 + upperint);
+					int bacc = Convert::base40ToAccidental(b40 + lowerint);
+					if (uacc != upperaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"turnUpperAccidental", to_string(uacc));
+						dstates[rindex][upperdiatonic] = -1000 + uacc;
+					}
+					if (bacc != loweraccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"turnLowerAccidental", to_string(bacc));
+						dstates[rindex][lowerdiatonic] = -1000 + bacc;
+					}
 				}
 
 				if (graceQ && (accid != gdstates[rindex][diatonic])) {
@@ -8297,102 +8515,126 @@ bool HumdrumFileContent::analyzeKernSlurs(void) {
 
 
 bool HumdrumFileContent::analyzeKernSlurs(HTp spinestart) {
+	// tracktokens == the 2-D data list for the track,
+	// arranged in layers with the second dimension.
 	vector<vector<HTp> > tracktokens;
 	this->getTrackSeq(tracktokens, spinestart, OPT_DATA | OPT_NOEMPTY);
 	// printSequence(tracktokens);
 
-	vector<vector<HTp> > sluropens;
-	sluropens.resize(32);
+	// sluropens == list of slur openings for each track and elision level
+	// first dimension: elision level
+	// second dimension: track number
+	vector<vector<vector<HTp> > > sluropens;
 
-	int elisionlevel;
-	int i, j;
-	for (i=0; i<(int)tracktokens.size(); i++) {
-		for (j=0; j<(int)tracktokens[i].size(); j++) {
-			if (tracktokens[i][j]->hasSlurStart() &&
-					tracktokens[i][j]->hasSlurEnd()) {
+	sluropens.resize(4); // maximum of 4 elision levels
+	for (int i=0; i<(int)sluropens.size(); i++) {
+		sluropens[i].resize(8);  // maximum of 8 layers
+	}
 
-				// If note has slur start and stop on the same note,
-				// then this means to end the previous slur and start
-				// a new one.  This is a special case of an elided slur
-				// where the elision is not explicitly marked.
+	int opencount = 0;
+	int closecount = 0;
+	int elision = 0;
+	HTp token;
+	for (int row=0; row<(int)tracktokens.size(); row++) {
+		for (int track=0; track<(int)tracktokens[row].size(); track++) {
+			token = tracktokens[row][track];
+			if (!token->isData()) {
+				continue;
+			}
+			if (token->isNull()) {
+				continue;
+			}
+			opencount = count(token->begin(), token->end(), '(');
+			closecount = count(token->begin(), token->end(), ')');
 
-				// slur ending code:
-				elisionlevel = tracktokens[i][j]->getSlurEndElisionLevel();
-				if (elisionlevel >= 0) {
-					if (sluropens[elisionlevel].size() > 0) {
-						sluropens[elisionlevel].back()->setValue("auto",
-								"slurEnd", tracktokens[i][j]);
-						sluropens[elisionlevel].back()->setValue("auto",
-								"id", sluropens[elisionlevel].back());
-						tracktokens[i][j]->setValue("auto", "slurStart",
-								sluropens[elisionlevel].back());
-						tracktokens[i][j]->setValue("auto", "id",
-								tracktokens[i][j]);
-						sluropens[elisionlevel].back()->setValue("auto", "slurDuration",
-							tracktokens[i][j]->getDurationFromStart() -
-							sluropens[elisionlevel].back()->getDurationFromStart());
-						sluropens[elisionlevel].pop_back();
-					} else {
-						// no starting slur marker to match to this slur end.
-						tracktokens[i][j]->setValue("auto", "hangingSlur", "true");
-						tracktokens[i][j]->setValue("auto", "slurDration",
-							tracktokens[i][j]->getDurationToEnd());
-					}
+			for (int i=0; i<closecount; i++) {
+				elision = token->getSlurEndElisionLevel(i);
+				if (elision < 0) {
+					continue;
 				}
-
-				// slur starting code:
-				elisionlevel = tracktokens[i][j]->getSlurStartElisionLevel();
-				if (elisionlevel >= 0) {
-					sluropens[elisionlevel].push_back(tracktokens[i][j]);
-				}
-
-			} else {
-
-				if (tracktokens[i][j]->hasSlurStart()) {
-					elisionlevel = tracktokens[i][j]->getSlurStartElisionLevel();
-					if (elisionlevel >= 0) {
-						sluropens[elisionlevel].push_back(tracktokens[i][j]);
-					}
-				}
-
-				if (tracktokens[i][j]->hasSlurEnd()) {
-
-					elisionlevel = tracktokens[i][j]->getSlurEndElisionLevel();
-					if (elisionlevel >= 0) {
-						if (sluropens[elisionlevel].size() > 0) {
-							sluropens[elisionlevel].back()->setValue("auto",
-									"slurEnd", tracktokens[i][j]);
-							sluropens[elisionlevel].back()->setValue("auto",
-									"id", sluropens[elisionlevel].back());
-							tracktokens[i][j]->setValue("auto", "slurStart",
-									sluropens[elisionlevel].back());
-							tracktokens[i][j]->setValue("auto", "id",
-									tracktokens[i][j]);
-							sluropens[elisionlevel].back()->setValue("auto", "slurDuration",
-								tracktokens[i][j]->getDurationFromStart() -
-								sluropens[elisionlevel].back()->getDurationFromStart());
-							sluropens[elisionlevel].pop_back();
-						} else {
-							// no starting slur marker to match to this slur end.
-							tracktokens[i][j]->setValue("auto", "hangingSlur", "true");
-							tracktokens[i][j]->setValue("auto", "slurDration",
-								tracktokens[i][j]->getDurationToEnd());
+				if (sluropens[elision][track].size() > 0) {
+					linkSlurEndpoints(sluropens[elision][track].back(), token);
+					// remove slur opening from buffer
+					sluropens[elision][track].pop_back();
+				} else {
+					// No starting slur marker to match to this slur end in the
+					// given track.
+					// search for an open slur in another track:
+					bool found = false;
+					for (int itrack=0; itrack<(int)sluropens[elision].size(); itrack++) {
+						if (sluropens[elision][itrack].size() > 0) {
+							linkSlurEndpoints(sluropens[elision][itrack].back(), token);
+							// remove slur opening from buffer
+							sluropens[elision][itrack].pop_back();
+							found = true;
+							break;
 						}
+					}
+					if (!found) {
+						token->setValue("auto", "hangingSlur", "true");
+						token->setValue("auto", "slurDration",
+							token->getDurationToEnd());
 					}
 				}
 			}
+
+			for (int i=0; i<opencount; i++) {
+				elision = token->getSlurStartElisionLevel(i);
+				if (elision < 0) {
+					continue;
+				}
+				sluropens[elision][track].push_back(token);
+			}
 		}
 	}
+
 	// Mark un-closed slur starts:
-	for (i=0; i<(int)sluropens.size(); i++) {
-		for (j=0; j<(int)sluropens[i].size(); j++) {
-			sluropens[i][j]->setValue("", "auto", "hangingSlur", "true");
-			sluropens[i][j]->setValue("", "auto", "slurDuration",
-				sluropens[i][j]->getDurationFromStart());
+	for (int i=0; i<(int)sluropens.size(); i++) {
+		for (int j=0; j<(int)sluropens[i].size(); j++) {
+			for (int k=0; k<(int)sluropens[i][j].size(); j++) {
+				sluropens[i][j][k]->setValue("", "auto", "hangingSlur", "true");
+				sluropens[i][j][k]->setValue("", "auto", "slurDuration",
+					sluropens[i][j][k]->getDurationFromStart());
+			}
 		}
 	}
 
 	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::linkSlurEndpoints --  Allow up to two slur starts/ends
+//      on a note.
+//
+
+void HumdrumFileContent::linkSlurEndpoints(HTp slurstart, HTp slurend) {
+	string durtag = "slurDuration";
+	string endtag = "slurEnd";
+	int slurEndCount = slurstart->getValueInt("auto", "slurEndCount");
+	slurEndCount++;
+	if (slurEndCount > 1) {
+		endtag += to_string(slurEndCount);
+		durtag += to_string(slurEndCount);
+	}
+	string starttag = "slurStart";
+	int slurStartCount = slurend->getValueInt("auto", "slurStartCount");
+	slurStartCount++;
+	if (slurStartCount > 1) {
+		starttag += to_string(slurStartCount);
+	}
+
+	slurstart->setValue("auto", endtag, slurend);
+	slurstart->setValue("auto", "id", slurstart);
+	slurend->setValue("auto", starttag, slurstart);
+	slurend->setValue("auto", "id", slurend);
+	HumNum duration = slurend->getDurationFromStart() 
+			- slurstart->getDurationFromStart();
+	slurstart->setValue("auto", durtag, duration);
+	slurstart->setValue("auto", "slurEndCount", to_string(slurEndCount));
+	slurend->setValue("auto", "slurStartCount", to_string(slurStartCount));
 }
 
 
@@ -9902,7 +10144,7 @@ bool HumdrumFileStructure::prepareDurations(HumdrumToken* token, int state,
 	// Process secondary tracks next:
 	int newstate = state;
 
-	for (int i=reservoir.size()-1; i>=0; i--) {
+	for (int i=(int)reservoir.size()-1; i>=0; i--) {
 		prepareDurations(reservoir[i], newstate, startdurs[i]);
 	}
 
@@ -13834,11 +14076,12 @@ int  HumdrumToken::getStrandIndex(void) const {
 // HumdrumToken::getSlurStartElisionLevel -- Returns the count of
 //   elision marks ('&') preceding a slur start character '('.
 //   Returns -1 if there is no slur start character.
+//   Default value: index = 0
 //
 
-int HumdrumToken::getSlurStartElisionLevel(void) const {
+int HumdrumToken::getSlurStartElisionLevel(int index) const {
 	if (isDataType("**kern")) {
-		return Convert::getKernSlurStartElisionLevel((string)(*this));
+		return Convert::getKernSlurStartElisionLevel((string)(*this), index);
 	} else {
 		return -1;
 	}
@@ -13851,11 +14094,12 @@ int HumdrumToken::getSlurStartElisionLevel(void) const {
 // HumdrumToken::getSlurEndElisionLevel -- Returns the count of
 //   elision marks ('&') preceding a slur end character ')'.
 //   Returns -1 if there is no slur end character.
+//   Default value: index = 0
 //
 
-int HumdrumToken::getSlurEndElisionLevel(void) const {
+int HumdrumToken::getSlurEndElisionLevel(int index) const {
 	if (isDataType("**kern")) {
-		return Convert::getKernSlurEndElisionLevel((string)(*this));
+		return Convert::getKernSlurEndElisionLevel((string)(*this), index);
 	} else {
 		return -1;
 	}
@@ -14212,8 +14456,12 @@ ostream& printSequence(vector<HTp>& sequence, ostream& out) {
 //				<parameter key="slurEnd" value="HT_140366146702320" idref=""/>
 //
 
-HTp HumdrumToken::getSlurStartToken(void) {
-	return getValueHTp("auto", "slurStart");
+HTp HumdrumToken::getSlurStartToken(int number) {
+	string tag = "slurStart";
+	if (number > 1) {
+		tag += to_string(number);
+	}
+	return getValueHTp("auto", tag);
 }
 
 
@@ -14226,8 +14474,12 @@ HTp HumdrumToken::getSlurStartToken(void) {
 //				<parameter key="slurStart" value="HT_140366146702320" idref=""/>
 //
 
-HTp HumdrumToken::getSlurEndToken(void) {
-	return getValueHTp("auto", "slurEnd");
+HTp HumdrumToken::getSlurEndToken(int number) {
+	string tag = "slurEnd";
+	if (number > 1) {
+		tag += to_string(number);
+	}
+	return getValueHTp("auto", tag);
 }
 
 
@@ -15594,13 +15846,12 @@ int Options::define(const string& aDefinition) {
 	// Set up space for a option entry in the registry
 	definitionEntry = new Option_register(aDefinition, otype[0], ovalue);
 
-	auto definitionIndex = m_optionRegister.size();
+	int definitionIndex = m_optionRegister.size();
 
 	// Store option aliases
 	string optionName;
-	unsigned int i;
 	aliases += '|';
-	for (i=0; i<aliases.size(); i++) {
+	for (int i=0; i<(int)aliases.size(); i++) {
 		if (::isspace(aliases[i])) {
 			continue;
 		} else if (aliases[i] == '|') {
@@ -15687,7 +15938,7 @@ string Options::getArgument(int index) {
 //
 
 int Options::getArgCount(void) {
-	return m_arguments.size();
+	return (int)m_arguments.size();
 }
 
 // Alias:
@@ -17922,7 +18173,7 @@ void Tool_autostem::getBeamState(vector<vector<string > >& beams,
 				for (int ii=0; ii<flagl; ii++) {
 					gbinfo += "\\";
 				}
-				len = gbinfo.size();
+				len = (int)gbinfo.size();
 				if (len > 6) {
 					cerr << "Error too many grace note beams" << endl;
 					exit(1);
@@ -17973,7 +18224,7 @@ void Tool_autostem::getBeamState(vector<vector<string > >& beams,
 				for (int ii=0; ii<flagl; ii++) {
 					gbinfo += "\\";
 				}
-				len = gbinfo.size();
+				len = (int)gbinfo.size();
 				if (len > 6) {
 					cerr << "Error too many grace note beams" << endl;
 					exit(1);
@@ -18192,7 +18443,9 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 	double lev;      // metric level of the current note
 	double levn;     // metric level of the next melodic note
 	int lineindex;   // line in original Humdrum file content that contains note
+	// int lineindexn;  // next line in original Humdrum file content that contains note
 	int sliceindex;  // current timepoint in NoteGrid.
+	// int alineindexn; // next line in Humdrum file that contains note in accompaniment voice
 	vector<double> harmint(grid.getVoiceCount());  // harmonic intervals;
 	bool dissonant;  // true if  note is dissonant with other sounding notes.
 	char marking = '\0';
@@ -18299,6 +18552,7 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 			}
 		} 
 
+		// variables for dissonant voice
 		durp = attacks[i-1]->getDuration();
 		dur  = attacks[i]->getDuration();
 		durn = attacks[i+1]->getDuration();
@@ -18307,8 +18561,33 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 		levp = attacks[i-1]->getMetricLevel();
 		lev  = attacks[i]->getMetricLevel();
 		levn = attacks[i+1]->getMetricLevel();
+		// lineindexn = attacks[i+1]->getLineIndex();
 
-		if ((dur <= durp) && (lev >= levp) && (lev >= levn)) { // weak dissonances
+		// variables for accompaniment voice
+		// valid_acc determines if the accompaniment voice conforms to the 
+		// standards of all dissonant types except suspensions.
+		// bool valid_acc = false
+		// if (The dissonant voice moves out of the dissonance to a different at 
+		// 	    the same time or before the accompaniment voice moves to a 
+		// 	    different pitch class or a rest) {
+		// 	valid_acc = true;
+		// }
+		// valid_sus_acc determines if the accompaniment voice conforms to the 
+		// standards of the accompaniment voice for suspensions.
+		// bool valid_sus_acc = false
+		// if ((Condition 1: The accompaniment voice moved to a different pitch
+		// 	    class at the onset of this dissonant interval) &&
+		// 	(Condition 2: The dissonant voice stayed in place or repeated the
+		// 		same pitch at the onset of this dissonant interval) &&
+		// 	(Condition 3: The dissonant voice leaves its note before or at the
+		// 		same time as the accompaniment voice leaves its pitch class. 
+		// 		The accompaniment voice can leave its pitch class for another 
+		// 		note or for a rest.)) {
+		// 	valid_sus_acc = true;
+		// }
+
+		if ((dur <= durp) && (lev >= levp) && (lev >= levn) // && (valid_acc)
+			) { // weak dissonances
 			if (intp == -1) { // descending dissonances
 				if (intn == -1) {
 					results[lineindex] = "pd"; // downward passing tone
@@ -18319,7 +18598,7 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 				} else if (intn > 1) {
 					results[lineindex] = "ed"; // lower échappée
 				} else if (intn == -2) {
-					results[lineindex] = "scd"; // short descending nota cambiata
+					results[lineindex] = "cd"; // descending nota cambiata
 				} else if (intn < -2) {
 					results[lineindex] = "ipd"; // incomplete posterior lower neighbor
 				}
@@ -18333,7 +18612,7 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 				} else if (intn == 0) {
 					results[lineindex] = "au"; // rising anticipation
 				} else if (intn == 2) {
-					results[lineindex] = "scu"; // short ascending nota cambiata
+					results[lineindex] = "cu"; // ascending nota cambiata
 				} else if (intn > 2) {
 					results[lineindex] = "ipu"; // incomplete posterior upper neighbor
 				}
@@ -18342,25 +18621,31 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 			} else if ((intp > 2) && (intn == -1)) {
 				results[lineindex] = "iau"; // incomplete anterior upper neighbor
 			}
+		} else if ((durp >= 2) && (dur == 1) && (lev < levn) &&
+			(intp == -1) && (intn == -1) // && (valid_acc)
+			) {
+			results[lineindex] = "dq"; // dissonant third quarter
 		}
-		// TODO: add check to see if results already has a result.
-		if (i < ((int)attacks.size() - 2)) { // expand the analysis window
+
+		// else if ((valid_sus_acc) &&
+		// 	     ((interval2 == -1) ||
+		// 	      ((interval2 == 0) && (interval3 == -1)) ||
+		// 	      ((interval2 == -2) && (interval3 == 1)))) {
+		// 	results[lineindex] = "s"; // suspension
+		// } else if ((valid_acc) && (interval1 == -2) && (interval2 == 1) &&
+		// 	     (results[attacks[i-1]->getLineIndex()] == "s")) {
+		// 	results[lineindex] = "so"; // suspension ornament
+		// }
+
+		else if (i < ((int)attacks.size() - 2)) { // expand the analysis window
 			double interval3 = *attacks[i+2] - *attacks[i+1];
 			HumNum durnn = attacks[i+2]->getDuration();	// dur of note after next
 			double levnn = attacks[i+2]->getMetricLevel(); // lev of note after next
 
 			if ((dur == durn) && (lev == 1) && (levn == 2) && (levnn == 0) &&
-				(intp == -1) && (intn == -1) && (interval3 == 1)) {
+				(intp == -1) && (intn == -1) && (interval3 == 1) // && (valid_acc)
+				) {
 				results[lineindex] = "ci"; // chanson idiom
-			} else if ((durp >= 2) && (dur == 1) && (lev < levn) &&
-				(intp == -1) && (intn == -1)) {
-				results[lineindex] = "dq"; // dissonant third quarter
-			} else if ((dur <= durp) && (lev >= levp) && (lev >= levn) &&
-				(intp == -1) && (intn == -2) && (interval3 == 1)) {
-				results[lineindex] = "lcd"; // long descending nota cambiata
-			} else if ((dur <= durp) && (lev >= levp) && (lev >= levn) &&
-				(intp == 1) && (intn == 2) && (interval3 == -1)) {
-				results[lineindex] = "lcu"; // long ascending nota cambiata
 			}
 		}
 	}
@@ -18413,7 +18698,6 @@ bool Tool_extract::run(const string& indata, ostream& out) {
 	HumdrumFile infile(indata);
 	bool status = run(infile);
 	if (hasAnyText()) {
-cerr << "GOT HERE BBB" << endl;
 		getAllText(out);
 	} else {
 		out << infile;
@@ -18425,7 +18709,6 @@ cerr << "GOT HERE BBB" << endl;
 bool Tool_extract::run(HumdrumFile& infile, ostream& out) {
 	int status = run(infile);
 	if (hasAnyText()) {
-cerr << "GOT HERE AAA" << endl;
 		getAllText(out);
 	} else {
 		out << infile;
@@ -18741,7 +19024,7 @@ void Tool_extract::reverseSpines(vector<int>& field, vector<int>& subfield, vect
 	field.resize(0);
 
 	int i, j;
-	int lasti = target.size();
+	int lasti = (int)target.size();
 	for (i=(int)target.size()-1; i>0; i--) {
 		if (target[i]) {
 			lasti = i;
@@ -18838,7 +19121,7 @@ void Tool_extract::processFieldEntry(vector<int>& field,
 	vector<HTp> ktracks;
 	infile.getKernSpineStartList(ktracks);
 	if (kernQ) {
-		maxtrack = ktracks.size();
+		maxtrack = (int)ktracks.size();
 	}
 
 	int modletter;

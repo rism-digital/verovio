@@ -31,12 +31,17 @@ public:
     virtual ~Dynam();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Dynam"; }
-    virtual ClassId Is() const { return DYNAM; }
+    virtual ClassId GetClassId() const { return DYNAM; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    ///@}
 
     /**
     * Add an element (text, rend. etc.) to a dynam.

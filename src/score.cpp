@@ -40,10 +40,10 @@ void Score::Reset()
 
 void Score::AddChild(Object *child)
 {
-    if (child->Is() == SCOREDEF) {
+    if (child->Is(SCOREDEF)) {
         assert(dynamic_cast<ScoreDef *>(child));
     }
-    else if (child->Is() == SECTION) {
+    else if (child->Is(SECTION)) {
         assert(dynamic_cast<Section *>(child));
     }
     else if (child->IsEditorialElement()) {

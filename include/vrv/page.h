@@ -14,6 +14,7 @@
 namespace vrv {
 
 class DeviceContext;
+class PrepareProcessingListsParams;
 class Staff;
 class System;
 
@@ -37,7 +38,7 @@ public:
     virtual ~Page();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Page"; }
-    virtual ClassId Is() const { return PAGE; }
+    virtual ClassId GetClassId() const { return PAGE; }
     ///@}
 
     /**
@@ -67,6 +68,12 @@ public:
     void LayOut(bool force = false);
 
     /**
+     * Do the layout for a transcription page (with layout information).
+     * This only calculates positioning or layer element parts using provided layout of parents.
+     */
+    void LayOutTranscription(bool force = false);
+
+    /**
      * Lay out the content of the page (measures and their content) horizontally
      */
     void LayOutHorizontally();
@@ -85,6 +92,11 @@ public:
      * Justifiy the content of the page (system/staves) vertically
      */
     void JustifyVertically();
+
+    /**
+     * Lay out the pitch positions and stems (without redoing the entire layout)
+     */
+    void LayOutPitchPos();
 
     /**
      * Return the height of the content by looking at the last system of the page.
@@ -106,6 +118,11 @@ public:
     //----------//
 
 private:
+    /**
+     * Adjust the horizontal postition of the syl processing verse by verse
+     */
+    void AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc);
+
     //
 public:
     /** Page width (MEI scoredef@page.width). Saved if != -1 */

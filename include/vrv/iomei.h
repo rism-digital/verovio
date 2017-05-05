@@ -36,6 +36,7 @@ class BTrem;
 class Choice;
 class Chord;
 class Clef;
+class ControlElement;
 class Corr;
 class Custos;
 class Damage;
@@ -46,6 +47,9 @@ class DurationInterface;
 class Dynam;
 class Ending;
 class Expan;
+class Expansion;
+class F;
+class Fb;
 class Fermata;
 class FloatingElement;
 class FTrem;
@@ -57,6 +61,7 @@ class Lem;
 class Measure;
 class Mensur;
 class MeterSig;
+class Mordent;
 class MRest;
 class MRpt;
 class MRpt2;
@@ -77,6 +82,7 @@ class Rest;
 class Restore;
 class Score;
 class ScoreDef;
+class ScoreDefElement;
 class ScoreDefInterface;
 class Sb;
 class Section;
@@ -87,6 +93,7 @@ class Staff;
 class Supplied;
 class Syl;
 class System;
+class SystemElement;
 class Tempo;
 class Text;
 class TextDirInterface;
@@ -95,6 +102,7 @@ class Tie;
 class TimePointInterface;
 class TimeSpanningInterface;
 class Trill;
+class Turn;
 class Tuplet;
 class Unclear;
 class Verse;
@@ -155,6 +163,7 @@ private:
     ///@{
     void WriteMeiSection(pugi::xml_node currentNode, Section *section);
     void WriteMeiEnding(pugi::xml_node currentNote, Ending *ending);
+    void WriteMeiExpansion(pugi::xml_node currentNote, Expansion *expansion);
     void WriteMeiPb(pugi::xml_node currentNode, Pb *pb);
     void WriteMeiSb(pugi::xml_node currentNode, Sb *sb);
     ///@}
@@ -215,18 +224,22 @@ private:
     void WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata);
     void WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteMeiHarm(pugi::xml_node currentNode, Harm *harm);
+    void WriteMeiMordent(pugi::xml_node currentNode, Mordent *mordent);
     void WriteMeiOctave(pugi::xml_node currentNode, Octave *octave);
     void WriteMeiPedal(pugi::xml_node currentNode, Pedal *pedal);
     void WriteMeiSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo);
     void WriteMeiTie(pugi::xml_node currentNode, Tie *tie);
     void WriteMeiTrill(pugi::xml_node currentNode, Trill *trill);
+    void WriteMeiTurn(pugi::xml_node currentNode, Turn *turn);
     ///@}
 
     /**
      * @name Methods for writing TextElement
      */
     ///@{
+    void WriteMeiF(pugi::xml_node currentNode, F *figure);
+    void WriteMeiFb(pugi::xml_node currentNode, Fb *fb);
     void WriteMeiRend(pugi::xml_node currentNode, Rend *rend);
     void WriteMeiText(pugi::xml_node currentNode, Text *text);
     ///@}
@@ -272,8 +285,13 @@ private:
      * Call WriteDurationInferface from WriteNote, for example.
      */
     ///@{
-    void WriteLayerElement(pugi::xml_node currentNode, LayerElement *element);
-    void WriteEditorialElement(pugi::xml_node currentNode, EditorialElement *element);
+    void WriteControlElement(pugi::xml_node element, ControlElement *object);
+    void WriteEditorialElement(pugi::xml_node element, EditorialElement *object);
+    void WriteLayerElement(pugi::xml_node element, LayerElement *object);
+    void WriteScoreDefElement(pugi::xml_node element, ScoreDefElement *object);
+    void WriteSystemElement(pugi::xml_node element, SystemElement *object);
+    void WriteTextElement(pugi::xml_node element, TextElement *object);
+    //
     void WriteDurationInterface(pugi::xml_node currentNode, DurationInterface *interface);
     void WritePitchInterface(pugi::xml_node currentNode, PitchInterface *interface);
     void WritePositionInterface(pugi::xml_node currentNode, PositionInterface *interface);
@@ -351,7 +369,6 @@ public:
 
 private:
     bool ReadMei(pugi::xml_node root);
-    bool ReadMeiHeader(pugi::xml_node meihead);
 
     /**
      * @name Methods for reading MEI score-based elements
@@ -360,6 +377,7 @@ private:
     bool ReadMeiSection(Object *parent, pugi::xml_node section);
     bool ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiEnding(Object *parent, pugi::xml_node ending);
+    bool ReadMeiExpansion(Object *parent, pugi::xml_node expansion);
     bool ReadMeiPb(Object *parent, pugi::xml_node pb);
     bool ReadMeiSb(Object *parent, pugi::xml_node sb);
     ///@}
@@ -385,6 +403,8 @@ private:
     bool ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef);
     bool ReadMeiMeasure(Object *parent, pugi::xml_node measure);
     bool ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeiFb(Object *parent, pugi::xml_node fb);
+    bool ReadMeiFbChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiStaff(Object *parent, pugi::xml_node staff);
     bool ReadMeiStaffChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiLayer(Object *parent, pugi::xml_node layer);
@@ -435,12 +455,14 @@ private:
     bool ReadMeiFermata(Object *parent, pugi::xml_node fermata);
     bool ReadMeiHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadMeiHarm(Object *parent, pugi::xml_node harm);
+    bool ReadMeiMordent(Object *parent, pugi::xml_node mordent);
     bool ReadMeiOctave(Object *parent, pugi::xml_node octave);
     bool ReadMeiPedal(Object *parent, pugi::xml_node pedal);
     bool ReadMeiSlur(Object *parent, pugi::xml_node slur);
     bool ReadMeiTempo(Object *parent, pugi::xml_node tempo);
     bool ReadMeiTie(Object *parent, pugi::xml_node tie);
     bool ReadMeiTrill(Object *parent, pugi::xml_node trill);
+    bool ReadMeiTurn(Object *parent, pugi::xml_node turn);
     ///@}
 
     /**
@@ -449,6 +471,7 @@ private:
     ///@{
     bool ReadMeiRend(Object *parent, pugi::xml_node rend);
     bool ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight);
+    bool ReadMeiF(Object *parent, pugi::xml_node figure);
     ///@}
 
     /**
@@ -484,8 +507,13 @@ private:
      * @name Methods for reading MEI LayerElement, EidtorialElement and interfaces
      */
     ///@{
-    bool ReadLayerElement(pugi::xml_node element, LayerElement *object);
+    bool ReadControlElement(pugi::xml_node element, ControlElement *object);
     bool ReadEditorialElement(pugi::xml_node element, EditorialElement *object);
+    bool ReadLayerElement(pugi::xml_node element, LayerElement *object);
+    bool ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object);
+    bool ReadSystemElement(pugi::xml_node element, SystemElement *object);
+    bool ReadTextElement(pugi::xml_node element, TextElement *object);
+
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
     bool ReadPitchInterface(pugi::xml_node element, PitchInterface *interface);
     bool ReadPositionInterface(pugi::xml_node element, PositionInterface *interface);

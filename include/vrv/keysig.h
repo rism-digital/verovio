@@ -47,7 +47,7 @@ public:
     virtual void Reset();
     virtual Object *Clone() const { return new KeySig(*this); }
     virtual std::string GetClassName() const { return "KeySig"; }
-    virtual ClassId Is() const { return KEYSIG; }
+    virtual ClassId GetClassId() const { return KEYSIG; }
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }

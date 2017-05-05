@@ -19,9 +19,8 @@ namespace vrv {
 // TextDirInterface
 //----------------------------------------------------------------------------
 
-TextDirInterface::TextDirInterface() : Interface(), AttCommon(), AttPlacement()
+TextDirInterface::TextDirInterface() : Interface(), AttPlacement()
 {
-    RegisterInterfaceAttClass(ATT_COMMON);
     RegisterInterfaceAttClass(ATT_PLACEMENT);
 
     Reset();
@@ -33,7 +32,6 @@ TextDirInterface::~TextDirInterface()
 
 void TextDirInterface::Reset()
 {
-    ResetCommon();
     ResetPlacement();
 }
 

@@ -28,7 +28,8 @@ class Tempo : public ControlElement,
               public TextDirInterface,
               public TimePointInterface,
               public AttLang,
-              public AttMiditempo {
+              public AttMiditempo,
+              public AttMmtempo {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -39,11 +40,16 @@ public:
     virtual ~Tempo();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Tempo"; }
-    virtual ClassId Is() const { return TEMPO; }
+    virtual ClassId GetClassId() const { return TEMPO; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    ///@}
 
     /**
      * Add an element (text, rend. etc.) to a tempo.

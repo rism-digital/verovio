@@ -17,6 +17,7 @@ class MidiFile;
 namespace vrv {
 
 class FontInfo;
+class Glyph;
 class Page;
 class Score;
 
@@ -35,7 +36,7 @@ public:
     // constructors and destructors
     Doc();
     virtual ~Doc();
-    virtual ClassId Is() const { return DOC; }
+    virtual ClassId GetClassId() const { return DOC; }
 
     virtual void AddChild(Object *object);
 
@@ -97,8 +98,10 @@ public:
     int GetDrawingBeamWidth(int staffSize, bool graceSize) const;
     int GetDrawingBeamWhiteWidth(int staffSize, bool graceSize) const;
     int GetDrawingLedgerLineLength(int staffSize, bool graceSize) const;
-    int GetGraceSize(int value) const;
+    int GetCueSize(int value) const;
     ///@}
+
+    Point ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staffSize, bool graceSize) const;
 
     /**
      * @name Get the height or width for a text glyph taking into account the grace size.

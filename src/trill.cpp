@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
+#include "verticalaligner.h"
 
 namespace vrv {
 
@@ -21,10 +21,11 @@ namespace vrv {
 // Trill
 //----------------------------------------------------------------------------
 
-Trill::Trill() : ControlElement("trill-"), TimePointInterface(), AttColor(), AttPlacement()
+Trill::Trill() : ControlElement("trill-"), TimePointInterface(), AttColor(), AttOrnamentaccid(), AttPlacement()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_ORNAMENTACCID);
     RegisterAttClass(ATT_PLACEMENT);
 
     Reset();
@@ -39,6 +40,7 @@ void Trill::Reset()
     ControlElement::Reset();
     TimePointInterface::Reset();
     ResetColor();
+    ResetOrnamentaccid();
     ResetPlacement();
 }
 

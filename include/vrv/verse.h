@@ -19,7 +19,7 @@ class Syl;
 // Verse
 //----------------------------------------------------------------------------
 
-class Verse : public LayerElement, public AttColor, public AttCommon, public AttLang {
+class Verse : public LayerElement, public AttColor, public AttLang, public AttTypography {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -30,7 +30,7 @@ public:
     virtual ~Verse();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Verse"; }
-    virtual ClassId Is() const { return VERSE; }
+    virtual ClassId GetClassId() const { return VERSE; }
     ///@}
 
     /**

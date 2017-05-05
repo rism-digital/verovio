@@ -56,8 +56,6 @@ void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::st
 
 void BBoxDeviceContext::ResumeGraphic(Object *object, std::string gId)
 {
-    // I am not sure we actually have to reset the bounding box here...
-    object->BoundingBox::ResetBoundingBox();
     m_objects.push_back(object);
 }
 
@@ -278,20 +276,23 @@ void BBoxDeviceContext::DrawRotatedText(const std::string &text, int x, int y, d
     // TODO
 }
 
-void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y)
+void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph)
 {
     assert(m_fontStack.top());
 
     int g_x, g_y, g_w, g_h;
     int lastCharWidth = 0;
 
+    wchar_t smuflGlyph = 0;
+    if (setSmuflGlyph && (text.length() == 1)) smuflGlyph = text.at(0);
+
     for (unsigned int i = 0; i < text.length(); i++) {
-        wchar_t c = text[i];
+        wchar_t c = text.at(i);
         Glyph *glyph = Resources::GetGlyph(c);
         if (!glyph) {
             continue;
         }
-        glyph->GetBoundingBox(&g_x, &g_y, &g_w, &g_h);
+        glyph->GetBoundingBox(g_x, g_y, g_w, g_h);
 
         int x_off = x + g_x * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
         // because we are in the drawing context, y position is already flipped
@@ -299,7 +300,7 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y)
 
         UpdateBB(x_off, y_off, x_off + g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm(),
             // idem, y position is flipped
-            y_off - g_h * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm());
+            y_off - g_h * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm(), smuflGlyph);
 
         lastCharWidth = g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
         x += lastCharWidth; // move x to next char
@@ -310,7 +311,7 @@ void BBoxDeviceContext::DrawSpline(int n, Point points[])
 {
 }
 
-void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
+void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, wchar_t glyph)
 {
     if (m_isDeactivatedX && m_isDeactivatedY) {
         return;
@@ -321,8 +322,14 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
 
     // we need to store logical coordinates in the objects, we need to convert them back (this is why we need a View
     // object)
-    if (!m_isDeactivatedX) (m_objects.back())->UpdateSelfBBoxX(m_view->ToLogicalX(x1), m_view->ToLogicalX(x2));
-    if (!m_isDeactivatedY) (m_objects.back())->UpdateSelfBBoxY(m_view->ToLogicalY(y1), m_view->ToLogicalY(y2));
+    if (!m_isDeactivatedX) {
+        (m_objects.back())->UpdateSelfBBoxX(m_view->ToLogicalX(x1), m_view->ToLogicalX(x2));
+        if (glyph != 0) (m_objects.back())->SetBoundingBoxGlyph(glyph, m_fontStack.top()->GetPointSize());
+    }
+    if (!m_isDeactivatedY) {
+        (m_objects.back())->UpdateSelfBBoxY(m_view->ToLogicalY(y1), m_view->ToLogicalY(y2));
+        if (glyph != 0) (m_objects.back())->SetBoundingBoxGlyph(glyph, m_fontStack.top()->GetPointSize());
+    }
 
     int i;
     // Stretch the content BB of the other objects

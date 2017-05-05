@@ -31,10 +31,15 @@ public:
     virtual ~Space();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Space"; }
-    virtual ClassId Is() const { return SPACE; }
+    virtual ClassId GetClassId() const { return SPACE; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    ///@}
 
 private:
     //

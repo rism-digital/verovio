@@ -10,6 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_shared.h"
+#include "beam.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -32,7 +33,7 @@ public:
     virtual ~BeatRpt();
     virtual void Reset();
     virtual std::string GetClassName() const { return "BeatRpt"; }
-    virtual ClassId Is() const { return BEATRPT; }
+    virtual ClassId GetClassId() const { return BEATRPT; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -58,7 +59,7 @@ private:
 /**
  * This class models the MEI <bTrem>
  */
-class BTrem : public LayerElement {
+class BTrem : public LayerElement, public AttTremmeasured {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -69,7 +70,7 @@ public:
     virtual ~BTrem();
     virtual void Reset();
     virtual std::string GetClassName() const { return "BTrem"; }
-    virtual ClassId Is() const { return BTREM; }
+    virtual ClassId GetClassId() const { return BTREM; }
     ///@}
 
     /**
@@ -92,7 +93,7 @@ private:
 /**
  * This class models the MEI <fTrem>
  */
-class FTrem : public LayerElement, public ObjectListInterface, public AttSlashcount {
+class FTrem : public LayerElement, public ObjectListInterface, public AttSlashcount, public AttTremmeasured {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -103,7 +104,7 @@ public:
     virtual ~FTrem();
     virtual void Reset();
     virtual std::string GetClassName() const { return "FTrem"; }
-    virtual ClassId Is() const { return FTREM; }
+    virtual ClassId GetClassId() const { return FTREM; }
     ///@}
 
     /**
@@ -111,6 +112,31 @@ public:
      * Only Note or Chord elements will be actually added to the fTrem.
      */
     virtual void AddChild(Object *object);
+
+    /**
+     * Initializes the m_beamElementCoords vector objects.
+     * This is called by FTrem::FilterList
+     */
+    void InitCoords(ListOfObjects *childList);
+
+    /**
+     * Clear the m_beamElementCoords vector and delete all the objects.
+     */
+    void ClearCoords();
+
+    /**
+     *
+     */
+    const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; }
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::CalcStem
+     */
+    virtual int CalcStem(FunctorParams *functorParams);
 
 private:
     //
@@ -121,8 +147,14 @@ protected:
     virtual void FilterList(ListOfObjects *childList);
 
 public:
-    //
+    /** */
+    BeamDrawingParams m_drawingParams;
+
 private:
+    /**
+     * An array of coordinates for each element
+     **/
+    mutable ArrayOfBeamElementCoords m_beamElementCoords;
 };
 
 //----------------------------------------------------------------------------
@@ -143,7 +175,7 @@ public:
     virtual ~MRpt();
     virtual void Reset();
     virtual std::string GetClassName() const { return "MRpt"; }
-    virtual ClassId Is() const { return MRPT; }
+    virtual ClassId GetClassId() const { return MRPT; }
     ///@}
 
     //----------//
@@ -182,7 +214,7 @@ public:
     virtual ~MRpt2();
     virtual void Reset();
     virtual std::string GetClassName() const { return "MRpt2"; }
-    virtual ClassId Is() const { return MRPT2; }
+    virtual ClassId GetClassId() const { return MRPT2; }
     ///@}
 
 private:
@@ -210,7 +242,7 @@ public:
     virtual ~MultiRpt();
     virtual void Reset();
     virtual std::string GetClassName() const { return "MultiRpt"; }
-    virtual ClassId Is() const { return MULTIRPT; }
+    virtual ClassId GetClassId() const { return MULTIRPT; }
     ///@}
 
 private:

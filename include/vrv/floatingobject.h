@@ -13,6 +13,7 @@
 
 namespace vrv {
 
+class Alignment;
 class FloatingPositioner;
 class StaffAlignment;
 
@@ -35,7 +36,7 @@ public:
     FloatingObject(std::string classid);
     virtual ~FloatingObject();
     virtual void Reset();
-    virtual ClassId Is() const { return FLOATING_OBJECT; }
+    virtual ClassId GetClassId() const { return FLOATING_OBJECT; }
     ///@}
 
     virtual void UpdateContentBBoxX(int x1, int x2);
@@ -129,17 +130,22 @@ public:
     // constructors and destructors
     FloatingPositioner(FloatingObject *object);
     virtual ~FloatingPositioner(){};
-    virtual ClassId Is() const { return FLOATING_POSITIONER; }
+    virtual ClassId GetClassId() const { return FLOATING_POSITIONER; }
 
     virtual void ResetPositioner();
 
     /**
-     * @name Get and set the X and Y drawing position
+     * @name Get the X and Y drawing position
      */
     ///@{
     virtual int GetDrawingX() const;
     virtual int GetDrawingY() const;
     ///@}
+
+    virtual void ResetCachedDrawingX() const;
+    virtual void ResetCachedDrawingY() const;
+
+    void SetObjectXY(Object *objectX, Object *objectY);
 
     FloatingObject *GetObject() const { return m_object; }
 
@@ -156,8 +162,12 @@ public:
      */
     ///@{
     int GetDrawingYRel() const { return m_drawingYRel; }
-    void SetDrawingYRel(int drawingYRel);
+    virtual void SetDrawingYRel(int drawingYRel);
     ///@}
+
+private:
+    Object *m_objectX;
+    Object *m_objectY;
 
 protected:
     /**

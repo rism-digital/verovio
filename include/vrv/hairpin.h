@@ -33,11 +33,16 @@ public:
     virtual ~Hairpin();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Hairpin"; }
-    virtual ClassId Is() const { return HAIRPIN; }
+    virtual ClassId GetClassId() const { return HAIRPIN; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+    ///@}
 
     //----------//
     // Functors //

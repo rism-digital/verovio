@@ -9,7 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "assert.h"
+#include <assert.h>
 
 //----------------------------------------------------------------------------
 
@@ -18,6 +18,7 @@
 #include "editorial.h"
 #include "note.h"
 #include "rest.h"
+#include "space.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -50,22 +51,25 @@ void Tuplet::Reset()
 
 void Tuplet::AddChild(Object *child)
 {
-    if (child->Is() == BEAM) {
+    if (child->Is(BEAM)) {
         assert(dynamic_cast<Beam *>(child));
     }
-    else if (child->Is() == CHORD) {
+    else if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));
     }
-    else if (child->Is() == CLEF) {
+    else if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
     }
-    else if (child->Is() == NOTE) {
+    else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
     }
-    else if (child->Is() == REST) {
+    else if (child->Is(REST)) {
         assert(dynamic_cast<Rest *>(child));
     }
-    else if (child->Is() == TUPLET) {
+    else if (child->Is(SPACE)) {
+        assert(dynamic_cast<Space *>(child));
+    }
+    else if (child->Is(TUPLET)) {
         assert(dynamic_cast<Tuplet *>(child));
     }
     else if (child->IsEditorialElement()) {

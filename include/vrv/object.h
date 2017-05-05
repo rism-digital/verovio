@@ -82,8 +82,17 @@ public:
     Object();
     Object(std::string classid);
     virtual ~Object();
-    virtual ClassId Is() const;
+    virtual ClassId GetClassId() const;
     virtual std::string GetClassName() const { return "[MISSING]"; }
+    ///@}
+
+    /**
+     * Make an object a reference object that do not own children.
+     * This cannot be un-done and has to be set before any child is added.
+     */
+    ///@{
+    void SetAsReferenceObject();
+    bool IsReferenceObject() const { return m_isReferencObject; }
     ///@}
 
     /**
@@ -102,12 +111,27 @@ public:
      * See classId enum.
      */
     ///@{
-    bool IsControlElement() const { return (this->Is() > CONTROL_ELEMENT && this->Is() < CONTROL_ELEMENT_max); }
-    bool IsEditorialElement() const { return (this->Is() > EDITORIAL_ELEMENT && this->Is() < EDITORIAL_ELEMENT_max); }
-    bool IsLayerElement() const { return (this->Is() > LAYER_ELEMENT && this->Is() < LAYER_ELEMENT_max); }
-    bool IsScoreDefElement() const { return (this->Is() > SCOREDEF_ELEMENT && this->Is() < SCOREDEF_ELEMENT_max); }
-    bool IsSystemElement() const { return (this->Is() > SYSTEM_ELEMENT && this->Is() < SYSTEM_ELEMENT_max); }
-    bool IsTextElement() const { return (this->Is() > TEXT_ELEMENT && this->Is() < TEXT_ELEMENT_max); }
+    bool IsControlElement() const
+    {
+        return (this->GetClassId() > CONTROL_ELEMENT && this->GetClassId() < CONTROL_ELEMENT_max);
+    }
+    bool IsEditorialElement() const
+    {
+        return (this->GetClassId() > EDITORIAL_ELEMENT && this->GetClassId() < EDITORIAL_ELEMENT_max);
+    }
+    bool IsLayerElement() const
+    {
+        return (this->GetClassId() > LAYER_ELEMENT && this->GetClassId() < LAYER_ELEMENT_max);
+    }
+    bool IsScoreDefElement() const
+    {
+        return (this->GetClassId() > SCOREDEF_ELEMENT && this->GetClassId() < SCOREDEF_ELEMENT_max);
+    }
+    bool IsSystemElement() const
+    {
+        return (this->GetClassId() > SYSTEM_ELEMENT && this->GetClassId() < SYSTEM_ELEMENT_max);
+    }
+    bool IsTextElement() const { return (this->GetClassId() > TEXT_ELEMENT && this->GetClassId() < TEXT_ELEMENT_max); }
     ///@}
 
     /**
@@ -182,11 +206,6 @@ public:
     void ResetUuid();
     static void SeedUuid(unsigned int seed = 0);
 
-    void SetSVGClass(const std::string &classcontent);
-    void AddSVGClass(const std::string &classname);
-    std::string GetSVGClass(void);
-    bool HasSVGClass(void);
-
     std::string GetComment() const { return m_comment; }
     void SetComment(std::string comment) { m_comment = comment; }
     bool HasComment(void) { return !m_comment.empty(); }
@@ -235,10 +254,21 @@ public:
     Object *GetLast() const;
 
     /**
+     * Get the parent of the Object
+     */
+    Object *GetParent() const { return m_parent; }
+
+    /**
      * Set the parent of the Object.
      * The current parent is expected to be NULL.
      */
     void SetParent(Object *parent);
+
+    /**
+     * Reset the parent of the Object.
+     * The current parent is not expected to be NULL.
+     */
+    void ResetParent() { m_parent = NULL; }
 
     /**
      * Base method for adding children.
@@ -250,6 +280,23 @@ public:
      * Return the index position of the object in its parent (-1 if not found)
      */
     int GetIdx() const;
+
+    /**
+     * @name Get the X and Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
+    ///@}
+
+    /**
+     * @name Reset the cached values of the drawingX and Y values.
+     * Reset all children recursively
+     */
+    ///@{
+    virtual void ResetCachedDrawingX() const;
+    virtual void ResetCachedDrawingY() const;
+    ///@}
 
     /**
      * Look for the Object in the children and return its position (-1 if not found)
@@ -266,6 +313,12 @@ public:
      * The parent pointer is set to NULL.
      */
     Object *DetachChild(int idx);
+
+    /**
+     * Return true if the object has the child Object as child (reference of direct).
+     * Processes in depth-first.
+     */
+    bool HasChild(Object *child, int deepness = UNLIMITED_DEPTH) const;
 
     /**
      * Look for a child with the specified uuid (returns NULL if not found)
@@ -318,15 +371,18 @@ public:
     void ClearRelinquishedChildren();
 
     /**
-     * Remove and delete the child at the idx position.
+     * Remove and delete the child.
+     * Return false if the child could not be found. In that case it will not be deleted.
      */
-    void RemoveChildAt(int idx);
+    bool DeleteChild(Object *child);
 
     /**
      * Return the first parent of the specified type.
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
     Object *GetFirstParent(const ClassId classId, int maxSteps = -1) const;
+
+    Object *GetFirstParentInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth = -1) const;
 
     /**
      * Return the last parent that is NOT of the specified type.
@@ -413,7 +469,7 @@ public:
     /**
      * Retrieve the time spanning layer elements between two points
      */
-    virtual int FindTimeSpanningLayerElements(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int FindTimeSpanningLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -425,14 +481,18 @@ public:
     /**
      * Convert top-level all container (section, endings) and editorial elements to boundary elements.
      */
-    virtual int ConvertToPageBased(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int ConvertToPageBasedEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int ConvertToPageBased(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertToPageBasedEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Save the content of any object by calling the appropriate FileOutputStream method.
      */
+    ///@{
     virtual int Save(FunctorParams *functorParams);
     virtual int SaveEnd(FunctorParams *functorParams);
+    ///@}
 
     ///@}
 
@@ -444,22 +504,27 @@ public:
     /**
      * Adjust the position the outside articulations.
      */
-    virtual int AdjustArtic(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position the outside articulations.
+     */
+    virtual int CalcArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position the outside articulations with slur.
      */
-    virtual int AdjustArticWithSlurs(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustArticWithSlurs(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of all floating positionner, staff by staff.
      */
-    virtual int AdjustFloatingPostioners(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustFloatingPostioners(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of all floating positionner that are grouped, staff by staff.
      */
-    virtual int AdjustFloatingPostionerGrps(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustFloatingPostionerGrps(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Align horizontally the content of a page.
@@ -467,52 +532,89 @@ public:
      * It creates it if no other note or event occurs at its position.
      * At the end, for each Layer, align the grace note stacked in GraceAlignment.
      */
-    virtual int AlignHorizontally(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int AlignHorizontallyEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int AlignHorizontally(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AlignHorizontallyEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
      * At the end, store the width of the system in the MeasureAligner for justification.
      */
-    virtual int AlignMeasures(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int AlignMeasuresEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Correct the X alignment once the content of a system has been aligned and laid out
-     * See Measure::IntegrateBoundingBoxXShift for actual implementation
-     */
-    virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Correct the X alignment once the content of a system has been aligned and laid out
-     * See Measure::IntegrateBoundingBoxXShift for actual implementation
-     */
-    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int AlignMeasures(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AlignMeasuresEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Reset the horizontal alignment environment for various types for object.
      */
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int ResetHorizontalAlignment(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Set the position of the Alignment.
      * Looks at the time difference from the previous Alignment.
      */
-    virtual int SetAlignmentXPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int SetAlignmentXPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     */
+    virtual int SetAlignmentPitchPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Set the drawing stem positions, including for beams.
+     */
+    virtual int CalcStem(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Set the note head flipped positions
+     */
+    virtual int CalcChordNoteHeads(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Set the drawing dot positions, including for chords.
+     */
+    virtual int CalcDots(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.
-     * The m_xShift is updated appropriately
+     * The functor is redirected from the MeasureAligner and then from the appropriate
+     * alignment to the GraceAligner
      */
-    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
+    ///@{
+    virtual int AdjustGraceXPos(FunctorParams *) { return FUNCTOR_CONTINUE; };
+    virtual int AdjustGraceXPosEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
+    ///@}
+
+    /**
+     * Retrieve the minimum left and maximum right for an alignment.
+     * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight
+     */
+    virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
+
+    /**
+     * Adjust the x position of accidental.
+     */
+    virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Lay out the X positions of the staff content looking at the bounding boxes.
-     * The m_xShift is updated appropriately
-     * At the end, lay out the X positions of the staff content looking at the bounding boxes.
+     * The functor process by aligned-staff content, that is from a rediction in the
+     * MeasureAligner and then staff by staff but taking into account cross-staff elements
      */
-    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
-    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
+    ///@{
+    virtual int AdjustXPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustXPosEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Adjust the spacing of the syl processing verse by verse
+     */
+    ///@{
+    virtual int AdjustSylSpacing(FunctorParams *) { return FUNCTOR_CONTINUE; };
+    virtual int AdjustSylSpacingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
+    ///@}
 
     ///@}
 
@@ -525,33 +627,35 @@ public:
      * Align vertically the content of a page.
      * For each Staff, instanciate its StaffAlignment.
      */
-    virtual int AlignVertically(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int AlignVertically(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AlignVerticallyEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
      */
-    virtual int AlignSystems(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int AlignSystems(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
      */
-    virtual int CalcStaffOverlap(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Correct the Y alignment once the content of a system has been aligned and laid out
-     * See System::IntegrateBoundingBoxYShift for actual implementation
+     * Set the note head flipped positions and calc the ledger lines
      */
-    virtual int IntegrateBoundingBoxYShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int CalcLedgerLines(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Reset the verticall alignment environment for various types for object.
      */
-    virtual int ResetVerticalAlignment(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int ResetVerticalAlignment(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Set the position of the StaffAlignment.
+     * Adjust the position of the StaffAlignment.
      */
-    virtual int SetAligmentYPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustYPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
@@ -575,7 +679,7 @@ public:
      * Set the current / drawing clef, key signature, etc. to the StaffDef
      * Called form ScoreDef::ReplaceDrawingValues.
      */
-    virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Set the current scoreDef wherever need.
@@ -593,7 +697,7 @@ public:
     /**
      * Unset the initial scoreDef of each system and measure
      */
-    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int UnsetCurrentScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
@@ -601,7 +705,7 @@ public:
      * This typically occurs when a new System or a new  ScoreDef is encountered.
      * See implementation and Object::SetStaffDefRedrawFlags for the parameters.
      */
-    virtual int SetStaffDefRedrawFlags(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int SetStaffDefRedrawFlags(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -611,31 +715,50 @@ public:
     ///@{
 
     /**
+     * Set the drawing cue size of all LayerElement
+     */
+    virtual int PrepareDrawingCueSize(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * See cross-staff / layer pointers on LayerElement
+     */
+    ///@{
+    virtual int PrepareCrossStaff(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareCrossStaffEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
      */
-    virtual int PrepareProcessingLists(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Match start for TimePointingInterface elements (such as fermata or harm).
      */
-    virtual int PrepareTimePointing(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int PrepareTimePointingEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int PrepareTimePointing(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareTimePointingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Match start and end for TimeSpanningInterface elements (such as tie or slur).
      * If fillList is set to false, only the remaining elements will be matched.
      * This is used when processing a second time in the other direction
      */
-    virtual int PrepareTimeSpanning(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int PrepareTimeSpanningEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int PrepareTimeSpanning(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareTimeSpanningEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Match start and end for TimeSpanningInterface elements with tstamp(2) attributes.
      * It is performed only on TimeSpanningInterface elements withouth @startid (or @endid).
      * It adds to the start (and end) measure a TimeStampAttr to the Measure::m_tstamps.
      */
-    virtual int PrepareTimestamps(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int PrepareTimestampsEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int PrepareTimestamps(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareTimestampsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Process Chord and Note for matching @tie by processing by Layer and by looking
@@ -643,40 +766,43 @@ public:
      * At the end, processes Chord and Note for matching @tie by processing by Layer; resets the
      * Chord pointer to NULL at the end of a chord.
      */
-    virtual int PrepareTieAttr(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int PrepareTieAttrEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int PrepareTieAttr(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareTieAttrEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Process by Layer and set drawing pointers.
      * Set Dot::m_drawingNote for Dot elements in mensural mode
-     * Set Note::m_drawingAccid for Note elements having an Accid child
      */
-    virtual int PreparePointersByLayer(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int PreparePointersByLayer(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Set wordpos and connector ends
      * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
      * At the end, the functor is processed by doc at the end of a document of closing opened syl.
      */
-    virtual int PrepareLyrics(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int PrepareLyricsEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int PrepareLyrics(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareLyricsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Functor for setting the artic parts.
      * Splits the artic content into different artic parts if necessary
      */
-    virtual int PrepareArtic(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareLayerElementParts(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Functor for setting mRpt drawing numbers (if required)
      * The functor is processed by staff/layer using an ArrayOfAttComparisons filter.
      */
-    virtual int PrepareRpt(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareRpt(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Functor for setting Measure of Ending
      */
-    virtual int PrepareBoundaries(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareBoundaries(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Functor for grouping FloatingObject by drawingGrpId
@@ -688,18 +814,15 @@ public:
      * where required. For Note with DrawingTieAttr, the functor is redirected to the tie object.
      * At the end, remove the TimeSpanningInterface element from the list when the last measure is reached.
      */
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int FillStaffCurrentTimeSpanning(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDrawing(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
-     */
-    virtual int SetDrawingXY(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int ResetDrawing(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -711,12 +834,12 @@ public:
     /**
      * Justify the X positions
      */
-    virtual int JustifyX(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int JustifyX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Justify the Y positions
      */
-    virtual int JustifyY(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int JustifyY(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -729,24 +852,26 @@ public:
      * Fill a page by adding systems with the appropriate length.
      * At the end, add all the pending objects where reaching the end
      */
-    virtual int CastOffSystems(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int CastOffSystemsEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int CastOffSystems(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CastOffSystemsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      *
      */
-    virtual int CastOffPages(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int CastOffPages(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Cast off the document according to the encoding provided (pb and sb)
      */
-    virtual int CastOffEncoding(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int CastOffEncoding(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Undo the cast of both pages and system.
      * This is used by Doc::ContinuousLayout for putting all pages / systems continously.
      */
-    virtual int UnCastOff(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int UnCastOff(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -758,13 +883,15 @@ public:
     /**
      * Export the object to a MidiFile
      */
-    virtual int GenerateMIDI(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int GenerateMIDIEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int GenerateMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int GenerateMIDIEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Calculate the maximum duration of each measure.
      */
-    virtual int CalcMaxMeasureDuration(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int CalcMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -775,7 +902,14 @@ protected:
     void ClearChildren();
 
 private:
+    /**
+     * Method for generating the uuid.
+     */
     void GenerateUuid();
+
+    /**
+     * Initialisation method taking a uuid prefix argument.
+     */
     void Init(std::string);
 
 public:
@@ -785,16 +919,32 @@ public:
      */
     ArrayOfStrAttr m_unsupported;
 
-    Object *m_parent;
-
 protected:
+    /**
+     * A vector of child objects.
+     * Unless SetAsReferenceObject is set or with detached and relinquished, the children are own by it.
+     */
     ArrayOfObjects m_children;
 
 private:
+    /**
+     * A pointer to the parent object;
+     */
+    Object *m_parent;
+
+    /**
+     * Members for storing / generating uuids
+     */
+    ///@{
     std::string m_uuid;
     std::string m_classid;
-    std::string m_svgclass;
-    static unsigned long s_objectCounter;
+    ///@}
+
+    /**
+     * A reference object do not own children.
+     * Destructor will not delete them.
+     */
+    bool m_isReferencObject;
 
     /**
      * Indicates whether the object content is up-to-date or not.
@@ -809,8 +959,10 @@ private:
      * See Object::IterGetFirst, Object::IterGetNext and Object::IterIsNotEnd
      * Values are set when GetFirst is called (which is mandatory)
      */
+    ///@{
     ArrayOfObjects::iterator m_iteratorEnd, m_iteratorCurrent;
     ClassId m_iteratorElementType;
+    ///@}
 
     /**
      * A vector for storing the list of AttClassId (MEI att classes) implemented.
@@ -833,6 +985,11 @@ private:
      * For example, a Artic child in Note for an original @artic
      */
     bool m_isAttribute;
+
+    /**
+     * A static counter for uuid generation.
+     */
+    static unsigned long s_objectCounter;
 };
 
 //----------------------------------------------------------------------------
@@ -883,7 +1040,7 @@ public:
     ListOfObjects *GetList(Object *node);
 
 private:
-    ListOfObjects m_list;
+    mutable ListOfObjects m_list;
     ListOfObjects::iterator m_iteratorCurrent;
 
 protected:
@@ -996,7 +1153,7 @@ public:
         if (m_classId == UNSPECIFIED) {
             return true;
         }
-        return (object->Is() == m_classId);
+        return (object->GetClassId() == m_classId);
     }
 
 private:

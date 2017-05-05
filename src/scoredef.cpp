@@ -28,9 +28,11 @@ namespace vrv {
 // ScoreDefElement
 //----------------------------------------------------------------------------
 
-ScoreDefElement::ScoreDefElement(std::string classid) : Object(classid), ScoreDefInterface()
+ScoreDefElement::ScoreDefElement(std::string classid) : Object(classid), ScoreDefInterface(), AttCommon(), AttTyped()
 {
     RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
@@ -43,6 +45,8 @@ void ScoreDefElement::Reset()
 {
     Object::Reset();
     ScoreDefInterface::Reset();
+    ResetCommon();
+    ResetTyped();
 }
 
 bool ScoreDefElement::HasClefInfo() const
@@ -200,7 +204,7 @@ void ScoreDef::Reset()
 
 void ScoreDef::AddChild(Object *child)
 {
-    if (child->Is() == STAFFGRP) {
+    if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<StaffGrp *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -308,7 +312,7 @@ void ScoreDef::FilterList(ListOfObjects *childList)
     ListOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
-        if ((*iter)->Is() != STAFFDEF) {
+        if (!(*iter)->Is(STAFFDEF)) {
             iter = childList->erase(iter);
         }
         else {
@@ -319,14 +323,13 @@ void ScoreDef::FilterList(ListOfObjects *childList)
 
 StaffDef *ScoreDef::GetStaffDef(int n)
 {
-    StaffDef *staffDef = NULL;
-
     this->ResetList(this);
     ListOfObjects *childList = this->GetList(this);
     ListOfObjects::iterator iter;
 
+    StaffDef *staffDef = NULL;
     for (iter = childList->begin(); iter != childList->end(); ++iter) {
-        if ((*iter)->Is() != STAFFDEF) continue;
+        if (!(*iter)->Is(STAFFDEF)) continue;
         staffDef = dynamic_cast<StaffDef *>(*iter);
         assert(staffDef);
         if (staffDef->GetN() == n) {
@@ -335,6 +338,24 @@ StaffDef *ScoreDef::GetStaffDef(int n)
     }
 
     return staffDef;
+}
+
+std::vector<int> ScoreDef::GetStaffNs()
+{
+    this->ResetList(this);
+    ListOfObjects *childList = this->GetList(this);
+    ListOfObjects::iterator iter;
+
+    std::vector<int> ns;
+    StaffDef *staffDef = NULL;
+    for (iter = childList->begin(); iter != childList->end(); ++iter) {
+        // It should be staffDef only, but double check.
+        if (!(*iter)->Is(STAFFDEF)) continue;
+        staffDef = dynamic_cast<StaffDef *>(*iter);
+        assert(staffDef);
+        ns.push_back(staffDef->GetN());
+    }
+    return ns;
 }
 
 void ScoreDef::SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool applyToAll)
@@ -361,19 +382,21 @@ void ScoreDef::SetDrawingWidth(int drawingWidth)
 //----------------------------------------------------------------------------
 
 StaffGrp::StaffGrp()
-    : Object()
+    : Object("staffgrp-")
     , ObjectListInterface()
     , AttCommon()
     , AttCommonPart()
     , AttLabelsAddl()
     , AttStaffgroupingsym()
     , AttStaffGrpVis()
+    , AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_STAFFGROUPINGSYM);
     RegisterAttClass(ATT_STAFFGRPVIS);
+    RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
@@ -390,14 +413,15 @@ void StaffGrp::Reset()
     ResetLabelsAddl();
     ResetStaffgroupingsym();
     ResetStaffGrpVis();
+    ResetTyped();
 }
 
 void StaffGrp::AddChild(Object *child)
 {
-    if (child->Is() == STAFFDEF) {
+    if (child->Is(STAFFDEF)) {
         assert(dynamic_cast<StaffDef *>(child));
     }
-    else if (child->Is() == STAFFGRP) {
+    else if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<StaffGrp *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -419,7 +443,7 @@ void StaffGrp::FilterList(ListOfObjects *childList)
     ListOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
-        if ((*iter)->Is() != STAFFDEF) {
+        if (!(*iter)->Is(STAFFDEF)) {
             iter = childList->erase(iter);
         }
         else {
@@ -434,8 +458,8 @@ void StaffGrp::FilterList(ListOfObjects *childList)
 
 StaffDef::StaffDef()
     : ScoreDefElement("staffdef-")
-    , AttCommon()
     , AttCommonPart()
+    , AttDistances()
     , AttLabelsAddl()
     , AttNotationtype()
     , AttScalable()
@@ -444,6 +468,7 @@ StaffDef::StaffDef()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
+    RegisterAttClass(ATT_DISTANCES);
     RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_NOTATIONTYPE);
     RegisterAttClass(ATT_SCALABLE);
@@ -463,6 +488,7 @@ void StaffDef::Reset()
     StaffDefDrawingInterface::Reset();
     ResetCommon();
     ResetCommonPart();
+    ResetDistances();
     ResetLabelsAddl();
     ResetNotationtype();
     ResetScalable();
@@ -491,7 +517,7 @@ int ScoreDef::CastOffSystems(FunctorParams *functorParams)
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->m_parent));
+    assert(dynamic_cast<System *>(this->GetParent()));
 
     // Special case where we use the Relinquish method.
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild

@@ -13,19 +13,22 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
 #include "fermata.h"
 #include "hairpin.h"
 #include "harm.h"
+#include "mordent.h"
 #include "octave.h"
 #include "pedal.h"
 #include "slur.h"
+#include "staff.h"
 #include "tempo.h"
-#include "trill.h"
 #include "timeinterface.h"
+#include "trill.h"
+#include "turn.h"
+#include "verticalaligner.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -107,63 +110,75 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
     assert(object);
 
     m_object = object;
-    if (object->Is() == DIR) {
+    if (object->Is(DIR)) {
         Dir *dir = dynamic_cast<Dir *>(object);
         assert(dir);
         // dir below by default
         m_place = dir->HasPlace() ? dir->GetPlace() : STAFFREL_below;
     }
-    else if (object->Is() == DYNAM) {
+    else if (object->Is(DYNAM)) {
         Dynam *dynam = dynamic_cast<Dynam *>(object);
         assert(dynam);
         // dynam below by default
         m_place = dynam->HasPlace() ? dynam->GetPlace() : STAFFREL_below;
     }
-    else if (object->Is() == ENDING) {
+    else if (object->Is(ENDING)) {
         // endings always above;
         m_place = STAFFREL_above;
     }
-    else if (object->Is() == FERMATA) {
+    else if (object->Is(FERMATA)) {
         Fermata *fermata = dynamic_cast<Fermata *>(object);
         assert(fermata);
         // fermata above by default
         m_place = fermata->HasPlace() ? fermata->GetPlace() : STAFFREL_above;
     }
-    else if (object->Is() == HAIRPIN) {
+    else if (object->Is(HAIRPIN)) {
         Hairpin *hairpin = dynamic_cast<Hairpin *>(object);
         assert(hairpin);
         // haripin below by default;
         m_place = hairpin->HasPlace() ? hairpin->GetPlace() : STAFFREL_below;
     }
-    else if (object->Is() == HARM) {
+    else if (object->Is(HARM)) {
         Harm *harm = dynamic_cast<Harm *>(object);
         assert(harm);
         // harm above by default
         m_place = harm->HasPlace() ? harm->GetPlace() : STAFFREL_above;
     }
-    else if (object->Is() == OCTAVE) {
+    else if (object->Is(MORDENT)) {
+        Mordent *mordent = dynamic_cast<Mordent *>(object);
+        assert(mordent);
+        // mordent above by default;
+        m_place = mordent->HasPlace() ? mordent->GetPlace() : STAFFREL_above;
+    }
+    else if (object->Is(OCTAVE)) {
         Octave *octave = dynamic_cast<Octave *>(object);
         assert(octave);
         // octave below by default (won't draw without @dis.place anyway);
         m_place = (octave->GetDisPlace() == PLACE_above) ? STAFFREL_above : STAFFREL_below;
     }
-    else if (object->Is() == PEDAL) {
+    else if (object->Is(PEDAL)) {
         Pedal *pedal = dynamic_cast<Pedal *>(object);
         assert(pedal);
         // pedal below by default
         m_place = pedal->HasPlace() ? pedal->GetPlace() : STAFFREL_below;
     }
-    else if (object->Is() == TEMPO) {
+    else if (object->Is(TEMPO)) {
         Tempo *tempo = dynamic_cast<Tempo *>(object);
         assert(tempo);
         // tempo above by default;
         m_place = tempo->HasPlace() ? tempo->GetPlace() : STAFFREL_above;
     }
-    else if (object->Is() == TRILL) {
+    else if (object->Is(TRILL)) {
         Trill *trill = dynamic_cast<Trill *>(object);
         assert(trill);
         // trill above by default;
         m_place = trill->HasPlace() ? trill->GetPlace() : STAFFREL_above;
+    }
+    else if (object->Is(TURN)) {
+        Turn *turn = dynamic_cast<Turn *>(object);
+        assert(turn);
+        // turn above by default;
+        m_place = turn->HasPlace() ? turn->GetPlace() : STAFFREL_above;
     }
     else {
         m_place = STAFFREL_NONE;
@@ -174,6 +189,10 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
 void FloatingPositioner::ResetPositioner()
 {
     BoundingBox::ResetBoundingBox();
+    ResetCachedDrawingY();
+
+    m_objectX = NULL;
+    m_objectY = NULL;
 
     m_drawingYRel = 0;
     m_cuvrePoints[0] = Point(0, 0);
@@ -188,12 +207,33 @@ void FloatingPositioner::ResetPositioner()
 
 int FloatingPositioner::GetDrawingX() const
 {
-    return m_drawingX;
+    assert(m_objectX);
+    return m_objectX->GetDrawingX();
 }
 
 int FloatingPositioner::GetDrawingY() const
 {
-    return BoundingBox::GetDrawingY() - this->GetDrawingYRel();
+    assert(m_objectY);
+    return (m_objectY->GetDrawingY() - this->GetDrawingYRel());
+}
+
+void FloatingPositioner::ResetCachedDrawingX() const
+{
+    m_cachedDrawingX = VRV_UNSET;
+}
+
+void FloatingPositioner::ResetCachedDrawingY() const
+{
+    m_cachedDrawingY = VRV_UNSET;
+}
+
+void FloatingPositioner::SetObjectXY(Object *objectX, Object *objectY)
+{
+    assert(objectX);
+    assert(objectY);
+
+    m_objectX = objectX;
+    m_objectY = objectY;
 }
 
 void FloatingPositioner::UpdateCurvePosition(
@@ -212,7 +252,7 @@ void FloatingPositioner::UpdateCurvePosition(
 int FloatingPositioner::CalcXMinMaxY(const Point points[4])
 {
     assert(this->GetObject());
-    assert((this->GetObject()->Is() == SLUR) || (this->GetObject()->Is() == TIE));
+    assert(this->GetObject()->Is({ SLUR, TIE }));
     assert(m_cuvreDir != curvature_CURVEDIR_NONE);
 
     if (m_cuvreXMinMaxY != -1) return m_cuvreXMinMaxY;
@@ -231,6 +271,7 @@ int FloatingPositioner::CalcXMinMaxY(const Point points[4])
 
 void FloatingPositioner::SetDrawingYRel(int drawingYRel)
 {
+    ResetCachedDrawingY();
     if (m_place == STAFFREL_above) {
         if (drawingYRel < m_drawingYRel) m_drawingYRel = drawingYRel;
     }
@@ -249,13 +290,15 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
 
     if (horizOverlapingBBox == NULL) {
         if (this->m_place == STAFFREL_above) {
-            yRel = m_contentBB_y1;
-            yRel -= doc->GetBottomMargin(this->m_object->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            yRel = GetContentY1();
+            yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize)
+                / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
         else {
-            yRel = staffAlignment->GetStaffHeight() + m_contentBB_y2;
-            yRel += doc->GetTopMargin(this->m_object->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            yRel = staffAlignment->GetStaffHeight() + GetContentY2();
+            yRel
+                += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
     }
@@ -264,8 +307,11 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         if (curve) {
             assert(curve->m_object);
         }
+        int margin = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize)
+        / PARAM_DENOMINATOR;
+        
         if (this->m_place == STAFFREL_above) {
-            if (curve && ((curve->m_object->Is() == SLUR) || (curve->m_object->Is() == TIE))) {
+            if (curve && curve->m_object->Is({ SLUR, TIE })) {
                 int shift = this->Intersects(curve, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
@@ -273,12 +319,14 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
-            yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + m_contentBB_y1;
-            yRel -= doc->GetBottomMargin(this->m_object->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
-            this->SetDrawingYRel(yRel);
+            if (this->VerticalContentOverlap(horizOverlapingBBox, margin))
+            {
+                yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
+                this->SetDrawingYRel(yRel);
+            }
         }
         else {
-            if (curve && ((curve->m_object->Is() == SLUR) || (curve->m_object->Is() == TIE))) {
+            if (curve && curve->m_object->Is({ SLUR, TIE })) {
                 int shift = this->Intersects(curve, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
@@ -286,10 +334,11 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
-            yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
-                + m_contentBB_y2;
-            yRel += doc->GetTopMargin(this->m_object->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
-            this->SetDrawingYRel(yRel);
+            if (this->VerticalContentOverlap(horizOverlapingBBox, margin))
+            {
+                yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight() + GetContentY2() + margin;
+                this->SetDrawingYRel(yRel);
+            }
         }
     }
     return true;

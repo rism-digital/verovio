@@ -1,4 +1,4 @@
-<symbol id="E221" viewBox="0 0 2048 2048" overflow="inherit">
+<symbol id="E221" viewBox="0 0 1000 1000" overflow="inherit">
    <path transform="scale(1,-1)"
-         d="M305 2v-256l-614 -129v256zM305 127l-614 -127v256l614 127v-256z"/>
+         d="M149 62l-300 -62v125l300 62v-125zM149 1v-125l-300 -63v125z"/>
 </symbol>

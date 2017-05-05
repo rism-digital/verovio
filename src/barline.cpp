@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
+#include "horizontalaligner.h"
 
 namespace vrv {
 
@@ -38,10 +38,10 @@ void BarLine::Reset()
     ResetBarLineLog();
 }
 
-void BarLine::SetAlignment(vrv::Alignment *alignment)
+bool BarLine::SetAlignment(vrv::Alignment *alignment)
 {
     m_alignment = alignment;
-    m_alignment->AddLayerElementRef(this);
+    return (m_alignment->AddLayerElementRef(this));
 }
 
 bool BarLine::HasRepetitionDots() const

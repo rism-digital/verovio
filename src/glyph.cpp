@@ -98,12 +98,44 @@ void Glyph::SetBoundingBox(double x, double y, double w, double h)
     m_height = (int)(10.0 * h);
 }
 
-void Glyph::GetBoundingBox(int *x, int *y, int *w, int *h)
+void Glyph::GetBoundingBox(int &x, int &y, int &w, int &h)
 {
-    (*x) = m_x;
-    (*y) = m_y;
-    (*w) = m_width;
-    (*h) = m_height;
+    x = m_x;
+    y = m_y;
+    w = m_width;
+    h = m_height;
+}
+
+void Glyph::SetAnchor(std::string anchorStr, double x, double y)
+{
+    SMuFLGlyphAnchor anchorId;
+    if (anchorStr == "stemDownNW")
+        anchorId = SMUFL_stemDownNW;
+    else if (anchorStr == "stemUpSE")
+        anchorId = SMUFL_stemUpSE;
+    else if (anchorStr == "cutOutNE")
+        anchorId = SMUFL_cutOutNE;
+    else if (anchorStr == "cutOutNW")
+        anchorId = SMUFL_cutOutNW;
+    else if (anchorStr == "cutOutSE")
+        anchorId = SMUFL_cutOutSE;
+    else if (anchorStr == "cutOutSW")
+        anchorId = SMUFL_cutOutSW;
+    // Silently ignore unused anchors
+    else
+        return;
+    // Anchor points are given as staff spaces (upm / 4)
+    m_anchors[anchorId] = Point(x * this->GetUnitsPerEm() / 4, y * this->GetUnitsPerEm() / 4);
+}
+
+bool Glyph::HasAnchor(SMuFLGlyphAnchor anchor)
+{
+    return (m_anchors.count(anchor) == 1);
+}
+
+const Point *Glyph::GetAnchor(SMuFLGlyphAnchor anchor)
+{
+    return &m_anchors[anchor];
 }
 
 } // namespace vrv

@@ -48,6 +48,9 @@ verovio.vrvToolkit.loadData = Module.cwrap('vrvToolkit_loadData', 'number', ['nu
 // void redoLayout(Toolkit *ic)
 verovio.vrvToolkit.redoLayout = Module.cwrap('vrvToolkit_redoLayout', null, ['number']);
 
+// void redoPagePitchPosLayout(Toolkit *ic)
+verovio.vrvToolkit.redoPagePitchPosLayout = Module.cwrap('vrvToolkit_redoPagePitchPosLayout', null, ['number']);
+
 // char *renderData(Toolkit *ic, const char *data, const char *options )
 verovio.vrvToolkit.renderData = Module.cwrap('vrvToolkit_renderData', 'string', ['number', 'string', 'string']);
 
@@ -133,6 +136,10 @@ verovio.toolkit.prototype.redoLayout = function () {
 	verovio.vrvToolkit.redoLayout(this.ptr);
 }
 
+verovio.toolkit.prototype.redoPagePitchPosLayout = function () {
+	verovio.vrvToolkit.redoPagePitchPosLayout(this.ptr);
+}
+
 verovio.toolkit.prototype.renderData = function (data, options) {
 	if (typeof options === 'string') {
 		console.warn("DEPRECATION WARNING: Passing a String to renderData will be removed in next version of Verovio. Pass a JSON Object instead.");
@@ -172,3 +179,14 @@ verovio.toolkit.prototype.getElementAttr = function (xmlId) {
 };
 
 /***************************************************************************************************************************/
+
+// If the window object is defined (if we are not within a WebWorker)...
+if ((typeof window !== "undefined") && (window.addEventListener))
+{
+	// Add a listener that will delete the object (if necessary) when the page is closed
+	window.addEventListener ("unload", function () {
+		if (verovio.ptr != 0) {
+			verovio.vrvToolkit.destructor( verovio.ptr );
+		}
+	});
+}

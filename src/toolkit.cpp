@@ -28,6 +28,8 @@
 #include "svgdevicecontext.h"
 #include "vrv.h"
 
+#include "functorparams.h"
+
 //----------------------------------------------------------------------------
 
 #include "MidiFile.h"
@@ -188,7 +190,10 @@ bool Toolkit::SetOutputFormat(std::string const &outformat)
     else if (outformat == "mei") {
         m_outformat = MEI;
     }
-    else {
+    else if (outformat == "midi") {
+        m_outformat = MIDI;
+    }
+    else if (outformat != "svg") {
         LogError("Output format can only be: mei, humdrum, midi or svg");
         return false;
     }
@@ -248,7 +253,7 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
 #else
     FileFormat musicxmlDefault = MUSICXML;
 #endif
-    
+
     size_t searchLimit = 600;
     if (data.size() == 0) {
         return UNKNOWN;
@@ -316,8 +321,9 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
         return UNKNOWN;
     }
 
-    // Assume that the input is DARMS if other input types were not detected.
-    return DARMS;
+    // Assume that the input is MEI if other input types were not detected.
+    // This means that DARMS cannot be auto detected.
+    return MEI;
 }
 
 bool Toolkit::SetFont(std::string const &font)
@@ -432,7 +438,7 @@ bool Toolkit::LoadData(const std::string &data)
         }
 
         SetHumdrumBuffer(tempinput->GetHumdrumString().c_str());
-        
+
         if (GetOutputFormat() == HUMDRUM) {
             return true;
         }
@@ -766,6 +772,10 @@ void Toolkit::ResetLogBuffer()
 
 void Toolkit::RedoLayout()
 {
+    if (m_doc.GetType() == Transcription) {
+        return;
+    }
+
     m_doc.SetPageHeight(this->GetPageHeight());
     m_doc.SetPageWidth(this->GetPageWidth());
     m_doc.SetPageRightMar(this->GetBorder());
@@ -778,6 +788,18 @@ void Toolkit::RedoLayout()
     m_doc.CastOffDoc();
 }
 
+void Toolkit::RedoPagePitchPosLayout()
+{
+    Page *page = m_doc.GetDrawingPage();
+
+    if (!page) {
+        LogError("No page to re-layout");
+        return;
+    }
+
+    page->LayOutPitchPos();
+}
+
 std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
 {
     // Page number is one-based - correct it to 0-based first
@@ -788,14 +810,10 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
 
     // Adjusting page width and height according to the options
     int width = m_pageWidth;
-    if (m_noLayout) {
-        width = m_doc.GetAdjustedDrawingPageWidth();
-    }
-
     int height = m_pageHeight;
-    if (m_adjustPageHeight || m_noLayout) {
-        height = m_doc.GetAdjustedDrawingPageHeight();
-    }
+
+    if (m_noLayout) width = m_doc.GetAdjustedDrawingPageWidth();
+    if (m_adjustPageHeight || m_noLayout) height = m_doc.GetAdjustedDrawingPageHeight();
 
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
@@ -939,7 +957,7 @@ double Toolkit::GetTimeForElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindChildByUuid(xmlId);
     double timeofElement = 0.0;
-    if (element->Is() == NOTE) {
+    if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
         timeofElement = note->m_playingOnset * 1000 / 120;
@@ -996,7 +1014,7 @@ void Toolkit::SetHumdrumBuffer(const char *data)
         strcpy(m_humdrumBuffer, output.c_str());
     }
     else {
-        int size = strlen(data) + 1;
+        int size = (int)strlen(data) + 1;
         m_humdrumBuffer = (char *)malloc(size);
         if (!m_humdrumBuffer) {
             // something went wrong
@@ -1006,7 +1024,7 @@ void Toolkit::SetHumdrumBuffer(const char *data)
     }
 
 #else
-    int size = strlen(data) + 1;
+    size_t size = (int)strlen(data) + 1;
     m_humdrumBuffer = (char *)malloc(size);
     if (!m_humdrumBuffer) {
         // something went wrong
@@ -1039,8 +1057,15 @@ const char *Toolkit::GetHumdrumBuffer()
 bool Toolkit::Drag(std::string elementId, int x, int y)
 {
     if (!m_doc.GetDrawingPage()) return false;
+
+    // Try to get the element on the current drawing page
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
-    if (element->Is() == NOTE) {
+
+    // If it wasn't there, go back up to the whole doc
+    if (!element) {
+        element = m_doc.FindChildByUuid(elementId);
+    }
+    if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
         Layer *layer = dynamic_cast<Layer *>(note->GetFirstParent(LAYER));
@@ -1094,6 +1119,7 @@ bool Toolkit::Set(std::string elementId, std::string attrType, std::string attrV
     if (!m_doc.GetDrawingPage()) return false;
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
     if (Att::SetCmn(element, attrType, attrValue)) return true;
+    if (Att::SetCmnornaments(element, attrType, attrValue)) return true;
     if (Att::SetCritapp(element, attrType, attrValue)) return true;
     if (Att::SetExternalsymbols(element, attrType, attrValue)) return true;
     if (Att::SetMei(element, attrType, attrValue)) return true;
