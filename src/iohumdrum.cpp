@@ -483,13 +483,13 @@ bool HumdrumInput::convertHumdrum(void)
         else if (it->getDataType().compare(0, 7, "**cdata") == 0) {
             m_harm = true;
         }
-		if (it->isDataType("**fb")) {
-			m_fb = true;
-		}
-		if (it->isDataType("**Bnum")) {
-			// older name
-			m_fb = true;
-		}
+        if (it->isDataType("**fb")) {
+            m_fb = true;
+        }
+        if (it->isDataType("**Bnum")) {
+            // older name
+            m_fb = true;
+        }
     }
 
     if (kernstarts.size() == 0) {
@@ -1848,25 +1848,27 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
                 continue;
             }
             Harm *harm = new Harm;
-            Text *text = new Text;
+            Fb *fb = new Fb;
             string datatype = token->getDataType();
             harm->SetPlace(STAFFREL_below);
+            harm->AddChild(fb);
 
             std::vector<std::string> content = cleanFBString(*token);
 
-			for (int k=0; k<(int)content.size(); k++) {
+            for (int k = 0; k < (int)content.size(); k++) {
+                F *f = new F();
+                Text *text = new Text();
+                text->SetText(UTF8to16(content[k]));
+                f->AddChild(text);
+                fb->AddChild(f);
+            }
 
-            	text->SetText(UTF8to16(content[k]));
-            	harm->AddChild(text);
-
-			}
-
-           	m_measure->AddChild(harm);
-          	int staffindex = m_rkern[track];
-           	hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
-           	harm->SetTstamp(tstamp.getFloat());
-           	setStaff(harm, staffindex + 1);
-           	setLocationId(harm, token);
+            m_measure->AddChild(harm);
+            int staffindex = m_rkern[track];
+            hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+            harm->SetTstamp(tstamp.getFloat());
+            setStaff(harm, staffindex + 1);
+            setLocationId(harm, token);
         }
     }
 }
@@ -1928,7 +1930,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
 vector<string> HumdrumInput::cleanFBString(const std::string &content)
 {
 
-	vector<string> output(1);
+    vector<string> output(1);
 
     for (int i = 0; i < (int)content.size(); i++) {
         if (content[i] == ' ') {
@@ -1940,7 +1942,7 @@ vector<string> HumdrumInput::cleanFBString(const std::string &content)
         }
         else if (content[i] == '#') {
             output.back() += "\u266F"; // unicode sharp
-		}
+        }
         else if (content[i] == 'n') {
             output.back() += "\u266E"; // unicode natural
         }
