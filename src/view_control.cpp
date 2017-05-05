@@ -1634,20 +1634,20 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, int x, int y)
 {
     assert(dc);
     assert(fb);
-    
+
     dc->StartGraphic(fb, "", fb->GetUuid());
 
     int offset = 0;
-    
+
     FontInfo *fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
     int descender = -m_doc->GetTextGlyphDescender(L'q', fontDim, false);
     int height = m_doc->GetTextGlyphHeight(L'1', fontDim, false);
-    
+
     fontDim->SetPointSize(m_doc->GetDrawingLyricFont((staff)->m_drawingStaffSize)->GetPointSize());
-    
+
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(fontDim);
-    
+
     Object *current;
     for (current = fb->GetFirst(); current; current = fb->GetNext()) {
         if (current->Is(FIGURE)) {
@@ -1660,13 +1660,13 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, int x, int y)
         }
         offset -= (descender + height);
     }
-    
+
     dc->ResetFont();
     dc->ResetBrush();
-    
+
     dc->EndGraphic(fb, this);
 }
-    
+
 void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, System *system)
 {
     assert(dc);
@@ -1752,27 +1752,25 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), harm, harm->GetStart(), *staffIter);
 
         int y = harm->GetDrawingY();
-        
+
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
             DrawFb(dc, *staffIter, dynamic_cast<Fb *>(harm->GetFirst()), x, y);
-        } else {
+        }
+        else {
             dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
-            
+
             dc->SetBrush(m_currentColour, AxSOLID);
             dc->SetFont(&dirTxt);
-            
+
             dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
             DrawTextChildren(dc, harm, x, y, setX, setY);
             dc->EndText();
-            
+
             dc->ResetFont();
             dc->ResetBrush();
-            
         }
-        
-
     }
-    
+
     dc->EndGraphic(harm, this);
 }
 
