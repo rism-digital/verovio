@@ -14,10 +14,10 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "fb.h"
 #include "functorparams.h"
 #include "text.h"
 #include "verticalaligner.h"
-#include "fb.h"
 #include "vrv.h"
 
 namespace vrv {

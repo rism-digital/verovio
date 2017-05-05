@@ -173,7 +173,7 @@ public:
      * See Object::ResetHorizontalAlignment
      */
     virtual int ResetVerticalAlignment(FunctorParams *functorParams);
-    
+
     /**
      * See Object::ApplyPPUFactor
      */
@@ -200,7 +200,7 @@ public:
      * See Object::AdjustXPos
      */
     virtual int AdjustXPos(FunctorParams *functorParams);
-    
+
     /**
      * See Object::AdjustXRelForTranscription
      */

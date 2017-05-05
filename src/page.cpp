@@ -134,7 +134,7 @@ void Page::LayOutTranscription(bool force)
     CalcDotsParams calcDotsParams(doc);
     Functor calcDots(&Object::CalcDots);
     this->Process(&calcDots, &calcDotsParams);
-    
+
     // Render it for filling the bounding box
     View view;
     view.SetDoc(doc);
@@ -145,11 +145,11 @@ void Page::LayOutTranscription(bool force)
 
     Functor adjustXRelForTranscription(&Object::AdjustXRelForTranscription);
     this->Process(&adjustXRelForTranscription, NULL);
-    
+
     FunctorDocParams calcLegerLinesParams(doc);
     Functor calcLedgerLines(&Object::CalcLedgerLines);
     this->Process(&calcLedgerLines, &calcLegerLinesParams);
-    
+
     m_layoutDone = true;
 }
 
@@ -449,30 +449,28 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
         }
     }
 }
-    
+
 void Page::UpgradePageBasedMEI(Doc *doc)
 {
     // Once we have the GetPPU in Page through LibMEI, call this from Doc::SetDrawingPage and
     // use m_unit instead of DEFAULT_UNIT - For the upgraded call Page->SetPPU(12.5);
-    
+
     m_PPUFactor = 25.0 / 2.0 / DEFAULT_UNIT;
-    //LogDebug("PPUFactor: %f", m_PPUFactor);
+    // LogDebug("PPUFactor: %f", m_PPUFactor);
 }
 
-    
-    
 int Page::ApplyPPUFactor(FunctorParams *functorParams)
 {
     ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
     assert(params);
-    
+
     params->m_page = this;
     this->m_pageWidth /= params->m_page->GetPPUFactor();
     this->m_pageHeight /= params->m_page->GetPPUFactor();
     this->m_pageTopMar /= params->m_page->GetPPUFactor();
     this->m_pageLeftMar /= params->m_page->GetPPUFactor();
     this->m_pageRightMar /= params->m_page->GetPPUFactor();
-        
+
     return FUNCTOR_CONTINUE;
 }
 

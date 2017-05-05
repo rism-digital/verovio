@@ -236,17 +236,16 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
         if (!(*iter)->GetObject()->Is(params->m_classId)) continue;
 
         // Skip if no content bounding box is available
-        if (!(*iter)->HasContentBB())
-            continue;
+        if (!(*iter)->HasContentBB()) continue;
 
         // for slurs and ties we do not need to adjust them, only add them to the overflow boxes if required
         if ((params->m_classId == SLUR) || (params->m_classId == TIE)) {
 
             bool skipAbove = false;
             bool skipBelow = false;
-            
+
             if ((*iter)->GetObject()->Is(SLUR)) {
-                Slur *slur = dynamic_cast<Slur*>((*iter)->GetObject());
+                Slur *slur = dynamic_cast<Slur *>((*iter)->GetObject());
                 assert(slur);
                 slur->GetCrossStaffOverflows(this, (*iter)->m_cuvreDir, skipAbove, skipBelow);
             }

@@ -1630,39 +1630,47 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     dc->EndGraphic(dynam, this);
 }
 
-void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y)
+void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, int x, int y, bool &setX, bool &setY)
 {
-    assert(element);
-    
-    int offset = 0;
-    
+    assert(dc);
+    assert(fb);
+
+    dc->StartGraphic(fb, "", fb->GetUuid());
+
     FontInfo *fontDim = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
     int descender = -m_doc->GetTextGlyphDescender(L'q', fontDim, false);
     int height = m_doc->GetTextGlyphHeight(L'1', fontDim, false);
-    
+
     fontDim->SetPointSize(m_doc->GetDrawingLyricFont((staff)->m_drawingStaffSize)->GetPointSize());
-    
+
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(fontDim);
-    
+
     Object *current;
-    for (current = element->GetFirst(); current; current = element->GetNext()) {
+    for (current = fb->GetFirst(); current; current = fb->GetNext()) {
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
         if (current->Is(FIGURE)) {
-            F *figure = dynamic_cast<F *>(current);
-            assert(figure);
-            DrawF(dc, figure, x, y + offset);
+            // dynamic_cast assert in DrawF
+            DrawF(dc, dynamic_cast<F *>(current), x, y, setX, setY);
+        }
+        else if (current->IsEditorialElement()) {
+            // cast to EditorialElement check in DrawLayerEditorialElement
+            DrawFbEditorialElement(dc, dynamic_cast<EditorialElement *>(current), x, y, setX, setY);
         }
         else {
             assert(false);
         }
-        offset -= (descender + height);
+        dc->EndText();
+
+        y -= (descender + height);
     }
-    
+
     dc->ResetFont();
     dc->ResetBrush();
-    
+
+    dc->EndGraphic(fb, this);
 }
-    
+
 void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, System *system)
 {
     assert(dc);
@@ -1748,27 +1756,25 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), harm, harm->GetStart(), *staffIter);
 
         int y = harm->GetDrawingY();
-        
+
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
-            DrawFb(dc, *staffIter, dynamic_cast<Fb *>(harm->GetFirst()), x, y);
-        } else {
+            DrawFb(dc, *staffIter, dynamic_cast<Fb *>(harm->GetFirst()), x, y, setX, setY);
+        }
+        else {
             dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
-            
+
             dc->SetBrush(m_currentColour, AxSOLID);
             dc->SetFont(&dirTxt);
-            
+
             dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
             DrawTextChildren(dc, harm, x, y, setX, setY);
             dc->EndText();
-            
+
             dc->ResetFont();
             dc->ResetBrush();
-            
         }
-        
-
     }
-    
+
     dc->EndGraphic(harm, this);
 }
 

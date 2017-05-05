@@ -137,7 +137,7 @@ public:
      * Defined in view_page.cpp
      */
     void DrawCurrentPage(DeviceContext *dc, bool background = true);
-    
+
     /**
      * Return the pixel per unit factor of the current page (if any, 1.0 otherwise)
      */
@@ -193,6 +193,8 @@ protected:
     void DrawStaffChildren(DeviceContext *dc, Object *parent, Staff *staff, Measure *measure);
     void DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, Staff *staff, Measure *measure);
     void DrawTextChildren(DeviceContext *dc, Object *parent, int x, int y, bool &setX, bool &setY);
+    void DrawFbChildren(DeviceContext *dc, Object *parent, int x, int y, bool &setX, bool &setY);
+
     ///@}
 
     /**
@@ -206,6 +208,7 @@ protected:
     void DrawLayerEditorialElement(
         DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY);
+    void DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY);
     ///@}
 
     /**
@@ -288,11 +291,11 @@ protected:
      * Defined in view_text.cpp
      */
     ///@{
-    void DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y);
-    void DrawF(DeviceContext *dc, F *figure, int x, int y);
+    void DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y, bool &setX, bool &setY);
+    void DrawF(DeviceContext *dc, F *figure, int x, int y, bool &setX, bool &setY);
 
     ///@}
-    
+
     /**
      * @name Methods for drawing LayerElement child classes.
      * They are base drawing methods that are called directly from DrawLayerElement

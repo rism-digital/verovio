@@ -28,12 +28,8 @@ namespace vrv {
 #define VERSION_REVISION 14
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
-    
-enum MEIVersion {
-    MEI_UNDEFINED = 0,
-    MEI_2013,
-    MEI_3_0_0
-};
+
+enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0 };
 
 //----------------------------------------------------------------------------
 // Object defines
@@ -57,6 +53,7 @@ enum ClassId {
     ALIGNMENT_REFERENCE,
     CLEF_ATTR,
     DOC,
+    FB,
     GRACE_ALIGNER,
     KEYSIG_ATTR,
     LAYER,
@@ -135,8 +132,6 @@ enum ClassId {
     CUSTOS,
     DOT,
     DOTS,
-    FB,
-    FIGURE,
     FLAG,
     FTREM,
     KEYSIG,
@@ -165,6 +160,7 @@ enum ClassId {
     SCOREDEF_ELEMENT_max,
     // Ids for TextElement child classes
     TEXT_ELEMENT,
+    FIGURE,
     REND,
     TEXT,
     TEXT_ELEMENT_max,
@@ -312,7 +308,8 @@ enum EditorialLevel {
     EDITORIAL_STAFF,
     EDITORIAL_LAYER,
     EDITORIAL_NOTE,
-    EDITORIAL_TEXT
+    EDITORIAL_TEXT,
+    EDITORIAL_FB
 };
 
 //----------------------------------------------------------------------------

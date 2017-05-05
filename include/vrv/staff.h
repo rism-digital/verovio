@@ -113,7 +113,7 @@ public:
      * See Object::ResetVerticalAlignment
      */
     virtual int ResetVerticalAlignment(FunctorParams *functorParams);
-    
+
     /**
      * See Object::ApplyPPUFactor
      */

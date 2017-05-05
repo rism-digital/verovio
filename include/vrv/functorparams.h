@@ -456,7 +456,7 @@ public:
     Functor *m_functorEnd;
     Doc *m_doc;
 };
-    
+
 //----------------------------------------------------------------------------
 // ApplyPPUFactorParams
 //----------------------------------------------------------------------------
@@ -467,10 +467,7 @@ public:
 
 class ApplyPPUFactorParams : public FunctorParams {
 public:
-    ApplyPPUFactorParams()
-    {
-        m_page = NULL;
-    }
+    ApplyPPUFactorParams() { m_page = NULL; }
     Page *m_page;
 };
 
