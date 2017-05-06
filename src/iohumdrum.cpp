@@ -2669,6 +2669,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
                 note->SetStemLen(0);
             }
+            if (m_signifiers.cuesize && layerdata[i]->find(m_signifiers.cuesize) != string::npos) {
+                note->SetSize(SIZE_cue);
+            }
             addArticulations(note, layerdata[i]);
             addOrnaments(note, layerdata[i]);
             processDirection(layerdata[i], staffindex);
@@ -3163,6 +3166,22 @@ void HumdrumInput::processChordSignifiers(Chord *chord, hum::HTp token, int staf
 {
     if (m_signifiers.nostem && token->find(m_signifiers.nostem) != string::npos) {
         chord->SetStemLen(0);
+    }
+
+    if (m_signifiers.cuesize) {
+        int tcount = 1;
+        int cuecount = 0;
+        for (int i = 0; i < (int)token->size(); i++) {
+            if ((*token)[i] == m_signifiers.cuesize) {
+                cuecount++;
+            }
+            if ((*token)[i] == ' ') {
+                tcount++;
+            }
+        }
+        if ((cuecount > 0) && (tcount == cuecount)) {
+            chord->SetSize(SIZE_cue);
+        }
     }
 }
 
@@ -5425,6 +5444,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
         int index = (int)m_measures.size() - 1;
         token->setValue("MEI", "measureIndex", index);
     }
+
+    // check for cue-size signifier:
+    if (m_signifiers.cuesize && tstring.find(m_signifiers.cuesize) != string::npos) {
+        note->SetSize(SIZE_cue);
+    }
 }
 
 //////////////////////////////
@@ -7241,23 +7265,25 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
         // !!!RDF**kern: i = no stem
         if (value.find("no stem", equals) != string::npos) {
             m_signifiers.nostem = signifier;
-            continue;
+        }
+
+        // cue-sized note:
+        // !!!RDF**kern: i = cue size
+        if (value.find("cue size", equals) != string::npos) {
+            m_signifiers.cuesize = signifier;
         }
 
         // slur directions
         if (value.find("above", equals) != string::npos) {
             m_signifiers.above = signifier;
-            continue;
         }
         if (value.find("below", equals) != string::npos) {
             m_signifiers.below = signifier;
-            continue;
         }
 
         // editorial accidentals:
         if (value.find("editorial accidental", equals) != string::npos) {
             m_signifiers.editacc = signifier;
-            continue;
         }
 
         // colored notes

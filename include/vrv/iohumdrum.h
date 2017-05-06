@@ -176,6 +176,7 @@ public:
 
     // boolean switches:
     char nostem = '\0'; // !!!RDF**kern: i = no stem
+    char cuesize = '\0'; // !!!RDF**kern: i = cue size
     char editacc = '\0'; // !!!RDF**kern: i = editorial accidental
     char below = '\0'; // !!!RDF**kern: i = below (previous signifier is "below")
     char above = '\0'; // !!!RDF**kern: i = above (previous signifier is "above")
