@@ -1863,7 +1863,8 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
                 fb->AddChild(f);
                 if (content.size() == 1) {
                     setLocationId(f, token);
-                } else {
+                }
+                else {
                     setLocationIdNSuffix(f, token, k + 1);
                 }
             }
@@ -5268,10 +5269,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
         case 6: note->SetPname(PITCHNAME_b); break;
     }
 
-    bool editorial = false;
+    bool cautionaryQ = false;
+    bool editorialQ = false;
     if (m_signifiers.editacc) {
         if (token->find(m_signifiers.editacc) != string::npos) {
-            editorial = true;
+            editorialQ = true;
         }
     }
 
@@ -5282,17 +5284,18 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     appendElement(note, accid);
     setLocationId(accid, token, subtoken);
 
-    if (!editorial) {
+    if (!editorialQ) {
         // don't mark cautionary accidentals if the note has
         // an editorial accidental.
         if (token->hasCautionaryAccidental(stindex)) {
             addCautionaryAccidental(accid, token, accidCount);
+            cautionaryQ = true;
             showInAccidGes = false;
             showInAccid = false;
         }
     }
 
-    if (!editorial) {
+    if (!editorialQ) {
         if (showInAccid) {
             switch (accidCount) {
                 // case +3: accid->SetAccid(ACCIDENTAL_EXPLICIT_ts); break;
@@ -5326,6 +5329,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
             case -1: accid->SetAccidGes(ACCIDENTAL_IMPLICIT_f); break;
             case -2: accid->SetAccidGes(ACCIDENTAL_IMPLICIT_ff); break;
         }
+    }
+
+    if (!(editorialQ || cautionaryQ)) {
+        // No need for sub-element so make them attributes of the note:
+        accid->IsAttribute(true);
     }
 
     if (!chordQ) {
