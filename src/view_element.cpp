@@ -307,6 +307,11 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
         xCorr = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, drawingCueSize) / 2;
         // The position of the next glyph (and for correcting the baseline if necessary
         int glyphHeight = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize);
+        
+        // Center the glyh if necessary
+        if (Artic::IsCentered(*articIter)) {
+            y += (articPart->GetPlace() == STAFFREL_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
+        }
 
         // Adjust the baseline for glyph above the baseline in SMuFL
         baselineCorr = 0;
