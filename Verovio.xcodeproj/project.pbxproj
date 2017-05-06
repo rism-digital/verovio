@@ -399,7 +399,6 @@
 		8F7DD0551EAF3682001B072A /* fb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DD0531EAF3682001B072A /* fb.cpp */; };
 		8F7DD0561EAF3682001B072A /* fb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DD0531EAF3682001B072A /* fb.cpp */; };
 		8F7DD0571EAF3682001B072A /* fb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F7DD0531EAF3682001B072A /* fb.cpp */; };
-		8F7DD0581EAF3682001B072A /* fb.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F7DD0541EAF3682001B072A /* fb.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -491,6 +490,7 @@
 		4D22C41818890E6100D0831F /* mrest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mrest.cpp; path = src/mrest.cpp; sourceTree = "<group>"; };
 		4D22C41B18890E9900D0831F /* mrest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mrest.h; path = include/vrv/mrest.h; sourceTree = "<group>"; };
 		4D2E09B118A92371001EEEB8 /* emscripten_main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = emscripten_main.cpp; path = emscripten/emscripten_main.cpp; sourceTree = SOURCE_ROOT; };
+		4D36C21C1EBCE14300A6DD1B /* fb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fb.h; path = include/vrv/fb.h; sourceTree = "<group>"; };
 		4D3FF8D919BADD7A00B105B5 /* atts_pagebased.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_pagebased.cpp; path = libmei/atts_pagebased.cpp; sourceTree = "<group>"; };
 		4D3FF8DA19BADD7A00B105B5 /* atts_pagebased.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_pagebased.h; path = libmei/atts_pagebased.h; sourceTree = "<group>"; };
 		4D4220FF199805E400963292 /* att.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = att.h; path = include/vrv/att.h; sourceTree = "<group>"; };
@@ -696,7 +696,6 @@
 		8F59293218854BF800FE51AD /* vrv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrv.h; path = include/vrv/vrv.h; sourceTree = "<group>"; };
 		8F59293318854BF800FE51AD /* vrvdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrvdef.h; path = include/vrv/vrvdef.h; sourceTree = "<group>"; };
 		8F7DD0531EAF3682001B072A /* fb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fb.cpp; path = src/fb.cpp; sourceTree = "<group>"; };
-		8F7DD0541EAF3682001B072A /* fb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fb.h; path = src/fb.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -819,7 +818,7 @@
 				4DA144891C2AB28700CB7CEE /* textelement.cpp */,
 				4DA1448C1C2AB29400CB7CEE /* textelement.h */,
 				8F7DD0531EAF3682001B072A /* fb.cpp */,
-				8F7DD0541EAF3682001B072A /* fb.h */,
+				4D36C21C1EBCE14300A6DD1B /* fb.h */,
 			);
 			name = textelements;
 			sourceTree = "<group>";
@@ -1157,7 +1156,6 @@
 				4DF9D29C1C1B3F0A0069E8C8 /* attconverter.h in Headers */,
 				8F59293918854BF800FE51AD /* clef.h in Headers */,
 				4D1D733E1A1D08CD001E08F6 /* glyph.h in Headers */,
-				8F7DD0581EAF3682001B072A /* fb.h in Headers */,
 				8F59293A18854BF800FE51AD /* devicecontext.h in Headers */,
 				8F59293B18854BF800FE51AD /* doc.h in Headers */,
 				8F59293C18854BF800FE51AD /* durationinterface.h in Headers */,
