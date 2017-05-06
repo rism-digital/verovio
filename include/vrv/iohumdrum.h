@@ -298,6 +298,7 @@ protected:
     void addFiguredBassForMeasure(int startline, int endline);
     void processDynamics(hum::HTp token, int staffindex);
     void processDirection(hum::HTp token, int staffindex);
+    void processChordSignifiers(Chord *chord, hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum frac = 0);
     hum::HumNum getMeasureEndTstamp(int staffindex);
     hum::HTp getPreviousDataToken(hum::HTp token);

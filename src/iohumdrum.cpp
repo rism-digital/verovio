@@ -2604,6 +2604,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             addArticulations(chord, layerdata[i]);
             addOrnaments(chord, layerdata[i]);
             processDirection(layerdata[i], staffindex);
+            processChordSignifiers(chord, layerdata[i], staffindex);
         }
         else if (layerdata[i]->isRest()) {
             if ((layerdata[i]->find("yy") != string::npos) && m_signifiers.irest_color.empty()
@@ -3150,6 +3151,18 @@ void HumdrumInput::addSpace(std::vector<string> &elements, std::vector<void *> &
             appendElement(elements, pointers, space);
             duration -= setDuration(space, duration);
         }
+    }
+}
+
+//////////////////////////////
+//
+// processChordSignifiers --
+//
+
+void HumdrumInput::processChordSignifiers(Chord *chord, hum::HTp token, int staffindex)
+{
+    if (m_signifiers.nostem && token->find(m_signifiers.nostem) != string::npos) {
+        chord->SetStemLen(0);
     }
 }
 
