@@ -1002,6 +1002,7 @@ void MeiOutput::WriteMeiBarLine(pugi::xml_node currentNode, BarLine *barLine)
 
     WriteLayerElement(currentNode, barLine);
     barLine->WriteBarLineLog(currentNode);
+    barLine->WriteColor(currentNode);
 }
 
 void MeiOutput::WriteMeiBeam(pugi::xml_node currentNode, Beam *beam)
@@ -2839,6 +2840,7 @@ bool MeiInput::ReadMeiBarLine(Object *parent, pugi::xml_node barLine)
     ReadLayerElement(barLine, vrvBarLine);
 
     vrvBarLine->ReadBarLineLog(barLine);
+    vrvBarLine->ReadColor(barLine);
 
     parent->AddChild(vrvBarLine);
     return true;
