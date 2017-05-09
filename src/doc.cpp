@@ -21,6 +21,7 @@
 #include "glyph.h"
 #include "keysig.h"
 #include "layer.h"
+#include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
@@ -108,7 +109,7 @@ void Doc::AddChild(Object *child)
 {
     assert(!m_scoreBuffer); // Children cannot be added if a score buffer was created;
 
-    if (child->Is() == PAGE) {
+    if (child->Is(PAGE)) {
         assert(dynamic_cast<Page *>(child));
     }
     else {
@@ -135,6 +136,42 @@ Score *Doc::CreateScoreBuffer()
 void Doc::Refresh()
 {
     RefreshViews();
+}
+
+bool Doc::GenerateDocumentScoreDef()
+{
+    Measure *measure = dynamic_cast<Measure *>(this->FindChildByType(MEASURE));
+    if (!measure) {
+        LogError("No measure found for generating a scoreDef");
+        return false;
+    }
+
+    ArrayOfObjects staves;
+    AttComparison matchType(STAFF);
+    measure->FindAllChildByAttComparison(&staves, &matchType);
+
+    if (staves.empty()) {
+        LogError("No staff found for generating a scoreDef");
+        return false;
+    }
+
+    m_scoreDef.Reset();
+    StaffGrp *staffGrp = new StaffGrp();
+    ArrayOfObjects::iterator iter;
+    for (iter = staves.begin(); iter != staves.end(); iter++) {
+        Staff *staff = dynamic_cast<Staff *>(*iter);
+        assert(staff);
+        StaffDef *staffDef = new StaffDef();
+        staffDef->SetN(staff->GetN());
+        staffDef->SetLines(5);
+        if (!measure->IsMeasuredMusic()) staffDef->SetNotationtype(NOTATIONTYPE_mensural);
+        staffGrp->AddChild(staffDef);
+    }
+    m_scoreDef.AddChild(staffGrp);
+
+    LogMessage("ScoreDef generated");
+
+    return true;
 }
 
 void Doc::ExportMIDI(MidiFile *midiFile)
@@ -164,7 +201,6 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
     // Set tempo
     if (m_scoreDef.HasMidiBpm()) {
-        midiFile->addTrack(0);
         midiFile->addTempo(0, 0, m_scoreDef.GetMidiBpm());
     }
 
@@ -179,10 +215,12 @@ void Doc::ExportMIDI(MidiFile *midiFile)
         // Get the transposition (semi-tone) value for the staff
         if (StaffDef *staffDef = this->m_scoreDef.GetStaffDef(staves->first)) {
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
+            midiTrack = staffDef->GetN();
+            midiFile->addTrack();
+            if (staffDef->HasLabel()) midiFile->addTrackName(midiTrack, 0, staffDef->GetLabel());
         }
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-            midiFile->addTrack(1);
             filters.clear();
             // Create ad comparison object for each type / @n
             AttCommonNComparison matchStaff(STAFF, staves->first);
@@ -192,14 +230,13 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
             GenerateMIDIParams generateMIDIParams(midiFile);
             generateMIDIParams.m_maxValues = calcMaxMeasureDurationParams.m_maxValues;
+            generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
             Functor generateMIDI(&Object::GenerateMIDI);
             Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(&generateMIDI, &generateMIDIParams, &generateMIDIEnd, &filters);
-
-            midiTrack++;
         }
     }
 
@@ -208,11 +245,9 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
 void Doc::PrepareDrawing()
 {
-    FunctorParams params;
-
     if (m_drawingPreparationDone) {
         Functor resetDrawing(&Object::ResetDrawing);
-        this->Process(&resetDrawing, &params);
+        this->Process(&resetDrawing, NULL);
     }
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
@@ -248,9 +283,15 @@ void Doc::PrepareDrawing()
 
     // If some are still there, then it is probably an issue in the encoding
     if (!prepareTimestampsParams.m_timeSpanningInterfaces.empty()) {
-        LogWarning(
-            "%d time spanning elements could not be matched", prepareTimestampsParams.m_timeSpanningInterfaces.size());
+        LogWarning("%d time spanning element(s) could not be matched",
+            prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
+
+    // Prepare the cross-staff pointers
+    PrepareCrossStaffParams prepareCrossStaffParams;
+    Functor prepareCrossStaff(&Object::PrepareCrossStaff);
+    Functor prepareCrossStaffEnd(&Object::PrepareCrossStaffEnd);
+    this->Process(&prepareCrossStaff, &prepareCrossStaffParams, &prepareCrossStaffEnd);
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
@@ -386,9 +427,12 @@ void Doc::PrepareDrawing()
     Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
     this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams);
 
-    FunctorParams prepareArticParams;
-    Functor prepareArtic(&Object::PrepareArtic);
-    this->Process(&prepareArtic, &prepareArticParams);
+    Functor prepareLayerElementParts(&Object::PrepareLayerElementParts);
+    this->Process(&prepareLayerElementParts, NULL);
+
+    // Prepare the drawing cue size
+    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
+    this->Process(&prepareDrawingCueSize, NULL);
 
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t
@@ -433,7 +477,7 @@ void Doc::CollectScoreDefs(bool force)
     }
 
     ScoreDef upcomingScoreDef = m_scoreDef;
-    SetCurrentScoreDefParams setCurrentScoreDefParams(&upcomingScoreDef);
+    SetCurrentScoreDefParams setCurrentScoreDefParams(this, &upcomingScoreDef);
     Functor setCurrentScoreDef(&Object::SetCurrentScoreDef);
 
     // First process the current scoreDef in order to fill the staffDef with
@@ -474,11 +518,16 @@ void Doc::CastOffDoc()
 
     // Reset the scoreDef at the beginning of each system
     this->CollectScoreDefs(true);
+
+    // Here we redo the alignment because of the new scoreDefs
+    // We can actually optimise this and have a custom version that does not redo all the calculation
+    // contentPage->LayOutHorizontally();
+
     contentPage->LayOutVertically();
 
     // Detach the contentPage
     this->DetachChild(0);
-    assert(contentPage && !contentPage->m_parent);
+    assert(contentPage && !contentPage->GetParent());
 
     Page *currentPage = new Page();
     this->AddChild(currentPage);
@@ -532,7 +581,7 @@ void Doc::CastOffEncodingDoc()
 
     // Detach the contentPage
     this->DetachChild(0);
-    assert(contentPage && !contentPage->m_parent);
+    assert(contentPage && !contentPage->GetParent());
 
     Page *page = new Page();
     this->AddChild(page);
@@ -595,7 +644,7 @@ int Doc::GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const
     int x, y, w, h;
     Glyph *glyph = Resources::GetGlyph(code);
     assert(glyph);
-    glyph->GetBoundingBox(&x, &y, &w, &h);
+    glyph->GetBoundingBox(x, y, w, h);
     h = h * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) h = h * this->m_style->m_graceFactor.GetValue();
     h = h * staffSize / 100;
@@ -607,11 +656,29 @@ int Doc::GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const
     int x, y, w, h;
     Glyph *glyph = Resources::GetGlyph(code);
     assert(glyph);
-    glyph->GetBoundingBox(&x, &y, &w, &h);
+    glyph->GetBoundingBox(x, y, w, h);
     w = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) w = w * this->m_style->m_graceFactor.GetValue();
     w = w * staffSize / 100;
     return w;
+}
+
+Point Doc::ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staffSize, bool graceSize) const
+{
+    assert(glyph);
+
+    Point point;
+    point.x = fontPoint.x * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    point.y = fontPoint.y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    if (graceSize) {
+        point.x = point.x * this->m_style->m_graceNum / this->m_style->m_graceDen;
+        point.y = point.y * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    }
+    if (staffSize != 100) {
+        point.x = point.x * staffSize / 100;
+        point.y = point.y * staffSize / 100;
+    }
+    return point;
 }
 
 int Doc::GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const
@@ -619,7 +686,7 @@ int Doc::GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const
     int x, y, w, h;
     Glyph *glyph = Resources::GetGlyph(code);
     assert(glyph);
-    glyph->GetBoundingBox(&x, &y, &w, &h);
+    glyph->GetBoundingBox(x, y, w, h);
     y = y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) y = y * this->m_style->m_graceFactor.GetValue();
     y = y * staffSize / 100;
@@ -633,7 +700,7 @@ int Doc::GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const
     int x, y, w, h;
     Glyph *glyph = Resources::GetTextGlyph(code);
     assert(glyph);
-    glyph->GetBoundingBox(&x, &y, &w, &h);
+    glyph->GetBoundingBox(x, y, w, h);
     h = h * font->GetPointSize() / glyph->GetUnitsPerEm();
     if (graceSize) h = h * this->m_style->m_graceFactor.GetValue();
     return h;
@@ -646,7 +713,7 @@ int Doc::GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const
     int x, y, w, h;
     Glyph *glyph = Resources::GetTextGlyph(code);
     assert(glyph);
-    glyph->GetBoundingBox(&x, &y, &w, &h);
+    glyph->GetBoundingBox(x, y, w, h);
     w = w * font->GetPointSize() / glyph->GetUnitsPerEm();
     if (graceSize) w = w * this->m_style->m_graceFactor.GetValue();
     return w;
@@ -659,7 +726,7 @@ int Doc::GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) con
     int x, y, w, h;
     Glyph *glyph = Resources::GetTextGlyph(code);
     assert(glyph);
-    glyph->GetBoundingBox(&x, &y, &w, &h);
+    glyph->GetBoundingBox(x, y, w, h);
     y = y * font->GetPointSize() / glyph->GetUnitsPerEm();
     if (graceSize) y = y * this->m_style->m_graceFactor.GetValue();
     return y;
@@ -742,7 +809,7 @@ int Doc::GetDrawingLedgerLineLength(int staffSize, bool graceSize) const
     return value;
 }
 
-int Doc::GetGraceSize(int value) const
+int Doc::GetCueSize(int value) const
 {
     return value * this->m_style->m_graceFactor.GetValue();
 }
@@ -946,6 +1013,9 @@ int Doc::CalcMusicFontSize()
 int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
+
+    if (this->GetType() == Transcription) return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
+
     int contentHeight = m_drawingPage->GetContentHeight();
     return (contentHeight + m_drawingPageTopMar * 2) / DEFINITION_FACTOR;
 }
@@ -953,9 +1023,11 @@ int Doc::GetAdjustedDrawingPageHeight() const
 int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
+
+    if (this->GetType() == Transcription) return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
+
     int contentWidth = m_drawingPage->GetContentWidth();
     return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar) / DEFINITION_FACTOR;
-    ;
 }
 
 //----------------------------------------------------------------------------

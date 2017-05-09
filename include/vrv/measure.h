@@ -8,9 +8,9 @@
 #ifndef __VRV_MEASURE_H__
 #define __VRV_MEASURE_H__
 
-#include "aligner.h"
 #include "atts_shared.h"
 #include "barline.h"
+#include "horizontalaligner.h"
 #include "object.h"
 
 namespace vrv {
@@ -18,6 +18,7 @@ namespace vrv {
 class Ending;
 class ControlElement;
 class ScoreDef;
+class System;
 class TimestampAttr;
 
 //----------------------------------------------------------------------------
@@ -30,7 +31,7 @@ class TimestampAttr;
  * It contains Layer objects.
  * For internally simplication of processing, unmeasured music is contained in one single measure object
  */
-class Measure : public Object, public AttCommon, public AttMeasureLog, public AttPointing {
+class Measure : public Object, public AttCommon, public AttMeasureLog, public AttPointing, public AttTyped {
 
 public:
     /**
@@ -42,7 +43,7 @@ public:
     virtual ~Measure();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Measure"; }
-    virtual ClassId Is() const { return MEASURE; }
+    virtual ClassId GetClassId() const { return MEASURE; }
     ///@}
 
     /**
@@ -62,6 +63,19 @@ public:
      * The TimestampAttr it not added as child of the measure but to the Measure::m_timestamps array.
      */
     void AddTimestamp(TimestampAttr *timestampAttr);
+
+    /**
+     * Get the X drawing position
+     */
+    virtual int GetDrawingX() const;
+
+    /**
+     * @name Get and set the X drawing relative positions
+     */
+    ///@{
+    int GetDrawingXRel() const { return m_drawingXRel; }
+    void SetDrawingXRel(int drawingXRel);
+    ///@}
 
     /**
      * Return the index position of the measure in its system parent
@@ -101,8 +115,6 @@ public:
     BarLine *const GetRightBarLine() { return &m_rightBarLine; }
     ///@}
 
-    // int GetXRel() const;
-
     /**
      * Return the non-justifiable left margin for the measure
      */
@@ -113,17 +125,27 @@ public:
      */
     ///@{
     int GetLeftBarLineXRel() const;
-    int GetLeftBarLineX1Rel() const;
-    int GetLeftBarLineX2Rel() const;
+    int GetLeftBarLineLeft() const;
+    int GetLeftBarLineRight() const;
     int GetRightBarLineXRel() const;
-    int GetRightBarLineX1Rel() const;
-    int GetRightBarLineX2Rel() const;
+    int GetRightBarLineLeft() const;
+    int GetRightBarLineRight() const;
     ///@}
 
     /**
      * Return the width of the measure, including the barLine width
      */
     int GetWidth() const;
+
+    /**
+     * Return the inner width of the measure
+     */
+    int GetInnerWidth() const;
+
+    /**
+     * Return the center x of the inner of the measure
+     */
+    int GetInnerCenterX() const;
 
     /**
      * @name Setter and getter of the drawing scoreDef
@@ -145,6 +167,11 @@ public:
      * Return the first staff of each staffGrp according to the scoreDef
      */
     std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
+
+    /**
+     * Custom method for upgrading page-based unmeasured transcription data
+     */
+    void UpgradePageBasedMEI(System *system);
 
     //----------//
     // Functors //
@@ -174,6 +201,11 @@ public:
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
     /**
+     * See Object::ApplyPPUFactor
+     */
+    virtual int ApplyPPUFactor(FunctorParams *functorParams);
+
+    /**
      * See Object::AlignHorizontally
      */
     virtual int AlignHorizontally(FunctorParams *functorParams);
@@ -185,27 +217,34 @@ public:
     virtual int AlignVertically(FunctorParams *functorParams);
 
     /**
-     * See Object::IntegrateBoundingBoxGraceXShift
-     */
-    virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams);
-
-    /**
-     * See Object::IntegrateBoundingBoxXShift
-     */
-    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams);
-
-    /**
      * See Object::SetAlignmentXPos
      */
     virtual int SetAlignmentXPos(FunctorParams *functorParams);
 
     /**
-     * See Object::SetBoundingBoxXShift
+     * See Object::AdjustLayers
      */
-    ///@{
-    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
-    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
-    ///@}
+    virtual int AdjustLayers(FunctorParams *functorParams);
+
+    /**
+     * See Object::AjustAccidX
+     */
+    virtual int AdjustAccidX(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustGraceXPos
+     */
+    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustXPos
+     */
+    virtual int AdjustXPos(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustSylSpacing
+     */
+    virtual int AdjustSylSpacingEnd(FunctorParams *functorParams);
 
     /**
      * See Object::AlignMeasures
@@ -228,11 +267,6 @@ public:
     virtual int CastOffEncoding(FunctorParams *functorParams);
 
     /**
-     * See Object::SetDrawingXY
-     */
-    virtual int SetDrawingXY(FunctorParams *functorParams);
-
-    /**
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
@@ -241,6 +275,11 @@ public:
      * See Object::FillStaffCurrentTimeSpanningEnd
      */
     virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareCrossStaff
+     */
+    virtual int PrepareCrossStaff(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareFloatingGrps
@@ -283,14 +322,12 @@ public:
 public:
     /**
      * The X absolute position of the measure for facsimile (transcription) encodings.
-     * This is the top left position of the measure.
+     * This is the left and right position of the measure.
      */
+    ///@{
     int m_xAbs;
-    /**
-     * The X relative position of the measure.
-     * It is used internally when calculating the layout and it is not stored in the file.
-     */
-    int m_drawingXRel;
+    int m_xAbs2;
+    ///@}
 
     /**
      * The measure aligner that holds the x positions of the content of the measure
@@ -298,6 +335,13 @@ public:
     MeasureAligner m_measureAligner;
 
     TimestampAligner m_timestampAligner;
+
+protected:
+    /**
+     * The X relative position of the measure.
+     * It is used internally when calculating the layout and it is not stored in the file.
+     */
+    int m_drawingXRel;
 
 private:
     bool m_measuredMusic;
@@ -323,6 +367,11 @@ private:
      * in DrawMeasure
      */
     Ending *m_drawingEnding;
+
+    /**
+     * A flag indicating if the measure has AlignmentReference with multiple layers
+     */
+    bool m_hasAlignmentRefWithMultipleLayers;
 };
 
 } // namespace vrv

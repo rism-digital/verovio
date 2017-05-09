@@ -32,4 +32,25 @@ void Custos::Reset()
     PositionInterface::Reset();
 }
 
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int Custos::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+    PositionInterface::InterfaceResetDrawing(functorParams, this);
+
+    return FUNCTOR_CONTINUE;
+};
+
+int Custos::ResetHorizontalAlignment(FunctorParams *functorParams)
+{
+    LayerElement::ResetHorizontalAlignment(functorParams);
+    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

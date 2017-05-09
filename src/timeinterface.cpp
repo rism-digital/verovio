@@ -121,7 +121,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
     if (this->HasStaff()) {
         staffList = this->GetStaff();
     }
-    else if (m_start && (m_start->Is() != TIMESTAMP_ATTR)) {
+    else if (m_start && !m_start->Is(TIMESTAMP_ATTR)) {
         Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstParent(STAFF));
         if (staff) staffList.push_back(staff->GetN());
     }
@@ -247,7 +247,7 @@ int TimePointInterface::InterfacePrepareTimePointing(FunctorParams *functorParam
     if (!this->HasStartid()) return FUNCTOR_CONTINUE;
 
     this->SetUuidStr();
-    params->m_timePointingInterfaces.push_back(std::make_pair(this, object->Is()));
+    params->m_timePointingInterfaces.push_back(std::make_pair(this, object->GetClassId()));
 
     return FUNCTOR_CONTINUE;
 }
@@ -266,7 +266,7 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorPa
     }
 
     this->SetUuidStr();
-    params->m_timeSpanningInterfaces.push_back(std::make_pair(this, object->Is()));
+    params->m_timeSpanningInterfaces.push_back(std::make_pair(this, object->GetClassId()));
 
     return FUNCTOR_CONTINUE;
 }
@@ -282,7 +282,8 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
             LogWarning("%s with @xml:id %s has both a @endid and an @tstamp2; @tstamp2 is ignored",
                 object->GetClassName().c_str(), object->GetUuid().c_str());
         if (this->GetStartid() == this->GetEndid()) {
-            LogWarning("%s with @xml:id %s will not get rendered as it has identical values in @startid and @endid", object->GetClassName().c_str(), object->GetUuid().c_str());
+            LogWarning("%s with @xml:id %s will not get rendered as it has identical values in @startid and @endid",
+                object->GetClassName().c_str(), object->GetUuid().c_str());
         }
         return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
     }

@@ -43,7 +43,7 @@ public:
     ///@{
     BBoxDeviceContext(View *view, int width, int height, unsigned char update = BBOX_BOTH);
     virtual ~BBoxDeviceContext();
-    virtual ClassId Is() const { return BBOX_DEVICE_CONTEXT; }
+    virtual ClassId GetClassId() const { return BBOX_DEVICE_CONTEXT; }
     ///@}
 
     /**
@@ -80,7 +80,7 @@ public:
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle);
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius);
     virtual void DrawText(const std::string &text, const std::wstring wtext = L"");
-    virtual void DrawMusicText(const std::wstring &text, int x, int y);
+    virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false);
     virtual void DrawSpline(int n, Point points[]);
     virtual void DrawBackgroundImage(int x = 0, int y = 0){};
     ///@}
@@ -154,9 +154,7 @@ private:
      */
     View *m_view;
 
-    void UpdateBB(int x1, int y1, int x2, int y2);
-
-    void ApproximateBezierBoundingBox(Point bezier[], Point *pos, int *width, int *height);
+    void UpdateBB(int x1, int y1, int x2, int y2, wchar_t glyph = 0);
 };
 
 } // namespace vrv

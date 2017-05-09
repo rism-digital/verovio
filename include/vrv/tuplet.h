@@ -35,7 +35,7 @@ public:
     virtual ~Tuplet();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Tuplet"; }
-    virtual ClassId Is() const { return TUPLET; }
+    virtual ClassId GetClassId() const { return TUPLET; }
     ///@}
 
     int GetNoteCount() const { return this->GetChildCount(NOTE); }

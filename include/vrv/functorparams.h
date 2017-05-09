@@ -20,6 +20,7 @@ class AttComparison;
 class BoundaryStartInterface;
 class Chord;
 class Clef;
+class Dots;
 class Ending;
 class FileOutputStream;
 class KeySig;
@@ -39,7 +40,6 @@ class StaffDef;
 class Syl;
 class System;
 class SystemAligner;
-class View;
 
 //----------------------------------------------------------------------------
 // FunctorParams
@@ -61,6 +61,18 @@ public:
 // Child classes of FunctorParams
 //----------------------------------------------------------------------------
 
+/**
+ * This is a basic FunctorParams with only the doc pointer for cases where
+ * it is the only parameter needed.
+ * member 0: the Doc
+ **/
+
+class FunctorDocParams : public FunctorParams {
+public:
+    FunctorDocParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
+};
+
 //----------------------------------------------------------------------------
 // AddLayerElementToFlatListParams
 //----------------------------------------------------------------------------
@@ -76,17 +88,73 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustArticulationsParams
+// AdjustAccidXParams
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the Doc
+ * member 0: the Functor to be redirected to MeasureAligner and GraceAligner
+ * member 1: the Doc
  **/
 
-class AdjustArticulationsParams : public FunctorParams {
+class AdjustAccidXParams : public FunctorParams {
 public:
-    AdjustArticulationsParams(Doc *doc) { m_doc = doc; }
+    AdjustAccidXParams(Doc *doc, Functor *functor)
+    {
+        m_currentMeasure = NULL;
+        m_functor = functor;
+        m_doc = doc;
+    }
+    Measure *m_currentMeasure;
+    Functor *m_functor;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustArticWithSlursParams
+//----------------------------------------------------------------------------
+
+// Use FunctorDocParams
+
+//----------------------------------------------------------------------------
+// AdjustGraceXPosParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the maximum position
+ * member 1: the upcoming maximum position (i.e., the min pos for the next element)
+ * member 2: the cumulated shift on the previous aligners
+ * member 3: the list of staffN in the top-level scoreDef
+ * member 4: the flag indicating whereas the alignment is in a Measure or in a Grace
+ * member 5: the pointer to the right ALIGNMENT_DEFAULT (if any)
+ * member 6: the Doc
+ * member 7: the Functor to be redirected to MeasureAligner and GraceAligner
+ * member 8: the end Functor for redirection
+ **/
+
+class AdjustGraceXPosParams : public FunctorParams {
+public:
+    AdjustGraceXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
+    {
+        m_graceMaxPos = 0;
+        m_graceUpcomingMaxPos = -VRV_UNSET;
+        m_graceCumulatedXShift = 0;
+        m_staffNs = staffNs;
+        m_isGraceAlignment = false;
+        m_rightDefaultAlignment = NULL;
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+    }
+
+    int m_graceMaxPos;
+    int m_graceUpcomingMaxPos;
+    int m_graceCumulatedXShift;
+    std::vector<int> m_staffNs;
+    bool m_isGraceAlignment;
+    Alignment *m_rightDefaultAlignment;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
 };
 
 //----------------------------------------------------------------------------
@@ -113,6 +181,42 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustLayersParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the list of staffN in the top-level scoreDef
+ * member 1: the current layerN set in the AlignmentRef (negative values for cross-staff)
+ * member 2: the elements for the previous layer(s)
+ * member 3: the elements of the current layer
+ * member 4: the current note
+ * member 5: the current chord (if any)
+ * member 6: the doc
+ * member 7: a pointer to the functor for passing it to the system aligner
+**/
+
+class AdjustLayersParams : public FunctorParams {
+public:
+    AdjustLayersParams(Doc *doc, Functor *functor, const std::vector<int> &staffNs)
+    {
+        m_currentLayerN = VRV_UNSET;
+        m_currentNote = NULL;
+        m_currentChord = NULL;
+        m_doc = doc;
+        m_functor = functor;
+        m_staffNs = staffNs;
+    }
+    std::vector<int> m_staffNs;
+    int m_currentLayerN;
+    std::vector<LayerElement *> m_previous;
+    std::vector<LayerElement *> m_current;
+    Note *m_currentNote;
+    Chord *m_currentChord;
+    Doc *m_doc;
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
 // AdjustFloatingPostionerGrpsParams
 //----------------------------------------------------------------------------
 
@@ -129,6 +233,120 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustStaffOverlapParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the previous staff alignment
+ * member 1: a pointer to the functor for passing it to the system aligner
+**/
+
+class AdjustStaffOverlapParams : public FunctorParams {
+public:
+    AdjustStaffOverlapParams(Functor *functor)
+    {
+        m_previous = NULL;
+        m_functor = functor;
+    }
+    StaffAlignment *m_previous;
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// AdjustSylSpacingParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a vector adjustment tuples (Aligment start, Aligment end, distance)
+ * member 1: a pointer to the previous Syl
+ * member 2: the doc
+ **/
+
+class AdjustSylSpacingParams : public FunctorParams {
+public:
+    AdjustSylSpacingParams(Doc *doc)
+    {
+        m_previousSyl = NULL;
+        m_doc = doc;
+    }
+    ArrayOfAdjustmentTuples m_overlapingSyl;
+    Syl *m_previousSyl;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustXPosParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the minimum position (i.e., the width of the previous element)
+ * member 1: the upcoming minimum position (i.e., the min pos for the next element)
+ * member 2: the cumulated shift on the previous aligners
+ * member 3: the @n of the staff currently processed (used for grace note alignment)
+ * member 4: the list of staffN in the top-level scoreDef
+ * member 5: the bounding box in the previous aligner
+ * member 6: the upcoming bounding boxes (to be used in the next aligner)
+ * member 7: the Doc
+ * member 8: the Functor for redirection to the MeasureAligner
+ * member 9: the end Functor for redirection
+ **/
+
+class AdjustXPosParams : public FunctorParams {
+public:
+    AdjustXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, const std::vector<int> &staffNs)
+    {
+        m_minPos = 0;
+        m_upcomingMinPos = VRV_UNSET;
+        m_cumulatedXShift = 0;
+        m_staffN = 0;
+        m_staffNs = staffNs;
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+    }
+    int m_minPos;
+    int m_upcomingMinPos;
+    int m_cumulatedXShift;
+    int m_staffN;
+    std::vector<int> m_staffNs;
+    std::vector<BoundingBox *> m_boundingBoxes;
+    std::vector<BoundingBox *> m_upcomingBoundingBoxes;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
+};
+
+//----------------------------------------------------------------------------
+// AdjustYPosParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the previous staff height
+ * member 1: the extra staff height
+ * member 2  the previous verse count
+ * member 3: the cumulated shift
+ * member 4: the doc
+ * member 5: the functor to be redirected to SystemAligner
+ **/
+
+class AdjustYPosParams : public FunctorParams {
+public:
+    AdjustYPosParams(Doc *doc, Functor *functor)
+    {
+        m_previousOverflowBelow = 0;
+        m_previousVerseCount = 0;
+        m_cumulatedShift = 0;
+        m_doc = doc;
+        m_functor = functor;
+    }
+    int m_previousOverflowBelow;
+    int m_previousVerseCount;
+    int m_cumulatedShift;
+    Doc *m_doc;
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
 // AlignHorizontallyParams
 //----------------------------------------------------------------------------
 
@@ -140,6 +358,7 @@ public:
  * member 4: the functor for passing it to the TimeStampAligner
  * member 5: a flag indicating whereas we are processing the caution scoreDef
  * member 6: a flag indicating is we are in the first measure (for the scoreDef role)
+ * member 7: a flag indicating if we had mutliple layer alignment reference in the measure
 **/
 
 class AlignHorizontallyParams : public FunctorParams {
@@ -153,6 +372,7 @@ public:
         m_functor = functor;
         m_scoreDefRole = NONE;
         m_isFirstMeasure = false;
+        m_hasMultipleLayer = false;
     }
     MeasureAligner *m_measureAligner;
     double m_time;
@@ -161,6 +381,7 @@ public:
     Functor *m_functor;
     ElementScoreDefRole m_scoreDefRole;
     bool m_isFirstMeasure;
+    bool m_hasMultipleLayer;
 };
 
 //----------------------------------------------------------------------------
@@ -212,21 +433,77 @@ public:
  * member 0: the systemAligner
  * member 1: the staffIdx
  * member 2: the staffN
- * member 3: the doc
+ * member 3: the cumulated shift for the default alignment
+ * member 4: the end functor (for redirecting from measure)
+ * member 5: the doc
 **/
 
 class AlignVerticallyParams : public FunctorParams {
 public:
-    AlignVerticallyParams(Doc *doc)
+    AlignVerticallyParams(Doc *doc, Functor *functorEnd)
     {
         m_systemAligner = NULL;
         m_staffIdx = 0;
         m_staffN = 0;
+        m_cumulatedShift = 0;
+        m_functorEnd = functorEnd;
         m_doc = doc;
     }
     SystemAligner *m_systemAligner;
     int m_staffIdx;
     int m_staffN;
+    int m_cumulatedShift;
+    Functor *m_functorEnd;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// ApplyPPUFactorParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current page
+ */
+
+class ApplyPPUFactorParams : public FunctorParams {
+public:
+    ApplyPPUFactorParams() { m_page = NULL; }
+    Page *m_page;
+};
+
+//----------------------------------------------------------------------------
+// CalcArticParams
+//----------------------------------------------------------------------------
+
+// Use FunctorDocParams
+
+//----------------------------------------------------------------------------
+// CalcChordNoteHeads
+//----------------------------------------------------------------------------
+
+// Use FunctorDocParams
+
+//----------------------------------------------------------------------------
+// CalcDotsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the chord dots object when processing chord notes
+ * member 7: the doc
+ **/
+
+class CalcDotsParams : public FunctorParams {
+public:
+    CalcDotsParams(Doc *doc)
+    {
+        m_chordDots = NULL;
+        m_chordDrawingX = 0;
+        m_chordStemDir = STEMDIRECTION_NONE;
+        m_doc = doc;
+    }
+    Dots *m_chordDots;
+    int m_chordDrawingX;
+    data_STEMDIRECTION m_chordStemDir;
     Doc *m_doc;
 };
 
@@ -253,23 +530,47 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// CalcStaffOverlapParams
+// CalcLedgerLine
+//----------------------------------------------------------------------------
+
+// Use FunctorDocParams
+
+//----------------------------------------------------------------------------
+// CalcStemParams
 //----------------------------------------------------------------------------
 
 /**
- * member 0: a pointer to the previous staff alignment
- * member 1: a pointer to the functor for passing it to the system aligner
-**/
+ * member 0: the additional length for a chord stem (between the top and bottom note)
+ * member 1: the vertical center of the staff
+ * member 2: the actual duration of the chord / note
+ * member 3: the flag for grace notes (stem is not extended)
+ * member 4: the current staff (to avoid additional lookup)
+ * member 5: the current layer (ditto)
+ * member 6: the chord or note to which the stem belongs
+ * member 7: the doc
+ **/
 
-class CalcStaffOverlapParams : public FunctorParams {
+class CalcStemParams : public FunctorParams {
 public:
-    CalcStaffOverlapParams(Functor *functor)
+    CalcStemParams(Doc *doc)
     {
-        m_previous = NULL;
-        m_functor = functor;
+        m_chordStemLength = 0;
+        m_verticalCenter = 0;
+        m_dur = DUR_1;
+        m_isGraceNote = false;
+        m_staff = NULL;
+        m_layer = NULL;
+        m_interface = NULL;
+        m_doc = doc;
     }
-    StaffAlignment *m_previous;
-    Functor *m_functor;
+    int m_chordStemLength;
+    int m_verticalCenter;
+    int m_dur;
+    bool m_isGraceNote;
+    Staff *m_staff;
+    Layer *m_layer;
+    StemmedDrawingInterface *m_interface;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -509,7 +810,7 @@ public:
     GenerateMIDIParams(MidiFile *midiFile)
     {
         m_midiFile = midiFile;
-        m_midiTrack = 0;
+        m_midiTrack = 1;
         m_currentMeasureTime = 0.0;
         m_totalTime = 0.0;
         m_transSemi = 0;
@@ -525,59 +826,24 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// IntegrateBoundingBoxGraceXShiftParams
+// GetAlignmentLeftRightParams
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the functor to be redirected to Aligner
-**/
+ * member 0: the min left
+ * member 1: the max right
+ **/
 
-class IntegrateBoundingBoxGraceXShiftParams : public FunctorParams {
+class GetAlignmentLeftRightParams : public FunctorParams {
 public:
-    IntegrateBoundingBoxGraceXShiftParams(Functor *functor) { m_functor = functor; }
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
-// IntegrateBoundingBoxXShiftParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the cumulated shift
- * member 3: the doc for accessing drawing parameters
- * member 4: the functor to be redirected to Aligner
-**/
-
-class IntegrateBoundingBoxXShiftParams : public FunctorParams {
-public:
-    IntegrateBoundingBoxXShiftParams(Doc *doc, Functor *functor)
+    GetAlignmentLeftRightParams(Functor *functor)
     {
-        m_shift = 0;
-        m_doc = doc;
+        m_minLeft = -VRV_UNSET;
+        m_maxRight = VRV_UNSET;
         m_functor = functor;
     }
-    int m_shift;
-    Doc *m_doc;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
-// IntegrateBoundingBoxYShiftParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the cumulated shift
- * member 1: the functor to be redirected to SystemAligner
-**/
-
-class IntegrateBoundingBoxYShiftParams : public FunctorParams {
-public:
-    IntegrateBoundingBoxYShiftParams(Functor *functor)
-    {
-        m_shift = 0;
-        m_functor = functor;
-    }
-    int m_shift;
+    int m_minLeft;
+    int m_maxRight;
     Functor *m_functor;
 };
 
@@ -651,6 +917,27 @@ public:
     }
     Ending *m_previousEnding;
     int m_drawingGrpId;
+};
+
+//----------------------------------------------------------------------------
+// PrepareCrossStaffParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the current measure
+ **/
+
+class PrepareCrossStaffParams : public FunctorParams {
+public:
+    PrepareCrossStaffParams()
+    {
+        m_currentMeasure = NULL;
+        m_currentCrossStaff = NULL;
+        m_currentCrossLayer = NULL;
+    }
+    Measure *m_currentMeasure;
+    Staff *m_currentCrossStaff;
+    Layer *m_currentCrossLayer;
 };
 
 //----------------------------------------------------------------------------
@@ -832,6 +1119,20 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// SetAlignmentPitchPosParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer doc
+ **/
+
+class SetAlignmentPitchPosParams : public FunctorParams {
+public:
+    SetAlignmentPitchPosParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // SetAlignmentXPosParams
 //----------------------------------------------------------------------------
 
@@ -858,85 +1159,6 @@ public:
     int m_longestActualDur;
     Doc *m_doc;
     Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
-// SetAligmentYPosParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the previous staff height
- * member 1: the extra staff height
- * member 2  the previous verse count
- * member 3: the doc
- * member 4: the functor to be redirected to SystemAligner
-**/
-
-class SetAligmentYPosParams : public FunctorParams {
-public:
-    SetAligmentYPosParams(Doc *doc, Functor *functor)
-    {
-        m_previousStaffHeight = 0;
-        m_previousOverflowBelow = 0;
-        m_previousVerseCount = 0;
-        m_doc = doc;
-        m_functor = functor;
-    }
-    int m_previousStaffHeight;
-    int m_previousOverflowBelow;
-    int m_previousVerseCount;
-    Doc *m_doc;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
-// SetBoundingBoxGraceXShiftParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the minimum position (i.e., the width of the previous element)
- * member 1: the Doc
-**/
-
-class SetBoundingBoxGraceXShiftParams : public FunctorParams {
-public:
-    SetBoundingBoxGraceXShiftParams(Doc *doc)
-    {
-        m_graceMinPos = 0;
-        m_doc = doc;
-    }
-
-    int m_graceMinPos;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
-// SetBoundingBoxXShiftParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the minimum position (i.e., the width of the previous element)
- * member 1: the maximum width in the current measure
- * member 2: the Doc
-**/
-
-class SetBoundingBoxXShiftParams : public FunctorParams {
-public:
-    SetBoundingBoxXShiftParams(Doc *doc, Functor *functor, Functor *functorEnd)
-    {
-        m_minPos = 0;
-        m_layerMinPos = 0;
-        m_measureWidth = 0;
-        m_doc = doc;
-        m_functor = functor;
-        m_functorEnd = functorEnd;
-    }
-    int m_minPos;
-    int m_layerMinPos;
-    int m_measureWidth;
-    Doc *m_doc;
-    Functor *m_functor;
-    Functor *m_functorEnd;
 };
 
 //----------------------------------------------------------------------------
@@ -970,11 +1192,12 @@ public:
  * member 3: the previous measure (for setting cautionary scoreDef)
  * member 4: the current system (for setting the system scoreDef)
  * member 5: the flag indicating whereas full labels have to be drawn
+ * member 6: the doc
 **/
 
 class SetCurrentScoreDefParams : public FunctorParams {
 public:
-    SetCurrentScoreDefParams(ScoreDef *upcomingScoreDef)
+    SetCurrentScoreDefParams(Doc *doc, ScoreDef *upcomingScoreDef)
     {
         m_currentScoreDef = NULL;
         m_currentStaffDef = NULL;
@@ -982,6 +1205,7 @@ public:
         m_previousMeasure = NULL;
         m_currentSystem = NULL;
         m_drawLabels = false;
+        m_doc = doc;
     }
     ScoreDef *m_currentScoreDef;
     StaffDef *m_currentStaffDef;
@@ -989,44 +1213,7 @@ public:
     Measure *m_previousMeasure;
     System *m_currentSystem;
     bool m_drawLabels;
-};
-
-//----------------------------------------------------------------------------
-// SetDrawingXYParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer doc
- * member 1: a pointer to the current system
- * member 2: a pointer to the current measure
- * member 3: a pointer to the current staff
- * member 4: a pointer to the current layer
- * member 5: a pointer to the view
- * member 6: a bool indicating if we are processing layer elements or not
- * member 7: a pointer to the functor for passing it to the timestamps
-**/
-
-class SetDrawingXYParams : public FunctorParams {
-public:
-    SetDrawingXYParams(Doc *doc, View *view, Functor *functor)
-    {
-        m_doc = doc;
-        m_currentSystem = NULL;
-        m_currentMeasure = NULL;
-        m_currentStaff = NULL;
-        m_currentLayer = NULL;
-        m_view = view;
-        m_processLayerElements = false;
-        m_functor = functor;
-    }
     Doc *m_doc;
-    System *m_currentSystem;
-    Measure *m_currentMeasure;
-    Staff *m_currentStaff;
-    Layer *m_currentLayer;
-    View *m_view;
-    bool m_processLayerElements;
-    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------

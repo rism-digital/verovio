@@ -36,7 +36,7 @@ public:
     virtual void Reset();
     virtual Object *Clone() const { return new Clef(*this); }
     virtual std::string GetClassName() const { return "Clef"; }
-    virtual ClassId Is() const { return CLEF; }
+    virtual ClassId GetClassId() const { return CLEF; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -45,7 +45,7 @@ public:
     /**
      * Return the offset of the clef
      */
-    int GetClefOffset() const;
+    int GetClefLocOffset() const;
 
     /**
      * Return a clef id based on the various parameters

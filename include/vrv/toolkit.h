@@ -26,7 +26,7 @@
 
 namespace vrv {
 
-enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML };
+enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM, MIDI };
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -118,6 +118,13 @@ public:
      */
     std::string RenderToMidi();
 
+    const char *GetHumdrumBuffer();
+    void SetHumdrumBuffer(const char *contents);
+
+    bool GetHumdrumFile(const std::string &filename);
+    void GetHumdrum(std::ostream &output);
+    std::string GetHumdrum();
+
     /**
      * Returns array of IDs of elements being currently played.
      */
@@ -140,6 +147,13 @@ public:
      * For example with a new page (sceen) height or a new zoom level.
      */
     void RedoLayout();
+
+    /**
+     * Redo the layout of the pitch postitions of the current drawing page.
+     * Only the note vertical positions are recalculated with this method.
+     * RedoLayout() needs to be called for a full recalculation.
+     */
+    void RedoPagePitchPosLayout();
 
     /**
      * Return the page on which the element is the ID (xml:id) is rendered.
@@ -284,6 +298,16 @@ public:
     ///@}
 
     /**
+     * @name Get the output file format (defined as FileFormat)
+     * The SetOutputFormat with FileFormat does not perform any validation
+     */
+    ///@{
+    bool SetOutputFormat(std::string const &outformat);
+    void SetOutputFormat(FileFormat format) { m_outformat = format; }
+    int GetOutputFormat() { return m_outformat; }
+    ///@}
+
+    /**
      * @name Identify the input file type for auto loading of input data
      */
     ///@{
@@ -369,6 +393,7 @@ private:
     View m_view;
     int m_scale;
     FileFormat m_format;
+    FileFormat m_outformat;
 
     int m_pageHeight;
     int m_pageWidth;
@@ -391,6 +416,7 @@ private:
     bool m_noJustification;
     bool m_showBoundingBoxes;
 
+    static char *m_humdrumBuffer;
     char *m_cString;
 };
 

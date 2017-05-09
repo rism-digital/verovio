@@ -27,6 +27,9 @@ verovio.vrvToolkit.getLog = Module.cwrap('vrvToolkit_getLog', 'string', ['number
 // char *getMEI(Toolkit *ic, int pageNo, int scoreBased )
 verovio.vrvToolkit.getMEI = Module.cwrap('vrvToolkit_getMEI', 'string', ['number', 'number', 'number']);
 
+// char *getHumdrum(Toolkit *ic)
+verovio.vrvToolkit.getHumdrum = Module.cwrap('vrvToolkit_getHumdrum', 'string');
+
 // int getPageCount(Toolkit *ic)
 verovio.vrvToolkit.getPageCount = Module.cwrap('vrvToolkit_getPageCount', 'number', ['number']);
 
@@ -44,6 +47,9 @@ verovio.vrvToolkit.loadData = Module.cwrap('vrvToolkit_loadData', 'number', ['nu
 
 // void redoLayout(Toolkit *ic)
 verovio.vrvToolkit.redoLayout = Module.cwrap('vrvToolkit_redoLayout', null, ['number']);
+
+// void redoPagePitchPosLayout(Toolkit *ic)
+verovio.vrvToolkit.redoPagePitchPosLayout = Module.cwrap('vrvToolkit_redoPagePitchPosLayout', null, ['number']);
 
 // char *renderData(Toolkit *ic, const char *data, const char *options )
 verovio.vrvToolkit.renderData = Module.cwrap('vrvToolkit_renderData', 'string', ['number', 'string', 'string']);
@@ -102,6 +108,10 @@ verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {
 	return verovio.vrvToolkit.getMEI(this.ptr, pageNo, scoreBased);
 };
 
+verovio.toolkit.prototype.getHumdrum = function () {
+	return verovio.vrvToolkit.getHumdrum(this.ptr);
+};
+
 verovio.toolkit.prototype.getPageCount = function () {
 	return verovio.vrvToolkit.getPageCount(this.ptr);
 };
@@ -124,6 +134,10 @@ verovio.toolkit.prototype.loadData = function (data) {
 
 verovio.toolkit.prototype.redoLayout = function () {
 	verovio.vrvToolkit.redoLayout(this.ptr);
+}
+
+verovio.toolkit.prototype.redoPagePitchPosLayout = function () {
+	verovio.vrvToolkit.redoPagePitchPosLayout(this.ptr);
 }
 
 verovio.toolkit.prototype.renderData = function (data, options) {
@@ -165,3 +179,14 @@ verovio.toolkit.prototype.getElementAttr = function (xmlId) {
 };
 
 /***************************************************************************************************************************/
+
+// If the window object is defined (if we are not within a WebWorker)...
+if ((typeof window !== "undefined") && (window.addEventListener))
+{
+	// Add a listener that will delete the object (if necessary) when the page is closed
+	window.addEventListener ("unload", function () {
+		if (verovio.ptr != 0) {
+			verovio.vrvToolkit.destructor( verovio.ptr );
+		}
+	});
+}

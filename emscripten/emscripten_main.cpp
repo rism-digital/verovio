@@ -77,6 +77,12 @@ const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool score_based)
     return tk->GetCString();
 }
 
+const char *vrvToolkit_getHumdrum(Toolkit *tk)
+{
+    const char* buffer = tk->GetHumdrumBuffer();
+    return buffer;
+}
+
 const char *vrvToolkit_renderPage(Toolkit *tk, int page_no, const char *c_options)
 {
     tk->ResetLogBuffer();
@@ -109,6 +115,11 @@ void vrvToolkit_redoLayout(Toolkit *tk)
     tk->RedoLayout();
 }
 
+void vrvToolkit_redoPagePitchPosLayout(Toolkit *tk)
+{
+    tk->RedoPagePitchPosLayout();
+}
+    
 const char *vrvToolkit_renderData(Toolkit *tk, const char *data, const char *options)
 {
     tk->ResetLogBuffer();

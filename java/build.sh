@@ -9,7 +9,7 @@ mkdir -p target/classes/META-INF/lib
 
 swig -c++ -java -package org.rismch.verovio -outdir src/main/java/org/rismch/verovio verovio.i
 
-SRCFILES=`LS ../src/*.cpp`
+SRCFILES=`\ls ../src/*.cpp`
 
 FILES="$SRCFILES \
  ../src/pugi/pugixml.cpp \
@@ -21,6 +21,7 @@ FILES="$SRCFILES \
  ../src/hum/humlib.cpp \
  ../libmei/attconverter.cpp \
  ../libmei/atts_cmn.cpp \
+ ../libmei/atts_cmnornaments.cpp \
  ../libmei/atts_critapp.cpp \
  ../libmei/atts_externalsymbols.cpp \
  ../libmei/atts_mei.cpp \

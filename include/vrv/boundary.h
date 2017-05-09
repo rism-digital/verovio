@@ -21,8 +21,7 @@ class Object;
 //----------------------------------------------------------------------------
 
 /**
- * This class is an interface for elements having a single time point, such as tempo, reh, etc..
- * It is not an abstract class but should not be instantiated directly.
+ * This class models an end milestone element and has no MEI equivalent.
  */
 class BoundaryEnd : public SystemElement {
 public:
@@ -35,7 +34,7 @@ public:
     virtual ~BoundaryEnd();
     virtual void Reset();
     virtual std::string GetClassName() const { return "boundaryEnd"; }
-    virtual ClassId Is() const { return BOUNDARY_END; }
+    virtual ClassId GetClassId() const { return BOUNDARY_END; }
     ///@}
 
     void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
@@ -69,11 +68,6 @@ public:
     virtual int CastOffSystems(FunctorParams *functorParams);
 
     /**
-     * See Object::CastOffEncoding
-     */
-    virtual int CastOffEncoding(FunctorParams *functorParams);
-
-    /**
      * See Object::PrepareFloatingGrps
      */
     virtual int PrepareFloatingGrps(FunctorParams *functoParams);
@@ -99,8 +93,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class is an interface for elements having a single time point, such as tempo, reh, etc..
- * It is not an abstract class but should not be instantiated directly.
+ * This class is an interface for container elements that have to be turned to milestones in a page-base representation.
  */
 class BoundaryStartInterface {
 public:

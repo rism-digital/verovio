@@ -6,6 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "vrv.h"
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
@@ -13,6 +14,7 @@
 #include <cmath>
 #include <sstream>
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <vector>
 
@@ -149,13 +151,14 @@ bool Resources::LoadFont(std::string fontName)
     int unitsPerEm = atoi(root.attribute("units-per-em").value());
     pugi::xml_node current;
     for (current = root.child("g"); current; current = current.next_sibling("g")) {
+        Glyph *glyph = NULL;
         if (current.attribute("c")) {
             wchar_t smuflCode = (wchar_t)strtol(current.attribute("c").value(), NULL, 16);
             if (!m_font.count(smuflCode)) {
                 LogWarning("Glyph with code '%d' not found.", smuflCode);
                 continue;
             }
-            Glyph *glyph = &m_font[smuflCode];
+            glyph = &m_font[smuflCode];
             if (glyph->GetUnitsPerEm() != unitsPerEm * 10) {
                 LogWarning("Glyph and bounding box units-per-em for code '%d' miss-match (bounding box: %d)", smuflCode,
                     unitsPerEm);
@@ -169,6 +172,18 @@ bool Resources::LoadFont(std::string fontName)
             if (current.attribute("h")) height = atof(current.attribute("h").value());
             glyph->SetBoundingBox(x, y, width, height);
             if (current.attribute("h-a-x")) glyph->SetHorizAdvX(atof(current.attribute("h-a-x").value()));
+        }
+
+        if (!glyph) continue;
+
+        // load anchors
+        pugi::xml_node anchor;
+        for (anchor = current.child("a"); anchor; anchor = anchor.next_sibling("a")) {
+            if (anchor.attribute("n")) {
+                std::string name = std::string(anchor.attribute("n").value());
+                // No check for possible x and y missing attributes - not very safe.
+                glyph->SetAnchor(name, atof(anchor.attribute("x").value()), atof(anchor.attribute("y").value()));
+            }
         }
     }
 
@@ -257,9 +272,9 @@ void LogDebug(const char *fmt, ...)
 #else
     va_list args;
     va_start(args, fmt);
-    printf("[Debug] ");
-    vprintf(fmt, args);
-    printf("\n");
+    fprintf(stderr, "[Debug] ");
+    vfprintf(stderr, fmt, args);
+    fprintf(stderr, "\n");
     va_end(args);
 #endif
 #endif
@@ -279,7 +294,7 @@ void LogError(const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     fprintf(stderr, "[Error] ");
-    fprintf(stderr, fmt, args);
+    vfprintf(stderr, fmt, args);
     fprintf(stderr, "\n");
     va_end(args);
 #endif
@@ -298,9 +313,9 @@ void LogMessage(const char *fmt, ...)
 #else
     va_list args;
     va_start(args, fmt);
-    printf("[Message] ");
-    vprintf(fmt, args);
-    printf("\n");
+    fprintf(stderr, "[Message] ");
+    vfprintf(stderr, fmt, args);
+    fprintf(stderr, "\n");
     va_end(args);
 #endif
 }
@@ -318,9 +333,9 @@ void LogWarning(const char *fmt, ...)
 #else
     va_list args;
     va_start(args, fmt);
-    printf("[Warning] ");
-    vprintf(fmt, args);
-    printf("\n");
+    fprintf(stderr, "[Warning] ");
+    vfprintf(stderr, fmt, args);
+    fprintf(stderr, "\n");
     va_end(args);
 #endif
 }

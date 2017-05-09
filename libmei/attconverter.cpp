@@ -656,6 +656,56 @@ data_GRACE AttConverter::StrToGrace(std::string value) const
     return GRACE_NONE;
 }
 
+std::string AttConverter::HeadshapeListToStr(data_HEADSHAPE_list data) const
+{
+    std::string value;
+    switch (data) {
+        case HEADSHAPE_list_quarter: value = "quarter"; break;
+        case HEADSHAPE_list_half: value = "half"; break;
+        case HEADSHAPE_list_whole: value = "whole"; break;
+        case HEADSHAPE_list_backslash: value = "backslash"; break;
+        case HEADSHAPE_list_circle: value = "circle"; break;
+        case HEADSHAPE_list_plus: value = "+"; break;
+        case HEADSHAPE_list_diamond: value = "diamond"; break;
+        case HEADSHAPE_list_isotriangle: value = "isotriangle"; break;
+        case HEADSHAPE_list_oval: value = "oval"; break;
+        case HEADSHAPE_list_piewedge: value = "piewedge"; break;
+        case HEADSHAPE_list_rectangle: value = "rectangle"; break;
+        case HEADSHAPE_list_rtriangle: value = "rtriangle"; break;
+        case HEADSHAPE_list_semicircle: value = "semicircle"; break;
+        case HEADSHAPE_list_slash: value = "slash"; break;
+        case HEADSHAPE_list_square: value = "square"; break;
+        case HEADSHAPE_list_x: value = "x"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.HEADSHAPE.list", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_HEADSHAPE_list AttConverter::StrToHeadshapeList(std::string value) const
+{
+    if (value == "quarter") return HEADSHAPE_list_quarter;
+    if (value == "half") return HEADSHAPE_list_half;
+    if (value == "whole") return HEADSHAPE_list_whole;
+    if (value == "backslash") return HEADSHAPE_list_backslash;
+    if (value == "circle") return HEADSHAPE_list_circle;
+    if (value == "+") return HEADSHAPE_list_plus;
+    if (value == "diamond") return HEADSHAPE_list_diamond;
+    if (value == "isotriangle") return HEADSHAPE_list_isotriangle;
+    if (value == "oval") return HEADSHAPE_list_oval;
+    if (value == "piewedge") return HEADSHAPE_list_piewedge;
+    if (value == "rectangle") return HEADSHAPE_list_rectangle;
+    if (value == "rtriangle") return HEADSHAPE_list_rtriangle;
+    if (value == "semicircle") return HEADSHAPE_list_semicircle;
+    if (value == "slash") return HEADSHAPE_list_slash;
+    if (value == "square") return HEADSHAPE_list_square;
+    if (value == "x") return HEADSHAPE_list_x;
+    LogWarning("Unsupported value '%s' for data.HEADSHAPE.list", value.c_str());
+    return HEADSHAPE_list_NONE;
+}
+
 std::string AttConverter::HorizontalalignmentToStr(data_HORIZONTALALIGNMENT data) const
 {
     std::string value;

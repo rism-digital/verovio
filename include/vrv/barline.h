@@ -20,7 +20,7 @@ namespace vrv {
 /**
  * This class models the MEI <barLine> element.
  */
-class BarLine : public LayerElement, public AttBarLineLog {
+class BarLine : public LayerElement, public AttBarLineLog, public AttColor {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -32,7 +32,7 @@ public:
     virtual void Reset();
     virtual Object *Clone() const { return new BarLine(*this); }
     virtual std::string GetClassName() const { return "BarLine"; }
-    virtual ClassId Is() const { return BARLINE; }
+    virtual ClassId GetClassId() const { return BARLINE; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -42,7 +42,7 @@ public:
      * Use to set the alignment for the Measure BarLine members.
      * This is as special case where we need to add to the measure aligner.
      */
-    void SetAlignment(Alignment *alignment);
+    bool SetAlignment(Alignment *alignment);
 
     /*
      * Return true if the barLine type requires repetition dots to be drawn.
@@ -74,7 +74,7 @@ public:
     virtual ~BarLineAttr();
     virtual Object *Clone() const { return new BarLineAttr(*this); }
     virtual std::string GetClassName() const { return "BarLineAttr"; }
-    virtual ClassId Is() const { return (m_isLeft ? BARLINE_ATTR_LEFT : BARLINE_ATTR_RIGHT); }
+    virtual ClassId GetClassId() const { return (m_isLeft ? BARLINE_ATTR_LEFT : BARLINE_ATTR_RIGHT); }
     ///@}
 
     void SetLeft() { m_isLeft = true; }

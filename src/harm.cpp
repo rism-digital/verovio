@@ -13,10 +13,11 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
 #include "editorial.h"
+#include "fb.h"
 #include "functorparams.h"
 #include "text.h"
+#include "verticalaligner.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -25,10 +26,11 @@ namespace vrv {
 // Harm
 //----------------------------------------------------------------------------
 
-Harm::Harm() : ControlElement("harm-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
+Harm::Harm() : ControlElement("harm-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttLang()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_LANG);
 
     Reset();
 }
@@ -42,6 +44,7 @@ void Harm::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
+    ResetLang();
 }
 
 void Harm::AddChild(Object *child)
@@ -51,6 +54,12 @@ void Harm::AddChild(Object *child)
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else if (child->Is(FB)) {
+        assert(dynamic_cast<Fb *>(child));
     }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
@@ -68,8 +77,8 @@ void Harm::AddChild(Object *child)
 
 int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    //PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
-    //assert(params);
+    // PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    // assert(params);
 
     this->SetDrawingGrpId(DRAWING_GRP_HARM);
 

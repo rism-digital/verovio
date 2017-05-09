@@ -22,6 +22,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "note.h"
+#include "page.h"
 #include "syl.h"
 #include "system.h"
 #include "timeinterface.h"
@@ -34,9 +35,16 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
-Staff::Staff(int n) : Object("staff-"), AttCommon()
+Staff::Staff(int n) : Object("staff-"), AttCommon(), AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
+
+    // owned pointers need to be set to NULL;
+    m_ledgerLinesAbove = NULL;
+    m_ledgerLinesBelow = NULL;
+    m_ledgerLinesAboveCue = NULL;
+    m_ledgerLinesBelowCue = NULL;
 
     Reset();
     SetN(n);
@@ -44,26 +52,49 @@ Staff::Staff(int n) : Object("staff-"), AttCommon()
 
 Staff::~Staff()
 {
+    ClearLedgerLines();
 }
 
 void Staff::Reset()
 {
     Object::Reset();
     ResetCommon();
+    ResetTyped();
 
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
     m_drawingNotationType = NOTATIONTYPE_NONE;
     m_yAbs = VRV_UNSET;
-    m_drawingY = 0;
     m_staffAlignment = NULL;
     m_timeSpanningElements.clear();
     m_drawingStaffDef = NULL;
+
+    ClearLedgerLines();
+}
+
+void Staff::ClearLedgerLines()
+{
+    if (m_ledgerLinesAbove) {
+        delete m_ledgerLinesAbove;
+        m_ledgerLinesAbove = NULL;
+    }
+    if (m_ledgerLinesBelow) {
+        delete m_ledgerLinesBelow;
+        m_ledgerLinesBelow = NULL;
+    }
+    if (m_ledgerLinesAboveCue) {
+        delete m_ledgerLinesAboveCue;
+        m_ledgerLinesAboveCue = NULL;
+    }
+    if (m_ledgerLinesBelowCue) {
+        delete m_ledgerLinesBelowCue;
+        m_ledgerLinesBelowCue = NULL;
+    }
 }
 
 void Staff::AddChild(Object *child)
 {
-    if (child->Is() == LAYER) {
+    if (child->Is(LAYER)) {
         Layer *layer = dynamic_cast<Layer *>(child);
         assert(layer);
         if (layer && (layer->GetN() < 1)) {
@@ -85,17 +116,109 @@ void Staff::AddChild(Object *child)
     Modify();
 }
 
-int Staff::GetVerticalSpacing()
+int Staff::GetDrawingY() const
 {
-    return 160; // arbitrary generic value
+    if (m_yAbs != VRV_UNSET) return m_yAbs;
+
+    if (!m_staffAlignment) return 0;
+
+    if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
+
+    System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
+    assert(system);
+
+    m_cachedDrawingY = system->GetDrawingY() + m_staffAlignment->GetYRel();
+    return m_cachedDrawingY;
 }
 
-int Staff::GetYRel() const
+int Staff::CalcPitchPosYRel(Doc *doc, int loc)
 {
-    if (m_staffAlignment) {
-        return m_staffAlignment->GetYRel();
+    assert(doc);
+
+    // the staff loc offset is based on the number of lines: 0 with 1 line, 2 with 2, etc
+    int staffLocOffset = (this->m_drawingLines - 1) * 2;
+    return (loc - staffLocOffset) * doc->GetDrawingUnit(this->m_drawingStaffSize);
+}
+
+void Staff::AddLegerLineAbove(int count, short left, short right, bool cueSize)
+{
+    if (cueSize) {
+        if (m_ledgerLinesAboveCue == NULL) m_ledgerLinesAboveCue = new ArrayOfLedgerLines;
+        AddLegerLines(m_ledgerLinesAboveCue, count, left, right);
     }
-    return 0;
+    else {
+        if (m_ledgerLinesAbove == NULL) m_ledgerLinesAbove = new ArrayOfLedgerLines;
+        AddLegerLines(m_ledgerLinesAbove, count, left, right);
+    }
+}
+
+void Staff::AddLegerLineBelow(int count, short left, short right, bool cueSize)
+{
+    if (cueSize) {
+        if (m_ledgerLinesBelowCue == NULL) m_ledgerLinesBelowCue = new ArrayOfLedgerLines;
+        AddLegerLines(m_ledgerLinesBelowCue, count, left, right);
+    }
+    else {
+        if (m_ledgerLinesBelow == NULL) m_ledgerLinesBelow = new ArrayOfLedgerLines;
+        AddLegerLines(m_ledgerLinesBelow, count, left, right);
+    }
+}
+
+void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, short left, short right)
+{
+    assert(lines);
+
+    if (lines->size() < count) lines->resize(count);
+    int i = 0;
+    for (i = 0; i < count; i++) {
+        lines->at(i).AddDash(left, right);
+    }
+}
+
+//----------------------------------------------------------------------------
+// LedgerLine
+//----------------------------------------------------------------------------
+
+LedgerLine::LedgerLine()
+{
+    Reset();
+}
+
+LedgerLine::~LedgerLine()
+{
+}
+
+void LedgerLine::Reset()
+{
+    m_dashes.clear();
+}
+
+void LedgerLine::AddDash(short left, short right)
+{
+    assert(left < right);
+
+    std::list<std::pair<short, short> >::iterator iter;
+
+    // First add the dash
+    for (iter = m_dashes.begin(); iter != m_dashes.end(); iter++) {
+        if (iter->first > left) break;
+    }
+    m_dashes.insert(iter, std::make_pair(left, right));
+
+    // Merge overlapping dashes
+    std::list<std::pair<short, short> >::iterator previous = m_dashes.begin();
+    iter = m_dashes.begin();
+    iter++;
+    while (iter != m_dashes.end()) {
+        if (previous->second > iter->first) {
+            previous->second = std::max(iter->second, previous->second);
+            iter = m_dashes.erase(iter);
+        }
+        else {
+            previous = iter;
+            iter++;
+        }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -111,8 +234,19 @@ int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
 
 int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    m_drawingY = 0;
     m_staffAlignment = NULL;
+
+    ClearLedgerLines();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Staff::ApplyPPUFactor(FunctorParams *functorParams)
+{
+    ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
+    assert(params);
+
+    if (m_yAbs != VRV_UNSET) m_yAbs /= params->m_page->GetPPUFactor();
 
     return FUNCTOR_CONTINUE;
 }
@@ -170,42 +304,9 @@ int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
 int Staff::ResetDrawing(FunctorParams *functorParams)
 {
     this->m_timeSpanningElements.clear();
+    ClearLedgerLines();
     return FUNCTOR_CONTINUE;
 };
-
-int Staff::SetDrawingXY(FunctorParams *functorParams)
-{
-    SetDrawingXYParams *params = dynamic_cast<SetDrawingXYParams *>(functorParams);
-    assert(params);
-
-    params->m_currentStaff = this;
-
-    // Second pass where we do just process layer elements
-    if (params->m_processLayerElements) return FUNCTOR_CONTINUE;
-
-    // Setting the drawing values for the staff (lines, scale)
-    if (StaffDef *staffDef = params->m_doc->m_scoreDef.GetStaffDef(this->GetN())) {
-        this->m_drawingLines = staffDef->GetLines();
-        this->m_drawingNotationType = staffDef->GetNotationtype();
-        if (staffDef->HasScale()) {
-            this->m_drawingStaffSize = staffDef->GetScale();
-        }
-    }
-
-    // Here we set the appropriate y value to be used for drawing
-    // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_yAbs
-    if (this->m_yAbs == VRV_UNSET) {
-        assert(params->m_doc->GetType() == Raw);
-        this->SetDrawingY(this->GetYRel() + params->m_currentSystem->GetDrawingY());
-    }
-    else {
-        assert(params->m_doc->GetType() == Transcription);
-        this->SetDrawingY(this->m_yAbs);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
 
 int Staff::PrepareRpt(FunctorParams *functorParams)
 {

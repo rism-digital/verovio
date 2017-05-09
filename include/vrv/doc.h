@@ -17,6 +17,7 @@ class MidiFile;
 namespace vrv {
 
 class FontInfo;
+class Glyph;
 class Page;
 class Score;
 
@@ -32,11 +33,19 @@ enum DocType { Raw = 0, Rendering, Transcription };
 class Doc : public Object {
 
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
     Doc();
     virtual ~Doc();
-    virtual ClassId Is() const { return DOC; }
+    virtual ClassId GetClassId() const { return DOC; }
+    ///@}
 
+    /**
+     * Add a page to the document
+     */
     virtual void AddChild(Object *object);
 
     /*
@@ -48,6 +57,12 @@ public:
      * Refreshes the views from Doc.
      */
     virtual void Refresh();
+
+    /**
+     * Generate a document scoreDef when none is provided.
+     * This only looks at the content first system of the document.
+     */
+    bool GenerateDocumentScoreDef();
 
     /**
      * Getter and setter for the DocType.
@@ -75,6 +90,7 @@ public:
     int GetPageCount() const;
 
     bool GetMidiExportDone() const;
+
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
      */
@@ -96,8 +112,10 @@ public:
     int GetDrawingBeamWidth(int staffSize, bool graceSize) const;
     int GetDrawingBeamWhiteWidth(int staffSize, bool graceSize) const;
     int GetDrawingLedgerLineLength(int staffSize, bool graceSize) const;
-    int GetGraceSize(int value) const;
+    int GetCueSize(int value) const;
     ///@}
+
+    Point ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staffSize, bool graceSize) const;
 
     /**
      * @name Get the height or width for a text glyph taking into account the grace size.

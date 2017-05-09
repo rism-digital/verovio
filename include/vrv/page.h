@@ -14,6 +14,7 @@
 namespace vrv {
 
 class DeviceContext;
+class PrepareProcessingListsParams;
 class Staff;
 class System;
 
@@ -37,7 +38,7 @@ public:
     virtual ~Page();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Page"; }
-    virtual ClassId Is() const { return PAGE; }
+    virtual ClassId GetClassId() const { return PAGE; }
     ///@}
 
     /**
@@ -47,7 +48,18 @@ public:
     virtual void AddChild(Object *object);
     ///@}
 
+    /**
+     * Return the number of system (children are System object only)
+     */
     int GetSystemCount() const { return (int)m_children.size(); }
+
+    /**
+     * @name Get and set the pixel per unit factor.
+     */
+    ///@{
+    double GetPPUFactor() const { return m_PPUFactor; }
+    void SetPPUFactor(double PPUFactor) { m_PPUFactor = PPUFactor; }
+    ///@}
 
     /**
      * Return the index position of the page in its document parent
@@ -65,6 +77,12 @@ public:
      * This will be done only if m_layoutDone is false or force is true.
      */
     void LayOut(bool force = false);
+
+    /**
+     * Do the layout for a transcription page (with layout information).
+     * This only calculates positioning or layer element parts using provided layout of parents.
+     */
+    void LayOutTranscription(bool force = false);
 
     /**
      * Lay out the content of the page (measures and their content) horizontally
@@ -87,6 +105,11 @@ public:
     void JustifyVertically();
 
     /**
+     * Lay out the pitch positions and stems (without redoing the entire layout)
+     */
+    void LayOutPitchPos();
+
+    /**
      * Return the height of the content by looking at the last system of the page.
      * This is used for adjusting the page height when this is the expected behaviour,
      * typically with the --adjust-page-height option in the commandline tool
@@ -101,11 +124,26 @@ public:
      */
     int GetContentWidth() const;
 
+    /**
+     * Custom method for upgrading page-based page transcription data
+     */
+    void UpgradePageBasedMEI(Doc *doc);
+
     //----------//
     // Functors //
     //----------//
 
+    /**
+     * Apply the Pixel Per Unit factor of the page to its elements.
+     */
+    virtual int ApplyPPUFactor(FunctorParams *);
+
 private:
+    /**
+     * Adjust the horizontal postition of the syl processing verse by verse
+     */
+    void AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc);
+
     //
 public:
     /** Page width (MEI scoredef@page.width). Saved if != -1 */
@@ -139,6 +177,11 @@ private:
      * the force parameter is set.
      */
     bool m_layoutDone;
+
+    /**
+     *
+     */
+    double m_PPUFactor;
 };
 
 } // namespace vrv

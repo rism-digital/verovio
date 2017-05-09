@@ -20,7 +20,7 @@ namespace vrv {
  * This class is an interface for elements with pitch, such as notes and neumes.
  * It is not an abstract class but should not be instanciated directly.
  */
-class PitchInterface : public Interface, public AttAccidental, public AttNoteGes, public AttOctave, public AttPitch {
+class PitchInterface : public Interface, public AttNoteGes, public AttOctave, public AttPitch {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -39,11 +39,24 @@ public:
      */
     bool HasIdenticalPitchInterface(PitchInterface *otherPitchInterface);
 
+    /**
+     * Calculate the loc for a pitch and octave and considerting the clef loc offset.
+     * E.g., return 0 for and C4 with clef C1, -2 with clef G2.
+     */
+    static int CalcLoc(data_PITCHNAME pname, int oct, int clefLocOffset);
+
+    /**
+     * Adjust the pname and the octave for values outside the range.
+     * To be tested
+     */
+    static void AdjustPname(int &pname, int &oct);
+
 private:
     //
 public:
     //
 private:
+    //
 };
 
 } // namespace vrv

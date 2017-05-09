@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
+#include "horizontalaligner.h"
 
 namespace vrv {
 
@@ -21,9 +21,10 @@ namespace vrv {
 // BarLine
 //----------------------------------------------------------------------------
 
-BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog()
+BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor()
 {
     RegisterAttClass(ATT_BARLINELOG);
+    RegisterAttClass(ATT_COLOR);
 
     Reset();
 }
@@ -35,13 +36,15 @@ BarLine::~BarLine()
 void BarLine::Reset()
 {
     LayerElement::Reset();
+
     ResetBarLineLog();
+    ResetColor();
 }
 
-void BarLine::SetAlignment(vrv::Alignment *alignment)
+bool BarLine::SetAlignment(vrv::Alignment *alignment)
 {
     m_alignment = alignment;
-    m_alignment->AddLayerElementRef(this);
+    return (m_alignment->AddLayerElementRef(this));
 }
 
 bool BarLine::HasRepetitionDots() const

@@ -18,6 +18,7 @@
 
 namespace vrv {
 
+class Glyph;
 class Object;
 class View;
 
@@ -49,7 +50,8 @@ public:
         m_isDeactivatedY = false;
     }
     virtual ~DeviceContext(){};
-    virtual ClassId Is() const;
+    virtual ClassId GetClassId() const;
+    bool Is(ClassId classId) const { return (this->GetClassId() == classId); }
     ///@}
 
     /**
@@ -77,7 +79,7 @@ public:
     ///@{
     virtual void GetTextExtent(const std::string &string, TextExtend *extend);
     virtual void GetTextExtent(const std::wstring &string, TextExtend *extend);
-    virtual void GetSmuflTextExtent(const std::wstring &string, int *w, int *h);
+    virtual void GetSmuflTextExtent(const std::wstring &string, TextExtend *extend);
 
     /**
      * @name Getters
@@ -101,7 +103,7 @@ public:
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle) = 0;
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius) = 0;
     virtual void DrawText(const std::string &text, const std::wstring wtext = L"") = 0;
-    virtual void DrawMusicText(const std::wstring &text, int x, int y) = 0;
+    virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false) = 0;
     virtual void DrawSpline(int n, Point points[]) = 0;
     virtual void DrawBackgroundImage(int x = 0, int y = 0) = 0;
     ///@}
@@ -152,6 +154,15 @@ public:
     ///@}
 
     /**
+     * @name Method for starting and ending a graphic custom graphic that do not correspond to an Object
+     * For example, the method can be used for grouping shapes in <g></g> in SVG
+     */
+    ///@{
+    virtual void StartCustomGraphic(std::string name, std::string gClass = "", std::string gId = ""){};
+    virtual void EndCustomGraphic(){};
+    ///@}
+
+    /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
      * The methods can be used to the output together, for example for a Beam
      */
@@ -191,6 +202,11 @@ public:
     virtual bool GetDrawBoundingBoxes() { return m_drawingBoundingBoxes; }
     ///@}
 
+private:
+    void AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend);
+
+public:
+    //
 protected:
     bool m_drawingBoundingBoxes;
 

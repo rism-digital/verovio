@@ -8,6 +8,10 @@
 #ifndef __VRV_STYLE_H__
 #define __VRV_STYLE_H__
 
+#ifdef CUSTOM_VEROVIO_STYLE
+#include "custom_style.h"
+#else
+
 #include <map>
 #include <string>
 #include <vector>
@@ -45,15 +49,15 @@ namespace vrv {
 #define MIN_PAGE_WIDTH 100
 #define MAX_PAGE_WIDTH 60000
 
-#define DEFAULT_BARLINE_WITDH 3.0
+#define DEFAULT_BARLINE_WIDTH 3.0
 #define MIN_BARLINE_WIDTH 1.0
 #define MAX_BARLINE_WIDTH 8.0
 
-#define DEFAULT_STAFFLINE_WITDH 2.0
+#define DEFAULT_STAFFLINE_WIDTH 2.0
 #define MIN_STAFFLINE_WIDTH 1.0
 #define MAX_STAFFLINE_WIDTH 8.0
 
-#define DEFAULT_STEM_WITDH 2.0
+#define DEFAULT_STEM_WIDTH 2.0
 #define MIN_STEM_WIDTH 1.0
 #define MAX_STEM_WIDTH 5.0
 
@@ -114,7 +118,7 @@ namespace vrv {
 #define DEFAULT_LEFT_MARGIN_BARLINE_ATTR_RIGHT 1.0
 #define DEFAULT_LEFT_MARGIN_BEATRPT 2.0
 #define DEFAULT_LEFT_MARGIN_CHORD 1.0
-#define DEFAULT_LEFT_MARGIN_CLEF 0.5
+#define DEFAULT_LEFT_MARGIN_CLEF 1.0
 #define DEFAULT_LEFT_MARGIN_KEYSIG 1.0
 #define DEFAULT_LEFT_MARGIN_MENSUR 1.0
 #define DEFAULT_LEFT_MARGIN_METERSIG 1.0
@@ -132,8 +136,8 @@ namespace vrv {
 #define MAX_RIGHT_MARGIN_DEFAULT 10.0
 
 #define DEFAULT_RIGHT_MARGIN_ACCID 0.0
-#define DEFAULT_RIGHT_MARGIN_BARLINE 2.0
-#define DEFAULT_RIGHT_MARGIN_BARLINE_ATTR_LEFT 0.0
+#define DEFAULT_RIGHT_MARGIN_BARLINE 0.0
+#define DEFAULT_RIGHT_MARGIN_BARLINE_ATTR_LEFT 1.0
 #define DEFAULT_RIGHT_MARGIN_BARLINE_ATTR_RIGHT 0.0
 #define DEFAULT_RIGHT_MARGIN_BEATRPT DEFAULT_RIGHT_MARGIN_DEFAULT
 #define DEFAULT_RIGHT_MARGIN_CHORD 0.0
@@ -163,9 +167,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // Style
 //----------------------------------------------------------------------------
-
-// the space between the staff and an editorial accid in units
-#define TEMP_ACCID_EDIT_SPACE 3.5 * PARAM_DENOMINATOR
 
 // the space between each lyric line in units
 #define TEMP_LYRIC_LINE_SPACE 5.0 * PARAM_DENOMINATOR
@@ -480,5 +481,7 @@ private:
 };
 
 } // namespace vrv
+
+#endif // CUSTOM_VEROVIO_STYLE
 
 #endif // __VRV_DEF_H__

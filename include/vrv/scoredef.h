@@ -35,7 +35,7 @@ class StaffDef;
  * information about clef, key signature, etc. This information can be either
  * attributes (implemented) of the ScoreDefInterface or elements (not implemented).
  */
-class ScoreDefElement : public Object, public ScoreDefInterface {
+class ScoreDefElement : public Object, public ScoreDefInterface, public AttCommon, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, and other standard methods.
@@ -44,10 +44,15 @@ public:
     ScoreDefElement(std::string classid);
     virtual ~ScoreDefElement();
     virtual void Reset();
-    virtual ClassId Is() const { return SCOREDEF_ELEMENT; }
+    virtual ClassId GetClassId() const { return SCOREDEF_ELEMENT; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual ScoreDefInterface *GetScoreDefInterface() { return dynamic_cast<ScoreDefInterface *>(this); }
+    ///@}
 
     /**
      * @name Methods for checking the presence of clef, key signature, etc. information.
@@ -117,7 +122,7 @@ public:
     virtual ~ScoreDef();
     virtual void Reset();
     virtual std::string GetClassName() const { return "ScoreDef"; }
-    virtual ClassId Is() const { return SCOREDEF; }
+    virtual ClassId GetClassId() const { return SCOREDEF; }
     ///@}
 
     virtual void AddChild(Object *object);
@@ -138,6 +143,11 @@ public:
      * Get the staffDef with number n (NULL if not found).
      */
     StaffDef *GetStaffDef(int n);
+
+    /**
+     * Return all the @n values of the staffDef in a scoreDef
+     */
+    std::vector<int> GetStaffNs();
 
     /**
      * Set the redraw flag to all staffDefs.
@@ -215,7 +225,8 @@ class StaffGrp : public Object,
                  public AttCommonPart,
                  public AttLabelsAddl,
                  public AttStaffgroupingsym,
-                 public AttStaffGrpVis {
+                 public AttStaffGrpVis,
+                 public AttTyped {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -227,7 +238,7 @@ public:
     virtual Object *Clone() const { return new StaffGrp(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "StaffGrp"; }
-    virtual ClassId Is() const { return STAFFGRP; }
+    virtual ClassId GetClassId() const { return STAFFGRP; }
     ///@}
 
     /**
@@ -264,8 +275,8 @@ private:
  */
 class StaffDef : public ScoreDefElement,
                  public StaffDefDrawingInterface,
-                 public AttCommon,
                  public AttCommonPart,
+                 public AttDistances,
                  public AttLabelsAddl,
                  public AttNotationtype,
                  public AttScalable,
@@ -282,7 +293,7 @@ public:
     virtual Object *Clone() const { return new StaffDef(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "StaffDef"; }
-    virtual ClassId Is() const { return STAFFDEF; }
+    virtual ClassId GetClassId() const { return STAFFDEF; }
     ///@}
 
     //----------//

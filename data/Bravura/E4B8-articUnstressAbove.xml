@@ -1,4 +1,4 @@
-<symbol id="E4B8" viewBox="0 0 2048 2048" overflow="inherit">
+<symbol id="E4B8" viewBox="0 0 1000 1000" overflow="inherit">
    <path transform="scale(1,-1)"
-         d="M0 424h66v-33q0 -135 96 -230t230 -95t230 95q95 95 95 230v33h65v-33q0 -163 -114 -277t-277 -114t-277 115t-114 276v33z"/>
+         d="M0 207h32v-16c0 -88 72 -159 159 -159c88 0 159 71 159 159v16h32v-16c0 -105 -85 -191 -191 -191c-105 0 -191 86 -191 191v16z"/>
 </symbol>

@@ -19,13 +19,19 @@ namespace vrv {
 // TextElement
 //----------------------------------------------------------------------------
 
-TextElement::TextElement() :  Object("te-")
+TextElement::TextElement() : Object("te-"), AttCommon(), AttTyped()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
+
     Reset();
 }
 
-TextElement::TextElement(std::string classid) :  Object(classid)
+TextElement::TextElement(std::string classid) : Object(classid), AttCommon(), AttTyped()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
+
     Reset();
 }
 
@@ -36,6 +42,8 @@ TextElement::~TextElement()
 void TextElement::Reset()
 {
     Object::Reset();
+    ResetCommon();
+    ResetTyped();
 }
 
 } // namespace vrv

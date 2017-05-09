@@ -33,10 +33,15 @@ public:
     virtual ~Fermata();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Fermata"; }
-    virtual ClassId Is() const { return FERMATA; }
+    virtual ClassId GetClassId() const { return FERMATA; }
     ///@}
 
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    ///@}
 
     //----------//
     // Functors //

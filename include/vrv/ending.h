@@ -25,7 +25,7 @@ class Measure;
  * It can be both a container (in score-based MEI) and a boundary (in page-based MEI).
  * It inherits from FloatingElement for spanning drawing features.
  */
-class Ending : public SystemElement, public BoundaryStartInterface, public AttCommon {
+class Ending : public SystemElement, public BoundaryStartInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -36,7 +36,7 @@ public:
     virtual ~Ending();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Ending"; }
-    virtual ClassId Is() const { return ENDING; }
+    virtual ClassId GetClassId() const { return ENDING; }
     ///@}
 
     /**

@@ -263,6 +263,8 @@ int DarmsInput::do_Clef(int pos, const char *data)
     else {
         // what the...
         LogWarning("DarmsInput: Invalid clef specification: %c", data[pos]);
+        // avoiding memory leak
+        delete mclef;
         return 0; // fail
     }
 
@@ -335,7 +337,7 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
         case 'Z': duration = DURATION_256; break;
 
         default:
-            LogWarning("DarmsInput: Unkown note duration: %c", data[pos]);
+            LogWarning("DarmsInput: Unknown note duration: %c", data[pos]);
             return 0;
             break;
     }
@@ -364,7 +366,11 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
         Note *note = new Note;
         note->SetDur(duration);
         note->SetDurGes(DURATION_8);
-        note->SetAccid(accidental);
+        if (accidental != ACCIDENTAL_EXPLICIT_NONE) {
+            Accid *accid = new Accid();
+            accid->SetAccid(accidental);
+            note->AddChild(accid);
+        }
         note->SetOct(PitchMap[position + m_clef_offset].oct);
         note->SetPname(PitchMap[position + m_clef_offset].pitch);
         note->SetDots(dot);

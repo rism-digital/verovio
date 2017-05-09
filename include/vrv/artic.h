@@ -30,7 +30,7 @@ public:
     virtual ~Artic();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Artic"; }
-    virtual ClassId Is() const { return ARTIC; }
+    virtual ClassId GetClassId() const { return ARTIC; }
     ///@}
 
     /**
@@ -41,20 +41,9 @@ public:
     /**
      * Split the articulation content into an array with the values to be displayed inside the staff / slur
      * and the values to be displayed outside.
-     * Used by Artic::PrepareArtic that then creates the corresponding ArticPart objects.
+     * Used by Artic::PrepareLayerElementParts that then creates the corresponding ArticPart objects.
      */
     void SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur);
-
-    /**
-     * Update the outside ArticPart (place and drawingY)
-     * If allowAbove is true it will place the above if the content requires so (even if place below if given)
-     */
-    void UpdateOutsidePartPosition(int yAbove, int yBelow, data_STAFFREL place, bool allowAbove);
-
-    /**
-     * Update the inside ArticPart (place and drawingY)
-     */
-    void UpdateInsidePartPosition(int yAbove, int yBelow, data_STAFFREL place);
 
     /**
      * Static method that retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
@@ -86,14 +75,14 @@ public:
     //----------//
 
     /**
-     * See Object::AdjustArticulations
+     * See Object::CalcArtic
      */
-    virtual int AdjustArticulations(FunctorParams *functorParams);
+    virtual int CalcArtic(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareArtic
+     * See Object::PrepareLayerElementParts
      */
-    virtual int PrepareArtic(FunctorParams *functorParams);
+    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing
@@ -120,7 +109,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class models a sub-part of an artic element and has not direct MEI correspondant.
+ * This class models a sub-part of an artic element and has not direct MEI equivlatent.
  */
 
 class ArticPart : public LayerElement, public AttArticulation, public AttColor, public AttPlacement {
@@ -134,23 +123,14 @@ public:
     virtual ~ArticPart();
     virtual void Reset();
     virtual std::string GetClassName() const { return "ArticPart"; }
-    virtual ClassId Is() const { return ARTIC_PART; }
+    virtual ClassId GetClassId() const { return ARTIC_PART; }
     ///@}
 
-    /**
-     * @name Get and set the Y drawing relative position
-     */
-    ///@{
-    int GetDrawingYRel() const { return m_drawingYRel; }
-    void SetDrawingYRel(int drawingYRel);
-    ///@}
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() const { return true; }
 
-    /**
-     * @name Overwritten version that takes into account m_drawingYRel
-     */
-    ///@{
-    virtual int GetDrawingY() const;
-    ///@}
+    /** Override the method since it is align to the staff */
+    virtual bool IsRelativeToStaff() const { return true; }
 
     /**
      * @name Set and get the type of the alignment
@@ -165,6 +145,8 @@ public:
      */
     bool AlwaysAbove();
 
+    void AddSlurPositioner(FloatingPositioner *positioner, bool start);
+
     //----------//
     // Functors //
     //----------//
@@ -172,8 +154,15 @@ public:
     /**
      * Overwritten version of Save that avoids anything to be written
      */
-    virtual int Save(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int SaveEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * See Object::AdjustArticWithSlurs
+     */
+    virtual int AdjustArticWithSlurs(FunctorParams *functorParams);
 
     /**
      * See Object::ResetVerticalAlignment
@@ -188,11 +177,9 @@ private:
     /** the type of artic part */
     ArticPartType m_type;
 
-    /**
-     * The Y drawing relative position of the object.
-     * It is re-computed everytime the object is drawn and it is not stored in the file.
-     */
-    int m_drawingYRel;
+public:
+    std::vector<FloatingPositioner *> m_startSlurPositioners;
+    std::vector<FloatingPositioner *> m_endSlurPositioners;
 };
 
 } // namespace vrv

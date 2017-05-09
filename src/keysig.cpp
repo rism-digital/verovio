@@ -127,7 +127,7 @@ void KeySig::Reset()
     ResetPitch();
 
     m_alterationNumber = 0;
-    m_alterationType = ACCIDENTAL_EXPLICIT_n;
+    m_alterationType = ACCIDENTAL_EXPLICIT_NONE;
 
     // key change drawing values
     m_drawingCancelAccidType = ACCIDENTAL_EXPLICIT_n;
