@@ -13,6 +13,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "attconverter.h"
+#include "vrv.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -61,7 +63,6 @@ void StyleParamMeasureNumber::Init(style_MEASURENUMBER defaultValue)
 
 bool StyleParamMeasureNumber::Read(std::string value)
 {
-
     std::map<style_MEASURENUMBER, std::string>::iterator it;
     for (it = StyleParamMeasureNumber::values.begin(); it != StyleParamMeasureNumber::values.end(); ++it)
         if (it->second == value) {
@@ -69,6 +70,24 @@ bool StyleParamMeasureNumber::Read(std::string value)
             return true;
         }
     return false;
+}
+    
+void StyleParamStaffrel::Init(data_STAFFREL defaultValue, const std::vector<data_STAFFREL> &values)
+{
+    m_value = defaultValue;
+    m_defaultValue = defaultValue;
+    m_values = values;
+}
+
+bool StyleParamStaffrel::Read(std::string value)
+{
+    AttConverter converter;
+    data_STAFFREL staffrel = converter.StrToStaffrel(value);
+    if (std::find(m_values.begin(), m_values.end(), staffrel) == m_values.end()) {
+        return false;
+    }
+    m_value = staffrel;
+    return true;
 }
 
 Style::Style()
@@ -179,6 +198,12 @@ Style::Style()
     
     m_measureNumber.Read("interval");
 
+    // Example of a staffRel param
+    StyleParamStaffrel rel;
+    rel.Init(STAFFREL_above, {STAFFREL_above, STAFFREL_below});
+    // within is not allowed for this param
+    rel.Read("within");
+    
     /*
     m_unit = DEFAULT_UNIT * DEFINITION_FACTOR;
     m_landscape = false;
