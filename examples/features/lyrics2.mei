@@ -7,11 +7,20 @@
             <titleStmt>
                 <title>Multiple verse example</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio also supports multiple lines of lyrics. The layout algorithm takes into account the multiple lines and spaces the staves appropriately.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>
@@ -92,7 +101,7 @@
                                 </layer>
                                 <layer n="2">
                                     <note xml:id="d23378e384" pname="a" oct="3" dur="4" stem.dir="down"/>
-                                    <note xml:id="d23378e398" pname="g" accid="s" oct="3" dur="4" stem.dir="down" accid.ges="s"/>
+                                    <note xml:id="d23378e398" pname="g" accid="s" oct="3" dur="4" stem.dir="down"/>
                                     <note xml:id="d23378e416" pname="a" oct="3" dur="4" stem.dir="down"/>
                                     <note xml:id="d23378e430" pname="d" oct="3" dur="4" stem.dir="down"/>
                                 </layer>
@@ -101,7 +110,7 @@
                         <measure n="2" xml:id="d23378e444">
                             <staff n="1">
                                 <layer n="1">
-                                    <note xml:id="d23378e446" pname="g" accid="s" oct="4" dur="4" dots="1" stem.dir="up" accid.ges="s"/>
+                                    <note xml:id="d23378e446" pname="g" accid="s" oct="4" dur="4" dots="1" stem.dir="up"/>
                                     <note xml:id="d23378e465" pname="a" oct="4" dur="8" stem.dir="up"/>
                                     <note xml:id="d23378e487" pname="b" oct="4" dur="2" stem.dir="up"/>
                                 </layer>
@@ -117,7 +126,7 @@
                                             <syl>mach</syl>
                                         </verse>
                                     </note>
-                                    <note xml:id="d23378e534" pname="f" accid="s" oct="4" dur="8" stem.dir="down" accid.ges="s">
+                                    <note xml:id="d23378e534" pname="f" accid="s" oct="4" dur="8" stem.dir="down">
                                         <verse n="1">
                                             <syl wordpos="t">zens</syl>
                                         </verse>
@@ -128,7 +137,7 @@
                                             <syl>mich</syl>
                                         </verse>
                                     </note>
-                                    <note xml:id="d23378e567" pname="g" accid="s" oct="4" dur="2" stem.dir="down" accid.ges="s">
+                                    <note xml:id="d23378e567" pname="g" accid="s" oct="4" dur="2" stem.dir="down">
                                         <verse n="1">
                                             <syl>Freud</syl>
                                         </verse>

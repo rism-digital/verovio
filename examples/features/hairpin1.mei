@@ -7,11 +7,20 @@
             <titleStmt>
                 <title>Hairpin example on multiple lines</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports "hairpin" elements. As with dynamics, the placement can be specified with the "place" attribute. Hairpins overlapping two measures or more and interrupted by a system break or a page break are displayed appropriately.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>
