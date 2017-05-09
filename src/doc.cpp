@@ -671,8 +671,8 @@ Point Doc::ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staf
     point.x = fontPoint.x * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     point.y = fontPoint.y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) {
-        point.x = point.x * this->m_style->m_graceNum / this->m_style->m_graceDen;
-        point.y = point.y * this->m_style->m_graceNum / this->m_style->m_graceDen;
+        point.x = point.x * this->m_style->m_graceFactor.GetValue();
+        point.y = point.y * this->m_style->m_graceFactor.GetValue();
     }
     if (staffSize != 100) {
         point.x = point.x * staffSize / 100;

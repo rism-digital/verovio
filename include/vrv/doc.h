@@ -57,6 +57,11 @@ public:
      * Refreshes the views from Doc.
      */
     virtual void Refresh();
+    
+    /**
+     * Getter for the style
+     */
+    Style *GetStyle() const { return m_style; }
 
     /**
      * Generate a document scoreDef when none is provided.

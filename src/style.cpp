@@ -210,6 +210,7 @@ Style::Style()
     m_barLineWidth = (unsigned short)(DEFAULT_BARLINE_WIDTH * DEFINITION_FACTOR);
     m_staffLineWidth = (unsigned short)(DEFAULT_STAFFLINE_WIDTH * DEFINITION_FACTOR);
     m_stemWidth = (unsigned short)(DEFAULT_STEM_WIDTH * DEFINITION_FACTOR);
+     */
 
     /**
      * Used for initializing Doc::m_drawingBeamMin/MaxSlope and used in
