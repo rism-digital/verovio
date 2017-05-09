@@ -29,38 +29,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 
-#define DEFAULT_PAGE_LEFT_MAR 50
-#define MIN_PAGE_LEFT_MAR 0
-#define MAX_PAGE_LEFT_MAR 500
-
-#define DEFAULT_PAGE_RIGHT_MAR 50
-#define MIN_PAGE_RIGHT_MAR 0
-#define MAX_PAGE_RIGHT_MAR 500
-
-#define DEFAULT_PAGE_TOP_MAR 50
-#define MIN_PAGE_TOP_MAR 0
-#define MAX_PAGE_TOP_MAR 500
-
-#define DEFAULT_PAGE_HEIGHT 2970
-#define MIN_PAGE_HEIGHT 100
-#define MAX_PAGE_HEIGHT 60000
-
-#define DEFAULT_PAGE_WIDTH 2100
-#define MIN_PAGE_WIDTH 100
-#define MAX_PAGE_WIDTH 60000
-
-#define DEFAULT_BARLINE_WIDTH 3.0
-#define MIN_BARLINE_WIDTH 1.0
-#define MAX_BARLINE_WIDTH 8.0
-
-#define DEFAULT_STAFFLINE_WIDTH 2.0
-#define MIN_STAFFLINE_WIDTH 1.0
-#define MAX_STAFFLINE_WIDTH 8.0
-
-#define DEFAULT_STEM_WIDTH 2.0
-#define MIN_STEM_WIDTH 1.0
-#define MAX_STEM_WIDTH 5.0
-
 #define DEFAULT_SPACING_LINEAR 0.25
 #define MIN_SPACING_LINEAR 0.0
 #define MAX_SPACING_LINEAR 1.0
@@ -76,32 +44,6 @@ namespace vrv {
 #define DEFAULT_SCALE 100
 #define MIN_SCALE 1
 #define MAX_SCALE 1000
-
-#define DEFAULT_SPACING_STAFF 10
-#define MIN_SPACING_STAFF 0
-#define MAX_SPACING_STAFF 24
-
-#define DEFAULT_SPACING_SYSTEM 6
-#define MIN_SPACING_SYSTEM 0
-#define MAX_SPACING_SYSTEM 12
-
-#define DEFAULT_HAIRPIN_SIZE 3.0
-#define MIN_HAIRPIN_SIZE 2.0
-#define MAX_HAIRPIN_SIZE 8.0
-
-#define DEFAULT_LYRIC_SIZE 4.5
-#define MIN_LYRIC_SIZE 2.0
-#define MAX_LYRIC_SIZE 8.0
-
-#define DEFAULT_MEASURE_WIDTH 15.0
-#define MIN_MEASURE_WIDTH 1.0
-#define MAX_MEASURE_WIDTH 30.0
-
-#define DEFAULT_TIE_THICKNESS 0.5
-
-#define DEFAULT_MIN_SLUR_HEIGHT 1.2
-#define DEFAULT_MAX_SLUR_HEIGHT 3.0
-#define DEFAULT_SLUR_THICKNESS 0.6
 
 /** The default position at the beginning of a measure */
 #define DEFAULT_LEFT_POSITION 0.8
@@ -217,7 +159,13 @@ public:
     StyleParam() {}
     virtual ~StyleParam() {}
     
+    void SetInfo(std::string title, std::string description);
+    
 public:
+    //
+protected:
+    std::string m_title;
+    std::string m_description;
 };
 
 //----------------------------------------------------------------------------
@@ -237,6 +185,7 @@ public:
     
     bool GetValue() { return m_value; }
     bool GetDefault() { return m_defaultValue; }
+    bool SetValue(bool m_value);
   
 private:
     //
@@ -266,6 +215,7 @@ public:
     double GetDefault() { return m_defaultValue; }
     double GetMin() { return m_minValue; }
     double GetMax() { return m_maxValue; }
+    bool SetValue(double value);
 
 private:
     //
@@ -297,6 +247,7 @@ public:
     int GetDefault() { return m_defaultValue; }
     int GetMin() { return m_minValue; }
     int GetMax() { return m_maxValue; }
+    bool SetValue(int value);
 
 private:
     //
@@ -325,7 +276,7 @@ public:
     virtual ~StyleParamMeasureNumber() {};
 
     void Init(style_MEASURENUMBER defaultValue);
-    bool Read(std::string value);
+    bool SetValue(std::string value);
     
     style_MEASURENUMBER GetValue() { return m_value; }
     style_MEASURENUMBER GetDefault() { return m_defaultValue; }
@@ -353,7 +304,7 @@ public:
     virtual ~StyleParamStaffrel() {};
 
     void Init(data_STAFFREL defaultValue, const std::vector<data_STAFFREL> &values);
-    bool Read(std::string value);
+    bool SetValue(std::string value);
     
     data_STAFFREL GetValue() { return m_value; }
     data_STAFFREL GetDefault() { return m_defaultValue; }
@@ -367,9 +318,13 @@ private:
     data_STAFFREL m_defaultValue;
 };
     
+    
+//----------------------------------------------------------------------------
+// Style
+//----------------------------------------------------------------------------
+    
 /**
- * This class contains the document default environment variables.
- * FIXME: Some of them are not available as is in MEI - to be solved
+ * This class contains the document styling parameters.
  */
 class Style {
 public:
@@ -410,11 +365,11 @@ public:
     /** The system minimal spacing */
     StyleParamInt m_spacingSystem;
 
-    /** The minimal measure width in units / PARAM_DENOMINATOR */
-    StyleParamDbl m_minMeasureWidth;
-    /** The lyrics size (in units / PARAM_DENOMINATOR) */
+    /** The minimal measure width (in units) */
+    StyleParamInt m_minMeasureWidth;
+    /** The lyrics size (in units) */
     StyleParamDbl m_lyricSize;
-    /** haripin size (in units / PARAM_DENOMINATOR) */
+    /** haripin size (in units) */
     StyleParamDbl m_hairpinSize;
 
     /** ties and slurs */

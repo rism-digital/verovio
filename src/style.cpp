@@ -25,7 +25,12 @@ std::map<style_MEASURENUMBER, std::string> StyleParamMeasureNumber::values
 //----------------------------------------------------------------------------
 // Style
 //----------------------------------------------------------------------------
-
+    
+void StyleParam::SetDoc(std::string title, std::string description)
+{
+    m_title = title;
+    m_description = description;
+}
     
 void StyleParamBool::Init(bool defaultValue)
 {
@@ -92,104 +97,158 @@ bool StyleParamStaffrel::Read(std::string value)
 
 Style::Style()
 {
-
-    /** The unit (1⁄2 of the distance between staff lines) **/
+    m_unit.SetDoc("Unit", "The unit (1⁄2 of the distance between the staff lines)");
     m_unit.Init(9, 6, 20, true);
     m_params["unit"] = &m_unit;
-    /** The landscape paper orientation flag */
+    
+    m_landscape.SetDoc("Landscape orientation", "The landscape paper orientation flag");
     m_landscape.Init(false);
     m_params["landscape"] = &m_landscape;
-    /** The staff line width */
-    m_staffLineWidth.Init(0.22, 0.10, 0.30);
+    
+    m_staffLineWidth.SetDoc("Staff line width", "The staff line width in unit");
+    m_staffLineWidth.Init(0.20, 0.10, 0.30);
     m_params["staffLineWidth"] = &m_staffLineWidth;
     /** The stem width */
-    StyleParamDbl m_stemWidth;
+    m_stemWidth.Init(0.20, 0.10, 0.);
     m_params["stemWidth"] = &m_stemWidth;
     /** The barLine width */
-    StyleParamDbl m_barLineWidth;
+    m_barLineWidth.Init(0.30, 0.10, 0.80);
     m_params["barLineWidth"] = &m_barLineWidth;
     /** The maximum beam slope */
-    StyleParamInt m_beamMaxSlope;
+    m_beamMaxSlope.Init(10, 1, 20);
+    m_params["beamMaxSlope"] = &m_beamMaxSlope;
     /** The minimum beam slope */
-    StyleParamInt m_beamMinSlope;
+    m_beamMinSlope.Init(0, 0, 0);
+    m_params["beamMinSlope"] = &m_beamMinSlope;
     /** The grace size ratio numerator */
-    StyleParamDbl m_graceFactor;
+    m_graceFactor.Init(0.75, 0.5, 1.0);
+    m_params["graceFactor"] = &m_graceFactor;
     /** The page height */
-    StyleParamInt m_pageHeight;
+    m_pageHeight.Init(2970, 100, 60000, true);
+    m_params["pageHeight"] = &m_pageHeight;
     /** The page width */
-    StyleParamInt m_pageWidth;
+    m_pageWidth.Init(2100, 100, 60000, true);
+    m_params["pageWidth"] = &m_pageWidth;
     /** The page left margin */
-    StyleParamInt m_pageLeftMar;
+    m_pageLeftMar.Init(50, 0, 500, true);
+    m_params["pageLeftMar"] = &m_pageLeftMar;
     /** The page right margin */
-    StyleParamInt m_pageRightMar;
+    m_pageRightMar.Init(50, 0, 500, true);
+    m_params["pageRightMar"] = &m_pageRightMar;
     /** The page top margin */
-    StyleParamInt m_pageTopMar;
+    m_pageTopMar.Init(50, 0, 500, true);
+    m_params["pageTopMar"] = &m_pageTopMar;
     /** The staff minimal spacing */
-    StyleParamInt m_spacingStaff;
+    m_spacingStaff.Init(10, 0, 24);
+    m_params["spacingStaff"] = &m_spacingStaff;
     /** The system minimal spacing */
-    StyleParamInt m_spacingSystem;
+    m_spacingSystem.Init(6, 0, 12);
+    m_params["spacingSystem"] = &m_spacingSystem;
     
     /** The minimal measure width in units / PARAM_DENOMINATOR */
-    StyleParamDbl m_minMeasureWidth;
-    /** The lyrics size (in units / PARAM_DENOMINATOR) */
-    StyleParamDbl m_lyricSize;
-    /** haripin size (in units / PARAM_DENOMINATOR) */
-    StyleParamDbl m_hairpinSize;
+    m_minMeasureWidth.Init(15, 1, 30);
+    m_params["minMeasureWidth"] = &m_minMeasureWidth;
+    /** The lyrics size (in units) */
+    m_lyricSize.Init(4.5, 2.0, 8.0);
+    m_params["lyricSize"] = &m_lyricSize;
+    /** haripin size (in units) */
+    m_hairpinSize.Init(3.0, 1.0, 8.0);
+    m_params["hairpinSize"] = &m_hairpinSize;
     
     /** ties and slurs */
-    StyleParamDbl m_tieThickness;
-    StyleParamDbl m_minSlurHeight;
-    StyleParamDbl m_maxSlurHeight;
-    StyleParamDbl m_slurThickness;
+    m_tieThickness.Init(0.5, 0.2, 1.0);
+    m_params["tieThickness"] = &m_tieThickness;
+    m_minSlurHeight.Init(1.2, 0.3, 2.0);
+    m_params["minSlurHeight"] = &m_minSlurHeight;
+    m_maxSlurHeight.Init(3.0, 2.0, 4.0);
+    m_params["maxSlurHeight"] = &m_maxSlurHeight;
+    m_slurThickness.Init(0.6, 0.2, 1.2);
+    m_params["slurThickness"] = &m_slurThickness;
     
     /** The left position */
-    StyleParamDbl m_leftPosition;
+    m_leftPosition.Init(0.8, 0.0, 2.0);
+    m_params["leftPosition"] = &m_leftPosition;
     
-    /** The layout left margin by element */
+    /** The layout left margin by element *
     StyleParamDbl m_leftMarginAccid;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginBarLine;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginBarLineAttrLeft;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginBarLineAttrRight;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginBeatRpt;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginChord;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginClef;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginKeySig;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginMensur;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginMeterSig;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginMRest;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginMRpt2;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginMultiRest;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginMultiRpt;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginNote;
+    m_params[""] = &;
     StyleParamDbl m_leftMarginRest;
-    /** The default left margin */
+    /** The default left margin *
     StyleParamDbl m_leftMarginDefault;
+    m_params[""] = &;
     
-    /** The layout right margin by element */
+    /** The layout right margin by element *
     StyleParamDbl m_rightMarginAccid;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginBarLine;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginBarLineAttrLeft;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginBarLineAttrRight;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginBeatRpt;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginChord;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginClef;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginKeySig;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginMensur;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginMeterSig;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginMRest;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginMRpt2;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginMultiRest;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginMultiRpt;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginNote;
+    m_params[""] = &;
     StyleParamDbl m_rightMarginRest;
-    /** The default right margin */
+    /** The default right margin *
     StyleParamDbl m_rightMarginDefault;
+    m_params[""] = &;
     
-    /** The default right margin */
+    /** The default right margin *
     StyleParamDbl m_bottomMarginDefault;
+    m_params[""] = &;
     
-    /** The default right margin */
+    /** The default right margin *
     StyleParamDbl m_topMarginDefault;
+    m_params[""] = &;
+     */
     
     m_margin.Init(2100, 10, 21000);
     m_params["margin"] = &m_margin;
@@ -205,31 +264,7 @@ Style::Style()
     rel.Read("within");
     
     /*
-    m_unit = DEFAULT_UNIT * DEFINITION_FACTOR;
-    m_landscape = false;
-    m_barLineWidth = (unsigned short)(DEFAULT_BARLINE_WIDTH * DEFINITION_FACTOR);
-    m_staffLineWidth = (unsigned short)(DEFAULT_STAFFLINE_WIDTH * DEFINITION_FACTOR);
-    m_stemWidth = (unsigned short)(DEFAULT_STEM_WIDTH * DEFINITION_FACTOR);
-     */
 
-    /**
-     * Used for initializing Doc::m_drawingBeamMin/MaxSlope and used in
-     * View::DrawBeamPostponed
-     *
-    m_beamMaxSlope = 10;
-    m_beamMinSlope = 0;
-
-    /**
-     * graceNum and Den for cue-sized notes.
-     *
-    m_graceNum = 5;
-    m_graceDen = 7;
-
-    m_pageHeight = DEFAULT_PAGE_HEIGHT * DEFINITION_FACTOR;
-    m_pageWidth = DEFAULT_PAGE_WIDTH * DEFINITION_FACTOR;
-    m_pageRightMar = DEFAULT_PAGE_RIGHT_MAR * DEFINITION_FACTOR;
-
-    m_pageLeftMar = DEFAULT_PAGE_LEFT_MAR * DEFINITION_FACTOR;
     m_pageTopMar = DEFAULT_PAGE_TOP_MAR * DEFINITION_FACTOR;
     m_spacingStaff = DEFAULT_SPACING_STAFF;
     m_spacingSystem = DEFAULT_SPACING_SYSTEM;
