@@ -205,9 +205,6 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     int staffSize = params->m_staff->m_drawingStaffSize;
     bool drawingCueSize = this->IsCueSize();
-    int radius = params->m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
-    // adjust the radius in order to take the stem width into account
-    radius -= params->m_doc->GetDrawingStemWidth(staffSize) / 2;
 
     /************ Set the position, the length and adjust to the note head ************/
 
@@ -229,14 +226,14 @@ int Stem::CalcStem(FunctorParams *functorParams)
         Point p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
         baseStem += p.y;
         this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
-        this->SetDrawingXRel(radius);
+        this->SetDrawingXRel(p.x);
         this->SetDrawingStemLen(baseStem);
     }
     else {
         Point p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
         baseStem -= p.y;
         this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
-        this->SetDrawingXRel(-radius);
+        this->SetDrawingXRel(p.x);
         this->SetDrawingStemLen(-baseStem);
     }
 
