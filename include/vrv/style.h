@@ -141,7 +141,7 @@ namespace vrv {
 #define MENSURAL_LINEWIDTH_FACTOR 1.0
 
 //----------------------------------------------------------------------------
-// StyleParam
+// Style defines
 //----------------------------------------------------------------------------
 
 enum style_MEASURENUMBER
@@ -149,6 +149,10 @@ enum style_MEASURENUMBER
     MEASURENUMBER_system = 0,
     MEASURENUMBER_interval
 };
+    
+//----------------------------------------------------------------------------
+// StyleParam
+//----------------------------------------------------------------------------
     
 /**
  * This class is a base class of each styling parameter
@@ -180,7 +184,6 @@ public:
     // constructors and destructors
     StyleParamBool() {}
     virtual ~StyleParamBool() {}
-    
     void Init(bool defaultValue);
     
     bool GetValue() { return m_value; }
@@ -208,7 +211,6 @@ public:
     // constructors and destructors
     StyleParamDbl() {}
     virtual ~StyleParamDbl() {}
-    
     void Init(double defaultValue, double minValue, double maxValue);
     
     double GetValue() { return m_value; }
@@ -240,7 +242,6 @@ public:
     // constructors and destructors
     StyleParamInt() {}
     virtual ~StyleParamInt() {}
-    
     void Init(int defaultValue, int minValue, int maxValue, bool definitionFactor = false);
     
     int GetValue();
@@ -312,12 +313,12 @@ public:
 private:
     //
 public:
-    std::vector<data_STAFFREL> m_values;
+    //
 private:
+    std::vector<data_STAFFREL> m_values;
     data_STAFFREL m_value;
     data_STAFFREL m_defaultValue;
 };
-    
     
 //----------------------------------------------------------------------------
 // Style

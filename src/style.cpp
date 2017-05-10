@@ -26,7 +26,7 @@ std::map<style_MEASURENUMBER, std::string> StyleParamMeasureNumber::values
 // Style
 //----------------------------------------------------------------------------
     
-void StyleParam::SetDoc(std::string title, std::string description)
+void StyleParam::SetInfo(std::string title, std::string description)
 {
     m_title = title;
     m_description = description;
@@ -37,6 +37,12 @@ void StyleParamBool::Init(bool defaultValue)
     m_value = defaultValue;
     m_defaultValue = defaultValue;
 }
+    
+bool StyleParamBool::SetValue(bool value)
+{
+    m_value = value;
+    return true;
+}
 
 void StyleParamDbl::Init(double defaultValue, double minValue, double maxValue)
 {
@@ -44,6 +50,16 @@ void StyleParamDbl::Init(double defaultValue, double minValue, double maxValue)
     m_defaultValue = defaultValue;
     m_minValue = minValue;
     m_maxValue = maxValue;
+}
+    
+bool StyleParamDbl::SetValue(double value)
+{
+    if ((value < m_minValue) || (value > m_maxValue)) {
+        LogError("Parameter out of bounds; default is %f, minimum is %f, and maximum is %f", m_defaultValue, m_minValue, m_maxValue);
+        return false;
+    }
+    m_value = value;
+    return true;
 }
     
 void StyleParamInt::Init(int defaultValue, int minValue, int maxValue, bool definitionFactor)
@@ -60,13 +76,23 @@ int StyleParamInt::GetValue()
     return (m_definitionFactor) ? m_value * DEFINITION_FACTOR : m_value;
 }
 
+bool StyleParamInt::SetValue(int value)
+{
+    if ((value < m_minValue) || (value > m_maxValue)) {
+        LogError("Parameter out of bounds; default is %d, minimum is %d, and maximum is %d", m_defaultValue, m_minValue, m_maxValue);
+        return false;
+    }
+    m_value = value;
+    return true;
+}
+    
 void StyleParamMeasureNumber::Init(style_MEASURENUMBER defaultValue)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
 }
 
-bool StyleParamMeasureNumber::Read(std::string value)
+bool StyleParamMeasureNumber::SetValue(std::string value)
 {
     std::map<style_MEASURENUMBER, std::string>::iterator it;
     for (it = StyleParamMeasureNumber::values.begin(); it != StyleParamMeasureNumber::values.end(); ++it)
@@ -74,6 +100,7 @@ bool StyleParamMeasureNumber::Read(std::string value)
             m_value = it->first;
             return true;
         }
+    LogError("Parameter '%s' not valie", value.c_str());
     return false;
 }
     
@@ -84,11 +111,12 @@ void StyleParamStaffrel::Init(data_STAFFREL defaultValue, const std::vector<data
     m_values = values;
 }
 
-bool StyleParamStaffrel::Read(std::string value)
+bool StyleParamStaffrel::SetValue(std::string value)
 {
     AttConverter converter;
     data_STAFFREL staffrel = converter.StrToStaffrel(value);
     if (std::find(m_values.begin(), m_values.end(), staffrel) == m_values.end()) {
+        LogError("Parameter '%s' not valie", value.c_str());
         return false;
     }
     m_value = staffrel;
@@ -97,80 +125,99 @@ bool StyleParamStaffrel::Read(std::string value)
 
 Style::Style()
 {
-    m_unit.SetDoc("Unit", "The unit (1⁄2 of the distance between the staff lines)");
+    m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
     m_unit.Init(9, 6, 20, true);
     m_params["unit"] = &m_unit;
     
-    m_landscape.SetDoc("Landscape orientation", "The landscape paper orientation flag");
+    m_landscape.SetInfo("Landscape orientation", "The landscape paper orientation flag");
     m_landscape.Init(false);
     m_params["landscape"] = &m_landscape;
     
-    m_staffLineWidth.SetDoc("Staff line width", "The staff line width in unit");
+    m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
     m_staffLineWidth.Init(0.20, 0.10, 0.30);
     m_params["staffLineWidth"] = &m_staffLineWidth;
+    
     /** The stem width */
     m_stemWidth.Init(0.20, 0.10, 0.);
     m_params["stemWidth"] = &m_stemWidth;
+    
     /** The barLine width */
     m_barLineWidth.Init(0.30, 0.10, 0.80);
     m_params["barLineWidth"] = &m_barLineWidth;
+    
     /** The maximum beam slope */
     m_beamMaxSlope.Init(10, 1, 20);
     m_params["beamMaxSlope"] = &m_beamMaxSlope;
+    
     /** The minimum beam slope */
     m_beamMinSlope.Init(0, 0, 0);
     m_params["beamMinSlope"] = &m_beamMinSlope;
+    
     /** The grace size ratio numerator */
     m_graceFactor.Init(0.75, 0.5, 1.0);
     m_params["graceFactor"] = &m_graceFactor;
+   
     /** The page height */
     m_pageHeight.Init(2970, 100, 60000, true);
     m_params["pageHeight"] = &m_pageHeight;
+    
     /** The page width */
     m_pageWidth.Init(2100, 100, 60000, true);
     m_params["pageWidth"] = &m_pageWidth;
+   
     /** The page left margin */
     m_pageLeftMar.Init(50, 0, 500, true);
     m_params["pageLeftMar"] = &m_pageLeftMar;
+    
     /** The page right margin */
     m_pageRightMar.Init(50, 0, 500, true);
     m_params["pageRightMar"] = &m_pageRightMar;
+    
     /** The page top margin */
     m_pageTopMar.Init(50, 0, 500, true);
     m_params["pageTopMar"] = &m_pageTopMar;
-    /** The staff minimal spacing */
+    
+    /** The staff minimal spacing (in MEI units) */
     m_spacingStaff.Init(10, 0, 24);
     m_params["spacingStaff"] = &m_spacingStaff;
+    
     /** The system minimal spacing */
     m_spacingSystem.Init(6, 0, 12);
     m_params["spacingSystem"] = &m_spacingSystem;
     
-    /** The minimal measure width in units / PARAM_DENOMINATOR */
+    /** The minimal measure width in units */
     m_minMeasureWidth.Init(15, 1, 30);
     m_params["minMeasureWidth"] = &m_minMeasureWidth;
-    /** The lyrics size (in units) */
-    m_lyricSize.Init(4.5, 2.0, 8.0);
-    m_params["lyricSize"] = &m_lyricSize;
-    /** haripin size (in units) */
-    m_hairpinSize.Init(3.0, 1.0, 8.0);
-    m_params["hairpinSize"] = &m_hairpinSize;
-    
-    /** ties and slurs */
-    m_tieThickness.Init(0.5, 0.2, 1.0);
-    m_params["tieThickness"] = &m_tieThickness;
-    m_minSlurHeight.Init(1.2, 0.3, 2.0);
-    m_params["minSlurHeight"] = &m_minSlurHeight;
-    m_maxSlurHeight.Init(3.0, 2.0, 4.0);
-    m_params["maxSlurHeight"] = &m_maxSlurHeight;
-    m_slurThickness.Init(0.6, 0.2, 1.2);
-    m_params["slurThickness"] = &m_slurThickness;
     
     /** The left position */
     m_leftPosition.Init(0.8, 0.0, 2.0);
     m_params["leftPosition"] = &m_leftPosition;
     
-    /** The layout left margin by element *
-    StyleParamDbl m_leftMarginAccid;
+    /** The lyrics size (in units) */
+    m_lyricSize.Init(4.5, 2.0, 8.0);
+    m_params["lyricSize"] = &m_lyricSize;
+    
+    /** haripin size (in units) */
+    m_hairpinSize.Init(3.0, 1.0, 8.0);
+    m_params["hairpinSize"] = &m_hairpinSize;
+    
+    /********* ties and slurs *********/
+    
+    m_tieThickness.Init(0.5, 0.2, 1.0);
+    m_params["tieThickness"] = &m_tieThickness;
+    
+    m_minSlurHeight.Init(1.2, 0.3, 2.0);
+    m_params["minSlurHeight"] = &m_minSlurHeight;
+    
+    m_maxSlurHeight.Init(3.0, 2.0, 4.0);
+    m_params["maxSlurHeight"] = &m_maxSlurHeight;
+    
+    m_slurThickness.Init(0.6, 0.2, 1.2);
+    m_params["slurThickness"] = &m_slurThickness;
+    
+    /********* The layout left margin by element *********/
+    
+     StyleParamDbl m_leftMarginAccid;
     m_params[""] = &;
     StyleParamDbl m_leftMarginBarLine;
     m_params[""] = &;
@@ -201,11 +248,13 @@ Style::Style()
     StyleParamDbl m_leftMarginNote;
     m_params[""] = &;
     StyleParamDbl m_leftMarginRest;
+    
     /** The default left margin *
     StyleParamDbl m_leftMarginDefault;
     m_params[""] = &;
     
-    /** The layout right margin by element *
+    /********* The layout right margin by element *********/
+    
     StyleParamDbl m_rightMarginAccid;
     m_params[""] = &;
     StyleParamDbl m_rightMarginBarLine;
