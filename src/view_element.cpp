@@ -685,7 +685,7 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     int y = element->GetDrawingY();
 
     // Use the note to which the points to for position
-    if (dot->m_drawingNote) {
+    if (dot->m_drawingNote && (m_doc->GetType() != Transcription)) {
         x = dot->m_drawingNote->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
         y = dot->m_drawingNote->GetDrawingY();
     }

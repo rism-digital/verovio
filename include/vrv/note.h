@@ -154,6 +154,11 @@ public:
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize);
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize);
     ///@}
+          
+    /**
+     * Return the SMuFL code for a mensural note looking at the staff notation type, the coloration and the duration
+     */
+    wchar_t GetMensuralSmuflNoteHead();
 
     //----------//
     // Functors //
