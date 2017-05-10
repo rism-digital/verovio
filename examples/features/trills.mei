@@ -7,11 +7,20 @@
             <titleStmt>
                 <title>Trills example</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio brings simple support for "trill" elements. By default, trills are placed above the staff.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>
@@ -81,7 +90,7 @@
                                     <note dur="4" oct="5" pname="c" accid.ges="s" stem.dir="down" />
                                 </layer>
                             </staff>
-                            <trill staff="1" tstamp="1" place="below" color="orange" />
+                            <trill staff="1" tstamp="1" place="below" color="fuchsia" />
                         </measure>
                         <measure n="6" right="dbl">
                             <staff n="1">

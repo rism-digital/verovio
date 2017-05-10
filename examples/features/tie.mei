@@ -11,7 +11,7 @@
                 <date>2017-05-09</date>
             </pubStmt>
             <notesStmt>
-                <annot></annot>
+                <annot>Verovio supports both ties encoded with "tie" attributes or with "tie" elements. Ties overlapping two measures and interrupted by a system break or a page break are displayed appropriately.</annot>
             </notesStmt>
         </fileDesc>
         <encodingDesc>
