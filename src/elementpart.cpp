@@ -220,22 +220,23 @@ int Stem::CalcStem(FunctorParams *functorParams)
     // Even if a stem length is given we add the length of the chord content (however only if not 0)
     // Also, the given stem length is understood as being mesured from the center of the note.
     // This means that it will be adjusted according to the note head (see below
-    if (!this->HasStemLen() || (this->GetStemLen() != 0))
+    if (!this->HasStemLen() || (this->GetStemLen() != 0)) {
         baseStem += params->m_chordStemLength;
 
-    if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-        Point p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
-        baseStem += p.y;
-        this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
-        this->SetDrawingXRel(p.x);
-        this->SetDrawingStemLen(baseStem);
-    }
-    else {
-        Point p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
-        baseStem -= p.y;
-        this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
-        this->SetDrawingXRel(p.x);
-        this->SetDrawingStemLen(-baseStem);
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+            Point p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+            baseStem += p.y;
+            this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
+            this->SetDrawingXRel(p.x);
+            this->SetDrawingStemLen(baseStem);
+        }
+        else {
+            Point p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+            baseStem -= p.y;
+            this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
+            this->SetDrawingXRel(p.x);
+            this->SetDrawingStemLen(-baseStem);
+        }
     }
 
     /************ Set the flag (if necessary) and adjust the length ************/
