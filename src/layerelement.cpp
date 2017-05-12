@@ -8,6 +8,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <math.h>
 
 //----------------------------------------------------------------------------
 
@@ -802,7 +803,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                         && (previousNote->GetDrawingDur() == DUR_1))
                         horizontalMargin = 0;
                 }
-                else if ((previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc()) > 1)
+                else if (abs(previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc()) > 1)
                     continue;
             }
 
