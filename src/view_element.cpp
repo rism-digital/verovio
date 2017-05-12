@@ -259,8 +259,8 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     int x = articPart->GetDrawingX();
     // HARDCODED value, we double the default margin for now - should go in styling
-    int yShift = 2 * m_doc->GetTopMargin(articPart->GetClassId()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
-        / PARAM_DENOMINATOR;
+    int yShift = 2 * m_doc->GetTopMargin(articPart->GetClassId()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+       
     int direction = (articPart->GetPlace() == STAFFREL_above) ? 1 : -1;
 
     int y = articPart->GetDrawingY();
@@ -1598,7 +1598,7 @@ int View::GetSylYRel(Syl *syl, Staff *staff)
         FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
         int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
         int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
-        int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
+        int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         y = -aligment->GetStaffHeight() - aligment->GetOverflowBelow()
             + (aligment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);

@@ -137,7 +137,8 @@ bool Toolkit::SetSpacingSystem(int spacingSystem)
 bool Toolkit::SetSpacingLinear(float spacingLinear)
 {
     assert(m_doc.GetStyle());
-    return (m_doc.GetStyle()->m_.SetValue(h));
+    return false;
+    //return (m_doc.GetStyle()->m_.SetValue(h));
 }
 
 bool Toolkit::SetSpacingNonLinear(float spacingNonLinear)

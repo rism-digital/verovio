@@ -759,17 +759,17 @@ int Doc::GetDrawingBrevisWidth(int staffSize) const
 
 int Doc::GetDrawingBarLineWidth(int staffSize) const
 {
-    return m_style->m_barLineWidth.GetValue() * staffSize / 100;
+    return m_style->m_barLineWidth.GetValue() * GetDrawingUnit(staffSize);
 }
 
 int Doc::GetDrawingStaffLineWidth(int staffSize) const
 {
-    return m_style->m_staffLineWidth.GetValue() * staffSize / 100;
+    return m_style->m_staffLineWidth.GetValue() * GetDrawingUnit(staffSize);
 }
 
 int Doc::GetDrawingStemWidth(int staffSize) const
 {
-    return m_style->m_stemWidth.GetValue() * staffSize / 100;
+    return m_style->m_stemWidth.GetValue()  * GetDrawingUnit(staffSize);
 }
 
 int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin) const
@@ -782,7 +782,7 @@ int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin) const
 
 int Doc::GetDrawingHairpinSize(int staffSize, bool withMargin) const
 {
-    int size = m_style->m_hairpinSize.GetValue() * GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+    int size = m_style->m_hairpinSize.GetValue() * GetDrawingUnit(staffSize);
     // This should be styled
     if (withMargin) size += GetDrawingUnit(staffSize);
     return size;
@@ -828,7 +828,7 @@ FontInfo *Doc::GetDrawingLyricFont(int staffSize)
     return &m_drawingLyricFont;
 }
 
-char Doc::GetLeftMargin(const ClassId classId) const
+double Doc::GetLeftMargin(const ClassId classId) const
 {
     if (classId == ACCID) return m_style->m_leftMarginAccid.GetValue();
     if (classId == BARLINE) return m_style->m_leftMarginBarLine.GetValue();
@@ -849,7 +849,7 @@ char Doc::GetLeftMargin(const ClassId classId) const
     return m_style->m_leftMarginDefault.GetValue();
 }
 
-char Doc::GetRightMargin(const ClassId classId) const
+double Doc::GetRightMargin(const ClassId classId) const
 {
     if (classId == ACCID) return m_style->m_rightMarginAccid.GetValue();
     if (classId == BARLINE) return m_style->m_rightMarginBarLine.GetValue();
@@ -870,17 +870,17 @@ char Doc::GetRightMargin(const ClassId classId) const
     return m_style->m_rightMarginDefault.GetValue();
 }
 
-char Doc::GetBottomMargin(const ClassId classId) const
+double Doc::GetBottomMargin(const ClassId classId) const
 {
     return m_style->m_bottomMarginDefault.GetValue();
 }
 
-char Doc::GetTopMargin(const ClassId classId) const
+double Doc::GetTopMargin(const ClassId classId) const
 {
     return m_style->m_topMarginDefault.GetValue();
 }
 
-char Doc::GetLeftPosition() const
+double Doc::GetLeftPosition() const
 {
     return m_style->m_leftPosition.GetValue();
 }
@@ -985,7 +985,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     // octave height
     m_drawingOctaveSize = m_drawingUnit * 7;
     // measure minimal width
-    m_drawingMinMeasureWidth = m_drawingUnit * m_style->m_minMeasureWidth.GetValue() / PARAM_DENOMINATOR;
+    m_drawingMinMeasureWidth = m_drawingUnit * m_style->m_minMeasureWidth.GetValue();
 
     // values for beams
     m_drawingBeamWidth = this->m_style->m_unit.GetValue();
@@ -993,7 +993,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
 
     // values for fonts
     m_drawingSmuflFontSize = CalcMusicFontSize();
-    m_drawingLyricFontSize = m_drawingUnit * m_style->m_lyricSize.GetValue() / PARAM_DENOMINATOR;
+    m_drawingLyricFontSize = m_drawingUnit * m_style->m_lyricSize.GetValue();
 
     glyph_size = GetGlyphWidth(SMUFL_E0A3_noteheadHalf, 100, 0);
     m_drawingLedgerLine = glyph_size * 72 / 100;

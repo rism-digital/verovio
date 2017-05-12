@@ -134,7 +134,7 @@ Style::Style()
     m_params["landscape"] = &m_landscape;
     
     m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
-    m_staffLineWidth.Init(0.20, 0.10, 0.30);
+    m_staffLineWidth.Init(0.15, 0.10, 0.30);
     m_params["staffLineWidth"] = &m_staffLineWidth;
     
     /** The stem width */
@@ -217,100 +217,130 @@ Style::Style()
     
     /********* The layout left margin by element *********/
     
-     StyleParamDbl m_leftMarginAccid;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginBarLine;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginBarLineAttrLeft;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginBarLineAttrRight;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginBeatRpt;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginChord;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginClef;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginKeySig;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginMensur;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginMeterSig;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginMRest;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginMRpt2;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginMultiRest;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginMultiRpt;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginNote;
-    m_params[""] = &;
-    StyleParamDbl m_leftMarginRest;
+    m_leftMarginAccid.Init(0.0, 0.0, 2.0);
+    m_params["leftMarginAccid"] = &m_leftMarginAccid;
     
-    /** The default left margin *
-    StyleParamDbl m_leftMarginDefault;
-    m_params[""] = &;
+    m_leftMarginBarLine.Init(0.0, 0.0, 2.0);
+    m_params["leftMarginBarLine"] = &m_leftMarginBarLine;
+    
+    m_leftMarginBarLineAttrLeft.Init(0.0, 0.0, 2.0);
+    m_params["leftMarginBarLineAttrLeft"] = &m_leftMarginBarLineAttrLeft;
+    
+    m_leftMarginBarLineAttrRight.Init(1.0, 0.0, 2.0);
+    m_params["leftMarginBarLineAttrRight"] = &m_leftMarginBarLineAttrRight;
+    
+    m_leftMarginBeatRpt.Init(2.0, 0.0, 2.0);
+    m_params["leftMarginBeatRpt"] = &m_leftMarginBeatRpt;
+    
+    m_leftMarginChord.Init(0.0, 0.0, 2.0);
+    m_params["leftMarginChord"] = &m_leftMarginChord;
+    
+    m_leftMarginClef.Init(0.0, 0.0, 2.0);;
+    m_params["leftMarginClef"] = &m_leftMarginClef;
+    
+    m_leftMarginKeySig.Init(0.0, 0.0, 2.0);;
+    m_params["leftMarginKeySig"] = &m_leftMarginKeySig;
+    
+    m_leftMarginMensur.Init(0.0, 0.0, 2.0);;
+    m_params["leftMarginMensur"] = &m_leftMarginMensur;
+    
+    m_leftMarginMeterSig.Init(0.0, 0.0, 2.0);;
+    m_params["leftMarginMeterSig"] = &m_leftMarginMeterSig;
+    
+    m_leftMarginMRest.Init(0.0, 0.0, 2.0);;
+    m_params["leftMarginMRest"] = &m_leftMarginMRest;
+    
+    m_leftMarginMRpt2.Init(0.0, 0.0, 2.0);;
+    m_params["leftMarginMRpt2"] = &m_leftMarginMRpt2;
+    
+    m_leftMarginMultiRest.Init(0.0, 0.0, 2.0);;
+    m_params["leftMarginMultiRest"] = &m_leftMarginMultiRest;
+    
+    m_leftMarginMultiRpt.Init(0.0, 0.0, 2.0);;
+    m_params["leftMarginMultiRpt"] = &m_leftMarginMultiRpt;
+    
+    m_leftMarginNote.Init(0.0, 0.0, 2.0);;
+    m_params["leftMarginNote"] = &m_leftMarginNote;
+    
+    m_leftMarginRest.Init(0.0, 0.0, 2.0);;
+    m_params["leftMarginRest"] = &m_leftMarginRest;
+    
+    /** The default left margin */
+    m_leftMarginDefault.Init(0.0, 0.0, 2.0);;
+    m_params["leftMarginDefault"] = &m_leftMarginDefault;
     
     /********* The layout right margin by element *********/
     
-    StyleParamDbl m_rightMarginAccid;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginBarLine;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginBarLineAttrLeft;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginBarLineAttrRight;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginBeatRpt;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginChord;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginClef;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginKeySig;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginMensur;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginMeterSig;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginMRest;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginMRpt2;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginMultiRest;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginMultiRpt;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginNote;
-    m_params[""] = &;
-    StyleParamDbl m_rightMarginRest;
-    /** The default right margin *
-    StyleParamDbl m_rightMarginDefault;
-    m_params[""] = &;
+    m_rightMarginAccid.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginAccid"] = &m_rightMarginAccid;
     
-    /** The default right margin *
-    StyleParamDbl m_bottomMarginDefault;
-    m_params[""] = &;
+    m_rightMarginBarLine.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginBarLine"] = &m_rightMarginBarLine;
     
-    /** The default right margin *
-    StyleParamDbl m_topMarginDefault;
-    m_params[""] = &;
-     */
+    m_rightMarginBarLineAttrLeft.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginBarLineAttrLeft"] = &m_rightMarginBarLineAttrLeft;
+    
+    m_rightMarginBarLineAttrRight.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginBarLineAttrRight"] = &m_rightMarginBarLineAttrRight;
+    
+    m_rightMarginBeatRpt.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginBeatRpt"] = &m_rightMarginBeatRpt;
+    
+    m_rightMarginChord.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginChord"] = &m_rightMarginChord;
+    
+    m_rightMarginClef.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginClef"] = &m_rightMarginClef;
+    
+    m_rightMarginKeySig.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginKeySig"] = &m_rightMarginKeySig;
+    
+    m_rightMarginMensur.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginMensur"] = &m_rightMarginMensur;
+    
+    m_rightMarginMeterSig.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginMeterSig"] = &m_rightMarginMeterSig;
+    
+    m_rightMarginMRest.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginMRest"] = &m_rightMarginMRest;
+    
+    m_rightMarginMRpt2.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginMRpt2"] = &m_rightMarginMRpt2;
+    
+    m_rightMarginMultiRest.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginMultiRest"] = &m_rightMarginMultiRest;
+    
+    m_rightMarginMultiRpt.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginMultiRpt"] = &m_rightMarginMultiRpt;
+    
+    m_rightMarginNote.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginNote"] = &m_rightMarginNote;
+    
+    /** The default right margin */
+    m_rightMarginDefault.Init(0.0, 0.0, 2.0);;
+    m_params["rightMarginRest"] = &m_rightMarginRest;
+    
+    /** The default right margin */
+    m_bottomMarginDefault.Init(0.0, 0.0, 2.0);;
+    m_params["bottomMarginDefault"] = &m_bottomMarginDefault;
+    
+    /** The default right margin */
+    m_topMarginDefault.Init(0.0, 0.0, 2.0);;
+    m_params["topMarginDefault"] = &m_topMarginDefault;
     
     m_margin.Init(2100, 10, 21000);
     m_params["margin"] = &m_margin;
+    
     m_measureNumber.Init(MEASURENUMBER_system);
     m_params["measureNumber"] = &m_measureNumber;
     
-    m_measureNumber.Read("interval");
+    //m_measureNumber.SetValue("interval");
 
     // Example of a staffRel param
     StyleParamStaffrel rel;
     rel.Init(STAFFREL_above, {STAFFREL_above, STAFFREL_below});
     // within is not allowed for this param
-    rel.Read("within");
+    //rel.SetValue("within");
     
     /*
 

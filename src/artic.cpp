@@ -385,7 +385,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     if (insidePart && outsidePart) {
 
         int margin = params->m_doc->GetTopMargin(insidePart->GetClassId())
-            * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
+        * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         if (insidePart->GetPlace() == outsidePart->GetPlace()) {
             if (insidePart->GetPlace() == STAFFREL_above) {

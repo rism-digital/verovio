@@ -158,10 +158,10 @@ public:
      * @name Getters for tie and slur parameters
      */
     ///@{
-    char GetTieThickness() const { return m_style->m_tieThickness.GetValue(); }
-    char GetSlurMinHeight() const { return m_style->m_minSlurHeight.GetValue(); }
-    char GetSlurMaxHeight() const { return m_style->m_maxSlurHeight.GetValue(); }
-    char GetSlurThickness() const { return m_style->m_slurThickness.GetValue(); }
+    int GetTieThickness() const { return m_style->m_tieThickness.GetValue(); }
+    int GetSlurMinHeight() const { return m_style->m_minSlurHeight.GetValue(); }
+    int GetSlurMaxHeight() const { return m_style->m_maxSlurHeight.GetValue(); }
+    int GetSlurThickness() const { return m_style->m_slurThickness.GetValue(); }
     ///@}
 
     /**
@@ -174,16 +174,14 @@ public:
 
     /**
      * @name Getters for the object margins (left and right).
-     * The margins are given in x / PARAM_DENOMINATOR * UNIT
-     * With PARAM_DENOMINATOR == 10, a margin of 25 is 2.5 UNIT.
-     * These should eventually be set at parameters.
+     * The margins are given in x * MEI UNIT
      */
     ///@{
-    char GetLeftMargin(const ClassId classId) const;
-    char GetRightMargin(const ClassId classId) const;
-    char GetLeftPosition() const;
-    char GetBottomMargin(const ClassId classId) const;
-    char GetTopMargin(const ClassId classId) const;
+    double GetLeftMargin(const ClassId classId) const;
+    double GetRightMargin(const ClassId classId) const;
+    double GetLeftPosition() const;
+    double GetBottomMargin(const ClassId classId) const;
+    double GetTopMargin(const ClassId classId) const;
     ///@}
 
     /*

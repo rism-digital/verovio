@@ -221,7 +221,7 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
             int descender = params->m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
             int height = params->m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
             int margin
-                = params->m_doc->GetBottomMargin(SYL) * params->m_doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            = params->m_doc->GetBottomMargin(SYL) * params->m_doc->GetDrawingUnit(staffSize);
             this->SetOverflowBelow(this->m_overflowBelow + this->GetVerseCount() * (height - descender + margin));
             // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep them
             // and check if they are some lyrics in order to know if the overlap needs to be calculated or not.
@@ -429,8 +429,8 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
     }
 
     // Add a margin
-    maxOverlfowAbove += params->m_doc->GetBottomMargin(STAFF) * params->m_doc->GetDrawingUnit(this->GetStaffSize())
-        / PARAM_DENOMINATOR;
+    maxOverlfowAbove += params->m_doc->GetBottomMargin(STAFF) * params->m_doc->GetDrawingUnit(this->GetStaffSize());
+       
 
     // Is the maximum the overflow (+ overlap) shift, or the default ?
     maxOverlfowAbove -= params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
