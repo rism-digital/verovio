@@ -807,8 +807,11 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                     continue;
             }
 
-            // Nothing to do if we have no vertical overlapping
+            // Nothing to do if we have no vertical overlap
             if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
+            
+            // Nothing to do either if we have no horizontal overlap
+            if (!this->HorizontalSelfOverlap(*iter, horizontalMargin)) continue;
 
             int xRelShift = this->HorizontalLeftOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
 
