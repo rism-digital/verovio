@@ -62,8 +62,8 @@ private:
     /** Records the appearance and usually the function of the bar line. **/
     mordentLog_FORM m_form;
     /**
-     * When the long attribute is set to 'yes', a double or long mordent, consisting of
-     * 5 notes, is indicated.
+     * When set to 'true', a double or long mordent, sometimes called a "pincé double",
+     * consisting of 5 notes, is indicated.
      **/
     data_BOOLEAN m_long;
 
@@ -71,22 +71,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttOrnam
+// AttOrnamentAccid
 //----------------------------------------------------------------------------
 
-class AttOrnam : public Att {
+class AttOrnamentAccid : public Att {
 public:
-    AttOrnam();
-    virtual ~AttOrnam();
+    AttOrnamentAccid();
+    virtual ~AttOrnamentAccid();
 
     /** Reset the default values for the attribute class **/
-    void ResetOrnam();
+    void ResetOrnamentAccid();
 
     /** Read the values for the attribute class **/
-    bool ReadOrnam(pugi::xml_node element);
+    bool ReadOrnamentAccid(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteOrnam(pugi::xml_node element);
+    bool WriteOrnamentAccid(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -94,60 +94,20 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOrnam(std::string ornam_) { m_ornam = ornam_; }
-    std::string GetOrnam() const { return m_ornam; }
-    bool HasOrnam() const;
-    ///@}
-
-private:
-    /**
-     * Indicates that this element has an attached ornament.
-     * If visual information about the ornament is needed, then one of the elements
-     * that represents an ornament (mordent, trill, or turn) should be employed.
-     **/
-    std::string m_ornam;
-
-    /* include <attornam> */
-};
-
-//----------------------------------------------------------------------------
-// AttOrnamentaccid
-//----------------------------------------------------------------------------
-
-class AttOrnamentaccid : public Att {
-public:
-    AttOrnamentaccid();
-    virtual ~AttOrnamentaccid();
-
-    /** Reset the default values for the attribute class **/
-    void ResetOrnamentaccid();
-
-    /** Read the values for the attribute class **/
-    bool ReadOrnamentaccid(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteOrnamentaccid(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetAccidupper(data_ACCIDENTAL_EXPLICIT accidupper_) { m_accidupper = accidupper_; }
-    data_ACCIDENTAL_EXPLICIT GetAccidupper() const { return m_accidupper; }
+    void SetAccidupper(data_ACCIDENTAL_WRITTEN accidupper_) { m_accidupper = accidupper_; }
+    data_ACCIDENTAL_WRITTEN GetAccidupper() const { return m_accidupper; }
     bool HasAccidupper() const;
     //
-    void SetAccidlower(data_ACCIDENTAL_EXPLICIT accidlower_) { m_accidlower = accidlower_; }
-    data_ACCIDENTAL_EXPLICIT GetAccidlower() const { return m_accidlower; }
+    void SetAccidlower(data_ACCIDENTAL_WRITTEN accidlower_) { m_accidlower = accidlower_; }
+    data_ACCIDENTAL_WRITTEN GetAccidlower() const { return m_accidlower; }
     bool HasAccidlower() const;
     ///@}
 
 private:
     /** Records the written accidental associated with an upper neighboring note. **/
-    data_ACCIDENTAL_EXPLICIT m_accidupper;
+    data_ACCIDENTAL_WRITTEN m_accidupper;
     /** Records the written accidental associated with a lower neighboring note. **/
-    data_ACCIDENTAL_EXPLICIT m_accidlower;
+    data_ACCIDENTAL_WRITTEN m_accidlower;
 
     /* include <attaccidlower> */
 };
@@ -186,11 +146,7 @@ public:
     ///@}
 
 private:
-    /**
-     * When the delayed attribute is set to 'true', the turn begins on the second half
-     * of the beat.
-     * See Read, p. 246.
-     **/
+    /** When set to 'true', the turn begins on the second half of the beat. **/
     data_BOOLEAN m_delayed;
     /** Records the appearance and usually the function of the bar line. **/
     turnLog_FORM m_form;

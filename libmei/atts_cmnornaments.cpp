@@ -88,108 +88,62 @@ bool AttMordentLog::HasLong() const
 /* include <attlong> */
 
 //----------------------------------------------------------------------------
-// AttOrnam
+// AttOrnamentAccid
 //----------------------------------------------------------------------------
 
-AttOrnam::AttOrnam() : Att()
+AttOrnamentAccid::AttOrnamentAccid() : Att()
 {
-    ResetOrnam();
+    ResetOrnamentAccid();
 }
 
-AttOrnam::~AttOrnam()
-{
-}
-
-void AttOrnam::ResetOrnam()
-{
-    m_ornam = "";
-}
-
-bool AttOrnam::ReadOrnam(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("ornam")) {
-        this->SetOrnam(StrToStr(element.attribute("ornam").value()));
-        element.remove_attribute("ornam");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttOrnam::WriteOrnam(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasOrnam()) {
-        element.append_attribute("ornam") = StrToStr(this->GetOrnam()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttOrnam::HasOrnam() const
-{
-    return (m_ornam != "");
-}
-
-/* include <attornam> */
-
-//----------------------------------------------------------------------------
-// AttOrnamentaccid
-//----------------------------------------------------------------------------
-
-AttOrnamentaccid::AttOrnamentaccid() : Att()
-{
-    ResetOrnamentaccid();
-}
-
-AttOrnamentaccid::~AttOrnamentaccid()
+AttOrnamentAccid::~AttOrnamentAccid()
 {
 }
 
-void AttOrnamentaccid::ResetOrnamentaccid()
+void AttOrnamentAccid::ResetOrnamentAccid()
 {
-    m_accidupper = ACCIDENTAL_EXPLICIT_NONE;
-    m_accidlower = ACCIDENTAL_EXPLICIT_NONE;
+    m_accidupper = ACCIDENTAL_WRITTEN_NONE;
+    m_accidlower = ACCIDENTAL_WRITTEN_NONE;
 }
 
-bool AttOrnamentaccid::ReadOrnamentaccid(pugi::xml_node element)
+bool AttOrnamentAccid::ReadOrnamentAccid(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("accidupper")) {
-        this->SetAccidupper(StrToAccidentalExplicit(element.attribute("accidupper").value()));
+        this->SetAccidupper(StrToAccidentalWritten(element.attribute("accidupper").value()));
         element.remove_attribute("accidupper");
         hasAttribute = true;
     }
     if (element.attribute("accidlower")) {
-        this->SetAccidlower(StrToAccidentalExplicit(element.attribute("accidlower").value()));
+        this->SetAccidlower(StrToAccidentalWritten(element.attribute("accidlower").value()));
         element.remove_attribute("accidlower");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttOrnamentaccid::WriteOrnamentaccid(pugi::xml_node element)
+bool AttOrnamentAccid::WriteOrnamentAccid(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasAccidupper()) {
-        element.append_attribute("accidupper") = AccidentalExplicitToStr(this->GetAccidupper()).c_str();
+        element.append_attribute("accidupper") = AccidentalWrittenToStr(this->GetAccidupper()).c_str();
         wroteAttribute = true;
     }
     if (this->HasAccidlower()) {
-        element.append_attribute("accidlower") = AccidentalExplicitToStr(this->GetAccidlower()).c_str();
+        element.append_attribute("accidlower") = AccidentalWrittenToStr(this->GetAccidlower()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttOrnamentaccid::HasAccidupper() const
+bool AttOrnamentAccid::HasAccidupper() const
 {
-    return (m_accidupper != ACCIDENTAL_EXPLICIT_NONE);
+    return (m_accidupper != ACCIDENTAL_WRITTEN_NONE);
 }
 
-bool AttOrnamentaccid::HasAccidlower() const
+bool AttOrnamentAccid::HasAccidlower() const
 {
-    return (m_accidlower != ACCIDENTAL_EXPLICIT_NONE);
+    return (m_accidlower != ACCIDENTAL_WRITTEN_NONE);
 }
 
 /* include <attaccidlower> */
@@ -269,23 +223,15 @@ bool Att::SetCmnornaments(Object *element, std::string attrType, std::string att
             return true;
         }
     }
-    if (element->HasAttClass(ATT_ORNAM)) {
-        AttOrnam *att = dynamic_cast<AttOrnam *>(element);
-        assert(att);
-        if (attrType == "ornam") {
-            att->SetOrnam(att->StrToStr(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass(ATT_ORNAMENTACCID)) {
-        AttOrnamentaccid *att = dynamic_cast<AttOrnamentaccid *>(element);
+        AttOrnamentAccid *att = dynamic_cast<AttOrnamentAccid *>(element);
         assert(att);
         if (attrType == "accidupper") {
-            att->SetAccidupper(att->StrToAccidentalExplicit(attrValue));
+            att->SetAccidupper(att->StrToAccidentalWritten(attrValue));
             return true;
         }
         if (attrType == "accidlower") {
-            att->SetAccidlower(att->StrToAccidentalExplicit(attrValue));
+            att->SetAccidlower(att->StrToAccidentalWritten(attrValue));
             return true;
         }
     }
@@ -317,21 +263,14 @@ void Att::GetCmnornaments(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("long", att->BooleanToStr(att->GetLong())));
         }
     }
-    if (element->HasAttClass(ATT_ORNAM)) {
-        const AttOrnam *att = dynamic_cast<const AttOrnam *>(element);
-        assert(att);
-        if (att->HasOrnam()) {
-            attributes->push_back(std::make_pair("ornam", att->StrToStr(att->GetOrnam())));
-        }
-    }
     if (element->HasAttClass(ATT_ORNAMENTACCID)) {
-        const AttOrnamentaccid *att = dynamic_cast<const AttOrnamentaccid *>(element);
+        const AttOrnamentAccid *att = dynamic_cast<const AttOrnamentAccid *>(element);
         assert(att);
         if (att->HasAccidupper()) {
-            attributes->push_back(std::make_pair("accidupper", att->AccidentalExplicitToStr(att->GetAccidupper())));
+            attributes->push_back(std::make_pair("accidupper", att->AccidentalWrittenToStr(att->GetAccidupper())));
         }
         if (att->HasAccidlower()) {
-            attributes->push_back(std::make_pair("accidlower", att->AccidentalExplicitToStr(att->GetAccidlower())));
+            attributes->push_back(std::make_pair("accidlower", att->AccidentalWrittenToStr(att->GetAccidlower())));
         }
     }
     if (element->HasAttClass(ATT_TURNLOG)) {

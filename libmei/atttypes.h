@@ -20,48 +20,32 @@
 namespace vrv {
 
 /**
- * MEI data.ACCIDENTAL.EXPLICIT
+ * MEI data.ACCIDENTAL.WRITTEN
  */
-enum data_ACCIDENTAL_EXPLICIT {
-    ACCIDENTAL_EXPLICIT_NONE = 0,
-    ACCIDENTAL_EXPLICIT_s,
-    ACCIDENTAL_EXPLICIT_f,
-    ACCIDENTAL_EXPLICIT_ss,
-    ACCIDENTAL_EXPLICIT_x,
-    ACCIDENTAL_EXPLICIT_ff,
-    ACCIDENTAL_EXPLICIT_xs,
-    ACCIDENTAL_EXPLICIT_sx,
-    ACCIDENTAL_EXPLICIT_ts,
-    ACCIDENTAL_EXPLICIT_tf,
-    ACCIDENTAL_EXPLICIT_n,
-    ACCIDENTAL_EXPLICIT_nf,
-    ACCIDENTAL_EXPLICIT_ns,
-    ACCIDENTAL_EXPLICIT_su,
-    ACCIDENTAL_EXPLICIT_sd,
-    ACCIDENTAL_EXPLICIT_fu,
-    ACCIDENTAL_EXPLICIT_fd,
-    ACCIDENTAL_EXPLICIT_nu,
-    ACCIDENTAL_EXPLICIT_nd,
-    ACCIDENTAL_EXPLICIT_1qf,
-    ACCIDENTAL_EXPLICIT_3qf,
-    ACCIDENTAL_EXPLICIT_1qs,
-    ACCIDENTAL_EXPLICIT_3qs,
-};
-
-/**
- * MEI data.ACCIDENTAL.IMPLICIT
- */
-enum data_ACCIDENTAL_IMPLICIT {
-    ACCIDENTAL_IMPLICIT_NONE = 0,
-    ACCIDENTAL_IMPLICIT_s,
-    ACCIDENTAL_IMPLICIT_f,
-    ACCIDENTAL_IMPLICIT_ss,
-    ACCIDENTAL_IMPLICIT_ff,
-    ACCIDENTAL_IMPLICIT_n,
-    ACCIDENTAL_IMPLICIT_su,
-    ACCIDENTAL_IMPLICIT_sd,
-    ACCIDENTAL_IMPLICIT_fu,
-    ACCIDENTAL_IMPLICIT_fd,
+enum data_ACCIDENTAL_WRITTEN {
+    ACCIDENTAL_WRITTEN_NONE = 0,
+    ACCIDENTAL_WRITTEN_s,
+    ACCIDENTAL_WRITTEN_f,
+    ACCIDENTAL_WRITTEN_ss,
+    ACCIDENTAL_WRITTEN_x,
+    ACCIDENTAL_WRITTEN_ff,
+    ACCIDENTAL_WRITTEN_xs,
+    ACCIDENTAL_WRITTEN_sx,
+    ACCIDENTAL_WRITTEN_ts,
+    ACCIDENTAL_WRITTEN_tf,
+    ACCIDENTAL_WRITTEN_n,
+    ACCIDENTAL_WRITTEN_nf,
+    ACCIDENTAL_WRITTEN_ns,
+    ACCIDENTAL_WRITTEN_su,
+    ACCIDENTAL_WRITTEN_sd,
+    ACCIDENTAL_WRITTEN_fu,
+    ACCIDENTAL_WRITTEN_fd,
+    ACCIDENTAL_WRITTEN_nu,
+    ACCIDENTAL_WRITTEN_nd,
+    ACCIDENTAL_WRITTEN_1qf,
+    ACCIDENTAL_WRITTEN_3qf,
+    ACCIDENTAL_WRITTEN_1qs,
+    ACCIDENTAL_WRITTEN_3qs,
 };
 
 /**
@@ -135,6 +119,16 @@ enum data_BARRENDITION {
 };
 
 /**
+ * MEI data.BEAMPLACE
+ */
+enum data_BEAMPLACE {
+    BEAMPLACE_NONE = 0,
+    BEAMPLACE_above,
+    BEAMPLACE_below,
+    BEAMPLACE_mixed,
+};
+
+/**
  * MEI data.BETYPE
  */
 enum data_BETYPE {
@@ -188,36 +182,157 @@ enum data_CLEFSHAPE {
 };
 
 /**
- * MEI data.CLUSTER
- */
-enum data_CLUSTER {
-    CLUSTER_NONE = 0,
-    CLUSTER_white,
-    CLUSTER_black,
-    CLUSTER_chromatic,
-};
-
-/**
  * MEI data.COLORNAMES
  */
 enum data_COLORNAMES {
     COLORNAMES_NONE = 0,
+    COLORNAMES_aliceblue,
+    COLORNAMES_antiquewhite,
     COLORNAMES_aqua,
+    COLORNAMES_aquamarine,
+    COLORNAMES_azure,
+    COLORNAMES_beige,
+    COLORNAMES_bisque,
     COLORNAMES_black,
+    COLORNAMES_blanchedalmond,
     COLORNAMES_blue,
+    COLORNAMES_blueviolet,
+    COLORNAMES_brown,
+    COLORNAMES_burlywood,
+    COLORNAMES_cadetblue,
+    COLORNAMES_chartreuse,
+    COLORNAMES_chocolate,
+    COLORNAMES_coral,
+    COLORNAMES_cornflowerblue,
+    COLORNAMES_cornsilk,
+    COLORNAMES_crimson,
+    COLORNAMES_cyan,
+    COLORNAMES_darkblue,
+    COLORNAMES_darkcyan,
+    COLORNAMES_darkgoldenrod,
+    COLORNAMES_darkgray,
+    COLORNAMES_darkgreen,
+    COLORNAMES_darkgrey,
+    COLORNAMES_darkkhaki,
+    COLORNAMES_darkmagenta,
+    COLORNAMES_darkolivegreen,
+    COLORNAMES_darkorange,
+    COLORNAMES_darkorchid,
+    COLORNAMES_darkred,
+    COLORNAMES_darksalmon,
+    COLORNAMES_darkseagreen,
+    COLORNAMES_darkslateblue,
+    COLORNAMES_darkslategray,
+    COLORNAMES_darkslategrey,
+    COLORNAMES_darkturquoise,
+    COLORNAMES_darkviolet,
+    COLORNAMES_deeppink,
+    COLORNAMES_deepskyblue,
+    COLORNAMES_dimgray,
+    COLORNAMES_dimgrey,
+    COLORNAMES_dodgerblue,
+    COLORNAMES_firebrick,
+    COLORNAMES_floralwhite,
+    COLORNAMES_forestgreen,
     COLORNAMES_fuchsia,
+    COLORNAMES_gainsboro,
+    COLORNAMES_ghostwhite,
+    COLORNAMES_gold,
+    COLORNAMES_goldenrod,
     COLORNAMES_gray,
     COLORNAMES_green,
+    COLORNAMES_greenyellow,
+    COLORNAMES_grey,
+    COLORNAMES_honeydew,
+    COLORNAMES_hotpink,
+    COLORNAMES_indianred,
+    COLORNAMES_indigo,
+    COLORNAMES_ivory,
+    COLORNAMES_khaki,
+    COLORNAMES_lavender,
+    COLORNAMES_lavenderblush,
+    COLORNAMES_lawngreen,
+    COLORNAMES_lemonchiffon,
+    COLORNAMES_lightblue,
+    COLORNAMES_lightcoral,
+    COLORNAMES_lightcyan,
+    COLORNAMES_lightgoldenrodyellow,
+    COLORNAMES_lightgray,
+    COLORNAMES_lightgreen,
+    COLORNAMES_lightgrey,
+    COLORNAMES_lightpink,
+    COLORNAMES_lightsalmon,
+    COLORNAMES_lightseagreen,
+    COLORNAMES_lightskyblue,
+    COLORNAMES_lightslategray,
+    COLORNAMES_lightslategrey,
+    COLORNAMES_lightsteelblue,
+    COLORNAMES_lightyellow,
     COLORNAMES_lime,
+    COLORNAMES_limegreen,
+    COLORNAMES_linen,
+    COLORNAMES_magenta,
     COLORNAMES_maroon,
+    COLORNAMES_mediumaquamarine,
+    COLORNAMES_mediumblue,
+    COLORNAMES_mediumorchid,
+    COLORNAMES_mediumpurple,
+    COLORNAMES_mediumseagreen,
+    COLORNAMES_mediumslateblue,
+    COLORNAMES_mediumspringgreen,
+    COLORNAMES_mediumturquoise,
+    COLORNAMES_mediumvioletred,
+    COLORNAMES_midnightblue,
+    COLORNAMES_mintcream,
+    COLORNAMES_mistyrose,
+    COLORNAMES_moccasin,
+    COLORNAMES_navajowhite,
     COLORNAMES_navy,
+    COLORNAMES_oldlace,
     COLORNAMES_olive,
+    COLORNAMES_olivedrab,
+    COLORNAMES_orange,
+    COLORNAMES_orangered,
+    COLORNAMES_orchid,
+    COLORNAMES_palegoldenrod,
+    COLORNAMES_palegreen,
+    COLORNAMES_paleturquoise,
+    COLORNAMES_palevioletred,
+    COLORNAMES_papayawhip,
+    COLORNAMES_peachpuff,
+    COLORNAMES_peru,
+    COLORNAMES_pink,
+    COLORNAMES_plum,
+    COLORNAMES_powderblue,
     COLORNAMES_purple,
     COLORNAMES_red,
+    COLORNAMES_rosybrown,
+    COLORNAMES_royalblue,
+    COLORNAMES_saddlebrown,
+    COLORNAMES_salmon,
+    COLORNAMES_sandybrown,
+    COLORNAMES_seagreen,
+    COLORNAMES_seashell,
+    COLORNAMES_sienna,
     COLORNAMES_silver,
+    COLORNAMES_skyblue,
+    COLORNAMES_slateblue,
+    COLORNAMES_slategray,
+    COLORNAMES_slategrey,
+    COLORNAMES_snow,
+    COLORNAMES_springgreen,
+    COLORNAMES_steelblue,
+    COLORNAMES_tan,
     COLORNAMES_teal,
+    COLORNAMES_thistle,
+    COLORNAMES_tomato,
+    COLORNAMES_turquoise,
+    COLORNAMES_violet,
+    COLORNAMES_wheat,
     COLORNAMES_white,
+    COLORNAMES_whitesmoke,
     COLORNAMES_yellow,
+    COLORNAMES_yellowgreen,
 };
 
 /**
@@ -250,12 +365,13 @@ enum data_FONTSIZETERM {
     FONTSIZETERM_xx_small,
     FONTSIZETERM_x_small,
     FONTSIZETERM_small,
-    FONTSIZETERM_medium,
+    FONTSIZETERM_normal,
     FONTSIZETERM_large,
     FONTSIZETERM_x_large,
     FONTSIZETERM_xx_large,
     FONTSIZETERM_smaller,
     FONTSIZETERM_larger,
+    FONTSIZETERM_cue,
 };
 
 /**
@@ -332,44 +448,6 @@ enum data_HORIZONTALALIGNMENT {
 };
 
 /**
- * MEI data.INEUMEFORM
- */
-enum data_INEUMEFORM {
-    INEUMEFORM_NONE = 0,
-    INEUMEFORM_liquescent1,
-    INEUMEFORM_liquescent2,
-    INEUMEFORM_tied,
-    INEUMEFORM_tiedliquescent1,
-    INEUMEFORM_tiedliquescent2,
-};
-
-/**
- * MEI data.INEUMENAME
- */
-enum data_INEUMENAME {
-    INEUMENAME_NONE = 0,
-    INEUMENAME_pessubpunctis,
-    INEUMENAME_climacus,
-    INEUMENAME_scandicus,
-    INEUMENAME_bistropha,
-    INEUMENAME_tristropha,
-    INEUMENAME_pressusminor,
-    INEUMENAME_pressusmaior,
-};
-
-/**
- * MEI data.LAYERSCHEME
- */
-enum data_LAYERSCHEME {
-    LAYERSCHEME_NONE = 0,
-    LAYERSCHEME_1,
-    LAYERSCHEME_2o,
-    LAYERSCHEME_2f,
-    LAYERSCHEME_3o,
-    LAYERSCHEME_3f,
-};
-
-/**
  * MEI data.LIGATUREFORM
  */
 enum data_LIGATUREFORM {
@@ -414,41 +492,6 @@ enum data_LINEWIDTHTERM {
     LINEWIDTHTERM_narrow,
     LINEWIDTHTERM_medium,
     LINEWIDTHTERM_wide,
-};
-
-/**
- * MEI data.MELODICFUNCTION
- */
-enum data_MELODICFUNCTION {
-    MELODICFUNCTION_NONE = 0,
-    MELODICFUNCTION_aln,
-    MELODICFUNCTION_ant,
-    MELODICFUNCTION_app,
-    MELODICFUNCTION_apt,
-    MELODICFUNCTION_arp,
-    MELODICFUNCTION_arp7,
-    MELODICFUNCTION_aun,
-    MELODICFUNCTION_chg,
-    MELODICFUNCTION_cln,
-    MELODICFUNCTION_ct,
-    MELODICFUNCTION_ct7,
-    MELODICFUNCTION_cun,
-    MELODICFUNCTION_cup,
-    MELODICFUNCTION_et,
-    MELODICFUNCTION_ln,
-    MELODICFUNCTION_ped,
-    MELODICFUNCTION_rep,
-    MELODICFUNCTION_ret,
-    MELODICFUNCTION_23ret,
-    MELODICFUNCTION_78ret,
-    MELODICFUNCTION_sus,
-    MELODICFUNCTION_43sus,
-    MELODICFUNCTION_98sus,
-    MELODICFUNCTION_76sus,
-    MELODICFUNCTION_un,
-    MELODICFUNCTION_un7,
-    MELODICFUNCTION_upt,
-    MELODICFUNCTION_upt7,
 };
 
 /**
@@ -667,6 +710,42 @@ enum data_MODE {
 };
 
 /**
+ * MEI data.MODSRELATIONSHIP
+ */
+enum data_MODSRELATIONSHIP {
+    MODSRELATIONSHIP_NONE = 0,
+    MODSRELATIONSHIP_preceding,
+    MODSRELATIONSHIP_succeeding,
+    MODSRELATIONSHIP_original,
+    MODSRELATIONSHIP_host,
+    MODSRELATIONSHIP_constituent,
+    MODSRELATIONSHIP_otherVersion,
+    MODSRELATIONSHIP_otherFormat,
+    MODSRELATIONSHIP_isReferencedBy,
+    MODSRELATIONSHIP_references,
+};
+
+/**
+ * MEI data.NONSTAFFPLACE
+ */
+enum data_NONSTAFFPLACE {
+    NONSTAFFPLACE_NONE = 0,
+    NONSTAFFPLACE_botmar,
+    NONSTAFFPLACE_topmar,
+    NONSTAFFPLACE_leftmar,
+    NONSTAFFPLACE_rightmar,
+    NONSTAFFPLACE_facing,
+    NONSTAFFPLACE_overleaf,
+    NONSTAFFPLACE_end,
+    NONSTAFFPLACE_inter,
+    NONSTAFFPLACE_intra,
+    NONSTAFFPLACE_super,
+    NONSTAFFPLACE_sub,
+    NONSTAFFPLACE_inspace,
+    NONSTAFFPLACE_superimposed,
+};
+
+/**
  * MEI data.NOTATIONTYPE
  */
 enum data_NOTATIONTYPE {
@@ -706,15 +785,6 @@ enum data_OTHERSTAFF {
 };
 
 /**
- * MEI data.PLACE
- */
-enum data_PLACE {
-    PLACE_NONE = 0,
-    PLACE_above,
-    PLACE_below,
-};
-
-/**
  * MEI data.ROTATIONDIRECTION
  */
 enum data_ROTATIONDIRECTION {
@@ -729,22 +799,71 @@ enum data_ROTATIONDIRECTION {
 };
 
 /**
- * MEI data.SIZE
+ * MEI data.STAFFITEM.basic
  */
-enum data_SIZE {
-    SIZE_NONE = 0,
-    SIZE_normal,
-    SIZE_cue,
+enum data_STAFFITEM_basic {
+    STAFFITEM_basic_NONE = 0,
+    STAFFITEM_basic_accid,
+    STAFFITEM_basic_annot,
+    STAFFITEM_basic_artic,
+    STAFFITEM_basic_dir,
+    STAFFITEM_basic_dynam,
+    STAFFITEM_basic_harm,
+    STAFFITEM_basic_ornam,
+    STAFFITEM_basic_sp,
+    STAFFITEM_basic_stageDir,
+    STAFFITEM_basic_tempo,
 };
 
 /**
- * MEI data.STAFFREL
+ * MEI data.STAFFITEM.cmn
  */
-enum data_STAFFREL {
-    STAFFREL_NONE = 0,
-    STAFFREL_above,
-    STAFFREL_below,
-    STAFFREL_within,
+enum data_STAFFITEM_cmn {
+    STAFFITEM_cmn_NONE = 0,
+    STAFFITEM_cmn_beam,
+    STAFFITEM_cmn_bend,
+    STAFFITEM_cmn_breath,
+    STAFFITEM_cmn_cpMark,
+    STAFFITEM_cmn_fermata,
+    STAFFITEM_cmn_fing,
+    STAFFITEM_cmn_hairpin,
+    STAFFITEM_cmn_harpPedal,
+    STAFFITEM_cmn_ligatureSpan,
+    STAFFITEM_cmn_lv,
+    STAFFITEM_cmn_mordent,
+    STAFFITEM_cmn_octave,
+    STAFFITEM_cmn_pedal,
+    STAFFITEM_cmn_reh,
+    STAFFITEM_cmn_tie,
+    STAFFITEM_cmn_trill,
+    STAFFITEM_cmn_tuplet,
+    STAFFITEM_cmn_turn,
+};
+
+/**
+ * MEI data.STAFFITEM.mensural
+ */
+enum data_STAFFITEM_mensural {
+    STAFFITEM_mensural_NONE = 0,
+    STAFFITEM_mensural_ligature,
+};
+
+/**
+ * MEI data.STAFFREL.basic
+ */
+enum data_STAFFREL_basic {
+    STAFFREL_basic_NONE = 0,
+    STAFFREL_basic_above,
+    STAFFREL_basic_below,
+};
+
+/**
+ * MEI data.STAFFREL.extended
+ */
+enum data_STAFFREL_extended {
+    STAFFREL_extended_NONE = 0,
+    STAFFREL_extended_between,
+    STAFFREL_extended_within,
 };
 
 /**
@@ -774,21 +893,12 @@ enum data_STEMPOSITION {
 };
 
 /**
- * MEI data.TEMPERAMENT
- */
-enum data_TEMPERAMENT {
-    TEMPERAMENT_NONE = 0,
-    TEMPERAMENT_equal,
-    TEMPERAMENT_just,
-    TEMPERAMENT_mean,
-    TEMPERAMENT_pythagorean,
-};
-
-/**
  * MEI data.TEXTRENDITIONLIST
  */
 enum data_TEXTRENDITIONLIST {
     TEXTRENDITIONLIST_NONE = 0,
+    TEXTRENDITIONLIST_quote,
+    TEXTRENDITIONLIST_quotedbl,
     TEXTRENDITIONLIST_italic,
     TEXTRENDITIONLIST_oblique,
     TEXTRENDITIONLIST_smcaps,
@@ -808,45 +918,13 @@ enum data_TEXTRENDITIONLIST {
     TEXTRENDITIONLIST_strike,
     TEXTRENDITIONLIST_sub,
     TEXTRENDITIONLIST_sup,
+    TEXTRENDITIONLIST_superimpose,
     TEXTRENDITIONLIST_underline,
+    TEXTRENDITIONLIST_x_through,
     TEXTRENDITIONLIST_ltr,
     TEXTRENDITIONLIST_rtl,
     TEXTRENDITIONLIST_lro,
     TEXTRENDITIONLIST_rlo,
-};
-
-/**
- * MEI data.UNEUMEFORM
- */
-enum data_UNEUMEFORM {
-    UNEUMEFORM_NONE = 0,
-    UNEUMEFORM_liquescent1,
-    UNEUMEFORM_liquescent2,
-    UNEUMEFORM_liquescent3,
-    UNEUMEFORM_quilismatic,
-    UNEUMEFORM_rectangular,
-    UNEUMEFORM_rhombic,
-    UNEUMEFORM_tied,
-};
-
-/**
- * MEI data.UNEUMENAME
- */
-enum data_UNEUMENAME {
-    UNEUMENAME_NONE = 0,
-    UNEUMENAME_punctum,
-    UNEUMENAME_virga,
-    UNEUMENAME_pes,
-    UNEUMENAME_clivis,
-    UNEUMENAME_torculus,
-    UNEUMENAME_torculusresupinus,
-    UNEUMENAME_porrectus,
-    UNEUMENAME_porrectusflexus,
-    UNEUMENAME_apostropha,
-    UNEUMENAME_oriscus,
-    UNEUMENAME_pressusmaior,
-    UNEUMENAME_pressusminor,
-    UNEUMENAME_virgastrata,
 };
 
 /**
@@ -869,33 +947,21 @@ enum arpegLog_ORDER {
 };
 
 /**
+ * MEI att.audience@audience
+ */
+enum audience_AUDIENCE {
+    audience_AUDIENCE_NONE = 0,
+    audience_AUDIENCE_private,
+    audience_AUDIENCE_public,
+};
+
+/**
  * MEI att.bTrem.log@form
  */
 enum bTremLog_FORM {
     bTremLog_FORM_NONE = 0,
     bTremLog_FORM_meas,
     bTremLog_FORM_unmeas,
-};
-
-/**
- * MEI att.beaming.vis@beam.rend
- */
-enum beamingVis_BEAMREND {
-    beamingVis_BEAMREND_NONE = 0,
-    beamingVis_BEAMREND_acc,
-    beamingVis_BEAMREND_rit,
-    beamingVis_BEAMREND_norm,
-};
-
-/**
- * MEI att.beamrend@form
- */
-enum beamrend_FORM {
-    beamrend_FORM_NONE = 0,
-    beamrend_FORM_acc,
-    beamrend_FORM_mixed,
-    beamrend_FORM_rit,
-    beamrend_FORM_norm,
 };
 
 /**
@@ -909,30 +975,12 @@ enum curvature_CURVEDIR {
 };
 
 /**
- * MEI att.cutout@cutout
- */
-enum cutout_CUTOUT {
-    cutout_CUTOUT_NONE = 0,
-    cutout_CUTOUT_cutout,
-};
-
-/**
  * MEI att.dot.log@form
  */
 enum dotLog_FORM {
     dotLog_FORM_NONE = 0,
     dotLog_FORM_aug,
     dotLog_FORM_div,
-};
-
-/**
- * MEI att.endings@ending.rend
- */
-enum endings_ENDINGREND {
-    endings_ENDINGREND_NONE = 0,
-    endings_ENDINGREND_top,
-    endings_ENDINGREND_barred,
-    endings_ENDINGREND_grouped,
 };
 
 /**
@@ -945,22 +993,13 @@ enum fTremLog_FORM {
 };
 
 /**
- * MEI att.fermata.vis@form
+ * MEI att.graceGrp.log@attach
  */
-enum fermataVis_FORM {
-    fermataVis_FORM_NONE = 0,
-    fermataVis_FORM_inv,
-    fermataVis_FORM_norm,
-};
-
-/**
- * MEI att.fermata.vis@shape
- */
-enum fermataVis_SHAPE {
-    fermataVis_SHAPE_NONE = 0,
-    fermataVis_SHAPE_curved,
-    fermataVis_SHAPE_square,
-    fermataVis_SHAPE_angular,
+enum graceGrpLog_ATTACH {
+    graceGrpLog_ATTACH_NONE = 0,
+    graceGrpLog_ATTACH_pre,
+    graceGrpLog_ATTACH_post,
+    graceGrpLog_ATTACH_unknown,
 };
 
 /**
@@ -970,16 +1009,6 @@ enum hairpinLog_FORM {
     hairpinLog_FORM_NONE = 0,
     hairpinLog_FORM_cres,
     hairpinLog_FORM_dim,
-};
-
-/**
- * MEI att.harm.vis@rendgrid
- */
-enum harmVis_RENDGRID {
-    harmVis_RENDGRID_NONE = 0,
-    harmVis_RENDGRID_grid,
-    harmVis_RENDGRID_gridtext,
-    harmVis_RENDGRID_text,
 };
 
 /**
@@ -1053,51 +1082,21 @@ enum harpPedalLog_G {
 };
 
 /**
- * MEI att.meiversion@meiversion
+ * MEI att.meiVersion@meiversion
  */
-enum meiversion_MEIVERSION {
-    meiversion_MEIVERSION_NONE = 0,
-    meiversion_MEIVERSION_3_0_0,
+enum meiVersion_MEIVERSION {
+    meiVersion_MEIVERSION_NONE = 0,
+    meiVersion_MEIVERSION_4_0_0,
 };
 
 /**
- * MEI att.mensur.vis@form
+ * MEI att.meterConformance@metcon
  */
-enum mensurVis_FORM {
-    mensurVis_FORM_NONE = 0,
-    mensurVis_FORM_horizontal,
-    mensurVis_FORM_vertical,
-};
-
-/**
- * MEI att.mensural.vis@mensur.form
- */
-enum mensuralVis_MENSURFORM {
-    mensuralVis_MENSURFORM_NONE = 0,
-    mensuralVis_MENSURFORM_horizontal,
-    mensuralVis_MENSURFORM_vertical,
-};
-
-/**
- * MEI att.meterSig.vis@form
- */
-enum meterSigVis_FORM {
-    meterSigVis_FORM_NONE = 0,
-    meterSigVis_FORM_num,
-    meterSigVis_FORM_denomsym,
-    meterSigVis_FORM_norm,
-    meterSigVis_FORM_invis,
-};
-
-/**
- * MEI att.meterSigDefault.vis@meter.rend
- */
-enum meterSigDefaultVis_METERREND {
-    meterSigDefaultVis_METERREND_NONE = 0,
-    meterSigDefaultVis_METERREND_num,
-    meterSigDefaultVis_METERREND_denomsym,
-    meterSigDefaultVis_METERREND_norm,
-    meterSigDefaultVis_METERREND_invis,
+enum meterConformance_METCON {
+    meterConformance_METCON_NONE = 0,
+    meterConformance_METCON_c,
+    meterConformance_METCON_i,
+    meterConformance_METCON_o,
 };
 
 /**
@@ -1111,31 +1110,12 @@ enum meterSigGrpLog_FUNC {
 };
 
 /**
- * MEI att.meterconformance@metcon
- */
-enum meterconformance_METCON {
-    meterconformance_METCON_NONE = 0,
-    meterconformance_METCON_c,
-    meterconformance_METCON_i,
-    meterconformance_METCON_o,
-};
-
-/**
  * MEI att.mordent.log@form
  */
 enum mordentLog_FORM {
     mordentLog_FORM_NONE = 0,
-    mordentLog_FORM_inv,
-    mordentLog_FORM_norm,
-};
-
-/**
- * MEI att.note.log.mensural@lig
- */
-enum noteLogMensural_LIG {
-    noteLogMensural_LIG_NONE = 0,
-    noteLogMensural_LIG_recta,
-    noteLogMensural_LIG_obliqua,
+    mordentLog_FORM_lower,
+    mordentLog_FORM_upper,
 };
 
 /**
@@ -1147,15 +1127,6 @@ enum octaveLog_COLL {
 };
 
 /**
- * MEI att.pb.vis@folium
- */
-enum pbVis_FOLIUM {
-    pbVis_FOLIUM_NONE = 0,
-    pbVis_FOLIUM_verso,
-    pbVis_FOLIUM_recto,
-};
-
-/**
  * MEI att.pedal.log@dir
  */
 enum pedalLog_DIR {
@@ -1164,26 +1135,6 @@ enum pedalLog_DIR {
     pedalLog_DIR_up,
     pedalLog_DIR_half,
     pedalLog_DIR_bounce,
-};
-
-/**
- * MEI att.pedal.vis@form
- */
-enum pedalVis_FORM {
-    pedalVis_FORM_NONE = 0,
-    pedalVis_FORM_line,
-    pedalVis_FORM_pedstar,
-    pedalVis_FORM_altpedstar,
-};
-
-/**
- * MEI att.pianopedals@pedal.style
- */
-enum pianopedals_PEDALSTYLE {
-    pianopedals_PEDALSTYLE_NONE = 0,
-    pianopedals_PEDALSTYLE_line,
-    pianopedals_PEDALSTYLE_pedstar,
-    pianopedals_PEDALSTYLE_altpedstar,
 };
 
 /**
@@ -1210,42 +1161,24 @@ enum pointing_XLINKSHOW {
 };
 
 /**
- * MEI att.regularmethod@method
+ * MEI att.regularMethod@method
  */
-enum regularmethod_METHOD {
-    regularmethod_METHOD_NONE = 0,
-    regularmethod_METHOD_silent,
-    regularmethod_METHOD_tags,
+enum regularMethod_METHOD {
+    regularMethod_METHOD_NONE = 0,
+    regularMethod_METHOD_silent,
+    regularMethod_METHOD_tags,
 };
 
 /**
- * MEI att.rehearsal@reh.enclose
+ * MEI att.staffGroupingSym@symbol
  */
-enum rehearsal_REHENCLOSE {
-    rehearsal_REHENCLOSE_NONE = 0,
-    rehearsal_REHENCLOSE_box,
-    rehearsal_REHENCLOSE_circle,
-    rehearsal_REHENCLOSE_none,
-};
-
-/**
- * MEI att.sb.vis@form
- */
-enum sbVis_FORM {
-    sbVis_FORM_NONE = 0,
-    sbVis_FORM_hash,
-};
-
-/**
- * MEI att.staffgroupingsym@symbol
- */
-enum staffgroupingsym_SYMBOL {
-    staffgroupingsym_SYMBOL_NONE = 0,
-    staffgroupingsym_SYMBOL_brace,
-    staffgroupingsym_SYMBOL_bracket,
-    staffgroupingsym_SYMBOL_bracketsq,
-    staffgroupingsym_SYMBOL_line,
-    staffgroupingsym_SYMBOL_none,
+enum staffGroupingSym_SYMBOL {
+    staffGroupingSym_SYMBOL_NONE = 0,
+    staffGroupingSym_SYMBOL_brace,
+    staffGroupingSym_SYMBOL_bracket,
+    staffGroupingSym_SYMBOL_bracketsq,
+    staffGroupingSym_SYMBOL_line,
+    staffGroupingSym_SYMBOL_none,
 };
 
 /**
@@ -1274,13 +1207,13 @@ enum sylLog_WORDPOS {
 };
 
 /**
- * MEI att.targeteval@evaluate
+ * MEI att.targetEval@evaluate
  */
-enum targeteval_EVALUATE {
-    targeteval_EVALUATE_NONE = 0,
-    targeteval_EVALUATE_all,
-    targeteval_EVALUATE_one,
-    targeteval_EVALUATE_none,
+enum targetEval_EVALUATE {
+    targetEval_EVALUATE_NONE = 0,
+    targetEval_EVALUATE_all,
+    targetEval_EVALUATE_one,
+    targetEval_EVALUATE_none,
 };
 
 /**
@@ -1295,21 +1228,12 @@ enum tempoLog_FUNC {
 };
 
 /**
- * MEI att.tuplet.vis@num.format
- */
-enum tupletVis_NUMFORMAT {
-    tupletVis_NUMFORMAT_NONE = 0,
-    tupletVis_NUMFORMAT_count,
-    tupletVis_NUMFORMAT_ratio,
-};
-
-/**
  * MEI att.turn.log@form
  */
 enum turnLog_FORM {
     turnLog_FORM_NONE = 0,
-    turnLog_FORM_inv,
-    turnLog_FORM_norm,
+    turnLog_FORM_lower,
+    turnLog_FORM_upper,
 };
 
 /**

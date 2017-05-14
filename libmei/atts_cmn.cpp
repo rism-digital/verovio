@@ -73,52 +73,6 @@ bool AttArpegLog::HasOrder() const
 /* include <attorder> */
 
 //----------------------------------------------------------------------------
-// AttArpegVis
-//----------------------------------------------------------------------------
-
-AttArpegVis::AttArpegVis() : Att()
-{
-    ResetArpegVis();
-}
-
-AttArpegVis::~AttArpegVis()
-{
-}
-
-void AttArpegVis::ResetArpegVis()
-{
-    m_arrow = BOOLEAN_NONE;
-}
-
-bool AttArpegVis::ReadArpegVis(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("arrow")) {
-        this->SetArrow(StrToBoolean(element.attribute("arrow").value()));
-        element.remove_attribute("arrow");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttArpegVis::WriteArpegVis(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasArrow()) {
-        element.append_attribute("arrow") = BooleanToStr(this->GetArrow()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttArpegVis::HasArrow() const
-{
-    return (m_arrow != BOOLEAN_NONE);
-}
-
-/* include <attarrow> */
-
-//----------------------------------------------------------------------------
 // AttBTremLog
 //----------------------------------------------------------------------------
 
@@ -165,70 +119,24 @@ bool AttBTremLog::HasForm() const
 /* include <attform> */
 
 //----------------------------------------------------------------------------
-// AttBeamed
+// AttBeamedWith
 //----------------------------------------------------------------------------
 
-AttBeamed::AttBeamed() : Att()
+AttBeamedWith::AttBeamedWith() : Att()
 {
-    ResetBeamed();
+    ResetBeamedWith();
 }
 
-AttBeamed::~AttBeamed()
-{
-}
-
-void AttBeamed::ResetBeamed()
-{
-    m_beam = "";
-}
-
-bool AttBeamed::ReadBeamed(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("beam")) {
-        this->SetBeam(StrToStr(element.attribute("beam").value()));
-        element.remove_attribute("beam");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttBeamed::WriteBeamed(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasBeam()) {
-        element.append_attribute("beam") = StrToStr(this->GetBeam()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttBeamed::HasBeam() const
-{
-    return (m_beam != "");
-}
-
-/* include <attbeam> */
-
-//----------------------------------------------------------------------------
-// AttBeamedwith
-//----------------------------------------------------------------------------
-
-AttBeamedwith::AttBeamedwith() : Att()
-{
-    ResetBeamedwith();
-}
-
-AttBeamedwith::~AttBeamedwith()
+AttBeamedWith::~AttBeamedWith()
 {
 }
 
-void AttBeamedwith::ResetBeamedwith()
+void AttBeamedWith::ResetBeamedWith()
 {
     m_beamWith = OTHERSTAFF_NONE;
 }
 
-bool AttBeamedwith::ReadBeamedwith(pugi::xml_node element)
+bool AttBeamedWith::ReadBeamedWith(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("beam.with")) {
@@ -239,7 +147,7 @@ bool AttBeamedwith::ReadBeamedwith(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttBeamedwith::WriteBeamedwith(pugi::xml_node element)
+bool AttBeamedWith::WriteBeamedWith(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasBeamWith()) {
@@ -249,7 +157,7 @@ bool AttBeamedwith::WriteBeamedwith(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttBeamedwith::HasBeamWith() const
+bool AttBeamedWith::HasBeamWith() const
 {
     return (m_beamWith != OTHERSTAFF_NONE);
 }
@@ -318,113 +226,6 @@ bool AttBeamingLog::HasBeamRests() const
 /* include <attbeam.rests> */
 
 //----------------------------------------------------------------------------
-// AttBeamrend
-//----------------------------------------------------------------------------
-
-AttBeamrend::AttBeamrend() : Att()
-{
-    ResetBeamrend();
-}
-
-AttBeamrend::~AttBeamrend()
-{
-}
-
-void AttBeamrend::ResetBeamrend()
-{
-    m_form = beamrend_FORM_NONE;
-    m_slope = 0.0;
-}
-
-bool AttBeamrend::ReadBeamrend(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("form")) {
-        this->SetForm(StrToBeamrendForm(element.attribute("form").value()));
-        element.remove_attribute("form");
-        hasAttribute = true;
-    }
-    if (element.attribute("slope")) {
-        this->SetSlope(StrToDbl(element.attribute("slope").value()));
-        element.remove_attribute("slope");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttBeamrend::WriteBeamrend(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasForm()) {
-        element.append_attribute("form") = BeamrendFormToStr(this->GetForm()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasSlope()) {
-        element.append_attribute("slope") = DblToStr(this->GetSlope()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttBeamrend::HasForm() const
-{
-    return (m_form != beamrend_FORM_NONE);
-}
-
-bool AttBeamrend::HasSlope() const
-{
-    return (m_slope != 0.0);
-}
-
-/* include <attslope> */
-
-//----------------------------------------------------------------------------
-// AttBeamsecondary
-//----------------------------------------------------------------------------
-
-AttBeamsecondary::AttBeamsecondary() : Att()
-{
-    ResetBeamsecondary();
-}
-
-AttBeamsecondary::~AttBeamsecondary()
-{
-}
-
-void AttBeamsecondary::ResetBeamsecondary()
-{
-    m_breaksec = 0;
-}
-
-bool AttBeamsecondary::ReadBeamsecondary(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("breaksec")) {
-        this->SetBreaksec(StrToInt(element.attribute("breaksec").value()));
-        element.remove_attribute("breaksec");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttBeamsecondary::WriteBeamsecondary(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasBreaksec()) {
-        element.append_attribute("breaksec") = IntToStr(this->GetBreaksec()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttBeamsecondary::HasBreaksec() const
-{
-    return (m_breaksec != 0);
-}
-
-/* include <attbreaksec> */
-
-//----------------------------------------------------------------------------
 // AttBeatRptLog
 //----------------------------------------------------------------------------
 
@@ -439,15 +240,15 @@ AttBeatRptLog::~AttBeatRptLog()
 
 void AttBeatRptLog::ResetBeatRptLog()
 {
-    m_beatDef = DURATION_NONE;
+    m_beatdef = DURATION_NONE;
 }
 
 bool AttBeatRptLog::ReadBeatRptLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("beatDef")) {
-        this->SetBeatDef(StrToDuration(element.attribute("beatDef").value()));
-        element.remove_attribute("beatDef");
+    if (element.attribute("beatdef")) {
+        this->SetBeatdef(StrToDuration(element.attribute("beatdef").value()));
+        element.remove_attribute("beatdef");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -456,203 +257,19 @@ bool AttBeatRptLog::ReadBeatRptLog(pugi::xml_node element)
 bool AttBeatRptLog::WriteBeatRptLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasBeatDef()) {
-        element.append_attribute("beatDef") = DurationToStr(this->GetBeatDef()).c_str();
+    if (this->HasBeatdef()) {
+        element.append_attribute("beatdef") = DurationToStr(this->GetBeatdef()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttBeatRptLog::HasBeatDef() const
+bool AttBeatRptLog::HasBeatdef() const
 {
-    return (m_beatDef != DURATION_NONE);
+    return (m_beatdef != DURATION_NONE);
 }
 
-/* include <attbeatDef> */
-
-//----------------------------------------------------------------------------
-// AttBeatRptVis
-//----------------------------------------------------------------------------
-
-AttBeatRptVis::AttBeatRptVis() : Att()
-{
-    ResetBeatRptVis();
-}
-
-AttBeatRptVis::~AttBeatRptVis()
-{
-}
-
-void AttBeatRptVis::ResetBeatRptVis()
-{
-    m_form = BEATRPT_REND_NONE;
-}
-
-bool AttBeatRptVis::ReadBeatRptVis(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("form")) {
-        this->SetForm(StrToBeatrptRend(element.attribute("form").value()));
-        element.remove_attribute("form");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttBeatRptVis::WriteBeatRptVis(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasForm()) {
-        element.append_attribute("form") = BeatrptRendToStr(this->GetForm()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttBeatRptVis::HasForm() const
-{
-    return (m_form != BEATRPT_REND_NONE);
-}
-
-/* include <attform> */
-
-//----------------------------------------------------------------------------
-// AttBendGes
-//----------------------------------------------------------------------------
-
-AttBendGes::AttBendGes() : Att()
-{
-    ResetBendGes();
-}
-
-AttBendGes::~AttBendGes()
-{
-}
-
-void AttBendGes::ResetBendGes()
-{
-    m_amount = 0.0;
-}
-
-bool AttBendGes::ReadBendGes(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("amount")) {
-        this->SetAmount(StrToDbl(element.attribute("amount").value()));
-        element.remove_attribute("amount");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttBendGes::WriteBendGes(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasAmount()) {
-        element.append_attribute("amount") = DblToStr(this->GetAmount()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttBendGes::HasAmount() const
-{
-    return (m_amount != 0.0);
-}
-
-/* include <attamount> */
-
-//----------------------------------------------------------------------------
-// AttCutout
-//----------------------------------------------------------------------------
-
-AttCutout::AttCutout() : Att()
-{
-    ResetCutout();
-}
-
-AttCutout::~AttCutout()
-{
-}
-
-void AttCutout::ResetCutout()
-{
-    m_cutout = cutout_CUTOUT_NONE;
-}
-
-bool AttCutout::ReadCutout(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("cutout")) {
-        this->SetCutout(StrToCutoutCutout(element.attribute("cutout").value()));
-        element.remove_attribute("cutout");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttCutout::WriteCutout(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasCutout()) {
-        element.append_attribute("cutout") = CutoutCutoutToStr(this->GetCutout()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttCutout::HasCutout() const
-{
-    return (m_cutout != cutout_CUTOUT_NONE);
-}
-
-/* include <attcutout> */
-
-//----------------------------------------------------------------------------
-// AttExpandable
-//----------------------------------------------------------------------------
-
-AttExpandable::AttExpandable() : Att()
-{
-    ResetExpandable();
-}
-
-AttExpandable::~AttExpandable()
-{
-}
-
-void AttExpandable::ResetExpandable()
-{
-    m_expand = BOOLEAN_NONE;
-}
-
-bool AttExpandable::ReadExpandable(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("expand")) {
-        this->SetExpand(StrToBoolean(element.attribute("expand").value()));
-        element.remove_attribute("expand");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttExpandable::WriteExpandable(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasExpand()) {
-        element.append_attribute("expand") = BooleanToStr(this->GetExpand()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttExpandable::HasExpand() const
-{
-    return (m_expand != BOOLEAN_NONE);
-}
-
-/* include <attexpand> */
+/* include <attbeatdef> */
 
 //----------------------------------------------------------------------------
 // AttFTremLog
@@ -701,65 +318,50 @@ bool AttFTremLog::HasForm() const
 /* include <attform> */
 
 //----------------------------------------------------------------------------
-// AttFermataVis
+// AttGraceGrpLog
 //----------------------------------------------------------------------------
 
-AttFermataVis::AttFermataVis() : Att()
+AttGraceGrpLog::AttGraceGrpLog() : Att()
 {
-    ResetFermataVis();
+    ResetGraceGrpLog();
 }
 
-AttFermataVis::~AttFermataVis()
+AttGraceGrpLog::~AttGraceGrpLog()
 {
 }
 
-void AttFermataVis::ResetFermataVis()
+void AttGraceGrpLog::ResetGraceGrpLog()
 {
-    m_form = fermataVis_FORM_NONE;
-    m_shape = fermataVis_SHAPE_NONE;
+    m_attach = graceGrpLog_ATTACH_NONE;
 }
 
-bool AttFermataVis::ReadFermataVis(pugi::xml_node element)
+bool AttGraceGrpLog::ReadGraceGrpLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("form")) {
-        this->SetForm(StrToFermataVisForm(element.attribute("form").value()));
-        element.remove_attribute("form");
-        hasAttribute = true;
-    }
-    if (element.attribute("shape")) {
-        this->SetShape(StrToFermataVisShape(element.attribute("shape").value()));
-        element.remove_attribute("shape");
+    if (element.attribute("attach")) {
+        this->SetAttach(StrToGraceGrpLogAttach(element.attribute("attach").value()));
+        element.remove_attribute("attach");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttFermataVis::WriteFermataVis(pugi::xml_node element)
+bool AttGraceGrpLog::WriteGraceGrpLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasForm()) {
-        element.append_attribute("form") = FermataVisFormToStr(this->GetForm()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasShape()) {
-        element.append_attribute("shape") = FermataVisShapeToStr(this->GetShape()).c_str();
+    if (this->HasAttach()) {
+        element.append_attribute("attach") = GraceGrpLogAttachToStr(this->GetAttach()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttFermataVis::HasForm() const
+bool AttGraceGrpLog::HasAttach() const
 {
-    return (m_form != fermataVis_FORM_NONE);
+    return (m_attach != graceGrpLog_ATTACH_NONE);
 }
 
-bool AttFermataVis::HasShape() const
-{
-    return (m_shape != fermataVis_SHAPE_NONE);
-}
-
-/* include <attshape> */
+/* include <attattach> */
 
 //----------------------------------------------------------------------------
 // AttGraced
@@ -882,52 +484,6 @@ bool AttHairpinLog::HasNiente() const
 }
 
 /* include <attniente> */
-
-//----------------------------------------------------------------------------
-// AttHairpinVis
-//----------------------------------------------------------------------------
-
-AttHairpinVis::AttHairpinVis() : Att()
-{
-    ResetHairpinVis();
-}
-
-AttHairpinVis::~AttHairpinVis()
-{
-}
-
-void AttHairpinVis::ResetHairpinVis()
-{
-    m_opening = "";
-}
-
-bool AttHairpinVis::ReadHairpinVis(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("opening")) {
-        this->SetOpening(StrToStr(element.attribute("opening").value()));
-        element.remove_attribute("opening");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttHairpinVis::WriteHairpinVis(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasOpening()) {
-        element.append_attribute("opening") = StrToStr(this->GetOpening()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttHairpinVis::HasOpening() const
-{
-    return (m_opening != "");
-}
-
-/* include <attopening> */
 
 //----------------------------------------------------------------------------
 // AttHarpPedalLog
@@ -1066,52 +622,6 @@ bool AttHarpPedalLog::HasB() const
 /* include <attb> */
 
 //----------------------------------------------------------------------------
-// AttLvpresent
-//----------------------------------------------------------------------------
-
-AttLvpresent::AttLvpresent() : Att()
-{
-    ResetLvpresent();
-}
-
-AttLvpresent::~AttLvpresent()
-{
-}
-
-void AttLvpresent::ResetLvpresent()
-{
-    m_lv = BOOLEAN_NONE;
-}
-
-bool AttLvpresent::ReadLvpresent(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("lv")) {
-        this->SetLv(StrToBoolean(element.attribute("lv").value()));
-        element.remove_attribute("lv");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttLvpresent::WriteLvpresent(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasLv()) {
-        element.append_attribute("lv") = BooleanToStr(this->GetLv()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttLvpresent::HasLv() const
-{
-    return (m_lv != BOOLEAN_NONE);
-}
-
-/* include <attlv> */
-
-//----------------------------------------------------------------------------
 // AttMeterSigGrpLog
 //----------------------------------------------------------------------------
 
@@ -1158,98 +668,6 @@ bool AttMeterSigGrpLog::HasFunc() const
 /* include <attfunc> */
 
 //----------------------------------------------------------------------------
-// AttMultiRestVis
-//----------------------------------------------------------------------------
-
-AttMultiRestVis::AttMultiRestVis() : Att()
-{
-    ResetMultiRestVis();
-}
-
-AttMultiRestVis::~AttMultiRestVis()
-{
-}
-
-void AttMultiRestVis::ResetMultiRestVis()
-{
-    m_block = BOOLEAN_NONE;
-}
-
-bool AttMultiRestVis::ReadMultiRestVis(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("block")) {
-        this->SetBlock(StrToBoolean(element.attribute("block").value()));
-        element.remove_attribute("block");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttMultiRestVis::WriteMultiRestVis(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasBlock()) {
-        element.append_attribute("block") = BooleanToStr(this->GetBlock()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttMultiRestVis::HasBlock() const
-{
-    return (m_block != BOOLEAN_NONE);
-}
-
-/* include <attblock> */
-
-//----------------------------------------------------------------------------
-// AttNoteGesCmn
-//----------------------------------------------------------------------------
-
-AttNoteGesCmn::AttNoteGesCmn() : Att()
-{
-    ResetNoteGesCmn();
-}
-
-AttNoteGesCmn::~AttNoteGesCmn()
-{
-}
-
-void AttNoteGesCmn::ResetNoteGesCmn()
-{
-    m_gliss = GLISSANDO_NONE;
-}
-
-bool AttNoteGesCmn::ReadNoteGesCmn(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("gliss")) {
-        this->SetGliss(StrToGlissando(element.attribute("gliss").value()));
-        element.remove_attribute("gliss");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttNoteGesCmn::WriteNoteGesCmn(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasGliss()) {
-        element.append_attribute("gliss") = GlissandoToStr(this->GetGliss()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttNoteGesCmn::HasGliss() const
-{
-    return (m_gliss != GLISSANDO_NONE);
-}
-
-/* include <attgliss> */
-
-//----------------------------------------------------------------------------
 // AttNumbered
 //----------------------------------------------------------------------------
 
@@ -1294,67 +712,6 @@ bool AttNumbered::HasNum() const
 }
 
 /* include <attnum> */
-
-//----------------------------------------------------------------------------
-// AttNumberplacement
-//----------------------------------------------------------------------------
-
-AttNumberplacement::AttNumberplacement() : Att()
-{
-    ResetNumberplacement();
-}
-
-AttNumberplacement::~AttNumberplacement()
-{
-}
-
-void AttNumberplacement::ResetNumberplacement()
-{
-    m_numPlace = PLACE_NONE;
-    m_numVisible = BOOLEAN_NONE;
-}
-
-bool AttNumberplacement::ReadNumberplacement(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("num.place")) {
-        this->SetNumPlace(StrToPlace(element.attribute("num.place").value()));
-        element.remove_attribute("num.place");
-        hasAttribute = true;
-    }
-    if (element.attribute("num.visible")) {
-        this->SetNumVisible(StrToBoolean(element.attribute("num.visible").value()));
-        element.remove_attribute("num.visible");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttNumberplacement::WriteNumberplacement(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasNumPlace()) {
-        element.append_attribute("num.place") = PlaceToStr(this->GetNumPlace()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasNumVisible()) {
-        element.append_attribute("num.visible") = BooleanToStr(this->GetNumVisible()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttNumberplacement::HasNumPlace() const
-{
-    return (m_numPlace != PLACE_NONE);
-}
-
-bool AttNumberplacement::HasNumVisible() const
-{
-    return (m_numVisible != BOOLEAN_NONE);
-}
-
-/* include <attnum.visible> */
 
 //----------------------------------------------------------------------------
 // AttOctaveLog
@@ -1418,6 +775,7 @@ AttPedalLog::~AttPedalLog()
 void AttPedalLog::ResetPedalLog()
 {
     m_dir = pedalLog_DIR_NONE;
+    m_func = "";
 }
 
 bool AttPedalLog::ReadPedalLog(pugi::xml_node element)
@@ -1426,6 +784,11 @@ bool AttPedalLog::ReadPedalLog(pugi::xml_node element)
     if (element.attribute("dir")) {
         this->SetDir(StrToPedalLogDir(element.attribute("dir").value()));
         element.remove_attribute("dir");
+        hasAttribute = true;
+    }
+    if (element.attribute("func")) {
+        this->SetFunc(StrToStr(element.attribute("func").value()));
+        element.remove_attribute("func");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1438,6 +801,10 @@ bool AttPedalLog::WritePedalLog(pugi::xml_node element)
         element.append_attribute("dir") = PedalLogDirToStr(this->GetDir()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasFunc()) {
+        element.append_attribute("func") = StrToStr(this->GetFunc()).c_str();
+        wroteAttribute = true;
+    }
     return wroteAttribute;
 }
 
@@ -1446,496 +813,12 @@ bool AttPedalLog::HasDir() const
     return (m_dir != pedalLog_DIR_NONE);
 }
 
-/* include <attdir> */
-
-//----------------------------------------------------------------------------
-// AttPedalVis
-//----------------------------------------------------------------------------
-
-AttPedalVis::AttPedalVis() : Att()
+bool AttPedalLog::HasFunc() const
 {
-    ResetPedalVis();
+    return (m_func != "");
 }
 
-AttPedalVis::~AttPedalVis()
-{
-}
-
-void AttPedalVis::ResetPedalVis()
-{
-    m_form = pedalVis_FORM_NONE;
-}
-
-bool AttPedalVis::ReadPedalVis(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("form")) {
-        this->SetForm(StrToPedalVisForm(element.attribute("form").value()));
-        element.remove_attribute("form");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttPedalVis::WritePedalVis(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasForm()) {
-        element.append_attribute("form") = PedalVisFormToStr(this->GetForm()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttPedalVis::HasForm() const
-{
-    return (m_form != pedalVis_FORM_NONE);
-}
-
-/* include <attform> */
-
-//----------------------------------------------------------------------------
-// AttPianopedals
-//----------------------------------------------------------------------------
-
-AttPianopedals::AttPianopedals() : Att()
-{
-    ResetPianopedals();
-}
-
-AttPianopedals::~AttPianopedals()
-{
-}
-
-void AttPianopedals::ResetPianopedals()
-{
-    m_pedalStyle = pianopedals_PEDALSTYLE_NONE;
-}
-
-bool AttPianopedals::ReadPianopedals(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("pedal.style")) {
-        this->SetPedalStyle(StrToPianopedalsPedalstyle(element.attribute("pedal.style").value()));
-        element.remove_attribute("pedal.style");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttPianopedals::WritePianopedals(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasPedalStyle()) {
-        element.append_attribute("pedal.style") = PianopedalsPedalstyleToStr(this->GetPedalStyle()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttPianopedals::HasPedalStyle() const
-{
-    return (m_pedalStyle != pianopedals_PEDALSTYLE_NONE);
-}
-
-/* include <attpedal.style> */
-
-//----------------------------------------------------------------------------
-// AttRehearsal
-//----------------------------------------------------------------------------
-
-AttRehearsal::AttRehearsal() : Att()
-{
-    ResetRehearsal();
-}
-
-AttRehearsal::~AttRehearsal()
-{
-}
-
-void AttRehearsal::ResetRehearsal()
-{
-    m_rehEnclose = rehearsal_REHENCLOSE_NONE;
-}
-
-bool AttRehearsal::ReadRehearsal(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("reh.enclose")) {
-        this->SetRehEnclose(StrToRehearsalRehenclose(element.attribute("reh.enclose").value()));
-        element.remove_attribute("reh.enclose");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttRehearsal::WriteRehearsal(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasRehEnclose()) {
-        element.append_attribute("reh.enclose") = RehearsalRehencloseToStr(this->GetRehEnclose()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttRehearsal::HasRehEnclose() const
-{
-    return (m_rehEnclose != rehearsal_REHENCLOSE_NONE);
-}
-
-/* include <attreh.enclose> */
-
-//----------------------------------------------------------------------------
-// AttScoreDefVisCmn
-//----------------------------------------------------------------------------
-
-AttScoreDefVisCmn::AttScoreDefVisCmn() : Att()
-{
-    ResetScoreDefVisCmn();
-}
-
-AttScoreDefVisCmn::~AttScoreDefVisCmn()
-{
-}
-
-void AttScoreDefVisCmn::ResetScoreDefVisCmn()
-{
-    m_gridShow = BOOLEAN_NONE;
-}
-
-bool AttScoreDefVisCmn::ReadScoreDefVisCmn(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("grid.show")) {
-        this->SetGridShow(StrToBoolean(element.attribute("grid.show").value()));
-        element.remove_attribute("grid.show");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttScoreDefVisCmn::WriteScoreDefVisCmn(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasGridShow()) {
-        element.append_attribute("grid.show") = BooleanToStr(this->GetGridShow()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttScoreDefVisCmn::HasGridShow() const
-{
-    return (m_gridShow != BOOLEAN_NONE);
-}
-
-/* include <attgrid.show> */
-
-//----------------------------------------------------------------------------
-// AttSlurrend
-//----------------------------------------------------------------------------
-
-AttSlurrend::AttSlurrend() : Att()
-{
-    ResetSlurrend();
-}
-
-AttSlurrend::~AttSlurrend()
-{
-}
-
-void AttSlurrend::ResetSlurrend()
-{
-    m_slurLform = LINEFORM_NONE;
-    m_slurLwidth = "";
-}
-
-bool AttSlurrend::ReadSlurrend(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("slur.lform")) {
-        this->SetSlurLform(StrToLineform(element.attribute("slur.lform").value()));
-        element.remove_attribute("slur.lform");
-        hasAttribute = true;
-    }
-    if (element.attribute("slur.lwidth")) {
-        this->SetSlurLwidth(StrToStr(element.attribute("slur.lwidth").value()));
-        element.remove_attribute("slur.lwidth");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttSlurrend::WriteSlurrend(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasSlurLform()) {
-        element.append_attribute("slur.lform") = LineformToStr(this->GetSlurLform()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasSlurLwidth()) {
-        element.append_attribute("slur.lwidth") = StrToStr(this->GetSlurLwidth()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttSlurrend::HasSlurLform() const
-{
-    return (m_slurLform != LINEFORM_NONE);
-}
-
-bool AttSlurrend::HasSlurLwidth() const
-{
-    return (m_slurLwidth != "");
-}
-
-/* include <attslur.lwidth> */
-
-//----------------------------------------------------------------------------
-// AttStemsCmn
-//----------------------------------------------------------------------------
-
-AttStemsCmn::AttStemsCmn() : Att()
-{
-    ResetStemsCmn();
-}
-
-AttStemsCmn::~AttStemsCmn()
-{
-}
-
-void AttStemsCmn::ResetStemsCmn()
-{
-    m_stemWith = OTHERSTAFF_NONE;
-}
-
-bool AttStemsCmn::ReadStemsCmn(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("stem.with")) {
-        this->SetStemWith(StrToOtherstaff(element.attribute("stem.with").value()));
-        element.remove_attribute("stem.with");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttStemsCmn::WriteStemsCmn(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasStemWith()) {
-        element.append_attribute("stem.with") = OtherstaffToStr(this->GetStemWith()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttStemsCmn::HasStemWith() const
-{
-    return (m_stemWith != OTHERSTAFF_NONE);
-}
-
-/* include <attstem.with> */
-
-//----------------------------------------------------------------------------
-// AttTierend
-//----------------------------------------------------------------------------
-
-AttTierend::AttTierend() : Att()
-{
-    ResetTierend();
-}
-
-AttTierend::~AttTierend()
-{
-}
-
-void AttTierend::ResetTierend()
-{
-    m_tieLform = LINEFORM_NONE;
-    m_tieLwidth = "";
-}
-
-bool AttTierend::ReadTierend(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("tie.lform")) {
-        this->SetTieLform(StrToLineform(element.attribute("tie.lform").value()));
-        element.remove_attribute("tie.lform");
-        hasAttribute = true;
-    }
-    if (element.attribute("tie.lwidth")) {
-        this->SetTieLwidth(StrToStr(element.attribute("tie.lwidth").value()));
-        element.remove_attribute("tie.lwidth");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttTierend::WriteTierend(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasTieLform()) {
-        element.append_attribute("tie.lform") = LineformToStr(this->GetTieLform()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasTieLwidth()) {
-        element.append_attribute("tie.lwidth") = StrToStr(this->GetTieLwidth()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttTierend::HasTieLform() const
-{
-    return (m_tieLform != LINEFORM_NONE);
-}
-
-bool AttTierend::HasTieLwidth() const
-{
-    return (m_tieLwidth != "");
-}
-
-/* include <atttie.lwidth> */
-
-//----------------------------------------------------------------------------
-// AttTremmeasured
-//----------------------------------------------------------------------------
-
-AttTremmeasured::AttTremmeasured() : Att()
-{
-    ResetTremmeasured();
-}
-
-AttTremmeasured::~AttTremmeasured()
-{
-}
-
-void AttTremmeasured::ResetTremmeasured()
-{
-    m_measperf = DURATION_NONE;
-}
-
-bool AttTremmeasured::ReadTremmeasured(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("measperf")) {
-        this->SetMeasperf(StrToDuration(element.attribute("measperf").value()));
-        element.remove_attribute("measperf");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttTremmeasured::WriteTremmeasured(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasMeasperf()) {
-        element.append_attribute("measperf") = DurationToStr(this->GetMeasperf()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttTremmeasured::HasMeasperf() const
-{
-    return (m_measperf != DURATION_NONE);
-}
-
-/* include <attmeasperf> */
-
-//----------------------------------------------------------------------------
-// AttTupletVis
-//----------------------------------------------------------------------------
-
-AttTupletVis::AttTupletVis() : Att()
-{
-    ResetTupletVis();
-}
-
-AttTupletVis::~AttTupletVis()
-{
-}
-
-void AttTupletVis::ResetTupletVis()
-{
-    m_bracketPlace = PLACE_NONE;
-    m_bracketVisible = BOOLEAN_NONE;
-    m_durVisible = BOOLEAN_NONE;
-    m_numFormat = tupletVis_NUMFORMAT_NONE;
-}
-
-bool AttTupletVis::ReadTupletVis(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("bracket.place")) {
-        this->SetBracketPlace(StrToPlace(element.attribute("bracket.place").value()));
-        element.remove_attribute("bracket.place");
-        hasAttribute = true;
-    }
-    if (element.attribute("bracket.visible")) {
-        this->SetBracketVisible(StrToBoolean(element.attribute("bracket.visible").value()));
-        element.remove_attribute("bracket.visible");
-        hasAttribute = true;
-    }
-    if (element.attribute("dur.visible")) {
-        this->SetDurVisible(StrToBoolean(element.attribute("dur.visible").value()));
-        element.remove_attribute("dur.visible");
-        hasAttribute = true;
-    }
-    if (element.attribute("num.format")) {
-        this->SetNumFormat(StrToTupletVisNumformat(element.attribute("num.format").value()));
-        element.remove_attribute("num.format");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttTupletVis::WriteTupletVis(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasBracketPlace()) {
-        element.append_attribute("bracket.place") = PlaceToStr(this->GetBracketPlace()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasBracketVisible()) {
-        element.append_attribute("bracket.visible") = BooleanToStr(this->GetBracketVisible()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasDurVisible()) {
-        element.append_attribute("dur.visible") = BooleanToStr(this->GetDurVisible()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasNumFormat()) {
-        element.append_attribute("num.format") = TupletVisNumformatToStr(this->GetNumFormat()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttTupletVis::HasBracketPlace() const
-{
-    return (m_bracketPlace != PLACE_NONE);
-}
-
-bool AttTupletVis::HasBracketVisible() const
-{
-    return (m_bracketVisible != BOOLEAN_NONE);
-}
-
-bool AttTupletVis::HasDurVisible() const
-{
-    return (m_durVisible != BOOLEAN_NONE);
-}
-
-bool AttTupletVis::HasNumFormat() const
-{
-    return (m_numFormat != tupletVis_NUMFORMAT_NONE);
-}
-
-/* include <attnum.format> */
+/* include <attfunc> */
 
 bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
 {
@@ -1947,14 +830,6 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
     }
-    if (element->HasAttClass(ATT_ARPEGVIS)) {
-        AttArpegVis *att = dynamic_cast<AttArpegVis *>(element);
-        assert(att);
-        if (attrType == "arrow") {
-            att->SetArrow(att->StrToBoolean(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass(ATT_BTREMLOG)) {
         AttBTremLog *att = dynamic_cast<AttBTremLog *>(element);
         assert(att);
@@ -1963,16 +838,8 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
     }
-    if (element->HasAttClass(ATT_BEAMED)) {
-        AttBeamed *att = dynamic_cast<AttBeamed *>(element);
-        assert(att);
-        if (attrType == "beam") {
-            att->SetBeam(att->StrToStr(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass(ATT_BEAMEDWITH)) {
-        AttBeamedwith *att = dynamic_cast<AttBeamedwith *>(element);
+        AttBeamedWith *att = dynamic_cast<AttBeamedWith *>(element);
         assert(att);
         if (attrType == "beam.with") {
             att->SetBeamWith(att->StrToOtherstaff(attrValue));
@@ -1991,63 +858,11 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
     }
-    if (element->HasAttClass(ATT_BEAMREND)) {
-        AttBeamrend *att = dynamic_cast<AttBeamrend *>(element);
-        assert(att);
-        if (attrType == "form") {
-            att->SetForm(att->StrToBeamrendForm(attrValue));
-            return true;
-        }
-        if (attrType == "slope") {
-            att->SetSlope(att->StrToDbl(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_BEAMSECONDARY)) {
-        AttBeamsecondary *att = dynamic_cast<AttBeamsecondary *>(element);
-        assert(att);
-        if (attrType == "breaksec") {
-            att->SetBreaksec(att->StrToInt(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass(ATT_BEATRPTLOG)) {
         AttBeatRptLog *att = dynamic_cast<AttBeatRptLog *>(element);
         assert(att);
-        if (attrType == "beatDef") {
-            att->SetBeatDef(att->StrToDuration(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_BEATRPTVIS)) {
-        AttBeatRptVis *att = dynamic_cast<AttBeatRptVis *>(element);
-        assert(att);
-        if (attrType == "form") {
-            att->SetForm(att->StrToBeatrptRend(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_BENDGES)) {
-        AttBendGes *att = dynamic_cast<AttBendGes *>(element);
-        assert(att);
-        if (attrType == "amount") {
-            att->SetAmount(att->StrToDbl(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_CUTOUT)) {
-        AttCutout *att = dynamic_cast<AttCutout *>(element);
-        assert(att);
-        if (attrType == "cutout") {
-            att->SetCutout(att->StrToCutoutCutout(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_EXPANDABLE)) {
-        AttExpandable *att = dynamic_cast<AttExpandable *>(element);
-        assert(att);
-        if (attrType == "expand") {
-            att->SetExpand(att->StrToBoolean(attrValue));
+        if (attrType == "beatdef") {
+            att->SetBeatdef(att->StrToDuration(attrValue));
             return true;
         }
     }
@@ -2059,15 +874,11 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
     }
-    if (element->HasAttClass(ATT_FERMATAVIS)) {
-        AttFermataVis *att = dynamic_cast<AttFermataVis *>(element);
+    if (element->HasAttClass(ATT_GRACEGRPLOG)) {
+        AttGraceGrpLog *att = dynamic_cast<AttGraceGrpLog *>(element);
         assert(att);
-        if (attrType == "form") {
-            att->SetForm(att->StrToFermataVisForm(attrValue));
-            return true;
-        }
-        if (attrType == "shape") {
-            att->SetShape(att->StrToFermataVisShape(attrValue));
+        if (attrType == "attach") {
+            att->SetAttach(att->StrToGraceGrpLogAttach(attrValue));
             return true;
         }
     }
@@ -2092,14 +903,6 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
         if (attrType == "niente") {
             att->SetNiente(att->StrToBoolean(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_HAIRPINVIS)) {
-        AttHairpinVis *att = dynamic_cast<AttHairpinVis *>(element);
-        assert(att);
-        if (attrType == "opening") {
-            att->SetOpening(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -2135,14 +938,6 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
     }
-    if (element->HasAttClass(ATT_LVPRESENT)) {
-        AttLvpresent *att = dynamic_cast<AttLvpresent *>(element);
-        assert(att);
-        if (attrType == "lv") {
-            att->SetLv(att->StrToBoolean(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass(ATT_METERSIGGRPLOG)) {
         AttMeterSigGrpLog *att = dynamic_cast<AttMeterSigGrpLog *>(element);
         assert(att);
@@ -2151,39 +946,11 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
     }
-    if (element->HasAttClass(ATT_MULTIRESTVIS)) {
-        AttMultiRestVis *att = dynamic_cast<AttMultiRestVis *>(element);
-        assert(att);
-        if (attrType == "block") {
-            att->SetBlock(att->StrToBoolean(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_NOTEGESCMN)) {
-        AttNoteGesCmn *att = dynamic_cast<AttNoteGesCmn *>(element);
-        assert(att);
-        if (attrType == "gliss") {
-            att->SetGliss(att->StrToGlissando(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass(ATT_NUMBERED)) {
         AttNumbered *att = dynamic_cast<AttNumbered *>(element);
         assert(att);
         if (attrType == "num") {
             att->SetNum(att->StrToInt(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_NUMBERPLACEMENT)) {
-        AttNumberplacement *att = dynamic_cast<AttNumberplacement *>(element);
-        assert(att);
-        if (attrType == "num.place") {
-            att->SetNumPlace(att->StrToPlace(attrValue));
-            return true;
-        }
-        if (attrType == "num.visible") {
-            att->SetNumVisible(att->StrToBoolean(attrValue));
             return true;
         }
     }
@@ -2202,96 +969,8 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
             att->SetDir(att->StrToPedalLogDir(attrValue));
             return true;
         }
-    }
-    if (element->HasAttClass(ATT_PEDALVIS)) {
-        AttPedalVis *att = dynamic_cast<AttPedalVis *>(element);
-        assert(att);
-        if (attrType == "form") {
-            att->SetForm(att->StrToPedalVisForm(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_PIANOPEDALS)) {
-        AttPianopedals *att = dynamic_cast<AttPianopedals *>(element);
-        assert(att);
-        if (attrType == "pedal.style") {
-            att->SetPedalStyle(att->StrToPianopedalsPedalstyle(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_REHEARSAL)) {
-        AttRehearsal *att = dynamic_cast<AttRehearsal *>(element);
-        assert(att);
-        if (attrType == "reh.enclose") {
-            att->SetRehEnclose(att->StrToRehearsalRehenclose(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_SCOREDEFVISCMN)) {
-        AttScoreDefVisCmn *att = dynamic_cast<AttScoreDefVisCmn *>(element);
-        assert(att);
-        if (attrType == "grid.show") {
-            att->SetGridShow(att->StrToBoolean(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_SLURREND)) {
-        AttSlurrend *att = dynamic_cast<AttSlurrend *>(element);
-        assert(att);
-        if (attrType == "slur.lform") {
-            att->SetSlurLform(att->StrToLineform(attrValue));
-            return true;
-        }
-        if (attrType == "slur.lwidth") {
-            att->SetSlurLwidth(att->StrToStr(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_STEMSCMN)) {
-        AttStemsCmn *att = dynamic_cast<AttStemsCmn *>(element);
-        assert(att);
-        if (attrType == "stem.with") {
-            att->SetStemWith(att->StrToOtherstaff(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_TIEREND)) {
-        AttTierend *att = dynamic_cast<AttTierend *>(element);
-        assert(att);
-        if (attrType == "tie.lform") {
-            att->SetTieLform(att->StrToLineform(attrValue));
-            return true;
-        }
-        if (attrType == "tie.lwidth") {
-            att->SetTieLwidth(att->StrToStr(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_TREMMEASURED)) {
-        AttTremmeasured *att = dynamic_cast<AttTremmeasured *>(element);
-        assert(att);
-        if (attrType == "measperf") {
-            att->SetMeasperf(att->StrToDuration(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_TUPLETVIS)) {
-        AttTupletVis *att = dynamic_cast<AttTupletVis *>(element);
-        assert(att);
-        if (attrType == "bracket.place") {
-            att->SetBracketPlace(att->StrToPlace(attrValue));
-            return true;
-        }
-        if (attrType == "bracket.visible") {
-            att->SetBracketVisible(att->StrToBoolean(attrValue));
-            return true;
-        }
-        if (attrType == "dur.visible") {
-            att->SetDurVisible(att->StrToBoolean(attrValue));
-            return true;
-        }
-        if (attrType == "num.format") {
-            att->SetNumFormat(att->StrToTupletVisNumformat(attrValue));
+        if (attrType == "func") {
+            att->SetFunc(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -2308,13 +987,6 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("order", att->ArpegLogOrderToStr(att->GetOrder())));
         }
     }
-    if (element->HasAttClass(ATT_ARPEGVIS)) {
-        const AttArpegVis *att = dynamic_cast<const AttArpegVis *>(element);
-        assert(att);
-        if (att->HasArrow()) {
-            attributes->push_back(std::make_pair("arrow", att->BooleanToStr(att->GetArrow())));
-        }
-    }
     if (element->HasAttClass(ATT_BTREMLOG)) {
         const AttBTremLog *att = dynamic_cast<const AttBTremLog *>(element);
         assert(att);
@@ -2322,15 +994,8 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("form", att->BTremLogFormToStr(att->GetForm())));
         }
     }
-    if (element->HasAttClass(ATT_BEAMED)) {
-        const AttBeamed *att = dynamic_cast<const AttBeamed *>(element);
-        assert(att);
-        if (att->HasBeam()) {
-            attributes->push_back(std::make_pair("beam", att->StrToStr(att->GetBeam())));
-        }
-    }
     if (element->HasAttClass(ATT_BEAMEDWITH)) {
-        const AttBeamedwith *att = dynamic_cast<const AttBeamedwith *>(element);
+        const AttBeamedWith *att = dynamic_cast<const AttBeamedWith *>(element);
         assert(att);
         if (att->HasBeamWith()) {
             attributes->push_back(std::make_pair("beam.with", att->OtherstaffToStr(att->GetBeamWith())));
@@ -2346,56 +1011,11 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("beam.rests", att->BooleanToStr(att->GetBeamRests())));
         }
     }
-    if (element->HasAttClass(ATT_BEAMREND)) {
-        const AttBeamrend *att = dynamic_cast<const AttBeamrend *>(element);
-        assert(att);
-        if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->BeamrendFormToStr(att->GetForm())));
-        }
-        if (att->HasSlope()) {
-            attributes->push_back(std::make_pair("slope", att->DblToStr(att->GetSlope())));
-        }
-    }
-    if (element->HasAttClass(ATT_BEAMSECONDARY)) {
-        const AttBeamsecondary *att = dynamic_cast<const AttBeamsecondary *>(element);
-        assert(att);
-        if (att->HasBreaksec()) {
-            attributes->push_back(std::make_pair("breaksec", att->IntToStr(att->GetBreaksec())));
-        }
-    }
     if (element->HasAttClass(ATT_BEATRPTLOG)) {
         const AttBeatRptLog *att = dynamic_cast<const AttBeatRptLog *>(element);
         assert(att);
-        if (att->HasBeatDef()) {
-            attributes->push_back(std::make_pair("beatDef", att->DurationToStr(att->GetBeatDef())));
-        }
-    }
-    if (element->HasAttClass(ATT_BEATRPTVIS)) {
-        const AttBeatRptVis *att = dynamic_cast<const AttBeatRptVis *>(element);
-        assert(att);
-        if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->BeatrptRendToStr(att->GetForm())));
-        }
-    }
-    if (element->HasAttClass(ATT_BENDGES)) {
-        const AttBendGes *att = dynamic_cast<const AttBendGes *>(element);
-        assert(att);
-        if (att->HasAmount()) {
-            attributes->push_back(std::make_pair("amount", att->DblToStr(att->GetAmount())));
-        }
-    }
-    if (element->HasAttClass(ATT_CUTOUT)) {
-        const AttCutout *att = dynamic_cast<const AttCutout *>(element);
-        assert(att);
-        if (att->HasCutout()) {
-            attributes->push_back(std::make_pair("cutout", att->CutoutCutoutToStr(att->GetCutout())));
-        }
-    }
-    if (element->HasAttClass(ATT_EXPANDABLE)) {
-        const AttExpandable *att = dynamic_cast<const AttExpandable *>(element);
-        assert(att);
-        if (att->HasExpand()) {
-            attributes->push_back(std::make_pair("expand", att->BooleanToStr(att->GetExpand())));
+        if (att->HasBeatdef()) {
+            attributes->push_back(std::make_pair("beatdef", att->DurationToStr(att->GetBeatdef())));
         }
     }
     if (element->HasAttClass(ATT_FTREMLOG)) {
@@ -2405,14 +1025,11 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("form", att->FTremLogFormToStr(att->GetForm())));
         }
     }
-    if (element->HasAttClass(ATT_FERMATAVIS)) {
-        const AttFermataVis *att = dynamic_cast<const AttFermataVis *>(element);
+    if (element->HasAttClass(ATT_GRACEGRPLOG)) {
+        const AttGraceGrpLog *att = dynamic_cast<const AttGraceGrpLog *>(element);
         assert(att);
-        if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->FermataVisFormToStr(att->GetForm())));
-        }
-        if (att->HasShape()) {
-            attributes->push_back(std::make_pair("shape", att->FermataVisShapeToStr(att->GetShape())));
+        if (att->HasAttach()) {
+            attributes->push_back(std::make_pair("attach", att->GraceGrpLogAttachToStr(att->GetAttach())));
         }
     }
     if (element->HasAttClass(ATT_GRACED)) {
@@ -2433,13 +1050,6 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasNiente()) {
             attributes->push_back(std::make_pair("niente", att->BooleanToStr(att->GetNiente())));
-        }
-    }
-    if (element->HasAttClass(ATT_HAIRPINVIS)) {
-        const AttHairpinVis *att = dynamic_cast<const AttHairpinVis *>(element);
-        assert(att);
-        if (att->HasOpening()) {
-            attributes->push_back(std::make_pair("opening", att->StrToStr(att->GetOpening())));
         }
     }
     if (element->HasAttClass(ATT_HARPPEDALLOG)) {
@@ -2467,13 +1077,6 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("b", att->HarpPedalLogBToStr(att->GetB())));
         }
     }
-    if (element->HasAttClass(ATT_LVPRESENT)) {
-        const AttLvpresent *att = dynamic_cast<const AttLvpresent *>(element);
-        assert(att);
-        if (att->HasLv()) {
-            attributes->push_back(std::make_pair("lv", att->BooleanToStr(att->GetLv())));
-        }
-    }
     if (element->HasAttClass(ATT_METERSIGGRPLOG)) {
         const AttMeterSigGrpLog *att = dynamic_cast<const AttMeterSigGrpLog *>(element);
         assert(att);
@@ -2481,35 +1084,11 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("func", att->MeterSigGrpLogFuncToStr(att->GetFunc())));
         }
     }
-    if (element->HasAttClass(ATT_MULTIRESTVIS)) {
-        const AttMultiRestVis *att = dynamic_cast<const AttMultiRestVis *>(element);
-        assert(att);
-        if (att->HasBlock()) {
-            attributes->push_back(std::make_pair("block", att->BooleanToStr(att->GetBlock())));
-        }
-    }
-    if (element->HasAttClass(ATT_NOTEGESCMN)) {
-        const AttNoteGesCmn *att = dynamic_cast<const AttNoteGesCmn *>(element);
-        assert(att);
-        if (att->HasGliss()) {
-            attributes->push_back(std::make_pair("gliss", att->GlissandoToStr(att->GetGliss())));
-        }
-    }
     if (element->HasAttClass(ATT_NUMBERED)) {
         const AttNumbered *att = dynamic_cast<const AttNumbered *>(element);
         assert(att);
         if (att->HasNum()) {
             attributes->push_back(std::make_pair("num", att->IntToStr(att->GetNum())));
-        }
-    }
-    if (element->HasAttClass(ATT_NUMBERPLACEMENT)) {
-        const AttNumberplacement *att = dynamic_cast<const AttNumberplacement *>(element);
-        assert(att);
-        if (att->HasNumPlace()) {
-            attributes->push_back(std::make_pair("num.place", att->PlaceToStr(att->GetNumPlace())));
-        }
-        if (att->HasNumVisible()) {
-            attributes->push_back(std::make_pair("num.visible", att->BooleanToStr(att->GetNumVisible())));
         }
     }
     if (element->HasAttClass(ATT_OCTAVELOG)) {
@@ -2525,83 +1104,8 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         if (att->HasDir()) {
             attributes->push_back(std::make_pair("dir", att->PedalLogDirToStr(att->GetDir())));
         }
-    }
-    if (element->HasAttClass(ATT_PEDALVIS)) {
-        const AttPedalVis *att = dynamic_cast<const AttPedalVis *>(element);
-        assert(att);
-        if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->PedalVisFormToStr(att->GetForm())));
-        }
-    }
-    if (element->HasAttClass(ATT_PIANOPEDALS)) {
-        const AttPianopedals *att = dynamic_cast<const AttPianopedals *>(element);
-        assert(att);
-        if (att->HasPedalStyle()) {
-            attributes->push_back(std::make_pair("pedal.style", att->PianopedalsPedalstyleToStr(att->GetPedalStyle())));
-        }
-    }
-    if (element->HasAttClass(ATT_REHEARSAL)) {
-        const AttRehearsal *att = dynamic_cast<const AttRehearsal *>(element);
-        assert(att);
-        if (att->HasRehEnclose()) {
-            attributes->push_back(std::make_pair("reh.enclose", att->RehearsalRehencloseToStr(att->GetRehEnclose())));
-        }
-    }
-    if (element->HasAttClass(ATT_SCOREDEFVISCMN)) {
-        const AttScoreDefVisCmn *att = dynamic_cast<const AttScoreDefVisCmn *>(element);
-        assert(att);
-        if (att->HasGridShow()) {
-            attributes->push_back(std::make_pair("grid.show", att->BooleanToStr(att->GetGridShow())));
-        }
-    }
-    if (element->HasAttClass(ATT_SLURREND)) {
-        const AttSlurrend *att = dynamic_cast<const AttSlurrend *>(element);
-        assert(att);
-        if (att->HasSlurLform()) {
-            attributes->push_back(std::make_pair("slur.lform", att->LineformToStr(att->GetSlurLform())));
-        }
-        if (att->HasSlurLwidth()) {
-            attributes->push_back(std::make_pair("slur.lwidth", att->StrToStr(att->GetSlurLwidth())));
-        }
-    }
-    if (element->HasAttClass(ATT_STEMSCMN)) {
-        const AttStemsCmn *att = dynamic_cast<const AttStemsCmn *>(element);
-        assert(att);
-        if (att->HasStemWith()) {
-            attributes->push_back(std::make_pair("stem.with", att->OtherstaffToStr(att->GetStemWith())));
-        }
-    }
-    if (element->HasAttClass(ATT_TIEREND)) {
-        const AttTierend *att = dynamic_cast<const AttTierend *>(element);
-        assert(att);
-        if (att->HasTieLform()) {
-            attributes->push_back(std::make_pair("tie.lform", att->LineformToStr(att->GetTieLform())));
-        }
-        if (att->HasTieLwidth()) {
-            attributes->push_back(std::make_pair("tie.lwidth", att->StrToStr(att->GetTieLwidth())));
-        }
-    }
-    if (element->HasAttClass(ATT_TREMMEASURED)) {
-        const AttTremmeasured *att = dynamic_cast<const AttTremmeasured *>(element);
-        assert(att);
-        if (att->HasMeasperf()) {
-            attributes->push_back(std::make_pair("measperf", att->DurationToStr(att->GetMeasperf())));
-        }
-    }
-    if (element->HasAttClass(ATT_TUPLETVIS)) {
-        const AttTupletVis *att = dynamic_cast<const AttTupletVis *>(element);
-        assert(att);
-        if (att->HasBracketPlace()) {
-            attributes->push_back(std::make_pair("bracket.place", att->PlaceToStr(att->GetBracketPlace())));
-        }
-        if (att->HasBracketVisible()) {
-            attributes->push_back(std::make_pair("bracket.visible", att->BooleanToStr(att->GetBracketVisible())));
-        }
-        if (att->HasDurVisible()) {
-            attributes->push_back(std::make_pair("dur.visible", att->BooleanToStr(att->GetDurVisible())));
-        }
-        if (att->HasNumFormat()) {
-            attributes->push_back(std::make_pair("num.format", att->TupletVisNumformatToStr(att->GetNumFormat())));
+        if (att->HasFunc()) {
+            attributes->push_back(std::make_pair("func", att->StrToStr(att->GetFunc())));
         }
     }
 }
