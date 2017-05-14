@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Accidentals in cross-staff chords</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-27</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio manages the placement of complex accidentals in combination with cross-staff notation.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000002103706200">
+                        <staffGrp xml:id="staffgrp-0000000117443753" symbol="brace" barthru="true">
+                            <staffDef xml:id="staffdef-0000000339685078" n="1" clef.shape="G" clef.line="2" key.sig="1f" lines="5" />
+                            <staffDef xml:id="staffdef-0000001280323780" n="2" clef.shape="F" clef.line="4" key.sig="1f" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000968655380">
+                        <measure xml:id="measure-L1" n="0">
+                            <staff xml:id="staff-0000000500572495" n="1">
+                                <layer xml:id="layer-L1F2N1" n="1">
+                                    <chord xml:id="chord-L4F3" dur="2">
+                                        <note xml:id="note-L4F3S1" oct="4" pname="d">
+                                            <accid xml:id="accid-L4F3S1" accid="f" />
+                                        </note>
+                                        <note xml:id="note-L4F3S2" staff="2" oct="3" pname="b">
+                                            <accid xml:id="accid-L4F3S2" accid.ges="f" />
+                                        </note>
+                                        <note xml:id="note-L4F3S3" staff="2" oct="3" pname="f">
+                                            <accid xml:id="accid-L4F3S3" accid="s" />
+                                        </note>
+                                    </chord>
+                                    <chord xml:id="chord-L6F3" dur="2">
+                                        <note xml:id="note-L6F3S1" oct="4" pname="c">
+                                            <accid xml:id="accid-L6F3S1" accid="s" />
+                                        </note>
+                                        <note xml:id="note-L6F3S2" oct="4" pname="d">
+                                            <accid xml:id="accid-L6F3S2" accid="s" />
+                                        </note>
+                                        <note xml:id="note-L6F3S3" staff="2" oct="3" pname="g">
+                                            <accid xml:id="accid-L6F3S3" accid="s" />
+                                        </note>
+                                        <note xml:id="note-L6F3S4" staff="2" oct="3" pname="e">
+                                            <accid xml:id="accid-L6F3S4" accid="n" func="caution" />
+                                        </note>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-0000001428478166" n="2">
+                                <layer xml:id="layer-L1F1N1" n="1">
+                                    <chord xml:id="chord-L4F1" dur="4" stem.dir="down">
+                                        <note xml:id="note-L4F1S1" oct="3" pname="f">
+                                            <accid xml:id="accid-L4F1S1" accid="s" />
+                                        </note>
+                                        <note xml:id="note-L4F1S2" oct="3" pname="e">
+                                            <accid xml:id="accid-L4F1S2" accid="f" />
+                                        </note>
+                                    </chord>
+                                    <chord xml:id="chord-L5F1" dur="4" stem.dir="down">
+                                        <note xml:id="note-L5F1S1" oct="3" pname="g">
+                                            <accid xml:id="accid-L5F1S1" accid="x" />
+                                        </note>
+                                        <note xml:id="note-L5F1S2" oct="3" pname="d">
+                                            <accid xml:id="accid-L5F1S2" accid="ff" />
+                                        </note>
+                                    </chord>
+                                    <chord xml:id="chord-L6F1" dur="2" stem.dir="down">
+                                        <note xml:id="note-L6F1S1" oct="3" pname="c">
+                                            <accid xml:id="accid-L6F1S1" accid="s" />
+                                        </note>
+                                        <note xml:id="note-L6F1S2" oct="3" pname="b">
+                                            <accid xml:id="accid-L6F1S2" accid="n" />
+                                        </note>
+                                        <note xml:id="note-L6F1S3" oct="3" pname="a">
+                                            <accid xml:id="accid-L6F1S3" accid="f" />
+                                        </note>
+                                    </chord>
+                                </layer>
+                                <layer xml:id="layer-L4F2N2" n="2">
+                                    <note xml:id="note-L4F2" dur="1" oct="2" pname="c">
+                                        <accid xml:id="accid-L4F2" accid.ges="n" />
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

@@ -19,10 +19,10 @@
                 <score>
                     <scoreDef>
                         <staffGrp symbol="bracket">
-                            <staffDef n="1" lines="5" clef.line="2" clef.shape="G" tempus="3" prolatio="3" proport.num="1" proport.numbase="3"/>
-                            <staffDef n="2" lines="5" clef.line="3" clef.shape="C" tempus="3" prolatio="2" proport.num="2" />
-                            <staffDef n="3" lines="5" clef.line="3" clef.shape="C" tempus="2" prolatio="3" proport.num="1" proport.numbase="2"/>
-                            <staffDef n="4" lines="5" clef.line="4" clef.shape="F" tempus="3" prolatio="2"/>
+                            <staffDef n="1" lines="5" clef.line="2" clef.shape="G" tempus="3" prolatio="3" proport.num="1" proport.numbase="3" notationtype="mensural"/>
+                            <staffDef n="2" lines="5" clef.line="3" clef.shape="C" tempus="3" prolatio="2" proport.num="2" notationtype="mensural"/>
+                            <staffDef n="3" lines="5" clef.line="3" clef.shape="C" tempus="2" prolatio="3" proport.num="1" proport.numbase="2" notationtype="mensural"/>
+                            <staffDef n="4" lines="5" clef.line="4" clef.shape="F" tempus="3" prolatio="2" notationtype="mensural"/>
                         </staffGrp>
                     </scoreDef>
                     <section>
@@ -107,6 +107,7 @@
                                 <note pname="g" dur="semibrevis" oct="4" />
                                 <note pname="f" dur="minima" oct="4" />
                                 <note pname="g" dur="longa" oct="4" num="1" numbase="3" />
+                                <barLine/>
                             </layer>
                         </staff>
                         <staff n="2">
@@ -259,6 +260,7 @@
                                 <note pname="e" dur="brevis" oct="4" colored="true" num="3" numbase="2"/>
                                 <note pname="d" dur="longa" oct="4" colored="true" num="3" numbase="2"/>
                                 <note pname="d" dur="longa" oct="4" num="1" numbase="8"/>
+                                <barLine/>
                             </layer>
                         </staff>
                         <staff n="3">
@@ -404,6 +406,7 @@
                                 <note pname="g" dur="semibrevis" oct="3" colored="true" />
                                 <note pname="a" dur="brevis" oct="3" colored="true" />
                                 <note pname="g" dur="longa" oct="3" num="1" numbase="6" />
+                                <barLine/>
                             </layer>
                         </staff>
                         <staff n="4">
@@ -505,6 +508,7 @@
                                 <note pname="d" dur="longa" oct="3" />
                                 <note pname="d" dur="longa" oct="3" />
                                 <note pname="g" dur="longa" oct="3" num="1" numbase="8" />
+                                <barLine/>
                             </layer>
                         </staff>
                     </section>

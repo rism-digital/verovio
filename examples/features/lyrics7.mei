@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Elision rendering</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-27</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio correctly renders elisions, that is, multiple syllables on the same note.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef n="1" clef.shape="G" clef.line="2" key.mode="major" meter.count="4" meter.unit="4" meter.sym="common" lines="5" />
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure n="1" right="end">
+              <staff n="1">
+                <layer n="1">
+                  <note dur="4" oct="5" pname="c">
+                    <verse n="1">
+                      <syl con="b">a</syl>
+                      <syl con="b">b</syl>
+                      <syl>c</syl>
+                    </verse>
+                  </note>
+                  <note dur="4" oct="5" pname="c">
+                    <verse n="1">
+                      <syl>d_e_f</syl>
+                    </verse>
+                  </note>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

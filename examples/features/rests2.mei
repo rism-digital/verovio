@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Rest placement</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-27</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Rests are rendered by Verovio in any position on the staff.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef clef.shape="G" clef.line="2" key.sig="0" n="1" lines="5" />
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure n="1">
+              <staff n="1">
+                <layer n="1">
+                  <rest dur="8"/>
+                  <rest dur="8" loc="-2"/>
+                  <rest dur="8" loc="0"/>
+                  <rest dur="8" loc="2"/>
+                  <rest dur="8" loc="4"/>
+                  <rest dur="8" loc="6"/>
+                  <rest dur="8" loc="8"/>
+                  <rest dur="8" loc="10"/>
+                </layer>
+              </staff>
+            </measure>
+            <measure n="2">
+              <staff n="1">
+                <layer n="1">
+                  <rest dur="4"/>
+                  <rest dur="4" loc="-2"/>
+                  <rest dur="4" loc="0"/>
+                  <rest dur="4" loc="2"/>
+                  <rest dur="4" loc="4"/>
+                  <rest dur="4" loc="6"/>
+                  <rest dur="4" loc="8"/>
+                  <rest dur="4" loc="10"/>
+                </layer>
+              </staff>
+            </measure>
+            <measure n="3">
+              <staff n="1">
+                <layer n="1">
+                  <rest dur="2"/>
+                  <rest dur="2" loc="-2"/>
+                  <rest dur="2" loc="0"/>
+                  <rest dur="2" loc="2"/>
+                  <rest dur="2" loc="4"/>
+                  <rest dur="2" loc="6"/>
+                  <rest dur="2" loc="8"/>
+                  <rest dur="2" loc="10"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

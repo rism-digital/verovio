@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Space within tuplets</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-25</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>In Romantic music, e.g., by Chopin and Brahms, the second of two eighth notes may be visually aligned with the third note of a triplet. In order to render similar cases of arithmetically 'incorrect' superimposition, Verovio supports the element "space" within tuplets.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000075403378">
+                        <staffGrp xml:id="m-000000008255812">
+                            <staffDef xml:id="staffdef-000000028000452" clef.shape="G" clef.line="2" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000158477552">
+                        <measure xml:id="measure-L2" n="1" right="end">
+                            <staff xml:id="staff-L2F1" n="1">
+                                <layer xml:id="layer-L2F1" n="1">
+                                    <tuplet xml:id="tuplet-000000123897701" num="3" numbase="2" bracket.visible="true" num.format="count">
+                                        <note xml:id="note-L3F1" dur="8" oct="4" pname="c" accid.ges="n" />
+                                        <space xml:id="note-L4F1" dur="8" />
+                                        <note xml:id="note-L5F1" dur="8" oct="4" pname="d" accid.ges="n" />
+                                    </tuplet>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

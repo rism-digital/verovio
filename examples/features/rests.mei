@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Rests and dotted rests</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-19</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio support rests from long to 256th.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef key.sig="0" key.mode="major">
+                        <staffGrp n="1" >
+                            <staffDef n="1" lines="5" clef.line="2" clef.shape="G"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <rest dur="long"/>
+                                    <rest dur="breve"/>
+                                    <rest dur="1"/>
+                                    <rest dur="2"/>
+                                    <rest dur="4"/>
+                                    <rest dur="8"/>
+                                    <rest dur="16"/>
+                                    <rest dur="32"/>
+                                    <rest dur="64"/>
+                                    <rest dur="128"/>
+                                    <rest dur="256"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="1" right="dbl">
+                            <staff n="1">
+                                <layer n="1">
+                                    <rest dur="2" dots="1"/>
+                                    <rest dur="4" dots="1"/>
+                                    <rest dur="8" dots="1"/>
+                                    <rest dur="16" dots="1"/>
+                                    <rest dur="32" dots="1"/>
+                                    <rest dur="64" dots="1"/>
+                                    <rest dur="128" dots="1"/>
+                                    <rest dur="256" dots="1"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
