@@ -8,6 +8,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <math.h>
 
 //----------------------------------------------------------------------------
 
@@ -802,12 +803,15 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                         && (previousNote->GetDrawingDur() == DUR_1))
                         horizontalMargin = 0;
                 }
-                else if ((previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc()) > 1)
+                else if (abs(previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc()) > 1)
                     continue;
             }
 
-            // Nothing to do if we have no vertical overlapping
+            // Nothing to do if we have no vertical overlap
             if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
+            
+            // Nothing to do either if we have no horizontal overlap
+            if (!this->HorizontalSelfOverlap(*iter, horizontalMargin)) continue;
 
             int xRelShift = this->HorizontalLeftOverlap(*iter, params->m_doc, horizontalMargin, verticalMargin);
 
