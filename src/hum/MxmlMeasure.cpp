@@ -339,6 +339,33 @@ void MxmlMeasure::reportHarmonyCountToOwner(int count) {
 
 //////////////////////////////
 //
+// MxmlMeasure::reportEditorialAccidentalToOwner --
+//
+
+void MxmlMeasure::reportEditorialAccidentalToOwner(void) {
+	if (!m_owner) {
+		return;
+	}
+	m_owner->receiveEditorialAccidental();
+}
+
+
+
+//////////////////////////////
+//
+// MxmlMeasure::receiveEditorialAccidentalFromChild --
+//
+
+void  MxmlMeasure::receiveEditorialAccidentalFromChild(void) {
+	if (m_owner != NULL) {
+		m_owner->receiveEditorialAccidental();
+	}
+}
+
+
+
+//////////////////////////////
+//
 // MxmlMeasure::getPartNumber --
 //
 

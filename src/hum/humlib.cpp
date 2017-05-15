@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Feb 27 21:12:02 PST 2017
+// Last Modified: Thu Apr 20 09:35:35 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -16210,7 +16210,7 @@ void Options::setOptions(int argc, char** argv) {
 }
 
 
-void Options::setOptions(vector<string>& argv) {
+void Options::setOptions(const vector<string>& argv) {
 	m_processedQ = 0;
 	m_argv = argv;
 }
@@ -16370,7 +16370,7 @@ bool Options::process(int argc, char** argv, int error_check, int suppress) {
 }
 
 
-bool Options::process(vector<string>& argv, int error_check, int suppress) {
+bool Options::process(const vector<string>& argv, int error_check, int suppress) {
 	setOptions(argv);
 	xverify(error_check, suppress);
 	return !hasParseError();
@@ -19260,7 +19260,7 @@ void Tool_extract::processFieldEntry(vector<int>& field,
 			stop = maxtrack+1;
 		}
 		for (j=start; j<stop; j++) {
-			if (trackstarts[j]->isKern()) {
+			if (trackstarts[j-1]->isKern()) {
 				break;
 			}
 			newfield.push_back(j);
@@ -20390,6 +20390,13 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 		interpQ = getBoolean("I");
 		interpstate = 0;
 		interps = getString("I");
+	}
+	if (interps.size() > 0) {
+		if (interps[0] != '*') {
+			// Automatically add ** if not given on exclusive interpretation
+			string tstring = "**";
+			interps = tstring + interps;
+		}
 	}
 
 	fieldQ      = getBoolean("f");

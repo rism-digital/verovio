@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Feb 27 21:12:02 PST 2017
+// Last Modified: Thu Apr 20 09:35:35 PDT 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2510,7 +2510,7 @@ class Options {
 		bool            process           (int argc, char** argv,
 		                                      int error_check = 1,
 		                                      int suppress = 0);
-		bool            process           (vector<string>& argv,
+		bool            process           (const vector<string>& argv,
 		                                      int error_check = 1,
 		                                      int suppress = 0);
 		bool            process           (string& argv, int error_check = 1,
@@ -2525,7 +2525,7 @@ class Options {
 		void            setModified       (const string& optionName,
 		                                   const string& optionValue);
 		void            setOptions        (int argc, char** argv);
-		void            setOptions        (vector<string>& argv);
+		void            setOptions        (const vector<string>& argv);
 		void            setOptions        (string& args);
 		void            appendOptions     (int argc, char** argv);
 		void            appendOptions     (string& args);

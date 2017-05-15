@@ -271,7 +271,6 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     Chord *parentChord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, 2));
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     data_STAFFREL place = STAFFREL_NONE;
-    bool drawingCueSize = false;
 
     if (!parentChord) {
         parentNote = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
@@ -292,7 +291,6 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     assert(layer);
 
     stemDir = parentNote ? parentNote->GetDrawingStemDir() : parentChord->GetDrawingStemDir();
-    drawingCueSize = parent->IsCueSize();
 
     /************** placement **************/
 
