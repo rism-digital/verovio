@@ -111,6 +111,7 @@ class MxmlEvent {
 		void               reportVerseCountToOwner (int staffnum, int count);
 		void               reportHarmonyCountToOwner (int count);
 		void               reportMeasureStyleToOwner (MeasureStyle style);
+		void               reportEditorialAccidentalToOwner(void);
       void               makeDummyRest      (MxmlMeasure* owner, 
 		                                       HumNum startime,
 		                                       HumNum duration,

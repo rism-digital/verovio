@@ -168,7 +168,7 @@ void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, short left, shor
 {
     assert(lines);
 
-    if (lines->size() < count) lines->resize(count);
+    if ((int)lines->size() < count) lines->resize(count);
     int i = 0;
     for (i = 0; i < count; i++) {
         lines->at(i).AddDash(left, right);

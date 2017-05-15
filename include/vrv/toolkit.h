@@ -247,6 +247,14 @@ public:
     ///@}
 
     /**
+     * @name Include type attributes when importing from Humdrum
+     */
+    ///@{
+    void SetHumType(int l) { m_humType = l; }
+    int GetHumType() { return m_humType; }
+    ///@}
+
+    /**
      * @name Ignore all encoded layout information (if any)
      * and fully recalculate the layout
      */
@@ -404,6 +412,7 @@ private:
 
     bool m_noLayout;
     bool m_ignoreLayout;
+    int m_humType = 0;
     bool m_adjustPageHeight;
     std::vector<std::string> m_appXPathQueries;
     std::vector<std::string> m_choiceXPathQueries;
