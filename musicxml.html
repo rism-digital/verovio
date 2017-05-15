@@ -50,14 +50,14 @@ examples:
             <h3>MusicXML Converter</h3>
 
             <p>
-                Verovio supports basic conversion from MusicXML to MEI. When converting from this web interface, the resulting MEI data will be displayed directly in the MEI-Viewer. The MEI file can be saved through the
+                Verovio supports conversion from MusicXML to MEI. When converting from this web interface, the resulting MEI data will be displayed directly in the MEI-Viewer. The MEI file can be saved through the
                 <button type="button" class="btn btn-default btn-xs">
                   <span class="glyphicon glyphicon-download" aria-hidden="true"></span> MEI
                 </button>
                 button that will be displayed on the top right.
             </p>
             <p>
-                This feature is highly experimental at this stage, and only the features supported by Verovio will be converted. Everything else will be lost. For a more complete conversion from MusicXML to MEI we strongly recommend to use the <a href="https://github.com/music-encoding/encoding-tools" target="_blank">MEI XSL stylesheets</a>.
+                This feature is still under development, and it's capabilities are limited. For a more complete conversion from MusicXML to MEI you should try the <a href="https://github.com/music-encoding/encoding-tools" target="_blank">MEI XSL stylesheets</a>.
             </p>
 
             <h4>Try it!</h4>
@@ -102,8 +102,8 @@ examples:
                 Important known limitations:
             </p>
             <ul>
-                 <li>The MusicXML <code>&lt;backup&gt;</code> element will always go back to the beginning of the measure.</li>
-                 <li>The MusicXML <code>&lt;forward&gt;</code> element isn't fully supported.</li>
+                 <li>The MusicXML <code>&lt;backup&gt;</code> and <code>&lt;forward&gt;</code> elements are not fully supported.</li>
+                 <li>Staff changes in parts with multiple staves won't work.</li>
                  <li>The file size with this web interface is limited to the size of the local storage of your browser, which is typically 5Mb.</li>
             </ul>
         </div>
