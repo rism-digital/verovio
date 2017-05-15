@@ -4670,7 +4670,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
 
 void HumdrumInput::resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg)
 {
-    for (int i = 0; i < tg.size(); i++) {
+    for (int i = 0; i < (int)tg.size(); i++) {
         if (tg[i].beamstart && tg[i].tupletstart) {
             resolveTupletBeamStartTie(tg, i);
         }
@@ -5520,7 +5520,7 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             bool dashend = false;
             bool extender = false;
             if (datatype.compare(0, 7, "**vdata") != 0) {
-                for (int z = 1; z < content.size() - 1; z++) {
+                for (int z = 1; z < (int)content.size() - 1; z++) {
                     // Use underscore for elision symbol
                     // (later use @con="b" when verovio allows it).
                     // Also possibly make elision symbols optional.
@@ -5764,7 +5764,7 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
 void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
 {
     vector<bool> chartable(256, false);
-    for (int i = 0; i < token->size(); i++) {
+    for (int i = 0; i < (int)token->size(); i++) {
         chartable[token->at(i)] = true;
     }
 
@@ -6037,7 +6037,7 @@ void HumdrumInput::addTrill(hum::HTp token)
         }
         if ((token->at(i) == 't') || (token->at(i) == 'T')) {
             tpos = i;
-            if (i < token->size() - 1) {
+            if (i < (int)token->size() - 1) {
                 // deal with TT or tt for trills with wavy lines
                 if ((token->at(i + 1) == 't') || (token->at(i + 1) == 'T')) {
                     tpos++;
@@ -7012,11 +7012,11 @@ void HumdrumInput::setBeamLocationId(Object *object, const std::vector<humaux::H
     id += "-L" + to_string(startline);
     id += "F" + to_string(startfield);
 
-    int endnum = -1;
+    // int endnum = -1;
     int endindex = -1;
     for (int i = startindex + 1; i < (int)tgs.size(); i++) {
         if (tgs[i].beamend == startnum) {
-            endnum = startnum;
+            // endnum = startnum;
             endindex = i;
             break;
         }
@@ -7051,11 +7051,11 @@ void HumdrumInput::setTupletLocationId(Object *object, const std::vector<humaux:
     id += "-L" + to_string(startline);
     id += "F" + to_string(startfield);
 
-    int endnum = -1;
+    // int endnum = -1;
     int endindex = -1;
     for (int i = startindex + 1; i < (int)tgs.size(); i++) {
         if (tgs[i].tupletend == startnum) {
-            endnum = startnum;
+            // endnum = startnum;
             endindex = i;
             break;
         }
