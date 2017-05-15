@@ -37,6 +37,7 @@ Note::Note()
     , AttColor()
     , AttColoration()
     , AttGraced()
+    , AttNoteheads()
     , AttNoteLogMensural()
     , AttStems()
     , AttStemsCmn()
@@ -49,6 +50,7 @@ Note::Note()
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_GRACED);
+    RegisterAttClass(ATT_NOTEHEADS);
     RegisterAttClass(ATT_NOTELOGMENSURAL);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
@@ -84,6 +86,7 @@ void Note::Reset()
     ResetColor();
     ResetColoration();
     ResetGraced();
+    ResetNoteheads();
     ResetNoteLogMensural();
     ResetStems();
     ResetStemsCmn();

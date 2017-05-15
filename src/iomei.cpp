@@ -834,7 +834,7 @@ void MeiOutput::WriteMeiTie(pugi::xml_node currentNode, Tie *tie)
 void MeiOutput::WriteMeiTrill(pugi::xml_node currentNode, Trill *trill)
 {
     assert(trill);
-    
+
     WriteXmlId(currentNode, trill);
     WriteTimePointInterface(currentNode, trill);
     trill->WriteColor(currentNode);
@@ -1044,6 +1044,7 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     note->WriteColor(currentNode);
     note->WriteColoration(currentNode);
     note->WriteGraced(currentNode);
+    note->WriteNoteheads(currentNode);
     note->WriteNoteLogMensural(currentNode);
     note->WriteStems(currentNode);
     note->WriteStemsCmn(currentNode);
@@ -2297,11 +2298,11 @@ bool MeiInput::ReadMeiTrill(Object *parent, pugi::xml_node trill)
 {
     Trill *vrvTrill = new Trill();
     SetMeiUuid(trill, vrvTrill);
-    
+
     ReadTimePointInterface(trill, vrvTrill);
     vrvTrill->ReadColor(trill);
     vrvTrill->ReadPlacement(trill);
-    
+
     parent->AddChild(vrvTrill);
     return true;
 }
@@ -2746,6 +2747,7 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadColor(note);
     vrvNote->ReadColoration(note);
     vrvNote->ReadGraced(note);
+    vrvNote->ReadNoteheads(note);
     vrvNote->ReadNoteLogMensural(note);
     vrvNote->ReadStems(note);
     vrvNote->ReadStemsCmn(note);
