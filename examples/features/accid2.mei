@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Rendering accidentals</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Accidentals are usually rendered using the "accid" attribute; the "accid" element is reserved for special cases, such as cautionary or editorial accidentals.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000000870224646">
+                        <staffGrp xml:id="staffgrp-0000000049153180">
+                            <staffDef xml:id="staffdef-0000001483775812" n="1" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000263087879">
+                        <measure xml:id="measure-L3" n="1">
+                            <staff xml:id="staff-L3F1N1" n="1">
+                                <layer xml:id="layer-L3F1N1" n="1">
+                                    <note xml:id="note-L4F1" dur="4" oct="4" pname="c" accid.ges="n" />
+                                    <note xml:id="note-L5F1" dur="4" oct="4" pname="d" accid.ges="n" />
+                                    <note xml:id="note-L6F1" dur="4" oct="4" pname="e" accid.ges="n" />
+                                    <note xml:id="note-L7F1" dur="4" oct="4" pname="f" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L8" n="2">
+                            <staff xml:id="staff-L8F1N1" n="1">
+                                <layer xml:id="layer-L8F1N1" n="1">
+                                    <beam xml:id="beam-L9F1-L10F1">
+                                        <note xml:id="note-L9F1" dur="8" oct="4" pname="g" accid.ges="n" />
+                                        <note xml:id="note-L10F1" dur="8" oct="4" pname="a" accid.ges="n" />
+                                    </beam>
+                                    <beam xml:id="beam-L11F1-L12F1">
+                                        <note xml:id="note-L11F1" dur="8" oct="4" pname="b" accid.ges="n" />
+                                        <note xml:id="note-L12F1" dur="8" oct="5" pname="c" accid.ges="n" />
+                                    </beam>
+                                    <beam xml:id="beam-L13F1-L14F1">
+                                        <note xml:id="note-L13F1" dur="8" oct="5" pname="d" accid.ges="n" />
+                                        <note xml:id="note-L14F1" dur="8" oct="5" pname="e" accid.ges="n" />
+                                    </beam>
+                                    <beam xml:id="beam-L15F1-L16F1">
+                                        <note xml:id="note-L15F1" dur="8" oct="5" pname="f" accid.ges="n" />
+                                        <note xml:id="note-L16F1" dur="8" oct="5" pname="g" accid.ges="n" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L17" n="3">
+                            <staff xml:id="staff-L17F1N1" n="1">
+                                <layer xml:id="layer-L17F1N1" n="1">
+                                    <note xml:id="note-L18F1" dur="4" oct="4" pname="c" accid="s" />
+                                    <note xml:id="note-L19F1" dur="4" oct="4" pname="d" accid="f" />
+                                    <note xml:id="note-L20F1" dur="4" oct="4" pname="e" accid="ff" />
+                                    <note xml:id="note-L21F1" dur="4" oct="4" pname="f" accid="x" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L22" n="4">
+                            <staff xml:id="staff-L22F1N1" n="1">
+                                <layer xml:id="layer-L22F1N1" n="1">
+                                    <beam xml:id="beam-L23F1-L24F1">
+                                        <note xml:id="note-L23F1" dur="8" oct="4" pname="g">
+                                            <accid xml:id="accid-L23F1" accid="n" func="caution" />
+                                        </note>
+                                        <note xml:id="note-L24F1" dur="8" oct="4" pname="a" accid="f" />
+                                    </beam>
+                                    <beam xml:id="beam-L25F1-L26F1">
+                                        <note xml:id="note-L25F1" dur="8" oct="4" pname="b" accid="ff" />
+                                        <note xml:id="note-L26F1" dur="8" oct="5" pname="c" accid="x" />
+                                    </beam>
+                                    <beam xml:id="beam-L27F1-L28F1">
+                                        <note xml:id="note-L27F1" dur="8" oct="5" pname="d" accid="s" />
+                                        <note xml:id="note-L28F1" dur="8" oct="5" pname="e">
+                                            <accid xml:id="accid-L28F1" accid="n" func="caution" />
+                                        </note>
+                                    </beam>
+                                    <beam xml:id="beam-L29F1-L30F1">
+                                        <note xml:id="note-L29F1" dur="8" oct="5" pname="f" accid="s" />
+                                        <note xml:id="note-L30F1" dur="8" oct="5" pname="g" accid="f" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L31" n="5" right="end">
+                            <staff xml:id="staff-L31F1N1" n="1">
+                                <layer xml:id="layer-L31F1N1" n="1">
+                                    <note xml:id="note-L32F1" dur="4" oct="4" pname="c" accid="s" />
+                                    <note xml:id="note-L33F1" dur="4" oct="4" pname="c">
+                                        <accid xml:id="accid-L33F1" accid="s" func="caution" />
+                                    </note>
+                                    <note xml:id="note-L34F1" dur="4" oct="4" pname="c">
+                                        <accid xml:id="accid-L34F1" accid="s" func="edit" />
+                                    </note>
+                                    <note xml:id="note-L35F1" dur="4" oct="4" pname="c" accid="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

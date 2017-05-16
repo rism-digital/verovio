@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Cue-sized grace notes</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>If grace notes are present in cues, Verovio scales them appropriately.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000001795135876">
+                        <staffGrp xml:id="staffgrp-0000001521372275">
+                            <staffDef xml:id="staffdef-0000001163924721" n="1" clef.shape="G" clef.line="2" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000001181446124">
+                        <measure xml:id="measure-L1" n="0" right="invis">
+                            <staff xml:id="staff-0000001074024664" n="1">
+                                <layer xml:id="layer-L1F1N1" n="1">
+                                    <note xml:id="note-L2F1" dur="4" oct="4" pname="a" size="cue" grace="unacc" accid.ges="n" />
+                                    <note xml:id="note-L2F2" dur="4" oct="4" pname="a" grace="unacc" accid.ges="n" />
+                                    <note xml:id="note-L3F1" dur="4" oct="5" pname="c" size="cue" stem.dir="up" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

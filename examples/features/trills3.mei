@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Trills example (3)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>As a general principle for ordering vertically different elements of
+                    notation, the closer to the note, the more localized the information.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000025829204">
+                        <staffGrp xml:id="m-000000194360221">
+                            <staffDef xml:id="staffdef-000000074867298" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000176185209">
+                        <measure xml:id="measure-L3" n="1">
+                            <staff xml:id="staff-L3F1" n="1">
+                                <layer xml:id="layer-L3F1" n="1">
+                                    <note xml:id="note-L4F1" dur="1" oct="4" pname="c" accid.ges="n"/>
+                                </layer>
+                            </staff>
+                            <trill xml:id="trill-000000128505182" staff="1" tstamp="1.000000"/>
+                        </measure>
+                        <measure xml:id="measure-L5" n="2" right="end">
+                            <staff xml:id="staff-L5F1" n="1">
+                                <layer xml:id="layer-L5F1" n="1">
+                                    <note xml:id="note-L6F1" dur="1" oct="4" pname="e" accid.ges="n"/>
+                                </layer>
+                            </staff>
+                            <dir staff="1" tstamp="1.000000" place="above">legatissimo</dir>
+                            <fermata xml:id="fermata-000000014996125" staff="1" tstamp="1.000000" place="above"/>
+                            <tempo staff="1" tstamp="1.000000">Adagio</tempo>
+                            <trill xml:id="trill-000000137395380" staff="1" tstamp="1.000000"/>
+                            <dynam staff="1" tstamp="1.000000" place="above">p</dynam>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

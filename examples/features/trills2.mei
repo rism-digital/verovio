@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Trills example (2)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Trills are placed next to the note, beneath performing directives.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000019258618">
+                        <staffGrp xml:id="m-000000170813431" symbol="brace" barthru="true">
+                            <staffDef xml:id="staffdef-000000043295121" clef.shape="G" clef.line="2" key.sig="5f" n="1" lines="5" />
+                            <staffDef xml:id="staffdef-000000187826225" clef.shape="F" clef.line="4" key.sig="5f" n="2" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000191736514">
+                        <measure xml:id="measure-L5" n="91">
+                            <staff xml:id="staff-L5F2" n="1">
+                                <layer xml:id="layer-L5F2" n="1">
+                                    <note xml:id="note-L7F2" dur="8" accid="f" oct="4" pname="f" grace="acc" stem.dir="up" />
+                                    <note xml:id="note-L9F2" dur="4" oct="4" pname="f" accid.ges="f" />
+                                    <beam xml:id="beam-000000146345888">
+                                        <note xml:id="note-L10F2" dur="8" oct="4" pname="e" accid.ges="f">
+                                            <accid xml:id="accid-000000061758803" accid="f" func="caution" />
+                                        </note>
+                                        <note xml:id="note-L11F2" dur="8" oct="4" pname="f" accid.ges="f" />
+                                        <note xml:id="note-L13F2" dur="8" oct="4" pname="g" accid.ges="f" />
+                                        <note xml:id="note-L14F2" dur="8" oct="4" pname="a" accid.ges="f" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-L5F1" n="2">
+                                <layer xml:id="layer-L5F1" n="1">
+                                    <note xml:id="note-L9F1" dur="4" oct="2" pname="g" accid.ges="f">
+                                        <accid xml:id="accid-000000018572229" accid="f" func="caution" />
+                                    </note>
+                                    <chord xml:id="chord-L10F1" dur="4">
+                                        <note xml:id="note-L10F1S1" oct="3" pname="e" accid.ges="f">
+                                            <accid xml:id="accid-000000154395125" accid="f" func="caution" />
+                                        </note>
+                                        <note xml:id="note-L10F1S2" accid="ff" oct="3" pname="b" />
+                                    </chord>
+                                    <chord xml:id="chord-L13F1" dur="4">
+                                        <note xml:id="note-L13F1S1" oct="3" pname="e" accid.ges="f" />
+                                        <note xml:id="note-L13F1S2" oct="3" pname="b" accid.ges="ff" />
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <dir xml:id="dir-000000169584342" place="above" staff="1" tstamp="1.000000">sotto voce</dir>
+                            <trill xml:id="trill-000000118768062" staff="1" tstamp="1.000000" />
+                            <slur xml:id="slur-000000064724676" staff="1" startid="#note-L9F2" endid="#note-L14F2" />
+                            <pedal xml:id="pedal-000000199018676" staff="2" tstamp="1.000000" dir="down" />
+                            <pedal xml:id="pedal-000000105288649" staff="2" tstamp="3.500000" dir="up" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
