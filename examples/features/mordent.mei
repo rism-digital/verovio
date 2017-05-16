@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Mordents example</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports the "mordent" element.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                            <staffDef clef.shape="C" clef.line="3" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1" right="dbl" label="feature-example">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="note-01" dur="4" oct="4" pname="c" stem.dir="down" />
+                                    <note xml:id="note-02" dur="4" oct="4" pname="c" stem.dir="up" />
+                                    <note xml:id="note-03" dur="4" oct="4" pname="c" stem.dir="down" />
+                                    <note xml:id="note-04" dur="4" oct="4" pname="c" stem.dir="up" />
+                                </layer>
+                            </staff>
+                            <mordent staff="1" startid="#note-01" />
+                            <mordent staff="1" startid="#note-02" form="inv"/>
+                            <mordent staff="1" startid="#note-03" form="inv" long="true"/>
+                            <mordent staff="1" startid="#note-04" form="inv" long="true" place="below"/>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
