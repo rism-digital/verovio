@@ -48,7 +48,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(note);
 
     int noteY = element->GetDrawingY();
-    int xLedger, xNote, xStem;
+    int xNote, xStem;
     int drawingDur;
     int staffY = staff->GetDrawingY();
     wchar_t charCode;
@@ -56,39 +56,34 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     xStem = element->GetDrawingX();
-    xLedger = xStem;
 
     drawingDur = note->GetDrawingDur();
 
     int radius = m_doc->GetGlyphWidth(SMUFL_E93C_mensuralNoteheadMinimaWhite, staff->m_drawingStaffSize, false) / 2;
 
     if (drawingDur > DUR_1) {
-        // ledge = m_doc->GetDrawingLedgerLineLength(pseudoStaffSize, false);
         if (mensural_black) radius *= TEMP_MINIMA_WIDTH_FACTOR;
     }
     else {
-        // ledge = m_doc->GetDrawingLedgerLineLength(pseudoStaffSize, false);
         radius += radius / 3;
     }
 
     /************** Stem/notehead direction: **************/
 
-    Stem *stem = note->GetDrawingStem();
+    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-    if (stem && stem->HasStemDir()) {
-        note->SetDrawingStemDir(stem->GetStemDir());
+    if (note->HasStemDir()) {
+        stemDir = note->GetStemDir();
     }
     else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        note->SetDrawingStemDir(layer->GetDrawingStemDir());
+        stemDir = layer->GetDrawingStemDir();
     }
     else {
         if (drawingDur < DUR_1)
-            note->SetDrawingStemDir(STEMDIRECTION_down);
-        else if (drawingDur == DUR_2)
-            note->SetDrawingStemDir(STEMDIRECTION_up);
+            stemDir = STEMDIRECTION_down;
         else
-            note->SetDrawingStemDir((noteY >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up);
+            stemDir = (noteY > verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
     }
 
     xNote = xStem - radius;
@@ -105,12 +100,11 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     // Semibrevis
     else if (drawingDur == DUR_1) {
         if (mensural_black) {
-            int sbStaffSize
-                = 0.8 * staff->m_drawingStaffSize; // FIXME: should be pseudoStaffSize, but that's too small; why??
-            // LogDebug("<DrawDiamond SB: pseudoStaffSize=%d m_drawing=%d sb=%d 2*sb=%d (int)(1.2*sb)=%d",
+            int sbStaffSize = 0.8 * staff->m_drawingStaffSize;
             DrawDiamond(dc, xNote, noteY, 2 * sbStaffSize, (int)(1.2 * sbStaffSize), !note->GetColored(), 20);
         }
         else {
+            // Maybe we can add this to Note::GetMensuralSmuflNoteHead?
             if (note->GetColored())
                 charCode = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
             else
@@ -124,57 +118,16 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         if (mensural_black) {
             // SMuFL 1.20 doesn't have a codepoint for the "colored" semibrevis and minima head in black
             // mensural notation. But an unfilled (void) narrow diamond is fine, so we draw one.
-            int sbStaffSize
-                = 0.8 * staff->m_drawingStaffSize; // FIXME: should be pseudoStaffSize, but that's too small; why??
+            int sbStaffSize = 0.8 * staff->m_drawingStaffSize;
             DrawDiamond(dc, xNote, noteY, 2 * sbStaffSize, (int)(TEMP_MINIMA_WIDTH_FACTOR * 2 * sbStaffSize),
                 !note->GetColored(), 20);
         }
         else {
-            if (note->GetColored()) {
-                if (drawingDur == DUR_2)
-                    charCode = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
-                else
-                    charCode = SMUFL_E93C_mensuralNoteheadMinimaWhite;
-            }
-            else {
-                if (drawingDur == DUR_2)
-                    charCode = SMUFL_E93C_mensuralNoteheadMinimaWhite;
-                else
-                    charCode = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
-            }
-            DrawSmuflCode(dc, xNote, noteY, charCode, staff->m_drawingStaffSize, false);
+            DrawSmuflCode(dc, xNote, noteY, note->GetMensuralSmuflNoteHead(), staff->m_drawingStaffSize, false);
         }
 
-        DrawMensuralStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
+        DrawMensuralStem(dc, note, staff, stemDir, radius, xStem, noteY);
     }
-
-    /************** Augmentation dots **************/
-
-    if (note->GetDots()) {
-        int mensDrawingUnit = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
-        int xDot;
-        if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && (note->GetDrawingStemDir() == STEMDIRECTION_up)))
-            xDot = xStem + mensDrawingUnit * 7 / 2;
-        else
-            xDot = xStem + mensDrawingUnit * 5 / 2;
-
-        DrawDotsPart(dc, xDot, noteY, note->GetDots(), staff);
-    }
-
-    /************** accidental **************/
-
-    Accid *accid = note->GetDrawingAccid();
-    if (accid) {
-        int xAccid = 0;
-        if (accid->GetFunc() != accidLog_FUNC_edit) {
-            xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false);
-        }
-
-        accid->SetDrawingXRel(xAccid);
-        accid->SetDrawingYRel(note->GetDrawingYRel());
-    }
-
-    DrawLayerChildren(dc, note, layer, staff, measure);
 }
 
 void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -352,15 +305,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     // Store the start and end values
     StemmedDrawingInterface *interface = object->GetStemmedDrawingInterface();
     assert(interface);
-    // assert(false);
-    // interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
-    // interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
     interface->SetDrawingStemDir(dir);
-
-    // cast to note is check when setting drawingCueSize value
-    if (drawingCueSize && ((dynamic_cast<Note *>(object))->GetGrace() == GRACE_unacc)) {
-        DrawAcciaccaturaSlash(dc, object);
-    }
 }
 
 void View::DrawMensurCircle(DeviceContext *dc, int x, int yy, Staff *staff)

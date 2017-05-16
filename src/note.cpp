@@ -237,11 +237,23 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
     if (graceSize) defaultYShift = doc->GetCueSize(defaultYShift);
-    // x default is always set to 0 because it is unused for now
-    Point p(0, defaultYShift);
+    // x default is always set to the radius for now
+    int radius = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, graceSize) / 2;
+    // adjust the radius in order to take the stem width into account
+    radius -= doc->GetDrawingStemWidth(staffSize) / 2;
+    Point p(radius, defaultYShift);
 
     // Here we should get the notehead value
     wchar_t code = SMUFL_E0A4_noteheadBlack;
+    
+    // This is never called for now because mensural notes do not have stem/flag children
+    // For changingg this, change Note::CalcStem and Note::PrepareLayerElementParts
+    if (this->IsMensural()) {
+        // For mensural notation, get the code and adjust the default stem position
+        code = this->GetMensuralSmuflNoteHead();
+        p.y = doc->GetGlyphHeight(code, staffSize, graceSize) / 2;
+        p.x = 0;
+    }
 
     // Use the default for standard quarter and half note heads
     if ((code == SMUFL_E0A3_noteheadHalf) || (code == SMUFL_E0A4_noteheadBlack)) {
@@ -264,11 +276,23 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
     if (graceSize) defaultYShift = doc->GetCueSize(defaultYShift);
-    // x default is always set to 0 because it is unused for now
-    Point p(0, -defaultYShift);
+    // x default is always set to the radius for now
+    int radius = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, graceSize) / 2;
+    // adjust the radius in order to take the stem width into account
+    radius -= doc->GetDrawingStemWidth(staffSize) / 2;
+    Point p(-radius, -defaultYShift);
 
     // Here we should get the notehead value
     wchar_t code = SMUFL_E0A4_noteheadBlack;
+    
+    // This is never called for now because mensural notes do not have stem/flag children
+    // See comment above
+    if (this->IsMensural()) {
+        // For mensural notation, get the code and adjust the default stem position
+        code = this->GetMensuralSmuflNoteHead();
+        p.y = -doc->GetGlyphHeight(code, staffSize, graceSize) / 2;
+        p.x = 0;
+    }
 
     // Use the default for standard quarter and half note heads
     if ((code == SMUFL_E0A3_noteheadHalf) || (code == SMUFL_E0A4_noteheadBlack)) {
@@ -285,6 +309,36 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
     }
 
     return p;
+}
+
+wchar_t Note::GetMensuralSmuflNoteHead()
+{
+    assert(this->IsMensural());
+    
+    Staff *staff = dynamic_cast<Staff*>(this->GetFirstParent(STAFF));
+    assert(staff);
+    bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+    
+    wchar_t code = 0;
+    if (mensural_black) {
+        code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+    }
+    else {
+        int drawingDur = this->GetDrawingDur();
+        if (this->GetColored()) {
+            if (drawingDur == DUR_2)
+                code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+            else
+                code = SMUFL_E93C_mensuralNoteheadMinimaWhite;
+        }
+        else {
+            if (drawingDur == DUR_2)
+                code = SMUFL_E93C_mensuralNoteheadMinimaWhite;
+            else
+                code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+        }
+    }
+    return code;
 }
 
 //----------------------------------------------------------------------------

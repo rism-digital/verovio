@@ -205,9 +205,6 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     int staffSize = params->m_staff->m_drawingStaffSize;
     bool drawingCueSize = this->IsCueSize();
-    int radius = params->m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
-    // adjust the radius in order to take the stem width into account
-    radius -= params->m_doc->GetDrawingStemWidth(staffSize) / 2;
 
     /************ Set the position, the length and adjust to the note head ************/
 
@@ -220,24 +217,26 @@ int Stem::CalcStem(FunctorParams *functorParams)
         baseStem = -params->m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
         if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);
     }
-    // Even if a stem length is given we add the length of the chord content
+    // Even if a stem length is given we add the length of the chord content (however only if not 0)
     // Also, the given stem length is understood as being mesured from the center of the note.
     // This means that it will be adjusted according to the note head (see below
-    baseStem += params->m_chordStemLength;
+    if (!this->HasStemLen() || (this->GetStemLen() != 0)) {
+        baseStem += params->m_chordStemLength;
 
-    if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-        Point p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
-        baseStem += p.y;
-        this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
-        this->SetDrawingXRel(radius);
-        this->SetDrawingStemLen(baseStem);
-    }
-    else {
-        Point p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
-        baseStem -= p.y;
-        this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
-        this->SetDrawingXRel(-radius);
-        this->SetDrawingStemLen(-baseStem);
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+            Point p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+            baseStem += p.y;
+            this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
+            this->SetDrawingXRel(p.x);
+            this->SetDrawingStemLen(baseStem);
+        }
+        else {
+            Point p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+            baseStem -= p.y;
+            this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
+            this->SetDrawingXRel(p.x);
+            this->SetDrawingStemLen(-baseStem);
+        }
     }
 
     /************ Set the flag (if necessary) and adjust the length ************/
