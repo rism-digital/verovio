@@ -1,0 +1,12 @@
+<measure>
+  <staff n="1">
+    <layer n="1">
+      <note dots="1" dur="4" oct="5" pname="g" stem.dir="down" tie="i"/>
+      <beam>
+        <note dots="1" dur="16" oct="5" pname="g" stem.dir="down" tie="t"/>
+        <note dur="32" oct="5" pname="a" stem.dir="down"/>
+      </beam>
+    </layer>
+  </staff>
+  <turn accidlower="s" delayed="true" place="above" staff="1" tstamp="2.75"/>
+</measure>

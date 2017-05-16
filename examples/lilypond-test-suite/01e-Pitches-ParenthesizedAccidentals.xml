@@ -135,7 +135,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental>double-flat</accidental>
+        <accidental>flat-flat</accidental>
       </note>
       <note>
         <pitch>
@@ -146,7 +146,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental editorial="yes">double-flat</accidental>
+        <accidental editorial="yes">flat-flat</accidental>
       </note>
       <note>
         <pitch>
@@ -157,7 +157,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental cautionary="yes">double-flat</accidental>
+        <accidental cautionary="yes">flat-flat</accidental>
       </note>
       <note>
         <pitch>
@@ -168,7 +168,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental editorial="yes" cautionary="yes">double-flat</accidental>
+        <accidental editorial="yes" cautionary="yes">flat-flat</accidental>
       </note>
     </measure>
     <!--=======================================================-->
