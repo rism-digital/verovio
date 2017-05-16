@@ -632,6 +632,10 @@ void View::DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barL
     if (barLine->GetForm() == BARRENDITION_single) {
         DrawVerticalLine(dc, y_top, y_bottom, x, barLineWidth);
     }
+    else if (barLine->GetForm() == BARRENDITION_rptend) {
+        DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
+        DrawVerticalLine(dc, y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
+    }
     else if (barLine->GetForm() == BARRENDITION_rptboth) {
         DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
         DrawVerticalLine(dc, y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
@@ -641,7 +645,10 @@ void View::DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barL
         DrawVerticalLine(dc, y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
         DrawVerticalLine(dc, y_top, y_bottom, x2, barLineWidth);
     }
-    else if (barLine->GetForm() == BARRENDITION_rptend) {
+    else if (barLine->GetForm() == BARRENDITION_invis) {
+        barLine->SetEmptyBB();
+    }
+    else if (barLine->GetForm() == BARRENDITION_end) {
         DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
         DrawVerticalLine(dc, y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
     }
@@ -651,12 +658,10 @@ void View::DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barL
         DrawVerticalLine(dc, y_top, y_bottom, x, barLineWidth);
         DrawVerticalLine(dc, y_top, y_bottom, x2, barLineWidth);
     }
-    else if (barLine->GetForm() == BARRENDITION_end) {
-        DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
-        DrawVerticalLine(dc, y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
-    }
     else {
-        barLine->SetEmptyBB();
+        // Use solid barline as fallback
+        LogWarning("%s bar lines not supported", barLine->AttBarLineLog::BarrenditionToStr(barLine->GetForm()).c_str());
+        DrawVerticalLine(dc, y_top, y_bottom, x, barLineWidth);
     }
 }
 

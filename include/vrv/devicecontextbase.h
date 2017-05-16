@@ -66,7 +66,7 @@ public:
     void SetColour(int colour) { m_penColour = colour; }
     int GetWidth() const { return m_penWidth; }
     void SetWidth(int width) { m_penWidth = width; }
-    int GetDashLenght() const { return m_dashLength; }
+    int GetDashLength() const { return m_dashLength; }
     void SetDashLength(int dashLength) { m_dashLength = dashLength; }
     float GetOpacity() const { return m_penOpacity; }
     void SetOpacity(float opacity) { m_penOpacity = opacity; }

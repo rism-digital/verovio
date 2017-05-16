@@ -143,6 +143,7 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
         assert(harm);
         // harm above by default
         m_place = harm->HasPlace() ? harm->GetPlace() : STAFFREL_above;
+        if (!harm->HasPlace() && object->GetFirst()->Is(FB)) m_place = STAFFREL_below;
     }
     else if (object->Is(MORDENT)) {
         Mordent *mordent = dynamic_cast<Mordent *>(object);
