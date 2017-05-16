@@ -47,7 +47,7 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
 
     std::size_t prev_pos = 0, pos;
     while ((pos = s.find_first_of(L"\u266D\u266E\u266F", prev_pos)) != std::wstring::npos) {
-        // If pos if > than the previous, it is the substring to exctrace
+        // If pos is > than the previous, it is the substring to extract
         if (pos > prev_pos) {
             std::wstring substr = s.substr(prev_pos, pos - prev_pos);
             dc->DrawText(UTF16to8(substr), substr);
