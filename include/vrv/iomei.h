@@ -32,6 +32,7 @@ class BarLine;
 class Beam;
 class BeatRpt;
 class BoundaryEnd;
+class Breath;
 class BTrem;
 class Choice;
 class Chord;
@@ -220,6 +221,7 @@ private:
      */
     ///@{
     void WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
+    void WriteMeiBreath(pugi::xml_node currentNode, Breath *breath);
     void WriteMeiDir(pugi::xml_node currentNode, Dir *dir);
     void WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata);
@@ -450,6 +452,7 @@ private:
      */
     ///@{
     bool ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText);
+    bool ReadMeiBreath(Object *parent, pugi::xml_node breath);
     bool ReadMeiDir(Object *parent, pugi::xml_node dir);
     bool ReadMeiDynam(Object *parent, pugi::xml_node dynam);
     bool ReadMeiFermata(Object *parent, pugi::xml_node fermata);
