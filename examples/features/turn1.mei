@@ -11,7 +11,7 @@
                 <date>2017-05-15</date>
             </pubStmt>
             <notesStmt>
-                <annot>Verovio supports the "turn" element in various forms.</annot>
+                <annot>Verovio supports <turn> elements with several attributes. Like trills, turns are placed above the staff by default.</annot>
             </notesStmt>
         </fileDesc>
         <encodingDesc>

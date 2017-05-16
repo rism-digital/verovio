@@ -11,7 +11,7 @@
                 <date>2017-05-15</date>
             </pubStmt>
             <notesStmt>
-                <annot>Verovio supports the "mordent" element.</annot>
+                <annot>Specific attribtues like "form", "long", "accidlower", and "accidupper" are taken into account on mordents.</annot>
             </notesStmt>
         </fileDesc>
         <encodingDesc>

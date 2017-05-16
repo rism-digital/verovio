@@ -5,13 +5,13 @@
     <meiHead>
         <fileDesc>
             <titleStmt>
-                <title>Turns example</title>
+                <title>Turns example (2)</title>
             </titleStmt>
             <pubStmt>
                 <date>2017-05-15</date>
             </pubStmt>
             <notesStmt>
-                <annot></annot>
+                <annot>For delayed turns you have to use and adjust the "tstamp" attribute.</annot>
             </notesStmt>
         </fileDesc>
         <encodingDesc>
