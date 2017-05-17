@@ -307,7 +307,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
         xCorr = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, drawingCueSize) / 2;
         // The position of the next glyph (and for correcting the baseline if necessary
         int glyphHeight = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize);
-        
+
         // Center the glyh if necessary
         if (Artic::IsCentered(*articIter)) {
             y += (articPart->GetPlace() == STAFFREL_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
@@ -1227,8 +1227,9 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    DrawVerticalLine(dc, stem->GetDrawingY(), stem->GetDrawingY() - stem->GetDrawingStemLen(), stem->GetDrawingX(),
-        m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+    DrawFilledRectangle(dc, stem->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
+        stem->GetDrawingY(), stem->GetDrawingX() + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
+        stem->GetDrawingY() - stem->GetDrawingStemLen());
 
     DrawLayerChildren(dc, stem, layer, staff, measure);
 

@@ -1010,6 +1010,7 @@ void MeiOutput::WriteMeiBeam(pugi::xml_node currentNode, Beam *beam)
     assert(beam);
 
     WriteLayerElement(currentNode, beam);
+    beam->WriteColor(currentNode);
 }
 
 void MeiOutput::WriteMeiBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt)
@@ -2850,6 +2851,8 @@ bool MeiInput::ReadMeiBeam(Object *parent, pugi::xml_node beam)
 {
     Beam *vrvBeam = new Beam();
     ReadLayerElement(beam, vrvBeam);
+
+    vrvBeam->ReadColor(beam);
 
     parent->AddChild(vrvBeam);
 
