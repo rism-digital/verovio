@@ -20,6 +20,22 @@
 namespace vrv {
 
 /**
+ * MEI data.ACCIDENTAL.GESTURAL
+ */
+enum data_ACCIDENTAL_GESTURAL {
+    ACCIDENTAL_GESTURAL_NONE = 0,
+    ACCIDENTAL_GESTURAL_s,
+    ACCIDENTAL_GESTURAL_f,
+    ACCIDENTAL_GESTURAL_ss,
+    ACCIDENTAL_GESTURAL_ff,
+    ACCIDENTAL_GESTURAL_n,
+    ACCIDENTAL_GESTURAL_su,
+    ACCIDENTAL_GESTURAL_sd,
+    ACCIDENTAL_GESTURAL_fu,
+    ACCIDENTAL_GESTURAL_fd,
+};
+
+/**
  * MEI data.ACCIDENTAL.WRITTEN
  */
 enum data_ACCIDENTAL_WRITTEN {
@@ -179,6 +195,16 @@ enum data_CLEFSHAPE {
     CLEFSHAPE_C,
     CLEFSHAPE_perc,
     CLEFSHAPE_TAB,
+};
+
+/**
+ * MEI data.CLUSTER
+ */
+enum data_CLUSTER {
+    CLUSTER_NONE = 0,
+    CLUSTER_white,
+    CLUSTER_black,
+    CLUSTER_chromatic,
 };
 
 /**
@@ -394,6 +420,49 @@ enum data_FONTWEIGHT {
 };
 
 /**
+ * MEI data.FRBRRELATIONSHIP
+ */
+enum data_FRBRRELATIONSHIP {
+    FRBRRELATIONSHIP_NONE = 0,
+    FRBRRELATIONSHIP_hasAbridgement,
+    FRBRRELATIONSHIP_isAbridgementOf,
+    FRBRRELATIONSHIP_hasAdaptation,
+    FRBRRELATIONSHIP_isAdaptationOf,
+    FRBRRELATIONSHIP_hasAlternate,
+    FRBRRELATIONSHIP_isAlternateOf,
+    FRBRRELATIONSHIP_hasArrangement,
+    FRBRRELATIONSHIP_isArrangementOf,
+    FRBRRELATIONSHIP_hasComplement,
+    FRBRRELATIONSHIP_isComplementOf,
+    FRBRRELATIONSHIP_hasEmbodiment,
+    FRBRRELATIONSHIP_isEmbodimentOf,
+    FRBRRELATIONSHIP_hasExemplar,
+    FRBRRELATIONSHIP_isExemplarOf,
+    FRBRRELATIONSHIP_hasImitation,
+    FRBRRELATIONSHIP_isImitationOf,
+    FRBRRELATIONSHIP_hasPart,
+    FRBRRELATIONSHIP_isPartOf,
+    FRBRRELATIONSHIP_hasRealization,
+    FRBRRELATIONSHIP_isRealizationOf,
+    FRBRRELATIONSHIP_hasReconfiguration,
+    FRBRRELATIONSHIP_isReconfigurationOf,
+    FRBRRELATIONSHIP_hasReproduction,
+    FRBRRELATIONSHIP_isReproductionOf,
+    FRBRRELATIONSHIP_hasRevision,
+    FRBRRELATIONSHIP_isRevisionOf,
+    FRBRRELATIONSHIP_hasSuccessor,
+    FRBRRELATIONSHIP_isSuccessorOf,
+    FRBRRELATIONSHIP_hasSummarization,
+    FRBRRELATIONSHIP_isSummarizationOf,
+    FRBRRELATIONSHIP_hasSupplement,
+    FRBRRELATIONSHIP_isSupplementOf,
+    FRBRRELATIONSHIP_hasTransformation,
+    FRBRRELATIONSHIP_isTransformationOf,
+    FRBRRELATIONSHIP_hasTranslation,
+    FRBRRELATIONSHIP_isTranslationOf,
+};
+
+/**
  * MEI data.GLISSANDO
  */
 enum data_GLISSANDO {
@@ -448,6 +517,18 @@ enum data_HORIZONTALALIGNMENT {
 };
 
 /**
+ * MEI data.LAYERSCHEME
+ */
+enum data_LAYERSCHEME {
+    LAYERSCHEME_NONE = 0,
+    LAYERSCHEME_1,
+    LAYERSCHEME_2o,
+    LAYERSCHEME_2f,
+    LAYERSCHEME_3o,
+    LAYERSCHEME_3f,
+};
+
+/**
  * MEI data.LIGATUREFORM
  */
 enum data_LIGATUREFORM {
@@ -492,6 +573,41 @@ enum data_LINEWIDTHTERM {
     LINEWIDTHTERM_narrow,
     LINEWIDTHTERM_medium,
     LINEWIDTHTERM_wide,
+};
+
+/**
+ * MEI data.MELODICFUNCTION
+ */
+enum data_MELODICFUNCTION {
+    MELODICFUNCTION_NONE = 0,
+    MELODICFUNCTION_aln,
+    MELODICFUNCTION_ant,
+    MELODICFUNCTION_app,
+    MELODICFUNCTION_apt,
+    MELODICFUNCTION_arp,
+    MELODICFUNCTION_arp7,
+    MELODICFUNCTION_aun,
+    MELODICFUNCTION_chg,
+    MELODICFUNCTION_cln,
+    MELODICFUNCTION_ct,
+    MELODICFUNCTION_ct7,
+    MELODICFUNCTION_cun,
+    MELODICFUNCTION_cup,
+    MELODICFUNCTION_et,
+    MELODICFUNCTION_ln,
+    MELODICFUNCTION_ped,
+    MELODICFUNCTION_rep,
+    MELODICFUNCTION_ret,
+    MELODICFUNCTION_23ret,
+    MELODICFUNCTION_78ret,
+    MELODICFUNCTION_sus,
+    MELODICFUNCTION_43sus,
+    MELODICFUNCTION_98sus,
+    MELODICFUNCTION_76sus,
+    MELODICFUNCTION_un,
+    MELODICFUNCTION_un7,
+    MELODICFUNCTION_upt,
+    MELODICFUNCTION_upt7,
 };
 
 /**
@@ -893,6 +1009,17 @@ enum data_STEMPOSITION {
 };
 
 /**
+ * MEI data.TEMPERAMENT
+ */
+enum data_TEMPERAMENT {
+    TEMPERAMENT_NONE = 0,
+    TEMPERAMENT_equal,
+    TEMPERAMENT_just,
+    TEMPERAMENT_mean,
+    TEMPERAMENT_pythagorean,
+};
+
+/**
  * MEI data.TEXTRENDITIONLIST
  */
 enum data_TEXTRENDITIONLIST {
@@ -965,6 +1092,27 @@ enum bTremLog_FORM {
 };
 
 /**
+ * MEI att.beamRend@form
+ */
+enum beamRend_FORM {
+    beamRend_FORM_NONE = 0,
+    beamRend_FORM_acc,
+    beamRend_FORM_mixed,
+    beamRend_FORM_rit,
+    beamRend_FORM_norm,
+};
+
+/**
+ * MEI att.beaming.vis@beam.rend
+ */
+enum beamingVis_BEAMREND {
+    beamingVis_BEAMREND_NONE = 0,
+    beamingVis_BEAMREND_acc,
+    beamingVis_BEAMREND_rit,
+    beamingVis_BEAMREND_norm,
+};
+
+/**
  * MEI att.curvature@curvedir
  */
 enum curvature_CURVEDIR {
@@ -972,6 +1120,14 @@ enum curvature_CURVEDIR {
     curvature_CURVEDIR_above,
     curvature_CURVEDIR_below,
     curvature_CURVEDIR_mixed,
+};
+
+/**
+ * MEI att.cutout@cutout
+ */
+enum cutout_CUTOUT {
+    cutout_CUTOUT_NONE = 0,
+    cutout_CUTOUT_cutout,
 };
 
 /**
@@ -984,12 +1140,60 @@ enum dotLog_FORM {
 };
 
 /**
+ * MEI att.endings@ending.rend
+ */
+enum endings_ENDINGREND {
+    endings_ENDINGREND_NONE = 0,
+    endings_ENDINGREND_top,
+    endings_ENDINGREND_barred,
+    endings_ENDINGREND_grouped,
+};
+
+/**
  * MEI att.fTrem.log@form
  */
 enum fTremLog_FORM {
     fTremLog_FORM_NONE = 0,
     fTremLog_FORM_meas,
     fTremLog_FORM_unmeas,
+};
+
+/**
+ * MEI att.fermata.vis@form
+ */
+enum fermataVis_FORM {
+    fermataVis_FORM_NONE = 0,
+    fermataVis_FORM_inv,
+    fermataVis_FORM_norm,
+};
+
+/**
+ * MEI att.fermata.vis@shape
+ */
+enum fermataVis_SHAPE {
+    fermataVis_SHAPE_NONE = 0,
+    fermataVis_SHAPE_curved,
+    fermataVis_SHAPE_square,
+    fermataVis_SHAPE_angular,
+};
+
+/**
+ * MEI att.fingGrp.log@form
+ */
+enum fingGrpLog_FORM {
+    fingGrpLog_FORM_NONE = 0,
+    fingGrpLog_FORM_alter,
+    fingGrpLog_FORM_combi,
+    fingGrpLog_FORM_subst,
+};
+
+/**
+ * MEI att.fingGrp.vis@orient
+ */
+enum fingGrpVis_ORIENT {
+    fingGrpVis_ORIENT_NONE = 0,
+    fingGrpVis_ORIENT_horiz,
+    fingGrpVis_ORIENT_vert,
 };
 
 /**
@@ -1009,6 +1213,25 @@ enum hairpinLog_FORM {
     hairpinLog_FORM_NONE = 0,
     hairpinLog_FORM_cres,
     hairpinLog_FORM_dim,
+};
+
+/**
+ * MEI att.harm.anl@form
+ */
+enum harmAnl_FORM {
+    harmAnl_FORM_NONE = 0,
+    harmAnl_FORM_explicit,
+    harmAnl_FORM_implied,
+};
+
+/**
+ * MEI att.harm.vis@rendgrid
+ */
+enum harmVis_RENDGRID {
+    harmVis_RENDGRID_NONE = 0,
+    harmVis_RENDGRID_grid,
+    harmVis_RENDGRID_gridtext,
+    harmVis_RENDGRID_text,
 };
 
 /**
@@ -1090,6 +1313,24 @@ enum meiVersion_MEIVERSION {
 };
 
 /**
+ * MEI att.mensur.vis@form
+ */
+enum mensurVis_FORM {
+    mensurVis_FORM_NONE = 0,
+    mensurVis_FORM_horizontal,
+    mensurVis_FORM_vertical,
+};
+
+/**
+ * MEI att.mensural.vis@mensur.form
+ */
+enum mensuralVis_MENSURFORM {
+    mensuralVis_MENSURFORM_NONE = 0,
+    mensuralVis_MENSURFORM_horizontal,
+    mensuralVis_MENSURFORM_vertical,
+};
+
+/**
  * MEI att.meterConformance@metcon
  */
 enum meterConformance_METCON {
@@ -1097,6 +1338,28 @@ enum meterConformance_METCON {
     meterConformance_METCON_c,
     meterConformance_METCON_i,
     meterConformance_METCON_o,
+};
+
+/**
+ * MEI att.meterSig.vis@form
+ */
+enum meterSigVis_FORM {
+    meterSigVis_FORM_NONE = 0,
+    meterSigVis_FORM_num,
+    meterSigVis_FORM_denomsym,
+    meterSigVis_FORM_norm,
+    meterSigVis_FORM_invis,
+};
+
+/**
+ * MEI att.meterSigDefault.vis@meter.rend
+ */
+enum meterSigDefaultVis_METERREND {
+    meterSigDefaultVis_METERREND_NONE = 0,
+    meterSigDefaultVis_METERREND_num,
+    meterSigDefaultVis_METERREND_denomsym,
+    meterSigDefaultVis_METERREND_norm,
+    meterSigDefaultVis_METERREND_invis,
 };
 
 /**
@@ -1119,11 +1382,84 @@ enum mordentLog_FORM {
 };
 
 /**
+ * MEI att.nc.vis@con
+ */
+enum ncVis_CON {
+    ncVis_CON_NONE = 0,
+    ncVis_CON_g,
+    ncVis_CON_l,
+};
+
+/**
+ * MEI att.nc.vis@curved
+ */
+enum ncVis_CURVED {
+    ncVis_CURVED_NONE = 0,
+    ncVis_CURVED_a,
+    ncVis_CURVED_c,
+};
+
+/**
+ * MEI att.nc.vis@diagonalright
+ */
+enum ncVis_DIAGONALRIGHT {
+    ncVis_DIAGONALRIGHT_NONE = 0,
+    ncVis_DIAGONALRIGHT_u,
+    ncVis_DIAGONALRIGHT_d,
+};
+
+/**
+ * MEI att.nc.vis@oriscus
+ */
+enum ncVis_ORISCUS {
+    ncVis_ORISCUS_NONE = 0,
+    ncVis_ORISCUS_c,
+    ncVis_ORISCUS_f,
+    ncVis_ORISCUS_j,
+};
+
+/**
+ * MEI att.nc.vis@quilisma
+ */
+enum ncVis_QUILISMA {
+    ncVis_QUILISMA_NONE = 0,
+    ncVis_QUILISMA_2,
+    ncVis_QUILISMA_3,
+};
+
+/**
+ * MEI att.note.anl.mensural@lig
+ */
+enum noteAnlMensural_LIG {
+    noteAnlMensural_LIG_NONE = 0,
+    noteAnlMensural_LIG_recta,
+    noteAnlMensural_LIG_obliqua,
+};
+
+/**
+ * MEI att.note.ges@extremis
+ */
+enum noteGes_EXTREMIS {
+    noteGes_EXTREMIS_NONE = 0,
+    noteGes_EXTREMIS_highest,
+    noteGes_EXTREMIS_lowest,
+};
+
+/**
  * MEI att.octave.log@coll
  */
 enum octaveLog_COLL {
     octaveLog_COLL_NONE = 0,
     octaveLog_COLL_coll,
+};
+
+/**
+ * MEI att.pb.vis@folium
+ */
+enum pbVis_FOLIUM {
+    pbVis_FOLIUM_NONE = 0,
+    pbVis_FOLIUM_verso,
+    pbVis_FOLIUM_recto,
 };
 
 /**
@@ -1135,6 +1471,26 @@ enum pedalLog_DIR {
     pedalLog_DIR_up,
     pedalLog_DIR_half,
     pedalLog_DIR_bounce,
+};
+
+/**
+ * MEI att.pedal.vis@form
+ */
+enum pedalVis_FORM {
+    pedalVis_FORM_NONE = 0,
+    pedalVis_FORM_line,
+    pedalVis_FORM_pedstar,
+    pedalVis_FORM_altpedstar,
+};
+
+/**
+ * MEI att.pianoPedals@pedal.style
+ */
+enum pianoPedals_PEDALSTYLE {
+    pianoPedals_PEDALSTYLE_NONE = 0,
+    pianoPedals_PEDALSTYLE_line,
+    pianoPedals_PEDALSTYLE_pedstar,
+    pianoPedals_PEDALSTYLE_altpedstar,
 };
 
 /**
@@ -1167,6 +1523,24 @@ enum regularMethod_METHOD {
     regularMethod_METHOD_NONE = 0,
     regularMethod_METHOD_silent,
     regularMethod_METHOD_tags,
+};
+
+/**
+ * MEI att.rehearsal@reh.enclose
+ */
+enum rehearsal_REHENCLOSE {
+    rehearsal_REHENCLOSE_NONE = 0,
+    rehearsal_REHENCLOSE_box,
+    rehearsal_REHENCLOSE_circle,
+    rehearsal_REHENCLOSE_none,
+};
+
+/**
+ * MEI att.sb.vis@form
+ */
+enum sbVis_FORM {
+    sbVis_FORM_NONE = 0,
+    sbVis_FORM_hash,
 };
 
 /**
@@ -1228,12 +1602,33 @@ enum tempoLog_FUNC {
 };
 
 /**
+ * MEI att.tuplet.vis@num.format
+ */
+enum tupletVis_NUMFORMAT {
+    tupletVis_NUMFORMAT_NONE = 0,
+    tupletVis_NUMFORMAT_count,
+    tupletVis_NUMFORMAT_ratio,
+};
+
+/**
  * MEI att.turn.log@form
  */
 enum turnLog_FORM {
     turnLog_FORM_NONE = 0,
     turnLog_FORM_lower,
     turnLog_FORM_upper,
+};
+
+/**
+ * MEI att.voltaGroupingSym@voltasym
+ */
+enum voltaGroupingSym_VOLTASYM {
+    voltaGroupingSym_VOLTASYM_NONE = 0,
+    voltaGroupingSym_VOLTASYM_brace,
+    voltaGroupingSym_VOLTASYM_bracket,
+    voltaGroupingSym_VOLTASYM_bracketsq,
+    voltaGroupingSym_VOLTASYM_line,
+    voltaGroupingSym_VOLTASYM_none,
 };
 
 /**

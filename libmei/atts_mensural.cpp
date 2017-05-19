@@ -269,6 +269,98 @@ bool AttMensuralShared::HasTempus() const
 
 /* include <atttempus> */
 
+//----------------------------------------------------------------------------
+// AttNoteAnlMensural
+//----------------------------------------------------------------------------
+
+AttNoteAnlMensural::AttNoteAnlMensural() : Att()
+{
+    ResetNoteAnlMensural();
+}
+
+AttNoteAnlMensural::~AttNoteAnlMensural()
+{
+}
+
+void AttNoteAnlMensural::ResetNoteAnlMensural()
+{
+    m_lig = noteAnlMensural_LIG_NONE;
+}
+
+bool AttNoteAnlMensural::ReadNoteAnlMensural(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("lig")) {
+        this->SetLig(StrToNoteAnlMensuralLig(element.attribute("lig").value()));
+        element.remove_attribute("lig");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttNoteAnlMensural::WriteNoteAnlMensural(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasLig()) {
+        element.append_attribute("lig") = NoteAnlMensuralLigToStr(this->GetLig()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttNoteAnlMensural::HasLig() const
+{
+    return (m_lig != noteAnlMensural_LIG_NONE);
+}
+
+/* include <attlig> */
+
+//----------------------------------------------------------------------------
+// AttRestVisMensural
+//----------------------------------------------------------------------------
+
+AttRestVisMensural::AttRestVisMensural() : Att()
+{
+    ResetRestVisMensural();
+}
+
+AttRestVisMensural::~AttRestVisMensural()
+{
+}
+
+void AttRestVisMensural::ResetRestVisMensural()
+{
+    m_spaces = 0;
+}
+
+bool AttRestVisMensural::ReadRestVisMensural(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("spaces")) {
+        this->SetSpaces(StrToInt(element.attribute("spaces").value()));
+        element.remove_attribute("spaces");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttRestVisMensural::WriteRestVisMensural(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasSpaces()) {
+        element.append_attribute("spaces") = IntToStr(this->GetSpaces()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttRestVisMensural::HasSpaces() const
+{
+    return (m_spaces != 0);
+}
+
+/* include <attspaces> */
+
 bool Att::SetMensural(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_LIGATURELOG)) {
@@ -323,6 +415,22 @@ bool Att::SetMensural(Object *element, std::string attrType, std::string attrVal
             return true;
         }
     }
+    if (element->HasAttClass(ATT_NOTEANLMENSURAL)) {
+        AttNoteAnlMensural *att = dynamic_cast<AttNoteAnlMensural *>(element);
+        assert(att);
+        if (attrType == "lig") {
+            att->SetLig(att->StrToNoteAnlMensuralLig(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_RESTVISMENSURAL)) {
+        AttRestVisMensural *att = dynamic_cast<AttRestVisMensural *>(element);
+        assert(att);
+        if (attrType == "spaces") {
+            att->SetSpaces(att->StrToInt(attrValue));
+            return true;
+        }
+    }
 
     return false;
 }
@@ -369,6 +477,20 @@ void Att::GetMensural(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasTempus()) {
             attributes->push_back(std::make_pair("tempus", att->TempusToStr(att->GetTempus())));
+        }
+    }
+    if (element->HasAttClass(ATT_NOTEANLMENSURAL)) {
+        const AttNoteAnlMensural *att = dynamic_cast<const AttNoteAnlMensural *>(element);
+        assert(att);
+        if (att->HasLig()) {
+            attributes->push_back(std::make_pair("lig", att->NoteAnlMensuralLigToStr(att->GetLig())));
+        }
+    }
+    if (element->HasAttClass(ATT_RESTVISMENSURAL)) {
+        const AttRestVisMensural *att = dynamic_cast<const AttRestVisMensural *>(element);
+        assert(att);
+        if (att->HasSpaces()) {
+            attributes->push_back(std::make_pair("spaces", att->IntToStr(att->GetSpaces())));
         }
     }
 }

@@ -89,7 +89,7 @@ void AttArpegVis::ResetArpegVis()
 {
     m_arrow = BOOLEAN_NONE;
     m_arrowShape = LINESTARTENDSYMBOL_NONE;
-    m_arrowSize = FONTSIZESCALE_NONE;
+    m_arrowSize = 0;
     m_arrowColor = "";
     m_arrowFillcolor = "";
     m_lineForm = LINEFORM_NONE;
@@ -110,7 +110,7 @@ bool AttArpegVis::ReadArpegVis(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("arrow.size")) {
-        this->SetArrowSize(StrToFontsizescale(element.attribute("arrow.size").value()));
+        this->SetArrowSize(StrToInt(element.attribute("arrow.size").value()));
         element.remove_attribute("arrow.size");
         hasAttribute = true;
     }
@@ -149,7 +149,7 @@ bool AttArpegVis::WriteArpegVis(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasArrowSize()) {
-        element.append_attribute("arrow.size") = FontsizescaleToStr(this->GetArrowSize()).c_str();
+        element.append_attribute("arrow.size") = IntToStr(this->GetArrowSize()).c_str();
         wroteAttribute = true;
     }
     if (this->HasArrowColor()) {
@@ -183,7 +183,7 @@ bool AttArpegVis::HasArrowShape() const
 
 bool AttArpegVis::HasArrowSize() const
 {
-    return (m_arrowSize != FONTSIZESCALE_NONE);
+    return (m_arrowSize != 0);
 }
 
 bool AttArpegVis::HasArrowColor() const
@@ -837,9 +837,9 @@ void AttLineVis::ResetLineVis()
     m_form = LINEFORM_NONE;
     m_width = "";
     m_endsym = LINESTARTENDSYMBOL_NONE;
-    m_endsymSize = FONTSIZESCALE_NONE;
+    m_endsymSize = 0;
     m_startsym = LINESTARTENDSYMBOL_NONE;
-    m_startsymSize = FONTSIZESCALE_NONE;
+    m_startsymSize = 0;
 }
 
 bool AttLineVis::ReadLineVis(pugi::xml_node element)
@@ -861,7 +861,7 @@ bool AttLineVis::ReadLineVis(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("endsym.size")) {
-        this->SetEndsymSize(StrToFontsizescale(element.attribute("endsym.size").value()));
+        this->SetEndsymSize(StrToInt(element.attribute("endsym.size").value()));
         element.remove_attribute("endsym.size");
         hasAttribute = true;
     }
@@ -871,7 +871,7 @@ bool AttLineVis::ReadLineVis(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("startsym.size")) {
-        this->SetStartsymSize(StrToFontsizescale(element.attribute("startsym.size").value()));
+        this->SetStartsymSize(StrToInt(element.attribute("startsym.size").value()));
         element.remove_attribute("startsym.size");
         hasAttribute = true;
     }
@@ -894,7 +894,7 @@ bool AttLineVis::WriteLineVis(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasEndsymSize()) {
-        element.append_attribute("endsym.size") = FontsizescaleToStr(this->GetEndsymSize()).c_str();
+        element.append_attribute("endsym.size") = IntToStr(this->GetEndsymSize()).c_str();
         wroteAttribute = true;
     }
     if (this->HasStartsym()) {
@@ -902,7 +902,7 @@ bool AttLineVis::WriteLineVis(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasStartsymSize()) {
-        element.append_attribute("startsym.size") = FontsizescaleToStr(this->GetStartsymSize()).c_str();
+        element.append_attribute("startsym.size") = IntToStr(this->GetStartsymSize()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -925,7 +925,7 @@ bool AttLineVis::HasEndsym() const
 
 bool AttLineVis::HasEndsymSize() const
 {
-    return (m_endsymSize != FONTSIZESCALE_NONE);
+    return (m_endsymSize != 0);
 }
 
 bool AttLineVis::HasStartsym() const
@@ -935,7 +935,7 @@ bool AttLineVis::HasStartsym() const
 
 bool AttLineVis::HasStartsymSize() const
 {
-    return (m_startsymSize != FONTSIZESCALE_NONE);
+    return (m_startsymSize != 0);
 }
 
 /* include <attstartsym.size> */
@@ -2088,7 +2088,7 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "arrow.size") {
-            att->SetArrowSize(att->StrToFontsizescale(attrValue));
+            att->SetArrowSize(att->StrToInt(attrValue));
             return true;
         }
         if (attrType == "arrow.color") {
@@ -2240,7 +2240,7 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "endsym.size") {
-            att->SetEndsymSize(att->StrToFontsizescale(attrValue));
+            att->SetEndsymSize(att->StrToInt(attrValue));
             return true;
         }
         if (attrType == "startsym") {
@@ -2248,7 +2248,7 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "startsym.size") {
-            att->SetStartsymSize(att->StrToFontsizescale(attrValue));
+            att->SetStartsymSize(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -2507,7 +2507,7 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("arrow.shape", att->LinestartendsymbolToStr(att->GetArrowShape())));
         }
         if (att->HasArrowSize()) {
-            attributes->push_back(std::make_pair("arrow.size", att->FontsizescaleToStr(att->GetArrowSize())));
+            attributes->push_back(std::make_pair("arrow.size", att->IntToStr(att->GetArrowSize())));
         }
         if (att->HasArrowColor()) {
             attributes->push_back(std::make_pair("arrow.color", att->StrToStr(att->GetArrowColor())));
@@ -2633,13 +2633,13 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("endsym", att->LinestartendsymbolToStr(att->GetEndsym())));
         }
         if (att->HasEndsymSize()) {
-            attributes->push_back(std::make_pair("endsym.size", att->FontsizescaleToStr(att->GetEndsymSize())));
+            attributes->push_back(std::make_pair("endsym.size", att->IntToStr(att->GetEndsymSize())));
         }
         if (att->HasStartsym()) {
             attributes->push_back(std::make_pair("startsym", att->LinestartendsymbolToStr(att->GetStartsym())));
         }
         if (att->HasStartsymSize()) {
-            attributes->push_back(std::make_pair("startsym.size", att->FontsizescaleToStr(att->GetStartsymSize())));
+            attributes->push_back(std::make_pair("startsym.size", att->IntToStr(att->GetStartsymSize())));
         }
     }
     if (element->HasAttClass(ATT_MENSURVIS)) {

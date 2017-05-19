@@ -91,10 +91,141 @@ public:
     ///@}
 
 private:
-    /** Records the appearance and usually the function of the bar line. **/
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
     bTremLog_FORM m_form;
 
     /* include <attform> */
+};
+
+//----------------------------------------------------------------------------
+// AttBeamPresent
+//----------------------------------------------------------------------------
+
+class AttBeamPresent : public Att {
+public:
+    AttBeamPresent();
+    virtual ~AttBeamPresent();
+
+    /** Reset the default values for the attribute class **/
+    void ResetBeamPresent();
+
+    /** Read the values for the attribute class **/
+    bool ReadBeamPresent(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteBeamPresent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetBeam(std::string beam_) { m_beam = beam_; }
+    std::string GetBeam() const { return m_beam; }
+    bool HasBeam() const;
+    ///@}
+
+private:
+    /** Indicates that this event is "under a beam". **/
+    std::string m_beam;
+
+    /* include <attbeam> */
+};
+
+//----------------------------------------------------------------------------
+// AttBeamRend
+//----------------------------------------------------------------------------
+
+class AttBeamRend : public Att {
+public:
+    AttBeamRend();
+    virtual ~AttBeamRend();
+
+    /** Reset the default values for the attribute class **/
+    void ResetBeamRend();
+
+    /** Read the values for the attribute class **/
+    bool ReadBeamRend(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteBeamRend(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetForm(beamRend_FORM form_) { m_form = form_; }
+    beamRend_FORM GetForm() const { return m_form; }
+    bool HasForm() const;
+    //
+    void SetPlace(data_BEAMPLACE place_) { m_place = place_; }
+    data_BEAMPLACE GetPlace() const { return m_place; }
+    bool HasPlace() const;
+    //
+    void SetSlash(data_BOOLEAN slash_) { m_slash = slash_; }
+    data_BOOLEAN GetSlash() const { return m_slash; }
+    bool HasSlash() const;
+    //
+    void SetSlope(double slope_) { m_slope = slope_; }
+    double GetSlope() const { return m_slope; }
+    bool HasSlope() const;
+    ///@}
+
+private:
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
+    beamRend_FORM m_form;
+    /** Records the placement of the beam relative to the events it affects. **/
+    data_BEAMPLACE m_place;
+    /** Indicates presence of slash through the beam. **/
+    data_BOOLEAN m_slash;
+    /** Records the slope of the beam. **/
+    double m_slope;
+
+    /* include <attslope> */
+};
+
+//----------------------------------------------------------------------------
+// AttBeamSecondary
+//----------------------------------------------------------------------------
+
+class AttBeamSecondary : public Att {
+public:
+    AttBeamSecondary();
+    virtual ~AttBeamSecondary();
+
+    /** Reset the default values for the attribute class **/
+    void ResetBeamSecondary();
+
+    /** Read the values for the attribute class **/
+    bool ReadBeamSecondary(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteBeamSecondary(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetBreaksec(int breaksec_) { m_breaksec = breaksec_; }
+    int GetBreaksec() const { return m_breaksec; }
+    bool HasBreaksec() const;
+    ///@}
+
+private:
+    /**
+     * Presence of this attribute indicates that the secondary beam should be broken
+     * following this note/chord.
+     * The value of the attribute records the number of beams which should remain
+     * unbroken.
+     **/
+    int m_breaksec;
+
+    /* include <attbreaksec> */
 };
 
 //----------------------------------------------------------------------------
@@ -222,6 +353,83 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttCutout
+//----------------------------------------------------------------------------
+
+class AttCutout : public Att {
+public:
+    AttCutout();
+    virtual ~AttCutout();
+
+    /** Reset the default values for the attribute class **/
+    void ResetCutout();
+
+    /** Read the values for the attribute class **/
+    bool ReadCutout(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteCutout(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetCutout(cutout_CUTOUT cutout_) { m_cutout = cutout_; }
+    cutout_CUTOUT GetCutout() const { return m_cutout; }
+    bool HasCutout() const;
+    ///@}
+
+private:
+    /** "Cut-out" style indicated for this measure. **/
+    cutout_CUTOUT m_cutout;
+
+    /* include <attcutout> */
+};
+
+//----------------------------------------------------------------------------
+// AttExpandable
+//----------------------------------------------------------------------------
+
+class AttExpandable : public Att {
+public:
+    AttExpandable();
+    virtual ~AttExpandable();
+
+    /** Reset the default values for the attribute class **/
+    void ResetExpandable();
+
+    /** Read the values for the attribute class **/
+    bool ReadExpandable(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteExpandable(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetExpand(data_BOOLEAN expand_) { m_expand = expand_; }
+    data_BOOLEAN GetExpand() const { return m_expand; }
+    bool HasExpand() const;
+    ///@}
+
+private:
+    /**
+     * Indicates whether to render a repeat symbol or the source material to which it
+     * refers.
+     * A value of 'true' renders the source material, while 'false' displays the repeat
+     * symbol.
+     **/
+    data_BOOLEAN m_expand;
+
+    /* include <attexpand> */
+};
+
+//----------------------------------------------------------------------------
 // AttFTremLog
 //----------------------------------------------------------------------------
 
@@ -251,10 +459,49 @@ public:
     ///@}
 
 private:
-    /** Records the appearance and usually the function of the bar line. **/
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
     fTremLog_FORM m_form;
 
     /* include <attform> */
+};
+
+//----------------------------------------------------------------------------
+// AttGlissPresent
+//----------------------------------------------------------------------------
+
+class AttGlissPresent : public Att {
+public:
+    AttGlissPresent();
+    virtual ~AttGlissPresent();
+
+    /** Reset the default values for the attribute class **/
+    void ResetGlissPresent();
+
+    /** Read the values for the attribute class **/
+    bool ReadGlissPresent(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteGlissPresent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetGliss(data_GLISSANDO gliss_) { m_gliss = gliss_; }
+    data_GLISSANDO GetGliss() const { return m_gliss; }
+    bool HasGliss() const;
+    ///@}
+
+private:
+    /**
+     * Indicates that this element participates in a glissando.
+     * If visual information about the glissando needs to be recorded, then a
+     **/
+    data_GLISSANDO m_gliss;
+
+    /* include <attgliss> */
 };
 
 //----------------------------------------------------------------------------
@@ -376,7 +623,7 @@ public:
     ///@}
 
 private:
-    /** Records the appearance and usually the function of the bar line. **/
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
     hairpinLog_FORM m_form;
     /**
      * Indicates that the hairpin starts from or ends in silence.
@@ -461,6 +708,45 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttLvPresent
+//----------------------------------------------------------------------------
+
+class AttLvPresent : public Att {
+public:
+    AttLvPresent();
+    virtual ~AttLvPresent();
+
+    /** Reset the default values for the attribute class **/
+    void ResetLvPresent();
+
+    /** Read the values for the attribute class **/
+    bool ReadLvPresent(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteLvPresent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetLv(data_BOOLEAN lv_) { m_lv = lv_; }
+    data_BOOLEAN GetLv() const { return m_lv; }
+    bool HasLv() const;
+    ///@}
+
+private:
+    /**
+     * Indicates the attachment of an l.v.
+     * (laissez vibrer) sign to this element.
+     **/
+    data_BOOLEAN m_lv;
+
+    /* include <attlv> */
+};
+
+//----------------------------------------------------------------------------
 // AttMeterSigGrpLog
 //----------------------------------------------------------------------------
 
@@ -490,10 +776,52 @@ public:
     ///@}
 
 private:
-    /** Records the function of an accidental. **/
+    /** Function of the meter signature group. **/
     meterSigGrpLog_FUNC m_func;
 
     /* include <attfunc> */
+};
+
+//----------------------------------------------------------------------------
+// AttNumberPlacement
+//----------------------------------------------------------------------------
+
+class AttNumberPlacement : public Att {
+public:
+    AttNumberPlacement();
+    virtual ~AttNumberPlacement();
+
+    /** Reset the default values for the attribute class **/
+    void ResetNumberPlacement();
+
+    /** Read the values for the attribute class **/
+    bool ReadNumberPlacement(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteNumberPlacement(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetNumPlace(data_STAFFREL_basic numPlace_) { m_numPlace = numPlace_; }
+    data_STAFFREL_basic GetNumPlace() const { return m_numPlace; }
+    bool HasNumPlace() const;
+    //
+    void SetNumVisible(data_BOOLEAN numVisible_) { m_numVisible = numVisible_; }
+    data_BOOLEAN GetNumVisible() const { return m_numVisible; }
+    bool HasNumVisible() const;
+    ///@}
+
+private:
+    /** States where the tuplet number will be placed in relation to the note heads. **/
+    data_STAFFREL_basic m_numPlace;
+    /** Determines if the tuplet number is visible. **/
+    data_BOOLEAN m_numVisible;
+
+    /* include <attnum.visible> */
 };
 
 //----------------------------------------------------------------------------
@@ -526,10 +854,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Along with numbase, describes duration as a ratio.
-     * num is the first value in the ratio, while numbase is the second.
-     **/
+    /** Records a number or count accompanying a notational feature. **/
     int m_num;
 
     /* include <attnum> */
@@ -613,10 +938,278 @@ public:
 private:
     /** Records the position of the piano damper pedal. **/
     pedalLog_DIR m_dir;
-    /** Records the function of an accidental. **/
+    /** Function of the meter signature group. **/
     std::string m_func;
 
     /* include <attfunc> */
+};
+
+//----------------------------------------------------------------------------
+// AttPianoPedals
+//----------------------------------------------------------------------------
+
+class AttPianoPedals : public Att {
+public:
+    AttPianoPedals();
+    virtual ~AttPianoPedals();
+
+    /** Reset the default values for the attribute class **/
+    void ResetPianoPedals();
+
+    /** Read the values for the attribute class **/
+    bool ReadPianoPedals(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WritePianoPedals(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetPedalStyle(pianoPedals_PEDALSTYLE pedalStyle_) { m_pedalStyle = pedalStyle_; }
+    pianoPedals_PEDALSTYLE GetPedalStyle() const { return m_pedalStyle; }
+    bool HasPedalStyle() const;
+    ///@}
+
+private:
+    /** Determines whether piano pedal marks should be rendered as lines or as terms. **/
+    pianoPedals_PEDALSTYLE m_pedalStyle;
+
+    /* include <attpedal.style> */
+};
+
+//----------------------------------------------------------------------------
+// AttRehearsal
+//----------------------------------------------------------------------------
+
+class AttRehearsal : public Att {
+public:
+    AttRehearsal();
+    virtual ~AttRehearsal();
+
+    /** Reset the default values for the attribute class **/
+    void ResetRehearsal();
+
+    /** Read the values for the attribute class **/
+    bool ReadRehearsal(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteRehearsal(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetRehEnclose(rehearsal_REHENCLOSE rehEnclose_) { m_rehEnclose = rehEnclose_; }
+    rehearsal_REHENCLOSE GetRehEnclose() const { return m_rehEnclose; }
+    bool HasRehEnclose() const;
+    ///@}
+
+private:
+    /** Describes the enclosing shape for rehearsal marks. **/
+    rehearsal_REHENCLOSE m_rehEnclose;
+
+    /* include <attreh.enclose> */
+};
+
+//----------------------------------------------------------------------------
+// AttScoreDefVisCmn
+//----------------------------------------------------------------------------
+
+class AttScoreDefVisCmn : public Att {
+public:
+    AttScoreDefVisCmn();
+    virtual ~AttScoreDefVisCmn();
+
+    /** Reset the default values for the attribute class **/
+    void ResetScoreDefVisCmn();
+
+    /** Read the values for the attribute class **/
+    bool ReadScoreDefVisCmn(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteScoreDefVisCmn(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetGridShow(data_BOOLEAN gridShow_) { m_gridShow = gridShow_; }
+    data_BOOLEAN GetGridShow() const { return m_gridShow; }
+    bool HasGridShow() const;
+    ///@}
+
+private:
+    /** Determines whether to display guitar chord grids. **/
+    data_BOOLEAN m_gridShow;
+
+    /* include <attgrid.show> */
+};
+
+//----------------------------------------------------------------------------
+// AttSlurRend
+//----------------------------------------------------------------------------
+
+class AttSlurRend : public Att {
+public:
+    AttSlurRend();
+    virtual ~AttSlurRend();
+
+    /** Reset the default values for the attribute class **/
+    void ResetSlurRend();
+
+    /** Read the values for the attribute class **/
+    bool ReadSlurRend(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteSlurRend(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetSlurLform(data_LINEFORM slurLform_) { m_slurLform = slurLform_; }
+    data_LINEFORM GetSlurLform() const { return m_slurLform; }
+    bool HasSlurLform() const;
+    //
+    void SetSlurLwidth(std::string slurLwidth_) { m_slurLwidth = slurLwidth_; }
+    std::string GetSlurLwidth() const { return m_slurLwidth; }
+    bool HasSlurLwidth() const;
+    ///@}
+
+private:
+    /** --- **/
+    data_LINEFORM m_slurLform;
+    /** --- **/
+    std::string m_slurLwidth;
+
+    /* include <attslur.lwidth> */
+};
+
+//----------------------------------------------------------------------------
+// AttStemsCmn
+//----------------------------------------------------------------------------
+
+class AttStemsCmn : public Att {
+public:
+    AttStemsCmn();
+    virtual ~AttStemsCmn();
+
+    /** Reset the default values for the attribute class **/
+    void ResetStemsCmn();
+
+    /** Read the values for the attribute class **/
+    bool ReadStemsCmn(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteStemsCmn(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetStemWith(data_OTHERSTAFF stemWith_) { m_stemWith = stemWith_; }
+    data_OTHERSTAFF GetStemWith() const { return m_stemWith; }
+    bool HasStemWith() const;
+    ///@}
+
+private:
+    /**
+     * Contains an indication of which staff a note or chord that logically belongs to
+     * the current staff should be visually placed on; that is, the one above or the
+     * one below.
+     **/
+    data_OTHERSTAFF m_stemWith;
+
+    /* include <attstem.with> */
+};
+
+//----------------------------------------------------------------------------
+// AttTieRend
+//----------------------------------------------------------------------------
+
+class AttTieRend : public Att {
+public:
+    AttTieRend();
+    virtual ~AttTieRend();
+
+    /** Reset the default values for the attribute class **/
+    void ResetTieRend();
+
+    /** Read the values for the attribute class **/
+    bool ReadTieRend(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteTieRend(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetTieLform(data_LINEFORM tieLform_) { m_tieLform = tieLform_; }
+    data_LINEFORM GetTieLform() const { return m_tieLform; }
+    bool HasTieLform() const;
+    //
+    void SetTieLwidth(std::string tieLwidth_) { m_tieLwidth = tieLwidth_; }
+    std::string GetTieLwidth() const { return m_tieLwidth; }
+    bool HasTieLwidth() const;
+    ///@}
+
+private:
+    /** --- **/
+    data_LINEFORM m_tieLform;
+    /** --- **/
+    std::string m_tieLwidth;
+
+    /* include <atttie.lwidth> */
+};
+
+//----------------------------------------------------------------------------
+// AttTremMeasured
+//----------------------------------------------------------------------------
+
+class AttTremMeasured : public Att {
+public:
+    AttTremMeasured();
+    virtual ~AttTremMeasured();
+
+    /** Reset the default values for the attribute class **/
+    void ResetTremMeasured();
+
+    /** Read the values for the attribute class **/
+    bool ReadTremMeasured(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteTremMeasured(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetUnitdur(data_DURATION unitdur_) { m_unitdur = unitdur_; }
+    data_DURATION GetUnitdur() const { return m_unitdur; }
+    bool HasUnitdur() const;
+    ///@}
+
+private:
+    /** The performed duration of an individual note in a measured tremolo. **/
+    data_DURATION m_unitdur;
+
+    /* include <attunitdur> */
 };
 
 } // vrv namespace

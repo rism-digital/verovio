@@ -59,7 +59,7 @@ public:
     ///@}
 
 private:
-    /** Records the appearance and usually the function of the bar line. **/
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
     mordentLog_FORM m_form;
     /**
      * When set to 'true', a double or long mordent, sometimes called a "pincé double",
@@ -68,6 +68,46 @@ private:
     data_BOOLEAN m_long;
 
     /* include <attlong> */
+};
+
+//----------------------------------------------------------------------------
+// AttOrnamPresent
+//----------------------------------------------------------------------------
+
+class AttOrnamPresent : public Att {
+public:
+    AttOrnamPresent();
+    virtual ~AttOrnamPresent();
+
+    /** Reset the default values for the attribute class **/
+    void ResetOrnamPresent();
+
+    /** Read the values for the attribute class **/
+    bool ReadOrnamPresent(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteOrnamPresent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetOrnam(std::string ornam_) { m_ornam = ornam_; }
+    std::string GetOrnam() const { return m_ornam; }
+    bool HasOrnam() const;
+    ///@}
+
+private:
+    /**
+     * Indicates that this element has an attached ornament.
+     * If visual information about the ornament is needed, then one of the elements
+     * that represents an ornament (mordent, trill, or turn) should be employed.
+     **/
+    std::string m_ornam;
+
+    /* include <attornam> */
 };
 
 //----------------------------------------------------------------------------
@@ -148,7 +188,7 @@ public:
 private:
     /** When set to 'true', the turn begins on the second half of the beat. **/
     data_BOOLEAN m_delayed;
-    /** Records the appearance and usually the function of the bar line. **/
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
     turnLog_FORM m_form;
 
     /* include <attform> */

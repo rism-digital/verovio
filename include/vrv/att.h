@@ -44,7 +44,7 @@ public:
      * Files to be uncommented according to the inclusion of the corresponding LibMEI files
      */
     ///@{
-    // static bool SetAnalysis(Object *element, std::string attrType, std::string attrValue);
+    // static bool SetAnalytical(Object *element, std::string attrType, std::string attrValue);
     static bool SetCmn(Object *element, std::string attrType, std::string attrValue);
     static bool SetCmnornaments(Object *element, std::string attrType, std::string attrValue);
     static bool SetCritapp(Object *element, std::string attrType, std::string attrValue);
@@ -52,23 +52,24 @@ public:
     static bool SetExternalsymbols(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFigtable(Object *element, std::string attrType, std::string attrValue);
+    // static bool SetFingering(Object *element, std::string attrType, std::string attrValue);
+    // static bool SetGestural(Object *element, std::string attrType, std::string attrValue);
     // static bool SetHarmony(Object *element, std::string attrType, std::string attrValue);
     // static bool SetHeader(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetLyrics(Object *element, std::string attrType, std::string attrValue);
     static bool SetMei(Object *element, std::string attrType, std::string attrValue);
     static bool SetMensural(Object *element, std::string attrType, std::string attrValue);
     static bool SetMidi(Object *element, std::string attrType, std::string attrValue);
     static bool SetPagebased(Object *element, std::string attrType, std::string attrValue);
     // static bool SetPerformance(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetNeumes(Object *element, std::string attrType, std::string attrValue);
     static bool SetShared(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetTablature(Object *element, std::string attrType, std::string attrValue);
     // static bool SetUsersymbols(Object *element, std::string attrType, std::string attrValue);
+    // static bool SetVisual(Object *element, std::string attrType, std::string attrValue);
+
 
     /**
      * Idem for getting attributes as strings
      */
-    // static void GetAnalysis(Object *element, ArrayOfStrAttr *attributes);
+    // static void GetAnalytical(Object *element, ArrayOfStrAttr *attributes);
     static void GetCmn(const Object *element, ArrayOfStrAttr *attributes);
     static void GetCmnornaments(const Object *element, ArrayOfStrAttr *attributes);
     static void GetCritapp(const Object *element, ArrayOfStrAttr *attributes);
@@ -76,18 +77,18 @@ public:
     static void GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFacsimile(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFigtable(const Object *element, ArrayOfStrAttr *attributes);
+    // static void GetFingering(const Object *element, ArrayOfStrAttr *attributes);
+    // static void GetGestural(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetHarmony(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetHeader(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetLyrics(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMei(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMensural(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMidi(const Object *element, ArrayOfStrAttr *attributes);
     static void GetPagebased(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetPerformance(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetNeumes(const Object *element, ArrayOfStrAttr *attributes);
     static void GetShared(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetTablature(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes);
+    // static void GetVisual(const Object *element, ArrayOfStrAttr *attributes);
     ///@}
 
 public:

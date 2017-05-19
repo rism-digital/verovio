@@ -184,6 +184,10 @@
 		4D422105199805F800963292 /* att.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D422103199805F700963292 /* att.cpp */; };
 		4D4221061998A8CE00963292 /* atts_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29031940BCC100C76319 /* atts_mensural.cpp */; };
 		4D4221071998A8CE00963292 /* atts_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29031940BCC100C76319 /* atts_mensural.cpp */; };
+		4D4335C61ECF2310003BE1A9 /* atts_analytical.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4335BE1ECF2310003BE1A9 /* atts_analytical.cpp */; };
+		4D4335C71ECF2310003BE1A9 /* atts_fingering.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4335C01ECF2310003BE1A9 /* atts_fingering.cpp */; };
+		4D4335C81ECF2310003BE1A9 /* atts_gestural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4335C21ECF2310003BE1A9 /* atts_gestural.cpp */; };
+		4D4335C91ECF2310003BE1A9 /* atts_visual.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4335C41ECF2310003BE1A9 /* atts_visual.cpp */; };
 		4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */; };
 		4D50B53A1C1B40C90081D56E /* atttypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50B5391C1B40C90081D56E /* atttypes.h */; };
 		4D50B53B1C1B47540081D56E /* atts_pagebased.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3FF8D919BADD7A00B105B5 /* atts_pagebased.cpp */; };
@@ -496,6 +500,14 @@
 		4D4220FF199805E400963292 /* att.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = att.h; path = include/vrv/att.h; sourceTree = "<group>"; };
 		4D422100199805E400963292 /* attdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attdef.h; path = include/vrv/attdef.h; sourceTree = "<group>"; };
 		4D422103199805F700963292 /* att.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = att.cpp; path = src/att.cpp; sourceTree = "<group>"; };
+		4D4335BE1ECF2310003BE1A9 /* atts_analytical.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_analytical.cpp; path = libmei/atts_analytical.cpp; sourceTree = "<group>"; };
+		4D4335BF1ECF2310003BE1A9 /* atts_analytical.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_analytical.h; path = libmei/atts_analytical.h; sourceTree = "<group>"; };
+		4D4335C01ECF2310003BE1A9 /* atts_fingering.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_fingering.cpp; path = libmei/atts_fingering.cpp; sourceTree = "<group>"; };
+		4D4335C11ECF2310003BE1A9 /* atts_fingering.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_fingering.h; path = libmei/atts_fingering.h; sourceTree = "<group>"; };
+		4D4335C21ECF2310003BE1A9 /* atts_gestural.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_gestural.cpp; path = libmei/atts_gestural.cpp; sourceTree = "<group>"; };
+		4D4335C31ECF2310003BE1A9 /* atts_gestural.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_gestural.h; path = libmei/atts_gestural.h; sourceTree = "<group>"; };
+		4D4335C41ECF2310003BE1A9 /* atts_visual.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_visual.cpp; path = libmei/atts_visual.cpp; sourceTree = "<group>"; };
+		4D4335C51ECF2310003BE1A9 /* atts_visual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_visual.h; path = libmei/atts_visual.h; sourceTree = "<group>"; };
 		4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_mensural.cpp; path = src/view_mensural.cpp; sourceTree = "<group>"; };
 		4D50B5391C1B40C90081D56E /* atttypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atttypes.h; path = libmei/atttypes.h; sourceTree = "<group>"; };
 		4D543E211B80AACF004B823C /* view_control.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_control.cpp; path = src/view_control.cpp; sourceTree = "<group>"; };
@@ -566,8 +578,6 @@
 		4DDBBB591C7AE45900054AFF /* dynam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dynam.cpp; path = src/dynam.cpp; sourceTree = "<group>"; };
 		4DDBBB5A1C7AE45900054AFF /* hairpin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hairpin.cpp; path = src/hairpin.cpp; sourceTree = "<group>"; };
 		4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_text.cpp; path = src/view_text.cpp; sourceTree = "<group>"; };
-		4DEE28ED1940BCC100C76319 /* atts_analysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_analysis.cpp; path = libmei/atts_analysis.cpp; sourceTree = "<group>"; };
-		4DEE28EE1940BCC100C76319 /* atts_analysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_analysis.h; path = libmei/atts_analysis.h; sourceTree = "<group>"; };
 		4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_cmn.cpp; path = libmei/atts_cmn.cpp; sourceTree = "<group>"; };
 		4DEE28F01940BCC100C76319 /* atts_cmn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_cmn.h; path = libmei/atts_cmn.h; sourceTree = "<group>"; };
 		4DEE28F11940BCC100C76319 /* atts_cmnornaments.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_cmnornaments.cpp; path = libmei/atts_cmnornaments.cpp; sourceTree = "<group>"; };
@@ -584,18 +594,12 @@
 		4DEE28FC1940BCC100C76319 /* atts_harmony.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_harmony.h; path = libmei/atts_harmony.h; sourceTree = "<group>"; };
 		4DEE28FD1940BCC100C76319 /* atts_header.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_header.cpp; path = libmei/atts_header.cpp; sourceTree = "<group>"; };
 		4DEE28FE1940BCC100C76319 /* atts_header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_header.h; path = libmei/atts_header.h; sourceTree = "<group>"; };
-		4DEE29011940BCC100C76319 /* atts_lyrics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_lyrics.cpp; path = libmei/atts_lyrics.cpp; sourceTree = "<group>"; };
-		4DEE29021940BCC100C76319 /* atts_lyrics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_lyrics.h; path = libmei/atts_lyrics.h; sourceTree = "<group>"; };
 		4DEE29031940BCC100C76319 /* atts_mensural.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_mensural.cpp; path = libmei/atts_mensural.cpp; sourceTree = "<group>"; };
 		4DEE29041940BCC100C76319 /* atts_mensural.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_mensural.h; path = libmei/atts_mensural.h; sourceTree = "<group>"; };
 		4DEE29051940BCC100C76319 /* atts_midi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_midi.cpp; path = libmei/atts_midi.cpp; sourceTree = "<group>"; };
 		4DEE29061940BCC100C76319 /* atts_midi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_midi.h; path = libmei/atts_midi.h; sourceTree = "<group>"; };
-		4DEE29071940BCC100C76319 /* atts_neumes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_neumes.cpp; path = libmei/atts_neumes.cpp; sourceTree = "<group>"; };
-		4DEE29081940BCC100C76319 /* atts_neumes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_neumes.h; path = libmei/atts_neumes.h; sourceTree = "<group>"; };
 		4DEE29091940BCC100C76319 /* atts_shared.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_shared.cpp; path = libmei/atts_shared.cpp; sourceTree = "<group>"; };
 		4DEE290A1940BCC100C76319 /* atts_shared.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_shared.h; path = libmei/atts_shared.h; sourceTree = "<group>"; };
-		4DEE290B1940BCC100C76319 /* atts_tablature.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_tablature.cpp; path = libmei/atts_tablature.cpp; sourceTree = "<group>"; };
-		4DEE290C1940BCC100C76319 /* atts_tablature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_tablature.h; path = libmei/atts_tablature.h; sourceTree = "<group>"; };
 		4DEEDE621E617C880087E8BC /* elementpart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = elementpart.h; path = include/vrv/elementpart.h; sourceTree = "<group>"; };
 		4DEEDE631E617C930087E8BC /* elementpart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = elementpart.cpp; path = src/elementpart.cpp; sourceTree = "<group>"; };
 		4DF289FC1A7545CC00BA9F7D /* timeinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = timeinterface.h; path = include/vrv/timeinterface.h; sourceTree = "<group>"; };
@@ -857,12 +861,18 @@
 		4DEE28EC1940BCA100C76319 /* libmei */ = {
 			isa = PBXGroup;
 			children = (
+				4D4335BE1ECF2310003BE1A9 /* atts_analytical.cpp */,
+				4D4335BF1ECF2310003BE1A9 /* atts_analytical.h */,
+				4D4335C01ECF2310003BE1A9 /* atts_fingering.cpp */,
+				4D4335C11ECF2310003BE1A9 /* atts_fingering.h */,
+				4D4335C21ECF2310003BE1A9 /* atts_gestural.cpp */,
+				4D4335C31ECF2310003BE1A9 /* atts_gestural.h */,
+				4D4335C41ECF2310003BE1A9 /* atts_visual.cpp */,
+				4D4335C51ECF2310003BE1A9 /* atts_visual.h */,
 				4DF9D2951C1B3F0A0069E8C8 /* attclasses.h */,
 				4DF9D2961C1B3F0A0069E8C8 /* attconverter.cpp */,
 				4DF9D2971C1B3F0A0069E8C8 /* attconverter.h */,
 				4D50B5391C1B40C90081D56E /* atttypes.h */,
-				4DEE28ED1940BCC100C76319 /* atts_analysis.cpp */,
-				4DEE28EE1940BCC100C76319 /* atts_analysis.h */,
 				4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */,
 				4DEE28F01940BCC100C76319 /* atts_cmn.h */,
 				4DEE28F11940BCC100C76319 /* atts_cmnornaments.cpp */,
@@ -881,8 +891,6 @@
 				4DEE28FC1940BCC100C76319 /* atts_harmony.h */,
 				4DEE28FD1940BCC100C76319 /* atts_header.cpp */,
 				4DEE28FE1940BCC100C76319 /* atts_header.h */,
-				4DEE29011940BCC100C76319 /* atts_lyrics.cpp */,
-				4DEE29021940BCC100C76319 /* atts_lyrics.h */,
 				4DF9D2811C18DC490069E8C8 /* atts_mei.cpp */,
 				4DF9D2821C18DC490069E8C8 /* atts_mei.h */,
 				4DEE29031940BCC100C76319 /* atts_mensural.cpp */,
@@ -893,12 +901,8 @@
 				4D3FF8DA19BADD7A00B105B5 /* atts_pagebased.h */,
 				4DF9D2861C18DE270069E8C8 /* atts_performance.cpp */,
 				4DF9D2871C18DE270069E8C8 /* atts_performance.h */,
-				4DEE29071940BCC100C76319 /* atts_neumes.cpp */,
-				4DEE29081940BCC100C76319 /* atts_neumes.h */,
 				4DEE29091940BCC100C76319 /* atts_shared.cpp */,
 				4DEE290A1940BCC100C76319 /* atts_shared.h */,
-				4DEE290B1940BCC100C76319 /* atts_tablature.cpp */,
-				4DEE290C1940BCC100C76319 /* atts_tablature.h */,
 				4DF9D2881C18DE270069E8C8 /* atts_usersymbols.cpp */,
 				4DF9D2891C18DE270069E8C8 /* atts_usersymbols.h */,
 			);
@@ -1480,6 +1484,7 @@
 				40D0D5E21E3BD7FE00E6BF5C /* turn.cpp in Sources */,
 				4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
 				8F086EEC188539540037FD8E /* io.cpp in Sources */,
+				4D4335C71ECF2310003BE1A9 /* atts_fingering.cpp in Sources */,
 				4D796B5E1D78641900A15238 /* harm.cpp in Sources */,
 				4DB3072F1AC9ED2500EE0982 /* space.cpp in Sources */,
 				8F086EED188539540037FD8E /* iodarms.cpp in Sources */,
@@ -1516,6 +1521,7 @@
 				8F086EFC188539540037FD8E /* positioninterface.cpp in Sources */,
 				4DB0B0161C44129300DBDCC3 /* timestamp.cpp in Sources */,
 				4D1BE76F1C688F5A0086DC0E /* MidiEventList.cpp in Sources */,
+				4D4335C61ECF2310003BE1A9 /* atts_analytical.cpp in Sources */,
 				4DA20ED11D0F151900706C4A /* iohumdrum.cpp in Sources */,
 				8F086EFD188539540037FD8E /* rest.cpp in Sources */,
 				8F086EFE188539540037FD8E /* scoredef.cpp in Sources */,
@@ -1547,6 +1553,7 @@
 				4DB726C01B8B9F480040231B /* rpt.cpp in Sources */,
 				2D2A799A1A69812C000A441B /* chord.cpp in Sources */,
 				8F086F0C188539540037FD8E /* view.cpp in Sources */,
+				4D4335C81ECF2310003BE1A9 /* atts_gestural.cpp in Sources */,
 				8F086F0D188539540037FD8E /* vrv.cpp in Sources */,
 				4D22C41918890E6100D0831F /* mrest.cpp in Sources */,
 				4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
@@ -1566,6 +1573,7 @@
 				4DF9D29A1C1B3F0A0069E8C8 /* attconverter.cpp in Sources */,
 				4D1D73401A1D08DC001E08F6 /* glyph.cpp in Sources */,
 				4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */,
+				4D4335C91ECF2310003BE1A9 /* atts_visual.cpp in Sources */,
 				4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */,
 				4DF28A051A754DF000BA9F7D /* floatingobject.cpp in Sources */,
 				4DF9D2831C18DC490069E8C8 /* atts_mei.cpp in Sources */,

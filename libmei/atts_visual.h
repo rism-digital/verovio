@@ -93,8 +93,8 @@ public:
     data_LINESTARTENDSYMBOL GetArrowShape() const { return m_arrowShape; }
     bool HasArrowShape() const;
     //
-    void SetArrowSize(data_FONTSIZESCALE arrowSize_) { m_arrowSize = arrowSize_; }
-    data_FONTSIZESCALE GetArrowSize() const { return m_arrowSize; }
+    void SetArrowSize(int arrowSize_) { m_arrowSize = arrowSize_; }
+    int GetArrowSize() const { return m_arrowSize; }
     bool HasArrowSize() const;
     //
     void SetArrowColor(std::string arrowColor_) { m_arrowColor = arrowColor_; }
@@ -120,7 +120,7 @@ private:
     /** Symbol rendered at end of the line. **/
     data_LINESTARTENDSYMBOL m_arrowShape;
     /** Holds the relative size of the arrow symbol. **/
-    data_FONTSIZESCALE m_arrowSize;
+    int m_arrowSize;
     /** Captures the overall color of the arrow. **/
     std::string m_arrowColor;
     /** Captures the fill color of the arrow if different from the line color. **/
@@ -615,16 +615,16 @@ public:
     data_LINESTARTENDSYMBOL GetEndsym() const { return m_endsym; }
     bool HasEndsym() const;
     //
-    void SetEndsymSize(data_FONTSIZESCALE endsymSize_) { m_endsymSize = endsymSize_; }
-    data_FONTSIZESCALE GetEndsymSize() const { return m_endsymSize; }
+    void SetEndsymSize(int endsymSize_) { m_endsymSize = endsymSize_; }
+    int GetEndsymSize() const { return m_endsymSize; }
     bool HasEndsymSize() const;
     //
     void SetStartsym(data_LINESTARTENDSYMBOL startsym_) { m_startsym = startsym_; }
     data_LINESTARTENDSYMBOL GetStartsym() const { return m_startsym; }
     bool HasStartsym() const;
     //
-    void SetStartsymSize(data_FONTSIZESCALE startsymSize_) { m_startsymSize = startsymSize_; }
-    data_FONTSIZESCALE GetStartsymSize() const { return m_startsymSize; }
+    void SetStartsymSize(int startsymSize_) { m_startsymSize = startsymSize_; }
+    int GetStartsymSize() const { return m_startsymSize; }
     bool HasStartsymSize() const;
     ///@}
 
@@ -636,11 +636,11 @@ private:
     /** Symbol rendered at end of line. **/
     data_LINESTARTENDSYMBOL m_endsym;
     /** Holds the relative size of the line-end symbol. **/
-    data_FONTSIZESCALE m_endsymSize;
+    int m_endsymSize;
     /** Symbol rendered at start of line. **/
     data_LINESTARTENDSYMBOL m_startsym;
     /** Holds the relative size of the line-start symbol. **/
-    data_FONTSIZESCALE m_startsymSize;
+    int m_startsymSize;
 
     /* include <attstartsym.size> */
 };

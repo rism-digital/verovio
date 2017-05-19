@@ -55,7 +55,7 @@ public:
     ///@}
 
 private:
-    /** Records the function of an accidental. **/
+    /** Function of the meter signature group. **/
     accidLog_FUNC m_func;
 
     /* include <attfunc> */
@@ -289,10 +289,61 @@ public:
     ///@}
 
 private:
-    /** Records the appearance and usually the function of the bar line. **/
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
     data_BARRENDITION m_form;
 
     /* include <attform> */
+};
+
+//----------------------------------------------------------------------------
+// AttBarPlacement
+//----------------------------------------------------------------------------
+
+class AttBarPlacement : public Att {
+public:
+    AttBarPlacement();
+    virtual ~AttBarPlacement();
+
+    /** Reset the default values for the attribute class **/
+    void ResetBarPlacement();
+
+    /** Read the values for the attribute class **/
+    bool ReadBarPlacement(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteBarPlacement(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetBarplace(data_BARPLACE barplace_) { m_barplace = barplace_; }
+    data_BARPLACE GetBarplace() const { return m_barplace; }
+    bool HasBarplace() const;
+    //
+    void SetTaktplace(int taktplace_) { m_taktplace = taktplace_; }
+    int GetTaktplace() const { return m_taktplace; }
+    bool HasTaktplace() const;
+    ///@}
+
+private:
+    /** Records the location of a bar line. **/
+    data_BARPLACE m_barplace;
+    /**
+     * If takt bar lines are to be used, then the taktplace attribute may be used to
+     * denote the staff location of the shortened bar line.
+     * The location may include staff lines, spaces, and the spaces directly above and
+     * below the staff. The value ranges between 0 (just below the staff) to 2 * number
+     * of staff lines (directly above the staff). For example, on a 5-line staff the
+     * lines would be numbered 1,3,5,7, and 9 while the spaces would be numbered
+     * 0,2,4,6,8,10. For example, a value of '9' puts the bar line through the top line
+     * of a 5-line staff.
+     **/
+    int m_taktplace;
+
+    /* include <atttaktplace> */
 };
 
 //----------------------------------------------------------------------------
@@ -993,6 +1044,57 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttDistances
+//----------------------------------------------------------------------------
+
+class AttDistances : public Att {
+public:
+    AttDistances();
+    virtual ~AttDistances();
+
+    /** Reset the default values for the attribute class **/
+    void ResetDistances();
+
+    /** Read the values for the attribute class **/
+    bool ReadDistances(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteDistances(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetDynamDist(std::string dynamDist_) { m_dynamDist = dynamDist_; }
+    std::string GetDynamDist() const { return m_dynamDist; }
+    bool HasDynamDist() const;
+    //
+    void SetHarmDist(std::string harmDist_) { m_harmDist = harmDist_; }
+    std::string GetHarmDist() const { return m_harmDist; }
+    bool HasHarmDist() const;
+    //
+    void SetTextDist(std::string textDist_) { m_textDist = textDist_; }
+    std::string GetTextDist() const { return m_textDist; }
+    bool HasTextDist() const;
+    ///@}
+
+private:
+    /** Records the default distance from the staff for dynamic marks. **/
+    std::string m_dynamDist;
+    /**
+     * Records the default distance from the staff of harmonic indications, such as
+     * guitar chord grids or functional labels.
+     **/
+    std::string m_harmDist;
+    /** Determines how far from the staff to render text elements. **/
+    std::string m_textDist;
+
+    /* include <atttext.dist> */
+};
+
+//----------------------------------------------------------------------------
 // AttDotLog
 //----------------------------------------------------------------------------
 
@@ -1022,7 +1124,7 @@ public:
     ///@}
 
 private:
-    /** Records the appearance and usually the function of the bar line. **/
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
     dotLog_FORM m_form;
 
     /* include <attform> */
@@ -1198,10 +1300,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Along with numbase, describes duration as a ratio.
-     * num is the first value in the ratio, while numbase is the second.
-     **/
+    /** Records a number or count accompanying a notational feature. **/
     int m_num;
     /**
      * Along with num, describes duration as a ratio.
@@ -1210,6 +1309,83 @@ private:
     int m_numbase;
 
     /* include <attnumbase> */
+};
+
+//----------------------------------------------------------------------------
+// AttEnclosingChars
+//----------------------------------------------------------------------------
+
+class AttEnclosingChars : public Att {
+public:
+    AttEnclosingChars();
+    virtual ~AttEnclosingChars();
+
+    /** Reset the default values for the attribute class **/
+    void ResetEnclosingChars();
+
+    /** Read the values for the attribute class **/
+    bool ReadEnclosingChars(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteEnclosingChars(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetEnclose(data_ENCLOSURE enclose_) { m_enclose = enclose_; }
+    data_ENCLOSURE GetEnclose() const { return m_enclose; }
+    bool HasEnclose() const;
+    ///@}
+
+private:
+    /**
+     * Records the characters often used to mark accidentals, articulations, and
+     * sometimes notes as having a cautionary or editorial function.
+     * For an example of cautionary accidentals enclosed in parentheses, see Read, p.
+     * 131, ex. 9-14.
+     **/
+    data_ENCLOSURE m_enclose;
+
+    /* include <attenclose> */
+};
+
+//----------------------------------------------------------------------------
+// AttEndings
+//----------------------------------------------------------------------------
+
+class AttEndings : public Att {
+public:
+    AttEndings();
+    virtual ~AttEndings();
+
+    /** Reset the default values for the attribute class **/
+    void ResetEndings();
+
+    /** Read the values for the attribute class **/
+    bool ReadEndings(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteEndings(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetEndingRend(endings_ENDINGREND endingRend_) { m_endingRend = endingRend_; }
+    endings_ENDINGREND GetEndingRend() const { return m_endingRend; }
+    bool HasEndingRend() const;
+    ///@}
+
+private:
+    /** Describes where ending marks should be displayed. **/
+    endings_ENDINGREND m_endingRend;
+
+    /* include <attending.rend> */
 };
 
 //----------------------------------------------------------------------------
@@ -1259,6 +1435,42 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttExtender
+//----------------------------------------------------------------------------
+
+class AttExtender : public Att {
+public:
+    AttExtender();
+    virtual ~AttExtender();
+
+    /** Reset the default values for the attribute class **/
+    void ResetExtender();
+
+    /** Read the values for the attribute class **/
+    bool ReadExtender(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteExtender(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetExtender(data_BOOLEAN extender_) { m_extender = extender_; }
+    data_BOOLEAN GetExtender() const { return m_extender; }
+    bool HasExtender() const;
+    ///@}
+
+private:
+    /** Indicates the presence of an extension symbol, typically a line. **/
+    data_BOOLEAN m_extender;
+
+    /* include <attextender> */
+};
+
+//----------------------------------------------------------------------------
 // AttExtent
 //----------------------------------------------------------------------------
 
@@ -1296,6 +1508,45 @@ private:
     std::string m_extent;
 
     /* include <attextent> */
+};
+
+//----------------------------------------------------------------------------
+// AttFermataPresent
+//----------------------------------------------------------------------------
+
+class AttFermataPresent : public Att {
+public:
+    AttFermataPresent();
+    virtual ~AttFermataPresent();
+
+    /** Reset the default values for the attribute class **/
+    void ResetFermataPresent();
+
+    /** Read the values for the attribute class **/
+    bool ReadFermataPresent(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteFermataPresent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFermata(data_STAFFREL_basic fermata_) { m_fermata = fermata_; }
+    data_STAFFREL_basic GetFermata() const { return m_fermata; }
+    bool HasFermata() const;
+    ///@}
+
+private:
+    /**
+     * Indicates the attachment of a fermata to this element.
+     * If visual information about the fermata needs to be recorded, then a
+     **/
+    data_STAFFREL_basic m_fermata;
+
+    /* include <attfermata> */
 };
 
 //----------------------------------------------------------------------------
@@ -1522,6 +1773,49 @@ private:
     std::string m_mimetype;
 
     /* include <attmimetype> */
+};
+
+//----------------------------------------------------------------------------
+// AttJoined
+//----------------------------------------------------------------------------
+
+class AttJoined : public Att {
+public:
+    AttJoined();
+    virtual ~AttJoined();
+
+    /** Reset the default values for the attribute class **/
+    void ResetJoined();
+
+    /** Read the values for the attribute class **/
+    bool ReadJoined(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteJoined(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetJoin(std::string join_) { m_join = join_; }
+    std::string GetJoin() const { return m_join; }
+    bool HasJoin() const;
+    ///@}
+
+private:
+    /**
+     * Used for linking visually separate entities that form a single logical entity,
+     * for example, multiple slurs broken across a system break that form a single
+     * musical phrase.
+     * Also used to indicate a measure which metrically completes the current one.
+     * Record the identifiers of the separately encoded components, excluding the one
+     * carrying the attribute.
+     **/
+    std::string m_join;
+
+    /* include <attjoin> */
 };
 
 //----------------------------------------------------------------------------
@@ -1802,6 +2096,102 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttLineRend
+//----------------------------------------------------------------------------
+
+class AttLineRend : public Att {
+public:
+    AttLineRend();
+    virtual ~AttLineRend();
+
+    /** Reset the default values for the attribute class **/
+    void ResetLineRend();
+
+    /** Read the values for the attribute class **/
+    bool ReadLineRend(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteLineRend(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetLendsym(data_LINESTARTENDSYMBOL lendsym_) { m_lendsym = lendsym_; }
+    data_LINESTARTENDSYMBOL GetLendsym() const { return m_lendsym; }
+    bool HasLendsym() const;
+    //
+    void SetLendsymSize(int lendsymSize_) { m_lendsymSize = lendsymSize_; }
+    int GetLendsymSize() const { return m_lendsymSize; }
+    bool HasLendsymSize() const;
+    //
+    void SetLstartsym(data_LINESTARTENDSYMBOL lstartsym_) { m_lstartsym = lstartsym_; }
+    data_LINESTARTENDSYMBOL GetLstartsym() const { return m_lstartsym; }
+    bool HasLstartsym() const;
+    //
+    void SetLstartsymSize(int lstartsymSize_) { m_lstartsymSize = lstartsymSize_; }
+    int GetLstartsymSize() const { return m_lstartsymSize; }
+    bool HasLstartsymSize() const;
+    ///@}
+
+private:
+    /** Symbol rendered at end of line. **/
+    data_LINESTARTENDSYMBOL m_lendsym;
+    /** Holds the relative size of the line-end symbol. **/
+    int m_lendsymSize;
+    /** Symbol rendered at start of line. **/
+    data_LINESTARTENDSYMBOL m_lstartsym;
+    /** Holds the relative size of the line-start symbol. **/
+    int m_lstartsymSize;
+
+    /* include <attlstartsym.size> */
+};
+
+//----------------------------------------------------------------------------
+// AttLineRendBase
+//----------------------------------------------------------------------------
+
+class AttLineRendBase : public Att {
+public:
+    AttLineRendBase();
+    virtual ~AttLineRendBase();
+
+    /** Reset the default values for the attribute class **/
+    void ResetLineRendBase();
+
+    /** Read the values for the attribute class **/
+    bool ReadLineRendBase(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteLineRendBase(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetLform(data_LINEFORM lform_) { m_lform = lform_; }
+    data_LINEFORM GetLform() const { return m_lform; }
+    bool HasLform() const;
+    //
+    void SetLwidth(std::string lwidth_) { m_lwidth = lwidth_; }
+    std::string GetLwidth() const { return m_lwidth; }
+    bool HasLwidth() const;
+    ///@}
+
+private:
+    /** Describes the line style of a curve. **/
+    data_LINEFORM m_lform;
+    /** Width of a curved line. **/
+    std::string m_lwidth;
+
+    /* include <attlwidth> */
+};
+
+//----------------------------------------------------------------------------
 // AttLinking
 //----------------------------------------------------------------------------
 
@@ -1874,6 +2264,72 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttLyricStyle
+//----------------------------------------------------------------------------
+
+class AttLyricStyle : public Att {
+public:
+    AttLyricStyle();
+    virtual ~AttLyricStyle();
+
+    /** Reset the default values for the attribute class **/
+    void ResetLyricStyle();
+
+    /** Read the values for the attribute class **/
+    bool ReadLyricStyle(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteLyricStyle(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetLyricAlign(std::string lyricAlign_) { m_lyricAlign = lyricAlign_; }
+    std::string GetLyricAlign() const { return m_lyricAlign; }
+    bool HasLyricAlign() const;
+    //
+    void SetLyricFam(std::string lyricFam_) { m_lyricFam = lyricFam_; }
+    std::string GetLyricFam() const { return m_lyricFam; }
+    bool HasLyricFam() const;
+    //
+    void SetLyricName(std::string lyricName_) { m_lyricName = lyricName_; }
+    std::string GetLyricName() const { return m_lyricName; }
+    bool HasLyricName() const;
+    //
+    void SetLyricSize(int lyricSize_) { m_lyricSize = lyricSize_; }
+    int GetLyricSize() const { return m_lyricSize; }
+    bool HasLyricSize() const;
+    //
+    void SetLyricStyle(data_FONTSTYLE lyricStyle_) { m_lyricStyle = lyricStyle_; }
+    data_FONTSTYLE GetLyricStyle() const { return m_lyricStyle; }
+    bool HasLyricStyle() const;
+    //
+    void SetLyricWeight(data_FONTWEIGHT lyricWeight_) { m_lyricWeight = lyricWeight_; }
+    data_FONTWEIGHT GetLyricWeight() const { return m_lyricWeight; }
+    bool HasLyricWeight() const;
+    ///@}
+
+private:
+    /** Describes the alignment of lyric syllables associated with a note or chord. **/
+    std::string m_lyricAlign;
+    /** Sets the font family default value for lyrics. **/
+    std::string m_lyricFam;
+    /** Sets the font name default value for lyrics. **/
+    std::string m_lyricName;
+    /** Sets the default font size value for lyrics. **/
+    int m_lyricSize;
+    /** Sets the default font style value for lyrics. **/
+    data_FONTSTYLE m_lyricStyle;
+    /** Sets the default font weight value for lyrics. **/
+    data_FONTWEIGHT m_lyricWeight;
+
+    /* include <attlyric.weight> */
+};
+
+//----------------------------------------------------------------------------
 // AttMeasureLog
 //----------------------------------------------------------------------------
 
@@ -1917,6 +2373,42 @@ private:
     data_BARRENDITION m_right;
 
     /* include <attright> */
+};
+
+//----------------------------------------------------------------------------
+// AttMeasureNumbers
+//----------------------------------------------------------------------------
+
+class AttMeasureNumbers : public Att {
+public:
+    AttMeasureNumbers();
+    virtual ~AttMeasureNumbers();
+
+    /** Reset the default values for the attribute class **/
+    void ResetMeasureNumbers();
+
+    /** Read the values for the attribute class **/
+    bool ReadMeasureNumbers(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteMeasureNumbers(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetMnumVisible(data_BOOLEAN mnumVisible_) { m_mnumVisible = mnumVisible_; }
+    data_BOOLEAN GetMnumVisible() const { return m_mnumVisible; }
+    bool HasMnumVisible() const;
+    ///@}
+
+private:
+    /** Indicates whether measure numbers should be displayed. **/
+    data_BOOLEAN m_mnumVisible;
+
+    /* include <attmnum.visible> */
 };
 
 //----------------------------------------------------------------------------
@@ -2297,12 +2789,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Captures the number of beats in a measure, that is, the top number of the meter
-     * signature.
-     * It must contain a decimal number or an additive expression that evaluates to a
-     * decimal number, such as 2+3.
-     **/
+    /** Indicates the number of performers. **/
     int m_count;
     /**
      * Indicates the use of a meter symbol instead of a numeric meter signature, that
@@ -2426,6 +2913,45 @@ private:
     int m_mmDots;
 
     /* include <attmm.dots> */
+};
+
+//----------------------------------------------------------------------------
+// AttMultinumMeasures
+//----------------------------------------------------------------------------
+
+class AttMultinumMeasures : public Att {
+public:
+    AttMultinumMeasures();
+    virtual ~AttMultinumMeasures();
+
+    /** Reset the default values for the attribute class **/
+    void ResetMultinumMeasures();
+
+    /** Read the values for the attribute class **/
+    bool ReadMultinumMeasures(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteMultinumMeasures(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetMultiNumber(data_BOOLEAN multiNumber_) { m_multiNumber = multiNumber_; }
+    data_BOOLEAN GetMultiNumber() const { return m_multiNumber; }
+    bool HasMultiNumber() const;
+    ///@}
+
+private:
+    /**
+     * Indicates whether programmatically calculated counts of multiple measures of
+     * rest (mRest) and whole measure repeats (mRpt) in parts should be rendered.
+     **/
+    data_BOOLEAN m_multiNumber;
+
+    /* include <attmulti.number> */
 };
 
 //----------------------------------------------------------------------------
@@ -2557,6 +3083,145 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttNotationStyle
+//----------------------------------------------------------------------------
+
+class AttNotationStyle : public Att {
+public:
+    AttNotationStyle();
+    virtual ~AttNotationStyle();
+
+    /** Reset the default values for the attribute class **/
+    void ResetNotationStyle();
+
+    /** Read the values for the attribute class **/
+    bool ReadNotationStyle(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteNotationStyle(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetMusicName(std::string musicName_) { m_musicName = musicName_; }
+    std::string GetMusicName() const { return m_musicName; }
+    bool HasMusicName() const;
+    //
+    void SetMusicSize(int musicSize_) { m_musicSize = musicSize_; }
+    int GetMusicSize() const { return m_musicSize; }
+    bool HasMusicSize() const;
+    ///@}
+
+private:
+    /** Sets the default music font name. **/
+    std::string m_musicName;
+    /** Sets the default music font size. **/
+    int m_musicSize;
+
+    /* include <attmusic.size> */
+};
+
+//----------------------------------------------------------------------------
+// AttNoteHeads
+//----------------------------------------------------------------------------
+
+class AttNoteHeads : public Att {
+public:
+    AttNoteHeads();
+    virtual ~AttNoteHeads();
+
+    /** Reset the default values for the attribute class **/
+    void ResetNoteHeads();
+
+    /** Read the values for the attribute class **/
+    bool ReadNoteHeads(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteNoteHeads(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetHeadAltsym(std::string headAltsym_) { m_headAltsym = headAltsym_; }
+    std::string GetHeadAltsym() const { return m_headAltsym; }
+    bool HasHeadAltsym() const;
+    //
+    void SetHeadAuth(std::string headAuth_) { m_headAuth = headAuth_; }
+    std::string GetHeadAuth() const { return m_headAuth; }
+    bool HasHeadAuth() const;
+    //
+    void SetHeadColor(std::string headColor_) { m_headColor = headColor_; }
+    std::string GetHeadColor() const { return m_headColor; }
+    bool HasHeadColor() const;
+    //
+    void SetHeadFill(data_FILL headFill_) { m_headFill = headFill_; }
+    data_FILL GetHeadFill() const { return m_headFill; }
+    bool HasHeadFill() const;
+    //
+    void SetHeadFillcolor(std::string headFillcolor_) { m_headFillcolor = headFillcolor_; }
+    std::string GetHeadFillcolor() const { return m_headFillcolor; }
+    bool HasHeadFillcolor() const;
+    //
+    void SetHeadMod(std::string headMod_) { m_headMod = headMod_; }
+    std::string GetHeadMod() const { return m_headMod; }
+    bool HasHeadMod() const;
+    //
+    void SetHeadRotation(std::string headRotation_) { m_headRotation = headRotation_; }
+    std::string GetHeadRotation() const { return m_headRotation; }
+    bool HasHeadRotation() const;
+    //
+    void SetHeadShape(data_HEADSHAPE_list headShape_) { m_headShape = headShape_; }
+    data_HEADSHAPE_list GetHeadShape() const { return m_headShape; }
+    bool HasHeadShape() const;
+    //
+    void SetHeadVisible(data_BOOLEAN headVisible_) { m_headVisible = headVisible_; }
+    data_BOOLEAN GetHeadVisible() const { return m_headVisible; }
+    bool HasHeadVisible() const;
+    ///@}
+
+private:
+    /**
+     * Provides a way of pointing to a user-defined symbol.
+     * It must contain a reference to an ID of a
+     **/
+    std::string m_headAltsym;
+    /**
+     * A name or label associated with the controlled vocabulary from which a numerical
+     * value of
+     **/
+    std::string m_headAuth;
+    /** Captures the overall color of a notehead. **/
+    std::string m_headColor;
+    /** Describes how/if the notehead is filled. **/
+    data_FILL m_headFill;
+    /** Captures the fill color of a notehead if different from the overall note color. **/
+    std::string m_headFillcolor;
+    /** Records any additional symbols applied to the notehead. **/
+    std::string m_headMod;
+    /**
+     * Describes rotation applied to the basic notehead shape.
+     * A positive value rotates the notehead in a counter-clockwise fashion, while
+     * negative values produce clockwise rotation.
+     **/
+    std::string m_headRotation;
+    /** Used to override the head shape normally used for the given duration. **/
+    data_HEADSHAPE_list m_headShape;
+    /**
+     * Indicates if a feature should be rendered when the notation is presented
+     * graphically or sounded when it is presented in an aural form.
+     **/
+    data_BOOLEAN m_headVisible;
+
+    /* include <atthead.visible> */
+};
+
+//----------------------------------------------------------------------------
 // AttOctave
 //----------------------------------------------------------------------------
 
@@ -2672,6 +3337,85 @@ private:
     data_STAFFREL_basic m_disPlace;
 
     /* include <attdis.place> */
+};
+
+//----------------------------------------------------------------------------
+// AttOneLineStaff
+//----------------------------------------------------------------------------
+
+class AttOneLineStaff : public Att {
+public:
+    AttOneLineStaff();
+    virtual ~AttOneLineStaff();
+
+    /** Reset the default values for the attribute class **/
+    void ResetOneLineStaff();
+
+    /** Read the values for the attribute class **/
+    bool ReadOneLineStaff(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteOneLineStaff(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetOntheline(data_BOOLEAN ontheline_) { m_ontheline = ontheline_; }
+    data_BOOLEAN GetOntheline() const { return m_ontheline; }
+    bool HasOntheline() const;
+    ///@}
+
+private:
+    /**
+     * Determines the placement of notes on a 1-line staff.
+     * A value of 'true' places all notes on the line, while a value of 'false' places
+     * stems-up notes above the line and stems-down notes below the line.
+     **/
+    data_BOOLEAN m_ontheline;
+
+    /* include <attontheline> */
+};
+
+//----------------------------------------------------------------------------
+// AttOptimization
+//----------------------------------------------------------------------------
+
+class AttOptimization : public Att {
+public:
+    AttOptimization();
+    virtual ~AttOptimization();
+
+    /** Reset the default values for the attribute class **/
+    void ResetOptimization();
+
+    /** Read the values for the attribute class **/
+    bool ReadOptimization(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteOptimization(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetOptimize(data_BOOLEAN optimize_) { m_optimize = optimize_; }
+    data_BOOLEAN GetOptimize() const { return m_optimize; }
+    bool HasOptimize() const;
+    ///@}
+
+private:
+    /**
+     * Indicates whether staves without notes, rests, etc.
+     * should be displayed. When the value is 'true', empty staves are displayed.
+     **/
+    data_BOOLEAN m_optimize;
+
+    /* include <attoptimize> */
 };
 
 //----------------------------------------------------------------------------
@@ -2841,6 +3585,90 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttPages
+//----------------------------------------------------------------------------
+
+class AttPages : public Att {
+public:
+    AttPages();
+    virtual ~AttPages();
+
+    /** Reset the default values for the attribute class **/
+    void ResetPages();
+
+    /** Read the values for the attribute class **/
+    bool ReadPages(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WritePages(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetPageHeight(std::string pageHeight_) { m_pageHeight = pageHeight_; }
+    std::string GetPageHeight() const { return m_pageHeight; }
+    bool HasPageHeight() const;
+    //
+    void SetPageWidth(std::string pageWidth_) { m_pageWidth = pageWidth_; }
+    std::string GetPageWidth() const { return m_pageWidth; }
+    bool HasPageWidth() const;
+    //
+    void SetPageTopmar(std::string pageTopmar_) { m_pageTopmar = pageTopmar_; }
+    std::string GetPageTopmar() const { return m_pageTopmar; }
+    bool HasPageTopmar() const;
+    //
+    void SetPageBotmar(std::string pageBotmar_) { m_pageBotmar = pageBotmar_; }
+    std::string GetPageBotmar() const { return m_pageBotmar; }
+    bool HasPageBotmar() const;
+    //
+    void SetPageLeftmar(std::string pageLeftmar_) { m_pageLeftmar = pageLeftmar_; }
+    std::string GetPageLeftmar() const { return m_pageLeftmar; }
+    bool HasPageLeftmar() const;
+    //
+    void SetPageRightmar(std::string pageRightmar_) { m_pageRightmar = pageRightmar_; }
+    std::string GetPageRightmar() const { return m_pageRightmar; }
+    bool HasPageRightmar() const;
+    //
+    void SetPagePanels(std::string pagePanels_) { m_pagePanels = pagePanels_; }
+    std::string GetPagePanels() const { return m_pagePanels; }
+    bool HasPagePanels() const;
+    //
+    void SetPageScale(std::string pageScale_) { m_pageScale = pageScale_; }
+    std::string GetPageScale() const { return m_pageScale; }
+    bool HasPageScale() const;
+    ///@}
+
+private:
+    /**
+     * Specifies the height of the page; may be expressed in real-world units or staff
+     * steps.
+     **/
+    std::string m_pageHeight;
+    /**
+     * Describes the width of the page; may be expressed in real-world units or staff
+     * steps.
+     **/
+    std::string m_pageWidth;
+    /** Indicates the amount of whitespace at the top of a page. **/
+    std::string m_pageTopmar;
+    /** Indicates the amount of whitespace at the bottom of a page. **/
+    std::string m_pageBotmar;
+    /** Indicates the amount of whitespace at the left side of a page. **/
+    std::string m_pageLeftmar;
+    /** Indicates the amount of whitespace at the right side of a page. **/
+    std::string m_pageRightmar;
+    /** Indicates the number of logical pages to be rendered on a single physical page. **/
+    std::string m_pagePanels;
+    /** Indicates how the page should be scaled when rendered. **/
+    std::string m_pageScale;
+
+    /* include <attpage.scale> */
+};
+
+//----------------------------------------------------------------------------
 // AttPitch
 //----------------------------------------------------------------------------
 
@@ -2906,10 +3734,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Captures the placement of the item with respect to the staff with which it is
-     * associated.
-     **/
+    /** Records the placement of the beam relative to the events it affects. **/
     data_STAFFREL_extended m_place;
 
     /* include <attplace> */
@@ -3210,10 +4035,112 @@ public:
     ///@}
 
 private:
-    /** Indicates the number of slashes present. **/
+    /** Indicates presence of slash through the beam. **/
     char m_slash;
 
     /* include <attslash> */
+};
+
+//----------------------------------------------------------------------------
+// AttSlurPresent
+//----------------------------------------------------------------------------
+
+class AttSlurPresent : public Att {
+public:
+    AttSlurPresent();
+    virtual ~AttSlurPresent();
+
+    /** Reset the default values for the attribute class **/
+    void ResetSlurPresent();
+
+    /** Read the values for the attribute class **/
+    bool ReadSlurPresent(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteSlurPresent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetSlur(std::string slur_) { m_slur = slur_; }
+    std::string GetSlur() const { return m_slur; }
+    bool HasSlur() const;
+    ///@}
+
+private:
+    /**
+     * Indicates that this element participates in a slur.
+     * If visual information about the slur needs to be recorded, then a
+     **/
+    std::string m_slur;
+
+    /* include <attslur> */
+};
+
+//----------------------------------------------------------------------------
+// AttSpacing
+//----------------------------------------------------------------------------
+
+class AttSpacing : public Att {
+public:
+    AttSpacing();
+    virtual ~AttSpacing();
+
+    /** Reset the default values for the attribute class **/
+    void ResetSpacing();
+
+    /** Read the values for the attribute class **/
+    bool ReadSpacing(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteSpacing(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetSpacingPackexp(double spacingPackexp_) { m_spacingPackexp = spacingPackexp_; }
+    double GetSpacingPackexp() const { return m_spacingPackexp; }
+    bool HasSpacingPackexp() const;
+    //
+    void SetSpacingPackfact(double spacingPackfact_) { m_spacingPackfact = spacingPackfact_; }
+    double GetSpacingPackfact() const { return m_spacingPackfact; }
+    bool HasSpacingPackfact() const;
+    //
+    void SetSpacingStaff(std::string spacingStaff_) { m_spacingStaff = spacingStaff_; }
+    std::string GetSpacingStaff() const { return m_spacingStaff; }
+    bool HasSpacingStaff() const;
+    //
+    void SetSpacingSystem(std::string spacingSystem_) { m_spacingSystem = spacingSystem_; }
+    std::string GetSpacingSystem() const { return m_spacingSystem; }
+    bool HasSpacingSystem() const;
+    ///@}
+
+private:
+    /** Describes a note's spacing relative to its time value. **/
+    double m_spacingPackexp;
+    /** Describes the note spacing of output. **/
+    double m_spacingPackfact;
+    /**
+     * Specifies the minimum amount of space between adjacent staves in the same
+     * system; measured from the bottom line of the staff above to the top line of the
+     * staff below.
+     **/
+    std::string m_spacingStaff;
+    /**
+     * Describes the space between adjacent systems; a pair of space-separated values
+     * (minimum and maximum, respectively) provides a range between which a rendering
+     * system-supplied value may fall, while a single value indicates a fixed amount of
+     * space; that is, the minimum and maximum values are equal.
+     **/
+    std::string m_spacingSystem;
+
+    /* include <attspacing.system> */
 };
 
 //----------------------------------------------------------------------------
@@ -3365,6 +4292,138 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttStaffItems
+//----------------------------------------------------------------------------
+
+class AttStaffItems : public Att {
+public:
+    AttStaffItems();
+    virtual ~AttStaffItems();
+
+    /** Reset the default values for the attribute class **/
+    void ResetStaffItems();
+
+    /** Read the values for the attribute class **/
+    bool ReadStaffItems(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteStaffItems(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetAboveorder(data_STAFFITEM aboveorder_) { m_aboveorder = aboveorder_; }
+    data_STAFFITEM GetAboveorder() const { return m_aboveorder; }
+    bool HasAboveorder() const;
+    //
+    void SetBeloworder(data_STAFFITEM beloworder_) { m_beloworder = beloworder_; }
+    data_STAFFITEM GetBeloworder() const { return m_beloworder; }
+    bool HasBeloworder() const;
+    //
+    void SetBetweenorder(data_STAFFITEM betweenorder_) { m_betweenorder = betweenorder_; }
+    data_STAFFITEM GetBetweenorder() const { return m_betweenorder; }
+    bool HasBetweenorder() const;
+    ///@}
+
+private:
+    /**
+     * Describes vertical order of items printed above a staff, from closest to
+     * farthest away from the staff.
+     **/
+    data_STAFFITEM m_aboveorder;
+    /**
+     * Describes vertical order of items printed below a staff, from closest to
+     * farthest away from the staff.
+     **/
+    data_STAFFITEM m_beloworder;
+    /** Describes vertical order of items printed between staves, from top to bottom. **/
+    data_STAFFITEM m_betweenorder;
+
+    /* include <attbetweenorder> */
+};
+
+//----------------------------------------------------------------------------
+// AttStaffLoc
+//----------------------------------------------------------------------------
+
+class AttStaffLoc : public Att {
+public:
+    AttStaffLoc();
+    virtual ~AttStaffLoc();
+
+    /** Reset the default values for the attribute class **/
+    void ResetStaffLoc();
+
+    /** Read the values for the attribute class **/
+    bool ReadStaffLoc(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteStaffLoc(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetLoc(int loc_) { m_loc = loc_; }
+    int GetLoc() const { return m_loc; }
+    bool HasLoc() const;
+    ///@}
+
+private:
+    /** Holds the staff location of the feature. **/
+    int m_loc;
+
+    /* include <attloc> */
+};
+
+//----------------------------------------------------------------------------
+// AttStaffLocPitched
+//----------------------------------------------------------------------------
+
+class AttStaffLocPitched : public Att {
+public:
+    AttStaffLocPitched();
+    virtual ~AttStaffLocPitched();
+
+    /** Reset the default values for the attribute class **/
+    void ResetStaffLocPitched();
+
+    /** Read the values for the attribute class **/
+    bool ReadStaffLocPitched(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteStaffLocPitched(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetPloc(data_PITCHNAME ploc_) { m_ploc = ploc_; }
+    data_PITCHNAME GetPloc() const { return m_ploc; }
+    bool HasPloc() const;
+    //
+    void SetOloc(char oloc_) { m_oloc = oloc_; }
+    char GetOloc() const { return m_oloc; }
+    bool HasOloc() const;
+    ///@}
+
+private:
+    /** Captures staff location in terms of written pitch name. **/
+    data_PITCHNAME m_ploc;
+    /** Records staff location in terms of written octave. **/
+    char m_oloc;
+
+    /* include <attoloc> */
+};
+
+//----------------------------------------------------------------------------
 // AttStartEndId
 //----------------------------------------------------------------------------
 
@@ -3440,6 +4499,81 @@ private:
     std::string m_startid;
 
     /* include <attstartid> */
+};
+
+//----------------------------------------------------------------------------
+// AttStems
+//----------------------------------------------------------------------------
+
+class AttStems : public Att {
+public:
+    AttStems();
+    virtual ~AttStems();
+
+    /** Reset the default values for the attribute class **/
+    void ResetStems();
+
+    /** Read the values for the attribute class **/
+    bool ReadStems(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteStems(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetStemDir(data_STEMDIRECTION stemDir_) { m_stemDir = stemDir_; }
+    data_STEMDIRECTION GetStemDir() const { return m_stemDir; }
+    bool HasStemDir() const;
+    //
+    void SetStemLen(int stemLen_) { m_stemLen = stemLen_; }
+    int GetStemLen() const { return m_stemLen; }
+    bool HasStemLen() const;
+    //
+    void SetStemMod(data_STEMMODIFIER stemMod_) { m_stemMod = stemMod_; }
+    data_STEMMODIFIER GetStemMod() const { return m_stemMod; }
+    bool HasStemMod() const;
+    //
+    void SetStemPos(data_STEMPOSITION stemPos_) { m_stemPos = stemPos_; }
+    data_STEMPOSITION GetStemPos() const { return m_stemPos; }
+    bool HasStemPos() const;
+    //
+    void SetStemVisible(data_BOOLEAN stemVisible_) { m_stemVisible = stemVisible_; }
+    data_BOOLEAN GetStemVisible() const { return m_stemVisible; }
+    bool HasStemVisible() const;
+    //
+    void SetStemX(double stemX_) { m_stemX = stemX_; }
+    double GetStemX() const { return m_stemX; }
+    bool HasStemX() const;
+    //
+    void SetStemY(double stemY_) { m_stemY = stemY_; }
+    double GetStemY() const { return m_stemY; }
+    bool HasStemY() const;
+    ///@}
+
+private:
+    /** Describes the direction of a stem. **/
+    data_STEMDIRECTION m_stemDir;
+    /** Encodes the stem length. **/
+    int m_stemLen;
+    /**
+     * Encodes any stem "modifiers"; that is, symbols rendered on the stem, such as
+     * tremolo or Sprechstimme indicators.
+     **/
+    data_STEMMODIFIER m_stemMod;
+    /** Records the position of the stem in relation to the note head(s). **/
+    data_STEMPOSITION m_stemPos;
+    /** Determines whether a stem should be displayed. **/
+    data_BOOLEAN m_stemVisible;
+    /** Records the output x coordinate of the stem's attachment point. **/
+    double m_stemX;
+    /** Records the output y coordinate of the stem's attachment point. **/
+    double m_stemY;
+
+    /* include <attstem.y> */
 };
 
 //----------------------------------------------------------------------------
@@ -3524,6 +4658,73 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttSystems
+//----------------------------------------------------------------------------
+
+class AttSystems : public Att {
+public:
+    AttSystems();
+    virtual ~AttSystems();
+
+    /** Reset the default values for the attribute class **/
+    void ResetSystems();
+
+    /** Read the values for the attribute class **/
+    bool ReadSystems(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteSystems(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetSystemLeftline(data_BOOLEAN systemLeftline_) { m_systemLeftline = systemLeftline_; }
+    data_BOOLEAN GetSystemLeftline() const { return m_systemLeftline; }
+    bool HasSystemLeftline() const;
+    //
+    void SetSystemLeftmar(std::string systemLeftmar_) { m_systemLeftmar = systemLeftmar_; }
+    std::string GetSystemLeftmar() const { return m_systemLeftmar; }
+    bool HasSystemLeftmar() const;
+    //
+    void SetSystemRightmar(std::string systemRightmar_) { m_systemRightmar = systemRightmar_; }
+    std::string GetSystemRightmar() const { return m_systemRightmar; }
+    bool HasSystemRightmar() const;
+    //
+    void SetSystemTopmar(std::string systemTopmar_) { m_systemTopmar = systemTopmar_; }
+    std::string GetSystemTopmar() const { return m_systemTopmar; }
+    bool HasSystemTopmar() const;
+    ///@}
+
+private:
+    /**
+     * Indicates whether the staves are joined at the left by a continuous line.
+     * The default value is "true". Do not confuse this with the heavy vertical line
+     * used as a grouping symbol.
+     **/
+    data_BOOLEAN m_systemLeftline;
+    /**
+     * Describes the amount of whitespace at the left system margin relative to
+     * page.leftmar.
+     **/
+    std::string m_systemLeftmar;
+    /**
+     * Describes the amount of whitespace at the right system margin relative to
+     * page.rightmar.
+     **/
+    std::string m_systemRightmar;
+    /**
+     * Describes the distance from page's top edge to the first system; used for first
+     * page only.
+     **/
+    std::string m_systemTopmar;
+
+    /* include <attsystem.topmar> */
+};
+
+//----------------------------------------------------------------------------
 // AttTargetEval
 //----------------------------------------------------------------------------
 
@@ -3592,7 +4793,7 @@ public:
     ///@}
 
 private:
-    /** Records the function of an accidental. **/
+    /** Function of the meter signature group. **/
     tempoLog_FUNC m_func;
 
     /* include <attfunc> */
@@ -3638,6 +4839,120 @@ private:
     std::string m_rend;
 
     /* include <attrend> */
+};
+
+//----------------------------------------------------------------------------
+// AttTextStyle
+//----------------------------------------------------------------------------
+
+class AttTextStyle : public Att {
+public:
+    AttTextStyle();
+    virtual ~AttTextStyle();
+
+    /** Reset the default values for the attribute class **/
+    void ResetTextStyle();
+
+    /** Read the values for the attribute class **/
+    bool ReadTextStyle(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteTextStyle(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetTextFam(std::string textFam_) { m_textFam = textFam_; }
+    std::string GetTextFam() const { return m_textFam; }
+    bool HasTextFam() const;
+    //
+    void SetTextName(std::string textName_) { m_textName = textName_; }
+    std::string GetTextName() const { return m_textName; }
+    bool HasTextName() const;
+    //
+    void SetTextSize(int textSize_) { m_textSize = textSize_; }
+    int GetTextSize() const { return m_textSize; }
+    bool HasTextSize() const;
+    //
+    void SetTextStyle(data_FONTSTYLE textStyle_) { m_textStyle = textStyle_; }
+    data_FONTSTYLE GetTextStyle() const { return m_textStyle; }
+    bool HasTextStyle() const;
+    //
+    void SetTextWeight(data_FONTWEIGHT textWeight_) { m_textWeight = textWeight_; }
+    data_FONTWEIGHT GetTextWeight() const { return m_textWeight; }
+    bool HasTextWeight() const;
+    ///@}
+
+private:
+    /**
+     * Provides a default value for the font family name of text (other than lyrics)
+     * when this information is not provided on the individual elements.
+     **/
+    std::string m_textFam;
+    /**
+     * Provides a default value for the font name of text (other than lyrics) when this
+     * information is not provided on the individual elements.
+     **/
+    std::string m_textName;
+    /**
+     * Provides a default value for the font size of text (other than lyrics) when this
+     * information is not provided on the individual elements.
+     **/
+    int m_textSize;
+    /**
+     * Provides a default value for the font style of text (other than lyrics) when
+     * this information is not provided on the individual elements.
+     **/
+    data_FONTSTYLE m_textStyle;
+    /**
+     * Provides a default value for the font weight for text (other than lyrics) when
+     * this information is not provided on the individual elements.
+     **/
+    data_FONTWEIGHT m_textWeight;
+
+    /* include <atttext.weight> */
+};
+
+//----------------------------------------------------------------------------
+// AttTiePresent
+//----------------------------------------------------------------------------
+
+class AttTiePresent : public Att {
+public:
+    AttTiePresent();
+    virtual ~AttTiePresent();
+
+    /** Reset the default values for the attribute class **/
+    void ResetTiePresent();
+
+    /** Read the values for the attribute class **/
+    bool ReadTiePresent(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteTiePresent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetTie(data_TIE tie_) { m_tie = tie_; }
+    data_TIE GetTie() const { return m_tie; }
+    bool HasTie() const;
+    ///@}
+
+private:
+    /**
+     * Indicates that this element participates in a tie.
+     * If visual information about the tie needs to be recorded, then a
+     **/
+    data_TIE m_tie;
+
+    /* include <atttie> */
 };
 
 //----------------------------------------------------------------------------
@@ -3767,6 +5082,45 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttTupletPresent
+//----------------------------------------------------------------------------
+
+class AttTupletPresent : public Att {
+public:
+    AttTupletPresent();
+    virtual ~AttTupletPresent();
+
+    /** Reset the default values for the attribute class **/
+    void ResetTupletPresent();
+
+    /** Read the values for the attribute class **/
+    bool ReadTupletPresent(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteTupletPresent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetTuplet(std::string tuplet_) { m_tuplet = tuplet_; }
+    std::string GetTuplet() const { return m_tuplet; }
+    bool HasTuplet() const;
+    ///@}
+
+private:
+    /**
+     * Indicates that this feature participates in a tuplet.
+     * If visual information about the tuplet needs to be recorded, then a
+     **/
+    std::string m_tuplet;
+
+    /* include <atttuplet> */
+};
+
+//----------------------------------------------------------------------------
 // AttTyped
 //----------------------------------------------------------------------------
 
@@ -3797,8 +5151,8 @@ public:
 
 private:
     /**
-     * Designation which characterizes the element in some sense, using any convenient
-     * classification scheme or typology that employs single-token labels.
+     * Provides a description of the relationship between the current and the target
+     * categories.
      **/
     std::string m_type;
 
@@ -3867,6 +5221,42 @@ private:
     data_FONTWEIGHT m_fontweight;
 
     /* include <attfontweight> */
+};
+
+//----------------------------------------------------------------------------
+// AttVerticalAlignment
+//----------------------------------------------------------------------------
+
+class AttVerticalAlignment : public Att {
+public:
+    AttVerticalAlignment();
+    virtual ~AttVerticalAlignment();
+
+    /** Reset the default values for the attribute class **/
+    void ResetVerticalAlignment();
+
+    /** Read the values for the attribute class **/
+    bool ReadVerticalAlignment(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteVerticalAlignment(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetVgrp(std::string vgrp_) { m_vgrp = vgrp_; }
+    std::string GetVgrp() const { return m_vgrp; }
+    bool HasVgrp() const;
+    ///@}
+
+private:
+    /** --- **/
+    std::string m_vgrp;
+
+    /* include <attvgrp> */
 };
 
 //----------------------------------------------------------------------------
@@ -4169,6 +5559,42 @@ private:
     std::string m_endvo;
 
     /* include <attendvo> */
+};
+
+//----------------------------------------------------------------------------
+// AttVoltaGroupingSym
+//----------------------------------------------------------------------------
+
+class AttVoltaGroupingSym : public Att {
+public:
+    AttVoltaGroupingSym();
+    virtual ~AttVoltaGroupingSym();
+
+    /** Reset the default values for the attribute class **/
+    void ResetVoltaGroupingSym();
+
+    /** Read the values for the attribute class **/
+    bool ReadVoltaGroupingSym(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteVoltaGroupingSym(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetVoltasym(voltaGroupingSym_VOLTASYM voltasym_) { m_voltasym = voltasym_; }
+    voltaGroupingSym_VOLTASYM GetVoltasym() const { return m_voltasym; }
+    bool HasVoltasym() const;
+    ///@}
+
+private:
+    /** Specifies the symbol used to group lyrics. **/
+    voltaGroupingSym_VOLTASYM m_voltasym;
+
+    /* include <attvoltasym> */
 };
 
 //----------------------------------------------------------------------------

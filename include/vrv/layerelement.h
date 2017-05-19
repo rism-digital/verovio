@@ -29,7 +29,7 @@ class Staff;
  * This class is a base class for the Layer (<layer>) content.
  * It is not an abstract class but should not be instantiated directly.
  */
-class LayerElement : public Object, public AttCommon, public AttTyped {
+class LayerElement : public Object, public AttBasic, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

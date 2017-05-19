@@ -88,6 +88,52 @@ bool AttMordentLog::HasLong() const
 /* include <attlong> */
 
 //----------------------------------------------------------------------------
+// AttOrnamPresent
+//----------------------------------------------------------------------------
+
+AttOrnamPresent::AttOrnamPresent() : Att()
+{
+    ResetOrnamPresent();
+}
+
+AttOrnamPresent::~AttOrnamPresent()
+{
+}
+
+void AttOrnamPresent::ResetOrnamPresent()
+{
+    m_ornam = "";
+}
+
+bool AttOrnamPresent::ReadOrnamPresent(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("ornam")) {
+        this->SetOrnam(StrToStr(element.attribute("ornam").value()));
+        element.remove_attribute("ornam");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttOrnamPresent::WriteOrnamPresent(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasOrnam()) {
+        element.append_attribute("ornam") = StrToStr(this->GetOrnam()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttOrnamPresent::HasOrnam() const
+{
+    return (m_ornam != "");
+}
+
+/* include <attornam> */
+
+//----------------------------------------------------------------------------
 // AttOrnamentAccid
 //----------------------------------------------------------------------------
 
@@ -223,6 +269,14 @@ bool Att::SetCmnornaments(Object *element, std::string attrType, std::string att
             return true;
         }
     }
+    if (element->HasAttClass(ATT_ORNAMPRESENT)) {
+        AttOrnamPresent *att = dynamic_cast<AttOrnamPresent *>(element);
+        assert(att);
+        if (attrType == "ornam") {
+            att->SetOrnam(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_ORNAMENTACCID)) {
         AttOrnamentAccid *att = dynamic_cast<AttOrnamentAccid *>(element);
         assert(att);
@@ -261,6 +315,13 @@ void Att::GetCmnornaments(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasLong()) {
             attributes->push_back(std::make_pair("long", att->BooleanToStr(att->GetLong())));
+        }
+    }
+    if (element->HasAttClass(ATT_ORNAMPRESENT)) {
+        const AttOrnamPresent *att = dynamic_cast<const AttOrnamPresent *>(element);
+        assert(att);
+        if (att->HasOrnam()) {
+            attributes->push_back(std::make_pair("ornam", att->StrToStr(att->GetOrnam())));
         }
     }
     if (element->HasAttClass(ATT_ORNAMENTACCID)) {

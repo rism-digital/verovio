@@ -80,6 +80,45 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttInstrumentIdent
+//----------------------------------------------------------------------------
+
+class AttInstrumentIdent : public Att {
+public:
+    AttInstrumentIdent();
+    virtual ~AttInstrumentIdent();
+
+    /** Reset the default values for the attribute class **/
+    void ResetInstrumentIdent();
+
+    /** Read the values for the attribute class **/
+    bool ReadInstrumentIdent(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteInstrumentIdent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetInstr(std::string instr_) { m_instr = instr_; }
+    std::string GetInstr() const { return m_instr; }
+    bool HasInstr() const;
+    ///@}
+
+private:
+    /**
+     * Provides a way of pointing to a MIDI instrument definition.
+     * It must contain the ID of an
+     **/
+    std::string m_instr;
+
+    /* include <attinstr> */
+};
+
+//----------------------------------------------------------------------------
 // AttMidiInstrument
 //----------------------------------------------------------------------------
 
@@ -178,13 +217,61 @@ public:
     ///@}
 
 private:
-    /**
-     * Along with numbase, describes duration as a ratio.
-     * num is the first value in the ratio, while numbase is the second.
-     **/
+    /** Records a number or count accompanying a notational feature. **/
     int m_num;
 
     /* include <attnum> */
+};
+
+//----------------------------------------------------------------------------
+// AttMidiTempo
+//----------------------------------------------------------------------------
+
+class AttMidiTempo : public Att {
+public:
+    AttMidiTempo();
+    virtual ~AttMidiTempo();
+
+    /** Reset the default values for the attribute class **/
+    void ResetMidiTempo();
+
+    /** Read the values for the attribute class **/
+    bool ReadMidiTempo(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteMidiTempo(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetMidiBpm(data_MIDIBPM midiBpm_) { m_midiBpm = midiBpm_; }
+    data_MIDIBPM GetMidiBpm() const { return m_midiBpm; }
+    bool HasMidiBpm() const;
+    //
+    void SetMidiMspb(data_MIDIMSPB midiMspb_) { m_midiMspb = midiMspb_; }
+    data_MIDIMSPB GetMidiMspb() const { return m_midiMspb; }
+    bool HasMidiMspb() const;
+    ///@}
+
+private:
+    /**
+     * Captures the number of *quarter notes* per minute.
+     * In MIDI, a beat is always defined as a quarter note, *not the numerator of the
+     * time signature or the metronomic indication*.
+     **/
+    data_MIDIBPM m_midiBpm;
+    /**
+     * Records the number of microseconds per *quarter note*.
+     * In MIDI, a beat is always defined as a quarter note, *not the numerator of the
+     * time signature or the metronomic indication*. At 120 quarter notes per minute,
+     * each quarter note will last 500,000 microseconds.
+     **/
+    data_MIDIMSPB m_midiMspb;
+
+    /* include <attmidi.mspb> */
 };
 
 //----------------------------------------------------------------------------
@@ -221,6 +308,118 @@ private:
     data_MIDIVALUE m_val;
 
     /* include <attval> */
+};
+
+//----------------------------------------------------------------------------
+// AttMidiValue2
+//----------------------------------------------------------------------------
+
+class AttMidiValue2 : public Att {
+public:
+    AttMidiValue2();
+    virtual ~AttMidiValue2();
+
+    /** Reset the default values for the attribute class **/
+    void ResetMidiValue2();
+
+    /** Read the values for the attribute class **/
+    bool ReadMidiValue2(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteMidiValue2(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetVal2(data_MIDIVALUE val2_) { m_val2 = val2_; }
+    data_MIDIVALUE GetVal2() const { return m_val2; }
+    bool HasVal2() const;
+    ///@}
+
+private:
+    /** MIDI number. **/
+    data_MIDIVALUE m_val2;
+
+    /* include <attval2> */
+};
+
+//----------------------------------------------------------------------------
+// AttMidiVelocity
+//----------------------------------------------------------------------------
+
+class AttMidiVelocity : public Att {
+public:
+    AttMidiVelocity();
+    virtual ~AttMidiVelocity();
+
+    /** Reset the default values for the attribute class **/
+    void ResetMidiVelocity();
+
+    /** Read the values for the attribute class **/
+    bool ReadMidiVelocity(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteMidiVelocity(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetVel(data_MIDIVALUE vel_) { m_vel = vel_; }
+    data_MIDIVALUE GetVel() const { return m_vel; }
+    bool HasVel() const;
+    ///@}
+
+private:
+    /** MIDI Note-on/off velocity. **/
+    data_MIDIVALUE m_vel;
+
+    /* include <attvel> */
+};
+
+//----------------------------------------------------------------------------
+// AttTimeBase
+//----------------------------------------------------------------------------
+
+class AttTimeBase : public Att {
+public:
+    AttTimeBase();
+    virtual ~AttTimeBase();
+
+    /** Reset the default values for the attribute class **/
+    void ResetTimeBase();
+
+    /** Read the values for the attribute class **/
+    bool ReadTimeBase(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteTimeBase(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetPpq(int ppq_) { m_ppq = ppq_; }
+    int GetPpq() const { return m_ppq; }
+    bool HasPpq() const;
+    ///@}
+
+private:
+    /**
+     * Indicates the number of pulses (sometimes referred to as ticks or divisions) per
+     * quarter note.
+     * Unlike MIDI, MEI permits different values for a score and individual staves.
+     **/
+    int m_ppq;
+
+    /* include <attppq> */
 };
 
 } // vrv namespace

@@ -55,7 +55,7 @@ public:
     ///@}
 
 private:
-    /** Records the appearance and usually the function of the bar line. **/
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
     data_LIGATUREFORM m_form;
 
     /* include <attform> */
@@ -184,6 +184,78 @@ private:
     data_TEMPUS m_tempus;
 
     /* include <atttempus> */
+};
+
+//----------------------------------------------------------------------------
+// AttNoteAnlMensural
+//----------------------------------------------------------------------------
+
+class AttNoteAnlMensural : public Att {
+public:
+    AttNoteAnlMensural();
+    virtual ~AttNoteAnlMensural();
+
+    /** Reset the default values for the attribute class **/
+    void ResetNoteAnlMensural();
+
+    /** Read the values for the attribute class **/
+    bool ReadNoteAnlMensural(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteNoteAnlMensural(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetLig(noteAnlMensural_LIG lig_) { m_lig = lig_; }
+    noteAnlMensural_LIG GetLig() const { return m_lig; }
+    bool HasLig() const;
+    ///@}
+
+private:
+    /** Indicates this element's participation in a ligature. **/
+    noteAnlMensural_LIG m_lig;
+
+    /* include <attlig> */
+};
+
+//----------------------------------------------------------------------------
+// AttRestVisMensural
+//----------------------------------------------------------------------------
+
+class AttRestVisMensural : public Att {
+public:
+    AttRestVisMensural();
+    virtual ~AttRestVisMensural();
+
+    /** Reset the default values for the attribute class **/
+    void ResetRestVisMensural();
+
+    /** Read the values for the attribute class **/
+    bool ReadRestVisMensural(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteRestVisMensural(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetSpaces(int spaces_) { m_spaces = spaces_; }
+    int GetSpaces() const { return m_spaces; }
+    bool HasSpaces() const;
+    ///@}
+
+private:
+    /** States how many spaces are covered by the rest. **/
+    int m_spaces;
+
+    /* include <attspaces> */
 };
 
 } // vrv namespace

@@ -29,6 +29,9 @@ namespace vrv {
 
 class AttConverter {
 public:
+    std::string AccidentalGesturalToStr(data_ACCIDENTAL_GESTURAL data) const;
+    data_ACCIDENTAL_GESTURAL StrToAccidentalGestural(std::string value) const;
+
     std::string AccidentalWrittenToStr(data_ACCIDENTAL_WRITTEN data) const;
     data_ACCIDENTAL_WRITTEN StrToAccidentalWritten(std::string value) const;
 
@@ -56,6 +59,9 @@ public:
     std::string ClefshapeToStr(data_CLEFSHAPE data) const;
     data_CLEFSHAPE StrToClefshape(std::string value) const;
 
+    std::string ClusterToStr(data_CLUSTER data) const;
+    data_CLUSTER StrToCluster(std::string value) const;
+
     std::string ColornamesToStr(data_COLORNAMES data) const;
     data_COLORNAMES StrToColornames(std::string value) const;
 
@@ -74,6 +80,9 @@ public:
     std::string FontweightToStr(data_FONTWEIGHT data) const;
     data_FONTWEIGHT StrToFontweight(std::string value) const;
 
+    std::string FrbrrelationshipToStr(data_FRBRRELATIONSHIP data) const;
+    data_FRBRRELATIONSHIP StrToFrbrrelationship(std::string value) const;
+
     std::string GlissandoToStr(data_GLISSANDO data) const;
     data_GLISSANDO StrToGlissando(std::string value) const;
 
@@ -86,6 +95,9 @@ public:
     std::string HorizontalalignmentToStr(data_HORIZONTALALIGNMENT data) const;
     data_HORIZONTALALIGNMENT StrToHorizontalalignment(std::string value) const;
 
+    std::string LayerschemeToStr(data_LAYERSCHEME data) const;
+    data_LAYERSCHEME StrToLayerscheme(std::string value) const;
+
     std::string LigatureformToStr(data_LIGATUREFORM data) const;
     data_LIGATUREFORM StrToLigatureform(std::string value) const;
 
@@ -97,6 +109,9 @@ public:
 
     std::string LinewidthtermToStr(data_LINEWIDTHTERM data) const;
     data_LINEWIDTHTERM StrToLinewidthterm(std::string value) const;
+
+    std::string MelodicfunctionToStr(data_MELODICFUNCTION data) const;
+    data_MELODICFUNCTION StrToMelodicfunction(std::string value) const;
 
     std::string MensurationsignToStr(data_MENSURATIONSIGN data) const;
     data_MENSURATIONSIGN StrToMensurationsign(std::string value) const;
@@ -149,6 +164,9 @@ public:
     std::string StempositionToStr(data_STEMPOSITION data) const;
     data_STEMPOSITION StrToStemposition(std::string value) const;
 
+    std::string TemperamentToStr(data_TEMPERAMENT data) const;
+    data_TEMPERAMENT StrToTemperament(std::string value) const;
+
     std::string TextrenditionlistToStr(data_TEXTRENDITIONLIST data) const;
     data_TEXTRENDITIONLIST StrToTextrenditionlist(std::string value) const;
 
@@ -164,20 +182,50 @@ public:
     std::string BTremLogFormToStr(bTremLog_FORM data) const;
     bTremLog_FORM StrToBTremLogForm(std::string value) const;
 
+    std::string BeamRendFormToStr(beamRend_FORM data) const;
+    beamRend_FORM StrToBeamRendForm(std::string value) const;
+
+    std::string BeamingVisBeamrendToStr(beamingVis_BEAMREND data) const;
+    beamingVis_BEAMREND StrToBeamingVisBeamrend(std::string value) const;
+
     std::string CurvatureCurvedirToStr(curvature_CURVEDIR data) const;
     curvature_CURVEDIR StrToCurvatureCurvedir(std::string value) const;
+
+    std::string CutoutCutoutToStr(cutout_CUTOUT data) const;
+    cutout_CUTOUT StrToCutoutCutout(std::string value) const;
 
     std::string DotLogFormToStr(dotLog_FORM data) const;
     dotLog_FORM StrToDotLogForm(std::string value) const;
 
+    std::string EndingsEndingrendToStr(endings_ENDINGREND data) const;
+    endings_ENDINGREND StrToEndingsEndingrend(std::string value) const;
+
     std::string FTremLogFormToStr(fTremLog_FORM data) const;
     fTremLog_FORM StrToFTremLogForm(std::string value) const;
+
+    std::string FermataVisFormToStr(fermataVis_FORM data) const;
+    fermataVis_FORM StrToFermataVisForm(std::string value) const;
+
+    std::string FermataVisShapeToStr(fermataVis_SHAPE data) const;
+    fermataVis_SHAPE StrToFermataVisShape(std::string value) const;
+
+    std::string FingGrpLogFormToStr(fingGrpLog_FORM data) const;
+    fingGrpLog_FORM StrToFingGrpLogForm(std::string value) const;
+
+    std::string FingGrpVisOrientToStr(fingGrpVis_ORIENT data) const;
+    fingGrpVis_ORIENT StrToFingGrpVisOrient(std::string value) const;
 
     std::string GraceGrpLogAttachToStr(graceGrpLog_ATTACH data) const;
     graceGrpLog_ATTACH StrToGraceGrpLogAttach(std::string value) const;
 
     std::string HairpinLogFormToStr(hairpinLog_FORM data) const;
     hairpinLog_FORM StrToHairpinLogForm(std::string value) const;
+
+    std::string HarmAnlFormToStr(harmAnl_FORM data) const;
+    harmAnl_FORM StrToHarmAnlForm(std::string value) const;
+
+    std::string HarmVisRendgridToStr(harmVis_RENDGRID data) const;
+    harmVis_RENDGRID StrToHarmVisRendgrid(std::string value) const;
 
     std::string HarpPedalLogAToStr(harpPedalLog_A data) const;
     harpPedalLog_A StrToHarpPedalLogA(std::string value) const;
@@ -203,8 +251,20 @@ public:
     std::string MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) const;
     meiVersion_MEIVERSION StrToMeiVersionMeiversion(std::string value) const;
 
+    std::string MensurVisFormToStr(mensurVis_FORM data) const;
+    mensurVis_FORM StrToMensurVisForm(std::string value) const;
+
+    std::string MensuralVisMensurformToStr(mensuralVis_MENSURFORM data) const;
+    mensuralVis_MENSURFORM StrToMensuralVisMensurform(std::string value) const;
+
     std::string MeterConformanceMetconToStr(meterConformance_METCON data) const;
     meterConformance_METCON StrToMeterConformanceMetcon(std::string value) const;
+
+    std::string MeterSigVisFormToStr(meterSigVis_FORM data) const;
+    meterSigVis_FORM StrToMeterSigVisForm(std::string value) const;
+
+    std::string MeterSigDefaultVisMeterrendToStr(meterSigDefaultVis_METERREND data) const;
+    meterSigDefaultVis_METERREND StrToMeterSigDefaultVisMeterrend(std::string value) const;
 
     std::string MeterSigGrpLogFuncToStr(meterSigGrpLog_FUNC data) const;
     meterSigGrpLog_FUNC StrToMeterSigGrpLogFunc(std::string value) const;
@@ -212,11 +272,41 @@ public:
     std::string MordentLogFormToStr(mordentLog_FORM data) const;
     mordentLog_FORM StrToMordentLogForm(std::string value) const;
 
+    std::string NcVisConToStr(ncVis_CON data) const;
+    ncVis_CON StrToNcVisCon(std::string value) const;
+
+    std::string NcVisCurvedToStr(ncVis_CURVED data) const;
+    ncVis_CURVED StrToNcVisCurved(std::string value) const;
+
+    std::string NcVisDiagonalrightToStr(ncVis_DIAGONALRIGHT data) const;
+    ncVis_DIAGONALRIGHT StrToNcVisDiagonalright(std::string value) const;
+
+    std::string NcVisOriscusToStr(ncVis_ORISCUS data) const;
+    ncVis_ORISCUS StrToNcVisOriscus(std::string value) const;
+
+    std::string NcVisQuilismaToStr(ncVis_QUILISMA data) const;
+    ncVis_QUILISMA StrToNcVisQuilisma(std::string value) const;
+
+    std::string NoteAnlMensuralLigToStr(noteAnlMensural_LIG data) const;
+    noteAnlMensural_LIG StrToNoteAnlMensuralLig(std::string value) const;
+
+    std::string NoteGesExtremisToStr(noteGes_EXTREMIS data) const;
+    noteGes_EXTREMIS StrToNoteGesExtremis(std::string value) const;
+
     std::string OctaveLogCollToStr(octaveLog_COLL data) const;
     octaveLog_COLL StrToOctaveLogColl(std::string value) const;
 
+    std::string PbVisFoliumToStr(pbVis_FOLIUM data) const;
+    pbVis_FOLIUM StrToPbVisFolium(std::string value) const;
+
     std::string PedalLogDirToStr(pedalLog_DIR data) const;
     pedalLog_DIR StrToPedalLogDir(std::string value) const;
+
+    std::string PedalVisFormToStr(pedalVis_FORM data) const;
+    pedalVis_FORM StrToPedalVisForm(std::string value) const;
+
+    std::string PianoPedalsPedalstyleToStr(pianoPedals_PEDALSTYLE data) const;
+    pianoPedals_PEDALSTYLE StrToPianoPedalsPedalstyle(std::string value) const;
 
     std::string PointingXlinkactuateToStr(pointing_XLINKACTUATE data) const;
     pointing_XLINKACTUATE StrToPointingXlinkactuate(std::string value) const;
@@ -226,6 +316,12 @@ public:
 
     std::string RegularMethodMethodToStr(regularMethod_METHOD data) const;
     regularMethod_METHOD StrToRegularMethodMethod(std::string value) const;
+
+    std::string RehearsalRehencloseToStr(rehearsal_REHENCLOSE data) const;
+    rehearsal_REHENCLOSE StrToRehearsalRehenclose(std::string value) const;
+
+    std::string SbVisFormToStr(sbVis_FORM data) const;
+    sbVis_FORM StrToSbVisForm(std::string value) const;
 
     std::string StaffGroupingSymSymbolToStr(staffGroupingSym_SYMBOL data) const;
     staffGroupingSym_SYMBOL StrToStaffGroupingSymSymbol(std::string value) const;
@@ -242,8 +338,14 @@ public:
     std::string TempoLogFuncToStr(tempoLog_FUNC data) const;
     tempoLog_FUNC StrToTempoLogFunc(std::string value) const;
 
+    std::string TupletVisNumformatToStr(tupletVis_NUMFORMAT data) const;
+    tupletVis_NUMFORMAT StrToTupletVisNumformat(std::string value) const;
+
     std::string TurnLogFormToStr(turnLog_FORM data) const;
     turnLog_FORM StrToTurnLogForm(std::string value) const;
+
+    std::string VoltaGroupingSymVoltasymToStr(voltaGroupingSym_VOLTASYM data) const;
+    voltaGroupingSym_VOLTASYM StrToVoltaGroupingSymVoltasym(std::string value) const;
 
     std::string WhitespaceXmlspaceToStr(whitespace_XMLSPACE data) const;
     whitespace_XMLSPACE StrToWhitespaceXmlspace(std::string value) const;
