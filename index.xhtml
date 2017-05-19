@@ -9,7 +9,7 @@ projects:
     - [["http://www.kb.dk/en/nb/dcm/projekter/mermeid.html", "mermeid"],["http://scorelib.huma-num.fr/", "neuma"], [ "http://ncodamusic.org/", "ncoda"]]
     - [["http://www.rism.info", "rism"], ["http://kern.ccarh.org", "ccarh"], ["http://en.chopin.nifc.pl/institute/library/archives", "nifc"]]
     - [["http://dme.mozarteum.at/DME/main/index.php", "dme"], ["http://www.oeaw.ac.at/ikm/forschung/digital-musicology/digitale-musikanalyse-mit-mei/", "oeaw"], ["http://www.gluck-gesamtausgabe.de/impressum.html", "gga"]]
-    - [["http://opac.sbn.it/opacsbn/opac/iccu/musica.jsp", "iccu"],["http://www.tassomusic.org/", "tasso"], []]
+    - [["http://opac.sbn.it/opacsbn/opac/iccu/musica.jsp", "iccu"],["http://www.tassomusic.org/", "tasso"], ["https://www.bach-digital.de", "bach"]]
 ---
 <div class="row home-row home-row-flex">
     <div class="col-md-5 col-sm-12">
@@ -45,6 +45,52 @@ projects:
     <div class="col-sm-12 visible-sm text-center">
         {% include svg/example-sm.svg %}
     </div>
+</div>
+
+<div class="row home-row">
+    <div class="col-md-6 col-sm-12">
+        <h4>News</h4>
+        {% for p in site.posts limit:3 %}
+        <hr class="news-row"/>
+        <h5>{{ p.date | date: '%B %d, %Y' }} – {{ p.title }}</h5>
+        <div class="content">
+            {{ p.content }}
+        </div>
+        {% endfor %}
+        <hr class="news-row"/>
+        <p class="news-link">
+            <a href="news.xhtml">See all news ...</a>
+        </p>
+    </div>
+    <div class="col-md-6 col-sm-12">  
+        <hr class="hidden-lg hidden-md"/>
+        <p>
+            Verovio is developed by the <a href="http://rism-ch.org/" target="_blank">Swiss RISM Office</a> and is supported by the Swiss National Science Foundation and the Salzburg Mozarteum Foundation. 
+        </p>
+        <p>
+            The source code is available on <a href="https://github.com/rism-ch/verovio">GitHub</a> under the <a href="http://www.gnu.org/copyleft/lgpl.html" target="_blank">LGPLv3 license</a>.
+        </p>
+
+        <table align="center">
+            <tr>
+                <td>
+                    <a href="http://www.rism-ch.org" target="_blank">
+                        <img alt="RISM logo" src="{{ site.baseurl }}/images/rism-ch.png" style="padding: 10px" class="img-responsive"/>
+                    </a>
+                </td>
+                <td>
+                    <a href="http://www.snf.ch" target="_blank">
+                        <img alt="SNF logo" src="{{ site.baseurl }}/images/snf.png" style="padding: 10px" class="img-responsive"/>
+                    </a>
+                </td>
+                <td>
+                    <a href="http://www.mozarteum.at" target="_blank">
+                        <img alt="SNF logo" src="{{ site.baseurl }}/images/mozarteum.png" style="padding: 10px;" class="img-responsive"/>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>   
 </div>
 
 <div class="row home-row home-row-flex">
@@ -103,43 +149,8 @@ projects:
     </div>
 </div>
 
-<div class="row home-row">
-    <div class="col-lg-4 col-sm-12">
-        <p>
-            Verovio is developed by the <a href="http://rism-ch.org/" target="_blank">Swiss RISM Office</a> and is supported by the Swiss National Science Foundation and the Salzburg Mozarteum Foundation. 
-        </p>
-        <p>
-            The source code is available on <a href="https://github.com/rism-ch/verovio">GitHub</a> under the <a href="http://www.gnu.org/copyleft/lgpl.html" target="_blank">LGPLv3 license</a>.
-        </p>
-    </div>
-    <div class="col-lg-8 col-sm-12">
-        <table align="center">
-            <tr>
-                <td>
-                    <a href="http://www.rism-ch.org" target="_blank">
-                        <img alt="RISM logo" src="{{ site.baseurl }}/images/rism-ch.png" style="padding: 10px" class="img-responsive"/>
-                    </a>
-                </td>
-                <td>
-                    <a href="http://www.snf.ch" target="_blank">
-                        <img alt="SNF logo" src="{{ site.baseurl }}/images/snf.png" style="padding: 10px" class="img-responsive"/>
-                    </a>
-                </td>
-                <td>
-                    <a href="http://www.mozarteum.at" target="_blank">
-                        <img alt="SNF logo" src="{{ site.baseurl }}/images/mozarteum.png" style="padding: 10px;" class="img-responsive"/>
-                    </a>
-                </td>
-            </tr>
-        </table>
-    </div>
-</div>
-
 <div class="row home-row home-row-flex">
-    <div class="col-sm-4 hidden-xs">
-        <img src="{{ site.baseurl }}/images/mobiles.png" class="img-responsive"/>
-    </div>
-    <div class="col-sm-8 col-xs-12">
+    <div class="col-sm-9 col-xs-12">
         <div class="panel-body home-panel">
             <p>
                 Verovio is designed to be usable in a wide range of technical environments (<a href="{{ site.baseurl }}/command-line.xhtml">C++</a>, <a href="{{ site.baseurl }}/javascript.xhtml">JavaScript</a>, <a href="{{ site.baseurl }}/python.xhtml">Python</a>).
@@ -148,6 +159,9 @@ projects:
                 It works on desktop computers but also tablets and mobile devices. Verovio also provides basic support for other music notation format, such as <a href="{{ site.baseurl }}/musicxml.xhtml">MusicXML import</a> and <a href="{{ site.baseurl }}/midi.xhtml">MIDI output</a>.
             </p>
         </div>
+    </div>
+    <div class="col-sm-3 hidden-xs">
+        <img src="{{ site.baseurl }}/images/mobiles.png" class="img-responsive"/>
     </div>
 </div>
 

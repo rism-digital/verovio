@@ -1,0 +1,22 @@
+---
+layout: verovio
+title: News
+active: home
+---
+
+<div class="row">
+    <div class="col-lg-12">
+        <h3>News</h3>
+
+        {% for p in site.posts %}
+        <hr/>
+        <h4>{{ p.title }}</h4>
+        <p class="author">
+            <span class="date">{{ p.date | date: '%B %d, %Y' }}</span>
+        </p>
+        <div class="content">
+            {{ p.content }}
+        </div>
+        {% endfor %}
+    </div>
+</div>
