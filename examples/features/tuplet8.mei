@@ -26,80 +26,52 @@
         <body>
             <mdiv>
                 <score>
-                    <scoreDef xml:id="scoredef-0000000806748281">
-                        <staffGrp xml:id="staffgrp-0000001294077892">
-                            <staffDef xml:id="staffdef-0000001482122524" n="1" clef.shape="G" clef.line="2" clef.dis="8" clef.dis.place="below" key.sig="1f" lines="5" />
+                    <scoreDef xml:id="scoredef-0000001824793152">
+                        <staffGrp xml:id="staffgrp-0000001310878023">
+                            <staffDef xml:id="staffdef-0000000762439150" n="1" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" lines="5" />
                         </staffGrp>
                     </scoreDef>
-                    <section xml:id="section-0000000943263383">
-                        <measure xml:id="measure-L4" n="8">
+                    <section xml:id="section-0000000046663488">
+                        <measure xml:id="measure-L4" n="1">
                             <staff xml:id="staff-L4F1N1" n="1">
                                 <layer xml:id="layer-L4F1N1" n="1">
-                                    <tuplet xml:id="tuplet-L5F1-L6F1" num="3" numbase="2" bracket.visible="true" num.format="count">
-                                        <note xml:id="note-L5F1" dur="1" oct="3" pname="g">
+                                    <tuplet xml:id="tuplet-L5F1-L7F1" num="3" numbase="2" bracket.visible="true" num.format="count">
+                                        <note xml:id="note-L5F1" dur="2" oct="4" pname="f">
                                             <accid xml:id="accid-L5F1" accid.ges="n" />
                                         </note>
-                                        <note xml:id="note-L6F1" dur="2" oct="3" pname="b">
-                                            <accid xml:id="accid-L6F1" accid.ges="f" />
+                                        <note xml:id="note-L6F1" dur="2" oct="4" pname="e">
+                                            <accid xml:id="accid-L6F1" accid.ges="n" />
                                         </note>
-                                    </tuplet>
-                                    <tuplet xml:id="tuplet-L7F1-L9F1" num="3" numbase="2" bracket.visible="true" num.format="count">
-                                        <note xml:id="note-L7F1" dots="1" dur="2" oct="4" pname="c">
+                                        <note xml:id="note-L7F1" dur="2" oct="4" pname="d">
                                             <accid xml:id="accid-L7F1" accid.ges="n" />
                                         </note>
-                                        <note xml:id="note-L8F1" dur="4" oct="4" pname="c">
-                                            <accid xml:id="accid-L8F1" accid.ges="n" />
-                                        </note>
-                                        <note xml:id="note-L9F1" dur="2" oct="3" pname="a">
+                                    </tuplet>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L8">
+                            <staff xml:id="staff-L8F1N1" n="1">
+                                <layer xml:id="layer-L8F1N1" n="1">
+                                    <tuplet xml:id="tuplet-L9F1-L10F1" num="3" numbase="2" bracket.visible="true" num.format="count">
+                                        <note xml:id="note-L9F1" dur="1" oct="4" pname="f">
                                             <accid xml:id="accid-L9F1" accid.ges="n" />
                                         </note>
+                                        <note xml:id="note-L10F1" dur="2" oct="4" pname="e">
+                                            <accid xml:id="accid-L10F1" accid.ges="n" />
+                                        </note>
                                     </tuplet>
                                 </layer>
                             </staff>
                         </measure>
-                        <measure xml:id="measure-L10" n="9">
-                            <staff xml:id="staff-L10F1N1" n="1">
-                                <layer xml:id="layer-L10F1N1" n="1">
-                                    <tuplet xml:id="tuplet-L12F1-L13F1" num.place="above" num="3" numbase="2" bracket.visible="true" num.format="count">
-                                        <note xml:id="note-L12F1" dur="2" oct="3" pname="g">
+                        <measure xml:id="measure-L11" right="end">
+                            <staff xml:id="staff-L11F1N1" n="1">
+                                <layer xml:id="layer-L11F1N1" n="1">
+                                    <tuplet xml:id="tuplet-L12F1-L13F1" num="3" numbase="2" bracket.visible="true" num.format="count">
+                                        <note xml:id="note-L12F1" dur="2" oct="4" pname="e">
                                             <accid xml:id="accid-L12F1" accid.ges="n" />
                                         </note>
-                                        <note xml:id="note-L13F1" dur="1" oct="3" pname="e">
+                                        <note xml:id="note-L13F1" dur="1" oct="4" pname="d">
                                             <accid xml:id="accid-L13F1" accid.ges="n" />
-                                        </note>
-                                    </tuplet>
-                                    <tuplet xml:id="tuplet-L14F1-L15F1" num="3" numbase="2" bracket.visible="true" num.format="count">
-                                        <note xml:id="note-L14F1" dur="1" oct="3" pname="g">
-                                            <accid xml:id="accid-L14F1" accid.ges="n" />
-                                        </note>
-                                        <note xml:id="note-L15F1" dur="2" oct="4" pname="g">
-                                            <accid xml:id="accid-L15F1" accid.ges="n" />
-                                        </note>
-                                    </tuplet>
-                                </layer>
-                            </staff>
-                            <dir xml:id="dir-L12F1" place="above" staff="1" tstamp="1.000000">missing tuplet?</dir>
-                        </measure>
-                        <measure xml:id="measure-L16" n="10">
-                            <staff xml:id="staff-L16F1N1" n="1">
-                                <layer xml:id="layer-L16F1N1" n="1">
-                                    <tuplet xml:id="tuplet-L17F1-L19F1" num="3" numbase="2" bracket.visible="true" num.format="count">
-                                        <note xml:id="note-L17F1" dots="1" dur="2" oct="4" pname="f">
-                                            <accid xml:id="accid-L17F1" accid.ges="n" />
-                                        </note>
-                                        <note xml:id="note-L18F1" dur="4" oct="4" pname="f">
-                                            <accid xml:id="accid-L18F1" accid.ges="n" />
-                                        </note>
-                                        <note xml:id="note-L19F1" dur="2" oct="4" pname="d">
-                                            <accid xml:id="accid-L19F1" accid.ges="n" />
-                                        </note>
-                                    </tuplet>
-                                    <tuplet xml:id="tuplet-L20F1-L21F1" num="3" numbase="2" bracket.visible="true" num.format="count">
-                                        <note xml:id="note-L20F1" dur="2" oct="4" pname="c">
-                                            <accid xml:id="accid-L20F1" accid.ges="n" />
-                                        </note>
-                                        <note xml:id="note-L21F1" dur="1" oct="4" pname="g">
-                                            <accid xml:id="accid-L21F1" accid.ges="n" />
                                         </note>
                                     </tuplet>
                                 </layer>

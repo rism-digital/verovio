@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Non-adjacent seconds in cross staff chords</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Seconds separated by cross-staff notation of the chord are vertically aligned, since they do not collide.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000062196711">
+                        <staffGrp xml:id="m-000000068138666" symbol="brace">
+                            <staffDef xml:id="staffdef-000000168278881" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5" />
+                            <staffDef xml:id="staffdef-000000139246092" clef.shape="F" clef.line="4" meter.count="4" meter.unit="4" n="2" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-000000146861364" n="1" right="end">
+                            <staff xml:id="staff-000000115534766" n="1">
+                                <!-- kern: =1-  2Ej 2Bj/ 2dj 2e  2Gj 2cj 2B 2e 2f  == -->
+                                <layer xml:id="layer-000000083853181" n="1">
+                                    <chord xml:id="chord-000000141648947" dur="2" stem.dir="up">
+                                        <note xml:id="note-000000208241294" staff="2" oct="3" pname="e" accid.ges="n" />
+                                        <note xml:id="note-000000157335464" staff="2" oct="3" pname="b" accid.ges="n" />
+                                        <note xml:id="note-000000140544023" staff="2" oct="4" pname="d" accid.ges="n" />
+                                        <note xml:id="note-000000106134587" oct="4" pname="e" accid.ges="n" />
+                                    </chord>
+                                    <chord xml:id="chord-000000104088191" dur="2">
+                                        <note xml:id="note-000000070055694" staff="2" oct="3" pname="g" accid.ges="n" />
+                                        <note xml:id="note-000000175518814" staff="2" oct="4" pname="c" accid.ges="n" />
+                                        <note xml:id="note-000000161181143" oct="3" pname="b" accid.ges="n" />
+                                        <note xml:id="note-000000135609840" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-000000070187999" oct="4" pname="f" accid.ges="n" />
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-000000038106948" n="2">
+                                <!-- kern: =1-  1AA  == -->
+                                <layer xml:id="layer-000000036941980" n="1">
+                                    <note xml:id="note-000000046337193" dur="1" oct="2" pname="a" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

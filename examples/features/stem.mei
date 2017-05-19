@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Stem length adjustment</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>The length of stems can be individually adjusted using the "stem.len" attribute.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000124522585">
+                        <staffGrp xml:id="m-000000204341851">
+                            <staffDef xml:id="staffdef-000000033029460" clef.shape="G" clef.line="2" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000089761626">
+                        <measure xml:id="measure-L1" n="0" right="end">
+                            <staff xml:id="staff-000000164232734" n="1">
+                                <layer xml:id="layer-L1F1" n="1">
+                                    <note xml:id="note-L3F1" dur="4" oct="4" pname="c" accid.ges="n" stem.len="0" />
+                                    <note xml:id="note-L4F1" dur="4" oct="4" pname="d" accid.ges="n" stem.len="1" />
+                                    <note xml:id="note-L5F1" dur="4" oct="4" pname="e" accid.ges="n" stem.len="3" />
+                                    <note xml:id="note-L6F1" dur="4" oct="4" pname="f" accid.ges="n" stem.len="5" />
+                                    <note xml:id="note-L7F1" dur="4" oct="4" pname="g" accid.ges="n" stem.len="7" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

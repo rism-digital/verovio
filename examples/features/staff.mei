@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Symbols centred con non-5-line staff</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Notational symbols are centred on staves with other than five lines.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef xml:id="scoredef-0000001121536489">
+            <staffGrp xml:id="staffgrp-0000000676894997">
+              <staffDef xml:id="staffdef-0000001378572237" clef.shape="C" meter.count="4" meter.unit="4" n="1" lines="5" />
+              <staffDef xml:id="staffdef-0000000039525334" clef.shape="perc" meter.count="4" meter.unit="4" n="2" lines="4" />
+              <staffDef xml:id="staffdef-0000001000793725" clef.shape="perc" meter.count="4" meter.unit="4" n="3" lines="1" />
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="section-0000001132119921">
+            <measure xml:id="measure-0000001517163118" n="1">
+              <staff xml:id="staff-0000000686555352" n="1">
+                <layer xml:id="layer-0000001390366260" n="1">
+                  <mRest xml:id="mrest-0000002085295690" />
+                </layer>
+              </staff>
+              <staff xml:id="staff-0000000072098738" n="2">
+                <layer xml:id="layer-0000001415020312" n="1">
+                  <mRest xml:id="mrest-0000000362470464" />
+                </layer>
+              </staff>
+              <staff xml:id="staff-0000001653569518" n="3">
+                <layer xml:id="layer-0000001109336206" n="1">
+                  <mRest xml:id="mrest-0000000149676583" />
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

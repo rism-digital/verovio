@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Accidental adjustment on chords</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio appropriately adjusts the spacing between accidentals and chords to ensure readability while avoiding collisions.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000123390218">
+                        <staffGrp xml:id="m-000000014796490">
+                            <staffDef xml:id="staffdef-000000006004468" clef.shape="F" clef.line="4" key.sig="4f" meter.count="4" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-000000200124077" n="1" right="end">
+                            <staff xml:id="staff-000000005970874" n="1">
+                                <!-- kern: =1-  4r  4c 4B- 4G 4En  2r  == -->
+                                <layer xml:id="layer-000000064999725" n="1">
+                                    <rest xml:id="rest-000000025461972" dur="4" />
+                                    <chord xml:id="chord-000000160627644" dur="4">
+                                        <note xml:id="note-000000067126787" oct="4" pname="c" accid.ges="n" />
+                                        <note xml:id="note-000000126751020" oct="3" pname="b" accid.ges="f" />
+                                        <note xml:id="note-000000000625400" oct="3" pname="g" accid.ges="n" />
+                                        <note xml:id="note-000000203179655" accid="n" oct="3" pname="e" />
+                                    </chord>
+                                    <rest xml:id="rest-000000126727935" dur="2" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
