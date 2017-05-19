@@ -119,6 +119,9 @@ public:
     std::string DurationToStr(data_DURATION data) const;
     data_DURATION StrToDuration(std::string value) const;
 
+    std::string FontsizeToStr(data_FONTSIZE data) const;
+    data_FONTSIZE StrToFontsize(std::string value) const;
+
     std::string KeysignatureToStr(data_KEYSIGNATURE data) const;
     data_KEYSIGNATURE StrToKeysignature(std::string value) const;
 

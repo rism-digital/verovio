@@ -208,6 +208,24 @@ data_DURATION Att::StrToDuration(std::string value) const
     return DURATION_NONE;
 }
 
+std::string Att::FontsizeToStr(data_FONTSIZE data) const
+{
+    // Here we need to format the output for each type
+    std::string value;
+    if (data.GetType() == FONTSIZE_point) {
+        value = StringFormat("%fpt", data.GetValue());
+    }
+    return value;
+}
+
+data_FONTSIZE Att::StrToFontsize(std::string value) const
+{
+    // Here we need to analyse the content and get the right type
+    data_FONTSIZE fs(FONTSIZE_point);
+    fs.SetValue(atoi(value.c_str()));
+    return fs;
+}
+
 std::string Att::KeysignatureToStr(data_KEYSIGNATURE data) const
 {
     std::string value;
