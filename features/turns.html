@@ -1,0 +1,53 @@
+---
+---
+<h4>Turns</h4>
+
+<p>
+    Verovio supports <code>&lt;turn&gt;</code> elements with several attributes. Like trills, turns are placed above the staff by default.
+</p>
+
+<div id="svg_output-turn1" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code-turn1" file="turn1.mei" %}
+<div id="code-turn1-xml" style="display: none">
+{% highlight xml %}
+{% include features/turn1.txt %}
+{% endhighlight %}
+</div>
+
+<!-- ***************************** -->
+<hr/>
+<p>
+    For delayed turns you have to use and adjust <code>@tstamp</code>.
+</p>
+
+<div id="svg_output-turn2" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code-turn2" file="turn2.mei" %}
+<div id="code-turn2-xml" style="display: none">
+{% highlight xml %}
+{% include features/turn2.txt %}
+{% endhighlight %}
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+    zoom = 40;
+    pageWidth = 1000;
+    spacingStaff = 6;
+
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
+
+    $.get( "{{ site.baseurl }}/examples/features/turn1.mei" , function( data ) {
+        load_data( data, $('#svg_output-turn1') );
+    });
+
+    $.get( "{{ site.baseurl }}/examples/features/turn2.mei" , function( data ) {
+        load_data( data, $('#svg_output-turn2') );
+    });
+//]]>
+</script>

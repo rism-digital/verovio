@@ -19,7 +19,7 @@
   <part id="P1">
     <measure number="1">
       <attributes>
-        <divisions>32</divisions>
+        <divisions>64</divisions>
         <key>
           <fifths>0</fifths>
           <mode>major</mode>
@@ -38,23 +38,25 @@
       </attributes>
       <note>
         <rest/>
-        <duration>128</duration>
+        <duration>256</duration>
         <voice>1</voice>
+        <type>whole</type>
       </note>
     </measure>
     <!--=======================================================-->
     <measure number="2">
       <note>
         <rest/>
-        <duration>128</duration>
+        <duration>256</duration>
         <voice>1</voice>
+        <type>whole</type>
       </note>
     </measure>
     <!--=======================================================-->
     <measure number="3">
       <note>
         <rest/>
-        <duration>128</duration>
+        <duration>256</duration>
         <voice>1</voice>
         <type>whole</type>
       </note>
@@ -63,49 +65,49 @@
     <measure number="4">
       <note>
         <rest/>
-        <duration>64</duration>
+        <duration>128</duration>
         <voice>1</voice>
         <type>half</type>
       </note>
       <note>
         <rest/>
-        <duration>32</duration>
+        <duration>64</duration>
         <voice>1</voice>
         <type>quarter</type>
       </note>
       <note>
         <rest/>
-        <duration>16</duration>
+        <duration>32</duration>
         <voice>1</voice>
         <type>eighth</type>
       </note>
       <note>
         <rest/>
-        <duration>8</duration>
+        <duration>16</duration>
         <voice>1</voice>
         <type>16th</type>
       </note>
       <note>
         <rest/>
-        <duration>4</duration>
+        <duration>8</duration>
         <voice>1</voice>
         <type>32nd</type>
       </note>
       <note>
         <rest/>
-        <duration>2</duration>
+        <duration>4</duration>
         <voice>1</voice>
         <type>64th</type>
       </note>
       <note>
         <rest/>
-        <duration>1</duration>
+        <duration>2</duration>
         <voice>1</voice>
         <type>128th</type>
       </note>
       <note>
         <rest/>
-        <duration>1</duration>
+        <duration>2</duration>
         <voice>1</voice>
         <type>128th</type>
       </note>
@@ -114,14 +116,14 @@
     <measure number="5">
       <note>
         <rest/>
-        <duration>96</duration>
+        <duration>192</duration>
         <voice>1</voice>
         <type>half</type>
         <dot/>
       </note>
       <note>
         <rest/>
-        <duration>32</duration>
+        <duration>64</duration>
         <voice>1</voice>
         <type>quarter</type>
       </note>
@@ -130,42 +132,55 @@
     <measure number="6">
       <note>
         <rest/>
-        <duration>48</duration>
+        <duration>64</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+      <note>
+        <rest/>
+        <duration>96</duration>
         <voice>1</voice>
         <type>quarter</type>
         <dot/>
       </note>
       <note>
         <rest/>
-        <duration>24</duration>
+        <duration>48</duration>
         <voice>1</voice>
         <type>eighth</type>
         <dot/>
       </note>
       <note>
         <rest/>
-        <duration>12</duration>
+        <duration>24</duration>
         <voice>1</voice>
         <type>16th</type>
         <dot/>
       </note>
       <note>
         <rest/>
-        <duration>6</duration>
+        <duration>12</duration>
         <voice>1</voice>
         <type>32nd</type>
         <dot/>
       </note>
       <note>
         <rest/>
-        <duration>3</duration>
+        <duration>6</duration>
         <voice>1</voice>
         <type>64th</type>
         <dot/>
       </note>
       <note>
         <rest/>
-        <duration>2</duration>
+        <duration>3</duration>
+        <voice>1</voice>
+        <type>128th</type>
+        <dot/>
+      </note>
+      <note>
+        <rest/>
+        <duration>3</duration>
         <voice>1</voice>
         <type>128th</type>
         <dot/>

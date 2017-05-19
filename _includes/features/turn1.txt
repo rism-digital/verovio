@@ -1,0 +1,20 @@
+<section>
+  <measure n="1">
+    <staff n="1">
+      <layer n="1">
+        <note xml:id="note-01" dur="4" oct="5" pname="e"/>
+        <note xml:id="note-02" dur="4" oct="5" pname="f"/>
+      </layer>
+    </staff>
+    <turn form="norm" startid="#note-01" label="doppelschlag"/>
+  </measure>
+  <measure n="2">
+    <staff n="1">
+      <layer n="1">
+        <note xml:id="note-03" dur="4" oct="4" pname="a"/>
+        <note xml:id="note-04" dur="4" oct="4" pname="g"/>
+      </layer>
+    </staff>
+    <turn form="inv" startid="#note-03" label="schleifer"/>
+  </measure>
+</section>
