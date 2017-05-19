@@ -282,42 +282,39 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
 
     dc->SetPen(m_currentColour, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
 
-    // Start is 0 when no line is necessary (i.e. beamed notes)
-    if (start.x > 0) {
-        // Draw the bracket, interrupt where the number is
+    // Draw the bracket, interrupt where the number is
 
-        // get the slope
-        double m = (double)(start.y - end.y) / (double)(start.x - end.x);
+    // get the slope
+    double m = (double)(start.y - end.y) / (double)(start.x - end.x);
 
-        // x = 10 pixels before the number
-        int x = txt_x - 40;
-        // xa = just after, the number is abundant so I do not add anything
-        int xa = txt_x + extend.m_width + 20;
+    // x = 10 pixels before the number
+    int x = txt_x - 40;
+    // xa = just after, the number is abundant so I do not add anything
+    int xa = txt_x + extend.m_width + 20;
 
-        // calculate the y coords in the slope
-        double y1 = (double)start.y + m * (x - (double)start.x);
-        double y2 = (double)start.y + m * (xa - (double)start.x);
+    // calculate the y coords in the slope
+    double y1 = (double)start.y + m * (x - (double)start.x);
+    double y2 = (double)start.y + m * (xa - (double)start.x);
 
-        if (tuplet->GetNumVisible() == BOOLEAN_false) {
-            // one single line
-            dc->DrawLine(start.x, ToDeviceContextY(start.y), end.x, ToDeviceContextY((int)y1));
-        }
-        else {
-            // first line
-            dc->DrawLine(start.x, ToDeviceContextY(start.y), (int)x, ToDeviceContextY((int)y1));
-            // second line after gap
-            dc->DrawLine((int)xa, ToDeviceContextY((int)y2), end.x, ToDeviceContextY(end.y));
-        }
+    if (tuplet->GetNumVisible() == BOOLEAN_false) {
+        // one single line
+        dc->DrawLine(start.x, ToDeviceContextY(start.y), end.x, ToDeviceContextY(end.y));
+    }
+    else {
+        // first line
+        dc->DrawLine(start.x, ToDeviceContextY(start.y), (int)x, ToDeviceContextY((int)y1));
+        // second line after gap
+        dc->DrawLine((int)xa, ToDeviceContextY((int)y2), end.x, ToDeviceContextY(end.y));
+    }
 
-        // vertical bracket lines
-        if (direction == STEMDIRECTION_up) {
-            dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y - verticalLine));
-            dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y - verticalLine));
-        }
-        else {
-            dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y + verticalLine));
-            dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y + verticalLine));
-        }
+    // vertical bracket lines
+    if (direction == STEMDIRECTION_up) {
+        dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y - verticalLine));
+        dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y - verticalLine));
+    }
+    else {
+        dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y + verticalLine));
+        dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y + verticalLine));
     }
 
     dc->ResetPen();
