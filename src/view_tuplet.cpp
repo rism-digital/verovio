@@ -243,31 +243,37 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
     TextExtend extend;
     std::wstring notes;
 
-    bool drawingCueSize = tuplet->IsCueSize();
-
-    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
-
-    if (tuplet->GetNum() > 0) {
-        notes = IntToTupletFigures((short int)tuplet->GetNum());
-        dc->GetSmuflTextExtent(notes, &extend);
-    }
-
     Point start, end, center;
     data_STEMDIRECTION direction = GetTupletCoordinates(tuplet, layer, &start, &end, &center);
+    int x1 = center.x, x2 = center.x;
 
-    // Calculate position for number 0x82
-    // since the number is slanted, move the center left
-    // by 4 pixels so it seems more centered to the eye
-    int txt_x = center.x - (extend.m_width / 2);
-    // we need to move down the figure of half of it height, which is about an accid width;
-    // also, cue size is not supported. Does it has to?
-    int txt_y = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, drawingCueSize);
+    // draw tuplet numerator
+    if ((tuplet->GetNum() > 0) && (tuplet->GetNumVisible() != BOOLEAN_false)) {
+        bool drawingCueSize = tuplet->IsCueSize();
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
+        notes = IntToTupletFigures((short int)tuplet->GetNum());
+        dc->GetSmuflTextExtent(notes, &extend);
 
-    if (tuplet->GetNum() && (tuplet->GetNumVisible() != BOOLEAN_false)) {
+        // Calculate position for number 0x82
+        // since the number is slanted, move the center left
+        int txt_x = x1 - (extend.m_width / 2);
+        if (direction == STEMDIRECTION_down) {
+            txt_x = x1 - extend.m_width;
+        }
+        // we need to move down the figure of half of it height, which is about an accid width;
+        // also, cue size is not supported. Does it has to?
+        int txt_y
+            = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, drawingCueSize);
+
         DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->m_drawingStaffSize);
-    }
 
-    dc->ResetFont();
+        // x1 = 10 pixels before the number
+        x1 = txt_x - 40;
+        // x2 = just after, the number is abundant so I do not add anything
+        x2 = txt_x + extend.m_width + 20;
+
+        dc->ResetFont();
+    }
 
     // Nothing to do if the bracket is not visible
     if (tuplet->GetBracketVisible() == BOOLEAN_false) {
@@ -287,14 +293,9 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
     // get the slope
     double m = (double)(start.y - end.y) / (double)(start.x - end.x);
 
-    // x = 10 pixels before the number
-    int x = txt_x - 40;
-    // xa = just after, the number is abundant so I do not add anything
-    int xa = txt_x + extend.m_width + 20;
-
     // calculate the y coords in the slope
-    double y1 = (double)start.y + m * (x - (double)start.x);
-    double y2 = (double)start.y + m * (xa - (double)start.x);
+    double y1 = (double)start.y + m * (x1 - (double)start.x);
+    double y2 = (double)start.y + m * (x2 - (double)start.x);
 
     if (tuplet->GetNumVisible() == BOOLEAN_false) {
         // one single line
@@ -302,9 +303,9 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
     }
     else {
         // first line
-        dc->DrawLine(start.x, ToDeviceContextY(start.y), (int)x, ToDeviceContextY((int)y1));
+        dc->DrawLine(start.x, ToDeviceContextY(start.y), (int)x1, ToDeviceContextY((int)y1));
         // second line after gap
-        dc->DrawLine((int)xa, ToDeviceContextY((int)y2), end.x, ToDeviceContextY(end.y));
+        dc->DrawLine((int)x2, ToDeviceContextY((int)y2), end.x, ToDeviceContextY(end.y));
     }
 
     // vertical bracket lines
