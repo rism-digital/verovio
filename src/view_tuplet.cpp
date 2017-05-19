@@ -105,7 +105,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
     x = firstElement->GetDrawingX()
         + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->GetSelfX2()) / 2;
 
-    // Return the start and end position for the brackes
+    // Return the start and end position for the brackets
     // starting from the first edge and last of the BBoxes
     start->x = firstElement->GetSelfX1() + firstElement->GetDrawingX();
     end->x = lastElement->GetSelfX2() + lastElement->GetDrawingX();
@@ -151,6 +151,15 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
                 start->y = firstNote->GetDrawingStemEnd(firstNote).y - TUPLET_OFFSET;
                 end->y = lastNote->GetDrawingStemEnd(lastNote).y - TUPLET_OFFSET;
             }
+        }
+        // or there are only rests and spaces
+        else {
+          // it should take the glyph height into account
+          y = y + 2.5 * TUPLET_OFFSET;
+          start->y = y;
+          end->y = y;
+          // set it back to up
+          direction = STEMDIRECTION_up;
         }
 
         // Now we cycle again in all the intermediate notes (i.e. we start from the second note
