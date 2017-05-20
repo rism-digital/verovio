@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        view_tuplet.cpp
-// Author:      Rodolfo Zitellini
+// Author:      Rodolfo Zitellini and Klaus Rettinghaus
 // Created:     21/08/2012
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
@@ -154,12 +154,13 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         }
         // or there are only rests and spaces
         else {
-          // it should take the glyph height into account
-          y = y + 2.5 * TUPLET_OFFSET;
-          start->y = y;
-          end->y = y;
-          // set it back to up
-          direction = STEMDIRECTION_up;
+            // it should take the glyph height into account
+            y = lastElement->GetDrawingY() + (firstElement->GetDrawingY() - lastElement->GetDrawingY()) / 2
+                + 2.5 * TUPLET_OFFSET;
+            start->y = firstElement->GetDrawingY() + 2.5 * TUPLET_OFFSET;
+            end->y = lastElement->GetDrawingY() + 2.5 * TUPLET_OFFSET;
+            // set it back to up
+            direction = STEMDIRECTION_up;
         }
 
         // Now we cycle again in all the intermediate notes (i.e. we start from the second note
@@ -261,11 +262,16 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
         bool drawingCueSize = tuplet->IsCueSize();
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
         notes = IntToTupletFigures((short int)tuplet->GetNum());
+        if (tuplet->GetNumFormat() == tupletVis_NUMFORMAT_ratio) {
+            notes.push_back(SMUFL_E88A_tupletColon);
+            notes = notes + IntToTupletFigures((short int)tuplet->GetNumbase());
+        }
         dc->GetSmuflTextExtent(notes, &extend);
 
         // Calculate position for number 0x82
         // since the number is slanted, move the center left
         int txt_x = x1 - (extend.m_width / 2);
+        // and move it further, when it is under the stave
         if (direction == STEMDIRECTION_down) {
             txt_x = x1 - extend.m_width;
         }
