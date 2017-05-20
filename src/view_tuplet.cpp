@@ -119,7 +119,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
             assert(currentNote);
             if (currentNote->GetDrawingStemDir() == STEMDIRECTION_up)
                 ups++;
-            else
+            else if (currentNote->GetDrawingStemDir() == STEMDIRECTION_down)
                 downs++;
         }
         ++iter;
