@@ -426,6 +426,7 @@ bool Toolkit::LoadData(const std::string &data)
 
         Doc tempdoc;
         HumdrumInput *tempinput = new HumdrumInput(&tempdoc, "");
+        tempinput->SetTypeOption(GetHumType());
 
         if (GetOutputFormat() == HUMDRUM) {
             tempinput->SetOutputFormat("humdrum");
@@ -476,6 +477,7 @@ bool Toolkit::LoadData(const std::string &data)
         // Now convert Humdrum into MEI:
         Doc tempdoc;
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        tempinput->SetTypeOption(GetHumType());
         if (!tempinput->ImportString(conversion.str())) {
             LogError("Error importing Humdrum data");
             delete tempinput;
@@ -656,6 +658,10 @@ bool Toolkit::ParseOptions(const std::string &json_options)
     if (json.has<jsonxx::Number>("adjustPageHeight")) SetAdjustPageHeight(json.get<jsonxx::Number>("adjustPageHeight"));
 
     if (json.has<jsonxx::Number>("noJustification")) SetNoJustification(json.get<jsonxx::Number>("noJustification"));
+
+    if (json.has<jsonxx::Number>("humType")) {
+        SetHumType(json.get<jsonxx::Number>("humType"));
+    }
 
     if (json.has<jsonxx::Number>("showBoundingBoxes"))
         SetShowBoundingBoxes(json.get<jsonxx::Number>("showBoundingBoxes"));

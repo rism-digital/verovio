@@ -146,6 +146,13 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 		out << "!!!RDF**kern: > = slur below" << endl;
 	}
 
+	for (int i=0; i<(int)partdata.size(); i++) {
+		if (partdata[i].hasEditorialAccidental()) {
+			out << "!!!RDF**kern: i = editorial accidental" << endl;
+			break;
+		}
+	}
+
 	return status;
 }
 
@@ -274,23 +281,7 @@ void Tool_musicxml2hum::setOptions(int argc, char** argv) {
 
 
 void Tool_musicxml2hum::setOptions(const vector<string>& argvlist) {
-	int tempargc = (int)argvlist.size();
-	char* tempargv[tempargc+1];
-	tempargv[tempargc] = NULL;
-
-	int i;
-	for (i=0; i<tempargc; i++) {
-		tempargv[i] = new char[argvlist[i].size() + 1];
-		strcpy(tempargv[i], argvlist[i].c_str());
-	}
-
-	setOptions(tempargc, tempargv);
-
-	for (i=0; i<tempargc; i++) {
-		if (tempargv[i] != NULL) {
-			delete [] tempargv[i];
-		}
-	}
+    m_options.process(argvlist);
 }
 
 
@@ -1038,8 +1029,18 @@ int Tool_musicxml2hum::addLyrics(GridStaff* staff, MxmlEvent* event) {
 			while (child) {
 				if (nodeType(child, "syllabic")) {
 					syllabic = child.child_value();
+					child = child.next_sibling();
+					continue;
 				} else if (nodeType(child, "text")) {
 					text = cleanSpaces(child.child_value());
+				} else if (nodeType(child, "elision")) {
+					finaltext += " ";
+					child = child.next_sibling();
+					continue;
+				} else {
+					// such as <extend>
+					child = child.next_sibling();
+					continue;
 				}
 				// escape text which would otherwise be reinterpreated
 				// as Humdrum syntax.
@@ -1051,19 +1052,19 @@ int Tool_musicxml2hum::addLyrics(GridStaff* staff, MxmlEvent* event) {
 					}
 				}
 				child = child.next_sibling();
-			}
-			if (syllabic == "middle" ) {
-				finaltext += "-";
-				finaltext += text;
-				finaltext += "-";
-			} else if (syllabic == "end") {
-				finaltext += "-";
-				finaltext += text;
-			} else if (syllabic == "begin") {
-				finaltext += text;
-				finaltext += "-";
-			} else {
-				finaltext += text;
+				if (syllabic == "middle" ) {
+					finaltext += "-";
+					finaltext += text;
+					finaltext += "-";
+				} else if (syllabic == "end") {
+					finaltext += "-";
+					finaltext += text;
+				} else if (syllabic == "begin") {
+					finaltext += text;
+					finaltext += "-";
+				} else {
+					finaltext += text;
+				}
 			}
 		}
 

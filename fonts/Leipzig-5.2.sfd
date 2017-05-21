@@ -3,9 +3,9 @@ FontName: Leipzig
 FullName: Leipzig
 FamilyName: Leipzig
 Weight: Regular
-Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.28
-UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoA-Version 5.2.13 - adding (very)short/long fermata and breath comma+AAoA-Version 5.2.14 - adding mensural stems+AAoA-Version 5.2.15 - changing ascent/descent to 750/250+AAoA-Version 5.2.16 - adding mensural rests+AAoA-Version 5.2.17 - correcting mensural rests position+AAoA-Version 5.2.18 - adding accid square brackets and reviewing bow directions+AAoA-Version 5.2.19 - adding some quartertone accidentals (Gould and Stein-Zimmermann)+AAoA-Version 5.2.20 - adding some anchor points (accidentals)+AAoA-Version 5.2.21 - adding stem flags (16th to 256th)+AAoA-Version 5.2.22 - fixing anchor point names+AAoA-Version 5.2.23 - adding anchor points to all accidentals+AAoA-Version 5.2.24 - changing 8th flags+AAoA-Version 5.2.25 - reviewing mensural clefs+AAoA-Version 5.2.26 - revising position of some rests+AAoA-Version 5.2.27 - adding some anchor points to note heads+AAoA-Version 5.2.28 - correcting anchor points"
-Version: 5.2.28
+Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.29
+UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoA-Version 5.2.13 - adding (very)short/long fermata and breath comma+AAoA-Version 5.2.14 - adding mensural stems+AAoA-Version 5.2.15 - changing ascent/descent to 750/250+AAoA-Version 5.2.16 - adding mensural rests+AAoA-Version 5.2.17 - correcting mensural rests position+AAoA-Version 5.2.18 - adding accid square brackets and reviewing bow directions+AAoA-Version 5.2.19 - adding some quartertone accidentals (Gould and Stein-Zimmermann)+AAoA-Version 5.2.20 - adding some anchor points (accidentals)+AAoA-Version 5.2.21 - adding stem flags (16th to 256th)+AAoA-Version 5.2.22 - fixing anchor point names+AAoA-Version 5.2.23 - adding anchor points to all accidentals+AAoA-Version 5.2.24 - changing 8th flags+AAoA-Version 5.2.25 - reviewing mensural clefs+AAoA-Version 5.2.26 - revising position of some rests+AAoA-Version 5.2.27 - adding some anchor points to note heads+AAoA-Version 5.2.28 - correcting anchor points+AAoA-Version 5.2.29 - adding plus time signature symbols"
+Version: 5.2.29
 ItalicAngle: 0
 UnderlinePosition: -50
 UnderlineWidth: 50
@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1493532553
+ModificationTime: 1495093021
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -50,12 +50,12 @@ NameList: Adobe Glyph List
 DisplaySize: -128
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 57940 10 4
+WinInfo: 57470 10 4
 BeginPrivate: 0
 EndPrivate
 TeXData: 1 0 0 346030 173015 115343 0 1048576 115343 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
 AnchorClass2: "cutOutNW"""  "cutOutSW"""  "cutOutSE"""  "cutOutNE""" 
-BeginChars: 1114115 229
+BeginChars: 1114115 231
 
 StartChar: uniE0A3
 Encoding: 57507 57507 0
@@ -11869,6 +11869,54 @@ Width: 180
 VWidth: 2048
 Flags: HW
 LayerCount: 2
+EndChar
+
+StartChar: uniE08D
+Encoding: 57485 57485 229
+Width: 253
+VWidth: 2048
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+252.799804688 -28 m 5
+ 154.400390625 -28 l 5
+ 154.400390625 -126.400390625 l 5
+ 98.400390625 -126.400390625 l 5
+ 98.400390625 -28 l 5
+ 0 -28 l 5
+ 0 28.7998046875 l 5
+ 98.400390625 28.7998046875 l 5
+ 98.400390625 126.400390625 l 5
+ 154.400390625 126.400390625 l 5
+ 154.400390625 28.7998046875 l 5
+ 252.799804688 28.7998046875 l 5
+ 252.799804688 -28 l 5
+EndSplineSet
+EndChar
+
+StartChar: uniE08C
+Encoding: 57484 57484 230
+Width: 342
+VWidth: 2048
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+341.279296875 -37.7998046875 m 1
+ 208.440429688 -37.7998046875 l 1
+ 208.440429688 -170.640625 l 1
+ 132.840820312 -170.640625 l 1
+ 132.840820312 -37.7998046875 l 1
+ 0 -37.7998046875 l 1
+ 0 38.87890625 l 1
+ 132.840820312 38.87890625 l 1
+ 132.840820312 170.640625 l 1
+ 208.440429688 170.640625 l 1
+ 208.440429688 38.87890625 l 1
+ 341.279296875 38.87890625 l 1
+ 341.279296875 -37.7998046875 l 1
+EndSplineSet
 EndChar
 EndChars
 EndSplineFont

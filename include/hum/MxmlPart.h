@@ -63,12 +63,14 @@ class MxmlPart {
 		void          prepareVoiceMapping  (void);
 		int           getVoiceIndex        (int voicenum);
 		int           getStaffIndex        (int voicenum);
+		bool          hasEditorialAccidental(void) const;
 
 	private:
 		void          receiveStaffNumberFromChild (int staffnum, int voicenum);
 		void          receiveVerseCount    (int count);
 		void          receiveVerseCount    (int staffnum, int count);
 		void          receiveHarmonyCount  (int count);
+		void          receiveEditorialAccidental(void);
 
 	protected:
 		vector<MxmlMeasure*> m_measures;
@@ -77,6 +79,7 @@ class MxmlPart {
 		int                  m_maxstaff;
 		vector<int>          m_verseCount;
 		int                  m_harmonyCount;
+		bool                 m_editorialAccidental;
 
 		// m_staffvoicehist: counts of staff and voice numbers.  
 		// staff=0 is used for items such as measures.

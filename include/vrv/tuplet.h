@@ -22,6 +22,7 @@ class Note;
 
 class Tuplet : public LayerElement,
                public ObjectListInterface,
+               public AttColor,
                public AttDurationRatio,
                public AttNumberplacement,
                public AttTupletVis {
