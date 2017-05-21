@@ -273,7 +273,7 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
         int txt_x = x1 - (extend.m_width / 2);
         // and move it further, when it is under the stave
         if (direction == STEMDIRECTION_down) {
-            txt_x = x1 - extend.m_width;
+            txt_x -= staff->m_drawingStaffSize;
         }
         // we need to move down the figure of half of it height, which is about an accid width;
         // also, cue size is not supported. Does it has to?
