@@ -176,6 +176,7 @@ public:
 
     // boolean switches:
     char nostem = '\0'; // !!!RDF**kern: i = no stem
+    char cuesize = '\0'; // !!!RDF**kern: i = cue size
     char editacc = '\0'; // !!!RDF**kern: i = editorial accidental
     char below = '\0'; // !!!RDF**kern: i = below (previous signifier is "below")
     char above = '\0'; // !!!RDF**kern: i = above (previous signifier is "above")
@@ -216,6 +217,9 @@ public:
     std::string GetHumdrumString(void);
     std::string GetMeiString(void);
 
+    int GetTypeOption(void) { return m_type; }
+    void SetTypeOption(int value) { m_type = value; }
+
 protected:
     void clear(void);
     bool convertHumdrum(void);
@@ -235,7 +239,7 @@ protected:
     void setClef(StaffDef *part, const std::string &clef);
     void setTimeSig(StaffDef *part, const std::string &timesig);
     void setMeterSymbol(StaffDef *part, const std::string &metersig);
-    void fillPartInfo(hum::HTp partstart, int partnumber);
+    void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
     void calculateReverseKernIndex(void);
     void prepareTimeSigDur(void);
@@ -292,8 +296,10 @@ protected:
     void processSlurs(hum::HTp token);
     int getSlurEndIndex(hum::HTp token, std::string targetid, std::vector<bool> &indexused);
     void addHarmFloatsForMeasure(int startine, int endline);
+    void addFiguredBassForMeasure(int startline, int endline);
     void processDynamics(hum::HTp token, int staffindex);
     void processDirection(hum::HTp token, int staffindex);
+    void processChordSignifiers(Chord *chord, hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum frac = 0);
     hum::HumNum getMeasureEndTstamp(int staffindex);
     hum::HTp getPreviousDataToken(hum::HTp token);
@@ -301,7 +307,7 @@ protected:
     hum::HTp getDecrescendoEnd(hum::HTp token);
     hum::HTp getCrescendoEnd(hum::HTp token);
     int getMeasureDifference(hum::HTp starttok, hum::HTp endtok);
-    void storeOriginalClefApp(void);
+    void storeOriginalClefMensurationApp(void);
     void addSpace(std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HumNum duration);
     void setLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
     void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
@@ -329,9 +335,9 @@ protected:
     void resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void resolveTupletBeamStartTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
     void resolveTupletBeamEndTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
-    void appendTypeTag(vrv::Note *note, const std::string &tag);
-    void embedQstampInClass(vrv::Note *note, hum::HTp token);
-    void embedBase40PitchInClass(vrv::Note *note, const std::string &token);
+    void embedQstampInClass(vrv::Note *note, hum::HTp token, const std::string &tstring);
+    void embedPitchInformationInClass(vrv::Note *note, const std::string &token);
+    void embedTieInformation(Note *note, const std::string &token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -359,6 +365,7 @@ protected:
 
     template <class ELEMENT> void addTextElement(ELEMENT *element, const std::string &content);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
+    template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
@@ -371,6 +378,7 @@ protected:
     static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
     std::string cleanHarmString(const std::string &content);
+    std::vector<std::string> cleanFBString(const std::string &content);
 
 private:
     std::string m_filename; // Filename to read/was read.
@@ -444,6 +452,9 @@ private:
     // m_oclef == temporary variable for printing "original-clef" <app>
     std::vector<std::pair<int, hum::HTp> > m_oclef;
 
+    // m_omet == temporary variable for printing "original-mensuration" <app>
+    std::vector<std::pair<int, hum::HTp> > m_omet;
+
     // m_staffstates == state variables for each staff.
     std::vector<humaux::StaffStateVariables> m_staffstates;
 
@@ -455,6 +466,11 @@ private:
     // the file to convert contains **mxhm spines that should be
     // converted into <harm> element in the MEI conversion.
     bool m_harm;
+
+    // m_fb == state variable for keeping track of whether or not
+    // the file to convert contains **Bnum spines that should be
+    // converted into <harm> element in the MEI conversion.
+    bool m_fb;
 
     // m_leftbarstyle is a barline left-hand style to store in the next measure.
     // When processing a measure, this variable should be checked and used
@@ -482,6 +498,9 @@ private:
     bool m_has_color_spine = false;
 
 #endif /* NO_HUMDRUM_SUPPORT */
+
+    // m_type == true means add type markup in Humdrum-to-MEI conversion.
+    bool m_type = true;
 };
 
 } // namespace vrv

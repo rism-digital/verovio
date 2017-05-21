@@ -145,8 +145,8 @@
             <glyph glyph-code="E089" smufl-name="timeSig9"/>
             <glyph glyph-code="E08A" smufl-name="timeSigCommon"/>
             <glyph glyph-code="E08B" smufl-name="timeSigCutCommon"/>
-            <!--<glyph glyph-code="E08C" smufl-name="timeSigPlus"/>-->
-            <!--<glyph glyph-code="E08D" smufl-name="timeSigPlusSmall"/>-->
+            <glyph glyph-code="E08C" smufl-name="timeSigPlus"/>
+            <glyph glyph-code="E08D" smufl-name="timeSigPlusSmall"/>
             <!--<glyph glyph-code="E08E" smufl-name="timeSigFractionalSlash"/>-->
             <!--<glyph glyph-code="E08F" smufl-name="timeSigEquals"/>-->
             <!--<glyph glyph-code="E090" smufl-name="timeSigMinus"/>-->

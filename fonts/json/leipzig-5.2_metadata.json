@@ -30,7 +30,7 @@
         "tupletBracketThickness": "0.16"
     },
     "fontName": "Leipzig-5.2",
-    "fontVersion": "5.2.28",
+    "fontVersion": "5.2.29",
     "glyphBBoxes": {
         "uniE003": {
             "bBoxNE": [
@@ -360,6 +360,26 @@
             "bBoxSW": [
                 0.0,
                 -1.276
+            ]
+        },
+        "uniE08C": {
+            "bBoxNE": [
+                1.3651,
+                0.6826
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6826
+            ]
+        },
+        "uniE08D": {
+            "bBoxNE": [
+                1.0112,
+                0.5056
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.5056
             ]
         },
         "uniE0A2": {
@@ -2392,6 +2412,12 @@
         },
         "uniE08B": {
             "codepoint": "0XE08B"
+        },
+        "uniE08C": {
+            "codepoint": "0XE08C"
+        },
+        "uniE08D": {
+            "codepoint": "0XE08D"
         },
         "uniE0A2": {
             "codepoint": "0XE0A2"

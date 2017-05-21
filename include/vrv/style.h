@@ -8,8 +8,12 @@
 #ifndef __VRV_STYLE_H__
 #define __VRV_STYLE_H__
 
-namespace vrv {
+#ifdef CUSTOM_VEROVIO_STYLE
+#include "custom_style.h"
+#else
 
+namespace vrv {
+    
 //----------------------------------------------------------------------------
 // Default layout values
 //----------------------------------------------------------------------------
@@ -296,5 +300,7 @@ public:
 };
 
 } // namespace vrv
+
+#endif // CUSTOM_VEROVIO_STYLE
 
 #endif // __VRV_DEF_H__

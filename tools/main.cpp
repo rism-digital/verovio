@@ -117,6 +117,8 @@ void display_usage()
 
     cerr << " --help                     Display this message" << endl;
 
+    cerr << " --hum-type                 Include type attributes when importing from Humdrum" << endl;
+
     cerr << " --ignore-layout            Ignore all encoded layout information (if any)" << endl;
     cerr << "                            and fully recalculate the layout" << endl;
 
@@ -164,6 +166,7 @@ int main(int argc, char **argv)
     int adjust_page_height = 0;
     int all_pages = 0;
     int no_layout = 0;
+    int hum_type = 0;
     int ignore_layout = 0;
     int no_justification = 0;
     int even_note_spacing = 0;
@@ -189,16 +192,16 @@ int main(int argc, char **argv)
         { "border", required_argument, 0, 'b' }, { "choice-xpath-query", required_argument, 0, 0 },
         { "even-note-spacing", no_argument, &even_note_spacing, 1 }, { "font", required_argument, 0, 0 },
         { "format", required_argument, 0, 'f' }, { "help", no_argument, &show_help, 1 },
-        { "ignore-layout", no_argument, &ignore_layout, 1 }, { "mdiv-xpath-query", required_argument, 0, 0 },
-        { "no-layout", no_argument, &no_layout, 1 }, { "no-mei-hdr", no_argument, &no_mei_hdr, 1 },
-        { "no-justification", no_argument, &no_justification, 1 }, { "outfile", required_argument, 0, 'o' },
-        { "page", required_argument, 0, 0 }, { "page-height", required_argument, 0, 'h' },
-        { "page-width", required_argument, 0, 'w' }, { "resources", required_argument, 0, 'r' },
-        { "scale", required_argument, 0, 's' }, { "show-bounding-boxes", no_argument, &show_bounding_boxes, 1 },
-        { "spacing-linear", required_argument, 0, 0 }, { "spacing-non-linear", required_argument, 0, 0 },
-        { "spacing-staff", required_argument, 0, 0 }, { "spacing-system", required_argument, 0, 0 },
-        { "type", required_argument, 0, 't' }, { "version", no_argument, &show_version, 1 },
-        { "xml-id-seed", required_argument, 0, 0 }, { 0, 0, 0, 0 } };
+        { "hum-type", no_argument, &hum_type, 1 }, { "ignore-layout", no_argument, &ignore_layout, 1 },
+        { "mdiv-xpath-query", required_argument, 0, 0 }, { "no-layout", no_argument, &no_layout, 1 },
+        { "no-mei-hdr", no_argument, &no_mei_hdr, 1 }, { "no-justification", no_argument, &no_justification, 1 },
+        { "outfile", required_argument, 0, 'o' }, { "page", required_argument, 0, 0 },
+        { "page-height", required_argument, 0, 'h' }, { "page-width", required_argument, 0, 'w' },
+        { "resources", required_argument, 0, 'r' }, { "scale", required_argument, 0, 's' },
+        { "show-bounding-boxes", no_argument, &show_bounding_boxes, 1 }, { "spacing-linear", required_argument, 0, 0 },
+        { "spacing-non-linear", required_argument, 0, 0 }, { "spacing-staff", required_argument, 0, 0 },
+        { "spacing-system", required_argument, 0, 0 }, { "type", required_argument, 0, 't' },
+        { "version", no_argument, &show_version, 1 }, { "xml-id-seed", required_argument, 0, 0 }, { 0, 0, 0, 0 } };
 
     int option_index = 0;
     while ((c = getopt_long(argc, argv, "b:f:h:o:p:r:s:t:w:v", long_options, &option_index)) != -1) {
@@ -319,6 +322,7 @@ int main(int argc, char **argv)
     // Set the various flags in accordance with the options given
     toolkit.SetAdjustPageHeight(adjust_page_height);
     toolkit.SetNoLayout(no_layout);
+    toolkit.SetHumType(hum_type);
     toolkit.SetIgnoreLayout(ignore_layout);
     toolkit.SetNoJustification(no_justification);
     toolkit.SetEvenNoteSpacing(even_note_spacing);
@@ -332,23 +336,23 @@ int main(int argc, char **argv)
         display_usage();
         exit(1);
     }
-    
+
     // If we output svg or do not request no layout to be performed then we need the font
     if ((outformat == "svg") || !toolkit.GetNoLayout()) {
         // Make sure the user uses a valid Resource path
         // Save many headaches for empty SVGs
         if (!dir_exists(vrv::Resources::GetPath())) {
             cerr << "The resources path " << vrv::Resources::GetPath() << " could not be found; please use -r option."
-            << endl;
+                 << endl;
             exit(1);
         }
-        
+
         // Load the music font from the resource directory
         if (!Resources::InitFonts()) {
             cerr << "The music font could not be loaded; please check the contents of the resource directory." << endl;
             exit(1);
         }
-        
+
         // Load a specified font
         if (!font.empty() && !toolkit.SetFont(font)) {
             cerr << "Font '" << font << "' could not be loaded." << endl;
