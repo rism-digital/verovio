@@ -44,7 +44,7 @@ bool View::OneBeamInTuplet(Tuplet *tuplet)
         if (tuplet->GetNoteCount() == currentBeam->GetNoteCount()) return false;
     }
 
-    // No we contain a beam? Go on and search for it in the children
+    // Do we contain a beam? Go on and search for it in the children
     for (int i = 0; i < tuplet->GetChildCount(); i++) {
         currentBeam = dynamic_cast<Beam *>(tuplet->GetChild(i));
 
@@ -55,6 +55,30 @@ bool View::OneBeamInTuplet(Tuplet *tuplet)
     }
 
     return true;
+}
+
+int View::NestedTuplets(Object *object)
+{
+    assert(object);
+
+    int tupletDepth = 1;
+
+    for (int i = 0; i < object->GetChildCount(); i++) {
+        int tupletCount = 1;
+
+        // check how many nested tuplets there are
+        if ((object->GetChild(i))->Is(TUPLET)) {
+            tupletCount += NestedTuplets(object->GetChild(i));
+        }
+        // and don't forget beams
+        if ((object->GetChild(i))->Is(BEAM)) {
+            tupletCount = NestedTuplets(object->GetChild(i));
+        }
+
+        tupletDepth = tupletCount > tupletDepth ? tupletCount : tupletDepth;
+    }
+
+    return tupletDepth;
 }
 
 /**
@@ -144,16 +168,16 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
             if (direction == STEMDIRECTION_up) { // up
                 y = lastNote->GetDrawingStemEnd(lastNote).y
                     + (firstNote->GetDrawingStemEnd(firstNote).y - lastNote->GetDrawingStemEnd(lastNote).y) / 2
-                    + TUPLET_OFFSET;
-                start->y = firstNote->GetDrawingStemEnd(firstNote).y + TUPLET_OFFSET;
-                end->y = lastNote->GetDrawingStemEnd(lastNote).y + TUPLET_OFFSET;
+                    + TUPLET_OFFSET * NestedTuplets(tuplet);
+                start->y = firstNote->GetDrawingStemEnd(firstNote).y + TUPLET_OFFSET * NestedTuplets(tuplet);
+                end->y = lastNote->GetDrawingStemEnd(lastNote).y + TUPLET_OFFSET * NestedTuplets(tuplet);
             }
             else {
                 y = lastNote->GetDrawingStemEnd(lastNote).y
                     + (firstNote->GetDrawingStemEnd(firstNote).y - lastNote->GetDrawingStemEnd(lastNote).y) / 2
-                    - TUPLET_OFFSET;
-                start->y = firstNote->GetDrawingStemEnd(firstNote).y - TUPLET_OFFSET;
-                end->y = lastNote->GetDrawingStemEnd(lastNote).y - TUPLET_OFFSET;
+                    - TUPLET_OFFSET * NestedTuplets(tuplet);
+                start->y = firstNote->GetDrawingStemEnd(firstNote).y - TUPLET_OFFSET * NestedTuplets(tuplet);
+                end->y = lastNote->GetDrawingStemEnd(lastNote).y - TUPLET_OFFSET * NestedTuplets(tuplet);
             }
         }
         // or there are only rests and spaces
@@ -181,7 +205,8 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
                     // The note is more than the avg, adjust to y the difference
                     // from this note to the avg
                     if (currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET > y) {
-                        int offset = y - (currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET);
+                        int offset = y
+                            - (currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET * NestedTuplets(tuplet));
                         y -= offset;
                         end->y -= offset;
                         start->y -= offset;
@@ -189,7 +214,8 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
                 }
                 else {
                     if (currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET < y) {
-                        int offset = y - (currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET);
+                        int offset = y
+                            - (currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET * NestedTuplets(tuplet));
                         y -= offset;
                         end->y -= offset;
                         start->y -= offset;
@@ -214,12 +240,16 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
 
                 if (currentNote->GetDrawingStemDir() == direction) {
                     if (direction == STEMDIRECTION_up) {
-                        if (y == 0 || currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET >= y)
-                            y = currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET;
+                        if (y == 0
+                            || currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET * NestedTuplets(tuplet)
+                                >= y)
+                            y = currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET * NestedTuplets(tuplet);
                     }
                     else {
-                        if (y == 0 || currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET <= y)
-                            y = currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET;
+                        if (y == 0
+                            || currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET * NestedTuplets(tuplet)
+                                <= y)
+                            y = currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET * NestedTuplets(tuplet);
                     }
                 }
                 else {

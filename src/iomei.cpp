@@ -1764,6 +1764,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "space") {
             return true;
         }
+        else if (element == "tuplet") {
+            return true;
+        }
         else {
             return false;
         }
