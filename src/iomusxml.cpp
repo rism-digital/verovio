@@ -1345,11 +1345,12 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                     note->SetOct(atoi(octaveStr.c_str()));
             }
             std::string alterStr = GetContentOfChild(pitch.node(), "alter");
-            if (!accidental && !alterStr.empty()) {
+            if (!alterStr.empty()) {
                 Accid *accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
                     accid = new Accid();
                     note->AddChild(accid);
+                    accid->IsAttribute(true);
                 }
                 accid->SetAccidGes(ConvertAlterToAccid(std::atof(alterStr.c_str())));
             }
@@ -1778,34 +1779,38 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Measure *measure, int
 data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAccidentalToAccid(std::string value)
 {
     if (value == "sharp") return ACCIDENTAL_EXPLICIT_s;
-    if (value == "natural") return ACCIDENTAL_EXPLICIT_n;
-    if (value == "flat") return ACCIDENTAL_EXPLICIT_f;
-    if (value == "double-sharp") return ACCIDENTAL_EXPLICIT_x;
-    if (value == "sharp-sharp") return ACCIDENTAL_EXPLICIT_ss;
-    if (value == "flat-flat") return ACCIDENTAL_EXPLICIT_ff;
-    if (value == "natural-sharp") return ACCIDENTAL_EXPLICIT_ns;
-    if (value == "natural-flat") return ACCIDENTAL_EXPLICIT_nf;
-    if (value == "quarter-flat") return ACCIDENTAL_EXPLICIT_1qf;
-    if (value == "quarter-sharp") return ACCIDENTAL_EXPLICIT_1qs;
-    if (value == "three-quarters-flat") return ACCIDENTAL_EXPLICIT_3qf;
-    if (value == "three-quarters-sharp") return ACCIDENTAL_EXPLICIT_3qs;
-    LogWarning("Unsupported accidental value '%s'", value.c_str());
-    return ACCIDENTAL_EXPLICIT_NONE;
+    else if (value == "natural") return ACCIDENTAL_EXPLICIT_n;
+    else if (value == "flat") return ACCIDENTAL_EXPLICIT_f;
+    else if (value == "double-sharp") return ACCIDENTAL_EXPLICIT_x;
+    else if (value == "sharp-sharp") return ACCIDENTAL_EXPLICIT_ss;
+    else if (value == "flat-flat") return ACCIDENTAL_EXPLICIT_ff;
+    else if (value == "natural-sharp") return ACCIDENTAL_EXPLICIT_ns;
+    else if (value == "natural-flat") return ACCIDENTAL_EXPLICIT_nf;
+    else if (value == "quarter-flat") return ACCIDENTAL_EXPLICIT_1qf;
+    else if (value == "quarter-sharp") return ACCIDENTAL_EXPLICIT_1qs;
+    else if (value == "three-quarters-flat") return ACCIDENTAL_EXPLICIT_3qf;
+    else if (value == "three-quarters-sharp") return ACCIDENTAL_EXPLICIT_3qs;
+    else {
+        LogWarning("Unsupported accidental value '%s'", value.c_str());
+        return ACCIDENTAL_EXPLICIT_NONE;
+    }
 }
 
 data_ACCIDENTAL_IMPLICIT MusicXmlInput::ConvertAlterToAccid(float value)
 {
     if (value == -2) return ACCIDENTAL_IMPLICIT_ff;
-    if (value == -1.5) return ACCIDENTAL_IMPLICIT_fd;
-    if (value == -1) return ACCIDENTAL_IMPLICIT_f;
-    if (value == -0.5) return ACCIDENTAL_IMPLICIT_fu;
-    if (value == 0) return ACCIDENTAL_IMPLICIT_n;
-    if (value == 0.5) return ACCIDENTAL_IMPLICIT_sd;
-    if (value == 1) return ACCIDENTAL_IMPLICIT_s;
-    if (value == 1.5) return ACCIDENTAL_IMPLICIT_su;
-    if (value == 2) return ACCIDENTAL_IMPLICIT_ss;
-    LogWarning("Unsupported alter value '%d'", value);
-    return ACCIDENTAL_IMPLICIT_NONE;
+    else if (value == -1.5) return ACCIDENTAL_IMPLICIT_fd;
+    else if (value == -1) return ACCIDENTAL_IMPLICIT_f;
+    else if (value == -0.5) return ACCIDENTAL_IMPLICIT_fu;
+    else if (value == 0) return ACCIDENTAL_IMPLICIT_n;
+    else if (value == 0.5) return ACCIDENTAL_IMPLICIT_sd;
+    else if (value == 1) return ACCIDENTAL_IMPLICIT_s;
+    else if (value == 1.5) return ACCIDENTAL_IMPLICIT_su;
+    else if (value == 2) return ACCIDENTAL_IMPLICIT_ss;
+    else {
+        LogWarning("Unsupported alter value '%d'", value);
+        return ACCIDENTAL_IMPLICIT_NONE;
+    }
 }
 
 data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repeat)
@@ -1828,69 +1833,75 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repe
 data_BOOLEAN MusicXmlInput::ConvertWordToBool(std::string value)
 {
     if (value == "yes") return BOOLEAN_true;
-    if (value == "no") return BOOLEAN_false;
-    return BOOLEAN_NONE;
+    else if (value == "no") return BOOLEAN_false;
+    else return BOOLEAN_NONE;
 }
 
 data_DURATION MusicXmlInput::ConvertTypeToDur(std::string value)
 {
     if (value == "maxima") return DURATION_maxima; // this is a mensural MEI value
-    if (value == "long") return DURATION_long; // mensural MEI value longa isn't supported
-    if (value == "breve") return DURATION_breve;
-    if (value == "whole") return DURATION_1;
-    if (value == "half") return DURATION_2;
-    if (value == "quarter") return DURATION_4;
-    if (value == "eighth") return DURATION_8;
-    if (value == "16th") return DURATION_16;
-    if (value == "32nd") return DURATION_32;
-    if (value == "64th") return DURATION_64;
-    if (value == "128th") return DURATION_128;
-    if (value == "256th") return DURATION_256;
-    LogWarning("Unsupported type '%s'", value.c_str());
-    return DURATION_NONE;
+    else if (value == "long") return DURATION_long; // mensural MEI value longa isn't supported
+    else if (value == "breve") return DURATION_breve;
+    else if (value == "whole") return DURATION_1;
+    else if (value == "half") return DURATION_2;
+    else if (value == "quarter") return DURATION_4;
+    else if (value == "eighth") return DURATION_8;
+    else if (value == "16th") return DURATION_16;
+    else if (value == "32nd") return DURATION_32;
+    else if (value == "64th") return DURATION_64;
+    else if (value == "128th") return DURATION_128;
+    else if (value == "256th") return DURATION_256;
+    else {
+        LogWarning("Unsupported type '%s'", value.c_str());
+        return DURATION_NONE;
+    }
 }
 
 data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(std::string value)
 {
     if (value == "C") return PITCHNAME_c;
-    if (value == "D") return PITCHNAME_d;
-    if (value == "E") return PITCHNAME_e;
-    if (value == "F") return PITCHNAME_f;
-    if (value == "G") return PITCHNAME_g;
-    if (value == "A") return PITCHNAME_a;
-    if (value == "B") return PITCHNAME_b;
-    LogWarning("Unsupported pitch name '%s'", value.c_str());
-    return PITCHNAME_NONE;
+    else if (value == "D") return PITCHNAME_d;
+    else if (value == "E") return PITCHNAME_e;
+    else if (value == "F") return PITCHNAME_f;
+    else if (value == "G") return PITCHNAME_g;
+    else if (value == "A") return PITCHNAME_a;
+    else if (value == "B") return PITCHNAME_b;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str());
+        return PITCHNAME_NONE;
+    }
 }
 
 curvature_CURVEDIR MusicXmlInput::ConvertOrientationToCurvedir(std::string value)
 {
     if (value == "over") return curvature_CURVEDIR_above;
-    if (value == "under") return curvature_CURVEDIR_below;
-    return curvature_CURVEDIR_NONE;
+    else if (value == "under") return curvature_CURVEDIR_below;
+    else return curvature_CURVEDIR_NONE;
 }
 
 fermataVis_SHAPE MusicXmlInput::ConvertFermataShape(std::string value)
 {
     if (value == "normal") return fermataVis_SHAPE_curved;
-    if (value == "angled") return fermataVis_SHAPE_angular;
-    if (value == "square") return fermataVis_SHAPE_square;
-    return fermataVis_SHAPE_NONE;
+    else if (value == "angled") return fermataVis_SHAPE_angular;
+    else if (value == "square") return fermataVis_SHAPE_square;
+    else return fermataVis_SHAPE_NONE;
 }
 
 pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(std::string value)
 {
     if (value == "start") return pedalLog_DIR_down;
-    if (value == "stop") return pedalLog_DIR_up;
-    LogWarning("Unsupported type '%s' for pedal", value.c_str());
-    return pedalLog_DIR_NONE;
+    else if (value == "stop") return pedalLog_DIR_up;
+    else {
+        LogWarning("Unsupported type '%s' for pedal", value.c_str());
+        return pedalLog_DIR_NONE;
+    }
 }
 
 tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(std::string value)
 {
     if (value == "actual") return tupletVis_NUMFORMAT_count;
-    if (value == "both") return tupletVis_NUMFORMAT_ratio;
-    return tupletVis_NUMFORMAT_NONE;
+    else if (value == "both") return tupletVis_NUMFORMAT_ratio;
+    else return tupletVis_NUMFORMAT_NONE;
 }
 
 } // namespace vrv
