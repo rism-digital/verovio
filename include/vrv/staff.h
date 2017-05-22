@@ -31,7 +31,7 @@ class TimeSpanningInterface;
  * It contains Measure objects.
  * For unmeasured music, one single Measure is added for simplifying internal processing
 */
-class Staff : public Object, public AttCommon, public AttTyped {
+class Staff : public Object, public AttNInteger, public AttTyped {
 
 public:
     /**

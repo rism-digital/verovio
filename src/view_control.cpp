@@ -367,7 +367,7 @@ void View::DrawHairpin(
 
     /************** adjusting y position **************/
 
-    if (place == STAFFREL_above) {
+    if (place.GetBasic() == STAFFREL_basic_above) {
         // y1 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         // y2 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
@@ -415,7 +415,7 @@ void View::DrawOctave(
     LayerElement *end = NULL;
 
     data_OCTAVE_DIS dis = octave->GetDis();
-    data_PLACE disPlace = octave->GetDisPlace();
+    data_STAFFREL_basic disPlace = octave->GetDisPlace();
 
     int y1 = octave->GetDrawingY();
     int y2 = y1;
@@ -445,7 +445,7 @@ void View::DrawOctave(
         dc->StartGraphic(octave, "spanning-octave", "");
 
     int code = SMUFL_E511_ottavaAlta;
-    if (disPlace == PLACE_above) {
+    if (disPlace == STAFFREL_basic_above) {
         switch (dis) {
             // here we could use other glyphs depending on the style
             case OCTAVE_DIS_8: code = SMUFL_E510_ottava; break;
@@ -478,11 +478,11 @@ void View::DrawOctave(
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
     TextExtend extend;
     dc->GetSmuflTextExtent(str, &extend);
-    int yCode = (disPlace == PLACE_above) ? y1 - extend.m_height : y1;
+    int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
     DrawSmuflCode(dc, x1 - extend.m_width, yCode, code, staff->m_drawingStaffSize, false);
     dc->ResetFont();
 
-    y2 += (disPlace == PLACE_above) ? -extend.m_height : extend.m_height;
+    y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
     // adjust is to avoid the figure to touch the line
     x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
 
@@ -810,10 +810,10 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
             if (outsidePart) {
-                if ((outsidePart->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
                     outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), true);
                 }
-                else if ((outsidePart->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
                     outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), true);
                 }
             }
@@ -828,10 +828,10 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
             if (outsidePart) {
-                if ((outsidePart->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
                     outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), false);
                 }
-                else if ((outsidePart->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
                     outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), false);
                 }
             }
@@ -1690,20 +1690,20 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     // check for shape
     if (fermata->GetShape() == fermataVis_SHAPE_angular) {
         if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
+            || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C5_fermataShortBelow;
         else
             code = SMUFL_E4C4_fermataShortAbove;
     }
     else if (fermata->GetShape() == fermataVis_SHAPE_square) {
         if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
+            || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C7_fermataLongBelow;
         else
             code = SMUFL_E4C6_fermataLongAbove;
     }
     else if (fermata->GetForm() == fermataVis_FORM_inv
-        || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
+        || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
         code = SMUFL_E4C1_fermataBelow;
 
     std::wstring str;
@@ -1794,7 +1794,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
 
     // set norm as default
     int code = SMUFL_E56D_ornamentMordentInverted;
-    if (mordent->GetForm() == mordentLog_FORM_inv) code = SMUFL_E56C_ornamentMordent;
+    if (mordent->GetForm() == mordentLog_FORM_upper) code = SMUFL_E56C_ornamentMordent;
     if (mordent->GetLong() == true) code = SMUFL_E56E_ornamentTremblement;
 
     std::wstring str;
@@ -1815,24 +1815,24 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
             // Adjust the y position
             double factor = 1.0;
-            data_ACCIDENTAL_EXPLICIT meiaccid = mordent->GetAccidlower();
+            data_ACCIDENTAL_WRITTEN meiaccid = mordent->GetAccidlower();
             // optimized vertical kerning for Leipzig font:
-            if (meiaccid == ACCIDENTAL_EXPLICIT_ff) {
+            if (meiaccid == ACCIDENTAL_WRITTEN_ff) {
                 factor = 1.20;
                 xShift = 0.14;
             }
-            else if (meiaccid == ACCIDENTAL_EXPLICIT_f) {
+            else if (meiaccid == ACCIDENTAL_WRITTEN_f) {
                 factor = 1.20;
                 xShift = -0.02;
             }
-            else if (meiaccid == ACCIDENTAL_EXPLICIT_n) {
+            else if (meiaccid == ACCIDENTAL_WRITTEN_n) {
                 factor = 0.90;
                 xShift = -0.04;
             }
-            else if (meiaccid == ACCIDENTAL_EXPLICIT_s) {
+            else if (meiaccid == ACCIDENTAL_WRITTEN_s) {
                 factor = 1.15;
             }
-            else if (meiaccid == ACCIDENTAL_EXPLICIT_x) {
+            else if (meiaccid == ACCIDENTAL_WRITTEN_x) {
                 factor = 2.00;
             }
             y += factor * m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
@@ -1846,23 +1846,23 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
             // Adjust the y position
             double factor = 1.75;
-            data_ACCIDENTAL_EXPLICIT meiaccid = mordent->GetAccidupper();
+            data_ACCIDENTAL_WRITTEN meiaccid = mordent->GetAccidupper();
             // optimized vertical kerning for Leipzig font:
-            if (meiaccid == ACCIDENTAL_EXPLICIT_ff) {
+            if (meiaccid == ACCIDENTAL_WRITTEN_ff) {
                 factor = 1.40;
             }
-            else if (meiaccid == ACCIDENTAL_EXPLICIT_f) {
+            else if (meiaccid == ACCIDENTAL_WRITTEN_f) {
                 factor = 1.25;
             }
-            else if (meiaccid == ACCIDENTAL_EXPLICIT_n) {
+            else if (meiaccid == ACCIDENTAL_WRITTEN_n) {
                 factor = 1.60;
                 xShift = -0.10;
             }
-            else if (meiaccid == ACCIDENTAL_EXPLICIT_s) {
+            else if (meiaccid == ACCIDENTAL_WRITTEN_s) {
                 factor = 1.60;
                 xShift = -0.06;
             }
-            else if (meiaccid == ACCIDENTAL_EXPLICIT_x) {
+            else if (meiaccid == ACCIDENTAL_WRITTEN_x) {
                 factor = 1.35;
                 xShift = -0.08;
             }
@@ -2058,7 +2058,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
 
     // set norm as default
     int code = SMUFL_E567_ornamentTurn;
-    if (turn->GetForm() == turnLog_FORM_inv) code = SMUFL_E568_ornamentTurnInverted;
+    if (turn->GetForm() == turnLog_FORM_upper) code = SMUFL_E568_ornamentTurnInverted;
 
     std::wstring str;
     str.push_back(code);

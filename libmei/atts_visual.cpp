@@ -41,7 +41,7 @@ AttAnnotVis::~AttAnnotVis()
 
 void AttAnnotVis::ResetAnnotVis()
 {
-    m_place = PLACEMENT_NONE;
+    m_place = data_PLACEMENT();
 }
 
 bool AttAnnotVis::ReadAnnotVis(pugi::xml_node element)
@@ -67,7 +67,7 @@ bool AttAnnotVis::WriteAnnotVis(pugi::xml_node element)
 
 bool AttAnnotVis::HasPlace() const
 {
-    return (m_place != PLACEMENT_NONE);
+    return (m_place.HasValue());
 }
 
 /* include <attplace> */

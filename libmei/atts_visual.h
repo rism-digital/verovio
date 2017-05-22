@@ -52,6 +52,11 @@ public:
     void SetPlace(data_PLACEMENT place_) { m_place = place_; }
     data_PLACEMENT GetPlace() const { return m_place; }
     bool HasPlace() const;
+    
+    /**
+     * Getter for reference (for alternate type only)
+     **/
+    data_PLACEMENT *GetPlaceAlternate() { return &m_place; }
     ///@}
 
 private:

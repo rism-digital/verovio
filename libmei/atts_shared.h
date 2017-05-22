@@ -1888,8 +1888,8 @@ public:
     std::string GetKeyFifths() const { return m_keyFifths; }
     bool HasKeyFifths() const;
     //
-    void SetKeySig(std::string keySig_) { m_keySig = keySig_; }
-    std::string GetKeySig() const { return m_keySig; }
+    void SetKeySig(data_KEYSIGNATURE keySig_) { m_keySig = keySig_; }
+    data_KEYSIGNATURE GetKeySig() const { return m_keySig; }
     bool HasKeySig() const;
     ///@}
 
@@ -1897,7 +1897,7 @@ private:
     /** Indicates where the key lies in the circle of fifths. **/
     std::string m_keyFifths;
     /** Written key signature. **/
-    std::string m_keySig;
+    data_KEYSIGNATURE m_keySig;
 
     /* include <attkey.sig> */
 };
@@ -3728,14 +3728,19 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPlace(data_STAFFREL_extended place_) { m_place = place_; }
-    data_STAFFREL_extended GetPlace() const { return m_place; }
+    void SetPlace(data_STAFFREL place_) { m_place = place_; }
+    data_STAFFREL GetPlace() const { return m_place; }
     bool HasPlace() const;
+    
+    /**
+     * Getter for reference (for alternate type only)
+     **/
+    data_STAFFREL *GetPlaceAlternate() { return &m_place; }
     ///@}
 
 private:
     /** Records the placement of the beam relative to the events it affects. **/
-    data_STAFFREL_extended m_place;
+    data_STAFFREL m_place;
 
     /* include <attplace> */
 };
@@ -4275,8 +4280,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStaff(int staff_) { m_staff = staff_; }
-    int GetStaff() const { return m_staff; }
+    void SetStaff(xsdPositiveInteger_List staff_) { m_staff = staff_; }
+    xsdPositiveInteger_List GetStaff() const { return m_staff; }
     bool HasStaff() const;
     ///@}
 
@@ -4286,7 +4291,7 @@ private:
      * applies.
      * Mandatory when applicable.
      **/
-    int m_staff;
+    xsdPositiveInteger_List m_staff;
 
     /* include <attstaff> */
 };
@@ -4318,14 +4323,29 @@ public:
     void SetAboveorder(data_STAFFITEM aboveorder_) { m_aboveorder = aboveorder_; }
     data_STAFFITEM GetAboveorder() const { return m_aboveorder; }
     bool HasAboveorder() const;
+    
+    /**
+     * Getter for reference (for alternate type only)
+     **/
+    data_STAFFITEM *GetAboveorderAlternate() { return &m_aboveorder; }
     //
     void SetBeloworder(data_STAFFITEM beloworder_) { m_beloworder = beloworder_; }
     data_STAFFITEM GetBeloworder() const { return m_beloworder; }
     bool HasBeloworder() const;
+    
+    /**
+     * Getter for reference (for alternate type only)
+     **/
+    data_STAFFITEM *GetBeloworderAlternate() { return &m_beloworder; }
     //
     void SetBetweenorder(data_STAFFITEM betweenorder_) { m_betweenorder = betweenorder_; }
     data_STAFFITEM GetBetweenorder() const { return m_betweenorder; }
     bool HasBetweenorder() const;
+    
+    /**
+     * Getter for reference (for alternate type only)
+     **/
+    data_STAFFITEM *GetBetweenorderAlternate() { return &m_betweenorder; }
     ///@}
 
 private:

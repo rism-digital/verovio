@@ -87,14 +87,14 @@ AttHarmonicFunction::~AttHarmonicFunction()
 
 void AttHarmonicFunction::ResetHarmonicFunction()
 {
-    m_deg = SCALEDEGREE_NONE;
+    m_deg = "";
 }
 
 bool AttHarmonicFunction::ReadHarmonicFunction(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("deg")) {
-        this->SetDeg(StrToScaledegree(element.attribute("deg").value()));
+        this->SetDeg(StrToStr(element.attribute("deg").value()));
         element.remove_attribute("deg");
         hasAttribute = true;
     }
@@ -105,7 +105,7 @@ bool AttHarmonicFunction::WriteHarmonicFunction(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasDeg()) {
-        element.append_attribute("deg") = ScaledegreeToStr(this->GetDeg()).c_str();
+        element.append_attribute("deg") = StrToStr(this->GetDeg()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -113,7 +113,7 @@ bool AttHarmonicFunction::WriteHarmonicFunction(pugi::xml_node element)
 
 bool AttHarmonicFunction::HasDeg() const
 {
-    return (m_deg != SCALEDEGREE_NONE);
+    return (m_deg != "");
 }
 
 /* include <attdeg> */
@@ -133,14 +133,14 @@ AttIntervalHarmonic::~AttIntervalHarmonic()
 
 void AttIntervalHarmonic::ResetIntervalHarmonic()
 {
-    m_inth = INTERVAL_HARMONIC_NONE;
+    m_inth = "";
 }
 
 bool AttIntervalHarmonic::ReadIntervalHarmonic(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("inth")) {
-        this->SetInth(StrToIntervalHarmonic(element.attribute("inth").value()));
+        this->SetInth(StrToStr(element.attribute("inth").value()));
         element.remove_attribute("inth");
         hasAttribute = true;
     }
@@ -151,7 +151,7 @@ bool AttIntervalHarmonic::WriteIntervalHarmonic(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasInth()) {
-        element.append_attribute("inth") = IntervalHarmonicToStr(this->GetInth()).c_str();
+        element.append_attribute("inth") = StrToStr(this->GetInth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -159,7 +159,7 @@ bool AttIntervalHarmonic::WriteIntervalHarmonic(pugi::xml_node element)
 
 bool AttIntervalHarmonic::HasInth() const
 {
-    return (m_inth != INTERVAL_HARMONIC_NONE);
+    return (m_inth != "");
 }
 
 /* include <attinth> */
@@ -179,14 +179,14 @@ AttIntervalMelodic::~AttIntervalMelodic()
 
 void AttIntervalMelodic::ResetIntervalMelodic()
 {
-    m_intm = INTERVAL_MELODIC_NONE;
+    m_intm = "";
 }
 
 bool AttIntervalMelodic::ReadIntervalMelodic(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("intm")) {
-        this->SetIntm(StrToIntervalMelodic(element.attribute("intm").value()));
+        this->SetIntm(StrToStr(element.attribute("intm").value()));
         element.remove_attribute("intm");
         hasAttribute = true;
     }
@@ -197,7 +197,7 @@ bool AttIntervalMelodic::WriteIntervalMelodic(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasIntm()) {
-        element.append_attribute("intm") = IntervalMelodicToStr(this->GetIntm()).c_str();
+        element.append_attribute("intm") = StrToStr(this->GetIntm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -205,7 +205,7 @@ bool AttIntervalMelodic::WriteIntervalMelodic(pugi::xml_node element)
 
 bool AttIntervalMelodic::HasIntm() const
 {
-    return (m_intm != INTERVAL_MELODIC_NONE);
+    return (m_intm != "");
 }
 
 /* include <attintm> */
@@ -393,14 +393,14 @@ AttPitchClass::~AttPitchClass()
 
 void AttPitchClass::ResetPitchClass()
 {
-    m_pclass = PITCHCLASS_NONE;
+    m_pclass = 0;
 }
 
 bool AttPitchClass::ReadPitchClass(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("pclass")) {
-        this->SetPclass(StrToPitchclass(element.attribute("pclass").value()));
+        this->SetPclass(StrToInt(element.attribute("pclass").value()));
         element.remove_attribute("pclass");
         hasAttribute = true;
     }
@@ -411,7 +411,7 @@ bool AttPitchClass::WritePitchClass(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasPclass()) {
-        element.append_attribute("pclass") = PitchclassToStr(this->GetPclass()).c_str();
+        element.append_attribute("pclass") = IntToStr(this->GetPclass()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -419,7 +419,7 @@ bool AttPitchClass::WritePitchClass(pugi::xml_node element)
 
 bool AttPitchClass::HasPclass() const
 {
-    return (m_pclass != PITCHCLASS_NONE);
+    return (m_pclass != 0);
 }
 
 /* include <attpclass> */
@@ -484,7 +484,7 @@ bool Att::SetAnalytical(Object *element, std::string attrType, std::string attrV
         AttHarmonicFunction *att = dynamic_cast<AttHarmonicFunction *>(element);
         assert(att);
         if (attrType == "deg") {
-            att->SetDeg(att->StrToScaledegree(attrValue));
+            att->SetDeg(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -492,7 +492,7 @@ bool Att::SetAnalytical(Object *element, std::string attrType, std::string attrV
         AttIntervalHarmonic *att = dynamic_cast<AttIntervalHarmonic *>(element);
         assert(att);
         if (attrType == "inth") {
-            att->SetInth(att->StrToIntervalHarmonic(attrValue));
+            att->SetInth(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -500,7 +500,7 @@ bool Att::SetAnalytical(Object *element, std::string attrType, std::string attrV
         AttIntervalMelodic *att = dynamic_cast<AttIntervalMelodic *>(element);
         assert(att);
         if (attrType == "intm") {
-            att->SetIntm(att->StrToIntervalMelodic(attrValue));
+            att->SetIntm(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -540,7 +540,7 @@ bool Att::SetAnalytical(Object *element, std::string attrType, std::string attrV
         AttPitchClass *att = dynamic_cast<AttPitchClass *>(element);
         assert(att);
         if (attrType == "pclass") {
-            att->SetPclass(att->StrToPitchclass(attrValue));
+            att->SetPclass(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -569,21 +569,21 @@ void Att::GetAnalytical(const Object *element, ArrayOfStrAttr *attributes)
         const AttHarmonicFunction *att = dynamic_cast<const AttHarmonicFunction *>(element);
         assert(att);
         if (att->HasDeg()) {
-            attributes->push_back(std::make_pair("deg", att->ScaledegreeToStr(att->GetDeg())));
+            attributes->push_back(std::make_pair("deg", att->StrToStr(att->GetDeg())));
         }
     }
     if (element->HasAttClass(ATT_INTERVALHARMONIC)) {
         const AttIntervalHarmonic *att = dynamic_cast<const AttIntervalHarmonic *>(element);
         assert(att);
         if (att->HasInth()) {
-            attributes->push_back(std::make_pair("inth", att->IntervalHarmonicToStr(att->GetInth())));
+            attributes->push_back(std::make_pair("inth", att->StrToStr(att->GetInth())));
         }
     }
     if (element->HasAttClass(ATT_INTERVALMELODIC)) {
         const AttIntervalMelodic *att = dynamic_cast<const AttIntervalMelodic *>(element);
         assert(att);
         if (att->HasIntm()) {
-            attributes->push_back(std::make_pair("intm", att->IntervalMelodicToStr(att->GetIntm())));
+            attributes->push_back(std::make_pair("intm", att->StrToStr(att->GetIntm())));
         }
     }
     if (element->HasAttClass(ATT_KEYSIGANL)) {
@@ -617,7 +617,7 @@ void Att::GetAnalytical(const Object *element, ArrayOfStrAttr *attributes)
         const AttPitchClass *att = dynamic_cast<const AttPitchClass *>(element);
         assert(att);
         if (att->HasPclass()) {
-            attributes->push_back(std::make_pair("pclass", att->PitchclassToStr(att->GetPclass())));
+            attributes->push_back(std::make_pair("pclass", att->IntToStr(att->GetPclass())));
         }
     }
     if (element->HasAttClass(ATT_SOLFA)) {

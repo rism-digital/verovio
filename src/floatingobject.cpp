@@ -155,7 +155,7 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
         Octave *octave = dynamic_cast<Octave *>(object);
         assert(octave);
         // octave below by default (won't draw without @dis.place anyway);
-        m_place = (octave->GetDisPlace() == PLACE_above) ? STAFFREL_above : STAFFREL_below;
+        m_place = (octave->GetDisPlace() == STAFFREL_basic_above) ? STAFFREL_above : STAFFREL_below;
     }
     else if (object->Is(PEDAL)) {
         Pedal *pedal = dynamic_cast<Pedal *>(object);

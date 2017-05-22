@@ -85,8 +85,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDeg(data_SCALEDEGREE deg_) { m_deg = deg_; }
-    data_SCALEDEGREE GetDeg() const { return m_deg; }
+    void SetDeg(std::string deg_) { m_deg = deg_; }
+    std::string GetDeg() const { return m_deg; }
     bool HasDeg() const;
     ///@}
 
@@ -99,7 +99,7 @@ private:
      * "v7", "^1", or "v5+", for example. The amount of chromatic alternation is not
      * indicated.
      **/
-    data_SCALEDEGREE m_deg;
+    std::string m_deg;
 
     /* include <attdeg> */
 };
@@ -128,14 +128,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetInth(data_INTERVAL_HARMONIC inth_) { m_inth = inth_; }
-    data_INTERVAL_HARMONIC GetInth() const { return m_inth; }
+    void SetInth(std::string inth_) { m_inth = inth_; }
+    std::string GetInth() const { return m_inth; }
     bool HasInth() const;
     ///@}
 
 private:
     /** Encodes the harmonic interval between pitches occurring at the same time. **/
-    data_INTERVAL_HARMONIC m_inth;
+    std::string m_inth;
 
     /* include <attinth> */
 };
@@ -164,8 +164,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetIntm(data_INTERVAL_MELODIC intm_) { m_intm = intm_; }
-    data_INTERVAL_MELODIC GetIntm() const { return m_intm; }
+    void SetIntm(std::string intm_) { m_intm = intm_; }
+    std::string GetIntm() const { return m_intm; }
     bool HasIntm() const;
     ///@}
 
@@ -176,7 +176,7 @@ private:
      * of diatonic interval direction, quality, and size, or a precise numeric value in
      * half steps.
      **/
-    data_INTERVAL_MELODIC m_intm;
+    std::string m_intm;
 
     /* include <attintm> */
 };
@@ -331,14 +331,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPclass(data_PITCHCLASS pclass_) { m_pclass = pclass_; }
-    data_PITCHCLASS GetPclass() const { return m_pclass; }
+    void SetPclass(int pclass_) { m_pclass = pclass_; }
+    int GetPclass() const { return m_pclass; }
     bool HasPclass() const;
     ///@}
 
 private:
     /** Holds pitch class information. **/
-    data_PITCHCLASS m_pclass;
+    int m_pclass;
 
     /* include <attpclass> */
 };

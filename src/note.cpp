@@ -208,8 +208,8 @@ bool Note::IsUnissonWith(Note *note, bool ignoreAccid)
     if (!ignoreAccid) {
         Accid *accid = this->GetDrawingAccid();
         Accid *noteAccid = note->GetDrawingAccid();
-        data_ACCIDENTAL_EXPLICIT accidVal = (accid) ? accid->GetAccid() : ACCIDENTAL_EXPLICIT_NONE;
-        data_ACCIDENTAL_EXPLICIT noteAccidVal = (noteAccid) ? noteAccid->GetAccid() : ACCIDENTAL_EXPLICIT_NONE;
+        data_ACCIDENTAL_WRITTEN accidVal = (accid) ? accid->GetAccid() : ACCIDENTAL_WRITTEN_NONE;
+        data_ACCIDENTAL_WRITTEN noteAccidVal = (noteAccid) ? noteAccid->GetAccid() : ACCIDENTAL_WRITTEN_NONE;
         if (accidVal != noteAccidVal) return false;
     }
 

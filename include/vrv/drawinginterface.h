@@ -102,7 +102,7 @@ public:
     void SetDrawClef(bool drawClef) { m_drawClef = drawClef; }
     bool DrawKeySig() const
     {
-        return (m_drawKeySig && (m_currentKeySig.GetAlterationType() != ACCIDENTAL_EXPLICIT_NONE));
+        return (m_drawKeySig && (m_currentKeySig.GetAlterationType() != ACCIDENTAL_WRITTEN_NONE));
     }
     void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; }
     bool DrawMensur() const { return (m_drawMensur && m_currentMensur.HasSign()); }
