@@ -566,18 +566,18 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_NONE, PLACE_NONE))
         sym = SMUFL_E050_gClef;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, PLACE_below))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
         sym = SMUFL_E052_gClef8vb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, PLACE_below))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
         sym = SMUFL_E051_gClef15mb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, PLACE_above))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
         sym = SMUFL_E053_gClef8va;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, PLACE_above))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
         sym = SMUFL_E054_gClef15ma;
     // C-clef
     else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_NONE, PLACE_NONE))
         sym = SMUFL_E05C_cClef;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_8, PLACE_below))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
         sym = SMUFL_E05D_cClef8vb;
     else if (clef->GetShape() == CLEFSHAPE_C)
         sym = SMUFL_E05C_cClef;
@@ -585,13 +585,13 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // F-clef
     else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_NONE, PLACE_NONE))
         sym = SMUFL_E062_fClef;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, PLACE_below))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
         sym = SMUFL_E064_fClef8vb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, PLACE_below))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
         sym = SMUFL_E063_fClef15mb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, PLACE_above))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
         sym = SMUFL_E065_fClef8va;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, PLACE_above))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
         sym = SMUFL_E066_fClef15ma;
     else if (clef->GetShape() == CLEFSHAPE_F)
         sym = SMUFL_E062_fClef;
@@ -858,7 +858,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         loc = PitchInterface::CalcLoc(pitch, KeySig::GetOctave(keySig->GetAlterationType(), pitch, c), clefLocOffset);
         y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
-        if (keySig->GetAlterationType() == ACCIDENTAL_EXPLICIT_f)
+        if (keySig->GetAlterationType() == ACCIDENTAL_WRITTEN_f)
             symb = SMUFL_E260_accidentalFlat;
         else
             symb = SMUFL_E262_accidentalSharp;
@@ -1413,7 +1413,7 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
 
     // First case, notes
     if (element->Is({ NOTE, CHORD })) {
-        if (place == PLACE_above) {
+        if (place == STAFFREL_basic_above) {
             // check if the notehead is in the staff.
             int top = element->GetDrawingTop(m_doc, staff->m_drawingStaffSize, true, ARTIC_PART_OUTSIDE);
             if (top < staff->GetDrawingY()) {
@@ -1444,7 +1444,7 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
         }
     }
     else if (element->Is({ REST, MREST })) {
-        if (place == PLACE_above) {
+        if (place == STAFFREL_basic_above) {
             y = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             DrawSmuflCode(dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false);
         }

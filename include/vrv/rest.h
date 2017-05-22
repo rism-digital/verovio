@@ -26,7 +26,8 @@ class Rest : public LayerElement,
              public DurationInterface,
              public PositionInterface,
              public AttColor,
-             public AttRelativesize,
+             // FIXME changed in MEI 4.0.0 - will be changed to @cue?
+             //public AttRelativesize,
              public AttRestVisMensural {
 public:
     /**

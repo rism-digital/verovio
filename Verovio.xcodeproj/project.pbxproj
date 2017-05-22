@@ -185,9 +185,10 @@
 		4D4221061998A8CE00963292 /* atts_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29031940BCC100C76319 /* atts_mensural.cpp */; };
 		4D4221071998A8CE00963292 /* atts_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29031940BCC100C76319 /* atts_mensural.cpp */; };
 		4D4335C61ECF2310003BE1A9 /* atts_analytical.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4335BE1ECF2310003BE1A9 /* atts_analytical.cpp */; };
-		4D4335C71ECF2310003BE1A9 /* atts_fingering.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4335C01ECF2310003BE1A9 /* atts_fingering.cpp */; };
 		4D4335C81ECF2310003BE1A9 /* atts_gestural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4335C21ECF2310003BE1A9 /* atts_gestural.cpp */; };
 		4D4335C91ECF2310003BE1A9 /* atts_visual.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4335C41ECF2310003BE1A9 /* atts_visual.cpp */; };
+		4D4335CA1ED00A33003BE1A9 /* atts_gestural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4335C21ECF2310003BE1A9 /* atts_gestural.cpp */; };
+		4D4335CB1ED00A33003BE1A9 /* atts_gestural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D4335C21ECF2310003BE1A9 /* atts_gestural.cpp */; };
 		4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */; };
 		4D50B53A1C1B40C90081D56E /* atttypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50B5391C1B40C90081D56E /* atttypes.h */; };
 		4D50B53B1C1B47540081D56E /* atts_pagebased.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3FF8D919BADD7A00B105B5 /* atts_pagebased.cpp */; };
@@ -508,6 +509,7 @@
 		4D4335C31ECF2310003BE1A9 /* atts_gestural.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_gestural.h; path = libmei/atts_gestural.h; sourceTree = "<group>"; };
 		4D4335C41ECF2310003BE1A9 /* atts_visual.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_visual.cpp; path = libmei/atts_visual.cpp; sourceTree = "<group>"; };
 		4D4335C51ECF2310003BE1A9 /* atts_visual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_visual.h; path = libmei/atts_visual.h; sourceTree = "<group>"; };
+		4D4335CC1ED2BACB003BE1A9 /* attalternates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attalternates.h; path = include/vrv/attalternates.h; sourceTree = "<group>"; };
 		4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_mensural.cpp; path = src/view_mensural.cpp; sourceTree = "<group>"; };
 		4D50B5391C1B40C90081D56E /* atttypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atttypes.h; path = libmei/atttypes.h; sourceTree = "<group>"; };
 		4D543E211B80AACF004B823C /* view_control.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_control.cpp; path = src/view_control.cpp; sourceTree = "<group>"; };
@@ -984,6 +986,7 @@
 				8F086F3918853A190037FD8E /* view */,
 				4D422103199805F700963292 /* att.cpp */,
 				4D4220FF199805E400963292 /* att.h */,
+				4D4335CC1ED2BACB003BE1A9 /* attalternates.h */,
 				4D9234F11A586AE100763251 /* attcomparison.h */,
 				4D422100199805E400963292 /* attdef.h */,
 				4D5FA9101E16A93F00F3B919 /* boundingbox.cpp */,
@@ -1410,6 +1413,7 @@
 				4D16942A1E3A44F300569BF4 /* octave.cpp in Sources */,
 				4D16942B1E3A44F300569BF4 /* slur.cpp in Sources */,
 				4D16942C1E3A44F300569BF4 /* staff.cpp in Sources */,
+				4D4335CA1ED00A33003BE1A9 /* atts_gestural.cpp in Sources */,
 				4D16942D1E3A44F300569BF4 /* trill.cpp in Sources */,
 				4D16942E1E3A44F300569BF4 /* textelement.cpp in Sources */,
 				4D16946C1E3A455200569BF4 /* MxmlMeasure.cpp in Sources */,
@@ -1484,7 +1488,6 @@
 				40D0D5E21E3BD7FE00E6BF5C /* turn.cpp in Sources */,
 				4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
 				8F086EEC188539540037FD8E /* io.cpp in Sources */,
-				4D4335C71ECF2310003BE1A9 /* atts_fingering.cpp in Sources */,
 				4D796B5E1D78641900A15238 /* harm.cpp in Sources */,
 				4DB3072F1AC9ED2500EE0982 /* space.cpp in Sources */,
 				8F086EED188539540037FD8E /* iodarms.cpp in Sources */,
@@ -1673,6 +1676,7 @@
 				4D1BE76C1C688F5A0086DC0E /* Binasc.cpp in Sources */,
 				4D9A9C1A199F561200028D93 /* verse.cpp in Sources */,
 				4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */,
+				4D4335CB1ED00A33003BE1A9 /* atts_gestural.cpp in Sources */,
 				4DB0B0171C44129300DBDCC3 /* timestamp.cpp in Sources */,
 				4D1694771E3A455200569BF4 /* MxmlPart.cpp in Sources */,
 				4DF28A061A754DF000BA9F7D /* floatingobject.cpp in Sources */,

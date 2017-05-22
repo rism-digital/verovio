@@ -1177,28 +1177,28 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
         }
         // Check for accidentals
         if (accid && accid->HasAccidGes()) {
-            data_ACCIDENTAL_IMPLICIT accImp = accid->GetAccidGes();
+            data_ACCIDENTAL_GESTURAL accImp = accid->GetAccidGes();
             switch (accImp) {
-                case ACCIDENTAL_IMPLICIT_s: midiBase += 1; break;
-                case ACCIDENTAL_IMPLICIT_f: midiBase -= 1; break;
-                case ACCIDENTAL_IMPLICIT_ss: midiBase += 2; break;
-                case ACCIDENTAL_IMPLICIT_ff: midiBase -= 2; break;
+                case ACCIDENTAL_GESTURAL_s: midiBase += 1; break;
+                case ACCIDENTAL_GESTURAL_f: midiBase -= 1; break;
+                case ACCIDENTAL_GESTURAL_ss: midiBase += 2; break;
+                case ACCIDENTAL_GESTURAL_ff: midiBase -= 2; break;
                 default: break;
             }
         }
         else if (accid) {
-            data_ACCIDENTAL_EXPLICIT accExp = accid->GetAccid();
+            data_ACCIDENTAL_WRITTEN accExp = accid->GetAccid();
             switch (accExp) {
-                case ACCIDENTAL_EXPLICIT_s: midiBase += 1; break;
-                case ACCIDENTAL_EXPLICIT_f: midiBase -= 1; break;
-                case ACCIDENTAL_EXPLICIT_ss: midiBase += 2; break;
-                case ACCIDENTAL_EXPLICIT_x: midiBase += 2; break;
-                case ACCIDENTAL_EXPLICIT_ff: midiBase -= 2; break;
-                case ACCIDENTAL_EXPLICIT_xs: midiBase += 3; break;
-                case ACCIDENTAL_EXPLICIT_ts: midiBase += 3; break;
-                case ACCIDENTAL_EXPLICIT_tf: midiBase -= 3; break;
-                case ACCIDENTAL_EXPLICIT_nf: midiBase -= 1; break;
-                case ACCIDENTAL_EXPLICIT_ns: midiBase += 1; break;
+                case ACCIDENTAL_WRITTEN_s: midiBase += 1; break;
+                case ACCIDENTAL_WRITTEN_f: midiBase -= 1; break;
+                case ACCIDENTAL_WRITTEN_ss: midiBase += 2; break;
+                case ACCIDENTAL_WRITTEN_x: midiBase += 2; break;
+                case ACCIDENTAL_WRITTEN_ff: midiBase -= 2; break;
+                case ACCIDENTAL_WRITTEN_xs: midiBase += 3; break;
+                case ACCIDENTAL_WRITTEN_ts: midiBase += 3; break;
+                case ACCIDENTAL_WRITTEN_tf: midiBase -= 3; break;
+                case ACCIDENTAL_WRITTEN_nf: midiBase -= 1; break;
+                case ACCIDENTAL_WRITTEN_ns: midiBase += 1; break;
                 default: break;
             }
         }

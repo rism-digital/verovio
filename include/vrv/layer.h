@@ -32,7 +32,7 @@ class StaffDef;
 class Layer : public Object,
               public DrawingListInterface,
               public ObjectListInterface,
-              public AttCommon,
+              public AttNInteger,
               public AttTyped {
 public:
     /**

@@ -252,7 +252,7 @@ private:
  * cross-staff situations.
  * Its children of the alignment are references.
  */
-class AlignmentReference : public Object, public AttBasic {
+class AlignmentReference : public Object, public AttNInteger {
 public:
     /**
     * @name Constructors, destructors, reset methods

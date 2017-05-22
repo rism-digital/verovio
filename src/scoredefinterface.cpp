@@ -26,6 +26,7 @@ namespace vrv {
 ScoreDefInterface::ScoreDefInterface()
     : Interface()
     , AttCleffingLog()
+    , AttKeySigDefaultAnl()
     , AttKeySigDefaultLog()
     , AttKeySigDefaultVis()
     , AttLyricstyle()
@@ -37,6 +38,7 @@ ScoreDefInterface::ScoreDefInterface()
     , AttMultinummeasures()
 {
     RegisterInterfaceAttClass(ATT_CLEFFINGLOG);
+    RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTANL);
     RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTLOG);
     RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTVIS);
     RegisterInterfaceAttClass(ATT_LYRICSTYLE);
@@ -57,6 +59,7 @@ ScoreDefInterface::~ScoreDefInterface()
 void ScoreDefInterface::Reset()
 {
     ResetCleffingLog();
+    ResetKeySigDefaultAnl();
     ResetKeySigDefaultLog();
     ResetKeySigDefaultVis();
     ResetLyricstyle();

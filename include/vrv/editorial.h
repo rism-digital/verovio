@@ -39,8 +39,7 @@ enum VisibilityType { Hidden = 0, Visible };
  */
 class EditorialElement : public Object,
                          public BoundaryStartInterface,
-                         public AttCommon,
-                         public AttCommonPart,
+                         public AttLabelled,
                          public AttTyped {
 public:
     /**

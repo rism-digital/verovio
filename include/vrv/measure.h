@@ -31,7 +31,7 @@ class TimestampAttr;
  * It contains Layer objects.
  * For internally simplication of processing, unmeasured music is contained in one single measure object
  */
-class Measure : public Object, public AttCommon, public AttMeasureLog, public AttPointing, public AttTyped {
+class Measure : public Object, public AttMeasureLog, public AttNNumberLike, public AttPointing, public AttTyped {
 
 public:
     /**

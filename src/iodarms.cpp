@@ -69,17 +69,17 @@ void DarmsInput::UnrollKeysig(int quantity, char alter)
     // data_PITCHNAME sharps[]
     //    = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
     // data_PITCHNAME *alteration_set;
-    data_ACCIDENTAL_EXPLICIT accid = ACCIDENTAL_EXPLICIT_NONE;
+    data_ACCIDENTAL_WRITTEN accid = ACCIDENTAL_WRITTEN_NONE;
 
     if (quantity == 0) quantity++;
 
     if (alter == '-') {
         // alteration_set = flats;
-        accid = ACCIDENTAL_EXPLICIT_f;
+        accid = ACCIDENTAL_WRITTEN_f;
     }
     else {
         // alteration_set = sharps;
-        accid = ACCIDENTAL_EXPLICIT_s;
+        accid = ACCIDENTAL_WRITTEN_s;
     }
 
     KeySig *k = new KeySig(quantity, accid);
@@ -275,7 +275,7 @@ int DarmsInput::do_Clef(int pos, const char *data)
 int DarmsInput::do_Note(int pos, const char *data, bool rest)
 {
     int position;
-    data_ACCIDENTAL_EXPLICIT accidental = ACCIDENTAL_EXPLICIT_NONE;
+    data_ACCIDENTAL_WRITTEN accidental = ACCIDENTAL_WRITTEN_NONE;
     data_DURATION duration;
     int dot = 0;
     int tie = 0;
@@ -302,15 +302,15 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
     }
 
     if (data[pos + 1] == '-') {
-        accidental = ACCIDENTAL_EXPLICIT_f;
+        accidental = ACCIDENTAL_WRITTEN_f;
         pos++;
     }
     else if (data[pos + 1] == '#') {
-        accidental = ACCIDENTAL_EXPLICIT_s;
+        accidental = ACCIDENTAL_WRITTEN_s;
         pos++;
     }
     else if (data[pos + 1] == '*') {
-        accidental = ACCIDENTAL_EXPLICIT_n;
+        accidental = ACCIDENTAL_WRITTEN_n;
         pos++;
     }
 
@@ -366,7 +366,7 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
         Note *note = new Note;
         note->SetDur(duration);
         note->SetDurGes(DURATION_8);
-        if (accidental != ACCIDENTAL_EXPLICIT_NONE) {
+        if (accidental != ACCIDENTAL_WRITTEN_NONE) {
             Accid *accid = new Accid();
             accid->SetAccid(accidental);
             note->AddChild(accid);

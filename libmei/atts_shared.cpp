@@ -2396,7 +2396,7 @@ AttKeySigDefaultLog::~AttKeySigDefaultLog()
 void AttKeySigDefaultLog::ResetKeySigDefaultLog()
 {
     m_keyFifths = "";
-    m_keySig = "";
+    m_keySig = KEYSIGNATURE_NONE;
 }
 
 bool AttKeySigDefaultLog::ReadKeySigDefaultLog(pugi::xml_node element)
@@ -2408,7 +2408,7 @@ bool AttKeySigDefaultLog::ReadKeySigDefaultLog(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("key.sig")) {
-        this->SetKeySig(StrToStr(element.attribute("key.sig").value()));
+        this->SetKeySig(StrToKeysignature(element.attribute("key.sig").value()));
         element.remove_attribute("key.sig");
         hasAttribute = true;
     }
@@ -2423,7 +2423,7 @@ bool AttKeySigDefaultLog::WriteKeySigDefaultLog(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasKeySig()) {
-        element.append_attribute("key.sig") = StrToStr(this->GetKeySig()).c_str();
+        element.append_attribute("key.sig") = KeysignatureToStr(this->GetKeySig()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -2436,7 +2436,7 @@ bool AttKeySigDefaultLog::HasKeyFifths() const
 
 bool AttKeySigDefaultLog::HasKeySig() const
 {
-    return (m_keySig != "");
+    return (m_keySig != KEYSIGNATURE_NONE);
 }
 
 /* include <attkey.sig> */
@@ -4940,14 +4940,14 @@ AttPlacement::~AttPlacement()
 
 void AttPlacement::ResetPlacement()
 {
-    m_place = STAFFREL_extended_NONE;
+    m_place = data_STAFFREL();
 }
 
 bool AttPlacement::ReadPlacement(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("place")) {
-        this->SetPlace(StrToStaffrelExtended(element.attribute("place").value()));
+        this->SetPlace(StrToStaffrel(element.attribute("place").value()));
         element.remove_attribute("place");
         hasAttribute = true;
     }
@@ -4958,7 +4958,7 @@ bool AttPlacement::WritePlacement(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasPlace()) {
-        element.append_attribute("place") = StaffrelExtendedToStr(this->GetPlace()).c_str();
+        element.append_attribute("place") = StaffrelToStr(this->GetPlace()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -4966,7 +4966,7 @@ bool AttPlacement::WritePlacement(pugi::xml_node element)
 
 bool AttPlacement::HasPlace() const
 {
-    return (m_place != STAFFREL_extended_NONE);
+    return (m_place.HasValue());
 }
 
 /* include <attplace> */
@@ -5643,14 +5643,14 @@ AttStaffIdent::~AttStaffIdent()
 
 void AttStaffIdent::ResetStaffIdent()
 {
-    m_staff = 0;
+    m_staff = std::vector<int>();
 }
 
 bool AttStaffIdent::ReadStaffIdent(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("staff")) {
-        this->SetStaff(StrToInt(element.attribute("staff").value()));
+        this->SetStaff(StrToXsdPositiveIntegerList(element.attribute("staff").value()));
         element.remove_attribute("staff");
         hasAttribute = true;
     }
@@ -5661,7 +5661,7 @@ bool AttStaffIdent::WriteStaffIdent(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasStaff()) {
-        element.append_attribute("staff") = IntToStr(this->GetStaff()).c_str();
+        element.append_attribute("staff") = XsdPositiveIntegerListToStr(this->GetStaff()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5669,7 +5669,7 @@ bool AttStaffIdent::WriteStaffIdent(pugi::xml_node element)
 
 bool AttStaffIdent::HasStaff() const
 {
-    return (m_staff != 0);
+    return (m_staff != std::vector<int>());
 }
 
 /* include <attstaff> */
@@ -5689,9 +5689,9 @@ AttStaffItems::~AttStaffItems()
 
 void AttStaffItems::ResetStaffItems()
 {
-    m_aboveorder = STAFFITEM_NONE;
-    m_beloworder = STAFFITEM_NONE;
-    m_betweenorder = STAFFITEM_NONE;
+    m_aboveorder = data_STAFFITEM();
+    m_beloworder = data_STAFFITEM();
+    m_betweenorder = data_STAFFITEM();
 }
 
 bool AttStaffItems::ReadStaffItems(pugi::xml_node element)
@@ -5735,17 +5735,17 @@ bool AttStaffItems::WriteStaffItems(pugi::xml_node element)
 
 bool AttStaffItems::HasAboveorder() const
 {
-    return (m_aboveorder != STAFFITEM_NONE);
+    return (m_aboveorder.HasValue());
 }
 
 bool AttStaffItems::HasBeloworder() const
 {
-    return (m_beloworder != STAFFITEM_NONE);
+    return (m_beloworder.HasValue());
 }
 
 bool AttStaffItems::HasBetweenorder() const
 {
-    return (m_betweenorder != STAFFITEM_NONE);
+    return (m_betweenorder.HasValue());
 }
 
 /* include <attbetweenorder> */
@@ -5765,7 +5765,7 @@ AttStaffLoc::~AttStaffLoc()
 
 void AttStaffLoc::ResetStaffLoc()
 {
-    m_loc = 0;
+    m_loc = VRV_UNSET;
 }
 
 bool AttStaffLoc::ReadStaffLoc(pugi::xml_node element)
@@ -5791,7 +5791,7 @@ bool AttStaffLoc::WriteStaffLoc(pugi::xml_node element)
 
 bool AttStaffLoc::HasLoc() const
 {
-    return (m_loc != 0);
+    return (m_loc != VRV_UNSET);
 }
 
 /* include <attloc> */
@@ -6603,7 +6603,7 @@ AttTimestampLogical::~AttTimestampLogical()
 
 void AttTimestampLogical::ResetTimestampLogical()
 {
-    m_tstamp = 0.0;
+    m_tstamp = -1.0;
 }
 
 bool AttTimestampLogical::ReadTimestampLogical(pugi::xml_node element)
@@ -6629,7 +6629,7 @@ bool AttTimestampLogical::WriteTimestampLogical(pugi::xml_node element)
 
 bool AttTimestampLogical::HasTstamp() const
 {
-    return (m_tstamp != 0.0);
+    return (m_tstamp != -1.0);
 }
 
 /* include <atttstamp> */
@@ -8062,7 +8062,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "key.sig") {
-            att->SetKeySig(att->StrToStr(attrValue));
+            att->SetKeySig(att->StrToKeysignature(attrValue));
             return true;
         }
     }
@@ -8566,7 +8566,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttPlacement *att = dynamic_cast<AttPlacement *>(element);
         assert(att);
         if (attrType == "place") {
-            att->SetPlace(att->StrToStaffrelExtended(attrValue));
+            att->SetPlace(att->StrToStaffrel(attrValue));
             return true;
         }
     }
@@ -8698,7 +8698,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttStaffIdent *att = dynamic_cast<AttStaffIdent *>(element);
         assert(att);
         if (attrType == "staff") {
-            att->SetStaff(att->StrToInt(attrValue));
+            att->SetStaff(att->StrToXsdPositiveIntegerList(attrValue));
             return true;
         }
     }
@@ -9465,7 +9465,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("key.fifths", att->StrToStr(att->GetKeyFifths())));
         }
         if (att->HasKeySig()) {
-            attributes->push_back(std::make_pair("key.sig", att->StrToStr(att->GetKeySig())));
+            attributes->push_back(std::make_pair("key.sig", att->KeysignatureToStr(att->GetKeySig())));
         }
     }
     if (element->HasAttClass(ATT_LABELLED)) {
@@ -9883,7 +9883,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttPlacement *att = dynamic_cast<const AttPlacement *>(element);
         assert(att);
         if (att->HasPlace()) {
-            attributes->push_back(std::make_pair("place", att->StaffrelExtendedToStr(att->GetPlace())));
+            attributes->push_back(std::make_pair("place", att->StaffrelToStr(att->GetPlace())));
         }
     }
     if (element->HasAttClass(ATT_PLIST)) {
@@ -9995,7 +9995,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttStaffIdent *att = dynamic_cast<const AttStaffIdent *>(element);
         assert(att);
         if (att->HasStaff()) {
-            attributes->push_back(std::make_pair("staff", att->IntToStr(att->GetStaff())));
+            attributes->push_back(std::make_pair("staff", att->XsdPositiveIntegerListToStr(att->GetStaff())));
         }
     }
     if (element->HasAttClass(ATT_STAFFITEMS)) {
