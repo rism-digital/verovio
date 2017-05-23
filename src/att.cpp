@@ -48,14 +48,6 @@ std::string Att::IntToStr(int data) const
     return StringFormat("%d", data);
 }
 
-std::string Att::WcharTToStr(wchar_t data) const
-{
-    char buf[5];
-    memset(buf, 0, 5);
-    sprintf(buf, "%.4X", data);
-    return StringFormat("U+%s", buf);
-}
-
 // Basic converters for reading
 
 double Att::StrToDbl(std::string value) const
@@ -66,30 +58,6 @@ double Att::StrToDbl(std::string value) const
 int Att::StrToInt(std::string value) const
 {
     return atoi(value.c_str());
-}
-
-wchar_t Att::StrToWcharT(std::string value) const
-{
-    std::string prefix1 = "U+";
-    std::string prefix2 = "#x";
-    if (value.compare(0, prefix1.length(), prefix1) == 0) {
-        value.erase(0, 2);
-    }
-    else if (value.compare(0, prefix2.length(), prefix2) == 0) {
-        value.erase(0, 2);
-    }
-    else {
-        LogWarning("Unable to parse glyph code '%s'", value.c_str());
-        return 0;
-    }
-    wchar_t wc = (wchar_t)strtol(value.c_str(), NULL, 16);
-    // Check that the value is in a SMuFL private area range - this does not check that it is an
-    // existing SMuFL glyph num or that it is supported by Verovio
-    if ((wc >= 0xE000) && (wc <= 0xF8FF))
-        return wc;
-    else
-        LogWarning("Value '%s' is not in the SMuFL (private area) range", value.c_str());
-    return 0;
 }
 
 // Converters for writing and reading
@@ -104,7 +72,7 @@ std::string Att::ArticulationListToStr(data_ARTICULATION_List data) const
     return ss.str();
 }
 
-data_ARTICULATION_List Att::StrToArticulationList(std::string value) const
+data_ARTICULATION_List Att::StrToArticulationList(std::string value, bool logWarning) const
 {
     data_ARTICULATION_List list;
     std::istringstream iss(value);
@@ -134,7 +102,7 @@ std::string Att::BeatrptRendToStr(data_BEATRPT_REND data) const
     return value;
 }
 
-data_BEATRPT_REND Att::StrToBeatrptRend(std::string value) const
+data_BEATRPT_REND Att::StrToBeatrptRend(std::string value, bool logWarning) const
 {
     if (value == "4") return BEATRPT_REND_4;
     if (value == "8") return BEATRPT_REND_8;
@@ -143,7 +111,8 @@ data_BEATRPT_REND Att::StrToBeatrptRend(std::string value) const
     if (value == "64") return BEATRPT_REND_64;
     if (value == "128") return BEATRPT_REND_128;
     if (value == "mixed") return BEATRPT_REND_mixed;
-    LogWarning("Unsupported beatrpt rend '%s'", value.c_str());
+    if (logWarning)
+        LogWarning("Unsupported beatrpt rend '%s'", value.c_str());
     return BEATRPT_REND_NONE;
 }
 
@@ -178,7 +147,7 @@ std::string Att::DurationToStr(data_DURATION data) const
     return value;
 }
 
-data_DURATION Att::StrToDuration(std::string value) const
+data_DURATION Att::StrToDuration(std::string value, bool logWarning) const
 {
     if (value == "maxima") return DURATION_maxima;
     if (value == "longa") return DURATION_longa;
@@ -200,7 +169,8 @@ data_DURATION Att::StrToDuration(std::string value) const
     if (value == "128") return DURATION_128;
     if (value == "256") return DURATION_256;
     if ((value.length() > 0) && (value[value.length() - 1] == 'p')) {
-        // LogWarning("PPQ duration dur_s are not supported"); // remove it for now
+        //if (logWarning)
+            // LogWarning("PPQ duration dur_s are not supported"); // remove it for now
     }
     else {
         LogWarning("Unknown dur '%s'", value.c_str());
@@ -210,14 +180,34 @@ data_DURATION Att::StrToDuration(std::string value) const
 
 std::string Att::HexnumToStr(data_HEXNUM data) const
 {
-    std::string value;
-    return value;
+    char buf[5];
+    memset(buf, 0, 5);
+    sprintf(buf, "%.4X", data);
+    return StringFormat("U+%s", buf);
 }
 
-data_HEXNUM Att::StrToHexnum(std::string value) const
+data_HEXNUM Att::StrToHexnum(std::string value, bool logWarning) const
 {
-    data_HEXNUM hexnum = 0;
-    return hexnum;
+    std::string prefix1 = "U+";
+    std::string prefix2 = "#x";
+    if (value.compare(0, prefix1.length(), prefix1) == 0) {
+        value.erase(0, 2);
+    }
+    else if (value.compare(0, prefix2.length(), prefix2) == 0) {
+        value.erase(0, 2);
+    }
+    else {
+        LogWarning("Unable to parse glyph code '%s'", value.c_str());
+        return 0;
+    }
+    wchar_t wc = (wchar_t)strtol(value.c_str(), NULL, 16);
+    // Check that the value is in a SMuFL private area range - this does not check that it is an
+    // existing SMuFL glyph num or that it is supported by Verovio
+    if ((wc >= 0xE000) && (wc <= 0xF8FF))
+        return wc;
+    else if (logWarning)
+        LogWarning("Value '%s' is not in the SMuFL (private area) range", value.c_str());
+    return 0;
 }
 
 std::string Att::FontsizeToStr(data_FONTSIZE data) const
@@ -230,7 +220,7 @@ std::string Att::FontsizeToStr(data_FONTSIZE data) const
     return value;
 }
 
-data_FONTSIZE Att::StrToFontsize(std::string value) const
+data_FONTSIZE Att::StrToFontsize(std::string value, bool logWarning) const
 {
     // Here we need to analyse the content and get the right type
     data_FONTSIZE fs;
@@ -266,7 +256,7 @@ std::string Att::KeysignatureToStr(data_KEYSIGNATURE data) const
     return value;
 }
 
-data_KEYSIGNATURE Att::StrToKeysignature(std::string value) const
+data_KEYSIGNATURE Att::StrToKeysignature(std::string value, bool logWarning) const
 {
     if (value == "7f") return KEYSIGNATURE_7f;
     if (value == "6f") return KEYSIGNATURE_6f;
@@ -284,7 +274,8 @@ data_KEYSIGNATURE Att::StrToKeysignature(std::string value) const
     if (value == "6s") return KEYSIGNATURE_6s;
     if (value == "7s") return KEYSIGNATURE_7s;
     if (value == "mixed") return KEYSIGNATURE_mixed;
-    LogWarning("Unsupported key signature '%s'", value.c_str());
+    if (logWarning)
+        LogWarning("Unsupported key signature '%s'", value.c_str());
     return KEYSIGNATURE_NONE;
 }
 
@@ -293,7 +284,7 @@ std::string Att::MeasurebeatToStr(data_MEASUREBEAT data) const
     return StringFormat("%dm+%.1f", data.first, data.second);
 }
 
-data_MEASUREBEAT Att::StrToMeasurebeat(std::string value) const
+data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool logWarning) const
 {
     for (size_t i = 0; i < value.length(); i++) {
         if (iswspace(value[i])) {
@@ -329,11 +320,12 @@ std::string Att::ModusmaiorToStr(data_MODUSMAIOR data) const
     return value;
 }
 
-data_MODUSMAIOR Att::StrToModusmaior(std::string value) const
+data_MODUSMAIOR Att::StrToModusmaior(std::string value, bool logWarning) const
 {
     if (value == "2") return MODUSMAIOR_2;
     if (value == "3") return MODUSMAIOR_3;
-    LogWarning("Unsupported modusmaior '%s'", value.c_str());
+    if (logWarning)
+        LogWarning("Unsupported modusmaior '%s'", value.c_str());
     return MODUSMAIOR_NONE;
 }
 
@@ -351,11 +343,12 @@ std::string Att::ModusminorToStr(data_MODUSMINOR data) const
     return value;
 }
 
-data_MODUSMINOR Att::StrToModusminor(std::string value) const
+data_MODUSMINOR Att::StrToModusminor(std::string value, bool logWarning) const
 {
     if (value == "2") return MODUSMINOR_2;
     if (value == "3") return MODUSMINOR_3;
-    LogWarning("Unsupported modusmaior '%s'", value.c_str());
+    if (logWarning)
+        LogWarning("Unsupported modusmaior '%s'", value.c_str());
     return MODUSMINOR_NONE;
 }
 
@@ -374,12 +367,13 @@ std::string Att::OctaveDisToStr(data_OCTAVE_DIS data) const
     return value;
 }
 
-data_OCTAVE_DIS Att::StrToOctaveDis(std::string value) const
+data_OCTAVE_DIS Att::StrToOctaveDis(std::string value, bool logWarning) const
 {
     if (value == "8") return OCTAVE_DIS_8;
     if (value == "15") return OCTAVE_DIS_15;
     if (value == "22") return OCTAVE_DIS_22;
-    LogWarning("Unsupported octave dis '%s'", value.c_str());
+    if (logWarning)
+        LogWarning("Unsupported octave dis '%s'", value.c_str());
     return OCTAVE_DIS_NONE;
 }
 
@@ -398,12 +392,13 @@ std::string Att::OrientationToStr(data_ORIENTATION data) const
     return value;
 }
 
-data_ORIENTATION Att::StrToOrientation(std::string value) const
+data_ORIENTATION Att::StrToOrientation(std::string value, bool logWarning) const
 {
     if (value == "reversed") return ORIENTATION_reversed;
     if (value == "90CW") return ORIENTATION_90CW;
     if (value == "90CCW") return ORIENTATION_90CCW;
-    LogWarning("Unsupported orientation '%s'", value.c_str());
+    if (logWarning)
+        LogWarning("Unsupported orientation '%s'", value.c_str());
     return ORIENTATION_NONE;
 }
 
@@ -412,7 +407,7 @@ std::string Att::PercentToStr(data_PERCENT data) const
     return StringFormat("%d%%", data);
 }
 
-data_PERCENT Att::StrToPercent(std::string value) const
+data_PERCENT Att::StrToPercent(std::string value, bool logWarning) const
 {
     return atoi(value.substr(0, value.find("%")).c_str());
 }
@@ -436,7 +431,7 @@ std::string Att::PitchnameToStr(data_PITCHNAME data) const
     return value;
 }
 
-data_PITCHNAME Att::StrToPitchname(std::string value) const
+data_PITCHNAME Att::StrToPitchname(std::string value, bool logWarning) const
 {
     if (value == "c") return PITCHNAME_c;
     if (value == "d") return PITCHNAME_d;
@@ -445,7 +440,8 @@ data_PITCHNAME Att::StrToPitchname(std::string value) const
     if (value == "g") return PITCHNAME_g;
     if (value == "a") return PITCHNAME_a;
     if (value == "b") return PITCHNAME_b;
-    LogWarning("Unsupported pitch name '%s'", value.c_str());
+    if (logWarning)
+        LogWarning("Unsupported pitch name '%s'", value.c_str());
     return PITCHNAME_NONE;
 }
 
@@ -455,7 +451,7 @@ std::string Att::PlacementToStr(data_PLACEMENT data) const
     return value;
 }
 
-data_PLACEMENT Att::StrToPlacement(std::string value) const
+data_PLACEMENT Att::StrToPlacement(std::string value, bool logWarning) const
 {
     data_PLACEMENT placement;
     return placement;
@@ -475,11 +471,12 @@ std::string Att::ProlatioToStr(data_PROLATIO data) const
     return value;
 }
 
-data_PROLATIO Att::StrToProlatio(std::string value) const
+data_PROLATIO Att::StrToProlatio(std::string value, bool logWarning) const
 {
     if (value == "2") return PROLATIO_2;
     if (value == "3") return PROLATIO_3;
-    LogWarning("Unsupported prolatio '%s'", value.c_str());
+    if (logWarning)
+        LogWarning("Unsupported prolatio '%s'", value.c_str());
     return PROLATIO_NONE;
 }
 
@@ -489,7 +486,7 @@ std::string Att::StaffitemToStr(data_STAFFITEM data) const
     return value;
 }
 
-data_STAFFITEM Att::StrToStaffitem(std::string value) const
+data_STAFFITEM Att::StrToStaffitem(std::string value, bool logWarning) const
 {
     data_STAFFITEM staffItem;
     return staffItem;
@@ -501,7 +498,7 @@ std::string Att::StaffrelToStr(data_STAFFREL data) const
     return value;
 }
 
-data_STAFFREL Att::StrToStaffrel(std::string value) const
+data_STAFFREL Att::StrToStaffrel(std::string value, bool logWarning) const
 {
     data_STAFFREL staffRel;
     return staffRel;
@@ -521,11 +518,12 @@ std::string Att::StemdirectionToStr(data_STEMDIRECTION data) const
     return value;
 }
 
-data_STEMDIRECTION Att::StrToStemdirection(std::string value) const
+data_STEMDIRECTION Att::StrToStemdirection(std::string value, bool logWarning) const
 {
     if (value == "up") return STEMDIRECTION_up;
     if (value == "down") return STEMDIRECTION_down;
-    LogWarning("Unsupported stem direction '%s'", value.c_str());
+    if (logWarning)
+        LogWarning("Unsupported stem direction '%s'", value.c_str());
     return STEMDIRECTION_NONE;
 }
 
@@ -543,11 +541,12 @@ std::string Att::TempusToStr(data_TEMPUS data) const
     return value;
 }
 
-data_TEMPUS Att::StrToTempus(std::string value) const
+data_TEMPUS Att::StrToTempus(std::string value, bool logWarning) const
 {
     if (value == "2") return TEMPUS_2;
     if (value == "3") return TEMPUS_3;
-    LogWarning("Unsupported tempus '%s'", value.c_str());
+    if (logWarning)
+        LogWarning("Unsupported tempus '%s'", value.c_str());
     return TEMPUS_NONE;
 }
 
@@ -566,12 +565,13 @@ std::string Att::TieToStr(data_TIE data) const
     return value;
 }
 
-data_TIE Att::StrToTie(std::string value) const
+data_TIE Att::StrToTie(std::string value, bool logWarning) const
 {
     if (value == "i") return TIE_i;
     if (value == "m") return TIE_m;
     if (value == "t") return TIE_t;
-    LogWarning("Unsupported tie '%s'", value.c_str());
+    if (logWarning)
+        LogWarning("Unsupported tie '%s'", value.c_str());
     return TIE_NONE;
 }
 

@@ -225,8 +225,8 @@ class StaffGrp : public Object,
                  public AttLabelled,
                  // FIXME changed in MEI 4.0.0
                  // public AttLabelsAddl,
-                 public AttStaffGrpVis,
                  public AttStaffGroupingSym,
+                 public AttStaffGrpVis,
                  public AttTyped {
 public:
     /**

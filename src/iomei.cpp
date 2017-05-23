@@ -2233,8 +2233,8 @@ bool MeiInput::ReadMeiStaffGrp(Object *parent, pugi::xml_node staffGrp)
     vrvStaffGrp->ReadLabelled(staffGrp);
     // FIXME MEI 4.0.0
     // vrvStaffGrp->ReadLabelsAddl(staffGrp);
-    vrvStaffGrp->ReadStaffGrpVis(staffGrp);
     vrvStaffGrp->ReadStaffGroupingSym(staffGrp);
+    vrvStaffGrp->ReadStaffGrpVis(staffGrp);
     vrvStaffGrp->ReadTyped(staffGrp);
 
     parent->AddChild(vrvStaffGrp);

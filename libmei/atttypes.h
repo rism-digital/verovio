@@ -1641,7 +1641,6 @@ enum whitespace_XMLSPACE {
 };
 
 
-
 } // vrv namespace
 
 #endif // __VRV_ATT_TYPES_H__

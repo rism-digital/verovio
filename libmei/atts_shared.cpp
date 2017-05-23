@@ -4682,8 +4682,8 @@ AttOriginTimestampLogical::~AttOriginTimestampLogical()
 
 void AttOriginTimestampLogical::ResetOriginTimestampLogical()
 {
-    m_originTstamp = std::make_pair(-1,-1.0);
-    m_originTstamp2 = std::make_pair(-1,-1.0);
+    m_originTstamp = std::make_pair(-1, -1.0);
+    m_originTstamp2 = std::make_pair(-1, -1.0);
 }
 
 bool AttOriginTimestampLogical::ReadOriginTimestampLogical(pugi::xml_node element)
@@ -4718,12 +4718,12 @@ bool AttOriginTimestampLogical::WriteOriginTimestampLogical(pugi::xml_node eleme
 
 bool AttOriginTimestampLogical::HasOriginTstamp() const
 {
-    return (m_originTstamp != std::make_pair(-1,-1.0));
+    return (m_originTstamp != std::make_pair(-1, -1.0));
 }
 
 bool AttOriginTimestampLogical::HasOriginTstamp2() const
 {
-    return (m_originTstamp2 != std::make_pair(-1,-1.0));
+    return (m_originTstamp2 != std::make_pair(-1, -1.0));
 }
 
 /* include <attorigin.tstamp2> */
@@ -6649,7 +6649,7 @@ AttTimestamp2Logical::~AttTimestamp2Logical()
 
 void AttTimestamp2Logical::ResetTimestamp2Logical()
 {
-    m_tstamp2 = std::make_pair(-1,-1.0);
+    m_tstamp2 = std::make_pair(-1, -1.0);
 }
 
 bool AttTimestamp2Logical::ReadTimestamp2Logical(pugi::xml_node element)
@@ -6675,7 +6675,7 @@ bool AttTimestamp2Logical::WriteTimestamp2Logical(pugi::xml_node element)
 
 bool AttTimestamp2Logical::HasTstamp2() const
 {
-    return (m_tstamp2 != std::make_pair(-1,-1.0));
+    return (m_tstamp2 != std::make_pair(-1, -1.0));
 }
 
 /* include <atttstamp2> */
