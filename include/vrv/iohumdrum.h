@@ -378,6 +378,7 @@ protected:
     static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
     std::string cleanHarmString(const std::string &content);
+	std::string cleanHarmString2(const std::string &content);
     std::vector<std::string> cleanFBString(const std::string &content);
 
 private:
