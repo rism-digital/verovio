@@ -495,12 +495,24 @@ data_STAFFITEM Att::StrToStaffitem(std::string value, bool logWarning) const
 std::string Att::StaffrelToStr(data_STAFFREL data) const
 {
     std::string value;
+    if (data.GetType() == STAFFREL_basic)
+        value = StaffrelBasicToStr(data.GetBasic());
+    else if (data.GetType() == STAFFREL_extended)
+        value = StaffrelExtendedToStr(data.GetExtended());
     return value;
 }
 
 data_STAFFREL Att::StrToStaffrel(std::string value, bool logWarning) const
 {
     data_STAFFREL staffRel;
+    staffRel.SetBasic(StrToStaffrelBasic(value, false));
+    if (staffRel.HasValue())
+        return staffRel;
+    staffRel.SetExtended(StrToStaffrelExtended(value, false));
+    if (staffRel.HasValue())
+        return staffRel;
+    if (logWarning)
+        LogWarning("Unsupported data.STAFFREL '%s'", value.c_str());
     return staffRel;
 }
 

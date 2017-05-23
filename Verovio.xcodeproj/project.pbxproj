@@ -868,18 +868,12 @@
 		4DEE28EC1940BCA100C76319 /* libmei */ = {
 			isa = PBXGroup;
 			children = (
-				4D4335BE1ECF2310003BE1A9 /* atts_analytical.cpp */,
-				4D4335BF1ECF2310003BE1A9 /* atts_analytical.h */,
-				4D4335C01ECF2310003BE1A9 /* atts_fingering.cpp */,
-				4D4335C11ECF2310003BE1A9 /* atts_fingering.h */,
-				4D4335C21ECF2310003BE1A9 /* atts_gestural.cpp */,
-				4D4335C31ECF2310003BE1A9 /* atts_gestural.h */,
-				4D4335C41ECF2310003BE1A9 /* atts_visual.cpp */,
-				4D4335C51ECF2310003BE1A9 /* atts_visual.h */,
 				4DF9D2951C1B3F0A0069E8C8 /* attclasses.h */,
 				4DF9D2961C1B3F0A0069E8C8 /* attconverter.cpp */,
 				4DF9D2971C1B3F0A0069E8C8 /* attconverter.h */,
 				4D50B5391C1B40C90081D56E /* atttypes.h */,
+				4D4335BE1ECF2310003BE1A9 /* atts_analytical.cpp */,
+				4D4335BF1ECF2310003BE1A9 /* atts_analytical.h */,
 				4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */,
 				4DEE28F01940BCC100C76319 /* atts_cmn.h */,
 				4DEE28F11940BCC100C76319 /* atts_cmnornaments.cpp */,
@@ -894,10 +888,14 @@
 				4DEE28F81940BCC100C76319 /* atts_facsimile.h */,
 				4DEE28F91940BCC100C76319 /* atts_figtable.cpp */,
 				4DEE28FA1940BCC100C76319 /* atts_figtable.h */,
+				4D4335C01ECF2310003BE1A9 /* atts_fingering.cpp */,
+				4D4335C11ECF2310003BE1A9 /* atts_fingering.h */,
 				4DEE28FB1940BCC100C76319 /* atts_harmony.cpp */,
 				4DEE28FC1940BCC100C76319 /* atts_harmony.h */,
 				4DEE28FD1940BCC100C76319 /* atts_header.cpp */,
 				4DEE28FE1940BCC100C76319 /* atts_header.h */,
+				4D4335C21ECF2310003BE1A9 /* atts_gestural.cpp */,
+				4D4335C31ECF2310003BE1A9 /* atts_gestural.h */,
 				4DF9D2811C18DC490069E8C8 /* atts_mei.cpp */,
 				4DF9D2821C18DC490069E8C8 /* atts_mei.h */,
 				4DEE29031940BCC100C76319 /* atts_mensural.cpp */,
@@ -912,6 +910,8 @@
 				4DEE290A1940BCC100C76319 /* atts_shared.h */,
 				4DF9D2881C18DE270069E8C8 /* atts_usersymbols.cpp */,
 				4DF9D2891C18DE270069E8C8 /* atts_usersymbols.h */,
+				4D4335C41ECF2310003BE1A9 /* atts_visual.cpp */,
+				4D4335C51ECF2310003BE1A9 /* atts_visual.h */,
 			);
 			name = libmei;
 			sourceTree = "<group>";
