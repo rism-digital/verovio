@@ -207,13 +207,25 @@ data_DURATION Att::StrToDuration(std::string value) const
     }
     return DURATION_NONE;
 }
+    
+std::string Att::HexnumToStr(data_HEXNUM data) const
+{
+    std::string value;
+    return value;
+}
 
+data_HEXNUM Att::StrToHexnum(std::string value) const
+{
+    data_HEXNUM hexnum = 0;
+    return hexnum;
+}
+    
 std::string Att::FontsizeToStr(data_FONTSIZE data) const
 {
     // Here we need to format the output for each type
     std::string value;
-    if (data.GetType() == FONTSIZE_point) {
-        value = StringFormat("%fpt", data.GetValue());
+    if (data.GetType() == FONTSIZE_fontSizeNumeric) {
+        value = StringFormat("%fpt", data.GetFontSizeNumeric());
     }
     return value;
 }
@@ -221,8 +233,8 @@ std::string Att::FontsizeToStr(data_FONTSIZE data) const
 data_FONTSIZE Att::StrToFontsize(std::string value) const
 {
     // Here we need to analyse the content and get the right type
-    data_FONTSIZE fs(FONTSIZE_point);
-    fs.SetValue(atoi(value.c_str()));
+    data_FONTSIZE fs;
+    fs.SetFontSizeNumeric(atoi(value.c_str()));
     return fs;
 }
 
@@ -346,49 +358,7 @@ data_MODUSMINOR Att::StrToModusminor(std::string value) const
     LogWarning("Unsupported modusmaior '%s'", value.c_str());
     return MODUSMINOR_NONE;
 }
-
-std::string Att::PercentToStr(data_PERCENT data) const
-{
-    return StringFormat("%d%%", data);
-}
-
-data_PERCENT Att::StrToPercent(std::string value) const
-{
-    return atoi(value.substr(0, value.find("%")).c_str());
-}
-
-std::string Att::PitchnameToStr(data_PITCHNAME data) const
-{
-    std::string value;
-    switch (data) {
-        case PITCHNAME_c: value = "c"; break;
-        case PITCHNAME_d: value = "d"; break;
-        case PITCHNAME_e: value = "e"; break;
-        case PITCHNAME_f: value = "f"; break;
-        case PITCHNAME_g: value = "g"; break;
-        case PITCHNAME_a: value = "a"; break;
-        case PITCHNAME_b: value = "b"; break;
-        default:
-            LogWarning("Unknown pitch name '%d'", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-data_PITCHNAME Att::StrToPitchname(std::string value) const
-{
-    if (value == "c") return PITCHNAME_c;
-    if (value == "d") return PITCHNAME_d;
-    if (value == "e") return PITCHNAME_e;
-    if (value == "f") return PITCHNAME_f;
-    if (value == "g") return PITCHNAME_g;
-    if (value == "a") return PITCHNAME_a;
-    if (value == "b") return PITCHNAME_b;
-    LogWarning("Unsupported pitch name '%s'", value.c_str());
-    return PITCHNAME_NONE;
-}
-
+    
 std::string Att::OctaveDisToStr(data_OCTAVE_DIS data) const
 {
     std::string value;
@@ -436,6 +406,60 @@ data_ORIENTATION Att::StrToOrientation(std::string value) const
     LogWarning("Unsupported orientation '%s'", value.c_str());
     return ORIENTATION_NONE;
 }
+    
+std::string Att::PercentToStr(data_PERCENT data) const
+{
+    return StringFormat("%d%%", data);
+}
+
+data_PERCENT Att::StrToPercent(std::string value) const
+{
+    return atoi(value.substr(0, value.find("%")).c_str());
+}
+
+std::string Att::PitchnameToStr(data_PITCHNAME data) const
+{
+    std::string value;
+    switch (data) {
+        case PITCHNAME_c: value = "c"; break;
+        case PITCHNAME_d: value = "d"; break;
+        case PITCHNAME_e: value = "e"; break;
+        case PITCHNAME_f: value = "f"; break;
+        case PITCHNAME_g: value = "g"; break;
+        case PITCHNAME_a: value = "a"; break;
+        case PITCHNAME_b: value = "b"; break;
+        default:
+            LogWarning("Unknown pitch name '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_PITCHNAME Att::StrToPitchname(std::string value) const
+{
+    if (value == "c") return PITCHNAME_c;
+    if (value == "d") return PITCHNAME_d;
+    if (value == "e") return PITCHNAME_e;
+    if (value == "f") return PITCHNAME_f;
+    if (value == "g") return PITCHNAME_g;
+    if (value == "a") return PITCHNAME_a;
+    if (value == "b") return PITCHNAME_b;
+    LogWarning("Unsupported pitch name '%s'", value.c_str());
+    return PITCHNAME_NONE;
+}
+
+std::string Att::PlacementToStr(data_PLACEMENT data) const
+{
+    std::string value;
+    return value;
+}
+
+data_PLACEMENT Att::StrToPlacement(std::string value) const
+{
+    data_PLACEMENT placement;
+    return placement;
+}
 
 std::string Att::ProlatioToStr(data_PROLATIO data) const
 {
@@ -459,6 +483,30 @@ data_PROLATIO Att::StrToProlatio(std::string value) const
     return PROLATIO_NONE;
 }
 
+std::string Att::StaffitemToStr(data_STAFFITEM data) const
+{
+    std::string value;
+    return value;
+}
+
+data_STAFFITEM Att::StrToStaffitem(std::string value) const
+{
+    data_STAFFITEM staffItem;
+    return staffItem;
+}
+
+std::string Att::StaffrelToStr(data_STAFFREL data) const
+{
+    std::string value;
+    return value;
+}
+
+data_STAFFREL Att::StrToStaffrel(std::string value) const
+{
+    data_STAFFREL staffRel;
+    return staffRel;
+}
+    
 std::string Att::StemdirectionToStr(data_STEMDIRECTION data) const
 {
     std::string value;

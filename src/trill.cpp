@@ -21,7 +21,7 @@ namespace vrv {
 // Trill
 //----------------------------------------------------------------------------
 
-Trill::Trill() : ControlElement("trill-"), TimePointInterface(), AttColor(), AttOrnamentaccid(), AttPlacement()
+Trill::Trill() : ControlElement("trill-"), TimePointInterface(), AttColor(), AttOrnamentAccid(), AttPlacement()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
@@ -40,7 +40,7 @@ void Trill::Reset()
     ControlElement::Reset();
     TimePointInterface::Reset();
     ResetColor();
-    ResetOrnamentaccid();
+    ResetOrnamentAccid();
     ResetPlacement();
 }
 

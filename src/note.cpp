@@ -43,11 +43,12 @@ Note::Note()
     , AttColor()
     , AttColoration()
     , AttGraced()
-    , AttNoteLogMensural()
-    , AttRelativesize()
+    , AttNoteAnlMensural()
+    // FIXME MEI 4.0.0
+    //, AttRelativesize()
     , AttStems()
     , AttStemsCmn()
-    , AttTiepresent()
+    , AttTiePresent()
     , AttVisibility()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
@@ -55,8 +56,9 @@ Note::Note()
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_NOTELOGMENSURAL);
-    RegisterAttClass(ATT_RELATIVESIZE);
+    RegisterAttClass(ATT_NOTEANLMENSURAL);
+    // FIXME 4.0.0
+    //RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -84,11 +86,12 @@ void Note::Reset()
     ResetColor();
     ResetColoration();
     ResetGraced();
-    ResetNoteLogMensural();
-    ResetRelativesize();
+    ResetNoteAnlMensural();
+    // FIXME 4.0.0
+    //ResetRelativesize();
     ResetStems();
     ResetStemsCmn();
-    ResetTiepresent();
+    ResetTiePresent();
     ResetVisibility();
 
     // tie pointers
@@ -638,7 +641,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
             currentDots = new Dots();
             this->AddChild(currentDots);
         }
-        currentDots->AttAugmentdots::operator=(*this);
+        currentDots->AttAugmentDots::operator=(*this);
     }
     // This will happen only if the duration has changed
     else if (currentDots) {
@@ -655,7 +658,7 @@ int Note::PrepareTieAttr(FunctorParams *functorParams)
     PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
     assert(params);
 
-    AttTiepresent *check = this;
+    AttTiePresent *check = this;
     // Use the parent chord if there is no @tie on the note
     if (!this->HasTie() && params->m_currentChord) {
         check = params->m_currentChord;

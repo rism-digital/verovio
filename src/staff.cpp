@@ -35,9 +35,9 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
-Staff::Staff(int n) : Object("staff-"), AttCommon(), AttTyped()
+Staff::Staff(int n) : Object("staff-"), AttNInteger(), AttTyped()
 {
-    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);
 
     // owned pointers need to be set to NULL;
@@ -58,7 +58,7 @@ Staff::~Staff()
 void Staff::Reset()
 {
     Object::Reset();
-    ResetCommon();
+    ResetNInteger();
     ResetTyped();
 
     m_drawingStaffSize = 100;

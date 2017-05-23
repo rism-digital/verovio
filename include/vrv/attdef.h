@@ -121,7 +121,12 @@ enum data_DURATION {
  * MEI data.FONTSIZENUMERIC
  */
 typedef int data_FONTSIZENUMERIC;
-
+        
+/**
+ * MEI data.HEXNUM
+ */
+typedef wchar_t data_HEXNUM;
+    
 /**
  * MEI data.KEYSIGNATURE
  * The maximum is 255 (unsigned char)

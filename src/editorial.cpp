@@ -30,20 +30,18 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement() : Object("ee-"), BoundaryStartInterface(), AttCommon(), AttCommonPart(), AttTyped()
+EditorialElement::EditorialElement() : Object("ee-"), BoundaryStartInterface(), AttLabelled(), AttTyped()
 {
-    RegisterAttClass(ATT_COMMON);
-    RegisterAttClass(ATT_COMMONPART);
+    RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
 
 EditorialElement::EditorialElement(std::string classid)
-    : Object(classid), vrv::BoundaryStartInterface(), AttCommon(), AttCommonPart(), AttTyped()
+    : Object(classid), vrv::BoundaryStartInterface(), AttLabelled(), AttTyped()
 {
-    RegisterAttClass(ATT_COMMON);
-    RegisterAttClass(ATT_COMMONPART);
+    RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
@@ -53,8 +51,7 @@ void EditorialElement::Reset()
 {
     Object::Reset();
     BoundaryStartInterface::Reset();
-    ResetCommon();
-    ResetCommonPart();
+    ResetLabelled();
     ResetTyped();
 
     m_visibility = Visible;

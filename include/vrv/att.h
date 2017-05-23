@@ -45,7 +45,7 @@ public:
      * Files to be uncommented according to the inclusion of the corresponding LibMEI files
      */
     ///@{
-    // static bool SetAnalytical(Object *element, std::string attrType, std::string attrValue);
+    static bool SetAnalytical(Object *element, std::string attrType, std::string attrValue);
     static bool SetCmn(Object *element, std::string attrType, std::string attrValue);
     static bool SetCmnornaments(Object *element, std::string attrType, std::string attrValue);
     static bool SetCritapp(Object *element, std::string attrType, std::string attrValue);
@@ -54,7 +54,7 @@ public:
     // static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFigtable(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFingering(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetGestural(Object *element, std::string attrType, std::string attrValue);
+    static bool SetGestural(Object *element, std::string attrType, std::string attrValue);
     // static bool SetHarmony(Object *element, std::string attrType, std::string attrValue);
     // static bool SetHeader(Object *element, std::string attrType, std::string attrValue);
     static bool SetMei(Object *element, std::string attrType, std::string attrValue);
@@ -64,13 +64,13 @@ public:
     // static bool SetPerformance(Object *element, std::string attrType, std::string attrValue);
     static bool SetShared(Object *element, std::string attrType, std::string attrValue);
     // static bool SetUsersymbols(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetVisual(Object *element, std::string attrType, std::string attrValue);
+    static bool SetVisual(Object *element, std::string attrType, std::string attrValue);
 
 
     /**
      * Idem for getting attributes as strings
      */
-    // static void GetAnalytical(Object *element, ArrayOfStrAttr *attributes);
+    static void GetAnalytical(const Object *element, ArrayOfStrAttr *attributes);
     static void GetCmn(const Object *element, ArrayOfStrAttr *attributes);
     static void GetCmnornaments(const Object *element, ArrayOfStrAttr *attributes);
     static void GetCritapp(const Object *element, ArrayOfStrAttr *attributes);
@@ -79,7 +79,7 @@ public:
     // static void GetFacsimile(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFigtable(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFingering(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetGestural(const Object *element, ArrayOfStrAttr *attributes);
+    static void GetGestural(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetHarmony(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetHeader(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMei(const Object *element, ArrayOfStrAttr *attributes);
@@ -89,7 +89,7 @@ public:
     // static void GetPerformance(const Object *element, ArrayOfStrAttr *attributes);
     static void GetShared(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetVisual(const Object *element, ArrayOfStrAttr *attributes);
+    static void GetVisual(const Object *element, ArrayOfStrAttr *attributes);
     ///@}
 
 public:
@@ -121,6 +121,9 @@ public:
     std::string DurationToStr(data_DURATION data) const;
     data_DURATION StrToDuration(std::string value) const;
 
+    std::string HexnumToStr(data_HEXNUM data) const;
+    data_HEXNUM StrToHexnum(std::string value) const;
+    
     std::string KeysignatureToStr(data_KEYSIGNATURE data) const;
     data_KEYSIGNATURE StrToKeysignature(std::string value) const;
 
@@ -188,7 +191,7 @@ public:
     /** @name Converters for writing and reading alternate data types unsing other alternate data types */
     ///@{
     std::string PlacementToStr(data_PLACEMENT data) const;
-    data_PLACEMENT StrToPlace(std::string value) const;
+    data_PLACEMENT StrToPlacement(std::string value) const;
     ///@}
 
 };

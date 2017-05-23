@@ -22,7 +22,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Octave::Octave()
-    : ControlElement("octave-"), TimeSpanningInterface(), AttColor(), AttLinerendBase(), AttOctavedisplacement()
+    : ControlElement("octave-"), TimeSpanningInterface(), AttColor(), AttLineRendBase(), AttOctaveDisplacement()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
@@ -41,8 +41,8 @@ void Octave::Reset()
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
     ResetColor();
-    ResetLinerendBase();
-    ResetOctavedisplacement();
+    ResetLineRendBase();
+    ResetOctaveDisplacement();
 }
 
 //----------------------------------------------------------------------------

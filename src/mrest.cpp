@@ -13,12 +13,14 @@ namespace vrv {
 // MRest
 //----------------------------------------------------------------------------
 
-MRest::MRest() : LayerElement("mrest-"), PositionInterface(), AttVisibility(), AttFermatapresent(), AttRelativesize()
+// FIXME MEI 4.0.0
+MRest::MRest() : LayerElement("mrest-"), PositionInterface(), AttVisibility(), AttFermataPresent()/*, AttRelativesize()*/
 {
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_VISIBILITY);
     RegisterAttClass(ATT_FERMATAPRESENT);
-    RegisterAttClass(ATT_RELATIVESIZE);
+    // FIXME MEI 4.0.0
+    //RegisterAttClass(ATT_RELATIVESIZE);
 
     Reset();
 }
@@ -32,8 +34,9 @@ void MRest::Reset()
     LayerElement::Reset();
     PositionInterface::Reset();
     ResetVisibility();
-    ResetFermatapresent();
-    ResetRelativesize();
+    ResetFermataPresent();
+    // FIXME MEI 4.0.0
+    //ResetRelativesize();
 }
 
 //----------------------------------------------------------------------------

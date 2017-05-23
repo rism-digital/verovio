@@ -26,12 +26,12 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Accid::Accid()
-    : LayerElement("accid-"), PositionInterface(), AttAccidental(), AttAccidLog(), AttColor(), AttEnclosingchars()
+    : LayerElement("accid-"), PositionInterface(), AttAccidental(), AttAccidentalGestural(), AttAccidLog(), AttColor(), AttEnclosingChars()
 {
 
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_ACCIDENTAL);
-    RegisterAttClass(ATT_ACCIDENTALPERFORMED);
+    RegisterAttClass(ATT_ACCIDENTALGESTURAL);
     RegisterAttClass(ATT_ACCIDLOG);
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_ENCLOSINGCHARS);
@@ -48,10 +48,10 @@ void Accid::Reset()
     LayerElement::Reset();
     PositionInterface::Reset();
     ResetAccidental();
-    ResetAccidentalPerformed();
+    ResetAccidentalGestural();
     ResetAccidLog();
     ResetColor();
-    ResetEnclosingchars();
+    ResetEnclosingChars();
 }
 
 std::wstring Accid::GetSymbolStr() const

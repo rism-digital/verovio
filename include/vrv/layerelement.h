@@ -258,7 +258,7 @@ public:
     virtual int ResetDrawing(FunctorParams *);
 
 private:
-    int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);
+    int GetDrawingArticulationTopOrBottom(data_STAFFREL_basic place, ArticPartType type);
 
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */

@@ -28,7 +28,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Tuplet::Tuplet()
-    : LayerElement("tuplet-"), ObjectListInterface(), AttDurationRatio(), AttNumberplacement(), AttTupletVis()
+    : LayerElement("tuplet-"), ObjectListInterface(), AttDurationRatio(), AttNumberPlacement(), AttTupletVis()
 {
     RegisterAttClass(ATT_DURATIONRATIO);
     RegisterAttClass(ATT_NUMBERPLACEMENT);
@@ -45,7 +45,7 @@ void Tuplet::Reset()
 {
     LayerElement::Reset();
     ResetDurationRatio();
-    ResetNumberplacement();
+    ResetNumberPlacement();
     ResetTupletVis();
 }
 

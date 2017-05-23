@@ -585,18 +585,18 @@ void Alignment::AddToAccidSpace(Accid *accid)
 // AlignmentReference
 //----------------------------------------------------------------------------
 
-AlignmentReference::AlignmentReference() : Object(), AttBasic()
+AlignmentReference::AlignmentReference() : Object(), AttNInteger()
 {
-    RegisterAttClass(ATT_BASIC);
+    RegisterAttClass(ATT_NINTEGER);
 
     Reset();
 
     this->SetAsReferenceObject();
 }
 
-AlignmentReference::AlignmentReference(int staffN) : Object(), AttBasic()
+AlignmentReference::AlignmentReference(int staffN) : Object(), AttNInteger()
 {
-    RegisterAttClass(ATT_BASIC);
+    RegisterAttClass(ATT_NINTEGER);
 
     Reset();
 
@@ -611,7 +611,7 @@ AlignmentReference::~AlignmentReference()
 void AlignmentReference::Reset()
 {
     Object::Reset();
-    ResetBasic();
+    ResetNInteger();
 
     m_accidSpace.clear();
     m_multipleLayer = false;

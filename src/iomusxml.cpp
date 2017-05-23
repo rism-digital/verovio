@@ -1528,11 +1528,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         // form and place
         if (HasAttributeWithValue(xmlFermata.node(), "type", "inverted")) {
             fermata->SetForm(fermataVis_FORM_inv);
-            fermata->SetPlace(STAFFREL_below);
+            fermata->GetPlaceAlternate()->SetBasic(STAFFREL_basic_below);
         }
         else if (HasAttributeWithValue(xmlFermata.node(), "type", "upright")) {
             fermata->SetForm(fermataVis_FORM_norm);
-            fermata->SetPlace(STAFFREL_above);
+            fermata->GetPlaceAlternate()->SetBasic(STAFFREL_basic_above);
         }
     }
 
@@ -1547,7 +1547,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         std::string colorStr = GetAttributeValue(xmlMordent.node(), "color");
         if (!colorStr.empty()) mordent->SetColor(colorStr.c_str());
         // form
-        mordent->SetForm(mordentLog_FORM_norm);
+        mordent->SetForm(mordentLog_FORM_lower);
         // long
         std::string elongation = GetAttributeValue(xmlMordent.node(), "long");
         if (!elongation.empty()) mordent->SetLong(ConvertWordToBool(elongation.c_str()));
@@ -1565,7 +1565,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         std::string colorStr = GetAttributeValue(xmlMordentInv.node(), "color");
         if (!colorStr.empty()) mordent->SetColor(colorStr.c_str());
         // form
-        mordent->SetForm(mordentLog_FORM_inv);
+        mordent->SetForm(mordentLog_FORM_upper);
         // long
         std::string elongation = GetAttributeValue(xmlMordentInv.node(), "long");
         if (!elongation.empty()) mordent->SetLong(ConvertWordToBool(elongation.c_str()));
@@ -1600,7 +1600,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         std::string colorStr = GetAttributeValue(xmlTurn.node(), "color");
         if (!colorStr.empty()) turn->SetColor(colorStr.c_str());
         // form
-        turn->SetForm(turnLog_FORM_norm);
+        turn->SetForm(turnLog_FORM_lower);
         // place
         std::string placeStr = GetAttributeValue(xmlTurn.node(), "placement");
         if (!placeStr.empty()) turn->SetPlace(turn->AttPlacement::StrToStaffrel(placeStr.c_str()));
@@ -1615,7 +1615,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         std::string colorStr = GetAttributeValue(xmlTurnInv.node(), "color");
         if (!colorStr.empty()) turn->SetColor(colorStr.c_str());
         // form
-        turn->SetForm(turnLog_FORM_inv);
+        turn->SetForm(turnLog_FORM_upper);
         // place
         std::string placeStr = GetAttributeValue(xmlTurnInv.node(), "placement");
         if (!placeStr.empty()) turn->SetPlace(turn->AttPlacement::StrToStaffrel(placeStr.c_str()));

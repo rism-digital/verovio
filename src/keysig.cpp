@@ -100,10 +100,10 @@ KeySig::KeySig(const ScoreDefInterface *keySigAttr) : LayerElement("ksig-"), Att
     }
     m_alterationNumber = abs(key);
 
-    if (keySigAttr->GetKeySigShow() == BOOLEAN_false) {
+    if (keySigAttr->GetKeysigShow() == BOOLEAN_false) {
         m_drawingShow = false;
     }
-    if (keySigAttr->GetKeySigShowchange() == BOOLEAN_true) {
+    if (keySigAttr->GetKeysigShowchange() == BOOLEAN_true) {
         m_drawingShowchange = true;
     }
 }

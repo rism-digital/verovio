@@ -29,25 +29,34 @@ enum FontSizeType { FONTSIZE_NONE = 0, FONTSIZE_fontSizeNumeric, FONTSIZE_term, 
 
 class data_FONTSIZE {
 public:
-    data_FONTSIZE()
+    data_FONTSIZE() { Reset(FONTSIZE_NONE); }
+    virtual ~data_FONTSIZE() {}
+    
+    void Reset(FontSizeType type)
     {
-        m_type = FONTSIZE_NONE;
+        m_type = type;
         m_fontSizeNumeric = VRV_UNSET;
         m_term = FONTSIZETERM_NONE;
         m_percent = 0;
     }
-    virtual ~data_FONTSIZE() {}
     
     FontSizeType GetType() const { return m_type; }
     
     data_FONTSIZENUMERIC GetFontSizeNumeric() const { return m_fontSizeNumeric; }
-    void SetFontSizeNumeric(data_FONTSIZENUMERIC value) { m_fontSizeNumeric = value; }
+    void SetFontSizeNumeric(data_FONTSIZENUMERIC value) { Reset(FONTSIZE_fontSizeNumeric); m_fontSizeNumeric = value; }
     
     data_FONTSIZETERM GetTerm() const { return m_term; }
-    void SetTerm(data_FONTSIZETERM value) { m_term = value; }
+    void SetTerm(data_FONTSIZETERM value) { Reset(FONTSIZE_term); m_term = value; }
     
     data_PERCENT GetPercent() const { return m_percent; }
-    void SetPercent(data_PERCENT value) { m_percent = value; }
+    void SetPercent(data_PERCENT value) { Reset(FONTSIZE_percent); m_percent = value; }
+    
+    bool HasValue() const {
+        if (m_fontSizeNumeric != VRV_UNSET) return true;
+        if (m_term != FONTSIZETERM_NONE) return true;
+        if (m_percent != 0) return true;
+        return false;
+    }
     
     // comparison
     bool operator==(const data_FONTSIZE &val) const
@@ -76,25 +85,34 @@ enum StaffItemType { STAFFITEM_NONE = 0, STAFFITEM_basic, STAFFITEM_cmn, STAFFIT
 
 class data_STAFFITEM {
 public:
-    data_STAFFITEM()
+    data_STAFFITEM() { Reset(STAFFITEM_NONE); }
+    virtual ~data_STAFFITEM() {}
+    
+    void Reset(StaffItemType type)
     {
-        m_type = STAFFITEM_NONE;
+        m_type = type;
         m_basic = STAFFITEM_basic_NONE;
         m_cmn = STAFFITEM_cmn_NONE;
         m_mensural = STAFFITEM_mensural_NONE;
     }
-    virtual ~data_STAFFITEM() {}
     
     StaffItemType GetType() const { return m_type; }
     
     data_STAFFITEM_basic GetBasic() const { return m_basic; }
-    void SetBasic(data_STAFFITEM_basic value) { m_basic = value; }
+    void SetBasic(data_STAFFITEM_basic value) { Reset(STAFFITEM_basic); m_basic = value; }
     
     data_STAFFITEM_cmn GetCmn() const { return m_cmn; }
-    void SetCmn(data_STAFFITEM_cmn value) { m_cmn = value; }
+    void SetCmn(data_STAFFITEM_cmn value) { Reset(STAFFITEM_cmn); m_cmn = value; }
     
     data_STAFFITEM_mensural GetMensural() const { return m_mensural; }
-    void SetMensural(data_STAFFITEM_mensural value) { m_mensural = value; }
+    void SetMensural(data_STAFFITEM_mensural value) { Reset(STAFFITEM_mensural); m_mensural = value; }
+    
+    bool HasValue() const {
+        if (m_basic != STAFFITEM_basic_NONE) return true;
+        if (m_cmn != STAFFITEM_cmn_NONE) return true;
+        if (m_mensural != STAFFITEM_mensural_NONE) return true;
+        return false;
+    }
     
     // comparison
     bool operator==(const data_STAFFITEM &val) const
@@ -175,26 +193,28 @@ enum PlacementType { PLACEMENT_NONE = 0, PLACEMENT_staffRel, PLACEMENT_nonStaffP
 
 class data_PLACEMENT {
 public:
-    data_PLACEMENT()
+    data_PLACEMENT() { Reset(PLACEMENT_NONE); }
+    virtual ~data_PLACEMENT() {}
+
+    void Reset(PlacementType type)
     {
-        m_type = PLACEMENT_NONE;
+        m_type = type;
         m_staffRel = data_STAFFREL();
         m_nonStaffPlace = NONSTAFFPLACE_NONE;
         m_nmtoken = "";
     }
-    virtual ~data_PLACEMENT() {}
     
     PlacementType GetType() const { return m_type; }
     
     data_STAFFREL GetStaffRel() const { return m_staffRel; }
-    void SetStaffRel(data_STAFFREL value) { m_staffRel = value; }
+    void SetStaffRel(data_STAFFREL value) { Reset(PLACEMENT_staffRel); m_staffRel = value; }
     data_STAFFREL *GetStaffRelAtlernate() { return &m_staffRel; }
 
     data_NONSTAFFPLACE GetNonStaffPlace() const { return m_nonStaffPlace; }
-    void SetNonStaffPlace(data_NONSTAFFPLACE value) { m_nonStaffPlace = value; }
+    void SetNonStaffPlace(data_NONSTAFFPLACE value) { Reset(PLACEMENT_nonStaffPlace); m_nonStaffPlace = value; }
     
     std::string GetNMToken() const { return m_nmtoken; }
-    void SetNMToken(std::string value) { m_nmtoken = value; }
+    void SetNMToken(std::string value) { Reset(PLACEMENT_nmtoken); m_nmtoken = value; }
     
     bool HasValue() const {
         if (m_staffRel.HasValue()) return true;

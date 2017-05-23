@@ -32,13 +32,15 @@ Rest::Rest()
     , DurationInterface()
     , PositionInterface()
     , AttColor()
-    , AttRelativesize()
+    // FIXME MEI 4.0.0
+    //, AttRelativesize()
     , AttRestVisMensural()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_RELATIVESIZE);
+    // FIXME MEI 4.0.0
+    //RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_RESTVISMENSURAL);
     Reset();
 }
@@ -53,7 +55,8 @@ void Rest::Reset()
     DurationInterface::Reset();
     PositionInterface::Reset();
     ResetColor();
-    ResetRelativesize();
+    // FIXME MEI 4.0.0
+    //ResetRelativesize();
     ResetRestVisMensural();
 }
 
@@ -138,7 +141,7 @@ int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
             currentDots = new Dots();
             this->AddChild(currentDots);
         }
-        currentDots->AttAugmentdots::operator=(*this);
+        currentDots->AttAugmentDots::operator=(*this);
     }
     // This will happen only if the duration has changed
     else if (currentDots) {

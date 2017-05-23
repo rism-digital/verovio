@@ -23,8 +23,9 @@ Mensur::Mensur()
     , AttMensuralShared()
     , AttMensurLog()
     , AttMensurVis()
-    , AttRelativesize()
-    , AttSlashcount()
+    // FIXME MEI 4.0.0
+    //, AttRelativesize()
+    , AttSlashCount()
 {
     Init();
 }
@@ -54,7 +55,8 @@ void Mensur::Init()
     RegisterAttClass(ATT_MENSURALSHARED);
     RegisterAttClass(ATT_MENSURLOG);
     RegisterAttClass(ATT_METERSIGVIS);
-    RegisterAttClass(ATT_RELATIVESIZE);
+    // FIXME MEI 4.0.0
+    //RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_SLASHCOUNT);
 
     Reset();
@@ -71,8 +73,9 @@ void Mensur::Reset()
     ResetMensuralShared();
     ResetMensurLog();
     ResetMensurVis();
-    ResetRelativesize();
-    ResetSlashcount();
+    // FIXME MEI 4.0.0
+    //ResetRelativesize();
+    ResetSlashCount();
 }
 
 } // namespace vrv

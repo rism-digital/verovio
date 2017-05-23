@@ -273,8 +273,8 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
 
         ArrayOfBoundingBoxes *overflowBoxes = &m_overflowBelowBBoxes;
         // above?
-        data_STAFFREL place = (*iter)->GetDrawingPlace();
-        if (place.GetBasic() == STAFFREL_basic_above) {
+        data_STAFFREL_basic place = (*iter)->GetDrawingPlace();
+        if (place == STAFFREL_basic_above) {
             overflowBoxes = &m_overflowAboveBBoxes;
         }
         auto i = overflowBoxes->begin();
@@ -290,7 +290,7 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
         }
         //  Now update the staffAlignment max overflow (above or below) and add the positioner to the list of
         //  overflowing elements
-        if (place.GetBasic() == STAFFREL_basic_above) {
+        if (place == STAFFREL_basic_above) {
             int overflowAbove = this->CalcOverflowAbove((*iter));
             overflowBoxes->push_back((*iter));
             this->SetOverflowAbove(overflowAbove);
@@ -337,7 +337,7 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
         }
         // else, adjust the min or max YRel of the pair if necessary
         else {
-            if ((*iter)->GetDrawingPlace().GetBasic() == STAFFREL_basic_above) {
+            if ((*iter)->GetDrawingPlace() == STAFFREL_basic_above) {
                 if ((*iter)->GetDrawingYRel() < (*i).second) (*i).second = (*iter)->GetDrawingYRel();
             }
             else {

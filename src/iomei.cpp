@@ -1214,6 +1214,7 @@ void MeiOutput::WriteMeiVerse(pugi::xml_node currentNode, Verse *verse)
     WriteLayerElement(currentNode, verse);
     verse->WriteColor(currentNode);
     verse->WriteLang(currentNode);
+    verse->WriteNInteger(currentNode);
     verse->WriteTypography(currentNode);
 }
 
@@ -3177,6 +3178,7 @@ bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
 
     vrvVerse->ReadColor(verse);
     vrvVerse->ReadLang(verse);
+    vrvVerse->ReadNInteger(verse);
     vrvVerse->ReadTypography(verse);
 
     parent->AddChild(vrvVerse);

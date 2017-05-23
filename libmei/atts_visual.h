@@ -52,10 +52,7 @@ public:
     void SetPlace(data_PLACEMENT place_) { m_place = place_; }
     data_PLACEMENT GetPlace() const { return m_place; }
     bool HasPlace() const;
-    
-    /**
-     * Getter for reference (for alternate type only)
-     **/
+    /** Getter for reference (for alternate type only) */
     data_PLACEMENT *GetPlaceAlternate() { return &m_place; }
     ///@}
 
@@ -732,9 +729,11 @@ public:
     data_ORIENTATION GetMensurOrient() const { return m_mensurOrient; }
     bool HasMensurOrient() const;
     //
-    void SetMensurSize(int mensurSize_) { m_mensurSize = mensurSize_; }
-    int GetMensurSize() const { return m_mensurSize; }
+    void SetMensurSize(data_FONTSIZE mensurSize_) { m_mensurSize = mensurSize_; }
+    data_FONTSIZE GetMensurSize() const { return m_mensurSize; }
     bool HasMensurSize() const;
+    /** Getter for reference (for alternate type only) */
+    data_FONTSIZE *GetMensurSizeAlternate() { return &m_mensurSize; }
     ///@}
 
 private:
@@ -750,7 +749,7 @@ private:
     /** Describes the rotation or reflection of the base symbol. **/
     data_ORIENTATION m_mensurOrient;
     /** Describes the relative size of the mensuration sign. **/
-    int m_mensurSize;
+    data_FONTSIZE m_mensurSize;
 
     /* include <attmensur.size> */
 };

@@ -37,10 +37,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Measure::Measure(bool measureMusic, int logMeasureNb)
-    : Object("measure-"), AttCommon(), AttMeasureLog(), AttPointing(), AttTyped()
+    : Object("measure-"), AttMeasureLog(), AttNNumberLike(), AttPointing(), AttTyped()
 {
-    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_MEASURELOG);
+    RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_POINTING);
     RegisterAttClass(ATT_TYPED);
 
@@ -73,8 +73,8 @@ Measure::~Measure()
 void Measure::Reset()
 {
     Object::Reset();
-    ResetCommon();
     ResetMeasureLog();
+    ResetNNumberLike();
     ResetPointing();
     ResetTyped();
 

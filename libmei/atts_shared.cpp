@@ -2977,7 +2977,7 @@ void AttLyricStyle::ResetLyricStyle()
     m_lyricAlign = "";
     m_lyricFam = "";
     m_lyricName = "";
-    m_lyricSize = 0;
+    m_lyricSize = data_FONTSIZE();
     m_lyricStyle = FONTSTYLE_NONE;
     m_lyricWeight = FONTWEIGHT_NONE;
 }
@@ -3001,7 +3001,7 @@ bool AttLyricStyle::ReadLyricStyle(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("lyric.size")) {
-        this->SetLyricSize(StrToInt(element.attribute("lyric.size").value()));
+        this->SetLyricSize(StrToFontsize(element.attribute("lyric.size").value()));
         element.remove_attribute("lyric.size");
         hasAttribute = true;
     }
@@ -3034,7 +3034,7 @@ bool AttLyricStyle::WriteLyricStyle(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasLyricSize()) {
-        element.append_attribute("lyric.size") = IntToStr(this->GetLyricSize()).c_str();
+        element.append_attribute("lyric.size") = FontsizeToStr(this->GetLyricSize()).c_str();
         wroteAttribute = true;
     }
     if (this->HasLyricStyle()) {
@@ -3065,7 +3065,7 @@ bool AttLyricStyle::HasLyricName() const
 
 bool AttLyricStyle::HasLyricSize() const
 {
-    return (m_lyricSize != 0);
+    return (m_lyricSize.HasValue());
 }
 
 bool AttLyricStyle::HasLyricStyle() const
@@ -4058,7 +4058,7 @@ AttNotationStyle::~AttNotationStyle()
 void AttNotationStyle::ResetNotationStyle()
 {
     m_musicName = "";
-    m_musicSize = 0;
+    m_musicSize = data_FONTSIZE();
 }
 
 bool AttNotationStyle::ReadNotationStyle(pugi::xml_node element)
@@ -4070,7 +4070,7 @@ bool AttNotationStyle::ReadNotationStyle(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("music.size")) {
-        this->SetMusicSize(StrToInt(element.attribute("music.size").value()));
+        this->SetMusicSize(StrToFontsize(element.attribute("music.size").value()));
         element.remove_attribute("music.size");
         hasAttribute = true;
     }
@@ -4085,7 +4085,7 @@ bool AttNotationStyle::WriteNotationStyle(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasMusicSize()) {
-        element.append_attribute("music.size") = IntToStr(this->GetMusicSize()).c_str();
+        element.append_attribute("music.size") = FontsizeToStr(this->GetMusicSize()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -4098,7 +4098,7 @@ bool AttNotationStyle::HasMusicName() const
 
 bool AttNotationStyle::HasMusicSize() const
 {
-    return (m_musicSize != 0);
+    return (m_musicSize.HasValue());
 }
 
 /* include <attmusic.size> */
@@ -6453,7 +6453,7 @@ void AttTextStyle::ResetTextStyle()
 {
     m_textFam = "";
     m_textName = "";
-    m_textSize = 0;
+    m_textSize = data_FONTSIZE();
     m_textStyle = FONTSTYLE_NONE;
     m_textWeight = FONTWEIGHT_NONE;
 }
@@ -6472,7 +6472,7 @@ bool AttTextStyle::ReadTextStyle(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("text.size")) {
-        this->SetTextSize(StrToInt(element.attribute("text.size").value()));
+        this->SetTextSize(StrToFontsize(element.attribute("text.size").value()));
         element.remove_attribute("text.size");
         hasAttribute = true;
     }
@@ -6501,7 +6501,7 @@ bool AttTextStyle::WriteTextStyle(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasTextSize()) {
-        element.append_attribute("text.size") = IntToStr(this->GetTextSize()).c_str();
+        element.append_attribute("text.size") = FontsizeToStr(this->GetTextSize()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTextStyle()) {
@@ -6527,7 +6527,7 @@ bool AttTextStyle::HasTextName() const
 
 bool AttTextStyle::HasTextSize() const
 {
-    return (m_textSize != 0);
+    return (m_textSize.HasValue());
 }
 
 bool AttTextStyle::HasTextStyle() const
@@ -6850,7 +6850,7 @@ void AttTypography::ResetTypography()
 {
     m_fontfam = "";
     m_fontname = "";
-    m_fontsize = 0;
+    m_fontsize = data_FONTSIZE();
     m_fontstyle = FONTSTYLE_NONE;
     m_fontweight = FONTWEIGHT_NONE;
 }
@@ -6869,7 +6869,7 @@ bool AttTypography::ReadTypography(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("fontsize")) {
-        this->SetFontsize(StrToInt(element.attribute("fontsize").value()));
+        this->SetFontsize(StrToFontsize(element.attribute("fontsize").value()));
         element.remove_attribute("fontsize");
         hasAttribute = true;
     }
@@ -6898,7 +6898,7 @@ bool AttTypography::WriteTypography(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasFontsize()) {
-        element.append_attribute("fontsize") = IntToStr(this->GetFontsize()).c_str();
+        element.append_attribute("fontsize") = FontsizeToStr(this->GetFontsize()).c_str();
         wroteAttribute = true;
     }
     if (this->HasFontstyle()) {
@@ -6924,7 +6924,7 @@ bool AttTypography::HasFontname() const
 
 bool AttTypography::HasFontsize() const
 {
-    return (m_fontsize != 0);
+    return (m_fontsize.HasValue());
 }
 
 bool AttTypography::HasFontstyle() const
@@ -8186,7 +8186,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "lyric.size") {
-            att->SetLyricSize(att->StrToInt(attrValue));
+            att->SetLyricSize(att->StrToFontsize(attrValue));
             return true;
         }
         if (attrType == "lyric.style") {
@@ -8390,7 +8390,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "music.size") {
-            att->SetMusicSize(att->StrToInt(attrValue));
+            att->SetMusicSize(att->StrToFontsize(attrValue));
             return true;
         }
     }
@@ -8866,7 +8866,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "text.size") {
-            att->SetTextSize(att->StrToInt(attrValue));
+            att->SetTextSize(att->StrToFontsize(attrValue));
             return true;
         }
         if (attrType == "text.style") {
@@ -8942,7 +8942,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "fontsize") {
-            att->SetFontsize(att->StrToInt(attrValue));
+            att->SetFontsize(att->StrToFontsize(attrValue));
             return true;
         }
         if (attrType == "fontstyle") {
@@ -9567,7 +9567,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("lyric.name", att->StrToStr(att->GetLyricName())));
         }
         if (att->HasLyricSize()) {
-            attributes->push_back(std::make_pair("lyric.size", att->IntToStr(att->GetLyricSize())));
+            attributes->push_back(std::make_pair("lyric.size", att->FontsizeToStr(att->GetLyricSize())));
         }
         if (att->HasLyricStyle()) {
             attributes->push_back(std::make_pair("lyric.style", att->FontstyleToStr(att->GetLyricStyle())));
@@ -9738,7 +9738,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("music.name", att->StrToStr(att->GetMusicName())));
         }
         if (att->HasMusicSize()) {
-            attributes->push_back(std::make_pair("music.size", att->IntToStr(att->GetMusicSize())));
+            attributes->push_back(std::make_pair("music.size", att->FontsizeToStr(att->GetMusicSize())));
         }
     }
     if (element->HasAttClass(ATT_NOTEHEADS)) {
@@ -10134,7 +10134,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("text.name", att->StrToStr(att->GetTextName())));
         }
         if (att->HasTextSize()) {
-            attributes->push_back(std::make_pair("text.size", att->IntToStr(att->GetTextSize())));
+            attributes->push_back(std::make_pair("text.size", att->FontsizeToStr(att->GetTextSize())));
         }
         if (att->HasTextStyle()) {
             attributes->push_back(std::make_pair("text.style", att->FontstyleToStr(att->GetTextStyle())));
@@ -10198,7 +10198,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("fontname", att->StrToStr(att->GetFontname())));
         }
         if (att->HasFontsize()) {
-            attributes->push_back(std::make_pair("fontsize", att->IntToStr(att->GetFontsize())));
+            attributes->push_back(std::make_pair("fontsize", att->FontsizeToStr(att->GetFontsize())));
         }
         if (att->HasFontstyle()) {
             attributes->push_back(std::make_pair("fontstyle", att->FontstyleToStr(att->GetFontstyle())));

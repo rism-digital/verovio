@@ -1020,7 +1020,7 @@ void AttMensuralVis::ResetMensuralVis()
     m_mensurForm = mensuralVis_MENSURFORM_NONE;
     m_mensurLoc = 0;
     m_mensurOrient = ORIENTATION_NONE;
-    m_mensurSize = 0;
+    m_mensurSize = data_FONTSIZE();
 }
 
 bool AttMensuralVis::ReadMensuralVis(pugi::xml_node element)
@@ -1047,7 +1047,7 @@ bool AttMensuralVis::ReadMensuralVis(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("mensur.size")) {
-        this->SetMensurSize(StrToInt(element.attribute("mensur.size").value()));
+        this->SetMensurSize(StrToFontsize(element.attribute("mensur.size").value()));
         element.remove_attribute("mensur.size");
         hasAttribute = true;
     }
@@ -1074,7 +1074,7 @@ bool AttMensuralVis::WriteMensuralVis(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasMensurSize()) {
-        element.append_attribute("mensur.size") = IntToStr(this->GetMensurSize()).c_str();
+        element.append_attribute("mensur.size") = FontsizeToStr(this->GetMensurSize()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1102,7 +1102,7 @@ bool AttMensuralVis::HasMensurOrient() const
 
 bool AttMensuralVis::HasMensurSize() const
 {
-    return (m_mensurSize != 0);
+    return (m_mensurSize.HasValue());
 }
 
 /* include <attmensur.size> */
@@ -2284,7 +2284,7 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "mensur.size") {
-            att->SetMensurSize(att->StrToInt(attrValue));
+            att->SetMensurSize(att->StrToFontsize(attrValue));
             return true;
         }
     }
@@ -2668,7 +2668,7 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("mensur.orient", att->OrientationToStr(att->GetMensurOrient())));
         }
         if (att->HasMensurSize()) {
-            attributes->push_back(std::make_pair("mensur.size", att->IntToStr(att->GetMensurSize())));
+            attributes->push_back(std::make_pair("mensur.size", att->FontsizeToStr(att->GetMensurSize())));
         }
     }
     if (element->HasAttClass(ATT_METERSIGVIS)) {

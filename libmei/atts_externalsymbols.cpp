@@ -43,7 +43,7 @@ void AttExtSym::ResetExtSym()
 {
     m_glyphAuth = "";
     m_glyphName = "";
-    m_glyphNum = HEXNUM_NONE;
+    m_glyphNum = 0;
     m_glyphUri = "";
 }
 
@@ -107,7 +107,7 @@ bool AttExtSym::HasGlyphName() const
 
 bool AttExtSym::HasGlyphNum() const
 {
-    return (m_glyphNum != HEXNUM_NONE);
+    return (m_glyphNum != 0);
 }
 
 bool AttExtSym::HasGlyphUri() const
