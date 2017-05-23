@@ -118,6 +118,9 @@ public:
     std::string DurationToStr(data_DURATION data) const;
     data_DURATION StrToDuration(std::string value, bool logWarning = true) const;
 
+    std::string FontsizenumericToStr(data_FONTSIZENUMERIC data) const;
+    data_FONTSIZENUMERIC StrToFontsizenumeric(std::string value, bool logWarning = true) const;
+    
     std::string HexnumToStr(data_HEXNUM data) const;
     data_HEXNUM StrToHexnum(std::string value, bool logWarning = true) const;
 

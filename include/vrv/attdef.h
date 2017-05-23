@@ -120,7 +120,7 @@ enum data_DURATION {
 /**
  * MEI data.FONTSIZENUMERIC
  */
-typedef int data_FONTSIZENUMERIC;
+typedef double data_FONTSIZENUMERIC;
 
 /**
  * MEI data.HEXNUM
@@ -203,7 +203,7 @@ enum data_ORIENTATION { ORIENTATION_NONE = 0, ORIENTATION_reversed, ORIENTATION_
 /**
  * MEI data.PERCENT
  */
-typedef int data_PERCENT;
+typedef double data_PERCENT;
 
 /**
  * MEI data.PITCHNAME

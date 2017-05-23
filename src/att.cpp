@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <regex>
 #include <sstream>
 #include <stdlib.h>
 
@@ -212,20 +213,50 @@ data_HEXNUM Att::StrToHexnum(std::string value, bool logWarning) const
 
 std::string Att::FontsizeToStr(data_FONTSIZE data) const
 {
-    // Here we need to format the output for each type
     std::string value;
-    if (data.GetType() == FONTSIZE_fontSizeNumeric) {
+    if (data.GetType() == FONTSIZE_fontSizeNumeric)
         value = StringFormat("%fpt", data.GetFontSizeNumeric());
-    }
+    else if (data.GetType() == FONTSIZE_term)
+        value = FontsizetermToStr(data.GetTerm());
+    else if (data.GetType() == FONTSIZE_percent)
+        value = PercentToStr(data.GetPercent());
+    
     return value;
 }
 
 data_FONTSIZE Att::StrToFontsize(std::string value, bool logWarning) const
 {
-    // Here we need to analyse the content and get the right type
-    data_FONTSIZE fs;
-    fs.SetFontSizeNumeric(atoi(value.c_str()));
-    return fs;
+    data_FONTSIZE data;
+    data.SetFontSizeNumeric(StrToFontsizenumeric(value, false));
+    if (data.HasValue())
+        return data;
+    data.SetTerm(StrToFontsizeterm(value, false));
+    if (data.HasValue())
+        return data;
+    data.SetPercent(StrToPercent(value, false));
+    if (data.HasValue())
+        return data;
+    
+    if (logWarning)
+        LogWarning("Unsupported data.FONTSIZE '%s'", value.c_str());
+    
+    return data;
+}
+    
+    std::string Att::FontsizenumericToStr(data_FONTSIZENUMERIC data) const
+{
+    return StringFormat("%.2fpt", data);
+}
+
+data_FONTSIZENUMERIC Att::StrToFontsizenumeric(std::string value, bool logWarning) const
+{
+    std::regex test("[0-9](\\.[0-9]+)?(pt)");
+    if (std::regex_match(value, test)) {
+        if (logWarning)
+            LogWarning("Unsupported data.FONTSIZENUMERIC '%s'", value.c_str());
+            
+    }
+    return atof(value.substr(0, value.find("pt")).c_str());
 }
 
 std::string Att::KeysignatureToStr(data_KEYSIGNATURE data) const
@@ -404,12 +435,18 @@ data_ORIENTATION Att::StrToOrientation(std::string value, bool logWarning) const
 
 std::string Att::PercentToStr(data_PERCENT data) const
 {
-    return StringFormat("%d%%", data);
+    return StringFormat("%.2f%%", data);
 }
 
 data_PERCENT Att::StrToPercent(std::string value, bool logWarning) const
 {
-    return atoi(value.substr(0, value.find("%")).c_str());
+    std::regex test("[0-9]+(\\.?[0-9]*)?%");
+    if (std::regex_match(value, test)) {
+        if (logWarning)
+            LogWarning("Unsupported data.PERCENT '%s'", value.c_str());
+            
+    }
+    return atof(value.substr(0, value.find("%")).c_str());
 }
 
 std::string Att::PitchnameToStr(data_PITCHNAME data) const
@@ -448,13 +485,34 @@ data_PITCHNAME Att::StrToPitchname(std::string value, bool logWarning) const
 std::string Att::PlacementToStr(data_PLACEMENT data) const
 {
     std::string value;
+    if (data.GetType() == PLACEMENT_staffRel)
+        value = StaffrelToStr(*data.GetStaffRelAtlernate());
+    else if (data.GetType() == PLACEMENT_nonStaffPlace)
+        value = NonstaffplaceToStr(data.GetNonStaffPlace());
+    else if (data.GetType() == PLACEMENT_nmtoken)
+        value = data.GetNMToken();
+    
     return value;
 }
 
 data_PLACEMENT Att::StrToPlacement(std::string value, bool logWarning) const
 {
-    data_PLACEMENT placement;
-    return placement;
+    data_PLACEMENT data;
+    data.SetStaffRel(StrToStaffrel(value, false));
+    if (data.HasValue())
+        return data;
+    data.SetNonStaffPlace(StrToNonstaffplace(value, false));
+    if (data.HasValue())
+        return data;
+    // Currently allows anything because it is not parsed at all...
+    data.SetNMToken(value);
+    if (data.HasValue())
+        return data;
+    
+    if (logWarning)
+        LogWarning("Unsupported data.PLACEMENT '%s'", value.c_str());
+    
+    return data;
 }
 
 std::string Att::ProlatioToStr(data_PROLATIO data) const
@@ -483,13 +541,17 @@ data_PROLATIO Att::StrToProlatio(std::string value, bool logWarning) const
 std::string Att::StaffitemToStr(data_STAFFITEM data) const
 {
     std::string value;
+    LogWarning("Writing data.STAFFITEM is not implemented");
+    
     return value;
 }
 
 data_STAFFITEM Att::StrToStaffitem(std::string value, bool logWarning) const
 {
-    data_STAFFITEM staffItem;
-    return staffItem;
+    data_STAFFITEM data;
+    LogWarning("Reading data.STAFFITEM is not implemented");
+    
+    return data;
 }
 
 std::string Att::StaffrelToStr(data_STAFFREL data) const
@@ -499,21 +561,24 @@ std::string Att::StaffrelToStr(data_STAFFREL data) const
         value = StaffrelBasicToStr(data.GetBasic());
     else if (data.GetType() == STAFFREL_extended)
         value = StaffrelExtendedToStr(data.GetExtended());
+    
     return value;
 }
 
 data_STAFFREL Att::StrToStaffrel(std::string value, bool logWarning) const
 {
-    data_STAFFREL staffRel;
-    staffRel.SetBasic(StrToStaffrelBasic(value, false));
-    if (staffRel.HasValue())
-        return staffRel;
-    staffRel.SetExtended(StrToStaffrelExtended(value, false));
-    if (staffRel.HasValue())
-        return staffRel;
+    data_STAFFREL data;
+    data.SetBasic(StrToStaffrelBasic(value, false));
+    if (data.HasValue())
+        return data;
+    data.SetExtended(StrToStaffrelExtended(value, false));
+    if (data.HasValue())
+        return data;
+    
     if (logWarning)
         LogWarning("Unsupported data.STAFFREL '%s'", value.c_str());
-    return staffRel;
+    
+    return data;
 }
 
 std::string Att::StemdirectionToStr(data_STEMDIRECTION data) const

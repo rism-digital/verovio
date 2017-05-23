@@ -42,7 +42,7 @@ AttChannelized::~AttChannelized()
 void AttChannelized::ResetChannelized()
 {
     m_midiChannel = -1;
-    m_midiDuty = 0;
+    m_midiDuty = -1.0;
     m_midiPort = -1;
     m_midiTrack = 0;
 }
@@ -102,7 +102,7 @@ bool AttChannelized::HasMidiChannel() const
 
 bool AttChannelized::HasMidiDuty() const
 {
-    return (m_midiDuty != 0);
+    return (m_midiDuty != -1.0);
 }
 
 bool AttChannelized::HasMidiPort() const
