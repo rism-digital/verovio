@@ -56,7 +56,7 @@ void Mensur::Init()
     RegisterAttClass(ATT_MENSURLOG);
     RegisterAttClass(ATT_METERSIGVIS);
     // FIXME MEI 4.0.0
-    //RegisterAttClass(ATT_RELATIVESIZE);
+    // RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_SLASHCOUNT);
 
     Reset();
@@ -74,7 +74,7 @@ void Mensur::Reset()
     ResetMensurLog();
     ResetMensurVis();
     // FIXME MEI 4.0.0
-    //ResetRelativesize();
+    // ResetRelativesize();
     ResetSlashCount();
 }
 

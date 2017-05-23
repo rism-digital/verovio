@@ -30,7 +30,7 @@ namespace vrv {
 Ending::Ending() : SystemElement("ending-"), BoundaryStartInterface(), AttNNumberLike()
 {
     RegisterAttClass(ATT_NINTEGER);
-    
+
     Reset();
 }
 

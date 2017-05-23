@@ -806,7 +806,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
 
             // Nothing to do if we have no vertical overlap
             if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
-            
+
             // Nothing to do either if we have no horizontal overlap
             if (!this->HorizontalSelfOverlap(*iter, horizontalMargin)) continue;
 
@@ -934,7 +934,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     }
     // This cover the case when the @size is given on the element
     // FIXME MEI 4.0.0
-    //else if (this->HasAttClass(ATT_RELATIVESIZE)) {
+    // else if (this->HasAttClass(ATT_RELATIVESIZE)) {
     //    AttRelativesize *att = dynamic_cast<AttRelativesize *>(this);
     //    assert(att);
     //    if (att->HasSize()) m_drawingCueSize = (att->GetSize() == SIZE_cue);

@@ -31,7 +31,7 @@ class data_FONTSIZE {
 public:
     data_FONTSIZE() { Reset(FONTSIZE_NONE); }
     virtual ~data_FONTSIZE() {}
-    
+
     void Reset(FontSizeType type)
     {
         m_type = type;
@@ -39,25 +39,38 @@ public:
         m_term = FONTSIZETERM_NONE;
         m_percent = 0;
     }
-    
+
     FontSizeType GetType() const { return m_type; }
-    
+
     data_FONTSIZENUMERIC GetFontSizeNumeric() const { return m_fontSizeNumeric; }
-    void SetFontSizeNumeric(data_FONTSIZENUMERIC value) { Reset(FONTSIZE_fontSizeNumeric); m_fontSizeNumeric = value; }
-    
+    void SetFontSizeNumeric(data_FONTSIZENUMERIC value)
+    {
+        Reset(FONTSIZE_fontSizeNumeric);
+        m_fontSizeNumeric = value;
+    }
+
     data_FONTSIZETERM GetTerm() const { return m_term; }
-    void SetTerm(data_FONTSIZETERM value) { Reset(FONTSIZE_term); m_term = value; }
-    
+    void SetTerm(data_FONTSIZETERM value)
+    {
+        Reset(FONTSIZE_term);
+        m_term = value;
+    }
+
     data_PERCENT GetPercent() const { return m_percent; }
-    void SetPercent(data_PERCENT value) { Reset(FONTSIZE_percent); m_percent = value; }
-    
-    bool HasValue() const {
+    void SetPercent(data_PERCENT value)
+    {
+        Reset(FONTSIZE_percent);
+        m_percent = value;
+    }
+
+    bool HasValue() const
+    {
         if (m_fontSizeNumeric != VRV_UNSET) return true;
         if (m_term != FONTSIZETERM_NONE) return true;
         if (m_percent != 0) return true;
         return false;
     }
-    
+
     // comparison
     bool operator==(const data_FONTSIZE &val) const
     {
@@ -68,7 +81,7 @@ public:
         return true;
     }
     bool operator!=(const data_FONTSIZE &val) const { return !(*this == val); }
-    
+
 protected:
     FontSizeType m_type;
     data_FONTSIZENUMERIC m_fontSizeNumeric;
@@ -87,7 +100,7 @@ class data_STAFFITEM {
 public:
     data_STAFFITEM() { Reset(STAFFITEM_NONE); }
     virtual ~data_STAFFITEM() {}
-    
+
     void Reset(StaffItemType type)
     {
         m_type = type;
@@ -95,25 +108,38 @@ public:
         m_cmn = STAFFITEM_cmn_NONE;
         m_mensural = STAFFITEM_mensural_NONE;
     }
-    
+
     StaffItemType GetType() const { return m_type; }
-    
+
     data_STAFFITEM_basic GetBasic() const { return m_basic; }
-    void SetBasic(data_STAFFITEM_basic value) { Reset(STAFFITEM_basic); m_basic = value; }
-    
+    void SetBasic(data_STAFFITEM_basic value)
+    {
+        Reset(STAFFITEM_basic);
+        m_basic = value;
+    }
+
     data_STAFFITEM_cmn GetCmn() const { return m_cmn; }
-    void SetCmn(data_STAFFITEM_cmn value) { Reset(STAFFITEM_cmn); m_cmn = value; }
-    
+    void SetCmn(data_STAFFITEM_cmn value)
+    {
+        Reset(STAFFITEM_cmn);
+        m_cmn = value;
+    }
+
     data_STAFFITEM_mensural GetMensural() const { return m_mensural; }
-    void SetMensural(data_STAFFITEM_mensural value) { Reset(STAFFITEM_mensural); m_mensural = value; }
-    
-    bool HasValue() const {
+    void SetMensural(data_STAFFITEM_mensural value)
+    {
+        Reset(STAFFITEM_mensural);
+        m_mensural = value;
+    }
+
+    bool HasValue() const
+    {
         if (m_basic != STAFFITEM_basic_NONE) return true;
         if (m_cmn != STAFFITEM_cmn_NONE) return true;
         if (m_mensural != STAFFITEM_mensural_NONE) return true;
         return false;
     }
-    
+
     // comparison
     bool operator==(const data_STAFFITEM &val) const
     {
@@ -124,14 +150,14 @@ public:
         return true;
     }
     bool operator!=(const data_STAFFITEM &val) const { return !(*this == val); }
-    
+
 protected:
     StaffItemType m_type;
     data_STAFFITEM_basic m_basic;
     data_STAFFITEM_cmn m_cmn;
     data_STAFFITEM_mensural m_mensural;
 };
-    
+
 /**
  * MEI data.STAFFREL
  * Since it can contain different subtype we need a dedicated class for it.
@@ -143,27 +169,37 @@ class data_STAFFREL {
 public:
     data_STAFFREL() { Reset(STAFFREL_NONE); }
     virtual ~data_STAFFREL() {}
-    
-    void Reset(StaffRelType type) {
+
+    void Reset(StaffRelType type)
+    {
         m_type = type;
         m_basic = STAFFREL_basic_NONE;
         m_extended = STAFFREL_extended_NONE;
     }
-    
+
     StaffRelType GetType() const { return m_type; }
-    
+
     data_STAFFREL_basic GetBasic() const { return m_basic; }
-    void SetBasic(data_STAFFREL_basic value) { Reset(STAFFREL_basic); m_basic = value; }
-    
+    void SetBasic(data_STAFFREL_basic value)
+    {
+        Reset(STAFFREL_basic);
+        m_basic = value;
+    }
+
     data_STAFFREL_extended GetExtended() const { return m_extended; }
-    void SetExtended(data_STAFFREL_extended value) { Reset(STAFFREL_extended); m_extended = value; }
-    
-    bool HasValue() const {
+    void SetExtended(data_STAFFREL_extended value)
+    {
+        Reset(STAFFREL_extended);
+        m_extended = value;
+    }
+
+    bool HasValue() const
+    {
         if (m_basic != STAFFREL_basic_NONE) return true;
         if (m_extended != STAFFREL_extended_NONE) return true;
         return false;
     }
-    
+
     // comparison
     bool operator==(const data_STAFFREL &val) const
     {
@@ -173,17 +209,17 @@ public:
         return true;
     }
     bool operator!=(const data_STAFFREL &val) const { return !(*this == val); }
-    
+
 protected:
     StaffRelType m_type;
     data_STAFFREL_basic m_basic;
     data_STAFFREL_extended m_extended;
 };
- 
+
 //----------------------------------------------------------------------------
 // Alternate data types unsing other alternate data types (above)
 //----------------------------------------------------------------------------
-   
+
 /**
  * MEI data.PLACEMENT
  * Since it can contain different subtype we need a dedicated class for it.
@@ -203,26 +239,39 @@ public:
         m_nonStaffPlace = NONSTAFFPLACE_NONE;
         m_nmtoken = "";
     }
-    
+
     PlacementType GetType() const { return m_type; }
-    
+
     data_STAFFREL GetStaffRel() const { return m_staffRel; }
-    void SetStaffRel(data_STAFFREL value) { Reset(PLACEMENT_staffRel); m_staffRel = value; }
+    void SetStaffRel(data_STAFFREL value)
+    {
+        Reset(PLACEMENT_staffRel);
+        m_staffRel = value;
+    }
     data_STAFFREL *GetStaffRelAtlernate() { return &m_staffRel; }
 
     data_NONSTAFFPLACE GetNonStaffPlace() const { return m_nonStaffPlace; }
-    void SetNonStaffPlace(data_NONSTAFFPLACE value) { Reset(PLACEMENT_nonStaffPlace); m_nonStaffPlace = value; }
-    
+    void SetNonStaffPlace(data_NONSTAFFPLACE value)
+    {
+        Reset(PLACEMENT_nonStaffPlace);
+        m_nonStaffPlace = value;
+    }
+
     std::string GetNMToken() const { return m_nmtoken; }
-    void SetNMToken(std::string value) { Reset(PLACEMENT_nmtoken); m_nmtoken = value; }
-    
-    bool HasValue() const {
+    void SetNMToken(std::string value)
+    {
+        Reset(PLACEMENT_nmtoken);
+        m_nmtoken = value;
+    }
+
+    bool HasValue() const
+    {
         if (m_staffRel.HasValue()) return true;
         if (m_nonStaffPlace != NONSTAFFPLACE_NONE) return true;
         if (m_nmtoken != "") return true;
         return false;
     }
-    
+
     // comparison
     bool operator==(const data_PLACEMENT &val) const
     {
@@ -233,7 +282,7 @@ public:
         return true;
     }
     bool operator!=(const data_PLACEMENT &val) const { return !(*this == val); }
-    
+
 protected:
     PlacementType m_type;
     data_STAFFREL m_staffRel;

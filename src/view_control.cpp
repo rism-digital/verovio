@@ -810,10 +810,12 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
             if (outsidePart) {
-                if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above)
+                    && (drawingCurveDir == curvature_CURVEDIR_above)) {
                     outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), true);
                 }
-                else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below)
+                    && (drawingCurveDir == curvature_CURVEDIR_below)) {
                     outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), true);
                 }
             }
@@ -828,10 +830,12 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
             if (outsidePart) {
-                if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above)
+                    && (drawingCurveDir == curvature_CURVEDIR_above)) {
                     outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), false);
                 }
-                else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                else if ((outsidePart->GetPlace().GetBasic() == STAFFREL_basic_below)
+                    && (drawingCurveDir == curvature_CURVEDIR_below)) {
                     outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), false);
                 }
             }
@@ -1689,15 +1693,15 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     int code = SMUFL_E4C0_fermataAbove;
     // check for shape
     if (fermata->GetShape() == fermataVis_SHAPE_angular) {
-        if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
+        if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
+                                                             && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C5_fermataShortBelow;
         else
             code = SMUFL_E4C4_fermataShortAbove;
     }
     else if (fermata->GetShape() == fermataVis_SHAPE_square) {
-        if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
+        if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
+                                                             && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C7_fermataLongBelow;
         else
             code = SMUFL_E4C6_fermataLongAbove;

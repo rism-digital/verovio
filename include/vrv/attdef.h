@@ -24,7 +24,7 @@ namespace vrv {
 typedef std::vector<std::pair<std::string, std::string> > ArrayOfStrAttr;
 
 #define VRV_UNSET -0x7FFFFFFF
-    
+
 class data_STAFFREL;
 
 //----------------------------------------------------------------------------
@@ -116,17 +116,17 @@ enum data_DURATION {
     DURATION_fusa,
     DURATION_semifusa
 };
-    
+
 /**
  * MEI data.FONTSIZENUMERIC
  */
 typedef int data_FONTSIZENUMERIC;
-        
+
 /**
  * MEI data.HEXNUM
  */
 typedef wchar_t data_HEXNUM;
-    
+
 /**
  * MEI data.KEYSIGNATURE
  * The maximum is 255 (unsigned char)
@@ -271,7 +271,6 @@ enum data_TEMPUS { TEMPUS_NONE = -3, TEMPUS_2 = 2, TEMPUS_3 };
  * E.g., list { xsd:positiveInteger+ }
  */
 typedef std::vector<int> xsdPositiveInteger_List;
-
 
 } // namespace vrv
 

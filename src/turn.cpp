@@ -21,7 +21,8 @@ namespace vrv {
 // Turn
 //----------------------------------------------------------------------------
 
-Turn::Turn() : ControlElement("turn-"), TimePointInterface(), AttColor(), vrv::AttOrnamentAccid(), AttPlacement(), AttTurnLog()
+Turn::Turn()
+    : ControlElement("turn-"), TimePointInterface(), AttColor(), vrv::AttOrnamentAccid(), AttPlacement(), AttTurnLog()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);

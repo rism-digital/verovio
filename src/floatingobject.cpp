@@ -114,13 +114,16 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
         Dir *dir = dynamic_cast<Dir *>(object);
         assert(dir);
         // dir below by default
-        m_place = (dir->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? dir->GetPlaceAlternate()->GetBasic() : STAFFREL_basic_below;
+        m_place = (dir->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? dir->GetPlaceAlternate()->GetBasic()
+                                                                                : STAFFREL_basic_below;
     }
     else if (object->Is(DYNAM)) {
         Dynam *dynam = dynamic_cast<Dynam *>(object);
         assert(dynam);
         // dynam below by default
-        m_place = (dynam->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? dynam->GetPlaceAlternate()->GetBasic() : STAFFREL_basic_below;
+        m_place = (dynam->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? dynam->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_below;
     }
     else if (object->Is(ENDING)) {
         // endings always above;
@@ -130,26 +133,34 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
         Fermata *fermata = dynamic_cast<Fermata *>(object);
         assert(fermata);
         // fermata above by default
-        m_place = (fermata->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? fermata->GetPlaceAlternate()->GetBasic() : STAFFREL_basic_above;
+        m_place = (fermata->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? fermata->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_above;
     }
     else if (object->Is(HAIRPIN)) {
         Hairpin *hairpin = dynamic_cast<Hairpin *>(object);
         assert(hairpin);
         // haripin below by default;
-        m_place = (hairpin->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? hairpin->GetPlaceAlternate()->GetBasic() : STAFFREL_basic_below;
+        m_place = (hairpin->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? hairpin->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_below;
     }
     else if (object->Is(HARM)) {
         Harm *harm = dynamic_cast<Harm *>(object);
         assert(harm);
         // harm above by default
-        m_place = (harm->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? harm->GetPlaceAlternate()->GetBasic() : STAFFREL_basic_above;
-        if ((harm->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_NONE) && object->GetFirst()->Is(FB)) m_place = STAFFREL_basic_below;
+        m_place = (harm->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? harm->GetPlaceAlternate()->GetBasic()
+                                                                                 : STAFFREL_basic_above;
+        if ((harm->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_NONE) && object->GetFirst()->Is(FB))
+            m_place = STAFFREL_basic_below;
     }
     else if (object->Is(MORDENT)) {
         Mordent *mordent = dynamic_cast<Mordent *>(object);
         assert(mordent);
         // mordent above by default;
-        m_place = (mordent->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? mordent->GetPlaceAlternate()->GetBasic() : STAFFREL_basic_above;
+        m_place = (mordent->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? mordent->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_above;
     }
     else if (object->Is(OCTAVE)) {
         Octave *octave = dynamic_cast<Octave *>(object);
@@ -161,25 +172,32 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
         Pedal *pedal = dynamic_cast<Pedal *>(object);
         assert(pedal);
         // pedal below by default
-        m_place = (pedal->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? pedal->GetPlaceAlternate()->GetBasic() : STAFFREL_basic_below;
+        m_place = (pedal->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? pedal->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_below;
     }
     else if (object->Is(TEMPO)) {
         Tempo *tempo = dynamic_cast<Tempo *>(object);
         assert(tempo);
         // tempo above by default;
-        m_place = (tempo->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? tempo->GetPlaceAlternate()->GetBasic() : STAFFREL_basic_above;
+        m_place = (tempo->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? tempo->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_above;
     }
     else if (object->Is(TRILL)) {
         Trill *trill = dynamic_cast<Trill *>(object);
         assert(trill);
         // trill above by default;
-        m_place = (trill->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? trill->GetPlaceAlternate()->GetBasic() : STAFFREL_basic_above;
+        m_place = (trill->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? trill->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_above;
     }
     else if (object->Is(TURN)) {
         Turn *turn = dynamic_cast<Turn *>(object);
         assert(turn);
         // turn above by default;
-        m_place = (turn->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? turn->GetPlaceAlternate()->GetBasic() : STAFFREL_basic_above;
+        m_place = (turn->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? turn->GetPlaceAlternate()->GetBasic()
+                                                                                 : STAFFREL_basic_above;
     }
     else {
         m_place = STAFFREL_basic_NONE;

@@ -207,7 +207,7 @@ data_DURATION Att::StrToDuration(std::string value) const
     }
     return DURATION_NONE;
 }
-    
+
 std::string Att::HexnumToStr(data_HEXNUM data) const
 {
     std::string value;
@@ -219,7 +219,7 @@ data_HEXNUM Att::StrToHexnum(std::string value) const
     data_HEXNUM hexnum = 0;
     return hexnum;
 }
-    
+
 std::string Att::FontsizeToStr(data_FONTSIZE data) const
 {
     // Here we need to format the output for each type
@@ -358,7 +358,7 @@ data_MODUSMINOR Att::StrToModusminor(std::string value) const
     LogWarning("Unsupported modusmaior '%s'", value.c_str());
     return MODUSMINOR_NONE;
 }
-    
+
 std::string Att::OctaveDisToStr(data_OCTAVE_DIS data) const
 {
     std::string value;
@@ -406,7 +406,7 @@ data_ORIENTATION Att::StrToOrientation(std::string value) const
     LogWarning("Unsupported orientation '%s'", value.c_str());
     return ORIENTATION_NONE;
 }
-    
+
 std::string Att::PercentToStr(data_PERCENT data) const
 {
     return StringFormat("%d%%", data);
@@ -506,7 +506,7 @@ data_STAFFREL Att::StrToStaffrel(std::string value) const
     data_STAFFREL staffRel;
     return staffRel;
 }
-    
+
 std::string Att::StemdirectionToStr(data_STEMDIRECTION data) const
 {
     std::string value;

@@ -284,12 +284,12 @@ void View::DrawStaffGrp(
         std::string label = staffGrp->GetLabel();
         if (abbreviations) {
             // FIXME MEI 4.0.0
-            //label = staffGrp->GetLabelAbbr();
+            // label = staffGrp->GetLabelAbbr();
         }
         // We still store the abbreviated label for calculating max width with abbreviations (see below)
         else {
             // FIXME MEI 4.0.0
-            //abbrLabel = staffGrp->GetLabelAbbr();
+            // abbrLabel = staffGrp->GetLabelAbbr();
         }
 
         if (label.length() != 0) {
@@ -387,12 +387,12 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         std::string label = staffDef->GetLabel();
         if (abbreviations) {
             // FIXME MEI 4.0.0
-            //label = staffDef->GetLabelAbbr();
+            // label = staffDef->GetLabelAbbr();
         }
         // We still store the abbreviated label for calculating max width with abbreviations (see below)
         else {
             // FIXME MEI 4.0.0
-            //abbrLabel = staffDef->GetLabelAbbr();
+            // abbrLabel = staffDef->GetLabelAbbr();
         }
 
         if (label.length() == 0) {

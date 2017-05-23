@@ -479,7 +479,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             if (nbStaves > 1) {
                 partStaffGrp->SetLabel(partName);
                 // FIXME MEI 4.0.0
-                //partStaffGrp->SetLabelAbbr(partAbbr);
+                // partStaffGrp->SetLabelAbbr(partAbbr);
                 partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
                 partStaffGrp->SetBarthru(BOOLEAN_true);
                 m_staffGrpStack.back()->AddChild(partStaffGrp);
@@ -489,7 +489,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 if (staffDef) {
                     staffDef->SetLabel(partName);
                     // FIXME MEI 4.0.0
-                    //staffDef->SetLabelAbbr(partAbbr);
+                    // staffDef->SetLabelAbbr(partAbbr);
                 }
                 m_staffGrpStack.back()->MoveChildrenFrom(partStaffGrp);
                 delete partStaffGrp;
@@ -1047,7 +1047,8 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
             Octave *octave = new Octave();
             std::string colorStr = GetAttributeValue(xmlShift.node(), "color");
             if (!colorStr.empty()) octave->SetColor(colorStr.c_str());
-            if (!placeStr.empty()) octave->SetDisPlace(octave->AttOctaveDisplacement::StrToStaffrelBasic(placeStr.c_str()));
+            if (!placeStr.empty())
+                octave->SetDisPlace(octave->AttOctaveDisplacement::StrToStaffrelBasic(placeStr.c_str()));
             octave->SetStaff(octave->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffN)));
             octave->SetDis(
                 octave->AttOctaveDisplacement::StrToOctaveDis(GetAttributeValue(xmlShift.node(), "size").c_str()));
@@ -1234,7 +1235,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             tuplet->SetNumbase(atoi(GetContent(normalNotes.node()).c_str()));
         }
         if (!GetAttributeValue(tupletStart.node(), "placement").empty()) {
-            tuplet->SetNumPlace(tuplet->AttTupletVis::StrToStaffrelBasic(GetAttributeValue(tupletStart.node(), "placement")));
+            tuplet->SetNumPlace(
+                tuplet->AttTupletVis::StrToStaffrelBasic(GetAttributeValue(tupletStart.node(), "placement")));
             tuplet->SetBracketPlace(
                 tuplet->AttTupletVis::StrToStaffrelBasic(GetAttributeValue(tupletStart.node(), "placement")));
         }
@@ -1258,7 +1260,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             MRest *mRest = new MRest();
             element = mRest;
             // FIXME MEI 4.0.0
-            //if (cue) mRest->SetSize(SIZE_cue);
+            // if (cue) mRest->SetSize(SIZE_cue);
             if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
             if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
             AddLayerElement(layer, mRest);
@@ -1269,7 +1271,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             rest->SetDur(ConvertTypeToDur(typeStr));
             if (dots > 0) rest->SetDots(dots);
             // FIXME MEI 4.0.0
-            //if (cue) rest->SetSize(SIZE_cue);
+            // if (cue) rest->SetSize(SIZE_cue);
             if (!stepStr.empty()) rest->SetPloc(ConvertStepToPitchName(stepStr));
             if (!octaveStr.empty()) rest->SetOloc(atoi(octaveStr.c_str()));
             AddLayerElement(layer, rest);
@@ -1348,7 +1350,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                 if (dots > 0) chord->SetDots(dots);
                 chord->SetStemDir(stemDir);
                 // FIXME MEI 4.0.0
-                //if (cue) chord->SetSize(SIZE_cue);
+                // if (cue) chord->SetSize(SIZE_cue);
                 if (tremSlashNum != "0") chord->SetStemMod(chord->AttStems::StrToStemmodifier(tremSlashNum + "slash"));
                 AddLayerElement(layer, chord);
                 m_elementStack.push_back(chord);
@@ -1378,7 +1380,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
             // FIXME MEI 4.0.0
-            //if (cue) note->SetSize(SIZE_cue);
+            // if (cue) note->SetSize(SIZE_cue);
             if (tremSlashNum != "0") note->SetStemMod(note->AttStems::StrToStemmodifier(tremSlashNum + "slash"));
         }
 

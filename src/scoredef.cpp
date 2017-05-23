@@ -298,7 +298,7 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
         // copy other attributes if present
         if (newStaffDef->HasLabel()) staffDef->SetLabel(newStaffDef->GetLabel());
         // FIXME MEI 4.0.0
-        //if (newStaffDef->HasLabelAbbr()) staffDef->SetLabelAbbr(newStaffDef->GetLabelAbbr());
+        // if (newStaffDef->HasLabelAbbr()) staffDef->SetLabelAbbr(newStaffDef->GetLabelAbbr());
     }
     else {
         LogWarning("StaffDef with xml:id '%s' could not be found", newStaffDef->GetUuid().c_str());
@@ -394,7 +394,7 @@ StaffGrp::StaffGrp()
     RegisterAttClass(ATT_BASIC);
     RegisterAttClass(ATT_LABELLED);
     // FIXME MEI 4.0.0
-    //RegisterAttClass(ATT_LABELSADDL);
+    // RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_STAFFGROUPINGSYM);
     RegisterAttClass(ATT_STAFFGRPVIS);
     RegisterAttClass(ATT_TYPED);
@@ -412,7 +412,7 @@ void StaffGrp::Reset()
     ResetBasic();
     ResetLabelled();
     // FIXME MEI 4.0.0
-    //ResetLabelsAddl();
+    // ResetLabelsAddl();
     ResetStaffGroupingSym();
     ResetStaffGrpVis();
     ResetTyped();
@@ -473,7 +473,7 @@ StaffDef::StaffDef()
     RegisterAttClass(ATT_DISTANCES);
     RegisterAttClass(ATT_LABELLED);
     // FIXME MEI 4.0.0
-    //RegisterAttClass(ATT_LABELSADDL);
+    // RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_NOTATIONTYPE);
     RegisterAttClass(ATT_SCALABLE);
@@ -494,7 +494,7 @@ void StaffDef::Reset()
     ResetDistances();
     ResetLabelled();
     // FIXME MEI 4.0.0
-    //ResetLabelsAddl();
+    // ResetLabelsAddl();
     ResetNInteger();
     ResetNotationType();
     ResetScalable();

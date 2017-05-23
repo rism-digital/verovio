@@ -52,7 +52,7 @@ Chord::Chord()
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_GRACED);
     // FIXME MEI 4.0.0
-    //RegisterAttClass(ATT_RELATIVESIZE);
+    // RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -75,7 +75,7 @@ void Chord::Reset()
     ResetColor();
     ResetGraced();
     // FIXME MEI 4.0.0
-    //ResetRelativesize();
+    // ResetRelativesize();
     ResetStems();
     ResetStemsCmn();
     ResetTiePresent();

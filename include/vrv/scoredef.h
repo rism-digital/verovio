@@ -224,7 +224,7 @@ class StaffGrp : public Object,
                  public AttBasic,
                  public AttLabelled,
                  // FIXME changed in MEI 4.0.0
-                 //public AttLabelsAddl,
+                 // public AttLabelsAddl,
                  public AttStaffGrpVis,
                  public AttStaffGroupingSym,
                  public AttTyped {
@@ -279,7 +279,7 @@ class StaffDef : public ScoreDefElement,
                  public AttDistances,
                  public AttLabelled,
                  // FIXME changed in MEI 4.0.0
-                 //public AttLabelsAddl,
+                 // public AttLabelsAddl,
                  public AttNInteger,
                  public AttNotationType,
                  public AttScalable,

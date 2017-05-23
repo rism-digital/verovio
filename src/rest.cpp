@@ -40,7 +40,7 @@ Rest::Rest()
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     // FIXME MEI 4.0.0
-    //RegisterAttClass(ATT_RELATIVESIZE);
+    // RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_RESTVISMENSURAL);
     Reset();
 }
@@ -56,7 +56,7 @@ void Rest::Reset()
     PositionInterface::Reset();
     ResetColor();
     // FIXME MEI 4.0.0
-    //ResetRelativesize();
+    // ResetRelativesize();
     ResetRestVisMensural();
 }
 

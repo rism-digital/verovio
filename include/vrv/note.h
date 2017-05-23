@@ -48,7 +48,7 @@ class Note : public LayerElement,
              public AttGraced,
              public AttNoteAnlMensural,
              // FIXME changed in MEI 4.0.0 - will be changed to @cue?
-             //public AttRelativesize,
+             // public AttRelativesize,
              public AttStems,
              public AttStemsCmn,
              public AttTiePresent,
@@ -155,7 +155,7 @@ public:
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize);
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize);
     ///@}
-          
+
     /**
      * Return the SMuFL code for a mensural note looking at the staff notation type, the coloration and the duration
      */

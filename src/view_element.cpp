@@ -288,7 +288,8 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
         if (articPart->GetType() == ARTIC_PART_INSIDE) {
             // If we are above the top of the  staff, just pile them up
-            if ((articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) && (y > staff->GetDrawingY())) y += yShift;
+            if ((articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) && (y > staff->GetDrawingY()))
+                y += yShift;
             // If we are below the bottom, just pile the down
             else if ((articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_below)
                 && (y < staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)))
@@ -307,10 +308,11 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
         xCorr = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, drawingCueSize) / 2;
         // The position of the next glyph (and for correcting the baseline if necessary
         int glyphHeight = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize);
-        
+
         // Center the glyh if necessary
         if (Artic::IsCentered(*articIter)) {
-            y += (articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
+            y += (articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) ? -(glyphHeight / 2)
+                                                                                      : (glyphHeight / 2);
         }
 
         // Adjust the baseline for glyph above the baseline in SMuFL
