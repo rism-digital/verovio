@@ -51,13 +51,13 @@ Toolkit::Toolkit(bool initFont)
     m_format = AUTO;
 
     // default page size
-    m_pageHeight = DEFAULT_PAGE_HEIGHT;
-    m_pageWidth = DEFAULT_PAGE_WIDTH;
-    m_border = DEFAULT_PAGE_LEFT_MAR;
+    m_pageHeight = m_doc.GetStyle()->m_pageHeight.GetDefault();
+    m_pageWidth = m_doc.GetStyle()->m_pageWidth.GetDefault();;
+    m_border = m_doc.GetStyle()->m_pageLeftMar.GetDefault();
     m_spacingLinear = DEFAULT_SPACING_LINEAR;
     m_spacingNonLinear = DEFAULT_SPACING_NON_LINEAR;
-    m_spacingStaff = DEFAULT_SPACING_STAFF;
-    m_spacingSystem = DEFAULT_SPACING_SYSTEM;
+    m_spacingStaff = m_doc.GetStyle()->m_spacingStaff.GetDefault();
+    m_spacingSystem = m_doc.GetStyle()->m_spacingSystem.GetDefault();;
 
     m_noLayout = false;
     m_ignoreLayout = false;
@@ -95,14 +95,8 @@ bool Toolkit::SetResourcePath(const std::string &path)
 
 bool Toolkit::SetBorder(int border)
 {
-    // We use left margin values because for now we cannot specify different values for each margin
-    if (border < MIN_PAGE_LEFT_MAR || border > MAX_PAGE_LEFT_MAR) {
-        LogError("Border out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_LEFT_MAR,
-            MIN_PAGE_LEFT_MAR, MAX_PAGE_LEFT_MAR);
-        return false;
-    }
-    m_border = border;
-    return true;
+    assert(m_doc.GetStyle());
+    return (m_doc.GetStyle()->m_pageLeftMar.SetValue(border) && m_doc.GetStyle()->m_pageRightMar.SetValue(border) && m_doc.GetStyle()->m_pageTopMar.SetValue(border));
 }
 
 bool Toolkit::SetScale(int scale)
@@ -118,57 +112,33 @@ bool Toolkit::SetScale(int scale)
 
 bool Toolkit::SetPageHeight(int h)
 {
-    if (h < MIN_PAGE_HEIGHT || h > MAX_PAGE_HEIGHT) {
-        LogError("Page height out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_HEIGHT,
-            MIN_PAGE_HEIGHT, MAX_PAGE_HEIGHT);
-        return false;
-    }
-    m_pageHeight = h;
-    return true;
+    assert(m_doc.GetStyle());
+    return (m_doc.GetStyle()->m_pageHeight.SetValue(h));
 }
 
 bool Toolkit::SetPageWidth(int w)
 {
-    if (w < MIN_PAGE_WIDTH || w > MAX_PAGE_WIDTH) {
-        LogError("Page width out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_WIDTH,
-            MIN_PAGE_WIDTH, MAX_PAGE_WIDTH);
-        return false;
-    }
-    m_pageWidth = w;
-    return true;
+    assert(m_doc.GetStyle());
+    return (m_doc.GetStyle()->m_pageWidth.SetValue(w));
 };
 
 bool Toolkit::SetSpacingStaff(int spacingStaff)
 {
-    if (spacingStaff < MIN_SPACING_STAFF || spacingStaff > MAX_SPACING_STAFF) {
-        LogError("Spacing staff out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SPACING_STAFF,
-            MIN_SPACING_STAFF, MAX_SPACING_STAFF);
-        return false;
-    }
-    m_spacingStaff = spacingStaff;
-    return true;
+    assert(m_doc.GetStyle());
+    return (m_doc.GetStyle()->m_spacingStaff.SetValue(spacingStaff));
 }
 
 bool Toolkit::SetSpacingSystem(int spacingSystem)
 {
-    if (spacingSystem < MIN_SPACING_SYSTEM || spacingSystem > MAX_SPACING_SYSTEM) {
-        LogError("Spacing system out of bounds; default is %d, minimum is %d, and maximum is %d",
-            DEFAULT_SPACING_SYSTEM, MIN_SPACING_SYSTEM, MAX_SPACING_SYSTEM);
-        return false;
-    }
-    m_spacingSystem = spacingSystem;
-    return true;
+    assert(m_doc.GetStyle());
+    return (m_doc.GetStyle()->m_spacingSystem.SetValue(spacingSystem));
 }
 
 bool Toolkit::SetSpacingLinear(float spacingLinear)
 {
-    if (spacingLinear < MIN_SPACING_LINEAR || spacingLinear > MAX_SPACING_LINEAR) {
-        LogError("Spacing (linear) out of bounds; default is %d, minimum is %d, and maximum is %d",
-            DEFAULT_SPACING_LINEAR, MIN_SPACING_LINEAR, MAX_SPACING_LINEAR);
-        return false;
-    }
-    m_spacingLinear = spacingLinear;
-    return true;
+    assert(m_doc.GetStyle());
+    return false;
+    //return (m_doc.GetStyle()->m_.SetValue(h));
 }
 
 bool Toolkit::SetSpacingNonLinear(float spacingNonLinear)

@@ -71,17 +71,19 @@ void display_usage()
     // -options with both short and long forms first
     // -then options with long forms only
     // -then debugging options
+    
+    Style style;
 
     // Options with both short and long forms
     cerr << "Options (marked as * are repeatable)" << endl;
 
     cerr << " -                          Use \"-\" as input file for reading from the standard input" << endl;
 
-    cerr << " -b, --border=BORDER        Add border (default is " << DEFAULT_PAGE_LEFT_MAR << ")" << endl;
+    cerr << " -b, --border=BORDER        Add border (default is " << style.m_pageLeftMar.GetDefault() << ")" << endl;
 
     cerr << " -f, --format=INPUT_FORMAT  Select input format: darms, mei, pae, xml (default is mei)" << endl;
 
-    cerr << " -h, --page-height=HEIGHT   Specify the page height (default is " << DEFAULT_PAGE_HEIGHT << ")" << endl;
+    cerr << " -h, --page-height=HEIGHT   Specify the page height (default is " << style.m_pageHeight.GetDefault()  << ")" << endl;
 
     cerr << " -o, --outfile=FILE_NAME    Output file name (use \"-\" for standard output)" << endl;
 
@@ -94,7 +96,7 @@ void display_usage()
 
     cerr << " -v, --version              Display the version number" << endl;
 
-    cerr << " -w, --page-width=WIDTH     Specify the page width (default is " << DEFAULT_PAGE_WIDTH << ")" << endl;
+    cerr << " -w, --page-width=WIDTH     Specify the page width (default is " << style.m_pageWidth.GetDefault()  << ")" << endl;
 
     // Options with long forms only
     cerr << endl << "Additional options" << endl;

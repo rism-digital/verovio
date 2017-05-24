@@ -12,47 +12,23 @@
 #include "custom_style.h"
 #else
 
+#include <map>
+#include <string>
+#include <vector>
+
+//----------------------------------------------------------------------------
+
+#include "attalternates.h"
+#include "atttypes.h"
+
+//----------------------------------------------------------------------------
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
 // Default layout values
 //----------------------------------------------------------------------------
 
-#define DEFAULT_UNIT 9
-#define MIN_UNIT 6
-#define MAX_UNIT 18
-
-#define DEFAULT_PAGE_LEFT_MAR 50
-#define MIN_PAGE_LEFT_MAR 0
-#define MAX_PAGE_LEFT_MAR 500
-
-#define DEFAULT_PAGE_RIGHT_MAR 50
-#define MIN_PAGE_RIGHT_MAR 0
-#define MAX_PAGE_RIGHT_MAR 500
-
-#define DEFAULT_PAGE_TOP_MAR 50
-#define MIN_PAGE_TOP_MAR 0
-#define MAX_PAGE_TOP_MAR 500
-
-#define DEFAULT_PAGE_HEIGHT 2970
-#define MIN_PAGE_HEIGHT 100
-#define MAX_PAGE_HEIGHT 60000
-
-#define DEFAULT_PAGE_WIDTH 2100
-#define MIN_PAGE_WIDTH 100
-#define MAX_PAGE_WIDTH 60000
-
-#define DEFAULT_BARLINE_WIDTH 3.0
-#define MIN_BARLINE_WIDTH 1.0
-#define MAX_BARLINE_WIDTH 8.0
-
-#define DEFAULT_STAFFLINE_WIDTH 2.0
-#define MIN_STAFFLINE_WIDTH 1.0
-#define MAX_STAFFLINE_WIDTH 8.0
-
-#define DEFAULT_STEM_WIDTH 2.0
-#define MIN_STEM_WIDTH 1.0
-#define MAX_STEM_WIDTH 5.0
 
 #define DEFAULT_SPACING_LINEAR 0.25
 #define MIN_SPACING_LINEAR 0.0
@@ -69,32 +45,6 @@ namespace vrv {
 #define DEFAULT_SCALE 100
 #define MIN_SCALE 1
 #define MAX_SCALE 1000
-
-#define DEFAULT_SPACING_STAFF 10
-#define MIN_SPACING_STAFF 0
-#define MAX_SPACING_STAFF 24
-
-#define DEFAULT_SPACING_SYSTEM 6
-#define MIN_SPACING_SYSTEM 0
-#define MAX_SPACING_SYSTEM 12
-
-#define DEFAULT_HAIRPIN_SIZE 3.0
-#define MIN_HAIRPIN_SIZE 2.0
-#define MAX_HAIRPIN_SIZE 8.0
-
-#define DEFAULT_LYRIC_SIZE 4.5
-#define MIN_LYRIC_SIZE 2.0
-#define MAX_LYRIC_SIZE 8.0
-
-#define DEFAULT_MEASURE_WIDTH 15.0
-#define MIN_MEASURE_WIDTH 1.0
-#define MAX_MEASURE_WIDTH 30.0
-
-#define DEFAULT_TIE_THICKNESS 0.5
-
-#define DEFAULT_MIN_SLUR_HEIGHT 1.2
-#define DEFAULT_MAX_SLUR_HEIGHT 3.0
-#define DEFAULT_SLUR_THICKNESS 0.6
 
 /** The default position at the beginning of a measure */
 #define DEFAULT_LEFT_POSITION 0.8
@@ -162,7 +112,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 // the space between each lyric line in units
-#define TEMP_LYRIC_LINE_SPACE 5.0 * PARAM_DENOMINATOR
+#define TEMP_LYRIC_LINE_SPACE 5.0
 
 // the key signature spacing factor
 #define TEMP_KEYSIG_STEP 1.3
@@ -191,9 +141,223 @@ namespace vrv {
 // Linewidth for staff lines in mensural notation, rel. to "normal" width of staff lines */
 #define MENSURAL_LINEWIDTH_FACTOR 1.0
 
+//----------------------------------------------------------------------------
+// Style defines
+//----------------------------------------------------------------------------
+
+enum style_MEASURENUMBER
+{
+    MEASURENUMBER_system = 0,
+    MEASURENUMBER_interval
+};
+    
+//----------------------------------------------------------------------------
+// StyleParam
+//----------------------------------------------------------------------------
+    
 /**
- * This class contains the document default environment variables.
- * FIXME: Some of them are not available as is in MEI - to be solved
+ * This class is a base class of each styling parameter
+ */
+class StyleParam {
+public:
+    // constructors and destructors
+    StyleParam() {}
+    virtual ~StyleParam() {}
+    
+    void SetInfo(std::string title, std::string description);
+    
+public:
+    //
+protected:
+    std::string m_title;
+    std::string m_description;
+};
+
+//----------------------------------------------------------------------------
+// StyleParamBool
+//----------------------------------------------------------------------------
+
+/**
+ * This class is for boolean styling params
+ */
+class StyleParamBool : public StyleParam {
+public:
+    // constructors and destructors
+    StyleParamBool() {}
+    virtual ~StyleParamBool() {}
+    void Init(bool defaultValue);
+    
+    bool GetValue() { return m_value; }
+    bool GetDefault() { return m_defaultValue; }
+    bool SetValue(bool m_value);
+  
+private:
+    //
+public:
+    //
+private:
+    bool m_value;
+    bool m_defaultValue;
+};
+
+//----------------------------------------------------------------------------
+// StyleParamDbl
+//----------------------------------------------------------------------------
+
+/**
+ * This class is for integer styling params
+ */
+class StyleParamDbl : public StyleParam {
+public:
+    // constructors and destructors
+    StyleParamDbl() {}
+    virtual ~StyleParamDbl() {}
+    void Init(double defaultValue, double minValue, double maxValue);
+    
+    double GetValue() { return m_value; }
+    double GetDefault() { return m_defaultValue; }
+    double GetMin() { return m_minValue; }
+    double GetMax() { return m_maxValue; }
+    bool SetValue(double value);
+
+private:
+    //
+public:
+    //
+private:
+    double m_value;
+    double m_defaultValue;
+    double m_minValue;
+    double m_maxValue;
+};
+    
+//----------------------------------------------------------------------------
+// StyleParamInt
+//----------------------------------------------------------------------------
+
+/**
+ * This class is for integer styling params
+ */
+class StyleParamInt : public StyleParam {
+public:
+    // constructors and destructors
+    StyleParamInt() {}
+    virtual ~StyleParamInt() {}
+    void Init(int defaultValue, int minValue, int maxValue, bool definitionFactor = false);
+    
+    int GetValue();
+    int GetDefault() { return m_defaultValue; }
+    int GetMin() { return m_minValue; }
+    int GetMax() { return m_maxValue; }
+    bool SetValue(int value);
+
+private:
+    //
+public:
+    //
+private:
+    int m_value;
+    int m_defaultValue;
+    int m_minValue;
+    int m_maxValue;
+    bool m_definitionFactor;
+};
+    
+    
+//----------------------------------------------------------------------------
+// StyleParamMeasureNumber
+//----------------------------------------------------------------------------
+
+/**
+ * This class is for map styling params
+ */
+class StyleParamMeasureNumber : public StyleParam {
+public:
+    // constructors and destructors
+    StyleParamMeasureNumber() {};
+    virtual ~StyleParamMeasureNumber() {};
+
+    void Init(style_MEASURENUMBER defaultValue);
+    bool SetValue(std::string value);
+    
+    style_MEASURENUMBER GetValue() { return m_value; }
+    style_MEASURENUMBER GetDefault() { return m_defaultValue; }
+
+private:
+    //
+public:
+    static std::map<style_MEASURENUMBER, std::string> values;
+private:
+    style_MEASURENUMBER m_value;
+    style_MEASURENUMBER m_defaultValue;
+};
+    
+//----------------------------------------------------------------------------
+// StyleParamStaffrel
+//----------------------------------------------------------------------------
+
+/**
+ * This class is for map styling params
+ */
+class StyleParamStaffrel : public StyleParam {
+public:
+    // constructors and destructors
+    StyleParamStaffrel() {};
+    virtual ~StyleParamStaffrel() {};
+    
+    // Alternate type style cannot have a restricted list of possible values
+    void Init(data_STAFFREL defaultValue);
+    bool SetValue(std::string value);
+    
+    // For altenate types return a reference to the value
+    // Alternatively we can have a values vector for each sub-type
+    data_STAFFREL *GetValueAlternate() { return &m_value; }
+    data_STAFFREL *GetDefaultAlernate() { return &m_defaultValue; }
+    
+private:
+    //
+public:
+    //
+private:
+    data_STAFFREL m_value;
+    data_STAFFREL m_defaultValue;
+};
+    
+//----------------------------------------------------------------------------
+// StyleParamStaffrelBasic
+//----------------------------------------------------------------------------
+
+/**
+ * This class is for map styling params
+ */
+class StyleParamStaffrelBasic : public StyleParam {
+public:
+    // constructors and destructors
+    StyleParamStaffrelBasic() {};
+    virtual ~StyleParamStaffrelBasic() {};
+
+    void Init(data_STAFFREL_basic defaultValue, const std::vector<data_STAFFREL_basic> &values);
+    bool SetValue(std::string value);
+    
+    data_STAFFREL_basic GetValue() { return m_value; }
+    data_STAFFREL_basic GetDefault() { return m_defaultValue; }
+
+private:
+    //
+public:
+    //
+private:
+    std::vector<data_STAFFREL_basic> m_values;
+    data_STAFFREL_basic m_value;
+    data_STAFFREL_basic m_defaultValue;
+};
+    
+//----------------------------------------------------------------------------
+// Style
+//----------------------------------------------------------------------------
+    
+/**
+ * This class contains the document styling parameters.
  */
 class Style {
 public:
@@ -202,101 +366,106 @@ public:
     virtual ~Style();
 
 public:
+    
     /** The unit (1Ú2 of the distance between staff lines) **/
-    int m_unit;
+    StyleParamInt m_unit;
     /** The landscape paper orientation flag */
-    char m_landscape;
+    StyleParamBool m_landscape;
     /** The staff line width */
-    unsigned short m_staffLineWidth;
+    StyleParamDbl m_staffLineWidth;
     /** The stem width */
-    unsigned short m_stemWidth;
+    StyleParamDbl m_stemWidth;
     /** The barLine width */
-    unsigned short m_barLineWidth;
+    StyleParamDbl m_barLineWidth;
     /** The maximum beam slope */
-    unsigned char m_beamMaxSlope;
+    StyleParamInt m_beamMaxSlope;
     /** The minimum beam slope */
-    unsigned char m_beamMinSlope;
+    StyleParamInt m_beamMinSlope;
     /** The grace size ratio numerator */
-    unsigned char m_graceNum;
-    /** The grace size ratio denominator */
-    unsigned char m_graceDen;
+    StyleParamDbl m_graceFactor;
     /** The page height */
-    int m_pageHeight;
+    StyleParamInt m_pageHeight;
     /** The page width */
-    int m_pageWidth;
+    StyleParamInt m_pageWidth;
     /** The page left margin */
-    short m_pageLeftMar;
+    StyleParamInt m_pageLeftMar;
     /** The page right margin */
-    short m_pageRightMar;
+    StyleParamInt m_pageRightMar;
     /** The page top margin */
-    short m_pageTopMar;
+    StyleParamInt m_pageTopMar;
     /** The staff minimal spacing */
-    short m_spacingStaff;
+    StyleParamInt m_spacingStaff;
     /** The system minimal spacing */
-    short m_spacingSystem;
+    StyleParamInt m_spacingSystem;
 
-    /** The minimal measure width in units / PARAM_DENOMINATOR */
-    short m_minMeasureWidth;
-    /** The lyrics size (in units / PARAM_DENOMINATOR) */
-    int m_lyricSize;
-    /** haripin size (in units / PARAM_DENOMINATOR) */
-    int m_hairpinSize;
+    /** The minimal measure width (in units) */
+    StyleParamInt m_minMeasureWidth;
+    /** The lyrics size (in units) */
+    StyleParamDbl m_lyricSize;
+    /** haripin size (in units) */
+    StyleParamDbl m_hairpinSize;
 
     /** ties and slurs */
-    char m_tieThickness;
-    char m_minSlurHeight;
-    char m_maxSlurHeight;
-    char m_slurThickness;
+    StyleParamDbl m_tieThickness;
+    StyleParamDbl m_minSlurHeight;
+    StyleParamDbl m_maxSlurHeight;
+    StyleParamDbl m_slurThickness;
 
     /** The left position */
-    char m_leftPosition;
+    StyleParamDbl m_leftPosition;
 
     /** The layout left margin by element */
-    char m_leftMarginAccid;
-    char m_leftMarginBarLine;
-    char m_leftMarginBarLineAttrLeft;
-    char m_leftMarginBarLineAttrRight;
-    char m_leftMarginBeatRpt;
-    char m_leftMarginChord;
-    char m_leftMarginClef;
-    char m_leftMarginKeySig;
-    char m_leftMarginMensur;
-    char m_leftMarginMeterSig;
-    char m_leftMarginMRest;
-    char m_leftMarginMRpt2;
-    char m_leftMarginMultiRest;
-    char m_leftMarginMultiRpt;
-    char m_leftMarginNote;
-    char m_leftMarginRest;
+    StyleParamDbl m_leftMarginAccid;
+    StyleParamDbl m_leftMarginBarLine;
+    StyleParamDbl m_leftMarginBarLineAttrLeft;
+    StyleParamDbl m_leftMarginBarLineAttrRight;
+    StyleParamDbl m_leftMarginBeatRpt;
+    StyleParamDbl m_leftMarginChord;
+    StyleParamDbl m_leftMarginClef;
+    StyleParamDbl m_leftMarginKeySig;
+    StyleParamDbl m_leftMarginMensur;
+    StyleParamDbl m_leftMarginMeterSig;
+    StyleParamDbl m_leftMarginMRest;
+    StyleParamDbl m_leftMarginMRpt2;
+    StyleParamDbl m_leftMarginMultiRest;
+    StyleParamDbl m_leftMarginMultiRpt;
+    StyleParamDbl m_leftMarginNote;
+    StyleParamDbl m_leftMarginRest;
     /** The default left margin */
-    char m_leftMarginDefault;
+    StyleParamDbl m_leftMarginDefault;
 
     /** The layout right margin by element */
-    char m_rightMarginAccid;
-    char m_rightMarginBarLine;
-    char m_rightMarginBarLineAttrLeft;
-    char m_rightMarginBarLineAttrRight;
-    char m_rightMarginBeatRpt;
-    char m_rightMarginChord;
-    char m_rightMarginClef;
-    char m_rightMarginKeySig;
-    char m_rightMarginMensur;
-    char m_rightMarginMeterSig;
-    char m_rightMarginMRest;
-    char m_rightMarginMRpt2;
-    char m_rightMarginMultiRest;
-    char m_rightMarginMultiRpt;
-    char m_rightMarginNote;
-    char m_rightMarginRest;
+    StyleParamDbl m_rightMarginAccid;
+    StyleParamDbl m_rightMarginBarLine;
+    StyleParamDbl m_rightMarginBarLineAttrLeft;
+    StyleParamDbl m_rightMarginBarLineAttrRight;
+    StyleParamDbl m_rightMarginBeatRpt;
+    StyleParamDbl m_rightMarginChord;
+    StyleParamDbl m_rightMarginClef;
+    StyleParamDbl m_rightMarginKeySig;
+    StyleParamDbl m_rightMarginMensur;
+    StyleParamDbl m_rightMarginMeterSig;
+    StyleParamDbl m_rightMarginMRest;
+    StyleParamDbl m_rightMarginMRpt2;
+    StyleParamDbl m_rightMarginMultiRest;
+    StyleParamDbl m_rightMarginMultiRpt;
+    StyleParamDbl m_rightMarginNote;
+    StyleParamDbl m_rightMarginRest;
+    /** The default right margin */
+    StyleParamDbl m_rightMarginDefault;
 
     /** The default right margin */
-    char m_rightMarginDefault;
+    StyleParamDbl m_bottomMarginDefault;
 
     /** The default right margin */
-    char m_bottomMarginDefault;
-
-    /** The default right margin */
-    char m_topMarginDefault;
+    StyleParamDbl m_topMarginDefault;
+    
+private:
+    /** The array of style parameters */
+    std::map<std::string, const StyleParam*> m_params;
+    
+    StyleParamInt m_margin;
+    StyleParamMeasureNumber m_measureNumber;
 };
 
 } // namespace vrv

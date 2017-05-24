@@ -855,7 +855,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     int selfLeft = this->GetSelfLeft()
         - params->m_doc->GetLeftMargin(this->GetClassId())
-            * params->m_doc->GetDrawingUnit(params->m_doc->GetCueSize(100)) / PARAM_DENOMINATOR;
+    * params->m_doc->GetDrawingUnit(params->m_doc->GetCueSize(100));
 
     params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
 
@@ -890,7 +890,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // We add it to the upcoming bouding boxes
         params->m_upcomingBoundingBoxes.push_back(this);
         selfLeft = this->GetSelfLeft()
-            - params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+        - params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
     }
 
     int offset = selfLeft - params->m_minPos;
@@ -904,12 +904,12 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     int selfRight;
     if (!this->HasUpdatedBB() || this->HasEmptyBB())
         selfRight = this->GetAlignment()->GetXRel()
-            + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-                / PARAM_DENOMINATOR;
+        + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+    
     else
         selfRight = this->GetSelfRight()
-            + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-                / PARAM_DENOMINATOR;
+        + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+    
 
     params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
 

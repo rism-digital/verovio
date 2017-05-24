@@ -789,7 +789,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     float angle = AdjustSlur(slur, staff, layer1->GetN(), drawingCurveDir, points);
 
-    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / PARAM_DENOMINATOR;
+    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness();
 
     assert(slur->GetCurrentFloatingPositioner());
     slur->GetCurrentFloatingPositioner()->UpdateCurvePosition(points, angle, thickness, drawingCurveDir);
@@ -887,10 +887,10 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     else {
         int dist = abs(p2->x - p1->x);
         height
-            = std::max(m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR,
+            = std::max(m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) ,
                 dist / TEMP_SLUR_HEIGHT_FACTOR);
         height = std::min(
-            m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR, height);
+            m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) , height);
     }
 
     // the height of the control points
@@ -1382,7 +1382,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
             height += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         }
     }
-    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetTieThickness() / PARAM_DENOMINATOR;
+    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetTieThickness();
 
     // control points
     Point c1, c2;

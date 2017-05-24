@@ -238,7 +238,6 @@ typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
 //----------------------------------------------------------------------------
 
 #define DEFINITION_FACTOR 10
-#define PARAM_DENOMINATOR 10
 
 #define isIn(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
 
