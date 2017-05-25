@@ -901,7 +901,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     else if (meterSig->GetForm() == meterSigVis_FORM_num) {
         DrawMeterSigFigures(dc, x, staff->GetDrawingY(), meterSig->GetCount(), NONE, staff);
     }
-    else if (meterSig->GetCount()) {
+    else if (meterSig->HasCount()) {
         DrawMeterSigFigures(dc, x, staff->GetDrawingY(), meterSig->GetCount(), meterSig->GetUnit(), staff);
     }
 
