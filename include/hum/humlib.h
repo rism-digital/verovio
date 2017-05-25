@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue May 23 18:11:28 CEST 2017
+// Last Modified: Thu May 25 19:12:01 CEST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2893,6 +2893,7 @@ class Tool_dissonant : public HumTool {
 		int     getNextPitchAttackIndex(NoteGrid& grid, int voicei, int sliceindex);
 		void    fillLabels         (void);
 		void    fillLabels2        (void);
+		void    printCountAnalysis (vector<vector<string> >& data);
 
 	private:
 	 	vector<HTp> m_kernspines;
@@ -2906,34 +2907,37 @@ class Tool_dissonant : public HumTool {
 		vector<string> m_labels;
 
 		// unaccdented non-harmonic tones:
-      const int UNKNOWN_DISSONANCE =  0; // unknown dissonance type
-		const int UNLABELED_Z2       =  1; // unknown dissonance type, 2nd interval
-		const int UNLABELED_Z7       =  2; // unknown dissonance type, 7th interval
-		const int UNLABELED_Z4       =  3; // unknown dissonance type, 4th interval
-		const int PASSING_UP         =  4; // rising passing tone
-		const int PASSING_DOWN       =  5; // downward passing tone
-		const int NEIGHBOR_UP        =  6; // upper neighbor
-		const int NEIGHBOR_DOWN      =  7; // lower neighbor
-		const int ECHAPPE_UP         =  8; // upper échappée
-		const int ECHAPPE_DOWN       =  9; // lower échappée
-		const int CAMBIATA_UP_S      = 10; // ascending short nota cambiata
-		const int CAMBIATA_DOWN_S    = 11; // descending short nota cambiata
-		const int CAMBIATA_UP_L      = 12; // ascending long nota cambiata
-		const int CAMBIATA_DOWN_L    = 13; // descending long nota cambiata
-		const int IPOSTHI_NEIGHBOR   = 14; // incomplete posterior upper neighbor
-		const int IPOSTLOW_NEIGHBOR  = 15; // incomplete posterior lower neighbor
-		const int IANTHI_NEIGHBOR    = 16; // incomplete anterior upper neighbor
-		const int IANTLOW_NEIGHBOR   = 17; // incomplete anterior lower neighbor
-		const int ANT_UP             = 18; // rising anticipation
-		const int ANT_DOWN           = 19; // descending anticipation
+		const int PASSING_UP         =  0; // rising passing tone
+		const int PASSING_DOWN       =  1; // downward passing tone
+		const int NEIGHBOR_UP        =  2; // upper neighbor
+		const int NEIGHBOR_DOWN      =  3; // lower neighbor
+		const int ECHAPPE_UP         =  4; // upper échappée
+		const int ECHAPPE_DOWN       =  5; // lower échappée
+		const int CAMBIATA_UP_S      =  6; // ascending short nota cambiata
+		const int CAMBIATA_DOWN_S    =  7; // descending short nota cambiata
+		const int CAMBIATA_UP_L      =  8; // ascending long nota cambiata
+		const int CAMBIATA_DOWN_L    =  9; // descending long nota cambiata
+		const int IPOSTHI_NEIGHBOR   = 10; // incomplete posterior upper neighbor
+		const int IPOSTLOW_NEIGHBOR  = 11; // incomplete posterior lower neighbor
+		const int IANTHI_NEIGHBOR    = 12; // incomplete anterior upper neighbor
+		const int IANTLOW_NEIGHBOR   = 13; // incomplete anterior lower neighbor
+		const int ANT_UP             = 14; // rising anticipation
+		const int ANT_DOWN           = 15; // descending anticipation
 
 		// unaccdented non-harmonic tones:
-		const int THIRD_QUARTER      = 20; // dissonant third quarter
-		const int SUSPENSION         = 21; // suspension
-		const int SUSPENSION_AGENT   = 22; // suspension agent
-		const int SUSPENSION_ORNAM   = 23; // suspension ornament
-		const int SUSPENSION_REP     = 24; // suspension repeated note
-		const int CHANSON_IDIOM      = 25; // chanson idiom
+		const int THIRD_QUARTER      = 16; // dissonant third quarter
+		const int SUSPENSION         = 17; // suspension
+		const int SUSPENSION_AGENT   = 18; // suspension agent
+		const int SUSPENSION_ORNAM   = 19; // suspension ornament
+		const int SUSPENSION_REP     = 20; // suspension repeated note
+		const int CHANSON_IDIOM      = 21; // chanson idiom
+
+		// unknown dissonances:
+		const int UNKNOWN_DISSONANCE = 22; // unknown dissonance type
+		const int UNLABELED_Z2       = 23; // unknown dissonance type, 2nd interval
+		const int UNLABELED_Z7       = 24; // unknown dissonance type, 7th interval
+		const int UNLABELED_Z4       = 25; // unknown dissonance type, 4th interval
+
 		const int LABELS_SIZE        = 26; // one more than last index
 };
 
