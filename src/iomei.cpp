@@ -1219,6 +1219,7 @@ void MeiOutput::WriteMeiTuplet(pugi::xml_node currentNode, Tuplet *tuplet)
     assert(tuplet);
 
     WriteLayerElement(currentNode, tuplet);
+    tuplet->WriteColor(currentNode);
     tuplet->WriteDurationRatio(currentNode);
     tuplet->WriteNumberplacement(currentNode);
     tuplet->WriteTupletVis(currentNode);
@@ -1762,6 +1763,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         else if (element == "space") {
+            return true;
+        }
+        else if (element == "tuplet") {
             return true;
         }
         else {
@@ -3198,6 +3202,7 @@ bool MeiInput::ReadMeiTuplet(Object *parent, pugi::xml_node tuplet)
     Tuplet *vrvTuplet = new Tuplet();
     ReadLayerElement(tuplet, vrvTuplet);
 
+    vrvTuplet->ReadColor(tuplet);
     vrvTuplet->ReadDurationRatio(tuplet);
     vrvTuplet->ReadNumberplacement(tuplet);
     vrvTuplet->ReadTupletVis(tuplet);
