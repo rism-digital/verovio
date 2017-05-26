@@ -22,7 +22,7 @@ else:
 
 verovio_module = Extension('_verovio',
     sources=
-        glob('../src/*.cpp') +
+        glob('../src/*.cpp') + glob('../src/hum/*.cpp')
         [
              '../src/json/jsonxx.cc',
              '../src/pugi/pugixml.cpp',
@@ -31,7 +31,6 @@ verovio_module = Extension('_verovio',
              '../src/midi/MidiEventList.cpp',
              '../src/midi/MidiFile.cpp',
              '../src/midi/MidiMessage.cpp',
-             '../src/hum/humlib.cpp',
              '../libmei/attconverter.cpp',
              '../libmei/atts_cmn.cpp',
              '../libmei/atts_cmnornaments.cpp',
