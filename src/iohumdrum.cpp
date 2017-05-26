@@ -1203,6 +1203,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 {
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
+    std::string primarymensuration;
     std::string label;
     std::string abbreviation;
     std::string clef;
@@ -1247,7 +1248,32 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
             timesig = *part;
             ss[partnumber - 1].meter_bottom = bot;
             ss[partnumber - 1].meter_top = top;
+            if (bot == 0) {
+                ss[partnumber - 1].meter_bottom = 1;
+                ss[partnumber - 1].meter_top *= 2;
+            }
         }
+
+        hum::HumdrumFile *hf = part->getOwner()->getOwner();
+        int line = part->getLineIndex();
+        for (int ii = line + 1; ii < hf->getLineCount(); ii++) {
+            if ((*hf)[ii].isGlobalComment()) {
+                if ((*hf)[ii].compare(0, 22, "!!primary-mensuration:") == 0) {
+                    string pmen = (*hf)[ii];
+                    auto ploc1 = pmen.find("met(");
+                    if (ploc1 != string::npos) {
+                        auto ploc2 = pmen.rfind(")");
+                        if (ploc2 != string::npos) {
+                            primarymensuration = pmen.substr(ploc1 + 4, ploc2 - ploc1 - 4);
+                        }
+                    }
+                }
+            }
+            else {
+                break;
+            }
+        }
+
         part = part->getNextToken();
     }
 
@@ -1274,12 +1300,26 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         setKeySig(m_staffdef.back(), keysig);
     }
 
-    if (timesig.size() > 0) {
-        setTimeSig(m_staffdef.back(), timesig);
+    if (primarymensuration.empty()) {
+        if (timesig.size() > 0) {
+            setTimeSig(m_staffdef.back(), timesig);
+        }
+        if (metersig.size() > 0) {
+            setMeterSymbol(m_staffdef.back(), metersig);
+        }
     }
-
-    if (metersig.size() > 0) {
-        setMeterSymbol(m_staffdef.back(), metersig);
+    else {
+        if ((primarymensuration == "C|") || (primarymensuration == "c|")) {
+            setTimeSig(m_staffdef.back(), "*M2/1");
+            setMeterSymbol(m_staffdef.back(), primarymensuration);
+        }
+        else if ((primarymensuration == "C") || (primarymensuration == "c")) {
+            setTimeSig(m_staffdef.back(), "*M4/1");
+            setMeterSymbol(m_staffdef.back(), primarymensuration);
+        }
+        else if ((primarymensuration == "O") || (primarymensuration == "o")) {
+            setTimeSig(m_staffdef.back(), "*M3/1");
+        }
     }
 
     addInstrumentDefinition(m_staffdef.back(), partstart);
@@ -1487,8 +1527,14 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig)
         // deal with this later
     }
     else if (sscanf(timesig.c_str(), "*M%d/%d", &top, &bot) == 2) {
-        part->SetMeterCount(top);
-        part->SetMeterUnit(bot);
+        if (bot == 0) {
+            part->SetMeterCount(top * 2);
+            part->SetMeterUnit(1);
+        }
+        else {
+            part->SetMeterCount(top);
+            part->SetMeterUnit(bot);
+        }
     }
     else {
         // some strange time signature which should never occur.
@@ -1901,7 +1947,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
     if (!m_measure) {
         return;
     }
-	int xstaffindex;
+    int xstaffindex;
     const std::vector<hum::HTp> &kernstarts = m_kernstarts;
     hum::HumdrumFile &infile = m_infile;
     for (int i = startline; i < endline; i++) {
@@ -1927,14 +1973,14 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             int staffindex = m_rkern[track];
 
             if (staffindex >= 0) {
-				xstaffindex = staffindex;
+                xstaffindex = staffindex;
                 setStaff(harm, staffindex + 1);
             }
             else {
                 // data is not attached to a **kern spine since it comes before
                 // any **kern data.  Treat it as attached to the bottom staff.
                 // (or the top staff depending on @place="above|below".
-				xstaffindex = kernstarts.size() - 1;
+                xstaffindex = kernstarts.size() - 1;
                 setStaff(harm, xstaffindex + 1);
             }
 
@@ -3705,6 +3751,10 @@ hum::HumNum HumdrumInput::getMeasureTstamp(hum::HTp token, int staffindex, hum::
         qbeat += fract * token->getDuration().getAbs();
     }
     hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
+    // if (ss[staffindex].meter_bottom == 0) {
+    // 	mfactor = 1;
+    // 	mfactor /= 8;
+    // }
     hum::HumNum mbeat = qbeat * mfactor + 1;
     return mbeat;
 }
@@ -5908,7 +5958,11 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
     if (centeredQ) {
         hum::HumNum duration = token->getDuration();
+        // if (ss[staffindex].meter_bottom == 0) {
+        // 	duration /= 2;
+        // } else {
         duration *= ss[staffindex].meter_bottom;
+        // }
         duration /= 4;
         duration /= 2;
         tstamp += duration;
