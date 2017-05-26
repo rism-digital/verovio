@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu May 25 19:12:01 CEST 2017
+// Last Modified: Fri May 26 10:17:34 CEST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -18472,6 +18472,7 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results, NoteGr
 	HumNum durnn;    // duration of next next melodic note;
 	double intp;     // diatonic interval from previous melodic note
 	double intn;     // diatonic interval to next melodic note
+	double intnn;    // diatonic interval to next next melodic note
 	double levp;     // metric level of the previous melodic note
 	double lev;      // metric level of the current note
 	double levn;     // metric level of the next melodic note
@@ -18753,14 +18754,20 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results, NoteGr
 		}
 
 		else if (i < ((int)attacks.size() - 2)) { // expand the analysis window
-			double interval3 = *attacks[i+2] - *attacks[i+1];
+			double intnn = *attacks[i+2] - *attacks[i+1];
 			HumNum durnn = attacks[i+2]->getDuration();	// dur of note after next
 			double levnn = attacks[i+2]->getMetricLevel(); // lev of note after next
 
 			if ((dur == durn) && (lev == 1) && (levn == 2) && (levnn == 0) &&
-				(intp == -1) && (intn == -1) && (interval3 == 1) && valid_acc_exit
+				(intp == -1) && (intn == -1) && (intnn == 1) && valid_acc_exit
 				) {
 				results[vindex][lineindex] = m_labels[CHANSON_IDIOM]; // chanson idiom
+			} else if ((dur <= durp) && (lev >= levp) && (lev >= levn) &&
+				(intp == -1) && (intn == -2) && (intnn == 1)) {
+				results[vindex][lineindex] = m_labels[CAMBIATA_DOWN_L]; // long-form descending cambiata
+			} else if ((dur <= durp) && (lev >= levp) && (lev >= levn) &&
+				(intp == 1) && (intn == 2) && (intnn == -1)) {
+				results[vindex][lineindex] = m_labels[CAMBIATA_UP_L]; // long-form ascending nota cambiata
 			}
 		}
 
@@ -18815,7 +18822,6 @@ void Tool_dissonant::printCountAnalysis(vector<vector<string> >& data) {
 
 	int sumsum = 0;
 	int sum;
-	int rj;
 	string item;
 	for (i=0; i<(int)LABELS_SIZE; i++) {
 
@@ -18843,7 +18849,6 @@ void Tool_dissonant::printCountAnalysis(vector<vector<string> >& data) {
 
 		for (int j=0; j<(int)analysis.size(); j++) {
 			m_humdrum_text << "\t";
-			rj = analysis.size() - j - 1;
 			if (analysis[j].find(item) != analysis[j].end()) {
 				if (percentQ) {
 					m_humdrum_text << int(analysis[j][item] * 1.0 / sum * 1000.0 + 0.5) / 10.0;
