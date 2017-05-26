@@ -55,6 +55,8 @@ enum {
     SMUFL_E089_timeSig9 = 0xE089,
     SMUFL_E08A_timeSigCommon = 0xE08A,
     SMUFL_E08B_timeSigCutCommon = 0xE08B,
+    SMUFL_E08C_timeSigPlus = 0xE08C,
+    SMUFL_E08D_timeSigPlusSmall = 0xE08D,
     SMUFL_E0A2_noteheadWhole = 0xE0A2,
     SMUFL_E0A3_noteheadHalf = 0xE0A3,
     SMUFL_E0A4_noteheadBlack = 0xE0A4,
@@ -245,7 +247,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 220
+#define SMUFL_COUNT 222
 
 } // vrv namespace
 

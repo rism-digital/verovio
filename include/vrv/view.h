@@ -18,6 +18,7 @@ class Accid;
 class BarLine;
 class Beam;
 class BeamDrawingParams;
+class Breath;
 class Chord;
 class DeviceContext;
 class Dir;
@@ -328,6 +329,7 @@ protected:
         DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff);
     void DrawTimeSpanningElement(DeviceContext *dc, Object *object, System *system);
+    void DrawBreath(DeviceContext *dc, Breath *dir, Measure *measure, System *system);
     void DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system);
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
     void DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, System *system);
@@ -432,6 +434,7 @@ private:
     std::wstring IntToTimeSigFigures(unsigned short number);
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
     bool OneBeamInTuplet(Tuplet *tuplet);
+    int NestedTuplets(Object *object);
     int GetSylYRel(Syl *syl, Staff *staff);
     ///@}
 
