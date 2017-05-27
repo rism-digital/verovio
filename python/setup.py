@@ -22,7 +22,7 @@ else:
 
 verovio_module = Extension('_verovio',
     sources=
-        glob('../src/*.cpp') + glob('../src/hum/*.cpp')
+        glob('../src/*.cpp') + glob('../src/hum/*.cpp') +
         [
              '../src/json/jsonxx.cc',
              '../src/pugi/pugixml.cpp',
