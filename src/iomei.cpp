@@ -1781,6 +1781,15 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for syl
+    else if (filterParent->Is(SYL)) {
+        if (element == "") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     else {
         LogDebug("Unknow filter for '%s'", filterParent->GetClassName().c_str());
         return true;
