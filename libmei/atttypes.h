@@ -33,6 +33,7 @@ enum data_ACCIDENTAL_GESTURAL {
     ACCIDENTAL_GESTURAL_sd,
     ACCIDENTAL_GESTURAL_fu,
     ACCIDENTAL_GESTURAL_fd,
+    ACCIDENTAL_GESTURAL_MAX
 };
 
 /**
@@ -62,6 +63,7 @@ enum data_ACCIDENTAL_WRITTEN {
     ACCIDENTAL_WRITTEN_3qf,
     ACCIDENTAL_WRITTEN_1qs,
     ACCIDENTAL_WRITTEN_3qs,
+    ACCIDENTAL_WRITTEN_MAX
 };
 
 /**
@@ -104,6 +106,7 @@ enum data_ARTICULATION {
     ARTICULATION_lhpizz,
     ARTICULATION_dot,
     ARTICULATION_stroke,
+    ARTICULATION_MAX
 };
 
 /**
@@ -114,6 +117,7 @@ enum data_BARPLACE {
     BARPLACE_mensur,
     BARPLACE_staff,
     BARPLACE_takt,
+    BARPLACE_MAX
 };
 
 /**
@@ -132,6 +136,7 @@ enum data_BARRENDITION {
     BARRENDITION_rptboth,
     BARRENDITION_rptend,
     BARRENDITION_single,
+    BARRENDITION_MAX
 };
 
 /**
@@ -142,6 +147,7 @@ enum data_BEAMPLACE {
     BEAMPLACE_above,
     BEAMPLACE_below,
     BEAMPLACE_mixed,
+    BEAMPLACE_MAX
 };
 
 /**
@@ -162,6 +168,7 @@ enum data_BETYPE {
     BETYPE_smpte_ndf29_97,
     BETYPE_tcf,
     BETYPE_time,
+    BETYPE_MAX
 };
 
 /**
@@ -171,6 +178,7 @@ enum data_BOOLEAN {
     BOOLEAN_NONE = 0,
     BOOLEAN_true,
     BOOLEAN_false,
+    BOOLEAN_MAX
 };
 
 /**
@@ -182,6 +190,7 @@ enum data_CERTAINTY {
     CERTAINTY_medium,
     CERTAINTY_low,
     CERTAINTY_unknown,
+    CERTAINTY_MAX
 };
 
 /**
@@ -195,6 +204,7 @@ enum data_CLEFSHAPE {
     CLEFSHAPE_C,
     CLEFSHAPE_perc,
     CLEFSHAPE_TAB,
+    CLEFSHAPE_MAX
 };
 
 /**
@@ -205,6 +215,7 @@ enum data_CLUSTER {
     CLUSTER_white,
     CLUSTER_black,
     CLUSTER_chromatic,
+    CLUSTER_MAX
 };
 
 /**
@@ -359,6 +370,7 @@ enum data_COLORNAMES {
     COLORNAMES_whitesmoke,
     COLORNAMES_yellow,
     COLORNAMES_yellowgreen,
+    COLORNAMES_MAX
 };
 
 /**
@@ -368,6 +380,7 @@ enum data_ENCLOSURE {
     ENCLOSURE_NONE = 0,
     ENCLOSURE_paren,
     ENCLOSURE_brack,
+    ENCLOSURE_MAX
 };
 
 /**
@@ -381,6 +394,7 @@ enum data_FILL {
     FILL_bottom,
     FILL_left,
     FILL_right,
+    FILL_MAX
 };
 
 /**
@@ -398,6 +412,7 @@ enum data_FONTSIZETERM {
     FONTSIZETERM_smaller,
     FONTSIZETERM_larger,
     FONTSIZETERM_cue,
+    FONTSIZETERM_MAX
 };
 
 /**
@@ -408,6 +423,7 @@ enum data_FONTSTYLE {
     FONTSTYLE_italic,
     FONTSTYLE_normal,
     FONTSTYLE_oblique,
+    FONTSTYLE_MAX
 };
 
 /**
@@ -417,6 +433,7 @@ enum data_FONTWEIGHT {
     FONTWEIGHT_NONE = 0,
     FONTWEIGHT_bold,
     FONTWEIGHT_normal,
+    FONTWEIGHT_MAX
 };
 
 /**
@@ -460,6 +477,7 @@ enum data_FRBRRELATIONSHIP {
     FRBRRELATIONSHIP_isTransformationOf,
     FRBRRELATIONSHIP_hasTranslation,
     FRBRRELATIONSHIP_isTranslationOf,
+    FRBRRELATIONSHIP_MAX
 };
 
 /**
@@ -470,6 +488,7 @@ enum data_GLISSANDO {
     GLISSANDO_i,
     GLISSANDO_m,
     GLISSANDO_t,
+    GLISSANDO_MAX
 };
 
 /**
@@ -480,6 +499,7 @@ enum data_GRACE {
     GRACE_acc,
     GRACE_unacc,
     GRACE_unknown,
+    GRACE_MAX
 };
 
 /**
@@ -503,6 +523,7 @@ enum data_HEADSHAPE_list {
     HEADSHAPE_list_slash,
     HEADSHAPE_list_square,
     HEADSHAPE_list_x,
+    HEADSHAPE_list_MAX
 };
 
 /**
@@ -514,6 +535,7 @@ enum data_HORIZONTALALIGNMENT {
     HORIZONTALALIGNMENT_right,
     HORIZONTALALIGNMENT_center,
     HORIZONTALALIGNMENT_justify,
+    HORIZONTALALIGNMENT_MAX
 };
 
 /**
@@ -526,6 +548,7 @@ enum data_LAYERSCHEME {
     LAYERSCHEME_2f,
     LAYERSCHEME_3o,
     LAYERSCHEME_3f,
+    LAYERSCHEME_MAX
 };
 
 /**
@@ -535,6 +558,7 @@ enum data_LIGATUREFORM {
     LIGATUREFORM_NONE = 0,
     LIGATUREFORM_recta,
     LIGATUREFORM_obliqua,
+    LIGATUREFORM_MAX
 };
 
 /**
@@ -546,6 +570,7 @@ enum data_LINEFORM {
     LINEFORM_dotted,
     LINEFORM_solid,
     LINEFORM_wavy,
+    LINEFORM_MAX
 };
 
 /**
@@ -563,6 +588,7 @@ enum data_LINESTARTENDSYMBOL {
     LINESTARTENDSYMBOL_harpoonleft,
     LINESTARTENDSYMBOL_harpoonright,
     LINESTARTENDSYMBOL_none,
+    LINESTARTENDSYMBOL_MAX
 };
 
 /**
@@ -573,6 +599,7 @@ enum data_LINEWIDTHTERM {
     LINEWIDTHTERM_narrow,
     LINEWIDTHTERM_medium,
     LINEWIDTHTERM_wide,
+    LINEWIDTHTERM_MAX
 };
 
 /**
@@ -608,6 +635,7 @@ enum data_MELODICFUNCTION {
     MELODICFUNCTION_un7,
     MELODICFUNCTION_upt,
     MELODICFUNCTION_upt7,
+    MELODICFUNCTION_MAX
 };
 
 /**
@@ -617,6 +645,7 @@ enum data_MENSURATIONSIGN {
     MENSURATIONSIGN_NONE = 0,
     MENSURATIONSIGN_C,
     MENSURATIONSIGN_O,
+    MENSURATIONSIGN_MAX
 };
 
 /**
@@ -626,6 +655,7 @@ enum data_METERSIGN {
     METERSIGN_NONE = 0,
     METERSIGN_common,
     METERSIGN_cut,
+    METERSIGN_MAX
 };
 
 /**
@@ -808,6 +838,7 @@ enum data_MIDINAMES {
     MIDINAMES_Open_Cuica,
     MIDINAMES_Mute_Triangle,
     MIDINAMES_Open_Triangle,
+    MIDINAMES_MAX
 };
 
 /**
@@ -823,6 +854,7 @@ enum data_MODE {
     MODE_mixolydian,
     MODE_aeolian,
     MODE_locrian,
+    MODE_MAX
 };
 
 /**
@@ -839,6 +871,7 @@ enum data_MODSRELATIONSHIP {
     MODSRELATIONSHIP_otherFormat,
     MODSRELATIONSHIP_isReferencedBy,
     MODSRELATIONSHIP_references,
+    MODSRELATIONSHIP_MAX
 };
 
 /**
@@ -859,6 +892,7 @@ enum data_NONSTAFFPLACE {
     NONSTAFFPLACE_sub,
     NONSTAFFPLACE_inspace,
     NONSTAFFPLACE_superimposed,
+    NONSTAFFPLACE_MAX
 };
 
 /**
@@ -872,6 +906,7 @@ enum data_NOTATIONTYPE {
     NOTATIONTYPE_mensural_white,
     NOTATIONTYPE_neume,
     NOTATIONTYPE_tab,
+    NOTATIONTYPE_MAX
 };
 
 /**
@@ -889,6 +924,7 @@ enum data_NOTEHEADMODIFIER_list {
     NOTEHEADMODIFIER_list_box,
     NOTEHEADMODIFIER_list_circle,
     NOTEHEADMODIFIER_list_dblwhole,
+    NOTEHEADMODIFIER_list_MAX
 };
 
 /**
@@ -898,6 +934,7 @@ enum data_OTHERSTAFF {
     OTHERSTAFF_NONE = 0,
     OTHERSTAFF_above,
     OTHERSTAFF_below,
+    OTHERSTAFF_MAX
 };
 
 /**
@@ -912,6 +949,7 @@ enum data_ROTATIONDIRECTION {
     ROTATIONDIRECTION_nw,
     ROTATIONDIRECTION_se,
     ROTATIONDIRECTION_sw,
+    ROTATIONDIRECTION_MAX
 };
 
 /**
@@ -929,6 +967,7 @@ enum data_STAFFITEM_basic {
     STAFFITEM_basic_sp,
     STAFFITEM_basic_stageDir,
     STAFFITEM_basic_tempo,
+    STAFFITEM_basic_MAX
 };
 
 /**
@@ -954,6 +993,7 @@ enum data_STAFFITEM_cmn {
     STAFFITEM_cmn_trill,
     STAFFITEM_cmn_tuplet,
     STAFFITEM_cmn_turn,
+    STAFFITEM_cmn_MAX
 };
 
 /**
@@ -962,6 +1002,7 @@ enum data_STAFFITEM_cmn {
 enum data_STAFFITEM_mensural {
     STAFFITEM_mensural_NONE = 0,
     STAFFITEM_mensural_ligature,
+    STAFFITEM_mensural_MAX
 };
 
 /**
@@ -971,6 +1012,7 @@ enum data_STAFFREL_basic {
     STAFFREL_basic_NONE = 0,
     STAFFREL_basic_above,
     STAFFREL_basic_below,
+    STAFFREL_basic_MAX
 };
 
 /**
@@ -980,6 +1022,7 @@ enum data_STAFFREL_extended {
     STAFFREL_extended_NONE = 0,
     STAFFREL_extended_between,
     STAFFREL_extended_within,
+    STAFFREL_extended_MAX
 };
 
 /**
@@ -996,6 +1039,7 @@ enum data_STEMMODIFIER {
     STEMMODIFIER_6slash,
     STEMMODIFIER_sprech,
     STEMMODIFIER_z,
+    STEMMODIFIER_MAX
 };
 
 /**
@@ -1006,6 +1050,7 @@ enum data_STEMPOSITION {
     STEMPOSITION_left,
     STEMPOSITION_right,
     STEMPOSITION_center,
+    STEMPOSITION_MAX
 };
 
 /**
@@ -1017,6 +1062,7 @@ enum data_TEMPERAMENT {
     TEMPERAMENT_just,
     TEMPERAMENT_mean,
     TEMPERAMENT_pythagorean,
+    TEMPERAMENT_MAX
 };
 
 /**
@@ -1052,6 +1098,7 @@ enum data_TEXTRENDITIONLIST {
     TEXTRENDITIONLIST_rtl,
     TEXTRENDITIONLIST_lro,
     TEXTRENDITIONLIST_rlo,
+    TEXTRENDITIONLIST_MAX
 };
 
 /**
@@ -1061,6 +1108,7 @@ enum accidLog_FUNC {
     accidLog_FUNC_NONE = 0,
     accidLog_FUNC_caution,
     accidLog_FUNC_edit,
+    accidLog_FUNC_MAX
 };
 
 /**
@@ -1071,6 +1119,7 @@ enum arpegLog_ORDER {
     arpegLog_ORDER_up,
     arpegLog_ORDER_down,
     arpegLog_ORDER_nonarp,
+    arpegLog_ORDER_MAX
 };
 
 /**
@@ -1080,6 +1129,7 @@ enum audience_AUDIENCE {
     audience_AUDIENCE_NONE = 0,
     audience_AUDIENCE_private,
     audience_AUDIENCE_public,
+    audience_AUDIENCE_MAX
 };
 
 /**
@@ -1089,6 +1139,7 @@ enum bTremLog_FORM {
     bTremLog_FORM_NONE = 0,
     bTremLog_FORM_meas,
     bTremLog_FORM_unmeas,
+    bTremLog_FORM_MAX
 };
 
 /**
@@ -1100,6 +1151,7 @@ enum beamRend_FORM {
     beamRend_FORM_mixed,
     beamRend_FORM_rit,
     beamRend_FORM_norm,
+    beamRend_FORM_MAX
 };
 
 /**
@@ -1110,6 +1162,7 @@ enum beamingVis_BEAMREND {
     beamingVis_BEAMREND_acc,
     beamingVis_BEAMREND_rit,
     beamingVis_BEAMREND_norm,
+    beamingVis_BEAMREND_MAX
 };
 
 /**
@@ -1120,6 +1173,7 @@ enum curvature_CURVEDIR {
     curvature_CURVEDIR_above,
     curvature_CURVEDIR_below,
     curvature_CURVEDIR_mixed,
+    curvature_CURVEDIR_MAX
 };
 
 /**
@@ -1128,6 +1182,7 @@ enum curvature_CURVEDIR {
 enum cutout_CUTOUT {
     cutout_CUTOUT_NONE = 0,
     cutout_CUTOUT_cutout,
+    cutout_CUTOUT_MAX
 };
 
 /**
@@ -1137,6 +1192,7 @@ enum dotLog_FORM {
     dotLog_FORM_NONE = 0,
     dotLog_FORM_aug,
     dotLog_FORM_div,
+    dotLog_FORM_MAX
 };
 
 /**
@@ -1147,6 +1203,7 @@ enum endings_ENDINGREND {
     endings_ENDINGREND_top,
     endings_ENDINGREND_barred,
     endings_ENDINGREND_grouped,
+    endings_ENDINGREND_MAX
 };
 
 /**
@@ -1156,6 +1213,7 @@ enum fTremLog_FORM {
     fTremLog_FORM_NONE = 0,
     fTremLog_FORM_meas,
     fTremLog_FORM_unmeas,
+    fTremLog_FORM_MAX
 };
 
 /**
@@ -1165,6 +1223,7 @@ enum fermataVis_FORM {
     fermataVis_FORM_NONE = 0,
     fermataVis_FORM_inv,
     fermataVis_FORM_norm,
+    fermataVis_FORM_MAX
 };
 
 /**
@@ -1175,6 +1234,7 @@ enum fermataVis_SHAPE {
     fermataVis_SHAPE_curved,
     fermataVis_SHAPE_square,
     fermataVis_SHAPE_angular,
+    fermataVis_SHAPE_MAX
 };
 
 /**
@@ -1185,6 +1245,7 @@ enum fingGrpLog_FORM {
     fingGrpLog_FORM_alter,
     fingGrpLog_FORM_combi,
     fingGrpLog_FORM_subst,
+    fingGrpLog_FORM_MAX
 };
 
 /**
@@ -1194,6 +1255,7 @@ enum fingGrpVis_ORIENT {
     fingGrpVis_ORIENT_NONE = 0,
     fingGrpVis_ORIENT_horiz,
     fingGrpVis_ORIENT_vert,
+    fingGrpVis_ORIENT_MAX
 };
 
 /**
@@ -1204,6 +1266,7 @@ enum graceGrpLog_ATTACH {
     graceGrpLog_ATTACH_pre,
     graceGrpLog_ATTACH_post,
     graceGrpLog_ATTACH_unknown,
+    graceGrpLog_ATTACH_MAX
 };
 
 /**
@@ -1213,6 +1276,7 @@ enum hairpinLog_FORM {
     hairpinLog_FORM_NONE = 0,
     hairpinLog_FORM_cres,
     hairpinLog_FORM_dim,
+    hairpinLog_FORM_MAX
 };
 
 /**
@@ -1222,6 +1286,7 @@ enum harmAnl_FORM {
     harmAnl_FORM_NONE = 0,
     harmAnl_FORM_explicit,
     harmAnl_FORM_implied,
+    harmAnl_FORM_MAX
 };
 
 /**
@@ -1232,6 +1297,7 @@ enum harmVis_RENDGRID {
     harmVis_RENDGRID_grid,
     harmVis_RENDGRID_gridtext,
     harmVis_RENDGRID_text,
+    harmVis_RENDGRID_MAX
 };
 
 /**
@@ -1242,6 +1308,7 @@ enum harpPedalLog_A {
     harpPedalLog_A_f,
     harpPedalLog_A_n,
     harpPedalLog_A_s,
+    harpPedalLog_A_MAX
 };
 
 /**
@@ -1252,6 +1319,7 @@ enum harpPedalLog_B {
     harpPedalLog_B_f,
     harpPedalLog_B_n,
     harpPedalLog_B_s,
+    harpPedalLog_B_MAX
 };
 
 /**
@@ -1262,6 +1330,7 @@ enum harpPedalLog_C {
     harpPedalLog_C_f,
     harpPedalLog_C_n,
     harpPedalLog_C_s,
+    harpPedalLog_C_MAX
 };
 
 /**
@@ -1272,6 +1341,7 @@ enum harpPedalLog_D {
     harpPedalLog_D_f,
     harpPedalLog_D_n,
     harpPedalLog_D_s,
+    harpPedalLog_D_MAX
 };
 
 /**
@@ -1282,6 +1352,7 @@ enum harpPedalLog_E {
     harpPedalLog_E_f,
     harpPedalLog_E_n,
     harpPedalLog_E_s,
+    harpPedalLog_E_MAX
 };
 
 /**
@@ -1292,6 +1363,7 @@ enum harpPedalLog_F {
     harpPedalLog_F_f,
     harpPedalLog_F_n,
     harpPedalLog_F_s,
+    harpPedalLog_F_MAX
 };
 
 /**
@@ -1302,6 +1374,7 @@ enum harpPedalLog_G {
     harpPedalLog_G_f,
     harpPedalLog_G_n,
     harpPedalLog_G_s,
+    harpPedalLog_G_MAX
 };
 
 /**
@@ -1310,6 +1383,7 @@ enum harpPedalLog_G {
 enum meiVersion_MEIVERSION {
     meiVersion_MEIVERSION_NONE = 0,
     meiVersion_MEIVERSION_4_0_0,
+    meiVersion_MEIVERSION_MAX
 };
 
 /**
@@ -1319,6 +1393,7 @@ enum mensurVis_FORM {
     mensurVis_FORM_NONE = 0,
     mensurVis_FORM_horizontal,
     mensurVis_FORM_vertical,
+    mensurVis_FORM_MAX
 };
 
 /**
@@ -1328,6 +1403,7 @@ enum mensuralVis_MENSURFORM {
     mensuralVis_MENSURFORM_NONE = 0,
     mensuralVis_MENSURFORM_horizontal,
     mensuralVis_MENSURFORM_vertical,
+    mensuralVis_MENSURFORM_MAX
 };
 
 /**
@@ -1338,6 +1414,7 @@ enum meterConformance_METCON {
     meterConformance_METCON_c,
     meterConformance_METCON_i,
     meterConformance_METCON_o,
+    meterConformance_METCON_MAX
 };
 
 /**
@@ -1349,6 +1426,7 @@ enum meterSigVis_FORM {
     meterSigVis_FORM_denomsym,
     meterSigVis_FORM_norm,
     meterSigVis_FORM_invis,
+    meterSigVis_FORM_MAX
 };
 
 /**
@@ -1360,6 +1438,7 @@ enum meterSigDefaultVis_METERREND {
     meterSigDefaultVis_METERREND_denomsym,
     meterSigDefaultVis_METERREND_norm,
     meterSigDefaultVis_METERREND_invis,
+    meterSigDefaultVis_METERREND_MAX
 };
 
 /**
@@ -1370,6 +1449,7 @@ enum meterSigGrpLog_FUNC {
     meterSigGrpLog_FUNC_alternating,
     meterSigGrpLog_FUNC_interchanging,
     meterSigGrpLog_FUNC_mixed,
+    meterSigGrpLog_FUNC_MAX
 };
 
 /**
@@ -1379,6 +1459,7 @@ enum mordentLog_FORM {
     mordentLog_FORM_NONE = 0,
     mordentLog_FORM_lower,
     mordentLog_FORM_upper,
+    mordentLog_FORM_MAX
 };
 
 /**
@@ -1388,6 +1469,7 @@ enum ncVis_CON {
     ncVis_CON_NONE = 0,
     ncVis_CON_g,
     ncVis_CON_l,
+    ncVis_CON_MAX
 };
 
 /**
@@ -1397,6 +1479,7 @@ enum ncVis_CURVED {
     ncVis_CURVED_NONE = 0,
     ncVis_CURVED_a,
     ncVis_CURVED_c,
+    ncVis_CURVED_MAX
 };
 
 /**
@@ -1406,6 +1489,7 @@ enum ncVis_DIAGONALRIGHT {
     ncVis_DIAGONALRIGHT_NONE = 0,
     ncVis_DIAGONALRIGHT_u,
     ncVis_DIAGONALRIGHT_d,
+    ncVis_DIAGONALRIGHT_MAX
 };
 
 /**
@@ -1416,6 +1500,7 @@ enum ncVis_ORISCUS {
     ncVis_ORISCUS_c,
     ncVis_ORISCUS_f,
     ncVis_ORISCUS_j,
+    ncVis_ORISCUS_MAX
 };
 
 /**
@@ -1425,6 +1510,7 @@ enum ncVis_QUILISMA {
     ncVis_QUILISMA_NONE = 0,
     ncVis_QUILISMA_2,
     ncVis_QUILISMA_3,
+    ncVis_QUILISMA_MAX
 };
 
 /**
@@ -1434,6 +1520,7 @@ enum noteAnlMensural_LIG {
     noteAnlMensural_LIG_NONE = 0,
     noteAnlMensural_LIG_recta,
     noteAnlMensural_LIG_obliqua,
+    noteAnlMensural_LIG_MAX
 };
 
 /**
@@ -1443,6 +1530,7 @@ enum noteGes_EXTREMIS {
     noteGes_EXTREMIS_NONE = 0,
     noteGes_EXTREMIS_highest,
     noteGes_EXTREMIS_lowest,
+    noteGes_EXTREMIS_MAX
 };
 
 /**
@@ -1451,6 +1539,7 @@ enum noteGes_EXTREMIS {
 enum octaveLog_COLL {
     octaveLog_COLL_NONE = 0,
     octaveLog_COLL_coll,
+    octaveLog_COLL_MAX
 };
 
 /**
@@ -1460,6 +1549,7 @@ enum pbVis_FOLIUM {
     pbVis_FOLIUM_NONE = 0,
     pbVis_FOLIUM_verso,
     pbVis_FOLIUM_recto,
+    pbVis_FOLIUM_MAX
 };
 
 /**
@@ -1471,6 +1561,7 @@ enum pedalLog_DIR {
     pedalLog_DIR_up,
     pedalLog_DIR_half,
     pedalLog_DIR_bounce,
+    pedalLog_DIR_MAX
 };
 
 /**
@@ -1481,6 +1572,7 @@ enum pedalVis_FORM {
     pedalVis_FORM_line,
     pedalVis_FORM_pedstar,
     pedalVis_FORM_altpedstar,
+    pedalVis_FORM_MAX
 };
 
 /**
@@ -1491,6 +1583,7 @@ enum pianoPedals_PEDALSTYLE {
     pianoPedals_PEDALSTYLE_line,
     pianoPedals_PEDALSTYLE_pedstar,
     pianoPedals_PEDALSTYLE_altpedstar,
+    pianoPedals_PEDALSTYLE_MAX
 };
 
 /**
@@ -1502,6 +1595,7 @@ enum pointing_XLINKACTUATE {
     pointing_XLINKACTUATE_onRequest,
     pointing_XLINKACTUATE_none,
     pointing_XLINKACTUATE_other,
+    pointing_XLINKACTUATE_MAX
 };
 
 /**
@@ -1514,6 +1608,7 @@ enum pointing_XLINKSHOW {
     pointing_XLINKSHOW_embed,
     pointing_XLINKSHOW_none,
     pointing_XLINKSHOW_other,
+    pointing_XLINKSHOW_MAX
 };
 
 /**
@@ -1523,6 +1618,7 @@ enum regularMethod_METHOD {
     regularMethod_METHOD_NONE = 0,
     regularMethod_METHOD_silent,
     regularMethod_METHOD_tags,
+    regularMethod_METHOD_MAX
 };
 
 /**
@@ -1533,6 +1629,7 @@ enum rehearsal_REHENCLOSE {
     rehearsal_REHENCLOSE_box,
     rehearsal_REHENCLOSE_circle,
     rehearsal_REHENCLOSE_none,
+    rehearsal_REHENCLOSE_MAX
 };
 
 /**
@@ -1541,6 +1638,7 @@ enum rehearsal_REHENCLOSE {
 enum sbVis_FORM {
     sbVis_FORM_NONE = 0,
     sbVis_FORM_hash,
+    sbVis_FORM_MAX
 };
 
 /**
@@ -1553,6 +1651,7 @@ enum staffGroupingSym_SYMBOL {
     staffGroupingSym_SYMBOL_bracketsq,
     staffGroupingSym_SYMBOL_line,
     staffGroupingSym_SYMBOL_none,
+    staffGroupingSym_SYMBOL_MAX
 };
 
 /**
@@ -1568,6 +1667,7 @@ enum sylLog_CON {
     sylLog_CON_v,
     sylLog_CON_i,
     sylLog_CON_b,
+    sylLog_CON_MAX
 };
 
 /**
@@ -1578,6 +1678,7 @@ enum sylLog_WORDPOS {
     sylLog_WORDPOS_i,
     sylLog_WORDPOS_m,
     sylLog_WORDPOS_t,
+    sylLog_WORDPOS_MAX
 };
 
 /**
@@ -1588,6 +1689,7 @@ enum targetEval_EVALUATE {
     targetEval_EVALUATE_all,
     targetEval_EVALUATE_one,
     targetEval_EVALUATE_none,
+    targetEval_EVALUATE_MAX
 };
 
 /**
@@ -1599,6 +1701,7 @@ enum tempoLog_FUNC {
     tempoLog_FUNC_instantaneous,
     tempoLog_FUNC_metricmod,
     tempoLog_FUNC_precedente,
+    tempoLog_FUNC_MAX
 };
 
 /**
@@ -1608,6 +1711,7 @@ enum tupletVis_NUMFORMAT {
     tupletVis_NUMFORMAT_NONE = 0,
     tupletVis_NUMFORMAT_count,
     tupletVis_NUMFORMAT_ratio,
+    tupletVis_NUMFORMAT_MAX
 };
 
 /**
@@ -1617,6 +1721,7 @@ enum turnLog_FORM {
     turnLog_FORM_NONE = 0,
     turnLog_FORM_lower,
     turnLog_FORM_upper,
+    turnLog_FORM_MAX
 };
 
 /**
@@ -1629,6 +1734,7 @@ enum voltaGroupingSym_VOLTASYM {
     voltaGroupingSym_VOLTASYM_bracketsq,
     voltaGroupingSym_VOLTASYM_line,
     voltaGroupingSym_VOLTASYM_none,
+    voltaGroupingSym_VOLTASYM_MAX
 };
 
 /**
@@ -1638,6 +1744,7 @@ enum whitespace_XMLSPACE {
     whitespace_XMLSPACE_NONE = 0,
     whitespace_XMLSPACE_default,
     whitespace_XMLSPACE_preserve,
+    whitespace_XMLSPACE_MAX
 };
 
 
