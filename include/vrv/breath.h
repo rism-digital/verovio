@@ -19,9 +19,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class Breath : public ControlElement,
-              public TimePointInterface,
-              public AttColor,
-              public AttPlacement {
+               public TimePointInterface,
+               public AttColor,
+               public AttCommonPart,
+               public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

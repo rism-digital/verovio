@@ -26,6 +26,7 @@ namespace vrv {
  */
 class ScoreDefInterface : public Interface,
                           public AttCleffingLog,
+                          public AttCleffingVis,
                           public AttKeySigDefaultLog,
                           public AttKeySigDefaultVis,
                           public AttLyricstyle,

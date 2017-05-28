@@ -26,7 +26,13 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Accid::Accid()
-    : LayerElement("accid-"), PositionInterface(), AttAccidental(), AttAccidLog(), AttColor(), AttEnclosingchars()
+    : LayerElement("accid-")
+    , PositionInterface()
+    , AttAccidental()
+    , AttAccidLog()
+    , AttColor()
+    , AttCommonPart()
+    , AttEnclosingchars()
 {
 
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
@@ -34,6 +40,7 @@ Accid::Accid()
     RegisterAttClass(ATT_ACCIDENTALPERFORMED);
     RegisterAttClass(ATT_ACCIDLOG);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_ENCLOSINGCHARS);
 
     Reset();
@@ -51,6 +58,7 @@ void Accid::Reset()
     ResetAccidentalPerformed();
     ResetAccidLog();
     ResetColor();
+    ResetCommonPart();
     ResetEnclosingchars();
 }
 

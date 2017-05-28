@@ -42,6 +42,7 @@ Note::Note()
     , PitchInterface()
     , AttColor()
     , AttColoration()
+    , AttCommonPart()
     , AttGraced()
     , AttNoteLogMensural()
     , AttRelativesize()
@@ -54,6 +55,7 @@ Note::Note()
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
+    RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTELOGMENSURAL);
     RegisterAttClass(ATT_RELATIVESIZE);
@@ -83,6 +85,7 @@ void Note::Reset()
     PitchInterface::Reset();
     ResetColor();
     ResetColoration();
+    ResetCommonPart();
     ResetGraced();
     ResetNoteLogMensural();
     ResetRelativesize();
@@ -245,7 +248,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
 
     // Here we should get the notehead value
     wchar_t code = SMUFL_E0A4_noteheadBlack;
-    
+
     // This is never called for now because mensural notes do not have stem/flag children
     // For changingg this, change Note::CalcStem and Note::PrepareLayerElementParts
     if (this->IsMensural()) {
@@ -284,7 +287,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
 
     // Here we should get the notehead value
     wchar_t code = SMUFL_E0A4_noteheadBlack;
-    
+
     // This is never called for now because mensural notes do not have stem/flag children
     // See comment above
     if (this->IsMensural()) {
@@ -314,11 +317,11 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
 wchar_t Note::GetMensuralSmuflNoteHead()
 {
     assert(this->IsMensural());
-    
-    Staff *staff = dynamic_cast<Staff*>(this->GetFirstParent(STAFF));
+
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
-    
+
     wchar_t code = 0;
     if (mensural_black) {
         code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;

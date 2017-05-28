@@ -25,6 +25,7 @@ class Accid : public LayerElement,
               public AttAccidentalPerformed,
               public AttAccidLog,
               public AttColor,
+              public AttCommonPart,
               public AttEnclosingchars {
 public:
     /**

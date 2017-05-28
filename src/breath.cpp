@@ -21,10 +21,11 @@ namespace vrv {
 // Breath
 //----------------------------------------------------------------------------
 
-Breath::Breath() : ControlElement("breath-"), TimePointInterface(), AttColor(), AttPlacement()
+Breath::Breath() : ControlElement("breath-"), TimePointInterface(), AttColor(), AttCommonPart(), AttPlacement()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_PLACEMENT);
 
     Reset();
@@ -39,6 +40,7 @@ void Breath::Reset()
     ControlElement::Reset();
     TimePointInterface::Reset();
     ResetColor();
+    ResetCommonPart();
     ResetPlacement();
 }
 
