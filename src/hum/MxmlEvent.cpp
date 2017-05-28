@@ -362,8 +362,8 @@ void MxmlEvent::setDurationByTicks(long value, xml_node el) {
 		return;
 	}
 
-	HumNum val = value;
-	val /= ticks;
+	HumNum val = (int)value;
+	val /= (int)ticks;
 
 	if (el) {
 		HumNum checkval = getEmbeddedDuration(el);

@@ -469,7 +469,7 @@ void MxmlPart::prepareVoiceMapping(void) {
 
 	for (i=1; i<(int)sv.size(); i++) {
 		if ((int)sv[i].size() - 1 > maxvoicenum) {
-			maxvoicenum = sv[i].size() - 1;
+			maxvoicenum = (int)sv[i].size() - 1;
 		}
 	}
 

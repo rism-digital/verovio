@@ -61,7 +61,7 @@ GridVoice* GridStaff::setTokenLayer(int layerindex, HTp token, HumNum duration) 
 		return NULL;
 	}
 	if (layerindex > (int)this->size()-1) {
-		int oldsize = this->size();
+		int oldsize = (int)this->size();
 		this->resize(layerindex+1);
 		for (int i=oldsize; i<(int)this->size(); i++) {
 			this->at(i) = NULL;
@@ -131,7 +131,7 @@ void GridStaff::appendTokenLayer(int layerindex, HTp token, HumNum duration,
 
 	GridVoice* gt;
 	if (layerindex > (int)this->size()-1) {
-		int oldsize = this->size();
+		int oldsize = (int)this->size();
 		this->resize(layerindex+1);
 		for (int i=oldsize; i<(int)this->size(); i++) {
 			this->at(i) = NULL;

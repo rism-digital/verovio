@@ -641,8 +641,8 @@ void HumGrid::addMeasureLines(void) {
 
 				// insert the minimum number of barlines based on the
 				// voices in the current and next measure.
-				vcount = endslice->at(p)->at(s)->size();
-				nextvcount = nextmeasure->front()->at(p)->at(s)->size();
+				vcount = (int)endslice->at(p)->at(s)->size();
+				nextvcount = (int)nextmeasure->front()->at(p)->at(s)->size();
 				lcount = vcount;
 				if (lcount > nextvcount) {
 					lcount = nextvcount;
@@ -802,7 +802,7 @@ void HumGrid::addLastMeasure(void) {
 			SliceType::Measures);
 	this->back()->push_back(mslice);
 	mslice->setTimestamp(timestamp);
-	int partcount = model->size();
+	int partcount = (int)model->size();
 	mslice->resize(partcount);
 	for (int p=0; p<partcount; p++) {
 		GridPart* part = new GridPart();
