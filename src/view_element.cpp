@@ -883,7 +883,8 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int y = staff->GetDrawingY() - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
+    int y = staff->GetDrawingY()
+        - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * (staff->m_drawingLines - 1);
     int x = element->GetDrawingX();
 
     if (meterSig->GetForm() == meterSigVis_FORM_invis) {
@@ -1015,7 +1016,8 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         x2 = xCentered + length / 2;
 
         // Position centered in staff
-        y1 = staff->GetDrawingY() - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * staff->m_drawingLines;
+        y1 = staff->GetDrawingY()
+            - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * staff->m_drawingLines;
         y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
         // Draw the base rect
@@ -1026,8 +1028,10 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         // Draw two lines at beginning and end
         // make it 8 pixels longer, and 4 pixels width
         int border = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        DrawFilledRectangle(dc, x1, y1 - border, x1 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y2 + border);
-        DrawFilledRectangle(dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y1 - border, x2, y2 + border);
+        DrawFilledRectangle(
+            dc, x1, y1 - border, x1 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y2 + border);
+        DrawFilledRectangle(
+            dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y1 - border, x2, y2 + border);
     }
     else {
         // Draw the base rect
@@ -1037,9 +1041,10 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         // Position centered in third line
         y1 = staff->GetDrawingY() - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * 4;
         y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        if (num == 2) DrawFilledRectangle(dc, x1, y2 - 4, x2, y1 + 4);
-        else DrawRestWhole(dc, xCentered, y2, DUR_1, false, staff);
-
+        if (num == 2)
+            DrawFilledRectangle(dc, x1, y2 - 4, x2, y1 + 4);
+        else
+            DrawRestWhole(dc, xCentered, y2, DUR_1, false, staff);
     }
 
     // Draw the text above
