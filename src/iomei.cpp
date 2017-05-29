@@ -1,4 +1,3 @@
-
 /////////////////////////////////////////////////////////////////////////////
 // Name:        iomei.cpp
 // Author:      Laurent Pugin
@@ -828,6 +827,7 @@ void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
     WriteControlElement(currentNode, fermata);
     WriteTimePointInterface(currentNode, fermata);
     fermata->WriteColor(currentNode);
+    fermata->WriteCommonPart(currentNode);
     fermata->WriteFermataVis(currentNode);
     fermata->WritePlacement(currentNode);
 };
@@ -1120,6 +1120,8 @@ void MeiOutput::WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur)
     assert(mensur);
 
     WriteLayerElement(currentNode, mensur);
+    mensur->WriteColor(currentNode);
+    mensur->WriteCommonPart(currentNode);
     mensur->WriteDurationRatio(currentNode);
     mensur->WriteMensuralShared(currentNode);
     mensur->WriteMensurLog(currentNode);
@@ -1143,9 +1145,10 @@ void MeiOutput::WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest)
 
     WriteLayerElement(currentNode, mRest);
     WritePositionInterface(currentNode, mRest);
-    mRest->WriteVisibility(currentNode);
+    mRest->WriteCommonPart(currentNode);
     mRest->WriteFermatapresent(currentNode);
     mRest->WriteRelativesize(currentNode);
+    mRest->WriteVisibility(currentNode);
 }
 
 void MeiOutput::WriteMeiMRpt(pugi::xml_node currentNode, MRpt *mRpt)
@@ -1167,6 +1170,7 @@ void MeiOutput::WriteMeiMultiRest(pugi::xml_node currentNode, MultiRest *multiRe
     assert(multiRest);
 
     WriteLayerElement(currentNode, multiRest);
+    multiRest->WriteCommonPart(currentNode);
     multiRest->WriteNumbered(currentNode);
 }
 
@@ -1205,6 +1209,7 @@ void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
     WriteDurationInterface(currentNode, rest);
     WritePositionInterface(currentNode, rest);
     rest->WriteColor(currentNode);
+    rest->WriteCommonPart(currentNode);
     rest->WriteRelativesize(currentNode);
     rest->WriteRestVisMensural(currentNode);
 }
@@ -2489,6 +2494,7 @@ bool MeiInput::ReadMeiFermata(Object *parent, pugi::xml_node fermata)
 
     ReadTimePointInterface(fermata, vrvFermata);
     vrvFermata->ReadColor(fermata);
+    vrvFermata->ReadCommonPart(fermata);
     vrvFermata->ReadFermataVis(fermata);
     vrvFermata->ReadPlacement(fermata);
 
@@ -3049,6 +3055,8 @@ bool MeiInput::ReadMeiMensur(Object *parent, pugi::xml_node mensur)
     Mensur *vrvMensur = new Mensur();
     ReadLayerElement(mensur, vrvMensur);
 
+    vrvMensur->ReadColor(mensur);
+    vrvMensur->ReadCommonPart(mensur);
     vrvMensur->ReadDurationRatio(mensur);
     vrvMensur->ReadMensuralShared(mensur);
     vrvMensur->ReadMensurLog(mensur);
@@ -3078,9 +3086,10 @@ bool MeiInput::ReadMeiMRest(Object *parent, pugi::xml_node mRest)
     ReadLayerElement(mRest, vrvMRest);
     ReadPositionInterface(mRest, vrvMRest);
 
-    vrvMRest->ReadVisibility(mRest);
+    vrvMRest->ReadCommonPart(mRest);
     vrvMRest->ReadFermatapresent(mRest);
     vrvMRest->ReadRelativesize(mRest);
+    vrvMRest->ReadVisibility(mRest);
 
     parent->AddChild(vrvMRest);
     return true;
@@ -3177,6 +3186,7 @@ bool MeiInput::ReadMeiRest(Object *parent, pugi::xml_node rest)
     ReadDurationInterface(rest, vrvRest);
     ReadPositionInterface(rest, vrvRest);
     vrvRest->ReadColor(rest);
+    vrvRest->ReadCommonPart(rest);
     vrvRest->ReadRelativesize(rest);
     vrvRest->ReadRestVisMensural(rest);
 

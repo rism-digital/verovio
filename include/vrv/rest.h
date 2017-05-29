@@ -26,6 +26,7 @@ class Rest : public LayerElement,
              public DurationInterface,
              public PositionInterface,
              public AttColor,
+             public AttCommonPart,
              public AttRelativesize,
              public AttRestVisMensural {
 public:

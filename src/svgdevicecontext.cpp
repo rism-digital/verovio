@@ -434,7 +434,7 @@ pugi::xml_node SvgDeviceContext::AppendChild(std::string name)
         return m_currentNode.append_child(name.c_str());
 }
 
-// Drawing mething
+// Drawing methods
 void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
 {
     pugi::xml_node pathChild = AppendChild("path");

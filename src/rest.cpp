@@ -32,12 +32,14 @@ Rest::Rest()
     , DurationInterface()
     , PositionInterface()
     , AttColor()
+    , AttCommonPart()
     , AttRelativesize()
     , AttRestVisMensural()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_RESTVISMENSURAL);
     Reset();
@@ -53,6 +55,7 @@ void Rest::Reset()
     DurationInterface::Reset();
     PositionInterface::Reset();
     ResetColor();
+    ResetCommonPart();
     ResetRelativesize();
     ResetRestVisMensural();
 }
