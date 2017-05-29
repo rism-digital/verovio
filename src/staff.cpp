@@ -140,7 +140,7 @@ int Staff::CalcPitchPosYRel(Doc *doc, int loc)
     return (loc - staffLocOffset) * doc->GetDrawingUnit(this->m_drawingStaffSize);
 }
 
-void Staff::AddLegerLineAbove(int count, short left, short right, bool cueSize)
+void Staff::AddLegerLineAbove(int count, int left, int right, bool cueSize)
 {
     if (cueSize) {
         if (m_ledgerLinesAboveCue == NULL) m_ledgerLinesAboveCue = new ArrayOfLedgerLines;
@@ -152,7 +152,7 @@ void Staff::AddLegerLineAbove(int count, short left, short right, bool cueSize)
     }
 }
 
-void Staff::AddLegerLineBelow(int count, short left, short right, bool cueSize)
+void Staff::AddLegerLineBelow(int count, int left, int right, bool cueSize)
 {
     if (cueSize) {
         if (m_ledgerLinesBelowCue == NULL) m_ledgerLinesBelowCue = new ArrayOfLedgerLines;
@@ -164,7 +164,7 @@ void Staff::AddLegerLineBelow(int count, short left, short right, bool cueSize)
     }
 }
 
-void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, short left, short right)
+void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int right)
 {
     assert(lines);
 
@@ -193,11 +193,11 @@ void LedgerLine::Reset()
     m_dashes.clear();
 }
 
-void LedgerLine::AddDash(short left, short right)
+void LedgerLine::AddDash(int left, int right)
 {
     assert(left < right);
 
-    std::list<std::pair<short, short> >::iterator iter;
+    std::list<std::pair<int, int> >::iterator iter;
 
     // First add the dash
     for (iter = m_dashes.begin(); iter != m_dashes.end(); iter++) {
@@ -206,7 +206,7 @@ void LedgerLine::AddDash(short left, short right)
     m_dashes.insert(iter, std::make_pair(left, right));
 
     // Merge overlapping dashes
-    std::list<std::pair<short, short> >::iterator previous = m_dashes.begin();
+    std::list<std::pair<int, int> >::iterator previous = m_dashes.begin();
     iter = m_dashes.begin();
     iter++;
     while (iter != m_dashes.end()) {

@@ -732,8 +732,9 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 assert(firstLayer);
                 if (firstLayer->GetN() == layerY->GetN()) isFirstLayer = true;
             }
-            loc = rest->GetDefaultLoc(hasMultipleLayer, isFirstLayer);
+            loc = rest->GetRestDefaultLoc(hasMultipleLayer, isFirstLayer);
         }
+        loc = rest->GetRestLocOffset(loc);
         rest->SetDrawingLoc(loc);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }

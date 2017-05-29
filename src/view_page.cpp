@@ -834,7 +834,7 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *
     dc->SetBrush(m_currentColour, AxSOLID);
 
     ArrayOfLedgerLines::iterator iter;
-    std::list<std::pair<short, short> >::iterator iterDashes;
+    std::list<std::pair<int, int> >::iterator iterDashes;
 
     // First add the dash
     for (iter = lines->begin(); iter != lines->end(); iter++) {
