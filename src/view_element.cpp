@@ -883,8 +883,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int y = staff->GetDrawingY()
-        - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
+    int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
     int x = element->GetDrawingX();
 
     if (meterSig->GetForm() == meterSigVis_FORM_invis) {
