@@ -96,21 +96,6 @@ wchar_t Rest::GetRestGlyph() const
     return symc;
 }
 
-int Rest::GetRestDefaultLoc(bool hasMultipleLayer, bool isFirstLayer)
-{
-    // only works if staff has 5 lines
-    int loc = 4;
-
-    if (hasMultipleLayer) {
-        if (isFirstLayer)
-            loc += 2;
-        else
-            loc -= 2;
-    }
-
-    return loc;
-}
-
 int Rest::GetRestLocOffset(int loc)
 {
     switch (this->GetActualDur()) {
