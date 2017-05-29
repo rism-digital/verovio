@@ -19,6 +19,7 @@
 
 #include "attcomparison.h"
 #include "bboxdevicecontext.h"
+#include "breath.h"
 #include "devicecontext.h"
 #include "dir.h"
 #include "doc.h"
@@ -70,6 +71,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
         system->AddToDrawingList(element);
+    }
+    else if (element->Is(BREATH)) {
+        Breath *breath = dynamic_cast<Breath *>(element);
+        assert(breath);
+        DrawBreath(dc, breath, measure, system);
     }
     else if (element->Is(DIR)) {
         Dir *dir = dynamic_cast<Dir *>(element);
@@ -1523,6 +1529,43 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         DrawFilledRectangle(dc, x1, y, x2, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
     }
+}
+
+void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(breath);
+
+    // Cannot draw a breath that has no start position
+    if (!breath->GetStart()) return;
+
+    dc->StartGraphic(breath, "", breath->GetUuid());
+
+    int x = breath->GetStart()->GetDrawingX();
+
+    // use breath mark comma glyph
+    int code = SMUFL_E4CE_breathMarkComma;
+
+    std::wstring str;
+    str.push_back(code);
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = breath->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), breath, breath->GetStart(), *staffIter);
+        int y =  breath->GetDrawingY();
+
+        // Adjust the x position
+        int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
+
+        dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+        DrawSmuflString(dc, drawingX, y, str, false, (*staffIter)->m_drawingStaffSize);
+        dc->ResetFont();
+    }
+
+    dc->EndGraphic(breath, this);
 }
 
 void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system)

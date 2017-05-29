@@ -903,7 +903,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     else if (meterSig->GetForm() == meterSigVis_FORM_num) {
         DrawMeterSigFigures(dc, x, staff->GetDrawingY(), meterSig->GetCount(), NONE, staff);
     }
-    else if (meterSig->GetCount()) {
+    else if (meterSig->HasCount()) {
         DrawMeterSigFigures(dc, x, staff->GetDrawingY(), meterSig->GetCount(), meterSig->GetUnit(), staff);
     }
 
@@ -1229,8 +1229,9 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    DrawVerticalLine(dc, stem->GetDrawingY(), stem->GetDrawingY() - stem->GetDrawingStemLen(), stem->GetDrawingX(),
-        m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+    DrawFilledRectangle(dc, stem->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
+        stem->GetDrawingY(), stem->GetDrawingX() + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
+        stem->GetDrawingY() - stem->GetDrawingStemLen());
 
     DrawLayerChildren(dc, stem, layer, staff, measure);
 

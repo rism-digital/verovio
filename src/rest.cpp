@@ -99,10 +99,23 @@ wchar_t Rest::GetRestGlyph() const
     return symc;
 }
 
-int Rest::GetDefaultLoc(bool hasMultipleLayer, bool isFirstLayer)
+int Rest::GetRestDefaultLoc(bool hasMultipleLayer, bool isFirstLayer)
 {
+    // only works if staff has 5 lines
     int loc = 4;
 
+    if (hasMultipleLayer) {
+        if (isFirstLayer)
+            loc += 2;
+        else
+            loc -= 2;
+    }
+
+    return loc;
+}
+
+int Rest::GetRestLocOffset(int loc)
+{
     switch (this->GetActualDur()) {
         case DUR_MX: loc -= 0; break;
         case DUR_LG: loc -= 0; break;
@@ -117,12 +130,6 @@ int Rest::GetDefaultLoc(bool hasMultipleLayer, bool isFirstLayer)
         case DUR_128: loc -= 2; break;
         case DUR_256: loc -= 2; break;
         default: loc -= 1; break;
-    }
-    if (hasMultipleLayer) {
-        if (isFirstLayer)
-            loc += 2;
-        else
-            loc -= 2;
     }
 
     return loc;

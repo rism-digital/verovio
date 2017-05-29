@@ -20,6 +20,7 @@
 #include "artic.h"
 #include "beam.h"
 #include "boundary.h"
+#include "breath.h"
 #include "chord.h"
 #include "clef.h"
 #include "custos.h"
@@ -240,6 +241,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(ANCHORED_TEXT)) {
         m_currentNode = m_currentNode.append_child("anchoredText");
         WriteMeiAnchoredText(m_currentNode, dynamic_cast<AnchoredText *>(object));
+    }
+    else if (object->Is(BREATH)) {
+        m_currentNode = m_currentNode.append_child("breath");
+        WriteMeiBreath(m_currentNode, dynamic_cast<Breath *>(object));
     }
     else if (object->Is(DIR)) {
         m_currentNode = m_currentNode.append_child("dir");
@@ -782,6 +787,16 @@ void MeiOutput::WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *a
     WriteTextDirInterface(currentNode, anchoredText);
 }
 
+void MeiOutput::WriteMeiBreath(pugi::xml_node currentNode, Breath *breath)
+{
+    assert(breath);
+
+    WriteControlElement(currentNode, breath);
+    WriteTimePointInterface(currentNode, breath);
+    breath->WriteColor(currentNode);
+    breath->WritePlacement(currentNode);
+};
+
 void MeiOutput::WriteMeiDir(pugi::xml_node currentNode, Dir *dir)
 {
     assert(dir);
@@ -1005,6 +1020,7 @@ void MeiOutput::WriteMeiBeam(pugi::xml_node currentNode, Beam *beam)
     assert(beam);
 
     WriteLayerElement(currentNode, beam);
+    beam->WriteColor(currentNode);
 }
 
 void MeiOutput::WriteMeiBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt)
@@ -1106,6 +1122,7 @@ void MeiOutput::WriteMeiMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
 
     WriteLayerElement(currentNode, meterSig);
     meterSig->WriteMeterSigLog(currentNode);
+    meterSig->WriteMeterSigVis(currentNode);
 }
 
 void MeiOutput::WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest)
@@ -1202,6 +1219,7 @@ void MeiOutput::WriteMeiTuplet(pugi::xml_node currentNode, Tuplet *tuplet)
     assert(tuplet);
 
     WriteLayerElement(currentNode, tuplet);
+    tuplet->WriteColor(currentNode);
     tuplet->WriteDurationRatio(currentNode);
     tuplet->WriteNumberPlacement(currentNode);
     tuplet->WriteTupletVis(currentNode);
@@ -1746,6 +1764,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "space") {
             return true;
         }
+        else if (element == "tuplet") {
+            return true;
+        }
         else {
             return false;
         }
@@ -1753,6 +1774,15 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for verse
     else if (filterParent->Is(VERSE)) {
         if (element == "syl") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for syl
+    else if (filterParent->Is(SYL)) {
+        if (element == "") {
             return true;
         }
         else {
@@ -2330,6 +2360,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "anchoredText") {
             success = ReadMeiAnchoredText(parent, current);
         }
+        else if (std::string(current.name()) == "breath") {
+            success = ReadMeiBreath(parent, current);
+        }
         else if (std::string(current.name()) == "dir") {
             success = ReadMeiDir(parent, current);
         }
@@ -2401,6 +2434,19 @@ bool MeiInput::ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText)
 
     parent->AddChild(vrvAnchoredText);
     return ReadMeiTextChildren(vrvAnchoredText, anchoredText, vrvAnchoredText);
+}
+
+bool MeiInput::ReadMeiBreath(Object *parent, pugi::xml_node breath)
+{
+    Breath *vrvBreath = new Breath();
+    ReadControlElement(breath, vrvBreath);
+
+    ReadTimePointInterface(breath, vrvBreath);
+    vrvBreath->ReadColor(breath);
+    vrvBreath->ReadPlacement(breath);
+
+    parent->AddChild(vrvBreath);
+    return ReadMeiTextChildren(vrvBreath, breath, vrvBreath);
 }
 
 bool MeiInput::ReadMeiDir(Object *parent, pugi::xml_node dir)
@@ -2846,6 +2892,8 @@ bool MeiInput::ReadMeiBeam(Object *parent, pugi::xml_node beam)
     Beam *vrvBeam = new Beam();
     ReadLayerElement(beam, vrvBeam);
 
+    vrvBeam->ReadColor(beam);
+
     parent->AddChild(vrvBeam);
 
     return ReadMeiLayerChildren(vrvBeam, beam, vrvBeam);
@@ -3003,6 +3051,7 @@ bool MeiInput::ReadMeiMeterSig(Object *parent, pugi::xml_node meterSig)
     ReadLayerElement(meterSig, vrvMeterSig);
 
     vrvMeterSig->ReadMeterSigLog(meterSig);
+    vrvMeterSig->ReadMeterSigVis(meterSig);
 
     parent->AddChild(vrvMeterSig);
     return true;
@@ -3162,6 +3211,7 @@ bool MeiInput::ReadMeiTuplet(Object *parent, pugi::xml_node tuplet)
     Tuplet *vrvTuplet = new Tuplet();
     ReadLayerElement(tuplet, vrvTuplet);
 
+    vrvTuplet->ReadColor(tuplet);
     vrvTuplet->ReadDurationRatio(tuplet);
     vrvTuplet->ReadNumberPlacement(tuplet);
     vrvTuplet->ReadTupletVis(tuplet);

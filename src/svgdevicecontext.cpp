@@ -200,7 +200,6 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         assert(att);
         if (att->HasColor()) {
             m_currentNode.append_attribute("fill") = att->GetColor().c_str();
-            m_currentNode.append_attribute("stroke") = att->GetColor().c_str();
         }
     }
 

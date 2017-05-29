@@ -303,8 +303,10 @@ void BeamDrawingParams::CalcBeam(
 // Beam
 //----------------------------------------------------------------------------
 
-Beam::Beam() : LayerElement("beam-"), ObjectListInterface()
+Beam::Beam() : LayerElement("beam-"), ObjectListInterface(), AttColor()
 {
+    RegisterAttClass(ATT_COLOR);
+
     Reset();
 }
 
@@ -316,6 +318,7 @@ Beam::~Beam()
 void Beam::Reset()
 {
     LayerElement::Reset();
+    ResetColor();
 
     ClearCoords();
 }

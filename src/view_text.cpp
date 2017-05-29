@@ -18,6 +18,7 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "fb.h"
+#include "smufl.h"
 #include "style.h"
 #include "text.h"
 #include "vrv.h"
@@ -46,7 +47,7 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
 
     std::size_t prev_pos = 0, pos;
     while ((pos = s.find_first_of(L"\u266D\u266E\u266F", prev_pos)) != std::wstring::npos) {
-        // If pos if > than the previous, it is the substring to exctrace
+        // If pos is > than the previous, it is the substring to extract
         if (pos > prev_pos) {
             std::wstring substr = s.substr(prev_pos, pos - prev_pos);
             dc->DrawText(UTF16to8(substr), substr);
@@ -58,13 +59,13 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
             std::wstring accid = s.substr(pos, 1);
             std::wstring smufl_accid;
             if (accid == L"\u266D") { // MUSIC FLAT SIGN
-                smufl_accid.push_back(0xE260);
+                smufl_accid.push_back(SMUFL_E260_accidentalFlat);
             }
-            else if (accid == L"\u266E") { // MUSIC FLAT SIGN
-                smufl_accid.push_back(0xE261);
+            else if (accid == L"\u266E") { // MUSIC NATURAL SIGN
+                smufl_accid.push_back(SMUFL_E261_accidentalNatural);
             }
             else if (accid == L"\u266F") { // MUSIC SHARP SIGN
-                smufl_accid.push_back(0xE262);
+                smufl_accid.push_back(SMUFL_E262_accidentalSharp);
             }
             else {
                 smufl_accid.push_back(0xE26D);
