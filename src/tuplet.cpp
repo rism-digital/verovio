@@ -32,7 +32,7 @@ Tuplet::Tuplet()
     , ObjectListInterface()
     , AttColor()
     , AttDurationRatio()
-    , AttNumberplacement()
+    , AttNumberPlacement()
     , AttTupletVis()
 {
     RegisterAttClass(ATT_COLOR);
