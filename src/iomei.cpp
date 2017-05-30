@@ -1171,6 +1171,7 @@ void MeiOutput::WriteMeiMultiRest(pugi::xml_node currentNode, MultiRest *multiRe
 
     WriteLayerElement(currentNode, multiRest);
     multiRest->WriteCommonPart(currentNode);
+    multiRest->WriteMultiRestVis(currentNode);
     multiRest->WriteNumbered(currentNode);
 }
 
@@ -3127,6 +3128,8 @@ bool MeiInput::ReadMeiMultiRest(Object *parent, pugi::xml_node multiRest)
     MultiRest *vrvMultiRest = new MultiRest();
     ReadLayerElement(multiRest, vrvMultiRest);
 
+    vrvMultiRest->ReadCommonPart(multiRest);
+    vrvMultiRest->ReadMultiRestVis(multiRest);
     vrvMultiRest->ReadNumbered(multiRest);
 
     parent->AddChild(vrvMultiRest);
