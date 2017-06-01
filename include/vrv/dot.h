@@ -19,7 +19,7 @@ class Note;
 // Dot
 //----------------------------------------------------------------------------
 
-class Dot : public LayerElement, public PositionInterface, public AttColor, public AttDotLog {
+class Dot : public LayerElement, public PositionInterface, public AttColor, public AttCommonPart, public AttDotLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

@@ -1033,6 +1033,7 @@ void MeiOutput::WriteMeiBeam(pugi::xml_node currentNode, Beam *beam)
 
     WriteLayerElement(currentNode, beam);
     beam->WriteColor(currentNode);
+    beam->WriteCommonPart(currentNode);
 }
 
 void MeiOutput::WriteMeiBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt)
@@ -1059,6 +1060,7 @@ void MeiOutput::WriteMeiChord(pugi::xml_node currentNode, Chord *chord)
     WriteLayerElement(currentNode, chord);
     WriteDurationInterface(currentNode, chord);
     chord->WriteColor(currentNode);
+    chord->WriteCommonPart(currentNode);
     chord->WriteGraced(currentNode);
     chord->WriteRelativesize(currentNode);
     chord->WriteStems(currentNode);
@@ -1085,6 +1087,8 @@ void MeiOutput::WriteMeiCustos(pugi::xml_node currentNode, Custos *custos)
 
     WriteLayerElement(currentNode, custos);
     WritePositionInterface(currentNode, custos);
+    custos->WriteColor(currentNode);
+    custos->WriteCommonPart(currentNode);
 }
 
 void MeiOutput::WriteMeiDot(pugi::xml_node currentNode, Dot *dot)
@@ -1094,6 +1098,7 @@ void MeiOutput::WriteMeiDot(pugi::xml_node currentNode, Dot *dot)
     WriteLayerElement(currentNode, dot);
     WritePositionInterface(currentNode, dot);
     dot->WriteColor(currentNode);
+    dot->WriteCommonPart(currentNode);
     dot->WriteDotLog(currentNode);
 }
 
@@ -2924,6 +2929,7 @@ bool MeiInput::ReadMeiBeam(Object *parent, pugi::xml_node beam)
     ReadLayerElement(beam, vrvBeam);
 
     vrvBeam->ReadColor(beam);
+    vrvBeam->ReadCommonPart(beam);
 
     parent->AddChild(vrvBeam);
 
@@ -2960,6 +2966,7 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
 
     ReadDurationInterface(chord, vrvChord);
     vrvChord->ReadColor(chord);
+    vrvChord->ReadCommonPart(chord);
     vrvChord->ReadGraced(chord);
     vrvChord->ReadRelativesize(chord);
     vrvChord->ReadStems(chord);
@@ -3002,6 +3009,9 @@ bool MeiInput::ReadMeiCustos(Object *parent, pugi::xml_node custos)
 
     ReadPositionInterface(custos, vrvCustos);
 
+    vrvCustos->ReadColor(custos);
+    vrvCustos->ReadCommonPart(custos);
+
     parent->AddChild(vrvCustos);
     return true;
 }
@@ -3013,6 +3023,7 @@ bool MeiInput::ReadMeiDot(Object *parent, pugi::xml_node dot)
 
     ReadPositionInterface(dot, vrvDot);
     vrvDot->ReadColor(dot);
+    vrvDot->ReadCommonPart(dot);
     vrvDot->ReadDotLog(dot);
 
     parent->AddChild(vrvDot);

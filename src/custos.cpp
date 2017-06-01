@@ -15,9 +15,11 @@ namespace vrv {
 // Custos
 //----------------------------------------------------------------------------
 
-Custos::Custos() : LayerElement("custos-"), PositionInterface()
+Custos::Custos() : LayerElement("custos-"), PositionInterface(), AttColor(), AttCommonPart()
 {
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_COMMONPART);
 
     Reset();
 }
@@ -30,6 +32,8 @@ void Custos::Reset()
 {
     LayerElement::Reset();
     PositionInterface::Reset();
+    ResetColor();
+    ResetCommonPart();
 }
 
 //----------------------------------------------------------------------------
