@@ -705,7 +705,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         Chord *chord = note->IsChordTone();
         int loc = 0;
         if (note->HasPname()) {
-          loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
+            loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
         }
         // should this override pname/oct
         if (note->HasLoc()) loc = note->GetLoc();
@@ -717,6 +717,39 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         note->SetDrawingLoc(loc);
         this->SetDrawingYRel(yRel);
     }
+    else if (this->Is(MREST)) {
+        MRest *mRest = dynamic_cast<MRest *>(this);
+        assert(mRest);
+        int loc = 0;
+        if (mRest->HasLoc()) {
+            loc = mRest->GetLoc();
+        }
+        // Automatically calculate rest position
+        else {
+            // set default location to the middle of the staff
+            Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+            assert(staff);
+            loc = staff->m_drawingLines - 1;
+            // Limitation: GetLayerCount does not take into account editorial markup
+            // should be refined later
+            bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
+            if (hasMultipleLayer) {
+                Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
+                assert(firstLayer);
+                if (firstLayer->GetN() == layerY->GetN())
+                    loc += 2;
+                else
+                    loc -= 2;
+            }
+
+            // add offset
+            else if (staff->m_drawingLines > 1) loc += 2;
+        }
+
+        mRest->SetDrawingLoc(loc);
+        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+    }
+
     else if (this->Is(REST)) {
         Rest *rest = dynamic_cast<Rest *>(this);
         assert(rest);
