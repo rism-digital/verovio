@@ -45,7 +45,6 @@ class Note : public LayerElement,
              public PitchInterface,
              public AttColor,
              public AttColoration,
-             public AttLabelled,
              public AttGraced,
              public AttNoteAnlMensural,
              // FIXME changed in MEI 4.0.0 - will be changed to @cue?

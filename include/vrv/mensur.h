@@ -26,7 +26,6 @@ class ScoreDefInterface;
  */
 class Mensur : public LayerElement,
                public AttColor,
-               public AttLabelled,
                public AttDurationRatio,
                public AttMensuralShared,
                public AttMensurLog,

@@ -19,7 +19,7 @@ class ArticPart;
 // Artic
 //----------------------------------------------------------------------------
 
-class Artic : public LayerElement, public AttArticulation, public AttColor, public AttLabelled, public AttPlacement {
+class Artic : public LayerElement, public AttArticulation, public AttColor, public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

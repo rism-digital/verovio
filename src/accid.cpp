@@ -33,7 +33,6 @@ Accid::Accid()
     , AttAccidLog()
     , AttColor()
     , AttEnclosingChars()
-    , AttLabelled()
 {
 
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
@@ -42,7 +41,6 @@ Accid::Accid()
     RegisterAttClass(ATT_ACCIDLOG);
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_ENCLOSINGCHARS);
-    RegisterAttClass(ATT_LABELLED);
 
     Reset();
 }
@@ -60,7 +58,6 @@ void Accid::Reset()
     ResetAccidLog();
     ResetColor();
     ResetEnclosingChars();
-    ResetLabelled();
 }
 
 std::wstring Accid::GetSymbolStr() const

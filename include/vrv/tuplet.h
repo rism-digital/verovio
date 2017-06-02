@@ -25,7 +25,6 @@ class Tuplet : public LayerElement,
                public ObjectListInterface,
                public AttColor,
                public AttDurationRatio,
-               public AttLabelled,
                public AttNumberPlacement,
                public AttTupletVis {
 public:

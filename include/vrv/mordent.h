@@ -22,7 +22,6 @@ namespace vrv {
 class Mordent : public ControlElement,
                 public TimePointInterface,
                 public AttColor,
-                public AttLabelled,
                 public AttOrnamentAccid,
                 public AttPlacement,
                 public AttMordentLog {

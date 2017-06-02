@@ -22,7 +22,6 @@ namespace vrv {
 class Fermata : public ControlElement,
                 public TimePointInterface,
                 public AttColor,
-                public AttLabelled,
                 public AttFermataVis,
                 public AttPlacement {
 public:
