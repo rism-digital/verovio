@@ -91,7 +91,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     /************** Noteheads: **************/
 
     // Ligature, maxima,longa, and brevis
-    if ((note->GetLig() != noteLogMensural_LIG_NONE) && (drawingDur <= DUR_1)) {
+    if ((note->GetLig() != noteAnlMensural_LIG_NONE) && (drawingDur <= DUR_1)) {
         DrawLigatureNote(dc, element, layer, staff);
     }
     else if (drawingDur < DUR_1) {

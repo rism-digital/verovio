@@ -186,11 +186,11 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         }
         if (staff->m_drawingStaffDef->HasLyricStyle()) {
             styleStr.append(
-                "font-style:" + staff->AttCommon::FontstyleToStr(staff->m_drawingStaffDef->GetLyricStyle()) + ";");
+                "font-style:" + staff->AttTyped::FontstyleToStr(staff->m_drawingStaffDef->GetLyricStyle()) + ";");
         }
         if (staff->m_drawingStaffDef->HasLyricWeight()) {
             styleStr.append(
-                "font-weight:" + staff->AttCommon::FontweightToStr(staff->m_drawingStaffDef->GetLyricWeight()) + ";");
+                "font-weight:" + staff->AttTyped::FontweightToStr(staff->m_drawingStaffDef->GetLyricWeight()) + ";");
         }
         if (!styleStr.empty()) m_currentNode.append_attribute("style") = styleStr.c_str();
     }
@@ -203,8 +203,8 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         }
     }
 
-    if (object->HasAttClass(ATT_COMMONPART)) {
-        AttCommonPart *att = dynamic_cast<AttCommonPart *>(object);
+    if (object->HasAttClass(ATT_LABELLED)) {
+        AttLabelled *att = dynamic_cast<AttLabelled *>(object);
         assert(att);
         if (att->HasLabel()) {
             pugi::xml_node svgTitle = m_currentNode.prepend_child("title");

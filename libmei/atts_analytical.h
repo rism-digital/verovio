@@ -12,8 +12,8 @@
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ATTS_ANALYSIS_H__
-#define __VRV_ATTS_ANALYSIS_H__
+#ifndef __VRV_ATTS_ANALYTICAL_H__
+#define __VRV_ATTS_ANALYTICAL_H__
 
 #include "att.h"
 #include "attdef.h"
@@ -26,22 +26,22 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttCommonAnl
+// AttHarmAnl
 //----------------------------------------------------------------------------
 
-class AttCommonAnl : public Att {
+class AttHarmAnl : public Att {
 public:
-    AttCommonAnl();
-    virtual ~AttCommonAnl();
+    AttHarmAnl();
+    virtual ~AttHarmAnl();
 
     /** Reset the default values for the attribute class **/
-    void ResetCommonAnl();
+    void ResetHarmAnl();
 
     /** Read the values for the attribute class **/
-    bool ReadCommonAnl(pugi::xml_node element);
+    bool ReadHarmAnl(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteCommonAnl(pugi::xml_node element);
+    bool WriteHarmAnl(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -49,71 +49,35 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCopyof(std::string copyof_) { m_copyof = copyof_; }
-    std::string GetCopyof() const { return m_copyof; }
-    bool HasCopyof() const;
-    //
-    void SetCorresp(std::string corresp_) { m_corresp = corresp_; }
-    std::string GetCorresp() const { return m_corresp; }
-    bool HasCorresp() const;
-    //
-    void SetNext(std::string next_) { m_next = next_; }
-    std::string GetNext() const { return m_next; }
-    bool HasNext() const;
-    //
-    void SetPrev(std::string prev_) { m_prev = prev_; }
-    std::string GetPrev() const { return m_prev; }
-    bool HasPrev() const;
-    //
-    void SetSameas(std::string sameas_) { m_sameas = sameas_; }
-    std::string GetSameas() const { return m_sameas; }
-    bool HasSameas() const;
-    //
-    void SetSynch(std::string synch_) { m_synch = synch_; }
-    std::string GetSynch() const { return m_synch; }
-    bool HasSynch() const;
+    void SetForm(harmAnl_FORM form_) { m_form = form_; }
+    harmAnl_FORM GetForm() const { return m_form; }
+    bool HasForm() const;
     ///@}
 
 private:
-    /** Points to an element of which the current element is a copy. **/
-    std::string m_copyof;
-    /**
-     * Used to point to other elements that correspond to this one in a generic
-     * fashion.
-     **/
-    std::string m_corresp;
-    /** Used to point to the next event(s) in a user-defined collection. **/
-    std::string m_next;
-    /** Points to the previous event(s) in a user-defined collection. **/
-    std::string m_prev;
-    /**
-     * Points to an element that is the same as the current element but is not a
-     * literal copy of the current element.
-     **/
-    std::string m_sameas;
-    /** Points to elements that are synchronous with the current element. **/
-    std::string m_synch;
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
+    harmAnl_FORM m_form;
 
-    /* include <attsynch> */
+    /* include <attform> */
 };
 
 //----------------------------------------------------------------------------
-// AttHarmonicfunction
+// AttHarmonicFunction
 //----------------------------------------------------------------------------
 
-class AttHarmonicfunction : public Att {
+class AttHarmonicFunction : public Att {
 public:
-    AttHarmonicfunction();
-    virtual ~AttHarmonicfunction();
+    AttHarmonicFunction();
+    virtual ~AttHarmonicFunction();
 
     /** Reset the default values for the attribute class **/
-    void ResetHarmonicfunction();
+    void ResetHarmonicFunction();
 
     /** Read the values for the attribute class **/
-    bool ReadHarmonicfunction(pugi::xml_node element);
+    bool ReadHarmonicFunction(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteHarmonicfunction(pugi::xml_node element);
+    bool WriteHarmonicFunction(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -121,41 +85,42 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDeg(data_SCALEDEGREE deg_) { m_deg = deg_; }
-    data_SCALEDEGREE GetDeg() const { return m_deg; }
+    void SetDeg(std::string deg_) { m_deg = deg_; }
+    std::string GetDeg() const { return m_deg; }
     bool HasDeg() const;
     ///@}
 
 private:
     /**
-     * Captures relative scale degree information using Humdrum **deg syntax -- an
-     * optional indicator of melodic approach (^ = ascending approach, v = descending
-     * approach), a scale degree value (1 = tonic ...
-     * 7 = leading tone), and an optional indication of chromatic alteration. The
-     * amount of chromatic alternation is not indicated.
+     * Captures scale degree information using Humdrum **deg syntax -- an optional
+     * indicator of melodic approach (^ = ascending approach, v = descending approach),
+     * a scale degree value (1 = tonic ...
+     * 7 = leading tone), and an optional indication of chromatic alteration, "1",
+     * "v7", "^1", or "v5+", for example. The amount of chromatic alternation is not
+     * indicated.
      **/
-    data_SCALEDEGREE m_deg;
+    std::string m_deg;
 
     /* include <attdeg> */
 };
 
 //----------------------------------------------------------------------------
-// AttIntervalharmonic
+// AttIntervalHarmonic
 //----------------------------------------------------------------------------
 
-class AttIntervalharmonic : public Att {
+class AttIntervalHarmonic : public Att {
 public:
-    AttIntervalharmonic();
-    virtual ~AttIntervalharmonic();
+    AttIntervalHarmonic();
+    virtual ~AttIntervalHarmonic();
 
     /** Reset the default values for the attribute class **/
-    void ResetIntervalharmonic();
+    void ResetIntervalHarmonic();
 
     /** Read the values for the attribute class **/
-    bool ReadIntervalharmonic(pugi::xml_node element);
+    bool ReadIntervalHarmonic(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteIntervalharmonic(pugi::xml_node element);
+    bool WriteIntervalHarmonic(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -163,35 +128,35 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetInth(data_INTERVAL_HARMONIC inth_) { m_inth = inth_; }
-    data_INTERVAL_HARMONIC GetInth() const { return m_inth; }
+    void SetInth(std::string inth_) { m_inth = inth_; }
+    std::string GetInth() const { return m_inth; }
     bool HasInth() const;
     ///@}
 
 private:
     /** Encodes the harmonic interval between pitches occurring at the same time. **/
-    data_INTERVAL_HARMONIC m_inth;
+    std::string m_inth;
 
     /* include <attinth> */
 };
 
 //----------------------------------------------------------------------------
-// AttIntervalmelodic
+// AttIntervalMelodic
 //----------------------------------------------------------------------------
 
-class AttIntervalmelodic : public Att {
+class AttIntervalMelodic : public Att {
 public:
-    AttIntervalmelodic();
-    virtual ~AttIntervalmelodic();
+    AttIntervalMelodic();
+    virtual ~AttIntervalMelodic();
 
     /** Reset the default values for the attribute class **/
-    void ResetIntervalmelodic();
+    void ResetIntervalMelodic();
 
     /** Read the values for the attribute class **/
-    bool ReadIntervalmelodic(pugi::xml_node element);
+    bool ReadIntervalMelodic(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteIntervalmelodic(pugi::xml_node element);
+    bool WriteIntervalMelodic(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -199,40 +164,130 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetIntm(data_INTERVAL_MELODIC intm_) { m_intm = intm_; }
-    data_INTERVAL_MELODIC GetIntm() const { return m_intm; }
+    void SetIntm(std::string intm_) { m_intm = intm_; }
+    std::string GetIntm() const { return m_intm; }
     bool HasIntm() const;
     ///@}
 
 private:
     /**
      * Encodes the melodic interval from the previous pitch.
-     * The value may be a general directional indication (u, d, s), an indication of
-     * diatonic interval direction, quality, and size, or a precise numeric value in
+     * The value may be a general directional indication (u, d, s, etc.), an indication
+     * of diatonic interval direction, quality, and size, or a precise numeric value in
      * half steps.
      **/
-    data_INTERVAL_MELODIC m_intm;
+    std::string m_intm;
 
     /* include <attintm> */
 };
 
 //----------------------------------------------------------------------------
-// AttMelodicfunction
+// AttKeySigAnl
 //----------------------------------------------------------------------------
 
-class AttMelodicfunction : public Att {
+class AttKeySigAnl : public Att {
 public:
-    AttMelodicfunction();
-    virtual ~AttMelodicfunction();
+    AttKeySigAnl();
+    virtual ~AttKeySigAnl();
 
     /** Reset the default values for the attribute class **/
-    void ResetMelodicfunction();
+    void ResetKeySigAnl();
 
     /** Read the values for the attribute class **/
-    bool ReadMelodicfunction(pugi::xml_node element);
+    bool ReadKeySigAnl(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteMelodicfunction(pugi::xml_node element);
+    bool WriteKeySigAnl(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetMode(data_MODE mode_) { m_mode = mode_; }
+    data_MODE GetMode() const { return m_mode; }
+    bool HasMode() const;
+    ///@}
+
+private:
+    /** Indicates major, minor, or other tonality. **/
+    data_MODE m_mode;
+
+    /* include <attmode> */
+};
+
+//----------------------------------------------------------------------------
+// AttKeySigDefaultAnl
+//----------------------------------------------------------------------------
+
+class AttKeySigDefaultAnl : public Att {
+public:
+    AttKeySigDefaultAnl();
+    virtual ~AttKeySigDefaultAnl();
+
+    /** Reset the default values for the attribute class **/
+    void ResetKeySigDefaultAnl();
+
+    /** Read the values for the attribute class **/
+    bool ReadKeySigDefaultAnl(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteKeySigDefaultAnl(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetKeyAccid(data_ACCIDENTAL_GESTURAL keyAccid_) { m_keyAccid = keyAccid_; }
+    data_ACCIDENTAL_GESTURAL GetKeyAccid() const { return m_keyAccid; }
+    bool HasKeyAccid() const;
+    //
+    void SetKeyMode(data_MODE keyMode_) { m_keyMode = keyMode_; }
+    data_MODE GetKeyMode() const { return m_keyMode; }
+    bool HasKeyMode() const;
+    //
+    void SetKeyPname(data_PITCHNAME keyPname_) { m_keyPname = keyPname_; }
+    data_PITCHNAME GetKeyPname() const { return m_keyPname; }
+    bool HasKeyPname() const;
+    ///@}
+
+private:
+    /**
+     * Contains an accidental for the tonic key, if one is required, e.g., if key.pname
+     * equals 'c' and key.accid equals 's', then a tonic of C# is indicated.
+     **/
+    data_ACCIDENTAL_GESTURAL m_keyAccid;
+    /** Indicates major, minor, or other tonality. **/
+    data_MODE m_keyMode;
+    /**
+     * Holds the pitch name of the tonic key, e.g.
+     * 'c' for the key of C.
+     **/
+    data_PITCHNAME m_keyPname;
+
+    /* include <attkey.pname> */
+};
+
+//----------------------------------------------------------------------------
+// AttMelodicFunction
+//----------------------------------------------------------------------------
+
+class AttMelodicFunction : public Att {
+public:
+    AttMelodicFunction();
+    virtual ~AttMelodicFunction();
+
+    /** Reset the default values for the attribute class **/
+    void ResetMelodicFunction();
+
+    /** Read the values for the attribute class **/
+    bool ReadMelodicFunction(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteMelodicFunction(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -253,22 +308,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttPitchclass
+// AttPitchClass
 //----------------------------------------------------------------------------
 
-class AttPitchclass : public Att {
+class AttPitchClass : public Att {
 public:
-    AttPitchclass();
-    virtual ~AttPitchclass();
+    AttPitchClass();
+    virtual ~AttPitchClass();
 
     /** Reset the default values for the attribute class **/
-    void ResetPitchclass();
+    void ResetPitchClass();
 
     /** Read the values for the attribute class **/
-    bool ReadPitchclass(pugi::xml_node element);
+    bool ReadPitchClass(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WritePitchclass(pugi::xml_node element);
+    bool WritePitchClass(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -276,14 +331,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPclass(data_PITCHCLASS pclass_) { m_pclass = pclass_; }
-    data_PITCHCLASS GetPclass() const { return m_pclass; }
+    void SetPclass(int pclass_) { m_pclass = pclass_; }
+    int GetPclass() const { return m_pclass; }
     bool HasPclass() const;
     ///@}
 
 private:
     /** Holds pitch class information. **/
-    data_PITCHCLASS m_pclass;
+    int m_pclass;
 
     /* include <attpclass> */
 };
@@ -329,4 +384,4 @@ private:
 
 } // vrv namespace
 
-#endif // __VRV_ATTS_ANALYSIS_H__
+#endif // __VRV_ATTS_ANALYTICAL_H__

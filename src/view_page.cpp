@@ -283,11 +283,13 @@ void View::DrawStaffGrp(
         std::string abbrLabel;
         std::string label = staffGrp->GetLabel();
         if (abbreviations) {
-            label = staffGrp->GetLabelAbbr();
+            // FIXME MEI 4.0.0
+            // label = staffGrp->GetLabelAbbr();
         }
         // We still store the abbreviated label for calculating max width with abbreviations (see below)
         else {
-            abbrLabel = staffGrp->GetLabelAbbr();
+            // FIXME MEI 4.0.0
+            // abbrLabel = staffGrp->GetLabelAbbr();
         }
 
         if (label.length() != 0) {
@@ -326,17 +328,17 @@ void View::DrawStaffGrp(
     }
 
     // actually draw the line, the brace or the bracket
-    if (topStaffGrp && ((firstDef != lastDef) || (staffGrp->GetSymbol() != staffgroupingsym_SYMBOL_NONE))) {
+    if (topStaffGrp && ((firstDef != lastDef) || (staffGrp->GetSymbol() != staffGroupingSym_SYMBOL_NONE))) {
         DrawVerticalLine(dc, y_top, y_bottom, x, barLineWidth);
     }
     // this will need to be changed with the next version of MEI will line means additional thick line
-    if (staffGrp->GetSymbol() == staffgroupingsym_SYMBOL_line) {
+    if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_line) {
         DrawVerticalLine(dc, y_top, y_bottom, x, barLineWidth);
     }
-    else if (staffGrp->GetSymbol() == staffgroupingsym_SYMBOL_brace) {
+    else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_brace) {
         DrawBrace(dc, x, y_top, y_bottom, last->m_drawingStaffSize);
     }
-    else if (staffGrp->GetSymbol() == staffgroupingsym_SYMBOL_bracket) {
+    else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracket) {
         DrawBracket(dc, x, y_top, y_bottom, last->m_drawingStaffSize);
         x -= 2 * m_doc->GetDrawingBeamWidth(100, false) - m_doc->GetDrawingBeamWhiteWidth(100, false);
     }
@@ -384,11 +386,13 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         std::string abbrLabel;
         std::string label = staffDef->GetLabel();
         if (abbreviations) {
-            label = staffDef->GetLabelAbbr();
+            // FIXME MEI 4.0.0
+            // label = staffDef->GetLabelAbbr();
         }
         // We still store the abbreviated label for calculating max width with abbreviations (see below)
         else {
-            abbrLabel = staffDef->GetLabelAbbr();
+            // FIXME MEI 4.0.0
+            // abbrLabel = staffDef->GetLabelAbbr();
         }
 
         if (label.length() == 0) {

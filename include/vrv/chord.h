@@ -34,12 +34,13 @@ class Chord : public LayerElement,
               public StemmedDrawingInterface,
               public DurationInterface,
               public AttColor,
-              public AttCommonPart,
               public AttGraced,
-              public AttRelativesize,
+              public AttLabelled,
+              // FIXME changed in MEI 4.0.0 - will be changed to @cue?
+              // public AttRelativesize,
               public AttStems,
               public AttStemsCmn,
-              public AttTiepresent,
+              public AttTiePresent,
               public AttVisibility {
 public:
     /**

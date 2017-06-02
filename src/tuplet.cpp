@@ -31,14 +31,14 @@ Tuplet::Tuplet()
     : LayerElement("tuplet-")
     , ObjectListInterface()
     , AttColor()
-    , AttCommonPart()
     , AttDurationRatio()
-    , AttNumberplacement()
+    , AttLabelled()
+    , AttNumberPlacement()
     , AttTupletVis()
 {
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_DURATIONRATIO);
+    RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_NUMBERPLACEMENT);
     RegisterAttClass(ATT_TUPLETVIS);
 
@@ -53,9 +53,9 @@ void Tuplet::Reset()
 {
     LayerElement::Reset();
     ResetColor();
-    ResetCommonPart();
     ResetDurationRatio();
-    ResetNumberplacement();
+    ResetLabelled();
+    ResetNumberPlacement();
     ResetTupletVis();
 }
 

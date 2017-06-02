@@ -26,22 +26,22 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttRegularmethod
+// AttRegularMethod
 //----------------------------------------------------------------------------
 
-class AttRegularmethod : public Att {
+class AttRegularMethod : public Att {
 public:
-    AttRegularmethod();
-    virtual ~AttRegularmethod();
+    AttRegularMethod();
+    virtual ~AttRegularMethod();
 
     /** Reset the default values for the attribute class **/
-    void ResetRegularmethod();
+    void ResetRegularMethod();
 
     /** Read the values for the attribute class **/
-    bool ReadRegularmethod(pugi::xml_node element);
+    bool ReadRegularMethod(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteRegularmethod(pugi::xml_node element);
+    bool WriteRegularMethod(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -49,14 +49,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMethod(regularmethod_METHOD method_) { m_method = method_; }
-    regularmethod_METHOD GetMethod() const { return m_method; }
+    void SetMethod(regularMethod_METHOD method_) { m_method = method_; }
+    regularMethod_METHOD GetMethod() const { return m_method; }
     bool HasMethod() const;
     ///@}
 
 private:
     /** Indicates the method employed to mark corrections and normalizations. **/
-    regularmethod_METHOD m_method;
+    regularMethod_METHOD m_method;
 
     /* include <attmethod> */
 };

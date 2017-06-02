@@ -12,8 +12,8 @@
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ATTS_LYRICS_H__
-#define __VRV_ATTS_LYRICS_H__
+#ifndef __VRV_ATTS_FINGERING_H__
+#define __VRV_ATTS_FINGERING_H__
 
 #include "att.h"
 #include "attdef.h"
@@ -26,22 +26,22 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttVerseLog
+// AttFingGrpLog
 //----------------------------------------------------------------------------
 
-class AttVerseLog : public Att {
+class AttFingGrpLog : public Att {
 public:
-    AttVerseLog();
-    virtual ~AttVerseLog();
+    AttFingGrpLog();
+    virtual ~AttFingGrpLog();
 
     /** Reset the default values for the attribute class **/
-    void ResetVerseLog();
+    void ResetFingGrpLog();
 
     /** Read the values for the attribute class **/
-    bool ReadVerseLog(pugi::xml_node element);
+    bool ReadFingGrpLog(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteVerseLog(pugi::xml_node element);
+    bool WriteFingGrpLog(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -49,28 +49,18 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetRefrain(data_BOOLEAN refrain_) { m_refrain = refrain_; }
-    data_BOOLEAN GetRefrain() const { return m_refrain; }
-    bool HasRefrain() const;
-    //
-    void SetRhythm(std::string rhythm_) { m_rhythm = rhythm_; }
-    std::string GetRhythm() const { return m_rhythm; }
-    bool HasRhythm() const;
+    void SetForm(fingGrpLog_FORM form_) { m_form = form_; }
+    fingGrpLog_FORM GetForm() const { return m_form; }
+    bool HasForm() const;
     ///@}
 
 private:
-    /** Used to indicate a common, usually centered, refrain. **/
-    data_BOOLEAN m_refrain;
-    /**
-     * Used to specify a rhythm for the lyric syllables that differs from that of the
-     * notes on the staff, e.g.
-     * '4,4,4,4' when the rhythm of the notes is '4.,8,4.,8'.
-     **/
-    std::string m_rhythm;
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
+    fingGrpLog_FORM m_form;
 
-    /* include <attrhythm> */
+    /* include <attform> */
 };
 
 } // vrv namespace
 
-#endif // __VRV_ATTS_LYRICS_H__
+#endif // __VRV_ATTS_FINGERING_H__

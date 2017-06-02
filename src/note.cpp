@@ -42,23 +42,25 @@ Note::Note()
     , PitchInterface()
     , AttColor()
     , AttColoration()
-    , AttCommonPart()
+    , AttLabelled()
     , AttGraced()
-    , AttNoteLogMensural()
-    , AttRelativesize()
+    , AttNoteAnlMensural()
+    // FIXME MEI 4.0.0
+    //, AttRelativesize()
     , AttStems()
     , AttStemsCmn()
-    , AttTiepresent()
+    , AttTiePresent()
     , AttVisibility()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
-    RegisterAttClass(ATT_COMMONPART);
+    RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_NOTELOGMENSURAL);
-    RegisterAttClass(ATT_RELATIVESIZE);
+    RegisterAttClass(ATT_NOTEANLMENSURAL);
+    // FIXME 4.0.0
+    // RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -85,13 +87,14 @@ void Note::Reset()
     PitchInterface::Reset();
     ResetColor();
     ResetColoration();
-    ResetCommonPart();
+    ResetLabelled();
     ResetGraced();
-    ResetNoteLogMensural();
-    ResetRelativesize();
+    ResetNoteAnlMensural();
+    // FIXME 4.0.0
+    // ResetRelativesize();
     ResetStems();
     ResetStemsCmn();
-    ResetTiepresent();
+    ResetTiePresent();
     ResetVisibility();
 
     // tie pointers
@@ -211,8 +214,8 @@ bool Note::IsUnissonWith(Note *note, bool ignoreAccid)
     if (!ignoreAccid) {
         Accid *accid = this->GetDrawingAccid();
         Accid *noteAccid = note->GetDrawingAccid();
-        data_ACCIDENTAL_EXPLICIT accidVal = (accid) ? accid->GetAccid() : ACCIDENTAL_EXPLICIT_NONE;
-        data_ACCIDENTAL_EXPLICIT noteAccidVal = (noteAccid) ? noteAccid->GetAccid() : ACCIDENTAL_EXPLICIT_NONE;
+        data_ACCIDENTAL_WRITTEN accidVal = (accid) ? accid->GetAccid() : ACCIDENTAL_WRITTEN_NONE;
+        data_ACCIDENTAL_WRITTEN noteAccidVal = (noteAccid) ? noteAccid->GetAccid() : ACCIDENTAL_WRITTEN_NONE;
         if (accidVal != noteAccidVal) return false;
     }
 
@@ -641,7 +644,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
             currentDots = new Dots();
             this->AddChild(currentDots);
         }
-        currentDots->AttAugmentdots::operator=(*this);
+        currentDots->AttAugmentDots::operator=(*this);
     }
     // This will happen only if the duration has changed
     else if (currentDots) {
@@ -658,7 +661,7 @@ int Note::PrepareTieAttr(FunctorParams *functorParams)
     PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
     assert(params);
 
-    AttTiepresent *check = this;
+    AttTiePresent *check = this;
     // Use the parent chord if there is no @tie on the note
     if (!this->HasTie() && params->m_currentChord) {
         check = params->m_currentChord;

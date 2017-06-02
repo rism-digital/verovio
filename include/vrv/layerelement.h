@@ -29,7 +29,7 @@ class Staff;
  * This class is a base class for the Layer (<layer>) content.
  * It is not an abstract class but should not be instantiated directly.
  */
-class LayerElement : public Object, public AttCommon, public AttTyped {
+class LayerElement : public Object, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -258,7 +258,7 @@ public:
     virtual int ResetDrawing(FunctorParams *);
 
 private:
-    int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);
+    int GetDrawingArticulationTopOrBottom(data_STAFFREL_basic place, ArticPartType type);
 
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */

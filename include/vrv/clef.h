@@ -23,11 +23,11 @@ class ScoreDefInterface;
  * This class models the MEI <clef> element.
  */
 class Clef : public LayerElement,
-             public AttClefshape,
+             public AttClefShape,
              public AttColor,
-             public AttCommonPart,
-             public AttLineloc,
-             public AttOctavedisplacement {
+             public AttLabelled,
+             public AttLineLoc,
+             public AttOctaveDisplacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -55,7 +55,7 @@ public:
     /**
      * Return a clef id based on the various parameters
      */
-    static int ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_PLACE place);
+    static int ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_STAFFREL_basic place);
 
 private:
     //

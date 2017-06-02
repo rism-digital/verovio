@@ -22,7 +22,7 @@ namespace vrv {
  */
 class Rend : public TextElement,
              public AttColor,
-             public AttHorizontalalign,
+             public AttHorizontalAlign,
              public AttLang,
              public AttTypography,
              public AttWhitespace {

@@ -55,17 +55,15 @@ namespace vrv {
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() : Object("le-"), AttCommon(), AttTyped()
+LayerElement::LayerElement() : Object("le-"), AttTyped()
 {
-    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid) : Object(classid), AttCommon(), AttTyped()
+LayerElement::LayerElement(std::string classid) : Object(classid), AttTyped()
 {
-    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
@@ -74,7 +72,6 @@ LayerElement::LayerElement(std::string classid) : Object(classid), AttCommon(), 
 void LayerElement::Reset()
 {
     Object::Reset();
-    ResetCommon();
     ResetTyped();
 
     m_xAbs = VRV_UNSET;
@@ -270,7 +267,7 @@ int LayerElement::GetDrawingY() const
     return m_cachedDrawingY;
 }
 
-int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type)
+int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL_basic place, ArticPartType type)
 {
     // It would not crash otherwise but there is not reason to call it
     assert(this->Is({ NOTE, CHORD }));
@@ -288,20 +285,20 @@ int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPa
         if (firstArtic) firstArticPart = firstArtic->GetOutsidePart();
         if (lastArtic) lastArticPart = lastArtic->GetOutsidePart();
         // Ignore them if on the opposite side of what we are looking for
-        if (firstArticPart && (firstArticPart->GetPlace() != place)) firstArticPart = NULL;
-        if (lastArticPart && (lastArticPart->GetPlace() != place)) lastArticPart = NULL;
+        if (firstArticPart && (firstArticPart->GetPlaceAlternate()->GetBasic() != place)) firstArticPart = NULL;
+        if (lastArticPart && (lastArticPart->GetPlaceAlternate()->GetBasic() != place)) lastArticPart = NULL;
     }
     // Looking at the inside if nothing is given outside
     if (firstArtic && !firstArticPart) {
         firstArticPart = firstArtic->GetInsidePart();
-        if (firstArticPart && (firstArticPart->GetPlace() != place)) firstArticPart = NULL;
+        if (firstArticPart && (firstArticPart->GetPlaceAlternate()->GetBasic() != place)) firstArticPart = NULL;
     }
     if (lastArtic && !lastArticPart) {
         lastArticPart = lastArtic->GetInsidePart();
-        if (lastArticPart && (lastArticPart->GetPlace() != place)) lastArticPart = NULL;
+        if (lastArticPart && (lastArticPart->GetPlaceAlternate()->GetBasic() != place)) lastArticPart = NULL;
     }
 
-    if (place == STAFFREL_above) {
+    if (place == STAFFREL_basic_above) {
         int firstY = !firstArticPart ? VRV_UNSET : firstArticPart->GetSelfTop();
         int lastY = !lastArticPart ? VRV_UNSET : lastArticPart->GetSelfTop();
         return std::max(firstY, lastY);
@@ -341,7 +338,7 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPa
 {
     if (this->Is({ NOTE, CHORD })) {
         if (withArtic) {
-            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_above, type);
+            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_basic_above, type);
             if (articY != VRV_UNSET) return articY;
         }
         DurationInterface *durationInterface = this->GetDurationInterface();
@@ -374,7 +371,7 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
 {
     if (this->Is({ NOTE, CHORD })) {
         if (withArtic) {
-            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_below, type);
+            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_basic_below, type);
             if (articY != -VRV_UNSET) return articY;
         }
         DurationInterface *durationInterface = this->GetDurationInterface();
@@ -943,11 +940,12 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
         m_drawingCueSize = true;
     }
     // This cover the case when the @size is given on the element
-    else if (this->HasAttClass(ATT_RELATIVESIZE)) {
-        AttRelativesize *att = dynamic_cast<AttRelativesize *>(this);
-        assert(att);
-        if (att->HasSize()) m_drawingCueSize = (att->GetSize() == SIZE_cue);
-    }
+    // FIXME MEI 4.0.0
+    // else if (this->HasAttClass(ATT_RELATIVESIZE)) {
+    //    AttRelativesize *att = dynamic_cast<AttRelativesize *>(this);
+    //    assert(att);
+    //    if (att->HasSize()) m_drawingCueSize = (att->GetSize() == SIZE_cue);
+    //}
     // For note, we also need to look at the parent chord
     else if (this->Is(NOTE)) {
         Note const *note = dynamic_cast<Note const *>(this);
@@ -1184,28 +1182,28 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
         }
         // Check for accidentals
         if (accid && accid->HasAccidGes()) {
-            data_ACCIDENTAL_IMPLICIT accImp = accid->GetAccidGes();
+            data_ACCIDENTAL_GESTURAL accImp = accid->GetAccidGes();
             switch (accImp) {
-                case ACCIDENTAL_IMPLICIT_s: midiBase += 1; break;
-                case ACCIDENTAL_IMPLICIT_f: midiBase -= 1; break;
-                case ACCIDENTAL_IMPLICIT_ss: midiBase += 2; break;
-                case ACCIDENTAL_IMPLICIT_ff: midiBase -= 2; break;
+                case ACCIDENTAL_GESTURAL_s: midiBase += 1; break;
+                case ACCIDENTAL_GESTURAL_f: midiBase -= 1; break;
+                case ACCIDENTAL_GESTURAL_ss: midiBase += 2; break;
+                case ACCIDENTAL_GESTURAL_ff: midiBase -= 2; break;
                 default: break;
             }
         }
         else if (accid) {
-            data_ACCIDENTAL_EXPLICIT accExp = accid->GetAccid();
+            data_ACCIDENTAL_WRITTEN accExp = accid->GetAccid();
             switch (accExp) {
-                case ACCIDENTAL_EXPLICIT_s: midiBase += 1; break;
-                case ACCIDENTAL_EXPLICIT_f: midiBase -= 1; break;
-                case ACCIDENTAL_EXPLICIT_ss: midiBase += 2; break;
-                case ACCIDENTAL_EXPLICIT_x: midiBase += 2; break;
-                case ACCIDENTAL_EXPLICIT_ff: midiBase -= 2; break;
-                case ACCIDENTAL_EXPLICIT_xs: midiBase += 3; break;
-                case ACCIDENTAL_EXPLICIT_ts: midiBase += 3; break;
-                case ACCIDENTAL_EXPLICIT_tf: midiBase -= 3; break;
-                case ACCIDENTAL_EXPLICIT_nf: midiBase -= 1; break;
-                case ACCIDENTAL_EXPLICIT_ns: midiBase += 1; break;
+                case ACCIDENTAL_WRITTEN_s: midiBase += 1; break;
+                case ACCIDENTAL_WRITTEN_f: midiBase -= 1; break;
+                case ACCIDENTAL_WRITTEN_ss: midiBase += 2; break;
+                case ACCIDENTAL_WRITTEN_x: midiBase += 2; break;
+                case ACCIDENTAL_WRITTEN_ff: midiBase -= 2; break;
+                case ACCIDENTAL_WRITTEN_xs: midiBase += 3; break;
+                case ACCIDENTAL_WRITTEN_ts: midiBase += 3; break;
+                case ACCIDENTAL_WRITTEN_tf: midiBase -= 3; break;
+                case ACCIDENTAL_WRITTEN_nf: midiBase -= 1; break;
+                case ACCIDENTAL_WRITTEN_ns: midiBase += 1; break;
                 default: break;
             }
         }

@@ -21,7 +21,7 @@ namespace vrv {
 class Breath : public ControlElement,
                public TimePointInterface,
                public AttColor,
-               public AttCommonPart,
+               public AttLabelled,
                public AttPlacement {
 public:
     /**

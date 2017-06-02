@@ -40,19 +40,21 @@ Chord::Chord()
     , StemmedDrawingInterface()
     , DurationInterface()
     , AttColor()
-    , vrv::AttCommonPart()
     , AttGraced()
-    , AttRelativesize()
+    , AttLabelled()
+    // FIXME MEI 4.0.0
+    //, AttRelativesize()
     , AttStems()
     , AttStemsCmn()
-    , AttTiepresent()
+    , AttTiePresent()
     , AttVisibility()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_RELATIVESIZE);
+    RegisterAttClass(ATT_LABELLED);
+    // FIXME MEI 4.0.0
+    // RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -73,12 +75,13 @@ void Chord::Reset()
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     ResetColor();
-    ResetCommonPart();
     ResetGraced();
-    ResetRelativesize();
+    ResetLabelled();
+    // FIXME MEI 4.0.0
+    // ResetRelativesize();
     ResetStems();
     ResetStemsCmn();
-    ResetTiepresent();
+    ResetTiePresent();
     ResetVisibility();
 
     ClearClusters();
@@ -530,7 +533,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
             currentDots = new Dots();
             this->AddChild(currentDots);
         }
-        currentDots->AttAugmentdots::operator=(*this);
+        currentDots->AttAugmentDots::operator=(*this);
     }
     // This will happen only if the duration has changed
     else if (currentDots) {

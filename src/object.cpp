@@ -233,15 +233,18 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     assert(attributes);
     attributes->clear();
 
+    Att::GetAnalytical(this, attributes);
     Att::GetCmn(this, attributes);
     Att::GetCmnornaments(this, attributes);
     Att::GetCritapp(this, attributes);
+    Att::GetGestural(this, attributes);
     Att::GetExternalsymbols(this, attributes);
     Att::GetMei(this, attributes);
     Att::GetMensural(this, attributes);
     Att::GetMidi(this, attributes);
     Att::GetPagebased(this, attributes);
     Att::GetShared(this, attributes);
+    Att::GetVisual(this, attributes);
 
     return (int)attributes->size();
 }

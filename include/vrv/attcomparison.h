@@ -57,8 +57,8 @@ public:
     {
         if (!MatchesType(object)) return false;
         // This should not happen, but just in case
-        if (!object->HasAttClass(ATT_COMMON)) return false;
-        AttCommon *element = dynamic_cast<AttCommon *>(object);
+        if (!object->HasAttClass(ATT_NINTEGER)) return false;
+        AttNInteger *element = dynamic_cast<AttNInteger *>(object);
         assert(element);
         return (element->GetN() == m_n);
     }
@@ -85,8 +85,8 @@ public:
     {
         if (!MatchesType(object)) return false;
         // This should not happen, but just in case
-        if (!object->HasAttClass(ATT_COMMON)) return false;
-        AttCommon *element = dynamic_cast<AttCommon *>(object);
+        if (!object->HasAttClass(ATT_NINTEGER)) return false;
+        AttNInteger *element = dynamic_cast<AttNInteger *>(object);
         assert(element);
         return (std::find(m_ns.begin(), m_ns.end(), element->GetN()) != m_ns.end());
     }

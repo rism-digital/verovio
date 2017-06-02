@@ -20,13 +20,14 @@ int Mensur::s_numBase = 2;
 Mensur::Mensur()
     : LayerElement("mensur-")
     , AttColor()
-    , AttCommonPart()
+    , AttLabelled()
     , AttDurationRatio()
     , AttMensuralShared()
     , AttMensurLog()
     , AttMensurVis()
-    , AttRelativesize()
-    , AttSlashcount()
+    // FIXME MEI 4.0.0
+    //, AttRelativesize()
+    , AttSlashCount()
 {
     Init();
 }
@@ -54,12 +55,13 @@ Mensur::Mensur(const ScoreDefInterface *mensurAttr) : LayerElement("mensur-")
 void Mensur::Init()
 {
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_COMMONPART);
+    RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_DURATIONRATIO);
     RegisterAttClass(ATT_MENSURALSHARED);
     RegisterAttClass(ATT_MENSURLOG);
     RegisterAttClass(ATT_METERSIGVIS);
-    RegisterAttClass(ATT_RELATIVESIZE);
+    // FIXME MEI 4.0.0
+    // RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_SLASHCOUNT);
 
     Reset();
@@ -73,13 +75,14 @@ void Mensur::Reset()
 {
     LayerElement::Reset();
     ResetColor();
-    ResetCommonPart();
+    ResetLabelled();
     ResetDurationRatio();
     ResetMensuralShared();
     ResetMensurLog();
     ResetMensurVis();
-    ResetRelativesize();
-    ResetSlashcount();
+    // FIXME MEI 4.0.0
+    // ResetRelativesize();
+    ResetSlashCount();
 }
 
 } // namespace vrv

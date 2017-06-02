@@ -261,7 +261,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
     // HARDCODED value, we double the default margin for now - should go in styling
     int yShift = 2 * m_doc->GetTopMargin(articPart->GetClassId()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
         / PARAM_DENOMINATOR;
-    int direction = (articPart->GetPlace() == STAFFREL_above) ? 1 : -1;
+    int direction = (articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) ? 1 : -1;
 
     int y = articPart->GetDrawingY();
 
@@ -288,14 +288,15 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
         if (articPart->GetType() == ARTIC_PART_INSIDE) {
             // If we are above the top of the  staff, just pile them up
-            if ((articPart->GetPlace() == STAFFREL_above) && (y > staff->GetDrawingY())) y += yShift;
+            if ((articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) && (y > staff->GetDrawingY()))
+                y += yShift;
             // If we are below the bottom, just pile the down
-            else if ((articPart->GetPlace() == STAFFREL_below)
+            else if ((articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_below)
                 && (y < staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)))
                 y -= yShift;
             // Otherwise make it fit the staff space
             else {
-                y = GetNearestInterStaffPosition(y, staff, articPart->GetPlace());
+                y = GetNearestInterStaffPosition(y, staff, articPart->GetPlaceAlternate()->GetBasic());
                 if (IsOnStaffLine(y, staff)) y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * direction;
             }
         }
@@ -310,7 +311,8 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
         // Center the glyh if necessary
         if (Artic::IsCentered(*articIter)) {
-            y += (articPart->GetPlace() == STAFFREL_above) ? -(glyphHeight / 2) : (glyphHeight / 2);
+            y += (articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) ? -(glyphHeight / 2)
+                                                                                      : (glyphHeight / 2);
         }
 
         // Adjust the baseline for glyph above the baseline in SMuFL
@@ -368,12 +370,12 @@ void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, S
     int y = element->GetDrawingY();
     y -= staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
-    if (beatRpt->GetForm() == BEATRPT_REND_mixed) {
+    if (beatRpt->GetSlash() == BEATRPT_REND_mixed) {
         DrawSmuflCode(dc, xSymbol, y, SMUFL_E501_repeat2Bars, staff->m_drawingStaffSize, false);
     }
     else {
         DrawSmuflCode(dc, xSymbol, y, SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false);
-        int additionalSlash = beatRpt->GetForm() - BEATRPT_REND_8;
+        int additionalSlash = beatRpt->GetSlash() - BEATRPT_REND_8;
         int halfWidth
             = m_doc->GetGlyphWidth(SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false) / 2;
         int i;
@@ -445,8 +447,8 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         stemPoint = childNote->GetDrawingStemStart(childNote);
     }
 
-    if (bTrem->HasMeasperf()) {
-        switch (bTrem->GetMeasperf()) {
+    if (bTrem->HasUnitdur()) {
+        switch (bTrem->GetUnitdur()) {
             case (DUR_8): stemMod = STEMMODIFIER_1slash; break;
             case (DUR_16): stemMod = STEMMODIFIER_2slash; break;
             case (DUR_32): stemMod = STEMMODIFIER_3slash; break;
@@ -564,34 +566,34 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
 
-    if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_NONE, PLACE_NONE))
+    if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
         sym = SMUFL_E050_gClef;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, PLACE_below))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
         sym = SMUFL_E052_gClef8vb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, PLACE_below))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
         sym = SMUFL_E051_gClef15mb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, PLACE_above))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
         sym = SMUFL_E053_gClef8va;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, PLACE_above))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
         sym = SMUFL_E054_gClef15ma;
     // C-clef
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_NONE, PLACE_NONE))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
         sym = SMUFL_E05C_cClef;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_8, PLACE_below))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
         sym = SMUFL_E05D_cClef8vb;
     else if (clef->GetShape() == CLEFSHAPE_C)
         sym = SMUFL_E05C_cClef;
 
     // F-clef
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_NONE, PLACE_NONE))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_NONE, STAFFREL_basic_NONE))
         sym = SMUFL_E062_fClef;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, PLACE_below))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_below))
         sym = SMUFL_E064_fClef8vb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, PLACE_below))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_below))
         sym = SMUFL_E063_fClef15mb;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, PLACE_above))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, STAFFREL_basic_above))
         sym = SMUFL_E065_fClef8va;
-    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, PLACE_above))
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, STAFFREL_basic_above))
         sym = SMUFL_E066_fClef15ma;
     else if (clef->GetShape() == CLEFSHAPE_F)
         sym = SMUFL_E062_fClef;
@@ -858,7 +860,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         loc = PitchInterface::CalcLoc(pitch, KeySig::GetOctave(keySig->GetAlterationType(), pitch, c), clefLocOffset);
         y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
-        if (keySig->GetAlterationType() == ACCIDENTAL_EXPLICIT_f)
+        if (keySig->GetAlterationType() == ACCIDENTAL_WRITTEN_f)
             symb = SMUFL_E260_accidentalFlat;
         else
             symb = SMUFL_E262_accidentalSharp;
@@ -1414,13 +1416,13 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
     // We move the fermata position of half of the fermata size
     x -= m_doc->GetGlyphWidth(SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false) / 2;
 
-    AttFermatapresent *fermatapresent = dynamic_cast<AttFermatapresent *>(element);
-    assert(fermatapresent);
-    data_PLACE place = fermatapresent->GetFermata();
+    AttFermataPresent *fermataPresent = dynamic_cast<AttFermataPresent *>(element);
+    assert(fermataPresent);
+    data_STAFFREL_basic place = fermataPresent->GetFermata();
 
     // First case, notes
     if (element->Is({ NOTE, CHORD })) {
-        if (place == PLACE_above) {
+        if (place == STAFFREL_basic_above) {
             // check if the notehead is in the staff.
             int top = element->GetDrawingTop(m_doc, staff->m_drawingStaffSize, true, ARTIC_PART_OUTSIDE);
             if (top < staff->GetDrawingY()) {
@@ -1451,7 +1453,7 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
         }
     }
     else if (element->Is({ REST, MREST })) {
-        if (place == PLACE_above) {
+        if (place == STAFFREL_basic_above) {
             y = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             DrawSmuflCode(dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false);
         }
@@ -1622,11 +1624,11 @@ bool View::IsOnStaffLine(int y, Staff *staff)
     return ((y - staff->GetDrawingY()) % (2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) == 0);
 }
 
-int View::GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place)
+int View::GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL_basic place)
 {
     int yPos = y - staff->GetDrawingY();
     int distance = yPos % m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    if (place == STAFFREL_above) {
+    if (place == STAFFREL_basic_above) {
         if (distance > 0) distance = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) - distance;
         return y - distance + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }

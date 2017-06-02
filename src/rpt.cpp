@@ -55,7 +55,7 @@ double BeatRpt::GetBeatRptAlignmentDuration(int meterUnit) const
 // BTrem
 //----------------------------------------------------------------------------
 
-BTrem::BTrem() : LayerElement("btrem-"), AttTremmeasured()
+BTrem::BTrem() : LayerElement("btrem-"), AttTremMeasured()
 {
     RegisterAttClass(ATT_TREMMEASURED);
 
@@ -69,7 +69,7 @@ BTrem::~BTrem()
 void BTrem::Reset()
 {
     LayerElement::Reset();
-    ResetTremmeasured();
+    ResetTremMeasured();
 }
 
 void BTrem::AddChild(Object *child)
@@ -99,7 +99,7 @@ void BTrem::AddChild(Object *child)
 // FTrem
 //----------------------------------------------------------------------------
 
-FTrem::FTrem() : LayerElement("ftrem-"), ObjectListInterface(), AttSlashcount(), AttTremmeasured()
+FTrem::FTrem() : LayerElement("ftrem-"), ObjectListInterface(), AttSlashCount(), AttTremMeasured()
 {
     RegisterAttClass(ATT_SLASHCOUNT);
     RegisterAttClass(ATT_TREMMEASURED);
@@ -115,8 +115,8 @@ FTrem::~FTrem()
 void FTrem::Reset()
 {
     LayerElement::Reset();
-    ResetSlashcount();
-    ResetTremmeasured();
+    ResetSlashCount();
+    ResetTremMeasured();
 }
 
 void FTrem::AddChild(Object *child)

@@ -303,10 +303,10 @@ void BeamDrawingParams::CalcBeam(
 // Beam
 //----------------------------------------------------------------------------
 
-Beam::Beam() : LayerElement("beam-"), ObjectListInterface(), AttColor(), AttCommonPart()
+Beam::Beam() : LayerElement("beam-"), ObjectListInterface(), AttColor(), AttLabelled()
 {
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_COMMONPART);
+    RegisterAttClass(ATT_LABELLED);
 
     Reset();
 }
@@ -320,7 +320,7 @@ void Beam::Reset()
 {
     LayerElement::Reset();
     ResetColor();
-    ResetCommonPart();
+    ResetLabelled();
 
     ClearCoords();
 }
@@ -496,7 +496,7 @@ void Beam::InitCoords(ListOfObjects *childList)
 
         // Look at beam breaks
         m_beamElementCoords.at(elementCount)->m_breaksec = 0;
-        AttBeamsecondary *beamsecondary = dynamic_cast<AttBeamsecondary *>(current);
+        AttBeamSecondary *beamsecondary = dynamic_cast<AttBeamSecondary *>(current);
         if (beamsecondary && beamsecondary->HasBreaksec()) {
             if (!m_drawingParams.m_changingDur) m_drawingParams.m_changingDur = true;
             m_beamElementCoords.at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();

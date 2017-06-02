@@ -19,7 +19,7 @@ class ArticPart;
 // Artic
 //----------------------------------------------------------------------------
 
-class Artic : public LayerElement, public AttArticulation, public AttColor, public AttCommonPart, public AttPlacement {
+class Artic : public LayerElement, public AttArticulation, public AttColor, public AttLabelled, public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -48,14 +48,14 @@ public:
     /**
      * Static method that retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
      */
-    static wchar_t GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place);
+    static wchar_t GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place);
 
     /**
      * Static method that retrieves the vertical correctoin for a SMuFL code for with data_STAFFREL.
      * The reason for this is that SMuFL sometimes has the glyph below the line, sometimes above.
      * See bow indications for an example where is is always above
      */
-    static bool VerticalCorr(wchar_t code, data_STAFFREL place);
+    static bool VerticalCorr(wchar_t code, const data_STAFFREL &place);
 
     /**
      * Static method that returns true if the data_ARTICULATION has to be centered between staff lines

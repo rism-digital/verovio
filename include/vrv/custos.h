@@ -17,7 +17,7 @@ namespace vrv {
 // Custos
 //----------------------------------------------------------------------------
 
-class Custos : public LayerElement, public PositionInterface, public AttColor, public AttCommonPart {
+class Custos : public LayerElement, public PositionInterface, public AttColor, public AttLabelled {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

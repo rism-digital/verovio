@@ -13,9 +13,9 @@ namespace vrv {
 // MultiRest
 //----------------------------------------------------------------------------
 
-MultiRest::MultiRest() : LayerElement("multirest-"), AttCommonPart(), AttMultiRestVis(), AttNumbered()
+MultiRest::MultiRest() : LayerElement("multirest-"), AttLabelled(), AttMultiRestVis(), AttNumbered()
 {
-    RegisterAttClass(ATT_COMMONPART);
+    RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_MULTIRESTVIS);
     RegisterAttClass(ATT_NUMBERED);
     Reset();
@@ -28,7 +28,7 @@ MultiRest::~MultiRest()
 void MultiRest::Reset()
 {
     LayerElement::Reset();
-    ResetCommonPart();
+    ResetLabelled();
     ResetMultiRestVis();
     ResetNumbered();
 }

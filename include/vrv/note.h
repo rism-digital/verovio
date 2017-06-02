@@ -45,13 +45,14 @@ class Note : public LayerElement,
              public PitchInterface,
              public AttColor,
              public AttColoration,
-             public AttCommonPart,
+             public AttLabelled,
              public AttGraced,
-             public AttNoteLogMensural,
-             public AttRelativesize,
+             public AttNoteAnlMensural,
+             // FIXME changed in MEI 4.0.0 - will be changed to @cue?
+             // public AttRelativesize,
              public AttStems,
              public AttStemsCmn,
-             public AttTiepresent,
+             public AttTiePresent,
              public AttVisibility {
 public:
     /**

@@ -8,6 +8,7 @@
 #ifndef __VRV_ACCID_H__
 #define __VRV_ACCID_H__
 
+#include "atts_gestural.h"
 #include "layerelement.h"
 #include "positioninterface.h"
 
@@ -22,11 +23,11 @@ class AlignmentReference;
 class Accid : public LayerElement,
               public PositionInterface,
               public AttAccidental,
-              public AttAccidentalPerformed,
+              public AttAccidentalGestural,
               public AttAccidLog,
               public AttColor,
-              public AttCommonPart,
-              public AttEnclosingchars {
+              public AttEnclosingChars,
+              public AttLabelled {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -66,7 +67,7 @@ public:
     /**
      * @name Method used for drawing accidentals on ornaments
      */
-    static wchar_t GetAccidGlyph(data_ACCIDENTAL_EXPLICIT);
+    static wchar_t GetAccidGlyph(data_ACCIDENTAL_WRITTEN);
 
     //----------//
     // Functors //

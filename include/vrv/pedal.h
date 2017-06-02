@@ -21,7 +21,7 @@ namespace vrv {
 class Pedal : public ControlElement,
               public TimePointInterface,
               public AttColor,
-              public AttCommonPart,
+              public AttLabelled,
               public AttPedalLog,
               public AttPlacement {
 public:

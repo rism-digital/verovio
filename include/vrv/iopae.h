@@ -77,7 +77,7 @@ namespace pae {
             beam = 0;
             pitch = PITCHNAME_NONE;
             duration = DURATION_NONE;
-            accidental = ACCIDENTAL_EXPLICIT_NONE;
+            accidental = ACCIDENTAL_WRITTEN_NONE;
             dots = 0;
             rest = false;
 
@@ -136,7 +136,7 @@ namespace pae {
         unsigned char beam;
         data_PITCHNAME pitch;
         data_DURATION duration;
-        data_ACCIDENTAL_EXPLICIT accidental;
+        data_ACCIDENTAL_WRITTEN accidental;
         unsigned int dots;
         bool rest;
 
@@ -241,7 +241,7 @@ private:
     int getTimeInfo(const char *incipit, MeterSig *meter, int index = 0);
     int getClefInfo(const char *incipit, Clef *mus_clef, int index = 0);
     int getBarLine(const char *incipit, data_BARRENDITION *output, int index);
-    int getAccidental(const char *incipit, data_ACCIDENTAL_EXPLICIT *accident, int index = 0);
+    int getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accident, int index = 0);
     int getOctave(const char *incipit, char *octave, int index = 0);
     int getDurations(const char *incipit, pae::Measure *measure, int index = 0);
     int getDuration(const char *incipit, data_DURATION *duration, int *dot, int index);

@@ -9,6 +9,7 @@
 #define __VRV_FERMATA_H__
 
 #include "atts_cmn.h"
+#include "atts_visual.h"
 #include "controlelement.h"
 #include "timeinterface.h"
 
@@ -21,7 +22,7 @@ namespace vrv {
 class Fermata : public ControlElement,
                 public TimePointInterface,
                 public AttColor,
-                public AttCommonPart,
+                public AttLabelled,
                 public AttFermataVis,
                 public AttPlacement {
 public:
