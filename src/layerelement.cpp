@@ -727,16 +727,23 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         }
         // Automatically calculate rest position
         else {
+            // set default location to the middle of the staff
+            Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+            assert(staff);
+            loc = staff->m_drawingLines - 1;
             // Limitation: GetLayerCount does not take into account editorial markup
+            // should be refined later
             bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
-            bool isFirstLayer = false;
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
-                if (firstLayer->GetN() == layerY->GetN()) isFirstLayer = true;
+                if (firstLayer->GetN() == layerY->GetN())
+                    loc += 2;
+                else
+                    loc -= 2;
             }
-            loc = rest->GetDefaultLoc(hasMultipleLayer, isFirstLayer);
         }
+        loc = rest->GetRestLocOffset(loc);
         rest->SetDrawingLoc(loc);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
@@ -809,7 +816,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
 
             // Nothing to do if we have no vertical overlap
             if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
-            
+
             // Nothing to do either if we have no horizontal overlap
             if (!this->HorizontalSelfOverlap(*iter, horizontalMargin)) continue;
 
