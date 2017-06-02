@@ -177,7 +177,8 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     }
     // otherwise copy the content to the corresponding existing measure
     else if (section->GetChildCount(MEASURE) > i) {
-        Measure *existingMeasure = dynamic_cast<Measure *>(section->GetChild(i));
+        AttCommonNComparison comparisonMeasure(MEASURE, measure->GetN());
+        Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByAttComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
         Object *current;
         for (current = measure->GetFirst(); current; current = measure->GetNext()) {
