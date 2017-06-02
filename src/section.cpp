@@ -97,7 +97,7 @@ void Pb::Reset()
 // Sb
 //----------------------------------------------------------------------------
 
-Sb::Sb() : SystemElement("pb-"), AttCommonPart()
+Sb::Sb() : SystemElement("sb-"), AttCommonPart()
 {
     RegisterAttClass(ATT_COMMONPART);
 
