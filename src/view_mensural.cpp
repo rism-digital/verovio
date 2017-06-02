@@ -128,6 +128,11 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
         DrawMensuralStem(dc, note, staff, stemDir, radius, xStem, noteY);
     }
+    
+    /************ Draw children (verse / syl) ************/
+    
+    DrawLayerChildren(dc, note, layer, staff, measure);
+    
 }
 
 void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

@@ -1158,6 +1158,7 @@ void MeiOutput::WriteMeiMultiRest(pugi::xml_node currentNode, MultiRest *multiRe
     assert(multiRest);
 
     WriteLayerElement(currentNode, multiRest);
+    multiRest->WriteMultiRestVis(currentNode);
     multiRest->WriteNumbered(currentNode);
 }
 
@@ -1776,6 +1777,15 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for verse
     else if (filterParent->Is(VERSE)) {
         if (element == "syl") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for syl
+    else if (filterParent->Is(SYL)) {
+        if (element == "") {
             return true;
         }
         else {
@@ -3089,6 +3099,7 @@ bool MeiInput::ReadMeiMultiRest(Object *parent, pugi::xml_node multiRest)
     MultiRest *vrvMultiRest = new MultiRest();
     ReadLayerElement(multiRest, vrvMultiRest);
 
+    vrvMultiRest->ReadMultiRestVis(multiRest);
     vrvMultiRest->ReadNumbered(multiRest);
 
     parent->AddChild(vrvMultiRest);
