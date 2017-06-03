@@ -743,7 +743,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             }
 
             // add offset
-            else if (staff->m_drawingLines > 1) loc += 2;
+            else if (staff->m_drawingLines > 1)
+                loc += 2;
         }
 
         mRest->SetDrawingLoc(loc);
@@ -1171,14 +1172,11 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    // Here we need to check if the LayerElement as a duration, otherwise we can continue
+    // Here we need to check if the LayerElement has a duration, otherwise we can continue
     if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
 
     // Now deal with the different elements
     if (this->Is(REST)) {
-        // Rest *rest = dynamic_cast<Rest *>(this);
-        // assert(rest);
-        // LogMessage("Rest %f", GetAlignmentDuration());
         // increase the currentTime accordingly
         params->m_currentMeasureTime += GetAlignmentDuration() * params->m_currentBpm / (DUR_MAX / DURATION_4);
     }
