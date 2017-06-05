@@ -1011,35 +1011,33 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         x2 = xCentered + length / 2;
 
         // Position centered in staff
-        y1 = staff->GetDrawingY()
-            - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * staff->m_drawingLines;
-        y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        y2 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;
+        y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
         // Draw the base rect
-        // make it 8 pixels smaller than the interline space
-        // these are the two 4 substracted and added
-        DrawFilledRectangle(dc, x1, y2, x2, y1);
+        DrawFilledRectangle(dc, x1, y1, x2, y2);
 
         // Draw two lines at beginning and end
-        // make it 8 pixels longer, and 4 pixels width
         int border = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         DrawFilledRectangle(
-            dc, x1, y1 - border, x1 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y2 + border);
+            dc, x1, y1 + border, x1 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y2 - border);
         DrawFilledRectangle(
-            dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y1 - border, x2, y2 + border);
+            dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y1 + border, x2, y2 - border);
     }
     else {
         // Draw the base rect
         x1 = xCentered - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 3;
         x2 = xCentered + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 3;
 
-        // Position centered in third line
-        y1 = staff->GetDrawingY() - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * 4;
-        y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        // Position centered in staff
+        y1 = staff->GetDrawingY()
+            - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * int((staff->m_drawingLines) / 2);
+        if (staff->m_drawingLines > 1) y1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        y2 = y1 - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         if (num == 2)
-            DrawFilledRectangle(dc, x1, y2 - 4, x2, y1 + 4);
+            DrawFilledRectangle(dc, x1, y1 + 4, x2, y2 - 4);
         else
-            DrawRestWhole(dc, xCentered, y2, DUR_1, false, staff);
+            DrawRestWhole(dc, xCentered, y1, DUR_1, false, staff);
     }
 
     // Draw the text above
@@ -1052,8 +1050,9 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     TextExtend extend;
     dc->GetSmuflTextExtent(wtext, &extend);
     start_offset = (x2 - x1 - extend.m_width) / 2; // calculate offset to center text
-    DrawSmuflString(dc, x1 + start_offset, staff->GetDrawingY() + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize),
-        wtext, false);
+    int y = (staff->GetDrawingY() > y1) ? staff->GetDrawingY() + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
+                                        : y1 + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    DrawSmuflString(dc, x1 + start_offset, y, wtext, false);
     dc->ResetFont();
 
     dc->EndGraphic(element, this);
@@ -1515,8 +1514,10 @@ void View::DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smuflCode, int
         TextExtend extend;
         std::wstring figures = IntToTupletFigures(num);
         dc->GetSmuflTextExtent(figures, &extend);
-        dc->DrawMusicText(figures, ToDeviceContextX(xCentered - extend.m_width / 2),
-            ToDeviceContextY(staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)));
+        int y = (staff->GetDrawingY() > ySymbol)
+            ? staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
+            : ySymbol + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        dc->DrawMusicText(figures, ToDeviceContextX(xCentered - extend.m_width / 2), ToDeviceContextY(y));
         dc->ResetFont();
     }
 }
