@@ -776,7 +776,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     for (pugi::xpath_node_set::const_iterator it = measures.begin(); it != measures.end(); ++it) {
         pugi::xpath_node xmlMeasure = *it;
         Measure *measure = new Measure();
-        ReadMusicXmlMeasure(xmlMeasure.node(), measure, nbStaves, staffOffset);
+        ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset);
         // Add the measure to the system - if already there from a previous part we'll just merge the content
         AddMeasure(section, measure, i);
         i++;
@@ -784,7 +784,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     return false;
 }
 
-bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, int nbStaves, int staffOffset)
+bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Section *section, Measure *measure, int nbStaves, int staffOffset)
 {
     assert(node);
     assert(measure);
@@ -812,7 +812,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, i
     // read the content of the measure
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
         if (IsElement(*it, "attributes")) {
-            ReadMusicXmlAttributes(*it, measure, measureNum);
+            ReadMusicXmlAttributes(*it, section, measure, measureNum);
         }
         else if (IsElement(*it, "backup")) {
             ReadMusicXmlBackup(*it, measure, measureNum);
@@ -835,16 +835,21 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, i
         else if (IsElement(*it, "note")) {
             ReadMusicXmlNote(*it, measure, measureNum);
         }
-        else if (IsElement(*it, "print")) {
-            ReadMusicXmlPrint(*it, measure, measureNum);
+        // for now only check first part
+        else if (IsElement(*it, "print") && node.select_single_node("parent::part[not(preceding-sibling::part)]")) {
+            ReadMusicXmlPrint(*it, section);
         }
     }
 
     return true;
 }
 
-void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Measure *measure, int measureNum)
+void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section, Measure *measure, int measureNum)
 {
+    assert(node);
+    assert(section);
+    assert(measure);
+    
     // read clef changes as MEI clef
     pugi::xpath_node clef = node.select_single_node("clef");
     if (clef) {
@@ -874,6 +879,62 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Measure *measure
             AddLayerElement(layer, meiClef);
         }
     }
+
+    // key and time change
+    pugi::xpath_node key = node.select_single_node("key");
+    pugi::xpath_node time = node.select_single_node("time");
+    // for now only read first part and make it change in scoreDef
+    if ((key || time) && node.select_single_node("ancestor::part[not(preceding-sibling::part)]")) {
+        ScoreDef *scoreDef = new ScoreDef();
+        if (key.node().select_single_node("fifths")) {
+            int fifths = atoi(key.node().select_single_node("fifths").node().text().as_string());
+            std::string keySig;
+            if (fifths < 0)
+                keySig = StringFormat("%df", abs(fifths));
+            else if (fifths > 0)
+                keySig = StringFormat("%ds", fifths);
+            else
+                keySig = "0";
+            scoreDef->SetKeySig(scoreDef->AttKeySigDefaultLog::StrToKeysignature(keySig));
+        }
+        else if (key.node().select_single_node("key-step")) {
+            scoreDef->SetKeySig(KEYSIGNATURE_mixed);
+        }
+        if (key.node().select_single_node("mode")) {
+            scoreDef->SetKeyMode(scoreDef->AttKeySigDefaultLog::StrToMode(key.node().select_single_node("mode").node().text().as_string()));
+        }
+        std::string symbol = GetAttributeValue(time.node(), "symbol");
+        if (!symbol.empty()) {
+            if (symbol == "cut" || symbol == "common")
+                scoreDef->SetMeterSym(scoreDef->AttMeterSigDefaultVis::StrToMetersign(symbol.c_str()));
+            else if (symbol == "single-number")
+                scoreDef->SetMeterRend(meterSigDefaultVis_METERREND_num);
+            else
+                scoreDef->SetMeterRend(meterSigDefaultVis_METERREND_norm);
+        }
+        if (time.node().select_nodes("beats").size() > 1) {
+            LogWarning("Compound meter signatures are not supported");
+        }
+        pugi::xpath_node beats = time.node().select_single_node("beats");
+        if (beats && HasContent(beats.node())) {
+            m_meterCount = beats.node().text().as_int();
+            // staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
+            // this is a little "hack", until libMEI is fixed
+            std::string compound = beats.node().text().as_string();
+            if (compound.find("+") != std::string::npos) {
+                m_meterCount += atoi(compound.substr(compound.find("+")).c_str());
+                LogWarning("Compound time is not supported");
+            }
+            scoreDef->SetMeterCount(m_meterCount);
+        }
+        pugi::xpath_node beatType = time.node().select_single_node("beat-type");
+        if (beatType && HasContent(beatType.node())) {
+            m_meterUnit = beatType.node().text().as_int();
+            scoreDef->SetMeterUnit(m_meterUnit);
+        }
+        section->AddChild(scoreDef);
+    }
+
 
     pugi::xpath_node measureRepeat = node.select_single_node("measure-style/measure-repeat");
     if (measureRepeat) {
@@ -1758,19 +1819,19 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     }
 }
 
-void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Measure *measure, int measureNum)
+void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
 {
     assert(node);
-    assert(measure);
+    assert(section);
 
     if (HasAttributeWithValue(node, "new-system", "yes")) {
-        // LogWarning("System breaks not supported");
-        // enter system break
+        Sb *sb = new Sb();
+        section->AddChild(sb);
     }
 
     if (HasAttributeWithValue(node, "new-page", "yes")) {
-        // LogWarning("Page breaks not supported");
-        // enter system break
+        Pb *pb = new Pb();
+        section->AddChild(pb);
     }
 }
 

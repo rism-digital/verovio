@@ -120,7 +120,7 @@ private:
      */
     ///@{
     bool ReadMusicXmlPart(pugi::xml_node node, Section *section, int nbStaves, int staffOffset);
-    bool ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, int nbStaves, int staffOffset);
+    bool ReadMusicXmlMeasure(pugi::xml_node node, Section *section, Measure *measure, int nbStaves, int staffOffset);
     ///@}
 
     /*
@@ -133,7 +133,7 @@ private:
      * @name Methods for reading the content of a MusicXml measure.
      */
     ///@{
-    void ReadMusicXmlAttributes(pugi::xml_node, Measure *measure, int measureNum);
+    void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, int measureNum);
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, int measureNum);
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, int measureNum);
     void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, int measureNum);
@@ -141,7 +141,7 @@ private:
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, int measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, int measureNum);
     void ReadMusicXmlNote(pugi::xml_node, Measure *measure, int measureNum);
-    void ReadMusicXmlPrint(pugi::xml_node, Measure *measure, int measureNum);
+    void ReadMusicXmlPrint(pugi::xml_node, Section *section);
     ///@}
 
     /*
