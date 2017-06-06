@@ -220,6 +220,9 @@ bool Toolkit::SetFormat(std::string const &informat)
     else if (informat == "musicxml-hum") {
         m_format = MUSICXMLHUM;
     }
+    else if (informat == "esac") {
+        m_format = ESAC;
+    }
     else if (informat == "auto") {
         m_format = AUTO;
     }
@@ -460,6 +463,7 @@ bool Toolkit::LoadData(const std::string &data)
         input = new MusicXmlInput(&m_doc, "");
     }
 #ifndef NO_HUMDRUM_SUPPORT
+
     else if (inputFormat == MUSICXMLHUM) {
         // This is the indirect converter from MusicXML to MEI using iohumdrum:
         hum::Tool_musicxml2hum converter;
@@ -468,7 +472,7 @@ bool Toolkit::LoadData(const std::string &data)
         stringstream conversion;
         bool status = converter.convert(conversion, xmlfile);
         if (!status) {
-            LogError("Error converting MusicXML");
+            LogError("Error converting MusicXML data");
             return false;
         }
         std::string buffer = conversion.str();
@@ -489,6 +493,35 @@ bool Toolkit::LoadData(const std::string &data)
         delete tempinput;
         input = new MeiInput(&m_doc, "");
     }
+
+    else if (inputFormat == ESAC) {
+        // This is the indirect converter from EsAC to MEI using iohumdrum:
+        hum::Tool_esac2hum converter;
+        stringstream conversion;
+        bool status = converter.convert(conversion, data);
+        if (!status) {
+            LogError("Error converting EsAC data");
+            return false;
+        }
+        std::string buffer = conversion.str();
+        SetHumdrumBuffer(buffer.c_str());
+
+        // Now convert Humdrum into MEI:
+        Doc tempdoc;
+        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        tempinput->SetTypeOption(GetHumType());
+        if (!tempinput->ImportString(conversion.str())) {
+            LogError("Error importing Humdrum data");
+            delete tempinput;
+            return false;
+        }
+        MeiOutput meioutput(&tempdoc, "");
+        meioutput.SetScoreBasedMEI(true);
+        newData = meioutput.GetOutput();
+        delete tempinput;
+        input = new MeiInput(&m_doc, "");
+    }
+
 #endif
     else {
         LogMessage("Unsupported format");
