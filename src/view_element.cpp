@@ -1575,18 +1575,15 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSi
             y1 += vertic;
     }
 
-    y2 = y1 + vertic;
-    DrawFilledRectangle(dc, x1, y1, x2, y2);
-
-    off /= 2;
-    x1 -= off;
-    x2 += off;
-
     // legder line
     if (y > (int)staff->GetDrawingY()
         || y < staff->GetDrawingY()
                 - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))
-        DrawHorizontalLine(dc, x1, x2, y1, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize) * 1.75);
+        DrawHorizontalLine(
+            dc, x1 - off / 2, x2 + off / 2, y1, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize) * 1.75);
+
+    y2 = y1 + vertic;
+    DrawFilledRectangle(dc, x1, y1, x2, y2);
 }
 
 //----------------------------------------------------------------------------
