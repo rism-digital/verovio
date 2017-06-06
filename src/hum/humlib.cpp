@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jun  6 18:47:27 CEST 2017
+// Last Modified: Tue Jun  6 19:44:22 CEST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -21625,10 +21625,10 @@ void Tool_dissonant::mergeWithPreviousNote(HumdrumFile& infile,
 	int line1 = note1->getLineIndex();
 	int line2 = note2->getLineIndex();
 
-	bool barlineQ = false;
+	// bool barlineQ = false;
 	for (int i=line1+1; i<line2; i++) {
 		if (infile[i].isBarline()) {
-			barlineQ = true;
+			// barlineQ = true;
 			break;
 		}
 	}
@@ -22796,7 +22796,6 @@ void Tool_esac2hum::convertSong(vector<string>& song, ostream& out) {
 void Tool_esac2hum::placeLyrics(vector<string>& song, vector<NoteData>& songdata) {
 	int start = -1;
 	int stop = -1;
-	int length;
 	getLineRange(song, "TXT", start, stop);
 	if (start < 0) {
 		// no TXT[] field, so don't do anything
@@ -22813,7 +22812,6 @@ void Tool_esac2hum::placeLyrics(vector<string>& song, vector<NoteData>& songdata
 		}
 		buffer = song[line+start].substr(4);
 		if (line == stop - start) {
-			length = (int)buffer.size();
 			auto loc = buffer.rfind(']');
 			if (loc != string::npos) {
 				buffer.resize(loc);
@@ -23617,7 +23615,7 @@ void Tool_esac2hum::getNoteList(vector<string>& song, vector<NoteData>& songdata
 		#define STATE_BAR      4
 		#define STATE_SLEND    5
 
-		while (j < 200 && (j < song[i].size())) {
+		while (j < 200 && (j < (int)song[i].size())) {
 			// oldstate = state;
 			switch (song[i][j]) {
 				// Octave information:
