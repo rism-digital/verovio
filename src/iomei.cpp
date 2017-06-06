@@ -1374,6 +1374,7 @@ void MeiOutput::WriteEditorialElement(pugi::xml_node currentNode, EditorialEleme
     assert(element);
 
     WriteXmlId(currentNode, element);
+    element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
 }
 
@@ -3468,6 +3469,7 @@ bool MeiInput::ReadEditorialElement(pugi::xml_node element, EditorialElement *ob
 {
     SetMeiUuid(element, object);
 
+    object->ReadLabelled(element);
     object->ReadTyped(element);
 
     return true;
