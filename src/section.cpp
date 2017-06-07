@@ -94,7 +94,8 @@ void Pb::Reset()
 // Sb
 //----------------------------------------------------------------------------
 
-Sb::Sb() : SystemElement("pb-")
+
+Sb::Sb() : SystemElement("sb-")
 {
     Reset();
 }
