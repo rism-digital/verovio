@@ -41,7 +41,7 @@ void BarLine::Reset()
     ResetColor();
 }
 
-bool BarLine::SetAlignment(vrv::Alignment *alignment)
+bool BarLine::SetAlignment(Alignment *alignment)
 {
     m_alignment = alignment;
     return (m_alignment->AddLayerElementRef(this));
