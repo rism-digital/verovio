@@ -21,15 +21,17 @@ namespace vrv {
 // ControlElement
 //----------------------------------------------------------------------------
 
-ControlElement::ControlElement() : FloatingObject("me"), AttTyped()
+ControlElement::ControlElement() : FloatingObject("me"), AttLabelled(), AttTyped()
 {
+    RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
 
-ControlElement::ControlElement(std::string classid) : FloatingObject(classid), AttTyped()
+ControlElement::ControlElement(std::string classid) : FloatingObject(classid), AttLabelled(), AttTyped()
 {
+    RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
@@ -42,6 +44,7 @@ ControlElement::~ControlElement()
 void ControlElement::Reset()
 {
     FloatingObject::Reset();
+    ResetLabelled();
     ResetTyped();
 }
 

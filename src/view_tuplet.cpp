@@ -44,17 +44,10 @@ bool View::OneBeamInTuplet(Tuplet *tuplet)
         if (currentBeam->GetChildCount() == 1 && tuplet->GetChildCount(TUPLET) == 0) return true;
     }
 
-    // Do we contain a beam? Go on and search for it in the children
-    for (int i = 0; i < tuplet->GetChildCount(); i++) {
-        currentBeam = dynamic_cast<Beam *>(tuplet->GetChild(i));
+    // Do we contain a beam?
+    if (tuplet->GetChildCount() == tuplet->GetChildCount(BEAM) == 1) return true;
 
-        // first child is not a beam, or it is a beam but we have more than one child
-        if (!currentBeam || tuplet->GetChildCount() > 1) {
-            return false;
-        }
-    }
-
-    return true;
+    return false;
 }
 
 int View::NestedTuplets(Object *object)

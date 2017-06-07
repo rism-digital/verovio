@@ -25,6 +25,7 @@ class ScoreDefInterface;
  * This class models the MEI <mensur> element.
  */
 class Mensur : public LayerElement,
+               public AttColor,
                public AttDurationRatio,
                public AttMensuralShared,
                public AttMensurLog,
