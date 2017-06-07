@@ -40,7 +40,7 @@ EditorialElement::EditorialElement() : Object("ee-"), BoundaryStartInterface(), 
 }
 
 EditorialElement::EditorialElement(std::string classid)
-    : Object(classid), vrv::BoundaryStartInterface(), AttCommon(), AttCommonPart(), AttTyped()
+    : Object(classid), BoundaryStartInterface(), AttCommon(), AttCommonPart(), AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);

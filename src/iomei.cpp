@@ -1289,7 +1289,7 @@ void MeiOutput::WriteMeiText(pugi::xml_node element, Text *text)
     }
 }
 
-void MeiOutput::WriteDurationInterface(pugi::xml_node element, vrv::DurationInterface *interface)
+void MeiOutput::WriteDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
     assert(interface);
 

@@ -205,7 +205,7 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element)
         (m_elementStack.back()->AddChild(element));
 }
 
-Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, vrv::Measure *measure)
+Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, Measure *measure)
 {
     int staffNum = 1;
     std::string staffNumStr = GetContentOfChild(node, "staff");
@@ -232,7 +232,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, vrv::Measure *measure)
     return SelectLayer(layerNum, staff);
 }
 
-Layer *MusicXmlInput::SelectLayer(int staffNum, vrv::Measure *measure)
+Layer *MusicXmlInput::SelectLayer(int staffNum, Measure *measure)
 {
     staffNum--;
     Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNum));
@@ -276,7 +276,7 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId)
     }
 }
 
-void MusicXmlInput::FillSpace(vrv::Layer *layer, int dur)
+void MusicXmlInput::FillSpace(Layer *layer, int dur)
 {
     std::string durStr;
     while (dur != 0) {
