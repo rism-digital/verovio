@@ -359,9 +359,10 @@ int Chord::CalcStem(FunctorParams *functorParams)
     this->GetYExtremes(yMax, yMin);
     params->m_chordStemLength = yMin - yMax;
 
-    int staffY = staff->GetDrawingY();
     int staffSize = staff->m_drawingStaffSize;
-    params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
+
+    params->m_verticalCenter
+        = staff->GetDrawingY() - params->m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 

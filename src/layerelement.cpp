@@ -691,7 +691,9 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         Note *note = chord->GetTopNote();
         assert(note);
         int loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
-        if (note->HasLoc()) loc = note->GetLoc();
+        if (note->HasLoc()) {
+            loc = note->GetLoc();
+        }
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
     else if (this->Is({ CUSTOS, DOT })) {
@@ -707,8 +709,10 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         if (note->HasPname()) {
             loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
         }
-        // should this override pname/oct
-        if (note->HasLoc()) loc = note->GetLoc();
+        // should this override pname/oct ?
+        if (note->HasLoc()) {
+            loc = note->GetLoc();
+        }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
         // Make it relative to the top note one (see above) but not for cross-staff notes in chords
         if (chord && !m_crossStaff) {

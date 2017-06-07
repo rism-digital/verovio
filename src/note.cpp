@@ -318,7 +318,7 @@ wchar_t Note::GetMensuralSmuflNoteHead()
 {
     assert(this->IsMensural());
 
-    Staff *staff = dynamic_cast<Staff*>(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
@@ -397,9 +397,9 @@ int Note::CalcStem(FunctorParams *functorParams)
     params->m_isGraceNote = this->IsGraceNote();
 
     int staffSize = staff->m_drawingStaffSize;
-    int staffY = staff->GetDrawingY();
 
-    params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
+    params->m_verticalCenter
+        = staff->GetDrawingY() - params->m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
 
     /************ Set the direction ************/
 
