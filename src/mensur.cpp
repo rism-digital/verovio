@@ -20,7 +20,6 @@ int Mensur::s_numBase = 2;
 Mensur::Mensur()
     : LayerElement("mensur-")
     , AttColor()
-    , AttCommonPart()
     , AttDurationRatio()
     , AttMensuralShared()
     , AttMensurLog()
@@ -54,7 +53,6 @@ Mensur::Mensur(const ScoreDefInterface *mensurAttr) : LayerElement("mensur-")
 void Mensur::Init()
 {
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_DURATIONRATIO);
     RegisterAttClass(ATT_MENSURALSHARED);
     RegisterAttClass(ATT_MENSURLOG);
@@ -73,7 +71,6 @@ void Mensur::Reset()
 {
     LayerElement::Reset();
     ResetColor();
-    ResetCommonPart();
     ResetDurationRatio();
     ResetMensuralShared();
     ResetMensurLog();

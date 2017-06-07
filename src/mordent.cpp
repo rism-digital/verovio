@@ -22,17 +22,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Mordent::Mordent()
-    : ControlElement("mordent-")
-    , TimePointInterface()
-    , AttColor()
-    , AttCommonPart()
-    , AttOrnamentaccid()
-    , AttPlacement()
-    , AttMordentLog()
+    : ControlElement("mordent-"), TimePointInterface(), AttColor(), AttOrnamentaccid(), AttPlacement(), AttMordentLog()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_ORNAMENTACCID);
     RegisterAttClass(ATT_PLACEMENT);
     RegisterAttClass(ATT_MORDENTLOG);
@@ -49,7 +42,6 @@ void Mordent::Reset()
     ControlElement::Reset();
     TimePointInterface::Reset();
     ResetColor();
-    ResetCommonPart();
     ResetOrnamentaccid();
     ResetPlacement();
     ResetMordentLog();

@@ -22,7 +22,6 @@ namespace vrv {
 class Turn : public ControlElement,
              public TimePointInterface,
              public AttColor,
-             public AttCommonPart,
              public AttOrnamentaccid,
              public AttPlacement,
              public AttTurnLog {

@@ -42,7 +42,6 @@ Note::Note()
     , PitchInterface()
     , AttColor()
     , AttColoration()
-    , AttCommonPart()
     , AttGraced()
     , AttNoteLogMensural()
     , AttRelativesize()
@@ -55,7 +54,6 @@ Note::Note()
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
-    RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTELOGMENSURAL);
     RegisterAttClass(ATT_RELATIVESIZE);
@@ -85,7 +83,6 @@ void Note::Reset()
     PitchInterface::Reset();
     ResetColor();
     ResetColoration();
-    ResetCommonPart();
     ResetGraced();
     ResetNoteLogMensural();
     ResetRelativesize();

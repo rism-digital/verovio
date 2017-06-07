@@ -76,10 +76,8 @@ void Section::AddChild(Object *child)
 // Pb
 //----------------------------------------------------------------------------
 
-Pb::Pb() : SystemElement("pb-"), AttCommonPart()
+Pb::Pb() : SystemElement("pb-")
 {
-    RegisterAttClass(ATT_COMMONPART);
-
     Reset();
 }
 
@@ -90,17 +88,14 @@ Pb::~Pb()
 void Pb::Reset()
 {
     SystemElement::Reset();
-    ResetCommonPart();
 }
 
 //----------------------------------------------------------------------------
 // Sb
 //----------------------------------------------------------------------------
 
-Sb::Sb() : SystemElement("pb-"), AttCommonPart()
+Sb::Sb() : SystemElement("pb-")
 {
-    RegisterAttClass(ATT_COMMONPART);
-
     Reset();
 }
 
@@ -111,7 +106,6 @@ Sb::~Sb()
 void Sb::Reset()
 {
     SystemElement::Reset();
-    ResetCommonPart();
 }
 
 //----------------------------------------------------------------------------
