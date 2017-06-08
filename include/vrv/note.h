@@ -168,6 +168,10 @@ public:
     void SetRealTimeOnsetSeconds(double timeInSeconds);
     void SetScoreTimeOffset(double scoreTime);
     void SetRealTimeOffsetSeconds(double timeInSeconds);
+    double GetScoreTimeOnset(void);
+    int GetRealTimeOnsetMilliseconds(void);
+    double GetScoreTimeOffset(void);
+    int GetRealTimeOffsetMilliseconds(void);
     ///@}
 
     //----------//

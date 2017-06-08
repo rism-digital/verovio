@@ -845,8 +845,8 @@ int Measure::GenerateMIDI(FunctorParams *functorParams)
     params->m_totalTime = m_scoreTimeOffset.back();
 
     if (m_currentTempo != params->m_currentTempo) {
-       params->m_midiFile->addTempo(0, m_scoreTimeOffset.back() * params->m_midiFile->getTPQ(), m_currentTempo);
-       m_currentTempo = params->m_currentTempo;
+        params->m_midiFile->addTempo(0, m_scoreTimeOffset.back() * params->m_midiFile->getTPQ(), m_currentTempo);
+        m_currentTempo = params->m_currentTempo;
     }
 
     return FUNCTOR_CONTINUE;

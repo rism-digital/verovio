@@ -367,6 +367,26 @@ void Note::SetRealTimeOffsetSeconds(double timeInSeconds)
     m_realTimeOffsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5) / 1000;
 }
 
+double Note::GetScoreTimeOnset(void)
+{
+    return m_scoreTimeOnset;
+}
+
+int Note::GetRealTimeOnsetMilliseconds(void)
+{
+    return m_realTimeOnsetMilliseconds;
+}
+
+double Note::GetScoreTimeOffset(void)
+{
+    return m_scoreTimeOffset;
+}
+
+int Note::GetRealTimeOffsetMilliseconds(void)
+{
+    return m_realTimeOffsetMilliseconds;
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
