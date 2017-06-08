@@ -42,10 +42,9 @@ Note::Note()
     , PitchInterface()
     , AttColor()
     , AttColoration()
+    , AttCue()
     , AttGraced()
     , AttNoteAnlMensural()
-    // FIXME MEI 4.0.0
-    //, AttRelativesize()
     , AttStems()
     , AttStemsCmn()
     , AttTiePresent()
@@ -55,10 +54,9 @@ Note::Note()
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
+    RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTEANLMENSURAL);
-    // FIXME 4.0.0
-    // RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -85,10 +83,9 @@ void Note::Reset()
     PitchInterface::Reset();
     ResetColor();
     ResetColoration();
+    ResetCue();
     ResetGraced();
     ResetNoteAnlMensural();
-    // FIXME 4.0.0
-    // ResetRelativesize();
     ResetStems();
     ResetStemsCmn();
     ResetTiePresent();

@@ -943,12 +943,11 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
         m_drawingCueSize = true;
     }
     // This cover the case when the @size is given on the element
-    // FIXME MEI 4.0.0
-    // else if (this->HasAttClass(ATT_RELATIVESIZE)) {
-    //    AttRelativesize *att = dynamic_cast<AttRelativesize *>(this);
-    //    assert(att);
-    //    if (att->HasSize()) m_drawingCueSize = (att->GetSize() == SIZE_cue);
-    //}
+    else if (this->HasAttClass(ATT_CUE)) {
+        AttCue *att = dynamic_cast<AttCue *>(this);
+        assert(att);
+        if (att->HasCue()) m_drawingCueSize = (att->GetCue() == BOOLEAN_true);
+    }
     // For note, we also need to look at the parent chord
     else if (this->Is(NOTE)) {
         Note const *note = dynamic_cast<Note const *>(this);

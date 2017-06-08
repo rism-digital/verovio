@@ -20,12 +20,11 @@ int Mensur::s_numBase = 2;
 Mensur::Mensur()
     : LayerElement("mensur-")
     , AttColor()
+    , AttCue()
     , AttDurationRatio()
     , AttMensuralShared()
     , AttMensurLog()
     , AttMensurVis()
-    // FIXME MEI 4.0.0
-    //, AttRelativesize()
     , AttSlashCount()
 {
     Init();
@@ -54,12 +53,11 @@ Mensur::Mensur(const ScoreDefInterface *mensurAttr) : LayerElement("mensur-")
 void Mensur::Init()
 {
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_DURATIONRATIO);
     RegisterAttClass(ATT_MENSURALSHARED);
     RegisterAttClass(ATT_MENSURLOG);
     RegisterAttClass(ATT_METERSIGVIS);
-    // FIXME MEI 4.0.0
-    // RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_SLASHCOUNT);
 
     Reset();
@@ -73,12 +71,11 @@ void Mensur::Reset()
 {
     LayerElement::Reset();
     ResetColor();
+    ResetCue();
     ResetDurationRatio();
     ResetMensuralShared();
     ResetMensurLog();
     ResetMensurVis();
-    // FIXME MEI 4.0.0
-    // ResetRelativesize();
     ResetSlashCount();
 }
 

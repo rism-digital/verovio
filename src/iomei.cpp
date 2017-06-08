@@ -1048,9 +1048,8 @@ void MeiOutput::WriteMeiChord(pugi::xml_node currentNode, Chord *chord)
     WriteLayerElement(currentNode, chord);
     WriteDurationInterface(currentNode, chord);
     chord->WriteColor(currentNode);
+    chord->WriteCue(currentNode);
     chord->WriteGraced(currentNode);
-    // FIXME MEI 4.0.0
-    // chord->WriteRelativesize(currentNode);
     chord->WriteStems(currentNode);
     chord->WriteStemsCmn(currentNode);
     chord->WriteTiePresent(currentNode);
@@ -1111,12 +1110,11 @@ void MeiOutput::WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur)
 
     WriteLayerElement(currentNode, mensur);
     mensur->WriteColor(currentNode);
+    mensur->WriteCue(currentNode);
     mensur->WriteDurationRatio(currentNode);
     mensur->WriteMensuralShared(currentNode);
     mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
-    // FIXME MEI 4.0.0
-    // mensur->WriteRelativesize(currentNode);
     mensur->WriteSlashCount(currentNode);
 }
 
@@ -1135,11 +1133,9 @@ void MeiOutput::WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest)
 
     WriteLayerElement(currentNode, mRest);
     WritePositionInterface(currentNode, mRest);
+    mRest->WriteCue(currentNode);
     mRest->WriteFermataPresent(currentNode);
     mRest->WriteVisibility(currentNode);
-    mRest->WriteFermataPresent(currentNode);
-    // FIXME MEI 4.0.0
-    // mRest->WriteRelativesize(currentNode);
 }
 
 void MeiOutput::WriteMeiMRpt(pugi::xml_node currentNode, MRpt *mRpt)
@@ -1182,10 +1178,9 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     WritePitchInterface(currentNode, note);
     note->WriteColor(currentNode);
     note->WriteColoration(currentNode);
+    note->WriteCue(currentNode);
     note->WriteGraced(currentNode);
     note->WriteNoteAnlMensural(currentNode);
-    // FIXME MEI 4.0.0
-    // note->WriteRelativesize(currentNode);
     note->WriteStems(currentNode);
     note->WriteStemsCmn(currentNode);
     note->WriteTiePresent(currentNode);
@@ -1200,8 +1195,7 @@ void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
     WriteDurationInterface(currentNode, rest);
     WritePositionInterface(currentNode, rest);
     rest->WriteColor(currentNode);
-    // FIXME MEI 4.0.0
-    // rest->WriteRelativesize(currentNode);
+    rest->WriteCue(currentNode);
     rest->WriteRestVisMensural(currentNode);
 }
 
@@ -2938,9 +2932,8 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
 
     ReadDurationInterface(chord, vrvChord);
     vrvChord->ReadColor(chord);
+    vrvChord->ReadCue(chord);
     vrvChord->ReadGraced(chord);
-    // FIXME MEI 4.0.0
-    // vrvChord->ReadRelativesize(chord);
     vrvChord->ReadStems(chord);
     vrvChord->ReadStemsCmn(chord);
     vrvChord->ReadTiePresent(chord);
@@ -3046,12 +3039,11 @@ bool MeiInput::ReadMeiMensur(Object *parent, pugi::xml_node mensur)
     ReadLayerElement(mensur, vrvMensur);
 
     vrvMensur->ReadColor(mensur);
+    vrvMensur->ReadCue(mensur);
     vrvMensur->ReadDurationRatio(mensur);
     vrvMensur->ReadMensuralShared(mensur);
     vrvMensur->ReadMensurLog(mensur);
     vrvMensur->ReadMensurVis(mensur);
-    // FIXME MEI 4.0.0
-    // vrvMensur->ReadRelativesize(mensur);
     vrvMensur->ReadSlashCount(mensur);
 
     parent->AddChild(vrvMensur);
@@ -3076,10 +3068,9 @@ bool MeiInput::ReadMeiMRest(Object *parent, pugi::xml_node mRest)
     ReadLayerElement(mRest, vrvMRest);
     ReadPositionInterface(mRest, vrvMRest);
 
+    vrvMRest->ReadCue(mRest);
     vrvMRest->ReadFermataPresent(mRest);
     vrvMRest->ReadVisibility(mRest);
-    // FIXME MEI 4.0.0
-    // vrvMRest->ReadRelativesize(mRest);
 
     parent->AddChild(vrvMRest);
     return true;
@@ -3135,10 +3126,9 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     ReadPitchInterface(note, vrvNote);
     vrvNote->ReadColor(note);
     vrvNote->ReadColoration(note);
+    vrvNote->ReadCue(note);
     vrvNote->ReadGraced(note);
     vrvNote->ReadNoteAnlMensural(note);
-    // FIXME MEI 4.0.0
-    // vrvNote->ReadRelativesize(note);
     vrvNote->ReadStems(note);
     vrvNote->ReadStemsCmn(note);
     vrvNote->ReadTiePresent(note);
@@ -3177,8 +3167,7 @@ bool MeiInput::ReadMeiRest(Object *parent, pugi::xml_node rest)
     ReadDurationInterface(rest, vrvRest);
     ReadPositionInterface(rest, vrvRest);
     vrvRest->ReadColor(rest);
-    // FIXME MEI 4.0.0
-    // vrvRest->ReadRelativesize(rest);
+    vrvRest->ReadCue(rest);
     vrvRest->ReadRestVisMensural(rest);
 
     parent->AddChild(vrvRest);

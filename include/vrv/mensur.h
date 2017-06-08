@@ -26,12 +26,11 @@ class ScoreDefInterface;
  */
 class Mensur : public LayerElement,
                public AttColor,
+               public AttCue,
                public AttDurationRatio,
                public AttMensuralShared,
                public AttMensurLog,
                public AttMensurVis,
-               // FIXME changed in MEI 4.0.0 - will be changed to @cue?
-               // public AttRelativesize,
                public AttSlashCount {
 public:
     /**

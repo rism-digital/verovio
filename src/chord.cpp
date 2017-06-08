@@ -40,9 +40,8 @@ Chord::Chord()
     , StemmedDrawingInterface()
     , DurationInterface()
     , AttColor()
+    , AttCue()
     , AttGraced()
-    // FIXME MEI 4.0.0
-    //, AttRelativesize()
     , AttStems()
     , AttStemsCmn()
     , AttTiePresent()
@@ -50,9 +49,8 @@ Chord::Chord()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_GRACED);
-    // FIXME MEI 4.0.0
-    // RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -73,9 +71,8 @@ void Chord::Reset()
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     ResetColor();
+    ResetCue();
     ResetGraced();
-    // FIXME MEI 4.0.0
-    // ResetRelativesize();
     ResetStems();
     ResetStemsCmn();
     ResetTiePresent();
