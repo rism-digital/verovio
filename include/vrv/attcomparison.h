@@ -234,7 +234,7 @@ public:
         if (!object->Is(NOTE)) return false;
         Note *note = dynamic_cast<Note *>(object);
         assert(note);
-        return ((note->m_playingOnset < m_time) && (note->m_playingOffset > m_time));
+        return ((note->GetRealTimeOffsetMilliseconds() < m_time) && (note->GetRealTimeOnsetMilliseconds() > m_time));
     }
 
 private:

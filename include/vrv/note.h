@@ -168,6 +168,10 @@ public:
     void SetRealTimeOnsetSeconds(double timeInSeconds);
     void SetScoreTimeOffset(double scoreTime);
     void SetRealTimeOffsetSeconds(double timeInSeconds);
+    double GetScoreTimeOnset(void);
+    int GetRealTimeOnsetMilliseconds(void);
+    double GetScoreTimeOffset(void);
+    int GetRealTimeOffsetMilliseconds(void);
     ///@}
 
     //----------//
@@ -237,9 +241,7 @@ public:
 private:
     //
 public:
-    double m_playingOnset;
-    double m_playingOffset;
-
+    //
 private:
     /**
      * Tie attributes are represented a pointers to Tie objects.
