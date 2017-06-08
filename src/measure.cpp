@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <iostream>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -865,8 +864,9 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     // search for tempo marks in the measure
     Tempo *tempo = dynamic_cast<Tempo *>(this->FindChildByType(TEMPO));
     if (tempo && tempo->HasMidiBpm()) {
-        m_currentTempo = tempo->GetMidiBpm();
+        params->m_currentTempo = tempo->GetMidiBpm();
     }
+    m_currentTempo = params->m_currentTempo;
 
     m_realTimeOffsetMilliseconds.clear();
     m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5) / 1000);
