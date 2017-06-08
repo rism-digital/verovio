@@ -203,6 +203,16 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         }
     }
 
+    if (object->HasAttClass(ATT_COMMONPART)) {
+        AttCommonPart *att = dynamic_cast<AttCommonPart *>(object);
+        assert(att);
+        if (att->HasLabel()) {
+            pugi::xml_node svgTitle = m_currentNode.prepend_child("title");
+            svgTitle.append_attribute("class") = "labelAttr";
+            svgTitle.append_child(pugi::node_pcdata).set_value(att->GetLabel().c_str());
+        }
+    }
+
     if (object->HasAttClass(ATT_LANG)) {
         AttLang *att = dynamic_cast<AttLang *>(object);
         assert(att);
@@ -345,8 +355,7 @@ void SvgDeviceContext::StartPage()
     m_currentNode = m_currentNode.append_child("style");
     m_currentNode.append_attribute("type") = "text/css";
     m_currentNode.append_child(pugi::node_pcdata)
-        .set_value(
-            "g.page-margin{font-family:Times;} g.tempo{font-weight:bold;} g.dir, g.dynam {font-style:italic;}");
+        .set_value("g.page-margin{font-family:Times;} g.tempo{font-weight:bold;} g.dir, g.dynam {font-style:italic;}");
     m_currentNode = m_svgNodeStack.back();
 
     // a graphic for definition scaling
@@ -425,7 +434,7 @@ pugi::xml_node SvgDeviceContext::AppendChild(std::string name)
         return m_currentNode.append_child(name.c_str());
 }
 
-// Drawing mething
+// Drawing methods
 void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
 {
     pugi::xml_node pathChild = AppendChild("path");

@@ -225,7 +225,7 @@ private:
      */
     ///@{
     ///@}
-    void FillSpace(vrv::Layer *layer, int dur);
+    void FillSpace(Layer *layer, int dur);
 
     /*
      * @name Helper method for generating additional IDs

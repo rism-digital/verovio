@@ -28,7 +28,7 @@ namespace vrv {
 // Dots
 //----------------------------------------------------------------------------
 
-Dots::Dots() : LayerElement("dots-"), vrv::AttAugmentdots()
+Dots::Dots() : LayerElement("dots-"), AttAugmentdots()
 {
     RegisterAttClass(ATT_AUGMENTDOTS);
 

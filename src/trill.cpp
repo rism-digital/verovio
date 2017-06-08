@@ -25,7 +25,6 @@ Trill::Trill() : ControlElement("trill-"), TimePointInterface(), AttColor(), Att
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_ORNAMENTACCID);
     RegisterAttClass(ATT_PLACEMENT);
 
     Reset();
