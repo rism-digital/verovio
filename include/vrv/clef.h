@@ -22,7 +22,11 @@ class ScoreDefInterface;
 /**
  * This class models the MEI <clef> element.
  */
-class Clef : public LayerElement, public AttClefShape, public AttLineLoc, public AttOctaveDisplacement {
+class Clef : public LayerElement,
+             public AttClefShape,
+             public AttColor,
+             public AttLineLoc,
+             public AttOctaveDisplacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

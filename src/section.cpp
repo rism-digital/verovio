@@ -96,7 +96,7 @@ void Pb::Reset()
 // Sb
 //----------------------------------------------------------------------------
 
-Sb::Sb() : SystemElement("pb-"), AttNNumberLike()
+Sb::Sb() : SystemElement("sb-"), AttNNumberLike()
 {
     RegisterAttClass(ATT_NNUMBERLIKE);
 
