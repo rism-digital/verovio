@@ -25,8 +25,7 @@ class MRest : public LayerElement,
               public PositionInterface,
               public AttCue,
               public AttFermataPresent,
-              public AttVisibility
-{
+              public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

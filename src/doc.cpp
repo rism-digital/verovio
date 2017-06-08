@@ -176,11 +176,16 @@ bool Doc::GenerateDocumentScoreDef()
 
 void Doc::ExportMIDI(MidiFile *midiFile)
 {
-    CalcMaxMeasureDurationParams calcMaxMeasureDurationParams;
 
     // We first calculate the maximum duration of each measure
+    CalcMaxMeasureDurationParams calcMaxMeasureDurationParams;
     Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
     this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams);
+
+    // Then first calculate the maximum duration of each measure
+    CalcOnsetOffsetParams calcOnsetOffsetParams;
+    Functor calcOnsetOffset(&Object::CalcOnsetOffset);
+    this->Process(&calcOnsetOffset, &calcOnsetOffsetParams);
 
     // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
     PrepareProcessingListsParams prepareProcessingListsParams;
@@ -229,7 +234,6 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             filters.push_back(&matchLayer);
 
             GenerateMIDIParams generateMIDIParams(midiFile);
-            generateMIDIParams.m_maxValues = calcMaxMeasureDurationParams.m_maxValues;
             generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
             Functor generateMIDI(&Object::GenerateMIDI);

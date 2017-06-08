@@ -240,17 +240,18 @@ public:
     virtual int FindTimeSpanningLayerElements(FunctorParams *functorParams);
 
     /**
-     * See Object::GenerateMIDI
+     * See Object::CalcOnsetOffset
      */
     ///@{
-    virtual int GenerateMIDI(FunctorParams *functorParams);
-    virtual int GenerateMIDIEnd(FunctorParams *functorParams);
+    virtual int CalcOnsetOffset(FunctorParams *);
     ///@}
 
     /**
-     * See Object::CalcMaxMeasureDuration
+     * See Object::ResolveMIDITies
      */
-    virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
+    ///@{
+    virtual int ResolveMIDITies(FunctorParams *);
+    ///@}
 
     /**
      * See Object::ResetDrawing

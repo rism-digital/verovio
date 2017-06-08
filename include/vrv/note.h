@@ -160,6 +160,16 @@ public:
      */
     wchar_t GetMensuralSmuflNoteHead();
 
+    /**
+     * MIDI timing information
+     */
+    ///@{
+    void SetScoreTimeOnset(double scoreTime);
+    void SetRealTimeOnsetSeconds(double timeInSeconds);
+    void SetScoreTimeOffset(double scoreTime);
+    void SetRealTimeOffsetSeconds(double timeInSeconds);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -219,6 +229,11 @@ public:
      */
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
+    /**
+     * See Object::GenerateMIDI
+     */
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+
 private:
     //
 public:
@@ -252,6 +267,31 @@ private:
      * Position in the cluster (1-indexed position in said cluster; 0 if does not have position)
      */
     int m_clusterPosition;
+
+    /**
+     * Note-on time in the measure (quarter-note units).
+     */
+    double m_scoreTimeOnset;
+
+    /**
+     * Note-off time in the measure (quarter-note units).
+     */
+    double m_scoreTimeOffset;
+
+    /**
+     * The time in milliseconds since the start of the measure element that contains the note.
+     */
+    int m_realTimeOnsetMilliseconds;
+
+    /**
+     * The time in milliseconds since the start of the measure element to end of note.
+     */
+    int m_realTimeOffsetMilliseconds;
+
+    /**
+     * The duration in quarter notes of the note for MIDI file creation.
+     */
+    double m_scoreTimeTiedDuration;
 };
 
 //----------------------------------------------------------------------------

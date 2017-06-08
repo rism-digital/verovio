@@ -548,7 +548,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         // no start and end, obviously nothing to do...
         return;
     }
-    
+
     if (start->Is(TIMESTAMP_ATTR) || end->Is(TIMESTAMP_ATTR)) {
         // fow now ignore slur using tstamps
         return;
@@ -581,15 +581,15 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     Layer *layer2 = NULL;
 
     // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
-    //if (start->Is(TIMESTAMP_ATTR))
+    // if (start->Is(TIMESTAMP_ATTR))
     //    layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-    //else
+    // else
     layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
 
     // idem
-    //if (end->Is(TIMESTAMP_ATTR))
+    // if (end->Is(TIMESTAMP_ATTR))
     //    layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-    //else
+    // else
     layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
 
     assert(layer1 && layer2);
@@ -1560,7 +1560,7 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
     std::vector<Staff *> staffList = breath->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), breath, breath->GetStart(), *staffIter);
-        int y =  breath->GetDrawingY();
+        int y = breath->GetDrawingY();
 
         // Adjust the x position
         int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;

@@ -306,13 +306,19 @@ public:
      */
     ///@{
     virtual int GenerateMIDI(FunctorParams *functorParams);
-    virtual int GenerateMIDIEnd(FunctorParams *functorParams);
     ///@}
 
     /**
      * See Object::CalcMaxMeasureDuration
      */
     virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcOnsetOffset
+     */
+    ///@{
+    virtual int CalcOnsetOffset(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::PrepareTimestamps
@@ -372,6 +378,13 @@ private:
      * A flag indicating if the measure has AlignmentReference with multiple layers
      */
     bool m_hasAlignmentRefWithMultipleLayers;
+
+    /**
+     * Start time state variables.
+     */
+    std::vector<double> m_scoreTimeOffset;
+    std::vector<int> m_realTimeOffsetMilliseconds;
+    int m_currentTempo;
 };
 
 } // namespace vrv

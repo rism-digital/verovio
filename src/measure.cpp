@@ -26,9 +26,14 @@
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
+#include "tempo.h"
 #include "timeinterface.h"
 #include "timestamp.h"
 #include "vrv.h"
+
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
 
 namespace vrv {
 
@@ -99,6 +104,10 @@ void Measure::Reset()
 
     m_drawingEnding = NULL;
     m_hasAlignmentRefWithMultipleLayers = false;
+
+    m_scoreTimeOffset.clear();
+    m_realTimeOffsetMilliseconds.clear();
+    m_currentTempo = 120;
 }
 
 void Measure::AddChild(Object *child)
@@ -833,23 +842,13 @@ int Measure::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    // Here we need to reset the currentMeasureTime because we are starting a new measure
-    params->m_currentMeasureTime = 0;
+    // Here we need to update the m_totalTime from the starting time of the measure.
+    params->m_totalTime = m_scoreTimeOffset.back();
 
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::GenerateMIDIEnd(FunctorParams *functorParams)
-{
-    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    // We a to the total time the maximum duration of the measure so if there is no layer, if the layer is not full
-    // or
-    // if there is an encoding error in the measure, the next one will be properly aligned
-    assert(!params->m_maxValues.empty());
-    params->m_totalTime += params->m_maxValues.front();
-    params->m_maxValues.erase(params->m_maxValues.begin());
+    if (m_currentTempo != params->m_currentTempo) {
+       params->m_midiFile->addTempo(0, m_scoreTimeOffset.back() * params->m_midiFile->getTPQ(), m_currentTempo);
+       m_currentTempo = params->m_currentTempo;
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -859,8 +858,30 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     CalcMaxMeasureDurationParams *params = dynamic_cast<CalcMaxMeasureDurationParams *>(functorParams);
     assert(params);
 
-    // We just need to add a value to the stack
-    params->m_maxValues.push_back(0.0);
+    m_scoreTimeOffset.clear();
+    m_scoreTimeOffset.push_back(params->m_maxCurrentScoreTime);
+    params->m_maxCurrentScoreTime += m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX;
+
+    // search for tempo marks in the measure
+    Tempo *tempo = dynamic_cast<Tempo *>(this->FindChildByType(TEMPO));
+    if (tempo && tempo->HasMidiBpm()) {
+        m_currentTempo = tempo->GetMidiBpm();
+    }
+
+    m_realTimeOffsetMilliseconds.clear();
+    m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5) / 1000);
+    params->m_maxCurrentRealTimeSeconds
+        += (m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX) * 60.0 / m_currentTempo;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::CalcOnsetOffset(FunctorParams *functorParams)
+{
+    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
+    assert(params);
+
+    params->m_currentTempo = m_currentTempo;
 
     return FUNCTOR_CONTINUE;
 }

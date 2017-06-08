@@ -508,6 +508,12 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// CalcLedgerLine
+//----------------------------------------------------------------------------
+
+// Use FunctorDocParams
+
+//----------------------------------------------------------------------------
 // CalcMaxMeasureDurationParams
 //----------------------------------------------------------------------------
 
@@ -521,19 +527,40 @@ class CalcMaxMeasureDurationParams : public FunctorParams {
 public:
     CalcMaxMeasureDurationParams()
     {
-        m_currentValue = 0.0;
-        m_currentBpm = 120;
+        m_currentScoreTime = 0.0;
+        m_currentRealTimeSeconds = 0.0;
+        m_maxCurrentScoreTime = 0.0;
+        m_maxCurrentRealTimeSeconds = 0.0;
+        m_currentTempo = 120;
     }
-    std::vector<double> m_maxValues;
-    double m_currentValue;
-    int m_currentBpm;
+    double m_currentScoreTime;
+    double m_currentRealTimeSeconds;
+    double m_maxCurrentScoreTime;
+    double m_maxCurrentRealTimeSeconds;
+    int m_currentTempo;
 };
 
 //----------------------------------------------------------------------------
-// CalcLedgerLine
+// CalcOnsetOffset
 //----------------------------------------------------------------------------
 
-// Use FunctorDocParams
+/**
+ * member 0: double: the current score time in the measure (incremented by each element)
+ * member 1: double: the current real time in seconds in the measure (incremented by each element)
+**/
+
+class CalcOnsetOffsetParams : public FunctorParams {
+public:
+    CalcOnsetOffsetParams(void)
+    {
+        m_currentScoreTime = 0.0;
+        m_currentRealTimeSeconds = 0.0;
+        m_currentTempo = 120.0;
+    }
+    double m_currentScoreTime;
+    double m_currentRealTimeSeconds;
+    int m_currentTempo;
+};
 
 //----------------------------------------------------------------------------
 // CalcStemParams
@@ -797,12 +824,10 @@ public:
 
 /**
  * member 0: MidiFile*: the MidiFile we are writing to
- * member 1: int*: the midi track number
- * member 2: int*: the current time in the measure (incremented by each element)
- * member 3: int*: the current total measure time (incremented by each measure
- * member 4: std::vector<double>: a stack of maximum duration filled by the functor
- * member 5: int* the semi tone transposition for the current track
- * member 6: int with the current bpm
+ * member 1: int: the midi track number
+ * member 3: double: the score time from the start of the music to the start of the current measure
+ * member 4: int: the semi tone transposition for the current track
+ * member 5: int with the current tempo
 **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -811,18 +836,15 @@ public:
     {
         m_midiFile = midiFile;
         m_midiTrack = 1;
-        m_currentMeasureTime = 0.0;
         m_totalTime = 0.0;
         m_transSemi = 0;
-        m_currentBpm = 120;
+        m_currentTempo = 120;
     }
     MidiFile *m_midiFile;
     int m_midiTrack;
-    double m_currentMeasureTime;
     double m_totalTime;
-    std::vector<double> m_maxValues;
     int m_transSemi;
-    int m_currentBpm;
+    int m_currentTempo;
 };
 
 //----------------------------------------------------------------------------

@@ -9,6 +9,8 @@
 
 //----------------------------------------------------------------------------
 
+#include <iostream>
+
 #include <assert.h>
 
 //----------------------------------------------------------------------------
@@ -28,6 +30,10 @@
 #include "tie.h"
 #include "verse.h"
 #include "vrv.h"
+
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
 
 namespace vrv {
 
@@ -339,6 +345,26 @@ wchar_t Note::GetMensuralSmuflNoteHead()
         }
     }
     return code;
+}
+
+void Note::SetScoreTimeOnset(double scoreTime)
+{
+    m_scoreTimeOnset = scoreTime;
+}
+
+void Note::SetRealTimeOnsetSeconds(double timeInSeconds)
+{
+    m_realTimeOnsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5) / 1000;
+}
+
+void Note::SetScoreTimeOffset(double scoreTime)
+{
+    m_scoreTimeOffset = scoreTime;
+}
+
+void Note::SetRealTimeOffsetSeconds(double timeInSeconds)
+{
+    m_realTimeOffsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5) / 1000;
 }
 
 //----------------------------------------------------------------------------
@@ -740,6 +766,78 @@ int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Note::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    // For now just ignore grace notes
+    if (this->HasGrace()) return FUNCTOR_CONTINUE;
+
+    Accid *accid = this->GetDrawingAccid();
+
+    // Create midi this
+    int midiBase = 0;
+    data_PITCHNAME pname = this->GetPname();
+    switch (pname) {
+        case PITCHNAME_c: midiBase = 0; break;
+        case PITCHNAME_d: midiBase = 2; break;
+        case PITCHNAME_e: midiBase = 4; break;
+        case PITCHNAME_f: midiBase = 5; break;
+        case PITCHNAME_g: midiBase = 7; break;
+        case PITCHNAME_a: midiBase = 9; break;
+        case PITCHNAME_b: midiBase = 11; break;
+        case PITCHNAME_NONE: break;
+    }
+    // Check for accidentals
+    if (accid && accid->HasAccidGes()) {
+        data_ACCIDENTAL_GESTURAL accImp = accid->GetAccidGes();
+        switch (accImp) {
+            case ACCIDENTAL_GESTURAL_s: midiBase += 1; break;
+            case ACCIDENTAL_GESTURAL_f: midiBase -= 1; break;
+            case ACCIDENTAL_GESTURAL_ss: midiBase += 2; break;
+            case ACCIDENTAL_GESTURAL_ff: midiBase -= 2; break;
+            default: break;
+        }
+    }
+    else if (accid) {
+        data_ACCIDENTAL_WRITTEN accExp = accid->GetAccid();
+        switch (accExp) {
+            case ACCIDENTAL_WRITTEN_s: midiBase += 1; break;
+            case ACCIDENTAL_WRITTEN_f: midiBase -= 1; break;
+            case ACCIDENTAL_WRITTEN_ss: midiBase += 2; break;
+            case ACCIDENTAL_WRITTEN_x: midiBase += 2; break;
+            case ACCIDENTAL_WRITTEN_ff: midiBase -= 2; break;
+            case ACCIDENTAL_WRITTEN_xs: midiBase += 3; break;
+            case ACCIDENTAL_WRITTEN_ts: midiBase += 3; break;
+            case ACCIDENTAL_WRITTEN_tf: midiBase -= 3; break;
+            case ACCIDENTAL_WRITTEN_nf: midiBase -= 1; break;
+            case ACCIDENTAL_WRITTEN_ns: midiBase += 1; break;
+            default: break;
+        }
+    }
+
+    // Adjustment for transposition intruments
+    midiBase += params->m_transSemi;
+
+    int oct = this->GetOct();
+    if (this->HasOctGes()) oct = this->GetOctGes();
+
+    int pitch = midiBase + (oct + 1) * 12;
+    int channel = 0;
+    int velocity = 64;
+
+    double starttime = params->m_totalTime + m_scoreTimeOnset;
+    double stoptime = params->m_totalTime + m_scoreTimeOffset;
+
+    int tpq = params->m_midiFile->getTPQ();
+
+    params->m_midiFile->addNoteOn(params->m_midiTrack, starttime * tpq, channel, pitch, velocity);
+    params->m_midiFile->addNoteOff(params->m_midiTrack, stoptime * tpq, channel, pitch);
 
     return FUNCTOR_CONTINUE;
 }
