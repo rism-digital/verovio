@@ -808,6 +808,42 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttCue
+//----------------------------------------------------------------------------
+
+class AttCue : public Att {
+public:
+    AttCue();
+    virtual ~AttCue();
+
+    /** Reset the default values for the attribute class **/
+    void ResetCue();
+
+    /** Read the values for the attribute class **/
+    bool ReadCue(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteCue(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetCue(data_BOOLEAN cue_) { m_cue = cue_; }
+    data_BOOLEAN GetCue() const { return m_cue; }
+    bool HasCue() const;
+    ///@}
+
+private:
+    /** --- **/
+    data_BOOLEAN m_cue;
+
+    /* include <attcue> */
+};
+
+//----------------------------------------------------------------------------
 // AttCurvature
 //----------------------------------------------------------------------------
 
@@ -1842,18 +1878,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFifths(std::string fifths_) { m_fifths = fifths_; }
-    std::string GetFifths() const { return m_fifths; }
-    bool HasFifths() const;
-    //
     void SetSig(std::string sig_) { m_sig = sig_; }
     std::string GetSig() const { return m_sig; }
     bool HasSig() const;
     ///@}
 
 private:
-    /** Indicates where the key lies in the circle of fifths. **/
-    std::string m_fifths;
     /** Written key signature. **/
     std::string m_sig;
 
@@ -1884,18 +1914,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetKeyFifths(std::string keyFifths_) { m_keyFifths = keyFifths_; }
-    std::string GetKeyFifths() const { return m_keyFifths; }
-    bool HasKeyFifths() const;
-    //
     void SetKeySig(data_KEYSIGNATURE keySig_) { m_keySig = keySig_; }
     data_KEYSIGNATURE GetKeySig() const { return m_keySig; }
     bool HasKeySig() const;
     ///@}
 
 private:
-    /** Indicates where the key lies in the circle of fifths. **/
-    std::string m_keyFifths;
     /** Written key signature. **/
     data_KEYSIGNATURE m_keySig;
 

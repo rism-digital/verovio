@@ -839,7 +839,6 @@ std::string AttConverter::FontsizetermToStr(data_FONTSIZETERM data) const
         case FONTSIZETERM_xx_large: value = "xx-large"; break;
         case FONTSIZETERM_smaller: value = "smaller"; break;
         case FONTSIZETERM_larger: value = "larger"; break;
-        case FONTSIZETERM_cue: value = "cue"; break;
         default:
             LogWarning("Unknown value '%d' for data.FONTSIZETERM", data);
             value = "";
@@ -859,7 +858,6 @@ data_FONTSIZETERM AttConverter::StrToFontsizeterm(std::string value, bool logWar
     if (value == "xx-large") return FONTSIZETERM_xx_large;
     if (value == "smaller") return FONTSIZETERM_smaller;
     if (value == "larger") return FONTSIZETERM_larger;
-    if (value == "cue") return FONTSIZETERM_cue;
     if (logWarning)
         LogWarning("Unsupported value '%s' for data.FONTSIZETERM", value.c_str());
     return FONTSIZETERM_NONE;
