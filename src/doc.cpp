@@ -7,6 +7,8 @@
 
 #include "doc.h"
 
+#include <iostream>
+
 //----------------------------------------------------------------------------
 
 #include <assert.h>
@@ -176,9 +178,17 @@ bool Doc::GenerateDocumentScoreDef()
 
 void Doc::ExportMIDI(MidiFile *midiFile)
 {
+    int tempo = 120;
+
+    // Set tempo
+    if (m_scoreDef.HasMidiBpm()) {
+        tempo = m_scoreDef.GetMidiBpm();
+    }
+    midiFile->addTempo(0, 0, tempo);
 
     // We first calculate the maximum duration of each measure
     CalcMaxMeasureDurationParams calcMaxMeasureDurationParams;
+    calcMaxMeasureDurationParams.m_currentTempo = tempo;
     Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
     this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams);
 
@@ -203,11 +213,6 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;
-
-    // Set tempo
-    if (m_scoreDef.HasMidiBpm()) {
-        midiFile->addTempo(0, 0, m_scoreDef.GetMidiBpm());
-    }
 
     // Process notes and chords, rests, spaces layer by layer
     // track 0 (included by default) is reserved for meta messages common to all tracks
@@ -236,11 +241,11 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             GenerateMIDIParams generateMIDIParams(midiFile);
             generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
+            generateMIDIParams.m_currentTempo = tempo;
             Functor generateMIDI(&Object::GenerateMIDI);
-            Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
-            this->Process(&generateMIDI, &generateMIDIParams, &generateMIDIEnd, &filters);
+            this->Process(&generateMIDI, &generateMIDIParams, NULL, &filters);
         }
     }
 

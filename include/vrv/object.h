@@ -917,7 +917,6 @@ public:
      */
     ///@{
     virtual int GenerateMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int GenerateMIDIEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
