@@ -199,7 +199,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
     // Adjust the duration of tied notes
     Functor resolveMIDITies(&Object::ResolveMIDITies);
-    this->Process(&resolveMIDITies, NULL);
+    this->Process(&resolveMIDITies, NULL, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
 
     // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
     PrepareProcessingListsParams prepareProcessingListsParams;

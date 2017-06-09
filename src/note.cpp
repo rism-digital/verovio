@@ -7,6 +7,8 @@
 
 #include "note.h"
 
+#include <iostream>
+
 //----------------------------------------------------------------------------
 
 #include <assert.h>
@@ -362,6 +364,11 @@ void Note::SetRealTimeOffsetSeconds(double timeInSeconds)
     m_realTimeOffsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5) / 1000;
 }
 
+void Note::SetScoreTimeTiedDuration(double scoreTime)
+{
+    m_scoreTimeTiedDuration = scoreTime;
+}
+
 double Note::GetScoreTimeOnset(void)
 {
     return m_scoreTimeOnset;
@@ -380,11 +387,6 @@ double Note::GetScoreTimeOffset(void)
 int Note::GetRealTimeOffsetMilliseconds(void)
 {
     return m_realTimeOffsetMilliseconds;
-}
-
-void Note::SetScoreTimeTiedDuration(double scoreTime)
-{
-    m_scoreTimeTiedDuration = scoreTime;
 }
 
 double Note::GetScoreTimeTiedDuration(void)

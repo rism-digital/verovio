@@ -61,7 +61,7 @@ int Tie::ResolveMIDITies(FunctorParams *)
     double std2 = note2->GetScoreTimeDuration();
 
     if (sttd2 > 0.0) {
-        note1->SetScoreTimeTiedDuration(sttd2);
+        note1->SetScoreTimeTiedDuration(sttd2 + std2);
     }
     else {
         note1->SetScoreTimeTiedDuration(std2);
