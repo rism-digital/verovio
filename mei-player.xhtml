@@ -240,7 +240,7 @@ downloads:
     }
     
     var midiUpdate = function(time) {
-        var vrvTime = Math.max(0, 2 * time);
+        var vrvTime = Math.max(0, time);
         var elementsattime = vrvToolkit.getElementsAtTime(vrvTime);
         if (elementsattime.page > 0) {
             if (elementsattime.page != page) {

@@ -53,8 +53,8 @@ midiplayer: true
     }
     
     var midiUpdate = function(time) {
-        // bug! time needs to be * 2 (- 400 for adjustment)
-        var vrvTime = Math.max(0, 2 * time - 400);
+        // (- 400 for adjustment)
+        var vrvTime = Math.max(0, time - 400);
         var elementsattime = vrvToolkit.getElementsAtTime(vrvTime);
         if (elementsattime.page > 0) {
             if ((elementsattime.notes.length > 0) && (ids != elementsattime.notes)) {
