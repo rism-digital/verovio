@@ -123,9 +123,11 @@ midiplayer: true
             
             <h4>The MIDI output takes into account:</h4>
             <ul class="list-style">
+                <li>Tempo indication (<code>@midi.bpm</code>) provided in the first <code>scoreDef</code> and in <code>tempo</code> elements.</li>
                 <li>The sounding accidental values provided by <code>@accid.ges</code> on <code>notes</code> and <code>accid</code>.</li>
                 <li>The sounding octave values provided by <code>@oct.ges</code> on <code>note</code>.</li>
                 <li>Transposing instrument information provided by <code>@trans.semi</code> on <code>staffDef</code>.</li>
+                <li>Tie elements referring to notes with <code>@startid</code> and <code>@endid</code>.</li>
             </ul>
             
             <p>
@@ -168,9 +170,7 @@ var midiFileIn64Base = vrvToolkit.renderToMidi();
 
             <h4>Future work</h4>
             <ul class="list-style">
-                <li>Tempo control options</li>
                 <li>Instrument type support</li>
-                <li>Tie support</li>
                 <li>Dynamic support</li>
             </ul>
             
