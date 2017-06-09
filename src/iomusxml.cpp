@@ -784,7 +784,8 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     return false;
 }
 
-bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Section *section, Measure *measure, int nbStaves, int staffOffset)
+bool MusicXmlInput::ReadMusicXmlMeasure(
+    pugi::xml_node node, Section *section, Measure *measure, int nbStaves, int staffOffset)
 {
     assert(node);
     assert(measure);
@@ -849,7 +850,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section
     assert(node);
     assert(section);
     assert(measure);
-    
+
     // read clef changes as MEI clef
     pugi::xpath_node clef = node.select_single_node("clef");
     if (clef) {
@@ -901,40 +902,42 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section
             scoreDef->SetKeySig(KEYSIGNATURE_mixed);
         }
         if (key.node().select_single_node("mode")) {
-            scoreDef->SetKeyMode(scoreDef->AttKeySigDefaultLog::StrToMode(key.node().select_single_node("mode").node().text().as_string()));
+            scoreDef->SetKeyMode(scoreDef->AttKeySigDefaultLog::StrToMode(
+                key.node().select_single_node("mode").node().text().as_string()));
         }
-        std::string symbol = GetAttributeValue(time.node(), "symbol");
-        if (!symbol.empty()) {
-            if (symbol == "cut" || symbol == "common")
-                scoreDef->SetMeterSym(scoreDef->AttMeterSigDefaultVis::StrToMetersign(symbol.c_str()));
-            else if (symbol == "single-number")
-                scoreDef->SetMeterRend(meterSigDefaultVis_METERREND_num);
-            else
-                scoreDef->SetMeterRend(meterSigDefaultVis_METERREND_norm);
-        }
-        if (time.node().select_nodes("beats").size() > 1) {
-            LogWarning("Compound meter signatures are not supported");
-        }
-        pugi::xpath_node beats = time.node().select_single_node("beats");
-        if (beats && HasContent(beats.node())) {
-            m_meterCount = beats.node().text().as_int();
-            // staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
-            // this is a little "hack", until libMEI is fixed
-            std::string compound = beats.node().text().as_string();
-            if (compound.find("+") != std::string::npos) {
-                m_meterCount += atoi(compound.substr(compound.find("+")).c_str());
-                LogWarning("Compound time is not supported");
+        if (time) {
+            std::string symbol = GetAttributeValue(time.node(), "symbol");
+            if (!symbol.empty()) {
+                if (symbol == "cut" || symbol == "common")
+                    scoreDef->SetMeterSym(scoreDef->AttMeterSigDefaultVis::StrToMetersign(symbol.c_str()));
+                else if (symbol == "single-number")
+                    scoreDef->SetMeterRend(meterSigDefaultVis_METERREND_num);
+                else
+                    scoreDef->SetMeterRend(meterSigDefaultVis_METERREND_norm);
             }
-            scoreDef->SetMeterCount(m_meterCount);
-        }
-        pugi::xpath_node beatType = time.node().select_single_node("beat-type");
-        if (beatType && HasContent(beatType.node())) {
-            m_meterUnit = beatType.node().text().as_int();
-            scoreDef->SetMeterUnit(m_meterUnit);
+            if (time.node().select_nodes("beats").size() > 1) {
+                LogWarning("Compound meter signatures are not supported");
+            }
+            pugi::xpath_node beats = time.node().select_single_node("beats");
+            if (beats && HasContent(beats.node())) {
+                m_meterCount = beats.node().text().as_int();
+                // staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
+                // this is a little "hack", until libMEI is fixed
+                std::string compound = beats.node().text().as_string();
+                if (compound.find("+") != std::string::npos) {
+                    m_meterCount += atoi(compound.substr(compound.find("+")).c_str());
+                    LogWarning("Compound time is not supported");
+                }
+                scoreDef->SetMeterCount(m_meterCount);
+            }
+            pugi::xpath_node beatType = time.node().select_single_node("beat-type");
+            if (beatType && HasContent(beatType.node())) {
+                m_meterUnit = beatType.node().text().as_int();
+                scoreDef->SetMeterUnit(m_meterUnit);
+            }
         }
         section->AddChild(scoreDef);
     }
-
 
     pugi::xpath_node measureRepeat = node.select_single_node("measure-style/measure-repeat");
     if (measureRepeat) {
@@ -1840,18 +1843,30 @@ void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Section *section)
 
 data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAccidentalToAccid(std::string value)
 {
-    if (value == "sharp") return ACCIDENTAL_EXPLICIT_s;
-    else if (value == "natural") return ACCIDENTAL_EXPLICIT_n;
-    else if (value == "flat") return ACCIDENTAL_EXPLICIT_f;
-    else if (value == "double-sharp") return ACCIDENTAL_EXPLICIT_x;
-    else if (value == "sharp-sharp") return ACCIDENTAL_EXPLICIT_ss;
-    else if (value == "flat-flat") return ACCIDENTAL_EXPLICIT_ff;
-    else if (value == "natural-sharp") return ACCIDENTAL_EXPLICIT_ns;
-    else if (value == "natural-flat") return ACCIDENTAL_EXPLICIT_nf;
-    else if (value == "quarter-flat") return ACCIDENTAL_EXPLICIT_1qf;
-    else if (value == "quarter-sharp") return ACCIDENTAL_EXPLICIT_1qs;
-    else if (value == "three-quarters-flat") return ACCIDENTAL_EXPLICIT_3qf;
-    else if (value == "three-quarters-sharp") return ACCIDENTAL_EXPLICIT_3qs;
+    if (value == "sharp")
+        return ACCIDENTAL_EXPLICIT_s;
+    else if (value == "natural")
+        return ACCIDENTAL_EXPLICIT_n;
+    else if (value == "flat")
+        return ACCIDENTAL_EXPLICIT_f;
+    else if (value == "double-sharp")
+        return ACCIDENTAL_EXPLICIT_x;
+    else if (value == "sharp-sharp")
+        return ACCIDENTAL_EXPLICIT_ss;
+    else if (value == "flat-flat")
+        return ACCIDENTAL_EXPLICIT_ff;
+    else if (value == "natural-sharp")
+        return ACCIDENTAL_EXPLICIT_ns;
+    else if (value == "natural-flat")
+        return ACCIDENTAL_EXPLICIT_nf;
+    else if (value == "quarter-flat")
+        return ACCIDENTAL_EXPLICIT_1qf;
+    else if (value == "quarter-sharp")
+        return ACCIDENTAL_EXPLICIT_1qs;
+    else if (value == "three-quarters-flat")
+        return ACCIDENTAL_EXPLICIT_3qf;
+    else if (value == "three-quarters-sharp")
+        return ACCIDENTAL_EXPLICIT_3qs;
     else {
         LogWarning("Unsupported accidental value '%s'", value.c_str());
         return ACCIDENTAL_EXPLICIT_NONE;
@@ -1860,15 +1875,24 @@ data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAccidentalToAccid(std::string val
 
 data_ACCIDENTAL_IMPLICIT MusicXmlInput::ConvertAlterToAccid(float value)
 {
-    if (value == -2) return ACCIDENTAL_IMPLICIT_ff;
-    else if (value == -1.5) return ACCIDENTAL_IMPLICIT_fd;
-    else if (value == -1) return ACCIDENTAL_IMPLICIT_f;
-    else if (value == -0.5) return ACCIDENTAL_IMPLICIT_fu;
-    else if (value == 0) return ACCIDENTAL_IMPLICIT_n;
-    else if (value == 0.5) return ACCIDENTAL_IMPLICIT_sd;
-    else if (value == 1) return ACCIDENTAL_IMPLICIT_s;
-    else if (value == 1.5) return ACCIDENTAL_IMPLICIT_su;
-    else if (value == 2) return ACCIDENTAL_IMPLICIT_ss;
+    if (value == -2)
+        return ACCIDENTAL_IMPLICIT_ff;
+    else if (value == -1.5)
+        return ACCIDENTAL_IMPLICIT_fd;
+    else if (value == -1)
+        return ACCIDENTAL_IMPLICIT_f;
+    else if (value == -0.5)
+        return ACCIDENTAL_IMPLICIT_fu;
+    else if (value == 0)
+        return ACCIDENTAL_IMPLICIT_n;
+    else if (value == 0.5)
+        return ACCIDENTAL_IMPLICIT_sd;
+    else if (value == 1)
+        return ACCIDENTAL_IMPLICIT_s;
+    else if (value == 1.5)
+        return ACCIDENTAL_IMPLICIT_su;
+    else if (value == 2)
+        return ACCIDENTAL_IMPLICIT_ss;
     else {
         LogWarning("Unsupported alter value '%d'", value);
         return ACCIDENTAL_IMPLICIT_NONE;
@@ -1894,25 +1918,40 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repe
 
 data_BOOLEAN MusicXmlInput::ConvertWordToBool(std::string value)
 {
-    if (value == "yes") return BOOLEAN_true;
-    else if (value == "no") return BOOLEAN_false;
-    else return BOOLEAN_NONE;
+    if (value == "yes")
+        return BOOLEAN_true;
+    else if (value == "no")
+        return BOOLEAN_false;
+    else
+        return BOOLEAN_NONE;
 }
 
 data_DURATION MusicXmlInput::ConvertTypeToDur(std::string value)
 {
-    if (value == "maxima") return DURATION_maxima; // this is a mensural MEI value
-    else if (value == "long") return DURATION_long; // mensural MEI value longa isn't supported
-    else if (value == "breve") return DURATION_breve;
-    else if (value == "whole") return DURATION_1;
-    else if (value == "half") return DURATION_2;
-    else if (value == "quarter") return DURATION_4;
-    else if (value == "eighth") return DURATION_8;
-    else if (value == "16th") return DURATION_16;
-    else if (value == "32nd") return DURATION_32;
-    else if (value == "64th") return DURATION_64;
-    else if (value == "128th") return DURATION_128;
-    else if (value == "256th") return DURATION_256;
+    if (value == "maxima")
+        return DURATION_maxima; // this is a mensural MEI value
+    else if (value == "long")
+        return DURATION_long; // mensural MEI value longa isn't supported
+    else if (value == "breve")
+        return DURATION_breve;
+    else if (value == "whole")
+        return DURATION_1;
+    else if (value == "half")
+        return DURATION_2;
+    else if (value == "quarter")
+        return DURATION_4;
+    else if (value == "eighth")
+        return DURATION_8;
+    else if (value == "16th")
+        return DURATION_16;
+    else if (value == "32nd")
+        return DURATION_32;
+    else if (value == "64th")
+        return DURATION_64;
+    else if (value == "128th")
+        return DURATION_128;
+    else if (value == "256th")
+        return DURATION_256;
     else {
         LogWarning("Unsupported type '%s'", value.c_str());
         return DURATION_NONE;
@@ -1921,13 +1960,20 @@ data_DURATION MusicXmlInput::ConvertTypeToDur(std::string value)
 
 data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(std::string value)
 {
-    if (value == "C") return PITCHNAME_c;
-    else if (value == "D") return PITCHNAME_d;
-    else if (value == "E") return PITCHNAME_e;
-    else if (value == "F") return PITCHNAME_f;
-    else if (value == "G") return PITCHNAME_g;
-    else if (value == "A") return PITCHNAME_a;
-    else if (value == "B") return PITCHNAME_b;
+    if (value == "C")
+        return PITCHNAME_c;
+    else if (value == "D")
+        return PITCHNAME_d;
+    else if (value == "E")
+        return PITCHNAME_e;
+    else if (value == "F")
+        return PITCHNAME_f;
+    else if (value == "G")
+        return PITCHNAME_g;
+    else if (value == "A")
+        return PITCHNAME_a;
+    else if (value == "B")
+        return PITCHNAME_b;
     else {
         LogWarning("Unsupported pitch name '%s'", value.c_str());
         return PITCHNAME_NONE;
@@ -1936,23 +1982,32 @@ data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(std::string value)
 
 curvature_CURVEDIR MusicXmlInput::ConvertOrientationToCurvedir(std::string value)
 {
-    if (value == "over") return curvature_CURVEDIR_above;
-    else if (value == "under") return curvature_CURVEDIR_below;
-    else return curvature_CURVEDIR_NONE;
+    if (value == "over")
+        return curvature_CURVEDIR_above;
+    else if (value == "under")
+        return curvature_CURVEDIR_below;
+    else
+        return curvature_CURVEDIR_NONE;
 }
 
 fermataVis_SHAPE MusicXmlInput::ConvertFermataShape(std::string value)
 {
-    if (value == "normal") return fermataVis_SHAPE_curved;
-    else if (value == "angled") return fermataVis_SHAPE_angular;
-    else if (value == "square") return fermataVis_SHAPE_square;
-    else return fermataVis_SHAPE_NONE;
+    if (value == "normal")
+        return fermataVis_SHAPE_curved;
+    else if (value == "angled")
+        return fermataVis_SHAPE_angular;
+    else if (value == "square")
+        return fermataVis_SHAPE_square;
+    else
+        return fermataVis_SHAPE_NONE;
 }
 
 pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(std::string value)
 {
-    if (value == "start") return pedalLog_DIR_down;
-    else if (value == "stop") return pedalLog_DIR_up;
+    if (value == "start")
+        return pedalLog_DIR_down;
+    else if (value == "stop")
+        return pedalLog_DIR_up;
     else {
         LogWarning("Unsupported type '%s' for pedal", value.c_str());
         return pedalLog_DIR_NONE;
@@ -1961,9 +2016,12 @@ pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(std::string value)
 
 tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(std::string value)
 {
-    if (value == "actual") return tupletVis_NUMFORMAT_count;
-    else if (value == "both") return tupletVis_NUMFORMAT_ratio;
-    else return tupletVis_NUMFORMAT_NONE;
+    if (value == "actual")
+        return tupletVis_NUMFORMAT_count;
+    else if (value == "both")
+        return tupletVis_NUMFORMAT_ratio;
+    else
+        return tupletVis_NUMFORMAT_NONE;
 }
 
 } // namespace vrv
