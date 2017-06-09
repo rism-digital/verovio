@@ -192,10 +192,14 @@ void Doc::ExportMIDI(MidiFile *midiFile)
     Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
     this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams);
 
-    // Then first calculate the maximum duration of each measure
+    // Then calculate the onset and offset times (w.r.t. the measure) for every note
     CalcOnsetOffsetParams calcOnsetOffsetParams;
     Functor calcOnsetOffset(&Object::CalcOnsetOffset);
     this->Process(&calcOnsetOffset, &calcOnsetOffsetParams);
+
+    // Adjust the duration of tied notes
+    Functor resolveMIDITies(&Object::ResolveMIDITies);
+    this->Process(&resolveMIDITies, NULL);
 
     // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
     PrepareProcessingListsParams prepareProcessingListsParams;

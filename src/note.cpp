@@ -382,6 +382,21 @@ int Note::GetRealTimeOffsetMilliseconds(void)
     return m_realTimeOffsetMilliseconds;
 }
 
+void Note::SetScoreTimeTiedDuration(double scoreTime)
+{
+    m_scoreTimeTiedDuration = scoreTime;
+}
+
+double Note::GetScoreTimeTiedDuration(void)
+{
+    return m_scoreTimeTiedDuration;
+}
+
+double Note::GetScoreTimeDuration(void)
+{
+    return GetScoreTimeOffset() - GetScoreTimeOnset();
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -790,8 +805,15 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
+    // If the note is a secondary tied note, then ignore it
+    if (this->GetScoreTimeTiedDuration() < 0.0) {
+        return FUNCTOR_SIBLINGS;
+    }
+
     // For now just ignore grace notes
-    if (this->HasGrace()) return FUNCTOR_CONTINUE;
+    if (this->HasGrace()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     Accid *accid = this->GetDrawingAccid();
 
@@ -846,15 +868,15 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     int channel = 0;
     int velocity = 64;
 
-    double starttime = params->m_totalTime + m_scoreTimeOnset;
-    double stoptime = params->m_totalTime + m_scoreTimeOffset;
+    double starttime = params->m_totalTime + this->GetScoreTimeOnset();
+    double stoptime = params->m_totalTime + this->GetScoreTimeOffset() + this->GetScoreTimeTiedDuration();
 
     int tpq = params->m_midiFile->getTPQ();
 
     params->m_midiFile->addNoteOn(params->m_midiTrack, starttime * tpq, channel, pitch, velocity);
     params->m_midiFile->addNoteOff(params->m_midiTrack, stoptime * tpq, channel, pitch);
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
