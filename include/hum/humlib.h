@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jun  6 19:44:22 CEST 2017
+// Last Modified: Thu, Jun  8, 2017 10:59:56 PM
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -3099,7 +3099,6 @@ class Tool_dissonant : public HumTool {
 		                            int sliceindex);
 		void    fillLabels         (void);
 		void    fillLabels2        (void);
-		void	collapseSus	       (void);
 		void    printCountAnalysis (vector<vector<string> >& data);
 		void    suppressDissonances(HumdrumFile& infile, NoteGrid& grid,
 		                            vector<vector<NoteCell* > >& attacks,
@@ -3134,23 +3133,27 @@ class Tool_dissonant : public HumTool {
 		const int CAMBIATA_DOWN_S      =  7; // descending short nota cambiata
 		const int CAMBIATA_UP_L        =  8; // ascending long nota cambiata
 		const int CAMBIATA_DOWN_L      =  9; // descending long nota cambiata
-		const int IPOSTHI_NEIGHBOR     = 10; // incomplete posterior upper neighbor
-		const int IPOSTLOW_NEIGHBOR    = 11; // incomplete posterior lower neighbor
-		const int IANTHI_NEIGHBOR      = 12; // incomplete anterior upper neighbor
-		const int IANTLOW_NEIGHBOR     = 13; // incomplete anterior lower neighbor
-		const int ANT_UP               = 14; // rising anticipation
-		const int ANT_DOWN             = 15; // descending anticipation
+		// const int IPOSTHI_NEIGHBOR     = 10; // incomplete posterior upper neighbor
+		// const int IPOSTLOW_NEIGHBOR    = 11; // incomplete posterior lower neighbor
+		// const int IANTHI_NEIGHBOR      = 12; // incomplete anterior upper neighbor
+		// const int IANTLOW_NEIGHBOR     = 13; // incomplete anterior lower neighbor
+		const int ANT_UP               = 10; // rising anticipation
+		const int ANT_DOWN             = 11; // descending anticipation
 
-		// unaccdented non-harmonic tones:
-		const int THIRD_QUARTER        = 16; // dissonant third quarter
-		const int SUS_BIN  	           = 17; // binary suspension
-		const int SUS_TERN  	       = 18; // ternary suspension
-		const int AGENT_BIN		       = 19; // binary agent
-		const int AGENT_TERN		   = 20; // ternary agent
-		const int SUSPENSION_ORNAM     = 21; // suspension ornament
-		const int SUSPENSION_REP       = 22; // suspension repeated note
-		const int FAKE_SUSPENSION_UP   = 23; // fake suspension approached by step up
-		const int FAKE_SUSPENSION_DOWN = 24; // fake suspension approached by step down
+		// accented non-harmonic tones:
+		const int THIRD_Q_PASS         = 12; // dissonant third quarter
+		const int THIRD_Q_UPPER_NEI    = 13; // dissonant third quarter
+		const int THIRD_Q_LOWER_NEI    = 14; // dissonant third quarter
+		const int SUS_BIN  	           = 15; // binary suspension
+		const int SUS_TERN  	       = 16; // ternary suspension
+		const int AGENT_BIN		       = 17; // binary agent
+		const int AGENT_TERN		   = 18; // ternary agent
+		const int SUSPENSION_ORNAM     = 19; // suspension ornament
+		const int SUSPENSION_REP       = 20; // suspension repeated note
+		const int FAKE_SUSPENSION_UP   = 21; // fake suspension approached by step up
+		const int FAKE_SUSPENSION_DOWN = 22; // fake suspension approached by step down
+		const int SUS_NO_AGENT_UP      = 23; // suspension missing a normal agent approached by step up
+		const int SUS_NO_AGENT_DOWN    = 24; // suspension missing a normal agent approached by step down
 		const int CHANSON_IDIOM        = 25; // chanson idiom
 
 		// unknown dissonances:

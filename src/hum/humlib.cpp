@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jun  6 19:44:22 CEST 2017
+// Last Modified: Thu, Jun  8, 2017 10:59:56 PM
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -21389,7 +21389,6 @@ Tool_dissonant::Tool_dissonant(void) {
 	define("s|suppress=b",        "suppress dissonant notes");
 	define("d|diatonic=b",        "print diatonic grid");
 	define("D|no-dissonant=b",    "don't do dissonance anaysis");
-	define("t|ternary=b",		  "distinguish between binary and ternary suspensions and agents");
 	define("m|midi-pitch=b",      "print midi-pitch grid");
 	define("b|base-40=b",         "print base-40 grid");
 	define("l|metric-levels=b",   "use metric levels in analysis");
@@ -21416,10 +21415,6 @@ bool Tool_dissonant::run(const string& indata, ostream& out) {
 	} else {
 		fillLabels();
 	}
-	
-	if (not getBoolean("ternary")) {
-		collapseSus();
-	}
 
 	HumdrumFile infile(indata);
 	bool status = run(infile);
@@ -21440,10 +21435,6 @@ bool Tool_dissonant::run(HumdrumFile& infile, ostream& out) {
 		fillLabels();
 	}
 
-	if (not getBoolean("ternary")) {
-		collapseSus();
-	}
-
 	int status = run(infile);
 	if (hasAnyText()) {
 		getAllText(out);
@@ -21460,10 +21451,6 @@ bool Tool_dissonant::run(HumdrumFile& infile) {
 		fillLabels2();
 	} else {
 		fillLabels();
-	}
-
-	if (not getBoolean("ternary")) {
-		collapseSus();
 	}
 
 	NoteGrid grid(infile);
@@ -21763,7 +21750,7 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 	HumNum durp;       // duration of previous melodic note;
 	HumNum dur;        // duration of current note;
 	HumNum durn;       // duration of next melodic note;
-	HumNum susdur = -1; // duration of previous note in other voice;
+	HumNum odur = -1; // duration of current note in other voice which may have started earlier;
 	HumNum odurn = -1; // duration of next note in other voice;
 	double intp;       // diatonic interval from previous melodic note
 	double intn;       // diatonic interval to next melodic note
@@ -21873,7 +21860,6 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 				dissonant = true;
 				diss4Q = true;
 				marking = 'N';
-				// unexp_label = m_labels[UNLABELED_Z4];
 				unexp_label = m_labels[UNLABELED_Z4];
 				// ovoiceindex = lowestnotei;
 				ovoiceindex = j;
@@ -21953,17 +21939,6 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 
 		// Suspension test cases ////////////////////////////////////////////////
 
-		// valid_sus_acc: determines if the reference voice conforms to the
-		// standards of the accompaniment voice for suspensions.
-
-		// Condition 1: The reference (accompaniment) voice moved to a different
-		//    pitch class at the onset of this dissonant interval) &&
-		bool condition1 = true;
-		if (intp == 0) {
-			// no repeated note attacks
-			condition1 = false;
-		}
-
 		// Condition 2: The other (dissonant) voice stayed in place or repeated the
 		//    same pitch at the onset of this dissonant interval.
 		bool condition2 = true;
@@ -21983,7 +21958,8 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 
 		int oattackindexp = grid.cell(ovoiceindex, sliceindex)->getPrevAttackIndex();
 		int oattackindexc = grid.cell(ovoiceindex, sliceindex)->getCurrAttackIndex();
-		susdur = grid.cell(ovoiceindex, oattackindexc)->getDuration();
+		odur = grid.cell(ovoiceindex, oattackindexc)->getDuration();
+		int olineindexc = grid.cell(ovoiceindex, oattackindexc)->getLineIndex();
 		double opitchp = NAN;
 		if (oattackindexp >= 0) {
 			opitchp = grid.cell(ovoiceindex, oattackindexp)->getAbsDiatonicPitch();
@@ -22013,13 +21989,15 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 
 		// Condition 3: The other (dissonant) voice leaves its note before
 		//    or at the same time as the accompaniment (reference) voice leaves
-		//    its pitch class.  [The other (accompaniment) voice can leave its pitch
-		//    class for another note or for a rest.]
+		//    its pitch class.  [The voices can leave their pitch classes for 
+		//    another note or for a rest.]
 		bool condition3a = oattackindexn <= attackindexn ? true : false;
 
 		// For ornamented suspensions.
 		bool condition3b = oattackindexnn <= attackindexn ? true : false;
 
+		// valid_sus_acc: determines if the reference voice conforms to the
+		// standards of the accompaniment voice for suspensions.
 		bool valid_sus_acc = condition2 && condition3a;
 		bool valid_ornam_sus_acc = condition2 && condition3b;
 
@@ -22047,18 +22025,18 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 		}
 
 		ternAgent = false;
-		if (((othMeterNum % 3 == 0) && (susdur >= othMeterDen)) && // the durational value of the meter's denominator groups in threes and the sus lasts at least as long as the denominator
-		 		((dur == othMeterDen*2) || // the ref note lasts 2 times as long as the meter's denominator
-		 		 ((dur == othMeterDen*threehalves) && ((intn == 0) || (intn == -1))) || // ref note lasts 1.5 times the meter's denominator and next note is a tenorizans ornament
-		 		 ((dur == sixteenthirds) && (refMeterNum == 3) && (refMeterDen == threehalves)) || // special case for 3/3 time signature
-		 		 ((susdur == othMeterDen*threehalves) && (ointn == -1) && (odurn == 2) && (ointnn == 0)) || // change of agent suspension with ant of resolution
-		 		 ((dur == othMeterDen) && (susdur == othMeterDen*2))) && // unornamented change of agent suspension
-		 		(results[ovoiceindex][lineindex] != m_labels[SUS_BIN])) { // the other voice hasn't already been labeled as a binary suspension
-		 	ternAgent = true;
+		if (((othMeterNum % 3 == 0) && (odur >= othMeterDen)) && // the durational value of the meter's denominator groups in threes and the sus lasts at least as long as the denominator
+				((dur == othMeterDen*2) || // the ref note lasts 2 times as long as the meter's denominator
+				 ((dur == othMeterDen*threehalves) && ((intn == 0) || (intn == -1))) || // ref note lasts 1.5 times the meter's denominator and next note is a tenorizans ornament
+				 ((dur == sixteenthirds) && (refMeterNum == 3) && (refMeterDen == threehalves)) || // special case for 3/3 time signature
+				 ((odur == othMeterDen*threehalves) && (ointn == -1) && (odurn == 2) && (ointnn == 0)) || // change of agent suspension with ant of resolution
+				 ((dur == othMeterDen) && (odur == othMeterDen*2))) && // unornamented change of agent suspension
+				(results[ovoiceindex][lineindex] != m_labels[SUS_BIN])) { // the other voice hasn't already been labeled as a binary suspension
+			ternAgent = true;
 		}
 
 
-		if (((lev >= levn) || ((lev == 2) && (dur == .5) && condition2)) && 
+		if (((lev >= levn) || ((lev == 2) && (dur == .5))) && condition2 && 
 			(dur <= 2) && (dur <= durp) && (lev >= levp) && valid_acc_exit) { // weak dissonances
 			if (intp == -1) { // descending dissonances
 				if (intn == -1) {
@@ -22071,8 +22049,8 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 					results[vindex][lineindex] = m_labels[ECHAPPE_DOWN]; // lower échappée
 				} else if (intn == -2) {
 					results[vindex][lineindex] = m_labels[CAMBIATA_DOWN_S]; // descending short nota cambiata
-				} else if (intn < -2) {
-					results[vindex][lineindex] = m_labels[IPOSTLOW_NEIGHBOR]; // incomplete posterior lower neighbor
+				// } else if (intn < -2) {
+				// 	results[vindex][lineindex] = m_labels[IPOSTLOW_NEIGHBOR]; // incomplete posterior lower neighbor
 				}
 			} else if (intp == 1) { // ascending dissonances
 				if (intn == 1) {
@@ -22085,22 +22063,40 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 					results[vindex][lineindex] = m_labels[ANT_UP]; // rising anticipation
 				} else if (intn == 2) {
 					results[vindex][lineindex] = m_labels[CAMBIATA_UP_S]; // ascending short nota cambiata
-				} else if (intn > 2) {
-					results[vindex][lineindex] = m_labels[IPOSTHI_NEIGHBOR]; // incomplete posterior upper neighbor
+				// } else if (intn > 2) {
+				// 	results[vindex][lineindex] = m_labels[IPOSTHI_NEIGHBOR]; // incomplete posterior upper neighbor
 				}
-			} else if ((intp < -2) && (intn == 1)) {
-				results[vindex][lineindex] = m_labels[IANTLOW_NEIGHBOR]; // incomplete anterior lower neighbor
-			} else if ((intp > 2) && (intn == -1)) {
-				results[vindex][lineindex] = m_labels[IANTHI_NEIGHBOR]; // incomplete anterior upper neighbor
+			// } else if ((intp < -2) && (intn == 1)) {
+			// 	results[vindex][lineindex] = m_labels[IANTLOW_NEIGHBOR]; // incomplete anterior lower neighbor
+			// } else if ((intp > 2) && (intn == -1)) {
+			// 	results[vindex][lineindex] = m_labels[IANTHI_NEIGHBOR]; // incomplete anterior upper neighbor
 			}
-		} else if ((durp >= 2) && (dur == 1) && (lev < levn) &&
-			(intp == -1) && (intn == -1) && valid_acc_exit
-			) {
-			results[vindex][lineindex] = m_labels[THIRD_QUARTER]; // dissonant third quarter
+		} else if ((durp >= 2) && (dur == 1) && (lev < levn) && condition2 && 
+				   valid_acc_exit) {
+			if (intp == -1) {
+				if (intn == -1) {
+					results[vindex][lineindex] = m_labels[THIRD_Q_PASS]; // dissonant third quarter descending passing tone
+				} else if (intn == 1) {
+					results[vindex][lineindex] = m_labels[THIRD_Q_LOWER_NEI]; // dissonant third quarter lower neighbor
+				}
+			} else if ((intp == 1) && (intn == -1)) {
+				results[vindex][lineindex] = m_labels[THIRD_Q_UPPER_NEI]; // dissonant third quarter upper neighbor
+			}
+		} else if ((lev > levp) && (lev == levn) && condition2 && (intn == -1) &&
+				   (dur == (durn+durn)) && (dur == (durp+durp)) && ((dur+dur) == odur)) {
+			if (intp == 1) {
+				results[vindex][lineindex] = m_labels[SUS_NO_AGENT_UP];
+			} else if (intp == -1) {
+				results[vindex][lineindex] = m_labels[SUS_NO_AGENT_DOWN];
+			}
 		}
 
-/////////////////////////////
-//// Code to apply binary or ternary suspension and agent labels
+
+		/////////////////////////////
+		////
+		//// Code to apply binary or ternary suspension and agent labels
+		////
+
 		else if (valid_sus_acc && (ointn == -1)) {
 			if (ternAgent) {
 				results[vindex][lineindex] = m_labels[AGENT_TERN]; // ternary agent
@@ -22141,33 +22137,35 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 			double levnn = attacks[i+2]->getMetricLevel(); // lev of note after next
 
 			if ((dur == durn) && (lev == 1) && (levn == 2) && (levnn == 0) &&
-				(intp == -1) && (intn == -1) && (intnn == 1) && valid_acc_exit
-				) {
+					(intp == -1) && (intn == -1) && (intnn == 1) && valid_acc_exit
+					) {
 				results[vindex][lineindex] = m_labels[CHANSON_IDIOM]; // chanson idiom
 
 			} else if ((dur <= durp) && (lev >= levp) && (lev >= levn) &&
-				(intp == -1) && (intn == -2) && (intnn == 1)) {
+					(intp == -1) && (intn == -2) && (intnn == 1)) {
 				results[vindex][lineindex] = m_labels[CAMBIATA_DOWN_L]; // long-form descending cambiata
 			} else if ((dur <= durp) && (lev >= levp) && (lev >= levn) &&
-				(intp == 1) && (intn == 2) && (intnn == -1)) {
+					(intp == 1) && (intn == 2) && (intnn == -1)) {
 				results[vindex][lineindex] = m_labels[CAMBIATA_UP_L]; // long-form ascending nota cambiata
 			}
 		}
 
 		// Decide whether to give an unexplained dissonance label to the ref.
 		// voice if none of the dissonant conditions above apply.
-		if (results[vindex][lineindex] == "") { // ref. voice doesn't  have a diss label
-			if ((Convert::isNaN(intp) && (not Convert::isNaN(ointp)) &&
-				 (not Convert::isNaN(ointn))) ||
-				 // ref. voice is approached or left by leap but the other voice resolves by step
-				 (((abs((int)intp) > 1) || (abs((int)intn) > 1)) && (abs((int)ointn) == 1))) {
-				continue;
-			} else if (((not Convert::isNaN(intp)) && condition2) || // ref. voice repeated or moved into diss obliquely
-				 (((condition1) && (ointp != 0)) && // both voices moved to new pitches at start of diss
-				 (attackindexn <= oattackindexn)) // and the other voice doesn't leave diss. first
-				){
-				results[vindex][lineindex] = unexp_label;
-			}
+		bool refLeaptTo = fabs(intp) > 1 ? true : false;
+		bool othLeaptTo = fabs(ointp) > 1 ? true : false;
+		bool refLeaptFrom = fabs(intn) > 1 ? true : false;
+		bool othLeaptFrom = fabs(ointn) > 1 ? true : false;
+
+		if ((results[vindex][lineindex] == "") && // this voice doesn't already have a dissonance label
+			((olineindexc < lineindex) || // other voice does not attack at this point
+				((olineindexc == lineindex) && (dur < odur)) || // both voices attack together, but ref voice leaves dissonance first
+				(((olineindexc == lineindex) && (dur == odur)) && // both voices enter and leave dissonance simultaneously
+				 ((!refLeaptFrom && othLeaptFrom) || // ref voice leaves diss by step and other voice leaves by leap
+				  (refLeaptTo && refLeaptFrom && othLeaptTo && othLeaptFrom) || // both voices enter and leave diss by leap
+				  (!refLeaptTo && !refLeaptFrom && !othLeaptTo && !othLeaptFrom) || // both voices enter and leave by step
+				  (!refLeaptTo && refLeaptFrom && othLeaptFrom))))) { // ref voice enters diss by step and both voices leave by leap
+			results[vindex][lineindex] = unexp_label;
 		}
 	}
 }
@@ -22183,12 +22181,14 @@ void Tool_dissonant::findFakeSuspensions(vector<vector<string> >& results, NoteG
 		vector<NoteCell*>& attacks, int vindex) {
 	double intp;        // diatonic interval from previous melodic note
 	int lineindexn;     // line index of the next note in the voice
-	bool sfound;        // boolean for if a suspension if found after a Z dissonance
+	bool sfound;        // boolean for if a suspension is found after a Z dissonance
 
 	for (int i=1; i<(int)attacks.size()-1; i++) {
 		int lineindex = attacks[i]->getLineIndex();
 		if ((results[vindex][lineindex].find("Z") == string::npos) &&
-			(results[vindex][lineindex].find("z") == string::npos)) {
+			(results[vindex][lineindex].find("z") == string::npos) &&
+			(results[vindex][lineindex].find("M") == string::npos) &&
+			(results[vindex][lineindex].find("m") == string::npos)) {
 			continue;
 		}
 		intp = *attacks[i] - *attacks[i-1];
@@ -22370,23 +22370,25 @@ void Tool_dissonant::fillLabels(void) {
 	m_labels[CAMBIATA_DOWN_S     ] = "c"; // descending short nota cambiata
 	m_labels[CAMBIATA_UP_L       ] = "K"; // ascending long nota cambiata
 	m_labels[CAMBIATA_DOWN_L     ] = "k"; // descending long nota cambiata
-	m_labels[IPOSTHI_NEIGHBOR    ] = "J"; // incomplete posterior upper neighbor
-	m_labels[IPOSTLOW_NEIGHBOR   ] = "j"; // incomplete posterior lower neighbor
-	m_labels[IANTHI_NEIGHBOR     ] = "I"; // incomplete anterior upper neighbor
-	m_labels[IANTLOW_NEIGHBOR    ] = "i"; // incomplete anterior lower neighbor
+	// m_labels[IPOSTHI_NEIGHBOR    ] = "J"; // incomplete posterior upper neighbor
+	// m_labels[IPOSTLOW_NEIGHBOR   ] = "j"; // incomplete posterior lower neighbor
+	// m_labels[IANTHI_NEIGHBOR     ] = "I"; // incomplete anterior upper neighbor
+	// m_labels[IANTLOW_NEIGHBOR    ] = "i"; // incomplete anterior lower neighbor
 	m_labels[ANT_UP              ] = "A"; // rising anticipation
 	m_labels[ANT_DOWN            ] = "a"; // descending anticipation
-	m_labels[THIRD_QUARTER       ] = "q"; // dissonant third quarter
-	// m_labels[SUSPENSION          ] = "s"; // suspension
-	m_labels[SUS_BIN			 ] = "s2"; // binary suspension
-	m_labels[SUS_TERN			 ] = "s3"; // ternary suspension
-	// m_labels[SUSPENSION_AGENT    ] = "G"; // suspension agent
-	m_labels[AGENT_BIN			 ] = "G2"; // binary agent
-	m_labels[AGENT_TERN			 ] = "G3"; // ternary agent
+	m_labels[THIRD_Q_PASS        ] = "q"; // dissonant third quarter descending passing tone
+	m_labels[THIRD_Q_UPPER_NEI   ] = "B"; // dissonant third quarter upper neighbor
+	m_labels[THIRD_Q_LOWER_NEI   ] = "b"; // dissonant third quarter lower neighbor
+	m_labels[SUS_BIN             ] = "s"; // binary suspension
+	m_labels[SUS_TERN            ] = "S"; // ternary suspension
+	m_labels[AGENT_BIN           ] = "g"; // binary agent
+	m_labels[AGENT_TERN          ] = "G"; // ternary agent
 	m_labels[SUSPENSION_ORNAM    ] = "o"; // suspension ornament
 	m_labels[SUSPENSION_REP      ] = "r"; // suspension repeated note
 	m_labels[FAKE_SUSPENSION_UP  ] = "F"; // fake suspension approached by step up
 	m_labels[FAKE_SUSPENSION_DOWN] = "f"; // fake suspension approached by step down
+	m_labels[SUS_NO_AGENT_UP     ] = "M"; // suspension missing a normal agent approached by step up
+	m_labels[SUS_NO_AGENT_DOWN   ] = "m"; // suspension missing a normal agent approached by step down
 	m_labels[CHANSON_IDIOM       ] = "h"; // chanson idiom
 	m_labels[UNKNOWN_DISSONANCE  ] = "Z"; // unknown dissonance
 	m_labels[UNLABELED_Z2        ] = "Z"; // unknown dissonance, 2nd interval
@@ -22414,23 +22416,25 @@ void Tool_dissonant::fillLabels2(void) {
 	m_labels[CAMBIATA_DOWN_S     ] = "C"; // descending short nota cambiata
 	m_labels[CAMBIATA_UP_L       ] = "K"; // ascending long nota cambiata
 	m_labels[CAMBIATA_DOWN_L     ] = "K"; // descending long nota cambiata
-	m_labels[IPOSTHI_NEIGHBOR    ] = "J"; // incomplete posterior upper neighbor
-	m_labels[IPOSTLOW_NEIGHBOR   ] = "J"; // incomplete posterior lower neighbor
-	m_labels[IANTHI_NEIGHBOR     ] = "I"; // incomplete anterior upper neighbor
-	m_labels[IANTLOW_NEIGHBOR    ] = "I"; // incomplete anterior lower neighbor
+	// m_labels[IPOSTHI_NEIGHBOR    ] = "J"; // incomplete posterior upper neighbor
+	// m_labels[IPOSTLOW_NEIGHBOR   ] = "J"; // incomplete posterior lower neighbor
+	// m_labels[IANTHI_NEIGHBOR     ] = "I"; // incomplete anterior upper neighbor
+	// m_labels[IANTLOW_NEIGHBOR    ] = "I"; // incomplete anterior lower neighbor
 	m_labels[ANT_UP              ] = "A"; // rising anticipation
 	m_labels[ANT_DOWN            ] = "A"; // descending anticipation
-	m_labels[THIRD_QUARTER       ] = "Q"; // dissonant third quarter
-	// m_labels[SUSPENSION          ] = "S"; // suspension
-	m_labels[SUS_BIN			 ] = "S2"; // binary suspension
-	m_labels[SUS_TERN			 ] = "S3"; // ternary suspension
-	// m_labels[SUSPENSION_AGENT    ] = "G"; // suspension agent
-	m_labels[AGENT_BIN			 ] = "G2"; // binary agent
-	m_labels[AGENT_TERN			 ] = "G3"; // ternary agent
+	m_labels[THIRD_Q_PASS        ] = "Q"; // dissonant third quarter
+	m_labels[THIRD_Q_UPPER_NEI   ] = "B"; // dissonant third quarter upper neighbor
+	m_labels[THIRD_Q_LOWER_NEI   ] = "B"; // dissonant third quarter lower neighbor
+	m_labels[SUS_BIN             ] = "S"; // binary suspension
+	m_labels[SUS_TERN            ] = "S"; // ternary suspension
+	m_labels[AGENT_BIN           ] = "G"; // binary agent
+	m_labels[AGENT_TERN          ] = "G"; // ternary agent
 	m_labels[SUSPENSION_ORNAM    ] = "O"; // suspension ornament
 	m_labels[SUSPENSION_REP      ] = "R"; // suspension repeated note
 	m_labels[FAKE_SUSPENSION_UP  ] = "F"; // fake suspension approached by step up
 	m_labels[FAKE_SUSPENSION_DOWN] = "F"; // fake suspension approached by step down
+	m_labels[SUS_NO_AGENT_UP     ] = "M"; // suspension missing a normal agent approached by step up
+	m_labels[SUS_NO_AGENT_DOWN   ] = "M"; // suspension missing a normal agent approached by step down
 	m_labels[CHANSON_IDIOM       ] = "H"; // chanson idiom
 	m_labels[UNKNOWN_DISSONANCE  ] = "Z"; // unknown dissonance
 	m_labels[UNLABELED_Z2        ] = "Z"; // unknown dissonance, 2nd interval
@@ -22438,12 +22442,6 @@ void Tool_dissonant::fillLabels2(void) {
 	m_labels[UNLABELED_Z4        ] = "Z"; // unknown dissonance, 4th interval
 }
 
-void Tool_dissonant::collapseSus(void) { // call if you don't want to distinguish between binary/ternary suspensions and agents.
-	m_labels[SUS_BIN] = m_labels[SUS_BIN][0];
-	m_labels[SUS_TERN] = m_labels[SUS_TERN][0];
-	m_labels[AGENT_BIN] = m_labels[AGENT_BIN][0];
-	m_labels[AGENT_TERN] = m_labels[AGENT_TERN][0];
-}
 
 
 
