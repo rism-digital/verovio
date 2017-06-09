@@ -38,8 +38,7 @@ midiplayer: true
         $( ".note" ).click(function() {
             var id = $(this).attr("id");
             var time = vrvToolkit.getTimeForElement(id);
-            // bug! time needs to be divided by 2
-            $("#midi-player").midiPlayer.seek(time / 2);
+            $("#midi-player").midiPlayer.seek(time);
         });
         
     }
