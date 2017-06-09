@@ -282,15 +282,14 @@ void Measure::UpgradePageBasedMEI(System *system)
 
 int Measure::EnclosesTime(int time) const
 {
-    int repeat = 0;
-    int timeDuration = int(
-        m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5);
+    int repeat = 1;
+    int timeDuration = int(m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5);
     std::vector<int>::const_iterator iter;
     for (iter = m_realTimeOffsetMilliseconds.begin(); iter != m_realTimeOffsetMilliseconds.end(); iter++) {
-        repeat++;
         if ((time >= *iter) && (time <= *iter + timeDuration)) return repeat;
+        repeat++;
     }
-    return repeat;
+    return 0;
 }
 
 int Measure::GetRealTimeOffsetMilliseconds(int repeat) const
