@@ -560,4 +560,18 @@ int Chord::PrepareTieAttrEnd(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+
+int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
+{
+    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
+    assert(params);
+
+    double incrementScoreTime = this->GetAlignmentDuration() / (DUR_MAX / DURATION_4);
+    double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
+
+    params->m_currentScoreTime += incrementScoreTime;
+    params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
+
+    return FUNCTOR_CONTINUE;
+}
 }

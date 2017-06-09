@@ -1153,10 +1153,12 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
 
         Chord *chord = note->IsChordTone();
 
-        if (chord)
+        if (chord) {
             incrementScoreTime = chord->GetAlignmentDuration();
-        else
+        }
+        else {
             incrementScoreTime = note->GetAlignmentDuration();
+        }
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
 

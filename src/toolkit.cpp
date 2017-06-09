@@ -905,25 +905,25 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     if (!m_doc.GetMidiExportDone()) {
         return o.json();
     }
-    
+
     MeasureOnsetOffsetComparison matchMeasureTime(millisec);
     Measure *measure = dynamic_cast<Measure *>(m_doc.FindChildByAttComparison(&matchMeasureTime));
-        
+
     if (!measure) {
         return o.json();
     }
-    
+
     int repeat = measure->EnclosesTime(millisec);
     int measureTimeOffset = measure->GetRealTimeOffsetMilliseconds(repeat);
-    
+
     // Get the pageNo from the first note (if any)
     int pageNo = -1;
     Page *page = dynamic_cast<Page *>(measure->GetFirstParent(PAGE));
     if (page) pageNo = page->GetIdx() + 1;
-    
+
     NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
     ArrayOfObjects notes;
-    
+
     measure->FindAllChildByAttComparison(&notes, &matchNoteTime);
 
     // Fill the JSON object
