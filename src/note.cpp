@@ -349,7 +349,7 @@ void Note::SetScoreTimeOnset(double scoreTime)
 
 void Note::SetRealTimeOnsetSeconds(double timeInSeconds)
 {
-    m_realTimeOnsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5) / 1000;
+    m_realTimeOnsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
 }
 
 void Note::SetScoreTimeOffset(double scoreTime)
@@ -359,7 +359,7 @@ void Note::SetScoreTimeOffset(double scoreTime)
 
 void Note::SetRealTimeOffsetSeconds(double timeInSeconds)
 {
-    m_realTimeOffsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5) / 1000;
+    m_realTimeOffsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
 }
 
 double Note::GetScoreTimeOnset(void)

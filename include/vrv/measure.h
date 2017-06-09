@@ -172,6 +172,17 @@ public:
      * Custom method for upgrading page-based unmeasured transcription data
      */
     void UpgradePageBasedMEI(System *system);
+    
+    /**
+     * Check if the measure encloses the given time (in millisecond)
+     * Return the playing repeat time (1-based), 0 otherwise
+     */
+    int EnclosesTime(int time) const;
+    
+    /**
+     * Return the real time offset in millisecond for the repeat (1-based).
+     */
+    int GetRealTimeOffsetMilliseconds(int repeat) const;
 
     //----------//
     // Functors //

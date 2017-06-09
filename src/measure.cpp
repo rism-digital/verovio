@@ -279,6 +279,25 @@ void Measure::UpgradePageBasedMEI(System *system)
     this->m_xAbs = system->m_systemLeftMar;
     this->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;
 }
+    
+int Measure::EnclosesTime(int time) const
+{
+    int repeat = 0;
+    int timeDuration = int(m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5);
+    std::vector<int>::const_iterator iter;
+    for (iter = m_realTimeOffsetMilliseconds.begin(); iter != m_realTimeOffsetMilliseconds.end(); iter++) {
+        repeat++;
+        if ((time >= *iter) && (time <= *iter + timeDuration)) return repeat;
+    }
+    return repeat;    
+}
+    
+    
+int Measure::GetRealTimeOffsetMilliseconds(int repeat) const
+{
+    if ((repeat < 1) || repeat > (int)m_realTimeOffsetMilliseconds.size()) return 0;
+    return m_realTimeOffsetMilliseconds.at(repeat - 1); 
+}
 
 //----------------------------------------------------------------------------
 // Measure functor methods
@@ -869,7 +888,7 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     m_currentTempo = params->m_currentTempo;
 
     m_realTimeOffsetMilliseconds.clear();
-    m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5) / 1000);
+    m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));
     params->m_maxCurrentRealTimeSeconds
         += (m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX) * 60.0 / m_currentTempo;
 

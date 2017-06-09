@@ -238,7 +238,7 @@ sub getSources {
 
 	# libmei: only a subset is included:
 	push @sources, "$VEROVIO_ROOT/libmei/attconverter.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_analyitcal.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_analytical.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_cmn.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_cmnornaments.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_critapp.cpp";

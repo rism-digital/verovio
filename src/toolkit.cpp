@@ -901,28 +901,39 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     jsonxx::Object o;
     jsonxx::Array a;
 
-    double time = (double)(millisec * 120 / 1000);
-    NoteOnsetOffsetComparison matchTime(time);
-    ArrayOfObjects notes;
-    // Here we would need to check that the midi export is done
-    if (m_doc.GetMidiExportDone()) {
-        m_doc.FindAllChildByAttComparison(&notes, &matchTime);
-
-        // Get the pageNo from the first note (if any)
-        int pageNo = -1;
-        if (notes.size() > 0) {
-            Page *page = dynamic_cast<Page *>(notes.at(0)->GetFirstParent(PAGE));
-            if (page) pageNo = page->GetIdx() + 1;
-        }
-
-        // Fill the JSON object
-        ArrayOfObjects::iterator iter;
-        for (iter = notes.begin(); iter != notes.end(); iter++) {
-            a << (*iter)->GetUuid();
-        }
-        o << "notes" << a;
-        o << "page" << pageNo;
+    // Here we need to check that the midi export is done
+    if (!m_doc.GetMidiExportDone()) {
+        return o.json();
     }
+    
+    MeasureOnsetOffsetComparison matchMeasureTime(millisec);
+    Measure *measure = dynamic_cast<Measure *>(m_doc.FindChildByAttComparison(&matchMeasureTime));
+        
+    if (!measure) {
+        return o.json();
+    }
+    
+    int repeat = measure->EnclosesTime(millisec);
+    int measureTimeOffset = measure->GetRealTimeOffsetMilliseconds(repeat);
+    
+    // Get the pageNo from the first note (if any)
+    int pageNo = -1;
+    Page *page = dynamic_cast<Page *>(measure->GetFirstParent(PAGE));
+    if (page) pageNo = page->GetIdx() + 1;
+    
+    NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
+    ArrayOfObjects notes;
+    
+    measure->FindAllChildByAttComparison(&notes, &matchNoteTime);
+
+    // Fill the JSON object
+    ArrayOfObjects::iterator iter;
+    for (iter = notes.begin(); iter != notes.end(); iter++) {
+        a << (*iter)->GetUuid();
+    }
+    o << "notes" << a;
+    o << "page" << pageNo;
+
     return o.json();
 #else
     // The non-js version of the app should not use this function.
