@@ -7,6 +7,8 @@
 
 #include "note.h"
 
+#include <iostream>
+
 //----------------------------------------------------------------------------
 
 #include <assert.h>
@@ -362,6 +364,11 @@ void Note::SetRealTimeOffsetSeconds(double timeInSeconds)
     m_realTimeOffsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
 }
 
+void Note::SetScoreTimeTiedDuration(double scoreTime)
+{
+    m_scoreTimeTiedDuration = scoreTime;
+}
+
 double Note::GetScoreTimeOnset(void)
 {
     return m_scoreTimeOnset;
@@ -380,6 +387,16 @@ double Note::GetScoreTimeOffset(void)
 int Note::GetRealTimeOffsetMilliseconds(void)
 {
     return m_realTimeOffsetMilliseconds;
+}
+
+double Note::GetScoreTimeTiedDuration(void)
+{
+    return m_scoreTimeTiedDuration;
+}
+
+double Note::GetScoreTimeDuration(void)
+{
+    return GetScoreTimeOffset() - GetScoreTimeOnset();
 }
 
 //----------------------------------------------------------------------------
@@ -790,8 +807,15 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
+    // If the note is a secondary tied note, then ignore it
+    if (this->GetScoreTimeTiedDuration() < 0.0) {
+        return FUNCTOR_SIBLINGS;
+    }
+
     // For now just ignore grace notes
-    if (this->HasGrace()) return FUNCTOR_CONTINUE;
+    if (this->HasGrace()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     Accid *accid = this->GetDrawingAccid();
 
@@ -846,15 +870,15 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     int channel = 0;
     int velocity = 64;
 
-    double starttime = params->m_totalTime + m_scoreTimeOnset;
-    double stoptime = params->m_totalTime + m_scoreTimeOffset;
+    double starttime = params->m_totalTime + this->GetScoreTimeOnset();
+    double stoptime = params->m_totalTime + this->GetScoreTimeOffset() + this->GetScoreTimeTiedDuration();
 
     int tpq = params->m_midiFile->getTPQ();
 
     params->m_midiFile->addNoteOn(params->m_midiTrack, starttime * tpq, channel, pitch, velocity);
     params->m_midiFile->addNoteOff(params->m_midiTrack, stoptime * tpq, channel, pitch);
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

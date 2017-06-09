@@ -43,6 +43,13 @@ public:
     // Functors //
     //----------//
 
+    /**
+     * see Object::ResolveMIDITies
+     */
+    ///@{
+    virtual int ResolveMIDITies(FunctorParams *functorParams);
+    ///@}
+
 private:
     //
 public:
