@@ -925,10 +925,6 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     int y = element->GetDrawingY();
 
-    // move it down according to the number of line in the staff
-    y -= staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
-        - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-
     if (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2)) {
         y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         DrawRestBreve(dc, mRest->GetDrawingX(), y, staff);
@@ -1015,35 +1011,33 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         x2 = xCentered + length / 2;
 
         // Position centered in staff
-        y1 = staff->GetDrawingY()
-            - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * staff->m_drawingLines;
-        y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        y2 = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * staff->m_drawingLines;
+        y1 = y2 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
         // Draw the base rect
-        // make it 8 pixels smaller than the interline space
-        // these are the two 4 substracted and added
-        DrawFilledRectangle(dc, x1, y2, x2, y1);
+        DrawFilledRectangle(dc, x1, y1, x2, y2);
 
         // Draw two lines at beginning and end
-        // make it 8 pixels longer, and 4 pixels width
         int border = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         DrawFilledRectangle(
-            dc, x1, y1 - border, x1 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y2 + border);
+            dc, x1, y1 + border, x1 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y2 - border);
         DrawFilledRectangle(
-            dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y1 - border, x2, y2 + border);
+            dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2, y1 + border, x2, y2 - border);
     }
     else {
         // Draw the base rect
         x1 = xCentered - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 3;
         x2 = xCentered + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 3;
 
-        // Position centered in third line
-        y1 = staff->GetDrawingY() - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * 4;
-        y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        // Position centered in staff
+        y1 = staff->GetDrawingY()
+            - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * int((staff->m_drawingLines) / 2);
+        if (staff->m_drawingLines > 1) y1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        y2 = y1 - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         if (num == 2)
-            DrawFilledRectangle(dc, x1, y2 - 4, x2, y1 + 4);
+            DrawFilledRectangle(dc, x1, y1 + 4, x2, y2 - 4);
         else
-            DrawRestWhole(dc, xCentered, y2, DUR_1, false, staff);
+            DrawRestWhole(dc, xCentered, y1, DUR_1, false, staff);
     }
 
     // Draw the text above
@@ -1056,8 +1050,9 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     TextExtend extend;
     dc->GetSmuflTextExtent(wtext, &extend);
     start_offset = (x2 - x1 - extend.m_width) / 2; // calculate offset to center text
-    DrawSmuflString(dc, x1 + start_offset, staff->GetDrawingY() + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize),
-        wtext, false);
+    int y = (staff->GetDrawingY() > y1) ? staff->GetDrawingY() + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
+                                        : y1 + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    DrawSmuflString(dc, x1 + start_offset, y, wtext, false);
     dc->ResetFont();
 
     dc->EndGraphic(element, this);
@@ -1519,8 +1514,10 @@ void View::DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smuflCode, int
         TextExtend extend;
         std::wstring figures = IntToTupletFigures(num);
         dc->GetSmuflTextExtent(figures, &extend);
-        dc->DrawMusicText(figures, ToDeviceContextX(xCentered - extend.m_width / 2),
-            ToDeviceContextY(staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)));
+        int y = (staff->GetDrawingY() > ySymbol)
+            ? staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
+            : ySymbol + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        dc->DrawMusicText(figures, ToDeviceContextX(xCentered - extend.m_width / 2), ToDeviceContextY(y));
         dc->ResetFont();
     }
 }
@@ -1570,7 +1567,7 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSi
 
     if (valeur == DUR_1) vertic = -vertic;
 
-    // look if one line or between line
+    // look if on line or between line
     if ((y - staff->GetDrawingY()) % m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) {
         if (valeur == DUR_2)
             y1 -= vertic;
@@ -1578,17 +1575,15 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSi
             y1 += vertic;
     }
 
-    y2 = y1 + vertic;
-    DrawFilledRectangle(dc, x1, y1, x2, y2);
-
-    off /= 2;
-    x1 -= off;
-    x2 += off;
-
     // legder line
     if (y > (int)staff->GetDrawingY()
-        || y < staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize))
-        DrawHorizontalLine(dc, x1, x2, y1, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize));
+        || y < staff->GetDrawingY()
+                - (staff->m_drawingLines - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))
+        DrawHorizontalLine(
+            dc, x1 - off / 2, x2 + off / 2, y1, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize) * 1.75);
+
+    y2 = y1 + vertic;
+    DrawFilledRectangle(dc, x1, y1, x2, y2);
 }
 
 //----------------------------------------------------------------------------

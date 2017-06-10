@@ -41,11 +41,11 @@ bool View::OneBeamInTuplet(Tuplet *tuplet)
     if (tuplet->GetFirstParent(BEAM, 1) && (tuplet->GetNoteCount() != 0)) {
         // is only the tuplet beamed and no other tuplet contained?
         currentBeam = dynamic_cast<Beam *>(tuplet->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
-        if (currentBeam->GetChildCount() == 1 && tuplet->GetChildCount(TUPLET) == 0) return true;
+        if ((currentBeam->GetChildCount() == 1) && (tuplet->GetChildCount(TUPLET) == 0)) return true;
     }
 
     // Do we contain a beam?
-    if (tuplet->GetChildCount() == tuplet->GetChildCount(BEAM) == 1) return true;
+    if ((tuplet->GetChildCount() == 1) && (tuplet->GetChildCount(BEAM) == 1)) return true;
 
     return false;
 }

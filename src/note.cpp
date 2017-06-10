@@ -40,6 +40,7 @@ Note::Note()
     , StemmedDrawingInterface()
     , DurationInterface()
     , PitchInterface()
+    , PositionInterface()
     , AttColor()
     , AttColoration()
     , AttGraced()
@@ -52,6 +53,7 @@ Note::Note()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
+    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_GRACED);
@@ -81,6 +83,7 @@ void Note::Reset()
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     PitchInterface::Reset();
+    PositionInterface::Reset();
     ResetColor();
     ResetColoration();
     ResetGraced();
@@ -394,9 +397,9 @@ int Note::CalcStem(FunctorParams *functorParams)
     params->m_isGraceNote = this->IsGraceNote();
 
     int staffSize = staff->m_drawingStaffSize;
-    int staffY = staff->GetDrawingY();
 
-    params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
+    params->m_verticalCenter
+        = staff->GetDrawingY() - params->m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
 
     /************ Set the direction ************/
 
@@ -725,6 +728,7 @@ int Note::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
+    PositionInterface::InterfaceResetDrawing(functorParams, this);
 
     this->ResetDrawingTieAttr();
 
@@ -737,6 +741,7 @@ int Note::ResetDrawing(FunctorParams *functorParams)
 int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     LayerElement::ResetHorizontalAlignment(functorParams);
+    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;
