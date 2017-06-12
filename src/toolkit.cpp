@@ -970,14 +970,18 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
     return page->GetIdx() + 1;
 }
 
-double Toolkit::GetTimeForElement(const std::string &xmlId)
+int Toolkit::GetTimeForElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindChildByUuid(xmlId);
-    double timeofElement = 0.0;
+    int timeofElement = 0;
     if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
-        timeofElement = note->GetRealTimeOnsetMilliseconds();
+        Measure *measure = dynamic_cast<Measure *>(note->GetFirstParent(MEASURE));
+        assert(measure);
+        // For now ignore repeats and access always the first
+        timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
+        timeofElement += note->GetRealTimeOnsetMilliseconds();
     }
     return timeofElement;
 }
