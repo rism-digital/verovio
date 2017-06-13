@@ -279,7 +279,7 @@ void Measure::UpgradePageBasedMEI(System *system)
     this->m_xAbs = system->m_systemLeftMar;
     this->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;
 }
-    
+
 int Measure::EnclosesTime(int time) const
 {
     int repeat = 1;
@@ -291,12 +291,11 @@ int Measure::EnclosesTime(int time) const
     }
     return 0;
 }
-    
-    
+
 int Measure::GetRealTimeOffsetMilliseconds(int repeat) const
 {
     if ((repeat < 1) || repeat > (int)m_realTimeOffsetMilliseconds.size()) return 0;
-    return m_realTimeOffsetMilliseconds.at(repeat - 1); 
+    return m_realTimeOffsetMilliseconds.at(repeat - 1);
 }
 
 //----------------------------------------------------------------------------

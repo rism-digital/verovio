@@ -195,7 +195,8 @@ void Doc::ExportMIDI(MidiFile *midiFile)
     // Then calculate the onset and offset times (w.r.t. the measure) for every note
     CalcOnsetOffsetParams calcOnsetOffsetParams;
     Functor calcOnsetOffset(&Object::CalcOnsetOffset);
-    this->Process(&calcOnsetOffset, &calcOnsetOffsetParams);
+    Functor calcOnsetOffsetEnd(&Object::CalcOnsetOffsetEnd);
+    this->Process(&calcOnsetOffset, &calcOnsetOffsetParams, &calcOnsetOffsetEnd);
 
     // Adjust the duration of tied notes
     Functor resolveMIDITies(&Object::ResolveMIDITies);

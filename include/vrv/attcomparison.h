@@ -265,7 +265,7 @@ public:
 private:
     int m_time;
 };
-    
+
 } // namespace vrv
 
 #endif

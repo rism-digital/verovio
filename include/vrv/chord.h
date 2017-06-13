@@ -152,6 +152,11 @@ public:
     virtual int PrepareTieAttr(FunctorParams *functorParams);
     virtual int PrepareTieAttrEnd(FunctorParams *functorParams);
 
+    /**
+     * See Object::GenerateMIDIEnd
+     */
+    virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams);
+
 protected:
     /**
      * Clear the m_clusters vector and delete all the objects.
