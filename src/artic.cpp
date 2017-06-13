@@ -36,7 +36,6 @@ std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic
 
 Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlacement()
 {
-
     RegisterAttClass(ATT_ARTICULATION);
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_PLACEMENT);

@@ -34,9 +34,8 @@ class Chord : public LayerElement,
               public StemmedDrawingInterface,
               public DurationInterface,
               public AttColor,
+              public AttCue,
               public AttGraced,
-              // FIXME changed in MEI 4.0.0 - will be changed to @cue?
-              // public AttRelativesize,
               public AttStems,
               public AttStemsCmn,
               public AttTiePresent,
@@ -152,6 +151,11 @@ public:
      */
     virtual int PrepareTieAttr(FunctorParams *functorParams);
     virtual int PrepareTieAttrEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::GenerateMIDIEnd
+     */
+    virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams);
 
 protected:
     /**

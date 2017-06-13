@@ -28,19 +28,12 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Rest::Rest()
-    : LayerElement("rest-")
-    , DurationInterface()
-    , PositionInterface()
-    , AttColor()
-    // FIXME MEI 4.0.0
-    //, AttRelativesize()
-    , AttRestVisMensural()
+    : LayerElement("rest-"), DurationInterface(), PositionInterface(), AttColor(), AttCue(), AttRestVisMensural()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
-    // FIXME MEI 4.0.0
-    // RegisterAttClass(ATT_RELATIVESIZE);
+    RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_RESTVISMENSURAL);
     Reset();
 }
@@ -55,8 +48,7 @@ void Rest::Reset()
     DurationInterface::Reset();
     PositionInterface::Reset();
     ResetColor();
-    // FIXME MEI 4.0.0
-    // ResetRelativesize();
+    ResetCue();
     ResetRestVisMensural();
 }
 
@@ -97,21 +89,6 @@ wchar_t Rest::GetRestGlyph() const
         case DUR_256: symc = SMUFL_E4EB_rest256th; break;
     }
     return symc;
-}
-
-int Rest::GetRestDefaultLoc(bool hasMultipleLayer, bool isFirstLayer)
-{
-    // only works if staff has 5 lines
-    int loc = 4;
-
-    if (hasMultipleLayer) {
-        if (isFirstLayer)
-            loc += 2;
-        else
-            loc -= 2;
-    }
-
-    return loc;
 }
 
 int Rest::GetRestLocOffset(int loc)

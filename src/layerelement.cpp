@@ -45,25 +45,23 @@
 #include "view.h"
 #include "vrv.h"
 
-//----------------------------------------------------------------------------
-
-#include "MidiFile.h"
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() : Object("le-"), AttTyped()
+LayerElement::LayerElement() : Object("le-"), AttLabelled(), AttTyped()
 {
+    RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid) : Object(classid), AttTyped()
+LayerElement::LayerElement(std::string classid) : Object(classid), AttLabelled(), AttTyped()
 {
+    RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
@@ -72,6 +70,7 @@ LayerElement::LayerElement(std::string classid) : Object(classid), AttTyped()
 void LayerElement::Reset()
 {
     Object::Reset();
+    ResetLabelled();
     ResetTyped();
 
     m_xAbs = VRV_UNSET;
@@ -688,8 +687,9 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         Note *note = chord->GetTopNote();
         assert(note);
         int loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
-        // Once we have AttLoc on Note
-        // if (note->HasLoc()) loc = note->GetLoc();
+        if (note->HasLoc()) {
+            loc = note->GetLoc();
+        }
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
     else if (this->Is({ CUSTOS, DOT })) {
@@ -701,9 +701,14 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
         Chord *chord = note->IsChordTone();
-        int loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
-        // Once we have AttLoc on Note
-        // if (note->HasLoc()) loc = note->GetLoc();
+        int loc = 0;
+        if (note->HasPname()) {
+            loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
+        }
+        // should this override pname/oct ?
+        if (note->HasLoc()) {
+            loc = note->GetLoc();
+        }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
         // Make it relative to the top note one (see above) but not for cross-staff notes in chords
         if (chord && !m_crossStaff) {
@@ -712,6 +717,40 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         note->SetDrawingLoc(loc);
         this->SetDrawingYRel(yRel);
     }
+    else if (this->Is(MREST)) {
+        MRest *mRest = dynamic_cast<MRest *>(this);
+        assert(mRest);
+        int loc = 0;
+        if (mRest->HasLoc()) {
+            loc = mRest->GetLoc();
+        }
+        // Automatically calculate rest position
+        else {
+            // set default location to the middle of the staff
+            Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+            assert(staff);
+            loc = staff->m_drawingLines - 1;
+            // Limitation: GetLayerCount does not take into account editorial markup
+            // should be refined later
+            bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
+            if (hasMultipleLayer) {
+                Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
+                assert(firstLayer);
+                if (firstLayer->GetN() == layerY->GetN())
+                    loc += 2;
+                else
+                    loc -= 2;
+            }
+
+            // add offset
+            else if (staff->m_drawingLines > 1)
+                loc += 2;
+        }
+
+        mRest->SetDrawingLoc(loc);
+        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+    }
+
     else if (this->Is(REST)) {
         Rest *rest = dynamic_cast<Rest *>(this);
         assert(rest);
@@ -724,15 +763,21 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         }
         // Automatically calculate rest position
         else {
+            // set default location to the middle of the staff
+            Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+            assert(staff);
+            loc = staff->m_drawingLines - 1;
             // Limitation: GetLayerCount does not take into account editorial markup
+            // should be refined later
             bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
-            bool isFirstLayer = false;
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
-                if (firstLayer->GetN() == layerY->GetN()) isFirstLayer = true;
+                if (firstLayer->GetN() == layerY->GetN())
+                    loc += 2;
+                else
+                    loc -= 2;
             }
-            loc = rest->GetRestDefaultLoc(hasMultipleLayer, isFirstLayer);
         }
         loc = rest->GetRestLocOffset(loc);
         rest->SetDrawingLoc(loc);
@@ -934,12 +979,11 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
         m_drawingCueSize = true;
     }
     // This cover the case when the @size is given on the element
-    // FIXME MEI 4.0.0
-    // else if (this->HasAttClass(ATT_RELATIVESIZE)) {
-    //    AttRelativesize *att = dynamic_cast<AttRelativesize *>(this);
-    //    assert(att);
-    //    if (att->HasSize()) m_drawingCueSize = (att->GetSize() == SIZE_cue);
-    //}
+    else if (this->HasAttClass(ATT_CUE)) {
+        AttCue *att = dynamic_cast<AttCue *>(this);
+        assert(att);
+        if (att->HasCue()) m_drawingCueSize = (att->GetCue() == BOOLEAN_true);
+    }
     // For note, we also need to look at the parent chord
     else if (this->Is(NOTE)) {
         Note const *note = dynamic_cast<Note const *>(this);
@@ -1123,21 +1167,22 @@ int LayerElement::FindTimeSpanningLayerElements(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::GenerateMIDI(FunctorParams *functorParams)
+int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+
+    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    // Here we need to check if the LayerElement as a duration, otherwise we can continue
+    // Here we need to check if the LayerElement has a duration, otherwise we can continue
     if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
 
+    double incrementScoreTime;
+
     // Now deal with the different elements
-    if (this->Is(REST)) {
-        // Rest *rest = dynamic_cast<Rest *>(this);
-        // assert(rest);
-        // LogMessage("Rest %f", GetAlignmentDuration());
-        // increase the currentTime accordingly
-        params->m_currentMeasureTime += GetAlignmentDuration() * params->m_currentBpm / (DUR_MAX / DURATION_4);
+    if (this->Is(REST) || this->Is(SPACE)) {
+        double incrementScoreTime = GetAlignmentDuration() / (DUR_MAX / DURATION_4);
+        params->m_currentScoreTime += incrementScoreTime;
+        params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
     else if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
@@ -1148,133 +1193,35 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
 
         Chord *chord = note->IsChordTone();
 
-        double dur;
-        if (chord)
-            dur = chord->GetAlignmentDuration();
-        else
-            dur = note->GetAlignmentDuration();
-        dur = dur * params->m_currentBpm / (DUR_MAX / DURATION_4);
+        if (chord) {
+            incrementScoreTime = chord->GetAlignmentDuration();
+        }
+        else {
+            incrementScoreTime = note->GetAlignmentDuration();
+        }
+        incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
+        double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
 
         // LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
         // note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
         // LogDebug("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
 
-        Accid *accid = note->GetDrawingAccid();
-
-        // Create midi note
-        int midiBase = 0;
-        data_PITCHNAME pname = note->GetPname();
-        switch (pname) {
-            case PITCHNAME_c: midiBase = 0; break;
-            case PITCHNAME_d: midiBase = 2; break;
-            case PITCHNAME_e: midiBase = 4; break;
-            case PITCHNAME_f: midiBase = 5; break;
-            case PITCHNAME_g: midiBase = 7; break;
-            case PITCHNAME_a: midiBase = 9; break;
-            case PITCHNAME_b: midiBase = 11; break;
-            case PITCHNAME_NONE: break;
-        }
-        // Check for accidentals
-        if (accid && accid->HasAccidGes()) {
-            data_ACCIDENTAL_GESTURAL accImp = accid->GetAccidGes();
-            switch (accImp) {
-                case ACCIDENTAL_GESTURAL_s: midiBase += 1; break;
-                case ACCIDENTAL_GESTURAL_f: midiBase -= 1; break;
-                case ACCIDENTAL_GESTURAL_ss: midiBase += 2; break;
-                case ACCIDENTAL_GESTURAL_ff: midiBase -= 2; break;
-                default: break;
-            }
-        }
-        else if (accid) {
-            data_ACCIDENTAL_WRITTEN accExp = accid->GetAccid();
-            switch (accExp) {
-                case ACCIDENTAL_WRITTEN_s: midiBase += 1; break;
-                case ACCIDENTAL_WRITTEN_f: midiBase -= 1; break;
-                case ACCIDENTAL_WRITTEN_ss: midiBase += 2; break;
-                case ACCIDENTAL_WRITTEN_x: midiBase += 2; break;
-                case ACCIDENTAL_WRITTEN_ff: midiBase -= 2; break;
-                case ACCIDENTAL_WRITTEN_xs: midiBase += 3; break;
-                case ACCIDENTAL_WRITTEN_ts: midiBase += 3; break;
-                case ACCIDENTAL_WRITTEN_tf: midiBase -= 3; break;
-                case ACCIDENTAL_WRITTEN_nf: midiBase -= 1; break;
-                case ACCIDENTAL_WRITTEN_ns: midiBase += 1; break;
-                default: break;
-            }
-        }
-
-        // Adjustment for transposition intruments
-        midiBase += params->m_transSemi;
-
-        int oct = note->GetOct();
-        if (note->HasOctGes()) oct = note->GetOctGes();
-
-        int pitch = midiBase + (oct + 1) * 12;
-        int channel = 0;
-        int velocity = 64;
-        params->m_midiFile->addNoteOn(
-            params->m_midiTrack, params->m_totalTime + params->m_currentMeasureTime, channel, pitch, velocity);
-        params->m_midiFile->addNoteOff(
-            params->m_midiTrack, params->m_totalTime + params->m_currentMeasureTime + dur, channel, pitch);
-
-        note->m_playingOnset = params->m_totalTime + params->m_currentMeasureTime;
-        note->m_playingOffset = params->m_totalTime + params->m_currentMeasureTime + dur;
+        note->SetScoreTimeOnset(params->m_currentScoreTime);
+        note->SetRealTimeOnsetSeconds(params->m_currentRealTimeSeconds);
+        note->SetScoreTimeOffset(params->m_currentScoreTime + incrementScoreTime);
+        note->SetRealTimeOffsetSeconds(params->m_currentRealTimeSeconds + realTimeIncrementSeconds);
 
         // increase the currentTime accordingly, but only if not in a chord - checkit with note->IsChordTone()
         if (!(note->IsChordTone())) {
-            params->m_currentMeasureTime += GetAlignmentDuration() * params->m_currentBpm / (DUR_MAX / DURATION_4);
+            params->m_currentScoreTime += incrementScoreTime;
+            params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
         }
     }
-    else if (this->Is(SPACE)) {
-        // Space *space = dynamic_cast<Space *>(this);
-        // assert(space);
-        // LogMessage("Space %f", GetAlignmentDuration());
-        // increase the currentTime accordingly
-        params->m_currentMeasureTime += GetAlignmentDuration() * params->m_currentBpm / (DUR_MAX / DURATION_4);
-    }
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::GenerateMIDIEnd(FunctorParams *functorParams)
+int LayerElement::ResolveMIDITies(FunctorParams *)
 {
-    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
-    assert(params);
-
-    if (this->Is(CHORD)) {
-        // Chord *chord = dynamic_cast<Chord *>(this);
-        // assert(chord);
-        // LogMessage("Chord %f", GetAlignmentDuration());
-        // increase the currentTime accordingly.
-        params->m_currentMeasureTime += GetAlignmentDuration() * params->m_currentBpm / (DUR_MAX / DURATION_4);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
-{
-    CalcMaxMeasureDurationParams *params = dynamic_cast<CalcMaxMeasureDurationParams *>(functorParams);
-    assert(params);
-
-    // Here we need to check if the LayerElement as a duration, otherwise we can continue
-    if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
-
-    if (this->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(this);
-        assert(note);
-
-        // For now just ignore grace notes
-        if (note->HasGrace()) return FUNCTOR_CONTINUE;
-
-        // The is increased by the chord element
-        if (note->IsChordTone()) return FUNCTOR_CONTINUE;
-    }
-
-    // increase the currentTime accordingly
-    params->m_currentValue += GetAlignmentDuration() * params->m_currentBpm / (DUR_MAX / DURATION_4);
-
-    // now if we have cummulated in the layer a longer duration for the current measure, replace it
-    if (params->m_maxValues.back() < params->m_currentValue) params->m_maxValues.back() = params->m_currentValue;
-
     return FUNCTOR_CONTINUE;
 }
 

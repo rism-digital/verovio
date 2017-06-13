@@ -1021,6 +1021,52 @@ bool AttCoordinated::HasLry() const
 /* include <attlry> */
 
 //----------------------------------------------------------------------------
+// AttCue
+//----------------------------------------------------------------------------
+
+AttCue::AttCue() : Att()
+{
+    ResetCue();
+}
+
+AttCue::~AttCue()
+{
+}
+
+void AttCue::ResetCue()
+{
+    m_cue = BOOLEAN_NONE;
+}
+
+bool AttCue::ReadCue(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("cue")) {
+        this->SetCue(StrToBoolean(element.attribute("cue").value()));
+        element.remove_attribute("cue");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttCue::WriteCue(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasCue()) {
+        element.append_attribute("cue") = BooleanToStr(this->GetCue()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttCue::HasCue() const
+{
+    return (m_cue != BOOLEAN_NONE);
+}
+
+/* include <attcue> */
+
+//----------------------------------------------------------------------------
 // AttCurvature
 //----------------------------------------------------------------------------
 
@@ -2334,18 +2380,12 @@ AttKeySigLog::~AttKeySigLog()
 
 void AttKeySigLog::ResetKeySigLog()
 {
-    m_fifths = "";
     m_sig = "";
 }
 
 bool AttKeySigLog::ReadKeySigLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("fifths")) {
-        this->SetFifths(StrToStr(element.attribute("fifths").value()));
-        element.remove_attribute("fifths");
-        hasAttribute = true;
-    }
     if (element.attribute("sig")) {
         this->SetSig(StrToStr(element.attribute("sig").value()));
         element.remove_attribute("sig");
@@ -2357,20 +2397,11 @@ bool AttKeySigLog::ReadKeySigLog(pugi::xml_node element)
 bool AttKeySigLog::WriteKeySigLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasFifths()) {
-        element.append_attribute("fifths") = StrToStr(this->GetFifths()).c_str();
-        wroteAttribute = true;
-    }
     if (this->HasSig()) {
         element.append_attribute("sig") = StrToStr(this->GetSig()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
-}
-
-bool AttKeySigLog::HasFifths() const
-{
-    return (m_fifths != "");
 }
 
 bool AttKeySigLog::HasSig() const
@@ -2395,18 +2426,12 @@ AttKeySigDefaultLog::~AttKeySigDefaultLog()
 
 void AttKeySigDefaultLog::ResetKeySigDefaultLog()
 {
-    m_keyFifths = "";
     m_keySig = KEYSIGNATURE_NONE;
 }
 
 bool AttKeySigDefaultLog::ReadKeySigDefaultLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("key.fifths")) {
-        this->SetKeyFifths(StrToStr(element.attribute("key.fifths").value()));
-        element.remove_attribute("key.fifths");
-        hasAttribute = true;
-    }
     if (element.attribute("key.sig")) {
         this->SetKeySig(StrToKeysignature(element.attribute("key.sig").value()));
         element.remove_attribute("key.sig");
@@ -2418,20 +2443,11 @@ bool AttKeySigDefaultLog::ReadKeySigDefaultLog(pugi::xml_node element)
 bool AttKeySigDefaultLog::WriteKeySigDefaultLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasKeyFifths()) {
-        element.append_attribute("key.fifths") = StrToStr(this->GetKeyFifths()).c_str();
-        wroteAttribute = true;
-    }
     if (this->HasKeySig()) {
         element.append_attribute("key.sig") = KeysignatureToStr(this->GetKeySig()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
-}
-
-bool AttKeySigDefaultLog::HasKeyFifths() const
-{
-    return (m_keyFifths != "");
 }
 
 bool AttKeySigDefaultLog::HasKeySig() const
@@ -7798,6 +7814,14 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
     }
+    if (element->HasAttClass(ATT_CUE)) {
+        AttCue *att = dynamic_cast<AttCue *>(element);
+        assert(att);
+        if (attrType == "cue") {
+            att->SetCue(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_CURVATURE)) {
         AttCurvature *att = dynamic_cast<AttCurvature *>(element);
         assert(att);
@@ -8045,10 +8069,6 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
     if (element->HasAttClass(ATT_KEYSIGLOG)) {
         AttKeySigLog *att = dynamic_cast<AttKeySigLog *>(element);
         assert(att);
-        if (attrType == "fifths") {
-            att->SetFifths(att->StrToStr(attrValue));
-            return true;
-        }
         if (attrType == "sig") {
             att->SetSig(att->StrToStr(attrValue));
             return true;
@@ -8057,10 +8077,6 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
     if (element->HasAttClass(ATT_KEYSIGDEFAULTLOG)) {
         AttKeySigDefaultLog *att = dynamic_cast<AttKeySigDefaultLog *>(element);
         assert(att);
-        if (attrType == "key.fifths") {
-            att->SetKeyFifths(att->StrToStr(attrValue));
-            return true;
-        }
         if (attrType == "key.sig") {
             att->SetKeySig(att->StrToKeysignature(attrValue));
             return true;
@@ -9241,6 +9257,13 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("lry", att->IntToStr(att->GetLry())));
         }
     }
+    if (element->HasAttClass(ATT_CUE)) {
+        const AttCue *att = dynamic_cast<const AttCue *>(element);
+        assert(att);
+        if (att->HasCue()) {
+            attributes->push_back(std::make_pair("cue", att->BooleanToStr(att->GetCue())));
+        }
+    }
     if (element->HasAttClass(ATT_CURVATURE)) {
         const AttCurvature *att = dynamic_cast<const AttCurvature *>(element);
         assert(att);
@@ -9451,9 +9474,6 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_KEYSIGLOG)) {
         const AttKeySigLog *att = dynamic_cast<const AttKeySigLog *>(element);
         assert(att);
-        if (att->HasFifths()) {
-            attributes->push_back(std::make_pair("fifths", att->StrToStr(att->GetFifths())));
-        }
         if (att->HasSig()) {
             attributes->push_back(std::make_pair("sig", att->StrToStr(att->GetSig())));
         }
@@ -9461,9 +9481,6 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_KEYSIGDEFAULTLOG)) {
         const AttKeySigDefaultLog *att = dynamic_cast<const AttKeySigDefaultLog *>(element);
         assert(att);
-        if (att->HasKeyFifths()) {
-            attributes->push_back(std::make_pair("key.fifths", att->StrToStr(att->GetKeyFifths())));
-        }
         if (att->HasKeySig()) {
             attributes->push_back(std::make_pair("key.sig", att->KeysignatureToStr(att->GetKeySig())));
         }

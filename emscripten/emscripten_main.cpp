@@ -106,7 +106,7 @@ const char *vrvToolkit_getElementsAtTime(Toolkit *tk, int millisec)
 void vrvToolkit_setOptions(Toolkit *tk, const char *options)
 {
     if (!tk->ParseOptions(options)) {
-        vrv::LogError("Could not load JSON options.");
+        LogError("Could not load JSON options.");
     }
 }
 
@@ -132,7 +132,7 @@ const char *vrvToolkit_renderData(Toolkit *tk, const char *data, const char *opt
 bool vrvToolkit_edit(Toolkit *tk, const char *editorAction)
 {
     if (!tk->Edit(editorAction)) {
-        vrv::LogError("Could not perform editor action.");
+        LogError("Could not perform editor action.");
         return false;
     }
     return true;

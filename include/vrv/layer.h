@@ -157,10 +157,13 @@ public:
      * See Object::AdjustSylSpacing
      */
     virtual int AdjustSylSpacing(FunctorParams *functorParams);
+
     /**
-     * See Object::CalcMaxMeasureDuration
+     * See Object::CalcOnsetOffset
      */
-    virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
+    ///@{
+    virtual int CalcOnsetOffset(FunctorParams *functorParams);
+    ///@}
 
 private:
     //

@@ -411,7 +411,6 @@ enum data_FONTSIZETERM {
     FONTSIZETERM_xx_large,
     FONTSIZETERM_smaller,
     FONTSIZETERM_larger,
-    FONTSIZETERM_cue,
     FONTSIZETERM_MAX
 };
 

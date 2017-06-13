@@ -252,7 +252,7 @@ void View::DrawStaffGrp(
     StaffDef *lastDef = dynamic_cast<StaffDef *>(staffDefs->back());
 
     if (!firstDef || !lastDef) {
-        LogDebug("Could not get staffDef while drawing staffGrp - Vrv::DrawStaffGrp");
+        LogDebug("Could not get staffDef while drawing staffGrp - DrawStaffGrp");
         return;
     }
 
@@ -263,7 +263,7 @@ void View::DrawStaffGrp(
     Staff *last = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparisonLast, 1));
 
     if (!first || !last) {
-        LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetN(),
+        LogDebug("Could not get staff (%d; %d) while drawing staffGrp - DrawStaffGrp", firstDef->GetN(),
             lastDef->GetN());
         return;
     }
@@ -550,7 +550,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                 Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
                 if (!staff) {
                     LogDebug(
-                        "Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarLines", childStaffDef->GetN());
+                        "Could not get staff (%d) while drawing staffGrp - DrawBarLines", childStaffDef->GetN());
                     continue;
                 }
                 int y_top = staff->GetDrawingY();
@@ -575,7 +575,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         StaffDef *lastDef = dynamic_cast<StaffDef *>(staffDefs->back());
 
         if (!firstDef || !lastDef) {
-            LogDebug("Could not get staffDef while drawing staffGrp - Vrv::DrawStaffGrp");
+            LogDebug("Could not get staffDef while drawing staffGrp - DrawStaffGrp");
             return;
         }
 
@@ -586,7 +586,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         Staff *last = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparisonLast, 1));
 
         if (!first || !last) {
-            LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetN(),
+            LogDebug("Could not get staff (%d; %d) while drawing staffGrp - DrawStaffGrp", firstDef->GetN(),
                 lastDef->GetN());
             return;
         }
@@ -608,7 +608,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                     AttCommonNComparison comparison(STAFF, childStaffDef->GetN());
                     Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
                     if (!staff) {
-                        LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarLines",
+                        LogDebug("Could not get staff (%d) while drawing staffGrp - DrawBarLines",
                             childStaffDef->GetN());
                         continue;
                     }

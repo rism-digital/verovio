@@ -58,7 +58,7 @@ Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType t
         assert(alignment);
 
         double alignment_time = alignment->GetTime();
-        if (vrv::AreEqual(alignment_time, time)) {
+        if (AreEqual(alignment_time, time)) {
             if (alignment->GetType() == type) {
                 return alignment;
             }
@@ -689,7 +689,7 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
         assert(timestampAttr);
 
         double alignmentTime = timestampAttr->GetActualDurPos();
-        if (vrv::AreEqual(alignmentTime, time)) {
+        if (AreEqual(alignmentTime, time)) {
             return timestampAttr;
         }
         // nothing found, do not go any further but keep the index
