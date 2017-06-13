@@ -25,6 +25,8 @@ typedef std::vector<std::pair<std::string, std::string> > ArrayOfStrAttr;
 
 #define VRV_UNSET -0x7FFFFFFF
 
+class data_STAFFREL;
+
 //----------------------------------------------------------------------------
 // Durations
 //----------------------------------------------------------------------------
@@ -116,6 +118,16 @@ enum data_DURATION {
 };
 
 /**
+ * MEI data.FONTSIZENUMERIC
+ */
+typedef double data_FONTSIZENUMERIC;
+
+/**
+ * MEI data.HEXNUM
+ */
+typedef wchar_t data_HEXNUM;
+
+/**
  * MEI data.KEYSIGNATURE
  * The maximum is 255 (unsigned char)
  * Order from 7f to 7s should not be changed. This is a special case since we use abs()
@@ -191,7 +203,7 @@ enum data_ORIENTATION { ORIENTATION_NONE = 0, ORIENTATION_reversed, ORIENTATION_
 /**
  * MEI data.PERCENT
  */
-typedef int data_PERCENT;
+typedef double data_PERCENT;
 
 /**
  * MEI data.PITCHNAME

@@ -21,7 +21,7 @@ namespace vrv {
 /**
  * This class models a group of dots as a layer element part and has not direct MEI equivlatent.
  */
-class Dots : public LayerElement, public AttAugmentdots {
+class Dots : public LayerElement, public AttAugmentDots {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

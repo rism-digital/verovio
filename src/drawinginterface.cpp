@@ -104,7 +104,7 @@ void StaffDefDrawingInterface::SetCurrentKeySig(KeySig *keySig)
 {
     if (keySig) {
         char drawingCancelAccidCount = m_currentKeySig.GetAlterationNumber();
-        data_ACCIDENTAL_EXPLICIT drawingCancelAccidType = m_currentKeySig.GetAlterationType();
+        data_ACCIDENTAL_WRITTEN drawingCancelAccidType = m_currentKeySig.GetAlterationType();
         m_currentKeySig = *keySig;
         m_currentKeySig.m_drawingCancelAccidCount = drawingCancelAccidCount;
         m_currentKeySig.m_drawingCancelAccidType = drawingCancelAccidType;

@@ -316,8 +316,8 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // Draw the stems and the bars
 
     // We look only at the first one for the duration since both are expected to be the same
-    assert(dynamic_cast<AttDurationMusical *>(firstElement->m_element));
-    int dur = (dynamic_cast<AttDurationMusical *>(firstElement->m_element))->GetDur();
+    assert(dynamic_cast<AttDurationLogical *>(firstElement->m_element));
+    int dur = (dynamic_cast<AttDurationLogical *>(firstElement->m_element))->GetDur();
 
     if (dur > DUR_1) {
         for (i = 0; i < elementCount; i++) {

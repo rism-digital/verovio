@@ -101,9 +101,9 @@ ArticPart *Artic::GetOutsidePart()
     return dynamic_cast<ArticPart *>(FindChildByAttComparison(&articPartComparison, 1));
 }
 
-wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
+wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
 {
-    if (place == STAFFREL_above) {
+    if (place.GetBasic() == STAFFREL_basic_above) {
         switch (artic) {
             case ARTICULATION_acc: return SMUFL_E4A0_articAccentAbove;
             case ARTICULATION_stacc: return SMUFL_E4A2_articStaccatoAbove;
@@ -146,7 +146,7 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
             default: return 0; break;
         }
     }
-    else if (place == STAFFREL_below) {
+    else if (place.GetBasic() == STAFFREL_basic_below) {
         switch (artic) {
             case ARTICULATION_acc: return SMUFL_E4A1_articAccentBelow;
             case ARTICULATION_stacc: return SMUFL_E4A3_articStaccatoBelow;
@@ -172,9 +172,9 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
         return 0;
 }
 
-bool Artic::VerticalCorr(wchar_t code, data_STAFFREL place)
+bool Artic::VerticalCorr(wchar_t code, const data_STAFFREL &place)
 {
-    if (place == STAFFREL_above)
+    if (place.GetBasic() == STAFFREL_basic_above)
         return false;
     else if (code == SMUFL_E611_stringsDownBowTurned)
         return true;
@@ -269,7 +269,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     Note *parentNote = NULL;
     Chord *parentChord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, 2));
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-    data_STAFFREL place = STAFFREL_NONE;
+    data_STAFFREL_basic place = STAFFREL_basic_NONE;
 
     if (!parentChord) {
         parentNote = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
@@ -296,20 +296,20 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     bool allowAbove = true;
 
     // for now we ignore within @place
-    if (this->HasPlace() && (this->GetPlace() != STAFFREL_within)) {
-        place = this->GetPlace();
+    if (this->GetPlace().GetBasic() != STAFFREL_basic_NONE) {
+        place = this->GetPlace().GetBasic();
         // If we have a place indication do not allow to be changed to above
         allowAbove = false;
     }
     else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        place = (layer->GetDrawingStemDir() == STEMDIRECTION_up) ? STAFFREL_above : STAFFREL_below;
+        place = (layer->GetDrawingStemDir() == STEMDIRECTION_up) ? STAFFREL_basic_above : STAFFREL_basic_below;
         // If we have more than one layer do not allow to be changed to above
         allowAbove = false;
     }
     else if (stemDir == STEMDIRECTION_up)
-        place = STAFFREL_below;
+        place = STAFFREL_basic_below;
     else
-        place = STAFFREL_above;
+        place = STAFFREL_basic_above;
 
     /************** set it to both the inside and outside part **************/
 
@@ -317,13 +317,17 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     ArticPart *outsidePart = this->GetOutsidePart();
 
     if (insidePart) {
-        insidePart->SetPlace(place);
+        data_STAFFREL staffRel;
+        staffRel.SetBasic(place);
+        insidePart->SetPlace(staffRel);
     }
 
     if (outsidePart) {
         // If allowAbove is true it will place the above if the content requires so (even if place below if given)
-        if (place == STAFFREL_below && allowAbove && outsidePart->AlwaysAbove()) place = STAFFREL_above;
-        outsidePart->SetPlace(place);
+        if (place == STAFFREL_basic_below && allowAbove && outsidePart->AlwaysAbove()) place = STAFFREL_basic_above;
+        data_STAFFREL staffRel;
+        staffRel.SetBasic(place);
+        outsidePart->SetPlace(staffRel);
     }
 
     /************** calculate the y position **************/
@@ -356,7 +360,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     // notes
     // The problem is that in MEI artic are children of chord element and not of the notes
     if (insidePart) {
-        if (insidePart->GetPlace() == STAFFREL_above) {
+        if (insidePart->GetPlace().GetBasic() == STAFFREL_basic_above) {
             insidePart->SetDrawingYRel(yInAbove);
             insidePart->m_crossStaff = staffAbove;
         }
@@ -367,7 +371,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     }
 
     if (outsidePart) {
-        if (outsidePart->GetPlace() == STAFFREL_above) {
+        if (outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above) {
             outsidePart->SetDrawingYRel(yOutAbove);
             outsidePart->m_crossStaff = staffAbove;
         }
@@ -385,7 +389,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
             * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
 
         if (insidePart->GetPlace() == outsidePart->GetPlace()) {
-            if (insidePart->GetPlace() == STAFFREL_above) {
+            if (insidePart->GetPlace().GetBasic() == STAFFREL_basic_above) {
                 int inTop = insidePart->GetContentTop();
                 int outBottom = outsidePart->GetContentBottom();
                 if (inTop > outBottom)

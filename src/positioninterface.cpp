@@ -22,7 +22,7 @@ namespace vrv {
 // PositionInterface
 //----------------------------------------------------------------------------
 
-PositionInterface::PositionInterface() : Interface(), AttStaffloc(), AttStafflocPitched()
+PositionInterface::PositionInterface() : Interface(), AttStaffLoc(), AttStaffLocPitched()
 {
     RegisterInterfaceAttClass(ATT_STAFFLOC);
     RegisterInterfaceAttClass(ATT_STAFFLOCPITCHED);
@@ -36,8 +36,8 @@ PositionInterface::~PositionInterface()
 
 void PositionInterface::Reset()
 {
-    ResetStaffloc();
-    ResetStafflocPitched();
+    ResetStaffLoc();
+    ResetStaffLocPitched();
 
     m_drawingLoc = 0;
 }

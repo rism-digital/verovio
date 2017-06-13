@@ -29,6 +29,10 @@
 #include "verse.h"
 #include "vrv.h"
 
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -43,12 +47,12 @@ Note::Note()
     , PositionInterface()
     , AttColor()
     , AttColoration()
+    , AttCue()
     , AttGraced()
-    , AttNoteLogMensural()
-    , AttRelativesize()
+    , AttNoteAnlMensural()
     , AttStems()
     , AttStemsCmn()
-    , AttTiepresent()
+    , AttTiePresent()
     , AttVisibility()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
@@ -56,9 +60,9 @@ Note::Note()
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
+    RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_NOTELOGMENSURAL);
-    RegisterAttClass(ATT_RELATIVESIZE);
+    RegisterAttClass(ATT_NOTEANLMENSURAL);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -86,12 +90,12 @@ void Note::Reset()
     PositionInterface::Reset();
     ResetColor();
     ResetColoration();
+    ResetCue();
     ResetGraced();
-    ResetNoteLogMensural();
-    ResetRelativesize();
+    ResetNoteAnlMensural();
     ResetStems();
     ResetStemsCmn();
-    ResetTiepresent();
+    ResetTiePresent();
     ResetVisibility();
 
     // tie pointers
@@ -99,9 +103,6 @@ void Note::Reset()
 
     m_clusterPosition = 0;
     m_cluster = NULL;
-
-    m_playingOnset = 0.0;
-    m_playingOffset = 0.0;
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;
@@ -211,8 +212,8 @@ bool Note::IsUnissonWith(Note *note, bool ignoreAccid)
     if (!ignoreAccid) {
         Accid *accid = this->GetDrawingAccid();
         Accid *noteAccid = note->GetDrawingAccid();
-        data_ACCIDENTAL_EXPLICIT accidVal = (accid) ? accid->GetAccid() : ACCIDENTAL_EXPLICIT_NONE;
-        data_ACCIDENTAL_EXPLICIT noteAccidVal = (noteAccid) ? noteAccid->GetAccid() : ACCIDENTAL_EXPLICIT_NONE;
+        data_ACCIDENTAL_WRITTEN accidVal = (accid) ? accid->GetAccid() : ACCIDENTAL_WRITTEN_NONE;
+        data_ACCIDENTAL_WRITTEN noteAccidVal = (noteAccid) ? noteAccid->GetAccid() : ACCIDENTAL_WRITTEN_NONE;
         if (accidVal != noteAccidVal) return false;
     }
 
@@ -342,6 +343,61 @@ wchar_t Note::GetMensuralSmuflNoteHead()
         }
     }
     return code;
+}
+
+void Note::SetScoreTimeOnset(double scoreTime)
+{
+    m_scoreTimeOnset = scoreTime;
+}
+
+void Note::SetRealTimeOnsetSeconds(double timeInSeconds)
+{
+    m_realTimeOnsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
+}
+
+void Note::SetScoreTimeOffset(double scoreTime)
+{
+    m_scoreTimeOffset = scoreTime;
+}
+
+void Note::SetRealTimeOffsetSeconds(double timeInSeconds)
+{
+    m_realTimeOffsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
+}
+
+void Note::SetScoreTimeTiedDuration(double scoreTime)
+{
+    m_scoreTimeTiedDuration = scoreTime;
+}
+
+double Note::GetScoreTimeOnset(void)
+{
+    return m_scoreTimeOnset;
+}
+
+int Note::GetRealTimeOnsetMilliseconds(void)
+{
+    return m_realTimeOnsetMilliseconds;
+}
+
+double Note::GetScoreTimeOffset(void)
+{
+    return m_scoreTimeOffset;
+}
+
+int Note::GetRealTimeOffsetMilliseconds(void)
+{
+    return m_realTimeOffsetMilliseconds;
+}
+
+double Note::GetScoreTimeTiedDuration(void)
+{
+    return m_scoreTimeTiedDuration;
+}
+
+double Note::GetScoreTimeDuration(void)
+{
+    return GetScoreTimeOffset() - GetScoreTimeOnset();
 }
 
 //----------------------------------------------------------------------------
@@ -641,7 +697,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
             currentDots = new Dots();
             this->AddChild(currentDots);
         }
-        currentDots->AttAugmentdots::operator=(*this);
+        currentDots->AttAugmentDots::operator=(*this);
     }
     // This will happen only if the duration has changed
     else if (currentDots) {
@@ -658,7 +714,7 @@ int Note::PrepareTieAttr(FunctorParams *functorParams)
     PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
     assert(params);
 
-    AttTiepresent *check = this;
+    AttTiePresent *check = this;
     // Use the parent chord if there is no @tie on the note
     if (!this->HasTie() && params->m_currentChord) {
         check = params->m_currentChord;
@@ -747,6 +803,85 @@ int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
     m_flippedNotehead = false;
 
     return FUNCTOR_CONTINUE;
+}
+
+int Note::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    // If the note is a secondary tied note, then ignore it
+    if (this->GetScoreTimeTiedDuration() < 0.0) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // For now just ignore grace notes
+    if (this->HasGrace()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    Accid *accid = this->GetDrawingAccid();
+
+    // Create midi this
+    int midiBase = 0;
+    data_PITCHNAME pname = this->GetPname();
+    switch (pname) {
+        case PITCHNAME_c: midiBase = 0; break;
+        case PITCHNAME_d: midiBase = 2; break;
+        case PITCHNAME_e: midiBase = 4; break;
+        case PITCHNAME_f: midiBase = 5; break;
+        case PITCHNAME_g: midiBase = 7; break;
+        case PITCHNAME_a: midiBase = 9; break;
+        case PITCHNAME_b: midiBase = 11; break;
+        case PITCHNAME_NONE: break;
+    }
+    // Check for accidentals
+    if (accid && accid->HasAccidGes()) {
+        data_ACCIDENTAL_GESTURAL accImp = accid->GetAccidGes();
+        switch (accImp) {
+            case ACCIDENTAL_GESTURAL_s: midiBase += 1; break;
+            case ACCIDENTAL_GESTURAL_f: midiBase -= 1; break;
+            case ACCIDENTAL_GESTURAL_ss: midiBase += 2; break;
+            case ACCIDENTAL_GESTURAL_ff: midiBase -= 2; break;
+            default: break;
+        }
+    }
+    else if (accid) {
+        data_ACCIDENTAL_WRITTEN accExp = accid->GetAccid();
+        switch (accExp) {
+            case ACCIDENTAL_WRITTEN_s: midiBase += 1; break;
+            case ACCIDENTAL_WRITTEN_f: midiBase -= 1; break;
+            case ACCIDENTAL_WRITTEN_ss: midiBase += 2; break;
+            case ACCIDENTAL_WRITTEN_x: midiBase += 2; break;
+            case ACCIDENTAL_WRITTEN_ff: midiBase -= 2; break;
+            case ACCIDENTAL_WRITTEN_xs: midiBase += 3; break;
+            case ACCIDENTAL_WRITTEN_ts: midiBase += 3; break;
+            case ACCIDENTAL_WRITTEN_tf: midiBase -= 3; break;
+            case ACCIDENTAL_WRITTEN_nf: midiBase -= 1; break;
+            case ACCIDENTAL_WRITTEN_ns: midiBase += 1; break;
+            default: break;
+        }
+    }
+
+    // Adjustment for transposition intruments
+    midiBase += params->m_transSemi;
+
+    int oct = this->GetOct();
+    if (this->HasOctGes()) oct = this->GetOctGes();
+
+    int pitch = midiBase + (oct + 1) * 12;
+    int channel = 0;
+    int velocity = 64;
+
+    double starttime = params->m_totalTime + this->GetScoreTimeOnset();
+    double stoptime = params->m_totalTime + this->GetScoreTimeOffset() + this->GetScoreTimeTiedDuration();
+
+    int tpq = params->m_midiFile->getTPQ();
+
+    params->m_midiFile->addNoteOn(params->m_midiTrack, starttime * tpq, channel, pitch, velocity);
+    params->m_midiFile->addNoteOff(params->m_midiTrack, stoptime * tpq, channel, pitch);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

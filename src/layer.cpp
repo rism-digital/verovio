@@ -34,9 +34,9 @@ namespace vrv {
 // Layer
 //----------------------------------------------------------------------------
 
-Layer::Layer(int n) : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttCommon(), AttTyped()
+Layer::Layer(int n) : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped()
 {
-    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);
 
     // owned pointers need to be set to NULL;
@@ -63,7 +63,7 @@ void Layer::Reset()
 {
     Object::Reset();
     DrawingListInterface::Reset();
-    ResetCommon();
+    ResetNInteger();
     ResetTyped();
 
     ResetStaffDefObjects();
@@ -404,13 +404,13 @@ int Layer::AdjustSylSpacing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::CalcMaxMeasureDuration(FunctorParams *functorParams)
+int Layer::CalcOnsetOffset(FunctorParams *functorParams)
 {
-    CalcMaxMeasureDurationParams *params = dynamic_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    // reset it
-    params->m_currentValue = 0.0;
+    params->m_currentScoreTime = 0.0;
+    params->m_currentRealTimeSeconds = 0.0;
 
     return FUNCTOR_CONTINUE;
 }

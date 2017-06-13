@@ -238,8 +238,8 @@ private:
      * @name Methods for converting MusicXML string values to MEI attributes.
      */
     ///@{
-    data_ACCIDENTAL_EXPLICIT ConvertAccidentalToAccid(std::string value);
-    data_ACCIDENTAL_IMPLICIT ConvertAlterToAccid(float value);
+    data_ACCIDENTAL_WRITTEN ConvertAccidentalToAccid(std::string value);
+    data_ACCIDENTAL_GESTURAL ConvertAlterToAccid(float value);
     data_BARRENDITION ConvertStyleToRend(std::string value, bool repeat);
     data_BOOLEAN ConvertWordToBool(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
