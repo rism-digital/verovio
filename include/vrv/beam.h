@@ -63,7 +63,7 @@ public:
 // Beam
 //----------------------------------------------------------------------------
 
-class Beam : public LayerElement, public ObjectListInterface, public DrawingListInterface {
+class Beam : public LayerElement, public ObjectListInterface, public DrawingListInterface, public AttColor {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

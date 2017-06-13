@@ -26,6 +26,8 @@ namespace vrv {
 class ControlElement;
 class Dir;
 class Dynam;
+class F;
+class Fb;
 class Hairpin;
 class Harm;
 class Layer;
@@ -118,7 +120,7 @@ private:
      */
     ///@{
     bool ReadMusicXmlPart(pugi::xml_node node, Section *section, int nbStaves, int staffOffset);
-    bool ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, int nbStaves, int staffOffset);
+    bool ReadMusicXmlMeasure(pugi::xml_node node, Section *section, Measure *measure, int nbStaves, int staffOffset);
     ///@}
 
     /*
@@ -131,14 +133,15 @@ private:
      * @name Methods for reading the content of a MusicXml measure.
      */
     ///@{
-    void ReadMusicXmlAttributes(pugi::xml_node, Measure *measure, int measureNum);
+    void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, int measureNum);
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, int measureNum);
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, int measureNum);
     void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, int measureNum);
+    void ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, int measureNum);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, int measureNum);
     void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, int measureNum);
     void ReadMusicXmlNote(pugi::xml_node, Measure *measure, int measureNum);
-    void ReadMusicXmlPrint(pugi::xml_node, Measure *measure, int measureNum);
+    void ReadMusicXmlPrint(pugi::xml_node, Section *section);
     ///@}
 
     /*
@@ -222,7 +225,7 @@ private:
      */
     ///@{
     ///@}
-    void FillSpace(vrv::Layer *layer, int dur);
+    void FillSpace(Layer *layer, int dur);
 
     /*
      * @name Helper method for generating additional IDs
@@ -258,8 +261,9 @@ private:
     int m_ppq;
     /* meaure time */
     int m_durTotal = 0;
-    /* meter count */
+    /* meter signature */
     int m_meterCount = 0;
+    int m_meterUnit = 0;
     /* LastElementID **/
     std::string m_ID;
     /* The stack for piling open LayerElements (beams, tuplets, chords, etc.)  */

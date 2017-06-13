@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        barline.cpp
-// Author:      Laurent Pugin
-// Created:     2011
+// Name:        breath.cpp
+// Author:      Klaus Rettinghaus
+// Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "barline.h"
+#include "breath.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,59 +13,37 @@
 
 //----------------------------------------------------------------------------
 
-#include "horizontalaligner.h"
+#include "verticalaligner.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// BarLine
+// Breath
 //----------------------------------------------------------------------------
 
-BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor()
+Breath::Breath() : ControlElement("breath-"), TimePointInterface(), AttColor(), AttPlacement()
 {
-    RegisterAttClass(ATT_BARLINELOG);
+    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_PLACEMENT);
 
     Reset();
 }
 
-BarLine::~BarLine()
+Breath::~Breath()
 {
 }
 
-void BarLine::Reset()
+void Breath::Reset()
 {
-    LayerElement::Reset();
-
-    ResetBarLineLog();
+    ControlElement::Reset();
+    TimePointInterface::Reset();
     ResetColor();
-}
-
-bool BarLine::SetAlignment(Alignment *alignment)
-{
-    m_alignment = alignment;
-    return (m_alignment->AddLayerElementRef(this));
-}
-
-bool BarLine::HasRepetitionDots() const
-{
-    if (GetForm() == BARRENDITION_rptstart || GetForm() == BARRENDITION_rptend || GetForm() == BARRENDITION_rptboth) {
-        return true;
-    }
-    return false;
+    ResetPlacement();
 }
 
 //----------------------------------------------------------------------------
-// BarLineAttr
+// Breath functor methods
 //----------------------------------------------------------------------------
-
-BarLineAttr::BarLineAttr() : BarLine()
-{
-    m_isLeft = false;
-}
-
-BarLineAttr::~BarLineAttr()
-{
-}
 
 } // namespace vrv

@@ -55,9 +55,10 @@ namespace vrv {
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() : Object("le-"), AttCommon(), AttTyped()
+LayerElement::LayerElement() : Object("le-"), AttCommon(), AttCommonPart(), AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
@@ -66,6 +67,7 @@ LayerElement::LayerElement() : Object("le-"), AttCommon(), AttTyped()
 LayerElement::LayerElement(std::string classid) : Object(classid), AttCommon(), AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
@@ -75,6 +77,7 @@ void LayerElement::Reset()
 {
     Object::Reset();
     ResetCommon();
+    ResetCommonPart();
     ResetTyped();
 
     m_xAbs = VRV_UNSET;
@@ -691,8 +694,9 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         Note *note = chord->GetTopNote();
         assert(note);
         int loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
-        // Once we have AttLoc on Note
-        // if (note->HasLoc()) loc = note->GetLoc();
+        if (note->HasLoc()) {
+            loc = note->GetLoc();
+        }
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
     else if (this->Is({ CUSTOS, DOT })) {
@@ -704,9 +708,14 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
         Chord *chord = note->IsChordTone();
-        int loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
-        // Once we have AttLoc on Note
-        // if (note->HasLoc()) loc = note->GetLoc();
+        int loc = 0;
+        if (note->HasPname()) {
+            loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
+        }
+        // should this override pname/oct ?
+        if (note->HasLoc()) {
+            loc = note->GetLoc();
+        }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
         // Make it relative to the top note one (see above) but not for cross-staff notes in chords
         if (chord && !m_crossStaff) {
@@ -715,6 +724,40 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         note->SetDrawingLoc(loc);
         this->SetDrawingYRel(yRel);
     }
+    else if (this->Is(MREST)) {
+        MRest *mRest = dynamic_cast<MRest *>(this);
+        assert(mRest);
+        int loc = 0;
+        if (mRest->HasLoc()) {
+            loc = mRest->GetLoc();
+        }
+        // Automatically calculate rest position
+        else {
+            // set default location to the middle of the staff
+            Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+            assert(staff);
+            loc = staff->m_drawingLines - 1;
+            // Limitation: GetLayerCount does not take into account editorial markup
+            // should be refined later
+            bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
+            if (hasMultipleLayer) {
+                Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
+                assert(firstLayer);
+                if (firstLayer->GetN() == layerY->GetN())
+                    loc += 2;
+                else
+                    loc -= 2;
+            }
+
+            // add offset
+            else if (staff->m_drawingLines > 1)
+                loc += 2;
+        }
+
+        mRest->SetDrawingLoc(loc);
+        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+    }
+
     else if (this->Is(REST)) {
         Rest *rest = dynamic_cast<Rest *>(this);
         assert(rest);
@@ -727,16 +770,23 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         }
         // Automatically calculate rest position
         else {
+            // set default location to the middle of the staff
+            Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+            assert(staff);
+            loc = staff->m_drawingLines - 1;
             // Limitation: GetLayerCount does not take into account editorial markup
+            // should be refined later
             bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
-            bool isFirstLayer = false;
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
-                if (firstLayer->GetN() == layerY->GetN()) isFirstLayer = true;
+                if (firstLayer->GetN() == layerY->GetN())
+                    loc += 2;
+                else
+                    loc -= 2;
             }
-            loc = rest->GetDefaultLoc(hasMultipleLayer, isFirstLayer);
         }
+        loc = rest->GetRestLocOffset(loc);
         rest->SetDrawingLoc(loc);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
@@ -809,7 +859,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
 
             // Nothing to do if we have no vertical overlap
             if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;
-            
+
             // Nothing to do either if we have no horizontal overlap
             if (!this->HorizontalSelfOverlap(*iter, horizontalMargin)) continue;
 
@@ -1129,14 +1179,11 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    // Here we need to check if the LayerElement as a duration, otherwise we can continue
+    // Here we need to check if the LayerElement has a duration, otherwise we can continue
     if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
 
     // Now deal with the different elements
     if (this->Is(REST)) {
-        // Rest *rest = dynamic_cast<Rest *>(this);
-        // assert(rest);
-        // LogMessage("Rest %f", GetAlignmentDuration());
         // increase the currentTime accordingly
         params->m_currentMeasureTime += GetAlignmentDuration() * params->m_currentBpm / (DUR_MAX / DURATION_4);
     }

@@ -40,6 +40,7 @@ Note::Note()
     , StemmedDrawingInterface()
     , DurationInterface()
     , PitchInterface()
+    , PositionInterface()
     , AttColor()
     , AttColoration()
     , AttGraced()
@@ -52,6 +53,7 @@ Note::Note()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
+    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_GRACED);
@@ -81,6 +83,7 @@ void Note::Reset()
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     PitchInterface::Reset();
+    PositionInterface::Reset();
     ResetColor();
     ResetColoration();
     ResetGraced();
@@ -245,7 +248,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
 
     // Here we should get the notehead value
     wchar_t code = SMUFL_E0A4_noteheadBlack;
-    
+
     // This is never called for now because mensural notes do not have stem/flag children
     // For changingg this, change Note::CalcStem and Note::PrepareLayerElementParts
     if (this->IsMensural()) {
@@ -284,7 +287,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
 
     // Here we should get the notehead value
     wchar_t code = SMUFL_E0A4_noteheadBlack;
-    
+
     // This is never called for now because mensural notes do not have stem/flag children
     // See comment above
     if (this->IsMensural()) {
@@ -314,11 +317,11 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
 wchar_t Note::GetMensuralSmuflNoteHead()
 {
     assert(this->IsMensural());
-    
-    Staff *staff = dynamic_cast<Staff*>(this->GetFirstParent(STAFF));
+
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
-    
+
     wchar_t code = 0;
     if (mensural_black) {
         code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
@@ -394,9 +397,9 @@ int Note::CalcStem(FunctorParams *functorParams)
     params->m_isGraceNote = this->IsGraceNote();
 
     int staffSize = staff->m_drawingStaffSize;
-    int staffY = staff->GetDrawingY();
 
-    params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
+    params->m_verticalCenter
+        = staff->GetDrawingY() - params->m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
 
     /************ Set the direction ************/
 
@@ -725,6 +728,7 @@ int Note::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
+    PositionInterface::InterfaceResetDrawing(functorParams, this);
 
     this->ResetDrawingTieAttr();
 
@@ -737,6 +741,7 @@ int Note::ResetDrawing(FunctorParams *functorParams)
 int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     LayerElement::ResetHorizontalAlignment(functorParams);
+    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;

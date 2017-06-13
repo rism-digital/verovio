@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        view_tuplet.cpp
-// Author:      Rodolfo Zitellini
+// Author:      Rodolfo Zitellini and Klaus Rettinghaus
 // Created:     21/08/2012
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
@@ -38,19 +38,40 @@ bool View::OneBeamInTuplet(Tuplet *tuplet)
     ArrayOfObjects elems;
 
     // Are we contained in a beam?
-    if (tuplet->GetFirstParent(BEAM, MAX_BEAM_DEPTH) && (tuplet->GetNoteCount() != 0)) return true;
-
-    // No we contain a beam? Go on and search for it in the children
-    for (int i = 0; i < tuplet->GetChildCount(); i++) {
-        currentBeam = dynamic_cast<Beam *>(tuplet->GetChild(i));
-
-        // first child is not a beam, or it is a beam but we have more than one child
-        if (!currentBeam || tuplet->GetChildCount() > 1) {
-            return false;
-        }
+    if (tuplet->GetFirstParent(BEAM, 1) && (tuplet->GetNoteCount() != 0)) {
+        // is only the tuplet beamed and no other tuplet contained?
+        currentBeam = dynamic_cast<Beam *>(tuplet->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
+        if ((currentBeam->GetChildCount() == 1) && (tuplet->GetChildCount(TUPLET) == 0)) return true;
     }
 
-    return true;
+    // Do we contain a beam?
+    if ((tuplet->GetChildCount() == 1) && (tuplet->GetChildCount(BEAM) == 1)) return true;
+
+    return false;
+}
+
+int View::NestedTuplets(Object *object)
+{
+    assert(object);
+
+    int tupletDepth = 1;
+
+    for (int i = 0; i < object->GetChildCount(); i++) {
+        int tupletCount = 1;
+
+        // check how many nested tuplets there are
+        if ((object->GetChild(i))->Is(TUPLET)) {
+            tupletCount += NestedTuplets(object->GetChild(i));
+        }
+        // and don't forget beams
+        if ((object->GetChild(i))->Is(BEAM)) {
+            tupletCount = NestedTuplets(object->GetChild(i));
+        }
+
+        tupletDepth = tupletCount > tupletDepth ? tupletCount : tupletDepth;
+    }
+
+    return tupletDepth;
 }
 
 /**
@@ -96,160 +117,145 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
     LayerElement *firstElement = dynamic_cast<LayerElement *>(tupletChildren->front());
     LayerElement *lastElement = dynamic_cast<LayerElement *>(tupletChildren->back());
 
-    // AllNotesBeamed tries to figure out if all the notes are in the same beam
-    if (OneBeamInTuplet(tuplet)) {
+    // There are unbeamed notes of two different beams
+    // treat all the notes as unbeamed
+    int ups = 0, downs = 0; // quantity of up- and down-stems
 
-        // yes they are in a beam
-        x = firstElement->GetDrawingX()
-            + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->GetSelfX2()) / 2;
+    // In this case use the center of the notehead to calculate the exact center
+    // as it looks better
+    x = firstElement->GetDrawingX()
+        + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->GetSelfX2()) / 2;
 
-        // align the center point at the exact center of the first an last stem
-        // TUPLET_OFFSET is summed so it does not collide with the stem
+    // Return the start and end position for the brackets
+    // starting from the first edge and last of the BBoxes
+    start->x = firstElement->GetSelfX1() + firstElement->GetDrawingX();
+    end->x = lastElement->GetSelfX2() + lastElement->GetDrawingX();
+
+    // The first step is to calculate all the stem directions
+    // cycle into the elements and count the up and down dirs
+    ListOfObjects::iterator iter = tupletChildren->begin();
+    while (iter != tupletChildren->end()) {
+        if ((*iter)->Is(NOTE)) {
+            Note *currentNote = dynamic_cast<Note *>(*iter);
+            assert(currentNote);
+            if (currentNote->GetDrawingStemDir() == STEMDIRECTION_up)
+                ups++;
+            else if (currentNote->GetDrawingStemDir() == STEMDIRECTION_down)
+                downs++;
+        }
+        ++iter;
+    }
+    // true means up
+    direction = ups > downs ? STEMDIRECTION_up : STEMDIRECTION_down;
+
+    // if ups or downs are 0, it means all the stems go in the same direction
+    if (ups == 0 || downs == 0) {
+
         Note *firstNote = dynamic_cast<Note *>(tuplet->FindChildByType(NOTE));
         Note *lastNote = dynamic_cast<Note *>(tuplet->FindChildByType(NOTE, UNLIMITED_DEPTH, BACKWARD));
 
+        // Calculate the average between the first and last stem
+        // set center, start and end too.
         y = firstElement->GetDrawingY();
         if (firstNote && lastNote) {
-            if (firstNote->GetDrawingStemDir() == STEMDIRECTION_up)
+            if (direction == STEMDIRECTION_up) { // up
                 y = lastNote->GetDrawingStemEnd(lastNote).y
                     + (firstNote->GetDrawingStemEnd(firstNote).y - lastNote->GetDrawingStemEnd(lastNote).y) / 2
-                    + TUPLET_OFFSET;
-            else
+                    + TUPLET_OFFSET * NestedTuplets(tuplet);
+                start->y = firstNote->GetDrawingStemEnd(firstNote).y + TUPLET_OFFSET * NestedTuplets(tuplet);
+                end->y = lastNote->GetDrawingStemEnd(lastNote).y + TUPLET_OFFSET * NestedTuplets(tuplet);
+            }
+            else {
                 y = lastNote->GetDrawingStemEnd(lastNote).y
                     + (firstNote->GetDrawingStemEnd(firstNote).y - lastNote->GetDrawingStemEnd(lastNote).y) / 2
-                    - TUPLET_OFFSET;
+                    - TUPLET_OFFSET * NestedTuplets(tuplet);
+                start->y = firstNote->GetDrawingStemEnd(firstNote).y - TUPLET_OFFSET * NestedTuplets(tuplet);
+                end->y = lastNote->GetDrawingStemEnd(lastNote).y - TUPLET_OFFSET * NestedTuplets(tuplet);
+            }
+        }
+        // or there are only rests and spaces
+        else {
+            // it should take the glyph height into account
+            y = lastElement->GetDrawingY() + (firstElement->GetDrawingY() - lastElement->GetDrawingY()) / 2
+                + 2.5 * TUPLET_OFFSET;
+            start->y = firstElement->GetDrawingY() + 2.5 * TUPLET_OFFSET;
+            end->y = lastElement->GetDrawingY() + 2.5 * TUPLET_OFFSET;
+            // set it back to up
+            direction = STEMDIRECTION_up;
         }
 
-        // Copy the generated coordinates
-        center->x = x;
-        center->y = y;
-        if (firstNote) direction = firstNote->GetDrawingStemDir(); // stem direction is the same for all notes
-    }
-    else {
-        // There are unbeamed notes of two different beams
-        // treat all the notes as unbeamed
-        int ups = 0, downs = 0; // quantity of up- and down-stems
-
-        // In this case use the center of the notehead to calculate the exact center
-        // as it looks better
-        x = firstElement->GetDrawingX()
-            + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->GetSelfX2()) / 2;
-
-        // Return the start and end position for the brackes
-        // starting from the first edge and last of the BBoxes
-        start->x = firstElement->GetSelfX1() + firstElement->GetDrawingX();
-        end->x = lastElement->GetSelfX2() + lastElement->GetDrawingX();
-
-        // The first step is to calculate all the stem directions
-        // cycle into the elements and count the up and down dirs
-        ListOfObjects::iterator iter = tupletChildren->begin();
+        // Now we cycle again in all the intermediate notes (i.e. we start from the second note
+        // and stop at last -1)
+        // We will see if the position of the note is more (or less for down stems) of the calculated
+        // average. In this case we offset down or up all the points
+        iter = tupletChildren->begin();
         while (iter != tupletChildren->end()) {
             if ((*iter)->Is(NOTE)) {
                 Note *currentNote = dynamic_cast<Note *>(*iter);
                 assert(currentNote);
-                if (currentNote->GetDrawingStemDir() == STEMDIRECTION_up)
-                    ups++;
-                else
-                    downs++;
+
+                if (direction == STEMDIRECTION_up) {
+                    // The note is more than the avg, adjust to y the difference
+                    // from this note to the avg
+                    if (currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET > y) {
+                        int offset = y
+                            - (currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET * NestedTuplets(tuplet));
+                        y -= offset;
+                        end->y -= offset;
+                        start->y -= offset;
+                    }
+                }
+                else {
+                    if (currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET < y) {
+                        int offset = y
+                            - (currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET * NestedTuplets(tuplet));
+                        y -= offset;
+                        end->y -= offset;
+                        start->y -= offset;
+                    }
+                }
             }
             ++iter;
         }
-        // true means up
-        direction = ups > downs ? STEMDIRECTION_up : STEMDIRECTION_down;
+    }
+    else {
+        // two-directional beams
+        // this case is similar to the above, but the bracket is only horizontal
+        // y is 0 because the final y pos is above the tallest stem
+        y = 0;
 
-        // if ups or downs are 0, it means all the stems go in the same direction
-        if (ups == 0 || downs == 0) {
+        // Find the tallest stem and set y to it (with the offset distance)
+        iter = tupletChildren->begin();
+        while (iter != tupletChildren->end()) {
+            if ((*iter)->Is(NOTE)) {
+                Note *currentNote = dynamic_cast<Note *>(*iter);
+                assert(currentNote);
 
-            Note *firstNote = dynamic_cast<Note *>(tuplet->FindChildByType(NOTE));
-            Note *lastNote = dynamic_cast<Note *>(tuplet->FindChildByType(NOTE, UNLIMITED_DEPTH, BACKWARD));
-
-            // Calculate the average between the first and last stem
-            // set center, start and end too.
-            y = firstElement->GetDrawingY();
-            if (firstNote && lastNote) {
-                if (direction == STEMDIRECTION_up) { // up
-                    y = lastNote->GetDrawingStemEnd(lastNote).y
-                        + (firstNote->GetDrawingStemEnd(firstNote).y - lastNote->GetDrawingStemEnd(lastNote).y) / 2
-                        + TUPLET_OFFSET;
-                    start->y = firstNote->GetDrawingStemEnd(firstNote).y + TUPLET_OFFSET;
-                    end->y = lastNote->GetDrawingStemEnd(lastNote).y + TUPLET_OFFSET;
+                if (currentNote->GetDrawingStemDir() == direction) {
+                    if (direction == STEMDIRECTION_up) {
+                        if (y == 0
+                            || currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET * NestedTuplets(tuplet)
+                                >= y)
+                            y = currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET * NestedTuplets(tuplet);
+                    }
+                    else {
+                        if (y == 0
+                            || currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET * NestedTuplets(tuplet)
+                                <= y)
+                            y = currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET * NestedTuplets(tuplet);
+                    }
                 }
                 else {
-                    y = lastNote->GetDrawingStemEnd(lastNote).y
-                        + (firstNote->GetDrawingStemEnd(firstNote).y - lastNote->GetDrawingStemEnd(lastNote).y) / 2
-                        - TUPLET_OFFSET;
-                    start->y = firstNote->GetDrawingStemEnd(firstNote).y - TUPLET_OFFSET;
-                    end->y = lastNote->GetDrawingStemEnd(lastNote).y - TUPLET_OFFSET;
+                    // do none for now
+                    // but if a notehead with a reversed stem is taller that the last
+                    // calculated y, we need to offset
                 }
             }
-
-            // Now we cycle again in all the intermediate notes (i.e. we start from the second note
-            // and stop at last -1)
-            // We will see if the position of the note is more (or less for down stems) of the calculated
-            // average. In this case we offset down or up all the points
-            iter = tupletChildren->begin();
-            while (iter != tupletChildren->end()) {
-                if ((*iter)->Is(NOTE)) {
-                    Note *currentNote = dynamic_cast<Note *>(*iter);
-                    assert(currentNote);
-
-                    if (direction == STEMDIRECTION_up) {
-                        // The note is more than the avg, adjust to y the difference
-                        // from this note to the avg
-                        if (currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET > y) {
-                            int offset = y - (currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET);
-                            y -= offset;
-                            end->y -= offset;
-                            start->y -= offset;
-                        }
-                    }
-                    else {
-                        if (currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET < y) {
-                            int offset = y - (currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET);
-                            y -= offset;
-                            end->y -= offset;
-                            start->y -= offset;
-                        }
-                    }
-                }
-                ++iter;
-            }
+            ++iter;
         }
-        else {
-            // two-directional beams
-            // this case is similar to the above, but the bracket is only horizontal
-            // y is 0 because the final y pos is above the tallest stem
-            y = 0;
 
-            // Find the tallest stem and set y to it (with the offset distance)
-            iter = tupletChildren->begin();
-            while (iter != tupletChildren->end()) {
-                if ((*iter)->Is(NOTE)) {
-                    Note *currentNote = dynamic_cast<Note *>(*iter);
-                    assert(currentNote);
-
-                    if (currentNote->GetDrawingStemDir() == direction) {
-                        if (direction == STEMDIRECTION_up) {
-                            if (y == 0 || currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET >= y)
-                                y = currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET;
-                        }
-                        else {
-                            if (y == 0 || currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET <= y)
-                                y = currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET;
-                        }
-                    }
-                    else {
-                        // do none for now
-                        // but if a notehead with a reversed stem is taller that the last
-                        // calculated y, we need to offset
-                    }
-                }
-                ++iter;
-            }
-
-            // end and start are on the same line (and so il center when set later)
-            end->y = start->y = y;
-        }
+        // end and start are on the same line (and so il center when set later)
+        end->y = start->y = y;
     }
 
     center->x = x;
@@ -274,34 +280,49 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
     TextExtend extend;
     std::wstring notes;
 
-    bool drawingCueSize = tuplet->IsCueSize();
-
-    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
-
-    if (tuplet->GetNum() > 0) {
-        notes = IntToTupletFigures((short int)tuplet->GetNum());
-        dc->GetSmuflTextExtent(notes, &extend);
-    }
-
     Point start, end, center;
     data_STEMDIRECTION direction = GetTupletCoordinates(tuplet, layer, &start, &end, &center);
+    int x1 = center.x, x2 = center.x;
 
-    // Calculate position for number 0x82
-    // since the number is slanted, move the center left
-    // by 4 pixels so it seems more centered to the eye
-    int txt_x = center.x - (extend.m_width / 2);
-    // we need to move down the figure of half of it height, which is about an accid width;
-    // also, cue size is not supported. Does it has to?
-    int txt_y = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, drawingCueSize);
+    // draw tuplet numerator
+    if ((tuplet->GetNum() > 0) && (tuplet->GetNumVisible() != BOOLEAN_false)) {
+        bool drawingCueSize = tuplet->IsCueSize();
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
+        notes = IntToTupletFigures((short int)tuplet->GetNum());
+        if (tuplet->GetNumFormat() == tupletVis_NUMFORMAT_ratio) {
+            notes.push_back(SMUFL_E88A_tupletColon);
+            notes = notes + IntToTupletFigures((short int)tuplet->GetNumbase());
+        }
+        dc->GetSmuflTextExtent(notes, &extend);
 
-    if (tuplet->GetNum() && (tuplet->GetNumVisible() != BOOLEAN_false)) {
+        // Calculate position for number 0x82
+        // since the number is slanted, move the center left
+        int txt_x = x1 - (extend.m_width / 2);
+        // and move it further, when it is under the stave
+        if (direction == STEMDIRECTION_down) {
+            txt_x -= staff->m_drawingStaffSize;
+        }
+        // we need to move down the figure of half of it height, which is about an accid width;
+        // also, cue size is not supported. Does it has to?
+        int txt_y
+            = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, drawingCueSize);
+
         DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->m_drawingStaffSize);
-    }
 
-    dc->ResetFont();
+        // x1 = 10 pixels before the number
+        x1 = txt_x - 40;
+        // x2 = just after, the number is abundant so I do not add anything
+        x2 = txt_x + extend.m_width + 20;
+
+        dc->ResetFont();
+    }
 
     // Nothing to do if the bracket is not visible
     if (tuplet->GetBracketVisible() == BOOLEAN_false) {
+        return;
+    }
+    // If all tuplets beamed draw no bracket by default
+    if (OneBeamInTuplet(tuplet) && !(tuplet->GetBracketVisible() == BOOLEAN_true)) {
         return;
     }
 
@@ -309,42 +330,34 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
 
     dc->SetPen(m_currentColour, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
 
-    // Start is 0 when no line is necessary (i.e. beamed notes)
-    if (start.x > 0) {
-        // Draw the bracket, interrupt where the number is
+    // Draw the bracket, interrupt where the number is
 
-        // get the slope
-        double m = (double)(start.y - end.y) / (double)(start.x - end.x);
+    // get the slope
+    double m = (double)(start.y - end.y) / (double)(start.x - end.x);
 
-        // x = 10 pixels before the number
-        int x = txt_x - 40;
-        // xa = just after, the number is abundant so I do not add anything
-        int xa = txt_x + extend.m_width + 20;
+    // calculate the y coords in the slope
+    double y1 = (double)start.y + m * (x1 - (double)start.x);
+    double y2 = (double)start.y + m * (x2 - (double)start.x);
 
-        // calculate the y coords in the slope
-        double y1 = (double)start.y + m * (x - (double)start.x);
-        double y2 = (double)start.y + m * (xa - (double)start.x);
+    if (tuplet->GetNumVisible() == BOOLEAN_false) {
+        // one single line
+        dc->DrawLine(start.x, ToDeviceContextY(start.y), end.x, ToDeviceContextY(end.y));
+    }
+    else {
+        // first line
+        dc->DrawLine(start.x, ToDeviceContextY(start.y), (int)x1, ToDeviceContextY((int)y1));
+        // second line after gap
+        dc->DrawLine((int)x2, ToDeviceContextY((int)y2), end.x, ToDeviceContextY(end.y));
+    }
 
-        if (tuplet->GetNumVisible() == BOOLEAN_false) {
-            // one single line
-            dc->DrawLine(start.x, ToDeviceContextY(start.y), end.x, ToDeviceContextY((int)y1));
-        }
-        else {
-            // first line
-            dc->DrawLine(start.x, ToDeviceContextY(start.y), (int)x, ToDeviceContextY((int)y1));
-            // second line after gap
-            dc->DrawLine((int)xa, ToDeviceContextY((int)y2), end.x, ToDeviceContextY(end.y));
-        }
-
-        // vertical bracket lines
-        if (direction == STEMDIRECTION_up) {
-            dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y - verticalLine));
-            dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y - verticalLine));
-        }
-        else {
-            dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y + verticalLine));
-            dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y + verticalLine));
-        }
+    // vertical bracket lines
+    if (direction == STEMDIRECTION_up) {
+        dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y - verticalLine));
+        dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y - verticalLine));
+    }
+    else {
+        dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y + verticalLine));
+        dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y + verticalLine));
     }
 
     dc->ResetPen();

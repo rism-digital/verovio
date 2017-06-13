@@ -65,9 +65,9 @@ public:
     wchar_t GetRestGlyph() const;
 
     /**
-     * Get the default loc for a doc when neither oloc or loc are provided.
+     * Get the vertical offset for each glyph.
      */
-    int GetDefaultLoc(bool hasMultipleLayer, bool isFirstLayer);
+    int GetRestLocOffset(int loc);
 
     //----------//
     // Functors //
