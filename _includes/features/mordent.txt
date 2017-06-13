@@ -1,0 +1,14 @@
+<measure n="1" right="dbl">
+  <staff n="1">
+    <layer n="1">
+      <note xml:id="note-01" dur="4" oct="4" pname="c" stem.dir="down"/>
+      <note xml:id="note-02" dur="4" oct="4" pname="c" stem.dir="up"/>
+      <note xml:id="note-03" dur="4" oct="4" pname="c" stem.dir="down"/>
+      <note xml:id="note-04" dur="4" oct="4" pname="c" stem.dir="up"/>
+    </layer>
+  </staff>
+  <mordent staff="1" startid="#note-01"/>
+  <mordent staff="1" startid="#note-02" form="inv"/>
+  <mordent staff="1" startid="#note-03" form="inv" long="true"/>
+  <mordent staff="1" startid="#note-04" form="inv" long="true" place="below"/>
+</measure>

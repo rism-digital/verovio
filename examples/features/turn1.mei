@@ -22,7 +22,7 @@
                             <staffDef clef.shape="G" clef.line="2" n="1" key.mode="major" key.pname="f" lines="5"/>
                         </staffGrp>
                     </scoreDef>
-                    <section>
+                    <section label="feature-example">
                         <measure n="1">
                             <staff n="1">
                                 <layer n="1">
