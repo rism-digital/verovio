@@ -31,7 +31,7 @@ class TimeSpanningInterface;
  * It contains Measure objects.
  * For unmeasured music, one single Measure is added for simplifying internal processing
 */
-class Staff : public Object, public AttCommon, public AttTyped {
+class Staff : public Object, public AttNInteger, public AttTyped {
 
 public:
     /**
@@ -96,8 +96,8 @@ public:
      * If necessary creates the ledger line array.
      */
     ///@{
-    void AddLegerLineAbove(int count, short left, short right, bool cueSize);
-    void AddLegerLineBelow(int count, short left, short right, bool cueSize);
+    void AddLegerLineAbove(int count, int left, int right, bool cueSize);
+    void AddLegerLineBelow(int count, int left, int right, bool cueSize);
     ///@}
 
     //----------//
@@ -143,7 +143,7 @@ private:
     /**
      * Add the ledger line dashes to the legderline array.
      */
-    void AddLegerLines(ArrayOfLedgerLines *lines, int count, short left, short right);
+    void AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int right);
 
 public:
     /**
@@ -216,7 +216,7 @@ public:
      * Add a dash to the ledger line object.
      * If necessary merges overlapping dashes.
      */
-    void AddDash(short left, short right);
+    void AddDash(int left, int right);
 
 protected:
     //
@@ -226,7 +226,7 @@ public:
     /**
      * A list of dashes relative to the staff position.
      */
-    std::list<std::pair<short, short> > m_dashes;
+    std::list<std::pair<int, int> > m_dashes;
 
 protected:
     //

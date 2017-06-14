@@ -31,7 +31,7 @@ class Staff;
  * A System is contained in a Page.
  * It contains Staff objects.
 */
-class System : public Object, public DrawingListInterface, public AttCommon, public AttTyped {
+class System : public Object, public DrawingListInterface, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

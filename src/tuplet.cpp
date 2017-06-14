@@ -32,7 +32,7 @@ Tuplet::Tuplet()
     , ObjectListInterface()
     , AttColor()
     , AttDurationRatio()
-    , AttNumberplacement()
+    , AttNumberPlacement()
     , AttTupletVis()
 {
     RegisterAttClass(ATT_COLOR);
@@ -52,7 +52,7 @@ void Tuplet::Reset()
     LayerElement::Reset();
     ResetColor();
     ResetDurationRatio();
-    ResetNumberplacement();
+    ResetNumberPlacement();
     ResetTupletVis();
 }
 

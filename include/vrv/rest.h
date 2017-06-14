@@ -26,7 +26,7 @@ class Rest : public LayerElement,
              public DurationInterface,
              public PositionInterface,
              public AttColor,
-             public AttRelativesize,
+             public AttCue,
              public AttRestVisMensural {
 public:
     /**
@@ -63,11 +63,6 @@ public:
      * This is valid only for CMN and for duration shorter than half notes.
      */
     wchar_t GetRestGlyph() const;
-
-    /**
-     * Get the default loc for a doc when neither oloc or loc are provided.
-     */
-    int GetRestDefaultLoc(bool hasMultipleLayer, bool isFirstLayer);
 
     /**
      * Get the vertical offset for each glyph.

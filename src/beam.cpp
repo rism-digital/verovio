@@ -494,7 +494,7 @@ void Beam::InitCoords(ListOfObjects *childList)
 
         // Look at beam breaks
         m_beamElementCoords.at(elementCount)->m_breaksec = 0;
-        AttBeamsecondary *beamsecondary = dynamic_cast<AttBeamsecondary *>(current);
+        AttBeamSecondary *beamsecondary = dynamic_cast<AttBeamSecondary *>(current);
         if (beamsecondary && beamsecondary->HasBreaksec()) {
             if (!m_drawingParams.m_changingDur) m_drawingParams.m_changingDur = true;
             m_beamElementCoords.at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();

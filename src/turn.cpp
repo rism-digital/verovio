@@ -21,7 +21,8 @@ namespace vrv {
 // Turn
 //----------------------------------------------------------------------------
 
-Turn::Turn() : ControlElement("turn-"), TimePointInterface(), AttColor(), AttPlacement(), AttTurnLog()
+Turn::Turn()
+    : ControlElement("turn-"), TimePointInterface(), AttColor(), AttOrnamentAccid(), AttPlacement(), AttTurnLog()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
@@ -41,7 +42,7 @@ void Turn::Reset()
     ControlElement::Reset();
     TimePointInterface::Reset();
     ResetColor();
-    ResetOrnamentaccid();
+    ResetOrnamentAccid();
     ResetPlacement();
     ResetTurnLog();
 }

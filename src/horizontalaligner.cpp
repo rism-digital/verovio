@@ -58,7 +58,7 @@ Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType t
         assert(alignment);
 
         double alignment_time = alignment->GetTime();
-        if (vrv::AreEqual(alignment_time, time)) {
+        if (AreEqual(alignment_time, time)) {
             if (alignment->GetType() == type) {
                 return alignment;
             }
@@ -585,18 +585,18 @@ void Alignment::AddToAccidSpace(Accid *accid)
 // AlignmentReference
 //----------------------------------------------------------------------------
 
-AlignmentReference::AlignmentReference() : Object(), AttCommon()
+AlignmentReference::AlignmentReference() : Object(), AttNInteger()
 {
-    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_NINTEGER);
 
     Reset();
 
     this->SetAsReferenceObject();
 }
 
-AlignmentReference::AlignmentReference(int staffN) : Object(), AttCommon()
+AlignmentReference::AlignmentReference(int staffN) : Object(), AttNInteger()
 {
-    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_NINTEGER);
 
     Reset();
 
@@ -611,7 +611,7 @@ AlignmentReference::~AlignmentReference()
 void AlignmentReference::Reset()
 {
     Object::Reset();
-    ResetCommon();
+    ResetNInteger();
 
     m_accidSpace.clear();
     m_multipleLayer = false;
@@ -689,7 +689,7 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
         assert(timestampAttr);
 
         double alignmentTime = timestampAttr->GetActualDurPos();
-        if (vrv::AreEqual(alignmentTime, time)) {
+        if (AreEqual(alignmentTime, time)) {
             return timestampAttr;
         }
         // nothing found, do not go any further but keep the index

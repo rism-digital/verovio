@@ -97,8 +97,7 @@ private:
     /**
      * Contains a list of one or more pointers indicating the sources which attest to a
      * given reading.
-     * Each value should correspond to the ID of a <source> element located in the
-     * document header.
+     * Each value should correspond to the ID of a
      **/
     std::string m_source;
 

@@ -8,6 +8,7 @@
 #ifndef __VRV_PITCH_INTERFACE_H__
 #define __VRV_PITCH_INTERFACE_H__
 
+#include "atts_gestural.h"
 #include "atts_shared.h"
 
 namespace vrv {

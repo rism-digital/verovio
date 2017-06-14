@@ -26,22 +26,22 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttExtsym
+// AttExtSym
 //----------------------------------------------------------------------------
 
-class AttExtsym : public Att {
+class AttExtSym : public Att {
 public:
-    AttExtsym();
-    virtual ~AttExtsym();
+    AttExtSym();
+    virtual ~AttExtSym();
 
     /** Reset the default values for the attribute class **/
-    void ResetExtsym();
+    void ResetExtSym();
 
     /** Read the values for the attribute class **/
-    bool ReadExtsym(pugi::xml_node element);
+    bool ReadExtSym(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteExtsym(pugi::xml_node element);
+    bool WriteExtSym(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -49,25 +49,40 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetGlyphname(std::string glyphname_) { m_glyphname = glyphname_; }
-    std::string GetGlyphname() const { return m_glyphname; }
-    bool HasGlyphname() const;
+    void SetGlyphAuth(std::string glyphAuth_) { m_glyphAuth = glyphAuth_; }
+    std::string GetGlyphAuth() const { return m_glyphAuth; }
+    bool HasGlyphAuth() const;
     //
-    void SetGlyphnum(wchar_t glyphnum_) { m_glyphnum = glyphnum_; }
-    wchar_t GetGlyphnum() const { return m_glyphnum; }
-    bool HasGlyphnum() const;
+    void SetGlyphName(std::string glyphName_) { m_glyphName = glyphName_; }
+    std::string GetGlyphName() const { return m_glyphName; }
+    bool HasGlyphName() const;
+    //
+    void SetGlyphNum(data_HEXNUM glyphNum_) { m_glyphNum = glyphNum_; }
+    data_HEXNUM GetGlyphNum() const { return m_glyphNum; }
+    bool HasGlyphNum() const;
+    //
+    void SetGlyphUri(std::string glyphUri_) { m_glyphUri = glyphUri_; }
+    std::string GetGlyphUri() const { return m_glyphUri; }
+    bool HasGlyphUri() const;
     ///@}
 
 private:
+    /**
+     * A name or label associated with the controlled vocabulary from which the value
+     * of
+     **/
+    std::string m_glyphAuth;
     /** Glyph name. **/
-    std::string m_glyphname;
+    std::string m_glyphName;
     /**
      * Numeric glyph reference in hexadecimal notation, e.g.
      * "#xE000" or "U+E000". N.B. SMuFL version 1.18 uses the range U+E000 - U+ECBF.
      **/
-    wchar_t m_glyphnum;
+    data_HEXNUM m_glyphNum;
+    /** The web-accessible location of the controlled vocabulary from which the value of **/
+    std::string m_glyphUri;
 
-    /* include <attglyphnum> */
+    /* include <attglyph.uri> */
 };
 
 } // vrv namespace

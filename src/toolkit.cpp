@@ -934,28 +934,39 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     jsonxx::Object o;
     jsonxx::Array a;
 
-    double time = (double)(millisec * 120 / 1000);
-    NoteOnsetOffsetComparison matchTime(time);
-    ArrayOfObjects notes;
-    // Here we would need to check that the midi export is done
-    if (m_doc.GetMidiExportDone()) {
-        m_doc.FindAllChildByAttComparison(&notes, &matchTime);
-
-        // Get the pageNo from the first note (if any)
-        int pageNo = -1;
-        if (notes.size() > 0) {
-            Page *page = dynamic_cast<Page *>(notes.at(0)->GetFirstParent(PAGE));
-            if (page) pageNo = page->GetIdx() + 1;
-        }
-
-        // Fill the JSON object
-        ArrayOfObjects::iterator iter;
-        for (iter = notes.begin(); iter != notes.end(); iter++) {
-            a << (*iter)->GetUuid();
-        }
-        o << "notes" << a;
-        o << "page" << pageNo;
+    // Here we need to check that the midi export is done
+    if (!m_doc.GetMidiExportDone()) {
+        return o.json();
     }
+
+    MeasureOnsetOffsetComparison matchMeasureTime(millisec);
+    Measure *measure = dynamic_cast<Measure *>(m_doc.FindChildByAttComparison(&matchMeasureTime));
+
+    if (!measure) {
+        return o.json();
+    }
+
+    int repeat = measure->EnclosesTime(millisec);
+    int measureTimeOffset = measure->GetRealTimeOffsetMilliseconds(repeat);
+
+    // Get the pageNo from the first note (if any)
+    int pageNo = -1;
+    Page *page = dynamic_cast<Page *>(measure->GetFirstParent(PAGE));
+    if (page) pageNo = page->GetIdx() + 1;
+
+    NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
+    ArrayOfObjects notes;
+
+    measure->FindAllChildByAttComparison(&notes, &matchNoteTime);
+
+    // Fill the JSON object
+    ArrayOfObjects::iterator iter;
+    for (iter = notes.begin(); iter != notes.end(); iter++) {
+        a << (*iter)->GetUuid();
+    }
+    o << "notes" << a;
+    o << "page" << pageNo;
+
     return o.json();
 #else
     // The non-js version of the app should not use this function.
@@ -992,14 +1003,18 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
     return page->GetIdx() + 1;
 }
 
-double Toolkit::GetTimeForElement(const std::string &xmlId)
+int Toolkit::GetTimeForElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindChildByUuid(xmlId);
-    double timeofElement = 0.0;
+    int timeofElement = 0;
     if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
-        timeofElement = note->m_playingOnset * 1000 / 120;
+        Measure *measure = dynamic_cast<Measure *>(note->GetFirstParent(MEASURE));
+        assert(measure);
+        // For now ignore repeats and access always the first
+        timeofElement = measure->GetRealTimeOffsetMilliseconds(1);
+        timeofElement += note->GetRealTimeOnsetMilliseconds();
     }
     return timeofElement;
 }
@@ -1157,15 +1172,18 @@ bool Toolkit::Set(std::string elementId, std::string attrType, std::string attrV
 {
     if (!m_doc.GetDrawingPage()) return false;
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
+    if (Att::SetAnalytical(element, attrType, attrValue)) return true;
     if (Att::SetCmn(element, attrType, attrValue)) return true;
     if (Att::SetCmnornaments(element, attrType, attrValue)) return true;
     if (Att::SetCritapp(element, attrType, attrValue)) return true;
+    if (Att::SetGestural(element, attrType, attrValue)) return true;
     if (Att::SetExternalsymbols(element, attrType, attrValue)) return true;
     if (Att::SetMei(element, attrType, attrValue)) return true;
     if (Att::SetMensural(element, attrType, attrValue)) return true;
     if (Att::SetMidi(element, attrType, attrValue)) return true;
     if (Att::SetPagebased(element, attrType, attrValue)) return true;
     if (Att::SetShared(element, attrType, attrValue)) return true;
+    if (Att::SetVisual(element, attrType, attrValue)) return true;
     return false;
 }
 

@@ -62,15 +62,18 @@ add_executable (
     ${midi_SRC}
     ../src/pugi/pugixml.cpp
     ../libmei/attconverter.cpp
+    ../libmei/atts_analytical.cpp
     ../libmei/atts_cmn.cpp
     ../libmei/atts_cmnornaments.cpp
     ../libmei/atts_critapp.cpp
+    ../libmei/atts_gestural.cpp
     ../libmei/atts_externalsymbols.cpp
     ../libmei/atts_mei.cpp
     ../libmei/atts_mensural.cpp
     ../libmei/atts_midi.cpp
     ../libmei/atts_pagebased.cpp
     ../libmei/atts_shared.cpp
+    ../libmei/atts_visual.cpp
 )
 
 install(

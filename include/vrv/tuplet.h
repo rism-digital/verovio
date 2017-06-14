@@ -10,6 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -24,7 +25,7 @@ class Tuplet : public LayerElement,
                public ObjectListInterface,
                public AttColor,
                public AttDurationRatio,
-               public AttNumberplacement,
+               public AttNumberPlacement,
                public AttTupletVis {
 public:
     /**

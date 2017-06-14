@@ -22,7 +22,7 @@ namespace vrv {
 // Rend
 //----------------------------------------------------------------------------
 
-Rend::Rend() : TextElement("rend-"), AttColor(), AttHorizontalalign(), AttLang(), AttTypography(), AttWhitespace()
+Rend::Rend() : TextElement("rend-"), AttColor(), AttHorizontalAlign(), AttLang(), AttTypography(), AttWhitespace()
 
 {
     RegisterAttClass(ATT_COLOR);
@@ -42,7 +42,7 @@ void Rend::Reset()
 {
     TextElement::Reset();
     ResetColor();
-    ResetHorizontalalign();
+    ResetHorizontalAlign();
     ResetLang();
     ResetTypography();
     ResetWhitespace();

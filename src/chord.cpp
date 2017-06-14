@@ -40,17 +40,17 @@ Chord::Chord()
     , StemmedDrawingInterface()
     , DurationInterface()
     , AttColor()
+    , AttCue()
     , AttGraced()
-    , AttRelativesize()
     , AttStems()
     , AttStemsCmn()
-    , AttTiepresent()
+    , AttTiePresent()
     , AttVisibility()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -71,11 +71,11 @@ void Chord::Reset()
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     ResetColor();
+    ResetCue();
     ResetGraced();
-    ResetRelativesize();
     ResetStems();
     ResetStemsCmn();
-    ResetTiepresent();
+    ResetTiePresent();
     ResetVisibility();
 
     ClearClusters();
@@ -527,7 +527,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
             currentDots = new Dots();
             this->AddChild(currentDots);
         }
-        currentDots->AttAugmentdots::operator=(*this);
+        currentDots->AttAugmentDots::operator=(*this);
     }
     // This will happen only if the duration has changed
     else if (currentDots) {
@@ -557,6 +557,20 @@ int Chord::PrepareTieAttrEnd(FunctorParams *functorParams)
 
     assert(params->m_currentChord);
     params->m_currentChord = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
+{
+    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
+    assert(params);
+
+    double incrementScoreTime = this->GetAlignmentDuration() / (DUR_MAX / DURATION_4);
+    double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
+
+    params->m_currentScoreTime += incrementScoreTime;
+    params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
 
     return FUNCTOR_CONTINUE;
 }

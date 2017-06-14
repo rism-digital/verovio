@@ -28,7 +28,7 @@ namespace vrv {
 // Dots
 //----------------------------------------------------------------------------
 
-Dots::Dots() : LayerElement("dots-"), vrv::AttAugmentdots()
+Dots::Dots() : LayerElement("dots-"), vrv::AttAugmentDots()
 {
     RegisterAttClass(ATT_AUGMENTDOTS);
 
@@ -42,7 +42,7 @@ Dots::~Dots()
 void Dots::Reset()
 {
     LayerElement::Reset();
-    ResetAugmentdots();
+    ResetAugmentDots();
 }
 
 std::list<int> *Dots::GetDotLocsForStaff(Staff *staff)

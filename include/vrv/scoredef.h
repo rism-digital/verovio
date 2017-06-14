@@ -35,7 +35,7 @@ class StaffDef;
  * information about clef, key signature, etc. This information can be either
  * attributes (implemented) of the ScoreDefInterface or elements (not implemented).
  */
-class ScoreDefElement : public Object, public ScoreDefInterface, public AttCommon, public AttTyped {
+class ScoreDefElement : public Object, public ScoreDefInterface, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, and other standard methods.
@@ -221,10 +221,11 @@ private:
  */
 class StaffGrp : public Object,
                  public ObjectListInterface,
-                 public AttCommon,
-                 public AttCommonPart,
-                 public AttLabelsAddl,
-                 public AttStaffgroupingsym,
+                 public AttBasic,
+                 public AttLabelled,
+                 // FIXME changed in MEI 4.0.0
+                 // public AttLabelsAddl,
+                 public AttStaffGroupingSym,
                  public AttStaffGrpVis,
                  public AttTyped {
 public:
@@ -275,12 +276,14 @@ private:
  */
 class StaffDef : public ScoreDefElement,
                  public StaffDefDrawingInterface,
-                 public AttCommonPart,
                  public AttDistances,
-                 public AttLabelsAddl,
-                 public AttNotationtype,
+                 public AttLabelled,
+                 // FIXME changed in MEI 4.0.0
+                 // public AttLabelsAddl,
+                 public AttNInteger,
+                 public AttNotationType,
                  public AttScalable,
-                 public AttStaffDefVis,
+                 public AttStaffDefLog,
                  public AttTransposition {
 public:
     /**
