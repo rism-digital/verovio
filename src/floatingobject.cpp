@@ -345,8 +345,14 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
-            if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
-                yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
+            yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
+            Object *object = dynamic_cast<Object*>(horizOverlapingBBox);
+            // With LayerElement always move them up
+            if (object && object->IsLayerElement()) {
+                if (yRel < 0) this->SetDrawingYRel(yRel);
+            }
+            // Otherwise only if the is a vertical overlap
+            else if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
                 this->SetDrawingYRel(yRel);
             }
         }
@@ -359,9 +365,15 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
-            if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
-                yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
-                    + GetContentY2() + margin;
+            yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
+            + GetContentY2() + margin;
+            Object *object = dynamic_cast<Object*>(horizOverlapingBBox);
+            // With LayerElement always move them down
+            if (object && object->IsLayerElement()) {
+                if (yRel > 0) this->SetDrawingYRel(yRel);
+            }
+            // Otherwise only if the is a vertical overlap
+            else if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
                 this->SetDrawingYRel(yRel);
             }
         }
