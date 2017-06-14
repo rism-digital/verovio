@@ -115,7 +115,9 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
         Breath *breath = dynamic_cast<Breath *>(object);
         assert(breath);
         // breath above by default
-        m_place = breath->HasPlace() ? breath->GetPlace() : STAFFREL_above;
+        m_place = (breath->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? breath->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_above;
     }
     else if (object->Is(DIR)) {
         Dir *dir = dynamic_cast<Dir *>(object);
