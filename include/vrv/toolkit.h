@@ -167,7 +167,7 @@ public:
      * RenderToMidi() must be called prior to using this method.
      * Returns 0 if no element is found.
      */
-    double GetTimeForElement(const std::string &xmlId);
+    int GetTimeForElement(const std::string &xmlId);
 
     /**
     * @name Set and get a std::string into a char * buffer.

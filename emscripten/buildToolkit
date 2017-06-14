@@ -238,15 +238,18 @@ sub getSources {
 
 	# libmei: only a subset is included:
 	push @sources, "$VEROVIO_ROOT/libmei/attconverter.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_analytical.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_cmn.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_cmnornaments.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_critapp.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_gestural.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_externalsymbols.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_mei.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_mensural.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_midi.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_pagebased.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_shared.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_visual.cpp";
 
 	return join " ", @sources
 }

@@ -19,12 +19,13 @@ int Mensur::s_numBase = 2;
 
 Mensur::Mensur()
     : LayerElement("mensur-")
+    , AttColor()
+    , AttCue()
     , AttDurationRatio()
     , AttMensuralShared()
     , AttMensurLog()
     , AttMensurVis()
-    , AttRelativesize()
-    , AttSlashcount()
+    , AttSlashCount()
 {
     Init();
 }
@@ -33,6 +34,7 @@ Mensur::Mensur(const ScoreDefInterface *mensurAttr) : LayerElement("mensur-")
 {
     Init();
 
+    // this->SetColor(mensurAttr->GetMensurColor());
     this->SetDot(mensurAttr->GetMensurDot());
     this->SetSign(mensurAttr->GetMensurSign());
     this->SetSlash(mensurAttr->GetMensurSlash());
@@ -50,11 +52,12 @@ Mensur::Mensur(const ScoreDefInterface *mensurAttr) : LayerElement("mensur-")
 
 void Mensur::Init()
 {
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_DURATIONRATIO);
     RegisterAttClass(ATT_MENSURALSHARED);
     RegisterAttClass(ATT_MENSURLOG);
     RegisterAttClass(ATT_METERSIGVIS);
-    RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_SLASHCOUNT);
 
     Reset();
@@ -67,12 +70,13 @@ Mensur::~Mensur()
 void Mensur::Reset()
 {
     LayerElement::Reset();
+    ResetColor();
+    ResetCue();
     ResetDurationRatio();
     ResetMensuralShared();
     ResetMensurLog();
     ResetMensurVis();
-    ResetRelativesize();
-    ResetSlashcount();
+    ResetSlashCount();
 }
 
 } // namespace vrv

@@ -24,7 +24,7 @@ namespace vrv {
 // Dir
 //----------------------------------------------------------------------------
 
-Dir::Dir() : ControlElement("dir-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), vrv::AttLang()
+Dir::Dir() : ControlElement("dir-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttLang()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());

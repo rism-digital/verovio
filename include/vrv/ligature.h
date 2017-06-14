@@ -31,7 +31,7 @@ class Ligature : public LayerElement,
                  public DurationInterface,
                  public AttStems,
                  public AttStemsCmn,
-                 public AttTiepresent {
+                 public AttTiePresent {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

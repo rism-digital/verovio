@@ -26,22 +26,22 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttAltsym
+// AttAltSym
 //----------------------------------------------------------------------------
 
-class AttAltsym : public Att {
+class AttAltSym : public Att {
 public:
-    AttAltsym();
-    virtual ~AttAltsym();
+    AttAltSym();
+    virtual ~AttAltSym();
 
     /** Reset the default values for the attribute class **/
-    void ResetAltsym();
+    void ResetAltSym();
 
     /** Read the values for the attribute class **/
-    bool ReadAltsym(pugi::xml_node element);
+    bool ReadAltSym(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteAltsym(pugi::xml_node element);
+    bool WriteAltSym(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -57,7 +57,7 @@ public:
 private:
     /**
      * Provides a way of pointing to a user-defined symbol.
-     * It must contain an ID of a <symbolDef> element elsewhere in the document.
+     * It must contain a reference to an ID of a
      **/
     std::string m_altsym;
 

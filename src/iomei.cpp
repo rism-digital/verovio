@@ -1,4 +1,3 @@
-
 /////////////////////////////////////////////////////////////////////////////
 // Name:        iomei.cpp
 // Author:      Laurent Pugin
@@ -640,7 +639,6 @@ void MeiOutput::WriteMeiSystem(pugi::xml_node currentNode, System *system)
     if (system->m_yAbs != VRV_UNSET) {
         currentNode.append_attribute("uly") = StringFormat("%d", system->m_yAbs / DEFINITION_FACTOR).c_str();
     }
-    system->WriteCommon(currentNode);
     system->WriteTyped(currentNode);
 }
 
@@ -649,7 +647,6 @@ void MeiOutput::WriteSystemElement(pugi::xml_node currentNode, SystemElement *sy
     assert(systemElement);
 
     WriteXmlId(currentNode, systemElement);
-    systemElement->WriteCommon(currentNode);
     systemElement->WriteTyped(currentNode);
 }
 
@@ -669,8 +666,7 @@ void MeiOutput::WriteMeiSection(pugi::xml_node currentNode, Section *section)
     assert(section);
 
     WriteSystemElement(currentNode, section);
-    section->WriteCommon(currentNode);
-    section->WriteCommonPart(currentNode);
+    section->WriteNNumberLike(currentNode);
 }
 
 void MeiOutput::WriteMeiEnding(pugi::xml_node currentNode, Ending *ending)
@@ -678,7 +674,7 @@ void MeiOutput::WriteMeiEnding(pugi::xml_node currentNode, Ending *ending)
     assert(ending);
 
     WriteSystemElement(currentNode, ending);
-    ending->WriteCommon(currentNode);
+    ending->WriteNNumberLike(currentNode);
 }
 
 void MeiOutput::WriteMeiExpansion(pugi::xml_node currentNode, Expansion *expansion)
@@ -686,8 +682,6 @@ void MeiOutput::WriteMeiExpansion(pugi::xml_node currentNode, Expansion *expansi
     assert(expansion);
 
     WriteSystemElement(currentNode, expansion);
-    expansion->WriteCommonPart(currentNode);
-    expansion->WritePlist(currentNode);
 }
 
 void MeiOutput::WriteMeiPb(pugi::xml_node currentNode, Pb *pb)
@@ -695,7 +689,7 @@ void MeiOutput::WriteMeiPb(pugi::xml_node currentNode, Pb *pb)
     assert(pb);
 
     WriteSystemElement(currentNode, pb);
-    pb->WriteCommonPart(currentNode);
+    pb->WriteNNumberLike(currentNode);
 }
 
 void MeiOutput::WriteMeiSb(pugi::xml_node currentNode, Sb *sb)
@@ -703,7 +697,7 @@ void MeiOutput::WriteMeiSb(pugi::xml_node currentNode, Sb *sb)
     assert(sb);
 
     WriteSystemElement(currentNode, sb);
-    sb->WriteCommonPart(currentNode);
+    sb->WriteNNumberLike(currentNode);
 }
 
 void MeiOutput::WriteScoreDefElement(pugi::xml_node currentNode, ScoreDefElement *scoreDefElement)
@@ -711,7 +705,6 @@ void MeiOutput::WriteScoreDefElement(pugi::xml_node currentNode, ScoreDefElement
     assert(scoreDefElement);
 
     WriteXmlId(currentNode, scoreDefElement);
-    scoreDefElement->WriteCommon(currentNode);
     scoreDefElement->WriteTyped(currentNode);
 }
 
@@ -729,10 +722,11 @@ void MeiOutput::WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp)
     assert(staffGrp);
 
     WriteXmlId(currentNode, staffGrp);
-    staffGrp->WriteCommon(currentNode);
-    staffGrp->WriteCommonPart(currentNode);
-    staffGrp->WriteLabelsAddl(currentNode);
-    staffGrp->WriteStaffgroupingsym(currentNode);
+    staffGrp->WriteBasic(currentNode);
+    staffGrp->WriteLabelled(currentNode);
+    // FIXME MEI 4.0.0
+    // staffGrp->WriteLabelsAddl(currentNode);
+    staffGrp->WriteStaffGroupingSym(currentNode);
     staffGrp->WriteStaffGrpVis(currentNode);
     staffGrp->WriteTyped(currentNode);
 }
@@ -743,12 +737,14 @@ void MeiOutput::WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
 
     WriteScoreDefElement(currentNode, staffDef);
     WriteScoreDefInterface(currentNode, staffDef);
-    staffDef->WriteCommonPart(currentNode);
     staffDef->WriteDistances(currentNode);
-    staffDef->WriteLabelsAddl(currentNode);
-    staffDef->WriteNotationtype(currentNode);
+    staffDef->WriteLabelled(currentNode);
+    // FIXME MEI 4.0.0
+    // staffDef->WriteLabelsAddl(currentNode);
+    staffDef->WriteNInteger(currentNode);
+    staffDef->WriteNotationType(currentNode);
     staffDef->WriteScalable(currentNode);
-    staffDef->WriteStaffDefVis(currentNode);
+    staffDef->WriteStaffDefLog(currentNode);
     staffDef->WriteTransposition(currentNode);
 }
 
@@ -757,8 +753,8 @@ void MeiOutput::WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure)
     assert(measure);
 
     WriteXmlId(currentNode, measure);
-    measure->WriteCommon(currentNode);
     measure->WriteMeasureLog(currentNode);
+    measure->WriteNNumberLike(currentNode);
     measure->WritePointing(currentNode);
     measure->WriteTyped(currentNode);
     if ((measure->m_xAbs != VRV_UNSET) && (measure->m_xAbs2 != VRV_UNSET)) {
@@ -779,7 +775,7 @@ void MeiOutput::WriteControlElement(pugi::xml_node currentNode, ControlElement *
     assert(controlElement);
 
     WriteXmlId(currentNode, controlElement);
-    controlElement->WriteCommon(currentNode);
+    controlElement->WriteLabelled(currentNode);
     controlElement->WriteTyped(currentNode);
 }
 
@@ -859,7 +855,7 @@ void MeiOutput::WriteMeiMordent(pugi::xml_node currentNode, Mordent *mordent)
     WriteControlElement(currentNode, mordent);
     WriteTimePointInterface(currentNode, mordent);
     mordent->WriteColor(currentNode);
-    mordent->WriteOrnamentaccid(currentNode);
+    mordent->WriteOrnamentAccid(currentNode);
     mordent->WritePlacement(currentNode);
     mordent->WriteMordentLog(currentNode);
 };
@@ -871,8 +867,8 @@ void MeiOutput::WriteMeiOctave(pugi::xml_node currentNode, Octave *octave)
     WriteControlElement(currentNode, octave);
     WriteTimeSpanningInterface(currentNode, octave);
     octave->WriteColor(currentNode);
-    octave->WriteLinerendBase(currentNode);
-    octave->WriteOctavedisplacement(currentNode);
+    octave->WriteLineRendBase(currentNode);
+    octave->WriteOctaveDisplacement(currentNode);
 };
 
 void MeiOutput::WriteMeiPedal(pugi::xml_node currentNode, Pedal *pedal)
@@ -901,7 +897,7 @@ void MeiOutput::WriteMeiStaff(pugi::xml_node currentNode, Staff *staff)
     assert(staff);
 
     WriteXmlId(currentNode, staff);
-    staff->WriteCommon(currentNode);
+    staff->WriteNInteger(currentNode);
     staff->WriteTyped(currentNode);
     // y position
     if (staff->m_yAbs != VRV_UNSET) {
@@ -917,8 +913,8 @@ void MeiOutput::WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo)
     WriteTextDirInterface(currentNode, tempo);
     WriteTimePointInterface(currentNode, tempo);
     tempo->WriteLang(currentNode);
-    tempo->WriteMiditempo(currentNode);
-    tempo->WriteMmtempo(currentNode);
+    tempo->WriteMidiTempo(currentNode);
+    tempo->WriteMmTempo(currentNode);
 }
 
 void MeiOutput::WriteMeiTie(pugi::xml_node currentNode, Tie *tie)
@@ -938,7 +934,7 @@ void MeiOutput::WriteMeiTrill(pugi::xml_node currentNode, Trill *trill)
     WriteControlElement(currentNode, trill);
     WriteTimePointInterface(currentNode, trill);
     trill->WriteColor(currentNode);
-    trill->WriteOrnamentaccid(currentNode);
+    trill->WriteOrnamentAccid(currentNode);
     trill->WritePlacement(currentNode);
 };
 
@@ -949,7 +945,7 @@ void MeiOutput::WriteMeiTurn(pugi::xml_node currentNode, Turn *turn)
     WriteControlElement(currentNode, turn);
     WriteTimePointInterface(currentNode, turn);
     turn->WriteColor(currentNode);
-    turn->WriteOrnamentaccid(currentNode);
+    turn->WriteOrnamentAccid(currentNode);
     turn->WritePlacement(currentNode);
     turn->WriteTurnLog(currentNode);
 };
@@ -959,7 +955,7 @@ void MeiOutput::WriteMeiLayer(pugi::xml_node currentNode, Layer *layer)
     assert(layer);
 
     WriteXmlId(currentNode, layer);
-    layer->WriteCommon(currentNode);
+    layer->WriteNInteger(currentNode);
     layer->WriteTyped(currentNode);
 }
 
@@ -968,7 +964,7 @@ void MeiOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *elem
     assert(element);
 
     WriteXmlId(currentNode, element);
-    element->WriteCommon(currentNode);
+    element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
     if (element->m_xAbs != VRV_UNSET) {
         currentNode.append_attribute("ulx") = StringFormat("%d", element->m_xAbs / DEFINITION_FACTOR).c_str();
@@ -982,17 +978,17 @@ void MeiOutput::WriteMeiAccid(pugi::xml_node currentNode, Accid *accid)
     // Only write att.accidental and accidentalPerformed if representing an attribute
     if (accid->IsAttribute()) {
         accid->WriteAccidental(currentNode);
-        accid->WriteAccidentalPerformed(currentNode);
+        accid->WriteAccidentalGestural(currentNode);
         return;
     }
 
     WriteLayerElement(currentNode, accid);
     WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
-    accid->WriteAccidentalPerformed(currentNode);
+    accid->WriteAccidentalGestural(currentNode);
     accid->WriteAccidLog(currentNode);
     accid->WriteColor(currentNode);
-    accid->WriteEnclosingchars(currentNode);
+    accid->WriteEnclosingChars(currentNode);
 }
 
 void MeiOutput::WriteMeiArtic(pugi::xml_node currentNode, Artic *artic)
@@ -1042,7 +1038,7 @@ void MeiOutput::WriteMeiBTrem(pugi::xml_node currentNode, BTrem *bTrem)
     assert(bTrem);
 
     WriteLayerElement(currentNode, bTrem);
-    bTrem->WriteTremmeasured(currentNode);
+    bTrem->WriteTremMeasured(currentNode);
 }
 
 void MeiOutput::WriteMeiChord(pugi::xml_node currentNode, Chord *chord)
@@ -1052,11 +1048,11 @@ void MeiOutput::WriteMeiChord(pugi::xml_node currentNode, Chord *chord)
     WriteLayerElement(currentNode, chord);
     WriteDurationInterface(currentNode, chord);
     chord->WriteColor(currentNode);
+    chord->WriteCue(currentNode);
     chord->WriteGraced(currentNode);
-    chord->WriteRelativesize(currentNode);
     chord->WriteStems(currentNode);
     chord->WriteStemsCmn(currentNode);
-    chord->WriteTiepresent(currentNode);
+    chord->WriteTiePresent(currentNode);
     chord->WriteVisibility(currentNode);
 }
 
@@ -1065,9 +1061,10 @@ void MeiOutput::WriteMeiClef(pugi::xml_node currentNode, Clef *clef)
     assert(clef);
 
     WriteLayerElement(currentNode, clef);
-    clef->WriteClefshape(currentNode);
-    clef->WriteLineloc(currentNode);
-    clef->WriteOctavedisplacement(currentNode);
+    clef->WriteClefShape(currentNode);
+    clef->WriteColor(currentNode);
+    clef->WriteLineLoc(currentNode);
+    clef->WriteOctaveDisplacement(currentNode);
 }
 
 void MeiOutput::WriteMeiCustos(pugi::xml_node currentNode, Custos *custos)
@@ -1076,6 +1073,7 @@ void MeiOutput::WriteMeiCustos(pugi::xml_node currentNode, Custos *custos)
 
     WriteLayerElement(currentNode, custos);
     WritePositionInterface(currentNode, custos);
+    custos->WriteColor(currentNode);
 }
 
 void MeiOutput::WriteMeiDot(pugi::xml_node currentNode, Dot *dot)
@@ -1093,8 +1091,8 @@ void MeiOutput::WriteMeiFTrem(pugi::xml_node currentNode, FTrem *fTrem)
     assert(fTrem);
 
     WriteLayerElement(currentNode, fTrem);
-    fTrem->WriteSlashcount(currentNode);
-    fTrem->WriteTremmeasured(currentNode);
+    fTrem->WriteSlashCount(currentNode);
+    fTrem->WriteTremMeasured(currentNode);
 }
 
 void MeiOutput::WriteMeiKeySig(pugi::xml_node currentNode, KeySig *keySig)
@@ -1111,12 +1109,13 @@ void MeiOutput::WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur)
     assert(mensur);
 
     WriteLayerElement(currentNode, mensur);
+    mensur->WriteColor(currentNode);
+    mensur->WriteCue(currentNode);
     mensur->WriteDurationRatio(currentNode);
     mensur->WriteMensuralShared(currentNode);
     mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
-    mensur->WriteRelativesize(currentNode);
-    mensur->WriteSlashcount(currentNode);
+    mensur->WriteSlashCount(currentNode);
 }
 
 void MeiOutput::WriteMeiMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
@@ -1134,9 +1133,9 @@ void MeiOutput::WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest)
 
     WriteLayerElement(currentNode, mRest);
     WritePositionInterface(currentNode, mRest);
+    mRest->WriteCue(currentNode);
+    mRest->WriteFermataPresent(currentNode);
     mRest->WriteVisibility(currentNode);
-    mRest->WriteFermatapresent(currentNode);
-    mRest->WriteRelativesize(currentNode);
 }
 
 void MeiOutput::WriteMeiMRpt(pugi::xml_node currentNode, MRpt *mRpt)
@@ -1177,14 +1176,15 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     WriteLayerElement(currentNode, note);
     WriteDurationInterface(currentNode, note);
     WritePitchInterface(currentNode, note);
+    WritePositionInterface(currentNode, note);
     note->WriteColor(currentNode);
     note->WriteColoration(currentNode);
+    note->WriteCue(currentNode);
     note->WriteGraced(currentNode);
-    note->WriteNoteLogMensural(currentNode);
-    note->WriteRelativesize(currentNode);
+    note->WriteNoteAnlMensural(currentNode);
     note->WriteStems(currentNode);
     note->WriteStemsCmn(currentNode);
-    note->WriteTiepresent(currentNode);
+    note->WriteTiePresent(currentNode);
     note->WriteVisibility(currentNode);
 }
 
@@ -1196,7 +1196,7 @@ void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
     WriteDurationInterface(currentNode, rest);
     WritePositionInterface(currentNode, rest);
     rest->WriteColor(currentNode);
-    rest->WriteRelativesize(currentNode);
+    rest->WriteCue(currentNode);
     rest->WriteRestVisMensural(currentNode);
 }
 
@@ -1222,7 +1222,7 @@ void MeiOutput::WriteMeiTuplet(pugi::xml_node currentNode, Tuplet *tuplet)
     WriteLayerElement(currentNode, tuplet);
     tuplet->WriteColor(currentNode);
     tuplet->WriteDurationRatio(currentNode);
-    tuplet->WriteNumberplacement(currentNode);
+    tuplet->WriteNumberPlacement(currentNode);
     tuplet->WriteTupletVis(currentNode);
 }
 
@@ -1233,6 +1233,7 @@ void MeiOutput::WriteMeiVerse(pugi::xml_node currentNode, Verse *verse)
     WriteLayerElement(currentNode, verse);
     verse->WriteColor(currentNode);
     verse->WriteLang(currentNode);
+    verse->WriteNInteger(currentNode);
     verse->WriteTypography(currentNode);
 }
 
@@ -1251,7 +1252,6 @@ void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textEl
     assert(textElement);
 
     WriteXmlId(currentNode, textElement);
-    textElement->WriteCommon(currentNode);
     textElement->WriteTyped(currentNode);
 }
 
@@ -1268,8 +1268,7 @@ void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
 
     WriteTextElement(currentNode, rend);
     rend->WriteColor(currentNode);
-    rend->WriteHorizontalalign(currentNode);
-    rend->WriteCommon(currentNode);
+    rend->WriteHorizontalAlign(currentNode);
     rend->WriteLang(currentNode);
     rend->WriteTypography(currentNode);
     rend->WriteWhitespace(currentNode);
@@ -1284,17 +1283,17 @@ void MeiOutput::WriteMeiText(pugi::xml_node element, Text *text)
     }
 }
 
-void MeiOutput::WriteDurationInterface(pugi::xml_node element, vrv::DurationInterface *interface)
+void MeiOutput::WriteDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
     assert(interface);
 
-    interface->WriteAugmentdots(element);
-    interface->WriteBeamsecondary(element);
-    interface->WriteDurationMusical(element);
-    interface->WriteDurationPerformed(element);
+    interface->WriteAugmentDots(element);
+    interface->WriteBeamSecondary(element);
+    interface->WriteDurationGestural(element);
+    interface->WriteDurationLogical(element);
     interface->WriteDurationRatio(element);
-    interface->WriteFermatapresent(element);
-    interface->WriteStaffident(element);
+    interface->WriteFermataPresent(element);
+    interface->WriteStaffIdent(element);
 }
 
 void MeiOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *interface)
@@ -1310,8 +1309,8 @@ void MeiOutput::WritePositionInterface(pugi::xml_node element, PositionInterface
 {
     assert(interface);
 
-    interface->WriteStaffloc(element);
-    interface->WriteStafflocPitched(element);
+    interface->WriteStaffLoc(element);
+    interface->WriteStaffLocPitched(element);
 }
 
 void MeiOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface *interface)
@@ -1319,15 +1318,17 @@ void MeiOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     assert(interface);
 
     interface->WriteCleffingLog(element);
+    interface->WriteCleffingVis(element);
+    interface->WriteKeySigDefaultAnl(element);
     interface->WriteKeySigDefaultLog(element);
     interface->WriteKeySigDefaultVis(element);
-    interface->WriteLyricstyle(element);
+    interface->WriteLyricStyle(element);
     interface->WriteMensuralLog(element);
     interface->WriteMensuralShared(element);
     interface->WriteMeterSigDefaultLog(element);
     interface->WriteMeterSigDefaultVis(element);
-    interface->WriteMiditempo(element);
-    interface->WriteMultinummeasures(element);
+    interface->WriteMidiTempo(element);
+    interface->WriteMultinumMeasures(element);
 }
 
 void MeiOutput::WriteTextDirInterface(pugi::xml_node element, TextDirInterface *interface)
@@ -1341,9 +1342,9 @@ void MeiOutput::WriteTimePointInterface(pugi::xml_node element, TimePointInterfa
 {
     assert(interface);
 
-    interface->WriteStaffident(element);
-    interface->WriteStartid(element);
-    interface->WriteTimestampMusical(element);
+    interface->WriteStaffIdent(element);
+    interface->WriteStartId(element);
+    interface->WriteTimestampLogical(element);
 }
 
 void MeiOutput::WriteTimeSpanningInterface(pugi::xml_node element, TimeSpanningInterface *interface)
@@ -1351,8 +1352,8 @@ void MeiOutput::WriteTimeSpanningInterface(pugi::xml_node element, TimeSpanningI
     assert(interface);
 
     WriteTimePointInterface(element, interface);
-    interface->WriteStartendid(element);
-    interface->WriteTimestamp2Musical(element);
+    interface->WriteStartEndId(element);
+    interface->WriteTimestamp2Logical(element);
 }
 
 void MeiOutput::WriteUnsupportedAttr(pugi::xml_node element, Object *object)
@@ -1368,8 +1369,7 @@ void MeiOutput::WriteEditorialElement(pugi::xml_node currentNode, EditorialEleme
     assert(element);
 
     WriteXmlId(currentNode, element);
-    element->WriteCommon(currentNode);
-    element->WriteCommonPart(currentNode);
+    element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
 }
 
@@ -1891,8 +1891,7 @@ bool MeiInput::ReadMeiSection(Object *parent, pugi::xml_node section)
     Section *vrvSection = new Section();
     SetMeiUuid(section, vrvSection);
 
-    vrvSection->ReadCommon(section);
-    vrvSection->ReadCommonPart(section);
+    vrvSection->ReadNNumberLike(section);
 
     parent->AddChild(vrvSection);
     if (m_readingScoreBased)
@@ -1969,7 +1968,6 @@ bool MeiInput::ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode)
 bool MeiInput::ReadSystemElement(pugi::xml_node element, SystemElement *object)
 {
     SetMeiUuid(element, object);
-    object->ReadCommon(element);
     object->ReadTyped(element);
 
     return true;
@@ -1979,6 +1977,8 @@ bool MeiInput::ReadMeiEnding(Object *parent, pugi::xml_node ending)
 {
     Ending *vrvEnding = new Ending();
     ReadSystemElement(ending, vrvEnding);
+
+    vrvEnding->ReadNNumberLike(ending);
 
     parent->AddChild(vrvEnding);
     if (m_readingScoreBased)
@@ -1991,9 +1991,6 @@ bool MeiInput::ReadMeiExpansion(Object *parent, pugi::xml_node expansion)
 {
     Expansion *vrvExpansion = new Expansion();
     ReadSystemElement(expansion, vrvExpansion);
-
-    vrvExpansion->ReadCommonPart(expansion);
-    vrvExpansion->ReadPlist(expansion);
 
     parent->AddChild(vrvExpansion);
     if (m_readingScoreBased)
@@ -2009,7 +2006,7 @@ bool MeiInput::ReadMeiPb(Object *parent, pugi::xml_node pb)
     Pb *vrvPb = new Pb();
     ReadSystemElement(pb, vrvPb);
 
-    vrvPb->ReadCommonPart(pb);
+    vrvPb->ReadNNumberLike(pb);
 
     parent->AddChild(vrvPb);
     return true;
@@ -2020,7 +2017,7 @@ bool MeiInput::ReadMeiSb(Object *parent, pugi::xml_node sb)
     Sb *vrvSb = new Sb();
     ReadSystemElement(sb, vrvSb);
 
-    vrvSb->ReadCommonPart(sb);
+    vrvSb->ReadNNumberLike(sb);
 
     parent->AddChild(vrvSb);
     return true;
@@ -2104,7 +2101,6 @@ bool MeiInput::ReadMeiSystem(Object *parent, pugi::xml_node system)
 
     System *vrvSystem = new System();
     SetMeiUuid(system, vrvSystem);
-    vrvSystem->ReadCommon(system);
     vrvSystem->ReadTyped(system);
 
     if (system.attribute("system.leftmar")) {
@@ -2204,7 +2200,6 @@ bool MeiInput::ReadMeiBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd)
 bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object)
 {
     SetMeiUuid(element, object);
-    object->ReadCommon(element);
     object->ReadTyped(element);
 
     return true;
@@ -2266,11 +2261,12 @@ bool MeiInput::ReadMeiStaffGrp(Object *parent, pugi::xml_node staffGrp)
     StaffGrp *vrvStaffGrp = new StaffGrp();
     SetMeiUuid(staffGrp, vrvStaffGrp);
 
-    vrvStaffGrp->ReadCommon(staffGrp);
-    vrvStaffGrp->ReadCommonPart(staffGrp);
-    vrvStaffGrp->ReadLabelsAddl(staffGrp);
+    vrvStaffGrp->ReadBasic(staffGrp);
+    vrvStaffGrp->ReadLabelled(staffGrp);
+    // FIXME MEI 4.0.0
+    // vrvStaffGrp->ReadLabelsAddl(staffGrp);
+    vrvStaffGrp->ReadStaffGroupingSym(staffGrp);
     vrvStaffGrp->ReadStaffGrpVis(staffGrp);
-    vrvStaffGrp->ReadStaffgroupingsym(staffGrp);
     vrvStaffGrp->ReadTyped(staffGrp);
 
     parent->AddChild(vrvStaffGrp);
@@ -2310,12 +2306,14 @@ bool MeiInput::ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef)
     StaffDef *vrvStaffDef = new StaffDef();
     ReadScoreDefElement(staffDef, vrvStaffDef);
 
-    vrvStaffDef->ReadCommonPart(staffDef);
     vrvStaffDef->ReadDistances(staffDef);
-    vrvStaffDef->ReadLabelsAddl(staffDef);
-    vrvStaffDef->ReadNotationtype(staffDef);
+    vrvStaffDef->ReadLabelled(staffDef);
+    // FIXME MEI 4.0.0
+    // vrvStaffDef->ReadLabelsAddl(staffDef);
+    vrvStaffDef->ReadNInteger(staffDef);
+    vrvStaffDef->ReadNotationType(staffDef);
     vrvStaffDef->ReadScalable(staffDef);
-    vrvStaffDef->ReadStaffDefVis(staffDef);
+    vrvStaffDef->ReadStaffDefLog(staffDef);
     vrvStaffDef->ReadTransposition(staffDef);
 
     if (!vrvStaffDef->HasN()) {
@@ -2333,8 +2331,8 @@ bool MeiInput::ReadMeiMeasure(Object *parent, pugi::xml_node measure)
     Measure *vrvMeasure = new Measure();
     SetMeiUuid(measure, vrvMeasure);
 
-    vrvMeasure->ReadCommon(measure);
     vrvMeasure->ReadMeasureLog(measure);
+    vrvMeasure->ReadNNumberLike(measure);
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);
 
@@ -2424,7 +2422,7 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
 bool MeiInput::ReadControlElement(pugi::xml_node element, ControlElement *object)
 {
     SetMeiUuid(element, object);
-    object->ReadCommon(element);
+    object->ReadLabelled(element);
     object->ReadTyped(element);
 
     return true;
@@ -2527,7 +2525,7 @@ bool MeiInput::ReadMeiMordent(Object *parent, pugi::xml_node mordent)
 
     ReadTimePointInterface(mordent, vrvMordent);
     vrvMordent->ReadColor(mordent);
-    vrvMordent->ReadOrnamentaccid(mordent);
+    vrvMordent->ReadOrnamentAccid(mordent);
     vrvMordent->ReadPlacement(mordent);
     vrvMordent->ReadMordentLog(mordent);
 
@@ -2542,8 +2540,8 @@ bool MeiInput::ReadMeiOctave(Object *parent, pugi::xml_node octave)
 
     ReadTimeSpanningInterface(octave, vrvOctave);
     vrvOctave->ReadColor(octave);
-    vrvOctave->ReadLinerendBase(octave);
-    vrvOctave->ReadOctavedisplacement(octave);
+    vrvOctave->ReadLineRendBase(octave);
+    vrvOctave->ReadOctaveDisplacement(octave);
 
     parent->AddChild(vrvOctave);
     return true;
@@ -2555,9 +2553,9 @@ bool MeiInput::ReadMeiPedal(Object *parent, pugi::xml_node pedal)
     ReadControlElement(pedal, vrvPedal);
 
     ReadTimePointInterface(pedal, vrvPedal);
+    vrvPedal->ReadColor(pedal);
     vrvPedal->ReadPedalLog(pedal);
     vrvPedal->ReadPlacement(pedal);
-    vrvPedal->ReadColor(pedal);
 
     parent->AddChild(vrvPedal);
     return true;
@@ -2584,8 +2582,8 @@ bool MeiInput::ReadMeiTempo(Object *parent, pugi::xml_node tempo)
     ReadTextDirInterface(tempo, vrvTempo);
     ReadTimePointInterface(tempo, vrvTempo);
     vrvTempo->ReadLang(tempo);
-    vrvTempo->ReadMiditempo(tempo);
-    vrvTempo->ReadMmtempo(tempo);
+    vrvTempo->ReadMidiTempo(tempo);
+    vrvTempo->ReadMmTempo(tempo);
 
     parent->AddChild(vrvTempo);
     return ReadMeiTextChildren(vrvTempo, tempo, vrvTempo);
@@ -2611,7 +2609,7 @@ bool MeiInput::ReadMeiTrill(Object *parent, pugi::xml_node trill)
 
     ReadTimePointInterface(trill, vrvTrill);
     vrvTrill->ReadColor(trill);
-    vrvTrill->ReadOrnamentaccid(trill);
+    vrvTrill->ReadOrnamentAccid(trill);
     vrvTrill->ReadPlacement(trill);
 
     parent->AddChild(vrvTrill);
@@ -2625,7 +2623,7 @@ bool MeiInput::ReadMeiTurn(Object *parent, pugi::xml_node turn)
 
     ReadTimePointInterface(turn, vrvTurn);
     vrvTurn->ReadColor(turn);
-    vrvTurn->ReadOrnamentaccid(turn);
+    vrvTurn->ReadOrnamentAccid(turn);
     vrvTurn->ReadPlacement(turn);
     vrvTurn->ReadTurnLog(turn);
 
@@ -2670,7 +2668,7 @@ bool MeiInput::ReadMeiStaff(Object *parent, pugi::xml_node staff)
     Staff *vrvStaff = new Staff();
     SetMeiUuid(staff, vrvStaff);
 
-    vrvStaff->ReadCommon(staff);
+    vrvStaff->ReadNInteger(staff);
     vrvStaff->ReadTyped(staff);
 
     if (staff.attribute("uly") && (this->m_doc->GetType() == Transcription)) {
@@ -2713,7 +2711,7 @@ bool MeiInput::ReadMeiLayer(Object *parent, pugi::xml_node layer)
     Layer *vrvLayer = new Layer();
     SetMeiUuid(layer, vrvLayer);
 
-    vrvLayer->ReadCommon(layer);
+    vrvLayer->ReadNInteger(layer);
     vrvLayer->ReadTyped(layer);
 
     if (!vrvLayer->HasN()) {
@@ -2846,7 +2844,7 @@ bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     }
 
     SetMeiUuid(element, object);
-    object->ReadCommon(element);
+    object->ReadLabelled(element);
     object->ReadTyped(element);
 
     return true;
@@ -2859,10 +2857,10 @@ bool MeiInput::ReadMeiAccid(Object *parent, pugi::xml_node accid)
 
     ReadPositionInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
-    vrvAccid->ReadAccidentalPerformed(accid);
+    vrvAccid->ReadAccidentalGestural(accid);
     vrvAccid->ReadAccidLog(accid);
     vrvAccid->ReadColor(accid);
-    vrvAccid->ReadEnclosingchars(accid);
+    vrvAccid->ReadEnclosingChars(accid);
 
     parent->AddChild(vrvAccid);
     return true;
@@ -2922,7 +2920,7 @@ bool MeiInput::ReadMeiBTrem(Object *parent, pugi::xml_node bTrem)
     BTrem *vrvBTrem = new BTrem();
     ReadLayerElement(bTrem, vrvBTrem);
 
-    vrvBTrem->ReadTremmeasured(bTrem);
+    vrvBTrem->ReadTremMeasured(bTrem);
 
     parent->AddChild(vrvBTrem);
     return ReadMeiLayerChildren(vrvBTrem, bTrem, vrvBTrem);
@@ -2935,11 +2933,11 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
 
     ReadDurationInterface(chord, vrvChord);
     vrvChord->ReadColor(chord);
+    vrvChord->ReadCue(chord);
     vrvChord->ReadGraced(chord);
-    vrvChord->ReadRelativesize(chord);
     vrvChord->ReadStems(chord);
     vrvChord->ReadStemsCmn(chord);
-    vrvChord->ReadTiepresent(chord);
+    vrvChord->ReadTiePresent(chord);
     vrvChord->ReadVisibility(chord);
 
     AttArticulation artic;
@@ -2960,9 +2958,10 @@ bool MeiInput::ReadMeiClef(Object *parent, pugi::xml_node clef)
     Clef *vrvClef = new Clef();
     ReadLayerElement(clef, vrvClef);
 
-    vrvClef->ReadClefshape(clef);
-    vrvClef->ReadLineloc(clef);
-    vrvClef->ReadOctavedisplacement(clef);
+    vrvClef->ReadClefShape(clef);
+    vrvClef->ReadColor(clef);
+    vrvClef->ReadLineLoc(clef);
+    vrvClef->ReadOctaveDisplacement(clef);
 
     parent->AddChild(vrvClef);
     return true;
@@ -2974,6 +2973,8 @@ bool MeiInput::ReadMeiCustos(Object *parent, pugi::xml_node custos)
     ReadLayerElement(custos, vrvCustos);
 
     ReadPositionInterface(custos, vrvCustos);
+
+    vrvCustos->ReadColor(custos);
 
     parent->AddChild(vrvCustos);
     return true;
@@ -2997,8 +2998,8 @@ bool MeiInput::ReadMeiFTrem(Object *parent, pugi::xml_node fTrem)
     FTrem *vrvFTrem = new FTrem();
     ReadLayerElement(fTrem, vrvFTrem);
 
-    vrvFTrem->ReadSlashcount(fTrem);
-    vrvFTrem->ReadTremmeasured(fTrem);
+    vrvFTrem->ReadSlashCount(fTrem);
+    vrvFTrem->ReadTremMeasured(fTrem);
 
     parent->AddChild(vrvFTrem);
     return ReadMeiLayerChildren(vrvFTrem, fTrem, vrvFTrem);
@@ -3027,7 +3028,7 @@ bool MeiInput::ReadMeiLigature(Object *parent, pugi::xml_node ligature)
     ReadDurationInterface(ligature, vrvLigature);
     vrvLigature->ReadStems(ligature);
     vrvLigature->ReadStemsCmn(ligature);
-    vrvLigature->ReadTiepresent(ligature);
+    vrvLigature->ReadTiePresent(ligature);
 
     parent->AddChild(vrvLigature);
     return ReadMeiLayerChildren(vrvLigature, ligature, vrvLigature);
@@ -3038,12 +3039,13 @@ bool MeiInput::ReadMeiMensur(Object *parent, pugi::xml_node mensur)
     Mensur *vrvMensur = new Mensur();
     ReadLayerElement(mensur, vrvMensur);
 
+    vrvMensur->ReadColor(mensur);
+    vrvMensur->ReadCue(mensur);
     vrvMensur->ReadDurationRatio(mensur);
     vrvMensur->ReadMensuralShared(mensur);
     vrvMensur->ReadMensurLog(mensur);
     vrvMensur->ReadMensurVis(mensur);
-    vrvMensur->ReadRelativesize(mensur);
-    vrvMensur->ReadSlashcount(mensur);
+    vrvMensur->ReadSlashCount(mensur);
 
     parent->AddChild(vrvMensur);
     return true;
@@ -3067,9 +3069,9 @@ bool MeiInput::ReadMeiMRest(Object *parent, pugi::xml_node mRest)
     ReadLayerElement(mRest, vrvMRest);
     ReadPositionInterface(mRest, vrvMRest);
 
+    vrvMRest->ReadCue(mRest);
+    vrvMRest->ReadFermataPresent(mRest);
     vrvMRest->ReadVisibility(mRest);
-    vrvMRest->ReadFermatapresent(mRest);
-    vrvMRest->ReadRelativesize(mRest);
 
     parent->AddChild(vrvMRest);
     return true;
@@ -3123,14 +3125,15 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
 
     ReadDurationInterface(note, vrvNote);
     ReadPitchInterface(note, vrvNote);
+    ReadPositionInterface(note, vrvNote);
     vrvNote->ReadColor(note);
     vrvNote->ReadColoration(note);
+    vrvNote->ReadCue(note);
     vrvNote->ReadGraced(note);
-    vrvNote->ReadNoteLogMensural(note);
-    vrvNote->ReadRelativesize(note);
+    vrvNote->ReadNoteAnlMensural(note);
     vrvNote->ReadStems(note);
     vrvNote->ReadStemsCmn(note);
-    vrvNote->ReadTiepresent(note);
+    vrvNote->ReadTiePresent(note);
     vrvNote->ReadVisibility(note);
 
     AttArticulation artic;
@@ -3144,13 +3147,13 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
 
     AttAccidental accidental;
     accidental.ReadAccidental(note);
-    AttAccidentalPerformed accidentalPerformed;
-    accidentalPerformed.ReadAccidentalPerformed(note);
-    if (accidental.HasAccid() || accidentalPerformed.HasAccidGes()) {
+    AttAccidentalGestural accidentalGestural;
+    accidentalGestural.ReadAccidentalGestural(note);
+    if (accidental.HasAccid() || accidentalGestural.HasAccidGes()) {
         Accid *vrvAccid = new Accid();
         vrvAccid->IsAttribute(true);
         vrvAccid->SetAccid(accidental.GetAccid());
-        vrvAccid->SetAccidGes(accidentalPerformed.GetAccidGes());
+        vrvAccid->SetAccidGes(accidentalGestural.GetAccidGes());
         vrvNote->AddChild(vrvAccid);
     }
 
@@ -3166,7 +3169,7 @@ bool MeiInput::ReadMeiRest(Object *parent, pugi::xml_node rest)
     ReadDurationInterface(rest, vrvRest);
     ReadPositionInterface(rest, vrvRest);
     vrvRest->ReadColor(rest);
-    vrvRest->ReadRelativesize(rest);
+    vrvRest->ReadCue(rest);
     vrvRest->ReadRestVisMensural(rest);
 
     parent->AddChild(vrvRest);
@@ -3215,7 +3218,7 @@ bool MeiInput::ReadMeiTuplet(Object *parent, pugi::xml_node tuplet)
 
     vrvTuplet->ReadColor(tuplet);
     vrvTuplet->ReadDurationRatio(tuplet);
-    vrvTuplet->ReadNumberplacement(tuplet);
+    vrvTuplet->ReadNumberPlacement(tuplet);
     vrvTuplet->ReadTupletVis(tuplet);
 
     parent->AddChild(vrvTuplet);
@@ -3229,6 +3232,7 @@ bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
 
     vrvVerse->ReadColor(verse);
     vrvVerse->ReadLang(verse);
+    vrvVerse->ReadNInteger(verse);
     vrvVerse->ReadTypography(verse);
 
     parent->AddChild(vrvVerse);
@@ -3282,7 +3286,6 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
 bool MeiInput::ReadTextElement(pugi::xml_node element, TextElement *object)
 {
     SetMeiUuid(element, object);
-    object->ReadCommon(element);
     object->ReadTyped(element);
 
     return true;
@@ -3303,7 +3306,7 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
     ReadTextElement(rend, vrvRend);
 
     vrvRend->ReadColor(rend);
-    vrvRend->ReadHorizontalalign(rend);
+    vrvRend->ReadHorizontalAlign(rend);
     vrvRend->ReadLang(rend);
     vrvRend->ReadTypography(rend);
     vrvRend->ReadWhitespace(rend);
@@ -3329,13 +3332,13 @@ bool MeiInput::ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, b
 
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
-    interface->ReadAugmentdots(element);
-    interface->ReadBeamsecondary(element);
-    interface->ReadDurationMusical(element);
-    interface->ReadDurationPerformed(element);
+    interface->ReadAugmentDots(element);
+    interface->ReadBeamSecondary(element);
+    interface->ReadDurationGestural(element);
+    interface->ReadDurationLogical(element);
     interface->ReadDurationRatio(element);
-    interface->ReadFermatapresent(element);
-    interface->ReadStaffident(element);
+    interface->ReadFermataPresent(element);
+    interface->ReadStaffIdent(element);
     return true;
 }
 
@@ -3349,23 +3352,25 @@ bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interf
 
 bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *interface)
 {
-    interface->ReadStaffloc(element);
-    interface->ReadStafflocPitched(element);
+    interface->ReadStaffLoc(element);
+    interface->ReadStaffLocPitched(element);
     return true;
 }
 
 bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *interface)
 {
     interface->ReadCleffingLog(element);
+    interface->ReadCleffingVis(element);
+    interface->ReadKeySigDefaultAnl(element);
     interface->ReadKeySigDefaultLog(element);
     interface->ReadKeySigDefaultVis(element);
-    interface->ReadLyricstyle(element);
+    interface->ReadLyricStyle(element);
     interface->ReadMensuralLog(element);
     interface->ReadMensuralShared(element);
     interface->ReadMeterSigDefaultLog(element);
     interface->ReadMeterSigDefaultVis(element);
-    interface->ReadMiditempo(element);
-    interface->ReadMultinummeasures(element);
+    interface->ReadMidiTempo(element);
+    interface->ReadMultinumMeasures(element);
     return true;
 }
 
@@ -3377,17 +3382,17 @@ bool MeiInput::ReadTextDirInterface(pugi::xml_node element, TextDirInterface *in
 
 bool MeiInput::ReadTimePointInterface(pugi::xml_node element, TimePointInterface *interface)
 {
-    interface->ReadStaffident(element);
-    interface->ReadStartid(element);
-    interface->ReadTimestampMusical(element);
+    interface->ReadStaffIdent(element);
+    interface->ReadStartId(element);
+    interface->ReadTimestampLogical(element);
     return true;
 }
 
 bool MeiInput::ReadTimeSpanningInterface(pugi::xml_node element, TimeSpanningInterface *interface)
 {
     ReadTimePointInterface(element, interface);
-    interface->ReadStartendid(element);
-    interface->ReadTimestamp2Musical(element);
+    interface->ReadStartEndId(element);
+    interface->ReadTimestamp2Logical(element);
     return true;
 }
 
@@ -3455,8 +3460,7 @@ bool MeiInput::ReadEditorialElement(pugi::xml_node element, EditorialElement *ob
 {
     SetMeiUuid(element, object);
 
-    object->ReadCommon(element);
-    object->ReadCommonPart(element);
+    object->ReadLabelled(element);
     object->ReadTyped(element);
 
     return true;
@@ -3883,6 +3887,11 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
 
     LayerElement *start = NULL;
     LayerElement *end = NULL;
+
+    // label
+    if (tupletSpan.attribute("label")) {
+        tuplet->SetLabel(tupletSpan.attribute("label").value());
+    }
 
     // Read in the numerator and denominator properties
     if (tupletSpan.attribute("num")) {

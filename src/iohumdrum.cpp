@@ -1149,11 +1149,11 @@ void HumdrumInput::prepareStaffGroup(void)
         addMidiTempo(m_doc->m_scoreDef, kernstarts[0]);
     }
     if (kernstarts.size() == 2) {
-        m_staffgroup->SetSymbol(staffgroupingsym_SYMBOL_brace);
+        m_staffgroup->SetSymbol(staffGroupingSym_SYMBOL_brace);
         m_staffgroup->SetBarthru(BOOLEAN_true);
     }
     else if (kernstarts.size() > 2) {
-        m_staffgroup->SetSymbol(staffgroupingsym_SYMBOL_bracket);
+        m_staffgroup->SetSymbol(staffGroupingSym_SYMBOL_bracket);
     }
 }
 
@@ -1606,19 +1606,19 @@ void HumdrumInput::setClef(StaffDef *part, const std::string &clef)
 
     if (clef.find("vv") != string::npos) {
         part->SetClefDis(OCTAVE_DIS_15);
-        part->SetClefDisPlace(PLACE_below);
+        part->SetClefDisPlace(STAFFREL_basic_below);
     }
     else if (clef.find("v") != string::npos) {
         part->SetClefDis(OCTAVE_DIS_8);
-        part->SetClefDisPlace(PLACE_below);
+        part->SetClefDisPlace(STAFFREL_basic_below);
     }
     else if (clef.find("^^") != string::npos) {
         part->SetClefDis(OCTAVE_DIS_15);
-        part->SetClefDisPlace(PLACE_above);
+        part->SetClefDisPlace(STAFFREL_basic_above);
     }
     else if (clef.find("^") != string::npos) {
         part->SetClefDis(OCTAVE_DIS_8);
-        part->SetClefDisPlace(PLACE_above);
+        part->SetClefDisPlace(STAFFREL_basic_above);
     }
 }
 
@@ -2487,16 +2487,16 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 if (layerdata[z]->find(";") != string::npos) {
                     int direction = getDirection(*layerdata[z], ";");
                     if (direction < 0) {
-                        mrest->SetFermata(PLACE_below);
+                        mrest->SetFermata(STAFFREL_basic_below);
                     }
                     else if (direction > 0) {
-                        mrest->SetFermata(PLACE_above);
+                        mrest->SetFermata(STAFFREL_basic_above);
                     }
                     else if (layer == 2) {
-                        mrest->SetFermata(PLACE_below);
+                        mrest->SetFermata(STAFFREL_basic_below);
                     }
                     else {
-                        mrest->SetFermata(PLACE_above);
+                        mrest->SetFermata(STAFFREL_basic_above);
                     }
                 }
             }
@@ -3926,7 +3926,7 @@ Clef *HumdrumInput::insertClefElement(std::vector<string> &elements, std::vector
 
     if (token->find("v") != string::npos) {
         clef->SetDis(OCTAVE_DIS_8);
-        clef->SetDisPlace(PLACE_below);
+        clef->SetDisPlace(STAFFREL_basic_below);
     }
 
     return clef;
@@ -4064,7 +4064,7 @@ void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<
     int staff = m_rkern[token->getTrack()];
     if (ss[staff].verse) {
         // If the music contains lyrics, force the tuplet above the staff.
-        tuplet->SetBracketPlace(PLACE_above);
+        tuplet->SetBracketPlace(STAFFREL_basic_above);
     }
     double scale = tg.numscale;
     if (scale == 0.0) {
@@ -4888,7 +4888,7 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
             octave->SetDis(OCTAVE_DIS_8);
             octave->SetStartid("#" + ss[staffindex].ottavanotestart->GetUuid());
             octave->SetEndid("#" + ss[staffindex].ottavanoteend->GetUuid());
-            octave->SetDisPlace(PLACE_above);
+            octave->SetDisPlace(STAFFREL_basic_above);
         }
         ss[staffindex].ottavanotestart = NULL;
         ss[staffindex].ottavanoteend = NULL;
@@ -5181,22 +5181,22 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
         if ((tstring.find("yy") == string::npos) && (tstring.find(";y") == string::npos)) {
             int direction = getDirection(tstring, ";");
             if (direction < 0) {
-                rest->SetFermata(PLACE_below);
+                rest->SetFermata(STAFFREL_basic_below);
             }
             else if (direction > 0) {
-                rest->SetFermata(PLACE_above);
+                rest->SetFermata(STAFFREL_basic_above);
             }
             else if (layer == 1) {
-                rest->SetFermata(PLACE_above);
+                rest->SetFermata(STAFFREL_basic_above);
             }
             else if (layer == 2) {
-                rest->SetFermata(PLACE_below);
+                rest->SetFermata(STAFFREL_basic_below);
             }
             else {
                 // who knows, maybe check the stem direction or see
                 // if another note/rest in a different layer already
                 // has a fermata (so you would not want to overwrite them).
-                rest->SetFermata(PLACE_above);
+                rest->SetFermata(STAFFREL_basic_above);
             }
         }
     }
@@ -5330,36 +5330,36 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     if (!editorialQ) {
         if (showInAccid) {
             switch (accidCount) {
-                // case +3: accid->SetAccid(ACCIDENTAL_EXPLICIT_ts); break;
-                // case -3: accid->SetAccid(ACCIDENTAL_EXPLICIT_tf); break;
-                case +2: accid->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
-                case +1: accid->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
-                case 0: accid->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
-                case -1: accid->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
-                case -2: accid->SetAccid(ACCIDENTAL_EXPLICIT_ff); break;
+                // case +3: accid->SetAccid(ACCIDENTAL_WRITTEN_ts); break;
+                // case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
+                case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
+                case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
+                case 0: accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
+                case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
+                case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
             }
         }
     }
     else {
         accid->SetFunc(accidLog_FUNC_edit);
         switch (accidCount) {
-            case +2: accid->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
-            case +1: accid->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
-            case 0: accid->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
-            case -1: accid->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
-            case -2: accid->SetAccid(ACCIDENTAL_EXPLICIT_ff); break;
+            case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
+            case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
+            case 0: accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
+            case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
+            case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
         }
     }
 
     if (showInAccidGes) {
         switch (accidCount) {
-            // case +3: note->SetAccidGes(ACCIDENTAL_IMPLICIT_ts); break;
-            // case -3: note->SetAccidGes(ACCIDENTAL_IMPLICIT_tf); break;
-            case +2: accid->SetAccidGes(ACCIDENTAL_IMPLICIT_ss); break;
-            case +1: accid->SetAccidGes(ACCIDENTAL_IMPLICIT_s); break;
-            case 0: accid->SetAccidGes(ACCIDENTAL_IMPLICIT_n); break;
-            case -1: accid->SetAccidGes(ACCIDENTAL_IMPLICIT_f); break;
-            case -2: accid->SetAccidGes(ACCIDENTAL_IMPLICIT_ff); break;
+            // case +3: note->SetAccidGes(ACCIDENTAL_GESTURAL_ts); break;
+            // case -3: note->SetAccidGes(ACCIDENTAL_GESTURAL_tf); break;
+            case +2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ss); break;
+            case +1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_s); break;
+            case 0: accid->SetAccidGes(ACCIDENTAL_GESTURAL_n); break;
+            case -1: accid->SetAccidGes(ACCIDENTAL_GESTURAL_f); break;
+            case -2: accid->SetAccidGes(ACCIDENTAL_GESTURAL_ff); break;
         }
     }
 
@@ -5460,13 +5460,13 @@ void HumdrumInput::addCautionaryAccidental(Accid *accid, hum::HTp token, int aco
 {
     accid->SetFunc(accidLog_FUNC_caution);
     switch (acount) {
-        case +3: accid->SetAccid(ACCIDENTAL_EXPLICIT_ts); break;
-        case +2: accid->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
-        case +1: accid->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
-        case 0: accid->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
-        case -1: accid->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
-        case -2: accid->SetAccid(ACCIDENTAL_EXPLICIT_ff); break;
-        case -3: accid->SetAccid(ACCIDENTAL_EXPLICIT_tf); break;
+        case +3: accid->SetAccid(ACCIDENTAL_WRITTEN_ts); break;
+        case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
+        case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
+        case 0: accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
+        case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
+        case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
+        case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
     }
 }
 
@@ -5731,11 +5731,11 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
             fermata->SetPlace(STAFFREL_above);
         }
         else if (layer == 1) {
-            // note->SetFermata(PLACE_above);
+            // note->SetFermata(STAFFREL_basic_above);
             fermata->SetPlace(STAFFREL_above);
         }
         else if (layer == 2) {
-            // note->SetFermata(PLACE_below);
+            // note->SetFermata(STAFFREL_basic_below);
             fermata->SetPlace(STAFFREL_below);
         }
     }
@@ -5875,11 +5875,11 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
     if (hasloweraccid) {
         loweraccidval = stoi(loweraccid);
         switch (loweraccidval) {
-            case -1: turn->SetAccidlower(ACCIDENTAL_EXPLICIT_f); break;
-            case 0: turn->SetAccidlower(ACCIDENTAL_EXPLICIT_n); break;
-            case +1: turn->SetAccidlower(ACCIDENTAL_EXPLICIT_s); break;
-            case -2: turn->SetAccidlower(ACCIDENTAL_EXPLICIT_ff); break;
-            case +2: turn->SetAccidlower(ACCIDENTAL_EXPLICIT_x); break;
+            case -1: turn->SetAccidlower(ACCIDENTAL_WRITTEN_f); break;
+            case 0: turn->SetAccidlower(ACCIDENTAL_WRITTEN_n); break;
+            case +1: turn->SetAccidlower(ACCIDENTAL_WRITTEN_s); break;
+            case -2: turn->SetAccidlower(ACCIDENTAL_WRITTEN_ff); break;
+            case +2: turn->SetAccidlower(ACCIDENTAL_WRITTEN_x); break;
         }
     }
 
@@ -5890,11 +5890,11 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
     if (hasupperaccid) {
         upperaccidval = stoi(upperaccid);
         switch (upperaccidval) {
-            case -1: turn->SetAccidupper(ACCIDENTAL_EXPLICIT_f); break;
-            case 0: turn->SetAccidupper(ACCIDENTAL_EXPLICIT_n); break;
-            case +1: turn->SetAccidupper(ACCIDENTAL_EXPLICIT_s); break;
-            case -2: turn->SetAccidupper(ACCIDENTAL_EXPLICIT_ff); break;
-            case +2: turn->SetAccidupper(ACCIDENTAL_EXPLICIT_x); break;
+            case -1: turn->SetAccidupper(ACCIDENTAL_WRITTEN_f); break;
+            case 0: turn->SetAccidupper(ACCIDENTAL_WRITTEN_n); break;
+            case +1: turn->SetAccidupper(ACCIDENTAL_WRITTEN_s); break;
+            case -2: turn->SetAccidupper(ACCIDENTAL_WRITTEN_ff); break;
+            case +2: turn->SetAccidupper(ACCIDENTAL_WRITTEN_x); break;
         }
     }
 }
@@ -5990,11 +5990,11 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
         if (hasaccid) {
             accidval = stoi(accid);
             switch (accidval) {
-                case -1: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_f); break;
-                case 0: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_n); break;
-                case +1: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_s); break;
-                case -2: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_ff); break;
-                case +2: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_x); break;
+                case -1: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_f); break;
+                case 0: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_n); break;
+                case +1: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_s); break;
+                case -2: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_ff); break;
+                case +2: mordent->SetAccidlower(ACCIDENTAL_WRITTEN_x); break;
             }
         }
     }
@@ -6006,11 +6006,11 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
         if (hasaccid) {
             accidval = stoi(accid);
             switch (accidval) {
-                case -1: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_f); break;
-                case 0: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_n); break;
-                case +1: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_s); break;
-                case -2: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_ff); break;
-                case +2: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_x); break;
+                case -1: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_f); break;
+                case 0: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_n); break;
+                case +1: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_s); break;
+                case -2: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_ff); break;
+                case +2: mordent->SetAccidupper(ACCIDENTAL_WRITTEN_x); break;
             }
         }
     }
@@ -6081,11 +6081,11 @@ void HumdrumInput::addTrill(hum::HTp token)
     if (hasaccid) {
         accidval = stoi(accid);
         switch (accidval) {
-            case -1: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_f); break;
-            case 0: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_n); break;
-            case 1: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_s); break;
-            case -2: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_ff); break;
-            case 2: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_x); break;
+            case -1: trill->SetAccidupper(ACCIDENTAL_WRITTEN_f); break;
+            case 0: trill->SetAccidupper(ACCIDENTAL_WRITTEN_n); break;
+            case 1: trill->SetAccidupper(ACCIDENTAL_WRITTEN_s); break;
+            case -2: trill->SetAccidupper(ACCIDENTAL_WRITTEN_ff); break;
+            case 2: trill->SetAccidupper(ACCIDENTAL_WRITTEN_x); break;
         }
     }
 }

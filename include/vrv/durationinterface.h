@@ -9,6 +9,7 @@
 #define __VRV_DURATION_INTERFACE_H__
 
 #include "atts_cmn.h"
+#include "atts_gestural.h"
 #include "atts_shared.h"
 
 namespace vrv {
@@ -25,13 +26,13 @@ class Object;
  * It is not an abstract class but should not be instanciated directly.
  */
 class DurationInterface : public Interface,
-                          public AttAugmentdots,
-                          public AttBeamsecondary,
-                          public AttDurationMusical,
-                          public AttDurationPerformed,
+                          public AttAugmentDots,
+                          public AttBeamSecondary,
+                          public AttDurationGestural,
+                          public AttDurationLogical,
                           public AttDurationRatio,
-                          public AttFermatapresent,
-                          public AttStaffident {
+                          public AttFermataPresent,
+                          public AttStaffIdent {
 public:
     /**
      * @name Constructors, destructors, reset methods

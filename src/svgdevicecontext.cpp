@@ -186,11 +186,11 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         }
         if (staff->m_drawingStaffDef->HasLyricStyle()) {
             styleStr.append(
-                "font-style:" + staff->AttCommon::FontstyleToStr(staff->m_drawingStaffDef->GetLyricStyle()) + ";");
+                "font-style:" + staff->AttTyped::FontstyleToStr(staff->m_drawingStaffDef->GetLyricStyle()) + ";");
         }
         if (staff->m_drawingStaffDef->HasLyricWeight()) {
             styleStr.append(
-                "font-weight:" + staff->AttCommon::FontweightToStr(staff->m_drawingStaffDef->GetLyricWeight()) + ";");
+                "font-weight:" + staff->AttTyped::FontweightToStr(staff->m_drawingStaffDef->GetLyricWeight()) + ";");
         }
         if (!styleStr.empty()) m_currentNode.append_attribute("style") = styleStr.c_str();
     }
@@ -200,6 +200,16 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         assert(att);
         if (att->HasColor()) {
             m_currentNode.append_attribute("fill") = att->GetColor().c_str();
+        }
+    }
+
+    if (object->HasAttClass(ATT_LABELLED)) {
+        AttLabelled *att = dynamic_cast<AttLabelled *>(object);
+        assert(att);
+        if (att->HasLabel()) {
+            pugi::xml_node svgTitle = m_currentNode.prepend_child("title");
+            svgTitle.append_attribute("class") = "labelAttr";
+            svgTitle.append_child(pugi::node_pcdata).set_value(att->GetLabel().c_str());
         }
     }
 
@@ -345,8 +355,7 @@ void SvgDeviceContext::StartPage()
     m_currentNode = m_currentNode.append_child("style");
     m_currentNode.append_attribute("type") = "text/css";
     m_currentNode.append_child(pugi::node_pcdata)
-        .set_value(
-            "g.page-margin{font-family:Times;} g.tempo{font-weight:bold;} g.dir, g.dynam {font-style:italic;}");
+        .set_value("g.page-margin{font-family:Times;} g.tempo{font-weight:bold;} g.dir, g.dynam {font-style:italic;}");
     m_currentNode = m_svgNodeStack.back();
 
     // a graphic for definition scaling
@@ -425,7 +434,7 @@ pugi::xml_node SvgDeviceContext::AppendChild(std::string name)
         return m_currentNode.append_child(name.c_str());
 }
 
-// Drawing mething
+// Drawing methods
 void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
 {
     pugi::xml_node pathChild = AppendChild("path");

@@ -34,11 +34,11 @@ class Chord : public LayerElement,
               public StemmedDrawingInterface,
               public DurationInterface,
               public AttColor,
+              public AttCue,
               public AttGraced,
-              public AttRelativesize,
               public AttStems,
               public AttStemsCmn,
-              public AttTiepresent,
+              public AttTiePresent,
               public AttVisibility {
 public:
     /**
@@ -151,6 +151,11 @@ public:
      */
     virtual int PrepareTieAttr(FunctorParams *functorParams);
     virtual int PrepareTieAttrEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::GenerateMIDIEnd
+     */
+    virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams);
 
 protected:
     /**

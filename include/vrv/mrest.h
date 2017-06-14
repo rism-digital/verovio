@@ -23,9 +23,9 @@ namespace vrv {
  */
 class MRest : public LayerElement,
               public PositionInterface,
-              public AttVisibility,
-              public AttFermatapresent,
-              public AttRelativesize {
+              public AttCue,
+              public AttFermataPresent,
+              public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

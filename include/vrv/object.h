@@ -898,11 +898,25 @@ public:
     ///@{
 
     /**
+     * Prepare Note onsets
+     */
+    ///@{
+    virtual int CalcOnsetOffset(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CalcOnsetOffsetEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Adjust note timings based on ties
+     */
+    ///@{
+    virtual int ResolveMIDITies(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Export the object to a MidiFile
      */
     ///@{
     virtual int GenerateMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int GenerateMIDIEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**

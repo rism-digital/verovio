@@ -28,17 +28,12 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Rest::Rest()
-    : LayerElement("rest-")
-    , DurationInterface()
-    , PositionInterface()
-    , AttColor()
-    , AttRelativesize()
-    , AttRestVisMensural()
+    : LayerElement("rest-"), DurationInterface(), PositionInterface(), AttColor(), AttCue(), AttRestVisMensural()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_RELATIVESIZE);
+    RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_RESTVISMENSURAL);
     Reset();
 }
@@ -53,7 +48,7 @@ void Rest::Reset()
     DurationInterface::Reset();
     PositionInterface::Reset();
     ResetColor();
-    ResetRelativesize();
+    ResetCue();
     ResetRestVisMensural();
 }
 
@@ -130,7 +125,7 @@ int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
             currentDots = new Dots();
             this->AddChild(currentDots);
         }
-        currentDots->AttAugmentdots::operator=(*this);
+        currentDots->AttAugmentDots::operator=(*this);
     }
     // This will happen only if the duration has changed
     else if (currentDots) {

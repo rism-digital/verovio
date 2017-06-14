@@ -10,6 +10,7 @@
 
 #include "atts_mensural.h"
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -24,12 +25,13 @@ class ScoreDefInterface;
  * This class models the MEI <mensur> element.
  */
 class Mensur : public LayerElement,
+               public AttColor,
+               public AttCue,
                public AttDurationRatio,
                public AttMensuralShared,
                public AttMensurLog,
                public AttMensurVis,
-               public AttRelativesize,
-               public AttSlashcount {
+               public AttSlashCount {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
