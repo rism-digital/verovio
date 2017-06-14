@@ -3925,7 +3925,7 @@ void HumdrumInput::insertMeterSigElement(
     if (tsig->getDurationFromStart() <= 0) {
         return;
     }
-    smatch matches;
+    std::smatch matches;
     int count = -1;
     int unit = -1;
     if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
@@ -3994,7 +3994,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         // cerr << "TIMESIG = " << timesig << endl;
         int count = -1;
         int unit = -1;
-        smatch matches;
+        std::smatch matches;
         if (regex_search(*timesig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
             count = stoi(matches[1]);
             unit = stoi(matches[2]);
@@ -5328,6 +5328,18 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
         }
     }
 
+	// If the rest is the start or stop of an analytic phrase,
+    // then color the rest (may change later, or be done with a label).
+	bool phraseStart = token->find('{') != string::npos ? true : false;
+	bool phraseStop = token->find('}') != string::npos ? true : false;
+    if (phraseStart && phraseStop) {
+        rest->SetType("phraseStop phraseStart");
+	} else if (phraseStart) {
+        rest->SetType("phraseStart");
+	} else if (phraseStop) {
+        rest->SetType("phraseStop");
+	}
+
     token->setValue("MEI", "xml:id", rest->GetUuid());
     int index = (int)m_measures.size() - 1;
     token->setValue("MEI", "measureIndex", index);
@@ -5576,6 +5588,18 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     if (m_signifiers.cuesize && tstring.find(m_signifiers.cuesize) != string::npos) {
         note->SetSize(SIZE_cue);
     }
+
+	// If the note is the start or stop of an analytic phrase,
+    // then color the note (may change later, or be done with a label).
+	bool phraseStart = token->find('{') != string::npos ? true : false;
+	bool phraseStop = token->find('}') != string::npos ? true : false;
+    if (phraseStart && phraseStop) {
+        note->SetType("phraseStart phraseStop");
+	} else if (phraseStart) {
+        note->SetType("phraseStart");
+	} else if (phraseStop) {
+        note->SetType("phraseStop");
+	}
 }
 
 //////////////////////////////
@@ -7577,7 +7601,7 @@ void HumdrumInput::prepareEndings(void)
             // ignore expansion lists
             continue;
         }
-        smatch matches;
+        std::smatch matches;
         if (regex_search(*((string *)infile.token(i, 0)), matches, regex("(\\d+)$"))) {
             endnum = stoi(matches[1]);
             ending[i] = endnum;

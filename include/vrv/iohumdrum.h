@@ -26,7 +26,7 @@
 #ifndef NO_HUMDRUM_SUPPORT
 #include "humlib.h"
 #include "pugixml.hpp"
-#include "tool-musicxml2hum.h"
+// #include "tool-musicxml2hum.h"
 #endif /* NO_HUMDRUM_SUPPORT */
 
 //----------------------------------------------------------------------------
