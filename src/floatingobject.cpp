@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "breath.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -110,7 +111,13 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
     assert(object);
 
     m_object = object;
-    if (object->Is(DIR)) {
+    if (object->Is(BREATH)) {
+        Breath *breath = dynamic_cast<Breath *>(object);
+        assert(breath);
+        // breath above by default
+        m_place = breath->HasPlace() ? breath->GetPlace() : STAFFREL_above;
+    }
+    else if (object->Is(DIR)) {
         Dir *dir = dynamic_cast<Dir *>(object);
         assert(dir);
         // dir below by default
