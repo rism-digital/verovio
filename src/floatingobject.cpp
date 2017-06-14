@@ -348,7 +348,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 return true;
             }
             yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
-            Object *object = dynamic_cast<Object*>(horizOverlapingBBox);
+            Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
             // With LayerElement always move them up
             if (object && object->IsLayerElement()) {
                 if (yRel < 0) this->SetDrawingYRel(yRel);
@@ -368,8 +368,8 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 return true;
             }
             yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
-            + GetContentY2() + margin;
-            Object *object = dynamic_cast<Object*>(horizOverlapingBBox);
+                + GetContentY2() + margin;
+            Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
             // With LayerElement always move them down
             if (object && object->IsLayerElement()) {
                 if (yRel > 0) this->SetDrawingYRel(yRel);
