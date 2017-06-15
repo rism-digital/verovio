@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+    <fileDesc>
+      <titleStmt>
+        <title>Cascading colors</title>
+      </titleStmt>
+      <pubStmt/>
+      <seriesStmt>
+        <title>MEILER test files</title>
+      </seriesStmt>
+    </fileDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef meter.count="4" meter.unit="4" meter.sym="common">
+            <staffGrp>
+              <staffDef n="1" clef.line="2" clef.shape="G" lines="5"/>
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure n="1">
+              <staff n="1">
+                <layer n="1">
+                  <chord dur="8" color="blue" label="feature-example">
+                    <note pname="d" oct="4" accid="f"/>
+                    <note pname="f" oct="4" color="green"/>
+                    <note pname="g" oct="4" color="red">
+                      <accid accid="s" color="yellow"/>
+                    </note>
+                    <note pname="c" oct="5" color="fuchsia">
+                      <accid accid="s"/>
+                    </note>
+                  </chord>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

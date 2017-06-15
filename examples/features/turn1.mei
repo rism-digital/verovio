@@ -30,7 +30,7 @@
                                     <note xml:id="note-02" dur="4" oct="5" pname="f"/>
                                 </layer>
                             </staff>
-                            <turn form="norm" startid="#note-01" label="doppelschlag"/>
+                            <turn form="norm" startid="#note-01" label="Doppelschlag"/>
                         </measure>
                         <measure n="2">
                             <staff n="1">
@@ -39,7 +39,7 @@
                                     <note xml:id="note-04" dur="4" oct="4" pname="g"/>
                                 </layer>
                             </staff>
-                            <turn form="inv" startid="#note-03" label="schleifer"/>
+                            <turn form="inv" startid="#note-03" label="Schleifer"/>
                         </measure>
                     </section>
                 </score>
