@@ -168,7 +168,7 @@ namespace humaux {
         // 2: all open ties for the staff
         std::list<humaux::HumdrumTie> ties;
     };
-}
+} // namespace humaux
 
 class HumdrumSignifiers {
 public:
@@ -366,6 +366,7 @@ protected:
     template <class ELEMENT> void addTextElement(ELEMENT *element, const std::string &content);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
+    template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
@@ -378,7 +379,7 @@ protected:
     static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
     std::string cleanHarmString(const std::string &content);
-	std::string cleanHarmString2(const std::string &content);
+    std::string cleanHarmString2(const std::string &content);
     std::vector<std::string> cleanFBString(const std::string &content);
 
 private:
