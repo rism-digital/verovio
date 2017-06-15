@@ -86,14 +86,7 @@ verovio.toolkit.prototype.destroy = function () {
 };
 
 verovio.toolkit.prototype.edit = function (editorAction) {
-	if (typeof editorAction === 'string') {
-		console.warn("DEPRECATION WARNING: Passing a String to edit will be removed in next version of Verovio. Pass a JSON Object instead.");
-		return verovio.vrvToolkit.edit(this.ptr, editorAction);
-	}
-	else {
-		return verovio.vrvToolkit.edit(this.ptr, JSON.stringify(editorAction));
-	}
-	
+	return verovio.vrvToolkit.edit(this.ptr, JSON.stringify(editorAction));
 };
 
 verovio.toolkit.prototype.getElementsAtTime = function (millisec) {
@@ -141,37 +134,19 @@ verovio.toolkit.prototype.redoPagePitchPosLayout = function () {
 }
 
 verovio.toolkit.prototype.renderData = function (data, options) {
-	if (typeof options === 'string') {
-		console.warn("DEPRECATION WARNING: Passing a String to renderData will be removed in next version of Verovio. Pass a JSON Object instead.");
-		verovio.vrvToolkit.renderData(this.ptr, data, options);
-	}
-	return verovio.vrvToolkit.renderData(this.ptr, data, JSON.stringify(options));
+    return verovio.vrvToolkit.renderData(this.ptr, data, JSON.stringify(options));
 };
 
 verovio.toolkit.prototype.renderPage = function (pageNo, options) {
-	if (typeof options === 'string') {
-		console.warn("DEPRECATION WARNING: Passing a String to renderPage will be removed in next version of Verovio. Pass a JSON Object instead.");
-		verovio.vrvToolkit.renderPage(this.ptr, pageNo, options);
-	}
-	return verovio.vrvToolkit.renderPage(this.ptr, pageNo, JSON.stringify(options));
+    return verovio.vrvToolkit.renderPage(this.ptr, pageNo, JSON.stringify(options));
 };
 
 verovio.toolkit.prototype.renderToMidi = function (options) {
-	if (typeof options === 'string') {
-		console.warn("DEPRECATION WARNING: Passing a String to renderToMidi will be removed in next version of Verovio. Pass a JSON Object instead.");
-		verovio.vrvToolkit.renderToMidi(this.ptr, options);
-	}
-	return verovio.vrvToolkit.renderToMidi(this.ptr, JSON.stringify(options));
+    return verovio.vrvToolkit.renderToMidi(this.ptr, JSON.stringify(options));
 };
 
 verovio.toolkit.prototype.setOptions = function (options) {
-	if (typeof options === 'string') {
-		console.warn("DEPRECATION WARNING: Passing a String to setOptions will be removed in next version of Verovio. Pass a JSON Object instead.");
-		verovio.vrvToolkit.setOptions(this.ptr, options);
-	}
-	else {
-		verovio.vrvToolkit.setOptions(this.ptr, JSON.stringify(options));
-	}
+	verovio.vrvToolkit.setOptions(this.ptr, JSON.stringify(options));
 };
 
 verovio.toolkit.prototype.getElementAttr = function (xmlId) {
