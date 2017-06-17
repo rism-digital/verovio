@@ -106,6 +106,12 @@ void Note::Reset()
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;
+
+    m_scoreTimeOnset = 0.0;
+    m_scoreTimeOffset = 0.0;
+    m_realTimeOnsetMilliseconds = 0;
+    m_realTimeOffsetMilliseconds = 0;
+    m_scoreTimeTiedDuration = 0.0;
 }
 
 void Note::AddChild(Object *child)

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Apr 20 09:35:35 PDT 2017
+// Last Modified: Tue Jun 13 22:49:17 CEST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -10,7 +10,7 @@
 // Description:   Include file for humlib library.
 //
 /*
-Copyright (c) 2015 Craig Stuart Sapp
+Copyright (c) 2015, 2016, 2017 Craig Stuart Sapp
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <list>
 #include <locale>
 #include <map>
 #include <regex>
@@ -64,6 +65,8 @@ using std::ends;
 using std::ifstream;
 using std::invalid_argument;
 using std::istream;
+using std::istreambuf_iterator;
+using std::list;
 using std::map;
 using std::ostream;
 using std::pair;
@@ -84,6 +87,14 @@ using std::vector;
    #include <sstream>
 #endif
 
+#include "pugiconfig.hpp"
+#include "pugixml.hpp"
+
+using pugi::xml_node;
+using pugi::xml_attribute;
+using pugi::xml_document;
+using pugi::xpath_node;
+
 namespace hum {
 
 class Convert;
@@ -96,6 +107,7 @@ class HumdrumFileBase;
 class HumdrumFileStructure;
 class HumdrumFileContent;
 class HumdrumFile;
+class GridVoice;
 
 
 class HumParameter : public string {
@@ -380,6 +392,9 @@ class HumRegex {
 		string      replaceCopy        (string* input, const string& replacement,
 		                                const string& exp,
 		                                const string& options);
+		string&      tr                 (string& input, const string& from, 
+		                                const string& to);
+
 		// matching (full-string match)
 		bool        match              (const string& input, const string& exp);
 		bool        match              (const string& input, const string& exp,
@@ -494,6 +509,9 @@ class HumRegex {
 };
 
 
+
+class HumdrumLine;
+class HumdrumToken;
 
 class HumAddress {
 	public:
@@ -1024,7 +1042,6 @@ ostream& operator<< (ostream& out, HumdrumLine* line);
 
 
 
-
 typedef HumdrumToken* HTp;
 
 class HumdrumToken : public string, public HumHash {
@@ -1102,6 +1119,8 @@ class HumdrumToken : public string, public HumHash {
 
 		HumNum   getDuration               (void) const;
 		HumNum   getDuration               (HumNum scale) const;
+		HumNum   getTiedDuration           (void);
+		HumNum   getTiedDuration           (HumNum scale);
 		HumNum   getDurationNoDots         (void) const;
 		HumNum   getDurationNoDots         (HumNum scale) const;
 		int      getDots                   (void) const;
@@ -1404,6 +1423,7 @@ class HumdrumFileBase : public HumHash {
 		                                                { return getMaxTrack(); }
 		int           getSpineCount            (void) const
 		                                                { return getMaxTrack(); }
+		int           getMeasureNumber         (int line);
 		ostream&      printSpineInfo           (ostream& out = cout);
 		ostream&      printDataTypeInfo        (ostream& out = cout);
 		ostream&      printTrackInfo           (ostream& out = cout);
@@ -2207,6 +2227,9 @@ class NoteCell {
 		double getMetricLevel       (void);
 		HumNum getDurationFromStart (void);
 		HumNum getDuration          (void);
+		void   setMeter             (int topval, HumNum botval);
+		int    getMeterTop          (void);
+		HumNum getMeterBottom       (void);
 
 	protected:
 		void clear                  (void);
@@ -2235,6 +2258,8 @@ class NoteCell {
 		int m_prevAttackIndex; // index to previous note attack.
 		int m_currAttackIndex; // index to current note attack (useful for
 		                       // finding the start of a sustained note.
+		int m_metertop = 0;    // top number of prevailing meter signature
+		HumNum m_meterbot = 0; // bottom number of prevailing meter signature
 
 	friend NoteGrid;
 };
@@ -2318,12 +2343,15 @@ class Convert {
 		                                     const string& separator = " ");
 		static string  durationToRecip      (HumNum duration, 
 		                                     HumNum scale = HumNum(1,4));
+		static string  durationFloatToRecip (double duration, 
+		                                     HumNum scale = HumNum(1,4));
 
 		// Pitch processing, defined in Convert-pitch.cpp
 		static string  base40ToKern         (int b40);
 		static int     base40ToAccidental   (int b40);
 		static int     base40ToDiatonic     (int b40);
 		static int     base40ToMidiNoteNumber(int b40);
+		static string  base40ToIntervalAbbr (int b40);
 		static int     kernToOctaveNumber   (const string& kerndata);
 		static int     kernToOctaveNumber   (HTp token)
 				{ return kernToOctaveNumber((string)*token); }
@@ -2385,6 +2413,7 @@ class Convert {
 		static int     base40IntervalToLineOfFifths(int trans);
 		static string  keyNumberToKern      (int number);
 		static int     base7ToBase40        (int base7);
+		static int     base40IntervalToDiatonic(int base40interval);
 
 		// data-type specific (other than pitch/rhythm),
 		// defined in Convert-kern.cpp
@@ -2429,6 +2458,613 @@ class Convert {
 		static bool    isNaN                (double value);
 		static double  pearsonCorrelation   (vector<double> x, vector<double> y);
 
+};
+
+
+
+// SliceType is a list of various Humdrum line types.  Groupings are 
+// segmented by categories which are prefixed with an underscore.
+// For example Notes are in the _Duration group, since they have 
+// non-zero durations.  Notes and Gracenotes are in the _Data group.
+// The indentation shows the various types of groups.
+// 
+
+enum class SliceType {
+				Notes,
+			_Duration,
+				GraceNotes,
+		_Data,
+			Measures,
+		_Measure,
+				Clefs,
+				KeySigs,
+				TimeSigs,
+				MeterSigs,
+			_RegularInterpretation,
+				Exclusives,
+				Terminators,
+				Manipulators,
+			_Manipulator,
+		_Interpretation,
+			Layouts,
+			LocalComments,
+	_Spined,
+		GlobalComment,
+		ReferenceRecord,
+	_Other,
+		Invalid
+};
+
+
+// MeasureType is a list of the style types for a measure (ending type for now)
+
+enum class MeasureStyle {
+	Plain,
+	RepeatBackward,
+	RepeatForward,
+	RepeatBoth,
+	Double,
+	Final
+};
+
+
+
+class MxmlMeasure;
+class MxmlEvent;
+
+class MxmlPart {
+	public:
+		              MxmlPart             (void);
+		             ~MxmlPart             ();
+		void          clear                (void);
+		void          enableStems          (void);
+		bool          readPart             (const string& id, xml_node partdef, 
+		                                    xml_node part);
+		bool          addMeasure           (xml_node mel);
+		bool          addMeasure           (xpath_node mel);
+		int           getMeasureCount      (void) const;
+		MxmlMeasure*  getMeasure           (int index) const;
+		long          getQTicks            (void) const;
+		int           setQTicks            (long value);
+	   MxmlMeasure*  getPreviousMeasure   (MxmlMeasure* measure) const;
+		HumNum        getDuration          (void) const;
+		void          allocateSortedEvents (void);
+		void          setPartNumber        (int number);
+		int           getPartNumber        (void) const;
+		int           getPartIndex         (void) const;
+		int           getStaffCount        (void) const;
+		int           getVerseCount        (void) const;
+		int           getVerseCount        (int staffindex) const;
+		int           getHarmonyCount      (void) const;
+		void          trackStaffVoices     (int staffnum, int voicenum);
+		void          printStaffVoiceInfo  (void);
+		void          prepareVoiceMapping  (void);
+		int           getVoiceIndex        (int voicenum);
+		int           getStaffIndex        (int voicenum);
+		bool          hasEditorialAccidental(void) const;
+
+	private:
+		void          receiveStaffNumberFromChild (int staffnum, int voicenum);
+		void          receiveVerseCount    (int count);
+		void          receiveVerseCount    (int staffnum, int count);
+		void          receiveHarmonyCount  (int count);
+		void          receiveEditorialAccidental(void);
+
+	protected:
+		vector<MxmlMeasure*> m_measures;
+		vector<long>         m_qtick;
+		int                  m_partnum;
+		int                  m_maxstaff;
+		vector<int>          m_verseCount;
+		int                  m_harmonyCount;
+		bool                 m_editorialAccidental;
+		bool                 m_stems = false;
+
+		// m_staffvoicehist: counts of staff and voice numbers.  
+		// staff=0 is used for items such as measures.
+		// voice=0 is used for nonduration items such as harmony.
+		vector<vector<int> > m_staffvoicehist;
+	 	vector<pair<int, int> > m_voicemapping; // voicenum -> (staff, voiceindex)
+		
+	friend MxmlMeasure;
+	friend MxmlEvent;
+
+};
+
+
+
+class GridSide {
+	public:
+		GridSide(void);
+		~GridSide();
+
+		int   getVerseCount  (void);
+		HTp   getVerse       (int index);
+		void  setVerse       (int index, HTp token);
+
+		int   getHarmonyCount(void);
+		void  setHarmony     (HTp token);
+		void  detachHarmony  (void);
+		HTp   getHarmony     (void);
+
+	private:
+		vector<HumdrumToken*> m_verses;
+		vector<HumdrumToken*> m_dynamics;
+		HumdrumToken* m_harmony;
+};
+
+
+
+class GridStaff : public vector<GridVoice*>, public GridSide {
+	public:
+		GridStaff(void);
+		~GridStaff();
+		GridVoice* setTokenLayer (int layerindex, HTp token, HumNum duration);
+		void setNullTokenLayer   (int layerindex, SliceType type, HumNum nextdur);
+		void appendTokenLayer    (int layerindex, HTp token, HumNum duration,
+		                          const string& spacer = " ");
+		int getMaxVerseCount     (void);
+};
+
+ostream& operator<<(ostream& output, GridStaff* staff);
+
+
+
+class GridPart : public vector<GridStaff*>, public GridSide {
+	public:
+		GridPart(void);
+		~GridPart();
+};
+
+ostream& operator<<(ostream& output, GridPart* part);
+ostream& operator<<(ostream& output, GridPart& part);
+
+
+
+class GridSlice;
+class HumGrid;
+
+class GridMeasure : public list<GridSlice*> {
+	public:
+		GridMeasure(HumGrid* owner);
+		~GridMeasure();
+
+		bool         transferTokens (HumdrumFile& outfile, bool recip,
+		                             bool addbar);
+		HumGrid*     getOwner       (void);
+		void         setOwner       (HumGrid* owner);
+		HumNum       getDuration    (void);
+		void         setDuration    (HumNum duration);
+		HumNum       getTimestamp   (void);
+		void         setTimestamp   (HumNum timestamp);
+		HumNum       getTimeSigDur  (void);
+		void         setTimeSigDur  (HumNum duration);
+		MeasureStyle getStyle       (void) { return m_style; }
+		MeasureStyle getBarStyle    (void) { return getStyle(); }
+		void         setStyle       (MeasureStyle style) { m_style = style; }
+		void         setBarStyle    (MeasureStyle style) { setStyle(style); }
+
+		bool         isDouble(void) 
+		                  {return m_style == MeasureStyle::Double;}
+		bool         isFinal(void) 
+		                  {return m_style == MeasureStyle::Final;}
+		bool         isRepeatBackward(void) 
+		                  { return m_style == MeasureStyle::RepeatBackward; }
+		bool         isRepeatForward(void) 
+		                  { return m_style == MeasureStyle::RepeatForward; }
+		bool         isRepeatBoth(void) 
+		                  { return m_style == MeasureStyle::RepeatBoth; }
+
+	protected:
+		void         appendInitialBarline(HumdrumFile& infile);
+
+	private:
+		HumGrid*     m_owner;
+		HumNum       m_duration;
+		HumNum       m_timestamp;
+		HumNum       m_timesigdur;
+		MeasureStyle m_style;
+};
+
+
+class HumGrid;
+
+
+class GridSlice : public vector<GridPart*> {
+	public:
+		GridSlice(GridMeasure* measure, HumNum timestamp, SliceType type,
+		          int partcount = 0);
+		GridSlice(GridMeasure* measure, HumNum timestamp, SliceType type,
+		          const GridSlice& slice);
+		GridSlice(GridMeasure* measure, HumNum timestamp, SliceType type,
+		          GridSlice* slice);
+		~GridSlice();
+
+		bool isNoteSlice(void)     { return m_type == SliceType::Notes; }
+		bool isGraceSlice(void)    { return m_type == SliceType::GraceNotes; }
+		bool isMeasureSlice(void)  { return m_type == SliceType::Measures; }
+		bool isClefSlice(void)     { return m_type == SliceType::Clefs; }
+		bool isTimeSigSlice(void)  { return m_type == SliceType::TimeSigs; }
+		bool isMeterSigSlice(void) { return m_type == SliceType::MeterSigs; }
+		bool isManipulatorSlice(void) { return m_type==SliceType::Manipulators; }
+		bool isInvalidSlice(void)  { return m_type == SliceType::Invalid; }
+		bool isInterpretationSlice(void);
+		bool isDataSlice(void);
+		SliceType getType(void)    { return m_type; }
+
+		void transferTokens    (HumdrumFile& outfile, bool recip);
+		void initializePartStaves (vector<MxmlPart>& partdata);
+
+		HumNum       getDuration        (void);
+		void         setDuration        (HumNum duration);
+		HumNum       getTimestamp       (void);
+		void         setTimestamp       (HumNum timestamp);
+		void         setOwner           (HumGrid* owner);
+		HumGrid*     getOwner           (void);
+		HumNum       getMeasureDuration (void);
+		HumNum       getMeasureTimestamp(void);
+		GridMeasure* getMeasure         (void);
+		void         invalidate         (void);
+
+		void transferSides        (HumdrumLine& line, GridStaff& sides, 
+		                           const string& empty, int maxvcount,
+		                           int maxhcount);
+		void transferSides        (HumdrumLine& line, GridPart& sides, 
+		                           const string& empty, int maxvcount,
+		                           int maxhcount);
+		int getVerseCount         (int partindex, int staffindex);
+		int getHarmonyCount       (int partindex, int staffindex = -1);
+
+	protected:
+		HTp  createRecipTokenFromDuration  (HumNum duration);
+
+	private:
+		HumGrid*     m_owner;
+		GridMeasure* m_measure;
+		HumNum       m_timestamp;
+		HumNum       m_duration;
+		SliceType    m_type;
+
+};
+
+
+ostream& operator<<(ostream& output, GridSlice* slice);
+
+
+
+class GridVoice {
+	public:
+		GridVoice(void);
+		GridVoice(HTp token, HumNum duration);
+		GridVoice(const char* token, HumNum duration);
+		GridVoice(const string& token, HumNum duration);
+		~GridVoice();
+
+		bool   isTransfered       (void);
+
+		HTp    getToken           (void) const;
+		void   setToken           (HTp token);
+		void   setToken           (const string& token);
+		void   setToken           (const char* token);
+		bool   isNull             (void) const;
+
+		void   setDuration        (HumNum duration);
+		HumNum getDuration        (void) const;
+		HumNum getDurationToNext  (void) const;
+		HumNum getDurationToPrev  (void) const;
+		void   setDurationToPrev  (HumNum dur);
+		void   incrementDuration  (HumNum duration);
+		void   forgetToken        (void);
+
+	protected:
+		void   setTransfered      (bool state);
+
+	private:
+		HTp    m_token;
+		HumNum m_nextdur;
+		HumNum m_prevdur;
+		bool   m_transfered;
+
+	friend class GridSlice;
+};
+
+ostream& operator<<(ostream& output, GridVoice* voice);
+ostream& operator<<(ostream& output, GridVoice& voice);
+
+
+
+class HumGrid : public vector<GridMeasure*> {
+	public:
+		HumGrid(void);
+		~HumGrid();
+		void enableRecipSpine (void);
+		bool transferTokens   (HumdrumFile& outfile);
+		int  getHarmonyCount  (int partindex);
+		int  getVerseCount    (int partindex, int staffindex);
+		void setVerseCount    (int partindex, int staffindex, int count);
+		void setHarmonyCount  (int partindex, int count);
+		void removeRedundantClefChanges(void);
+		bool hasPickup         (void);
+
+	protected:
+		void calculateGridDurations        (void);
+		void insertExclusiveInterpretationLine (HumdrumFile& outfile);
+		void insertDataTerminationLine     (HumdrumFile& outfile);
+		void appendMeasureLine             (HumdrumFile& outfile,
+		                                    GridSlice& slice);
+		void insertPartIndications         (HumdrumFile& outfile);
+		void insertStaffIndications        (HumdrumFile& outfile);
+		void addNullTokens                 (void);
+		void addNullTokensForGraceNotes    (void);
+		void FillInNullTokensForGraceNotes(GridSlice* graceslice, GridSlice* lastnote,
+		                                   GridSlice* nextnote);
+		bool buildSingleList               (void);
+		void extendDurationToken           (int slicei, int parti,
+		                                    int staffi, int voicei);
+		GridVoice* getGridVoice(int slicei, int parti, int staffi, int voicei);
+		void addMeasureLines                (void);
+		void addLastMeasure                 (void);
+		bool manipulatorCheck               (void);
+		GridSlice* manipulatorCheck         (GridSlice* ice1, GridSlice* ice2);
+		void cleanupManipulators            (void);
+		void cleanManipulator               (vector<GridSlice*>& newslices, 
+		                                     GridSlice* curr);
+		GridSlice* checkManipulatorContract (GridSlice* curr);
+		void transferMerges                 (GridStaff* oldstaff,
+		                                     GridStaff* oldlaststaff,
+		                                     GridStaff* newstaff,
+		                                     GridStaff* newlaststaff);
+		void insertExInterpSides            (HumdrumLine* line, int part,
+		                                     int staff);
+		void insertSideTerminals            (HumdrumLine* line, int part, 
+		                                     int staff);
+		void insertSidePartInfo             (HumdrumLine* line, int part,
+		                                     int staff);
+		void insertSideStaffInfo            (HumdrumLine* line, int part,
+		                                     int staff, int staffnum);
+		void getMetricBarNumbers            (vector<int>& barnums);
+		string  createBarToken              (int m, int barnum,
+		                                     GridMeasure* measure);
+		string getBarStyle                  (GridMeasure* measure);
+
+	private:
+		vector<GridSlice*>   m_allslices;
+		vector<vector<int> > m_verseCount;
+		vector<int>          m_harmonyCount;
+		bool                 m_pickup;
+
+		// options:
+		bool m_recip;               // include **recip spine in output
+		bool m_musicxmlbarlines;    // use measure numbers from <measure> element
+
+};
+
+
+
+class MxmlMeasure;
+class MxmlPart;
+
+// Event types: These are all of the XML elements which can be children of
+// the measure element in MusicXML.
+
+enum measure_event_type {
+	mevent_unknown,
+	mevent_attributes,
+	mevent_backup,
+	mevent_barline,
+	mevent_bookmark,
+	mevent_direction,
+	mevent_figured_bass,
+	mevent_forward,
+	mevent_grouping,
+	mevent_harmony,
+	mevent_link,
+	mevent_note,
+	mevent_print,
+	mevent_sound,
+	mevent_float       // category for GridSides not attached to note onsets
+};
+
+
+class MxmlEvent {
+	public:
+		                   MxmlEvent          (MxmlMeasure* measure);
+		                  ~MxmlEvent          ();
+		void               clear              (void);
+		void               enableStems        (void);
+		bool               parseEvent         (xml_node el, xml_node nextel,
+		                                       HumNum starttime);
+		bool               parseEvent         (xpath_node el, HumNum starttime);
+		void               setTickStart       (long value, long ticks);
+		void               setTickDur         (long value, long ticks);
+		void               setStartTime       (HumNum value);
+		void               setDuration        (HumNum value);
+		void               setDurationByTicks (long value,
+		                                       xml_node el = xml_node(NULL));
+		HumNum             getStartTime       (void) const;
+		HumNum             getDuration        (void) const;
+		void               setOwner           (MxmlMeasure* measure);
+		MxmlMeasure*       getOwner           (void) const;
+		const char*        getName            (void) const;
+		int                setQTicks          (long value);
+		long               getQTicks          (void) const;
+		long               getIntValue        (const char* query) const;
+		bool               hasChild           (const char* query) const;
+		void               link               (MxmlEvent* event);
+		bool               isLinked           (void) const;
+		bool               isRest             (void);
+		bool               isGrace            (void);
+		bool               isFloating         (void);
+		bool               hasSlurStart       (int& direction);
+		bool               hasSlurStop        (void);
+		void               setLinked          (void);
+		vector<MxmlEvent*> getLinkedNotes     (void);
+		void               attachToLastEvent  (void);
+		bool               isChord            (void) const;
+		void               printEvent         (void);
+		int                getSequenceNumber  (void) const;
+		int                getVoiceNumber     (void) const;
+		void               setVoiceNumber     (int value);
+		int                getStaffNumber     (void) const;
+		int                getStaffIndex      (void) const;
+		int                getVoiceIndex      (int maxvoice = 4) const;
+		void               setStaffNumber     (int value);
+		measure_event_type getType            (void) const;
+		int                getPartNumber      (void) const;
+		int                getPartIndex       (void) const;
+		string             getRecip           (void) const;
+		string             getKernPitch       (void);
+		string             getPrefixNoteInfo  (void) const;
+		string             getPostfixNoteInfo (bool primarynote) const;
+		xml_node           getNode            (void);
+		xml_node           getHNode           (void);
+		HumNum             getTimeSigDur      (void);
+		string             getElementName     (void);
+		void               addNotations       (stringstream& ss, 
+		                                       xml_node notations) const;
+		void               reportVerseCountToOwner (int count);
+		void               reportVerseCountToOwner (int staffnum, int count);
+		void               reportHarmonyCountToOwner (int count);
+		void               reportMeasureStyleToOwner (MeasureStyle style);
+		void               reportEditorialAccidentalToOwner(void);
+      void               makeDummyRest      (MxmlMeasure* owner, 
+		                                       HumNum startime,
+		                                       HumNum duration,
+		                                       int staffindex = 0,
+		                                       int voiceindex = 0);
+		void               setVoiceIndex      (int voiceindex);
+		void               forceInvisible     (void);
+		bool               isInvisible        (void);
+		void               setBarlineStyle    (xml_node node);
+
+	protected:
+		HumNum             m_starttime;  // start time in quarter notes of event
+		HumNum             m_duration;   // duration in quarter notes of event
+		measure_event_type m_eventtype;  // enumeration type of event
+		xml_node           m_node;       // pointer to event in XML structure
+		MxmlMeasure*       m_owner;      // measure that contains this event
+		vector<MxmlEvent*> m_links;      // list of secondary chord notes
+		bool               m_linked;     // true if a secondary chord note
+		int                m_sequence;   // ordering of event in XML file
+		static int         m_counter;    // counter for sequence variable
+		short              m_staff;      // staff number in part for event
+		short              m_voice;      // voice number in part for event
+		int                m_voiceindex; // voice index of item (remapping)
+      int                m_maxstaff;   // maximum staff number for measure
+		xml_node           m_hnode;      // harmony label starting at note event
+		bool               m_invisible;  // for forceInvisible();
+		bool               m_stems;      // for preserving stems
+
+
+	private:
+   	void   reportStaffNumberToOwner  (int staffnum, int voicenum);
+		void   reportTimeSigDurToOwner   (HumNum duration);
+		int    getDotCount               (void) const;
+
+	public:
+		static HumNum getEmbeddedDuration  (xml_node el = xml_node(NULL));
+		static HumNum getQuarterDurationFromType (const char* type);
+		static bool   nodeType             (xml_node node, const char* testname);
+
+	friend MxmlMeasure;
+	friend MxmlPart;
+};
+
+
+
+class MxmlEvent;
+class MxmlPart;
+
+
+class SimultaneousEvents {
+	public:
+		SimultaneousEvents(void) { }
+		~SimultaneousEvents() { }
+		HumNum starttime;              // start time of events
+		HumNum duration;               // duration to next non-zero duration
+		vector<MxmlEvent*> zerodur;    // zero-duration elements at this time
+		vector<MxmlEvent*> nonzerodur; // non-zero dur elements at this time
+};
+
+
+class MxmlMeasure {
+	public:
+		              MxmlMeasure        (MxmlPart* part);
+		             ~MxmlMeasure        (void);
+		void          clear              (void);
+		void          enableStems        (void);
+		bool          parseMeasure       (xml_node mel);
+		bool          parseMeasure       (xpath_node mel);
+		void          setStartTimeOfMeasure (HumNum value);
+		void          setStartTimeOfMeasure (void);
+		void          setDuration        (HumNum value);
+		HumNum        getStartTime       (void) const;
+		HumNum        getTimestamp       (void) const { return getStartTime(); }
+		HumNum        getDuration        (void) const;
+		void          setOwner           (MxmlPart* part);
+		MxmlPart*     getOwner           (void) const;
+		int           getPartNumber      (void) const;
+		int           getPartIndex       (void) const;
+		int           setQTicks          (long value);
+		long          getQTicks          (void) const;
+		void          attachLastEventToPrevious  (void);
+		void          calculateDuration  (void);
+		int           getEventCount      (void) const;
+		vector<SimultaneousEvents>* getSortedEvents(void);
+		MxmlEvent*    getEvent           (int index) const;
+
+		void          setNextMeasure     (MxmlMeasure* event);
+		MxmlMeasure*  getNextMeasure     (void) const;
+		MxmlMeasure*  getPreviousMeasure (void) const;
+		void          setPreviousMeasure (MxmlMeasure* event);
+
+		int           getVoiceIndex      (int voicenum);
+		int           getStaffIndex      (int voicenum);
+		void          setTimeSigDur      (HumNum duration);
+		HumNum        getTimeSigDur      (void);
+		void          addDummyRest       (void);
+		void          addDummyRest       (HumNum starttime, HumNum duration, 
+		                                  int staffindex, int voiceindex);
+		vector<MxmlEvent*>& getEventList (void);
+		void  sortEvents                 (void);
+		void  forceLastInvisible         (void);
+		MeasureStyle  getStyle           (void);
+		MeasureStyle  getBarStyle        (void);
+		void  setStyle                   (MeasureStyle style);
+		void  setBarStyle                (MeasureStyle style);
+		void  makeFinalBarline(void)   { m_style = MeasureStyle::Final; }
+		bool  isFinal(void)            { return m_style == MeasureStyle::Final; }
+		bool  isDouble(void)           { return m_style == MeasureStyle::Double; }
+		bool  isRepeatBackward(void)   { return m_style == MeasureStyle::RepeatBackward; }
+		bool  isRepeatForward(void)    { return m_style == MeasureStyle::RepeatForward; }
+		bool  isRepeatBoth(void)       { return m_style == MeasureStyle::RepeatBoth; }
+
+	private:
+		void  receiveStaffNumberFromChild (int staffnum, int voicenum);
+		void  receiveTimeSigDurFromChild  (HumNum duration);
+		void  receiveMeasureStyleFromChild(MeasureStyle style);
+		void  receiveEditorialAccidentalFromChild(void);
+   	void  reportStaffNumberToOwner    (int staffnum, int voicenum);
+		void  reportVerseCountToOwner     (int count);
+		void  reportVerseCountToOwner     (int staffindex, int count);
+		void  reportHarmonyCountToOwner   (int count);
+		void  reportEditorialAccidentalToOwner (void);
+
+	protected:
+		HumNum             m_starttime; // start time of measure in quarter notes
+		HumNum             m_duration;  // duration of measure in quarter notes
+		HumNum             m_timesigdur; // duration of measure according to 
+													// prevailing time signature.
+		MxmlPart*          m_owner;     // part which contains measure
+		MxmlMeasure*       m_previous;  // previous measure in part or null
+		MxmlMeasure*       m_following; // following measure in part or null
+		vector<MxmlEvent*> m_events;    // list of semi-ordered events in measure
+		vector<SimultaneousEvents> m_sortedevents; // list of time-sorted events
+		MeasureStyle       m_style;     // measure style type
+		bool               m_stems = false;
+
+	friend MxmlEvent;
+	friend MxmlPart;
 };
 
 
@@ -2874,6 +3510,188 @@ class Tool_autostem : public HumTool {
 };
 
 
+class NoteNode {
+   public:
+		int b40;         // base-40 pitch number or 0 if a rest, negative if tied
+		int line;        // line number in original score of note
+		int spine;       // spine number in original score of note
+		int measure;     // measure number of note
+		int serial;      // serial number 
+		int mark;        // for marking search matches
+		int notemarker;  // for pass-through of marks
+		double beatsize; // time signature bottom value which or
+		                 // 3 times the bottom if compound meter
+		HumNum   duration;  // duration
+
+		         NoteNode             (void) { clear(); }
+		         NoteNode             (const NoteNode& anode);
+		         NoteNode& operator=  (NoteNode& anode);
+		        ~NoteNode             (void);
+		void     clear                (void);
+		int      isRest               (void) { return b40 == 0 ? 1 : 0; }
+		int      isSustain            (void) { return b40 < 0 ? 1 : 0; }
+		int      isAttack             (void) { return b40 > 0 ? 1 : 0; }
+		int      getB40               (void) { return abs(b40); }
+		void     setId                (const string& anid);
+		string   getIdString          (void);
+		string   getId                (void);
+
+   protected:
+		string  protected_id; // id number provided by data
+};
+
+
+
+class Tool_cint : public HumTool {
+	public:
+		         Tool_cint    (void);
+		        ~Tool_cint    () {};
+
+		bool     run                    (HumdrumFile& infile);
+		bool     run                    (const string& indata, ostream& out);
+		bool     run                    (HumdrumFile& infile, ostream& out);
+
+	protected:
+
+		void      initialize           (void);
+		void      example              (void);
+		void      usage                (const string& command);
+		int       processFile          (HumdrumFile& infile);
+		void      getKernTracks        (vector<int>& ktracks, HumdrumFile& infile);
+		int       validateInterval     (vector<vector<NoteNode> >& notes, 
+		                                int i, int j, int k);
+		void      printIntervalInfo    (HumdrumFile& infile, int line, 
+		                                int spine, vector<vector<NoteNode> >& notes, 
+		                                int noteline, int noteindex, 
+		                                vector<string >& abbr);
+		void      getAbbreviations     (vector<string >& abbreviations, 
+		                                vector<string >& names);
+		void      getAbbreviation      (string& abbr, string& name);
+		void      extractNoteArray     (vector<vector<NoteNode> >& notes, 
+		                                HumdrumFile& infile, vector<int>& ktracks, 
+		                                vector<int>& reverselookup);
+		int       onlyRests            (vector<NoteNode>& data);
+		int       hasAttack            (vector<NoteNode>& data);
+		int       allSustained         (vector<NoteNode>& data);
+		void      printPitchGrid       (vector<vector<NoteNode> >& notes, 
+		                                HumdrumFile& infile);
+		void      getNames             (vector<string >& names, 
+		                                vector<int>& reverselookup, HumdrumFile& infile);
+		void      printLattice         (vector<vector<NoteNode> >& notes, 
+		                                HumdrumFile& infile, vector<int>& ktracks, 
+		                                vector<int>& reverselookup, int n);
+		void      printSpacer          (ostream& out);
+		int       printInterval        (ostream& out, NoteNode& note1, NoteNode& note2,
+		                                int type, int octaveadjust = 0);
+		int       printLatticeItem     (vector<vector<NoteNode> >& notes, int n, 
+		                                int currentindex, int fileline);
+		int       printLatticeItemRows (vector<vector<NoteNode> >& notes, int n, 
+		                                int currentindex, int fileline);
+		int       printLatticeModule   (ostream& out, vector<vector<NoteNode> >& notes, 
+		                                int n, int startline, int part1, int part2);
+		void      printInterleaved     (HumdrumFile& infile, int line, 
+		                                vector<int>& ktracks, vector<int>& reverselookup, 
+		                                const string& interstring);
+		void      printLatticeInterleaved(vector<vector<NoteNode> >& notes, 
+		                                HumdrumFile& infile, vector<int>& ktracks, 
+		                                vector<int>& reverselookup, int n);
+		int       printInterleavedLattice(HumdrumFile& infile, int line, 
+		                                vector<int>& ktracks, vector<int>& reverselookup,
+		                                int n, int currentindex,
+		                                vector<vector<NoteNode> >& notes);
+		int       printCombinations    (vector<vector<NoteNode> >& notes, 
+		                                HumdrumFile& infile, vector<int>& ktracks, 
+		                                vector<int>& reverselookup, int n,
+		                                vector<vector<string> >& retrospective,
+		                                const string& searchstring);
+		void      printAsCombination   (HumdrumFile& infile, int line, 
+		                                vector<int>& ktracks, vector<int>& reverselookup,
+		                                const string& interstring);
+		int       printModuleCombinations(HumdrumFile& infile, int line, 
+		                                vector<int>& ktracks, vector<int>& reverselookup,
+		                                int n, int currentindex, 
+		                                vector<vector<NoteNode> >& notes, 
+		                                int& matchcount, 
+		                                vector<vector<string> >& retrospective,
+		                                const string& searchstring);
+		int       printCombinationsSuspensions(vector<vector<NoteNode> >& notes, 
+		                                HumdrumFile& infile, vector<int>& ktracks, 
+		                                vector<int>& reverselookup, int n,
+		                                vector<vector<string> >& retrospective);
+		int       printCombinationModule(ostream& out, const string& filename, 
+		                                vector<vector<NoteNode> >& notes, 
+		                                int n, int startline, int part1, int part2,
+		                                vector<vector<string> >& retrospective,
+		                                char& notemarker, int markstate = 0);
+		int       printCombinationModulePrepare(ostream& out, const string& filename,
+		                                vector<vector<NoteNode> >& notes, int n, 
+		                                int startline, int part1, int part2,
+		                                vector<vector<string> >& retrospective,
+		                                HumdrumFile& infile, const string& searchstring);
+		int       getOctaveAdjustForCombinationModule(vector<vector<NoteNode> >& notes, 
+		                                int n, int startline, int part1, int part2);
+		void      addMarksToInputData  (HumdrumFile& infile, 
+		                                vector<vector<NoteNode> >& notes,
+		                                vector<int>& ktracks,
+		                                vector<int>& reverselookup);
+		void      markNote              (HumdrumFile& infile, int line, int col);
+		void      initializeRetrospective(vector<vector<string> >& retrospective, 
+		                                HumdrumFile& infile, vector<int>& ktracks);
+		int       getTriangleIndex(int number, int num1, int num2);
+		void      adjustKTracks        (vector<int>& ktracks, const string& koption);
+		int       getMeasure           (HumdrumFile& infile, int line);
+
+	private:
+
+		int       debugQ       = 0;      // used with --debug option
+		int       base40Q      = 0;      // used with --40 option
+		int       base12Q      = 0;      // used with --12 option
+		int       base7Q       = 0;      // used with -7 option
+		int       pitchesQ     = 0;      // used with --pitches option
+		int       rhythmQ      = 0;      // used with -r option and others
+		int       durationQ    = 0;      // used with --dur option
+		int       latticeQ     = 0;      // used with -l option
+		int       interleavedQ = 0;      // used with -L option
+		int       Chaincount   = 1;      // used with -n option
+		int       chromaticQ   = 0;      // used with --chromatic option
+		int       sustainQ     = 0;      // used with -s option
+		int       zeroQ        = 0;      // used with -z option
+		int       topQ         = 0;      // used with -t option
+		int       toponlyQ     = 0;      // used with -T option
+		int       hparenQ      = 0;      // used with -h option
+		int       mparenQ      = 0;      // used with -y option
+		int       locationQ    = 0;      // used with --location option
+		int       koptionQ     = 0;      // used with -k option
+		int       parenQ       = 0;      // used with -p option
+		int       rowsQ        = 0;      // used with --rows option
+		int       hmarkerQ     = 0;      // used with -h option
+		int       mmarkerQ     = 0;      // used with -m option
+		int       attackQ      = 0;      // used with --attacks option
+		int       rawQ         = 0;      // used with --raw option
+		int       raw2Q        = 0;      // used with --raw2 option
+		int       xoptionQ     = 0;      // used with -x option
+		int       octaveallQ   = 0;      // used with -O option
+		int       octaveQ      = 0;      // used with -o option
+		int       noharmonicQ  = 0;      // used with -H option
+		int       nomelodicQ   = 0;      // used with -M option
+		int       norestsQ     = 0;      // used with -R option
+		int       nounisonsQ   = 0;      // used with -U option
+		int       filenameQ    = 0;      // used with -f option
+		int       searchQ      = 0;      // used with --search option
+		int       markQ        = 0;      // used with --mark option
+		int       countQ       = 0;      // used with --count option
+		int       suspensionsQ = 0;      // used with --suspensions option
+		int       uncrossQ     = 0;      // used with -c option
+		int       retroQ       = 0;      // used with --retro option
+		int       idQ          = 0;      // used with --id option
+		vector<string> Ids;              // used with --id option
+		char      NoteMarker   = '\0';   // used with -N option
+		string    SearchString;
+		string Spacer;
+
+};
+
+
 class Tool_dissonant : public HumTool {
 	public:
 		         Tool_dissonant    (void);
@@ -2886,10 +3704,32 @@ class Tool_dissonant : public HumTool {
 	protected:
 		void    doAnalysis         (vector<vector<string> >& results,
 		                            NoteGrid& grid,
+		                            vector<vector<NoteCell*> >& attacks,
 		                            bool debug);
-		void    doAnalysisForVoice (vector<string>& results, NoteGrid& grid,
+		void    doAnalysisForVoice (vector<vector<string> >& results,
+		                            NoteGrid& grid,
+		                            vector<NoteCell*>& attacks,
 		                            int vindex, bool debug);
+		void    findFakeSuspensions(vector<vector<string> >& results, 
+		                            NoteGrid& grid,
+		                            vector<NoteCell*>& attacks, int vindex);
+		void    changePitch        (HTp note2, HTp note1);
+
 		void    printColorLegend   (HumdrumFile& infile);
+		int     getNextPitchAttackIndex(NoteGrid& grid, int voicei,
+		                            int sliceindex);
+		void    fillLabels         (void);
+		void    fillLabels2        (void);
+		void    printCountAnalysis (vector<vector<string> >& data);
+		void    suppressDissonances(HumdrumFile& infile, NoteGrid& grid,
+		                            vector<vector<NoteCell* > >& attacks,
+		                            vector<vector<string> >& results);
+		void    suppressDissonancesInVoice(HumdrumFile& infile, 
+		                            NoteGrid& grid, int vindex,
+		                            vector<NoteCell*>& attacks,
+		                            vector<string>& results);
+		void    mergeWithPreviousNote(HumdrumFile& infile,
+		                            vector<NoteCell*>& attacks, int index);
 
 	private:
 	 	vector<HTp> m_kernspines;
@@ -2899,6 +3739,146 @@ class Tool_dissonant : public HumTool {
 		bool dissL0Q = false;
 		bool dissL1Q = false;
 		bool dissL2Q = false;
+		bool suppressQ = false;
+
+		vector<string> m_labels;
+
+		// unaccdented non-harmonic tones:
+		const int PASSING_UP           =  0; // rising passing tone
+		const int PASSING_DOWN         =  1; // downward passing tone
+		const int NEIGHBOR_UP          =  2; // upper neighbor
+		const int NEIGHBOR_DOWN        =  3; // lower neighbor
+		const int ECHAPPE_UP           =  4; // upper échappée
+		const int ECHAPPE_DOWN         =  5; // lower échappée
+		const int CAMBIATA_UP_S        =  6; // ascending short nota cambiata
+		const int CAMBIATA_DOWN_S      =  7; // descending short nota cambiata
+		const int CAMBIATA_UP_L        =  8; // ascending long nota cambiata
+		const int CAMBIATA_DOWN_L      =  9; // descending long nota cambiata
+		// const int IPOSTHI_NEIGHBOR     = 10; // incomplete posterior upper neighbor
+		// const int IPOSTLOW_NEIGHBOR    = 11; // incomplete posterior lower neighbor
+		// const int IANTHI_NEIGHBOR      = 12; // incomplete anterior upper neighbor
+		// const int IANTLOW_NEIGHBOR     = 13; // incomplete anterior lower neighbor
+		const int ANT_UP               = 10; // rising anticipation
+		const int ANT_DOWN             = 11; // descending anticipation
+
+		// accented non-harmonic tones:
+		const int THIRD_Q_PASS_UP      = 12; // dissonant third quarter
+		const int THIRD_Q_PASS_DOWN    = 13; // dissonant third quarter
+		const int THIRD_Q_UPPER_NEI    = 14; // dissonant third quarter
+		const int THIRD_Q_LOWER_NEI    = 15; // dissonant third quarter
+		const int SUS_BIN  	           = 16; // binary suspension
+		const int SUS_TERN  	       = 17; // ternary suspension
+		const int AGENT_BIN		       = 18; // binary agent
+		const int AGENT_TERN		   = 19; // ternary agent
+		const int SUSPENSION_ORNAM     = 20; // suspension ornament
+		const int SUSPENSION_REP       = 21; // suspension repeated note
+		const int FAKE_SUSPENSION_UP   = 22; // fake suspension approached by step up
+		const int FAKE_SUSPENSION_DOWN = 23; // fake suspension approached by step down
+		const int SUS_NO_AGENT_UP      = 24; // suspension missing a normal agent approached by step up
+		const int SUS_NO_AGENT_DOWN    = 25; // suspension missing a normal agent approached by step down
+		const int CHANSON_IDIOM        = 26; // chanson idiom
+
+		// unknown dissonances:
+		const int UNKNOWN_DISSONANCE   = 27; // unknown dissonance type
+		const int UNLABELED_Z2         = 28; // unknown dissonance type, 2nd interval
+		const int UNLABELED_Z7         = 29; // unknown dissonance type, 7th interval
+		const int UNLABELED_Z4         = 30; // unknown dissonance type, 4th interval
+
+		const int LABELS_SIZE          = 31; // one more than last index
+};
+
+
+
+#define ND_NOTE 0  /* notes or rests + text and phrase markings */
+#define ND_BAR  1  /* explicit barlines */
+
+
+class NoteData {
+	public:
+		NoteData(void) { clear(); }
+		void clear(void) { bar = pitch = phstart = phend = 0;
+							  phnum = -1;
+							  lyricerr = lyricnum = 0;
+							  tiestart = tiecont = tieend = 0;
+							  slstart = slend = 0;
+							  num = denom = barnum = 0;
+							  barinterp = 0; bardur = 0.0;
+							  duration = 0.0; text = ""; }
+		double duration;
+		int    bar;       int    num;
+		int    denom;     int    barnum;
+		double bardur;    int    barinterp;
+		int    pitch;     int    lyricerr;
+		int    phstart;   int    phend;    int phnum;
+		int    slstart;   int    slend;    int lyricnum;
+		int    tiestart;  int    tiecont;  int tieend;
+		string text;
+};
+
+		
+
+class Tool_esac2hum : public HumTool {
+	public:
+		         Tool_esac2hum         (void);
+		        ~Tool_esac2hum         () {};
+
+		bool    convertFile          (ostream& out, const string& filename);
+		bool    convert              (ostream& out, const string& input);
+		bool    convert              (ostream& out, istream& input);
+
+	protected:
+		bool      initialize            (void);
+		void      checkOptions          (Options& opts, int argc, char** argv);
+		void      example               (void);
+		void      usage                 (const string& command);
+		void      convertEsacToHumdrum  (ostream& out, istream& input);
+		bool      getSong               (vector<string>& song, istream& infile, 
+		                                int init);
+		void      convertSong           (vector<string>& song, ostream& out);
+		bool      getKeyInfo            (vector<string>& song, string& key, 
+		                                 double& mindur, int& tonic, string& meter,
+		                                 ostream& out);
+		void      printNoteData         (NoteData& data, int textQ, ostream& out);
+		bool      getNoteList           (vector<string>& song, 
+		                                 vector<NoteData>& songdata, double mindur,
+		                                 int tonic);
+		void      getMeterInfo          (string& meter, vector<int>& numerator, 
+		                                 vector<int>& denominator);
+		void      postProcessSongData   (vector<NoteData>& songdata,
+		                                 vector<int>& numerator,vector<int>& denominator);
+		void      printKeyInfo          (vector<NoteData>& songdata, int tonic, 
+		                                 int textQ, ostream& out);
+		int       getAccidentalMax      (int a, int b, int c);
+		bool      printTitleInfo        (vector<string>& song, ostream& out);
+		void      getLineRange          (vector<string>& song, const string& field, 
+		                                 int& start, int& stop);
+		void      printChar             (unsigned char c, ostream& out);
+		void      printBibInfo          (vector<string>& song, ostream& out);
+		void      printString           (const string& string, ostream& out);
+		void      printSpecialChars     (ostream& out);
+		bool      placeLyrics           (vector<string>& song,
+		                                 vector<NoteData>& songdata);
+		bool      placeLyricPhrase      (vector<NoteData>& songdata, 
+		                                 vector<string>& lyrics, int line);
+		void      getLyrics             (vector<string>& lyrics, const string& buffer);
+		void      cleanupLyrics         (vector<string>& lyrics);
+		bool      getFileContents       (vector<string>& array, const string& filename);
+		void      chopExtraInfo         (char* holdbuffer);
+		void      printHumdrumHeaderInfo(ostream& out, vector<string>& song);
+		void      printHumdrumFooterInfo(ostream& out, vector<string>& song);
+		
+	private:
+		int            debugQ = 0;        // used with --debug option
+		int            verboseQ = 0;      // used with -v option
+		int            splitQ = 0;        // used with -s option
+		int            firstfilenum = 1;  // used with -f option
+		vector<string> header;            // used with -h option
+		vector<string> trailer;           // used with -t option
+		string         fileextension;     // used with -x option
+		string         namebase;          // used with -s option
+
+		vector<int>    chartable;  // used printChars() & printSpecialChars()
+		int inputline = 0;
 
 };
 
@@ -3059,6 +4039,133 @@ class Tool_metlev : public HumTool {
 
 
 
+class Tool_musicxml2hum : public HumTool {
+	public:
+		        Tool_musicxml2hum    (void);
+		       ~Tool_musicxml2hum    () {}
+
+		bool    convertFile          (ostream& out, const char* filename);
+		bool    convert              (ostream& out, xml_document& infile);
+		bool    convert              (ostream& out, const char* input);
+		bool    convert              (ostream& out, istream& input);
+
+		void    setOptions           (int argc, char** argv);
+		void    setOptions           (const vector<string>& argvlist);
+		Options getOptionDefinitions (void);
+
+	protected:
+		void   initialize           (void);
+		string getChildElementText  (xml_node root, const char* xpath);
+		string getChildElementText  (xpath_node root, const char* xpath);
+		string getAttributeValue    (xml_node xnode, const string& target);
+		string getAttributeValue    (xpath_node xnode, const string& target);
+		void   printAttributes      (xml_node node);
+		bool   getPartInfo          (map<string, xml_node>& partinfo,
+		                             vector<string>& partids, xml_document& doc);
+		bool   stitchParts          (HumGrid& outdata,
+		                             vector<string>& partids,
+		                             map<string, xml_node>& partinfo,
+		                             map<string, xml_node>& partcontent,
+		                             vector<MxmlPart>& partdata);
+		bool   getPartContent       (map<string, xml_node>& partcontent,
+		                             vector<string>& partids, xml_document& doc);
+		void   printPartInfo        (vector<string>& partids,
+		                             map<string, xml_node>& partinfo,
+		                             map<string, xml_node>& partcontent,
+		                             vector<MxmlPart>& partdata);
+		bool   fillPartData         (vector<MxmlPart>& partdata,
+		                             const vector<string>& partids,
+		                             map<string, xml_node>& partinfo,
+		                             map<string, xml_node>& partcontent);
+		bool   fillPartData         (MxmlPart& partdata, const string& id,
+		                             xml_node partdeclaration,
+		                             xml_node partcontent);
+		void   appendZeroEvents     (GridMeasure* outfile,
+		                             vector<SimultaneousEvents*>& nowevents,
+		                             HumNum nowtime,
+		                             vector<MxmlPart>& partdata);
+		void   appendNonZeroEvents   (GridMeasure* outdata,
+		                              vector<SimultaneousEvents*>& nowevents,
+		                              HumNum nowtime,
+		                              vector<MxmlPart>& partdata);
+		void   addGraceLines         (GridMeasure* outdata,
+		                              vector<vector<vector<vector<MxmlEvent*> > > >& notes,
+		                              vector<MxmlPart>& partdata, HumNum nowtime);
+		void   addEventToList        (vector<vector<vector<vector<MxmlEvent*> > > >& list, 
+		                              MxmlEvent* event);
+
+		bool convert          (ostream& out);
+		bool convertPart      (ostream& out, const string& partname,
+		                       int partindex);
+		bool insertMeasure    (HumGrid& outdata, int mnum,
+		                       vector<MxmlPart>& partdata,
+		                       vector<int> partstaves);
+		bool convertNowEvents (GridMeasure* outdata, 
+		                       vector<SimultaneousEvents*>& nowevents,
+		                       vector<int>& nowparts, 
+		                       HumNum nowtime,
+		                       vector<MxmlPart>& partdata, 
+		                       vector<int>& partstaves);
+		void appendNullTokens (HumdrumLine* line, MxmlPart& part);
+		void appendEvent      (HumdrumLine* line, MxmlEvent* event);
+		void insertExclusiveInterpretationLine(HumdrumFile& outfile,
+		                       vector<MxmlPart>& partdata);
+		void insertAllToken   (HumdrumFile& outfile, vector<MxmlPart>& partdata,
+		                       const string& common);
+		void insertSingleMeasure(HumdrumFile& outfile);
+		void cleanupMeasures   (HumdrumFile& outfile,
+		                        vector<HumdrumLine*> measures);
+
+		void addClefLine       (GridMeasure* outdata, vector<vector<xml_node> >& clefs,
+		                        vector<MxmlPart>& partdata, HumNum nowtime);
+		void insertPartClefs   (xml_node clef, GridPart& part);
+		xml_node convertClefToHumdrum(xml_node clef, HTp& token, int& staffindex);
+
+		void addKeySigLine    (GridMeasure* outdata, vector<vector<xml_node> >& keysigs,
+		                        vector<MxmlPart>& partdata, HumNum nowtime);
+		void insertPartKeySigs (xml_node keysig, GridPart& part);
+		xml_node convertKeySigToHumdrum(xml_node keysig, 
+		                        HTp& token, int& staffindex);
+
+		void addTimeSigLine    (GridMeasure* outdata, vector<vector<xml_node> >& timesigs,
+		                        vector<MxmlPart>& partdata, HumNum nowtime);
+		bool insertPartTimeSigs (xml_node timesig, GridPart& part);
+		void insertPartMensurations(xml_node timesig, GridPart& part);
+		bool checkForMensuration(xml_node timesig);
+		xml_node convertTimeSigToHumdrum(xml_node timesig, 
+		                        HTp& token, int& staffindex);
+		xml_node convertMensurationToHumdrum(xml_node timesig,
+		                        HTp& token, int& staffindex);
+
+		void addEvent          (GridSlice& slice, MxmlEvent* event);
+		void fillEmpties       (GridPart* part, const char* string);
+		void addSecondaryChordNotes (ostream& output, MxmlEvent* head, const string& recip);
+		bool isInvisible       (MxmlEvent* event);
+		int  addLyrics         (GridStaff* staff, MxmlEvent* event);
+		int  addHarmony        (GridPart* oart, MxmlEvent* event);
+		string getHarmonyString(xml_node hnode);
+		string cleanSpaces     (const string& input);
+		void checkForDummyRests(MxmlMeasure* measure);
+		void reindexVoices     (vector<MxmlPart>& partdata);
+		void reindexMeasure    (MxmlMeasure* measure);
+
+	public:
+
+	static bool nodeType      (xml_node node, const char* testname);
+
+	private:
+		Options m_options;
+		bool DebugQ;
+		bool VoiceDebugQ;
+		bool m_recipQ = false;
+		bool m_stemsQ = false;
+		int m_slurabove = 0;
+		int m_slurbelow = 0;
+
+};
+
+
+
 class MyCoord {
 	public:
 		     MyCoord   (void) { clear(); }
@@ -3144,8 +4251,7 @@ class Tool_myank : public HumTool {
 		bool     run                   (HumdrumFile& infile, ostream& out);
 
 	protected:
-		void     initialize            (HumdrumFile& infile);
-		void      checkOptions         (Options& opts, int argc, char** argv);
+		void      initialize            (HumdrumFile& infile);
 		void      example              (void);
 		void      usage                (const string& command);
 		void      myank                (HumdrumFile& infile, 
@@ -3191,7 +4297,7 @@ class Tool_myank : public HumTool {
 
 	private:
 		int    debugQ      = 0;             // used with --debug option
-		int    inputlist   = 0;             // used with --inlist option
+		// int    inputlist   = 0;             // used with --inlist option
 		int    inlistQ     = 0;             // used with --inlist option
 		int    outlistQ    = 0;             // used with --outlist option
 		int    verboseQ    = 0;             // used with -v option
