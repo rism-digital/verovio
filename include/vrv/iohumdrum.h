@@ -338,6 +338,7 @@ protected:
     void embedQstampInClass(vrv::Note *note, hum::HTp token, const std::string &tstring);
     void embedPitchInformationInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
+    void splitSyllableBySpaces(vector<string> &vtext, char spacer = ' ');
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);

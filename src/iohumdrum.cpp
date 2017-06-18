@@ -1038,6 +1038,9 @@ void HumdrumInput::prepareVerses(void)
             else if (line.token(j)->getDataType().compare(0, 7, "**vdata") == 0) {
                 ss[i].verse = true;
             }
+            else if (line.token(j)->getDataType().compare(0, 8, "**vvdata") == 0) {
+                ss[i].verse = true;
+            }
         }
     }
 }
@@ -2826,8 +2829,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
         // check for rptend here, since the one for the last measure in
         // the music is missed by the inline processing.  But maybe limit
-        // this one to only checking for the last measure.  Or move barline 
-		// styling here...
+        // this one to only checking for the last measure.  Or move barline
+        // styling here...
         if ((layerdata.back()->find(":|") != std::string::npos)
             || (layerdata.back()->find(":!") != std::string::npos)) {
             m_measure->SetRight(BARRENDITION_rptend);
@@ -5677,10 +5680,15 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
         return;
     }
 
+    vector<string> vtexts;
+    std::string content;
     hum::HumdrumLine &line = *token->getLine();
     int track = token->getTrack();
     int ttrack;
     int versenum = 0;
+    bool vvdataQ;
+    bool vdataQ;
+    bool lyricQ;
     int startfield = token->getFieldIndex() + 1;
     for (int i = startfield; i < line.getFieldCount(); i++) {
         if (line.token(i)->isKern()) {
@@ -5689,41 +5697,97 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
                 break;
             }
         }
-        else if (line.token(i)->isDataType("**text") || line.token(i)->isDataType("**silbe")
-            || (line.token(i)->getDataType().compare(0, 7, "**vdata") == 0)) {
+
+        lyricQ = false;
+        vdataQ = false;
+        vvdataQ = false;
+        if (line.token(i)->isDataType("**text") || line.token(i)->isDataType("**silbe")) {
+            lyricQ = true;
+        }
+        else if (line.token(i)->getDataType().compare(0, 7, "**vdata") == 0) {
+            vdataQ = true;
+            lyricQ = true;
+        }
+        else if (line.token(i)->getDataType().compare(0, 8, "**vvdata") == 0) {
+            vvdataQ = true;
+            lyricQ = true;
+        }
+
+        if (!lyricQ) {
+            continue;
+        }
+
+        if (line.token(i)->isNull()) {
             versenum++;
-            if (line.token(i)->isNull()) {
+            continue;
+        }
+
+        vtexts.clear();
+        vtexts.push_back(*line.token(i));
+        if (vvdataQ) {
+            splitSyllableBySpaces(vtexts);
+        }
+
+        for (int j = 0; j < vtexts.size(); j++) {
+            content = vtexts[j];
+            versenum++;
+            if (content == "") {
                 continue;
             }
+
             Verse *verse = new Verse;
-            setLocationId(verse, line.token(i), -1);
+            if (vvdataQ) {
+                setLocationId(verse, line.token(i), j + 1);
+            }
+            else {
+                setLocationId(verse, line.token(i), -1);
+            }
             appendElement(note, verse);
             verse->SetN(versenum);
             Syl *syl = new Syl;
             string datatype = line.token(i)->getDataType();
+
             if (datatype.compare(0, 8, "**vdata-") == 0) {
                 string subdatatype = datatype.substr(8);
                 if (!subdatatype.empty()) {
                     appendTypeTag(syl, subdatatype);
                 }
             }
-            setLocationId(syl, line.token(i), -1);
+            else if (datatype.compare(0, 9, "**vdata-") == 0) {
+                string subdatatype = datatype.substr(9);
+                if (!subdatatype.empty()) {
+                    appendTypeTag(syl, subdatatype);
+                }
+            }
+
+            if (vvdataQ) {
+                setLocationId(syl, line.token(i), j + 1);
+            }
+            else {
+                setLocationId(syl, line.token(i), -1);
+            }
+
             appendElement(verse, syl);
-            std::string content = *line.token(i);
+
+            if (vdataQ || vvdataQ) {
+                addTextElement(syl, content);
+                continue;
+            }
+
             bool dashbegin = false;
             bool dashend = false;
             bool extender = false;
-            if (datatype.compare(0, 7, "**vdata") != 0) {
-                for (int z = 1; z < (int)content.size() - 1; z++) {
-                    // Use underscore for elision symbol
-                    // (later use @con="b" when verovio allows it).
-                    // Also possibly make elision symbols optional.
-                    if ((content[z] == ' ') && (content[z + 1] != '\'')) {
-                        // the later condition is to not elide "ma 'l"
-                        content[z] = '_';
-                    }
+
+            for (int z = 1; z < (int)content.size() - 1; z++) {
+                // Use underscore for elision symbol
+                // (later use @con="b" when verovio allows it).
+                // Also possibly make elision symbols optional.
+                if ((content[z] == ' ') && (content[z + 1] != '\'')) {
+                    // the later condition is to not to elide "ma 'l"
+                    content[z] = '_';
                 }
             }
+
             if (content.back() == '-') {
                 dashend = true;
                 content.pop_back();
@@ -5775,6 +5839,33 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             }
             addTextElement(syl, content);
         }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::splitSyllableBySpaces -- Split a string into pieces
+//    according to spaces.  Default value spacer = ' ');
+//
+
+void HumdrumInput::splitSyllableBySpaces(vector<string> &vtext, char spacer)
+{
+    if (vtext[0].find(spacer) == string::npos) {
+        return;
+    }
+    if (vtext.size() != 1) {
+        // invalid size
+        return;
+    }
+    string original = vtext[0];
+    vtext[0] = "";
+    for (int i = 0; i < (int)original.size(); i++) {
+        if (original[i] != spacer) {
+            vtext.back().push_back(original[i]);
+            continue;
+        }
+        // new string needs to be made
+        vtext.push_back("");
     }
 }
 
