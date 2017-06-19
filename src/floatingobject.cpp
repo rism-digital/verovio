@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "breath.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -110,7 +111,13 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
     assert(object);
 
     m_object = object;
-    if (object->Is(DIR)) {
+    if (object->Is(BREATH)) {
+        Breath *breath = dynamic_cast<Breath *>(object);
+        assert(breath);
+        // breath above by default
+        m_place = breath->HasPlace() ? breath->GetPlace() : STAFFREL_above;
+    }
+    else if (object->Is(DIR)) {
         Dir *dir = dynamic_cast<Dir *>(object);
         assert(dir);
         // dir below by default
@@ -320,8 +327,14 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
-            if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
-                yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
+            yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
+            Object *object = dynamic_cast<Object*>(horizOverlapingBBox);
+            // With LayerElement always move them up
+            if (object && object->IsLayerElement()) {
+                if (yRel < 0) this->SetDrawingYRel(yRel);
+            }
+            // Otherwise only if the is a vertical overlap
+            else if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
                 this->SetDrawingYRel(yRel);
             }
         }
@@ -334,9 +347,15 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
-            if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
-                yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
-                    + GetContentY2() + margin;
+            yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
+            + GetContentY2() + margin;
+            Object *object = dynamic_cast<Object*>(horizOverlapingBBox);
+            // With LayerElement always move them down
+            if (object && object->IsLayerElement()) {
+                if (yRel > 0) this->SetDrawingYRel(yRel);
+            }
+            // Otherwise only if the is a vertical overlap
+            else if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
                 this->SetDrawingYRel(yRel);
             }
         }
