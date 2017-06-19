@@ -899,6 +899,8 @@ void MeiOutput::WriteMeiStaff(pugi::xml_node currentNode, Staff *staff)
     WriteXmlId(currentNode, staff);
     staff->WriteNInteger(currentNode);
     staff->WriteTyped(currentNode);
+    staff->WriteVisibility(currentNode);
+
     // y position
     if (staff->m_yAbs != VRV_UNSET) {
         currentNode.append_attribute("uly") = StringFormat("%d", staff->m_yAbs / DEFINITION_FACTOR).c_str();
@@ -957,6 +959,7 @@ void MeiOutput::WriteMeiLayer(pugi::xml_node currentNode, Layer *layer)
     WriteXmlId(currentNode, layer);
     layer->WriteNInteger(currentNode);
     layer->WriteTyped(currentNode);
+    layer->WriteVisibility(currentNode);
 }
 
 void MeiOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *element)
@@ -2670,6 +2673,7 @@ bool MeiInput::ReadMeiStaff(Object *parent, pugi::xml_node staff)
 
     vrvStaff->ReadNInteger(staff);
     vrvStaff->ReadTyped(staff);
+    vrvStaff->ReadVisibility(staff);
 
     if (staff.attribute("uly") && (this->m_doc->GetType() == Transcription)) {
         vrvStaff->m_yAbs = atoi(staff.attribute("uly").value()) * DEFINITION_FACTOR;
@@ -2713,6 +2717,7 @@ bool MeiInput::ReadMeiLayer(Object *parent, pugi::xml_node layer)
 
     vrvLayer->ReadNInteger(layer);
     vrvLayer->ReadTyped(layer);
+    vrvLayer->ReadVisibility(layer);
 
     if (!vrvLayer->HasN()) {
         LogWarning("No @n on <layer>, 1 is set");
