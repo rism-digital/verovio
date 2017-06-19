@@ -1,27 +1,25 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        score.h
+// Name:        label.h
 // Author:      Laurent Pugin
-// Created:     29/08/2016
+// Created:     19/06/2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_SCORE_H__
-#define __VRV_SCORE_H__
+#ifndef __VRV_LABEL_H__
+#define __VRV_LABEL_H__
 
 #include "object.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Score
+// Label
 //----------------------------------------------------------------------------
 
 /**
- * This class represent a <score> in MEI.
- * It is used only for loading score-based MEI documents before they are
- * converted to page-based MEI.
+ * This class represent a <label> in MEI.
  */
-class Score : public Object {
+class Label : public Object, public TextListInterface {
 
 public:
     /**
@@ -29,13 +27,13 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Score();
-    virtual ~Score();
+    Label();
+    virtual ~Label();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Score"; }
-    virtual ClassId GetClassId() const { return SCORE; }
+    virtual std::string GetClassName() const { return "Label"; }
+    virtual ClassId GetClassId() const { return LABEL; }
     ///@}
-
+    
     /**
      * @name Methods for adding allowed content
      */

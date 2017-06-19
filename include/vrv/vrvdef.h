@@ -56,6 +56,7 @@ enum ClassId {
     FB,
     GRACE_ALIGNER,
     KEYSIG_ATTR,
+    LABEL,
     LAYER,
     MEASURE,
     MEASURE_ALIGNER,
