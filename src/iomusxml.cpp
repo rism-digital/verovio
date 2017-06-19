@@ -177,7 +177,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     }
     // otherwise copy the content to the corresponding existing measure
     else if (section->GetChildCount(MEASURE) > i) {
-        AttCommonNComparison comparisonMeasure(MEASURE, measure->GetN());
+        AttCommonNLikeComparison comparisonMeasure(MEASURE, measure->GetN());
         Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByAttComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
         Object *current;
@@ -514,15 +514,15 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     // here we could check that we have that there is only one staffGrp left in m_staffGrpStack
 
     Measure *measure = NULL;
-    std::vector<std::pair<int, ControlElement *> >::iterator iter;
+    std::vector<std::pair<std::string, ControlElement *> >::iterator iter;
     for (iter = m_controlElements.begin(); iter != m_controlElements.end(); iter++) {
         if (!measure || (measure->GetN() != iter->first)) {
-            AttCommonNComparison comparisonMeasure(MEASURE, iter->first);
+            AttCommonNLikeComparison comparisonMeasure(MEASURE, iter->first);
             measure = dynamic_cast<Measure *>(section->FindChildByAttComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
             LogWarning(
-                "Element '%s' could not be added to measure '%d'", iter->second->GetClassName().c_str(), iter->first);
+                "Element '%s' could not be added to measure '%s'", iter->second->GetClassName().c_str(), iter->first.c_str());
             continue;
         }
         measure->AddChild(iter->second);
@@ -792,7 +792,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     assert(node);
     assert(measure);
 
-    int measureNum = atoi(GetAttributeValue(node, "number").c_str());
+    std::string measureNum(GetAttributeValue(node, "number").c_str());
     if (measure != NULL) measure->SetN(measureNum);
 
     int i = 0;
@@ -847,7 +847,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     return true;
 }
 
-void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section, Measure *measure, int measureNum)
+    void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section, Measure *measure, std::string measureNum)
 {
     assert(node);
     assert(section);
@@ -950,7 +950,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section
     }
 }
 
-void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, int measureNum)
+void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, std::string measureNum)
 {
     assert(node);
     assert(measure);
@@ -966,7 +966,7 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, in
     }
 }
 
-void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, int measureNum)
+    void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, std::string measureNum)
 {
     assert(node);
     assert(measure);
@@ -1025,7 +1025,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, i
     }
 }
 
-void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure, int measureNum)
+void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure, std::string measureNum)
 {
     assert(node);
     assert(measure);
@@ -1100,7 +1100,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
         int staffN = (!staffNode) ? 1 : atoi(GetContent(staffNode.node()).c_str());
         if (HasAttributeWithValue(xmlShift.node(), "type", "stop")) {
             m_octDis[staffN] = 0;
-            std::vector<std::pair<int, ControlElement *> >::iterator iter;
+            std::vector<std::pair<std::string, ControlElement *> >::iterator iter;
             for (iter = m_controlElements.begin(); iter != m_controlElements.end(); iter++) {
                 if (iter->second->Is(OCTAVE)) {
                     Octave *octave = dynamic_cast<Octave *>(iter->second);
@@ -1169,7 +1169,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     }
 }
 
-void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, int measureNum)
+void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, std::string measureNum)
 {
     assert(node);
     assert(measure);
@@ -1194,7 +1194,7 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, i
     }
 }
 
-void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, int measureNum)
+void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, std::string measureNum)
 {
     assert(node);
     assert(measure);
@@ -1219,7 +1219,7 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, i
     }
 }
 
-void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, int measureNum)
+void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, std::string measureNum)
 {
     assert(node);
     assert(measure);
@@ -1249,7 +1249,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, i
     m_harmStack.push_back(harm);
 }
 
-void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int measureNum)
+void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std::string measureNum)
 {
     assert(node);
     assert(measure);

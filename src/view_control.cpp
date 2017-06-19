@@ -2295,14 +2295,14 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         dc->GetTextExtent("M", &extend);
 
         if (ending->HasN()) {
-            std::wstringstream strStream;
+            std::stringstream strStream;
             // Maybe we want to add ( ) after system breaks?
             if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L"(";
             strStream << ending->GetN() << L".";
             if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L")";
 
             Text text;
-            text.SetText(strStream.str());
+            text.SetText(UTF8to16(strStream.str()));
 
             bool setX = false;
             bool setY = false;

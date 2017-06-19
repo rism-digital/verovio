@@ -148,13 +148,29 @@ void View::DrawSystem(DeviceContext *dc, System *system)
         // Draw mesure number if > 1
         // This needs to be improved because we are now using (tuplet) oblique figures.
         // We should also have a better way to specify if the number has to be displayed or not
-        if ((measure->GetN() != VRV_UNSET) && (measure->GetN() > 1)) {
+        if ((measure->HasN()) && (measure->GetN() != "1")) {
             Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
             if (staff) {
-                dc->SetFont(m_doc->GetDrawingSmuflFont(100, false));
-                dc->DrawMusicText(IntToTupletFigures(measure->GetN()), ToDeviceContextX(system->GetDrawingX()),
-                    ToDeviceContextY(
-                        staff->GetDrawingY() + 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)));
+                FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+                // HARDCODED
+                currentFont.SetStyle(FONTSTYLE_italic);
+                currentFont.SetPointSize(currentFont.GetPointSize() * 4 / 5);
+                dc->SetFont(&currentFont);
+                
+                Text text;
+                text.SetText(UTF8to16(measure->GetN()));
+                
+                bool setX = false;
+                bool setY = false;
+                
+                // HARDCODED
+                int x = system->GetDrawingX();
+                int y = staff->GetDrawingY() + 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
+                dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y));
+                DrawTextElement(dc, &text, x, y, setX, setY);
+                dc->EndText();
+                
                 dc->ResetFont();
             }
         }
