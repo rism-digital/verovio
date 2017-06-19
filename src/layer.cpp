@@ -34,10 +34,12 @@ namespace vrv {
 // Layer
 //----------------------------------------------------------------------------
 
-Layer::Layer(int n) : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped()
+Layer::Layer(int n)
+    : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);
+    RegisterAttClass(ATT_VISIBILITY);
 
     // owned pointers need to be set to NULL;
     m_staffDefClef = NULL;
@@ -65,6 +67,7 @@ void Layer::Reset()
     DrawingListInterface::Reset();
     ResetNInteger();
     ResetTyped();
+    ResetVisibility();
 
     ResetStaffDefObjects();
 
