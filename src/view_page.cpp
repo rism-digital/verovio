@@ -273,9 +273,9 @@ void View::DrawStaffGrp(
     }
 
     // Get the corresponding staff looking at the previous (or first) measure
-    AttCommonNComparison comparisonFirst(STAFF, firstDef->GetN());
+    AttNIntegerComparison comparisonFirst(STAFF, firstDef->GetN());
     Staff *first = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparisonFirst, 1));
-    AttCommonNComparison comparisonLast(STAFF, lastDef->GetN());
+    AttNIntegerComparison comparisonLast(STAFF, lastDef->GetN());
     Staff *last = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparisonLast, 1));
 
     if (!first || !last) {
@@ -389,7 +389,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
             continue;
         }
 
-        AttCommonNComparison comparison(STAFF, staffDef->GetN());
+        AttNIntegerComparison comparison(STAFF, staffDef->GetN());
         Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
         System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
 
@@ -562,7 +562,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                 DrawBarLines(dc, measure, childStaffGrp, barLine);
             }
             else if (childStaffDef) {
-                AttCommonNComparison comparison(STAFF, childStaffDef->GetN());
+                AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
                 Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
                 if (!staff) {
                     LogDebug("Could not get staff (%d) while drawing staffGrp - DrawBarLines", childStaffDef->GetN());
@@ -595,9 +595,9 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         }
 
         // Get the corresponding staff looking at the previous (or first) measure
-        AttCommonNComparison comparisonFirst(STAFF, firstDef->GetN());
+        AttNIntegerComparison comparisonFirst(STAFF, firstDef->GetN());
         Staff *first = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparisonFirst, 1));
-        AttCommonNComparison comparisonLast(STAFF, lastDef->GetN());
+        AttNIntegerComparison comparisonLast(STAFF, lastDef->GetN());
         Staff *last = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparisonLast, 1));
 
         if (!first || !last) {
@@ -620,7 +620,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
                 childStaffDef = dynamic_cast<StaffDef *>((*it));
                 if (childStaffDef) {
-                    AttCommonNComparison comparison(STAFF, childStaffDef->GetN());
+                    AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
                     Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
                     if (!staff) {
                         LogDebug(

@@ -177,7 +177,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     }
     // otherwise copy the content to the corresponding existing measure
     else if (section->GetChildCount(MEASURE) > i) {
-        AttCommonNLikeComparison comparisonMeasure(MEASURE, measure->GetN());
+        AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
         Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByAttComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
         Object *current;
@@ -253,7 +253,7 @@ Layer *MusicXmlInput::SelectLayer(int layerNum, Staff *staff)
         layerNum = 1;
     }
     else {
-        AttCommonNComparison comparisonLayer(LAYER, layerNum);
+        AttNIntegerComparison comparisonLayer(LAYER, layerNum);
         layer = dynamic_cast<Layer *>(staff->FindChildByAttComparison(&comparisonLayer, 1));
     }
     if (layer) return layer;
@@ -517,7 +517,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     std::vector<std::pair<std::string, ControlElement *> >::iterator iter;
     for (iter = m_controlElements.begin(); iter != m_controlElements.end(); iter++) {
         if (!measure || (measure->GetN() != iter->first)) {
-            AttCommonNLikeComparison comparisonMeasure(MEASURE, iter->first);
+            AttNNumberLikeComparison comparisonMeasure(MEASURE, iter->first);
             measure = dynamic_cast<Measure *>(section->FindChildByAttComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
@@ -607,7 +607,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
         for (i = 0; i < nbStaves; i++) {
             // Find or create the staffDef
             StaffDef *staffDef = NULL;
-            AttCommonNComparison comparisonStaffDef(STAFFDEF, i + 1 + staffOffset);
+            AttNIntegerComparison comparisonStaffDef(STAFFDEF, i + 1 + staffOffset);
             staffDef = dynamic_cast<StaffDef *>(staffGrp->FindChildByAttComparison(&comparisonStaffDef, 1));
             if (!staffDef) {
                 staffDef = new StaffDef();

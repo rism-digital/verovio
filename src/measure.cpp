@@ -254,7 +254,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 
     // Get the corresponding staves in the measure
     for (iter = staffList.begin(); iter != staffList.end(); iter++) {
-        AttCommonNComparison matchN(STAFF, *iter);
+        AttNIntegerComparison matchN(STAFF, *iter);
         Staff *staff = dynamic_cast<Staff *>(this->FindChildByAttComparison(&matchN, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
@@ -489,7 +489,7 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(*iter);
-        AttCommonNComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
+        AttNIntegerComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, NULL, &filters);
@@ -547,7 +547,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(*iter);
-        AttCommonNComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
+        AttNIntegerComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);

@@ -130,7 +130,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
         staffList.push_back(1);
     }
     for (iter = staffList.begin(); iter != staffList.end(); iter++) {
-        AttCommonNComparison comparison(STAFF, *iter);
+        AttNIntegerComparison comparison(STAFF, *iter);
         Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());

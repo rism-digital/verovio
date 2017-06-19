@@ -922,8 +922,8 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     std::vector<AttComparison *> filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
-    AttCommonNComparison matchStaff(STAFF, staff->GetN());
-    AttCommonNComparison matchLayer(LAYER, layerN);
+    AttNIntegerComparison matchStaff(STAFF, staff->GetN());
+    AttNIntegerComparison matchLayer(LAYER, layerN);
     filters.push_back(&matchStaff);
     filters.push_back(&matchLayer);
 

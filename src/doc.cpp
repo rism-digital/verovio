@@ -213,7 +213,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
     this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
 
     // The tree is used to process each staff/layer/verse separatly
-    // For this, we use a array of AttCommmonNComparison that looks for each object if it is of the type
+    // For this, we use a array of AttNIntegerComparison that looks for each object if it is of the type
     // and with @n specified
 
     IntTree_t::iterator staves;
@@ -238,8 +238,8 @@ void Doc::ExportMIDI(MidiFile *midiFile)
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
-            AttCommonNComparison matchStaff(STAFF, staves->first);
-            AttCommonNComparison matchLayer(LAYER, layers->first);
+            AttNIntegerComparison matchStaff(STAFF, staves->first);
+            AttNIntegerComparison matchLayer(LAYER, layers->first);
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
@@ -320,7 +320,7 @@ void Doc::PrepareDrawing()
     this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
 
     // The tree is used to process each staff/layer/verse separately
-    // For this, we use an array of AttCommmonNComparison that looks for each object if it is of the type
+    // For this, we use an array of AttNIntegerComparison that looks for each object if it is of the type
     // and with @n specified
 
     IntTree_t::iterator staves;
@@ -335,8 +335,8 @@ void Doc::PrepareDrawing()
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
-            AttCommonNComparison matchStaff(STAFF, staves->first);
-            AttCommonNComparison matchLayer(LAYER, layers->first);
+            AttNIntegerComparison matchStaff(STAFF, staves->first);
+            AttNIntegerComparison matchLayer(LAYER, layers->first);
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
@@ -363,8 +363,8 @@ void Doc::PrepareDrawing()
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
-            AttCommonNComparison matchStaff(STAFF, staves->first);
-            AttCommonNComparison matchLayer(LAYER, layers->first);
+            AttNIntegerComparison matchStaff(STAFF, staves->first);
+            AttNIntegerComparison matchLayer(LAYER, layers->first);
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
@@ -382,9 +382,9 @@ void Doc::PrepareDrawing()
                 // std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
                 filters.clear();
                 // Create ad comparison object for each type / @n
-                AttCommonNComparison matchStaff(STAFF, staves->first);
-                AttCommonNComparison matchLayer(LAYER, layers->first);
-                AttCommonNComparison matchVerse(VERSE, verses->first);
+                AttNIntegerComparison matchStaff(STAFF, staves->first);
+                AttNIntegerComparison matchLayer(LAYER, layers->first);
+                AttNIntegerComparison matchVerse(VERSE, verses->first);
                 filters.push_back(&matchStaff);
                 filters.push_back(&matchLayer);
                 filters.push_back(&matchVerse);
@@ -419,8 +419,8 @@ void Doc::PrepareDrawing()
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
-            AttCommonNComparison matchStaff(STAFF, staves->first);
-            AttCommonNComparison matchLayer(LAYER, layers->first);
+            AttNIntegerComparison matchStaff(STAFF, staves->first);
+            AttNIntegerComparison matchLayer(LAYER, layers->first);
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
@@ -459,9 +459,9 @@ void Doc::PrepareDrawing()
             for (verses= layers->second.begin(); verses != layers->second.end(); ++verses) {
                 std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
                 filters.clear();
-                AttCommonNComparison matchStaff(&typeid(Staff), staves->first);
-                AttCommonNComparison matchLayer(&typeid(Layer), layers->first);
-                AttCommonNComparison matchVerse(&typeid(Verse), verses->first);
+                AttNIntegerComparison matchStaff(&typeid(Staff), staves->first);
+                AttNIntegerComparison matchLayer(&typeid(Layer), layers->first);
+                AttNIntegerComparison matchVerse(&typeid(Verse), verses->first);
                 filters.push_back(&matchStaff);
                 filters.push_back(&matchLayer);
                 filters.push_back(&matchVerse);
