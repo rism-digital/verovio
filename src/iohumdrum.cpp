@@ -6366,20 +6366,24 @@ void HumdrumInput::addTrill(hum::HTp token)
         return;
     }
 
+    if ((subtok == 0) && token->find(" ") == std::string::npos) {
+        subtok = -1;
+    }
+
     // int layer = m_currentlayer; // maybe place below if in layer 2
     int staff = m_currentstaff;
     Trill *trill = new Trill;
     appendElement(m_measure, trill);
     setStaff(trill, staff);
 
-    // using tstamp for now, but @startid is perhaps better?
     hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
-    trill->SetTstamp(tstamp.getFloat());
-    setLocationId(trill, token);
+    // trill->SetTstamp(tstamp.getFloat());
+    trill->SetStartid("#" + getLocationId("note", token, subtok));
+    setLocationId(trill, token, subtok);
     if (m_signifiers.above) {
         if (tpos < token->size() - 1) {
             if ((*token)[tpos + 1] == m_signifiers.above) {
-                // trill->SetPlace(STAFFREL_above);
+                // 300: trill->SetPlace(STAFFREL_above);
                 setPlace(trill, "above");
             }
         }
@@ -7266,6 +7270,21 @@ std::string HumdrumInput::GetMeiString(void)
 
 void HumdrumInput::setLocationId(Object *object, hum::HTp token, int subtoken)
 {
+    object->SetUuid(getLocationId(object, token, subtoken));
+}
+
+void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, int subtokenindex)
+{
+    object->SetUuid(getLocationId(object, lineindex, fieldindex, subtokenindex));
+}
+
+///////////////////////////////////
+//
+// HumdrumInput::getLocationId --
+//
+
+std::string HumdrumInput::getLocationId(Object *object, hum::HTp token, int subtoken)
+{
     int line = token->getLineIndex() + 1;
     int field = token->getFieldIndex() + 1;
     std::string id = object->GetClassName();
@@ -7275,10 +7294,23 @@ void HumdrumInput::setLocationId(Object *object, hum::HTp token, int subtoken)
     if (subtoken >= 0) {
         id += "S" + to_string(subtoken + 1);
     }
-    object->SetUuid(id);
+    return id;
 }
 
-void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, int subtokenindex)
+std::string HumdrumInput::getLocationId(const string &prefix, hum::HTp token, int subtoken)
+{
+    int line = token->getLineIndex() + 1;
+    int field = token->getFieldIndex() + 1;
+    std::string id = prefix;
+    id += "-L" + to_string(line);
+    id += "F" + to_string(field);
+    if (subtoken >= 0) {
+        id += "S" + to_string(subtoken + 1);
+    }
+    return id;
+}
+
+std::string HumdrumInput::getLocationId(Object *object, int lineindex, int fieldindex, int subtokenindex)
 {
     int line = lineindex + 1;
     int field = fieldindex + 1;
@@ -7294,7 +7326,25 @@ void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, 
     if (subtoken > 0) {
         id += "S" + to_string(subtoken);
     }
-    object->SetUuid(id);
+    return id;
+}
+
+std::string HumdrumInput::getLocationId(const string &prefix, int lineindex, int fieldindex, int subtokenindex)
+{
+    int line = lineindex + 1;
+    int field = fieldindex + 1;
+    int subtoken = subtokenindex + 1;
+    std::string id = prefix;
+    if (line > 0) {
+        id += "-L" + to_string(line);
+    }
+    if (field > 0) {
+        id += "F" + to_string(field);
+    }
+    if (subtoken > 0) {
+        id += "S" + to_string(subtoken);
+    }
+    return id;
 }
 
 //////////////////////////////
