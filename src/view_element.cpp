@@ -1235,6 +1235,12 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         stem->GetDrawingY() - stem->GetDrawingStemLen());
 
     DrawLayerChildren(dc, stem, layer, staff, measure);
+    
+    /************ Draw slash ************/
+    
+    if (stem->GetGrace() == GRACE_unacc) {
+        DrawAcciaccaturaSlash(dc, stem, staff);
+    }
 
     dc->EndGraphic(element, this);
 }
@@ -1337,46 +1343,32 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 // Partial drawing methods
 //----------------------------------------------------------------------------
 
-void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
+void View::DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff)
 {
-    DurationInterface *durInterface = dynamic_cast<DurationInterface *>(element);
-    assert(durInterface);
-
-    StemmedDrawingInterface *stemInterface = dynamic_cast<StemmedDrawingInterface *>(element);
-    assert(stemInterface);
-
-    Staff *staff = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
+    assert(dc);
+    assert(stem);
     assert(staff);
-
-    if (durInterface->GetActualDur() < DUR_8) return;
 
     dc->SetPen(AxBLACK, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
     dc->SetBrush(AxBLACK, AxSOLID);
 
     int positionShift = m_doc->GetCueSize(m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
     int positionShiftX1 = positionShift * 3 / 2;
-    int positionShiftY1 = positionShift * 2;
+    int positionShiftY1 = positionShift * -5;
     int positionShiftX2 = positionShift * 3;
-    int positionShiftY2 = positionShift * 6;
-    Point startPoint = stemInterface->GetDrawingStemStart(element);
+    int positionShiftY2 = positionShift * -1;
+    Point startPoint(stem->GetDrawingX(), stem->GetDrawingY() - stem->GetDrawingStemLen());
 
     int startPointY = startPoint.y;
-    if (element->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord *>(element);
-        assert(chord);
-        int yMin, yMax;
-        chord->GetYExtremes(yMin, yMax);
-        startPointY = (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up) ? yMin : yMax;
-    }
 
     // HARDCODED
-    if (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
+    if (stem->GetDrawingStemDir() == STEMDIRECTION_up) {
         dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPointY + positionShiftY1),
             ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPointY + positionShiftY2));
     }
     else {
-        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPointY - positionShiftY1),
-            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPointY - positionShiftY2));
+        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPointY - positionShiftY2),
+            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPointY - positionShiftY1));
     }
 
     dc->ResetPen();

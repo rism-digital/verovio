@@ -666,6 +666,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
             currentStem = new Stem();
             this->AddChild(currentStem);
         }
+        currentStem->AttGraced::operator=(*this);
         currentStem->AttStems::operator=(*this);
         currentStem->AttStemsCmn::operator=(*this);
     }

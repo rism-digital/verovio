@@ -267,7 +267,7 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
+    void DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff);
     void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff);
     void DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
     void DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
