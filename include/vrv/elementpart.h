@@ -147,7 +147,7 @@ private:
 /**
  * This class models a stem as a layer element part and has not direct MEI equivlatent.
  */
-class Stem : public LayerElement, public AttStems, public AttStemsCmn {
+class Stem : public LayerElement, public AttGraced, public AttStems, public AttStemsCmn {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

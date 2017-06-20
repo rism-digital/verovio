@@ -124,8 +124,9 @@ Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code
 // Stem
 //----------------------------------------------------------------------------
 
-Stem::Stem() : LayerElement("stem-"), AttStems(), AttStemsCmn()
+Stem::Stem() : LayerElement("stem-"), AttGraced(), AttStems(), AttStemsCmn()
 {
+    RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
 
@@ -139,6 +140,7 @@ Stem::~Stem()
 void Stem::Reset()
 {
     LayerElement::Reset();
+    ResetGraced();
     ResetStems();
     ResetStemsCmn();
 

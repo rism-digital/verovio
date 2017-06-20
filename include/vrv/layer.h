@@ -33,7 +33,8 @@ class Layer : public Object,
               public DrawingListInterface,
               public ObjectListInterface,
               public AttCommon,
-              public AttTyped {
+              public AttTyped,
+              public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
