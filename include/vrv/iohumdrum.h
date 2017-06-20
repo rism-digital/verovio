@@ -352,14 +352,11 @@ protected:
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void setKeySig(ELEMENT element, const std::string &keysig);
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
-
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
-
     template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
-
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
-
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
+    template <class ELEMENT> void setN(ELEMENT element, int nvalue);
 
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);

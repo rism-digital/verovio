@@ -1764,6 +1764,16 @@ template <class ELEMENT> void HumdrumInput::setStaff(ELEMENT element, int staffn
 
 //////////////////////////////
 //
+// HumdrumInput::setN --
+//
+
+template <class ELEMENT> void HumdrumInput::setN(ELEMENT element, int nvalue)
+{
+    element->SetN(to_string(nvalue));
+}
+
+//////////////////////////////
+//
 // HumdrumInput::storeStaffLayerTokensForMeasure -- Store lists of notation
 //   data by staff and layer.
 //
@@ -6668,7 +6678,8 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     if ((m_ending[startline] != 0) && (m_endingnum != m_ending[startline])) {
         // create a new ending
         m_currentending = new Ending;
-        m_currentending->SetN(m_ending[startline]);
+        setN(m_currentending, m_ending[startline]);
+        // 300: m_currentending->SetN(m_ending[startline]);
         m_sections.back()->AddChild(m_currentending);
         m_currentending->AddChild(m_measure);
     }
@@ -6692,7 +6703,8 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 
     int measurenumber = getMeasureNumber(startline, endline);
     if (measurenumber >= 0) {
-        m_measure->SetN(measurenumber);
+        // 300: m_measure->SetN(measurenumber);
+        setN(m_measure, measurenumber);
     }
 
     if (GetTypeOption()) {
