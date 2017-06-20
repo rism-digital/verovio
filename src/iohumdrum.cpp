@@ -6364,6 +6364,7 @@ void HumdrumInput::addTrill(hum::HTp token)
                     tpos++;
                 }
             }
+            break;
         }
     }
     if (tpos == std::string::npos) {
