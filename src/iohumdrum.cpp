@@ -6253,6 +6253,10 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
         }
     }
 
+    if ((subtok == 0) && token->find(" ") == std::string::npos) {
+        subtok = -1;
+    }
+
     if (tpos == std::string::npos) {
         // no mordent on note
         return;
@@ -6263,14 +6267,15 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
     Mordent *mordent = new Mordent;
     appendElement(m_measure, mordent);
     setStaff(mordent, staff);
-    if (linked) {
-        mordent->SetStartid("#" + linked->GetUuid());
-    }
-    else {
-        hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
-        mordent->SetTstamp(tstamp.getFloat());
-    }
-    setLocationId(mordent, token);
+    mordent->SetStartid("#" + getLocationId("note", token, subtok));
+    // if (linked) {
+    //     mordent->SetStartid("#" + linked->GetUuid());
+    // }
+    // else {
+    //     hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
+    //     mordent->SetTstamp(tstamp.getFloat());
+    // }
+    setLocationId(mordent, token, subtok);
 
     if (!lowerQ) {
         // reversing for now
@@ -6376,7 +6381,7 @@ void HumdrumInput::addTrill(hum::HTp token)
     appendElement(m_measure, trill);
     setStaff(trill, staff);
 
-    hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
+    // hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
     // trill->SetTstamp(tstamp.getFloat());
     trill->SetStartid("#" + getLocationId("note", token, subtok));
     setLocationId(trill, token, subtok);
