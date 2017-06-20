@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jun 17 23:59:38 CEST 2017
+// Last Modified: Sun Jun 18 23:26:57 CEST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -32369,7 +32369,7 @@ int Tool_imitation::Enumerator = 0;
 
 Tool_imitation::Tool_imitation(void) {
 	define("debug=b",             "print grid cell information");
-	define("e|exinterp=s:**vdata","specify exinterp for **vdata spine");
+	define("e|exinterp=s:**vvdata","specify exinterp for **vvdata spine");
 	define("n|threshold=i:7",     "minimum number of notes to match");
 	define("D|no-duration=b",     "do not consider duration when matching");
 	define("r|rest=b",            "require match trigger to follow a rest");
@@ -32409,6 +32409,8 @@ bool Tool_imitation::run(HumdrumFile& infile, ostream& out) {
 
 
 bool Tool_imitation::run(HumdrumFile& infile) {
+	Enumerator = 0;
+
 	NoteGrid grid(infile);
 
 	if (getBoolean("debug")) {
