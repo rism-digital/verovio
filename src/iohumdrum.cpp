@@ -1742,6 +1742,7 @@ void HumdrumInput::checkForOmd(int startline, int endline)
         if (key == "OMD") {
             value = infile[i].getReferenceValue();
             Tempo *tempo = new Tempo;
+            setLocationId(tempo, infile.token(i, 0));
             m_measure->AddChild(tempo);
             addTextElement(tempo, value);
             tempo->SetTstamp(1.0);
