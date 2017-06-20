@@ -922,8 +922,8 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     std::vector<AttComparison *> filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
-    AttCommonNComparison matchStaff(STAFF, staff->GetN());
-    AttCommonNComparison matchLayer(LAYER, layerN);
+    AttNIntegerComparison matchStaff(STAFF, staff->GetN());
+    AttNIntegerComparison matchLayer(LAYER, layerN);
     filters.push_back(&matchStaff);
     filters.push_back(&matchLayer);
 
@@ -2295,14 +2295,14 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         dc->GetTextExtent("M", &extend);
 
         if (ending->HasN()) {
-            std::wstringstream strStream;
+            std::stringstream strStream;
             // Maybe we want to add ( ) after system breaks?
             if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L"(";
             strStream << ending->GetN() << L".";
             if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L")";
 
             Text text;
-            text.SetText(strStream.str());
+            text.SetText(UTF8to16(strStream.str()));
 
             bool setX = false;
             bool setY = false;

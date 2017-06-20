@@ -3044,8 +3044,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetN(int n_) { m_n = n_; }
-    int GetN() const { return m_n; }
+    void SetN(std::string n_) { m_n = n_; }
+    std::string GetN() const { return m_n; }
     bool HasN() const;
     ///@}
 
@@ -3055,7 +3055,7 @@ private:
      * sequence of similar elements.
      * Its value must be a non-negative integer.
      **/
-    int m_n;
+    std::string m_n;
 
     /* include <attn> */
 };

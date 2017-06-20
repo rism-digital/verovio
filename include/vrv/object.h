@@ -42,7 +42,7 @@ class TimeSpanningInterface;
  * all layer one by one, and so one (lyrics, etc.). In IntTree, we can store
  * @n with all existing values (1 => 1 => 1; 2 => 1 => 1)
  * The stucture must be filled first and can then be used by instanciating a vector
- * of corresponding AttComparison (typically AttCommonNComparison for @n attribute).
+ * of corresponding AttComparison (typically AttNIntegerComparison for @n attribute).
  * See Doc::PrepareDrawing for an example.
  */
 struct IntTree {

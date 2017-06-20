@@ -41,16 +41,16 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AttCommonNComparison
+// AttNIntegerComparison
 //----------------------------------------------------------------------------
 
 /**
  * This class evaluates if the object is of a certain ClassId and has a @n of value n.
  */
-class AttCommonNComparison : public AttComparison {
+class AttNIntegerComparison : public AttComparison {
 
 public:
-    AttCommonNComparison(ClassId AttClassId, const int n) : AttComparison(AttClassId) { m_n = n; }
+    AttNIntegerComparison(ClassId AttClassId, const int n) : AttComparison(AttClassId) { m_n = n; }
 
     void SetN(int n) { m_n = n; }
 
@@ -69,16 +69,16 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttCommonNComparisonAny
+// AttNIntegerComparisonAny
 //----------------------------------------------------------------------------
 
 /**
  * This class evaluates if the object is of a certain ClassId and has a @n of value n.
  */
-class AttCommonNComparisonAny : public AttComparison {
+class AttNIntegerComparisonAny : public AttComparison {
 
 public:
-    AttCommonNComparisonAny(ClassId AttClassId, std::vector<int> ns) : AttComparison(AttClassId) { m_ns = ns; }
+    AttNIntegerComparisonAny(ClassId AttClassId, std::vector<int> ns) : AttComparison(AttClassId) { m_ns = ns; }
 
     void SetNs(std::vector<int> ns) { m_ns = ns; }
 
@@ -94,6 +94,34 @@ public:
 
 private:
     std::vector<int> m_ns;
+};
+    
+//----------------------------------------------------------------------------
+// AttNNumberLikeComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if the object is of a certain ClassId and has a @n of value n.
+ */
+class AttNNumberLikeComparison : public AttComparison {
+
+public:
+    AttNNumberLikeComparison(ClassId AttClassId, const std::string n) : AttComparison(AttClassId) { m_n = n; }
+
+    void SetN(std::string n) { m_n = n; }
+
+    virtual bool operator()(Object *object)
+    {
+        if (!MatchesType(object)) return false;
+        // This should not happen, but just in case
+        if (!object->HasAttClass(ATT_NNUMBERLIKE)) return false;
+        AttNNumberLike *element = dynamic_cast<AttNNumberLike *>(object);
+        assert(element);
+        return (element->GetN() == m_n);
+    }
+
+private:
+    std::string m_n;
 };
 
 //----------------------------------------------------------------------------
