@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        score.cpp
+// Name:        label.cpp
 // Author:      Laurent Pugin
-// Created:     29/08/2016
+// Created:     19/06/2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "score.h"
+#include "label.h"
 
 //----------------------------------------------------------------------------
 
@@ -14,37 +14,34 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
-#include "scoredef.h"
-#include "section.h"
+#include "text.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Score
+// Label
 //----------------------------------------------------------------------------
 
-Score::Score() : Object("score-")
+Label::Label() : Object("label-"), TextListInterface()
 {
     Reset();
 }
 
-Score::~Score()
+Label::~Label()
 {
 }
 
-void Score::Reset()
+void Label::Reset()
 {
     Object::Reset();
 }
-
-void Score::AddChild(Object *child)
+    
+    
+void Label::AddChild(Object *child)
 {
-    if (child->Is(SCOREDEF)) {
-        assert(dynamic_cast<ScoreDef *>(child));
-    }
-    else if (child->Is(SECTION)) {
-        assert(dynamic_cast<Section *>(child));
+    if (child->IsTextElement()) {
+        assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
