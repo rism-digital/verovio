@@ -2296,10 +2296,10 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
         if (ending->HasN()) {
             std::stringstream strStream;
-            // Maybe we want to add ( ) after system breaks?
-            if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L"(";
-            strStream << ending->GetN() << L".";
-            if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L")";
+            // Maybe we want to add ( ) after system breaks? Or . as a styling options?
+            if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << "(";
+            strStream << ending->GetN(); // << ".";
+            if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << ")";
 
             Text text;
             text.SetText(UTF8to16(strStream.str()));
