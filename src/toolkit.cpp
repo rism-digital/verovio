@@ -916,7 +916,7 @@ void Toolkit::GetHumdrum(ostream &output)
     output << GetHumdrumBuffer();
 }
 
-std::string Toolkit::RenderToMidi()
+std::string Toolkit::RenderToMidi(void)
 {
     MidiFile outputfile;
     outputfile.absoluteTicks();
@@ -931,14 +931,11 @@ std::string Toolkit::RenderToMidi()
     return outputstr;
 }
 
-bool Toolkit::RenderToTimemap(std::string &output)
+std::string Toolkit::RenderToTimemap(void)
 {
-    if (m_doc.ExportTimemap(output)) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    std::string output;
+    m_doc.ExportTimemap(output);
+    return output;
 }
 
 std::string Toolkit::GetElementsAtTime(int millisec)
@@ -947,8 +944,8 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     jsonxx::Object o;
     jsonxx::Array a;
 
-    // Here we need to check that the midi export is done
-    if (!m_doc.GetMidiExportDone()) {
+    // Here we need to check that the midi timemap is done
+    if (!m_doc.HasMidiTimemap()) {
         return o.json();
     }
 

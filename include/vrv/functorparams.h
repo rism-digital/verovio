@@ -856,10 +856,9 @@ public:
  * member 1: mapping of real times to elements which should be highlighted at time
  * member 2: mapping of real times to elements which should be unhighlighted at time
  * member 3: mapping of real times to tempos
- * member 4: map<double, double> map of real-time to tempo
- * member 5: Score time from the start of the piece to previous barline in quarter notes
- * member 6: Real time from the start of the piece to previous barline in ms
- * member 7: Currently active tempo
+ * member 4: Score time from the start of the piece to previous barline in quarter notes
+ * member 5: Real time from the start of the piece to previous barline in ms
+ * member 6: Currently active tempo
  **/
 
 class GenerateTimemapParams : public FunctorParams {

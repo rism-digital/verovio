@@ -459,9 +459,7 @@ int main(int argc, char **argv)
         outfile += ".json";
         if (std_output) {
 	    std::string output;
-            if (toolkit.RenderToTimemap(output)) {
-	        std::cout << output;
-	    }
+            std::cout << toolkit.RenderToTimemap();
         }
         else if (!toolkit.RenderToTimemapFile(outfile)) {
             cerr << "Unable to write MIDI to " << outfile << "." << endl;
