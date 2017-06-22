@@ -116,7 +116,7 @@ class Verse;
  * This class is a file output stream for writing MEI files.
  * It uses the libmei C++ library.
  * Not implemented.
-*/
+ */
 class MeiOutput : public FileOutputStream {
 public:
     /** @name Constructors and destructor */
@@ -338,7 +338,7 @@ private:
  * This class is a file input stream for reading MEI files.
  * It uses the libmei C++ library.
  * Under development.
-*/
+ */
 class MeiInput : public FileInputStream {
 public:
     // constructors and destructors

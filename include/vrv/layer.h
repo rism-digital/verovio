@@ -28,7 +28,7 @@ class StaffDef;
  * This class represents a layer in a laid-out score (Doc).
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
-*/
+ */
 class Layer : public Object,
               public DrawingListInterface,
               public ObjectListInterface,

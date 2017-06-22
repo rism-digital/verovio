@@ -575,4 +575,4 @@ int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-}
+} // namespace vrv

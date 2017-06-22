@@ -33,7 +33,7 @@ public:
     virtual std::string GetClassName() const { return "Label"; }
     virtual ClassId GetClassId() const { return LABEL; }
     ///@}
-    
+
     /**
      * @name Methods for adding allowed content
      */

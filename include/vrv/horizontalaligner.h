@@ -255,9 +255,9 @@ private:
 class AlignmentReference : public Object, public AttNInteger {
 public:
     /**
-    * @name Constructors, destructors, reset methods
-    * Reset method reset all attribute classes
-    */
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
     ///@{
     AlignmentReference();
     AlignmentReference(int staffN);

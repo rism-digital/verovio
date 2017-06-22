@@ -320,6 +320,13 @@ public:
     ///@}
 
     /**
+     * @name See Object::GenerateTimemap
+     */
+    ///@{
+    virtual int GenerateTimemap(FunctorParams *functorParams);
+    ///@}
+
+    /**
      * See Object::CalcMaxMeasureDuration
      */
     virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);

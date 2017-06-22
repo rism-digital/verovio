@@ -193,8 +193,11 @@ bool Toolkit::SetOutputFormat(std::string const &outformat)
     else if (outformat == "midi") {
         m_outformat = MIDI;
     }
+    else if (outformat == "timemap") {
+        m_outformat = TIMEMAP;
+    }
     else if (outformat != "svg") {
-        LogError("Output format can only be: mei, humdrum, midi or svg");
+        LogError("Output format can only be: mei, humdrum, midi, timemap or svg");
         return false;
     }
     return true;
@@ -928,6 +931,16 @@ std::string Toolkit::RenderToMidi()
     return outputstr;
 }
 
+bool Toolkit::RenderToTimemap(std::string &output)
+{
+    if (m_doc.ExportTimemap(output)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 std::string Toolkit::GetElementsAtTime(int millisec)
 {
 #if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
@@ -981,6 +994,20 @@ bool Toolkit::RenderToMidiFile(const std::string &filename)
     m_doc.ExportMIDI(&outputfile);
     outputfile.sortTracks();
     outputfile.write(filename);
+
+    return true;
+}
+
+bool Toolkit::RenderToTimemapFile(const std::string &filename)
+{
+    std::string outputString;
+    m_doc.ExportTimemap(outputString);
+
+    std::ofstream output(filename.c_str());
+    if (!output.is_open()) {
+        return false;
+    }
+    output << outputString;
 
     return true;
 }

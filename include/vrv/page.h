@@ -26,7 +26,7 @@ class System;
  * This class represents a page in a laid-out score (Doc).
  * A Page is contained in a Doc.
  * It contains System objects.
-*/
+ */
 class Page : public Object {
 public:
     /**

@@ -203,8 +203,8 @@ public:
     virtual int CalcLedgerLines(FunctorParams *functorParams);
 
     /**
-    * See Object::PrepareLayerElementParts
-    */
+     * See Object::PrepareLayerElementParts
+     */
     virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
@@ -241,6 +241,11 @@ public:
      * See Object::GenerateMIDI
      */
     virtual int GenerateMIDI(FunctorParams *functorParams);
+
+    /**
+     * See Object::GenerateTimemap
+     */
+    virtual int GenerateTimemap(FunctorParams *functorParams);
 
 private:
     //

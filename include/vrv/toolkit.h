@@ -26,7 +26,7 @@
 
 namespace vrv {
 
-enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM, ESAC, MIDI };
+enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM, ESAC, MIDI, TIMEMAP };
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -118,6 +118,12 @@ public:
      */
     std::string RenderToMidi();
 
+    /**
+     * Creates a timemap file, and return it as a JSON string.
+     */
+    bool RenderToTimemap(std::string &output);
+    bool RenderToTimemapFile(const std::string &filename);
+
     const char *GetHumdrumBuffer();
     void SetHumdrumBuffer(const char *contents);
 
@@ -170,10 +176,10 @@ public:
     int GetTimeForElement(const std::string &xmlId);
 
     /**
-    * @name Set and get a std::string into a char * buffer.
-    * This is used for returning a string buffer to emscripten.
-    * The buffer is freed when reset or in MusController destructor.
-    */
+     * @name Set and get a std::string into a char * buffer.
+     * This is used for returning a string buffer to emscripten.
+     * The buffer is freed when reset or in MusController destructor.
+     */
     ///@{
     void SetCString(const std::string &data);
     const char *GetCString();

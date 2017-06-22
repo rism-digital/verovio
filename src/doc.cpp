@@ -87,7 +87,6 @@ void Doc::Reset()
     m_drawingEvenSpacing = false;
     m_currentScoreDefDone = false;
     m_drawingPreparationDone = false;
-    m_midiExportDone = false;
     m_hasMidiTimemap = false;
 
     m_scoreDef.Reset();
@@ -280,11 +279,9 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             this->Process(&generateMIDI, &generateMIDIParams, NULL, &filters);
         }
     }
-
-    m_midiExportDone = true;
 }
 
-string Doc::ExportTimemap(void)
+bool Doc::ExportTimemap(string &output)
 {
     if (!Doc::HasMidiTimemap()) {
         // generate MIDI timemap before progressing
@@ -292,8 +289,87 @@ string Doc::ExportTimemap(void)
     }
     if (!Doc::HasMidiTimemap()) {
         LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
+        output = "";
+        return false;
     }
-    return "\"GOT HERE in Doc::ExportTimemap\"";
+    GenerateTimemapParams generateTimemapParams;
+    Functor generateTimemap(&Object::GenerateTimemap);
+    this->Process(&generateTimemap, &generateTimemapParams);
+
+    PrepareJsonTimemap(output, generateTimemapParams.realTimeToScoreTime, generateTimemapParams.realTimeToOnElements,
+        generateTimemapParams.realTimeToOffElements, generateTimemapParams.realTimeToTempo);
+
+    return true;
+}
+
+void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTimeToScoreTime,
+    std::map<int, vector<string> > &realTimeToOnElements, std::map<int, vector<string> > &realTimeToOffElements,
+    std::map<int, int> &realTimeToTempo)
+{
+
+    int currentTempo = -1000;
+    int newTempo;
+    int mapsize = realTimeToScoreTime.size();
+    output = "";
+    output.reserve(mapsize * 100); // Estimate 100 characters for each entry.
+    output += "[\n";
+    auto lastit = realTimeToScoreTime.end();
+    lastit--;
+    for (auto it = realTimeToScoreTime.begin(); it != realTimeToScoreTime.end(); it++) {
+        output += "\t{\n";
+        output += "\t\t\"tstamp\":\t";
+        output += to_string(it->first);
+        output += ",\n";
+        output += "\t\t\"qstamp\":\t";
+        output += to_string(it->second);
+
+        auto ittempo = realTimeToTempo.find(it->first);
+        if (ittempo != realTimeToTempo.end()) {
+            newTempo = ittempo->second;
+            if (newTempo != currentTempo) {
+                currentTempo = newTempo;
+                output += ",\n\t\t\"tempo\":\t";
+                output += to_string(currentTempo);
+            }
+        }
+
+        auto iton = realTimeToOnElements.find(it->first);
+        if (iton != realTimeToOnElements.end()) {
+            output += ",\n\t\t\"on\":\t[";
+            for (int ion = 0; ion < (int)iton->second.size(); ion++) {
+                output += "\"";
+                output += iton->second[ion];
+                output += "\"";
+                if (ion < iton->second.size() - 1) {
+                    output += ", ";
+                }
+            }
+            output += "]";
+        }
+
+        auto itoff = realTimeToOffElements.find(it->first);
+        if (itoff != realTimeToOffElements.end()) {
+            output += ",\n\t\t\"off\":\t[";
+            for (int ioff = 0; ioff < (int)itoff->second.size(); ioff++) {
+                output += "\"";
+                output += itoff->second[ioff];
+                output += "\"";
+                if (ioff < itoff->second.size() - 1) {
+                    output += ", ";
+                }
+            }
+            output += "]";
+        }
+
+        output += "\n\t}";
+        if (it == lastit) {
+            output += "\n";
+        }
+        else {
+            output += ",\n";
+        }
+    }
+    output += "]\n";
 }
 
 void Doc::PrepareDrawing()
@@ -685,11 +761,6 @@ bool Doc::HasPage(int pageIdx) const
 int Doc::GetPageCount() const
 {
     return GetChildCount();
-}
-
-bool Doc::GetMidiExportDone() const
-{
-    return m_midiExportDone;
 }
 
 int Doc::GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const

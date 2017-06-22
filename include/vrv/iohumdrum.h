@@ -312,9 +312,9 @@ protected:
     void setLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
     void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
     std::string getLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
-	std::string getLocationId(Object *object, int lineindex, int fieldindex, int subtokenindex);
-	std::string getLocationId(const string& prefix, hum::HTp token, int subtoken);
-	std::string getLocationId(const string& prefix, int lineindex, int fieldindex, int subtokenindex);
+    std::string getLocationId(Object *object, int lineindex, int fieldindex, int subtokenindex);
+    std::string getLocationId(const string &prefix, hum::HTp token, int subtoken);
+    std::string getLocationId(const string &prefix, int lineindex, int fieldindex, int subtokenindex);
     void setLocationIdNSuffix(vrv::Object *object, hum::HTp token, int number);
     void setSlurLocationId(vrv::Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex);
     void setTieLocationId(vrv::Object *object, hum::HTp tiestart, int sindex, hum::HTp tieend, int eindex);

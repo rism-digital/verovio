@@ -521,8 +521,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             measure = dynamic_cast<Measure *>(section->FindChildByAttComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
-            LogWarning(
-                "Element '%s' could not be added to measure '%s'", iter->second->GetClassName().c_str(), iter->first.c_str());
+            LogWarning("Element '%s' could not be added to measure '%s'", iter->second->GetClassName().c_str(),
+                iter->first.c_str());
             continue;
         }
         measure->AddChild(iter->second);
@@ -847,7 +847,8 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     return true;
 }
 
-    void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section, Measure *measure, std::string measureNum)
+void MusicXmlInput::ReadMusicXmlAttributes(
+    pugi::xml_node node, Section *section, Measure *measure, std::string measureNum)
 {
     assert(node);
     assert(section);
@@ -966,7 +967,7 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, st
     }
 }
 
-    void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, std::string measureNum)
+void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, std::string measureNum)
 {
     assert(node);
     assert(measure);

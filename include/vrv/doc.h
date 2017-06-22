@@ -234,7 +234,10 @@ public:
      * Extract a timemap from the document to a JSON string.
      * Run trough all the layers and fill the timemap file content.
      */
-    std::string ExportTimemap(void);
+    bool ExportTimemap(std::string &output);
+    void PrepareJsonTimemap(std::string &output, std::map<int, double> &realTimeToScoreTime,
+        std::map<int, std::vector<std::string> > &realTimeToOnElements,
+        std::map<int, std::vector<std::string> > &realTimeToOffElements, std::map<int, int> &realTimeToTempo);
 
     /**
      * Set the initial scoreDef of each page.
@@ -430,12 +433,6 @@ private:
      * drawing preparation will be reset before being done again.
      */
     bool m_drawingPreparationDone;
-
-    /**
-     * A flag to indicate if the MIDI export has been done.
-     * This is necessary for retrieving notes being played at a certain time.
-     */
-    bool m_midiExportDone;
 
     /**
      * A flag to indicate that the MIDI timemap has been calculated.  The

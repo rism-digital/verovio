@@ -36,8 +36,7 @@ void Label::Reset()
 {
     Object::Reset();
 }
-    
-    
+
 void Label::AddChild(Object *child)
 {
     if (child->IsTextElement()) {

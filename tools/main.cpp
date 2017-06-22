@@ -360,7 +360,7 @@ int main(int argc, char **argv)
         }
     }
 
-    if (outformat != "svg" && outformat != "mei" && outformat != "midi" && outformat != "humdrum") {
+    if (outformat != "svg" && outformat != "mei" && outformat != "midi" && outformat != "timemap" && outformat != "humdrum") {
         cerr << "Output format can only be 'mei', 'svg', 'midi', or 'humdrum'." << endl;
         exit(1);
     }
@@ -440,6 +440,7 @@ int main(int argc, char **argv)
             }
         }
     }
+
     else if (outformat == "midi") {
         outfile += ".mid";
         if (std_output) {
@@ -447,6 +448,22 @@ int main(int argc, char **argv)
             exit(1);
         }
         else if (!toolkit.RenderToMidiFile(outfile)) {
+            cerr << "Unable to write MIDI to " << outfile << "." << endl;
+            exit(1);
+        }
+        else {
+            cerr << "Output written to " << outfile << "." << endl;
+        }
+    }
+    else if (outformat == "timemap") {
+        outfile += ".json";
+        if (std_output) {
+	    std::string output;
+            if (toolkit.RenderToTimemap(output)) {
+	        std::cout << output;
+	    }
+        }
+        else if (!toolkit.RenderToTimemapFile(outfile)) {
             cerr << "Unable to write MIDI to " << outfile << "." << endl;
             exit(1);
         }

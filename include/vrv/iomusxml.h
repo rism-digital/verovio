@@ -288,6 +288,6 @@ private:
     std::vector<std::pair<std::string, ControlElement *> > m_controlElements;
 };
 
-} // namespace vrv {
+} // namespace vrv
 
 #endif // __VRV_IOMUSXML_H__

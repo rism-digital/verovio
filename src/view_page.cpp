@@ -156,13 +156,13 @@ void View::DrawSystem(DeviceContext *dc, System *system)
                 currentFont.SetStyle(FONTSTYLE_italic);
                 currentFont.SetPointSize(currentFont.GetPointSize() * 4 / 5);
                 dc->SetFont(&currentFont);
-                
+
                 Text text;
                 text.SetText(UTF8to16(measure->GetN()));
-                
+
                 bool setX = false;
                 bool setY = false;
-                
+
                 // HARDCODED
                 int x = system->GetDrawingX();
                 int y = staff->GetDrawingY() + 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -170,7 +170,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
                 dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y));
                 DrawTextElement(dc, &text, x, y, setX, setY);
                 dc->EndText();
-                
+
                 dc->ResetFont();
             }
         }

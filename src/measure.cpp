@@ -871,6 +871,19 @@ int Measure::GenerateMIDI(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::GenerateTimemap(FunctorParams *functorParams)
+{
+    GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
+    assert(params);
+
+    // Deal with repeated music later, for now get the last times.
+    params->m_scoreTimeOffset = m_scoreTimeOffset.back();
+    params->m_realTimeOffsetMilliseconds = m_realTimeOffsetMilliseconds.back();
+    params->m_currentTempo = m_currentTempo;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
 {
     CalcMaxMeasureDurationParams *params = dynamic_cast<CalcMaxMeasureDurationParams *>(functorParams);

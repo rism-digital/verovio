@@ -920,6 +920,13 @@ public:
     ///@}
 
     /**
+     * Export the object to a JSON timemap file.
+     */
+    ///@{
+    virtual int GenerateTimemap(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Calculate the maximum duration of each measure.
      */
     virtual int CalcMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
