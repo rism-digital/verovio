@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jun 18 23:26:57 CEST 2017
+// Last Modified: Wed Jun 21 16:06:58 CEST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -27851,7 +27851,11 @@ void Tool_dissonant::doAnalysis(vector<vector<string> >& results,
 	}
 
 	for (int i=0; i<grid.getVoiceCount(); i++) {
-		categorizeUnknowns(results, grid, attacks[i], i);
+		findLs(results, grid, attacks[i], i);
+	}
+	
+	for (int i=0; i<grid.getVoiceCount(); i++) {
+		findYs(results, grid, attacks[i], i);
 	}
 
 }
@@ -27950,8 +27954,13 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 		// check if current note is dissonant to another sounding note:
 		dissonant = false;
 
+		int nextj = 0;
+		int j = 0;
+
+RECONSIDER:
+
 		int value = 0;
-		for (int j=0; j<(int)harmint.size(); j++) {
+		for (j=nextj; j<(int)harmint.size(); j++) {
 			if (j == vindex) {
 				// don't compare to self
 				continue;
@@ -27960,12 +27969,9 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 				// rest, so ignore
 				continue;
 			}
-			value = (int)harmint[j];
-			if (value > 7) {
-				value = value % 7; // remove octaves from interval
-			} else if (value < -7) {
-				value = -(-value % 7); // remove octaves from interval
-			}
+
+			value = (int)harmint[j] % 7; // remove octaves from interval, can return negative ints
+
 			int vpitch = (int)grid.cell(vindex, sliceindex)->getAbsDiatonicPitch();
 			int otherpitch = (int)grid.cell(j, sliceindex)->getAbsDiatonicPitch();
 
@@ -28007,6 +28013,7 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 				break;
 			}
 		}
+		nextj = j+1;
 
 
 /*
@@ -28085,11 +28092,17 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 		// Condition 2: The other (dissonant) voice stayed in place or repeated the
 		//    same pitch at the onset of this dissonant interval.
 		bool condition2 = true;
+		bool condition2b = false;
 		double opitch = grid.cell(ovoiceindex, sliceindex)->getSgnMidiPitch();
+		double opitchDia = grid.cell(ovoiceindex, sliceindex)->getAbsDiatonicPitch();
 		int lastonoteindex = grid.cell(ovoiceindex, sliceindex)->getPrevAttackIndex();
 		double lopitch = NAN;
 		if (lastonoteindex >= 0) {
 			lopitch = grid.cell(ovoiceindex, lastonoteindex)->getAbsMidiPitch();
+			double lopitchDia = grid.cell(ovoiceindex, lastonoteindex)->getAbsDiatonicPitch();
+			if (abs(int(opitchDia - lopitchDia)) == 7) {
+				condition2b = true;
+			}
 		} else {
 			condition2 = false;
 		}
@@ -28178,8 +28191,8 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 		}
 
 
-		if (((lev >= levn) || ((lev == 2) && (dur == .5))) && condition2 && 
-			(dur <= 2) && (dur <= durp) && (lev >= levp) && valid_acc_exit) { // weak dissonances
+		if (((lev >= levn) || ((lev == 2) && (dur == .5))) && (lev >= levp) && 
+			(dur <= 2) && (dur <= durp) && (condition2 || condition2b) && valid_acc_exit) { // weak dissonances
 			if (intp == -1) { // descending dissonances
 				if (intn == -1) {
 					results[vindex][lineindex] = m_labels[PASSING_DOWN]; // downward passing tone
@@ -28213,8 +28226,8 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 			// } else if ((intp > 2) && (intn == -1)) {
 			// 	results[vindex][lineindex] = m_labels[IANTHI_NEIGHBOR]; // incomplete anterior upper neighbor
 			}
-		} else if ((durp >= 2) && (dur == 1) && (lev < levn) && condition2 && 
-				   valid_acc_exit && (lev == 1)) {
+		} else if ((durp >= 2) && (dur == 1) && (lev < levn) && valid_acc_exit &&
+					 (condition2 || condition2b) && (lev == 1)) {
 			if (intp == -1) {
 				if (intn == -1) {
 					results[vindex][lineindex] = m_labels[THIRD_Q_PASS_DOWN]; // dissonant third quarter descending passing tone
@@ -28319,7 +28332,19 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 				  (!refLeaptTo && refLeaptFrom && othLeaptFrom))))) { // ref voice enters diss by step and both voices leave by leap
 			results[vindex][lineindex] = unexp_label;
 		}
+
+
+		// If the note was labeled as an unknown dissonance, then go back and check
+		// against another note with which it might have a known dissonant function.
+		if ((results[vindex][lineindex] == m_labels[UNLABELED_Z4]) || 
+				(results[vindex][lineindex] == m_labels[UNLABELED_Z7]) ||
+				(results[vindex][lineindex] == m_labels[UNLABELED_Z7])) {
+			if (nextj < (int)harmint.size()) {
+				goto RECONSIDER;
+			}
+		}
 	}
+
 }
 
 
@@ -28378,10 +28403,9 @@ void Tool_dissonant::findFakeSuspensions(vector<vector<string> >& results, NoteG
 
 //////////////////////////////
 //
-// Tool_dissonant::categorizeUnknowns --
+// Tool_dissonant::findLs --
 //
-
-void Tool_dissonant::categorizeUnknowns(vector<vector<string> >& results, NoteGrid& grid,
+void Tool_dissonant::findLs(vector<vector<string> >& results, NoteGrid& grid,
 		vector<NoteCell*>& attacks, int vindex) {
 	HumNum dur;        // duration of current note;
 	HumNum odur;       // duration of current note in other voice which may have started earlier;
@@ -28414,14 +28438,12 @@ void Tool_dissonant::categorizeUnknowns(vector<vector<string> >& results, NoteGr
 			if (vindex == j) { // only compare different voices
 				continue;
 			}
-			if ((results[j][lineindex] == m_labels[SUS_BIN]) ||
-				(results[j][lineindex] == m_labels[AGENT_BIN]) ||
-				(results[j][lineindex] == m_labels[SUS_TERN]) ||
+			if ((results[j][lineindex] == m_labels[AGENT_BIN]) ||
 				(results[j][lineindex] == m_labels[AGENT_TERN]) ||
 				(results[j][lineindex] == m_labels[UNLABELED_Z7]) ||
 				(results[j][lineindex] == m_labels[UNLABELED_Z4]) ||
 				(results[j][lineindex] == "")) {
-				continue; // skip if other voice a suspension, an agent, unexplainable, or empty.
+				continue; // skip if other voice is an agent, unexplainable, or empty.
 			}
 			oattackindexc = grid.cell(j, sliceindex)->getCurrAttackIndex();
 			olineindex = grid.cell(j, oattackindexc)->getLineIndex();
@@ -28442,17 +28464,93 @@ void Tool_dissonant::categorizeUnknowns(vector<vector<string> >& results, NoteGr
 			if ((intp == ointp) && (intn == ointn)) { // this note moves in parallel with an identifiable dissonance
 				if (intp > 0) {
 					results[vindex][lineindex] = m_labels[PARALLEL_UP];
+					break;
 				} else if (intp < 0) {
-					results[vindex][lineindex] = m_labels[PARALLEL_DOWN];					
+					results[vindex][lineindex] = m_labels[PARALLEL_DOWN];
+					break;			
 				}
 			}
-			// if (this note is only dissonant against other notes that are identifiable dissonances) {
-			// 	mark this note with a Y label;
-			// }
 		}
 	}
 }
 
+//////////////////////////////
+//
+// Tool_dissonant::findYs --
+//
+void Tool_dissonant::findYs(vector<vector<string> >& results, NoteGrid& grid,
+		vector<NoteCell*>& attacks, int vindex) { 
+	double intp;       // diatonic interval from previous melodic note
+	int lineindex;     // line in original Humdrum file content that contains note
+	int olineindex;    // line in original Humdrum file content that contains other voice note
+	int sliceindex;    // current timepoint in NoteGrid
+	int oattackindexc; // line index of other voice current note
+	double pitch;      // current pitch in this voice
+	double opitch;     // current pitch in other voice
+	bool onlyWithValids; // note is only dissonant with identifiable dissonances
+
+	for (int i=1; i<(int)attacks.size()-1; i++) {
+		lineindex = attacks[i]->getLineIndex();
+		if ((results[vindex][lineindex].find("Z") == string::npos) &&
+			(results[vindex][lineindex].find("z") == string::npos)) {
+			continue;
+		}
+		intp = *attacks[i] - *attacks[i-1];
+		sliceindex = attacks[i]->getSliceIndex();
+
+		int lowestnote = 1000; // lowest sounding diatonic note in any voice at this sliceindex
+		double tpitch;
+		for (int v=0; v<(int)grid.getVoiceCount(); v++) {
+			tpitch = grid.cell(v, sliceindex)->getAbsDiatonicPitch();
+			if (!Convert::isNaN(tpitch)) {
+				if (tpitch <= lowestnote) {
+					lowestnote = tpitch;
+				}
+			}
+		}
+
+		onlyWithValids = true; 
+		for (int j=0; j<(int)grid.getVoiceCount(); j++) { // j is the voice index of the other voice
+			if (vindex == j) { // only compare different voices
+				continue;
+			}
+			oattackindexc = grid.cell(j, sliceindex)->getCurrAttackIndex();
+			pitch = attacks[i]->getAbsDiatonicPitch();
+			opitch = grid.cell(j, sliceindex)->getAbsDiatonicPitch();
+			olineindex = grid.cell(j, oattackindexc)->getLineIndex();
+			int thisInt = opitch - pitch; // diatonic interval in this pair
+			int thisMod7 = thisInt % 7; // simplify octaves out of thisInt
+
+
+			if (((abs(thisMod7) == 1) || (abs(thisMod7) == 6)  ||
+				 ((thisInt > 0) && (thisMod7 == 3) && 
+				  not (((int(pitch-lowestnote) % 7) == 2) ||
+                 	   ((int(pitch-lowestnote) % 7) == 4))) ||
+				 ((thisInt < 0) && (thisMod7 == -3) && // a fourth by inversion is -3 and -3%7 = -3.
+				  not (((int(opitch-lowestnote) % 7) == 2) ||
+                 	   ((int(opitch-lowestnote) % 7) == 4)))) &&
+				((results[j][olineindex] == m_labels[AGENT_BIN]) ||
+				 (results[j][olineindex] == m_labels[AGENT_TERN]) ||
+				 (results[j][olineindex] == m_labels[UNLABELED_Z7]) ||
+				 (results[j][olineindex] == m_labels[UNLABELED_Z4]) ||
+				 ((results[j][olineindex] == "") &&
+				  ((results[j][lineindex] != m_labels[SUS_BIN]) &&
+				   (results[j][lineindex] != m_labels[SUS_TERN]))))) {
+				
+				onlyWithValids = false;
+			}
+		}
+
+		if (onlyWithValids && ((results[vindex][lineindex] == m_labels[UNLABELED_Z7]) ||
+							   (results[vindex][lineindex] == m_labels[UNLABELED_Z4]))) {
+			if (intp > 0) {
+				results[vindex][lineindex] = m_labels[ONLY_WITH_VALID_UP];
+			} else if (intp <= 0) {
+				results[vindex][lineindex] = m_labels[ONLY_WITH_VALID_DOWN];
+			}
+		}
+	}
+}
 
 ///////////////////////////////
 //
@@ -32496,10 +32594,18 @@ void Tool_imitation::doAnalysis(vector<vector<string> >& results,
 
 void Tool_imitation::getIntervals(vector<double>& intervals,
 		vector<NoteCell*>& attacks) {
-	for (int i=0; i<attacks.size() - 1; i++) {
+	for (int i=0; i<(int)attacks.size() - 1; i++) {
 		intervals[i] = *attacks[i+1] - *attacks[i];
 	}
 	intervals.back() = NAN;
+
+	if (getBoolean("debug")) {
+		cout << endl;
+		for (int i=0; i<intervals.size(); i++) {
+			cout << "INTERVAL " << i << "\t=\t" << intervals[i] << "\tATK " << attacks[i]->getSgnDiatonicPitch() << "\t" << attacks[i]->getToken() << endl;
+		}
+	}
+
 }
 
 
@@ -32524,8 +32630,8 @@ void Tool_imitation::analyzeImmitation(vector<vector<string>>& results,
 	vector<int> enum1(v1a.size(), 0);
 	vector<int> enum2(v1a.size(), 0);
 
-	for (int i=0; i<v1i.size() - 1; i++) {
-		for (int j=0; j<v2i.size() - 1; j++) {
+	for (int i=0; i<(int)v1i.size() - 1; i++) {
+		for (int j=0; j<(int)v2i.size() - 1; j++) {
 			if (m_rest || m_rest2) {
 				if ((i > 0) && (!Convert::isNaN(attacks[v1][i-1]->getSgnDiatonicPitch()))) {
 					// match initiator must be preceded by a rest (or start of music)
@@ -32615,8 +32721,9 @@ void Tool_imitation::analyzeImmitation(vector<vector<string>>& results,
 // Tool_imitation::compareSequences --
 //
 
-int Tool_imitation::compareSequences(vector<NoteCell*>& attack1, vector<double>& seq1, int i1,
-		vector<NoteCell*>& attack2, vector<double>& seq2, int i2) {
+int Tool_imitation::compareSequences(vector<NoteCell*>& attack1,
+		vector<double>& seq1, int i1, vector<NoteCell*>& attack2,
+		vector<double>& seq2, int i2) {
 	int count = 0;
 	// sequences cannot start with rests
 	if (Convert::isNaN(seq1[i1]) || Convert::isNaN(seq2[i2])) {
@@ -32653,7 +32760,7 @@ int Tool_imitation::compareSequences(vector<NoteCell*>& attack1, vector<double>&
 		}
 	}
 
-	return count;
+	return count + 1;
 }
 
 
