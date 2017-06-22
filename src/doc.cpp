@@ -7,8 +7,6 @@
 
 #include "doc.h"
 
-#include <iostream>
-
 //----------------------------------------------------------------------------
 
 #include <assert.h>
@@ -90,6 +88,7 @@ void Doc::Reset()
     m_currentScoreDefDone = false;
     m_drawingPreparationDone = false;
     m_midiExportDone = false;
+    m_hasMidiTimemap = false;
 
     m_scoreDef.Reset();
     if (m_scoreBuffer) {
@@ -176,15 +175,21 @@ bool Doc::GenerateDocumentScoreDef()
     return true;
 }
 
-void Doc::ExportMIDI(MidiFile *midiFile)
+bool Doc::HasMidiTimemap(void)
 {
+    return m_hasMidiTimemap;
+}
+
+void Doc::CalculateMidiTimemap(void)
+{
+    m_hasMidiTimemap = false;
+
     int tempo = 120;
 
     // Set tempo
     if (m_scoreDef.HasMidiBpm()) {
         tempo = m_scoreDef.GetMidiBpm();
     }
-    midiFile->addTempo(0, 0, tempo);
 
     // We first calculate the maximum duration of each measure
     CalcMaxMeasureDurationParams calcMaxMeasureDurationParams;
@@ -201,6 +206,28 @@ void Doc::ExportMIDI(MidiFile *midiFile)
     // Adjust the duration of tied notes
     Functor resolveMIDITies(&Object::ResolveMIDITies);
     this->Process(&resolveMIDITies, NULL, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+
+    m_hasMidiTimemap = true;
+}
+
+void Doc::ExportMIDI(MidiFile *midiFile)
+{
+
+    if (!Doc::HasMidiTimemap()) {
+        // generate MIDI timemap before progressing
+        CalculateMidiTimemap();
+    }
+    if (!Doc::HasMidiTimemap()) {
+        LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
+    }
+
+    int tempo = 120;
+
+    // Set tempo
+    if (m_scoreDef.HasMidiBpm()) {
+        tempo = m_scoreDef.GetMidiBpm();
+    }
+    midiFile->addTempo(0, 0, tempo);
 
     // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
     PrepareProcessingListsParams prepareProcessingListsParams;
@@ -255,6 +282,18 @@ void Doc::ExportMIDI(MidiFile *midiFile)
     }
 
     m_midiExportDone = true;
+}
+
+string Doc::ExportTimemap(void)
+{
+    if (!Doc::HasMidiTimemap()) {
+        // generate MIDI timemap before progressing
+        CalculateMidiTimemap();
+    }
+    if (!Doc::HasMidiTimemap()) {
+        LogWarning("Calculation of MIDI timemap failed, not exporting MidiFile.");
+    }
+    return "\"GOT HERE in Doc::ExportTimemap\"";
 }
 
 void Doc::PrepareDrawing()

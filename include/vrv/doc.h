@@ -85,8 +85,8 @@ public:
     Score *CreateScoreBuffer();
 
     /**
-    * Get the total page count
-    */
+     * Get the total page count
+     */
     int GetPageCount() const;
 
     bool GetMidiExportDone() const;
@@ -212,10 +212,29 @@ public:
     ///@}
 
     /**
+     * Prepare the MIDI timemap for MIDI and timemap file export.
+     * Run trough all the layers and fill the score-time and performance timing variables.
+     */
+    void CalculateMidiTimemap(void);
+
+    /**
+     * Check to see if the MIDI timemap has already been calculated.  This needs to return
+     * true before ExportMIDI() or ExportTimemap() can export anything (These two functions
+     * will automatically run CalculateMidiTimemap() if HasMidiTimemap() return false.
+     */
+    bool HasMidiTimemap(void);
+
+    /**
      * Export the document to a MIDI file.
-     * Run trough all the layer and fill the midi file content.
+     * Run trough all the layers and fill the midi file content.
      */
     void ExportMIDI(MidiFile *midiFile);
+
+    /**
+     * Extract a timemap from the document to a JSON string.
+     * Run trough all the layers and fill the timemap file content.
+     */
+    std::string ExportTimemap(void);
 
     /**
      * Set the initial scoreDef of each page.
@@ -417,6 +436,13 @@ private:
      * This is necessary for retrieving notes being played at a certain time.
      */
     bool m_midiExportDone;
+
+    /**
+     * A flag to indicate that the MIDI timemap has been calculated.  The
+     * timemap needs to be prepared before MIDI files or timemap JSON files
+     * are generated.
+     */
+    bool m_hasMidiTimemap;
 
     /** Page width (MEI scoredef@page.width) - currently not saved */
     int m_pageWidth;
