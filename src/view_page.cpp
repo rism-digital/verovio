@@ -149,7 +149,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
         // Draw mesure number if > 1
         // This needs to be improved because we are now using (tuplet) oblique figures.
         // We should also have a better way to specify if the number has to be displayed or not
-        if ((measure->HasN()) && (measure->GetN() != "1")) {
+        if ((measure->HasN()) && (measure->GetN() != "0") && (measure->GetN() != "1")) {
             Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
             if (staff) {
                 FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
@@ -419,7 +419,6 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
             continue;
         }
 
-        
         // HARDCODED
         int space = 3 * m_doc->GetDrawingBeamWidth(100, false);
         int x = system->GetDrawingX() - space;
