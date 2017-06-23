@@ -29,9 +29,52 @@ public:
     ///@{
     Label();
     virtual ~Label();
+    virtual Object *Clone() const { return new Label(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Label"; }
     virtual ClassId GetClassId() const { return LABEL; }
+    ///@}
+    
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
+    virtual void AddChild(Object *object);
+    ///@}
+
+    //----------//
+    // Functors //
+    //----------//
+
+private:
+    //
+public:
+    //
+private:
+    //
+};
+
+//----------------------------------------------------------------------------
+// LabelAbbr
+//----------------------------------------------------------------------------
+
+/**
+ * This class represent a <label> in MEI.
+ */
+class LabelAbbr : public Object, public TextListInterface {
+
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    LabelAbbr();
+    virtual ~LabelAbbr();
+    virtual Object *Clone() const { return new LabelAbbr(*this); }
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "LabelAbbr"; }
+    virtual ClassId GetClassId() const { return LABELABBR; }
     ///@}
     
     /**

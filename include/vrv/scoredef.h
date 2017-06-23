@@ -223,8 +223,6 @@ class StaffGrp : public Object,
                  public ObjectListInterface,
                  public AttBasic,
                  public AttLabelled,
-                 // FIXME changed in MEI 4.0.0
-                 // public AttLabelsAddl,
                  public AttStaffGroupingSym,
                  public AttStaffGrpVis,
                  public AttTyped {
@@ -278,8 +276,6 @@ class StaffDef : public ScoreDefElement,
                  public StaffDefDrawingInterface,
                  public AttDistances,
                  public AttLabelled,
-                 // FIXME changed in MEI 4.0.0
-                 // public AttLabelsAddl,
                  public AttNInteger,
                  public AttNotationType,
                  public AttScalable,
@@ -298,6 +294,12 @@ public:
     virtual std::string GetClassName() const { return "StaffDef"; }
     virtual ClassId GetClassId() const { return STAFFDEF; }
     ///@}
+                
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
+    virtual void AddChild(Object *object);
 
     //----------//
     // Functors //
