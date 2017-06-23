@@ -72,6 +72,9 @@ svg:not(:root){
     width:100%;
 }
 
+.support-logo {
+    padding: 10px 30px;
+}
 
 /* This is a fix for bootstrap 3.1 to override width: auto; */
 .form-control {
