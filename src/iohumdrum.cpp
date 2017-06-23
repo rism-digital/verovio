@@ -1038,6 +1038,9 @@ void HumdrumInput::prepareVerses(void)
             else if (line.token(j)->getDataType().compare(0, 7, "**vdata") == 0) {
                 ss[i].verse = true;
             }
+            else if (line.token(j)->getDataType().compare(0, 8, "**vvdata") == 0) {
+                ss[i].verse = true;
+            }
         }
     }
 }
@@ -1739,6 +1742,7 @@ void HumdrumInput::checkForOmd(int startline, int endline)
         if (key == "OMD") {
             value = infile[i].getReferenceValue();
             Tempo *tempo = new Tempo;
+            setLocationId(tempo, infile.token(i, 0));
             m_measure->AddChild(tempo);
             addTextElement(tempo, value);
             tempo->SetTstamp(1.0);
@@ -1757,6 +1761,16 @@ template <class ELEMENT> void HumdrumInput::setStaff(ELEMENT element, int staffn
     xsdPositiveInteger_List stafflist;
     stafflist.push_back(staffnum);
     element->SetStaff(stafflist);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setN --
+//
+
+template <class ELEMENT> void HumdrumInput::setN(ELEMENT element, int nvalue)
+{
+    element->SetN(to_string(nvalue));
 }
 
 //////////////////////////////
@@ -2826,8 +2840,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
         // check for rptend here, since the one for the last measure in
         // the music is missed by the inline processing.  But maybe limit
-        // this one to only checking for the last measure.  Or move barline 
-		// styling here...
+        // this one to only checking for the last measure.  Or move barline
+        // styling here...
         if ((layerdata.back()->find(":|") != std::string::npos)
             || (layerdata.back()->find(":!") != std::string::npos)) {
             m_measure->SetRight(BARRENDITION_rptend);
@@ -3434,6 +3448,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             m_measure->AddChild(dynam);
             setStaff(dynam, m_currentstaff);
             addTextElement(dynam, "sf");
+            setLocationId(dynam, token, -1);
             hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
             dynam->SetTstamp(barstamp.getFloat());
             if (aboveQ) {
@@ -3565,6 +3580,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             Dynam *dynam = new Dynam;
             m_measure->AddChild(dynam);
             setStaff(dynam, m_currentstaff);
+            setLocationId(dynam, line->token(i), -1);
             addTextElement(dynam, dynamic);
             hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
             dynam->SetTstamp(barstamp.getFloat());
@@ -3601,6 +3617,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
                 Hairpin *hairpin = new Hairpin;
                 setStaff(hairpin, m_currentstaff);
+                setLocationId(hairpin, line->token(i), -1);
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 hum::HumNum tstamp2 = getMeasureTstamp(endtok, staffindex);
                 int measures = getMeasureDifference(line->token(i), endtok);
@@ -3642,6 +3659,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
                 Hairpin *hairpin = new Hairpin;
                 setStaff(hairpin, m_currentstaff);
+                setLocationId(hairpin, line->token(i), -1);
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 hum::HumNum tstamp2 = getMeasureTstamp(endtok, staffindex);
                 int measures = getMeasureDifference(line->token(i), endtok);
@@ -5677,10 +5695,15 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
         return;
     }
 
+    vector<string> vtexts;
+    std::string content;
     hum::HumdrumLine &line = *token->getLine();
     int track = token->getTrack();
     int ttrack;
     int versenum = 0;
+    bool vvdataQ;
+    bool vdataQ;
+    bool lyricQ;
     int startfield = token->getFieldIndex() + 1;
     for (int i = startfield; i < line.getFieldCount(); i++) {
         if (line.token(i)->isKern()) {
@@ -5689,41 +5712,97 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
                 break;
             }
         }
-        else if (line.token(i)->isDataType("**text") || line.token(i)->isDataType("**silbe")
-            || (line.token(i)->getDataType().compare(0, 7, "**vdata") == 0)) {
+
+        lyricQ = false;
+        vdataQ = false;
+        vvdataQ = false;
+        if (line.token(i)->isDataType("**text") || line.token(i)->isDataType("**silbe")) {
+            lyricQ = true;
+        }
+        else if (line.token(i)->getDataType().compare(0, 7, "**vdata") == 0) {
+            vdataQ = true;
+            lyricQ = true;
+        }
+        else if (line.token(i)->getDataType().compare(0, 8, "**vvdata") == 0) {
+            vvdataQ = true;
+            lyricQ = true;
+        }
+
+        if (!lyricQ) {
+            continue;
+        }
+
+        if (line.token(i)->isNull()) {
             versenum++;
-            if (line.token(i)->isNull()) {
+            continue;
+        }
+
+        vtexts.clear();
+        vtexts.push_back(*line.token(i));
+        if (vvdataQ) {
+            splitSyllableBySpaces(vtexts);
+        }
+
+        for (int j = 0; j < vtexts.size(); j++) {
+            content = vtexts[j];
+            versenum++;
+            if (content == "") {
                 continue;
             }
+
             Verse *verse = new Verse;
-            setLocationId(verse, line.token(i), -1);
+            if (vvdataQ) {
+                setLocationId(verse, line.token(i), j + 1);
+            }
+            else {
+                setLocationId(verse, line.token(i), -1);
+            }
             appendElement(note, verse);
             verse->SetN(versenum);
             Syl *syl = new Syl;
             string datatype = line.token(i)->getDataType();
+
             if (datatype.compare(0, 8, "**vdata-") == 0) {
                 string subdatatype = datatype.substr(8);
                 if (!subdatatype.empty()) {
                     appendTypeTag(syl, subdatatype);
                 }
             }
-            setLocationId(syl, line.token(i), -1);
+            else if (datatype.compare(0, 9, "**vdata-") == 0) {
+                string subdatatype = datatype.substr(9);
+                if (!subdatatype.empty()) {
+                    appendTypeTag(syl, subdatatype);
+                }
+            }
+
+            if (vvdataQ) {
+                setLocationId(syl, line.token(i), j + 1);
+            }
+            else {
+                setLocationId(syl, line.token(i), -1);
+            }
+
             appendElement(verse, syl);
-            std::string content = *line.token(i);
+
+            if (vdataQ || vvdataQ) {
+                addTextElement(syl, content);
+                continue;
+            }
+
             bool dashbegin = false;
             bool dashend = false;
             bool extender = false;
-            if (datatype.compare(0, 7, "**vdata") != 0) {
-                for (int z = 1; z < (int)content.size() - 1; z++) {
-                    // Use underscore for elision symbol
-                    // (later use @con="b" when verovio allows it).
-                    // Also possibly make elision symbols optional.
-                    if ((content[z] == ' ') && (content[z + 1] != '\'')) {
-                        // the later condition is to not elide "ma 'l"
-                        content[z] = '_';
-                    }
+
+            for (int z = 1; z < (int)content.size() - 1; z++) {
+                // Use underscore for elision symbol
+                // (later use @con="b" when verovio allows it).
+                // Also possibly make elision symbols optional.
+                if ((content[z] == ' ') && (content[z + 1] != '\'')) {
+                    // the later condition is to not to elide "ma 'l"
+                    content[z] = '_';
                 }
             }
+
             if (content.back() == '-') {
                 dashend = true;
                 content.pop_back();
@@ -5775,6 +5854,33 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             }
             addTextElement(syl, content);
         }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::splitSyllableBySpaces -- Split a string into pieces
+//    according to spaces.  Default value spacer = ' ');
+//
+
+void HumdrumInput::splitSyllableBySpaces(vector<string> &vtext, char spacer)
+{
+    if (vtext[0].find(spacer) == string::npos) {
+        return;
+    }
+    if (vtext.size() != 1) {
+        // invalid size
+        return;
+    }
+    string original = vtext[0];
+    vtext[0] = "";
+    for (int i = 0; i < (int)original.size(); i++) {
+        if (original[i] != spacer) {
+            vtext.back().push_back(original[i]);
+            continue;
+        }
+        // new string needs to be made
+        vtext.push_back("");
     }
 }
 
@@ -6147,6 +6253,10 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
         }
     }
 
+    if ((subtok == 0) && token->find(" ") == std::string::npos) {
+        subtok = -1;
+    }
+
     if (tpos == std::string::npos) {
         // no mordent on note
         return;
@@ -6157,14 +6267,15 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
     Mordent *mordent = new Mordent;
     appendElement(m_measure, mordent);
     setStaff(mordent, staff);
-    if (linked) {
-        mordent->SetStartid("#" + linked->GetUuid());
-    }
-    else {
-        hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
-        mordent->SetTstamp(tstamp.getFloat());
-    }
-    setLocationId(mordent, token);
+    mordent->SetStartid("#" + getLocationId("note", token, subtok));
+    // if (linked) {
+    //     mordent->SetStartid("#" + linked->GetUuid());
+    // }
+    // else {
+    //     hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
+    //     mordent->SetTstamp(tstamp.getFloat());
+    // }
+    setLocationId(mordent, token, subtok);
 
     if (!lowerQ) {
         // reversing for now
@@ -6253,11 +6364,16 @@ void HumdrumInput::addTrill(hum::HTp token)
                     tpos++;
                 }
             }
+            break;
         }
     }
     if (tpos == std::string::npos) {
         // no trill on a note
         return;
+    }
+
+    if ((subtok == 0) && token->find(" ") == std::string::npos) {
+        subtok = -1;
     }
 
     // int layer = m_currentlayer; // maybe place below if in layer 2
@@ -6266,14 +6382,14 @@ void HumdrumInput::addTrill(hum::HTp token)
     appendElement(m_measure, trill);
     setStaff(trill, staff);
 
-    // using tstamp for now, but @startid is perhaps better?
-    hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
-    trill->SetTstamp(tstamp.getFloat());
-    setLocationId(trill, token);
+    // hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
+    // trill->SetTstamp(tstamp.getFloat());
+    trill->SetStartid("#" + getLocationId("note", token, subtok));
+    setLocationId(trill, token, subtok);
     if (m_signifiers.above) {
         if (tpos < token->size() - 1) {
             if ((*token)[tpos + 1] == m_signifiers.above) {
-                // trill->SetPlace(STAFFREL_above);
+                // 300: trill->SetPlace(STAFFREL_above);
                 setPlace(trill, "above");
             }
         }
@@ -6577,7 +6693,8 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     if ((m_ending[startline] != 0) && (m_endingnum != m_ending[startline])) {
         // create a new ending
         m_currentending = new Ending;
-        m_currentending->SetN(m_ending[startline]);
+        setN(m_currentending, m_ending[startline]);
+        // 300: m_currentending->SetN(m_ending[startline]);
         m_sections.back()->AddChild(m_currentending);
         m_currentending->AddChild(m_measure);
     }
@@ -6601,7 +6718,8 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 
     int measurenumber = getMeasureNumber(startline, endline);
     if (measurenumber >= 0) {
-        m_measure->SetN(measurenumber);
+        // 300: m_measure->SetN(measurenumber);
+        setN(m_measure, measurenumber);
     }
 
     if (GetTypeOption()) {
@@ -7158,6 +7276,21 @@ std::string HumdrumInput::GetMeiString(void)
 
 void HumdrumInput::setLocationId(Object *object, hum::HTp token, int subtoken)
 {
+    object->SetUuid(getLocationId(object, token, subtoken));
+}
+
+void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, int subtokenindex)
+{
+    object->SetUuid(getLocationId(object, lineindex, fieldindex, subtokenindex));
+}
+
+///////////////////////////////////
+//
+// HumdrumInput::getLocationId --
+//
+
+std::string HumdrumInput::getLocationId(Object *object, hum::HTp token, int subtoken)
+{
     int line = token->getLineIndex() + 1;
     int field = token->getFieldIndex() + 1;
     std::string id = object->GetClassName();
@@ -7167,10 +7300,23 @@ void HumdrumInput::setLocationId(Object *object, hum::HTp token, int subtoken)
     if (subtoken >= 0) {
         id += "S" + to_string(subtoken + 1);
     }
-    object->SetUuid(id);
+    return id;
 }
 
-void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, int subtokenindex)
+std::string HumdrumInput::getLocationId(const string &prefix, hum::HTp token, int subtoken)
+{
+    int line = token->getLineIndex() + 1;
+    int field = token->getFieldIndex() + 1;
+    std::string id = prefix;
+    id += "-L" + to_string(line);
+    id += "F" + to_string(field);
+    if (subtoken >= 0) {
+        id += "S" + to_string(subtoken + 1);
+    }
+    return id;
+}
+
+std::string HumdrumInput::getLocationId(Object *object, int lineindex, int fieldindex, int subtokenindex)
 {
     int line = lineindex + 1;
     int field = fieldindex + 1;
@@ -7186,7 +7332,25 @@ void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, 
     if (subtoken > 0) {
         id += "S" + to_string(subtoken);
     }
-    object->SetUuid(id);
+    return id;
+}
+
+std::string HumdrumInput::getLocationId(const string &prefix, int lineindex, int fieldindex, int subtokenindex)
+{
+    int line = lineindex + 1;
+    int field = fieldindex + 1;
+    int subtoken = subtokenindex + 1;
+    std::string id = prefix;
+    if (line > 0) {
+        id += "-L" + to_string(line);
+    }
+    if (field > 0) {
+        id += "F" + to_string(field);
+    }
+    if (subtoken > 0) {
+        id += "S" + to_string(subtoken);
+    }
+    return id;
 }
 
 //////////////////////////////
