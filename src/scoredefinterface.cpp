@@ -27,6 +27,7 @@ ScoreDefInterface::ScoreDefInterface()
     : Interface()
     , AttCleffingLog()
     , AttCleffingVis()
+    , AttDurationDefault()
     , AttKeySigDefaultAnl()
     , AttKeySigDefaultLog()
     , AttKeySigDefaultVis()
@@ -40,6 +41,7 @@ ScoreDefInterface::ScoreDefInterface()
 {
     RegisterInterfaceAttClass(ATT_CLEFFINGLOG);
     RegisterInterfaceAttClass(ATT_CLEFFINGVIS);
+    RegisterInterfaceAttClass(ATT_DURATIONDEFAULT);
     RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTANL);
     RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTLOG);
     RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTVIS);
@@ -62,6 +64,7 @@ void ScoreDefInterface::Reset()
 {
     ResetCleffingLog();
     ResetCleffingVis();
+    ResetDurationDefault();
     ResetKeySigDefaultAnl();
     ResetKeySigDefaultLog();
     ResetKeySigDefaultVis();

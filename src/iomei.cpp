@@ -179,7 +179,7 @@ bool MeiOutput::WriteObject(Object *object)
         m_nodeStack.push_back(m_currentNode);
         return true;
     }
-    
+
     if (object->Is(PAGE)) {
         if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("page");
@@ -192,7 +192,7 @@ bool MeiOutput::WriteObject(Object *object)
             WriteMeiSystem(m_currentNode, dynamic_cast<System *>(object));
         }
     }
-    
+
     // System boundaries
     else if (object->Is(ENDING)) {
         m_currentNode = m_currentNode.append_child("ending");
@@ -214,7 +214,7 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("section");
         WriteMeiSection(m_currentNode, dynamic_cast<Section *>(object));
     }
-    
+
     // ScoreDef related
     else if (object->Is(LABEL)) {
         m_currentNode = m_currentNode.append_child("label");
@@ -763,7 +763,7 @@ void MeiOutput::WriteMeiLabel(pugi::xml_node currentNode, Label *label)
 
     WriteXmlId(currentNode, label);
 }
-    
+
 void MeiOutput::WriteMeiLabelAbbr(pugi::xml_node currentNode, LabelAbbr *labelAbbr)
 {
     assert(labelAbbr);
@@ -1345,6 +1345,7 @@ void MeiOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
 
     interface->WriteCleffingLog(element);
     interface->WriteCleffingVis(element);
+    interface->WriteDurationDefault(element);
     interface->WriteKeySigDefaultAnl(element);
     interface->WriteKeySigDefaultLog(element);
     interface->WriteKeySigDefaultVis(element);
@@ -1761,7 +1762,7 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "rend") {
             return true;
         }
-        
+
         else {
             return false;
         }
@@ -1774,7 +1775,7 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "rend") {
             return true;
         }
-        
+
         else {
             return false;
         }
@@ -2219,7 +2220,7 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
                     unmeasured = new Measure(false);
                     if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
                         UpgradeMeasureTo_3_0_0(unmeasured, system);
-                        
+
                     }
                     system->AddChild(unmeasured);
                 }
@@ -2327,7 +2328,7 @@ bool MeiInput::ReadMeiStaffGrp(Object *parent, pugi::xml_node staffGrp)
 
     StaffGrp *vrvStaffGrp = new StaffGrp();
     SetMeiUuid(staffGrp, vrvStaffGrp);
-    
+
     if (m_version < MEI_4_0_0) {
         UpgradeStaffGrpTo_4_0_0(staffGrp, vrvStaffGrp);
     }
@@ -2380,7 +2381,7 @@ bool MeiInput::ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef)
 
     StaffDef *vrvStaffDef = new StaffDef();
     ReadScoreDefElement(staffDef, vrvStaffDef);
-    
+
     if (m_version < MEI_4_0_0) {
         UpgradeStaffDefTo_4_0_0(staffDef, vrvStaffDef);
     }
@@ -2396,18 +2397,18 @@ bool MeiInput::ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef)
     if (!vrvStaffDef->HasN()) {
         LogWarning("No @n on <staffDef> might yield unpredictable results");
     }
-    
+
     ReadScoreDefInterface(staffDef, vrvStaffDef);
-    
+
     parent->AddChild(vrvStaffDef);
-    
+
     return ReadMeiStaffDefChildren(vrvStaffDef, staffDef);
 }
 
 bool MeiInput::ReadMeiStaffDefChildren(Object *parent, pugi::xml_node parentNode)
 {
     assert(dynamic_cast<StaffDef *>(parent) || dynamic_cast<EditorialElement *>(parent));
-    
+
     bool success = true;
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
@@ -3481,6 +3482,7 @@ bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
 {
     interface->ReadCleffingLog(element);
     interface->ReadCleffingVis(element);
+    interface->ReadDurationDefault(element);
     interface->ReadKeySigDefaultAnl(element);
     interface->ReadKeySigDefaultLog(element);
     interface->ReadKeySigDefaultVis(element);
@@ -4117,7 +4119,7 @@ bool MeiInput::IsEditorialElementName(std::string elementName)
     if (i != MeiInput::s_editorialElementNames.end()) return true;
     return false;
 }
-    
+
 void MeiInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef)
 {
     if (staffDef.attribute("label")) {
@@ -4137,7 +4139,7 @@ void MeiInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvSta
         staffDef.remove_attribute("label.abbr");
     }
 }
- 
+
 void MeiInput::UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvStaffGrp)
 {
     if (staffGrp.attribute("label")) {
@@ -4157,7 +4159,7 @@ void MeiInput::UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvSta
         staffGrp.remove_attribute("label.abbr");
     }
 }
-    
+
 void MeiInput::UpgradeMeasureTo_3_0_0(Measure *measure, System *system)
 {
     assert(measure);
@@ -4173,15 +4175,15 @@ void MeiInput::UpgradeMeasureTo_3_0_0(Measure *measure, System *system)
     measure->m_xAbs = system->m_systemLeftMar;
     measure->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;
 }
-    
+
 void MeiInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
 {
     assert(page);
     assert(doc);
-    
+
     // Once we have the GetPPU in Page through LibMEI, call this from Doc::SetDrawingPage and
     // use m_unit instead of DEFAULT_UNIT - For the upgraded call Page->SetPPU(12.5);
-    
+
     page->m_PPUFactor = (25.0 / 2.0 / DEFAULT_UNIT);
     // LogDebug("PPUFactor: %f", m_PPUFactor);
 }
