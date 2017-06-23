@@ -506,14 +506,14 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                         Text *text = new Text();
                         text->SetText(UTF8to16(partName));
                         label->AddChild(text);
-                        partStaffGrp->AddChild(label);
+                        staffDef->AddChild(label);
                     }
                     if (!partAbbr.empty()) {
                         LabelAbbr *labelAbbr = new LabelAbbr();
                         Text *text = new Text();
                         text->SetText(UTF8to16(partName));
                         labelAbbr->AddChild(text);
-                        partStaffGrp->AddChild(labelAbbr);
+                        staffDef->AddChild(labelAbbr);
                     }
                 }
                 m_staffGrpStack.back()->MoveChildrenFrom(partStaffGrp);
