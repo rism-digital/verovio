@@ -311,6 +311,10 @@ protected:
     void addSpace(std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HumNum duration);
     void setLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
     void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
+    std::string getLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
+	std::string getLocationId(Object *object, int lineindex, int fieldindex, int subtokenindex);
+	std::string getLocationId(const string& prefix, hum::HTp token, int subtoken);
+	std::string getLocationId(const string& prefix, int lineindex, int fieldindex, int subtokenindex);
     void setLocationIdNSuffix(vrv::Object *object, hum::HTp token, int number);
     void setSlurLocationId(vrv::Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex);
     void setTieLocationId(vrv::Object *object, hum::HTp tiestart, int sindex, hum::HTp tieend, int eindex);
@@ -338,6 +342,7 @@ protected:
     void embedQstampInClass(vrv::Note *note, hum::HTp token, const std::string &tstring);
     void embedPitchInformationInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
+    void splitSyllableBySpaces(vector<string> &vtext, char spacer = ' ');
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -351,14 +356,11 @@ protected:
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void setKeySig(ELEMENT element, const std::string &keysig);
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
-
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
-
     template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
-
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
-
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
+    template <class ELEMENT> void setN(ELEMENT element, int nvalue);
 
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);

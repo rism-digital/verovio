@@ -1046,7 +1046,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     params->m_currentCrossStaff = NULL;
     params->m_currentCrossLayer = NULL;
 
-    AttCommonNComparison comparisonFirst(STAFF, durElement->GetStaff().at(0));
+    AttNIntegerComparison comparisonFirst(STAFF, durElement->GetStaff().at(0));
     m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindChildByAttComparison(&comparisonFirst, 1));
     if (!m_crossStaff) {
         LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff().at(0),
@@ -1070,7 +1070,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     int layerN = parentLayer->GetN();
     // When we will have allowed @layer in <note>, we will have to do:
     // int layerN = durElement->HasLayer() ? durElement->GetLayer() : (*currentLayer)->GetN();
-    AttCommonNComparison comparisonFirstLayer(LAYER, layerN);
+    AttNIntegerComparison comparisonFirstLayer(LAYER, layerN);
     m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByAttComparison(&comparisonFirstLayer, 1));
     if (!m_crossLayer) {
         // Just try to pick the first one...

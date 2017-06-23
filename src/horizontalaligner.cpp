@@ -369,7 +369,7 @@ int GraceAligner::GetGraceGroupLeft(int staffN)
     // First we need to get the left alignment with an alignment reference with staffN
     Alignment *leftAlignment = NULL;
     if (staffN != VRV_UNSET) {
-        AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+        AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
         Object *reference = this->FindChildByAttComparison(&matchStaff);
         if (!reference) return -VRV_UNSET;
         // The alignment is its parent
@@ -462,7 +462,7 @@ void Alignment::AddChild(Object *child)
 
 AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
-    AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+    AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
     AlignmentReference *alignmentRef
         = dynamic_cast<AlignmentReference *>(this->FindChildByAttComparison(&matchStaff, 1));
     if (!alignmentRef) {
@@ -533,7 +533,7 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
 
     if (staffN != VRV_UNSET) {
         std::vector<AttComparison *> filters;
-        AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+        AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
         filters.push_back(&matchStaff);
         this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
     }
@@ -792,7 +792,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             params->m_graceCumulatedXShift = VRV_UNSET;
             filters.clear();
             // Create ad comparison object for each type / @n
-            AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
+            AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
             filters.push_back(&matchStaff);
 
             m_graceAligner->Process(
