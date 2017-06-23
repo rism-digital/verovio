@@ -25,6 +25,7 @@
 #include "fermata.h"
 #include "hairpin.h"
 #include "harm.h"
+#include "label.h"
 #include "layer.h"
 #include "measure.h"
 #include "mordent.h"
@@ -479,9 +480,20 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             int nbStaves = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
-                partStaffGrp->SetLabel(partName);
-                // FIXME MEI 4.0.0
-                // partStaffGrp->SetLabelAbbr(partAbbr);
+                if (!partName.empty()) {
+                    Label *label = new Label();
+                    Text *text = new Text();
+                    text->SetText(UTF8to16(partName));
+                    label->AddChild(text);
+                    partStaffGrp->AddChild(label);
+                }
+                if (!partAbbr.empty()) {
+                    LabelAbbr *labelAbbr = new LabelAbbr();
+                    Text *text = new Text();
+                    text->SetText(UTF8to16(partName));
+                    labelAbbr->AddChild(text);
+                    partStaffGrp->AddChild(labelAbbr);
+                }
                 partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
                 partStaffGrp->SetBarthru(BOOLEAN_true);
                 m_staffGrpStack.back()->AddChild(partStaffGrp);
@@ -489,9 +501,20 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             else {
                 StaffDef *staffDef = dynamic_cast<StaffDef *>(partStaffGrp->FindChildByType(STAFFDEF));
                 if (staffDef) {
-                    staffDef->SetLabel(partName);
-                    // FIXME MEI 4.0.0
-                    // staffDef->SetLabelAbbr(partAbbr);
+                    if (!partName.empty()) {
+                        Label *label = new Label();
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(partName));
+                        label->AddChild(text);
+                        staffDef->AddChild(label);
+                    }
+                    if (!partAbbr.empty()) {
+                        LabelAbbr *labelAbbr = new LabelAbbr();
+                        Text *text = new Text();
+                        text->SetText(UTF8to16(partName));
+                        labelAbbr->AddChild(text);
+                        staffDef->AddChild(labelAbbr);
+                    }
                 }
                 m_staffGrpStack.back()->MoveChildrenFrom(partStaffGrp);
                 delete partStaffGrp;
@@ -521,8 +544,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             measure = dynamic_cast<Measure *>(section->FindChildByAttComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
-            LogWarning(
-                "Element '%s' could not be added to measure '%s'", iter->second->GetClassName().c_str(), iter->first.c_str());
+            LogWarning("Element '%s' could not be added to measure '%s'", iter->second->GetClassName().c_str(),
+                iter->first.c_str());
             continue;
         }
         measure->AddChild(iter->second);
@@ -847,7 +870,8 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     return true;
 }
 
-    void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section, Measure *measure, std::string measureNum)
+void MusicXmlInput::ReadMusicXmlAttributes(
+    pugi::xml_node node, Section *section, Measure *measure, std::string measureNum)
 {
     assert(node);
     assert(section);
@@ -966,7 +990,7 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, st
     }
 }
 
-    void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, std::string measureNum)
+void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, std::string measureNum)
 {
     assert(node);
     assert(measure);
