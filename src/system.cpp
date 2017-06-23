@@ -162,6 +162,7 @@ void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
+    m_drawingScoreDef->SetParent(this);
 }
 
 //----------------------------------------------------------------------------

@@ -127,7 +127,7 @@ public:
     /**
      * Custom method for upgrading page-based page transcription data
      */
-    void UpgradePageBasedMEI(Doc *doc);
+    void UpgradePageBasedMEI2013(Doc *doc);
 
     //----------//
     // Functors //

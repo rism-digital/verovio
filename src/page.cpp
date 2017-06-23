@@ -450,7 +450,7 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
     }
 }
 
-void Page::UpgradePageBasedMEI(Doc *doc)
+void Page::UpgradePageBasedMEI2013(Doc *doc)
 {
     // Once we have the GetPPU in Page through LibMEI, call this from Doc::SetDrawingPage and
     // use m_unit instead of DEFAULT_UNIT - For the upgraded call Page->SetPPU(12.5);

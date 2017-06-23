@@ -56,6 +56,8 @@ class FloatingElement;
 class FTrem;
 class Hairpin;
 class Harm;
+class Label;
+class LabelAbbr;
 class Layer;
 class LayerElement;
 class Lem;
@@ -179,6 +181,8 @@ private:
     void WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
     void WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp);
     void WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef);
+    void WriteMeiLabel(pugi::xml_node currentNode, Label *label);
+    void WriteMeiLabelAbbr(pugi::xml_node currentNode, LabelAbbr *labelAbbr);
     void WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure);
     void WriteMeiFb(pugi::xml_node currentNode, Fb *fb);
     void WriteMeiStaff(pugi::xml_node currentNode, Staff *staff);
@@ -403,6 +407,9 @@ private:
     bool ReadMeiStaffGrp(Object *parent, pugi::xml_node staffGrp);
     bool ReadMeiStaffGrpChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef);
+    bool ReadMeiStaffDefChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeiLabel(Object *parent, pugi::xml_node label);
+    bool ReadMeiLabelAbbr(Object *parent, pugi::xml_node labelAbbr);
     bool ReadMeiMeasure(Object *parent, pugi::xml_node measure);
     bool ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiFb(Object *parent, pugi::xml_node fb);

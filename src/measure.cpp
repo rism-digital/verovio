@@ -266,7 +266,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     return staves;
 }
 
-void Measure::UpgradePageBasedMEI(System *system)
+void Measure::UpgradePageBasedMEI2013(System *system)
 {
     assert(!this->IsMeasuredMusic());
 

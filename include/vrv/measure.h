@@ -171,7 +171,7 @@ public:
     /**
      * Custom method for upgrading page-based unmeasured transcription data
      */
-    void UpgradePageBasedMEI(System *system);
+    void UpgradePageBasedMEI2013(System *system);
 
     /**
      * Check if the measure encloses the given time (in millisecond)
