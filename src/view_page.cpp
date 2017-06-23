@@ -24,6 +24,7 @@
 #include "fb.h"
 #include "functorparams.h"
 #include "keysig.h"
+#include "label.h"
 #include "layer.h"
 #include "measure.h"
 #include "mensur.h"
@@ -148,7 +149,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
         // Draw mesure number if > 1
         // This needs to be improved because we are now using (tuplet) oblique figures.
         // We should also have a better way to specify if the number has to be displayed or not
-        if ((measure->HasN()) && (measure->GetN() != "1")) {
+        if ((measure->HasN()) && (measure->GetN() != "0") && (measure->GetN() != "1")) {
             Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
             if (staff) {
                 FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
@@ -294,53 +295,55 @@ void View::DrawStaffGrp(
     x += barLineWidth / 2;
     // y_top += m_doc->GetDrawingStaffLineWidth(100) / 1;
     // y_bottom -= m_doc->GetDrawingStaffLineWidth(100) / 4;
+    
+    Label *label = dynamic_cast<Label*>(staffGrp->FindChildByType(LABEL, 1));
+    LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr*>(staffGrp->FindChildByType(LABELABBR, 1));
+    Object *graphic = label;
 
-    if (staffGrp->HasLabel()) {
-        std::string abbrLabel;
-        std::string label = staffGrp->GetLabel();
-        if (abbreviations) {
-            // FIXME MEI 4.0.0
-            // label = staffGrp->GetLabelAbbr();
+    std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
+    std::wstring labelStr = (label) ? label->GetText(label) : L"";
+    
+    if (abbreviations) {
+        labelStr = labelAbbrStr;
+        graphic = labelAbbr;
+    }
+
+    if (labelStr.length() != 0) {
+        // HARDCODED
+        int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
+        int x_label = x - space;
+        int y_label = y_bottom - (y_bottom - y_top) / 2 - m_doc->GetDrawingUnit(100);
+
+        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetFont(m_doc->GetDrawingLyricFont(100));
+
+        dc->GetTextExtent(labelStr, &extend);
+
+        bool setX = false;
+        bool setY = false;
+        
+        dc->StartGraphic(graphic, "", graphic->GetUuid());
+        
+        dc->StartText(ToDeviceContextX(x_label), ToDeviceContextY(y_label), RIGHT);
+        DrawTextChildren(dc, graphic, x_label, y_label, setX, setY);
+        dc->EndText();
+        
+        dc->EndGraphic(graphic, this);
+        
+        // keep the widest width for the system
+        System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+        if (system) {
+            system->SetDrawingLabelsWidth(extend.m_width + space);
         }
-        // We still store the abbreviated label for calculating max width with abbreviations (see below)
-        else {
-            // FIXME MEI 4.0.0
-            // abbrLabel = staffGrp->GetLabelAbbr();
+
+        // also store in the system the maximum width with abbreviations
+        if (system && !abbreviations && (labelAbbrStr.length() > 0)) {
+            dc->GetTextExtent(labelAbbrStr, &extend);
+            system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
         }
 
-        if (label.length() != 0) {
-            // HARDCODED
-            int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
-            int x_label = x - space;
-            int y_label = y_bottom - (y_bottom - y_top) / 2 - m_doc->GetDrawingUnit(100);
-
-            dc->SetBrush(m_currentColour, AxSOLID);
-            dc->SetFont(m_doc->GetDrawingLyricFont(100));
-
-            dc->GetTextExtent(label, &extend);
-
-            // keep the widest width for the system
-            System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
-            if (!system) {
-                LogDebug("Staff or System missing in View::DrawStaffDefLabels");
-            }
-            else {
-                system->SetDrawingLabelsWidth(extend.m_width + space);
-            }
-
-            dc->StartText(ToDeviceContextX(x_label), ToDeviceContextY(y_label), RIGHT);
-            dc->DrawText(label);
-            dc->EndText();
-
-            // also store in the system the maximum width with abbreviations
-            if (system && !abbreviations && (abbrLabel.length() > 0)) {
-                dc->GetTextExtent(abbrLabel, &extend);
-                system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
-            }
-
-            dc->ResetFont();
-            dc->ResetBrush();
-        }
+        dc->ResetFont();
+        dc->ResetBrush();
     }
 
     // actually draw the line, the brace or the bracket
@@ -398,20 +401,20 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
             ++iter;
             continue;
         }
-
-        std::string abbrLabel;
-        std::string label = staffDef->GetLabel();
+        
+        Label *label = dynamic_cast<Label*>(staffDef->FindChildByType(LABEL, 1));
+        LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr*>(staffDef->FindChildByType(LABELABBR, 1));
+        Object *graphic = label;
+        
+        std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
+        std::wstring labelStr = (label) ? label->GetText(label) : L"";
+        
         if (abbreviations) {
-            // FIXME MEI 4.0.0
-            // label = staffDef->GetLabelAbbr();
-        }
-        // We still store the abbreviated label for calculating max width with abbreviations (see below)
-        else {
-            // FIXME MEI 4.0.0
-            // abbrLabel = staffDef->GetLabelAbbr();
+            labelStr = labelAbbrStr;
+            graphic = labelAbbr;
         }
 
-        if (label.length() == 0) {
+        if (labelStr.length() == 0) {
             ++iter;
             continue;
         }
@@ -424,18 +427,25 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(m_doc->GetDrawingLyricFont(100));
+        
+        dc->GetTextExtent(labelStr, &extend);
+        
+        bool setX = false;
+        bool setY = false;
+        
+        dc->StartGraphic(graphic, "", graphic->GetUuid());
+        
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), RIGHT);
+        DrawTextChildren(dc, graphic, x, y, setX, setY);
+        dc->EndText();
+        
+        dc->EndGraphic(graphic, this);
 
         // keep the widest width for the system
-        dc->GetTextExtent(label, &extend);
         system->SetDrawingLabelsWidth(extend.m_width + space);
-
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), RIGHT);
-        dc->DrawText(label);
-        dc->EndText();
-
         // also store in the system the maximum width with abbreviations for justification
-        if (!abbreviations && (abbrLabel.length() > 0)) {
-            dc->GetTextExtent(abbrLabel, &extend);
+        if (!abbreviations && (labelAbbrStr.length() > 0)) {
+            dc->GetTextExtent(labelAbbrStr, &extend);
             system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
         }
 

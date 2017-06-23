@@ -17,6 +17,7 @@
 #include "editorial.h"
 #include "functorparams.h"
 #include "keysig.h"
+#include "label.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "system.h"
@@ -385,16 +386,12 @@ StaffGrp::StaffGrp()
     , ObjectListInterface()
     , AttBasic()
     , AttLabelled()
-    // FIXME MEI 4.0.0
-    //, AttLabelsAddl()
     , AttStaffGroupingSym()
     , AttStaffGrpVis()
     , AttTyped()
 {
     RegisterAttClass(ATT_BASIC);
     RegisterAttClass(ATT_LABELLED);
-    // FIXME MEI 4.0.0
-    // RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_STAFFGROUPINGSYM);
     RegisterAttClass(ATT_STAFFGRPVIS);
     RegisterAttClass(ATT_TYPED);
@@ -411,8 +408,6 @@ void StaffGrp::Reset()
     Object::Reset();
     ResetBasic();
     ResetLabelled();
-    // FIXME MEI 4.0.0
-    // ResetLabelsAddl();
     ResetStaffGroupingSym();
     ResetStaffGrpVis();
     ResetTyped();
@@ -425,6 +420,9 @@ void StaffGrp::AddChild(Object *child)
     }
     else if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<StaffGrp *>(child));
+    }
+    else if (child->Is(LABEL)) {
+        assert(dynamic_cast<Label *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
@@ -462,8 +460,6 @@ StaffDef::StaffDef()
     : ScoreDefElement("staffdef-")
     , AttDistances()
     , AttLabelled()
-    // FIXME MEI 4.0.0
-    //, AttLabelsAddl()
     , AttNInteger()
     , AttNotationType()
     , AttScalable()
@@ -472,8 +468,6 @@ StaffDef::StaffDef()
 {
     RegisterAttClass(ATT_DISTANCES);
     RegisterAttClass(ATT_LABELLED);
-    // FIXME MEI 4.0.0
-    // RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_NOTATIONTYPE);
     RegisterAttClass(ATT_SCALABLE);
@@ -493,13 +487,29 @@ void StaffDef::Reset()
     StaffDefDrawingInterface::Reset();
     ResetDistances();
     ResetLabelled();
-    // FIXME MEI 4.0.0
-    // ResetLabelsAddl();
     ResetNInteger();
     ResetNotationType();
     ResetScalable();
     ResetStaffDefLog();
     ResetTransposition();
+}
+    
+void StaffDef::AddChild(Object *child)
+{
+    if (child->Is(LABEL)) {
+        assert(dynamic_cast<Label *>(child));
+    }
+    else if (child->Is(LABELABBR)) {
+        assert(dynamic_cast<LabelAbbr *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
 }
 
 //----------------------------------------------------------------------------
