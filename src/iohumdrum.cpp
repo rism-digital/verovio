@@ -4281,23 +4281,20 @@ void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<
     tuplet->SetNum(tg.num * scale);
     tuplet->SetNumbase(tg.numbase * scale);
     if (suppress) {
-        // This shouldn't be needed, but just in case.
-        // The visibility of the bracket is determined
-        // earlier when there is a beam to attach
-        // the tuplet to.
         tuplet->SetBracketVisible(BOOLEAN_false);
     }
-    else {
-        if (tg.bracket) {
-            tuplet->SetBracketVisible(BOOLEAN_true);
-        }
-        else {
-            tuplet->SetBracketVisible(BOOLEAN_false);
-        }
-    }
+    // Brackets will be displayed automatically, so don't turn on:
+    // else {
+    //     if (tg.bracket) {
+    //         tuplet->SetBracketVisible(BOOLEAN_true);
+    //     }
+    //     else {
+    //         tuplet->SetBracketVisible(BOOLEAN_false);
+    //     }
+    // }
     if (suppress) {
         // Number is visible by default, so only hide
-        // it if necessary.
+        // if explicitly requested:
         tuplet->SetNumVisible(BOOLEAN_false);
     }
     hum::HumNum base = tg.numbase;
