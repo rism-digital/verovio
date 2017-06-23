@@ -35,10 +35,9 @@ bool View::OneBeamInTuplet(Tuplet *tuplet)
     assert(tuplet);
 
     Beam *currentBeam = NULL;
-    ArrayOfObjects elems;
 
     // Are we contained in a beam?
-    if (tuplet->GetFirstParent(BEAM, 1) && (tuplet->GetNoteCount() != 0)) {
+    if (tuplet->GetFirstParent(BEAM, MAX_BEAM_DEPTH)) {
         // is only the tuplet beamed and no other tuplet contained?
         currentBeam = dynamic_cast<Beam *>(tuplet->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
         if ((currentBeam->GetChildCount() == 1) && (tuplet->GetChildCount(TUPLET) == 0)) return true;
