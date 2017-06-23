@@ -266,20 +266,6 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     return staves;
 }
 
-void Measure::UpgradePageBasedMEI2013(System *system)
-{
-    assert(!this->IsMeasuredMusic());
-
-    if (system->m_yAbs == VRV_UNSET) return;
-    if (system->m_systemRightMar == VRV_UNSET) return;
-    if (system->m_systemRightMar == VRV_UNSET) return;
-
-    Page *page = dynamic_cast<Page *>(system->GetFirstParent(PAGE));
-    assert(page);
-    this->m_xAbs = system->m_systemLeftMar;
-    this->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;
-}
-
 int Measure::EnclosesTime(int time) const
 {
     int repeat = 1;

@@ -568,6 +568,18 @@ private:
     std::wstring RightTrim(std::wstring str);
     ///@}
 
+    /**
+     * @name Various methods for upgrading older MEI files
+     */
+    ///@{
+    // to MEI 4.0.0
+    void UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef);
+    void UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvStaffGrp);
+    // to MEI 3.0.0 (Page-Based MEI only)
+    void UpgradeMeasureTo_3_0_0(Measure *measure, System *system);
+    void UpgradePageTo_3_0_0(Page *page, Doc *doc);
+    ///@}
+    
 public:
     //
 private:

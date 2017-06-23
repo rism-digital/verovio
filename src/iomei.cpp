@@ -2094,7 +2094,7 @@ bool MeiInput::ReadMeiPage(pugi::xml_node page)
     SetMeiUuid(page, vrvPage);
 
     if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
-        vrvPage->UpgradePageBasedMEI2013(m_doc);
+        UpgradePageTo_3_0_0(vrvPage, m_doc);
     }
 
     if (page.attribute("page.height")) {
@@ -2217,8 +2217,10 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
                     System *system = dynamic_cast<System *>(parent);
                     assert(system);
                     unmeasured = new Measure(false);
-                    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013))
-                        unmeasured->UpgradePageBasedMEI2013(system);
+                    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
+                        UpgradeMeasureTo_3_0_0(unmeasured, system);
+                        
+                    }
                     system->AddChild(unmeasured);
                 }
                 else {
@@ -2326,24 +2328,8 @@ bool MeiInput::ReadMeiStaffGrp(Object *parent, pugi::xml_node staffGrp)
     StaffGrp *vrvStaffGrp = new StaffGrp();
     SetMeiUuid(staffGrp, vrvStaffGrp);
     
-    // Upgrade to MEI 4.0.0
     if (m_version < MEI_4_0_0) {
-        if (staffGrp.attribute("label")) {
-            Text *text = new Text();
-            text->SetText(UTF8to16(staffGrp.attribute("label").value()));
-            Label *label = new Label();
-            label->AddChild(text);
-            vrvStaffGrp->AddChild(label);
-            staffGrp.remove_attribute("label");
-        }
-        if (staffGrp.attribute("label.abbr")) {
-            Text *text = new Text();
-            text->SetText(UTF8to16(staffGrp.attribute("label.abbr").value()));
-            LabelAbbr *labelAbbr = new LabelAbbr();
-            labelAbbr->AddChild(text);
-            vrvStaffGrp->AddChild(labelAbbr);
-            staffGrp.remove_attribute("label.abbr");
-        }
+        UpgradeStaffGrpTo_4_0_0(staffGrp, vrvStaffGrp);
     }
 
     vrvStaffGrp->ReadBasic(staffGrp);
@@ -2395,24 +2381,8 @@ bool MeiInput::ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef)
     StaffDef *vrvStaffDef = new StaffDef();
     ReadScoreDefElement(staffDef, vrvStaffDef);
     
-    // Upgrade to MEI 4.0.0
     if (m_version < MEI_4_0_0) {
-        if (staffDef.attribute("label")) {
-            Text *text = new Text();
-            text->SetText(UTF8to16(staffDef.attribute("label").value()));
-            Label *label = new Label();
-            label->AddChild(text);
-            vrvStaffDef->AddChild(label);
-            staffDef.remove_attribute("label");
-        }
-        if (staffDef.attribute("label.abbr")) {
-            Text *text = new Text();
-            text->SetText(UTF8to16(staffDef.attribute("label.abbr").value()));
-            LabelAbbr *labelAbbr = new LabelAbbr();
-            labelAbbr->AddChild(text);
-            vrvStaffDef->AddChild(labelAbbr);
-            staffDef.remove_attribute("label.abbr");
-        }
+        UpgradeStaffDefTo_4_0_0(staffDef, vrvStaffDef);
     }
 
     vrvStaffDef->ReadDistances(staffDef);
@@ -4147,5 +4117,74 @@ bool MeiInput::IsEditorialElementName(std::string elementName)
     if (i != MeiInput::s_editorialElementNames.end()) return true;
     return false;
 }
+    
+void MeiInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef)
+{
+    if (staffDef.attribute("label")) {
+        Text *text = new Text();
+        text->SetText(UTF8to16(staffDef.attribute("label").value()));
+        Label *label = new Label();
+        label->AddChild(text);
+        vrvStaffDef->AddChild(label);
+        staffDef.remove_attribute("label");
+    }
+    if (staffDef.attribute("label.abbr")) {
+        Text *text = new Text();
+        text->SetText(UTF8to16(staffDef.attribute("label.abbr").value()));
+        LabelAbbr *labelAbbr = new LabelAbbr();
+        labelAbbr->AddChild(text);
+        vrvStaffDef->AddChild(labelAbbr);
+        staffDef.remove_attribute("label.abbr");
+    }
+}
+ 
+void MeiInput::UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvStaffGrp)
+{
+    if (staffGrp.attribute("label")) {
+        Text *text = new Text();
+        text->SetText(UTF8to16(staffGrp.attribute("label").value()));
+        Label *label = new Label();
+        label->AddChild(text);
+        vrvStaffGrp->AddChild(label);
+        staffGrp.remove_attribute("label");
+    }
+    if (staffGrp.attribute("label.abbr")) {
+        Text *text = new Text();
+        text->SetText(UTF8to16(staffGrp.attribute("label.abbr").value()));
+        LabelAbbr *labelAbbr = new LabelAbbr();
+        labelAbbr->AddChild(text);
+        vrvStaffGrp->AddChild(labelAbbr);
+        staffGrp.remove_attribute("label.abbr");
+    }
+}
+    
+void MeiInput::UpgradeMeasureTo_3_0_0(Measure *measure, System *system)
+{
+    assert(measure);
+    assert(system);
+    assert(!measure->IsMeasuredMusic());
+
+    if (system->m_yAbs == VRV_UNSET) return;
+    if (system->m_systemRightMar == VRV_UNSET) return;
+    if (system->m_systemRightMar == VRV_UNSET) return;
+
+    Page *page = dynamic_cast<Page *>(system->GetFirstParent(PAGE));
+    assert(page);
+    measure->m_xAbs = system->m_systemLeftMar;
+    measure->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;
+}
+    
+void MeiInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
+{
+    assert(page);
+    assert(doc);
+    
+    // Once we have the GetPPU in Page through LibMEI, call this from Doc::SetDrawingPage and
+    // use m_unit instead of DEFAULT_UNIT - For the upgraded call Page->SetPPU(12.5);
+    
+    page->m_PPUFactor = (25.0 / 2.0 / DEFAULT_UNIT);
+    // LogDebug("PPUFactor: %f", m_PPUFactor);
+}
+
 
 } // namespace vrv

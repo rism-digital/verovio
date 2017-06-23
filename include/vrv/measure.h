@@ -169,11 +169,6 @@ public:
     std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
 
     /**
-     * Custom method for upgrading page-based unmeasured transcription data
-     */
-    void UpgradePageBasedMEI2013(System *system);
-
-    /**
      * Check if the measure encloses the given time (in millisecond)
      * Return the playing repeat time (1-based), 0 otherwise
      */
