@@ -343,6 +343,8 @@ protected:
     void embedPitchInformationInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
     void splitSyllableBySpaces(vector<string> &vtext, char spacer = ' ');
+    void setInstrumentName(vrv::StaffDef *staffdef, const string &name);
+    void setInstrumentAbbreviation(vrv::StaffDef *staffdef, const string &name);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);

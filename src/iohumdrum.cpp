@@ -52,6 +52,7 @@
 #include "hairpin.h"
 #include "harm.h"
 #include "iomei.h"
+#include "label.h"
 #include "layer.h"
 #include "measure.h"
 #include "mordent.h"
@@ -381,7 +382,7 @@ bool HumdrumInput::ImportString(std::string const &content)
         }
 
         bool result;
-        if (comma < tab) {
+        if (comma <= tab) {
             result = infile.readString(content);
         }
         else {
@@ -1292,13 +1293,13 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     if (label.size() > 0) {
-        m_staffdef.back()->SetLabel(label);
+        // 300: m_staffdef.back()->SetLabel(label);
+        setInstrumentName(m_staffdef.back(), label);
     }
 
     if (abbreviation.size() > 0) {
-        // 400
-        // currently no label in MEI 4.0.0 branch, so add back later:
-        // m_staffdef.back()->SetLabelAbbr(abbreviation);
+        // 300: m_staffdef.back()->SetLabelAbbr(abbreviation);
+        setInstrumentAbbreviation(m_staffdef.back(), abbreviation);
     }
 
     if (keysig.size() > 0) {
@@ -1328,6 +1329,34 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     addInstrumentDefinition(m_staffdef.back(), partstart);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setInstrumentName --
+//
+
+void HumdrumInput::setInstrumentName(vrv::StaffDef *staffdef, const string &name)
+{
+    Label *label = new Label();
+    Text *text = new Text;
+    text->SetText(UTF8to16(name));
+    label->AddChild(text);
+    staffdef->AddChild(label);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setInstrumentAbbreviation --
+//
+
+void HumdrumInput::setInstrumentAbbreviation(vrv::StaffDef *staffdef, const string &name)
+{
+    LabelAbbr *label = new LabelAbbr();
+    Text *text = new Text;
+    text->SetText(UTF8to16(name));
+    label->AddChild(text);
+    staffdef->AddChild(label);
 }
 
 //////////////////////////////
