@@ -1238,7 +1238,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     
     /************ Draw slash ************/
     
-    if (stem->GetGrace() == GRACE_unacc) {
+    if ((stem->GetGrace() == GRACE_unacc) && !stem->IsInBeam()) {
         DrawAcciaccaturaSlash(dc, stem, staff);
     }
 
