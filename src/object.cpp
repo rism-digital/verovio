@@ -1030,8 +1030,8 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
         // setting the layer stem direction. Alternatively, this could be done in
         // View::DrawLayer. If this (and other things) is kept here, renaming the method to something
         // more generic (PrepareDrawing?) might be a good idea...
-        if (layer->GetParent()->GetChildCount() > 1) {
-            if (layer->GetParent()->GetChildIndex(layer) == 0) {
+        if (layer->GetParent()->GetChildCount(LAYER) > 1) {
+            if (layer->GetParent()->FindChildByType(LAYER) == layer) {
                 layer->SetDrawingStemDir(STEMDIRECTION_up);
             }
             else {

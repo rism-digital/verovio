@@ -735,7 +735,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             loc = staff->m_drawingLines - 1;
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
-            bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
+            bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
@@ -772,7 +772,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             loc = staff->m_drawingLines - 1;
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
-            bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
+            bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
