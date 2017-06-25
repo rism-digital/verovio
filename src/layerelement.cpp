@@ -735,7 +735,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             loc = staff->m_drawingLines - 1;
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
-            bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
+            bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
@@ -772,7 +772,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             loc = staff->m_drawingLines - 1;
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
-            bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
+            bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
@@ -806,7 +806,9 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
 
     // These are the only ones we want to keep for further collision detection
     // Eventually  we also need stem for overlapping voices
-    if (this->Is({ DOTS, NOTE }) && this->HasUpdatedBB()) params->m_current.push_back(this);
+    if (this->Is({ DOTS, NOTE }) && this->HasUpdatedBB()) {
+        params->m_current.push_back(this);
+    }
 
     // We are processing the first layer, nothing to do yet
     if (params->m_previous.empty()) return FUNCTOR_SIBLINGS;
@@ -865,7 +867,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
             if (xRelShift > 0) {
                 if (params->m_currentChord)
                     params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + xRelShift);
-                else
+                else if (params->m_currentNote)
                     params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + xRelShift);
             }
         }
