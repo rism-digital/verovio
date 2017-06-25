@@ -5769,7 +5769,7 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             splitSyllableBySpaces(vtexts);
         }
 
-        for (int j = 0; j < vtexts.size(); j++) {
+        for (int j = 0; j < (int)vtexts.size(); j++) {
             content = vtexts[j];
             versenum++;
             if (content == "") {
