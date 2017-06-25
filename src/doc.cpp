@@ -22,6 +22,7 @@
 #include "functorparams.h"
 #include "glyph.h"
 #include "keysig.h"
+#include "label.h"
 #include "layer.h"
 #include "measure.h"
 #include "mensur.h"
@@ -232,7 +233,9 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
             midiTrack = staffDef->GetN();
             midiFile->addTrack();
-            if (staffDef->HasLabel()) midiFile->addTrackName(midiTrack, 0, staffDef->GetLabel());
+            Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
+            std::string trackName = UTF16to8(label->GetText(label)).c_str();
+            if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
         }
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {

@@ -424,6 +424,9 @@ void StaffGrp::AddChild(Object *child)
     else if (child->Is(LABEL)) {
         assert(dynamic_cast<Label *>(child));
     }
+    else if (child->Is(LABELABBR)) {
+        assert(dynamic_cast<LabelAbbr *>(child));
+    }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
     }
@@ -493,7 +496,7 @@ void StaffDef::Reset()
     ResetStaffDefLog();
     ResetTransposition();
 }
-    
+
 void StaffDef::AddChild(Object *child)
 {
     if (child->Is(LABEL)) {
