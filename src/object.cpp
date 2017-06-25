@@ -76,9 +76,14 @@ Object::Object(const Object &object) : BoundingBox(object)
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
     m_parent = NULL;
     m_classid = object.m_classid;
+    m_attClasses = object.m_attClasses;
+    m_interfaces = object.m_interfaces;
     m_isReferencObject = object.m_isReferencObject;
-    m_uuid = object.m_uuid; // for now copy the uuid - to be decided
     m_isModified = true;
+    // For now do now copy them
+    // m_uuid = object.m_uuid;
+    // m_unsupported = object.m_unsupported;
+    
     int i;
     for (i = 0; i < (int)object.m_children.size(); i++) {
         Object *current = object.m_children.at(i);
@@ -97,10 +102,14 @@ Object &Object::operator=(const Object &object)
         ResetBoundingBox(); // It does not make sense to keep the values of the BBox
         m_parent = NULL;
         m_classid = object.m_classid;
+        m_attClasses = object.m_attClasses;
+        m_interfaces = object.m_interfaces;
         m_isReferencObject = object.m_isReferencObject;
-        m_uuid = object.m_uuid; // for now copy the uuid - to be decided
         m_isModified = true;
-
+        // For now do now copy them
+        // m_uuid = object.m_uuid;
+        // m_unsupported = object.m_unsupported;
+        
         int i;
         for (i = 0; i < (int)object.m_children.size(); i++) {
             Object *current = object.m_children.at(i);

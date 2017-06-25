@@ -163,14 +163,17 @@ bool LayerElement::IsInFTrem()
 
 Beam *LayerElement::IsInBeam()
 {
-    if (!this->Is(NOTE) && !this->Is(CHORD)) return NULL;
+    if (!this->Is({CHORD, NOTE, STEM})) return NULL;
     Beam *beamParent = dynamic_cast<Beam *>(this->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
     if (beamParent != NULL) {
-        // This note is beamed and cue-sized
+        // This note is beamed and cue-sized - we will be able to get rid of this once MEI has a better modeling for
+        // beamed grace notes
         if (this->IsGraceNote()) {
+            LayerElement *graceNote = this;
+            if (this->Is(STEM)) graceNote = dynamic_cast<LayerElement *>(this->GetFirstParent(NOTE, MAX_BEAM_DEPTH));
             // If the note is part of the beam parent, this means we
             // have a beam of graced notes
-            if (beamParent->GetListIndex(this) > -1) return beamParent;
+            if (beamParent->GetListIndex(graceNote) > -1) return beamParent;
             // otherwise it is a non-beamed grace note within a beam - will return false
         }
         else {

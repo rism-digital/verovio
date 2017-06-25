@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jun 21 16:06:58 CEST 2017
+// Last Modified: Fri Jun 23 19:27:01 CEST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2809,6 +2809,7 @@ class HumGrid : public vector<GridMeasure*> {
 		void cleanupManipulators            (void);
 		void cleanManipulator               (vector<GridSlice*>& newslices, 
 		                                     GridSlice* curr);
+		GridSlice* checkManipulatorExpand   (GridSlice* curr);
 		GridSlice* checkManipulatorContract (GridSlice* curr);
 		void transferMerges                 (GridStaff* oldstaff,
 		                                     GridStaff* oldlaststaff,
@@ -4042,7 +4043,7 @@ class Tool_imitation : public HumTool {
 		                            vector<vector<NoteCell*>>& attacks,
 		                            vector<vector<double>>& intervals,
 		                            HumdrumFile& infile, bool debug);
-		void    analyzeImmitation  (vector<vector<string>>& results,
+		void    analyzeImitation  (vector<vector<string>>& results,
 		                            vector<vector<NoteCell*>>& attacks,
 		                            vector<vector<double>>& intervals,
 		                            int v1, int v2);

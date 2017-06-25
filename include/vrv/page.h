@@ -124,11 +124,6 @@ public:
      */
     int GetContentWidth() const;
 
-    /**
-     * Custom method for upgrading page-based page transcription data
-     */
-    void UpgradePageBasedMEI(Doc *doc);
-
     //----------//
     // Functors //
     //----------//
@@ -169,6 +164,11 @@ public:
      * The value is initialized by the Object::SetCurrentScoreDef functor.
      */
     ScoreDef m_drawingScoreDef;
+    
+    /**
+     * Temporary member that will be replace by its LibMEI equivalent in the next version of the page-based MEI
+     */
+    double m_PPUFactor;
 
 private:
     /**
@@ -177,11 +177,6 @@ private:
      * the force parameter is set.
      */
     bool m_layoutDone;
-
-    /**
-     *
-     */
-    double m_PPUFactor;
 };
 
 } // namespace vrv
