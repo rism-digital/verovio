@@ -64,8 +64,6 @@ public:
     ///@{
     virtual int GetDrawingY() const;
 
-    int GetLayerCount() const { return (int)m_children.size(); }
-
     /**
      * Return the index position of the staff in its measure parent
      */

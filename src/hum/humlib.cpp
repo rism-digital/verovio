@@ -10861,7 +10861,7 @@ bool HumdrumFileBase::analyzeNonNullDataTokens(void) {
 		}
 	}
 
-	// Eventually set the foward and backward non-null data token for
+	// Eventually set the forward and backward non-null data token for
 	// tokens in spines for all types of line types  For now specify
 	// the next non-null data token for the exclusive interpretation token.
 	// Also this implementation does not consider that the first

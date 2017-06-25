@@ -394,6 +394,24 @@ int Layer::PrepareRpt(FunctorParams *functorParams)
     }
     return FUNCTOR_CONTINUE;
 }
+    
+int Layer::CalcStem(FunctorParams *functorParams)
+{
+    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
+    assert(params);
+
+    // setting the layer stem direction
+    if (this->GetParent()->GetChildCount(LAYER) > 1) {
+        if (this->GetParent()->FindChildByType(LAYER) == this) {
+            this->SetDrawingStemDir(STEMDIRECTION_up);
+        }
+        else {
+            this->SetDrawingStemDir(STEMDIRECTION_down);
+        }
+    }
+    
+    return FUNCTOR_CONTINUE;
+}
 
 int Layer::AdjustSylSpacing(FunctorParams *functorParams)
 {

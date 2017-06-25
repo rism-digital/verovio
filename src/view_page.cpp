@@ -295,14 +295,14 @@ void View::DrawStaffGrp(
     x += barLineWidth / 2;
     // y_top += m_doc->GetDrawingStaffLineWidth(100) / 1;
     // y_bottom -= m_doc->GetDrawingStaffLineWidth(100) / 4;
-    
-    Label *label = dynamic_cast<Label*>(staffGrp->FindChildByType(LABEL, 1));
-    LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr*>(staffGrp->FindChildByType(LABELABBR, 1));
+
+    Label *label = dynamic_cast<Label *>(staffGrp->FindChildByType(LABEL, 1));
+    LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(staffGrp->FindChildByType(LABELABBR, 1));
     Object *graphic = label;
 
     std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
     std::wstring labelStr = (label) ? label->GetText(label) : L"";
-    
+
     if (abbreviations) {
         labelStr = labelAbbrStr;
         graphic = labelAbbr;
@@ -321,15 +321,15 @@ void View::DrawStaffGrp(
 
         bool setX = false;
         bool setY = false;
-        
+
         dc->StartGraphic(graphic, "", graphic->GetUuid());
-        
+
         dc->StartText(ToDeviceContextX(x_label), ToDeviceContextY(y_label), RIGHT);
         DrawTextChildren(dc, graphic, x_label, y_label, setX, setY);
         dc->EndText();
-        
+
         dc->EndGraphic(graphic, this);
-        
+
         // keep the widest width for the system
         System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
         if (system) {
@@ -401,14 +401,14 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
             ++iter;
             continue;
         }
-        
-        Label *label = dynamic_cast<Label*>(staffDef->FindChildByType(LABEL, 1));
-        LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr*>(staffDef->FindChildByType(LABELABBR, 1));
+
+        Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
+        LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(staffDef->FindChildByType(LABELABBR, 1));
         Object *graphic = label;
-        
+
         std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
         std::wstring labelStr = (label) ? label->GetText(label) : L"";
-        
+
         if (abbreviations) {
             labelStr = labelAbbrStr;
             graphic = labelAbbr;
@@ -427,18 +427,18 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(m_doc->GetDrawingLyricFont(100));
-        
+
         dc->GetTextExtent(labelStr, &extend);
-        
+
         bool setX = false;
         bool setY = false;
-        
+
         dc->StartGraphic(graphic, "", graphic->GetUuid());
-        
+
         dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), RIGHT);
         DrawTextChildren(dc, graphic, x, y, setX, setY);
         dc->EndText();
-        
+
         dc->EndGraphic(graphic, this);
 
         // keep the widest width for the system
