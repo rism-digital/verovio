@@ -233,7 +233,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
             midiTrack = staffDef->GetN();
             midiFile->addTrack();
-            Label *label = dynamic_cast<Label*>(staffDef->FindChildByType(LABEL, 1));
+            Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
             std::string trackName = UTF16to8(label->GetText(label)).c_str();
             if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
         }
