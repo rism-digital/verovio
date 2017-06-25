@@ -309,7 +309,7 @@ void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTim
 
     int currentTempo = -1000;
     int newTempo;
-    int mapsize = realTimeToScoreTime.size();
+    int mapsize = (int)realTimeToScoreTime.size();
     output = "";
     output.reserve(mapsize * 100); // Estimate 100 characters for each entry.
     output += "[\n";
@@ -340,7 +340,7 @@ void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTim
                 output += "\"";
                 output += iton->second[ion];
                 output += "\"";
-                if (ion < iton->second.size() - 1) {
+                if (ion < (int)iton->second.size() - 1) {
                     output += ", ";
                 }
             }
@@ -354,7 +354,7 @@ void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTim
                 output += "\"";
                 output += itoff->second[ioff];
                 output += "\"";
-                if (ioff < itoff->second.size() - 1) {
+                if (ioff < (int)itoff->second.size() - 1) {
                     output += ", ";
                 }
             }
