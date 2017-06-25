@@ -1027,17 +1027,6 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     if (this->Is(LAYER)) {
         Layer *layer = dynamic_cast<Layer *>(this);
         assert(layer);
-        // setting the layer stem direction. Alternatively, this could be done in
-        // View::DrawLayer. If this (and other things) is kept here, renaming the method to something
-        // more generic (PrepareDrawing?) might be a good idea...
-        if (layer->GetParent()->GetChildCount(LAYER) > 1) {
-            if (layer->GetParent()->FindChildByType(LAYER) == layer) {
-                layer->SetDrawingStemDir(STEMDIRECTION_up);
-            }
-            else {
-                layer->SetDrawingStemDir(STEMDIRECTION_down);
-            }
-        }
         if (params->m_doc->GetType() != Transcription) layer->SetDrawingStaffDefValues(params->m_currentStaffDef);
         return FUNCTOR_CONTINUE;
     }
