@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jun 23 19:27:01 CEST 2017
+// Last Modified: Sun Jun 25 15:16:51 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -32636,7 +32636,7 @@ void Tool_imitation::getIntervals(vector<double>& intervals,
 
 	if (getBoolean("debug")) {
 		cout << endl;
-		for (int i=0; i<intervals.size(); i++) {
+		for (int i=0; i<(int)intervals.size(); i++) {
 			cout << "INTERVAL " << i << "\t=\t" << intervals[i] << "\tATK " << attacks[i]->getSgnDiatonicPitch() << "\t" << attacks[i]->getToken() << endl;
 		}
 	}
