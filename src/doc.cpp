@@ -184,6 +184,16 @@ void Doc::CalculateMidiTimemap()
 {
     m_hasMidiTimemap = false;
 
+    // This happens if the document was never cast off (no-layout option in the toolkit)
+    if (!m_drawingPage && GetChildCount() == 1) {
+        Page *page = this->SetDrawingPage(0);
+        if (!page) {
+            return;
+        }
+        this->CollectScoreDefs();
+        page->LayOutHorizontally();
+    }
+
     int tempo = 120;
 
     // Set tempo
@@ -260,6 +270,11 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             midiTrack = staffDef->GetN();
             midiFile->addTrack();
             Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
+            if (!label) {
+                StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDef->GetFirstParent(STAFFGRP));
+                assert(staffGrp);
+                label = dynamic_cast<Label *>(staffGrp->FindChildByType(LABEL, 1));
+            }
             if (label) {
                 std::string trackName = UTF16to8(label->GetText(label)).c_str();
                 if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
