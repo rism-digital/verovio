@@ -116,12 +116,12 @@ public:
     /**
      * Creates a midi file, opens it, and returns it (base64 encoded).
      */
-    std::string RenderToMidi(void);
+    std::string RenderToMidi();
 
     /**
      * Creates a timemap file, and return it as a JSON string.
      */
-    std::string RenderToTimemap(void);
+    std::string RenderToTimemap();
     bool RenderToTimemapFile(const std::string &filename);
 
     const char *GetHumdrumBuffer();

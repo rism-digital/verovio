@@ -916,7 +916,7 @@ void Toolkit::GetHumdrum(ostream &output)
     output << GetHumdrumBuffer();
 }
 
-std::string Toolkit::RenderToMidi(void)
+std::string Toolkit::RenderToMidi()
 {
     MidiFile outputfile;
     outputfile.absoluteTicks();
@@ -931,7 +931,7 @@ std::string Toolkit::RenderToMidi(void)
     return outputstr;
 }
 
-std::string Toolkit::RenderToTimemap(void)
+std::string Toolkit::RenderToTimemap()
 {
     std::string output;
     m_doc.ExportTimemap(output);
