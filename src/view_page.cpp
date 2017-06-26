@@ -1208,6 +1208,10 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
     // if (element->m_visibility == Visible) {
     //    DrawSystemChildren(dc, element, system);
     //}
+    if (element->Is(ANNOT)) {
+        Annot *annot = dynamic_cast<Annot *>(element);
+        dc->AddDescription(UTF16to8(annot->GetText(annot)).c_str());
+    }
     dc->EndGraphic(element, this);
 }
 
@@ -1223,6 +1227,10 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
     if (element->m_visibility == Visible) {
         DrawMeasureChildren(dc, element, measure, system);
     }
+    if (element->Is(ANNOT)) {
+        Annot *annot = dynamic_cast<Annot *>(element);
+        dc->AddDescription(UTF16to8(annot->GetText(annot)).c_str());
+    }
     dc->EndGraphic(element, this);
 }
 
@@ -1237,6 +1245,10 @@ void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *elemen
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
         DrawStaffChildren(dc, element, staff, measure);
+    }
+    if (element->Is(ANNOT)) {
+        Annot *annot = dynamic_cast<Annot *>(element);
+        dc->AddDescription(UTF16to8(annot->GetText(annot)).c_str());
     }
     dc->EndGraphic(element, this);
 }
@@ -1254,6 +1266,10 @@ void View::DrawLayerEditorialElement(
     if (element->m_visibility == Visible) {
         DrawLayerChildren(dc, element, layer, staff, measure);
     }
+    if (element->Is(ANNOT)) {
+        Annot *annot = dynamic_cast<Annot *>(element);
+        dc->AddDescription(UTF16to8(annot->GetText(annot)).c_str());
+    }
     dc->EndGraphic(element, this);
 }
 
@@ -1269,6 +1285,10 @@ void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element
     if (element->m_visibility == Visible) {
         DrawTextChildren(dc, element, x, y, setX, setY);
     }
+    if (element->Is(ANNOT)) {
+        Annot *annot = dynamic_cast<Annot *>(element);
+        dc->AddDescription(UTF16to8(annot->GetText(annot)).c_str());
+    }
     dc->EndTextGraphic(element, this);
 }
 
@@ -1283,6 +1303,10 @@ void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, 
     dc->StartTextGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
         DrawFbChildren(dc, element, x, y, setX, setY);
+    }
+    if (element->Is(ANNOT)) {
+        Annot *annot = dynamic_cast<Annot *>(element);
+        dc->AddDescription(UTF16to8(annot->GetText(annot)).c_str());
     }
     dc->EndTextGraphic(element, this);
 }
