@@ -179,6 +179,16 @@ bool Doc::GenerateDocumentScoreDef()
 
 void Doc::ExportMIDI(MidiFile *midiFile)
 {
+    // This happens if the document was never cast off (no-layout option in the toolkit)
+    if (!m_drawingPage && GetChildCount() == 1) {
+        Page *page = this->SetDrawingPage(0);
+        if (!page) {
+            return;
+        }
+        this->CollectScoreDefs();
+        page->LayOutHorizontally();
+    }
+    
     int tempo = 120;
 
     // Set tempo

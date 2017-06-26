@@ -337,8 +337,8 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    // If we output svg or do not request no layout to be performed then we need the font
-    if ((outformat == "svg") || !toolkit.GetNoLayout()) {
+    // If we output svg or midi then we need the font for the layout alignment
+    if ((outformat == "svg") || (outformat == "midi")) {
         // Make sure the user uses a valid Resource path
         // Save many headaches for empty SVGs
         if (!dir_exists(vrv::Resources::GetPath())) {
