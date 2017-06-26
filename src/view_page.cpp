@@ -1210,7 +1210,7 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
     //}
     if (element->Is(ANNOT)) {
         Annot *annot = dynamic_cast<Annot *>(element);
-        dc->AddDescription(UTF16to8(annot->GetText(annot)).c_str());
+        dc->AddDescription(UTF16to8(annot->GetText(annot)));
     }
     dc->EndGraphic(element, this);
 }
@@ -1229,7 +1229,7 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
     }
     if (element->Is(ANNOT)) {
         Annot *annot = dynamic_cast<Annot *>(element);
-        dc->AddDescription(UTF16to8(annot->GetText(annot)).c_str());
+        dc->AddDescription(UTF16to8(annot->GetText(annot)));
     }
     dc->EndGraphic(element, this);
 }
@@ -1248,7 +1248,7 @@ void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *elemen
     }
     if (element->Is(ANNOT)) {
         Annot *annot = dynamic_cast<Annot *>(element);
-        dc->AddDescription(UTF16to8(annot->GetText(annot)).c_str());
+        dc->AddDescription(UTF16to8(annot->GetText(annot)));
     }
     dc->EndGraphic(element, this);
 }
@@ -1268,7 +1268,7 @@ void View::DrawLayerEditorialElement(
     }
     if (element->Is(ANNOT)) {
         Annot *annot = dynamic_cast<Annot *>(element);
-        dc->AddDescription(UTF16to8(annot->GetText(annot)).c_str());
+        dc->AddDescription(UTF16to8(annot->GetText(annot)));
     }
     dc->EndGraphic(element, this);
 }
@@ -1287,7 +1287,7 @@ void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element
     }
     if (element->Is(ANNOT)) {
         Annot *annot = dynamic_cast<Annot *>(element);
-        dc->AddDescription(UTF16to8(annot->GetText(annot)).c_str());
+        dc->AddDescription(UTF16to8(annot->GetText(annot)));
     }
     dc->EndTextGraphic(element, this);
 }
@@ -1306,7 +1306,7 @@ void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, 
     }
     if (element->Is(ANNOT)) {
         Annot *annot = dynamic_cast<Annot *>(element);
-        dc->AddDescription(UTF16to8(annot->GetText(annot)).c_str());
+        dc->AddDescription(UTF16to8(annot->GetText(annot)));
     }
     dc->EndTextGraphic(element, this);
 }
