@@ -260,8 +260,10 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             midiTrack = staffDef->GetN();
             midiFile->addTrack();
             Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
-            std::string trackName = UTF16to8(label->GetText(label)).c_str();
-            if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
+            if (label) {
+                std::string trackName = UTF16to8(label->GetText(label)).c_str();
+                if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
+            }
         }
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
