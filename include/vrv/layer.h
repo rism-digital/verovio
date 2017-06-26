@@ -155,6 +155,11 @@ public:
     virtual int PrepareRpt(FunctorParams *functorParams);
 
     /**
+     * See Object::CalcStem
+     */
+    virtual int CalcStem(FunctorParams *functorParams);
+
+    /**
      * See Object::AdjustSylSpacing
      */
     virtual int AdjustSylSpacing(FunctorParams *functorParams);

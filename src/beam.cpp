@@ -551,6 +551,11 @@ void Beam::InitCoords(ListOfObjects *childList)
 
     // We look only at the last note for checking if cue-sized. Somehow arbitrarily
     m_drawingParams.m_cueSize = m_beamElementCoords.at(last)->m_element->IsCueSize();
+
+    // Always set stem diretion to up for grace note beam unless stem direction is provided
+    if (this->m_drawingParams.m_cueSize && (this->m_drawingParams.m_stemDir == STEMDIRECTION_NONE)) {
+        this->m_drawingParams.m_stemDir = STEMDIRECTION_up;
+    }
 }
 
 void Beam::ClearCoords()

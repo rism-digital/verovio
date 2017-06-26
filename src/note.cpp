@@ -408,6 +408,9 @@ int Note::CalcStem(FunctorParams *functorParams)
     if (stem->HasStemDir()) {
         stemDir = stem->GetStemDir();
     }
+    else if (this->IsGraceNote()) {
+        stemDir = STEMDIRECTION_up;
+    }
     else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
         stemDir = layer->GetDrawingStemDir();
     }

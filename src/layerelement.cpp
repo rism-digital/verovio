@@ -170,14 +170,17 @@ bool LayerElement::IsInFTrem()
 
 Beam *LayerElement::IsInBeam()
 {
-    if (!this->Is(NOTE) && !this->Is(CHORD)) return NULL;
+    if (!this->Is({ CHORD, NOTE, STEM })) return NULL;
     Beam *beamParent = dynamic_cast<Beam *>(this->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
     if (beamParent != NULL) {
-        // This note is beamed and cue-sized
+        // This note is beamed and cue-sized - we will be able to get rid of this once MEI has a better modeling for
+        // beamed grace notes
         if (this->IsGraceNote()) {
+            LayerElement *graceNote = this;
+            if (this->Is(STEM)) graceNote = dynamic_cast<LayerElement *>(this->GetFirstParent(NOTE, MAX_BEAM_DEPTH));
             // If the note is part of the beam parent, this means we
             // have a beam of graced notes
-            if (beamParent->GetListIndex(this) > -1) return beamParent;
+            if (beamParent->GetListIndex(graceNote) > -1) return beamParent;
             // otherwise it is a non-beamed grace note within a beam - will return false
         }
         else {
@@ -737,9 +740,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
             assert(staff);
             loc = staff->m_drawingLines - 1;
-            // Limitation: GetLayerCount does not take into account editorial markup
-            // should be refined later
-            bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
+            bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
@@ -774,9 +775,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
             assert(staff);
             loc = staff->m_drawingLines - 1;
-            // Limitation: GetLayerCount does not take into account editorial markup
-            // should be refined later
-            bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
+            bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
@@ -810,7 +809,9 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
 
     // These are the only ones we want to keep for further collision detection
     // Eventually  we also need stem for overlapping voices
-    if (this->Is({ DOTS, NOTE }) && this->HasUpdatedBB()) params->m_current.push_back(this);
+    if (this->Is({ DOTS, NOTE }) && this->HasUpdatedBB()) {
+        params->m_current.push_back(this);
+    }
 
     // We are processing the first layer, nothing to do yet
     if (params->m_previous.empty()) return FUNCTOR_SIBLINGS;
@@ -869,7 +870,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
             if (xRelShift > 0) {
                 if (params->m_currentChord)
                     params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + xRelShift);
-                else
+                else if (params->m_currentNote)
                     params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + xRelShift);
             }
         }
