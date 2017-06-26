@@ -93,6 +93,17 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
 
     if (!this->VerticalSelfOverlap(element, verticalMargin)) return false;
 
+    // Look for identical accidentals that needs to remain superimposed
+    if (element->Is(ACCID) && (this->GetDrawingX() == element->GetDrawingX())) {
+        Accid *accid = dynamic_cast<Accid *>(element);
+        assert(accid);
+        if (this->GetSymbolStr() == accid->GetSymbolStr()) {
+            // There is the same accidental, so we leave it a the same place
+            // This works with multiple layers but can create problems with chords and multiple layers
+            return false;
+        }
+    }
+
     if (element->Is(ACCID)) {
         if (!this->HorizontalLeftOverlap(element, doc, horizontalMargin, verticalMargin)) {
             // There is enough space on the right of the accidental, but maybe we will need to
