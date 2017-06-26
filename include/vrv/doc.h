@@ -215,14 +215,14 @@ public:
      * Prepare the MIDI timemap for MIDI and timemap file export.
      * Run trough all the layers and fill the score-time and performance timing variables.
      */
-    void CalculateMidiTimemap(void);
+    void CalculateMidiTimemap();
 
     /**
      * Check to see if the MIDI timemap has already been calculated.  This needs to return
      * true before ExportMIDI() or ExportTimemap() can export anything (These two functions
      * will automatically run CalculateMidiTimemap() if HasMidiTimemap() return false.
      */
-    bool HasMidiTimemap(void);
+    bool HasMidiTimemap();
 
     /**
      * Export the document to a MIDI file.

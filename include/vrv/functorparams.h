@@ -551,7 +551,7 @@ public:
 
 class CalcOnsetOffsetParams : public FunctorParams {
 public:
-    CalcOnsetOffsetParams(void)
+    CalcOnsetOffsetParams()
     {
         m_currentScoreTime = 0.0;
         m_currentRealTimeSeconds = 0.0;
@@ -863,7 +863,7 @@ public:
 
 class GenerateTimemapParams : public FunctorParams {
 public:
-    GenerateTimemapParams(void)
+    GenerateTimemapParams()
     {
         m_scoreTimeOffset = 0.0;
         m_realTimeOffsetMilliseconds = 0;

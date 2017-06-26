@@ -170,12 +170,12 @@ public:
     void SetScoreTimeOffset(double scoreTime);
     void SetRealTimeOffsetSeconds(double timeInSeconds);
     void SetScoreTimeTiedDuration(double timeInSeconds);
-    double GetScoreTimeOnset(void);
-    int GetRealTimeOnsetMilliseconds(void);
-    double GetScoreTimeOffset(void);
-    double GetScoreTimeTiedDuration(void);
-    int GetRealTimeOffsetMilliseconds(void);
-    double GetScoreTimeDuration(void);
+    double GetScoreTimeOnset();
+    int GetRealTimeOnsetMilliseconds();
+    double GetScoreTimeOffset();
+    double GetScoreTimeTiedDuration();
+    int GetRealTimeOffsetMilliseconds();
+    double GetScoreTimeDuration();
     ///@}
 
     //----------//

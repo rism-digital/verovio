@@ -377,32 +377,32 @@ void Note::SetScoreTimeTiedDuration(double scoreTime)
     m_scoreTimeTiedDuration = scoreTime;
 }
 
-double Note::GetScoreTimeOnset(void)
+double Note::GetScoreTimeOnset()
 {
     return m_scoreTimeOnset;
 }
 
-int Note::GetRealTimeOnsetMilliseconds(void)
+int Note::GetRealTimeOnsetMilliseconds()
 {
     return m_realTimeOnsetMilliseconds;
 }
 
-double Note::GetScoreTimeOffset(void)
+double Note::GetScoreTimeOffset()
 {
     return m_scoreTimeOffset;
 }
 
-int Note::GetRealTimeOffsetMilliseconds(void)
+int Note::GetRealTimeOffsetMilliseconds()
 {
     return m_realTimeOffsetMilliseconds;
 }
 
-double Note::GetScoreTimeTiedDuration(void)
+double Note::GetScoreTimeTiedDuration()
 {
     return m_scoreTimeTiedDuration;
 }
 
-double Note::GetScoreTimeDuration(void)
+double Note::GetScoreTimeDuration()
 {
     return GetScoreTimeOffset() - GetScoreTimeOnset();
 }

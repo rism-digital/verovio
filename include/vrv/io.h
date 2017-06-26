@@ -69,7 +69,7 @@ public:
     virtual ~FileInputStream();
 
     void SetOutputFormat(const std::string &format) { m_outformat = format; }
-    std::string GetOutputFormat(void) { return m_outformat; }
+    std::string GetOutputFormat() { return m_outformat; }
 
     // read
     virtual bool ImportFile() { return true; }

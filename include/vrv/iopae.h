@@ -66,8 +66,8 @@ namespace pae {
             tuplet_notes = old.tuplet_notes;
             tuplet_note = old.tuplet_note;
         }
-        Note(void) { clear(); }
-        void clear(void)
+        Note() { clear(); }
+        void clear()
         {
             appoggiatura = 0;
             acciaccatura = fermata = trill = chord = false;
@@ -163,7 +163,7 @@ namespace pae {
             abbreviation_offset = d.abbreviation_offset;
             wholerest = d.wholerest;
         }
-        Measure(void) { clear(); }
+        Measure() { clear(); }
 
         Measure &operator=(const Measure &d)
         { // for STL vector
@@ -182,7 +182,7 @@ namespace pae {
             return *this;
         }
 
-        void clear(void)
+        void clear()
         {
             durations.clear();
             dots.clear();
@@ -190,7 +190,7 @@ namespace pae {
             durations_offset = DURATION_long;
             reset();
         }
-        void reset(void)
+        void reset()
         {
             clef = NULL;
             meter = NULL;

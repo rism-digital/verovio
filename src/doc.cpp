@@ -175,12 +175,12 @@ bool Doc::GenerateDocumentScoreDef()
     return true;
 }
 
-bool Doc::HasMidiTimemap(void)
+bool Doc::HasMidiTimemap()
 {
     return m_hasMidiTimemap;
 }
 
-void Doc::CalculateMidiTimemap(void)
+void Doc::CalculateMidiTimemap()
 {
     m_hasMidiTimemap = false;
 
