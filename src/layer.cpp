@@ -190,6 +190,16 @@ int Layer::GetClefLocOffset(LayerElement *test)
     return clef->GetClefLocOffset();
 }
 
+data_STEMDIRECTION Layer::GetDrawingStemDir(LayerElement *element)
+{
+    return m_drawingStemDir;
+}
+
+data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coords)
+{
+    return m_drawingStemDir;
+}
+
 Clef *Layer::GetCurrentClef() const
 {
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
@@ -394,7 +404,7 @@ int Layer::PrepareRpt(FunctorParams *functorParams)
     }
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Layer::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
@@ -409,7 +419,7 @@ int Layer::CalcStem(FunctorParams *functorParams)
             this->SetDrawingStemDir(STEMDIRECTION_down);
         }
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 

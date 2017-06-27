@@ -294,6 +294,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     /************** placement **************/
 
     bool allowAbove = true;
+    data_STEMDIRECTION layerStemDir;
 
     // for now we ignore within @place
     if (this->GetPlace().GetBasic() != STAFFREL_basic_NONE) {
@@ -301,8 +302,8 @@ int Artic::CalcArtic(FunctorParams *functorParams)
         // If we have a place indication do not allow to be changed to above
         allowAbove = false;
     }
-    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        place = (layer->GetDrawingStemDir() == STEMDIRECTION_up) ? STAFFREL_basic_above : STAFFREL_basic_below;
+    else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
+        place = (layerStemDir == STEMDIRECTION_up) ? STAFFREL_basic_above : STAFFREL_basic_below;
         // If we have more than one layer do not allow to be changed to above
         allowAbove = false;
     }

@@ -466,6 +466,7 @@ int Note::CalcStem(FunctorParams *functorParams)
 
     /************ Set the direction ************/
 
+    data_STEMDIRECTION layerStemDir;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     if (stem->HasStemDir()) {
@@ -474,8 +475,8 @@ int Note::CalcStem(FunctorParams *functorParams)
     else if (this->IsGraceNote()) {
         stemDir = STEMDIRECTION_up;
     }
-    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        stemDir = layer->GetDrawingStemDir();
+    else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
+        stemDir = layerStemDir;
     }
     else {
         stemDir = (this->GetDrawingY() >= params->m_verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;

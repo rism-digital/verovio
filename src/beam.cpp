@@ -137,17 +137,13 @@ void BeamDrawingParams::CalcBeam(
     avgY /= elementCount;
 
     // If we have one stem direction in the beam, then don't look at the layer
-    if (this->m_stemDir == STEMDIRECTION_NONE)
-        this->m_stemDir = layer->GetDrawingStemDir(); // force layer direction if it exists
+    if (this->m_stemDir == STEMDIRECTION_NONE) {
+        this->m_stemDir = layer->GetDrawingStemDir(beamElementCoords); // force layer direction if it exists
+    }
 
     // Automatic stem direction if nothing in the notes or in the layer
     if (this->m_stemDir == STEMDIRECTION_NONE) {
-        /*if (this->m_beamHasChord)
-         this->m_stemDir = (yExtreme < verticalCenter)
-         ? STEMDIRECTION_up
-         : STEMDIRECTION_down; // if it has a chord, go by the most extreme position
-         else */
-        this->m_stemDir = (avgY < verticalCenter) ? STEMDIRECTION_up : STEMDIRECTION_down; // otherwise go by average
+        this->m_stemDir = (avgY < verticalCenter) ? STEMDIRECTION_up : STEMDIRECTION_down;
     }
 
     if (this->m_stemDir == STEMDIRECTION_up) { // set stem direction for all the notes
@@ -551,7 +547,7 @@ void Beam::InitCoords(ListOfObjects *childList)
 
     // We look only at the last note for checking if cue-sized. Somehow arbitrarily
     m_drawingParams.m_cueSize = m_beamElementCoords.at(last)->m_element->IsCueSize();
-    
+
     // Always set stem diretion to up for grace note beam unless stem direction is provided
     if (this->m_drawingParams.m_cueSize && (this->m_drawingParams.m_stemDir == STEMDIRECTION_NONE)) {
         this->m_drawingParams.m_stemDir = STEMDIRECTION_up;
