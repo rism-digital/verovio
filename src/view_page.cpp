@@ -147,8 +147,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
         // NULL for the BarLine parameters indicates that we are drawing the scoreDef
         DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, system->GetDrawingX(), NULL);
         // Draw measure number if > 1
-        // This needs to be improved because we are now using (tuplet) oblique figures.
-        // We should also have a better way to specify if the number has to be displayed or not
+        // We should have a better way to specify if the number has to be displayed or not
         if ((measure->HasN()) && (measure->GetN() != "0") && (measure->GetN() != "1")) {
             Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
             if (staff) {
@@ -166,9 +165,9 @@ void View::DrawSystem(DeviceContext *dc, System *system)
 
                 // HARDCODED
                 int x = system->GetDrawingX();
-                int y = staff->GetDrawingY() + 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                int y = staff->GetDrawingY() + 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
-                dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y));
+                dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
                 DrawTextElement(dc, &text, x, y, setX, setY);
                 dc->EndText();
 
