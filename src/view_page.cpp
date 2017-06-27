@@ -1321,6 +1321,7 @@ void View::DrawAnnot(DeviceContext *dc, EditorialElement *element)
     dc->StartGraphic(element, "", element->GetUuid());
 
     Annot *annot = dynamic_cast<Annot *>(element);
+    assert(annot);
     dc->AddDescription(UTF16to8(annot->GetText(annot)));
 
     dc->EndGraphic(element, this);
