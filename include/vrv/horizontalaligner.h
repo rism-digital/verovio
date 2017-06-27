@@ -203,7 +203,7 @@ public:
     /**
      * See Object::AjustAccidX
      */
-    virtual int AdjustAccidX(FunctorParams *);
+    virtual int AdjustAccidX(FunctorParams *functorParams);
 
 private:
     /**
@@ -303,7 +303,7 @@ public:
     /**
      * See Object::AjustAccidX
      */
-    virtual int AdjustAccidX(FunctorParams *);
+    virtual int AdjustAccidX(FunctorParams *functorParams);
 
 private:
     //

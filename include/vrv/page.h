@@ -131,7 +131,7 @@ public:
     /**
      * Apply the Pixel Per Unit factor of the page to its elements.
      */
-    virtual int ApplyPPUFactor(FunctorParams *);
+    virtual int ApplyPPUFactor(FunctorParams *functorParams);
 
 private:
     /**
