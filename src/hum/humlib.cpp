@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jun 21 16:06:58 CEST 2017
+// Last Modified: Sun Jun 25 15:16:51 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2871,10 +2871,10 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 						line->appendToken(staff.at(v)->getToken());
 						staff.at(v)->forgetToken();
 					} else if (!staff.at(v)) {
-						token = new HumdrumToken(".z");
+						token = new HumdrumToken(".");
 						line->appendToken(token);
 					} else {
-						token = new HumdrumToken(".b");
+						token = new HumdrumToken(".");
 						line->appendToken(token);
 					}
 				}
@@ -4170,16 +4170,29 @@ void HumGrid::cleanManipulator(vector<GridSlice*>& newslices, GridSlice* curr) {
 	GridSlice* output;
 
 	// deal with *^ manipulators:
-
-// ggg implement later:
-//	while (output = checkManipulatorExpand(curr)) {
-//		newslices.push_back(output);
-//	}
+	while ((output = checkManipulatorExpand(curr))) {
+		newslices.push_back(output);
+	}
 
 	// deal with *v manipulators:
 	while ((output = checkManipulatorContract(curr))) {
 		newslices.push_back(output);
 	}
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::checkManipulatorExpand -- Check for cases where a spine expands
+//    into sub-spines.
+//
+
+GridSlice* HumGrid::checkManipulatorExpand(GridSlice* curr) {
+
+// ggg
+
+	return NULL;
 }
 
 
@@ -4513,17 +4526,19 @@ GridSlice* HumGrid::manipulatorCheck(GridSlice* ice1, GridSlice* ice2) {
 			} else if (v1count < v2count) {
 				// need to grow
 				int grow = v2count - v1count;
+cerr << "GROW1 = " << grow << endl;
 				if (grow == 2 * v1count) {
+cerr << "\tGROWING1" << endl;
 					// all subspines split
 					for (z=0; z<v1count; z++) {
-						token = new HumdrumToken("*^");
+						token = new HumdrumToken("*^X");
 						gv = new GridVoice(token, 0);
 						mslice->at(p)->at(s)->push_back(gv);
 					}
 				} else if ((v1count > 0) && (grow > 2 * v1count)) {
 					// too large to split all at the same time, deal with later
 					for (z=0; z<v1count-1; z++) {
-						token = new HumdrumToken("*^");
+						token = new HumdrumToken("*^Y");
 						gv = new GridVoice(token, 0);
 						mslice->at(p)->at(s)->push_back(gv);
 					}
@@ -4541,7 +4556,7 @@ GridSlice* HumGrid::manipulatorCheck(GridSlice* ice1, GridSlice* ice2) {
 						mslice->at(p)->at(s)->push_back(gv);
 					}
 					for (z=0; z<doubled; z++) {
-						token = new HumdrumToken("*^");
+						token = new HumdrumToken("*^Z");
 						gv = new GridVoice(token, 0);
 						mslice->at(p)->at(s)->push_back(gv);
 					}
@@ -27886,11 +27901,12 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 	bool colorizeQ = getBoolean("colorize");
 	bool colorize2Q = getBoolean("colorize2");
 
-	HumNum durp;       // duration of previous melodic note;
-	HumNum dur;        // duration of current note;
-	HumNum durn;       // duration of next melodic note;
-	HumNum odur = -1; // duration of current note in other voice which may have started earlier;
-	HumNum odurn = -1; // duration of next note in other voice;
+	HumNum durpp = -1; // duration of previous previous note
+	HumNum durp;       // duration of previous melodic note
+	HumNum dur;        // duration of current note
+	HumNum durn;       // duration of next melodic note
+	HumNum odur = -1; // duration of current note in other voice which may have started earlier
+	HumNum odurn = -1; // duration of next note in other voice
 	double intp;       // diatonic interval from previous melodic note
 	double intpp = -99;// diatonic interval to previous melodic note
 	double intn;       // diatonic interval to next melodic note
@@ -27898,11 +27914,12 @@ void Tool_dissonant::doAnalysisForVoice(vector<vector<string> >& results,
 	double lev;        // metric level of the current note
 	double levn;       // metric level of the next melodic note
 	int lineindex;     // line in original Humdrum file content that contains note
+	int lineindexpp = -1;// line in original Humdrum file content that contains the previous previous note
 	// int lineindexn; // next line in original Humdrum file content that contains note
 	int attackindexn;  // slice in NoteGrid content that contains next note attack
 	int sliceindex;    // current timepoint in NoteGrid.
 	int oattackindexn = -1; // next note attack index of the other voice involved in the diss.
-	vector<double> harmint(grid.getVoiceCount());  // harmonic intervals;
+	vector<double> harmint(grid.getVoiceCount());  // harmonic intervals
 	bool dissonant;    // true if  note is dissonant with other sounding notes.
 	char marking = '\0';
 	int ovoiceindex = -1;
@@ -28072,6 +28089,8 @@ RECONSIDER:
 		levn = attacks[i+1]->getMetricLevel();
 		if (i >= 2) {
 			intpp = *attacks[i-1] - *attacks[i-2];
+			durpp = attacks[i-2]->getDuration();
+			lineindexpp = attacks[i-2]->getLineIndex();
 		}
 
 		// Non-suspension test cases ////////////////////////////////////////////
@@ -28257,6 +28276,11 @@ RECONSIDER:
 		////
 
 		else if (valid_sus_acc && (ointn == -1)) {
+			if ((durpp == 1) && (durp == 1) && (intpp == -1) && (intp = 1) &&
+				((results[vindex][lineindexpp] == m_labels[UNLABELED_Z7]) ||
+				 (results[vindex][lineindexpp] == m_labels[UNLABELED_Z4]))) {
+				results[vindex][lineindexpp] = m_labels[CHANSON_IDIOM];
+			}
 			if (ternAgent) {
 				results[vindex][lineindex] = m_labels[AGENT_TERN]; // ternary agent
 				results[ovoiceindex][lineindex] = m_labels[SUS_TERN]; // ternary suspension
@@ -28265,6 +28289,11 @@ RECONSIDER:
 				results[ovoiceindex][lineindex] = m_labels[SUS_BIN]; // binary suspension
 			}
 		} else if (valid_ornam_sus_acc && ((ointn == 0) && (ointnn == -1))) {
+			if ((durpp == 1) && (durp == 1) && (intpp == -1) && (intp = 1) &&
+				((results[vindex][lineindexpp] == m_labels[UNLABELED_Z7]) ||
+				 (results[vindex][lineindexpp] == m_labels[UNLABELED_Z4]))) {
+				results[vindex][lineindexpp] = m_labels[CHANSON_IDIOM];
+			}
 			if (ternAgent) {
 				results[vindex][lineindex] = m_labels[AGENT_TERN]; // ternary agent
 				results[ovoiceindex][lineindex] = m_labels[SUS_TERN]; // ternary suspension
@@ -28274,6 +28303,12 @@ RECONSIDER:
 			}
 			results[ovoiceindex][olineindexn] = m_labels[SUSPENSION_REP]; // repeated-note of suspension
 		} else if (valid_ornam_sus_acc && ((ointn == -2) && (ointnn == 1))) {
+			if ((durpp == 1) && (durp == 1) && (intpp == -1) && (intp = 1) &&
+				((results[vindex][lineindexpp] == m_labels[THIRD_Q_PASS_DOWN] ||
+				 (results[vindex][lineindexpp] == m_labels[UNLABELED_Z7]) ||
+				 (results[vindex][lineindexpp] == m_labels[UNLABELED_Z4])))) {
+				results[vindex][lineindexpp] = m_labels[CHANSON_IDIOM];
+			}
 			if (ternAgent) {
 				results[vindex][lineindex] = m_labels[AGENT_TERN]; // ternary agent
 				results[ovoiceindex][lineindex] = m_labels[SUS_TERN]; // ternary suspension
@@ -28283,6 +28318,11 @@ RECONSIDER:
 			}
 			results[ovoiceindex][olineindexn] = m_labels[SUSPENSION_ORNAM]; // suspension ornament
 		} else if (valid_ornam_sus_acc && ((ointn == 1) && (ointnn == -2))) {
+			if ((durpp == 1) && (durp == 1) && (intpp == -1) && (intp = 1) &&
+				((results[vindex][lineindexpp] == m_labels[UNLABELED_Z7]) ||
+				 (results[vindex][lineindexpp] == m_labels[UNLABELED_Z4]))) {
+				results[vindex][lineindexpp] = m_labels[CHANSON_IDIOM];
+			}
 			if (ternAgent) {
 				results[vindex][lineindex] = m_labels[AGENT_TERN]; // ternary agent
 				results[ovoiceindex][lineindex] = m_labels[SUS_TERN]; // ternary suspension
@@ -28298,14 +28338,9 @@ RECONSIDER:
 
 			double intnn = *attacks[i+2] - *attacks[i+1];
 			HumNum durnn = attacks[i+2]->getDuration();	// dur of note after next
-			double levnn = attacks[i+2]->getMetricLevel(); // lev of note after next
+			// double levnn = attacks[i+2]->getMetricLevel(); // lev of note after next
 
-			if ((dur == durn) && (lev == 1) && (levn == 2) && (levnn == 0) &&
-					(intp == -1) && (intn == -1) && (intnn == 1) && valid_acc_exit
-					) {
-				results[vindex][lineindex] = m_labels[CHANSON_IDIOM]; // chanson idiom
-
-			} else if ((dur <= durp) && (lev >= levp) && (lev >= levn) &&
+			if ((dur <= durp) && (lev >= levp) && (lev >= levn) &&
 					(intp == -1) && (intn == -2) && (intnn == 1)) {
 				results[vindex][lineindex] = m_labels[CAMBIATA_DOWN_L]; // long-form descending cambiata
 			} else if ((dur <= durp) && (lev >= levp) && (lev >= levn) &&
@@ -32580,7 +32615,7 @@ void Tool_imitation::doAnalysis(vector<vector<string> >& results,
 
 	for (int i=0; i<(int)attacks.size(); i++) {
 		for (int j=i+1; j<(int)attacks.size(); j++) {
-			analyzeImmitation(results, attacks, intervals, i, j);
+			analyzeImitation(results, attacks, intervals, i, j);
 		}
 	}
 }
@@ -32601,7 +32636,7 @@ void Tool_imitation::getIntervals(vector<double>& intervals,
 
 	if (getBoolean("debug")) {
 		cout << endl;
-		for (int i=0; i<intervals.size(); i++) {
+		for (int i=0; i<(int)intervals.size(); i++) {
 			cout << "INTERVAL " << i << "\t=\t" << intervals[i] << "\tATK " << attacks[i]->getSgnDiatonicPitch() << "\t" << attacks[i]->getToken() << endl;
 		}
 	}
@@ -32612,10 +32647,10 @@ void Tool_imitation::getIntervals(vector<double>& intervals,
 
 //////////////////////////////
 //
-// Tool_imitation::analyzeImmitation -- do imitation analysis between two voices.
+// Tool_imitation::analyzeImitation -- do imitation analysis between two voices.
 //
 
-void Tool_imitation::analyzeImmitation(vector<vector<string>>& results,
+void Tool_imitation::analyzeImitation(vector<vector<string>>& results,
 		vector<vector<NoteCell*>>& attacks, vector<vector<double>>& intervals,
 		int v1, int v2) {
 

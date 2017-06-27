@@ -28,7 +28,7 @@ class StaffDef;
  * This class represents a layer in a laid-out score (Doc).
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
-*/
+ */
 class Layer : public Object,
               public DrawingListInterface,
               public ObjectListInterface,
@@ -85,7 +85,8 @@ public:
      */
     ///@{
     void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; }
-    data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; }
+    data_STEMDIRECTION GetDrawingStemDir(LayerElement *element);
+    data_STEMDIRECTION GetDrawingStemDir(const ArrayOfBeamElementCoords *coords);
     ///@}
 
     Clef *GetCurrentClef() const;
@@ -153,7 +154,7 @@ public:
      * See Object::PrepareRpt
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
-                  
+
     /**
      * See Object::CalcStem
      */

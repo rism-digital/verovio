@@ -851,8 +851,21 @@ int Measure::GenerateMIDI(FunctorParams *functorParams)
 
     if (m_currentTempo != params->m_currentTempo) {
         params->m_midiFile->addTempo(0, m_scoreTimeOffset.back() * params->m_midiFile->getTPQ(), m_currentTempo);
-        m_currentTempo = params->m_currentTempo;
+        params->m_currentTempo = m_currentTempo;
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::GenerateTimemap(FunctorParams *functorParams)
+{
+    GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
+    assert(params);
+
+    // Deal with repeated music later, for now get the last times.
+    params->m_scoreTimeOffset = m_scoreTimeOffset.back();
+    params->m_realTimeOffsetMilliseconds = m_realTimeOffsetMilliseconds.back();
+    params->m_currentTempo = m_currentTempo;
 
     return FUNCTOR_CONTINUE;
 }

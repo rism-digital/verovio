@@ -30,7 +30,7 @@ class Staff;
  * This class represents a system in a laid-out score (Doc).
  * A System is contained in a Page.
  * It contains Staff objects.
-*/
+ */
 class System : public Object, public DrawingListInterface, public AttTyped {
 public:
     /**

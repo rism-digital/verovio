@@ -181,6 +181,7 @@ $exports .= "'_vrvToolkit_redoPagePitchPosLayout',";
 $exports .= "'_vrvToolkit_renderData',";
 $exports .= "'_vrvToolkit_renderPage',";
 $exports .= "'_vrvToolkit_renderToMidi',";
+$exports .= "'_vrvToolkit_renderToTimemap',";
 $exports .= "'_vrvToolkit_setOptions',";
 $exports .= "'_vrvToolkit_edit',";
 $exports .= "'_vrvToolkit_getElementAttr'";

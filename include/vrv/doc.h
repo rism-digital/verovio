@@ -85,8 +85,8 @@ public:
     Score *CreateScoreBuffer();
 
     /**
-    * Get the total page count
-    */
+     * Get the total page count
+     */
     int GetPageCount() const;
 
     bool GetMidiExportDone() const;
@@ -212,10 +212,32 @@ public:
     ///@}
 
     /**
+     * Prepare the MIDI timemap for MIDI and timemap file export.
+     * Run trough all the layers and fill the score-time and performance timing variables.
+     */
+    void CalculateMidiTimemap();
+
+    /**
+     * Check to see if the MIDI timemap has already been calculated.  This needs to return
+     * true before ExportMIDI() or ExportTimemap() can export anything (These two functions
+     * will automatically run CalculateMidiTimemap() if HasMidiTimemap() return false.
+     */
+    bool HasMidiTimemap();
+
+    /**
      * Export the document to a MIDI file.
-     * Run trough all the layer and fill the midi file content.
+     * Run trough all the layers and fill the midi file content.
      */
     void ExportMIDI(MidiFile *midiFile);
+
+    /**
+     * Extract a timemap from the document to a JSON string.
+     * Run trough all the layers and fill the timemap file content.
+     */
+    bool ExportTimemap(std::string &output);
+    void PrepareJsonTimemap(std::string &output, std::map<int, double> &realTimeToScoreTime,
+        std::map<int, std::vector<std::string> > &realTimeToOnElements,
+        std::map<int, std::vector<std::string> > &realTimeToOffElements, std::map<int, int> &realTimeToTempo);
 
     /**
      * Set the initial scoreDef of each page.
@@ -413,10 +435,11 @@ private:
     bool m_drawingPreparationDone;
 
     /**
-     * A flag to indicate if the MIDI export has been done.
-     * This is necessary for retrieving notes being played at a certain time.
+     * A flag to indicate that the MIDI timemap has been calculated.  The
+     * timemap needs to be prepared before MIDI files or timemap JSON files
+     * are generated.
      */
-    bool m_midiExportDone;
+    bool m_hasMidiTimemap;
 
     /** Page width (MEI scoredef@page.width) - currently not saved */
     int m_pageWidth;

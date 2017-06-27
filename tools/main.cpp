@@ -337,8 +337,8 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    // If we output svg or do not request no layout to be performed then we need the font
-    if ((outformat == "svg") || !toolkit.GetNoLayout()) {
+    // If we output svg or midi then we need the font for the layout alignment
+    if ((outformat == "svg") || (outformat == "midi")) {
         // Make sure the user uses a valid Resource path
         // Save many headaches for empty SVGs
         if (!dir_exists(vrv::Resources::GetPath())) {
@@ -360,7 +360,7 @@ int main(int argc, char **argv)
         }
     }
 
-    if (outformat != "svg" && outformat != "mei" && outformat != "midi" && outformat != "humdrum") {
+    if (outformat != "svg" && outformat != "mei" && outformat != "midi" && outformat != "timemap" && outformat != "humdrum") {
         cerr << "Output format can only be 'mei', 'svg', 'midi', or 'humdrum'." << endl;
         exit(1);
     }
@@ -440,6 +440,7 @@ int main(int argc, char **argv)
             }
         }
     }
+
     else if (outformat == "midi") {
         outfile += ".mid";
         if (std_output) {
@@ -447,6 +448,20 @@ int main(int argc, char **argv)
             exit(1);
         }
         else if (!toolkit.RenderToMidiFile(outfile)) {
+            cerr << "Unable to write MIDI to " << outfile << "." << endl;
+            exit(1);
+        }
+        else {
+            cerr << "Output written to " << outfile << "." << endl;
+        }
+    }
+    else if (outformat == "timemap") {
+        outfile += ".json";
+        if (std_output) {
+	    std::string output;
+            std::cout << toolkit.RenderToTimemap();
+        }
+        else if (!toolkit.RenderToTimemapFile(outfile)) {
             cerr << "Unable to write MIDI to " << outfile << "." << endl;
             exit(1);
         }

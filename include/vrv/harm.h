@@ -48,9 +48,9 @@ public:
     ///@}
 
     /**
-    * Add an element (text, rend. etc.) to a harm.
-    * Only supported elements will be actually added to the child list.
-    */
+     * Add an element (text, rend. etc.) to a harm.
+     * Only supported elements will be actually added to the child list.
+     */
     virtual void AddChild(Object *object);
 
     //----------//

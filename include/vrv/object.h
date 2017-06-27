@@ -208,7 +208,7 @@ public:
 
     std::string GetComment() const { return m_comment; }
     void SetComment(std::string comment) { m_comment = comment; }
-    bool HasComment(void) { return !m_comment.empty(); }
+    bool HasComment() { return !m_comment.empty(); }
 
     /**
      * @name Children count, with or without a ClassId.
@@ -917,6 +917,13 @@ public:
      */
     ///@{
     virtual int GenerateMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Export the object to a JSON timemap file.
+     */
+    ///@{
+    virtual int GenerateTimemap(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**

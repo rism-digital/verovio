@@ -35,7 +35,7 @@ class View;
  *  MusCairoDC - a wrapper to a Cairo surface;
  * The class uses int-based colour encoding (instead of wxColour in wxDC).
  * It uses FontInfo (instead of wxFont in wxDC).
-*/
+ */
 
 class DeviceContext {
 public:
