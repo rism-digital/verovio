@@ -76,7 +76,7 @@ public:
     virtual std::string GetClassName() const { return "LabelAbbr"; }
     virtual ClassId GetClassId() const { return LABELABBR; }
     ///@}
-    
+
     /**
      * @name Methods for adding allowed content
      */

@@ -579,7 +579,7 @@ private:
     void UpgradeMeasureTo_3_0_0(Measure *measure, System *system);
     void UpgradePageTo_3_0_0(Page *page, Doc *doc);
     ///@}
-    
+
 public:
     //
 private:

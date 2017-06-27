@@ -163,7 +163,7 @@ bool LayerElement::IsInFTrem()
 
 Beam *LayerElement::IsInBeam()
 {
-    if (!this->Is({CHORD, NOTE, STEM})) return NULL;
+    if (!this->Is({ CHORD, NOTE, STEM })) return NULL;
     Beam *beamParent = dynamic_cast<Beam *>(this->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
     if (beamParent != NULL) {
         // This note is beamed and cue-sized - we will be able to get rid of this once MEI has a better modeling for

@@ -164,7 +164,7 @@ public:
      * The value is initialized by the Object::SetCurrentScoreDef functor.
      */
     ScoreDef m_drawingScoreDef;
-    
+
     /**
      * Temporary member that will be replace by its LibMEI equivalent in the next version of the page-based MEI
      */

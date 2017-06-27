@@ -294,7 +294,7 @@ public:
     virtual std::string GetClassName() const { return "StaffDef"; }
     virtual ClassId GetClassId() const { return STAFFDEF; }
     ///@}
-                
+
     /**
      * @name Methods for adding allowed content
      */

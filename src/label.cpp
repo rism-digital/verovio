@@ -51,8 +51,7 @@ void Label::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-    
-    
+
 //----------------------------------------------------------------------------
 // LabelAbbr
 //----------------------------------------------------------------------------
@@ -70,8 +69,7 @@ void LabelAbbr::Reset()
 {
     Object::Reset();
 }
-    
-    
+
 void LabelAbbr::AddChild(Object *child)
 {
     if (child->IsTextElement()) {
