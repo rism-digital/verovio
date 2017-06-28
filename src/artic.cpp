@@ -302,7 +302,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
         // If we have a place indication do not allow to be changed to above
         allowAbove = false;
     }
-    else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
+    else if ((layerStemDir = layer->GetDrawingStemDir(parent)) != STEMDIRECTION_NONE) {
         place = (layerStemDir == STEMDIRECTION_up) ? STAFFREL_basic_above : STAFFREL_basic_below;
         // If we have more than one layer do not allow to be changed to above
         allowAbove = false;
