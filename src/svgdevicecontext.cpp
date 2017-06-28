@@ -163,6 +163,11 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         }
     }
 
+    // make sure we are in a g container
+    while (strcmp(m_currentNode.name(), "g")) {
+        m_currentNode = m_currentNode.parent();
+    }
+
     m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = baseClass.c_str();
