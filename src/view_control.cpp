@@ -249,9 +249,6 @@ void View::DrawHairpin(
         return;
     }
 
-    LayerElement *start = NULL;
-    LayerElement *end = NULL;
-
     data_STAFFREL place = hairpin->GetPlace();
     hairpinLog_FORM form = hairpin->GetForm();
 
@@ -264,37 +261,6 @@ void View::DrawHairpin(
     // int y1 = GetHairpinY(hairpin->GetPlace(), staff);
     int y1 = hairpin->GetDrawingY();
     int y2 = y1;
-
-    /************** parent layers **************/
-
-    start = dynamic_cast<LayerElement *>(hairpin->GetStart());
-    end = dynamic_cast<LayerElement *>(hairpin->GetEnd());
-
-    if (!start || !end) {
-        // no start and end, obviously nothing to do...
-        return;
-    }
-
-    /* We actually do not need the layer for now
-
-    Layer *layer1 = NULL;
-    Layer *layer2 = NULL;
-
-    // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
-    if (start->Is(TIMESTAMP_ATTR))
-        layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-    else
-        layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
-
-    // idem
-    if (end->Is(TIMESTAMP_ATTR))
-        layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-    else
-        layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
-
-    assert(layer1 && layer2);
-
-     */
 
     /************** start / end opening **************/
 
@@ -335,51 +301,6 @@ void View::DrawHairpin(
             endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false) / 3;
             startY = 2 * endY;
         }
-    }
-
-    /************** direction **************/
-
-    /*
-    // first should be the tie @curvedir
-    if (slur->HasCurvedir()) {
-        up = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? true : false;
-    }
-    // then layer direction trumps note direction
-    else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
-    }
-    // look if in a chord
-    else if (startParentChord) {
-        if (startParentChord->PositionInChord(startNote) < 0) {
-            up = false;
-        }
-        else if (startParentChord->PositionInChord(startNote) > 0) {
-            up = true;
-        }
-        // away from the stem if odd number (center note)
-        else {
-            up = (stemDir != STEMDIRECTION_up);
-        }
-    }
-    else if (stemDir == STEMDIRECTION_up) {
-        up = false;
-    }
-    else if (stemDir == STEMDIRECTION_NONE) {
-        // no information from the note stem directions, look at the position in the notes
-        int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-        up = (start->GetDrawingY() > center) ? true : false;
-    }
-    */
-
-    /************** adjusting y position **************/
-
-    if (place.GetBasic() == STAFFREL_basic_above) {
-        // y1 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        // y2 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
-    else {
-        // y1 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        // y2 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
     /************** draw it **************/
@@ -860,6 +781,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         dc->StartGraphic(slur, "spanning-slur", "");
     DrawThickBezierCurve(dc, points, thickness, staff->m_drawingStaffSize, angle);
 
+    /* drawing debug points */
     /*
     int i;
     int dist = (points[3].x - points[0].x) / 10;
