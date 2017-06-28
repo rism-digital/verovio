@@ -108,6 +108,7 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
     }
     duration *= (double)numbase / (double)num;
     // LogDebug("Duration %d; %d/%d; Alignement %f; Ratio %f", note_dur, num, numbase, duration, ratio);
+    duration = durRound(duration);
     return duration;
 }
 

@@ -967,7 +967,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int LayerElement::AdjustXRelForTranscription(FunctorParams *functorParams)
+int LayerElement::AdjustXRelForTranscription(FunctorParams *)
 {
     if (this->m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
 
@@ -1174,7 +1174,6 @@ int LayerElement::FindTimeSpanningLayerElements(FunctorParams *functorParams)
 
 int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
 {
-
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 

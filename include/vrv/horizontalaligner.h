@@ -284,7 +284,7 @@ public:
     /**
      * Return true if the reference has elements from multiple layers.
      */
-    bool HasMultipleLayer() const { return m_multipleLayer; }
+    bool HasMultipleLayer() const { return (m_layerCount > 1); }
 
     //----------//
     // Functors //
@@ -305,6 +305,11 @@ public:
      */
     virtual int AdjustAccidX(FunctorParams *functorParams);
 
+    /**
+     * See Object::FindSpaceInReferenceAlignments
+     */
+    virtual int FindSpaceInReferenceAlignments(FunctorParams *functorParams);
+
 private:
     //
 public:
@@ -318,7 +323,7 @@ private:
     /**
      *
      */
-    bool m_multipleLayer;
+    int m_layerCount;
 };
 
 //----------------------------------------------------------------------------

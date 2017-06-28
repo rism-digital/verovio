@@ -467,6 +467,11 @@ public:
     virtual int FindAllByAttComparison(FunctorParams *functorParams);
 
     /**
+     * Look if the time / duration passed as parameter overlap with a space in the alignment references
+     */
+    virtual int FindSpaceInReferenceAlignments(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Retrieve the time spanning layer elements between two points
      */
     virtual int FindTimeSpanningLayerElements(FunctorParams *) { return FUNCTOR_CONTINUE; }

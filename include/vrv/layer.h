@@ -17,6 +17,7 @@ namespace vrv {
 class Clef;
 class DeviceContext;
 class LayerElement;
+class Measure;
 class Note;
 class StaffDef;
 
@@ -87,6 +88,7 @@ public:
     void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; }
     data_STEMDIRECTION GetDrawingStemDir(LayerElement *element);
     data_STEMDIRECTION GetDrawingStemDir(const ArrayOfBeamElementCoords *coords);
+    data_STEMDIRECTION GetDrawingStemDir(double time, double duration, Measure *measure, int staff);
     ///@}
 
     Clef *GetCurrentClef() const;
@@ -158,7 +160,7 @@ public:
     /**
      * See Object::CalcStem
      */
-    virtual int CalcStem(FunctorParams *functorParams);
+    virtual int CalcStem(FunctorParams *);
 
     /**
      * See Object::AdjustSylSpacing

@@ -797,6 +797,41 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// FindSpaceInAlignmentParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the time of the event
+ * member 1: the duration of the event
+ * member 2: the layer count at that position
+ * member 3: the flag indicating whereas the event is aligned with a space
+ * member 4: the current meter signature
+ * member 5: the current mensur
+ * member 6: the functor for redirection
+ **/
+
+class FindSpaceInAlignmentParams : public FunctorParams {
+public:
+    FindSpaceInAlignmentParams(MeterSig *meterSig, Mensur *mensur, Functor *functor)
+    {
+        m_time = 0.0;
+        m_duration = 0.0;
+        m_layerCount = 1;
+        m_success = false;
+        m_meterSig = meterSig;
+        m_mensur = mensur;
+        m_functor = functor;
+    }
+    double m_time;
+    double m_duration;
+    int m_layerCount;
+    bool m_success;
+    MeterSig *m_meterSig;
+    Mensur *m_mensur;
+    Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
 // FindTimeSpanningLayerElementsParams
 //----------------------------------------------------------------------------
 

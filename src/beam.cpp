@@ -44,6 +44,7 @@ void BeamDrawingParams::Reset()
     m_beamHasChord = false;
     m_hasMultipleStemDir = false;
     m_cueSize = false;
+    m_crossStaff = false;
     m_shortestDur = 0;
     m_stemDir = STEMDIRECTION_NONE;
 }
@@ -137,7 +138,8 @@ void BeamDrawingParams::CalcBeam(
     avgY /= elementCount;
 
     // If we have one stem direction in the beam, then don't look at the layer
-    if (this->m_stemDir == STEMDIRECTION_NONE) {
+    // We probably do not want to call this if we have a cross-staff situation
+    if (!this->m_crossStaff && (this->m_stemDir == STEMDIRECTION_NONE)) {
         this->m_stemDir = layer->GetDrawingStemDir(beamElementCoords); // force layer direction if it exists
     }
 
@@ -471,6 +473,8 @@ void Beam::InitCoords(ListOfObjects *childList)
     // need for redoing it everytime it is drawn.
 
     data_STEMDIRECTION currentStemDir;
+    Layer *layer = NULL;
+    Staff *currentStaff = NULL;
 
     int elementCount = 0;
 
@@ -495,6 +499,12 @@ void Beam::InitCoords(ListOfObjects *childList)
             if (!m_drawingParams.m_changingDur) m_drawingParams.m_changingDur = true;
             m_beamElementCoords.at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();
         }
+
+        Staff *staff = current->GetCrossStaff(layer);
+        if (staff != currentStaff) {
+            m_drawingParams.m_crossStaff = true;
+        }
+        currentStaff = staff;
 
         // Skip rests
         if (current->Is({ NOTE, CHORD })) {
