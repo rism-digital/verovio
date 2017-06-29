@@ -1221,14 +1221,14 @@ void PaeInput::parseNote(pae::Note *note)
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         mnote->SetDur(DURATION_8);
-        mnote->SetGrace(GRACE_acc);
+        mnote->SetGrace(GRACE_unacc);
         mnote->SetStemDir(STEMDIRECTION_up);
     }
 
     if ((note->appoggiatura > 0) && (element->Is(NOTE))) {
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
-        mnote->SetGrace(GRACE_unacc);
+        mnote->SetGrace(GRACE_acc);
         mnote->SetStemDir(STEMDIRECTION_up);
     }
 
