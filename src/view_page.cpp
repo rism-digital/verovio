@@ -1276,7 +1276,7 @@ void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element
 {
     assert(element);
     if (element->Is(ANNOT)) {
-        DrawAnnot(dc, element);
+        DrawAnnot(dc, element, true);
         return;
     }
     if (element->Is(APP))
@@ -1295,7 +1295,7 @@ void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, 
 {
     assert(element);
     if (element->Is(ANNOT)) {
-        DrawAnnot(dc, element);
+        DrawAnnot(dc, element, true);
         return;
     }
     if (element->Is(APP))
@@ -1310,17 +1310,27 @@ void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, 
     dc->EndTextGraphic(element, this);
 }
 
-void View::DrawAnnot(DeviceContext *dc, EditorialElement *element)
+void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextElement)
 {
     assert(element);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    if (isTextElement) {
+        dc->StartGraphic(element, "", element->GetUuid());
+    }
+    else {
+        dc->StartGraphic(element, "", element->GetUuid());
+    }
 
     Annot *annot = dynamic_cast<Annot *>(element);
     assert(annot);
     dc->AddDescription(UTF16to8(annot->GetText(annot)));
 
-    dc->EndGraphic(element, this);
+    if (isTextElement) {
+        dc->EndTextGraphic(element, this);
+    }
+    else {
+        dc->EndGraphic(element, this);
+    }
 }
 
 } // namespace vrv
