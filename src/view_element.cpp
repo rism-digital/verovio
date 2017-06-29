@@ -893,18 +893,18 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     }
     else if (meterSig->HasSym()) {
         if (meterSig->GetSym() == METERSIGN_common) {
-            DrawSmuflCode(dc, element->GetDrawingX(), y, SMUFL_E08A_timeSigCommon, staff->m_drawingStaffSize, false);
+            DrawSmuflCode(dc, x, y, SMUFL_E08A_timeSigCommon, staff->m_drawingStaffSize, false);
         }
         else if (meterSig->GetSym() == METERSIGN_cut) {
-            DrawSmuflCode(dc, element->GetDrawingX(), y, SMUFL_E08B_timeSigCutCommon, staff->m_drawingStaffSize, false);
+            DrawSmuflCode(dc, x, y, SMUFL_E08B_timeSigCutCommon, staff->m_drawingStaffSize, false);
         }
         x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5; // step forward because we have a symbol
     }
     else if (meterSig->GetForm() == meterSigVis_FORM_num) {
-        DrawMeterSigFigures(dc, x, staff->GetDrawingY(), meterSig->GetCount(), NONE, staff);
+        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), NONE, staff);
     }
     else if (meterSig->HasCount()) {
-        DrawMeterSigFigures(dc, x, staff->GetDrawingY(), meterSig->GetCount(), meterSig->GetUnit(), staff);
+        DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), meterSig->GetUnit(), staff);
     }
 
     dc->EndGraphic(element, this);
@@ -1235,9 +1235,9 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         stem->GetDrawingY() - stem->GetDrawingStemLen());
 
     DrawLayerChildren(dc, stem, layer, staff, measure);
-    
+
     /************ Draw slash ************/
-    
+
     if ((stem->GetGrace() == GRACE_unacc) && !stem->IsInBeam()) {
         DrawAcciaccaturaSlash(dc, stem, staff);
     }
@@ -1452,39 +1452,31 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
     }
 }
 
-void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff)
+void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den, Staff *staff)
 {
     assert(dc);
     assert(staff);
 
-    int ynum = 0, yden = 0;
-    std::wstring numText, numBaseText;
-
-    int yCenter = y - (staff->m_drawingLines) / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    yCenter += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-
-    if (numBase) {
-        ynum = yCenter; // - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2);
-        yden = ynum - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2);
-    }
-    else
-        ynum = yCenter - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2);
+    std::wstring numText = IntToTimeSigFigures(num), denText;
+    if (den) denText = IntToTimeSigFigures(den);
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    numText = IntToTimeSigFigures(num);
-    if (numBase) numBaseText = IntToTimeSigFigures(numBase);
-
-    std::wstring widthText = (numText.length() > numBaseText.length()) ? numText : numBaseText;
+    std::wstring widthText = (numText.length() > denText.length()) ? numText : denText;
 
     TextExtend extend;
     dc->GetSmuflTextExtent(widthText, &extend);
     x += (extend.m_width / 2);
-    DrawSmuflString(dc, x, ynum, numText, true, staff->m_drawingStaffSize);
 
-    if (numBase) {
-        DrawSmuflString(dc, x, yden, numBaseText, true, staff->m_drawingStaffSize);
+    if (den) {
+        DrawSmuflString(dc, x, y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), numText, true,
+            staff->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), denText, true,
+            staff->m_drawingStaffSize);
     }
+    else
+        DrawSmuflString(
+            dc, x, y, numText, true, staff->m_drawingStaffSize);
 
     dc->ResetFont();
 }
