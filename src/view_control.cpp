@@ -550,7 +550,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     }
 
     if (start->Is(TIMESTAMP_ATTR) || end->Is(TIMESTAMP_ATTR)) {
-        // fow now ignore slur using tstamps
+        // for now ignore slur using tstamps
         return;
     }
 
