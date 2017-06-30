@@ -216,7 +216,7 @@ protected:
      * Defined in view_page.cpp
      */
     ///@{
-    void DrawAnnot(DeviceContext *dc, EditorialElement *element);
+    void DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextElement = false);
     ///@}
 
     /**
