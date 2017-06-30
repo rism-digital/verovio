@@ -1195,7 +1195,7 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
 {
     assert(element);
     if (element->Is(ANNOT)) {
-        DrawAnnot(dc, element, false);
+        DrawAnnot(dc, element);
         return;
     }
     if (element->Is(APP))
@@ -1218,7 +1218,7 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
 {
     assert(element);
     if (element->Is(ANNOT)) {
-        DrawAnnot(dc, element, false);
+        DrawAnnot(dc, element);
         return;
     }
     if (element->Is(APP))
@@ -1237,7 +1237,7 @@ void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *elemen
 {
     assert(element);
     if (element->Is(ANNOT)) {
-        DrawAnnot(dc, element, false);
+        DrawAnnot(dc, element);
         return;
     }
     if (element->Is(APP))
@@ -1257,7 +1257,7 @@ void View::DrawLayerEditorialElement(
 {
     assert(element);
     if (element->Is(ANNOT)) {
-        DrawAnnot(dc, element, false);
+        DrawAnnot(dc, element);
         return;
     }
     if (element->Is(APP))
