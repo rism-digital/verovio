@@ -743,7 +743,7 @@ int Measure::PrepareTimePointingEnd(FunctorParams *functorParams)
     assert(params);
 
     if (!params->m_timePointingInterfaces.empty()) {
-        LogWarning("%d time pointing element(s) could not be matched in mesure %s",
+        LogWarning("%d time pointing element(s) could not be matched in measure %s",
             params->m_timePointingInterfaces.size(), this->GetUuid().c_str());
     }
 
