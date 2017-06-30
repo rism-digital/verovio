@@ -92,7 +92,7 @@ bool PaeInput::ImportFile()
     parsePlainAndEasy(infile);
     return true;
 #else
-    LogError("Plain and Easy import is not supported in the build.");
+    LogError("Plaine & Easie import is not supported in the build.");
     return false;
 #endif
 }
@@ -104,7 +104,7 @@ bool PaeInput::ImportString(std::string const &pae)
     parsePlainAndEasy(in_stream);
     return true;
 #else
-    LogError("Plain and Easy import is not support in the build.");
+    LogError("Plaine & Easie import is not support in the build.");
     return false;
 #endif
 }
@@ -1221,14 +1221,14 @@ void PaeInput::parseNote(pae::Note *note)
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         mnote->SetDur(DURATION_8);
-        mnote->SetGrace(GRACE_acc);
+        mnote->SetGrace(GRACE_unacc);
         mnote->SetStemDir(STEMDIRECTION_up);
     }
 
     if ((note->appoggiatura > 0) && (element->Is(NOTE))) {
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
-        mnote->SetGrace(GRACE_unacc);
+        mnote->SetGrace(GRACE_acc);
         mnote->SetStemDir(STEMDIRECTION_up);
     }
 
