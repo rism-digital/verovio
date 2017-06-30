@@ -58,28 +58,28 @@ namespace humaux {
 
     class HumdrumTie {
     public:
-        HumdrumTie(void);
+        HumdrumTie();
         HumdrumTie(const HumdrumTie &anothertie);
         ~HumdrumTie();
         HumdrumTie &operator=(const HumdrumTie &anothertie);
-        vrv::Tie *insertTieIntoDom(void);
+        vrv::Tie *insertTieIntoDom();
         void setStart(const std::string &id, Measure *starting, int layer, const std::string &token, int pitch,
             hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp starttok);
         void setEnd(const std::string &id, Measure *ending, const std::string &token);
         vrv::Tie *setEndAndInsert(const std::string &id, Measure *ending, const std::string &token);
-        hum::HumNum getEndTime(void);
-        hum::HumNum getStartTime(void);
-        hum::HumNum getDuration(void);
-        std::string getStartToken(void);
-        hum::HTp getStartTokenPointer(void);
-        std::string getEndToken(void);
-        int getStartSubindex(void);
-        int getPitch(void);
-        int getLayer(void);
-        bool isInserted(void);
+        hum::HumNum getEndTime();
+        hum::HumNum getStartTime();
+        hum::HumNum getDuration();
+        std::string getStartToken();
+        hum::HTp getStartTokenPointer();
+        std::string getEndToken();
+        int getStartSubindex();
+        int getPitch();
+        int getLayer();
+        bool isInserted();
         void clear();
-        void setTieAbove(void);
-        void setTieBelow(void);
+        void setTieAbove();
+        void setTieBelow();
 
     private:
         std::string m_starttoken;
@@ -113,9 +113,9 @@ namespace humaux {
         int gbeamstart;
         int gbeamend;
         char priority;
-        HumdrumBeamAndTuplet(void) { clear(); }
-        ~HumdrumBeamAndTuplet(void) { clear(); }
-        void clear(void)
+        HumdrumBeamAndTuplet() { clear(); }
+        ~HumdrumBeamAndTuplet() { clear(); }
+        void clear()
         {
             group = bracket = 0;
             numbase = num = 1;
@@ -132,9 +132,9 @@ namespace humaux {
     // is used to store all variables which are vectors
     class StaffStateVariables {
     public:
-        StaffStateVariables(void);
-        ~StaffStateVariables(void);
-        void clear(void);
+        StaffStateVariables();
+        ~StaffStateVariables();
+        void clear();
 
         // verse == keeps track of whether or not staff contains associated
         // **text spines which will be converted into lyrics.
@@ -214,16 +214,16 @@ public:
 
 #ifndef NO_HUMDRUM_SUPPORT
 
-    std::string GetHumdrumString(void);
-    std::string GetMeiString(void);
+    std::string GetHumdrumString();
+    std::string GetMeiString();
 
-    int GetTypeOption(void) { return m_type; }
+    int GetTypeOption() { return m_type; }
     void SetTypeOption(int value) { m_type = value; }
 
 protected:
-    void clear(void);
-    bool convertHumdrum(void);
-    void setupMeiDocument(void);
+    void clear();
+    bool convertHumdrum();
+    void setupMeiDocument();
     int getMeasureEndLine(int startline);
     bool convertSystemMeasure(int &line);
     bool convertMeasureStaves(int startline, int endline);
@@ -232,23 +232,23 @@ protected:
     bool convertStaffLayer(int track, int startline, int endline, int layerindex);
     int getMeasureNumber(int startline, int endline);
     bool fillContentsOfLayer(int track, int startline, int endline, int layerindex);
-    void calculateLayout(void);
+    void calculateLayout();
     void setSystemMeasureStyle(int startline, int endline);
-    std::vector<int> getStaffLayerCounts(void);
-    void prepareStaffGroup(void);
+    std::vector<int> getStaffLayerCounts();
+    void prepareStaffGroup();
     void setClef(StaffDef *part, const std::string &clef);
     void setTimeSig(StaffDef *part, const std::string &timesig);
     void setMeterSymbol(StaffDef *part, const std::string &metersig);
     void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
-    void calculateReverseKernIndex(void);
-    void prepareTimeSigDur(void);
-    void printMeasureTokens(void);
+    void calculateReverseKernIndex();
+    void prepareTimeSigDur();
+    void printMeasureTokens();
     int characterCount(const std::string &text, char symbol);
     int characterCount(hum::HTp token, char symbol);
     int characterCountInSubtoken(hum::HTp token, char symbol);
     int characterCountInSubtoken(const std::string &text, char symbol);
-    bool emptyMeasures(void);
+    bool emptyMeasures();
     bool hasFullMeasureRest(std::vector<hum::HTp> &layerdata, hum::HumNum timesigdur, hum::HumNum measuredur);
     void convertNote(vrv::Note *note, hum::HTp token, int staffindex, int subtoken = -1);
     void addCautionaryAccidental(Accid *accid, hum::HTp token, int acount);
@@ -263,7 +263,7 @@ protected:
     void getTimingInformation(std::vector<hum::HumNum> &prespace, std::vector<hum::HTp> &layerdata,
         hum::HumNum layerstarttime, hum::HumNum layerendtime);
     void convertChord(Chord *chord, hum::HTp token, int staffindex);
-    void prepareVerses(void);
+    void prepareVerses();
     void convertVerses(Note *note, hum::HTp token, int subtoken);
     void checkForOmd(int startline, int endline);
     void handleOttavaMark(hum::HTp token, Note *note);
@@ -307,14 +307,14 @@ protected:
     hum::HTp getDecrescendoEnd(hum::HTp token);
     hum::HTp getCrescendoEnd(hum::HTp token);
     int getMeasureDifference(hum::HTp starttok, hum::HTp endtok);
-    void storeOriginalClefMensurationApp(void);
+    void storeOriginalClefMensurationApp();
     void addSpace(std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HumNum duration);
     void setLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
     void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
     std::string getLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
-	std::string getLocationId(Object *object, int lineindex, int fieldindex, int subtokenindex);
-	std::string getLocationId(const string& prefix, hum::HTp token, int subtoken);
-	std::string getLocationId(const string& prefix, int lineindex, int fieldindex, int subtokenindex);
+    std::string getLocationId(Object *object, int lineindex, int fieldindex, int subtokenindex);
+    std::string getLocationId(const string &prefix, hum::HTp token, int subtoken);
+    std::string getLocationId(const string &prefix, int lineindex, int fieldindex, int subtokenindex);
     void setLocationIdNSuffix(vrv::Object *object, hum::HTp token, int number);
     void setSlurLocationId(vrv::Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex);
     void setTieLocationId(vrv::Object *object, hum::HTp tiestart, int sindex, hum::HTp tieend, int eindex);
@@ -334,7 +334,7 @@ protected:
     void checkForColorSpine(hum::HumdrumFile &infile);
     std::vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
     void addSystemKeyTimeChange(int startline, int endline);
-    void prepareEndings(void);
+    void prepareEndings();
     int getDirection(const string &token, const std::string &target);
     void resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void resolveTupletBeamStartTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
@@ -343,9 +343,11 @@ protected:
     void embedPitchInformationInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
     void splitSyllableBySpaces(vector<string> &vtext, char spacer = ' ');
+    void setInstrumentName(vrv::StaffDef *staffdef, const string &name);
+    void setInstrumentAbbreviation(vrv::StaffDef *staffdef, const string &name);
 
     // header related functions: ///////////////////////////////////////////
-    void createHeader(void);
+    void createHeader();
     void insertTitle(pugi::xml_node &titleStmt, const std::vector<hum::HumdrumLine *> &references);
     void insertExtMeta(std::vector<hum::HumdrumLine *> &references);
     void addPerson(std::vector<std::vector<std::string> > &respPeople, std::vector<hum::HumdrumLine *> &references,
@@ -377,7 +379,7 @@ protected:
     static hum::HumNum removeFactorsOfTwo(hum::HumNum value, int &tcount, int &bcount);
     static int getDotPowerOfTwo(hum::HumNum value);
     static int nextLowerPowerOfTwo(int x);
-    static std::string getDateString(void);
+    static std::string getDateString();
     static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
     std::string cleanHarmString(const std::string &content);

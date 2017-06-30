@@ -70,14 +70,15 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     /************** Stem/notehead direction: **************/
 
+    data_STEMDIRECTION layerStemDir;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
     if (note->HasStemDir()) {
         stemDir = note->GetStemDir();
     }
-    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        stemDir = layer->GetDrawingStemDir();
+    else if ((layerStemDir = layer->GetDrawingStemDir(note)) != STEMDIRECTION_NONE) {
+        stemDir = layerStemDir;
     }
     else {
         if (drawingDur < DUR_1)

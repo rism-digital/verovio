@@ -41,6 +41,15 @@ public:
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
     ///@}
 
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::FindSpaceInReferenceAlignments
+     */
+    virtual int FindSpaceInReferenceAlignments(FunctorParams *functorParams);
+
 private:
     //
 public:

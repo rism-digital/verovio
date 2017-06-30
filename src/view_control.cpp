@@ -249,9 +249,6 @@ void View::DrawHairpin(
         return;
     }
 
-    LayerElement *start = NULL;
-    LayerElement *end = NULL;
-
     data_STAFFREL place = hairpin->GetPlace();
     hairpinLog_FORM form = hairpin->GetForm();
 
@@ -264,37 +261,6 @@ void View::DrawHairpin(
     // int y1 = GetHairpinY(hairpin->GetPlace(), staff);
     int y1 = hairpin->GetDrawingY();
     int y2 = y1;
-
-    /************** parent layers **************/
-
-    start = dynamic_cast<LayerElement *>(hairpin->GetStart());
-    end = dynamic_cast<LayerElement *>(hairpin->GetEnd());
-
-    if (!start || !end) {
-        // no start and end, obviously nothing to do...
-        return;
-    }
-
-    /* We actually do not need the layer for now
-
-    Layer *layer1 = NULL;
-    Layer *layer2 = NULL;
-
-    // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
-    if (start->Is(TIMESTAMP_ATTR))
-        layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-    else
-        layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
-
-    // idem
-    if (end->Is(TIMESTAMP_ATTR))
-        layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-    else
-        layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
-
-    assert(layer1 && layer2);
-
-     */
 
     /************** start / end opening **************/
 
@@ -335,51 +301,6 @@ void View::DrawHairpin(
             endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false) / 3;
             startY = 2 * endY;
         }
-    }
-
-    /************** direction **************/
-
-    /*
-    // first should be the tie @curvedir
-    if (slur->HasCurvedir()) {
-        up = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? true : false;
-    }
-    // then layer direction trumps note direction
-    else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
-    }
-    // look if in a chord
-    else if (startParentChord) {
-        if (startParentChord->PositionInChord(startNote) < 0) {
-            up = false;
-        }
-        else if (startParentChord->PositionInChord(startNote) > 0) {
-            up = true;
-        }
-        // away from the stem if odd number (center note)
-        else {
-            up = (stemDir != STEMDIRECTION_up);
-        }
-    }
-    else if (stemDir == STEMDIRECTION_up) {
-        up = false;
-    }
-    else if (stemDir == STEMDIRECTION_NONE) {
-        // no information from the note stem directions, look at the position in the notes
-        int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-        up = (start->GetDrawingY() > center) ? true : false;
-    }
-    */
-
-    /************** adjusting y position **************/
-
-    if (place.GetBasic() == STAFFREL_basic_above) {
-        // y1 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        // y2 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
-    else {
-        // y1 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        // y2 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
     /************** draw it **************/
@@ -620,15 +541,16 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     /************** direction **************/
 
+    data_STEMDIRECTION layerStemDir;
+
     // first should be the tie @curvedir
     if (slur->HasCurvedir()) {
         drawingCurveDir
             = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
-    else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        drawingCurveDir
-            = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+    else if (layer1 && ((layerStemDir = layer1->GetDrawingStemDir(start)) != STEMDIRECTION_NONE)) {
+        drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // look if in a chord
     else if (startParentChord) {
@@ -859,6 +781,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         dc->StartGraphic(slur, "spanning-slur", "");
     DrawThickBezierCurve(dc, points, thickness, staff->m_drawingStaffSize, angle);
 
+    /* drawing debug points */
     /*
     int i;
     int dist = (points[3].x - points[0].x) / 10;
@@ -1075,8 +998,9 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
 
     // 0.2 for avoiding / by 0 (below)
     float maxHeightFactor = std::max(0.2f, fabsf(angle));
-    maxHeight = dist / (maxHeightFactor * (TEMP_SLUR_CURVE_FACTOR
-                                              + 5)); // 5 is the minimum - can be increased for limiting curvature
+    maxHeight = dist
+        / (maxHeightFactor
+              * (TEMP_SLUR_CURVE_FACTOR + 5)); // 5 is the minimum - can be increased for limiting curvature
 
     maxHeight = std::max(maxHeight, currentHeight);
 
@@ -1328,15 +1252,16 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
 
     /************** direction **************/
 
+    data_STEMDIRECTION layerStemDir;
+
     // first should be the tie @curvedir
     if (tie->HasCurvedir()) {
         drawingCurveDir
             = (tie->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
-    else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        drawingCurveDir
-            = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+    else if (layer1 && ((layerStemDir = layer1->GetDrawingStemDir(note1)) != STEMDIRECTION_NONE)) {
+        drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // look if in a chord
     else if (parentChord1) {
@@ -1741,15 +1666,17 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     int code = SMUFL_E4C0_fermataAbove;
     // check for shape
     if (fermata->GetShape() == fermataVis_SHAPE_angular) {
-        if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
-                                                             && !(fermata->GetForm() == fermataVis_FORM_norm)))
+        if (fermata->GetForm() == fermataVis_FORM_inv
+            || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
+                   && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C5_fermataShortBelow;
         else
             code = SMUFL_E4C4_fermataShortAbove;
     }
     else if (fermata->GetShape() == fermataVis_SHAPE_square) {
-        if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
-                                                             && !(fermata->GetForm() == fermataVis_FORM_norm)))
+        if (fermata->GetForm() == fermataVis_FORM_inv
+            || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
+                   && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C7_fermataLongBelow;
         else
             code = SMUFL_E4C6_fermataLongAbove;

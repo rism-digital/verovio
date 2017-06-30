@@ -5,8 +5,16 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "mensur.h"
+#include "mensur.h" //----------------------------------------------------------------------------
+
+#include <assert.h>
+#include <math.h>
+
+//----------------------------------------------------------------------------
+
+#include "functorparams.h"
 #include "scoredefinterface.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -77,6 +85,20 @@ void Mensur::Reset()
     ResetMensurLog();
     ResetMensurVis();
     ResetSlashCount();
+}
+
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int Mensur::FindSpaceInReferenceAlignments(FunctorParams *functorParams)
+{
+    FindSpaceInAlignmentParams *params = dynamic_cast<FindSpaceInAlignmentParams *>(functorParams);
+    assert(params);
+
+    params->m_mensur = this;
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

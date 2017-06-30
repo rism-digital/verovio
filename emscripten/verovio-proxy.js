@@ -60,6 +60,9 @@ verovio.vrvToolkit.renderPage = Module.cwrap('vrvToolkit_renderPage', 'string', 
 // char *renderToMidi(Toolkit *ic, const char *rendering_options )
 verovio.vrvToolkit.renderToMidi = Module.cwrap('vrvToolkit_renderToMidi', 'string', ['number', 'string']);
 
+// char *renderToTimemap(Toolkit *ic )
+verovio.vrvToolkit.renderToTimemap = Module.cwrap('vrvToolkit_renderToTimemap', 'string', ['number']);
+
 // void setOptions(Toolkit *ic, const char *options) 
 verovio.vrvToolkit.setOptions = Module.cwrap('vrvToolkit_setOptions', null, ['number', 'string']);
 
@@ -143,6 +146,10 @@ verovio.toolkit.prototype.renderPage = function (pageNo, options) {
 
 verovio.toolkit.prototype.renderToMidi = function (options) {
     return verovio.vrvToolkit.renderToMidi(this.ptr, JSON.stringify(options));
+};
+
+verovio.toolkit.prototype.renderToTimemap = function () {
+    return verovio.vrvToolkit.renderToTimemap(this.ptr);
 };
 
 verovio.toolkit.prototype.setOptions = function (options) {

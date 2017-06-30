@@ -7,6 +7,7 @@
 
 #include "note.h"
 
+#include <iostream>
 //----------------------------------------------------------------------------
 
 #include <assert.h>
@@ -376,32 +377,32 @@ void Note::SetScoreTimeTiedDuration(double scoreTime)
     m_scoreTimeTiedDuration = scoreTime;
 }
 
-double Note::GetScoreTimeOnset(void)
+double Note::GetScoreTimeOnset()
 {
     return m_scoreTimeOnset;
 }
 
-int Note::GetRealTimeOnsetMilliseconds(void)
+int Note::GetRealTimeOnsetMilliseconds()
 {
     return m_realTimeOnsetMilliseconds;
 }
 
-double Note::GetScoreTimeOffset(void)
+double Note::GetScoreTimeOffset()
 {
     return m_scoreTimeOffset;
 }
 
-int Note::GetRealTimeOffsetMilliseconds(void)
+int Note::GetRealTimeOffsetMilliseconds()
 {
     return m_realTimeOffsetMilliseconds;
 }
 
-double Note::GetScoreTimeTiedDuration(void)
+double Note::GetScoreTimeTiedDuration()
 {
     return m_scoreTimeTiedDuration;
 }
 
-double Note::GetScoreTimeDuration(void)
+double Note::GetScoreTimeDuration()
 {
     return GetScoreTimeOffset() - GetScoreTimeOnset();
 }
@@ -465,6 +466,7 @@ int Note::CalcStem(FunctorParams *functorParams)
 
     /************ Set the direction ************/
 
+    data_STEMDIRECTION layerStemDir;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     if (stem->HasStemDir()) {
@@ -473,8 +475,8 @@ int Note::CalcStem(FunctorParams *functorParams)
     else if (this->IsGraceNote()) {
         stemDir = STEMDIRECTION_up;
     }
-    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        stemDir = layer->GetDrawingStemDir();
+    else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
+        stemDir = layerStemDir;
     }
     else {
         stemDir = (this->GetDrawingY() >= params->m_verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
@@ -890,6 +892,36 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
 
     params->m_midiFile->addNoteOn(params->m_midiTrack, starttime * tpq, channel, pitch, velocity);
     params->m_midiFile->addNoteOff(params->m_midiTrack, stoptime * tpq, channel, pitch);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Note::GenerateTimemap(FunctorParams *functorParams)
+{
+    GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
+    assert(params);
+
+    int realTimeStart = params->m_realTimeOffsetMilliseconds + m_realTimeOnsetMilliseconds;
+    double scoreTimeStart = params->m_scoreTimeOffset + m_scoreTimeOnset;
+
+    int realTimeEnd = params->m_realTimeOffsetMilliseconds + m_realTimeOffsetMilliseconds;
+    double scoreTimeEnd = params->m_scoreTimeOffset + m_scoreTimeOffset;
+
+    // Should check if value for realTimeStart already exists and if so, then
+    // ensure that it is equal to scoreTimeStart:
+    params->realTimeToScoreTime[realTimeStart] = scoreTimeStart;
+
+    // Store the element ID in list to turn on at given time.
+    params->realTimeToOnElements[realTimeStart].push_back(this->GetUuid());
+
+    // Should check if value for realTimeEnd already exists and if so, then
+    // ensure that it is equal to scoreTimeEnd:
+    params->realTimeToScoreTime[realTimeEnd] = scoreTimeEnd;
+
+    // Store the element ID in list to turn off at given time.
+    params->realTimeToOffElements[realTimeEnd].push_back(this->GetUuid());
+
+    params->realTimeToTempo[realTimeStart] = params->m_currentTempo;
 
     return FUNCTOR_SIBLINGS;
 }

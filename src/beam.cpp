@@ -44,6 +44,7 @@ void BeamDrawingParams::Reset()
     m_beamHasChord = false;
     m_hasMultipleStemDir = false;
     m_cueSize = false;
+    m_crossStaff = false;
     m_shortestDur = 0;
     m_stemDir = STEMDIRECTION_NONE;
 }
@@ -137,17 +138,14 @@ void BeamDrawingParams::CalcBeam(
     avgY /= elementCount;
 
     // If we have one stem direction in the beam, then don't look at the layer
-    if (this->m_stemDir == STEMDIRECTION_NONE)
-        this->m_stemDir = layer->GetDrawingStemDir(); // force layer direction if it exists
+    // We probably do not want to call this if we have a cross-staff situation
+    if (!this->m_crossStaff && (this->m_stemDir == STEMDIRECTION_NONE)) {
+        this->m_stemDir = layer->GetDrawingStemDir(beamElementCoords); // force layer direction if it exists
+    }
 
     // Automatic stem direction if nothing in the notes or in the layer
     if (this->m_stemDir == STEMDIRECTION_NONE) {
-        /*if (this->m_beamHasChord)
-         this->m_stemDir = (yExtreme < verticalCenter)
-         ? STEMDIRECTION_up
-         : STEMDIRECTION_down; // if it has a chord, go by the most extreme position
-         else */
-        this->m_stemDir = (avgY < verticalCenter) ? STEMDIRECTION_up : STEMDIRECTION_down; // otherwise go by average
+        this->m_stemDir = (avgY < verticalCenter) ? STEMDIRECTION_up : STEMDIRECTION_down;
     }
 
     if (this->m_stemDir == STEMDIRECTION_up) { // set stem direction for all the notes
@@ -475,6 +473,8 @@ void Beam::InitCoords(ListOfObjects *childList)
     // need for redoing it everytime it is drawn.
 
     data_STEMDIRECTION currentStemDir;
+    Layer *layer = NULL;
+    Staff *currentStaff = NULL;
 
     int elementCount = 0;
 
@@ -499,6 +499,12 @@ void Beam::InitCoords(ListOfObjects *childList)
             if (!m_drawingParams.m_changingDur) m_drawingParams.m_changingDur = true;
             m_beamElementCoords.at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();
         }
+
+        Staff *staff = current->GetCrossStaff(layer);
+        if (staff != currentStaff) {
+            m_drawingParams.m_crossStaff = true;
+        }
+        currentStaff = staff;
 
         // Skip rests
         if (current->Is({ NOTE, CHORD })) {
@@ -551,7 +557,7 @@ void Beam::InitCoords(ListOfObjects *childList)
 
     // We look only at the last note for checking if cue-sized. Somehow arbitrarily
     m_drawingParams.m_cueSize = m_beamElementCoords.at(last)->m_element->IsCueSize();
-    
+
     // Always set stem diretion to up for grace note beam unless stem direction is provided
     if (this->m_drawingParams.m_cueSize && (this->m_drawingParams.m_stemDir == STEMDIRECTION_NONE)) {
         this->m_drawingParams.m_stemDir = STEMDIRECTION_up;

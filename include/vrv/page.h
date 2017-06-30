@@ -26,7 +26,7 @@ class System;
  * This class represents a page in a laid-out score (Doc).
  * A Page is contained in a Doc.
  * It contains System objects.
-*/
+ */
 class Page : public Object {
 public:
     /**
@@ -131,7 +131,7 @@ public:
     /**
      * Apply the Pixel Per Unit factor of the page to its elements.
      */
-    virtual int ApplyPPUFactor(FunctorParams *);
+    virtual int ApplyPPUFactor(FunctorParams *functorParams);
 
 private:
     /**
@@ -164,7 +164,7 @@ public:
      * The value is initialized by the Object::SetCurrentScoreDef functor.
      */
     ScoreDef m_drawingScoreDef;
-    
+
     /**
      * Temporary member that will be replace by its LibMEI equivalent in the next version of the page-based MEI
      */

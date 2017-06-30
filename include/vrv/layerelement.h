@@ -243,7 +243,7 @@ public:
      * See Object::CalcOnsetOffset
      */
     ///@{
-    virtual int CalcOnsetOffset(FunctorParams *);
+    virtual int CalcOnsetOffset(FunctorParams *functorParams);
     ///@}
 
     /**

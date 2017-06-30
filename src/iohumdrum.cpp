@@ -52,6 +52,7 @@
 #include "hairpin.h"
 #include "harm.h"
 #include "iomei.h"
+#include "label.h"
 #include "layer.h"
 #include "measure.h"
 #include "mordent.h"
@@ -93,7 +94,7 @@ namespace humaux {
 
     /////////////////////////////////////////////////////////////////////
 
-    HumdrumTie::HumdrumTie(void)
+    HumdrumTie::HumdrumTie()
     {
         m_endmeasure = m_startmeasure = NULL;
         m_inserted = false;
@@ -120,7 +121,7 @@ namespace humaux {
         m_layer = anothertie.m_layer;
     }
 
-    HumdrumTie::~HumdrumTie(void) { clear(); }
+    HumdrumTie::~HumdrumTie() { clear(); }
 
     HumdrumTie &HumdrumTie::operator=(const HumdrumTie &anothertie)
     {
@@ -143,7 +144,7 @@ namespace humaux {
         return *this;
     }
 
-    void HumdrumTie::clear(void)
+    void HumdrumTie::clear()
     {
         m_endmeasure = m_startmeasure = NULL;
         m_inserted = false;
@@ -153,11 +154,11 @@ namespace humaux {
         m_endid.clear();
     }
 
-    void HumdrumTie::setTieAbove(void) { m_above = true; }
+    void HumdrumTie::setTieAbove() { m_above = true; }
 
-    void HumdrumTie::setTieBelow(void) { m_below = true; }
+    void HumdrumTie::setTieBelow() { m_below = true; }
 
-    Tie *HumdrumTie::insertTieIntoDom(void)
+    Tie *HumdrumTie::insertTieIntoDom()
     {
         if (m_inserted) {
             // don't insert again
@@ -235,31 +236,31 @@ namespace humaux {
         return insertTieIntoDom();
     }
 
-    bool HumdrumTie::isInserted(void) { return m_inserted; }
+    bool HumdrumTie::isInserted() { return m_inserted; }
 
-    int HumdrumTie::getPitch(void) { return m_pitch; }
+    int HumdrumTie::getPitch() { return m_pitch; }
 
-    int HumdrumTie::getLayer(void) { return m_layer; }
+    int HumdrumTie::getLayer() { return m_layer; }
 
-    hum::HumNum HumdrumTie::getStartTime(void) { return m_starttime; }
+    hum::HumNum HumdrumTie::getStartTime() { return m_starttime; }
 
-    hum::HumNum HumdrumTie::getEndTime(void) { return m_endtime; }
+    hum::HumNum HumdrumTie::getEndTime() { return m_endtime; }
 
-    hum::HumNum HumdrumTie::getDuration(void) { return m_endtime - m_starttime; }
+    hum::HumNum HumdrumTie::getDuration() { return m_endtime - m_starttime; }
 
-    std::string HumdrumTie::getStartToken(void) { return m_starttoken; }
+    std::string HumdrumTie::getStartToken() { return m_starttoken; }
 
-    hum::HTp HumdrumTie::getStartTokenPointer(void) { return m_starttokenpointer; }
+    hum::HTp HumdrumTie::getStartTokenPointer() { return m_starttokenpointer; }
 
-    int HumdrumTie::getStartSubindex(void) { return m_subindex; }
+    int HumdrumTie::getStartSubindex() { return m_subindex; }
 
-    std::string HumdrumTie::getEndToken(void) { return m_endtoken; }
+    std::string HumdrumTie::getEndToken() { return m_endtoken; }
 
     /////////////////////////////////////////////////////////////////////
 
-    StaffStateVariables::StaffStateVariables(void) { clear(); }
+    StaffStateVariables::StaffStateVariables() { clear(); }
     StaffStateVariables::~StaffStateVariables() { clear(); }
-    void StaffStateVariables::clear(void)
+    void StaffStateVariables::clear()
     {
         verse = false;
         suppress_beam_tuplet = false;
@@ -381,7 +382,7 @@ bool HumdrumInput::ImportString(std::string const &content)
         }
 
         bool result;
-        if (comma < tab) {
+        if (comma <= tab) {
             result = infile.readString(content);
         }
         else {
@@ -416,7 +417,7 @@ bool HumdrumInput::ImportString(std::string const &content)
 //    convesion.
 //
 
-string HumdrumInput::GetHumdrumString(void)
+string HumdrumInput::GetHumdrumString()
 {
     stringstream tempout;
     tempout << m_infile;
@@ -434,7 +435,7 @@ string HumdrumInput::GetHumdrumString(void)
 //     http://music-encoding.org/documentation/2.1.1/cmn
 //
 
-bool HumdrumInput::convertHumdrum(void)
+bool HumdrumInput::convertHumdrum()
 {
     hum::HumdrumFile &infile = m_infile;
 
@@ -578,7 +579,7 @@ bool HumdrumInput::convertHumdrum(void)
 //        <change>
 //
 
-void HumdrumInput::createHeader(void)
+void HumdrumInput::createHeader()
 {
     hum::HumdrumFile &infile = m_infile;
     std::vector<hum::HumdrumLine *> references = infile.getReferenceRecords();
@@ -786,7 +787,7 @@ string HumdrumInput::getReferenceValue(const std::string &key, std::vector<hum::
 // HumdrumInput::getDateSting -- Return the current time and date as a string.
 //
 
-string HumdrumInput::getDateString(void)
+string HumdrumInput::getDateString()
 {
     time_t t = time(0); // get time now
     struct tm *now = localtime(&t);
@@ -1008,7 +1009,7 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const std::vector<hum:
 //      filled already.
 //
 
-void HumdrumInput::prepareVerses(void)
+void HumdrumInput::prepareVerses()
 {
     int i, j;
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
@@ -1052,7 +1053,7 @@ void HumdrumInput::prepareVerses(void)
 //      the first spine in the file is considered.
 //
 
-void HumdrumInput::prepareTimeSigDur(void)
+void HumdrumInput::prepareTimeSigDur()
 {
     std::vector<hum::HumNum> &sigdurs = m_timesigdurs;
     hum::HumdrumFile &infile = m_infile;
@@ -1125,7 +1126,7 @@ void HumdrumInput::prepareTimeSigDur(void)
 // HumdrumInput::calculateReverseKernIndex --
 //
 
-void HumdrumInput::calculateReverseKernIndex(void)
+void HumdrumInput::calculateReverseKernIndex()
 {
     std::vector<int> &rkern = m_rkern;
     hum::HumdrumFile &infile = m_infile;
@@ -1143,7 +1144,7 @@ void HumdrumInput::calculateReverseKernIndex(void)
 // HumdrumInput::prepareStaffGroup --  Add information about each part.
 //
 
-void HumdrumInput::prepareStaffGroup(void)
+void HumdrumInput::prepareStaffGroup()
 {
     const std::vector<hum::HTp> &kernstarts = m_kernstarts;
 
@@ -1292,13 +1293,13 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     if (label.size() > 0) {
-        m_staffdef.back()->SetLabel(label);
+        // 300: m_staffdef.back()->SetLabel(label);
+        setInstrumentName(m_staffdef.back(), label);
     }
 
     if (abbreviation.size() > 0) {
-        // 400
-        // currently no label in MEI 4.0.0 branch, so add back later:
-        // m_staffdef.back()->SetLabelAbbr(abbreviation);
+        // 300: m_staffdef.back()->SetLabelAbbr(abbreviation);
+        setInstrumentAbbreviation(m_staffdef.back(), abbreviation);
     }
 
     if (keysig.size() > 0) {
@@ -1328,6 +1329,34 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     addInstrumentDefinition(m_staffdef.back(), partstart);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setInstrumentName --
+//
+
+void HumdrumInput::setInstrumentName(vrv::StaffDef *staffdef, const string &name)
+{
+    Label *label = new Label();
+    Text *text = new Text;
+    text->SetText(UTF8to16(name));
+    label->AddChild(text);
+    staffdef->AddChild(label);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setInstrumentAbbreviation --
+//
+
+void HumdrumInput::setInstrumentAbbreviation(vrv::StaffDef *staffdef, const string &name)
+{
+    LabelAbbr *label = new LabelAbbr();
+    Text *text = new Text;
+    text->SetText(UTF8to16(name));
+    label->AddChild(text);
+    staffdef->AddChild(label);
 }
 
 //////////////////////////////
@@ -4252,23 +4281,20 @@ void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<
     tuplet->SetNum(tg.num * scale);
     tuplet->SetNumbase(tg.numbase * scale);
     if (suppress) {
-        // This shouldn't be needed, but just in case.
-        // The visibility of the bracket is determined
-        // earlier when there is a beam to attach
-        // the tuplet to.
         tuplet->SetBracketVisible(BOOLEAN_false);
     }
-    else {
-        if (tg.bracket) {
-            tuplet->SetBracketVisible(BOOLEAN_true);
-        }
-        else {
-            tuplet->SetBracketVisible(BOOLEAN_false);
-        }
-    }
+    // Brackets will be displayed automatically, so don't turn on:
+    // else {
+    //     if (tg.bracket) {
+    //         tuplet->SetBracketVisible(BOOLEAN_true);
+    //     }
+    //     else {
+    //         tuplet->SetBracketVisible(BOOLEAN_false);
+    //     }
+    // }
     if (suppress) {
         // Number is visible by default, so only hide
-        // it if necessary.
+        // if explicitly requested:
         tuplet->SetNumVisible(BOOLEAN_false);
     }
     hum::HumNum base = tg.numbase;
@@ -5743,7 +5769,7 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             splitSyllableBySpaces(vtexts);
         }
 
-        for (int j = 0; j < vtexts.size(); j++) {
+        for (int j = 0; j < (int)vtexts.size(); j++) {
             content = vtexts[j];
             versenum++;
             if (content == "") {
@@ -6558,7 +6584,7 @@ int HumdrumInput::characterCountInSubtoken(hum::HTp token, char symbol)
 // HumdrumInput::printMeasureTokens -- For debugging.
 //
 
-void HumdrumInput::printMeasureTokens(void)
+void HumdrumInput::printMeasureTokens()
 {
     std::vector<std::vector<std::vector<hum::HTp> > > &lt = m_layertokens;
     int i, j, k;
@@ -6659,7 +6685,7 @@ template <class ELEMENT> hum::HumNum HumdrumInput::setDuration(ELEMENT element, 
 //    part within the measure.
 //
 
-std::vector<int> HumdrumInput::getStaffLayerCounts(void)
+std::vector<int> HumdrumInput::getStaffLayerCounts()
 {
     std::vector<std::vector<std::vector<hum::HTp> > > &lt = m_layertokens;
     std::vector<int> output(lt.size(), 0);
@@ -6748,7 +6774,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 // </app>
 //
 
-void HumdrumInput::storeOriginalClefMensurationApp(void)
+void HumdrumInput::storeOriginalClefMensurationApp()
 {
     if (m_oclef.empty() || m_omet.empty()) {
         return;
@@ -6931,7 +6957,7 @@ int HumdrumInput::getMeasureEndLine(int startline)
 //     get things started.
 //
 
-void HumdrumInput::setupMeiDocument(void)
+void HumdrumInput::setupMeiDocument()
 {
     m_score = m_doc->CreateScoreBuffer();
 
@@ -6947,7 +6973,7 @@ void HumdrumInput::setupMeiDocument(void)
 //    parent class).
 //
 
-void HumdrumInput::clear(void)
+void HumdrumInput::clear()
 {
     m_filename = "";
     m_tupletscaling = 1;
@@ -6989,7 +7015,7 @@ int HumdrumInput::getMeasureNumber(int startline, int endline)
 //     after the Humdrum data has finished loading.
 //
 
-void HumdrumInput::calculateLayout(void)
+void HumdrumInput::calculateLayout()
 {
     // m_doc->CastOff();
 }
@@ -7000,7 +7026,7 @@ void HumdrumInput::calculateLayout(void)
 //     an option.
 //
 
-bool HumdrumInput::emptyMeasures(void)
+bool HumdrumInput::emptyMeasures()
 {
     return false;
 }
@@ -7260,7 +7286,7 @@ void HumdrumInput::UnquoteHTML(std::istream &In, std::ostream &Out)
 // HumdrumInput::GetMeiString -- Return the converted MEI content.
 //
 
-std::string HumdrumInput::GetMeiString(void)
+std::string HumdrumInput::GetMeiString()
 {
     MeiOutput meioutput(m_doc, "");
     meioutput.SetScoreBasedMEI(true);
@@ -7802,7 +7828,7 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
 // HumdrumInput::prepareEndings --
 //
 
-void HumdrumInput::prepareEndings(void)
+void HumdrumInput::prepareEndings()
 {
     std::vector<int> &ending = m_ending;
     hum::HumdrumFile &infile = m_infile;
