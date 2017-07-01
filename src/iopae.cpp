@@ -19,10 +19,12 @@
 #include "chord.h"
 #include "clef.h"
 #include "doc.h"
+#include "fermata.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
 #include "metersig.h"
+#include "mrest.h"
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
@@ -821,8 +823,6 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
 {
     // a clef is maximum 3 character length
     // go through the 3 character and retrieve the letter (clef) and the line
-    // mensural clef (with + in between) currently ignored
-    // clef with octava correct?
     int length = (int)strlen(incipit);
     int i = 0;
     char clef = 'G';
@@ -834,16 +834,23 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
         else if (i == 2) {
             line = incipit[index];
         }
+        if (incipit[index] == '+') {
+            LogWarning("Mensural clefs are not supported");
+        }
         i++;
         index++;
     }
 
-    if (clef == 'C' || clef == 'c') {
+    if (clef == 'G') {
+        mclef->SetShape(CLEFSHAPE_G);
+        mclef->SetLine(line - 48);
+    }
+    else if (clef == 'C') {
         mclef->SetShape(CLEFSHAPE_C);
         mclef->SetLine(line - 48);
     }
-    else if (clef == 'G') {
-        mclef->SetShape(CLEFSHAPE_G);
+    else if (clef == 'F') {
+        mclef->SetShape(CLEFSHAPE_F);
         mclef->SetLine(line - 48);
     }
     else if (clef == 'g') {
@@ -852,12 +859,7 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
         mclef->SetDis(OCTAVE_DIS_8);
         mclef->SetDisPlace(STAFFREL_basic_below);
     }
-    else if (clef == 'F' || clef == 'f') {
-        mclef->SetShape(CLEFSHAPE_F);
-        mclef->SetLine(line - 48);
-    }
     else {
-        // what the...
         LogDebug("Clef %c is Undefined", clef);
     }
 
@@ -1118,9 +1120,15 @@ void PaeInput::convertMeasure(pae::Measure *measure)
     }
 
     if (measure->wholerest > 0) {
-        MultiRest *mr = new MultiRest();
-        mr->SetNum(measure->wholerest);
-        m_layer->AddChild(mr);
+        if (measure->wholerest == 1) {
+            MRest *mRest = new MRest;
+            m_layer->AddChild(mRest);
+        }
+        else {
+            MultiRest *multiRest = new MultiRest();
+            multiRest->SetNum(measure->wholerest);
+            m_layer->AddChild(multiRest);
+        }
     }
 
     m_nested_objects.clear();
@@ -1146,7 +1154,9 @@ void PaeInput::parseNote(pae::Note *note)
         rest->SetDur(note->duration);
 
         if (note->fermata) {
-            rest->SetFermata(STAFFREL_basic_above); // always above for now
+            Fermata *fermata = new Fermata();
+            fermata->SetStartid(rest->GetUuid());
+            m_measure->AddChild(fermata);
         }
 
         element = rest;
@@ -1173,12 +1183,14 @@ void PaeInput::parseNote(pae::Note *note)
         }
 
         if (note->fermata) {
-            mnote->SetFermata(STAFFREL_basic_above); // always above for now
+            Fermata *fermata = new Fermata();
+            fermata->SetStartid(mnote->GetUuid());
+            m_measure->AddChild(fermata);
         }
 
-        if (note->trill == true) {
+        if (note->trill) {
             Trill *trill = new Trill();
-            trill->SetStart(mnote);
+            trill->SetStartid(mnote->GetUuid());
             m_measure->AddChild(trill);
         }
 
