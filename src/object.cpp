@@ -83,7 +83,7 @@ Object::Object(const Object &object) : BoundingBox(object)
     // For now do now copy them
     // m_uuid = object.m_uuid;
     // m_unsupported = object.m_unsupported;
-    
+
     int i;
     for (i = 0; i < (int)object.m_children.size(); i++) {
         Object *current = object.m_children.at(i);
@@ -109,7 +109,7 @@ Object &Object::operator=(const Object &object)
         // For now do now copy them
         // m_uuid = object.m_uuid;
         // m_unsupported = object.m_unsupported;
-        
+
         int i;
         for (i = 0; i < (int)object.m_children.size(); i++) {
             Object *current = object.m_children.at(i);

@@ -2220,7 +2220,6 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
                     unmeasured = new Measure(false);
                     if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
                         UpgradeMeasureTo_3_0_0(unmeasured, system);
-
                     }
                     system->AddChild(unmeasured);
                 }
@@ -4187,6 +4186,5 @@ void MeiInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
     page->m_PPUFactor = (25.0 / 2.0 / DEFAULT_UNIT);
     // LogDebug("PPUFactor: %f", m_PPUFactor);
 }
-
 
 } // namespace vrv

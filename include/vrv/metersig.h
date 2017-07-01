@@ -46,6 +46,15 @@ public:
     /** Convert rendition to form */
     meterSigVis_FORM meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_METERREND rend);
 
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::FindSpaceInReferenceAlignments
+     */
+    virtual int FindSpaceInReferenceAlignments(FunctorParams *functorParams);
+
 private:
     //
 public:
