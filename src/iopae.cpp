@@ -94,7 +94,7 @@ bool PaeInput::ImportFile()
     parsePlainAndEasy(infile);
     return true;
 #else
-    LogError("Plaine & Easie import is not supported in the build.");
+    LogError("Plaine & Easie import is not supported in this build.");
     return false;
 #endif
 }
@@ -106,7 +106,7 @@ bool PaeInput::ImportString(std::string const &pae)
     parsePlainAndEasy(in_stream);
     return true;
 #else
-    LogError("Plaine & Easie import is not supported in the build.");
+    LogError("Plaine & Easie import is not supported in this build.");
     return false;
 #endif
 }
@@ -517,7 +517,7 @@ int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
         // neumatic notation
         *duration = DURATION_breve;
         *dot = 0;
-        LogWarning("Found a note in neumatic notation (7.), using breve instead");
+        LogWarning("Plaine & Easie import: neumatic notation unsupported, using breve instead");
     }
 
     return i - index;
@@ -627,7 +627,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
                 // we should not find any close paren before the ';' !
                 // FIXME find a graceful way to exit signaling this to user
                 if (incipit[t] == ')') {
-                    LogDebug("You have a) before the ; in a tuplet!");
+                    LogDebug("Plaine & Easie import: You have a ')' before the ';' in a tuplet!");
                     free(buf);
                     return i - index;
                 }
@@ -641,7 +641,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 
                 // If we have extraneous chars, exit here
                 if (!isdigit(incipit[t + t2])) {
-                    LogDebug("You have a non-number in a tuplet number");
+                    LogDebug("Plaine & Easie import: non-number in tuplet number found");
                     free(buf);
                     return i - index;
                 }
@@ -666,7 +666,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
     }
     else {
         if (note->tuplet_notes > 0) {
-            LogWarning("Fermata within a tuplet. Won't be handled correctly");
+            LogWarning("Plaine & Easie import: fermatas within tuplets won't be handled correctly");
         }
         note->fermata = true;
     }
@@ -808,7 +808,7 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, int index)
         meter->SetUnit(2);
     }
     else {
-        LogWarning("Unknown time signature: %s", timesig_str);
+        LogWarning("Plaine & Easie import: unsupported time signature: %s", timesig_str);
     }
 
     return i - index;
@@ -835,7 +835,7 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
             line = incipit[index];
         }
         if (incipit[index] == '+') {
-            LogWarning("Mensural clefs are not supported");
+            LogWarning("Plaine & Easie import: Mensural clefs are not supported");
         }
         i++;
         index++;
@@ -860,7 +860,7 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
         mclef->SetDisPlace(STAFFREL_basic_below);
     }
     else {
-        LogDebug("Clef %c is Undefined", clef);
+        LogDebug("Plaine & Easie import: undefined clef %c", clef);
     }
 
     // measure->clef = mclef;
@@ -1039,7 +1039,7 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
         if (measure->durations.size() == 0) {
             note->duration = DURATION_4;
             note->dots = 0;
-            LogWarning("Got a note before a duration was specified");
+            LogWarning("Plaine & Easie import: found note before duration was specified");
         }
         else {
             note->duration = measure->durations[measure->durations_offset];
@@ -1312,7 +1312,7 @@ void PaeInput::popContainer()
 {
     // assert(m_nested_objects.size() > 0);
     if (m_nested_objects.size() == 0) {
-        LogError("PaeInput::popContainer: tried to pop an object from empty stack. "
+        LogError("Plaine & Easie import: tried to pop an object from empty stack. "
                  "Cross-measure objects (tuplets, beams) are not supported.");
     }
     else {
