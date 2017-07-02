@@ -29,9 +29,9 @@ namespace vrv {
 // Section
 //----------------------------------------------------------------------------
 
-Section::Section() : SystemElement("section-"), BoundaryStartInterface(), AttCommonPart()
+Section::Section() : SystemElement("section-"), BoundaryStartInterface(), AttNNumberLike()
 {
-    RegisterAttClass(ATT_COMMONPART);
+    RegisterAttClass(ATT_NNUMBERLIKE);
 
     Reset();
 }
@@ -44,8 +44,7 @@ void Section::Reset()
 {
     SystemElement::Reset();
     BoundaryStartInterface::Reset();
-    ResetCommon();
-    ResetCommonPart();
+    ResetNNumberLike();
 }
 
 void Section::AddChild(Object *child)
@@ -76,8 +75,10 @@ void Section::AddChild(Object *child)
 // Pb
 //----------------------------------------------------------------------------
 
-Pb::Pb() : SystemElement("pb-")
+Pb::Pb() : SystemElement("pb-"), AttNNumberLike()
 {
+    RegisterAttClass(ATT_NNUMBERLIKE);
+
     Reset();
 }
 
@@ -88,15 +89,17 @@ Pb::~Pb()
 void Pb::Reset()
 {
     SystemElement::Reset();
+    ResetNNumberLike();
 }
 
 //----------------------------------------------------------------------------
 // Sb
 //----------------------------------------------------------------------------
 
-
-Sb::Sb() : SystemElement("sb-")
+Sb::Sb() : SystemElement("sb-"), AttNNumberLike()
 {
+    RegisterAttClass(ATT_NNUMBERLIKE);
+
     Reset();
 }
 
@@ -107,6 +110,7 @@ Sb::~Sb()
 void Sb::Reset()
 {
     SystemElement::Reset();
+    ResetNNumberLike();
 }
 
 //----------------------------------------------------------------------------

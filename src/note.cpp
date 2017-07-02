@@ -7,6 +7,7 @@
 
 #include "note.h"
 
+#include <iostream>
 //----------------------------------------------------------------------------
 
 #include <assert.h>
@@ -29,6 +30,10 @@
 #include "verse.h"
 #include "vrv.h"
 
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -40,23 +45,25 @@ Note::Note()
     , StemmedDrawingInterface()
     , DurationInterface()
     , PitchInterface()
+    , PositionInterface()
     , AttColor()
     , AttColoration()
+    , AttCue()
     , AttGraced()
-    , AttNoteLogMensural()
-    , AttRelativesize()
+    , AttNoteAnlMensural()
     , AttStems()
     , AttStemsCmn()
-    , AttTiepresent()
+    , AttTiePresent()
     , AttVisibility()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
+    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
+    RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_NOTELOGMENSURAL);
-    RegisterAttClass(ATT_RELATIVESIZE);
+    RegisterAttClass(ATT_NOTEANLMENSURAL);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -81,14 +88,15 @@ void Note::Reset()
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     PitchInterface::Reset();
+    PositionInterface::Reset();
     ResetColor();
     ResetColoration();
+    ResetCue();
     ResetGraced();
-    ResetNoteLogMensural();
-    ResetRelativesize();
+    ResetNoteAnlMensural();
     ResetStems();
     ResetStemsCmn();
-    ResetTiepresent();
+    ResetTiePresent();
     ResetVisibility();
 
     // tie pointers
@@ -97,11 +105,14 @@ void Note::Reset()
     m_clusterPosition = 0;
     m_cluster = NULL;
 
-    m_playingOnset = 0.0;
-    m_playingOffset = 0.0;
-
     m_drawingLoc = 0;
     m_flippedNotehead = false;
+
+    m_scoreTimeOnset = 0.0;
+    m_scoreTimeOffset = 0.0;
+    m_realTimeOnsetMilliseconds = 0;
+    m_realTimeOffsetMilliseconds = 0;
+    m_scoreTimeTiedDuration = 0.0;
 }
 
 void Note::AddChild(Object *child)
@@ -208,8 +219,8 @@ bool Note::IsUnissonWith(Note *note, bool ignoreAccid)
     if (!ignoreAccid) {
         Accid *accid = this->GetDrawingAccid();
         Accid *noteAccid = note->GetDrawingAccid();
-        data_ACCIDENTAL_EXPLICIT accidVal = (accid) ? accid->GetAccid() : ACCIDENTAL_EXPLICIT_NONE;
-        data_ACCIDENTAL_EXPLICIT noteAccidVal = (noteAccid) ? noteAccid->GetAccid() : ACCIDENTAL_EXPLICIT_NONE;
+        data_ACCIDENTAL_WRITTEN accidVal = (accid) ? accid->GetAccid() : ACCIDENTAL_WRITTEN_NONE;
+        data_ACCIDENTAL_WRITTEN noteAccidVal = (noteAccid) ? noteAccid->GetAccid() : ACCIDENTAL_WRITTEN_NONE;
         if (accidVal != noteAccidVal) return false;
     }
 
@@ -341,6 +352,61 @@ wchar_t Note::GetMensuralSmuflNoteHead()
     return code;
 }
 
+void Note::SetScoreTimeOnset(double scoreTime)
+{
+    m_scoreTimeOnset = scoreTime;
+}
+
+void Note::SetRealTimeOnsetSeconds(double timeInSeconds)
+{
+    m_realTimeOnsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
+}
+
+void Note::SetScoreTimeOffset(double scoreTime)
+{
+    m_scoreTimeOffset = scoreTime;
+}
+
+void Note::SetRealTimeOffsetSeconds(double timeInSeconds)
+{
+    m_realTimeOffsetMilliseconds = int(timeInSeconds * 1000.0 + 0.5);
+}
+
+void Note::SetScoreTimeTiedDuration(double scoreTime)
+{
+    m_scoreTimeTiedDuration = scoreTime;
+}
+
+double Note::GetScoreTimeOnset()
+{
+    return m_scoreTimeOnset;
+}
+
+int Note::GetRealTimeOnsetMilliseconds()
+{
+    return m_realTimeOnsetMilliseconds;
+}
+
+double Note::GetScoreTimeOffset()
+{
+    return m_scoreTimeOffset;
+}
+
+int Note::GetRealTimeOffsetMilliseconds()
+{
+    return m_realTimeOffsetMilliseconds;
+}
+
+double Note::GetScoreTimeTiedDuration()
+{
+    return m_scoreTimeTiedDuration;
+}
+
+double Note::GetScoreTimeDuration()
+{
+    return GetScoreTimeOffset() - GetScoreTimeOnset();
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -394,19 +460,23 @@ int Note::CalcStem(FunctorParams *functorParams)
     params->m_isGraceNote = this->IsGraceNote();
 
     int staffSize = staff->m_drawingStaffSize;
-    int staffY = staff->GetDrawingY();
 
-    params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
+    params->m_verticalCenter
+        = staff->GetDrawingY() - params->m_doc->GetDrawingUnit(staffSize) * (staff->m_drawingLines - 1);
 
     /************ Set the direction ************/
 
+    data_STEMDIRECTION layerStemDir;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     if (stem->HasStemDir()) {
         stemDir = stem->GetStemDir();
     }
-    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        stemDir = layer->GetDrawingStemDir();
+    else if (this->IsGraceNote()) {
+        stemDir = STEMDIRECTION_up;
+    }
+    else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
+        stemDir = layerStemDir;
     }
     else {
         stemDir = (this->GetDrawingY() >= params->m_verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
@@ -601,6 +671,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
             currentStem = new Stem();
             this->AddChild(currentStem);
         }
+        currentStem->AttGraced::operator=(*this);
         currentStem->AttStems::operator=(*this);
         currentStem->AttStemsCmn::operator=(*this);
     }
@@ -638,7 +709,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
             currentDots = new Dots();
             this->AddChild(currentDots);
         }
-        currentDots->AttAugmentdots::operator=(*this);
+        currentDots->AttAugmentDots::operator=(*this);
     }
     // This will happen only if the duration has changed
     else if (currentDots) {
@@ -655,7 +726,7 @@ int Note::PrepareTieAttr(FunctorParams *functorParams)
     PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
     assert(params);
 
-    AttTiepresent *check = this;
+    AttTiePresent *check = this;
     // Use the parent chord if there is no @tie on the note
     if (!this->HasTie() && params->m_currentChord) {
         check = params->m_currentChord;
@@ -725,6 +796,7 @@ int Note::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
+    PositionInterface::InterfaceResetDrawing(functorParams, this);
 
     this->ResetDrawingTieAttr();
 
@@ -737,11 +809,121 @@ int Note::ResetDrawing(FunctorParams *functorParams)
 int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     LayerElement::ResetHorizontalAlignment(functorParams);
+    PositionInterface::InterfaceResetHorizontalAlignment(functorParams, this);
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;
 
     return FUNCTOR_CONTINUE;
+}
+
+int Note::GenerateMIDI(FunctorParams *functorParams)
+{
+    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
+
+    // If the note is a secondary tied note, then ignore it
+    if (this->GetScoreTimeTiedDuration() < 0.0) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // For now just ignore grace notes
+    if (this->HasGrace()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    Accid *accid = this->GetDrawingAccid();
+
+    // Create midi this
+    int midiBase = 0;
+    data_PITCHNAME pname = this->GetPname();
+    switch (pname) {
+        case PITCHNAME_c: midiBase = 0; break;
+        case PITCHNAME_d: midiBase = 2; break;
+        case PITCHNAME_e: midiBase = 4; break;
+        case PITCHNAME_f: midiBase = 5; break;
+        case PITCHNAME_g: midiBase = 7; break;
+        case PITCHNAME_a: midiBase = 9; break;
+        case PITCHNAME_b: midiBase = 11; break;
+        case PITCHNAME_NONE: break;
+    }
+    // Check for accidentals
+    if (accid && accid->HasAccidGes()) {
+        data_ACCIDENTAL_GESTURAL accImp = accid->GetAccidGes();
+        switch (accImp) {
+            case ACCIDENTAL_GESTURAL_s: midiBase += 1; break;
+            case ACCIDENTAL_GESTURAL_f: midiBase -= 1; break;
+            case ACCIDENTAL_GESTURAL_ss: midiBase += 2; break;
+            case ACCIDENTAL_GESTURAL_ff: midiBase -= 2; break;
+            default: break;
+        }
+    }
+    else if (accid) {
+        data_ACCIDENTAL_WRITTEN accExp = accid->GetAccid();
+        switch (accExp) {
+            case ACCIDENTAL_WRITTEN_s: midiBase += 1; break;
+            case ACCIDENTAL_WRITTEN_f: midiBase -= 1; break;
+            case ACCIDENTAL_WRITTEN_ss: midiBase += 2; break;
+            case ACCIDENTAL_WRITTEN_x: midiBase += 2; break;
+            case ACCIDENTAL_WRITTEN_ff: midiBase -= 2; break;
+            case ACCIDENTAL_WRITTEN_xs: midiBase += 3; break;
+            case ACCIDENTAL_WRITTEN_ts: midiBase += 3; break;
+            case ACCIDENTAL_WRITTEN_tf: midiBase -= 3; break;
+            case ACCIDENTAL_WRITTEN_nf: midiBase -= 1; break;
+            case ACCIDENTAL_WRITTEN_ns: midiBase += 1; break;
+            default: break;
+        }
+    }
+
+    // Adjustment for transposition intruments
+    midiBase += params->m_transSemi;
+
+    int oct = this->GetOct();
+    if (this->HasOctGes()) oct = this->GetOctGes();
+
+    int pitch = midiBase + (oct + 1) * 12;
+    int channel = 0;
+    int velocity = 64;
+
+    double starttime = params->m_totalTime + this->GetScoreTimeOnset();
+    double stoptime = params->m_totalTime + this->GetScoreTimeOffset() + this->GetScoreTimeTiedDuration();
+
+    int tpq = params->m_midiFile->getTPQ();
+
+    params->m_midiFile->addNoteOn(params->m_midiTrack, starttime * tpq, channel, pitch, velocity);
+    params->m_midiFile->addNoteOff(params->m_midiTrack, stoptime * tpq, channel, pitch);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Note::GenerateTimemap(FunctorParams *functorParams)
+{
+    GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
+    assert(params);
+
+    int realTimeStart = params->m_realTimeOffsetMilliseconds + m_realTimeOnsetMilliseconds;
+    double scoreTimeStart = params->m_scoreTimeOffset + m_scoreTimeOnset;
+
+    int realTimeEnd = params->m_realTimeOffsetMilliseconds + m_realTimeOffsetMilliseconds;
+    double scoreTimeEnd = params->m_scoreTimeOffset + m_scoreTimeOffset;
+
+    // Should check if value for realTimeStart already exists and if so, then
+    // ensure that it is equal to scoreTimeStart:
+    params->realTimeToScoreTime[realTimeStart] = scoreTimeStart;
+
+    // Store the element ID in list to turn on at given time.
+    params->realTimeToOnElements[realTimeStart].push_back(this->GetUuid());
+
+    // Should check if value for realTimeEnd already exists and if so, then
+    // ensure that it is equal to scoreTimeEnd:
+    params->realTimeToScoreTime[realTimeEnd] = scoreTimeEnd;
+
+    // Store the element ID in list to turn off at given time.
+    params->realTimeToOffElements[realTimeEnd].push_back(this->GetUuid());
+
+    params->realTimeToTempo[realTimeStart] = params->m_currentTempo;
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

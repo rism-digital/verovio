@@ -27,77 +27,115 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttExtsym
+// AttExtSym
 //----------------------------------------------------------------------------
 
-AttExtsym::AttExtsym() : Att()
+AttExtSym::AttExtSym() : Att()
 {
-    ResetExtsym();
+    ResetExtSym();
 }
 
-AttExtsym::~AttExtsym()
+AttExtSym::~AttExtSym()
 {
 }
 
-void AttExtsym::ResetExtsym()
+void AttExtSym::ResetExtSym()
 {
-    m_glyphname = "";
-    m_glyphnum = 0;
+    m_glyphAuth = "";
+    m_glyphName = "";
+    m_glyphNum = 0;
+    m_glyphUri = "";
 }
 
-bool AttExtsym::ReadExtsym(pugi::xml_node element)
+bool AttExtSym::ReadExtSym(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("glyphname")) {
-        this->SetGlyphname(StrToStr(element.attribute("glyphname").value()));
-        element.remove_attribute("glyphname");
+    if (element.attribute("glyph.auth")) {
+        this->SetGlyphAuth(StrToStr(element.attribute("glyph.auth").value()));
+        element.remove_attribute("glyph.auth");
         hasAttribute = true;
     }
-    if (element.attribute("glyphnum")) {
-        this->SetGlyphnum(StrToWcharT(element.attribute("glyphnum").value()));
-        element.remove_attribute("glyphnum");
+    if (element.attribute("glyph.name")) {
+        this->SetGlyphName(StrToStr(element.attribute("glyph.name").value()));
+        element.remove_attribute("glyph.name");
+        hasAttribute = true;
+    }
+    if (element.attribute("glyph.num")) {
+        this->SetGlyphNum(StrToHexnum(element.attribute("glyph.num").value()));
+        element.remove_attribute("glyph.num");
+        hasAttribute = true;
+    }
+    if (element.attribute("glyph.uri")) {
+        this->SetGlyphUri(StrToStr(element.attribute("glyph.uri").value()));
+        element.remove_attribute("glyph.uri");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttExtsym::WriteExtsym(pugi::xml_node element)
+bool AttExtSym::WriteExtSym(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasGlyphname()) {
-        element.append_attribute("glyphname") = StrToStr(this->GetGlyphname()).c_str();
+    if (this->HasGlyphAuth()) {
+        element.append_attribute("glyph.auth") = StrToStr(this->GetGlyphAuth()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasGlyphnum()) {
-        element.append_attribute("glyphnum") = WcharTToStr(this->GetGlyphnum()).c_str();
+    if (this->HasGlyphName()) {
+        element.append_attribute("glyph.name") = StrToStr(this->GetGlyphName()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasGlyphNum()) {
+        element.append_attribute("glyph.num") = HexnumToStr(this->GetGlyphNum()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasGlyphUri()) {
+        element.append_attribute("glyph.uri") = StrToStr(this->GetGlyphUri()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttExtsym::HasGlyphname() const
+bool AttExtSym::HasGlyphAuth() const
 {
-    return (m_glyphname != "");
+    return (m_glyphAuth != "");
 }
 
-bool AttExtsym::HasGlyphnum() const
+bool AttExtSym::HasGlyphName() const
 {
-    return (m_glyphnum != 0);
+    return (m_glyphName != "");
 }
 
-/* include <attglyphnum> */
+bool AttExtSym::HasGlyphNum() const
+{
+    return (m_glyphNum != 0);
+}
+
+bool AttExtSym::HasGlyphUri() const
+{
+    return (m_glyphUri != "");
+}
+
+/* include <attglyph.uri> */
 
 bool Att::SetExternalsymbols(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_EXTSYM)) {
-        AttExtsym *att = dynamic_cast<AttExtsym *>(element);
+        AttExtSym *att = dynamic_cast<AttExtSym *>(element);
         assert(att);
-        if (attrType == "glyphname") {
-            att->SetGlyphname(att->StrToStr(attrValue));
+        if (attrType == "glyph.auth") {
+            att->SetGlyphAuth(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "glyphnum") {
-            att->SetGlyphnum(att->StrToWcharT(attrValue));
+        if (attrType == "glyph.name") {
+            att->SetGlyphName(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "glyph.num") {
+            att->SetGlyphNum(att->StrToHexnum(attrValue));
+            return true;
+        }
+        if (attrType == "glyph.uri") {
+            att->SetGlyphUri(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -108,13 +146,19 @@ bool Att::SetExternalsymbols(Object *element, std::string attrType, std::string 
 void Att::GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_EXTSYM)) {
-        const AttExtsym *att = dynamic_cast<const AttExtsym *>(element);
+        const AttExtSym *att = dynamic_cast<const AttExtSym *>(element);
         assert(att);
-        if (att->HasGlyphname()) {
-            attributes->push_back(std::make_pair("glyphname", att->StrToStr(att->GetGlyphname())));
+        if (att->HasGlyphAuth()) {
+            attributes->push_back(std::make_pair("glyph.auth", att->StrToStr(att->GetGlyphAuth())));
         }
-        if (att->HasGlyphnum()) {
-            attributes->push_back(std::make_pair("glyphnum", att->WcharTToStr(att->GetGlyphnum())));
+        if (att->HasGlyphName()) {
+            attributes->push_back(std::make_pair("glyph.name", att->StrToStr(att->GetGlyphName())));
+        }
+        if (att->HasGlyphNum()) {
+            attributes->push_back(std::make_pair("glyph.num", att->HexnumToStr(att->GetGlyphNum())));
+        }
+        if (att->HasGlyphUri()) {
+            attributes->push_back(std::make_pair("glyph.uri", att->StrToStr(att->GetGlyphUri())));
         }
     }
 }

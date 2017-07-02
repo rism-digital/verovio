@@ -267,7 +267,7 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
+    void DrawAcciaccaturaSlash(DeviceContext *dc, Stem *stem, Staff *staff);
     void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff);
     void DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
     void DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
@@ -461,7 +461,7 @@ private:
     /**
      * Find the nearest unit position in the direction indicated by place.
      */
-    int GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place);
+    int GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL_basic place);
 
 public:
     /** Document */

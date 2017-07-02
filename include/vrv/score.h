@@ -24,17 +24,24 @@ namespace vrv {
 class Score : public Object {
 
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
     Score();
     virtual ~Score();
-    virtual ClassId GetClassId() const { return SCORE; }
-
-    virtual void AddChild(Object *object);
-
-    /*
-     * Clear the content of the score.
-     */
     virtual void Reset();
+    virtual std::string GetClassName() const { return "Score"; }
+    virtual ClassId GetClassId() const { return SCORE; }
+    ///@}
+
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
+    virtual void AddChild(Object *object);
+    ///@}
 
     //----------//
     // Functors //

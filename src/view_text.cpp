@@ -12,7 +12,6 @@
 #include <assert.h>
 #include <iostream>
 #include <math.h>
-#include <sstream>
 
 //----------------------------------------------------------------------------
 
@@ -98,7 +97,7 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, int x, int y
         assert(f);
         DrawF(dc, f, x, y, setX, setY);
     }
-    if (element->Is(REND)) {
+    else if (element->Is(REND)) {
         Rend *rend = dynamic_cast<Rend *>(element);
         assert(rend);
         DrawRend(dc, rend, x, y, setX, setY);
@@ -119,9 +118,15 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, int x, int y, bool &setX, boo
 
     FontInfo rendFont;
     bool customFont = false;
-    if (rend->HasFontsize()) {
+    if (rend->HasFontname() || rend->HasFontsize() || rend->HasFontstyle() || rend->HasFontweight()) {
         customFont = true;
-        rendFont.SetPointSize(rend->GetFontsize());
+        if (rend->HasFontname()) rendFont.SetFaceName(rend->GetFontname().c_str());
+        if (rend->HasFontsize()) {
+            data_FONTSIZE *fs = rend->GetFontsizeAlternate();
+            if (fs->GetType() == FONTSIZE_fontSizeNumeric) rendFont.SetPointSize(fs->GetFontSizeNumeric());
+        }
+        if (rend->HasFontstyle()) rendFont.SetStyle(rend->GetFontstyle());
+        if (rend->HasFontweight()) rendFont.SetWeight(rend->GetFontweight());
     }
     if (customFont) dc->SetFont(&rendFont);
 
@@ -137,14 +142,16 @@ void View::DrawText(DeviceContext *dc, Text *text, int x, int y, bool &setX, boo
     assert(dc);
     assert(text);
 
-    // special case where we want to replace the '_' with a lyric connector
-    // '_' are produce with the SibMEI plugin
-    if (text->GetFirstParent(SYL)) {
-        DrawLyricString(dc, x, y, text->GetText());
-    }
-    else if (text->GetFirstParent(HARM)) {
+    // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
+    if (text->GetFirstParent(HARM)) {
         DrawHarmString(dc, x, y, text->GetText());
     }
+    // special case where we want to replace the '_' with a lyric connector
+    // '_' are produce with the SibMEI plugin
+    else if (text->GetFirstParent(SYL)) {
+        DrawLyricString(dc, x, y, text->GetText());
+    }
+
     else {
         dc->DrawText(UTF16to8(text->GetText()), text->GetText());
     }

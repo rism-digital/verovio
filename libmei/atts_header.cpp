@@ -27,47 +27,47 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// AttRegularmethod
+// AttRegularMethod
 //----------------------------------------------------------------------------
 
-AttRegularmethod::AttRegularmethod() : Att()
+AttRegularMethod::AttRegularMethod() : Att()
 {
-    ResetRegularmethod();
+    ResetRegularMethod();
 }
 
-AttRegularmethod::~AttRegularmethod()
+AttRegularMethod::~AttRegularMethod()
 {
 }
 
-void AttRegularmethod::ResetRegularmethod()
+void AttRegularMethod::ResetRegularMethod()
 {
-    m_method = regularmethod_METHOD_NONE;
+    m_method = regularMethod_METHOD_NONE;
 }
 
-bool AttRegularmethod::ReadRegularmethod(pugi::xml_node element)
+bool AttRegularMethod::ReadRegularMethod(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("method")) {
-        this->SetMethod(StrToRegularmethodMethod(element.attribute("method").value()));
+        this->SetMethod(StrToRegularMethodMethod(element.attribute("method").value()));
         element.remove_attribute("method");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttRegularmethod::WriteRegularmethod(pugi::xml_node element)
+bool AttRegularMethod::WriteRegularMethod(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasMethod()) {
-        element.append_attribute("method") = RegularmethodMethodToStr(this->GetMethod()).c_str();
+        element.append_attribute("method") = RegularMethodMethodToStr(this->GetMethod()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttRegularmethod::HasMethod() const
+bool AttRegularMethod::HasMethod() const
 {
-    return (m_method != regularmethod_METHOD_NONE);
+    return (m_method != regularMethod_METHOD_NONE);
 }
 
 /* include <attmethod> */
@@ -75,10 +75,10 @@ bool AttRegularmethod::HasMethod() const
 bool Att::SetHeader(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_REGULARMETHOD)) {
-        AttRegularmethod *att = dynamic_cast<AttRegularmethod *>(element);
+        AttRegularMethod *att = dynamic_cast<AttRegularMethod *>(element);
         assert(att);
         if (attrType == "method") {
-            att->SetMethod(att->StrToRegularmethodMethod(attrValue));
+            att->SetMethod(att->StrToRegularMethodMethod(attrValue));
             return true;
         }
     }
@@ -89,10 +89,10 @@ bool Att::SetHeader(Object *element, std::string attrType, std::string attrValue
 void Att::GetHeader(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_REGULARMETHOD)) {
-        const AttRegularmethod *att = dynamic_cast<const AttRegularmethod *>(element);
+        const AttRegularMethod *att = dynamic_cast<const AttRegularMethod *>(element);
         assert(att);
         if (att->HasMethod()) {
-            attributes->push_back(std::make_pair("method", att->RegularmethodMethodToStr(att->GetMethod())));
+            attributes->push_back(std::make_pair("method", att->RegularMethodMethodToStr(att->GetMethod())));
         }
     }
 }

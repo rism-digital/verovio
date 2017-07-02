@@ -29,18 +29,18 @@ namespace vrv {
 
 DurationInterface::DurationInterface()
     : Interface()
-    , AttAugmentdots()
-    , AttBeamsecondary()
-    , AttDurationMusical()
-    , AttDurationPerformed()
+    , AttAugmentDots()
+    , AttBeamSecondary()
+    , AttDurationGestural()
+    , AttDurationLogical()
     , AttDurationRatio()
-    , AttFermatapresent()
-    , AttStaffident()
+    , AttFermataPresent()
+    , AttStaffIdent()
 {
     RegisterInterfaceAttClass(ATT_AUGMENTDOTS);
     RegisterInterfaceAttClass(ATT_BEAMSECONDARY);
-    RegisterInterfaceAttClass(ATT_DURATIONMUSICAL);
-    RegisterInterfaceAttClass(ATT_DURATIONPERFORMED);
+    RegisterInterfaceAttClass(ATT_DURATIONGESTURAL);
+    RegisterInterfaceAttClass(ATT_DURATIONLOGICAL);
     RegisterInterfaceAttClass(ATT_DURATIONRATIO);
     RegisterInterfaceAttClass(ATT_FERMATAPRESENT);
     RegisterInterfaceAttClass(ATT_STAFFIDENT);
@@ -54,13 +54,13 @@ DurationInterface::~DurationInterface()
 
 void DurationInterface::Reset()
 {
-    ResetAugmentdots();
-    ResetBeamsecondary();
-    ResetDurationMusical();
-    ResetDurationPerformed();
+    ResetAugmentDots();
+    ResetBeamSecondary();
+    ResetDurationGestural();
+    ResetDurationLogical();
     ResetDurationRatio();
-    ResetFermatapresent();
-    ResetStaffident();
+    ResetFermataPresent();
+    ResetStaffIdent();
 }
 
 double DurationInterface::GetInterfaceAlignmentDuration(int num, int numbase)
@@ -108,6 +108,7 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
     }
     duration *= (double)numbase / (double)num;
     // LogDebug("Duration %d; %d/%d; Alignement %f; Ratio %f", note_dur, num, numbase, duration, ratio);
+    duration = durRound(duration);
     return duration;
 }
 

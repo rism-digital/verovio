@@ -273,7 +273,8 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
 
         ArrayOfBoundingBoxes *overflowBoxes = &m_overflowBelowBBoxes;
         // above?
-        if ((*iter)->GetDrawingPlace() == STAFFREL_above) {
+        data_STAFFREL_basic place = (*iter)->GetDrawingPlace();
+        if (place == STAFFREL_basic_above) {
             overflowBoxes = &m_overflowAboveBBoxes;
         }
         auto i = overflowBoxes->begin();
@@ -289,7 +290,7 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
         }
         //  Now update the staffAlignment max overflow (above or below) and add the positioner to the list of
         //  overflowing elements
-        if ((*iter)->GetDrawingPlace() == STAFFREL_above) {
+        if (place == STAFFREL_basic_above) {
             int overflowAbove = this->CalcOverflowAbove((*iter));
             overflowBoxes->push_back((*iter));
             this->SetOverflowAbove(overflowAbove);
@@ -336,7 +337,7 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
         }
         // else, adjust the min or max YRel of the pair if necessary
         else {
-            if ((*iter)->GetDrawingPlace() == STAFFREL_above) {
+            if ((*iter)->GetDrawingPlace() == STAFFREL_basic_above) {
                 if ((*iter)->GetDrawingYRel() < (*i).second) (*i).second = (*iter)->GetDrawingYRel();
             }
             else {
@@ -416,26 +417,26 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
     AdjustYPosParams *params = dynamic_cast<AdjustYPosParams *>(functorParams);
     assert(params);
 
-    int maxOverlfowAbove;
+    int maxOverflowAbove;
     if (params->m_previousVerseCount > 0) {
-        maxOverlfowAbove = params->m_previousOverflowBelow + m_overflowAbove;
+        maxOverflowAbove = params->m_previousOverflowBelow + m_overflowAbove;
     }
     else {
         // The maximum between the overflow below of the previous staff and the overflow above of the current
-        maxOverlfowAbove = std::max(params->m_previousOverflowBelow, m_overflowAbove);
+        maxOverflowAbove = std::max(params->m_previousOverflowBelow, m_overflowAbove);
 
         // If we have some overlap, add it
-        if (m_overlap) maxOverlfowAbove += m_overlap;
+        if (m_overlap) maxOverflowAbove += m_overlap;
     }
 
     // Add a margin
-    maxOverlfowAbove += params->m_doc->GetBottomMargin(STAFF) * params->m_doc->GetDrawingUnit(this->GetStaffSize())
+    maxOverflowAbove += params->m_doc->GetBottomMargin(STAFF) * params->m_doc->GetDrawingUnit(this->GetStaffSize())
         / PARAM_DENOMINATOR;
 
     // Is the maximum the overflow (+ overlap) shift, or the default ?
-    maxOverlfowAbove -= params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+    maxOverflowAbove -= params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
     // Is the maximum the overflow (+ overlap) shift, or the default ?
-    int shift = std::max(0, maxOverlfowAbove);
+    int shift = std::max(0, maxOverflowAbove);
 
     params->m_cumulatedShift += shift;
 

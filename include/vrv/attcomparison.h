@@ -12,6 +12,7 @@
 #include "atts_shared.h"
 #include "durationinterface.h"
 #include "horizontalaligner.h"
+#include "measure.h"
 #include "note.h"
 #include "object.h"
 
@@ -40,16 +41,16 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AttCommonNComparison
+// AttNIntegerComparison
 //----------------------------------------------------------------------------
 
 /**
  * This class evaluates if the object is of a certain ClassId and has a @n of value n.
  */
-class AttCommonNComparison : public AttComparison {
+class AttNIntegerComparison : public AttComparison {
 
 public:
-    AttCommonNComparison(ClassId AttClassId, const int n) : AttComparison(AttClassId) { m_n = n; }
+    AttNIntegerComparison(ClassId AttClassId, const int n) : AttComparison(AttClassId) { m_n = n; }
 
     void SetN(int n) { m_n = n; }
 
@@ -57,8 +58,8 @@ public:
     {
         if (!MatchesType(object)) return false;
         // This should not happen, but just in case
-        if (!object->HasAttClass(ATT_COMMON)) return false;
-        AttCommon *element = dynamic_cast<AttCommon *>(object);
+        if (!object->HasAttClass(ATT_NINTEGER)) return false;
+        AttNInteger *element = dynamic_cast<AttNInteger *>(object);
         assert(element);
         return (element->GetN() == m_n);
     }
@@ -68,16 +69,16 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttCommonNComparisonAny
+// AttNIntegerComparisonAny
 //----------------------------------------------------------------------------
 
 /**
  * This class evaluates if the object is of a certain ClassId and has a @n of value n.
  */
-class AttCommonNComparisonAny : public AttComparison {
+class AttNIntegerComparisonAny : public AttComparison {
 
 public:
-    AttCommonNComparisonAny(ClassId AttClassId, std::vector<int> ns) : AttComparison(AttClassId) { m_ns = ns; }
+    AttNIntegerComparisonAny(ClassId AttClassId, std::vector<int> ns) : AttComparison(AttClassId) { m_ns = ns; }
 
     void SetNs(std::vector<int> ns) { m_ns = ns; }
 
@@ -85,14 +86,42 @@ public:
     {
         if (!MatchesType(object)) return false;
         // This should not happen, but just in case
-        if (!object->HasAttClass(ATT_COMMON)) return false;
-        AttCommon *element = dynamic_cast<AttCommon *>(object);
+        if (!object->HasAttClass(ATT_NINTEGER)) return false;
+        AttNInteger *element = dynamic_cast<AttNInteger *>(object);
         assert(element);
         return (std::find(m_ns.begin(), m_ns.end(), element->GetN()) != m_ns.end());
     }
 
 private:
     std::vector<int> m_ns;
+};
+
+//----------------------------------------------------------------------------
+// AttNNumberLikeComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if the object is of a certain ClassId and has a @n of value n.
+ */
+class AttNNumberLikeComparison : public AttComparison {
+
+public:
+    AttNNumberLikeComparison(ClassId AttClassId, const std::string n) : AttComparison(AttClassId) { m_n = n; }
+
+    void SetN(std::string n) { m_n = n; }
+
+    virtual bool operator()(Object *object)
+    {
+        if (!MatchesType(object)) return false;
+        // This should not happen, but just in case
+        if (!object->HasAttClass(ATT_NNUMBERLIKE)) return false;
+        AttNNumberLike *element = dynamic_cast<AttNNumberLike *>(object);
+        assert(element);
+        return (element->GetN() == m_n);
+    }
+
+private:
+    std::string m_n;
 };
 
 //----------------------------------------------------------------------------
@@ -214,6 +243,32 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// MeasureOnsetOffsetComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if the object is a measure enclosing the given time
+ */
+class MeasureOnsetOffsetComparison : public AttComparison {
+
+public:
+    MeasureOnsetOffsetComparison(const int time) : AttComparison(MEASURE) { m_time = time; }
+
+    void SetTime(int time) { m_time = time; }
+
+    virtual bool operator()(Object *object)
+    {
+        if (!MatchesType(object)) return false;
+        Measure *measure = dynamic_cast<Measure *>(object);
+        assert(measure);
+        return (measure->EnclosesTime(m_time) > 0);
+    }
+
+private:
+    int m_time;
+};
+
+//----------------------------------------------------------------------------
 // NoteOnsetOffsetComparison
 //----------------------------------------------------------------------------
 
@@ -223,22 +278,20 @@ private:
 class NoteOnsetOffsetComparison : public AttComparison {
 
 public:
-    NoteOnsetOffsetComparison(const double time) : AttComparison(NOTE) { m_time = time; }
+    NoteOnsetOffsetComparison(const int time) : AttComparison(NOTE) { m_time = time; }
 
     void SetTime(int time) { m_time = time; }
 
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
-        // This should not happen, but just in case
-        if (!object->Is(NOTE)) return false;
         Note *note = dynamic_cast<Note *>(object);
         assert(note);
-        return ((note->m_playingOnset < m_time) && (note->m_playingOffset > m_time));
+        return ((m_time >= note->GetRealTimeOnsetMilliseconds()) && (m_time <= note->GetRealTimeOffsetMilliseconds()));
     }
 
 private:
-    double m_time;
+    int m_time;
 };
 
 } // namespace vrv

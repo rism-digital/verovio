@@ -22,7 +22,7 @@ namespace vrv {
  * This class represents elements appearing within a measure.
  * It is not an abstract class but should not be instanciated directly.
  */
-class ControlElement : public FloatingObject, public AttCommon, public AttCommonPart, public AttTyped {
+class ControlElement : public FloatingObject, public AttLabelled, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset methods

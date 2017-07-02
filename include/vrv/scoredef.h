@@ -35,7 +35,7 @@ class StaffDef;
  * information about clef, key signature, etc. This information can be either
  * attributes (implemented) of the ScoreDefInterface or elements (not implemented).
  */
-class ScoreDefElement : public Object, public ScoreDefInterface, public AttCommon, public AttTyped {
+class ScoreDefElement : public Object, public ScoreDefInterface, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, and other standard methods.
@@ -110,7 +110,7 @@ private:
 /**
  * This class represents a MEI scoreDef.
  * It contains StaffGrp objects.
-*/
+ */
 class ScoreDef : public ScoreDefElement, public ObjectListInterface, public AttEndings {
 public:
     /**
@@ -221,10 +221,9 @@ private:
  */
 class StaffGrp : public Object,
                  public ObjectListInterface,
-                 public AttCommon,
-                 public AttCommonPart,
-                 public AttLabelsAddl,
-                 public AttStaffgroupingsym,
+                 public AttBasic,
+                 public AttLabelled,
+                 public AttStaffGroupingSym,
                  public AttStaffGrpVis,
                  public AttTyped {
 public:
@@ -275,12 +274,12 @@ private:
  */
 class StaffDef : public ScoreDefElement,
                  public StaffDefDrawingInterface,
-                 public AttCommonPart,
                  public AttDistances,
-                 public AttLabelsAddl,
-                 public AttNotationtype,
+                 public AttLabelled,
+                 public AttNInteger,
+                 public AttNotationType,
                  public AttScalable,
-                 public AttStaffDefVis,
+                 public AttStaffDefLog,
                  public AttTransposition {
 public:
     /**
@@ -295,6 +294,12 @@ public:
     virtual std::string GetClassName() const { return "StaffDef"; }
     virtual ClassId GetClassId() const { return STAFFDEF; }
     ///@}
+
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
+    virtual void AddChild(Object *object);
 
     //----------//
     // Functors //

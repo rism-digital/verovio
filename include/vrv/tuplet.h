@@ -10,6 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -24,7 +25,7 @@ class Tuplet : public LayerElement,
                public ObjectListInterface,
                public AttColor,
                public AttDurationRatio,
-               public AttNumberplacement,
+               public AttNumberPlacement,
                public AttTupletVis {
 public:
     /**
@@ -38,8 +39,6 @@ public:
     virtual std::string GetClassName() const { return "Tuplet"; }
     virtual ClassId GetClassId() const { return TUPLET; }
     ///@}
-
-    int GetNoteCount() const { return this->GetChildCount(NOTE); }
 
     /**
      * Add an element (a note or a rest) to a tuplet.

@@ -25,7 +25,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Ligature::Ligature()
-    : LayerElement("ligature-"), ObjectListInterface(), DurationInterface(), AttStems(), AttStemsCmn(), AttTiepresent()
+    : LayerElement("ligature-"), ObjectListInterface(), DurationInterface(), AttStems(), AttStemsCmn(), AttTiePresent()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterAttClass(ATT_STEMS);
@@ -46,7 +46,7 @@ void Ligature::Reset()
     DurationInterface::Reset();
     ResetStems();
     ResetStemsCmn();
-    ResetTiepresent();
+    ResetTiePresent();
 
     ClearClusters();
 }
@@ -142,4 +142,4 @@ int Ligature::PositionInLigature(Note *note)
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
-}
+} // namespace vrv

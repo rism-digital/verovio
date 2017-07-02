@@ -29,284 +29,326 @@ namespace vrv {
 
 class AttConverter {
 public:
-    std::string AccidentalExplicitToStr(data_ACCIDENTAL_EXPLICIT data) const;
-    data_ACCIDENTAL_EXPLICIT StrToAccidentalExplicit(std::string value) const;
+    std::string AccidentalGesturalToStr(data_ACCIDENTAL_GESTURAL data) const;
+    data_ACCIDENTAL_GESTURAL StrToAccidentalGestural(std::string value, bool logWarning = true) const;
 
-    std::string AccidentalImplicitToStr(data_ACCIDENTAL_IMPLICIT data) const;
-    data_ACCIDENTAL_IMPLICIT StrToAccidentalImplicit(std::string value) const;
+    std::string AccidentalWrittenToStr(data_ACCIDENTAL_WRITTEN data) const;
+    data_ACCIDENTAL_WRITTEN StrToAccidentalWritten(std::string value, bool logWarning = true) const;
 
     std::string ArticulationToStr(data_ARTICULATION data) const;
-    data_ARTICULATION StrToArticulation(std::string value) const;
+    data_ARTICULATION StrToArticulation(std::string value, bool logWarning = true) const;
 
     std::string BarplaceToStr(data_BARPLACE data) const;
-    data_BARPLACE StrToBarplace(std::string value) const;
+    data_BARPLACE StrToBarplace(std::string value, bool logWarning = true) const;
 
     std::string BarrenditionToStr(data_BARRENDITION data) const;
-    data_BARRENDITION StrToBarrendition(std::string value) const;
+    data_BARRENDITION StrToBarrendition(std::string value, bool logWarning = true) const;
+
+    std::string BeamplaceToStr(data_BEAMPLACE data) const;
+    data_BEAMPLACE StrToBeamplace(std::string value, bool logWarning = true) const;
 
     std::string BetypeToStr(data_BETYPE data) const;
-    data_BETYPE StrToBetype(std::string value) const;
+    data_BETYPE StrToBetype(std::string value, bool logWarning = true) const;
 
     std::string BooleanToStr(data_BOOLEAN data) const;
-    data_BOOLEAN StrToBoolean(std::string value) const;
+    data_BOOLEAN StrToBoolean(std::string value, bool logWarning = true) const;
 
     std::string CertaintyToStr(data_CERTAINTY data) const;
-    data_CERTAINTY StrToCertainty(std::string value) const;
+    data_CERTAINTY StrToCertainty(std::string value, bool logWarning = true) const;
 
     std::string ClefshapeToStr(data_CLEFSHAPE data) const;
-    data_CLEFSHAPE StrToClefshape(std::string value) const;
+    data_CLEFSHAPE StrToClefshape(std::string value, bool logWarning = true) const;
 
     std::string ClusterToStr(data_CLUSTER data) const;
-    data_CLUSTER StrToCluster(std::string value) const;
+    data_CLUSTER StrToCluster(std::string value, bool logWarning = true) const;
 
     std::string ColornamesToStr(data_COLORNAMES data) const;
-    data_COLORNAMES StrToColornames(std::string value) const;
+    data_COLORNAMES StrToColornames(std::string value, bool logWarning = true) const;
 
     std::string EnclosureToStr(data_ENCLOSURE data) const;
-    data_ENCLOSURE StrToEnclosure(std::string value) const;
+    data_ENCLOSURE StrToEnclosure(std::string value, bool logWarning = true) const;
 
     std::string FillToStr(data_FILL data) const;
-    data_FILL StrToFill(std::string value) const;
+    data_FILL StrToFill(std::string value, bool logWarning = true) const;
 
     std::string FontsizetermToStr(data_FONTSIZETERM data) const;
-    data_FONTSIZETERM StrToFontsizeterm(std::string value) const;
+    data_FONTSIZETERM StrToFontsizeterm(std::string value, bool logWarning = true) const;
 
     std::string FontstyleToStr(data_FONTSTYLE data) const;
-    data_FONTSTYLE StrToFontstyle(std::string value) const;
+    data_FONTSTYLE StrToFontstyle(std::string value, bool logWarning = true) const;
 
     std::string FontweightToStr(data_FONTWEIGHT data) const;
-    data_FONTWEIGHT StrToFontweight(std::string value) const;
+    data_FONTWEIGHT StrToFontweight(std::string value, bool logWarning = true) const;
+
+    std::string FrbrrelationshipToStr(data_FRBRRELATIONSHIP data) const;
+    data_FRBRRELATIONSHIP StrToFrbrrelationship(std::string value, bool logWarning = true) const;
 
     std::string GlissandoToStr(data_GLISSANDO data) const;
-    data_GLISSANDO StrToGlissando(std::string value) const;
+    data_GLISSANDO StrToGlissando(std::string value, bool logWarning = true) const;
 
     std::string GraceToStr(data_GRACE data) const;
-    data_GRACE StrToGrace(std::string value) const;
+    data_GRACE StrToGrace(std::string value, bool logWarning = true) const;
 
     std::string HeadshapeListToStr(data_HEADSHAPE_list data) const;
-    data_HEADSHAPE_list StrToHeadshapeList(std::string value) const;
+    data_HEADSHAPE_list StrToHeadshapeList(std::string value, bool logWarning = true) const;
 
     std::string HorizontalalignmentToStr(data_HORIZONTALALIGNMENT data) const;
-    data_HORIZONTALALIGNMENT StrToHorizontalalignment(std::string value) const;
-
-    std::string IneumeformToStr(data_INEUMEFORM data) const;
-    data_INEUMEFORM StrToIneumeform(std::string value) const;
-
-    std::string IneumenameToStr(data_INEUMENAME data) const;
-    data_INEUMENAME StrToIneumename(std::string value) const;
+    data_HORIZONTALALIGNMENT StrToHorizontalalignment(std::string value, bool logWarning = true) const;
 
     std::string LayerschemeToStr(data_LAYERSCHEME data) const;
-    data_LAYERSCHEME StrToLayerscheme(std::string value) const;
+    data_LAYERSCHEME StrToLayerscheme(std::string value, bool logWarning = true) const;
 
     std::string LigatureformToStr(data_LIGATUREFORM data) const;
-    data_LIGATUREFORM StrToLigatureform(std::string value) const;
+    data_LIGATUREFORM StrToLigatureform(std::string value, bool logWarning = true) const;
 
     std::string LineformToStr(data_LINEFORM data) const;
-    data_LINEFORM StrToLineform(std::string value) const;
+    data_LINEFORM StrToLineform(std::string value, bool logWarning = true) const;
 
     std::string LinestartendsymbolToStr(data_LINESTARTENDSYMBOL data) const;
-    data_LINESTARTENDSYMBOL StrToLinestartendsymbol(std::string value) const;
+    data_LINESTARTENDSYMBOL StrToLinestartendsymbol(std::string value, bool logWarning = true) const;
 
     std::string LinewidthtermToStr(data_LINEWIDTHTERM data) const;
-    data_LINEWIDTHTERM StrToLinewidthterm(std::string value) const;
+    data_LINEWIDTHTERM StrToLinewidthterm(std::string value, bool logWarning = true) const;
 
     std::string MelodicfunctionToStr(data_MELODICFUNCTION data) const;
-    data_MELODICFUNCTION StrToMelodicfunction(std::string value) const;
+    data_MELODICFUNCTION StrToMelodicfunction(std::string value, bool logWarning = true) const;
 
     std::string MensurationsignToStr(data_MENSURATIONSIGN data) const;
-    data_MENSURATIONSIGN StrToMensurationsign(std::string value) const;
+    data_MENSURATIONSIGN StrToMensurationsign(std::string value, bool logWarning = true) const;
 
     std::string MetersignToStr(data_METERSIGN data) const;
-    data_METERSIGN StrToMetersign(std::string value) const;
+    data_METERSIGN StrToMetersign(std::string value, bool logWarning = true) const;
 
     std::string MidinamesToStr(data_MIDINAMES data) const;
-    data_MIDINAMES StrToMidinames(std::string value) const;
+    data_MIDINAMES StrToMidinames(std::string value, bool logWarning = true) const;
 
     std::string ModeToStr(data_MODE data) const;
-    data_MODE StrToMode(std::string value) const;
+    data_MODE StrToMode(std::string value, bool logWarning = true) const;
+
+    std::string ModsrelationshipToStr(data_MODSRELATIONSHIP data) const;
+    data_MODSRELATIONSHIP StrToModsrelationship(std::string value, bool logWarning = true) const;
+
+    std::string NonstaffplaceToStr(data_NONSTAFFPLACE data) const;
+    data_NONSTAFFPLACE StrToNonstaffplace(std::string value, bool logWarning = true) const;
 
     std::string NotationtypeToStr(data_NOTATIONTYPE data) const;
-    data_NOTATIONTYPE StrToNotationtype(std::string value) const;
+    data_NOTATIONTYPE StrToNotationtype(std::string value, bool logWarning = true) const;
 
     std::string NoteheadmodifierListToStr(data_NOTEHEADMODIFIER_list data) const;
-    data_NOTEHEADMODIFIER_list StrToNoteheadmodifierList(std::string value) const;
+    data_NOTEHEADMODIFIER_list StrToNoteheadmodifierList(std::string value, bool logWarning = true) const;
 
     std::string OtherstaffToStr(data_OTHERSTAFF data) const;
-    data_OTHERSTAFF StrToOtherstaff(std::string value) const;
-
-    std::string PlaceToStr(data_PLACE data) const;
-    data_PLACE StrToPlace(std::string value) const;
+    data_OTHERSTAFF StrToOtherstaff(std::string value, bool logWarning = true) const;
 
     std::string RotationdirectionToStr(data_ROTATIONDIRECTION data) const;
-    data_ROTATIONDIRECTION StrToRotationdirection(std::string value) const;
+    data_ROTATIONDIRECTION StrToRotationdirection(std::string value, bool logWarning = true) const;
 
-    std::string SizeToStr(data_SIZE data) const;
-    data_SIZE StrToSize(std::string value) const;
+    std::string StaffitemBasicToStr(data_STAFFITEM_basic data) const;
+    data_STAFFITEM_basic StrToStaffitemBasic(std::string value, bool logWarning = true) const;
 
-    std::string StaffrelToStr(data_STAFFREL data) const;
-    data_STAFFREL StrToStaffrel(std::string value) const;
+    std::string StaffitemCmnToStr(data_STAFFITEM_cmn data) const;
+    data_STAFFITEM_cmn StrToStaffitemCmn(std::string value, bool logWarning = true) const;
+
+    std::string StaffitemMensuralToStr(data_STAFFITEM_mensural data) const;
+    data_STAFFITEM_mensural StrToStaffitemMensural(std::string value, bool logWarning = true) const;
+
+    std::string StaffrelBasicToStr(data_STAFFREL_basic data) const;
+    data_STAFFREL_basic StrToStaffrelBasic(std::string value, bool logWarning = true) const;
+
+    std::string StaffrelExtendedToStr(data_STAFFREL_extended data) const;
+    data_STAFFREL_extended StrToStaffrelExtended(std::string value, bool logWarning = true) const;
 
     std::string StemmodifierToStr(data_STEMMODIFIER data) const;
-    data_STEMMODIFIER StrToStemmodifier(std::string value) const;
+    data_STEMMODIFIER StrToStemmodifier(std::string value, bool logWarning = true) const;
 
     std::string StempositionToStr(data_STEMPOSITION data) const;
-    data_STEMPOSITION StrToStemposition(std::string value) const;
+    data_STEMPOSITION StrToStemposition(std::string value, bool logWarning = true) const;
 
     std::string TemperamentToStr(data_TEMPERAMENT data) const;
-    data_TEMPERAMENT StrToTemperament(std::string value) const;
+    data_TEMPERAMENT StrToTemperament(std::string value, bool logWarning = true) const;
 
     std::string TextrenditionlistToStr(data_TEXTRENDITIONLIST data) const;
-    data_TEXTRENDITIONLIST StrToTextrenditionlist(std::string value) const;
-
-    std::string UneumeformToStr(data_UNEUMEFORM data) const;
-    data_UNEUMEFORM StrToUneumeform(std::string value) const;
-
-    std::string UneumenameToStr(data_UNEUMENAME data) const;
-    data_UNEUMENAME StrToUneumename(std::string value) const;
+    data_TEXTRENDITIONLIST StrToTextrenditionlist(std::string value, bool logWarning = true) const;
 
     std::string AccidLogFuncToStr(accidLog_FUNC data) const;
-    accidLog_FUNC StrToAccidLogFunc(std::string value) const;
+    accidLog_FUNC StrToAccidLogFunc(std::string value, bool logWarning = true) const;
 
     std::string ArpegLogOrderToStr(arpegLog_ORDER data) const;
-    arpegLog_ORDER StrToArpegLogOrder(std::string value) const;
+    arpegLog_ORDER StrToArpegLogOrder(std::string value, bool logWarning = true) const;
+
+    std::string AudienceAudienceToStr(audience_AUDIENCE data) const;
+    audience_AUDIENCE StrToAudienceAudience(std::string value, bool logWarning = true) const;
 
     std::string BTremLogFormToStr(bTremLog_FORM data) const;
-    bTremLog_FORM StrToBTremLogForm(std::string value) const;
+    bTremLog_FORM StrToBTremLogForm(std::string value, bool logWarning = true) const;
+
+    std::string BeamRendFormToStr(beamRend_FORM data) const;
+    beamRend_FORM StrToBeamRendForm(std::string value, bool logWarning = true) const;
 
     std::string BeamingVisBeamrendToStr(beamingVis_BEAMREND data) const;
-    beamingVis_BEAMREND StrToBeamingVisBeamrend(std::string value) const;
-
-    std::string BeamrendFormToStr(beamrend_FORM data) const;
-    beamrend_FORM StrToBeamrendForm(std::string value) const;
+    beamingVis_BEAMREND StrToBeamingVisBeamrend(std::string value, bool logWarning = true) const;
 
     std::string CurvatureCurvedirToStr(curvature_CURVEDIR data) const;
-    curvature_CURVEDIR StrToCurvatureCurvedir(std::string value) const;
+    curvature_CURVEDIR StrToCurvatureCurvedir(std::string value, bool logWarning = true) const;
 
     std::string CutoutCutoutToStr(cutout_CUTOUT data) const;
-    cutout_CUTOUT StrToCutoutCutout(std::string value) const;
+    cutout_CUTOUT StrToCutoutCutout(std::string value, bool logWarning = true) const;
 
     std::string DotLogFormToStr(dotLog_FORM data) const;
-    dotLog_FORM StrToDotLogForm(std::string value) const;
+    dotLog_FORM StrToDotLogForm(std::string value, bool logWarning = true) const;
 
     std::string EndingsEndingrendToStr(endings_ENDINGREND data) const;
-    endings_ENDINGREND StrToEndingsEndingrend(std::string value) const;
+    endings_ENDINGREND StrToEndingsEndingrend(std::string value, bool logWarning = true) const;
 
     std::string FTremLogFormToStr(fTremLog_FORM data) const;
-    fTremLog_FORM StrToFTremLogForm(std::string value) const;
+    fTremLog_FORM StrToFTremLogForm(std::string value, bool logWarning = true) const;
 
     std::string FermataVisFormToStr(fermataVis_FORM data) const;
-    fermataVis_FORM StrToFermataVisForm(std::string value) const;
+    fermataVis_FORM StrToFermataVisForm(std::string value, bool logWarning = true) const;
 
     std::string FermataVisShapeToStr(fermataVis_SHAPE data) const;
-    fermataVis_SHAPE StrToFermataVisShape(std::string value) const;
+    fermataVis_SHAPE StrToFermataVisShape(std::string value, bool logWarning = true) const;
+
+    std::string FingGrpLogFormToStr(fingGrpLog_FORM data) const;
+    fingGrpLog_FORM StrToFingGrpLogForm(std::string value, bool logWarning = true) const;
+
+    std::string FingGrpVisOrientToStr(fingGrpVis_ORIENT data) const;
+    fingGrpVis_ORIENT StrToFingGrpVisOrient(std::string value, bool logWarning = true) const;
+
+    std::string GraceGrpLogAttachToStr(graceGrpLog_ATTACH data) const;
+    graceGrpLog_ATTACH StrToGraceGrpLogAttach(std::string value, bool logWarning = true) const;
 
     std::string HairpinLogFormToStr(hairpinLog_FORM data) const;
-    hairpinLog_FORM StrToHairpinLogForm(std::string value) const;
+    hairpinLog_FORM StrToHairpinLogForm(std::string value, bool logWarning = true) const;
+
+    std::string HarmAnlFormToStr(harmAnl_FORM data) const;
+    harmAnl_FORM StrToHarmAnlForm(std::string value, bool logWarning = true) const;
 
     std::string HarmVisRendgridToStr(harmVis_RENDGRID data) const;
-    harmVis_RENDGRID StrToHarmVisRendgrid(std::string value) const;
+    harmVis_RENDGRID StrToHarmVisRendgrid(std::string value, bool logWarning = true) const;
 
     std::string HarpPedalLogAToStr(harpPedalLog_A data) const;
-    harpPedalLog_A StrToHarpPedalLogA(std::string value) const;
+    harpPedalLog_A StrToHarpPedalLogA(std::string value, bool logWarning = true) const;
 
     std::string HarpPedalLogBToStr(harpPedalLog_B data) const;
-    harpPedalLog_B StrToHarpPedalLogB(std::string value) const;
+    harpPedalLog_B StrToHarpPedalLogB(std::string value, bool logWarning = true) const;
 
     std::string HarpPedalLogCToStr(harpPedalLog_C data) const;
-    harpPedalLog_C StrToHarpPedalLogC(std::string value) const;
+    harpPedalLog_C StrToHarpPedalLogC(std::string value, bool logWarning = true) const;
 
     std::string HarpPedalLogDToStr(harpPedalLog_D data) const;
-    harpPedalLog_D StrToHarpPedalLogD(std::string value) const;
+    harpPedalLog_D StrToHarpPedalLogD(std::string value, bool logWarning = true) const;
 
     std::string HarpPedalLogEToStr(harpPedalLog_E data) const;
-    harpPedalLog_E StrToHarpPedalLogE(std::string value) const;
+    harpPedalLog_E StrToHarpPedalLogE(std::string value, bool logWarning = true) const;
 
     std::string HarpPedalLogFToStr(harpPedalLog_F data) const;
-    harpPedalLog_F StrToHarpPedalLogF(std::string value) const;
+    harpPedalLog_F StrToHarpPedalLogF(std::string value, bool logWarning = true) const;
 
     std::string HarpPedalLogGToStr(harpPedalLog_G data) const;
-    harpPedalLog_G StrToHarpPedalLogG(std::string value) const;
+    harpPedalLog_G StrToHarpPedalLogG(std::string value, bool logWarning = true) const;
 
-    std::string MeiversionMeiversionToStr(meiversion_MEIVERSION data) const;
-    meiversion_MEIVERSION StrToMeiversionMeiversion(std::string value) const;
+    std::string MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) const;
+    meiVersion_MEIVERSION StrToMeiVersionMeiversion(std::string value, bool logWarning = true) const;
 
     std::string MensurVisFormToStr(mensurVis_FORM data) const;
-    mensurVis_FORM StrToMensurVisForm(std::string value) const;
+    mensurVis_FORM StrToMensurVisForm(std::string value, bool logWarning = true) const;
 
     std::string MensuralVisMensurformToStr(mensuralVis_MENSURFORM data) const;
-    mensuralVis_MENSURFORM StrToMensuralVisMensurform(std::string value) const;
+    mensuralVis_MENSURFORM StrToMensuralVisMensurform(std::string value, bool logWarning = true) const;
+
+    std::string MeterConformanceMetconToStr(meterConformance_METCON data) const;
+    meterConformance_METCON StrToMeterConformanceMetcon(std::string value, bool logWarning = true) const;
 
     std::string MeterSigVisFormToStr(meterSigVis_FORM data) const;
-    meterSigVis_FORM StrToMeterSigVisForm(std::string value) const;
+    meterSigVis_FORM StrToMeterSigVisForm(std::string value, bool logWarning = true) const;
 
     std::string MeterSigDefaultVisMeterrendToStr(meterSigDefaultVis_METERREND data) const;
-    meterSigDefaultVis_METERREND StrToMeterSigDefaultVisMeterrend(std::string value) const;
+    meterSigDefaultVis_METERREND StrToMeterSigDefaultVisMeterrend(std::string value, bool logWarning = true) const;
 
     std::string MeterSigGrpLogFuncToStr(meterSigGrpLog_FUNC data) const;
-    meterSigGrpLog_FUNC StrToMeterSigGrpLogFunc(std::string value) const;
-
-    std::string MeterconformanceMetconToStr(meterconformance_METCON data) const;
-    meterconformance_METCON StrToMeterconformanceMetcon(std::string value) const;
+    meterSigGrpLog_FUNC StrToMeterSigGrpLogFunc(std::string value, bool logWarning = true) const;
 
     std::string MordentLogFormToStr(mordentLog_FORM data) const;
-    mordentLog_FORM StrToMordentLogForm(std::string value) const;
+    mordentLog_FORM StrToMordentLogForm(std::string value, bool logWarning = true) const;
 
-    std::string NoteLogMensuralLigToStr(noteLogMensural_LIG data) const;
-    noteLogMensural_LIG StrToNoteLogMensuralLig(std::string value) const;
+    std::string NcVisConToStr(ncVis_CON data) const;
+    ncVis_CON StrToNcVisCon(std::string value, bool logWarning = true) const;
+
+    std::string NcVisCurvedToStr(ncVis_CURVED data) const;
+    ncVis_CURVED StrToNcVisCurved(std::string value, bool logWarning = true) const;
+
+    std::string NcVisDiagonalrightToStr(ncVis_DIAGONALRIGHT data) const;
+    ncVis_DIAGONALRIGHT StrToNcVisDiagonalright(std::string value, bool logWarning = true) const;
+
+    std::string NcVisOriscusToStr(ncVis_ORISCUS data) const;
+    ncVis_ORISCUS StrToNcVisOriscus(std::string value, bool logWarning = true) const;
+
+    std::string NcVisQuilismaToStr(ncVis_QUILISMA data) const;
+    ncVis_QUILISMA StrToNcVisQuilisma(std::string value, bool logWarning = true) const;
+
+    std::string NoteAnlMensuralLigToStr(noteAnlMensural_LIG data) const;
+    noteAnlMensural_LIG StrToNoteAnlMensuralLig(std::string value, bool logWarning = true) const;
+
+    std::string NoteGesExtremisToStr(noteGes_EXTREMIS data) const;
+    noteGes_EXTREMIS StrToNoteGesExtremis(std::string value, bool logWarning = true) const;
 
     std::string OctaveLogCollToStr(octaveLog_COLL data) const;
-    octaveLog_COLL StrToOctaveLogColl(std::string value) const;
+    octaveLog_COLL StrToOctaveLogColl(std::string value, bool logWarning = true) const;
 
     std::string PbVisFoliumToStr(pbVis_FOLIUM data) const;
-    pbVis_FOLIUM StrToPbVisFolium(std::string value) const;
+    pbVis_FOLIUM StrToPbVisFolium(std::string value, bool logWarning = true) const;
 
     std::string PedalLogDirToStr(pedalLog_DIR data) const;
-    pedalLog_DIR StrToPedalLogDir(std::string value) const;
+    pedalLog_DIR StrToPedalLogDir(std::string value, bool logWarning = true) const;
 
     std::string PedalVisFormToStr(pedalVis_FORM data) const;
-    pedalVis_FORM StrToPedalVisForm(std::string value) const;
+    pedalVis_FORM StrToPedalVisForm(std::string value, bool logWarning = true) const;
 
-    std::string PianopedalsPedalstyleToStr(pianopedals_PEDALSTYLE data) const;
-    pianopedals_PEDALSTYLE StrToPianopedalsPedalstyle(std::string value) const;
+    std::string PianoPedalsPedalstyleToStr(pianoPedals_PEDALSTYLE data) const;
+    pianoPedals_PEDALSTYLE StrToPianoPedalsPedalstyle(std::string value, bool logWarning = true) const;
 
     std::string PointingXlinkactuateToStr(pointing_XLINKACTUATE data) const;
-    pointing_XLINKACTUATE StrToPointingXlinkactuate(std::string value) const;
+    pointing_XLINKACTUATE StrToPointingXlinkactuate(std::string value, bool logWarning = true) const;
 
     std::string PointingXlinkshowToStr(pointing_XLINKSHOW data) const;
-    pointing_XLINKSHOW StrToPointingXlinkshow(std::string value) const;
+    pointing_XLINKSHOW StrToPointingXlinkshow(std::string value, bool logWarning = true) const;
 
-    std::string RegularmethodMethodToStr(regularmethod_METHOD data) const;
-    regularmethod_METHOD StrToRegularmethodMethod(std::string value) const;
+    std::string RegularMethodMethodToStr(regularMethod_METHOD data) const;
+    regularMethod_METHOD StrToRegularMethodMethod(std::string value, bool logWarning = true) const;
 
     std::string RehearsalRehencloseToStr(rehearsal_REHENCLOSE data) const;
-    rehearsal_REHENCLOSE StrToRehearsalRehenclose(std::string value) const;
+    rehearsal_REHENCLOSE StrToRehearsalRehenclose(std::string value, bool logWarning = true) const;
 
     std::string SbVisFormToStr(sbVis_FORM data) const;
-    sbVis_FORM StrToSbVisForm(std::string value) const;
+    sbVis_FORM StrToSbVisForm(std::string value, bool logWarning = true) const;
 
-    std::string StaffgroupingsymSymbolToStr(staffgroupingsym_SYMBOL data) const;
-    staffgroupingsym_SYMBOL StrToStaffgroupingsymSymbol(std::string value) const;
+    std::string StaffGroupingSymSymbolToStr(staffGroupingSym_SYMBOL data) const;
+    staffGroupingSym_SYMBOL StrToStaffGroupingSymSymbol(std::string value, bool logWarning = true) const;
 
     std::string SylLogConToStr(sylLog_CON data) const;
-    sylLog_CON StrToSylLogCon(std::string value) const;
+    sylLog_CON StrToSylLogCon(std::string value, bool logWarning = true) const;
 
     std::string SylLogWordposToStr(sylLog_WORDPOS data) const;
-    sylLog_WORDPOS StrToSylLogWordpos(std::string value) const;
+    sylLog_WORDPOS StrToSylLogWordpos(std::string value, bool logWarning = true) const;
 
-    std::string TargetevalEvaluateToStr(targeteval_EVALUATE data) const;
-    targeteval_EVALUATE StrToTargetevalEvaluate(std::string value) const;
+    std::string TargetEvalEvaluateToStr(targetEval_EVALUATE data) const;
+    targetEval_EVALUATE StrToTargetEvalEvaluate(std::string value, bool logWarning = true) const;
 
     std::string TempoLogFuncToStr(tempoLog_FUNC data) const;
-    tempoLog_FUNC StrToTempoLogFunc(std::string value) const;
+    tempoLog_FUNC StrToTempoLogFunc(std::string value, bool logWarning = true) const;
 
     std::string TupletVisNumformatToStr(tupletVis_NUMFORMAT data) const;
-    tupletVis_NUMFORMAT StrToTupletVisNumformat(std::string value) const;
+    tupletVis_NUMFORMAT StrToTupletVisNumformat(std::string value, bool logWarning = true) const;
 
     std::string TurnLogFormToStr(turnLog_FORM data) const;
-    turnLog_FORM StrToTurnLogForm(std::string value) const;
+    turnLog_FORM StrToTurnLogForm(std::string value, bool logWarning = true) const;
+
+    std::string VoltaGroupingSymVoltasymToStr(voltaGroupingSym_VOLTASYM data) const;
+    voltaGroupingSym_VOLTASYM StrToVoltaGroupingSymVoltasym(std::string value, bool logWarning = true) const;
 
     std::string WhitespaceXmlspaceToStr(whitespace_XMLSPACE data) const;
-    whitespace_XMLSPACE StrToWhitespaceXmlspace(std::string value) const;
+    whitespace_XMLSPACE StrToWhitespaceXmlspace(std::string value, bool logWarning = true) const;
 };
 
 } // vrv namespace

@@ -29,7 +29,7 @@ class Staff;
  * This class is a base class for the Layer (<layer>) content.
  * It is not an abstract class but should not be instantiated directly.
  */
-class LayerElement : public Object, public AttCommon, public AttCommonPart, public AttTyped {
+class LayerElement : public Object, public AttLabelled, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -240,17 +240,18 @@ public:
     virtual int FindTimeSpanningLayerElements(FunctorParams *functorParams);
 
     /**
-     * See Object::GenerateMIDI
+     * See Object::CalcOnsetOffset
      */
     ///@{
-    virtual int GenerateMIDI(FunctorParams *functorParams);
-    virtual int GenerateMIDIEnd(FunctorParams *functorParams);
+    virtual int CalcOnsetOffset(FunctorParams *functorParams);
     ///@}
 
     /**
-     * See Object::CalcMaxMeasureDuration
+     * See Object::ResolveMIDITies
      */
-    virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
+    ///@{
+    virtual int ResolveMIDITies(FunctorParams *);
+    ///@}
 
     /**
      * See Object::ResetDrawing
@@ -258,7 +259,7 @@ public:
     virtual int ResetDrawing(FunctorParams *);
 
 private:
-    int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);
+    int GetDrawingArticulationTopOrBottom(data_STAFFREL_basic place, ArticPartType type);
 
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */

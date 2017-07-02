@@ -10,6 +10,7 @@
 
 #include "atts_mensural.h"
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -25,12 +26,12 @@ class ScoreDefInterface;
  */
 class Mensur : public LayerElement,
                public AttColor,
+               public AttCue,
                public AttDurationRatio,
                public AttMensuralShared,
                public AttMensurLog,
                public AttMensurVis,
-               public AttRelativesize,
-               public AttSlashcount {
+               public AttSlashCount {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -49,6 +50,15 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::FindSpaceInReferenceAlignments
+     */
+    virtual int FindSpaceInReferenceAlignments(FunctorParams *functorParams);
 
 private:
     //

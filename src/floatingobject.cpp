@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "breath.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -110,79 +111,105 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
     assert(object);
 
     m_object = object;
-    if (object->Is(DIR)) {
+    if (object->Is(BREATH)) {
+        Breath *breath = dynamic_cast<Breath *>(object);
+        assert(breath);
+        // breath above by default
+        m_place = (breath->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? breath->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_above;
+    }
+    else if (object->Is(DIR)) {
         Dir *dir = dynamic_cast<Dir *>(object);
         assert(dir);
         // dir below by default
-        m_place = dir->HasPlace() ? dir->GetPlace() : STAFFREL_below;
+        m_place = (dir->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? dir->GetPlaceAlternate()->GetBasic()
+                                                                                : STAFFREL_basic_below;
     }
     else if (object->Is(DYNAM)) {
         Dynam *dynam = dynamic_cast<Dynam *>(object);
         assert(dynam);
         // dynam below by default
-        m_place = dynam->HasPlace() ? dynam->GetPlace() : STAFFREL_below;
+        m_place = (dynam->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? dynam->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_below;
     }
     else if (object->Is(ENDING)) {
         // endings always above;
-        m_place = STAFFREL_above;
+        m_place = STAFFREL_basic_above;
     }
     else if (object->Is(FERMATA)) {
         Fermata *fermata = dynamic_cast<Fermata *>(object);
         assert(fermata);
         // fermata above by default
-        m_place = fermata->HasPlace() ? fermata->GetPlace() : STAFFREL_above;
+        m_place = (fermata->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? fermata->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_above;
     }
     else if (object->Is(HAIRPIN)) {
         Hairpin *hairpin = dynamic_cast<Hairpin *>(object);
         assert(hairpin);
         // haripin below by default;
-        m_place = hairpin->HasPlace() ? hairpin->GetPlace() : STAFFREL_below;
+        m_place = (hairpin->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? hairpin->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_below;
     }
     else if (object->Is(HARM)) {
         Harm *harm = dynamic_cast<Harm *>(object);
         assert(harm);
         // harm above by default
-        m_place = harm->HasPlace() ? harm->GetPlace() : STAFFREL_above;
-        if (!harm->HasPlace() && object->GetFirst()->Is(FB)) m_place = STAFFREL_below;
+        m_place = (harm->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? harm->GetPlaceAlternate()->GetBasic()
+                                                                                 : STAFFREL_basic_above;
+        if ((harm->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_NONE) && object->GetFirst()->Is(FB))
+            m_place = STAFFREL_basic_below;
     }
     else if (object->Is(MORDENT)) {
         Mordent *mordent = dynamic_cast<Mordent *>(object);
         assert(mordent);
         // mordent above by default;
-        m_place = mordent->HasPlace() ? mordent->GetPlace() : STAFFREL_above;
+        m_place = (mordent->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? mordent->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_above;
     }
     else if (object->Is(OCTAVE)) {
         Octave *octave = dynamic_cast<Octave *>(object);
         assert(octave);
         // octave below by default (won't draw without @dis.place anyway);
-        m_place = (octave->GetDisPlace() == PLACE_above) ? STAFFREL_above : STAFFREL_below;
+        m_place = (octave->GetDisPlace() == STAFFREL_basic_above) ? STAFFREL_basic_above : STAFFREL_basic_below;
     }
     else if (object->Is(PEDAL)) {
         Pedal *pedal = dynamic_cast<Pedal *>(object);
         assert(pedal);
         // pedal below by default
-        m_place = pedal->HasPlace() ? pedal->GetPlace() : STAFFREL_below;
+        m_place = (pedal->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? pedal->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_below;
     }
     else if (object->Is(TEMPO)) {
         Tempo *tempo = dynamic_cast<Tempo *>(object);
         assert(tempo);
         // tempo above by default;
-        m_place = tempo->HasPlace() ? tempo->GetPlace() : STAFFREL_above;
+        m_place = (tempo->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? tempo->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_above;
     }
     else if (object->Is(TRILL)) {
         Trill *trill = dynamic_cast<Trill *>(object);
         assert(trill);
         // trill above by default;
-        m_place = trill->HasPlace() ? trill->GetPlace() : STAFFREL_above;
+        m_place = (trill->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
+            ? trill->GetPlaceAlternate()->GetBasic()
+            : STAFFREL_basic_above;
     }
     else if (object->Is(TURN)) {
         Turn *turn = dynamic_cast<Turn *>(object);
         assert(turn);
         // turn above by default;
-        m_place = turn->HasPlace() ? turn->GetPlace() : STAFFREL_above;
+        m_place = (turn->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE) ? turn->GetPlaceAlternate()->GetBasic()
+                                                                                 : STAFFREL_basic_above;
     }
     else {
-        m_place = STAFFREL_NONE;
+        m_place = STAFFREL_basic_NONE;
     }
     ResetPositioner();
 };
@@ -273,7 +300,7 @@ int FloatingPositioner::CalcXMinMaxY(const Point points[4])
 void FloatingPositioner::SetDrawingYRel(int drawingYRel)
 {
     ResetCachedDrawingY();
-    if (m_place == STAFFREL_above) {
+    if (m_place == STAFFREL_basic_above) {
         if (drawingYRel < m_drawingYRel) m_drawingYRel = drawingYRel;
     }
     else {
@@ -290,7 +317,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     int yRel;
 
     if (horizOverlapingBBox == NULL) {
-        if (this->m_place == STAFFREL_above) {
+        if (this->m_place == STAFFREL_basic_above) {
             yRel = GetContentY1();
             yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize)
                 / PARAM_DENOMINATOR;
@@ -311,7 +338,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         int margin
             = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
 
-        if (this->m_place == STAFFREL_above) {
+        if (this->m_place == STAFFREL_basic_above) {
             if (curve && curve->m_object->Is({ SLUR, TIE })) {
                 int shift = this->Intersects(curve, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
@@ -320,8 +347,14 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
-            if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
-                yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
+            yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
+            Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
+            // With LayerElement always move them up
+            if (object && object->IsLayerElement()) {
+                if (yRel < 0) this->SetDrawingYRel(yRel);
+            }
+            // Otherwise only if the is a vertical overlap
+            else if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
                 this->SetDrawingYRel(yRel);
             }
         }
@@ -334,9 +367,15 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
-            if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
-                yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
-                    + GetContentY2() + margin;
+            yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
+                + GetContentY2() + margin;
+            Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
+            // With LayerElement always move them down
+            if (object && object->IsLayerElement()) {
+                if (yRel > 0) this->SetDrawingYRel(yRel);
+            }
+            // Otherwise only if the is a vertical overlap
+            else if (this->VerticalContentOverlap(horizOverlapingBBox, margin)) {
                 this->SetDrawingYRel(yRel);
             }
         }

@@ -76,9 +76,14 @@ Object::Object(const Object &object) : BoundingBox(object)
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
     m_parent = NULL;
     m_classid = object.m_classid;
+    m_attClasses = object.m_attClasses;
+    m_interfaces = object.m_interfaces;
     m_isReferencObject = object.m_isReferencObject;
-    m_uuid = object.m_uuid; // for now copy the uuid - to be decided
     m_isModified = true;
+    // For now do now copy them
+    // m_uuid = object.m_uuid;
+    // m_unsupported = object.m_unsupported;
+
     int i;
     for (i = 0; i < (int)object.m_children.size(); i++) {
         Object *current = object.m_children.at(i);
@@ -97,9 +102,13 @@ Object &Object::operator=(const Object &object)
         ResetBoundingBox(); // It does not make sense to keep the values of the BBox
         m_parent = NULL;
         m_classid = object.m_classid;
+        m_attClasses = object.m_attClasses;
+        m_interfaces = object.m_interfaces;
         m_isReferencObject = object.m_isReferencObject;
-        m_uuid = object.m_uuid; // for now copy the uuid - to be decided
         m_isModified = true;
+        // For now do now copy them
+        // m_uuid = object.m_uuid;
+        // m_unsupported = object.m_unsupported;
 
         int i;
         for (i = 0; i < (int)object.m_children.size(); i++) {
@@ -233,15 +242,18 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     assert(attributes);
     attributes->clear();
 
+    Att::GetAnalytical(this, attributes);
     Att::GetCmn(this, attributes);
     Att::GetCmnornaments(this, attributes);
     Att::GetCritapp(this, attributes);
+    Att::GetGestural(this, attributes);
     Att::GetExternalsymbols(this, attributes);
     Att::GetMei(this, attributes);
     Att::GetMensural(this, attributes);
     Att::GetMidi(this, attributes);
     Att::GetPagebased(this, attributes);
     Att::GetShared(this, attributes);
+    Att::GetVisual(this, attributes);
 
     return (int)attributes->size();
 }
@@ -1015,17 +1027,6 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     if (this->Is(LAYER)) {
         Layer *layer = dynamic_cast<Layer *>(this);
         assert(layer);
-        // setting the layer stem direction. Alternatively, this could be done in
-        // View::DrawLayer. If this (and other things) is kept here, renaming the method to something
-        // more generic (PrepareDrawing?) might be a good idea...
-        if (layer->GetParent()->GetChildCount() > 1) {
-            if (layer->GetParent()->GetChildIndex(layer) == 0) {
-                layer->SetDrawingStemDir(STEMDIRECTION_up);
-            }
-            else {
-                layer->SetDrawingStemDir(STEMDIRECTION_down);
-            }
-        }
         if (params->m_doc->GetType() != Transcription) layer->SetDrawingStaffDefValues(params->m_currentStaffDef);
         return FUNCTOR_CONTINUE;
     }

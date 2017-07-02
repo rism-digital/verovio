@@ -22,7 +22,7 @@ namespace vrv {
  */
 class Rend : public TextElement,
              public AttColor,
-             public AttHorizontalalign,
+             public AttHorizontalAlign,
              public AttLang,
              public AttTypography,
              public AttWhitespace {
@@ -34,6 +34,7 @@ public:
     ///@{
     Rend();
     virtual ~Rend();
+    virtual Object *Clone() const { return new Rend(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Rend"; }
     virtual ClassId GetClassId() const { return REND; }
@@ -68,6 +69,7 @@ public:
     ///@{
     Text();
     virtual ~Text();
+    virtual Object *Clone() const { return new Text(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "Text"; }
     virtual ClassId GetClassId() const { return TEXT; }

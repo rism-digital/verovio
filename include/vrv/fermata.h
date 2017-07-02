@@ -9,6 +9,7 @@
 #define __VRV_FERMATA_H__
 
 #include "atts_cmn.h"
+#include "atts_visual.h"
 #include "controlelement.h"
 #include "timeinterface.h"
 

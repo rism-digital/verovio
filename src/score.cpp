@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        score.h
+// Name:        score.cpp
 // Author:      Laurent Pugin
 // Created:     29/08/2016
 // Copyright (c) Authors and others. All rights reserved.

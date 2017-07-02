@@ -122,7 +122,7 @@ void MeasureAligner::Reset()
 Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
 {
     int idx; // the index if we reach the end.
-    time = round(time * (pow(10, 10)) / pow(10, 10));
+    time = durRound(time);
     Alignment *alignment = this->SearchAlignmentAtTime(time, type, idx);
     // we already have a alignment of the type at that time
     if (alignment != NULL) return alignment;
@@ -303,7 +303,7 @@ void GraceAligner::Reset()
 Alignment *GraceAligner::GetAlignmentAtTime(double time, AlignmentType type)
 {
     int idx; // the index if we reach the end.
-    time = round(time * (pow(10, 10)) / pow(10, 10));
+    time = round(time);
     Alignment *alignment = this->SearchAlignmentAtTime(time, type, idx);
     // we already have a alignment of the type at that time
     if (alignment != NULL) return alignment;
@@ -369,7 +369,7 @@ int GraceAligner::GetGraceGroupLeft(int staffN)
     // First we need to get the left alignment with an alignment reference with staffN
     Alignment *leftAlignment = NULL;
     if (staffN != VRV_UNSET) {
-        AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+        AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
         Object *reference = this->FindChildByAttComparison(&matchStaff);
         if (!reference) return -VRV_UNSET;
         // The alignment is its parent
@@ -462,7 +462,7 @@ void Alignment::AddChild(Object *child)
 
 AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
-    AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+    AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
     AlignmentReference *alignmentRef
         = dynamic_cast<AlignmentReference *>(this->FindChildByAttComparison(&matchStaff, 1));
     if (!alignmentRef) {
@@ -533,7 +533,7 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
 
     if (staffN != VRV_UNSET) {
         std::vector<AttComparison *> filters;
-        AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+        AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
         filters.push_back(&matchStaff);
         this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
     }
@@ -585,18 +585,18 @@ void Alignment::AddToAccidSpace(Accid *accid)
 // AlignmentReference
 //----------------------------------------------------------------------------
 
-AlignmentReference::AlignmentReference() : Object(), AttCommon()
+AlignmentReference::AlignmentReference() : Object(), AttNInteger()
 {
-    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_NINTEGER);
 
     Reset();
 
     this->SetAsReferenceObject();
 }
 
-AlignmentReference::AlignmentReference(int staffN) : Object(), AttCommon()
+AlignmentReference::AlignmentReference(int staffN) : Object(), AttNInteger()
 {
-    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_NINTEGER);
 
     Reset();
 
@@ -611,10 +611,10 @@ AlignmentReference::~AlignmentReference()
 void AlignmentReference::Reset()
 {
     Object::Reset();
-    ResetCommon();
+    ResetNInteger();
 
     m_accidSpace.clear();
-    m_multipleLayer = false;
+    m_layerCount = 0;
 }
 
 void AlignmentReference::AddChild(Object *child)
@@ -626,9 +626,9 @@ void AlignmentReference::AddChild(Object *child)
     // Check if the we will have a reference with multiple layers
     for (childrenIter = m_children.begin(); childrenIter != m_children.end(); childrenIter++) {
         LayerElement *element = dynamic_cast<LayerElement *>(*childrenIter);
-        if (childElement->GetAlignmentLayerN() != element->GetAlignmentLayerN()) break;
+        if (childElement->GetAlignmentLayerN() == element->GetAlignmentLayerN()) break;
     }
-    if (!m_children.empty() && (childrenIter != m_children.end())) m_multipleLayer = true;
+    if (childrenIter == m_children.end()) m_layerCount++;
 
     // Specical case where we do not set the parent because the reference will not have ownership
     // Children will be treated as relinquished objects in the desctructor
@@ -792,7 +792,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             params->m_graceCumulatedXShift = VRV_UNSET;
             filters.clear();
             // Create ad comparison object for each type / @n
-            AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
+            AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
             filters.push_back(&matchStaff);
 
             m_graceAligner->Process(
@@ -957,7 +957,7 @@ int AlignmentReference::AdjustLayers(FunctorParams *functorParams)
     AdjustLayersParams *params = dynamic_cast<AdjustLayersParams *>(functorParams);
     assert(params);
 
-    if (!m_multipleLayer) return FUNCTOR_SIBLINGS;
+    if (!this->HasMultipleLayer()) return FUNCTOR_SIBLINGS;
 
     params->m_currentLayerN = VRV_UNSET;
     params->m_currentNote = NULL;
@@ -1050,6 +1050,20 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     }
 
     return FUNCTOR_SIBLINGS;
+}
+
+int AlignmentReference::FindSpaceInReferenceAlignments(FunctorParams *functorParams)
+{
+    FindSpaceInAlignmentParams *params = dynamic_cast<FindSpaceInAlignmentParams *>(functorParams);
+    assert(params);
+
+    if (!this->HasMultipleLayer()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    params->m_layerCount = this->m_layerCount;
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

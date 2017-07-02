@@ -40,17 +40,17 @@ Chord::Chord()
     , StemmedDrawingInterface()
     , DurationInterface()
     , AttColor()
+    , AttCue()
     , AttGraced()
-    , AttRelativesize()
     , AttStems()
     , AttStemsCmn()
-    , AttTiepresent()
+    , AttTiePresent()
     , AttVisibility()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_CUE);
     RegisterAttClass(ATT_GRACED);
-    RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -71,11 +71,11 @@ void Chord::Reset()
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     ResetColor();
+    ResetCue();
     ResetGraced();
-    ResetRelativesize();
     ResetStems();
     ResetStemsCmn();
-    ResetTiepresent();
+    ResetTiePresent();
     ResetVisibility();
 
     ClearClusters();
@@ -363,13 +363,14 @@ int Chord::CalcStem(FunctorParams *functorParams)
     int staffSize = staff->m_drawingStaffSize;
     params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
 
+    data_STEMDIRECTION layerStemDir;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     if (stem->HasStemDir()) {
         stemDir = stem->GetStemDir();
     }
-    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        stemDir = layer->GetDrawingStemDir();
+    else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
+        stemDir = layerStemDir;
     }
     else {
         stemDir = (yMax - params->m_verticalCenter >= params->m_verticalCenter - yMin) ? STEMDIRECTION_down
@@ -481,6 +482,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
             currentStem = new Stem();
             this->AddChild(currentStem);
         }
+        currentStem->AttGraced::operator=(*this);
         currentStem->AttStems::operator=(*this);
         currentStem->AttStemsCmn::operator=(*this);
     }
@@ -527,7 +529,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
             currentDots = new Dots();
             this->AddChild(currentDots);
         }
-        currentDots->AttAugmentdots::operator=(*this);
+        currentDots->AttAugmentDots::operator=(*this);
     }
     // This will happen only if the duration has changed
     else if (currentDots) {
@@ -560,4 +562,18 @@ int Chord::PrepareTieAttrEnd(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+
+int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
+{
+    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
+    assert(params);
+
+    double incrementScoreTime = this->GetAlignmentDuration() / (DUR_MAX / DURATION_4);
+    double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
+
+    params->m_currentScoreTime += incrementScoreTime;
+    params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
+
+    return FUNCTOR_CONTINUE;
 }
+} // namespace vrv

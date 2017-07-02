@@ -6,7 +6,16 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "metersig.h"
+//----------------------------------------------------------------------------
+
+#include <assert.h>
+#include <math.h>
+
+//----------------------------------------------------------------------------
+
+#include "functorparams.h"
 #include "scoredefinterface.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -58,6 +67,20 @@ meterSigVis_FORM MeterSig::meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_ME
         case meterSigDefaultVis_METERREND_invis: return meterSigVis_FORM_invis;
         default: return meterSigVis_FORM_NONE;
     }
+}
+
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int MeterSig::FindSpaceInReferenceAlignments(FunctorParams *functorParams)
+{
+    FindSpaceInAlignmentParams *params = dynamic_cast<FindSpaceInAlignmentParams *>(functorParams);
+    assert(params);
+
+    params->m_meterSig = this;
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

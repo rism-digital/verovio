@@ -56,6 +56,8 @@ class FloatingElement;
 class FTrem;
 class Hairpin;
 class Harm;
+class Label;
+class LabelAbbr;
 class Layer;
 class LayerElement;
 class Lem;
@@ -116,7 +118,7 @@ class Verse;
  * This class is a file output stream for writing MEI files.
  * It uses the libmei C++ library.
  * Not implemented.
-*/
+ */
 class MeiOutput : public FileOutputStream {
 public:
     /** @name Constructors and destructor */
@@ -179,6 +181,8 @@ private:
     void WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
     void WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp);
     void WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef);
+    void WriteMeiLabel(pugi::xml_node currentNode, Label *label);
+    void WriteMeiLabelAbbr(pugi::xml_node currentNode, LabelAbbr *labelAbbr);
     void WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure);
     void WriteMeiFb(pugi::xml_node currentNode, Fb *fb);
     void WriteMeiStaff(pugi::xml_node currentNode, Staff *staff);
@@ -338,7 +342,7 @@ private:
  * This class is a file input stream for reading MEI files.
  * It uses the libmei C++ library.
  * Under development.
-*/
+ */
 class MeiInput : public FileInputStream {
 public:
     // constructors and destructors
@@ -403,6 +407,9 @@ private:
     bool ReadMeiStaffGrp(Object *parent, pugi::xml_node staffGrp);
     bool ReadMeiStaffGrpChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef);
+    bool ReadMeiStaffDefChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeiLabel(Object *parent, pugi::xml_node label);
+    bool ReadMeiLabelAbbr(Object *parent, pugi::xml_node labelAbbr);
     bool ReadMeiMeasure(Object *parent, pugi::xml_node measure);
     bool ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiFb(Object *parent, pugi::xml_node fb);
@@ -559,6 +566,18 @@ private:
     std::string ExtractUuidFragment(std::string refUuid);
     std::wstring LeftTrim(std::wstring str);
     std::wstring RightTrim(std::wstring str);
+    ///@}
+
+    /**
+     * @name Various methods for upgrading older MEI files
+     */
+    ///@{
+    // to MEI 4.0.0
+    void UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef);
+    void UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvStaffGrp);
+    // to MEI 3.0.0 (Page-Based MEI only)
+    void UpgradeMeasureTo_3_0_0(Measure *measure, System *system);
+    void UpgradePageTo_3_0_0(Page *page, Doc *doc);
     ///@}
 
 public:

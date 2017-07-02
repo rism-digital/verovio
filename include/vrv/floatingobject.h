@@ -151,7 +151,7 @@ public:
 
     bool CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox);
 
-    data_STAFFREL GetDrawingPlace() const { return m_place; }
+    data_STAFFREL_basic GetDrawingPlace() const { return m_place; }
 
     void UpdateCurvePosition(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
 
@@ -178,7 +178,7 @@ protected:
 
     FloatingObject *m_object;
 
-    data_STAFFREL m_place;
+    data_STAFFREL_basic m_place;
 
 public:
     Point m_cuvrePoints[4];

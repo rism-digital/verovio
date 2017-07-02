@@ -66,8 +66,8 @@ namespace pae {
             tuplet_notes = old.tuplet_notes;
             tuplet_note = old.tuplet_note;
         }
-        Note(void) { clear(); }
-        void clear(void)
+        Note() { clear(); }
+        void clear()
         {
             appoggiatura = 0;
             acciaccatura = fermata = trill = chord = false;
@@ -77,7 +77,7 @@ namespace pae {
             beam = 0;
             pitch = PITCHNAME_NONE;
             duration = DURATION_NONE;
-            accidental = ACCIDENTAL_EXPLICIT_NONE;
+            accidental = ACCIDENTAL_WRITTEN_NONE;
             dots = 0;
             rest = false;
 
@@ -136,7 +136,7 @@ namespace pae {
         unsigned char beam;
         data_PITCHNAME pitch;
         data_DURATION duration;
-        data_ACCIDENTAL_EXPLICIT accidental;
+        data_ACCIDENTAL_WRITTEN accidental;
         unsigned int dots;
         bool rest;
 
@@ -163,7 +163,7 @@ namespace pae {
             abbreviation_offset = d.abbreviation_offset;
             wholerest = d.wholerest;
         }
-        Measure(void) { clear(); }
+        Measure() { clear(); }
 
         Measure &operator=(const Measure &d)
         { // for STL vector
@@ -182,7 +182,7 @@ namespace pae {
             return *this;
         }
 
-        void clear(void)
+        void clear()
         {
             durations.clear();
             dots.clear();
@@ -190,7 +190,7 @@ namespace pae {
             durations_offset = DURATION_long;
             reset();
         }
-        void reset(void)
+        void reset()
         {
             clef = NULL;
             meter = NULL;
@@ -241,7 +241,7 @@ private:
     int getTimeInfo(const char *incipit, MeterSig *meter, int index = 0);
     int getClefInfo(const char *incipit, Clef *mus_clef, int index = 0);
     int getBarLine(const char *incipit, data_BARRENDITION *output, int index);
-    int getAccidental(const char *incipit, data_ACCIDENTAL_EXPLICIT *accident, int index = 0);
+    int getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accident, int index = 0);
     int getOctave(const char *incipit, char *octave, int index = 0);
     int getDurations(const char *incipit, pae::Measure *measure, int index = 0);
     int getDuration(const char *incipit, data_DURATION *duration, int *dot, int index);

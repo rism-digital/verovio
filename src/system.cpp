@@ -29,9 +29,8 @@ namespace vrv {
 // System
 //----------------------------------------------------------------------------
 
-System::System() : Object("system-"), DrawingListInterface(), AttCommon(), AttTyped()
+System::System() : Object("system-"), DrawingListInterface(), AttTyped()
 {
-    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
 
     // We set parent to it because we want to access the parent doc from the aligners
@@ -53,7 +52,6 @@ void System::Reset()
 {
     Object::Reset();
     DrawingListInterface::Reset();
-    ResetCommon();
     ResetTyped();
 
     if (m_drawingScoreDef) {
@@ -164,6 +162,7 @@ void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
+    m_drawingScoreDef->SetParent(this);
 }
 
 //----------------------------------------------------------------------------

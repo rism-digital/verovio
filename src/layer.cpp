@@ -10,10 +10,13 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <math.h>
 
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "attcomparison.h"
+#include "beam.h"
 #include "clef.h"
 #include "custos.h"
 #include "doc.h"
@@ -34,10 +37,12 @@ namespace vrv {
 // Layer
 //----------------------------------------------------------------------------
 
-Layer::Layer(int n) : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttCommon(), AttTyped()
+Layer::Layer(int n)
+    : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
-    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);
+    RegisterAttClass(ATT_VISIBILITY);
 
     // owned pointers need to be set to NULL;
     m_staffDefClef = NULL;
@@ -63,8 +68,9 @@ void Layer::Reset()
 {
     Object::Reset();
     DrawingListInterface::Reset();
-    ResetCommon();
+    ResetNInteger();
     ResetTyped();
+    ResetVisibility();
 
     ResetStaffDefObjects();
 
@@ -185,6 +191,91 @@ int Layer::GetClefLocOffset(LayerElement *test)
     Clef *clef = GetClef(test);
     if (!clef) return 0;
     return clef->GetClefLocOffset();
+}
+
+data_STEMDIRECTION Layer::GetDrawingStemDir(LayerElement *element)
+{
+    assert(element);
+
+    Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+    assert(measure);
+
+    // First check if there is any <space> in the measure - if not we can return the layer stem direction
+    if (!measure->FindChildByType(SPACE)) {
+        return m_drawingStemDir;
+    }
+
+    Alignment *alignment = element->GetAlignment();
+    assert(alignment);
+
+    Layer *layer = NULL;
+    Staff *staff = element->GetCrossStaff(layer);
+    if (!staff) {
+        staff = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
+    }
+    // At this stage we have the parent or the cross-staff
+    assert(staff);
+
+    return GetDrawingStemDir(alignment->GetTime(), element->GetAlignmentDuration(), measure, staff->GetN());
+}
+
+data_STEMDIRECTION Layer::GetDrawingStemDir(const ArrayOfBeamElementCoords *coords)
+{
+    assert(!coords->empty());
+
+    // Adjust the x position of the first and last element for taking into account the stem width
+    LayerElement *first = dynamic_cast<LayerElement *>(coords->front()->m_element);
+    LayerElement *last = dynamic_cast<LayerElement *>(coords->back()->m_element);
+
+    if (!first || !last) {
+        return m_drawingStemDir;
+    }
+
+    Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+    assert(measure);
+
+    // First check if there is any <space> in the measure - if not we can return the layer stem direction
+    if (!measure->FindChildByType(SPACE)) {
+        return m_drawingStemDir;
+    }
+
+    Alignment *alignmentFirst = first->GetAlignment();
+    assert(alignmentFirst);
+    Alignment *alignmentLast = last->GetAlignment();
+    assert(alignmentLast);
+
+    // We are ignoring cross-staff situation here because this should not be called if we have one
+    Staff *staff = dynamic_cast<Staff *>(first->GetFirstParent(STAFF));
+    assert(staff);
+
+    double time = alignmentFirst->GetTime();
+    double duration = alignmentLast->GetTime() - time + last->GetAlignmentDuration();
+    duration = durRound(duration);
+
+    return GetDrawingStemDir(time, duration, measure, staff->GetN());
+}
+
+data_STEMDIRECTION Layer::GetDrawingStemDir(double time, double duration, Measure *measure, int staff)
+{
+    assert(measure);
+
+    Functor findSpaceInAlignment(&Object::FindSpaceInReferenceAlignments);
+    FindSpaceInAlignmentParams findSpaceInAlignmentParams(
+        GetCurrentMeterSig(), GetCurrentMensur(), &findSpaceInAlignment);
+    findSpaceInAlignmentParams.m_time = time;
+    findSpaceInAlignmentParams.m_duration = duration;
+
+    std::vector<AttComparison *> filters;
+    AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
+    filters.push_back(&matchStaff);
+
+    measure->m_measureAligner.Process(&findSpaceInAlignment, &findSpaceInAlignmentParams, NULL, &filters);
+
+    if (findSpaceInAlignmentParams.m_success && (findSpaceInAlignmentParams.m_layerCount < 3)) {
+        return STEMDIRECTION_NONE;
+    }
+
+    return m_drawingStemDir;
 }
 
 Clef *Layer::GetCurrentClef() const
@@ -392,6 +483,21 @@ int Layer::PrepareRpt(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Layer::CalcStem(FunctorParams *)
+{
+    // setting the layer stem direction
+    if (this->GetParent()->GetChildCount(LAYER) > 1) {
+        if (this->GetParent()->FindChildByType(LAYER) == this) {
+            this->SetDrawingStemDir(STEMDIRECTION_up);
+        }
+        else {
+            this->SetDrawingStemDir(STEMDIRECTION_down);
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Layer::AdjustSylSpacing(FunctorParams *functorParams)
 {
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
@@ -404,13 +510,13 @@ int Layer::AdjustSylSpacing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::CalcMaxMeasureDuration(FunctorParams *functorParams)
+int Layer::CalcOnsetOffset(FunctorParams *functorParams)
 {
-    CalcMaxMeasureDurationParams *params = dynamic_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    // reset it
-    params->m_currentValue = 0.0;
+    params->m_currentScoreTime = 0.0;
+    params->m_currentRealTimeSeconds = 0.0;
 
     return FUNCTOR_CONTINUE;
 }

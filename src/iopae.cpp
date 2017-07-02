@@ -560,25 +560,25 @@ int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index
 // getAccidental --
 //
 
-int PaeInput::getAccidental(const char *incipit, data_ACCIDENTAL_EXPLICIT *accident, int index)
+int PaeInput::getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accident, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
 
     if (incipit[i] == 'n') {
-        *accident = ACCIDENTAL_EXPLICIT_n;
+        *accident = ACCIDENTAL_WRITTEN_n;
     }
     else if (incipit[i] == 'x') {
-        *accident = ACCIDENTAL_EXPLICIT_s;
+        *accident = ACCIDENTAL_WRITTEN_s;
         if ((i + 1 < length) && (incipit[i + 1] == 'x')) {
-            *accident = ACCIDENTAL_EXPLICIT_x;
+            *accident = ACCIDENTAL_WRITTEN_x;
             i++;
         }
     }
     else if (incipit[i] == 'b') {
-        *accident = ACCIDENTAL_EXPLICIT_f;
+        *accident = ACCIDENTAL_WRITTEN_f;
         if ((i + 1 < length) && (incipit[i + 1] == 'b')) {
-            *accident = ACCIDENTAL_EXPLICIT_ff;
+            *accident = ACCIDENTAL_WRITTEN_ff;
             i++;
         }
     }
@@ -850,7 +850,7 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
         mclef->SetShape(CLEFSHAPE_G);
         mclef->SetLine(line - 48);
         mclef->SetDis(OCTAVE_DIS_8);
-        mclef->SetDisPlace(PLACE_below);
+        mclef->SetDisPlace(STAFFREL_basic_below);
     }
     else if (clef == 'F' || clef == 'f') {
         mclef->SetShape(CLEFSHAPE_F);
@@ -991,9 +991,9 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
     bool end_of_keysig = false;
     while ((i < length) && (!end_of_keysig)) {
         switch (incipit[i]) {
-            case 'b': key->SetAlterationType(ACCIDENTAL_EXPLICIT_f); break;
-            case 'x': key->SetAlterationType(ACCIDENTAL_EXPLICIT_s); break;
-            case 'n': key->SetAlterationType(ACCIDENTAL_EXPLICIT_n); break;
+            case 'b': key->SetAlterationType(ACCIDENTAL_WRITTEN_f); break;
+            case 'x': key->SetAlterationType(ACCIDENTAL_WRITTEN_s); break;
+            case 'n': key->SetAlterationType(ACCIDENTAL_WRITTEN_n); break;
             case '[': break;
             case 'F':
             case 'C':
@@ -1007,7 +1007,7 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
         if (!end_of_keysig) i++;
     }
 
-    if (key->GetAlterationType() != ACCIDENTAL_EXPLICIT_n) {
+    if (key->GetAlterationType() != ACCIDENTAL_WRITTEN_n) {
         key->SetAlterationNumber(alt_nr);
     }
 
@@ -1146,7 +1146,7 @@ void PaeInput::parseNote(pae::Note *note)
         rest->SetDur(note->duration);
 
         if (note->fermata) {
-            rest->SetFermata(PLACE_above); // always above for now
+            rest->SetFermata(STAFFREL_basic_above); // always above for now
         }
 
         element = rest;
@@ -1156,7 +1156,7 @@ void PaeInput::parseNote(pae::Note *note)
 
         mnote->SetPname(note->pitch);
         mnote->SetOct(note->octave);
-        if (note->accidental != ACCIDENTAL_EXPLICIT_NONE) {
+        if (note->accidental != ACCIDENTAL_WRITTEN_NONE) {
             Accid *accid = new Accid();
             accid->SetAccid(note->accidental);
             mnote->AddChild(accid);
@@ -1173,7 +1173,7 @@ void PaeInput::parseNote(pae::Note *note)
         }
 
         if (note->fermata) {
-            mnote->SetFermata(PLACE_above); // always above for now
+            mnote->SetFermata(STAFFREL_basic_above); // always above for now
         }
 
         if (note->trill == true) {
@@ -1221,14 +1221,14 @@ void PaeInput::parseNote(pae::Note *note)
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         mnote->SetDur(DURATION_8);
-        mnote->SetGrace(GRACE_acc);
+        mnote->SetGrace(GRACE_unacc);
         mnote->SetStemDir(STEMDIRECTION_up);
     }
 
     if ((note->appoggiatura > 0) && (element->Is(NOTE))) {
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
-        mnote->SetGrace(GRACE_unacc);
+        mnote->SetGrace(GRACE_acc);
         mnote->SetStemDir(STEMDIRECTION_up);
     }
 

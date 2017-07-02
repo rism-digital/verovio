@@ -55,52 +55,10 @@ public:
     ///@}
 
 private:
-    /** Records the appearance and usually the function of the bar line. **/
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
     data_LIGATUREFORM m_form;
 
     /* include <attform> */
-};
-
-//----------------------------------------------------------------------------
-// AttMensurVis
-//----------------------------------------------------------------------------
-
-class AttMensurVis : public Att {
-public:
-    AttMensurVis();
-    virtual ~AttMensurVis();
-
-    /** Reset the default values for the attribute class **/
-    void ResetMensurVis();
-
-    /** Read the values for the attribute class **/
-    bool ReadMensurVis(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteMensurVis(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetForm(mensurVis_FORM form_) { m_form = form_; }
-    mensurVis_FORM GetForm() const { return m_form; }
-    bool HasForm() const;
-    //
-    void SetOrient(data_ORIENTATION orient_) { m_orient = orient_; }
-    data_ORIENTATION GetOrient() const { return m_orient; }
-    bool HasOrient() const;
-    ///@}
-
-private:
-    /** Records the appearance and usually the function of the bar line. **/
-    mensurVis_FORM m_form;
-    /** Describes the rotation or reflection of the base symbol. **/
-    data_ORIENTATION m_orient;
-
-    /* include <attorient> */
 };
 
 //----------------------------------------------------------------------------
@@ -229,22 +187,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttMensuralVis
+// AttNoteAnlMensural
 //----------------------------------------------------------------------------
 
-class AttMensuralVis : public Att {
+class AttNoteAnlMensural : public Att {
 public:
-    AttMensuralVis();
-    virtual ~AttMensuralVis();
+    AttNoteAnlMensural();
+    virtual ~AttNoteAnlMensural();
 
     /** Reset the default values for the attribute class **/
-    void ResetMensuralVis();
+    void ResetNoteAnlMensural();
 
     /** Read the values for the attribute class **/
-    bool ReadMensuralVis(pugi::xml_node element);
+    bool ReadNoteAnlMensural(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteMensuralVis(pugi::xml_node element);
+    bool WriteNoteAnlMensural(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -252,77 +210,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMensurColor(std::string mensurColor_) { m_mensurColor = mensurColor_; }
-    std::string GetMensurColor() const { return m_mensurColor; }
-    bool HasMensurColor() const;
-    //
-    void SetMensurForm(mensuralVis_MENSURFORM mensurForm_) { m_mensurForm = mensurForm_; }
-    mensuralVis_MENSURFORM GetMensurForm() const { return m_mensurForm; }
-    bool HasMensurForm() const;
-    //
-    void SetMensurLoc(int mensurLoc_) { m_mensurLoc = mensurLoc_; }
-    int GetMensurLoc() const { return m_mensurLoc; }
-    bool HasMensurLoc() const;
-    //
-    void SetMensurOrient(data_ORIENTATION mensurOrient_) { m_mensurOrient = mensurOrient_; }
-    data_ORIENTATION GetMensurOrient() const { return m_mensurOrient; }
-    bool HasMensurOrient() const;
-    //
-    void SetMensurSize(data_SIZE mensurSize_) { m_mensurSize = mensurSize_; }
-    data_SIZE GetMensurSize() const { return m_mensurSize; }
-    bool HasMensurSize() const;
-    ///@}
-
-private:
-    /**
-     * Records the color of the mensuration sign.
-     * Do not confuse this with the musical term 'color' as used in pre-CMN notation.
-     **/
-    std::string m_mensurColor;
-    /** Indicates whether the base symbol is written vertically or horizontally. **/
-    mensuralVis_MENSURFORM m_mensurForm;
-    /** Holds the staff location of the mensuration sign. **/
-    int m_mensurLoc;
-    /** Describes the rotation or reflection of the base symbol. **/
-    data_ORIENTATION m_mensurOrient;
-    /** Describes the relative size of the mensuration sign. **/
-    data_SIZE m_mensurSize;
-
-    /* include <attmensur.size> */
-};
-
-//----------------------------------------------------------------------------
-// AttNoteLogMensural
-//----------------------------------------------------------------------------
-
-class AttNoteLogMensural : public Att {
-public:
-    AttNoteLogMensural();
-    virtual ~AttNoteLogMensural();
-
-    /** Reset the default values for the attribute class **/
-    void ResetNoteLogMensural();
-
-    /** Read the values for the attribute class **/
-    bool ReadNoteLogMensural(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteNoteLogMensural(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetLig(noteLogMensural_LIG lig_) { m_lig = lig_; }
-    noteLogMensural_LIG GetLig() const { return m_lig; }
+    void SetLig(noteAnlMensural_LIG lig_) { m_lig = lig_; }
+    noteAnlMensural_LIG GetLig() const { return m_lig; }
     bool HasLig() const;
     ///@}
 
 private:
     /** Indicates this element's participation in a ligature. **/
-    noteLogMensural_LIG m_lig;
+    noteAnlMensural_LIG m_lig;
 
     /* include <attlig> */
 };

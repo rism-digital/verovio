@@ -26,7 +26,7 @@ class System;
  * This class represents a page in a laid-out score (Doc).
  * A Page is contained in a Doc.
  * It contains System objects.
-*/
+ */
 class Page : public Object {
 public:
     /**
@@ -124,11 +124,6 @@ public:
      */
     int GetContentWidth() const;
 
-    /**
-     * Custom method for upgrading page-based page transcription data
-     */
-    void UpgradePageBasedMEI(Doc *doc);
-
     //----------//
     // Functors //
     //----------//
@@ -136,7 +131,7 @@ public:
     /**
      * Apply the Pixel Per Unit factor of the page to its elements.
      */
-    virtual int ApplyPPUFactor(FunctorParams *);
+    virtual int ApplyPPUFactor(FunctorParams *functorParams);
 
 private:
     /**
@@ -170,6 +165,11 @@ public:
      */
     ScoreDef m_drawingScoreDef;
 
+    /**
+     * Temporary member that will be replace by its LibMEI equivalent in the next version of the page-based MEI
+     */
+    double m_PPUFactor;
+
 private:
     /**
      * A flag for indicating whether the layout has been done or not.
@@ -177,11 +177,6 @@ private:
      * the force parameter is set.
      */
     bool m_layoutDone;
-
-    /**
-     *
-     */
-    double m_PPUFactor;
 };
 
 } // namespace vrv

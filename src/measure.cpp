@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <iostream>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -26,9 +25,14 @@
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
+#include "tempo.h"
 #include "timeinterface.h"
 #include "timestamp.h"
 #include "vrv.h"
+
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
 
 namespace vrv {
 
@@ -37,10 +41,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Measure::Measure(bool measureMusic, int logMeasureNb)
-    : Object("measure-"), AttCommon(), AttMeasureLog(), AttPointing(), AttTyped()
+    : Object("measure-"), AttMeasureLog(), AttNNumberLike(), AttPointing(), AttTyped()
 {
-    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_MEASURELOG);
+    RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_POINTING);
     RegisterAttClass(ATT_TYPED);
 
@@ -73,8 +77,8 @@ Measure::~Measure()
 void Measure::Reset()
 {
     Object::Reset();
-    ResetCommon();
     ResetMeasureLog();
+    ResetNNumberLike();
     ResetPointing();
     ResetTyped();
 
@@ -99,6 +103,10 @@ void Measure::Reset()
 
     m_drawingEnding = NULL;
     m_hasAlignmentRefWithMultipleLayers = false;
+
+    m_scoreTimeOffset.clear();
+    m_realTimeOffsetMilliseconds.clear();
+    m_currentTempo = 120;
 }
 
 void Measure::AddChild(Object *child)
@@ -246,7 +254,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 
     // Get the corresponding staves in the measure
     for (iter = staffList.begin(); iter != staffList.end(); iter++) {
-        AttCommonNComparison matchN(STAFF, *iter);
+        AttNIntegerComparison matchN(STAFF, *iter);
         Staff *staff = dynamic_cast<Staff *>(this->FindChildByAttComparison(&matchN, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
@@ -258,18 +266,23 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     return staves;
 }
 
-void Measure::UpgradePageBasedMEI(System *system)
+int Measure::EnclosesTime(int time) const
 {
-    assert(!this->IsMeasuredMusic());
+    int repeat = 1;
+    int timeDuration = int(
+        m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5);
+    std::vector<int>::const_iterator iter;
+    for (iter = m_realTimeOffsetMilliseconds.begin(); iter != m_realTimeOffsetMilliseconds.end(); iter++) {
+        if ((time >= *iter) && (time <= *iter + timeDuration)) return repeat;
+        repeat++;
+    }
+    return 0;
+}
 
-    if (system->m_yAbs == VRV_UNSET) return;
-    if (system->m_systemRightMar == VRV_UNSET) return;
-    if (system->m_systemRightMar == VRV_UNSET) return;
-
-    Page *page = dynamic_cast<Page *>(system->GetFirstParent(PAGE));
-    assert(page);
-    this->m_xAbs = system->m_systemLeftMar;
-    this->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;
+int Measure::GetRealTimeOffsetMilliseconds(int repeat) const
+{
+    if ((repeat < 1) || repeat > (int)m_realTimeOffsetMilliseconds.size()) return 0;
+    return m_realTimeOffsetMilliseconds.at(repeat - 1);
 }
 
 //----------------------------------------------------------------------------
@@ -462,7 +475,7 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(*iter);
-        AttCommonNComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
+        AttNIntegerComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, NULL, &filters);
@@ -520,7 +533,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(*iter);
-        AttCommonNComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
+        AttNIntegerComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
@@ -833,23 +846,26 @@ int Measure::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    // Here we need to reset the currentMeasureTime because we are starting a new measure
-    params->m_currentMeasureTime = 0;
+    // Here we need to update the m_totalTime from the starting time of the measure.
+    params->m_totalTime = m_scoreTimeOffset.back();
+
+    if (m_currentTempo != params->m_currentTempo) {
+        params->m_midiFile->addTempo(0, m_scoreTimeOffset.back() * params->m_midiFile->getTPQ(), m_currentTempo);
+        params->m_currentTempo = m_currentTempo;
+    }
 
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::GenerateMIDIEnd(FunctorParams *functorParams)
+int Measure::GenerateTimemap(FunctorParams *functorParams)
 {
-    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
     assert(params);
 
-    // We a to the total time the maximum duration of the measure so if there is no layer, if the layer is not full
-    // or
-    // if there is an encoding error in the measure, the next one will be properly aligned
-    assert(!params->m_maxValues.empty());
-    params->m_totalTime += params->m_maxValues.front();
-    params->m_maxValues.erase(params->m_maxValues.begin());
+    // Deal with repeated music later, for now get the last times.
+    params->m_scoreTimeOffset = m_scoreTimeOffset.back();
+    params->m_realTimeOffsetMilliseconds = m_realTimeOffsetMilliseconds.back();
+    params->m_currentTempo = m_currentTempo;
 
     return FUNCTOR_CONTINUE;
 }
@@ -859,8 +875,31 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     CalcMaxMeasureDurationParams *params = dynamic_cast<CalcMaxMeasureDurationParams *>(functorParams);
     assert(params);
 
-    // We just need to add a value to the stack
-    params->m_maxValues.push_back(0.0);
+    m_scoreTimeOffset.clear();
+    m_scoreTimeOffset.push_back(params->m_maxCurrentScoreTime);
+    params->m_maxCurrentScoreTime += m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX;
+
+    // search for tempo marks in the measure
+    Tempo *tempo = dynamic_cast<Tempo *>(this->FindChildByType(TEMPO));
+    if (tempo && tempo->HasMidiBpm()) {
+        params->m_currentTempo = tempo->GetMidiBpm();
+    }
+    m_currentTempo = params->m_currentTempo;
+
+    m_realTimeOffsetMilliseconds.clear();
+    m_realTimeOffsetMilliseconds.push_back(int(params->m_maxCurrentRealTimeSeconds * 1000.0 + 0.5));
+    params->m_maxCurrentRealTimeSeconds
+        += (m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX) * 60.0 / m_currentTempo;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::CalcOnsetOffset(FunctorParams *functorParams)
+{
+    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
+    assert(params);
+
+    params->m_currentTempo = m_currentTempo;
 
     return FUNCTOR_CONTINUE;
 }

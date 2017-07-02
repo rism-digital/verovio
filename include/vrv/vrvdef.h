@@ -23,13 +23,13 @@ namespace vrv {
 // Version
 //----------------------------------------------------------------------------
 
-#define VERSION_MAJOR 1
+#define VERSION_MAJOR 2
 #define VERSION_MINOR 0
-#define VERSION_REVISION 1
+#define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
 
-enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0 };
+enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0 };
 
 //----------------------------------------------------------------------------
 // Object defines
@@ -56,6 +56,8 @@ enum ClassId {
     FB,
     GRACE_ALIGNER,
     KEYSIG_ATTR,
+    LABEL,
+    LABELABBR,
     LAYER,
     MEASURE,
     MEASURE_ALIGNER,
@@ -242,6 +244,8 @@ typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
 #define PARAM_DENOMINATOR 10
 
 #define isIn(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
+
+#define durRound(dur) round(dur *pow(10, 8)) / pow(10, 8)
 
 /**
  * Codes returned by Functors.

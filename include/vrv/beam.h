@@ -47,6 +47,7 @@ public:
     bool m_beamHasChord;
     bool m_hasMultipleStemDir;
     bool m_cueSize;
+    bool m_crossStaff;
     int m_shortestDur;
     data_STEMDIRECTION m_stemDir;
 

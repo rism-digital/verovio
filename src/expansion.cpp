@@ -19,11 +19,8 @@ namespace vrv {
 // Expansion
 //----------------------------------------------------------------------------
 
-Expansion::Expansion() : SystemElement("expansion-"), AttCommonPart(), AttPlist()
+Expansion::Expansion() : SystemElement("expansion-")
 {
-    RegisterAttClass(ATT_COMMONPART);
-    RegisterAttClass(ATT_PLIST);
-
     Reset();
 }
 
@@ -34,8 +31,6 @@ Expansion::~Expansion()
 void Expansion::Reset()
 {
     SystemElement::Reset();
-    ResetCommonPart();
-    ResetPlist();
 }
 
 //----------------------------------------------------------------------------

@@ -31,7 +31,7 @@ class TimestampAttr;
  * It contains Layer objects.
  * For internally simplication of processing, unmeasured music is contained in one single measure object
  */
-class Measure : public Object, public AttCommon, public AttMeasureLog, public AttPointing, public AttTyped {
+class Measure : public Object, public AttMeasureLog, public AttNNumberLike, public AttPointing, public AttTyped {
 
 public:
     /**
@@ -169,9 +169,15 @@ public:
     std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
 
     /**
-     * Custom method for upgrading page-based unmeasured transcription data
+     * Check if the measure encloses the given time (in millisecond)
+     * Return the playing repeat time (1-based), 0 otherwise
      */
-    void UpgradePageBasedMEI(System *system);
+    int EnclosesTime(int time) const;
+
+    /**
+     * Return the real time offset in millisecond for the repeat (1-based).
+     */
+    int GetRealTimeOffsetMilliseconds(int repeat) const;
 
     //----------//
     // Functors //
@@ -306,13 +312,26 @@ public:
      */
     ///@{
     virtual int GenerateMIDI(FunctorParams *functorParams);
-    virtual int GenerateMIDIEnd(FunctorParams *functorParams);
+    ///@}
+
+    /**
+     * @name See Object::GenerateTimemap
+     */
+    ///@{
+    virtual int GenerateTimemap(FunctorParams *functorParams);
     ///@}
 
     /**
      * See Object::CalcMaxMeasureDuration
      */
     virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcOnsetOffset
+     */
+    ///@{
+    virtual int CalcOnsetOffset(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::PrepareTimestamps
@@ -372,6 +391,13 @@ private:
      * A flag indicating if the measure has AlignmentReference with multiple layers
      */
     bool m_hasAlignmentRefWithMultipleLayers;
+
+    /**
+     * Start time state variables.
+     */
+    std::vector<double> m_scoreTimeOffset;
+    std::vector<int> m_realTimeOffsetMilliseconds;
+    int m_currentTempo;
 };
 
 } // namespace vrv
