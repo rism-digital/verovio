@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jul  1 02:23:07 CEST 2017
+// Last Modified: Sat Jul  1 15:18:59 CEST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -4007,6 +4007,7 @@ HumGrid::~HumGrid(void) {
 }
 
 
+
 //////////////////////////////
 //
 // HumGrid::enableRecipSpine --
@@ -4015,6 +4016,7 @@ HumGrid::~HumGrid(void) {
 void HumGrid::enableRecipSpine(void) {
 	m_recip = true;
 }
+
 
 
 //////////////////////////////
@@ -4662,7 +4664,11 @@ GridSlice* HumGrid::manipulatorCheck(GridSlice* ice1, GridSlice* ice2) {
 						mslice->at(p)->at(s)->push_back(gv);
 					}
 					int extra = v2count - (v1count - 1) * 2;
-					token = new HumdrumToken("*^" + to_string(extra));
+					if (extra > 2) {
+						token = new HumdrumToken("*^" + to_string(extra));
+					} else {
+						token = new HumdrumToken("*^");
+					}
 					gv = new GridVoice(token, 0);
 					mslice->at(p)->at(s)->push_back(gv);
 				} else {
@@ -4675,8 +4681,12 @@ GridSlice* HumGrid::manipulatorCheck(GridSlice* ice1, GridSlice* ice2) {
 						mslice->at(p)->at(s)->push_back(gv);
 					}
 					//for (z=0; z<doubled; z++) {
-						token = new HumdrumToken("*^" + to_string(doubled+1));
-						// token = new HumdrumToken("*^Z");
+						if (doubled > 1) {
+							token = new HumdrumToken("*^" + to_string(doubled+1));
+						} else {
+							token = new HumdrumToken("*^");
+						}
+						// token = new HumdrumToken("*^");
 						gv = new GridVoice(token, 0);
 						mslice->at(p)->at(s)->push_back(gv);
 					//}
