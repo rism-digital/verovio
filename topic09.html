@@ -79,7 +79,7 @@ var midiStop = function() {
 $(".note").click(function() {
     var id = $(this).attr("id");
     var time = vrvToolkit.getTimeForElement(id);
-    $("#midi-player").midiPlayer.seek(time);
+    $("#player").midiPlayer.seek(time);
 });
 {% endhighlight %}
 
