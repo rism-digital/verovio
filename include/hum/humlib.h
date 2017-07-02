@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jun 25 15:16:51 PDT 2017
+// Last Modified: Sat Jul  1 02:23:07 CEST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2827,6 +2827,7 @@ class HumGrid : public vector<GridMeasure*> {
 		string  createBarToken              (int m, int barnum,
 		                                     GridMeasure* measure);
 		string getBarStyle                  (GridMeasure* measure);
+		void adjustExpansionsInStaff        (GridSlice* newmanip, GridSlice* curr, int p, int s);
 
 	private:
 		vector<GridSlice*>   m_allslices;
