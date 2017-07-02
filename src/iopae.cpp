@@ -94,7 +94,7 @@ bool PaeInput::ImportFile()
     parsePlainAndEasy(infile);
     return true;
 #else
-    LogError("Plain and Easy import is not supported in the build.");
+    LogError("Plaine & Easie import is not supported in the build.");
     return false;
 #endif
 }
@@ -106,7 +106,7 @@ bool PaeInput::ImportString(std::string const &pae)
     parsePlainAndEasy(in_stream);
     return true;
 #else
-    LogError("Plain and Easy import is not support in the build.");
+    LogError("Plaine & Easie import is not supported in the build.");
     return false;
 #endif
 }
