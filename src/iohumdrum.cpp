@@ -4790,6 +4790,27 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             state = 1;
             xmin = twocountbot[i];
             starti = i;
+            if (tupletendboolean[i]) {
+                // Tuplet also ends on the same note so process and then continue
+                state = 0;
+                value = (1 << xmin);
+                vdur = dursum[i] - dursum[starti] + fulldur[i];
+                if (vdur < 1) {
+                    val2 = vdur * value;
+                    if (val2.isInteger()) {
+                        tupletscale.push_back(val2.getNumerator());
+                    }
+                    else {
+                        tupletscale.push_back(value);
+                    }
+                }
+                else if (vdur / 3 * 2 == 1) {
+                    tupletscale.push_back(1);
+                }
+                else {
+                    tupletscale.push_back(value);
+                }
+            }
             continue;
         }
         if (!state) {
@@ -4802,6 +4823,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             state = 0;
             value = (1 << xmin);
             vdur = dursum[i] - dursum[starti] + fulldur[i];
+
             if (vdur < 1) {
                 val2 = vdur * value;
                 if (val2.isInteger()) {
