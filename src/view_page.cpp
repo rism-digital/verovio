@@ -1315,7 +1315,7 @@ void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextEl
     assert(element);
 
     if (isTextElement) {
-        dc->StartGraphic(element, "", element->GetUuid());
+        dc->StartTextGraphic(element, "", element->GetUuid());
     }
     else {
         dc->StartGraphic(element, "", element->GetUuid());
