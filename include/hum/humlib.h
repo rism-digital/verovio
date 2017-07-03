@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jul  1 15:18:59 CEST 2017
+// Last Modified: Mon Jul  3 05:57:17 CEST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2798,36 +2798,41 @@ class HumGrid : public vector<GridMeasure*> {
 		void addNullTokensForGraceNotes    (void);
 		void FillInNullTokensForGraceNotes(GridSlice* graceslice, GridSlice* lastnote,
 		                                   GridSlice* nextnote);
+		void addNullTokensForClefChanges  (void);
+		void FillInNullTokensForClefChanges (GridSlice* clefslice,
+		                                    GridSlice* lastnote, GridSlice* nextnote);
+		void adjustClefChanges             (void);
 		bool buildSingleList               (void);
 		void extendDurationToken           (int slicei, int parti,
 		                                    int staffi, int voicei);
 		GridVoice* getGridVoice(int slicei, int parti, int staffi, int voicei);
-		void addMeasureLines                (void);
-		void addLastMeasure                 (void);
-		bool manipulatorCheck               (void);
-		GridSlice* manipulatorCheck         (GridSlice* ice1, GridSlice* ice2);
-		void cleanupManipulators            (void);
-		void cleanManipulator               (vector<GridSlice*>& newslices, 
-		                                     GridSlice* curr);
-		GridSlice* checkManipulatorExpand   (GridSlice* curr);
-		GridSlice* checkManipulatorContract (GridSlice* curr);
-		void transferMerges                 (GridStaff* oldstaff,
-		                                     GridStaff* oldlaststaff,
-		                                     GridStaff* newstaff,
-		                                     GridStaff* newlaststaff);
-		void insertExInterpSides            (HumdrumLine* line, int part,
-		                                     int staff);
-		void insertSideTerminals            (HumdrumLine* line, int part, 
-		                                     int staff);
-		void insertSidePartInfo             (HumdrumLine* line, int part,
-		                                     int staff);
-		void insertSideStaffInfo            (HumdrumLine* line, int part,
-		                                     int staff, int staffnum);
-		void getMetricBarNumbers            (vector<int>& barnums);
-		string  createBarToken              (int m, int barnum,
-		                                     GridMeasure* measure);
-		string getBarStyle                  (GridMeasure* measure);
-		void adjustExpansionsInStaff        (GridSlice* newmanip, GridSlice* curr, int p, int s);
+		void addMeasureLines               (void);
+		void addLastMeasure                (void);
+		bool manipulatorCheck              (void);
+		GridSlice* manipulatorCheck        (GridSlice* ice1, GridSlice* ice2);
+		void cleanupManipulators           (void);
+		void cleanManipulator              (vector<GridSlice*>& newslices,
+		                                    GridSlice* curr);
+		GridSlice* checkManipulatorExpand  (GridSlice* curr);
+		GridSlice* checkManipulatorContract(GridSlice* curr);
+		void transferMerges                (GridStaff* oldstaff,
+		                                    GridStaff* oldlaststaff,
+		                                    GridStaff* newstaff,
+		                                    GridStaff* newlaststaff);
+		void insertExInterpSides           (HumdrumLine* line, int part,
+		                                    int staff);
+		void insertSideTerminals           (HumdrumLine* line, int part,
+		                                    int staff);
+		void insertSidePartInfo            (HumdrumLine* line, int part,
+		                                    int staff);
+		void insertSideStaffInfo           (HumdrumLine* line, int part,
+		                                    int staff, int staffnum);
+		void getMetricBarNumbers           (vector<int>& barnums);
+		string  createBarToken             (int m, int barnum,
+		                                    GridMeasure* measure);
+		string getBarStyle                 (GridMeasure* measure);
+		void adjustExpansionsInStaff       (GridSlice* newmanip, GridSlice* curr,
+		                                    int p, int s);
 
 	private:
 		vector<GridSlice*>   m_allslices;
