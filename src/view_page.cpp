@@ -141,40 +141,9 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     // first we need to clear the drawing list of postponed elements
     system->ResetDrawingList();
 
-    // First get the first measure of the system
-    Measure *measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
-    if (measure) {
-        // NULL for the BarLine parameters indicates that we are drawing the scoreDef
-        DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, system->GetDrawingX(), NULL);
-        // Draw mesure number if > 1
-        // This needs to be improved because we are now using (tuplet) oblique figures.
-        // We should also have a better way to specify if the number has to be displayed or not
-        if ((measure->HasN()) && (measure->GetN() != "0") && (measure->GetN() != "1")) {
-            Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
-            if (staff) {
-                FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-                // HARDCODED
-                currentFont.SetStyle(FONTSTYLE_italic);
-                currentFont.SetPointSize(currentFont.GetPointSize() * 4 / 5);
-                dc->SetFont(&currentFont);
-
-                Text text;
-                text.SetText(UTF8to16(measure->GetN()));
-
-                bool setX = false;
-                bool setY = false;
-
-                // HARDCODED
-                int x = system->GetDrawingX();
-                int y = staff->GetDrawingY() + 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-
-                dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y));
-                DrawTextElement(dc, &text, x, y, setX, setY);
-                dc->EndText();
-
-                dc->ResetFont();
-            }
-        }
+    Measure *systemStart = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
+    if (systemStart) {
+        DrawScoreDef(dc, system->GetDrawingScoreDef(), systemStart, system->GetDrawingX(), NULL);
     }
 
     DrawSystemChildren(dc, system, system);
@@ -735,6 +704,15 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
         dc->StartGraphic(measure, "", measure->GetUuid());
     }
 
+    // Check if the first measure of the system
+    Measure *systemStart = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
+    if (measure == systemStart) {
+        // Draw measure number if > 1
+        if ((measure->HasN()) && (measure->GetN() != "0") && (measure->GetN() != "1")) {
+            DrawMNum(dc, measure);
+        }
+    }
+
     DrawMeasureChildren(dc, measure, measure, system);
 
     if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
@@ -752,6 +730,42 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     if (measure->GetDrawingEnding()) {
         system->AddToDrawingList(measure->GetDrawingEnding());
+    }
+}
+
+void View::DrawMNum(DeviceContext *dc, Measure *measure)
+{
+    assert(dc);
+    assert(measure);
+
+    Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
+    if (staff) {
+
+        dc->StartCustomGraphic("mNum", "");
+
+        FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+        // HARDCODED
+        currentFont.SetStyle(FONTSTYLE_italic);
+        currentFont.SetPointSize(currentFont.GetPointSize() * 4 / 5);
+        dc->SetFont(&currentFont);
+
+        Text text;
+        text.SetText(UTF8to16(measure->GetN()));
+
+        bool setX = false;
+        bool setY = false;
+
+        // HARDCODED
+        int x = staff->GetDrawingX();
+        int y = staff->GetDrawingY() + 2.5 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+        DrawTextElement(dc, &text, x, y, setX, setY);
+        dc->EndText();
+
+        dc->ResetFont();
+
+        dc->EndCustomGraphic();
     }
 }
 

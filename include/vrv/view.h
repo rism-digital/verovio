@@ -174,6 +174,7 @@ protected:
     void DrawBarLineDots(DeviceContext *dc, StaffDef *staffDef, Staff *staff, BarLine *barLine);
     void DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *lines, bool below, bool cueSize);
     void DrawMeasure(DeviceContext *dc, Measure *measure, System *system);
+    void DrawMNum(DeviceContext *dc, Measure *measure);
     void DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure);
@@ -271,7 +272,7 @@ protected:
     void DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff);
     void DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
     void DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
-    void DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
+    void DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den, Staff *staff);
     void DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smulfCode, int num, bool line, Staff *staff);
     void DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff);
     void DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff);

@@ -220,7 +220,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
         if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);
     }
     // Even if a stem length is given we add the length of the chord content (however only if not 0)
-    // Also, the given stem length is understood as being mesured from the center of the note.
+    // Also, the given stem length is understood as being measured from the center of the note.
     // This means that it will be adjusted according to the note head (see below
     if (!this->HasStemLen() || (this->GetStemLen() != 0)) {
         baseStem += params->m_chordStemLength;
