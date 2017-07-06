@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Mordents example (2)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>The correct placement of ornaments is not affected by the presence of tuplets.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000001830545213">
+                        <staffGrp xml:id="staffgrp-0000001656329325">
+                            <staffDef xml:id="staffdef-0000000434242508" n="1" clef.shape="G" clef.line="2" key.sig="0" meter.count="2" meter.unit="2" meter.sym="cut" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000089593503">
+                        <measure xml:id="measure-L8" n="1">
+                            <staff xml:id="staff-L8F1N1" n="1">
+                                <layer xml:id="layer-L8F1N1" n="1">
+                                    <tuplet xml:id="tuplet-L10F1-L15F1" num="6" numbase="4" bracket.visible="false" num.format="count">
+                                        <beam xml:id="beam-L10F1-L15F1">
+                                            <note xml:id="note-L10F1" dur="8" oct="4" pname="f" accid.ges="n" />
+                                            <note xml:id="note-L11F1" dur="8" oct="4" pname="d" accid.ges="n" />
+                                            <note xml:id="note-L12F1" dur="8" oct="4" pname="e" accid.ges="n" />
+                                            <note xml:id="note-L13F1" dur="8" oct="5" pname="c" accid.ges="n" />
+                                            <note xml:id="note-L14F1" dur="8" oct="5" pname="d" accid.ges="n" />
+                                            <note xml:id="note-L15F1" dur="8" oct="5" pname="c" accid.ges="n" />
+                                        </beam>
+                                    </tuplet>
+                                </layer>
+                            </staff>
+                            <mordent xml:id="mordent-L10F1" staff="1" startid="#note-L10F1" form="inv" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

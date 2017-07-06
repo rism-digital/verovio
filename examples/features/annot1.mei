@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Support for annotations</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports the annotation element "annot".</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef n="1">
+            <staffGrp>
+              <staffDef n="1" lines="5" meter.count="4" meter.unit="4" clef.shape="G" clef.line="1"/>
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure>
+              <staff n="1">
+                <annot>staff annotation</annot>
+                <layer n="1">
+                  <note dur="8" oct="5" pname="a" />
+                  <note dur="8" oct="5" pname="b" />
+                  <note dur="8" oct="5" pname="f" />
+                  <note dur="8" oct="5" pname="c" />
+                  <note dur="8" oct="5" pname="e" />
+                  <note dur="8" oct="5" pname="g" />
+                  <note dur="8" oct="5" pname="a" />
+                  <note dur="8" oct="4" pname="c" />
+                  <note dur="8" oct="4" pname="d" />
+                  <annot>layer annotation</annot>
+                </layer>
+              </staff>
+              <dir staff="1" tstamp="1">
+                <annot>annotation before text</annot>molto dolce</dir>
+                <dir staff="1" tstamp="2">più<annot>annotation between text</annot> exp.</dir>
+                <dir staff="1" tstamp="3">bouche fermée <del>totalement</del><annot>annotation after text</annot>
+              </dir>
+              <annot label="should be child of measure">measure annotation</annot>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>
