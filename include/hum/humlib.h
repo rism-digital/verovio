@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jul  3 09:14:20 CEST 2017
+// Last Modified: Fri Jul  7 14:41:08 CEST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2231,6 +2231,8 @@ class NoteCell {
 		int    getMeterTop          (void);
 		HumNum getMeterBottom       (void);
 
+		vector<HTp> m_tiedtokens;	// list of tied notes/rests after note attack
+
 	protected:
 		void clear                  (void);
 		void calculateNumericPitches(void);
@@ -4058,6 +4060,9 @@ class Tool_imitation : public HumTool {
 		int     compareSequences   (vector<NoteCell*>& attack1, vector<double>& seq1,
 		                            int i1, vector<NoteCell*>& attack2,
 		                            vector<double>& seq2, int i2);
+		int     checkForIntervalSequence(vector<int>& m_intervals,
+		                            vector<double>& v1i, int starti, int count);
+		void    markedTiedNotes    (vector<HTp>& tokens);
 
 	private:
 	 	vector<HTp> m_kernspines;
@@ -4065,6 +4070,9 @@ class Tool_imitation : public HumTool {
 		bool m_duration;
 		bool m_rest;
 		bool m_rest2;
+		double m_maxdistance;
+		bool m_maxdistanceQ;
+		vector<int> m_intervals;
 		bool m_mark;
 		char m_marker = '@';
 		static int Enumerator;
