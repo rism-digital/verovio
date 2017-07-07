@@ -345,6 +345,7 @@ protected:
     void splitSyllableBySpaces(vector<string> &vtext, char spacer = ' ');
     void setInstrumentName(vrv::StaffDef *staffdef, const string &name);
     void setInstrumentAbbreviation(vrv::StaffDef *staffdef, const string &name);
+	void addDefaultTempo(ScoreDef &m_scoreDef);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
