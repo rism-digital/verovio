@@ -5223,7 +5223,12 @@ hum::HTp HumdrumInput::getPreviousDataToken(hum::HTp token)
 void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
 {
     int scount = token->getSubtokenCount();
+    string tstring;
     for (int j = 0; j < scount; j++) {
+        tstring = token->getSubtoken(j);
+        if (tstring == "") {
+            continue;
+        }
         Note *note = new Note;
         setLocationId(note, token, j);
         appendElement(chord, note);
