@@ -346,6 +346,7 @@ protected:
     void setInstrumentName(vrv::StaffDef *staffdef, const string &name);
     void setInstrumentAbbreviation(vrv::StaffDef *staffdef, const string &name);
 	void addDefaultTempo(ScoreDef &m_scoreDef);
+	int getChordNoteCount(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

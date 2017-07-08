@@ -2791,22 +2791,45 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         handleGroupStarts(tg, elements, pointers, layerdata, i);
 
         if (layerdata[i]->isChord()) {
-            Chord *chord = new Chord;
-            setLocationId(chord, layerdata[i]);
-            appendElement(elements, pointers, chord);
-            elements.push_back("chord");
-            pointers.push_back((void *)chord);
-            convertChord(chord, layerdata[i], staffindex);
-            elements.pop_back();
-            pointers.pop_back();
-            processSlurs(layerdata[i]);
-            processDynamics(layerdata[i], staffindex);
-            addArticulations(chord, layerdata[i]);
-            addOrnaments(chord, layerdata[i]);
-            processDirection(layerdata[i], staffindex);
-            processChordSignifiers(chord, layerdata[i], staffindex);
+            int chordnotecount = getChordNoteCount(layerdata[i]);
+            if (chordnotecount < 1) {
+                // invalid chord, so put a space in its place.
+                if (m_signifiers.irest_color.empty() && m_signifiers.space_color.empty()) {
+                    Space *irest = new Space;
+                    setLocationId(irest, layerdata[i]);
+                    appendElement(elements, pointers, irest);
+                    convertRhythm(irest, layerdata[i]);
+                }
+                else {
+                    // force invisible rest to be displayed
+                    Rest *rest = new Rest;
+                    setLocationId(rest, layerdata[i]);
+                    appendElement(elements, pointers, rest);
+                    convertRest(rest, layerdata[i]);
+                    int line = layerdata[i]->getLineIndex();
+                    int field = layerdata[i]->getFieldIndex();
+                    colorRest(rest, *layerdata[i], line, field);
+                }
+            }
+            else {
+                Chord *chord = new Chord;
+                setLocationId(chord, layerdata[i]);
+                appendElement(elements, pointers, chord);
+                elements.push_back("chord");
+                pointers.push_back((void *)chord);
+                convertChord(chord, layerdata[i], staffindex);
+                elements.pop_back();
+                pointers.pop_back();
+                processSlurs(layerdata[i]);
+                processDynamics(layerdata[i], staffindex);
+                addArticulations(chord, layerdata[i]);
+                addOrnaments(chord, layerdata[i]);
+                processDirection(layerdata[i], staffindex);
+                processChordSignifiers(chord, layerdata[i], staffindex);
+            }
         }
         else if (layerdata[i]->isRest()) {
+
             if ((layerdata[i]->find("yy") != string::npos) && m_signifiers.irest_color.empty()
                 && m_signifiers.space_color.empty()) {
                 // Invisible rest (or note which should be invisible.
@@ -2832,6 +2855,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
         }
         else if (!layerdata[i]->isNote()) {
+
             // this is probably a **recip value without note or rest information
             // so print it as a space (invisible rest).
             if ((!m_signifiers.rspace_color.empty()) || (!m_signifiers.space_color.empty())) {
@@ -5217,6 +5241,41 @@ hum::HTp HumdrumInput::getPreviousDataToken(hum::HTp token)
 
 //////////////////////////////
 //
+// HumdrumInput::getChordNoteCount -- Count the number of notes in a chord,
+//    removing invalid null chord notes and rests.
+//
+
+int HumdrumInput::getChordNoteCount(hum::HTp token)
+{
+    int scount = token->getSubtokenCount();
+    bool isnote = false;
+    int count = 0;
+    std::string tstring;
+    for (int i = 0; i < scount; i++) {
+        isnote = false;
+        tstring = token->getSubtoken(i);
+        if (tstring == "") {
+            continue;
+        }
+        for (int k = 0; k < (int)tstring.size(); k++) {
+            if ((tstring[k] >= 'a') && (tstring[k] <= 'g')) {
+                isnote = true;
+                break;
+            }
+            else if ((tstring[k] >= 'A') && (tstring[k] <= 'G')) {
+                isnote = true;
+                break;
+            }
+        }
+        if (isnote) {
+            count++;
+        }
+    }
+    return count;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::convertChord --
 //
 
@@ -5224,11 +5283,49 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
 {
     int scount = token->getSubtokenCount();
     string tstring;
+    int k;
+    bool isnote = false;
+    bool isrest = false;
+    bool isrecip = false;
     for (int j = 0; j < scount; j++) {
+
+        isnote = false;
+        isrest = false;
+        isrecip = false;
         tstring = token->getSubtoken(j);
         if (tstring == "") {
             continue;
         }
+        for (k = 0; k < (int)tstring.size(); k++) {
+            if (tstring[k] == 'r') {
+                isrest = true;
+            }
+            else if ((tstring[k] >= 'a') && (tstring[k] <= 'g')) {
+                isnote = true;
+            }
+            else if ((tstring[k] >= 'A') && (tstring[k] <= 'G')) {
+                isnote = true;
+            }
+            else if ((tstring[k] >= '0') && (tstring[k] <= '9')) {
+                isrecip = true;
+            }
+        }
+        if (!(isnote || isrest || isrecip)) {
+            continue;
+        }
+
+        if (isrest) {
+            // <rest> not allowed in <chord>
+            // (but chords are allowed in <rest>s somehow...)
+            continue;
+        }
+
+        if (isrecip && !isnote) {
+            // <space> not allowed in <chord>
+            // (but chords are allowed in <space>es somehow...)
+            continue;
+        }
+
         Note *note = new Note;
         setLocationId(note, token, j);
         appendElement(chord, note);
@@ -5979,6 +6076,11 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
     std::string tstring;
     if (subtoken < 0) {
         tstring = *token;
+        // strip off any leading spaces
+        auto first = tstring.find_first_not_of(' ');
+        if (first != string::npos) {
+            tstring = tstring.substr(first);
+        }
     }
     else {
         tstring = token->getSubtoken(subtoken);
