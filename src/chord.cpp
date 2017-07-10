@@ -139,6 +139,13 @@ void Chord::FilterList(ListOfObjects *childList)
 
     std::sort(childList->begin(), childList->end(), DiatonicSort());
 
+    if (childList->empty()) {
+        LogWarning("Chord '%s' has no child note - a default note is added", this->GetUuid().c_str());
+        Note *rescueNote = new Note();
+        this->AddChild(rescueNote);
+        childList->push_back(rescueNote);
+    }
+    
     iter = childList->begin();
 
     this->ClearClusters();
