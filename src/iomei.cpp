@@ -1657,6 +1657,15 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
     }
+    // filter for annot
+    else if (filterParent->Is(ANNOT)) {
+        if (element == "") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for harm
     else if (filterParent->Is(HARM)) {
         if (element == "") {
@@ -1855,7 +1864,7 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     else {
-        LogDebug("Unknow filter for '%s'", filterParent->GetClassName().c_str());
+        LogDebug("Unknown filter for '%s'", filterParent->GetClassName().c_str());
         return true;
     }
 }
