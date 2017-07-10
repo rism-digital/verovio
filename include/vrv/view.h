@@ -196,7 +196,6 @@ protected:
     void DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, Staff *staff, Measure *measure);
     void DrawTextChildren(DeviceContext *dc, Object *parent, int x, int y, bool &setX, bool &setY);
     void DrawFbChildren(DeviceContext *dc, Object *parent, int x, int y, bool &setX, bool &setY);
-
     ///@}
 
     /**
@@ -211,6 +210,14 @@ protected:
         DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY);
     void DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY);
+    ///@}
+
+    /**
+     * @name Methods for drawing Annotations
+     * Defined in view_page.cpp
+     */
+    ///@{
+    void DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextElement = false);
     ///@}
 
     /**
