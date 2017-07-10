@@ -1209,6 +1209,10 @@ void View::DrawFbChildren(DeviceContext *dc, Object *parent, int x, int y, bool 
 void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *element, System *system)
 {
     assert(element);
+    if (element->Is(ANNOT)) {
+        DrawAnnot(dc, element);
+        return;
+    }
     if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TOPLEVEL);
     else if (element->Is(CHOICE))
@@ -1228,6 +1232,10 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
 void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *element, Measure *measure, System *system)
 {
     assert(element);
+    if (element->Is(ANNOT)) {
+        DrawAnnot(dc, element);
+        return;
+    }
     if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_MEASURE);
     else if (element->Is(CHOICE))
@@ -1243,6 +1251,10 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
 void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *element, Staff *staff, Measure *measure)
 {
     assert(element);
+    if (element->Is(ANNOT)) {
+        DrawAnnot(dc, element);
+        return;
+    }
     if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_STAFF);
     else if (element->Is(CHOICE))
@@ -1259,6 +1271,10 @@ void View::DrawLayerEditorialElement(
     DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(element);
+    if (element->Is(ANNOT)) {
+        DrawAnnot(dc, element);
+        return;
+    }
     if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_LAYER);
     else if (element->Is(CHOICE))
@@ -1274,6 +1290,10 @@ void View::DrawLayerEditorialElement(
 void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY)
 {
     assert(element);
+    if (element->Is(ANNOT)) {
+        DrawAnnot(dc, element, true);
+        return;
+    }
     if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TEXT);
     else if (element->Is(CHOICE))
@@ -1289,6 +1309,10 @@ void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element
 void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY)
 {
     assert(element);
+    if (element->Is(ANNOT)) {
+        DrawAnnot(dc, element, true);
+        return;
+    }
     if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_FB);
     else if (element->Is(CHOICE))
@@ -1299,6 +1323,29 @@ void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, 
         DrawFbChildren(dc, element, x, y, setX, setY);
     }
     dc->EndTextGraphic(element, this);
+}
+
+void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextElement)
+{
+    assert(element);
+
+    if (isTextElement) {
+        dc->StartTextGraphic(element, "", element->GetUuid());
+    }
+    else {
+        dc->StartGraphic(element, "", element->GetUuid());
+    }
+
+    Annot *annot = dynamic_cast<Annot *>(element);
+    assert(annot);
+    dc->AddDescription(UTF16to8(annot->GetText(annot)));
+
+    if (isTextElement) {
+        dc->EndTextGraphic(element, this);
+    }
+    else {
+        dc->EndGraphic(element, this);
+    }
 }
 
 } // namespace vrv

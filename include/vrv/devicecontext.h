@@ -202,6 +202,13 @@ public:
     virtual bool GetDrawBoundingBoxes() { return m_drawingBoundingBoxes; }
     ///@}
 
+    /**
+     * @name Method for adding description element
+     */
+    ///@{
+    virtual void AddDescription(const std::string &text){};
+    ///@}
+
 private:
     void AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend);
 
