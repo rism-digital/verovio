@@ -1166,7 +1166,7 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     }
 
     // tie
-    if (regex_search(incipit + i + 1, std::regex("^[A-G]*\\+"))) {
+    if (regex_search(incipit + i + 1, std::regex("^[^A-G]*\\+"))) {
         // reset 1 for first note, >1 for next ones is incremented under
         if (note->tie == 0) note->tie = 1;
     }
