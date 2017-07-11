@@ -145,7 +145,7 @@ void Chord::FilterList(ListOfObjects *childList)
         this->AddChild(rescueNote);
         childList->push_back(rescueNote);
     }
-    
+
     iter = childList->begin();
 
     this->ClearClusters();

@@ -24,6 +24,7 @@ class Layer;
 class LayerElement;
 class Measure;
 class MeterSig;
+class Mensur;
 class Note;
 class Staff;
 class Tie;
@@ -156,6 +157,7 @@ namespace pae {
         { // for STL vector
             clef = d.clef;
             meter = d.meter;
+            mensur = d.mensur;
             notes = d.notes;
 
             key = d.key;
@@ -173,6 +175,7 @@ namespace pae {
         { // for STL vector
             clef = d.clef;
             meter = d.meter;
+            mensur = d.mensur;
             notes = d.notes;
 
             key = d.key;
@@ -198,6 +201,7 @@ namespace pae {
         {
             clef = NULL;
             meter = NULL;
+            mensur = NULL;
             key = NULL;
             notes.clear();
             barLine = BARRENDITION_invis;
@@ -205,6 +209,7 @@ namespace pae {
             abbreviation_offset = -1;
         }
         Clef *clef;
+        Mensur *mensur;
         MeterSig *meter;
         KeySig *key;
 
@@ -242,7 +247,7 @@ private:
 
     // parsing functions
     int getKeyInfo(const char *incipit, KeySig *key, int index = 0);
-    int getTimeInfo(const char *incipit, MeterSig *meter, int index = 0);
+    int getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, int index = 0);
     int getClefInfo(const char *incipit, Clef *mus_clef, int index = 0);
     int getBarLine(const char *incipit, data_BARRENDITION *output, int index);
     int getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accident, int index = 0);
@@ -279,6 +284,7 @@ private:
     Layer *m_layer;
     Note *m_last_tied_note;
     bool m_is_in_chord;
+    bool m_is_mensural;
     std::string m_keySigString;
 
     std::vector<LayerElement *> m_nested_objects;
