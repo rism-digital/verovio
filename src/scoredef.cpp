@@ -91,7 +91,8 @@ bool ScoreDefElement::HasKeySigAttrInfo() const
 bool ScoreDefElement::HasMensurAttrInfo() const
 {
     // What is the minimum we need? Checking only some for now. Need clarification
-    return (this->HasProlatio() || this->HasTempus() || this->HasProportNum() || this->HasProportNumbase());
+    return (this->HasProlatio() || this->HasTempus() || this->HasProportNum() || this->HasProportNumbase()
+        || this->HasMensurSign());
 }
 
 bool ScoreDefElement::HasMeterSigAttrInfo() const
