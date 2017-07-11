@@ -1091,6 +1091,7 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
 int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
 {
     int alt_nr = 0;
+    m_keySigString = "";
 
     // at the key information line, extract data
     int length = (int)strlen(incipit);
@@ -1111,7 +1112,10 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
             case 'B': alt_nr++; break;
             default: end_of_keysig = true; break;
         }
-        if (!end_of_keysig) i++;
+        if (!end_of_keysig) {
+            m_keySigString.push_back(incipit[i]);
+            i++;
+        }
     }
 
     if (key->GetAlterationType() != ACCIDENTAL_WRITTEN_n) {
@@ -1152,6 +1156,13 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
         }
     }
     note->pitch = getPitch(incipit[i]);
+
+    if (m_keySigString.find(incipit[i]) != std::string::npos) {
+        if (m_keySigString[0] == 'x')
+            note->accidGes = ACCIDENTAL_GESTURAL_s;
+        else if (m_keySigString[0] == 'b')
+            note->accidGes = ACCIDENTAL_GESTURAL_f;
+    }
 
     // lookout, hack. If a rest (PITCHNAME_NONE val) then create rest object.
     // it will be added instead of the note
@@ -1275,6 +1286,12 @@ void PaeInput::parseNote(pae::Note *note)
             Accid *accid = new Accid();
             accid->SetAccid(note->accidental);
             mnote->AddChild(accid);
+        }
+        if (!mnote->FindChildByType(ACCID)) {
+            Accid *accid = new Accid();
+            mnote->AddChild(accid);
+            accid->IsAttribute(true);
+            accid->SetAccidGes(note->accidGes);
         }
 
         mnote->SetDots(note->dots);
