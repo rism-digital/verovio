@@ -77,6 +77,8 @@ Flag::~Flag()
 void Flag::Reset()
 {
     LayerElement::Reset();
+    
+    m_drawingNbFlags = 0;
 }
 
 wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
