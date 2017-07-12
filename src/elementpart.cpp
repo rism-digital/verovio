@@ -43,21 +43,13 @@ void Dots::Reset()
 {
     LayerElement::Reset();
     ResetAugmentDots();
+    
+    m_dotLocsByStaff.clear();
 }
 
 std::list<int> *Dots::GetDotLocsForStaff(Staff *staff)
 {
     return &m_dotLocsByStaff[staff];
-    /*
-    if (m_dotLocsByStaff.count(staff) == 0)
-        m_dotLocsByStaff[staff] =
-
-    auto item = std::find_if(m_dotLocsByStaff.begin(), m_dotLocsByStaff.end(),
-                             [staff](MapOfDotLocs dotLocs) { return (staff == dotLocs. .first) });
-    if (item != m_dotLocsByStaff.end()) {
-        // LogDebug("Found it!");
-    }
-    */
 }
 
 //----------------------------------------------------------------------------
