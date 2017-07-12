@@ -95,8 +95,8 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     }
 
     // take care of width/height once userScale is updated
-    m_svgNode.prepend_attribute("height") = StringFormat("%dpx", (int)((double)m_height * m_userScaleY)).c_str();
-    m_svgNode.prepend_attribute("width") = StringFormat("%dpx", (int)((double)m_width * m_userScaleX)).c_str();
+    m_svgNode.prepend_attribute("height") = StringFormat("%.2fpx", ((double)m_height * m_userScaleY)).c_str();
+    m_svgNode.prepend_attribute("width") = StringFormat("%.2fpx", ((double)m_width * m_userScaleX)).c_str();
 
     // add the woff VerovioText font if needed
     if (m_vrvTextFont) {
