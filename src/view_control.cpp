@@ -2248,7 +2248,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
             DrawFilledRectangle(dc, x1, y1, x1 + m_doc->GetDrawingBarLineWidth((*staffIter)->m_drawingStaffSize), y2);
         }
-        if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        if (((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) && (ending->GetLendsym() != LINESTARTENDSYMBOL_none))  {
             DrawFilledRectangle(dc, x2 - m_doc->GetDrawingBarLineWidth((*staffIter)->m_drawingStaffSize), y1, x2, y2);
         }
     }
