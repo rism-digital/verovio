@@ -24,6 +24,7 @@ class Layer;
 class LayerElement;
 class Measure;
 class MeterSig;
+class Mensur;
 class Note;
 class Staff;
 class Tie;
@@ -56,6 +57,7 @@ namespace pae {
             pitch = old.pitch;
             duration = old.duration;
             accidental = old.accidental;
+            accidGes = old.accidGes;
             dots = old.dots;
             rest = old.rest;
 
@@ -78,6 +80,7 @@ namespace pae {
             pitch = PITCHNAME_NONE;
             duration = DURATION_NONE;
             accidental = ACCIDENTAL_WRITTEN_NONE;
+            accidGes = ACCIDENTAL_GESTURAL_NONE;
             dots = 0;
             rest = false;
 
@@ -105,6 +108,7 @@ namespace pae {
             pitch = d.pitch;
             duration = d.duration;
             accidental = d.accidental;
+            accidGes = d.accidGes;
             dots = d.dots;
             rest = d.rest;
 
@@ -137,6 +141,7 @@ namespace pae {
         data_PITCHNAME pitch;
         data_DURATION duration;
         data_ACCIDENTAL_WRITTEN accidental;
+        data_ACCIDENTAL_GESTURAL accidGes;
         unsigned int dots;
         bool rest;
 
@@ -152,6 +157,7 @@ namespace pae {
         { // for STL vector
             clef = d.clef;
             meter = d.meter;
+            mensur = d.mensur;
             notes = d.notes;
 
             key = d.key;
@@ -169,6 +175,7 @@ namespace pae {
         { // for STL vector
             clef = d.clef;
             meter = d.meter;
+            mensur = d.mensur;
             notes = d.notes;
 
             key = d.key;
@@ -194,6 +201,7 @@ namespace pae {
         {
             clef = NULL;
             meter = NULL;
+            mensur = NULL;
             key = NULL;
             notes.clear();
             barLine = BARRENDITION_invis;
@@ -201,6 +209,7 @@ namespace pae {
             abbreviation_offset = -1;
         }
         Clef *clef;
+        Mensur *mensur;
         MeterSig *meter;
         KeySig *key;
 
@@ -238,7 +247,7 @@ private:
 
     // parsing functions
     int getKeyInfo(const char *incipit, KeySig *key, int index = 0);
-    int getTimeInfo(const char *incipit, MeterSig *meter, int index = 0);
+    int getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, int index = 0);
     int getClefInfo(const char *incipit, Clef *mus_clef, int index = 0);
     int getBarLine(const char *incipit, data_BARRENDITION *output, int index);
     int getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accident, int index = 0);
@@ -275,6 +284,8 @@ private:
     Layer *m_layer;
     Note *m_last_tied_note;
     bool m_is_in_chord;
+    bool m_is_mensural;
+    std::string m_keySigString;
 
     std::vector<LayerElement *> m_nested_objects;
 };

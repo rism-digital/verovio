@@ -1475,8 +1475,7 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den
             staff->m_drawingStaffSize);
     }
     else
-        DrawSmuflString(
-            dc, x, y, numText, true, staff->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y, numText, true, staff->m_drawingStaffSize);
 
     dc->ResetFont();
 }

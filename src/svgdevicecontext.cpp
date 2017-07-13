@@ -95,8 +95,8 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     }
 
     // take care of width/height once userScale is updated
-    m_svgNode.prepend_attribute("height") = StringFormat("%dpx", (int)((double)m_height * m_userScaleY)).c_str();
-    m_svgNode.prepend_attribute("width") = StringFormat("%dpx", (int)((double)m_width * m_userScaleX)).c_str();
+    m_svgNode.prepend_attribute("height") = StringFormat("%.2fpx", ((double)m_height * m_userScaleY)).c_str();
+    m_svgNode.prepend_attribute("width") = StringFormat("%.2fpx", ((double)m_width * m_userScaleX)).c_str();
 
     // add the woff VerovioText font if needed
     if (m_vrvTextFont) {
@@ -447,10 +447,9 @@ void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d")
         = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", bezier1[0].x, bezier1[0].y, // M command
-              bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
-              bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
-              )
-              .c_str();
+            bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
+            bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
+            ).c_str();
     // pathChild.append_attribute("fill") = "#000000";
     // pathChild.append_attribute("fill-opacity") = "1";
     pathChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
@@ -550,8 +549,8 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
 
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d", int(xs), int(ys), abs(int(rx)),
-                                          abs(int(ry)), fArc, fSweep, int(xe), int(ye))
-                                          .c_str();
+        abs(int(ry)), fArc, fSweep, int(xe),
+        int(ye)).c_str();
     // pathChild.append_attribute("fill") = "#000000";
     if (currentBrush.GetOpacity() != 1.0) pathChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
     if (currentPen.GetOpacity() != 1.0) pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
