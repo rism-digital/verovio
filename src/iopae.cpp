@@ -196,7 +196,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     if (strlen(c_timesig)) {
         if (m_is_mensural) {
             Mensur *mensur = new Mensur();
-            getTimeInfo(c_timesig, NULL, mensur, NULL);
+            getTimeInfo(c_timesig, NULL, mensur);
             if (!scoreDefMensur) {
                 scoreDefMensur = mensur;
             }
