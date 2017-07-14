@@ -43,7 +43,7 @@ void Dots::Reset()
 {
     LayerElement::Reset();
     ResetAugmentDots();
-    
+
     m_dotLocsByStaff.clear();
 }
 
@@ -69,7 +69,7 @@ Flag::~Flag()
 void Flag::Reset()
 {
     LayerElement::Reset();
-    
+
     m_drawingNbFlags = 0;
 }
 

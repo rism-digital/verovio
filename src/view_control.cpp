@@ -518,11 +518,19 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     if (layer1->GetN() != layer2->GetN()) {
         LogWarning("Slurs between different layers may not be fully supported.");
     }
+    else if (!start->Is(TIMESTAMP_ATTR) && !end->Is(TIMESTAMP_ATTR) && (spanningType == SPANNING_START_END)) {
+        System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
+        assert(system);
+        // If we have a start to end situation, then store the curvedir in the slur for mixed drawing stem dir
+        // situations
+        if (system->HasMixedDrawingStemDir(start, end)) {
+            slur->SetDrawingCurvedir(curvature_CURVEDIR_above);
+        }
+    }
 
     /************** note stem dir **************/
 
-    // the normal case
-    if (spanningType == SPANNING_START_END) {
+    else if (spanningType == SPANNING_START_END) {
         stemDir = startStemDir;
     }
     // This is the case when the tie is split over two system of two pages.
@@ -547,6 +555,10 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     if (slur->HasCurvedir()) {
         drawingCurveDir
             = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+    }
+    // the normal case
+    else if (slur->HasDrawingCurvedir()) {
+        drawingCurveDir = slur->GetDrawingCurvedir();
     }
     // then layer direction trumps note direction
     else if (layer1 && ((layerStemDir = layer1->GetDrawingStemDir(start)) != STEMDIRECTION_NONE)) {
@@ -2248,7 +2260,8 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
             DrawFilledRectangle(dc, x1, y1, x1 + m_doc->GetDrawingBarLineWidth((*staffIter)->m_drawingStaffSize), y2);
         }
-        if (((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) && (ending->GetLendsym() != LINESTARTENDSYMBOL_none))  {
+        if (((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END))
+            && (ending->GetLendsym() != LINESTARTENDSYMBOL_none)) {
             DrawFilledRectangle(dc, x2 - m_doc->GetDrawingBarLineWidth((*staffIter)->m_drawingStaffSize), y1, x2, y2);
         }
     }

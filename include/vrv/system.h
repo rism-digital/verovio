@@ -100,6 +100,12 @@ public:
     void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
     ///@}
 
+    /**
+     * Check if the notes between the start and end have mixed drawing stem directions.
+     * The start and end element are expected to be on the same staff and same layer.
+     */
+    bool HasMixedDrawingStemDir(LayerElement *start, LayerElement *end);
+
     //----------//
     // Functors //
     //----------//
