@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jul 13 03:05:49 CEST 2017
+// Last Modified: Fri Jul 14 08:19:36 CEST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -3766,16 +3766,16 @@ class Tool_dissonant : public HumTool {
 		const int PASSING_DOWN         =  1; // downward passing tone
 		const int NEIGHBOR_UP          =  2; // upper neighbor
 		const int NEIGHBOR_DOWN        =  3; // lower neighbor
-		const int ECHAPPE_UP           =  4; // upper échappée
-		const int ECHAPPE_DOWN         =  5; // lower échappée
+		const int ECHAPPEE_UP           =  4; // upper échappée
+		const int ECHAPPEE_DOWN         =  5; // lower échappée
 		const int CAMBIATA_UP_S        =  6; // ascending short nota cambiata
 		const int CAMBIATA_DOWN_S      =  7; // descending short nota cambiata
 		const int CAMBIATA_UP_L        =  8; // ascending long nota cambiata
 		const int CAMBIATA_DOWN_L      =  9; // descending long nota cambiata
-		const int INC_ANT_UP_NEI       = 10; // incomplete anterior upper neighbor
-		const int INC_ANT_LO_NEI       = 11; // incomplete anterior lower neighbor
-		const int INC_POST_UP_NEI      = 12; // incomplete posterior upper neighbor
-		const int INC_POST_LO_NEI      = 13; // incomplete posterior lower neighbor
+		const int REV_CAMBIATA_UP      = 10; // incomplete anterior upper neighbor
+		const int REV_CAMBIATA_DOWN    = 11; // incomplete anterior lower neighbor
+		const int REV_ECHAPPEE_UP      = 12; // incomplete posterior upper neighbor
+		const int REV_ECHAPPEE_DOWN    = 13; // incomplete posterior lower neighbor
 		const int ANT_UP               = 14; // rising anticipation
 		const int ANT_DOWN             = 15; // descending anticipation
 
@@ -4239,7 +4239,7 @@ class Tool_musicxml2hum : public HumTool {
 class MyCoord {
 	public:
 		     MyCoord   (void) { clear(); }
-		void clear   (void) { x = y = -1; }
+		void clear   (void) { x = -1; y = -1; }
 		bool isValid (void) { return ((x < 0) || (y < 0)) ? false : true; }
 		int  x;
 		int  y;
@@ -4358,7 +4358,7 @@ class Tool_myank : public HumTool {
 		                                HumdrumFile& infile);
 		void      getMetStates         (vector<vector<MyCoord> >& metstates, 
 		                                HumdrumFile& infile);
-		MyCoord     getLocalMetInfo      (HumdrumFile& infile, int row, int track);
+		MyCoord   getLocalMetInfo      (HumdrumFile& infile, int row, int track);
 		int       atEndOfFile          (HumdrumFile& infile, int line);
 		void      processFile          (HumdrumFile& infile);
 		int       getSectionCount      (HumdrumFile& infile);
