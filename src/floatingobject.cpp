@@ -459,6 +459,11 @@ int FloatingObject::ResetDrawing(FunctorParams *functorParams)
         assert(interface);
         return interface->InterfaceResetDrawing(functorParams, this);
     }
+    else if (this->HasInterface(INTERFACE_TIME_POINT)) {
+        TimePointInterface *interface = this->GetTimePointInterface();
+        assert(interface);
+        return interface->InterfaceResetDrawing(functorParams, this);
+    }
     m_drawingGrpId = DRAWING_GRP_NONE;
     return FUNCTOR_CONTINUE;
 };

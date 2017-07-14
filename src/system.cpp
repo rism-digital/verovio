@@ -13,14 +13,17 @@
 
 //----------------------------------------------------------------------------
 
+#include "attcomparison.h"
 #include "boundary.h"
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
+#include "layer.h"
 #include "measure.h"
 #include "page.h"
 #include "section.h"
+#include "staff.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -163,6 +166,49 @@ void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
     m_drawingScoreDef->SetParent(this);
+}
+
+bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
+{
+    AttComparisonAny matchType({ CHORD, NOTE });
+    ArrayOfObjects children;
+    ArrayOfObjects::iterator childrenIter;
+    this->FindAllChildBetween(&children, &matchType, start, end);
+
+    Layer *layerStart = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+    assert(layerStart);
+    Staff *staffStart = dynamic_cast<Staff *>(layerStart->GetFirstParent(STAFF));
+    assert(staffStart);
+
+    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+
+    for (childrenIter = children.begin(); childrenIter != children.end(); childrenIter++) {
+        Layer *layer = dynamic_cast<Layer *>((*childrenIter)->GetFirstParent(LAYER));
+        assert(layer);
+        Staff *staff = dynamic_cast<Staff *>((*childrenIter)->GetFirstParent(STAFF));
+        assert(staff);
+
+        // If the slur is spanning over several measure, the the children list will include note and chords
+        // from other staves and layers, so we need to skip them.
+        // Alternatively we could process by staff / layer, but the current solution might be better
+        // if we want to look for slurs starting / ending on different staff / layer
+        if ((staff->GetN() != staffStart->GetN()) || (layer->GetN() != layerStart->GetN())) {
+            continue;
+        }
+
+        StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface *>(*childrenIter);
+        assert(interface);
+
+        // First pass
+        if (stemDir == STEMDIRECTION_NONE) {
+            stemDir = interface->GetDrawingStemDir();
+        }
+        else if (stemDir != interface->GetDrawingStemDir()) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 //----------------------------------------------------------------------------
