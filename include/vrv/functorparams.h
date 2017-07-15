@@ -721,6 +721,32 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// FindAllBetweenParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the attComparision text
+ * member 1: an array of all matching objects
+ * member 2: the start object range
+ * member 3: the end object range
+ **/
+
+class FindAllBetweenParams : public FunctorParams {
+public:
+    FindAllBetweenParams(AttComparison *attComparison, ArrayOfObjects *elements, Object *start, Object *end)
+    {
+        m_attComparison = attComparison;
+        m_elements = elements;
+        m_start = start;
+        m_end = end;
+    }
+    AttComparison *m_attComparison;
+    ArrayOfObjects *m_elements;
+    Object *m_start;
+    Object *m_end;
+};
+
+//----------------------------------------------------------------------------
 // FindAllByAttComparisonParams
 //----------------------------------------------------------------------------
 

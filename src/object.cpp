@@ -402,6 +402,17 @@ void Object::FindAllChildByAttComparison(
     this->Process(&findAllByAttComparison, &findAllByAttComparisonParams, NULL, NULL, deepness, direction);
 }
 
+void Object::FindAllChildBetween(
+    ArrayOfObjects *objects, AttComparison *attComparison, Object *start, Object *end, bool clear)
+{
+    assert(objects);
+    if (clear) objects->clear();
+
+    Functor findAllBetween(&Object::FindAllBetween);
+    FindAllBetweenParams findAllBetweenParams(attComparison, objects, start, end);
+    this->Process(&findAllBetween, &findAllBetweenParams);
+}
+
 Object *Object::GetChild(int idx) const
 {
     if ((idx < 0) || (idx >= (int)m_children.size())) {
@@ -895,6 +906,35 @@ int Object::FindAllByAttComparison(FunctorParams *functorParams)
     if ((*params->m_attComparison)(this)) {
         params->m_elements->push_back(this);
     }
+    // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::FindAllBetween(FunctorParams *functorParams)
+{
+    FindAllBetweenParams *params = dynamic_cast<FindAllBetweenParams *>(functorParams);
+    assert(params);
+
+    // We are reaching the start of the range
+    if (params->m_start == this) {
+        // Setting the start to NULL indicates that we are in the range
+        params->m_start = NULL;
+    }
+    // We have not reached the start yet
+    else if (params->m_start) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // evaluate by applying the AttComparison operator()
+    if ((*params->m_attComparison)(this)) {
+        params->m_elements->push_back(this);
+    }
+
+    // We have reached the end of the range
+    if (params->m_end == this) {
+        return FUNCTOR_STOP;
+    }
+
     // continue until the end
     return FUNCTOR_CONTINUE;
 }

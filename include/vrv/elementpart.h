@@ -75,14 +75,9 @@ public:
     //
 private:
     /**
-     *
+     * A map of dot locations
      */
     MapOfDotLocs m_dotLocsByStaff;
-    // data_STEMDIRECTION m_drawingStemDir;
-    /**
-     *
-     */
-    // int m_drawingStemLen;
 };
 
 //----------------------------------------------------------------------------

@@ -171,10 +171,16 @@ Beam *LayerElement::IsInBeam()
         if (this->IsGraceNote()) {
             LayerElement *graceNote = this;
             if (this->Is(STEM)) graceNote = dynamic_cast<LayerElement *>(this->GetFirstParent(NOTE, MAX_BEAM_DEPTH));
-            // If the note is part of the beam parent, this means we
-            // have a beam of graced notes
-            if (beamParent->GetListIndex(graceNote) > -1) return beamParent;
-            // otherwise it is a non-beamed grace note within a beam - will return false
+            // Make sure the object list is set
+            beamParent->GetList(beamParent);
+            // If the note is part of the beam parent, this means we have a beam of graced notes
+            if (beamParent->GetListIndex(graceNote) > -1) {
+                return beamParent;
+            }
+            // otherwise it is a non-beamed grace note within a beam - return NULL
+            else {
+                return NULL;
+            }
         }
         else {
             return beamParent;
