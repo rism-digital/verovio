@@ -1542,36 +1542,36 @@ void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, hum::HTp partstar
 //    (no other mensurations for now).
 //
 
-void HumdrumInput::setMeterSymbol(StaffDef *part, const std::string &metersig)
+template <class ELEMENT> void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig)
 {
 
     if (metersig == "C") {
         // This is used more strictly for C mensuration.
-        part->SetMeterSym(METERSIGN_common);
+        element->SetMeterSym(METERSIGN_common);
     }
     else if (metersig == "c") {
-        part->SetMeterSym(METERSIGN_common);
+        element->SetMeterSym(METERSIGN_common);
     }
     else if (metersig == "c|") {
-        part->SetMeterSym(METERSIGN_cut);
+        element->SetMeterSym(METERSIGN_cut);
     }
     else if (metersig == "C|") {
         // This is used more strictly for Cut-C mensuration.
-        part->SetMeterSym(METERSIGN_cut);
+        element->SetMeterSym(METERSIGN_cut);
     }
     else if (metersig == "*omet(C)") {
         // This is used more strictly for C mensuration.
-        part->SetMeterSym(METERSIGN_common);
+        element->SetMeterSym(METERSIGN_common);
     }
     else if (metersig == "*omet(c)") {
-        part->SetMeterSym(METERSIGN_common);
+        element->SetMeterSym(METERSIGN_common);
     }
     else if (metersig == "*omet(c|)") {
-        part->SetMeterSym(METERSIGN_cut);
+        element->SetMeterSym(METERSIGN_cut);
     }
     else if (metersig == "*omet(C|)") {
         // This is used more strictly for Cut-C mensuration.
-        part->SetMeterSym(METERSIGN_cut);
+        element->SetMeterSym(METERSIGN_cut);
     }
 }
 
@@ -4099,6 +4099,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
 
     hum::HTp keysig = NULL;
     hum::HTp timesig = NULL;
+    hum::HTp metersig = NULL;
 
     for (int i = startline; i <= endline; i++) {
         if (infile[i].isData()) {
@@ -4113,6 +4114,9 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             }
             if ((!keysig) && regex_search(*infile.token(i, j), regex(R"(^\*k\[.*\])"))) {
                 keysig = infile.token(i, j);
+            }
+            if (timesig && regex_search(*infile.token(i, j), regex(R"(^\*met\(.*\))"))) {
+                metersig = infile.token(i, j);
             }
         }
     }
@@ -4137,6 +4141,15 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             unit = stoi(matches[2]);
             scoreDef->SetMeterCount(count);
             scoreDef->SetMeterUnit(unit);
+            if (metersig) {
+                auto ploc = metersig->rfind(")");
+                if (ploc != string::npos) {
+                    string mstring = metersig->substr(5, ploc - 5);
+                    setMeterSymbol(scoreDef, mstring);
+                }
+                // ggg
+            }
+
             for (int i = 0; i < (int)ss.size(); i++) {
                 // assuming only a single time sig. at a time.
                 ss[i].meter_top = count;

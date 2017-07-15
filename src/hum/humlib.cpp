@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jul 14 08:19:36 CEST 2017
+// Last Modified: Sat Jul 15 18:28:50 CEST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -4339,14 +4339,16 @@ GridSlice* HumGrid::checkManipulatorContract(GridSlice* curr) {
 	int p, s;
 	int partcount = (int)curr->size();
 	int staffcount;
-	for (p=0; p<partcount; p++) {
+	bool init = false;
+	for (p=partcount-1; p>=0; p--) {
 		part  = curr->at(p);
 		staffcount = (int)part->size();
-		for (s=0; s<staffcount; s++) {
+		for (s=staffcount-1; s>=0; s--) {
 			staff = part->at(s);
-			voice = staff->front();
-			if ((p == 0) && (s == 0)) {
+			voice = staff->back();
+			if (!init) {
 				lastvoice = staff->back();
+				init = true;
 				continue;
 			}
 			if (lastvoice != NULL) {
@@ -4381,12 +4383,12 @@ GridSlice* HumGrid::checkManipulatorContract(GridSlice* curr) {
 	int lastp = 0;
 	int lasts = 0;
 
-	for (p=0; p<partcount; p++) {
+	for (p=partcount-1; p>=0; p--) {
 		part  = curr->at(p);
 		staffcount = (int)part->size();
-		for (s=0; s<staffcount; s++) {
+		for (s=staffcount-1; s>=0; s--) {
 			staff = part->at(s);
-			voice = staff->front();
+			voice = staff->back();
 			if (lastvoice != NULL) {
            	if ((*voice->getToken() == "*v") &&
 						(*lastvoice->getToken() == "*v")) {

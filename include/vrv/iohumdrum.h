@@ -238,7 +238,6 @@ protected:
     void prepareStaffGroup();
     void setClef(StaffDef *part, const std::string &clef);
     void setTimeSig(StaffDef *part, const std::string &timesig);
-    void setMeterSymbol(StaffDef *part, const std::string &metersig);
     void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
     void calculateReverseKernIndex();
@@ -373,6 +372,7 @@ protected:
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
     template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place);
+    template <class ELEMENT> void setMeterSymbol(ELEMENT *element, const std::string &metersig);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
