@@ -2699,6 +2699,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         mrest->SetFermata(STAFFREL_basic_above);
                     }
                 }
+                if (layerdata[z]->find("yy") != string::npos) {
+                    mrest->SetVisible(BOOLEAN_false);
+                }
             }
         }
 
@@ -5439,10 +5442,13 @@ bool HumdrumInput::hasFullMeasureRest(std::vector<hum::HTp> &layerdata, hum::Hum
         if (!layerdata[i]->isRest()) {
             return false;
         }
-        if (layerdata[i]->find("yy") != string::npos) {
-            // treat invisible full measure rest as a space later.
-            return false;
-        }
+        // Don't convert full-measure rests into spaces since
+        // due to cases such as 5/4 measure rests.  Use @visible="false"
+        // instead.
+        // if (layerdata[i]->find("yy") != string::npos) {
+        //    // treat invisible full-measure rest as a space later.
+        //    return false;
+        //}
     }
     return true;
 }
