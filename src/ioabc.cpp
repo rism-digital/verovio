@@ -784,6 +784,10 @@ void AbcInput::readInformationField(char dataKey, std::string value, Score *scor
     else if (dataKey == 'M') {
         parseMeter(value);
     }
+    else if (dataKey == 'Q') {
+        // parseTempo(value);
+        LogWarning("ABC input: tempo definitions are not supported yet");
+    }
     else if (dataKey == 'X') {
         // re-adding dataKey for complete string
         parseReferenceNumber("X:" + value);
