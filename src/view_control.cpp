@@ -530,7 +530,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     /************** note stem dir **************/
 
-    else if (spanningType == SPANNING_START_END) {
+    if (spanningType == SPANNING_START_END) {
         stemDir = startStemDir;
     }
     // This is the case when the tie is split over two system of two pages.
