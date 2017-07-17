@@ -33,6 +33,7 @@
 #include "slur.h"
 #include "space.h"
 #include "staff.h"
+#include "tempo.h"
 #include "text.h"
 #include "trill.h"
 #include "vrv.h"
@@ -132,24 +133,28 @@ void AbcInput::parseABC(std::istream &infile)
     Section *section = new Section();
     score->AddChild(section);
 
-    // read lines
+    // find first tune
+    while (abcLine[0] != 'X') {
+        if (abcLine[0] == '%') {
+            // LogWarning("comment: %s", section);
+        }
+        infile.getline(abcLine, 10000);
+        m_lineNum++;
+    }
+    // read tune header
+    readInformationField('X', &abcLine[2], score);
+    while (abcLine[0] != 'K') {
+        infile.getline(abcLine, 10000);
+        m_lineNum++;
+        readInformationField(abcLine[0], &abcLine[2], score);
+    }
+    // read music code
     while (!infile.eof()) {
         infile.getline(abcLine, 10000);
         m_lineNum++;
-        if (infile.eof()) {
-            // LogDebug("Truncated file or ending tag missing");
-            // exit(1);
-        }
         if (abcLine[0] == 'X' && m_doc->m_scoreDef.HasType()) {
             LogDebug("Reading only first tune in file");
             break;
-        }
-        // check if line is information field
-        if (abcLine[1] == ':' && abcLine[0] != '|') {
-            readInformationField(abcLine[0], &abcLine[2], score);
-        }
-        else if (abcLine[0] == '%') {
-            // LogWarning("comment: %s", section);
         }
         else {
             readMusicCode(abcLine, section);
@@ -226,74 +231,6 @@ int AbcInput::getOctave(const char *music, char *octave, int index)
             i++;
         }
     }
-
-    return i - index;
-}
-
-//////////////////////////////
-//
-// getDuration --
-//
-
-int AbcInput::getDuration(const char *music, data_DURATION *duration, int *dot, int index)
-{
-
-    int i = index;
-    int length = (int)strlen(music);
-
-    *duration = DURATION_4;
-
-    *dot = 0;
-    if ((i + 1 < length) && (music[i + 1] == '.')) {
-        // one dot
-        (*dot)++;
-        i++;
-    }
-    if ((i + 1 < length) && (music[i + 1] == '.')) {
-        // two dots
-        (*dot)++;
-        i++;
-    }
-    if ((*dot == 1) && (music[i] == 7)) {
-        // neumatic notation
-        *duration = DURATION_breve;
-        *dot = 0;
-        LogWarning("Found a note in neumatic notation (7.), using breve instead");
-    }
-
-    return i - index;
-}
-
-//////////////////////////////
-//
-// getDurations --
-//
-
-int AbcInput::getDurations(const char *music, abc::Measure *measure, int index)
-{
-    int i = index;
-    int length = (int)strlen(music);
-
-    measure->durations_offset = 0;
-    measure->durations.clear();
-    measure->dots.clear();
-
-    // int j = 0;
-    do {
-        int dot;
-        data_DURATION dur = DURATION_4;
-        // measure->dots.setSize(j+1);
-        i += getDuration(music, &dur, &dot, i);
-        measure->durations.push_back(dur);
-        measure->dots.push_back(dot);
-        // j++;
-        if ((i + 1 < length) && isdigit(music[i + 1])) {
-            i++;
-        }
-        else {
-            break;
-        }
-    } while (1);
 
     return i - index;
 }
@@ -434,7 +371,7 @@ void AbcInput::convertMeasure(abc::Measure *measure)
         m_layer->AddChild(mr);
     }
 
-    m_nested_objects.clear();
+    m_layerElements.clear();
 
     for (unsigned int i = 0; i < measure->notes.size(); i++) {
         abc::Note *note = &measure->notes[i];
@@ -591,25 +528,25 @@ void AbcInput::parseNote(abc::Note *note)
 void AbcInput::pushContainer(LayerElement *container)
 {
     addLayerElement(container);
-    m_nested_objects.push_back(container);
+    m_layerElements.push_back(container);
 }
 
 void AbcInput::popContainer()
 {
-    // assert(m_nested_objects.size() > 0);
-    if (m_nested_objects.size() == 0) {
+    // assert(m_layerElements.size() > 0);
+    if (m_layerElements.size() == 0) {
         LogError("ABC input: tried to pop an object from empty stack. "
                  "Cross-measure objects (tuplets, beams) are not supported.");
     }
     else {
-        m_nested_objects.pop_back();
+        m_layerElements.pop_back();
     }
 }
 
 void AbcInput::addLayerElement(LayerElement *element)
 {
-    if (m_nested_objects.size() > 0) {
-        m_nested_objects.back()->AddChild(element);
+    if (m_layerElements.size() > 0) {
+        m_layerElements.back()->AddChild(element);
     }
     else {
         m_layer->AddChild(element);
@@ -638,8 +575,8 @@ void AbcInput::parseKey(std::string keyString)
 
     // set key.pname
     if (pitch.find(keyString[i]) != std::string::npos) {
-        char pname = tolower(keyString[i]);
-        m_doc->m_scoreDef.SetKeyPname((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToPitchname(&pname));
+        keyString[i] = tolower(keyString[i]);
+        m_doc->m_scoreDef.SetKeyPname((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToPitchname(keyString.substr(i, 1)));
         i += 1;
     }
     while (keyString[i] == ' ') i += 1;
@@ -759,6 +696,13 @@ void AbcInput::parseMeter(std::string meterString)
     }
 }
 
+void AbcInput::parseTempo(std::string tempoString)
+{
+    Tempo *tempo = new Tempo;
+    m_controlElements.push_back(tempo);
+    LogWarning("ABC input: tempo definitions are not supported yet");
+}
+
 void AbcInput::parseReferenceNumber(std::string referenceNumberString)
 {
     // as it is not possible to SetN on mdiv we put it on scoreDef for now
@@ -778,7 +722,7 @@ void AbcInput::readInformationField(char dataKey, std::string value, Score *scor
     // remove comments
     if (value.find('%') != std::string::npos) {
         value = value.substr(0, value.find('%'));
-        while (value[value.length() - 1] == ' ') value.pop_back();
+        while (isspace(value[value.length() - 1])) value.pop_back();
     }
 
     if (dataKey == 'I') {
@@ -794,8 +738,7 @@ void AbcInput::readInformationField(char dataKey, std::string value, Score *scor
         parseMeter(value);
     }
     else if (dataKey == 'Q') {
-        // parseTempo(value);
-        LogWarning("ABC input: tempo definitions are not supported yet");
+        parseTempo(value);
     }
     else if (dataKey == 'X') {
         // re-adding dataKey for complete string
@@ -822,7 +765,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
     // calculate default unit note length
     // if (!m_doc->m_scoreDef.HasDurDefault()) {
     if (!m_doc->m_scoreDef.HasMeterUnit()
-        || (m_doc->m_scoreDef.GetMeterCount() / m_doc->m_scoreDef.GetMeterUnit()) >= 0.75) {
+        || double(m_doc->m_scoreDef.GetMeterCount()) / double(m_doc->m_scoreDef.GetMeterUnit()) >= 0.75) {
         m_unitDur = 8;
         m_durDefault = DURATION_8;
         // m_doc->m_scoreDef.SetDurDefault(DURATION_8);
@@ -847,6 +790,11 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
         if (isspace(musicCode[i])) {
             // just ignore for now
+        }
+
+        if (musicCode[i] == 'W') {
+          LogWarning("ABC input: seperate lyrics are not supported");
+          break;
         }
 
         // linebreaks
