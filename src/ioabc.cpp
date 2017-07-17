@@ -692,7 +692,8 @@ void AbcInput::parseKey(std::string keyString)
 
     // set clef
     // <clef name> - may be treble, alto, tenor, bass, perc or none. perc selects the drum clef. clef= may be omitted.
-    // [<line number>] - indicates on which staff line the base clef is written. Defaults are: treble: 2; alto: 3; tenor: 4; bass: 4.
+    // [<line number>] - indicates on which staff line the base clef is written. Defaults are: treble: 2; alto: 3;
+    // tenor: 4; bass: 4.
     // [+8 | -8] - draws '8' above or below the staff. The player will transpose the notes one octave higher or lower.
 
     // for now only default treble clef
@@ -703,14 +704,16 @@ void AbcInput::parseKey(std::string keyString)
         i = int(keyString.find("transpose=", i)) + 10;
         std::string transStr;
         int trans = 1;
-        if (keyString[i] == '-') { trans=-1; i++; }
+        if (keyString[i] == '-') {
+            trans = -1;
+            i++;
+        }
         while (isdigit(keyString[i])) {
             transStr.push_back(keyString[i]);
             i++;
         }
         trans = trans * atoi(transStr.c_str());
     }
-
 }
 
 void AbcInput::parseUnitNoteLength(std::string unitNoteLength)
@@ -772,6 +775,12 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
 
 void AbcInput::readInformationField(char dataKey, std::string value, Score *score)
 {
+    // remove comments
+    if (value.find('%') != std::string::npos) {
+        value = value.substr(0, value.find('%'));
+        while (value[value.length() - 1] == ' ') value.pop_back();
+    }
+
     if (dataKey == 'I') {
         parseInstruction(value);
     }
@@ -811,18 +820,18 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
     bool sysBreak = true;
 
     // calculate default unit note length
-    //if (!m_doc->m_scoreDef.HasDurDefault()) {
-        if (!m_doc->m_scoreDef.HasMeterUnit()
-            || (m_doc->m_scoreDef.GetMeterCount() / m_doc->m_scoreDef.GetMeterUnit()) >= 0.75) {
-            m_unitDur = 8;
-            m_durDefault = DURATION_8;
-            //m_doc->m_scoreDef.SetDurDefault(DURATION_8);
-        }
-        else {
-            m_unitDur = 16;
-            m_durDefault = DURATION_16;
-            //m_doc->m_scoreDef.SetDurDefault(DURATION_16);
-        }
+    // if (!m_doc->m_scoreDef.HasDurDefault()) {
+    if (!m_doc->m_scoreDef.HasMeterUnit()
+        || (m_doc->m_scoreDef.GetMeterCount() / m_doc->m_scoreDef.GetMeterUnit()) >= 0.75) {
+        m_unitDur = 8;
+        m_durDefault = DURATION_8;
+        // m_doc->m_scoreDef.SetDurDefault(DURATION_8);
+    }
+    else {
+        m_unitDur = 16;
+        m_durDefault = DURATION_16;
+        // m_doc->m_scoreDef.SetDurDefault(DURATION_16);
+    }
     //}
 
     data_GRACE grace = GRACE_NONE;
@@ -960,7 +969,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
             layer->AddChild(note);
         }
-
 
         // Spaces
         else if (musicCode[i] == 'x') {
