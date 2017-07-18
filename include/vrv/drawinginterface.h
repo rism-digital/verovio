@@ -192,8 +192,14 @@ public:
     Point GetDrawingStemStart(Object *object = NULL);
     Point GetDrawingStemEnd(Object *object = NULL);
 
+    /**
+     * @name Virtual methods overriden in child classes (Chord and Note)
+     */
+    ///@{
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize) = 0;
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize) = 0;
+    virtual int GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) = 0;
+    ///@}
 
 protected:
     /**

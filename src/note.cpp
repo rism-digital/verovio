@@ -233,7 +233,7 @@ void Note::SetCluster(ChordCluster *cluster, int position)
     m_clusterPosition = position;
 }
 
-int Note::GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) const
+int Note::GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize)
 {
     assert(doc);
 
@@ -244,15 +244,15 @@ int Note::GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) const
     return doc->GetGlyphWidth(code, staffSize, isCueSize) / 2;
 }
 
-Point Note::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
+Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
-    if (graceSize) defaultYShift = doc->GetCueSize(defaultYShift);
-    // x default is always set to the radius for now
-    int radius = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, graceSize) / 2;
-    // adjust the radius in order to take the stem width into account
-    radius -= doc->GetDrawingStemWidth(staffSize) / 2;
-    Point p(radius, defaultYShift);
+    if (isCueSize) defaultYShift = doc->GetCueSize(defaultYShift);
+    // x default is always set to the right for now
+    int defaultXShift = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, isCueSize);
+    // adjust the x shift in order to take the stem width into account
+    defaultXShift -= doc->GetDrawingStemWidth(staffSize) / 2;
+    Point p(defaultXShift, defaultYShift);
 
     // Here we should get the notehead value
     wchar_t code = SMUFL_E0A4_noteheadBlack;
@@ -262,8 +262,8 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
     if (this->IsMensural()) {
         // For mensural notation, get the code and adjust the default stem position
         code = this->GetMensuralSmuflNoteHead();
-        p.y = doc->GetGlyphHeight(code, staffSize, graceSize) / 2;
-        p.x = 0;
+        p.y = doc->GetGlyphHeight(code, staffSize, isCueSize) / 2;
+        p.x = doc->GetGlyphWidth(code, staffSize, isCueSize);
     }
 
     // Use the default for standard quarter and half note heads
@@ -277,21 +277,21 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
     if (glyph->HasAnchor(SMUFL_stemUpSE)) {
         const Point *anchor = glyph->GetAnchor(SMUFL_stemUpSE);
         assert(anchor);
-        p = doc->ConvertFontPoint(glyph, *anchor, staffSize, graceSize);
+        p = doc->ConvertFontPoint(glyph, *anchor, staffSize, isCueSize);
     }
 
     return p;
 }
 
-Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
+Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
-    if (graceSize) defaultYShift = doc->GetCueSize(defaultYShift);
-    // x default is always set to the radius for now
-    int radius = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, graceSize) / 2;
-    // adjust the radius in order to take the stem width into account
-    radius -= doc->GetDrawingStemWidth(staffSize) / 2;
-    Point p(-radius, -defaultYShift);
+    if (isCueSize) defaultYShift = doc->GetCueSize(defaultYShift);
+    // x default is always set to the left for now
+    int defaultXShift = 0;
+    // adjust the x shift in order to take the stem width into account
+    defaultXShift += doc->GetDrawingStemWidth(staffSize) / 2;
+    Point p(defaultXShift, -defaultYShift);
 
     // Here we should get the notehead value
     wchar_t code = SMUFL_E0A4_noteheadBlack;
@@ -301,8 +301,8 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
     if (this->IsMensural()) {
         // For mensural notation, get the code and adjust the default stem position
         code = this->GetMensuralSmuflNoteHead();
-        p.y = -doc->GetGlyphHeight(code, staffSize, graceSize) / 2;
-        p.x = 0;
+        p.y = -doc->GetGlyphHeight(code, staffSize, isCueSize) / 2;
+        p.x = doc->GetGlyphWidth(code, staffSize, isCueSize);
     }
 
     // Use the default for standard quarter and half note heads
@@ -316,7 +316,7 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
     if (glyph->HasAnchor(SMUFL_stemDownNW)) {
         const Point *anchor = glyph->GetAnchor(SMUFL_stemDownNW);
         assert(anchor);
-        p = doc->ConvertFontPoint(glyph, *anchor, staffSize, graceSize);
+        p = doc->ConvertFontPoint(glyph, *anchor, staffSize, isCueSize);
     }
 
     return p;
@@ -606,7 +606,7 @@ int Note::CalcDots(FunctorParams *functorParams)
     }
 
     int radius = this->GetDrawingRadius(params->m_doc, staffSize, drawingCueSize);
-    int xRel = this->GetDrawingX() - params->m_chordDrawingX + radius + flagShift;
+    int xRel = this->GetDrawingX() - params->m_chordDrawingX + 2 * radius + flagShift;
     dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
 
     return FUNCTOR_SIBLINGS;
@@ -616,7 +616,7 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 {
     FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
     assert(params);
-    
+
     if (this->GetVisible() == BOOLEAN_false) {
         return FUNCTOR_SIBLINGS;
     }
@@ -651,8 +651,8 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
         rightExtender = params->m_doc->GetCueSize(rightExtender);
     }
 
-    int left = this->GetDrawingX() - radius - leftExtender - staffX;
-    int right = this->GetDrawingX() + radius + rightExtender - staffX;
+    int left = this->GetDrawingX() - leftExtender - staffX;
+    int right = this->GetDrawingX() + 2 * radius + rightExtender - staffX;
 
     if (linesAbove > 0) {
         staff->AddLegerLineAbove(linesAbove, left, right, drawingCueSize);

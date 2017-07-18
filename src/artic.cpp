@@ -312,6 +312,17 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     else
         place = STAFFREL_basic_above;
 
+    /************** adjust the xRel position **************/
+
+    int xShift = 0;
+    if (parentChord) {
+        xShift = parentChord->GetDrawingRadius(params->m_doc, staff->m_drawingStaffSize, parent->IsCueSize());
+    }
+    else {
+        xShift = parentNote->GetDrawingRadius(params->m_doc, staff->m_drawingStaffSize, parent->IsCueSize());
+    }
+    this->SetDrawingXRel(xShift);
+
     /************** set it to both the inside and outside part **************/
 
     ArticPart *insidePart = this->GetInsidePart();

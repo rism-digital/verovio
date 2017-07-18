@@ -1101,19 +1101,13 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (note->m_crossStaff) staff = note->m_crossStaff;
 
     bool drawingCueSize = note->IsCueSize();
-    int staffSize = staff->m_drawingStaffSize;
     int noteY = element->GetDrawingY();
     int noteX = element->GetDrawingX();
-    int noteXShift;
     int drawingDur;
     wchar_t fontNo;
 
     drawingDur = note->GetDrawingDur();
     drawingDur = ((note->GetColored() == BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
-
-    int radius = note->GetDrawingRadius(m_doc, staffSize, drawingCueSize);
-
-    noteXShift = -radius;
 
     /************** Noteheads: **************/
 
@@ -1127,7 +1121,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         else
             fontNo = SMUFL_E0A2_noteheadWhole;
 
-        DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
+        DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
     }
     // Other values
     else {
@@ -1136,7 +1130,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         else
             fontNo = SMUFL_E0A4_noteheadBlack;
 
-        DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
+        DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
     }
 
     /************ Draw children (accidentals, etc) ************/
