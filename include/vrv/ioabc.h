@@ -243,8 +243,6 @@ private:
     int getBarLine(const char *incipit, data_BARRENDITION *output, int index);
     int getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accident, int index = 0);
     int getOctave(const char *incipit, char *octave, int index = 0);
-    int getDurations(const char *incipit, abc::Measure *measure, int index = 0);
-    int getDuration(const char *incipit, data_DURATION *duration, int *dot, int index);
     int getMultiRest(const char *incipit, int *multirest, int index);
     int getAbbreviation(const char *incipit, abc::Measure *measure, int index = 0);
     int getNote(const char *incipit, abc::Note *note, abc::Measure *measure, int index = 0);
@@ -261,6 +259,7 @@ private:
     void parseKey(std::string keyString); // K:
     void parseUnitNoteLength(std::string unitNoteLength); // L:
     void parseMeter(std::string meterString); // M:
+    void parseTempo(std::string tempoString); // Q:
     void parseReferenceNumber(std::string referenceNumberString); // X:
 
     // input functions
@@ -288,7 +287,7 @@ private:
     Note *m_last_tied_note;
     bool m_is_in_chord;
 
-    std::vector<LayerElement *> m_nested_objects;
+    std::vector<LayerElement *> m_layerElements;
 };
 
 } // namespace vrv
