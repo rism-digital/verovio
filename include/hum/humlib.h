@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul 16 19:10:43 CEST 2017
+// Last Modified: Mon Jul 17 23:44:23 CEST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2544,13 +2544,16 @@ class MxmlPart {
 		int           getVoiceIndex        (int voicenum);
 		int           getStaffIndex        (int voicenum);
 		bool          hasEditorialAccidental(void) const;
+		bool          hasDynamics          (void) const;
+
 
 	private:
 		void          receiveStaffNumberFromChild (int staffnum, int voicenum);
-		void          receiveVerseCount    (int count);
-		void          receiveVerseCount    (int staffnum, int count);
-		void          receiveHarmonyCount  (int count);
-		void          receiveEditorialAccidental(void);
+		void          receiveVerseCount           (int count);
+		void          receiveVerseCount           (int staffnum, int count);
+		void          receiveHarmonyCount         (int count);
+		void          receiveEditorialAccidental  (void);
+		void          receiveDynamic              (void);
 
 	protected:
 		vector<MxmlMeasure*> m_measures;
@@ -2561,6 +2564,7 @@ class MxmlPart {
 		int                  m_harmonyCount;
 		bool                 m_editorialAccidental;
 		bool                 m_stems = false;
+		bool                 m_has_dynamics = false;
 
 		// m_staffvoicehist: counts of staff and voice numbers.  
 		// staff=0 is used for items such as measures.
@@ -2588,11 +2592,14 @@ class GridSide {
 		void  setHarmony     (HTp token);
 		void  detachHarmony  (void);
 		HTp   getHarmony     (void);
+		void  setDynamic     (HTp token);
+		void  detachDynamics (void);
+		HTp   getDynamics    (void);
 
 	private:
 		vector<HumdrumToken*> m_verses;
-		vector<HumdrumToken*> m_dynamics;
-		HumdrumToken* m_harmony;
+		HumdrumToken* m_dynamics = NULL;
+		HumdrumToken* m_harmony = NULL;
 };
 
 
@@ -2779,14 +2786,16 @@ class HumGrid : public vector<GridMeasure*> {
 	public:
 		HumGrid(void);
 		~HumGrid();
-		void enableRecipSpine (void);
-		bool transferTokens   (HumdrumFile& outfile);
-		int  getHarmonyCount  (int partindex);
-		int  getVerseCount    (int partindex, int staffindex);
-		void setVerseCount    (int partindex, int staffindex, int count);
-		void setHarmonyCount  (int partindex, int count);
-		void removeRedundantClefChanges(void);
-		bool hasPickup         (void);
+		void enableRecipSpine           (void);
+		bool transferTokens             (HumdrumFile& outfile);
+		int  getHarmonyCount            (int partindex);
+		int  getVerseCount              (int partindex, int staffindex);
+		bool hasDynamics                (int partindex);
+		void setDynamicsPresent         (int partindex);
+		void setVerseCount              (int partindex, int staffindex, int count);
+		void setHarmonyCount            (int partindex, int count);
+		void removeRedundantClefChanges (void);
+		bool hasPickup                  (void);
 
 	protected:
 		void calculateGridDurations        (void);
@@ -2841,6 +2850,7 @@ class HumGrid : public vector<GridMeasure*> {
 		vector<vector<int> > m_verseCount;
 		vector<int>          m_harmonyCount;
 		bool                 m_pickup;
+		vector<bool>         m_dynamics;
 
 		// options:
 		bool m_recip;               // include **recip spine in output
@@ -2931,11 +2941,12 @@ class MxmlEvent {
 		string             getElementName     (void);
 		void               addNotations       (stringstream& ss, 
 		                                       xml_node notations) const;
-		void               reportVerseCountToOwner (int count);
-		void               reportVerseCountToOwner (int staffnum, int count);
-		void               reportHarmonyCountToOwner (int count);
-		void               reportMeasureStyleToOwner (MeasureStyle style);
+		void               reportVerseCountToOwner         (int count);
+		void               reportVerseCountToOwner         (int staffnum, int count);
+		void               reportHarmonyCountToOwner       (int count);
+		void               reportMeasureStyleToOwner       (MeasureStyle style);
 		void               reportEditorialAccidentalToOwner(void);
+		void               reportDynamicToOwner            (void);
       void               makeDummyRest      (MxmlMeasure* owner, 
 		                                       HumNum startime,
 		                                       HumNum duration,
@@ -2965,6 +2976,7 @@ class MxmlEvent {
 		bool               m_stems;      // for preserving stems
 
 
+
 	private:
    	void   reportStaffNumberToOwner  (int staffnum, int voicenum);
 		void   reportTimeSigDurToOwner   (HumNum duration);
@@ -2974,6 +2986,9 @@ class MxmlEvent {
 		static HumNum getEmbeddedDuration  (xml_node el = xml_node(NULL));
 		static HumNum getQuarterDurationFromType (const char* type);
 		static bool   nodeType             (xml_node node, const char* testname);
+
+		xml_node      m_dynamics;    // dynamics <direction> starting just before note
+		xml_node      m_text;        // text <direction> starting just before note
 
 	friend MxmlMeasure;
 	friend MxmlPart;
@@ -3049,15 +3064,16 @@ class MxmlMeasure {
 		bool  isRepeatBoth(void)       { return m_style == MeasureStyle::RepeatBoth; }
 
 	private:
-		void  receiveStaffNumberFromChild (int staffnum, int voicenum);
-		void  receiveTimeSigDurFromChild  (HumNum duration);
-		void  receiveMeasureStyleFromChild(MeasureStyle style);
-		void  receiveEditorialAccidentalFromChild(void);
-   	void  reportStaffNumberToOwner    (int staffnum, int voicenum);
-		void  reportVerseCountToOwner     (int count);
-		void  reportVerseCountToOwner     (int staffindex, int count);
-		void  reportHarmonyCountToOwner   (int count);
-		void  reportEditorialAccidentalToOwner (void);
+		void  receiveStaffNumberFromChild         (int staffnum, int voicenum);
+		void  receiveTimeSigDurFromChild          (HumNum duration);
+		void  receiveMeasureStyleFromChild        (MeasureStyle style);
+		void  receiveEditorialAccidentalFromChild (void);
+   	void  reportStaffNumberToOwner            (int staffnum, int voicenum);
+		void  reportVerseCountToOwner             (int count);
+		void  reportVerseCountToOwner             (int staffindex, int count);
+		void  reportHarmonyCountToOwner           (int count);
+		void  reportEditorialAccidentalToOwner    (void);
+		void  reportDynamicToOwner                (void);
 
 	protected:
 		HumNum             m_starttime; // start time of measure in quarter notes
@@ -3758,6 +3774,8 @@ class Tool_dissonant : public HumTool {
 		bool dissL1Q = false;
 		bool dissL2Q = false;
 		bool suppressQ = false;
+		bool m_voicenumQ = false;
+		bool m_selfnumQ = false;
 
 		vector<string> m_labels;
 
@@ -4213,7 +4231,9 @@ class Tool_musicxml2hum : public HumTool {
 		bool isInvisible       (MxmlEvent* event);
 		int  addLyrics         (GridStaff* staff, MxmlEvent* event);
 		int  addHarmony        (GridPart* oart, MxmlEvent* event);
+		void addDynamic        (GridPart* part, MxmlEvent* event);
 		string getHarmonyString(xml_node hnode);
+		string getDynamicString(xml_node element);
 		string cleanSpaces     (const string& input);
 		void checkForDummyRests(MxmlMeasure* measure);
 		void reindexVoices     (vector<MxmlPart>& partdata);
@@ -4231,6 +4251,9 @@ class Tool_musicxml2hum : public HumTool {
 		bool m_stemsQ = false;
 		int m_slurabove = 0;
 		int m_slurbelow = 0;
+
+		xml_node m_current_dynamic = xml_node(NULL);
+		xml_node m_current_text    = xml_node(NULL);
 
 };
 

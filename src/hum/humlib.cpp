@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul 16 19:10:43 CEST 2017
+// Last Modified: Tue Jul 18 00:25:11 CEST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2479,7 +2479,7 @@ ostream& operator<<(ostream& output, GridPart& part) {
 //
 
 GridSide::GridSide(void) {
-	m_harmony = NULL;
+	// do nothing
 }
 
 
@@ -2499,13 +2499,10 @@ GridSide::~GridSide(void) {
 	}
 	m_verses.resize(0);
 
-	for (int i=0; i<(int)m_dynamics.size(); i++) {
-		if (m_dynamics[i]) {
-			delete m_dynamics[i];
-			m_dynamics[i] = NULL;
-		}
+	if (m_dynamics) {
+		delete m_dynamics;
+		m_dynamics = NULL;
 	}
-	m_dynamics.resize(0);
 
 	if (m_harmony) {
 		delete m_harmony;
@@ -2596,6 +2593,21 @@ void GridSide::setHarmony(HTp token) {
 
 
 
+//////////////////////////////
+//
+// GridSide::setDynamic --
+//
+
+void GridSide::setDynamic(HTp token) {
+	if (m_dynamics) {
+		delete m_dynamics;
+		m_dynamics = NULL;
+	}
+	m_dynamics = token;
+}
+
+
+
 ///////////////////////////
 //
 // GridSide::detachHarmony --
@@ -2607,6 +2619,17 @@ void GridSide::detachHarmony(void) {
 
 
 
+///////////////////////////
+//
+// GridSide::detachDynamics --
+//
+
+void GridSide::detachDynamics(void) {
+	m_dynamics = NULL;
+}
+
+
+
 //////////////////////////////
 //
 // GridSide::getHarmony --
@@ -2614,6 +2637,17 @@ void GridSide::detachHarmony(void) {
 
 HTp GridSide::getHarmony(void) {
 	return m_harmony;
+}
+
+
+
+//////////////////////////////
+//
+// GridSide::getDynamics --
+//
+
+HTp GridSide::getDynamics(void) {
+	return m_dynamics;
 }
 
 
@@ -2989,6 +3023,15 @@ void GridSlice::transferSides(HumdrumLine& line, GridPart& sides,
 	}
 
 	for (int i=vcount; i<maxvcount; i++) {
+		newtoken = new HumdrumToken(empty);
+		line.appendToken(newtoken);
+	}
+
+	HTp dynamics = sides.getDynamics();
+	if (dynamics) {
+		line.appendToken(dynamics);
+		sides.detachDynamics();
+	} else {
 		newtoken = new HumdrumToken(empty);
 		line.appendToken(newtoken);
 	}
@@ -3980,9 +4023,11 @@ void HumAddress::setSubtrackCount(int count) {
 //
 
 HumGrid::HumGrid(void) {
-	// for now, limit to 100 parts:
+	// Limited to 100 parts:
 	m_verseCount.resize(100);
 	m_harmonyCount.resize(100);
+	m_dynamics.resize(100);
+	fill(m_dynamics.begin(), m_dynamics.end(), false);
 	fill(m_harmonyCount.begin(), m_harmonyCount.end(), 0);
 
 	// default options
@@ -4049,6 +4094,34 @@ int HumGrid::getVerseCount(int partindex, int staffindex) {
 	}
 	int value = m_verseCount.at(partindex).at(staffnumber);
 	return value;
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::hasDynamics -- Return true if there are any dyanmics for the part.
+//
+
+bool HumGrid::hasDynamics(int partindex) {
+	if ((partindex < 0) || (partindex >= (int)m_dynamics.size())) {
+		return false;
+	}
+	return m_dynamics[partindex];
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::setDynamicsPresent -- Indicate that part needs a **dynam spine.
+//
+
+void HumGrid::setDynamicsPresent(int partindex) {
+	if ((partindex < 0) || (partindex >= (int)m_dynamics.size())) {
+		return;
+	}
+	m_dynamics[partindex] = true;
 }
 
 
@@ -5518,6 +5591,7 @@ void HumGrid::insertExclusiveInterpretationLine(HumdrumFile& outfile) {
 //
 
 void HumGrid::insertExInterpSides(HumdrumLine* line, int part, int staff) {
+
 	if (staff >= 0) {
 		int versecount = getVerseCount(part, staff); // verses related to staff
 		for (int i=0; i<versecount; i++) {
@@ -5526,12 +5600,18 @@ void HumGrid::insertExInterpSides(HumdrumLine* line, int part, int staff) {
 		}
 	}
 
+	if ((staff < 0) && hasDynamics(part)) {
+		HTp token = new HumdrumToken("**dynam");
+		line->appendToken(token);
+	}
+
 	if (staff < 0) {
 		int harmonyCount = getHarmonyCount(part);
 		for (int i=0; i<harmonyCount; i++) {
 			HTp token = new HumdrumToken("**mxhm");
 			line->appendToken(token);
 		}
+
 	}
 }
 
@@ -5590,12 +5670,20 @@ void HumGrid::insertSidePartInfo(HumdrumLine* line, int part, int staff) {
 	string text;
 
 	if (staff < 0) {
+
+		if (hasDynamics(part)) {
+			text = "*part" + to_string(part+1);
+			token = new HumdrumToken(text);
+			line->appendToken(token);
+		}
+
 		int harmcount = getHarmonyCount(part);
 		for (int i=0; i<harmcount; i++) {
 			text = "*part" + to_string(part+1);
 			token = new HumdrumToken(text);
 			line->appendToken(token);
 		}
+
 	} else {
 		int versecount = getVerseCount(part, staff);
 		for (int i=0; i<versecount; i++) {
@@ -5671,11 +5759,18 @@ void HumGrid::insertSideStaffInfo(HumdrumLine* line, int part, int staff,
 
 	// part-specific sides (no staff markers)
 	if (staffnum < 0) {
+
+		if (hasDynamics(part)) {
+			token = new HumdrumToken("*");
+			line->appendToken(token);
+		}
+
 		int harmcount = getHarmonyCount(part);
 		for (int i=0; i<harmcount; i++) {
 			token = new HumdrumToken("*");
 			line->appendToken(token);
 		}
+
 		return;
 	}
 
@@ -5744,11 +5839,18 @@ void HumGrid::insertSideTerminals(HumdrumLine* line, int part, int staff) {
 	HTp token;
 
 	if (staff < 0) {
+
+		if (hasDynamics(part)) {
+			token = new HumdrumToken("*-");
+			line->appendToken(token);
+		}
+
 		int harmcount = getHarmonyCount(part);
 		for (int i=0; i<harmcount; i++) {
 			token = new HumdrumToken("*-");
 			line->appendToken(token);
 		}
+
 	} else {
 		int versecount = getVerseCount(part, staff);
 		for (int i=0; i<versecount; i++) {
@@ -18385,6 +18487,18 @@ void MxmlEvent::reportVerseCountToOwner(int staffindex, int count) {
 
 //////////////////////////////
 //
+// MxmlEvent::reportDynamicToOwner -- inform the owner that there is a dynamic
+//    that needs a spine to store it in.
+//
+
+void MxmlEvent::reportDynamicToOwner(void) {
+	m_owner->reportDynamicToOwner();
+}
+
+
+
+//////////////////////////////
+//
 // MxmlEvent::reportHarmonyCountToOwner --
 //
 
@@ -20266,6 +20380,17 @@ void MxmlMeasure::reportHarmonyCountToOwner(int count) {
 
 //////////////////////////////
 //
+// MxmlMeasure::reportDynamicToOwner --
+//
+
+void MxmlMeasure::reportDynamicToOwner(void) {
+	m_owner->receiveDynamic();
+}
+
+
+
+//////////////////////////////
+//
 // MxmlMeasure::reportEditorialAccidentalToOwner --
 //
 
@@ -20989,6 +21114,17 @@ bool MxmlPart::hasEditorialAccidental(void) const {
 
 //////////////////////////////
 //
+// MxmlPart::hasDynamics --
+// 
+
+bool MxmlPart::hasDynamics(void) const {
+	return m_has_dynamics;
+}
+
+
+
+//////////////////////////////
+//
 // MxmlPart::getVerseCount -- Return the number of verses in the part.
 //
 
@@ -21019,6 +21155,17 @@ int MxmlPart::getVerseCount(int staffindex) const {
 
 void MxmlPart::receiveHarmonyCount(int count) {
 	m_harmonyCount = count;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlPart::receiveDynamic --
+//
+
+void MxmlPart::receiveDynamic(void) {
+	m_has_dynamics = true;
 }
 
 
@@ -27842,6 +27989,8 @@ Tool_dissonant::Tool_dissonant(void) {
 	define("b|base-40=b",         "print base-40 grid");
 	define("l|metric-levels=b",   "use metric levels in analysis");
 	define("k|kern=b",            "print kern pitch grid");
+	define("v|voice-number=b",    "print voice number of dissonance");
+	define("f|self-number=b",     "print self voice number of dissonance");
 	define("debug=b",             "print grid cell information");
 	define("u|undirected=b",      "use undirected dissonance labels");
 	define("c|count=b",           "count dissonances by category");
@@ -27895,6 +28044,13 @@ bool Tool_dissonant::run(HumdrumFile& infile, ostream& out) {
 
 
 bool Tool_dissonant::run(HumdrumFile& infile) {
+
+	if (getBoolean("voice-number")) {
+		m_voicenumQ = true;
+	}
+	if (getBoolean("self-number")) {
+		m_selfnumQ = true;
+	}
 
 	if (getBoolean("undirected")) {
 		fillLabels2();
@@ -33663,6 +33819,16 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 		outdata.setHarmonyCount(p, harmonyCount);
 	}
 
+
+// ggg
+	// transfer dynamics boolean for part to HumGrid
+	for (int p=0; p<(int)partdata.size(); p++) {
+		bool dynstate = partdata[p].hasDynamics();
+		if (dynstate) {
+			outdata.setDynamicsPresent(p);
+		}
+	}
+
 	// set the duration of the last slice
 
 	HumdrumFile outfile;
@@ -34407,6 +34573,117 @@ void Tool_musicxml2hum::addEvent(GridSlice& slice,
 	if (hcount > 0) {
 		event->reportHarmonyCountToOwner(hcount);
 	}
+
+	if (m_current_text) {
+		event->m_text = m_current_text;
+		m_current_text = xml_node(NULL);
+	}
+
+	if (m_current_dynamic) {
+		event->m_dynamics = m_current_dynamic;
+		m_current_dynamic = xml_node(NULL);
+		event->reportDynamicToOwner();
+		addDynamic(slice.at(partindex), event);
+	}
+
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::addDynamic -- extract any dynamics for the event
+// 
+// Such as:
+//    <direction placement="below">
+//      <direction-type>
+//        <dynamics>
+//          <fff/>
+//          </dynamics>
+//        </direction-type>
+//      <sound dynamics="140.00"/>
+//      </direction>
+//
+
+void Tool_musicxml2hum::addDynamic(GridPart* part, MxmlEvent* event) {
+	xml_node direction = event->m_dynamics;
+	if (!direction) {
+		return;
+	}
+	xml_node child = direction.first_child();
+	if (!child) {
+		return;
+	}
+	if (!nodeType(child, "direction-type")) {
+		return;
+	}
+	xml_node grandchild = child.first_child();
+	if (!grandchild) {
+		return;
+	}
+	if (!nodeType(grandchild, "dynamics")) {
+		return;
+	}
+	xml_node dynamic = grandchild.first_child();
+	if (!dynamic) {
+		return;
+	}
+	string dstring = getDynamicString(dynamic);
+	HTp dtok = new HumdrumToken(dstring);
+	part->setDynamic(dtok);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::getDynamicString --
+//
+
+string Tool_musicxml2hum::getDynamicString(xml_node element) {
+
+	if (nodeType(element, "f")) {
+		return "f";
+	} else if (nodeType(element, "p")) {
+		return "p";
+	} else if (nodeType(element, "mf")) {
+		return "mf";
+	} else if (nodeType(element, "mp")) {
+		return "mp";
+	} else if (nodeType(element, "ff")) {
+		return "ff";
+	} else if (nodeType(element, "pp")) {
+		return "pp";
+	} else if (nodeType(element, "sf")) {
+		return "sf";
+	} else if (nodeType(element, "sfp")) {
+		return "sfp";
+	} else if (nodeType(element, "sfpp")) {
+		return "sfpp";
+	} else if (nodeType(element, "fp")) {
+		return "fp";
+	} else if (nodeType(element, "rf")) {
+		return "rfz";
+	} else if (nodeType(element, "rfz")) {
+		return "rfz";
+	} else if (nodeType(element, "sfz")) {
+		return "sfz";
+	} else if (nodeType(element, "sffz")) {
+		return "sffz";
+	} else if (nodeType(element, "fz")) {
+		return "fz";
+	} else if (nodeType(element, "fff")) {
+		return "fff";
+	} else if (nodeType(element, "ppp")) {
+		return "ppp";
+	} else if (nodeType(element, "ffff")) {
+		return "ffff";
+	} else if (nodeType(element, "pppp")) {
+		return "pppp";
+	} else {
+		return "???";
+	}
 }
 
 
@@ -34768,6 +35045,7 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 
 	int pindex = 0;
 	xml_node child;
+	xml_node grandchild;
 
 	for (int i=0; i<(int)nowevents.size(); i++) {
 		for (int j=0; j<(int)nowevents[i]->zerodur.size(); j++) {
@@ -34797,6 +35075,19 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 
 					child = child.next_sibling();
 				}
+			} else if (nodeType(element, "direction")) {
+				// direction -> direction-type -> words
+				// direction -> direction-type -> dynamics
+				child = element.first_child();
+				if (nodeType(child, "direction-type")) {
+					grandchild = child.first_child();
+					if (nodeType(grandchild, "words")) {
+						m_current_text = element;
+					} else if (nodeType(grandchild, "dynamics")) {
+						m_current_dynamic = element;
+					}
+				}
+
 			} else if (nodeType(element, "note")) {
 				if (foundnongrace) {
 					addEventToList(graceafter, nowevents[i]->zerodur[j]);
