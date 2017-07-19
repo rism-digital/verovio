@@ -111,7 +111,7 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
 
 bool LayerElement::IsGraceNote()
 {
-    // For note, we need to look it or at the parent chord
+    // For note, we need to look at it or at the parent chord
     if (this->Is(NOTE)) {
         Note const *note = dynamic_cast<Note const *>(this);
         assert(note);
