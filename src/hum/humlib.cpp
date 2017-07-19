@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jul 18 00:25:11 CEST 2017
+// Last Modified: Wed Jul 19 09:06:10 CEST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2406,6 +2406,60 @@ void GridMeasure::setTimeSigDur(HumNum duration) {
 
 //////////////////////////////
 //
+// GridMeasure::addLayoutParameter --
+//
+
+void GridMeasure::addLayoutParameter(GridSlice* slice, int partindex, const string& locomment) {
+	auto iter = this->rbegin();
+	if (iter == this->rend()) {
+		// something strange happened: expecting at least one item in measure.
+		return;
+	}
+	GridPart* part;
+	GridStaff* staff;
+	GridVoice* voice;
+	
+	auto previous = iter;
+	previous++;
+	while (previous != this->rend()) {
+		if ((*previous)->isLayoutSlice()) {
+			part = (*previous)->at(partindex);
+			staff = part->at(0);
+			voice = staff->at(0);
+			if (voice) {
+				if (voice->getToken() == NULL) {
+					// create a token with text
+					HTp newtoken = new HumdrumToken(locomment);
+					voice->setToken(newtoken);
+					return;
+				} else if (*voice->getToken() == "!") {
+					// replace token with text
+					HTp newtoken = new HumdrumToken(locomment);
+					voice->setToken(newtoken);
+					return;
+				}
+			} else {
+				previous++;
+				continue;
+			}
+		} else {
+			break;
+		}
+	}
+
+	auto insertpoint = previous.base();
+	GridSlice* newslice = new GridSlice(this, (*iter)->getTimestamp(), SliceType::Layouts);	
+	newslice->initializeBySlice(*iter);
+	this->insert(insertpoint, newslice);
+	HTp newtoken = new HumdrumToken(locomment);
+	newslice->at(partindex)->at(0)->at(0)->setToken(newtoken);
+}
+
+
+
+
+//////////////////////////////
+//
 // GridPart::GridPart -- Constructor.
 //
 
@@ -2654,6 +2708,21 @@ HTp GridSide::getDynamics(void) {
 
 //////////////////////////////
 //
+// GridSide::getDynamicsCount --
+//
+
+int GridSide::getDynamicsCount(void) {
+	if (m_dynamics == NULL) {
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+
+
+//////////////////////////////
+//
 // GridSlice::GridSlice -- Constructor.  If partcount is positive, then
 //    allocate the desired number of parts (still have to allocate staves
 //    in part before using).
@@ -2854,6 +2923,8 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 		}
 	} else if (isInterpretationSlice()) {
 		empty = "*";
+	} else if (isLayoutSlice()) {
+		empty = "!";
 	}
 
 	if (recip) {
@@ -2999,6 +3070,26 @@ int GridSlice::getHarmonyCount(int partindex, int staffindex) {
 
 //////////////////////////////
 //
+// GridSlice::getDynamicsCount -- Return 0 if no dynamics, otherwise typically returns 1.
+//
+
+int GridSlice::getDynamicsCount(int partindex, int staffindex) {
+	HumGrid* grid = getOwner();
+	if (!grid) {
+		return 0;
+	}
+	if (staffindex >= 0) {
+		// ignoring staff-level harmony
+		return 0;
+	} else {
+		return grid->getDynamicsCount(partindex);
+	}
+}
+
+
+
+//////////////////////////////
+//
 // GridSlice::transferSides --
 //
 
@@ -3009,6 +3100,8 @@ void GridSlice::transferSides(HumdrumLine& line, GridPart& sides,
 
 	int hcount = sides.getHarmonyCount();
 	int vcount = sides.getVerseCount();
+	int dcount = sides.getDynamicsCount();
+
 	HTp newtoken;
 
 	for (int i=0; i<vcount; i++) {
@@ -3027,13 +3120,15 @@ void GridSlice::transferSides(HumdrumLine& line, GridPart& sides,
 		line.appendToken(newtoken);
 	}
 
-	HTp dynamics = sides.getDynamics();
-	if (dynamics) {
-		line.appendToken(dynamics);
-		sides.detachDynamics();
-	} else {
-		newtoken = new HumdrumToken(empty);
-		line.appendToken(newtoken);
+	if (dcount > 0) {
+		HTp dynamics = sides.getDynamics();
+		if (dynamics) {
+			line.appendToken(dynamics);
+			sides.detachDynamics();
+		} else {
+			newtoken = new HumdrumToken(empty);
+			line.appendToken(newtoken);
+		}
 	}
 
 	for (int i=0; i<hcount; i++) {
@@ -3133,6 +3228,32 @@ void GridSlice::initializePartStaves(vector<MxmlPart>& partdata) {
 		}
 	}
 
+}
+
+
+
+//////////////////////////////
+//
+// GridSlice::initializeBySlice -- Allocate parts/staves/voices counts by an existing slice.
+//   Presuming that the slice is not already initialize with content.
+//
+
+void GridSlice::initializeBySlice(GridSlice* slice) {
+	int partcount = (int)slice->size();
+	this->resize(partcount);
+	for (int p = 0; p < partcount; p++) {
+		this->at(p) = new GridPart;
+		int staffcount = (int)slice->at(p)->size();
+		this->at(p)->resize(staffcount);
+		for (int s = 0; s < staffcount; s++) {
+			this->at(p)->at(s) = new GridStaff;
+			int voicecount = (int)slice->at(p)->at(s)->size();
+			this->at(p)->at(s)->resize(voicecount);
+			for (int v=0; v < voicecount; v++) {
+				this->at(p)->at(s)->at(v) = new GridVoice;
+			}
+		}
+	}
 }
 
 
@@ -4074,6 +4195,20 @@ int HumGrid::getHarmonyCount(int partindex) {
 		return 0;
 	}
 	return m_harmonyCount.at(partindex);
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::getDynamicsCount --
+//
+
+int HumGrid::getDynamicsCount(int partindex) {
+	if ((partindex < 0) || (partindex >= (int)m_dynamics.size())) {
+		return 0;
+	}
+	return m_dynamics[partindex];
 }
 
 
@@ -20052,6 +20187,51 @@ bool MxmlEvent::nodeType(xml_node node, const char* testname) {
 
 
 
+//////////////////////////////
+//
+// MxmlEvent::setTexts --
+//
+
+void MxmlEvent::setTexts(vector<xml_node>& nodes) {
+	m_text = nodes;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::getTexts --
+//
+
+vector<xml_node>&  MxmlEvent::getTexts(void) {
+	return m_text;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::setDynamics --
+//
+
+void MxmlEvent::setDynamics(xml_node node) {
+	m_dynamics = node;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::getDynamics --
+//
+
+xml_node MxmlEvent::getDynamics(void) {
+	return m_dynamics;
+}
+
+
+
+
 class MxmlPart;
 
 
@@ -20991,7 +21171,10 @@ int MxmlPart::getMeasureCount(void) const {
 //
 
 MxmlMeasure* MxmlPart::getMeasure(int index) const {
-	if ((index < 0) || (index >= (int)m_measures.size())) {
+	if (index < 0) {
+		return NULL;
+	}
+	if (index >= (int)m_measures.size()) {
 		return NULL;
 	}
 	return m_measures[index];
@@ -29184,6 +29367,8 @@ void Tool_dissonant::findAppoggiaturas(vector<vector<string> >& results, NoteGri
 	}
 }
 
+
+
 ///////////////////////////////
 //
 // printCountAnalysis --
@@ -29209,7 +29394,7 @@ void Tool_dissonant::printCountAnalysis(vector<vector<string> >& data) {
 		}
 	}
 
-	m_humdrum_text << "**dis";
+	m_humdrum_text << "**rdis";
 	if (brief) {
 		m_humdrum_text << "u";
 	}
@@ -29223,6 +29408,12 @@ void Tool_dissonant::printCountAnalysis(vector<vector<string> >& data) {
 	int sum;
 	string item;
 	for (i=0; i<(int)LABELS_SIZE; i++) {
+		if (i == UNLABELED_Z2) {
+			continue;
+		}
+		if (i == UNLABELED_Z7) {
+			continue;
+		}
 
 		item = m_labels[i];
 
@@ -29235,7 +29426,10 @@ void Tool_dissonant::printCountAnalysis(vector<vector<string> >& data) {
 		for (j=0; j<(int)analysis.size(); j++) {
 			if (analysis[j].find(item) != analysis[j].end()) {
 				sum += analysis[j][item];
-				sumsum += analysis[j][item];
+				// Don't include agents in dissonant note summation.
+				if ((item != m_labels[AGENT_TERN]) && (item != m_labels[AGENT_BIN])) {
+					sumsum += analysis[j][item];
+				}
 			}
 		}
 
@@ -29250,7 +29444,11 @@ void Tool_dissonant::printCountAnalysis(vector<vector<string> >& data) {
 			m_humdrum_text << "\t";
 			if (analysis[j].find(item) != analysis[j].end()) {
 				if (percentQ) {
-					m_humdrum_text << int(analysis[j][item] * 1.0 / sum * 1000.0 + 0.5) / 10.0;
+					if ((item == m_labels[AGENT_BIN]) || (item == m_labels[AGENT_TERN])) {
+						m_humdrum_text << ".";
+					} else {
+						m_humdrum_text << int(analysis[j][item] * 1.0 / sum * 1000.0 + 0.5) / 10.0;
+					}
 				} else {
 					m_humdrum_text << analysis[j][item];
 				}
@@ -29338,12 +29536,12 @@ void Tool_dissonant::fillLabels(void) {
 	m_labels[THIRD_Q_PASS_DOWN   ] = "q"; // dissonant third quarter descending passing tone
 	m_labels[THIRD_Q_UPPER_NEI   ] = "B"; // dissonant third quarter upper neighbor
 	m_labels[THIRD_Q_LOWER_NEI   ] = "b"; // dissonant third quarter lower neighbor
-	m_labels[ACC_PASSING_UP		 ] = "V"; // ascending accented passing tone
-	m_labels[ACC_PASSING_DOWN	 ] = "v"; // descending accented passing tone
-	m_labels[ACC_UP_NEI	 		 ] = "W"; // accented upper neighbor
-	m_labels[ACC_LO_NEI			 ] = "w"; // accented lower neighbor
-	m_labels[APP_LEAP_UP		 ] = "T"; // appoggiatura approached by leap up
-	m_labels[APP_LEAP_DOWN		 ] = "t"; // appoggiatura approached by leap down
+	m_labels[ACC_PASSING_UP      ] = "V"; // ascending accented passing tone
+	m_labels[ACC_PASSING_DOWN    ] = "v"; // descending accented passing tone
+	m_labels[ACC_UP_NEI          ] = "W"; // accented upper neighbor
+	m_labels[ACC_LO_NEI          ] = "w"; // accented lower neighbor
+	m_labels[APP_LEAP_UP         ] = "T"; // appoggiatura approached by leap up
+	m_labels[APP_LEAP_DOWN       ] = "t"; // appoggiatura approached by leap down
 	m_labels[SUS_BIN             ] = "s"; // binary suspension
 	m_labels[SUS_TERN            ] = "S"; // ternary suspension
 	m_labels[AGENT_BIN           ] = "g"; // binary agent
@@ -29395,12 +29593,12 @@ void Tool_dissonant::fillLabels2(void) {
 	m_labels[THIRD_Q_PASS_DOWN   ] = "Q"; // dissonant third quarter descending passing tone
 	m_labels[THIRD_Q_UPPER_NEI   ] = "B"; // dissonant third quarter upper neighbor
 	m_labels[THIRD_Q_LOWER_NEI   ] = "B"; // dissonant third quarter lower neighbor
-	m_labels[ACC_PASSING_UP		 ] = "V"; // ascending accented passing tone
-	m_labels[ACC_PASSING_DOWN	 ] = "V"; // descending accented passing tone
-	m_labels[ACC_UP_NEI	 		 ] = "W"; // accented upper neighbor
-	m_labels[ACC_LO_NEI			 ] = "W"; // accented lower neighbor
-	m_labels[APP_LEAP_UP		 ] = "T"; // appoggiatura approached by leap up
-	m_labels[APP_LEAP_DOWN		 ] = "T"; // appoggiatura approached by leap down
+	m_labels[ACC_PASSING_UP      ] = "V"; // ascending accented passing tone
+	m_labels[ACC_PASSING_DOWN    ] = "V"; // descending accented passing tone
+	m_labels[ACC_UP_NEI          ] = "W"; // accented upper neighbor
+	m_labels[ACC_LO_NEI          ] = "W"; // accented lower neighbor
+	m_labels[APP_LEAP_UP         ] = "T"; // appoggiatura approached by leap up
+	m_labels[APP_LEAP_DOWN       ] = "T"; // appoggiatura approached by leap down
 	m_labels[SUS_BIN             ] = "S"; // binary suspension
 	m_labels[SUS_TERN            ] = "S"; // ternary suspension
 	m_labels[AGENT_BIN           ] = "G"; // binary agent
@@ -33412,7 +33610,7 @@ void Tool_imitation::analyzeImitation(vector<vector<string>>& results,
 //
 
 void Tool_imitation::markedTiedNotes(vector<HTp>& tokens) {
-	for (int i=0; i<tokens.size(); i++) {
+	for (int i=0; i<(int)tokens.size(); i++) {
 		tokens[i]->setText(*tokens[i] + m_marker);
 	}
 }
@@ -33433,7 +33631,7 @@ int Tool_imitation::checkForIntervalSequence(vector<int>& m_intervals,
 			if (m_intervals[j] != v1i[i+j]) {
 				break;
 			}
-			if (j == m_intervals.size() - 1) {
+			if (j == (int)m_intervals.size() - 1) {
 				// successfully found the interval pattern in imitation
 				return count;
 			}
@@ -33718,7 +33916,6 @@ Tool_musicxml2hum::Tool_musicxml2hum(void) {
 
 	VoiceDebugQ = false;
 	DebugQ = false;
-
 }
 
 
@@ -33819,8 +34016,6 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 		outdata.setHarmonyCount(p, harmonyCount);
 	}
 
-
-// ggg
 	// transfer dynamics boolean for part to HumGrid
 	for (int p=0; p<(int)partdata.size(); p++) {
 		bool dynstate = partdata[p].hasDynamics();
@@ -33841,10 +34036,10 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 
 	// add RDFs
 	if (m_slurabove) {
-		out << "!!!RDF**kern: > = slur above" << endl;
+		out << "!!!RDF**kern: > = above" << endl;
 	}
 	if (m_slurbelow) {
-		out << "!!!RDF**kern: < = slur below" << endl;
+		out << "!!!RDF**kern: < = below" << endl;
 	}
 
 	for (int i=0; i<(int)partdata.size(); i++) {
@@ -34451,7 +34646,7 @@ void Tool_musicxml2hum::appendNonZeroEvents(GridMeasure* outdata,
 	for (int i=0; i<(int)nowevents.size(); i++) {
 		vector<MxmlEvent*>& events = nowevents[i]->nonzerodur;
 		for (int j=0; j<(int)events.size(); j++) {
-			addEvent(*slice, events[j]);
+			addEvent(slice, outdata, events[j]);
 		}
 	}
 }
@@ -34463,8 +34658,7 @@ void Tool_musicxml2hum::appendNonZeroEvents(GridMeasure* outdata,
 // Tool_musicxml2hum::addEvent -- Add a note or rest.
 //
 
-void Tool_musicxml2hum::addEvent(GridSlice& slice,
-		MxmlEvent* event) {
+void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEvent* event) {
 
 	int partindex;  // which part the event occurs in
 	int staffindex; // which staff the event occurs in (need to fix)
@@ -34529,7 +34723,7 @@ void Tool_musicxml2hum::addEvent(GridSlice& slice,
 	if (event->isFloating()) {
 		ss << ".";
 		HTp token = new HumdrumToken(ss.str());
-		slice.at(partindex)->at(staffindex)->setTokenLayer(voiceindex, token,
+		slice->at(partindex)->at(staffindex)->setTokenLayer(voiceindex, token,
 			event->getDuration());
 	} else {
 		ss << prefix << recip << pitch << postfix;
@@ -34542,11 +34736,11 @@ void Tool_musicxml2hum::addEvent(GridSlice& slice,
 		if (event->isChord()) {
 			addSecondaryChordNotes(ss, event, recip);
 			token = new HumdrumToken(ss.str());
-			slice.at(partindex)->at(staffindex)->setTokenLayer(voiceindex, token,
+			slice->at(partindex)->at(staffindex)->setTokenLayer(voiceindex, token,
 				event->getDuration());
 		} else {
 			token = new HumdrumToken(ss.str());
-			slice.at(partindex)->at(staffindex)->setTokenLayer(voiceindex, token,
+			slice->at(partindex)->at(staffindex)->setTokenLayer(voiceindex, token,
 				event->getDuration());
 		}
 	}
@@ -34563,29 +34757,112 @@ void Tool_musicxml2hum::addEvent(GridSlice& slice,
 		cerr << endl;
 	}
 
-	int vcount = addLyrics(slice.at(partindex)->at(staffindex), event);
+	int vcount = addLyrics(slice->at(partindex)->at(staffindex), event);
 
 	if (vcount > 0) {
 		event->reportVerseCountToOwner(staffindex, vcount);
 	}
 
-	int hcount = addHarmony(slice.at(partindex), event);
+	int hcount = addHarmony(slice->at(partindex), event);
 	if (hcount > 0) {
 		event->reportHarmonyCountToOwner(hcount);
 	}
 
-	if (m_current_text) {
-		event->m_text = m_current_text;
-		m_current_text = xml_node(NULL);
+	if (m_current_text.size() > 0) {
+		event->setTexts(m_current_text);
+		m_current_text.clear();
+		addTexts(slice, outdata, partindex, event);
 	}
 
 	if (m_current_dynamic) {
-		event->m_dynamics = m_current_dynamic;
+		event->setDynamics(m_current_dynamic);
 		m_current_dynamic = xml_node(NULL);
 		event->reportDynamicToOwner();
-		addDynamic(slice.at(partindex), event);
+		addDynamic(slice->at(partindex), event);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::addTexts -- Add all text direction for a note.
+//
+
+void Tool_musicxml2hum::addTexts(GridSlice* slice, GridMeasure* measure, int partindex, MxmlEvent* event) {
+	vector<xml_node>& nodes = event->getTexts();
+	for (xml_node item : nodes) {
+		addText(slice, measure, partindex, item);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::addText -- Add a text direction to the grid.
+//
+//      <direction placement="below">
+//        <direction-type>
+//          <words font-style="italic">Some Text</words>
+//        </direction-type>
+//      </direction>
+
+void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int partindex, xml_node node) {
+
+	string placementstring;
+	xml_attribute placement = node.attribute("placement");
+	if (placement) {
+		string value = placement.value();
+		if (value == "above") {
+			placementstring = ":a";
+		} else if (value == "below") {
+			placementstring = ":b";
+		}
 	}
 
+	xml_node child = node.first_child();
+	if (!child) {
+		return;
+	}
+	if (!nodeType(child, "direction-type")) {
+		return;
+	}
+
+
+	xml_node grandchild = child.first_child();
+	if (!grandchild) {
+		return;
+	}
+	if (!nodeType(grandchild, "words")) {
+		return;
+	}
+	string text = grandchild.child_value();
+	if (text == "") {
+		return;
+	}
+
+	string stylestring;
+	xml_attribute fontstyle = grandchild.attribute("font-style");
+	if (fontstyle) {
+		string value = fontstyle.value();
+		if (value == "italic") {
+			stylestring = ":i";
+		}
+		// add bold and bold-italic here
+	}
+
+	// maybe check for text only containing spaces and exclude here
+	string output = "!LO:TX";
+	output += placementstring;
+	output += stylestring;
+	output += ":t=";
+	output += text;
+
+	// The text direction needs to be added before the last line in the measure object.
+	// If there is already an empty layout slice before the current one (with no spine manipulators
+	// in between), then insert onto the existing layout slice; otherwise create a new layout slice.
+	measure->addLayoutParameter(slice, partindex, output);
 
 }
 
@@ -34607,7 +34884,7 @@ void Tool_musicxml2hum::addEvent(GridSlice& slice,
 //
 
 void Tool_musicxml2hum::addDynamic(GridPart* part, MxmlEvent* event) {
-	xml_node direction = event->m_dynamics;
+	xml_node direction = event->getDynamics();
 	if (!direction) {
 		return;
 	}
@@ -35082,7 +35359,7 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 				if (nodeType(child, "direction-type")) {
 					grandchild = child.first_child();
 					if (nodeType(grandchild, "words")) {
-						m_current_text = element;
+						m_current_text.push_back(element);
 					} else if (nodeType(grandchild, "dynamics")) {
 						m_current_dynamic = element;
 					}
@@ -35180,7 +35457,7 @@ void Tool_musicxml2hum::addGraceLines(GridMeasure* outdata,
 			for (int k=0; k<(int)notes[i][j].size(); k++) {
 				int startm = maxcount - (int)notes[i][j][k].size();
 				for (int m=0; m<(int)notes[i][j][k].size(); m++) {
-					addEvent(*slices.at(startm+m), notes[i][j][k][m]);
+					addEvent(slices.at(startm+m), outdata, notes[i][j][k][m]);
 				}
 			}
 		}
