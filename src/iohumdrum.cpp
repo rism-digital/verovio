@@ -3439,11 +3439,30 @@ void HumdrumInput::processDirection(hum::HTp token, int staffindex)
         return;
     }
 
-    int zparam = token->isDefined("LO", "TX", "Z");
-    int yparam = token->isDefined("LO", "TX", "Y");
+    bool zparam = token->isDefined("LO", "TX", "Z");
+    bool yparam = token->isDefined("LO", "TX", "Y");
 
-    bool aparam = token->getValueBool("LO", "TX", "a");
-    bool bparam = token->getValueBool("LO", "TX", "b");
+    bool aparam = token->getValueBool("LO", "TX", "a");  // place above staff
+    bool bparam = token->getValueBool("LO", "TX", "b");  // place below staff
+
+	// default font for text string (later check for embedded fonts)
+	bool italic = false;
+	bool bold   = false;
+
+	if (token->isDefined("LO", "TX", "i")) {
+		italic = true;
+	}
+	if (token->isDefined("LO", "TX", "b")) {
+		bold = true;
+	}
+	if (token->isDefined("LO", "TX", "bi")) {
+		bold = true;
+		italic = true;
+	}
+	if (token->isDefined("LO", "TX", "ib")) {
+		bold = true;
+		italic = true;
+	}
 
     double Y = 0.0;
     double Z = 0.0;
@@ -3476,7 +3495,6 @@ void HumdrumInput::processDirection(hum::HTp token, int staffindex)
     Dir *dir = new Dir;
     m_measure->AddChild(dir);
     setStaff(dir, m_currentstaff);
-    addTextElement(dir, text);
     setLocationId(dir, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
     dir->SetTstamp(tstamp.getFloat());
@@ -3489,6 +3507,19 @@ void HumdrumInput::processDirection(hum::HTp token, int staffindex)
         // 300: dir->SetPlace(STAFFREL_below);
         setPlace(dir, "below");
     }
+	if ((!italic) || bold) {
+		Rend *rend = new Rend;
+		dir->AddChild(rend);
+    	addTextElement(rend, text);
+		if (!italic) {
+			rend->SetFontstyle(FONTSTYLE_normal);
+		}
+		if (bold) {
+			rend->SetFontweight(FONTWEIGHT_bold);
+		}
+	} else {
+    	addTextElement(dir, text);
+	}
 }
 
 /////////////////////////////
@@ -4147,7 +4178,6 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
                     string mstring = metersig->substr(5, ploc - 5);
                     setMeterSymbol(scoreDef, mstring);
                 }
-                // ggg
             }
 
             for (int i = 0; i < (int)ss.size(); i++) {
