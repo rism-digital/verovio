@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul 19 09:06:10 CEST 2017
+// Last Modified: Wed Jul 19 11:28:30 CEST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2273,6 +2273,11 @@ bool GridMeasure::transferTokens(HumdrumFile& outfile, bool recip,
 			continue;
 		}
 		if (it->isDataSlice()) {
+			founddata = true;
+		}
+		if (it->isLayoutSlice()) {
+			// didn't actually find data, but barline should
+			// not cross this line.
 			founddata = true;
 		}
 		if (it->isManipulatorSlice()) {
@@ -34843,13 +34848,31 @@ void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int part
 	}
 
 	string stylestring;
+	bool italic = false;
+	bool bold = false;
+
 	xml_attribute fontstyle = grandchild.attribute("font-style");
 	if (fontstyle) {
 		string value = fontstyle.value();
 		if (value == "italic") {
-			stylestring = ":i";
+			italic = true;
 		}
-		// add bold and bold-italic here
+	}
+
+	xml_attribute fontweight = grandchild.attribute("font-weight");
+	if (fontweight) {
+		string value = fontweight.value();
+		if (value == "bold") {
+			bold = true;
+		}
+	}
+	
+	if (italic && bold) {
+		stylestring = ":Bi";
+	} else if (italic) {
+		stylestring = ":i";
+	} else if (bold) {
+		stylestring = ":B";
 	}
 
 	// maybe check for text only containing spaces and exclude here
