@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul 19 11:28:30 CEST 2017
+// Last Modified: Wed Jul 19 15:27:30 CEST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2763,13 +2763,8 @@ GridSlice::GridSlice(GridMeasure* measure, HumNum timestamp, SliceType type,
 		const GridSlice& slice) {
 	m_timestamp = timestamp;
 	m_type = type;
-	if (m_measure) {
-		m_owner = measure->getOwner();
-		m_measure = measure;
-	} else {
-		m_owner = NULL;
-		m_measure = NULL;
-	}
+	m_owner = measure->getOwner();
+	m_measure = measure;
 	int partcount = (int)slice.size();
 	int staffcount;
 	if (partcount > 0) {
@@ -2791,13 +2786,8 @@ GridSlice::GridSlice(GridMeasure* measure, HumNum timestamp, SliceType type,
 		GridSlice* slice) {
 	m_timestamp = timestamp;
 	m_type = type;
-	if (m_measure) {
-		m_owner = measure->getOwner();
-		m_measure = measure;
-	} else {
-		m_owner = NULL;
-		m_measure = NULL;
-	}
+	m_owner = measure->getOwner();
+	m_measure = measure;
 	int partcount = (int)slice->size();
 	int staffcount;
 	if (partcount > 0) {
@@ -2981,10 +2971,10 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 						line->appendToken(staff.at(v)->getToken());
 						staff.at(v)->forgetToken();
 					} else if (!staff.at(v)) {
-						token = new HumdrumToken(".");
+						token = new HumdrumToken(empty);
 						line->appendToken(token);
 					} else {
-						token = new HumdrumToken(".");
+						token = new HumdrumToken(empty);
 						line->appendToken(token);
 					}
 				}
@@ -2996,7 +2986,8 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 		}
 		int maxhcount = getHarmonyCount(p);
 		int maxvcount = getVerseCount(p, -1);
-		transferSides(*line, part, empty, maxvcount, maxhcount);
+		int maxdcount = getDynamicsCount(p);
+		transferSides(*line, part, empty, maxvcount, maxhcount, maxdcount);
 	}
 
 	outfile.appendLine(line);
@@ -3098,14 +3089,12 @@ int GridSlice::getDynamicsCount(int partindex, int staffindex) {
 // GridSlice::transferSides --
 //
 
-
 // this version is used to transfer Sides from the Part
 void GridSlice::transferSides(HumdrumLine& line, GridPart& sides,
-		const string& empty, int maxvcount, int maxhcount) {
+		const string& empty, int maxvcount, int maxhcount, int maxdcount) {
 
 	int hcount = sides.getHarmonyCount();
 	int vcount = sides.getVerseCount();
-	int dcount = sides.getDynamicsCount();
 
 	HTp newtoken;
 
@@ -3125,7 +3114,7 @@ void GridSlice::transferSides(HumdrumLine& line, GridPart& sides,
 		line.appendToken(newtoken);
 	}
 
-	if (dcount > 0) {
+	if (maxdcount > 0) {
 		HTp dynamics = sides.getDynamics();
 		if (dynamics) {
 			line.appendToken(dynamics);
@@ -28929,9 +28918,11 @@ RECONSIDER:
 		//// Code to apply binary or ternary suspension and agent labels and 
 		//// also suspension ornament and chanson idiom labels
 
-		else if (valid_sus_acc && (ointn == -1)) {
+		else if (valid_sus_acc && ((ointn == -1) || ((ointn == -2) && (ointnn == 1)))) {
 			if ((durpp == 1) && (durp == 1) && (intpp == -1) && (intp == 1) &&
-				((results[vindex][lineindexpp] == m_labels[UNLABELED_Z7]) ||
+				((results[vindex][lineindexpp] == m_labels[THIRD_Q_PASS_DOWN]) ||
+				 (results[vindex][lineindexpp] == m_labels[ACC_PASSING_DOWN]) ||
+				 (results[vindex][lineindexpp] == m_labels[UNLABELED_Z7]) ||
 				 (results[vindex][lineindexpp] == m_labels[UNLABELED_Z4]))) {
 				results[vindex][lineindexpp] = m_labels[CHANSON_IDIOM];
 			}
@@ -28944,7 +28935,9 @@ RECONSIDER:
 			}
 		} else if (valid_ornam_sus_acc && ((ointn == 0) && (ointnn == -1))) {
 			if ((durpp == 1) && (durp == 1) && (intpp == -1) && (intp == 1) &&
-				((results[vindex][lineindexpp] == m_labels[UNLABELED_Z7]) ||
+				((results[vindex][lineindexpp] == m_labels[THIRD_Q_PASS_DOWN]) ||
+				 (results[vindex][lineindexpp] == m_labels[ACC_PASSING_DOWN]) ||
+				 (results[vindex][lineindexpp] == m_labels[UNLABELED_Z7]) ||
 				 (results[vindex][lineindexpp] == m_labels[UNLABELED_Z4]))) {
 				results[vindex][lineindexpp] = m_labels[CHANSON_IDIOM];
 			}
@@ -28956,24 +28949,11 @@ RECONSIDER:
 				results[ovoiceindex][lineindex] = m_labels[SUS_BIN];
 			} // repeated-note of suspension
 			results[ovoiceindex][olineindexn] = m_labels[SUSPENSION_REP];
-		} else if (valid_ornam_sus_acc && ((ointn == -2) && (ointnn == 1))) {
-			if ((durpp == 1) && (durp == 1) && (intpp == -1) && (intp == 1) &&
-				((results[vindex][lineindexpp] == m_labels[THIRD_Q_PASS_DOWN] ||
-				 (results[vindex][lineindexpp] == m_labels[UNLABELED_Z7]) ||
-				 (results[vindex][lineindexpp] == m_labels[UNLABELED_Z4])))) {
-				results[vindex][lineindexpp] = m_labels[CHANSON_IDIOM];
-			}
-			if (ternAgent) { // ternary agent and suspension
-				results[vindex][lineindex] = m_labels[AGENT_TERN];
-				results[ovoiceindex][lineindex] = m_labels[SUS_TERN];
-			} else { // binary agent and suspension
-				results[vindex][lineindex] = m_labels[AGENT_BIN];
-				results[ovoiceindex][lineindex] = m_labels[SUS_BIN];
-			} // suspension ornament
-			results[ovoiceindex][olineindexn] = m_labels[SUSPENSION_ORNAM];
 		} else if (valid_ornam_sus_acc && ((ointn == 1) && (ointnn == -2))) {
 			if ((durpp == 1) && (durp == 1) && (intpp == -1) && (intp == 1) &&
-				((results[vindex][lineindexpp] == m_labels[UNLABELED_Z7]) ||
+				((results[vindex][lineindexpp] == m_labels[THIRD_Q_PASS_DOWN]) ||
+				 (results[vindex][lineindexpp] == m_labels[ACC_PASSING_DOWN]) ||
+				 (results[vindex][lineindexpp] == m_labels[UNLABELED_Z7]) ||
 				 (results[vindex][lineindexpp] == m_labels[UNLABELED_Z4]))) {
 				results[vindex][lineindexpp] = m_labels[CHANSON_IDIOM];
 			}
@@ -29170,13 +29150,17 @@ void Tool_dissonant::findLs(vector<vector<string> >& results, NoteGrid& grid,
 void Tool_dissonant::findYs(vector<vector<string> >& results, NoteGrid& grid,
 		vector<NoteCell*>& attacks, int vindex) { 
 	double intp;       // diatonic interval from previous melodic note
+	double intn;       // diatonic interval to next melodic note
 	int lineindex;     // line in original Humdrum file content that contains note
 	int olineindex;    // line in original Humdrum file content that contains other voice note
 	int sliceindex;    // current timepoint in NoteGrid
+	int attackindexn;  // line index of next note
 	int oattackindexc; // line index of other voice current note
+	int oattackindexn; // line index of other voice's next note
 	double pitch;      // current pitch in this voice
 	double opitch;     // current pitch in other voice
 	bool onlyWithValids; // note is only dissonant with identifiable dissonances
+	bool valid_acc_exit; // if accompaniment voice conforms to necessary standards
 
 	for (int i=1; i<(int)attacks.size()-1; i++) {
 		lineindex = attacks[i]->getLineIndex();
@@ -29185,6 +29169,7 @@ void Tool_dissonant::findYs(vector<vector<string> >& results, NoteGrid& grid,
 			continue;
 		}
 		intp = *attacks[i] - *attacks[i-1];
+		intn = *attacks[i+1] - *attacks[i];
 		sliceindex = attacks[i]->getSliceIndex();
 
 		int lowestnote = 1000; // lowest sounding diatonic note in any voice at this sliceindex
@@ -29200,39 +29185,42 @@ void Tool_dissonant::findYs(vector<vector<string> >& results, NoteGrid& grid,
 
 		onlyWithValids = true; 
 		for (int j=0; j<(int)grid.getVoiceCount(); j++) { // j = index of other voice
-			if (vindex == j) { // only compare different voices
+			if ((vindex == j) || (onlyWithValids == false)) {
 				continue;
 			}
 			oattackindexc = grid.cell(j, sliceindex)->getCurrAttackIndex();
+			oattackindexn = grid.cell(j, sliceindex)->getNextAttackIndex();
+			attackindexn = attacks[i]->getNextAttackIndex();
 			pitch = attacks[i]->getAbsDiatonicPitch();
 			opitch = grid.cell(j, sliceindex)->getAbsDiatonicPitch();
 			olineindex = grid.cell(j, oattackindexc)->getLineIndex();
 			int thisInt = opitch - pitch; // diatonic interval in this pair
 			int thisMod7 = thisInt % 7; // simplify octaves out of thisInt
+			valid_acc_exit = oattackindexn < attackindexn ? false : true;
+			if (oattackindexn < 0) {
+				valid_acc_exit = true;
+			}
 
-			// if (((thisMod7 == -1) || (thisMod7 == 6)) && // creates 2nd or 7th diss
-			// 	((results[j][lineindex] == m_labels[SUS_BIN]) || // other voice is susp
-			// 	 (results[j][lineindex] == m_labels[SUS_TERN])) &&
-			// 	(abs(intp) == 1) && (intn == -1) && valid_acc_exit) {
-			// 	onlyWithValids = false;
-			// 	results[vindex][lineindex] = m_labels[RES_AND_DISS]; *********Pick up here initialize variables and add to list.
-			// }
-
-			if (((abs(thisMod7) == 1) || (abs(thisMod7) == 6)  ||
-				 ((thisInt > 0) && (thisMod7 == 3) && 
-				  not (((int(pitch-lowestnote) % 7) == 2) ||
-                 	   ((int(pitch-lowestnote) % 7) == 4))) ||
-				 ((thisInt < 0) && (thisMod7 == -3) && // a fourth by inversion is -3 and -3%7 = -3.
-				  not (((int(opitch-lowestnote) % 7) == 2) ||
-                 	   ((int(opitch-lowestnote) % 7) == 4)))) &&
-				((results[j][olineindex] == m_labels[AGENT_BIN]) ||
-				 (results[j][olineindex] == m_labels[AGENT_TERN]) ||
-				 (results[j][olineindex] == m_labels[UNLABELED_Z7]) ||
-				 (results[j][olineindex] == m_labels[UNLABELED_Z4]) ||
-				 ((results[j][olineindex] == "") &&
-				  ((results[j][lineindex] != m_labels[SUS_BIN]) &&
-				   (results[j][lineindex] != m_labels[SUS_TERN]))))) {
-				
+			if (((thisMod7 == 1) || (thisMod7 == -6)) && // creates 2nd or 7th diss
+				((results[j][lineindex] == m_labels[SUS_BIN]) || // other voice is susp
+				 (results[j][lineindex] == m_labels[SUS_TERN])) &&
+				(fabs(intp) == 1) && (intn == -1) && valid_acc_exit) {
+				results[vindex][lineindex] = m_labels[RES_PITCH];
+				onlyWithValids = false;
+			} else if (((abs(thisMod7) == 1) || (abs(thisMod7) == 6)  ||
+				       ((thisInt > 0) && (thisMod7 == 3) && 
+				        not (((int(pitch-lowestnote) % 7) == 2) ||
+                 	         ((int(pitch-lowestnote) % 7) == 4))) ||
+				       ((thisInt < 0) && (thisMod7 == -3) && // a fourth by inversion is -3 and -3%7 = -3.
+				        not (((int(opitch-lowestnote) % 7) == 2) ||
+                 	         ((int(opitch-lowestnote) % 7) == 4)))) &&
+				      ((results[j][olineindex] == m_labels[AGENT_BIN]) ||
+				       (results[j][olineindex] == m_labels[AGENT_TERN]) ||
+				       (results[j][olineindex] == m_labels[UNLABELED_Z7]) ||
+				       (results[j][olineindex] == m_labels[UNLABELED_Z4]) ||
+				       ((results[j][olineindex] == "") &&
+				        ((results[j][lineindex] != m_labels[SUS_BIN]) &&
+				         (results[j][lineindex] != m_labels[SUS_TERN]))))) {
 				onlyWithValids = false;
 			}
 		}
@@ -29262,21 +29250,24 @@ void Tool_dissonant::findAppoggiaturas(vector<vector<string> >& results, NoteGri
 	double intn;       // diatonic interval to next melodic note
 	double lev;        // metric level of the current note
 	double levn;       // metric level of the next melodic note
+	int lineindexp;    // line in original Humdrum file content that contains previous note
 	int lineindex;     // line in original Humdrum file content that contains note
 	int sliceindex;    // current timepoint in NoteGrid.
 	int attackindexn;  // line index of ref voice's next note
 	int oattackindexn; // line index of other voice's next note
 	double pitch;      // current pitch in ref voice
 	double opitch;     // current pitch in other voice
-	bool ant_down;	   // if the current ref voice pitch was preceded by a descending anticipation
-	bool ant_up;	   // if the current ref voice pitch was preceded by an ascending anticipation
-	bool ant_leap_dn;  // if the current ref voice pitch was preceded by an anticipation leapt down to
-	bool ant_leap_up;  // if the current ref voice pitch was preceded by an anticipation leapt up to
+	bool ant_down;	   // if the current note was preceded by a descending anticipation
+	bool ant_up;	   // if the current note was preceded by an ascending anticipation
+	bool ant_leapt_to; // if the current note was preceded by an anticipation leapt to
 
 	for (int i=1; i<(int)attacks.size()-1; i++) {
+		lineindexp = attacks[i-1]->getLineIndex();
 		lineindex = attacks[i]->getLineIndex();
 		if ((results[vindex][lineindex].find("Z") == string::npos) &&
-			(results[vindex][lineindex].find("z") == string::npos)) {
+			(results[vindex][lineindex].find("z") == string::npos) &&
+			(results[vindex][lineindex].find("J") == string::npos) &&
+			(results[vindex][lineindex].find("j") == string::npos)) {
 			continue;
 		}
 		durp = attacks[i-1]->getDuration();
@@ -29293,10 +29284,9 @@ void Tool_dissonant::findAppoggiaturas(vector<vector<string> >& results, NoteGri
 		}
 
 		// determine if current note was preceded by an anticipation (which may be a consonant anticipation)
-		ant_down    = false;
-		ant_up      = false;
-		ant_leap_dn = false;
-		ant_leap_up = false;
+		ant_down     = false;
+		ant_up       = false;
+		ant_leapt_to = false;
 		if (i > 1) {
 			durpp = attacks[i-2]->getDuration();
 			if ((intp == 0) && (durp <= dur) && (durp <= durpp)) {
@@ -29304,10 +29294,8 @@ void Tool_dissonant::findAppoggiaturas(vector<vector<string> >& results, NoteGri
 					ant_down = true;
 				} else if ((*attacks[i-1] - *attacks[i-2]) == 1) {
 					ant_up = true;
-				} else if ((*attacks[i-1] - *attacks[i-2]) < -1) {
-					ant_leap_dn = true;
-				} else if ((*attacks[i-1] - *attacks[i-2]) > 1) {
-					ant_leap_up = true;
+				} else if (fabs(*attacks[i-1] - *attacks[i-2]) > 1) {
+					ant_leapt_to = true;
 				}
 			}
 		}
@@ -29316,10 +29304,8 @@ void Tool_dissonant::findAppoggiaturas(vector<vector<string> >& results, NoteGri
 		double tpitch;
 		for (int v=0; v<(int)grid.getVoiceCount(); v++) {
 			tpitch = grid.cell(v, sliceindex)->getAbsDiatonicPitch();
-			if (!Convert::isNaN(tpitch)) {
-				if (tpitch <= lowestnote) {
-					lowestnote = tpitch;
-				}
+			if ((!Convert::isNaN(tpitch)) && (tpitch <= lowestnote)) {
+				lowestnote = tpitch;
 			}
 		}
 
@@ -29327,7 +29313,7 @@ void Tool_dissonant::findAppoggiaturas(vector<vector<string> >& results, NoteGri
 			if (vindex == j) { // only compare different voices
 				continue;
 			}
-			
+
 			attackindexn = attacks[i]->getNextAttackIndex();
 			oattackindexn = grid.cell(j, sliceindex)->getNextAttackIndex();
 			if (oattackindexn < attackindexn) {
@@ -29348,24 +29334,45 @@ void Tool_dissonant::findAppoggiaturas(vector<vector<string> >& results, NoteGri
 				  not (((int(opitch-lowestnote) % 7) == 2) ||
                  	   ((int(opitch-lowestnote) % 7) == 4))))) {
 				continue;
-				
-			} else if ((intp == -1) || ant_down) {
+			} else if (((intp == -1) || ant_down) && ((lev <= levn) && (dur <= durn)) &&
+				       ((results[vindex][lineindex] == m_labels[UNLABELED_Z7]) ||
+				        (results[vindex][lineindex] == m_labels[UNLABELED_Z4]))) {
 				if (intn == -1) {
 					results[vindex][lineindex] = m_labels[ACC_PASSING_DOWN]; // descending accented passing tone
 				} else if (intn == 1) {
 					results[vindex][lineindex] = m_labels[ACC_LO_NEI]; // accented lower neighbor
 				}
-			} else if ((intp == 1) || ant_up) {
+			} else if (((intp == 1) || ant_up) && ((lev <= levn) && (dur <= durn)) &&
+				       ((results[vindex][lineindex] == m_labels[UNLABELED_Z7]) ||
+				        (results[vindex][lineindex] == m_labels[UNLABELED_Z4]))) {
 				if (intn == 1) {
 					results[vindex][lineindex] = m_labels[ACC_PASSING_UP]; // rising accented passing tone
 				} else if (intn == -1) {
 					results[vindex][lineindex] = m_labels[ACC_UP_NEI]; // accented upper neighbor
 				}
 			} else if (intn == -1) {
-				if ((intp > 1) || ant_leap_up) {
-					results[vindex][lineindex] = m_labels[APP_LEAP_UP]; // appoggiatura approached by leap up
-				} else if ((intp < -1) || ant_leap_dn) {
-					results[vindex][lineindex] = m_labels[APP_LEAP_DOWN]; // appoggiatura approached by leap down
+				if ((intp == 2) && (results[vindex][lineindexp] == m_labels[ECHAPPEE_DOWN]) &&
+					(((results[vindex][lineindex] == m_labels[UNLABELED_Z7]) ||
+				      (results[vindex][lineindex] == m_labels[UNLABELED_Z4]) ||
+				      (results[vindex][lineindex] == m_labels[REV_ECHAPPEE_UP])) ||
+					 ((lev <= levn) && (dur <= durn)))) {
+					results[vindex][lineindexp] = m_labels[DBL_NEIGHBOR_DOWN];
+					results[vindex][lineindex]  = m_labels[DBL_NEIGHBOR_DOWN];									
+				} else if (((fabs(intp) > 1) || ant_leapt_to) && 
+						   ((lev <= levn) && (dur <= durn))) { // upper appoggiatura
+					results[vindex][lineindex] = m_labels[APP_UPPER];
+				}
+			} else if (intn == 1) {
+				if ((intp == -2) && (results[vindex][lineindexp] == m_labels[ECHAPPEE_UP]) &&
+					(((results[vindex][lineindex] == m_labels[UNLABELED_Z7]) ||
+				      (results[vindex][lineindex] == m_labels[UNLABELED_Z4]) ||
+				      (results[vindex][lineindex] == m_labels[REV_ECHAPPEE_DOWN])) ||
+					 ((lev <= levn) && (dur <= durn)))) {
+					results[vindex][lineindexp] = m_labels[DBL_NEIGHBOR_UP];
+					results[vindex][lineindex]  = m_labels[DBL_NEIGHBOR_UP];					
+				} else if (((fabs(intp) > 1) || ant_leapt_to) && 
+						   ((lev <= levn) && (dur <= durn))) { // lower appoggiatura
+					results[vindex][lineindex] = m_labels[APP_LOWER];
 				}
 			}
 		}
@@ -29537,21 +29544,22 @@ void Tool_dissonant::fillLabels(void) {
 	m_labels[REV_ECHAPPEE_DOWN   ] = "j"; // incomplete posterior lower neighbor
 	m_labels[ANT_UP              ] = "A"; // rising anticipation
 	m_labels[ANT_DOWN            ] = "a"; // descending anticipation
+	m_labels[DBL_NEIGHBOR_UP     ] = "D"; // double neighbor beginning with upper neighbor
+	m_labels[DBL_NEIGHBOR_DOWN   ] = "d"; // double neighbor beginning with lower neighbor
 	m_labels[THIRD_Q_PASS_UP     ] = "Q"; // dissonant third quarter ascending passing tone
 	m_labels[THIRD_Q_PASS_DOWN   ] = "q"; // dissonant third quarter descending passing tone
 	m_labels[THIRD_Q_UPPER_NEI   ] = "B"; // dissonant third quarter upper neighbor
 	m_labels[THIRD_Q_LOWER_NEI   ] = "b"; // dissonant third quarter lower neighbor
-	m_labels[ACC_PASSING_UP      ] = "V"; // ascending accented passing tone
-	m_labels[ACC_PASSING_DOWN    ] = "v"; // descending accented passing tone
-	m_labels[ACC_UP_NEI          ] = "W"; // accented upper neighbor
-	m_labels[ACC_LO_NEI          ] = "w"; // accented lower neighbor
-	m_labels[APP_LEAP_UP         ] = "T"; // appoggiatura approached by leap up
-	m_labels[APP_LEAP_DOWN       ] = "t"; // appoggiatura approached by leap down
+	m_labels[ACC_PASSING_UP		 ] = "V"; // ascending accented passing tone
+	m_labels[ACC_PASSING_DOWN	 ] = "v"; // descending accented passing tone
+	m_labels[ACC_UP_NEI	 		 ] = "W"; // accented upper neighbor
+	m_labels[ACC_LO_NEI			 ] = "w"; // accented lower neighbor
+	m_labels[APP_UPPER			 ] = "T"; // appoggiatura resolving down by step
+	m_labels[APP_LOWER			 ] = "t"; // appoggiatura resolving up by step
 	m_labels[SUS_BIN             ] = "s"; // binary suspension
 	m_labels[SUS_TERN            ] = "S"; // ternary suspension
 	m_labels[AGENT_BIN           ] = "g"; // binary agent
 	m_labels[AGENT_TERN          ] = "G"; // ternary agent
-	m_labels[SUSPENSION_ORNAM    ] = "o"; // suspension ornament
 	m_labels[SUSPENSION_REP      ] = "r"; // suspension repeated note
 	m_labels[FAKE_SUSPENSION_LEAP] = "F"; // fake suspension approached by leap
 	m_labels[FAKE_SUSPENSION_STEP] = "f"; // fake suspension approached by step or by anticipation
@@ -29560,6 +29568,7 @@ void Tool_dissonant::fillLabels(void) {
 	m_labels[CHANSON_IDIOM       ] = "h"; // chanson idiom
 	m_labels[PARALLEL_UP         ] = "L"; // moves up in parallel with identifiable dissonance
 	m_labels[PARALLEL_DOWN       ] = "l"; // moves down in parallel with identifiable dissonance
+	m_labels[RES_PITCH			 ] = "x"; // note of resolution of a suspension against suspension dissonance
 	m_labels[ONLY_WITH_VALID_UP  ] = "Y"; // only dissonant against identifiable dissonances, approached from below
 	m_labels[ONLY_WITH_VALID_DOWN] = "y"; // only dissonant against identifiable dissonances, approached from above
 	m_labels[UNKNOWN_DISSONANCE  ] = "Z"; // unknown dissonance
@@ -29594,21 +29603,22 @@ void Tool_dissonant::fillLabels2(void) {
 	m_labels[REV_ECHAPPEE_DOWN   ] = "J"; // incomplete posterior lower neighbor
 	m_labels[ANT_UP              ] = "A"; // rising anticipation
 	m_labels[ANT_DOWN            ] = "A"; // descending anticipation
+	m_labels[DBL_NEIGHBOR_UP     ] = "D"; // double neighbor beginning with upper neighbor
+	m_labels[DBL_NEIGHBOR_DOWN   ] = "D"; // double neighbor beginning with lower neighbor
 	m_labels[THIRD_Q_PASS_UP     ] = "Q"; // dissonant third quarter ascending passing tone
 	m_labels[THIRD_Q_PASS_DOWN   ] = "Q"; // dissonant third quarter descending passing tone
 	m_labels[THIRD_Q_UPPER_NEI   ] = "B"; // dissonant third quarter upper neighbor
 	m_labels[THIRD_Q_LOWER_NEI   ] = "B"; // dissonant third quarter lower neighbor
-	m_labels[ACC_PASSING_UP      ] = "V"; // ascending accented passing tone
-	m_labels[ACC_PASSING_DOWN    ] = "V"; // descending accented passing tone
-	m_labels[ACC_UP_NEI          ] = "W"; // accented upper neighbor
-	m_labels[ACC_LO_NEI          ] = "W"; // accented lower neighbor
-	m_labels[APP_LEAP_UP         ] = "T"; // appoggiatura approached by leap up
-	m_labels[APP_LEAP_DOWN       ] = "T"; // appoggiatura approached by leap down
+	m_labels[ACC_PASSING_UP		 ] = "V"; // ascending accented passing tone
+	m_labels[ACC_PASSING_DOWN	 ] = "V"; // descending accented passing tone
+	m_labels[ACC_UP_NEI	 		 ] = "W"; // accented upper neighbor
+	m_labels[ACC_LO_NEI			 ] = "W"; // accented lower neighbor
+	m_labels[APP_UPPER			 ] = "T"; // appoggiatura resolving down by step
+	m_labels[APP_LOWER			 ] = "T"; // appoggiatura resolving up by step
 	m_labels[SUS_BIN             ] = "S"; // binary suspension
 	m_labels[SUS_TERN            ] = "S"; // ternary suspension
 	m_labels[AGENT_BIN           ] = "G"; // binary agent
 	m_labels[AGENT_TERN          ] = "G"; // ternary agent
-	m_labels[SUSPENSION_ORNAM    ] = "O"; // suspension ornament
 	m_labels[SUSPENSION_REP      ] = "R"; // suspension repeated note
 	m_labels[FAKE_SUSPENSION_LEAP] = "F"; // fake suspension approached by leap
 	m_labels[FAKE_SUSPENSION_STEP] = "F"; // fake suspension approached by step or anticipation
@@ -29617,6 +29627,7 @@ void Tool_dissonant::fillLabels2(void) {
 	m_labels[CHANSON_IDIOM       ] = "H"; // chanson idiom
 	m_labels[PARALLEL_UP         ] = "L"; // moves up in parallel with identifiable dissonance
 	m_labels[PARALLEL_DOWN       ] = "L"; // moves down in parallel with identifiable dissonance
+	m_labels[RES_PITCH			 ] = "X"; // note of resolution of a suspension against suspension dissonance
 	m_labels[ONLY_WITH_VALID_UP  ] = "Y"; // only dissonant against identifiable dissonances, approached from below
 	m_labels[ONLY_WITH_VALID_DOWN] = "Y"; // only dissonant against identifiable dissonances, approached from above
 	m_labels[UNKNOWN_DISSONANCE  ] = "Z"; // unknown dissonance
