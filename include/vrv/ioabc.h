@@ -18,6 +18,8 @@
 
 namespace vrv {
 
+class Accid;
+class Artic;
 class Beam;
 class Clef;
 class ControlElement;
@@ -28,6 +30,7 @@ class MeterSig;
 class Note;
 class Score;
 class Section;
+class Slur;
 class Staff;
 class Tie;
 class Tuplet;
@@ -241,8 +244,6 @@ private:
 
     // parsing functions
     int getBarLine(const char *incipit, data_BARRENDITION *output, int index);
-    int getAccidental(const char *incipit, data_ACCIDENTAL_WRITTEN *accident, int index = 0);
-    int getOctave(const char *incipit, char *octave, int index = 0);
     int getMultiRest(const char *incipit, int *multirest, int index);
     int getAbbreviation(const char *incipit, abc::Measure *measure, int index = 0);
     int getNote(const char *incipit, abc::Note *note, abc::Measure *measure, int index = 0);
@@ -266,6 +267,8 @@ private:
     void readInformationField(char dataKey, std::string dataValue, Score *score);
     void readMusicCode(const char *musicCode, Section *section);
 
+    void parseDecoration(std::string decorationString);
+
 #endif // NO_ABC_SUPPORT
 
 public:
@@ -276,6 +279,7 @@ private:
     Measure *m_measure;
     Layer *m_layer;
 
+    std::vector<data_ARTICULATION> m_artic;
     data_DURATION m_durDefault = DURATION_NONE;
     int m_unitDur;
     char m_decoration = '!';

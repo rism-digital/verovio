@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "artic.h"
 #include "beam.h"
 #include "chord.h"
 #include "clef.h"
@@ -175,8 +176,6 @@ void AbcInput::parseABC(std::istream &infile)
 
         m_staff = new Staff(1);
         m_measure = new Measure(true, measure_count);
-        m_layer = new Layer();
-        m_layer->SetN(1);
 
         m_staff->AddChild(m_layer);
         m_measure->AddChild(m_staff);
@@ -205,64 +204,6 @@ void AbcInput::parseABC(std::istream &infile)
     m_doc->m_scoreDef.AddChild(staffGrp);
 
     m_doc->ConvertToPageBasedDoc();
-}
-
-//////////////////////////////
-//
-// getOctave --
-//
-#define BASE_OCT 4
-int AbcInput::getOctave(const char *music, char *octave, int index)
-{
-    int i = index;
-    int length = (int)strlen(music);
-    if (music[i] == '\'') {
-        *octave = BASE_OCT;
-        while ((i + 1 < length) && (music[i + 1] == '\'')) {
-            (*octave)++;
-            i++;
-        }
-    }
-    else if (music[i] == ',') {
-        // negative octave
-        *octave = BASE_OCT - 1;
-        while ((i + 1 < length) && (music[i + 1] == ',')) {
-            (*octave)--;
-            i++;
-        }
-    }
-
-    return i - index;
-}
-
-//////////////////////////////
-//
-// getAccidental --
-//
-
-int AbcInput::getAccidental(const char *music, data_ACCIDENTAL_WRITTEN *accident, int index)
-{
-    int i = index;
-    int length = (int)strlen(music);
-
-    if (music[i] == '=') {
-        *accident = ACCIDENTAL_WRITTEN_n;
-    }
-    else if (music[i] == '^') {
-        *accident = ACCIDENTAL_WRITTEN_s;
-        if ((i + 1 < length) && (music[i + 1] == '^')) {
-            *accident = ACCIDENTAL_WRITTEN_x;
-            i++;
-        }
-    }
-    else if (music[i] == '_') {
-        *accident = ACCIDENTAL_WRITTEN_f;
-        if ((i + 1 < length) && (music[i + 1] == '_')) {
-            *accident = ACCIDENTAL_WRITTEN_ff;
-            i++;
-        }
-    }
-    return i - index;
 }
 
 /**********************************
@@ -553,6 +494,38 @@ void AbcInput::addLayerElement(LayerElement *element)
     }
 }
 
+void AbcInput::parseDecoration(std::string decorationString)
+{
+    if (atoi(decorationString.c_str())) {
+        LogWarning("ABC input: Fingering not supported", decorationString.c_str());
+        return;
+    }
+    if (!strcmp(decorationString.c_str(), "."))
+        m_artic.push_back(ARTICULATION_stacc);
+    else if (!strcmp(decorationString.c_str(), ">"))
+        m_artic.push_back(ARTICULATION_acc);
+    else if (!strcmp(decorationString.c_str(), "accent"))
+        m_artic.push_back(ARTICULATION_acc);
+    else if (!strcmp(decorationString.c_str(), "emphasis"))
+        m_artic.push_back(ARTICULATION_acc);
+    else if (!strcmp(decorationString.c_str(), "tenuto"))
+        m_artic.push_back(ARTICULATION_ten);
+    else if (!strcmp(decorationString.c_str(), "+"))
+        m_artic.push_back(ARTICULATION_stop);
+    else if (!strcmp(decorationString.c_str(), "plus"))
+        m_artic.push_back(ARTICULATION_stop);
+    else if (!strcmp(decorationString.c_str(), "snap"))
+        m_artic.push_back(ARTICULATION_snap);
+    else if (!strcmp(decorationString.c_str(), "upbow"))
+        m_artic.push_back(ARTICULATION_upbow);
+    else if (!strcmp(decorationString.c_str(), "downbow"))
+        m_artic.push_back(ARTICULATION_dnbow);
+    else if (!strcmp(decorationString.c_str(), "open"))
+        m_artic.push_back(ARTICULATION_open);
+    else
+        LogWarning("ABC input: Decoration '%s' not supported", decorationString.c_str());
+}
+
 //////////////////////////////
 //
 // parse information fields
@@ -782,19 +755,20 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
     if (length == 0) return;
 
     Measure *measure = new Measure();
-    Layer *layer = new Layer();
     Staff *staff = new Staff();
+    m_layer = new Layer();
+    m_layer->SetN(1);
 
     while (i < length) {
         // eat the input...
 
         if (isspace(musicCode[i])) {
-            // just ignore for now
+            // always ends a beam, may start a new one
         }
 
         if (musicCode[i] == 'W') {
-          LogWarning("ABC input: seperate lyrics are not supported");
-          break;
+            LogWarning("ABC input: seperate lyrics are not supported");
+            break;
         }
 
         // linebreaks
@@ -805,17 +779,19 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
         // decorations
         if (shorthandDecoration.find(musicCode[i]) != std::string::npos) {
+            std::string shorthandDecorationString;
+            shorthandDecorationString.push_back(musicCode[i]);
             i++;
-            LogWarning("ABC input: Decorations are not yet supported");
+            parseDecoration(shorthandDecorationString);
         }
         if (musicCode[i] == m_decoration) {
             i++;
-            LogWarning("ABC input: Decorations are not yet supported");
             std::string decorationString;
             while (musicCode[i] != m_decoration) {
                 decorationString.push_back(musicCode[i]);
                 i++;
             }
+            parseDecoration(decorationString);
         }
 
         // slurs are read when adding the note
@@ -915,7 +891,15 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 note->SetDur(DURATION_8);
             }
 
-            layer->AddChild(note);
+            // add articulation
+            if (!m_artic.empty()) {
+                Artic *artic = new Artic();
+                artic->SetArtic(m_artic);
+                note->AddChild(artic);
+                m_artic.clear();
+            }
+
+            m_layer->AddChild(note);
         }
 
         // Spaces
@@ -951,7 +935,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             space->SetDots(dots);
             space->SetDur(space->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
 
-            layer->AddChild(space);
+            m_layer->AddChild(space);
         }
 
         // Padding
@@ -992,7 +976,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             rest->SetDots(dots);
             rest->SetDur(rest->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
 
-            layer->AddChild(rest);
+            m_layer->AddChild(rest);
         }
 
         // Multi-measure rests
@@ -1004,7 +988,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 i++;
             }
             multiRest->SetNum(atoi(numString.c_str()));
-            layer->AddChild(multiRest);
+            m_layer->AddChild(multiRest);
         }
 
         // text elements
@@ -1038,7 +1022,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             Text *text = new Text();
             text->SetText(UTF8to16(remark));
             annot->AddChild(text);
-            layer->AddChild(annot);
+            m_layer->AddChild(annot);
         }
 
         // barLine
@@ -1054,19 +1038,19 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                     measure->SetRight(BARRENDITION_end);
                 else
                     measure->SetRight(BARRENDITION_single);
-                staff->AddChild(layer);
+                staff->AddChild(m_layer);
                 measure->AddChild(staff);
                 section->AddChild(measure);
                 measure = new Measure();
                 staff = new Staff();
-                layer = new Layer();
+                m_layer = new Layer();
             }
         }
 
         i++;
     }
 
-    staff->AddChild(layer);
+    staff->AddChild(m_layer);
     measure->AddChild(staff);
     section->AddChild(measure);
 
