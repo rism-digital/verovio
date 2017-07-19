@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul 19 15:27:30 CEST 2017
+// Last Modified: Wed Jul 19 22:20:39 CEST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -3459,17 +3459,22 @@ GridVoice* GridStaff::setTokenLayer(int layerindex, HTp token, HumNum duration) 
 void GridStaff::setNullTokenLayer(int layerindex, SliceType type,
 		HumNum nextdur) {
 
+	if (type == SliceType::Invalid) {
+		return;
+	}
+
 	string nulltoken;
 	if (type < SliceType::_Data) {
 		nulltoken = ".";
 	} else if (type < SliceType::_Measure) {
 		nulltoken = "=";
-	} else if (type < SliceType::_Manipulator) {
+	} else if (type < SliceType::_Interpretation) {
 		nulltoken = "*";
 	} else if (type < SliceType::_Spined) {
 		nulltoken = "!!";
 	} else {
-		cerr << "STRANGE ERROR" << endl;
+		cerr << "!!STRANGE ERROR: " << this << endl;
+		cerr << "!!SLICE TYPE: " << (int)type << endl;
 	}
 
 	if (layerindex < (int)this->size()) {
@@ -5554,7 +5559,6 @@ void HumGrid::extendDurationToken(int slicei, int parti, int staffi,
 				cerr << "Strange error2 in extendDurationToken()" << endl;
 				return;
 			}
-			gs->setNullTokenLayer(voicei, type, slicedur);
 			
 			if (m_allslices.at(s)->isDataSlice()) {
 				gs->setNullTokenLayer(voicei, type, slicedur);
@@ -5562,7 +5566,12 @@ void HumGrid::extendDurationToken(int slicei, int parti, int staffi,
 			} else {
 				// store a null token for the non-data slice, but probably skip
 				// if there is a token already there (such as a clef-change).
-				gs->setNullTokenLayer(voicei, type, slicedur);
+				if (gs->at(voicei)->getToken()) {
+					// there is already a token here, so do not replace it.
+					// cerr << "Not replacing token: "  << gs->at(voicei)->getToken() << endl;
+				} else {
+					gs->setNullTokenLayer(voicei, type, slicedur);
+				}
 			}
 			s++;
 			if (s == (int)m_allslices.size() - 1) {
@@ -19388,6 +19397,16 @@ bool MxmlEvent::parseEvent(xml_node el, xml_node nextel, HumNum starttime) {
 			break;
 
 		case mevent_forward:
+			if (tempduration == 1) {
+				// handle errors in SharpEye:
+				long ticks = getQTicks();
+				if ((double)tempduration / (double)ticks < 0.0001) {
+					tempduration = 0;
+					m_eventtype = mevent_unknown;
+				}
+			} else if (tempduration < 4) {
+				cerr << "FORWARD WITH A SMALL VALUE " << tempduration << endl;
+			}
 			setDurationByTicks(tempduration);
 			break;
 
