@@ -3442,27 +3442,35 @@ void HumdrumInput::processDirection(hum::HTp token, int staffindex)
     bool zparam = token->isDefined("LO", "TX", "Z");
     bool yparam = token->isDefined("LO", "TX", "Y");
 
-    bool aparam = token->getValueBool("LO", "TX", "a");  // place above staff
-    bool bparam = token->getValueBool("LO", "TX", "b");  // place below staff
+    bool aparam = token->getValueBool("LO", "TX", "a"); // place above staff
+    bool bparam = token->getValueBool("LO", "TX", "b"); // place below staff
 
-	// default font for text string (later check for embedded fonts)
-	bool italic = false;
-	bool bold   = false;
+    // default font for text string (later check for embedded fonts)
+    bool italic = false;
+    bool bold = false;
 
-	if (token->isDefined("LO", "TX", "i")) {
-		italic = true;
-	}
-	if (token->isDefined("LO", "TX", "b")) {
-		bold = true;
-	}
-	if (token->isDefined("LO", "TX", "bi")) {
-		bold = true;
-		italic = true;
-	}
-	if (token->isDefined("LO", "TX", "ib")) {
-		bold = true;
-		italic = true;
-	}
+    if (token->isDefined("LO", "TX", "i")) { // italic
+        italic = true;
+    }
+    if (token->isDefined("LO", "TX", "B")) { // bold
+        bold = true;
+    }
+    if (token->isDefined("LO", "TX", "bi")) { // bold-italic
+        bold = true;
+        italic = true;
+    }
+    if (token->isDefined("LO", "TX", "ib")) { // bold-italic
+        bold = true;
+        italic = true;
+    }
+    if (token->isDefined("LO", "TX", "Bi")) { // bold-italic
+        bold = true;
+        italic = true;
+    }
+    if (token->isDefined("LO", "TX", "iB")) { // italic
+        bold = true;
+        italic = true;
+    }
 
     double Y = 0.0;
     double Z = 0.0;
@@ -3507,19 +3515,20 @@ void HumdrumInput::processDirection(hum::HTp token, int staffindex)
         // 300: dir->SetPlace(STAFFREL_below);
         setPlace(dir, "below");
     }
-	if ((!italic) || bold) {
-		Rend *rend = new Rend;
-		dir->AddChild(rend);
-    	addTextElement(rend, text);
-		if (!italic) {
-			rend->SetFontstyle(FONTSTYLE_normal);
-		}
-		if (bold) {
-			rend->SetFontweight(FONTWEIGHT_bold);
-		}
-	} else {
-    	addTextElement(dir, text);
-	}
+    if ((!italic) || bold) {
+        Rend *rend = new Rend;
+        dir->AddChild(rend);
+        addTextElement(rend, text);
+        if (!italic) {
+            rend->SetFontstyle(FONTSTYLE_normal);
+        }
+        if (bold) {
+            rend->SetFontweight(FONTWEIGHT_bold);
+        }
+    }
+    else {
+        addTextElement(dir, text);
+    }
 }
 
 /////////////////////////////
@@ -4096,11 +4105,11 @@ void HumdrumInput::insertMeterSigElement(
     std::smatch matches;
     int count = -1;
     int unit = -1;
-    if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
+    if (regex_search(*tsig, matches, regex(R "(^\*M(\d+)/(\d+))"))) {
         count = stoi(matches[1]);
         unit = stoi(matches[2]);
     }
-    else if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)"))) {
+    else if (regex_search(*tsig, matches, regex(R "(^\*M(\d+)"))) {
         count = stoi(matches[1]);
     }
     // deal with non-rational units here.
@@ -4140,13 +4149,13 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             continue;
         }
         for (int j = 0; j < infile[i].getFieldCount(); j++) {
-            if ((!timesig) && regex_search(*infile.token(i, j), regex(R"(^\*M\d+/\d+)"))) {
+            if ((!timesig) && regex_search(*infile.token(i, j), regex(R "(^\*M\d+/\d+)"))) {
                 timesig = infile.token(i, j);
             }
-            if ((!keysig) && regex_search(*infile.token(i, j), regex(R"(^\*k\[.*\])"))) {
+            if ((!keysig) && regex_search(*infile.token(i, j), regex(R "(^\*k\[.*\])"))) {
                 keysig = infile.token(i, j);
             }
-            if (timesig && regex_search(*infile.token(i, j), regex(R"(^\*met\(.*\))"))) {
+            if (timesig && regex_search(*infile.token(i, j), regex(R "(^\*met\(.*\))"))) {
                 metersig = infile.token(i, j);
             }
         }
@@ -4167,7 +4176,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         int count = -1;
         int unit = -1;
         std::smatch matches;
-        if (regex_search(*timesig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
+        if (regex_search(*timesig, matches, regex(R "(^\*M(\d+)/(\d+))"))) {
             count = stoi(matches[1]);
             unit = stoi(matches[2]);
             scoreDef->SetMeterCount(count);
