@@ -633,8 +633,13 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             // P(^)
             if (startStemDir == STEMDIRECTION_down) y1 = start->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
             //  d(^)d
-            else if (isShortSlur || ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start))) {
+            else if (isShortSlur) {
                 y1 = start->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
+            }
+            // same but in beam - adjust the x too
+            else if ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start)) {
+                y1 = start->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
+                x1 += startRadius - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
             // d(^)
             else {
@@ -651,8 +656,13 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             // d(_)
             if (startStemDir == STEMDIRECTION_up) y1 = start->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
             // P(_)P
-            else if (isShortSlur || ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start))) {
+            else if (isShortSlur) {
                 y1 = start->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+            }
+            // same but in beam
+            else if ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start)) {
+                y1 = start->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+                x1 -= startRadius - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
             // P(_)
             else {
@@ -679,8 +689,13 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             // (^)P
             if (endStemDir == STEMDIRECTION_down) y2 = end->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
             // d(^)d
-            else if (isShortSlur || ((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstInBeam(end))) {
+            else if (isShortSlur) {
                 y2 = end->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
+            }
+            // same but in beam - adjust the x too
+            else if ((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstInBeam(end)) {
+                y2 = end->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
+                x2 += endRadius - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
             // (^)d
             else {
@@ -695,8 +710,14 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             // (_)d
             if (endStemDir == STEMDIRECTION_up) y2 = end->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
             // P(_)P
-            else if (isShortSlur || ((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstInBeam(end))) {
+            else if (isShortSlur) {
                 y2 = end->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+            }
+            // same but in beam
+            else if ((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstInBeam(end)) {
+                y2 = end->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+                //
+                x2 -= endRadius - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             }
             // (_)P
             else {
@@ -898,6 +919,9 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     std::vector<LayerElement *>::iterator it;
     for (it = findTimeSpanningLayerElementsParams.m_spanningContent.begin();
          it != findTimeSpanningLayerElementsParams.m_spanningContent.end(); it++) {
+        // We skip the start or end of the slur
+        if ((*it == slur->GetStart()) || (*it == slur->GetEnd())) continue;
+        
         Note *note = NULL;
         // We keep only notes and chords for now
         if (!(*it)->Is(NOTE) && !(*it)->Is(CHORD)) continue;
