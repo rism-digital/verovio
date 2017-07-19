@@ -452,6 +452,8 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     Note *endNote = NULL;
     Chord *startChord = NULL;
     Chord *endChord = NULL;
+    StemmedDrawingInterface *startInterface = NULL;
+    StemmedDrawingInterface *endInterface = NULL;
 
     curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
     data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
@@ -480,22 +482,30 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         assert(startNote);
         startParentChord = startNote->IsChordTone();
         startStemDir = startNote->GetDrawingStemDir();
+        startInterface = dynamic_cast<StemmedDrawingInterface*>(start);
+        assert(startInterface);
     }
     else if (start->Is(CHORD)) {
         startChord = dynamic_cast<Chord *>(start);
         assert(startChord);
         startStemDir = startChord->GetDrawingStemDir();
+        startInterface = dynamic_cast<StemmedDrawingInterface*>(start);
+        assert(startInterface);
     }
     if (end->Is(NOTE)) {
         endNote = dynamic_cast<Note *>(end);
         assert(endNote);
         endParentChord = endNote->IsChordTone();
         endStemDir = endNote->GetDrawingStemDir();
+        endInterface = dynamic_cast<StemmedDrawingInterface*>(end);
+        assert(endInterface);
     }
     else if (end->Is(CHORD)) {
         endChord = dynamic_cast<Chord *>(end);
         assert(endChord);
         endStemDir = endChord->GetDrawingStemDir();
+        endInterface = dynamic_cast<StemmedDrawingInterface*>(end);
+        assert(endInterface);
     }
 
     Layer *layer1 = NULL;
@@ -527,20 +537,38 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             slur->SetDrawingCurvedir(curvature_CURVEDIR_above);
         }
     }
+    
+    /************** calculate the radius for adjusting the x position **************/
+    
+    int startRadius = 0;
+    if (!start->Is(TIMESTAMP_ATTR)) {
+        assert(startInterface);
+        startRadius = startInterface->GetDrawingRadius(m_doc, staff->m_drawingStaffSize, start->IsCueSize());
+    }
+    
+    int endRadius = 0;
+    if (!end->Is(TIMESTAMP_ATTR)) {
+        assert(endInterface);
+        endRadius = endInterface->GetDrawingRadius(m_doc, staff->m_drawingStaffSize, end->IsCueSize());
+    }
 
     /************** note stem dir **************/
 
     if (spanningType == SPANNING_START_END) {
         stemDir = startStemDir;
+        x1 += startRadius;
+        x2 += endRadius;
     }
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
     else if (spanningType == SPANNING_START) {
         stemDir = startStemDir;
+        x1 += startRadius;
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if (spanningType == SPANNING_END) {
         stemDir = endStemDir;
+        x2 += endRadius;
     }
     // Finally, slur accross an entire system; use the staff position and up (see below)
     else {
