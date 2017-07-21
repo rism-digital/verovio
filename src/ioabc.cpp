@@ -792,8 +792,10 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // chords
-        else if (musicCode[i] == '[' && pitch.find(musicCode[i + 1]) != std::string::npos) {
+        else if (musicCode[i] == '[' && musicCode[i] != ':') {
             LogWarning("ABC input: Chords are not supported yet");
+        }
+        else if  (musicCode[i] == ']') {
         }
 
         // grace notes
