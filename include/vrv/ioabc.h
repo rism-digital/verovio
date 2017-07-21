@@ -251,6 +251,7 @@ private:
     // output functions
     void addLayerElement(LayerElement *element);
     void parseNote(abc::Note *note);
+    void AddBeam();
     void popContainer();
     void convertMeasure(abc::Measure *measure);
     void pushContainer(LayerElement *container);
@@ -292,6 +293,7 @@ private:
     bool m_is_in_chord;
 
     std::vector<LayerElement *> m_layerElements;
+    std::vector<LayerElement *> m_noteStack;
 };
 
 } // namespace vrv

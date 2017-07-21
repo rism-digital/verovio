@@ -47,10 +47,6 @@
 
 namespace vrv {
 
-#define BEAM_INITIAL 0x01
-#define BEAM_MEDIAL 0x02
-#define BEAM_TERMINAL 0x04
-
 // Global variables:
 char abcLine[10001] = { 0 };
 #define MAX_DATA_LEN 1024 // One line of the abc file would not be that long!
@@ -155,6 +151,10 @@ void AbcInput::parseABC(std::istream &infile)
         m_lineNum++;
         if (abcLine[0] == 'X' && m_doc->m_scoreDef.HasType()) {
             LogDebug("Reading only first tune in file");
+            break;
+        }
+        else if (abcLine[1] == ':' && abcLine[0] != '|') {
+            LogWarning("ABC input: Information fields in music code not supported");
             break;
         }
         else {
@@ -398,11 +398,6 @@ void AbcInput::parseNote(abc::Note *note)
         addLayerElement(note->meter);
     }
 
-    // Handle key change. Evil if done in a beam
-    if (note->key) {
-        addLayerElement(note->key);
-    }
-
     // Acciaccaturas are similar but do not get beamed (do they)
     // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
     // Acciaccatura rests do not exist
@@ -419,10 +414,6 @@ void AbcInput::parseNote(abc::Note *note)
         assert(mnote);
         mnote->SetGrace(GRACE_unacc);
         mnote->SetStemDir(STEMDIRECTION_up);
-    }
-
-    if (note->beam == BEAM_INITIAL) {
-        pushContainer(new Beam());
     }
 
     // note in a chord
@@ -448,10 +439,6 @@ void AbcInput::parseNote(abc::Note *note)
     // insert the tuplet elem
     // and reset the tuplet counter
     if (note->tuplet_note == 1) {
-        popContainer();
-    }
-
-    if (note->beam == BEAM_TERMINAL) {
         popContainer();
     }
 
@@ -492,6 +479,22 @@ void AbcInput::addLayerElement(LayerElement *element)
     else {
         m_layer->AddChild(element);
     }
+}
+
+void AbcInput::AddBeam()
+{
+    if (m_noteStack.size() == 1) {
+        m_layer->AddChild(m_noteStack.back());
+    }
+    else {
+        Beam *beam = new Beam();
+        std::vector<LayerElement *>::iterator iter;
+        for (iter = m_noteStack.begin(); iter != m_noteStack.end(); iter++) {
+            beam->AddChild(*iter);
+        }
+        m_layer->AddChild(beam);
+    }
+    m_noteStack.clear();
 }
 
 void AbcInput::parseDecoration(std::string decorationString)
@@ -763,7 +766,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         // eat the input...
 
         if (isspace(musicCode[i])) {
-            // always ends a beam, may start a new one
+            // always ends a beam
+            AddBeam();
         }
 
         if (musicCode[i] == 'W') {
@@ -899,7 +903,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 m_artic.clear();
             }
 
-            m_layer->AddChild(note);
+            m_noteStack.push_back(note);
+            // m_layer->AddChild(note);
         }
 
         // Spaces
@@ -935,7 +940,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             space->SetDots(dots);
             space->SetDur(space->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
 
-            m_layer->AddChild(space);
+            m_noteStack.push_back(space);
+            // m_layer->AddChild(space);
         }
 
         // Padding
@@ -976,7 +982,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             rest->SetDots(dots);
             rest->SetDur(rest->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
 
-            m_layer->AddChild(rest);
+            m_noteStack.push_back(rest);
+            // m_layer->AddChild(rest);
         }
 
         // Multi-measure rests
@@ -1027,6 +1034,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
         // barLine
         else if (musicCode[i] == '|') {
+            // add stacked elements to layer
+            AddBeam();
             if (musicCode[i + 1] == ':')
                 measure->SetLeft(BARRENDITION_rptstart);
             else if (musicCode[i + 1]) {
@@ -1053,7 +1062,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
     staff->AddChild(m_layer);
     measure->AddChild(staff);
     section->AddChild(measure);
-
+    
     // by default, line-breaks in the code generate line-breaks in the typeset score
     if (sysBreak) {
         Sb *sb = new Sb();
