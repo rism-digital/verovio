@@ -345,12 +345,6 @@ void AbcInput::parseNote(abc::Note *note)
 
         mnote->SetPname(note->pitch);
         mnote->SetOct(note->octave);
-        if (note->accidental != ACCIDENTAL_WRITTEN_NONE) {
-            Accid *accid = new Accid();
-            accid->SetAccid(note->accidental);
-            mnote->AddChild(accid);
-        }
-
         mnote->SetDots(note->dots);
         mnote->SetDur(note->duration);
 
@@ -770,11 +764,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             AddBeam();
         }
 
-        if (musicCode[i] == 'W') {
-            LogWarning("ABC input: seperate lyrics are not supported");
-            break;
-        }
-
         // linebreaks
         if (musicCode[i] == m_linebreak) {
             Sb *sb = new Sb();
@@ -1062,7 +1051,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
     staff->AddChild(m_layer);
     measure->AddChild(staff);
     section->AddChild(measure);
-    
+
     // by default, line-breaks in the code generate line-breaks in the typeset score
     if (sysBreak) {
         Sb *sb = new Sb();
