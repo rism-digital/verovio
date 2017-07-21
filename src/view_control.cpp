@@ -530,7 +530,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     /************** note stem dir **************/
 
-    else if (spanningType == SPANNING_START_END) {
+    if (spanningType == SPANNING_START_END) {
         stemDir = startStemDir;
     }
     // This is the case when the tie is split over two system of two pages.
@@ -1468,7 +1468,9 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
     }
     else if (syl->GetCon() == sylLog_CON_u) {
         x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
-        DrawFilledRectangle(dc, x1, y, x2, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+        if (x2 > x1) {
+            DrawFilledRectangle(dc, x1, y, x2, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+        }
     }
 }
 

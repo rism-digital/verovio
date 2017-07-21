@@ -616,6 +616,10 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 {
     FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
     assert(params);
+    
+    if (this->GetVisible() == BOOLEAN_false) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
