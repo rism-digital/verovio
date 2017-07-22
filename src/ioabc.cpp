@@ -542,6 +542,7 @@ void AbcInput::parseKey(std::string keyString)
 {
     int i = 0;
     data_MODE mode = MODE_NONE;
+    while (isspace(keyString[i])) i++;
 
     // set key.pname
     if (pitch.find(keyString[i]) != std::string::npos) {
@@ -549,7 +550,7 @@ void AbcInput::parseKey(std::string keyString)
         m_doc->m_scoreDef.SetKeyPname((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToPitchname(keyString.substr(i, 1)));
         i += 1;
     }
-    while (keyString[i] == ' ') i += 1;
+    while (isspace(keyString[i])) i++;
 
     // set key.accid
     switch (keyString[i]) {
