@@ -748,6 +748,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
     //}
 
     data_GRACE grace = GRACE_NONE;
+    Chord *chord = NULL;
 
     if (length == 0) return;
 
@@ -793,9 +794,13 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
         // chords
         else if (musicCode[i] == '[' && musicCode[i] != ':') {
-            LogWarning("ABC input: Chords are not supported yet");
+            // start chord
+            chord = new Chord();
         }
-        else if  (musicCode[i] == ']') {
+        else if (musicCode[i] == ']') {
+            // end chord
+            m_noteStack.push_back(chord);
+            chord = NULL;
         }
 
         // grace notes
@@ -875,8 +880,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 num = num - num / 3;
             }
             if ((numbase & (numbase - 1)) != 0) LogError("ABC input: note length divider must be power of 2");
-            note->SetDots(dots);
-            note->SetDur(note->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
 
             // set grace
             if (grace != GRACE_NONE) {
@@ -894,8 +897,18 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 m_artic.clear();
             }
 
-            m_noteStack.push_back(note);
-            // m_layer->AddChild(note);
+            if (chord) {
+                chord->AddChild(note);
+                if (!chord->HasDur()) {
+                    chord->SetDots(dots);
+                    chord->SetDur(note->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
+                }
+            }
+            else {
+                note->SetDots(dots);
+                note->SetDur(note->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
+                m_noteStack.push_back(note);
+            }
         }
 
         // Spaces
