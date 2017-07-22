@@ -793,11 +793,11 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // chords
-        else if (musicCode[i] == '[' && musicCode[i] != ':') {
+        else if (musicCode[i] == '[' && musicCode[i + 2] != ':') {
             // start chord
             chord = new Chord();
         }
-        else if (musicCode[i] == ']') {
+        else if (musicCode[i] == ']' && musicCode[i - 1] != '|') {
             // end chord
             m_noteStack.push_back(chord);
             chord = NULL;
@@ -1063,11 +1063,15 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         i++;
     }
 
-    staff->AddChild(m_layer);
-    measure->AddChild(staff);
-    section->AddChild(measure);
+    // don't write empty layers
+    if (m_layer->GetChildCount()) {
+        staff->AddChild(m_layer);
+        measure->AddChild(staff);
+        section->AddChild(measure);
+    }
 
     // by default, line-breaks in the code generate line-breaks in the typeset score
+    // has to be refined later
     if (sysBreak) {
         Sb *sb = new Sb();
         section->AddChild(sb);
