@@ -244,11 +244,9 @@ private:
 
     // parsing functions
     int getBarLine(const char *incipit, data_BARRENDITION *output, int index);
-    int getNote(const char *incipit, abc::Note *note, abc::Measure *measure, int index = 0);
 
-    // output functions
     void addLayerElement(LayerElement *element);
-    void parseNote(abc::Note *note);
+    void calcUnitNoteLength();
     void AddBeam();
     void popContainer();
     void convertMeasure(abc::Measure *measure);

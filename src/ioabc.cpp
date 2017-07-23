@@ -145,6 +145,10 @@ void AbcInput::parseABC(std::istream &infile)
         m_lineNum++;
         readInformationField(abcLine[0], &abcLine[2], score);
     }
+    // calculate default unit note length
+    if (m_durDefault == DURATION_NONE) {
+        calcUnitNoteLength();
+    }
     // read music code
     while (!infile.eof()) {
         infile.getline(abcLine, 10000);
@@ -280,136 +284,22 @@ void AbcInput::convertMeasure(abc::Measure *measure)
 
     m_layerElements.clear();
 
-    for (unsigned int i = 0; i < measure->notes.size(); i++) {
-        abc::Note *note = &measure->notes[i];
-        parseNote(note);
-    }
-
     // Set barLine
     m_measure->SetRight(measure->barLine);
 }
 
-void AbcInput::parseNote(abc::Note *note)
+void AbcInput::calcUnitNoteLength()
 {
-
-    LayerElement *element;
-
-    if (note->rest) {
-        Rest *rest = new Rest();
-
-        rest->SetDots(note->dots);
-        rest->SetDur(note->duration);
-
-        if (note->fermata) {
-            rest->SetFermata(STAFFREL_basic_above); // always above for now
-        }
-
-        element = rest;
+    if (!m_doc->m_scoreDef.HasMeterUnit()
+        || double(m_doc->m_scoreDef.GetMeterCount()) / double(m_doc->m_scoreDef.GetMeterUnit()) >= 0.75) {
+        m_unitDur = 8;
+        m_durDefault = DURATION_8;
+        // m_doc->m_scoreDef.SetDurDefault(DURATION_8);
     }
     else {
-        Note *mnote = new Note();
-
-        mnote->SetPname(note->pitch);
-        mnote->SetOct(note->octave);
-        mnote->SetDots(note->dots);
-        mnote->SetDur(note->duration);
-
-        // pseudo chant notation with 7. in ABC - make quater notes without stem
-        if ((mnote->GetDur() == DURATION_128) && (mnote->GetDots() == 1)) {
-            mnote->SetDur(DURATION_4);
-            mnote->SetDots(0);
-            mnote->SetStemLen(0);
-        }
-
-        if (note->fermata) {
-            mnote->SetFermata(STAFFREL_basic_above); // always above for now
-        }
-
-        if (note->trill == true) {
-            Trill *trill = new Trill();
-            trill->SetStart(mnote);
-            m_measure->AddChild(trill);
-        }
-
-        if (m_last_tied_note != NULL) {
-            mnote->SetTie(TIE_t);
-            m_last_tied_note = NULL;
-        }
-
-        if (note->tie) {
-            if (mnote->GetTie() == TIE_t)
-                mnote->SetTie(TIE_m);
-            else
-                mnote->SetTie(TIE_i);
-            m_last_tied_note = mnote;
-        }
-
-        element = mnote;
-    }
-
-    // Does this note have a clef change? push it before everything else
-    if (note->clef) {
-        addLayerElement(note->clef);
-    }
-
-    // Same thing for time changes
-    // You can find this sometimes
-    if (note->meter) {
-        addLayerElement(note->meter);
-    }
-
-    // Acciaccaturas are similar but do not get beamed (do they)
-    // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
-    // Acciaccatura rests do not exist
-    if (note->acciaccatura && (element->Is(NOTE))) {
-        Note *mnote = dynamic_cast<Note *>(element);
-        assert(mnote);
-        mnote->SetDur(DURATION_8);
-        mnote->SetGrace(GRACE_acc);
-        mnote->SetStemDir(STEMDIRECTION_up);
-    }
-
-    if ((note->appoggiatura > 0) && (element->Is(NOTE))) {
-        Note *mnote = dynamic_cast<Note *>(element);
-        assert(mnote);
-        mnote->SetGrace(GRACE_unacc);
-        mnote->SetStemDir(STEMDIRECTION_up);
-    }
-
-    // note in a chord
-    if (note->chord) {
-        Note *mnote = dynamic_cast<Note *>(element);
-        assert(mnote);
-        // first note?
-        if (!m_is_in_chord) {
-            Chord *chord = new Chord();
-            chord->SetDots(mnote->GetDots());
-            chord->SetDur(mnote->GetDur());
-            pushContainer(chord);
-            m_is_in_chord = true;
-        }
-        mnote->SetDots(0);
-        mnote->SetDur(DURATION_NONE);
-    }
-
-    // Add the note to the current container
-    addLayerElement(element);
-
-    // the last note counts always '1'
-    // insert the tuplet elem
-    // and reset the tuplet counter
-    if (note->tuplet_note == 1) {
-        popContainer();
-    }
-
-    // last note of a chord
-    if (!note->chord && m_is_in_chord) {
-        Note *mnote = dynamic_cast<Note *>(element);
-        assert(mnote);
-        mnote->SetDots(0);
-        mnote->SetDur(DURATION_NONE);
-        popContainer();
-        m_is_in_chord = false;
+        m_unitDur = 16;
+        m_durDefault = DURATION_16;
+        // m_doc->m_scoreDef.SetDurDefault(DURATION_16);
     }
 }
 
@@ -616,15 +506,17 @@ void AbcInput::parseUnitNoteLength(std::string unitNoteLength)
 
 void AbcInput::parseMeter(std::string meterString)
 {
-    if (meterString == "C") {
-        m_doc->m_scoreDef.SetMeterSym(METERSIGN_common);
-        m_doc->m_scoreDef.SetMeterCount(4);
-        m_doc->m_scoreDef.SetMeterUnit(4);
-    }
-    else if (meterString == "C|") {
-        m_doc->m_scoreDef.SetMeterSym(METERSIGN_cut);
-        m_doc->m_scoreDef.SetMeterCount(2);
-        m_doc->m_scoreDef.SetMeterUnit(2);
+    if (meterString.find('C') != std::string::npos) {
+        if (meterString[meterString.find('C') + 1] == '|') {
+            m_doc->m_scoreDef.SetMeterSym(METERSIGN_cut);
+            m_doc->m_scoreDef.SetMeterCount(2);
+            m_doc->m_scoreDef.SetMeterUnit(2);
+        }
+        else {
+            m_doc->m_scoreDef.SetMeterSym(METERSIGN_common);
+            m_doc->m_scoreDef.SetMeterCount(4);
+            m_doc->m_scoreDef.SetMeterUnit(4);
+        }
     }
     else if (meterString.find('/')) {
         std::string meterCount = meterString.substr(0, meterString.find('/'));
@@ -701,21 +593,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
     int length = int(strlen(musicCode));
     int i = 0;
     bool sysBreak = true;
-
-    // calculate default unit note length
-    // if (!m_doc->m_scoreDef.HasDurDefault()) {
-    if (!m_doc->m_scoreDef.HasMeterUnit()
-        || double(m_doc->m_scoreDef.GetMeterCount()) / double(m_doc->m_scoreDef.GetMeterUnit()) >= 0.75) {
-        m_unitDur = 8;
-        m_durDefault = DURATION_8;
-        // m_doc->m_scoreDef.SetDurDefault(DURATION_8);
-    }
-    else {
-        m_unitDur = 16;
-        m_durDefault = DURATION_16;
-        // m_doc->m_scoreDef.SetDurDefault(DURATION_16);
-    }
-    //}
 
     data_GRACE grace = GRACE_NONE;
     Chord *chord = NULL;
