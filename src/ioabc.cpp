@@ -269,34 +269,6 @@ int AbcInput::getBarLine(const char *music, data_BARRENDITION *output, int index
 
 //////////////////////////////
 //
-// getAbbreviation -- read abbreviation
-//
-
-int AbcInput::getAbbreviation(const char *music, abc::Measure *measure, int index)
-{
-    int length = (int)strlen(music);
-    int i = index;
-    int j;
-
-    if (measure->abbreviation_offset == -1) { // start
-        measure->abbreviation_offset = (int)measure->notes.size();
-    }
-    else { //
-        int abbreviation_stop = (int)measure->notes.size();
-        while ((i + 1 < length) && (music[i + 1] == 'f')) {
-            i++;
-            for (j = measure->abbreviation_offset; j < abbreviation_stop; j++) {
-                measure->notes.push_back(measure->notes[j]);
-            }
-        }
-        measure->abbreviation_offset = -1;
-    }
-
-    return i - index;
-}
-
-//////////////////////////////
-//
 // convertMeasure --
 //
 
@@ -304,12 +276,6 @@ void AbcInput::convertMeasure(abc::Measure *measure)
 {
     if (measure->clef != NULL) {
         m_layer->AddChild(measure->clef);
-    }
-
-    if (measure->multirest > 0) {
-        MultiRest *mr = new MultiRest();
-        mr->SetNum(measure->multirest);
-        m_layer->AddChild(mr);
     }
 
     m_layerElements.clear();
@@ -477,7 +443,10 @@ void AbcInput::addLayerElement(LayerElement *element)
 
 void AbcInput::AddBeam()
 {
-    if (m_noteStack.size() == 1) {
+    if (!m_noteStack.size()) {
+        return;
+    }
+    else if (m_noteStack.size() == 1) {
         m_layer->AddChild(m_noteStack.back());
     }
     else {
@@ -761,25 +730,27 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
     while (i < length) {
         // eat the input...
 
+        if (musicCode[i] == '`') {
+            // keeps a beam
+        }
         if (isspace(musicCode[i])) {
             // always ends a beam
             AddBeam();
         }
 
         // linebreaks
-        if (musicCode[i] == m_linebreak) {
+        else if (musicCode[i] == m_linebreak) {
             Sb *sb = new Sb();
             section->AddChild(sb);
         }
 
         // decorations
-        if (shorthandDecoration.find(musicCode[i]) != std::string::npos) {
+        else if (shorthandDecoration.find(musicCode[i]) != std::string::npos) {
             std::string shorthandDecorationString;
             shorthandDecorationString.push_back(musicCode[i]);
-            i++;
             parseDecoration(shorthandDecorationString);
         }
-        if (musicCode[i] == m_decoration) {
+        else if (musicCode[i] == m_decoration) {
             i++;
             std::string decorationString;
             while (musicCode[i] != m_decoration) {
@@ -908,7 +879,13 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             else {
                 note->SetDots(dots);
                 note->SetDur(note->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
-                m_noteStack.push_back(note);
+                if (note->GetDur() < DURATION_8) {
+                    // if note cannot beamed, write it directly to the layer
+                    if (m_noteStack.size() > 0) AddBeam();
+                    m_layer->AddChild(note);
+                }
+                else
+                    m_noteStack.push_back(note);
             }
         }
 
@@ -1043,7 +1020,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             AddBeam();
             if (musicCode[i + 1] == ':')
                 measure->SetLeft(BARRENDITION_rptstart);
-            else if (musicCode[i + 1]) {
+            else {
                 if (musicCode[i - 1] == ':')
                     measure->SetRight(BARRENDITION_rptend);
                 else if (musicCode[i + 1] == '|')
@@ -1064,7 +1041,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         i++;
     }
 
-    // don't write empty layers
+    // in case of not empty layer
     if (m_layer->GetChildCount()) {
         staff->AddChild(m_layer);
         measure->AddChild(staff);

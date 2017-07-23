@@ -244,8 +244,6 @@ private:
 
     // parsing functions
     int getBarLine(const char *incipit, data_BARRENDITION *output, int index);
-    int getMultiRest(const char *incipit, int *multirest, int index);
-    int getAbbreviation(const char *incipit, abc::Measure *measure, int index = 0);
     int getNote(const char *incipit, abc::Note *note, abc::Measure *measure, int index = 0);
 
     // output functions
