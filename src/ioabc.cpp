@@ -389,7 +389,10 @@ void AbcInput::parseDecoration(std::string decorationString)
 
 void AbcInput::parseInstruction(std::string instruction)
 {
-    if (!strncmp(instruction.c_str(), "linebreak", 8)) {
+    if (!strncmp(instruction.c_str(), "abc-include", 11)) {
+        LogWarning("ABC input: Include field is ignored");
+    }
+    else if (!strncmp(instruction.c_str(), "linebreak", 8)) {
         LogWarning("ABC input: Default linebreak is used for now.");
     }
     else if (!strncmp(instruction.c_str(), "decoration", 10)) {
@@ -538,7 +541,7 @@ void AbcInput::parseTempo(std::string tempoString)
 void AbcInput::parseReferenceNumber(std::string referenceNumberString)
 {
     // as it is not possible to SetN on mdiv we put it on scoreDef for now
-    m_doc->m_scoreDef.SetType(referenceNumberString.c_str());
+    m_doc->m_scoreDef.SetType(("X:" + referenceNumberString).c_str());
 }
 
 //////////////////////////////
@@ -574,7 +577,7 @@ void AbcInput::readInformationField(char dataKey, std::string value, Score *scor
     }
     else if (dataKey == 'X') {
         // re-adding dataKey for complete string
-        parseReferenceNumber("X:" + value);
+        parseReferenceNumber(value);
     }
     else
         LogWarning("ABC input: information field %c is ignored", dataKey);

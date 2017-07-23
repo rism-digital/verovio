@@ -277,7 +277,7 @@ private:
     Layer *m_layer;
 
     std::vector<data_ARTICULATION> m_artic;
-    data_DURATION m_durDefault = DURATION_NONE;
+    data_DURATION m_durDefault = DURATION_NONE; // todo: switch to MEI
     int m_unitDur;
     char m_decoration = '!';
     char m_linebreak = '$';
