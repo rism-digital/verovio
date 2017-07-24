@@ -803,7 +803,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             space->SetDur(space->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
 
             m_noteStack.push_back(space);
-            // m_layer->AddChild(space);
         }
 
         // Padding
@@ -845,7 +844,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             rest->SetDur(rest->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
 
             m_noteStack.push_back(rest);
-            // m_layer->AddChild(rest);
         }
 
         // Multi-measure rests
@@ -880,8 +878,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // remarks
-        else if (musicCode[i] == '[' && musicCode[i + 1] == 'r') {
-            i += 3;
+        else if (musicCode[i] == 'r') {
+            i += 2;
             Annot *annot = new Annot();
             std::string remark;
             while (musicCode[i] != ']') {
@@ -891,7 +889,13 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             Text *text = new Text();
             text->SetText(UTF8to16(remark));
             annot->AddChild(text);
-            m_layer->AddChild(annot);
+            if (chord) {
+                chord->AddChild(annot);
+            }
+            else {
+                // will not work within beams
+                m_layer->AddChild(annot);
+            }
         }
 
         // barLine
