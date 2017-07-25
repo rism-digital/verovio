@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul 19 22:20:39 CEST 2017
+// Last Modified: Tue Jul 25 16:11:51 CEST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2465,6 +2465,78 @@ void GridMeasure::addLayoutParameter(GridSlice* slice, int partindex, const stri
 
 //////////////////////////////
 //
+// GridMeasure::addDynamicsLayoutParameters --
+//
+
+void GridMeasure::addDynamicsLayoutParameters(GridSlice* slice, int partindex,
+		const string& locomment) {
+	auto iter = this->rbegin();
+	if (iter == this->rend()) {
+		// something strange happened: expecting at least one item in measure.
+		return;
+	}
+	GridPart* part;
+
+	while ((iter != this->rend()) && (*iter != slice)) {
+		iter++;
+	}
+
+	if (*iter != slice) {
+		// cannot find owning line.
+		return;
+	}
+
+	auto previous = iter;
+	previous++;
+	while (previous != this->rend()) {
+		if ((*previous)->isLayoutSlice()) {
+			part = (*previous)->at(partindex);
+			if ((part->getDynamics() == NULL) || (*part->getDynamics() == "!")) {
+				HTp token = new HumdrumToken(locomment);
+				part->setDynamics(token);
+				return;
+			} else {
+				previous++;
+				continue;
+			}
+		} else {
+			break;
+		}
+	}
+
+	auto insertpoint = previous.base();
+	GridSlice* newslice = new GridSlice(this, (*iter)->getTimestamp(), SliceType::Layouts);	
+	newslice->initializeBySlice(*iter);
+	this->insert(insertpoint, newslice);
+
+	HTp newtoken = new HumdrumToken(locomment);
+	newslice->at(partindex)->setDynamics(newtoken);
+}
+
+
+
+//////////////////////////////
+//
+// operator<< --
+//
+
+ostream& operator<<(ostream& output, GridMeasure* measure) {
+	output << *measure;
+	return output;
+}
+
+ostream& operator<<(ostream& output, GridMeasure& measure) {
+	for (auto item : measure) {
+		output << item << endl;
+	}
+	return output;
+}
+
+
+
+
+//////////////////////////////
+//
 // GridPart::GridPart -- Constructor.
 //
 
@@ -2654,10 +2726,10 @@ void GridSide::setHarmony(HTp token) {
 
 //////////////////////////////
 //
-// GridSide::setDynamic --
+// GridSide::setDynamics --
 //
 
-void GridSide::setDynamic(HTp token) {
+void GridSide::setDynamics(HTp token) {
 	if (m_dynamics) {
 		delete m_dynamics;
 		m_dynamics = NULL;
@@ -2987,7 +3059,8 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 		int maxhcount = getHarmonyCount(p);
 		int maxvcount = getVerseCount(p, -1);
 		int maxdcount = getDynamicsCount(p);
-		transferSides(*line, part, empty, maxvcount, maxhcount, maxdcount);
+
+		transferSides(*line, part, p, empty, maxvcount, maxhcount, maxdcount);
 	}
 
 	outfile.appendLine(line);
@@ -3091,7 +3164,8 @@ int GridSlice::getDynamicsCount(int partindex, int staffindex) {
 
 // this version is used to transfer Sides from the Part
 void GridSlice::transferSides(HumdrumLine& line, GridPart& sides,
-		const string& empty, int maxvcount, int maxhcount, int maxdcount) {
+		int partindex, const string& empty, int maxvcount, int maxhcount,
+		int maxdcount) {
 
 	int hcount = sides.getHarmonyCount();
 	int vcount = sides.getVerseCount();
@@ -3537,7 +3611,6 @@ void GridStaff::appendTokenLayer(int layerindex, HTp token, HumNum duration,
 
 int GridStaff::getMaxVerseCount(void) {
 	return 5;
-// ggg
 }
 
 
@@ -4519,8 +4592,6 @@ void HumGrid::adjustExpansionsInStaff(GridSlice* newmanip, GridSlice* curr, int 
 		}
 
 	}
-
-// ggg
 }
 
 
@@ -5581,7 +5652,6 @@ void HumGrid::extendDurationToken(int slicei, int parti, int staffi,
 	}
 	// walk through zero-dur items and fill them in, but stop at
 	// a token (likely a grace note which should not be erased).
-// ggg
 
 }
 
@@ -29378,7 +29448,9 @@ void Tool_dissonant::findAppoggiaturas(vector<vector<string> >& results, NoteGri
 					results[vindex][lineindexp] = m_labels[DBL_NEIGHBOR_DOWN];
 					results[vindex][lineindex]  = m_labels[DBL_NEIGHBOR_DOWN];									
 				} else if (((fabs(intp) > 1) || ant_leapt_to) && 
-						   ((lev <= levn) && (dur <= durn))) { // upper appoggiatura
+						   ((lev <= levn) && (dur <= durn)) &&
+						   ((results[vindex][lineindex] == m_labels[UNLABELED_Z7]) ||
+						    (results[vindex][lineindex] == m_labels[UNLABELED_Z4]))) { // upper appoggiatura
 					results[vindex][lineindex] = m_labels[APP_UPPER];
 				}
 			} else if (intn == 1) {
@@ -29390,7 +29462,9 @@ void Tool_dissonant::findAppoggiaturas(vector<vector<string> >& results, NoteGri
 					results[vindex][lineindexp] = m_labels[DBL_NEIGHBOR_UP];
 					results[vindex][lineindex]  = m_labels[DBL_NEIGHBOR_UP];					
 				} else if (((fabs(intp) > 1) || ant_leapt_to) && 
-						   ((lev <= levn) && (dur <= durn))) { // lower appoggiatura
+						   ((lev <= levn) && (dur <= durn)) &&
+						   ((results[vindex][lineindex] == m_labels[UNLABELED_Z7]) ||
+						    (results[vindex][lineindex] == m_labels[UNLABELED_Z4]))) { // lower appoggiatura
 					results[vindex][lineindex] = m_labels[APP_LOWER];
 				}
 			}
@@ -34056,6 +34130,7 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 		bool dynstate = partdata[p].hasDynamics();
 		if (dynstate) {
 			outdata.setDynamicsPresent(p);
+			break;
 		}
 	}
 
@@ -34811,9 +34886,17 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 
 	if (m_current_dynamic) {
 		event->setDynamics(m_current_dynamic);
+		string dparam = getDynamicsParameters(m_current_dynamic);
 		m_current_dynamic = xml_node(NULL);
 		event->reportDynamicToOwner();
 		addDynamic(slice->at(partindex), event);
+		if (dparam != "") {
+			GridMeasure *gm = slice->getMeasure();
+			string fullparam = "!LO:DY" + dparam;
+			if (gm) {
+				gm->addDynamicsLayoutParameters(slice, partindex, fullparam);
+			}
+		}
 	}
 }
 
@@ -34935,11 +35018,32 @@ void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int part
 //      <sound dynamics="140.00"/>
 //      </direction>
 //
+// Hairpins:
+//      <direction placement="below">
+//        <direction-type>
+//          <wedge default-y="-75" number="2" spread="15" type="diminuendo"/>
+//        </direction-type>
+//      </direction>
+//
+//      <direction>
+//        <direction-type>
+//          <wedge spread="15" type="stop"/>
+//        </direction-type>
+//      </direction>
+//
 
 void Tool_musicxml2hum::addDynamic(GridPart* part, MxmlEvent* event) {
 	xml_node direction = event->getDynamics();
 	if (!direction) {
 		return;
+	}
+	xml_attribute placement = direction.attribute("placement");
+	bool above = false;
+	if (placement) {
+		string value = placement.value();
+		if (value == "above") {
+			above = true;
+		}
 	}
 	xml_node child = direction.first_child();
 	if (!child) {
@@ -34952,16 +35056,126 @@ void Tool_musicxml2hum::addDynamic(GridPart* part, MxmlEvent* event) {
 	if (!grandchild) {
 		return;
 	}
-	if (!nodeType(grandchild, "dynamics")) {
+
+	if (!(nodeType(grandchild, "dynamics") || nodeType(grandchild, "wedge"))) {
 		return;
 	}
-	xml_node dynamic = grandchild.first_child();
-	if (!dynamic) {
-		return;
+
+	if (nodeType(grandchild, "dynamics")) {
+		xml_node dynamic = grandchild.first_child();
+		if (!dynamic) {
+			return;
+		}
+		string dstring = getDynamicString(dynamic);
+		HTp dtok = new HumdrumToken(dstring);
+		part->setDynamics(dtok);
+	} else if (nodeType(grandchild, "wedge")) {
+		xml_node hairpin = grandchild;
+		if (!hairpin) {
+			return;
+		}
+		string hstring = getHairpinString(hairpin);
+		HTp htok = new HumdrumToken(hstring);
+		if ((hstring != "[") && (hstring != "]") && above) {
+			htok->setValue("LO", "DY", "a", "true");
+		}
+		part->setDynamics(htok);
 	}
-	string dstring = getDynamicString(dynamic);
-	HTp dtok = new HumdrumToken(dstring);
-	part->setDynamic(dtok);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::getDynanmicsParameters --  Already presumed to be a dynamic.
+//
+
+string Tool_musicxml2hum::getDynamicsParameters(xml_node element) {
+	string output;
+	if (!nodeType(element, "direction")) {
+		return output;
+	}
+
+	xml_attribute placement = element.attribute("placement");
+	if (!placement) {
+		return output;
+	}
+	string value = placement.value();
+	if (value == "above") {
+		output = ":a";
+	}
+	xml_node child = element.first_child();
+	if (!child) {
+		return output;
+	}
+	if (!nodeType(child, "direction-type")) {
+		return output;
+	}
+	xml_node grandchild = child.first_child();
+	if (!grandchild) {
+		return output;
+	}
+	if (!nodeType(grandchild, "wedge")) {
+		return output;
+	}
+
+	xml_attribute wtype = grandchild.attribute("type");
+	if (!wtype) {
+		return output;
+	}
+	string value2 = wtype.value();
+	if (value2 == "stop") {
+		// don't apply parameters to ends of hairpins.
+		output = "";
+	}
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::getHairpinString --
+//
+// Hairpins:
+//      <direction placement="below">
+//        <direction-type>
+//          <wedge default-y="-75" number="2" spread="15" type="diminuendo"/>
+//        </direction-type>
+//      </direction>
+//
+//      <direction>
+//        <direction-type>
+//          <wedge spread="15" type="stop"/>
+//        </direction-type>
+//      </direction>
+//
+
+string Tool_musicxml2hum::getHairpinString(xml_node element) {
+	static char stopchar = '[';
+	if (nodeType(element, "wedge")) {
+		xml_attribute wtype = element.attribute("type");
+		if (!wtype) {
+			return "???";
+		}
+		string output;
+		string wstring = wtype.value();
+		if (wstring == "diminuendo") {
+			stopchar = ']';
+			output = '>';
+		} else if (wstring == "crescendo") {
+			stopchar = '[';
+			output = '<';
+		} else if (wstring == "stop") {
+			output = stopchar;
+		} else {
+			output = "???";
+		}
+		return output;
+	}
+
+	return "???";
 }
 
 
@@ -35414,6 +35628,8 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 					if (nodeType(grandchild, "words")) {
 						m_current_text.push_back(element);
 					} else if (nodeType(grandchild, "dynamics")) {
+						m_current_dynamic = element;
+					} else if (nodeType(grandchild, "wedge")) {
 						m_current_dynamic = element;
 					}
 				}

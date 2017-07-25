@@ -2752,6 +2752,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             handleOttavaMark(layerdata[i], note);
             handlePedalMark(layerdata[i]);
             handleStaffStateVariables(layerdata[i]);
+            handleStaffDynamStateVariables(layerdata[i]);
             if (layerdata[i]->getDurationFromStart() != 0) {
                 if (layerdata[i]->isClef()) {
                     Clef *clef = insertClefElement(elements, pointers, layerdata[i]);
@@ -3550,7 +3551,15 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     int startfield = token->getFieldIndex() + 1;
 
     bool forceAboveQ = false;
-    if (ss[staffindex].verse) {
+    bool forceBelowQ = false;
+
+    if (ss[staffindex].m_dynampos > 0) {
+        forceAboveQ = true;
+    }
+    else if (ss[staffindex].m_dynampos < 0) {
+        forceBelowQ = true;
+    }
+    else if (ss[staffindex].verse) {
         forceAboveQ = true;
     }
 
@@ -3576,17 +3585,18 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             setLocationId(dynam, token, -1);
             hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
             dynam->SetTstamp(barstamp.getFloat());
+
             if (aboveQ) {
-                // 300: dynam->SetPlace(STAFFREL_above);
                 setPlace(dynam, "above");
             }
             else if (belowQ) {
-                // 300: dynam->SetPlace(STAFFREL_below);
                 setPlace(dynam, "below");
             }
             else if (forceAboveQ) {
-                // 300: dynam->SetPlace(STAFFREL_above);
                 setPlace(dynam, "above");
+            }
+            else if (forceBelowQ) {
+                setPlace(dynam, "below");
             }
         }
     }
@@ -3605,7 +3615,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         if (!(line->token(i)->isDataType("**dynam") || line->token(i)->isDataType("**dyn"))) {
             continue;
         }
-        // Don't skipp NULL tokens, because this algorithm only prints dynamics
+        // Don't skip NULL tokens, because this algorithm only prints dynamics
         // after the last layer, and there could be notes in earlier layer
         // that need the dynamic.
         // if (line->token(i)->isNull()) {
@@ -3695,6 +3705,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         if (!dynamic.empty()) {
             bool aboveQ = line->token(i)->getValueBool("LO", "DY", "a");
             bool belowQ = line->token(i)->getValueBool("LO", "DY", "b");
+
             if (line->token(i)->isDefined("LO", "DY", "Z")) {
                 aboveQ = true;
             }
@@ -3711,16 +3722,16 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             dynam->SetTstamp(barstamp.getFloat());
 
             if (aboveQ) {
-                // 300: dynam->SetPlace(STAFFREL_above);
                 setPlace(dynam, "above");
             }
             else if (belowQ) {
-                // 300: dynam->SetPlace(STAFFREL_below);
                 setPlace(dynam, "below");
             }
             else if (forceAboveQ) {
-                // 300: dynam->SetPlace(STAFFREL_above);
                 setPlace(dynam, "above");
+            }
+            else if (forceBelowQ) {
+                setPlace(dynam, "below");
             }
         }
         if (hairpins.find("<") != string::npos) {
@@ -3732,14 +3743,15 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 endtok = getCrescendoEnd(line->token(i));
             }
             if (endtok != NULL) {
-                bool aboveQ = line->token(i)->getValueBool("LO", "DY", "a");
-                bool belowQ = line->token(i)->getValueBool("LO", "DY", "b");
-                if (line->token(i)->isDefined("LO", "DY", "Z")) {
+                bool aboveQ = line->token(i)->getValueBool("LO", "HP", "a");
+                bool belowQ = line->token(i)->getValueBool("LO", "HP", "b");
+                if (line->token(i)->isDefined("LO", "HP", "Z")) {
                     aboveQ = true;
                 }
-                else if (line->token(i)->isDefined("LO", "DY", "Y")) {
+                else if (line->token(i)->isDefined("LO", "HP", "Y")) {
                     belowQ = true;
                 }
+
                 Hairpin *hairpin = new Hairpin;
                 setStaff(hairpin, m_currentstaff);
                 setLocationId(hairpin, line->token(i), -1);
@@ -3751,17 +3763,18 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_cres);
                 m_measure->AddChild(hairpin);
+
                 if (aboveQ) {
-                    // 300: hairpin->SetPlace(STAFFREL_above);
                     setPlace(hairpin, "above");
                 }
                 else if (belowQ) {
-                    // 300: hairpin->SetPlace(STAFFREL_below);
                     setPlace(hairpin, "below");
                 }
                 else if (forceAboveQ) {
-                    // 300: hairpin->SetPlace(STAFFREL_above);
                     setPlace(hairpin, "above");
+                }
+                else if (forceBelowQ) {
+                    setPlace(hairpin, "below");
                 }
             }
         }
@@ -3774,12 +3787,12 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 endtok = getDecrescendoEnd(line->token(i));
             }
             if (endtok != NULL) {
-                bool aboveQ = line->token(i)->getValueBool("LO", "DY", "a");
-                bool belowQ = line->token(i)->getValueBool("LO", "DY", "b");
-                if (line->token(i)->isDefined("LO", "DY", "Z")) {
+                bool aboveQ = line->token(i)->getValueBool("LO", "HP", "a");
+                bool belowQ = line->token(i)->getValueBool("LO", "HP", "b");
+                if (line->token(i)->isDefined("LO", "HP", "Z")) {
                     aboveQ = true;
                 }
-                else if (line->token(i)->isDefined("LO", "DY", "Y")) {
+                else if (line->token(i)->isDefined("LO", "HP", "Y")) {
                     belowQ = true;
                 }
                 Hairpin *hairpin = new Hairpin;
@@ -3799,7 +3812,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
                 else if (belowQ) {
                     // 300: hairpin->SetPlace(STAFFREL_below);
-                    setPlace(hairpin, "above");
+                    setPlace(hairpin, "below");
                 }
                 else if (forceAboveQ) {
                     // 300: hairpin->SetPlace(STAFFREL_above);
@@ -5157,15 +5170,15 @@ hum::HumNum HumdrumInput::removeFactorsOfTwo(hum::HumNum value, int &tcount, int
 //////////////////////////////
 //
 // HumdrumInput::handleStaffStateVariables -- Deal with simple boolean switches
-//     that are turned on/off by interpretation tokes.
+//     that are turned on/off by interpretation tokens.
 //
 // Controls that this function deals with:
-// *Xtuplet = suppress beam and bracket tuplet numbers
-// *tuplet = display beam and bracket tuplet numbers
-// *Xbeamtup = suppress beam tuplet numbers
-// *beamtup  = display beam tuplet numbers
-// *Xbrackettup = suppress tuplet brackets
-// *brackettup  = display tuplet brackets
+//    *Xtuplet = suppress beam and bracket tuplet numbers
+//    *tuplet = display beam and bracket tuplet numbers
+//    *Xbeamtup = suppress beam tuplet numbers
+//    *beamtup  = display beam tuplet numbers
+//    *Xbrackettup = suppress tuplet brackets
+//    *brackettup  = display tuplet brackets
 //
 
 void HumdrumInput::handleStaffStateVariables(hum::HTp token)
@@ -5192,6 +5205,43 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
     if (value == "*tuplet") {
         ss[staffindex].suppress_beam_tuplet = false;
         ss[staffindex].suppress_bracket_tuplet = false;
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::handleStaffDynamStateVariables -- Deal with simple boolean switches
+//     that are turned on/off by interpretation tokens in **dynam spines.
+//
+// NB: need to set to part level rather than staff level?
+//
+// Controls that this function deals with:
+//    *above = Force all dynamics above staff.
+//    *below = Force all dynamics above staff.
+//    *center = Force all dynamics to be centered between this staff and the one below.
+//
+
+void HumdrumInput::handleStaffDynamStateVariables(hum::HTp token)
+{
+    int staffindex = m_currentstaff - 1;
+    std::string value = *token;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+
+    hum::HTp tok = token->getNextFieldToken();
+    while ((tok != NULL) && (!tok->isKern())) {
+        if (!tok->isDataType("**dynam")) {
+            continue;
+        }
+        if (*tok == "*above") {
+            ss[staffindex].m_dynampos = +1;
+        }
+        else if (*tok == "*below") {
+            ss[staffindex].m_dynampos = -1;
+        }
+        else if (*tok == "*centered") {
+            ss[staffindex].m_dynampos = 0;
+        }
+        tok = tok->getNextFieldToken();
     }
 }
 

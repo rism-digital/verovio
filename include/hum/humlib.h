@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul 19 22:20:39 CEST 2017
+// Last Modified: Tue Jul 25 16:11:51 CEST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2594,7 +2594,7 @@ class GridSide {
 		HTp   getHarmony        (void);
 
 		int   getDynamicsCount  (void);
-		void  setDynamic        (HTp token);
+		void  setDynamics       (HTp token);
 		void  detachDynamics    (void);
 		HTp   getDynamics       (void);
 
@@ -2666,6 +2666,7 @@ class GridMeasure : public list<GridSlice*> {
 		bool         isRepeatBoth(void) 
 		                  { return m_style == MeasureStyle::RepeatBoth; }
 		void         addLayoutParameter(GridSlice* slice, int partindex, const string& locomment);
+		void         addDynamicsLayoutParameters(GridSlice* slice, int partindex, const string& locomment);
 
 	protected:
 		void         appendInitialBarline(HumdrumFile& infile);
@@ -2677,6 +2678,9 @@ class GridMeasure : public list<GridSlice*> {
 		HumNum       m_timesigdur;
 		MeasureStyle m_style;
 };
+
+ostream& operator<<(ostream& output, GridMeasure& measure);
+ostream& operator<<(ostream& output, GridMeasure* measure);
 
 
 class HumGrid;
@@ -2724,8 +2728,9 @@ class GridSlice : public vector<GridPart*> {
 		                           const string& empty, int maxvcount,
 		                           int maxhcount);
 		void transferSides        (HumdrumLine& line, GridPart& sides, 
-		                           const string& empty, int maxvcount,
-		                           int maxhcount, int maxdcount);
+		                           int partindex, const string& empty,
+		                           int maxvcount, int maxhcount,
+		                           int maxdcount);
 		int getVerseCount         (int partindex, int staffindex);
 		int getHarmonyCount       (int partindex, int staffindex = -1);
 		int getDynamicsCount      (int partindex, int staffindex = -1);
@@ -4249,6 +4254,8 @@ class Tool_musicxml2hum : public HumTool {
 		void addText           (GridSlice* slice, GridMeasure* measure, int partindex, xml_node node);
 		string getHarmonyString(xml_node hnode);
 		string getDynamicString(xml_node element);
+		string getDynamicsParameters(xml_node element);
+		string getHairpinString(xml_node element);
 		string cleanSpaces     (const string& input);
 		void checkForDummyRests(MxmlMeasure* measure);
 		void reindexVoices     (vector<MxmlPart>& partdata);
