@@ -5230,6 +5230,7 @@ void HumdrumInput::handleStaffDynamStateVariables(hum::HTp token)
     hum::HTp tok = token->getNextFieldToken();
     while ((tok != NULL) && (!tok->isKern())) {
         if (!tok->isDataType("**dynam")) {
+            tok = tok->getNextFieldToken();
             continue;
         }
         if (*tok == "*above") {

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jul 25 16:11:51 CEST 2017
+// Last Modified: Wed Jul 26 00:46:52 CEST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2696,15 +2696,15 @@ class GridSlice : public vector<GridPart*> {
 		          GridSlice* slice);
 		~GridSlice();
 
-		bool isNoteSlice(void)     { return m_type == SliceType::Notes; }
-		bool isGraceSlice(void)    { return m_type == SliceType::GraceNotes; }
-		bool isMeasureSlice(void)  { return m_type == SliceType::Measures; }
-		bool isClefSlice(void)     { return m_type == SliceType::Clefs; }
-		bool isTimeSigSlice(void)  { return m_type == SliceType::TimeSigs; }
-		bool isMeterSigSlice(void) { return m_type == SliceType::MeterSigs; }
+		bool isNoteSlice(void)        { return m_type == SliceType::Notes;      }
+		bool isGraceSlice(void)       { return m_type == SliceType::GraceNotes; }
+		bool isMeasureSlice(void)     { return m_type == SliceType::Measures;   }
+		bool isClefSlice(void)        { return m_type == SliceType::Clefs;      }
+		bool isTimeSigSlice(void)     { return m_type == SliceType::TimeSigs;   }
+		bool isMeterSigSlice(void)    { return m_type == SliceType::MeterSigs;  }
 		bool isManipulatorSlice(void) { return m_type==SliceType::Manipulators; }
-		bool isLayoutSlice(void)   { return m_type ==  SliceType::Layouts; }
-		bool isInvalidSlice(void)  { return m_type == SliceType::Invalid; }
+		bool isLayoutSlice(void)      { return m_type ==  SliceType::Layouts;   }
+		bool isInvalidSlice(void)     { return m_type == SliceType::Invalid;    }
 		bool isInterpretationSlice(void);
 		bool isDataSlice(void);
 		SliceType getType(void)    { return m_type; }
