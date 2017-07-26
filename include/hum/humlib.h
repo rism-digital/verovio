@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul 26 00:46:52 CEST 2017
+// Last Modified: Wed Jul 26 14:00:22 CEST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -4199,6 +4199,9 @@ class Tool_musicxml2hum : public HumTool {
 		                              vector<MxmlPart>& partdata, HumNum nowtime);
 		void   addEventToList        (vector<vector<vector<vector<MxmlEvent*> > > >& list, 
 		                              MxmlEvent* event);
+		void   addHeaderRecords      (HumdrumFile& outfile, xml_document& doc);
+		void   addFooterRecords      (HumdrumFile& outfile, xml_document& doc);
+		string cleanSpaces           (string& input);
 
 		bool convert          (ostream& out);
 		bool convertPart      (ostream& out, const string& partname,

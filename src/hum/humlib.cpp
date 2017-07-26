@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul 26 00:46:52 CEST 2017
+// Last Modified: Wed Jul 26 14:00:22 CEST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -34077,6 +34077,7 @@ bool Tool_musicxml2hum::convert(ostream& out, const char* input) {
 
 bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 
+
 	initialize();
 
 	bool status = true; // for keeping track of problems in conversion process.
@@ -34142,7 +34143,10 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	// set the duration of the last slice
 
 	HumdrumFile outfile;
+
 	outdata.transferTokens(outfile);
+	addHeaderRecords(outfile, doc);
+	addFooterRecords(outfile, doc);
 
 
 	for (int i=0; i<outfile.getLineCount(); i++) {
@@ -34166,6 +34170,104 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	}
 
 	return status;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::cleanSpaces --
+//
+
+string Tool_musicxml2hum::cleanSpaces(string& input) {
+	for (int i=0; i<(int)input.size(); i++) {
+		if (std::isspace(input[i])) {
+			input[i] = ' ';
+		}
+	}
+	return input;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::addHeaderRecords -- Inserted in reverse order
+//      (last record inserted first).
+//
+
+void Tool_musicxml2hum::addHeaderRecords(HumdrumFile& outfile, xml_document& doc) {
+	string xpath;
+	HumRegex hre;
+
+	// OTL: title //////////////////////////////////////////////////////////
+	xpath = "/score-partwise/movement-title";
+	string title = cleanSpaces(doc.select_single_node(xpath.c_str()).node().child_value());
+	if (title != "") {
+		string otl_record = "!!!OTL:\t";
+		otl_record += title;
+		outfile.insertLine(0, otl_record);
+	}
+
+	// COM: composer /////////////////////////////////////////////////////////
+	// CDT: composer's dates
+	xpath = "/score-partwise/identification/creator[@type='composer']";
+	string composer = cleanSpaces(doc.select_single_node(xpath.c_str()).node().child_value());
+	string cdt_record;
+	if (composer != "") {
+		if (hre.search(composer, R"(\((.*?\d.*?)\))")) {
+			string dates = hre.getMatch(1);
+			// hre.replaceDestructive(composer, "", R"(\()" + dates + R"(\))");
+			auto loc = composer.find(dates);
+			if (loc != std::string::npos) {
+				composer.replace(loc-1, dates.size()+2, "");
+			}
+			hre.replaceDestructive(composer, "", R"(^\s+)");
+			hre.replaceDestructive(composer, "", R"(\s+$)");
+			if (hre.search(composer, R"(([^\s]+) +([^\s]+))")) {
+				composer = hre.getMatch(2) + ", " + hre.getMatch(1);
+			}
+			if (dates != "") {
+				if (hre.search(dates, R"(\b(\d{4})\?)")) {
+					string replacement = "~";
+					replacement += hre.getMatch(1);
+					hre.replaceDestructive(dates, replacement, R"(\b\d{4}\?)");
+					cdt_record = "!!!CDT:\t";
+					cdt_record += dates;
+				}
+			}
+		}
+	}
+
+	if (cdt_record != "") {
+		outfile.insertLine(0, cdt_record);
+	}
+
+	if (composer != "") {
+		string com_record = "!!!COM:\t";
+		com_record += composer;
+		outfile.insertLine(0, com_record);
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::addFooterRecords --
+//
+
+void Tool_musicxml2hum::addFooterRecords(HumdrumFile& outfile, xml_document& doc) {
+
+	// YEM: copyright
+	string copy = doc.select_single_node("/score-partwise/identification/rights").node().child_value();
+	if (copy != "") {
+		string yem_record = "!!!YEM:\t";
+		yem_record += copy;
+		outfile.appendLine(yem_record);
+	}
+
 }
 
 
