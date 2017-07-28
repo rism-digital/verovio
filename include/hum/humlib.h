@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul 26 14:00:22 CEST 2017
+// Last Modified: Wed Jul 26 16:50:20 CEST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -4202,6 +4202,8 @@ class Tool_musicxml2hum : public HumTool {
 		void   addHeaderRecords      (HumdrumFile& outfile, xml_document& doc);
 		void   addFooterRecords      (HumdrumFile& outfile, xml_document& doc);
 		string cleanSpaces           (string& input);
+		void setEditorialAccidental  (int accidental, GridSlice* slice, 
+		                              int partindex, int staffindex, int voiceindex);
 
 		bool convert          (ostream& out);
 		bool convertPart      (ostream& out, const string& partname,
@@ -4253,8 +4255,10 @@ class Tool_musicxml2hum : public HumTool {
 		int  addLyrics         (GridStaff* staff, MxmlEvent* event);
 		int  addHarmony        (GridPart* oart, MxmlEvent* event);
 		void addDynamic        (GridPart* part, MxmlEvent* event);
-		void addTexts          (GridSlice* slice, GridMeasure* measure, int partindex, MxmlEvent* event);
-		void addText           (GridSlice* slice, GridMeasure* measure, int partindex, xml_node node);
+		void addTexts          (GridSlice* slice, GridMeasure* measure, int partindex,
+		                        int staffindex, int voiceindex, MxmlEvent* event);
+		void addText           (GridSlice* slice, GridMeasure* measure, int partindex, 
+		                        int staffindex, int voiceindex, xml_node node);
 		string getHarmonyString(xml_node hnode);
 		string getDynamicString(xml_node element);
 		string getDynamicsParameters(xml_node element);
@@ -4276,6 +4280,7 @@ class Tool_musicxml2hum : public HumTool {
 		bool m_stemsQ = false;
 		int m_slurabove = 0;
 		int m_slurbelow = 0;
+		char m_hasEditorial = '\0';
 
 		xml_node m_current_dynamic = xml_node(NULL);
 		vector<xml_node> m_current_text;

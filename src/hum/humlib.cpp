@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul 26 14:00:22 CEST 2017
+// Last Modified: Wed Jul 26 16:50:20 CEST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -34268,6 +34268,11 @@ void Tool_musicxml2hum::addFooterRecords(HumdrumFile& outfile, xml_document& doc
 		outfile.appendLine(yem_record);
 	}
 
+	// RDF:
+	if (m_hasEditorial) {
+		string rdf_record = "!!!RDF**kern: i = editorial accidental";
+		outfile.appendLine(rdf_record);
+	}
 }
 
 
@@ -34989,7 +34994,7 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 	if (m_current_text.size() > 0) {
 		event->setTexts(m_current_text);
 		m_current_text.clear();
-		addTexts(slice, outdata, partindex, event);
+		addTexts(slice, outdata, partindex, staffindex, voiceindex, event);
 	}
 
 	if (m_current_dynamic) {
@@ -35015,10 +35020,11 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 // Tool_musicxml2hum::addTexts -- Add all text direction for a note.
 //
 
-void Tool_musicxml2hum::addTexts(GridSlice* slice, GridMeasure* measure, int partindex, MxmlEvent* event) {
+void Tool_musicxml2hum::addTexts(GridSlice* slice, GridMeasure* measure, int partindex,
+		int staffindex, int voiceindex, MxmlEvent* event) {
 	vector<xml_node>& nodes = event->getTexts();
 	for (xml_node item : nodes) {
-		addText(slice, measure, partindex, item);
+		addText(slice, measure, partindex, staffindex, voiceindex, item);
 	}
 }
 
@@ -35034,8 +35040,8 @@ void Tool_musicxml2hum::addTexts(GridSlice* slice, GridMeasure* measure, int par
 //        </direction-type>
 //      </direction>
 
-void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int partindex, xml_node node) {
-
+void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int partindex, 
+		int staffindex, int voiceindex, xml_node node) {
 	string placementstring;
 	xml_attribute placement = node.attribute("placement");
 	if (placement) {
@@ -35065,6 +35071,21 @@ void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int part
 	}
 	string text = grandchild.child_value();
 	if (text == "") {
+		return;
+	}
+
+	if (text == "#") {
+		// interpret as an editorial sharp marker
+		setEditorialAccidental(+1, slice, partindex, staffindex, voiceindex);
+		return;
+	} else if (text == "b") {
+		// interpret as an editorial flat marker
+		setEditorialAccidental(-1, slice, partindex, staffindex, voiceindex);
+		return;
+	// } else if (text == u8"§") {
+	} else if (text == "\xc2\xa7") {
+		// interpret as an editorial natural marker
+		setEditorialAccidental(0, slice, partindex, staffindex, voiceindex);
 		return;
 	}
 
@@ -35108,6 +35129,98 @@ void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int part
 	// in between), then insert onto the existing layout slice; otherwise create a new layout slice.
 	measure->addLayoutParameter(slice, partindex, output);
 
+}
+
+
+
+//////////////////////////////
+//
+// setEditorialAccidental --
+//
+
+void Tool_musicxml2hum::setEditorialAccidental(int accidental, GridSlice* slice, 
+		int partindex, int staffindex, int voiceindex) {
+
+	HTp tok = slice->at(partindex)->at(staffindex)->at(voiceindex)->getToken();
+
+	if ((accidental < 0) && (tok->find("-") == string::npos))  {
+		cerr << "Editorial error for " << tok << ": no flat to mark" << endl;
+		return;
+	}
+	if ((accidental > 0) && (tok->find("#") == string::npos))  {
+		cerr << "Editorial error for " << tok << ": no sharp to mark" << endl;
+		return;
+	}
+	if ((accidental == 0) &&
+			((tok->find("#") != string::npos) || (tok->find("-") != string::npos)))  {
+		cerr << "Editorial error for " << tok << ": requesting a natural accidental" << endl;
+		return;
+	}
+
+	string newtok = *tok;
+
+	if (accidental == -1) {
+		auto loc = newtok.find("-");
+		if (loc < newtok.size()) {
+			if (newtok[loc+1] == 'X') {
+				// replace explicit accidental with editorial accidental
+				newtok[loc+1] = 'i';
+				tok->setText(newtok);
+				m_hasEditorial = 'i';
+			} else {
+				// append i after -:
+				newtok.insert(loc+1, "i");
+				tok->setText(newtok);
+				m_hasEditorial = 'i';
+			}
+		}
+		return;
+	}
+
+	if (accidental == +1) {
+		auto loc = newtok.find("#");
+		if (loc < newtok.size()) {
+			if (newtok[loc+1] == 'X') {
+				// replace explicit accidental with editorial accidental
+				newtok[loc+1] = 'i';
+				tok->setText(newtok);
+				m_hasEditorial = 'i';
+			} else {
+				// append i after -:
+				newtok.insert(loc+1, "i");
+				tok->setText(newtok);
+				m_hasEditorial = 'i';
+			}
+		}
+		return;
+	}
+
+	if (accidental == 0) {
+		auto loc = newtok.find("n");
+		if (loc < newtok.size()) {
+			if (newtok[loc+1] == 'X') {
+				// replace explicit accidental with editorial accidental
+				newtok[loc+1] = 'i';
+				tok->setText(newtok);
+				m_hasEditorial = 'i';
+			} else {
+				// append i after -:
+				newtok.insert(loc+1, "i");
+				tok->setText(newtok);
+				m_hasEditorial = 'i';
+			}
+		} else {
+			// no natural sign, so add it after any pitch classes.
+			HumRegex hre;
+			hre.search(newtok, R"(([a-gA-G]+))");
+			string diatonic = hre.getMatch(1);
+			string newacc = diatonic + "i";
+			hre.replaceDestructive(newtok, newacc, diatonic);
+			tok->setText(newtok);
+			m_hasEditorial = 'i';
+		}
+		return;
+	}
 }
 
 
