@@ -10,6 +10,7 @@
 		152886C51C9CA86100B515BB /* ligature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 152886C41C9CA86100B515BB /* ligature.cpp */; };
 		1579B3431B15033100B16F5C /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
+		402197941F2E09DA00182DF1 /* ioabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 402197931F2E09DA00182DF1 /* ioabc.cpp */; };
 		4067E4C81DDDAF0000C6E059 /* fermata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4067E4C71DDDAF0000C6E059 /* fermata.cpp */; };
 		40910FEC1E42734C00DB1FA5 /* mordent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40910FEA1E42734C00DB1FA5 /* mordent.cpp */; };
 		40ABF1FF1E5DF23B00F32F41 /* expansion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */; };
@@ -444,6 +445,8 @@
 		1579B3421B15033100B16F5C /* proport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = proport.cpp; path = src/proport.cpp; sourceTree = "<group>"; };
 		2D2A79991A69812C000A441B /* chord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chord.cpp; path = src/chord.cpp; sourceTree = "<group>"; };
 		2D2A799B1A698137000A441B /* chord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chord.h; path = include/vrv/chord.h; sourceTree = "<group>"; };
+		402197921F2E09CB00182DF1 /* ioabc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ioabc.h; path = include/vrv/ioabc.h; sourceTree = "<group>"; };
+		402197931F2E09DA00182DF1 /* ioabc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ioabc.cpp; path = src/ioabc.cpp; sourceTree = "<group>"; };
 		4067E4C71DDDAF0000C6E059 /* fermata.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fermata.cpp; path = src/fermata.cpp; sourceTree = "<group>"; };
 		4067E4C91DDDAF6400C6E059 /* fermata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fermata.h; path = include/vrv/fermata.h; sourceTree = "<group>"; };
 		40910FEA1E42734C00DB1FA5 /* mordent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mordent.cpp; path = src/mordent.cpp; sourceTree = "<group>"; };
@@ -1047,6 +1050,8 @@
 			children = (
 				8F086EC0188539540037FD8E /* io.cpp */,
 				8F59291718854BF800FE51AD /* io.h */,
+				402197931F2E09DA00182DF1 /* ioabc.cpp */,
+				402197921F2E09CB00182DF1 /* ioabc.h */,
 				8F086EC1188539540037FD8E /* iodarms.cpp */,
 				8F59291818854BF800FE51AD /* iodarms.h */,
 				4DA20ED01D0F151900706C4A /* iohumdrum.cpp */,
@@ -1526,6 +1531,7 @@
 				4DE644F51EDBEA01002FBE6C /* breath.cpp in Sources */,
 				1579B3431B15033100B16F5C /* proport.cpp in Sources */,
 				8F086EF3188539540037FD8E /* layerelement.cpp in Sources */,
+				402197941F2E09DA00182DF1 /* ioabc.cpp in Sources */,
 				4DF4407D1D511D0200152B7E /* boundary.cpp in Sources */,
 				8F086EF5188539540037FD8E /* measure.cpp in Sources */,
 				4D4335D21ED4567F003BE1A9 /* atts_externalsymbols.cpp in Sources */,
