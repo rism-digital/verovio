@@ -1,0 +1,91 @@
+/////////////////////////////////////////////////////////////////////////////
+// Name:        ftrem.h
+// Author:      Klaus Rettinghaus
+// Created:     2017
+// Copyright (c) Authors and others. All rights reserved.
+/////////////////////////////////////////////////////////////////////////////
+
+#ifndef __VRV_FTREM_H__
+#define __VRV_FTREM_H__
+
+#include "atts_cmn.h"
+#include "atts_shared.h"
+#include "beam.h"
+#include "layerelement.h"
+
+namespace vrv {
+
+//----------------------------------------------------------------------------
+// FTrem
+//----------------------------------------------------------------------------
+
+/**
+ * This class models the MEI <fTrem>
+ */
+class FTrem : public LayerElement, public ObjectListInterface, public AttSlashCount, public AttTremMeasured {
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    FTrem();
+    virtual ~FTrem();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "FTrem"; }
+    virtual ClassId GetClassId() const { return FTREM; }
+    ///@}
+
+    /**
+     * Add an element (a note or a chord) to a fTrem.
+     * Only Note or Chord elements will be actually added to the fTrem.
+     */
+    virtual void AddChild(Object *object);
+
+    /**
+     * Initializes the m_beamElementCoords vector objects.
+     * This is called by FTrem::FilterList
+     */
+    void InitCoords(ListOfObjects *childList);
+
+    /**
+     * Clear the m_beamElementCoords vector and delete all the objects.
+     */
+    void ClearCoords();
+
+    /**
+     *
+     */
+    const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; }
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::CalcStem
+     */
+    virtual int CalcStem(FunctorParams *functorParams);
+
+private:
+    //
+protected:
+    /**
+     * Filter the list for a specific fTrem;
+     */
+    virtual void FilterList(ListOfObjects *childList);
+
+public:
+    /** */
+    BeamDrawingParams m_drawingParams;
+
+private:
+    /**
+     * An array of coordinates for each element
+     **/
+    mutable ArrayOfBeamElementCoords m_beamElementCoords;
+};
+
+} // namespace vrv
+
+#endif

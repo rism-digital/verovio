@@ -19,6 +19,7 @@
 #include "beam.h"
 #include "devicecontext.h"
 #include "doc.h"
+#include "ftrem.h"
 #include "layer.h"
 #include "layerelement.h"
 #include "note.h"
