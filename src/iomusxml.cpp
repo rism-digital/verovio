@@ -16,6 +16,7 @@
 
 #include "attcomparison.h"
 #include "beam.h"
+#include "btrem.h"
 #include "chord.h"
 #include "clef.h"
 #include "dir.h"
@@ -23,6 +24,7 @@
 #include "dynam.h"
 #include "fb.h"
 #include "fermata.h"
+#include "ftrem.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "label.h"
