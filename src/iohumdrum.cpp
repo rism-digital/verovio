@@ -3938,7 +3938,8 @@ hum::HumNum HumdrumInput::getMeasureTstamp(hum::HTp token, int staffindex, hum::
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumNum qbeat = token->getDurationFromBarline();
     if (fract > 0) {
-        qbeat += fract * token->getDuration().getAbs();
+		// what is this for? Causes problems with pedal markings.
+        // qbeat += fract * token->getDuration().getAbs();
     }
     hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
     // if (ss[staffindex].meter_bottom == 0) {
@@ -5309,15 +5310,15 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
     }
     else if (*token == "*Xped") {
         // turn off pedal
-        hum::HTp pdata = getPreviousDataToken(token);
-        if (pdata != NULL) {
-            Pedal *pedal = new Pedal;
-            m_measure->AddChild(pedal);
-            hum::HumNum tstamp = getMeasureTstamp(pdata, staffindex, hum::HumNum(1, 1));
-            pedal->SetTstamp(tstamp.getFloat());
-            pedal->SetDir(pedalLog_DIR_up);
-            setStaff(pedal, m_currentstaff);
-        }
+        // hum::HTp pdata = getPreviousDataToken(token);
+        // if (pdata != NULL) {
+        Pedal *pedal = new Pedal;
+        m_measure->AddChild(pedal);
+        hum::HumNum tstamp = getMeasureTstamp(token, staffindex, hum::HumNum(1, 1));
+        pedal->SetTstamp(tstamp.getFloat());
+        pedal->SetDir(pedalLog_DIR_up);
+        setStaff(pedal, m_currentstaff);
+        // }
     }
 }
 
