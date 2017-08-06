@@ -741,7 +741,8 @@ void View::DrawMNum(DeviceContext *dc, Measure *measure)
     Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
     if (staff) {
 
-        dc->StartCustomGraphic("mNum", "");
+        // needs to be refined when mNum element is available
+        dc->StartCustomGraphic("mnum", "");
 
         FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
         // HARDCODED
