@@ -6474,8 +6474,13 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
         }
     }
 
+    int tokindex = subtok;
+    if (subtok < 0) {
+        tokindex = 0;
+    }
+
     // check for lower accidental on turn
-    std::string loweraccid = token->getValue("auto", to_string(subtok), "turnLowerAccidental");
+    std::string loweraccid = token->getValue("auto", to_string(tokindex), "turnLowerAccidental");
     bool hasloweraccid = loweraccid.empty() ? false : true;
     int loweraccidval = 0;
     if (hasloweraccid) {
@@ -6490,7 +6495,7 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
     }
 
     // check for upper accidental on turn
-    std::string upperaccid = token->getValue("auto", to_string(subtok), "turnUpperAccidental");
+    std::string upperaccid = token->getValue("auto", to_string(tokindex), "turnUpperAccidental");
     bool hasupperaccid = upperaccid.empty() ? false : true;
     int upperaccidval = 0;
     if (hasupperaccid) {
@@ -6596,9 +6601,14 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
         }
     }
 
+    int tokindex = subtok;
+    if (tokindex < 0) {
+        tokindex = 0;
+    }
+
     if (std::tolower(token->at(tpos)) == 'w') {
         // lower mordent
-        std::string accid = token->getValue("auto", to_string(subtok), "mordentLowerAccidental");
+        std::string accid = token->getValue("auto", to_string(tokindex), "mordentLowerAccidental");
         bool hasaccid = accid.empty() ? false : true;
         int accidval = 0;
         if (hasaccid) {
@@ -6614,7 +6624,7 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
     }
     else {
         // upper mordent
-        std::string accid = token->getValue("auto", to_string(subtok), "mordentUpperAccidental");
+        std::string accid = token->getValue("auto", to_string(tokindex), "mordentUpperAccidental");
         bool hasaccid = accid.empty() ? false : true;
         int accidval = 0;
         if (hasaccid) {
@@ -6696,7 +6706,11 @@ void HumdrumInput::addTrill(hum::HTp token)
         }
     }
 
-    std::string accid = token->getValue("auto", to_string(subtok), "trillAccidental");
+    int tokindex = subtok;
+    if (tokindex < 0) {
+        tokindex = 0;
+    }
+    std::string accid = token->getValue("auto", to_string(tokindex), "trillAccidental");
     bool hasaccid = accid.empty() ? false : true;
     int accidval = 0;
     if (hasaccid) {
