@@ -7,14 +7,20 @@
             <titleStmt>
                 <title>Critical apparatus example</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
-            <sourceDesc>
-                <source xml:id="source1570"></source>
-            </sourceDesc>
+            <pubStmt>
+                <date>2017-05-03</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports basic "app" and "rdg/lem" elements. During rendering, the lemma or the first reading is selected by default. A specific reading can easily be selected using the --app-xpath-query=QUERY option (appXPathQuery with the JavaScript toolkit). The --app-xpath-query=QUERY option is repeatable with the command-line tool. With the JavaScript toolkit, multiple values can be passed as an array to appXPathQueries option.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

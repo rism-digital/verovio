@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Color example (2)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Coloured accidentals are attached to single notes or chords.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000023298785">
+                        <staffGrp xml:id="m-000000157538120">
+                            <staffDef xml:id="staffdef-000000110597815" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000182073361">
+                        <measure xml:id="measure-L4" n="1" right="end">
+                            <staff xml:id="staff-L4F1" n="1">
+                                <layer xml:id="layer-L4F1" n="1">
+                                    <note xml:id="note-L5F1" dur="4" oct="4" pname="c" color="yellow">
+                                        <accid xml:id="accid-000000008252579" accid="s" />
+                                    </note>
+                                    <chord xml:id="chord-L6F1" dur="4">
+                                        <note xml:id="note-L6F1S1" oct="3" pname="g" color="yellow">
+                                            <accid xml:id="accid-000000087867647" accid="f" />
+                                        </note>
+                                        <note xml:id="note-L6F1S2" oct="4" pname="f" color="yellow">
+                                            <accid xml:id="accid-000000161460390" accid="s" />
+                                        </note>
+                                        <note xml:id="note-L6F1S3" oct="4" pname="a" color="yellow">
+                                            <accid xml:id="accid-000000055723147" accid="n" func="caution" />
+                                        </note>
+                                    </chord>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

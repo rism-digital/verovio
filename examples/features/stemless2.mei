@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Notes without stem (3)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Stemless notes are used also for explanatory aims, e.g., to visualize the pitches implied by figured bass notation.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <identifier analog="humdrum:SCT">Riemenschneider no. 47/69</identifier>
+                <titleStmt>
+                    <title xml:id="title-L2" analog="humdrum:OTL" type="main">Beschränkt, ihr Weisen</title>
+                    <respStmt>
+                        <persName xml:id="persname-L1" analog="humdrum:COM" role="composer">Bach, Johann Sebastian</persName>
+                    </respStmt>
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000000848065020">
+                        <staffGrp xml:id="staffgrp-0000001459080486">
+                            <staffDef xml:id="staffdef-0000000649963109" n="1" clef.shape="F" clef.line="4" key.sig="3s" meter.count="3" meter.unit="4" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000002002292368">
+                        <measure xml:id="measure-L4" n="0">
+                            <staff xml:id="staff-0000000951593966" n="1">
+                                <layer xml:id="layer-L4F1N1" n="1">
+                                    <chord xml:id="chord-L9F1" dur="4" size="cue" stem.len="0">
+                                        <note xml:id="note-L9F1S1" oct="3" pname="g" size="cue" accid.ges="s" />
+                                        <note xml:id="note-L9F1S2" oct="3" pname="b" size="cue" accid.ges="n" />
+                                    </chord>
+                                    <chord xml:id="chord-L10F1" dur="4" size="cue" stem.len="0">
+                                        <note xml:id="note-L10F1S1" oct="3" pname="a" size="cue" accid.ges="n" />
+                                        <note xml:id="note-L10F1S2" oct="4" pname="e" size="cue" accid.ges="n" />
+                                    </chord>
+                                    <chord xml:id="chord-L11F1" dur="4" size="cue" stem.len="0">
+                                        <note xml:id="note-L11F1S1" oct="3" pname="a" size="cue" accid.ges="n" />
+                                        <note xml:id="note-L11F1S2" oct="4" pname="c" size="cue" accid.ges="s" />
+                                    </chord>
+                                </layer>
+                                <layer xml:id="layer-L9F2N2" n="2">
+                                    <note xml:id="note-L9F2" dur="4" oct="3" pname="e" accid.ges="n" />
+                                    <note xml:id="note-L10F2" dur="4" oct="3" pname="c" accid.ges="s" />
+                                    <note xml:id="note-L11F2" dur="4" oct="3" pname="f" accid.ges="s" />
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-L10F3" place="below" staff="1" tstamp="2.000000">
+                                <fb xml:id="fb-L10F3">
+                                    <f xml:id="f-L10F3">6</f>
+                                </fb>
+                            </harm>
+                        </measure>
+                        <measure xml:id="measure-L12">
+                            <staff xml:id="staff-L12F1N1" n="1">
+                                <layer xml:id="layer-L12F1N1" n="1">
+                                    <note xml:id="note-L14F1" dur="2" oct="3" pname="f" size="cue" stem.len="0" accid.ges="s" />
+                                    <chord xml:id="chord-L17F1" dur="4" size="cue" stem.len="0">
+                                        <note xml:id="note-L17F1S1" oct="3" pname="b" size="cue" accid.ges="n" />
+                                        <note xml:id="note-L17F1S2" oct="4" pname="e" size="cue" accid.ges="n" />
+                                    </chord>
+                                </layer>
+                                <layer xml:id="layer-L12F2N2" n="2">
+                                    <note xml:id="note-L14F2" dur="4" oct="4" pname="c" size="cue" stem.len="0" accid.ges="s" />
+                                    <note xml:id="note-L15F2" dur="4" oct="3" pname="b" size="cue" stem.len="0" accid.ges="n" />
+                                    <note xml:id="note-L17F2" dur="4" oct="3" pname="g" accid="n" />
+                                </layer>
+                                <layer xml:id="layer-L14F3N3" n="3">
+                                    <note xml:id="note-L14F3" dur="2" oct="3" pname="d" accid.ges="n" />
+                                    <space xml:id="space-0000000452959531" dur="4" />
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-L14F4" place="below" staff="1" tstamp="1.000000">
+                                <fb xml:id="fb-L14F4">
+                                    <f xml:id="f-L14F4">76</f>
+                                </fb>
+                            </harm>
+                            <harm xml:id="harm-L17F3" place="below" staff="1" tstamp="3.000000">
+                                <fb xml:id="fb-L17F3">
+                                    <f xml:id="f-L17F3">6</f>
+                                </fb>
+                            </harm>
+                        </measure>
+                        <measure xml:id="measure-L18">
+                            <staff xml:id="staff-L18F1N1" n="1">
+                                <layer xml:id="layer-L18F1N1" n="1">
+                                    <chord xml:id="chord-L19F1" dur="4" size="cue" stem.len="0">
+                                        <note xml:id="note-L19F1S1" oct="3" pname="a" size="cue" accid="s" />
+                                        <note xml:id="note-L19F1S2" oct="4" pname="c" size="cue" accid.ges="s" />
+                                        <note xml:id="note-L19F1S3" oct="4" pname="f" size="cue" accid.ges="s" />
+                                    </chord>
+                                    <chord xml:id="chord-L20F1" dur="2" size="cue" stem.len="0">
+                                        <note xml:id="note-L20F1S1" oct="3" pname="f" size="cue" accid.ges="s" />
+                                        <note xml:id="note-L20F1S2" oct="3" pname="b" size="cue" accid.ges="n" />
+                                        <note xml:id="note-L20F1S3" oct="4" pname="d" size="cue" accid.ges="n" />
+                                    </chord>
+                                </layer>
+                                <layer xml:id="layer-L18F2N2" n="2">
+                                    <note xml:id="note-L19F2" dur="4" oct="3" pname="f" accid.ges="s" />
+                                    <beam xml:id="beam-L20F2-L23F2">
+                                        <note xml:id="note-L20F2" dur="8" oct="3" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L21F2" dur="8" oct="3" pname="d" accid.ges="n" />
+                                        <note xml:id="note-L22F2" dur="8" oct="3" pname="c" accid.ges="s" />
+                                        <note xml:id="note-L23F2" dur="8" oct="2" pname="b" accid.ges="n" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-L19F3" place="below" staff="1" tstamp="1.000000">
+                                <fb xml:id="fb-L19F3">
+                                    <f xml:id="f-L19F3">♯</f>
+                                </fb>
+                            </harm>
+                            <harm xml:id="harm-L20F3" place="below" staff="1" tstamp="2.000000">
+                                <fb xml:id="fb-L20F3">
+                                    <f xml:id="f-L20F3N1">7</f>
+                                    <f xml:id="f-L20F3N2">5</f>
+                                    <f xml:id="f-L20F3N3">2</f>
+                                </fb>
+                            </harm>
+                            <harm xml:id="harm-L21F3" place="below" staff="1" tstamp="2.500000">
+                                <fb xml:id="fb-L21F3">
+                                    <f xml:id="f-L21F3">_</f>
+                                </fb>
+                            </harm>
+                            <harm xml:id="harm-L22F3" place="below" staff="1" tstamp="3.000000">
+                                <fb xml:id="fb-L22F3">
+                                    <f xml:id="f-L22F3">_</f>
+                                </fb>
+                            </harm>
+                            <harm xml:id="harm-L23F3" place="below" staff="1" tstamp="3.500000">
+                                <fb xml:id="fb-L23F3">
+                                    <f xml:id="f-L23F3">_</f>
+                                </fb>
+                            </harm>
+                        </measure>
+                        <measure xml:id="measure-L24">
+                            <staff xml:id="staff-L24F1N1" n="1">
+                                <layer xml:id="layer-L24F1N1" n="1">
+                                    <chord xml:id="chord-L25F1" dots="1" dur="2" size="cue" stem.len="0">
+                                        <note xml:id="note-L25F1S1" oct="3" pname="a" size="cue" accid="s" />
+                                        <note xml:id="note-L25F1S2" oct="4" pname="c" size="cue" accid.ges="s" />
+                                        <note xml:id="note-L25F1S3" oct="4" pname="f" size="cue" accid.ges="s" />
+                                    </chord>
+                                </layer>
+                                <layer xml:id="layer-L24F2N2" n="2">
+                                    <note xml:id="note-L25F2" dur="4" oct="3" pname="f" accid.ges="s" />
+                                    <note xml:id="note-L26F2" dur="4" oct="2" pname="f" accid.ges="s" />
+                                    <note xml:id="note-L27F2" dur="4" oct="2" pname="g" accid.ges="s" />
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-L25F3" place="below" staff="1" tstamp="1.000000">
+                                <fb xml:id="fb-L25F3">
+                                    <f xml:id="f-L25F3">♯</f>
+                                </fb>
+                            </harm>
+                            <harm xml:id="harm-L26F3" place="below" staff="1" tstamp="2.000000">
+                                <fb xml:id="fb-L26F3">
+                                    <f xml:id="f-L26F3">_</f>
+                                </fb>
+                            </harm>
+                            <harm xml:id="harm-L27F3" place="below" staff="1" tstamp="3.000000">
+                                <fb xml:id="fb-L27F3">
+                                    <f xml:id="f-L27F3">_</f>
+                                </fb>
+                            </harm>
+                        </measure>
+                        <measure xml:id="measure-L28">
+                            <staff xml:id="staff-L28F1N1" n="1">
+                                <layer xml:id="layer-L28F1N1" n="1">
+                                    <chord xml:id="chord-L29F1" dur="4" size="cue" stem.len="0">
+                                        <note xml:id="note-L29F1S1" oct="3" pname="c" size="cue" accid.ges="s" />
+                                        <note xml:id="note-L29F1S2" oct="3" pname="f" size="cue" accid.ges="s" />
+                                    </chord>
+                                    <chord xml:id="chord-L30F1" dur="4" size="cue" stem.len="0">
+                                        <note xml:id="note-L30F1S1" oct="3" pname="e" size="cue" accid.ges="n" />
+                                        <note xml:id="note-L30F1S2" oct="3" pname="g" size="cue" accid.ges="s" />
+                                    </chord>
+                                    <chord xml:id="chord-L31F1" dur="4" size="cue" stem.len="0">
+                                        <note xml:id="note-L31F1S1" oct="3" pname="e" size="cue" accid.ges="n" />
+                                        <note xml:id="note-L31F1S2" oct="3" pname="f" size="cue" accid.ges="s" />
+                                        <note xml:id="note-L31F1S3" oct="3" pname="a" size="cue" accid="s" />
+                                    </chord>
+                                </layer>
+                                <layer xml:id="layer-L28F2N2" n="2">
+                                    <note xml:id="note-L29F2" dur="4" oct="2" pname="a" accid="s" />
+                                    <note xml:id="note-L30F2" dur="4" oct="2" pname="b" accid.ges="n" />
+                                    <note xml:id="note-L31F2" dur="4" oct="3" pname="c" accid.ges="s" />
+                                </layer>
+                            </staff>
+                            <harm xml:id="harm-L29F3" place="below" staff="1" tstamp="1.000000">
+                                <fb xml:id="fb-L29F3">
+                                    <f xml:id="f-L29F3">6</f>
+                                </fb>
+                            </harm>
+                            <harm xml:id="harm-L30F3" place="below" staff="1" tstamp="2.000000">
+                                <fb xml:id="fb-L30F3">
+                                    <f xml:id="f-L30F3N1">6</f>
+                                    <f xml:id="f-L30F3N2">4</f>
+                                </fb>
+                            </harm>
+                            <harm xml:id="harm-L31F3" place="below" staff="1" tstamp="3.000000">
+                                <fb xml:id="fb-L31F3">
+                                    <f xml:id="f-L31F3N1">6♯</f>
+                                    <f xml:id="f-L31F3N2">4</f>
+                                    <f xml:id="f-L31F3N3">3</f>
+                                </fb>
+                            </harm>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

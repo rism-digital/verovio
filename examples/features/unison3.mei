@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Accidental placement on unison</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio correctly renders unison notes with different accidentals.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000001711750343">
+                        <staffGrp xml:id="staffgrp-0000002093296849">
+                            <staffDef xml:id="staffdef-0000001755826350" n="1" clef.shape="G" clef.line="2" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000001339547885">
+                        <measure xml:id="measure-L1" n="0">
+                            <staff xml:id="staff-0000000646971315" n="1">
+                                <layer xml:id="layer-L1F1N1" n="1">
+                                    <note xml:id="note-L3F1" dur="4" oct="4" pname="c" accid="s" />
+                                    <note xml:id="note-L4F1" dur="4" oct="4" pname="d" accid="s" />
+                                    <note xml:id="note-L5F1" dur="4" oct="4" pname="e" accid="s" />
+                                    <note xml:id="note-L6F1" dur="4" oct="4" pname="f" accid="s" />
+                                </layer>
+                                <layer xml:id="layer-L3F2N2" n="2">
+                                    <note xml:id="note-L3F2" dur="4" oct="4" pname="c" accid="f" />
+                                    <note xml:id="note-L4F2" dur="4" oct="4" pname="d" accid="s" />
+                                    <note xml:id="note-L5F2" dur="4" oct="4" pname="e" >
+                                        <accid accid="s" enclose="brack"/>
+                                    </note>
+                                    <note xml:id="note-L6F2" dur="4" oct="4" pname="f" accid="s" />
+                                </layer>
+                            </staff>
+                        </measure>                        
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

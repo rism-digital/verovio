@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Vertical placement of rests (4)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>By default, Verovio places rests in the middle of the staff, indepentently of the number of lines.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef meter.sym="cut" meter.count="4" meter.unit="4">
+            <staffGrp>
+              <staffDef clef.shape="C" clef.line="1" n="1" lines="1" />
+              <staffDef clef.shape="C" clef.line="1" n="2" lines="2" />
+              <staffDef clef.shape="C" clef.line="1" n="3" lines="3" />
+              <staffDef clef.shape="C" clef.line="1" n="4" lines="4" />
+              <staffDef clef.shape="C" clef.line="1" n="5" lines="5" />
+              <staffDef clef.shape="C" clef.line="1" n="6" lines="6" />
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure n="0">
+              <staff n="1">
+                <layer n="1">
+                  <rest dur="4" />
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <rest dur="4" />
+                </layer>
+              </staff>
+              <staff n="3">
+                <layer n="1">
+                  <rest dur="4" />
+                </layer>
+              </staff>
+              <staff n="4">
+                <layer n="1">
+                  <rest dur="4" />
+                </layer>
+              </staff>
+              <staff n="5">
+                <layer n="1">
+                  <rest dur="4" />
+                </layer>
+              </staff>
+              <staff n="6">
+                <layer n="1">
+                  <rest dur="4" />
+                </layer>
+              </staff>
+            </measure>
+            <measure n="1">
+              <staff n="1">
+                <layer n="1">
+                  <multiRest num="4" />
+                </layer>
+              </staff>
+              <staff n="2">
+                <layer n="1">
+                  <multiRest num="4" />
+                </layer>
+              </staff>
+              <staff n="3">
+                <layer n="1">
+                  <multiRest num="4" />
+                </layer>
+              </staff>
+              <staff n="4">
+                <layer n="1">
+                  <multiRest num="4" />
+                </layer>
+              </staff>
+              <staff n="5">
+                <layer n="1">
+                  <multiRest num="4" />
+                </layer>
+              </staff>
+              <staff n="6">
+                <layer n="1">
+                  <multiRest num="4" />
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

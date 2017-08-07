@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Tuplet options</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports various rendering options for tuplets. The tuplet number placement is dependent on the stem directions. Also, Verovio supports coloured tuplets.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef meter.count="4" meter.unit="4">
+            <staffGrp>
+              <staffDef n="1" clef.line="2" clef.shape="G" lines="5"/>
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure n="1">
+              <staff n="1">
+                <layer n="1">
+                  <tuplet num="3" numbase="2" num.place="below">
+                    <note pname="g" oct="4" dur="8"/>
+                    <note pname="a" oct="4" dur="8"/>
+                    <note pname="b" oct="4" dur="8" stem.dir="up"/>
+                  </tuplet>
+                  <tuplet num="3" numbase="2" bracket.place="above" color="blue">
+                    <note pname="c" oct="5" dur="8"/>
+                    <note pname="b" oct="4" dur="8"/>
+                    <note pname="a" oct="4" dur="8" stem.dir="down"/>
+                  </tuplet>
+                  <tuplet num="3" numbase="2" num.visible="false">
+                    <note pname="g" oct="4" dur="8"/>
+                    <note pname="a" oct="4" dur="8"/>
+                    <note pname="b" oct="4" dur="8" stem.dir="up"/>
+                  </tuplet>
+                  <tuplet num="3" numbase="2" bracket.visible="false">
+                    <note pname="c" oct="5" dur="8"/>
+                    <note pname="b" oct="4" dur="8"/>
+                    <note pname="a" oct="4" dur="8" stem.dir="down"/>
+                  </tuplet>
+                </layer>
+              </staff>
+            </measure>
+            <measure n="2">
+              <staff n="1">
+                <layer n="1">
+                  <beam>
+                    <tuplet num="3" numbase="2" num.place="below" bracket.visible="false">
+                      <note pname="g" oct="4" dur="8"/>
+                      <note pname="g" oct="4" dur="8"/>
+                      <note pname="g" oct="4" dur="8"/>
+                    </tuplet>
+                  </beam>
+                  <tuplet num="3" numbase="2" bracket.place="below" num.visible="false">
+                    <beam>
+                      <note pname="g" oct="4" dur="8"/>
+                      <note pname="g" oct="4" dur="8"/>
+                      <note pname="g" oct="4" dur="8"/>
+                    </beam>
+                  </tuplet>
+                  <beam>
+                    <tuplet num="3" numbase="2" num.place="below" bracket.visible="true">
+                      <note pname="g" oct="4" dur="8"/>
+                      <note pname="g" oct="4" dur="8"/>
+                      <note pname="g" oct="4" dur="8"/>
+                    </tuplet>
+                  </beam>
+                  <tuplet num="3" numbase="2" bracket.place="below" num.visible="true" num.format="ratio">
+                    <beam>
+                      <note pname="g" oct="4" dur="8"/>
+                      <note pname="g" oct="4" dur="8"/>
+                      <note pname="g" oct="4" dur="8"/>
+                    </beam>
+                  </tuplet>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

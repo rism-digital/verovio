@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Grace note chords (2)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Single notes and chords in grace notes can be beamed together.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000203982120">
+                        <staffGrp xml:id="m-000000209816519">
+                            <staffDef xml:id="staffdef-000000017653299" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000027874412">
+                        <measure xml:id="measure-L3" n="1" right="end">
+                            <staff xml:id="staff-L3F1" n="1">
+                                <layer xml:id="layer-L3F1" n="1">
+                                    <beam xml:id="beam-000000113869938">
+                                        <note xml:id="note-L4F1" dur="16" oct="4" pname="d" accid.ges="n" grace="acc" stem.dir="up" />
+                                        <note xml:id="note-L5F1" dur="16" oct="4" pname="e" accid.ges="n" grace="acc" stem.dir="up" />
+                                    </beam>
+                                    <note xml:id="note-L6F1" dur="4" oct="4" pname="d" accid.ges="n" />
+                                    <beam xml:id="beam-000000092271716">
+                                        <chord xml:id="chord-L7F1" dur="16" stem.dir="up" grace="acc">
+                                            <note xml:id="note-L7F1S1" dur="8" oct="4" pname="e" accid.ges="n" />
+                                            <note xml:id="note-L7F1S2" dur="8" oct="4" pname="g" accid.ges="n" />
+                                        </chord>
+                                        <chord xml:id="chord-L8F1" dur="16" stem.dir="up" grace="acc">
+                                            <note xml:id="note-L8F1S1" dur="8" oct="4" pname="a" accid.ges="n"/>
+                                            <note xml:id="note-L8F1S2" dur="8" oct="4" pname="f" accid.ges="n"/>
+                                        </chord>
+                                    </beam>
+                                    <note xml:id="note-L9F1" dur="2" oct="4" pname="e" accid.ges="n" />
+                                    <beam xml:id="beam-000000077717922">
+                                        <chord xml:id="chord-L10F1" dur="16" stem.dir="up" grace="acc">
+                                            <note xml:id="note-L10F1S1" dur="8" oct="4" pname="e" accid.ges="n"/>
+                                            <note xml:id="note-L10F1S2" dur="8" oct="4" pname="g" accid.ges="n"/>
+                                        </chord>
+                                        <note xml:id="note-L11F1" dur="16" oct="4" pname="f" accid.ges="n" grace="acc" stem.dir="up" />
+                                    </beam>
+                                    <note xml:id="note-L12F1" dur="4" oct="4" pname="g" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
