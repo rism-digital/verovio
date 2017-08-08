@@ -564,13 +564,7 @@ int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
     }
 
     *dot = 0;
-    if ((i + 1 < length) && (incipit[i + 1] == '.')) {
-        // one dot
-        (*dot)++;
-        i++;
-    }
-    if ((i + 1 < length) && (incipit[i + 1] == '.')) {
-        // two dots
+    while ((i + 1 < length) && (incipit[i + 1] == '.')) {
         (*dot)++;
         i++;
     }
