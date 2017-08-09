@@ -69,6 +69,7 @@ class MRpt2;
 class MultiRest;
 class MultiRpt;
 class Note;
+class Neume;
 class Octave;
 class Orig;
 class Pb;
@@ -93,6 +94,7 @@ class Space;
 class Staff;
 class Supplied;
 class Syl;
+class Syllable;
 class System;
 class SystemElement;
 class Tempo;
@@ -210,9 +212,11 @@ private:
     void WriteMeiMultiRest(pugi::xml_node currentNode, MultiRest *multiRest);
     void WriteMeiMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt);
     void WriteMeiNote(pugi::xml_node currentNode, Note *note);
+    void WriteMeiNeume(pugi::xml_node currentNode, Neume *neume);
     void WriteMeiProport(pugi::xml_node currentNode, Proport *proport);
     void WriteMeiRest(pugi::xml_node currentNode, Rest *rest);
     void WriteMeiSpace(pugi::xml_node currentNode, Space *space);
+    void WriteMeiSyllable(pugi::xml_node currentNode, Syllable *syllable);
     void WriteMeiTuplet(pugi::xml_node currentNode, Tuplet *tuplet);
     ///@}
 
@@ -439,10 +443,12 @@ private:
     bool ReadMeiMultiRest(Object *parent, pugi::xml_node multiRest);
     bool ReadMeiMultiRpt(Object *parent, pugi::xml_node multiRpt);
     bool ReadMeiNote(Object *parent, pugi::xml_node note);
+    bool ReadMeiNeume(Object *parent, pugi::xml_node neume);
     bool ReadMeiProport(Object *parent, pugi::xml_node proport);
     bool ReadMeiRest(Object *parent, pugi::xml_node rest);
     bool ReadMeiSpace(Object *parent, pugi::xml_node space);
     bool ReadMeiSyl(Object *parent, pugi::xml_node syl);
+    bool ReadMeiSyllable(Object *parent, pugi::xml_node syllable);
     bool ReadMeiTuplet(Object *parent, pugi::xml_node tuplet);
     bool ReadMeiVerse(Object *parent, pugi::xml_node verse);
     ///@}

@@ -68,7 +68,7 @@ bool Resources::InitFonts()
 {
     // We will need to rethink this for adding the option to add custom fonts
     // Font Bravura first since it is expected to have always all symbols
-    if (!LoadFont("Bravura")) LogError("Bravura font could not be loaded.");
+//    if (!LoadFont("Bravura")) LogError("Bravura font could not be loaded.");
     // The Leipzig as the default font
     if (!LoadFont("Leipzig")) LogError("Leipzig font could not be loaded.");
 
@@ -107,6 +107,7 @@ bool Resources::LoadFont(std::string fontName)
     ::DIR *dir;
     dirent *pdir;
     std::string dirname = Resources::GetPath() + "/" + fontName;
+    std::cout << dirname << std::endl;
     dir = opendir(dirname.c_str());
 
     if (!dir) {
@@ -121,6 +122,7 @@ bool Resources::LoadFont(std::string fontName)
         if (strstr(pdir->d_name, ".xml")) {
             // E.g, : E053-gClef8va.xml => strtol extracts E053 as hex
             wchar_t smuflCode = (wchar_t)strtol(pdir->d_name, NULL, 16);
+
             if (smuflCode == 0) {
                 LogError("Invalid SMUFL code (0)");
                 continue;

@@ -43,6 +43,7 @@ class Rend;
 class Slur;
 class Staff;
 class Syl;
+class Syllable;
 class System;
 class SystemElement;
 class Tempo;
@@ -317,6 +318,13 @@ protected:
     void DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}
 
+    /**
+     * @name Method for drawing Syllable.
+     * Defined in view_neume.cpp
+     */
+    ///@{
+    void DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    ///@}
     /**
      * @name Methods for drawing Floating child classes.
      * They are base drawing methods that are called directly from DrawFloatingElement.

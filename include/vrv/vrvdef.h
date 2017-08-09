@@ -145,11 +145,13 @@ enum ClassId {
     MULTIREST,
     MULTIRPT,
     NOTE,
+    NEUME,
     PROPORT,
     REST,
     SPACE,
     STEM,
     SYL,
+    SYLLABLE,
     TIMESTAMP_ATTR,
     TUPLET,
     VERSE,
@@ -200,6 +202,7 @@ class FloatingPositioner;
 class LayerElement;
 class LedgerLine;
 class Note;
+class Neume;
 class Object;
 class Point;
 class Staff;

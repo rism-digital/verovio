@@ -31,6 +31,7 @@
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
+#include "neume.h"
 #include "page.h"
 #include "rest.h"
 #include "rpt.h"

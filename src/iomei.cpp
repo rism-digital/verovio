@@ -44,6 +44,7 @@
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
+#include "neume.h"
 #include "octave.h"
 #include "page.h"
 #include "pedal.h"
@@ -56,6 +57,7 @@
 #include "space.h"
 #include "staff.h"
 #include "syl.h"
+#include "syllable.h"
 #include "system.h"
 #include "tempo.h"
 #include "text.h"
@@ -401,6 +403,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(SYL)) {
         m_currentNode = m_currentNode.append_child("syl");
         WriteMeiSyl(m_currentNode, dynamic_cast<Syl *>(object));
+    }
+    else if (object->Is(SYL)) {
+        m_currentNode = m_currentNode.append_child("syllable");
+        WriteMeiSyllable(m_currentNode, dynamic_cast<Syllable *>(object));
     }
     else if (object->Is(TUPLET)) {
         m_currentNode = m_currentNode.append_child("tuplet");
@@ -1197,6 +1203,17 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     note->WriteVisibility(currentNode);
 }
 
+void MeiOutput::WriteMeiNeume(pugi::xml_node currentNode, Neume *neume)
+{
+    assert(neume);
+
+    WriteLayerElement(currentNode, neume);
+    WriteDurationInterface(currentNode, neume);
+    WritePitchInterface(currentNode, neume);
+    WritePositionInterface(currentNode, neume);
+    neume->WriteColor(currentNode);;
+}
+
 void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
 {
     assert(rest);
@@ -1253,6 +1270,17 @@ void MeiOutput::WriteMeiSyl(pugi::xml_node currentNode, Syl *syl)
     syl->WriteLang(currentNode);
     syl->WriteTypography(currentNode);
     syl->WriteSylLog(currentNode);
+}
+
+void MeiOutput::WriteMeiSyllable(pugi::xml_node currentNode, Syllable *syllable)
+{
+    assert(syllable);
+
+    WriteLayerElement(currentNode, syllable);
+    syllable->WriteColor(currentNode);
+    syllable->WriteDurationRatio(currentNode);
+    syllable->WriteRelativesize(currentNode);
+    syllable->WriteSlashcount(currentNode);
 }
 
 void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textElement)
@@ -2807,6 +2835,9 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
         else if (elementName == "note") {
             success = ReadMeiNote(parent, xmlElement);
         }
+        else if (elementName == "neume") {
+            success = ReadMeiNeume(parent, xmlElement);
+        }
         else if (elementName == "rest") {
             success = ReadMeiRest(parent, xmlElement);
         }
@@ -2833,6 +2864,9 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
         }
         else if (elementName == "syl") {
             success = ReadMeiSyl(parent, xmlElement);
+        }
+        else if (elementName == "syllable") {
+            success = ReadMeiSyllable(parent, xmlElement);
         }
         else if (elementName == "tuplet") {
             success = ReadMeiTuplet(parent, xmlElement);
@@ -3173,6 +3207,20 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     return ReadMeiLayerChildren(vrvNote, note, vrvNote);
 }
 
+bool MeiInput::ReadMeiNeume(Object *parent, pugi::xml_node neume)
+{
+    Neume *vrvNeume = new Neume();
+    ReadLayerElement(neume, vrvNeume);
+
+    ReadDurationInterface(neume, vrvNeume);
+    ReadPitchInterface(neume, vrvNeume);
+    ReadPositionInterface(neume, vrvNeume);
+    vrvNeume->ReadColor(neume);
+
+    parent->AddChild(vrvNeume);
+    return ReadMeiLayerChildren(vrvNeume, neume, vrvNeume);
+}
+
 bool MeiInput::ReadMeiRest(Object *parent, pugi::xml_node rest)
 {
     Rest *vrvRest = new Rest();
@@ -3221,6 +3269,21 @@ bool MeiInput::ReadMeiSyl(Object *parent, pugi::xml_node syl)
 
     parent->AddChild(vrvSyl);
     return ReadMeiTextChildren(vrvSyl, syl, vrvSyl);
+}
+
+bool MeiInput::ReadMeiSyllable(Object *parent, pugi::xml_node syllable)
+{
+    Syllable *vrvSyllable = new Syllable();
+    ReadLayerElement(syllable, vrvSyllable);
+
+    vrvSyllable->ReadColor(syllable);
+    vrvSyllable->ReadDurationRatio(syllable);
+    vrvSyllable->ReadRelativesize(syllable);
+    vrvSyllable->ReadSlashcount(syllable);
+
+    parent->AddChild(vrvSyllable);
+
+    return ReadMeiLayerChildren(vrvSyllable, syllable, vrvSyllable);
 }
 
 bool MeiInput::ReadMeiTuplet(Object *parent, pugi::xml_node tuplet)
