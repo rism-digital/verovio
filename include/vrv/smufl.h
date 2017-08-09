@@ -227,6 +227,7 @@ enum {
     SMUFL_E904_mensuralFclefPetrucci = 0xE904,
     SMUFL_E906_chantCclef = 0xE906,
     SMUFL_E909_mensuralCclefPetrucciPosMiddle = 0xE909,
+    SMUFL_E990_chantPunctum = 0xE990,
     SMUFL_E938_mensuralNoteheadSemibrevisBlack = 0xE938,
     SMUFL_E939_mensuralNoteheadSemibrevisVoid = 0xE939,
     SMUFL_E93C_mensuralNoteheadMinimaWhite = 0xE93C,

@@ -75,7 +75,8 @@ class MRpt;
 class MRpt2;
 class MultiRest;
 class MultiRpt;
-class Note;
+class Note
+class Neume;
 class Num;
 class Octave;
 class Orig;
@@ -108,6 +109,7 @@ class Staff;
 class Supplied;
 class Svg;
 class Syl;
+class Syllable;
 class System;
 class SystemElement;
 class Tempo;
@@ -226,6 +228,7 @@ private:
     void WriteLigature(pugi::xml_node currentNode, Ligature *ligature);
     void WriteMensur(pugi::xml_node currentNode, Mensur *mensur);
     void WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig);
+    void WriteNeume(pugi::xml_node currentNode, Neume *neume);
     void WriteMRest(pugi::xml_node currentNode, MRest *mRest);
     void WriteMRpt(pugi::xml_node currentNode, MRpt *mRpt);
     void WriteMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2);
@@ -235,6 +238,7 @@ private:
     void WriteProport(pugi::xml_node currentNode, Proport *proport);
     void WriteRest(pugi::xml_node currentNode, Rest *rest);
     void WriteSpace(pugi::xml_node currentNode, Space *space);
+    void WriteSyllable(pugi::xml_mode currentNode, Syllable *syllable);
     void WriteTuplet(pugi::xml_node currentNode, Tuplet *tuplet);
     ///@}
 
@@ -456,11 +460,13 @@ private:
     bool ReadMRpt2(Object *parent, pugi::xml_node mRpt2);
     bool ReadMultiRest(Object *parent, pugi::xml_node multiRest);
     bool ReadMultiRpt(Object *parent, pugi::xml_node multiRpt);
+    bool ReadNeume(Object *parent, pugi::xml_node note);
     bool ReadNote(Object *parent, pugi::xml_node note);
     bool ReadProport(Object *parent, pugi::xml_node proport);
     bool ReadRest(Object *parent, pugi::xml_node rest);
     bool ReadSpace(Object *parent, pugi::xml_node space);
     bool ReadSyl(Object *parent, pugi::xml_node syl);
+    bool ReadSyllable(Object *parent, pugi::xml_node syllable);
     bool ReadTuplet(Object *parent, pugi::xml_node tuplet);
     bool ReadVerse(Object *parent, pugi::xml_node verse);
     ///@}
