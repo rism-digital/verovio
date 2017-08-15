@@ -127,11 +127,6 @@ public:
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
     ///@}
 
-    /**
-     * Get the drawing radius of the note head taking into accound the note duration.
-     */
-    virtual int GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize);
-
     //----------//
     // Functors //
     //----------//

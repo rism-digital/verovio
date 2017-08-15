@@ -233,17 +233,6 @@ void Note::SetCluster(ChordCluster *cluster, int position)
     m_clusterPosition = position;
 }
 
-int Note::GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize)
-{
-    assert(doc);
-
-    wchar_t code = SMUFL_E0A3_noteheadHalf;
-    if (this->GetDrawingDur() <= DUR_1) {
-        code = SMUFL_E0A2_noteheadWhole;
-    }
-    return doc->GetGlyphWidth(code, staffSize, isCueSize) / 2;
-}
-
 Point Note::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
@@ -506,7 +495,7 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
     bool drawingCueSize = this->IsCueSize();
     int staffSize = staff->m_drawingStaffSize;
 
-    int radius = this->GetDrawingRadius(params->m_doc, staffSize, drawingCueSize);
+    int radius = this->GetDrawingRadius(params->m_doc);
 
     /************** notehead direction **************/
 
@@ -605,7 +594,7 @@ int Note::CalcDots(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
-    int radius = this->GetDrawingRadius(params->m_doc, staffSize, drawingCueSize);
+    int radius = this->GetDrawingRadius(params->m_doc);
     int xRel = this->GetDrawingX() - params->m_chordDrawingX + 2 * radius + flagShift;
     dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
 
@@ -629,7 +618,7 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
     bool drawingCueSize = this->IsCueSize();
     int staffSize = staff->m_drawingStaffSize;
     int staffX = staff->GetDrawingX();
-    int radius = GetDrawingRadius(params->m_doc, staffSize, drawingCueSize);
+    int radius = GetDrawingRadius(params->m_doc);
 
     /************** Ledger lines: **************/
 

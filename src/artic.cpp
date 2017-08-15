@@ -267,7 +267,6 @@ int Artic::CalcArtic(FunctorParams *functorParams)
 
     LayerElement *parent = NULL;
     Note *parentNote = NULL;
-    StemmedDrawingInterface *interface = NULL;
     Chord *parentChord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, 2));
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     data_STAFFREL_basic place = STAFFREL_basic_NONE;
@@ -284,9 +283,6 @@ int Artic::CalcArtic(FunctorParams *functorParams)
         // no parent chord or note, nothing we can do...
         return FUNCTOR_CONTINUE;
     }
-    
-    interface = dynamic_cast<StemmedDrawingInterface *>(parent);
-    assert(interface);
 
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
@@ -318,7 +314,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
 
     /************** adjust the xRel position **************/
 
-    int xShift = interface->GetDrawingRadius(params->m_doc, staff->m_drawingStaffSize, parent->IsCueSize());
+    int xShift = parent->GetDrawingRadius(params->m_doc);
     this->SetDrawingXRel(xShift);
 
     /************** set it to both the inside and outside part **************/

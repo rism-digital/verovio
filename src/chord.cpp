@@ -319,13 +319,6 @@ Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
-int Chord::GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize)
-{
-    Note *topNote = this->GetTopNote();
-    assert(topNote);
-    return topNote->GetDrawingRadius(doc, staffSize, isCueSize);
-}
-
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

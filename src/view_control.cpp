@@ -142,6 +142,11 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     assert(interface);
 
     if (!interface->HasStartAndEnd()) return;
+    
+    LayerElement *start = dynamic_cast<LayerElement *>(interface->GetStart());
+    assert(start);
+    LayerElement *end = dynamic_cast<LayerElement *>(interface->GetEnd());
+    assert(end);
 
     // Get the parent system of the first and last note
     System *parentSystem1 = dynamic_cast<System *>(interface->GetStart()->GetFirstParent(SYSTEM));
@@ -199,6 +204,29 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         if (!Check(last)) return;
         x2 = last->GetDrawingX() + last->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;
+    }
+    
+    int startRadius = 0;
+    if (!start->Is(TIMESTAMP_ATTR)) {
+        startRadius = start->GetDrawingRadius(m_doc);
+    }
+    
+    int endRadius = 0;
+    if (!end->Is(TIMESTAMP_ATTR)) {
+        endRadius = end->GetDrawingRadius(m_doc);
+    }
+    
+    /************** adjust the position according to the radius **************/
+    
+    if (spanningType == SPANNING_START_END) {
+        x1 += startRadius;
+        x2 += endRadius;
+    }
+    else if (spanningType == SPANNING_START) {
+        x1 += startRadius;
+    }
+    else if (spanningType == SPANNING_END) {
+        x2 += endRadius;
     }
 
     std::vector<Staff *>::iterator staffIter;
@@ -452,8 +480,6 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     Note *endNote = NULL;
     Chord *startChord = NULL;
     Chord *endChord = NULL;
-    StemmedDrawingInterface *startInterface = NULL;
-    StemmedDrawingInterface *endInterface = NULL;
 
     curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
     data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
@@ -482,30 +508,22 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         assert(startNote);
         startParentChord = startNote->IsChordTone();
         startStemDir = startNote->GetDrawingStemDir();
-        startInterface = dynamic_cast<StemmedDrawingInterface*>(start);
-        assert(startInterface);
     }
     else if (start->Is(CHORD)) {
         startChord = dynamic_cast<Chord *>(start);
         assert(startChord);
         startStemDir = startChord->GetDrawingStemDir();
-        startInterface = dynamic_cast<StemmedDrawingInterface*>(start);
-        assert(startInterface);
     }
     if (end->Is(NOTE)) {
         endNote = dynamic_cast<Note *>(end);
         assert(endNote);
         endParentChord = endNote->IsChordTone();
         endStemDir = endNote->GetDrawingStemDir();
-        endInterface = dynamic_cast<StemmedDrawingInterface*>(end);
-        assert(endInterface);
     }
     else if (end->Is(CHORD)) {
         endChord = dynamic_cast<Chord *>(end);
         assert(endChord);
         endStemDir = endChord->GetDrawingStemDir();
-        endInterface = dynamic_cast<StemmedDrawingInterface*>(end);
-        assert(endInterface);
     }
 
     Layer *layer1 = NULL;
@@ -542,33 +560,27 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     
     int startRadius = 0;
     if (!start->Is(TIMESTAMP_ATTR)) {
-        assert(startInterface);
-        startRadius = startInterface->GetDrawingRadius(m_doc, staff->m_drawingStaffSize, start->IsCueSize());
+        startRadius = start->GetDrawingRadius(m_doc);
     }
     
     int endRadius = 0;
     if (!end->Is(TIMESTAMP_ATTR)) {
-        assert(endInterface);
-        endRadius = endInterface->GetDrawingRadius(m_doc, staff->m_drawingStaffSize, end->IsCueSize());
+        endRadius = end->GetDrawingRadius(m_doc);
     }
 
     /************** note stem dir **************/
 
     if (spanningType == SPANNING_START_END) {
         stemDir = startStemDir;
-        x1 += startRadius;
-        x2 += endRadius;
     }
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
     else if (spanningType == SPANNING_START) {
         stemDir = startStemDir;
-        x1 += startRadius;
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if (spanningType == SPANNING_END) {
         stemDir = endStemDir;
-        x2 += endRadius;
     }
     // Finally, slur accross an entire system; use the staff position and up (see below)
     else {
@@ -1538,7 +1550,7 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
 
     dc->StartGraphic(breath, "", breath->GetUuid());
 
-    int x = breath->GetStart()->GetDrawingX();
+    int x = breath->GetStart()->GetDrawingX() + breath->GetStart()->GetDrawingRadius(m_doc);
 
     // use breath mark comma glyph
     int code = SMUFL_E4CE_breathMarkComma;
@@ -1578,7 +1590,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     FontInfo dirTxt;
 
     // If we have not timestamp
-    int x = dir->GetStart()->GetDrawingX();
+    int x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
 
     bool setX = false;
     bool setY = false;
@@ -1631,7 +1643,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     FontInfo dynamTxt;
 
     // If we have not timestamp
-    int x = dynam->GetStart()->GetDrawingX();
+    int x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
 
     bool setX = false;
     bool setY = false;
@@ -1725,7 +1737,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
 
     dc->StartGraphic(fermata, "", fermata->GetUuid());
 
-    int x = fermata->GetStart()->GetDrawingX();
+    int x = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
 
     // for a start always put fermatas up
     int code = SMUFL_E4C0_fermataAbove;
@@ -1783,7 +1795,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     FontInfo dirTxt;
 
     // If we have not timestamp
-    int x = harm->GetStart()->GetDrawingX();
+    int x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
 
     bool setX = false;
     bool setY = false;
@@ -1832,7 +1844,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
 
     dc->StartGraphic(mordent, "", mordent->GetUuid());
 
-    int x = mordent->GetStart()->GetDrawingX();
+    int x = mordent->GetStart()->GetDrawingX() + mordent->GetStart()->GetDrawingRadius(m_doc);
 
     // set norm as default
     int code = SMUFL_E56D_ornamentMordentInverted;
@@ -1934,7 +1946,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
 
     dc->StartGraphic(pedal, "", pedal->GetUuid());
 
-    int x = pedal->GetStart()->GetDrawingX();
+    int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
 
     int code = SMUFL_E650_keyboardPedalPed;
     if (pedal->GetDir() == pedalLog_DIR_up) code = SMUFL_E655_keyboardPedalUp;
@@ -2035,7 +2047,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
 
     dc->StartGraphic(trill, "", trill->GetUuid());
 
-    int x = trill->GetStart()->GetDrawingX();
+    int x = trill->GetStart()->GetDrawingX() + trill->GetStart()->GetDrawingRadius(m_doc);
 
     // for a start always put trill up
     int code = SMUFL_E566_ornamentTrill;
@@ -2095,7 +2107,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
 
     dc->StartGraphic(turn, "", turn->GetUuid());
 
-    int x = turn->GetStart()->GetDrawingX();
+    int x = turn->GetStart()->GetDrawingX() + turn->GetStart()->GetDrawingRadius(m_doc);
     if (turn->GetDelayed() == true) LogWarning("delayed turns not supported");
 
     // set norm as default

@@ -133,6 +133,11 @@ public:
     int GetDrawingTop(Doc *doc, int staffSize, bool withArtic = true, ArticPartType articPartType = ARTIC_PART_INSIDE);
     int GetDrawingBottom(
         Doc *doc, int staffSize, bool withArtic = true, ArticPartType articPartType = ARTIC_PART_INSIDE);
+    
+    /** 
+     * Return the drawing radius for notes and chords 
+     */
+    int GetDrawingRadius(Doc *doc);
 
     /**
      * Alignment getter

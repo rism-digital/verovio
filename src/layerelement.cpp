@@ -34,6 +34,7 @@
 #include "page.h"
 #include "rest.h"
 #include "rpt.h"
+#include "smufl.h"
 #include "space.h"
 #include "staff.h"
 #include "syl.h"
@@ -406,6 +407,32 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
         }
     }
     return this->GetDrawingY();
+}
+    
+int LayerElement::GetDrawingRadius(Doc *doc)
+{
+    assert(doc);
+    
+    if (!this->Is({ NOTE, CHORD })) return 0;
+    
+    int dur = DUR_4;
+    if (this->Is(NOTE)) {
+        Note *note = dynamic_cast<Note*>(this);
+        assert(note);
+        dur = note->GetDrawingDur();
+    }
+    else {
+        Chord *chord = dynamic_cast<Chord*>(this);
+        assert(chord);
+        dur = chord->GetActualDur();
+    }
+    wchar_t code = SMUFL_E0A3_noteheadHalf;
+    if (dur <= DUR_1) {
+        code = SMUFL_E0A2_noteheadWhole;
+    }
+    Staff *staff = dynamic_cast<Staff*>(this->GetFirstParent(STAFF));
+    assert(staff);
+    return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->IsCueSize()) / 2;
 }
 
 double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bool notGraceOnly)
