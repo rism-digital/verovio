@@ -575,13 +575,13 @@ void Doc::PrepareDrawing()
     PrepareFloatingGrpsParams prepareFloatingGrpsParams;
     Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
     this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams);
-
-    Functor prepareLayerElementParts(&Object::PrepareLayerElementParts);
-    this->Process(&prepareLayerElementParts, NULL);
-
+    
     // Prepare the drawing cue size
     Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
     this->Process(&prepareDrawingCueSize, NULL);
+    
+    Functor prepareLayerElementParts(&Object::PrepareLayerElementParts);
+    this->Process(&prepareLayerElementParts, NULL);
 
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t
