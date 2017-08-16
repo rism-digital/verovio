@@ -147,7 +147,7 @@ bool LayerElement::IsGraceNote()
     return false;
 }
 
-bool LayerElement::IsCueSize()
+bool LayerElement::GetDrawingCueSize()
 {
     return m_drawingCueSize;
 }
@@ -434,7 +434,7 @@ int LayerElement::GetDrawingRadius(Doc *doc)
     }
     Staff *staff = dynamic_cast<Staff*>(this->GetFirstParent(STAFF));
     assert(staff);
-    return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->IsCueSize()) / 2;
+    return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
 }
 
 double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bool notGraceOnly)
@@ -1029,14 +1029,14 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
         Note const *note = dynamic_cast<Note const *>(this);
         assert(note);
         Chord *chord = note->IsChordTone();
-        if (chord) m_drawingCueSize = chord->IsCueSize();
+        if (chord) m_drawingCueSize = chord->GetDrawingCueSize();
     }
     // For tuplet, we also need to look at the first note or chord
     else if (this->Is(TUPLET)) {
         AttComparisonAny matchType({ NOTE, CHORD });
         ArrayOfObjects children;
         LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByAttComparison(&matchType));
-        if (child) m_drawingCueSize = child->IsCueSize();
+        if (child) m_drawingCueSize = child->GetDrawingCueSize();
     }
     // For accid, look at the parent if @func="edit" or otherwise to the parent note
     else if (this->Is(ACCID)) {
@@ -1046,16 +1046,16 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
             m_drawingCueSize = true;
         else {
             Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
-            if (note) m_drawingCueSize = note->IsCueSize();
+            if (note) m_drawingCueSize = note->GetDrawingCueSize();
         }
     }
     else if (this->Is({ DOTS, FLAG, STEM })) {
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_NOTE_DEPTH));
         if (note)
-            m_drawingCueSize = note->IsCueSize();
+            m_drawingCueSize = note->GetDrawingCueSize();
         else {
             Chord *chord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
-            if (chord) m_drawingCueSize = chord->IsCueSize();
+            if (chord) m_drawingCueSize = chord->GetDrawingCueSize();
         }
     }
 

@@ -133,7 +133,12 @@ int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
             currentDots = NULL;
         }
     }
-
+    
+    /************ Prepare the drawing cue size ************/
+    
+    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
+    this->Process(&prepareDrawingCueSize, NULL);
+    
     return FUNCTOR_CONTINUE;
 };
 
@@ -157,7 +162,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
 
-    bool drawingCueSize = this->IsCueSize();
+    bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;
 
     Dots *dots = NULL;

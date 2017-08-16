@@ -144,7 +144,7 @@ void FTrem::InitCoords(ListOfObjects *childList)
     this->m_drawingParams.m_stemDir = (dynamic_cast<AttStems *>(firstElement->m_element))->GetStemDir();
 
     // We look only at the first note for checking if cue-sized. Somehow arbitrarily
-    this->m_drawingParams.m_cueSize = firstElement->m_element->IsCueSize();
+    this->m_drawingParams.m_cueSize = firstElement->m_element->GetDrawingCueSize();
 }
 
 void FTrem::ClearCoords()

@@ -582,7 +582,7 @@ void Doc::PrepareDrawing()
     
     Functor prepareLayerElementParts(&Object::PrepareLayerElementParts);
     this->Process(&prepareLayerElementParts, NULL);
-
+    
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t
     StaffN_LayerN_VerseN_t::iterator staves;

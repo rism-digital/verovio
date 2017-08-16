@@ -492,7 +492,7 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
 
-    bool drawingCueSize = this->IsCueSize();
+    bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;
 
     int radius = this->GetDrawingRadius(params->m_doc);
@@ -547,7 +547,7 @@ int Note::CalcDots(FunctorParams *functorParams)
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
 
-    bool drawingCueSize = this->IsCueSize();
+    bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;
 
     Dots *dots = NULL;
@@ -615,7 +615,7 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
 
-    bool drawingCueSize = this->IsCueSize();
+    bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;
     int staffX = staff->GetDrawingX();
     int radius = GetDrawingRadius(params->m_doc);
@@ -710,6 +710,11 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
             currentDots = NULL;
         }
     }
+    
+    /************ Prepare the drawing cue size ************/
+    
+    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
+    this->Process(&prepareDrawingCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
 };

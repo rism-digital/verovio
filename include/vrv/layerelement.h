@@ -78,7 +78,7 @@ public:
     /** Return true if the element is a grace note */
     bool IsGraceNote();
     /** Return true if the element is has to be rederred as cue sized */
-    bool IsCueSize();
+    bool GetDrawingCueSize();
     /** Return true if the element is a note within a ligature */
     bool IsInLigature();
     /** Return true if the element is a note or a chord within a fTrem */
@@ -299,16 +299,18 @@ protected:
      * It is re-computed everytime the object is drawn and it is not stored in the file.
      */
     int m_drawingXRel;
+    
+    /**
+     * The cached drawing cue size set by PrepareDarwingCueSize
+     */
+    bool m_drawingCueSize;
 
 private:
     /**
      * Indicates whether it is a ScoreDef or StaffDef attribute
      */
     ElementScoreDefRole m_scoreDefRole;
-    /**
-     * The cached drawing cue size set by PrepareDarwingCueSize
-     */
-    bool m_drawingCueSize;
+    
     /**
      * The cached alignment layer @n.
      * This also stores the negative values for identifying cross-staff

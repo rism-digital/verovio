@@ -1557,18 +1557,21 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
 
     std::wstring str;
     str.push_back(code);
+    
+    bool centered = true;
+    // center the glyph only with @stratid
+    if (breath->GetStart()->Is(TIMESTAMP_ATTR)) {
+        centered = false;
+    }
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = breath->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), breath, breath->GetStart(), *staffIter);
         int y = breath->GetDrawingY();
-
-        // Adjust the x position
-        int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
-
+        
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-        DrawSmuflString(dc, drawingX, y, str, false, (*staffIter)->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y, str, centered, (*staffIter)->m_drawingStaffSize);
         dc->ResetFont();
     }
 
@@ -1596,7 +1599,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     bool setY = false;
 
     char alignment = dir->GetAlignment();
-    // Dir are left aligned by default;
+    // Dir are left aligned by default (with both @tstamp and @startid)
     if (alignment == 0) alignment = LEFT;
 
     std::vector<Staff *>::iterator staffIter;
@@ -1650,7 +1653,10 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
 
     char alignment = dynam->GetAlignment();
     // Dynam are left aligned by default;
-    if (alignment == 0) alignment = LEFT;
+    if (alignment == 0) {
+        // centre the dynam only with @stratid
+        alignment = (dynam->GetStart()->Is(TIMESTAMP_ATTR)) ? LEFT : CENTER;
+    }
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dynam->GetTstampStaves(measure);
@@ -1664,8 +1670,9 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         // If the dynamic is a symbol (pp, mf, etc.) draw it as one smufl string. This will not take into account
         // editorial element within the dynam as it would with text. Also, it is center only if it is a symbol.
         if (isSymbolOnly) {
+            bool centered = (alignment == CENTER) ? true : false;
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-            DrawSmuflString(dc, x, y, dynamSymbol, true, (*staffIter)->m_drawingStaffSize);
+            DrawSmuflString(dc, x, y, dynamSymbol, centered, (*staffIter)->m_drawingStaffSize);
             dc->ResetFont();
         }
         else {
@@ -1738,6 +1745,12 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     dc->StartGraphic(fermata, "", fermata->GetUuid());
 
     int x = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
+    
+    bool centered = true;
+    // center the fermata only with @stratid
+    if (fermata->GetStart()->Is(TIMESTAMP_ATTR)) {
+        centered = false;
+    }
 
     // for a start always put fermatas up
     int code = SMUFL_E4C0_fermataAbove;
@@ -1769,11 +1782,8 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), fermata, fermata->GetStart(), *staffIter);
         int y = fermata->GetDrawingY();
 
-        // Adjust the x position
-        int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
-
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-        DrawSmuflString(dc, drawingX, y, str, false, (*staffIter)->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y, str, centered, (*staffIter)->m_drawingStaffSize);
         dc->ResetFont();
     }
 
@@ -1802,7 +1812,10 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
     char alignment = harm->GetAlignment();
     // Harm are centered aligned by default;
-    if (alignment == 0) alignment = CENTER;
+    if (alignment == 0) {
+        // centre the harm only with @stratid
+        alignment = (harm->GetStart()->Is(TIMESTAMP_ATTR)) ? LEFT : CENTER;
+    }
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = harm->GetTstampStaves(measure);
@@ -1947,6 +1960,12 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     dc->StartGraphic(pedal, "", pedal->GetUuid());
 
     int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
+    
+    bool centered = true;
+    // center the pedal only with @stratid
+    if (pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
+        centered = false;
+    }
 
     int code = SMUFL_E650_keyboardPedalPed;
     if (pedal->GetDir() == pedalLog_DIR_up) code = SMUFL_E655_keyboardPedalUp;
@@ -1960,15 +1979,8 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
         // Basic method that use bounding box
         int y = pedal->GetDrawingY();
 
-        // Adjust the x position differently for up and down
-        int drawingX = x;
-        if (pedal->GetDir() == pedalLog_DIR_up)
-            drawingX -= m_doc->GetGlyphWidth(SMUFL_E655_keyboardPedalUp, (*staffIter)->m_drawingStaffSize, false) / 2;
-        else
-            drawingX -= m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, (*staffIter)->m_drawingStaffSize, false) / 2;
-
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-        DrawSmuflString(dc, drawingX, y, str, false, (*staffIter)->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y, str, centered, (*staffIter)->m_drawingStaffSize);
         dc->ResetFont();
     }
 
@@ -2048,6 +2060,12 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     dc->StartGraphic(trill, "", trill->GetUuid());
 
     int x = trill->GetStart()->GetDrawingX() + trill->GetStart()->GetDrawingRadius(m_doc);
+    
+    bool centered = true;
+    // center the trill only with @stratid
+    if (trill->GetStart()->Is(TIMESTAMP_ATTR)) {
+        centered = false;
+    }
 
     // for a start always put trill up
     int code = SMUFL_E566_ornamentTrill;
@@ -2063,32 +2081,30 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
 
         // Upper and lower accidentals are currently exclusive, but sould both be allowed at the same time.
         if (trill->HasAccidlower()) {
-
+            int accidXShift = (centered) ? 0 : m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
             wchar_t accid = Accid::GetAccidGlyph(trill->GetAccidlower());
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-            DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
+            DrawSmuflString(dc, x + accidXShift, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
             // Adjust the y position
             y += m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
         }
         else if (trill->HasAccidupper()) {
+            int accidXShift = (centered) ? 0 : m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
             double trillHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
             wchar_t accid = Accid::GetAccidGlyph(trill->GetAccidupper());
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-            DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
+            DrawSmuflString(dc, x + accidXShift, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
             // Adjust the y position
             double factor = 1.5;
             y -= factor * trillHeight;
         }
 
-        // Adjust the x position
-        int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
-
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-        DrawSmuflString(dc, drawingX, y, str, false, (*staffIter)->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y, str, centered, (*staffIter)->m_drawingStaffSize);
         dc->ResetFont();
     }
 
@@ -2113,6 +2129,12 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     // set norm as default
     int code = SMUFL_E567_ornamentTurn;
     if (turn->GetForm() == turnLog_FORM_upper) code = SMUFL_E568_ornamentTurnInverted;
+    
+    bool centered = true;
+    // center the turn only with @stratid
+    if (turn->GetStart()->Is(TIMESTAMP_ATTR)) {
+        centered = false;
+    }
 
     std::wstring str;
     str.push_back(code);
@@ -2124,20 +2146,18 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
         int y = turn->GetDrawingY();
 
         if (turn->HasAccidlower()) {
+            int accidXShift = (centered) ? 0 : m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
             wchar_t accid = Accid::GetAccidGlyph(turn->GetAccidlower());
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-            DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
+            DrawSmuflString(dc, x + accidXShift, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
             // Adjust the y position
             y = y + m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
         }
 
-        // Adjust the x position
-        int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
-
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-        DrawSmuflString(dc, drawingX, y, str, false, (*staffIter)->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y, str, centered, (*staffIter)->m_drawingStaffSize);
         dc->ResetFont();
     }
 
