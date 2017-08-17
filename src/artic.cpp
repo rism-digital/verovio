@@ -430,9 +430,9 @@ int Artic::PrepareLayerElementParts(FunctorParams *functorParams)
         articPart->SetArtic(outsideSlur);
         this->AddChild(articPart);
     }
-    
+
     /************ Prepare the drawing cue size ************/
-    
+
     Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
     this->Process(&prepareDrawingCueSize, NULL);
 

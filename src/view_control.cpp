@@ -142,7 +142,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     assert(interface);
 
     if (!interface->HasStartAndEnd()) return;
-    
+
     LayerElement *start = dynamic_cast<LayerElement *>(interface->GetStart());
     assert(start);
     LayerElement *end = dynamic_cast<LayerElement *>(interface->GetEnd());
@@ -205,19 +205,19 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         x2 = last->GetDrawingX() + last->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;
     }
-    
+
     int startRadius = 0;
     if (!start->Is(TIMESTAMP_ATTR)) {
         startRadius = start->GetDrawingRadius(m_doc);
     }
-    
+
     int endRadius = 0;
     if (!end->Is(TIMESTAMP_ATTR)) {
         endRadius = end->GetDrawingRadius(m_doc);
     }
-    
+
     /************** adjust the position according to the radius **************/
-    
+
     if (spanningType == SPANNING_START_END) {
         x1 += startRadius;
         x2 += endRadius;
@@ -555,14 +555,14 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             slur->SetDrawingCurvedir(curvature_CURVEDIR_above);
         }
     }
-    
+
     /************** calculate the radius for adjusting the x position **************/
-    
+
     int startRadius = 0;
     if (!start->Is(TIMESTAMP_ATTR)) {
         startRadius = start->GetDrawingRadius(m_doc);
     }
-    
+
     int endRadius = 0;
     if (!end->Is(TIMESTAMP_ATTR)) {
         endRadius = end->GetDrawingRadius(m_doc);
@@ -933,7 +933,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
          it != findTimeSpanningLayerElementsParams.m_spanningContent.end(); it++) {
         // We skip the start or end of the slur
         if ((*it == slur->GetStart()) || (*it == slur->GetEnd())) continue;
-        
+
         Note *note = NULL;
         // We keep only notes and chords for now
         if (!(*it)->Is(NOTE) && !(*it)->Is(CHORD)) continue;
@@ -1557,7 +1557,7 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
 
     std::wstring str;
     str.push_back(code);
-    
+
     bool centered = true;
     // center the glyph only with @stratid
     if (breath->GetStart()->Is(TIMESTAMP_ATTR)) {
@@ -1569,7 +1569,7 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), breath, breath->GetStart(), *staffIter);
         int y = breath->GetDrawingY();
-        
+
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
         DrawSmuflString(dc, x, y, str, centered, (*staffIter)->m_drawingStaffSize);
         dc->ResetFont();
@@ -1745,7 +1745,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     dc->StartGraphic(fermata, "", fermata->GetUuid());
 
     int x = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
-    
+
     bool centered = true;
     // center the fermata only with @stratid
     if (fermata->GetStart()->Is(TIMESTAMP_ATTR)) {
@@ -1960,7 +1960,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     dc->StartGraphic(pedal, "", pedal->GetUuid());
 
     int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
-    
+
     bool centered = true;
     // center the pedal only with @stratid
     if (pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
@@ -2060,7 +2060,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     dc->StartGraphic(trill, "", trill->GetUuid());
 
     int x = trill->GetStart()->GetDrawingX() + trill->GetStart()->GetDrawingRadius(m_doc);
-    
+
     bool centered = true;
     // center the trill only with @stratid
     if (trill->GetStart()->Is(TIMESTAMP_ATTR)) {
@@ -2129,7 +2129,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     // set norm as default
     int code = SMUFL_E567_ornamentTurn;
     if (turn->GetForm() == turnLog_FORM_upper) code = SMUFL_E568_ornamentTurnInverted;
-    
+
     bool centered = true;
     // center the turn only with @stratid
     if (turn->GetStart()->Is(TIMESTAMP_ATTR)) {

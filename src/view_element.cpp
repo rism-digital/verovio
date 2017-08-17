@@ -196,7 +196,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     dc->StartGraphic(element, "", element->GetUuid());
-    
+
     /************** editorial accidental **************/
 
     std::wstring accidStr = accid->GetSymbolStr();
@@ -1187,7 +1187,6 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         case DUR_1:
         case DUR_2: DrawRestWhole(dc, x, y, drawingDur, drawingCueSize, staff); break;
         default:
-            //x -= m_doc->GetGlyphWidth(rest->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize) / 2;
             y += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             DrawSmuflCode(dc, x, y, rest->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize);
     }
@@ -1515,7 +1514,7 @@ void View::DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff)
 
     y1 = y;
     y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    
+
     DrawFilledRectangle(dc, x1, y2, x2, y1);
 }
 
@@ -1541,8 +1540,8 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSi
     int off
         = m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, cueSize) * 2 / 3; // i.e., la moitie de la ronde
 
-    x1 = x;// - off;
-    x2 = x + 2 *off;
+    x1 = x; // - off;
+    x2 = x + 2 * off;
 
     if (valeur == DUR_1) vertic = -vertic;
 

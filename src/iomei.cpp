@@ -632,10 +632,14 @@ void MeiOutput::WriteMeiPage(pugi::xml_node currentNode, Page *page)
     // size and margins but only if any - we rely on page.height only to check this
     if (page->m_pageHeight != -1) {
         currentNode.append_attribute("page.width") = StringFormat("%d", page->m_pageWidth / DEFINITION_FACTOR).c_str();
-        currentNode.append_attribute("page.height") = StringFormat("%d", page->m_pageHeight / DEFINITION_FACTOR).c_str();
-        currentNode.append_attribute("page.leftmar") = StringFormat("%d", page->m_pageLeftMar / DEFINITION_FACTOR).c_str();
-        currentNode.append_attribute("page.rightmar") = StringFormat("%d", page->m_pageRightMar / DEFINITION_FACTOR).c_str();
-        currentNode.append_attribute("page.rightmar") = StringFormat("%d", page->m_pageRightMar / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("page.height")
+            = StringFormat("%d", page->m_pageHeight / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("page.leftmar")
+            = StringFormat("%d", page->m_pageLeftMar / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("page.rightmar")
+            = StringFormat("%d", page->m_pageRightMar / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("page.rightmar")
+            = StringFormat("%d", page->m_pageRightMar / DEFINITION_FACTOR).c_str();
     }
     if (!page->m_surface.empty()) {
         currentNode.append_attribute("surface") = page->m_surface.c_str();
@@ -651,8 +655,10 @@ void MeiOutput::WriteMeiSystem(pugi::xml_node currentNode, System *system)
 
     WriteXmlId(currentNode, system);
     // margins
-    currentNode.append_attribute("system.leftmar") = StringFormat("%d", system->m_systemLeftMar / DEFINITION_FACTOR).c_str();
-    currentNode.append_attribute("system.rightmar") = StringFormat("%d", system->m_systemRightMar / DEFINITION_FACTOR).c_str();
+    currentNode.append_attribute("system.leftmar")
+        = StringFormat("%d", system->m_systemLeftMar / DEFINITION_FACTOR).c_str();
+    currentNode.append_attribute("system.rightmar")
+        = StringFormat("%d", system->m_systemRightMar / DEFINITION_FACTOR).c_str();
     // y positions
     if (system->m_yAbs != VRV_UNSET) {
         currentNode.append_attribute("uly") = StringFormat("%d", system->m_yAbs / DEFINITION_FACTOR).c_str();
@@ -2132,7 +2138,7 @@ bool MeiInput::ReadMeiPage(pugi::xml_node page)
         vrvPage->m_surface = page.attribute("surface").value();
     }
     if (page.attribute("ppu")) {
-        //vrvPage->m_PPUFactor = 12.5; //atof(page.attribute("ppu").value());
+        // vrvPage->m_PPUFactor = 12.5; //atof(page.attribute("ppu").value());
     }
 
     m_doc->AddChild(vrvPage);

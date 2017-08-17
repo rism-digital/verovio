@@ -710,9 +710,9 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
             currentDots = NULL;
         }
     }
-    
+
     /************ Prepare the drawing cue size ************/
-    
+
     Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
     this->Process(&prepareDrawingCueSize, NULL);
 

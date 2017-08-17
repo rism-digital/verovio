@@ -133,9 +133,9 @@ public:
     int GetDrawingTop(Doc *doc, int staffSize, bool withArtic = true, ArticPartType articPartType = ARTIC_PART_INSIDE);
     int GetDrawingBottom(
         Doc *doc, int staffSize, bool withArtic = true, ArticPartType articPartType = ARTIC_PART_INSIDE);
-    
-    /** 
-     * Return the drawing radius for notes and chords 
+
+    /**
+     * Return the drawing radius for notes and chords
      */
     int GetDrawingRadius(Doc *doc);
 
@@ -299,7 +299,7 @@ protected:
      * It is re-computed everytime the object is drawn and it is not stored in the file.
      */
     int m_drawingXRel;
-    
+
     /**
      * The cached drawing cue size set by PrepareDarwingCueSize
      */
@@ -310,7 +310,7 @@ private:
      * Indicates whether it is a ScoreDef or StaffDef attribute
      */
     ElementScoreDefRole m_scoreDefRole;
-    
+
     /**
      * The cached alignment layer @n.
      * This also stores the negative values for identifying cross-staff
