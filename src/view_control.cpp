@@ -65,7 +65,8 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(element);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->HasInterface(INTERFACE_TIME_SPANNING) && !element->Is(DIR) && !element->Is({ DYNAM, FERMATA, HARM, TRILL} )) {
+    if (element->HasInterface(INTERFACE_TIME_SPANNING) && !element->Is(DIR)
+        && !element->Is({ DYNAM, FERMATA, HARM, TRILL })) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -1438,9 +1439,8 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     else
         dc->EndGraphic(tie, this);
 }
-    
-void View::DrawTrill(
-    DeviceContext *dc, Trill *trill, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+
+void View::DrawTrill(DeviceContext *dc, Trill *trill, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
     assert(dc);
     assert(trill);
@@ -1449,7 +1449,7 @@ void View::DrawTrill(
     data_STAFFREL place = trill->GetPlace();
 
     int y = trill->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
-    
+
     // Adjust the x1 for the tr symbol
     if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
         x1 += m_doc->GetGlyphWidth(SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false);
@@ -1462,7 +1462,8 @@ void View::DrawTrill(
     else
         dc->StartGraphic(trill, "spanning-trill", "");
 
-    DrawSmuflHorizontalLine(dc, x1, x2, y, staff->m_drawingStaffSize, false, SMUFL_E59D_ornamentZigZagLineNoRightEnd, 0, SMUFL_E59E_ornamentZigZagLineWithRightEnd);
+    DrawSmuflHorizontalLine(dc, x1, x2, y, staff->m_drawingStaffSize, false, SMUFL_E59D_ornamentZigZagLineNoRightEnd, 0,
+        SMUFL_E59E_ornamentZigZagLineWithRightEnd);
 
     if (graphic)
         dc->EndResumedGraphic(graphic, this);

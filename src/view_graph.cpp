@@ -176,29 +176,30 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staf
 
     return;
 }
-    
-void View::DrawSmuflHorizontalLine(DeviceContext *dc, int x1, int x2, int y, int staffSize, bool dimin, wchar_t fill, wchar_t start, wchar_t end)
+
+void View::DrawSmuflHorizontalLine(
+    DeviceContext *dc, int x1, int x2, int y, int staffSize, bool dimin, wchar_t fill, wchar_t start, wchar_t end)
 {
     assert(dc);
-    
+
     int startWidth = (start == 0) ? 0 : m_doc->GetGlyphWidth(start, staffSize, dimin);
     int fillWidth = m_doc->GetGlyphWidth(fill, staffSize, dimin);
     int endWidth = (end == 0) ? 0 : m_doc->GetGlyphWidth(end, staffSize, dimin);
     int totalWidth = x2 - x1;
-    
+
     if (totalWidth <= 0) return;
-    
+
     int count = (totalWidth - startWidth - endWidth) / fillWidth;
-    
+
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
 
     std::wstring str;
-    
+
     if (start != 0) {
         str.push_back(start);
     }
-    
+
     int i;
     for (i = 0; i < count; i++) {
         str.push_back(fill);
@@ -207,7 +208,7 @@ void View::DrawSmuflHorizontalLine(DeviceContext *dc, int x1, int x2, int y, int
     if (end != 0) {
         str.push_back(end);
     }
-    
+
     dc->DrawMusicText(str, ToDeviceContextX(x1), ToDeviceContextY(y), false);
 
     dc->ResetFont();
