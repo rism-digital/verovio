@@ -353,6 +353,7 @@ protected:
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
     void DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *system);
+    void DrawTrill(DeviceContext *dc, Trill *trill, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *system);
     ///@}
 
@@ -416,6 +417,7 @@ protected:
     void DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle = 0.0);
     void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
     void DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s);
+    void DrawSmuflHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int staffSize, bool dimin, wchar_t fill, wchar_t start = 0, wchar_t end = 0);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100,
         bool dimin = false, bool setBBGlyph = false);
     void DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);

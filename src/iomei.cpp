@@ -969,7 +969,7 @@ void MeiOutput::WriteMeiTrill(pugi::xml_node currentNode, Trill *trill)
     assert(trill);
 
     WriteControlElement(currentNode, trill);
-    WriteTimePointInterface(currentNode, trill);
+    WriteTimeSpanningInterface(currentNode, trill);
     trill->WriteColor(currentNode);
     trill->WriteOrnamentAccid(currentNode);
     trill->WritePlacement(currentNode);
@@ -2749,7 +2749,7 @@ bool MeiInput::ReadMeiTrill(Object *parent, pugi::xml_node trill)
     Trill *vrvTrill = new Trill();
     ReadControlElement(trill, vrvTrill);
 
-    ReadTimePointInterface(trill, vrvTrill);
+    ReadTimeSpanningInterface(trill, vrvTrill);
     vrvTrill->ReadColor(trill);
     vrvTrill->ReadOrnamentAccid(trill);
     vrvTrill->ReadPlacement(trill);
