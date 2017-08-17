@@ -32,14 +32,15 @@ Version 5.2.26 - revising position of some rests
 Version 5.2.27 - adding some anchor points to note heads
 Version 5.2.28 - correcting anchor points
 Version 5.2.29 - adding plus time signature symbols
+Version 5.2.30 - adding some combining strokes for trills
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20161003 at Thu May 18 09:37:01 2017
+Created by FontForge 20161003 at Thu Aug 17 15:59:34 2017
  By laurent
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.29
+Version 5.2.30
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="274" >
@@ -1078,5 +1079,11 @@ c-10 38 -26 47 -67 53c-39 -6 -62 -27 -70 -62c0 -33 19 -54 58 -62l17 -6c2 -1 8 0 
 d="M252.8 -28h-98.3994v-98.4004h-56v98.4004h-98.4004v56.7998h98.4004v97.6006h56v-97.6006h98.3994v-56.7998z" />
     <glyph glyph-name="uniE08C" unicode="&#xe08c;" horiz-adv-x="342" 
 d="M341.279 -37.7998h-132.839v-132.841h-75.5996v132.841h-132.841v76.6787h132.841v131.762h75.5996v-131.762h132.839v-76.6787z" />
+    <glyph glyph-name="uniE59E" unicode="&#xe59e;" horiz-adv-x="375" 
+d="M0 16.7998v47.2002l129 120s9 7.2002 17 8c5 0.799805 10 -1 15 -4.7998l103 -74.4004s7 -5.59961 13 -6.39941c7 -0.800781 16 4 16 4l82 73.5996v-51.2002l-143 -126.399c-7 -5.60059 -14 -6.40039 -19 -6.40039c-3 0 -7 0 -10 3.2002l-105 75.2002
+c-6 4.7998 -11 5.59961 -18 5.59961c-3 0 -9 -4 -12 -6.40039z" />
+    <glyph glyph-name="uniE59D" unicode="&#xe59d;" horiz-adv-x="244" 
+d="M0 16.7998v47.2002l129 120s9 7.2002 17 8c5 0.799805 9 -2.40039 12 -4.7998c53 -38.4004 126 -91.2002 142 -102.4c10.9814 -7.68652 -1.0625 -15.9727 -1 -16l-55.3818 -52l-11.6182 -10.3994c-7 -5.60059 -14 -6.40039 -19 -6.40039c-3 0 -7 0 -10 3.2002
+l-105 75.2002c-6 4.7998 -11 5.59961 -18 5.59961c-3 0 -9 -4 -12 -6.40039z" />
   </font>
 </defs></svg>
