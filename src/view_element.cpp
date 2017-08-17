@@ -187,13 +187,16 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(accid);
 
     // This can happen with accid within note with only accid.ges
+    // We still create an graphic in the output
     if (!accid->HasAccid()) {
+        dc->StartGraphic(element, "", element->GetUuid());
         accid->SetEmptyBB();
+        dc->EndGraphic(element, this);
         return;
     }
 
     dc->StartGraphic(element, "", element->GetUuid());
-
+    
     /************** editorial accidental **************/
 
     std::wstring accidStr = accid->GetSymbolStr();
