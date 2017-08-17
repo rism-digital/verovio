@@ -29,7 +29,7 @@
                                     <note dur="4" oct="4" pname="g" stem.dir="down" />
                                 </layer>
                             </staff>
-                            <trill staff="1" tstamp="1" />
+                            <trill staff="1" tstamp="1" tstamp2="0m+1.9" />
                         </measure>
                         <measure n="2" right="dbl">
                             <staff n="1">
