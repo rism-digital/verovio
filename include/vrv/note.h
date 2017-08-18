@@ -138,11 +138,6 @@ public:
     ///}
 
     /**
-     * Get the drawing radius of the note head taking into accound the note duration
-     */
-    int GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) const;
-
-    /**
      * Returns a single integer representing pitch and octave.
      */
     int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; }
@@ -152,8 +147,8 @@ public:
      * If necessary look at the glyph anchor (if any).
      */
     ///@{
-    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize);
-    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize);
+    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
+    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
     ///@}
 
     /**

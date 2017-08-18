@@ -285,7 +285,7 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
 
     // draw tuplet numerator
     if ((tuplet->GetNum() > 0) && (tuplet->GetNumVisible() != BOOLEAN_false)) {
-        bool drawingCueSize = tuplet->IsCueSize();
+        bool drawingCueSize = tuplet->GetDrawingCueSize();
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
         notes = IntToTupletFigures((short int)tuplet->GetNum());
         if (tuplet->GetNumFormat() == tupletVis_NUMFORMAT_ratio) {

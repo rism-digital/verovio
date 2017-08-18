@@ -78,7 +78,7 @@ public:
     /** Return true if the element is a grace note */
     bool IsGraceNote();
     /** Return true if the element is has to be rederred as cue sized */
-    bool IsCueSize();
+    bool GetDrawingCueSize();
     /** Return true if the element is a note within a ligature */
     bool IsInLigature();
     /** Return true if the element is a note or a chord within a fTrem */
@@ -133,6 +133,11 @@ public:
     int GetDrawingTop(Doc *doc, int staffSize, bool withArtic = true, ArticPartType articPartType = ARTIC_PART_INSIDE);
     int GetDrawingBottom(
         Doc *doc, int staffSize, bool withArtic = true, ArticPartType articPartType = ARTIC_PART_INSIDE);
+
+    /**
+     * Return the drawing radius for notes and chords
+     */
+    int GetDrawingRadius(Doc *doc);
 
     /**
      * Alignment getter
@@ -295,15 +300,17 @@ protected:
      */
     int m_drawingXRel;
 
+    /**
+     * The cached drawing cue size set by PrepareDarwingCueSize
+     */
+    bool m_drawingCueSize;
+
 private:
     /**
      * Indicates whether it is a ScoreDef or StaffDef attribute
      */
     ElementScoreDefRole m_scoreDefRole;
-    /**
-     * The cached drawing cue size set by PrepareDarwingCueSize
-     */
-    bool m_drawingCueSize;
+
     /**
      * The cached alignment layer @n.
      * This also stores the negative values for identifying cross-staff
