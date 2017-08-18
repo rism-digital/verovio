@@ -21,8 +21,8 @@ namespace vrv {
 
 class Arpeg : public ControlElement,
               public TimePointInterface,
-            public AttArpegLog,
-    public AttArpegVis,
+              public AttArpegLog,
+              public AttArpegVis,
               public AttColor {
 public:
     /**
