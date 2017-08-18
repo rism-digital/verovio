@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul 26 16:50:20 CEST 2017
+// Last Modified: Thu Aug 17 22:09:57 EDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -38,6 +38,410 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "humlib.h"
 
 namespace hum {
+
+
+
+//////////////////////////////
+//
+// Convert::majorScaleBase40 -- Return the base-40 scale degree
+//     tonic-intervals for each  note in a major scale.  The input is the
+//     base-40 pitch-class of the root.  The default input is 0, which
+//     will return a list of the intervals for each scale degree to the
+//     tonic of the key.
+//
+
+vector<int> Convert::majorScaleBase40(void) {
+	return {0, 6, 12, 17, 23, 29, 35};
+}
+
+
+
+//////////////////////////////
+//
+// Convert::minorHScaleBase40 -- Return the base-40 scale degree
+//     tonic-intervals for each  note in a harmonic minor scale.  The input
+//     is the base-40 pitch-class of the root.  The default input is 0, which
+//     will return a list of the intervals for each scale degree to the
+//     tonic of the key.
+//
+
+vector<int> Convert::minorHScaleBase40(void) {
+	return {0, 6, 11, 17, 23, 28, 35};
+}
+
+
+
+//////////////////////////////
+//
+// Convert::keyToBase40 -- convert a Humdrum **kern key designation into
+//    a base-40 integer.  Positive values are for major keys and negative
+//    values are for minor keys.  (C-double-flat major is 40 rather than 0).
+//    Returns 0 if no legitimate key was found.
+//
+
+int Convert::keyToBase40(const string& key) {
+	string token;
+	auto loc = key.find(":");
+	if (loc != std::string::npos) {
+		token = key.substr(0, loc);
+	} else {
+		token = key;
+	}
+
+	int base40 = Convert::kernToBase40(token);
+	if (base40 < 0)  {
+		return 0;
+	}
+
+	if (base40 >= 160) {
+		base40 = -(base40 % 40);
+		if (base40 == 0) {
+			base40 = -40;
+		}
+	} else {
+		base40 = base40 % 40;
+		if (base40 == 0) {
+			base40 = 40;
+		}
+	}
+	return base40;
+}
+
+
+
+//////////////////////////////
+//
+// Convert::keyToInversion -- Extract the inversion from a **harm token.
+//    Root position is 0, first inversion is 1, etc. up to 6th inversion
+//    for 13th chords.
+//
+
+int Convert::keyToInversion(const string& harm) {
+	for (char ch : harm) {
+		if ((ch >= 'a') && (ch <= 'g')) {
+			return ch - 'a';
+		}
+	}
+	return 0;
+}
+
+
+
+//////////////////////////////
+//
+// Convert::chromaticAlteration -- Return the sum of "#" minus "-" in the string.
+//
+
+int Convert::chromaticAlteration(const string& content) {
+	int sum = 0;
+	for (char ch : content) {
+		switch (ch) {
+			case '#': sum++; break;
+			case '-': sum--; break;
+		}
+	}
+	return sum;
+}
+
+
+
+//////////////////////////////
+//
+// Convert::makeAdjustedKeyRootAndMode --
+//
+
+void Convert::makeAdjustedKeyRootAndMode(const string& secondary, int& keyroot,
+		int& keymode) {
+
+	vector<int> majorkey = Convert::majorScaleBase40();
+	vector<int> minorkey = Convert::minorHScaleBase40();
+
+	vector<string> roots;
+	HumRegex hre;
+	hre.split(roots, secondary, "/");
+	string piece;
+	int number;
+
+	for (int i=0; i<(int)roots.size(); i++) {
+		piece = roots[(int)roots.size() - i - 1];
+		number = Convert::romanNumeralToInteger(piece);
+		if (number == 0) {
+			continue;
+		} else if (number > 7) {
+			number = (number - 1) % 7;
+		} else {
+			number -= 1;
+		}
+		if (keymode == 0) { // major key
+			keyroot += majorkey[number];
+		} else {
+			keyroot += minorkey[number];
+		}
+		int alteration = chromaticAlteration(piece);
+		keyroot += alteration;
+		if ((!piece.empty()) && isupper(piece[0])) {
+			keymode = 0; // major
+		} else {
+			keymode = 1; // minor
+		}
+	}
+
+	keyroot = keyroot % 40;
+}
+
+
+
+//////////////////////////////
+//
+// Convert::harmToBase40 -- Convert a **harm chord into a list of
+//   pitch classes contained in the chord.  The output is a vector
+//   that contains the root pitch class in the first slot, then
+//   the successive chord tones after that.  If the vector is empty
+//   then there was some sort of syntax error in the **harm token.
+//   The bass note is placed in the 3rd octave and other pitch classes
+//   in the chord are placed in the 4th octave.
+//
+
+vector<int> Convert::harmToBase40(const string& harm, const string& key) {
+	int keyroot = Convert::keyToBase40(key);
+	int keymode = 0; // major key
+	if (keyroot < 0) {
+		keyroot = -keyroot;
+		keymode = 1; // minor key
+	}
+	return harmToBase40(harm, keyroot, keymode);
+}
+
+
+vector<int> Convert::harmToBase40(const string& harm, int keyroot, int keymode) {
+	// Create a tonic-interval list of the scale-degrees:
+	vector<int> degrees;
+	if (keymode == 1) {
+		degrees = Convert::minorHScaleBase40();
+	} else {
+		degrees = Convert::majorScaleBase40();
+	}
+
+	// Remove any **recip prefixed to token:
+	string newharm = harm;
+	HumRegex hre;
+	if (hre.search(harm, R"(^[{}\d%._\][]+(.*))")) {
+		newharm = hre.getMatch(1);
+	}
+
+	// Remove alternate chord labels:
+	string single;
+	auto loc = newharm.find('[');
+	if (loc != string::npos) {
+		single = newharm.substr(0, loc);
+	} else {
+		single = newharm;
+	}
+
+	// Split off secondary dominant qualifications
+	string cbase;     // base chord
+	string secondary; // secondary chord qualifiers
+	loc = single.find("/");
+	if (loc != string::npos) {
+		cbase = single.substr(0, loc);
+		secondary = single.substr(loc+1, string::npos);
+	} else {
+		cbase = single;
+	}
+
+	// Calculate interval offset for secondary dominants:
+	int newkeyroot = keyroot;
+	int newkeymode = keymode;
+	if (!secondary.empty()) {
+		makeAdjustedKeyRootAndMode(secondary, newkeyroot, newkeymode);
+	}
+
+	int rootdeg = -1; // chord root scale degree in key
+	int degalt = 0;   // degree alteration
+
+	vector<char> chars(256, 0);
+	for (auto ch : cbase) {
+		chars[ch]++;
+	}
+
+	rootdeg = -1; // invalid scale degree
+	degalt = chars['#'] - chars['-'];
+
+	int vcount = chars['V'] + chars['v'];
+	int icount = chars['I'] + chars['i'];
+
+	if (vcount == 1) {
+		switch (icount) {
+			case 0: rootdeg = 4; break; // V
+			case 1:
+				if (cbase.find("IV") != string::npos) {
+					rootdeg = 3; break; // IV
+				} else if (cbase.find("iv") != string::npos) {
+					rootdeg = 3; break; // iv
+				} else {
+					rootdeg = 5; break; // VI/vi
+				}
+			case 2: rootdeg = 6; break; // VII
+			case 3: rootdeg = 0; break; // VIII (I)
+		}
+	} else {
+		switch (icount) {
+			case 0:  // N, Fr, Gn, Lt, Tr
+				if (chars['N']) {
+					// Neapolitan (flat-second scale degree)
+					rootdeg = 1; // -II
+					degalt += -1; // -II
+				} else if (chars['L'] || chars['F'] || chars['G']) {
+					// augmented 6th chord on -VII
+					rootdeg = 5;
+					// fixed to -VI of major scale:
+					if (newkeymode == 0) { // major
+						degalt += -1;
+					} else { // minor
+						// already at -VI in minor
+						degalt += 0;
+					}
+				}
+				break;
+			case 1: rootdeg = 0; break; // I
+			case 2: rootdeg = 1; break; // II
+			case 3: rootdeg = 2; break; // III
+		}
+	}
+
+	int inversion = Convert::keyToInversion(single);
+	vector<int> output;
+
+	if (rootdeg < 0) {
+		return output;
+	}
+
+	int root = degrees.at(rootdeg) + newkeyroot;
+	output.push_back(root);
+
+	int int3  = -1;
+	int int5  = 23;  // assume a perfect 5th
+	int int7  = -1;
+	int int9  = -1;
+	// int int11 = -1;
+	// int int13 = -1;
+
+	// determine the third's interval
+	if (chars['i'] || chars['v']) {
+		// minor third
+		int3 = 11;
+	} else if (chars['I'] || chars['V']) {
+		// major third
+		int3 = 12;
+	} else if (chars['N']) {
+		// neapolitan (major triad)
+		int3 = 12;
+		int5 = 23;
+	} else if (chars['G']) {
+		// german aug. 6th chord
+		int3 = 12;
+		int5 = 23;
+		int7 = 30; // technically on 6th
+	} else if (chars['L']) {
+		// Italian aug. 6th chord
+		int3 = 12;
+		int5 = -1;
+		int7 = 30; // technically on 6th
+	} else if (chars['F']) {
+		// French aug. 6th chord
+		int3 = 12;
+		int5 = 18; // technically on 4th
+		int7 = 30; // technically on 6th
+	}
+
+	// determine the fifth's interval
+	if (chars['o']) { // diminished
+		int5 = 22;
+	}
+	if (chars['+']) { // augmented
+		int5 = 24;
+	}
+
+	if (int3 > 0) {
+		output.push_back(int3 + output[0]);
+	}
+	if (int5 > 0) {
+		output.push_back(int5 + output[0]);
+	}
+
+
+	///// determine higher chord notes
+
+	// determine the seventh
+	if (chars['7']) {
+		int7 = degrees.at((rootdeg + 6) % 7) - degrees.at(rootdeg);
+		if (int7 < 0) {
+			int7 += 40;
+		}
+		if (hre.search(cbase, "(A+|D+|M|m)7")) {
+			string quality = hre.getMatch(1);
+			if (quality == "M") {
+				int7 = 35;
+			} else if (quality == "m") {
+				int7 = 34;
+			} else if (quality[0] == 'D') {
+				int7 = 34 - (int)quality.size();
+			} else if (quality[0] == 'A') {
+				int7 = 35 + (int)quality.size();
+			}
+		}
+		output.push_back(int7 % 40 + output[0]);
+	}
+
+	// determine the 9th
+	if (chars['9']) {
+		HumRegex hre;
+		int9 = degrees.at((rootdeg + 1) % 7) - degrees.at(rootdeg);
+		if (int9 < 0) {
+			int9 += 40;
+		}
+		if (hre.search(cbase, "(A+|D+|M|m)9")) {
+			string quality = hre.getMatch(1);
+			if (quality == "M") {
+				int9 = 46;
+			} else if (quality == "m") {
+				int9 = 45;
+			} else if (quality[0] == 'D') {
+				int9 = 45 - (int)quality.size();
+			} else if (quality[0] == 'A') {
+				int9 = 46 + (int)quality.size();
+			}
+		}
+		output.push_back(int9 + output[0]);
+	}
+
+
+	// add inverion
+	if (inversion < (int)output.size()) {
+		output[inversion] = output[inversion] % 40 + 3 * 40;
+	}
+
+	int oct = 4;
+	int lastvalue = -1;
+	for (int i=0; i<(int)output.size(); i++) {
+		if (i != inversion) {
+			output[i] = output[i] % 40 + oct * 40;
+			if (output[i] < lastvalue) {
+				output[i] += 40;
+			}
+			if (output[i] < lastvalue) {
+				output[i] += 40;
+			}
+			lastvalue = output[i];
+		} else {
+		}
+	}
+
+	return output;
+
+}
+
+
 
 
 
@@ -415,6 +819,41 @@ double Convert::pearsonCorrelation(vector<double> x, vector<double> y) {
 	double covxy  = sumco / size;
 
 	return covxy / (popsdx * popsdy);
+}
+
+
+
+//////////////////////////////
+//
+// Convert::romanNumeralToInteger -- Convert a roman numeral into an integer.
+//
+
+int Convert::romanNumeralToInteger(const string& roman) {
+	int rdigit;
+	int sum = 0;
+	char previous='_';
+	for (int i=(roman.length()-1); i>=0; i--) {
+		switch (roman[i]) {
+			case 'I': case 'i': rdigit =    1; break;
+			case 'V': case 'v': rdigit =    5; break;
+			case 'X': case 'x': rdigit =   10; break;
+			case 'L': case 'l': rdigit =   50; break;
+			case 'C': case 'c': rdigit =  100; break;
+			case 'D': case 'd': rdigit =  500; break;
+			case 'M': case 'm': rdigit = 1000; break;
+			default:  rdigit =   -1;
+		}
+		if (rdigit < 0) {
+			continue;
+		} else if (rdigit < sum && (roman[i] != previous)) {
+			sum -= rdigit;
+		} else {
+			sum += rdigit;
+		}
+		previous = roman[i];
+	}
+
+	return sum;
 }
 
 
@@ -2450,6 +2889,7 @@ void GridMeasure::addLayoutParameter(GridSlice* slice, int partindex, const stri
 		} else {
 			break;
 		}
+		previous++;
 	}
 
 	auto insertpoint = previous.base();
@@ -2511,6 +2951,125 @@ void GridMeasure::addDynamicsLayoutParameters(GridSlice* slice, int partindex,
 
 	HTp newtoken = new HumdrumToken(locomment);
 	newslice->at(partindex)->setDynamics(newtoken);
+}
+
+
+
+//////////////////////////////
+//
+// GridMeasure::isMonophonicMeasure --  One part starts with note/rest, the others 
+//     with invisible rest.
+//
+
+bool GridMeasure::isMonophonicMeasure(void) {
+	int inviscount = 0;
+	int viscount = 0;
+
+	for (auto slice : *this) {
+		if (!slice->isDataSlice()) {
+			continue;
+		}
+		for (int p=0; p<(int)slice->size(); p++) {
+			GridPart* part = slice->at(p);
+			for (int s=0; s<(int)part->size(); s++) {
+				GridStaff* staff = part->at(s);
+				for (int v=0; v<(int)staff->size(); v++) {
+					GridVoice* voice = staff->at(v);
+					HTp token = voice->getToken();
+					if (!token) {
+						return false;
+					}
+					if (token->find("yy")) {
+						inviscount++;
+					} else {
+						viscount++;
+					}
+				}
+				if (inviscount + viscount) {
+					break;
+				}
+			}
+			if (inviscount + viscount) {
+				break;
+			}
+		}
+		if (inviscount + viscount) {
+			break;
+		}
+	}
+	if ((viscount = 1) && (inviscount > 0)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// GridMeasure::isSingleChordMeasure --
+//
+
+bool GridMeasure::isSingleChordMeasure(void) {
+
+	for (auto slice : *this) {
+		if (!slice->isDataSlice()) {
+			continue;
+		}
+		for (int p=0; p<(int)slice->size(); p++) {
+			GridPart* part = slice->at(p);
+			for (int s=0; s<(int)part->size(); s++) {
+				GridStaff* staff = part->at(s);
+				for (int v=0; v<(int)staff->size(); v++) {
+					GridVoice* voice = staff->at(v);
+					HTp token = voice->getToken();
+					if (!token) {
+						return false;
+					}
+					if (!token->isChord()) {
+						return false;
+					}
+				}
+			}
+		}
+	}
+	return true;
+
+}
+
+
+
+//////////////////////////////
+//
+// GridMeasure::isInvisible --
+//
+
+bool GridMeasure::isInvisible(void) {
+
+	for (auto slice : *this) {
+		if (!slice->isDataSlice()) {
+			continue;
+		}
+		for (int p=0; p<(int)slice->size(); p++) {
+			GridPart* part = slice->at(p);
+			for (int s=0; s<(int)part->size(); s++) {
+				GridStaff* staff = part->at(s);
+				for (int v=0; v<(int)staff->size(); v++) {
+					GridVoice* voice = staff->at(v);
+					HTp token = voice->getToken();
+					if (!token) {
+						return false;
+					}
+					if (token->find("yy") == string::npos) {
+						return false;
+					}
+				}
+			}
+		}
+	}
+	return true;
+
 }
 
 
@@ -6072,6 +6631,175 @@ void HumGrid::insertSideTerminals(HumdrumLine* line, int part, int staff) {
 		}
 	}
 }
+
+
+
+//////////////////////////////
+//
+// HumGrid::transferNonDataSlices --
+//
+
+void HumGrid::transferNonDataSlices(GridMeasure* output, GridMeasure* input) {
+	for (auto it = input->begin(); it != input->end(); it++) {
+		GridSlice* slice = *it;
+		if (slice->isDataSlice()) {
+			continue;
+		}
+		output->push_front(slice);
+		input->erase(it);
+		it--;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::removeSibeliusIncipit --
+//
+
+void HumGrid::removeSibeliusIncipit(void) {
+
+	if (this->size() == 0) {
+		return;
+	}
+	GridMeasure* measure = this->at(0);
+	bool invisible = measure->isInvisible();
+	if (!invisible) {
+		return;
+	}
+
+	this->erase(this->begin());
+	if (this->size() > 0) {
+		transferNonDataSlices(this->at(0), measure);
+	}
+	delete measure;
+	measure = NULL;
+
+	// remove vocal ranges, if present
+	if (this->size() == 0) {
+		return;
+	}
+
+	measure = this->at(0);
+	bool singlechord = measure->isSingleChordMeasure();
+	if (!singlechord) {
+		return;
+	}
+
+	this->erase(this->begin());
+	if (this->size() > 0) {
+		transferNonDataSlices(this->at(0), measure);
+	}
+	delete measure;
+	measure = NULL;
+
+	measure = this->at(0);
+	bool monophonic = measure->isMonophonicMeasure();
+	if (!monophonic) {
+		return;
+	}
+
+	string melody = extractMelody(measure);
+
+	this->erase(this->begin());
+	if (this->size() > 0) {
+		transferNonDataSlices(this->at(0), measure);
+	}
+	delete measure;
+	measure = NULL;
+
+	if (this->size() > 0) {
+		insertMelodyString(this->at(0), melody);
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::insertMelodyString -- Insert a global comment before first data line.
+//
+
+void HumGrid::insertMelodyString(GridMeasure* measure, const string& melody) {
+	for (auto it = measure->begin(); it != measure->end(); it++) {
+		GridSlice* slice = *it;
+		if (!slice->isDataSlice()) {
+			continue;
+		}
+
+		// insert a new GridSlice
+		// first need to implement global commands in GridSlice object...
+		break;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::extractMelody --
+//
+
+string HumGrid::extractMelody(GridMeasure* measure) {
+	string output = "!!";
+
+	int parti  = -1;
+	int staffi = -1;
+	int voicei = -1;
+
+	// First find the part which has the melody:
+	for (auto slice : *measure) {
+		if (!slice->isDataSlice()) {
+			continue;
+		}
+		for (int p=0; p<(int)slice->size(); p++) {
+			GridPart* part = slice->at(p);
+			for (int s=0; s<(int)part->size(); s++) {
+				GridStaff* staff = part->at(s);
+				for (int v=0; v<(int)staff->size(); v++) {
+					GridVoice* voice = staff->at(v);
+					HTp token = voice->getToken();
+					if (!token) {
+						continue;
+					}
+					if (token->find("yy") == string::npos) {
+						parti  = p;
+						staffi = s;
+						voicei = v;
+						goto loop_end;
+					}
+				}
+			}
+		}
+	}
+
+	loop_end:
+
+	if (parti < 0) {
+		return output;
+	}
+
+	// First find the part which has the melody:
+	for (auto slice : *measure) {
+		if (!slice->isDataSlice()) {
+			continue;
+		}
+		HTp token = slice->at(parti)->at(staffi)->at(voicei)->getToken();
+		if (!token) {
+			continue;
+		}
+		if (*token == ".") {
+			continue;
+		}
+		output += " ";
+		output += *token;
+	}
+
+	return output;
+}
+
 
 
 
@@ -10196,6 +10924,22 @@ bool HumdrumFileBase::readCsv(istream& contents, const string& separator) {
 
 bool HumdrumFileBase::analyzeBaseFromLines(void)  {
 	if (!analyzeTokens()) { return isValid(); }
+	if (!analyzeLines() ) { return isValid(); }
+	if (!analyzeSpines()) { return isValid(); }
+	if (!analyzeLinks() ) { return isValid(); }
+	if (!analyzeTracks()) { return isValid(); }
+	return isValid();
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::analyzeBaseFromTokens --
+//
+
+bool HumdrumFileBase::analyzeBaseFromTokens(void) {
+	// if (!analyzeTokens()) { return isValid(); } // this creates tokens from lines
 	if (!analyzeLines() ) { return isValid(); }
 	if (!analyzeSpines()) { return isValid(); }
 	if (!analyzeLinks() ) { return isValid(); }
@@ -17424,6 +18168,10 @@ bool HumdrumToken::isKeySignature(void) {
 //////////////////////////////
 //
 // HumdrumToken::isKeyDesignation -- True if a **kern key designation.
+//   *C:
+//   *A-:
+//   *c#:
+//   *d:dor
 //
 
 bool HumdrumToken::isKeyDesignation(void) {
@@ -17433,7 +18181,7 @@ bool HumdrumToken::isKeyDesignation(void) {
 	if (this->find(":") == string::npos) {
 		return false;
 	}
-	char diatonic = (*this)[2];
+	char diatonic = (*this)[1];
 
 	if ((diatonic >= 'A') && (diatonic <= 'G')) {
 		return true;
@@ -28935,6 +29683,7 @@ RECONSIDER:
 		if (((othMeterNum % 3 == 0) && (odur >= othMeterDen)) && // the durational value of the meter's denominator groups in threes and the sus lasts at least as long as the denominator
 				((dur == othMeterDen*2) || // the ref note lasts 2 times as long as the meter's denominator
 				 ((dur == othMeterDen*threehalves) && ((intn == 0) || (intn == -1))) || // ref note lasts 1.5 times the meter's denominator and next note is a tenorizans ornament
+				 ((dur == othMeterDen*threehalves) && ((unexp_label == m_labels[UNLABELED_Z4]) || (intn == 3))) || // 4-3 susp where agent leaps to diatonic pitch class of resolution
 				 ((dur == sixteenthirds) && (refMeterNum == 3) && (refMeterDen == threehalves)) || // special case for 3/3 time signature
 				 ((odur == othMeterDen*threehalves) && (ointn == -1) && (odurn == 2) && (ointnn == 0)) || // change of agent suspension with ant of resolution
 				 ((dur == othMeterDen) && (odur == othMeterDen*2))) && // unornamented change of agent suspension
@@ -29090,9 +29839,10 @@ RECONSIDER:
 				(((olineindexc == lineindex) && (dur == odur)) && // both voices enter and leave dissonance simultaneously
 				 ((!refLeaptFrom && othLeaptFrom) || // ref voice leaves diss by step or rep and other voice leaves by leap
 				  (refLeaptTo && refLeaptFrom && othLeaptTo && othLeaptFrom) || // both voices enter and leave diss by leap
+				  ((fabs(intp) == 1) && (intn == 0) && ((fabs(ointp)) > 0 || (fabs(ointn) > 0))) || // ref voice enters by step, leaves by rep, other v repeats no more than once
 				  ((fabs(intp) == 1) && (fabs(intn) == 1) && !othLeaptTo && !othLeaptFrom) || // ref voice enters and leaves by step, other voice by step or rep
 				  ((fabs(intp) == 1) && (intn == 0) && !othLeaptTo && (ointn == 0)) || // ref enters by step and leaves by rep, other v enters by step or rep and leaves by rep
-				  (!refLeaptTo && refLeaptFrom && othLeaptFrom))))) { // ref voice enters diss by step and both voices leave by leap
+				  (!refLeaptTo && refLeaptFrom && othLeaptFrom))))) { // ref voice enters diss by step or rep and both voices leave by leap
 			results[vindex][lineindex] = unexp_label;
 		}
 
@@ -33315,6 +34065,8 @@ bool Tool_filter::run(HumdrumFile& infile) {
 			RUNTOOL(cint, infile, commands[i].second, status);
 		} else if (commands[i].first == "dissonant") {
 			RUNTOOL(dissonant, infile, commands[i].second, status);
+		} else if (commands[i].first == "hproof") {
+			RUNTOOL(hproof, infile, commands[i].second, status);
 		} else if (commands[i].first == "imitation") {
 			RUNTOOL(imitation, infile, commands[i].second, status);
 		} else if (commands[i].first == "extract") {
@@ -33407,6 +34159,194 @@ void Tool_filter::getCommandList(vector<pair<string, string> >& commands,
 
 void Tool_filter::initialize(HumdrumFile& infile) {
 	m_debugQ = getBoolean("debug");
+}
+
+
+
+
+
+/////////////////////////////////
+//
+// Tool_gridtest::Tool_hproof -- Set the recognized options for the tool.
+//
+
+Tool_hproof::Tool_hproof(void) {
+	// put option definitions here
+}
+
+
+
+///////////////////////////////
+//
+// Tool_hproof::run -- Primary interfaces to the tool.
+//
+
+bool Tool_hproof::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	return run(infile, out);
+}
+
+
+bool Tool_hproof::run(HumdrumFile& infile, ostream& out) {
+	int status = run(infile);
+	out << infile;
+	return status;
+}
+
+
+bool Tool_hproof::run(HumdrumFile& infile) {
+	markNonChordTones(infile);
+	infile.appendLine("!!!RDF**kern: N = marked note, color=chocolate (non-chord tone)");
+	infile.appendLine("!!!RDF**kern: Z = marked note, color=black (chord tone)");
+	infile.createLinesFromTokens();
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_hproof::markNonChordTones -- Mark
+//
+
+void Tool_hproof::markNonChordTones(HumdrumFile& infile) {
+	vector<HTp> list;
+	infile.getSpineStartList(list);
+	vector<HTp> hlist;
+	for (auto it : list) {
+		if (*it == "**harm") {
+			hlist.push_back(it);
+		}
+		if (*it == "**rhrm") {
+			hlist.push_back(it);
+		}
+	}
+	if (hlist.empty()) {
+		cerr << "Warning: No **harm or **rhrm spines in data" << endl;
+		return;
+	}
+	
+	processHarmSpine(infile, hlist[0]);
+}
+
+
+
+//////////////////////////////
+//
+// processHarmSpine --
+//
+
+void Tool_hproof::processHarmSpine(HumdrumFile& infile, HTp hstart) {
+	string key = "*C:";  // assume C major if no key designation
+	HTp token = hstart;
+	HTp ntoken = token->getNextNNDT();
+	while (token) {
+		markNotesInRange(infile, token, ntoken, key);
+		if (!ntoken) {
+			break;
+		}
+		if (ntoken && token) {
+			getNewKey(token, ntoken, key);
+		}
+		token = ntoken;
+		ntoken = ntoken->getNextNNDT();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_hproof::getNewKey --
+//
+
+void Tool_hproof::getNewKey(HTp token, HTp ntoken, string& key) {
+	token = token->getNextToken();
+	while (token && (token != ntoken)) {
+		if (token->isKeyDesignation()) {
+			key = *token;
+		}
+		token = token->getNextToken();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_hproof::markNotesInRange --
+//
+
+void Tool_hproof::markNotesInRange(HumdrumFile& infile, HTp ctoken, HTp ntoken, const string& key) {
+	if (!ctoken) {
+		return;
+	}
+	int startline = ctoken->getLineIndex();
+	int stopline = infile.getLineCount();
+	if (ntoken) {
+		stopline = ntoken->getLineIndex();
+	}
+	vector<int> cts;
+	cts = Convert::harmToBase40(ctoken, key);
+	for (int i=startline; i<stopline; i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			if (!infile.token(i, j)->isKern()) {
+				continue;
+			}
+			HTp tok = infile.token(i, j);
+			if (tok->isNull()) {
+				continue;
+			}
+			if (tok->isRest()) {
+				continue;
+			}
+			markHarmonicTones(tok, cts);
+		}
+	}
+
+// cerr << "TOK\t" << ctoken << "\tLINES\t" << startline << "\t" << stopline << "\t";
+// for (int i=0; i<cts.size(); i++) {
+// cerr << " " << Convert::base40ToKern(cts[i]);
+// }
+// cerr << endl;
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_hproof::markHarmonicTones --
+//
+
+void Tool_hproof::markHarmonicTones(HTp tok, vector<int>& cts) {
+	int count = tok->getSubtokenCount();
+	vector<int> notes = cts;
+	string output;
+	for (int i=0; i<count; i++) {
+		string subtok = tok->getSubtoken(i);
+		int pitch = Convert::kernToBase40(subtok);
+		if (i > 0) {
+			output += " ";
+		}
+		bool found = false;
+		for (int j=0; j<(int)cts.size(); j++) {
+			if (pitch % 40 == cts[j] % 40) {
+				output += subtok;
+				output += "Z";
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			output += subtok;
+			output += "N";
+		}
+	}
+	tok->setText(output);
 }
 
 
@@ -33670,7 +34610,15 @@ void Tool_imitation::analyzeImitation(vector<vector<string>>& results,
 				results[v1][line1] += to_string(distance1.getNumerator());
 			}
 			results[v1][line1] += ":i";
-			results[v1][line1] += to_string(interval + 1);
+			if (interval > 0) {
+				results[v1][line1] += to_string(interval + 1);
+			} else {
+				int newinterval = -(interval + 1);
+				if (newinterval == -1) {
+					newinterval = 1; // unison (no sign)
+				}
+				results[v1][line1] += to_string(newinterval);
+			}
 
 			if (!results[v2][line2].empty()) {
 				results[v2][line2] += " ";
@@ -33686,7 +34634,15 @@ void Tool_imitation::analyzeImitation(vector<vector<string>>& results,
 				results[v2][line2] += to_string(distance2.getNumerator());
 			}
 			results[v2][line2] += ":i";
-			results[v2][line2] += to_string(interval + 1);
+			if (interval > 0) {
+				int newinterval = -(interval + 1);
+				if (newinterval == -1) {
+					newinterval = 1; // unison (no sign)
+				}
+				results[v2][line2] += to_string(newinterval);
+			} else {
+				results[v2][line2] += to_string(interval + 1);
+			}
 
 			if (m_mark) {
 				for (int z=0; z<count; z++) {
@@ -34076,8 +35032,6 @@ bool Tool_musicxml2hum::convert(ostream& out, const char* input) {
 
 
 bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
-
-
 	initialize();
 
 	bool status = true; // for keeping track of problems in conversion process.
@@ -34114,6 +35068,7 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	status &= stitchParts(outdata, partids, partinfo, partcontent, partdata);
 
 	outdata.removeRedundantClefChanges();
+	outdata.removeSibeliusIncipit();
 
 	// tranfer verse counts from parts/staves to HumGrid:
 	// should also do part verse counts here (-1 staffindex).
@@ -34145,9 +35100,12 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	HumdrumFile outfile;
 
 	outdata.transferTokens(outfile);
+
 	addHeaderRecords(outfile, doc);
 	addFooterRecords(outfile, doc);
 
+	Tool_ruthfix ruthfix;
+	ruthfix.run(outfile);
 
 	for (int i=0; i<outfile.getLineCount(); i++) {
 		outfile[i].createLineFromTokens();
@@ -34262,7 +35220,15 @@ void Tool_musicxml2hum::addFooterRecords(HumdrumFile& outfile, xml_document& doc
 
 	// YEM: copyright
 	string copy = doc.select_single_node("/score-partwise/identification/rights").node().child_value();
-	if (copy != "") {
+	bool validcopy = true;
+	if (copy == "") {
+		validcopy = false;
+	}
+	if ((copy.find("opyright") != std::string::npos) && (copy.size() < 15)) {
+		validcopy = false;
+	}
+
+	if (validcopy) {
 		string yem_record = "!!!YEM:\t";
 		yem_record += copy;
 		outfile.appendLine(yem_record);
@@ -34904,6 +35870,16 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 
 	if (!event->isFloating()) {
 		recip     = event->getRecip();
+		// will need to fix for exotic tuplest such as 11%2 or 1%23
+		auto loc = recip.find("1%2");
+		if (loc != string::npos) {
+			recip.replace(loc, 3, "0");
+		}
+		// will need to fix for exotic tuplest such as 11%4 or 1%42
+		loc = recip.find("1%4");
+		if (loc != string::npos) {
+			recip.replace(loc, 3, "00");
+		}
 		pitch     = event->getKernPitch();
 		prefix    = event->getPrefixNoteInfo();
 		postfix   = event->getPostfixNoteInfo(primarynote);
@@ -39136,6 +40112,132 @@ void Tool_recip::initialize(HumdrumFile& infile) {
 	}
 	if (m_exinterp[1] != '*') {
 		m_exinterp.insert(0, "*");
+	}
+}
+
+
+
+
+
+/////////////////////////////////
+//
+// Tool_ruthfix::Tool_ruthfix -- Set the recognized options for the tool.
+//
+
+Tool_ruthfix::Tool_ruthfix(void) {
+	// add options here
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_ruthfix::run -- Do the main work of the tool.
+//
+
+bool Tool_ruthfix::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_ruthfix::run(HumdrumFile& infile, ostream& out) {
+	int status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_ruthfix::run(HumdrumFile& infile) {
+	insertCrossBarTies(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_ruthfix::insertCrossBarTies -- 
+//
+
+void Tool_ruthfix::insertCrossBarTies(HumdrumFile& infile) {
+	int scount = infile.getStrandCount();
+	if (scount == 0) {
+		// The input file was not read from a file but was created
+		// dynamically.  The easiest thing to do is to reload to get the 
+		// spine/strand information.
+		stringstream ss;
+		infile.createLinesFromTokens();
+		ss << infile;
+		infile.readString(ss.str());
+	}
+	scount = infile.getStrandCount();
+
+
+	HTp token;
+	for (int i=0; i<scount; i++) {
+		token = infile.getStrandStart(i);
+		if (!token->isKern()) {
+			continue;
+		}
+		insertCrossBarTies(infile, i);
+	}
+}
+
+
+void Tool_ruthfix::insertCrossBarTies(HumdrumFile& infile, int strand) {
+	HTp sstart = infile.getStrandStart(strand);
+	HTp send   = infile.getStrandEnd(strand);
+	HTp s = sstart;
+	HTp lastnote = NULL;
+	bool barstart = true;
+	while (s != send) {
+		if (s->isBarline()) {
+			barstart = true;
+		} else if (s->isNote()) {
+			if (lastnote && barstart && (s->find("yy") != string::npos)) {
+				createTiedNote(lastnote, s);
+			}
+			barstart = false;
+			lastnote = s;
+		} else if (s->isRest()) {
+			lastnote = NULL;
+			barstart = false;
+		}
+		s = s->getNextToken();
+		if (!s) {
+			break;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_ruthfix::createTiedNote -- Does not work for chords.
+//  change  1E-X TO 2E-Xyy
+//      to  [1E-X TO 2E-X]
+//
+
+void Tool_ruthfix::createTiedNote(HTp left, HTp right) {
+	if (left->isChord() || right->isChord()) {
+		return;
+	}
+	auto loc = right->find("yy");
+	if (loc != string::npos) {
+		left->insert(0, 1, '[');
+		right->replace(loc, 2, "]");
 	}
 }
 

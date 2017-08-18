@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul 26 16:50:20 CEST 2017
+// Last Modified: Thu Aug 17 22:09:57 EDT 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1475,6 +1475,8 @@ class HumdrumFileBase : public HumHash {
 		HumdrumLine*  back                     (void);
 		void          makeBooleanTrackList     (vector<bool>& spinelist,
 		                                        const string& spinestring);
+		bool          analyzeBaseFromLines     (void);
+		bool          analyzeBaseFromTokens    (void);
 
 
 		vector<HumdrumLine*> getReferenceRecords(void);
@@ -1528,7 +1530,6 @@ class HumdrumFileBase : public HumHash {
 
 	protected:
 		bool          analyzeTokens             (void);
-		bool          analyzeBaseFromLines      (void);
 		bool          analyzeSpines             (void);
 		bool          analyzeLinks              (void);
 		bool          analyzeTracks             (void);
@@ -1717,10 +1718,10 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		HumNum        getBarlineDurationToEnd      (int index) const;
 
 		bool          analyzeStructure             (void);
+		bool          analyzeStrands               (void);
 
 	protected:
 
-		bool          analyzeStrands               (void);
 		bool          analyzeRhythm                (void);
 		bool          assignRhythmFromRecip        (HTp spinestart);
 		bool          analyzeMeter                 (void);
@@ -2343,9 +2344,9 @@ class Convert {
 		static HumNum  recipToDurationNoDots(string* recip,
 		                                     HumNum scale = 4,
 		                                     const string& separator = " ");
-		static string  durationToRecip      (HumNum duration, 
+		static string  durationToRecip      (HumNum duration,
 		                                     HumNum scale = HumNum(1,4));
-		static string  durationFloatToRecip (double duration, 
+		static string  durationFloatToRecip (double duration,
 		                                     HumNum scale = HumNum(1,4));
 
 		// Pitch processing, defined in Convert-pitch.cpp
@@ -2417,6 +2418,21 @@ class Convert {
 		static int     base7ToBase40        (int base7);
 		static int     base40IntervalToDiatonic(int base40interval);
 
+		// Harmony processing, defined in Convert-harmony.cpp
+		static vector<int> minorHScaleBase40(void);
+		static vector<int> majorScaleBase40 (void);
+		static int         keyToInversion   (const string& harm);
+		static int         keyToBase40      (const string& key);
+		static vector<int> harmToBase40     (HTp harm, const string& key) {
+		                                        return harmToBase40(*harm, key); }
+		static vector<int> harmToBase40     (HTp harm, HTp key) {
+		                                        return harmToBase40(*harm, *key); }
+		static vector<int> harmToBase40     (const string& harm, const string& key);
+		static vector<int> harmToBase40     (const string& harm, int keyroot, int keymode);
+		static void        makeAdjustedKeyRootAndMode(const string& secondary,
+		                                     int& keyroot, int& keymode);
+		static int         chromaticAlteration(const string& content);
+
 		// data-type specific (other than pitch/rhythm),
 		// defined in Convert-kern.cpp
 		static bool isKernRest              (const string& kerndata);
@@ -2447,7 +2463,7 @@ class Convert {
 		static bool    contains(string* input, const string& pattern);
 		static bool    contains(string* input, char pattern);
 		static void    makeBooleanTrackList(vector<bool>& spinelist,
-		                                     const string& spinestring, 
+		                                     const string& spinestring,
 		                                     int maxtrack);
 
 		// Mathematical processing, defined in Convert-math.cpp
@@ -2459,6 +2475,7 @@ class Convert {
 		static double  significantDigits    (double value, int digits);
 		static bool    isNaN                (double value);
 		static double  pearsonCorrelation   (vector<double> x, vector<double> y);
+		static int     romanNumeralToInteger(const string& roman);
 
 };
 
@@ -2667,6 +2684,10 @@ class GridMeasure : public list<GridSlice*> {
 		                  { return m_style == MeasureStyle::RepeatBoth; }
 		void         addLayoutParameter(GridSlice* slice, int partindex, const string& locomment);
 		void         addDynamicsLayoutParameters(GridSlice* slice, int partindex, const string& locomment);
+		bool         isInvisible(void);
+		bool         isSingleChordMeasure(void);
+		bool         isMonophonicMeasure(void);
+	
 
 	protected:
 		void         appendInitialBarline(HumdrumFile& infile);
@@ -2807,6 +2828,7 @@ class HumGrid : public vector<GridMeasure*> {
 		void setVerseCount              (int partindex, int staffindex, int count);
 		void setHarmonyCount            (int partindex, int count);
 		void removeRedundantClefChanges (void);
+		void removeSibeliusIncipit      (void);
 		bool hasPickup                  (void);
 
 	protected:
@@ -2856,6 +2878,9 @@ class HumGrid : public vector<GridMeasure*> {
 		string getBarStyle                 (GridMeasure* measure);
 		void adjustExpansionsInStaff       (GridSlice* newmanip, GridSlice* curr,
 		                                    int p, int s);
+		void transferNonDataSlices         (GridMeasure* output, GridMeasure* input);
+		string extractMelody               (GridMeasure* measure);
+		void insertMelodyString            (GridMeasure* measure, const string& melody);
 
 	private:
 		vector<GridSlice*>   m_allslices;
@@ -4082,6 +4107,29 @@ class Tool_filter : public HumTool {
 };
 
 
+class Tool_hproof : public HumTool {
+	public:
+		      Tool_hproof      (void);
+		     ~Tool_hproof      () {};
+
+		bool  run              (HumdrumFile& infile);
+		bool  run              (const string& indata, ostream& out);
+		bool  run              (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void  markNonChordTones(HumdrumFile& infile);
+		void  processHarmSpine (HumdrumFile& infile, HTp hstart);
+		void  markNotesInRange (HumdrumFile& infile, HTp ctoken, HTp ntoken, const string& key);
+		void  markHarmonicTones(HTp tok, vector<int>& cts);
+		void  getNewKey        (HTp token, HTp ntoken, string& key);
+
+	private:
+		vector<HTp> m_kernspines;
+
+};
+
+
+
 class Tool_imitation : public HumTool {
 	public:
 		         Tool_imitation    (void);
@@ -4463,6 +4511,23 @@ class Tool_recip : public HumTool {
 
 };
 
+
+
+class Tool_ruthfix : public HumTool {
+	public:
+		         Tool_ruthfix      (void);
+		        ~Tool_ruthfix      () {};
+
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void    insertCrossBarTies (HumdrumFile& infile);
+		void    insertCrossBarTies (HumdrumFile& infile, int strand);
+		void    createTiedNote     (HTp left, HTp right);
+
+};
 
 
 class Tool_satb2gs : public HumTool {
