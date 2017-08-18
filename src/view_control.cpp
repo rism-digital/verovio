@@ -266,8 +266,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             DrawTie(dc, dynamic_cast<Tie *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(TRILL)) {
-            // cast to Slur check in DrawTrill
-            DrawTrill(dc, dynamic_cast<Trill *>(element), x1, x2, *staffIter, spanningType, graphic);
+            // cast to Trill check in DrawTrill
+            DrawTrillExtension(dc, dynamic_cast<Trill *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
     }
 }
@@ -1440,7 +1440,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         dc->EndGraphic(tie, this);
 }
 
-void View::DrawTrill(DeviceContext *dc, Trill *trill, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+void View::DrawTrillExtension(DeviceContext *dc, Trill *trill, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
     assert(dc);
     assert(trill);
