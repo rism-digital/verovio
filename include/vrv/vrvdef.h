@@ -104,6 +104,7 @@ enum ClassId {
     // Ids for ControlElement child classes
     CONTROL_ELEMENT,
     ANCHORED_TEXT,
+    ARPEG,
     BREATH,
     DIR,
     DYNAM,
