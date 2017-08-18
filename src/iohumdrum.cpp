@@ -5789,11 +5789,16 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
 
     bool cautionaryQ = false;
     bool editorialQ = false;
-    if (m_signifiers.editacc) {
-        if (token->find(m_signifiers.editacc) != string::npos) {
-            editorialQ = true;
-        }
-    }
+	string edittype;
+	if (!m_signifiers.editacc.empty()) {
+		for (int x=0; x<(int)m_signifiers.editacc.size(); x++) {
+        	if (token->find(m_signifiers.editacc[x]) != string::npos) {
+            	editorialQ = true;
+				edittype = m_signifiers.edittype[x];
+				break;
+        	}
+		}
+	}
 
     int accidCount = hum::Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
@@ -5827,7 +5832,15 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
         }
     }
     else {
-        accid->SetFunc(accidLog_FUNC_edit);
+		if (edittype == "") {
+        	accid->SetFunc(accidLog_FUNC_edit);
+		} else if (edittype == "brack") {
+			// enclose="brack" cannot be present with func="edit" at the moment...
+			accid->SetEnclose(ENCLOSURE_brack);
+		} else if (edittype == "paren") {
+			// enclose="paren" cannot be present with func="edit" at the moment...
+			accid->SetEnclose(ENCLOSURE_paren);
+		}
         switch (accidCount) {
             case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
             case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
@@ -7968,7 +7981,14 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
 
         // editorial accidentals:
         if (value.find("editorial accidental", equals) != string::npos) {
-            m_signifiers.editacc = signifier;
+            m_signifiers.editacc.push_back(signifier);
+			if (value.find("brack") != string::npos) {
+				m_signifiers.edittype.push_back("brack");
+			} else if (value.find("paren") != string::npos) {
+				m_signifiers.edittype.push_back("paren");
+			} else {
+				m_signifiers.edittype.push_back("");
+			}
         }
 
         // colored notes
