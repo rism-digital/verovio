@@ -181,8 +181,8 @@ public:
     // boolean switches:
     char nostem = '\0'; // !!!RDF**kern: i = no stem
     char cuesize = '\0'; // !!!RDF**kern: i = cue size
-	vector<char> editacc; // !!!RDF**kern: i = editorial accidental
-	vector<string> edittype; // !!!RDF**kern: i= editoral accidental, brack[ets]/paren[theses]
+    vector<char> editacc; // !!!RDF**kern: i = editorial accidental
+    vector<string> edittype; // !!!RDF**kern: i= editoral accidental, brack[ets]/paren[theses]
     char below = '\0'; // !!!RDF**kern: i = below (previous signifier is "below")
     char above = '\0'; // !!!RDF**kern: i = above (previous signifier is "above")
 
