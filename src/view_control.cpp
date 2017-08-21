@@ -17,6 +17,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "arpeg.h"
 #include "attcomparison.h"
 #include "bboxdevicecontext.h"
 #include "breath.h"
@@ -71,6 +72,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
         system->AddToDrawingList(element);
+    }
+    else if (element->Is(ARPEG)) {
+        Arpeg *arpeg = dynamic_cast<Arpeg *>(element);
+        assert(arpeg);
+        DrawArpeg(dc, arpeg, measure, system);
     }
     else if (element->Is(BREATH)) {
         Breath *breath = dynamic_cast<Breath *>(element);
@@ -1577,6 +1583,24 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
     }
 }
 
+    
+void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(arpeg);
+
+    // Cannot draw a breath that has no start position
+    //if (!breath->GetStart()) return;
+
+    dc->StartGraphic(arpeg, "", arpeg->GetUuid());
+
+    arpeg->SetEmptyBB();
+
+    dc->EndGraphic(arpeg, this);
+}
+    
 void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, System *system)
 {
     assert(dc);
