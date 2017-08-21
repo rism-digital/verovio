@@ -2633,7 +2633,7 @@ bool MeiInput::ReadMeiBreath(Object *parent, pugi::xml_node breath)
     vrvBreath->ReadPlacement(breath);
 
     parent->AddChild(vrvBreath);
-    return ReadMeiTextChildren(vrvBreath, breath, vrvBreath);
+    return true;
 }
 
 bool MeiInput::ReadMeiDir(Object *parent, pugi::xml_node dir)
