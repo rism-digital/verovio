@@ -934,10 +934,10 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     if (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2)) {
         y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        DrawRestBreve(dc, mRest->GetDrawingX(), y, staff);
+        DrawRestBreve(dc, mRest->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2, y, staff);
     }
     else
-        DrawRestWhole(dc, mRest->GetDrawingX(), y, DUR_1, false, staff);
+        DrawRestWhole(dc, mRest->GetDrawingX()-m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, false) * 2 / 3, y, DUR_1, false, staff);
 
     if (mRest->HasFermata()) {
         DrawFermataAttr(dc, element, layer, staff);
@@ -1044,7 +1044,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         if (num == 2)
             DrawFilledRectangle(dc, x1, y1 + 4, x2, y2 - 4);
         else
-            DrawRestWhole(dc, xCentered, y1, DUR_1, false, staff);
+            DrawRestWhole(dc, xCentered-m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, false) * 2 / 3, y1, DUR_1, false, staff);
     }
 
     // Draw the text above
