@@ -27,6 +27,7 @@ class Add;
 class AnchoredText;
 class Annot;
 class App;
+class Arpeg;
 class Artic;
 class BarLine;
 class Beam;
@@ -76,6 +77,7 @@ class Orig;
 class Pb;
 class Pedal;
 class PitchInterface;
+class PlistInterface;
 class PositionInterface;
 class Proport;
 class Rdg;
@@ -225,6 +227,7 @@ private:
      */
     ///@{
     void WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
+    void WriteMeiArpeg(pugi::xml_node currentNode, Arpeg *arpeg);
     void WriteMeiBreath(pugi::xml_node currentNode, Breath *breath);
     void WriteMeiDir(pugi::xml_node currentNode, Dir *dir);
     void WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam);
@@ -300,6 +303,7 @@ private:
     //
     void WriteDurationInterface(pugi::xml_node currentNode, DurationInterface *interface);
     void WritePitchInterface(pugi::xml_node currentNode, PitchInterface *interface);
+    void WritePlistInterface(pugi::xml_node currentNode, PlistInterface *interface);
     void WritePositionInterface(pugi::xml_node currentNode, PositionInterface *interface);
     void WriteScoreDefInterface(pugi::xml_node currentNode, ScoreDefInterface *interface);
     void WriteTextDirInterface(pugi::xml_node currentNode, TextDirInterface *interface);
@@ -459,6 +463,7 @@ private:
      */
     ///@{
     bool ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText);
+    bool ReadMeiArpeg(Object *parent, pugi::xml_node arpeg);
     bool ReadMeiBreath(Object *parent, pugi::xml_node breath);
     bool ReadMeiDir(Object *parent, pugi::xml_node dir);
     bool ReadMeiDynam(Object *parent, pugi::xml_node dynam);
@@ -525,6 +530,7 @@ private:
 
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
     bool ReadPitchInterface(pugi::xml_node element, PitchInterface *interface);
+    bool ReadPlistInterface(pugi::xml_node element, PlistInterface *interface);
     bool ReadPositionInterface(pugi::xml_node element, PositionInterface *interface);
     bool ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *interface);
     bool ReadTextDirInterface(pugi::xml_node element, TextDirInterface *interface);

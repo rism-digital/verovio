@@ -11,6 +11,7 @@
 #include "atts_cmn.h"
 #include "atts_visual.h"
 #include "controlelement.h"
+#include "plistinterface.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -20,6 +21,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class Arpeg : public ControlElement,
+              public PlistInterface,
               public TimePointInterface,
               public AttArpegLog,
               public AttArpegVis,
