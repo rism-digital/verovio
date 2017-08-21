@@ -82,18 +82,18 @@ public:
     //-----------------//
     // Pseudo functors //
     //-----------------//
-
-    /**
-     * See Object::PrepareTimeSpanning
-     */
-    virtual int InterfacePrepareTimePointing(FunctorParams *functorParams, Object *object);
-
+    
     /**
      * We have functor in the interface for avoiding code duplication in each implementation class.
      * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor method. These not called by the Process/Call loop but by the implementaion
      * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
      */
+    
+    /**
+     * See Object::PrepareTimeSpanning
+     */
+    virtual int InterfacePrepareTimePointing(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::PrepareTimestamps
@@ -110,11 +110,6 @@ protected:
      * Extract the fragment of the start or end @xml:id if given
      */
     void SetUuidStr();
-
-    /**
-     * Extract the uuid from a string
-     */
-    std::string ExtractUuidFragment(std::string refUuid);
 
 private:
     //

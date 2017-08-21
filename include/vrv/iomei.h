@@ -562,8 +562,6 @@ private:
     ///@{
     void SetMeiUuid(pugi::xml_node element, Object *object);
     DocType StrToDocType(std::string type);
-    /** Extract the uuid for references to uuids with ..#uuid values */
-    std::string ExtractUuidFragment(std::string refUuid);
     std::wstring LeftTrim(std::wstring str);
     std::wstring RightTrim(std::wstring str);
     ///@}

@@ -211,6 +211,10 @@
 		4D6331F51F46D2CB00A0D6BF /* arpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6331F41F46D2CB00A0D6BF /* arpeg.cpp */; };
 		4D6331F61F46D2CB00A0D6BF /* arpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6331F41F46D2CB00A0D6BF /* arpeg.cpp */; };
 		4D6331F71F46D2CB00A0D6BF /* arpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6331F41F46D2CB00A0D6BF /* arpeg.cpp */; };
+		4D6331F91F46DBF200A0D6BF /* plistinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D6331F81F46DBF200A0D6BF /* plistinterface.h */; };
+		4D6331FB1F46DD3A00A0D6BF /* plistinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6331FA1F46DD3A00A0D6BF /* plistinterface.cpp */; };
+		4D6331FC1F46DD3A00A0D6BF /* plistinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6331FA1F46DD3A00A0D6BF /* plistinterface.cpp */; };
+		4D6331FD1F46DD3A00A0D6BF /* plistinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6331FA1F46DD3A00A0D6BF /* plistinterface.cpp */; };
 		4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
 		4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
 		4D763EC91987D067003FCAB5 /* metersig.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D763EC81987D067003FCAB5 /* metersig.h */; };
@@ -543,6 +547,8 @@
 		4D5FA9101E16A93F00F3B919 /* boundingbox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = boundingbox.cpp; path = src/boundingbox.cpp; sourceTree = "<group>"; };
 		4D6331F21F46D2B400A0D6BF /* arpeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = arpeg.h; path = include/vrv/arpeg.h; sourceTree = "<group>"; };
 		4D6331F41F46D2CB00A0D6BF /* arpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = arpeg.cpp; path = src/arpeg.cpp; sourceTree = "<group>"; };
+		4D6331F81F46DBF200A0D6BF /* plistinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = plistinterface.h; path = include/vrv/plistinterface.h; sourceTree = "<group>"; };
+		4D6331FA1F46DD3A00A0D6BF /* plistinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = plistinterface.cpp; path = src/plistinterface.cpp; sourceTree = "<group>"; };
 		4D763EC51987D04D003FCAB5 /* metersig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersig.cpp; path = src/metersig.cpp; sourceTree = "<group>"; };
 		4D763EC81987D067003FCAB5 /* metersig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersig.h; path = include/vrv/metersig.h; sourceTree = "<group>"; };
 		4D796B5C1D78641200A15238 /* harm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = harm.h; path = include/vrv/harm.h; sourceTree = "<group>"; };
@@ -882,6 +888,8 @@
 				4DA60EDF1B6307A8006E2DFC /* textdirinterface.h */,
 				4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */,
 				4DF289FC1A7545CC00BA9F7D /* timeinterface.h */,
+				4D6331FA1F46DD3A00A0D6BF /* plistinterface.cpp */,
+				4D6331F81F46DBF200A0D6BF /* plistinterface.h */,
 			);
 			name = interfaces;
 			sourceTree = "<group>";
@@ -1219,6 +1227,7 @@
 				8F59294418854BF800FE51AD /* layer.h in Headers */,
 				8F59294518854BF800FE51AD /* layerelement.h in Headers */,
 				8F59294718854BF800FE51AD /* measure.h in Headers */,
+				4D6331F91F46DBF200A0D6BF /* plistinterface.h in Headers */,
 				8F59294818854BF800FE51AD /* mensur.h in Headers */,
 				4DA1448D1C2AB29400CB7CEE /* textelement.h in Headers */,
 				8F59294918854BF800FE51AD /* multirest.h in Headers */,
@@ -1469,6 +1478,7 @@
 				4D16946B1E3A455200569BF4 /* MxmlEvent.cpp in Sources */,
 				4D1694371E3A44F300569BF4 /* tie.cpp in Sources */,
 				4D1694381E3A44F300569BF4 /* MidiFile.cpp in Sources */,
+				4D6331FC1F46DD3A00A0D6BF /* plistinterface.cpp in Sources */,
 				4D1694391E3A44F300569BF4 /* tuplet.cpp in Sources */,
 				4D16943A1E3A44F300569BF4 /* pugixml.cpp in Sources */,
 				4D16946E1E3A455200569BF4 /* tool-musicxml2hum.cpp in Sources */,
@@ -1585,6 +1595,7 @@
 				4D95D4F21D6E042400B2B856 /* section.cpp in Sources */,
 				4D1BE7731C688F5A0086DC0E /* MidiMessage.cpp in Sources */,
 				4DCA95D81A515D0E008AD7E9 /* editorial.cpp in Sources */,
+				4D6331FB1F46DD3A00A0D6BF /* plistinterface.cpp in Sources */,
 				4D1694791E41DCDF00569BF4 /* atts_cmnornaments.cpp in Sources */,
 				4DB351151C8040B1002DD057 /* tempo.cpp in Sources */,
 				8F086F04188539540037FD8E /* tie.cpp in Sources */,
@@ -1735,6 +1746,7 @@
 				4DC34BA919BC4A83006175CD /* accid.cpp in Sources */,
 				4DC34BAB19BC4A83006175CD /* custos.cpp in Sources */,
 				4D4335D11ED4502C003BE1A9 /* atts_visual.cpp in Sources */,
+				4D6331FD1F46DD3A00A0D6BF /* plistinterface.cpp in Sources */,
 				4DC34BAD19BC4A83006175CD /* dot.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

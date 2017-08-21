@@ -51,6 +51,11 @@ void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel l
  * Utility for comparing doubles
  */
 bool AreEqual(double dFirstVal, double dSecondVal);
+    
+/**
+ * Extract the uuid from a any uri string
+ */
+std::string ExtractUuidFragment(std::string refUuid);
 
 /**
  * Utility for converting UTF16 (std::wstring) to UTF-8
