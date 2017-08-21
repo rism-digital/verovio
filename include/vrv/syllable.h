@@ -23,6 +23,7 @@ class ScoreDefInterface;
  * This class models the MEI <mensur> element.
  */
 class Syllable : public LayerElement,
+                 public ObjectListInterface,
                public AttColor,
                public AttDurationRatio,
                public AttRelativesize,
@@ -41,6 +42,13 @@ public:
     virtual ClassId GetClassId() const { return SYLLABLE; }
     virtual Object *Clone() const { return new Syllable(*this); }
     ///@}
+
+    /**
+    * Add an element (a note or a rest) to a syllable.
+    * Only syl or neume will be added.
+    */
+    virtual void AddChild(Object *object);
+
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }

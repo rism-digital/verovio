@@ -36,6 +36,7 @@
 #include "metersig.h"
 #include "mrest.h"
 #include "multirest.h"
+#include "neume.h"
 #include "note.h"
 #include "options.h"
 #include "proport.h"
@@ -142,6 +143,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(NOTE)) {
         DrawDurationElement(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(NEUME)) {
+        DrawNeume(dc, element, layer, staff, measure);
     }
     else if (element->Is(PROPORT)) {
         DrawProport(dc, element, layer, staff, measure);

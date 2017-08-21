@@ -39,9 +39,7 @@ class Neume;
  */
 
 class Neume : public LayerElement,
-             public DurationInterface,
-             public PitchInterface,
-             public PositionInterface,
+              public ObjectListInterface,
              public AttColor {
 public:
     /**
@@ -61,12 +59,12 @@ public:
     ///@}
 
     /**
-     * @name Getter to interfaces
-     */
-    ///@{
-    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    * Add an element (a note or a rest) to a syllable.
+    * Only syl or neume will be added.
+    */
+    virtual void AddChild(Object *object);
 
-    virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
+
 private:
 };
 } // namespace vrv

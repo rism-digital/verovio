@@ -634,11 +634,18 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         // accid within note was already taken into account by noteParent
         type = ALIGNMENT_ACCID;
     }
-    else if (this->Is({ ARTIC, ARTIC_PART, SYL })) {
+    else if (this->Is({ ARTIC, ARTIC_PART })) {
         // Refer to the note parent
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
         m_alignment = note->GetAlignment();
+    }
+        //Have to add a case for SYL being
+    else if (this->Is(SYL)) {
+//        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+//        assert(note);
+//        m_alignment = note->GetAlignment();
+        type = ALIGNMENT_DEFAULT;
     }
     else if (this->Is(VERSE)) {
         // Idem

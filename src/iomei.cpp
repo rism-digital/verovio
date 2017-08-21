@@ -1350,6 +1350,14 @@ void MeiOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     note->WriteVisibility(currentNode);
 }
 
+void MeiOutput::WriteMeiNeume(pugi::xml_node currentNode, Neume *neume)
+{
+    assert(neume);
+
+    WriteLayerElement(currentNode, neume);
+    neume->WriteColor(currentNode);;
+}
+
 void MeiOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
 {
     assert(rest);
@@ -3228,11 +3236,16 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
     pugi::xml_node xmlElement;
     std::string elementName;
     for (xmlElement = parentNode.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
+
         if (!success) {
             break;
         }
         elementName = std::string(xmlElement.name());
+<<<<<<< b585b7f2dd1b367bb6290eb898355313ad6cdbc2
         // LogDebug("ReadLayerChildren: element <%s>", xmlElement.name());
+=======
+//         LogDebug("ReadMeiLayerChildren: element <%s>", xmlElement.name());
+>>>>>>> Fixed issue with conflicting syl alignment
         if (!IsAllowed(elementName, filter)) {
             std::string meiElementName = filter->GetClassName();
             std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
@@ -3679,9 +3692,22 @@ bool MeiInput::ReadNote(Object *parent, pugi::xml_node note)
         vrvNote->AddChild(vrvAccid);
     }
 
+<<<<<<< b585b7f2dd1b367bb6290eb898355313ad6cdbc2
     if (vrvNote->HasTie()) {
         m_doc->SetAnalyticalMarkup(true);
     }
+=======
+    parent->AddChild(vrvNote);
+    return ReadMeiLayerChildren(vrvNote, note, vrvNote);
+}
+
+bool MeiInput::ReadMeiNeume(Object *parent, pugi::xml_node neume)
+{
+    Neume *vrvNeume = new Neume();
+    ReadLayerElement(neume, vrvNeume);
+
+    vrvNeume->ReadColor(neume);
+>>>>>>> Fixed issue with conflicting syl alignment
 
     parent->AddChild(vrvNote);
     return ReadLayerChildren(vrvNote, note, vrvNote);

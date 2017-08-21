@@ -36,15 +36,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Neume::Neume()
-    : LayerElement("neume-")
-    , DurationInterface()
-    , PitchInterface()
-    , PositionInterface()
-    , AttColor()
+    : LayerElement("neume-"),
+      ObjectListInterface(),
+      AttColor()
 {
-    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
-    RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
-    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
 
     Reset();
@@ -55,12 +50,24 @@ Neume::~Neume()
 
 }
 
+void Syl::AddChild(Object *child)
+{
+    if (child->Is(NC)) {
+        assert(dynamic_cast<Nc *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
+}
+
 void Neume::Reset()
 {
     LayerElement::Reset();
-    DurationInterface::Reset();
-    PitchInterface::Reset();
-    PositionInterface::Reset();
     ResetColor();
 }
 

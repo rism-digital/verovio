@@ -20,6 +20,7 @@ class BarLine;
 class Beam;
 class BeamDrawingParams;
 class Breath;
+class ControlElement;
 class Chord;
 class ControlElement;
 class DeviceContext;
@@ -39,6 +40,7 @@ class LayerElement;
 class Lb;
 class Measure;
 class Mordent;
+class Neume;
 class Num;
 class Octave;
 class Page;
@@ -358,6 +360,7 @@ protected:
      */
     ///@{
     void DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}
     /**
      * @name Methods for drawing Floating child classes.
