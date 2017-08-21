@@ -167,6 +167,10 @@ namespace humaux {
         // 1: staff
         // 2: all open ties for the staff
         std::list<humaux::HumdrumTie> ties;
+
+        // m_dynampos == dynamic position relativ to the staff:
+        // +1 = above, -1=below, 0=undefined (deal center between staves later)
+        int m_dynampos = 0;
     };
 } // namespace humaux
 
@@ -177,7 +181,8 @@ public:
     // boolean switches:
     char nostem = '\0'; // !!!RDF**kern: i = no stem
     char cuesize = '\0'; // !!!RDF**kern: i = cue size
-    char editacc = '\0'; // !!!RDF**kern: i = editorial accidental
+    vector<char> editacc; // !!!RDF**kern: i = editorial accidental
+    vector<string> edittype; // !!!RDF**kern: i= editoral accidental, brack[ets]/paren[theses]
     char below = '\0'; // !!!RDF**kern: i = below (previous signifier is "below")
     char above = '\0'; // !!!RDF**kern: i = above (previous signifier is "above")
 
@@ -238,7 +243,6 @@ protected:
     void prepareStaffGroup();
     void setClef(StaffDef *part, const std::string &clef);
     void setTimeSig(StaffDef *part, const std::string &timesig);
-    void setMeterSymbol(StaffDef *part, const std::string &metersig);
     void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
     void calculateReverseKernIndex();
@@ -287,6 +291,7 @@ protected:
     void handleGroupEnds(
         const humaux::HumdrumBeamAndTuplet &tg, std::vector<std::string> &elements, std::vector<void *> &pointers);
     void handleStaffStateVariables(hum::HTp token);
+    void handleStaffDynamStateVariables(hum::HTp token);
     void removeTuplet(std::vector<std::string> &elements, std::vector<void *> &pointers);
     void removeGBeam(std::vector<std::string> &elements, std::vector<void *> &pointers);
     void removeBeam(std::vector<std::string> &elements, std::vector<void *> &pointers);
@@ -345,6 +350,8 @@ protected:
     void splitSyllableBySpaces(vector<string> &vtext, char spacer = ' ');
     void setInstrumentName(vrv::StaffDef *staffdef, const string &name);
     void setInstrumentAbbreviation(vrv::StaffDef *staffdef, const string &name);
+    void addDefaultTempo(ScoreDef &m_scoreDef);
+    int getChordNoteCount(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -371,6 +378,7 @@ protected:
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
     template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place);
+    template <class ELEMENT> void setMeterSymbol(ELEMENT *element, const std::string &metersig);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
@@ -384,6 +392,7 @@ protected:
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
     std::string cleanHarmString(const std::string &content);
     std::string cleanHarmString2(const std::string &content);
+	std::string cleanHarmString3(const std::string &content);
     std::vector<std::string> cleanFBString(const std::string &content);
 
 private:

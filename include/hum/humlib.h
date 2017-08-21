@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jul  1 02:23:07 CEST 2017
+// Last Modified: Thu Aug 17 22:09:57 EDT 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1475,6 +1475,8 @@ class HumdrumFileBase : public HumHash {
 		HumdrumLine*  back                     (void);
 		void          makeBooleanTrackList     (vector<bool>& spinelist,
 		                                        const string& spinestring);
+		bool          analyzeBaseFromLines     (void);
+		bool          analyzeBaseFromTokens    (void);
 
 
 		vector<HumdrumLine*> getReferenceRecords(void);
@@ -1528,7 +1530,6 @@ class HumdrumFileBase : public HumHash {
 
 	protected:
 		bool          analyzeTokens             (void);
-		bool          analyzeBaseFromLines      (void);
 		bool          analyzeSpines             (void);
 		bool          analyzeLinks              (void);
 		bool          analyzeTracks             (void);
@@ -1717,10 +1718,10 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		HumNum        getBarlineDurationToEnd      (int index) const;
 
 		bool          analyzeStructure             (void);
+		bool          analyzeStrands               (void);
 
 	protected:
 
-		bool          analyzeStrands               (void);
 		bool          analyzeRhythm                (void);
 		bool          assignRhythmFromRecip        (HTp spinestart);
 		bool          analyzeMeter                 (void);
@@ -2231,6 +2232,8 @@ class NoteCell {
 		int    getMeterTop          (void);
 		HumNum getMeterBottom       (void);
 
+		vector<HTp> m_tiedtokens;	// list of tied notes/rests after note attack
+
 	protected:
 		void clear                  (void);
 		void calculateNumericPitches(void);
@@ -2341,9 +2344,9 @@ class Convert {
 		static HumNum  recipToDurationNoDots(string* recip,
 		                                     HumNum scale = 4,
 		                                     const string& separator = " ");
-		static string  durationToRecip      (HumNum duration, 
+		static string  durationToRecip      (HumNum duration,
 		                                     HumNum scale = HumNum(1,4));
-		static string  durationFloatToRecip (double duration, 
+		static string  durationFloatToRecip (double duration,
 		                                     HumNum scale = HumNum(1,4));
 
 		// Pitch processing, defined in Convert-pitch.cpp
@@ -2415,6 +2418,21 @@ class Convert {
 		static int     base7ToBase40        (int base7);
 		static int     base40IntervalToDiatonic(int base40interval);
 
+		// Harmony processing, defined in Convert-harmony.cpp
+		static vector<int> minorHScaleBase40(void);
+		static vector<int> majorScaleBase40 (void);
+		static int         keyToInversion   (const string& harm);
+		static int         keyToBase40      (const string& key);
+		static vector<int> harmToBase40     (HTp harm, const string& key) {
+		                                        return harmToBase40(*harm, key); }
+		static vector<int> harmToBase40     (HTp harm, HTp key) {
+		                                        return harmToBase40(*harm, *key); }
+		static vector<int> harmToBase40     (const string& harm, const string& key);
+		static vector<int> harmToBase40     (const string& harm, int keyroot, int keymode);
+		static void        makeAdjustedKeyRootAndMode(const string& secondary,
+		                                     int& keyroot, int& keymode);
+		static int         chromaticAlteration(const string& content);
+
 		// data-type specific (other than pitch/rhythm),
 		// defined in Convert-kern.cpp
 		static bool isKernRest              (const string& kerndata);
@@ -2445,7 +2463,7 @@ class Convert {
 		static bool    contains(string* input, const string& pattern);
 		static bool    contains(string* input, char pattern);
 		static void    makeBooleanTrackList(vector<bool>& spinelist,
-		                                     const string& spinestring, 
+		                                     const string& spinestring,
 		                                     int maxtrack);
 
 		// Mathematical processing, defined in Convert-math.cpp
@@ -2457,6 +2475,7 @@ class Convert {
 		static double  significantDigits    (double value, int digits);
 		static bool    isNaN                (double value);
 		static double  pearsonCorrelation   (vector<double> x, vector<double> y);
+		static int     romanNumeralToInteger(const string& roman);
 
 };
 
@@ -2542,13 +2561,16 @@ class MxmlPart {
 		int           getVoiceIndex        (int voicenum);
 		int           getStaffIndex        (int voicenum);
 		bool          hasEditorialAccidental(void) const;
+		bool          hasDynamics          (void) const;
+
 
 	private:
 		void          receiveStaffNumberFromChild (int staffnum, int voicenum);
-		void          receiveVerseCount    (int count);
-		void          receiveVerseCount    (int staffnum, int count);
-		void          receiveHarmonyCount  (int count);
-		void          receiveEditorialAccidental(void);
+		void          receiveVerseCount           (int count);
+		void          receiveVerseCount           (int staffnum, int count);
+		void          receiveHarmonyCount         (int count);
+		void          receiveEditorialAccidental  (void);
+		void          receiveDynamic              (void);
 
 	protected:
 		vector<MxmlMeasure*> m_measures;
@@ -2559,6 +2581,7 @@ class MxmlPart {
 		int                  m_harmonyCount;
 		bool                 m_editorialAccidental;
 		bool                 m_stems = false;
+		bool                 m_has_dynamics = false;
 
 		// m_staffvoicehist: counts of staff and voice numbers.  
 		// staff=0 is used for items such as measures.
@@ -2578,19 +2601,24 @@ class GridSide {
 		GridSide(void);
 		~GridSide();
 
-		int   getVerseCount  (void);
-		HTp   getVerse       (int index);
-		void  setVerse       (int index, HTp token);
+		int   getVerseCount     (void);
+		HTp   getVerse          (int index);
+		void  setVerse          (int index, HTp token);
 
-		int   getHarmonyCount(void);
-		void  setHarmony     (HTp token);
-		void  detachHarmony  (void);
-		HTp   getHarmony     (void);
+		int   getHarmonyCount   (void);
+		void  setHarmony        (HTp token);
+		void  detachHarmony     (void);
+		HTp   getHarmony        (void);
+
+		int   getDynamicsCount  (void);
+		void  setDynamics       (HTp token);
+		void  detachDynamics    (void);
+		HTp   getDynamics       (void);
 
 	private:
 		vector<HumdrumToken*> m_verses;
-		vector<HumdrumToken*> m_dynamics;
-		HumdrumToken* m_harmony;
+		HumdrumToken* m_dynamics = NULL;
+		HumdrumToken* m_harmony = NULL;
 };
 
 
@@ -2654,6 +2682,12 @@ class GridMeasure : public list<GridSlice*> {
 		                  { return m_style == MeasureStyle::RepeatForward; }
 		bool         isRepeatBoth(void) 
 		                  { return m_style == MeasureStyle::RepeatBoth; }
+		void         addLayoutParameter(GridSlice* slice, int partindex, const string& locomment);
+		void         addDynamicsLayoutParameters(GridSlice* slice, int partindex, const string& locomment);
+		bool         isInvisible(void);
+		bool         isSingleChordMeasure(void);
+		bool         isMonophonicMeasure(void);
+	
 
 	protected:
 		void         appendInitialBarline(HumdrumFile& infile);
@@ -2665,6 +2699,9 @@ class GridMeasure : public list<GridSlice*> {
 		HumNum       m_timesigdur;
 		MeasureStyle m_style;
 };
+
+ostream& operator<<(ostream& output, GridMeasure& measure);
+ostream& operator<<(ostream& output, GridMeasure* measure);
 
 
 class HumGrid;
@@ -2680,20 +2717,22 @@ class GridSlice : public vector<GridPart*> {
 		          GridSlice* slice);
 		~GridSlice();
 
-		bool isNoteSlice(void)     { return m_type == SliceType::Notes; }
-		bool isGraceSlice(void)    { return m_type == SliceType::GraceNotes; }
-		bool isMeasureSlice(void)  { return m_type == SliceType::Measures; }
-		bool isClefSlice(void)     { return m_type == SliceType::Clefs; }
-		bool isTimeSigSlice(void)  { return m_type == SliceType::TimeSigs; }
-		bool isMeterSigSlice(void) { return m_type == SliceType::MeterSigs; }
+		bool isNoteSlice(void)        { return m_type == SliceType::Notes;      }
+		bool isGraceSlice(void)       { return m_type == SliceType::GraceNotes; }
+		bool isMeasureSlice(void)     { return m_type == SliceType::Measures;   }
+		bool isClefSlice(void)        { return m_type == SliceType::Clefs;      }
+		bool isTimeSigSlice(void)     { return m_type == SliceType::TimeSigs;   }
+		bool isMeterSigSlice(void)    { return m_type == SliceType::MeterSigs;  }
 		bool isManipulatorSlice(void) { return m_type==SliceType::Manipulators; }
-		bool isInvalidSlice(void)  { return m_type == SliceType::Invalid; }
+		bool isLayoutSlice(void)      { return m_type ==  SliceType::Layouts;   }
+		bool isInvalidSlice(void)     { return m_type == SliceType::Invalid;    }
 		bool isInterpretationSlice(void);
 		bool isDataSlice(void);
 		SliceType getType(void)    { return m_type; }
 
-		void transferTokens    (HumdrumFile& outfile, bool recip);
-		void initializePartStaves (vector<MxmlPart>& partdata);
+		void transferTokens        (HumdrumFile& outfile, bool recip);
+		void initializePartStaves  (vector<MxmlPart>& partdata);
+		void initializeBySlice     (GridSlice* slice);
 
 		HumNum       getDuration        (void);
 		void         setDuration        (HumNum duration);
@@ -2710,10 +2749,12 @@ class GridSlice : public vector<GridPart*> {
 		                           const string& empty, int maxvcount,
 		                           int maxhcount);
 		void transferSides        (HumdrumLine& line, GridPart& sides, 
-		                           const string& empty, int maxvcount,
-		                           int maxhcount);
+		                           int partindex, const string& empty,
+		                           int maxvcount, int maxhcount,
+		                           int maxdcount);
 		int getVerseCount         (int partindex, int staffindex);
 		int getHarmonyCount       (int partindex, int staffindex = -1);
+		int getDynamicsCount      (int partindex, int staffindex = -1);
 
 	protected:
 		HTp  createRecipTokenFromDuration  (HumNum duration);
@@ -2777,14 +2818,18 @@ class HumGrid : public vector<GridMeasure*> {
 	public:
 		HumGrid(void);
 		~HumGrid();
-		void enableRecipSpine (void);
-		bool transferTokens   (HumdrumFile& outfile);
-		int  getHarmonyCount  (int partindex);
-		int  getVerseCount    (int partindex, int staffindex);
-		void setVerseCount    (int partindex, int staffindex, int count);
-		void setHarmonyCount  (int partindex, int count);
-		void removeRedundantClefChanges(void);
-		bool hasPickup         (void);
+		void enableRecipSpine           (void);
+		bool transferTokens             (HumdrumFile& outfile);
+		int  getHarmonyCount            (int partindex);
+		int  getDynamicsCount           (int partindex);
+		int  getVerseCount              (int partindex, int staffindex);
+		bool hasDynamics                (int partindex);
+		void setDynamicsPresent         (int partindex);
+		void setVerseCount              (int partindex, int staffindex, int count);
+		void setHarmonyCount            (int partindex, int count);
+		void removeRedundantClefChanges (void);
+		void removeSibeliusIncipit      (void);
+		bool hasPickup                  (void);
 
 	protected:
 		void calculateGridDurations        (void);
@@ -2798,42 +2843,51 @@ class HumGrid : public vector<GridMeasure*> {
 		void addNullTokensForGraceNotes    (void);
 		void FillInNullTokensForGraceNotes(GridSlice* graceslice, GridSlice* lastnote,
 		                                   GridSlice* nextnote);
+		void addNullTokensForClefChanges  (void);
+		void FillInNullTokensForClefChanges (GridSlice* clefslice,
+		                                    GridSlice* lastnote, GridSlice* nextnote);
+		void adjustClefChanges             (void);
 		bool buildSingleList               (void);
 		void extendDurationToken           (int slicei, int parti,
 		                                    int staffi, int voicei);
 		GridVoice* getGridVoice(int slicei, int parti, int staffi, int voicei);
-		void addMeasureLines                (void);
-		void addLastMeasure                 (void);
-		bool manipulatorCheck               (void);
-		GridSlice* manipulatorCheck         (GridSlice* ice1, GridSlice* ice2);
-		void cleanupManipulators            (void);
-		void cleanManipulator               (vector<GridSlice*>& newslices, 
-		                                     GridSlice* curr);
-		GridSlice* checkManipulatorExpand   (GridSlice* curr);
-		GridSlice* checkManipulatorContract (GridSlice* curr);
-		void transferMerges                 (GridStaff* oldstaff,
-		                                     GridStaff* oldlaststaff,
-		                                     GridStaff* newstaff,
-		                                     GridStaff* newlaststaff);
-		void insertExInterpSides            (HumdrumLine* line, int part,
-		                                     int staff);
-		void insertSideTerminals            (HumdrumLine* line, int part, 
-		                                     int staff);
-		void insertSidePartInfo             (HumdrumLine* line, int part,
-		                                     int staff);
-		void insertSideStaffInfo            (HumdrumLine* line, int part,
-		                                     int staff, int staffnum);
-		void getMetricBarNumbers            (vector<int>& barnums);
-		string  createBarToken              (int m, int barnum,
-		                                     GridMeasure* measure);
-		string getBarStyle                  (GridMeasure* measure);
-		void adjustExpansionsInStaff        (GridSlice* newmanip, GridSlice* curr, int p, int s);
+		void addMeasureLines               (void);
+		void addLastMeasure                (void);
+		bool manipulatorCheck              (void);
+		GridSlice* manipulatorCheck        (GridSlice* ice1, GridSlice* ice2);
+		void cleanupManipulators           (void);
+		void cleanManipulator              (vector<GridSlice*>& newslices,
+		                                    GridSlice* curr);
+		GridSlice* checkManipulatorExpand  (GridSlice* curr);
+		GridSlice* checkManipulatorContract(GridSlice* curr);
+		void transferMerges                (GridStaff* oldstaff,
+		                                    GridStaff* oldlaststaff,
+		                                    GridStaff* newstaff,
+		                                    GridStaff* newlaststaff);
+		void insertExInterpSides           (HumdrumLine* line, int part,
+		                                    int staff);
+		void insertSideTerminals           (HumdrumLine* line, int part,
+		                                    int staff);
+		void insertSidePartInfo            (HumdrumLine* line, int part,
+		                                    int staff);
+		void insertSideStaffInfo           (HumdrumLine* line, int part,
+		                                    int staff, int staffnum);
+		void getMetricBarNumbers           (vector<int>& barnums);
+		string  createBarToken             (int m, int barnum,
+		                                    GridMeasure* measure);
+		string getBarStyle                 (GridMeasure* measure);
+		void adjustExpansionsInStaff       (GridSlice* newmanip, GridSlice* curr,
+		                                    int p, int s);
+		void transferNonDataSlices         (GridMeasure* output, GridMeasure* input);
+		string extractMelody               (GridMeasure* measure);
+		void insertMelodyString            (GridMeasure* measure, const string& melody);
 
 	private:
 		vector<GridSlice*>   m_allslices;
 		vector<vector<int> > m_verseCount;
 		vector<int>          m_harmonyCount;
 		bool                 m_pickup;
+		vector<bool>         m_dynamics;
 
 		// options:
 		bool m_recip;               // include **recip spine in output
@@ -2924,11 +2978,12 @@ class MxmlEvent {
 		string             getElementName     (void);
 		void               addNotations       (stringstream& ss, 
 		                                       xml_node notations) const;
-		void               reportVerseCountToOwner (int count);
-		void               reportVerseCountToOwner (int staffnum, int count);
-		void               reportHarmonyCountToOwner (int count);
-		void               reportMeasureStyleToOwner (MeasureStyle style);
+		void               reportVerseCountToOwner         (int count);
+		void               reportVerseCountToOwner         (int staffnum, int count);
+		void               reportHarmonyCountToOwner       (int count);
+		void               reportMeasureStyleToOwner       (MeasureStyle style);
 		void               reportEditorialAccidentalToOwner(void);
+		void               reportDynamicToOwner            (void);
       void               makeDummyRest      (MxmlMeasure* owner, 
 		                                       HumNum startime,
 		                                       HumNum duration,
@@ -2938,6 +2993,10 @@ class MxmlEvent {
 		void               forceInvisible     (void);
 		bool               isInvisible        (void);
 		void               setBarlineStyle    (xml_node node);
+		void               setTexts           (vector<xml_node>& nodes);
+		vector<xml_node>&  getTexts           (void);
+		void               setDynamics        (xml_node node);
+		xml_node           getDynamics        (void);
 
 	protected:
 		HumNum             m_starttime;  // start time in quarter notes of event
@@ -2957,6 +3016,8 @@ class MxmlEvent {
 		bool               m_invisible;  // for forceInvisible();
 		bool               m_stems;      // for preserving stems
 
+		xml_node          m_dynamics;    // dynamics <direction> starting just before note
+		vector<xml_node>  m_text;        // text <direction> starting just before note
 
 	private:
    	void   reportStaffNumberToOwner  (int staffnum, int voicenum);
@@ -2967,6 +3028,7 @@ class MxmlEvent {
 		static HumNum getEmbeddedDuration  (xml_node el = xml_node(NULL));
 		static HumNum getQuarterDurationFromType (const char* type);
 		static bool   nodeType             (xml_node node, const char* testname);
+
 
 	friend MxmlMeasure;
 	friend MxmlPart;
@@ -3042,15 +3104,16 @@ class MxmlMeasure {
 		bool  isRepeatBoth(void)       { return m_style == MeasureStyle::RepeatBoth; }
 
 	private:
-		void  receiveStaffNumberFromChild (int staffnum, int voicenum);
-		void  receiveTimeSigDurFromChild  (HumNum duration);
-		void  receiveMeasureStyleFromChild(MeasureStyle style);
-		void  receiveEditorialAccidentalFromChild(void);
-   	void  reportStaffNumberToOwner    (int staffnum, int voicenum);
-		void  reportVerseCountToOwner     (int count);
-		void  reportVerseCountToOwner     (int staffindex, int count);
-		void  reportHarmonyCountToOwner   (int count);
-		void  reportEditorialAccidentalToOwner (void);
+		void  receiveStaffNumberFromChild         (int staffnum, int voicenum);
+		void  receiveTimeSigDurFromChild          (HumNum duration);
+		void  receiveMeasureStyleFromChild        (MeasureStyle style);
+		void  receiveEditorialAccidentalFromChild (void);
+   	void  reportStaffNumberToOwner            (int staffnum, int voicenum);
+		void  reportVerseCountToOwner             (int count);
+		void  reportVerseCountToOwner             (int staffindex, int count);
+		void  reportHarmonyCountToOwner           (int count);
+		void  reportEditorialAccidentalToOwner    (void);
+		void  reportDynamicToOwner                (void);
 
 	protected:
 		HumNum             m_starttime; // start time of measure in quarter notes
@@ -3715,10 +3778,13 @@ class Tool_dissonant : public HumTool {
 		void    findFakeSuspensions(vector<vector<string> >& results, 
 		                            NoteGrid& grid,
 		                            vector<NoteCell*>& attacks, int vindex);
-		void    findLs			   (vector<vector<string> >& results, 
+		void    findAppoggiaturas  (vector<vector<string> >& results, 
 		                            NoteGrid& grid,
 		                            vector<NoteCell*>& attacks, int vindex);
-		void    findYs			   (vector<vector<string> >& results, 
+		void    findLs             (vector<vector<string> >& results, 
+		                            NoteGrid& grid,
+		                            vector<NoteCell*>& attacks, int vindex);
+		void    findYs             (vector<vector<string> >& results, 
 		                            NoteGrid& grid,
 		                            vector<NoteCell*>& attacks, int vindex);
 		void    changePitch        (HTp note2, HTp note1);
@@ -3748,6 +3814,8 @@ class Tool_dissonant : public HumTool {
 		bool dissL1Q = false;
 		bool dissL2Q = false;
 		bool suppressQ = false;
+		bool m_voicenumQ = false;
+		bool m_selfnumQ = false;
 
 		vector<string> m_labels;
 
@@ -3756,47 +3824,56 @@ class Tool_dissonant : public HumTool {
 		const int PASSING_DOWN         =  1; // downward passing tone
 		const int NEIGHBOR_UP          =  2; // upper neighbor
 		const int NEIGHBOR_DOWN        =  3; // lower neighbor
-		const int ECHAPPE_UP           =  4; // upper échappée
-		const int ECHAPPE_DOWN         =  5; // lower échappée
+		const int ECHAPPEE_UP          =  4; // upper échappée
+		const int ECHAPPEE_DOWN        =  5; // lower échappée
 		const int CAMBIATA_UP_S        =  6; // ascending short nota cambiata
 		const int CAMBIATA_DOWN_S      =  7; // descending short nota cambiata
 		const int CAMBIATA_UP_L        =  8; // ascending long nota cambiata
 		const int CAMBIATA_DOWN_L      =  9; // descending long nota cambiata
-		// const int IPOSTHI_NEIGHBOR     = 10; // incomplete posterior upper neighbor
-		// const int IPOSTLOW_NEIGHBOR    = 11; // incomplete posterior lower neighbor
-		// const int IANTHI_NEIGHBOR      = 12; // incomplete anterior upper neighbor
-		// const int IANTLOW_NEIGHBOR     = 13; // incomplete anterior lower neighbor
-		const int ANT_UP               = 10; // rising anticipation
-		const int ANT_DOWN             = 11; // descending anticipation
+		const int REV_CAMBIATA_UP      = 10; // incomplete anterior upper neighbor
+		const int REV_CAMBIATA_DOWN    = 11; // incomplete anterior lower neighbor
+		const int REV_ECHAPPEE_UP      = 12; // incomplete posterior upper neighbor
+		const int REV_ECHAPPEE_DOWN    = 13; // incomplete posterior lower neighbor
+		const int ANT_UP               = 14; // rising anticipation
+		const int ANT_DOWN             = 15; // descending anticipation
+		const int DBL_NEIGHBOR_UP      = 16; // double neighbor beginning with upper neighbor
+		const int DBL_NEIGHBOR_DOWN    = 17; // double neighbor beginning with lower neighbor
 
 		// accented non-harmonic tones:
-		const int THIRD_Q_PASS_UP      = 12; // dissonant third quarter
-		const int THIRD_Q_PASS_DOWN    = 13; // dissonant third quarter
-		const int THIRD_Q_UPPER_NEI    = 14; // dissonant third quarter
-		const int THIRD_Q_LOWER_NEI    = 15; // dissonant third quarter
-		const int SUS_BIN  	           = 16; // binary suspension
-		const int SUS_TERN  	       = 17; // ternary suspension
-		const int AGENT_BIN		       = 18; // binary agent
-		const int AGENT_TERN		   = 19; // ternary agent
-		const int SUSPENSION_ORNAM     = 20; // suspension ornament
-		const int SUSPENSION_REP       = 21; // suspension repeated note
-		const int FAKE_SUSPENSION_UP   = 22; // fake suspension approached by step up
-		const int FAKE_SUSPENSION_DOWN = 23; // fake suspension approached by step down
-		const int SUS_NO_AGENT_UP      = 24; // suspension missing a normal agent approached by step up
-		const int SUS_NO_AGENT_DOWN    = 25; // suspension missing a normal agent approached by step down
-		const int CHANSON_IDIOM        = 26; // chanson idiom
+		const int THIRD_Q_PASS_UP      = 18; // dissonant third quarter
+		const int THIRD_Q_PASS_DOWN    = 19; // dissonant third quarter
+		const int THIRD_Q_UPPER_NEI    = 20; // dissonant third quarter
+		const int THIRD_Q_LOWER_NEI    = 21; // dissonant third quarter
+		const int ACC_PASSING_UP	   = 22; // appoggiatura
+		const int ACC_PASSING_DOWN	   = 23; // appoggiatura
+		const int ACC_UP_NEI		   = 24; // appoggiatura
+		const int ACC_LO_NEI		   = 25; // appoggiatura
+		const int APP_UPPER            = 26; // appoggiatura
+		const int APP_LOWER            = 27; // appoggiatura
+		const int SUS_BIN  	           = 28; // binary suspension
+		const int SUS_TERN  	       = 29; // ternary suspension
+		const int AGENT_BIN		       = 30; // binary agent
+		const int AGENT_TERN		   = 31; // ternary agent
+		const int SUSPENSION_REP       = 32; // suspension repeated note
+		const int FAKE_SUSPENSION_LEAP = 33; // fake suspension approached by leap
+		const int FAKE_SUSPENSION_STEP = 34; // fake suspension approached by step or anticipation
+		const int SUS_NO_AGENT_LEAP    = 35; // suspension missing a normal agent approached by leap
+		const int SUS_NO_AGENT_STEP    = 36; // suspension missing a normal agent approached by step or anticipation
+		const int CHANSON_IDIOM        = 37; // chanson idiom
 
 		// unknown dissonances:
-		const int PARALLEL_UP          = 27; // moves in parallel with known dissonant, approached from below
-		const int PARALLEL_DOWN        = 28; // moves in parallel with known dissonant, approached from above
-		const int ONLY_WITH_VALID_UP   = 29; // only dissonant with identifiable dissonances, approached from below
-		const int ONLY_WITH_VALID_DOWN = 30; // only dissonant with identifiable dissonances, approached from above
-		const int UNKNOWN_DISSONANCE   = 31; // unknown dissonance type
-		const int UNLABELED_Z2         = 32; // unknown dissonance type, 2nd interval
-		const int UNLABELED_Z7         = 33; // unknown dissonance type, 7th interval
-		const int UNLABELED_Z4         = 34; // unknown dissonance type, 4th interval
+		const int PARALLEL_UP          = 38; // moves in parallel with known dissonant, approached from below
+		const int PARALLEL_DOWN        = 39; // moves in parallel with known dissonant, approached from above
+		const int RES_PITCH			   = 40; // note of resolution of a suspension against suspension dissonance
 
-		const int LABELS_SIZE          = 35; // one more than last index
+		const int ONLY_WITH_VALID_UP   = 41; // only dissonant with identifiable dissonances, approached from below
+		const int ONLY_WITH_VALID_DOWN = 42; // only dissonant with identifiable dissonances, approached from above
+		const int UNKNOWN_DISSONANCE   = 43; // unknown dissonance type
+		const int UNLABELED_Z2         = 44; // unknown dissonance type, 2nd interval
+		const int UNLABELED_Z7         = 45; // unknown dissonance type, 7th interval
+		const int UNLABELED_Z4         = 46; // unknown dissonance type, 4th interval
+
+		const int LABELS_SIZE          = 47; // one more than last index
 };
 
 
@@ -4030,6 +4107,29 @@ class Tool_filter : public HumTool {
 };
 
 
+class Tool_hproof : public HumTool {
+	public:
+		      Tool_hproof      (void);
+		     ~Tool_hproof      () {};
+
+		bool  run              (HumdrumFile& infile);
+		bool  run              (const string& indata, ostream& out);
+		bool  run              (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void  markNonChordTones(HumdrumFile& infile);
+		void  processHarmSpine (HumdrumFile& infile, HTp hstart);
+		void  markNotesInRange (HumdrumFile& infile, HTp ctoken, HTp ntoken, const string& key);
+		void  markHarmonicTones(HTp tok, vector<int>& cts);
+		void  getNewKey        (HTp token, HTp ntoken, string& key);
+
+	private:
+		vector<HTp> m_kernspines;
+
+};
+
+
+
 class Tool_imitation : public HumTool {
 	public:
 		         Tool_imitation    (void);
@@ -4053,6 +4153,9 @@ class Tool_imitation : public HumTool {
 		int     compareSequences   (vector<NoteCell*>& attack1, vector<double>& seq1,
 		                            int i1, vector<NoteCell*>& attack2,
 		                            vector<double>& seq2, int i2);
+		int     checkForIntervalSequence(vector<int>& m_intervals,
+		                            vector<double>& v1i, int starti, int count);
+		void    markedTiedNotes    (vector<HTp>& tokens);
 
 	private:
 	 	vector<HTp> m_kernspines;
@@ -4060,6 +4163,9 @@ class Tool_imitation : public HumTool {
 		bool m_duration;
 		bool m_rest;
 		bool m_rest2;
+		double m_maxdistance;
+		bool m_maxdistanceQ;
+		vector<int> m_intervals;
 		bool m_mark;
 		char m_marker = '@';
 		static int Enumerator;
@@ -4141,6 +4247,11 @@ class Tool_musicxml2hum : public HumTool {
 		                              vector<MxmlPart>& partdata, HumNum nowtime);
 		void   addEventToList        (vector<vector<vector<vector<MxmlEvent*> > > >& list, 
 		                              MxmlEvent* event);
+		void   addHeaderRecords      (HumdrumFile& outfile, xml_document& doc);
+		void   addFooterRecords      (HumdrumFile& outfile, xml_document& doc);
+		string cleanSpaces           (string& input);
+		void setEditorialAccidental  (int accidental, GridSlice* slice, 
+		                              int partindex, int staffindex, int voiceindex);
 
 		bool convert          (ostream& out);
 		bool convertPart      (ostream& out, const string& partname,
@@ -4185,13 +4296,21 @@ class Tool_musicxml2hum : public HumTool {
 		xml_node convertMensurationToHumdrum(xml_node timesig,
 		                        HTp& token, int& staffindex);
 
-		void addEvent          (GridSlice& slice, MxmlEvent* event);
+		void addEvent          (GridSlice* slice, GridMeasure* outdata, MxmlEvent* event);
 		void fillEmpties       (GridPart* part, const char* string);
 		void addSecondaryChordNotes (ostream& output, MxmlEvent* head, const string& recip);
 		bool isInvisible       (MxmlEvent* event);
 		int  addLyrics         (GridStaff* staff, MxmlEvent* event);
 		int  addHarmony        (GridPart* oart, MxmlEvent* event);
+		void addDynamic        (GridPart* part, MxmlEvent* event);
+		void addTexts          (GridSlice* slice, GridMeasure* measure, int partindex,
+		                        int staffindex, int voiceindex, MxmlEvent* event);
+		void addText           (GridSlice* slice, GridMeasure* measure, int partindex, 
+		                        int staffindex, int voiceindex, xml_node node);
 		string getHarmonyString(xml_node hnode);
+		string getDynamicString(xml_node element);
+		string getDynamicsParameters(xml_node element);
+		string getHairpinString(xml_node element);
 		string cleanSpaces     (const string& input);
 		void checkForDummyRests(MxmlMeasure* measure);
 		void reindexVoices     (vector<MxmlPart>& partdata);
@@ -4209,6 +4328,10 @@ class Tool_musicxml2hum : public HumTool {
 		bool m_stemsQ = false;
 		int m_slurabove = 0;
 		int m_slurbelow = 0;
+		char m_hasEditorial = '\0';
+
+		xml_node m_current_dynamic = xml_node(NULL);
+		vector<xml_node> m_current_text;
 
 };
 
@@ -4217,7 +4340,7 @@ class Tool_musicxml2hum : public HumTool {
 class MyCoord {
 	public:
 		     MyCoord   (void) { clear(); }
-		void clear   (void) { x = y = -1; }
+		void clear   (void) { x = -1; y = -1; }
 		bool isValid (void) { return ((x < 0) || (y < 0)) ? false : true; }
 		int  x;
 		int  y;
@@ -4336,7 +4459,7 @@ class Tool_myank : public HumTool {
 		                                HumdrumFile& infile);
 		void      getMetStates         (vector<vector<MyCoord> >& metstates, 
 		                                HumdrumFile& infile);
-		MyCoord     getLocalMetInfo      (HumdrumFile& infile, int row, int track);
+		MyCoord   getLocalMetInfo      (HumdrumFile& infile, int row, int track);
 		int       atEndOfFile          (HumdrumFile& infile, int line);
 		void      processFile          (HumdrumFile& infile);
 		int       getSectionCount      (HumdrumFile& infile);
@@ -4388,6 +4511,23 @@ class Tool_recip : public HumTool {
 
 };
 
+
+
+class Tool_ruthfix : public HumTool {
+	public:
+		         Tool_ruthfix      (void);
+		        ~Tool_ruthfix      () {};
+
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void    insertCrossBarTies (HumdrumFile& infile);
+		void    insertCrossBarTies (HumdrumFile& infile, int strand);
+		void    createTiedNote     (HTp left, HTp right);
+
+};
 
 
 class Tool_satb2gs : public HumTool {

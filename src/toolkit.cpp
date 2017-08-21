@@ -1034,6 +1034,13 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     Object *element = m_doc.FindChildByUuid(xmlId);
     int timeofElement = 0;
     if (element->Is(NOTE)) {
+        if (!m_doc.HasMidiTimemap()) {
+            // generate MIDI timemap before progressing
+            m_doc.CalculateMidiTimemap();
+        }
+        if (!m_doc.HasMidiTimemap()) {
+            LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
+        }
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
         Measure *measure = dynamic_cast<Measure *>(note->GetFirstParent(MEASURE));
