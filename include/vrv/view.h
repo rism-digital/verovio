@@ -35,6 +35,7 @@ class Layer;
 class LayerElement;
 class Measure;
 class Mordent;
+class Neume;
 class ControlElement;
 class Octave;
 class Page;
@@ -324,6 +325,7 @@ protected:
      */
     ///@{
     void DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}
     /**
      * @name Methods for drawing Floating child classes.

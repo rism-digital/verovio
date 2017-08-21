@@ -22,6 +22,7 @@
 #include "layer.h"
 #include "layerelement.h"
 #include "note.h"
+#include "neume.h"
 #include "rpt.h"
 #include "smufl.h"
 #include "staff.h"
@@ -54,8 +55,40 @@ void View::DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     /******************************************************************/
     // Draw the children
+    ListOfObjects *syllableChildren = syllable->GetList(syllable);
+
     DrawLayerChildren(dc, syllable, layer, staff, measure);
 
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    Neume *neume = dynamic_cast<Neume *>(element);
+    assert(neume);
+
+
+    /******************************************************************/
+    // initialization
+
+//    ListOfObjects *beamChildren = beam->GetList(beam);
+
+
+    /******************************************************************/
+    // Start the Neume graphic and draw the children
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    /******************************************************************/
+    // Draw the children
+    DrawLayerChildren(dc, neume, layer, staff, measure);
+    dc -> DrawRectangle(200, 200, 100, 200);
 
     dc->EndGraphic(element, this);
 }

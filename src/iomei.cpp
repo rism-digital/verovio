@@ -1208,9 +1208,6 @@ void MeiOutput::WriteMeiNeume(pugi::xml_node currentNode, Neume *neume)
     assert(neume);
 
     WriteLayerElement(currentNode, neume);
-    WriteDurationInterface(currentNode, neume);
-    WritePitchInterface(currentNode, neume);
-    WritePositionInterface(currentNode, neume);
     neume->WriteColor(currentNode);;
 }
 
@@ -2770,11 +2767,12 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
     pugi::xml_node xmlElement;
     std::string elementName;
     for (xmlElement = parentNode.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
+
         if (!success) {
             break;
         }
         elementName = std::string(xmlElement.name());
-        // LogDebug("ReadMeiLayerChildren: element <%s>", xmlElement.name());
+//         LogDebug("ReadMeiLayerChildren: element <%s>", xmlElement.name());
         if (!IsAllowed(elementName, filter)) {
             std::string meiElementName = filter->GetClassName();
             std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
@@ -3212,9 +3210,6 @@ bool MeiInput::ReadMeiNeume(Object *parent, pugi::xml_node neume)
     Neume *vrvNeume = new Neume();
     ReadLayerElement(neume, vrvNeume);
 
-    ReadDurationInterface(neume, vrvNeume);
-    ReadPitchInterface(neume, vrvNeume);
-    ReadPositionInterface(neume, vrvNeume);
     vrvNeume->ReadColor(neume);
 
     parent->AddChild(vrvNeume);
