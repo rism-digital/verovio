@@ -1338,8 +1338,8 @@
             <!--<glyph glyph-code="E59A" smufl-name="ornamentBottomLeftConcaveStroke"/>-->
             <!--<glyph glyph-code="E59B" smufl-name="ornamentBottomLeftConcaveStrokeLarge"/>-->
             <!--<glyph glyph-code="E59C" smufl-name="ornamentBottomLeftConvexStroke"/>-->
-            <!--<glyph glyph-code="E59D" smufl-name="ornamentZigZagLineNoRightEnd"/>-->
-            <!--<glyph glyph-code="E59E" smufl-name="ornamentZigZagLineWithRightEnd"/>-->
+            <glyph glyph-code="E59D" smufl-name="ornamentZigZagLineNoRightEnd"/>
+            <glyph glyph-code="E59E" smufl-name="ornamentZigZagLineWithRightEnd"/>
             <!--<glyph glyph-code="E59F" smufl-name="ornamentMiddleVerticalStroke"/>-->
             <!--<glyph glyph-code="E5A0" smufl-name="ornamentTopRightConcaveStroke"/>-->
             <!--<glyph glyph-code="E5A1" smufl-name="ornamentTopRightConvexStroke"/>-->

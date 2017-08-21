@@ -1872,6 +1872,26 @@
                 -0.004
             ]
         },
+        "uniE59D": {
+            "bBoxNE": [
+                1.2185,
+                0.7685
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniE59E": {
+            "bBoxNE": [
+                1.5,
+                0.7687
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "uniE610": {
             "bBoxNE": [
                 1.24,
@@ -2865,6 +2885,12 @@
         },
         "uniE56E": {
             "codepoint": "0XE56E"
+        },
+        "uniE59D": {
+            "codepoint": "0XE59D"
+        },
+        "uniE59E": {
+            "codepoint": "0XE59E"
         },
         "uniE610": {
             "codepoint": "0XE610"

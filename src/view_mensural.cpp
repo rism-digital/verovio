@@ -148,7 +148,7 @@ void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *lay
     Rest *rest = dynamic_cast<Rest *>(element);
     assert(rest);
 
-    bool drawingCueSize = rest->IsCueSize();
+    bool drawingCueSize = rest->GetDrawingCueSize();
     int drawingDur = rest->GetActualDur();
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -226,7 +226,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     int staffY = staff->GetDrawingY();
     int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
     int drawingDur = (object->GetDurationInterface())->GetActualDur();
-    bool drawingCueSize = object->IsCueSize();
+    bool drawingCueSize = object->GetDrawingCueSize();
     int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 

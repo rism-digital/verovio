@@ -312,6 +312,11 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     else
         place = STAFFREL_basic_above;
 
+    /************** adjust the xRel position **************/
+
+    int xShift = parent->GetDrawingRadius(params->m_doc);
+    this->SetDrawingXRel(xShift);
+
     /************** set it to both the inside and outside part **************/
 
     ArticPart *insidePart = this->GetInsidePart();
@@ -425,6 +430,11 @@ int Artic::PrepareLayerElementParts(FunctorParams *functorParams)
         articPart->SetArtic(outsideSlur);
         this->AddChild(articPart);
     }
+
+    /************ Prepare the drawing cue size ************/
+
+    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
+    this->Process(&prepareDrawingCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
 };

@@ -187,8 +187,11 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(accid);
 
     // This can happen with accid within note with only accid.ges
+    // We still create an graphic in the output
     if (!accid->HasAccid()) {
+        dc->StartGraphic(element, "", element->GetUuid());
         accid->SetEmptyBB();
+        dc->EndGraphic(element, this);
         return;
     }
 
@@ -213,13 +216,13 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                 y = note->GetDrawingStemEnd(note).y;
         }
         TextExtend extend;
-        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->IsCueSize()));
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->GetDrawingCueSize()));
         dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
         dc->ResetFont();
         y += extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
-    DrawSmuflString(dc, x, y, accidStr, true, staff->m_drawingStaffSize, accid->IsCueSize(), true);
+    DrawSmuflString(dc, x, y, accidStr, true, staff->m_drawingStaffSize, accid->GetDrawingCueSize(), true);
 
     dc->EndGraphic(element, this);
 }
@@ -443,7 +446,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
     else {
         Stem *stem = childNote->GetDrawingStem();
-        drawingCueSize = childNote->IsCueSize();
+        drawingCueSize = childNote->GetDrawingCueSize();
         stemDir = childNote->GetDrawingStemDir();
         stemMod = stem ? stem->GetStemMod() : STEMMODIFIER_NONE;
         stemPoint = childNote->GetDrawingStemStart(childNote);
@@ -477,7 +480,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             // Take into account artic (not likely, though)
             y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize)
                 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
-            x = childElement->GetDrawingX();
+            x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
         }
         step = -step;
     }
@@ -490,7 +493,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         else {
             y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize)
                 - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5;
-            x = childElement->GetDrawingX();
+            x = childElement->GetDrawingX() + childElement->GetDrawingRadius(m_doc);
         }
     }
 
@@ -775,7 +778,7 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     dc->StartGraphic(element, "", element->GetUuid());
 
     wchar_t code = flag->GetSmuflCode(stem->GetDrawingStemDir());
-    DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, flag->IsCueSize());
+    DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, flag->GetDrawingCueSize());
 
     dc->EndGraphic(element, this);
 }
@@ -1102,20 +1105,14 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (note->m_crossStaff) staff = note->m_crossStaff;
 
-    bool drawingCueSize = note->IsCueSize();
-    int staffSize = staff->m_drawingStaffSize;
+    bool drawingCueSize = note->GetDrawingCueSize();
     int noteY = element->GetDrawingY();
     int noteX = element->GetDrawingX();
-    int noteXShift;
     int drawingDur;
     wchar_t fontNo;
 
     drawingDur = note->GetDrawingDur();
     drawingDur = ((note->GetColored() == BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
-
-    int radius = note->GetDrawingRadius(m_doc, staffSize, drawingCueSize);
-
-    noteXShift = -radius;
 
     /************** Noteheads: **************/
 
@@ -1129,7 +1126,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         else
             fontNo = SMUFL_E0A2_noteheadWhole;
 
-        DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
+        DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
     }
     // Other values
     else {
@@ -1138,7 +1135,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         else
             fontNo = SMUFL_E0A4_noteheadBlack;
 
-        DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
+        DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
     }
 
     /************ Draw children (accidentals, etc) ************/
@@ -1178,7 +1175,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (rest->m_crossStaff) staff = rest->m_crossStaff;
 
-    bool drawingCueSize = rest->IsCueSize();
+    bool drawingCueSize = rest->GetDrawingCueSize();
     int drawingDur = rest->GetActualDur();
 
     int x = element->GetDrawingX();
@@ -1190,7 +1187,6 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         case DUR_1:
         case DUR_2: DrawRestWhole(dc, x, y, drawingDur, drawingCueSize, staff); break;
         default:
-            x -= m_doc->GetGlyphWidth(rest->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize) / 2;
             y += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             DrawSmuflCode(dc, x, y, rest->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize);
     }
@@ -1512,19 +1508,14 @@ void View::DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smuflCode, int
 void View::DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff)
 {
     int x1, x2, y1, y2;
-    y1 = y;
+
     x1 = x;
     x2 = x + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
+    y1 = y;
     y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
     DrawFilledRectangle(dc, x1, y2, x2, y1);
-
-    // lines
-    x1 = x - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    x2 = x + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-
-    DrawHorizontalLine(dc, x1, x2, y2, 1);
-    DrawHorizontalLine(dc, x1, x2, y1, 1);
 }
 
 void View::DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff)
@@ -1549,8 +1540,8 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, bool cueSi
     int off
         = m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, cueSize) * 2 / 3; // i.e., la moitie de la ronde
 
-    x1 = x - off;
-    x2 = x + off;
+    x1 = x; // - off;
+    x2 = x + 2 * off;
 
     if (valeur == DUR_1) vertic = -vertic;
 

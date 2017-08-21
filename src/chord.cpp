@@ -305,18 +305,18 @@ bool Chord::HasCrossStaff()
     return ((staffAbove != NULL) || (staffBelow != NULL));
 }
 
-Point Chord::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
+Point Chord::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
 {
     Note *bottomNote = this->GetBottomNote();
     assert(bottomNote);
-    return bottomNote->GetStemUpSE(doc, staffSize, graceSize);
+    return bottomNote->GetStemUpSE(doc, staffSize, isCueSize);
 }
 
-Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
+Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 {
     Note *topNote = this->GetTopNote();
     assert(topNote);
-    return topNote->GetStemDownNW(doc, staffSize, graceSize);
+    return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
 //----------------------------------------------------------------------------
@@ -544,6 +544,11 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
             currentDots = NULL;
         }
     }
+
+    /************ Prepare the drawing cue size ************/
+
+    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
+    this->Process(&prepareDrawingCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
 };
