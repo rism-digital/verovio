@@ -475,8 +475,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     partId.c_str());
                 continue;
             }
-            std::string partName = GetContentOfChild(xpathNode.node(), "part-name");
-            std::string partAbbr = GetContentOfChild(xpathNode.node(), "part-abbreviation");
+            // part-name should be revised, as soon MEI can suppress labels
+            std::string partName = GetContentOfChild(xpathNode.node(), "part-name[not(@print-object='no')]");
+            std::string partAbbr = GetContentOfChild(xpathNode.node(), "part-abbreviation[not(@print-object='no')]");
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
             int nbStaves = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
