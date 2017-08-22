@@ -118,8 +118,8 @@ bool DurationInterface::IsFirstInBeam(LayerElement *noteOrRest)
     if (!beam) {
         return false;
     }
-    ListOfObjects *notesOrRests = beam->GetList(beam);
-    ListOfObjects::iterator iter = notesOrRests->begin();
+    const ListOfObjects *notesOrRests = beam->GetList(beam);
+    ListOfObjects::const_iterator iter = notesOrRests->begin();
     if (*iter == noteOrRest) {
         return true;
     }
@@ -132,8 +132,8 @@ bool DurationInterface::IsLastInBeam(LayerElement *noteOrRest)
     if (!beam) {
         return false;
     }
-    ListOfObjects *notesOrRests = beam->GetList(beam);
-    ListOfObjects::reverse_iterator iter = notesOrRests->rbegin();
+    const ListOfObjects *notesOrRests = beam->GetList(beam);
+    ListOfObjects::const_reverse_iterator iter = notesOrRests->rbegin();
     if (*iter == noteOrRest) {
         return true;
     }

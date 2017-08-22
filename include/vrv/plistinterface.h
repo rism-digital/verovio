@@ -47,6 +47,8 @@ public:
      * Calls IsValidRef to check that the type of object is valid.
      */
     void SetRef(Object *object);
+    
+    const ArrayOfObjects *GetRefs() { return &m_references; }
 
     //-----------------//
     // Pseudo functors //
@@ -91,7 +93,7 @@ private:
      * An array of resolved references.
      * Filled in InterfacePreparePlist (backward).
      */
-    std::vector<Object *> m_references;
+    ArrayOfObjects m_references;
 
     /**
      * An array of parsed any uris stored as uuids.
