@@ -3794,8 +3794,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPlist(std::string plist_) { m_plist = plist_; }
-    std::string GetPlist() const { return m_plist; }
+    void SetPlist(xsdAnyURI_List plist_) { m_plist = plist_; }
+    xsdAnyURI_List GetPlist() const { return m_plist; }
     bool HasPlist() const;
     ///@}
 
@@ -3807,7 +3807,7 @@ private:
      * When the target attribute is not present, it identifies participants in a mutual
      * relationship.
      **/
-    std::string m_plist;
+    xsdAnyURI_List m_plist;
 
     /* include <attplist> */
 };

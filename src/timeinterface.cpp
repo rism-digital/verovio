@@ -77,17 +77,8 @@ void TimePointInterface::AddStaff(int n)
 void TimePointInterface::SetUuidStr()
 {
     if (this->HasStartid()) {
-        m_startUuid = this->ExtractUuidFragment(this->GetStartid());
+        m_startUuid = ExtractUuidFragment(this->GetStartid());
     }
-}
-
-std::string TimePointInterface::ExtractUuidFragment(std::string refUuid)
-{
-    size_t pos = refUuid.find_last_of("#");
-    if ((pos != std::string::npos) && (pos < refUuid.length() - 1)) {
-        refUuid = refUuid.substr(pos + 1);
-    }
-    return refUuid;
 }
 
 Measure *TimePointInterface::GetStartMeasure()
@@ -178,7 +169,7 @@ void TimeSpanningInterface::SetUuidStr()
 {
     TimePointInterface::SetUuidStr();
     if (this->HasEndid()) {
-        m_endUuid = this->ExtractUuidFragment(this->GetEndid());
+        m_endUuid = ExtractUuidFragment(this->GetEndid());
     }
 }
 

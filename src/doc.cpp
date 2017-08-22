@@ -399,6 +399,8 @@ void Doc::PrepareDrawing()
         this->Process(&resetDrawing, NULL);
     }
 
+    /************ Resolve @starid / @endid ************/
+
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
     PrepareTimeSpanningParams prepareTimeSpanningParams;
     Functor prepareTimeSpanning(&Object::PrepareTimeSpanning);
@@ -416,12 +418,16 @@ void Doc::PrepareDrawing()
         this->Process(&prepareTimeSpanning, &prepareTimeSpanningParams);
     }
 
+    /************ Resolve @starid (only) ************/
+
     // Try to match all time pointing elements (tempo, fermata, etc) by processing backwards
     PrepareTimePointingParams prepareTimePointingParams;
     Functor prepareTimePointing(&Object::PrepareTimePointing);
     Functor prepareTimePointingEnd(&Object::PrepareTimePointingEnd);
     this->Process(
         &prepareTimePointing, &prepareTimePointingParams, &prepareTimePointingEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
+
+    /************ Resolve @tstamp / tstamp2 ************/
 
     // Now try to match the @tstamp and @tstamp2 attributes.
     PrepareTimestampsParams prepareTimestampsParams;
@@ -436,11 +442,34 @@ void Doc::PrepareDrawing()
             prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
 
+    /************ Resolve @plist ************/
+
+    // Try to match all pointing elements using @plist
+    PreparePlistParams preparePlistParams;
+    Functor preparePlist(&Object::PreparePlist);
+    this->Process(&preparePlist, &preparePlistParams);
+
+    // If we have some left process again backward.
+    if (!preparePlistParams.m_interfaceUuidPairs.empty()) {
+        preparePlistParams.m_fillList = false;
+        this->Process(&preparePlist, &preparePlistParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+    }
+
+    // If some are still there, then it is probably an issue in the encoding
+    if (!preparePlistParams.m_interfaceUuidPairs.empty()) {
+        LogWarning(
+            "%d element(s) with a @plist could match the target", preparePlistParams.m_interfaceUuidPairs.size());
+    }
+
+    /************ Resolve cross staff ************/
+
     // Prepare the cross-staff pointers
     PrepareCrossStaffParams prepareCrossStaffParams;
     Functor prepareCrossStaff(&Object::PrepareCrossStaff);
     Functor prepareCrossStaffEnd(&Object::PrepareCrossStaffEnd);
     this->Process(&prepareCrossStaff, &prepareCrossStaffParams, &prepareCrossStaffEnd);
+
+    /************ Prepare processing by staff/layer/verse ************/
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
@@ -461,6 +490,8 @@ void Doc::PrepareDrawing()
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;
     IntTree_t::iterator verses;
+
+    /************ Resolve ties ************/
 
     // Process by layer for matching @tie attribute - we process notes and chords, looking at
     // GetTie values and pitch and oct for matching notes
@@ -493,6 +524,8 @@ void Doc::PrepareDrawing()
         }
     }
 
+    /************ Resolve some pointers by layer ************/
+
     for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
          staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
@@ -508,6 +541,8 @@ void Doc::PrepareDrawing()
             this->Process(&preparePointersByLayer, &preparePointersByLayerParams, NULL, &filters);
         }
     }
+
+    /************ Resolve lyric connectors ************/
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
     for (staves = prepareProcessingListsParams.m_verseTree.child.begin();
@@ -534,6 +569,8 @@ void Doc::PrepareDrawing()
         }
     }
 
+    /************ Fill control event spanning ************/
+
     // Once <slur>, <ties> and @ties are matched but also syl connectors, we need to set them as running
     // TimeSpanningInterface to each staff they are extended. This does not need to be done staff by staff because we
     // can just check the staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
@@ -547,6 +584,8 @@ void Doc::PrepareDrawing()
         LogDebug("%d time spanning elements could not be set as running",
             fillStaffCurrentTimeSpanningParams.m_timeSpanningElements.size());
     }
+
+    /************ Resolve mRpt ************/
 
     // Process by staff for matching mRpt elements and setting the drawing number
     for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
@@ -566,19 +605,27 @@ void Doc::PrepareDrawing()
         }
     }
 
+    /************ Resolve endings ************/
+
     // Prepare the endings (pointers to the measure after and before the boundaries
     PrepareBoundariesParams prepareEndingsParams;
     Functor prepareEndings(&Object::PrepareBoundaries);
     this->Process(&prepareEndings, &prepareEndingsParams);
+
+    /************ Resolve floating groups for vertical alignment ************/
 
     // Prepare the floating drawing groups
     PrepareFloatingGrpsParams prepareFloatingGrpsParams;
     Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
     this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams);
 
+    /************ Resolve cue size ************/
+
     // Prepare the drawing cue size
     Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
     this->Process(&prepareDrawingCueSize, NULL);
+
+    /************ Instanciate LayerElement parts (stemp, flag, dots, etc) ************/
 
     Functor prepareLayerElementParts(&Object::PrepareLayerElementParts);
     this->Process(&prepareLayerElementParts, NULL);

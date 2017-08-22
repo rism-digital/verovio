@@ -17,6 +17,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "arpeg.h"
 #include "attcomparison.h"
 #include "bboxdevicecontext.h"
 #include "breath.h"
@@ -71,6 +72,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
         system->AddToDrawingList(element);
+    }
+    else if (element->Is(ARPEG)) {
+        Arpeg *arpeg = dynamic_cast<Arpeg *>(element);
+        assert(arpeg);
+        DrawArpeg(dc, arpeg, measure, system);
     }
     else if (element->Is(BREATH)) {
         Breath *breath = dynamic_cast<Breath *>(element);
@@ -266,8 +272,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             DrawTie(dc, dynamic_cast<Tie *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(TRILL)) {
-            // cast to Slur check in DrawTrill
-            DrawTrill(dc, dynamic_cast<Trill *>(element), x1, x2, *staffIter, spanningType, graphic);
+            // cast to Trill check in DrawTrill
+            DrawTrillExtension(dc, dynamic_cast<Trill *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
     }
 }
@@ -1440,7 +1446,8 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         dc->EndGraphic(tie, this);
 }
 
-void View::DrawTrill(DeviceContext *dc, Trill *trill, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+void View::DrawTrillExtension(
+    DeviceContext *dc, Trill *trill, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
     assert(dc);
     assert(trill);
@@ -1574,6 +1581,23 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
             DrawFilledRectangle(dc, x1, y, x2, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
         }
     }
+}
+
+void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(arpeg);
+
+    // Cannot draw a breath that has no start position
+    // if (!breath->GetStart()) return;
+
+    dc->StartGraphic(arpeg, "", arpeg->GetUuid());
+
+    arpeg->SetEmptyBB();
+
+    dc->EndGraphic(arpeg, this);
 }
 
 void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, System *system)

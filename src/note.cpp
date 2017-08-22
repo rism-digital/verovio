@@ -492,7 +492,6 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
 
-    bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;
 
     int radius = this->GetDrawingRadius(params->m_doc);
