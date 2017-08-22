@@ -21,7 +21,8 @@ namespace vrv {
 // Arpeg
 //----------------------------------------------------------------------------
 
-Arpeg::Arpeg() : ControlElement("arpeg-"), PlistInterface(), TimePointInterface(), AttArpegLog(), AttArpegVis(), AttColor()
+Arpeg::Arpeg()
+    : ControlElement("arpeg-"), PlistInterface(), TimePointInterface(), AttArpegLog(), AttArpegVis(), AttColor()
 {
     RegisterInterface(PlistInterface::GetAttClasses(), PlistInterface::IsInterface());
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
@@ -45,11 +46,12 @@ void Arpeg::Reset()
     ResetArpegVis();
     ResetColor();
 }
-    
+
 bool Arpeg::IsValidRef(Object *ref)
 {
-    if (!ref->Is({CHORD, NOTE})) {
-        LogWarning("%s is not supported as @plist target for %s", ref->GetClassName().c_str(), this->GetClassName().c_str());
+    if (!ref->Is({ CHORD, NOTE })) {
+        LogWarning(
+            "%s is not supported as @plist target for %s", ref->GetClassName().c_str(), this->GetClassName().c_str());
         return false;
     }
     return true;

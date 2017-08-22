@@ -50,23 +50,22 @@ void PlistInterface::AddRef(std::string ref)
         this->SetPlist(references);
     }
 }
-    
+
 void PlistInterface::SetRef(Object *ref)
 {
     if (!IsValidRef(ref)) {
         return;
     }
-    
+
     if (std::find(m_references.begin(), m_references.end(), ref) == m_references.end()) {
         m_references.push_back(ref);
     }
-    
 }
 
 void PlistInterface::SetUuidStrs()
 {
     assert(m_uuids.empty() && m_references.empty());
-    
+
     xsdAnyURI_List list = this->GetPlist();
     xsdAnyURI_List::iterator iter;
     for (iter = list.begin(); iter != list.end(); iter++) {
@@ -88,14 +87,14 @@ int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *
 {
     PreparePlistParams *params = dynamic_cast<PreparePlistParams *>(functorParams);
     assert(params);
-    
+
     // This should not happen?
     if (params->m_fillList == false) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     this->SetUuidStrs();
-    
+
     std::vector<std::string>::iterator iter;
     for (iter = m_uuids.begin(); iter != m_uuids.end(); iter++) {
         params->m_interfaceUuidPairs.push_back(std::make_pair(this, *iter));
@@ -108,7 +107,7 @@ int PlistInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *
 {
     m_uuids.clear();
     m_references.clear();
-    
+
     return FUNCTOR_CONTINUE;
 }
 

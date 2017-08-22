@@ -223,7 +223,7 @@ typedef std::vector<std::tuple<Alignment *, Alignment *, int> > ArrayOfAdjustmen
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
-typedef std::vector<std::pair<PlistInterface *, std::string > > ArrayOfInterfaceUuidPairs;
+typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfInterfaceUuidPairs;
 
 typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
 

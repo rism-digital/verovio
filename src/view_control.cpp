@@ -1583,7 +1583,6 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
     }
 }
 
-    
 void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *system)
 {
     assert(dc);
@@ -1592,7 +1591,7 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     assert(arpeg);
 
     // Cannot draw a breath that has no start position
-    //if (!breath->GetStart()) return;
+    // if (!breath->GetStart()) return;
 
     dc->StartGraphic(arpeg, "", arpeg->GetUuid());
 
@@ -1600,7 +1599,7 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
 
     dc->EndGraphic(arpeg, this);
 }
-    
+
 void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, System *system)
 {
     assert(dc);

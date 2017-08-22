@@ -646,7 +646,7 @@ xsdAnyURI_List Att::StrToXsdAnyURIList(std::string value) const
     }
     return list;
 }
-    
+
 std::string Att::XsdPositiveIntegerListToStr(xsdPositiveInteger_List data) const
 {
     std::ostringstream ss;

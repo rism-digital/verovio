@@ -51,7 +51,7 @@ void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel l
  * Utility for comparing doubles
  */
 bool AreEqual(double dFirstVal, double dSecondVal);
-    
+
 /**
  * Extract the uuid from a any uri string
  */

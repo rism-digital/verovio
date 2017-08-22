@@ -174,7 +174,7 @@ public:
 
     std::string XsdAnyURIListToStr(xsdAnyURI_List data) const;
     xsdAnyURI_List StrToXsdAnyURIList(std::string value) const;
-    
+
     std::string XsdPositiveIntegerListToStr(xsdPositiveInteger_List data) const;
     xsdPositiveInteger_List StrToXsdPositiveIntegerList(std::string value) const;
     ///@}

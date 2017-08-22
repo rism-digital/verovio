@@ -41,7 +41,7 @@ public:
      * Add a reference ref to the AttPlist vector (if not already there)
      */
     void AddRef(std::string ref);
-    
+
     /**
      * Set a reference object when the uuid is found in the m_uuids.
      * Calls IsValidRef to check that the type of object is valid.
@@ -58,7 +58,7 @@ public:
      * the functor method. These not called by the Process/Call loop but by the implementaion
      * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
      */
-    
+
     /**
      * See Object::PreparePlist
      */
@@ -74,7 +74,7 @@ protected:
      * Extract the fragment of the any uris given in @plist
      */
     void SetUuidStrs();
-    
+
     /**
      * Method to be redefined in the child class if specific validation is required.
      * The method is called from PlistInterface::SetRef
@@ -86,14 +86,13 @@ private:
 public:
     //
 protected:
-
 private:
     /**
-     * An array of resolved references. 
+     * An array of resolved references.
      * Filled in InterfacePreparePlist (backward).
      */
     std::vector<Object *> m_references;
-    
+
     /**
      * An array of parsed any uris stored as uuids.
      * Filled in InterfacePreparePlist (backward and forward).

@@ -826,7 +826,7 @@ void MeiOutput::WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *a
     WriteControlElement(currentNode, anchoredText);
     WriteTextDirInterface(currentNode, anchoredText);
 }
-    
+
 void MeiOutput::WriteMeiArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
 {
     assert(arpeg);
@@ -838,7 +838,7 @@ void MeiOutput::WriteMeiArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
     arpeg->WriteArpegVis(currentNode);
     arpeg->WriteColor(currentNode);
 };
-    
+
 void MeiOutput::WriteMeiBreath(pugi::xml_node currentNode, Breath *breath)
 {
     assert(breath);
@@ -2622,7 +2622,7 @@ bool MeiInput::ReadMeiArpeg(Object *parent, pugi::xml_node arpeg)
     parent->AddChild(vrvArpeg);
     return true;
 }
-    
+
 bool MeiInput::ReadMeiBreath(Object *parent, pugi::xml_node breath)
 {
     Breath *vrvBreath = new Breath();
@@ -3535,7 +3535,7 @@ bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interf
     interface->ReadPitch(element);
     return true;
 }
-    
+
 bool MeiInput::ReadPlistInterface(pugi::xml_node element, PlistInterface *interface)
 {
     interface->ReadPlist(element);

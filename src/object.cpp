@@ -950,15 +950,15 @@ int Object::PreparePlist(FunctorParams *functorParams)
         assert(interface);
         return interface->InterfacePreparePlist(functorParams, this);
     }
-    
+
     std::string uuid = this->GetUuid();
     auto i = std::find_if(params->m_interfaceUuidPairs.begin(), params->m_interfaceUuidPairs.end(),
-                          [uuid](std::pair<PlistInterface *, std::string> pair) { return (pair.second == uuid); });
+        [uuid](std::pair<PlistInterface *, std::string> pair) { return (pair.second == uuid); });
     if (i != params->m_interfaceUuidPairs.end()) {
         i->first->SetRef(this);
         params->m_interfaceUuidPairs.erase(i);
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 

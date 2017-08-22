@@ -773,7 +773,7 @@ public:
     ///@{
     virtual int PreparePlist(FunctorParams *functorParams);
     ///@}
-    
+
     /**
      * Match start for TimePointingInterface elements (such as fermata or harm).
      */
