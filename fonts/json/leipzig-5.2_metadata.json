@@ -30,7 +30,7 @@
         "tupletBracketThickness": "0.16"
     },
     "fontName": "Leipzig-5.2",
-    "fontVersion": "5.2.29",
+    "fontVersion": "5.2.31",
     "glyphBBoxes": {
         "uniE003": {
             "bBoxNE": [
@@ -2322,14 +2322,44 @@
                 0.0
             ]
         },
-        "z": {
+        "uniEAA9": {
             "bBoxNE": [
-                0.0,
-                0.0
+                0.88,
+                0.372
             ],
             "bBoxSW": [
                 0.0,
                 0.0
+            ]
+        },
+        "uniEAAA": {
+            "bBoxNE": [
+                0.88,
+                0.372
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniEAAD": {
+            "bBoxNE": [
+                1.3408,
+                0.428
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.068
+            ]
+        },
+        "uniEAAE": {
+            "bBoxNE": [
+                1.3408,
+                0.44
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.056
             ]
         }
     },
@@ -3021,8 +3051,17 @@
         "uniE9F9": {
             "codepoint": "0XE9F9"
         },
-        "z": {
-            "codepoint": "0X007A"
+        "uniEAA9": {
+            "codepoint": "0XEAA9"
+        },
+        "uniEAAA": {
+            "codepoint": "0XEAAA"
+        },
+        "uniEAAD": {
+            "codepoint": "0XEAAD"
+        },
+        "uniEAAE": {
+            "codepoint": "0XEAAE"
         }
     },
     "glyphsWithAnchors": {
