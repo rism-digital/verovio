@@ -484,7 +484,7 @@ bool HumdrumInput::convertHumdrum()
         if (it->isDataType("**harm")) {
             m_harm = true;
         }
-		else if (it->isDataType("**rhrm")) {  // **recip + **harm
+        else if (it->isDataType("**rhrm")) { // **recip + **harm
             m_harm = true;
         }
         else if (it->getDataType().compare(0, 7, "**cdata") == 0) {
@@ -2042,8 +2042,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             if (token->isNull()) {
                 continue;
             }
-            if (!(token->isDataType("**mxhm") || token->isDataType("**harm")
-                    || token->isDataType("**rhrm")
+            if (!(token->isDataType("**mxhm") || token->isDataType("**harm") || token->isDataType("**rhrm")
                     || (token->getDataType().compare(0, 7, "**cdata") == 0))) {
                 continue;
             }
@@ -2138,46 +2137,46 @@ vector<string> HumdrumInput::cleanFBString(const std::string &content)
 
 string HumdrumInput::cleanHarmString3(const std::string &content)
 {
-	string temp;
+    string temp;
 
-	// hide **rhrm token if not a harmony "attack":
-	
-	if (content.find("_") != string::npos) {
-		return "";
-	}
-	if (content.find("]") != string::npos) {
-		return "";
-	}
+    // hide **rhrm token if not a harmony "attack":
 
-	// skip over **recip data:
-	int i;
-	for (i=0; i<(int)content.size(); i++) {
-		if ((content[i] == '-') || (content[i] == '#')) {
-			break;
-		}
-		if (isalpha(content[i])) {
-			// V, I, ii, vi, Lt, Gn, Fr, N
-			break;
-		}
-	}
+    if (content.find("_") != string::npos) {
+        return "";
+    }
+    if (content.find("]") != string::npos) {
+        return "";
+    }
 
-	int foundstartsquare = false;
-	for (int ii=i; ii<(int)content.size(); ii++) {
-		if (content[ii] == '[') {
-			foundstartsquare = true;
-		}
-		if (content[ii] == ']') {
-			if (!foundstartsquare) {
-				continue;
-			}
-		}
-		if (content[ii] == '_') {
-			continue;
-		}
-		temp += content[ii];
-	}
+    // skip over **recip data:
+    int i;
+    for (i = 0; i < (int)content.size(); i++) {
+        if ((content[i] == '-') || (content[i] == '#')) {
+            break;
+        }
+        if (isalpha(content[i])) {
+            // V, I, ii, vi, Lt, Gn, Fr, N
+            break;
+        }
+    }
 
-	return cleanHarmString2(temp);
+    int foundstartsquare = false;
+    for (int ii = i; ii < (int)content.size(); ii++) {
+        if (content[ii] == '[') {
+            foundstartsquare = true;
+        }
+        if (content[ii] == ']') {
+            if (!foundstartsquare) {
+                continue;
+            }
+        }
+        if (content[ii] == '_') {
+            continue;
+        }
+        temp += content[ii];
+    }
+
+    return cleanHarmString2(temp);
 }
 
 //////////////////////////////
@@ -3050,79 +3049,129 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
 template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hum::HTp token)
 {
+    // store artics in random access grid, along with their staff positions:
+    vector<int> articloc(256, 0);
+    vector<int> articpos(256, 0);
+    char ch;
+    char posch;
+    int tsize = (int)((string *)token)->size();
+    for (int i = 0; i < tsize; i++) {
+        ch = token->at(i);
+        if (isdigit(ch)) {
+            continue;
+        }
+        posch = i < tsize - 1 ? token->at(i + 1) : 0;
+        if ((ch == '^') && (posch == '^')) {
+            // use 6 slot in array for "^^" (heavy accent)
+            ch = 6;
+            posch = i < tsize - 2 ? token->at(i + 2) : 'g';
+        }
+        else if ((ch == '\'') && (posch == '\'')) {
+            // staccatissimo alternate
+            ch = '`';
+            posch = i < tsize - 2 ? token->at(i + 2) : 'g';
+        }
+        articloc.at(ch) = i + 1;
+
+        if (posch == m_signifiers.above) {
+            articpos.at(ch) = 1;
+        }
+        else if (posch == m_signifiers.below) {
+            articpos.at(ch) = -1;
+        }
+        else {
+            articpos.at(ch) = 0;
+        }
+    }
+
+    // second position is the staff position (-1=below, 0=undefined, 1=above)
     std::vector<data_ARTICULATION> artics;
+    std::vector<int> positions;
 
-    if (token->find('\'') != string::npos) {
-        if (token->find("''") != string::npos) {
-            artics.push_back(ARTICULATION_stacciss);
-        }
-        else if (token->find("^^") != string::npos) {
-            // artics.push_back(ARTICULATION_marc_stacc);
-            artics.push_back(ARTICULATION_stacc);
-            artics.push_back(ARTICULATION_marc);
-        }
-        else if (token->find('^') != string::npos) {
-            // no composite articulation for "acc-stacc"
-            artics.push_back(ARTICULATION_stacc);
-            artics.push_back(ARTICULATION_acc);
-        }
-        else if (token->find('~') != string::npos) {
-            // artics.push_back(ARTICULATION_ten_stacc);
-            artics.push_back(ARTICULATION_stacc);
-            artics.push_back(ARTICULATION_ten);
-        }
-        else {
-            artics.push_back(ARTICULATION_stacc);
-        }
+    // place articulations in stacking order (nearest to furthest from note):
+    if (articloc['\'']) {
+        artics.push_back(ARTICULATION_stacc);
+        positions.push_back(articpos['\'']);
     }
-    else if (token->find('`') != string::npos) {
+    if (articloc['`']) {
         artics.push_back(ARTICULATION_stacciss);
+        positions.push_back(articpos['`']);
     }
-    else if (token->find('^') != string::npos) {
-        if (token->find("^^") != string::npos) {
-            artics.push_back(ARTICULATION_marc);
-        }
-        else {
-            artics.push_back(ARTICULATION_acc);
-        }
-    }
-    else if (token->find('~') != string::npos) {
+    if (articloc['~']) {
         artics.push_back(ARTICULATION_ten);
+        positions.push_back(articpos['~']);
     }
-    else if (token->find('o') != string::npos) {
+    if (articloc[6]) {
+        artics.push_back(ARTICULATION_marc);
+        positions.push_back(articpos[6]);
+    }
+    if (articloc['^']) {
+        artics.push_back(ARTICULATION_acc);
+        positions.push_back(articpos['^']);
+    }
+    if (articloc['o']) {
         artics.push_back(ARTICULATION_harm);
+        positions.push_back(articpos['o']);
     }
 
-    int direction = 0;
-
-    // deal with articulation positions in more detail later.
-    if (m_signifiers.above) {
-        std::string pattern = "['`^~o]+";
-        pattern.push_back(m_signifiers.above);
-        if (regex_search(*token, regex(pattern))) {
-            direction = 1;
-        }
-    }
-    if (m_signifiers.below) {
-        std::string pattern = "['`^~o]+";
-        pattern.push_back(m_signifiers.below);
-        if (regex_search(*token, regex(pattern))) {
-            direction = -1;
-        }
+    if (artics.empty()) {
+        return;
     }
 
-    if (artics.size() > 0) {
+    if (artics.size() == 1) {
+        // single articulation, so no problem
+
         Artic *artic = new Artic;
         appendElement(element, artic);
         artic->SetArtic(artics);
-        if (direction > 0) {
-            // 300: artic->SetPlace(STAFFREL_above);
+        if (positions.at(0) > 0) {
             setPlace(artic, "above");
         }
-        else if (direction < 0) {
-            // 300: artic->SetPlace(STAFFREL_below);
+        else if (positions.at(0) < 0) {
             setPlace(artic, "below");
         }
+        setLocationId(artic, token);
+        return;
+    }
+
+    // more than one articulation, so categorize them by placement.
+
+    std::vector<data_ARTICULATION> articsabove;
+    std::vector<data_ARTICULATION> articsbelow;
+    std::vector<data_ARTICULATION> articsdefault; // no placment parameter
+
+    for (int i = 0; i < (int)artics.size(); i++) {
+        if (positions[i] > 0) {
+            articsabove.push_back(artics[i]);
+        }
+        else if (positions[i] < 0) {
+            articsbelow.push_back(artics[i]);
+        }
+        else {
+            articsdefault.push_back(artics[i]);
+        }
+    }
+
+    if (!articsabove.empty()) {
+        Artic *artic = new Artic;
+        appendElement(element, artic);
+        artic->SetArtic(articsabove);
+        setPlace(artic, "above");
+        element->SetUuid(getLocationId(element, token, 0) + "-above");
+    }
+
+    if (!articsbelow.empty()) {
+        Artic *artic = new Artic;
+        appendElement(element, artic);
+        artic->SetArtic(articsbelow);
+        setPlace(artic, "below");
+        element->SetUuid(getLocationId(element, token, 0) + "-below");
+    }
+
+    if (!articsdefault.empty()) {
+        Artic *artic = new Artic;
+        appendElement(element, artic);
+        artic->SetArtic(articsdefault);
         setLocationId(artic, token);
     }
 }
