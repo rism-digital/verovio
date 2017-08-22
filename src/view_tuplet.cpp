@@ -309,7 +309,7 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
         DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->m_drawingStaffSize);
 
         // x1 = 10 pixels before the number
-        x1 = txt_x - 40;
+        x1 = ((txt_x - 40) > start.x) ? txt_x - 40 : start.x;
         // x2 = just after, the number is abundant so I do not add anything
         x2 = txt_x + extend.m_width + 20;
 
@@ -351,12 +351,18 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
 
     // vertical bracket lines
     if (direction == STEMDIRECTION_up) {
-        dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y - verticalLine));
-        dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y - verticalLine));
+        dc->DrawLine(start.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(start.y),
+            start.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
+            ToDeviceContextY(start.y - verticalLine));
+        dc->DrawLine(end.x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(end.y),
+            end.x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(end.y - verticalLine));
     }
     else {
-        dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y + verticalLine));
-        dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y + verticalLine));
+        dc->DrawLine(start.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(start.y),
+            start.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
+            ToDeviceContextY(start.y + verticalLine));
+        dc->DrawLine(end.x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(end.y),
+            end.x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(end.y + verticalLine));
     }
 
     dc->ResetPen();
