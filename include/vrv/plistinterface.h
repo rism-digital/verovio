@@ -41,6 +41,12 @@ public:
      * Add a reference ref to the AttPlist vector (if not already there)
      */
     void AddRef(std::string ref);
+    
+    /**
+     * Set a reference object when the uuid is found in the m_uuids.
+     * Calls IsValidRef to check that the type of object is valid.
+     */
+    void SetRef(Object *object);
 
     //-----------------//
     // Pseudo functors //
@@ -68,6 +74,12 @@ protected:
      * Extract the fragment of the any uris given in @plist
      */
     void SetUuidStrs();
+    
+    /**
+     * Method to be redefined in the child class if specific validation is required.
+     * The method is called from PlistInterface::SetRef
+     */
+    virtual bool IsValidRef(Object *ref) { return true; }
 
 private:
     //
@@ -86,7 +98,7 @@ private:
      * An array of parsed any uris stored as uuids.
      * Filled in InterfacePreparePlist (backward and forward).
      */
-    std::vector<std::string *> m_uuids;
+    std::vector<std::string> m_uuids;
 };
 
 } // namespace vrv

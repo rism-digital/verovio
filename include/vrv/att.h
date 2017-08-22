@@ -172,6 +172,9 @@ public:
     std::string TieToStr(data_TIE data) const;
     data_TIE StrToTie(std::string value, bool logWarning = true) const;
 
+    std::string XsdAnyURIListToStr(xsdAnyURI_List data) const;
+    xsdAnyURI_List StrToXsdAnyURIList(std::string value) const;
+    
     std::string XsdPositiveIntegerListToStr(xsdPositiveInteger_List data) const;
     xsdPositiveInteger_List StrToXsdPositiveIntegerList(std::string value) const;
     ///@}

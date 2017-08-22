@@ -44,20 +44,40 @@ void PlistInterface::Reset()
 
 void PlistInterface::AddRef(std::string ref)
 {
-    /*
-    xsdAnyURI_List references = this->GetStaff();
-    if (std::find(staves.begin(), staves.end(), n) == staves.end()) {
-        staves.push_back(n);
-        this->SetStaff(staves);
+    xsdAnyURI_List references = this->GetPlist();
+    if (std::find(references.begin(), references.end(), ref) == references.end()) {
+        references.push_back(ref);
+        this->SetPlist(references);
     }
-    */
+}
+    
+void PlistInterface::SetRef(Object *ref)
+{
+    if (!IsValidRef(ref)) {
+        return;
+    }
+    
+    if (std::find(m_references.begin(), m_references.end(), ref) == m_references.end()) {
+        m_references.push_back(ref);
+    }
+    
 }
 
 void PlistInterface::SetUuidStrs()
 {
-    //if (this->HasStartid()) {
-    //    m_startUuid = this->ExtractUuidFragment(this->GetStartid());
-    //}
+    assert(m_uuids.empty() && m_references.empty());
+    
+    xsdAnyURI_List list = this->GetPlist();
+    xsdAnyURI_List::iterator iter;
+    for (iter = list.begin(); iter != list.end(); iter++) {
+        std::string uuid = ExtractUuidFragment(*iter);
+        if (!uuid.empty()) {
+            m_uuids.push_back(uuid);
+        }
+        else {
+            LogError("Cannot parse the anyURI '%s'", (*iter).c_str());
+        }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -66,30 +86,29 @@ void PlistInterface::SetUuidStrs()
 
 int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *object)
 {
-    /*
-    PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
+    PreparePlistParams *params = dynamic_cast<PreparePlistParams *>(functorParams);
     assert(params);
-
-    // First we check if the object has already a mapped @startid (it should not)
-    if (this->HasStart()) {
-        if (this->HasTstamp())
-            LogWarning("%s with @xml:id %s has both a @startid and an @tstamp; @tstamp is ignored",
-                object->GetClassName().c_str(), object->GetUuid().c_str());
+    
+    // This should not happen?
+    if (params->m_fillList == false) {
         return FUNCTOR_CONTINUE;
     }
-    else if (!HasTstamp()) {
-        return FUNCTOR_CONTINUE; // This file is quite likely invalid?
+    
+    this->SetUuidStrs();
+    
+    std::vector<std::string>::iterator iter;
+    for (iter = m_uuids.begin(); iter != m_uuids.end(); iter++) {
+        params->m_interfaceUuidPairs.push_back(std::make_pair(this, *iter));
     }
-
-    // We set -1 to the data_MEASUREBEAT for @tstamp
-    params->m_tstamps.push_back(std::make_pair(object, data_MEASUREBEAT(-1, this->GetTstamp())));
-    */
 
     return FUNCTOR_CONTINUE;
 }
 
 int PlistInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
 {
+    m_uuids.clear();
+    m_references.clear();
+    
     return FUNCTOR_CONTINUE;
 }
 

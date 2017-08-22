@@ -270,7 +270,7 @@ enum data_TEMPUS { TEMPUS_NONE = -3, TEMPUS_2 = 2, TEMPUS_3 };
  * A typedef for a list of data.URI integer.
  * E.g., list { xsd:anyURI+ }
  */
-typedef std::vector<int> xsdPositiveInteger_List;
+typedef std::vector<std::string> xsdAnyURI_List;
     
 /**
  * A typedef for a list of positive integer.

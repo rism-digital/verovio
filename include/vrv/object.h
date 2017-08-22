@@ -152,6 +152,7 @@ public:
 
     virtual DurationInterface *GetDurationInterface() { return NULL; }
     virtual PitchInterface *GetPitchInterface() { return NULL; }
+    virtual PlistInterface *GetPlistInterface() { return NULL; }
     virtual PositionInterface *GetPositionInterface() { return NULL; }
     virtual ScoreDefInterface *GetScoreDefInterface() { return NULL; }
     virtual StemmedDrawingInterface *GetStemmedDrawingInterface() { return NULL; }
@@ -766,6 +767,13 @@ public:
      */
     virtual int PrepareProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
+    /**
+     * Match elements of @plist.
+     */
+    ///@{
+    virtual int PreparePlist(FunctorParams *functorParams);
+    ///@}
+    
     /**
      * Match start for TimePointingInterface elements (such as fermata or harm).
      */

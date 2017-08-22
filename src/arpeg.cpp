@@ -13,6 +13,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "vrv.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -42,6 +44,15 @@ void Arpeg::Reset()
     ResetArpegLog();
     ResetArpegVis();
     ResetColor();
+}
+    
+bool Arpeg::IsValidRef(Object *ref)
+{
+    if (!ref->Is({CHORD, NOTE})) {
+        LogWarning("%s is not supported as @plist target for %s", ref->GetClassName().c_str(), this->GetClassName().c_str());
+        return false;
+    }
+    return true;
 }
 
 //----------------------------------------------------------------------------

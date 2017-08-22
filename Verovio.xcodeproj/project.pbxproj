@@ -880,6 +880,8 @@
 				8F59291518854BF800FE51AD /* durationinterface.h */,
 				8F086ECF188539540037FD8E /* pitchinterface.cpp */,
 				8F59292618854BF800FE51AD /* pitchinterface.h */,
+				4D6331FA1F46DD3A00A0D6BF /* plistinterface.cpp */,
+				4D6331F81F46DBF200A0D6BF /* plistinterface.h */,
 				8F086ED0188539540037FD8E /* positioninterface.cpp */,
 				8F59292718854BF800FE51AD /* positioninterface.h */,
 				4D20B5EB1B873A1300EA9EC3 /* scoredefinterface.cpp */,
@@ -888,8 +890,6 @@
 				4DA60EDF1B6307A8006E2DFC /* textdirinterface.h */,
 				4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */,
 				4DF289FC1A7545CC00BA9F7D /* timeinterface.h */,
-				4D6331FA1F46DD3A00A0D6BF /* plistinterface.cpp */,
-				4D6331F81F46DBF200A0D6BF /* plistinterface.h */,
 			);
 			name = interfaces;
 			sourceTree = "<group>";

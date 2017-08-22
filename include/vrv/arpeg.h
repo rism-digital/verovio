@@ -43,8 +43,14 @@ public:
      * @name Getter to interfaces
      */
     ///@{
+    virtual PlistInterface *GetPlistInterface() { return dynamic_cast<PlistInterface *>(this); }
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     ////@}
+                  
+    /**
+     * Custom method for @plist validation
+     */
+    virtual bool IsValidRef(Object *ref);
 
     //----------//
     // Functors //
