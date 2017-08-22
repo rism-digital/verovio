@@ -21,6 +21,7 @@
 #include "doc.h"
 #include "layer.h"
 #include "layerelement.h"
+#include "nc.h"
 #include "note.h"
 #include "neume.h"
 #include "rpt.h"
@@ -59,6 +60,44 @@ void View::DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     DrawLayerChildren(dc, syllable, layer, staff, measure);
 
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    Nc *nc = dynamic_cast<Nc *>(element);
+    assert(nc);
+
+
+    /******************************************************************/
+    // initialization
+
+//    ListOfObjects *beamChildren = beam->GetList(beam);
+
+
+    /******************************************************************/
+    // Start the Neume graphic and draw the children
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    /******************************************************************/
+    // Draw the children
+    DrawLayerChildren(dc, nc, layer, staff, measure);
+    dc -> DrawCircle(2000, 2000, 5000);
+
+    int noteY = element->GetDrawingY();
+    int noteX = element->GetDrawingX();
+//    std::cout << "noteX: ";
+//    std::cout << noteX << std::endl;
+//    std::cout << "noteY: ";
+//    std::cout << noteY << std::endl;
+//    std::cout << element->GetPname() << std::endl;
 
     dc->EndGraphic(element, this);
 }

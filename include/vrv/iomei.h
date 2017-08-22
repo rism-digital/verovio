@@ -75,8 +75,9 @@ class MRpt;
 class MRpt2;
 class MultiRest;
 class MultiRpt;
-class Note
+class Nc;
 class Neume;
+class Note
 class Num;
 class Octave;
 class Orig;
@@ -228,6 +229,7 @@ private:
     void WriteLigature(pugi::xml_node currentNode, Ligature *ligature);
     void WriteMensur(pugi::xml_node currentNode, Mensur *mensur);
     void WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig);
+    void WriteNc(pugi::xml_node currentNode, Nc *nc);
     void WriteNeume(pugi::xml_node currentNode, Neume *neume);
     void WriteMRest(pugi::xml_node currentNode, MRest *mRest);
     void WriteMRpt(pugi::xml_node currentNode, MRpt *mRpt);
@@ -460,6 +462,7 @@ private:
     bool ReadMRpt2(Object *parent, pugi::xml_node mRpt2);
     bool ReadMultiRest(Object *parent, pugi::xml_node multiRest);
     bool ReadMultiRpt(Object *parent, pugi::xml_node multiRpt);
+    bool ReadNc(Object *parent, pugi::xml_node nc);
     bool ReadNeume(Object *parent, pugi::xml_node note);
     bool ReadNote(Object *parent, pugi::xml_node note);
     bool ReadProport(Object *parent, pugi::xml_node proport);

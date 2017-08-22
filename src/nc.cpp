@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        neume.cpp
+// Name:        nc.cpp
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "neume.h"
+#include "nc.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,62 +13,46 @@
 
 //----------------------------------------------------------------------------
 
-#include "artic.h"
 #include "attcomparison.h"
 #include "doc.h"
-#include "editorial.h"
 #include "elementpart.h"
-#include "functorparams.h"
-#include "glyph.h"
-#include "layer.h"
-#include "slur.h"
-#include "smufl.h"
 #include "staff.h"
-#include "syl.h"
-#include "tie.h"
-#include "verse.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Note
+// Nc
 //----------------------------------------------------------------------------
 
-Neume::Neume()
-    : LayerElement("neume-"),
-      ObjectListInterface(),
-      AttColor()
+Nc::Nc()
+        : LayerElement("nc-")
+        , DurationInterface()
+        , PitchInterface()
+        , PositionInterface()
+        , AttColor()
+
 {
+    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
+    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
 
     Reset();
 }
 
-Neume::~Neume()
+Nc::~Nc()
 {
 
 }
 
-void Neume::AddChild(Object *child)
-{
-    if (child->Is(NC)) {
-        assert(dynamic_cast<Nc *>(child));
-    }
-    else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
-    }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-void Neume::Reset()
+void Nc::Reset()
 {
     LayerElement::Reset();
+    DurationInterface::Reset();
+    PitchInterface::Reset();
+    PositionInterface::Reset();
     ResetColor();
 }
 
-} // namespace vrv
+}

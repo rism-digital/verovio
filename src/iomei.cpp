@@ -49,6 +49,7 @@
 #include "mordent.h"
 #include "mrest.h"
 #include "multirest.h"
+#include "nc.h"
 #include "note.h"
 #include "num.h"
 #include "neume.h"
@@ -454,7 +455,7 @@ bool MeiOutput::WriteObject(Object *object)
     }
     else if (object->Is(SYL)) {
         m_currentNode = m_currentNode.append_child("syllable");
-        WriteMeiSyllable(m_currentNode, dynamic_cast<Syllable *>(object));
+        WriteSyllable(m_currentNode, dynamic_cast<Syllable *>(object));
     }
     else if (object->Is(TUPLET)) {
         m_currentNode = m_currentNode.append_child("tuplet");
@@ -1350,7 +1351,7 @@ void MeiOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     note->WriteVisibility(currentNode);
 }
 
-void MeiOutput::WriteMeiNeume(pugi::xml_node currentNode, Neume *neume)
+void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
 {
     assert(neume);
 
@@ -3241,11 +3242,7 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
             break;
         }
         elementName = std::string(xmlElement.name());
-<<<<<<< b585b7f2dd1b367bb6290eb898355313ad6cdbc2
         // LogDebug("ReadLayerChildren: element <%s>", xmlElement.name());
-=======
-//         LogDebug("ReadMeiLayerChildren: element <%s>", xmlElement.name());
->>>>>>> Fixed issue with conflicting syl alignment
         if (!IsAllowed(elementName, filter)) {
             std::string meiElementName = filter->GetClassName();
             std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
@@ -3303,11 +3300,14 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "meterSig") {
             success = ReadMeterSig(parent, xmlElement);
         }
+        else if (elementName == "nc") {
+            success = ReadNc(parent, xmlElement);
+        }
         else if (elementName == "note") {
             success = ReadNote(parent, xmlElement);
         }
         else if (elementName == "neume") {
-            success = ReadMeiNeume(parent, xmlElement);
+            success = ReadNeume(parent, xmlElement);
         }
         else if (elementName == "rest") {
             success = ReadRest(parent, xmlElement);
@@ -3337,7 +3337,7 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
             success = ReadSyl(parent, xmlElement);
         }
         else if (elementName == "syllable") {
-            success = ReadMeiSyllable(parent, xmlElement);
+            success = ReadSyllable(parent, xmlElement);
         }
         else if (elementName == "tuplet") {
             success = ReadTuplet(parent, xmlElement);
@@ -3551,7 +3551,7 @@ bool MeiInput::ReadLigature(Object *parent, pugi::xml_node ligature)
     return ReadLayerChildren(vrvLigature, ligature, vrvLigature);
 }
 
-bool MeiInput::ReadMeiNeume(Object *parent, pugi::xml_node neume)
+bool MeiInput::ReadNeume(Object *parent, pugi::xml_node neume)
 {
     Neume *vrvNeume = new Neume();
     ReadLayerElement(neume, vrvNeume);
@@ -3562,7 +3562,7 @@ bool MeiInput::ReadMeiNeume(Object *parent, pugi::xml_node neume)
     vrvNeume->ReadColor(neume);
 
     parent->AddChild(vrvNeume);
-    return ReadMeiLayerChildren(vrvNeume, neume, vrvNeume);
+    return ReadLayerChildren(vrvNeume, neume, vrvNeume);
 }
 
 bool MeiInput::ReadMensur(Object *parent, pugi::xml_node mensur)
@@ -3653,6 +3653,20 @@ bool MeiInput::ReadMultiRpt(Object *parent, pugi::xml_node multiRpt)
     return true;
 }
 
+bool MeiInput::ReadNc(Object *parent, pugi::xml_node nc)
+{
+    Nc *vrvNc = new Nc();
+    ReadLayerElement(nc, vrvNc);
+
+    ReadDurationInterface(nc, vrvNc);
+    ReadPitchInterface(nc, vrvNc);
+    ReadPositionInterface(nc, vrvNc);
+    vrvNc->ReadColor(nc);
+
+    parent->AddChild(vrvNc);
+    return ReadLayerChildren(vrvNc, nc, vrvNc);
+}
+
 bool MeiInput::ReadNote(Object *parent, pugi::xml_node note)
 {
     Note *vrvNote = new Note();
@@ -3692,22 +3706,9 @@ bool MeiInput::ReadNote(Object *parent, pugi::xml_node note)
         vrvNote->AddChild(vrvAccid);
     }
 
-<<<<<<< b585b7f2dd1b367bb6290eb898355313ad6cdbc2
     if (vrvNote->HasTie()) {
         m_doc->SetAnalyticalMarkup(true);
     }
-=======
-    parent->AddChild(vrvNote);
-    return ReadMeiLayerChildren(vrvNote, note, vrvNote);
-}
-
-bool MeiInput::ReadMeiNeume(Object *parent, pugi::xml_node neume)
-{
-    Neume *vrvNeume = new Neume();
-    ReadLayerElement(neume, vrvNeume);
-
-    vrvNeume->ReadColor(neume);
->>>>>>> Fixed issue with conflicting syl alignment
 
     parent->AddChild(vrvNote);
     return ReadLayerChildren(vrvNote, note, vrvNote);
@@ -3763,7 +3764,7 @@ bool MeiInput::ReadSyl(Object *parent, pugi::xml_node syl)
     return ReadTextChildren(vrvSyl, syl, vrvSyl);
 }
 
-bool MeiInput::ReadMeiSyllable(Object *parent, pugi::xml_node syllable)
+bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
 {
     Syllable *vrvSyllable = new Syllable();
     ReadLayerElement(syllable, vrvSyllable);
@@ -3775,7 +3776,7 @@ bool MeiInput::ReadMeiSyllable(Object *parent, pugi::xml_node syllable)
 
     parent->AddChild(vrvSyllable);
 
-    return ReadMeiLayerChildren(vrvSyllable, syllable, vrvSyllable);
+    return ReadLayerChildren(vrvSyllable, syllable, vrvSyllable);
 }
 
 bool MeiInput::ReadTuplet(Object *parent, pugi::xml_node tuplet)
