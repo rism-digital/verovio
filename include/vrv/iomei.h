@@ -68,6 +68,7 @@ class MRpt;
 class MRpt2;
 class MultiRest;
 class MultiRpt;
+class Nc;
 class Note;
 class Neume;
 class Octave;
@@ -211,6 +212,7 @@ private:
     void WriteMeiMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2);
     void WriteMeiMultiRest(pugi::xml_node currentNode, MultiRest *multiRest);
     void WriteMeiMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt);
+    void WriteMeiNc(pugi::xml_node currentNode, Nc *nc);
     void WriteMeiNote(pugi::xml_node currentNode, Note *note);
     void WriteMeiNeume(pugi::xml_node currentNode, Neume *neume);
     void WriteMeiProport(pugi::xml_node currentNode, Proport *proport);
@@ -442,6 +444,7 @@ private:
     bool ReadMeiMRpt2(Object *parent, pugi::xml_node mRpt2);
     bool ReadMeiMultiRest(Object *parent, pugi::xml_node multiRest);
     bool ReadMeiMultiRpt(Object *parent, pugi::xml_node multiRpt);
+    bool ReadMeiNc(Object *parent, pugi::xml_node nc);
     bool ReadMeiNote(Object *parent, pugi::xml_node note);
     bool ReadMeiNeume(Object *parent, pugi::xml_node neume);
     bool ReadMeiProport(Object *parent, pugi::xml_node proport);

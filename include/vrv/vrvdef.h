@@ -144,6 +144,7 @@ enum ClassId {
     MRPT2,
     MULTIREST,
     MULTIRPT,
+    NC,
     NOTE,
     NEUME,
     PROPORT,
@@ -201,6 +202,7 @@ class BoundingBox;
 class FloatingPositioner;
 class LayerElement;
 class LedgerLine;
+class Nc;
 class Note;
 class Neume;
 class Object;

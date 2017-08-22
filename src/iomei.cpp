@@ -43,6 +43,7 @@
 #include "mordent.h"
 #include "mrest.h"
 #include "multirest.h"
+#include "nc.h"
 #include "note.h"
 #include "neume.h"
 #include "octave.h"
@@ -2830,6 +2831,9 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
         else if (elementName == "meterSig") {
             success = ReadMeiMeterSig(parent, xmlElement);
         }
+        else if (elementName == "nc") {
+            success = ReadMeiNc(parent, xmlElement);
+        }
         else if (elementName == "note") {
             success = ReadMeiNote(parent, xmlElement);
         }
@@ -3160,6 +3164,20 @@ bool MeiInput::ReadMeiMultiRpt(Object *parent, pugi::xml_node multiRpt)
 
     parent->AddChild(vrvMultiRpt);
     return true;
+}
+
+bool MeiInput::ReadMeiNc(Object *parent, pugi::xml_node nc)
+{
+    Nc *vrvNc = new Nc();
+    ReadLayerElement(nc, vrvNc);
+
+    ReadDurationInterface(nc, vrvNc);
+    ReadPitchInterface(nc, vrvNc);
+    ReadPositionInterface(nc, vrvNc);
+    vrvNc->ReadColor(nc);
+
+    parent->AddChild(vrvNc);
+    return ReadMeiLayerChildren(vrvNc, nc, vrvNc);
 }
 
 bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
