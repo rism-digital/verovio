@@ -695,6 +695,10 @@ bool Toolkit::ParseOptions(const std::string &json_options)
 
     if (json.has<jsonxx::Number>("noJustification")) SetNoJustification(json.get<jsonxx::Number>("noJustification"));
 
+    if (json.has<jsonxx::Number>("evenNoteSpacing")) {
+        SetEvenNoteSpacing(json.get<jsonxx::Number>("evenNoteSpacing"));
+    }
+
     if (json.has<jsonxx::Number>("humType")) {
         SetHumType(json.get<jsonxx::Number>("humType"));
     }

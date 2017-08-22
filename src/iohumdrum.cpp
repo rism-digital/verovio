@@ -484,6 +484,9 @@ bool HumdrumInput::convertHumdrum()
         if (it->isDataType("**harm")) {
             m_harm = true;
         }
+		else if (it->isDataType("**rhrm")) {  // **recip + **harm
+            m_harm = true;
+        }
         else if (it->getDataType().compare(0, 7, "**cdata") == 0) {
             m_harm = true;
         }
@@ -2040,6 +2043,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 continue;
             }
             if (!(token->isDataType("**mxhm") || token->isDataType("**harm")
+                    || token->isDataType("**rhrm")
                     || (token->getDataType().compare(0, 7, "**cdata") == 0))) {
                 continue;
             }
@@ -2072,6 +2076,10 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 // 300: harm->SetPlace(STAFFREL_below);
                 setPlace(harm, "below");
                 content = cleanHarmString2(*token);
+            }
+            else if (token->isDataType("**rhrm")) {
+                setPlace(harm, "below");
+                content = cleanHarmString3(*token);
             }
             else {
                 content = cleanHarmString(*token);
@@ -2117,6 +2125,59 @@ vector<string> HumdrumInput::cleanFBString(const std::string &content)
     }
 
     return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::cleanHarmString3 -- Adjust **rhrm text to remove
+//     **recip data and then clean with cleanHarmString2.
+//     **rhrm cannot contain alternate chords using [vi] syntax,
+//     because [, _, ], are for tied notes, **rhrm tokens with _ or ]
+//     will be suppressed.
+//
+
+string HumdrumInput::cleanHarmString3(const std::string &content)
+{
+	string temp;
+
+	// hide **rhrm token if not a harmony "attack":
+	
+	if (content.find("_") != string::npos) {
+		return "";
+	}
+	if (content.find("]") != string::npos) {
+		return "";
+	}
+
+	// skip over **recip data:
+	int i;
+	for (i=0; i<(int)content.size(); i++) {
+		if ((content[i] == '-') || (content[i] == '#')) {
+			break;
+		}
+		if (isalpha(content[i])) {
+			// V, I, ii, vi, Lt, Gn, Fr, N
+			break;
+		}
+	}
+
+	int foundstartsquare = false;
+	for (int ii=i; ii<(int)content.size(); ii++) {
+		if (content[ii] == '[') {
+			foundstartsquare = true;
+		}
+		if (content[ii] == ']') {
+			if (!foundstartsquare) {
+				continue;
+			}
+		}
+		if (content[ii] == '_') {
+			continue;
+		}
+		temp += content[ii];
+	}
+
+	return cleanHarmString2(temp);
 }
 
 //////////////////////////////
