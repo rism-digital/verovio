@@ -16,10 +16,12 @@
 
 #include "accid.h"
 #include "anchoredtext.h"
+#include "arpeg.h"
 #include "artic.h"
 #include "beam.h"
 #include "boundary.h"
 #include "breath.h"
+#include "btrem.h"
 #include "chord.h"
 #include "clef.h"
 #include "custos.h"
@@ -31,6 +33,7 @@
 #include "expansion.h"
 #include "fb.h"
 #include "fermata.h"
+#include "ftrem.h"
 #include "functorparams.h"
 #include "hairpin.h"
 #include "harm.h"
@@ -253,6 +256,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(ANCHORED_TEXT)) {
         m_currentNode = m_currentNode.append_child("anchoredText");
         WriteMeiAnchoredText(m_currentNode, dynamic_cast<AnchoredText *>(object));
+    }
+    else if (object->Is(ARPEG)) {
+        m_currentNode = m_currentNode.append_child("arpeg");
+        WriteMeiArpeg(m_currentNode, dynamic_cast<Arpeg *>(object));
     }
     else if (object->Is(BREATH)) {
         m_currentNode = m_currentNode.append_child("breath");
@@ -629,14 +636,21 @@ void MeiOutput::WriteMeiPage(pugi::xml_node currentNode, Page *page)
     WriteXmlId(currentNode, page);
     // size and margins but only if any - we rely on page.height only to check this
     if (page->m_pageHeight != -1) {
-        currentNode.append_attribute("page.width") = StringFormat("%d", page->m_pageWidth).c_str();
-        currentNode.append_attribute("page.height") = StringFormat("%d", page->m_pageHeight).c_str();
-        currentNode.append_attribute("page.leftmar") = StringFormat("%d", page->m_pageLeftMar).c_str();
-        currentNode.append_attribute("page.rightmar") = StringFormat("%d", page->m_pageRightMar).c_str();
-        currentNode.append_attribute("page.rightmar") = StringFormat("%d", page->m_pageRightMar).c_str();
+        currentNode.append_attribute("page.width") = StringFormat("%d", page->m_pageWidth / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("page.height")
+            = StringFormat("%d", page->m_pageHeight / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("page.leftmar")
+            = StringFormat("%d", page->m_pageLeftMar / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("page.rightmar")
+            = StringFormat("%d", page->m_pageRightMar / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("page.rightmar")
+            = StringFormat("%d", page->m_pageRightMar / DEFINITION_FACTOR).c_str();
     }
     if (!page->m_surface.empty()) {
         currentNode.append_attribute("surface") = page->m_surface.c_str();
+    }
+    if (page->m_PPUFactor != 1.0) {
+        currentNode.append_attribute("ppu") = StringFormat("%f", page->m_PPUFactor).c_str();
     }
 }
 
@@ -646,8 +660,10 @@ void MeiOutput::WriteMeiSystem(pugi::xml_node currentNode, System *system)
 
     WriteXmlId(currentNode, system);
     // margins
-    currentNode.append_attribute("system.leftmar") = StringFormat("%d", system->m_systemLeftMar).c_str();
-    currentNode.append_attribute("system.rightmar") = StringFormat("%d", system->m_systemRightMar).c_str();
+    currentNode.append_attribute("system.leftmar")
+        = StringFormat("%d", system->m_systemLeftMar / DEFINITION_FACTOR).c_str();
+    currentNode.append_attribute("system.rightmar")
+        = StringFormat("%d", system->m_systemRightMar / DEFINITION_FACTOR).c_str();
     // y positions
     if (system->m_yAbs != VRV_UNSET) {
         currentNode.append_attribute("uly") = StringFormat("%d", system->m_yAbs / DEFINITION_FACTOR).c_str();
@@ -687,6 +703,7 @@ void MeiOutput::WriteMeiEnding(pugi::xml_node currentNode, Ending *ending)
     assert(ending);
 
     WriteSystemElement(currentNode, ending);
+    ending->WriteLineRend(currentNode);
     ending->WriteNNumberLike(currentNode);
 }
 
@@ -809,6 +826,18 @@ void MeiOutput::WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *a
     WriteControlElement(currentNode, anchoredText);
     WriteTextDirInterface(currentNode, anchoredText);
 }
+
+void MeiOutput::WriteMeiArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
+{
+    assert(arpeg);
+
+    WriteControlElement(currentNode, arpeg);
+    WritePlistInterface(currentNode, arpeg);
+    WriteTimePointInterface(currentNode, arpeg);
+    arpeg->WriteArpegLog(currentNode);
+    arpeg->WriteArpegVis(currentNode);
+    arpeg->WriteColor(currentNode);
+};
 
 void MeiOutput::WriteMeiBreath(pugi::xml_node currentNode, Breath *breath)
 {
@@ -957,7 +986,7 @@ void MeiOutput::WriteMeiTrill(pugi::xml_node currentNode, Trill *trill)
     assert(trill);
 
     WriteControlElement(currentNode, trill);
-    WriteTimePointInterface(currentNode, trill);
+    WriteTimeSpanningInterface(currentNode, trill);
     trill->WriteColor(currentNode);
     trill->WriteOrnamentAccid(currentNode);
     trill->WritePlacement(currentNode);
@@ -1331,6 +1360,13 @@ void MeiOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *inte
     interface->WritePitch(element);
 }
 
+void MeiOutput::WritePlistInterface(pugi::xml_node element, PlistInterface *interface)
+{
+    assert(interface);
+
+    interface->WritePlist(element);
+}
+
 void MeiOutput::WritePositionInterface(pugi::xml_node element, PositionInterface *interface)
 {
     assert(interface);
@@ -1657,6 +1693,15 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
     }
+    // filter for annot
+    else if (filterParent->Is(ANNOT)) {
+        if (element == "") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for harm
     else if (filterParent->Is(HARM)) {
         if (element == "") {
@@ -1855,7 +1900,7 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     else {
-        LogDebug("Unknow filter for '%s'", filterParent->GetClassName().c_str());
+        LogDebug("Unknown filter for '%s'", filterParent->GetClassName().c_str());
         return true;
     }
 }
@@ -2043,6 +2088,7 @@ bool MeiInput::ReadMeiEnding(Object *parent, pugi::xml_node ending)
     Ending *vrvEnding = new Ending();
     ReadSystemElement(ending, vrvEnding);
 
+    vrvEnding->ReadLineRend(ending);
     vrvEnding->ReadNNumberLike(ending);
 
     parent->AddChild(vrvEnding);
@@ -2114,6 +2160,9 @@ bool MeiInput::ReadMeiPage(pugi::xml_node page)
     }
     if (page.attribute("surface")) {
         vrvPage->m_surface = page.attribute("surface").value();
+    }
+    if (page.attribute("ppu")) {
+        // vrvPage->m_PPUFactor = 12.5; //atof(page.attribute("ppu").value());
     }
 
     m_doc->AddChild(vrvPage);
@@ -2479,6 +2528,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "anchoredText") {
             success = ReadMeiAnchoredText(parent, current);
         }
+        else if (std::string(current.name()) == "arpeg") {
+            success = ReadMeiArpeg(parent, current);
+        }
         else if (std::string(current.name()) == "breath") {
             success = ReadMeiBreath(parent, current);
         }
@@ -2556,6 +2608,21 @@ bool MeiInput::ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText)
     return ReadMeiTextChildren(vrvAnchoredText, anchoredText, vrvAnchoredText);
 }
 
+bool MeiInput::ReadMeiArpeg(Object *parent, pugi::xml_node arpeg)
+{
+    Arpeg *vrvArpeg = new Arpeg();
+    ReadControlElement(arpeg, vrvArpeg);
+
+    ReadPlistInterface(arpeg, vrvArpeg);
+    ReadTimePointInterface(arpeg, vrvArpeg);
+    vrvArpeg->ReadArpegLog(arpeg);
+    vrvArpeg->ReadArpegVis(arpeg);
+    vrvArpeg->ReadColor(arpeg);
+
+    parent->AddChild(vrvArpeg);
+    return true;
+}
+
 bool MeiInput::ReadMeiBreath(Object *parent, pugi::xml_node breath)
 {
     Breath *vrvBreath = new Breath();
@@ -2566,7 +2633,7 @@ bool MeiInput::ReadMeiBreath(Object *parent, pugi::xml_node breath)
     vrvBreath->ReadPlacement(breath);
 
     parent->AddChild(vrvBreath);
-    return ReadMeiTextChildren(vrvBreath, breath, vrvBreath);
+    return true;
 }
 
 bool MeiInput::ReadMeiDir(Object *parent, pugi::xml_node dir)
@@ -2724,7 +2791,7 @@ bool MeiInput::ReadMeiTrill(Object *parent, pugi::xml_node trill)
     Trill *vrvTrill = new Trill();
     ReadControlElement(trill, vrvTrill);
 
-    ReadTimePointInterface(trill, vrvTrill);
+    ReadTimeSpanningInterface(trill, vrvTrill);
     vrvTrill->ReadColor(trill);
     vrvTrill->ReadOrnamentAccid(trill);
     vrvTrill->ReadPlacement(trill);
@@ -3469,6 +3536,12 @@ bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interf
     return true;
 }
 
+bool MeiInput::ReadPlistInterface(pugi::xml_node element, PlistInterface *interface)
+{
+    interface->ReadPlist(element);
+    return true;
+}
+
 bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *interface)
 {
     interface->ReadStaffLoc(element);
@@ -3622,7 +3695,7 @@ bool MeiInput::ReadMeiAnnot(Object *parent, pugi::xml_node annot)
     }
 
     parent->AddChild(vrvAnnot);
-    return true;
+    return ReadMeiTextChildren(vrvAnnot, annot, vrvAnnot);
 }
 
 bool MeiInput::ReadMeiApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter)
@@ -4083,15 +4156,6 @@ DocType MeiInput::StrToDocType(std::string type)
     if (type == "transcription") return Transcription;
     LogWarning("Unknown layout type '%s'", type.c_str());
     return Raw;
-}
-
-std::string MeiInput::ExtractUuidFragment(std::string refUuid)
-{
-    size_t pos = refUuid.find_last_of("#");
-    if ((pos != std::string::npos) && (pos < refUuid.length() - 1)) {
-        refUuid = refUuid.substr(pos + 1);
-    }
-    return refUuid;
 }
 
 std::wstring MeiInput::LeftTrim(std::wstring str)

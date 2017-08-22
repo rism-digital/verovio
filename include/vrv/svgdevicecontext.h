@@ -98,7 +98,7 @@ public:
     virtual void EndText();
 
     /**
-     * Move a text to the specified position, for example when starting a new line.
+     * Move a text to the specified position, for example when starting a new line
      */
     virtual void MoveTextTo(int x, int y);
 
@@ -127,7 +127,7 @@ public:
     ///@}
 
     /**
-     * @name Method for starting and ending a text (<tspan>) text graphic.
+     * @name Method for starting and ending a text (<tspan>) text graphic
      */
     ///@{
     virtual void StartTextGraphic(Object *object, std::string gClass, std::string gId);
@@ -140,6 +140,13 @@ public:
     ///@{
     virtual void StartPage();
     virtual void EndPage();
+    ///@}
+
+    /**
+     * @name Method for adding description element
+     */
+    ///@{
+    virtual void AddDescription(const std::string &text);
     ///@}
 
 private:

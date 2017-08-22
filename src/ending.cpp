@@ -27,8 +27,9 @@ namespace vrv {
 // Ending
 //----------------------------------------------------------------------------
 
-Ending::Ending() : SystemElement("ending-"), BoundaryStartInterface(), AttNNumberLike()
+Ending::Ending() : SystemElement("ending-"), BoundaryStartInterface(), AttLineRend(), AttNNumberLike()
 {
+    RegisterAttClass(ATT_LINEREND);
     RegisterAttClass(ATT_NINTEGER);
 
     Reset();
@@ -42,6 +43,7 @@ void Ending::Reset()
 {
     SystemElement::Reset();
     BoundaryStartInterface::Reset();
+    ResetLineRend();
     ResetNNumberLike();
 }
 

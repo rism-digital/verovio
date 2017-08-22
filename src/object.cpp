@@ -32,6 +32,7 @@
 #include "metersig.h"
 #include "note.h"
 #include "page.h"
+#include "plistinterface.h"
 #include "staff.h"
 #include "system.h"
 #include "tempo.h"
@@ -400,6 +401,17 @@ void Object::FindAllChildByAttComparison(
     Functor findAllByAttComparison(&Object::FindAllByAttComparison);
     FindAllByAttComparisonParams findAllByAttComparisonParams(attComparison, objects);
     this->Process(&findAllByAttComparison, &findAllByAttComparisonParams, NULL, NULL, deepness, direction);
+}
+
+void Object::FindAllChildBetween(
+    ArrayOfObjects *objects, AttComparison *attComparison, Object *start, Object *end, bool clear)
+{
+    assert(objects);
+    if (clear) objects->clear();
+
+    Functor findAllBetween(&Object::FindAllBetween);
+    FindAllBetweenParams findAllBetweenParams(attComparison, objects, start, end);
+    this->Process(&findAllBetween, &findAllBetweenParams);
 }
 
 Object *Object::GetChild(int idx) const
@@ -896,6 +908,57 @@ int Object::FindAllByAttComparison(FunctorParams *functorParams)
         params->m_elements->push_back(this);
     }
     // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::FindAllBetween(FunctorParams *functorParams)
+{
+    FindAllBetweenParams *params = dynamic_cast<FindAllBetweenParams *>(functorParams);
+    assert(params);
+
+    // We are reaching the start of the range
+    if (params->m_start == this) {
+        // Setting the start to NULL indicates that we are in the range
+        params->m_start = NULL;
+    }
+    // We have not reached the start yet
+    else if (params->m_start) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // evaluate by applying the AttComparison operator()
+    if ((*params->m_attComparison)(this)) {
+        params->m_elements->push_back(this);
+    }
+
+    // We have reached the end of the range
+    if (params->m_end == this) {
+        return FUNCTOR_STOP;
+    }
+
+    // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::PreparePlist(FunctorParams *functorParams)
+{
+    PreparePlistParams *params = dynamic_cast<PreparePlistParams *>(functorParams);
+    assert(params);
+
+    if (params->m_fillList && this->HasInterface(INTERFACE_PLIST)) {
+        PlistInterface *interface = this->GetPlistInterface();
+        assert(interface);
+        return interface->InterfacePreparePlist(functorParams, this);
+    }
+
+    std::string uuid = this->GetUuid();
+    auto i = std::find_if(params->m_interfaceUuidPairs.begin(), params->m_interfaceUuidPairs.end(),
+        [uuid](std::pair<PlistInterface *, std::string> pair) { return (pair.second == uuid); });
+    if (i != params->m_interfaceUuidPairs.end()) {
+        i->first->SetRef(this);
+        params->m_interfaceUuidPairs.erase(i);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 

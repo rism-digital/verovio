@@ -695,6 +695,10 @@ bool Toolkit::ParseOptions(const std::string &json_options)
 
     if (json.has<jsonxx::Number>("noJustification")) SetNoJustification(json.get<jsonxx::Number>("noJustification"));
 
+    if (json.has<jsonxx::Number>("evenNoteSpacing")) {
+        SetEvenNoteSpacing(json.get<jsonxx::Number>("evenNoteSpacing"));
+    }
+
     if (json.has<jsonxx::Number>("humType")) {
         SetHumType(json.get<jsonxx::Number>("humType"));
     }
@@ -1032,6 +1036,13 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     Object *element = m_doc.FindChildByUuid(xmlId);
     int timeofElement = 0;
     if (element->Is(NOTE)) {
+        if (!m_doc.HasMidiTimemap()) {
+            // generate MIDI timemap before progressing
+            m_doc.CalculateMidiTimemap();
+        }
+        if (!m_doc.HasMidiTimemap()) {
+            LogWarning("Calculation of MIDI timemap failed, time value is invalid.");
+        }
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
         Measure *measure = dynamic_cast<Measure *>(note->GetFirstParent(MEASURE));

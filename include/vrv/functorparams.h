@@ -721,6 +721,32 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// FindAllBetweenParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the attComparision text
+ * member 1: an array of all matching objects
+ * member 2: the start object range
+ * member 3: the end object range
+ **/
+
+class FindAllBetweenParams : public FunctorParams {
+public:
+    FindAllBetweenParams(AttComparison *attComparison, ArrayOfObjects *elements, Object *start, Object *end)
+    {
+        m_attComparison = attComparison;
+        m_elements = elements;
+        m_start = start;
+        m_end = end;
+    }
+    AttComparison *m_attComparison;
+    ArrayOfObjects *m_elements;
+    Object *m_start;
+    Object *m_end;
+};
+
+//----------------------------------------------------------------------------
 // FindAllByAttComparisonParams
 //----------------------------------------------------------------------------
 
@@ -1051,26 +1077,19 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareRptParams
+// PreparePlistParams
 //----------------------------------------------------------------------------
 
 /**
- * member 0: a pointer to the current MRpt pointer
- * member 1: a pointer to the data_BOOLEAN indicating if multiNumber
- * member 2: a pointer to the doc scoreDef
+ * member 0: ArrayOfInterfaceUuidPairs holds the interface / uuid pairs to match
+ * member 1: bool* fillList for indicating whether the pairs have to be stacked or not
  **/
 
-class PrepareRptParams : public FunctorParams {
+class PreparePlistParams : public FunctorParams {
 public:
-    PrepareRptParams(ScoreDef *currentScoreDef)
-    {
-        m_currentMRpt = NULL;
-        m_multiNumber = BOOLEAN_NONE;
-        m_currentScoreDef = currentScoreDef;
-    }
-    MRpt *m_currentMRpt;
-    data_BOOLEAN m_multiNumber;
-    ScoreDef *m_currentScoreDef;
+    PreparePlistParams() { m_fillList = true; }
+    ArrayOfInterfaceUuidPairs m_interfaceUuidPairs;
+    bool m_fillList;
 };
 
 //----------------------------------------------------------------------------
@@ -1101,6 +1120,29 @@ public:
     PrepareProcessingListsParams() {}
     IntTree m_verseTree;
     IntTree m_layerTree;
+};
+
+//----------------------------------------------------------------------------
+// PrepareRptParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the current MRpt pointer
+ * member 1: a pointer to the data_BOOLEAN indicating if multiNumber
+ * member 2: a pointer to the doc scoreDef
+ **/
+
+class PrepareRptParams : public FunctorParams {
+public:
+    PrepareRptParams(ScoreDef *currentScoreDef)
+    {
+        m_currentMRpt = NULL;
+        m_multiNumber = BOOLEAN_NONE;
+        m_currentScoreDef = currentScoreDef;
+    }
+    MRpt *m_currentMRpt;
+    data_BOOLEAN m_multiNumber;
+    ScoreDef *m_currentScoreDef;
 };
 
 //----------------------------------------------------------------------------

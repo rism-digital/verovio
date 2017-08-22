@@ -130,6 +130,13 @@ public:
     bool UpdateHorizontalValues() { return (m_update != BBOX_VERTICAL_ONLY); }
     bool UpdateVerticalValues() { return (m_update != BBOX_HORIZONTAL_ONLY); }
 
+    /**
+     * @name Method for adding description element
+     */
+    ///@{
+    virtual void AddDescription(const std::string &text){};
+    ///@}
+
 private:
     int m_width, m_height;
     double m_userScaleX, m_userScaleY;

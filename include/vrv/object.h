@@ -152,6 +152,7 @@ public:
 
     virtual DurationInterface *GetDurationInterface() { return NULL; }
     virtual PitchInterface *GetPitchInterface() { return NULL; }
+    virtual PlistInterface *GetPlistInterface() { return NULL; }
     virtual PositionInterface *GetPositionInterface() { return NULL; }
     virtual ScoreDefInterface *GetScoreDefInterface() { return NULL; }
     virtual StemmedDrawingInterface *GetStemmedDrawingInterface() { return NULL; }
@@ -347,11 +348,18 @@ public:
         AttComparison *attComparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
-     * Return all the object matching the AttComparison functor
+     * Return all the objects matching the AttComparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
     void FindAllChildByAttComparison(ArrayOfObjects *objects, AttComparison *attComparison,
         int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool clear = true);
+
+    /**
+     * Return all the objects matching the AttComparison functor and being between start and end in the tree.
+     * The start and end objects are included in the result set.
+     */
+    void FindAllChildBetween(
+        ArrayOfObjects *objects, AttComparison *attComparison, Object *start, Object *end, bool clear = true);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -462,9 +470,14 @@ public:
     virtual int FindExtremeByAttComparison(FunctorParams *functorParams);
 
     /**
-     * Find a all Object with a AttComparison functor.
+     * Find a all Object with an AttComparison functor.
      */
     virtual int FindAllByAttComparison(FunctorParams *functorParams);
+
+    /**
+     * Find a all Object between a start and end Object and with an AttComparison functor.
+     */
+    virtual int FindAllBetween(FunctorParams *functorParams);
 
     /**
      * Look if the time / duration passed as parameter overlap with a space in the alignment references
@@ -753,6 +766,13 @@ public:
      * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
      */
     virtual int PrepareProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Match elements of @plist.
+     */
+    ///@{
+    virtual int PreparePlist(FunctorParams *functorParams);
+    ///@}
 
     /**
      * Match start for TimePointingInterface elements (such as fermata or harm).
