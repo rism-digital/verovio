@@ -574,6 +574,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
         || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
         || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+    bool isNeume = staff->m_drawingNotationType == NOTATIONTYPE_neume;
 
     int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
 
@@ -633,6 +634,14 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 sym = SMUFL_E904_mensuralFclefPetrucci;
         }
     }
+
+    if(isNeume) {
+        if (clef->GetShape() == CLEFSHAPE_C)
+            sym = SMUFL_E906_chantCclef;
+        else if(clef->GetShape() == CLEFSHAPE_F)
+            sym = SMUFL_E902_chantFclef;
+    }
+
 
     if (sym == 0) {
         clef->SetEmptyBB();

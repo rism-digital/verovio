@@ -19,7 +19,7 @@
                 <score>
                     <scoreDef>
                         <staffGrp symbol="bracket">
-                            <staffDef n="1" lines="4" clef.line="2" clef.shape="C" tempus="3" prolatio="3" proport.num="1" proport.numbase="3" notationtype="chant"/>
+                            <staffDef n="1" lines="4" clef.line="2" clef.shape="C" tempus="3" prolatio="3" proport.num="1" proport.numbase="3" notationtype="neume"/>
                         </staffGrp>
                     </scoreDef>
                     <section>
