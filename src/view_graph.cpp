@@ -177,19 +177,20 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staf
     return;
 }
 
-void View::DrawSmuflHorizontalLine(
-    DeviceContext *dc, int x1, int x2, int y, int staffSize, bool dimin, wchar_t fill, wchar_t start, wchar_t end)
+void View::DrawSmuflLine(
+    DeviceContext *dc, Point orig, int length, int staffSize, bool dimin, wchar_t fill, wchar_t start, wchar_t end)
 {
     assert(dc);
 
-    int startWidth = (start == 0) ? 0 : m_doc->GetGlyphWidth(start, staffSize, dimin);
-    int fillWidth = m_doc->GetGlyphWidth(fill, staffSize, dimin);
-    int endWidth = (end == 0) ? 0 : m_doc->GetGlyphWidth(end, staffSize, dimin);
-    int totalWidth = x2 - x1;
+    int startWidth = (start == 0) ? 0 : m_doc->GetGlyphAdvX(start, staffSize, dimin);
+    int fillWidth = m_doc->GetGlyphAdvX(fill, staffSize, dimin);
+    int endWidth = (end == 0) ? 0 : m_doc->GetGlyphAdvX(end, staffSize, dimin);
+    int totalWidth = length;
 
     if (totalWidth <= 0) return;
 
-    int count = (totalWidth - startWidth - endWidth) / fillWidth;
+    // We add half a fill length for an average shorter / longer line result
+    int count = (totalWidth + fillWidth / 2 - startWidth - endWidth) / fillWidth;
 
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
@@ -209,7 +210,7 @@ void View::DrawSmuflHorizontalLine(
         str.push_back(end);
     }
 
-    dc->DrawMusicText(str, ToDeviceContextX(x1), ToDeviceContextY(y), false);
+    dc->DrawMusicText(str, ToDeviceContextX(orig.x), ToDeviceContextY(orig.y), false);
 
     dc->ResetFont();
     dc->ResetBrush();

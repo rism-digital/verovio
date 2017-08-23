@@ -1461,6 +1461,9 @@ void View::DrawTrillExtension(
     if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
         x1 += m_doc->GetGlyphWidth(SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false);
     }
+    
+    int length = x2 - x1;
+    Point orig(x1, y);
 
     /************** draw it **************/
 
@@ -1469,7 +1472,7 @@ void View::DrawTrillExtension(
     else
         dc->StartGraphic(trill, "spanning-trill", "");
 
-    DrawSmuflHorizontalLine(dc, x1, x2, y, staff->m_drawingStaffSize, false, SMUFL_E59D_ornamentZigZagLineNoRightEnd, 0,
+    DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, false, SMUFL_E59D_ornamentZigZagLineNoRightEnd, 0,
         SMUFL_E59E_ornamentZigZagLineWithRightEnd);
 
     if (graphic)
@@ -1590,13 +1593,31 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     assert(measure);
     assert(arpeg);
 
-    // Cannot draw a breath that has no start position
-    // if (!breath->GetStart()) return;
-
+    // Cannot draw a breath that has no target
+    if (arpeg->GetRefs()->empty()) return;
+    
+    Object *object = arpeg->GetRefs()->front();
+    
+    if (!object->Is(CHORD)) return;
+    
+    Chord *chord1 = dynamic_cast<Chord*>(object);
+    assert(chord1);
+    
+    Staff *staff = dynamic_cast<Staff *>(chord1->GetFirstParent(STAFF));
+    assert(staff);
+    
+    int length = chord1->GetTopNote()->GetDrawingY() - chord1->GetBottomNote()->GetDrawingY();
+    length += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int y = chord1->GetBottomNote()->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);;
+    int x = chord1->GetBottomNote()->GetDrawingX();
+    Point orig(x, y);
+    
     dc->StartGraphic(arpeg, "", arpeg->GetUuid());
-
-    arpeg->SetEmptyBB();
-
+    
+    dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), -90);
+    
+    DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, false, SMUFL_EAAA_wiggleArpeggiatoDown);
+    
     dc->EndGraphic(arpeg, this);
 }
 

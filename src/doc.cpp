@@ -853,6 +853,19 @@ int Doc::GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const
     w = w * staffSize / 100;
     return w;
 }
+    
+    
+int Doc::GetGlyphAdvX(wchar_t code, int staffSize, bool graceSize) const
+{
+    Glyph *glyph = Resources::GetGlyph(code);
+    assert(glyph);
+    int advX = glyph->GetHorizAdvX();
+    advX = advX * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    if (graceSize) advX = advX * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    advX = advX * staffSize / 100;
+    return advX;
+}
+
 
 Point Doc::ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staffSize, bool graceSize) const
 {

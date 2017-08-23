@@ -8,6 +8,8 @@
 #ifndef __VRV_DC_H__
 #define __VRV_DC_H__
 
+#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
+#include <math.h>
 #include <stack>
 #include <string>
 
@@ -21,6 +23,17 @@ namespace vrv {
 class Glyph;
 class Object;
 class View;
+    
+extern "C" {
+    static inline double DegToRad(double deg)
+    {
+        return (deg * M_PI) / 180.0;
+    }
+    static inline double RadToDeg(double deg)
+    {
+        return (deg * 180.0) / M_PI;
+    }
+}
 
 // ---------------------------------------------------------------------------
 // DeviceContext
@@ -181,6 +194,14 @@ public:
         StartGraphic(object, gClass, gId);
     }
     virtual void EndTextGraphic(Object *object, View *view) { EndGraphic(object, view); }
+    ///@}
+    
+    /**
+     * @name Method for rotating a graphic (clockwise).
+     * This should be called only once per graphic and before drawing anything in it.
+     */
+    ///@{
+    virtual void RotateGraphic(Point const &orig, double angle) = 0;
     ///@}
 
     /**

@@ -10,8 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
-#include <math.h>
 
 //----------------------------------------------------------------------------
 
@@ -29,14 +27,6 @@ namespace vrv {
 
 #define space " "
 #define semicolon ";"
-
-extern "C" {
-static inline double DegToRad(double deg)
-{
-    return (deg * M_PI) / 180.0;
-}
-// static inline double RadToDeg(double deg) { return (deg * 180.0) / M_PI; } // unused
-}
 
 //----------------------------------------------------------------------------
 // SvgDeviceContext
@@ -351,6 +341,15 @@ void SvgDeviceContext::EndTextGraphic(Object *object, View *view)
     m_currentNode = m_svgNodeStack.back();
 }
 
+void SvgDeviceContext::RotateGraphic(Point const &orig, double angle)
+{
+    if (m_currentNode.attribute("transform")) {
+        return;
+    }
+    
+    m_currentNode.append_attribute("transform") = StringFormat("rotate(%f %d,%d)", angle, orig.x, orig.y).c_str();
+}
+    
 void SvgDeviceContext::StartPage()
 {
     // Initialize the flag to false because we want to know if the font needs to be included in the SVG
@@ -729,7 +728,7 @@ void SvgDeviceContext::DrawRotatedText(const std::string &text, int x, int y, do
 void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph)
 {
     assert(m_fontStack.top());
-
+    
     int w, h, gx, gy;
 
     // print chars one by one

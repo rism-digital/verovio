@@ -133,6 +133,13 @@ public:
     virtual void StartTextGraphic(Object *object, std::string gClass, std::string gId);
     virtual void EndTextGraphic(Object *object, View *view);
     ///@}
+    
+    /**
+     * @name Method for rotating a graphic (clockwise).
+     */
+    ///@{
+    virtual void RotateGraphic(Point const &orig, double angle);
+    ///@}
 
     /**
      * @name Method for starting and ending page
