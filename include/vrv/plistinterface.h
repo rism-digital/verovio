@@ -47,7 +47,7 @@ public:
      * Calls IsValidRef to check that the type of object is valid.
      */
     void SetRef(Object *object);
-    
+
     const ArrayOfObjects *GetRefs() { return &m_references; }
 
     //-----------------//

@@ -39,7 +39,7 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
     SetPen(AxBLACK, 1, AxSOLID);
 
     m_update = update;
-    
+
     ResetGraphicRotation();
 }
 
@@ -52,7 +52,7 @@ void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::st
     // add the object object
     object->BoundingBox::ResetBoundingBox();
     m_objects.push_back(object);
-    
+
     ResetGraphicRotation();
 }
 
@@ -66,7 +66,7 @@ void BBoxDeviceContext::EndGraphic(Object *object, View *view)
     // detach the object
     assert(m_objects.back() == object);
     m_objects.pop_back();
-    
+
     ResetGraphicRotation();
 }
 
@@ -76,11 +76,11 @@ void BBoxDeviceContext::EndResumedGraphic(Object *object, View *view)
     assert(m_objects.back() == object);
     m_objects.pop_back();
 }
-    
+
 void BBoxDeviceContext::RotateGraphic(Point const &orig, double angle)
 {
     assert(AreEqual(m_rotationAngle, 0.0));
-    
+
     m_rotationAngle = angle;
     m_rotationOrigin = orig;
 }
@@ -328,7 +328,7 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, wchar_t glyph)
     if (m_isDeactivatedX && m_isDeactivatedY) {
         return;
     }
-    
+
     if (!AreEqual(m_rotationAngle, 0.0)) {
         Point p1 = BoundingBox::CalcPositionAfterRotation(Point(x1, y1), DegToRad(m_rotationAngle), m_rotationOrigin);
         Point p2 = BoundingBox::CalcPositionAfterRotation(Point(x2, y2), DegToRad(m_rotationAngle), m_rotationOrigin);
@@ -359,7 +359,7 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, wchar_t glyph)
         if (!m_isDeactivatedY) (m_objects.at(i))->UpdateContentBBoxY(m_view->ToLogicalY(y1), m_view->ToLogicalY(y2));
     }
 }
-    
+
 void BBoxDeviceContext::ResetGraphicRotation()
 {
     m_rotationAngle = 0.0;

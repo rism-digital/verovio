@@ -118,7 +118,7 @@ public:
     virtual void ResumeGraphic(Object *object, std::string gId);
     virtual void EndResumedGraphic(Object *object, View *view);
     ///@}
-        
+
     /**
      * @name Method for rotating a graphic (clockwise).
      */
@@ -143,13 +143,13 @@ public:
     ///@{
     virtual void AddDescription(const std::string &text){};
     ///@}
-    
+
 private:
     /**
      *
      */
     void ResetGraphicRotation();
-    
+
 public:
     //
 private:
@@ -161,12 +161,12 @@ private:
     double m_userScaleX, m_userScaleY;
     ///@}
 
-    /** 
-     * Indicates whereas we need to update bounding boxes horizontally and/or vertically 
+    /**
+     * Indicates whereas we need to update bounding boxes horizontally and/or vertically
      */
     unsigned char m_update;
 
-    /** 
+    /**
      * The rotation values by RotateGraphic
      */
     ///@{{

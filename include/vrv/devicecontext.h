@@ -23,16 +23,16 @@ namespace vrv {
 class Glyph;
 class Object;
 class View;
-    
+
 extern "C" {
-    static inline double DegToRad(double deg)
-    {
-        return (deg * M_PI) / 180.0;
-    }
-    static inline double RadToDeg(double deg)
-    {
-        return (deg * 180.0) / M_PI;
-    }
+static inline double DegToRad(double deg)
+{
+    return (deg * M_PI) / 180.0;
+}
+static inline double RadToDeg(double deg)
+{
+    return (deg * 180.0) / M_PI;
+}
 }
 
 // ---------------------------------------------------------------------------
@@ -195,7 +195,7 @@ public:
     }
     virtual void EndTextGraphic(Object *object, View *view) { EndGraphic(object, view); }
     ///@}
-    
+
     /**
      * @name Method for rotating a graphic (clockwise).
      * This should be called only once per graphic and before drawing anything in it.

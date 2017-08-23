@@ -853,8 +853,7 @@ int Doc::GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const
     w = w * staffSize / 100;
     return w;
 }
-    
-    
+
 int Doc::GetGlyphAdvX(wchar_t code, int staffSize, bool graceSize) const
 {
     Glyph *glyph = Resources::GetGlyph(code);
@@ -865,7 +864,6 @@ int Doc::GetGlyphAdvX(wchar_t code, int staffSize, bool graceSize) const
     advX = advX * staffSize / 100;
     return advX;
 }
-
 
 Point Doc::ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staffSize, bool graceSize) const
 {
