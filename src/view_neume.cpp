@@ -89,15 +89,17 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     /******************************************************************/
     // Draw the children
     DrawLayerChildren(dc, nc, layer, staff, measure);
-    dc -> DrawCircle(2000, 2000, 5000);
+
 
     int noteY = element->GetDrawingY();
     int noteX = element->GetDrawingX();
-//    std::cout << "noteX: ";
-//    std::cout << noteX << std::endl;
-//    std::cout << "noteY: ";
-//    std::cout << noteY << std::endl;
-//    std::cout << element->GetPname() << std::endl;
+    int yValue = 3500 + nc->GetPname() * -100 + nc->GetOct() * -500;
+
+//    dc -> DrawCircle(noteX/2, yValue, 50);
+
+    wchar_t fontNo = SMUFL_E990_chantPunctum;
+
+    DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, false, true);
 
     dc->EndGraphic(element, this);
 }
@@ -127,7 +129,6 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /******************************************************************/
     // Draw the children
     DrawLayerChildren(dc, neume, layer, staff, measure);
-    dc -> DrawRectangle(200, 200, 100, 200);
 
     dc->EndGraphic(element, this);
 }
