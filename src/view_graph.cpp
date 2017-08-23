@@ -185,12 +185,11 @@ void View::DrawSmuflLine(
     int startWidth = (start == 0) ? 0 : m_doc->GetGlyphAdvX(start, staffSize, dimin);
     int fillWidth = m_doc->GetGlyphAdvX(fill, staffSize, dimin);
     int endWidth = (end == 0) ? 0 : m_doc->GetGlyphAdvX(end, staffSize, dimin);
-    int totalWidth = length;
 
-    if (totalWidth <= 0) return;
+    if (length <= 0) return;
 
     // We add half a fill length for an average shorter / longer line result
-    int count = (totalWidth + fillWidth / 2 - startWidth - endWidth) / fillWidth;
+    int count = (length + fillWidth / 2 - startWidth - endWidth) / fillWidth;
 
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));

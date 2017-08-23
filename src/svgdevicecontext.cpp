@@ -317,9 +317,9 @@ void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
 
 void SvgDeviceContext::EndGraphic(Object *object, View *view)
 {
-    DrawSvgBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
+    DrawSvgBoundingBox(object, view);
 }
 
 void SvgDeviceContext::EndCustomGraphic()
@@ -330,9 +330,9 @@ void SvgDeviceContext::EndCustomGraphic()
 
 void SvgDeviceContext::EndResumedGraphic(Object *object, View *view)
 {
-    DrawSvgBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
+    DrawSvgBoundingBox(object, view);
 }
 
 void SvgDeviceContext::EndTextGraphic(Object *object, View *view)
@@ -827,7 +827,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         SetPen(AxRED, 10, AxDOT_DASH);
         // SetBrush(AxWHITE, AxTRANSPARENT);
         StartGraphic(object, "self-bounding-box", "0");
-        if (object->HasSelfBB()) {
+        if (box->HasSelfBB()) {
             this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
                 view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()),
                 view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX2())
