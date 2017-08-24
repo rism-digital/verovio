@@ -90,16 +90,32 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     // Draw the children
     DrawLayerChildren(dc, nc, layer, staff, measure);
 
+    Clef *clef = layer->GetClef(element);
+    int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int staffLineNumber = staff->m_drawingLines;
+    int clefLine = clef->GetLine();
 
     int noteY = element->GetDrawingY();
     int noteX = element->GetDrawingX();
-    int yValue = 3500 + nc->GetPname() * -100 + nc->GetOct() * -500;
+
+    int clefYPosition = noteY - ( staffSize * (staffLineNumber - clefLine) );
+    int pitchOffset;
+    int octaveOffset = (nc->GetOct() - 3) * ( (staffSize / 2) * 7);
+
+    if(clef->GetShape() == CLEFSHAPE_C){
+        pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
+    }
+    else if(clef->GetShape() == CLEFSHAPE_F){
+        pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
+    }
+
 
 //    dc -> DrawCircle(noteX/2, yValue, 50);
 
     wchar_t fontNo = SMUFL_E990_chantPunctum;
+    int yValue = clefYPosition + pitchOffset + octaveOffset;
 
-    DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, false, true);
+    DrawSmuflCode(dc, noteX/4 + 300, yValue, fontNo, staff->m_drawingStaffSize, false, true);
 
     dc->EndGraphic(element, this);
 }
