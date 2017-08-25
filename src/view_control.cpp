@@ -1619,6 +1619,9 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
 
     // We are going to have only one FloatingPositioner - staff will be the top note one
     system->SetCurrentFloatingPositioner(staff->GetN(), arpeg, topNote, staff);
+    // Special case: because the positionner objects are reset in ResetVerticalAlignment we
+    // need to reset the value of the DrawingXRel each time. The value is stored in Arpeg.
+    arpeg->GetCurrentFloatingPositioner()->SetDrawingXRel(arpeg->GetDrawingXRel());
     
     int x = arpeg->GetDrawingX();
     Point orig(x, y);
