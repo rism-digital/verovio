@@ -53,7 +53,7 @@ public:
     ///@}
 
     void SetCurrentFloatingPositioner(FloatingPositioner *boundingBox);
-    FloatingPositioner *GetCurrentFloatingPositioner() { return m_currentPositioner; }
+    FloatingPositioner *GetCurrentFloatingPositioner() const { return m_currentPositioner; }
 
     /**
      * @name Get and set the drawing group id for linking floating element horizontally

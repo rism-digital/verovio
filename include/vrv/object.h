@@ -577,6 +577,10 @@ public:
     virtual int CalcDots(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     */
+    virtual int AdjustArpeg(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust the position the outside articulations.
      */
     virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }

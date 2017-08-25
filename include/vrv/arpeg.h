@@ -38,6 +38,17 @@ public:
     virtual std::string GetClassName() const { return "Arpeg"; }
     virtual ClassId GetClassId() const { return ARPEG; }
     ///@}
+                  
+    /**
+     * @name Get the X drawing position (relative to the top note)
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    ///@}
+                  
+    Note* GetDrawingTopNote();
+    Note *GetDrawingBottomNote();
+    void GetDrawingTopBottomNotes(Note *& top, Note *& bottom);
 
     /**
      * @name Getter to interfaces
@@ -46,6 +57,15 @@ public:
     virtual PlistInterface *GetPlistInterface() { return dynamic_cast<PlistInterface *>(this); }
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     ////@}
+                  
+                  
+    /**
+     * @name Get and set the X drawing relative position
+     */
+    ///@{
+    int GetDrawingXRel() const { return m_drawingXRel; }
+    virtual void SetDrawingXRel(int drawingXRel);
+    ///@}
 
     /**
      * Custom method for @plist validation
@@ -55,6 +75,19 @@ public:
     //----------//
     // Functors //
     //----------//
+                  
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+     
+    /**
+     * See Object::AdjustArpeg
+     */
+    ///@{
+    virtual int AdjustArpeg(FunctorParams *functorParams);
+    ///@}
+                  
 
 protected:
     //
@@ -63,7 +96,12 @@ private:
 public:
     //
 private:
-    //
+    /**
+     * The X drawing relative position of the object.
+     * Arpeg are positionned according to the top note through the FloatingPositioner
+     * (See View::DrawArpeg that sets the FloatingPositioner)
+     */
+    int m_drawingXRel;
 };
 
 } // namespace vrv

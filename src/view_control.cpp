@@ -1596,67 +1596,36 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     // Cannot draw a breath that has no target
     if (arpeg->GetRefs()->empty()) return;
 
-    Object *front = arpeg->GetRefs()->front();
-    Object *back = arpeg->GetRefs()->back();
-    
-    if (!front->Is({CHORD, NOTE}) || !back->Is({CHORD, NOTE})) return;
-    
-    int top1 = 0;
-    int top2 = 0;
-    int bottom1 = 0;
-    int bottom2 = 0;
-    
-    bool drawingCueSize = false;
+    Note *topNote = NULL;
+    Note *bottomNote = NULL;
 
-    if (front->Is(CHORD)) {
-        Chord *chord1 = dynamic_cast<Chord *>(front);
-        assert(chord1);
-        top1 = chord1->GetTopNote()->GetDrawingY();
-        bottom1 = chord1->GetBottomNote()->GetDrawingY();
-        drawingCueSize = chord1->GetDrawingCueSize();
-    }
-    else {
-        Note *note1 = dynamic_cast<Note *>(front);
-        assert(note1);
-        top1 = note1->GetDrawingY();
-        bottom1 = top1;
-        drawingCueSize = note1->GetDrawingCueSize();
-    }
-
-    if (front == back) {
-        top2 = top1;
-        bottom2 = bottom1;
-    }
-    else if (back->Is(CHORD)) {
-        Chord *chord2 = dynamic_cast<Chord *>(back);
-        assert(chord2);
-        top2 = chord2->GetTopNote()->GetDrawingY();
-        bottom2 = chord2->GetBottomNote()->GetDrawingY();
-    }
-    else {
-        Note *note2 = dynamic_cast<Note *>(back);
-        assert(note2);
-        top2 = note2->GetDrawingY();
-        bottom2 = top2;
-    }
+    arpeg->GetDrawingTopBottomNotes(topNote, bottomNote);
     
-    Staff *staff = dynamic_cast<Staff *>(front->GetFirstParent(STAFF));
+    // We cannot draw without a top and bottom note
+    if (!topNote || !bottomNote) return;
+    
+    int top = topNote->GetDrawingY();
+    int bottom = bottomNote->GetDrawingY();
+    
+    // We arbitrarily look at the top note
+    Staff *staff = dynamic_cast<Staff *>(topNote->GetFirstParent(STAFF));
     assert(staff);
-    
-    top1 = std::max(top1, top2);
-    bottom1 = std::min(bottom1, bottom2);
+    bool drawingCueSize = topNote->GetDrawingCueSize();
 
-    int length = top1 - bottom1;
+    int length = top - bottom;
+    // We add - substract a unit in order to have the line going to the edge
     length += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int y = bottom1 - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int y = bottom - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-    int x = front->GetDrawingX();
-    Point orig(x, y);
+    // We are going to have only one FloatingPositioner - staff will be the top note one
+    system->SetCurrentFloatingPositioner(staff->GetN(), arpeg, topNote, staff);
     
-    system->SetCurrentFloatingPositioner(staff->GetN(), arpeg, front, staff);
+    int x = arpeg->GetDrawingX();
+    Point orig(x, y);
 
     dc->StartGraphic(arpeg, "", arpeg->GetUuid());
 
+    // Smufl glyphs are horizontal - Rotate them counter clockwise
     dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), -90);
 
     DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, SMUFL_EAAA_wiggleArpeggiatoDown);
