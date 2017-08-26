@@ -45,9 +45,11 @@ public:
     ///@{
     virtual int GetDrawingX() const;
     ///@}
-                  
-    Note* GetDrawingTopNote();
-    Note *GetDrawingBottomNote();
+
+    /**
+     * Set the top and bottom note of the arpeg.
+     * Pointers will be NULL if resovling fails (e.g., pointing to one single note)
+     */
     void GetDrawingTopBottomNotes(Note *& top, Note *& bottom);
 
     /**

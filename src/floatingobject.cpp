@@ -301,7 +301,7 @@ int FloatingPositioner::CalcXMinMaxY(const Point points[4])
 void FloatingPositioner::SetDrawingXRel(int drawingXRel)
 {
     ResetCachedDrawingX();
-    if (drawingXRel > m_drawingXRel) m_drawingXRel = drawingXRel;
+    m_drawingXRel = drawingXRel;
 };
 
 void FloatingPositioner::SetDrawingYRel(int drawingYRel)

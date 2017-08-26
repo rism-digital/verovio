@@ -578,7 +578,10 @@ public:
 
     /**
      */
+    ///@{
     virtual int AdjustArpeg(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustArpegEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Adjust the position the outside articulations.

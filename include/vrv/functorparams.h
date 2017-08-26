@@ -114,13 +114,22 @@ public:
 //----------------------------------------------------------------------------
 
 /**
+ * member 0: the array of Alignement, Arpeg, StaffN, bool tuples
+ * member 1: the MeasureAligner
+ * member 2: the Functor to be redirected to MeasureAligner
+ * member 3: the Doc
  **/
 
 class AdjustArpegParams : public FunctorParams {
 public:
-    AdjustArpegParams(Doc *doc) {
+    AdjustArpegParams(Doc *doc, Functor *functor) {
+        m_measureAligner = NULL;
         m_doc = doc;
+        m_functor = functor;
     }
+    ArrayOfAligmentArpegTuples m_alignmentArpegTuples;
+    MeasureAligner *m_measureAligner;
+    Functor *m_functor;
     Doc *m_doc;
 };
 

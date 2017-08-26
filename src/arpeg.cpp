@@ -62,13 +62,15 @@ int Arpeg::GetDrawingX() const
     // @staff are not taken into account for arpeg (only @plist)
     // The positionner for Arpeg uses the top note as objectX
     if (this->GetCurrentFloatingPositioner()) {
-        return (GetCurrentFloatingPositioner()->GetDrawingX() + this->GetDrawingXRel());
+        return (GetCurrentFloatingPositioner()->GetDrawingX());
     }
     
     // Otherwise get the measure - no cast to Measure is necessary
+    LogDebug("Accessing an arpeg x without positionner");
     Object *measure = this->GetFirstParent(MEASURE);
     assert(measure);
 
+    // This will be very arbitrary positionned...
     return measure->GetDrawingX() + this->GetDrawingXRel();
 }
 
@@ -87,15 +89,14 @@ void Arpeg::SetDrawingXRel(int drawingXRel)
 {
     // Cache is currently not used for Arpeg
     ResetCachedDrawingX();
-    /*
-    if (m_place == STAFFREL_basic_above) {
-        if (drawingYRel < m_drawingYRel) m_drawingYRel = drawingYRel;
-    }
-    else {
-        if (drawingYRel > m_drawingYRel) m_drawingYRel = drawingYRel;
-    }
-    */
+
     m_drawingXRel = drawingXRel;
+    // Also update the positonner drawingXRel - this is a duplcation but we need it in
+    // the positionner too for the bounding box calculation and for the DrawingX value
+    // See GetDrawingX
+    if (GetCurrentFloatingPositioner()) {
+        GetCurrentFloatingPositioner()->SetDrawingXRel(m_drawingXRel);
+    }
 };
     
 void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
@@ -181,6 +182,9 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     AdjustArpegParams *params = dynamic_cast<AdjustArpegParams *>(functorParams);
     assert(params);
     
+    // We should have call DrawArpeg before
+    assert(this->GetCurrentFloatingPositioner());
+    
     Note *topNote = NULL;
     Note *bottomNote = NULL;
     
@@ -192,30 +196,28 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     Staff* topStaff = dynamic_cast<Staff*>(topNote->GetFirstParent(STAFF));
     assert(topStaff);
     
-    int minLeft, maxRight;
-    topNote->GetAlignment()->GetLeftRight(topStaff->GetN(), minLeft, maxRight);
+    Staff* bottomStaff = dynamic_cast<Staff*>(bottomNote->GetFirstParent(STAFF));
+    assert(bottomStaff);
     
-    if (minLeft != -VRV_UNSET) {
-        int dist = topNote->GetDrawingX() - minLeft + params->m_doc->GetDrawingUnit(topStaff->m_drawingStaffSize);
-        this->SetDrawingXRel(-dist);
-       // this->GetCurrentFloatingPositioner()->SetDrawingX(minLeft);
-    }
-    
-    
-    /*
-    // Here we also need to handle the last syl or the measure - we check the alignment with the right barline
-    if (params->m_previousSyl) {
-        int overlap = params->m_previousSyl->GetSelfRight() - this->GetRightBarLine()->GetAlignment()->GetXRel();
-        if (overlap > 0) {
-            params->m_overlapingSyl.push_back(std::make_tuple(
-                params->m_previousSyl->GetAlignment(), this->GetRightBarLine()->GetAlignment(), overlap));
-        }
-    }
+    int minTopLeft, maxTopRight;
+    topNote->GetAlignment()->GetLeftRight(topStaff->GetN(), minTopLeft, maxTopRight);
 
-    // Ajust the postion of the alignment according to what we have collected for this verse
-    m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
-    params->m_overlapingSyl.clear();
-    */
+    params->m_alignmentArpegTuples.push_back(std::make_tuple(topNote->GetAlignment(), this, topStaff->GetN(), false));
+    
+    if (topStaff != bottomStaff) {
+        int minBottomLeft, maxBottomRight;
+        topNote->GetAlignment()->GetLeftRight(bottomStaff->GetN(), minBottomLeft, maxBottomRight);
+        minTopLeft = std::min(minTopLeft, minBottomLeft);
+        
+        params->m_alignmentArpegTuples.push_back(std::make_tuple(topNote->GetAlignment(), this, bottomStaff->GetN(), false));
+    }
+    
+    if (minTopLeft != -VRV_UNSET) {
+        int dist = topNote->GetDrawingX() - minTopLeft;
+        // HARDCODED
+        dist += (params->m_doc->GetDrawingUnit(topStaff->m_drawingStaffSize) / 2);
+        this->SetDrawingXRel(-dist);
+    }
 
     return FUNCTOR_CONTINUE;
 }
