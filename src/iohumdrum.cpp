@@ -1861,6 +1861,9 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
     int layerindex = 0;
     for (i = startline; i <= endline; i++) {
         if (!infile[i].hasSpines()) {
+            if (infile[i].find("!!LO:") == 0) {
+                lt[staffindex][layerindex].push_back(infile[i].token(0));
+            }
             continue;
         }
         lasttrack = -1;
@@ -1884,7 +1887,9 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
             if (infile[i].token(j)->isData() && infile[i].token(j)->isNull()) {
                 // keeping null interpretations to search for clef
                 // in primary layer for secondary layer duplication.
-                continue;
+                if (infile[i].token(j)->getLinkedParameterCount() == 0) {
+                    continue;
+                }
             }
             if (infile[i].token(j)->isCommentLocal() && infile[i].token(j)->isNull()) {
                 // don't store empty comments as well. (maybe ignore all
@@ -2735,6 +2740,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             appendElement(layer, mrest);
             int layer = m_currentlayer;
             for (int z = 0; z < (int)layerdata.size(); z++) {
+                processDirections(layerdata[z], staffindex);
                 if (layerdata[z]->isInterpretation()) {
                     handlePedalMark(layerdata[z]);
                 }
@@ -2801,11 +2807,16 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     Note *note = NULL;
 
+    // ggg	processGlobalDirections(token, staffindex);
+
     for (i = 0; i < (int)layerdata.size(); i++) {
         if (prespace[i] > 0) {
             addSpace(elements, pointers, prespace[i]);
         }
         if (layerdata[i]->isData() && layerdata[i]->isNull()) {
+            // print any global text directions attacked to the null token
+            // and then skip to next token.
+            processDirections(layerdata[i], staffindex);
             continue;
         }
         if (layerdata[i]->isInterpretation()) {
@@ -2888,7 +2899,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 processDynamics(layerdata[i], staffindex);
                 addArticulations(chord, layerdata[i]);
                 addOrnaments(chord, layerdata[i]);
-                processDirection(layerdata[i], staffindex);
+                processDirections(layerdata[i], staffindex);
                 processChordSignifiers(chord, layerdata[i], staffindex);
             }
         }
@@ -2903,7 +2914,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 convertRhythm(irest, layerdata[i]);
                 processSlurs(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
-                processDirection(layerdata[i], staffindex);
+                processDirections(layerdata[i], staffindex);
             }
             else {
                 Rest *rest = new Rest;
@@ -2912,7 +2923,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 convertRest(rest, layerdata[i]);
                 processSlurs(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
-                processDirection(layerdata[i], staffindex);
+                processDirections(layerdata[i], staffindex);
                 int line = layerdata[i]->getLineIndex();
                 int field = layerdata[i]->getFieldIndex();
                 colorRest(rest, *layerdata[i], line, field);
@@ -2931,7 +2942,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 convertRest(rest, layerdata[i]);
                 processSlurs(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
-                processDirection(layerdata[i], staffindex);
+                processDirections(layerdata[i], staffindex);
                 int line = layerdata[i]->getLineIndex();
                 int field = layerdata[i]->getFieldIndex();
                 colorRest(rest, *layerdata[i], line, field);
@@ -2943,7 +2954,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 convertRhythm(irest, layerdata[i]);
                 processSlurs(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
-                processDirection(layerdata[i], staffindex);
+                processDirections(layerdata[i], staffindex);
             }
         }
         else {
@@ -2963,7 +2974,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             addArticulations(note, layerdata[i]);
             addOrnaments(note, layerdata[i]);
-            processDirection(layerdata[i], staffindex);
+            processDirections(layerdata[i], staffindex);
         }
 
         handleGroupEnds(tg[i], elements, pointers);
@@ -3065,18 +3076,20 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             // use 6 slot in array for "^^" (heavy accent)
             ch = 6;
             posch = i < tsize - 2 ? token->at(i + 2) : 'g';
+            i++;
         }
         else if ((ch == '\'') && (posch == '\'')) {
             // staccatissimo alternate
             ch = '`';
             posch = i < tsize - 2 ? token->at(i + 2) : 'g';
+            i++;
         }
         articloc.at(ch) = i + 1;
 
-        if (posch == m_signifiers.above) {
+        if ((posch != 0) && (posch == m_signifiers.above)) {
             articpos.at(ch) = 1;
         }
-        else if (posch == m_signifiers.below) {
+        else if ((posch != 0) && (posch == m_signifiers.below)) {
             articpos.at(ch) = -1;
         }
         else {
@@ -3493,7 +3506,7 @@ void HumdrumInput::addSpace(std::vector<string> &elements, std::vector<void *> &
             // convertRest(rest, layerdata[i]);
             // processSlurs(layerdata[i]);
             // processDynamics(layerdata[i], staffindex);
-            // processDirection(layerdata[i], staffindex);
+            // processDirections(layerdata[i], staffindex);
             // int line = layerdata[i]->getLineIndex();
             // int field = layerdata[i]->getFieldIndex();
             // colorRest(rest, "", line, field);
@@ -3540,11 +3553,135 @@ void HumdrumInput::processChordSignifiers(Chord *chord, hum::HTp token, int staf
 
 //////////////////////////////
 //
-// HumdrumInput::processDirection --
+// HumdrumInput::processGlobalDirections --
 //
 
-void HumdrumInput::processDirection(hum::HTp token, int staffindex)
+void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
 {
+    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+    int staffcount = (int)kernstarts.size();
+
+    // only put above or below system (no cases of intermediate
+    // directions allowed for now)
+    if ((staffindex > 0) && (staffindex < staffcount - 1)) {
+        return;
+    }
+
+    hum::HumdrumLine *hline = token->getOwner();
+    if (hline == NULL) {
+        return;
+    }
+
+    // Generalize the code below to not duplicate processDirections():
+
+    std::string text = hline->getValue("LO", "TX", "t");
+    if (text.size() == 0) {
+        return;
+    }
+
+    bool zparam = hline->isDefined("LO", "TX", "Z");
+    bool yparam = hline->isDefined("LO", "TX", "Y");
+
+    bool aparam = hline->getValueBool("LO", "TX", "a"); // place above staff
+    bool bparam = hline->getValueBool("LO", "TX", "b"); // place below staff
+
+    // default font for text string (later check for embedded fonts)
+    bool italic = false;
+    bool bold = false;
+
+    if (hline->isDefined("LO", "TX", "i")) { // italic
+        italic = true;
+    }
+    if (hline->isDefined("LO", "TX", "B")) { // bold
+        bold = true;
+    }
+    if (hline->isDefined("LO", "TX", "bi")) { // bold-italic
+        bold = true;
+        italic = true;
+    }
+    if (hline->isDefined("LO", "TX", "ib")) { // bold-italic
+        bold = true;
+        italic = true;
+    }
+    if (hline->isDefined("LO", "TX", "Bi")) { // bold-italic
+        bold = true;
+        italic = true;
+    }
+    if (hline->isDefined("LO", "TX", "iB")) { // italic
+        bold = true;
+        italic = true;
+    }
+
+    double Y = 0.0;
+    double Z = 0.0;
+    std::string placement;
+    if (aparam) {
+        placement = "above";
+    }
+    else if (bparam) {
+        placement = "below";
+    }
+    else if (zparam) {
+        Z = hline->getValueInt("LO", "TX", "Z");
+        if (Z > 0) {
+            placement = "above";
+        }
+        else {
+            placement = "below";
+        }
+    }
+    else if (yparam) {
+        Y = hline->getValueInt("LO", "TX", "Y");
+        if (Y > 0) {
+            placement = "below";
+        }
+        else {
+            placement = "above";
+        }
+    }
+
+    Dir *dir = new Dir;
+    m_measure->AddChild(dir);
+    setStaff(dir, m_currentstaff);
+    setLocationId(dir, token);
+    hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+    dir->SetTstamp(tstamp.getFloat());
+
+    if (placement == "above") {
+        setPlace(dir, "above");
+    }
+    else if (placement == "below") {
+        setPlace(dir, "below");
+    }
+    if ((!italic) || bold) {
+        Rend *rend = new Rend;
+        dir->AddChild(rend);
+        addTextElement(rend, text);
+        if (!italic) {
+            rend->SetFontstyle(FONTSTYLE_normal);
+        }
+        if (bold) {
+            rend->SetFontweight(FONTWEIGHT_bold);
+        }
+    }
+    else {
+        addTextElement(dir, text);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processDirections --
+//
+
+void HumdrumInput::processDirections(hum::HTp token, int staffindex)
+{
+    int lcount = token->getLinkedParameterCount();
+    for (int i = 0; i < lcount; i++) {
+        processLinkedDirection(i, token, staffindex);
+    }
+
+    // process an internal text direction (no longer common):
     std::string text = token->getValue("LO", "TX", "t");
     if (text.size() == 0) {
         return;
@@ -3610,6 +3747,138 @@ void HumdrumInput::processDirection(hum::HTp token, int staffindex)
             placement = "above";
         }
     }
+
+    addDirection(text, placement, bold, italic, token, staffindex);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processLinkedDirection --
+//
+
+void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffindex)
+{
+    hum::HumParamSet *hps = token->getLinkedParameter(index);
+    if (hps == NULL) {
+        return;
+    }
+
+    if (hps->getNamespace1() != "LO") {
+        return;
+    }
+    if (hps->getNamespace2() != "TX") {
+        return;
+    }
+
+    // default font for text string (later check for embedded fonts)
+    bool italic = false;
+    bool bold = false;
+    bool zparam = false;
+    bool yparam = false;
+    bool aparam = false;
+    bool bparam = false;
+
+    string text;
+
+    string key;
+    string value;
+    for (int i = 0; i < hps->getCount(); i++) {
+        key = hps->getParameterName(i);
+        value = hps->getParameterValue(i);
+        if (key == "a") {
+            aparam = true;
+        }
+        else if (key == "b") {
+            bparam = true;
+        }
+        else if (key == "t") {
+            text = value;
+            if (text.size() == 0) {
+                // nothing to display
+                return;
+            }
+        }
+        else if (key == "Y") {
+            yparam = true;
+        }
+        else if (key == "Z") {
+            zparam = true;
+        }
+        else if (key == "i") {
+            italic = true;
+        }
+        else if (key == "B") {
+            bold = true;
+        }
+        else if (key == "Bi") {
+            italic = true;
+            bold = true;
+        }
+        else if (key == "bi") {
+            italic = true;
+            bold = true;
+        }
+        else if (key == "iB") {
+            italic = true;
+            bold = true;
+        }
+        else if (key == "ib") {
+            italic = true;
+            bold = true;
+        }
+    }
+
+    double Y = 0.0;
+    double Z = 0.0;
+    std::string placement;
+    if (aparam) {
+        placement = "above";
+    }
+    else if (bparam) {
+        placement = "below";
+    }
+    else if (zparam) {
+        Z = token->getValueInt("LO", "TX", "Z");
+        if (Z > 0) {
+            placement = "above";
+        }
+        else {
+            placement = "below";
+        }
+    }
+    else if (yparam) {
+        Y = token->getValueInt("LO", "TX", "Y");
+        if (Y > 0) {
+            placement = "below";
+        }
+        else {
+            placement = "above";
+        }
+    }
+
+    if (token->linkedParameterIsGlobal(index)) {
+        int maxstaff = (int)m_kernstarts.size() - 1;
+
+        if ((placement == "below") && (staffindex == maxstaff)) {
+            addDirection(text, placement, bold, italic, token, staffindex);
+        }
+        else if ((placement == "above") && (staffindex == 0)) {
+            addDirection(text, placement, bold, italic, token, staffindex);
+        }
+    }
+    else {
+        addDirection(text, placement, bold, italic, token, staffindex);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addDirection --
+//
+
+void HumdrumInput::addDirection(
+    const string &text, const string &placement, bool bold, bool italic, hum::HTp token, int staffindex)
+{
 
     Dir *dir = new Dir;
     m_measure->AddChild(dir);
@@ -5601,6 +5870,9 @@ void HumdrumInput::getTimingInformation(std::vector<hum::HumNum> &prespace, std:
     for (int i = 0; i < (int)layerdata.size(); i++) {
         startdur[i] = layerdata[i]->getDurationFromStart();
         if (!layerdata[i]->isData()) {
+            duration[i] = 0;
+        }
+        else if (layerdata[i]->isNull()) {
             duration[i] = 0;
         }
         else {

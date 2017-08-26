@@ -303,7 +303,9 @@ protected:
     void addHarmFloatsForMeasure(int startine, int endline);
     void addFiguredBassForMeasure(int startline, int endline);
     void processDynamics(hum::HTp token, int staffindex);
-    void processDirection(hum::HTp token, int staffindex);
+    void processDirections(hum::HTp token, int staffindex);
+    void processLinkedDirection(int index, hum::HTp token, int staffindex);
+    void processGlobalDirections(hum::HTp token, int staffindex);
     void processChordSignifiers(Chord *chord, hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum frac = 0);
     hum::HumNum getMeasureEndTstamp(int staffindex);
@@ -352,6 +354,8 @@ protected:
     void setInstrumentAbbreviation(vrv::StaffDef *staffdef, const string &name);
     void addDefaultTempo(ScoreDef &m_scoreDef);
     int getChordNoteCount(hum::HTp token);
+    void addDirection(
+        const string &text, const string &placement, bool bold, bool italic, hum::HTp token, int staffindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

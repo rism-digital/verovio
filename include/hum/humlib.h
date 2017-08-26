@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Aug 17 22:09:57 EDT 2017
+// Last Modified: Sat Aug 26 16:20:12 PDT 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -219,6 +219,8 @@ class HumHash {
 		void           setPrefix           (const string& value);
 		string         getPrefix           (void) const;
 		ostream&       printXml            (ostream& out = cout, int level = 0,
+		                                    const string& indent = "\t");
+		ostream&       printXmlAsGlobal    (ostream& out = cout, int level = 0,
 		                                    const string& indent = "\t");
 
 		void           setOrigin           (const string& key,
@@ -588,6 +590,41 @@ class HumAddress {
 
 
 
+class HumParamSet {
+
+	public:
+		              HumParamSet        (void);
+		              HumParamSet        (const string& token);
+		              HumParamSet        (HTp token);
+		             ~HumParamSet        ();
+
+		const string& getNamespace1      (void);
+		const string& getNamespace2      (void);
+		string        getNamespace       (void);
+		void          setNamespace1      (const string& name);
+		void          setNamespace2      (const string& name);
+		void          setNamespace       (const string& name);
+		void          setNamespace       (const string& name1, const string& name2);
+
+		void          clear              (void);
+		int           getCount           (void);
+		const string& getParameterName   (int index);
+		const string& getParameterValue  (int index);
+		int           addParameter       (const string& name, const string& value);
+		int           setParameter       (const string& name, const string& value);
+		void          readString         (const string& text);
+		ostream&      printXml           (ostream& out = cout, int level = 0,
+		                                  const string& indent = "\t");
+
+	private:
+		string ns1;
+		string ns2;
+		vector<pair<string, string>> parameters;
+
+};
+
+
+
 class _HumInstrument {
 	public:
 		_HumInstrument    (void) { humdrum = ""; name = ""; gm = 0; }
@@ -914,6 +951,10 @@ class HumdrumLine : public string, public HumHash {
 		                                 const string& separator = ",");
 		ostream& printXml               (ostream& out = cout, int level = 0,
 		                                 const string& indent = "\t");
+		ostream& printXmlParameterInfo  (ostream& out, int level,
+		                                 const string& indent);
+		ostream& printGlobalXmlParameterInfo(ostream& out, int level,
+		                                 const string& indent);
 		string   getXmlId               (const string& prefix = "") const;
 		string   getXmlIdPrefix         (void) const;
 		void     createLineFromTokens   (void);
@@ -937,6 +978,7 @@ class HumdrumLine : public string, public HumHash {
 		HumNum   getDurationToBarline   (HumNum scale) const;
 		HumNum   getBarlineDuration     (HumNum scale) const;
 		int      getKernNoteAttacks     (void);
+		int      addLinkedParameter     (HTp token);
 
 		HumNum   getBeat                (HumNum beatdur = "1") const;
 		HumNum   getBeat                (string beatrecip = "4") const;
@@ -974,8 +1016,13 @@ class HumdrumLine : public string, public HumHash {
 		void     clear                  (void);
 		void     setOwner               (void* hfile);
 		int      createTokensFromLine   (void);
-		void     setParameters          (HumdrumLine* pLine);
+		void     setLayoutParameters    (void);
 		void     setParameters          (const string& pdata);
+		void     storeGlobalLinkedParameters(void);
+		ostream&	printXmlGlobalLinkedParameterInfo(ostream& out = cout, int level = 0,
+		                                 const string& indent = "\t");
+		ostream& printXmlGlobalLinkedParameters(ostream& out = cout, int level = 0,
+		                                 const string& indent = "\t");
 
 	private:
 
@@ -983,12 +1030,12 @@ class HumdrumLine : public string, public HumHash {
 		// State variables managed by the HumdrumLine class:
 		//
 
-		// lineindex: Used to store the index number of the HumdrumLine in
+		// m_lineindex: Used to store the index number of the HumdrumLine in
 		// the owning HumdrumFile object.
 		// This variable is filled by HumdrumFileStructure::analyzeLines().
 		int m_lineindex;
 
-		// tokens: Used to store the individual tab-separated token fields
+		// m_tokens: Used to store the individual tab-separated token fields
 		// on a line.  These are prepared automatically after reading in
 		// a full line of text (which is accessed throught the string parent
 		// class).  If the full line is changed, the tokens are not updated
@@ -1002,7 +1049,7 @@ class HumdrumLine : public string, public HumHash {
 		// a HumdrumLine object.
 		vector<HumdrumToken*> m_tokens;
 
-		// duration: This is the "duration" of a line.  The duration is
+		// m_duration: This is the "duration" of a line.  The duration is
 		// equal to the minimum time unit of all durational tokens on the
 		// line.  This also includes null tokens when the duration of a
 		// previous note in a previous spine is ending on the line, so it is
@@ -1010,7 +1057,7 @@ class HumdrumLine : public string, public HumHash {
 		// This variable is filled by HumdrumFileStructure::analyzeRhythm().
 		HumNum m_duration;
 
-		// durationFromStart: This is the cumulative duration of all lines
+		// m_durationFromStart: This is the cumulative duration of all lines
 		// prior to this one in the owning HumdrumFile object.  For example,
 		// the first notes in a score start at time 0, If the duration of the
 		// first data line is 1 quarter note, then the durationFromStart for
@@ -1018,15 +1065,19 @@ class HumdrumLine : public string, public HumHash {
 		// This variable is filled by HumdrumFileStructure::analyzeRhythm().
 		HumNum m_durationFromStart;
 
-		// durationFromBarline: This is the cumulative duration from the
+		// m_durationFromBarline: This is the cumulative duration from the
 		// last barline to the current data line.
 		// This variable is filled by HumdrumFileStructure::analyzeMeter().
 		HumNum m_durationFromBarline;
 
-		// durationToBarline: This is the duration from the start of the
+		// m_durationToBarline: This is the duration from the start of the
 		// current line to the next barline in the owning HumdrumFile object.
 		// This variable is filled by HumdrumFileStructure::analyzeMeter().
 		HumNum m_durationToBarline;
+
+		// m_linkedParameters: List of Humdrum tokens which are parameters
+		// (mostly only layout parameters at the moment)
+		vector<HTp> m_linkedParameters;
 
 		// owner: This is the HumdrumFile which manages the given line.
 		void* m_owner;
@@ -1039,6 +1090,7 @@ class HumdrumLine : public string, public HumHash {
 
 ostream& operator<< (ostream& out, HumdrumLine& line);
 ostream& operator<< (ostream& out, HumdrumLine* line);
+
 
 
 
@@ -1087,6 +1139,7 @@ class HumdrumToken : public string, public HumHash {
 
 		bool     isBarline                 (void) const;
 		bool     isCommentLocal            (void) const;
+		bool     isCommentGlobal           (void) const;
 		bool     isComment                 (void) const;
 		bool     isData                    (void) const;
 		bool     isInterpretation          (void) const;
@@ -1169,13 +1222,22 @@ class HumdrumToken : public string, public HumHash {
 		int      getSlurEndElisionLevel    (int index = 0) const;
 		HTp      getSlurStartToken         (int number = 0);
 		HTp      getSlurEndToken           (int number = 0);
+		void     storeLinkedParameters     (void);
+		bool     linkedParameterIsGlobal   (int index);
 		ostream& printCsv                  (ostream& out = cout);
 		ostream& printXml                  (ostream& out = cout, int level = 0,
 		                                    const string& indent = "\t");
+		ostream& printGlobalXmlParameterInfo(ostream& out = cout, int level = 0,
+		                                   const string& indent = "\t");
 		string   getXmlId                  (const string& prefix = "") const;
 		string   getXmlIdPrefix            (void) const;
 		void     setText                   (const string& text);
 		string   getText                   (void) const;
+		int      addLinkedParameter        (HTp token);
+		int      getLinkedParameterCount   (void);
+		HumParamSet* getLinkedParameter    (int index);
+		HumParamSet* getLinkedParameter    (void);
+		ostream& printXmlLinkedParameterInfo(ostream& out, int level, const string& indent);
 
 		HumdrumToken& operator=            (HumdrumToken& aToken);
 		HumdrumToken& operator=            (const string& aToken);
@@ -1238,6 +1300,8 @@ class HumdrumToken : public string, public HumHash {
 		                                   const string& indent = "\t");
 		ostream& printXmlParameterInfo    (ostream& out = cout, int level = 0,
 		                                   const string& indent = "\t");
+		ostream&	printXmlLinkedParameters (ostream& out = cout, int level = 0,
+		                                   const string& indent = "\t");
 
 	private:
 		// address: The address contains information about the location of
@@ -1283,8 +1347,16 @@ class HumdrumToken : public string, public HumHash {
 		int m_strand;
 
 		// m_nullresolve: used to point to the token that a null token
-		// refers to
+		// refers to.
 		HTp m_nullresolve;
+
+		// m_linkedParameters: List of Humdrum tokens which are parameters
+		// (mostly only layout parameters at the moment).
+		vector<HTp> m_linkedParameters;
+
+		// m_linkedParameter: A single parameter encoded in the text of the
+		// token.
+		HumParamSet* m_linkedParameter = NULL;
 
 	friend class HumdrumLine;
 	friend class HumdrumFileBase;
@@ -1697,17 +1769,17 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		int           tpq                          (void);
 
 		// strand functionality:
-		HumdrumToken* getStrandStart               (int index) const;
-		HumdrumToken* getStrandEnd                 (int index) const;
-		HumdrumToken* getStrandStart               (int sindex, int index) const;
-		HumdrumToken* getStrandEnd                 (int sindex, int index) const;
+		HTp           getStrandStart               (int index) const;
+		HTp           getStrandEnd                 (int index) const;
+		HTp           getStrandStart               (int sindex, int index) const;
+		HTp           getStrandEnd                 (int sindex, int index) const;
 		int           getStrandCount               (void) const;
 		int           getStrandCount               (int spineindex) const;
 		void          resolveNullTokens            (void);
 
-		HumdrumToken* getStrand                    (int index) const
+		HTp           getStrand                    (int index) const
 		                                        { return getStrandStart(index); }
-		HumdrumToken* getStrand                    (int sindex, int index) const
+		HTp           getStrand                    (int sindex, int index) const
 		                                { return getStrandStart(sindex, index); }
 
 		// barline/measure functionality:
@@ -1737,28 +1809,24 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		                                            int line);
 		bool          decrementDurStates           (vector<HumNum>& durs,
 		                                            HumNum linedur, int line);
-		bool          assignDurationsToTrack       (HumdrumToken* starttoken,
+		bool          assignDurationsToTrack       (HTp starttoken,
 		                                            HumNum startdur);
-		bool          prepareDurations             (HumdrumToken* token,
-		                                            int state,
+		bool          prepareDurations             (HTp token, int state,
 		                                            HumNum startdur);
-		bool          setLineDurationFromStart     (HumdrumToken* token,
-		                                            HumNum dursum);
-		bool          analyzeRhythmOfFloatingSpine (HumdrumToken* spinestart);
+		bool          setLineDurationFromStart     (HTp token, HumNum dursum);
+		bool          analyzeRhythmOfFloatingSpine (HTp spinestart);
 		bool          analyzeNullLineRhythms       (void);
 		void          fillInNegativeStartTimes     (void);
 		void          assignLineDurations          (void);
 		void          assignStrandsToTokens        (void);
 		set<HumNum>   getNonZeroLineDurations      (void);
 		set<HumNum>   getPositiveLineDurations     (void);
-		bool          processLocalParametersForTrack (HumdrumToken* starttok,
-		                                            HumdrumToken* current);
-		void          checkForLocalParameters      (HumdrumToken *token,
-		                                            HumdrumToken *current);
-		bool          assignDurationsToNonRhythmicTrack(HumdrumToken* endtoken,
-		                                            HumdrumToken* ptoken);
+		void          processLocalParametersForStrand(int index);
+		bool          processLocalParametersForTrack (HTp starttok, HTp current);
+		void          checkForLocalParameters      (HTp token, HTp current);
+		bool          assignDurationsToNonRhythmicTrack(HTp endtoken, HTp ptoken);
 		void          analyzeSpineStrands          (vector<TokenPair>& ends,
-		                                            HumdrumToken* starttok);
+		                                            HTp starttok);
 };
 
 
