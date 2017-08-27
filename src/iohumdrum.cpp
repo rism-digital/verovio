@@ -6677,7 +6677,9 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
 
         if (parent && (token->find("q") != std::string::npos)) {
             // grace notes cannot be addressed with @tstamp, so
-            // have to use @startid
+            // have to use @startid.  Maybe allow @tstamp, since
+            // @startid will probably shift to the correct grace note
+            // position.
             std::string id = "#" + parent->GetUuid();
             fermata->SetStartid(id);
             if (fermata2) {
@@ -6686,17 +6688,35 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
         }
         else if (!token->empty() && (token->at(0) == '=')) {
             // barline fermata
-            hum::HumNum tstamp = getMeasureEndTstamp(staff - 1);
-            fermata->SetTstamp(tstamp.getFloat());
-            if (fermata2) {
-                fermata2->SetTstamp(tstamp.getFloat());
+            if (parent) {
+                std::string id = "#" + parent->GetUuid();
+                fermata->SetStartid(id);
+                if (fermata2) {
+                    fermata2->SetStartid(id);
+                }
+            }
+            else {
+                hum::HumNum tstamp = getMeasureEndTstamp(staff - 1);
+                fermata->SetTstamp(tstamp.getFloat());
+                if (fermata2) {
+                    fermata2->SetTstamp(tstamp.getFloat());
+                }
             }
         }
         else {
             hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
-            fermata->SetTstamp(tstamp.getFloat());
-            if (fermata2) {
-                fermata2->SetTstamp(tstamp.getFloat());
+            if (parent) {
+                std::string id = "#" + parent->GetUuid();
+                fermata->SetStartid(id);
+                if (fermata2) {
+                    fermata2->SetStartid(id);
+                }
+            }
+            else {
+                fermata->SetTstamp(tstamp.getFloat());
+                if (fermata2) {
+                    fermata2->SetTstamp(tstamp.getFloat());
+                }
             }
         }
         // if a barline, then can have two fermatas
