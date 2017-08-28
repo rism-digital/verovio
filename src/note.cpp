@@ -641,6 +641,9 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
     int left = this->GetDrawingX() - leftExtender - staffX;
     int right = this->GetDrawingX() + 2 * radius + rightExtender - staffX;
+    if (this->GetDrawingDur() == DUR_MX) {
+        right += 2 * radius;
+    }
 
     if (linesAbove > 0) {
         staff->AddLegerLineAbove(linesAbove, left, right, drawingCueSize);
