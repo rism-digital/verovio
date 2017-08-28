@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Aug 26 16:20:12 PDT 2017
+// Last Modified: Sun Aug 27 22:23:56 PDT 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2267,6 +2267,9 @@ class NoteCell {
 		double getSgnBase40Pitch    (void) { return m_b40;               }
 		double getSgnAccidental     (void) { return m_accidental;        }
 
+		double getSgnDiatonicPitchClass(void);
+		double getAbsDiatonicPitchClass(void);
+
 		double getAbsDiatonicPitch  (void) { return fabs(m_b7);          }
 		double getAbsMidiPitch      (void) { return fabs(m_b12);         }
 		double getAbsBase40Pitch    (void) { return fabs(m_b40);         }
@@ -3855,6 +3858,10 @@ class Tool_dissonant : public HumTool {
 		void    findYs             (vector<vector<string> >& results, 
 		                            NoteGrid& grid,
 		                            vector<NoteCell*>& attacks, int vindex);
+		void	findCadentialVoiceFunctions(vector<vector<string> >& results,
+									NoteGrid& grid,	vector<NoteCell*>& attacks,
+									vector<vector<string> >& voiceFuncs,
+									int vindex);
 		void    changePitch        (HTp note2, HTp note1);
 
 		void    printColorLegend   (HumdrumFile& infile);
@@ -3882,6 +3889,7 @@ class Tool_dissonant : public HumTool {
 		bool dissL1Q = false;
 		bool dissL2Q = false;
 		bool suppressQ = false;
+		bool voiceFuncsQ = false;
 		bool m_voicenumQ = false;
 		bool m_selfnumQ = false;
 
@@ -4259,6 +4267,64 @@ class Tool_metlev : public HumTool {
 
 };
 
+
+
+class MSearchQueryToken {
+	public:
+		MSearchQueryToken(void) {
+			clear();
+		}
+		MSearchQueryToken(const MSearchQueryToken& token) {
+			pc        = token.pc;
+			base      = token.base;
+			direction = token.direction;
+			duration  = token.duration;
+		}
+		MSearchQueryToken& operator=(MSearchQueryToken& token) {
+			if (this == &token) {
+				return token;
+			}
+			pc        = token.pc;
+			base      = token.base;
+			direction = token.direction;
+			duration  = token.duration;
+			return *this;
+		}
+		void clear(void) {
+			pc        = NAN;
+			base      = 0;
+			direction = 0;
+			duration  = 0;
+		}
+
+		double pc;           // NAN = rest
+		int    base;
+		int    direction; 
+		HumNum duration;
+};
+
+
+class Tool_msearch : public HumTool {
+	public:
+		         Tool_msearch      (void);
+		        ~Tool_msearch      () {};
+
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void    doAnalysis         (HumdrumFile& infile, NoteGrid& grid,
+		                            vector<MSearchQueryToken>& query);
+		void    fillQuery          (vector<MSearchQueryToken>& query, const string& input);
+		bool    checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index, 
+		                            vector<MSearchQueryToken>& dpcQuery,
+		                            vector<NoteCell*>& match);
+		void     markMatch         (HumdrumFile& infile, vector<NoteCell*>& match);
+
+	private:
+	 	vector<HTp> m_kernspines;
+};
 
 
 class Tool_musicxml2hum : public HumTool {

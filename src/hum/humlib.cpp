@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Aug 26 16:20:12 PDT 2017
+// Last Modified: Sun Aug 27 22:23:56 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -23487,6 +23487,38 @@ HumNum NoteCell::getMeterBottom(void) {
 
 
 
+//////////////////////////////
+//
+// NoteCell::getSgnDiatonicPitchClass --
+//
+
+double NoteCell::getSgnDiatonicPitchClass(void) {
+	if (m_b7 == GRIDREST) {
+		return GRIDREST;
+	} else if (m_b7 < 0) {
+		return -(double)(((int)-m_b7) % 7);
+	} else {
+		return (double)(((int)m_b7) % 7);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// NoteCell::getAbsDiatonicPitchClass --
+//
+
+double NoteCell::getAbsDiatonicPitchClass(void) {
+	if (m_b7 == GRIDREST) {
+		return GRIDREST;
+	} else {
+		return (double)(((int)fabs(m_b7)) % 7);
+	}
+}
+
+
+
 
 //////////////////////////////
 //
@@ -29710,6 +29742,7 @@ Tool_dissonant::Tool_dissonant(void) {
 	define("b|base-40=b",         "print base-40 grid");
 	define("l|metric-levels=b",   "use metric levels in analysis");
 	define("k|kern=b",            "print kern pitch grid");
+	define("V|voice-functions=b", "do cadential-voice-function analysis");
 	define("v|voice-number=b",    "print voice number of dissonance");
 	define("f|self-number=b",     "print self voice number of dissonance");
 	define("debug=b",             "print grid cell information");
@@ -29810,9 +29843,11 @@ bool Tool_dissonant::run(HumdrumFile& infile) {
 	dissL2Q = false;
 
 	suppressQ = getBoolean("suppress");
+	voiceFuncsQ = getBoolean("voice-functions");
 
 	vector<vector<string> > results;
 	vector<vector<string> > results2;
+	vector<vector<string> > voiceFuncs;
 	vector<vector<NoteCell*> > attacks;
 	vector<vector<NoteCell*> > attacks2;
 
@@ -29853,6 +29888,31 @@ bool Tool_dissonant::run(HumdrumFile& infile) {
 			infile.createLinesFromTokens();
 			return true;
 		}
+	} else if (voiceFuncsQ) { // run cadnetial-voice-function analysis if requested
+		// TODO: make sure this count stuff works with the -V setting too.
+		// if (getBoolean("count")) {
+		// 	printCountAnalysis(voiceFuncs);
+		// 	return false;
+		// }
+		
+		voiceFuncs.resize(grid.getVoiceCount());
+		for (int i=0; i<(int)voiceFuncs.size(); i++) {
+			voiceFuncs[i].resize(infile.getLineCount());
+		}
+		for (int i=0; i<grid.getVoiceCount(); i++) {
+			findCadentialVoiceFunctions(results, grid, attacks[i], voiceFuncs, i);
+		}
+
+		string exinterp = getString("exinterp");
+		vector<HTp> kernspines = infile.getKernSpineStartList();
+		infile.appendDataSpine(voiceFuncs.back(), "", exinterp);
+		for (int i = (int)voiceFuncs.size()-1; i>0; i--) {
+			int track = kernspines[i]->getTrack();
+			infile.insertDataSpineBefore(track, voiceFuncs[i-1], "", exinterp);
+		}
+		printColorLegend(infile);
+		infile.createLinesFromTokens();
+		return true;
 	} else {
 		if (getBoolean("count")) {
 			printCountAnalysis(results);
@@ -29870,7 +29930,6 @@ bool Tool_dissonant::run(HumdrumFile& infile) {
 			return true;
 		}
 	}
-
 }
 
 
@@ -30924,6 +30983,104 @@ void Tool_dissonant::findAppoggiaturas(vector<vector<string> >& results, NoteGri
 						    (results[vindex][lineindex] == m_labels[UNLABELED_Z4]))) { // lower appoggiatura
 					results[vindex][lineindex] = m_labels[APP_LOWER];
 				}
+			}
+		}
+	}
+}
+
+
+
+
+//////////////////////////////
+//
+// Tool_dissonant::findCadentialVoiceFunctions -- identify the cadential-voice 
+//		functions present in each voice. These are the single-line constituents
+//		of Renaissance cadences. Five basic types are identified: Cantizans,
+//		Altizans, Tenorizans, Leaping Contratenor, and Bassizans. Since the
+//		cadential-voice functions are identified contrapuntally, a Cantizans or
+//		Altizans must be found set against any of the other three types for 
+//		anything to be detected. 
+//
+void Tool_dissonant::findCadentialVoiceFunctions(vector<vector<string> >& results, NoteGrid& grid,
+		vector<NoteCell*>& attacks, vector<vector<string> >& voiceFuncs, int vindex) {
+	// HumNum dur;        // duration of current note
+	// HumNum durn;	   // duration of next note
+	double int2;       // diatonic interval to next melodic note
+	// double int3;	   // diatonic interval from next melodic note to following note
+	double oint2;	   // diatonic interval to next melodic note in other voice
+	double oint3;	   // diatonic interval from next melodic note to following note
+	int lineindex;     // line in original Humdrum file content that contains note
+	// NB lineindex2 is not needed
+	// int lineindex3;    // line in original Humdrum file content that contains note two events later
+	// int lineindex4;    // line in original Humdrum file content that contains note three events later
+	int sliceindex;    // current timepoint in NoteGrid.
+	int attInd2;  	   // line index of ref voice's next attack
+	// int attInd3;       // line index of ref voice's attack two events later
+	int oattInd2;      // line index of other voice's next attack
+	int oattInd3;      // line index of other voice's third attack
+	double pitch;      // current pitch in ref voice
+	double opitch;     // current pitch in other voice
+	double opitch2;	   // pitch of next note in other voice
+	double opitch3;	   // pitch of third note in other voice
+
+	for (int i=1; i<(int)attacks.size()-1; i++) {
+		// lineindexp = attacks[i-1]->getLineIndex();
+		lineindex  = attacks[i]->getLineIndex();
+		// lineindex3 = attacks[i+2]->getLineIndex();
+		// pass over if ref voice is not an agent
+		if ((results[vindex][lineindex] != m_labels[AGENT_BIN]) &&
+			(results[vindex][lineindex] != m_labels[AGENT_TERN])) {
+			continue;
+		}
+		// dur  = attacks[i]->getDuration();
+		// durn = attacks[i+1]->getDuration();
+		int2 = *attacks[i+1] - *attacks[i];
+		// int3 = *attacks[i+2] - *attacks[i+1];
+		sliceindex = attacks[i]->getSliceIndex();
+
+		for (int j=0; j<(int)grid.getVoiceCount(); j++) { // j is the voice index of the other voice
+			// cerr << "**************HERE 3" << endl;
+			if (vindex == j) { // only compare different voices
+				continue;
+			}
+
+			// skip if other voice isn't a patient
+			if ((results[j][lineindex] != m_labels[SUS_BIN]) &&
+				(results[j][lineindex] != m_labels[SUS_TERN])) {
+				continue;
+			}
+
+			oattInd2 = -22;
+			oattInd3 = -22;
+			oint2	 = -22;
+			oint3	 = -22;
+			pitch    = attacks[i]->getAbsDiatonicPitch();
+			opitch   = grid.cell(j, sliceindex)->getAbsDiatonicPitch();
+			attInd2  = attacks[i]->getNextAttackIndex();
+			// attInd3  = attacks[i+1]->getNextAttackIndex();
+			oattInd2 = grid.cell(j, sliceindex)->getNextAttackIndex();
+			// cerr << "**************HERE 4" << endl;
+
+			if (oattInd2 > 0) {
+				opitch2 = grid.cell(j, oattInd2)->getAbsDiatonicPitch();
+				oint2 = opitch2 - opitch;
+				oattInd3 = grid.cell(j, oattInd2)->getNextAttackIndex();
+				if (oattInd3 > 0) {
+					opitch3 = grid.cell(j, oattInd3)->getAbsDiatonicPitch();
+					oint3 = opitch3 - opitch2;
+				}
+			}
+			// NB since the ref voice is the one with the suspension, if the 
+			// suspension is in the higher voice (the most common case) then the
+			// harmonic intervals will actually be negative
+			int thisInt = opitch - pitch; // diatonic interval in this pair
+			int thisMod7 = thisInt % 7; // simplify octaves out of thisInt
+
+			if ((thisMod7 == 6) && (int2 == -1) && (attInd2 == oattInd3) && 
+				(oint2 == -1) && (oint3 == 1)) {
+				voiceFuncs[j][attInd2] = "C"; // cantizans
+				voiceFuncs[vindex][attInd2] = "T"; // tenorizans
+
 			}
 		}
 	}
@@ -34775,6 +34932,8 @@ bool Tool_filter::run(HumdrumFile& infile) {
 			RUNTOOL(extract, infile, commands[i].second, status);
 		} else if (commands[i].first == "metlev") {
 			RUNTOOL(metlev, infile, commands[i].second, status);
+		} else if (commands[i].first == "msearch") {
+			RUNTOOL(msearch, infile, commands[i].second, status);
 		} else if (commands[i].first == "satb2gs") {
 			RUNTOOL(satb2gs, infile, commands[i].second, status);
 		} else if (commands[i].first == "recip") {
@@ -35671,6 +35830,224 @@ void Tool_metlev::fillVoiceResults(vector<vector<double> >& results,
 		}
 	}
 }
+
+
+
+
+/////////////////////////////////
+//
+// Tool_msearch::Tool_msearch -- Set the recognized options for the tool.
+//
+
+Tool_msearch::Tool_msearch(void) {
+	define("debug=b",       "diatonic search");
+	define("q|query=s:c d e f g",  "query string");
+	define("x|cross=b",     "search across parts");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_msearch::run -- Do the main work of the tool.
+//
+
+bool Tool_msearch::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_msearch::run(HumdrumFile& infile, ostream& out) {
+	int status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_msearch::run(HumdrumFile& infile) {
+	NoteGrid grid(infile);
+
+	vector<MSearchQueryToken> query;
+	fillQuery(query, getString("query"));
+
+	if (getBoolean("debug")) {
+		grid.printGridInfo(cerr);
+		// return 1;
+	}
+
+	doAnalysis(infile, grid, query);
+
+	return 1;
+}
+
+
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::doAnalysis -- do a basic melodic analysis of all parts.
+//
+
+void Tool_msearch::doAnalysis(HumdrumFile& infile, NoteGrid& grid,
+		vector<MSearchQueryToken>& query) {
+
+	vector<vector<NoteCell*>> attacks;
+	attacks.resize(grid.getVoiceCount());
+	for (int i=0; i<grid.getVoiceCount(); i++) {
+		grid.getNoteAndRestAttacks(attacks[i], i);
+	}
+
+	vector<NoteCell*>  match;
+	int mcount = 0;
+	for (int i=0; i<(int)attacks.size(); i++) {
+		for (int j=0; j<(int)attacks[i].size(); j++) {
+			checkForMatchDiatonicPC(attacks[i], j, query, match);
+			if (!match.empty()) {
+				mcount++;
+				markMatch(infile, match);
+				// cerr << "FOUND MATCH AT " << i << ", " << j << endl;
+				// markNotes(attacks[i], j, (int)query.size());
+			}
+		}
+	}
+	
+	if (mcount) {
+		infile.appendLine("!!!RDF**kern: @ = marked note");
+		infile.createLinesFromTokens();
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_msearch::markMatch -- assumes monophonic music.
+//
+
+void Tool_msearch::markMatch(HumdrumFile& infile, vector<NoteCell*>& match) {
+	if (match.empty()) {
+		return;
+	}
+	HTp mstart = match[0]->getToken();
+	HTp mend = NULL;
+	if (match.back() != NULL) {
+		mend = match.back()->getToken();
+	}
+	HTp tok = mstart;
+	string text;
+	while (tok && (tok != mend)) {
+		if (!tok->isData()) {
+			return;
+		}
+		text = tok->getText();
+		text += '@';
+		tok->setText(text);
+		tok = tok->getNextNNDT();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::checkForMatchDiatonicPC --
+//
+
+bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index, 
+		vector<MSearchQueryToken>& dpcQuery, vector<NoteCell*>& match) {
+	match.clear();
+
+	int maxi = (int)notes.size() - index;
+	if ((int)dpcQuery.size() > maxi) {
+		return false;
+	}
+	int interval;
+	for (int i=0; i<(int)dpcQuery.size(); i++) {
+		if (notes[index + i]->getAbsDiatonicPitchClass() != dpcQuery[i].pc) {
+			match.clear();
+			return false;
+		} else {
+			if ((index + i>0) && dpcQuery[i].direction) {
+				interval = notes[index + i]->getAbsBase40Pitch() -
+						notes[index + i - 1]->getAbsBase40Pitch();
+				if ((dpcQuery[i].direction > 0) && (interval <= 0)) {
+					match.clear();
+					return false;
+				}
+				if ((dpcQuery[i].direction < 0) && (interval >= 0)) {
+					match.clear();
+					return false;
+				}
+			}
+			match.push_back(notes[index+i]);
+		}
+	}
+
+	// Add extra token for marking tied notes at end of match
+	if (index + (int)dpcQuery.size() < (int)notes.size()) {
+		match.push_back(notes[index + (int)dpcQuery.size()]);
+	} else {
+		match.push_back(NULL);
+	}
+
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::fillQuery -- 
+//
+
+void Tool_msearch::fillQuery(vector<MSearchQueryToken>& query, const string& input) {
+	query.clear();
+	char ch;
+
+	MSearchQueryToken temp;
+
+	for (int i=0; i<(int)input.size(); i++) {
+		ch = tolower(input[i]);
+
+		if (ch == '^') {
+			temp.direction = 1;
+			continue;
+		}
+		if (ch == 'v') {
+			temp.direction = -1;
+			continue;
+		}
+
+		if ((ch >= 'a' && ch <= 'g')) {
+			temp.base = 7;
+			temp.pc = (ch - 'a' + 5) % 7;
+			query.push_back(temp);
+			temp.clear();
+			continue;
+		} else if (ch == 'r') {
+			temp.base = 7;
+			temp.pc = GRIDREST;
+			query.push_back(temp);
+			temp.clear();
+			continue;
+		}
+
+		// deal with accidentals here
+		// deal with duration here
+	}
+}
+
 
 
 
