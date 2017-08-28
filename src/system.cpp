@@ -410,11 +410,11 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = OCTAVE;
     m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = DIR;
-    m_systemAligner.Process(params->m_functor, params);
     params->m_classId = BREATH;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = FERMATA;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = DIR;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = TEMPO;
     m_systemAligner.Process(params->m_functor, params);

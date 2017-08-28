@@ -23,6 +23,7 @@
 #include "measure.h"
 #include "note.h"
 #include "page.h"
+#include "staffdef.h"
 #include "syl.h"
 #include "system.h"
 #include "timeinterface.h"

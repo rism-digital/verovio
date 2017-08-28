@@ -34,6 +34,7 @@
 #include "page.h"
 #include "plistinterface.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "system.h"
 #include "tempo.h"
 #include "text.h"
