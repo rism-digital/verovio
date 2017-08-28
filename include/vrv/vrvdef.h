@@ -104,6 +104,7 @@ enum ClassId {
     // Ids for ControlElement child classes
     CONTROL_ELEMENT,
     ANCHORED_TEXT,
+    ARPEG,
     BREATH,
     DIR,
     DYNAM,
@@ -183,6 +184,7 @@ enum InterfaceId {
     INTERFACE_BOUNDARY,
     INTERFACE_DURATION,
     INTERFACE_PITCH,
+    INTERFACE_PLIST,
     INTERFACE_POSITION,
     INTERFACE_SCOREDEF,
     INTERFACE_TEXT_DIR,
@@ -203,6 +205,7 @@ class LayerElement;
 class LedgerLine;
 class Note;
 class Object;
+class PlistInterface;
 class Point;
 class Staff;
 class TimePointInterface;
@@ -219,6 +222,8 @@ typedef std::vector<Note *> ChordCluster;
 typedef std::vector<std::tuple<Alignment *, Alignment *, int> > ArrayOfAdjustmentTuples;
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
+
+typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfInterfaceUuidPairs;
 
 typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
 

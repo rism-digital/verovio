@@ -626,6 +626,27 @@ data_TIE Att::StrToTie(std::string value, bool logWarning) const
     return TIE_NONE;
 }
 
+std::string Att::XsdAnyURIListToStr(xsdAnyURI_List data) const
+{
+    std::ostringstream ss;
+    for (size_t i = 0; i < data.size(); ++i) {
+        if (i != 0) ss << " ";
+        ss << data[i];
+    }
+    return ss.str();
+}
+
+xsdAnyURI_List Att::StrToXsdAnyURIList(std::string value) const
+{
+    xsdAnyURI_List list;
+    std::istringstream iss(value);
+    std::string token;
+    while (std::getline(iss, token, ' ')) {
+        list.push_back(token.c_str());
+    }
+    return list;
+}
+
 std::string Att::XsdPositiveIntegerListToStr(xsdPositiveInteger_List data) const
 {
     std::ostringstream ss;

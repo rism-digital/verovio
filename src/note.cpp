@@ -492,7 +492,6 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
 
-    bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;
 
     int radius = this->GetDrawingRadius(params->m_doc);
@@ -642,6 +641,9 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
     int left = this->GetDrawingX() - leftExtender - staffX;
     int right = this->GetDrawingX() + 2 * radius + rightExtender - staffX;
+    if (this->GetDrawingDur() == DUR_MX) {
+        right += 2 * radius;
+    }
 
     if (linesAbove > 0) {
         staff->AddLegerLineAbove(linesAbove, left, right, drawingCueSize);

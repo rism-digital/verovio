@@ -16,6 +16,7 @@
 
 #include "accid.h"
 #include "anchoredtext.h"
+#include "arpeg.h"
 #include "artic.h"
 #include "beam.h"
 #include "boundary.h"
@@ -58,6 +59,8 @@
 #include "slur.h"
 #include "space.h"
 #include "staff.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "syl.h"
 #include "system.h"
 #include "tempo.h"
@@ -255,6 +258,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(ANCHORED_TEXT)) {
         m_currentNode = m_currentNode.append_child("anchoredText");
         WriteMeiAnchoredText(m_currentNode, dynamic_cast<AnchoredText *>(object));
+    }
+    else if (object->Is(ARPEG)) {
+        m_currentNode = m_currentNode.append_child("arpeg");
+        WriteMeiArpeg(m_currentNode, dynamic_cast<Arpeg *>(object));
     }
     else if (object->Is(BREATH)) {
         m_currentNode = m_currentNode.append_child("breath");
@@ -822,6 +829,18 @@ void MeiOutput::WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *a
     WriteTextDirInterface(currentNode, anchoredText);
 }
 
+void MeiOutput::WriteMeiArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
+{
+    assert(arpeg);
+
+    WriteControlElement(currentNode, arpeg);
+    WritePlistInterface(currentNode, arpeg);
+    WriteTimePointInterface(currentNode, arpeg);
+    arpeg->WriteArpegLog(currentNode);
+    arpeg->WriteArpegVis(currentNode);
+    arpeg->WriteColor(currentNode);
+};
+
 void MeiOutput::WriteMeiBreath(pugi::xml_node currentNode, Breath *breath)
 {
     assert(breath);
@@ -1341,6 +1360,13 @@ void MeiOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *inte
     interface->WriteNoteGes(element);
     interface->WriteOctave(element);
     interface->WritePitch(element);
+}
+
+void MeiOutput::WritePlistInterface(pugi::xml_node element, PlistInterface *interface)
+{
+    assert(interface);
+
+    interface->WritePlist(element);
 }
 
 void MeiOutput::WritePositionInterface(pugi::xml_node element, PositionInterface *interface)
@@ -2504,6 +2530,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "anchoredText") {
             success = ReadMeiAnchoredText(parent, current);
         }
+        else if (std::string(current.name()) == "arpeg") {
+            success = ReadMeiArpeg(parent, current);
+        }
         else if (std::string(current.name()) == "breath") {
             success = ReadMeiBreath(parent, current);
         }
@@ -2581,6 +2610,21 @@ bool MeiInput::ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText)
     return ReadMeiTextChildren(vrvAnchoredText, anchoredText, vrvAnchoredText);
 }
 
+bool MeiInput::ReadMeiArpeg(Object *parent, pugi::xml_node arpeg)
+{
+    Arpeg *vrvArpeg = new Arpeg();
+    ReadControlElement(arpeg, vrvArpeg);
+
+    ReadPlistInterface(arpeg, vrvArpeg);
+    ReadTimePointInterface(arpeg, vrvArpeg);
+    vrvArpeg->ReadArpegLog(arpeg);
+    vrvArpeg->ReadArpegVis(arpeg);
+    vrvArpeg->ReadColor(arpeg);
+
+    parent->AddChild(vrvArpeg);
+    return true;
+}
+
 bool MeiInput::ReadMeiBreath(Object *parent, pugi::xml_node breath)
 {
     Breath *vrvBreath = new Breath();
@@ -2591,7 +2635,7 @@ bool MeiInput::ReadMeiBreath(Object *parent, pugi::xml_node breath)
     vrvBreath->ReadPlacement(breath);
 
     parent->AddChild(vrvBreath);
-    return ReadMeiTextChildren(vrvBreath, breath, vrvBreath);
+    return true;
 }
 
 bool MeiInput::ReadMeiDir(Object *parent, pugi::xml_node dir)
@@ -3494,6 +3538,12 @@ bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interf
     return true;
 }
 
+bool MeiInput::ReadPlistInterface(pugi::xml_node element, PlistInterface *interface)
+{
+    interface->ReadPlist(element);
+    return true;
+}
+
 bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *interface)
 {
     interface->ReadStaffLoc(element);
@@ -4108,15 +4158,6 @@ DocType MeiInput::StrToDocType(std::string type)
     if (type == "transcription") return Transcription;
     LogWarning("Unknown layout type '%s'", type.c_str());
     return Raw;
-}
-
-std::string MeiInput::ExtractUuidFragment(std::string refUuid)
-{
-    size_t pos = refUuid.find_last_of("#");
-    if ((pos != std::string::npos) && (pos < refUuid.length() - 1)) {
-        refUuid = refUuid.substr(pos + 1);
-    }
-    return refUuid;
 }
 
 std::wstring MeiInput::LeftTrim(std::wstring str)

@@ -42,6 +42,8 @@
 #include "slur.h"
 #include "space.h"
 #include "staff.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "syl.h"
 #include "tempo.h"
 #include "text.h"
@@ -475,8 +477,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     partId.c_str());
                 continue;
             }
-            std::string partName = GetContentOfChild(xpathNode.node(), "part-name");
-            std::string partAbbr = GetContentOfChild(xpathNode.node(), "part-abbreviation");
+            // part-name should be revised, as soon MEI can suppress labels
+            std::string partName = GetContentOfChild(xpathNode.node(), "part-name[not(@print-object='no')]");
+            std::string partAbbr = GetContentOfChild(xpathNode.node(), "part-abbreviation[not(@print-object='no')]");
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
             int nbStaves = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);

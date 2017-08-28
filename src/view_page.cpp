@@ -33,6 +33,8 @@
 #include "page.h"
 #include "smufl.h"
 #include "staff.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "style.h"
 #include "syl.h"
 #include "system.h"

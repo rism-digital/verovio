@@ -23,6 +23,7 @@
 #include "note.h"
 #include "smufl.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "style.h"
 #include "timestamp.h"
 #include "vrv.h"

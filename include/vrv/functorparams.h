@@ -1077,26 +1077,19 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareRptParams
+// PreparePlistParams
 //----------------------------------------------------------------------------
 
 /**
- * member 0: a pointer to the current MRpt pointer
- * member 1: a pointer to the data_BOOLEAN indicating if multiNumber
- * member 2: a pointer to the doc scoreDef
+ * member 0: ArrayOfInterfaceUuidPairs holds the interface / uuid pairs to match
+ * member 1: bool* fillList for indicating whether the pairs have to be stacked or not
  **/
 
-class PrepareRptParams : public FunctorParams {
+class PreparePlistParams : public FunctorParams {
 public:
-    PrepareRptParams(ScoreDef *currentScoreDef)
-    {
-        m_currentMRpt = NULL;
-        m_multiNumber = BOOLEAN_NONE;
-        m_currentScoreDef = currentScoreDef;
-    }
-    MRpt *m_currentMRpt;
-    data_BOOLEAN m_multiNumber;
-    ScoreDef *m_currentScoreDef;
+    PreparePlistParams() { m_fillList = true; }
+    ArrayOfInterfaceUuidPairs m_interfaceUuidPairs;
+    bool m_fillList;
 };
 
 //----------------------------------------------------------------------------
@@ -1127,6 +1120,29 @@ public:
     PrepareProcessingListsParams() {}
     IntTree m_verseTree;
     IntTree m_layerTree;
+};
+
+//----------------------------------------------------------------------------
+// PrepareRptParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the current MRpt pointer
+ * member 1: a pointer to the data_BOOLEAN indicating if multiNumber
+ * member 2: a pointer to the doc scoreDef
+ **/
+
+class PrepareRptParams : public FunctorParams {
+public:
+    PrepareRptParams(ScoreDef *currentScoreDef)
+    {
+        m_currentMRpt = NULL;
+        m_multiNumber = BOOLEAN_NONE;
+        m_currentScoreDef = currentScoreDef;
+    }
+    MRpt *m_currentMRpt;
+    data_BOOLEAN m_multiNumber;
+    ScoreDef *m_currentScoreDef;
 };
 
 //----------------------------------------------------------------------------
