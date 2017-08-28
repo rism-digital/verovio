@@ -22,6 +22,8 @@
 #include "score.h"
 #include "section.h"
 #include "staff.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "tie.h"
 #include "vrv.h"
 

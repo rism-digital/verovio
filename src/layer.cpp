@@ -29,6 +29,7 @@
 #include "note.h"
 #include "rpt.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "vrv.h"
 
 namespace vrv {

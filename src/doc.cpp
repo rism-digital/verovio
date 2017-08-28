@@ -34,6 +34,8 @@
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "syl.h"
 #include "system.h"
 #include "verse.h"

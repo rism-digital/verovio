@@ -20,6 +20,7 @@
 #include "glyph.h"
 #include "layerelement.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "view.h"
 #include "vrv.h"
 

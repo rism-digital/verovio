@@ -23,6 +23,7 @@
 #include "functorparams.h"
 #include "page.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "syl.h"
 #include "system.h"
 #include "tempo.h"

@@ -32,6 +32,8 @@
 #include "scoredef.h"
 #include "section.h"
 #include "staff.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "trill.h"
 #include "tuplet.h"
 #include "vrv.h"
