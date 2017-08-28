@@ -428,12 +428,20 @@ int LayerElement::GetDrawingRadius(Doc *doc)
         assert(chord);
         dur = chord->GetActualDur();
     }
+    
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+    
+    if (dur <= DUR_BR) {
+        return doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+    }
+    
     wchar_t code = SMUFL_E0A3_noteheadHalf;
+
     if (dur <= DUR_1) {
         code = SMUFL_E0A2_noteheadWhole;
     }
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
-    assert(staff);
+
     return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
 }
 

@@ -180,7 +180,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     }
 
     switch (this->GetActualDur()) {
-        case DUR_1: loc += 2; break;
+        case DUR_1: loc -= 2; break;
         case DUR_2: loc += 0; break;
         case DUR_4: loc += 2; break;
         case DUR_8: loc += 2; break;
@@ -195,10 +195,10 @@ int Rest::CalcDots(FunctorParams *functorParams)
     dotLocs->push_back(loc);
 
     // HARDCODED
-    int xRel = params->m_doc->GetDrawingUnit(staffSize) * 1.5;
+    int xRel = params->m_doc->GetDrawingUnit(staffSize) * 2.5;
     if (drawingCueSize) xRel = params->m_doc->GetCueSize(xRel);
     if (this->GetDur() > DUR_2) {
-        xRel = params->m_doc->GetGlyphWidth(this->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize) / 2;
+        xRel = params->m_doc->GetGlyphWidth(this->GetRestGlyph(), staff->m_drawingStaffSize, drawingCueSize);
     }
     dots->SetDrawingXRel(std::max(dots->GetDrawingXRel(), xRel));
 
