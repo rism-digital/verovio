@@ -398,6 +398,12 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = SLUR;
     m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = MORDENT;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = TURN;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = TRILL;
+    m_systemAligner.Process(params->m_functor, params);
     params->m_classId = DYNAM;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = HAIRPIN;
@@ -405,12 +411,6 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     params->m_classId = OCTAVE;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = DIR;
-    m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = MORDENT;
-    m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = TURN;
-    m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = TRILL;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = BREATH;
     m_systemAligner.Process(params->m_functor, params);
