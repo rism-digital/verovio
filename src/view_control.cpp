@@ -1611,27 +1611,39 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     Staff *staff = dynamic_cast<Staff *>(topNote->GetFirstParent(STAFF));
     assert(staff);
     bool drawingCueSize = topNote->GetDrawingCueSize();
-
-    int length = top - bottom;
-    // We add - substract a unit in order to have the line going to the edge
-    length += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int y = bottom - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-
+    
     // We are going to have only one FloatingPositioner - staff will be the top note one
     system->SetCurrentFloatingPositioner(staff->GetN(), arpeg, topNote, staff);
     // Special case: because the positionner objects are reset in ResetVerticalAlignment we
     // need to reset the value of the DrawingXRel each time. The value is stored in Arpeg.
     arpeg->GetCurrentFloatingPositioner()->SetDrawingXRel(arpeg->GetDrawingXRel());
-    
+
+    int length = top - bottom;
+    // We add - substract a unit in order to have the line going to the edge
+    length += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int y = bottom - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int x = arpeg->GetDrawingX();
+    int angle = -90;
+    
+    wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
+    wchar_t endGlyph = (arpeg->GetArrow()) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
+    
+    if (arpeg->GetOrder() == arpegLog_ORDER_down) {
+        y = top + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        x -=  m_doc->GetGlyphWidth(SMUFL_EAAA_wiggleArpeggiatoDown, staff->m_drawingStaffSize, drawingCueSize) / 2;
+        fillGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
+        endGlyph = (arpeg->GetArrow()) ? SMUFL_EAAE_wiggleArpeggiatoDownArrow : 0;
+        angle = 90;
+    }
+    
     Point orig(x, y);
 
     dc->StartGraphic(arpeg, "", arpeg->GetUuid());
 
     // Smufl glyphs are horizontal - Rotate them counter clockwise
-    dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), -90);
+    dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
 
-    DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, SMUFL_EAAA_wiggleArpeggiatoDown);
+    DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, 0, endGlyph);
 
     dc->EndGraphic(arpeg, this);
 }

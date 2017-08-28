@@ -215,7 +215,7 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     if (minTopLeft != -VRV_UNSET) {
         int dist = topNote->GetDrawingX() - minTopLeft;
         // HARDCODED
-        dist += (params->m_doc->GetDrawingUnit(topStaff->m_drawingStaffSize) / 2);
+        dist += (params->m_doc->GetDrawingUnit(topStaff->m_drawingStaffSize));
         this->SetDrawingXRel(-dist);
     }
 
