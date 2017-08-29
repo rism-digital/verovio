@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/4.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title />
+            </titleStmt>
+            <pubStmt />
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application isodate="2017-07-18T08:28:59" version="2.0.0-dev-6e20a1f-dirty">
+                    <name>Verovio</name>
+                    <p>Transcoded from Humdrum</p>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000001414165424">
+                        <staffGrp xml:id="staffgrp-0000000957693180">
+                            <staffGrp xml:id="staffgrp-0000000001112210" symbol="brace" barthru="true">
+                                <staffDef xml:id="staffdef-0000000495473714" clef.shape="G" clef.line="2" key.mode="major" key.sig="3f" meter.count="3" meter.unit="4" n="1" lines="5" />
+                                <staffDef xml:id="staffdef-0000001161899523" clef.shape="F" clef.line="4" key.mode="major" key.sig="3f" meter.count="3" meter.unit="4" n="2" lines="5" />
+                                <label xml:id="label-0000000881701825">Piano</label>
+                            </staffGrp>
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000001272089139">
+                        <measure xml:id="measure-0000000740960685" n="0">
+                            <staff xml:id="staff-0000001764884061" n="1">
+                                <layer xml:id="layer-0000000080565422" n="1">
+                                    <note xml:id="note-0000001986960701" dur="8" oct="5" pname="b" accid.ges="f" />
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-0000000525252409" n="2">
+                                <layer xml:id="layer-0000001235952730" n="5">
+                                    <note xml:id="note-0000001986960702" dur="8" oct="3" pname="b" accid.ges="f" />
+                                </layer>
+                            </staff>
+                            <tempo xml:id="tempo-0000002104290263" place="above" staff="1" startid="#note-0000001986960701" midi.bpm="76">Allegretto</tempo>
+                            <dynam xml:id="dynam-0000002020766319" place="below" staff="1" startid="#note-0000001986960701">f</dynam>
+                            <slur xml:id="slur-0000001956359152" startid="#note-0000001986960701" endid="#chord-0000001015527891" />
+                            <arpeg plist="#note-0000001986960701 #note-0000001986960702"/>
+                        </measure>
+                        <measure xml:id="measure-0000000509156074" n="1" left="rptstart">
+                            <staff xml:id="staff-0000001716214222" n="1">
+                                <layer xml:id="layer-0000002139406993" n="1">
+                                    <beam xml:id="beam-0000000853543998">
+                                        <chord xml:id="chord-0000001015527891" dur="8" stem.dir="down">
+                                            <artic xml:id="artic-0000000640633191" artic="stacc" />
+                                            <note xml:id="note-0000002054817598" oct="4" pname="b" accid.ges="f" />
+                                            <note xml:id="note-0000002021454370" oct="5" pname="g" />
+                                            <note xml:id="note-0000000944651251" oct="6" pname="e" accid.ges="f" />
+                                        </chord>
+                                        <chord xml:id="chord-0000001709663567" dur="8" stem.dir="down">
+                                            <note xml:id="note-0000000807433737" oct="4" pname="b" accid.ges="f" />
+                                            <note xml:id="note-0000001997984054" oct="5" pname="g" />
+                                            <note xml:id="note-0000001933005356" oct="5" pname="b" accid.ges="f" />
+                                        </chord>
+                                        <chord xml:id="chord-0000001755409588" dur="8" stem.dir="down">
+                                            <note xml:id="note-0000001053538611" oct="4" pname="b" accid.ges="f" />
+                                            <note xml:id="note-0000000889468306" oct="5" pname="g" />
+                                            <note xml:id="note-0000000738518562" oct="5" pname="a">
+                                                <accid xml:id="accid-0000000084658181" accid="n" />
+                                            </note>
+                                        </chord>
+                                        <chord xml:id="chord-0000001674888388" dur="8" stem.dir="down">
+                                            <note xml:id="note-0000001899400018" oct="4" pname="b" accid.ges="f" />
+                                            <note xml:id="note-0000000405058770" oct="5" pname="g" />
+                                            <note xml:id="note-0000000330229048" oct="5" pname="b" accid.ges="f" />
+                                        </chord>
+                                        <chord xml:id="chord-0000001846973064" dur="8" stem.dir="down">
+                                            <note xml:id="note-0000000770057542" oct="4" pname="b" accid.ges="f" />
+                                            <note xml:id="note-0000000582619913" oct="5" pname="g" />
+                                            <note xml:id="note-0000002067977796" oct="6" pname="c" />
+                                        </chord>
+                                        <chord xml:id="chord-0000001671225548" dur="8" stem.dir="down">
+                                            <note xml:id="note-0000000813966941" oct="4" pname="b" accid.ges="f" />
+                                            <note xml:id="note-0000000235559102" oct="5" pname="g" />
+                                            <note xml:id="note-0000000656426991" oct="5" pname="b" accid.ges="f" />
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-0000000146768755" n="2">
+                                <layer xml:id="layer-0000001678301057" n="5">
+                                    <note xml:id="note-0000000873023418" dur="8" oct="2" pname="e" stem.dir="up" accid.ges="f">
+                                        <artic xml:id="artic-0000001526526805" artic="stacc" />
+                                    </note>
+                                    <beam xml:id="beam-0000000075405694">
+                                        <chord xml:id="chord-0000000306499350" dur="8" stem.dir="down">
+                                            <note xml:id="note-0000000907245187" oct="3" pname="e" accid.ges="f" />
+                                            <note xml:id="note-0000001547851020" oct="3" pname="b" accid.ges="f" />
+                                            <note xml:id="note-0000000176566956" oct="4" pname="g" />
+                                        </chord>
+                                        <chord xml:id="chord-0000000977687251" dur="8" stem.dir="down">
+                                            <note xml:id="note-0000001591155312" oct="3" pname="e" accid.ges="f" />
+                                            <note xml:id="note-0000001427408056" oct="3" pname="b" accid.ges="f" />
+                                            <note xml:id="note-0000001698017893" oct="4" pname="g" />
+                                        </chord>
+                                        <chord xml:id="chord-0000001792638419" dur="8" stem.dir="down">
+                                            <note xml:id="note-0000001534383619" oct="3" pname="e" accid.ges="f" />
+                                            <note xml:id="note-0000002023337404" oct="3" pname="b" accid.ges="f" />
+                                            <note xml:id="note-0000000612991413" oct="4" pname="g" />
+                                        </chord>
+                                        <chord xml:id="chord-0000000329889732" dur="8" stem.dir="down">
+                                            <note xml:id="note-0000001485792254" oct="3" pname="e" accid.ges="f" />
+                                            <note xml:id="note-0000000733584223" oct="3" pname="b" accid.ges="f" />
+                                            <note xml:id="note-0000001910849337" oct="4" pname="g" />
+                                        </chord>
+                                        <chord xml:id="chord-0000002058476737" dur="8" stem.dir="down">
+                                            <note xml:id="note-0000001236730793" oct="3" pname="e" accid.ges="f" />
+                                            <note xml:id="note-0000000054702243" oct="3" pname="b" accid.ges="f" />
+                                            <note xml:id="note-0000000671018547" oct="4" pname="g" />
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <arpeg plist="test#chord-0000001015527891"/>
+                            <arpeg plist="#chord-0000001709663567 #chord-0000000306499350"/>
+                            <arpeg plist="#chord-0000000977687251" order="down" arrow="true"/>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
