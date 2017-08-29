@@ -359,7 +359,10 @@ int System::JustifyX(FunctorParams *functorParams)
 
     if (params->m_justifiableRatio < 0.8) {
         // Arbitrary value for avoiding over-compressed justification
-        LogWarning("Justification stop because of a ratio smaller than 0.8");
+        LogWarning("Justification stop because of a ratio smaller than 0.8: %lf", params->m_justifiableRatio);
+        LogWarning("\tSystem full width: %lf", params->m_systemFullWidth);
+        LogWarning("\tNon-justifiable width: %lf", nonJustifiableWidth);
+        LogWarning("\tDrawing Justifiable width: %lf", m_drawingJustifiableWidth);
     }
 
     // Check if we are on the last page and on the last system - do no justify it if ratio > 1.25
