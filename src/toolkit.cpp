@@ -62,6 +62,7 @@ Toolkit::Toolkit(bool initFont)
     m_noLayout = false;
     m_ignoreLayout = false;
     m_adjustPageHeight = false;
+    m_mmOutput = false;
     m_noJustification = false;
     m_evenNoteSpacing = false;
     m_showBoundingBoxes = false;
@@ -637,6 +638,8 @@ bool Toolkit::ParseOptions(const std::string &json_options)
 
     if (json.has<jsonxx::String>("font")) SetFont(json.get<jsonxx::String>("font"));
 
+    if (json.has<jsonxx::Number>("mmOutput")) SetMMOutput(json.get<jsonxx::Number>("mmOutput"));
+    
     if (json.has<jsonxx::Number>("pageWidth")) SetPageWidth(json.get<jsonxx::Number>("pageWidth"));
 
     if (json.has<jsonxx::Number>("pageHeight")) SetPageHeight(json.get<jsonxx::Number>("pageHeight"));
@@ -864,6 +867,10 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
     SvgDeviceContext svg(width, height);
+    
+    if (m_mmOutput) {
+        svg.SetMMOutput(true);
+    }
 
     // set scale and border from user options
     svg.SetUserScale(m_view.GetPPUFactor() * (double)m_scale / 100, m_view.GetPPUFactor() * (double)m_scale / 100);

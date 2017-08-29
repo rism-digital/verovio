@@ -148,6 +148,11 @@ public:
     ///@{
     virtual void AddDescription(const std::string &text);
     ///@}
+    
+    /**
+     * Setting mm output flag (false by default)
+     */
+    void SetMMOutput(bool mmOutput) { m_mmOutput = mmOutput; }
 
 private:
     /**
@@ -208,6 +213,9 @@ private:
     pugi::xml_node m_svgNode;
     pugi::xml_node m_currentNode;
     std::list<pugi::xml_node> m_svgNodeStack;
+    
+    // output as mm (for pdf generation with a 72 dpi)
+    bool m_mmOutput;
 };
 
 } // namespace vrv
