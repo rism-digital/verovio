@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Aug 28 15:15:57 PDT 2017
+// Last Modified: Tue Aug 29 00:27:40 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -22711,7 +22711,7 @@ MxmlMeasure* MxmlPart::getMeasure(int index) const {
 	if (index < 0) {
 		return NULL;
 	}
-	if (index >= (int)m_measures.size()) {
+	if (index > (int)m_measures.size() - 1) {
 		return NULL;
 	}
 	return m_measures[index];
@@ -23493,7 +23493,7 @@ HumNum NoteCell::getMeterBottom(void) {
 //
 
 double NoteCell::getSgnDiatonicPitchClass(void) {
-	if (m_b7 == GRIDREST) {
+	if (Convert::isNaN(m_b7)) {
 		return GRIDREST;
 	} else if (m_b7 < 0) {
 		return -(double)(((int)-m_b7) % 7);
@@ -23510,7 +23510,7 @@ double NoteCell::getSgnDiatonicPitchClass(void) {
 //
 
 double NoteCell::getAbsDiatonicPitchClass(void) {
-	if (m_b7 == GRIDREST) {
+	if (Convert::isNaN(m_b7)) {
 		return GRIDREST;
 	} else {
 		return (double)(((int)fabs(m_b7)) % 7);
@@ -36005,8 +36005,6 @@ bool Tool_msearch::run(HumdrumFile& infile) {
 
 
 
-
-
 //////////////////////////////
 //
 // Tool_msearch::doAnalysis -- do a basic melodic analysis of all parts.
@@ -36086,10 +36084,9 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 	}
 	int interval;
 	for (int i=0; i<(int)dpcQuery.size(); i++) {
-		if (notes[index + i]->getAbsDiatonicPitchClass() != dpcQuery[i].pc) {
-			match.clear();
-			return false;
-		} else {
+		if ((Convert::isNaN(notes[index+i]->getAbsDiatonicPitchClass()) &&
+				Convert::isNaN(dpcQuery[i].pc)) ||
+				(notes[index + i]->getAbsDiatonicPitchClass() == dpcQuery[i].pc)) {
 			if ((index + i>0) && dpcQuery[i].direction) {
 				interval = notes[index + i]->getAbsBase40Pitch() -
 						notes[index + i - 1]->getAbsBase40Pitch();
@@ -36103,6 +36100,10 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 				}
 			}
 			match.push_back(notes[index+i]);
+		} else {
+			// not a match
+			match.clear();
+			return false;
 		}
 	}
 
