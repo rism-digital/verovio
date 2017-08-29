@@ -3169,7 +3169,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         appendElement(element, artic);
         artic->SetArtic(articsabove);
         setPlace(artic, "above");
-        element->SetUuid(getLocationId(element, token, 0) + "-above");
+        artic->SetUuid(getLocationId(element, token, 0) + "-above");
     }
 
     if (!articsbelow.empty()) {
@@ -3177,7 +3177,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         appendElement(element, artic);
         artic->SetArtic(articsbelow);
         setPlace(artic, "below");
-        element->SetUuid(getLocationId(element, token, 0) + "-below");
+        artic->SetUuid(getLocationId(element, token, 0) + "-below");
     }
 
     if (!articsdefault.empty()) {
