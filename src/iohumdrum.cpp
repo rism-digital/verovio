@@ -68,10 +68,10 @@
 #include "slur.h"
 #include "space.h"
 #include "staff.h"
-#include "syl.h"
-#include "system.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "syl.h"
+#include "system.h"
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
@@ -1863,9 +1863,6 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
     int layerindex = 0;
     for (i = startline; i <= endline; i++) {
         if (!infile[i].hasSpines()) {
-            if (infile[i].find("!!LO:") == 0) {
-                lt[staffindex][layerindex].push_back(infile[i].token(0));
-            }
             continue;
         }
         lasttrack = -1;
