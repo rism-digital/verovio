@@ -70,6 +70,8 @@
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
