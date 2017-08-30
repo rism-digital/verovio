@@ -51,14 +51,26 @@ downloads:
     var format = 'mei';
     var outputFilename = 'output.mei'
     var ids = [];
+    var pdfFormat = "A4";
+    var pdfOrientation = "portrait";
 
     // reload cookies
     if ( $.cookie('zoom') ) zoom = $.cookie('zoom');
-    console.log(zoom);
+    //console.log(zoom);
+    if ( $.cookie('pdfFormat') ) pdfFormat = $.cookie('pdfFormat');
+    if ( $.cookie('pdfOrientation') ) pdfOrientation = $.cookie('pdfOrientation');
+
+    function calc_page_height() {
+        return ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom;
+    }
+
+    function calc_page_width() {
+        return ($(".row-offcanvas").width()) * 100 / zoom ; // - $( "#sidbar" ).width();
+    }
 
     function set_options( ) {
-        pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
-        pageWidth = ($(".row-offcanvas").width()) * 100 / zoom ; // - $( "#sidbar" ).width();
+        pageHeight = calc_page_height();
+        pageWidth = calc_page_width();
         border = 50;
         options = {
                     inputFormat: format,
@@ -343,8 +355,17 @@ downloads:
     
     function generate_pdf() {
         
+        var pdfFormat = $("#pdfFormat").val();
+        var pdfSize = [2100, 2970];
+        if (pdfFormat == "letter") pdfSize = [2159, 2794];
+        else if (pdfFormat == "B4") pdfSize = [2500, 3530];
+        
+        var pdfOrientation = $("#pdfOrientation").val();
+        var pdfLandscape = pdfOrientation == 'landscape';
+        var pdfHeight = pdfLandscape ? pdfSize[0] : pdfSize[1];
+        var pdfWidth = pdfLandscape ? pdfSize[1] : pdfSize[0];
+        
         var fontCallback = function(family, bold, italic, fontOptions) {
-            console.log(family, bold, italic, fontOptions);
             if (family == "VerovioText") {
                 return family;
             }
@@ -360,7 +381,7 @@ downloads:
         options.fontCallback = fontCallback;
         options.useCSS = true;
         
-        var doc = new PDFDocument({useCSS: true, compress: true, autoFirstPage: false}); 
+        var doc = new PDFDocument({useCSS: true, compress: true, autoFirstPage: false, layout: pdfOrientation}); 
         doc.font('Times-Roman');
         var stream = doc.pipe(blobStream());
         
@@ -380,8 +401,8 @@ downloads:
         doc.registerFont('VerovioText',buffer);  
         
         pdfOptions = {
-                    pageHeight: 2970,
-                    pageWidth: 2100,
+                    pageHeight: pdfHeight,
+                    pageWidth: pdfWidth,
                     border: 50,
                     scale: 100,
                     spacingSystem: spacingSystem,
@@ -392,12 +413,11 @@ downloads:
         
         vrvToolkit.setOptions(pdfOptions);
         vrvToolkit.redoLayout();
-        console.log(outputFilename);
         for (i = 0; i < vrvToolkit.getPageCount(); i++) {
             // Set it to the hidden div
             let hiddenDiv = document.getElementById("pdfBuffer");
             hiddenDiv.innerHTML = vrvToolkit.renderPage(i + 1, {});
-            doc.addPage({size: 'A4'});
+            doc.addPage({size: pdfFormat, layout: pdfOrientation});
             SVGtoPDF(doc, hiddenDiv.firstChild, 0, 0, options);
         }        
         
@@ -591,18 +611,42 @@ downloads:
     </div>
 </div>
 
-
-<div class="modal fade" id="pdfDialog" role="dialog">
+<div class="modal fade" id="pdfDialog" role="dialog" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                <p class="modal-title" id="myModalLabel">
-                    Be aware that this is an experimental feature and it can take quite some time.
-                </p>
+                <h4>PDF options</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <div class="form-group">
+                        <label for="inputEmail3">Format</label>
+                        <div>
+                            <select class="form-control" id="pdfFormat">
+                                <option value="A4">A4</option>
+                                <option value="letter">Letter</option>
+                                <option value="B4">B4</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputPassword3">Orientation</label>
+                        <div>
+                            <select class="form-control" id="pdfOrientation">
+                                <option value="portrait">Portrait</option>
+                                <option value="landscape">Landscape</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button> <button type="button" id="pdfOK" class="btn btn-primary">OK</button>
+                <div class="alert alert-warning" style="text-align:left;">
+                    <strong>Warning!</strong> This is an experimental feature and it can take some time.
+                </div>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" id="pdfOK" class="btn btn-primary">OK</button>
             </div>
         </div>
     </div>
@@ -703,7 +747,9 @@ downloads:
             });
         }
         $(".row-offcanvas").on('transitionend webkitTransitionEnd oTransitionEnd mozTransitionend MSTransitionEnd', function() { 
-            apply_zoom();
+            if (pageWidth != calc_page_width()) {
+                apply_zoom();   
+            }
         });
         
         $("#player").midiPlayer({
@@ -713,8 +759,15 @@ downloads:
             width: 250
         });
         
+        $("#pdfFormat").val(pdfFormat);
+        $("#pdfOrientation").val(pdfOrientation);
+        
         $('#pdfOK').click(function () {
             $('#pdfDialog').modal('hide');
+            var pdfFormat = $("#pdfFormat").val();
+            var pdfOrientation = $("#pdfOrientation").val();
+            $.cookie('pdfFormat', pdfFormat, { expires: 30 });
+            $.cookie('pdfOrientation', pdfOrientation, { expires: 30 });
             generate_pdf();
         });
     });
