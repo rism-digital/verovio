@@ -1653,6 +1653,10 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     dc->StartGraphic(dir, "", dir->GetUuid());
 
     FontInfo dirTxt;
+    if (!dc->UseGlobalStyling()) {
+        dirTxt.SetFaceName("Times");
+        dirTxt.SetStyle(FONTSTYLE_italic);
+    }
 
     // If we have not timestamp
     int x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
@@ -1706,6 +1710,10 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     }
 
     FontInfo dynamTxt;
+    if (!dc->UseGlobalStyling()) {
+        dynamTxt.SetFaceName("Times");
+        dynamTxt.SetStyle(FONTSTYLE_italic);
+    }
 
     // If we have not timestamp
     int x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
@@ -1864,7 +1872,10 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
     dc->StartGraphic(harm, "", harm->GetUuid());
 
-    FontInfo dirTxt;
+    FontInfo harmTxt;
+    if (!dc->UseGlobalStyling()) {
+        harmTxt.SetFaceName("Times");
+    }
 
     // If we have not timestamp
     int x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
@@ -1890,10 +1901,10 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
             DrawFb(dc, *staffIter, dynamic_cast<Fb *>(harm->GetFirst()), x, y, setX, setY);
         }
         else {
-            dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+            harmTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
             dc->SetBrush(m_currentColour, AxSOLID);
-            dc->SetFont(&dirTxt);
+            dc->SetFont(&harmTxt);
 
             dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
             DrawTextChildren(dc, harm, x, y, setX, setY);
@@ -2062,6 +2073,10 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     dc->StartGraphic(tempo, "", tempo->GetUuid());
 
     FontInfo tempoTxt;
+    if (!dc->UseGlobalStyling()) {
+        tempoTxt.SetFaceName("Times");
+        tempoTxt.SetWeight(FONTWEIGHT_bold);
+    }
 
     // If we have not timestamp
     int x = measure->GetDrawingX();

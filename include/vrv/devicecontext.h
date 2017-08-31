@@ -208,6 +208,13 @@ public:
     ///@{
     virtual void AddDescription(const std::string &text){};
     ///@}
+    
+    /**
+     * Method indicating if default global styling is used. Typically this is the case with SVG and CSS.
+     * When global styling is used, some elements will not set corresponding styles.
+     * Global styling is false by default.
+     */
+    virtual bool UseGlobalStyling() { return false; }
 
 private:
     void AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend);

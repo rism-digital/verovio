@@ -150,6 +150,11 @@ public:
     ///@}
     
     /**
+     * In SVG use global styling but not with mm output (for pdf generation)
+     */
+    virtual bool UseGlobalStyling() { return !m_mmOutput; }
+    
+    /**
      * Setting mm output flag (false by default)
      */
     void SetMMOutput(bool mmOutput) { m_mmOutput = mmOutput; }

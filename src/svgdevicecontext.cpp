@@ -366,13 +366,15 @@ void SvgDeviceContext::StartPage()
     m_vrvTextFont = false;
 
     // default styles
-    m_currentNode = m_currentNode.append_child("style");
-    m_currentNode.append_attribute("type") = "text/css";
-    m_currentNode.append_child(pugi::node_pcdata)
-        .set_value("g.page-margin{font-family:Times;} "
-                   "g.tempo{font-weight:bold;} g.dir, "
-                   "g.dynam{font-style:italic;} g.label{font-weight:normal;}");
-    m_currentNode = m_svgNodeStack.back();
+    if (this->UseGlobalStyling()) {
+        m_currentNode = m_currentNode.append_child("style");
+        m_currentNode.append_attribute("type") = "text/css";
+        m_currentNode.append_child(pugi::node_pcdata)
+            .set_value("g.page-margin{font-family:Times;} "
+                       "g.tempo{font-weight:bold;} g.dir, "
+                       "g.dynam{font-style:italic;} g.label{font-weight:normal;}");
+        m_currentNode = m_svgNodeStack.back();
+    }
 
     // a graphic for definition scaling
     m_currentNode = m_currentNode.append_child("svg");
@@ -717,11 +719,15 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
         svgText.replace(0, 1, "\xC2\xA0");
     }
 
+    std::string currentFaceName = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
+    std::string fontFaceName = m_fontStack.top()->GetFaceName();
+    
     pugi::xml_node textChild = AppendChild("tspan");
-    if (!m_fontStack.top()->GetFaceName().empty()) {
+    // Set the @font-family only if it is not the same as in the parent node
+    if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {
         textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
         // Special case where we want to specifiy if the VerovioText font (woff) needs to be included in the output
-        if (m_fontStack.top()->GetFaceName() == "VerovioText") this->VrvTextFont();
+        if (fontFaceName == "VerovioText") this->VrvTextFont();
     }
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
