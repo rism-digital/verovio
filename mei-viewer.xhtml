@@ -381,10 +381,8 @@ downloads:
     
         var options = {};
         options.fontCallback = fontCallback;
-        options.useCSS = true;
         
         var doc = new PDFDocument({useCSS: true, compress: true, autoFirstPage: false, layout: pdfOrientation}); 
-        doc.font('Times-Roman');
         var stream = doc.pipe(blobStream());
         
         stream.on('finish', function() {
@@ -417,11 +415,8 @@ downloads:
         vrvToolkit.setOptions(pdfOptions);
         vrvToolkit.redoLayout();
         for (i = 0; i < vrvToolkit.getPageCount(); i++) {
-            // Set it to the hidden div
-            let hiddenDiv = document.getElementById("pdfBuffer");
-            hiddenDiv.innerHTML = vrvToolkit.renderPage(i + 1, {});
             doc.addPage({size: pdfFormat, layout: pdfOrientation});
-            SVGtoPDF(doc, hiddenDiv.firstChild, 0, 0, options);
+            SVGtoPDF(doc, vrvToolkit.renderPage(i + 1, {}), 0, 0, options);
         }        
         
         // Reset the options
@@ -669,9 +664,6 @@ downloads:
             </div>
         </div>
     </div>
-</div>
-
-<div id="pdfBuffer" style="display: none;">
 </div>
 
 <script type="text/javascript">
