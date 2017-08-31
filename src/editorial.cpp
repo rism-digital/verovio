@@ -177,7 +177,7 @@ void Annot::AddChild(Object *child)
     if (child->IsTextElement()) {
         assert(dynamic_cast<TextElement *>(child));
     }
-    if (child->Is(ANNOT)) {
+    else if (child->Is(ANNOT)) {
         assert(dynamic_cast<Annot *>(child));
     }
     else {
