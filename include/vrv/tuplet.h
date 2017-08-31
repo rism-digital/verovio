@@ -46,6 +46,15 @@ public:
      */
     virtual void AddChild(Object *object);
 
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::PrepareLayerElementParts
+     */
+    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
+
 protected:
     /**
      * Filter the list for a specific class.
