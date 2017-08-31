@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Aug 17 22:09:57 EDT 2017
+// Last Modified: Mon Aug 28 15:15:57 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -4550,6 +4550,9 @@ const HumdrumToken& HumAddress::getDataType(void) const {
 		return null;
 	}
 	HumdrumToken* tok = m_owner->getTrackStart(getTrack());
+	if (tok == NULL) {
+		return null;
+	}
 	return *tok;
 }
 
@@ -7903,6 +7906,7 @@ HumdrumToken* HumHash::getOrigin(const string& ns1, const string& ns2,
 //
 
 ostream& HumHash::printXml(ostream& out, int level, const string& indent) {
+
 	if (parameters == NULL) {
 		return out;
 	}
@@ -7937,12 +7941,12 @@ ostream& HumHash::printXml(ostream& out, int level, const string& indent) {
 				str << "<parameter key=\"" << it3.first << "\"";
 				str << " value=\"";
 				str << Convert::encodeXml(it3.second) << "\"";
-				str << " idref=\"";
 				ref = it3.second.origin;
 				if (ref != NULL) {
+					str << " idref=\"";
 					str << ref->getXmlId();
+					str << "\"";
 				}
-				str << "\"";
 				str << "/>\n";
 			}
 			str << Convert::repeatString(indent, --level) << "</namespace>\n";
@@ -7952,6 +7956,122 @@ ostream& HumHash::printXml(ostream& out, int level, const string& indent) {
 	if (found) {
 		str << Convert::repeatString(indent, --level) << "</parameters>\n";
 		out << Convert::repeatString(indent, level) << "<parameters>\n";
+		out << str.str();
+	}
+
+	return out;
+
+}
+
+
+
+//////////////////////////////
+//
+// HumHash::printXmlAsGlobal --
+//
+
+ostream& HumHash::printXmlAsGlobal(ostream& out, int level,
+		const string& indent) {
+
+	if (parameters == NULL) {
+		return out;
+	}
+	if (parameters->size() == 0) {
+		return out;
+	}
+	
+	stringstream str;
+	stringstream str2;
+	string it1str;
+	string it2str;
+	int str2count = 0;
+	bool found = 0;
+
+	HumdrumToken* ref = NULL;
+	level++;
+	for (auto& it1 : *(parameters)) {
+		if (it1.second.size() == 0) {
+			continue;
+		}
+		str2.str("");
+		it1str = it1.first;
+		if (!found) {
+			found = 1;
+		}
+		if (it1.first == "") {
+			str2 << Convert::repeatString(indent, level++);
+			str2 << "<namespace n=\"1\" name=\"" << it1.first << "\">\n";
+		} else {
+			str << Convert::repeatString(indent, level++);
+			str << "<namespace n=\"1\" name=\"" << it1.first << "\">\n";
+		}
+		for (auto& it2 : it1.second) {
+			if (it2.second.size() == 0) {
+				continue;
+			}
+			it2str = it2.first;
+
+			if ((it2.first == "") && (it2.first == "")) {
+				str2 << Convert::repeatString(indent, level++);
+				str2 << "<namespace n=\"2\" name=\"" << it2.first << "\">\n";
+			} else {
+				str << Convert::repeatString(indent, level++);
+				str << "<namespace n=\"2\" name=\"" << it2.first << "\">\n";
+			}
+
+			for (auto& it3 : it2.second) {
+				if ((it2.first == "") && (it2.first == "")) {
+
+					if ((it3.first == "global") && (it3.second == "true")) {
+						// don't do anything because parameter should be removed
+					} else {
+						str2count++;
+						str2 << Convert::repeatString(indent, level);
+						str2 << "<parameter key=\"" << it3.first << "\"";
+						str2 << " value=\"";
+						str2 << Convert::encodeXml(it3.second) << "\"";
+						ref = it3.second.origin;
+						if (ref != NULL) {
+							str2 << " idref=\"";
+							str2 << ref->getXmlId();
+							str2 << "\"";
+						}
+						str2 << "/>\n";
+					}
+				} else {
+					str << Convert::repeatString(indent, level);
+					str << "<parameter key=\"" << it3.first << "\"";
+					str << " value=\"";
+					str << Convert::encodeXml(it3.second) << "\"";
+					ref = it3.second.origin;
+					if (ref != NULL) {
+						str << " idref=\"";
+						str << ref->getXmlId();
+						str << "\"";
+					}
+					str << "/>\n";
+				}
+			}
+			if ((it1str == "") && (it2str == "")) {
+				if (str2count > 0) {
+					str << str2.str();
+					str << Convert::repeatString(indent, --level) << "</namespace>\n";
+				}
+			} else {
+				str << Convert::repeatString(indent, --level) << "</namespace>\n";
+			}
+		}
+		if ((it1str == "") && (it2str == "")) {
+			if (str2count > 0) {
+				str << Convert::repeatString(indent, --level) << "</namespace>\n";
+			}
+		} else {
+			str << Convert::repeatString(indent, --level) << "</namespace>\n";
+		}
+	}
+	if (found) {
+		str << Convert::repeatString(indent, --level) << "</parameters>\n";
+		out << Convert::repeatString(indent, level) << "<parameters global=\"true\">\n";
 		out << str.str();
 	}
 
@@ -9258,6 +9378,279 @@ ostream& operator<<(ostream& out, const HumNum& number) {
 
 //////////////////////////////
 //
+// HumParamSet::HumParamSet --
+//
+
+HumParamSet::HumParamSet(void) {
+	// do nothing
+}
+
+HumParamSet::HumParamSet(const string& token) {
+	readString(token);
+}
+
+HumParamSet::HumParamSet(HTp token) {
+	readString(*((string*)token));
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::~HumParamSet --
+//
+
+HumParamSet::~HumParamSet() {
+	clear();
+}
+
+
+//////////////////////////////
+//
+// HumParamSet::getNamespace1 --
+//
+
+const string& HumParamSet::getNamespace1(void) {
+	return ns1;
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::getNamespace2 --
+//
+
+const string& HumParamSet::getNamespace2(void) {
+	return ns2;
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::getNamespace --
+//
+
+string HumParamSet::getNamespace(void) {
+	return ns1 + ":" + ns2;
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::setNamespace1 --
+//
+
+void HumParamSet::setNamespace1(const string& name) {
+	ns1 = name;
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::setNamespace2 --
+//
+
+void HumParamSet::setNamespace2(const string& name) {
+	ns2 = name;
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::setNamespace --
+//
+
+void HumParamSet::setNamespace(const string& name) {
+	auto loc = name.find(':');
+	if (loc == string::npos) {
+		ns1 = "";
+		ns2 = name;
+	} else {
+		ns1 = name.substr(0, loc);
+		ns2 = name.substr(loc+1, string::npos);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::setNamespace --
+//
+
+void HumParamSet::setNamespace(const string& name1, const string& name2) {
+	ns1 = name1;
+	ns2 = name2;
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::getCount --
+//
+
+int HumParamSet::getCount(void) {
+	return (int)parameters.size();
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::getParameterName --
+//
+
+const string& HumParamSet::getParameterName(int index) {
+	return parameters.at(index).first;
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::getParameterValue --
+//
+
+const string& HumParamSet::getParameterValue(int index) {
+	return parameters.at(index).second;
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::addParameter --
+//
+
+int HumParamSet::addParameter(const string& name, const string& value) {
+	parameters.push_back(make_pair(name, value));
+	return (int)parameters.size() - 1;
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::setParameter --
+//
+
+int HumParamSet::setParameter(const string& name, const string& value) {
+	for (int i=0; i<(int)parameters.size(); i++) {
+		if (parameters[i].first == name) {
+			parameters[i].second = value;
+			return i;
+		}
+	}
+	// Parameter does not exist so create at end of list.
+	parameters.push_back(make_pair(name, value));
+	return (int)parameters.size() - 1;
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::clear --
+//
+
+void HumParamSet::clear(void) {
+	ns1.clear();
+	ns2.clear();
+	parameters.clear();
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::readString --
+//
+
+void HumParamSet::readString(const string& text) {
+	vector<string> pieces(1);
+	bool bangs = true;
+	for (int i=0; i<(int)text.size(); i++) {
+		if (bangs && text[i] == '!') {
+			continue;
+		}
+		bangs = false;
+		if (text[i] == ':') {
+			pieces.resize(pieces.size() + 1);
+			continue;
+		}
+		pieces.back() += text[i];
+	}
+
+	if (pieces.size() < 3) {
+		// not enough information
+		return;
+	}
+
+	ns1 = pieces[0];
+	ns2 = pieces[1];
+
+	string key;
+	string value;
+	int loc;
+	for (int i=2; i<(int)pieces.size(); i++) {
+		Convert::replaceOccurrences(pieces[i], "&colon;", ":");
+		loc = (int)pieces[i].find("=");
+		if (loc != (int)string::npos) {
+			key   = pieces[i].substr(0, loc);
+			value = pieces[i].substr(loc+1, pieces[i].size());
+		} else {
+			key   = pieces[i];
+			value = "true";
+		}
+		addParameter(key, value);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumParamSet::printXml --
+//
+
+ostream& HumParamSet::printXml(ostream& out, int level,
+		const string& indent) {
+
+	if (getCount() == 0) {
+		return out;
+	}
+	
+	out << Convert::repeatString(indent, level++) << "<linked-parameter-set>\n";
+	out << Convert::repeatString(indent, level++);
+	out << "<namespace n=\"1\" name=\"" << getNamespace1() << "\">\n";
+	out << Convert::repeatString(indent, level++);
+	out << "<namespace n=\"2\" name=\"" << getNamespace2() << "\">\n";
+
+	for (int i=0; i<getCount(); i++) {
+		out << Convert::repeatString(indent, level);
+		out << "<parameter key=\"" << getParameterName(i) << "\"";
+		out << " value=\"";
+		out << Convert::encodeXml(getParameterValue(i)) << "\"";
+		out << "/>\n";
+	}
+
+	out << Convert::repeatString(indent, --level) << "</namespace>\n";
+	out << Convert::repeatString(indent, --level) << "</namespace>\n";
+	out << Convert::repeatString(indent, --level) << "<linked-parameter-set>\n";
+	return out;
+}
+
+
+
+
+//////////////////////////////
+//
 // HumRegex::HumRegex -- Constructor.
 //
 
@@ -10111,7 +10504,7 @@ ostream& HumdrumFile::printXml(ostream& out, int level,
 	}
 
 	level--;
-	out << Convert::repeatString(indent, level) << "<trackInfo>\n";
+	out << Convert::repeatString(indent, level) << "</trackInfo>\n";
 
 	printXmlParameterInfo(out, level, "\t");
 
@@ -14563,32 +14956,45 @@ bool HumdrumFileStructure::analyzeTokenDurations (void) {
 //
 
 bool HumdrumFileStructure::analyzeGlobalParameters(void) {
-	HumdrumLine* spineline = NULL;
-	for (int i=(int)m_lines.size()-1; i>=0; i--) {
-		if (m_lines[i]->hasSpines()) {
-			if (m_lines[i]->isAllNull())  {
-				continue;
+	vector<HumdrumLine*> globals;
+
+//	for (int i=0; i<(int)m_lines.size(); i++) {
+//		if (m_lines[i]->isCommentGlobal()) {
+//			m_lines[i]->setLayoutParameters();
+//		}
+//	}
+
+	for (int i=0; i<(int)m_lines.size(); i++) {
+		if (m_lines[i]->isCommentGlobal() && (m_lines[i]->find("!!LO:") != string::npos)) {
+			m_lines[i]->storeGlobalLinkedParameters();
+			globals.push_back(m_lines[i]);
+			continue;
+		}
+		if (!m_lines[i]->hasSpines()) {
+			continue;
+		}
+		if (m_lines[i]->isAllNull())  {
+			continue;
+		}
+		if (m_lines[i]->isCommentLocal()) {
+			continue;
+		}
+		if (globals.empty()) {
+			continue;
+		}
+
+		// Filter manipulators or not?  At the moment allow
+		// global parameters to pass through manipulators.
+		// if (m_lines[i]->isManipulator()) {
+		// 	continue;
+		// }
+
+		for (int j=0; j<(int)m_lines[i]->getFieldCount(); j++) {
+			for (int k=0; k<(int)globals.size(); k++) {
+				m_lines[i]->token(j)->addLinkedParameter(globals[k]->token(0));
 			}
-			if (m_lines[i]->isManipulator()) {
-				continue;
-			}
-			if (m_lines[i]->isCommentLocal()) {
-				continue;
-			}
-			// should be a non-null data, barlines, or interpretation
-			spineline = m_lines[i];
-			continue;
 		}
-		if (spineline == NULL) {
-			continue;
-		}
-		if (!m_lines[i]->isCommentGlobal()) {
-			continue;
-		}
-		if (m_lines[i]->find("!!LO:") != 0) {
-			continue;
-		}
-		spineline->setParameters(m_lines[i]);
+		globals.clear();
 	}
 
 	return isValid();
@@ -14604,14 +15010,19 @@ bool HumdrumFileStructure::analyzeGlobalParameters(void) {
 
 bool HumdrumFileStructure::analyzeLocalParameters(void) {
 	// analyze backward tokens:
-	for (int i=1; i<=getMaxTrack(); i++) {
-		for (int j=0; j<getTrackEndCount(i); j++) {
-			if (!processLocalParametersForTrack(getTrackEnd(i, j),
-					getTrackEnd(i, j))) {
-				return isValid();
-			}
-		}
+
+	for (int i=0; i<getStrandCount(); i++) {
+		processLocalParametersForStrand(i);
 	}
+
+//	for (int i=1; i<=getMaxTrack(); i++) {
+//		for (int j=0; j<getTrackEndCount(i); j++) {
+//			if (!processLocalParametersForTrack(getTrackEnd(i, j),
+//					getTrackEnd(i, j), getTrackStart(i, j))) {
+//				return isValid();
+//			}
+//		}
+//	}
 
 	return isValid();
 }
@@ -14770,7 +15181,7 @@ bool HumdrumFileStructure::decrementDurStates(vector<HumNum>& durs,
 //    done elsewhere.
 //
 
-bool HumdrumFileStructure::assignDurationsToTrack(HumdrumToken* starttoken,
+bool HumdrumFileStructure::assignDurationsToTrack(HTp starttoken,
 		HumNum startdur) {
 	if (!starttoken->hasRhythm()) {
 		return isValid();
@@ -14791,7 +15202,7 @@ bool HumdrumFileStructure::assignDurationsToTrack(HumdrumToken* starttoken,
 //     work for assigning durationFromStart values.
 //
 
-bool HumdrumFileStructure::prepareDurations(HumdrumToken* token, int state,
+bool HumdrumFileStructure::prepareDurations(HTp token, int state,
 		HumNum startdur) {
 	if (state != token->getState()) {
 		return isValid();
@@ -14849,7 +15260,7 @@ bool HumdrumFileStructure::prepareDurations(HumdrumToken* token, int state,
 //      a line based on the analysis of tokens in the spine.
 //
 
-bool HumdrumFileStructure::setLineDurationFromStart(HumdrumToken* token,
+bool HumdrumFileStructure::setLineDurationFromStart(HTp token,
 		HumNum dursum) {
 	if ((!token->isTerminateInterpretation()) &&
 			token->getDuration().isNegative()) {
@@ -14885,10 +15296,10 @@ bool HumdrumFileStructure::setLineDurationFromStart(HumdrumToken* token,
 //
 
 bool HumdrumFileStructure::analyzeRhythmOfFloatingSpine(
-		HumdrumToken* spinestart) {
+		HTp spinestart) {
 	HumNum dursum = 0;
 	HumNum founddur = 0;
-	HumdrumToken* token = spinestart;
+	HTp token = spinestart;
 	int tcount = token->getNextTokenCount();
 
 	// Find a known durationFromStart for a line in the Humdrum file, then
@@ -15052,8 +15463,8 @@ void HumdrumFileStructure::assignLineDurations(void) {
 //
 
 bool HumdrumFileStructure::assignDurationsToNonRhythmicTrack(
-		HumdrumToken* endtoken, HumdrumToken* current) {
-	HumdrumToken* token = endtoken;
+		HTp endtoken, HTp current) {
+	HTp token = endtoken;
 	int tcount = token->getPreviousTokenCount();
 	while (tcount > 0) {
 		for (int i=1; i<tcount; i++) {
@@ -15082,15 +15493,45 @@ bool HumdrumFileStructure::assignDurationsToNonRhythmicTrack(
 
 //////////////////////////////
 //
+// HumdrumFileStructure::processLocalParametersForStrand --
+//
+
+void HumdrumFileStructure::processLocalParametersForStrand(int index) {
+	HTp sstart = getStrandStart(index);
+	HTp send = getStrandEnd(index);
+	HTp tok = send;
+	HTp dtok = NULL;
+	while (tok && (tok != sstart)) {
+		if (tok->isData()) {
+			dtok = tok;
+		} else if (tok->isCommentLocal()) {
+			if (tok->find("!LO:") == 0) {
+				tok->storeLinkedParameters();
+				if (dtok) {
+					dtok->addLinkedParameter(tok);
+				}
+			}
+		}
+		tok = tok->getPreviousToken();
+	}
+}
+
+
+
+
+//////////////////////////////
+//
 // HumdrumFileStructure::processLocalParametersForTrack --  Search for
 //   local parameters backwards in each spine and fill in the HumHash
 //   for the token to which the parameter is to be applied.
 //
+// No longer used.
+//
 
 bool HumdrumFileStructure::processLocalParametersForTrack(
-		HumdrumToken* starttok, HumdrumToken* current) {
+		HTp starttok, HTp current) {
 
-	HumdrumToken* token = starttok;
+	HTp token = starttok;
 	int tcount = token->getPreviousTokenCount();
 
 	while (tcount > 0) {
@@ -15131,8 +15572,8 @@ bool HumdrumFileStructure::processLocalParametersForTrack(
 //     layout parameters currently.
 //
 
-void HumdrumFileStructure::checkForLocalParameters(HumdrumToken *token,
-		HumdrumToken *current) {
+void HumdrumFileStructure::checkForLocalParameters(HTp token,
+		HTp current) {
 	if (token->size() < 1) {
 		return;
 	}
@@ -15174,7 +15615,7 @@ bool HumdrumFileStructure::analyzeStrands(void) {
 	m_strand2d.resize(0);
 	int i, j;
 	for (i=0; i<spines; i++) {
-		HumdrumToken* tok = getSpineStart(i);
+		HTp tok = getSpineStart(i);
 		m_strand2d.resize(m_strand2d.size()+1);
 		analyzeSpineStrands(m_strand2d.back(), tok);
 	}
@@ -15258,12 +15699,12 @@ void HumdrumFileStructure::assignStrandsToTokens(void) {
 //
 
 void HumdrumFileStructure::analyzeSpineStrands(vector<TokenPair>& ends,
-		HumdrumToken* starttok) {
+		HTp starttok) {
 
 	ends.resize(ends.size()+1);
 	int index = (int)ends.size()-1;
 	ends[index].first = starttok;
-	HumdrumToken* tok = starttok;
+	HTp tok = starttok;
 	while (tok != NULL) {
 		if ((tok->getSubtrack() > 1) && (tok->isMerge())) {
 			ends[index].last = tok;
@@ -15314,23 +15755,23 @@ int HumdrumFileStructure::getStrandCount(int spineindex) const {
 //    in the a strand.
 //
 
-HumdrumToken* HumdrumFileStructure::getStrandStart(int index) const {
+HTp HumdrumFileStructure::getStrandStart(int index) const {
 	return m_strand1d[index].first;
 }
 
 
-HumdrumToken* HumdrumFileStructure::getStrandEnd(int index) const {
+HTp HumdrumFileStructure::getStrandEnd(int index) const {
 	return m_strand1d[index].last;
 }
 
 
-HumdrumToken* HumdrumFileStructure::getStrandStart(int sindex,
+HTp HumdrumFileStructure::getStrandStart(int sindex,
 		int index) const {
 	return m_strand2d[sindex][index].first;
 }
 
 
-HumdrumToken* HumdrumFileStructure::getStrandEnd(int sindex, int index) const {
+HTp HumdrumFileStructure::getStrandEnd(int sindex, int index) const {
 	return m_strand2d[sindex][index].last;
 }
 
@@ -16546,6 +16987,55 @@ ostream& HumdrumLine::printCsv(ostream& out, const string& separator) {
 
 //////////////////////////////
 //
+// HumdrumLine::printGlobalXmlParameterInfo --
+//
+
+ostream& HumdrumLine::printGlobalXmlParameterInfo(ostream& out, int level, 
+		const string& indent) {
+	token(0)->printGlobalXmlParameterInfo(out, level, indent);
+	return out;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::printXmlParameterInfo --
+//
+
+ostream& HumdrumLine::printXmlParameterInfo(ostream& out, int level,
+		const string& indent) {
+	((HumHash*)this)->printXml(out, level, indent);
+	return out;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::printXmlGlobalLinkedParameterInfo --
+//
+
+ostream&	HumdrumLine::printXmlGlobalLinkedParameterInfo(ostream& out, int level,
+		const string& indent) {
+	return out;
+	// return token(0)->printXmlLinkedParameterInfo(out, level, indent);
+}
+
+
+//////////////////////////////
+//
+// HumdrumLine::printXmlGlobalLinkedParameters --
+//
+
+ostream& HumdrumLine::printXmlGlobalLinkedParameters(ostream& out, int level, const string& indent) {
+	return out;
+	// return token(0)->printXmlLinkedParameters(out, level, indent);
+}
+
+
+//////////////////////////////
+//
 // HumdrumLine::printXml -- Print the HumdrumLine as a XML element.
 //
 
@@ -16628,6 +17118,11 @@ ostream& HumdrumLine::printXml(ostream& out, int level, const string& indent) {
 		level--;
 		out << Convert::repeatString(indent, level) << "</fields>\n";
 
+		printGlobalXmlParameterInfo(out, level, indent);
+		printXmlParameterInfo(out, level, indent);
+		printXmlGlobalLinkedParameterInfo(out, level, indent);
+		printXmlGlobalLinkedParameters(out, level, indent);
+
 		level--;
 		out << Convert::repeatString(indent, level) << "</frame>\n";
 
@@ -16694,10 +17189,15 @@ ostream& HumdrumLine::printXml(ostream& out, int level, const string& indent) {
 		level--;
 		out << Convert::repeatString(indent, level) << "</frameInfo>\n";
 
+		printGlobalXmlParameterInfo(out, level-2, indent);
+		printXmlParameterInfo(out, level-2, indent);
+		printXmlGlobalLinkedParameterInfo(out, level-2, indent);
+		printXmlGlobalLinkedParameters(out, level, indent);
 
 		level--;
 		out << Convert::repeatString(indent, level) << "</metaFrame>\n";
 	}
+
 
 	return out;
 }
@@ -16801,21 +17301,46 @@ HumdrumFile* HumdrumLine::getOwner(void) {
 
 //////////////////////////////
 //
-// HumdrumLine::setParameters -- Takes a global comment with
+// HumdrumLine::addLinkedParameter --
+//
+
+int HumdrumLine::addLinkedParameter(HTp token) {
+	for (int i=0; i<(int)m_linkedParameters.size(); i++) {
+		if (m_linkedParameters[i] == token) {
+			return i;
+		}
+	}
+
+	m_linkedParameters.push_back(token);
+	return m_linkedParameters.size() - 1;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::setLayoutParameters -- Takes a global comment with
 //     the structure:
-//        !!NS1:NS2:key1=value1:key2=value2:key3=value3
+//        !!LO:NS2:key1=value1:key2=value2:key3=value3
 //     and stores it in the HumHash parent class of the line.
 //
 
-void HumdrumLine::setParameters(HumdrumLine* pLine) {
-	HumdrumLine& pl = *pLine;
-	if (pl.size() <= 2) {
+void HumdrumLine::setLayoutParameters(void) {
+	if (this->find("!!LO:") == string::npos) {
 		return;
 	}
-	string pdata = pLine->substr(2, pl.size()-2);
+	string pdata = this->substr(2, string::npos);
 	setParameters(pdata);
 }
 
+
+//////////////////////////////
+//
+// HumdrumLine::setParameters -- Store global parameters in the first token
+//    of the line.  Also add a marker at ("","","global","true") to indicate
+//    that the parameters are global rather than local.  (Global text directions
+//    will behave differently from local text directions, for example).
+//
 
 void HumdrumLine::setParameters(const string& pdata) {
 	vector<string> pieces = Convert::splitString(pdata, ':');
@@ -16837,8 +17362,9 @@ void HumdrumLine::setParameters(const string& pdata) {
 			key   = pieces[i];
 			value = "true";
 		}
-		setValue(ns1, ns2, key, value);
+		token(0)->setValue(ns1, ns2, key, value);
 	}
+	token(0)->setValue("global", "true");
 }
 
 
@@ -16948,6 +17474,17 @@ void HumdrumLine::appendToken(int index, const string& token) {
 
 void HumdrumLine::appendToken(int index, const char* token) {
 	HumdrumLine::insertToken(index+1, token);
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::storeGlobalLinkedParameters --
+//
+
+void HumdrumLine::storeGlobalLinkedParameters(void) {
+	token(0)->storeLinkedParameters();
 }
 
 
@@ -17152,7 +17689,10 @@ HumdrumToken& HumdrumToken::operator=(const char* token) {
 //
 
 HumdrumToken::~HumdrumToken() {
-	// do nothing
+	if (m_linkedParameter) {
+		delete m_linkedParameter;
+		m_linkedParameter = NULL;
+	}
 }
 
 
@@ -18366,6 +18906,29 @@ bool HumdrumToken::isBarline(void) const {
 
 //////////////////////////////
 //
+// HumdrumToken::isCommentGlobal -- Returns true of the token starts with "!!".
+//    Currently confused with reference records.
+//
+
+bool HumdrumToken::isCommentGlobal(void) const {
+	if (size() == 0) {
+		return false;
+	}
+	if ((*this)[0] == '!') {
+		if (size() > 1) {
+			if ((*this)[1] == '!') {
+				// global comment
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumToken::isCommentLocal -- Returns true of the token start with "!",
 //   but not "!!" which is for global comments.
 //
@@ -18747,6 +19310,77 @@ string HumdrumToken::getText(void) const {
 
 //////////////////////////////
 //
+// HumdrumToken::addLinkedParamter --
+//
+
+int HumdrumToken::addLinkedParameter(HTp token) {
+	for (int i=0; i<(int)m_linkedParameters.size(); i++) {
+		if (m_linkedParameters[i] == token) {
+			return i;
+		}
+	}
+
+	m_linkedParameters.push_back(token);
+	return m_linkedParameters.size() - 1;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::linkedParameterIsGlobal --
+//
+
+bool HumdrumToken::linkedParameterIsGlobal(int index) {
+	return m_linkedParameters.at(index)->isCommentGlobal();
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getLinkedParameterCount --
+//
+
+int HumdrumToken::getLinkedParameterCount(void) {
+	return (int)m_linkedParameters.size();
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getLinkedParameter--
+//
+
+HumParamSet* HumdrumToken::getLinkedParameter(void) {
+	return m_linkedParameter;
+}
+
+
+HumParamSet* HumdrumToken::getLinkedParameter(int index) {
+	return m_linkedParameters.at(index)->getLinkedParameter();
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::storeLinkedParameters -- Store the contents of the token
+//    in the linked parameter storage.  Used for layout parameters.
+//
+
+void HumdrumToken::storeLinkedParameters(void) {
+	if (m_linkedParameter) {
+		delete m_linkedParameter;
+	}
+	m_linkedParameter = new HumParamSet(*((string*)this));
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumToken::makeForwardLink -- Line a following spine token to this one.
 //    Used by the HumdrumFileBase::analyzeLinks function.
 //
@@ -18947,6 +19581,7 @@ ostream& HumdrumToken::printCsv(ostream& out) {
 //
 
 ostream& HumdrumToken::printXml(ostream& out, int level, const string& indent) {
+
 	out << Convert::repeatString(indent, level);
 	out << "<field";
 	out << " n=\"" << getTokenIndex() << "\"";
@@ -18972,7 +19607,61 @@ ostream& HumdrumToken::printXml(ostream& out, int level, const string& indent) {
 
 	printXmlContentInfo(out, level+1, indent);
 	printXmlParameterInfo(out, level+1, indent);
+	printXmlLinkedParameterInfo(out, level+1, indent);
+	printXmlLinkedParameters(out, level+1, indent);
+
 	out << Convert::repeatString(indent, level) << "</field>\n";
+	return out;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::printXmlLinkedParameters --
+//
+
+ostream&	HumdrumToken::printXmlLinkedParameters(ostream& out, int level, const string& indent) {
+	if (m_linkedParameter) {
+		m_linkedParameter->printXml(out, level, indent);
+	}
+	return out;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::printXmlLinkedParameterInfo --
+//
+
+ostream& HumdrumToken::printXmlLinkedParameterInfo(ostream& out, int level, const string& indent) {
+	if (m_linkedParameters.empty()) {
+		return out;
+	}
+	
+	out << Convert::repeatString(indent, level);
+	out << "<parameters-linked>\n";
+
+	level++;
+	for (int i=0; i<(int)m_linkedParameters.size(); i++) {
+		out << Convert::repeatString(indent, level);
+		out << "<linked-parameter";
+		out << " idref=\"";
+		HumdrumLine* owner = m_linkedParameters[i]->getOwner();
+		if (owner && owner->isGlobalComment()) {
+			out << owner->getXmlId();
+		} else {
+			out << m_linkedParameters[i]->getXmlId();
+		}
+		out << "\"";
+		out << ">\n";
+	}
+	level--;
+
+	out << Convert::repeatString(indent, level);
+	out << "</parameters-linked>\n";
+
 	return out;
 }
 
@@ -19082,6 +19771,18 @@ ostream& HumdrumToken::printXmlContentInfo(ostream& out, int level,
 		out << "/>\n";
 		out << Convert::repeatString(indent, level) << "</slur>" << endl;
 	}
+	return out;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::printGlobalXmlParameterInfo --
+//
+
+ostream& HumdrumToken::printGlobalXmlParameterInfo(ostream& out, int level, const string& indent) {
+	((HumHash*)this)->printXmlAsGlobal(out, level, indent);
 	return out;
 }
 
@@ -22782,6 +23483,38 @@ int NoteCell::getMeterTop(void) {
 
 HumNum NoteCell::getMeterBottom(void) {
 	return m_meterbot;
+}
+
+
+
+//////////////////////////////
+//
+// NoteCell::getSgnDiatonicPitchClass --
+//
+
+double NoteCell::getSgnDiatonicPitchClass(void) {
+	if (m_b7 == GRIDREST) {
+		return GRIDREST;
+	} else if (m_b7 < 0) {
+		return -(double)(((int)-m_b7) % 7);
+	} else {
+		return (double)(((int)m_b7) % 7);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// NoteCell::getAbsDiatonicPitchClass --
+//
+
+double NoteCell::getAbsDiatonicPitchClass(void) {
+	if (m_b7 == GRIDREST) {
+		return GRIDREST;
+	} else {
+		return (double)(((int)fabs(m_b7)) % 7);
+	}
 }
 
 
@@ -28701,7 +29434,8 @@ int Tool_cint::onlyRests(vector<NoteNode>& data) {
 
 //////////////////////////////
 //
-// Tool_cint::hasAttack -- returns true if all NoteNodes are for rests
+// Tool_cint::hasAttack -- returns true if at least one NoteNode has
+//   has an attack.
 //
 
 int Tool_cint::hasAttack(vector<NoteNode>& data) {
@@ -29008,6 +29742,7 @@ Tool_dissonant::Tool_dissonant(void) {
 	define("b|base-40=b",         "print base-40 grid");
 	define("l|metric-levels=b",   "use metric levels in analysis");
 	define("k|kern=b",            "print kern pitch grid");
+	define("V|voice-functions=b", "do cadential-voice-function analysis");
 	define("v|voice-number=b",    "print voice number of dissonance");
 	define("f|self-number=b",     "print self voice number of dissonance");
 	define("debug=b",             "print grid cell information");
@@ -29108,9 +29843,11 @@ bool Tool_dissonant::run(HumdrumFile& infile) {
 	dissL2Q = false;
 
 	suppressQ = getBoolean("suppress");
+	voiceFuncsQ = getBoolean("voice-functions");
 
 	vector<vector<string> > results;
 	vector<vector<string> > results2;
+	vector<vector<string> > voiceFuncs;
 	vector<vector<NoteCell*> > attacks;
 	vector<vector<NoteCell*> > attacks2;
 
@@ -29151,6 +29888,31 @@ bool Tool_dissonant::run(HumdrumFile& infile) {
 			infile.createLinesFromTokens();
 			return true;
 		}
+	} else if (voiceFuncsQ) { // run cadnetial-voice-function analysis if requested
+		// TODO: make sure this count stuff works with the -V setting too.
+		// if (getBoolean("count")) {
+		// 	printCountAnalysis(voiceFuncs);
+		// 	return false;
+		// }
+		
+		voiceFuncs.resize(grid.getVoiceCount());
+		for (int i=0; i<(int)voiceFuncs.size(); i++) {
+			voiceFuncs[i].resize(infile.getLineCount());
+		}
+		for (int i=0; i<grid.getVoiceCount(); i++) {
+			findCadentialVoiceFunctions(results, grid, attacks[i], voiceFuncs, i);
+		}
+
+		string exinterp = getString("exinterp");
+		vector<HTp> kernspines = infile.getKernSpineStartList();
+		infile.appendDataSpine(voiceFuncs.back(), "", exinterp);
+		for (int i = (int)voiceFuncs.size()-1; i>0; i--) {
+			int track = kernspines[i]->getTrack();
+			infile.insertDataSpineBefore(track, voiceFuncs[i-1], "", exinterp);
+		}
+		printColorLegend(infile);
+		infile.createLinesFromTokens();
+		return true;
 	} else {
 		if (getBoolean("count")) {
 			printCountAnalysis(results);
@@ -29168,7 +29930,6 @@ bool Tool_dissonant::run(HumdrumFile& infile) {
 			return true;
 		}
 	}
-
 }
 
 
@@ -29699,7 +30460,7 @@ RECONSIDER:
 					results[vindex][lineindex] = m_labels[PASSING_DOWN];
 				} else if (intn == 1) { // lower neighbor
 					results[vindex][lineindex] = m_labels[NEIGHBOR_DOWN];
-				} else if (intn == 0) { // descending anticipation
+				} else if ((intn == 0) && (dur <= 2)) { // descending anticipation
 					results[vindex][lineindex] = m_labels[ANT_DOWN];
 				} else if (intn > 1) { // lower échappée
 					results[vindex][lineindex] = m_labels[ECHAPPEE_DOWN];
@@ -29713,7 +30474,7 @@ RECONSIDER:
 					results[vindex][lineindex] = m_labels[NEIGHBOR_UP];
 				} else if (intn < -1) { // upper échappée
 					results[vindex][lineindex] = m_labels[ECHAPPEE_UP];
-				} else if (intn == 0) { // rising anticipation
+				} else if ((intn == 0) && (dur <= 2)) { // rising anticipation
 					results[vindex][lineindex] = m_labels[ANT_UP];
 				} else if (intn > 1) { // ascending short nota cambiata
 					results[vindex][lineindex] = m_labels[CAMBIATA_UP_S];
@@ -30223,6 +30984,216 @@ void Tool_dissonant::findAppoggiaturas(vector<vector<string> >& results, NoteGri
 					results[vindex][lineindex] = m_labels[APP_LOWER];
 				}
 			}
+		}
+	}
+}
+
+
+
+
+//////////////////////////////
+//
+// Tool_dissonant::findCadentialVoiceFunctions -- identify the cadential-voice 
+//		functions present in each voice. These are the single-line constituents
+//		of Renaissance cadences. Five basic types are identified: Cantizans,
+//		Altizans, Tenorizans, Leaping Contratenor, and Bassizans. Since the
+//		cadential-voice functions are identified contrapuntally, a Cantizans or
+//		Altizans must be found set against any of the other three types for 
+//		anything to be detected. 
+//
+void Tool_dissonant::findCadentialVoiceFunctions(vector<vector<string> >& results, NoteGrid& grid,
+		vector<NoteCell*>& attacks, vector<vector<string> >& voiceFuncs, int vindex) {
+	// HumNum dur;        // duration of current note
+	// HumNum durn;	   // duration of next note
+	double int2;       // diatonic interval to next melodic note
+	// double int3;	   // diatonic interval from next melodic note to following note
+	double oint2;	   // diatonic interval to next melodic note in other voice
+	double oint3;	   // diatonic interval from next melodic note to following note
+	double oint4;	   // diatonic interval from third to fourth note in other voice
+	double oint5;	   // diatonic interval from third to fifth note in other voice
+	int lineindex;     // line in original Humdrum file that contains note
+	int lineindex2;	   // line in original Humdrum file that contains note one event later
+	int lineindex3;    // line in original Humdrum file that contains note two events later
+	// int lineindex4;    // line in original Humdrum file content that contains note three events later
+	int sliceindex;    // current timepoint in NoteGrid.
+	int attInd2;  	   // line index of ref voice's next attack
+	int attInd3;       // line index of ref voice's attack two events later
+	int oattInd2;      // line index of other voice's next attack
+	int oattInd3;      // line index of other voice's third attack
+	int oattInd4;      // line index of other voice's fourth attack
+	int oattInd5;      // line index of other voice's fifth attack
+	double pitch;      // current pitch in ref voice
+	double opitch;     // current pitch in other voice
+	double opitch2;	   // pitch of next note in other voice
+	double opitch3;	   // pitch of third note in other voice
+	double opitch4;	   // pitch of fourth note in other voice
+	double opitch5;	   // pitch of fifth note in other voice
+
+	for (int i=1; i<(int)attacks.size()-1; i++) {
+		// lineindexp = attacks[i-1]->getLineIndex();
+		lineindex  = attacks[i]->getLineIndex();
+		// lineindex3 = attacks[i+2]->getLineIndex();
+		// pass over if ref voice is not an agent
+		if ((results[vindex][lineindex] != m_labels[AGENT_BIN]) &&
+			(results[vindex][lineindex] != m_labels[AGENT_TERN])) {
+			continue;
+		}
+		// dur  = attacks[i]->getDuration();
+		// durn = attacks[i+1]->getDuration();
+		int2 = *attacks[i+1] - *attacks[i];
+		// int3 = *attacks[i+2] - *attacks[i+1];
+		sliceindex = attacks[i]->getSliceIndex();
+
+		for (int j=0; j<(int)grid.getVoiceCount(); j++) { // j is the voice index of the other voice
+			if (vindex == j) { // only compare different voices
+				continue;
+			}
+
+			// skip if other voice isn't a patient
+			if ((results[j][lineindex] != m_labels[SUS_BIN]) &&
+				(results[j][lineindex] != m_labels[SUS_TERN])) {
+				continue;
+			}
+
+			oattInd2 = -22;
+			oattInd3 = -22;
+			oattInd4 = -22;
+			oint2	 = -22;
+			oint3	 = -22;
+			oint4	 = -22;
+			oint5	 = -22;
+			pitch    = attacks[i]->getAbsDiatonicPitch();
+			opitch   = grid.cell(j, sliceindex)->getAbsDiatonicPitch();
+			lineindex2 = attacks[i+1]->getLineIndex();
+			attInd2  = attacks[i]->getNextAttackIndex();
+			// attInd3  = attacks[i+1]->getNextAttackIndex();
+			oattInd2 = grid.cell(j, sliceindex)->getNextAttackIndex();
+
+			if (oattInd2 > 0) {
+				opitch2 = grid.cell(j, oattInd2)->getAbsDiatonicPitch();
+				oint2 = opitch2 - opitch;
+				oattInd3 = grid.cell(j, oattInd2)->getNextAttackIndex();
+			} else { // all cadence types need at least 3 attacks in other voice
+				continue;
+			}
+			if (oattInd3 > 0) {
+				opitch3 = grid.cell(j, oattInd3)->getAbsDiatonicPitch();
+				oint3 = opitch3 - opitch2;
+				oattInd4 = grid.cell(j, oattInd3)->getNextAttackIndex();
+			} else { // all cadence types need at least 3 attacks in other voice
+				continue;
+			}
+			// NB since the ref voice is the one with the suspension, if the 
+			// suspension is in the higher voice (the most common case) then the
+			// harmonic intervals will actually be negative
+			int thisInt = opitch - pitch; // diatonic interval in this pair
+			int thisMod7 = thisInt % 7; // simplify octaves out of thisInt
+
+			// cerr << "lineindex: " << lineindex << endl;
+			// cerr << "sliceindex: " << sliceindex << endl;
+			// cerr << "pitch: " << pitch << endl;
+			// cerr << "opitch: " << opitch << endl;
+			// cerr << "int2: " << int2 << endl;
+			// cerr << "oint2: " << oint2 << endl;
+			// cerr << "oint3: " << oint3 << endl;
+			// cerr << "attInd2: " << attInd2 << endl;
+			// cerr << "oattInd2: " << oattInd2 << endl;
+			// cerr << "oattInd3: " << oattInd3 << endl;
+			// cerr << "thisInt: " << thisInt << endl;
+			// cerr << "thisMod7: " << thisMod7 << endl;
+
+			// agent voice has 2 attacks, patient has 3 notes
+			if (((thisMod7 == 6) || (thisMod7 == -1)) && (int2 == -1) && 
+				(attInd2 == oattInd3) && (oint2 == -1) && (oint3 == 1)) { // "^7xs 1 6sx -2 8xx$"
+				voiceFuncs[j][lineindex2] = "C"; // cantizans
+				voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
+			} else if ((thisMod7 == 3) && ((int2 == -4) || (int2 == 3)) && 
+				(attInd2 == oattInd3) && (oint2 == -1) && (oint3 == 1)) { // "^4xs 1 3sx -5 8xx$"
+				voiceFuncs[j][lineindex2] = "C"; // cantizans
+				voiceFuncs[vindex][lineindex2] = "B"; // bassizans
+			} else if ((thisMod7 == 3) && (int2 == 7) && (attInd2 == oattInd3) && 
+				(oint2 == -1) && (oint3 == 1)) { // "^11xs 1 10sx 8 4xx$"
+				voiceFuncs[j][lineindex2] = "C"; // cantizans
+				voiceFuncs[vindex][lineindex2] = "L"; // leaping contratenor
+			} else if ((thisMod7 == 3) && (int2 == -1) && (attInd2 == oattInd3) &&
+				(oint2 == -1) && (oint3 == 1)) { // "^4xs 1 3sx -2 5xx$"
+				voiceFuncs[j][lineindex2] = "A"; // altizans
+				voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
+			}
+			
+			// agent voice has 3 attacks, patient has 3 notes. In this block the
+			// perfection is anticipated in the agent.
+			if ((i + 3) < int(attacks.size())) {
+				attInd3  = attacks[i+1]->getNextAttackIndex();
+				lineindex3 = attacks[i+2]->getLineIndex();
+				if (((thisMod7 == 6) || (thisMod7 == -1)) && (int2 == -1) && 
+					(results[vindex][lineindex2] == m_labels[ANT_DOWN]) &&
+					(attInd3 == oattInd3) && (oint2 == -1) && (oint3 == 1)) {
+					voiceFuncs[j][lineindex3] = "C"; // cantizans
+					voiceFuncs[vindex][lineindex3] = "T"; // tenorizans
+				} else if ((thisMod7 == 3) && (int2 == -1) && (attInd3 == oattInd3) &&
+					(results[vindex][lineindex2] == m_labels[ANT_DOWN]) &&
+					(oint2 == -1) && (oint3 == 1)) { // "^4xs 1 3sx -2 5xx$"
+					voiceFuncs[j][lineindex3] = "A"; // altizans
+					voiceFuncs[vindex][lineindex3] = "T"; // tenorizans
+				}
+			}
+			
+			// agent voice has 2 attacks, patient has 4 notes
+			if (oattInd4 > 0) {
+				opitch4 = grid.cell(j, oattInd4)->getAbsDiatonicPitch();
+				oint4 = opitch4 - opitch3;
+				oattInd5 = grid.cell(j, oattInd4)->getNextAttackIndex();
+			} else { // the following cadence types need 4 attacks in other voice
+				continue;
+			}
+			if (((thisMod7 == 6) || (thisMod7 == -1)) && (int2 == -1) && 
+				(attInd2 == oattInd4) && (oint2 == -1) && (oint3 == -1) && 
+				(oint4 == 2)) { // under-third cadence
+				voiceFuncs[j][lineindex2] = "C"; // cantizans
+				voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
+			} else if ((thisMod7 == 3) && ((int2 == -4) || (int2 == 3)) && 
+				(attInd2 == oattInd4) && (oint2 == -1) && (oint3 == -1) && 
+				(oint4 == 2)) { // under-third cadence
+				voiceFuncs[j][lineindex2] = "C"; // cantizans
+				voiceFuncs[vindex][lineindex2] = "B"; // bassizans
+			} else if ((thisMod7 == 3) && (int2 == 7) && (attInd2 == oattInd4) && 
+				(oint2 == -1) && (oint3 == -1) && (oint4 == 2)) { // under-third cadence
+				voiceFuncs[j][lineindex2] = "C"; // cantizans
+				voiceFuncs[vindex][lineindex2] = "L"; // leaping contratenor
+			} else if ((thisMod7 == 3) && (int2 == -1) && (attInd2 == oattInd4) &&
+				(oint2 == -1) && (oint3 == -1) && (oint4 == 2)) { // under-third cadence
+				voiceFuncs[j][lineindex2] = "A"; // altizans
+				voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
+			}
+			
+			// agent voice has 2 attacks, patient has 5 notes
+			if (oattInd5 > 0) {
+				opitch5 = grid.cell(j, oattInd5)->getAbsDiatonicPitch();
+				oint5 = opitch5 - opitch4;
+			} else { // the following cadence types need 5 attacks in other voice
+				continue;
+			}
+			if (((thisMod7 == 6) || (thisMod7 == -1)) && (int2 == -1) && 
+				(attInd2 == oattInd5) && (oint2 == -1) && (oint3 == 0) && 
+				(oint4 == -1) && (oint5 == 2)) { // under-third cadence
+				voiceFuncs[j][lineindex2] = "C"; // cantizans
+				voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
+			} else if ((thisMod7 == 3) && ((int2 == -4) || (int2 == 3)) && 
+				(attInd2 == oattInd5) && (oint2 == -1) && (oint3 == 0) && 
+				(oint4 == -1) && (oint5 == 2)) { // under-third cadence
+				voiceFuncs[j][lineindex2] = "C"; // cantizans
+				voiceFuncs[vindex][lineindex2] = "B"; // bassizans
+			} else if ((thisMod7 == 3) && (int2 == 7) && (attInd2 == oattInd5) && 
+				(oint2 == -1) && (oint3 == 0) && (oint4 == -1) && (oint5 == 2)) { // under-third cadence
+				voiceFuncs[j][lineindex2] = "C"; // cantizans
+				voiceFuncs[vindex][lineindex2] = "L"; // leaping contratenor
+			} else if ((thisMod7 == 3) && (int2 == -1) && (attInd2 == oattInd5) &&
+				(oint2 == -1) && (oint3 == 0) && (oint4 == -1) && (oint5 == 2)) { // under-third cadence
+				voiceFuncs[j][lineindex2] = "A"; // altizans
+				voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
+			}
+
 		}
 	}
 }
@@ -34073,6 +35044,8 @@ bool Tool_filter::run(HumdrumFile& infile) {
 			RUNTOOL(extract, infile, commands[i].second, status);
 		} else if (commands[i].first == "metlev") {
 			RUNTOOL(metlev, infile, commands[i].second, status);
+		} else if (commands[i].first == "msearch") {
+			RUNTOOL(msearch, infile, commands[i].second, status);
 		} else if (commands[i].first == "satb2gs") {
 			RUNTOOL(satb2gs, infile, commands[i].second, status);
 		} else if (commands[i].first == "recip") {
@@ -34969,6 +35942,224 @@ void Tool_metlev::fillVoiceResults(vector<vector<double> >& results,
 		}
 	}
 }
+
+
+
+
+/////////////////////////////////
+//
+// Tool_msearch::Tool_msearch -- Set the recognized options for the tool.
+//
+
+Tool_msearch::Tool_msearch(void) {
+	define("debug=b",       "diatonic search");
+	define("q|query=s:c d e f g",  "query string");
+	define("x|cross=b",     "search across parts");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_msearch::run -- Do the main work of the tool.
+//
+
+bool Tool_msearch::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_msearch::run(HumdrumFile& infile, ostream& out) {
+	int status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_msearch::run(HumdrumFile& infile) {
+	NoteGrid grid(infile);
+
+	vector<MSearchQueryToken> query;
+	fillQuery(query, getString("query"));
+
+	if (getBoolean("debug")) {
+		grid.printGridInfo(cerr);
+		// return 1;
+	}
+
+	doAnalysis(infile, grid, query);
+
+	return 1;
+}
+
+
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::doAnalysis -- do a basic melodic analysis of all parts.
+//
+
+void Tool_msearch::doAnalysis(HumdrumFile& infile, NoteGrid& grid,
+		vector<MSearchQueryToken>& query) {
+
+	vector<vector<NoteCell*>> attacks;
+	attacks.resize(grid.getVoiceCount());
+	for (int i=0; i<grid.getVoiceCount(); i++) {
+		grid.getNoteAndRestAttacks(attacks[i], i);
+	}
+
+	vector<NoteCell*>  match;
+	int mcount = 0;
+	for (int i=0; i<(int)attacks.size(); i++) {
+		for (int j=0; j<(int)attacks[i].size(); j++) {
+			checkForMatchDiatonicPC(attacks[i], j, query, match);
+			if (!match.empty()) {
+				mcount++;
+				markMatch(infile, match);
+				// cerr << "FOUND MATCH AT " << i << ", " << j << endl;
+				// markNotes(attacks[i], j, (int)query.size());
+			}
+		}
+	}
+	
+	if (mcount) {
+		infile.appendLine("!!!RDF**kern: @ = marked note");
+		infile.createLinesFromTokens();
+	}
+}
+
+
+//////////////////////////////
+//
+// Tool_msearch::markMatch -- assumes monophonic music.
+//
+
+void Tool_msearch::markMatch(HumdrumFile& infile, vector<NoteCell*>& match) {
+	if (match.empty()) {
+		return;
+	}
+	HTp mstart = match[0]->getToken();
+	HTp mend = NULL;
+	if (match.back() != NULL) {
+		mend = match.back()->getToken();
+	}
+	HTp tok = mstart;
+	string text;
+	while (tok && (tok != mend)) {
+		if (!tok->isData()) {
+			return;
+		}
+		text = tok->getText();
+		text += '@';
+		tok->setText(text);
+		tok = tok->getNextNNDT();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::checkForMatchDiatonicPC --
+//
+
+bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index, 
+		vector<MSearchQueryToken>& dpcQuery, vector<NoteCell*>& match) {
+	match.clear();
+
+	int maxi = (int)notes.size() - index;
+	if ((int)dpcQuery.size() > maxi) {
+		return false;
+	}
+	int interval;
+	for (int i=0; i<(int)dpcQuery.size(); i++) {
+		if (notes[index + i]->getAbsDiatonicPitchClass() != dpcQuery[i].pc) {
+			match.clear();
+			return false;
+		} else {
+			if ((index + i>0) && dpcQuery[i].direction) {
+				interval = notes[index + i]->getAbsBase40Pitch() -
+						notes[index + i - 1]->getAbsBase40Pitch();
+				if ((dpcQuery[i].direction > 0) && (interval <= 0)) {
+					match.clear();
+					return false;
+				}
+				if ((dpcQuery[i].direction < 0) && (interval >= 0)) {
+					match.clear();
+					return false;
+				}
+			}
+			match.push_back(notes[index+i]);
+		}
+	}
+
+	// Add extra token for marking tied notes at end of match
+	if (index + (int)dpcQuery.size() < (int)notes.size()) {
+		match.push_back(notes[index + (int)dpcQuery.size()]);
+	} else {
+		match.push_back(NULL);
+	}
+
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::fillQuery -- 
+//
+
+void Tool_msearch::fillQuery(vector<MSearchQueryToken>& query, const string& input) {
+	query.clear();
+	char ch;
+
+	MSearchQueryToken temp;
+
+	for (int i=0; i<(int)input.size(); i++) {
+		ch = tolower(input[i]);
+
+		if (ch == '^') {
+			temp.direction = 1;
+			continue;
+		}
+		if (ch == 'v') {
+			temp.direction = -1;
+			continue;
+		}
+
+		if ((ch >= 'a' && ch <= 'g')) {
+			temp.base = 7;
+			temp.pc = (ch - 'a' + 5) % 7;
+			query.push_back(temp);
+			temp.clear();
+			continue;
+		} else if (ch == 'r') {
+			temp.base = 7;
+			temp.pc = GRIDREST;
+			query.push_back(temp);
+			temp.clear();
+			continue;
+		}
+
+		// deal with accidentals here
+		// deal with duration here
+	}
+}
+
 
 
 
