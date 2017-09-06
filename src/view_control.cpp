@@ -1461,6 +1461,15 @@ void View::DrawTrillExtension(
     if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
         x1 += m_doc->GetGlyphWidth(SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false);
     }
+    
+    // Adjust the x2 for extensions with @endid
+    if ((spanningType == SPANNING_END) || (spanningType == SPANNING_START_END)) {
+        LayerElement *end = trill->GetEnd();
+        assert(end);
+        if (!end->Is(TIMESTAMP_ATTR)) {
+            x2 = end->GetContentLeft() - m_doc->GetGlyphWidth(SMUFL_E59D_ornamentZigZagLineNoRightEnd, staff->m_drawingStaffSize, false) / 2;
+        }
+    }
 
     int length = x2 - x1;
     Point orig(x1, y);
