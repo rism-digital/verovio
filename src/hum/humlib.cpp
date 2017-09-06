@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Aug 29 00:27:40 PDT 2017
+// Last Modified: Tue Sep  5 16:30:05 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -23519,6 +23519,38 @@ double NoteCell::getAbsDiatonicPitchClass(void) {
 
 
 
+//////////////////////////////
+//
+// NoteCell::getSgnBase40PitchClass --
+//
+
+double NoteCell::getSgnBase40PitchClass(void) {
+	if (Convert::isNaN(m_b40)) {
+		return GRIDREST;
+	} else if (m_b40 < 0) {
+		return -(double)(((int)-m_b40) % 40);
+	} else {
+		return (double)(((int)m_b40) % 40);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// NoteCell::getAbsBase40PitchClass --
+//
+
+double NoteCell::getAbsBase40PitchClass(void) {
+	if (Convert::isNaN(m_b40)) {
+		return GRIDREST;
+	} else {
+		return (double)(((int)fabs(m_b40)) % 40);
+	}
+}
+
+
+
 
 //////////////////////////////
 //
@@ -29889,11 +29921,10 @@ bool Tool_dissonant::run(HumdrumFile& infile) {
 			return true;
 		}
 	} else if (voiceFuncsQ) { // run cadnetial-voice-function analysis if requested
-		// TODO: make sure this count stuff works with the -V setting too.
-		// if (getBoolean("count")) {
-		// 	printCountAnalysis(voiceFuncs);
-		// 	return false;
-		// }
+		if (getBoolean("count")) {
+			printCountAnalysis(voiceFuncs);
+			return false;
+		}
 		
 		voiceFuncs.resize(grid.getVoiceCount());
 		for (int i=0; i<(int)voiceFuncs.size(); i++) {
@@ -30610,9 +30641,12 @@ RECONSIDER:
 
 		// If the note was labeled as an unknown dissonance, then go back and check
 		// against another note with which it might have a known dissonant function.
+		// Also go back if this voice was identified as an agent, because it may be
+		// the agent of multiple patients.
 		if ((results[vindex][lineindex] == m_labels[UNLABELED_Z4]) || 
 				(results[vindex][lineindex] == m_labels[UNLABELED_Z7]) ||
-				(results[vindex][lineindex] == m_labels[UNLABELED_Z7])) {
+				(results[vindex][lineindex] == m_labels[AGENT_BIN]) ||
+				(results[vindex][lineindex] == m_labels[AGENT_TERN])) {
 			if (nextj < (int)harmint.size()) {
 				goto RECONSIDER;
 			}
@@ -31003,10 +31037,9 @@ void Tool_dissonant::findAppoggiaturas(vector<vector<string> >& results, NoteGri
 //
 void Tool_dissonant::findCadentialVoiceFunctions(vector<vector<string> >& results, NoteGrid& grid,
 		vector<NoteCell*>& attacks, vector<vector<string> >& voiceFuncs, int vindex) {
-	// HumNum dur;        // duration of current note
-	// HumNum durn;	   // duration of next note
 	double int2;       // diatonic interval to next melodic note
-	// double int3;	   // diatonic interval from next melodic note to following note
+	double int3;	   // diatonic interval from next melodic note to following note
+	double int4;	   // diatonic interval from note three to note four
 	double oint2;	   // diatonic interval to next melodic note in other voice
 	double oint3;	   // diatonic interval from next melodic note to following note
 	double oint4;	   // diatonic interval from third to fourth note in other voice
@@ -31014,10 +31047,11 @@ void Tool_dissonant::findCadentialVoiceFunctions(vector<vector<string> >& result
 	int lineindex;     // line in original Humdrum file that contains note
 	int lineindex2;	   // line in original Humdrum file that contains note one event later
 	int lineindex3;    // line in original Humdrum file that contains note two events later
-	// int lineindex4;    // line in original Humdrum file content that contains note three events later
+	int lineindex4;    // line in original Humdrum file content that contains note three events later
 	int sliceindex;    // current timepoint in NoteGrid.
 	int attInd2;  	   // line index of ref voice's next attack
 	int attInd3;       // line index of ref voice's attack two events later
+	int attInd4;       // line index of ref voice's attack three events later
 	int oattInd2;      // line index of other voice's next attack
 	int oattInd3;      // line index of other voice's third attack
 	int oattInd4;      // line index of other voice's fourth attack
@@ -31030,18 +31064,13 @@ void Tool_dissonant::findCadentialVoiceFunctions(vector<vector<string> >& result
 	double opitch5;	   // pitch of fifth note in other voice
 
 	for (int i=1; i<(int)attacks.size()-1; i++) {
-		// lineindexp = attacks[i-1]->getLineIndex();
 		lineindex  = attacks[i]->getLineIndex();
-		// lineindex3 = attacks[i+2]->getLineIndex();
 		// pass over if ref voice is not an agent
 		if ((results[vindex][lineindex] != m_labels[AGENT_BIN]) &&
 			(results[vindex][lineindex] != m_labels[AGENT_TERN])) {
 			continue;
 		}
-		// dur  = attacks[i]->getDuration();
-		// durn = attacks[i+1]->getDuration();
 		int2 = *attacks[i+1] - *attacks[i];
-		// int3 = *attacks[i+2] - *attacks[i+1];
 		sliceindex = attacks[i]->getSliceIndex();
 
 		for (int j=0; j<(int)grid.getVoiceCount(); j++) { // j is the voice index of the other voice
@@ -31066,7 +31095,6 @@ void Tool_dissonant::findCadentialVoiceFunctions(vector<vector<string> >& result
 			opitch   = grid.cell(j, sliceindex)->getAbsDiatonicPitch();
 			lineindex2 = attacks[i+1]->getLineIndex();
 			attInd2  = attacks[i]->getNextAttackIndex();
-			// attInd3  = attacks[i+1]->getNextAttackIndex();
 			oattInd2 = grid.cell(j, sliceindex)->getNextAttackIndex();
 
 			if (oattInd2 > 0) {
@@ -31083,34 +31111,27 @@ void Tool_dissonant::findCadentialVoiceFunctions(vector<vector<string> >& result
 			} else { // all cadence types need at least 3 attacks in other voice
 				continue;
 			}
-			// NB since the ref voice is the one with the suspension, if the 
-			// suspension is in the higher voice (the most common case) then the
-			// harmonic intervals will actually be negative
 			int thisInt = opitch - pitch; // diatonic interval in this pair
 			int thisMod7 = thisInt % 7; // simplify octaves out of thisInt
 
-			// cerr << "lineindex: " << lineindex << endl;
-			// cerr << "sliceindex: " << sliceindex << endl;
-			// cerr << "pitch: " << pitch << endl;
-			// cerr << "opitch: " << opitch << endl;
-			// cerr << "int2: " << int2 << endl;
-			// cerr << "oint2: " << oint2 << endl;
-			// cerr << "oint3: " << oint3 << endl;
-			// cerr << "attInd2: " << attInd2 << endl;
-			// cerr << "oattInd2: " << oattInd2 << endl;
-			// cerr << "oattInd3: " << oattInd3 << endl;
-			// cerr << "thisInt: " << thisInt << endl;
-			// cerr << "thisMod7: " << thisMod7 << endl;
-
 			// agent voice has 2 attacks, patient has 3 notes
-			if (((thisMod7 == 6) || (thisMod7 == -1)) && (int2 == -1) && 
-				(attInd2 == oattInd3) && (oint2 == -1) && (oint3 == 1)) { // "^7xs 1 6sx -2 8xx$"
-				voiceFuncs[j][lineindex2] = "C"; // cantizans
-				voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
+			if (((thisMod7 == 6) || (thisMod7 == -1)) && (attInd2 == oattInd3) && 
+				(oint2 == -1) && (oint3 == 1)) {
+				if (int2 == -1) { // "^7xs 1 6sx -2 8xx$"
+					voiceFuncs[j][lineindex2] = "C"; // cantizans
+					voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
+				} else if (int2 == 1) { // "^7xs 1 6sx 2 6xx$"
+					voiceFuncs[j][lineindex2] = "C"; // cantizans
+					voiceFuncs[vindex][lineindex2] = "t"; // evaded tenorizans
+				}
 			} else if ((thisMod7 == 3) && ((int2 == -4) || (int2 == 3)) && 
 				(attInd2 == oattInd3) && (oint2 == -1) && (oint3 == 1)) { // "^4xs 1 3sx -5 8xx$"
 				voiceFuncs[j][lineindex2] = "C"; // cantizans
 				voiceFuncs[vindex][lineindex2] = "B"; // bassizans
+			} else if ((thisMod7 == 3) && (int2 == 1) && (attInd2 == oattInd3) && 
+				(oint2 == -1) && (oint3 == 1)) { // "^4xs 1 3sx 2 3xx$"
+				voiceFuncs[j][lineindex2] = "C"; // cantizans
+				voiceFuncs[vindex][lineindex2] = "b"; // evaded bassizans
 			} else if ((thisMod7 == 3) && (int2 == 7) && (attInd2 == oattInd3) && 
 				(oint2 == -1) && (oint3 == 1)) { // "^11xs 1 10sx 8 4xx$"
 				voiceFuncs[j][lineindex2] = "C"; // cantizans
@@ -31121,9 +31142,9 @@ void Tool_dissonant::findCadentialVoiceFunctions(vector<vector<string> >& result
 				voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
 			}
 			
-			// agent voice has 3 attacks, patient has 3 notes. In this block the
-			// perfection is anticipated in the agent.
+			// agent voice has 3 attacks, patient has 3 notes
 			if ((i + 3) < int(attacks.size())) {
+				int3 = *attacks[i+2] - *attacks[i+1];
 				attInd3  = attacks[i+1]->getNextAttackIndex();
 				lineindex3 = attacks[i+2]->getLineIndex();
 				if (((thisMod7 == 6) || (thisMod7 == -1)) && (int2 == -1) && 
@@ -31136,6 +31157,28 @@ void Tool_dissonant::findCadentialVoiceFunctions(vector<vector<string> >& result
 					(oint2 == -1) && (oint3 == 1)) { // "^4xs 1 3sx -2 5xx$"
 					voiceFuncs[j][lineindex3] = "A"; // altizans
 					voiceFuncs[vindex][lineindex3] = "T"; // tenorizans
+				} else if ((thisMod7 == 3) && (int2 == 2) && (int3 == -1) &&
+					(attInd3 == oattInd3) && (oint2 == -1) && (oint3 == 1)) {
+					voiceFuncs[j][lineindex3] = "C"; // cantizans
+					voiceFuncs[vindex][lineindex3] = "b"; // evaded bassizans
+				}
+			}
+
+			// agent voice has 4 attacks, patient has 3 notes
+			if ((i + 4) < int(attacks.size())) {
+				int4 = *attacks[i+3] - *attacks[i+2];
+				attInd4  = attacks[i+2]->getNextAttackIndex();
+				lineindex4 = attacks[i+3]->getLineIndex();
+				if ((int2 == -1) && (int3 == 1) && (int4 == 1) && 
+					(attInd4 == oattInd3) && (oint2 == -1) && (oint3 == 1) && 
+					(attInd2 > oattInd2)) {
+					if (thisMod7 == 3) { // ex. Obr1001a m. 85
+						voiceFuncs[j][lineindex4] = "C"; // cantizans
+						voiceFuncs[vindex][lineindex4] = "b"; // ornamented evaded bassizans
+					} else if ((thisMod7 == 6) || (thisMod7 == -1)) { // ex. Obr1001b m. 36
+						voiceFuncs[j][lineindex4] = "C"; // cantizans
+						voiceFuncs[vindex][lineindex4] = "t"; // ornamented evaded tenorizans
+					} 
 				}
 			}
 			
@@ -31147,11 +31190,15 @@ void Tool_dissonant::findCadentialVoiceFunctions(vector<vector<string> >& result
 			} else { // the following cadence types need 4 attacks in other voice
 				continue;
 			}
-			if (((thisMod7 == 6) || (thisMod7 == -1)) && (int2 == -1) && 
-				(attInd2 == oattInd4) && (oint2 == -1) && (oint3 == -1) && 
-				(oint4 == 2)) { // under-third cadence
-				voiceFuncs[j][lineindex2] = "C"; // cantizans
-				voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
+			if (((thisMod7 == 6) || (thisMod7 == -1)) && (attInd2 == oattInd4) && 
+				(oint2 == -1) && (oint3 == -1) && (oint4 == 2)) {
+				if (int2 == -1) {
+					voiceFuncs[j][lineindex2] = "C"; // cantizans
+					voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
+				} else if (int2 == 1) {
+					voiceFuncs[j][lineindex2] = "C"; // cantizans
+					voiceFuncs[vindex][lineindex2] = "t"; // evaded tenorizans
+				}
 			} else if ((thisMod7 == 3) && ((int2 == -4) || (int2 == 3)) && 
 				(attInd2 == oattInd4) && (oint2 == -1) && (oint3 == -1) && 
 				(oint4 == 2)) { // under-third cadence
@@ -31174,26 +31221,45 @@ void Tool_dissonant::findCadentialVoiceFunctions(vector<vector<string> >& result
 			} else { // the following cadence types need 5 attacks in other voice
 				continue;
 			}
-			if (((thisMod7 == 6) || (thisMod7 == -1)) && (int2 == -1) && 
-				(attInd2 == oattInd5) && (oint2 == -1) && (oint3 == 0) && 
-				(oint4 == -1) && (oint5 == 2)) { // under-third cadence
-				voiceFuncs[j][lineindex2] = "C"; // cantizans
-				voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
-			} else if ((thisMod7 == 3) && ((int2 == -4) || (int2 == 3)) && 
-				(attInd2 == oattInd5) && (oint2 == -1) && (oint3 == 0) && 
-				(oint4 == -1) && (oint5 == 2)) { // under-third cadence
-				voiceFuncs[j][lineindex2] = "C"; // cantizans
-				voiceFuncs[vindex][lineindex2] = "B"; // bassizans
+			if (((thisMod7 == 6) || (thisMod7 == -1)) && (attInd2 == oattInd5) && 
+				(oint2 == -1) && (oint3 == 0) && (oint4 == -1) && (oint5 == 2)) {
+				if (int2 == -1) {
+					voiceFuncs[j][lineindex2] = "C"; // cantizans
+					voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
+				} else if (int2 == 1) {
+					voiceFuncs[j][lineindex2] = "C"; // cantizans
+					voiceFuncs[vindex][lineindex2] = "t"; // evaded tenorizans
+				}
+			} else if (((thisMod7 == 6) || (thisMod7 == -1)) && (attInd2 == oattInd5) && 
+				(oint2 == -1) && (oint3 == -1) && (oint4 == 1) && (oint5 == 1)) {
+				if (int2 == -1) {
+					voiceFuncs[j][lineindex2] = "C"; // cantizans
+					voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
+				} else if (int2 == 1) {
+					voiceFuncs[j][lineindex2] = "C"; // cantizans
+					voiceFuncs[vindex][lineindex2] = "t"; // evaded tenorizans
+				}
+			} else if ((thisMod7 == 3) && (attInd2 == oattInd5) && (oint2 == -1) && 
+				(((oint3 == 0) && (oint4 == -1) && (oint5 == 2)) || // under-third cadence
+				 ((oint3 == -1) && (oint4 == 1) && (oint5 == 1)))) { // anticipated resolution phase
+				if ((int2 == -4) || (int2 == 3)) {
+					voiceFuncs[j][lineindex2] = "C"; // cantizans
+					voiceFuncs[vindex][lineindex2] = "B"; // bassizans
+				} else if (int2 == 1) {
+					voiceFuncs[j][lineindex2] = "C"; // cantizans
+					voiceFuncs[vindex][lineindex2] = "b"; // evaded bassizans
+				}
 			} else if ((thisMod7 == 3) && (int2 == 7) && (attInd2 == oattInd5) && 
 				(oint2 == -1) && (oint3 == 0) && (oint4 == -1) && (oint5 == 2)) { // under-third cadence
 				voiceFuncs[j][lineindex2] = "C"; // cantizans
 				voiceFuncs[vindex][lineindex2] = "L"; // leaping contratenor
-			} else if ((thisMod7 == 3) && (int2 == -1) && (attInd2 == oattInd5) &&
-				(oint2 == -1) && (oint3 == 0) && (oint4 == -1) && (oint5 == 2)) { // under-third cadence
+			} else if ((thisMod7 == 3) && (int2 == -1) &&
+				(attInd2 == oattInd5) && (oint2 == -1) &&
+				(((oint3 == 0) && (oint4 == -1) && (oint5 == 2)) || // under-third cadence
+				 ((oint3 == -1) && (oint4 == 1) && (oint5 == 1)))) { // anticipated resolution phase
 				voiceFuncs[j][lineindex2] = "A"; // altizans
 				voiceFuncs[vindex][lineindex2] = "T"; // tenorizans
 			}
-
 		}
 	}
 }
@@ -35954,6 +36020,7 @@ void Tool_metlev::fillVoiceResults(vector<vector<double> >& results,
 Tool_msearch::Tool_msearch(void) {
 	define("debug=b",       "diatonic search");
 	define("q|query=s:c d e f g",  "query string");
+	define("t|text=s:",  "lyrical text query string");
 	define("x|cross=b",     "search across parts");
 }
 
@@ -35989,16 +36056,24 @@ bool Tool_msearch::run(HumdrumFile& infile, ostream& out) {
 
 bool Tool_msearch::run(HumdrumFile& infile) {
 	NoteGrid grid(infile);
-
-	vector<MSearchQueryToken> query;
-	fillQuery(query, getString("query"));
-
 	if (getBoolean("debug")) {
 		grid.printGridInfo(cerr);
 		// return 1;
 	}
 
-	doAnalysis(infile, grid, query);
+	if (getBoolean("text")) {
+		m_text = getString("text");
+	}
+
+	if (m_text.empty()) {
+		vector<MSearchQueryToken> query;
+		fillMusicQuery(query, getString("query"));
+		doMusicSearch(infile, grid, query);
+	} else {
+		vector<MSearchTextQuery> query;
+		fillTextQuery(query, getString("text"));
+		doTextSearch(infile, grid, query);
+	}
 
 	return 1;
 }
@@ -36007,10 +36082,107 @@ bool Tool_msearch::run(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// Tool_msearch::doAnalysis -- do a basic melodic analysis of all parts.
+// Tool_msearch::fillWords --
 //
 
-void Tool_msearch::doAnalysis(HumdrumFile& infile, NoteGrid& grid,
+void Tool_msearch::fillWords(HumdrumFile& infile, vector<TextInfo*>& words) {
+	vector<HTp> textspines;
+	infile.getSpineStartList(textspines, "**text");
+	for (int i=0; i<(int)textspines.size(); i++) {
+		fillWordsForTrack(words, textspines[i]);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::fillWordsForTrack --
+//
+
+void Tool_msearch::fillWordsForTrack(vector<TextInfo*>& words,
+		HTp starttoken) {
+	HTp tok = starttoken->getNextNNDT();
+	while (tok != NULL) {
+		if (tok->empty()) {
+			tok = tok->getNextNNDT();
+			continue;
+		}
+		if (tok->at(0) == '-') {
+			// append a syllable to the end of previous word
+			if (!words.empty()) {
+				words.back()->fullword += tok->substr(1, string::npos);
+				if (words.back()->fullword.back() == '-') {
+					words.back()->fullword.pop_back();
+				}
+			}
+			tok = tok->getNextNNDT();
+			continue;
+		} else {
+			// start a new word
+			TextInfo* temp = new TextInfo();
+			temp->nexttoken = NULL;
+			if (!words.empty()) {
+				words.back()->nexttoken = tok;
+			}
+			temp->fullword = *tok;
+			if (!temp->fullword.empty()) {
+				if (temp->fullword.back() == '-') {
+					temp->fullword.pop_back();
+				}
+			}
+			temp->starttoken = tok;
+			words.push_back(temp);
+			tok = tok->getNextNNDT();
+			continue;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::doTextSearch -- do a basic text search of all parts.
+//
+
+void Tool_msearch::doTextSearch(HumdrumFile& infile, NoteGrid& grid,
+		vector<MSearchTextQuery>& query) {
+
+	vector<TextInfo*> words;
+	words.reserve(10000);
+	fillWords(infile, words);
+	int tcount = 0;
+
+	HumRegex hre;
+	for (int i=0; i<(int)query.size(); i++) {
+		for (int j=0; j<(int)words.size(); j++) {
+			if (hre.search(words[j]->fullword, query[i].word, "i")) {
+				tcount++;
+				markTextMatch(infile, *words[j]);
+			}
+		}
+	}
+
+	if (tcount) {
+		infile.appendLine("!!!RDF**kern: @ = marked note");
+		infile.createLinesFromTokens();
+	}
+
+	for (int i=0; i<(int)words.size(); i++) {
+		delete words[i];
+		words[i] = NULL;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::doMusicSearch -- do a basic melodic search of all parts.
+//
+
+void Tool_msearch::doMusicSearch(HumdrumFile& infile, NoteGrid& grid,
 		vector<MSearchQueryToken>& query) {
 
 	vector<vector<NoteCell*>> attacks;
@@ -36038,6 +36210,7 @@ void Tool_msearch::doAnalysis(HumdrumFile& infile, NoteGrid& grid,
 		infile.createLinesFromTokens();
 	}
 }
+
 
 
 //////////////////////////////
@@ -36071,6 +36244,53 @@ void Tool_msearch::markMatch(HumdrumFile& infile, vector<NoteCell*>& match) {
 
 //////////////////////////////
 //
+// Tool_msearch::markTextMatch -- assumes monophonic music.
+//
+
+void Tool_msearch::markTextMatch(HumdrumFile& infile, TextInfo& word) {
+// ggg
+	HTp mstart = word.starttoken;
+	while (mstart && !mstart->isKern()) {
+		mstart = mstart->getPreviousFieldToken();
+	}
+	HTp mend = word.nexttoken;
+	while (mend && !mend->isKern()) {
+		mend = mend->getPreviousFieldToken();
+	}
+
+	if (mstart) {
+		if (!mstart->isData()) {
+			return;
+		} else if (mstart->isNull()) {
+			return;
+		}
+	}
+
+	if (mend) {
+		if (!mend->isData()) {
+			mend = NULL;
+		} else if (mend->isNull()) {
+			mend = NULL;
+		}
+	}
+
+	HTp tok = mstart;
+	string text;
+	while (tok && (tok != mend)) {
+		if (!tok->isData()) {
+			return;
+		}
+		text = tok->getText();
+		text += '@';
+		tok->setText(text);
+		tok = tok->getNextNNDT();
+	}
+}
+
+
+
+//////////////////////////////
+//
 // Tool_msearch::checkForMatchDiatonicPC --
 //
 
@@ -36082,14 +36302,85 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 	if ((int)dpcQuery.size() > maxi) {
 		return false;
 	}
+	bool lastIsInterval = false;
 	int interval;
+	bool rhymatch;
+	int c = 0;
 	for (int i=0; i<(int)dpcQuery.size(); i++) {
-		if ((Convert::isNaN(notes[index+i]->getAbsDiatonicPitchClass()) &&
+		if (dpcQuery[i].anything) {
+			match.push_back(notes[index+i-c]);
+			continue;
+		}
+		rhymatch = true;
+		if ((!dpcQuery[i].rhythm.empty()) 
+				&& (notes[index+i-c]->getDuration() != dpcQuery[i].duration)) {
+			// duration needs to match query, but does not
+			rhymatch = false;
+		}
+		
+		// check for gross-contour queries:
+		if (dpcQuery[i].base <= 0) {
+			lastIsInterval = true;
+			// Search by gross contour
+			if ((dpcQuery[i].direction == 1) && (notes[index+i-c]->getAbsMidiPitch() >
+					notes[index+i-1-c]->getAbsMidiPitch())) {
+				match.push_back(notes[index+i-c]);
+				continue;
+			} else if ((dpcQuery[i].direction == -1) && (notes[index+i-c]->getAbsMidiPitch() <
+					notes[index+i-1-c]->getAbsMidiPitch())) {
+				match.push_back(notes[index+i-c]);
+				continue;
+			} else if ((dpcQuery[i].direction == 0) && (notes[index+i-c]->getAbsMidiPitch() ==
+					notes[index+i-1-c]->getAbsMidiPitch())) {
+				match.push_back(notes[index+i-c]);
+				continue;
+			} else {
+				match.clear();
+				return false;
+			}
+		}
+
+		// Interface between interval moving to pitch:
+		if (lastIsInterval) {
+			c++;
+			match.pop_back();
+			lastIsInterval = false;
+		}
+
+		// Search by pitch/rest
+		if (dpcQuery[i].base == 40) {
+			if ((Convert::isNaN(notes[index+i-c]->getAbsBase40PitchClass()) &&
+					Convert::isNaN(dpcQuery[i].pc)) ||
+					(notes[index+i-c]->getAbsBase40PitchClass() == dpcQuery[i].pc)) {
+				if ((index+i-c>0) && dpcQuery[i].direction) {
+					interval = notes[index+i-c]->getAbsBase40Pitch() -
+							notes[index+i-1-c]->getAbsBase40Pitch();
+					if ((dpcQuery[i].direction > 0) && (interval <= 0)) {
+						match.clear();
+						return false;
+					}
+					if ((dpcQuery[i].direction < 0) && (interval >= 0)) {
+						match.clear();
+						return false;
+					}
+				}
+				if (rhymatch) {
+					match.push_back(notes[index+i-c]);
+				} else {
+					match.clear();
+					return false;
+				}
+			} else {
+				// not a match
+				match.clear();
+				return false;
+			}
+		} else if ((Convert::isNaN(notes[index+i-c]->getAbsDiatonicPitchClass()) &&
 				Convert::isNaN(dpcQuery[i].pc)) ||
-				(notes[index + i]->getAbsDiatonicPitchClass() == dpcQuery[i].pc)) {
-			if ((index + i>0) && dpcQuery[i].direction) {
-				interval = notes[index + i]->getAbsBase40Pitch() -
-						notes[index + i - 1]->getAbsBase40Pitch();
+				(notes[index+i-c]->getAbsDiatonicPitchClass() == dpcQuery[i].pc)) {
+			if ((index+i-c>0) && dpcQuery[i].direction) {
+				interval = notes[index+i-c]->getAbsBase40Pitch() -
+						notes[index+i-1-c]->getAbsBase40Pitch();
 				if ((dpcQuery[i].direction > 0) && (interval <= 0)) {
 					match.clear();
 					return false;
@@ -36099,7 +36390,13 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 					return false;
 				}
 			}
-			match.push_back(notes[index+i]);
+			if (rhymatch) {
+				match.push_back(notes[index+i-c]);
+			} else {
+				match.clear();
+				return false;
+			}
+
 		} else {
 			// not a match
 			match.clear();
@@ -36109,7 +36406,7 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 
 	// Add extra token for marking tied notes at end of match
 	if (index + (int)dpcQuery.size() < (int)notes.size()) {
-		match.push_back(notes[index + (int)dpcQuery.size()]);
+		match.push_back(notes[index + (int)dpcQuery.size() - c]);
 	} else {
 		match.push_back(NULL);
 	}
@@ -36121,10 +36418,41 @@ bool Tool_msearch::checkForMatchDiatonicPC(vector<NoteCell*>& notes, int index,
 
 //////////////////////////////
 //
-// Tool_msearch::fillQuery -- 
+// Tool_msearch::fillTextQuery -- 
 //
 
-void Tool_msearch::fillQuery(vector<MSearchQueryToken>& query, const string& input) {
+void Tool_msearch::fillTextQuery(vector<MSearchTextQuery>& query,
+		const string& input) {
+	query.clear();
+	bool inquote = false;
+
+	query.resize(1);
+
+	for (int i=0; i<(int)input.size(); i++) {
+		if (input[i] == '"') {
+			inquote = !inquote;
+			query.resize(query.size() + 1);
+			continue;
+		}
+		if (isspace(input[i])) {
+			query.resize(query.size() + 1);
+		}
+		query.back().word.push_back(input[i]);
+		if (inquote) {
+			query.back().link = true;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_msearch::fillMusicQuery -- 
+//
+
+void Tool_msearch::fillMusicQuery(vector<MSearchQueryToken>& query,
+		const string& input) {
 	query.clear();
 	char ch;
 
@@ -36142,6 +36470,37 @@ void Tool_msearch::fillQuery(vector<MSearchQueryToken>& query, const string& inp
 			continue;
 		}
 
+		if (isdigit(ch)) {
+			temp.rhythm += ch;
+		}
+
+		if (ch == '.') {
+			temp.rhythm += ch;
+		}
+
+		if (ch == '/') {
+			temp.direction = 1;
+			temp.base = -1;
+			temp.pc = -1;
+			query.push_back(temp);
+			temp.clear();
+			continue;
+		} else if (ch == '\\') {
+			temp.direction = -1;
+			temp.base = -1;
+			temp.pc = -1;
+			query.push_back(temp);
+			temp.clear();
+			continue;
+		} else if (ch == '=') {
+			temp.direction = 0;
+			temp.base = -1;
+			temp.pc = -1;
+			query.push_back(temp);
+			temp.clear();
+			continue;
+		}
+
 		if ((ch >= 'a' && ch <= 'g')) {
 			temp.base = 7;
 			temp.pc = (ch - 'a' + 5) % 7;
@@ -36156,11 +36515,36 @@ void Tool_msearch::fillQuery(vector<MSearchQueryToken>& query, const string& inp
 			continue;
 		}
 
-		// deal with accidentals here
-		// deal with duration here
+		// accidentals:
+		if ((!query.empty()) && (ch == 'n') && (!Convert::isNaN(query.back().pc))) {
+			query.back().base = 40;
+			query.back().pc = Convert::base7ToBase40(query.back().pc + 70) % 40;
+		} else if ((!query.empty()) && (ch == '#') && (!Convert::isNaN(query.back().pc))) {
+			query.back().base = 40;
+			query.back().pc = (Convert::base7ToBase40(query.back().pc + 70) + 1) % 40;
+		} else if ((!query.empty()) && (ch == '-') && (!Convert::isNaN(query.back().pc))) {
+			query.back().base = 40;
+			query.back().pc = (Convert::base7ToBase40(query.back().pc + 70) - 1) % 40;
+		}
+		// deal with double sharps and double flats here
 	}
-}
 
+
+	// Convert rhythms to durations
+	for (int i=0; i<(int)query.size(); i++) {
+		if (query[i].rhythm.empty()) {
+			continue;
+		}
+		query[i].duration = Convert::recipToDuration(query[i].rhythm);
+	}
+
+	if ((!query.empty()) && (query[0].base <= 0)) {
+		temp.clear();
+		temp.anything = true;
+		query.insert(query.begin(), temp);
+	}
+
+}
 
 
 
