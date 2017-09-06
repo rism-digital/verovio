@@ -1602,9 +1602,6 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     assert(measure);
     assert(arpeg);
 
-    // Cannot draw a breath that has no target
-    if (arpeg->GetRefs()->empty()) return;
-
     Note *topNote = NULL;
     Note *bottomNote = NULL;
 

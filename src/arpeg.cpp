@@ -104,12 +104,22 @@ void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
     top = NULL;
     bottom = NULL;
     
-    // Cannot draw a arpeg that has no target
-    if (this->GetRefs()->empty()) return;
+    Object *front = NULL;
+    Object *back = NULL;
     
-    Object *front = this->GetRefs()->front();
-    Object *back = this->GetRefs()->back();
+    if (this->GetStart()) {
+        front = this->GetStart();
+        back = this->GetStart();
+    }
+    else if (!this->GetRefs()->empty()) {
+        front = this->GetRefs()->front();
+        back = this->GetRefs()->back();
+    }
     
+    // Cannot draw an arpeg that has no target
+    if (!front || !back) return;
+    
+    // Cannot draw an arpeg not pointing to a chord or a note
     if (!front->Is({CHORD, NOTE}) || !back->Is({CHORD, NOTE})) return;
     
     // Pointing to a single element
@@ -182,9 +192,6 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
     AdjustArpegParams *params = dynamic_cast<AdjustArpegParams *>(functorParams);
     assert(params);
     
-    // We should have call DrawArpeg before
-    assert(this->GetCurrentFloatingPositioner());
-    
     Note *topNote = NULL;
     Note *bottomNote = NULL;
     
@@ -192,6 +199,9 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
 
     // Nothing to do
     if (!topNote || !bottomNote) return FUNCTOR_CONTINUE;
+
+    // We should have call DrawArpeg before
+    assert(this->GetCurrentFloatingPositioner());
     
     Staff* topStaff = dynamic_cast<Staff*>(topNote->GetFirstParent(STAFF));
     assert(topStaff);
