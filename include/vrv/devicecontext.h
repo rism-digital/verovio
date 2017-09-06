@@ -8,6 +8,8 @@
 #ifndef __VRV_DC_H__
 #define __VRV_DC_H__
 
+#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
+#include <math.h>
 #include <stack>
 #include <string>
 
@@ -21,6 +23,17 @@ namespace vrv {
 class Glyph;
 class Object;
 class View;
+
+extern "C" {
+static inline double DegToRad(double deg)
+{
+    return (deg * M_PI) / 180.0;
+}
+static inline double RadToDeg(double deg)
+{
+    return (deg * 180.0) / M_PI;
+}
+}
 
 // ---------------------------------------------------------------------------
 // DeviceContext
@@ -184,6 +197,14 @@ public:
     ///@}
 
     /**
+     * @name Method for rotating a graphic (clockwise).
+     * This should be called only once per graphic and before drawing anything in it.
+     */
+    ///@{
+    virtual void RotateGraphic(Point const &orig, double angle) = 0;
+    ///@}
+
+    /**
      * @name Method for starting and ending page
      */
     ///@{
@@ -208,6 +229,13 @@ public:
     ///@{
     virtual void AddDescription(const std::string &text){};
     ///@}
+    
+    /**
+     * Method indicating if default global styling is used. Typically this is the case with SVG and CSS.
+     * When global styling is used, some elements will not set corresponding styles.
+     * Global styling is false by default.
+     */
+    virtual bool UseGlobalStyling() { return false; }
 
 private:
     void AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend);

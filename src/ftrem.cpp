@@ -165,7 +165,7 @@ int FTrem::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    ListOfObjects *fTremChildren = this->GetList(this);
+    const ListOfObjects *fTremChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
     if (fTremChildren->empty()) {

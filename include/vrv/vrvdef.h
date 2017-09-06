@@ -130,6 +130,7 @@ enum ClassId {
     BARLINE_ATTR_RIGHT,
     BEAM,
     BEATRPT,
+    BRACKET,
     BTREM,
     CHORD,
     CLEF,
@@ -148,6 +149,7 @@ enum ClassId {
     MULTIREST,
     MULTIRPT,
     NOTE,
+    NUM,
     PROPORT,
     REST,
     SPACE,
@@ -197,6 +199,7 @@ enum InterfaceId {
 //----------------------------------------------------------------------------
 
 class Alignment;
+class Arpeg;
 class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
@@ -220,6 +223,8 @@ typedef std::vector<AttComparison *> ArrayOfAttComparisons;
 typedef std::vector<Note *> ChordCluster;
 
 typedef std::vector<std::tuple<Alignment *, Alignment *, int> > ArrayOfAdjustmentTuples;
+    
+typedef std::vector<std::tuple<Alignment *, Arpeg *, int, bool> > ArrayOfAligmentArpegTuples;
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 

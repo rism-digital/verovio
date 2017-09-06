@@ -458,6 +458,20 @@ int Measure::AlignVertically(FunctorParams *functorParams)
     params->m_staffIdx = 0;
 
     return FUNCTOR_CONTINUE;
+}    
+        
+int Measure::AdjustArpegEnd(FunctorParams *functorParams)
+{
+    AdjustArpegParams *params = dynamic_cast<AdjustArpegParams *>(functorParams);
+    assert(params);
+    
+    if (!params->m_alignmentArpegTuples.empty()) {
+        params->m_measureAligner = &m_measureAligner;
+        m_measureAligner.Process(params->m_functor, params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+        params->m_alignmentArpegTuples.clear();
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 int Measure::AdjustLayers(FunctorParams *functorParams)

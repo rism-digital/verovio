@@ -125,6 +125,8 @@ void display_usage()
     cerr << " --mdiv-xpath-query=QR      Set the xPath query for selecting the <mdiv> to be rendered;" << endl;
     cerr << "                            only one <mdiv> can be rendered" << endl;
 
+    cerr << " --mm-ouptut                Specify that the output in the SVG is given in mm (default is px)" << endl;
+    
     cerr << " --no-layout                Ignore all encoded layout information (if any)" << endl;
     cerr << "                            and output one single page with one single system" << endl;
 
@@ -170,6 +172,7 @@ int main(int argc, char **argv)
     int ignore_layout = 0;
     int no_justification = 0;
     int even_note_spacing = 0;
+    int mm_output = 0;
     int show_bounding_boxes = 0;
     int page = 1;
     int show_help = 0;
@@ -194,6 +197,7 @@ int main(int argc, char **argv)
         { "format", required_argument, 0, 'f' }, { "help", no_argument, &show_help, 1 },
         { "hum-type", no_argument, &hum_type, 1 }, { "ignore-layout", no_argument, &ignore_layout, 1 },
         { "mdiv-xpath-query", required_argument, 0, 0 }, { "no-layout", no_argument, &no_layout, 1 },
+        { "mm-output", no_argument, &mm_output, 1 },
         { "no-mei-hdr", no_argument, &no_mei_hdr, 1 }, { "no-justification", no_argument, &no_justification, 1 },
         { "outfile", required_argument, 0, 'o' }, { "page", required_argument, 0, 0 },
         { "page-height", required_argument, 0, 'h' }, { "page-width", required_argument, 0, 'w' },
@@ -324,6 +328,7 @@ int main(int argc, char **argv)
     toolkit.SetNoLayout(no_layout);
     toolkit.SetHumType(hum_type);
     toolkit.SetIgnoreLayout(ignore_layout);
+    toolkit.SetMMOutput(mm_output);
     toolkit.SetNoJustification(no_justification);
     toolkit.SetEvenNoteSpacing(even_note_spacing);
     toolkit.SetShowBoundingBoxes(show_bounding_boxes);

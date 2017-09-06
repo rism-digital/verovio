@@ -264,6 +264,12 @@ void Page::LayOutHorizontally()
     this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
 
     this->AdjustSylSpacingByVerse(prepareProcessingListsParams, doc);
+    
+    // Adjust the arpeg
+    Functor adjustArpeg(&Object::AdjustArpeg);
+    Functor adjustArpegEnd(&Object::AdjustArpegEnd);
+    AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
+    this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
 
     // Adjust measure X position
     AlignMeasuresParams alignMeasuresParams;

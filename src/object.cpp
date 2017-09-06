@@ -704,7 +704,7 @@ void ObjectListInterface::ResetList(Object *node)
     this->FilterList(&m_list);
 }
 
-ListOfObjects *ObjectListInterface::GetList(Object *node)
+const ListOfObjects *ObjectListInterface::GetList(Object *node)
 {
     ResetList(node);
     return &m_list;
@@ -785,8 +785,8 @@ std::wstring TextListInterface::GetText(Object *node)
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
-    ListOfObjects *childList = this->GetList(node); // make sure it's initialized
-    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+    const ListOfObjects *childList = this->GetList(node); // make sure it's initialized
+    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); it++) {
         Text *text = dynamic_cast<Text *>(*it);
         assert(text);
         concatText += text->GetText();
@@ -797,7 +797,6 @@ std::wstring TextListInterface::GetText(Object *node)
 void TextListInterface::FilterList(ListOfObjects *childList)
 {
     ListOfObjects::iterator iter = childList->begin();
-
     while (iter != childList->end()) {
         if (!(*iter)->Is(TEXT)) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)

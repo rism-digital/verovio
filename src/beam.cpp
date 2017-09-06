@@ -592,7 +592,7 @@ int Beam::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    ListOfObjects *beamChildren = this->GetList(this);
+    const ListOfObjects *beamChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
     if (beamChildren->empty()) {
