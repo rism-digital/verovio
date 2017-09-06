@@ -305,6 +305,7 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bo
             continue;
         }
         glyph->GetBoundingBox(g_x, g_y, g_w, g_h);
+        int advX = glyph->GetHorizAdvX();
 
         int x_off = x + g_x * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
         // because we are in the drawing context, y position is already flipped
@@ -314,7 +315,7 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bo
             // idem, y position is flipped
             y_off - g_h * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm(), smuflGlyph);
 
-        lastCharWidth = g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+        lastCharWidth = advX * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
         x += lastCharWidth; // move x to next char
     }
 }
