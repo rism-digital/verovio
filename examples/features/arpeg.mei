@@ -131,7 +131,7 @@
                             </staff>
                             <arpeg plist="test#chord-0000001015527891"/>
                             <arpeg plist="#chord-0000001709663567 #chord-0000000306499350"/>
-                            <arpeg plist="#chord-0000000977687251" order="down" arrow="true"/>
+                            <arpeg startid="#chord-0000000977687251" order="down" arrow="true"/>
                         </measure>
                     </section>
                 </score>
