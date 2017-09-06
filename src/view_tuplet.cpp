@@ -112,7 +112,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
     int x, y;
     data_STEMDIRECTION direction = STEMDIRECTION_up;
 
-    ListOfObjects *tupletChildren = tuplet->GetList(tuplet);
+    const ListOfObjects *tupletChildren = tuplet->GetList(tuplet);
     LayerElement *firstElement = dynamic_cast<LayerElement *>(tupletChildren->front());
     LayerElement *lastElement = dynamic_cast<LayerElement *>(tupletChildren->back());
 
@@ -132,7 +132,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
 
     // The first step is to calculate all the stem directions
     // cycle into the elements and count the up and down dirs
-    ListOfObjects::iterator iter = tupletChildren->begin();
+    ListOfObjects::const_iterator iter = tupletChildren->begin();
     while (iter != tupletChildren->end()) {
         if ((*iter)->Is(NOTE)) {
             Note *currentNote = dynamic_cast<Note *>(*iter);

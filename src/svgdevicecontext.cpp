@@ -10,8 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
-#include <math.h>
 
 //----------------------------------------------------------------------------
 
@@ -30,14 +28,6 @@ namespace vrv {
 
 #define space " "
 #define semicolon ";"
-
-extern "C" {
-static inline double DegToRad(double deg)
-{
-    return (deg * M_PI) / 180.0;
-}
-// static inline double RadToDeg(double deg) { return (deg * 180.0) / M_PI; } // unused
-}
 
 //----------------------------------------------------------------------------
 // SvgDeviceContext
@@ -336,9 +326,9 @@ void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
 
 void SvgDeviceContext::EndGraphic(Object *object, View *view)
 {
-    DrawSvgBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
+    DrawSvgBoundingBox(object, view);
 }
 
 void SvgDeviceContext::EndCustomGraphic()
@@ -349,15 +339,24 @@ void SvgDeviceContext::EndCustomGraphic()
 
 void SvgDeviceContext::EndResumedGraphic(Object *object, View *view)
 {
-    DrawSvgBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
+    DrawSvgBoundingBox(object, view);
 }
 
 void SvgDeviceContext::EndTextGraphic(Object *object, View *view)
 {
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
+}
+
+void SvgDeviceContext::RotateGraphic(Point const &orig, double angle)
+{
+    if (m_currentNode.attribute("transform")) {
+        return;
+    }
+
+    m_currentNode.append_attribute("transform") = StringFormat("rotate(%f %d,%d)", angle, orig.x, orig.y).c_str();
 }
 
 void SvgDeviceContext::StartPage()
@@ -843,7 +842,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         SetPen(AxRED, 10, AxDOT_DASH);
         // SetBrush(AxWHITE, AxTRANSPARENT);
         StartGraphic(object, "self-bounding-box", "0");
-        if (object->HasSelfBB()) {
+        if (box->HasSelfBB()) {
             this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
                 view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()),
                 view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX2())

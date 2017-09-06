@@ -2517,12 +2517,12 @@
             <!--<glyph glyph-code="EAA6" smufl-name="wiggleTrillSlower"/>-->
             <!--<glyph glyph-code="EAA7" smufl-name="wiggleTrillSlowerStill"/>-->
             <!--<glyph glyph-code="EAA8" smufl-name="wiggleTrillSlowest"/>-->
-            <!--<glyph glyph-code="EAA9" smufl-name="wiggleArpeggiatoUp"/>-->
-            <!--<glyph glyph-code="EAAA" smufl-name="wiggleArpeggiatoDown"/>-->
+            <glyph glyph-code="EAA9" smufl-name="wiggleArpeggiatoUp"/>
+            <glyph glyph-code="EAAA" smufl-name="wiggleArpeggiatoDown"/>
             <!--<glyph glyph-code="EAAB" smufl-name="wiggleArpeggiatoUpSwash"/>-->
             <!--<glyph glyph-code="EAAC" smufl-name="wiggleArpeggiatoDownSwash"/>-->
-            <!--<glyph glyph-code="EAAD" smufl-name="wiggleArpeggiatoUpArrow"/>-->
-            <!--<glyph glyph-code="EAAE" smufl-name="wiggleArpeggiatoDownArrow"/>-->
+            <glyph glyph-code="EAAD" smufl-name="wiggleArpeggiatoUpArrow"/>
+            <glyph glyph-code="EAAE" smufl-name="wiggleArpeggiatoDownArrow"/>
             <!--<glyph glyph-code="EAAF" smufl-name="wiggleGlissando"/>-->
             <!--<glyph glyph-code="EAB0" smufl-name="wiggleVibrato"/>-->
             <!--<glyph glyph-code="EAB1" smufl-name="wiggleVibratoWide"/>-->

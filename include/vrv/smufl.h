@@ -246,10 +246,14 @@ enum {
     SMUFL_E9F6_mensuralRestSemiminima = 0xE9F6,
     SMUFL_E9F7_mensuralRestFusa = 0xE9F7,
     SMUFL_E9F8_mensuralRestSemifusa = 0xE9F8,
+    SMUFL_EAA9_wiggleArpeggiatoUp = 0xEAA9,
+    SMUFL_EAAA_wiggleArpeggiatoDown = 0xEAAA,
+    SMUFL_EAAD_wiggleArpeggiatoUpArrow = 0xEAAD,
+    SMUFL_EAAE_wiggleArpeggiatoDownArrow = 0xEAAE,
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 224
+#define SMUFL_COUNT 228
 
 } // vrv namespace
 

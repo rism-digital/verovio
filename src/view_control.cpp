@@ -1462,6 +1462,9 @@ void View::DrawTrillExtension(
         x1 += m_doc->GetGlyphWidth(SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false);
     }
 
+    int length = x2 - x1;
+    Point orig(x1, y);
+
     /************** draw it **************/
 
     if (graphic)
@@ -1469,7 +1472,7 @@ void View::DrawTrillExtension(
     else
         dc->StartGraphic(trill, "spanning-trill", "");
 
-    DrawSmuflHorizontalLine(dc, x1, x2, y, staff->m_drawingStaffSize, false, SMUFL_E59D_ornamentZigZagLineNoRightEnd, 0,
+    DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, false, SMUFL_E59D_ornamentZigZagLineNoRightEnd, 0,
         SMUFL_E59E_ornamentZigZagLineWithRightEnd);
 
     if (graphic)
@@ -1590,12 +1593,57 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     assert(measure);
     assert(arpeg);
 
-    // Cannot draw a breath that has no start position
-    // if (!breath->GetStart()) return;
+    // Cannot draw a breath that has no target
+    if (arpeg->GetRefs()->empty()) return;
+
+    Note *topNote = NULL;
+    Note *bottomNote = NULL;
+
+    arpeg->GetDrawingTopBottomNotes(topNote, bottomNote);
+    
+    // We cannot draw without a top and bottom note
+    if (!topNote || !bottomNote) return;
+    
+    int top = topNote->GetDrawingY();
+    int bottom = bottomNote->GetDrawingY();
+    
+    // We arbitrarily look at the top note
+    Staff *staff = dynamic_cast<Staff *>(topNote->GetFirstParent(STAFF));
+    assert(staff);
+    bool drawingCueSize = topNote->GetDrawingCueSize();
+    
+    // We are going to have only one FloatingPositioner - staff will be the top note one
+    system->SetCurrentFloatingPositioner(staff->GetN(), arpeg, topNote, staff);
+    // Special case: because the positionner objects are reset in ResetVerticalAlignment we
+    // need to reset the value of the DrawingXRel each time. The value is stored in Arpeg.
+    arpeg->GetCurrentFloatingPositioner()->SetDrawingXRel(arpeg->GetDrawingXRel());
+
+    int length = top - bottom;
+    // We add - substract a unit in order to have the line going to the edge
+    length += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int y = bottom - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int x = arpeg->GetDrawingX();
+    int angle = -90;
+    
+    wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
+    wchar_t endGlyph = (arpeg->GetArrow()) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
+    
+    if (arpeg->GetOrder() == arpegLog_ORDER_down) {
+        y = top + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        x -=  m_doc->GetGlyphWidth(SMUFL_EAAA_wiggleArpeggiatoDown, staff->m_drawingStaffSize, drawingCueSize) / 2;
+        fillGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
+        endGlyph = (arpeg->GetArrow()) ? SMUFL_EAAE_wiggleArpeggiatoDownArrow : 0;
+        angle = 90;
+    }
+    
+    Point orig(x, y);
 
     dc->StartGraphic(arpeg, "", arpeg->GetUuid());
 
-    arpeg->SetEmptyBB();
+    // Smufl glyphs are horizontal - Rotate them counter clockwise
+    dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
+
+    DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, 0, endGlyph);
 
     dc->EndGraphic(arpeg, this);
 }

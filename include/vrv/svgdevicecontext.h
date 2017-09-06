@@ -135,6 +135,13 @@ public:
     ///@}
 
     /**
+     * @name Method for rotating a graphic (clockwise).
+     */
+    ///@{
+    virtual void RotateGraphic(Point const &orig, double angle);
+    ///@}
+
+    /**
      * @name Method for starting and ending page
      */
     ///@{

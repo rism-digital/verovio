@@ -223,6 +223,7 @@ void FloatingPositioner::ResetPositioner()
     m_objectY = NULL;
 
     m_drawingYRel = 0;
+    m_drawingXRel = 0;
     m_cuvrePoints[0] = Point(0, 0);
     m_cuvrePoints[1] = Point(0, 0);
     m_cuvrePoints[2] = Point(0, 0);
@@ -236,7 +237,7 @@ void FloatingPositioner::ResetPositioner()
 int FloatingPositioner::GetDrawingX() const
 {
     assert(m_objectX);
-    return m_objectX->GetDrawingX();
+    return m_objectX->GetDrawingX() + this->GetDrawingXRel();
 }
 
 int FloatingPositioner::GetDrawingY() const
@@ -296,6 +297,12 @@ int FloatingPositioner::CalcXMinMaxY(const Point points[4])
 
     return m_cuvreXMinMaxY;
 }
+    
+void FloatingPositioner::SetDrawingXRel(int drawingXRel)
+{
+    ResetCachedDrawingX();
+    m_drawingXRel = drawingXRel;
+};
 
 void FloatingPositioner::SetDrawingYRel(int drawingYRel)
 {
@@ -307,7 +314,7 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel)
         if (drawingYRel > m_drawingYRel) m_drawingYRel = drawingYRel;
     }
 };
-
+    
 bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox)
 {
     assert(doc);

@@ -162,12 +162,12 @@ public:
     static void SwapPoints(Point &p1, Point &p2);
 
     /**
-     * Calculate the position of a point after a rotation of rot_alpha around the center
+     * Calculate the position of a point after a rotation of alpha (in radian) around the center
      */
-    static Point CalcPositionAfterRotation(Point point, float rot_alpha, Point center);
+    static Point CalcPositionAfterRotation(Point point, float alpha, Point center);
 
     /**
-     * Calculate the position of a point after a rotation of rot_alpha around the center
+     * Calculate the position of a point after a rotation of alpha around the center
      */
     static int CalcBezierAtPosition(const Point bezier[4], int x);
 
