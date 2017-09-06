@@ -336,6 +336,11 @@ void Page::LayOutVertically()
     Functor adjustYPos(&Object::AdjustYPos);
     AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
     this->Process(&adjustYPos, &adjustYPosParams);
+    
+    Functor adjustCrossStaffYPos(&Object::AdjustCrossStaffYPos);
+    Functor adjustCrossStaffYPosEnd(&Object::AdjustCrossStaffYPosEnd);
+    FunctorDocParams adjustCrossStaffYPosParams(doc);
+    this->Process(&adjustCrossStaffYPos, &adjustCrossStaffYPosParams, &adjustCrossStaffYPosEnd);
 
     // Adjust system Y position
     AlignSystemsParams alignSystemsParams;

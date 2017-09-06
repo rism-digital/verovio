@@ -293,6 +293,10 @@ int System::AdjustYPos(FunctorParams *functorParams)
 {
     AdjustYPosParams *params = dynamic_cast<AdjustYPosParams *>(functorParams);
     assert(params);
+    
+    // We need to call this explicitly because changing the YRel of the StaffAligner (below in the functor)
+    // will not trigger it
+    this->ResetCachedDrawingY();
 
     params->m_previousOverflowBelow = 0;
     params->m_previousVerseCount = 0;

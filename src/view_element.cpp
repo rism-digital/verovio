@@ -527,17 +527,6 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     if (chord->m_crossStaff) staff = chord->m_crossStaff;
 
-    // For cross staff chords we need to re-calculate the stem because the staff position might have changed
-    if (chord->HasCrossStaff()) {
-        SetAlignmentPitchPosParams setAlignmentPitchPosParams(this->m_doc);
-        Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
-        chord->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
-
-        CalcStemParams calcStemParams(this->m_doc);
-        Functor calcStem(&Object::CalcStem);
-        chord->Process(&calcStem, &calcStemParams);
-    }
-
     chord->ResetDrawingList();
 
     /************ Draw children (notes, accidentals, etc) ************/

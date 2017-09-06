@@ -130,6 +130,11 @@ public:
     //----------//
     // Functors //
     //----------//
+                  
+    /**
+     * See Object::AdjustCrossStaffYPos
+     */
+    virtual int AdjustCrossStaffYPos(FunctorParams *functorParams);
 
     /**
      * See Object::CalcStem

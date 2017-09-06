@@ -323,6 +323,25 @@ Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 // Functors methods
 //----------------------------------------------------------------------------
 
+int Chord::AdjustCrossStaffYPos(FunctorParams *functorParams)
+{
+    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    assert(params);
+    
+    if (!this->HasCrossStaff()) return FUNCTOR_SIBLINGS;
+    
+    // For cross staff chords we need to re-calculate the stem because the staff position might have changed
+    SetAlignmentPitchPosParams setAlignmentPitchPosParams(params->m_doc);
+    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
+    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+    
+    CalcStemParams calcStemParams(params->m_doc);
+    Functor calcStem(&Object::CalcStem);
+    this->Process(&calcStem, &calcStemParams);
+
+    return FUNCTOR_SIBLINGS;
+}
+    
 int Chord::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
