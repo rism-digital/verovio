@@ -40,6 +40,7 @@
 #ifndef NO_HUMDRUM_SUPPORT
 
 #include "accid.h"
+#include "arpeg.h"
 #include "artic.h"
 #include "beam.h"
 #include "chord.h"
@@ -2898,6 +2899,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 processDynamics(layerdata[i], staffindex);
                 addArticulations(chord, layerdata[i]);
                 addOrnaments(chord, layerdata[i]);
+                addArpeggio(chord, layerdata[i]);
                 processDirections(layerdata[i], staffindex);
                 processChordSignifiers(chord, layerdata[i], staffindex);
             }
@@ -3474,11 +3476,14 @@ void HumdrumInput::addOrnamentMarkers(hum::HTp token)
     if (!token) {
         return;
     }
-    if (strchr(token->c_str(), ':') != NULL) { // arpeggio
-        token->setValue("LO", "TX", "t", "arp.");
-        token->setValue("LO", "TX", "a", "true");
-    }
-    else if (strchr(token->c_str(), 'O') != NULL) { // generic ornament
+
+    // arpeggios are now implemented, so no need for text marking:
+    // if (strchr(token->c_str(), ':') != NULL) { // arpeggio
+    //     token->setValue("LO", "TX", "t", "arp.");
+    //     token->setValue("LO", "TX", "a", "true");
+    // }
+
+    if (strchr(token->c_str(), 'O') != NULL) { // generic ornament
         token->setValue("LO", "TX", "t", "*");
         token->setValue("LO", "TX", "a", "true");
     }
@@ -6757,8 +6762,129 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
 
 //////////////////////////////
 //
+// HumdrumInput::addArpeggio --
+//   : = arpeggio which may cross layers on a single staff.
+//   :: = arpeggio which crosses staves on a single system.
+//
+
+void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
+{
+
+    bool systemQ = false;
+    hum::HTp earp = NULL;
+    if (token->find("::") != string::npos) {
+        if (!leftmostSystemArpeggio(token)) {
+            return;
+        }
+        systemQ = true;
+        hum::HTp earp = getRightmostSystemArpeggio(token);
+        if (earp == NULL) {
+            // no system arpeggio actually found
+            return;
+        }
+    }
+    else if (token->find(":") != string::npos) {
+        // only consider on local chord for now (not cross-layer)
+    }
+    else {
+        return; // no arpeggio on this note/chord
+    }
+
+    // int layer = m_currentlayer;
+    int staff = m_currentstaff;
+
+    if (systemQ) {
+        Arpeg *arpeg = new Arpeg;
+        appendElement(m_measure, arpeg);
+        // no staff attachment, or list both endpoint staves or all staves involved?
+        setLocationId(arpeg, token);
+        // arpeg->SetStartid("#" + object->GetUuid());
+        string firstid = object->GetUuid();
+        string secondid;
+        if (earp->find(" ") != string::npos) {
+            string secondid = getLocationId("chord", earp);
+        }
+        else {
+            string secondid = getLocationId("note", earp);
+        }
+        string plist = "#" + firstid + " #" + secondid;
+        // setPlist(arpeg, plist);
+// ggg
+    }
+    else {
+        Arpeg *arpeg = new Arpeg;
+        appendElement(m_measure, arpeg);
+        setStaff(arpeg, staff);
+        arpeg->SetStartid("#" + object->GetUuid());
+        setLocationId(arpeg, token);
+    }
+}
+
+/*
+//////////////////////////////
+//
+// HumdrumInput::setPlist --
+//
+
+void HumdrumInput::setPlist(Object* object, const string& plist) {
+        object->SetPlist(StrToXsdAnyURIList(plist));
+}
+*/
+
+//////////////////////////////
+//
+// HumdrumInput::getRightmostSystemArpeggio -- Assuming a single contiguous
+//     arpeggio across all staves from first to last marker.  Will probably have
+//     to adjust for layers (which are ordered reversed compared to staves).
+//
+
+hum::HTp HumdrumInput::getRightmostSystemArpeggio(hum::HTp token)
+{
+    hum::HTp output = NULL;
+    if (token->find("::")) {
+        output = token;
+    }
+    token = token->getNextToken();
+    while (token != NULL) {
+        if (!token->isKern()) {
+            token = token->getNextToken();
+            continue;
+        }
+        if (token->find("::") != string::npos) {
+            output = token;
+        }
+        token = token->getNextToken();
+    }
+    return token;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::leftmostSystemArpeggio -- Not checking for contiguous staves
+//  (i.e., only one cross-staff arpeggio is allowed at a time for now).  Will
+//  probably have to adjust for layers (which are ordered reverse of staves).
+//
+
+bool HumdrumInput::leftmostSystemArpeggio(hum::HTp token)
+{
+    token = token->getPreviousToken();
+    while (token != NULL) {
+        if (!token->isKern()) {
+            token = token->getPreviousToken();
+            continue;
+        }
+        if (token->find("::") != string::npos) {
+            return false;
+        }
+        token = token->getPreviousToken();
+    }
+    return true;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::addOrnaments --
-//   M  = mordent, majaor second for top interval
+//   M  = mordent, major second for top interval
 //   m  = mordent, minor second for top interval
 //   W  = inverted mordent, major second for top interval
 //   w  = inverted mordent, minor second for top interval
