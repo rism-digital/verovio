@@ -1267,7 +1267,11 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
             harmText = harmText + "♯";
     }
     pugi::xpath_node kind = node.select_single_node("kind");
-    if (kind) harmText = harmText + GetAttributeValue(kind.node(), "text").c_str();
+    if (kind) {
+        harmText = harmText + GetAttributeValue(kind.node(), "text").c_str();
+        if (HasAttributeWithValue(kind.node(), "use-symbols", "yes"))
+            harmText = harmText + ConvertKindToSymbol(GetContent(kind.node()));
+    }
     Harm *harm = new Harm();
     Text *text = new Text();
     if (!placeStr.empty()) harm->SetPlace(harm->AttPlacement::StrToStaffrel(placeStr.c_str()));
@@ -2034,6 +2038,22 @@ tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(std::string value)
         return tupletVis_NUMFORMAT_ratio;
     else
         return tupletVis_NUMFORMAT_NONE;
+}
+
+std::string MusicXmlInput::ConvertKindToSymbol(std::string value)
+{
+    if (value.find("major") != std::string::npos)
+        return "△";
+    else if (value.find("minor") != std::string::npos)
+        return "-";
+    else if (value.find("augmented") != std::string::npos)
+        return "+";
+    else if (value.find("diminished") != std::string::npos)
+        return "°";
+    else if (value.find("half-diminished") != std::string::npos)
+        return "ø";
+    else
+        return "";
 }
 
 } // namespace vrv
