@@ -359,7 +359,6 @@ protected:
     hum::HTp getRightmostSystemArpeggio(hum::HTp token);
     void addDirection(
         const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token, int staffindex);
-    // void setPlist(Object* object, const std::string& plist);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

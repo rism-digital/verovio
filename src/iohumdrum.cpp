@@ -2975,6 +2975,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             addArticulations(note, layerdata[i]);
             addOrnaments(note, layerdata[i]);
+            addArpeggio(note, layerdata[i]);
             processDirections(layerdata[i], staffindex);
         }
 
@@ -6777,7 +6778,7 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
             return;
         }
         systemQ = true;
-        hum::HTp earp = getRightmostSystemArpeggio(token);
+        earp = getRightmostSystemArpeggio(token);
         if (earp == NULL) {
             // no system arpeggio actually found
             return;
@@ -6802,14 +6803,14 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
         string firstid = object->GetUuid();
         string secondid;
         if (earp->find(" ") != string::npos) {
-            string secondid = getLocationId("chord", earp);
+            secondid = getLocationId("chord", earp);
         }
         else {
-            string secondid = getLocationId("note", earp);
+            secondid = getLocationId("note", earp);
         }
-        string plist = "#" + firstid + " #" + secondid;
-        // setPlist(arpeg, plist);
-// ggg
+        // string plist = "#" + firstid + " #" + secondid;
+        arpeg->AddRef("#" + firstid);
+        arpeg->AddRef("#" + secondid);
     }
     else {
         Arpeg *arpeg = new Arpeg;
@@ -6819,17 +6820,6 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
         setLocationId(arpeg, token);
     }
 }
-
-/*
-//////////////////////////////
-//
-// HumdrumInput::setPlist --
-//
-
-void HumdrumInput::setPlist(Object* object, const string& plist) {
-        object->SetPlist(StrToXsdAnyURIList(plist));
-}
-*/
 
 //////////////////////////////
 //
@@ -6841,21 +6831,21 @@ void HumdrumInput::setPlist(Object* object, const string& plist) {
 hum::HTp HumdrumInput::getRightmostSystemArpeggio(hum::HTp token)
 {
     hum::HTp output = NULL;
-    if (token->find("::")) {
+    if (token->find("::") != string::npos) {
         output = token;
     }
-    token = token->getNextToken();
+    token = token->getNextFieldToken();
     while (token != NULL) {
         if (!token->isKern()) {
-            token = token->getNextToken();
+            token = token->getNextFieldToken();
             continue;
         }
         if (token->find("::") != string::npos) {
             output = token;
         }
-        token = token->getNextToken();
+        token = token->getNextFieldToken();
     }
-    return token;
+    return output;
 }
 
 //////////////////////////////
@@ -6867,16 +6857,16 @@ hum::HTp HumdrumInput::getRightmostSystemArpeggio(hum::HTp token)
 
 bool HumdrumInput::leftmostSystemArpeggio(hum::HTp token)
 {
-    token = token->getPreviousToken();
+    token = token->getPreviousFieldToken();
     while (token != NULL) {
         if (!token->isKern()) {
-            token = token->getPreviousToken();
+            token = token->getPreviousFieldToken();
             continue;
         }
         if (token->find("::") != string::npos) {
             return false;
         }
-        token = token->getPreviousToken();
+        token = token->getPreviousFieldToken();
     }
     return true;
 }
