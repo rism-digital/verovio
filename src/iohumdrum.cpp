@@ -7279,6 +7279,9 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
 
     if (m_signifiers.above) {
         std::string marker = "[";
+		if (tstring.find("_") != string::npos) {
+			marker = "_";
+		}
         marker.push_back(m_signifiers.above);
         if (tstring.find(marker) != string::npos) {
             ss[rtrack].ties.back().setTieAbove();
@@ -7286,6 +7289,9 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
     }
     if (m_signifiers.below) {
         std::string marker = "[";
+		if (tstring.find("_") != string::npos) {
+			marker = "_";
+		}
         marker.push_back(m_signifiers.below);
         if (tstring.find(marker) != string::npos) {
             ss[rtrack].ties.back().setTieBelow();
@@ -7352,6 +7358,7 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
         // with [[, ]] rather than [, ]).
         ss[staffnum].ties.erase(found);
     }
+
 }
 
 /////////////////////////////
