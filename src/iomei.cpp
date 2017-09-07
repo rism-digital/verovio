@@ -1383,6 +1383,7 @@ void MeiOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
 
     interface->WriteCleffingLog(element);
     interface->WriteCleffingVis(element);
+    interface->WriteDurationDefault(element);
     interface->WriteKeySigDefaultAnl(element);
     interface->WriteKeySigDefaultLog(element);
     interface->WriteKeySigDefaultVis(element);
@@ -3555,6 +3556,7 @@ bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
 {
     interface->ReadCleffingLog(element);
     interface->ReadCleffingVis(element);
+    interface->ReadDurationDefault(element);
     interface->ReadKeySigDefaultAnl(element);
     interface->ReadKeySigDefaultLog(element);
     interface->ReadKeySigDefaultVis(element);

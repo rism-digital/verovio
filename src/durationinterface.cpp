@@ -142,8 +142,9 @@ bool DurationInterface::IsLastInBeam(LayerElement *noteOrRest)
 
 int DurationInterface::GetActualDur() const
 {
+    if (!this->HasDur()) return DURATION_NONE;
     // maxima (-1) is a mensural only value
-    if (this->GetDur() == DURATION_maxima) return DUR_MX;
+    else if (this->GetDur() == DURATION_maxima) return DUR_MX;
     return (this->GetDur() & DUR_MENSURAL_MASK);
 }
 
