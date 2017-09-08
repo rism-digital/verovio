@@ -1259,19 +1259,18 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
 
     std::string harmText = GetContentOfChild(node, "root/root-step");
     pugi::xpath_node alter = node.select_single_node("root/root-alter");
-    if (alter) {
-        if (GetContent(alter.node()) == "-1")
-            harmText = harmText + "♭";
-        else if (GetContent(alter.node()) == "0")
-            harmText = harmText + "♮";
-        else if (GetContent(alter.node()) == "1")
-            harmText = harmText + "♯";
-    }
+    harmText += ConvertAlterToSymbol(GetContent(alter.node()));
     pugi::xpath_node kind = node.select_single_node("kind");
     if (kind) {
         harmText = harmText + GetAttributeValue(kind.node(), "text").c_str();
         if (HasAttributeWithValue(kind.node(), "use-symbols", "yes"))
             harmText = harmText + ConvertKindToSymbol(GetContent(kind.node()));
+    }
+    pugi::xpath_node bass = node.select_single_node("bass");
+    if (bass) {
+        harmText += "/" + GetContentOfChild(node, "bass/bass-step");
+        pugi::xpath_node alter = node.select_single_node("bass/bass-alter");
+        harmText += ConvertAlterToSymbol(GetContent(alter.node()));
     }
     Harm *harm = new Harm();
     Text *text = new Text();
@@ -2041,6 +2040,18 @@ tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(std::string value)
         return tupletVis_NUMFORMAT_ratio;
     else
         return tupletVis_NUMFORMAT_NONE;
+}
+
+std::string MusicXmlInput::ConvertAlterToSymbol(std::string value)
+{
+    if (value == "-1")
+        return "♭";
+    else if (value == "0")
+        return "♮";
+    else if (value == "1")
+        return "♯";
+    else
+        return "";
 }
 
 std::string MusicXmlInput::ConvertKindToSymbol(std::string value)
