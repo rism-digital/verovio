@@ -1874,12 +1874,6 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
 
     int x = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
 
-    bool centered = true;
-    // center the fermata only with @stratid
-    if (fermata->GetStart()->Is(TIMESTAMP_ATTR)) {
-        centered = false;
-    }
-
     // for a start always put fermatas up
     int code = SMUFL_E4C0_fermataAbove;
     // check for shape
@@ -1911,7 +1905,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
         int y = fermata->GetDrawingY();
 
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-        DrawSmuflString(dc, x, y, str, centered, (*staffIter)->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y, str, true, (*staffIter)->m_drawingStaffSize);
         dc->ResetFont();
     }
 
