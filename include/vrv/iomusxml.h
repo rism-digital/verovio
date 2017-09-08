@@ -248,6 +248,7 @@ private:
     fermataVis_SHAPE ConvertFermataShape(std::string);
     pedalLog_DIR ConvertPedalTypeToDir(std::string value);
     tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);
+    std::string ConvertAlterToSymbol(std::string value);
     std::string ConvertKindToSymbol(std::string value);
     ///@}
 
