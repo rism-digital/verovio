@@ -561,7 +561,15 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_FULLMEASURE2);
     Alignment *fullMeasure2
         = dynamic_cast<Alignment *>(m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
-    if (fullMeasure2 != NULL) minMeasureWidth *= 2;
+    
+    // With a double measure with element (mRpt2, multiRpt)
+    if (fullMeasure2 != NULL) {
+        minMeasureWidth *= 2;
+    }
+    // Nothing if the measure has at least one note - can be improved
+    else if (this->FindChildByType(NOTE) != NULL) {
+        minMeasureWidth = 0;
+    }
 
     int currentMeasureWidth = this->GetRightBarLineLeft() - this->GetLeftBarLineRight();
     if (currentMeasureWidth < minMeasureWidth) {
