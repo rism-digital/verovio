@@ -1266,6 +1266,11 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
         if (HasAttributeWithValue(kind.node(), "use-symbols", "yes"))
             harmText = harmText + ConvertKindToSymbol(GetContent(kind.node()));
     }
+    pugi::xpath_node degree = node.select_single_node("degree");
+    if (degree) {
+      pugi::xpath_node alter = node.select_single_node("degree/degree-alter");
+      harmText += ConvertAlterToSymbol(GetContent(alter.node())) + GetContentOfChild(node, "degree/degree-value");
+    }
     pugi::xpath_node bass = node.select_single_node("bass");
     if (bass) {
         harmText += "/" + GetContentOfChild(node, "bass/bass-step");
