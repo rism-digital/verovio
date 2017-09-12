@@ -387,14 +387,8 @@ downloads:
         
         stream.on('finish', function() {
             var blob = stream.toBlob('application/pdf');
-            var url = window.URL.createObjectURL(blob);
-            var a = document.createElement("a");
-            document.body.appendChild(a);
-            a.style = "display: none";
-            a.href = url;
-            a.download = outputFilename.replace(/\.[^\.]+$/, '.pdf');;
-            a.click();
-            window.URL.revokeObjectURL(url);
+            var pdfFilename = outputFilename.replace(/\.[^\.]+$/, '.pdf');
+            saveAs(blob, pdfFilename);
         });
         
         var buffer = Uint8Array.from(atob(vrvTTF), c => c.charCodeAt(0));
