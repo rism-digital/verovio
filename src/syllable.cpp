@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        syllable.cpp
-// Author:      Laurent Pugin
-// Created:     2011
+// Author:      Andrew Tran
+// Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -31,7 +31,6 @@ Syllable::Syllable()
     : LayerElement("syllable-")
     , ObjectListInterface()
     , AttColor()
-    , AttDurationRatio()
     , AttRelativesize()
     , AttSlashcount()
 {
@@ -41,7 +40,6 @@ Syllable::Syllable()
 void Syllable::Init()
 {
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_DURATIONRATIO);
     RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_SLASHCOUNT);
 

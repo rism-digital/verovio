@@ -229,13 +229,13 @@ private:
     void WriteLigature(pugi::xml_node currentNode, Ligature *ligature);
     void WriteMensur(pugi::xml_node currentNode, Mensur *mensur);
     void WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig);
-    void WriteNc(pugi::xml_node currentNode, Nc *nc);
-    void WriteNeume(pugi::xml_node currentNode, Neume *neume);
     void WriteMRest(pugi::xml_node currentNode, MRest *mRest);
     void WriteMRpt(pugi::xml_node currentNode, MRpt *mRpt);
     void WriteMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2);
     void WriteMultiRest(pugi::xml_node currentNode, MultiRest *multiRest);
-    void WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt);
+    void WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt);    
+    void WriteNc(pugi::xml_node currentNode, Nc *nc);
+    void WriteNeume(pugi::xml_node currentNode, Neume *neume);
     void WriteNote(pugi::xml_node currentNode, Note *note);
     void WriteProport(pugi::xml_node currentNode, Proport *proport);
     void WriteRest(pugi::xml_node currentNode, Rest *rest);
