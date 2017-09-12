@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        syllable.h
-// Author:      Laurent Pugin
-// Created:     2011
+// Author:      Andrew Tran
+// Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -25,7 +25,6 @@ class ScoreDefInterface;
 class Syllable : public LayerElement,
                  public ObjectListInterface,
                public AttColor,
-               public AttDurationRatio,
                public AttRelativesize,
                public AttSlashcount {
 public:
@@ -56,16 +55,6 @@ public:
 private:
     //
 public:
-    /**
-     * Static member for setting a value from a controller.
-     * Used for example in SetValue
-     */
-    static int s_num;
-    /**
-     * Static member for setting a value from a controller.
-     * Used for examle in SetValue.
-     */
-    static int s_numBase;
 
 private:
 };

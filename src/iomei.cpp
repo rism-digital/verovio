@@ -385,6 +385,10 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("multiRpt");
         WriteMeiMultiRpt(m_currentNode, dynamic_cast<MultiRpt *>(object));
     }
+    else if (object->Is(NEUME)) {
+        m_currentNode = m_currentNode.append_child("neume");
+        WriteMeiNeume(m_currentNode, dynamic_cast<Neume *>(object));
+    }
     else if (object->Is(NOTE)) {
         m_currentNode = m_currentNode.append_child("note");
         WriteMeiNote(m_currentNode, dynamic_cast<Note *>(object));
@@ -405,7 +409,7 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("syl");
         WriteMeiSyl(m_currentNode, dynamic_cast<Syl *>(object));
     }
-    else if (object->Is(SYL)) {
+    else if (object->Is(SYLLABLE)) {
         m_currentNode = m_currentNode.append_child("syllable");
         WriteMeiSyllable(m_currentNode, dynamic_cast<Syllable *>(object));
     }
@@ -2834,11 +2838,11 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
         else if (elementName == "nc") {
             success = ReadMeiNc(parent, xmlElement);
         }
-        else if (elementName == "note") {
-            success = ReadMeiNote(parent, xmlElement);
-        }
         else if (elementName == "neume") {
             success = ReadMeiNeume(parent, xmlElement);
+        }
+        else if (elementName == "note") {
+            success = ReadMeiNote(parent, xmlElement);
         }
         else if (elementName == "rest") {
             success = ReadMeiRest(parent, xmlElement);
@@ -3180,6 +3184,17 @@ bool MeiInput::ReadMeiNc(Object *parent, pugi::xml_node nc)
     return ReadMeiLayerChildren(vrvNc, nc, vrvNc);
 }
 
+bool MeiInput::ReadMeiNeume(Object *parent, pugi::xml_node neume)
+{
+    Neume *vrvNeume = new Neume();
+    ReadLayerElement(neume, vrvNeume);
+
+    vrvNeume->ReadColor(neume);
+
+    parent->AddChild(vrvNeume);
+    return ReadMeiLayerChildren(vrvNeume, neume, vrvNeume);
+}
+
 bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
 {
     Note *vrvNote = new Note();
@@ -3221,17 +3236,6 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
 
     parent->AddChild(vrvNote);
     return ReadMeiLayerChildren(vrvNote, note, vrvNote);
-}
-
-bool MeiInput::ReadMeiNeume(Object *parent, pugi::xml_node neume)
-{
-    Neume *vrvNeume = new Neume();
-    ReadLayerElement(neume, vrvNeume);
-
-    vrvNeume->ReadColor(neume);
-
-    parent->AddChild(vrvNeume);
-    return ReadMeiLayerChildren(vrvNeume, neume, vrvNeume);
 }
 
 bool MeiInput::ReadMeiRest(Object *parent, pugi::xml_node rest)
@@ -3290,7 +3294,6 @@ bool MeiInput::ReadMeiSyllable(Object *parent, pugi::xml_node syllable)
     ReadLayerElement(syllable, vrvSyllable);
 
     vrvSyllable->ReadColor(syllable);
-    vrvSyllable->ReadDurationRatio(syllable);
     vrvSyllable->ReadRelativesize(syllable);
     vrvSyllable->ReadSlashcount(syllable);
 
