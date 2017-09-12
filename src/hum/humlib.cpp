@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Sep 12 11:01:58 PDT 2017
+// Last Modified: Tue Sep 12 11:56:18 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -22708,13 +22708,7 @@ int MxmlPart::getMeasureCount(void) const {
 //
 
 MxmlMeasure* MxmlPart::getMeasure(int index) const {
-	if (index < 0) {
-		return NULL;
-	}
-	if (index > (int)m_measures.size() - 1) {
-		return NULL;
-	}
-	return m_measures[index];
+	return ((index >= 0) && (index < (int)m_measures.size())) ? m_measures[index] : NULL;
 }
 
 
