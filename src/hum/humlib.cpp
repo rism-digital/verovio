@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Sep  5 16:30:05 PDT 2017
+// Last Modified: Tue Sep 12 11:01:58 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -832,7 +832,7 @@ int Convert::romanNumeralToInteger(const string& roman) {
 	int rdigit;
 	int sum = 0;
 	char previous='_';
-	for (int i=(roman.length()-1); i>=0; i--) {
+	for (int i=(int)roman.length()-1; i>=0; i--) {
 		switch (roman[i]) {
 			case 'I': case 'i': rdigit =    1; break;
 			case 'V': case 'v': rdigit =    5; break;
@@ -10064,9 +10064,9 @@ string& HumRegex::tr(string& input, const string& from, const string& to) {
 	for (int i=0; i<(int)trans.size(); i++) {
 		trans[i] = (char)i;
 	}
-	int minmax = from.size();
+	int minmax = (int)from.size();
 	if (to.size() < from.size()) {
-		minmax = to.size();
+		minmax = (int)to.size();
 	}
 	
 	for (int i=0; i<minmax; i++) {
@@ -17312,7 +17312,7 @@ int HumdrumLine::addLinkedParameter(HTp token) {
 	}
 
 	m_linkedParameters.push_back(token);
-	return m_linkedParameters.size() - 1;
+	return (int)m_linkedParameters.size() - 1;
 }
 
 
@@ -19321,7 +19321,7 @@ int HumdrumToken::addLinkedParameter(HTp token) {
 	}
 
 	m_linkedParameters.push_back(token);
-	return m_linkedParameters.size() - 1;
+	return (int)m_linkedParameters.size() - 1;
 }
 
 
@@ -31751,7 +31751,7 @@ bool Tool_esac2hum::getSong(vector<string>& song, istream& infile, int init) {
 //
 
 void Tool_esac2hum::chopExtraInfo(char* holdbuffer) {
-	int length = strlen(holdbuffer);
+	int length = (int)strlen(holdbuffer);
 	int i;
 	int spacecount = 0;
 	for (i=length-2; i>=0; i--) {
@@ -31989,7 +31989,7 @@ void Tool_esac2hum::cleanupLyrics(vector<string>& lyrics) {
 	int i, j, m;
 	int lastsyl = 0;
 	for (i=0; i<(int)lyrics.size(); i++) {
-		length = lyrics[i].size();
+		length = (int)lyrics[i].size();
 		for (j=0; j<length; j++) {
 			if (lyrics[i][j] == '_') {
 				lyrics[i][j] = ' ';
@@ -32016,7 +32016,7 @@ void Tool_esac2hum::cleanupLyrics(vector<string>& lyrics) {
 					}
 				}
 				if (lastsyl >= 0) {
-					length2 = lyrics[lastsyl].size();
+					length2 = (int)lyrics[lastsyl].size();
 					if (lyrics[lastsyl][length2-1] == '-') {
 						for (j=0; j<=length; j++) {
 							lyrics[i][length - j + 1] = lyrics[i][length - j];
@@ -32030,7 +32030,7 @@ void Tool_esac2hum::cleanupLyrics(vector<string>& lyrics) {
 		// avoid *'s on the start of lyrics by placing a space before
 		// them if they exist.
 		if (lyrics[i][0] == '*') {
-			length = lyrics[i].size();
+			length = (int)lyrics[i].size();
 			for (j=0; j<=length; j++) {
 				lyrics[i][length - j + 1] = lyrics[i][length - j];
 			}
@@ -32040,7 +32040,7 @@ void Tool_esac2hum::cleanupLyrics(vector<string>& lyrics) {
 		// avoid !'s on the start of lyrics by placing a space before
 		// them if they exist.
 		if (lyrics[i][0] == '!') {
-			length = lyrics[i].size();
+			length = (int)lyrics[i].size();
 			for (j=0; j<=length; j++) {
 				lyrics[i][length - j + 1] = lyrics[i][length - j];
 			}
@@ -32065,7 +32065,7 @@ void Tool_esac2hum::getLyrics(vector<string>& lyrics, const string& buffer) {
 	int zero2 = 0;
 	zero2 = zero1 + zero2;
 
-	int length = buffer.size();
+	int length = (int)buffer.size();
 	int i;
 
 	i = 0;
@@ -32099,7 +32099,7 @@ bool Tool_esac2hum::placeLyricPhrase(vector<NoteData>& songdata, vector<string>&
 	int start = 0;
 	int found = 0;
 
-	if (lyrics.size() == 0) {
+	if (lyrics.empty()) {
 		return true;
 	}
 
@@ -32250,7 +32250,7 @@ bool Tool_esac2hum::printTitleInfo(vector<string>& song, ostream& out) {
 	string buffer;
 	buffer = song[start].substr(4);
 	if (buffer.back() == ']') {
-		buffer.resize(buffer.size() - 1);
+		buffer.resize((int)buffer.size() - 1);
 	}
 
 	out << "!!!OTL: ";
@@ -33073,7 +33073,7 @@ bool Tool_esac2hum::getKeyInfo(vector<string>& song, string& key, double& mindur
 				cerr << "Expected ] as last character but found " << meter.back() << endl;
 				return false;
 			} else {
-				meter.resize(meter.size() - 1);
+				meter.resize((int)meter.size() - 1);
 			}
 			return true;
 		}
@@ -35734,7 +35734,7 @@ void Tool_imitation::markedTiedNotes(vector<HTp>& tokens) {
 int Tool_imitation::checkForIntervalSequence(vector<int>& m_intervals,
 		vector<double>& v1i, int starti, int count) {
 
-	int endi = starti + count - m_intervals.size();
+	int endi = starti + count - (int)m_intervals.size();
 	for (int i=starti; i<endi; i++) {
 		for (int j=0; j<(int)m_intervals.size(); j++) {
 			if (m_intervals[j] != v1i[i+j]) {

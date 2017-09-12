@@ -2064,7 +2064,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 // data is not attached to a **kern spine since it comes before
                 // any **kern data.  Treat it as attached to the bottom staff.
                 // (or the top staff depending on @place="above|below".
-                xstaffindex = kernstarts.size() - 1;
+                xstaffindex = (int)kernstarts.size() - 1;
                 setStaff(harm, xstaffindex + 1);
             }
 
@@ -7279,9 +7279,9 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
 
     if (m_signifiers.above) {
         std::string marker = "[";
-		if (tstring.find("_") != string::npos) {
-			marker = "_";
-		}
+        if (tstring.find("_") != string::npos) {
+            marker = "_";
+        }
         marker.push_back(m_signifiers.above);
         if (tstring.find(marker) != string::npos) {
             ss[rtrack].ties.back().setTieAbove();
@@ -7289,9 +7289,9 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
     }
     if (m_signifiers.below) {
         std::string marker = "[";
-		if (tstring.find("_") != string::npos) {
-			marker = "_";
-		}
+        if (tstring.find("_") != string::npos) {
+            marker = "_";
+        }
         marker.push_back(m_signifiers.below);
         if (tstring.find(marker) != string::npos) {
             ss[rtrack].ties.back().setTieBelow();
@@ -7358,7 +7358,6 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
         // with [[, ]] rather than [, ]).
         ss[staffnum].ties.erase(found);
     }
-
 }
 
 /////////////////////////////
