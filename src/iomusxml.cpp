@@ -1320,8 +1320,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
 
     pugi::xpath_node notations = node.select_single_node("notations[not(@print-object='no')]");
 
-    bool cue = false;
-    if (node.select_single_node("cue") || node.select_single_node("type[@size='cue']")) cue = true;
+    // bool cue = false;
+    // if (node.select_single_node("cue") || node.select_single_node("type[@size='cue']")) cue = true;
 
     // duration string and dots
     std::string typeStr = GetContentOfChild(node, "type");
