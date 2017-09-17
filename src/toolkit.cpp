@@ -335,6 +335,7 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
 
 bool Toolkit::SetFont(std::string const &font)
 {
+    m_doc.SetDrawingSmuflFontName(font);
     return Resources::SetFont(font);
 };
 
@@ -639,7 +640,7 @@ bool Toolkit::ParseOptions(const std::string &json_options)
     if (json.has<jsonxx::String>("font")) SetFont(json.get<jsonxx::String>("font"));
 
     if (json.has<jsonxx::Number>("mmOutput")) SetMMOutput(json.get<jsonxx::Number>("mmOutput"));
-    
+
     if (json.has<jsonxx::Number>("pageWidth")) SetPageWidth(json.get<jsonxx::Number>("pageWidth"));
 
     if (json.has<jsonxx::Number>("pageHeight")) SetPageHeight(json.get<jsonxx::Number>("pageHeight"));
@@ -849,7 +850,7 @@ void Toolkit::RedoPagePitchPosLayout()
     page->LayOutPitchPos();
 }
 
-std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
+bool Toolkit::RenderToCustomDevice(int pageNo, DeviceContext *deviceContext)
 {
     // Page number is one-based - correct it to 0-based first
     pageNo--;
@@ -864,22 +865,33 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
     if (m_noLayout) width = m_doc.GetAdjustedDrawingPageWidth();
     if (m_adjustPageHeight || m_noLayout) height = m_doc.GetAdjustedDrawingPageHeight();
 
+    // set dimensions
+    deviceContext->SetWidth(width);
+    deviceContext->SetHeight(height);
+    double userScale = m_view.GetPPUFactor() * m_scale / 100;
+    deviceContext->SetUserScale(userScale, userScale);
+
+    // render the page
+    m_view.DrawCurrentPage(deviceContext, false);
+
+    return true;
+}
+
+std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
+{
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
-    SvgDeviceContext svg(width, height);
-    
+    SvgDeviceContext svg;
+
     if (m_mmOutput) {
         svg.SetMMOutput(true);
     }
-
-    // set scale and border from user options
-    svg.SetUserScale(m_view.GetPPUFactor() * (double)m_scale / 100, m_view.GetPPUFactor() * (double)m_scale / 100);
 
     // debug BB?
     svg.SetDrawBoundingBoxes(m_showBoundingBoxes);
 
     // render the page
-    m_view.DrawCurrentPage(&svg, false);
+    RenderToCustomDevice(pageNo, &svg);
 
     std::string out_str = svg.GetStringSVG(xml_declaration);
     return out_str;

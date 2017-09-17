@@ -7,6 +7,7 @@ set(CMAKE_BUILD_TYPE Release)
 option(NO_PAE_SUPPORT           "Disable Plain and Easy support"               OFF)
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
+option(BUILD_AS_LIBRARY         "Build verovio as library"                     OFF)
 
 if (NO_HUMDRUM_SUPPORT AND MUSICXML_DEFAULT_HUMDRUM)
     message(SEND_ERROR "Default MusicXML to Humdrum cannot be enabled by default without Humdrum support")
@@ -54,27 +55,54 @@ endif()
 file(GLOB verovio_SRC "../src/*.cpp")
 file(GLOB midi_SRC "../src/midi/*.cpp")
 
-add_executable (
-    verovio
-    main.cpp
-    ${verovio_SRC}
-    ${hum_SRC}
-    ${midi_SRC}
-    ../src/pugi/pugixml.cpp
-    ../libmei/attconverter.cpp
-    ../libmei/atts_analytical.cpp
-    ../libmei/atts_cmn.cpp
-    ../libmei/atts_cmnornaments.cpp
-    ../libmei/atts_critapp.cpp
-    ../libmei/atts_gestural.cpp
-    ../libmei/atts_externalsymbols.cpp
-    ../libmei/atts_mei.cpp
-    ../libmei/atts_mensural.cpp
-    ../libmei/atts_midi.cpp
-    ../libmei/atts_pagebased.cpp
-    ../libmei/atts_shared.cpp
-    ../libmei/atts_visual.cpp
-)
+if (BUILD_AS_LIBRARY)
+    message(STATUS "build verovio as library")
+    add_library (
+         verovio
+         SHARED
+         ${verovio_SRC}
+         ${hum_SRC}
+         ${midi_SRC}
+             ../src/pugi/pugixml.cpp
+             ../libmei/attconverter.cpp
+             ../libmei/atts_analytical.cpp
+             ../libmei/atts_cmn.cpp
+             ../libmei/atts_cmnornaments.cpp
+             ../libmei/atts_critapp.cpp
+             ../libmei/atts_gestural.cpp
+             ../libmei/atts_externalsymbols.cpp
+             ../libmei/atts_mei.cpp
+             ../libmei/atts_mensural.cpp
+             ../libmei/atts_midi.cpp
+             ../libmei/atts_pagebased.cpp
+             ../libmei/atts_shared.cpp
+             ../libmei/atts_visual.cpp
+         )
+else()
+    message(STATUS "build verovio as executable")
+    add_executable (
+        verovio
+        main.cpp
+        ${verovio_SRC}
+        ${hum_SRC}
+        ${midi_SRC}
+        ../src/pugi/pugixml.cpp
+        ../libmei/attconverter.cpp
+        ../libmei/atts_analytical.cpp
+        ../libmei/atts_cmn.cpp
+        ../libmei/atts_cmnornaments.cpp
+        ../libmei/atts_critapp.cpp
+        ../libmei/atts_gestural.cpp
+        ../libmei/atts_externalsymbols.cpp
+        ../libmei/atts_mei.cpp
+        ../libmei/atts_mensural.cpp
+        ../libmei/atts_midi.cpp
+        ../libmei/atts_pagebased.cpp
+        ../libmei/atts_shared.cpp
+        ../libmei/atts_visual.cpp
+    )
+endif()
+
 
 install(
     TARGETS verovio
