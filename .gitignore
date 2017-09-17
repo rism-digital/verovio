@@ -5,6 +5,11 @@ Verovio.xcodeproj/xcuserdata/
 bin/
 build/
 
+# Qt Creator
+tools/CMakeLists.txt.user
+build-tools-*
+build
+
 # doc generated file
 doc/pae-tests.html
 
@@ -38,6 +43,10 @@ output.mei
 main.class
 leipzig-5.2.log
 leipzig-5.2_data.ly
+
+# Qt build
+qt/build-verovio-qt-*
+*.pro.user
 
 # MacOS
 .DS_Store
