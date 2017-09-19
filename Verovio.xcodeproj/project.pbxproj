@@ -271,6 +271,10 @@
 		4DB726C51B8BB0E80040231B /* text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB726C41B8BB0E80040231B /* text.cpp */; };
 		4DB726C61B8BB0E80040231B /* text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB726C41B8BB0E80040231B /* text.cpp */; };
 		4DB726C81B8BB0F30040231B /* text.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB726C71B8BB0F30040231B /* text.h */; };
+		4DC12A571F716E1C000440E9 /* pghead.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC12A561F716E1C000440E9 /* pghead.h */; };
+		4DC12A591F716E27000440E9 /* pghead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A581F716E27000440E9 /* pghead.cpp */; };
+		4DC12A5A1F716E27000440E9 /* pghead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A581F716E27000440E9 /* pghead.cpp */; };
+		4DC12A5B1F716E27000440E9 /* pghead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A581F716E27000440E9 /* pghead.cpp */; };
 		4DC34BA219BC4A71006175CD /* accid.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC34B9F19BC4A70006175CD /* accid.h */; };
 		4DC34BA319BC4A71006175CD /* custos.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC34BA019BC4A70006175CD /* custos.h */; };
 		4DC34BA419BC4A71006175CD /* dot.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC34BA119BC4A70006175CD /* dot.h */; };
@@ -609,6 +613,8 @@
 		4DB726C21B8B9F540040231B /* rpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rpt.h; path = include/vrv/rpt.h; sourceTree = "<group>"; };
 		4DB726C41B8BB0E80040231B /* text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = text.cpp; path = src/text.cpp; sourceTree = "<group>"; };
 		4DB726C71B8BB0F30040231B /* text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = text.h; path = include/vrv/text.h; sourceTree = "<group>"; };
+		4DC12A561F716E1C000440E9 /* pghead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pghead.h; path = include/vrv/pghead.h; sourceTree = "<group>"; };
+		4DC12A581F716E27000440E9 /* pghead.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pghead.cpp; path = src/pghead.cpp; sourceTree = "<group>"; };
 		4DC34B9F19BC4A70006175CD /* accid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = accid.h; path = include/vrv/accid.h; sourceTree = "<group>"; };
 		4DC34BA019BC4A70006175CD /* custos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = custos.h; path = include/vrv/custos.h; sourceTree = "<group>"; };
 		4DC34BA119BC4A70006175CD /* dot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dot.h; path = include/vrv/dot.h; sourceTree = "<group>"; };
@@ -1110,6 +1116,8 @@
 				8F59292018854BF800FE51AD /* measure.h */,
 				8F086ECE188539540037FD8E /* page.cpp */,
 				8F59292518854BF800FE51AD /* page.h */,
+				4DC12A581F716E27000440E9 /* pghead.cpp */,
+				4DC12A561F716E1C000440E9 /* pghead.h */,
 				8F086ED2188539540037FD8E /* scoredef.cpp */,
 				8F59292918854BF800FE51AD /* scoredef.h */,
 				4D4FCD111F54570E0009C455 /* staffdef.cpp */,
@@ -1234,6 +1242,7 @@
 				8F59293E18854BF800FE51AD /* io.h in Headers */,
 				8F59293F18854BF800FE51AD /* iodarms.h in Headers */,
 				4DDBBB571C7AE43E00054AFF /* hairpin.h in Headers */,
+				4DC12A571F716E1C000440E9 /* pghead.h in Headers */,
 				8F59294018854BF800FE51AD /* iomei.h in Headers */,
 				4D4335CF1ED421D2003BE1A9 /* atts_analytical.h in Headers */,
 				4DCA95DB1A515D33008AD7E9 /* editorial.h in Headers */,
@@ -1481,6 +1490,7 @@
 				4D16942A1E3A44F300569BF4 /* octave.cpp in Sources */,
 				4D16942B1E3A44F300569BF4 /* slur.cpp in Sources */,
 				4D16942C1E3A44F300569BF4 /* staff.cpp in Sources */,
+				4DC12A5A1F716E27000440E9 /* pghead.cpp in Sources */,
 				4D4335CA1ED00A33003BE1A9 /* atts_gestural.cpp in Sources */,
 				4D16942D1E3A44F300569BF4 /* trill.cpp in Sources */,
 				4D16942E1E3A44F300569BF4 /* textelement.cpp in Sources */,
@@ -1658,6 +1668,7 @@
 				4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */,
 				4D4335C91ECF2310003BE1A9 /* atts_visual.cpp in Sources */,
 				4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */,
+				4DC12A591F716E27000440E9 /* pghead.cpp in Sources */,
 				4DF28A051A754DF000BA9F7D /* floatingobject.cpp in Sources */,
 				4DF9D2831C18DC490069E8C8 /* atts_mei.cpp in Sources */,
 				4D3FF8DB19BADD7A00B105B5 /* atts_pagebased.cpp in Sources */,
@@ -1714,6 +1725,7 @@
 				4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
 				8F3DD34818854B2E0051330C /* mensur.cpp in Sources */,
 				4D1694721E3A455200569BF4 /* GridVoice.cpp in Sources */,
+				4DC12A5B1F716E27000440E9 /* pghead.cpp in Sources */,
 				8F3DD34A18854B2E0051330C /* multirest.cpp in Sources */,
 				8F3DD34C18854B2E0051330C /* note.cpp in Sources */,
 				4D8CD8A71B4E927300F0756F /* atts_critapp.cpp in Sources */,
