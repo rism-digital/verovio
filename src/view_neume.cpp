@@ -74,13 +74,6 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     Nc *nc = dynamic_cast<Nc *>(element);
     assert(nc);
 
-
-    /******************************************************************/
-    // initialization
-
-//    ListOfObjects *beamChildren = beam->GetList(beam);
-
-
     /******************************************************************/
     // Start the Neume graphic and draw the children
 
@@ -90,6 +83,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     // Draw the children
     DrawLayerChildren(dc, nc, layer, staff, measure);
 
+    // Draw the actual notes
     Clef *clef = layer->GetClef(element);
     int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     int staffLineNumber = staff->m_drawingLines;
@@ -108,9 +102,6 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     else if(clef->GetShape() == CLEFSHAPE_F){
         pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
     }
-
-
-//    dc -> DrawCircle(noteX/2, yValue, 50);
 
     wchar_t fontNo = SMUFL_E990_chantPunctum;
     int yValue = clefYPosition + pitchOffset + octaveOffset;

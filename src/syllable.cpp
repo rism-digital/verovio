@@ -20,9 +20,6 @@
 
 namespace vrv {
 
-int Syllable::s_num = 3;
-int Syllable::s_numBase = 2;
-
 //----------------------------------------------------------------------------
 // Syllable
 //----------------------------------------------------------------------------
@@ -73,7 +70,6 @@ void Syllable::Reset()
 {
     LayerElement::Reset();
     ResetColor();
-    ResetDurationRatio();
     ResetRelativesize();
     ResetSlashcount();
 }

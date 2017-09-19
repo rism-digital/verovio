@@ -1130,7 +1130,6 @@ void MeiOutput::WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur)
 
     WriteLayerElement(currentNode, mensur);
     mensur->WriteColor(currentNode);
-    mensur->WriteDurationRatio(currentNode);
     mensur->WriteMensuralShared(currentNode);
     mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
@@ -1280,7 +1279,6 @@ void MeiOutput::WriteMeiSyllable(pugi::xml_node currentNode, Syllable *syllable)
 
     WriteLayerElement(currentNode, syllable);
     syllable->WriteColor(currentNode);
-    syllable->WriteDurationRatio(currentNode);
     syllable->WriteRelativesize(currentNode);
     syllable->WriteSlashcount(currentNode);
 }
