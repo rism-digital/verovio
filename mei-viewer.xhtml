@@ -3,6 +3,7 @@ layout: viewer
 title: Verovio MEI Viewer
 active: mei-viewer
 midiplayer: true
+pdfkit: true
 downloads:
     - name: "Brahms Op 51/1"
       description: "String quartet, 7 pages - 640Kb"
@@ -46,18 +47,31 @@ downloads:
     var pageHeight = 2970;
     var pageWidth = 2100;
     var spacingSystem = 2;
+    var font = 'Leipzig';
     var swipe_pages = false;
     var format = 'mei';
     var outputFilename = 'output.mei'
     var ids = [];
+    var pdfFormat = "A4";
+    var pdfOrientation = "portrait";
 
     // reload cookies
     if ( $.cookie('zoom') ) zoom = $.cookie('zoom');
-    console.log(zoom);
+    if ( $.cookie('font') ) font = $.cookie('font');
+    if ( $.cookie('pdfFormat') ) pdfFormat = $.cookie('pdfFormat');
+    if ( $.cookie('pdfOrientation') ) pdfOrientation = $.cookie('pdfOrientation');
+
+    function calc_page_height() {
+        return ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom;
+    }
+
+    function calc_page_width() {
+        return ($(".row-offcanvas").width()) * 100 / zoom ; // - $( "#sidbar" ).width();
+    }
 
     function set_options( ) {
-        pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
-        pageWidth = ($(".row-offcanvas").width()) * 100 / zoom ; // - $( "#sidbar" ).width();
+        pageHeight = calc_page_height();
+        pageWidth = calc_page_width();
         border = 50;
         options = {
                     inputFormat: format,
@@ -67,7 +81,9 @@ downloads:
                     scale: zoom,
                     spacingSystem: spacingSystem,
                     adjustPageHeight: 1,
-                    ignoreLayout: 1
+                    ignoreLayout: 1,
+                    mmOutput: 0,
+                    font: font
                 };
         //console.log( options );
         vrvToolkit.setOptions( options );
@@ -109,6 +125,7 @@ downloads:
                 page = 1;
                 load_page();
                 $("#play-button").show();
+                $("#pdf-button").show();
             }
         }
         catch(err) {
@@ -337,6 +354,71 @@ downloads:
         });
         return this;
     };
+    
+    function generate_pdf() {
+        
+        var pdfFormat = $("#pdfFormat").val();
+        var pdfSize = [2100, 2970];
+        if (pdfFormat == "letter") pdfSize = [2159, 2794];
+        else if (pdfFormat == "B4") pdfSize = [2500, 3530];
+        
+        var pdfOrientation = $("#pdfOrientation").val();
+        var pdfLandscape = pdfOrientation == 'landscape';
+        var pdfHeight = pdfLandscape ? pdfSize[0] : pdfSize[1];
+        var pdfWidth = pdfLandscape ? pdfSize[1] : pdfSize[0];
+        
+        var fontCallback = function(family, bold, italic, fontOptions) {
+            if (family == "VerovioText") {
+                return family;
+            }
+            if (family.match(/(?:^|,)\s*sans-serif\s*$/) || true) {
+                if (bold && italic) {return 'Times-BoldItalic';}
+                if (bold && !italic) {return 'Times-Bold';}
+                if (!bold && italic) {return 'Times-Italic';}
+                if (!bold && !italic) {return 'Times-Roman';}
+            }
+        };
+    
+        var options = {};
+        options.fontCallback = fontCallback;
+        
+        var doc = new PDFDocument({useCSS: true, compress: true, autoFirstPage: false, layout: pdfOrientation}); 
+        var stream = doc.pipe(blobStream());
+        
+        stream.on('finish', function() {
+            var blob = stream.toBlob('application/pdf');
+            var pdfFilename = outputFilename.replace(/\.[^\.]+$/, '.pdf');
+            saveAs(blob, pdfFilename);
+        });
+        
+        var buffer = Uint8Array.from(atob(vrvTTF), c => c.charCodeAt(0));
+        doc.registerFont('VerovioText',buffer);  
+        
+        pdfOptions = {
+                    pageHeight: pdfHeight,
+                    pageWidth: pdfWidth,
+                    border: 50,
+                    scale: 100,
+                    spacingSystem: spacingSystem,
+                    adjustPageHeight: 0,
+                    ignoreLayout: 1,
+                    mmOutput: 1,
+                    font: font
+        }
+        
+        vrvToolkit.setOptions(pdfOptions);
+        vrvToolkit.redoLayout();
+        for (i = 0; i < vrvToolkit.getPageCount(); i++) {
+            doc.addPage({size: pdfFormat, layout: pdfOrientation});
+            SVGtoPDF(doc, vrvToolkit.renderPage(i + 1, {}), 0, 0, options);
+        }        
+        
+        // Reset the options
+        set_options();
+        vrvToolkit.redoLayout();
+        
+        doc.end();
+    }
 
 //]]>
 </script>
@@ -427,6 +509,22 @@ downloads:
             </div>
             <!-- /.col-md-6 -->
         </div>
+        <div class="row sidebar-row">
+            <div class="col-md-12">
+                <p>
+                    Font:
+                </p>
+            </div>
+            <div class="col-md-12">
+                <div>
+                    <select class="form-control" id="fontSelect">
+                        <option value="Leipzig">Leipzig</option>
+                        <option value="Bravura">Bravura</option>
+                        <option value="Gootville">Gootville</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="sidebar-panel">
@@ -488,11 +586,6 @@ downloads:
 
 </div>
 
-
-
-
-
-
 <div id="page-content-wrapper">
     <!-- top navbar -->
     <div id="navbar" class="navbar navbar-default navbar-with-sidebar">
@@ -502,6 +595,9 @@ downloads:
              <span class="icon-bar"></span>
         </button>
         <div class="btn-group">
+            <button id="pdf-button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#pdfDialog" type="button" data-loading-text="Generating PDF..." style="display: none;">
+                <span>PDF </span><span class="glyphicon glyphicon-book"/>
+            </button>
             <button id="play-button" onclick="play_midi();" class="btn btn-sm btn-default" type="button" style="display: none;">
                 <span class="glyphicon glyphicon-volume-up"/>
             </button>
@@ -523,7 +619,46 @@ downloads:
     </div>
 </div>
 
-
+<div class="modal fade" id="pdfDialog" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4>PDF options</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form">
+                    <div class="form-group">
+                        <label for="inputEmail3">Format</label>
+                        <div>
+                            <select class="form-control" id="pdfFormat">
+                                <option value="A4">A4</option>
+                                <option value="letter">Letter</option>
+                                <option value="B4">B4</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputPassword3">Orientation</label>
+                        <div>
+                            <select class="form-control" id="pdfOrientation">
+                                <option value="portrait">Portrait</option>
+                                <option value="landscape">Landscape</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="alert alert-warning" style="text-align:left;">
+                    <strong>Warning!</strong> This is an experimental feature and it can take some time.
+                </div>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" id="pdfOK" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript">
 //<![CDATA[
@@ -583,7 +718,6 @@ downloads:
         width = $('#svg_panel').width();
 
         zoom = Math.min( Math.floor( 100 * width / 2100 ), zoom );
-        //$("#svg_output").height( zoom * 30 ); // slighly more for making sure we have no scroll bar (3000 for default height of 2970)
 
         // Init the swipe
         enable_swipe( true );
@@ -617,14 +751,39 @@ downloads:
                 }
             });
         }
-        $(".row-offcanvas").on('transitionend webkitTransitionEnd oTransitionEnd mozTransitionend MSTransitionEnd',
-            function() { apply_zoom();
+        $(".row-offcanvas").on('transitionend webkitTransitionEnd oTransitionEnd mozTransitionend MSTransitionEnd', function() { 
+            if (pageWidth != calc_page_width()) {
+                apply_zoom();   
+            }
         });
+        
         $("#player").midiPlayer({
             color: "#c00",
             onUnpdate: midiUpdate,
             onStop: midiStop,
             width: 250
+        });
+        
+        $("#fontSelect").val(font);
+        
+        $("#fontSelect").change(function() {
+            if (font == $(this).val()) return;
+            console.log($(this).val());
+            font = $(this).val();
+            $.cookie('font', font, { expires: 30 });
+            apply_zoom();
+        });
+        
+        $("#pdfFormat").val(pdfFormat);
+        $("#pdfOrientation").val(pdfOrientation);
+        
+        $('#pdfOK').click(function () {
+            $('#pdfDialog').modal('hide');
+            var pdfFormat = $("#pdfFormat").val();
+            var pdfOrientation = $("#pdfOrientation").val();
+            $.cookie('pdfFormat', pdfFormat, { expires: 30 });
+            $.cookie('pdfOrientation', pdfOrientation, { expires: 30 });
+            generate_pdf();
         });
     });
 //]]>

@@ -51,6 +51,13 @@
     <script src="{{ site.baseurl }}/javascript/inc/Base64.js" type="text/javascript"></script>
     <script src="{{ site.baseurl }}/javascript/inc/base64binary.js" type="text/javascript"></script>
     {% endif %}
+    <!-- pdf kit -->
+    {% if page.pdfkit %}
+    <script src="{{ site.baseurl }}/javascript/pdfkit/blobstream.js" type="text/javascript"></script>
+    <script src="{{ site.baseurl }}/javascript/pdfkit/pdfkit.js" type="text/javascript"></script>
+    <script src="{{ site.baseurl }}/javascript/pdfkit/source.js" type="text/javascript"></script>
+    <script src="{{ site.baseurl }}/javascript/pdfkit/vrv-ttf.js" type="text/javascript"></script>
+    {% endif %}
 
 </head>
 
