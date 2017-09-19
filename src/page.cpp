@@ -456,6 +456,10 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
     }
 }
 
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
+
 int Page::ApplyPPUFactor(FunctorParams *functorParams)
 {
     ApplyPPUFactorParams *params = dynamic_cast<ApplyPPUFactorParams *>(functorParams);
