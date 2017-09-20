@@ -97,6 +97,7 @@ downloads:
 
         // Closure to capture the file information.
         reader.onload = (function(theFile) {
+            outputFilename = theFile.name;
             return function(e) {
                 $('.row-offcanvas').toggleClass('active');
                 load_data(e.target.result);
