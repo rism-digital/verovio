@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        pghead.cpp
+// Name:        pgfoot2.cpp
 // Author:      Laurent Pugin
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "pghead.h"
+#include "pgfoot2.h"
 
 //----------------------------------------------------------------------------
 
@@ -16,24 +16,24 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// PgHead
+// PgFoot2
 //----------------------------------------------------------------------------
 
-PgHead::PgHead() : RunningElement("pghead-")
+PgFoot2::PgFoot2() : RunningElement("pgfoot2-")
 {
     Reset();
 }
 
-PgHead::~PgHead()
+PgFoot2::~PgFoot2()
 {
 }
 
-void PgHead::Reset()
+void PgFoot2::Reset()
 {
     RunningElement::Reset();
 }
 
-void PgHead::AddChild(Object *child)
+void PgFoot2::AddChild(Object *child)
 {
     /*
     if (child->Is(SYSTEM)) {

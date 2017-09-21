@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        pghead.cpp
+// Name:        runningelement.cpp
 // Author:      Laurent Pugin
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "pghead.h"
+#include "runningelement.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,45 +13,40 @@
 
 //----------------------------------------------------------------------------
 
+#include "text.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// PgHead
+// RunningElement
 //----------------------------------------------------------------------------
 
-PgHead::PgHead() : RunningElement("pghead-")
+RunningElement::RunningElement() : Object("re"), AttTyped()
 {
+    RegisterAttClass(ATT_TYPED);
+
     Reset();
 }
 
-PgHead::~PgHead()
+RunningElement::RunningElement(std::string classid) : Object(classid), AttTyped()
+{
+    RegisterAttClass(ATT_TYPED);
+
+    Reset();
+}
+
+RunningElement::~RunningElement()
 {
 }
 
-void PgHead::Reset()
+void RunningElement::Reset()
 {
-    RunningElement::Reset();
-}
-
-void PgHead::AddChild(Object *child)
-{
-    /*
-    if (child->Is(SYSTEM)) {
-        assert(dynamic_cast<System *>(child));
-    }
-    else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
-    }
-    */
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    Object::Reset();
+    ResetTyped();
 }
 
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
-    
+
 } // namespace vrv

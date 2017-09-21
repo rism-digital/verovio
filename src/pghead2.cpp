@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        pghead.cpp
+// Name:        pghead2.cpp
 // Author:      Laurent Pugin
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "pghead.h"
+#include "pghead2.h"
 
 //----------------------------------------------------------------------------
 
@@ -16,24 +16,24 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// PgHead
+// PgHead2
 //----------------------------------------------------------------------------
 
-PgHead::PgHead() : RunningElement("pghead-")
+PgHead2::PgHead2() : RunningElement("pghead2-")
 {
     Reset();
 }
 
-PgHead::~PgHead()
+PgHead2::~PgHead2()
 {
 }
 
-void PgHead::Reset()
+void PgHead2::Reset()
 {
     RunningElement::Reset();
 }
 
-void PgHead::AddChild(Object *child)
+void PgHead2::AddChild(Object *child)
 {
     /*
     if (child->Is(SYSTEM)) {

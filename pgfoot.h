@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        pghead.h
+// Name:        pgfoot.h
 // Author:      Laurent Pugin
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_PGHEAD_H__
-#define __VRV_PGHEAD_H__
+#ifndef __VRV_PGFOOT_H__
+#define __VRV_PGFOOT_H__
 
 #include "runningelement.h"
 
@@ -14,24 +14,24 @@ namespace vrv {
 
 
 //----------------------------------------------------------------------------
-// PgHead
+// PgFoot
 //----------------------------------------------------------------------------
 
 /**
- * This class represents an MEI pgHead. 
+ * This class represents an MEI pgFoot. 
  */
-class PgHead : public RunningElement {
+class PgFoot : public RunningElement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method resets all attribute classes
      */
     ///@{
-    PgHead();
-    virtual ~PgHead();
+    PgFoot();
+    virtual ~PgFoot();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "PgHead"; }
-    virtual ClassId GetClassId() const { return PGHEAD; }
+    virtual std::string GetClassName() const { return "PgFoot"; }
+    virtual ClassId GetClassId() const { return PGFOOT; }
     ///@}
 
     /**

@@ -51,6 +51,10 @@
 #include "octave.h"
 #include "page.h"
 #include "pedal.h"
+#include "pgfoot.h"
+#include "pgfoot2.h"
+#include "pghead.h"
+#include "pghead2.h"
 #include "proport.h"
 #include "rest.h"
 #include "rpt.h"
@@ -747,6 +751,43 @@ void MeiOutput::WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
     WriteScoreDefElement(currentNode, scoreDef);
     WriteScoreDefInterface(currentNode, scoreDef);
     scoreDef->WriteEndings(currentNode);
+}
+    
+void MeiOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *runningElement)
+{
+    assert(runningElement);
+
+    WriteXmlId(currentNode, runningElement);
+    runningElement->WriteTyped(currentNode);
+}
+
+
+void MeiOutput::WriteMeiPgFoot(pugi::xml_node currentNode, PgFoot *pgFoot)
+{
+    assert(pgFoot);
+    
+    WriteRunningElement(currentNode, pgFoot);
+}
+
+void MeiOutput::WriteMeiPgFoot2(pugi::xml_node currentNode, PgFoot2 *pgFoot2)
+{
+    assert(pgFoot2);
+    
+    WriteRunningElement(currentNode, pgFoot2);
+}
+
+void MeiOutput::WriteMeiPgHead(pugi::xml_node currentNode, PgHead *pgHead)
+{
+    assert(pgHead);
+    
+    WriteRunningElement(currentNode, pgHead);
+}
+
+void MeiOutput::WriteMeiPgHead2(pugi::xml_node currentNode, PgHead2 *pgHead2)
+{
+    assert(pgHead2);
+
+    WriteRunningElement(currentNode, pgHead2);
 }
 
 void MeiOutput::WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp)
@@ -1731,6 +1772,18 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for running element
+    else if (filterParent->IsRunningElement()) {
+        if (element == "") {
+            return true;
+        }
+        else if (element == "rend") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for beam
     else if (filterParent->Is(BEAM)) {
         if (element == "beam") {
@@ -2360,6 +2413,19 @@ bool MeiInput::ReadMeiScoreDefChildren(Object *parent, pugi::xml_node parentNode
         else if (IsEditorialElementName(current.name())) {
             success = ReadMeiEditorialElement(parent, current, EDITORIAL_SCOREDEF);
         }
+        // headers and footers
+        else if (std::string(current.name()) == "pgFoot") {
+            success = ReadMeiPgFoot(parent, current);
+        }
+        else if (std::string(current.name()) == "pgFoot2") {
+            success = ReadMeiPgFoot2(parent, current);
+        }
+        else if (std::string(current.name()) == "pgHead") {
+            success = ReadMeiPgHead(parent, current);
+        }
+        else if (std::string(current.name()) == "pgHead2") {
+            success = ReadMeiPgHead2(parent, current);
+        }
         // content
         else if (std::string(current.name()) == "staffGrp") {
             success = ReadMeiStaffGrp(parent, current);
@@ -2422,6 +2488,51 @@ bool MeiInput::ReadMeiStaffGrpChildren(Object *parent, pugi::xml_node parentNode
         }
     }
     return success;
+}
+    
+bool MeiInput::ReadRunningElement(pugi::xml_node element, RunningElement *object)
+{
+    SetMeiUuid(element, object);
+    object->ReadTyped(element);
+
+    return true;
+}
+
+
+bool MeiInput::ReadMeiPgFoot(Object *parent, pugi::xml_node pgFoot)
+{
+    PgFoot *vrvPgFoot = new PgFoot();
+    ReadRunningElement(pgFoot, vrvPgFoot);
+    
+    parent->AddChild(vrvPgFoot);
+    return ReadMeiTextChildren(vrvPgFoot, pgFoot, vrvPgFoot);
+}
+
+bool MeiInput::ReadMeiPgFoot2(Object *parent, pugi::xml_node pgFoot2)
+{
+    PgFoot2 *vrvPgFoot2 = new PgFoot2();
+    ReadRunningElement(pgFoot2, vrvPgFoot2);
+    
+    parent->AddChild(vrvPgFoot2);
+    return ReadMeiTextChildren(vrvPgFoot2, pgFoot2, vrvPgFoot2);
+}
+
+bool MeiInput::ReadMeiPgHead(Object *parent, pugi::xml_node pgHead)
+{
+    PgHead *vrvPgHead = new PgHead();
+    ReadRunningElement(pgHead, vrvPgHead);
+    
+    parent->AddChild(vrvPgHead);
+    return ReadMeiTextChildren(vrvPgHead, pgHead, vrvPgHead);
+}
+
+bool MeiInput::ReadMeiPgHead2(Object *parent, pugi::xml_node pgHead2)
+{
+    PgHead2 *vrvPgHead2 = new PgHead2();
+    ReadRunningElement(pgHead2, vrvPgHead2);
+    
+    parent->AddChild(vrvPgHead2);
+    return ReadMeiTextChildren(vrvPgHead2, pgHead2, vrvPgHead2);
 }
 
 bool MeiInput::ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef)

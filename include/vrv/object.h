@@ -123,6 +123,10 @@ public:
     {
         return (this->GetClassId() > LAYER_ELEMENT && this->GetClassId() < LAYER_ELEMENT_max);
     }
+    bool IsRunningElement() const
+    {
+        return (this->GetClassId() > RUNNING_ELEMENT && this->GetClassId() < RUNNING_ELEMENT_max);
+    }
     bool IsScoreDefElement() const
     {
         return (this->GetClassId() > SCOREDEF_ELEMENT && this->GetClassId() < SCOREDEF_ELEMENT_max);

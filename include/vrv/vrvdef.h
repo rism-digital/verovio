@@ -64,7 +64,6 @@ enum ClassId {
     MENSUR_ATTR,
     METERSIG_ATTR,
     PAGE,
-    PGHEAD,
     SCORE,
     STAFF,
     STAFF_ALIGNMENT,
@@ -93,6 +92,13 @@ enum ClassId {
     SUPPLIED,
     UNCLEAR,
     EDITORIAL_ELEMENT_max,
+    // Ids for RunningElement child classes
+    RUNNING_ELEMENT,
+    PGFOOT,
+    PGFOOT2,
+    PGHEAD,
+    PGHEAD2,
+    RUNNING_ELEMENT_max,
     // Ids for SystemElement child classes
     SYSTEM_ELEMENT,
     BOUNDARY_END,

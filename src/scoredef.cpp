@@ -20,6 +20,10 @@
 #include "label.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "pgfoot.h"
+#include "pgfoot2.h"
+#include "pghead.h"
+#include "pghead2.h"
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "system.h"
@@ -211,6 +215,9 @@ void ScoreDef::AddChild(Object *child)
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else if (child->IsRunningElement()) {
+        assert(dynamic_cast<RunningElement *>(child));
     }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());

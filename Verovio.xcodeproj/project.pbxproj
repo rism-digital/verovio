@@ -275,6 +275,22 @@
 		4DC12A591F716E27000440E9 /* pghead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A581F716E27000440E9 /* pghead.cpp */; };
 		4DC12A5A1F716E27000440E9 /* pghead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A581F716E27000440E9 /* pghead.cpp */; };
 		4DC12A5B1F716E27000440E9 /* pghead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A581F716E27000440E9 /* pghead.cpp */; };
+		4DC12A5D1F73F888000440E9 /* pghead2.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC12A5C1F73F888000440E9 /* pghead2.h */; };
+		4DC12A611F73F891000440E9 /* pgfoot.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC12A601F73F891000440E9 /* pgfoot.h */; };
+		4DC12A631F73F898000440E9 /* pghead2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A621F73F898000440E9 /* pghead2.cpp */; };
+		4DC12A641F73F898000440E9 /* pghead2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A621F73F898000440E9 /* pghead2.cpp */; };
+		4DC12A651F73F898000440E9 /* pghead2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A621F73F898000440E9 /* pghead2.cpp */; };
+		4DC12A6B1F73F8A3000440E9 /* pgfoot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A6A1F73F8A3000440E9 /* pgfoot.cpp */; };
+		4DC12A6C1F73F8A3000440E9 /* pgfoot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A6A1F73F8A3000440E9 /* pgfoot.cpp */; };
+		4DC12A6D1F73F8A3000440E9 /* pgfoot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A6A1F73F8A3000440E9 /* pgfoot.cpp */; };
+		4DC12A6F1F73F934000440E9 /* pgfoot2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A6E1F73F934000440E9 /* pgfoot2.cpp */; };
+		4DC12A701F73F934000440E9 /* pgfoot2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A6E1F73F934000440E9 /* pgfoot2.cpp */; };
+		4DC12A711F73F934000440E9 /* pgfoot2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A6E1F73F934000440E9 /* pgfoot2.cpp */; };
+		4DC12A731F73F93D000440E9 /* pgfoot2.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC12A721F73F93D000440E9 /* pgfoot2.h */; };
+		4DC12A751F73FF92000440E9 /* runningelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC12A741F73FF92000440E9 /* runningelement.h */; };
+		4DC12A781F7400B9000440E9 /* runningelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A771F7400B9000440E9 /* runningelement.cpp */; };
+		4DC12A791F7400B9000440E9 /* runningelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A771F7400B9000440E9 /* runningelement.cpp */; };
+		4DC12A7A1F7400B9000440E9 /* runningelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A771F7400B9000440E9 /* runningelement.cpp */; };
 		4DC34BA219BC4A71006175CD /* accid.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC34B9F19BC4A70006175CD /* accid.h */; };
 		4DC34BA319BC4A71006175CD /* custos.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC34BA019BC4A70006175CD /* custos.h */; };
 		4DC34BA419BC4A71006175CD /* dot.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC34BA119BC4A70006175CD /* dot.h */; };
@@ -615,6 +631,14 @@
 		4DB726C71B8BB0F30040231B /* text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = text.h; path = include/vrv/text.h; sourceTree = "<group>"; };
 		4DC12A561F716E1C000440E9 /* pghead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pghead.h; path = include/vrv/pghead.h; sourceTree = "<group>"; };
 		4DC12A581F716E27000440E9 /* pghead.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pghead.cpp; path = src/pghead.cpp; sourceTree = "<group>"; };
+		4DC12A5C1F73F888000440E9 /* pghead2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pghead2.h; path = include/vrv/pghead2.h; sourceTree = "<group>"; };
+		4DC12A601F73F891000440E9 /* pgfoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pgfoot.h; sourceTree = "<group>"; };
+		4DC12A621F73F898000440E9 /* pghead2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pghead2.cpp; path = src/pghead2.cpp; sourceTree = "<group>"; };
+		4DC12A6A1F73F8A3000440E9 /* pgfoot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pgfoot.cpp; sourceTree = "<group>"; };
+		4DC12A6E1F73F934000440E9 /* pgfoot2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pgfoot2.cpp; sourceTree = "<group>"; };
+		4DC12A721F73F93D000440E9 /* pgfoot2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pgfoot2.h; sourceTree = "<group>"; };
+		4DC12A741F73FF92000440E9 /* runningelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = runningelement.h; path = include/vrv/runningelement.h; sourceTree = "<group>"; };
+		4DC12A771F7400B9000440E9 /* runningelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = runningelement.cpp; path = src/runningelement.cpp; sourceTree = "<group>"; };
 		4DC34B9F19BC4A70006175CD /* accid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = accid.h; path = include/vrv/accid.h; sourceTree = "<group>"; };
 		4DC34BA019BC4A70006175CD /* custos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = custos.h; path = include/vrv/custos.h; sourceTree = "<group>"; };
 		4DC34BA119BC4A70006175CD /* dot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dot.h; path = include/vrv/dot.h; sourceTree = "<group>"; };
@@ -889,6 +913,23 @@
 			name = utf8;
 			sourceTree = "<group>";
 		};
+		4DC12A761F740089000440E9 /* runningelements */ = {
+			isa = PBXGroup;
+			children = (
+				4DC12A771F7400B9000440E9 /* runningelement.cpp */,
+				4DC12A741F73FF92000440E9 /* runningelement.h */,
+				4DC12A6A1F73F8A3000440E9 /* pgfoot.cpp */,
+				4DC12A601F73F891000440E9 /* pgfoot.h */,
+				4DC12A6E1F73F934000440E9 /* pgfoot2.cpp */,
+				4DC12A721F73F93D000440E9 /* pgfoot2.h */,
+				4DC12A581F716E27000440E9 /* pghead.cpp */,
+				4DC12A561F716E1C000440E9 /* pghead.h */,
+				4DC12A621F73F898000440E9 /* pghead2.cpp */,
+				4DC12A5C1F73F888000440E9 /* pghead2.h */,
+			);
+			name = runningelements;
+			sourceTree = "<group>";
+		};
 		4DC34B9E19BC33A0006175CD /* interfaces */ = {
 			isa = PBXGroup;
 			children = (
@@ -1034,6 +1075,7 @@
 				8F086F36188539B10037FD8E /* dc */,
 				8F086F37188539C50037FD8E /* io */,
 				8F086F38188539F00037FD8E /* containers */,
+				4DC12A761F740089000440E9 /* runningelements */,
 				4D95D4F31D717CD600B2B856 /* systemelements */,
 				4DF28A011A754DAA00BA9F7D /* controlelements */,
 				8F086F3A18853A540037FD8E /* layerelements */,
@@ -1116,8 +1158,6 @@
 				8F59292018854BF800FE51AD /* measure.h */,
 				8F086ECE188539540037FD8E /* page.cpp */,
 				8F59292518854BF800FE51AD /* page.h */,
-				4DC12A581F716E27000440E9 /* pghead.cpp */,
-				4DC12A561F716E1C000440E9 /* pghead.h */,
 				8F086ED2188539540037FD8E /* scoredef.cpp */,
 				8F59292918854BF800FE51AD /* scoredef.h */,
 				4D4FCD111F54570E0009C455 /* staffdef.cpp */,
@@ -1250,6 +1290,7 @@
 				8F59294218854BF800FE51AD /* iopae.h in Headers */,
 				8F59294318854BF800FE51AD /* keysig.h in Headers */,
 				8F59294418854BF800FE51AD /* layer.h in Headers */,
+				4DC12A5D1F73F888000440E9 /* pghead2.h in Headers */,
 				8F59294518854BF800FE51AD /* layerelement.h in Headers */,
 				4D4FCD0A1F5455F10009C455 /* staffgrp.h in Headers */,
 				8F59294718854BF800FE51AD /* measure.h in Headers */,
@@ -1263,11 +1304,14 @@
 				8F59294C18854BF800FE51AD /* page.h in Headers */,
 				4D1BE77F1C69434C0086DC0E /* Binasc.h in Headers */,
 				4D9C53131B52E4AE0003C6EC /* unchecked.h in Headers */,
+				4DC12A751F73FF92000440E9 /* runningelement.h in Headers */,
 				4DF28A031A754DE400BA9F7D /* controlelement.h in Headers */,
 				4D1031881DECB83E0098EA1C /* atts_externalsymbols.h in Headers */,
 				8F59294D18854BF800FE51AD /* pitchinterface.h in Headers */,
 				4DF9D2851C18DC490069E8C8 /* atts_mei.h in Headers */,
+				4DC12A731F73F93D000440E9 /* pgfoot2.h in Headers */,
 				4D1BE7781C6942930086DC0E /* pugiconfig.hpp in Headers */,
+				4DC12A611F73F891000440E9 /* pgfoot.h in Headers */,
 				8F59294E18854BF800FE51AD /* positioninterface.h in Headers */,
 				8F59294F18854BF800FE51AD /* rest.h in Headers */,
 				4DF289FD1A7545CC00BA9F7D /* timeinterface.h in Headers */,
@@ -1433,6 +1477,7 @@
 				4D1693FA1E3A44F300569BF4 /* clef.cpp in Sources */,
 				4D1694661E3A455100569BF4 /* GridSlice.cpp in Sources */,
 				4D1693FB1E3A44F300569BF4 /* devicecontext.cpp in Sources */,
+				4DC12A6C1F73F8A3000440E9 /* pgfoot.cpp in Sources */,
 				4D4335CD1ED421BA003BE1A9 /* atts_analytical.cpp in Sources */,
 				4D1693FC1E3A44F300569BF4 /* view_control.cpp in Sources */,
 				4D1693FD1E3A44F300569BF4 /* score.cpp in Sources */,
@@ -1472,6 +1517,7 @@
 				4D16946D1E3A455200569BF4 /* MxmlPart.cpp in Sources */,
 				4D16941A1E3A44F300569BF4 /* view_text.cpp in Sources */,
 				4D16941B1E3A44F300569BF4 /* multirest.cpp in Sources */,
+				4DC12A641F73F898000440E9 /* pghead2.cpp in Sources */,
 				4D16941C1E3A44F300569BF4 /* ending.cpp in Sources */,
 				4D1694611E3A453A00569BF4 /* GridMeasure.cpp in Sources */,
 				4D16941D1E3A44F300569BF4 /* dir.cpp in Sources */,
@@ -1479,9 +1525,11 @@
 				4D16941F1E3A44F300569BF4 /* boundingbox.cpp in Sources */,
 				4D1694211E3A44F300569BF4 /* object.cpp in Sources */,
 				4D1694221E3A44F300569BF4 /* page.cpp in Sources */,
+				4DC12A791F7400B9000440E9 /* runningelement.cpp in Sources */,
 				4D1694231E3A44F300569BF4 /* pitchinterface.cpp in Sources */,
 				4D1694681E3A455100569BF4 /* GridVoice.cpp in Sources */,
 				4D1694241E3A44F300569BF4 /* positioninterface.cpp in Sources */,
+				4DC12A701F73F934000440E9 /* pgfoot2.cpp in Sources */,
 				4D1694251E3A44F300569BF4 /* timestamp.cpp in Sources */,
 				4D1694261E3A44F300569BF4 /* MidiEventList.cpp in Sources */,
 				4D1694271E3A44F300569BF4 /* iohumdrum.cpp in Sources */,
@@ -1556,6 +1604,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D4FCD121F54570E0009C455 /* staffdef.cpp in Sources */,
+				4DC12A6F1F73F934000440E9 /* pgfoot2.cpp in Sources */,
 				8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */,
 				8F086EE4188539540037FD8E /* barline.cpp in Sources */,
 				8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */,
@@ -1564,6 +1613,8 @@
 				8F086EE7188539540037FD8E /* clef.cpp in Sources */,
 				8F086EE8188539540037FD8E /* devicecontext.cpp in Sources */,
 				4D543E221B80AACF004B823C /* view_control.cpp in Sources */,
+				4DC12A781F7400B9000440E9 /* runningelement.cpp in Sources */,
+				4DC12A631F73F898000440E9 /* pghead2.cpp in Sources */,
 				4D95D4FC1D74551100B2B856 /* score.cpp in Sources */,
 				8F086EE9188539540037FD8E /* doc.cpp in Sources */,
 				8F086EEA188539540037FD8E /* durationinterface.cpp in Sources */,
@@ -1636,6 +1687,7 @@
 				4D1BE76B1C688F5A0086DC0E /* Binasc.cpp in Sources */,
 				8F086F06188539540037FD8E /* view_beam.cpp in Sources */,
 				8F086F08188539540037FD8E /* view_element.cpp in Sources */,
+				4DC12A6B1F73F8A3000440E9 /* pgfoot.cpp in Sources */,
 				8F086F09188539540037FD8E /* view_graph.cpp in Sources */,
 				8F086F0A188539540037FD8E /* view_page.cpp in Sources */,
 				8F086F0B188539540037FD8E /* view_tuplet.cpp in Sources */,
@@ -1684,6 +1736,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8F3DD36718854B410051330C /* verticalaligner.cpp in Sources */,
+				4DC12A651F73F898000440E9 /* pghead2.cpp in Sources */,
 				8F3DD36818854B410051330C /* doc.cpp in Sources */,
 				8F3DD36A18854B410051330C /* toolkit.cpp in Sources */,
 				4D1694781E3A455200569BF4 /* tool-musicxml2hum.cpp in Sources */,
@@ -1692,6 +1745,7 @@
 				8F3DD36E18854B410051330C /* vrv.cpp in Sources */,
 				8F3DD35E18854B390051330C /* view.cpp in Sources */,
 				4DDBBB5E1C7AE45900054AFF /* hairpin.cpp in Sources */,
+				4DC12A7A1F7400B9000440E9 /* runningelement.cpp in Sources */,
 				4D1694621E3A453F00569BF4 /* GridMeasure.cpp in Sources */,
 				8F3DD36018854B390051330C /* view_beam.cpp in Sources */,
 				8F3DD36218854B390051330C /* view_element.cpp in Sources */,
@@ -1755,6 +1809,7 @@
 				8F3DD32818854B090051330C /* iomei.cpp in Sources */,
 				8F3DD32A18854B090051330C /* iomusxml.cpp in Sources */,
 				8F3DD32C18854B090051330C /* iopae.cpp in Sources */,
+				4DC12A6D1F73F8A3000440E9 /* pgfoot.cpp in Sources */,
 				4D4335CE1ED421BC003BE1A9 /* atts_analytical.cpp in Sources */,
 				8F3DD31E18854AFB0051330C /* bboxdevicecontext.cpp in Sources */,
 				8F3DD32018854AFB0051330C /* devicecontext.cpp in Sources */,
@@ -1766,6 +1821,7 @@
 				4D22C41A18890E6100D0831F /* mrest.cpp in Sources */,
 				4DF440781D39575500152B7E /* ending.cpp in Sources */,
 				4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */,
+				4DC12A711F73F934000440E9 /* pgfoot2.cpp in Sources */,
 				4D763EEC198BF2D8003FCAB5 /* atts_shared.cpp in Sources */,
 				4D1BE7701C688F5A0086DC0E /* MidiEventList.cpp in Sources */,
 				4D422105199805F800963292 /* att.cpp in Sources */,

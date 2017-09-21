@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        pghead.h
+// Name:        pghead2.h
 // Author:      Laurent Pugin
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_PGHEAD_H__
-#define __VRV_PGHEAD_H__
+#ifndef __VRV_PGHEAD2_H__
+#define __VRV_PGHEAD2_H__
 
 #include "runningelement.h"
 
@@ -14,24 +14,24 @@ namespace vrv {
 
 
 //----------------------------------------------------------------------------
-// PgHead
+// PgHead2
 //----------------------------------------------------------------------------
 
 /**
- * This class represents an MEI pgHead. 
+ * This class represents an MEI pgHead2.
  */
-class PgHead : public RunningElement {
+class PgHead2 : public RunningElement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method resets all attribute classes
      */
     ///@{
-    PgHead();
-    virtual ~PgHead();
+    PgHead2();
+    virtual ~PgHead2();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "PgHead"; }
-    virtual ClassId GetClassId() const { return PGHEAD; }
+    virtual std::string GetClassName() const { return "PgHead2"; }
+    virtual ClassId GetClassId() const { return PGHEAD2; }
     ///@}
 
     /**
