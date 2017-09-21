@@ -13,6 +13,9 @@
 
 namespace vrv {
 
+class Page;
+class StaffAlignment;
+    
 //----------------------------------------------------------------------------
 // RunningElement
 //----------------------------------------------------------------------------
@@ -40,6 +43,22 @@ public:
      * It does not make sense you carry copying the running element acrosse the systems.
      */
     virtual Object *Clone() const { return NULL; }
+    
+    /*
+     * @name Setter and getter for the current drawing page
+     */
+    ///@{
+    void SetDrawingPage(Page *page) { m_drawingPage = page; }
+    Page *GetDrawingPage() { return m_drawingPage; }
+    ///@}
+    
+    /*
+     * @name Setter and getter for the current staff alignment
+     */
+    ///@{
+    void SetStaffAlignment(StaffAlignment *staffAlignment) { m_staffAlignment = staffAlignment; }
+    StaffAlignment *GetStaffAlignment() { return m_staffAlignment; }
+    ///@}
 
     //----------//
     // Functors //
@@ -50,7 +69,15 @@ private:
 public:
     //
 private:
-    //
+    /**
+     * The page we are drawing
+     */
+    Page *m_drawingPage;
+    
+    /**
+     * The staff alignment we are darwing
+     */
+    StaffAlignment *m_staffAlignment;
 };
 
 } // namespace vrv

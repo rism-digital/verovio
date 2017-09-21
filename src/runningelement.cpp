@@ -13,7 +13,9 @@
 
 //----------------------------------------------------------------------------
 
+#include "page.h"
 #include "text.h"
+#include "verticalaligner.h"
 
 namespace vrv {
 
@@ -43,6 +45,8 @@ void RunningElement::Reset()
 {
     Object::Reset();
     ResetTyped();
+    
+    m_drawingPage = NULL;
 }
 
 //----------------------------------------------------------------------------
