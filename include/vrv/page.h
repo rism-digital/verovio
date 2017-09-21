@@ -132,6 +132,18 @@ public:
      * Apply the Pixel Per Unit factor of the page to its elements.
      */
     virtual int ApplyPPUFactor(FunctorParams *functorParams);
+    
+    /**
+     * See Object::ResetVerticalAlignment
+     */
+    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+    
+    /**
+     * See Object::AlignVertically
+     */
+    ///@{
+    virtual int AlignVerticallyEnd(FunctorParams *functorParams);
+    ///@}
 
 private:
     /**

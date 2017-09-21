@@ -40,6 +40,10 @@ class ControlElement;
 class Octave;
 class Page;
 class Pedal;
+class PgFoot;
+class PgFoot;
+class PgHead;
+class PgHead2;
 class Rend;
 class Slur;
 class Staff;
@@ -182,6 +186,15 @@ protected:
     void DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId);
     ///@}
 
+    /**
+     * @name Methods for drawing RunningElements (PgHead, PgFoot, etc.)
+     * Defined in view_running.cpp
+     */
+    ///@{
+    void DrawRunningElements(DeviceContext *dc, Page *page);
+    void DrawPgHead(DeviceContext *dc, PgHead *pgHead);
+    ///@}
+    
     /**
      * @name Methods for drawing children
      * Defined in view_page.cpp

@@ -17,6 +17,10 @@
 #include "bboxdevicecontext.h"
 #include "doc.h"
 #include "functorparams.h"
+#include "pgfoot.h"
+#include "pgfoot2.h"
+#include "pghead.h"
+#include "pghead2.h"
 #include "system.h"
 #include "view.h"
 #include "vrv.h"
@@ -471,6 +475,79 @@ int Page::ApplyPPUFactor(FunctorParams *functorParams)
     this->m_pageTopMar /= params->m_page->GetPPUFactor();
     this->m_pageLeftMar /= params->m_page->GetPPUFactor();
     this->m_pageRightMar /= params->m_page->GetPPUFactor();
+
+    return FUNCTOR_CONTINUE;
+}
+    
+int Page::ResetVerticalAlignment(FunctorParams *functorParams)
+{
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+    
+    PgHead *pgHead = doc->m_scoreDef.GetPgHead();
+    if (pgHead) {
+        pgHead->SetDrawingPage(NULL);
+        pgHead->SetStaffAlignment(NULL);
+    }
+    PgFoot *pgFoot = doc->m_scoreDef.GetPgFoot();
+    if (pgFoot) {
+        pgFoot->SetDrawingPage(NULL);
+        pgFoot->SetStaffAlignment(NULL);
+    }
+    PgHead2 *pgHead2 = doc->m_scoreDef.GetPgHead2();
+    if (pgHead2) {
+        pgHead2->SetDrawingPage(NULL);
+        pgHead2->SetStaffAlignment(NULL);
+    }
+    PgFoot2 *pgFoot2 = doc->m_scoreDef.GetPgFoot2();
+    if (pgFoot2) {
+        pgFoot2->SetDrawingPage(NULL);
+        pgFoot2->SetStaffAlignment(NULL);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+    
+    
+int Page::AlignVerticallyEnd(FunctorParams *functorParams)
+{
+    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    assert(params);
+
+    params->m_cumulatedShift = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+    
+    System *topSystem = dynamic_cast<System *>(this->FindChildByType(SYSTEM, 1));
+    System *bottomSystem = dynamic_cast<System *>(this->FindChildByType(SYSTEM, 1, BACKWARD));
+    
+    if (!topSystem || !bottomSystem) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    // first page?
+    if (params->m_doc->GetFirst() == this) {
+        PgHead *pgHead = params->m_doc->m_scoreDef.GetPgHead();
+        if (pgHead) {
+            pgHead->SetDrawingPage(this);
+            pgHead->SetStaffAlignment(dynamic_cast<StaffAlignment *>(topSystem->m_systemAligner.GetFirst()));
+        }
+        PgFoot *pgFoot = params->m_doc->m_scoreDef.GetPgFoot();
+        if (pgFoot) {
+            pgFoot->SetDrawingPage(this);
+            pgFoot->SetStaffAlignment(bottomSystem->m_systemAligner.GetBottomAlignment());
+        }
+    }
+    else {
+        PgHead2 *pgHead2 = params->m_doc->m_scoreDef.GetPgHead2();
+        if (pgHead2) {
+            pgHead2->SetDrawingPage(this);
+            pgHead2->SetStaffAlignment(dynamic_cast<StaffAlignment *>(topSystem->m_systemAligner.GetFirst()));
+        }
+        PgFoot2 *pgFoot2 = params->m_doc->m_scoreDef.GetPgFoot2();
+        if (pgFoot2) {
+            pgFoot2->SetDrawingPage(this);
+            pgFoot2->SetStaffAlignment(bottomSystem->m_systemAligner.GetBottomAlignment());
+        }
+    }
 
     return FUNCTOR_CONTINUE;
 }

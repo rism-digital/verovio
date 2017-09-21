@@ -386,6 +386,26 @@ void ScoreDef::SetDrawingWidth(int drawingWidth)
 {
     m_drawingWidth = drawingWidth;
 }
+    
+PgFoot *ScoreDef::GetPgFoot()
+{
+    return dynamic_cast<PgFoot *>(this->FindChildByType(PGFOOT));
+}
+
+PgFoot2 *ScoreDef::GetPgFoot2()
+{
+    return dynamic_cast<PgFoot2 *>(this->FindChildByType(PGFOOT2));
+}
+
+PgHead *ScoreDef::GetPgHead()
+{
+    return dynamic_cast<PgHead *>(this->FindChildByType(PGHEAD));
+}
+
+PgHead2 *ScoreDef::GetPgHead2()
+{
+    return dynamic_cast<PgHead2 *>(this->FindChildByType(PGHEAD2));
+}
 
 //----------------------------------------------------------------------------
 // ScoreDef functor methods

@@ -78,6 +78,8 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
         System *system = dynamic_cast<System *>(m_currentPage->GetChild(i));
         DrawSystem(dc, system);
     }
+    
+    DrawRunningElements(dc, m_currentPage);
 
     dc->EndPage();
 }
