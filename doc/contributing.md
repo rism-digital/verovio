@@ -4,7 +4,7 @@ This document sets out the methods and practices for contributing to the Verovio
 
 ## Contributor License Agreement
 
-In order to contribute the the project you need to sign and send us a [Contributor License Agreement](http://docs.rism-ch.org/verovio-cla.pdf) (CLA). However, following a generally accepted practice, very small contributions (below 20 lines of code) will be accepted without signing the CLA.
+In order to contribute the the project you need to sign and send us (info@rism-ch.org) a [Contributor License Agreement](http://docs.rism-ch.org/verovio-cla.pdf) (CLA). However, following a generally accepted practice, very small contributions (below 20 lines of code) will be accepted without signing the CLA.
 
 ## How to contribute
 
