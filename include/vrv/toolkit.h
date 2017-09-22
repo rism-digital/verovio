@@ -26,7 +26,7 @@
 
 namespace vrv {
 
-enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM, ESAC, MIDI, TIMEMAP };
+enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM, MEIHUM, ESAC, MIDI, TIMEMAP };
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -290,7 +290,7 @@ public:
     void SetEvenNoteSpacing(bool even) { m_evenNoteSpacing = even; }
     int GetEvenNoteSpacing() { return m_evenNoteSpacing; }
     ///@}
-    
+
     /**
      * @name Set SVG output in mm (for PDF generation with a 72 dpi)
      */

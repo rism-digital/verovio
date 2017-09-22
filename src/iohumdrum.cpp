@@ -892,10 +892,11 @@ void HumdrumInput::insertExtMeta(std::vector<hum::HumdrumLine *> &references)
     xmldata << "\t<frames xmlns:humxml=\"http://www.humdrum.org/ns/humxml\">\n";
     for (int i = 0; i < (int)references.size(); i++) {
         std::string refKey = references[i]->getReferenceKey();
-        if (!(refKey.compare(0, 3, "EED") && refKey.compare(0, 2, "HA") && refKey.compare(0, 2, "OT")
-                && refKey.compare(0, 2, "YE") && refKey.compare(0, 1, "X"))) {
-            continue;
-        }
+        // Keep all reference records for round-trip conversions:
+        // if (!(refKey.compare(0, 3, "EED") && refKey.compare(0, 2, "HA") && refKey.compare(0, 2, "OT")
+        //         && refKey.compare(0, 2, "YE") && refKey.compare(0, 1, "X"))) {
+        //     continue;
+        // }
         references[i]->printXml(xmldata, 4);
     }
     xmldata << "\t</frames>\n";
