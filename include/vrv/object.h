@@ -152,6 +152,7 @@ public:
 
     virtual DurationInterface *GetDurationInterface() { return NULL; }
     virtual PitchInterface *GetPitchInterface() { return NULL; }
+    virtual PlistInterface *GetPlistInterface() { return NULL; }
     virtual PositionInterface *GetPositionInterface() { return NULL; }
     virtual ScoreDefInterface *GetScoreDefInterface() { return NULL; }
     virtual StemmedDrawingInterface *GetStemmedDrawingInterface() { return NULL; }
@@ -576,6 +577,13 @@ public:
     virtual int CalcDots(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     */
+    ///@{
+    virtual int AdjustArpeg(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustArpegEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Adjust the position the outside articulations.
      */
     virtual int AdjustLayers(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -765,6 +773,13 @@ public:
      * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
      */
     virtual int PrepareProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Match elements of @plist.
+     */
+    ///@{
+    virtual int PreparePlist(FunctorParams *functorParams);
+    ///@}
 
     /**
      * Match start for TimePointingInterface elements (such as fermata or harm).
@@ -1092,7 +1107,7 @@ public:
      * If not, it updates the list and also calls FilterList.
      * Because this is an interface, we need to pass the object - not the best design.
      */
-    ListOfObjects *GetList(Object *node);
+    const ListOfObjects *GetList(Object *node);
 
 private:
     mutable ListOfObjects m_list;

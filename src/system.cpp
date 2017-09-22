@@ -359,7 +359,10 @@ int System::JustifyX(FunctorParams *functorParams)
 
     if (params->m_justifiableRatio < 0.8) {
         // Arbitrary value for avoiding over-compressed justification
-        LogWarning("Justification stop because of a ratio smaller than 0.8");
+        LogWarning("Justification stop because of a ratio smaller than 0.8: %lf", params->m_justifiableRatio);
+        LogWarning("\tSystem full width: %d", params->m_systemFullWidth);
+        LogWarning("\tNon-justifiable width: %d", nonJustifiableWidth);
+        LogWarning("\tDrawing justifiable width: %d", m_drawingJustifiableWidth);
     }
 
     // Check if we are on the last page and on the last system - do no justify it if ratio > 1.25
@@ -398,23 +401,23 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = SLUR;
     m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = DYNAM;
-    m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = HAIRPIN;
-    m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = OCTAVE;
-    m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = DIR;
-    m_systemAligner.Process(params->m_functor, params);
     params->m_classId = MORDENT;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = TURN;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = TRILL;
     m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = DYNAM;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = HAIRPIN;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = OCTAVE;
+    m_systemAligner.Process(params->m_functor, params);
     params->m_classId = BREATH;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = FERMATA;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = DIR;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = TEMPO;
     m_systemAligner.Process(params->m_functor, params);

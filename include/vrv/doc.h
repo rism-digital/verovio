@@ -98,6 +98,7 @@ public:
     int GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const;
     int GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const;
     int GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const;
+    int GetGlyphAdvX(wchar_t code, int staffSize, bool graceSize) const;
     int GetDrawingUnit(int staffSize) const;
     int GetDrawingDoubleUnit(int staffSize) const;
     int GetDrawingStaffSize(int staffSize) const;

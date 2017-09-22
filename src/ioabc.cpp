@@ -21,6 +21,7 @@
 #include "clef.h"
 #include "doc.h"
 #include "editorial.h"
+#include "harm.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -34,6 +35,8 @@
 #include "slur.h"
 #include "space.h"
 #include "staff.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "tempo.h"
 #include "text.h"
 #include "trill.h"
@@ -555,7 +558,8 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
 void AbcInput::readInformationField(char dataKey, std::string value, Score *score)
 {
     // remove comments
-    if (value.find('%') != std::string::npos) {
+    if (dataKey == '%') return;
+    else if (value.find('%') != std::string::npos) {
         value = value.substr(0, value.find('%'));
         while (isspace(value[value.length() - 1])) value.pop_back();
     }
@@ -645,7 +649,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // chords
-        else if (musicCode[i] == '[' && musicCode[i + 2] != ':') {
+        else if (musicCode[i] == '[' && !isdigit(musicCode[i + 1]) && musicCode[i + 2] != ':') {
             // start chord
             chord = new Chord();
         }
@@ -767,6 +771,9 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 else
                     m_noteStack.push_back(note);
             }
+            if (!m_harmStack.empty() && !m_harmStack.back()->HasStartid()) {
+                m_harmStack.back()->SetStartid("#" + note->GetUuid());
+            }
         }
 
         // Spaces
@@ -861,10 +868,16 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         // text elements
         else if (musicCode[i] == '\"') {
             i++;
+            Harm *harm = new Harm();
+            std::string chordSymbol;
             while (musicCode[i] != '\"') {
-                // just skip for now
+                chordSymbol.push_back(musicCode[i]);
                 i++;
             }
+            Text *text = new Text();
+            text->SetText(UTF8to16(chordSymbol));
+            harm->AddChild(text);
+            m_harmStack.push_back(harm);
         }
 
         // suppressing score line-breaks
@@ -907,14 +920,25 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             else {
                 if (musicCode[i - 1] == ':')
                     measure->SetRight(BARRENDITION_rptend);
-                else if (musicCode[i + 1] == '|')
+                else if (musicCode[i + 1] == '|'){
+                    i++;
                     measure->SetRight(BARRENDITION_dbl);
-                else if (musicCode[i + 1] == ']')
-                    measure->SetRight(BARRENDITION_end);
+                }
+                else if (musicCode[i + 1] == ']'){
+                    i++;
+                    measure->SetRight(BARRENDITION_end);                    
+                }
                 else
                     measure->SetRight(BARRENDITION_single);
                 staff->AddChild(m_layer);
                 measure->AddChild(staff);
+                if (!m_harmStack.empty()) {
+                    std::vector<Harm *>::iterator iter;
+                    for (iter = m_harmStack.begin(); iter != m_harmStack.end(); iter++) {
+                        measure->AddChild(*iter);
+                    }
+                    m_harmStack.clear();
+                }
                 section->AddChild(measure);
                 measure = new Measure();
                 staff = new Staff();

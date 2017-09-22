@@ -26,7 +26,8 @@
 
 namespace vrv {
 
-enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, ABC, DARMS, MUSICXML, MUSICXMLHUM, ESAC, MIDI, TIMEMAP };
+
+enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, ABC, DARMS, MUSICXML, MUSICXMLHUM, MEIHUM, ESAC, MIDI, TIMEMAP };
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -286,6 +287,14 @@ public:
     ///@}
 
     /**
+     * @name Set SVG output in mm (for PDF generation with a 72 dpi)
+     */
+    ///@{
+    void SetMMOutput(bool mmOutput) { m_mmOutput = mmOutput; }
+    int GetMMOutput() { return m_mmOutput; }
+    ///@}
+
+    /**
      * @name Do not justify the system (for debugging purposes)
      */
     ///@{
@@ -427,6 +436,7 @@ private:
     bool m_evenNoteSpacing;
     float m_spacingLinear;
     float m_spacingNonLinear;
+    bool m_mmOutput;
     // for debugging
     bool m_noJustification;
     bool m_showBoundingBoxes;

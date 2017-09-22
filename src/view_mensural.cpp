@@ -148,7 +148,7 @@ void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *lay
     Rest *rest = dynamic_cast<Rest *>(element);
     assert(rest);
 
-    bool drawingCueSize = rest->IsCueSize();
+    bool drawingCueSize = rest->GetDrawingCueSize();
     int drawingDur = rest->GetActualDur();
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -226,7 +226,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     int staffY = staff->GetDrawingY();
     int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
     int drawingDur = (object->GetDurationInterface())->GetActualDur();
-    bool drawingCueSize = object->IsCueSize();
+    bool drawingCueSize = object->GetDrawingCueSize();
     int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
@@ -448,21 +448,19 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
-    int xn, xLeft, xRight, yTop, yBottom, y3, y4;
+    int xLeft, xRight, yTop, yBottom, y3, y4;
     // int yy2, y5; // unused
     int verticalCenter, up, height;
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     bool fillNotehead = (mensural_black || note->GetColored()) && !(mensural_black && note->GetColored());
     height = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) / 2;
-    xn = element->GetDrawingX();
 
     // Calculate size of the rectangle
-    xLeft = xn - m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
-    xRight = xn + m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+    xLeft = element->GetDrawingX();
+    xRight = xLeft + 2 * m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
     if (note->GetActualDur() == DUR_MX) {
         // Maxima is twice the width of brevis
-        xLeft -= m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
-        xRight += m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+        xRight += 2* m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
     }
     yTop = y + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     yBottom = y - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);

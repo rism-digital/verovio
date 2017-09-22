@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "arpeg.h"
 #include "attcomparison.h"
 #include "doc.h"
 #include "floatingobject.h"
@@ -23,6 +24,7 @@
 #include "note.h"
 #include "smufl.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "style.h"
 #include "timestamp.h"
 #include "vrv.h"
@@ -735,6 +737,58 @@ int MeasureAligner::JustifyX(FunctorParams *functorParams)
 
     params->m_leftBarLineX = GetLeftBarLineAlignment()->GetXRel();
     params->m_rightBarLineX = GetRightBarLineAlignment()->GetXRel();
+
+    return FUNCTOR_CONTINUE;
+}
+    
+            
+int Alignment::AdjustArpeg(FunctorParams *functorParams)
+{
+    AdjustArpegParams *params = dynamic_cast<AdjustArpegParams *>(functorParams);
+    assert(params);
+    
+    // An array of Alignment / Arpeg / staffN / bool (for indicating if we have reached the aligment yet)
+    ArrayOfAligmentArpegTuples::iterator iter = params->m_alignmentArpegTuples.begin();
+    
+    while (iter != params->m_alignmentArpegTuples.end()) {
+        // We are reaching the alignment to which an arpeg points to (i.e, the topNote one)
+        if (std::get<0>(*iter) == this) {
+            std::get<3>(*iter) = true;
+            iter++;
+            continue;
+        }
+        // We have not reached the alignment of the arpeg, just continue (backwards)
+        else if (std::get<3>(*iter) == false) {
+            iter++;
+            continue;
+        }
+        // We are now in an alignment preceeding an arpeg - check for overlap
+        int minLeft, maxRight;
+        this->GetLeftRight(std::get<2>(*iter), minLeft, maxRight);
+        
+        // Nothing for the staff we are looking at, we also need to check with barlines
+        if (maxRight == VRV_UNSET) {
+            this->GetLeftRight(-1, minLeft, maxRight);
+        }
+
+        // Nothing, just continue
+        if (maxRight == VRV_UNSET) {
+            iter++;
+            continue;
+        }
+        
+        int overlap = maxRight - std::get<1>(*iter)->GetCurrentFloatingPositioner()->GetSelfLeft();
+        // HARDCODED
+        overlap += params->m_doc->GetDrawingUnit(100) / 2;
+        //LogDebug("maxRight %d, %d %d", maxRight, std::get<2>(*iter), overlap);
+        if (overlap > 0) {
+            ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this, std::get<0>(*iter), overlap) };
+            params->m_measureAligner->AdjustProportionally(boundaries);
+        }
+        
+        // We can remove it from the list
+        iter = params->m_alignmentArpegTuples.erase(iter);
+    }
 
     return FUNCTOR_CONTINUE;
 }

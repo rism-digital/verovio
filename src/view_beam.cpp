@@ -58,7 +58,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /******************************************************************/
     // initialization
 
-    ListOfObjects *beamChildren = beam->GetList(beam);
+    const ListOfObjects *beamChildren = beam->GetList(beam);
 
     // Should we assert this at the beginning?
     if (beamChildren->empty()) {
@@ -283,7 +283,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /******************************************************************/
     // initialization
 
-    ListOfObjects *fTremChildren = fTrem->GetList(fTrem);
+    const ListOfObjects *fTremChildren = fTrem->GetList(fTrem);
 
     // Should we assert this at the beginning?
     if (fTremChildren->empty()) {

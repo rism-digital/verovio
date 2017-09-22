@@ -25,6 +25,26 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// Bracket
+//----------------------------------------------------------------------------
+
+Bracket::Bracket() : LayerElement("bracket-")
+{
+
+    Reset();
+}
+
+Bracket::~Bracket()
+{
+}
+
+void Bracket::Reset()
+{
+    LayerElement::Reset();
+}
+
+    
+//----------------------------------------------------------------------------
 // Dots
 //----------------------------------------------------------------------------
 
@@ -115,6 +135,25 @@ Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code
 }
 
 //----------------------------------------------------------------------------
+// Num
+//----------------------------------------------------------------------------
+
+Num::Num() : LayerElement("num-")
+{
+
+    Reset();
+}
+
+Num::~Num()
+{
+}
+
+void Num::Reset()
+{
+    LayerElement::Reset();
+}
+
+//----------------------------------------------------------------------------
 // Stem
 //----------------------------------------------------------------------------
 
@@ -161,6 +200,14 @@ void Stem::AddChild(Object *child)
 // Functors methods
 //----------------------------------------------------------------------------
 
+int Bracket::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    return FUNCTOR_CONTINUE;
+};
+
 int Dots::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
@@ -190,6 +237,15 @@ int Flag::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 };
 
+int Num::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    return FUNCTOR_CONTINUE;
+};
+
+    
 int Stem::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
@@ -200,7 +256,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     assert(params->m_interface);
 
     int staffSize = params->m_staff->m_drawingStaffSize;
-    bool drawingCueSize = this->IsCueSize();
+    bool drawingCueSize = this->GetDrawingCueSize();
 
     /************ Set the position, the length and adjust to the note head ************/
 

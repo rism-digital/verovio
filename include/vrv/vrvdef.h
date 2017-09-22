@@ -104,6 +104,7 @@ enum ClassId {
     // Ids for ControlElement child classes
     CONTROL_ELEMENT,
     ANCHORED_TEXT,
+    ARPEG,
     BREATH,
     DIR,
     DYNAM,
@@ -129,6 +130,7 @@ enum ClassId {
     BARLINE_ATTR_RIGHT,
     BEAM,
     BEATRPT,
+    BRACKET,
     BTREM,
     CHORD,
     CLEF,
@@ -147,6 +149,7 @@ enum ClassId {
     MULTIREST,
     MULTIRPT,
     NOTE,
+    NUM,
     PROPORT,
     REST,
     SPACE,
@@ -183,6 +186,7 @@ enum InterfaceId {
     INTERFACE_BOUNDARY,
     INTERFACE_DURATION,
     INTERFACE_PITCH,
+    INTERFACE_PLIST,
     INTERFACE_POSITION,
     INTERFACE_SCOREDEF,
     INTERFACE_TEXT_DIR,
@@ -195,6 +199,7 @@ enum InterfaceId {
 //----------------------------------------------------------------------------
 
 class Alignment;
+class Arpeg;
 class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
@@ -203,6 +208,7 @@ class LayerElement;
 class LedgerLine;
 class Note;
 class Object;
+class PlistInterface;
 class Point;
 class Staff;
 class TimePointInterface;
@@ -217,8 +223,12 @@ typedef std::vector<AttComparison *> ArrayOfAttComparisons;
 typedef std::vector<Note *> ChordCluster;
 
 typedef std::vector<std::tuple<Alignment *, Alignment *, int> > ArrayOfAdjustmentTuples;
+    
+typedef std::vector<std::tuple<Alignment *, Arpeg *, int, bool> > ArrayOfAligmentArpegTuples;
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
+
+typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfInterfaceUuidPairs;
 
 typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
 

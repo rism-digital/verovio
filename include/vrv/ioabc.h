@@ -25,6 +25,7 @@ class Clef;
 class ControlElement;
 class Layer;
 class LayerElement;
+class Harm;
 class Measure;
 class MeterSig;
 class Note;
@@ -290,6 +291,7 @@ private:
 
     std::vector<LayerElement *> m_layerElements;
     std::vector<LayerElement *> m_noteStack;
+    std::vector<Harm *> m_harmStack;
 };
 
 } // namespace vrv

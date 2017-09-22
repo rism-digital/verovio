@@ -86,7 +86,7 @@ public:
     AddLayerElementToFlatListParams(ListOfObjects *flatList) { m_flatList = flatList; }
     ListOfObjects *m_flatList;
 };
-
+    
 //----------------------------------------------------------------------------
 // AdjustAccidXParams
 //----------------------------------------------------------------------------
@@ -110,9 +110,33 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustArticWithSlursParams
+// AdjustArpegParams
 //----------------------------------------------------------------------------
 
+/**
+ * member 0: the array of Alignement, Arpeg, StaffN, bool tuples
+ * member 1: the MeasureAligner
+ * member 2: the Functor to be redirected to MeasureAligner
+ * member 3: the Doc
+ **/
+
+class AdjustArpegParams : public FunctorParams {
+public:
+    AdjustArpegParams(Doc *doc, Functor *functor) {
+        m_measureAligner = NULL;
+        m_doc = doc;
+        m_functor = functor;
+    }
+    ArrayOfAligmentArpegTuples m_alignmentArpegTuples;
+    MeasureAligner *m_measureAligner;
+    Functor *m_functor;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustArticWithSlursParams
+//----------------------------------------------------------------------------
+    
 // Use FunctorDocParams
 
 //----------------------------------------------------------------------------
@@ -1077,26 +1101,19 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareRptParams
+// PreparePlistParams
 //----------------------------------------------------------------------------
 
 /**
- * member 0: a pointer to the current MRpt pointer
- * member 1: a pointer to the data_BOOLEAN indicating if multiNumber
- * member 2: a pointer to the doc scoreDef
+ * member 0: ArrayOfInterfaceUuidPairs holds the interface / uuid pairs to match
+ * member 1: bool* fillList for indicating whether the pairs have to be stacked or not
  **/
 
-class PrepareRptParams : public FunctorParams {
+class PreparePlistParams : public FunctorParams {
 public:
-    PrepareRptParams(ScoreDef *currentScoreDef)
-    {
-        m_currentMRpt = NULL;
-        m_multiNumber = BOOLEAN_NONE;
-        m_currentScoreDef = currentScoreDef;
-    }
-    MRpt *m_currentMRpt;
-    data_BOOLEAN m_multiNumber;
-    ScoreDef *m_currentScoreDef;
+    PreparePlistParams() { m_fillList = true; }
+    ArrayOfInterfaceUuidPairs m_interfaceUuidPairs;
+    bool m_fillList;
 };
 
 //----------------------------------------------------------------------------
@@ -1127,6 +1144,29 @@ public:
     PrepareProcessingListsParams() {}
     IntTree m_verseTree;
     IntTree m_layerTree;
+};
+
+//----------------------------------------------------------------------------
+// PrepareRptParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the current MRpt pointer
+ * member 1: a pointer to the data_BOOLEAN indicating if multiNumber
+ * member 2: a pointer to the doc scoreDef
+ **/
+
+class PrepareRptParams : public FunctorParams {
+public:
+    PrepareRptParams(ScoreDef *currentScoreDef)
+    {
+        m_currentMRpt = NULL;
+        m_multiNumber = BOOLEAN_NONE;
+        m_currentScoreDef = currentScoreDef;
+    }
+    MRpt *m_currentMRpt;
+    data_BOOLEAN m_multiNumber;
+    ScoreDef *m_currentScoreDef;
 };
 
 //----------------------------------------------------------------------------
