@@ -16,6 +16,7 @@
 #include <QSGGeometryNode>
 #include <QSGSimpleRectNode>
 #include <QScreen>
+#include <cmath>
 
 //----------------------------------------------------------------------------
 
