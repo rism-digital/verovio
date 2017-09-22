@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "textquickitem.h"
+#include "verovio-qt/textquickitem.h"
 
 VerovioPageDemo::VerovioPageDemo()
 {

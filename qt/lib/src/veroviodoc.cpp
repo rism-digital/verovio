@@ -32,17 +32,9 @@ VerovioDoc::VerovioDoc()
     , m_ignoreLayout(m_verovioToolkit.GetIgnoreLayout())
     , m_musicFont("Leipzig")
 {
-    QString resourcesDataPath;
-    resourcesDataPath = "../../data";
-    Resources::SetPath(resourcesDataPath.toStdString());
-
-    if (!Resources::InitFonts()) {
-        qWarning() << "The music font could not be loaded; please check the contents of the resource directory.";
-        exit(1);
-    }
-
     connect(this, SIGNAL(documentLayoutInvalidated()), this, SLOT(documentRelayout()), Qt::QueuedConnection);
-    connect(this, SIGNAL(fileContentInvalidated()), this, SLOT(readFile()), Qt::QueuedConnection);
+    connect(this, SIGNAL(fileNameInvalidated()), this, SLOT(readFile()), Qt::QueuedConnection);
+    connect(this, SIGNAL(fileContentInvalidated()), this, SLOT(reloadData()), Qt::QueuedConnection);
 }
 
 int VerovioDoc::adjustedPageHeightForPage(int page)
@@ -82,6 +74,14 @@ void VerovioDoc::renderPage(int page, DeviceContext *deviceContext)
 {
     if (m_hasValidData) {
         m_verovioToolkit.RenderToCustomDevice(page, deviceContext);
+    }
+}
+
+void VerovioDoc::setHasValidData(bool hasValidData)
+{
+    if (m_hasValidData != hasValidData) {
+        m_hasValidData = hasValidData;
+        emit hasValidDataChanged(hasValidData);
     }
 }
 
@@ -166,7 +166,7 @@ void VerovioDoc::setNoLayout(bool noLayout)
         m_noLayout = noLayout;
         m_verovioToolkit.SetNoLayout(noLayout);
         // "no layout" is used in LoadData
-        requestReadFile();
+        requestReloadData();
     }
 }
 
@@ -176,7 +176,37 @@ void VerovioDoc::setIgnoreLayout(bool ignoreLayout)
         m_ignoreLayout = ignoreLayout;
         m_verovioToolkit.SetIgnoreLayout(ignoreLayout);
         // "ignore layout" is used in LoadData
-        requestReadFile();
+        requestReloadData();
+    }
+}
+
+void VerovioDoc::setFileContent(QString fileContent)
+{
+    if (m_fileContent != fileContent) {
+        m_fileContent = fileContent;
+        requestReloadData();
+    }
+}
+
+void VerovioDoc::setResourcesDataPath(QString resourcesDataPath)
+{
+    if (m_resourcesDataPath != resourcesDataPath) {
+        m_resourcesDataPath = resourcesDataPath;
+        Resources::SetPath(resourcesDataPath.toStdString());
+
+        if (!Resources::InitFonts()) {
+            qWarning() << "The music font could not be loaded; please check the contents of the resource directory.";
+            exit(1);
+        }
+        requestDocumentRelayout();
+    }
+}
+
+void VerovioDoc::setFontDirPath(QString fontDirPath)
+{
+    if (m_fontDirPath != fontDirPath) {
+        m_fontDirPath = fontDirPath;
+        requestDocumentRelayout();
     }
 }
 
@@ -206,22 +236,30 @@ void VerovioDoc::initFont()
     m_verovioToolkit.SetFont(m_musicFont.toStdString());
 
     if (m_musicFont == "Bravura")
-        QFontDatabase::addApplicationFont("../../fonts/Bravura-1.204.otf");
+        QFontDatabase::addApplicationFont(m_fontDirPath + "/Bravura-1.204.otf");
     else if (m_musicFont == "Leipzig")
-        QFontDatabase::addApplicationFont("../../fonts/Leipzig-5.2.ttf");
+        qDebug() << "Leipzig" << QFontDatabase::addApplicationFont(m_fontDirPath + "/Leipzig-5.2.ttf");
     else if (m_musicFont == "Gootville")
-        QFontDatabase::addApplicationFont("../../fonts/Gootville-1.2.otf");
+        QFontDatabase::addApplicationFont(m_fontDirPath + "/Gootville-1.2.otf");
     else
         qWarning() << "Using currently unsupported font:" << m_musicFont;
 
     // Always add VerovioText (required e.g. for # in harmonies)
-    QFontDatabase::addApplicationFont("../../fonts/VerovioText-1.0.ttf");
+    QFontDatabase::addApplicationFont(m_fontDirPath + "/VerovioText-1.0.ttf");
 }
 
 void VerovioDoc::requestReadFile()
 {
     if (!m_readFileRequested) {
         m_readFileRequested = true;
+        emit fileNameInvalidated();
+    }
+}
+
+void VerovioDoc::requestReloadData()
+{
+    if (!m_reloadDataRequested) {
+        m_reloadDataRequested = true;
         emit fileContentInvalidated();
     }
 }
@@ -247,9 +285,15 @@ void VerovioDoc::readFile()
     }
 
     if (success) {
-        success = m_verovioToolkit.LoadData(m_fileContent.toStdString());
+        requestReloadData();
     }
+}
 
+void VerovioDoc::reloadData()
+{
+    m_reloadDataRequested = false;
+
+    bool success = m_verovioToolkit.LoadData(m_fileContent.toStdString());
     setHasValidData(success);
 
     if (success) {

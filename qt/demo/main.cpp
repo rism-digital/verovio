@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "veroviodoc.h"
+#include "verovio-qt/veroviodoc.h"
 #include "veroviopagedemo.h"
 
 /**

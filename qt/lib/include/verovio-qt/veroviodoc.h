@@ -29,7 +29,10 @@ namespace vrv {
 class VerovioDoc : public QObject {
     Q_OBJECT
 
+    Q_PROPERTY(QString resourcesDataPath MEMBER m_resourcesDataPath WRITE setResourcesDataPath)
+    Q_PROPERTY(QString fontDirPath MEMBER m_fontDirPath WRITE setFontDirPath)
     Q_PROPERTY(QString fileName MEMBER m_fileName WRITE setFileName)
+    Q_PROPERTY(QString fileContent MEMBER m_fileContent WRITE setFileContent)
     Q_PROPERTY(QString musicFont MEMBER m_musicFont WRITE setMusicFont)
     Q_PROPERTY(int pageCount MEMBER m_pageCount READ pageCount NOTIFY pageCountChanged)
     Q_PROPERTY(int pageWidth MEMBER m_pageWidth WRITE setPageWidth)
@@ -74,21 +77,16 @@ public:
      * @name Returns if the document has valid data to show.
      */
     bool hasValidData() const { return m_hasValidData; }
-    void setHasValidData(bool hasValidData)
-    {
-        if (m_hasValidData != hasValidData) {
-            m_hasValidData = hasValidData;
-            emit hasValidDataChanged(hasValidData);
-        }
-    }
 
 public slots:
-
     /**
      * @name Setters for public properties.
      */
     ///@{
+    void setResourcesDataPath(QString resourcesDataPath);
+    void setFontDirPath(QString fontDirPath);
     void setFileName(QString fileName);
+    void setFileContent(QString fileContent);
     void setMusicFont(QString musicFont);
     void setPageWidth(int pageWidth);
     void setPageHeight(int pageHeight);
@@ -115,6 +113,7 @@ signals:
     ///@{
     void documentLayoutInvalidated();
     void fileContentInvalidated();
+    void fileNameInvalidated();
     ///@}
 
     /**
@@ -125,25 +124,35 @@ signals:
     void hasValidDataChanged(bool hasValidData);
     ///@}
 
+protected:
+    // instance of the verovio Toolkit class used to communicate to the C++ library.
+    Toolkit m_verovioToolkit;
+
 private slots:
     /**
-     * @name Worker function that recalculates the document layout. This function is called asynchronously if
-     * requestDocumentLayout() is called.
+     * @name Loads or reloads the data stored in the m_content member variable.
      */
-    void documentRelayout();
+    void reloadData();
 
     /**
      * @name Read the content of the file specified by the fileName property.
      */
     void readFile();
 
+    /**
+     * @name Worker function that recalculates the document layout. This function is called asynchronously if
+     * requestDocumentLayout() is called.
+     */
+    void documentRelayout();
+
 private:
     /**
-     * @name These function trigger an asynchronous document relayout or read file request.
+     * @name These function trigger an asynchronous read file, reload data or document relayout request.
      */
     ///@{
-    void requestDocumentRelayout();
     void requestReadFile();
+    void requestReloadData();
+    void requestDocumentRelayout();
     ///@}
 
     /**
@@ -156,10 +165,12 @@ private:
      */
     void initFont();
 
-private:
-    // instance of the verovio Toolkit class used to communicate to the C++ library.
-    Toolkit m_verovioToolkit;
+    /**
+     * @name Setter for hasValidData.
+     */
+    void setHasValidData(bool hasValidData);
 
+private:
     // configuration parameters for Verovio
     int m_pageWidth;
     int m_pageHeight;
@@ -179,11 +190,16 @@ private:
     // font name for the music symbols (e.g. notes)
     QString m_musicFont;
 
+    // paths to the resource and font dirs
+    QString m_resourcesDataPath;
+    QString m_fontDirPath;
+
     QString m_fileName;
     QString m_fileContent;
 
     // flags to store state of document
     bool m_documentRelayoutRequested{ false };
+    bool m_reloadDataRequested{ false };
     bool m_readFileRequested{ false };
     bool m_fontInitDone{ false };
     bool m_hasValidData{ false };

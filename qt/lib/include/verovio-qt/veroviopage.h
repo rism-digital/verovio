@@ -53,6 +53,12 @@ public slots:
     void setPageNumber(int pageNumber);
     ///@}
 
+signals:
+    /**
+     * @name This signal is emitted when the attached verovioDoc changes.
+     */
+    void verovioDocChanged(VerovioDoc *verovicoDoc);
+
 protected:
     /**
      * @name Reimplemented function from QQuickItem.

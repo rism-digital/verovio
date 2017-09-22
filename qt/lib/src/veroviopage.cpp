@@ -41,6 +41,8 @@ void VerovioPage::setVerovioDoc(VerovioDoc *verovioDoc)
             m_verovioRenderingDirty = true;
             update();
         });
+
+        emit verovioDocChanged(m_verovioDoc);
     }
 }
 

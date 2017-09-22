@@ -49,6 +49,9 @@ Item {
         scale: 50
         adjustPageHeight: options.viewMode == "Continuous" ? true : false
 
+        resourcesDataPath: "../../data"
+        fontDirPath: "../../fonts"
+
         fileName: options.fileName
         musicFont: options.musicFont
         border: options.border
