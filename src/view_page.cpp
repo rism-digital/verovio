@@ -105,8 +105,8 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
     }
 
     // longest key signature of the staffDefs
-    ListOfObjects *scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
-    for (ListOfObjects::iterator it = scoreDefList->begin(); it != scoreDefList->end(); it++) {
+    const ListOfObjects *scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
+    for (ListOfObjects::const_iterator it = scoreDefList->begin(); it != scoreDefList->end(); it++) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*it);
         assert(staffDef);
         if (!staffDef->HasKeySigInfo()) continue;
@@ -233,7 +233,7 @@ void View::DrawStaffGrp(
 
     TextExtend extend;
 
-    ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
+    const ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
     if (staffDefs->empty()) {
         return;
     }
@@ -289,7 +289,14 @@ void View::DrawStaffGrp(
         int y_label = y_bottom - (y_bottom - y_top) / 2 - m_doc->GetDrawingUnit(100);
 
         dc->SetBrush(m_currentColour, AxSOLID);
-        dc->SetFont(m_doc->GetDrawingLyricFont(100));
+        
+        FontInfo grpTxt;
+        if (!dc->UseGlobalStyling()) {
+            grpTxt.SetFaceName("Times");
+        }
+        
+        grpTxt.SetPointSize(m_doc->GetDrawingLyricFont(100)->GetPointSize());
+        dc->SetFont(&grpTxt);
 
         dc->GetTextExtent(labelStr, &extend);
 
@@ -355,8 +362,8 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
 
     TextExtend extend;
 
-    ListOfObjects *scoreDefChildren = scoreDef->GetList(scoreDef);
-    ListOfObjects::iterator iter = scoreDefChildren->begin();
+    const ListOfObjects *scoreDefChildren = scoreDef->GetList(scoreDef);
+    ListOfObjects::const_iterator iter = scoreDefChildren->begin();
     while (iter != scoreDefChildren->end()) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
 
@@ -399,8 +406,15 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         int y = staff->GetDrawingY()
             - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
 
+        FontInfo labelTxt;
+        if (!dc->UseGlobalStyling()) {
+            labelTxt.SetFaceName("Times");
+        }
+        
+        labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize());
+        
         dc->SetBrush(m_currentColour, AxSOLID);
-        dc->SetFont(m_doc->GetDrawingLyricFont(100));
+        dc->SetFont(&labelTxt);
 
         dc->GetTextExtent(labelStr, &extend);
 
@@ -564,7 +578,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         }
     }
     else {
-        ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
+        const ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
         if (staffDefs->empty()) {
             return;
         }
@@ -600,8 +614,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // Now we have a barthru barLine, but we have dots so we still need to go through each staff
         if (barLine->HasRepetitionDots()) {
             StaffDef *childStaffDef = NULL;
-            ListOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
-            for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
+            const ListOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
+            for (ListOfObjects::const_reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
                 childStaffDef = dynamic_cast<StaffDef *>((*it));
                 if (childStaffDef) {
                     AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());

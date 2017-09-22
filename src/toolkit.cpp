@@ -62,6 +62,7 @@ Toolkit::Toolkit(bool initFont)
     m_noLayout = false;
     m_ignoreLayout = false;
     m_adjustPageHeight = false;
+    m_mmOutput = false;
     m_noJustification = false;
     m_evenNoteSpacing = false;
     m_showBoundingBoxes = false;
@@ -184,7 +185,7 @@ bool Toolkit::SetSpacingNonLinear(float spacingNonLinear)
 
 bool Toolkit::SetOutputFormat(std::string const &outformat)
 {
-    if (outformat == "humdrum") {
+    if ((outformat == "humdrum") || (outformat == "hum")) {
         m_outformat = HUMDRUM;
     }
     else if (outformat == "mei") {
@@ -211,7 +212,7 @@ bool Toolkit::SetFormat(std::string const &informat)
     else if (informat == "darms") {
         m_format = DARMS;
     }
-    else if (informat == "humdrum") {
+    else if ((informat == "humdrum") || (informat == "hum")) {
         m_format = HUMDRUM;
     }
     else if (informat == "mei") {
@@ -222,6 +223,9 @@ bool Toolkit::SetFormat(std::string const &informat)
     }
     else if (informat == "musicxml-hum") {
         m_format = MUSICXMLHUM;
+    }
+    else if (informat == "mei-hum") {
+        m_format = MEIHUM;
     }
     else if (informat == "esac") {
         m_format = ESAC;
@@ -497,6 +501,36 @@ bool Toolkit::LoadData(const std::string &data)
         input = new MeiInput(&m_doc, "");
     }
 
+    else if (inputFormat == MEIHUM) {
+        // This is the indirect converter from MusicXML to MEI using iohumdrum:
+        hum::Tool_mei2hum converter;
+        pugi::xml_document xmlfile;
+        xmlfile.load(data.c_str());
+        stringstream conversion;
+        bool status = converter.convert(conversion, xmlfile);
+        if (!status) {
+            LogError("Error converting MEI data");
+            return false;
+        }
+        std::string buffer = conversion.str();
+        SetHumdrumBuffer(buffer.c_str());
+
+        // Now convert Humdrum into MEI:
+        Doc tempdoc;
+        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        tempinput->SetTypeOption(GetHumType());
+        if (!tempinput->ImportString(conversion.str())) {
+            LogError("Error importing Humdrum data");
+            delete tempinput;
+            return false;
+        }
+        MeiOutput meioutput(&tempdoc, "");
+        meioutput.SetScoreBasedMEI(true);
+        newData = meioutput.GetOutput();
+        delete tempinput;
+        input = new MeiInput(&m_doc, "");
+    }
+
     else if (inputFormat == ESAC) {
         // This is the indirect converter from EsAC to MEI using iohumdrum:
         hum::Tool_esac2hum converter;
@@ -636,6 +670,8 @@ bool Toolkit::ParseOptions(const std::string &json_options)
     if (json.has<jsonxx::Number>("border")) SetBorder(json.get<jsonxx::Number>("border"));
 
     if (json.has<jsonxx::String>("font")) SetFont(json.get<jsonxx::String>("font"));
+
+    if (json.has<jsonxx::Number>("mmOutput")) SetMMOutput(json.get<jsonxx::Number>("mmOutput"));
 
     if (json.has<jsonxx::Number>("pageWidth")) SetPageWidth(json.get<jsonxx::Number>("pageWidth"));
 
@@ -864,6 +900,10 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
     SvgDeviceContext svg(width, height);
+
+    if (m_mmOutput) {
+        svg.SetMMOutput(true);
+    }
 
     // set scale and border from user options
     svg.SetUserScale(m_view.GetPPUFactor() * (double)m_scale / 100, m_view.GetPPUFactor() * (double)m_scale / 100);

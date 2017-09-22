@@ -183,7 +183,12 @@ public:
      * Special case of functor redirected from Measure.
      */
     virtual int JustifyX(FunctorParams *functorParams);
-
+         
+    /**
+     * See Object::AdjustArpeg
+     */
+    virtual int AdjustArpeg(FunctorParams *functorParams);
+    
     /**
      * See Object::AdjustGraceXPos
      */

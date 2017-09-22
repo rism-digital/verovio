@@ -186,10 +186,10 @@ public:
     char below = '\0'; // !!!RDF**kern: i = below (previous signifier is "below")
     char above = '\0'; // !!!RDF**kern: i = above (previous signifier is "above")
 
-    string space_color; // !!!RDF**kern: show spaces color=hotpink
-    string ispace_color; // !!!RDF**kern: show invisible rests color=chartreuse
-    string irest_color; // !!!RDF**kern: show implicit spaces color=blueviolet
-    string rspace_color; // !!!RDF**kern: show recip spaces color=royalblue
+    std::string space_color; // !!!RDF**kern: show spaces color=hotpink
+    std::string ispace_color; // !!!RDF**kern: show invisible rests color=chartreuse
+    std::string irest_color; // !!!RDF**kern: show implicit spaces color=blueviolet
+    std::string rspace_color; // !!!RDF**kern: show recip spaces color=royalblue
 
     // coloring of notes
     // !!!RDF**kern: i = marked note, color="#553325"
@@ -264,6 +264,7 @@ protected:
     void addTurn(vrv::Object *linked, hum::HTp token);
     void addMordent(vrv::Object *linked, hum::HTp token);
     void addOrnaments(vrv::Object *object, hum::HTp token);
+    void addArpeggio(vrv::Object *object, hum::HTp token);
     void getTimingInformation(std::vector<hum::HumNum> &prespace, std::vector<hum::HTp> &layerdata,
         hum::HumNum layerstarttime, hum::HumNum layerendtime);
     void convertChord(Chord *chord, hum::HTp token, int staffindex);
@@ -303,7 +304,9 @@ protected:
     void addHarmFloatsForMeasure(int startine, int endline);
     void addFiguredBassForMeasure(int startline, int endline);
     void processDynamics(hum::HTp token, int staffindex);
-    void processDirection(hum::HTp token, int staffindex);
+    void processDirections(hum::HTp token, int staffindex);
+    void processLinkedDirection(int index, hum::HTp token, int staffindex);
+    void processGlobalDirections(hum::HTp token, int staffindex);
     void processChordSignifiers(Chord *chord, hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum frac = 0);
     hum::HumNum getMeasureEndTstamp(int staffindex);
@@ -318,8 +321,8 @@ protected:
     void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
     std::string getLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
     std::string getLocationId(Object *object, int lineindex, int fieldindex, int subtokenindex);
-    std::string getLocationId(const string &prefix, hum::HTp token, int subtoken);
-    std::string getLocationId(const string &prefix, int lineindex, int fieldindex, int subtokenindex);
+    std::string getLocationId(const std::string &prefix, hum::HTp token, int subtoken = -1);
+    std::string getLocationId(const std::string &prefix, int lineindex, int fieldindex, int subtokenindex);
     void setLocationIdNSuffix(vrv::Object *object, hum::HTp token, int number);
     void setSlurLocationId(vrv::Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex);
     void setTieLocationId(vrv::Object *object, hum::HTp tiestart, int sindex, hum::HTp tieend, int eindex);
@@ -340,7 +343,7 @@ protected:
     std::vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
     void addSystemKeyTimeChange(int startline, int endline);
     void prepareEndings();
-    int getDirection(const string &token, const std::string &target);
+    int getDirection(const std::string &token, const std::string &target);
     void resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void resolveTupletBeamStartTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
     void resolveTupletBeamEndTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
@@ -348,10 +351,14 @@ protected:
     void embedPitchInformationInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
     void splitSyllableBySpaces(vector<string> &vtext, char spacer = ' ');
-    void setInstrumentName(vrv::StaffDef *staffdef, const string &name);
-    void setInstrumentAbbreviation(vrv::StaffDef *staffdef, const string &name);
+    void setInstrumentName(vrv::StaffDef *staffdef, const std::string &name);
+    void setInstrumentAbbreviation(vrv::StaffDef *staffdef, const std::string &name);
     void addDefaultTempo(ScoreDef &m_scoreDef);
     int getChordNoteCount(hum::HTp token);
+    bool leftmostSystemArpeggio(hum::HTp token);
+    hum::HTp getRightmostSystemArpeggio(hum::HTp token);
+    void addDirection(
+        const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token, int staffindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

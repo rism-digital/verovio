@@ -1281,7 +1281,11 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         return;
     }
 
+    LayerElement *durElement = note1;
     parentChord1 = note1->IsChordTone();
+    if (parentChord1) {
+        durElement = parentChord1;
+    }
 
     Layer *layer1 = dynamic_cast<Layer *>(note1->GetFirstParent(LAYER));
     Layer *layer2 = dynamic_cast<Layer *>(note2->GetFirstParent(LAYER));
@@ -1348,7 +1352,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
             = (tie->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
-    else if (layer1 && ((layerStemDir = layer1->GetDrawingStemDir(note1)) != STEMDIRECTION_NONE)) {
+    else if (layer1 && ((layerStemDir = layer1->GetDrawingStemDir(durElement)) != STEMDIRECTION_NONE)) {
         drawingCurveDir = (layerStemDir == STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // look if in a chord
@@ -1461,6 +1465,18 @@ void View::DrawTrillExtension(
     if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
         x1 += m_doc->GetGlyphWidth(SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false);
     }
+    
+    // Adjust the x2 for extensions with @endid
+    if ((spanningType == SPANNING_END) || (spanningType == SPANNING_START_END)) {
+        LayerElement *end = trill->GetEnd();
+        assert(end);
+        if (!end->Is(TIMESTAMP_ATTR)) {
+            x2 = end->GetContentLeft() - m_doc->GetGlyphWidth(SMUFL_E59D_ornamentZigZagLineNoRightEnd, staff->m_drawingStaffSize, false) / 2;
+        }
+    }
+
+    int length = x2 - x1;
+    Point orig(x1, y);
 
     /************** draw it **************/
 
@@ -1469,7 +1485,7 @@ void View::DrawTrillExtension(
     else
         dc->StartGraphic(trill, "spanning-trill", "");
 
-    DrawSmuflHorizontalLine(dc, x1, x2, y, staff->m_drawingStaffSize, false, SMUFL_E59D_ornamentZigZagLineNoRightEnd, 0,
+    DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, false, SMUFL_E59D_ornamentZigZagLineNoRightEnd, 0,
         SMUFL_E59E_ornamentZigZagLineWithRightEnd);
 
     if (graphic)
@@ -1590,12 +1606,54 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     assert(measure);
     assert(arpeg);
 
-    // Cannot draw a breath that has no start position
-    // if (!breath->GetStart()) return;
+    Note *topNote = NULL;
+    Note *bottomNote = NULL;
+
+    arpeg->GetDrawingTopBottomNotes(topNote, bottomNote);
+    
+    // We cannot draw without a top and bottom note
+    if (!topNote || !bottomNote) return;
+    
+    int top = topNote->GetDrawingY();
+    int bottom = bottomNote->GetDrawingY();
+    
+    // We arbitrarily look at the top note
+    Staff *staff = dynamic_cast<Staff *>(topNote->GetFirstParent(STAFF));
+    assert(staff);
+    bool drawingCueSize = topNote->GetDrawingCueSize();
+    
+    // We are going to have only one FloatingPositioner - staff will be the top note one
+    system->SetCurrentFloatingPositioner(staff->GetN(), arpeg, topNote, staff);
+    // Special case: because the positionner objects are reset in ResetVerticalAlignment we
+    // need to reset the value of the DrawingXRel each time. The value is stored in Arpeg.
+    arpeg->GetCurrentFloatingPositioner()->SetDrawingXRel(arpeg->GetDrawingXRel());
+
+    int length = top - bottom;
+    // We add - substract a unit in order to have the line going to the edge
+    length += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int y = bottom - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int x = arpeg->GetDrawingX();
+    int angle = -90;
+    
+    wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
+    wchar_t endGlyph = (arpeg->GetArrow()) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
+    
+    if (arpeg->GetOrder() == arpegLog_ORDER_down) {
+        y = top + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        x -=  m_doc->GetGlyphWidth(SMUFL_EAAA_wiggleArpeggiatoDown, staff->m_drawingStaffSize, drawingCueSize) / 2;
+        fillGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
+        endGlyph = (arpeg->GetArrow()) ? SMUFL_EAAE_wiggleArpeggiatoDownArrow : 0;
+        angle = 90;
+    }
+    
+    Point orig(x, y);
 
     dc->StartGraphic(arpeg, "", arpeg->GetUuid());
 
-    arpeg->SetEmptyBB();
+    // Smufl glyphs are horizontal - Rotate them counter clockwise
+    dc->RotateGraphic(Point(ToDeviceContextX(x), ToDeviceContextY(y)), angle);
+
+    DrawSmuflLine(dc, orig, length, staff->m_drawingStaffSize, drawingCueSize, fillGlyph, 0, endGlyph);
 
     dc->EndGraphic(arpeg, this);
 }
@@ -1653,6 +1711,10 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     dc->StartGraphic(dir, "", dir->GetUuid());
 
     FontInfo dirTxt;
+    if (!dc->UseGlobalStyling()) {
+        dirTxt.SetFaceName("Times");
+        dirTxt.SetStyle(FONTSTYLE_italic);
+    }
 
     // If we have not timestamp
     int x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
@@ -1706,6 +1768,10 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     }
 
     FontInfo dynamTxt;
+    if (!dc->UseGlobalStyling()) {
+        dynamTxt.SetFaceName("Times");
+        dynamTxt.SetStyle(FONTSTYLE_italic);
+    }
 
     // If we have not timestamp
     int x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
@@ -1808,12 +1874,6 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
 
     int x = fermata->GetStart()->GetDrawingX() + fermata->GetStart()->GetDrawingRadius(m_doc);
 
-    bool centered = true;
-    // center the fermata only with @stratid
-    if (fermata->GetStart()->Is(TIMESTAMP_ATTR)) {
-        centered = false;
-    }
-
     // for a start always put fermatas up
     int code = SMUFL_E4C0_fermataAbove;
     // check for shape
@@ -1845,7 +1905,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
         int y = fermata->GetDrawingY();
 
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-        DrawSmuflString(dc, x, y, str, centered, (*staffIter)->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y, str, true, (*staffIter)->m_drawingStaffSize);
         dc->ResetFont();
     }
 
@@ -1864,7 +1924,10 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
     dc->StartGraphic(harm, "", harm->GetUuid());
 
-    FontInfo dirTxt;
+    FontInfo harmTxt;
+    if (!dc->UseGlobalStyling()) {
+        harmTxt.SetFaceName("Times");
+    }
 
     // If we have not timestamp
     int x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
@@ -1890,10 +1953,10 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
             DrawFb(dc, *staffIter, dynamic_cast<Fb *>(harm->GetFirst()), x, y, setX, setY);
         }
         else {
-            dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+            harmTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
             dc->SetBrush(m_currentColour, AxSOLID);
-            dc->SetFont(&dirTxt);
+            dc->SetFont(&harmTxt);
 
             dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
             DrawTextChildren(dc, harm, x, y, setX, setY);
@@ -2062,6 +2125,10 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     dc->StartGraphic(tempo, "", tempo->GetUuid());
 
     FontInfo tempoTxt;
+    if (!dc->UseGlobalStyling()) {
+        tempoTxt.SetFaceName("Times");
+        tempoTxt.SetWeight(FONTWEIGHT_bold);
+    }
 
     // If we have not timestamp
     int x = measure->GetDrawingX();

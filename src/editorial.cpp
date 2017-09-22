@@ -177,6 +177,9 @@ void Annot::AddChild(Object *child)
     if (child->IsTextElement()) {
         assert(dynamic_cast<TextElement *>(child));
     }
+    else if (child->Is(ANNOT)) {
+        assert(dynamic_cast<Annot *>(child));
+    }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         assert(false);
