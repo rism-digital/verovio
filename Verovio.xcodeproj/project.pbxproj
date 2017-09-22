@@ -1187,11 +1187,11 @@
 				8F59293118854BF800FE51AD /* view.h */,
 				8F086EDA188539540037FD8E /* view_beam.cpp */,
 				4D543E211B80AACF004B823C /* view_control.cpp */,
-				4DC12A7B1F740FB9000440E9 /* view_running.cpp */,
 				8F086EDC188539540037FD8E /* view_element.cpp */,
 				8F086EDD188539540037FD8E /* view_graph.cpp */,
 				4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */,
 				8F086EDE188539540037FD8E /* view_page.cpp */,
+				4DC12A7B1F740FB9000440E9 /* view_running.cpp */,
 				4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */,
 				8F086EDF188539540037FD8E /* view_tuplet.cpp */,
 			);

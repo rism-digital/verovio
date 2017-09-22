@@ -48,6 +48,20 @@ void RunningElement::Reset()
     
     m_drawingPage = NULL;
 }
+    
+int RunningElement::GetDrawingX() const
+{
+    if (!m_drawingPage) return 0;
+    //return m_drawingPage->GetDrawingX();
+    return 0;
+}
+
+int RunningElement::GetDrawingY() const
+{
+    if (!m_staffAlignment) return 0;
+    return m_staffAlignment->GetYRel();
+}
+
 
 //----------------------------------------------------------------------------
 // Functor methods

@@ -44,6 +44,14 @@ public:
      */
     virtual Object *Clone() const { return NULL; }
     
+    /**
+     * @name Get and set the X and Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
+    ///@}
+    
     /*
      * @name Setter and getter for the current drawing page
      */
