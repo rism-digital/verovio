@@ -345,10 +345,10 @@ void QtSceneGraphDeviceContext::DrawText(const std::string &text, const std::wst
 
     QFont font(QString::fromStdString(m_fontStack.top()->GetFaceName()));
 
-    // Note: Verovio calls it point size but it is actually pixel size. Qt can only handle pixel size in int, thus we
-    // convert the pixel size to point size.
-    double pointSize = static_cast<double>(translate(ConvertPixelSizeToPointSize(m_fontStack.top()->GetPointSize())));
-    font.setPointSizeF(pointSize);
+    // Note: Verovio calls it point size but it is actually pixel size. Qt can only handle pixel size in int, thus it
+    // would be better to use point size.
+    int pixelSize = static_cast<int>(translate(m_fontStack.top()->GetPointSize()));
+    font.setPixelSize(pixelSize);
 
     if (m_fontStack.top()->GetStyle() != FONTSTYLE_NONE) {
         if (m_fontStack.top()->GetStyle() == FONTSTYLE_italic) {
@@ -386,10 +386,10 @@ void QtSceneGraphDeviceContext::DrawMusicText(const std::wstring &text, int x, i
 
     QFont font(QString::fromStdString(m_fontStack.top()->GetFaceName()));
 
-    // Note: Verovio calls it point size but it is actually pixel size. Qt can only handle pixel size in int, thus we
-    // convert the pixel size to point size.
-    double pointSize = static_cast<double>(translate(ConvertPixelSizeToPointSize(m_fontStack.top()->GetPointSize())));
-    font.setPointSizeF(pointSize);
+    // Note: Verovio calls it point size but it is actually pixel size. Qt can only handle pixel size in int, thus it
+    // would be better to use point size.
+    int pixelSize = static_cast<int>(translate(m_fontStack.top()->GetPointSize()));
+    font.setPixelSize(pixelSize);
 
     // Memory management is handled by m_quickItem (set in AddQuickItem)
     auto musicTextQuickItem = new TextQuickItem();
