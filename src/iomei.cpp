@@ -4058,6 +4058,9 @@ bool MeiInput::ReadScoreBasedMei(pugi::xml_node element, Score *parent)
             else if (elementName == "section") {
                 success = ReadMeiSection(parent, current);
             }
+            else if (elementName == "ending") {
+                success = ReadMeiEnding(parent, current);
+            }
             else {
                 LogWarning("Element <%s> within <score> is not supported and will be ignored ", elementName.c_str());
             }
