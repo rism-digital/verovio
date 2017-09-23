@@ -249,6 +249,7 @@ private:
     void addLayerElement(LayerElement *element);
     void calcUnitNoteLength();
     void AddBeam();
+    void AddTuplet();
     void popContainer();
     void convertMeasure(abc::Measure *measure);
     void pushContainer(LayerElement *container);
