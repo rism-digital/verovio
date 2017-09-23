@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Sep 22 07:03:57 PDT 2017
+// Last Modified: Sat Sep 23 16:02:57 PDT 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2679,6 +2679,7 @@ class GridSide {
 		int   getVerseCount     (void);
 		HTp   getVerse          (int index);
 		void  setVerse          (int index, HTp token);
+		void  setVerse          (int index, const string& token);
 
 		int   getHarmonyCount   (void);
 		void  setHarmony        (HTp token);
@@ -4383,6 +4384,9 @@ class Tool_mei2hum : public HumTool {
 		void   addFooterRecords      (HumdrumFile& outfile, xml_document& doc);
 		void   addExtMetaRecords     (HumdrumFile& outfile, xml_document& doc);
 		void   addHeaderRecords      (HumdrumFile& outfile, xml_document& doc);
+		void   parseVerse            (xml_node verse, GridStaff* staff);
+		string parseSyl              (xml_node syl);
+		void   reportVerseNumber     (int pmax, int staffindex);
 
 	private:
 		Options m_options;
@@ -4400,6 +4404,8 @@ class Tool_mei2hum : public HumTool {
 		bool         m_aboveQ = false;
 		bool         m_belowQ = false;
 		string       m_appLabel;
+
+		vector<int>  m_maxverse;
 
 		map<string, vector<xml_node>> m_startlinks;
 		map<string, vector<xml_node>> m_stoplinks;

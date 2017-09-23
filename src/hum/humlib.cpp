@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Sep 22 07:03:57 PDT 2017
+// Last Modified: Sat Sep 23 16:02:57 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -3487,6 +3487,11 @@ void GridSide::setVerse(int index, HTp token) {
 	}
 }
 
+
+void GridSide::setVerse(int index, const string& token) {
+	HTp newtoken = new HumdrumToken(token);
+	setVerse(index, newtoken);
+}
 
 
 //////////////////////////////
@@ -36197,6 +36202,9 @@ Tool_mei2hum::Tool_mei2hum(void) {
 	define("app|app-label=s", "app label to follow");
 	define("r|recip=b", "output **recip spine");
 	define("s|stems=b", "include stems in output");
+
+	m_maxverse.resize(1000);
+	fill(m_maxverse.begin(), m_maxverse.end(), 0);
 }
 
 
@@ -36272,6 +36280,15 @@ bool Tool_mei2hum::convert(ostream& out, xml_document& doc) {
 	// set the duration of the last slice
 
 	HumdrumFile outfile;
+
+
+	// Report verse counts for each staff to HumGrid:
+	for (int i=0; i<m_maxverse.size(); i++) {
+		if (m_maxverse[i] == 0) {
+			continue;
+		}
+		m_outdata.setVerseCount(i, 0, m_maxverse[i]);
+	}
 
 	m_outdata.transferTokens(outfile);
 
@@ -36895,6 +36912,7 @@ HumNum Tool_mei2hum::parseLayer(xml_node layer, HumNum starttime) {
 	NODE_VERIFY(layer, starttime)
 	MAKE_CHILD_LIST(children, layer);
 
+
 	string n = layer.attribute("n").value();
 	int nnum = 0;
 	if (n == "") {
@@ -36917,6 +36935,8 @@ HumNum Tool_mei2hum::parseLayer(xml_node layer, HumNum starttime) {
 		} else if (nodename == "chord") {
 			starttime = parseChord(children[i], starttime);
 		} else if (nodename == "rest") {
+			starttime = parseRest(children[i], starttime);
+		} else if (nodename == "space") {
 			starttime = parseRest(children[i], starttime);
 		} else if (nodename == "beam") {
 			starttime = parseBeam(children[i], starttime);
@@ -37068,6 +37088,7 @@ HumNum Tool_mei2hum::parseBeam(xml_node beam, HumNum starttime) {
 
 HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output, HumNum starttime) {
 	NODE_VERIFY(note, starttime)
+	MAKE_CHILD_LIST(children, note);
 
 	HumNum duration;
 	int dotcount;
@@ -37095,10 +37116,23 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output, Hu
 	processFermataAttribute(tok, note);
 
 	if (!chord) {
-		m_outdata.back()->addDataToken(tok, starttime QUARTER_CONVERT, m_currentstaff-1,
-			0, m_currentlayer-1, m_staffcount);
+		m_outdata.back()->addDataToken(tok, starttime QUARTER_CONVERT,
+				m_currentstaff-1, 0, m_currentlayer-1, m_staffcount);
 	} else {
 		output += tok;
+	}
+
+
+	for (int i=0; i<(int)children.size(); i++) {
+		string nodename = children[i].name();
+		if (nodename == "verse") {
+			parseVerse(children[i],
+					m_outdata.back()->back()->at(m_currentstaff-1)->at(0));
+		} else if (nodename == "artic") {
+			// don't do anything
+		} else {
+			cerr << "Don't know how to parse layer/" << nodename << endl;
+		}
 	}
 
 	return starttime + duration;
@@ -37112,13 +37146,28 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output, Hu
 //
 
 HumNum Tool_mei2hum::parseRest(xml_node rest, HumNum starttime) {
-	NODE_VERIFY(rest, starttime)
+	if (!rest) {
+		return starttime;
+	}
+	string nodename = rest.name();
+	if (!((nodename == "rest") || (nodename == "space"))) {
+		return starttime;
+	}
+	if (nodename == "rest") {
+		ELEMENT_DEBUG_STATEMENT("rest")
+	} else if (nodename == "space") {
+		ELEMENT_DEBUG_STATEMENT("space")
+	}
 
 	HumNum duration = getDuration(rest);
 	int dotcount = getDotCount(rest);
 	string recip = getHumdrumRecip(duration, dotcount);
+	string invisible;
+	if (nodename == "space") {
+		invisible = "yy";
+	}
 
-	string output = recip + "r" + m_beamPrefix + m_beamPostfix;
+	string output = recip + "r" + invisible + m_beamPrefix + m_beamPostfix;
 	m_beamPrefix.clear();
 	m_beamPostfix.clear();
 
@@ -37657,6 +37706,109 @@ HumNum Tool_mei2hum::getDuration(xml_node element) {
 	}
 
 	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::parseVerse --
+//
+
+void Tool_mei2hum::parseVerse(xml_node verse, GridStaff* staff) {
+	NODE_VERIFY(verse, )
+	MAKE_CHILD_LIST(children, verse);
+
+	string n = verse.attribute("n").value();
+	int nnum = 1;
+	if (n == "") {
+		cerr << "Warning: no layer number on layer element" << endl;
+	} else {
+		nnum = stoi(n);
+	}
+	if (nnum < 1) {
+		cerr << "Warning: invalid layer number: " << nnum << endl;
+		cerr << "Setting it to 1." << endl;
+		nnum = 1;
+	}
+
+	string versetext;
+	int sylcount = 0;
+
+	for (int i=0; i<(int)children.size(); i++) {
+		string nodename = children[i].name();
+		if (nodename == "syl") {
+			if (sylcount > 0) {
+				versetext += " ";
+			}
+			sylcount++;
+			versetext += parseSyl(children[i]);
+		} else {
+			cerr << "Don't know how to parse verse/" << nodename << endl;
+		}
+	}
+
+	if (versetext == "") {
+		// nothing to store
+		return;
+	}
+
+	
+	
+
+	staff->setVerse(nnum-1, versetext);
+	reportVerseNumber(nnum, m_currentstaff-1); 
+
+	return;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::reportVerseNumber --
+//
+
+void Tool_mei2hum::reportVerseNumber(int pmax, int staffindex) {
+	if (staffindex < 0) {
+		return;
+	}
+	if (staffindex >= (int)m_maxverse.size()) {
+		return;
+	}
+	if (m_maxverse.at(staffindex) < pmax) {
+		m_maxverse[staffindex] = pmax;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::parseSyl --
+//
+
+string Tool_mei2hum::parseSyl(xml_node syl) {
+	NODE_VERIFY(syl, "")
+	MAKE_CHILD_LIST(children, syl);
+
+	string text = syl.child_value();
+	for (int i=0; i<(int)text.size(); i++) {
+		if (text[i] == '_') {
+			text[i] = ' ';
+		}
+	}
+
+	string wordpos = syl.attribute("wordpos").value();
+	if (wordpos == "i") {
+		text = text + "-";
+	} else if (wordpos == "m") {
+		text = "-" + text + "-";
+	} else if (wordpos == "t") {
+		text = "-" + text;
+	}
+
+	return text;
 }
 
 
