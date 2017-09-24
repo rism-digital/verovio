@@ -758,6 +758,7 @@ void MeiOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *
     assert(runningElement);
 
     WriteXmlId(currentNode, runningElement);
+    runningElement->WriteHorizontalAlign(currentNode);
     runningElement->WriteTyped(currentNode);
 }
 
@@ -2493,6 +2494,7 @@ bool MeiInput::ReadMeiStaffGrpChildren(Object *parent, pugi::xml_node parentNode
 bool MeiInput::ReadRunningElement(pugi::xml_node element, RunningElement *object)
 {
     SetMeiUuid(element, object);
+    object->ReadHorizontalAlign(element);
     object->ReadTyped(element);
 
     return true;

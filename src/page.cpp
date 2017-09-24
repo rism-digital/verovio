@@ -22,6 +22,7 @@
 #include "pghead.h"
 #include "pghead2.h"
 #include "system.h"
+#include "staff.h"
 #include "view.h"
 #include "vrv.h"
 
@@ -487,22 +488,22 @@ int Page::ResetVerticalAlignment(FunctorParams *functorParams)
     PgHead *pgHead = doc->m_scoreDef.GetPgHead();
     if (pgHead) {
         pgHead->SetDrawingPage(NULL);
-        pgHead->SetStaffAlignment(NULL);
+        pgHead->SetDrawingStaff(NULL);
     }
     PgFoot *pgFoot = doc->m_scoreDef.GetPgFoot();
     if (pgFoot) {
         pgFoot->SetDrawingPage(NULL);
-        pgFoot->SetStaffAlignment(NULL);
+        pgFoot->SetDrawingStaff(NULL);
     }
     PgHead2 *pgHead2 = doc->m_scoreDef.GetPgHead2();
     if (pgHead2) {
         pgHead2->SetDrawingPage(NULL);
-        pgHead2->SetStaffAlignment(NULL);
+        pgHead2->SetDrawingStaff(NULL);
     }
     PgFoot2 *pgFoot2 = doc->m_scoreDef.GetPgFoot2();
     if (pgFoot2) {
         pgFoot2->SetDrawingPage(NULL);
-        pgFoot2->SetStaffAlignment(NULL);
+        pgFoot2->SetDrawingStaff(NULL);
     }
 
     return FUNCTOR_CONTINUE;
@@ -522,30 +523,37 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
     if (!topSystem || !bottomSystem) {
         return FUNCTOR_CONTINUE;
     }
+
+    Measure *topMeasure = dynamic_cast<Measure *>(topSystem->FindChildByType(MEASURE, 1));
+    Measure *bottomMeasure = dynamic_cast<Measure *>(bottomSystem->FindChildByType(MEASURE, 1));
+    
+    if (!topMeasure || !bottomMeasure) {
+        return FUNCTOR_CONTINUE;
+    }
     
     // first page?
     if (params->m_doc->GetFirst() == this) {
         PgHead *pgHead = params->m_doc->m_scoreDef.GetPgHead();
         if (pgHead) {
             pgHead->SetDrawingPage(this);
-            pgHead->SetStaffAlignment(dynamic_cast<StaffAlignment *>(topSystem->m_systemAligner.GetFirst()));
+            pgHead->SetDrawingStaff(dynamic_cast<Staff *>(topMeasure->FindChildByType(STAFF)));
         }
         PgFoot *pgFoot = params->m_doc->m_scoreDef.GetPgFoot();
         if (pgFoot) {
             pgFoot->SetDrawingPage(this);
-            pgFoot->SetStaffAlignment(bottomSystem->m_systemAligner.GetBottomAlignment());
+            pgFoot->SetDrawingStaff(dynamic_cast<Staff *>(bottomMeasure->FindChildByType(STAFF, UNLIMITED_DEPTH, BACKWARD)));
         }
     }
     else {
         PgHead2 *pgHead2 = params->m_doc->m_scoreDef.GetPgHead2();
         if (pgHead2) {
             pgHead2->SetDrawingPage(this);
-            pgHead2->SetStaffAlignment(dynamic_cast<StaffAlignment *>(topSystem->m_systemAligner.GetFirst()));
+            pgHead2->SetDrawingStaff(dynamic_cast<Staff *>(topMeasure->FindChildByType(STAFF)));
         }
         PgFoot2 *pgFoot2 = params->m_doc->m_scoreDef.GetPgFoot2();
         if (pgFoot2) {
             pgFoot2->SetDrawingPage(this);
-            pgFoot2->SetStaffAlignment(bottomSystem->m_systemAligner.GetBottomAlignment());
+            pgFoot2->SetDrawingStaff(dynamic_cast<Staff *>(bottomMeasure->FindChildByType(STAFF, UNLIMITED_DEPTH, BACKWARD)));
         }
     }
 

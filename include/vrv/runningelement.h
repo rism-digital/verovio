@@ -14,7 +14,7 @@
 namespace vrv {
 
 class Page;
-class StaffAlignment;
+class Staff;
     
 //----------------------------------------------------------------------------
 // RunningElement
@@ -24,7 +24,7 @@ class StaffAlignment;
  * This class represents running elements (headers and footers).
  * It is not an abstract class but should not be instanciated directly.
  */
-class RunningElement : public Object, public AttTyped {
+class RunningElement : public Object, public AttHorizontalAlign, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -61,11 +61,11 @@ public:
     ///@}
     
     /*
-     * @name Setter and getter for the current staff alignment
+     * @name Setter and getter for the current darwing staff
      */
     ///@{
-    void SetStaffAlignment(StaffAlignment *staffAlignment) { m_staffAlignment = staffAlignment; }
-    StaffAlignment *GetStaffAlignment() { return m_staffAlignment; }
+    void SetDrawingStaff(Staff *staff) { m_drawingStaff = staff; }
+    Staff *GetDrawingStaff() { return m_drawingStaff; }
     ///@}
 
     //----------//
@@ -78,14 +78,14 @@ public:
     //
 private:
     /**
-     * The page we are drawing
+     * The page we are drawing (for the x position)
      */
     Page *m_drawingPage;
     
     /**
-     * The staff alignment we are darwing
+     * The staff we are darwing (for the y postion)
      */
-    StaffAlignment *m_staffAlignment;
+    Staff *m_drawingStaff;
 };
 
 } // namespace vrv

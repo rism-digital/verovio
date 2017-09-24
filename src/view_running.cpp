@@ -61,7 +61,7 @@ void View::DrawPgHead(DeviceContext *dc, PgHead *pgHead)
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(&pgHeadTxt);
     
-    dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
+    dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), RIGHT);
     DrawTextChildren(dc, pgHead, x, y, setX, setY);
     dc->EndText();
     
