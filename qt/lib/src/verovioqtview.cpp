@@ -5,7 +5,7 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "veroviopage.h"
+#include "verovioqtview.h"
 
 //----------------------------------------------------------------------------
 
@@ -15,29 +15,29 @@
 //----------------------------------------------------------------------------
 
 #include "qtscenegraphdevicecontext.h"
-#include "veroviodoc.h"
+#include "verovioqttoolkit.h"
 
-namespace vrv {
-VerovioPage::VerovioPage()
+namespace vrv_qt {
+View::View()
 {
     setFlag(ItemHasContents, true);
 }
 
-VerovioPage::~VerovioPage()
+View::~View()
 {
     if (m_documentLayoutChangedConnection) {
         disconnect(m_documentLayoutChangedConnection);
     }
 }
 
-void VerovioPage::setVerovioDoc(VerovioDoc *verovioDoc)
+void View::setVerovioDoc(Toolkit *verovioDoc)
 {
     if (m_verovioDoc != verovioDoc) {
         if (m_documentLayoutChangedConnection) {
             disconnect(m_documentLayoutChangedConnection);
         }
         m_verovioDoc = verovioDoc;
-        m_documentLayoutChangedConnection = connect(m_verovioDoc, &VerovioDoc::documentLayoutChanged, [this]() {
+        m_documentLayoutChangedConnection = connect(m_verovioDoc, &Toolkit::documentLayoutChanged, [this]() {
             m_verovioRenderingDirty = true;
             update();
         });
@@ -46,7 +46,7 @@ void VerovioPage::setVerovioDoc(VerovioDoc *verovioDoc)
     }
 }
 
-void VerovioPage::setPageNumber(int pageNumber)
+void View::setPageNumber(int pageNumber)
 {
     if (m_pageNumber != pageNumber) {
         m_pageNumber = pageNumber;
@@ -54,7 +54,7 @@ void VerovioPage::setPageNumber(int pageNumber)
     };
 }
 
-QSGNode *VerovioPage::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
+QSGNode *View::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
 {
     if (node == nullptr) {
         node = new QSGNode();
@@ -80,4 +80,4 @@ QSGNode *VerovioPage::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
 
     return node;
 }
-} // namespace vrv
+} // namespace vrv_qt

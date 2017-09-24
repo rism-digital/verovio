@@ -11,7 +11,7 @@
 
 #include <QPainter>
 
-namespace vrv {
+namespace vrv_qt {
 
 TextQuickItem::TextQuickItem()
 {
@@ -92,4 +92,4 @@ void TextQuickItem::paint(QPainter *painter)
         painter->drawText(m_paintOffsetX + textWithFont.offset, m_paintOffsetY, textWithFont.text);
     }
 }
-} // namespace vrv
+} // namespace vrv_qt

@@ -55,51 +55,43 @@ endif()
 file(GLOB verovio_SRC "../src/*.cpp")
 file(GLOB midi_SRC "../src/midi/*.cpp")
 
+# Add header files to custom target, otherwise they are not shown in some IDEs (e.g. QtCreator)
+file(GLOB_RECURSE LibFiles "../include/*.h")
+add_custom_target(headers SOURCES ${LibFiles})
+
+set(all_SRC
+    ${verovio_SRC}
+    ${hum_SRC}
+    ${midi_SRC}
+    ../src/pugi/pugixml.cpp
+    ../libmei/attconverter.cpp
+    ../libmei/atts_analytical.cpp
+    ../libmei/atts_cmn.cpp
+    ../libmei/atts_cmnornaments.cpp
+    ../libmei/atts_critapp.cpp
+    ../libmei/atts_gestural.cpp
+    ../libmei/atts_externalsymbols.cpp
+    ../libmei/atts_mei.cpp
+    ../libmei/atts_mensural.cpp
+    ../libmei/atts_midi.cpp
+    ../libmei/atts_pagebased.cpp
+    ../libmei/atts_shared.cpp
+    ../libmei/atts_visual.cpp
+)
+
 if (BUILD_AS_LIBRARY)
     message(STATUS "build verovio as library")
     add_library (
-         verovio
-         SHARED
-         ${verovio_SRC}
-         ${hum_SRC}
-         ${midi_SRC}
-             ../src/pugi/pugixml.cpp
-             ../libmei/attconverter.cpp
-             ../libmei/atts_analytical.cpp
-             ../libmei/atts_cmn.cpp
-             ../libmei/atts_cmnornaments.cpp
-             ../libmei/atts_critapp.cpp
-             ../libmei/atts_gestural.cpp
-             ../libmei/atts_externalsymbols.cpp
-             ../libmei/atts_mei.cpp
-             ../libmei/atts_mensural.cpp
-             ../libmei/atts_midi.cpp
-             ../libmei/atts_pagebased.cpp
-             ../libmei/atts_shared.cpp
-             ../libmei/atts_visual.cpp
-         )
+        verovio
+        SHARED
+        ${all_SRC}
+    )
 else()
     message(STATUS "build verovio as executable")
     add_executable (
         verovio
         main.cpp
-        ${verovio_SRC}
-        ${hum_SRC}
-        ${midi_SRC}
-        ../src/pugi/pugixml.cpp
-        ../libmei/attconverter.cpp
-        ../libmei/atts_analytical.cpp
-        ../libmei/atts_cmn.cpp
-        ../libmei/atts_cmnornaments.cpp
-        ../libmei/atts_critapp.cpp
-        ../libmei/atts_gestural.cpp
-        ../libmei/atts_externalsymbols.cpp
-        ../libmei/atts_mei.cpp
-        ../libmei/atts_mensural.cpp
-        ../libmei/atts_midi.cpp
-        ../libmei/atts_pagebased.cpp
-        ../libmei/atts_shared.cpp
-        ../libmei/atts_visual.cpp
+        ${all_SRC}
     )
 endif()
 

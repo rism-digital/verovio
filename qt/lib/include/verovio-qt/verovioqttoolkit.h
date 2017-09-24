@@ -5,8 +5,8 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VEROVIODOC_H__
-#define __VEROVIODOC_H__
+#ifndef __VEROVIOQTTOOLKIT_H__
+#define __VEROVIOQTTOOLKIT_H__
 
 //----------------------------------------------------------------------------
 
@@ -17,16 +17,16 @@
 
 #include "toolkit.h"
 
-namespace vrv {
+namespace vrv_qt {
 
 //----------------------------------------------------------------------------
 // VerovioDoc
 //----------------------------------------------------------------------------
 
 /**
- * This class represents one Verovio document.
+ * This class is a wrapper around the Verovio Toolkit (vrv::Toolkit).
  */
-class VerovioDoc : public QObject {
+class Toolkit : public QObject {
     Q_OBJECT
 
     Q_PROPERTY(QString resourcesDataPath MEMBER m_resourcesDataPath WRITE setResourcesDataPath)
@@ -35,15 +35,15 @@ class VerovioDoc : public QObject {
     Q_PROPERTY(QString fileContent MEMBER m_fileContent WRITE setFileContent)
     Q_PROPERTY(QString musicFont MEMBER m_musicFont WRITE setMusicFont)
     Q_PROPERTY(int pageCount MEMBER m_pageCount READ pageCount NOTIFY pageCountChanged)
-    Q_PROPERTY(int pageWidth MEMBER m_pageWidth WRITE setPageWidth)
-    Q_PROPERTY(int pageHeight MEMBER m_pageHeight WRITE setPageHeight)
-    Q_PROPERTY(int scale MEMBER m_scale WRITE setScale)
-    Q_PROPERTY(int border MEMBER m_border WRITE setBorder)
-    Q_PROPERTY(int spacingStaff MEMBER m_spacingStaff WRITE setSpacingStaff)
-    Q_PROPERTY(int spacingSystem MEMBER m_spacingSystem WRITE setSpacingSystem)
-    Q_PROPERTY(bool adjustPageHeight MEMBER m_adjustPageHeight WRITE setAdjustPageHeight)
-    Q_PROPERTY(bool noLayout MEMBER m_noLayout WRITE setNoLayout)
-    Q_PROPERTY(bool ignoreLayout MEMBER m_ignoreLayout WRITE setIgnoreLayout)
+    Q_PROPERTY(int displayWidth MEMBER m_displayWidth WRITE setDisplayWidth)
+    Q_PROPERTY(int displayHeight MEMBER m_displayHeight WRITE setDisplayHeight)
+    Q_PROPERTY(int scale WRITE setScale READ getScale)
+    Q_PROPERTY(int border WRITE setBorder)
+    Q_PROPERTY(int spacingStaff WRITE setSpacingStaff)
+    Q_PROPERTY(int spacingSystem WRITE setSpacingSystem)
+    Q_PROPERTY(bool adjustPageHeight WRITE setAdjustPageHeight)
+    Q_PROPERTY(bool noLayout WRITE setNoLayout)
+    Q_PROPERTY(bool ignoreLayout WRITE setIgnoreLayout)
     Q_PROPERTY(bool hasValidData MEMBER m_hasValidData READ hasValidData NOTIFY hasValidDataChanged)
 
 public:
@@ -51,8 +51,8 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    VerovioDoc();
-    virtual ~VerovioDoc() = default;
+    Toolkit();
+    virtual ~Toolkit() = default;
     ///@}
 
     /**
@@ -60,7 +60,7 @@ public:
      */
     ///@{
     Q_INVOKABLE int adjustedPageHeightForPage(int page);
-    void setAdjustedPageHeightForPage(int pageNumber, int pageHeight);
+    void setAdjustedPageHeightForPage(int pageNumber, int displayHeight);
     ///@}
 
     /**
@@ -71,12 +71,17 @@ public:
     /**
      * @name Render the given page of this document to the specified deviceContext.
      */
-    void renderPage(int page, DeviceContext *deviceContext);
+    void renderPage(int page, vrv::DeviceContext *deviceContext);
 
     /**
      * @name Returns if the document has valid data to show.
      */
     bool hasValidData() const { return m_hasValidData; }
+
+    /**
+     * @name Returns the current scale of the document.
+     */
+    int getScale() { return m_verovioToolkit.GetScale(); }
 
 public slots:
     /**
@@ -88,8 +93,8 @@ public slots:
     void setFileName(QString fileName);
     void setFileContent(QString fileContent);
     void setMusicFont(QString musicFont);
-    void setPageWidth(int pageWidth);
-    void setPageHeight(int pageHeight);
+    void setDisplayWidth(int displayWidth);
+    void setDisplayHeight(int displayHeight);
     void setScale(int scale);
     void setBorder(int border);
     void setSpacingStaff(int spacingStaff);
@@ -126,7 +131,7 @@ signals:
 
 protected:
     // instance of the verovio Toolkit class used to communicate to the C++ library.
-    Toolkit m_verovioToolkit;
+    vrv::Toolkit m_verovioToolkit;
 
 private slots:
     /**
@@ -171,16 +176,10 @@ private:
     void setHasValidData(bool hasValidData);
 
 private:
-    // configuration parameters for Verovio
-    int m_pageWidth;
-    int m_pageHeight;
-    int m_scale;
-    int m_border;
-    int m_spacingStaff;
-    int m_spacingSystem;
-    bool m_adjustPageHeight;
-    bool m_noLayout;
-    bool m_ignoreLayout;
+    // Stores the dimensions to which the score should be rendered. This takes into account the current scale and thus
+    // differs to the Verovio pageWidth and pageHeight.
+    int m_displayWidth;
+    int m_displayHeight;
 
     int m_pageCount{ 0 };
 
@@ -204,5 +203,5 @@ private:
     bool m_fontInitDone{ false };
     bool m_hasValidData{ false };
 };
-} // namespace vrv
-#endif // __VEROVIODOC_H__
+} // namespace vrv_qt
+#endif // __VEROVIOQTTOOLKIT_H__

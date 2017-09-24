@@ -41,37 +41,31 @@ Item {
         }
     }
 
-    VerovioDoc
+    VerovioToolkit
     {
-        id: verovioDocument
-        pageWidth: root.width
-        pageHeight: options.viewMode == "Continuous" ? 100 : root.height
+        id: verovioToolkit
+        displayWidth: root.width
+        displayHeight: 100
         scale: 50
-        adjustPageHeight: options.viewMode == "Continuous" ? true : false
+        adjustPageHeight: true
 
         resourcesDataPath: "../../data"
         fontDirPath: "../../fonts"
 
         fileName: options.fileName
         musicFont: options.musicFont
-        border: options.border
-        spacingStaff: options.spacingStaff
-        spacingSystem: options.spacingSystem
-        noLayout: options.noLayout
-        ignoreLayout: options.ignoreLayout
     }
 
     ListView {
         anchors.fill: parent
-        snapMode: options.viewMode == "Page" ? ListView.SnapOneItem : ListView.NoSnap
-        orientation: options.orientation
+        snapMode: ListView.NoSnap
 
-        model: verovioDocument.pageCount
+        model: verovioToolkit.pageCount
 
-        delegate: VerovioPage {
-            verovioDoc: verovioDocument
+        delegate: VerovioView {
+            verovioDoc: verovioToolkit
             width:  root.width
-            height: verovioDocument.adjustedPageHeightForPage(index+1)
+            height: verovioToolkit.adjustedPageHeightForPage(index+1)
             pageNumber: index + 1
         }
         ScrollBar.vertical: ScrollBar { }
@@ -83,15 +77,15 @@ Item {
             onWheel: {
                 if (wheel.modifiers & Qt.ControlModifier) {
                     // calculate new scale
-                    verovioDocument.scale = verovioDocument.scale * (1 + 0.1 * wheel.angleDelta.y / 120)
+                    verovioToolkit.scale = verovioToolkit.scale * (1 + 0.1 * wheel.angleDelta.y / 120)
 
                     // put scale to limits
-                    if (wheel.angleDelta.y < 0 && verovioDocument.scale < 20)
-                        verovioDocument.scale = 20
-                    else if (wheel.angleDelta.y > 0 && verovioDocument.scale > 300)
-                        verovioDocument.scale = 300
-                    else if (verovioDocument.scale >= 95 && verovioDocument.scale <= 105)
-                        verovioDocument.scale = 100
+                    if (wheel.angleDelta.y < 0 && verovioToolkit.scale < 20)
+                        verovioToolkit.scale = 20
+                    else if (wheel.angleDelta.y > 0 && verovioToolkit.scale > 300)
+                        verovioToolkit.scale = 300
+                    else if (verovioToolkit.scale >= 95 && verovioToolkit.scale <= 105)
+                        verovioToolkit.scale = 100
                 }
                 else {
                     wheel.accepted = false
@@ -124,7 +118,7 @@ Item {
     Settings {
         property alias width: root.width
         property alias height: root.height
-        property alias scale: verovioDocument.scale
+        property alias scale: verovioToolkit.scale
         property alias drawerVisible: drawer.visible
     }
 }

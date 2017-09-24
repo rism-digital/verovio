@@ -19,7 +19,7 @@
 
 #include "devicecontext.h"
 
-namespace vrv {
+namespace vrv_qt {
 
 class TextQuickItem;
 
@@ -31,7 +31,7 @@ class TextQuickItem;
  * This class implements a drawing context for the Qt scene graph. This allows
  * to create a QQuickItem that can be used in QML.
  */
-class QtSceneGraphDeviceContext : public DeviceContext {
+class QtSceneGraphDeviceContext : public vrv::DeviceContext {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -77,25 +77,26 @@ public:
      * @name Getters
      */
     ///@{
-    Point GetLogicalOrigin() override;
+    vrv::Point GetLogicalOrigin() override;
     ///}
 
     /**
      * @name Drawing methods
      */
     ///@{
-    void DrawComplexBezierPath(Point bezier1[4], Point bezier2[4]) override;
+    void DrawComplexBezierPath(vrv::Point bezier1[4], vrv::Point bezier2[4]) override;
     void DrawCircle(int x, int y, int radius) override;
     void DrawEllipse(int x, int y, int width, int height) override;
     void DrawEllipticArc(int x, int y, int width, int height, double start, double end) override;
     void DrawLine(int x1, int y1, int x2, int y2) override;
-    void DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style = AxODDEVEN_RULE) override;
+    void DrawPolygon(
+        int n, vrv::Point points[], int xoffset, int yoffset, int fill_style = vrv::AxODDEVEN_RULE) override;
     void DrawRectangle(int x, int y, int width, int height) override;
     void DrawRotatedText(const std::string &text, int x, int y, double angle) override;
     void DrawRoundedRectangle(int x, int y, int width, int height, double radius) override;
     void DrawText(const std::string &text, const std::wstring wtext = L"") override;
     void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph) override;
-    void DrawSpline(int n, Point points[]) override;
+    void DrawSpline(int n, vrv::Point points[]) override;
     void DrawBackgroundImage(int x = 0, int y = 0) override;
     ///@}
 
@@ -103,7 +104,7 @@ public:
      * @name Method for starting, ending and moving a text
      */
     ///@{
-    void StartText(int x, int y, char alignment = LEFT) override;
+    void StartText(int x, int y, char alignment = vrv::LEFT) override;
     void EndText() override;
     void MoveTextTo(int x, int y) override;
     ///@}
@@ -112,17 +113,17 @@ public:
      * @name Method for starting, restarting and ending a graphic
      */
     ///@{
-    void StartGraphic(Object *object, std::string gClass, std::string gId) override;
-    void EndGraphic(Object *object, View *view) override;
-    void ResumeGraphic(Object *object, std::string gId) override;
-    void EndResumedGraphic(Object *object, View *view) override;
+    void StartGraphic(vrv::Object *object, std::string gClass, std::string gId) override;
+    void EndGraphic(vrv::Object *object, vrv::View *view) override;
+    void ResumeGraphic(vrv::Object *object, std::string gId) override;
+    void EndResumedGraphic(vrv::Object *object, vrv::View *view) override;
     ///@}
 
     /**
      * @name Method for rotating a graphic (clockwise).
      */
     ///@{
-    void RotateGraphic(const Point &orig, double angle) override;
+    void RotateGraphic(const vrv::Point &orig, double angle) override;
     ///@}
 
     /**
@@ -171,20 +172,20 @@ private:
 
     struct ActiveGraphic {
         ActiveGraphic() : object(nullptr) {}
-        ActiveGraphic(QString id_, Object *object_) : id(id_), object(object_) {}
+        ActiveGraphic(QString id_, vrv::Object *object_) : id(id_), object(object_) {}
         QString id;
-        Object *object;
+        vrv::Object *object;
     };
     QStack<ActiveGraphic> m_activeGraphicObjectsStack;
 
     TextQuickItem *m_currentTextQuickItem{ nullptr };
-    Point m_logicalOrigin{ 0, 0 };
+    vrv::Point m_logicalOrigin{ 0, 0 };
     float m_dpi{ 0 };
 
     // datastructures for mapping object ids to graphical items
     QMap<QString, QList<QSGGeometryNode *> > m_id2NodeMapping;
     QMap<QString, QList<TextQuickItem *> > m_id2QuickItemMapping;
 };
-} // namespace vrv
+} // namespace vrv_qt
 
 #endif // __QTSCENEGRAPHDEVICECONTEXT_H__

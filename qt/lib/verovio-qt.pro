@@ -17,14 +17,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     src/qtscenegraphdevicecontext.cpp \
     src/textquickitem.cpp \
-    src/veroviopage.cpp \
-    src/veroviodoc.cpp
+    src/verovioqttoolkit.cpp \
+    src/verovioqtview.cpp
 
 HEADERS +=\
     include/verovio-qt/qtscenegraphdevicecontext.h \
     include/verovio-qt/textquickitem.h \
-    include/verovio-qt/veroviopage.h \
-    include/verovio-qt/veroviodoc.h
+    include/verovio-qt/verovioqttoolkit.h \
+    include/verovio-qt/verovioqtview.h
 
 INCLUDEPATH += include/verovio-qt
 

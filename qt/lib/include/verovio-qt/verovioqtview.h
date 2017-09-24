@@ -5,8 +5,8 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VEROVIOPAGE_H__
-#define __VEROVIOPAGE_H__
+#ifndef __VEROVIOQTVIEW_H__
+#define __VEROVIOQTVIEW_H__
 
 //----------------------------------------------------------------------------
 
@@ -17,21 +17,21 @@
 
 #include "qtscenegraphdevicecontext.h"
 
-namespace vrv {
-class VerovioDoc;
+namespace vrv_qt {
+class Toolkit;
 
 //----------------------------------------------------------------------------
 // VerovioPage
 //----------------------------------------------------------------------------
 
 /**
- * This class represents one page of a Verovio document.
+ * This class represents a view of a Verovio document, it corresponds to vrv::View.
  */
-class VerovioPage : public QQuickItem {
+class View : public QQuickItem {
     Q_OBJECT
 
     // Note: The namespace is required when specifying Qt properties
-    Q_PROPERTY(vrv::VerovioDoc *verovioDoc MEMBER m_verovioDoc WRITE setVerovioDoc)
+    Q_PROPERTY(vrv_qt::Toolkit *verovioDoc MEMBER m_verovioDoc WRITE setVerovioDoc)
     Q_PROPERTY(int pageNumber MEMBER m_pageNumber WRITE setPageNumber)
 
 public:
@@ -39,8 +39,8 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    VerovioPage();
-    virtual ~VerovioPage();
+    View();
+    virtual ~View();
     ///@}
 
 public slots:
@@ -49,7 +49,7 @@ public slots:
      * @name Setters for public properties.
      */
     ///@{
-    void setVerovioDoc(VerovioDoc *verovioDoc);
+    void setVerovioDoc(Toolkit *verovioDoc);
     void setPageNumber(int pageNumber);
     ///@}
 
@@ -57,7 +57,7 @@ signals:
     /**
      * @name This signal is emitted when the attached verovioDoc changes.
      */
-    void verovioDocChanged(VerovioDoc *verovicoDoc);
+    void verovioDocChanged(Toolkit *verovicoDoc);
 
 protected:
     /**
@@ -70,7 +70,7 @@ protected:
 
 private:
     // variables to store the public properties
-    VerovioDoc *m_verovioDoc{ nullptr };
+    Toolkit *m_verovioDoc{ nullptr };
     int m_pageNumber{ 0 };
 
     // stores if the rendering has to be redone
@@ -79,6 +79,6 @@ private:
     // handle for registered documentChanged connection.
     QMetaObject::Connection m_documentLayoutChangedConnection;
 };
-} // namespace vrv
+} // namespace vrv_qt
 
-#endif // __VEROVIOPAGE_H__
+#endif // __VEROVIOQTVIEW_H__

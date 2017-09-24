@@ -28,7 +28,7 @@
 
 #include "textquickitem.h"
 
-namespace vrv {
+namespace vrv_qt {
 
 QtSceneGraphDeviceContext::QtSceneGraphDeviceContext(QQuickItem *quickItem, QSGNode *node)
     : DeviceContext()
@@ -44,7 +44,7 @@ void QtSceneGraphDeviceContext::Clear()
 {
     m_currentTextQuickItem = nullptr;
 
-    m_logicalOrigin = Point(0, 0);
+    m_logicalOrigin = vrv::Point(0, 0);
 
     m_activeGraphicObjectsStack.clear();
 
@@ -122,15 +122,15 @@ void QtSceneGraphDeviceContext::SetTextBackground(int)
 
 void QtSceneGraphDeviceContext::SetLogicalOrigin(int x, int y)
 {
-    m_logicalOrigin = Point(-x, -y);
+    m_logicalOrigin = vrv::Point(-x, -y);
 }
 
-Point QtSceneGraphDeviceContext::GetLogicalOrigin()
+vrv::Point QtSceneGraphDeviceContext::GetLogicalOrigin()
 {
     return m_logicalOrigin;
 }
 
-void QtSceneGraphDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
+void QtSceneGraphDeviceContext::DrawComplexBezierPath(vrv::Point bezier1[4], vrv::Point bezier2[4])
 {
     // Note: No support for vertex antialiasing. Use a top-level QQuickView with multisample antialiasing.
     // TODO: Add vertex antialiasing, refer to
@@ -138,7 +138,7 @@ void QtSceneGraphDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point be
     // qtdeclarative/src/quick/scenegraph/qsgbasicinternalrectanglenode.cpp
     // 2) https://stackoverflow.com/questions/28125425/smooth-painting-in-custom-qml-element
 
-    Pen currentPen = m_penStack.top();
+    vrv::Pen currentPen = m_penStack.top();
 
     int segmentCount = 16;
 
@@ -153,7 +153,7 @@ void QtSceneGraphDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point be
     node->setMaterial(material);
     node->setFlag(QSGNode::OwnsMaterial);
 
-    auto calculateCubicBezierPoint = [](Point p[4], float t) -> std::tuple<float, float> {
+    auto calculateCubicBezierPoint = [](vrv::Point p[4], float t) -> std::tuple<float, float> {
         auto invt = 1 - t;
         auto x = invt * invt * invt * p[0].x + 3 * invt * invt * t * p[1].x + 3 * invt * t * t * p[2].x
             + t * t * t * p[3].x;
@@ -192,7 +192,7 @@ void QtSceneGraphDeviceContext::DrawCircle(int x, int y, int radius)
     // qtdeclarative/src/quick/scenegraph/qsgbasicinternalrectanglenode.cpp
     // 2) https://stackoverflow.com/questions/28125425/smooth-painting-in-custom-qml-element
 
-    Pen currentPen = m_penStack.top();
+    vrv::Pen currentPen = m_penStack.top();
 
     int segmentCount = 16;
 
@@ -234,7 +234,7 @@ void QtSceneGraphDeviceContext::DrawEllipticArc(int, int, int, int, double, doub
 
 void QtSceneGraphDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
-    Pen currentPen = m_penStack.top();
+    vrv::Pen currentPen = m_penStack.top();
 
     QSGGeometry *geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), 2);
     geometry->setDrawingMode(GL_LINES);
@@ -254,7 +254,7 @@ void QtSceneGraphDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     AddGeometryNode(node);
 }
 
-void QtSceneGraphDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffset, int)
+void QtSceneGraphDeviceContext::DrawPolygon(int n, vrv::Point points[], int xoffset, int yoffset, int)
 {
     // Note: No support for vertex antialiasing. Use a top-level QQuickView with multisample antialiasing.
     // TODO: Add vertex antialiasing, refer to
@@ -265,7 +265,7 @@ void QtSceneGraphDeviceContext::DrawPolygon(int n, Point points[], int xoffset, 
     // TODO: This function only works for convex polygons. At the moment verovio calls this function only with n = 4.
     // Maybe this function should be renamed to DrawConvexPolygon
 
-    Pen currentPen = m_penStack.top();
+    vrv::Pen currentPen = m_penStack.top();
 
     QSGGeometry *geometry;
     geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), n);
@@ -301,7 +301,7 @@ void QtSceneGraphDeviceContext::DrawPolygon(int n, Point points[], int xoffset, 
 
 void QtSceneGraphDeviceContext::DrawRectangle(int x, int y, int width, int height)
 {
-    Pen currentPen = m_penStack.top();
+    vrv::Pen currentPen = m_penStack.top();
 
     QSGSimpleRectNode *node = new QSGSimpleRectNode;
     node->setColor(static_cast<QRgb>(currentPen.GetColour()));
@@ -333,9 +333,9 @@ void QtSceneGraphDeviceContext::StartText(int x, int y, char alignment)
     m_currentTextQuickItem->setY(static_cast<double>(translateY(y)));
 
     switch (alignment) {
-        case RIGHT: m_currentTextQuickItem->setAlignment(Qt::AlignRight); break;
-        case CENTER: m_currentTextQuickItem->setAlignment(Qt::AlignHCenter); break;
-        case LEFT: m_currentTextQuickItem->setAlignment(Qt::AlignLeft); break;
+        case vrv::RIGHT: m_currentTextQuickItem->setAlignment(Qt::AlignRight); break;
+        case vrv::CENTER: m_currentTextQuickItem->setAlignment(Qt::AlignHCenter); break;
+        case vrv::LEFT: m_currentTextQuickItem->setAlignment(Qt::AlignLeft); break;
     }
 }
 
@@ -350,19 +350,19 @@ void QtSceneGraphDeviceContext::DrawText(const std::string &text, const std::wst
     int pixelSize = static_cast<int>(translate(m_fontStack.top()->GetPointSize()));
     font.setPixelSize(pixelSize);
 
-    if (m_fontStack.top()->GetStyle() != FONTSTYLE_NONE) {
-        if (m_fontStack.top()->GetStyle() == FONTSTYLE_italic) {
+    if (m_fontStack.top()->GetStyle() != vrv::FONTSTYLE_NONE) {
+        if (m_fontStack.top()->GetStyle() == vrv::FONTSTYLE_italic) {
             font.setStyle(QFont::StyleItalic);
         }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_normal) {
+        else if (m_fontStack.top()->GetStyle() == vrv::FONTSTYLE_normal) {
             font.setStyle(QFont::StyleNormal);
         }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_oblique) {
+        else if (m_fontStack.top()->GetStyle() == vrv::FONTSTYLE_oblique) {
             font.setStyle(QFont::StyleOblique);
         }
     }
-    if (m_fontStack.top()->GetWeight() != FONTWEIGHT_NONE) {
-        if (m_fontStack.top()->GetWeight() == FONTWEIGHT_bold) {
+    if (m_fontStack.top()->GetWeight() != vrv::FONTWEIGHT_NONE) {
+        if (m_fontStack.top()->GetWeight() == vrv::FONTWEIGHT_bold) {
             font.setWeight(QFont::Bold);
         }
     }
@@ -403,7 +403,7 @@ void QtSceneGraphDeviceContext::DrawMusicText(const std::wstring &text, int x, i
     AddQuickItem(musicTextQuickItem);
 }
 
-void QtSceneGraphDeviceContext::DrawSpline(int, Point[])
+void QtSceneGraphDeviceContext::DrawSpline(int, vrv::Point[])
 {
     // This function is also not implemented for SvgDeviceContext
 }
@@ -418,27 +418,27 @@ void QtSceneGraphDeviceContext::MoveTextTo(int, int)
     // This function is also not implemented for SvgDeviceContext
 }
 
-void QtSceneGraphDeviceContext::StartGraphic(Object *object, std::string, std::string gId)
+void QtSceneGraphDeviceContext::StartGraphic(vrv::Object *object, std::string, std::string gId)
 {
     m_activeGraphicObjectsStack.push(ActiveGraphic(QString::fromStdString(gId), object));
 }
 
-void QtSceneGraphDeviceContext::EndGraphic(Object *, View *)
+void QtSceneGraphDeviceContext::EndGraphic(vrv::Object *, vrv::View *)
 {
     m_activeGraphicObjectsStack.pop();
 }
 
-void QtSceneGraphDeviceContext::ResumeGraphic(Object *object, std::string gId)
+void QtSceneGraphDeviceContext::ResumeGraphic(vrv::Object *object, std::string gId)
 {
     m_activeGraphicObjectsStack.push(ActiveGraphic(QString::fromStdString(gId), object));
 }
 
-void QtSceneGraphDeviceContext::EndResumedGraphic(Object *, View *)
+void QtSceneGraphDeviceContext::EndResumedGraphic(vrv::Object *, vrv::View *)
 {
     m_activeGraphicObjectsStack.pop();
 }
 
-void QtSceneGraphDeviceContext::RotateGraphic(const Point &, double)
+void QtSceneGraphDeviceContext::RotateGraphic(const vrv::Point &, double)
 {
     qWarning() << "Warning:" << __FUNCTION__ << "not supported";
 }
@@ -452,4 +452,4 @@ void QtSceneGraphDeviceContext::EndPage()
 {
     // No action required
 }
-} // namespace vrv
+} // namespace vrv_qt

@@ -3,11 +3,9 @@ QT += qml quick
 CONFIG += c++14
 TARGET = verovio-qt-demo
 
-SOURCES += main.cpp \
-    veroviopagedemo.cpp
+SOURCES += main.cpp
 
-HEADERS += \
-    veroviopagedemo.h
+HEADERS +=
 
 RESOURCES += qml.qrc
 

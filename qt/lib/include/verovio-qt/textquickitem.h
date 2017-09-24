@@ -12,7 +12,7 @@
 
 #include <QQuickPaintedItem>
 
-namespace vrv {
+namespace vrv_qt {
 
 //----------------------------------------------------------------------------
 // TextQuickItem
@@ -76,6 +76,6 @@ private:
     Qt::Alignment m_alignment{ Qt::AlignLeft };
     QColor m_color{ Qt::black };
 };
-} // namespace vrv
+} // namespace vrv_qt
 
 #endif // __TEXTQUICKITEM_H__

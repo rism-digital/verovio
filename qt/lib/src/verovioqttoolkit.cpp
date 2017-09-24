@@ -5,7 +5,7 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "veroviodoc.h"
+#include "verovioqttoolkit.h"
 
 //----------------------------------------------------------------------------
 
@@ -14,22 +14,11 @@
 #include <QFontDatabase>
 #include <QUrl>
 
-//----------------------------------------------------------------------------
-
-#include "vrv.h"
-
-namespace vrv {
-VerovioDoc::VerovioDoc()
+namespace vrv_qt {
+Toolkit::Toolkit()
     : m_verovioToolkit(false)
-    , m_pageWidth(m_verovioToolkit.GetPageWidth())
-    , m_pageHeight(m_verovioToolkit.GetPageHeight())
-    , m_scale(m_verovioToolkit.GetScale())
-    , m_border(m_verovioToolkit.GetBorder())
-    , m_spacingStaff(m_verovioToolkit.GetSpacingStaff())
-    , m_spacingSystem(m_verovioToolkit.GetSpacingSystem())
-    , m_adjustPageHeight(m_verovioToolkit.GetAdjustPageHeight())
-    , m_noLayout(m_verovioToolkit.GetNoLayout())
-    , m_ignoreLayout(m_verovioToolkit.GetIgnoreLayout())
+    , m_displayWidth(m_verovioToolkit.GetPageWidth())
+    , m_displayHeight(m_verovioToolkit.GetPageHeight())
     , m_musicFont("Leipzig")
 {
     connect(this, SIGNAL(documentLayoutInvalidated()), this, SLOT(documentRelayout()), Qt::QueuedConnection);
@@ -37,9 +26,9 @@ VerovioDoc::VerovioDoc()
     connect(this, SIGNAL(fileContentInvalidated()), this, SLOT(reloadData()), Qt::QueuedConnection);
 }
 
-int VerovioDoc::adjustedPageHeightForPage(int page)
+int Toolkit::adjustedPageHeightForPage(int page)
 {
-    if (!m_adjustPageHeight) return m_pageHeight;
+    if (!m_verovioToolkit.GetAdjustPageHeight()) return m_displayHeight;
 
     Q_ASSERT(page <= m_adjustedPageHeights.count());
 
@@ -62,22 +51,22 @@ int VerovioDoc::adjustedPageHeightForPage(int page)
     }
 }
 
-void VerovioDoc::setAdjustedPageHeightForPage(int pageNumber, int pageHeight)
+void Toolkit::setAdjustedPageHeightForPage(int pageNumber, int pageHeight)
 {
-    if (m_adjustPageHeight) {
+    if (m_verovioToolkit.GetAdjustPageHeight()) {
         Q_ASSERT(pageNumber <= m_adjustedPageHeights.count());
         m_adjustedPageHeights[pageNumber - 1] = pageHeight;
     }
 }
 
-void VerovioDoc::renderPage(int page, DeviceContext *deviceContext)
+void Toolkit::renderPage(int page, vrv::DeviceContext *deviceContext)
 {
     if (m_hasValidData) {
         m_verovioToolkit.RenderToCustomDevice(page, deviceContext);
     }
 }
 
-void VerovioDoc::setHasValidData(bool hasValidData)
+void Toolkit::setHasValidData(bool hasValidData)
 {
     if (m_hasValidData != hasValidData) {
         m_hasValidData = hasValidData;
@@ -85,7 +74,7 @@ void VerovioDoc::setHasValidData(bool hasValidData)
     }
 }
 
-void VerovioDoc::setPageCount(int pageCount)
+void Toolkit::setPageCount(int pageCount)
 {
     if (m_pageCount != pageCount) {
         m_pageCount = pageCount;
@@ -95,7 +84,7 @@ void VerovioDoc::setPageCount(int pageCount)
     }
 }
 
-void VerovioDoc::setFileName(QString fileName)
+void Toolkit::setFileName(QString fileName)
 {
     // file-names from QML start with file://
     if (fileName.startsWith("file://")) {
@@ -108,7 +97,7 @@ void VerovioDoc::setFileName(QString fileName)
     }
 }
 
-void VerovioDoc::setMusicFont(QString musicFont)
+void Toolkit::setMusicFont(QString musicFont)
 {
     if (m_musicFont != musicFont) {
         m_musicFont = musicFont;
@@ -118,69 +107,65 @@ void VerovioDoc::setMusicFont(QString musicFont)
     }
 }
 
-void VerovioDoc::setPageWidth(int pageWidth)
+void Toolkit::setDisplayWidth(int pageWidth)
 {
-    if (m_pageWidth != pageWidth) {
-        m_pageWidth = pageWidth;
+    if (m_displayWidth != pageWidth) {
+        m_displayWidth = pageWidth;
         requestDocumentRelayout();
     }
 }
 
-void VerovioDoc::setPageHeight(int pageHeight)
+void Toolkit::setDisplayHeight(int pageHeight)
 {
-    if (m_pageHeight != pageHeight) {
-        m_pageHeight = pageHeight;
+    if (m_displayHeight != pageHeight) {
+        m_displayHeight = pageHeight;
         requestDocumentRelayout();
     }
 }
 
-void VerovioDoc::setScale(int scale)
+void Toolkit::setScale(int scale)
 {
-    if (m_scale != scale) {
-        m_scale = scale;
+    if (m_verovioToolkit.GetScale() != scale) {
+        m_verovioToolkit.SetScale(scale);
         requestDocumentRelayout();
     }
 }
 
-void VerovioDoc::setBorder(int border)
+void Toolkit::setBorder(int border)
 {
-    if (m_border != border) {
-        m_border = border;
+    if (m_verovioToolkit.GetBorder() != border) {
         m_verovioToolkit.SetAdjustPageHeight(border);
         requestDocumentRelayout();
     }
 }
 
-void VerovioDoc::setAdjustPageHeight(bool adjustPageHeight)
+void Toolkit::setAdjustPageHeight(bool adjustPageHeight)
 {
-    if (m_adjustPageHeight != adjustPageHeight) {
-        m_adjustPageHeight = adjustPageHeight;
+    if (m_verovioToolkit.GetAdjustPageHeight() != adjustPageHeight) {
         m_verovioToolkit.SetAdjustPageHeight(adjustPageHeight);
         requestDocumentRelayout();
     }
 }
 
-void VerovioDoc::setNoLayout(bool noLayout)
+void Toolkit::setNoLayout(bool noLayout)
 {
-    if (m_noLayout != noLayout) {
-        m_noLayout = noLayout;
+    if (m_verovioToolkit.GetNoLayout() != noLayout) {
         m_verovioToolkit.SetNoLayout(noLayout);
         // "no layout" is used in LoadData
         requestReloadData();
     }
 }
 
-void VerovioDoc::setIgnoreLayout(bool ignoreLayout)
+void Toolkit::setIgnoreLayout(bool ignoreLayout)
 {
-    if (m_ignoreLayout != ignoreLayout) {
-        m_ignoreLayout = ignoreLayout;
+    if (m_verovioToolkit.GetIgnoreLayout() != ignoreLayout) {
         m_verovioToolkit.SetIgnoreLayout(ignoreLayout);
         // "ignore layout" is used in LoadData
         requestReloadData();
     }
 }
 
-void VerovioDoc::setFileContent(QString fileContent)
+void Toolkit::setFileContent(QString fileContent)
 {
     if (m_fileContent != fileContent) {
         m_fileContent = fileContent;
@@ -188,21 +173,21 @@ void VerovioDoc::setFileContent(QString fileContent)
     }
 }
 
-void VerovioDoc::setResourcesDataPath(QString resourcesDataPath)
+void Toolkit::setResourcesDataPath(QString resourcesDataPath)
 {
     if (m_resourcesDataPath != resourcesDataPath) {
         m_resourcesDataPath = resourcesDataPath;
-        Resources::SetPath(resourcesDataPath.toStdString());
+        bool success = m_verovioToolkit.SetResourcePath(resourcesDataPath.toStdString());
 
-        if (!Resources::InitFonts()) {
+        if (!success) {
             qWarning() << "The music font could not be loaded; please check the contents of the resource directory.";
-            exit(1);
+            return;
         }
         requestDocumentRelayout();
     }
 }
 
-void VerovioDoc::setFontDirPath(QString fontDirPath)
+void Toolkit::setFontDirPath(QString fontDirPath)
 {
     if (m_fontDirPath != fontDirPath) {
         m_fontDirPath = fontDirPath;
@@ -210,25 +195,23 @@ void VerovioDoc::setFontDirPath(QString fontDirPath)
     }
 }
 
-void VerovioDoc::setSpacingStaff(int spacingStaff)
+void Toolkit::setSpacingStaff(int spacingStaff)
 {
-    if (m_spacingStaff != spacingStaff) {
-        m_spacingStaff = spacingStaff;
+    if (m_verovioToolkit.GetSpacingStaff() != spacingStaff) {
         m_verovioToolkit.SetSpacingStaff(spacingStaff);
         requestDocumentRelayout();
     }
 }
 
-void VerovioDoc::setSpacingSystem(int spacingSystem)
+void Toolkit::setSpacingSystem(int spacingSystem)
 {
-    if (m_spacingSystem != spacingSystem) {
-        m_spacingSystem = spacingSystem;
+    if (m_verovioToolkit.GetSpacingSystem() != spacingSystem) {
         m_verovioToolkit.SetSpacingSystem(spacingSystem);
         requestDocumentRelayout();
     }
 }
 
-void VerovioDoc::initFont()
+void Toolkit::initFont()
 {
     if (m_fontInitDone) return;
     m_fontInitDone = true;
@@ -238,7 +221,7 @@ void VerovioDoc::initFont()
     if (m_musicFont == "Bravura")
         QFontDatabase::addApplicationFont(m_fontDirPath + "/Bravura-1.204.otf");
     else if (m_musicFont == "Leipzig")
-        qDebug() << "Leipzig" << QFontDatabase::addApplicationFont(m_fontDirPath + "/Leipzig-5.2.ttf");
+        QFontDatabase::addApplicationFont(m_fontDirPath + "/Leipzig-5.2.ttf");
     else if (m_musicFont == "Gootville")
         QFontDatabase::addApplicationFont(m_fontDirPath + "/Gootville-1.2.otf");
     else
@@ -248,7 +231,7 @@ void VerovioDoc::initFont()
     QFontDatabase::addApplicationFont(m_fontDirPath + "/VerovioText-1.0.ttf");
 }
 
-void VerovioDoc::requestReadFile()
+void Toolkit::requestReadFile()
 {
     if (!m_readFileRequested) {
         m_readFileRequested = true;
@@ -256,7 +239,7 @@ void VerovioDoc::requestReadFile()
     }
 }
 
-void VerovioDoc::requestReloadData()
+void Toolkit::requestReloadData()
 {
     if (!m_reloadDataRequested) {
         m_reloadDataRequested = true;
@@ -264,7 +247,7 @@ void VerovioDoc::requestReloadData()
     }
 }
 
-void VerovioDoc::requestDocumentRelayout()
+void Toolkit::requestDocumentRelayout()
 {
     if (!m_documentRelayoutRequested) {
         m_documentRelayoutRequested = true;
@@ -272,7 +255,7 @@ void VerovioDoc::requestDocumentRelayout()
     }
 }
 
-void VerovioDoc::readFile()
+void Toolkit::readFile()
 {
     bool success = false;
     m_readFileRequested = false;
@@ -289,7 +272,7 @@ void VerovioDoc::readFile()
     }
 }
 
-void VerovioDoc::reloadData()
+void Toolkit::reloadData()
 {
     m_reloadDataRequested = false;
 
@@ -304,7 +287,7 @@ void VerovioDoc::reloadData()
     }
 }
 
-void VerovioDoc::documentRelayout()
+void Toolkit::documentRelayout()
 {
     m_documentRelayoutRequested = false;
 
@@ -314,9 +297,8 @@ void VerovioDoc::documentRelayout()
 
     initFont();
 
-    m_verovioToolkit.SetScale(m_scale);
-    m_verovioToolkit.SetPageWidth(static_cast<int>(m_pageWidth * 100.0 / m_scale));
-    m_verovioToolkit.SetPageHeight(static_cast<int>(m_pageHeight * 100.0 / m_scale));
+    m_verovioToolkit.SetPageWidth(static_cast<int>(m_displayWidth * 100.0 / m_verovioToolkit.GetScale()));
+    m_verovioToolkit.SetPageHeight(static_cast<int>(m_displayHeight * 100.0 / m_verovioToolkit.GetScale()));
 
     m_verovioToolkit.RedoLayout();
 
@@ -324,4 +306,4 @@ void VerovioDoc::documentRelayout()
 
     emit documentLayoutChanged();
 }
-} // namespace vrv
+} // namespace vrv_qt
