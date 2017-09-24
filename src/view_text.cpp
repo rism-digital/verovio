@@ -18,6 +18,7 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "fb.h"
+#include "rend.h"
 #include "smufl.h"
 #include "style.h"
 #include "text.h"

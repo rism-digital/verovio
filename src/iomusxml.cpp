@@ -35,6 +35,7 @@
 #include "note.h"
 #include "octave.h"
 #include "pedal.h"
+#include "rend.h"
 #include "rest.h"
 #include "rpt.h"
 #include "score.h"

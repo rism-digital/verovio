@@ -56,6 +56,7 @@
 #include "pghead.h"
 #include "pghead2.h"
 #include "proport.h"
+#include "rend.h"
 #include "rest.h"
 #include "rpt.h"
 #include "score.h"
