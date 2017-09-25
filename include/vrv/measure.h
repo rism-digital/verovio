@@ -111,8 +111,8 @@ public:
      * not for creating other measure objects.
      */
     ///@{
-    BarLine *const GetLeftBarLine() { return &m_leftBarLine; }
-    BarLine *const GetRightBarLine() { return &m_rightBarLine; }
+    BarLine *GetLeftBarLine() { return &m_leftBarLine; }
+    BarLine *GetRightBarLine() { return &m_rightBarLine; }
     ///@}
 
     /**
