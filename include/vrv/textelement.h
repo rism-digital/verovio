@@ -39,6 +39,31 @@ public:
 private:
 };
 
+//----------------------------------------------------------------------------
+// TextDrawingParams
+//----------------------------------------------------------------------------
+  
+    
+/**
+ * This class stores current drawing parameters for text.
+ */
+class TextDrawingParams {
+public:
+    TextDrawingParams()
+    {
+        m_width = 0;
+        m_setX = false;
+        m_setY = false;
+        m_alignment = HORIZONTALALIGNMENT_left;
+    }
+    virtual ~TextDrawingParams(){};
+
+    int m_width;
+    bool m_setX;
+    bool m_setY;
+    data_HORIZONTALALIGNMENT m_alignment;
+};
+    
 } // namespace vrv
 
 #endif
