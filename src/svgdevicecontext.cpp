@@ -648,15 +648,15 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     */
 }
 
-void SvgDeviceContext::StartText(int x, int y, char alignment)
+void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignment)
 {
     std::string s;
     std::string anchor;
 
-    if (alignment == RIGHT) {
+    if (alignment == HORIZONTALALIGNMENT_right) {
         anchor = "end";
     }
-    if (alignment == CENTER) {
+    if (alignment == HORIZONTALALIGNMENT_center) {
         anchor = "middle";
     }
 

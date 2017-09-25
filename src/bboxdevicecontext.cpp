@@ -33,7 +33,7 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
     m_userScaleY = 1.0;
 
     m_drawingText = false;
-    m_textAlignment = LEFT;
+    m_textAlignment = HORIZONTALALIGNMENT_left;
 
     SetBrush(AxBLACK, AxSOLID);
     SetPen(AxBLACK, 1, AxSOLID);
@@ -238,7 +238,7 @@ void BBoxDeviceContext::DrawPlaceholder(int x, int y)
     UpdateBB(x, y, x, y);
 }
 
-void BBoxDeviceContext::StartText(int x, int y, char alignment)
+void BBoxDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignment)
 {
     assert(!m_drawingText);
     m_drawingText = true;
@@ -274,10 +274,10 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
     m_textAscent = std::max(m_textAscent, extend.m_ascent);
     m_textDescent = std::max(m_textDescent, extend.m_descent);
     m_textHeight = m_textAscent + m_textDescent;
-    if (m_textAlignment == RIGHT) {
+    if (m_textAlignment == HORIZONTALALIGNMENT_right) {
         m_textX -= extend.m_width;
     }
-    else if (m_textAlignment == CENTER) {
+    else if (m_textAlignment == HORIZONTALALIGNMENT_center) {
         m_textX -= (extend.m_width / 2);
     }
     UpdateBB(m_textX, m_textY + m_textDescent, m_textX + m_textWidth, m_textY - m_textAscent);

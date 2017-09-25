@@ -1722,9 +1722,9 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     bool setX = false;
     bool setY = false;
 
-    char alignment = dir->GetAlignment();
+    data_HORIZONTALALIGNMENT alignment = dir->GetChildRendAlignment();
     // Dir are left aligned by default (with both @tstamp and @startid)
-    if (alignment == 0) alignment = LEFT;
+    if (alignment == HORIZONTALALIGNMENT_NONE) alignment = HORIZONTALALIGNMENT_left;
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dir->GetTstampStaves(measure);
@@ -1779,11 +1779,11 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     bool setX = false;
     bool setY = false;
 
-    char alignment = dynam->GetAlignment();
+    data_HORIZONTALALIGNMENT alignment = dynam->GetChildRendAlignment();
     // Dynam are left aligned by default;
     if (alignment == 0) {
         // centre the dynam only with @stratid
-        alignment = (dynam->GetStart()->Is(TIMESTAMP_ATTR)) ? LEFT : CENTER;
+        alignment = (dynam->GetStart()->Is(TIMESTAMP_ATTR)) ? HORIZONTALALIGNMENT_left : HORIZONTALALIGNMENT_center;
     }
 
     std::vector<Staff *>::iterator staffIter;
@@ -1798,7 +1798,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         // If the dynamic is a symbol (pp, mf, etc.) draw it as one smufl string. This will not take into account
         // editorial element within the dynam as it would with text. Also, it is center only if it is a symbol.
         if (isSymbolOnly) {
-            bool centered = (alignment == CENTER) ? true : false;
+            bool centered = (alignment == HORIZONTALALIGNMENT_center) ? true : false;
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
             DrawSmuflString(dc, x, y, dynamSymbol, centered, (*staffIter)->m_drawingStaffSize);
             dc->ResetFont();
@@ -1837,7 +1837,7 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, int x, int y, bool &s
 
     Object *current;
     for (current = fb->GetFirst(); current; current = fb->GetNext()) {
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), HORIZONTALALIGNMENT_left);
         if (current->Is(FIGURE)) {
             // dynamic_cast assert in DrawF
             DrawF(dc, dynamic_cast<F *>(current), x, y, setX, setY);
@@ -1935,11 +1935,11 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     bool setX = false;
     bool setY = false;
 
-    char alignment = harm->GetAlignment();
+    data_HORIZONTALALIGNMENT alignment = harm->GetChildRendAlignment();
     // Harm are centered aligned by default;
     if (alignment == 0) {
         // centre the harm only with @stratid
-        alignment = (harm->GetStart()->Is(TIMESTAMP_ATTR)) ? LEFT : CENTER;
+        alignment = (harm->GetStart()->Is(TIMESTAMP_ATTR)) ? HORIZONTALALIGNMENT_left : HORIZONTALALIGNMENT_center;
     }
 
     std::vector<Staff *>::iterator staffIter;
@@ -2149,9 +2149,9 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     bool setX = false;
     bool setY = false;
 
-    char alignment = tempo->GetAlignment();
+    data_HORIZONTALALIGNMENT alignment = tempo->GetChildRendAlignment();
     // Tempo are left aligned by default;
-    if (alignment == 0) alignment = LEFT;
+    if (alignment == 0) alignment = HORIZONTALALIGNMENT_left;
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = tempo->GetTstampStaves(measure);
@@ -2462,7 +2462,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
                 textX += m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
             }
-            dc->StartText(ToDeviceContextX(textX), ToDeviceContextY(y1), LEFT);
+            dc->StartText(ToDeviceContextX(textX), ToDeviceContextY(y1), HORIZONTALALIGNMENT_left);
             DrawTextElement(dc, &text, textX, y1, setX, setY);
             dc->EndText();
         }

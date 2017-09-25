@@ -95,7 +95,7 @@ public:
      * @name Method for starting and ending a text
      */
     ///@{
-    virtual void StartText(int x, int y, char alignement = LEFT);
+    virtual void StartText(int x, int y, data_HORIZONTALALIGNMENT alignement = HORIZONTALALIGNMENT_left);
     virtual void EndText();
 
     /**
@@ -180,7 +180,7 @@ private:
      */
     int m_textX, m_textY, m_textWidth, m_textHeight, m_textAscent, m_textDescent;
     bool m_drawingText;
-    char m_textAlignment;
+    data_HORIZONTALALIGNMENT m_textAlignment;
 
     /**
      * The array containing the object for which the bounding box needs to be updated

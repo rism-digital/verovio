@@ -307,7 +307,7 @@ void View::DrawStaffGrp(
 
         dc->StartGraphic(graphic, "", graphic->GetUuid());
 
-        dc->StartText(ToDeviceContextX(x_label), ToDeviceContextY(y_label), RIGHT);
+        dc->StartText(ToDeviceContextX(x_label), ToDeviceContextY(y_label), HORIZONTALALIGNMENT_right);
         DrawTextChildren(dc, graphic, x_label, y_label, setX, setY);
         dc->EndText();
 
@@ -425,7 +425,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
 
         dc->StartGraphic(graphic, "", graphic->GetUuid());
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), RIGHT);
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), HORIZONTALALIGNMENT_right);
         DrawTextChildren(dc, graphic, x, y, setX, setY);
         dc->EndText();
 
@@ -781,7 +781,7 @@ void View::DrawMNum(DeviceContext *dc, Measure *measure)
         int x = staff->GetDrawingX();
         int y = staff->GetDrawingY() + 2.5 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), HORIZONTALALIGNMENT_center);
         DrawTextElement(dc, &text, x, y, setX, setY);
         dc->EndText();
 
