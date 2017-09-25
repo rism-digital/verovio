@@ -30,14 +30,14 @@ namespace vrv {
 // View - TextElement
 //----------------------------------------------------------------------------
 
-void View::DrawF(DeviceContext *dc, F *f, int x, int y, bool &setX, bool &setY)
+void View::DrawF(DeviceContext *dc, F *f, TextDrawingParams &params)
 {
     assert(dc);
     assert(f);
 
     dc->StartTextGraphic(f, "", f->GetUuid());
 
-    DrawTextChildren(dc, f, x, y, setX, setY);
+    DrawTextChildren(dc, f, params);
 
     dc->EndTextGraphic(f, this);
 }
@@ -88,7 +88,7 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
     }
 }
 
-void View::DrawTextElement(DeviceContext *dc, TextElement *element, int x, int y, bool &setX, bool &setY)
+void View::DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingParams &params)
 {
     assert(dc);
     assert(element);
@@ -96,21 +96,21 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, int x, int y
     if (element->Is(FIGURE)) {
         F *f = dynamic_cast<F *>(element);
         assert(f);
-        DrawF(dc, f, x, y, setX, setY);
+        DrawF(dc, f, params);
     }
     else if (element->Is(REND)) {
         Rend *rend = dynamic_cast<Rend *>(element);
         assert(rend);
-        DrawRend(dc, rend, x, y, setX, setY);
+        DrawRend(dc, rend, params);
     }
     else if (element->Is(TEXT)) {
         Text *text = dynamic_cast<Text *>(element);
         assert(text);
-        DrawText(dc, text, x, y, setX, setY);
+        DrawText(dc, text, params);
     }
 }
 
-void View::DrawRend(DeviceContext *dc, Rend *rend, int x, int y, bool &setX, bool &setY)
+void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 {
     assert(dc);
     assert(rend);
@@ -131,26 +131,26 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, int x, int y, bool &setX, boo
     }
     if (customFont) dc->SetFont(&rendFont);
 
-    DrawTextChildren(dc, rend, x, y, setX, setY);
+    DrawTextChildren(dc, rend, params);
 
     if (customFont) dc->ResetFont();
 
     dc->EndTextGraphic(rend, this);
 }
 
-void View::DrawText(DeviceContext *dc, Text *text, int x, int y, bool &setX, bool &setY)
+void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
 {
     assert(dc);
     assert(text);
 
     // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
     if (text->GetFirstParent(HARM)) {
-        DrawHarmString(dc, x, y, text->GetText());
+        DrawHarmString(dc, params.m_x, params.m_y, text->GetText());
     }
     // special case where we want to replace the '_' with a lyric connector
     // '_' are produce with the SibMEI plugin
     else if (text->GetFirstParent(SYL)) {
-        DrawLyricString(dc, x, y, text->GetText());
+        DrawLyricString(dc, params.m_x, params.m_y, text->GetText());
     }
 
     else {

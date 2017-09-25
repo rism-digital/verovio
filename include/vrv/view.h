@@ -52,6 +52,7 @@ class System;
 class SystemElement;
 class Tempo;
 class Text;
+class TextDrawingParams;
 class TextElement;
 class Tie;
 class Trill;
@@ -208,8 +209,8 @@ protected:
     void DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measure, System *system);
     void DrawStaffChildren(DeviceContext *dc, Object *parent, Staff *staff, Measure *measure);
     void DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, Staff *staff, Measure *measure);
-    void DrawTextChildren(DeviceContext *dc, Object *parent, int x, int y, bool &setX, bool &setY);
-    void DrawFbChildren(DeviceContext *dc, Object *parent, int x, int y, bool &setX, bool &setY);
+    void DrawTextChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params);
+    void DrawFbChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params);
     ///@}
 
     /**
@@ -222,8 +223,8 @@ protected:
     void DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *element, Staff *staff, Measure *measure);
     void DrawLayerEditorialElement(
         DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure);
-    void DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY);
-    void DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY);
+    void DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element, TextDrawingParams &params);
+    void DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, TextDrawingParams &params);
     ///@}
 
     /**
@@ -306,7 +307,7 @@ protected:
      * Defined in view_text.cpp
      */
     ///@{
-    void DrawTextElement(DeviceContext *dc, TextElement *element, int x, int y, bool &setX, bool &setY);
+    void DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingParams &params);
     ///@}
 
     /**
@@ -314,8 +315,8 @@ protected:
      * Defined in view_text.cpp
      */
     ///@{
-    void DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y, bool &setX, bool &setY);
-    void DrawF(DeviceContext *dc, F *figure, int x, int y, bool &setX, bool &setY);
+    void DrawFb(DeviceContext *dc, Staff *staff, Fb *element, TextDrawingParams &params);
+    void DrawF(DeviceContext *dc, F *figure, TextDrawingParams &params);
 
     ///@}
 
@@ -327,8 +328,8 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawRend(DeviceContext *dc, Rend *rend, int x, int y, bool &setX, bool &setY);
-    void DrawText(DeviceContext *dc, Text *text, int x, int y, bool &setX, bool &setY);
+    void DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params);
+    void DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params);
 
     /**
      * @name Method for drawing Beam and FTrem.

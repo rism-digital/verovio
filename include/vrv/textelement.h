@@ -54,6 +54,8 @@ public:
         m_width = 0;
         m_setX = false;
         m_setY = false;
+        m_x = 0;
+        m_y = 0;
         m_alignment = HORIZONTALALIGNMENT_left;
     }
     virtual ~TextDrawingParams(){};
@@ -61,6 +63,8 @@ public:
     int m_width;
     bool m_setX;
     bool m_setY;
+    int m_x;
+    int m_y;
     data_HORIZONTALALIGNMENT m_alignment;
 };
     

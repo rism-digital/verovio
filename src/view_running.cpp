@@ -48,21 +48,20 @@ void View::DrawPgHead(DeviceContext *dc, PgHead *pgHead)
     
     FontInfo pgHeadTxt;
     
+    TextDrawingParams params;
+    
     // If we have not timestamp
-    int x = pgHead->GetDrawingX();
-    int y = pgHead->GetDrawingY();
-    
-    bool setX = false;
-    bool setY = false;
-    
+    params.m_x = pgHead->GetDrawingX();
+    params.m_y = pgHead->GetDrawingY();
+
     
     pgHeadTxt.SetPointSize(m_doc->GetDrawingLyricFont(100)->GetPointSize());
     
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(&pgHeadTxt);
     
-    dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), HORIZONTALALIGNMENT_right);
-    DrawTextChildren(dc, pgHead, x, y, setX, setY);
+    dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
+    DrawTextChildren(dc, pgHead, params);
     dc->EndText();
     
     dc->ResetFont();
