@@ -469,6 +469,15 @@ double LayerElement::GetAlignmentDuration(
         if (duration->IsMensural() && (notationType != NOTATIONTYPE_cmn)) {
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
+        if (this->Is(NC)){
+            Neume *neume = dynamic_cast<Neume *>(this->GetFirstParent(NEUME));
+            if (neume->IsLastInNeume(this)){
+                return 128;
+            }
+            else {
+                return 16;
+            }
+        }
         double durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
         // With fTrem we need to divide the duration by two
         FTrem *fTrem = dynamic_cast<FTrem *>(this->GetFirstParent(FTREM, MAX_FTREM_DEPTH));
@@ -640,7 +649,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         assert(note);
         m_alignment = note->GetAlignment();
     }
-        //Have to add a case for SYL being
+        //Have to add a case for SYL being different in 4.0
     else if (this->Is(SYL)) {
 //        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
 //        assert(note);
