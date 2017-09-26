@@ -106,7 +106,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     wchar_t fontNo = SMUFL_E990_chantPunctum;
     int yValue = clefYPosition + pitchOffset + octaveOffset;
 
-    DrawSmuflCode(dc, noteX/4 + 300, yValue, fontNo, staff->m_drawingStaffSize, false, true);
+    DrawSmuflCode(dc, noteX, yValue, fontNo, staff->m_drawingStaffSize, false, true);
 
     dc->EndGraphic(element, this);
 }

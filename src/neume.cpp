@@ -71,4 +71,23 @@ void Neume::Reset()
     ResetColor();
 }
 
+int Neume::GetPosition(LayerElement *element)
+{
+    this->GetList(this);
+    int position = this->GetListIndex(element);
+    return position;
+}
+
+bool Neume::IsLastInNeume(LayerElement *element)
+{
+    int size = (int)this->GetList(this)->size();
+    int position = this->GetPosition(element);
+
+    // This method should be called only if the note is part of a beam
+    assert(position != -1);
+    // this is the last one
+    if (position == (size - 1)) return true;
+    return false;
+}
+
 } // namespace vrv
