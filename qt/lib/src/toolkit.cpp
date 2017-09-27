@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        veroviodoc.cpp
+// Name:        toolkit.cpp
 // Author:      Jonathan Schluessler
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "verovioqttoolkit.h"
+#include "vrvqt/toolkit.h"
 
 //----------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@
 #include <QFontDatabase>
 #include <QUrl>
 
-namespace vrv_qt {
+namespace vrvQt {
 Toolkit::Toolkit()
     : m_verovioToolkit(false)
     , m_displayWidth(m_verovioToolkit.GetPageWidth())
@@ -26,21 +26,21 @@ Toolkit::Toolkit()
     connect(this, SIGNAL(fileContentInvalidated()), this, SLOT(reloadData()), Qt::QueuedConnection);
 }
 
-int Toolkit::adjustedPageHeightForPage(int page)
+int Toolkit::adjustedDisplayHeightForPage(int page)
 {
     if (!m_verovioToolkit.GetAdjustPageHeight()) return m_displayHeight;
 
-    Q_ASSERT(page <= m_adjustedPageHeights.count());
+    Q_ASSERT(page <= m_adjustedDisplayHeights.count());
 
     int defaultPageHeight = 1000;
 
-    if (m_adjustedPageHeights[page - 1] != 0) {
-        return m_adjustedPageHeights[page - 1];
+    if (m_adjustedDisplayHeights[page - 1] != 0) {
+        return m_adjustedDisplayHeights[page - 1];
     }
     else {
         int averagePageHeight = 0;
         int num = 0;
-        for (auto height : m_adjustedPageHeights) {
+        for (auto height : m_adjustedDisplayHeights) {
             if (height != 0) {
                 averagePageHeight += height;
                 num++;
@@ -51,18 +51,18 @@ int Toolkit::adjustedPageHeightForPage(int page)
     }
 }
 
-void Toolkit::setAdjustedPageHeightForPage(int pageNumber, int pageHeight)
+void Toolkit::setAdjustedDisplayHeightForPage(int pageNumber, int pageHeight)
 {
     if (m_verovioToolkit.GetAdjustPageHeight()) {
-        Q_ASSERT(pageNumber <= m_adjustedPageHeights.count());
-        m_adjustedPageHeights[pageNumber - 1] = pageHeight;
+        Q_ASSERT(pageNumber <= m_adjustedDisplayHeights.count());
+        m_adjustedDisplayHeights[pageNumber - 1] = pageHeight;
     }
 }
 
 void Toolkit::renderPage(int page, vrv::DeviceContext *deviceContext)
 {
     if (m_hasValidData) {
-        m_verovioToolkit.RenderToCustomDevice(page, deviceContext);
+        m_verovioToolkit.RenderToDeviceContext(page, deviceContext);
     }
 }
 
@@ -78,7 +78,7 @@ void Toolkit::setPageCount(int pageCount)
 {
     if (m_pageCount != pageCount) {
         m_pageCount = pageCount;
-        m_adjustedPageHeights.fill(0, pageCount);
+        m_adjustedDisplayHeights.fill(0, pageCount);
 
         emit pageCountChanged(pageCount);
     }
@@ -306,4 +306,4 @@ void Toolkit::documentRelayout()
 
     emit documentLayoutChanged();
 }
-} // namespace vrv_qt
+} // namespace vrvQt

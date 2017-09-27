@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        veroviopage.h
+// Name:        view.h
 // Author:      Jonathan Schluessler
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VEROVIOQTVIEW_H__
-#define __VEROVIOQTVIEW_H__
+#ifndef __VRV_QT_VIEW_H__
+#define __VRV_QT_VIEW_H__
 
 //----------------------------------------------------------------------------
 
@@ -15,9 +15,9 @@
 
 //----------------------------------------------------------------------------
 
-#include "qtscenegraphdevicecontext.h"
+#include "scenegraphdevicecontext.h"
 
-namespace vrv_qt {
+namespace vrvQt {
 class Toolkit;
 
 //----------------------------------------------------------------------------
@@ -31,7 +31,7 @@ class View : public QQuickItem {
     Q_OBJECT
 
     // Note: The namespace is required when specifying Qt properties
-    Q_PROPERTY(vrv_qt::Toolkit *verovioDoc MEMBER m_verovioDoc WRITE setVerovioDoc)
+    Q_PROPERTY(vrvQt::Toolkit *verovioDoc MEMBER m_verovioDoc WRITE setVerovioDoc)
     Q_PROPERTY(int pageNumber MEMBER m_pageNumber WRITE setPageNumber)
 
 public:
@@ -66,7 +66,7 @@ protected:
     QSGNode *updatePaintNode(QSGNode *node, UpdatePaintNodeData *) override;
 
     // The device context for Qt
-    std::unique_ptr<QtSceneGraphDeviceContext> m_qtDeviceContext{ nullptr };
+    std::unique_ptr<SceneGraphDeviceContext> m_qtDeviceContext{ nullptr };
 
 private:
     // variables to store the public properties
@@ -79,6 +79,6 @@ private:
     // handle for registered documentChanged connection.
     QMetaObject::Connection m_documentLayoutChangedConnection;
 };
-} // namespace vrv_qt
+} // namespace vrvQt
 
-#endif // __VEROVIOQTVIEW_H__
+#endif // __VRV_QT_VIEW_H__

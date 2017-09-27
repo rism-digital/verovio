@@ -65,7 +65,7 @@ Item {
         delegate: VerovioView {
             verovioDoc: verovioToolkit
             width:  root.width
-            height: verovioToolkit.adjustedPageHeightForPage(index+1)
+            height: verovioToolkit.adjustedDisplayHeightForPage(index+1)
             pageNumber: index + 1
         }
         ScrollBar.vertical: ScrollBar { }

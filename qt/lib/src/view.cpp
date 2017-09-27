@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        veroviopage.cpp
+// Name:        view.cpp
 // Author:      Jonathan Schluessler
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "verovioqtview.h"
+#include "vrvqt/view.h"
 
 //----------------------------------------------------------------------------
 
@@ -14,10 +14,10 @@
 
 //----------------------------------------------------------------------------
 
-#include "qtscenegraphdevicecontext.h"
-#include "verovioqttoolkit.h"
+#include "vrvqt/scenegraphdevicecontext.h"
+#include "vrvqt/toolkit.h"
 
-namespace vrv_qt {
+namespace vrvQt {
 View::View()
 {
     setFlag(ItemHasContents, true);
@@ -60,7 +60,7 @@ QSGNode *View::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
         node = new QSGNode();
     }
     if (m_qtDeviceContext == nullptr) {
-        m_qtDeviceContext = std::make_unique<QtSceneGraphDeviceContext>(this, node);
+        m_qtDeviceContext = std::make_unique<SceneGraphDeviceContext>(this, node);
     }
 
     if (m_verovioRenderingDirty) {
@@ -74,10 +74,10 @@ QSGNode *View::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
         m_verovioDoc->renderPage(m_pageNumber, m_qtDeviceContext.get());
         m_verovioRenderingDirty = false;
 
-        m_verovioDoc->setAdjustedPageHeightForPage(m_pageNumber, m_qtDeviceContext->GetScaledHeight());
-        setHeight(m_verovioDoc->adjustedPageHeightForPage(m_pageNumber));
+        m_verovioDoc->setAdjustedDisplayHeightForPage(m_pageNumber, m_qtDeviceContext->GetScaledHeight());
+        setHeight(m_verovioDoc->adjustedDisplayHeightForPage(m_pageNumber));
     }
 
     return node;
 }
-} // namespace vrv_qt
+} // namespace vrvQt

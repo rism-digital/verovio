@@ -99,7 +99,7 @@ public:
      * Render the page to the deviceContext.
      * Page number is 1-based.
      */
-    bool RenderToCustomDevice(int pageNo, DeviceContext *deviceContext);
+    bool RenderToDeviceContext(int pageNo, DeviceContext *deviceContext);
 
     /**
      * Render the page in SVG and returns it as a string.

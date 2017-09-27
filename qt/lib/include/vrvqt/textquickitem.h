@@ -5,14 +5,14 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __TEXTQUICKITEM_H__
-#define __TEXTQUICKITEM_H__
+#ifndef __VRV_QT_TEXTQUICKITEM_H__
+#define __VRV_QT_TEXTQUICKITEM_H__
 
 //----------------------------------------------------------------------------
 
 #include <QQuickPaintedItem>
 
-namespace vrv_qt {
+namespace vrvQt {
 
 //----------------------------------------------------------------------------
 // TextQuickItem
@@ -76,6 +76,6 @@ private:
     Qt::Alignment m_alignment{ Qt::AlignLeft };
     QColor m_color{ Qt::black };
 };
-} // namespace vrv_qt
+} // namespace vrvQt
 
-#endif // __TEXTQUICKITEM_H__
+#endif // __VRV_QT_TEXTQUICKITEM_H__

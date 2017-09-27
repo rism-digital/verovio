@@ -15,20 +15,21 @@ DEFINES += VEROVIOQT_LIBRARY
 DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
-    src/qtscenegraphdevicecontext.cpp \
+    src/scenegraphdevicecontext.cpp \
     src/textquickitem.cpp \
-    src/verovioqttoolkit.cpp \
-    src/verovioqtview.cpp
+    src/toolkit.cpp \
+    src/view.cpp
 
-HEADERS +=\
-    include/verovio-qt/qtscenegraphdevicecontext.h \
-    include/verovio-qt/textquickitem.h \
-    include/verovio-qt/verovioqttoolkit.h \
-    include/verovio-qt/verovioqtview.h
+HEADERS += \
+    include/vrvqt/scenegraphdevicecontext.h \
+    include/vrvqt/textquickitem.h \
+    include/vrvqt/toolkit.h \
+    include/vrvqt/view.h
 
-INCLUDEPATH += include/verovio-qt
+INCLUDEPATH += include
 
 {
+    INCLUDEPATH += ../../include/
     INCLUDEPATH += ../../include/vrv
     INCLUDEPATH += ../../include/pugi
     INCLUDEPATH += ../../include/utf8

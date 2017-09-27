@@ -13,8 +13,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "verovio-qt/verovioqttoolkit.h"
-#include "verovio-qt/verovioqtview.h"
+#include "vrvqt/toolkit.h"
+#include "vrvqt/view.h"
 
 /**
  * Retrieves GL_MAX_SAMPLES by creating an offscreen surface.
@@ -55,8 +55,8 @@ int main(int argc, char *argv[])
     QSettings settings;
 
     // Register custom QML types for Verovio
-    qmlRegisterType<vrv_qt::View>("VerovioQml", 1, 0, "VerovioView");
-    qmlRegisterType<vrv_qt::Toolkit>("VerovioQml", 1, 0, "VerovioToolkit");
+    qmlRegisterType<vrvQt::View>("VerovioQml", 1, 0, "VerovioView");
+    qmlRegisterType<vrvQt::Toolkit>("VerovioQml", 1, 0, "VerovioToolkit");
 
     QQuickView view;
 

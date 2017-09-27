@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        qtscenegraphdevicecontext.cpp
+// Name:        scenegraphdevicecontext.cpp
 // Author:      Jonathan Schluessler
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "qtscenegraphdevicecontext.h"
+#include "vrvqt/scenegraphdevicecontext.h"
 
 //----------------------------------------------------------------------------
 
@@ -26,11 +26,11 @@
 
 //----------------------------------------------------------------------------
 
-#include "textquickitem.h"
+#include "vrvqt/textquickitem.h"
 
-namespace vrv_qt {
+namespace vrvQt {
 
-QtSceneGraphDeviceContext::QtSceneGraphDeviceContext(QQuickItem *quickItem, QSGNode *node)
+SceneGraphDeviceContext::SceneGraphDeviceContext(QQuickItem *quickItem, QSGNode *node)
     : DeviceContext()
     , m_quickItem(quickItem)
     , m_node(node)
@@ -40,7 +40,7 @@ QtSceneGraphDeviceContext::QtSceneGraphDeviceContext(QQuickItem *quickItem, QSGN
 {
 }
 
-void QtSceneGraphDeviceContext::Clear()
+void SceneGraphDeviceContext::Clear()
 {
     m_currentTextQuickItem = nullptr;
 
@@ -53,7 +53,7 @@ void QtSceneGraphDeviceContext::Clear()
 }
 //----------------------------------------------------------------------------
 
-void QtSceneGraphDeviceContext::AddGeometryNode(QSGGeometryNode *node)
+void SceneGraphDeviceContext::AddGeometryNode(QSGGeometryNode *node)
 {
     m_node->appendChildNode(node);
 
@@ -62,7 +62,7 @@ void QtSceneGraphDeviceContext::AddGeometryNode(QSGGeometryNode *node)
     }
 }
 
-void QtSceneGraphDeviceContext::AddQuickItem(TextQuickItem *item)
+void SceneGraphDeviceContext::AddQuickItem(TextQuickItem *item)
 {
     item->setParentItem(m_quickItem); // visual parent
     item->setParent(m_quickItem); // object parent (for proper cleanup)
@@ -72,17 +72,17 @@ void QtSceneGraphDeviceContext::AddQuickItem(TextQuickItem *item)
     }
 }
 
-QList<QSGGeometryNode *> QtSceneGraphDeviceContext::GetGeometryNodesForId(QString id)
+QList<QSGGeometryNode *> SceneGraphDeviceContext::GetGeometryNodesForId(QString id)
 {
     return m_id2NodeMapping[id];
 }
 
-QList<TextQuickItem *> QtSceneGraphDeviceContext::GetQuickItemsForId(QString id)
+QList<TextQuickItem *> SceneGraphDeviceContext::GetQuickItemsForId(QString id)
 {
     return m_id2QuickItemMapping[id];
 }
 
-QStringList QtSceneGraphDeviceContext::GetIdsForQuickItem(QQuickItem *item)
+QStringList SceneGraphDeviceContext::GetIdsForQuickItem(QQuickItem *item)
 {
     QStringList ids;
     for (auto iter = m_id2QuickItemMapping.begin(); iter != m_id2QuickItemMapping.end(); ++iter) {
@@ -95,42 +95,42 @@ QStringList QtSceneGraphDeviceContext::GetIdsForQuickItem(QQuickItem *item)
     return ids;
 }
 
-void QtSceneGraphDeviceContext::SetBackground(int, int)
+void SceneGraphDeviceContext::SetBackground(int, int)
 {
     // This function is also not implemented for SvgDeviceContext
 }
 
-void QtSceneGraphDeviceContext::SetBackgroundImage(void *, double)
+void SceneGraphDeviceContext::SetBackgroundImage(void *, double)
 {
     // This function is also not implemented for SvgDeviceContext
 }
 
-void QtSceneGraphDeviceContext::SetBackgroundMode(int)
+void SceneGraphDeviceContext::SetBackgroundMode(int)
 {
     // This function is also not implemented for SvgDeviceContext
 }
 
-void QtSceneGraphDeviceContext::SetTextForeground(int colour)
+void SceneGraphDeviceContext::SetTextForeground(int colour)
 {
     m_brushStack.top().SetColour(colour); // we use the brush colour for text
 }
 
-void QtSceneGraphDeviceContext::SetTextBackground(int)
+void SceneGraphDeviceContext::SetTextBackground(int)
 {
     // This function is also not implemented for SvgDeviceContext
 }
 
-void QtSceneGraphDeviceContext::SetLogicalOrigin(int x, int y)
+void SceneGraphDeviceContext::SetLogicalOrigin(int x, int y)
 {
     m_logicalOrigin = vrv::Point(-x, -y);
 }
 
-vrv::Point QtSceneGraphDeviceContext::GetLogicalOrigin()
+vrv::Point SceneGraphDeviceContext::GetLogicalOrigin()
 {
     return m_logicalOrigin;
 }
 
-void QtSceneGraphDeviceContext::DrawComplexBezierPath(vrv::Point bezier1[4], vrv::Point bezier2[4])
+void SceneGraphDeviceContext::DrawComplexBezierPath(vrv::Point bezier1[4], vrv::Point bezier2[4])
 {
     // Note: No support for vertex antialiasing. Use a top-level QQuickView with multisample antialiasing.
     // TODO: Add vertex antialiasing, refer to
@@ -184,7 +184,7 @@ void QtSceneGraphDeviceContext::DrawComplexBezierPath(vrv::Point bezier1[4], vrv
     AddGeometryNode(node);
 }
 
-void QtSceneGraphDeviceContext::DrawCircle(int x, int y, int radius)
+void SceneGraphDeviceContext::DrawCircle(int x, int y, int radius)
 {
     // Note: No support for vertex antialiasing. Use a top-level QQuickView with multisample antialiasing.
     // TODO: Add vertex antialiasing, refer to
@@ -222,17 +222,17 @@ void QtSceneGraphDeviceContext::DrawCircle(int x, int y, int radius)
     AddGeometryNode(node);
 }
 
-void QtSceneGraphDeviceContext::DrawEllipse(int, int, int, int)
+void SceneGraphDeviceContext::DrawEllipse(int, int, int, int)
 {
     qWarning() << "Warning:" << __FUNCTION__ << "not supported";
 }
 
-void QtSceneGraphDeviceContext::DrawEllipticArc(int, int, int, int, double, double)
+void SceneGraphDeviceContext::DrawEllipticArc(int, int, int, int, double, double)
 {
     qWarning() << "Warning:" << __FUNCTION__ << "not supported";
 }
 
-void QtSceneGraphDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
+void SceneGraphDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
     vrv::Pen currentPen = m_penStack.top();
 
@@ -254,7 +254,7 @@ void QtSceneGraphDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     AddGeometryNode(node);
 }
 
-void QtSceneGraphDeviceContext::DrawPolygon(int n, vrv::Point points[], int xoffset, int yoffset, int)
+void SceneGraphDeviceContext::DrawPolygon(int n, vrv::Point points[], int xoffset, int yoffset, int)
 {
     // Note: No support for vertex antialiasing. Use a top-level QQuickView with multisample antialiasing.
     // TODO: Add vertex antialiasing, refer to
@@ -299,7 +299,7 @@ void QtSceneGraphDeviceContext::DrawPolygon(int n, vrv::Point points[], int xoff
     AddGeometryNode(node);
 }
 
-void QtSceneGraphDeviceContext::DrawRectangle(int x, int y, int width, int height)
+void SceneGraphDeviceContext::DrawRectangle(int x, int y, int width, int height)
 {
     vrv::Pen currentPen = m_penStack.top();
 
@@ -313,17 +313,17 @@ void QtSceneGraphDeviceContext::DrawRectangle(int x, int y, int width, int heigh
     AddGeometryNode(node);
 }
 
-void QtSceneGraphDeviceContext::DrawRotatedText(const std::string &, int, int, double)
+void SceneGraphDeviceContext::DrawRotatedText(const std::string &, int, int, double)
 {
     // This function is also not implemented for SvgDeviceContext
 }
 
-void QtSceneGraphDeviceContext::DrawRoundedRectangle(int, int, int, int, double)
+void SceneGraphDeviceContext::DrawRoundedRectangle(int, int, int, int, double)
 {
     qWarning() << "Warning:" << __FUNCTION__ << "not supported";
 }
 
-void QtSceneGraphDeviceContext::StartText(int x, int y, char alignment)
+void SceneGraphDeviceContext::StartText(int x, int y, char alignment)
 {
     Q_ASSERT(m_currentTextQuickItem == nullptr);
 
@@ -339,7 +339,7 @@ void QtSceneGraphDeviceContext::StartText(int x, int y, char alignment)
     }
 }
 
-void QtSceneGraphDeviceContext::DrawText(const std::string &text, const std::wstring)
+void SceneGraphDeviceContext::DrawText(const std::string &text, const std::wstring)
 {
     Q_ASSERT(m_currentTextQuickItem != nullptr);
 
@@ -370,7 +370,7 @@ void QtSceneGraphDeviceContext::DrawText(const std::string &text, const std::wst
     m_currentTextQuickItem->appendText(QString::fromStdString(text), font);
 }
 
-void QtSceneGraphDeviceContext::EndText()
+void SceneGraphDeviceContext::EndText()
 {
     Q_ASSERT(m_currentTextQuickItem != nullptr);
 
@@ -380,7 +380,7 @@ void QtSceneGraphDeviceContext::EndText()
     m_currentTextQuickItem = nullptr;
 }
 
-void QtSceneGraphDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool)
+void SceneGraphDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool)
 {
     Q_ASSERT(m_fontStack.top());
 
@@ -403,53 +403,53 @@ void QtSceneGraphDeviceContext::DrawMusicText(const std::wstring &text, int x, i
     AddQuickItem(musicTextQuickItem);
 }
 
-void QtSceneGraphDeviceContext::DrawSpline(int, vrv::Point[])
+void SceneGraphDeviceContext::DrawSpline(int, vrv::Point[])
 {
     // This function is also not implemented for SvgDeviceContext
 }
 
-void QtSceneGraphDeviceContext::DrawBackgroundImage(int, int)
+void SceneGraphDeviceContext::DrawBackgroundImage(int, int)
 {
     // This function is also not implemented for SvgDeviceContext
 }
 
-void QtSceneGraphDeviceContext::MoveTextTo(int, int)
+void SceneGraphDeviceContext::MoveTextTo(int, int)
 {
     // This function is also not implemented for SvgDeviceContext
 }
 
-void QtSceneGraphDeviceContext::StartGraphic(vrv::Object *object, std::string, std::string gId)
+void SceneGraphDeviceContext::StartGraphic(vrv::Object *object, std::string, std::string gId)
 {
     m_activeGraphicObjectsStack.push(ActiveGraphic(QString::fromStdString(gId), object));
 }
 
-void QtSceneGraphDeviceContext::EndGraphic(vrv::Object *, vrv::View *)
+void SceneGraphDeviceContext::EndGraphic(vrv::Object *, vrv::View *)
 {
     m_activeGraphicObjectsStack.pop();
 }
 
-void QtSceneGraphDeviceContext::ResumeGraphic(vrv::Object *object, std::string gId)
+void SceneGraphDeviceContext::ResumeGraphic(vrv::Object *object, std::string gId)
 {
     m_activeGraphicObjectsStack.push(ActiveGraphic(QString::fromStdString(gId), object));
 }
 
-void QtSceneGraphDeviceContext::EndResumedGraphic(vrv::Object *, vrv::View *)
+void SceneGraphDeviceContext::EndResumedGraphic(vrv::Object *, vrv::View *)
 {
     m_activeGraphicObjectsStack.pop();
 }
 
-void QtSceneGraphDeviceContext::RotateGraphic(const vrv::Point &, double)
+void SceneGraphDeviceContext::RotateGraphic(const vrv::Point &, double)
 {
     qWarning() << "Warning:" << __FUNCTION__ << "not supported";
 }
 
-void QtSceneGraphDeviceContext::StartPage()
+void SceneGraphDeviceContext::StartPage()
 {
     // No action required
 }
 
-void QtSceneGraphDeviceContext::EndPage()
+void SceneGraphDeviceContext::EndPage()
 {
     // No action required
 }
-} // namespace vrv_qt
+} // namespace vrvQt

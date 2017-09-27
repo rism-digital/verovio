@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        qtscenegraphdevicecontext.h
+// Name:        scenegraphdevicecontext.h
 // Author:      Jonathan Schluessler
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __QTSCENEGRAPHDEVICECONTEXT_H__
-#define __QTSCENEGRAPHDEVICECONTEXT_H__
+#ifndef __VRV_QT_SCENEGRAPH_DC_H__
+#define __VRV_QT_SCENEGRAPH_DC_H__
 
 //----------------------------------------------------------------------------
 
@@ -19,26 +19,26 @@
 
 #include "devicecontext.h"
 
-namespace vrv_qt {
+namespace vrvQt {
 
 class TextQuickItem;
 
 //----------------------------------------------------------------------------
-// QtSceneGraphDeviceContext
+// SceneGraphDeviceContext
 //----------------------------------------------------------------------------
 
 /**
  * This class implements a drawing context for the Qt scene graph. This allows
  * to create a QQuickItem that can be used in QML.
  */
-class QtSceneGraphDeviceContext : public vrv::DeviceContext {
+class SceneGraphDeviceContext : public vrv::DeviceContext {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    QtSceneGraphDeviceContext(QQuickItem *quickItem, QSGNode *node);
-    virtual ~QtSceneGraphDeviceContext() = default;
+    SceneGraphDeviceContext(QQuickItem *quickItem, QSGNode *node);
+    virtual ~SceneGraphDeviceContext() = default;
     void Clear();
     ///@}
 
@@ -186,6 +186,6 @@ private:
     QMap<QString, QList<QSGGeometryNode *> > m_id2NodeMapping;
     QMap<QString, QList<TextQuickItem *> > m_id2QuickItemMapping;
 };
-} // namespace vrv_qt
+} // namespace vrvQt
 
-#endif // __QTSCENEGRAPHDEVICECONTEXT_H__
+#endif // __VRV_QT_SCENEGRAPH_DC_H__

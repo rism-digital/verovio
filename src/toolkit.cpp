@@ -883,7 +883,7 @@ void Toolkit::RedoPagePitchPosLayout()
     page->LayOutPitchPos();
 }
 
-bool Toolkit::RenderToCustomDevice(int pageNo, DeviceContext *deviceContext)
+bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 {
     // Page number is one-based - correct it to 0-based first
     pageNo--;
@@ -924,7 +924,7 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
     svg.SetDrawBoundingBoxes(m_showBoundingBoxes);
 
     // render the page
-    RenderToCustomDevice(pageNo, &svg);
+    RenderToDeviceContext(pageNo, &svg);
 
     std::string out_str = svg.GetStringSVG(xml_declaration);
     return out_str;

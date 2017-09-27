@@ -5,13 +5,13 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "textquickitem.h"
+#include "vrvqt/textquickitem.h"
 
 //----------------------------------------------------------------------------
 
 #include <QPainter>
 
-namespace vrv_qt {
+namespace vrvQt {
 
 TextQuickItem::TextQuickItem()
 {
@@ -92,4 +92,4 @@ void TextQuickItem::paint(QPainter *painter)
         painter->drawText(m_paintOffsetX + textWithFont.offset, m_paintOffsetY, textWithFont.text);
     }
 }
-} // namespace vrv_qt
+} // namespace vrvQt

@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        veroviodoc.h
+// Name:        toolkit.h
 // Author:      Jonathan Schluessler
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VEROVIOQTTOOLKIT_H__
-#define __VEROVIOQTTOOLKIT_H__
+#ifndef __VRV_QT_TOOLKIT_H__
+#define __VRV_QT_TOOLKIT_H__
 
 //----------------------------------------------------------------------------
 
@@ -15,9 +15,9 @@
 
 //----------------------------------------------------------------------------
 
-#include "toolkit.h"
+#include "vrv/toolkit.h"
 
-namespace vrv_qt {
+namespace vrvQt {
 
 //----------------------------------------------------------------------------
 // VerovioDoc
@@ -56,11 +56,12 @@ public:
     ///@}
 
     /**
-     * @name Getter/setter for the adjusted page height if the adjustPageHeight is activated.
+     * @name Getter/setter for the adjusted display height. This returns the normal display height if adjustPageHeight
+     * is deactivated.
      */
     ///@{
-    Q_INVOKABLE int adjustedPageHeightForPage(int page);
-    void setAdjustedPageHeightForPage(int pageNumber, int displayHeight);
+    Q_INVOKABLE int adjustedDisplayHeightForPage(int page);
+    void setAdjustedDisplayHeightForPage(int pageNumber, int displayHeight);
     ///@}
 
     /**
@@ -178,13 +179,13 @@ private:
 private:
     // Stores the dimensions to which the score should be rendered. This takes into account the current scale and thus
     // differs to the Verovio pageWidth and pageHeight.
-    int m_displayWidth;
-    int m_displayHeight;
+    int m_displayWidth{ 0 };
+    int m_displayHeight{ 0 };
 
     int m_pageCount{ 0 };
 
     // adjusted page heights for the currently layouted document
-    QVector<int> m_adjustedPageHeights;
+    QVector<int> m_adjustedDisplayHeights;
 
     // font name for the music symbols (e.g. notes)
     QString m_musicFont;
@@ -203,5 +204,5 @@ private:
     bool m_fontInitDone{ false };
     bool m_hasValidData{ false };
 };
-} // namespace vrv_qt
-#endif // __VEROVIOQTTOOLKIT_H__
+} // namespace vrvQt
+#endif // __VRV_QT_TOOLKIT_H__
