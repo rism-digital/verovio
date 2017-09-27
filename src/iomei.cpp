@@ -40,6 +40,7 @@
 #include "keysig.h"
 #include "label.h"
 #include "layer.h"
+#include "lb.h"
 #include "ligature.h"
 #include "measure.h"
 #include "mensur.h"
@@ -446,6 +447,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(FB)) {
         m_currentNode = m_currentNode.append_child("fb");
         WriteMeiFb(m_currentNode, dynamic_cast<Fb *>(object));
+    }
+    else if (object->Is(LB)) {
+        m_currentNode = m_currentNode.append_child("lb");
+        WriteMeiLb(m_currentNode, dynamic_cast<Lb *>(object));
     }
     else if (object->Is(REND)) {
         m_currentNode = m_currentNode.append_child("rend");
@@ -1362,6 +1367,13 @@ void MeiOutput::WriteMeiF(pugi::xml_node currentNode, F *figure)
     WriteTextElement(currentNode, figure);
 };
 
+void MeiOutput::WriteMeiLb(pugi::xml_node currentNode, Lb *lb)
+{
+    assert(lb);
+
+    WriteTextElement(currentNode, lb);
+}
+    
 void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
 {
     assert(rend);
@@ -1777,6 +1789,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for running element
     else if (filterParent->IsRunningElement()) {
         if (element == "") {
+            return true;
+        }
+        else if (element == "lb") {
             return true;
         }
         else if (element == "rend") {
@@ -3564,6 +3579,9 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
             success = ReadMeiEditorialElement(parent, xmlElement, EDITORIAL_TEXT, filter);
         }
         // content
+        else if (elementName == "lb") {
+            success = ReadMeiLb(parent, xmlElement);
+        }
         else if (elementName == "rend") {
             success = ReadMeiRend(parent, xmlElement);
         }
@@ -3602,6 +3620,15 @@ bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node f)
     return ReadMeiTextChildren(vrvF, f);
 }
 
+bool MeiInput::ReadMeiLb(Object *parent, pugi::xml_node lb)
+{
+    Lb *vrvLb = new Lb();
+    ReadTextElement(lb, vrvLb);
+
+    parent->AddChild(vrvLb);
+    return true;
+}
+    
 bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
 {
     Rend *vrvRend = new Rend();

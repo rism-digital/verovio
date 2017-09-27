@@ -18,6 +18,7 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "fb.h"
+#include "lb.h"
 #include "rend.h"
 #include "smufl.h"
 #include "style.h"
@@ -98,6 +99,11 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingP
         assert(f);
         DrawF(dc, f, params);
     }
+    else if (element->Is(LB)) {
+        Lb *lb = dynamic_cast<Lb *>(element);
+        assert(lb);
+        DrawLb(dc, lb, params);
+    }
     else if (element->Is(REND)) {
         Rend *rend = dynamic_cast<Rend *>(element);
         assert(rend);
@@ -110,6 +116,23 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingP
     }
 }
 
+void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
+{
+    assert(dc);
+    assert(lb);
+
+    dc->StartTextGraphic(lb, "", lb->GetUuid());
+    
+    FontInfo *currentFont = dc->GetFont();
+    int descender = -m_doc->GetTextGlyphDescender(L'q', currentFont, false);
+    int height = m_doc->GetTextGlyphHeight(L'I', currentFont, false);
+    
+    params.m_y -= (descender + height);
+    params.m_newLine = true;
+    
+    dc->EndTextGraphic(lb, this);
+}
+    
 void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 {
     assert(dc);
@@ -134,17 +157,21 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
     if (params.m_laidOut) {
         if (rend->HasHalign() && (rend->GetHalign() != params.m_alignment)) {
             params.m_alignment = rend->GetHalign();
-            params.m_setX = true;
-            int x = params.m_x;
+            params.m_x = rend->GetDrawingX();
+            params.m_y = rend->GetDrawingY();
             if (params.m_width != 0) {
                 switch (params.m_alignment) {
-                    case (HORIZONTALALIGNMENT_right): x += params.m_width; break;
-                    case (HORIZONTALALIGNMENT_center): x += (params.m_width / 2); break;
+                    case (HORIZONTALALIGNMENT_right): params.m_x += params.m_width; break;
+                    case (HORIZONTALALIGNMENT_center): params.m_x += (params.m_width / 2); break;
                     default: break;
                 }
                 
             }
-            dc->MoveTextTo(ToDeviceContextX(x), ToDeviceContextY(rend->GetDrawingY()), params.m_alignment);
+            dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), params.m_alignment);
+        }
+        else if (params.m_newLine) {
+            params.m_newLine = false;
+            dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_NONE);
         }
     }
 
@@ -159,6 +186,8 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
 {
     assert(dc);
     assert(text);
+    
+    dc->StartTextGraphic(text, "", text->GetUuid());
 
     // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
     if (text->GetFirstParent(HARM)) {
@@ -171,8 +200,16 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     }
 
     else {
-        dc->DrawText(UTF16to8(text->GetText()), text->GetText());
+        if (params.m_laidOut && params.m_newLine) {
+            dc->DrawText(UTF16to8(text->GetText()), text->GetText(), ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
+            params.m_newLine = false;
+        }
+        else {
+            dc->DrawText(UTF16to8(text->GetText()), text->GetText());
+        }
     }
+    
+    dc->EndTextGraphic(text, this);
 }
 
 } // namespace vrv

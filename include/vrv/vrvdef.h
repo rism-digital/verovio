@@ -174,6 +174,7 @@ enum ClassId {
     // Ids for TextElement child classes
     TEXT_ELEMENT,
     FIGURE,
+    LB,
     REND,
     TEXT,
     TEXT_ELEMENT_max,

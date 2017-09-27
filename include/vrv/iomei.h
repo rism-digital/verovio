@@ -61,6 +61,7 @@ class Label;
 class LabelAbbr;
 class Layer;
 class LayerElement;
+class Lb;
 class Lem;
 class Measure;
 class Mensur;
@@ -258,6 +259,7 @@ private:
      */
     ///@{
     void WriteMeiF(pugi::xml_node currentNode, F *f);
+    void WriteMeiLb(pugi::xml_node currentNode, Lb *lb);
     void WriteMeiRend(pugi::xml_node currentNode, Rend *rend);
     void WriteMeiText(pugi::xml_node currentNode, Text *text);
     ///@}
@@ -499,6 +501,7 @@ private:
      */
     ///@{
     bool ReadMeiF(Object *parent, pugi::xml_node f);
+    bool ReadMeiLb(Object *parent, pugi::xml_node lb);
     bool ReadMeiRend(Object *parent, pugi::xml_node rend);
     bool ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight);
     ///@}

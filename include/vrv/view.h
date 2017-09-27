@@ -34,6 +34,7 @@ class Hairpin;
 class Harm;
 class Layer;
 class LayerElement;
+class Lb;
 class Measure;
 class Mordent;
 class ControlElement;
@@ -328,6 +329,7 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
+    void DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params);
     void DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params);
     void DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params);
 

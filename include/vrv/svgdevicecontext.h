@@ -84,7 +84,7 @@ public:
     virtual void DrawRectangle(int x, int y, int width, int height);
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle);
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius);
-    virtual void DrawText(const std::string &text, const std::wstring wtext = L"");
+    virtual void DrawText(const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET);
     virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false);
     virtual void DrawSpline(int n, Point points[]);
     virtual void DrawBackgroundImage(int x = 0, int y = 0);
@@ -98,7 +98,7 @@ public:
     virtual void EndText();
 
     /**
-     * Move a text to the specified position, for example when starting a new line
+     * Move a text to the specified position
      */
     virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment);
 

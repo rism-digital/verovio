@@ -86,22 +86,20 @@ class TextDrawingParams {
 public:
     TextDrawingParams()
     {
-        m_width = 0;
-        m_setX = false;
-        m_setY = false;
         m_x = 0;
         m_y = 0;
+        m_width = 0;
         m_laidOut = false;
+        m_newLine = false;
         m_alignment = HORIZONTALALIGNMENT_left;
     }
     virtual ~TextDrawingParams(){};
 
-    int m_width;
-    bool m_setX;
-    bool m_setY;
     int m_x;
     int m_y;
+    int m_width;
     bool m_laidOut;
+    bool m_newLine;
     data_HORIZONTALALIGNMENT m_alignment;
 };
     

@@ -702,14 +702,16 @@ void SvgDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignme
 {
     m_currentNode.append_attribute("x") = x;
     m_currentNode.append_attribute("y") = y;
-    std::string anchor = "start";
-    if (alignment == HORIZONTALALIGNMENT_right) {
-        anchor = "end";
+    if (alignment != HORIZONTALALIGNMENT_NONE) {
+        std::string anchor = "start";
+        if (alignment == HORIZONTALALIGNMENT_right) {
+            anchor = "end";
+        }
+        if (alignment == HORIZONTALALIGNMENT_center) {
+            anchor = "middle";
+        }
+        m_currentNode.append_attribute("text-anchor") = anchor.c_str();
     }
-    if (alignment == HORIZONTALALIGNMENT_center) {
-        anchor = "middle";
-    }
-    m_currentNode.append_attribute("text-anchor") = anchor.c_str();
 }
 
 void SvgDeviceContext::EndText()
@@ -718,7 +720,7 @@ void SvgDeviceContext::EndText()
     m_currentNode = m_svgNodeStack.back();
 }
 
-void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtext)
+void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y)
 {
     assert(m_fontStack.top());
 
@@ -744,6 +746,11 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     }
     textChild.append_attribute("class") = "text";
     textChild.append_child(pugi::node_pcdata).set_value(svgText.c_str());
+    
+    if ((x != VRV_UNSET) && (y != VRV_UNSET)) {
+        textChild.append_attribute("x") = StringFormat("%d", x).c_str();
+        textChild.append_attribute("y") = StringFormat("%d", y).c_str();
+    }
 }
 
 void SvgDeviceContext::DrawRotatedText(const std::string &text, int x, int y, double angle)

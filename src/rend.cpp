@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        rend
+// Name:        rend.cpp
 // Author:      Laurent Pugin
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "lb.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -51,7 +52,10 @@ void Rend::Reset()
 
 void Rend::AddChild(Object *child)
 {
-    if (child->Is(REND)) {
+    if (child->Is(LB)) {
+        assert(dynamic_cast<Lb *>(child));
+    }
+    else if (child->Is(REND)) {
         assert(dynamic_cast<Rend *>(child));
     }
     else if (child->Is(TEXT)) {
