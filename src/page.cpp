@@ -531,15 +531,21 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
     
+    // Special case where we need to reset the vertical alignment here.
+    // The reason is the the RunningElement are not set when ResetVerticalAlignment is previously called
+    Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
+    
     // first page?
     if (params->m_doc->GetFirst() == this) {
         PgHead *pgHead = params->m_doc->m_scoreDef.GetPgHead();
         if (pgHead) {
+            pgHead->Process(&resetVerticalAlignment, NULL);
             pgHead->SetDrawingPage(this);
             pgHead->SetDrawingStaff(dynamic_cast<Staff *>(topMeasure->FindChildByType(STAFF)));
         }
         PgFoot *pgFoot = params->m_doc->m_scoreDef.GetPgFoot();
         if (pgFoot) {
+            pgFoot->Process(&resetVerticalAlignment, NULL);
             pgFoot->SetDrawingPage(this);
             pgFoot->SetDrawingStaff(dynamic_cast<Staff *>(bottomMeasure->FindChildByType(STAFF, UNLIMITED_DEPTH, BACKWARD)));
         }
@@ -547,11 +553,13 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
     else {
         PgHead2 *pgHead2 = params->m_doc->m_scoreDef.GetPgHead2();
         if (pgHead2) {
+            pgHead2->Process(&resetVerticalAlignment, NULL);
             pgHead2->SetDrawingPage(this);
             pgHead2->SetDrawingStaff(dynamic_cast<Staff *>(topMeasure->FindChildByType(STAFF)));
         }
         PgFoot2 *pgFoot2 = params->m_doc->m_scoreDef.GetPgFoot2();
         if (pgFoot2) {
+            pgFoot2->Process(&resetVerticalAlignment, NULL);
             pgFoot2->SetDrawingPage(this);
             pgFoot2->SetDrawingStaff(dynamic_cast<Staff *>(bottomMeasure->FindChildByType(STAFF, UNLIMITED_DEPTH, BACKWARD)));
         }

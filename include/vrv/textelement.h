@@ -31,18 +31,53 @@ public:
     virtual std::string GetClassName() const { return "TextElement"; }
     virtual ClassId GetClassId() const { return TEXT_ELEMENT; }
     ///@}
+    
+    /**
+     * @name Get the X and Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
+    ///@}
+    
+    /**
+     * @name Get and set the X and Y drawing relative positions
+     */
+    ///@{
+    int GetDrawingXRel() const { return m_drawingXRel; }
+    virtual void SetDrawingXRel(int drawingXRel);
+    int GetDrawingYRel() const { return m_drawingYRel; }
+    virtual void SetDrawingYRel(int drawingYRel);
+    ///@}
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * See Object::ResetVerticalAlignment
+     */
+    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
 
 private:
     //
 public:
     //
 private:
+    /**
+     * The Y drawing relative position of the object.
+     */
+    int m_drawingYRel;
+    
+    /**
+     * The X drawing relative position of the object.
+     */
+    int m_drawingXRel;
 };
 
 //----------------------------------------------------------------------------
 // TextDrawingParams
 //----------------------------------------------------------------------------
-  
     
 /**
  * This class stores current drawing parameters for text.
@@ -56,6 +91,7 @@ public:
         m_setY = false;
         m_x = 0;
         m_y = 0;
+        m_laidOut = false;
         m_alignment = HORIZONTALALIGNMENT_left;
     }
     virtual ~TextDrawingParams(){};
@@ -65,6 +101,7 @@ public:
     bool m_setY;
     int m_x;
     int m_y;
+    bool m_laidOut;
     data_HORIZONTALALIGNMENT m_alignment;
 };
     

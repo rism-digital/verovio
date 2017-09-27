@@ -140,7 +140,7 @@ public:
      * Move a text to the specified position, for example when starting a new line.
      * This method should be called only between a StartText and EndText call.
      */
-    virtual void MoveTextTo(int x, int y) = 0;
+    virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment) = 0;
 
     /**
      * @name Temporarily deactivate a graphic

@@ -52,11 +52,13 @@ public:
     virtual int GetDrawingY() const;
     ///@}
     
+    int GetWidth() const;
+    
     /*
      * @name Setter and getter for the current drawing page
      */
     ///@{
-    void SetDrawingPage(Page *page) { m_drawingPage = page; }
+    void SetDrawingPage(Page *page);
     Page *GetDrawingPage() { return m_drawingPage; }
     ///@}
     
@@ -64,7 +66,7 @@ public:
      * @name Setter and getter for the current darwing staff
      */
     ///@{
-    void SetDrawingStaff(Staff *staff) { m_drawingStaff = staff; }
+    void SetDrawingStaff(Staff *staff);
     Staff *GetDrawingStaff() { return m_drawingStaff; }
     ///@}
 

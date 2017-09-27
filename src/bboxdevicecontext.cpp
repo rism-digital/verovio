@@ -256,11 +256,16 @@ void BBoxDeviceContext::EndText()
     m_drawingText = false;
 }
 
-void BBoxDeviceContext::MoveTextTo(int x, int y)
+void BBoxDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment)
 {
     assert(m_drawingText);
     m_textX = x;
     m_textY = y;
+    m_textWidth = 0;
+    m_textHeight = 0;
+    m_textAscent = 0;
+    m_textDescent = 0;
+    m_textAlignment = alignment;
 }
 
 void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wtext)

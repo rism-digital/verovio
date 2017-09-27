@@ -100,7 +100,7 @@ public:
     /**
      * Move a text to the specified position, for example when starting a new line
      */
-    virtual void MoveTextTo(int x, int y);
+    virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment);
 
     /**
      * @name Method for starting and ending a graphic
@@ -223,6 +223,7 @@ private:
     // pugixml data
     pugi::xml_document m_svgDoc;
     pugi::xml_node m_svgNode;
+    pugi::xml_node m_pageNode;
     pugi::xml_node m_currentNode;
     std::list<pugi::xml_node> m_svgNodeStack;
     

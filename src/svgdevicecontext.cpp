@@ -348,6 +348,7 @@ void SvgDeviceContext::EndTextGraphic(Object *object, View *view)
 {
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
+    DrawSvgBoundingBox(object, view);
 }
 
 void SvgDeviceContext::RotateGraphic(Point const &orig, double angle)
@@ -388,6 +389,8 @@ void SvgDeviceContext::StartPage()
     m_currentNode.append_attribute("class") = "page-margin";
     m_currentNode.append_attribute("transform")
         = StringFormat("translate(%d, %d)", (int)((double)m_originX), (int)((double)m_originY)).c_str();
+    
+    m_pageNode = m_currentNode;
 }
 
 void SvgDeviceContext::EndPage()
@@ -640,12 +643,12 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute("width") = width;
     if (radius != 0) rectChild.append_attribute("rx") = radius;
     // for empty rectangles with bounding boxes
-    /*
+    
     rectChild.append_attribute("fill-opacity") = "0.0";
     rectChild.append_attribute("stroke-opacity") = "1.0";
     rectChild.append_attribute("stroke-width") = "10";
     rectChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
-    */
+    
 }
 
 void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignment)
@@ -695,10 +698,18 @@ void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignmen
     }
 }
 
-void SvgDeviceContext::MoveTextTo(int x, int y)
+void SvgDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment)
 {
     m_currentNode.append_attribute("x") = x;
     m_currentNode.append_attribute("y") = y;
+    std::string anchor = "start";
+    if (alignment == HORIZONTALALIGNMENT_right) {
+        anchor = "end";
+    }
+    if (alignment == HORIZONTALALIGNMENT_center) {
+        anchor = "middle";
+    }
+    m_currentNode.append_attribute("text-anchor") = anchor.c_str();
 }
 
 void SvgDeviceContext::EndText()
@@ -823,10 +834,10 @@ std::string SvgDeviceContext::GetStringSVG(bool xml_declaration)
 
     return m_outdata.str();
 }
-
+    
 void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 {
-    bool drawBoundingBox = false;
+    bool drawBoundingBox = true;
     if (drawBoundingBox && view) {
         BoundingBox *box = object;
         // For floating elements, get the current bounding box set by System::SetCurrentFloatingPositioner
@@ -841,7 +852,9 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 
         SetPen(AxRED, 10, AxDOT_DASH);
         // SetBrush(AxWHITE, AxTRANSPARENT);
-        StartGraphic(object, "self-bounding-box", "0");
+        pugi::xml_node currentNode = m_currentNode;
+        m_currentNode = m_pageNode;
+        StartGraphic(object, "self-bounding-box", "bbox-" + object->GetUuid());
         if (box->HasSelfBB()) {
             this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
                 view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()),
@@ -885,20 +898,27 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         }
 
         EndGraphic(object, NULL);
+        
+        m_currentNode = m_pageNode;
 
-        /*
-        SetPen(AxBLUE, 10, AxDOT_DASH);
-        StartGraphic(object, "content-bounding-box", "0");
-        if (object->HasContentBB()) {
-            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
-                view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()),
-                view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX2())
-                    - view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
-                view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY2())
-                    - view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()));
+        //Rend *rend = dynamic_cast<Rend *>(object);
+        //if (rend && rend->HasHalign()) {
+        if (object->IsTextElement()) {
+            
+            SetPen(AxBLUE, 20, AxDOT_DASH);
+            StartGraphic(object, "content-bounding-box", "cbbox-" + object->GetUuid());
+            if (object->HasContentBB()) {
+                this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
+                    view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()),
+                    view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX2())
+                        - view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
+                    view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY2())
+                        - view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()));
+            }
+            EndGraphic(object, NULL);
         }
-        EndGraphic(object, NULL);
-        */
+        
+        m_currentNode = currentNode;
 
         SetPen(AxBLACK, 1, AxSOLID);
         SetBrush(AxBLACK, AxSOLID);

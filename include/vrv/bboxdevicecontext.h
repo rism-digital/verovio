@@ -101,7 +101,7 @@ public:
     /**
      * Move a text to the specified position, for example when starting a new line.
      */
-    virtual void MoveTextTo(int x, int y);
+    virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment);
 
     /**
      * @name Method for starting and ending a graphic

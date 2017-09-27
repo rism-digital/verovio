@@ -57,6 +57,7 @@ int RunningElement::GetDrawingX() const
 {
     if (!m_drawingPage) return 0;
     
+    /*
     if (this->GetHalign() == HORIZONTALALIGNMENT_left) {
         return 0;
     }
@@ -66,6 +67,7 @@ int RunningElement::GetDrawingX() const
     else if (this->GetHalign() == HORIZONTALALIGNMENT_right) {
         return m_drawingPage->GetContentWidth();
     }
+    */
     
     return 0;
 }
@@ -75,8 +77,26 @@ int RunningElement::GetDrawingY() const
     if (!m_drawingStaff) return 0;
     return m_drawingStaff->GetDrawingY();
 }
+    
+int RunningElement::GetWidth() const
+{
+    if (!m_drawingPage) return 0;
+    
+    return m_drawingPage->GetContentWidth();
+}
+    
+void RunningElement::SetDrawingPage(Page *page)
+{
+    ResetCachedDrawingX();
+    m_drawingPage = page;
+}
 
-
+void RunningElement::SetDrawingStaff(Staff *staff)
+{
+    ResetCachedDrawingY();
+    m_drawingStaff = staff;
+}
+    
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------

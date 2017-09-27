@@ -53,14 +53,16 @@ void View::DrawPgHead(DeviceContext *dc, PgHead *pgHead)
     // If we have not timestamp
     params.m_x = pgHead->GetDrawingX();
     params.m_y = pgHead->GetDrawingY();
-
+    params.m_width = pgHead->GetWidth();
+    params.m_alignment = HORIZONTALALIGNMENT_left;
+    params.m_laidOut = true;
     
     pgHeadTxt.SetPointSize(m_doc->GetDrawingLyricFont(100)->GetPointSize());
     
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(&pgHeadTxt);
     
-    dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_right);
+    dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
     DrawTextChildren(dc, pgHead, params);
     dc->EndText();
     

@@ -130,6 +130,23 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         if (rend->HasFontweight()) rendFont.SetWeight(rend->GetFontweight());
     }
     if (customFont) dc->SetFont(&rendFont);
+    
+    if (params.m_laidOut) {
+        if (rend->HasHalign() && (rend->GetHalign() != params.m_alignment)) {
+            params.m_alignment = rend->GetHalign();
+            params.m_setX = true;
+            int x = params.m_x;
+            if (params.m_width != 0) {
+                switch (params.m_alignment) {
+                    case (HORIZONTALALIGNMENT_right): x += params.m_width; break;
+                    case (HORIZONTALALIGNMENT_center): x += (params.m_width / 2); break;
+                    default: break;
+                }
+                
+            }
+            dc->MoveTextTo(ToDeviceContextX(x), ToDeviceContextY(rend->GetDrawingY()), params.m_alignment);
+        }
+    }
 
     DrawTextChildren(dc, rend, params);
 
