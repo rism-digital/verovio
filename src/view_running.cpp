@@ -16,7 +16,10 @@
 #include "bboxdevicecontext.h"
 #include "devicecontext.h"
 #include "doc.h"
+#include "pgfoot.h"
+#include "pgfoot2.h"
 #include "pghead.h"
+#include "pghead2.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -35,25 +38,37 @@ void View::DrawRunningElements(DeviceContext *dc, Page *page)
     
     PgHead *pgHead = m_doc->m_scoreDef.GetPgHead();
     if (pgHead) {
-        DrawPgHead(dc, pgHead);
+        DrawPgHeader(dc, pgHead);
+    }
+    PgHead2 *pgHead2 = m_doc->m_scoreDef.GetPgHead2();
+    if (pgHead2) {
+        DrawPgHeader(dc, pgHead);
+    }
+    PgFoot *pgFoot = m_doc->m_scoreDef.GetPgFoot();
+    if (pgFoot) {
+        DrawPgHeader(dc, pgFoot);
+    }
+    PgFoot2 *pgFoot2 = m_doc->m_scoreDef.GetPgFoot2();
+    if (pgFoot2) {
+        DrawPgHeader(dc, pgFoot2);
     }
 }
     
-void View::DrawPgHead(DeviceContext *dc, PgHead *pgHead)
+void View::DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader)
 {
     assert(dc);
-    assert(pgHead);
+    assert(pgHeader);
     
-    dc->StartGraphic(pgHead, "", pgHead->GetUuid());
+    dc->StartGraphic(pgHeader, "", pgHeader->GetUuid());
     
     FontInfo pgHeadTxt;
     
     TextDrawingParams params;
     
     // If we have not timestamp
-    params.m_x = pgHead->GetDrawingX();
-    params.m_y = pgHead->GetDrawingY();
-    params.m_width = pgHead->GetWidth();
+    params.m_x = pgHeader->GetDrawingX();
+    params.m_y = pgHeader->GetDrawingY();
+    params.m_width = pgHeader->GetWidth();
     params.m_alignment = HORIZONTALALIGNMENT_left;
     params.m_laidOut = true;
     
@@ -63,13 +78,13 @@ void View::DrawPgHead(DeviceContext *dc, PgHead *pgHead)
     dc->SetFont(&pgHeadTxt);
     
     dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
-    DrawTextChildren(dc, pgHead, params);
+    DrawTextChildren(dc, pgHeader, params);
     dc->EndText();
     
     dc->ResetFont();
     dc->ResetBrush();
 
-    dc->EndGraphic(pgHead, this);
+    dc->EndGraphic(pgHeader, this);
 }
 
 } // namespace vrv

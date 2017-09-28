@@ -46,6 +46,7 @@ class PgFoot;
 class PgHead;
 class PgHead2;
 class Rend;
+class RunningElement;
 class Slur;
 class Staff;
 class Syl;
@@ -194,7 +195,8 @@ protected:
      */
     ///@{
     void DrawRunningElements(DeviceContext *dc, Page *page);
-    void DrawPgHead(DeviceContext *dc, PgHead *pgHead);
+    void DrawPgFooter(DeviceContext *dc, RunningElement *pgFooter);
+    void DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader);
     ///@}
     
     /**
