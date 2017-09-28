@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functorparams.h"
 #include "page.h"
 #include "staff.h"
 #include "text.h"
@@ -101,4 +102,14 @@ void RunningElement::SetDrawingStaff(Staff *staff)
 // Functor methods
 //----------------------------------------------------------------------------
 
+int RunningElement::AlignVertically(FunctorParams *functorParams)
+{
+    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    assert(params);
+    
+    params->m_pageWidth = this->GetWidth();
+
+    return FUNCTOR_CONTINUE;
+}
+    
 } // namespace vrv

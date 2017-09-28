@@ -159,14 +159,6 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
             params.m_alignment = rend->GetHalign();
             params.m_x = rend->GetDrawingX();
             params.m_y = rend->GetDrawingY();
-            if (params.m_width != 0) {
-                switch (params.m_alignment) {
-                    case (HORIZONTALALIGNMENT_right): params.m_x += params.m_width; break;
-                    case (HORIZONTALALIGNMENT_center): params.m_x += (params.m_width / 2); break;
-                    default: break;
-                }
-                
-            }
             dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), params.m_alignment);
         }
         else if (params.m_newLine) {

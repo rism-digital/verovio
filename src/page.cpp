@@ -120,7 +120,7 @@ void Page::LayOutTranscription(bool force)
     // - each Staff object will then have its StaffAlignment pointer initialized
     Functor alignVertically(&Object::AlignVertically);
     Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
-    AlignVerticallyParams alignVerticallyParams(doc, &alignVerticallyEnd);
+    AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Set the pitch / pos alignement
@@ -188,7 +188,7 @@ void Page::LayOutHorizontally()
     // - each Staff object will then have its StaffAlignment pointer initialized
     Functor alignVertically(&Object::AlignVertically);
     Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
-    AlignVerticallyParams alignVerticallyParams(doc, &alignVerticallyEnd);
+    AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
@@ -305,7 +305,7 @@ void Page::LayOutVertically()
     // - each Staff object will then have its StaffAlignment pointer initialized
     Functor alignVertically(&Object::AlignVertically);
     Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
-    AlignVerticallyParams alignVerticallyParams(doc, &alignVerticallyEnd);
+    AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Adjust the position of outside articulations
@@ -542,12 +542,14 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
             pgHead->Process(&resetVerticalAlignment, NULL);
             pgHead->SetDrawingPage(this);
             pgHead->SetDrawingStaff(dynamic_cast<Staff *>(topMeasure->FindChildByType(STAFF)));
+            pgHead->Process(params->m_functor, params, params->m_functorEnd);
         }
         PgFoot *pgFoot = params->m_doc->m_scoreDef.GetPgFoot();
         if (pgFoot) {
             pgFoot->Process(&resetVerticalAlignment, NULL);
             pgFoot->SetDrawingPage(this);
             pgFoot->SetDrawingStaff(dynamic_cast<Staff *>(bottomMeasure->FindChildByType(STAFF, UNLIMITED_DEPTH, BACKWARD)));
+            pgFoot->Process(params->m_functor, params, params->m_functorEnd);
         }
     }
     else {
@@ -556,12 +558,14 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
             pgHead2->Process(&resetVerticalAlignment, NULL);
             pgHead2->SetDrawingPage(this);
             pgHead2->SetDrawingStaff(dynamic_cast<Staff *>(topMeasure->FindChildByType(STAFF)));
+            pgHead2->Process(params->m_functor, params, params->m_functorEnd);
         }
         PgFoot2 *pgFoot2 = params->m_doc->m_scoreDef.GetPgFoot2();
         if (pgFoot2) {
             pgFoot2->Process(&resetVerticalAlignment, NULL);
             pgFoot2->SetDrawingPage(this);
             pgFoot2->SetDrawingStaff(dynamic_cast<Staff *>(bottomMeasure->FindChildByType(STAFF, UNLIMITED_DEPTH, BACKWARD)));
+            pgFoot2->Process(params->m_functor, params, params->m_functorEnd);
         }
     }
 

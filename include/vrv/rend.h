@@ -46,6 +46,17 @@ public:
      */
     virtual void AddChild(Object *object);
 
+    //----------//
+    // Functors //
+    //----------//
+                 
+    /**
+     * See Object::AlignVertically
+     */
+    ///@{
+    virtual int AlignVertically(FunctorParams *functorParams);
+    ///@}
+
 private:
     //
 public:

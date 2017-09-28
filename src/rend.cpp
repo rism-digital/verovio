@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functorparams.h"
 #include "lb.h"
 #include "text.h"
 #include "vrv.h"
@@ -72,6 +73,26 @@ void Rend::AddChild(Object *child)
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
+}
+    
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
+    
+int Rend::AlignVertically(FunctorParams *functorParams)
+{
+    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    assert(params);
+    
+    if (this->GetHalign()) {
+        switch (this->GetHalign()) {
+            case (HORIZONTALALIGNMENT_right): this->SetDrawingXRel(params->m_pageWidth); break;
+            case (HORIZONTALALIGNMENT_center): this->SetDrawingXRel(params->m_pageWidth / 2); break;
+            default: break;
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

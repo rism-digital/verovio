@@ -73,6 +73,13 @@ public:
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     * See Object::AlignVertically
+     */
+    ///@{
+    virtual int AlignVertically(FunctorParams *functorParams);
+    ///@}
 
 private:
     //
