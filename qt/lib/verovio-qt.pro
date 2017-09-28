@@ -14,6 +14,9 @@ DEFINES += VEROVIOQT_LIBRARY
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
+QMAKE_CFLAGS_WARN_ON += -Wno-unused-parameter
+QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-parameter
+
 SOURCES += \
     src/scenegraphdevicecontext.cpp \
     src/textquickitem.cpp \
