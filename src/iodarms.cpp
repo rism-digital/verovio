@@ -11,6 +11,8 @@
 
 //----------------------------------------------------------------------------
 
+#ifndef NO_DARMS_SUPPORT
+
 #include "clef.h"
 #include "doc.h"
 #include "keysig.h"
@@ -27,7 +29,11 @@
 
 #define MAX_DARMS_BUFFER 10000
 
+#endif /* NO_DARMS_SUPPORT */
+
 namespace vrv {
+
+#ifndef NO_DARMS_SUPPORT
 
 // Ok, this is ugly, but since this is static data, why not?
 pitchmap DarmsInput::PitchMap[] = {
@@ -117,7 +123,7 @@ int DarmsInput::parseMeter(int pos, const char *data)
     else if (data[pos] == 'O') {
         if (data[pos + 1] == '/') {
             pos++;
-            LogWarning("DarmsInput: O/ not supported");
+            LogWarning("DARMS import: O/ not supported");
         }
         meter->SetSign(MENSURATIONSIGN_O);
         pos++;
@@ -141,7 +147,7 @@ int DarmsInput::parseMeter(int pos, const char *data)
         }
         else {
             pos++;
-            if (data[pos] == '-') LogWarning("DarmsInput: Time sig numbers should be divided with ':'.");
+            if (data[pos] == '-') LogWarning("DARMS import: Time signature numbers should be divided with ':'.");
             // same as above, get one or two nums
             n1 = data[++pos] - ASCII_NUMBER_OFFSET; // old school conversion to int
             if (isdigit(data[pos + 1])) {
@@ -151,7 +157,7 @@ int DarmsInput::parseMeter(int pos, const char *data)
 
             meter->SetNumbase(n1);
         }
-        LogDebug("DarmsInput: Meter is: %i %i", meter->GetNumbase(), meter->GetNumbase());
+        LogDebug("DARMS import: Meter is: %i %i", meter->GetNumbase(), meter->GetNumbase());
     }
 
     m_layer->AddChild(meter);
@@ -170,7 +176,7 @@ int DarmsInput::do_globalSpec(int pos, const char *data)
         case 'I': // Voice nr.
             // the next digit should be a number, but we do not care what
             if (!isdigit(data[++pos])) {
-                LogWarning("DarmsInput: Expected number after I");
+                LogWarning("DARMS import: Expected number after 'I'");
             }
             break;
 
@@ -185,7 +191,7 @@ int DarmsInput::do_globalSpec(int pos, const char *data)
                 UnrollKeysig(quantity, data[pos]);
             }
             else {
-                LogWarning("DarmsInput: Invalid char for K: %c", data[pos]);
+                LogWarning("DARMS import: Invalid char for 'K': %c", data[pos]);
             }
             break;
 
@@ -205,8 +211,8 @@ int DarmsInput::do_globalSpec(int pos, const char *data)
              N8	diamond notehead, stem to side
              NR	rest in place of notehead
              */
-            if (!isdigit(data[++pos])) {
-                LogWarning("DarmsInput: Expected number after N");
+            if (!isdigit(data[++pos]) && data[++pos] != 'R') {
+                LogWarning("DARMS import: Expected number or 'R' after N");
             }
             else { // we honor only notehead 7, diamond
                 if (data[pos] == 0x07 + ASCII_NUMBER_OFFSET) m_antique_notation = true;
@@ -234,7 +240,7 @@ int DarmsInput::do_Clef(int pos, const char *data)
             case 3: mclef->SetLine(2); break;
             case 5: mclef->SetLine(3); break;
             case 7: mclef->SetLine(4); break;
-            default: LogWarning("DarmsInput: Invalid C clef on line %i", position); break;
+            default: LogWarning("DARMS import: Invalid C clef on line %i", position); break;
         }
         m_clef_offset = 21 - position; // 21 is the position in the array, position is of the clef
     }
@@ -243,7 +249,7 @@ int DarmsInput::do_Clef(int pos, const char *data)
         switch (position) {
             case 1: mclef->SetLine(1); break;
             case 3: mclef->SetLine(2); break;
-            default: LogWarning("DarmsInput: Invalid G clef on line %i", position); break;
+            default: LogWarning("DARMS import: Invalid G clef on line %i", position); break;
         }
         m_clef_offset = 25 - position;
     }
@@ -256,13 +262,13 @@ int DarmsInput::do_Clef(int pos, const char *data)
                 ;
                 break;
             case 7: mclef->SetLine(5); break;
-            default: LogWarning("DarmsInput: Invalid F clef on line %i", position); break;
+            default: LogWarning("DARMS import: Invalid F clef on line %i", position); break;
         }
         m_clef_offset = 15 - position;
     }
     else {
         // what the...
-        LogWarning("DarmsInput: Invalid clef specification: %c", data[pos]);
+        LogWarning("DARMS import: Invalid clef specification: %c", data[pos]);
         // avoiding memory leak
         delete mclef;
         return 0; // fail
@@ -337,7 +343,7 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
         case 'Z': duration = DURATION_256; break;
 
         default:
-            LogWarning("DarmsInput: Unknown note duration: %c", data[pos]);
+            LogWarning("DARMS import: Unknown note duration: %c", data[pos]);
             return 0;
             break;
     }
@@ -453,7 +459,7 @@ bool DarmsInput::ImportString(std::string const &data_str)
         char c = data[pos];
 
         if (c == '!') {
-            LogDebug("DarmsInput: Global spec. at %i", pos);
+            LogDebug("DARMS import: Global spec. at %i", pos);
             res = do_globalSpec(pos, data);
             if (res) pos = res;
             // if notehead type was specified in the !Nx option preserve it
@@ -493,5 +499,7 @@ bool DarmsInput::ImportString(std::string const &data_str)
 
     return true;
 }
+
+#endif /* NO_DARMS_SUPPORT */
 
 } // namespace vrv
