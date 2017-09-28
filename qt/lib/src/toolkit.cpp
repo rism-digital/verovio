@@ -11,6 +11,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QFileInfo>
 #include <QFontDatabase>
 #include <QUrl>
 
@@ -211,6 +212,22 @@ void Toolkit::setSpacingSystem(int spacingSystem)
     }
 }
 
+bool Toolkit::addFont(QString fontFilePath)
+{
+    int fontId = QFontDatabase::addApplicationFont(fontFilePath);
+    if (fontId == -1) {
+        QFileInfo fontFile(fontFilePath);
+        if (!fontFile.exists() || !fontFile.isFile()) {
+            qWarning() << "Font file" << fontFilePath << "does not exist!";
+        }
+        else {
+            qWarning() << "Could not add font" << fontFilePath << "(file exists)";
+        }
+        return false;
+    }
+    return true;
+}
+
 void Toolkit::initFont()
 {
     if (m_fontInitDone) return;
@@ -219,16 +236,16 @@ void Toolkit::initFont()
     m_verovioToolkit.SetFont(m_musicFont.toStdString());
 
     if (m_musicFont == "Bravura")
-        QFontDatabase::addApplicationFont(m_fontDirPath + "/Bravura-1.204.otf");
+        addFont(m_fontDirPath + "/Bravura-1.204.otf");
     else if (m_musicFont == "Leipzig")
-        QFontDatabase::addApplicationFont(m_fontDirPath + "/Leipzig-5.2.ttf");
+        addFont(m_fontDirPath + "/Leipzig-5.2.ttf");
     else if (m_musicFont == "Gootville")
-        QFontDatabase::addApplicationFont(m_fontDirPath + "/Gootville-1.2.otf");
+        addFont(m_fontDirPath + "/Gootville-1.2.otf");
     else
         qWarning() << "Using currently unsupported font:" << m_musicFont;
 
     // Always add VerovioText (required e.g. for # in harmonies)
-    QFontDatabase::addApplicationFont(m_fontDirPath + "/VerovioText-1.0.ttf");
+    addFont(m_fontDirPath + "/VerovioText-1.0.ttf");
 }
 
 void Toolkit::requestReadFile()

@@ -167,9 +167,12 @@ private:
     void setPageCount(int pageCount);
 
     /**
-     * @name Initialies required fonts.
+     * @name Initialise required fonts.
      */
+    ///@{
     void initFont();
+    bool addFont(QString fontFilePath);
+    ///@}
 
     /**
      * @name Setter for hasValidData.
