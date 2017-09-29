@@ -339,7 +339,12 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bo
 void BBoxDeviceContext::DrawSpline(int n, Point points[])
 {
 }
-
+    
+void BBoxDeviceContext::DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg)
+{
+    DrawRoundedRectangle(x, y, width, height, 0);
+}
+    
 void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, wchar_t glyph)
 {
     if (m_isDeactivatedX && m_isDeactivatedY) {

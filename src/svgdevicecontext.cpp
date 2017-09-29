@@ -802,6 +802,16 @@ void SvgDeviceContext::DrawSpline(int n, Point points[])
 {
 }
 
+void SvgDeviceContext::DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg)
+{
+    m_currentNode.append_attribute("transform")
+    = StringFormat("translate(%d, %d) scale(%d, %d)", x, y, DEFINITION_FACTOR, DEFINITION_FACTOR).c_str();
+    
+    for (pugi::xml_node child: svg.children()) {
+        m_currentNode.append_copy(child);
+    }
+}
+    
 void SvgDeviceContext::DrawBackgroundImage(int x, int y)
 {
 }
@@ -844,7 +854,7 @@ std::string SvgDeviceContext::GetStringSVG(bool xml_declaration)
     
 void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 {
-    bool drawBoundingBox = true;
+    bool drawBoundingBox = false;
     if (drawBoundingBox && view) {
         BoundingBox *box = object;
         // For floating elements, get the current bounding box set by System::SetCurrentFloatingPositioner
@@ -910,7 +920,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 
         //Rend *rend = dynamic_cast<Rend *>(object);
         //if (rend && rend->HasHalign()) {
-        if (object->IsTextElement()) {
+        if (object->IsTextElement() || object->Is(FIG)) {
             
             SetPen(AxBLUE, 20, AxDOT_DASH);
             StartGraphic(object, "content-bounding-box", "cbbox-" + object->GetUuid());

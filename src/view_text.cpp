@@ -142,12 +142,10 @@ void View::DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params)
 
     dc->StartGraphic(fig, "", fig->GetUuid());
     
-    FontInfo *currentFont = dc->GetFont();
-    int descender = -m_doc->GetTextGlyphDescender(L'q', currentFont, false);
-    int height = m_doc->GetTextGlyphHeight(L'I', currentFont, false);
-    
-    params.m_y -= (descender + height);
-    params.m_newLine = true;
+    Svg *svg = dynamic_cast<Svg *>(fig->FindChildByType(SVG));
+    if (svg) {
+        DrawSvg(dc, svg, params);
+    }
     
     dc->EndGraphic(fig, this);
 }
@@ -221,6 +219,19 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
     }
     
     dc->EndTextGraphic(text, this);
+}
+    
+void View::DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params)
+{
+    assert(dc);
+    assert(svg);
+
+    dc->StartGraphic(svg, "", svg->GetUuid());
+    
+    dc->DrawSvgShape(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y),
+                     svg->GetWidth(), svg->GetHeight(), svg->Get());
+    
+    dc->EndGraphic(svg, this);
 }
 
 } // namespace vrv

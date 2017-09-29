@@ -241,6 +241,22 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("scoreDef");
         WriteMeiScoreDef(m_currentNode, dynamic_cast<ScoreDef *>(object));
     }
+    else if (object->Is(PGFOOT)) {
+        m_currentNode = m_currentNode.append_child("pgFoot");
+        WriteMeiPgFoot(m_currentNode, dynamic_cast<PgFoot *>(object));
+    }
+    else if (object->Is(PGFOOT2)) {
+        m_currentNode = m_currentNode.append_child("pgFoot2");
+        WriteMeiPgFoot2(m_currentNode, dynamic_cast<PgFoot2 *>(object));
+    }
+    else if (object->Is(PGHEAD)) {
+        m_currentNode = m_currentNode.append_child("pgHead");
+        WriteMeiPgHead(m_currentNode, dynamic_cast<PgHead *>(object));
+    }
+    else if (object->Is(PGHEAD2)) {
+        m_currentNode = m_currentNode.append_child("pgHead2");
+        WriteMeiPgHead2(m_currentNode, dynamic_cast<PgHead2 *>(object));
+    }
     else if (object->Is(STAFFGRP)) {
         m_currentNode = m_currentNode.append_child("staffGrp");
         WriteMeiStaffGrp(m_currentNode, dynamic_cast<StaffGrp *>(object));
@@ -1407,8 +1423,17 @@ void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
 void MeiOutput::WriteMeiSvg(pugi::xml_node currentNode, Svg *svg)
 {
     assert(svg);
-
+    
     WriteXmlId(currentNode, svg);
+    
+    pugi::xml_node svgNode = svg->Get();
+    for (pugi::xml_attribute attr: svgNode.attributes()) {
+        currentNode.append_attribute(attr.name()) = attr.value();
+    }
+    
+    for (pugi::xml_node child: svgNode.children()) {
+        currentNode.append_copy(child);
+    }
 };
 
 void MeiOutput::WriteMeiText(pugi::xml_node element, Text *text)
@@ -3712,8 +3737,8 @@ bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node f)
 bool MeiInput::ReadMeiFig(Object *parent, pugi::xml_node fig)
 {
     Fig *vrvFig = new Fig();
-    
     SetMeiUuid(fig, vrvFig);
+    
     vrvFig->ReadTyped(fig);
     
     parent->AddChild(vrvFig);
@@ -3747,6 +3772,14 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
 bool MeiInput::ReadMeiSvg(Object *parent, pugi::xml_node svg)
 {
     Svg *vrvSvg = new Svg();
+    SetMeiUuid(svg, vrvSvg);
+    
+    if (std::string(svg.name()) == "svg") {
+        vrvSvg->Set(svg);
+    }
+    else {
+        LogWarning("No svg content found for <fig> %s", parent->GetUuid().c_str());
+    }
 
     parent->AddChild(vrvSvg);
     
