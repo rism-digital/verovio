@@ -44,6 +44,14 @@ public:
      */
     virtual Object *Clone() const { return NULL; }
     
+    
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
+    virtual void AddChild(Object *object);
+    ///@}
+    
     /**
      * @name Get and set the X and Y drawing position
      */

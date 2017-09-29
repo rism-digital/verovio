@@ -18,10 +18,12 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "fb.h"
+#include "fig.h"
 #include "lb.h"
 #include "rend.h"
 #include "smufl.h"
 #include "style.h"
+#include "svg.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -131,6 +133,23 @@ void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
     params.m_newLine = true;
     
     dc->EndTextGraphic(lb, this);
+}
+
+void View::DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params)
+{
+    assert(dc);
+    assert(fig);
+
+    dc->StartGraphic(fig, "", fig->GetUuid());
+    
+    FontInfo *currentFont = dc->GetFont();
+    int descender = -m_doc->GetTextGlyphDescender(L'q', currentFont, false);
+    int height = m_doc->GetTextGlyphHeight(L'I', currentFont, false);
+    
+    params.m_y -= (descender + height);
+    params.m_newLine = true;
+    
+    dc->EndGraphic(fig, this);
 }
     
 void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)

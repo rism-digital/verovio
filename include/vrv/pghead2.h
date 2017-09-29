@@ -34,13 +34,6 @@ public:
     virtual ClassId GetClassId() const { return PGHEAD2; }
     ///@}
 
-    /**
-     * @name Methods for adding allowed content
-     */
-    ///@{
-    virtual void AddChild(Object *object);
-    ///@}
-
     //----------//
     // Functors //
     //----------//

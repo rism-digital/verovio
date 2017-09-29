@@ -21,6 +21,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
+#include "fig.h"
 #include "fb.h"
 #include "functorparams.h"
 #include "keysig.h"
@@ -1196,7 +1197,7 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, TextDrawingParams
             DrawTextElement(dc, dynamic_cast<TextElement *>(current), params);
         }
         else if (current->IsEditorialElement()) {
-            // cast to EditorialElement check in DrawLayerEditorialElement
+            // cast to EditorialElement check in DrawTextEditorialElement
             DrawTextEditorialElement(dc, dynamic_cast<EditorialElement *>(current), params);
         }
         else {
@@ -1218,6 +1219,33 @@ void View::DrawFbChildren(DeviceContext *dc, Object *parent, TextDrawingParams &
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawLayerEditorialElement
             DrawFbEditorialElement(dc, dynamic_cast<EditorialElement *>(current), params);
+        }
+        else {
+            assert(false);
+        }
+    }
+}
+    
+void View::DrawRunningChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params)
+{
+    assert(dc);
+    assert(parent);
+
+    Object *current;
+    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+        if (current->Is(FIG)) {
+            DrawFig(dc, dynamic_cast<Fig *>(current), params);
+        }
+        else if (current->IsTextElement()) {
+            // We are now reaching a text element - start set only here because we can have a figure
+            TextDrawingParams paramsChild = params;
+            dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
+            DrawTextElement(dc, dynamic_cast<TextElement *>(current), paramsChild);
+            dc->EndText();
+        }
+        else if (current->IsEditorialElement()) {
+            // cast to EditorialElement check in DrawLayerEditorialElement
+            DrawRunningEditorialElement(dc, dynamic_cast<EditorialElement *>(current), params);
         }
         else {
             assert(false);
@@ -1348,6 +1376,26 @@ void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, 
     dc->EndTextGraphic(element, this);
 }
 
+void View::DrawRunningEditorialElement(DeviceContext *dc, EditorialElement *element, TextDrawingParams &params)
+{
+    assert(element);
+    if (element->Is(ANNOT)) {
+        DrawAnnot(dc, element, true);
+        return;
+    }
+    if (element->Is(APP))
+        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_RUNNING);
+    else if (element->Is(CHOICE))
+        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_RUNNING);
+
+    dc->StartGraphic(element, "", element->GetUuid());
+    if (element->m_visibility == Visible) {
+        DrawRunningChildren(dc, element, params);
+    }
+    dc->EndGraphic(element, this);
+}
+
+    
 void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextElement)
 {
     assert(element);

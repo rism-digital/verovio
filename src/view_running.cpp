@@ -77,9 +77,7 @@ void View::DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader)
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(&pgHeadTxt);
     
-    dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
-    DrawTextChildren(dc, pgHeader, params);
-    dc->EndText();
+    DrawRunningChildren(dc, pgHeader, params);
     
     dc->ResetFont();
     dc->ResetBrush();

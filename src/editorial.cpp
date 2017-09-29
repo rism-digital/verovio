@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "controlelement.h"
+#include "fig.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
@@ -78,6 +79,9 @@ void EditorialElement::AddChild(Object *child)
     }
     else if (child->IsTextElement()) {
         assert(dynamic_cast<TextElement *>(child));
+    }
+    else if (child->Is(FIG)) {
+        assert(dynamic_cast<Fig *>(child));
     }
     else if (child->Is(LAYER)) {
         assert(dynamic_cast<Layer *>(child));

@@ -274,6 +274,10 @@
 		4DB3D8991F7C325D00B5FC2B /* lb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB3D8951F7C2B0E00B5FC2B /* lb.cpp */; };
 		4DB3D89A1F7C326800B5FC2B /* fb.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36C21C1EBCE14300A6DD1B /* fb.h */; };
 		4DB3D89B1F7C326A00B5FC2B /* lb.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB3D8971F7C2B2900B5FC2B /* lb.h */; };
+		4DB3D89E1F7E7FAA00B5FC2B /* fig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB3D89D1F7E7FAA00B5FC2B /* fig.cpp */; };
+		4DB3D8A11F7E812300B5FC2B /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB3D8A01F7E812300B5FC2B /* svg.cpp */; };
+		4DB3D8A21F7E812300B5FC2B /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB3D8A01F7E812300B5FC2B /* svg.cpp */; };
+		4DB3D8A31F7E812300B5FC2B /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB3D8A01F7E812300B5FC2B /* svg.cpp */; };
 		4DB726C01B8B9F480040231B /* rpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB726BF1B8B9F480040231B /* rpt.cpp */; };
 		4DB726C11B8B9F480040231B /* rpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB726BF1B8B9F480040231B /* rpt.cpp */; };
 		4DB726C31B8B9F540040231B /* rpt.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB726C21B8B9F540040231B /* rpt.h */; };
@@ -641,6 +645,10 @@
 		4DB351121C8040B1002DD057 /* tempo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tempo.cpp; path = src/tempo.cpp; sourceTree = "<group>"; };
 		4DB3D8951F7C2B0E00B5FC2B /* lb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lb.cpp; path = src/lb.cpp; sourceTree = "<group>"; };
 		4DB3D8971F7C2B2900B5FC2B /* lb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lb.h; path = include/vrv/lb.h; sourceTree = "<group>"; };
+		4DB3D89C1F7E7F9D00B5FC2B /* fig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fig.h; path = include/vrv/fig.h; sourceTree = "<group>"; };
+		4DB3D89D1F7E7FAA00B5FC2B /* fig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fig.cpp; path = src/fig.cpp; sourceTree = "<group>"; };
+		4DB3D89F1F7E80DB00B5FC2B /* svg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = svg.h; path = include/vrv/svg.h; sourceTree = "<group>"; };
+		4DB3D8A01F7E812300B5FC2B /* svg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = svg.cpp; path = src/pugi/svg.cpp; sourceTree = "<group>"; };
 		4DB726BF1B8B9F480040231B /* rpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rpt.cpp; path = src/rpt.cpp; sourceTree = "<group>"; };
 		4DB726C21B8B9F540040231B /* rpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rpt.h; path = include/vrv/rpt.h; sourceTree = "<group>"; };
 		4DB726C41B8BB0E80040231B /* text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = text.cpp; path = src/text.cpp; sourceTree = "<group>"; };
@@ -912,10 +920,14 @@
 			children = (
 				8F7DD0531EAF3682001B072A /* fb.cpp */,
 				4D36C21C1EBCE14300A6DD1B /* fb.h */,
+				4DB3D89D1F7E7FAA00B5FC2B /* fig.cpp */,
+				4DB3D89C1F7E7F9D00B5FC2B /* fig.h */,
 				4DB3D8951F7C2B0E00B5FC2B /* lb.cpp */,
 				4DB3D8971F7C2B2900B5FC2B /* lb.h */,
 				4D6122BD1F77E1E000FC90A0 /* rend.cpp */,
 				4D6122BB1F77E1B900FC90A0 /* rend.h */,
+				4DB3D8A01F7E812300B5FC2B /* svg.cpp */,
+				4DB3D89F1F7E80DB00B5FC2B /* svg.h */,
 				4DB726C41B8BB0E80040231B /* text.cpp */,
 				4DB726C71B8BB0F30040231B /* text.h */,
 				4DA144891C2AB28700CB7CEE /* textelement.cpp */,
@@ -1592,6 +1604,7 @@
 				4D16943E1E3A44F300569BF4 /* view_graph.cpp in Sources */,
 				4D16943F1E3A44F300569BF4 /* view_page.cpp in Sources */,
 				4D1694401E3A44F300569BF4 /* view_tuplet.cpp in Sources */,
+				4DB3D8A21F7E812300B5FC2B /* svg.cpp in Sources */,
 				4D1694411E3A44F300569BF4 /* rpt.cpp in Sources */,
 				4D1694421E3A44F300569BF4 /* chord.cpp in Sources */,
 				4D1694431E3A44F300569BF4 /* view.cpp in Sources */,
@@ -1631,6 +1644,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4DB3D89E1F7E7FAA00B5FC2B /* fig.cpp in Sources */,
 				4D4FCD121F54570E0009C455 /* staffdef.cpp in Sources */,
 				8F086EE2188539540037FD8E /* verticalaligner.cpp in Sources */,
 				8F086EE4188539540037FD8E /* barline.cpp in Sources */,
@@ -1696,6 +1710,7 @@
 				4D4335C61ECF2310003BE1A9 /* atts_analytical.cpp in Sources */,
 				4DA20ED11D0F151900706C4A /* iohumdrum.cpp in Sources */,
 				8F086EFD188539540037FD8E /* rest.cpp in Sources */,
+				4DB3D8A11F7E812300B5FC2B /* svg.cpp in Sources */,
 				8F086EFE188539540037FD8E /* scoredef.cpp in Sources */,
 				4D5572401CF3F32A008D06A0 /* octave.cpp in Sources */,
 				8F086EFF188539540037FD8E /* slur.cpp in Sources */,
@@ -1789,6 +1804,7 @@
 				4D1BE7861C6A40A80086DC0E /* pugixml.cpp in Sources */,
 				4D1694751E3A455200569BF4 /* MxmlEvent.cpp in Sources */,
 				4DB726C61B8BB0E80040231B /* text.cpp in Sources */,
+				4DB3D8A31F7E812300B5FC2B /* svg.cpp in Sources */,
 				4D4FCD141F54570E0009C455 /* staffdef.cpp in Sources */,
 				8F3DD33C18854B2E0051330C /* barline.cpp in Sources */,
 				4D1694711E3A455200569BF4 /* GridStaff.cpp in Sources */,

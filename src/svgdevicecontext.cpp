@@ -663,7 +663,7 @@ void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignmen
         anchor = "middle";
     }
 
-    m_currentNode = AppendChild("text");
+    m_currentNode = m_currentNode.append_child("text");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("x") = x;
     m_currentNode.append_attribute("y") = y;

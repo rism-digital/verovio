@@ -1,49 +1,44 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        pgfoot.h
+// Name:        svg.h
 // Author:      Laurent Pugin
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_PGFOOT_H__
-#define __VRV_PGFOOT_H__
+#ifndef __VRV_SVG_H__
+#define __VRV_SVG_H__
 
-#include "runningelement.h"
+#include "atts_shared.h"
+#include "object.h"
 
 namespace vrv {
 
-
 //----------------------------------------------------------------------------
-// PgFoot
+// Svg
 //----------------------------------------------------------------------------
 
 /**
- * This class represents an MEI pgFoot. 
+ * This class models the MEI <fig>
  */
-class PgFoot : public RunningElement {
+class Svg : public Object {
 public:
     /**
-     * @name Constructors, destructors, and other standard methods
-     * Reset method resets all attribute classes
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
      */
     ///@{
-    PgFoot();
-    virtual ~PgFoot();
+    Svg();
+    virtual ~Svg();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "PgFoot"; }
-    virtual ClassId GetClassId() const { return PGFOOT; }
+    virtual std::string GetClassName() const { return "Svg"; }
+    virtual ClassId GetClassId() const { return SVG; }
     ///@}
-
-    //----------//
-    // Functors //
-    //----------//
 
 private:
     //
 public:
     //
 private:
-    //
 };
 
 } // namespace vrv

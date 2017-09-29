@@ -27,8 +27,9 @@ class Doc;
 class Dynam;
 class EditorialElement;
 class Ending;
-class Fb;
 class F;
+class Fb;
+class Fig;
 class Fermata;
 class Hairpin;
 class Harm;
@@ -49,6 +50,7 @@ class Rend;
 class RunningElement;
 class Slur;
 class Staff;
+class Svg;
 class Syl;
 class System;
 class SystemElement;
@@ -214,6 +216,7 @@ protected:
     void DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, Staff *staff, Measure *measure);
     void DrawTextChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params);
     void DrawFbChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params);
+    void DrawRunningChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params);
     ///@}
 
     /**
@@ -228,6 +231,7 @@ protected:
         DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element, TextDrawingParams &params);
     void DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, TextDrawingParams &params);
+    void DrawRunningEditorialElement(DeviceContext *dc, EditorialElement *element, TextDrawingParams &params);
     ///@}
 
     /**
@@ -331,8 +335,10 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
+    void DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params);
     void DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params);
     void DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params);
+    void DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params);
     void DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params);
 
     /**

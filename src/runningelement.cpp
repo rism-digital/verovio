@@ -13,10 +13,13 @@
 
 //----------------------------------------------------------------------------
 
+#include "editorial.h"
+#include "fig.h"
 #include "functorparams.h"
 #include "page.h"
 #include "staff.h"
 #include "text.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -52,6 +55,27 @@ void RunningElement::Reset()
     
     m_drawingPage = NULL;
     m_drawingStaff = NULL;
+}
+
+void RunningElement::AddChild(Object *child)
+{
+    if (child->Is(FIG)) {
+        assert(dynamic_cast<Fig *>(child));
+    }
+    else if (child->IsTextElement()) {
+        assert(dynamic_cast<TextElement *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+    
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
 }
     
 int RunningElement::GetDrawingX() const

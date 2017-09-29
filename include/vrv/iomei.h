@@ -52,6 +52,7 @@ class Expan;
 class Expansion;
 class F;
 class Fb;
+class Fig;
 class Fermata;
 class FloatingElement;
 class FTrem;
@@ -102,6 +103,7 @@ class Slur;
 class Space;
 class Staff;
 class Supplied;
+class Svg;
 class Syl;
 class System;
 class SystemElement;
@@ -255,12 +257,14 @@ private:
     ///@}
 
     /**
-     * @name Methods for writing TextElement
+     * @name Methods for writing text and figure elements
      */
     ///@{
     void WriteMeiF(pugi::xml_node currentNode, F *f);
+    void WriteMeiFig(pugi::xml_node currentNode, Fig *fig);
     void WriteMeiLb(pugi::xml_node currentNode, Lb *lb);
     void WriteMeiRend(pugi::xml_node currentNode, Rend *rend);
+    void WriteMeiSvg(pugi::xml_node currentNode, Svg *svg);
     void WriteMeiText(pugi::xml_node currentNode, Text *text);
     ///@}
 
@@ -424,6 +428,7 @@ private:
     bool ReadMeiPgFoot2(Object *parent, pugi::xml_node pgFoot2);
     bool ReadMeiPgHead(Object *parent, pugi::xml_node pgHead);
     bool ReadMeiPgHead2(Object *parent, pugi::xml_node pgHead2);
+    bool ReadMeiRunningChildren(Object *parent, pugi::xml_node parentNode, Object *filter = NULL);
     bool ReadMeiStaffGrp(Object *parent, pugi::xml_node staffGrp);
     bool ReadMeiStaffGrpChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef);
@@ -497,12 +502,14 @@ private:
     ///@}
 
     /**
-     * @name Methods for reading MEI text elements
+     * @name Methods for reading MEI text and figure elements
      */
     ///@{
     bool ReadMeiF(Object *parent, pugi::xml_node f);
+    bool ReadMeiFig(Object *parent, pugi::xml_node fig);
     bool ReadMeiLb(Object *parent, pugi::xml_node lb);
     bool ReadMeiRend(Object *parent, pugi::xml_node rend);
+    bool ReadMeiSvg(Object *parent, pugi::xml_node svg);
     bool ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight);
     ///@}
 

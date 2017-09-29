@@ -54,6 +54,7 @@ enum ClassId {
     CLEF_ATTR,
     DOC,
     FB,
+    FIG,
     GRACE_ALIGNER,
     KEYSIG_ATTR,
     LABEL,
@@ -68,6 +69,7 @@ enum ClassId {
     STAFF,
     STAFF_ALIGNMENT,
     STAFFGRP,
+    SVG,
     SYSTEM,
     SYSTEM_ALIGNER,
     SYSTEM_ALIGNMENT,
@@ -332,7 +334,8 @@ enum EditorialLevel {
     EDITORIAL_LAYER,
     EDITORIAL_NOTE,
     EDITORIAL_TEXT,
-    EDITORIAL_FB
+    EDITORIAL_FB,
+    EDITORIAL_RUNNING,
 };
 
 //----------------------------------------------------------------------------
