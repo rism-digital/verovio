@@ -20,7 +20,7 @@
 namespace vrvQt {
 
 //----------------------------------------------------------------------------
-// VerovioDoc
+// vrvQt Toolkit
 //----------------------------------------------------------------------------
 
 /**
@@ -70,17 +70,17 @@ public:
     int pageCount() const { return m_pageCount; }
 
     /**
-     * @name Render the given page of this document to the specified deviceContext.
+     * @name Render the given page of the currently set document to the specified deviceContext.
      */
     void renderPage(int page, vrv::DeviceContext *deviceContext);
 
     /**
-     * @name Returns if the document has valid data to show.
+     * @name Returns if the toolkit has valid data to show.
      */
     bool hasValidData() const { return m_hasValidData; }
 
     /**
-     * @name Returns the current scale of the document.
+     * @name Returns the current scale of the toolkit.
      */
     int getScale() { return m_verovioToolkit.GetScale(); }
 
@@ -187,7 +187,7 @@ private:
 
     int m_pageCount{ 0 };
 
-    // adjusted page heights for the currently layouted document
+    // adjusted display heights for the currently layouted document
     QVector<int> m_adjustedDisplayHeights;
 
     // font name for the music symbols (e.g. notes)
@@ -200,7 +200,7 @@ private:
     QString m_fileName;
     QString m_fileContent;
 
-    // flags to store state of document
+    // flags to store the state of the vrvQt toolkit
     bool m_documentRelayoutRequested{ false };
     bool m_reloadDataRequested{ false };
     bool m_readFileRequested{ false };

@@ -63,7 +63,7 @@ Item {
         model: verovioToolkit.pageCount
 
         delegate: VerovioView {
-            verovioDoc: verovioToolkit
+            toolkit: verovioToolkit
             width:  root.width
             height: verovioToolkit.adjustedDisplayHeightForPage(index+1)
             pageNumber: index + 1
