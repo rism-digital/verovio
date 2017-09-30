@@ -30,10 +30,11 @@ class Toolkit : public QObject {
     Q_OBJECT
 
     Q_PROPERTY(QString resourcesDataPath MEMBER m_resourcesDataPath WRITE setResourcesDataPath)
-    Q_PROPERTY(QString fontDirPath MEMBER m_fontDirPath WRITE setFontDirPath)
     Q_PROPERTY(QString fileName MEMBER m_fileName WRITE setFileName)
     Q_PROPERTY(QString fileContent MEMBER m_fileContent WRITE setFileContent)
-    Q_PROPERTY(QString musicFont MEMBER m_musicFont WRITE setMusicFont)
+    Q_PROPERTY(QString musicFontName MEMBER m_musicFontName WRITE setMusicFontName)
+    Q_PROPERTY(QString musicFontPath MEMBER m_musicFontPath WRITE setMusicFontPath)
+    Q_PROPERTY(QString verovioTextFontPath MEMBER m_verovioTextFontPath WRITE setVerovioTextFontPath)
     Q_PROPERTY(int pageCount MEMBER m_pageCount READ pageCount NOTIFY pageCountChanged)
     Q_PROPERTY(int displayWidth MEMBER m_displayWidth WRITE setDisplayWidth)
     Q_PROPERTY(int displayHeight MEMBER m_displayHeight WRITE setDisplayHeight)
@@ -90,10 +91,11 @@ public slots:
      */
     ///@{
     void setResourcesDataPath(QString resourcesDataPath);
-    void setFontDirPath(QString fontDirPath);
     void setFileName(QString fileName);
     void setFileContent(QString fileContent);
-    void setMusicFont(QString musicFont);
+    void setMusicFontName(QString musicFontName);
+    void setMusicFontPath(QString musicFontPath);
+    void setVerovioTextFontPath(QString verovioTextFontPath);
     void setDisplayWidth(int displayWidth);
     void setDisplayHeight(int displayHeight);
     void setScale(int scale);
@@ -170,7 +172,7 @@ private:
      * @name Initialise required fonts.
      */
     ///@{
-    void initFont();
+    bool initFont();
     bool addFont(QString fontFilePath);
     ///@}
 
@@ -191,11 +193,16 @@ private:
     QVector<int> m_adjustedDisplayHeights;
 
     // font name for the music symbols (e.g. notes)
-    QString m_musicFont;
+    QString m_musicFontName;
 
-    // paths to the resource and font dirs
+    // font path to the music symbols font
+    QString m_musicFontPath;
+
+    // font path to the verovio text font (required e.g. for # in harmonies)
+    QString m_verovioTextFontPath;
+
+    // path to the resource dir
     QString m_resourcesDataPath;
-    QString m_fontDirPath;
 
     QString m_fileName;
     QString m_fileContent;
@@ -206,6 +213,7 @@ private:
     bool m_readFileRequested{ false };
     bool m_fontInitDone{ false };
     bool m_hasValidData{ false };
+    bool m_resourcesDataInitialized{ false };
 };
 } // namespace vrvQt
 #endif // __VRV_QT_TOOLKIT_H__
