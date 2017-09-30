@@ -258,6 +258,29 @@ void View::DrawHairpin(
     int startY = 0;
     int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
 
+
+    /** Making sure the angle is not unsightly big **/
+    float theta;
+
+    // Angle as a function of the width
+    //theta = 29.1 - (16.4 * (x2 - x1));
+    //endY = 2 * (x2 - x1) * tan((M_PI / 360) * theta);
+
+    // Cap angle of hairpin at 20 degrees
+
+    // Calculate angle of a whole hairpin using its height and width
+    // Then we convert radians to degrees with 360 / 2*pi
+    theta = (360.0 / (2.0 * M_PI)) * 2.0 * atan((endY / 2.0) / (x2 - x1));
+
+    // if the angle is too big, restrict endY
+    LogMessage("%f", theta);
+    if (theta > 15){
+        LogMessage("hello, everybody. tihs i");
+        theta = 15;
+        endY = 2 * (x2 - x1) * tan((M_PI / 360) * theta);
+    }
+
+
     // We calculate points for cresc by default. Start/End have to be swapped
     if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);
 
@@ -303,11 +326,11 @@ void View::DrawHairpin(
         if (spanningType == SPANNING_START_END) {
             // nothing to adjust
         }
-        // In this case, we are drawing the first half a a cresc. Reduce the openning end
+        // In this case, we are drawing the first half a a cresc. Reduce the opening end
         else if (spanningType == SPANNING_START) {
             endY = endY / 2;
         }
-        // Now this is the case we are drawing the end of a cresc. Increase the openning start
+        // Now this is the case we are drawing the end of a cresc. Increase the opening start
         else if (spanningType == SPANNING_END) {
             startY = endY / 2;
         }
@@ -322,11 +345,11 @@ void View::DrawHairpin(
         if (spanningType == SPANNING_START_END) {
             // nothing to adjust
         }
-        // In this case, we are drawing the first half a a dim. Increase the openning end
+        // In this case, we are drawing the first half a a dim. Increase the opening end
         else if (spanningType == SPANNING_START) {
             endY = startY / 2;
         }
-        // Now this is the case we are drawing the end of a dim. Reduce the openning start
+        // Now this is the case we are drawing the end of a dim. Reduce the opening start
         else if (spanningType == SPANNING_END) {
             startY = startY / 2;
         }
