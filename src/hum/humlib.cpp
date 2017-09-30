@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Sep 30 06:14:02 PDT 2017
+// Last Modified: Sat Sep 30 09:44:52 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -6147,7 +6147,7 @@ void HumGrid::addMeasureLines(void) {
 		// what to do when endslice is NULL?
 		endslice = measure->getLastSpinedSlice(); // this has to come before next line
 		measure->push_back(mslice); // this has to come after the previous line
-		partcount = firstspined->size();
+		partcount = (int)firstspined->size();
 		mslice->resize(partcount);
 
 		for (int p=0; p<partcount; p++) {
@@ -37347,7 +37347,6 @@ HumNum Tool_mei2hum::parseStaff(xml_node staff, HumNum starttime) {
 	}
 
 	vector<HumNum> durations;
-	int layerindex = 0;
 
 	for (int i=0; i<(int)children.size(); i++) {
 		string nodename = children[i].name();
