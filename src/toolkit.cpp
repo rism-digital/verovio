@@ -425,10 +425,20 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     if (inputFormat == PAE) {
+#ifndef NO_PAE_SUPPORT
         input = new PaeInput(&m_doc, "");
+#else
+        LogError("Plaine & Easie import is not supported in this build.");
+        return false;
+#endif
     }
     else if (inputFormat == DARMS) {
+#ifndef NO_DARMS_SUPPORT
         input = new DarmsInput(&m_doc, "");
+#else
+        LogError("DARMS import is not supported in this build.");
+        return false;
+#endif
     }
 #ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == HUMDRUM) {
@@ -470,7 +480,6 @@ bool Toolkit::LoadData(const std::string &data)
         input = new MusicXmlInput(&m_doc, "");
     }
 #ifndef NO_HUMDRUM_SUPPORT
-
     else if (inputFormat == MUSICXMLHUM) {
         // This is the indirect converter from MusicXML to MEI using iohumdrum:
         hum::Tool_musicxml2hum converter;
@@ -558,7 +567,6 @@ bool Toolkit::LoadData(const std::string &data)
         delete tempinput;
         input = new MeiInput(&m_doc, "");
     }
-
 #endif
     else {
         LogMessage("Unsupported format");

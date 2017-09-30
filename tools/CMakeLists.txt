@@ -4,7 +4,8 @@ project(Verovio)
 
 set(CMAKE_BUILD_TYPE Release)
 
-option(NO_PAE_SUPPORT           "Disable Plain and Easy support"               OFF)
+option(NO_DARMS_SUPPORT         "Disable Humdrum support"                      ON)
+option(NO_PAE_SUPPORT           "Disable Plaine & Easie support"               OFF)
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
 option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
 
@@ -37,6 +38,10 @@ execute_process(
     COMMAND ../tools/get_git_commit.sh
     OUTPUT_VARIABLE GIT_COMMIT
 )
+
+if(NO_DARMS_SUPPORT)
+    add_definitions(-DNO_DARMS_SUPPORT)
+endif()
 
 if(NO_PAE_SUPPORT)
     add_definitions(-DNO_PAE_SUPPORT)

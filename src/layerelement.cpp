@@ -1050,7 +1050,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     else if (this->Is(ACCID)) {
         Accid const *accid = dynamic_cast<Accid *>(this);
         assert(accid);
-        if (accid->GetFunc() == accidLog_FUNC_edit)
+        if ((accid->GetFunc() == accidLog_FUNC_edit) && !accid->HasEnclose())
             m_drawingCueSize = true;
         else {
             Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
