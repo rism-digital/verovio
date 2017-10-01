@@ -25,13 +25,14 @@ namespace vrv {
 // Rend
 //----------------------------------------------------------------------------
 
-Rend::Rend() : TextElement("rend-"), AttColor(), AttHorizontalAlign(), AttLang(), AttTypography(), AttWhitespace()
+Rend::Rend() : TextElement("rend-"), AttColor(), AttHorizontalAlign(), AttLang(), AttTypography(), AttVerticalAlign(), AttWhitespace()
 
 {
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_HORIZONTALALIGN);
     RegisterAttClass(ATT_LANG);
     RegisterAttClass(ATT_TYPOGRAPHY);
+    RegisterAttClass(ATT_VERTICALALIGN);
     RegisterAttClass(ATT_WHITESPACE);
 
     Reset();
@@ -48,6 +49,7 @@ void Rend::Reset()
     ResetHorizontalAlign();
     ResetLang();
     ResetTypography();
+    ResetVerticalAlign();
     ResetWhitespace();
 }
 

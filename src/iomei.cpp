@@ -1417,6 +1417,7 @@ void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
     rend->WriteHorizontalAlign(currentNode);
     rend->WriteLang(currentNode);
     rend->WriteTypography(currentNode);
+    rend->WriteVerticalAlign(currentNode);
     rend->WriteWhitespace(currentNode);
 }
     
@@ -3763,6 +3764,7 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
     vrvRend->ReadHorizontalAlign(rend);
     vrvRend->ReadLang(rend);
     vrvRend->ReadTypography(rend);
+    vrvRend->ReadVerticalAlign(rend);
     vrvRend->ReadWhitespace(rend);
 
     parent->AddChild(vrvRend);

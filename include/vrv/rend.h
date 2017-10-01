@@ -25,6 +25,7 @@ class Rend : public TextElement,
              public AttHorizontalAlign,
              public AttLang,
              public AttTypography,
+             public AttVerticalAlign,
              public AttWhitespace {
 public:
     /**
