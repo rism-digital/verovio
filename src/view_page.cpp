@@ -775,6 +775,7 @@ void View::DrawMNum(DeviceContext *dc, Measure *measure)
         dc->SetFont(&currentFont);
 
         Text text;
+        text.SetParent(staff);
         text.SetText(UTF8to16(measure->GetN()));
 
         TextDrawingParams params;

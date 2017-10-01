@@ -17,6 +17,7 @@
 #include "fig.h"
 #include "functorparams.h"
 #include "page.h"
+#include "rend.h"
 #include "staff.h"
 #include "text.h"
 #include "vrv.h"
@@ -27,7 +28,7 @@ namespace vrv {
 // RunningElement
 //----------------------------------------------------------------------------
 
-RunningElement::RunningElement() : Object("re"), AttHorizontalAlign(), AttTyped()
+RunningElement::RunningElement() : Object("re"), ObjectListInterface(), AttHorizontalAlign(), AttTyped()
 {
     RegisterAttClass(ATT_HORIZONTALALIGN);
     RegisterAttClass(ATT_TYPED);
@@ -54,7 +55,12 @@ void RunningElement::Reset()
     ResetTyped();
     
     m_drawingPage = NULL;
-    m_drawingStaff = NULL;
+    m_drawingYRel = 0;
+    
+    int i;
+    for (i = 0; i < 3; i++) {
+        m_drawingScalingPercent[i] = 100;
+    }
 }
 
 void RunningElement::AddChild(Object *child)
@@ -78,6 +84,50 @@ void RunningElement::AddChild(Object *child)
     Modify();
 }
     
+void RunningElement::FilterList(ListOfObjects *childList)
+{
+    ListOfObjects::iterator iter = childList->begin();
+
+    while (iter != childList->end()) {
+        // remove nested rend elements
+        if ((*iter)->Is(REND)) {
+            if ((*iter)->GetFirstParent(REND)) {
+                iter = childList->erase(iter);
+                continue;
+            }
+        }
+        // Also remove anything that is not a fig
+        else if (!(*iter)->Is(FIG)) {
+            iter = childList->erase(iter);
+            continue;
+        }
+        iter++;
+    }
+    
+    int i;
+    for (i = 0; i < 9; i++) {
+        m_positionnedObjects[i].clear();
+    }
+    for (i = 0; i < 3; i++) {
+        m_drawingScalingPercent[i] = 100;
+    }
+    
+    for (iter = childList->begin(); iter != childList->end(); iter++) {
+        int pos = 0;
+        if ((*iter)->Is(REND)) {
+            Rend *rend = dynamic_cast<Rend *>(*iter);
+            assert(rend);
+            pos = this->GetAlignmentPos(rend->GetHalign(), rend->GetValign());
+        }
+        else {
+            Fig *fig = dynamic_cast<Fig *>(*iter);
+            assert(fig);
+            pos = this->GetAlignmentPos(HORIZONTALALIGNMENT_NONE, VERTICALALIGNMENT_NONE);
+        }
+        m_positionnedObjects[pos].push_back(*iter);
+    }
+}
+    
 int RunningElement::GetDrawingX() const
 {
     if (!m_drawingPage) return 0;
@@ -99,8 +149,14 @@ int RunningElement::GetDrawingX() const
 
 int RunningElement::GetDrawingY() const
 {
-    if (!m_drawingStaff) return 0;
-    return m_drawingStaff->GetDrawingY();
+    m_cachedDrawingY = 0;
+    return m_drawingYRel;
+}
+
+void RunningElement::SetDrawingYRel(int drawingYRel)
+{
+    ResetCachedDrawingY();
+    m_drawingYRel = drawingYRel;
 }
     
 int RunningElement::GetWidth() const
@@ -112,14 +168,78 @@ int RunningElement::GetWidth() const
     
 void RunningElement::SetDrawingPage(Page *page)
 {
+    ResetList(this);
+    
     ResetCachedDrawingX();
     m_drawingPage = page;
 }
 
-void RunningElement::SetDrawingStaff(Staff *staff)
+int RunningElement::CalcTotalHeight()
 {
-    ResetCachedDrawingY();
-    m_drawingStaff = staff;
+    int height = 0;
+    int i, j;
+    for (i = 0; i < 3; i++) {
+        int columnHeight = 0;
+        for (j = 0; j < 3; j++) {
+            ArrayOfObjects *objects = &m_positionnedObjects[i + j * 3];
+            ArrayOfObjects::iterator iter;
+            for (iter = objects->begin(); iter != objects->end(); iter++)
+            {
+                if ((*iter)->HasContentBB()) {
+                    columnHeight += (*iter)->GetContentY2() - (*iter)->GetContentY1();
+                }
+            }
+        }
+        height = std::max(height, columnHeight);
+    }
+    return height;
+}
+    
+bool RunningElement::AdjustDrawingScaling(int width)
+{
+    int i, j;
+    bool scale = false;
+    for (i = 0; i < 3; i++) {
+        int rowWidth = 0;
+        for (j = 0; j < 3; j++) {
+            ArrayOfObjects *objects = &m_positionnedObjects[i * 3 + j ];
+            ArrayOfObjects::iterator iter;
+            int columnWidth = 0;
+            for (iter = objects->begin(); iter != objects->end(); iter++)
+            {
+                if ((*iter)->HasContentBB()) {
+                    int iterWidth = (*iter)->GetContentX2() - (*iter)->GetContentX1();
+                    columnWidth = std::max(columnWidth, iterWidth);
+                }
+            }
+            rowWidth += columnWidth;
+        }
+        if (rowWidth > width) {
+            m_drawingScalingPercent[i] = width * 100 / rowWidth;
+            scale = true;
+        }
+    }
+    return scale;
+}
+        
+int RunningElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v)
+{
+    int pos = 0;
+    switch (h) {
+        case (HORIZONTALALIGNMENT_left) : break;
+        case (HORIZONTALALIGNMENT_center) : pos += POSITION_CENTER; break;
+        case (HORIZONTALALIGNMENT_right) : pos += POSITION_RIGHT; break;
+        default:
+            pos += POSITION_CENTER; break;
+    }
+    switch (v) {
+        case (VERTICALALIGNMENT_top) : break;
+        case (VERTICALALIGNMENT_middle) : pos += POSITION_MIDDLE; break;
+        case (VERTICALALIGNMENT_bottom) : pos += POSITION_BOTTOM; break;
+        default:
+            pos += POSITION_MIDDLE; break;
+    }
+    return pos;
 }
     
 //----------------------------------------------------------------------------

@@ -3768,6 +3768,14 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
     vrvRend->ReadWhitespace(rend);
 
     parent->AddChild(vrvRend);
+    
+    if (vrvRend->GetFirstParent(REND) && (vrvRend->HasHalign() || vrvRend->HasValign())) {
+        LogWarning ("@halign or @valign in nested <rend> element <rend> %s will be ignored", vrvRend->GetUuid().c_str());
+        // Eventually to be added to unsupported attributes?
+        vrvRend->SetHalign(HORIZONTALALIGNMENT_NONE);
+        vrvRend->SetValign(VERTICALALIGNMENT_NONE);
+    }
+    
     return ReadMeiTextChildren(vrvRend, rend, vrvRend);
 }
     

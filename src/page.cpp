@@ -73,7 +73,7 @@ void Page::AddChild(Object *child)
     Modify();
 }
     
-RunningElement *Page::GetHeader()
+RunningElement *Page::GetHeader() const
 {
     Doc *doc = dynamic_cast<Doc*>(this->GetFirstParent(DOC));
     if (!doc) {
@@ -89,7 +89,7 @@ RunningElement *Page::GetHeader()
     }
 }
     
-RunningElement *Page::GetFooter()
+RunningElement *Page::GetFooter() const
 {
     Doc *doc = dynamic_cast<Doc*>(this->GetFirstParent(DOC));
     if (!doc) {
@@ -379,10 +379,16 @@ void Page::LayOutVertically()
     Functor adjustYPos(&Object::AdjustYPos);
     AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
     this->Process(&adjustYPos, &adjustYPosParams);
+    
+    int header = 0;
+    if (this->GetHeader()) {
+        header = this->GetHeader()->CalcTotalHeight();
+        this->GetHeader()->AdjustDrawingScaling(5000);
+    }
 
     // Adjust system Y position
     AlignSystemsParams alignSystemsParams;
-    alignSystemsParams.m_shift = doc->m_drawingPageHeight - doc->m_drawingPageTopMar;
+    alignSystemsParams.m_shift = doc->m_drawingPageHeight;
     alignSystemsParams.m_systemMargin = (doc->GetSpacingSystem()) * doc->GetDrawingUnit(100);
     Functor alignSystems(&Object::AlignSystems);
     this->Process(&alignSystems, &alignSystemsParams);
@@ -438,7 +444,14 @@ int Page::GetContentHeight() const
 
     System *last = dynamic_cast<System *>(m_children.back());
     assert(last);
-    return doc->m_drawingPageHeight - doc->m_drawingPageTopMar - last->GetDrawingYRel() + last->GetHeight();
+    int height = doc->m_drawingPageHeight - doc->m_drawingPageTopMar - last->GetDrawingYRel() + last->GetHeight();
+    
+    // Not sure what to do with the footer when adjusted page height is requested...
+    //if (this->GetFooter()) {
+    //    height += this->GetFooter()->CalcTotalHeight();
+    //}
+    
+    return height;
 }
 
 int Page::GetContentWidth() const
@@ -520,27 +533,26 @@ int Page::ResetVerticalAlignment(FunctorParams *functorParams)
     PgHead *pgHead = doc->m_scoreDef.GetPgHead();
     if (pgHead) {
         pgHead->SetDrawingPage(NULL);
-        pgHead->SetDrawingStaff(NULL);
+        pgHead->SetDrawingYRel(0);
     }
     PgFoot *pgFoot = doc->m_scoreDef.GetPgFoot();
     if (pgFoot) {
         pgFoot->SetDrawingPage(NULL);
-        pgFoot->SetDrawingStaff(NULL);
+        pgFoot->SetDrawingYRel(0);
     }
     PgHead2 *pgHead2 = doc->m_scoreDef.GetPgHead2();
     if (pgHead2) {
         pgHead2->SetDrawingPage(NULL);
-        pgHead2->SetDrawingStaff(NULL);
+        pgHead2->SetDrawingYRel(0);
     }
     PgFoot2 *pgFoot2 = doc->m_scoreDef.GetPgFoot2();
     if (pgFoot2) {
         pgFoot2->SetDrawingPage(NULL);
-        pgFoot2->SetDrawingStaff(NULL);
+        pgFoot2->SetDrawingYRel(0);
     }
 
     return FUNCTOR_CONTINUE;
 }
-    
     
 int Page::AlignVerticallyEnd(FunctorParams *functorParams)
 {
@@ -551,20 +563,6 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
     
     // Also align the header and footer
     
-    System *topSystem = dynamic_cast<System *>(this->FindChildByType(SYSTEM, 1));
-    System *bottomSystem = dynamic_cast<System *>(this->FindChildByType(SYSTEM, 1, BACKWARD));
-    
-    if (!topSystem || !bottomSystem) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    Measure *topMeasure = dynamic_cast<Measure *>(topSystem->FindChildByType(MEASURE, 1));
-    Measure *bottomMeasure = dynamic_cast<Measure *>(bottomSystem->FindChildByType(MEASURE, 1));
-    
-    if (!topMeasure || !bottomMeasure) {
-        return FUNCTOR_CONTINUE;
-    }
-    
     // Special case where we need to reset the vertical alignment here.
     // The reason is the the RunningElement are not reset when ResetVerticalAlignment is previously called
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
@@ -573,15 +571,36 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
     if (header) {
         header->Process(&resetVerticalAlignment, NULL);
         header->SetDrawingPage(this);
-        header->SetDrawingStaff(dynamic_cast<Staff *>(topMeasure->FindChildByType(STAFF)));
+        header->SetDrawingYRel(0);
         header->Process(params->m_functor, params, params->m_functorEnd);
     }
     RunningElement *footer = this->GetFooter();
     if (footer) {
         footer->Process(&resetVerticalAlignment, NULL);
         footer->SetDrawingPage(this);
-        footer->SetDrawingStaff(dynamic_cast<Staff *>(bottomMeasure->FindChildByType(STAFF, UNLIMITED_DEPTH, BACKWARD)));
+        header->SetDrawingYRel(0);
         footer->Process(params->m_functor, params, params->m_functorEnd);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Page::AlignSystems(FunctorParams *functorParams)
+{
+    AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
+    assert(params);
+    
+    RunningElement *header = this->GetHeader();
+    if (header) {
+        header->SetDrawingYRel(params->m_shift);
+        params->m_shift -= header->CalcTotalHeight();
+    }
+    RunningElement *footer = this->GetFooter();
+    if (footer) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        assert(doc);
+        // We add twice the top margin, once for the origin moved at the top and one for the bottom margin
+        footer->SetDrawingYRel(footer->CalcTotalHeight() + doc->m_drawingPageTopMar * 2);
     }
 
     return FUNCTOR_CONTINUE;

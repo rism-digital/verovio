@@ -24,7 +24,7 @@ class Staff;
  * This class represents running elements (headers and footers).
  * It is not an abstract class but should not be instanciated directly.
  */
-class RunningElement : public Object, public AttHorizontalAlign, public AttTyped {
+class RunningElement : public Object, public ObjectListInterface, public AttHorizontalAlign, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -70,13 +70,17 @@ public:
     Page *GetDrawingPage() { return m_drawingPage; }
     ///@}
     
-    /*
-     * @name Setter and getter for the current darwing staff
+    /**
+     * @name Get and set the X and Y drawing relative positions
      */
     ///@{
-    void SetDrawingStaff(Staff *staff);
-    Staff *GetDrawingStaff() { return m_drawingStaff; }
+    int GetDrawingYRel() const { return m_drawingYRel; }
+    virtual void SetDrawingYRel(int drawingYRel);
     ///@}
+    
+    int CalcTotalHeight();
+    
+    bool AdjustDrawingScaling(int width);
 
     //----------//
     // Functors //
@@ -88,9 +92,20 @@ public:
     ///@{
     virtual int AlignVertically(FunctorParams *functorParams);
     ///@}
+    
+protected:
+    /**
+     * Filter the list for a specific class.
+     * Keep only the top <rend> and <fig>
+     */
+    virtual void FilterList(ListOfObjects *childList);
 
 private:
-    //
+    /**
+     *
+     */
+    int GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v);
+
 public:
     //
 private:
@@ -100,9 +115,20 @@ private:
     Page *m_drawingPage;
     
     /**
-     * The staff we are darwing (for the y postion)
+     * The y position of the running element
      */
-    Staff *m_drawingStaff;
+    int m_drawingYRel;
+    
+    /**
+     * Stored the top <rend> or <fig> with the 9 possible positioning combinations, from
+     * top-left to bottom-right (going left to right first)
+     */
+    ArrayOfObjects m_positionnedObjects[9];
+    
+    /**
+     *
+     */
+    int m_drawingScalingPercent[3];
 };
 
 } // namespace vrv

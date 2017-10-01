@@ -16,6 +16,7 @@
 #include "bboxdevicecontext.h"
 #include "devicecontext.h"
 #include "doc.h"
+#include "page.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
 #include "pghead.h"
@@ -36,21 +37,14 @@ void View::DrawRunningElements(DeviceContext *dc, Page *page)
         if (!bBoxDC->UpdateVerticalValues()) return;
     }
     
-    PgHead *pgHead = m_doc->m_scoreDef.GetPgHead();
-    if (pgHead) {
-        DrawPgHeader(dc, pgHead);
+    
+    RunningElement *header = page->GetHeader();
+    if (header) {
+        DrawPgHeader(dc, header);
     }
-    PgHead2 *pgHead2 = m_doc->m_scoreDef.GetPgHead2();
-    if (pgHead2) {
-        DrawPgHeader(dc, pgHead);
-    }
-    PgFoot *pgFoot = m_doc->m_scoreDef.GetPgFoot();
-    if (pgFoot) {
-        DrawPgHeader(dc, pgFoot);
-    }
-    PgFoot2 *pgFoot2 = m_doc->m_scoreDef.GetPgFoot2();
-    if (pgFoot2) {
-        DrawPgHeader(dc, pgFoot2);
+    RunningElement *footer = page->GetFooter();
+    if (footer) {
+        DrawPgHeader(dc, footer);
     }
 }
     

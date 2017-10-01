@@ -67,8 +67,8 @@ public:
      * Looks if the page is the first one or not
      */
     ///@{
-    RunningElement *GetHeader();
-    RunningElement *GetFooter();
+    RunningElement *GetHeader() const;
+    RunningElement *GetFooter() const;
     ///@}
 
     /**
@@ -154,6 +154,11 @@ public:
     ///@{
     virtual int AlignVerticallyEnd(FunctorParams *functorParams);
     ///@}
+    
+    /**
+     * See Object::AlignSystems
+     */
+    virtual int AlignSystems(FunctorParams *functorParams);
 
 private:
     /**
