@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Sep 30 09:44:52 PDT 2017
+// Last Modified: Sat Sep 30 20:32:47 PDT 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2764,6 +2764,8 @@ class GridMeasure : public list<GridSlice*> {
 		void         setStyle       (MeasureStyle style) { m_style = style; }
 		void         setBarStyle    (MeasureStyle style) { setStyle(style); }
 		void         setFinalBarlineStyle(void) { setStyle(MeasureStyle::Final); }
+		void         setRepeatEndStyle(void) { setStyle(MeasureStyle::RepeatBackward); }
+		void         setRepeatBackwardStyle(void) { setStyle(MeasureStyle::RepeatBackward); }
 
 		bool         isDouble(void) 
 		                  {return m_style == MeasureStyle::Double;}
@@ -4417,6 +4419,8 @@ class Tool_mei2hum : public HumTool {
 		                              const string& clefdis,
 		                              const string& clefdisplace);
 		string cleanDirText          (const string& input);
+		string cleanReferenceRecordText(const string& input);
+		bool   beamIsValid           (vector<xml_node>& beamlist);
 
 	private:
 		Options        m_options;

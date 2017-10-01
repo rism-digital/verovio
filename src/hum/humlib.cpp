@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Sep 30 09:44:52 PDT 2017
+// Last Modified: Sat Sep 30 20:32:47 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -36744,7 +36744,25 @@ void Tool_mei2hum::addExtMetaRecords(HumdrumFile& outfile, xml_document& doc) {
 //
 
 void Tool_mei2hum::addHeaderRecords(HumdrumFile& outfile, xml_document& doc) {
-	// do something here
+
+	// title is at /mei/meiHead/fileDesc/titleStmt/title
+	string title = cleanReferenceRecordText(doc.select_node("/mei/meiHead/fileDesc/titleStmt/title").node().child_value());
+
+	// composer is at /mei/meiHead/fileDesc/titleStmt/respStmt/persName@role="creator"
+	string composer = cleanReferenceRecordText(doc.select_node("/mei/meiHead/fileDesc/titleStmt/respStmt/persName[@role='creator']").node().child_value());
+
+	// lyricist is at /mei/meiHead/fileDesc/titleStmt/respStmt/persName@role="lyricist"
+	string lyricist = cleanReferenceRecordText(doc.select_node("/mei/meiHead/fileDesc/titleStmt/respStmt/persName[@role='lyricist']").node().child_value());
+
+	if (!title.empty()) {
+		outfile.insertLine(0, "!!!OTL: " + title);
+	}
+	if (!lyricist.empty()) {
+		outfile.insertLine(0, "!!!LYR: " + lyricist);
+	}
+	if (!composer.empty()) {
+		outfile.insertLine(0, "!!!COM: " + composer);
+	}
 }
 
 
@@ -37312,9 +37330,15 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 	gm->setDuration(measuredur QUARTER_CONVERT);
 	gm->setTimeSigDur(m_measureDuration[0]);
 
-	if (strcmp(measure.attribute("right").value(), "end") == 0) {
+	string rightstyle = measure.attribute("right").value();
+	if (rightstyle == "") {
+		// do nothing
+	} else if (rightstyle == "end") {
 		gm->setFinalBarlineStyle();
+	} else if (rightstyle == "rptend") {
+		gm->setRepeatBackwardStyle();
 	}
+
 
 	return starttime + measuredur;
 }
@@ -37551,7 +37575,11 @@ HumNum Tool_mei2hum::parseBeam(xml_node beam, HumNum starttime) {
 	NODE_VERIFY(beam, starttime)
 	MAKE_CHILD_LIST(children, beam);
 
-	m_beamPrefix = "L";
+	bool isvalid = beamIsValid(children);
+
+	if (isvalid) {
+		m_beamPrefix = "L";
+	}
 
 	xml_node lastnoterestchord;
 	for (int i=(int)children.size()-1; i>=0; i--) {
@@ -37574,7 +37602,9 @@ HumNum Tool_mei2hum::parseBeam(xml_node beam, HumNum starttime) {
 	string dummy;
 	for (int i=0; i<(int)children.size(); i++) {
 		if (children[i] == lastnoterestchord) {
-			m_beamPostfix = "J";
+			if (isvalid) {
+				m_beamPostfix = "J";
+			}
 		}
 		string nodename = children[i].name();
 		if (nodename == "note") {
@@ -37591,6 +37621,41 @@ HumNum Tool_mei2hum::parseBeam(xml_node beam, HumNum starttime) {
 	}
 
 	return starttime;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::beamIsValid --
+//
+
+bool Tool_mei2hum::beamIsValid(vector<xml_node>& beamlist) {
+	for (int i=0; i<(int)beamlist.size(); i++) {
+		string nodename = beamlist[i].name();
+		if (nodename != "note") {
+			continue;
+		}
+		string grace = beamlist[i].attribute("grace").value();
+		if (!grace.empty()) {
+			continue;
+		}
+		string dur = beamlist[i].attribute("dur").value();
+		if (dur.empty()) {
+			// strange, but skip
+			continue;
+		}
+		if (isdigit(dur[0])) {
+			if (stoi(dur) <= 4) {
+				return false;
+			}
+		} else {
+			// "breve", "long", "maxima", junk, etc.
+			return false;
+		}
+	}
+
+	return true;
 }
 
 
@@ -38881,6 +38946,48 @@ string Tool_mei2hum::cleanDirText(const string& input) {
 			output += ' ';
 		} else {
 			output += input[i];
+		}
+	}
+	while ((!output.empty()) && (output.back() == ' ')) {
+		output.pop_back();
+	}
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::cleanReferenceRecordText -- convert ":" to "&colon;".
+//     Remove tabs and newlines, and trim spaces.  Maybe allow
+//     newlines using "\n" and allow font changes in the future.
+//     Do accents later perhaps or monitor for UTF-8.
+//
+
+string Tool_mei2hum::cleanReferenceRecordText(const string& input) {
+	string output;
+	output.reserve(input.size() + 8);
+	bool foundstart = false;
+	char lastchar = '\0';
+	for (int i=0; i<(int)input.size(); i++) {
+		if ((!foundstart) && std::isspace(input[i])) {
+			continue;
+		}
+		foundstart = true;
+		if (input[i] == '\n') {
+			if (lastchar != ' ') {
+				output += ' ';
+			}
+			lastchar = ' ';
+		} else if (input[i] == '\t') {
+			if (lastchar != ' ') {
+				output += ' ';
+			}
+			lastchar = ' ';
+		} else {
+			output += input[i];
+			lastchar = input[i];
 		}
 	}
 	while ((!output.empty()) && (output.back() == ' ')) {
