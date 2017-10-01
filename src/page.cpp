@@ -72,7 +72,39 @@ void Page::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-
+    
+RunningElement *Page::GetHeader()
+{
+    Doc *doc = dynamic_cast<Doc*>(this->GetFirstParent(DOC));
+    if (!doc) {
+        return NULL;
+    }
+    
+    // first page?
+    if (doc->GetFirst() == this) {
+        return doc->m_scoreDef.GetPgHead();
+    }
+    else {
+        return doc->m_scoreDef.GetPgHead2();
+    }
+}
+    
+RunningElement *Page::GetFooter()
+{
+    Doc *doc = dynamic_cast<Doc*>(this->GetFirstParent(DOC));
+    if (!doc) {
+        return NULL;
+    }
+    
+    // first page?
+    if (doc->GetFirst() == this) {
+        return doc->m_scoreDef.GetPgFoot();
+    }
+    else {
+        return doc->m_scoreDef.GetPgFoot2();
+    }
+}
+    
 void Page::LayOut(bool force)
 {
     if (m_layoutDone && !force) {
@@ -517,6 +549,8 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
 
     params->m_cumulatedShift = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
     
+    // Also align the header and footer
+    
     System *topSystem = dynamic_cast<System *>(this->FindChildByType(SYSTEM, 1));
     System *bottomSystem = dynamic_cast<System *>(this->FindChildByType(SYSTEM, 1, BACKWARD));
     
@@ -532,41 +566,22 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
     }
     
     // Special case where we need to reset the vertical alignment here.
-    // The reason is the the RunningElement are not set when ResetVerticalAlignment is previously called
+    // The reason is the the RunningElement are not reset when ResetVerticalAlignment is previously called
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
     
-    // first page?
-    if (params->m_doc->GetFirst() == this) {
-        PgHead *pgHead = params->m_doc->m_scoreDef.GetPgHead();
-        if (pgHead) {
-            pgHead->Process(&resetVerticalAlignment, NULL);
-            pgHead->SetDrawingPage(this);
-            pgHead->SetDrawingStaff(dynamic_cast<Staff *>(topMeasure->FindChildByType(STAFF)));
-            pgHead->Process(params->m_functor, params, params->m_functorEnd);
-        }
-        PgFoot *pgFoot = params->m_doc->m_scoreDef.GetPgFoot();
-        if (pgFoot) {
-            pgFoot->Process(&resetVerticalAlignment, NULL);
-            pgFoot->SetDrawingPage(this);
-            pgFoot->SetDrawingStaff(dynamic_cast<Staff *>(bottomMeasure->FindChildByType(STAFF, UNLIMITED_DEPTH, BACKWARD)));
-            pgFoot->Process(params->m_functor, params, params->m_functorEnd);
-        }
+    RunningElement *header = this->GetHeader();
+    if (header) {
+        header->Process(&resetVerticalAlignment, NULL);
+        header->SetDrawingPage(this);
+        header->SetDrawingStaff(dynamic_cast<Staff *>(topMeasure->FindChildByType(STAFF)));
+        header->Process(params->m_functor, params, params->m_functorEnd);
     }
-    else {
-        PgHead2 *pgHead2 = params->m_doc->m_scoreDef.GetPgHead2();
-        if (pgHead2) {
-            pgHead2->Process(&resetVerticalAlignment, NULL);
-            pgHead2->SetDrawingPage(this);
-            pgHead2->SetDrawingStaff(dynamic_cast<Staff *>(topMeasure->FindChildByType(STAFF)));
-            pgHead2->Process(params->m_functor, params, params->m_functorEnd);
-        }
-        PgFoot2 *pgFoot2 = params->m_doc->m_scoreDef.GetPgFoot2();
-        if (pgFoot2) {
-            pgFoot2->Process(&resetVerticalAlignment, NULL);
-            pgFoot2->SetDrawingPage(this);
-            pgFoot2->SetDrawingStaff(dynamic_cast<Staff *>(bottomMeasure->FindChildByType(STAFF, UNLIMITED_DEPTH, BACKWARD)));
-            pgFoot2->Process(params->m_functor, params, params->m_functorEnd);
-        }
+    RunningElement *footer = this->GetFooter();
+    if (footer) {
+        footer->Process(&resetVerticalAlignment, NULL);
+        footer->SetDrawingPage(this);
+        footer->SetDrawingStaff(dynamic_cast<Staff *>(bottomMeasure->FindChildByType(STAFF, UNLIMITED_DEPTH, BACKWARD)));
+        footer->Process(params->m_functor, params, params->m_functorEnd);
     }
 
     return FUNCTOR_CONTINUE;

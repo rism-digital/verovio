@@ -15,6 +15,7 @@ namespace vrv {
 
 class DeviceContext;
 class PrepareProcessingListsParams;
+class RunningElement;
 class Staff;
 class System;
 
@@ -59,6 +60,15 @@ public:
     ///@{
     double GetPPUFactor() const { return m_PPUFactor; }
     void SetPPUFactor(double PPUFactor) { m_PPUFactor = PPUFactor; }
+    ///@}
+    
+    /**
+     * @name Getter header and footer.
+     * Looks if the page is the first one or not
+     */
+    ///@{
+    RunningElement *GetHeader();
+    RunningElement *GetFooter();
     ///@}
 
     /**
