@@ -81,6 +81,8 @@ public:
     int CalcTotalHeight();
     
     bool AdjustDrawingScaling(int width);
+    
+    bool AdjustYPos();
 
     //----------//
     // Functors //

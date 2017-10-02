@@ -382,8 +382,9 @@ void Page::LayOutVertically()
     
     int header = 0;
     if (this->GetHeader()) {
-        header = this->GetHeader()->CalcTotalHeight();
+        //header = this->GetHeader()->CalcTotalHeight();
         this->GetHeader()->AdjustDrawingScaling(5000);
+        this->GetHeader()->AdjustYPos();
     }
 
     // Adjust system Y position

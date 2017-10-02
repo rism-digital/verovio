@@ -144,6 +144,8 @@ void View::DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params)
     
     Svg *svg = dynamic_cast<Svg *>(fig->FindChildByType(SVG));
     if (svg) {
+        params.m_x = fig->GetDrawingX();
+        params.m_y = fig->GetDrawingY();
         DrawSvg(dc, svg, params);
     }
     
@@ -172,8 +174,8 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
     if (customFont) dc->SetFont(&rendFont);
     
     if (params.m_laidOut) {
-        if (rend->HasHalign() && (rend->GetHalign() != params.m_alignment)) {
-            params.m_alignment = rend->GetHalign();
+        if (params.m_alignment == HORIZONTALALIGNMENT_NONE) {
+            params.m_alignment = rend->HasHalign() ? rend->GetHalign() : HORIZONTALALIGNMENT_left;
             params.m_x = rend->GetDrawingX();
             params.m_y = rend->GetDrawingY();
             dc->MoveTextTo(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), params.m_alignment);

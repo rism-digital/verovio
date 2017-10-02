@@ -183,8 +183,7 @@ int RunningElement::CalcTotalHeight()
         for (j = 0; j < 3; j++) {
             ArrayOfObjects *objects = &m_positionnedObjects[i + j * 3];
             ArrayOfObjects::iterator iter;
-            for (iter = objects->begin(); iter != objects->end(); iter++)
-            {
+            for (iter = objects->begin(); iter != objects->end(); iter++) {
                 if ((*iter)->HasContentBB()) {
                     columnHeight += (*iter)->GetContentY2() - (*iter)->GetContentY1();
                 }
@@ -199,14 +198,16 @@ bool RunningElement::AdjustDrawingScaling(int width)
 {
     int i, j;
     bool scale = false;
+    // For each row
     for (i = 0; i < 3; i++) {
         int rowWidth = 0;
+        // For each column
         for (j = 0; j < 3; j++) {
             ArrayOfObjects *objects = &m_positionnedObjects[i * 3 + j ];
             ArrayOfObjects::iterator iter;
             int columnWidth = 0;
-            for (iter = objects->begin(); iter != objects->end(); iter++)
-            {
+            // For each object
+            for (iter = objects->begin(); iter != objects->end(); iter++) {
                 if ((*iter)->HasContentBB()) {
                     int iterWidth = (*iter)->GetContentX2() - (*iter)->GetContentX1();
                     columnWidth = std::max(columnWidth, iterWidth);
@@ -221,6 +222,34 @@ bool RunningElement::AdjustDrawingScaling(int width)
     }
     return scale;
 }
+    
+bool RunningElement::AdjustYPos()
+{
+    int i;
+    for (i = 0; i < 9; i++) {
+        ArrayOfObjects *objects = &m_positionnedObjects[i];
+        ArrayOfObjects::iterator iter;
+        int cumulatedYRel = 0;
+        for (iter = objects->begin(); iter != objects->end(); iter++) {
+            if ((*iter)->HasContentBB()) {
+                int yShift = (*iter)->GetContentY2();
+                if ((*iter)->Is(REND)) {
+                    Rend *rend = dynamic_cast<Rend *>(*iter);
+                    assert(rend);
+                    rend->SetDrawingYRel(cumulatedYRel - yShift);
+
+                }
+                else {
+                    Fig *fig = dynamic_cast<Fig *>(*iter);
+                    assert(fig);
+                    fig->SetDrawingYRel(cumulatedYRel - yShift);
+                }
+                cumulatedYRel += ((*iter)->GetContentY1() - (*iter)->GetContentY2());
+            }
+        }
+    }
+    return true;
+}
         
 int RunningElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v)
 {
@@ -230,7 +259,7 @@ int RunningElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALI
         case (HORIZONTALALIGNMENT_center) : pos += POSITION_CENTER; break;
         case (HORIZONTALALIGNMENT_right) : pos += POSITION_RIGHT; break;
         default:
-            pos += POSITION_CENTER; break;
+            pos += POSITION_LEFT; break;
     }
     switch (v) {
         case (VERTICALALIGNMENT_top) : break;
