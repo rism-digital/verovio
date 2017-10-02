@@ -258,28 +258,17 @@ void View::DrawHairpin(
     int startY = 0;
     int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
 
-
-    /** Making sure the angle is not unsightly big **/
-    float theta;
-
-    // Angle as a function of the width
-    //theta = 29.1 - (16.4 * (x2 - x1));
-    //endY = 2 * (x2 - x1) * tan((M_PI / 360) * theta);
-
-    // Cap angle of hairpin at 20 degrees
-
-    // Calculate angle of a whole hairpin using its height and width
-    // Then we convert radians to degrees with 360 / 2*pi
-    theta = (360.0 / (2.0 * M_PI)) * 2.0 * atan((endY / 2.0) / (x2 - x1));
-
-    // if the angle is too big, restrict endY
-    LogMessage("%f", theta);
-    if (theta > 15){
-        LogMessage("hello, everybody. tihs i");
-        theta = 15;
+    //*** Cap the angle of hairpins ***//
+    //
+    // Given height and width, calculate hairpin angle 
+    float theta =  2.0 * atan((endY / 2.0) / (x2 - x1)); 
+    // Convert to Radians
+    theta *= (360.0 / (2.0 * M_PI));
+    // If the angle is too big, restrict endY
+    if (theta > 16){
+        theta = 16;
         endY = 2 * (x2 - x1) * tan((M_PI / 360) * theta);
     }
-
 
     // We calculate points for cresc by default. Start/End have to be swapped
     if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);
