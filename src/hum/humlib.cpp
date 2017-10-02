@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Sep 30 20:32:47 PDT 2017
+// Last Modified: Mon Oct  2 10:01:48 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -19867,6 +19867,48 @@ int HumdrumToken::getSubtrack(void) const {
 
 //////////////////////////////
 //
+// HumdrumToken::noteInLowerSubtrack -- Return true if the note
+//     is attacked or sustained with another note in a lower layer.
+//     This is for using in hum2mei conversion to avoid a bug in
+//     verovio related to lyrics in layers where the notes are a
+//     second apart.
+//
+
+bool HumdrumToken::noteInLowerSubtrack(void) {
+	int subtrack = this->getSubtrack();
+	if (subtrack <= 1) {
+		return false;
+	}
+	int field = this->getFieldIndex();
+	int track = this->getTrack();
+
+	HumdrumLine* owner = this->getOwner();
+	if (owner == NULL) {
+		return false;
+	}
+
+	for (int i=field-1; i>=0; i--) {
+		HTp xtoken = owner->token(i);
+		int xtrack = xtoken->getTrack();
+		if (xtrack != track) {
+			return false;
+		}
+		if (xtoken->isNull()) {
+			continue;
+		}
+		if (xtoken->find("r") != string::npos) {
+			continue;
+		}
+		return true;
+	}
+
+	return false;
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumToken::getTrackString -- Gets "track.subtrack" as a string.  The
 //     track and subtrack are integers.  The getTrackString function will
 //     return a string with the track and subtrack separated by an dot.  The
@@ -37247,7 +37289,7 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 	string n = measure.attribute("n").value();
 	int nnum = 0;
 	if (n.empty()) {
-		cerr << "Warning: no measure number on measure element" << endl;
+		// cerr << "Warning: no measure number on measure element" << endl;
 	} else {
 		nnum = stoi(n);
 	}
@@ -37715,8 +37757,11 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output, Hu
 	m_beamPrefix.clear();
 	m_beamPostfix.clear();
 
+	m_fermata = false;
 	processLinkedNodes(tok, note);
-	processFermataAttribute(tok, note);
+	if (!m_fermata) {
+		processFermataAttribute(tok, note);
+	}
 
 	GridSlice* dataslice = NULL;
 
@@ -37727,10 +37772,12 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output, Hu
 		output += tok;
 	}
 
+	bool hasverse = false;
 
 	for (int i=0; i<(int)children.size(); i++) {
 		string nodename = children[i].name();
 		if ((nodename == "verse") && (dataslice != NULL)) {
+			hasverse = true;
 			parseVerse(children[i], dataslice->at(m_currentStaff-1)->at(0));
 		} else if (nodename == "artic") {
 			// handled elsewhere: don't do anything
@@ -37741,8 +37788,61 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output, Hu
 		}
 	}
 
+	if (!hasverse) {
+		string attsyl = note.attribute("syl").value();
+		if (!attsyl.empty()) {
+			parseSylAttribute(attsyl, dataslice->at(m_currentStaff-1)->at(0));
+		}
+	}
 
 	return starttime + duration;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::parseSylAttribute -- 
+//
+
+void Tool_mei2hum::parseSylAttribute(const string& attsyl, GridStaff* staff) {
+	vector<string> pieces(1);
+	int length = (int)attsyl.size();
+	if (length == 0) {
+		return;
+	}
+	if (length == 1) {
+		pieces[0] += attsyl;
+	} else {
+		for (int i=0; i<length-2; i++) {
+			if ((attsyl[i] == '/') && (attsyl[i+1] == '/')) {
+				pieces.emplace_back("");
+				i++;
+			} else {
+				pieces.back() += attsyl[i];
+			}
+		}
+		if ((attsyl[length-1] != '/') && (attsyl[length-2] != '/')) {
+			pieces.back() += attsyl[length-2];
+			pieces.back() += attsyl.back();
+		}
+	}
+
+	if ((pieces.size() == 1) && (pieces[0].empty())) {
+		return;
+	}
+
+	for (int i=0; i<(int)pieces.size(); i++) {
+		pieces[i] = cleanVerseText(pieces[i]);
+	}
+
+	for (int i=0; i<(int)pieces.size(); i++) {
+		if (pieces[i].empty()) {
+			continue;
+		}
+		staff->setVerse(i, pieces[i]);
+		reportVerseNumber(i+1, m_currentStaff-1);
+	}
 }
 
 
@@ -37862,6 +37962,19 @@ HumNum Tool_mei2hum::parseMRest(xml_node mrest, HumNum starttime) {
 	duration /= 4;
 	int dotcount = 0;
 	string recip = getHumdrumRecip(duration, dotcount);
+	if (recip.find('%') != string::npos) {
+		string recip2 = getHumdrumRecip(duration, 1);
+		if (recip2.find('%') == string::npos) {
+			recip = recip2;
+			dotcount = 1;
+		} else {
+			string recip3 = getHumdrumRecip(duration, 2);
+			if (recip2.find('%') == string::npos) {
+				recip = recip3;
+				dotcount = 2;
+			}
+		}
+	}
 	string tok = recip + "r";
 	// Add fermata on whole-measure rest if needed.	
 
@@ -38101,6 +38214,7 @@ void Tool_mei2hum::processNodeStartLinks(string& output, xml_node node,
 	for (int i=0; i<(int)nodelist.size(); i++) {
 		string nodename = nodelist[i].name();
 		if (nodename == "fermata") {
+			m_fermata = true; // used to disable note@fermata duplications
 			parseFermata(output, node, nodelist[i]);
 		} else if (nodename == "slur") {
 			parseSlurStart(output, node, nodelist[i]);
@@ -38441,14 +38555,11 @@ HumNum Tool_mei2hum::getDuration(xml_node element) {
 
 	HumNum output;
 	if (dur == "breve") {
-		output = 1;
-		output /= 2;
+		output = 2;
 	} else if (dur == "long") {
-		output = 1;
-		output /= 4;
+		output = 4;
 	} else if (dur == "maxima") {
-		output = 1;
-		output /= 8;
+		output = 8;
 	} else if (isdigit(dur[0])) {
 		output = 1;
 		output /= stoi(dur);
@@ -38491,7 +38602,7 @@ HumNum Tool_mei2hum::getDuration(xml_node element) {
 
 //////////////////////////////
 //
-// Tool_mei2hum::parseVerse --
+// Tool_mei2hum::parseVerse -- 
 //
 
 void Tool_mei2hum::parseVerse(xml_node verse, GridStaff* staff) {
@@ -38673,8 +38784,11 @@ HumNum Tool_mei2hum::parseChord(xml_node chord, HumNum starttime) {
 		}
 	}
 
+	m_fermata = false;
 	processLinkedNodes(tok, chord);
-	processFermataAttribute(tok, chord);
+	if (!m_fermata) {
+		processFermataAttribute(tok, chord);
+	}
 
 	m_outdata.back()->addDataToken(tok, starttime QUARTER_CONVERT, m_currentStaff-1,
 		0, m_currentLayer-1, m_staffcount);
@@ -38941,6 +39055,39 @@ string Tool_mei2hum::cleanDirText(const string& input) {
 		if (input[i] == ':') {
 			output += "&colon;";
 		} else if (input[i] == '\t') {
+			output += ' ';
+		} else if (input[i] == '\n') {
+			output += ' ';
+		} else {
+			output += input[i];
+		}
+	}
+	while ((!output.empty()) && (output.back() == ' ')) {
+		output.pop_back();
+	}
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::cleanVerseText -- 
+//     Remove tabs and newlines, and trim spaces. 
+//     Do accents later perhaps or monitor for UTF-8.
+//
+
+string Tool_mei2hum::cleanVerseText(const string& input) {
+	string output;
+	output.reserve(input.size() + 8);
+	bool foundstart = false;
+	for (int i=0; i<(int)input.size(); i++) {
+		if ((!foundstart) && std::isspace(input[i])) {
+			continue;
+		}
+		foundstart = true;
+		if (input[i] == '\t') {
 			output += ' ';
 		} else if (input[i] == '\n') {
 			output += ' ';

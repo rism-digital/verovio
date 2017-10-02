@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Sep 30 20:32:47 PDT 2017
+// Last Modified: Mon Oct  2 10:01:48 PDT 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1211,6 +1211,7 @@ class HumdrumToken : public string, public HumHash {
 		string   getSpineInfo              (void) const;
 		int      getTrack                  (void) const;
 		int      getSubtrack               (void) const;
+		bool     noteInLowerSubtrack       (void);
 		string   getTrackString            (void) const;
 		int      getSubtokenCount          (const string& separator = " ") const;
 		string   getSubtoken               (int index,
@@ -4411,6 +4412,7 @@ class Tool_mei2hum : public HumTool {
 		void   addHeaderRecords      (HumdrumFile& outfile, xml_document& doc);
 		void   parseVerse            (xml_node verse, GridStaff* staff);
 		string parseSyl              (xml_node syl);
+		void   parseSylAttribute     (const string& attsyl, GridStaff* staff);
 		void   reportVerseNumber     (int pmax, int staffindex);
 		string getEditorialAccidental(vector<xml_node>& children);
 		string getCautionaryAccidental(vector<xml_node>& children);
@@ -4420,6 +4422,7 @@ class Tool_mei2hum : public HumTool {
 		                              const string& clefdisplace);
 		string cleanDirText          (const string& input);
 		string cleanReferenceRecordText(const string& input);
+		string cleanVerseText        (const string& input);
 		bool   beamIsValid           (vector<xml_node>& beamlist);
 
 	private:
@@ -4447,6 +4450,8 @@ class Tool_mei2hum : public HumTool {
 		vector<HumNum> m_measureDuration;
 		vector<bool>   m_hasDynamics;
 		const int      m_maxstaff = 1000;
+
+		bool           m_fermata = false;     // set priority of note/fermata over note@fermata
 
 		map<string, vector<xml_node>> m_startlinks;
 		map<string, vector<xml_node>> m_stoplinks;

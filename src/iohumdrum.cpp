@@ -6387,6 +6387,19 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
         return;
     }
 
+	int subtrack = token->getSubtrack();
+	if (subtrack > 1) {
+		if (token->noteInLowerSubtrack()) {
+			// don't print a lyric for secondary layers unless
+			// all of the lower layers do not have a note attacking
+			// or tied at the same time.  This is because verovio
+			// will incorrectly overstrike syllables shared between
+			// layers if there is an offset of a second between the layers.
+			return;
+			// probably also have to deal with chords containing seconds...
+		}
+	}
+
     vector<string> vtexts;
     std::string content;
     hum::HumdrumLine &line = *token->getLine();
