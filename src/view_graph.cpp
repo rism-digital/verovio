@@ -258,6 +258,12 @@ void View::DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int 
     }
 }
 
+/***************************
+Original Function:
+View::DrawThickBezierCurve()
+BEGIN
+****************************
+
 void View::DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle)
 {
     assert(dc);
@@ -279,6 +285,40 @@ void View::DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thicknes
     // Actually draw it
     dc->SetPen(m_currentColour, std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), AxSOLID);
     dc->DrawComplexBezierPath(bez1, bez2);
+    dc->ResetPen();
+}
+
+
+****************************
+Original Function:
+View::DrawThickBezierCurve()
+END
+****************************/
+
+
+// This code replaces the thick curve for a dashed-curve
+// TODO: Make its own function, currently, it overwrites every curve for a dashed-curve! 
+void View::DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle)
+{
+    assert(dc);
+
+    Point bez1[4], bez2[4]; // filled array with control points and end point
+
+    BoundingBox::CalcThickBezier(bezier, thickness, angle, bez1, bez2);
+
+    bez1[0] = ToDeviceContext(bez1[0]);
+    bez1[1] = ToDeviceContext(bez1[1]);
+    bez1[2] = ToDeviceContext(bez1[2]);
+    bez1[3] = ToDeviceContext(bez1[3]);
+
+    bez2[0] = ToDeviceContext(bez2[0]);
+    bez2[1] = ToDeviceContext(bez2[1]);
+    bez2[2] = ToDeviceContext(bez2[2]);
+    bez2[3] = ToDeviceContext(bez2[3]);
+
+    // Actually draw it
+    dc->SetPen(m_currentColour, std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), AxSOLID);
+    dc->DrawComplexBezierPath(bez1, bez1);
     dc->ResetPen();
 }
 

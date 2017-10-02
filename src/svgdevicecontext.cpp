@@ -452,6 +452,12 @@ pugi::xml_node SvgDeviceContext::AppendChild(std::string name)
 }
 
 // Drawing methods
+/***************************
+Original Function:
+View::DrawComplexBezierPath()
+BEGIN
+****************************
+
 void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
 {
     pugi::xml_node pathChild = AppendChild("path");
@@ -467,6 +473,30 @@ void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
     pathChild.append_attribute("stroke-linejoin") = "round";
     // pathChild.append_attribute("stroke-opacity") = "1";
     pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
+}
+
+****************************
+Original Function:
+View::DrawComplexBezierPath()
+END
+****************************/
+
+void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
+{
+    pugi::xml_node pathChild = AppendChild("path");
+    pathChild.append_attribute("d")
+        = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", bezier1[0].x, bezier1[0].y, // M command
+              bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y // First bezier
+              )
+              .c_str();
+    pathChild.append_attribute("fill") = "none";
+    // pathChild.append_attribute("fill-opacity") = "1";
+    pathChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
+    pathChild.append_attribute("stroke-linecap") = "round";
+    pathChild.append_attribute("stroke-linejoin") = "round";
+    pathChild.append_attribute("stroke-dasharray") = "100, 100"; // Does the magic of dashes
+    // pathChild.append_attribute("stroke-opacity") = "1";
+    pathChild.append_attribute("stroke-width") = "50"; // Width should probably be controlled by thickness in this case?
 }
 
 void SvgDeviceContext::DrawCircle(int x, int y, int radius)
