@@ -8,6 +8,7 @@
 #ifndef __VRV_FIG_H__
 #define __VRV_FIG_H__
 
+#include "areaposinterface.h"
 #include "textelement.h"
 
 namespace vrv {
@@ -19,7 +20,7 @@ namespace vrv {
 /**
  * This class models the MEI <fig>
  */
-class Fig : public TextElement {
+class Fig : public TextElement, public AreaPosInterface {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -31,6 +32,13 @@ public:
     virtual void Reset();
     virtual std::string GetClassName() const { return "Fig"; }
     virtual ClassId GetClassId() const { return FIG; }
+    ///@}
+    
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    virtual AreaPosInterface *GetAreaPosInterface() { return dynamic_cast<AreaPosInterface *>(this); }
     ///@}
 
     /**

@@ -8,6 +8,7 @@
 #ifndef __VRV_REND_H__
 #define __VRV_REND_H__
 
+#include "areaposinterface.h"
 #include "atts_shared.h"
 #include "textelement.h"
 
@@ -21,11 +22,10 @@ namespace vrv {
  * This class models the MEI <rend>
  */
 class Rend : public TextElement,
+             public AreaPosInterface,
              public AttColor,
-             public AttHorizontalAlign,
              public AttLang,
              public AttTypography,
-             public AttVerticalAlign,
              public AttWhitespace {
 public:
     /**
@@ -39,6 +39,13 @@ public:
     virtual void Reset();
     virtual std::string GetClassName() const { return "Rend"; }
     virtual ClassId GetClassId() const { return REND; }
+    ///@}
+        
+    /**
+     * @name Getter to interfaces
+     */
+    ///@{
+    virtual AreaPosInterface *GetAreaPosInterface() { return dynamic_cast<AreaPosInterface *>(this); }
     ///@}
 
     /**

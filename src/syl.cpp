@@ -55,7 +55,7 @@ void Syl::Reset()
 
 void Syl::AddChild(Object *child)
 {
-    if (child->IsTextElement()) {
+    if (child->Is({REND, TEXT})) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {

@@ -23,8 +23,10 @@ namespace vrv {
 // Fig
 //----------------------------------------------------------------------------
 
-Fig::Fig() : TextElement("fig-")
+Fig::Fig() : TextElement("fig-"), AreaPosInterface()
 {
+    RegisterInterface(AreaPosInterface::GetAttClasses(), AreaPosInterface::IsInterface());
+    
     Reset();
 }
 
@@ -35,6 +37,7 @@ Fig::~Fig()
 void Fig::Reset()
 {
     TextElement::Reset();
+    AreaPosInterface::Reset();
 }
 
 void Fig::AddChild(Object *child)
@@ -51,8 +54,6 @@ void Fig::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-    
-    
 
 //----------------------------------------------------------------------------
 // Functors methods

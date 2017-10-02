@@ -54,7 +54,6 @@ enum ClassId {
     CLEF_ATTR,
     DOC,
     FB,
-    FIG,
     GRACE_ALIGNER,
     KEYSIG_ATTR,
     LABEL,
@@ -175,6 +174,7 @@ enum ClassId {
     SCOREDEF_ELEMENT_max,
     // Ids for TextElement child classes
     TEXT_ELEMENT,
+    FIG,
     FIGURE,
     LB,
     REND,
@@ -193,6 +193,7 @@ enum ClassId {
  */
 enum InterfaceId {
     INTERFACE,
+    INTERFACE_AREA_POS,
     INTERFACE_BOUNDARY,
     INTERFACE_DURATION,
     INTERFACE_PITCH,

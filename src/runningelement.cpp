@@ -111,16 +111,9 @@ void RunningElement::FilterList(ListOfObjects *childList)
     
     for (iter = childList->begin(); iter != childList->end(); iter++) {
         int pos = 0;
-        if ((*iter)->Is(REND)) {
-            Rend *rend = dynamic_cast<Rend *>(*iter);
-            assert(rend);
-            pos = this->GetAlignmentPos(rend->GetHalign(), rend->GetValign());
-        }
-        else {
-            Fig *fig = dynamic_cast<Fig *>(*iter);
-            assert(fig);
-            pos = this->GetAlignmentPos(HORIZONTALALIGNMENT_NONE, VERTICALALIGNMENT_NONE);
-        }
+        AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
+        assert(interface);
+        pos = this->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
         TextElement *text = dynamic_cast<TextElement *>(*iter);
         assert(text);
         m_positionnedObjects[pos].push_back(text);

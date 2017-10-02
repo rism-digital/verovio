@@ -27,6 +27,7 @@ class Add;
 class AnchoredText;
 class Annot;
 class App;
+class AreaPosInterface;
 class Arpeg;
 class Artic;
 class BarLine;
@@ -317,6 +318,7 @@ private:
     void WriteSystemElement(pugi::xml_node element, SystemElement *object);
     void WriteTextElement(pugi::xml_node element, TextElement *object);
     //
+    void WriteAreaPosInterface(pugi::xml_node currentNode, AreaPosInterface *interface);
     void WriteDurationInterface(pugi::xml_node currentNode, DurationInterface *interface);
     void WritePitchInterface(pugi::xml_node currentNode, PitchInterface *interface);
     void WritePlistInterface(pugi::xml_node currentNode, PlistInterface *interface);
@@ -553,6 +555,7 @@ private:
     bool ReadSystemElement(pugi::xml_node element, SystemElement *object);
     bool ReadTextElement(pugi::xml_node element, TextElement *object);
 
+    bool ReadAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface);
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
     bool ReadPitchInterface(pugi::xml_node element, PitchInterface *interface);
     bool ReadPlistInterface(pugi::xml_node element, PlistInterface *interface);

@@ -1398,6 +1398,8 @@ void MeiOutput::WriteMeiFig(pugi::xml_node currentNode, Fig *fig)
     assert(fig);
 
     WriteTextElement(currentNode, fig);
+    WriteAreaPosInterface(currentNode, fig);
+
 };
     
 void MeiOutput::WriteMeiLb(pugi::xml_node currentNode, Lb *lb)
@@ -1412,11 +1414,10 @@ void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
     assert(rend);
 
     WriteTextElement(currentNode, rend);
+    WriteAreaPosInterface(currentNode, rend);
     rend->WriteColor(currentNode);
-    rend->WriteHorizontalAlign(currentNode);
     rend->WriteLang(currentNode);
     rend->WriteTypography(currentNode);
-    rend->WriteVerticalAlign(currentNode);
     rend->WriteWhitespace(currentNode);
 }
     
@@ -1445,6 +1446,14 @@ void MeiOutput::WriteMeiText(pugi::xml_node element, Text *text)
     }
 }
 
+void MeiOutput::WriteAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface)
+{
+    assert(interface);
+
+    interface->WriteHorizontalAlign(element);
+    interface->WriteVerticalAlign(element);
+}
+    
 void MeiOutput::WriteDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
     assert(interface);
@@ -3739,6 +3748,8 @@ bool MeiInput::ReadMeiFig(Object *parent, pugi::xml_node fig)
     Fig *vrvFig = new Fig();
     ReadTextElement(fig, vrvFig);
     
+    ReadAreaPosInterface(fig, vrvFig);
+    
     parent->AddChild(vrvFig);
     return ReadMeiTextChildren(vrvFig, fig, vrvFig);
 }
@@ -3756,12 +3767,12 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
 {
     Rend *vrvRend = new Rend();
     ReadTextElement(rend, vrvRend);
+    
+    ReadAreaPosInterface(rend, vrvRend);
 
     vrvRend->ReadColor(rend);
-    vrvRend->ReadHorizontalAlign(rend);
     vrvRend->ReadLang(rend);
     vrvRend->ReadTypography(rend);
-    vrvRend->ReadVerticalAlign(rend);
     vrvRend->ReadWhitespace(rend);
 
     parent->AddChild(vrvRend);
@@ -3808,6 +3819,13 @@ bool MeiInput::ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, b
     return true;
 }
 
+bool MeiInput::ReadAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface)
+{
+    interface->ReadHorizontalAlign(element);
+    interface->ReadVerticalAlign(element);
+    return true;
+}
+    
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
     interface->ReadAugmentDots(element);
