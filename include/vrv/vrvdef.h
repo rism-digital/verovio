@@ -221,6 +221,7 @@ class Object;
 class PlistInterface;
 class Point;
 class Staff;
+class TextElement;
 class TimePointInterface;
 class TimeSpanningInterface;
 
@@ -253,6 +254,8 @@ typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
 typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
 
 typedef std::vector<LedgerLine> ArrayOfLedgerLines;
+    
+typedef std::vector<TextElement *> ArrayOfTextElements;
 
 typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
 

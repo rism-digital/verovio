@@ -1397,8 +1397,7 @@ void MeiOutput::WriteMeiFig(pugi::xml_node currentNode, Fig *fig)
 {
     assert(fig);
 
-    WriteXmlId(currentNode, fig);
-    fig->WriteTyped(currentNode);
+    WriteTextElement(currentNode, fig);
 };
     
 void MeiOutput::WriteMeiLb(pugi::xml_node currentNode, Lb *lb)
@@ -3738,9 +3737,7 @@ bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node f)
 bool MeiInput::ReadMeiFig(Object *parent, pugi::xml_node fig)
 {
     Fig *vrvFig = new Fig();
-    SetMeiUuid(fig, vrvFig);
-    
-    vrvFig->ReadTyped(fig);
+    ReadTextElement(fig, vrvFig);
     
     parent->AddChild(vrvFig);
     return ReadMeiTextChildren(vrvFig, fig, vrvFig);

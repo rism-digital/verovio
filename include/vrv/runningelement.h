@@ -15,6 +15,7 @@ namespace vrv {
 
 class Page;
 class Staff;
+class TextElement;
     
 //----------------------------------------------------------------------------
 // RunningElement
@@ -125,7 +126,7 @@ private:
      * Stored the top <rend> or <fig> with the 9 possible positioning combinations, from
      * top-left to bottom-right (going left to right first)
      */
-    ArrayOfObjects m_positionnedObjects[9];
+    ArrayOfTextElements m_positionnedObjects[9];
     
     /**
      *

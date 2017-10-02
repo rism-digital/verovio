@@ -920,7 +920,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 
         //Rend *rend = dynamic_cast<Rend *>(object);
         //if (rend && rend->HasHalign()) {
-        if (object->IsTextElement() || object->Is(FIG)) {
+        if (object->IsTextElement()) {
             
             SetPen(AxBLUE, 20, AxDOT_DASH);
             StartGraphic(object, "content-bounding-box", "cbbox-" + object->GetUuid());

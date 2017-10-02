@@ -65,10 +65,7 @@ void RunningElement::Reset()
 
 void RunningElement::AddChild(Object *child)
 {
-    if (child->Is(FIG)) {
-        assert(dynamic_cast<Fig *>(child));
-    }
-    else if (child->IsTextElement()) {
+    if (child->IsTextElement()) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -124,7 +121,9 @@ void RunningElement::FilterList(ListOfObjects *childList)
             assert(fig);
             pos = this->GetAlignmentPos(HORIZONTALALIGNMENT_NONE, VERTICALALIGNMENT_NONE);
         }
-        m_positionnedObjects[pos].push_back(*iter);
+        TextElement *text = dynamic_cast<TextElement *>(*iter);
+        assert(text);
+        m_positionnedObjects[pos].push_back(text);
     }
 }
     
@@ -181,9 +180,9 @@ int RunningElement::CalcTotalHeight()
     for (i = 0; i < 3; i++) {
         int columnHeight = 0;
         for (j = 0; j < 3; j++) {
-            ArrayOfObjects *objects = &m_positionnedObjects[i + j * 3];
-            ArrayOfObjects::iterator iter;
-            for (iter = objects->begin(); iter != objects->end(); iter++) {
+            ArrayOfTextElements *textElements = &m_positionnedObjects[i + j * 3];
+            ArrayOfTextElements::iterator iter;
+            for (iter = textElements->begin(); iter != textElements->end(); iter++) {
                 if ((*iter)->HasContentBB()) {
                     columnHeight += (*iter)->GetContentY2() - (*iter)->GetContentY1();
                 }
@@ -203,11 +202,11 @@ bool RunningElement::AdjustDrawingScaling(int width)
         int rowWidth = 0;
         // For each column
         for (j = 0; j < 3; j++) {
-            ArrayOfObjects *objects = &m_positionnedObjects[i * 3 + j ];
-            ArrayOfObjects::iterator iter;
+            ArrayOfTextElements *textElements = &m_positionnedObjects[i * 3 + j ];
+            ArrayOfTextElements::iterator iter;
             int columnWidth = 0;
             // For each object
-            for (iter = objects->begin(); iter != objects->end(); iter++) {
+            for (iter = textElements->begin(); iter != textElements->end(); iter++) {
                 if ((*iter)->HasContentBB()) {
                     int iterWidth = (*iter)->GetContentX2() - (*iter)->GetContentX1();
                     columnWidth = std::max(columnWidth, iterWidth);
@@ -227,10 +226,10 @@ bool RunningElement::AdjustYPos()
 {
     int i;
     for (i = 0; i < 9; i++) {
-        ArrayOfObjects *objects = &m_positionnedObjects[i];
-        ArrayOfObjects::iterator iter;
+        ArrayOfTextElements *textElements = &m_positionnedObjects[i];
+        ArrayOfTextElements::iterator iter;
         int cumulatedYRel = 0;
-        for (iter = objects->begin(); iter != objects->end(); iter++) {
+        for (iter = textElements->begin(); iter != textElements->end(); iter++) {
             if ((*iter)->HasContentBB()) {
                 int yShift = (*iter)->GetContentY2();
                 if ((*iter)->Is(REND)) {

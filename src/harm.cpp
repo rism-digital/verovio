@@ -55,9 +55,6 @@ void Harm::AddChild(Object *child)
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
     }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
-    }
     else if (child->Is(FB)) {
         assert(dynamic_cast<Fb *>(child));
     }

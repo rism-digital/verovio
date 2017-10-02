@@ -80,9 +80,6 @@ void EditorialElement::AddChild(Object *child)
     else if (child->IsTextElement()) {
         assert(dynamic_cast<TextElement *>(child));
     }
-    else if (child->Is(FIG)) {
-        assert(dynamic_cast<Fig *>(child));
-    }
     else if (child->Is(LAYER)) {
         assert(dynamic_cast<Layer *>(child));
     }
