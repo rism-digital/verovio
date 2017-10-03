@@ -58,5 +58,23 @@ void Fig::AddChild(Object *child)
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+        
+int Fig::AlignVertically(FunctorParams *functorParams)
+{
+    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    assert(params);
+    
+    Svg *svg = dynamic_cast<Svg *>(this->FindChildByType(SVG));
+    int width = (svg) ? svg->GetWidth() : 0;
+    
+    if (this->GetHalign() == HORIZONTALALIGNMENT_right) {
+        this->SetDrawingXRel(params->m_pageWidth - width);
+    }
+    else if (this->GetHalign() == HORIZONTALALIGNMENT_center) {
+        this->SetDrawingXRel((params->m_pageWidth - width) / 2);
+    }
 
+    return FUNCTOR_SIBLINGS;
+}
+    
 } // namespace vrv

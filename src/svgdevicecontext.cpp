@@ -854,7 +854,7 @@ std::string SvgDeviceContext::GetStringSVG(bool xml_declaration)
     
 void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 {
-    bool drawBoundingBox = false;
+    bool drawBoundingBox = true;
     if (drawBoundingBox && view) {
         BoundingBox *box = object;
         // For floating elements, get the current bounding box set by System::SetCurrentFloatingPositioner
