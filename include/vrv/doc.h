@@ -138,6 +138,11 @@ public:
     ///@}
 
     /**
+     * Set the name of the used Smufl-font.
+     */
+    void SetDrawingSmuflFontName(const std::string &fontName);
+
+    /**
      * @name Setters for the page dimensions and margins
      */
     ///@{
