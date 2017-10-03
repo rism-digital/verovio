@@ -50,10 +50,18 @@ Item {
         adjustPageHeight: true
 
         resourcesDataPath: "../../data"
-        fontDirPath: "../../fonts"
 
         fileName: options.fileName
-        musicFont: options.musicFont
+        musicFontName: options.musicFontName
+        musicFontPath: {
+            if (options.musicFontName == "Bravura")
+                ":/fonts/Bravura.otf"
+            else if (options.musicFontName == "Leipzig")
+                ":/fonts/Leipzig.ttf"
+            else if (options.musicFontName == "Gootville")
+                ":/fonts/Gootville.otf"
+        }
+        verovioTextFontPath: ":/fonts/VerovioText.ttf"
     }
 
     ListView {
@@ -63,7 +71,7 @@ Item {
         model: verovioToolkit.pageCount
 
         delegate: VerovioView {
-            verovioDoc: verovioToolkit
+            toolkit: verovioToolkit
             width:  root.width
             height: verovioToolkit.adjustedDisplayHeightForPage(index+1)
             pageNumber: index + 1

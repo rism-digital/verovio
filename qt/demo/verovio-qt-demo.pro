@@ -7,7 +7,7 @@ SOURCES += main.cpp
 
 HEADERS +=
 
-RESOURCES += qml.qrc
+RESOURCES += qml.qrc verovio.qrc
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which as been marked deprecated (the exact warnings

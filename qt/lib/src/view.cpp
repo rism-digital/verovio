@@ -30,19 +30,19 @@ View::~View()
     }
 }
 
-void View::setVerovioDoc(Toolkit *verovioDoc)
+void View::setToolkit(Toolkit *toolkit)
 {
-    if (m_verovioDoc != verovioDoc) {
+    if (m_toolkit != toolkit) {
         if (m_documentLayoutChangedConnection) {
             disconnect(m_documentLayoutChangedConnection);
         }
-        m_verovioDoc = verovioDoc;
-        m_documentLayoutChangedConnection = connect(m_verovioDoc, &Toolkit::documentLayoutChanged, [this]() {
+        m_toolkit = toolkit;
+        m_documentLayoutChangedConnection = connect(m_toolkit, &Toolkit::documentLayoutChanged, [this]() {
             m_verovioRenderingDirty = true;
             update();
         });
 
-        emit verovioDocChanged(m_verovioDoc);
+        emit toolkitChanged(m_toolkit);
     }
 }
 
@@ -71,11 +71,11 @@ QSGNode *View::updatePaintNode(QSGNode *node, UpdatePaintNodeData *)
         }
         m_qtDeviceContext->Clear();
 
-        m_verovioDoc->renderPage(m_pageNumber, m_qtDeviceContext.get());
+        m_toolkit->renderPage(m_pageNumber, m_qtDeviceContext.get());
         m_verovioRenderingDirty = false;
 
-        m_verovioDoc->setAdjustedDisplayHeightForPage(m_pageNumber, m_qtDeviceContext->GetScaledHeight());
-        setHeight(m_verovioDoc->adjustedDisplayHeightForPage(m_pageNumber));
+        m_toolkit->setAdjustedDisplayHeightForPage(m_pageNumber, m_qtDeviceContext->GetScaledHeight());
+        setHeight(m_toolkit->adjustedDisplayHeightForPage(m_pageNumber));
     }
 
     return node;

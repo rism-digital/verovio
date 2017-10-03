@@ -16,8 +16,8 @@ Item {
 
     width: layout.width
 
-    property string fileName: "../../doc/tests/mei/01_mensural/01_durations.mei"
-    property string musicFont: "Leipzig"
+    property string fileName: ":/mei/test.mei"
+    property string musicFontName: "Leipzig"
 
     Column {
         id: layout
@@ -69,10 +69,10 @@ Item {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignBaseline
                 onCountChanged: {
-                    currentIndex = musicFontComboxBox.find(root.musicFont)
+                    currentIndex = musicFontComboxBox.find(root.musicFontName)
                 }
                 onActivated: {
-                    root.musicFont = currentText
+                    root.musicFontName = currentText
                 }
             }
         }
@@ -80,6 +80,6 @@ Item {
 
     Settings {
         property alias fileName: root.fileName
-        property alias musicFont: root.musicFont
+        property alias musicFontName: root.musicFontName
     }
 }

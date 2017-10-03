@@ -21,7 +21,7 @@ namespace vrvQt {
 class Toolkit;
 
 //----------------------------------------------------------------------------
-// VerovioPage
+// vrvQt View
 //----------------------------------------------------------------------------
 
 /**
@@ -31,7 +31,7 @@ class View : public QQuickItem {
     Q_OBJECT
 
     // Note: The namespace is required when specifying Qt properties
-    Q_PROPERTY(vrvQt::Toolkit *verovioDoc MEMBER m_verovioDoc WRITE setVerovioDoc)
+    Q_PROPERTY(vrvQt::Toolkit *toolkit MEMBER m_toolkit WRITE setToolkit)
     Q_PROPERTY(int pageNumber MEMBER m_pageNumber WRITE setPageNumber)
 
 public:
@@ -49,15 +49,15 @@ public slots:
      * @name Setters for public properties.
      */
     ///@{
-    void setVerovioDoc(Toolkit *verovioDoc);
+    void setToolkit(Toolkit *toolkit);
     void setPageNumber(int pageNumber);
     ///@}
 
 signals:
     /**
-     * @name This signal is emitted when the attached verovioDoc changes.
+     * @name This signal is emitted when the attached toolkit changes.
      */
-    void verovioDocChanged(Toolkit *verovicoDoc);
+    void toolkitChanged(Toolkit *toolkit);
 
 protected:
     /**
@@ -70,7 +70,7 @@ protected:
 
 private:
     // variables to store the public properties
-    Toolkit *m_verovioDoc{ nullptr };
+    Toolkit *m_toolkit{ nullptr };
     int m_pageNumber{ 0 };
 
     // stores if the rendering has to be redone

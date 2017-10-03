@@ -11,6 +11,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QFileInfo>
 #include <QFontDatabase>
 #include <QUrl>
 
@@ -19,7 +20,6 @@ Toolkit::Toolkit()
     : m_verovioToolkit(false)
     , m_displayWidth(m_verovioToolkit.GetPageWidth())
     , m_displayHeight(m_verovioToolkit.GetPageHeight())
-    , m_musicFont("Leipzig")
 {
     connect(this, SIGNAL(documentLayoutInvalidated()), this, SLOT(documentRelayout()), Qt::QueuedConnection);
     connect(this, SIGNAL(fileNameInvalidated()), this, SLOT(readFile()), Qt::QueuedConnection);
@@ -97,10 +97,30 @@ void Toolkit::setFileName(QString fileName)
     }
 }
 
-void Toolkit::setMusicFont(QString musicFont)
+void Toolkit::setMusicFontName(QString musicFont)
 {
-    if (m_musicFont != musicFont) {
-        m_musicFont = musicFont;
+    if (m_musicFontName != musicFont) {
+        m_musicFontName = musicFont;
+        m_fontInitDone = false;
+        initFont();
+        requestDocumentRelayout();
+    }
+}
+
+void Toolkit::setMusicFontPath(QString musicFontPath)
+{
+    if (m_musicFontPath != musicFontPath) {
+        m_musicFontPath = musicFontPath;
+        m_fontInitDone = false;
+        initFont();
+        requestDocumentRelayout();
+    }
+}
+
+void Toolkit::setVerovioTextFontPath(QString verovioTextFontPath)
+{
+    if (m_verovioTextFontPath != verovioTextFontPath) {
+        m_verovioTextFontPath = verovioTextFontPath;
         m_fontInitDone = false;
         initFont();
         requestDocumentRelayout();
@@ -180,18 +200,12 @@ void Toolkit::setResourcesDataPath(QString resourcesDataPath)
         bool success = m_verovioToolkit.SetResourcePath(resourcesDataPath.toStdString());
 
         if (!success) {
+            m_resourcesDataInitialized = false;
             qWarning() << "The music font could not be loaded; please check the contents of the resource directory.";
             return;
         }
-        requestDocumentRelayout();
-    }
-}
-
-void Toolkit::setFontDirPath(QString fontDirPath)
-{
-    if (m_fontDirPath != fontDirPath) {
-        m_fontDirPath = fontDirPath;
-        requestDocumentRelayout();
+        m_resourcesDataInitialized = true;
+        requestReloadData();
     }
 }
 
@@ -211,24 +225,37 @@ void Toolkit::setSpacingSystem(int spacingSystem)
     }
 }
 
-void Toolkit::initFont()
+bool Toolkit::addFont(QString fontFilePath)
 {
-    if (m_fontInitDone) return;
+    int fontId = QFontDatabase::addApplicationFont(fontFilePath);
+    if (fontId == -1) {
+        QFileInfo fontFile(fontFilePath);
+        if (!fontFile.exists() || !fontFile.isFile()) {
+            qWarning() << "Font file" << fontFilePath << "does not exist!";
+        }
+        else {
+            qWarning() << "Could not add font" << fontFilePath << "(file exists)";
+        }
+        return false;
+    }
+    return true;
+}
+
+bool Toolkit::initFont()
+{
+    if (m_musicFontName.isEmpty() || m_musicFontPath.isEmpty() || m_verovioTextFontPath.isEmpty()) {
+        return false;
+    }
+
+    if (m_fontInitDone) return true;
     m_fontInitDone = true;
 
-    m_verovioToolkit.SetFont(m_musicFont.toStdString());
+    m_verovioToolkit.SetFont(m_musicFontName.toStdString());
 
-    if (m_musicFont == "Bravura")
-        QFontDatabase::addApplicationFont(m_fontDirPath + "/Bravura-1.204.otf");
-    else if (m_musicFont == "Leipzig")
-        QFontDatabase::addApplicationFont(m_fontDirPath + "/Leipzig-5.2.ttf");
-    else if (m_musicFont == "Gootville")
-        QFontDatabase::addApplicationFont(m_fontDirPath + "/Gootville-1.2.otf");
-    else
-        qWarning() << "Using currently unsupported font:" << m_musicFont;
+    addFont(m_musicFontPath);
+    addFont(m_verovioTextFontPath);
 
-    // Always add VerovioText (required e.g. for # in harmonies)
-    QFontDatabase::addApplicationFont(m_fontDirPath + "/VerovioText-1.0.ttf");
+    return true;
 }
 
 void Toolkit::requestReadFile()
@@ -276,6 +303,8 @@ void Toolkit::reloadData()
 {
     m_reloadDataRequested = false;
 
+    if (!m_resourcesDataInitialized) return;
+
     bool success = m_verovioToolkit.LoadData(m_fileContent.toStdString());
     setHasValidData(success);
 
@@ -295,7 +324,10 @@ void Toolkit::documentRelayout()
         return;
     }
 
-    initFont();
+    if (!initFont()) {
+        qWarning() << "Could not layout document because fonts are not correctly initialized";
+        return;
+    }
 
     m_verovioToolkit.SetPageWidth(static_cast<int>(m_displayWidth * 100.0 / m_verovioToolkit.GetScale()));
     m_verovioToolkit.SetPageHeight(static_cast<int>(m_displayHeight * 100.0 / m_verovioToolkit.GetScale()));

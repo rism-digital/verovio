@@ -20,7 +20,7 @@
 namespace vrvQt {
 
 //----------------------------------------------------------------------------
-// VerovioDoc
+// vrvQt Toolkit
 //----------------------------------------------------------------------------
 
 /**
@@ -30,10 +30,11 @@ class Toolkit : public QObject {
     Q_OBJECT
 
     Q_PROPERTY(QString resourcesDataPath MEMBER m_resourcesDataPath WRITE setResourcesDataPath)
-    Q_PROPERTY(QString fontDirPath MEMBER m_fontDirPath WRITE setFontDirPath)
     Q_PROPERTY(QString fileName MEMBER m_fileName WRITE setFileName)
     Q_PROPERTY(QString fileContent MEMBER m_fileContent WRITE setFileContent)
-    Q_PROPERTY(QString musicFont MEMBER m_musicFont WRITE setMusicFont)
+    Q_PROPERTY(QString musicFontName MEMBER m_musicFontName WRITE setMusicFontName)
+    Q_PROPERTY(QString musicFontPath MEMBER m_musicFontPath WRITE setMusicFontPath)
+    Q_PROPERTY(QString verovioTextFontPath MEMBER m_verovioTextFontPath WRITE setVerovioTextFontPath)
     Q_PROPERTY(int pageCount MEMBER m_pageCount READ pageCount NOTIFY pageCountChanged)
     Q_PROPERTY(int displayWidth MEMBER m_displayWidth WRITE setDisplayWidth)
     Q_PROPERTY(int displayHeight MEMBER m_displayHeight WRITE setDisplayHeight)
@@ -70,17 +71,17 @@ public:
     int pageCount() const { return m_pageCount; }
 
     /**
-     * @name Render the given page of this document to the specified deviceContext.
+     * @name Render the given page of the currently set document to the specified deviceContext.
      */
     void renderPage(int page, vrv::DeviceContext *deviceContext);
 
     /**
-     * @name Returns if the document has valid data to show.
+     * @name Returns if the toolkit has valid data to show.
      */
     bool hasValidData() const { return m_hasValidData; }
 
     /**
-     * @name Returns the current scale of the document.
+     * @name Returns the current scale of the toolkit.
      */
     int getScale() { return m_verovioToolkit.GetScale(); }
 
@@ -90,10 +91,11 @@ public slots:
      */
     ///@{
     void setResourcesDataPath(QString resourcesDataPath);
-    void setFontDirPath(QString fontDirPath);
     void setFileName(QString fileName);
     void setFileContent(QString fileContent);
-    void setMusicFont(QString musicFont);
+    void setMusicFontName(QString musicFontName);
+    void setMusicFontPath(QString musicFontPath);
+    void setVerovioTextFontPath(QString verovioTextFontPath);
     void setDisplayWidth(int displayWidth);
     void setDisplayHeight(int displayHeight);
     void setScale(int scale);
@@ -167,9 +169,12 @@ private:
     void setPageCount(int pageCount);
 
     /**
-     * @name Initialies required fonts.
+     * @name Initialise required fonts.
      */
-    void initFont();
+    ///@{
+    bool initFont();
+    bool addFont(QString fontFilePath);
+    ///@}
 
     /**
      * @name Setter for hasValidData.
@@ -184,25 +189,31 @@ private:
 
     int m_pageCount{ 0 };
 
-    // adjusted page heights for the currently layouted document
+    // adjusted display heights for the currently layouted document
     QVector<int> m_adjustedDisplayHeights;
 
     // font name for the music symbols (e.g. notes)
-    QString m_musicFont;
+    QString m_musicFontName;
 
-    // paths to the resource and font dirs
+    // font path to the music symbols font
+    QString m_musicFontPath;
+
+    // font path to the verovio text font (required e.g. for # in harmonies)
+    QString m_verovioTextFontPath;
+
+    // path to the resource dir
     QString m_resourcesDataPath;
-    QString m_fontDirPath;
 
     QString m_fileName;
     QString m_fileContent;
 
-    // flags to store state of document
+    // flags to store the state of the vrvQt toolkit
     bool m_documentRelayoutRequested{ false };
     bool m_reloadDataRequested{ false };
     bool m_readFileRequested{ false };
     bool m_fontInitDone{ false };
     bool m_hasValidData{ false };
+    bool m_resourcesDataInitialized{ false };
 };
 } // namespace vrvQt
 #endif // __VRV_QT_TOOLKIT_H__
