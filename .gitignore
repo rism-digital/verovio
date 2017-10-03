@@ -29,25 +29,24 @@ emscripten/data/
 emscripten/build/
 
 # python build
-python/verovio_wrap.cpp
-python/verovio.pyc
-python/verovio.py
-python/_verovio.so
+bindings/python/verovio_wrap.cpp
+bindings/python/verovio.pyc
+bindings/python/verovio.py
+bindings/python/_verovio.so
 
 # java build
-java/verovio_wrap.cxx
-java/main.class
-java/src/
-java/target/
-output.mei
+bindings/java/verovio_wrap.cxx
+bindings/java/main.class
+bindings/java/src/
+bindings/java/target/
 main.class
 leipzig-5.2.log
 leipzig-5.2_data.ly
 
 # Qt build
-qt/build-verovio-qt-*
+bindings/qt/build-verovio-qt-*
 *.pro.user
 
 # MacOS
 .DS_Store
-libverovio.dylib
+tools/libverovio.dylib
