@@ -185,7 +185,7 @@ bool Toolkit::SetSpacingNonLinear(float spacingNonLinear)
 
 bool Toolkit::SetOutputFormat(std::string const &outformat)
 {
-    if (outformat == "humdrum") {
+    if ((outformat == "humdrum") || (outformat == "hum")) {
         m_outformat = HUMDRUM;
     }
     else if (outformat == "mei") {
@@ -212,7 +212,7 @@ bool Toolkit::SetFormat(std::string const &informat)
     else if (informat == "darms") {
         m_format = DARMS;
     }
-    else if (informat == "humdrum") {
+    else if ((informat == "humdrum") || (informat == "hum")) {
         m_format = HUMDRUM;
     }
     else if (informat == "mei") {
@@ -223,6 +223,9 @@ bool Toolkit::SetFormat(std::string const &informat)
     }
     else if (informat == "musicxml-hum") {
         m_format = MUSICXMLHUM;
+    }
+    else if (informat == "mei-hum") {
+        m_format = MEIHUM;
     }
     else if (informat == "esac") {
         m_format = ESAC;
@@ -335,6 +338,7 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
 
 bool Toolkit::SetFont(std::string const &font)
 {
+    m_doc.SetDrawingSmuflFontName(font);
     return Resources::SetFont(font);
 };
 
@@ -422,10 +426,20 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     if (inputFormat == PAE) {
+#ifndef NO_PAE_SUPPORT
         input = new PaeInput(&m_doc, "");
+#else
+        LogError("Plaine & Easie import is not supported in this build.");
+        return false;
+#endif
     }
     else if (inputFormat == DARMS) {
+#ifndef NO_DARMS_SUPPORT
         input = new DarmsInput(&m_doc, "");
+#else
+        LogError("DARMS import is not supported in this build.");
+        return false;
+#endif
     }
 #ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == HUMDRUM) {
@@ -467,7 +481,6 @@ bool Toolkit::LoadData(const std::string &data)
         input = new MusicXmlInput(&m_doc, "");
     }
 #ifndef NO_HUMDRUM_SUPPORT
-
     else if (inputFormat == MUSICXMLHUM) {
         // This is the indirect converter from MusicXML to MEI using iohumdrum:
         hum::Tool_musicxml2hum converter;
@@ -477,6 +490,36 @@ bool Toolkit::LoadData(const std::string &data)
         bool status = converter.convert(conversion, xmlfile);
         if (!status) {
             LogError("Error converting MusicXML data");
+            return false;
+        }
+        std::string buffer = conversion.str();
+        SetHumdrumBuffer(buffer.c_str());
+
+        // Now convert Humdrum into MEI:
+        Doc tempdoc;
+        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        tempinput->SetTypeOption(GetHumType());
+        if (!tempinput->ImportString(conversion.str())) {
+            LogError("Error importing Humdrum data");
+            delete tempinput;
+            return false;
+        }
+        MeiOutput meioutput(&tempdoc, "");
+        meioutput.SetScoreBasedMEI(true);
+        newData = meioutput.GetOutput();
+        delete tempinput;
+        input = new MeiInput(&m_doc, "");
+    }
+
+    else if (inputFormat == MEIHUM) {
+        // This is the indirect converter from MusicXML to MEI using iohumdrum:
+        hum::Tool_mei2hum converter;
+        pugi::xml_document xmlfile;
+        xmlfile.load(data.c_str());
+        stringstream conversion;
+        bool status = converter.convert(conversion, xmlfile);
+        if (!status) {
+            LogError("Error converting MEI data");
             return false;
         }
         std::string buffer = conversion.str();
@@ -525,7 +568,6 @@ bool Toolkit::LoadData(const std::string &data)
         delete tempinput;
         input = new MeiInput(&m_doc, "");
     }
-
 #endif
     else {
         LogMessage("Unsupported format");
@@ -639,7 +681,7 @@ bool Toolkit::ParseOptions(const std::string &json_options)
     if (json.has<jsonxx::String>("font")) SetFont(json.get<jsonxx::String>("font"));
 
     if (json.has<jsonxx::Number>("mmOutput")) SetMMOutput(json.get<jsonxx::Number>("mmOutput"));
-    
+
     if (json.has<jsonxx::Number>("pageWidth")) SetPageWidth(json.get<jsonxx::Number>("pageWidth"));
 
     if (json.has<jsonxx::Number>("pageHeight")) SetPageHeight(json.get<jsonxx::Number>("pageHeight"));
@@ -849,7 +891,7 @@ void Toolkit::RedoPagePitchPosLayout()
     page->LayOutPitchPos();
 }
 
-std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
+bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 {
     // Page number is one-based - correct it to 0-based first
     pageNo--;
@@ -864,22 +906,33 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
     if (m_noLayout) width = m_doc.GetAdjustedDrawingPageWidth();
     if (m_adjustPageHeight || m_noLayout) height = m_doc.GetAdjustedDrawingPageHeight();
 
+    // set dimensions
+    deviceContext->SetWidth(width);
+    deviceContext->SetHeight(height);
+    double userScale = m_view.GetPPUFactor() * m_scale / 100;
+    deviceContext->SetUserScale(userScale, userScale);
+
+    // render the page
+    m_view.DrawCurrentPage(deviceContext, false);
+
+    return true;
+}
+
+std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
+{
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
-    SvgDeviceContext svg(width, height);
-    
+    SvgDeviceContext svg;
+
     if (m_mmOutput) {
         svg.SetMMOutput(true);
     }
-
-    // set scale and border from user options
-    svg.SetUserScale(m_view.GetPPUFactor() * (double)m_scale / 100, m_view.GetPPUFactor() * (double)m_scale / 100);
 
     // debug BB?
     svg.SetDrawBoundingBoxes(m_showBoundingBoxes);
 
     // render the page
-    m_view.DrawCurrentPage(&svg, false);
+    RenderToDeviceContext(pageNo, &svg);
 
     std::string out_str = svg.GetStringSVG(xml_declaration);
     return out_str;

@@ -65,10 +65,28 @@ public:
         m_drawingBoundingBoxes = false;
         m_isDeactivatedX = false;
         m_isDeactivatedY = false;
+        m_width = 0;
+        m_height = 0;
+        m_userScaleX = 1.0;
+        m_userScaleY = 1.0;
     }
     virtual ~DeviceContext(){};
     virtual ClassId GetClassId() const;
     bool Is(ClassId classId) const { return (this->GetClassId() == classId); }
+    ///@}
+
+    /**
+     * @name Getters and setters for common attributes.
+     * Non-virtual methods cannot be overridden and manage the width, height and user-scale
+     */
+    ///@{
+    void SetWidth(int width) { m_width = width; }
+    void SetHeight(int height) { m_height = height; }
+    void SetUserScale(double scaleX, double scaleY) { m_userScaleX = scaleX; m_userScaleY = scaleY; }
+    int GetWidth() { return m_width; }
+    int GetHeight() { return m_height; }
+    double GetUserScaleX() { return m_userScaleX; }
+    double GetUserScaleY() { return m_userScaleY; }
     ///@}
 
     /**
@@ -264,6 +282,15 @@ protected:
     /** flag for indicating if the graphic is deactivated */
     bool m_isDeactivatedX;
     bool m_isDeactivatedY;
+
+private:
+    /** stores the width and height of the device context */
+    int m_width;
+    int m_height;
+
+    /** stores the scale as requested by the used */
+    double m_userScaleX;
+    double m_userScaleY;
 };
 
 } // namespace vrv

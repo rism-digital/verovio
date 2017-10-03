@@ -205,7 +205,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
-    if (accid->GetFunc() == accidLog_FUNC_edit) {
+    if ((accid->GetFunc() == accidLog_FUNC_edit) && (!accid->HasEnclose())) {
         y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
@@ -215,6 +215,8 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             // Check if the top of the stem is above
             if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd(note).y > y))
                 y = note->GetDrawingStemEnd(note).y;
+            // Increase the x position of the accid
+            x += note->GetDrawingRadius(m_doc);
         }
         TextExtend extend;
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->GetDrawingCueSize()));

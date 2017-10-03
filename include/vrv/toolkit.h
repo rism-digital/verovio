@@ -26,7 +26,7 @@
 
 namespace vrv {
 
-enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM, ESAC, MIDI, TIMEMAP };
+enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM, MEIHUM, ESAC, MIDI, TIMEMAP };
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -94,6 +94,12 @@ public:
      * This is used only for Emscripten-based compilation.
      */
     void ResetLogBuffer();
+
+    /**
+     * Render the page to the deviceContext.
+     * Page number is 1-based.
+     */
+    bool RenderToDeviceContext(int pageNo, DeviceContext *deviceContext);
 
     /**
      * Render the page in SVG and returns it as a string.
@@ -284,7 +290,7 @@ public:
     void SetEvenNoteSpacing(bool even) { m_evenNoteSpacing = even; }
     int GetEvenNoteSpacing() { return m_evenNoteSpacing; }
     ///@}
-    
+
     /**
      * @name Set SVG output in mm (for PDF generation with a 72 dpi)
      */

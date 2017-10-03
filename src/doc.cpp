@@ -1018,6 +1018,11 @@ int Doc::GetCueSize(int value) const
     return value * this->m_style->m_graceNum / this->m_style->m_graceDen;
 }
 
+void Doc::SetDrawingSmuflFontName(const std::string & fontName)
+{
+    m_drawingSmuflFont.SetFaceName(fontName.c_str());
+}
+
 FontInfo *Doc::GetDrawingSmuflFont(int staffSize, bool graceSize)
 {
     int value = m_drawingSmuflFontSize * staffSize / 100;

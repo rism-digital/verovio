@@ -24,7 +24,7 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// BBoxDeviceContext
+// SvgDeviceContext
 //----------------------------------------------------------------------------
 
 /**
@@ -38,7 +38,7 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    SvgDeviceContext(int width, int height);
+    SvgDeviceContext();
     virtual ~SvgDeviceContext();
     virtual ClassId GetClassId() const { return SVG_DEVICE_CONTEXT; }
     ///@}
@@ -53,7 +53,6 @@ public:
     virtual void SetTextForeground(int colour);
     virtual void SetTextBackground(int colour);
     virtual void SetLogicalOrigin(int x, int y);
-    virtual void SetUserScale(double xScale, double yScale);
     ///@}
 
     /**
@@ -211,9 +210,7 @@ private:
     std::ostringstream m_outdata;
 
     bool m_committed; // did we flushed the file?
-    int m_width, m_height;
     int m_originX, m_originY;
-    double m_userScaleX, m_userScaleY;
 
     // holds the list of glyphs from the smufl font used so far
     // they will be added at the end of the file as <defs>
