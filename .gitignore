@@ -23,6 +23,7 @@ tools/Makefile
 tools/cmake_install.cmake
 tools/install_manifest.txt
 tools/verovio
+tools/libverovio.dylib
 
 # emscripten build
 emscripten/data/
@@ -49,4 +50,7 @@ bindings/qt/build-verovio-qt-*
 
 # MacOS
 .DS_Store
-tools/libverovio.dylib
+
+# Output files
+output.svg
+output.mei
