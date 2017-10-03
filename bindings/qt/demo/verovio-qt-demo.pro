@@ -21,12 +21,12 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 {
-    INCLUDEPATH += ../../include/
-    INCLUDEPATH += ../../include/vrv
-    INCLUDEPATH += ../../include/pugi
-    INCLUDEPATH += ../../include/utf8
-    INCLUDEPATH += ../../libmei
-    LIBS += -L../../tools -lverovio
+    INCLUDEPATH += ../../../include/
+    INCLUDEPATH += ../../../include/vrv
+    INCLUDEPATH += ../../../include/pugi
+    INCLUDEPATH += ../../../include/utf8
+    INCLUDEPATH += ../../../libmei
+    LIBS += -L../../../tools -lverovio
 }
 
 {
