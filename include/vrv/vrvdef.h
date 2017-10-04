@@ -173,6 +173,7 @@ enum ClassId {
     //
     BBOX_DEVICE_CONTEXT,
     SVG_DEVICE_CONTEXT,
+    CUSTOM_DEVICE_CONTEXT,
     //
     UNSPECIFIED
 };

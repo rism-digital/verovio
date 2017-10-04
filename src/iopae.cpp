@@ -9,9 +9,14 @@
 
 //----------------------------------------------------------------------------
 
+#ifndef NO_PAE_SUPPORT
+
 #include <assert.h>
+#include <regex>
 #include <sstream>
 #include <string>
+
+#endif /* NO_PAE_SUPPORT */
 
 //----------------------------------------------------------------------------
 
@@ -40,11 +45,9 @@
 
 //----------------------------------------------------------------------------
 
-#ifndef NO_PAE_SUPPORT
-#include <regex>
-#endif
-
 namespace vrv {
+
+#ifndef NO_PAE_SUPPORT
 
 #define BEAM_INITIAL 0x01
 #define BEAM_MEDIAL 0x02
@@ -91,30 +94,18 @@ PaeInput::~PaeInput()
 
 bool PaeInput::ImportFile()
 {
-#ifndef NO_PAE_SUPPORT
     std::ifstream infile;
     infile.open(m_filename.c_str());
     parsePlainAndEasy(infile);
     return true;
-#else
-    LogError("Plaine & Easie import is not supported in this build.");
-    return false;
-#endif
 }
 
 bool PaeInput::ImportString(std::string const &pae)
 {
-#ifndef NO_PAE_SUPPORT
     std::istringstream in_stream(pae);
     parsePlainAndEasy(in_stream);
     return true;
-#else
-    LogError("Plaine & Easie import is not supported in this build.");
-    return false;
-#endif
 }
-
-#ifndef NO_PAE_SUPPORT
 
 //////////////////////////////
 //

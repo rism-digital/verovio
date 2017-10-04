@@ -61,13 +61,13 @@ int KeySig::octave_map[2][9][7] = {
 // KeySig
 //----------------------------------------------------------------------------
 
-KeySig::KeySig() : LayerElement("ksig-"), AttAccidental(), AttPitch()
+KeySig::KeySig() : LayerElement("keysig-"), AttAccidental(), AttPitch()
 {
     Init();
 }
 
 KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_WRITTEN alterationType)
-    : LayerElement("ksig-"), AttAccidental(), AttPitch()
+    : LayerElement("keysig-"), AttAccidental(), AttPitch()
 {
     Init();
 
@@ -75,7 +75,7 @@ KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_WRITTEN alterationType)
     m_alterationType = alterationType;
 }
 
-KeySig::KeySig(const ScoreDefInterface *keySigAttr) : LayerElement("ksig-"), AttAccidental(), AttPitch()
+KeySig::KeySig(const ScoreDefInterface *keySigAttr) : LayerElement("keysig-"), AttAccidental(), AttPitch()
 {
     Init();
 
