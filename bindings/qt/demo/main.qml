@@ -49,7 +49,7 @@ Item {
         scale: 50
         adjustPageHeight: true
 
-        resourcesDataPath: "../../data"
+        resourcesDataPath: "../../../data"
 
         fileName: options.fileName
         musicFontName: options.musicFontName

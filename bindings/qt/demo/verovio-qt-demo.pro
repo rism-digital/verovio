@@ -31,5 +31,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 {
     INCLUDEPATH += ../../qt/lib/include
-    LIBS += -L../../qt/build -lverovio-qt
+    LIBS += -L../../qt/build-library -lverovio-qt
 }
