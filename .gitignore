@@ -8,7 +8,6 @@ build/
 # Qt Creator
 tools/CMakeLists.txt.user
 build-tools-*
-build
 
 # doc generated file
 doc/pae-tests.html
@@ -23,7 +22,9 @@ tools/Makefile
 tools/cmake_install.cmake
 tools/install_manifest.txt
 tools/verovio
+tools/build-library
 tools/libverovio.dylib
+tools/libverovio.so
 
 # emscripten build
 emscripten/data/
@@ -46,6 +47,8 @@ leipzig-5.2_data.ly
 
 # Qt build
 bindings/qt/build-verovio-qt-*
+bindings/qt/build-library
+bindings/qt/build-demo
 *.pro.user
 
 # MacOS
