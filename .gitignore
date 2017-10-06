@@ -56,6 +56,10 @@ bindings/qt/build-library
 bindings/qt/build-demo
 *.pro.user
 
+# Android build
+tools/android/obj
+tools/android/libs
+
 # MacOS
 .DS_Store
 

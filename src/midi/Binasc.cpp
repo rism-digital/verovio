@@ -13,7 +13,7 @@
 
 #include <sstream>
 #include <stdlib.h>
-
+#include <stdlib.h>     /* strtod */
 
 namespace smf {
 
