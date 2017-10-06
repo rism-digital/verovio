@@ -27,6 +27,24 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
     INCLUDEPATH += ../../../include/utf8
     INCLUDEPATH += ../../../libmei
     INCLUDEPATH += ../lib/include
+}
+
+android {
+    message("* Using settings for Android.")
+
+    LIBS += -L../../../tools/android/libs/armeabi-v7a -lverovio-android
+    LIBS += -L../build-android -lverovio-qt
+
+    ANDROID_EXTRA_LIBS += "../../../tools/android/libs/armeabi-v7a/libverovio-android.so"
+    ANDROID_EXTRA_LIBS += "../build-android/libverovio-qt.so"
+
+    # The 'data' directory with the font resources is put into the assets of the Android APK
+    resources_data.path = /assets/data
+    resources_data.files = $$files($$PWD/../../../data/*)
+    INSTALLS += resources_data
+}
+else {
+    message("* Using settings for Other (Linux, Mac, Windows, ...).")
 
     LIBS += -L../build-library -lverovio-qt
     LIBS += -L../../../tools -lverovio

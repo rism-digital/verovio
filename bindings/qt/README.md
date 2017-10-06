@@ -40,3 +40,21 @@ To start the Qt demo add the directories for the CPP and Qt libraries to LD_LIBR
 LD_LIBRARY_PATH=../../../tools/:../build-library ./verovio-qt-demo
 ```
 
+Android
+-------
+
+The demo can also be compiled for Android. This requires following steps:
+
+1) Build the Verovio C++ project for Android: VEROVIO_ROOT/tools/android. See there for build instructions.
+
+2) Build the verovio-qt library for Android:
+    - The steps are basically the same as in the normal build instructions.
+    - Run the qmake from a build-android directory
+    - Use the qmake version for android_armv7 (e.g. QTDIR/5.9.1/android_armv7/bin/qmake)
+
+3) Building the verovio-qt-demo from command line is possible, but if you want to deploy the demo to your phone it is easier to use QtCreator:
+    - Open the verovio-qt-demo.pro file with QtCreator
+    - Configure the project for an Android kit (e.g. "Android for armeabi-v7a (GCC 4.9 Qt 5.8.0 for Android armv72")
+    - Build and deploy to your Android device.
+
+Known issues: The "Choose file" dialog is severely broken and it opens behind the Options pane.

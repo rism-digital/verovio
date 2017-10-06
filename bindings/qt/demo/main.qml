@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 import QtQuick 2.7
-import QtQuick.Controls 2.2
+import QtQuick.Controls 2.1
 import Qt.labs.settings 1.0
 import VerovioQml 1.0
 
@@ -49,7 +49,7 @@ Item {
         scale: 50
         adjustPageHeight: true
 
-        resourcesDataPath: "../../../data"
+        resourcesDataPath: Qt.platform.os == "android" ? "assets:/data" : "../../../data"
 
         fileName: options.fileUrl
         musicFontName: options.musicFontName
@@ -79,24 +79,36 @@ Item {
         ScrollBar.vertical: ScrollBar { }
         ScrollBar.horizontal: ScrollBar { }
 
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.NoButton
-            onWheel: {
-                if (wheel.modifiers & Qt.ControlModifier) {
-                    // calculate new scale
-                    verovioToolkit.scale = verovioToolkit.scale * (1 + 0.1 * wheel.angleDelta.y / 120)
 
-                    // put scale to limits
-                    if (wheel.angleDelta.y < 0 && verovioToolkit.scale < 20)
-                        verovioToolkit.scale = 20
-                    else if (wheel.angleDelta.y > 0 && verovioToolkit.scale > 300)
-                        verovioToolkit.scale = 300
-                    else if (verovioToolkit.scale >= 95 && verovioToolkit.scale <= 105)
-                        verovioToolkit.scale = 100
-                }
-                else {
-                    wheel.accepted = false
+        PinchArea {
+            anchors.fill: parent
+
+            property var orgPointSize;
+            onPinchStarted: {
+                orgPointSize = verovioToolkit.scale;
+            }
+            onPinchUpdated: {
+                verovioToolkit.scale = orgPointSize * pinch.scale
+            }
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.NoButton
+                onWheel: {
+                    if (wheel.modifiers & Qt.ControlModifier) {
+                        // calculate new scale
+                        verovioToolkit.scale = verovioToolkit.scale * (1 + 0.1 * wheel.angleDelta.y / 120)
+
+                        // put scale to limits
+                        if (wheel.angleDelta.y < 0 && verovioToolkit.scale < 20)
+                            verovioToolkit.scale = 20
+                        else if (wheel.angleDelta.y > 0 && verovioToolkit.scale > 300)
+                            verovioToolkit.scale = 300
+                        else if (verovioToolkit.scale >= 95 && verovioToolkit.scale <= 105)
+                            verovioToolkit.scale = 100
+                    }
+                    else {
+                        wheel.accepted = false
+                    }
                 }
             }
         }

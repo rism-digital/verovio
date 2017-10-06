@@ -13,6 +13,10 @@
 #include <QObject>
 #include <QVector>
 
+#ifdef Q_OS_ANDROID
+#include <QTemporaryDir>
+#endif
+
 //----------------------------------------------------------------------------
 
 #include "vrv/toolkit.h"
@@ -222,6 +226,12 @@ private:
     bool m_fontInitDone{ false };
     bool m_hasValidData{ false };
     bool m_resourcesDataInitialized{ false };
+
+#ifdef Q_OS_ANDROID
+    // This variable is used on Android to copy the directory with the font resources from the assets to this temporary
+    // directory
+    QTemporaryDir m_resourcesDataTmpDir;
+#endif
 };
 } // namespace vrvQt
 #endif // __VRV_QT_TOOLKIT_H__

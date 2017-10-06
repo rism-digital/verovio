@@ -59,6 +59,7 @@ bindings/qt/build-demo
 # Android build
 tools/android/obj
 tools/android/libs
+bindings/qt/build-android
 
 # MacOS
 .DS_Store

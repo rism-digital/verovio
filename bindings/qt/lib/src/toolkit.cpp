@@ -184,9 +184,56 @@ void Toolkit::setFileContent(QString fileContent)
     }
 }
 
+bool copyDirRecursive(QString sourcePath, QString destinationPath)
+{
+    QDir sourceDir(sourcePath);
+    if (!sourceDir.exists()) {
+        return false;
+    }
+
+    QDir destinationDir(destinationPath);
+    if (!destinationDir.exists()) destinationDir.mkdir(destinationPath);
+
+    bool success = true;
+
+    // 1. copy all files from given directory
+    for (QString fileName : sourceDir.entryList(QDir::Files)) {
+        QString sourceFilePath = sourcePath + "/" + fileName;
+        QString destinationFilePath = destinationPath + "/" + fileName;
+        if (!QFile::copy(sourceFilePath, destinationFilePath)) {
+            success = false;
+            // continue anyway
+        }
+    }
+
+    // 2. copy all directories recursively
+    for (QString dirName : sourceDir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot)) {
+        QString sourceDirPath = sourcePath + "/" + dirName;
+        QString destinationDirPath = destinationPath + "/" + dirName;
+        if (!copyDirRecursive(sourceDirPath, destinationDirPath)) {
+            success = false;
+            // continue anyway
+        }
+    }
+
+    return success;
+}
+
 void Toolkit::setResourcesDataPath(QString resourcesDataPath)
 {
     if (m_resourcesDataPath != resourcesDataPath) {
+
+#ifdef Q_OS_ANDROID
+        if (resourcesDataPath.startsWith("assets:/")) {
+            if (!m_resourcesDataTmpDir.isValid()) {
+                qWarning() << "tmp directory for resources data is invalid";
+                return;
+            }
+            copyDirRecursive(resourcesDataPath, m_resourcesDataTmpDir.path());
+            resourcesDataPath = m_resourcesDataTmpDir.path();
+        }
+#endif
+
         m_resourcesDataPath = resourcesDataPath;
         bool success = m_verovioToolkit.SetResourcePath(resourcesDataPath.toStdString());
 
