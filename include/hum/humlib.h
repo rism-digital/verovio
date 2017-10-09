@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Oct  2 10:01:48 PDT 2017
+// Last Modified: Mon Oct  2 15:47:35 PDT 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -4737,6 +4737,7 @@ class Tool_musicxml2hum : public HumTool {
 		void checkForDummyRests(MxmlMeasure* measure);
 		void reindexVoices     (vector<MxmlPart>& partdata);
 		void reindexMeasure    (MxmlMeasure* measure);
+		void setSoftwareInfo   (xml_document& doc);
 
 	public:
 
@@ -4751,6 +4752,8 @@ class Tool_musicxml2hum : public HumTool {
 		int m_slurabove = 0;
 		int m_slurbelow = 0;
 		char m_hasEditorial = '\0';
+
+		string m_software;
 
 		xml_node m_current_dynamic = xml_node(NULL);
 		vector<xml_node> m_current_text;

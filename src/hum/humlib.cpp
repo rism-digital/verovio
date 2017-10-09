@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Oct  2 10:01:48 PDT 2017
+// Last Modified: Mon Oct  2 15:47:35 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -21949,12 +21949,17 @@ string MxmlEvent::getKernPitch(void) {
 					// doublesharpQ = true;
 					explicitQ = true;
 				}
-				xml_attribute paren = child.attribute("parentheses");
-				if (paren) {
-					if (strcmp(paren.value(), "yes") == 0) {
-						editorialQ = 1;
-						reportEditorialAccidentalToOwner();
-					}
+				string paren = child.attribute("parentheses").value();
+				if (paren == "yes") {
+					editorialQ = 1;
+					reportEditorialAccidentalToOwner();
+				}
+				// Sibelius method of adding parenthese to notes:
+    			//    <accidental cautionary="yes">natural</accidental>
+				string caution = child.attribute("cautionary").value();
+				if (caution == "yes") {
+					editorialQ = 1;
+					reportEditorialAccidentalToOwner();
 				}
 			}
 			child = child.next_sibling();
@@ -40011,6 +40016,7 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 
 	bool status = true; // for keeping track of problems in conversion process.
 
+	setSoftwareInfo(doc);
 	vector<string> partids;            // list of part IDs
 	map<string, xml_node> partinfo;    // mapping if IDs to score-part elements
 	map<string, xml_node> partcontent; // mapping of IDs to part elements
@@ -40109,6 +40115,24 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 
 //////////////////////////////
 //
+// Tool_muisicxml2hum::setSoftwareInfo -- Store which software program generated the 
+//    MusicXML data to handle locale variants.  There can be more than one
+//    <software> entry, so desired information is not necessarily in the first one.
+//
+
+void Tool_musicxml2hum::setSoftwareInfo(xml_document& doc) {
+	string xpath = "/score-partwise/identification/encoding/software";
+	string software = doc.select_node(xpath.c_str()).node().child_value();
+	HumRegex hre;
+	if (hre.search(software, "sibelius", "i")) {
+		m_software = "sibelius";
+	}
+}
+
+
+
+//////////////////////////////
+//
 // Tool_musicxml2hum::cleanSpaces --
 //
 
@@ -40134,11 +40158,26 @@ void Tool_musicxml2hum::addHeaderRecords(HumdrumFile& outfile, xml_document& doc
 	HumRegex hre;
 
 	// OTL: title //////////////////////////////////////////////////////////
-	xpath = "/score-partwise/movement-title";
-	string title = cleanSpaces(doc.select_single_node(xpath.c_str()).node().child_value());
-	if (title != "") {
+
+	// Sibelius method
+	xpath = "/score-partwise/work/work-title";
+	string worktitle = cleanSpaces(doc.select_single_node(xpath.c_str()).node().child_value());
+	bool worktitleQ = false;
+	if (worktitle != "") {
 		string otl_record = "!!!OTL:\t";
-		otl_record += title;
+		otl_record += worktitle;
+		outfile.insertLine(0, otl_record);
+		worktitleQ = true;
+	}
+
+	xpath = "/score-partwise/movement-title";
+	string mtitle = cleanSpaces(doc.select_single_node(xpath.c_str()).node().child_value());
+	if (mtitle != "") {
+		string otl_record = "!!!OTL:\t";
+		if (worktitleQ) {
+			otl_record = "!!!OMV:\t";
+		}
+		otl_record += mtitle;
 		outfile.insertLine(0, otl_record);
 	}
 
@@ -40205,7 +40244,7 @@ void Tool_musicxml2hum::addFooterRecords(HumdrumFile& outfile, xml_document& doc
 
 	if (validcopy) {
 		string yem_record = "!!!YEM:\t";
-		yem_record += copy;
+		yem_record += cleanSpaces(copy);
 		outfile.appendLine(yem_record);
 	}
 
@@ -41623,6 +41662,9 @@ int Tool_musicxml2hum::addLyrics(GridStaff* staff, MxmlEvent* event) {
 
 		if (finaltext.empty()) {
 			continue;
+		}
+		if (m_software == "sibelius") {
+			hre.replaceDestructive(finaltext, " ", "_", "g");
 		}
 
 		if (verses[i]) {
