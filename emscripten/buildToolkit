@@ -129,6 +129,8 @@ my $FILENAME = "verovio-toolkit$FLAGS_NAME.js";
 my $DATA_DIR  = "data";
 my $BUILD_DIR = "build";
 $BUILD_DIR .= "/$VERSION" if $VERSION;
+my $NPM = "npm";
+$NPM .= "-dev" if not($VERSION);
 
 print "Compiled files will be written to $BUILD_DIR\n";
 
@@ -197,6 +199,9 @@ if ($? == 0) {
 
 	# the wrapper is necessary with closure 1 for avoiding to conflict with globals
 	`cat $BUILD_DIR/verovio.js verovio-proxy.js > $BUILD_DIR/$FILENAME`;
+
+	# wrap the npm package
+	`cat $BUILD_DIR/verovio.js verovio-proxy.js verovio-npm.js > $NPM/index.js`;
 
 	# create a gzip version
 	`(cd $BUILD_DIR && gzip -c $FILENAME > $FILENAME.gz)`;
