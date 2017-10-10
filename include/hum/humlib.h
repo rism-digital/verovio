@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Oct  2 15:47:35 PDT 2017
+// Last Modified: Mon Oct  9 15:46:23 PDT 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -617,11 +617,15 @@ class HumParamSet {
 		                                  const string& indent = "\t");
 
 	private:
-		string ns1;
-		string ns2;
-		vector<pair<string, string>> parameters;
+		string m_ns1;
+		string m_ns2;
+		vector<pair<string, string>> m_parameters;
 
 };
+
+
+ostream& operator<<(ostream& out, HumParamSet* hps);
+ostream& operator<<(ostream& out, HumParamSet& hps);
 
 
 
@@ -1239,6 +1243,9 @@ class HumdrumToken : public string, public HumHash {
 		HumParamSet* getLinkedParameter    (int index);
 		HumParamSet* getLinkedParameter    (void);
 		ostream& printXmlLinkedParameterInfo(ostream& out, int level, const string& indent);
+
+		// layout parameter accessors
+		string   getVisualDuration         (void);
 
 		HumdrumToken& operator=            (HumdrumToken& aToken);
 		HumdrumToken& operator=            (const string& aToken);

@@ -6387,18 +6387,18 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
         return;
     }
 
-	int subtrack = token->getSubtrack();
-	if (subtrack > 1) {
-		if (token->noteInLowerSubtrack()) {
-			// don't print a lyric for secondary layers unless
-			// all of the lower layers do not have a note attacking
-			// or tied at the same time.  This is because verovio
-			// will incorrectly overstrike syllables shared between
-			// layers if there is an offset of a second between the layers.
-			return;
-			// probably also have to deal with chords containing seconds...
-		}
-	}
+    int subtrack = token->getSubtrack();
+    if (subtrack > 1) {
+        if (token->noteInLowerSubtrack()) {
+            // don't print a lyric for secondary layers unless
+            // all of the lower layers do not have a note attacking
+            // or tied at the same time.  This is because verovio
+            // will incorrectly overstrike syllables shared between
+            // layers if there is an offset of a second between the layers.
+            return;
+            // probably also have to deal with chords containing seconds...
+        }
+    }
 
     vector<string> vtexts;
     std::string content;
@@ -6619,17 +6619,45 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         tstring.erase(std::remove(tstring.begin(), tstring.end(), 'q'), tstring.end());
     }
 
-    int dotcount = characterCountInSubtoken(tstring, '.');
-    if (dotcount > 0) {
-        element->SetDots(dotcount);
+    string vstring = token->getVisualDuration();
+    if (!vstring.empty()) {
+        int dotcount = characterCountInSubtoken(vstring, '.');
+        if (dotcount > 0) {
+            element->SetDots(dotcount);
+        }
+
+        //dotcount = characterCountInSubtoken(tstring, '.');
+        //if (dotcount > 0) {
+        //    element->SetDotsGes(dotcount);
+        //}
+    }
+    else {
+        int dotcount = characterCountInSubtoken(tstring, '.');
+        if (dotcount > 0) {
+            element->SetDots(dotcount);
+        }
     }
 
     // Tuplet durations are not handled below yet.
     // dur is in units of quarter notes.
-    hum::HumNum dur = hum::Convert::recipToDurationNoDots(tstring);
-    dur /= 4; // duration is now in whole note units;
 
-    dur *= m_tupletscaling;
+    hum::HumNum dur;
+    hum::HumNum durges;
+
+    if (vstring.empty()) {
+        dur = hum::Convert::recipToDurationNoDots(tstring);
+        dur /= 4; // duration is now in whole note units;
+        dur *= m_tupletscaling;
+    }
+    else {
+        dur = hum::Convert::recipToDurationNoDots(vstring);
+        dur /= 4; // duration is now in whole note units;
+        dur *= m_tupletscaling;
+
+        durges = hum::Convert::recipToDurationNoDots(tstring);
+        durges /= 4; // duration is now in whole note units;
+        durges *= m_tupletscaling;
+    }
 
     if ((!grace) && (dur == 0) && (element)) {
         return 0;
@@ -6641,7 +6669,8 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         // durations (rests and spaces), so the calling function
         // has to take character.
     }
-    else if (dur.isInteger()) {
+
+    if (dur.isInteger()) {
         switch (dur.getNumerator()) {
             case 1: element->SetDur(DURATION_1); break;
             case 2: element->SetDur(DURATION_breve); break;
@@ -6664,6 +6693,34 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
             case 2048: element->SetDur(DURATION_2048); break;
         }
     }
+
+    if (!vstring.empty()) {
+        if (durges.isInteger()) {
+            switch (durges.getNumerator()) {
+                case 1: element->SetDurGes(DURATION_1); break;
+                case 2: element->SetDurGes(DURATION_breve); break;
+                case 4: element->SetDurGes(DURATION_long); break;
+                case 8: element->SetDurGes(DURATION_maxima); break;
+            }
+        }
+        else if (durges.getNumerator() == 1) {
+            switch (durges.getDenominator()) {
+                case 2: element->SetDurGes(DURATION_2); break;
+                case 4: element->SetDurGes(DURATION_4); break;
+                case 8: element->SetDurGes(DURATION_8); break;
+                case 16: element->SetDurGes(DURATION_16); break;
+                case 32: element->SetDurGes(DURATION_32); break;
+                case 64: element->SetDurGes(DURATION_64); break;
+                case 128: element->SetDurGes(DURATION_128); break;
+                case 256: element->SetDurGes(DURATION_256); break;
+                case 512: element->SetDurGes(DURATION_512); break;
+                case 1024: element->SetDurGes(DURATION_1024); break;
+                case 2048: element->SetDurGes(DURATION_2048); break;
+            }
+        }
+        return durges;
+    }
+
     return dur;
 }
 
