@@ -468,6 +468,7 @@ bool HumdrumInput::convertHumdrum()
     infile.analyzeKernSlurs();
     parseSignifiers(infile);
     checkForColorSpine(infile);
+	infile.analyzeRScale();
 
     bool status = true; // for keeping track of problems in conversion process.
 

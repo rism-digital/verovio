@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Oct  9 15:46:23 PDT 2017
+// Last Modified: Tue Oct 10 21:01:14 PDT 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1180,7 +1180,7 @@ class HumdrumToken : public string, public HumHash {
 		HumNum   getTiedDuration           (HumNum scale);
 		HumNum   getDurationNoDots         (void) const;
 		HumNum   getDurationNoDots         (HumNum scale) const;
-		int      getDots                   (void) const;
+		int      getDots                   (char separator = ' ') const;
 
 		HumNum   getDurationFromStart      (void) const;
 		HumNum   getDurationFromStart      (HumNum scale) const;
@@ -1849,6 +1849,8 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		bool   analyzeKernSlurs           (void);
 		bool   analyzeKernTies            (void);
 		bool   analyzeKernAccidentals     (void);
+
+		bool   analyzeRScale              (void);
 
 		// in HumdrumFileContent-metlev.cpp
 		void  getMetricLevels             (vector<double>& output, int track = 0,
