@@ -468,7 +468,7 @@ bool HumdrumInput::convertHumdrum()
     infile.analyzeKernSlurs();
     parseSignifiers(infile);
     checkForColorSpine(infile);
-	infile.analyzeRScale();
+    infile.analyzeRScale();
 
     bool status = true; // for keeping track of problems in conversion process.
 
@@ -6627,8 +6627,8 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
             element->SetDots(dotcount);
         }
 
-        //dotcount = characterCountInSubtoken(tstring, '.');
-        //if (dotcount > 0) {
+        // dotcount = characterCountInSubtoken(tstring, '.');
+        // if (dotcount > 0) {
         //    element->SetDotsGes(dotcount);
         //}
     }
