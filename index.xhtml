@@ -10,6 +10,7 @@ projects:
     - [["http://www.rism.info", "rism"], ["http://kern.ccarh.org", "ccarh"], ["http://en.chopin.nifc.pl/institute/library/archives", "nifc"]]
     - [["http://dme.mozarteum.at/DME/main/index.php", "dme"], ["http://www.oeaw.ac.at/ikm/forschung/digital-musicology/digitale-musikanalyse-mit-mei/", "oeaw"], ["http://www.gluck-gesamtausgabe.de/impressum.html", "gga"]]
     - [["http://opac.sbn.it/opacsbn/opac/iccu/musica.jsp", "iccu"],["http://www.tassomusic.org/", "tasso"], ["https://www.bach-digital.de", "bach"]]
+    - [["http://folksong.eu", "folk-song-index"], [], []]
 ---
 <div class="row home-row home-row-flex">
     <div class="col-md-5 col-sm-12">
@@ -181,13 +182,13 @@ projects:
             {% for line in page.projects %}
             <tr>
                 {% for p in line %}
-                    {% if p != empty %}
-                       <td align="center">
+                    <td align="center">
+                    {%- if p != empty -%}
                            <a href="{{ p[0] }}" target="_blank">
                                <img src="{{ site.baseurl }}/images/projects/{{ p[1] }}.png" style="padding: 10px" class="img-responsive"/>
                            </a>
-                       </td>
-                    {% endif %}
+                    {%- endif -%}
+                    </td>
                 {% endfor %}
             </tr>
             {% endfor %}
