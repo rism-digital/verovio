@@ -840,7 +840,6 @@
 				4D2E09B118A92371001EEEB8 /* emscripten_main.cpp */,
 			);
 			name = tools;
-			path = tinyxml;
 			sourceTree = "<group>";
 		};
 		4D95D4F31D717CD600B2B856 /* systemelements */ = {
