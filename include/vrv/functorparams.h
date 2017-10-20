@@ -393,6 +393,7 @@ public:
         m_time = 0.0;
         m_currentMensur = NULL;
         m_currentMeterSig = NULL;
+        m_notationType = NOTATIONTYPE_cmn;
         m_functor = functor;
         m_scoreDefRole = NONE;
         m_isFirstMeasure = false;
@@ -402,6 +403,7 @@ public:
     double m_time;
     Mensur *m_currentMensur;
     MeterSig *m_currentMeterSig;
+    data_NOTATIONTYPE m_notationType;
     Functor *m_functor;
     ElementScoreDefRole m_scoreDefRole;
     bool m_isFirstMeasure;

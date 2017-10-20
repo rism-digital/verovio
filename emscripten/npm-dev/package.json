@@ -1,6 +1,6 @@
 {
   "name": "verovio-dev",
-  "version": "2.0.0-2",
+  "version": "2.0.0-3",
   "description": "This is the development version of the verovio package",
   "main": "index.js",
   "keywords": [
@@ -24,5 +24,8 @@
   "dependencies": {
     "fs": "*",
     "path": "*"
+  },
+  "engines": {
+    "node": ">= 7.0.0"
   }
 }

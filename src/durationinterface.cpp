@@ -65,7 +65,7 @@ void DurationInterface::Reset()
 
 double DurationInterface::GetInterfaceAlignmentDuration(int num, int numbase)
 {
-    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
+    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
 
     if (this->HasNum()) num *= this->GetNum();
     if (this->HasNumbase()) numbase *= this->GetNumbase();
@@ -80,7 +80,7 @@ double DurationInterface::GetInterfaceAlignmentDuration(int num, int numbase)
 
 double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int numbase, Mensur *currentMensur)
 {
-    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
+    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
 
     if (!currentMensur) {
         LogWarning("No current mensur for calculating duration");
@@ -147,6 +147,13 @@ int DurationInterface::GetActualDur() const
     return (this->GetDur() & DUR_MENSURAL_MASK);
 }
 
+int DurationInterface::GetActualDurGes() const
+{
+    // maxima (-1) is a mensural only value
+    if (this->GetDurGes() == DURATION_maxima) return DUR_MX;
+    return (this->GetDurGes() & DUR_MENSURAL_MASK);
+}
+    
 int DurationInterface::GetNoteOrChordDur(LayerElement *element)
 {
     if (element->Is(CHORD)) {
