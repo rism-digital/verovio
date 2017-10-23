@@ -517,6 +517,9 @@ bool HumdrumInput::convertHumdrum()
 
     m_staffstates.resize(kernstarts.size());
 
+    m_transpose.resize(kernstarts.size());
+    std::fill(m_transpose.begin(), m_transpose.end(), 0);
+
     prepareVerses();
     prepareEndings();
     prepareStaffGroup();
@@ -1250,6 +1253,8 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     std::string clef;
     std::string keysig;
     std::string key;
+    std::string transpose;
+    std::string itranspose;
     std::string timesig;
     std::string metersig;
     int top = 0;
@@ -1270,6 +1275,12 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
         else if (part->compare(0, 3, "*k[") == 0) {
             keysig = *part;
+        }
+        else if (part->compare(0, 4, "*Trd") == 0) {
+            transpose = *part;
+        }
+        else if (part->compare(0, 5, "*ITrd") == 0) {
+            itranspose = *part;
         }
         else if (part->compare(0, 3, "*I'") == 0) {
             if (partcount > 1) {
@@ -1329,6 +1340,15 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         setClef(m_staffdef.back(), autoclef);
     }
 
+    if (transpose.size() > 0) {
+        setTransposition(m_staffdef.back(), transpose);
+    }
+
+    if (itranspose.size() > 0) {
+        // This has to be above setKeySig():
+        setDynamicTransposition(partnumber - 1, m_staffdef.back(), itranspose);
+    }
+
     if (label.size() > 0) {
         // 300: m_staffdef.back()->SetLabel(label);
         setInstrumentName(m_staffdef.back(), label);
@@ -1340,7 +1360,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     if (keysig.size() > 0) {
-        setKeySig(m_staffdef.back(), keysig);
+        setKeySig(partnumber - 1, m_staffdef.back(), keysig);
     }
 
     if (primarymensuration.empty()) {
@@ -1398,7 +1418,7 @@ void HumdrumInput::setInstrumentAbbreviation(vrv::StaffDef *staffdef, const stri
 
 //////////////////////////////
 //
-// HumdrumInput::getAutoClef -- extimate a clef for a part
+// HumdrumInput::getAutoClef -- estimate a clef for a part
 //     which does not have a specified clef.  Choice will be
 //     treble or bass.
 //
@@ -1617,7 +1637,7 @@ void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig)
 // HumdrumInput::setKeySig -- Convert a Humdrum keysig to an MEI keysig.
 //
 
-template <class ELEMENT> void HumdrumInput::setKeySig(ELEMENT element, const std::string &keysig)
+template <class ELEMENT> void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &keysig)
 {
     bool fs = keysig.find("f#") != string::npos;
     bool cs = keysig.find("c#") != string::npos;
@@ -1635,55 +1655,118 @@ template <class ELEMENT> void HumdrumInput::setKeySig(ELEMENT element, const std
     bool cb = keysig.find("c-") != string::npos;
     bool fb = keysig.find("f-") != string::npos;
 
+    int keyvalue = 0;
     if (fs && !cs && !gs && !ds && !as && !es && !bs) {
-        element->SetKeySig(KEYSIGNATURE_1s);
+        keyvalue = 1;
     }
     else if (fs && cs && !gs && !ds && !as && !es && !bs) {
-        element->SetKeySig(KEYSIGNATURE_2s);
+        keyvalue = 2;
     }
     else if (fs && cs && gs && !ds && !as && !es && !bs) {
-        element->SetKeySig(KEYSIGNATURE_3s);
+        keyvalue = 3;
     }
     else if (fs && cs && gs && ds && !as && !es && !bs) {
-        element->SetKeySig(KEYSIGNATURE_4s);
+        keyvalue = 4;
     }
     else if (fs && cs && gs && ds && as && !es && !bs) {
-        element->SetKeySig(KEYSIGNATURE_5s);
+        keyvalue = 5;
     }
     else if (fs && cs && gs && ds && as && es && !bs) {
-        element->SetKeySig(KEYSIGNATURE_6s);
+        keyvalue = 6;
     }
     else if (fs && cs && gs && ds && as && es && bs) {
-        element->SetKeySig(KEYSIGNATURE_7s);
+        keyvalue = 7;
     }
     else if (bb && !eb && !ab && !db && !gb && !cb && !fb) {
-        element->SetKeySig(KEYSIGNATURE_1f);
+        keyvalue = -1;
     }
     else if (bb && eb && !ab && !db && !gb && !cb && !fb) {
-        element->SetKeySig(KEYSIGNATURE_2f);
+        keyvalue = -2;
     }
     else if (bb && eb && ab && !db && !gb && !cb && !fb) {
-        element->SetKeySig(KEYSIGNATURE_3f);
+        keyvalue = -3;
     }
     else if (bb && eb && ab && db && !gb && !cb && !fb) {
-        element->SetKeySig(KEYSIGNATURE_4f);
+        keyvalue = -4;
     }
     else if (bb && eb && ab && db && gb && !cb && !fb) {
-        element->SetKeySig(KEYSIGNATURE_5f);
+        keyvalue = -5;
     }
     else if (bb && eb && ab && db && gb && cb && !fb) {
-        element->SetKeySig(KEYSIGNATURE_6f);
+        keyvalue = -6;
     }
     else if (bb && eb && ab && db && gb && cb && fb) {
-        element->SetKeySig(KEYSIGNATURE_7f);
+        keyvalue = -7;
     }
     else if (!bb && !eb && !ab && !db && !gb && !cb && !fb && !fs && !cs && !gs && !ds && !as && !es && !bs) {
         element->SetKeySig(KEYSIGNATURE_0);
+        keyvalue = 0;
     }
     else {
         // nonstandard keysignature, so give a NONE style.
         element->SetKeySig(KEYSIGNATURE_NONE);
+        return;
     }
+
+    if ((partindex >= 0) && (m_transpose[partindex] != 0)) {
+        keyvalue += hum::Convert::base40IntervalToLineOfFifths(m_transpose[partindex]);
+    }
+
+    switch (keyvalue) {
+        case 0: element->SetKeySig(KEYSIGNATURE_0); break;
+        case +1: element->SetKeySig(KEYSIGNATURE_1s); break;
+        case -1: element->SetKeySig(KEYSIGNATURE_1f); break;
+        case +2: element->SetKeySig(KEYSIGNATURE_2s); break;
+        case -2: element->SetKeySig(KEYSIGNATURE_2f); break;
+        case +3: element->SetKeySig(KEYSIGNATURE_3s); break;
+        case -3: element->SetKeySig(KEYSIGNATURE_3f); break;
+        case +4: element->SetKeySig(KEYSIGNATURE_4s); break;
+        case -4: element->SetKeySig(KEYSIGNATURE_4f); break;
+        case +5: element->SetKeySig(KEYSIGNATURE_5s); break;
+        case -5: element->SetKeySig(KEYSIGNATURE_5f); break;
+        case +6: element->SetKeySig(KEYSIGNATURE_6s); break;
+        case -6: element->SetKeySig(KEYSIGNATURE_6f); break;
+        case +7: element->SetKeySig(KEYSIGNATURE_7s); break;
+        case -7: element->SetKeySig(KEYSIGNATURE_7f); break;
+        default: element->SetKeySig(KEYSIGNATURE_NONE);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setTransposition -- Set the transposition to sounding score.
+//
+
+void HumdrumInput::setTransposition(StaffDef *part, const std::string &transpose)
+{
+    int chromatic = 0;
+    int diatonic = 0;
+    if (sscanf(transpose.c_str(), "*Trd%dc%dd", &diatonic, &chromatic) != 2) {
+        // Transposition is not formatted correctly
+        return;
+    }
+    part->SetTransDiat(-diatonic);
+    part->SetTransSemi(-chromatic);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setDynamicTransposition --
+//
+
+void HumdrumInput::setDynamicTransposition(int partindex, StaffDef *part, const std::string &itranspose)
+{
+    int chromatic = 0;
+    int diatonic = 0;
+    if (sscanf(itranspose.c_str(), "*ITrd%dc%dd", &diatonic, &chromatic) != 2) {
+        // Transposition is not formatted correctly
+        return;
+    }
+    part->SetTransDiat(-diatonic);
+    part->SetTransSemi(-chromatic);
+
+    // Store dynamic transposition to go from sounding score to written:
+    m_transpose[partindex] = hum::Convert::transToBase40(itranspose);
 }
 
 //////////////////////////////
@@ -2894,6 +2977,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 appendElement(elements, pointers, chord);
                 elements.push_back("chord");
                 pointers.push_back((void *)chord);
+                processChordSignifiers(chord, layerdata[i], staffindex);
                 convertChord(chord, layerdata[i], staffindex);
                 elements.pop_back();
                 pointers.pop_back();
@@ -2903,7 +2987,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 addOrnaments(chord, layerdata[i]);
                 addArpeggio(chord, layerdata[i]);
                 processDirections(layerdata[i], staffindex);
-                processChordSignifiers(chord, layerdata[i], staffindex);
             }
         }
         else if (layerdata[i]->isRest()) {
@@ -3531,7 +3614,79 @@ void HumdrumInput::addSpace(std::vector<string> &elements, std::vector<void *> &
 
 //////////////////////////////
 //
-// processChordSignifiers --
+// processTerminalLong -- Not set up for chords yet.
+//
+
+void HumdrumInput::processTerminalLong(hum::HTp token)
+{
+    if (!m_signifiers.terminallong) {
+        return;
+    }
+    if (token->find(m_signifiers.terminallong) == string::npos) {
+        return;
+    }
+    token->setValue("LO", "N", "vis", "00");
+    if ((token->find('[') != string::npos) || (token->find('_') != string::npos)) {
+        removeCharacter(token, '[');
+        removeCharacter(token, '_');
+        int pitch = hum::Convert::kernToBase40(token);
+        hum::HTp testtok = token->getNextToken();
+        while (testtok) {
+            if (testtok->isBarline()) {
+                // make measure invisible:
+                testtok->setText(*testtok + "-");
+            }
+            else if (testtok->isData()) {
+                if (testtok->isNull()) {
+                    testtok = testtok->getNextToken();
+                    continue;
+                }
+                int tpitch = hum::Convert::kernToBase40(testtok);
+                if (tpitch != pitch) {
+                    break;
+                }
+                if ((testtok->find(']') == string::npos) && (testtok->find('_') == string::npos)) {
+                    break;
+                }
+                // make note invisible:
+                testtok->setText(*testtok + "yy");
+                if (testtok->find("_") != string::npos) {
+                    removeCharacter(testtok, '_');
+                    testtok = testtok->getNextToken();
+                    continue;
+                }
+                else if (testtok->find("]") != string::npos) {
+                    removeCharacter(testtok, ']');
+                    break;
+                }
+            }
+            testtok = testtok->getNextToken();
+        }
+    }
+    // If token is tied, then follow ties to attached notes and make invisible.
+}
+
+//////////////////////////////
+//
+// HumdrumInput:: removeCharacter --
+//
+
+void HumdrumInput::removeCharacter(hum::HTp token, char removechar)
+{
+    string output;
+    for (char ch : *token) {
+        if (ch == removechar) {
+            continue;
+        }
+        output += ch;
+    }
+
+    token->setText(output);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processChordSignifiers --
 //
 
 void HumdrumInput::processChordSignifiers(Chord *chord, hum::HTp token, int staffindex)
@@ -3556,6 +3711,7 @@ void HumdrumInput::processChordSignifiers(Chord *chord, hum::HTp token, int staf
             // chord->SetSize(SIZE_cue);
         }
     }
+    processTerminalLong(token); // Not tested and probably won't work yet on chords.
 }
 
 //////////////////////////////
@@ -4599,7 +4755,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
 
     if (keysig) {
         // cerr << "KEYSIG = " << keysig << endl;
-        setKeySig(scoreDef, *((string *)keysig));
+        setKeySig(-1, scoreDef, *((string *)keysig));
     }
 }
 
@@ -6120,6 +6276,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
 
     bool chordQ = token->isChord();
 
+    processTerminalLong(token); // do this before assigning rhythmic value.
+
     bool octaveupQ = ss[staffindex].ottavameasure ? true : false;
 
     int line = token->getLineIndex();
@@ -6155,7 +6313,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     }
 
     // Add the pitch information
-    int diatonic = hum::Convert::kernToBase7(tstring);
+    int base40 = hum::Convert::kernToBase40(tstring);
+    base40 += m_transpose[staffindex];
+
+    int diatonic = hum::Convert::base40ToDiatonic(base40);
     int octave = diatonic / 7;
     if (octaveupQ) {
         // @oct required even if @oct.ges given.
@@ -6189,7 +6350,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
         }
     }
 
-    int accidCount = hum::Convert::kernToAccidentalCount(tstring);
+    int accidCount = hum::Convert::base40ToAccidental(base40);
+    // int accidCount = hum::Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
     bool showInAccidGes = !showInAccid;
     Accid *accid = new Accid;
@@ -8566,6 +8728,15 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
         // !!!RDF**kern: i = cue size
         if (value.find("cue size", equals) != string::npos) {
             m_signifiers.cuesize = signifier;
+        }
+
+        // terminal longs
+        // !!!RDF**kern: i = terminal long
+        if (value.find("terminal long", equals) != string::npos) {
+            m_signifiers.terminallong = signifier;
+        }
+        else if (value.find("long note", equals) != string::npos) {
+            m_signifiers.terminallong = signifier;
         }
 
         // slur directions

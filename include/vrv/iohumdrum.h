@@ -181,6 +181,7 @@ public:
     // boolean switches:
     char nostem = '\0'; // !!!RDF**kern: i = no stem
     char cuesize = '\0'; // !!!RDF**kern: i = cue size
+    char terminallong = '\0'; // !!!RDF**kern: i = terminal long
     vector<char> editacc; // !!!RDF**kern: i = editorial accidental
     vector<string> edittype; // !!!RDF**kern: i= editoral accidental, brack[ets]/paren[theses]
     char below = '\0'; // !!!RDF**kern: i = below (previous signifier is "below")
@@ -242,6 +243,8 @@ protected:
     std::vector<int> getStaffLayerCounts();
     void prepareStaffGroup();
     void setClef(StaffDef *part, const std::string &clef);
+    void setTransposition(StaffDef *part, const std::string &transpose);
+    void setDynamicTransposition(int partindex, StaffDef *part, const std::string &itranspose);
     void setTimeSig(StaffDef *part, const std::string &timesig);
     void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
@@ -359,6 +362,8 @@ protected:
     hum::HTp getRightmostSystemArpeggio(hum::HTp token);
     void addDirection(
         const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token, int staffindex);
+    void processTerminalLong(hum::HTp token);
+    void removeCharacter(hum::HTp token, char removechar);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -370,7 +375,7 @@ protected:
     void insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<std::string> > &respPeople);
 
     /// Templates ///////////////////////////////////////////////////////////
-    template <class ELEMENT> void setKeySig(ELEMENT element, const std::string &keysig);
+    template <class ELEMENT> void setKeySig(int partindex, ELEMENT element, const std::string &keysig);
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
     template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
@@ -518,6 +523,9 @@ private:
 
     // m_has_color_spine == true if a color spine is present.
     bool m_has_color_spine = false;
+
+    // m_traspose == transposition to go from sounding to written pitch.
+    vector<int> m_transpose;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 

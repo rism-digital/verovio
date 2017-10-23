@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Oct 10 21:01:14 PDT 2017
+// Last Modified: Sun Oct 22 20:36:00 PDT 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -429,6 +429,7 @@ class HumRegex {
 		int         getMatchCount      (void);
 		string      getMatch           (int index);
 		int         getMatchInt        (int index);
+		double      getMatchDouble     (int index);
 		string      getPrefix          (void);
 		string      getSuffix          (void);
 		int         getMatchStartIndex (int index = 0);
@@ -2580,10 +2581,13 @@ enum class SliceType {
 			Measures,
 		_Measure,
 				Clefs,
+				Transpositions,
 				KeySigs,
 				TimeSigs,
 				MeterSigs,
 				Tempos,
+				Labels,
+				LabelAbbrs,
 			_RegularInterpretation,
 				Exclusives,
 				Terminators,
@@ -2754,6 +2758,12 @@ class GridMeasure : public list<GridSlice*> {
 		                             int part, int staff, int voice, int maxstaff);
 		GridSlice*   addClefToken   (const string& tok, HumNum timestamp,
 		                             int part, int staff, int voice, int maxstaff);
+		GridSlice*   addTransposeToken(const string& tok, HumNum timestamp,
+		                             int part, int staff, int voice, int maxstaff);
+		GridSlice*   addLabelToken(const string& tok, HumNum timestamp,
+		                             int part, int staff, int voice, int maxstaff);
+		GridSlice*   addLabelAbbrToken(const string& tok, HumNum timestamp,
+		                             int part, int staff, int voice, int maxstaff);
 		GridSlice*   addDataToken   (const string& tok, HumNum timestamp,
 		                             int part, int staff, int voice, int maxstaff);
 		GridSlice*   addGlobalLayout(const string& tok, HumNum timestamp);
@@ -2827,6 +2837,9 @@ class GridSlice : public vector<GridPart*> {
 		bool isGraceSlice(void)       { return m_type == SliceType::GraceNotes;       }
 		bool isMeasureSlice(void)     { return m_type == SliceType::Measures;         }
 		bool isClefSlice(void)        { return m_type == SliceType::Clefs;            }
+		bool isLabelSlice(void)       { return m_type == SliceType::Labels;           }
+		bool isLabelAbbrSlice(void)   { return m_type == SliceType::LabelAbbrs;       }
+		bool isTransposeSlice(void)   { return m_type == SliceType::Transpositions;   }
 		bool isKeySigSlice(void)      { return m_type == SliceType::KeySigs;          }
 		bool isTimeSigSlice(void)     { return m_type == SliceType::TimeSigs;         }
 		bool isTempoSlice(void)       { return m_type == SliceType::Tempos;           }
@@ -4304,30 +4317,47 @@ class mei_staffDef {
 		string timesig;    // such as *M4/4
 		string keysig;     // such as *k[f#]
 		string midibpm;    // such as *MM120
+		string transpose;  // such as *Trd-1c-2
+		int base40 = 0;    // used for transposing to C score
+		string label;      // such as *I"violin 1
+		string labelabbr;  // such as *I'v1
+
 		void clear(void) {
 			clef.clear();
 			timesig.clear();
 			keysig.clear();
 			midibpm.clear();
+			transpose.clear();
+			base40 = 0;
+			label.clear();
+			labelabbr.clear();
 		}
 		mei_staffDef& operator=(mei_staffDef& staffDef) {
 			if (this == &staffDef) {
 				return *this;
 			}
-			clef     = staffDef.clef;
-			timesig  = staffDef.timesig;
-			keysig   = staffDef.keysig;
-			midibpm  = staffDef.midibpm;
+			clef       = staffDef.clef;
+			timesig    = staffDef.timesig;
+			keysig     = staffDef.keysig;
+			midibpm    = staffDef.midibpm;
+			transpose  = staffDef.transpose;
+			base40     = staffDef.base40;
+			label      = staffDef.label;
+			labelabbr  = staffDef.labelabbr;
 			return *this;
 		}
 		mei_staffDef(void) {
 			// do nothing
 		}
 		mei_staffDef(const mei_staffDef& staffDef) {
-			clef     = staffDef.clef;
-			timesig  = staffDef.timesig;
-			keysig   = staffDef.keysig;
-			midibpm  = staffDef.midibpm;
+			clef       = staffDef.clef;
+			timesig    = staffDef.timesig;
+			keysig     = staffDef.keysig;
+			midibpm    = staffDef.midibpm;
+			transpose  = staffDef.transpose;
+			base40     = staffDef.base40;
+			label      = staffDef.label;
+			labelabbr  = staffDef.labelabbr;
 		}
 };
 
@@ -4371,15 +4401,18 @@ class Tool_mei2hum : public HumTool {
 		HumNum parseScore           (xml_node score, HumNum starttime);
 		void   getChildrenVector    (vector<xml_node>& children, xml_node parent);
 		void   parseScoreDef        (xml_node scoreDef, HumNum starttime);
+		void   processPgHead        (xml_node pgHead, HumNum starttime);
+		void   processPgFoot        (xml_node pgFoot, HumNum starttime);
 		HumNum parseSection         (xml_node section, HumNum starttime);
 		HumNum parseApp             (xml_node app, HumNum starttime);
 		HumNum parseLem             (xml_node lem, HumNum starttime);
 		HumNum parseRdg             (xml_node rdg, HumNum starttime);
-		void   processStaffGrp      (xml_node staffGrp, HumNum starttime);
-		void   processStaffDef      (xml_node staffDef, HumNum starttime);
+		void   parseStaffGrp        (xml_node staffGrp, HumNum starttime);
+		void   parseStaffDef        (xml_node staffDef, HumNum starttime);
 		void   fillWithStaffDefAttributes(mei_staffDef& staffinfo, xml_node element);
 		HumNum parseMeasure         (xml_node measure, HumNum starttime);
 		HumNum parseStaff           (xml_node staff, HumNum starttime);
+		void   parseReh             (xml_node reh, HumNum starttime);
 		HumNum parseLayer           (xml_node layer, HumNum starttime);
 		int    extractStaffCount    (xml_node element);
 		HumNum parseRest            (xml_node chord, HumNum starttime);
@@ -4390,6 +4423,7 @@ class Tool_mei2hum : public HumTool {
 		HumNum parseTuplet          (xml_node note, HumNum starttime);
 		void   parseClef            (xml_node clef, HumNum starttime);
 		void   parseDynam           (xml_node dynam, HumNum starttime);
+		void   parseTempo           (xml_node tempo, HumNum starttime);
 		void   parseDir             (xml_node dir, HumNum starttime);
 		HumNum getDuration          (xml_node element);
 		string getHumdrumPitch      (xml_node note);
@@ -4399,13 +4433,18 @@ class Tool_mei2hum : public HumTool {
 		                             vector<xml_node>& nodelist);
 		void   processNodeStopLinks(string& output, xml_node node,
 		                             vector<xml_node>& nodelist);
+		void   processPreliminaryLinkedNodes(xml_node node);
+		void   processNodeStartLinks2(xml_node node, vector<xml_node>& nodelist);
 		void   parseFermata         (string& output, xml_node node, xml_node fermata);
 		void   parseSlurStart       (string& output, xml_node node, xml_node slur);
 		void   parseSlurStop        (string& output, xml_node node, xml_node slur);
 		void   parseTieStart        (string& output, xml_node node, xml_node tie);
 		void   parseTieStop         (string& output, xml_node node, xml_node tie);
 		void   parseArpeg           (string& output, xml_node node, xml_node arpeg);
+		void   parseTupletSpanStart (xml_node node, xml_node tupletSpan);
+		void   parseTupletSpanStop  (string& output, xml_node node, xml_node tupletSpan);
 		void   parseSb              (xml_node sb, HumNum starttime);
+		void   parsePb              (xml_node pb, HumNum starttime);
 		void   processLinkedNodes   (string& output, xml_node node);
 		int    getDotCount          (xml_node node);
 		void   processFermataAttribute(string& output, xml_node node);
@@ -4990,6 +5029,29 @@ class Tool_satb2gs : public HumTool {
 		int    debugQ    = 0;             // used with --debug option
 };
 
+
+
+class Tool_tassoize : public HumTool {
+	public:
+		         Tool_tassoize   (void);
+		        ~Tool_tassoize   () {};
+
+		bool     run                (HumdrumFile& infile);
+		bool     run                (const string& indata, ostream& out);
+		bool     run                (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     initialize         (HumdrumFile& infile);
+		void     processFile        (HumdrumFile& infile);
+		void     updateKeySignatures(HumdrumFile& infile, int lineindex);
+		void     checkDataLine      (HumdrumFile& infile, int lineindex);
+		void     clearStates        (void);
+
+	private:
+		vector<vector<int>> m_pstates;
+		vector<vector<bool>> m_estates;
+
+};
 
 
 class Tool_transpose : public HumTool {

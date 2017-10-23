@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Oct 10 21:01:14 PDT 2017
+// Last Modified: Sun Oct 22 20:36:00 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2856,7 +2856,7 @@ GridSlice* GridMeasure::addTimeSigToken(const string& tok, HumNum timestamp,
 
 //////////////////////////////
 //
-// GridMeasure::addKeySigToken -- Add a key signature  token in the data slice at 
+// GridMeasure::addKeySigToken -- Add a key signature  token in a key sig slice at 
 //    the given timestamp (or create a new keysig slice at that timestamp), placing the
 //    token at the specified part, staff, and voice index.
 //
@@ -2909,6 +2909,175 @@ GridSlice* GridMeasure::addKeySigToken(const string& tok, HumNum timestamp,
 
 
 
+
+//////////////////////////////
+//
+// GridMeasure::addLabelToken -- Add an instrument label token in a label slice at 
+//    the given timestamp (or create a new label slice at that timestamp), placing the
+//    token at the specified part, staff, and voice index.
+//
+
+GridSlice* GridMeasure::addLabelToken(const string& tok, HumNum timestamp,
+		int part, int staff, int voice, int maxstaff) {
+	GridSlice* gs = NULL;
+	if (this->empty() || (this->back()->getTimestamp() < timestamp)) { 
+		// add a new GridSlice to an empty list or at end of list if timestamp
+		// is after last entry in list.
+		gs = new GridSlice(this, timestamp, SliceType::Labels, maxstaff);
+		gs->addToken(tok, part, staff, voice);
+		this->push_back(gs);
+	} else { 
+		// search for existing line with same timestamp and the same slice type
+		GridSlice* target = NULL;
+		auto iterator = this->begin();
+		while (iterator != this->end()) {
+			if (((*iterator)->getTimestamp() == timestamp) && (*iterator)->isLabelSlice()) {
+				target = *iterator;
+				target->addToken(tok, part, staff, voice);
+				break;
+			} else if (((*iterator)->getTimestamp() == timestamp) && (*iterator)->isDataSlice()) {
+				// found the correct timestamp, but no clef slice at the timestamp
+				// so add the clef slice before the data slice (eventually keepping
+				// track of the order in which the other non-data slices should be placed).
+				gs = new GridSlice(this, timestamp, SliceType::Labels, maxstaff);
+				gs->addToken(tok, part, staff, voice);
+				this->insert(iterator, gs);
+				break;
+			} else if ((*iterator)->getTimestamp() > timestamp) {
+				gs = new GridSlice(this, timestamp, SliceType::Labels, maxstaff);
+				gs->addToken(tok, part, staff, voice);
+				this->insert(iterator, gs);
+				break;
+			}
+			iterator++;
+		}
+
+		if (iterator == this->end()) {
+			// Couldn't find a place for the label line, so place at end of measure.
+			gs = new GridSlice(this, timestamp, SliceType::Labels, maxstaff);
+			gs->addToken(tok, part, staff, voice);
+			this->insert(iterator, gs);
+		}
+
+	}
+	return gs;
+}
+
+
+
+//////////////////////////////
+//
+// GridMeasure::addLabelAbbrToken -- Add an instrument label token in a label slice at 
+//    the given timestamp (or create a new label slice at that timestamp), placing the
+//    token at the specified part, staff, and voice index.
+//
+
+GridSlice* GridMeasure::addLabelAbbrToken(const string& tok, HumNum timestamp,
+		int part, int staff, int voice, int maxstaff) {
+	GridSlice* gs = NULL;
+	if (this->empty() || (this->back()->getTimestamp() < timestamp)) { 
+		// add a new GridSlice to an empty list or at end of list if timestamp
+		// is after last entry in list.
+		gs = new GridSlice(this, timestamp, SliceType::LabelAbbrs, maxstaff);
+		gs->addToken(tok, part, staff, voice);
+		this->push_back(gs);
+	} else { 
+		// search for existing line with same timestamp and the same slice type
+		GridSlice* target = NULL;
+		auto iterator = this->begin();
+		while (iterator != this->end()) {
+			if (((*iterator)->getTimestamp() == timestamp) && (*iterator)->isLabelAbbrSlice()) {
+				target = *iterator;
+				target->addToken(tok, part, staff, voice);
+				break;
+			} else if (((*iterator)->getTimestamp() == timestamp) && (*iterator)->isDataSlice()) {
+				// found the correct timestamp, but no clef slice at the timestamp
+				// so add the clef slice before the data slice (eventually keepping
+				// track of the order in which the other non-data slices should be placed).
+				gs = new GridSlice(this, timestamp, SliceType::LabelAbbrs, maxstaff);
+				gs->addToken(tok, part, staff, voice);
+				this->insert(iterator, gs);
+				break;
+			} else if ((*iterator)->getTimestamp() > timestamp) {
+				gs = new GridSlice(this, timestamp, SliceType::LabelAbbrs, maxstaff);
+				gs->addToken(tok, part, staff, voice);
+				this->insert(iterator, gs);
+				break;
+			}
+			iterator++;
+		}
+
+		if (iterator == this->end()) {
+			// Couldn't find a place for the label abbreviation line, so place at end of measure.
+			gs = new GridSlice(this, timestamp, SliceType::LabelAbbrs, maxstaff);
+			gs->addToken(tok, part, staff, voice);
+			this->insert(iterator, gs);
+		}
+
+	}
+	return gs;
+}
+
+
+
+//////////////////////////////
+//
+// GridMeasure::addTransposeToken -- Add a transposition token in the data slice at 
+//    the given timestamp (or create a new transposition slice at that timestamp), placing
+//    the token at the specified part, staff, and voice index.
+//
+//    Note: should placed after clef if present and no other transpose slice at
+//    same time.
+//
+
+GridSlice* GridMeasure::addTransposeToken(const string& tok, HumNum timestamp,
+		int part, int staff, int voice, int maxstaff) {
+	GridSlice* gs = NULL;
+	if (this->empty() || (this->back()->getTimestamp() < timestamp)) { 
+		// add a new GridSlice to an empty list or at end of list if timestamp
+		// is after last entry in list.
+		gs = new GridSlice(this, timestamp, SliceType::Transpositions, maxstaff);
+		gs->addToken(tok, part, staff, voice);
+		this->push_back(gs);
+	} else { 
+		// search for existing line with same timestamp and the same slice type
+		GridSlice* target = NULL;
+		auto iterator = this->begin();
+		while (iterator != this->end()) {
+			if (((*iterator)->getTimestamp() == timestamp) && (*iterator)->isTransposeSlice()) {
+				target = *iterator;
+				target->addToken(tok, part, staff, voice);
+				break;
+			} else if (((*iterator)->getTimestamp() == timestamp) && (*iterator)->isDataSlice()) {
+				// found the correct timestamp, but no clef slice at the timestamp
+				// so add the clef slice before the data slice (eventually keepping
+				// track of the order in which the other non-data slices should be placed).
+				gs = new GridSlice(this, timestamp, SliceType::Transpositions, maxstaff);
+				gs->addToken(tok, part, staff, voice);
+				this->insert(iterator, gs);
+				break;
+			} else if ((*iterator)->getTimestamp() > timestamp) {
+				gs = new GridSlice(this, timestamp, SliceType::Transpositions, maxstaff);
+				gs->addToken(tok, part, staff, voice);
+				this->insert(iterator, gs);
+				break;
+			}
+			iterator++;
+		}
+
+		if (iterator == this->end()) {
+			// Couldn't find a place for the key signature, so place at end of measure.
+			gs = new GridSlice(this, timestamp, SliceType::Transpositions, maxstaff);
+			gs->addToken(tok, part, staff, voice);
+			this->insert(iterator, gs);
+		}
+
+	}
+	return gs;
+}
+
+
+
 //////////////////////////////
 //
 // GridMeasure::addClefToken -- Add a clef token in the data slice at the given
@@ -2950,7 +3119,15 @@ GridSlice* GridMeasure::addClefToken(const string& tok, HumNum timestamp,
 			}
 			iterator++;
 		}
+
+		if (iterator == this->end()) {
+			// Couldn't find a place for the key signature, so place at end of measure.
+			gs = new GridSlice(this, timestamp, SliceType::Clefs, maxstaff);
+			gs->addToken(tok, part, staff, voice);
+			this->insert(iterator, gs);
+		}
 	}
+
 	return gs;
 }
 
@@ -2967,7 +3144,7 @@ GridSlice* GridMeasure::addGlobalComment(const string& tok, HumNum timestamp) {
 	if (this->empty() || (this->back()->getTimestamp() < timestamp)) { 
 		// add a new GridSlice to an empty list or at end of list if timestamp
 		// is after last entry in list.
-		gs = new GridSlice(this, timestamp, SliceType::Clefs, 1);
+		gs = new GridSlice(this, timestamp, SliceType::GlobalComments, 1);
 		gs->addToken(tok, 0, 0, 0);
 		this->push_back(gs);
 	} else { 
@@ -7387,7 +7564,9 @@ void HumGrid::removeSibeliusIncipit(void) {
 
 	this->erase(this->begin());
 	if (this->size() > 0) {
-		transferNonDataSlices(this->at(0), measure);
+		// [20171012] remove this for now since it is crashing
+		// emscripten version of code.
+		// transferNonDataSlices(this->at(0), measure);
 	}
 	delete measure;
 	measure = NULL;
@@ -10603,6 +10782,22 @@ int HumRegex::getMatchInt(int index) {
 		return stoi(value);
 	} else {
 		return 0;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumRegex::getMatchDouble -- Get the match interpreted as a double.
+//
+
+double HumRegex::getMatchDouble(int index) {
+	string value = m_matches.str(index);
+	if (value.size() > 0) {
+		return stod(value);
+	} else {
+		return 0.0;
 	}
 }
 
@@ -31383,6 +31578,12 @@ RECONSIDER:
 			 ((dur == othMeterDen) && (odur == othMeterDen*2)) || // unornamented change of agent suspension
 			 ((dur == othMeterDen) && (odur == othMeterDen) && (durp == 2) &&
 			  (levp == 0) && (lev == 1) & (levn == 1))) ) { // perfection is on 4th minim of 6/2, see Jos2302 m. 34
+// TO DO: fix case from Ano2002 m. 29
+// Also fix Bus1001a m. 57 => conflicting agents
+// Bus1001b m. 135 susp. should be ternary
+// Bus2007 m. 43 should be binary and 47 shouldn't be a susp at all!
+// Com1002a m. 49 all should be ternary => conflicting agents
+// Sort out Bus3038 m. 16
 			ternAgent = true;
 		}
 
@@ -36761,8 +36962,6 @@ Tool_mei2hum::Tool_mei2hum(void) {
 
 	m_hasDynamics.resize(m_maxstaff);
 	fill(m_hasDynamics.begin(), m_hasDynamics.end(), false);
-
-	
 }
 
 
@@ -36818,8 +37017,10 @@ bool Tool_mei2hum::convert(ostream& out, xml_document& doc) {
 	auto score = doc.select_node("/mei/music/body/mdiv/score").node();
 
 	if (!score) {
-		cerr << "Cannot find score, so cannot convert ";
-		cerr << "MEI file to Humdrum" << endl;
+		cerr << "Cannot find score, so cannot convert MDI file to Humdrum";
+		cerr << endl;
+		cerr << "Perhaps there is a problem in the XML structure of the file.";
+		cerr << endl;
 		return false;
 	}
 
@@ -37056,9 +37257,13 @@ void Tool_mei2hum::parseScoreDef(xml_node scoreDef, HumNum starttime) {
 	for (xml_node item : children) {
 		string nodename = item.name();
 		if (nodename == "staffGrp") {
-		    processStaffGrp(item, starttime);
+		    parseStaffGrp(item, starttime);
 		} else if (nodename == "staffDef") {
-		    processStaffDef(item, starttime);
+		    parseStaffDef(item, starttime);
+		} else if (nodename == "pgHead") {
+		    processPgHead(item, starttime);
+		} else if (nodename == "pgFoot") {
+		    processPgFoot(item, starttime);
 		} else {
 			cerr << DKHTP << scoreDef.name() << "/" << nodename << CURRLOC << endl;
 		}
@@ -37067,22 +37272,45 @@ void Tool_mei2hum::parseScoreDef(xml_node scoreDef, HumNum starttime) {
 }
 
 
+//////////////////////////////
+//
+// Tool_mei2hum::processPgFoot -- Dummy function since scoreDef/pgFoot is ignored.
+//
+
+void Tool_mei2hum::processPgFoot(xml_node pgFoot, HumNum starttime) {
+	NODE_VERIFY(pgFoot, )
+	return;
+}
+
+
 
 //////////////////////////////
 //
-// Tool_mei2hum::processStaffGrp -- Process a <staffGrp> element in an MEI file.
+// Tool_mei2hum::processPgHead -- Dummy function since scoreDef/pgHead is ignored.
 //
 
-void Tool_mei2hum::processStaffGrp(xml_node staffGrp, HumNum starttime) {
+void Tool_mei2hum::processPgHead(xml_node pgHead, HumNum starttime) {
+	NODE_VERIFY(pgHead, )
+	return;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::parseStaffGrp -- Process a <staffGrp> element in an MEI file.
+//
+
+void Tool_mei2hum::parseStaffGrp(xml_node staffGrp, HumNum starttime) {
 	NODE_VERIFY(staffGrp, )
 	MAKE_CHILD_LIST(children, staffGrp);
 
 	for (xml_node item : children) {
 		string nodename = item.name();
 		if (nodename == "staffGrp") {
-		    processStaffGrp(item, starttime);
+		    parseStaffGrp(item, starttime);
 		} else if (nodename == "staffDef") {
-		    processStaffDef(item, starttime);
+		    parseStaffDef(item, starttime);
 		} else {
 			cerr << DKHTP << staffGrp.name() << "/" << nodename << CURRLOC << endl;
 		}
@@ -37094,10 +37322,38 @@ void Tool_mei2hum::processStaffGrp(xml_node staffGrp, HumNum starttime) {
 
 //////////////////////////////
 //
-// Tool_mei2hum::processStaffDef -- Process a <staffDef> element in an MEI file.
+// Tool_mei2hum::parseStaffDef -- Process a <staffDef> element in an MEI file.
+//
+// Also see instrument abbreviations:
+//     https://www.loc.gov/standards/valuelist/marcmusperf.html
+//
+// Stored in mei/meiHead/workDesc/work/perfMedium/perfResList/perfRes@codeval:
+//
+// <mei>
+//     <meiHead>
+//         <workDesc>
+//             <work>
+//                <perfMedium>
+//                    <perfResList>
+//                        <perfRes codedval="wa">Flute</perfRes>
+//                        <perfRes codedval="wb">Oboe 1</perfRes>
+//                        <perfRes codedval="wb">Oboe 2</perfRes>
+//                        <perfRes codedval="wc">Clarinet in B flat 1</perfRes>
+//                        <perfRes codedval="wc">Clarinet in B flat 2</perfRes>
+//                        <perfRes codedval="bc">Horn in F 1</perfRes>
+//                        <perfRes codedval="bc">Horn F 2</perfRes>
+//                        <perfRes codedval="bb" solo="true">Solo Trumpet in C</perfRes>
+//                        <perfRes codedval="pa">Timpani</perfRes>
+//                        <perfRes codedval="sa">Violin I</perfRes>
+//                        <perfRes codedval="sa">Violin II</perfRes>
+//                        <perfRes codedval="sb">Viola</perfRes>
+//                        <perfRes codedval="sc">Violoncello</perfRes>
+//                        <perfRes codedval="sd">Contrabass</perfRes>
+//                    </perfResList>
+//                </perfMedium>
 //
 
-void Tool_mei2hum::processStaffDef(xml_node staffDef, HumNum starttime) {
+void Tool_mei2hum::parseStaffDef(xml_node staffDef, HumNum starttime) {
 	NODE_VERIFY(staffDef, )
 
 	string staffnum = staffDef.attribute("n").value();
@@ -37128,7 +37384,41 @@ void Tool_mei2hum::processStaffDef(xml_node staffDef, HumNum starttime) {
 	string keysig = m_scoreDef.staves[num-1].keysig;
 	string timesig = m_scoreDef.staves[num-1].timesig;
 	string midibpm = m_scoreDef.staves[num-1].midibpm;
+	string transpose = m_scoreDef.staves[num-1].transpose;
+	string label = m_scoreDef.staves[num-1].label;
+	string labelabbr = m_scoreDef.staves[num-1].labelabbr;
 
+	// Incorporate label into HumGrid:
+	if (label.empty()) {
+		label = m_scoreDef.global.label;
+	}
+	if (!label.empty()) {
+		// Need to store in next measure (fix later).  If there are no measures then
+		// create one.
+		if (m_outdata.empty()) {
+			/* GridMeasure* gm = */ m_outdata.addMeasureToBack();
+		}
+		// m_scoreDef.staves[num-1].keysig disappears after this line, so some
+		// leaky memory is likey to happen here.
+		m_outdata.back()->addLabelToken(label, starttime QUARTER_CONVERT, num-1,
+				0, 0, m_staffcount);
+	}
+
+	// Incorporate labelabbr into HumGrid:
+	if (labelabbr.empty()) {
+		labelabbr = m_scoreDef.global.labelabbr;
+	}
+	if (!labelabbr.empty()) {
+		// Need to store in next measure (fix later).  If there are no measures then
+		// create one.
+		if (m_outdata.empty()) {
+			/* GridMeasure* gm = */ m_outdata.addMeasureToBack();
+		}
+		// m_scoreDef.staves[num-1].keysig disappears after this line, so some
+		// leaky memory is likey to happen here.
+		m_outdata.back()->addLabelAbbrToken(labelabbr, starttime QUARTER_CONVERT, num-1,
+				0, 0, m_staffcount);
+	}
 
 	// Incorporate clef into HumGrid:
 	if (clef.empty()) {
@@ -37143,6 +37433,20 @@ void Tool_mei2hum::processStaffDef(xml_node staffDef, HumNum starttime) {
 		// m_scoreDef.staves[num-1].keysig disappears after this line, so some
 		// leaky memory is likey to happen here.
 		m_outdata.back()->addClefToken(clef, starttime QUARTER_CONVERT, num-1,
+				0, 0, m_staffcount);
+	}
+
+	// Incorporate transposition into HumGrid:
+	if (transpose.empty()) {
+		transpose = m_scoreDef.global.transpose;
+	}
+	if (!transpose.empty()) {
+		// Need to store in next measure (fix later).  If there are no measures then
+		// create one.
+		if (m_outdata.empty()) {
+			/* GridMeasure* gm = */ m_outdata.addMeasureToBack();
+		}
+		m_outdata.back()->addTransposeToken(transpose, starttime QUARTER_CONVERT, num-1,
 				0, 0, m_staffcount);
 	}
 
@@ -37208,6 +37512,10 @@ void Tool_mei2hum::fillWithStaffDefAttributes(mei_staffDef& staffinfo, xml_node 
 	string staffnum;
 	string keysig;
 	string midibpm;
+	string label;
+	string labelabbr;
+	int transsemi;
+	int transdiat;
 
 	string nodename = element.name();
 
@@ -37230,14 +37538,34 @@ void Tool_mei2hum::fillWithStaffDefAttributes(mei_staffDef& staffinfo, xml_node 
 			meterunit = atti->value();
 		} else if (attname == "key.sig") {
 			keysig = atti->value();
+		} else if (attname == "label") {
+			label = atti->value();
+		} else if (attname == "label.abbr") {
+			labelabbr = atti->value();
 		} else if (attname == "midi.bpm") {
 			midibpm = atti->value();
+		} else if (attname == "trans.semi") {
+			transsemi = atti->as_int();
+		} else if (attname == "trans.diat") {
+			transdiat = atti->as_int();
 		} else if (attname == "n") {
 			nnum = atoi(atti->value());
 		}
 	}
 	if (nnum < 1) {
 		nnum = 1;
+	}
+
+	if ((transsemi != 0) || (transdiat != 0)) {
+		// Fix octave transposition problems:
+		if ((transsemi ==  12) && (transdiat ==  0)) { transdiat =   7; }
+		if ((transsemi == -12) && (transdiat ==  0)) { transdiat =  -7; }
+		if ((transsemi ==   0) && (transdiat ==  7)) { transsemi =  12; }
+		if ((transsemi ==   0) && (transdiat == -7)) { transsemi = -12; }
+		// transposition needed to get to transposed score:
+		staffinfo.transpose = "*ITrd" + to_string(-transdiat) + "c" + to_string(-transsemi);
+		// transposition needed to get to C score:
+		staffinfo.base40 = -Convert::transToBase40(staffinfo.transpose);
 	}
 
 	if ((!clefshape.empty()) && (!clefline.empty())) {
@@ -37270,6 +37598,16 @@ void Tool_mei2hum::fillWithStaffDefAttributes(mei_staffDef& staffinfo, xml_node 
 			accid = -1;
 		}
 
+
+		// Also check for enharmonic transpositions...
+		int adjust = 0;
+		if (staffinfo.base40 != 0) {
+			adjust = Convert::base40IntervalToLineOfFifths(staffinfo.base40);
+		}
+		count += adjust;
+
+		// Adjust for transposition to C score here.
+
 		if (accid > 0) {
 			switch (count) {
 				case 1: staffinfo.keysig = "*k[f#]";             break;
@@ -37295,6 +37633,12 @@ void Tool_mei2hum::fillWithStaffDefAttributes(mei_staffDef& staffinfo, xml_node 
 	if (!midibpm.empty()) {
 		staffinfo.midibpm = "*MM" + midibpm;
 	}
+	if (!label.empty()) {
+		staffinfo.label = "*I\"" + label;
+	}
+	if (!labelabbr.empty()) {
+		staffinfo.labelabbr = "*I'" + labelabbr;
+	}
 
 }
 
@@ -37317,7 +37661,9 @@ HumNum Tool_mei2hum::parseSection(xml_node section, HumNum starttime) {
 			starttime = parseMeasure(children[i], starttime);
 		} else if (nodename == "app") {
 			starttime = parseApp(children[i], starttime);
-		} else if (nodename == "sb") {
+		} else if (nodename == "sb") {   // system break
+			parseSb(children[i], starttime);
+		} else if (nodename == "pb") {   // page break;
 			parseSb(children[i], starttime);
 		} else {
 			cerr << DKHTP << section.name() << "/" << nodename << CURRLOC << endl;
@@ -37326,6 +37672,28 @@ HumNum Tool_mei2hum::parseSection(xml_node section, HumNum starttime) {
 
 	return starttime;
 }
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::parsePb -- Page break in the music.  Currently treating the same
+//   as <sb>.
+//
+
+void Tool_mei2hum::parsePb(xml_node pb, HumNum starttime) {
+	NODE_VERIFY(pb, );
+	MAKE_CHILD_LIST(children, pb);
+
+	// There should be no children of pb (at least any that are currently known)
+	for (int i=0; i<(int)children.size(); i++) {
+		string nodename = children[i].name();
+		cerr << DKHTP << pb.name() << "/" << nodename << CURRLOC << endl;
+	}
+
+	m_outdata.back()->appendGlobalLayout("!!LO:LB", starttime QUARTER_CONVERT);
+}
+
 
 
 //////////////////////////////
@@ -37476,10 +37844,16 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 			// handled in process processNode(Start|Stop)Links()
 		} else if (nodename == "arpeg") {
 			// handled in process processNode(Start|Stop)Links()
+		} else if (nodename == "tupletSpan") {
+			// handled in process processNode(Start|Stop)Links()
 		} else if (nodename == "dynam") {
 			parseDynam(children[i], starttime);
+		} else if (nodename == "tempo") {
+			parseTempo(children[i], starttime);
 		} else if (nodename == "dir") {
 			parseDir(children[i], starttime);
+		} else if (nodename == "reh") {
+			parseReh(children[i], starttime);
 		} else {
 			cerr << DKHTP << measure.name() << "/" << nodename << CURRLOC << endl;
 		}
@@ -37507,22 +37881,26 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 			if (durations[i] == targetDur) {
 				continue;
 			}
-			if (durations[i] < targetDur) {
+			if (durations[i] QUARTER_CONVERT < targetDur) {
 				std::ostringstream message;
 				message << "Error: measure " << m_currentMeasure;
 				message << " staff " << i+1 << " is underfilled: ";
 				message << (durations[i] QUARTER_CONVERT).getFloat();
 				message << " quarter notes instead of ";
-				message << (targetDur QUARTER_CONVERT).getFloat() << ".";
+// ggg
+				// message << (targetDur QUARTER_CONVERT).getFloat() << ".";
+				message << targetDur.getFloat() << ".";
 				cerr << message.str() << endl;
 				m_outdata.back()->addGlobalComment("!!" + message.str(), starttime QUARTER_CONVERT);
-			} else if (durations[i] > targetDur) {
+			} else if (durations[i] QUARTER_CONVERT > targetDur) {
 				std::ostringstream message;
 				message << "Error: measure " << m_currentMeasure;
 				message << " staff " << i+1 << " is overfilled: ";
 				message << (durations[i] QUARTER_CONVERT).getFloat();
 				message << " quarter notes instead of ";
-				message << (targetDur QUARTER_CONVERT).getFloat() << ".";
+// ggg
+				// message << (targetDur QUARTER_CONVERT).getFloat() << ".";
+				message << targetDur.getFloat() << ".";
 				cerr << message.str() << endl;
 				m_outdata.back()->addGlobalComment("!!" + message.str(), starttime QUARTER_CONVERT);
 			}
@@ -37542,8 +37920,25 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 		gm->setRepeatBackwardStyle();
 	}
 
-
 	return starttime + measuredur;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::parseReh -- Rehearsal markings (ignored for now)
+//
+
+void Tool_mei2hum::parseReh(xml_node reh, HumNum starttime) {
+	NODE_VERIFY(reh, );
+	MAKE_CHILD_LIST(children, reh);
+
+	for (int i=0; i<(int)children.size(); i++) {
+		string nodename = children[i].name();
+		cerr << DKHTP << reh.name() << "/" << nodename << CURRLOC << endl;
+	}
+
 }
 
 
@@ -37690,7 +38085,6 @@ HumNum Tool_mei2hum::parseLayer(xml_node layer, HumNum starttime) {
 
 	m_currentLayer = 0;
 	return starttime;
-// ggg
 }
 
 
@@ -37881,6 +38275,8 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output, Hu
 		cerr << "Warning: currently ignoring grace notes." << endl;
  		return starttime;
 	}
+
+	processPreliminaryLinkedNodes(note);
 
 	if (chord) {
 		duration = getDuration(chord);
@@ -38169,6 +38565,8 @@ HumNum Tool_mei2hum::parseRest(xml_node rest, HumNum starttime) {
 		ELEMENT_DEBUG_STATEMENT(space)
 	}
 
+	processPreliminaryLinkedNodes(rest);
+
 	HumNum duration = getDuration(rest);
 	int dotcount = getDotCount(rest);
 	string recip = getHumdrumRecip(duration, dotcount);
@@ -38330,6 +38728,24 @@ void Tool_mei2hum::processFermataAttribute(string& output, xml_node node) {
 
 //////////////////////////////
 //
+// Tool_mei2hum::processPreliminaryLinkedNodes -- Process tupletSpan
+//      before rhythm of linked notes are processed.
+//
+
+void Tool_mei2hum::processPreliminaryLinkedNodes(xml_node node) {
+	string id = node.attribute("xml:id").value();
+	if (!id.empty()) {
+		auto found = m_startlinks.find(id);
+		if (found != m_startlinks.end()) {
+			processNodeStartLinks2(node, (*found).second);
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
 // Tool_mei2hum::processLinkedNodes --
 //
 
@@ -38383,11 +38799,123 @@ void Tool_mei2hum::processNodeStartLinks(string& output, xml_node node,
 			parseTieStart(output, node, nodelist[i]);
 		} else if (nodename == "arpeg") {
 			parseArpeg(output, node, nodelist[i]);
+		} else if (nodename == "tupletSpan") {
+			// handled in processNodeStartLinks2
 		} else {
 			cerr << DKHTP << nodename
 			     << " element in processNodeStartLinks()" << endl;
 		}
 	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::processNodeStartLinks2 -- process tupletSpan before the 
+//     duration of the note/rest/chord is calculated.
+//
+
+void Tool_mei2hum::processNodeStartLinks2(xml_node node,
+		vector<xml_node>& nodelist) {
+	for (int i=0; i<(int)nodelist.size(); i++) {
+		string nodename = nodelist[i].name();
+		if (nodename == "tupletSpan") {
+			parseTupletSpanStart(node, nodelist[i]);
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::parseTupletSpanStart -- 
+//     Such as:
+//          <tupletSpan staff="10" num="3" numbase="2" num.visible="true"
+//                num.place="below" num.format="count" startid="#4235235"
+//                endid="#532532"/>
+//
+
+void Tool_mei2hum::parseTupletSpanStart(xml_node node, 
+		xml_node tupletSpan) {
+	NODE_VERIFY(tupletSpan, )
+
+	if (strcmp(tupletSpan.attribute("endid").value(), "") == 0) {
+		cerr << "Warning: <tupletSpan> requires endid attribute (at least ";
+		cerr << "for this parser)" << endl;
+		return;
+	}
+
+	if (strcmp(tupletSpan.attribute("startid").value(), "") == 0) {
+		cerr << "Warning: <tupletSpan> requires startid attribute (at least ";
+		cerr << "for this parser)" << endl;
+		return;
+	}
+
+	string num = tupletSpan.attribute("num").value();
+	string numbase = tupletSpan.attribute("numbase").value();
+
+	HumNum newfactor = 1;
+
+	if (numbase == "") {
+		cerr << "Warning: tuplet@numbase is empty" << endl;
+	} else {
+		newfactor = stoi(numbase);
+	}
+
+	if (num == "") {
+		cerr << "Warning: tuplet@num is empty" << endl;
+	} else {
+		newfactor /= stoi(num);
+	}
+
+	m_tupletfactor *= newfactor;
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::parseTupletSpanStop -- 
+//     Such as:
+//          <tupletSpan staff="10" num="3" numbase="2" num.visible="true"
+//                num.place="below" num.format="count" startid="#4235235"
+//                endid="#532532"/>
+//
+
+void Tool_mei2hum::parseTupletSpanStop(string& output, xml_node node, 
+		xml_node tupletSpan) {
+	NODE_VERIFY(tupletSpan, )
+
+	if (strcmp(tupletSpan.attribute("endid").value(), "") == 0) {
+		return;
+	}
+	if (strcmp(tupletSpan.attribute("startid").value(), "") == 0) {
+		return;
+	}
+
+	string num = tupletSpan.attribute("num").value();
+	string numbase = tupletSpan.attribute("numbase").value();
+
+	HumNum newfactor = 1;
+
+	if (numbase == "") {
+		cerr << "Warning: tuplet@numbase is empty" << endl;
+	} else {
+		newfactor = stoi(numbase);
+	}
+
+	if (num == "") {
+		cerr << "Warning: tuplet@num is empty" << endl;
+	} else {
+		newfactor /= stoi(num);
+	}
+
+	// undo the tuplet factor:
+	m_tupletfactor /= newfactor;
+
 }
 
 
@@ -38442,6 +38970,8 @@ void Tool_mei2hum::processNodeStopLinks(string& output, xml_node node,
 			parseSlurStop(output, node, nodelist[i]);
 		} else if (nodename == "tie") {
 			parseTieStop(output, node, nodelist[i]);
+		} else if (nodename == "tupletSpan") {
+			parseTupletSpanStop(output, node, nodelist[i]);
 		} else {
 			cerr << DKHTP << nodename
 			     << " element in processNodeStopLinks()" << endl;
@@ -38698,6 +39228,15 @@ string Tool_mei2hum::getHumdrumPitch(xml_node note) {
 		}
 	}
 
+	// Transpose to C score if part is transposing:
+	if (m_currentStaff) {
+		if (m_scoreDef.staves[m_currentStaff-1].base40 != 0) {
+			int base40 = Convert::kernToBase40(output);
+			base40 += m_scoreDef.staves[m_currentStaff-1].base40;
+			output = Convert::base40ToKern(base40);
+		}
+	}
+
 	return output;
 }
 
@@ -38928,6 +39467,10 @@ HumNum Tool_mei2hum::parseChord(xml_node chord, HumNum starttime) {
 	NODE_VERIFY(chord, starttime)
 	MAKE_CHILD_LIST(children, chord);
 
+	processPreliminaryLinkedNodes(chord);
+
+	HumNum duration = getDuration(chord);
+
 	string tok;
 	int counter = 0;
 	for (int i=0; i<(int)children.size(); i++) {
@@ -38954,7 +39497,6 @@ HumNum Tool_mei2hum::parseChord(xml_node chord, HumNum starttime) {
 	m_outdata.back()->addDataToken(tok, starttime QUARTER_CONVERT, m_currentStaff-1,
 		0, m_currentLayer-1, m_staffcount);
 
-	HumNum duration = getDuration(chord);
 	return starttime + duration;
 }
 
@@ -39171,7 +39713,12 @@ void Tool_mei2hum::parseDir(xml_node dir, HumNum starttime) {
 		if (previous->isLayoutSlice()) {
 			GridVoice* voice = previous->at(staffnum-1)->at(0)->at(0);
 			HTp tok = voice->getToken();
-			if ((tok == NULL) || tok->isNull()) {
+			if (tok == NULL) {
+				HTp newtok = new HumdrumToken(message);
+				voice->setToken(newtok);
+				tok = voice->getToken();
+				break;
+			} else if (tok->isNull()) {
 				tok->setText(message);
 				break;
 			}
@@ -39184,8 +39731,6 @@ void Tool_mei2hum::parseDir(xml_node dir, HumNum starttime) {
 		int voicei = 0;
 		ngs->addToken(message, parti, staffi, voicei);
 		gm->insert(gsit, ngs);
-
-// ggg
 
 		break;
 	}
@@ -39303,6 +39848,145 @@ string Tool_mei2hum::cleanReferenceRecordText(const string& input) {
 	}
 
 	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::parseTempo --
+//
+// Example:
+//   <tempo tstamp="1" place="above" staff="1">
+//      1 - Allegro con spirito <rend fontname="VerovioText">&#xE1D5;</rend> = 132
+//   </tempo>
+//
+//
+// Ways of indicating tempo:
+//
+// tempo@midi.bpm == tempo per quarter note (Same as Humdrum *MM value)
+//
+// tempo@midi.mspb == microseconds per quarter note ( bpm = mspb * 60 / 1000000) 
+//
+// tempo@mm == tempo per beat (bpm = mm / unit(dots))
+// tempo@mm.unit == beat unit for tempo@mm
+// tempo@mm.dots == dots for tempo@unit
+// 
+// Free-form text:
+//
+// &#xE1D5; == quarter note
+//
+
+#define SMUFL_QUARTER_NOTE "\ue1d5"
+
+void Tool_mei2hum::parseTempo(xml_node tempo, HumNum starttime) {
+	NODE_VERIFY(tempo, )
+
+	bool found = false;
+	double value = 0.0;
+
+	xml_attribute bpm = tempo.attribute("bpm");
+	if (bpm) {
+		value = bpm.as_double();
+		if (value > 0.0) {
+			found = true;
+		}
+	}
+
+	if (!found) {
+		xml_attribute mspb   = tempo.attribute("mspb");
+		value = mspb.as_double() * 60.0 / 1000000.0;
+		if (value > 0.0) {
+			found = true;
+		}
+	}
+
+	if (!found) {
+		xml_attribute mm     = tempo.attribute("mm");
+		xml_attribute mmunit = tempo.attribute("mm.unit");
+		xml_attribute mmdots = tempo.attribute("mm.dots");
+		value = mm.as_double();
+		string recip = mmunit.value();
+		int dcount = mmdots.as_int();
+		for (int i=0; i<dcount; i++) {
+			recip += '.';
+		}
+		HumNum duration = Convert::recipToDuration(recip);
+		value *= duration.getFloat();
+		if (value > 0.0) {
+			found = true;
+		}
+	}
+
+	if (!found) {
+		// search for free-form tempo marking.  Something like:
+		//   <tempo tstamp="1" place="above" staff="1">
+		//      1 - Allegro con spirito <rend fontname="VerovioText">&#xE1D5;</rend> = 132
+		//   </tempo>
+		//
+		// UTF-8 version in string "\ue1d5";
+		string text;
+
+		MAKE_CHILD_LIST(children, tempo);
+		for (int i=0; i<(int)children.size(); i++) {
+			if (children[i].type() == pugi::node_pcdata) {
+				text += children[i].value();
+			} else {
+				text += children[i].child_value();
+			}
+			text += " ";
+
+		}
+		HumRegex hre;
+		if (hre.search(text, SMUFL_QUARTER_NOTE "\\s*=\\s*(\\d+\\.?\\d*)")) {
+			value = hre.getMatchDouble(1);
+			found = true;
+		}
+		// further rhythmic values for tempo should go here.
+	}
+
+	// also deal with tempo designiations such as "Allegro"...
+
+	if (!found) {
+		// no tempo to set
+		return;
+	}
+
+	// insert tempo 
+	GridMeasure* gm = m_outdata.back();
+	GridSlice* gs = new GridSlice(gm, starttime, SliceType::Tempos, m_maxStaffInFile);
+	stringstream stok;
+	stok << "*MM" << value;
+	string token = stok.str();
+
+	for (int i=0; i<m_maxStaffInFile; i++) {
+		gs->at(i)->at(0)->at(0)->setToken(token);
+	}
+
+	// insert after time signature at same timestamp if possible
+	bool inserted = false;
+	for (auto it = gm->begin(); it != gm->end(); it++) {
+		if ((*it)->getTimestamp() > starttime) {
+			gm->insert(it, gs);
+			inserted = true;
+			break;
+		} else if ((*it)->isTimeSigSlice()) {
+			it++;
+			gm->insert(it, gs);
+			inserted = true;
+			break;
+		} else if (((*it)->getTimestamp() == starttime) && ((*it)->isNoteSlice()
+				|| (*it)->isGraceSlice())) {
+			gm->insert(it, gs);
+			inserted = true;
+			break;
+		}
+	}
+
+	if (!inserted) {
+		gm->push_back(gs);
+	}
+
 }
 
 
@@ -45858,6 +46542,295 @@ void Tool_satb2gs::example(void) {
 
 void Tool_satb2gs::usage(const string& command) {
 
+}
+
+
+
+
+
+/////////////////////////////////
+//
+// Tool_tassoize::Tool_tassoize -- Set the recognized options for the tool.
+//
+
+Tool_tassoize::Tool_tassoize(void) {
+	// no options yet
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_tassoize::run -- Primary interfaces to the tool.
+//
+
+bool Tool_tassoize::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_tassoize::run(HumdrumFile& infile, ostream& out) {
+	int status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+//
+// In-place processing of file:
+//
+
+bool Tool_tassoize::run(HumdrumFile& infile) {
+	processFile(infile);
+
+	// Re-load the text for each line from their tokens.
+	infile.createLinesFromTokens();
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_tassoize::processFile --
+//
+
+void Tool_tassoize::processFile(HumdrumFile& infile) {
+
+	m_pstates.resize(infile.getMaxTrack() + 1);
+	m_estates.resize(infile.getMaxTrack() + 1);
+	for (int i=0; i<(int)m_pstates.size(); i++) {
+		m_pstates[i].resize(70);
+		fill(m_pstates[i].begin(), m_pstates[i].end(), 0);
+		m_estates[i].resize(70);
+		fill(m_estates[i].begin(), m_estates[i].end(), false);
+	}
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isInterpretation()) {
+			updateKeySignatures(infile, i);
+			continue;
+		} else if (infile[i].isBarline()) {
+			clearStates();
+			continue;
+		} else if (infile[i].isData()) {
+			checkDataLine(infile, i);
+		}
+	}
+}
+
+
+
+////////////////////////////////
+//
+// Tool_tassoize::checkDataLine --
+//
+
+void Tool_tassoize::checkDataLine(HumdrumFile& infile, int lineindex) {
+	HumdrumLine& line = infile[lineindex];
+
+	HTp token;
+	bool editQ;
+	int diatonic;
+	// int octave;
+	int accid;
+	int track;
+	for (int i=0; i<line.getFieldCount(); i++) {
+		token = line.token(i);
+		track = token->getTrack();
+		if (token->isNull()) {
+			continue;
+		}
+		if (!token->isKern()) {
+			continue;
+		}
+		if (token->isRest()) {
+			continue;
+		}
+		diatonic = Convert::kernToBase7(token);
+		// octave = diatonic / 7;
+		diatonic = diatonic % 7;
+		accid = Convert::kernToAccidentalCount(token);
+		editQ = false;
+
+		// hard-wired to "i" as editorial accidental marker
+		if (token->find("ni") != string::npos) {
+			editQ = true;
+		} else if (token->find("-i") != string::npos) {
+			editQ = true;
+		} else if (token->find("#i") != string::npos) {
+			editQ = true;
+		}
+
+		if (editQ) {
+			// store new editorial pitch state
+			m_estates.at(track).at(diatonic) = true;
+			m_pstates.at(track).at(diatonic) = accid;
+			continue;
+		}
+
+		if (!m_estates[track][diatonic]) {
+			// last note with same pitch did not have editorial accidental
+			m_pstates[track][diatonic] = accid;
+			continue;
+		}
+
+		if (accid != m_pstates[track][diatonic]) {
+			// change in accidental (which would be explicit)
+			m_pstates[track][diatonic] = accid;
+			m_estates[track][diatonic] = false;
+			continue;
+		}
+
+		// At this point the previous note with this pitch class
+		// had an editorial accidental, and this note also has the
+		// same accidentla, so the note should have an editorial
+		// mark applied (since Sibelius will drop secondary editorial
+		// accidentals in a measure when exporting MusicXML).
+
+		m_estates[track][diatonic] = true;
+		m_pstates[track][diatonic] = accid;
+
+		string text = token->getText();
+		string output = "";
+		bool foundQ = false;
+		for (int j=0; j<(int)text.size(); j++) {
+			if (text[j] == 'n') {
+				output += "ni";
+				foundQ = true;
+			} else if (text[j] == '#') {
+				output += "#i";
+				foundQ = true;
+			} else if (text[j] == '-') {
+				output += "-i";
+				foundQ = true;
+			} else {
+				output += text[j];
+			}
+		}
+
+		if (foundQ) {
+			token->setText(output);
+			continue;
+		}
+
+		// The note is natural, but has no natural sign.
+		// add the natural sign and editorial mark.
+		for (int j=(int)output.size()-1; j>=0; j--) {
+			if ((tolower(output[j]) >= 'a') && (tolower(output[j]) <= 'g')) {
+				output.insert(j+1, "ni");
+				break;
+			}
+		}
+		token->setText(output);
+	}
+}
+
+
+
+////////////////////////////////
+//
+// Tool_tassoize::updateKeySignatures --
+//
+
+void Tool_tassoize::updateKeySignatures(HumdrumFile& infile, int lineindex) {
+	HumdrumLine& line = infile[lineindex];
+	int track;
+	for (int i=0; i<line.getFieldCount(); i++) {
+		if (!line.token(i)->isKeySignature()) {
+			continue;
+		}
+		HTp token = line.token(i);
+		track = token->getTrack();
+		string text = token->getText();
+		fill(m_pstates[track].begin(), m_pstates[track].end(), 0);
+		for (int j=3; j<(int)text.size()-1; j++) {
+			switch (text[j]) {
+				case 'a': case 'A':
+					switch (text[j+1]) {
+						case '#': m_pstates[track][5] = +1;
+						case '-': m_pstates[track][5] = -1;
+					}
+					break;
+
+				case 'b': case 'B':
+					switch (text[j+1]) {
+						case '#': m_pstates[track][6] = +1;
+						case '-': m_pstates[track][6] = -1;
+					}
+					break;
+
+				case 'c': case 'C':
+					switch (text[j+1]) {
+						case '#': m_pstates[track][0] = +1;
+						case '-': m_pstates[track][0] = -1;
+					}
+					break;
+
+				case 'd': case 'D':
+					switch (text[j+1]) {
+						case '#': m_pstates[track][1] = +1;
+						case '-': m_pstates[track][1] = -1;
+					}
+					break;
+
+				case 'e': case 'E':
+					switch (text[j+1]) {
+						case '#': m_pstates[track][2] = +1;
+						case '-': m_pstates[track][2] = -1;
+					}
+					break;
+
+				case 'f': case 'F':
+					switch (text[j+1]) {
+						case '#': m_pstates[track][3] = +1;
+						case '-': m_pstates[track][3] = -1;
+					}
+					break;
+
+				case 'g': case 'G':
+					switch (text[j+1]) {
+						case '#': m_pstates[track][4] = +1;
+						case '-': m_pstates[track][4] = -1;
+					}
+					break;
+			}
+			for (int j=0; j<7; j++) {
+				if (m_pstates[track][j] == 0) {
+					continue;
+				}
+				for (int k=1; k<10; k++) {
+					m_pstates[track][j+k*7] = m_pstates[track][j];
+				}
+			}
+		}
+	}
+}
+
+
+
+////////////////////////////////
+//
+// Tool_tassoize::clearStates --
+//
+
+void Tool_tassoize::clearStates(void) {
+	for (int i=0; i<(int)m_pstates.size(); i++) {
+		fill(m_pstates[i].begin(), m_pstates[i].end(), 0);
+	}
+	for (int i=0; i<(int)m_estates.size(); i++) {
+		fill(m_estates[i].begin(), m_estates[i].end(), false);
+	}
 }
 
 
