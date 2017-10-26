@@ -40,6 +40,7 @@ $FLAGS .= " --memory-init-file 0";
 $FLAGS .= " -std=c++11";
 $FLAGS .= " -s ASM_JS=1";
 $FLAGS .= " -s OUTLINING_LIMIT=10000";
+$FLAGS .= " -s ALLOW_MEMORY_GROWTH=1";
 $FLAGS .= " -s TOTAL_MEMORY=192*1024*1024";
 $FLAGS .= " -s TOTAL_STACK=96*1024*1024";
 
@@ -90,6 +91,10 @@ GetOptions (
 if ($wasmQ) {
 	print "Creating WASM toolkit version\n";
 	$FLAGS = "-O3";
+	# tried this for find the integer overflow runtime error but g4 does not work, so line number is missing
+	# $FLAGS = "-g4 -O0 --emit-symbol-map"; 
+	# this is necessary to avoid integer overflow runtime error
+	$FLAGS .= " -s \"BINARYEN_TRAP_MODE='clamp'\"";
 	$FLAGS .= " -DNDEBUG";
 	$FLAGS .= " --memory-init-file 0";
 	$FLAGS .= " -std=c++11";
@@ -97,6 +102,7 @@ if ($wasmQ) {
 	$FLAGS .= " -s OUTLINING_LIMIT=10000";
 	$FLAGS .= " -s TOTAL_MEMORY=256*1024*1024";
 	$FLAGS .= " -s TOTAL_STACK=128*1024*1024";
+	$FLAGS .= " -s ALLOW_MEMORY_GROWTH=1";	
 	$FLAGS_NAME = "-wasm";
 }
 
