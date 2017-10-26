@@ -162,6 +162,7 @@ downloads:
     function apply_zoom() {
         console.log("apply zoom")
         if (vrvToolkit === undefined) return;
+        console.debug(vrvToolkit);
         
         $.cookie('zoom', zoom, { expires: 30 });
         set_options();
