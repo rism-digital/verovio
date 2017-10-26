@@ -69,9 +69,7 @@ downloads:
                     adjustPageHeight: 1,
                     ignoreLayout: 1
                 };
-        console.debug( options );
         vrvToolkit.setOptions( options );
-        console.debug("options set");
     }
 
     function upload_file() {
@@ -180,7 +178,6 @@ downloads:
         if (measure != 0) {
             page = vrvToolkit.getPageWithElement(measure);
         }
-        console.debug(page);
         load_page();
     }
 
