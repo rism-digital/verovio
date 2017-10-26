@@ -161,8 +161,10 @@ downloads:
 
     function apply_zoom() {
         console.log("apply zoom")
+        // make sure we the toolkit exists
         if (vrvToolkit === undefined) return;
-        console.debug(vrvToolkit);
+        // make sure we have loaded a file
+        if (vrvToolkit.getPageCount() == 0) return;
         
         $.cookie('zoom', zoom, { expires: 30 });
         set_options();
