@@ -51,7 +51,7 @@ projects:
 <div class="row home-row">
     <div class="col-md-6 col-sm-12">
         <h4>News</h4>
-        {% for p in site.posts limit:3 %}
+        {% for p in site.posts limit:4 %}
         <hr class="news-row"/>
         <h5>{{ p.date | date: '%B %d, %Y' }} – {{ p.title }}</h5>
         <div class="content">
