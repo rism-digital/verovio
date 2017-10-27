@@ -10,6 +10,14 @@ Verovio follows the [Standard Music Font Layout (SMuFL)](http://www.smufl.org) s
 
 The project page is http://www.verovio.org. Verovio is available under the LGPL license (see LICENSE.txt).
 
+
+NPM
+---
+
+The devlopment version is available via [NPM](https://www.npmjs.com/package/verovio-dev)
+
+    $ npm install verovio-dev
+
 LibMEI
 ------
 
