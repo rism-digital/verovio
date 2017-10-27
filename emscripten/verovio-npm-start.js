@@ -21,7 +21,7 @@ init = function (memory, createInstance = false) {
 		else {
 			Module.TOTAL_MEMORY = 2*memory*1024*1024;
 			Module.TOTAL_STACK = memory*1024*1024;
-			console.info("Maxmimum memory increased to %d MB", memory);
+			console.info("Maxmimum memory increased to " + memory + "MB");
 		}
 	}
 	
