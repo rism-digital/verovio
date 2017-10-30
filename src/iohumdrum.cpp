@@ -1262,7 +1262,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         else if (d[i] == '{') {
             groupstyle.back() = '{';
         }
-        else if ((d[i] == 's') && (std::isdigit(d[i + 1]))) {
+        else if (d[i] == 's') {
             staffQ = true;
         }
         else if (d[i] == ')') {
@@ -1291,6 +1291,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                 staffQ = false;
                 if (value < 0) {
                     // Spine does not exist in score, so skip
+                    value = 0;
                     continue;
                 }
                 else {
@@ -1351,9 +1352,11 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
 
     // Build system groups based on system decoration instructions
     if (newgroups.size() == 1) {
-        // one barred group
+        // only one group
         StaffGrp *sg = new StaffGrp();
         m_doc->m_scoreDef.AddChild(sg);
+        // currently required to be barred:
+        sg->SetBarthru(BOOLEAN_true);
         if (newstyles[0] == '[') {
             sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
         }
