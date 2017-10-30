@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Oct 22 20:36:00 PDT 2017
+// Last Modified: Mon Oct 30 00:07:27 PDT 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2695,6 +2695,117 @@ GridSlice* GridMeasure::appendGlobalLayout(const string& tok, HumNum timestamp) 
 
 //////////////////////////////
 //
+// GridSlice::addGraceToken -- Add a grace note token at the given
+//   gracenumber grace note line before the data line at the given
+//   timestamp.
+//
+
+GridSlice* GridMeasure::addGraceToken(const string& tok, HumNum timestamp,
+	int part, int staff, int voice, int maxstaff, int gracenumber) {
+	if (gracenumber < 1) {
+		cerr << "ERROR: gracenumber " << gracenumber << " has to be larger than 0" << endl;
+		return NULL;
+	}
+
+	GridSlice* gs = NULL;
+	GridSlice* datatarget = NULL;
+	auto iterator = this->begin();
+	if (this->empty()) {
+		// add a new GridSlice to an empty list or at end of list if timestamp
+		// is after last entry in list.
+		gs = new GridSlice(this, timestamp, SliceType::GraceNotes, maxstaff);
+		gs->addToken(tok, part, staff, voice);
+		this->push_back(gs);
+	} else if (timestamp > this->back()->getTimestamp()) { 
+
+		// Grace note needs to be added at the end of a measure:
+		auto it2 = this->end();
+		it2--;
+		int counter = 0;
+		while (it2 != this->end()) {
+			if ((*it2)->isGraceSlice()) {
+				counter++;
+				if (counter == gracenumber) {
+					// insert grace note into this slice
+					(*it2)->addToken(tok, part, staff, voice);
+					return *it2;
+				}
+			} else if ((*it2)->isLayoutSlice()) {
+				// skip over any layout paramter lines.
+				it2--;
+				continue;
+			} else if ((*it2)->isDataSlice()) {
+				// insert grace note after this note
+				gs = new GridSlice(this, timestamp, SliceType::GraceNotes, maxstaff);
+				gs->addToken(tok, part, staff, voice);
+				it2++;
+				this->insert(it2, gs);
+				return gs;
+			}
+			it2--;
+		}
+		return NULL;
+
+	} else { 
+		// search for existing line with same timestamp on a data slice:
+
+		while (iterator != this->end()) {
+			if (timestamp < (*iterator)->getTimestamp()) {
+				cerr << "STRANGE CASE 2 IN GRIDMEASURE::ADDGRACETOKEN" << endl;
+				cerr << "\tGRACE TIMESTAMP: " << timestamp << endl;
+				cerr << "\tTEST  TIMESTAMP: " << (*iterator)->getTimestamp() << endl;
+				return NULL;
+			}
+			if ((*iterator)->isDataSlice()) {
+				if ((*iterator)->getTimestamp() == timestamp) {
+					// found dataslice just before graceslice(s)
+					datatarget = *iterator;
+					break;
+				}
+			}
+			iterator++;
+		}
+
+		auto it2 = iterator;
+		it2--;
+		int counter = 0;
+		while (it2 != this->end()) {
+			if ((*it2)->isGraceSlice()) {
+				counter++;
+				if (counter == gracenumber) {
+					// insert grace note into this slice
+					(*it2)->addToken(tok, part, staff, voice);
+					return *it2;
+				}
+			} else if ((*it2)->isLayoutSlice()) {
+				// skip over any layout paramter lines.
+				it2--;
+				continue;
+			} else if ((*it2)->isDataSlice()) {
+				// insert grace note after this note
+				gs = new GridSlice(this, timestamp, SliceType::GraceNotes, maxstaff);
+				gs->addToken(tok, part, staff, voice);
+				it2++;
+				this->insert(it2, gs);
+				return gs;
+			}
+			it2--;
+		}
+
+		// grace note should be added at start of measure
+		gs = new GridSlice(this, timestamp, SliceType::GraceNotes, maxstaff);
+		gs->addToken(tok, part, staff, voice);
+		this->insert(this->begin(), gs);
+
+	}
+
+	return NULL;
+}
+
+
+
+//////////////////////////////
+//
 // GridMeasure::addDataToken -- Add a data token in the data slice at the given
 //    timestamp (or create a new data slice at that timestamp), placing the
 //    token at the specified part, staff, and voice index.
@@ -2714,6 +2825,10 @@ GridSlice* GridMeasure::addDataToken(const string& tok, HumNum timestamp,
 		GridSlice* target = NULL;
 		auto iterator = this->begin();
 		while (iterator != this->end()) {
+			if ((timestamp == (*iterator)->getTimestamp()) && ((*iterator)->isGraceSlice())) {
+				iterator++;
+				continue;
+			}
 			if (!(*iterator)->isDataSlice()) {
 				iterator++;
 				continue;
@@ -4219,7 +4334,7 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 			empty = "*";
 		} else if (isGraceSlice()) {
 			token = new HumdrumToken("q");
-			empty = ".H";
+			empty = ".";
 		} else {
 			token = new HumdrumToken("55");
 			empty = "!z";
@@ -7014,6 +7129,11 @@ void HumGrid::extendDurationToken(int slicei, int parti, int staffi,
 		return;
 	}
 
+	if (m_allslices.at(slicei)->isGraceSlice()) {
+		cerr << "THIS IS A GRACE SLICE SO DO NOT FILL" << endl;
+		return;
+	}
+
 	GridVoice* gv = m_allslices.at(slicei)->at(parti)->at(staffi)->at(voicei);
  	HTp token = gv->getToken();
 	if (!token) {
@@ -7083,8 +7203,10 @@ void HumGrid::extendDurationToken(int slicei, int parti, int staffi,
 				cerr << "Strange error2 in extendDurationToken()" << endl;
 				return;
 			}
-			
-			if (m_allslices.at(s)->isDataSlice()) {
+
+			if (m_allslices.at(s)->isGraceSlice()) {
+				m_allslices[s]->setDuration(0);
+			} else if (m_allslices.at(s)->isDataSlice()) {
 				gs->setNullTokenLayer(voicei, type, slicedur);
 				timeleft = timeleft - slicedur;
 			} else if (m_allslices.at(s)->isInvalidSlice()) {
@@ -36921,7 +37043,6 @@ int Tool_imitation::compareSequences(vector<NoteCell*>& attack1,
 #define ELEMENT_DEBUG_STATEMENT(X)
 // #define ELEMENT_DEBUG_STATEMENT(X)  cerr << #X << endl;
 
-
 #define NODE_VERIFY(ELEMENT, RETURNVALUE)        \
 	if (!ELEMENT) {                               \
 		return RETURNVALUE;                        \
@@ -37036,10 +37157,11 @@ bool Tool_mei2hum::convert(ostream& out, xml_document& doc) {
 	m_outdata.removeRedundantClefChanges();
 	// m_outdata.removeSibeliusIncipit();
 
+	processHairpins();
+
 	// set the duration of the last slice
 
 	HumdrumFile outfile;
-
 
 	// Report verse counts for each staff to HumGrid:
 	for (int i=0; i<m_maxverse.size(); i++) {
@@ -37069,6 +37191,136 @@ bool Tool_mei2hum::convert(ostream& out, xml_document& doc) {
 	out << outfile;
 
 	return status;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::processHairpins --
+//
+
+void Tool_mei2hum::processHairpins(void) {
+	for (int i=0; i<(int)m_hairpins.size(); i++) {
+		processHairpin(m_hairpins[i]);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::processHairpin -- Currently does not create lines to refine position of hairpin.
+//
+//    <hairpin tstamp="1" form="dim" place="below" staff="8" opening="0" endto="4" tstamp2="0m+4.667"/>
+//
+
+void Tool_mei2hum::processHairpin(hairpin_info& info) {
+	xml_node hairpin = info.hairpin;
+	GridMeasure *gm = info.gm;
+	int mindex = info.mindex;
+
+	string tstamp  = hairpin.attribute("tstamp").value();
+	string tstamp2 = hairpin.attribute("tstamp2").value();
+	string form    = hairpin.attribute("form").value();
+	string staff   = hairpin.attribute("staff").value();
+	if (staff == "") {
+		cerr << "Error: hairpin requires a staff number" << endl;
+		return;
+	}
+
+	auto myit = m_outdata.begin();
+	while (myit != m_outdata.end()) {
+		if (*myit == gm) {
+			break;
+		}
+		myit++;
+	}
+
+	int staffnum = stoi(staff);
+	string hairopen = "<";
+	string hairclose = "[";
+	if (form == "dim") {
+		hairopen = ">";
+		hairclose = "]";
+	}
+	double starttime = stod(tstamp) - 1.0;
+	double measure = 0.0;
+	auto loc = tstamp2.find("m+");
+	if (loc != string::npos) {
+		string mnum = tstamp2.substr(0, loc);
+		measure = stod(mnum);
+		tstamp2 = tstamp2.substr(loc+2, string::npos);
+	}
+	double endtime = stod(tstamp2) - 1;
+
+	HumNum measurestart = gm->getTimestamp();
+	HumNum timestamp;   // timestamp of event in measure
+	HumNum mtimestamp;  // starttime of the measure
+	double threshold = 0.001;
+	auto it = gm->begin();
+	GridSlice *lastgs = NULL;
+	bool found = false;
+
+	while (it != gm->end()) {
+		if (!(*it)->isDataSlice()) {
+			continue;
+		}
+		timestamp = (*it)->getTimestamp();
+		mtimestamp = (timestamp - measurestart) * 4.0 / m_currentMeterUnit[mindex];
+		double diff = starttime - mtimestamp.getFloat();
+		if (diff < threshold) {
+			found = true;
+			lastgs = *it;
+			break;
+		} else if (diff < 0.0) {
+			found = true;
+			lastgs = *it;
+			break;
+		}
+		lastgs = *it;
+		it++;
+	}
+	if (lastgs) {
+		GridPart* part = lastgs->at(staffnum-1);
+		part->setDynamics(hairopen);
+		m_outdata.setDynamicsPresent(staffnum-1);
+	}
+
+
+	myit += measure;
+	mindex += measure;
+	gm = *myit;
+	it = gm->begin();
+	lastgs = NULL;
+	found = false;
+	while (it != gm->end()) {
+		if (!(*it)->isDataSlice()) {
+			continue;
+		}
+		timestamp = (*it)->getTimestamp();
+		mtimestamp = (timestamp - measurestart) * 4.0 / m_currentMeterUnit[mindex];
+		double diff = endtime - mtimestamp.getFloat();
+		if (diff < threshold) {
+			found = true;
+			lastgs = *it;
+			break;
+		} else if (diff < 0.0) {
+			found = true;
+			lastgs = *it;
+			break;
+		}
+		lastgs = *it;
+		it++;
+	}
+	if (lastgs) {
+		GridPart* part = lastgs->at(staffnum-1);
+		part->setDynamics(hairclose);
+		m_outdata.setDynamicsPresent(staffnum-1);
+	}
+
+	
+// ggg
 }
 
 
@@ -37665,12 +37917,36 @@ HumNum Tool_mei2hum::parseSection(xml_node section, HumNum starttime) {
 			parseSb(children[i], starttime);
 		} else if (nodename == "pb") {   // page break;
 			parseSb(children[i], starttime);
+		} else if (nodename == "scoreDef") {   // usually page size information;
+			parseScoreDef(children[i], starttime);
 		} else {
 			cerr << DKHTP << section.name() << "/" << nodename << CURRLOC << endl;
 		}
 	}
 
 	return starttime;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::parseSectionScoreDef --  This is used for page layout information.  Have to look
+//   later at if ever has musical content.
+//
+// Example:
+// 	<scoreDef page.height="1973" page.width="1524" page.leftmar="179" 
+//                 page.rightmar="90" page.topmar="118" page.botmar="112"/>
+//
+
+void Tool_mei2hum::parseSectionScoreDef(xml_node scoreDef, HumNum starttime) {
+	NODE_VERIFY(scoreDef, );
+	MAKE_CHILD_LIST(children, scoreDef);
+
+	for (int i=0; i<(int)children.size(); i++) {
+		string nodename = children[i].name();
+		cerr << DKHTP << scoreDef.name() << "/" << nodename << CURRLOC << endl;
+	}
 }
 
 
@@ -37848,6 +38124,8 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 			// handled in process processNode(Start|Stop)Links()
 		} else if (nodename == "dynam") {
 			parseDynam(children[i], starttime);
+		} else if (nodename == "hairpin") {
+			parseHairpin(children[i], starttime);
 		} else if (nodename == "tempo") {
 			parseTempo(children[i], starttime);
 		} else if (nodename == "dir") {
@@ -37927,6 +38205,36 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 
 //////////////////////////////
 //
+// Tool_mei2hum::parseHairpin -- Process crescendo or dimuendo.
+// 
+//    <hairpin tstamp="1" form="dim" place="below" staff="8" opening="0" endto="4" tstamp2="0m+4.667"/>
+//
+
+void Tool_mei2hum::parseHairpin(xml_node hairpin, HumNum starttime) {
+	NODE_VERIFY(hairpin, );
+	MAKE_CHILD_LIST(children, hairpin);
+
+	for (int i=0; i<(int)children.size(); i++) {
+		string nodename = children[i].name();
+		cerr << DKHTP << hairpin.name() << "/" << nodename << CURRLOC << endl;
+	}
+
+	// Store the hairpin for later parsing when more of the 
+	// score is known:
+	auto it = m_outdata.end();
+	it--;
+	if (it != m_outdata.end()) {
+		m_hairpins.resize(m_hairpins.size() + 1);
+		m_hairpins.back().hairpin = hairpin;
+		m_hairpins.back().gm = *it;
+		m_hairpins.back().mindex = m_currentMeterUnit.size() - 1;
+	}
+}
+
+
+
+//////////////////////////////
+//
 // Tool_mei2hum::parseReh -- Rehearsal markings (ignored for now)
 //
 
@@ -37936,7 +38244,11 @@ void Tool_mei2hum::parseReh(xml_node reh, HumNum starttime) {
 
 	for (int i=0; i<(int)children.size(); i++) {
 		string nodename = children[i].name();
-		cerr << DKHTP << reh.name() << "/" << nodename << CURRLOC << endl;
+		if (nodename == "rend") {
+			// deal with reh/rend here.
+		} else {
+			cerr << DKHTP << reh.name() << "/" << nodename << CURRLOC << endl;
+		}
 	}
 
 }
@@ -38063,9 +38375,9 @@ HumNum Tool_mei2hum::parseLayer(xml_node layer, HumNum starttime) {
 	for (int i=0; i<(int)children.size(); i++) {
 		string nodename = children[i].name();
 		if (nodename == "note") {
-			starttime = parseNote(children[i], xml_node(NULL), dummy, starttime);
+			starttime = parseNote(children[i], xml_node(NULL), dummy, starttime, 0);
 		} else if (nodename == "chord") {
-			starttime = parseChord(children[i], starttime);
+			starttime = parseChord(children[i], starttime, 0);
 		} else if (nodename == "rest") {
 			starttime = parseRest(children[i], starttime);
 		} else if (nodename == "space") {
@@ -38081,6 +38393,10 @@ HumNum Tool_mei2hum::parseLayer(xml_node layer, HumNum starttime) {
 		} else {
 			cerr << DKHTP << layer.name() << "/" << nodename << CURRLOC << endl;
 		}
+	}
+
+	if (!m_gracenotes.empty()) {
+		processGraceNotes(starttime);
 	}
 
 	m_currentLayer = 0;
@@ -38144,11 +38460,11 @@ HumNum Tool_mei2hum::parseTuplet(xml_node tuplet, HumNum starttime) {
 		}
 		string nodename = children[i].name();
 		if (nodename == "note") {
-			starttime = parseNote(children[i], xml_node(NULL), dummy, starttime);
+			starttime = parseNote(children[i], xml_node(NULL), dummy, starttime, 0);
 		} else if (nodename == "rest") {
 			starttime = parseRest(children[i], starttime);
 		} else if (nodename == "chord") {
-			starttime = parseChord(children[i], starttime);
+			starttime = parseChord(children[i], starttime, 0);
 		} else if (nodename == "beam") {
 			starttime = parseBeam(children[i], starttime);
 		} else {
@@ -38173,6 +38489,7 @@ HumNum Tool_mei2hum::parseBeam(xml_node beam, HumNum starttime) {
 	MAKE_CHILD_LIST(children, beam);
 
 	bool isvalid = beamIsValid(children);
+	// bool isgrace = beamIsGrace(children);
 
 	if (isvalid) {
 		m_beamPrefix = "L";
@@ -38205,11 +38522,11 @@ HumNum Tool_mei2hum::parseBeam(xml_node beam, HumNum starttime) {
 		}
 		string nodename = children[i].name();
 		if (nodename == "note") {
-			starttime = parseNote(children[i], xml_node(NULL), dummy, starttime);
+			starttime = parseNote(children[i], xml_node(NULL), dummy, starttime, 0);
 		} else if (nodename == "rest") {
 			starttime = parseRest(children[i], starttime);
 		} else if (nodename == "chord") {
-			starttime = parseChord(children[i], starttime);
+			starttime = parseChord(children[i], starttime, 0);
 		} else if (nodename == "tuplet") {
 			starttime = parseTuplet(children[i], starttime);
 		} else {
@@ -38218,6 +38535,28 @@ HumNum Tool_mei2hum::parseBeam(xml_node beam, HumNum starttime) {
 	}
 
 	return starttime;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::beamIsGrace -- beam only contains grace notes.
+//
+
+bool Tool_mei2hum::beamIsGrace(vector<xml_node>& beamlist) {
+	for (int i=0; i<(int)beamlist.size(); i++) {
+		string nodename = beamlist[i].name();
+		if (nodename != "note") {
+			continue;
+		}
+		string grace = beamlist[i].attribute("grace").value();
+		if (grace.empty()) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 
@@ -38259,10 +38598,42 @@ bool Tool_mei2hum::beamIsValid(vector<xml_node>& beamlist) {
 
 //////////////////////////////
 //
+// Tool_mei2hum::processGraceNotes -- write the grace notes into the score
+//   in reverse order before any note at the given timestamp.
+//
+
+void Tool_mei2hum::processGraceNotes(HumNum timestamp) {
+	int size = m_gracenotes.size();
+	int counter = 1;
+	string output;
+	for (int i=size-1; i>=0; i--) {
+		string nodename = m_gracenotes[i].node.name();
+		if (nodename == "note") {
+			m_beamPrefix = m_gracenotes[i].beamprefix;
+			m_beamPostfix = m_gracenotes[i].beampostfix;
+			parseNote(m_gracenotes[i].node, xml_node(NULL), output, m_gracetime, counter);
+		} else if (nodename == "chord") {
+			m_beamPrefix = m_gracenotes[i].beamprefix;
+			m_beamPostfix = m_gracenotes[i].beampostfix;
+			parseChord(m_gracenotes[i].node, m_gracetime, counter);
+		} else {
+			cerr << "STRANGE THING HAPPENED HERE, node name is " << nodename << endl;
+		}
+		counter++;
+	}
+
+	m_gracenotes.clear();
+}
+
+
+
+//////////////////////////////
+//
 // Tool_mei2hum::parseNote --
 //
 
-HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output, HumNum starttime) {
+HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output,
+		HumNum starttime, int gracenumber) {
 	NODE_VERIFY(note, starttime)
 	MAKE_CHILD_LIST(children, note);
 
@@ -38270,10 +38641,44 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output, Hu
 	int dotcount;
 
 	string grace = note.attribute("grace").value();
-	if (!grace.empty()) {
-		// grace note so currently ignore.
-		cerr << "Warning: currently ignoring grace notes." << endl;
- 		return starttime;
+	bool graceQ = !grace.empty();
+
+	if (gracenumber == 0) {
+		if (graceQ) {
+			if (!m_gracenotes.empty()) {
+				if (starttime != m_gracetime) {
+					// Grace notes at end of previous measure which
+					// should have been processed before coming into the
+					// next measure.
+					cerr << "STRANGE ERROR IN GRACE NOTE PARSING" << endl;
+					cerr << "\tSTARTTIME: " << starttime << endl;
+					cerr << "\tGRACETIME: " << m_gracetime << endl;
+				} 
+			} else {
+				m_gracetime = starttime;
+			}
+			if (chord) {
+				grace_info ginfo;
+				ginfo.node = chord;
+				ginfo.beamprefix = m_beamPrefix;
+				ginfo.beampostfix = m_beamPostfix;
+				m_beamPrefix.clear();
+				m_beamPostfix.clear();
+				m_gracenotes.push_back(ginfo);
+			} else {
+				grace_info ginfo;
+				ginfo.node = note;
+				ginfo.beamprefix = m_beamPrefix;
+				ginfo.beampostfix = m_beamPostfix;
+				m_beamPrefix.clear();
+				m_beamPostfix.clear();
+				m_gracenotes.push_back(ginfo);
+			}
+			// grace notes processed after knowing how many of them
+			// are before a real note (or at the end of the measure).
+ 			return starttime;
+		}
+
 	}
 
 	processPreliminaryLinkedNodes(note);
@@ -38281,8 +38686,8 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output, Hu
 	if (chord) {
 		duration = getDuration(chord);
 		dotcount = getDotCount(chord);
-		// maybe allow different durations on notes in a chord if the first one is the
-		// same as the duration of the chord.
+		// maybe allow different durations on notes in a chord if the
+		// first one is the same as the duration of the chord.
 	} else {
 		duration = getDuration(note);
 		dotcount = getDotCount(note);
@@ -38302,6 +38707,12 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output, Hu
 	string articulations = getNoteArticulations(note, chord);
 
 	string stemdir = note.attribute("stem.dir").value();
+
+	if (!m_stemsQ) {
+		// suppress note stems
+		stemdir = "";
+	}
+
 	if (stemdir == "up") {
 		stemdir = "/";
 	} else if (stemdir == "down") {
@@ -38309,8 +38720,13 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output, Hu
 	} else {
 		stemdir = "";
 	}
+	string gracelabel = "";
+	if (graceQ) {
+		gracelabel = "q";
+	}
 
-	string tok = recip + humpitch + articulations + stemdir + m_beamPrefix + m_beamPostfix;
+	string tok = recip + gracelabel + humpitch + articulations + stemdir
+			+ m_beamPrefix + m_beamPostfix;
 	m_beamPrefix.clear();
 	m_beamPostfix.clear();
 
@@ -38323,8 +38739,13 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output, Hu
 	GridSlice* dataslice = NULL;
 
 	if (!chord) {
-		dataslice = m_outdata.back()->addDataToken(tok, starttime QUARTER_CONVERT,
-				m_currentStaff-1, 0, m_currentLayer-1, m_staffcount);
+		if (gracenumber == 0) {
+			dataslice = m_outdata.back()->addDataToken(tok, starttime QUARTER_CONVERT,
+					m_currentStaff-1, 0, m_currentLayer-1, m_staffcount);
+		} else {
+			dataslice = m_outdata.back()->addGraceToken(tok, starttime QUARTER_CONVERT,
+					m_currentStaff-1, 0, m_currentLayer-1, m_staffcount, gracenumber);
+		}
 	} else {
 		output += tok;
 	}
@@ -38352,7 +38773,15 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output, Hu
 		}
 	}
 
-	return starttime + duration;
+	if ((!graceQ) && (!m_gracenotes.empty())) {
+		processGraceNotes(starttime);
+	}
+
+	if (graceQ) {
+		return starttime;
+	} else {
+		return starttime + duration;
+	}
 }
 
 
@@ -39463,7 +39892,7 @@ string Tool_mei2hum::makeHumdrumClef(const string& shape,
 // Tool_mei2hum::parseChord --
 //
 
-HumNum Tool_mei2hum::parseChord(xml_node chord, HumNum starttime) {
+HumNum Tool_mei2hum::parseChord(xml_node chord, HumNum starttime, int gracenumber) {
 	NODE_VERIFY(chord, starttime)
 	MAKE_CHILD_LIST(children, chord);
 
@@ -39480,7 +39909,7 @@ HumNum Tool_mei2hum::parseChord(xml_node chord, HumNum starttime) {
 			if (counter > 1) {
 				tok += " ";
 			}
-			parseNote(children[i], chord, tok, starttime);
+			parseNote(children[i], chord, tok, starttime, gracenumber);
 		} else if (nodename == "artic") {
 			// This is handled within parseNote();
 		} else {
@@ -40030,16 +40459,25 @@ void Tool_mei2hum::parseDynam(xml_node dynam, HumNum starttime) {
 		return;
 	}
 	double tsd = (stof(ts)-1) * 4.0 / meterunit;
+	double tolerance = 0.001;
 	GridMeasure* gm = m_outdata.back();
 	double tsm = gm->getTimestamp().getFloat();
 	bool foundslice = false;
+	GridSlice *nextgs = NULL;
 	for (auto gs : *gm) {
 		if (!gs->isDataSlice()) {
 			continue;
 		}
 		double gsts = gs->getTimestamp().getFloat();
 		double difference = (gsts-tsm) - tsd;
-		if (!(fabs(difference) < 0.0001)) {
+		if (difference < tolerance) {
+			// did not find data line at exact timestamp, so move 
+			// the dynamic to the next event. Maybe think about adding
+			// a new timeslice for the dynamic.
+			nextgs = gs;
+			break;
+		}
+		if (!(fabs(difference) < tolerance)) {
 			continue;
 		}
 		GridPart* part = gs->at(staffnum-1);
@@ -40049,9 +40487,16 @@ void Tool_mei2hum::parseDynam(xml_node dynam, HumNum starttime) {
 		break;
 	}
 	if (!foundslice) {
-		cerr << "Warning: dynamics not attched to system events are not yet supported" << endl;
+		if (nextgs == NULL) {
+			cerr << "Warning: dynamics not attched to system events "
+					<< "are not yet supported in measure " << m_currentMeasure << endl;
+		} else {
+			GridPart* part = nextgs->at(staffnum-1);
+			part->setDynamics(text);
+			m_outdata.setDynamicsPresent(staffnum-1);
+			// Give a time offset for displaying the dynamic here.
+		}
 	}
-
 }
 
 

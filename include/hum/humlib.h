@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Oct 22 20:36:00 PDT 2017
+// Last Modified: Mon Oct 30 00:07:27 PDT 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2766,6 +2766,9 @@ class GridMeasure : public list<GridSlice*> {
 		                             int part, int staff, int voice, int maxstaff);
 		GridSlice*   addDataToken   (const string& tok, HumNum timestamp,
 		                             int part, int staff, int voice, int maxstaff);
+		GridSlice*   addGraceToken  (const string& tok, HumNum timestamp,
+		                             int part, int staff, int voice, int maxstaff,
+		                             int gracenumber);
 		GridSlice*   addGlobalLayout(const string& tok, HumNum timestamp);
 		GridSlice*   addGlobalComment(const string& tok, HumNum timestamp);
 		GridSlice*   appendGlobalLayout(const string& tok, HumNum timestamp);
@@ -4382,6 +4385,22 @@ class mei_scoreDef {
 };
 
 
+class hairpin_info {
+	public:
+		xml_node hairpin;
+		GridMeasure *gm = NULL;
+		int mindex = 0;
+};
+
+
+class grace_info {
+	public:
+		xml_node node; // note or chord
+		string beamprefix;
+		string beampostfix;
+};
+
+
 class Tool_mei2hum : public HumTool {
 	public:
 		        Tool_mei2hum    (void);
@@ -4401,6 +4420,7 @@ class Tool_mei2hum : public HumTool {
 		HumNum parseScore           (xml_node score, HumNum starttime);
 		void   getChildrenVector    (vector<xml_node>& children, xml_node parent);
 		void   parseScoreDef        (xml_node scoreDef, HumNum starttime);
+		void   parseSectionScoreDef (xml_node scoreDef, HumNum starttime);
 		void   processPgHead        (xml_node pgHead, HumNum starttime);
 		void   processPgFoot        (xml_node pgFoot, HumNum starttime);
 		HumNum parseSection         (xml_node section, HumNum starttime);
@@ -4417,8 +4437,8 @@ class Tool_mei2hum : public HumTool {
 		int    extractStaffCount    (xml_node element);
 		HumNum parseRest            (xml_node chord, HumNum starttime);
 		HumNum parseMRest           (xml_node mrest, HumNum starttime);
-		HumNum parseChord           (xml_node chord, HumNum starttime);
-		HumNum parseNote            (xml_node note, xml_node chord, string& output, HumNum starttime);
+		HumNum parseChord           (xml_node chord, HumNum starttime, int gracenumber);
+		HumNum parseNote            (xml_node note, xml_node chord, string& output, HumNum starttime, int gracenumber);
 		HumNum parseBeam            (xml_node note, HumNum starttime);
 		HumNum parseTuplet          (xml_node note, HumNum starttime);
 		void   parseClef            (xml_node clef, HumNum starttime);
@@ -4472,6 +4492,11 @@ class Tool_mei2hum : public HumTool {
 		string cleanReferenceRecordText(const string& input);
 		string cleanVerseText        (const string& input);
 		bool   beamIsValid           (vector<xml_node>& beamlist);
+		bool   beamIsGrace           (vector<xml_node>& beamlist);
+		void   parseHairpin          (xml_node hairpin, HumNum starttime);
+		void   processHairpins       (void);
+		void   processHairpin        (hairpin_info& info);
+		void   processGraceNotes     (HumNum timestamp);
 
 	private:
 		Options        m_options;
@@ -4500,6 +4525,10 @@ class Tool_mei2hum : public HumTool {
 		const int      m_maxstaff = 1000;
 
 		bool           m_fermata = false;     // set priority of note/fermata over note@fermata
+		vector<grace_info> m_gracenotes;      // buffer for storing grace notes
+		HumNum			m_gracetime = 0;       // performance time of buffered grace notes
+
+		vector<hairpin_info> m_hairpins;
 
 		map<string, vector<xml_node>> m_startlinks;
 		map<string, vector<xml_node>> m_stoplinks;
