@@ -522,7 +522,8 @@ bool HumdrumInput::convertHumdrum()
 
     prepareVerses();
     prepareEndings();
-    prepareStaffGroup();
+
+    prepareStaffGroups();
 
     // m_meausreIndex not currently used but might be useful sometime.
     m_measureIndex = 0;
@@ -1152,30 +1153,312 @@ void HumdrumInput::calculateReverseKernIndex()
 
 //////////////////////////////
 //
-// HumdrumInput::prepareStaffGroup --  Add information about each part.
+// HumdrumInput::prepareStaffGroups --  Add information about each part and
+//    group by brackets/bar groupings
 //
 
-void HumdrumInput::prepareStaffGroup()
+void HumdrumInput::prepareStaffGroups()
 {
     const std::vector<hum::HTp> &kernstarts = m_kernstarts;
 
-    m_staffgroup = new StaffGrp();
-    m_doc->m_scoreDef.AddChild(m_staffgroup);
-    for (int i = 0; i < (int)kernstarts.size(); i++) {
-        m_staffdef.push_back(new StaffDef());
-        m_staffgroup->AddChild(m_staffdef.back());
-        fillPartInfo(kernstarts[i], i + 1, (int)kernstarts.size());
-    }
     if (kernstarts.size() > 0) {
         addMidiTempo(m_doc->m_scoreDef, kernstarts[0]);
     }
-    if (kernstarts.size() == 2) {
-        m_staffgroup->SetSymbol(staffGroupingSym_SYMBOL_brace);
-        m_staffgroup->SetBarthru(BOOLEAN_true);
+    for (int i = 0; i < (int)kernstarts.size(); i++) {
+        m_staffdef.push_back(new StaffDef());
+        // m_staffgroup->AddChild(m_staffdef.back());
+        fillPartInfo(kernstarts[i], i + 1, (int)kernstarts.size());
     }
-    else if (kernstarts.size() > 2) {
-        m_staffgroup->SetSymbol(staffGroupingSym_SYMBOL_bracket);
+
+    string decoration = getSystemDecoration("system-decoration");
+
+    if (decoration == "") {
+        if (kernstarts.size() == 2) {
+            StaffGrp *sg = new StaffGrp();
+            m_doc->m_scoreDef.AddChild(sg);
+            sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
+            sg->SetBarthru(BOOLEAN_true);
+            sg->AddChild(m_staffdef[0]);
+            sg->AddChild(m_staffdef[1]);
+        }
+
+        else if (kernstarts.size() > 2) {
+            StaffGrp *sg = new StaffGrp();
+            m_doc->m_scoreDef.AddChild(sg);
+            sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
+            for (int i = 0; i < (int)m_staffdef.size(); i++) {
+                sg->AddChild(m_staffdef[i]);
+            }
+        }
+
+        else if (kernstarts.size() == 1) {
+            StaffGrp *sg = new StaffGrp();
+            m_doc->m_scoreDef.AddChild(sg);
+            sg->AddChild(m_staffdef[0]);
+        }
+        // do something if there is no staff in the score?
     }
+    else {
+        processStaffDecoration(decoration);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processStaffDecoration -- Currently only one level
+//    of bracing is allowed.  Probably allow remapping of staff order
+//    with the system decoration, and possible merge two kern spines
+//    onto a single staff (such as two similar instruments sharing
+//    a common staff).
+//
+
+void HumdrumInput::processStaffDecoration(const string &decoration)
+{
+    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+
+    bool validQ = true;
+
+    // If decoration prefixes number with "s", then match to a kern
+    // start which contains *staff# before any data content.  If the
+    // number is not prefixed by "s", then assume that it is a kern
+    // spine enumeration.  Staff enumerations can be utilized if a smaller
+    // group of parts are extracted, but kern enumerations can become
+    // invalid if extracting sub-scores.  In both cases the enumeration
+    // goes from the top of the staff to the bottom, which means from right
+    // to left on the Humdrum line.  If the order of the staff or kern
+    // enumeration in the decoration is not monotonic covering every staff
+    // in the score, then the results may have problems.
+
+    map<int, int> staffToSpineMapping;
+    for (int i = 0; i < (int)kernstarts.size(); i++) {
+        int staff = getStaffNumberLabel(kernstarts[i]);
+        if (staff <= 0) {
+            continue;
+        }
+        staffToSpineMapping[staff] = i;
+    }
+
+    vector<int> spine; // kernstart index
+    vector<bool> barstart; // true if bar group starts at staff.
+    vector<bool> barend; // true if bar group stops at staff.
+
+    string d = decoration;
+    d += ' ';
+
+    vector<vector<int> > bargroups;
+    vector<char> groupstyle;
+
+    groupstyle.resize(1);
+    groupstyle.back() = ' ';
+    bargroups.resize(1);
+
+    bool staffQ = false;
+    int value = 0;
+
+    for (int i = 0; i < (int)d.size() - 1; i++) {
+        if (d[i] == '[') {
+            groupstyle.back() = '[';
+        }
+        else if (d[i] == '{') {
+            groupstyle.back() = '{';
+        }
+        else if ((d[i] == 's') && (std::isdigit(d[i + 1]))) {
+            staffQ = true;
+        }
+        else if (d[i] == ')') {
+            // end of a bar group
+            bargroups.resize(bargroups.size() + 1);
+            groupstyle.push_back(' ');
+        }
+        else if (std::isdigit(d[i])) {
+            value = value * 10 + (d[i] - '0');
+            if (!std::isdigit(d[i + 1])) {
+                if (staffQ) {
+                    auto it = staffToSpineMapping.find(value);
+                    if (it != staffToSpineMapping.end()) {
+                        value = (*it).second;
+                    }
+                    else {
+                        value = -1;
+                    }
+                }
+                else {
+                    value = value - 1;
+                    if (value >= (int)kernstarts.size()) {
+                        value = -1;
+                    }
+                }
+                staffQ = false;
+                if (value < 0) {
+                    // Spine does not exist in score, so skip
+                    continue;
+                }
+                else {
+                    bargroups.back().push_back(value);
+                }
+                value = 0;
+            }
+        }
+    }
+
+    // Remove bracket/brace for any group which has only a single staff:
+    for (int i = 0; i < (int)bargroups.size(); i++) {
+        if (bargroups.size() <= 1) {
+            groupstyle[i] = ' ';
+        }
+    }
+
+    // Pull out all non-zero staff groups:
+    vector<vector<int> > newgroups;
+    vector<char> newstyles;
+    for (int i = 0; i < (int)bargroups.size(); i++) {
+        if (bargroups[i].empty()) {
+            continue;
+        }
+        newgroups.push_back(bargroups[i]);
+        newstyles.push_back(groupstyle[i]);
+    }
+
+    // Check to see that all kernstarts are represented in system decoration;
+    // otherwise, declare that it is invalid and print a simple decoration.
+    vector<int> found(kernstarts.size(), 0);
+
+    for (int i = 0; i < (int)newgroups.size(); i++) {
+        for (int j = 0; j < (int)newgroups[i].size(); j++) {
+            found.at(newgroups[i][j])++;
+        }
+    }
+
+    // probably also require the spine indexes to be monotonic.
+    for (int i = 0; i < (int)found.size(); i++) {
+        if (found[i] != 1) {
+            cerr << "I:" << i << "\t=\t" << found[i] << endl;
+            validQ = false;
+            break;
+        }
+    }
+
+    if (!validQ) {
+        cerr << "DECORATION IS INVALID " << decoration << endl;
+        StaffGrp *sg = new StaffGrp();
+        sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
+        m_doc->m_scoreDef.AddChild(sg);
+        for (int i = 0; i < (int)m_staffdef.size(); i++) {
+            sg->AddChild(m_staffdef[i]);
+        }
+        return;
+    }
+
+    // Build system groups based on system decoration instructions
+    if (newgroups.size() == 1) {
+        // one barred group
+        StaffGrp *sg = new StaffGrp();
+        m_doc->m_scoreDef.AddChild(sg);
+        if (newstyles[0] == '[') {
+            sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
+        }
+        else if (newstyles[0] == '{') {
+            sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
+        }
+        for (int i = 0; i < (int)newgroups[0].size(); i++) {
+            sg->AddChild(m_staffdef[newgroups[0][i]]);
+        }
+    }
+    else {
+        // multiple barred groups, the outer currently cannot be styled, so just plain
+        // and no barring, so outer group is:
+        //    <staffGrp barthru="false">
+        //    </staffGrp>
+        // If there is only one staff in a group, it will be given as a bare
+        // staffDef in the root_sg group.
+        StaffGrp *root_sg = new StaffGrp();
+        root_sg->SetBarthru(BOOLEAN_false);
+        m_doc->m_scoreDef.AddChild(root_sg);
+        for (int i = 0; i < newgroups.size(); i++) {
+            if (newgroups[i].size() == 1) {
+                // insert staffDef directly in root_sg:
+                root_sg->AddChild(m_staffdef[newgroups[i][0]]);
+            }
+            else {
+                // create staffGrp and then insert staffDefs for group
+                StaffGrp *sg = new StaffGrp();
+                root_sg->AddChild(sg);
+                sg->SetBarthru(BOOLEAN_true);
+                if (newstyles[i] == '[') {
+                    sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
+                }
+                else if (newstyles[i] == '{') {
+                    sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
+                }
+                for (int j = 0; j < (int)newgroups[i].size(); j++) {
+                    sg->AddChild(m_staffdef[newgroups[i][j]]);
+                }
+            }
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getStaffNumberLabel -- Return number 12 in pattern *staff12.
+//
+
+int HumdrumInput::getStaffNumberLabel(hum::HTp spinestart)
+{
+    hum::HTp tok = spinestart;
+    while (tok) {
+        if (tok->isData()) {
+            break;
+        }
+        if (!tok->isInterpretation()) {
+            tok = tok->getNextToken();
+            continue;
+        }
+        if (tok->compare(0, 6, "*staff") != 0) {
+            tok = tok->getNextToken();
+            continue;
+        }
+        if (tok->size() <= 6) {
+            tok = tok->getNextToken();
+            continue;
+        }
+        string number = tok->substr(6, string::npos);
+        if (!std::isdigit(number[0])) {
+            tok = tok->getNextToken();
+            continue;
+        }
+        return stoi(number);
+    }
+    return 0;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getSystemDecoration --
+//
+
+string HumdrumInput::getSystemDecoration(const string &tag)
+{
+    hum::HumdrumFile &infile = m_infile;
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (!infile[i].isReference()) {
+            continue;
+        }
+        string key = infile[i].getReferenceKey();
+        if (key != tag) {
+            continue;
+        }
+        string value = infile[i].getReferenceValue();
+        string output;
+        for (int j = 0; j < (int)value.size(); j++) {
+            if (std::isspace(value[j])) {
+                continue;
+            }
+            output.push_back(value[j]);
+        }
+        return output;
+    }
+    return "";
 }
 
 //////////////////////////////

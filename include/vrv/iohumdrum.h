@@ -241,7 +241,7 @@ protected:
     void calculateLayout();
     void setSystemMeasureStyle(int startline, int endline);
     std::vector<int> getStaffLayerCounts();
-    void prepareStaffGroup();
+    void prepareStaffGroups();
     void setClef(StaffDef *part, const std::string &clef);
     void setTransposition(StaffDef *part, const std::string &transpose);
     void setDynamicTransposition(int partindex, StaffDef *part, const std::string &itranspose);
@@ -364,6 +364,9 @@ protected:
         const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token, int staffindex);
     void processTerminalLong(hum::HTp token);
     void removeCharacter(hum::HTp token, char removechar);
+    std::string getSystemDecoration(const std::string &tag);
+    void processStaffDecoration(const std::string &decoration);
+    int getStaffNumberLabel(hum::HTp spinestart);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -432,7 +435,8 @@ private:
     //
 
     // m_staffgroup == information about parts
-    vrv::StaffGrp *m_staffgroup = NULL;
+    // no longer used
+    // vrv::StaffGrp *m_staffgroup = NULL;
 
     // m_staffdef == information about a staff.
     std::vector<vrv::StaffDef *> m_staffdef;
