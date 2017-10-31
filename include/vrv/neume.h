@@ -64,6 +64,9 @@ public:
     */
     virtual void AddChild(Object *object);
 
+    virtual int GetPosition(LayerElement *element);
+    virtual bool IsLastInNeume(LayerElement *element);
+
 
 private:
 };
