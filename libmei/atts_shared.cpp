@@ -3920,7 +3920,7 @@ AttNInteger::~AttNInteger()
 
 void AttNInteger::ResetNInteger()
 {
-    m_n = 0;
+    m_n = -1;
 }
 
 bool AttNInteger::ReadNInteger(pugi::xml_node element)
@@ -3946,7 +3946,7 @@ bool AttNInteger::WriteNInteger(pugi::xml_node element)
 
 bool AttNInteger::HasN() const
 {
-    return (m_n != 0);
+    return (m_n != -1);
 }
 
 /* include <attn> */
@@ -3966,14 +3966,14 @@ AttNNumberLike::~AttNNumberLike()
 
 void AttNNumberLike::ResetNNumberLike()
 {
-    m_n = 0;
+    m_n = "";
 }
 
 bool AttNNumberLike::ReadNNumberLike(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("n")) {
-        this->SetN(StrToInt(element.attribute("n").value()));
+        this->SetN(StrToStr(element.attribute("n").value()));
         element.remove_attribute("n");
         hasAttribute = true;
     }
@@ -3984,7 +3984,7 @@ bool AttNNumberLike::WriteNNumberLike(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasN()) {
-        element.append_attribute("n") = IntToStr(this->GetN()).c_str();
+        element.append_attribute("n") = StrToStr(this->GetN()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -3992,7 +3992,7 @@ bool AttNNumberLike::WriteNNumberLike(pugi::xml_node element)
 
 bool AttNNumberLike::HasN() const
 {
-    return (m_n != 0);
+    return (m_n != "");
 }
 
 /* include <attn> */
@@ -5002,14 +5002,14 @@ AttPlist::~AttPlist()
 
 void AttPlist::ResetPlist()
 {
-    m_plist = "";
+    m_plist = std::vector<std::string>();
 }
 
 bool AttPlist::ReadPlist(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("plist")) {
-        this->SetPlist(StrToStr(element.attribute("plist").value()));
+        this->SetPlist(StrToXsdAnyURIList(element.attribute("plist").value()));
         element.remove_attribute("plist");
         hasAttribute = true;
     }
@@ -5020,7 +5020,7 @@ bool AttPlist::WritePlist(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasPlist()) {
-        element.append_attribute("plist") = StrToStr(this->GetPlist()).c_str();
+        element.append_attribute("plist") = XsdAnyURIListToStr(this->GetPlist()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5028,7 +5028,7 @@ bool AttPlist::WritePlist(pugi::xml_node element)
 
 bool AttPlist::HasPlist() const
 {
-    return (m_plist != "");
+    return (m_plist != std::vector<std::string>());
 }
 
 /* include <attplist> */
@@ -8382,7 +8382,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttNNumberLike *att = dynamic_cast<AttNNumberLike *>(element);
         assert(att);
         if (attrType == "n") {
-            att->SetN(att->StrToInt(attrValue));
+            att->SetN(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -8590,7 +8590,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttPlist *att = dynamic_cast<AttPlist *>(element);
         assert(att);
         if (attrType == "plist") {
-            att->SetPlist(att->StrToStr(attrValue));
+            att->SetPlist(att->StrToXsdAnyURIList(attrValue));
             return true;
         }
     }
@@ -9735,7 +9735,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttNNumberLike *att = dynamic_cast<const AttNNumberLike *>(element);
         assert(att);
         if (att->HasN()) {
-            attributes->push_back(std::make_pair("n", att->IntToStr(att->GetN())));
+            attributes->push_back(std::make_pair("n", att->StrToStr(att->GetN())));
         }
     }
     if (element->HasAttClass(ATT_NAME)) {
@@ -9907,7 +9907,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttPlist *att = dynamic_cast<const AttPlist *>(element);
         assert(att);
         if (att->HasPlist()) {
-            attributes->push_back(std::make_pair("plist", att->StrToStr(att->GetPlist())));
+            attributes->push_back(std::make_pair("plist", att->XsdAnyURIListToStr(att->GetPlist())));
         }
     }
     if (element->HasAttClass(ATT_POINTING)) {

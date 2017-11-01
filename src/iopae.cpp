@@ -9,9 +9,14 @@
 
 //----------------------------------------------------------------------------
 
+#ifndef NO_PAE_SUPPORT
+
 #include <assert.h>
+#include <regex>
 #include <sstream>
 #include <string>
+
+#endif /* NO_PAE_SUPPORT */
 
 //----------------------------------------------------------------------------
 
@@ -19,10 +24,12 @@
 #include "chord.h"
 #include "clef.h"
 #include "doc.h"
+#include "fermata.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
 #include "metersig.h"
+#include "mrest.h"
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
@@ -30,17 +37,17 @@
 #include "scoredef.h"
 #include "section.h"
 #include "staff.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "trill.h"
 #include "tuplet.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
 
-#ifndef NO_PAE_SUPPORT
-#include <regex>
-#endif
-
 namespace vrv {
+
+#ifndef NO_PAE_SUPPORT
 
 #define BEAM_INITIAL 0x01
 #define BEAM_MEDIAL 0x02
@@ -76,6 +83,7 @@ PaeInput::PaeInput(Doc *doc, std::string filename)
     m_layer = NULL;
     m_last_tied_note = NULL;
     m_is_in_chord = false;
+    m_is_mensural = false;
 }
 
 PaeInput::~PaeInput()
@@ -86,30 +94,18 @@ PaeInput::~PaeInput()
 
 bool PaeInput::ImportFile()
 {
-#ifndef NO_PAE_SUPPORT
     std::ifstream infile;
     infile.open(m_filename.c_str());
     parsePlainAndEasy(infile);
     return true;
-#else
-    LogError("Plain and Easy import is not supported in the build.");
-    return false;
-#endif
 }
 
 bool PaeInput::ImportString(std::string const &pae)
 {
-#ifndef NO_PAE_SUPPORT
     std::istringstream in_stream(pae);
     parsePlainAndEasy(in_stream);
     return true;
-#else
-    LogError("Plain and Easy import is not support in the build.");
-    return false;
-#endif
 }
-
-#ifndef NO_PAE_SUPPORT
 
 //////////////////////////////
 //
@@ -132,6 +128,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     pae::Note current_note;
     Clef *staffDefClef = NULL;
     MeterSig *scoreDefMeterSig = NULL;
+    Mensur *scoreDefMensur = NULL;
     KeySig *scoreDefKeySig = NULL;
 
     std::vector<pae::Measure> staff;
@@ -190,16 +187,31 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         }
     }
     if (strlen(c_timesig)) {
-        MeterSig *meter = new MeterSig;
-        getTimeInfo(c_timesig, meter);
-        if (!scoreDefMeterSig) {
-            scoreDefMeterSig = meter;
+        if (m_is_mensural) {
+            Mensur *mensur = new Mensur();
+            getTimeInfo(c_timesig, NULL, mensur);
+            if (!scoreDefMensur) {
+                scoreDefMensur = mensur;
+            }
+            else {
+                if (current_measure.mensur) {
+                    delete current_measure.mensur;
+                }
+                current_measure.mensur = mensur;
+            }
         }
         else {
-            if (current_measure.meter) {
-                delete current_measure.meter;
+            MeterSig *meter = new MeterSig;
+            getTimeInfo(c_timesig, meter, NULL);
+            if (!scoreDefMeterSig) {
+                scoreDefMeterSig = meter;
             }
-            current_measure.meter = meter;
+            else {
+                if (current_measure.meter) {
+                    delete current_measure.meter;
+                }
+                current_measure.meter = meter;
+            }
         }
     }
 
@@ -332,20 +344,31 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
 
         // time signature change
         else if ((incipit[i] == '@') && (i + 1 < length)) {
-            MeterSig *meter = new MeterSig;
-            i += getTimeInfo(incipit, meter, i + 1);
-            if (current_measure.notes.size() == 0) {
-                if (current_measure.meter) {
-                    delete current_measure.meter;
+            if (m_is_mensural) {
+                Mensur *mensur = new Mensur();
+                i += getTimeInfo(incipit, NULL, mensur, i + 1);
+                if (current_measure.mensur) {
+                    delete current_measure.mensur;
                 }
                 // When will this be deleted? Potential memory leak? LP
-                current_measure.meter = meter;
+                current_measure.mensur = mensur;
             }
             else {
-                if (current_note.meter) {
-                    delete current_note.meter;
+                MeterSig *meter = new MeterSig;
+                i += getTimeInfo(incipit, meter, NULL, i + 1);
+                if (current_measure.notes.size() == 0) {
+                    if (current_measure.meter) {
+                        delete current_measure.meter;
+                    }
+                    // When will this be deleted? Potential memory leak? LP
+                    current_measure.meter = meter;
                 }
-                current_note.meter = meter;
+                else {
+                    if (current_note.meter) {
+                        delete current_note.meter;
+                    }
+                    current_note.meter = meter;
+                }
             }
         }
 
@@ -425,6 +448,9 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN(1);
     staffDef->SetLines(5);
+    if (m_is_mensural) {
+        staffDef->SetNotationtype(NOTATIONTYPE_mensural);
+    }
     if (staffDefClef) {
         staffDef->SetClefShape(staffDefClef->GetShape());
         staffDef->SetClefLine(staffDefClef->GetLine());
@@ -441,6 +467,14 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         m_doc->m_scoreDef.SetMeterUnit(scoreDefMeterSig->GetUnit());
         m_doc->m_scoreDef.SetMeterSym(scoreDefMeterSig->GetSym());
         delete scoreDefMeterSig;
+    }
+    if (scoreDefMensur) {
+        m_doc->m_scoreDef.SetMensurDot(scoreDefMensur->GetDot());
+        m_doc->m_scoreDef.SetMensurSign(scoreDefMensur->GetSign());
+        m_doc->m_scoreDef.SetMensurSlash(scoreDefMensur->GetSlash());
+        m_doc->m_scoreDef.SetProportNum(scoreDefMensur->GetNum());
+        m_doc->m_scoreDef.SetProportNumbase(scoreDefMensur->GetNumbase());
+        delete scoreDefMensur;
     }
     staffGrp->AddChild(staffDef);
     m_doc->m_scoreDef.AddChild(staffGrp);
@@ -487,27 +521,43 @@ int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
     int i = index;
     int length = (int)strlen(incipit);
 
-    switch (incipit[i]) {
-        case '0': *duration = DURATION_long; break;
-        case '1': *duration = DURATION_1; break;
-        case '2': *duration = DURATION_2; break;
-        case '3': *duration = DURATION_32; break;
-        case '4': *duration = DURATION_4; break;
-        case '5': *duration = DURATION_64; break;
-        case '6': *duration = DURATION_16; break;
-        case '7': *duration = DURATION_128; break;
-        case '8': *duration = DURATION_8; break;
-        case '9': *duration = DURATION_breve; break;
+    if (m_is_mensural) {
+        switch (incipit[i]) {
+            case '0': *duration = DURATION_longa; break;
+            case '1': *duration = DURATION_semibrevis; break;
+            case '2': *duration = DURATION_minima; break;
+            case '3':
+                *duration = DURATION_breve;
+                LogWarning("Duration 3 unsupported with mensural notation, using breve instead");
+                break;
+            case '4': *duration = DURATION_semiminima; break;
+            case '5':
+                *duration = DURATION_breve;
+                LogWarning("Duration 5 unsupported with mensural notation, using breve instead");
+                break;
+            case '6': *duration = DURATION_semifusa; break;
+            case '7': *duration = DURATION_breve; break;
+            case '8': *duration = DURATION_fusa; break;
+            case '9': *duration = DURATION_brevis; break;
+        }
+    }
+    else {
+        switch (incipit[i]) {
+            case '0': *duration = DURATION_long; break;
+            case '1': *duration = DURATION_1; break;
+            case '2': *duration = DURATION_2; break;
+            case '3': *duration = DURATION_32; break;
+            case '4': *duration = DURATION_4; break;
+            case '5': *duration = DURATION_64; break;
+            case '6': *duration = DURATION_16; break;
+            case '7': *duration = DURATION_128; break;
+            case '8': *duration = DURATION_8; break;
+            case '9': *duration = DURATION_breve; break;
+        }
     }
 
     *dot = 0;
-    if ((i + 1 < length) && (incipit[i + 1] == '.')) {
-        // one dot
-        (*dot)++;
-        i++;
-    }
-    if ((i + 1 < length) && (incipit[i + 1] == '.')) {
-        // two dots
+    while ((i + 1 < length) && (incipit[i + 1] == '.')) {
         (*dot)++;
         i++;
     }
@@ -515,7 +565,7 @@ int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
         // neumatic notation
         *duration = DURATION_breve;
         *dot = 0;
-        LogWarning("Found a note in neumatic notation (7.), using breve instead");
+        LogWarning("Plaine & Easie import: neumatic notation unsupported, using breve instead");
     }
 
     return i - index;
@@ -625,7 +675,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
                 // we should not find any close paren before the ';' !
                 // FIXME find a graceful way to exit signaling this to user
                 if (incipit[t] == ')') {
-                    LogDebug("You have a) before the ; in a tuplet!");
+                    LogDebug("Plaine & Easie import: You have a ')' before the ';' in a tuplet!");
                     free(buf);
                     return i - index;
                 }
@@ -639,7 +689,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 
                 // If we have extraneous chars, exit here
                 if (!isdigit(incipit[t + t2])) {
-                    LogDebug("You have a non-number in a tuplet number");
+                    LogDebug("Plaine & Easie import: non-number in tuplet number found");
                     free(buf);
                     return i - index;
                 }
@@ -664,7 +714,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
     }
     else {
         if (note->tuplet_notes > 0) {
-            LogWarning("Fermata within a tuplet. Won't be handled correctly");
+            LogWarning("Plaine & Easie import: fermatas within tuplets won't be handled correctly");
         }
         note->fermata = true;
     }
@@ -748,10 +798,14 @@ data_PITCHNAME PaeInput::getPitch(char c_note)
 // getTimeInfo -- read the key signature.
 //
 
-int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, int index)
+int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
+
+    if (!meter && !mensur) {
+        return 0;
+    }
 
     if (!isdigit(incipit[i]) && (incipit[i] != 'c') && (incipit[i] != 'o')) {
         return 0;
@@ -779,34 +833,74 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, int index)
     // (enclosed in parentheses) for later reference.  Use std::smatch when
     // dealing with strings, or std::wmatch with wstrings.
     std::cmatch matches;
-    if (regex_match(timesig_str, matches, std::regex("(\\d+)/(\\d+)"))) {
-        meter->SetCount(std::stoi(matches[1]));
-        meter->SetUnit(std::stoi(matches[2]));
-    }
-    else if (regex_match(timesig_str, matches, std::regex("\\d+"))) {
-        meter->SetCount(std::stoi(timesig_str));
-    }
-    else if (strcmp(timesig_str, "c") == 0) {
-        // C
-        meter->SetSym(METERSIGN_common);
-    }
-    else if (strcmp(timesig_str, "c/") == 0) {
-        // C|
-        meter->SetSym(METERSIGN_cut);
-    }
-    else if (strcmp(timesig_str, "c3") == 0) {
-        // C3
-        meter->SetSym(METERSIGN_common);
-        meter->SetCount(3);
-    }
-    else if (strcmp(timesig_str, "c3/2") == 0) {
-        // C3/2
-        meter->SetSym(METERSIGN_common); // ??
-        meter->SetCount(3);
-        meter->SetUnit(2);
+    if (meter) {
+        if (regex_match(timesig_str, matches, std::regex("(\\d+)/(\\d+)"))) {
+            meter->SetCount(std::stoi(matches[1]));
+            meter->SetUnit(std::stoi(matches[2]));
+        }
+        else if (regex_match(timesig_str, matches, std::regex("\\d+"))) {
+            meter->SetCount(std::stoi(timesig_str));
+        }
+        else if (strcmp(timesig_str, "c") == 0) {
+            // C
+            meter->SetSym(METERSIGN_common);
+        }
+        else if (strcmp(timesig_str, "c/") == 0) {
+            // C|
+            meter->SetSym(METERSIGN_cut);
+        }
+        else if (strcmp(timesig_str, "c3") == 0) {
+            // C3
+            meter->SetSym(METERSIGN_common);
+            meter->SetCount(3);
+        }
+        else if (strcmp(timesig_str, "c3/2") == 0) {
+            // C3/2
+            meter->SetSym(METERSIGN_common); // ??
+            meter->SetCount(3);
+            meter->SetUnit(2);
+        }
+        else {
+            LogWarning("Plaine & Easie import: unsupported time signature: %s", timesig_str);
+        }
     }
     else {
-        LogWarning("Unknown time signature: %s", timesig_str);
+        if (regex_match(timesig_str, matches, std::regex("(\\d+)/(\\d+)"))) {
+            mensur->SetNum(std::stoi(matches[1]));
+            mensur->SetNumbase(std::stoi(matches[2]));
+        }
+        else if (regex_match(timesig_str, matches, std::regex("\\d+"))) {
+            mensur->SetNum(std::stoi(timesig_str));
+        }
+        else if (regex_match(timesig_str, matches, std::regex("([co])([\\./]?)([\\./]?)(\\d*)/?(\\d*)"))) {
+            // C
+            if (matches[1] == "c") {
+                mensur->SetSign(MENSURATIONSIGN_C);
+            }
+            // 0
+            else {
+                mensur->SetSign(MENSURATIONSIGN_O);
+            }
+            // Dot (second or third match since order between . and / is not defined in PAE)
+            if ((matches[2] == ".") || (matches[3] == ".")) {
+                mensur->SetDot(BOOLEAN_true);
+            }
+            // Slash (second or third match, ditto)
+            if ((matches[2] == "/") || (matches[3] == "/")) {
+                mensur->SetSlash(1);
+            }
+            // Num
+            if (matches[4] != "") {
+                mensur->SetNum(std::stoi(matches[4]));
+            }
+            // Numbase (but only if Num is given)
+            if ((matches[4] != "") && (matches[5] != "")) {
+                mensur->SetNumbase(std::stoi(matches[5]));
+            }
+        }
+        else {
+            LogWarning("Plaine & Easie import: unsupported time signature: %s", timesig_str);
+        }
     }
 
     return i - index;
@@ -821,8 +915,6 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
 {
     // a clef is maximum 3 character length
     // go through the 3 character and retrieve the letter (clef) and the line
-    // mensural clef (with + in between) currently ignored
-    // clef with octava correct?
     int length = (int)strlen(incipit);
     int i = 0;
     char clef = 'G';
@@ -834,16 +926,23 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
         else if (i == 2) {
             line = incipit[index];
         }
+        if (incipit[index] == '+') {
+            m_is_mensural = true;
+        }
         i++;
         index++;
     }
 
-    if (clef == 'C' || clef == 'c') {
+    if (clef == 'G') {
+        mclef->SetShape(CLEFSHAPE_G);
+        mclef->SetLine(line - 48);
+    }
+    else if (clef == 'C') {
         mclef->SetShape(CLEFSHAPE_C);
         mclef->SetLine(line - 48);
     }
-    else if (clef == 'G') {
-        mclef->SetShape(CLEFSHAPE_G);
+    else if (clef == 'F') {
+        mclef->SetShape(CLEFSHAPE_F);
         mclef->SetLine(line - 48);
     }
     else if (clef == 'g') {
@@ -852,13 +951,8 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
         mclef->SetDis(OCTAVE_DIS_8);
         mclef->SetDisPlace(STAFFREL_basic_below);
     }
-    else if (clef == 'F' || clef == 'f') {
-        mclef->SetShape(CLEFSHAPE_F);
-        mclef->SetLine(line - 48);
-    }
     else {
-        // what the...
-        LogDebug("Clef %c is Undefined", clef);
+        LogDebug("Plaine & Easie import: undefined clef %c", clef);
     }
 
     // measure->clef = mclef;
@@ -984,6 +1078,7 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
 int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
 {
     int alt_nr = 0;
+    m_keySigString = "";
 
     // at the key information line, extract data
     int length = (int)strlen(incipit);
@@ -1004,7 +1099,10 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
             case 'B': alt_nr++; break;
             default: end_of_keysig = true; break;
         }
-        if (!end_of_keysig) i++;
+        if (!end_of_keysig) {
+            m_keySigString.push_back(incipit[i]);
+            i++;
+        }
     }
 
     if (key->GetAlterationType() != ACCIDENTAL_WRITTEN_n) {
@@ -1037,7 +1135,7 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
         if (measure->durations.size() == 0) {
             note->duration = DURATION_4;
             note->dots = 0;
-            LogWarning("Got a note before a duration was specified");
+            LogWarning("Plaine & Easie import: found note before duration was specified");
         }
         else {
             note->duration = measure->durations[measure->durations_offset];
@@ -1045,6 +1143,13 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
         }
     }
     note->pitch = getPitch(incipit[i]);
+
+    if (m_keySigString.find(incipit[i]) != std::string::npos) {
+        if (m_keySigString[0] == 'x')
+            note->accidGes = ACCIDENTAL_GESTURAL_s;
+        else if (m_keySigString[0] == 'b')
+            note->accidGes = ACCIDENTAL_GESTURAL_f;
+    }
 
     // lookout, hack. If a rest (PITCHNAME_NONE val) then create rest object.
     // it will be added instead of the note
@@ -1058,7 +1163,7 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     }
 
     // tie
-    if (regex_search(incipit + i + 1, std::regex("^[A-G]*\\+"))) {
+    if (regex_search(incipit + i + 1, std::regex("^[^A-G]*\\+"))) {
         // reset 1 for first note, >1 for next ones is incremented under
         if (note->tie == 0) note->tie = 1;
     }
@@ -1118,9 +1223,15 @@ void PaeInput::convertMeasure(pae::Measure *measure)
     }
 
     if (measure->wholerest > 0) {
-        MultiRest *mr = new MultiRest();
-        mr->SetNum(measure->wholerest);
-        m_layer->AddChild(mr);
+        if (measure->wholerest == 1) {
+            MRest *mRest = new MRest;
+            m_layer->AddChild(mRest);
+        }
+        else {
+            MultiRest *multiRest = new MultiRest();
+            multiRest->SetNum(measure->wholerest);
+            m_layer->AddChild(multiRest);
+        }
     }
 
     m_nested_objects.clear();
@@ -1146,7 +1257,9 @@ void PaeInput::parseNote(pae::Note *note)
         rest->SetDur(note->duration);
 
         if (note->fermata) {
-            rest->SetFermata(STAFFREL_basic_above); // always above for now
+            Fermata *fermata = new Fermata();
+            fermata->SetStartid(rest->GetUuid());
+            m_measure->AddChild(fermata);
         }
 
         element = rest;
@@ -1161,6 +1274,12 @@ void PaeInput::parseNote(pae::Note *note)
             accid->SetAccid(note->accidental);
             mnote->AddChild(accid);
         }
+        if (!mnote->FindChildByType(ACCID)) {
+            Accid *accid = new Accid();
+            mnote->AddChild(accid);
+            accid->IsAttribute(true);
+            accid->SetAccidGes(note->accidGes);
+        }
 
         mnote->SetDots(note->dots);
         mnote->SetDur(note->duration);
@@ -1173,12 +1292,14 @@ void PaeInput::parseNote(pae::Note *note)
         }
 
         if (note->fermata) {
-            mnote->SetFermata(STAFFREL_basic_above); // always above for now
+            Fermata *fermata = new Fermata();
+            fermata->SetStartid(mnote->GetUuid());
+            m_measure->AddChild(fermata);
         }
 
-        if (note->trill == true) {
+        if (note->trill) {
             Trill *trill = new Trill();
-            trill->SetStart(mnote);
+            trill->SetStartid(mnote->GetUuid());
             m_measure->AddChild(trill);
         }
 
@@ -1221,18 +1342,18 @@ void PaeInput::parseNote(pae::Note *note)
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         mnote->SetDur(DURATION_8);
-        mnote->SetGrace(GRACE_acc);
+        mnote->SetGrace(GRACE_unacc);
         mnote->SetStemDir(STEMDIRECTION_up);
     }
 
     if ((note->appoggiatura > 0) && (element->Is(NOTE))) {
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
-        mnote->SetGrace(GRACE_unacc);
+        mnote->SetGrace(GRACE_acc);
         mnote->SetStemDir(STEMDIRECTION_up);
     }
 
-    if (note->beam == BEAM_INITIAL) {
+    if ((note->beam == BEAM_INITIAL) && !m_is_mensural) {
         pushContainer(new Beam());
     }
 
@@ -1245,7 +1366,7 @@ void PaeInput::parseNote(pae::Note *note)
         pushContainer(newTuplet);
     }
 
-    if (note->beam == BEAM_TUPLET) {
+    if ((note->beam == BEAM_TUPLET) && !m_is_mensural) {
         pushContainer(new Beam());
     }
 
@@ -1275,7 +1396,7 @@ void PaeInput::parseNote(pae::Note *note)
         popContainer();
     }
 
-    if (note->beam == BEAM_TERMINAL) {
+    if ((note->beam == BEAM_TERMINAL) && !m_is_mensural) {
         popContainer();
     }
 
@@ -1300,7 +1421,7 @@ void PaeInput::popContainer()
 {
     // assert(m_nested_objects.size() > 0);
     if (m_nested_objects.size() == 0) {
-        LogError("PaeInput::popContainer: tried to pop an object from empty stack. "
+        LogError("Plaine & Easie import: tried to pop an object from empty stack. "
                  "Cross-measure objects (tuplets, beams) are not supported.");
     }
     else {

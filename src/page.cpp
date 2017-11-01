@@ -264,6 +264,12 @@ void Page::LayOutHorizontally()
     this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
 
     this->AdjustSylSpacingByVerse(prepareProcessingListsParams, doc);
+    
+    // Adjust the arpeg
+    Functor adjustArpeg(&Object::AdjustArpeg);
+    Functor adjustArpegEnd(&Object::AdjustArpegEnd);
+    AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
+    this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
 
     // Adjust measure X position
     AlignMeasuresParams alignMeasuresParams;
@@ -434,9 +440,9 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 // Create ad comparison object for each type / @n
-                AttCommonNComparison matchStaff(STAFF, staves->first);
-                AttCommonNComparison matchLayer(LAYER, layers->first);
-                AttCommonNComparison matchVerse(VERSE, verses->first);
+                AttNIntegerComparison matchStaff(STAFF, staves->first);
+                AttNIntegerComparison matchLayer(LAYER, layers->first);
+                AttNIntegerComparison matchVerse(VERSE, verses->first);
                 filters = { &matchStaff, &matchLayer, &matchVerse };
 
                 // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
@@ -448,15 +454,6 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
             }
         }
     }
-}
-
-void Page::UpgradePageBasedMEI(Doc *doc)
-{
-    // Once we have the GetPPU in Page through LibMEI, call this from Doc::SetDrawingPage and
-    // use m_unit instead of DEFAULT_UNIT - For the upgraded call Page->SetPPU(12.5);
-
-    m_PPUFactor = 25.0 / 2.0 / DEFAULT_UNIT;
-    // LogDebug("PPUFactor: %f", m_PPUFactor);
 }
 
 int Page::ApplyPPUFactor(FunctorParams *functorParams)

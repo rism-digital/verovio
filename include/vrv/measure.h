@@ -169,11 +169,6 @@ public:
     std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
 
     /**
-     * Custom method for upgrading page-based unmeasured transcription data
-     */
-    void UpgradePageBasedMEI(System *system);
-
-    /**
      * Check if the measure encloses the given time (in millisecond)
      * Return the playing repeat time (1-based), 0 otherwise
      */
@@ -231,7 +226,12 @@ public:
      * See Object::SetAlignmentXPos
      */
     virtual int SetAlignmentXPos(FunctorParams *functorParams);
-
+    
+    /**
+     * See Object::AdjustArpeg
+     */
+    virtual int AdjustArpegEnd(FunctorParams *functorParams);
+    
     /**
      * See Object::AdjustLayers
      */
@@ -317,6 +317,13 @@ public:
      */
     ///@{
     virtual int GenerateMIDI(FunctorParams *functorParams);
+    ///@}
+
+    /**
+     * @name See Object::GenerateTimemap
+     */
+    ///@{
+    virtual int GenerateTimemap(FunctorParams *functorParams);
     ///@}
 
     /**

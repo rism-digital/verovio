@@ -25,6 +25,26 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// Bracket
+//----------------------------------------------------------------------------
+
+Bracket::Bracket() : LayerElement("bracket-")
+{
+
+    Reset();
+}
+
+Bracket::~Bracket()
+{
+}
+
+void Bracket::Reset()
+{
+    LayerElement::Reset();
+}
+
+    
+//----------------------------------------------------------------------------
 // Dots
 //----------------------------------------------------------------------------
 
@@ -43,21 +63,13 @@ void Dots::Reset()
 {
     LayerElement::Reset();
     ResetAugmentDots();
+
+    m_dotLocsByStaff.clear();
 }
 
 std::list<int> *Dots::GetDotLocsForStaff(Staff *staff)
 {
     return &m_dotLocsByStaff[staff];
-    /*
-    if (m_dotLocsByStaff.count(staff) == 0)
-        m_dotLocsByStaff[staff] =
-
-    auto item = std::find_if(m_dotLocsByStaff.begin(), m_dotLocsByStaff.end(),
-                             [staff](MapOfDotLocs dotLocs) { return (staff == dotLocs. .first) });
-    if (item != m_dotLocsByStaff.end()) {
-        // LogDebug("Found it!");
-    }
-    */
 }
 
 //----------------------------------------------------------------------------
@@ -77,6 +89,8 @@ Flag::~Flag()
 void Flag::Reset()
 {
     LayerElement::Reset();
+
+    m_drawingNbFlags = 0;
 }
 
 wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
@@ -121,11 +135,31 @@ Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code
 }
 
 //----------------------------------------------------------------------------
+// Num
+//----------------------------------------------------------------------------
+
+Num::Num() : LayerElement("num-")
+{
+
+    Reset();
+}
+
+Num::~Num()
+{
+}
+
+void Num::Reset()
+{
+    LayerElement::Reset();
+}
+
+//----------------------------------------------------------------------------
 // Stem
 //----------------------------------------------------------------------------
 
-Stem::Stem() : LayerElement("stem-"), AttStems(), AttStemsCmn()
+Stem::Stem() : LayerElement("stem-"), AttGraced(), AttStems(), AttStemsCmn()
 {
+    RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
 
@@ -139,6 +173,7 @@ Stem::~Stem()
 void Stem::Reset()
 {
     LayerElement::Reset();
+    ResetGraced();
     ResetStems();
     ResetStemsCmn();
 
@@ -164,6 +199,14 @@ void Stem::AddChild(Object *child)
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int Bracket::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    return FUNCTOR_CONTINUE;
+};
 
 int Dots::ResetDrawing(FunctorParams *functorParams)
 {
@@ -194,6 +237,15 @@ int Flag::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 };
 
+int Num::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    return FUNCTOR_CONTINUE;
+};
+
+    
 int Stem::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
@@ -204,7 +256,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     assert(params->m_interface);
 
     int staffSize = params->m_staff->m_drawingStaffSize;
-    bool drawingCueSize = this->IsCueSize();
+    bool drawingCueSize = this->GetDrawingCueSize();
 
     /************ Set the position, the length and adjust to the note head ************/
 
@@ -218,7 +270,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
         if (drawingCueSize) baseStem = params->m_doc->GetCueSize(baseStem);
     }
     // Even if a stem length is given we add the length of the chord content (however only if not 0)
-    // Also, the given stem length is understood as being mesured from the center of the note.
+    // Also, the given stem length is understood as being measured from the center of the note.
     // This means that it will be adjusted according to the note head (see below
     if (!this->HasStemLen() || (this->GetStemLen() != 0)) {
         baseStem += params->m_chordStemLength;

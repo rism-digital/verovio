@@ -42,7 +42,7 @@ class TimeSpanningInterface;
  * all layer one by one, and so one (lyrics, etc.). In IntTree, we can store
  * @n with all existing values (1 => 1 => 1; 2 => 1 => 1)
  * The stucture must be filled first and can then be used by instanciating a vector
- * of corresponding AttComparison (typically AttCommonNComparison for @n attribute).
+ * of corresponding AttComparison (typically AttNIntegerComparison for @n attribute).
  * See Doc::PrepareDrawing for an example.
  */
 struct IntTree {
@@ -152,6 +152,7 @@ public:
 
     virtual DurationInterface *GetDurationInterface() { return NULL; }
     virtual PitchInterface *GetPitchInterface() { return NULL; }
+    virtual PlistInterface *GetPlistInterface() { return NULL; }
     virtual PositionInterface *GetPositionInterface() { return NULL; }
     virtual ScoreDefInterface *GetScoreDefInterface() { return NULL; }
     virtual StemmedDrawingInterface *GetStemmedDrawingInterface() { return NULL; }
@@ -208,7 +209,7 @@ public:
 
     std::string GetComment() const { return m_comment; }
     void SetComment(std::string comment) { m_comment = comment; }
-    bool HasComment(void) { return !m_comment.empty(); }
+    bool HasComment() { return !m_comment.empty(); }
 
     /**
      * @name Children count, with or without a ClassId.
@@ -347,11 +348,18 @@ public:
         AttComparison *attComparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
-     * Return all the object matching the AttComparison functor
+     * Return all the objects matching the AttComparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
     void FindAllChildByAttComparison(ArrayOfObjects *objects, AttComparison *attComparison,
         int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool clear = true);
+
+    /**
+     * Return all the objects matching the AttComparison functor and being between start and end in the tree.
+     * The start and end objects are included in the result set.
+     */
+    void FindAllChildBetween(
+        ArrayOfObjects *objects, AttComparison *attComparison, Object *start, Object *end, bool clear = true);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -462,9 +470,19 @@ public:
     virtual int FindExtremeByAttComparison(FunctorParams *functorParams);
 
     /**
-     * Find a all Object with a AttComparison functor.
+     * Find a all Object with an AttComparison functor.
      */
     virtual int FindAllByAttComparison(FunctorParams *functorParams);
+
+    /**
+     * Find a all Object between a start and end Object and with an AttComparison functor.
+     */
+    virtual int FindAllBetween(FunctorParams *functorParams);
+
+    /**
+     * Look if the time / duration passed as parameter overlap with a space in the alignment references
+     */
+    virtual int FindSpaceInReferenceAlignments(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Retrieve the time spanning layer elements between two points
@@ -557,6 +575,13 @@ public:
      * Set the drawing dot positions, including for chords.
      */
     virtual int CalcDots(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     */
+    ///@{
+    virtual int AdjustArpeg(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustArpegEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Adjust the position the outside articulations.
@@ -750,6 +775,13 @@ public:
     virtual int PrepareProcessingLists(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Match elements of @plist.
+     */
+    ///@{
+    virtual int PreparePlist(FunctorParams *functorParams);
+    ///@}
+
+    /**
      * Match start for TimePointingInterface elements (such as fermata or harm).
      */
     ///@{
@@ -920,6 +952,13 @@ public:
     ///@}
 
     /**
+     * Export the object to a JSON timemap file.
+     */
+    ///@{
+    virtual int GenerateTimemap(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Calculate the maximum duration of each measure.
      */
     virtual int CalcMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
@@ -1068,7 +1107,7 @@ public:
      * If not, it updates the list and also calls FilterList.
      * Because this is an interface, we need to pass the object - not the best design.
      */
-    ListOfObjects *GetList(Object *node);
+    const ListOfObjects *GetList(Object *node);
 
 private:
     mutable ListOfObjects m_list;

@@ -294,6 +294,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     /************** placement **************/
 
     bool allowAbove = true;
+    data_STEMDIRECTION layerStemDir;
 
     // for now we ignore within @place
     if (this->GetPlace().GetBasic() != STAFFREL_basic_NONE) {
@@ -301,8 +302,8 @@ int Artic::CalcArtic(FunctorParams *functorParams)
         // If we have a place indication do not allow to be changed to above
         allowAbove = false;
     }
-    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        place = (layer->GetDrawingStemDir() == STEMDIRECTION_up) ? STAFFREL_basic_above : STAFFREL_basic_below;
+    else if ((layerStemDir = layer->GetDrawingStemDir(parent)) != STEMDIRECTION_NONE) {
+        place = (layerStemDir == STEMDIRECTION_up) ? STAFFREL_basic_above : STAFFREL_basic_below;
         // If we have more than one layer do not allow to be changed to above
         allowAbove = false;
     }
@@ -310,6 +311,11 @@ int Artic::CalcArtic(FunctorParams *functorParams)
         place = STAFFREL_basic_below;
     else
         place = STAFFREL_basic_above;
+
+    /************** adjust the xRel position **************/
+
+    int xShift = parent->GetDrawingRadius(params->m_doc);
+    this->SetDrawingXRel(xShift);
 
     /************** set it to both the inside and outside part **************/
 
@@ -424,6 +430,11 @@ int Artic::PrepareLayerElementParts(FunctorParams *functorParams)
         articPart->SetArtic(outsideSlur);
         this->AddChild(articPart);
     }
+
+    /************ Prepare the drawing cue size ************/
+
+    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
+    this->Process(&prepareDrawingCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
 };

@@ -183,7 +183,12 @@ public:
      * Special case of functor redirected from Measure.
      */
     virtual int JustifyX(FunctorParams *functorParams);
-
+         
+    /**
+     * See Object::AdjustArpeg
+     */
+    virtual int AdjustArpeg(FunctorParams *functorParams);
+    
     /**
      * See Object::AdjustGraceXPos
      */
@@ -203,7 +208,7 @@ public:
     /**
      * See Object::AjustAccidX
      */
-    virtual int AdjustAccidX(FunctorParams *);
+    virtual int AdjustAccidX(FunctorParams *functorParams);
 
 private:
     /**
@@ -255,9 +260,9 @@ private:
 class AlignmentReference : public Object, public AttNInteger {
 public:
     /**
-    * @name Constructors, destructors, reset methods
-    * Reset method reset all attribute classes
-    */
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
     ///@{
     AlignmentReference();
     AlignmentReference(int staffN);
@@ -284,7 +289,7 @@ public:
     /**
      * Return true if the reference has elements from multiple layers.
      */
-    bool HasMultipleLayer() const { return m_multipleLayer; }
+    bool HasMultipleLayer() const { return (m_layerCount > 1); }
 
     //----------//
     // Functors //
@@ -303,7 +308,12 @@ public:
     /**
      * See Object::AjustAccidX
      */
-    virtual int AdjustAccidX(FunctorParams *);
+    virtual int AdjustAccidX(FunctorParams *functorParams);
+
+    /**
+     * See Object::FindSpaceInReferenceAlignments
+     */
+    virtual int FindSpaceInReferenceAlignments(FunctorParams *functorParams);
 
 private:
     //
@@ -318,7 +328,7 @@ private:
     /**
      *
      */
-    bool m_multipleLayer;
+    int m_layerCount;
 };
 
 //----------------------------------------------------------------------------

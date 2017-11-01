@@ -1338,8 +1338,8 @@
             <!--<glyph glyph-code="E59A" smufl-name="ornamentBottomLeftConcaveStroke"/>-->
             <!--<glyph glyph-code="E59B" smufl-name="ornamentBottomLeftConcaveStrokeLarge"/>-->
             <!--<glyph glyph-code="E59C" smufl-name="ornamentBottomLeftConvexStroke"/>-->
-            <!--<glyph glyph-code="E59D" smufl-name="ornamentZigZagLineNoRightEnd"/>-->
-            <!--<glyph glyph-code="E59E" smufl-name="ornamentZigZagLineWithRightEnd"/>-->
+            <glyph glyph-code="E59D" smufl-name="ornamentZigZagLineNoRightEnd"/>
+            <glyph glyph-code="E59E" smufl-name="ornamentZigZagLineWithRightEnd"/>
             <!--<glyph glyph-code="E59F" smufl-name="ornamentMiddleVerticalStroke"/>-->
             <!--<glyph glyph-code="E5A0" smufl-name="ornamentTopRightConcaveStroke"/>-->
             <!--<glyph glyph-code="E5A1" smufl-name="ornamentTopRightConvexStroke"/>-->
@@ -2517,12 +2517,12 @@
             <!--<glyph glyph-code="EAA6" smufl-name="wiggleTrillSlower"/>-->
             <!--<glyph glyph-code="EAA7" smufl-name="wiggleTrillSlowerStill"/>-->
             <!--<glyph glyph-code="EAA8" smufl-name="wiggleTrillSlowest"/>-->
-            <!--<glyph glyph-code="EAA9" smufl-name="wiggleArpeggiatoUp"/>-->
-            <!--<glyph glyph-code="EAAA" smufl-name="wiggleArpeggiatoDown"/>-->
+            <glyph glyph-code="EAA9" smufl-name="wiggleArpeggiatoUp"/>
+            <glyph glyph-code="EAAA" smufl-name="wiggleArpeggiatoDown"/>
             <!--<glyph glyph-code="EAAB" smufl-name="wiggleArpeggiatoUpSwash"/>-->
             <!--<glyph glyph-code="EAAC" smufl-name="wiggleArpeggiatoDownSwash"/>-->
-            <!--<glyph glyph-code="EAAD" smufl-name="wiggleArpeggiatoUpArrow"/>-->
-            <!--<glyph glyph-code="EAAE" smufl-name="wiggleArpeggiatoDownArrow"/>-->
+            <glyph glyph-code="EAAD" smufl-name="wiggleArpeggiatoUpArrow"/>
+            <glyph glyph-code="EAAE" smufl-name="wiggleArpeggiatoDownArrow"/>
             <!--<glyph glyph-code="EAAF" smufl-name="wiggleGlissando"/>-->
             <!--<glyph glyph-code="EAB0" smufl-name="wiggleVibrato"/>-->
             <!--<glyph glyph-code="EAB1" smufl-name="wiggleVibratoWide"/>-->

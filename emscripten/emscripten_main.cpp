@@ -97,6 +97,13 @@ const char *vrvToolkit_renderToMidi(Toolkit *tk, const char *c_options)
     return tk->GetCString();
 }
 
+const char *vrvToolkit_renderToTimemap(Toolkit *tk) 
+{
+    tk->ResetLogBuffer();
+    tk->SetCString(tk->RenderToTimemap());
+    return tk->GetCString();
+}
+
 const char *vrvToolkit_getElementsAtTime(Toolkit *tk, int millisec)
 {
     tk->SetCString(tk->GetElementsAtTime(millisec));

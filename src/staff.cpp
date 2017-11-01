@@ -23,6 +23,7 @@
 #include "measure.h"
 #include "note.h"
 #include "page.h"
+#include "staffdef.h"
 #include "syl.h"
 #include "system.h"
 #include "timeinterface.h"
@@ -35,10 +36,11 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
-Staff::Staff(int n) : Object("staff-"), AttNInteger(), AttTyped()
+Staff::Staff(int n) : Object("staff-"), AttNInteger(), AttTyped(), AttVisibility()
 {
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);
+    RegisterAttClass(ATT_VISIBILITY);
 
     // owned pointers need to be set to NULL;
     m_ledgerLinesAbove = NULL;
@@ -60,6 +62,7 @@ void Staff::Reset()
     Object::Reset();
     ResetNInteger();
     ResetTyped();
+    ResetVisibility();
 
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
@@ -247,6 +250,23 @@ int Staff::ApplyPPUFactor(FunctorParams *functorParams)
     assert(params);
 
     if (m_yAbs != VRV_UNSET) m_yAbs /= params->m_page->GetPPUFactor();
+
+    return FUNCTOR_CONTINUE;
+}
+    
+int Staff::AlignHorizontally(FunctorParams *functorParams)
+{
+    AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
+    assert(params);
+    
+    assert(this->m_drawingStaffDef);
+    
+    if (this->m_drawingStaffDef->HasNotationtype()) {
+        params->m_notationType = this->m_drawingStaffDef->GetNotationtype();
+    }
+    else {
+        params->m_notationType = NOTATIONTYPE_cmn;
+    }
 
     return FUNCTOR_CONTINUE;
 }

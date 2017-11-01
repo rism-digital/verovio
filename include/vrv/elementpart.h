@@ -10,10 +10,57 @@
 
 #include "atts_cmn.h"
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "layerelement.h"
 
 namespace vrv {
 
+//----------------------------------------------------------------------------
+// Bracket
+//----------------------------------------------------------------------------
+
+/**
+ * This class models a bracket as a layer element part and has not direct MEI equivlatent.
+ * It is used to represent tuplet brackets.
+ */
+class Bracket : public LayerElement {
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    Bracket();
+    virtual ~Bracket();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Bracket"; }
+    virtual ClassId GetClassId() const { return BRACKET; }
+    ///@}
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * Overwritten version of Save that avoids anything to be written
+     */
+    ///@{
+    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
+private:
+    //
+public:
+    //
+private:
+};
+    
 //----------------------------------------------------------------------------
 // Dots
 //----------------------------------------------------------------------------
@@ -75,14 +122,9 @@ public:
     //
 private:
     /**
-     *
+     * A map of dot locations
      */
     MapOfDotLocs m_dotLocsByStaff;
-    // data_STEMDIRECTION m_drawingStemDir;
-    /**
-     *
-     */
-    // int m_drawingStemLen;
 };
 
 //----------------------------------------------------------------------------
@@ -139,6 +181,52 @@ public:
 
 private:
 };
+    
+//----------------------------------------------------------------------------
+// Num
+//----------------------------------------------------------------------------
+
+/**
+ * This class models a num as a layer element part and has not direct MEI equivlatent.
+ * It is used to represent tuplet number
+ */
+class Num : public LayerElement, public AttTupletVis {
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    Num();
+    virtual ~Num();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Num"; }
+    virtual ClassId GetClassId() const { return NUM; }
+    ///@}
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * Overwritten version of Save that avoids anything to be written
+     */
+    ///@{
+    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
+private:
+    //
+public:
+    //
+private:
+};
 
 //----------------------------------------------------------------------------
 // Stem
@@ -147,7 +235,7 @@ private:
 /**
  * This class models a stem as a layer element part and has not direct MEI equivlatent.
  */
-class Stem : public LayerElement, public AttStems, public AttStemsCmn {
+class Stem : public LayerElement, public AttGraced, public AttStems, public AttStemsCmn {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

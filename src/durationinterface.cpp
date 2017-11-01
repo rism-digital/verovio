@@ -65,7 +65,7 @@ void DurationInterface::Reset()
 
 double DurationInterface::GetInterfaceAlignmentDuration(int num, int numbase)
 {
-    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
+    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
 
     if (this->HasNum()) num *= this->GetNum();
     if (this->HasNumbase()) numbase *= this->GetNumbase();
@@ -80,7 +80,7 @@ double DurationInterface::GetInterfaceAlignmentDuration(int num, int numbase)
 
 double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int numbase, Mensur *currentMensur)
 {
-    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
+    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
 
     if (!currentMensur) {
         LogWarning("No current mensur for calculating duration");
@@ -108,6 +108,7 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
     }
     duration *= (double)numbase / (double)num;
     // LogDebug("Duration %d; %d/%d; Alignement %f; Ratio %f", note_dur, num, numbase, duration, ratio);
+    duration = durRound(duration);
     return duration;
 }
 
@@ -117,8 +118,8 @@ bool DurationInterface::IsFirstInBeam(LayerElement *noteOrRest)
     if (!beam) {
         return false;
     }
-    ListOfObjects *notesOrRests = beam->GetList(beam);
-    ListOfObjects::iterator iter = notesOrRests->begin();
+    const ListOfObjects *notesOrRests = beam->GetList(beam);
+    ListOfObjects::const_iterator iter = notesOrRests->begin();
     if (*iter == noteOrRest) {
         return true;
     }
@@ -131,8 +132,8 @@ bool DurationInterface::IsLastInBeam(LayerElement *noteOrRest)
     if (!beam) {
         return false;
     }
-    ListOfObjects *notesOrRests = beam->GetList(beam);
-    ListOfObjects::reverse_iterator iter = notesOrRests->rbegin();
+    const ListOfObjects *notesOrRests = beam->GetList(beam);
+    ListOfObjects::const_reverse_iterator iter = notesOrRests->rbegin();
     if (*iter == noteOrRest) {
         return true;
     }
@@ -146,6 +147,13 @@ int DurationInterface::GetActualDur() const
     return (this->GetDur() & DUR_MENSURAL_MASK);
 }
 
+int DurationInterface::GetActualDurGes() const
+{
+    // maxima (-1) is a mensural only value
+    if (this->GetDurGes() == DURATION_maxima) return DUR_MX;
+    return (this->GetDurGes() & DUR_MENSURAL_MASK);
+}
+    
 int DurationInterface::GetNoteOrChordDur(LayerElement *element)
 {
     if (element->Is(CHORD)) {

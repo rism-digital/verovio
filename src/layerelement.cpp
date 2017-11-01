@@ -16,11 +16,13 @@
 #include "attcomparison.h"
 #include "barline.h"
 #include "beam.h"
+#include "btrem.h"
 #include "chord.h"
 #include "clef.h"
 #include "custos.h"
 #include "doc.h"
 #include "dot.h"
+#include "ftrem.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
 #include "keysig.h"
@@ -34,6 +36,7 @@
 #include "page.h"
 #include "rest.h"
 #include "rpt.h"
+#include "smufl.h"
 #include "space.h"
 #include "staff.h"
 #include "syl.h"
@@ -111,7 +114,7 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
 
 bool LayerElement::IsGraceNote()
 {
-    // For note, we need to look it or at the parent chord
+    // For note, we need to look at it or at the parent chord
     if (this->Is(NOTE)) {
         Note const *note = dynamic_cast<Note const *>(this);
         assert(note);
@@ -144,7 +147,7 @@ bool LayerElement::IsGraceNote()
     return false;
 }
 
-bool LayerElement::IsCueSize()
+bool LayerElement::GetDrawingCueSize()
 {
     return m_drawingCueSize;
 }
@@ -163,15 +166,24 @@ bool LayerElement::IsInFTrem()
 
 Beam *LayerElement::IsInBeam()
 {
-    if (!this->Is(NOTE) && !this->Is(CHORD)) return NULL;
+    if (!this->Is({ CHORD, NOTE, STEM })) return NULL;
     Beam *beamParent = dynamic_cast<Beam *>(this->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
     if (beamParent != NULL) {
-        // This note is beamed and cue-sized
+        // This note is beamed and cue-sized - we will be able to get rid of this once MEI has a better modeling for
+        // beamed grace notes
         if (this->IsGraceNote()) {
-            // If the note is part of the beam parent, this means we
-            // have a beam of graced notes
-            if (beamParent->GetListIndex(this) > -1) return beamParent;
-            // otherwise it is a non-beamed grace note within a beam - will return false
+            LayerElement *graceNote = this;
+            if (this->Is(STEM)) graceNote = dynamic_cast<LayerElement *>(this->GetFirstParent(NOTE, MAX_BEAM_DEPTH));
+            // Make sure the object list is set
+            beamParent->GetList(beamParent);
+            // If the note is part of the beam parent, this means we have a beam of graced notes
+            if (beamParent->GetListIndex(graceNote) > -1) {
+                return beamParent;
+            }
+            // otherwise it is a non-beamed grace note within a beam - return NULL
+            else {
+                return NULL;
+            }
         }
         else {
             return beamParent;
@@ -399,7 +411,41 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
     return this->GetDrawingY();
 }
 
-double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bool notGraceOnly)
+int LayerElement::GetDrawingRadius(Doc *doc)
+{
+    assert(doc);
+
+    if (!this->Is({ NOTE, CHORD })) return 0;
+
+    int dur = DUR_4;
+    if (this->Is(NOTE)) {
+        Note *note = dynamic_cast<Note *>(this);
+        assert(note);
+        dur = note->GetDrawingDur();
+    }
+    else {
+        Chord *chord = dynamic_cast<Chord *>(this);
+        assert(chord);
+        dur = chord->GetActualDur();
+    }
+    
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+    
+    if (dur <= DUR_BR) {
+        return doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+    }
+    
+    wchar_t code = SMUFL_E0A3_noteheadHalf;
+
+    if (dur <= DUR_1) {
+        code = SMUFL_E0A2_noteheadWhole;
+    }
+
+    return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
+}
+
+double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
 {
     if (this->IsGraceNote() && notGraceOnly) {
         return 0.0;
@@ -418,7 +464,7 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         }
         DurationInterface *duration = this->GetDurationInterface();
         assert(duration);
-        if (duration->IsMensural()) {
+        if (duration->IsMensural() && (notationType != NOTATIONTYPE_cmn)) {
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
         double durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
@@ -606,7 +652,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     // We have already an alignment with grace note children - skip this
     if (!m_alignment) {
         // get the duration of the event
-        duration = this->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig);
+        duration = this->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
 
         // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
         // So use it as current time - we can do this because the timestamp loop is redirected from the measure
@@ -732,7 +778,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             loc = staff->m_drawingLines - 1;
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
-            bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
+            bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
@@ -769,7 +815,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             loc = staff->m_drawingLines - 1;
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
-            bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
+            bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
@@ -803,7 +849,9 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
 
     // These are the only ones we want to keep for further collision detection
     // Eventually  we also need stem for overlapping voices
-    if (this->Is({ DOTS, NOTE }) && this->HasUpdatedBB()) params->m_current.push_back(this);
+    if (this->Is({ DOTS, NOTE }) && this->HasUpdatedBB()) {
+        params->m_current.push_back(this);
+    }
 
     // We are processing the first layer, nothing to do yet
     if (params->m_previous.empty()) return FUNCTOR_SIBLINGS;
@@ -862,7 +910,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
             if (xRelShift > 0) {
                 if (params->m_currentChord)
                     params->m_currentChord->SetDrawingXRel(params->m_currentChord->GetDrawingXRel() + xRelShift);
-                else
+                else if (params->m_currentNote)
                     params->m_currentNote->SetDrawingXRel(params->m_currentNote->GetDrawingXRel() + xRelShift);
             }
         }
@@ -962,7 +1010,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int LayerElement::AdjustXRelForTranscription(FunctorParams *functorParams)
+int LayerElement::AdjustXRelForTranscription(FunctorParams *)
 {
     if (this->m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
 
@@ -989,33 +1037,33 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
         Note const *note = dynamic_cast<Note const *>(this);
         assert(note);
         Chord *chord = note->IsChordTone();
-        if (chord) m_drawingCueSize = chord->IsCueSize();
+        if (chord) m_drawingCueSize = chord->GetDrawingCueSize();
     }
     // For tuplet, we also need to look at the first note or chord
     else if (this->Is(TUPLET)) {
         AttComparisonAny matchType({ NOTE, CHORD });
         ArrayOfObjects children;
         LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByAttComparison(&matchType));
-        if (child) m_drawingCueSize = child->IsCueSize();
+        if (child) m_drawingCueSize = child->GetDrawingCueSize();
     }
     // For accid, look at the parent if @func="edit" or otherwise to the parent note
     else if (this->Is(ACCID)) {
         Accid const *accid = dynamic_cast<Accid *>(this);
         assert(accid);
-        if (accid->GetFunc() == accidLog_FUNC_edit)
+        if ((accid->GetFunc() == accidLog_FUNC_edit) && !accid->HasEnclose())
             m_drawingCueSize = true;
         else {
             Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
-            if (note) m_drawingCueSize = note->IsCueSize();
+            if (note) m_drawingCueSize = note->GetDrawingCueSize();
         }
     }
     else if (this->Is({ DOTS, FLAG, STEM })) {
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_NOTE_DEPTH));
         if (note)
-            m_drawingCueSize = note->IsCueSize();
+            m_drawingCueSize = note->GetDrawingCueSize();
         else {
             Chord *chord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
-            if (chord) m_drawingCueSize = chord->IsCueSize();
+            if (chord) m_drawingCueSize = chord->GetDrawingCueSize();
         }
     }
 
@@ -1046,7 +1094,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     params->m_currentCrossStaff = NULL;
     params->m_currentCrossLayer = NULL;
 
-    AttCommonNComparison comparisonFirst(STAFF, durElement->GetStaff().at(0));
+    AttNIntegerComparison comparisonFirst(STAFF, durElement->GetStaff().at(0));
     m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindChildByAttComparison(&comparisonFirst, 1));
     if (!m_crossStaff) {
         LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff().at(0),
@@ -1070,7 +1118,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     int layerN = parentLayer->GetN();
     // When we will have allowed @layer in <note>, we will have to do:
     // int layerN = durElement->HasLayer() ? durElement->GetLayer() : (*currentLayer)->GetN();
-    AttCommonNComparison comparisonFirstLayer(LAYER, layerN);
+    AttNIntegerComparison comparisonFirstLayer(LAYER, layerN);
     m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByAttComparison(&comparisonFirstLayer, 1));
     if (!m_crossLayer) {
         // Just try to pick the first one...
@@ -1169,7 +1217,6 @@ int LayerElement::FindTimeSpanningLayerElements(FunctorParams *functorParams)
 
 int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
 {
-
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 

@@ -16,10 +16,12 @@
 
 #include "accid.h"
 #include "anchoredtext.h"
+#include "arpeg.h"
 #include "artic.h"
 #include "beam.h"
 #include "boundary.h"
 #include "breath.h"
+#include "btrem.h"
 #include "chord.h"
 #include "clef.h"
 #include "custos.h"
@@ -31,10 +33,12 @@
 #include "expansion.h"
 #include "fb.h"
 #include "fermata.h"
+#include "ftrem.h"
 #include "functorparams.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "keysig.h"
+#include "label.h"
 #include "layer.h"
 #include "ligature.h"
 #include "measure.h"
@@ -55,6 +59,8 @@
 #include "slur.h"
 #include "space.h"
 #include "staff.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "syl.h"
 #include "system.h"
 #include "tempo.h"
@@ -100,20 +106,20 @@ bool MeiOutput::ExportFile()
             // schema processing instruction
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "http://music-encoding.org/schema/3.0.0/mei-all.rng";
+            decl.append_attribute("href") = "http://music-encoding.org/schema/4.0.0/mei-all.rng";
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://relaxng.org/ns/structure/1.0";
 
             // schematron processing instruction
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "http://music-encoding.org/schema/3.0.0/mei-all.rng";
+            decl.append_attribute("href") = "http://music-encoding.org/schema/4.0.0/mei-all.rng";
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
 
             m_mei = meiDoc.append_child("mei");
             m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
-            m_mei.append_attribute("meiversion") = "3.0.0";
+            m_mei.append_attribute("meiversion") = "4.0.0";
 
             // this starts the call of all the functors
             m_doc->Save(this);
@@ -172,7 +178,7 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode.append_child(pugi::node_comment).set_value(object->GetComment().c_str());
     }
 
-    // Containers and scoreDef related
+    // Main containers
     if (object->Is(DOC)) {
         WriteMeiDoc(dynamic_cast<Doc *>(object));
         m_nodeStack.push_back(m_currentNode);
@@ -191,10 +197,8 @@ bool MeiOutput::WriteObject(Object *object)
             WriteMeiSystem(m_currentNode, dynamic_cast<System *>(object));
         }
     }
-    else if (object->Is(SECTION)) {
-        m_currentNode = m_currentNode.append_child("section");
-        WriteMeiSection(m_currentNode, dynamic_cast<Section *>(object));
-    }
+
+    // System boundaries
     else if (object->Is(ENDING)) {
         m_currentNode = m_currentNode.append_child("ending");
         WriteMeiEnding(m_currentNode, dynamic_cast<Ending *>(object));
@@ -210,6 +214,20 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(SB)) {
         m_currentNode = m_currentNode.append_child("sb");
         WriteMeiSb(m_currentNode, dynamic_cast<Sb *>(object));
+    }
+    else if (object->Is(SECTION)) {
+        m_currentNode = m_currentNode.append_child("section");
+        WriteMeiSection(m_currentNode, dynamic_cast<Section *>(object));
+    }
+
+    // ScoreDef related
+    else if (object->Is(LABEL)) {
+        m_currentNode = m_currentNode.append_child("label");
+        WriteMeiLabel(m_currentNode, dynamic_cast<Label *>(object));
+    }
+    else if (object->Is(LABELABBR)) {
+        m_currentNode = m_currentNode.append_child("labelAbbr");
+        WriteMeiLabelAbbr(m_currentNode, dynamic_cast<LabelAbbr *>(object));
     }
     else if (object->Is(SCOREDEF)) {
         m_currentNode = m_currentNode.append_child("scoreDef");
@@ -240,6 +258,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(ANCHORED_TEXT)) {
         m_currentNode = m_currentNode.append_child("anchoredText");
         WriteMeiAnchoredText(m_currentNode, dynamic_cast<AnchoredText *>(object));
+    }
+    else if (object->Is(ARPEG)) {
+        m_currentNode = m_currentNode.append_child("arpeg");
+        WriteMeiArpeg(m_currentNode, dynamic_cast<Arpeg *>(object));
     }
     else if (object->Is(BREATH)) {
         m_currentNode = m_currentNode.append_child("breath");
@@ -616,14 +638,21 @@ void MeiOutput::WriteMeiPage(pugi::xml_node currentNode, Page *page)
     WriteXmlId(currentNode, page);
     // size and margins but only if any - we rely on page.height only to check this
     if (page->m_pageHeight != -1) {
-        currentNode.append_attribute("page.width") = StringFormat("%d", page->m_pageWidth).c_str();
-        currentNode.append_attribute("page.height") = StringFormat("%d", page->m_pageHeight).c_str();
-        currentNode.append_attribute("page.leftmar") = StringFormat("%d", page->m_pageLeftMar).c_str();
-        currentNode.append_attribute("page.rightmar") = StringFormat("%d", page->m_pageRightMar).c_str();
-        currentNode.append_attribute("page.rightmar") = StringFormat("%d", page->m_pageRightMar).c_str();
+        currentNode.append_attribute("page.width") = StringFormat("%d", page->m_pageWidth / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("page.height")
+            = StringFormat("%d", page->m_pageHeight / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("page.leftmar")
+            = StringFormat("%d", page->m_pageLeftMar / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("page.rightmar")
+            = StringFormat("%d", page->m_pageRightMar / DEFINITION_FACTOR).c_str();
+        currentNode.append_attribute("page.rightmar")
+            = StringFormat("%d", page->m_pageRightMar / DEFINITION_FACTOR).c_str();
     }
     if (!page->m_surface.empty()) {
         currentNode.append_attribute("surface") = page->m_surface.c_str();
+    }
+    if (page->m_PPUFactor != 1.0) {
+        currentNode.append_attribute("ppu") = StringFormat("%f", page->m_PPUFactor).c_str();
     }
 }
 
@@ -633,8 +662,10 @@ void MeiOutput::WriteMeiSystem(pugi::xml_node currentNode, System *system)
 
     WriteXmlId(currentNode, system);
     // margins
-    currentNode.append_attribute("system.leftmar") = StringFormat("%d", system->m_systemLeftMar).c_str();
-    currentNode.append_attribute("system.rightmar") = StringFormat("%d", system->m_systemRightMar).c_str();
+    currentNode.append_attribute("system.leftmar")
+        = StringFormat("%d", system->m_systemLeftMar / DEFINITION_FACTOR).c_str();
+    currentNode.append_attribute("system.rightmar")
+        = StringFormat("%d", system->m_systemRightMar / DEFINITION_FACTOR).c_str();
     // y positions
     if (system->m_yAbs != VRV_UNSET) {
         currentNode.append_attribute("uly") = StringFormat("%d", system->m_yAbs / DEFINITION_FACTOR).c_str();
@@ -674,6 +705,7 @@ void MeiOutput::WriteMeiEnding(pugi::xml_node currentNode, Ending *ending)
     assert(ending);
 
     WriteSystemElement(currentNode, ending);
+    ending->WriteLineRend(currentNode);
     ending->WriteNNumberLike(currentNode);
 }
 
@@ -724,8 +756,6 @@ void MeiOutput::WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp)
     WriteXmlId(currentNode, staffGrp);
     staffGrp->WriteBasic(currentNode);
     staffGrp->WriteLabelled(currentNode);
-    // FIXME MEI 4.0.0
-    // staffGrp->WriteLabelsAddl(currentNode);
     staffGrp->WriteStaffGroupingSym(currentNode);
     staffGrp->WriteStaffGrpVis(currentNode);
     staffGrp->WriteTyped(currentNode);
@@ -739,13 +769,25 @@ void MeiOutput::WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
     WriteScoreDefInterface(currentNode, staffDef);
     staffDef->WriteDistances(currentNode);
     staffDef->WriteLabelled(currentNode);
-    // FIXME MEI 4.0.0
-    // staffDef->WriteLabelsAddl(currentNode);
     staffDef->WriteNInteger(currentNode);
     staffDef->WriteNotationType(currentNode);
     staffDef->WriteScalable(currentNode);
     staffDef->WriteStaffDefLog(currentNode);
     staffDef->WriteTransposition(currentNode);
+}
+
+void MeiOutput::WriteMeiLabel(pugi::xml_node currentNode, Label *label)
+{
+    assert(label);
+
+    WriteXmlId(currentNode, label);
+}
+
+void MeiOutput::WriteMeiLabelAbbr(pugi::xml_node currentNode, LabelAbbr *labelAbbr)
+{
+    assert(labelAbbr);
+
+    WriteXmlId(currentNode, labelAbbr);
 }
 
 void MeiOutput::WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure)
@@ -786,6 +828,18 @@ void MeiOutput::WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *a
     WriteControlElement(currentNode, anchoredText);
     WriteTextDirInterface(currentNode, anchoredText);
 }
+
+void MeiOutput::WriteMeiArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
+{
+    assert(arpeg);
+
+    WriteControlElement(currentNode, arpeg);
+    WritePlistInterface(currentNode, arpeg);
+    WriteTimePointInterface(currentNode, arpeg);
+    arpeg->WriteArpegLog(currentNode);
+    arpeg->WriteArpegVis(currentNode);
+    arpeg->WriteColor(currentNode);
+};
 
 void MeiOutput::WriteMeiBreath(pugi::xml_node currentNode, Breath *breath)
 {
@@ -899,6 +953,8 @@ void MeiOutput::WriteMeiStaff(pugi::xml_node currentNode, Staff *staff)
     WriteXmlId(currentNode, staff);
     staff->WriteNInteger(currentNode);
     staff->WriteTyped(currentNode);
+    staff->WriteVisibility(currentNode);
+
     // y position
     if (staff->m_yAbs != VRV_UNSET) {
         currentNode.append_attribute("uly") = StringFormat("%d", staff->m_yAbs / DEFINITION_FACTOR).c_str();
@@ -932,7 +988,7 @@ void MeiOutput::WriteMeiTrill(pugi::xml_node currentNode, Trill *trill)
     assert(trill);
 
     WriteControlElement(currentNode, trill);
-    WriteTimePointInterface(currentNode, trill);
+    WriteTimeSpanningInterface(currentNode, trill);
     trill->WriteColor(currentNode);
     trill->WriteOrnamentAccid(currentNode);
     trill->WritePlacement(currentNode);
@@ -957,6 +1013,7 @@ void MeiOutput::WriteMeiLayer(pugi::xml_node currentNode, Layer *layer)
     WriteXmlId(currentNode, layer);
     layer->WriteNInteger(currentNode);
     layer->WriteTyped(currentNode);
+    layer->WriteVisibility(currentNode);
 }
 
 void MeiOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *element)
@@ -1305,6 +1362,13 @@ void MeiOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *inte
     interface->WritePitch(element);
 }
 
+void MeiOutput::WritePlistInterface(pugi::xml_node element, PlistInterface *interface)
+{
+    assert(interface);
+
+    interface->WritePlist(element);
+}
+
 void MeiOutput::WritePositionInterface(pugi::xml_node element, PositionInterface *interface)
 {
     assert(interface);
@@ -1621,7 +1685,24 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
 
     // editorial
     if (IsEditorialElementName(element)) {
-        return true;
+        if (filterParent->Is(LABEL)) {
+            return false;
+        }
+        else if (filterParent->Is(LABELABBR)) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    // filter for annot
+    else if (filterParent->Is(ANNOT)) {
+        if (element == "") {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
     // filter for harm
     else if (filterParent->Is(HARM)) {
@@ -1719,6 +1800,32 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for label
+    else if (filterParent->Is(LABEL)) {
+        if (element == "") {
+            return true;
+        }
+        else if (element == "rend") {
+            return true;
+        }
+
+        else {
+            return false;
+        }
+    }
+    // filter for label
+    else if (filterParent->Is(LABELABBR)) {
+        if (element == "") {
+            return true;
+        }
+        else if (element == "rend") {
+            return true;
+        }
+
+        else {
+            return false;
+        }
+    }
     // filter for ligature
     else if (filterParent->Is(LIGATURE)) {
         if (element == "note") {
@@ -1787,12 +1894,15 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         if (element == "") {
             return true;
         }
+        else if (element == "rend") {
+            return true;
+        }
         else {
             return false;
         }
     }
     else {
-        LogDebug("Unknow filter for '%s'", filterParent->GetClassName().c_str());
+        LogDebug("Unknown filter for '%s'", filterParent->GetClassName().c_str());
         return true;
     }
 }
@@ -1809,10 +1919,12 @@ bool MeiInput::ReadMei(pugi::xml_node root)
         m_doc->m_header.append_copy(current);
         if (root.attribute("meiversion")) {
             std::string version = std::string(root.attribute("meiversion").value());
-            if (version == "2013")
-                m_version = MEI_2013;
+            if (version == "4.0.0")
+                m_version = MEI_4_0_0;
             else if (version == "3.0.0")
                 m_version = MEI_3_0_0;
+            else if (version == "2013")
+                m_version = MEI_2013;
         }
     }
     // music
@@ -1978,6 +2090,7 @@ bool MeiInput::ReadMeiEnding(Object *parent, pugi::xml_node ending)
     Ending *vrvEnding = new Ending();
     ReadSystemElement(ending, vrvEnding);
 
+    vrvEnding->ReadLineRend(ending);
     vrvEnding->ReadNNumberLike(ending);
 
     parent->AddChild(vrvEnding);
@@ -2029,7 +2142,7 @@ bool MeiInput::ReadMeiPage(pugi::xml_node page)
     SetMeiUuid(page, vrvPage);
 
     if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
-        vrvPage->UpgradePageBasedMEI(m_doc);
+        UpgradePageTo_3_0_0(vrvPage, m_doc);
     }
 
     if (page.attribute("page.height")) {
@@ -2049,6 +2162,9 @@ bool MeiInput::ReadMeiPage(pugi::xml_node page)
     }
     if (page.attribute("surface")) {
         vrvPage->m_surface = page.attribute("surface").value();
+    }
+    if (page.attribute("ppu")) {
+        // vrvPage->m_PPUFactor = 12.5; //atof(page.attribute("ppu").value());
     }
 
     m_doc->AddChild(vrvPage);
@@ -2152,8 +2268,9 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
                     System *system = dynamic_cast<System *>(parent);
                     assert(system);
                     unmeasured = new Measure(false);
-                    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013))
-                        unmeasured->UpgradePageBasedMEI(system);
+                    if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
+                        UpgradeMeasureTo_3_0_0(unmeasured, system);
+                    }
                     system->AddChild(unmeasured);
                 }
                 else {
@@ -2261,10 +2378,12 @@ bool MeiInput::ReadMeiStaffGrp(Object *parent, pugi::xml_node staffGrp)
     StaffGrp *vrvStaffGrp = new StaffGrp();
     SetMeiUuid(staffGrp, vrvStaffGrp);
 
+    if (m_version < MEI_4_0_0) {
+        UpgradeStaffGrpTo_4_0_0(staffGrp, vrvStaffGrp);
+    }
+
     vrvStaffGrp->ReadBasic(staffGrp);
     vrvStaffGrp->ReadLabelled(staffGrp);
-    // FIXME MEI 4.0.0
-    // vrvStaffGrp->ReadLabelsAddl(staffGrp);
     vrvStaffGrp->ReadStaffGroupingSym(staffGrp);
     vrvStaffGrp->ReadStaffGrpVis(staffGrp);
     vrvStaffGrp->ReadTyped(staffGrp);
@@ -2286,6 +2405,12 @@ bool MeiInput::ReadMeiStaffGrpChildren(Object *parent, pugi::xml_node parentNode
             success = ReadMeiEditorialElement(parent, current, EDITORIAL_STAFFGRP);
         }
         // content
+        else if (std::string(current.name()) == "label") {
+            success = ReadMeiLabel(parent, current);
+        }
+        else if (std::string(current.name()) == "labelAbbr") {
+            success = ReadMeiLabelAbbr(parent, current);
+        }
         else if (std::string(current.name()) == "staffGrp") {
             success = ReadMeiStaffGrp(parent, current);
         }
@@ -2306,10 +2431,12 @@ bool MeiInput::ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef)
     StaffDef *vrvStaffDef = new StaffDef();
     ReadScoreDefElement(staffDef, vrvStaffDef);
 
+    if (m_version < MEI_4_0_0) {
+        UpgradeStaffDefTo_4_0_0(staffDef, vrvStaffDef);
+    }
+
     vrvStaffDef->ReadDistances(staffDef);
     vrvStaffDef->ReadLabelled(staffDef);
-    // FIXME MEI 4.0.0
-    // vrvStaffDef->ReadLabelsAddl(staffDef);
     vrvStaffDef->ReadNInteger(staffDef);
     vrvStaffDef->ReadNotationType(staffDef);
     vrvStaffDef->ReadScalable(staffDef);
@@ -2323,7 +2450,48 @@ bool MeiInput::ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef)
     ReadScoreDefInterface(staffDef, vrvStaffDef);
 
     parent->AddChild(vrvStaffDef);
-    return true;
+
+    return ReadMeiStaffDefChildren(vrvStaffDef, staffDef);
+}
+
+bool MeiInput::ReadMeiStaffDefChildren(Object *parent, pugi::xml_node parentNode)
+{
+    assert(dynamic_cast<StaffDef *>(parent) || dynamic_cast<EditorialElement *>(parent));
+
+    bool success = true;
+    pugi::xml_node current;
+    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+        // content
+        else if (std::string(current.name()) == "label") {
+            success = ReadMeiLabel(parent, current);
+        }
+        else if (std::string(current.name()) == "labelAbbr") {
+            success = ReadMeiLabelAbbr(parent, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <staffGrp>", current.name());
+        }
+    }
+    return success;
+}
+
+bool MeiInput::ReadMeiLabel(Object *parent, pugi::xml_node label)
+{
+    Label *vrvLabel = new Label();
+    SetMeiUuid(label, vrvLabel);
+
+    parent->AddChild(vrvLabel);
+    return ReadMeiTextChildren(vrvLabel, label, vrvLabel);
+}
+
+bool MeiInput::ReadMeiLabelAbbr(Object *parent, pugi::xml_node labelAbbr)
+{
+    LabelAbbr *vrvLabelAbbr = new LabelAbbr();
+    SetMeiUuid(labelAbbr, vrvLabelAbbr);
+
+    parent->AddChild(vrvLabelAbbr);
+    return ReadMeiTextChildren(vrvLabelAbbr, labelAbbr, vrvLabelAbbr);
 }
 
 bool MeiInput::ReadMeiMeasure(Object *parent, pugi::xml_node measure)
@@ -2361,6 +2529,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         // content
         else if (std::string(current.name()) == "anchoredText") {
             success = ReadMeiAnchoredText(parent, current);
+        }
+        else if (std::string(current.name()) == "arpeg") {
+            success = ReadMeiArpeg(parent, current);
         }
         else if (std::string(current.name()) == "breath") {
             success = ReadMeiBreath(parent, current);
@@ -2439,6 +2610,21 @@ bool MeiInput::ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText)
     return ReadMeiTextChildren(vrvAnchoredText, anchoredText, vrvAnchoredText);
 }
 
+bool MeiInput::ReadMeiArpeg(Object *parent, pugi::xml_node arpeg)
+{
+    Arpeg *vrvArpeg = new Arpeg();
+    ReadControlElement(arpeg, vrvArpeg);
+
+    ReadPlistInterface(arpeg, vrvArpeg);
+    ReadTimePointInterface(arpeg, vrvArpeg);
+    vrvArpeg->ReadArpegLog(arpeg);
+    vrvArpeg->ReadArpegVis(arpeg);
+    vrvArpeg->ReadColor(arpeg);
+
+    parent->AddChild(vrvArpeg);
+    return true;
+}
+
 bool MeiInput::ReadMeiBreath(Object *parent, pugi::xml_node breath)
 {
     Breath *vrvBreath = new Breath();
@@ -2449,7 +2635,7 @@ bool MeiInput::ReadMeiBreath(Object *parent, pugi::xml_node breath)
     vrvBreath->ReadPlacement(breath);
 
     parent->AddChild(vrvBreath);
-    return ReadMeiTextChildren(vrvBreath, breath, vrvBreath);
+    return true;
 }
 
 bool MeiInput::ReadMeiDir(Object *parent, pugi::xml_node dir)
@@ -2607,7 +2793,7 @@ bool MeiInput::ReadMeiTrill(Object *parent, pugi::xml_node trill)
     Trill *vrvTrill = new Trill();
     ReadControlElement(trill, vrvTrill);
 
-    ReadTimePointInterface(trill, vrvTrill);
+    ReadTimeSpanningInterface(trill, vrvTrill);
     vrvTrill->ReadColor(trill);
     vrvTrill->ReadOrnamentAccid(trill);
     vrvTrill->ReadPlacement(trill);
@@ -2670,6 +2856,7 @@ bool MeiInput::ReadMeiStaff(Object *parent, pugi::xml_node staff)
 
     vrvStaff->ReadNInteger(staff);
     vrvStaff->ReadTyped(staff);
+    vrvStaff->ReadVisibility(staff);
 
     if (staff.attribute("uly") && (this->m_doc->GetType() == Transcription)) {
         vrvStaff->m_yAbs = atoi(staff.attribute("uly").value()) * DEFINITION_FACTOR;
@@ -2713,6 +2900,7 @@ bool MeiInput::ReadMeiLayer(Object *parent, pugi::xml_node layer)
 
     vrvLayer->ReadNInteger(layer);
     vrvLayer->ReadTyped(layer);
+    vrvLayer->ReadVisibility(layer);
 
     if (!vrvLayer->HasN()) {
         LogWarning("No @n on <layer>, 1 is set");
@@ -3350,6 +3538,12 @@ bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interf
     return true;
 }
 
+bool MeiInput::ReadPlistInterface(pugi::xml_node element, PlistInterface *interface)
+{
+    interface->ReadPlist(element);
+    return true;
+}
+
 bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *interface)
 {
     interface->ReadStaffLoc(element);
@@ -3503,7 +3697,7 @@ bool MeiInput::ReadMeiAnnot(Object *parent, pugi::xml_node annot)
     }
 
     parent->AddChild(vrvAnnot);
-    return true;
+    return ReadMeiTextChildren(vrvAnnot, annot, vrvAnnot);
 }
 
 bool MeiInput::ReadMeiApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter)
@@ -3864,6 +4058,9 @@ bool MeiInput::ReadScoreBasedMei(pugi::xml_node element, Score *parent)
             else if (elementName == "section") {
                 success = ReadMeiSection(parent, current);
             }
+            else if (elementName == "ending") {
+                success = ReadMeiEnding(parent, current);
+            }
             else {
                 LogWarning("Element <%s> within <score> is not supported and will be ignored ", elementName.c_str());
             }
@@ -3966,15 +4163,6 @@ DocType MeiInput::StrToDocType(std::string type)
     return Raw;
 }
 
-std::string MeiInput::ExtractUuidFragment(std::string refUuid)
-{
-    size_t pos = refUuid.find_last_of("#");
-    if ((pos != std::string::npos) && (pos < refUuid.length() - 1)) {
-        refUuid = refUuid.substr(pos + 1);
-    }
-    return refUuid;
-}
-
 std::wstring MeiInput::LeftTrim(std::wstring str)
 {
     std::wstring::size_type pos = 0;
@@ -3996,6 +4184,74 @@ bool MeiInput::IsEditorialElementName(std::string elementName)
     auto i = std::find(MeiInput::s_editorialElementNames.begin(), MeiInput::s_editorialElementNames.end(), elementName);
     if (i != MeiInput::s_editorialElementNames.end()) return true;
     return false;
+}
+
+void MeiInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef)
+{
+    if (staffDef.attribute("label")) {
+        Text *text = new Text();
+        text->SetText(UTF8to16(staffDef.attribute("label").value()));
+        Label *label = new Label();
+        label->AddChild(text);
+        vrvStaffDef->AddChild(label);
+        staffDef.remove_attribute("label");
+    }
+    if (staffDef.attribute("label.abbr")) {
+        Text *text = new Text();
+        text->SetText(UTF8to16(staffDef.attribute("label.abbr").value()));
+        LabelAbbr *labelAbbr = new LabelAbbr();
+        labelAbbr->AddChild(text);
+        vrvStaffDef->AddChild(labelAbbr);
+        staffDef.remove_attribute("label.abbr");
+    }
+}
+
+void MeiInput::UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvStaffGrp)
+{
+    if (staffGrp.attribute("label")) {
+        Text *text = new Text();
+        text->SetText(UTF8to16(staffGrp.attribute("label").value()));
+        Label *label = new Label();
+        label->AddChild(text);
+        vrvStaffGrp->AddChild(label);
+        staffGrp.remove_attribute("label");
+    }
+    if (staffGrp.attribute("label.abbr")) {
+        Text *text = new Text();
+        text->SetText(UTF8to16(staffGrp.attribute("label.abbr").value()));
+        LabelAbbr *labelAbbr = new LabelAbbr();
+        labelAbbr->AddChild(text);
+        vrvStaffGrp->AddChild(labelAbbr);
+        staffGrp.remove_attribute("label.abbr");
+    }
+}
+
+void MeiInput::UpgradeMeasureTo_3_0_0(Measure *measure, System *system)
+{
+    assert(measure);
+    assert(system);
+    assert(!measure->IsMeasuredMusic());
+
+    if (system->m_yAbs == VRV_UNSET) return;
+    if (system->m_systemRightMar == VRV_UNSET) return;
+    if (system->m_systemRightMar == VRV_UNSET) return;
+
+    Page *page = dynamic_cast<Page *>(system->GetFirstParent(PAGE));
+    assert(page);
+    measure->m_xAbs = system->m_systemLeftMar;
+    measure->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;
+}
+
+void MeiInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
+{
+    assert(page);
+    assert(doc);
+
+    // Once we have the GetPPU in Page through LibMEI, call this from Doc::SetDrawingPage and
+    // use m_unit instead of DEFAULT_UNIT - For the upgraded call Page->SetPPU(12.5);
+
+    page->m_PPUFactor = (25.0 / 2.0 / DEFAULT_UNIT);
+    // LogDebug("PPUFactor: %f", m_PPUFactor);
 }
 
 } // namespace vrv

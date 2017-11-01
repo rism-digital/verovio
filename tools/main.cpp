@@ -57,7 +57,7 @@ bool dir_exists(string dir)
 
 void display_version()
 {
-    cerr << "Verovio " << GetVersion() << endl;
+    cerr << "Verovio " << vrv::GetVersion() << endl;
 }
 
 void display_usage()
@@ -125,6 +125,8 @@ void display_usage()
     cerr << " --mdiv-xpath-query=QR      Set the xPath query for selecting the <mdiv> to be rendered;" << endl;
     cerr << "                            only one <mdiv> can be rendered" << endl;
 
+    cerr << " --mm-ouptut                Specify that the output in the SVG is given in mm (default is px)" << endl;
+
     cerr << " --no-layout                Ignore all encoded layout information (if any)" << endl;
     cerr << "                            and output one single page with one single system" << endl;
 
@@ -170,6 +172,7 @@ int main(int argc, char **argv)
     int ignore_layout = 0;
     int no_justification = 0;
     int even_note_spacing = 0;
+    int mm_output = 0;
     int show_bounding_boxes = 0;
     int page = 1;
     int show_help = 0;
@@ -194,14 +197,15 @@ int main(int argc, char **argv)
         { "format", required_argument, 0, 'f' }, { "help", no_argument, &show_help, 1 },
         { "hum-type", no_argument, &hum_type, 1 }, { "ignore-layout", no_argument, &ignore_layout, 1 },
         { "mdiv-xpath-query", required_argument, 0, 0 }, { "no-layout", no_argument, &no_layout, 1 },
-        { "no-mei-hdr", no_argument, &no_mei_hdr, 1 }, { "no-justification", no_argument, &no_justification, 1 },
-        { "outfile", required_argument, 0, 'o' }, { "page", required_argument, 0, 0 },
-        { "page-height", required_argument, 0, 'h' }, { "page-width", required_argument, 0, 'w' },
-        { "resources", required_argument, 0, 'r' }, { "scale", required_argument, 0, 's' },
-        { "show-bounding-boxes", no_argument, &show_bounding_boxes, 1 }, { "spacing-linear", required_argument, 0, 0 },
-        { "spacing-non-linear", required_argument, 0, 0 }, { "spacing-staff", required_argument, 0, 0 },
-        { "spacing-system", required_argument, 0, 0 }, { "type", required_argument, 0, 't' },
-        { "version", no_argument, &show_version, 1 }, { "xml-id-seed", required_argument, 0, 0 }, { 0, 0, 0, 0 } };
+        { "mm-output", no_argument, &mm_output, 1 }, { "no-mei-hdr", no_argument, &no_mei_hdr, 1 },
+        { "no-justification", no_argument, &no_justification, 1 }, { "outfile", required_argument, 0, 'o' },
+        { "page", required_argument, 0, 0 }, { "page-height", required_argument, 0, 'h' },
+        { "page-width", required_argument, 0, 'w' }, { "resources", required_argument, 0, 'r' },
+        { "scale", required_argument, 0, 's' }, { "show-bounding-boxes", no_argument, &show_bounding_boxes, 1 },
+        { "spacing-linear", required_argument, 0, 0 }, { "spacing-non-linear", required_argument, 0, 0 },
+        { "spacing-staff", required_argument, 0, 0 }, { "spacing-system", required_argument, 0, 0 },
+        { "type", required_argument, 0, 't' }, { "version", no_argument, &show_version, 1 },
+        { "xml-id-seed", required_argument, 0, 0 }, { 0, 0, 0, 0 } };
 
     int option_index = 0;
     while ((c = getopt_long(argc, argv, "b:f:h:o:p:r:s:t:w:v", long_options, &option_index)) != -1) {
@@ -324,6 +328,7 @@ int main(int argc, char **argv)
     toolkit.SetNoLayout(no_layout);
     toolkit.SetHumType(hum_type);
     toolkit.SetIgnoreLayout(ignore_layout);
+    toolkit.SetMMOutput(mm_output);
     toolkit.SetNoJustification(no_justification);
     toolkit.SetEvenNoteSpacing(even_note_spacing);
     toolkit.SetShowBoundingBoxes(show_bounding_boxes);
@@ -337,8 +342,9 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    // If we output svg or do not request no layout to be performed then we need the font
-    if ((outformat == "svg") || !toolkit.GetNoLayout()) {
+    // If we output svg or midi then we need the font for the layout alignment
+    if ((outformat == "svg") || (outformat == "midi") || (outformat == "timemap") || (outformat == "humdrum")
+        || (outformat == "hum")) {
         // Make sure the user uses a valid Resource path
         // Save many headaches for empty SVGs
         if (!dir_exists(vrv::Resources::GetPath())) {
@@ -360,8 +366,9 @@ int main(int argc, char **argv)
         }
     }
 
-    if (outformat != "svg" && outformat != "mei" && outformat != "midi" && outformat != "humdrum") {
-        cerr << "Output format can only be 'mei', 'svg', 'midi', or 'humdrum'." << endl;
+    if ((outformat != "svg") && (outformat != "mei") && (outformat != "midi") && (outformat != "timemap")
+        && (outformat != "humdrum") && (outformat != "hum")) {
+        cerr << "Output format (" << outformat << ") can only be 'mei', 'svg', 'midi', or 'humdrum'." << endl;
         exit(1);
     }
 
@@ -440,6 +447,7 @@ int main(int argc, char **argv)
             }
         }
     }
+
     else if (outformat == "midi") {
         outfile += ".mid";
         if (std_output) {
@@ -454,7 +462,21 @@ int main(int argc, char **argv)
             cerr << "Output written to " << outfile << "." << endl;
         }
     }
-    else if (outformat == "humdrum") {
+    else if (outformat == "timemap") {
+        outfile += ".json";
+        if (std_output) {
+            std::string output;
+            std::cout << toolkit.RenderToTimemap();
+        }
+        else if (!toolkit.RenderToTimemapFile(outfile)) {
+            cerr << "Unable to write MIDI to " << outfile << "." << endl;
+            exit(1);
+        }
+        else {
+            cerr << "Output written to " << outfile << "." << endl;
+        }
+    }
+    else if (outformat == "humdrum" || outformat == "hum") {
         outfile += ".krn";
         if (std_output) {
             toolkit.GetHumdrum(std::cout);

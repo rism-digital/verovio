@@ -13,14 +13,17 @@
 
 //----------------------------------------------------------------------------
 
+#include "attcomparison.h"
 #include "boundary.h"
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
+#include "layer.h"
 #include "measure.h"
 #include "page.h"
 #include "section.h"
+#include "staff.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -162,6 +165,50 @@ void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
+    m_drawingScoreDef->SetParent(this);
+}
+
+bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
+{
+    AttComparisonAny matchType({ CHORD, NOTE });
+    ArrayOfObjects children;
+    ArrayOfObjects::iterator childrenIter;
+    this->FindAllChildBetween(&children, &matchType, start, end);
+
+    Layer *layerStart = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+    assert(layerStart);
+    Staff *staffStart = dynamic_cast<Staff *>(layerStart->GetFirstParent(STAFF));
+    assert(staffStart);
+
+    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+
+    for (childrenIter = children.begin(); childrenIter != children.end(); childrenIter++) {
+        Layer *layer = dynamic_cast<Layer *>((*childrenIter)->GetFirstParent(LAYER));
+        assert(layer);
+        Staff *staff = dynamic_cast<Staff *>((*childrenIter)->GetFirstParent(STAFF));
+        assert(staff);
+
+        // If the slur is spanning over several measure, the the children list will include note and chords
+        // from other staves and layers, so we need to skip them.
+        // Alternatively we could process by staff / layer, but the current solution might be better
+        // if we want to look for slurs starting / ending on different staff / layer
+        if ((staff->GetN() != staffStart->GetN()) || (layer->GetN() != layerStart->GetN())) {
+            continue;
+        }
+
+        StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface *>(*childrenIter);
+        assert(interface);
+
+        // First pass
+        if (stemDir == STEMDIRECTION_NONE) {
+            stemDir = interface->GetDrawingStemDir();
+        }
+        else if (stemDir != interface->GetDrawingStemDir()) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 //----------------------------------------------------------------------------
@@ -312,7 +359,10 @@ int System::JustifyX(FunctorParams *functorParams)
 
     if (params->m_justifiableRatio < 0.8) {
         // Arbitrary value for avoiding over-compressed justification
-        LogWarning("Justification stop because of a ratio smaller than 0.8");
+        LogWarning("Justification stop because of a ratio smaller than 0.8: %lf", params->m_justifiableRatio);
+        LogWarning("\tSystem full width: %d", params->m_systemFullWidth);
+        LogWarning("\tNon-justifiable width: %d", nonJustifiableWidth);
+        LogWarning("\tDrawing justifiable width: %d", m_drawingJustifiableWidth);
     }
 
     // Check if we are on the last page and on the last system - do no justify it if ratio > 1.25
@@ -351,23 +401,23 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = SLUR;
     m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = DYNAM;
-    m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = HAIRPIN;
-    m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = OCTAVE;
-    m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = DIR;
-    m_systemAligner.Process(params->m_functor, params);
     params->m_classId = MORDENT;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = TURN;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = TRILL;
     m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = DYNAM;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = HAIRPIN;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = OCTAVE;
+    m_systemAligner.Process(params->m_functor, params);
     params->m_classId = BREATH;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = FERMATA;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = DIR;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = TEMPO;
     m_systemAligner.Process(params->m_functor, params);

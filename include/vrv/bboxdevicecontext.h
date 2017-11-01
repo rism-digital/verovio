@@ -120,6 +120,13 @@ public:
     ///@}
 
     /**
+     * @name Method for rotating a graphic (clockwise).
+     */
+    ///@{
+    virtual void RotateGraphic(Point const &orig, double angle);
+    ///@}
+
+    /**
      * @name Method for starting and ending page
      */
     ///@{
@@ -130,11 +137,42 @@ public:
     bool UpdateHorizontalValues() { return (m_update != BBOX_VERTICAL_ONLY); }
     bool UpdateVerticalValues() { return (m_update != BBOX_HORIZONTAL_ONLY); }
 
+    /**
+     * @name Method for adding description element
+     */
+    ///@{
+    virtual void AddDescription(const std::string &text){};
+    ///@}
+
 private:
+    /**
+     *
+     */
+    void ResetGraphicRotation();
+
+public:
+    //
+private:
+    /**
+     * Size and scale members
+     */
+    ///@{
     int m_width, m_height;
     double m_userScaleX, m_userScaleY;
+    ///@}
 
+    /**
+     * Indicates whereas we need to update bounding boxes horizontally and/or vertically
+     */
     unsigned char m_update;
+
+    /**
+     * The rotation values by RotateGraphic
+     */
+    ///@{{
+    Point m_rotationOrigin;
+    double m_rotationAngle;
+    ///@}
 
     /**
      * members for keeping track of the text bounding box.

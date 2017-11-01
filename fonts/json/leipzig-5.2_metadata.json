@@ -30,7 +30,7 @@
         "tupletBracketThickness": "0.16"
     },
     "fontName": "Leipzig-5.2",
-    "fontVersion": "5.2.29",
+    "fontVersion": "5.2.31",
     "glyphBBoxes": {
         "uniE003": {
             "bBoxNE": [
@@ -1872,6 +1872,26 @@
                 -0.004
             ]
         },
+        "uniE59D": {
+            "bBoxNE": [
+                1.2185,
+                0.7685
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniE59E": {
+            "bBoxNE": [
+                1.5,
+                0.7687
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
         "uniE610": {
             "bBoxNE": [
                 1.24,
@@ -2302,14 +2322,44 @@
                 0.0
             ]
         },
-        "z": {
+        "uniEAA9": {
             "bBoxNE": [
-                0.0,
-                0.0
+                0.792,
+                0.448
             ],
             "bBoxSW": [
                 0.0,
                 0.0
+            ]
+        },
+        "uniEAAA": {
+            "bBoxNE": [
+                0.792,
+                0.448
+            ],
+            "bBoxSW": [
+                0.0,
+                0.0
+            ]
+        },
+        "uniEAAD": {
+            "bBoxNE": [
+                1.48,
+                0.62
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.18
+            ]
+        },
+        "uniEAAE": {
+            "bBoxNE": [
+                1.48,
+                0.628
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.172
             ]
         }
     },
@@ -2866,6 +2916,12 @@
         "uniE56E": {
             "codepoint": "0XE56E"
         },
+        "uniE59D": {
+            "codepoint": "0XE59D"
+        },
+        "uniE59E": {
+            "codepoint": "0XE59E"
+        },
         "uniE610": {
             "codepoint": "0XE610"
         },
@@ -2995,8 +3051,17 @@
         "uniE9F9": {
             "codepoint": "0XE9F9"
         },
-        "z": {
-            "codepoint": "0X007A"
+        "uniEAA9": {
+            "codepoint": "0XEAA9"
+        },
+        "uniEAAA": {
+            "codepoint": "0XEAAA"
+        },
+        "uniEAAD": {
+            "codepoint": "0XEAAD"
+        },
+        "uniEAAE": {
+            "codepoint": "0XEAAE"
         }
     },
     "glyphsWithAnchors": {

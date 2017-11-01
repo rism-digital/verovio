@@ -10,8 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
-#include <math.h>
 
 //----------------------------------------------------------------------------
 
@@ -20,6 +18,7 @@
 #include "glyph.h"
 #include "layerelement.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "view.h"
 #include "vrv.h"
 
@@ -30,25 +29,12 @@ namespace vrv {
 #define space " "
 #define semicolon ";"
 
-extern "C" {
-static inline double DegToRad(double deg)
-{
-    return (deg * M_PI) / 180.0;
-}
-// static inline double RadToDeg(double deg) { return (deg * 180.0) / M_PI; } // unused
-}
-
 //----------------------------------------------------------------------------
 // SvgDeviceContext
 //----------------------------------------------------------------------------
 
-SvgDeviceContext::SvgDeviceContext(int width, int height) : DeviceContext()
+SvgDeviceContext::SvgDeviceContext() : DeviceContext()
 {
-    m_width = width;
-    m_height = height;
-
-    m_userScaleX = 1.0;
-    m_userScaleY = 1.0;
     m_originX = 0;
     m_originY = 0;
 
@@ -59,6 +45,8 @@ SvgDeviceContext::SvgDeviceContext(int width, int height) : DeviceContext()
 
     m_committed = false;
     m_vrvTextFont = false;
+
+    m_mmOutput = false;
 
     // create the initial SVG element
     // width and height need to be set later; these are taken care of in "commit"
@@ -95,8 +83,14 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     }
 
     // take care of width/height once userScale is updated
-    m_svgNode.prepend_attribute("height") = StringFormat("%dpx", (int)((double)m_height * m_userScaleY)).c_str();
-    m_svgNode.prepend_attribute("width") = StringFormat("%dpx", (int)((double)m_width * m_userScaleX)).c_str();
+    if (m_mmOutput) {
+        m_svgNode.prepend_attribute("height") = StringFormat("%.2fmm", ((double)GetHeight() * GetUserScaleY()) / 10).c_str();
+        m_svgNode.prepend_attribute("width") = StringFormat("%.2fmm", ((double)GetWidth() * GetUserScaleX()) / 10).c_str();
+    }
+    else {
+        m_svgNode.prepend_attribute("height") = StringFormat("%.2fpx", ((double)GetHeight() * GetUserScaleY())).c_str();
+        m_svgNode.prepend_attribute("width") = StringFormat("%.2fpx", ((double)GetWidth() * GetUserScaleX())).c_str();
+    }
 
     // add the woff VerovioText font if needed
     if (m_vrvTextFont) {
@@ -236,8 +230,13 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
     if (object->HasAttClass(ATT_VISIBILITY)) {
         AttVisibility *att = dynamic_cast<AttVisibility *>(object);
         assert(att);
-        if (att->GetVisible() == BOOLEAN_false) {
-            m_currentNode.append_attribute("visibility") = "hidden";
+        if (att->HasVisible()) {
+            if (att->GetVisible() == BOOLEAN_true) {
+                m_currentNode.append_attribute("visibility") = "visible";
+            }
+            else if (att->GetVisible() == BOOLEAN_false) {
+                m_currentNode.append_attribute("visibility") = "hidden";
+            }
         }
     }
 
@@ -322,9 +321,9 @@ void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
 
 void SvgDeviceContext::EndGraphic(Object *object, View *view)
 {
-    DrawSvgBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
+    DrawSvgBoundingBox(object, view);
 }
 
 void SvgDeviceContext::EndCustomGraphic()
@@ -335,9 +334,9 @@ void SvgDeviceContext::EndCustomGraphic()
 
 void SvgDeviceContext::EndResumedGraphic(Object *object, View *view)
 {
-    DrawSvgBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
+    DrawSvgBoundingBox(object, view);
 }
 
 void SvgDeviceContext::EndTextGraphic(Object *object, View *view)
@@ -346,24 +345,37 @@ void SvgDeviceContext::EndTextGraphic(Object *object, View *view)
     m_currentNode = m_svgNodeStack.back();
 }
 
+void SvgDeviceContext::RotateGraphic(Point const &orig, double angle)
+{
+    if (m_currentNode.attribute("transform")) {
+        return;
+    }
+
+    m_currentNode.append_attribute("transform") = StringFormat("rotate(%f %d,%d)", angle, orig.x, orig.y).c_str();
+}
+
 void SvgDeviceContext::StartPage()
 {
     // Initialize the flag to false because we want to know if the font needs to be included in the SVG
     m_vrvTextFont = false;
 
     // default styles
-    m_currentNode = m_currentNode.append_child("style");
-    m_currentNode.append_attribute("type") = "text/css";
-    m_currentNode.append_child(pugi::node_pcdata)
-        .set_value("g.page-margin{font-family:Times;} g.tempo{font-weight:bold;} g.dir, g.dynam {font-style:italic;}");
-    m_currentNode = m_svgNodeStack.back();
+    if (this->UseGlobalStyling()) {
+        m_currentNode = m_currentNode.append_child("style");
+        m_currentNode.append_attribute("type") = "text/css";
+        m_currentNode.append_child(pugi::node_pcdata)
+            .set_value("g.page-margin{font-family:Times;} "
+                       "g.tempo{font-weight:bold;} g.dir, "
+                       "g.dynam{font-style:italic;} g.label{font-weight:normal;}");
+        m_currentNode = m_svgNodeStack.back();
+    }
 
     // a graphic for definition scaling
     m_currentNode = m_currentNode.append_child("svg");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = "definition-scale";
     m_currentNode.append_attribute("viewBox")
-        = StringFormat("0 0 %d %d", m_width * DEFINITION_FACTOR, m_height * DEFINITION_FACTOR).c_str();
+        = StringFormat("0 0 %d %d", GetWidth() * DEFINITION_FACTOR, GetHeight() * DEFINITION_FACTOR).c_str();
 
     // a graphic for the origin
     m_currentNode = m_currentNode.append_child("g");
@@ -412,12 +424,6 @@ void SvgDeviceContext::SetLogicalOrigin(int x, int y)
 {
     m_originX = -x;
     m_originY = -y;
-}
-
-void SvgDeviceContext::SetUserScale(double xScale, double yScale)
-{
-    m_userScaleX = xScale;
-    m_userScaleY = yScale;
 }
 
 Point SvgDeviceContext::GetLogicalOrigin()
@@ -701,11 +707,15 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
         svgText.replace(0, 1, "\xC2\xA0");
     }
 
+    std::string currentFaceName = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
+    std::string fontFaceName = m_fontStack.top()->GetFaceName();
+    
     pugi::xml_node textChild = AppendChild("tspan");
-    if (!m_fontStack.top()->GetFaceName().empty()) {
+    // Set the @font-family only if it is not the same as in the parent node
+    if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {
         textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
         // Special case where we want to specifiy if the VerovioText font (woff) needs to be included in the output
-        if (m_fontStack.top()->GetFaceName() == "VerovioText") this->VrvTextFont();
+        if (fontFaceName == "VerovioText") this->VrvTextFont();
     }
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
@@ -767,6 +777,12 @@ void SvgDeviceContext::DrawBackgroundImage(int x, int y)
 {
 }
 
+void SvgDeviceContext::AddDescription(const std::string &text)
+{
+    pugi::xml_node desc = m_currentNode.append_child("desc");
+    desc.append_child(pugi::node_pcdata).set_value(text.c_str());
+}
+
 std::string SvgDeviceContext::GetColour(int colour)
 {
     std::ostringstream ss;
@@ -815,7 +831,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         SetPen(AxRED, 10, AxDOT_DASH);
         // SetBrush(AxWHITE, AxTRANSPARENT);
         StartGraphic(object, "self-bounding-box", "0");
-        if (object->HasSelfBB()) {
+        if (box->HasSelfBB()) {
             this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
                 view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()),
                 view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX2())

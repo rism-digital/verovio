@@ -24,6 +24,7 @@
 #include "fb.h"
 #include "functorparams.h"
 #include "keysig.h"
+#include "label.h"
 #include "layer.h"
 #include "measure.h"
 #include "mensur.h"
@@ -32,6 +33,8 @@
 #include "page.h"
 #include "smufl.h"
 #include "staff.h"
+#include "staffdef.h"
+#include "staffgrp.h"
 #include "style.h"
 #include "syl.h"
 #include "system.h"
@@ -102,8 +105,8 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
     }
 
     // longest key signature of the staffDefs
-    ListOfObjects *scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
-    for (ListOfObjects::iterator it = scoreDefList->begin(); it != scoreDefList->end(); it++) {
+    const ListOfObjects *scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
+    for (ListOfObjects::const_iterator it = scoreDefList->begin(); it != scoreDefList->end(); it++) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*it);
         assert(staffDef);
         if (!staffDef->HasKeySigInfo()) continue;
@@ -140,31 +143,16 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     // first we need to clear the drawing list of postponed elements
     system->ResetDrawingList();
 
-    // First get the first measure of the system
-    Measure *measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
-    if (measure) {
-        // NULL for the BarLine parameters indicates that we are drawing the scoreDef
-        DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, system->GetDrawingX(), NULL);
-        // Draw mesure number if > 1
-        // This needs to be improved because we are now using (tuplet) oblique figures.
-        // We should also have a better way to specify if the number has to be displayed or not
-        if ((measure->GetN() != VRV_UNSET) && (measure->GetN() > 1)) {
-            Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
-            if (staff) {
-                dc->SetFont(m_doc->GetDrawingSmuflFont(100, false));
-                dc->DrawMusicText(IntToTupletFigures(measure->GetN()), ToDeviceContextX(system->GetDrawingX()),
-                    ToDeviceContextY(
-                        staff->GetDrawingY() + 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)));
-                dc->ResetFont();
-            }
-        }
+    Measure *systemStart = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
+    if (systemStart) {
+        DrawScoreDef(dc, system->GetDrawingScoreDef(), systemStart, system->GetDrawingX(), NULL);
     }
 
     DrawSystemChildren(dc, system, system);
 
-    // first draw the beams
     DrawSystemList(dc, system, SYL);
     DrawSystemList(dc, system, HAIRPIN);
+    DrawSystemList(dc, system, TRILL);
     DrawSystemList(dc, system, OCTAVE);
     DrawSystemList(dc, system, TIE);
     DrawSystemList(dc, system, SLUR);
@@ -192,6 +180,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == TIE)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
+        if ((*iter)->Is(classId) && (classId == TRILL)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if ((*iter)->Is(classId) && (classId == SLUR)) {
@@ -242,7 +233,7 @@ void View::DrawStaffGrp(
 
     TextExtend extend;
 
-    ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
+    const ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
     if (staffDefs->empty()) {
         return;
     }
@@ -257,14 +248,14 @@ void View::DrawStaffGrp(
     }
 
     // Get the corresponding staff looking at the previous (or first) measure
-    AttCommonNComparison comparisonFirst(STAFF, firstDef->GetN());
+    AttNIntegerComparison comparisonFirst(STAFF, firstDef->GetN());
     Staff *first = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparisonFirst, 1));
-    AttCommonNComparison comparisonLast(STAFF, lastDef->GetN());
+    AttNIntegerComparison comparisonLast(STAFF, lastDef->GetN());
     Staff *last = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparisonLast, 1));
 
     if (!first || !last) {
-        LogDebug("Could not get staff (%d; %d) while drawing staffGrp - DrawStaffGrp", firstDef->GetN(),
-            lastDef->GetN());
+        LogDebug(
+            "Could not get staff (%d; %d) while drawing staffGrp - DrawStaffGrp", firstDef->GetN(), lastDef->GetN());
         return;
     }
 
@@ -279,52 +270,61 @@ void View::DrawStaffGrp(
     // y_top += m_doc->GetDrawingStaffLineWidth(100) / 1;
     // y_bottom -= m_doc->GetDrawingStaffLineWidth(100) / 4;
 
-    if (staffGrp->HasLabel()) {
-        std::string abbrLabel;
-        std::string label = staffGrp->GetLabel();
-        if (abbreviations) {
-            // FIXME MEI 4.0.0
-            // label = staffGrp->GetLabelAbbr();
+    Label *label = dynamic_cast<Label *>(staffGrp->FindChildByType(LABEL, 1));
+    LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(staffGrp->FindChildByType(LABELABBR, 1));
+    Object *graphic = label;
+
+    std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
+    std::wstring labelStr = (label) ? label->GetText(label) : L"";
+
+    if (abbreviations) {
+        labelStr = labelAbbrStr;
+        graphic = labelAbbr;
+    }
+
+    if (labelStr.length() != 0) {
+        // HARDCODED
+        int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
+        int x_label = x - space;
+        int y_label = y_bottom - (y_bottom - y_top) / 2 - m_doc->GetDrawingUnit(100);
+
+        dc->SetBrush(m_currentColour, AxSOLID);
+        
+        FontInfo grpTxt;
+        if (!dc->UseGlobalStyling()) {
+            grpTxt.SetFaceName("Times");
         }
-        // We still store the abbreviated label for calculating max width with abbreviations (see below)
-        else {
-            // FIXME MEI 4.0.0
-            // abbrLabel = staffGrp->GetLabelAbbr();
+        
+        grpTxt.SetPointSize(m_doc->GetDrawingLyricFont(100)->GetPointSize());
+        dc->SetFont(&grpTxt);
+
+        dc->GetTextExtent(labelStr, &extend);
+
+        bool setX = false;
+        bool setY = false;
+
+        dc->StartGraphic(graphic, "", graphic->GetUuid());
+
+        dc->StartText(ToDeviceContextX(x_label), ToDeviceContextY(y_label), RIGHT);
+        DrawTextChildren(dc, graphic, x_label, y_label, setX, setY);
+        dc->EndText();
+
+        dc->EndGraphic(graphic, this);
+
+        // keep the widest width for the system
+        System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+        if (system) {
+            system->SetDrawingLabelsWidth(extend.m_width + space);
         }
 
-        if (label.length() != 0) {
-            // HARDCODED
-            int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
-            int x_label = x - space;
-            int y_label = y_bottom - (y_bottom - y_top) / 2 - m_doc->GetDrawingUnit(100);
-
-            dc->SetBrush(m_currentColour, AxSOLID);
-            dc->SetFont(m_doc->GetDrawingLyricFont(100));
-
-            dc->GetTextExtent(label, &extend);
-
-            // keep the widest width for the system
-            System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
-            if (!system) {
-                LogDebug("Staff or System missing in View::DrawStaffDefLabels");
-            }
-            else {
-                system->SetDrawingLabelsWidth(extend.m_width + space);
-            }
-
-            dc->StartText(ToDeviceContextX(x_label), ToDeviceContextY(y_label), RIGHT);
-            dc->DrawText(label);
-            dc->EndText();
-
-            // also store in the system the maximum width with abbreviations
-            if (system && !abbreviations && (abbrLabel.length() > 0)) {
-                dc->GetTextExtent(abbrLabel, &extend);
-                system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
-            }
-
-            dc->ResetFont();
-            dc->ResetBrush();
+        // also store in the system the maximum width with abbreviations
+        if (system && !abbreviations && (labelAbbrStr.length() > 0)) {
+            dc->GetTextExtent(labelAbbrStr, &extend);
+            system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
         }
+
+        dc->ResetFont();
+        dc->ResetBrush();
     }
 
     // actually draw the line, the brace or the bracket
@@ -362,8 +362,8 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
 
     TextExtend extend;
 
-    ListOfObjects *scoreDefChildren = scoreDef->GetList(scoreDef);
-    ListOfObjects::iterator iter = scoreDefChildren->begin();
+    const ListOfObjects *scoreDefChildren = scoreDef->GetList(scoreDef);
+    ListOfObjects::const_iterator iter = scoreDefChildren->begin();
     while (iter != scoreDefChildren->end()) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
 
@@ -373,7 +373,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
             continue;
         }
 
-        AttCommonNComparison comparison(STAFF, staffDef->GetN());
+        AttNIntegerComparison comparison(STAFF, staffDef->GetN());
         Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
         System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
 
@@ -383,19 +383,19 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
             continue;
         }
 
-        std::string abbrLabel;
-        std::string label = staffDef->GetLabel();
+        Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
+        LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(staffDef->FindChildByType(LABELABBR, 1));
+        Object *graphic = label;
+
+        std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
+        std::wstring labelStr = (label) ? label->GetText(label) : L"";
+
         if (abbreviations) {
-            // FIXME MEI 4.0.0
-            // label = staffDef->GetLabelAbbr();
-        }
-        // We still store the abbreviated label for calculating max width with abbreviations (see below)
-        else {
-            // FIXME MEI 4.0.0
-            // abbrLabel = staffDef->GetLabelAbbr();
+            labelStr = labelAbbrStr;
+            graphic = labelAbbr;
         }
 
-        if (label.length() == 0) {
+        if (labelStr.length() == 0) {
             ++iter;
             continue;
         }
@@ -406,20 +406,34 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         int y = staff->GetDrawingY()
             - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
 
+        FontInfo labelTxt;
+        if (!dc->UseGlobalStyling()) {
+            labelTxt.SetFaceName("Times");
+        }
+        
+        labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize());
+        
         dc->SetBrush(m_currentColour, AxSOLID);
-        dc->SetFont(m_doc->GetDrawingLyricFont(100));
+        dc->SetFont(&labelTxt);
 
-        // keep the widest width for the system
-        dc->GetTextExtent(label, &extend);
-        system->SetDrawingLabelsWidth(extend.m_width + space);
+        dc->GetTextExtent(labelStr, &extend);
+
+        bool setX = false;
+        bool setY = false;
+
+        dc->StartGraphic(graphic, "", graphic->GetUuid());
 
         dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), RIGHT);
-        dc->DrawText(label);
+        DrawTextChildren(dc, graphic, x, y, setX, setY);
         dc->EndText();
 
+        dc->EndGraphic(graphic, this);
+
+        // keep the widest width for the system
+        system->SetDrawingLabelsWidth(extend.m_width + space);
         // also store in the system the maximum width with abbreviations for justification
-        if (!abbreviations && (abbrLabel.length() > 0)) {
-            dc->GetTextExtent(abbrLabel, &extend);
+        if (!abbreviations && (labelAbbrStr.length() > 0)) {
+            dc->GetTextExtent(labelAbbrStr, &extend);
             system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
         }
 
@@ -546,11 +560,10 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                 DrawBarLines(dc, measure, childStaffGrp, barLine);
             }
             else if (childStaffDef) {
-                AttCommonNComparison comparison(STAFF, childStaffDef->GetN());
+                AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
                 Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
                 if (!staff) {
-                    LogDebug(
-                        "Could not get staff (%d) while drawing staffGrp - DrawBarLines", childStaffDef->GetN());
+                    LogDebug("Could not get staff (%d) while drawing staffGrp - DrawBarLines", childStaffDef->GetN());
                     continue;
                 }
                 int y_top = staff->GetDrawingY();
@@ -565,7 +578,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         }
     }
     else {
-        ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
+        const ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
         if (staffDefs->empty()) {
             return;
         }
@@ -580,9 +593,9 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         }
 
         // Get the corresponding staff looking at the previous (or first) measure
-        AttCommonNComparison comparisonFirst(STAFF, firstDef->GetN());
+        AttNIntegerComparison comparisonFirst(STAFF, firstDef->GetN());
         Staff *first = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparisonFirst, 1));
-        AttCommonNComparison comparisonLast(STAFF, lastDef->GetN());
+        AttNIntegerComparison comparisonLast(STAFF, lastDef->GetN());
         Staff *last = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparisonLast, 1));
 
         if (!first || !last) {
@@ -601,15 +614,15 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // Now we have a barthru barLine, but we have dots so we still need to go through each staff
         if (barLine->HasRepetitionDots()) {
             StaffDef *childStaffDef = NULL;
-            ListOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
-            for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
+            const ListOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
+            for (ListOfObjects::const_reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
                 childStaffDef = dynamic_cast<StaffDef *>((*it));
                 if (childStaffDef) {
-                    AttCommonNComparison comparison(STAFF, childStaffDef->GetN());
+                    AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
                     Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
                     if (!staff) {
-                        LogDebug("Could not get staff (%d) while drawing staffGrp - DrawBarLines",
-                            childStaffDef->GetN());
+                        LogDebug(
+                            "Could not get staff (%d) while drawing staffGrp - DrawBarLines", childStaffDef->GetN());
                         continue;
                     }
                     DrawBarLineDots(dc, childStaffDef, staff, barLine);
@@ -710,6 +723,15 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
         dc->StartGraphic(measure, "", measure->GetUuid());
     }
 
+    // Check if the first measure of the system
+    Measure *systemStart = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
+    if (measure == systemStart) {
+        // Draw measure number if > 1
+        if ((measure->HasN()) && (measure->GetN() != "0") && (measure->GetN() != "1")) {
+            DrawMNum(dc, measure);
+        }
+    }
+
     DrawMeasureChildren(dc, measure, measure, system);
 
     if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
@@ -727,6 +749,43 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     if (measure->GetDrawingEnding()) {
         system->AddToDrawingList(measure->GetDrawingEnding());
+    }
+}
+
+void View::DrawMNum(DeviceContext *dc, Measure *measure)
+{
+    assert(dc);
+    assert(measure);
+
+    Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
+    if (staff) {
+
+        // needs to be refined when mNum element is available
+        dc->StartCustomGraphic("mnum", "");
+
+        FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+        // HARDCODED
+        currentFont.SetStyle(FONTSTYLE_italic);
+        currentFont.SetPointSize(currentFont.GetPointSize() * 4 / 5);
+        dc->SetFont(&currentFont);
+
+        Text text;
+        text.SetText(UTF8to16(measure->GetN()));
+
+        bool setX = false;
+        bool setY = false;
+
+        // HARDCODED
+        int x = staff->GetDrawingX();
+        int y = staff->GetDrawingY() + 2.5 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+        DrawTextElement(dc, &text, x, y, setX, setY);
+        dc->EndText();
+
+        dc->ResetFont();
+
+        dc->EndCustomGraphic();
     }
 }
 
@@ -1170,6 +1229,10 @@ void View::DrawFbChildren(DeviceContext *dc, Object *parent, int x, int y, bool 
 void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *element, System *system)
 {
     assert(element);
+    if (element->Is(ANNOT)) {
+        DrawAnnot(dc, element);
+        return;
+    }
     if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TOPLEVEL);
     else if (element->Is(CHOICE))
@@ -1189,6 +1252,10 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
 void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *element, Measure *measure, System *system)
 {
     assert(element);
+    if (element->Is(ANNOT)) {
+        DrawAnnot(dc, element);
+        return;
+    }
     if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_MEASURE);
     else if (element->Is(CHOICE))
@@ -1204,6 +1271,10 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
 void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *element, Staff *staff, Measure *measure)
 {
     assert(element);
+    if (element->Is(ANNOT)) {
+        DrawAnnot(dc, element);
+        return;
+    }
     if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_STAFF);
     else if (element->Is(CHOICE))
@@ -1220,6 +1291,10 @@ void View::DrawLayerEditorialElement(
     DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(element);
+    if (element->Is(ANNOT)) {
+        DrawAnnot(dc, element);
+        return;
+    }
     if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_LAYER);
     else if (element->Is(CHOICE))
@@ -1235,6 +1310,10 @@ void View::DrawLayerEditorialElement(
 void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY)
 {
     assert(element);
+    if (element->Is(ANNOT)) {
+        DrawAnnot(dc, element, true);
+        return;
+    }
     if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TEXT);
     else if (element->Is(CHOICE))
@@ -1250,6 +1329,10 @@ void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element
 void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY)
 {
     assert(element);
+    if (element->Is(ANNOT)) {
+        DrawAnnot(dc, element, true);
+        return;
+    }
     if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_FB);
     else if (element->Is(CHOICE))
@@ -1260,6 +1343,29 @@ void View::DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, 
         DrawFbChildren(dc, element, x, y, setX, setY);
     }
     dc->EndTextGraphic(element, this);
+}
+
+void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextElement)
+{
+    assert(element);
+
+    if (isTextElement) {
+        dc->StartTextGraphic(element, "", element->GetUuid());
+    }
+    else {
+        dc->StartGraphic(element, "", element->GetUuid());
+    }
+
+    Annot *annot = dynamic_cast<Annot *>(element);
+    assert(annot);
+    dc->AddDescription(UTF16to8(annot->GetText(annot)));
+
+    if (isTextElement) {
+        dc->EndTextGraphic(element, this);
+    }
+    else {
+        dc->EndGraphic(element, this);
+    }
 }
 
 } // namespace vrv
