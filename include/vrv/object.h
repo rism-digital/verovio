@@ -214,7 +214,7 @@ public:
     /**
      * @name Children count, with or without a ClassId.
      * Used for classes with several types of children.
-     * The method with a ClassId only searches at the first level.
+     * The methods count at the first level.
      */
     ///@{
     int GetChildCount() const { return (int)m_children.size(); }

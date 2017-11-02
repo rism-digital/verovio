@@ -71,7 +71,7 @@ private:
     //
 protected:
     /**
-     * Filter the list for a specific fTrem;
+     * Filter the flat list and keep only Note or Chords elements.
      */
     virtual void FilterList(ListOfObjects *childList);
 

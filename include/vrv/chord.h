@@ -72,7 +72,6 @@ public:
      */
     virtual void AddChild(Object *object);
 
-    virtual void FilterList(ListOfObjects *childlist);
 
     /**
      * Return the maximum and minimum Y positions of the notes in the chord
@@ -162,6 +161,11 @@ protected:
      * Clear the m_clusters vector and delete all the objects.
      */
     void ClearClusters() const;
+
+    /**
+     * Filter the flat list and keep only Note elements.
+     */
+    virtual void FilterList(ListOfObjects *childlist);
 
 public:
     mutable std::list<ChordCluster *> m_clusters;
