@@ -258,7 +258,7 @@ void BeamDrawingParams::CalcBeam(
             minDistToCenter = verticalCenter - (*beamElementCoords).at(i)->m_yBeam;
         }
     }
-    
+
     if (minDistToCenter < 0) {
         this->m_startingY += (this->m_stemDir == STEMDIRECTION_down) ? minDistToCenter : -minDistToCenter;
         for (i = 0; i < elementCount; i++) {

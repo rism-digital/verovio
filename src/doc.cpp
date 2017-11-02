@@ -1018,7 +1018,7 @@ int Doc::GetCueSize(int value) const
     return value * this->m_style->m_graceNum / this->m_style->m_graceDen;
 }
 
-void Doc::SetDrawingSmuflFontName(const std::string & fontName)
+void Doc::SetDrawingSmuflFontName(const std::string &fontName)
 {
     m_drawingSmuflFont.SetFaceName(fontName.c_str());
 }

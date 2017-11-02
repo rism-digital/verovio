@@ -153,7 +153,7 @@ int DurationInterface::GetActualDurGes() const
     if (this->GetDurGes() == DURATION_maxima) return DUR_MX;
     return (this->GetDurGes() & DUR_MENSURAL_MASK);
 }
-    
+
 int DurationInterface::GetNoteOrChordDur(LayerElement *element)
 {
     if (element->Is(CHORD)) {

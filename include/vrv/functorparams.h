@@ -86,7 +86,7 @@ public:
     AddLayerElementToFlatListParams(ListOfObjects *flatList) { m_flatList = flatList; }
     ListOfObjects *m_flatList;
 };
-    
+
 //----------------------------------------------------------------------------
 // AdjustAccidXParams
 //----------------------------------------------------------------------------
@@ -122,7 +122,8 @@ public:
 
 class AdjustArpegParams : public FunctorParams {
 public:
-    AdjustArpegParams(Doc *doc, Functor *functor) {
+    AdjustArpegParams(Doc *doc, Functor *functor)
+    {
         m_measureAligner = NULL;
         m_doc = doc;
         m_functor = functor;
@@ -136,7 +137,7 @@ public:
 //----------------------------------------------------------------------------
 // AdjustArticWithSlursParams
 //----------------------------------------------------------------------------
-    
+
 // Use FunctorDocParams
 
 //----------------------------------------------------------------------------

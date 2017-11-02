@@ -238,7 +238,7 @@ int Object::GetChildCount(const ClassId classId) const
 {
     return (int)count_if(m_children.begin(), m_children.end(), ObjectComparison(classId));
 }
-    
+
 int Object::GetAttributes(ArrayOfStrAttr *attributes) const
 {
     assert(attributes);
