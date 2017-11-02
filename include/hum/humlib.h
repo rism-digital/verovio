@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Oct 30 00:07:27 PDT 2017
+// Last Modified: Thu Nov  2 00:24:04 PDT 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1268,7 +1268,7 @@ class HumdrumToken : public string, public HumHash {
 		int      getPreviousNNDTCount      (void)
 		                           { return getPreviousNonNullDataTokenCount(); }
 		HTp      getPreviousNonNullDataToken(int index = 0);
-		HTp      getPreviousNNDT           (int index)
+		HTp      getPreviousNNDT           (int index = 0)
 		                           { return getPreviousNonNullDataToken(index); }
 		int      getNextNonNullDataTokenCount(void);
 		int      getNextNNDTCount          (void)
@@ -2307,6 +2307,7 @@ class NoteCell {
 		double operator-            (int B);
 
 		int    getLineIndex         (void);
+		int    getFieldIndex        (void);
 		ostream& printNoteInfo      (ostream& out);
 		double getDiatonicIntervalToNextAttack      (void);
 		double getDiatonicIntervalFromPreviousAttack(void);
@@ -2367,6 +2368,7 @@ class NoteGrid {
 		int        getVoiceCount         (void);
 		int        getSliceCount         (void);
 		int        getLineIndex          (int sindex);
+		int        getFieldIndex         (int sindex);
 
 		void       printDiatonicGrid     (ostream& out);
 		void       printMidiGrid         (ostream& out);
@@ -3927,7 +3929,6 @@ class Tool_dissonant : public HumTool {
 									NoteGrid& grid,	vector<NoteCell*>& attacks,
 									vector<vector<string> >& voiceFuncs,
 									int vindex);
-		void    changePitch        (HTp note2, HTp note1);
 
 		void    printColorLegend   (HumdrumFile& infile);
 		int     getNextPitchAttackIndex(NoteGrid& grid, int voicei,
@@ -3942,8 +3943,15 @@ class Tool_dissonant : public HumTool {
 		                            NoteGrid& grid, int vindex,
 		                            vector<NoteCell*>& attacks,
 		                            vector<string>& results);
-		void    mergeWithPreviousNote(HumdrumFile& infile,
-		                            vector<NoteCell*>& attacks, int index);
+		void    mergeWithPreviousNote(HumdrumFile& infile, int line, int field);
+		void    mergeWithNextNote(HumdrumFile& infile, int line, int field);
+		void    changeDurationOfNote(HTp note, HumNum dur);
+		void    changePitch        (HTp note2, HTp note1);
+		void    simplePreviousMerge(HTp pnote, HTp cnote);
+		void    changePitchOfTieGroupFollowing(HTp note, const string& pitch);
+		void    mergeWithPreviousNoteViaTies(HTp pnote, HTp cnote);
+		void    mergeWithPreviousNote(HumdrumFile& infile, NoteCell* cell);
+		void    mergeWithNextNote(HumdrumFile& infile, NoteCell* cell);
 
 	private:
 	 	vector<HTp> m_kernspines;
@@ -4001,20 +4009,21 @@ class Tool_dissonant : public HumTool {
 		const int SUS_NO_AGENT_LEAP    = 35; // suspension missing a normal agent approached by leap
 		const int SUS_NO_AGENT_STEP    = 36; // suspension missing a normal agent approached by step or anticipation
 		const int CHANSON_IDIOM        = 37; // chanson idiom
+		const int ORNAMENTAL_SUS	   = 38; // purely ornamental suspension
 
 		// unknown dissonances:
-		const int PARALLEL_UP          = 38; // moves in parallel with known dissonant, approached from below
-		const int PARALLEL_DOWN        = 39; // moves in parallel with known dissonant, approached from above
-		const int RES_PITCH			   = 40; // note of resolution of a suspension against suspension dissonance
+		const int PARALLEL_UP          = 39; // moves in parallel with known dissonant, approached from below
+		const int PARALLEL_DOWN        = 40; // moves in parallel with known dissonant, approached from above
+		const int RES_PITCH			   = 41; // note of resolution of a suspension against suspension dissonance
 
-		const int ONLY_WITH_VALID_UP   = 41; // only dissonant with identifiable dissonances, approached from below
-		const int ONLY_WITH_VALID_DOWN = 42; // only dissonant with identifiable dissonances, approached from above
-		const int UNKNOWN_DISSONANCE   = 43; // unknown dissonance type
-		const int UNLABELED_Z2         = 44; // unknown dissonance type, 2nd interval
-		const int UNLABELED_Z7         = 45; // unknown dissonance type, 7th interval
-		const int UNLABELED_Z4         = 46; // unknown dissonance type, 4th interval
+		const int ONLY_WITH_VALID_UP   = 42; // only dissonant with identifiable dissonances, approached from below
+		const int ONLY_WITH_VALID_DOWN = 43; // only dissonant with identifiable dissonances, approached from above
+		const int UNKNOWN_DISSONANCE   = 44; // unknown dissonance type
+		const int UNLABELED_Z2         = 45; // unknown dissonance type, 2nd interval
+		const int UNLABELED_Z7         = 46; // unknown dissonance type, 7th interval
+		const int UNLABELED_Z4         = 47; // unknown dissonance type, 4th interval
 
-		const int LABELS_SIZE          = 47; // one more than last index
+		const int LABELS_SIZE          = 48; // one more than last index
 };
 
 
