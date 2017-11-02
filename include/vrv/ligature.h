@@ -49,18 +49,22 @@ public:
     virtual bool HasToBeAligned() const { return true; }
 
     /**
-     * Add an element (only notes are supported) to a ligature.
+     * Add children (notes or editorial markup)
      */
     virtual void AddChild(Object *object);
-
-    virtual void FilterList(ListOfObjects *childlist);
-
+                     
     /**
-     * Return information about the note's position in the ligature ??
+     * Return information about the note's position in the ligature
+     * Assume that the note is in the ligature and does not check for that.
+     */
+    int PositionInLigature(Note *note);
+    
+    /**
+     * @name Return the first and last note in the ligature (NULL if empty)
      */
     ///@{
-    /** Return 0 if the note is the middle note, -1 if below it and 1 if above */
-    int PositionInLigature(Note *note);
+    Note *GetFirstNote();
+    Note *GetLastNote();
     ///@}
 
     //----------//
@@ -72,6 +76,11 @@ protected:
      * Clear the m_clusters vector and delete all the objects.
      */
     void ClearClusters();
+                     
+    /**
+     * Filter the flat list and keep only Note elements.
+     */
+    virtual void FilterList(ListOfObjects *childlist);
 
 public:
 };

@@ -152,7 +152,7 @@ bool LayerElement::GetDrawingCueSize()
     return m_drawingCueSize;
 }
 
-bool LayerElement::IsInLigature()
+bool LayerElement::IsInLigature() const
 {
     if (!this->Is(NOTE)) return false;
     return (this->GetFirstParent(LIGATURE, MAX_LIGATURE_DEPTH));

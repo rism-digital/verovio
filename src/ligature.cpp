@@ -130,15 +130,30 @@ void Ligature::FilterList(ListOfObjects *childList)
 
 int Ligature::PositionInLigature(Note *note)
 {
-    int size = (int)this->GetList(this)->size();
+    this->GetList(this);
     int position = this->GetListIndex(note);
     assert(position != -1);
-    // this is the middle (only if odd)
-    if ((size % 2) && (position == (size - 1) / 2)) return 0;
-    if (position < (size / 2)) return -1;
-    return 1;
+    return position;
 }
-
+    
+Note *Ligature::GetFirstNote()
+{
+    const ListOfObjects *list = this->GetList(this);
+    if  (list->empty()) {
+        return NULL;
+    }
+    return dynamic_cast<Note*>(list->front());
+}
+    
+Note *Ligature::GetLastNote()
+{
+    const ListOfObjects *list = this->GetList(this);
+    if  (list->empty()) {
+        return NULL;
+    }
+    return dynamic_cast<Note*>(list->back());
+}
+    
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

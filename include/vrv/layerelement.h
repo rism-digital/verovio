@@ -80,7 +80,7 @@ public:
     /** Return true if the element is has to be rederred as cue sized */
     bool GetDrawingCueSize();
     /** Return true if the element is a note within a ligature */
-    bool IsInLigature();
+    bool IsInLigature() const;
     /** Return true if the element is a note or a chord within a fTrem */
     bool IsInFTrem();
     /**

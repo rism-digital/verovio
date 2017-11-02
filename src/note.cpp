@@ -22,6 +22,7 @@
 #include "functorparams.h"
 #include "glyph.h"
 #include "layer.h"
+#include "ligature.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -113,6 +114,15 @@ void Note::Reset()
     m_realTimeOnsetMilliseconds = 0;
     m_realTimeOffsetMilliseconds = 0;
     m_scoreTimeTiedDuration = 0.0;
+}
+    
+bool Note::HasToBeAligned() const
+{
+    if (!this->IsInLigature()) return true;
+    Note *note = const_cast<Note*>(this);
+    Ligature *ligature = dynamic_cast<Ligature*>(note->GetFirstParent(LIGATURE));
+    assert(ligature);
+    return ((note == ligature->GetFirstNote()) || (note == ligature->GetLastNote()));
 }
 
 void Note::AddChild(Object *child)
