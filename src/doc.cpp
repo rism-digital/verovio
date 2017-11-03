@@ -790,28 +790,28 @@ void Doc::ConvertToPageBasedDoc()
 
     this->ResetDrawingPage();
 }
-    
+
 void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
 {
     if (!m_hasAnalyticalMarkup) return;
-    
+
     LogMessage("Converting analytical markup...");
-    
+
     /************ Prepare processing by staff/layer/verse ************/
-    
+
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
     PrepareProcessingListsParams prepareProcessingListsParams;
-    
+
     // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
     Functor prepareProcessingLists(&Object::PrepareProcessingLists);
     this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
-    
+
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;
-    
+
     /************ Resolve ties ************/
-    
+
     // Process by layer for matching @tie attribute - we process notes and chords, looking at
     // GetTie values and pitch and oct for matching notes
     std::vector<AttComparison *> filters;
@@ -824,11 +824,12 @@ void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
             AttNIntegerComparison matchLayer(LAYER, layers->first);
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
-            
+
             ConvertAnalyticalMarkupParams convertAnalyticalMarkupParams(permanent);
             Functor convertAnalyticalMarkup(&Object::ConvertAnalyticalMarkup);
             Functor convertAnalyticalMarkupEnd(&Object::ConvertAnalyticalMarkupEnd);
-            this->Process(&convertAnalyticalMarkup, &convertAnalyticalMarkupParams, &convertAnalyticalMarkupEnd, &filters);
+            this->Process(
+                &convertAnalyticalMarkup, &convertAnalyticalMarkupParams, &convertAnalyticalMarkupEnd, &filters);
 
             // After having processed one layer, we check if we have open ties - if yes, we
             // must reset them and they will be ignored.
@@ -842,7 +843,7 @@ void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
         }
     }
 }
-    
+
 bool Doc::HasPage(int pageIdx) const
 {
     return ((pageIdx >= 0) && (pageIdx < GetChildCount()));

@@ -284,13 +284,13 @@ public:
      * Does not perform any check if the data needs or can be converted.
      */
     void ConvertToPageBasedDoc();
-    
+
     /**
      * Convert analytical encoding (@fermata, @tie) to correpsonding elements
      * By default, the element are used only for the rendering and not preserved in the MEI output
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
      */
-    void ConvertAnalyticalMarkupDoc(bool permanent = false  );
+    void ConvertAnalyticalMarkupDoc(bool permanent = false);
 
     /**
      * To be implemented.
@@ -330,6 +330,11 @@ public:
      * This includes the appropriate top and bottom margin (using top as bottom).
      */
     int GetAdjustedDrawingPageHeight() const;
+    
+    /**
+     * Setter for analytical markup flag
+     */
+    void SetAnalyticalMarkup(bool hasAnalyticalMarkup) { m_hasAnalyticalMarkup = hasAnalyticalMarkup; }
 
     //----------//
     // Functors //
@@ -453,7 +458,7 @@ private:
      * are generated.
      */
     bool m_hasMidiTimemap;
-    
+
     /**
      * A flag to indicate whereash the document contains analytical markup to be converted.
      * This is currently limited to @fermata and @tie. Other attribute markup (@accid and @artic)

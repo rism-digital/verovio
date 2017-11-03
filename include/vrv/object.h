@@ -519,7 +519,6 @@ public:
     virtual int ConvertAnalyticalMarkupEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
-    
     /**
      * Save the content of any object by calling the appropriate FileOutputStream method.
      */

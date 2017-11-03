@@ -722,11 +722,12 @@ public:
 //----------------------------------------------------------------------------
 // ConvertAnalyticalMarkupParams
 //----------------------------------------------------------------------------
-    
+
 /**
  * member 0: std::vector<Note*>* that holds the current notes with open ties
  * member 1: Chord** currentChord for the current chord if in a chord
- * member 2: a flag indicating whereas the conversion is permanent of not
+ * member 2: an array of control events to be added to the measure (at its end)
+ * member 3: a flag indicating whereas the conversion is permanent of not
  **/
 
 class ConvertAnalyticalMarkupParams : public FunctorParams {
@@ -738,9 +739,10 @@ public:
     }
     std::vector<Note *> m_currentNotes;
     Chord *m_currentChord;
+    ArrayOfObjects m_controlEvents;
     bool m_permanent;
 };
-    
+
 //----------------------------------------------------------------------------
 // ConvertToPageBasedParams
 //----------------------------------------------------------------------------

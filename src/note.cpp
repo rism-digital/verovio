@@ -19,6 +19,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
+#include "fermata.h"
 #include "functorparams.h"
 #include "glyph.h"
 #include "layer.h"
@@ -380,6 +381,8 @@ int Note::ConvertAnalyticalMarkup(FunctorParams *functorParams)
     ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
     assert(params);
 
+    /****** ties ******/
+
     AttTiePresent *check = this;
     // Use the parent chord if there is no @tie on the note
     if (!this->HasTie() && params->m_currentChord) {
@@ -399,9 +402,7 @@ int Note::ConvertAnalyticalMarkup(FunctorParams *functorParams)
                 }
                 tie->SetStartid("#" + (*iter)->GetUuid());
                 tie->SetEndid("#" + this->GetUuid());
-                Object *measure = (*iter)->GetFirstParent(MEASURE);
-                assert(measure);
-                measure->AddChild(tie);
+                params->m_controlEvents.push_back(tie);
             }
             else {
                 LogWarning("Expected @tie median or terminal in note '%s', skipping it", this->GetUuid().c_str());
@@ -416,14 +417,21 @@ int Note::ConvertAnalyticalMarkup(FunctorParams *functorParams)
     if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_i)) {
         params->m_currentNotes.push_back(this);
     }
-    
+
     if (params->m_permanent) {
         this->ResetTiePresent();
     }
 
+    /****** fermata ******/
+
+    if (this->HasFermata()) {
+        Fermata *fermata = new Fermata();
+        fermata->ConvertFromAnalyticalMarkup(this, this->GetUuid(), params);
+    }
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Note::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);

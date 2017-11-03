@@ -178,7 +178,7 @@ public:
      * See Object::ConvertAnalyticalMarkup
      */
     virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
-                 
+
     /**
      * See Object::CalcStem
      */

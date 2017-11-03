@@ -136,7 +136,7 @@ public:
     virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
     virtual int ConvertAnalyticalMarkupEnd(FunctorParams *functorParams);
     ///@}
-                  
+
     /**
      * See Object::CalcStem
      */
