@@ -323,6 +323,29 @@ Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 // Functors methods
 //----------------------------------------------------------------------------
 
+    
+int Chord::ConvertAnalyticalMarkup(FunctorParams *functorParams)
+{
+    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    assert(params);
+
+    assert(!params->m_currentChord);
+    params->m_currentChord = this;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
+{
+    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    assert(params);
+
+    assert(params->m_currentChord);
+    params->m_currentChord = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+    
 int Chord::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
@@ -552,28 +575,6 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 };
-
-int Chord::PrepareTieAttr(FunctorParams *functorParams)
-{
-    PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
-    assert(params);
-
-    assert(!params->m_currentChord);
-    params->m_currentChord = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::PrepareTieAttrEnd(FunctorParams *functorParams)
-{
-    PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentChord);
-    params->m_currentChord = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
 
 int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
 {

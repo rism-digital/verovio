@@ -130,6 +130,14 @@ public:
     //----------//
 
     /**
+     * See Object::ConvertAnalyticalMarkup
+     */
+    ///@{
+    virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
+    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *functorParams);
+    ///@}
+                  
+    /**
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *functorParams);
@@ -143,12 +151,6 @@ public:
      * See Object::PrepareLayerElementParts
      */
     virtual int PrepareLayerElementParts(FunctorParams *functorParams);
-
-    /**
-     * See Object::PrepareTieAttr
-     */
-    virtual int PrepareTieAttr(FunctorParams *functorParams);
-    virtual int PrepareTieAttrEnd(FunctorParams *functorParams);
 
     /**
      * See Object::GenerateMIDIEnd

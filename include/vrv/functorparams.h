@@ -720,6 +720,28 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// ConvertAnalyticalMarkupParams
+//----------------------------------------------------------------------------
+    
+/**
+ * member 0: std::vector<Note*>* that holds the current notes with open ties
+ * member 1: Chord** currentChord for the current chord if in a chord
+ * member 2: a flag indicating whereas the conversion is permanent of not
+ **/
+
+class ConvertAnalyticalMarkupParams : public FunctorParams {
+public:
+    ConvertAnalyticalMarkupParams(bool permanent)
+    {
+        m_currentChord = NULL;
+        m_permanent = permanent;
+    }
+    std::vector<Note *> m_currentNotes;
+    Chord *m_currentChord;
+    bool m_permanent;
+};
+    
+//----------------------------------------------------------------------------
 // ConvertToPageBasedParams
 //----------------------------------------------------------------------------
 
@@ -1170,23 +1192,6 @@ public:
     MRpt *m_currentMRpt;
     data_BOOLEAN m_multiNumber;
     ScoreDef *m_currentScoreDef;
-};
-
-//----------------------------------------------------------------------------
-// PrepareTieAttrParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: std::vector<Note*>* that holds the current notes with open ties
- * member 1: Chord** currentChord for the current chord if in a chord
- **/
-
-class PrepareTieAttrParams : public FunctorParams {
-public:
-    PrepareTieAttrParams() { m_currentChord = NULL; }
-
-    std::vector<Note *> m_currentNotes;
-    Chord *m_currentChord;
 };
 
 //----------------------------------------------------------------------------

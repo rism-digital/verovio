@@ -1987,6 +1987,7 @@ bool MeiInput::ReadMei(pugi::xml_node root)
         }
         if (success) {
             m_doc->ConvertToPageBasedDoc();
+            m_doc->ConvertAnalyticalMarkupDoc();
         }
     }
 

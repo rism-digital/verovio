@@ -284,6 +284,13 @@ public:
      * Does not perform any check if the data needs or can be converted.
      */
     void ConvertToPageBasedDoc();
+    
+    /**
+     * Convert analytical encoding (@fermata, @tie) to correpsonding elements
+     * By default, the analitical markup is discarded and elements are preserved in the output.
+     * Non permanent conversion will used converted element only for the rendering and not be preserved in the MEI output.
+     */
+    void ConvertAnalyticalMarkupDoc(bool permanent = true);
 
     /**
      * To be implemented.
@@ -446,6 +453,13 @@ private:
      * are generated.
      */
     bool m_hasMidiTimemap;
+    
+    /**
+     * A flag to indicate whereash the document contains analytical markup to be converted.
+     * This is currently limited to @fermata and @tie. Other attribute markup (@accid and @artic)
+     * is converted during the import in MeiInput.
+     */
+    bool m_hasAnalyticalMarkup;
 
     /** Page width (MEI scoredef@page.width) - currently not saved */
     int m_pageWidth;

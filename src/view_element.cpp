@@ -1149,14 +1149,6 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     /************** peripherals: **************/
 
-    if (note->GetDrawingTieAttr()) {
-        System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
-        // create a placeholder for the tie attribute that will be drawn from the system
-        dc->StartGraphic(note->GetDrawingTieAttr(), "", note->GetDrawingTieAttr()->GetUuid().c_str());
-        dc->EndGraphic(note->GetDrawingTieAttr(), this);
-        if (system) system->AddToDrawingList(note->GetDrawingTieAttr());
-    }
-
     if (note->HasFermata()) {
         DrawFermataAttr(dc, element, layer, staff);
     }
