@@ -308,8 +308,10 @@ bool MeiOutput::WriteObject(Object *object)
         WriteMeiTempo(m_currentNode, dynamic_cast<Tempo *>(object));
     }
     else if (object->Is(TIE)) {
-        m_currentNode = m_currentNode.append_child("tie");
-        WriteMeiTie(m_currentNode, dynamic_cast<Tie *>(object));
+        if (!object->IsAttribute()) {
+            m_currentNode = m_currentNode.append_child("tie");
+            WriteMeiTie(m_currentNode, dynamic_cast<Tie *>(object));
+        }
     }
     else if (object->Is(TRILL)) {
         m_currentNode = m_currentNode.append_child("trill");

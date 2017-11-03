@@ -393,12 +393,18 @@ int Note::ConvertAnalyticalMarkup(FunctorParams *functorParams)
         if ((this->GetOct() == (*iter)->GetOct()) && (this->GetPname() == (*iter)->GetPname())) {
             // right flag
             if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_t)) {
-                ///assert((*iter)->GetDrawingTieAttr());
-                ///(*iter)->GetDrawingTieAttr()->SetEnd(this);
+                Tie *tie = new Tie();
+                if (!params->m_permanent) {
+                    tie->IsAttribute(true);
+                }
+                tie->SetStartid("#" + (*iter)->GetUuid());
+                tie->SetEndid("#" + this->GetUuid());
+                Object *measure = (*iter)->GetFirstParent(MEASURE);
+                assert(measure);
+                measure->AddChild(tie);
             }
             else {
                 LogWarning("Expected @tie median or terminal in note '%s', skipping it", this->GetUuid().c_str());
-                ///(*iter)->ResetDrawingTieAttr();
             }
             iter = params->m_currentNotes.erase(iter);
             // we are done for this note
@@ -408,8 +414,11 @@ int Note::ConvertAnalyticalMarkup(FunctorParams *functorParams)
     }
 
     if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_i)) {
-        ///this->SetDrawingTieAttr();
         params->m_currentNotes.push_back(this);
+    }
+    
+    if (params->m_permanent) {
+        this->ResetTiePresent();
     }
 
     return FUNCTOR_CONTINUE;

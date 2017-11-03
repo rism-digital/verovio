@@ -339,7 +339,11 @@ int Chord::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
 {
     ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
     assert(params);
-
+    
+    if (params->m_permanent) {
+        this->ResetTiePresent();
+    }
+    
     assert(params->m_currentChord);
     params->m_currentChord = NULL;
 
