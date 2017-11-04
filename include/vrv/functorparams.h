@@ -86,7 +86,7 @@ public:
     AddLayerElementToFlatListParams(ListOfObjects *flatList) { m_flatList = flatList; }
     ListOfObjects *m_flatList;
 };
-    
+
 //----------------------------------------------------------------------------
 // AdjustAccidXParams
 //----------------------------------------------------------------------------
@@ -122,7 +122,8 @@ public:
 
 class AdjustArpegParams : public FunctorParams {
 public:
-    AdjustArpegParams(Doc *doc, Functor *functor) {
+    AdjustArpegParams(Doc *doc, Functor *functor)
+    {
         m_measureAligner = NULL;
         m_doc = doc;
         m_functor = functor;
@@ -136,7 +137,7 @@ public:
 //----------------------------------------------------------------------------
 // AdjustArticWithSlursParams
 //----------------------------------------------------------------------------
-    
+
 // Use FunctorDocParams
 
 //----------------------------------------------------------------------------
@@ -719,6 +720,30 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// ConvertAnalyticalMarkupParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: std::vector<Note*>* that holds the current notes with open ties
+ * member 1: Chord** currentChord for the current chord if in a chord
+ * member 2: an array of control events to be added to the measure (at its end)
+ * member 3: a flag indicating whereas the conversion is permanent of not
+ **/
+
+class ConvertAnalyticalMarkupParams : public FunctorParams {
+public:
+    ConvertAnalyticalMarkupParams(bool permanent)
+    {
+        m_currentChord = NULL;
+        m_permanent = permanent;
+    }
+    std::vector<Note *> m_currentNotes;
+    Chord *m_currentChord;
+    ArrayOfObjects m_controlEvents;
+    bool m_permanent;
+};
+
+//----------------------------------------------------------------------------
 // ConvertToPageBasedParams
 //----------------------------------------------------------------------------
 
@@ -1169,23 +1194,6 @@ public:
     MRpt *m_currentMRpt;
     data_BOOLEAN m_multiNumber;
     ScoreDef *m_currentScoreDef;
-};
-
-//----------------------------------------------------------------------------
-// PrepareTieAttrParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: std::vector<Note*>* that holds the current notes with open ties
- * member 1: Chord** currentChord for the current chord if in a chord
- **/
-
-class PrepareTieAttrParams : public FunctorParams {
-public:
-    PrepareTieAttrParams() { m_currentChord = NULL; }
-
-    std::vector<Note *> m_currentNotes;
-    Chord *m_currentChord;
 };
 
 //----------------------------------------------------------------------------

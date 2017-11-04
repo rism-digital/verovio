@@ -78,7 +78,11 @@ public:
     ///@{
     void SetWidth(int width) { m_width = width; }
     void SetHeight(int height) { m_height = height; }
-    void SetUserScale(double scaleX, double scaleY) { m_userScaleX = scaleX; m_userScaleY = scaleY; }
+    void SetUserScale(double scaleX, double scaleY)
+    {
+        m_userScaleX = scaleX;
+        m_userScaleY = scaleY;
+    }
     int GetWidth() { return m_width; }
     int GetHeight() { return m_height; }
     double GetUserScaleX() { return m_userScaleX; }
@@ -247,7 +251,7 @@ public:
     ///@{
     virtual void AddDescription(const std::string &text){};
     ///@}
-    
+
     /**
      * Method indicating if default global styling is used. Typically this is the case with SVG and CSS.
      * When global styling is used, some elements will not set corresponding styles.

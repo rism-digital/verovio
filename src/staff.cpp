@@ -253,14 +253,14 @@ int Staff::ApplyPPUFactor(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Staff::AlignHorizontally(FunctorParams *functorParams)
 {
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
-    
+
     assert(this->m_drawingStaffDef);
-    
+
     if (this->m_drawingStaffDef->HasNotationtype()) {
         params->m_notationType = this->m_drawingStaffDef->GetNotationtype();
     }

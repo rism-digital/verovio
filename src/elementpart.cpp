@@ -43,7 +43,6 @@ void Bracket::Reset()
     LayerElement::Reset();
 }
 
-    
 //----------------------------------------------------------------------------
 // Dots
 //----------------------------------------------------------------------------
@@ -245,7 +244,6 @@ int Num::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 };
 
-    
 int Stem::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);

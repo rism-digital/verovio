@@ -51,11 +51,10 @@ void Arpeg::Reset()
     ResetArpegLog();
     ResetArpegVis();
     ResetColor();
-    
+
     m_drawingXRel = 0;
 }
-    
-    
+
 int Arpeg::GetDrawingX() const
 {
     // Getting the position of the current positionner (we have only one for arpeg because values in
@@ -64,7 +63,7 @@ int Arpeg::GetDrawingX() const
     if (this->GetCurrentFloatingPositioner()) {
         return (GetCurrentFloatingPositioner()->GetDrawingX());
     }
-    
+
     // Otherwise get the measure - no cast to Measure is necessary
     LogDebug("Accessing an arpeg x without positionner");
     Object *measure = this->GetFirstParent(MEASURE);
@@ -83,8 +82,7 @@ bool Arpeg::IsValidRef(Object *ref)
     }
     return true;
 }
-    
-    
+
 void Arpeg::SetDrawingXRel(int drawingXRel)
 {
     // Cache is currently not used for Arpeg
@@ -98,15 +96,15 @@ void Arpeg::SetDrawingXRel(int drawingXRel)
         GetCurrentFloatingPositioner()->SetDrawingXRel(m_drawingXRel);
     }
 };
-    
+
 void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
 {
     top = NULL;
     bottom = NULL;
-    
+
     Object *front = NULL;
     Object *back = NULL;
-    
+
     if (this->GetStart()) {
         front = this->GetStart();
         back = this->GetStart();
@@ -115,13 +113,13 @@ void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
         front = this->GetRefs()->front();
         back = this->GetRefs()->back();
     }
-    
+
     // Cannot draw an arpeg that has no target
     if (!front || !back) return;
-    
+
     // Cannot draw an arpeg not pointing to a chord or a note
-    if (!front->Is({CHORD, NOTE}) || !back->Is({CHORD, NOTE})) return;
-    
+    if (!front->Is({ CHORD, NOTE }) || !back->Is({ CHORD, NOTE })) return;
+
     // Pointing to a single element
     if (front == back) {
         // It has to be a chord in this case
@@ -132,12 +130,12 @@ void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
         bottom = chord->GetBottomNote();
         return;
     }
-    
+
     Chord *chord1 = NULL;
     Chord *chord2 = NULL;
     Note *note1 = NULL;
     Note *note2 = NULL;
-    
+
     // Get the first and second chord or note
     if (front->Is(CHORD)) {
         chord1 = dynamic_cast<Chord *>(front);
@@ -155,11 +153,14 @@ void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
         note2 = dynamic_cast<Note *>(back);
         assert(note2);
     }
-    
+
     // Note get the top and bottom note accordingly
     if (chord1 && chord2) {
-        top = (chord1->GetTopNote()->GetDrawingY() > chord2->GetTopNote()->GetDrawingY()) ? chord1->GetTopNote() : chord2->GetTopNote();
-        bottom = (chord1->GetBottomNote()->GetDrawingY() < chord2->GetBottomNote()->GetDrawingY()) ? chord1->GetBottomNote() : chord2->GetBottomNote();
+        top = (chord1->GetTopNote()->GetDrawingY() > chord2->GetTopNote()->GetDrawingY()) ? chord1->GetTopNote()
+                                                                                          : chord2->GetTopNote();
+        bottom = (chord1->GetBottomNote()->GetDrawingY() < chord2->GetBottomNote()->GetDrawingY())
+            ? chord1->GetBottomNote()
+            : chord2->GetBottomNote();
     }
     else if (chord1 && note2) {
         top = (chord1->GetTopNote()->GetDrawingY() > note2->GetDrawingY()) ? chord1->GetTopNote() : note2;
@@ -179,22 +180,21 @@ void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
 // Arpeg functor methods
 //----------------------------------------------------------------------------
 
-    
 int Arpeg::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_drawingXRel = 0;
-    
+
     return ControlElement::ResetHorizontalAlignment(functorParams);
 }
-    
+
 int Arpeg::AdjustArpeg(FunctorParams *functorParams)
 {
     AdjustArpegParams *params = dynamic_cast<AdjustArpegParams *>(functorParams);
     assert(params);
-    
+
     Note *topNote = NULL;
     Note *bottomNote = NULL;
-    
+
     this->GetDrawingTopBottomNotes(topNote, bottomNote);
 
     // Nothing to do
@@ -202,26 +202,27 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
 
     // We should have call DrawArpeg before
     assert(this->GetCurrentFloatingPositioner());
-    
-    Staff* topStaff = dynamic_cast<Staff*>(topNote->GetFirstParent(STAFF));
+
+    Staff *topStaff = dynamic_cast<Staff *>(topNote->GetFirstParent(STAFF));
     assert(topStaff);
-    
-    Staff* bottomStaff = dynamic_cast<Staff*>(bottomNote->GetFirstParent(STAFF));
+
+    Staff *bottomStaff = dynamic_cast<Staff *>(bottomNote->GetFirstParent(STAFF));
     assert(bottomStaff);
-    
+
     int minTopLeft, maxTopRight;
     topNote->GetAlignment()->GetLeftRight(topStaff->GetN(), minTopLeft, maxTopRight);
 
     params->m_alignmentArpegTuples.push_back(std::make_tuple(topNote->GetAlignment(), this, topStaff->GetN(), false));
-    
+
     if (topStaff != bottomStaff) {
         int minBottomLeft, maxBottomRight;
         topNote->GetAlignment()->GetLeftRight(bottomStaff->GetN(), minBottomLeft, maxBottomRight);
         minTopLeft = std::min(minTopLeft, minBottomLeft);
-        
-        params->m_alignmentArpegTuples.push_back(std::make_tuple(topNote->GetAlignment(), this, bottomStaff->GetN(), false));
+
+        params->m_alignmentArpegTuples.push_back(
+            std::make_tuple(topNote->GetAlignment(), this, bottomStaff->GetN(), false));
     }
-    
+
     if (minTopLeft != -VRV_UNSET) {
         int dist = topNote->GetDrawingX() - minTopLeft;
         // HARDCODED
@@ -231,5 +232,5 @@ int Arpeg::AdjustArpeg(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 } // namespace vrv

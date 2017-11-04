@@ -154,12 +154,12 @@ public:
     ///@{
     virtual void AddDescription(const std::string &text);
     ///@}
-    
+
     /**
      * In SVG use global styling but not with mm output (for pdf generation)
      */
     virtual bool UseGlobalStyling() { return !m_mmOutput; }
-    
+
     /**
      * Setting mm output flag (false by default)
      */
@@ -222,7 +222,7 @@ private:
     pugi::xml_node m_svgNode;
     pugi::xml_node m_currentNode;
     std::list<pugi::xml_node> m_svgNodeStack;
-    
+
     // output as mm (for pdf generation with a 72 dpi)
     bool m_mmOutput;
 };
