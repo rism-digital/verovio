@@ -450,27 +450,29 @@ void View::DrawOctave(
     DrawSmuflCode(dc, x1 - extend.m_width, yCode, code, staff->m_drawingStaffSize, false);
     dc->ResetFont();
 
-    y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
-    // adjust is to avoid the figure to touch the line
-    x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    if (octave->GetExtender() != BOOLEAN_false) {
+        y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
+        // adjust is to avoid the figure to touch the line
+        x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
 
-    if (octave->HasLform()) {
-        if (octave->GetLform() == LINEFORM_solid) {
-            extend.m_height *= 0;
+        if (octave->HasLform()) {
+            if (octave->GetLform() == LINEFORM_solid) {
+                extend.m_height *= 0;
+            }
         }
+
+        dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
+        dc->SetBrush(m_currentColour, AxSOLID);
+
+        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+        // draw the ending vertical line if not the end of the system
+        if (spanningType != SPANNING_START)
+            dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
+                ToDeviceContextY(y2 + lineWidth / 2));
+
+        dc->ResetPen();
+        dc->ResetBrush();
     }
-
-    dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
-    dc->SetBrush(m_currentColour, AxSOLID);
-
-    dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
-    // draw the ending vertical line if not the end of the system
-    if (spanningType != SPANNING_START)
-        dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
-            ToDeviceContextY(y2 + lineWidth / 2));
-
-    dc->ResetPen();
-    dc->ResetBrush();
 
     if (graphic)
         dc->EndResumedGraphic(graphic, this);

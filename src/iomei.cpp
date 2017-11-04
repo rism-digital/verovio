@@ -925,6 +925,7 @@ void MeiOutput::WriteMeiOctave(pugi::xml_node currentNode, Octave *octave)
     WriteControlElement(currentNode, octave);
     WriteTimeSpanningInterface(currentNode, octave);
     octave->WriteColor(currentNode);
+    octave->WriteExtender(currentNode);
     octave->WriteLineRendBase(currentNode);
     octave->WriteOctaveDisplacement(currentNode);
 };
@@ -2731,6 +2732,7 @@ bool MeiInput::ReadMeiOctave(Object *parent, pugi::xml_node octave)
 
     ReadTimeSpanningInterface(octave, vrvOctave);
     vrvOctave->ReadColor(octave);
+    vrvOctave->ReadExtender(octave);
     vrvOctave->ReadLineRendBase(octave);
     vrvOctave->ReadOctaveDisplacement(octave);
 
@@ -3141,7 +3143,7 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
         vrvArtic->SetArtic(artic.GetArtic());
         vrvChord->AddChild(vrvArtic);
     }
-    
+
     if (vrvChord->HasTie()) {
         m_doc->SetAnalyticalMarkup(true);
     }
@@ -3269,7 +3271,7 @@ bool MeiInput::ReadMeiMRest(Object *parent, pugi::xml_node mRest)
     vrvMRest->ReadCue(mRest);
     vrvMRest->ReadFermataPresent(mRest);
     vrvMRest->ReadVisibility(mRest);
-    
+
     if (vrvMRest->HasFermata()) {
         m_doc->SetAnalyticalMarkup(true);
     }
@@ -3357,7 +3359,7 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
         vrvAccid->SetAccidGes(accidentalGestural.GetAccidGes());
         vrvNote->AddChild(vrvAccid);
     }
-    
+
     if (vrvNote->HasTie()) {
         m_doc->SetAnalyticalMarkup(true);
     }
@@ -3544,11 +3546,11 @@ bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
     interface->ReadDurationRatio(element);
     interface->ReadFermataPresent(element);
     interface->ReadStaffIdent(element);
-    
+
     if (interface->HasFermata()) {
         m_doc->SetAnalyticalMarkup(true);
     }
-    
+
     return true;
 }
 
