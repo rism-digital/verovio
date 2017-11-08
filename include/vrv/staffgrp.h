@@ -57,8 +57,7 @@ public:
 
 protected:
     /**
-     * Filter the list for a specific class.
-     * For example, keep staffDef for fast access.
+     * Filter the flat list and keep only StaffDef elements.
      */
     virtual void FilterList(ListOfObjects *childList);
 

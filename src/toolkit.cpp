@@ -345,6 +345,7 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
 
 bool Toolkit::SetFont(std::string const &font)
 {
+    m_doc.SetDrawingSmuflFontName(font);
     return Resources::SetFont(font);
 };
 
@@ -433,11 +434,21 @@ bool Toolkit::LoadData(const std::string &data)
     if (inputFormat == ABC) {
         input = new AbcInput(&m_doc, "");
     }
-    else if (inputFormat == PAE) {
+    if (inputFormat == PAE) {
+#ifndef NO_PAE_SUPPORT
         input = new PaeInput(&m_doc, "");
+#else
+        LogError("Plaine & Easie import is not supported in this build.");
+        return false;
+#endif
     }
     else if (inputFormat == DARMS) {
+#ifndef NO_DARMS_SUPPORT
         input = new DarmsInput(&m_doc, "");
+#else
+        LogError("DARMS import is not supported in this build.");
+        return false;
+#endif
     }
 #ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == HUMDRUM) {
@@ -479,7 +490,6 @@ bool Toolkit::LoadData(const std::string &data)
         input = new MusicXmlInput(&m_doc, "");
     }
 #ifndef NO_HUMDRUM_SUPPORT
-
     else if (inputFormat == MUSICXMLHUM) {
         // This is the indirect converter from MusicXML to MEI using iohumdrum:
         hum::Tool_musicxml2hum converter;
@@ -567,7 +577,6 @@ bool Toolkit::LoadData(const std::string &data)
         delete tempinput;
         input = new MeiInput(&m_doc, "");
     }
-
 #endif
     else {
         LogMessage("Unsupported format");
@@ -891,7 +900,7 @@ void Toolkit::RedoPagePitchPosLayout()
     page->LayOutPitchPos();
 }
 
-std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
+bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 {
     // Page number is one-based - correct it to 0-based first
     pageNo--;
@@ -906,22 +915,33 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
     if (m_noLayout) width = m_doc.GetAdjustedDrawingPageWidth();
     if (m_adjustPageHeight || m_noLayout) height = m_doc.GetAdjustedDrawingPageHeight();
 
+    // set dimensions
+    deviceContext->SetWidth(width);
+    deviceContext->SetHeight(height);
+    double userScale = m_view.GetPPUFactor() * m_scale / 100;
+    deviceContext->SetUserScale(userScale, userScale);
+
+    // render the page
+    m_view.DrawCurrentPage(deviceContext, false);
+
+    return true;
+}
+
+std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
+{
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
-    SvgDeviceContext svg(width, height);
+    SvgDeviceContext svg;
 
     if (m_mmOutput) {
         svg.SetMMOutput(true);
     }
 
-    // set scale and border from user options
-    svg.SetUserScale(m_view.GetPPUFactor() * (double)m_scale / 100, m_view.GetPPUFactor() * (double)m_scale / 100);
-
     // debug BB?
     svg.SetDrawBoundingBoxes(m_showBoundingBoxes);
 
     // render the page
-    m_view.DrawCurrentPage(&svg, false);
+    RenderToDeviceContext(pageNo, &svg);
 
     std::string out_str = svg.GetStringSVG(xml_declaration);
     return out_str;

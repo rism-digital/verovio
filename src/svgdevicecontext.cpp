@@ -33,13 +33,8 @@ namespace vrv {
 // SvgDeviceContext
 //----------------------------------------------------------------------------
 
-SvgDeviceContext::SvgDeviceContext(int width, int height) : DeviceContext()
+SvgDeviceContext::SvgDeviceContext() : DeviceContext()
 {
-    m_width = width;
-    m_height = height;
-
-    m_userScaleX = 1.0;
-    m_userScaleY = 1.0;
     m_originX = 0;
     m_originY = 0;
 
@@ -50,7 +45,7 @@ SvgDeviceContext::SvgDeviceContext(int width, int height) : DeviceContext()
 
     m_committed = false;
     m_vrvTextFont = false;
-    
+
     m_mmOutput = false;
 
     // create the initial SVG element
@@ -89,12 +84,14 @@ void SvgDeviceContext::Commit(bool xml_declaration)
 
     // take care of width/height once userScale is updated
     if (m_mmOutput) {
-        m_svgNode.prepend_attribute("height") = StringFormat("%.2fmm", ((double)m_height * m_userScaleY) / 10).c_str();
-        m_svgNode.prepend_attribute("width") = StringFormat("%.2fmm", ((double)m_width * m_userScaleX / 10)).c_str();
+        m_svgNode.prepend_attribute("height")
+            = StringFormat("%.2fmm", ((double)GetHeight() * GetUserScaleY()) / 10).c_str();
+        m_svgNode.prepend_attribute("width")
+            = StringFormat("%.2fmm", ((double)GetWidth() * GetUserScaleX()) / 10).c_str();
     }
     else {
-        m_svgNode.prepend_attribute("height") = StringFormat("%.2fpx", ((double)m_height * m_userScaleY)).c_str();
-        m_svgNode.prepend_attribute("width") = StringFormat("%.2fpx", ((double)m_width * m_userScaleX)).c_str();
+        m_svgNode.prepend_attribute("height") = StringFormat("%.2fpx", ((double)GetHeight() * GetUserScaleY())).c_str();
+        m_svgNode.prepend_attribute("width") = StringFormat("%.2fpx", ((double)GetWidth() * GetUserScaleX())).c_str();
     }
 
     // add the woff VerovioText font if needed
@@ -380,7 +377,7 @@ void SvgDeviceContext::StartPage()
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = "definition-scale";
     m_currentNode.append_attribute("viewBox")
-        = StringFormat("0 0 %d %d", m_width * DEFINITION_FACTOR, m_height * DEFINITION_FACTOR).c_str();
+        = StringFormat("0 0 %d %d", GetWidth() * DEFINITION_FACTOR, GetHeight() * DEFINITION_FACTOR).c_str();
 
     // a graphic for the origin
     m_currentNode = m_currentNode.append_child("g");
@@ -429,12 +426,6 @@ void SvgDeviceContext::SetLogicalOrigin(int x, int y)
 {
     m_originX = -x;
     m_originY = -y;
-}
-
-void SvgDeviceContext::SetUserScale(double xScale, double yScale)
-{
-    m_userScaleX = xScale;
-    m_userScaleY = yScale;
 }
 
 Point SvgDeviceContext::GetLogicalOrigin()
@@ -718,9 +709,10 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
         svgText.replace(0, 1, "\xC2\xA0");
     }
 
-    std::string currentFaceName = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
+    std::string currentFaceName
+        = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
     std::string fontFaceName = m_fontStack.top()->GetFaceName();
-    
+
     pugi::xml_node textChild = AppendChild("tspan");
     // Set the @font-family only if it is not the same as in the parent node
     if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {

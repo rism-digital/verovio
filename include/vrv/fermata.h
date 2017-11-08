@@ -15,6 +15,8 @@
 
 namespace vrv {
 
+class ConvertAnalyticalMarkupParams;
+
 //----------------------------------------------------------------------------
 // Fermata
 //----------------------------------------------------------------------------
@@ -43,6 +45,12 @@ public:
     ///@{
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     ///@}
+
+    /**
+     * Helpler for converting markup (from Note, Chord, Rest, MRest)
+     */
+    void ConvertFromAnalyticalMarkup(
+        AttFermataPresent *fermataPresent, const std::string &uuid, ConvertAnalyticalMarkupParams *params);
 
     //----------//
     // Functors //

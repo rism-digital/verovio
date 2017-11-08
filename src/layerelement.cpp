@@ -428,14 +428,14 @@ int LayerElement::GetDrawingRadius(Doc *doc)
         assert(chord);
         dur = chord->GetActualDur();
     }
-    
+
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
-    
+
     if (dur <= DUR_BR) {
         return doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
     }
-    
+
     wchar_t code = SMUFL_E0A3_noteheadHalf;
 
     if (dur <= DUR_1) {
@@ -445,7 +445,8 @@ int LayerElement::GetDrawingRadius(Doc *doc)
     return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
 }
 
-double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bool notGraceOnly)
+double LayerElement::GetAlignmentDuration(
+    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
 {
     if (this->IsGraceNote() && notGraceOnly) {
         return 0.0;
@@ -464,7 +465,7 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         }
         DurationInterface *duration = this->GetDurationInterface();
         assert(duration);
-        if (duration->IsMensural()) {
+        if (duration->IsMensural() && (notationType != NOTATIONTYPE_cmn)) {
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
         double durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
@@ -652,7 +653,8 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     // We have already an alignment with grace note children - skip this
     if (!m_alignment) {
         // get the duration of the event
-        duration = this->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig);
+        duration = this->GetAlignmentDuration(
+            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
 
         // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
         // So use it as current time - we can do this because the timestamp loop is redirected from the measure
@@ -1050,7 +1052,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     else if (this->Is(ACCID)) {
         Accid const *accid = dynamic_cast<Accid *>(this);
         assert(accid);
-        if (accid->GetFunc() == accidLog_FUNC_edit)
+        if ((accid->GetFunc() == accidLog_FUNC_edit) && !accid->HasEnclose())
             m_drawingCueSize = true;
         else {
             Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
