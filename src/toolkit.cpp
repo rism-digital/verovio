@@ -432,9 +432,14 @@ bool Toolkit::LoadData(const std::string &data)
         inputFormat = IdentifyInputFormat(data);
     }
     if (inputFormat == ABC) {
+#ifndef NO_ABC_SUPPORT
         input = new AbcInput(&m_doc, "");
+#else
+        LogError("ABC import is not supported in this build.");
+        return false;
+#endif
     }
-    if (inputFormat == PAE) {
+    else if (inputFormat == PAE) {
 #ifndef NO_PAE_SUPPORT
         input = new PaeInput(&m_doc, "");
 #else
