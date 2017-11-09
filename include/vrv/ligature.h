@@ -8,9 +8,8 @@
 #ifndef __VRV_LIGATURE_H__
 #define __VRV_LIGATURE_H__
 
-#include "atts_shared.h"
+#include "atts_mensural.h"
 #include "drawinginterface.h"
-#include "durationinterface.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -28,10 +27,7 @@ namespace vrv {
 
 class Ligature : public LayerElement,
                  public ObjectListInterface,
-                 public DurationInterface,
-                 public AttStems,
-                 public AttStemsCmn,
-                 public AttTiePresent {
+                 public AttLigatureLog {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
