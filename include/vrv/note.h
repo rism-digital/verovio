@@ -78,8 +78,11 @@ public:
     }
     ///@}
 
-    /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    /**
+     * Override the method since alignment is required.
+     * For notes we want not to align notes within a ligature (except first and last)
+     */
+    virtual bool HasToBeAligned() const;
 
     /**
      * Add an element (a verse or an accid) to a note.
