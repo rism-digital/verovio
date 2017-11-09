@@ -51,6 +51,11 @@ public:
     //----------//
 
     /**
+     * See Object::ConvertAnalyticalMarkup
+     */
+    virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
+
+    /**
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
