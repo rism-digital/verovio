@@ -377,7 +377,7 @@ bool MeiOutput::WriteObject(Object *object)
     }
     else if (object->Is(LIGATURE)) {
         m_currentNode = m_currentNode.append_child("ligature");
-        WriteMeiLigature(m_currentNode, dynamic_cast<KeySig *>(object));
+        WriteMeiLigature(m_currentNode, dynamic_cast<Ligature *>(object));
     }
     else if (object->Is(MENSUR)) {
         m_currentNode = m_currentNode.append_child("mensur");
