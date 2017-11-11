@@ -80,7 +80,7 @@ public:
     /** Return true if the element is has to be rederred as cue sized */
     bool GetDrawingCueSize();
     /** Return true if the element is a note within a ligature */
-    bool IsInLigature();
+    bool IsInLigature() const;
     /** Return true if the element is a note or a chord within a fTrem */
     bool IsInFTrem();
     /**
@@ -163,7 +163,8 @@ public:
     /**
      * Returns the duration if the child element has a DurationInterface
      */
-    double GetAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true, data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
+    double GetAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true,
+        data_NOTATIONTYPE notationType = NOTATIONTYPE_cmn);
 
     //----------//
     // Functors //

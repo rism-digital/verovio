@@ -297,7 +297,7 @@ int FloatingPositioner::CalcXMinMaxY(const Point points[4])
 
     return m_cuvreXMinMaxY;
 }
-    
+
 void FloatingPositioner::SetDrawingXRel(int drawingXRel)
 {
     ResetCachedDrawingX();
@@ -314,7 +314,7 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel)
         if (drawingYRel > m_drawingYRel) m_drawingYRel = drawingYRel;
     }
 };
-    
+
 bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox)
 {
     assert(doc);

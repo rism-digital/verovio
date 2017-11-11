@@ -1268,8 +1268,8 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
     }
     pugi::xpath_node degree = node.select_single_node("degree");
     if (degree) {
-      pugi::xpath_node alter = node.select_single_node("degree/degree-alter");
-      harmText += ConvertAlterToSymbol(GetContent(alter.node())) + GetContentOfChild(node, "degree/degree-value");
+        pugi::xpath_node alter = node.select_single_node("degree/degree-alter");
+        harmText += ConvertAlterToSymbol(GetContent(alter.node())) + GetContentOfChild(node, "degree/degree-value");
     }
     pugi::xpath_node bass = node.select_single_node("bass");
     if (bass) {

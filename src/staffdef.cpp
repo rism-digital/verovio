@@ -87,7 +87,7 @@ int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
 {
     ReplaceDrawingValuesInStaffDefParams *params = dynamic_cast<ReplaceDrawingValuesInStaffDefParams *>(functorParams);
     assert(params);
-    
+
     if (params->m_clef) {
         this->SetCurrentClef(params->m_clef);
     }
@@ -100,7 +100,7 @@ int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
     if (params->m_meterSig) {
         this->SetCurrentMeterSig(params->m_meterSig);
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -108,7 +108,7 @@ int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
 {
     SetStaffDefRedrawFlagsParams *params = dynamic_cast<SetStaffDefRedrawFlagsParams *>(functorParams);
     assert(params);
-    
+
     if (params->m_clef || params->m_applyToAll) {
         this->SetDrawClef(params->m_clef);
     }
@@ -121,7 +121,7 @@ int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
     if (params->m_meterSig || params->m_applyToAll) {
         this->SetDrawMeterSig(params->m_meterSig);
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 

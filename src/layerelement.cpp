@@ -152,7 +152,7 @@ bool LayerElement::GetDrawingCueSize()
     return m_drawingCueSize;
 }
 
-bool LayerElement::IsInLigature()
+bool LayerElement::IsInLigature() const
 {
     if (!this->Is(NOTE)) return false;
     return (this->GetFirstParent(LIGATURE, MAX_LIGATURE_DEPTH));
@@ -428,14 +428,14 @@ int LayerElement::GetDrawingRadius(Doc *doc)
         assert(chord);
         dur = chord->GetActualDur();
     }
-    
+
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
-    
+
     if (dur <= DUR_BR) {
         return doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
     }
-    
+
     wchar_t code = SMUFL_E0A3_noteheadHalf;
 
     if (dur <= DUR_1) {
@@ -445,7 +445,8 @@ int LayerElement::GetDrawingRadius(Doc *doc)
     return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
 }
 
-double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
+double LayerElement::GetAlignmentDuration(
+    Mensur *mensur, MeterSig *meterSig, bool notGraceOnly, data_NOTATIONTYPE notationType)
 {
     if (this->IsGraceNote() && notGraceOnly) {
         return 0.0;
@@ -565,7 +566,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         assert(false);
     }
     // We do not align these (formely container). Any other?
-    else if (this->Is({ BEAM, FTREM, TUPLET })) {
+    else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
         return FUNCTOR_CONTINUE;
     }
     else if (this->Is(BARLINE)) {
@@ -652,7 +653,8 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     // We have already an alignment with grace note children - skip this
     if (!m_alignment) {
         // get the duration of the event
-        duration = this->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        duration = this->GetAlignmentDuration(
+            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
 
         // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
         // So use it as current time - we can do this because the timestamp loop is redirected from the measure
