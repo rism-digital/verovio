@@ -2201,6 +2201,12 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         }
     }
     else {
+        DocType type;
+        if (mdiv.first_child().attribute("type")) {
+            type = StrToDocType(mdiv.first_child().attribute("type").value());
+            m_doc->SetType(type);
+        }
+
         m_readingScoreBased = true;
         Score *score = m_doc->CreateScoreBuffer();
         pugi::xml_node current;
