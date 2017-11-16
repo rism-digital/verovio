@@ -95,9 +95,6 @@ public:
      */
     ///@{
     Accid *GetDrawingAccid();
-    void ResetDrawingTieAttr();
-    void SetDrawingTieAttr();
-    Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; }
     ///@}
 
     /**
@@ -181,6 +178,11 @@ public:
     //----------//
 
     /**
+     * See Object::ConvertAnalyticalMarkup
+     */
+    virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
+
+    /**
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *functorParams);
@@ -206,11 +208,6 @@ public:
     virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareTieAttr
-     */
-    virtual int PrepareTieAttr(FunctorParams *functorParams);
-
-    /**
      * See Object::PrepareLyrics
      */
     virtual int PrepareLyrics(FunctorParams *functorParams);
@@ -219,11 +216,6 @@ public:
      * See Object::PreparePointersByLayer
      */
     virtual int PreparePointersByLayer(FunctorParams *functorParams);
-
-    /**
-     * See Object::FillStaffCurrentTimeSpanning
-     */
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing
@@ -250,13 +242,6 @@ private:
 public:
     //
 private:
-    /**
-     * Tie attributes are represented a pointers to Tie objects.
-     * There is one pointer for the initial attribute (TIE_i or TIE_m).
-     * The note with the initial attribute owns the Tie object and takes care of deleting it
-     */
-    Tie *m_drawingTieAttr;
-
     /**
      * The drawing location of the note
      */

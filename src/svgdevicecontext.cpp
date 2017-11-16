@@ -84,8 +84,10 @@ void SvgDeviceContext::Commit(bool xml_declaration)
 
     // take care of width/height once userScale is updated
     if (m_mmOutput) {
-        m_svgNode.prepend_attribute("height") = StringFormat("%.2fmm", ((double)GetHeight() * GetUserScaleY()) / 10).c_str();
-        m_svgNode.prepend_attribute("width") = StringFormat("%.2fmm", ((double)GetWidth() * GetUserScaleX()) / 10).c_str();
+        m_svgNode.prepend_attribute("height")
+            = StringFormat("%.2fmm", ((double)GetHeight() * GetUserScaleY()) / 10).c_str();
+        m_svgNode.prepend_attribute("width")
+            = StringFormat("%.2fmm", ((double)GetWidth() * GetUserScaleX()) / 10).c_str();
     }
     else {
         m_svgNode.prepend_attribute("height") = StringFormat("%.2fpx", ((double)GetHeight() * GetUserScaleY())).c_str();
@@ -707,9 +709,10 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
         svgText.replace(0, 1, "\xC2\xA0");
     }
 
-    std::string currentFaceName = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
+    std::string currentFaceName
+        = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
     std::string fontFaceName = m_fontStack.top()->GetFaceName();
-    
+
     pugi::xml_node textChild = AppendChild("tspan");
     // Set the @font-family only if it is not the same as in the parent node
     if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {

@@ -289,12 +289,12 @@ void View::DrawStaffGrp(
         int y_label = y_bottom - (y_bottom - y_top) / 2 - m_doc->GetDrawingUnit(100);
 
         dc->SetBrush(m_currentColour, AxSOLID);
-        
+
         FontInfo grpTxt;
         if (!dc->UseGlobalStyling()) {
             grpTxt.SetFaceName("Times");
         }
-        
+
         grpTxt.SetPointSize(m_doc->GetDrawingLyricFont(100)->GetPointSize());
         dc->SetFont(&grpTxt);
 
@@ -410,9 +410,9 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         if (!dc->UseGlobalStyling()) {
             labelTxt.SetFaceName("Times");
         }
-        
+
         labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize());
-        
+
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&labelTxt);
 

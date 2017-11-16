@@ -290,6 +290,21 @@ int Measure::GetRealTimeOffsetMilliseconds(int repeat) const
 // Measure functor methods
 //----------------------------------------------------------------------------
 
+int Measure::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
+{
+    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    assert(params);
+
+    ArrayOfObjects::iterator iter;
+    for (iter = params->m_controlEvents.begin(); iter != params->m_controlEvents.end(); iter++) {
+        this->AddChild(*iter);
+    }
+
+    params->m_controlEvents.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::ConvertToPageBased(FunctorParams *functorParams)
 {
     ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
@@ -458,13 +473,13 @@ int Measure::AlignVertically(FunctorParams *functorParams)
     params->m_staffIdx = 0;
 
     return FUNCTOR_CONTINUE;
-}    
-        
+}
+
 int Measure::AdjustArpegEnd(FunctorParams *functorParams)
 {
     AdjustArpegParams *params = dynamic_cast<AdjustArpegParams *>(functorParams);
     assert(params);
-    
+
     if (!params->m_alignmentArpegTuples.empty()) {
         params->m_measureAligner = &m_measureAligner;
         m_measureAligner.Process(params->m_functor, params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
@@ -561,7 +576,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_FULLMEASURE2);
     Alignment *fullMeasure2
         = dynamic_cast<Alignment *>(m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
-    
+
     // With a double measure with element (mRpt2, multiRpt)
     if (fullMeasure2 != NULL) {
         minMeasureWidth *= 2;

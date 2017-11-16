@@ -470,7 +470,11 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     xRight = xLeft + 2 * m_doc->GetDrawingBrevisWidth(pseudoStaffSize);
     if (note->GetActualDur() == DUR_MX) {
         // Maxima is twice the width of brevis
+<<<<<<< HEAD
         xRight += 2* m_doc->GetDrawingBrevisWidth(pseudoStaffSize);
+=======
+        xRight += 2 * m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+>>>>>>> e72b5e142590e4ddac42bc6b51511aac22a0152d
     }
     yTop = y + m_doc->GetDrawingUnit(pseudoStaffSize);
     yBottom = y - m_doc->GetDrawingUnit(pseudoStaffSize);

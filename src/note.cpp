@@ -19,6 +19,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
+#include "fermata.h"
 #include "functorparams.h"
 #include "glyph.h"
 #include "layer.h"
@@ -70,17 +71,11 @@ Note::Note()
     RegisterAttClass(ATT_TIEPRESENT);
     RegisterAttClass(ATT_VISIBILITY);
 
-    m_drawingTieAttr = NULL;
-
     Reset();
 }
 
 Note::~Note()
 {
-    // This deletes the Tie, Slur, and Accid objects if necessary
-    if (m_drawingTieAttr) {
-        delete m_drawingTieAttr;
-    }
 }
 
 void Note::Reset()
@@ -99,9 +94,6 @@ void Note::Reset()
     ResetStemsCmn();
     ResetTiePresent();
     ResetVisibility();
-
-    // tie pointers
-    ResetDrawingTieAttr();
 
     m_clusterPosition = 0;
     m_cluster = NULL;
@@ -174,22 +166,6 @@ void Note::AddChild(Object *child)
     else
         m_children.push_back(child);
     Modify();
-}
-
-void Note::SetDrawingTieAttr()
-{
-    assert(!this->m_drawingTieAttr);
-    if (m_drawingTieAttr) return;
-    m_drawingTieAttr = new Tie();
-    m_drawingTieAttr->SetStart(this);
-}
-
-void Note::ResetDrawingTieAttr()
-{
-    if (m_drawingTieAttr) {
-        delete m_drawingTieAttr;
-        m_drawingTieAttr = NULL;
-    }
 }
 
 Accid *Note::GetDrawingAccid()
@@ -409,6 +385,62 @@ double Note::GetScoreTimeDuration()
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int Note::ConvertAnalyticalMarkup(FunctorParams *functorParams)
+{
+    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    assert(params);
+
+    /****** ties ******/
+
+    AttTiePresent *check = this;
+    // Use the parent chord if there is no @tie on the note
+    if (!this->HasTie() && params->m_currentChord) {
+        check = params->m_currentChord;
+    }
+    assert(check);
+
+    std::vector<Note *>::iterator iter = params->m_currentNotes.begin();
+    while (iter != params->m_currentNotes.end()) {
+        // same octave and same pitch - this is the one!
+        if ((this->GetOct() == (*iter)->GetOct()) && (this->GetPname() == (*iter)->GetPname())) {
+            // right flag
+            if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_t)) {
+                Tie *tie = new Tie();
+                if (!params->m_permanent) {
+                    tie->IsAttribute(true);
+                }
+                tie->SetStartid("#" + (*iter)->GetUuid());
+                tie->SetEndid("#" + this->GetUuid());
+                params->m_controlEvents.push_back(tie);
+            }
+            else {
+                LogWarning("Expected @tie median or terminal in note '%s', skipping it", this->GetUuid().c_str());
+            }
+            iter = params->m_currentNotes.erase(iter);
+            // we are done for this note
+            break;
+        }
+        iter++;
+    }
+
+    if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_i)) {
+        params->m_currentNotes.push_back(this);
+    }
+
+    if (params->m_permanent) {
+        this->ResetTiePresent();
+    }
+
+    /****** fermata ******/
+
+    if (this->HasFermata()) {
+        Fermata *fermata = new Fermata();
+        fermata->ConvertFromAnalyticalMarkup(this, this->GetUuid(), params);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Note::CalcStem(FunctorParams *functorParams)
 {
@@ -731,56 +763,6 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 };
 
-int Note::PrepareTieAttr(FunctorParams *functorParams)
-{
-    PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
-    assert(params);
-
-    AttTiePresent *check = this;
-    // Use the parent chord if there is no @tie on the note
-    if (!this->HasTie() && params->m_currentChord) {
-        check = params->m_currentChord;
-    }
-    assert(check);
-
-    std::vector<Note *>::iterator iter = params->m_currentNotes.begin();
-    while (iter != params->m_currentNotes.end()) {
-        // same octave and same pitch - this is the one!
-        if ((this->GetOct() == (*iter)->GetOct()) && (this->GetPname() == (*iter)->GetPname())) {
-            // right flag
-            if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_t)) {
-                assert((*iter)->GetDrawingTieAttr());
-                (*iter)->GetDrawingTieAttr()->SetEnd(this);
-            }
-            else {
-                LogWarning("Expected @tie median or terminal in note '%s', skipping it", this->GetUuid().c_str());
-                (*iter)->ResetDrawingTieAttr();
-            }
-            iter = params->m_currentNotes.erase(iter);
-            // we are done for this note
-            break;
-        }
-        iter++;
-    }
-
-    if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_i)) {
-        this->SetDrawingTieAttr();
-        params->m_currentNotes.push_back(this);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Note::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
-{
-    // Pass it to the pseudo functor of the interface
-    if (this->m_drawingTieAttr) {
-        return this->m_drawingTieAttr->FillStaffCurrentTimeSpanning(functorParams);
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Note::PrepareLyrics(FunctorParams *functorParams)
 {
     PrepareLyricsParams *params = dynamic_cast<PrepareLyricsParams *>(functorParams);
@@ -807,8 +789,6 @@ int Note::ResetDrawing(FunctorParams *functorParams)
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
     PositionInterface::InterfaceResetDrawing(functorParams, this);
-
-    this->ResetDrawingTieAttr();
 
     m_drawingLoc = 0;
     m_flippedNotehead = false;

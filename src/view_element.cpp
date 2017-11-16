@@ -545,12 +545,6 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /************ Draw children (notes, accidentals, etc) ************/
 
     DrawLayerChildren(dc, chord, layer, staff, measure);
-
-    /************ Fermata attribute ************/
-
-    if (chord->HasFermata()) {
-        DrawFermataAttr(dc, element, layer, staff);
-    }
 }
 
 void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -943,10 +937,6 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             mRest->GetDrawingX() - m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, false) * 2 / 3, y,
             DUR_1, false, staff);
 
-    if (mRest->HasFermata()) {
-        DrawFermataAttr(dc, element, layer, staff);
-    }
-
     dc->EndGraphic(element, this);
 }
 
@@ -1146,20 +1136,6 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /************ Draw children (accidentals, etc) ************/
 
     DrawLayerChildren(dc, note, layer, staff, measure);
-
-    /************** peripherals: **************/
-
-    if (note->GetDrawingTieAttr()) {
-        System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
-        // create a placeholder for the tie attribute that will be drawn from the system
-        dc->StartGraphic(note->GetDrawingTieAttr(), "", note->GetDrawingTieAttr()->GetUuid().c_str());
-        dc->EndGraphic(note->GetDrawingTieAttr(), this);
-        if (system) system->AddToDrawingList(note->GetDrawingTieAttr());
-    }
-
-    if (note->HasFermata()) {
-        DrawFermataAttr(dc, element, layer, staff);
-    }
 }
 
 void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1199,12 +1175,6 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /************ Draw children (dots) ************/
 
     DrawLayerChildren(dc, rest, layer, staff, measure);
-
-    /************** peripherals: **************/
-
-    if (rest->HasFermata()) {
-        DrawFermataAttr(dc, element, layer, staff);
-    }
 }
 
 void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1389,69 +1359,6 @@ void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Sta
         DrawDot(dc, x, y, staff->m_drawingStaffSize);
         // HARDCODED
         x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
-    }
-}
-
-void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff)
-{
-    assert(dc);
-    assert(element);
-    assert(layer);
-    assert(staff);
-
-    int x, y;
-
-    x = element->GetDrawingX();
-
-    // We move the fermata position of half of the fermata size
-    x -= m_doc->GetGlyphWidth(SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false) / 2;
-
-    AttFermataPresent *fermataPresent = dynamic_cast<AttFermataPresent *>(element);
-    assert(fermataPresent);
-    data_STAFFREL_basic place = fermataPresent->GetFermata();
-
-    // First case, notes
-    if (element->Is({ NOTE, CHORD })) {
-        if (place == STAFFREL_basic_above) {
-            // check if the notehead is in the staff.
-            int top = element->GetDrawingTop(m_doc, staff->m_drawingStaffSize, true, ARTIC_PART_OUTSIDE);
-            if (top < staff->GetDrawingY()) {
-                // in the staff, set the fermata 20 pixels above the last line
-                y = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            }
-            else {
-                // out of the staff, place the trill above the notehead
-                y = top + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            }
-            // draw the up-fermata - need cue size support
-            DrawSmuflCode(dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false);
-        }
-        else {
-            int bottom = element->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, true, ARTIC_PART_OUTSIDE);
-            // This works as above, only we check that the note head is not
-            if (bottom > (staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize))) {
-                // notehead in staff, set  under
-                y = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)
-                    - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            }
-            else {
-                // notehead under staff, set under notehead
-                y = bottom - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            }
-            // draw the down-fermata - need cue size support
-            DrawSmuflCode(dc, x, y, SMUFL_E4C1_fermataBelow, staff->m_drawingStaffSize, false);
-        }
-    }
-    else if (element->Is({ REST, MREST })) {
-        if (place == STAFFREL_basic_above) {
-            y = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            DrawSmuflCode(dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false);
-        }
-        else {
-            y = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)
-                - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            DrawSmuflCode(dc, x, y, SMUFL_E4C1_fermataBelow, staff->m_drawingStaffSize, false);
-        }
     }
 }
 

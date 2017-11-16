@@ -38,7 +38,7 @@ public:
     virtual std::string GetClassName() const { return "Arpeg"; }
     virtual ClassId GetClassId() const { return ARPEG; }
     ///@}
-                  
+
     /**
      * @name Get the X drawing position (relative to the top note)
      */
@@ -50,7 +50,7 @@ public:
      * Set the top and bottom note of the arpeg.
      * Pointers will be NULL if resovling fails (e.g., pointing to one single note)
      */
-    void GetDrawingTopBottomNotes(Note *& top, Note *& bottom);
+    void GetDrawingTopBottomNotes(Note *&top, Note *&bottom);
 
     /**
      * @name Getter to interfaces
@@ -59,8 +59,7 @@ public:
     virtual PlistInterface *GetPlistInterface() { return dynamic_cast<PlistInterface *>(this); }
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     ////@}
-                  
-                  
+
     /**
      * @name Get and set the X drawing relative position
      */
@@ -77,19 +76,18 @@ public:
     //----------//
     // Functors //
     //----------//
-                  
+
     /**
      * See Object::ResetHorizontalAlignment
      */
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
-     
+
     /**
      * See Object::AdjustArpeg
      */
     ///@{
     virtual int AdjustArpeg(FunctorParams *functorParams);
     ///@}
-                  
 
 protected:
     //
