@@ -396,6 +396,8 @@ protected:
     void DrawMensurReversedHalfCircle(DeviceContext *dc, int x, int yy, Staff *staff);
     void DrawMensurSlash(DeviceContext *dc, int x, int yy, Staff *staff);
     void DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff);
+    void DrawMaximaOrLongaRest(DeviceContext *dc, int x, int yStaffTop, LayerElement *element, int loc, Staff *staff);
+    void DrawRestLines(DeviceContext *dc, int x, int y_top, int y_bottom, int drawingDur);
     void CalculateLigaturePosX(LayerElement *element, Layer *layer, Staff *staff);
     void DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     ///@}
@@ -427,6 +429,7 @@ protected:
     void DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
+    void DrawVSidedParallogram(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
     void DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill, int linewidth);
     void DrawDot(DeviceContext *dc, int x, int y, int staffSize);
     ///@}
@@ -514,7 +517,7 @@ protected:
 private:
     /** @name Internal values for storing temporary values for ligatures */
     ///@{
-    static int s_drawingLigX[2], s_drawingLigY[2];
+    static int s_drawLig1stX, s_drawLig1stYT, s_drawLig1stYB;
     static bool s_drawingLigObliqua;
     ///@}
 };
