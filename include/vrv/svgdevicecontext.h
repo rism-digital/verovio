@@ -184,7 +184,7 @@ private:
 
     /**
      * Flush the data to the internal buffer.
-     * Adds the xml tag if necessary and the <defs> from m_smufl_glyphs
+     * Adds the xml tag if necessary and the <defs> from m_smuflGlyphs
      */
     void Commit(bool xml_declaration);
 
@@ -215,7 +215,7 @@ private:
 
     // holds the list of glyphs from the smufl font used so far
     // they will be added at the end of the file as <defs>
-    std::vector<std::string> m_smufl_glyphs;
+    std::vector<std::string> m_smuflGlyphs;
 
     // pugixml data
     pugi::xml_document m_svgDoc;
