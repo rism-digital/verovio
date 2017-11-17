@@ -115,34 +115,6 @@ void View::DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2,
     dc->ResetBrush();
 }
 
-
-/* Draw a parallelogram with vertical left and right sides, with the given height, and with
- opposite vertices at (x1,y1) and (x2,y2). */
-
-void View::DrawVSidedParallogram(DeviceContext *dc, int x1, int y1, int x2, int y2, int height)
-{
-    Point p[4];
-    
-    dc->SetPen(m_currentColour, 0, AxSOLID);
-    dc->SetBrush(m_currentColour, AxSOLID);
-    
-    height = ToDeviceContextX(height);
-    p[0].x = ToDeviceContextX(x1);
-    p[0].y = ToDeviceContextY(y1);
-    p[2].x = ToDeviceContextX(x2);
-    p[2].y = ToDeviceContextY(y2);
-    p[1].x = p[2].x;
-    p[1].y = p[2].y + height;
-    p[3].x = p[0].x;
-    p[3].y = p[0].y - height;
-    
-    dc->DrawPolygon(4, p);
-    
-    dc->ResetPen();
-    dc->ResetBrush();
-}
-    
-    
 /* Draw an empty ("void") diamond with its top lefthand point at (x1, y1). */
 
 void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill, int linewidth)

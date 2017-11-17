@@ -983,7 +983,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         selfLeft = this->GetAlignment()->GetXRel();
     }
     else {
-        // We add it to the upcoming bounding boxes
+        // We add it to the upcoming bouding boxes
         params->m_upcomingBoundingBoxes.push_back(this);
         selfLeft = this->GetSelfLeft()
             - params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
@@ -992,7 +992,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     int offset = selfLeft - params->m_minPos;
     if (offset < 0) {
         this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() - offset);
-        // Also move the accumulated x shift and the minimum position for the next alignment accordingly
+        // Also move the cumultated x shift and the minimum position for the next alignment accordingly
         params->m_cumulatedXShift += (-offset);
         params->m_upcomingMinPos += (-offset);
     }
