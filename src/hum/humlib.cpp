@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Nov  2 00:24:04 PDT 2017
+// Last Modified: Sun Nov 19 23:19:26 PST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2251,7 +2251,8 @@ string Convert::durationToRecip(HumNum duration, HumNum scale) {
 	HumNum test1dot = (duration * 2) / 3;
 	if (test1dot.getNumerator() == 1) {
 		// single dot works
-		string output = to_string(test1dot.getDenominator() * 2);
+		// string output = to_string(test1dot.getDenominator() * 2);
+		string output = to_string(test1dot.getDenominator());
 		output += ".";
 		return output;
 	}
@@ -2260,7 +2261,7 @@ string Convert::durationToRecip(HumNum duration, HumNum scale) {
 	HumNum test2dot = (duration * 4) / 7;
 	if (test2dot.getNumerator() == 1) {
 		// double dot works
-		string output = to_string(test2dot.getDenominator() * 4);
+		string output = to_string(test2dot.getDenominator() * 2);
 		output += "..";
 		return output;
 	}
@@ -2269,7 +2270,7 @@ string Convert::durationToRecip(HumNum duration, HumNum scale) {
 	HumNum test3dot = (duration * 8) / 15;
 	if (test3dot.getNumerator() == 1) {
 		// single dot works
-		string output = to_string(test3dot.getDenominator() * 8);
+		string output = to_string(test3dot.getDenominator() * 4);
 		output += "...";
 		return output;
 	}
@@ -3049,6 +3050,7 @@ GridSlice* GridMeasure::addLabelToken(const string& tok, HumNum timestamp,
 			if (((*iterator)->getTimestamp() == timestamp) && (*iterator)->isLabelSlice()) {
 				target = *iterator;
 				target->addToken(tok, part, staff, voice);
+				gs = target;
 				break;
 			} else if (((*iterator)->getTimestamp() == timestamp) && (*iterator)->isDataSlice()) {
 				// found the correct timestamp, but no clef slice at the timestamp
@@ -3266,7 +3268,9 @@ GridSlice* GridMeasure::addGlobalComment(const string& tok, HumNum timestamp) {
 		// search for existing data line (or any other type)  with same timestamp 
 		auto iterator = this->begin();
 		while (iterator != this->end()) {
-			if (((*iterator)->getTimestamp() == timestamp) && (*iterator)->isDataSlice()) {
+			// does it need to be before data slice or any slice?
+			// if (((*iterator)->getTimestamp() == timestamp) && (*iterator)->isDataSlice()) {
+			if ((*iterator)->getTimestamp() == timestamp) {
 				// found the correct timestamp on a data slice, so add the global comment
 				// before the data slice.
 				gs = new GridSlice(this, timestamp, SliceType::GlobalComments, 1);
@@ -3290,10 +3294,11 @@ GridSlice* GridMeasure::addGlobalComment(const string& tok, HumNum timestamp) {
 //////////////////////////////
 //
 // GridMeasure::transferTokens --
+//    default value: startbarnum = 0
 //
 
 bool GridMeasure::transferTokens(HumdrumFile& outfile, bool recip,
-		bool addbar) {
+		bool addbar, int startbarnum) {
 
 	// If the last data slice duration is zero, then calculate
 	// the true duration from the duration of the measure.
@@ -3348,7 +3353,11 @@ bool GridMeasure::transferTokens(HumdrumFile& outfile, bool recip,
 			if (getDuration() == 0) {
 				// do nothing
 			} else {
-				appendInitialBarline(outfile);
+				if (startbarnum) {
+					appendInitialBarline(outfile, startbarnum);
+				} else {
+					appendInitialBarline(outfile);
+				}
 				addedbar = true;
 			}
 		}
@@ -3365,16 +3374,23 @@ bool GridMeasure::transferTokens(HumdrumFile& outfile, bool recip,
 //    duplicated to all spines later.
 //
 
-void GridMeasure::appendInitialBarline(HumdrumFile& infile) {
+void GridMeasure::appendInitialBarline(HumdrumFile& infile, int startbarline) {
 	if (infile.getLineCount() == 0) {
 		// strange case which should never happen.
 		return;
 	}
 	int fieldcount = infile.back()->getFieldCount();
 	HumdrumLine* line = new HumdrumLine;
+	string tstring = "=";
+	if (startbarline) {
+		tstring += to_string(startbarline);
+	} else {
+		tstring += "1";
+	}
+	tstring += "-";
 	HTp token;
 	for (int i=0; i<fieldcount; i++) {
-		token = new HumdrumToken("=1-");
+		token = new HumdrumToken(tstring);
 		line->appendToken(token);
 	}
 	infile.push_back(line);
@@ -4313,6 +4329,8 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 		empty = "*";
 	} else if (isLayoutSlice()) {
 		empty = "!";
+	} else if (!hasSpines()) {
+		empty = "???";
 	}
 
 	if (recip) {
@@ -4335,11 +4353,13 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 		} else if (isGraceSlice()) {
 			token = new HumdrumToken("q");
 			empty = ".";
-		} else {
+		} else if (hasSpines()) {
 			token = new HumdrumToken("55");
 			empty = "!z";
 		}
-		line->appendToken(token);
+		if (hasSpines()) {
+			line->appendToken(token);
+		}
 	}
 
 	// extract the Tokens from each part/staff
@@ -4348,8 +4368,14 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 	int v; // voice index
 
 	for (p=(int)size()-1; p>=0; p--) {
+		if ((!hasSpines()) && (p != 0)) {
+			continue;
+		}
 		GridPart& part = *this->at(p);
 		for (s=(int)part.size()-1; s>=0; s--) {
+			if ((!hasSpines()) && (s != 0)) {
+				continue;
+			}
 			GridStaff& staff = *part.at(s);
 			if (staff.size() == 0) {
 				// fix this later.  For now if there are no notes
@@ -4380,7 +4406,9 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 
 			int maxvcount = getVerseCount(p, s);
 			int maxhcount = getHarmonyCount(p, s);
-			transferSides(*line, staff, empty, maxvcount, maxhcount);
+			if (hasSpines()) {
+				transferSides(*line, staff, empty, maxvcount, maxhcount);
+			}
 		}
 
 		// Transfer the sides at the part level
@@ -4388,7 +4416,9 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 		int maxvcount = getVerseCount(p, -1);
 		int maxdcount = getDynamicsCount(p);
 
-		transferSides(*line, part, p, empty, maxvcount, maxhcount, maxdcount);
+		if (hasSpines()) {
+			transferSides(*line, part, p, empty, maxvcount, maxhcount, maxdcount);
+		}
 	}
 
 	outfile.appendLine(line);
@@ -5659,6 +5689,49 @@ void HumGrid::enableRecipSpine(void) {
 
 //////////////////////////////
 //
+// HumGrid::getPartCount -- Return the number of parts in the Grid
+//   by looking at the number of parts in the first spined GridSlice.
+//
+
+int  HumGrid::getPartCount(void) {
+	if (!m_allslices.empty()) {
+		return (int)m_allslices[0]->size();
+	}
+
+	if (this->empty()) {
+		return 0;
+	}
+
+	if (this->at(0)->empty()) {
+		return 0;
+	}
+
+	return this->at(0)->back()->size();
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::getStaffCount --
+//
+
+int HumGrid::getStaffCount(int partindex) {
+	if (this->empty()) {
+		return 0;
+	}
+
+	if (this->at(0)->empty()) {
+		return 0;
+	}
+
+	return this->at(0)->back()->at(partindex)->size();
+}
+
+
+
+//////////////////////////////
+//
 // HumGrid::getHarmonyCount --
 //
 
@@ -5778,9 +5851,10 @@ void HumGrid::setVerseCount(int partindex, int staffindex, int count) {
 //////////////////////////////
 //
 // HumGrid::transferTokens --
+//   default value: startbarnum = 0.
 //
 
-bool HumGrid::transferTokens(HumdrumFile& outfile) {
+bool HumGrid::transferTokens(HumdrumFile& outfile, int startbarnum) {
 	bool status = buildSingleList();
 	if (!status) {
 		return false;
@@ -5801,7 +5875,7 @@ bool HumGrid::transferTokens(HumdrumFile& outfile) {
 	bool addstartbar = (!hasPickup()) && (!m_musicxmlbarlines);
 	for (int m=0; m<(int)this->size(); m++) {
 		if (addstartbar && m == 0) {
-			status &= at(m)->transferTokens(outfile, m_recip, addstartbar);
+			status &= at(m)->transferTokens(outfile, m_recip, addstartbar, startbarnum);
 		} else {
 			status &= at(m)->transferTokens(outfile, m_recip, false);
 		}
@@ -6178,6 +6252,44 @@ void HumGrid::transferMerges(GridStaff* oldstaff, GridStaff* oldlaststaff,
 
 //////////////////////////////
 //
+// HumGrid::getNextSpinedLine -- Find next spined GridSlice.
+//
+
+GridSlice* HumGrid::getNextSpinedLine(const GridMeasure::iterator& it, int measureindex) {
+	auto nextone = it;
+	nextone++;
+	while (nextone != this->at(measureindex)->end()) {
+		if ((*nextone)->hasSpines()) {
+			break;
+		}
+		nextone++;
+	}
+
+	if (nextone != this->at(measureindex)->end()) {
+		return *nextone;
+	}
+
+	measureindex++;
+	if (measureindex >= (int)this->size()) {
+		// end of data, so nothing to adjust with
+		// but this should never happen in general.
+		return NULL;
+	}
+	nextone = this->at(measureindex)->begin();
+	while (nextone != this->at(measureindex)->end()) {
+		if ((*nextone)->hasSpines()) {
+			return *nextone;
+		}
+		nextone++;
+	}
+
+	return NULL;
+}
+
+
+
+//////////////////////////////
+//
 // HumGrid::manipulatorCheck --
 //
 
@@ -6197,18 +6309,8 @@ bool HumGrid::manipulatorCheck(void) {
 				continue;
 			}
 			s1 = *it;
-			auto nextone = it;
-			nextone++;
-			if (nextone != this->at(m)->end()) {
-				s2 = *nextone;
-			} else if (m<(int)this->size()-1) {
-				s2 = this->at(m+1)->front();
-			} else {
-				continue;
-				// there is no next slice.  Presumably the terminal
-				// barlines have already been added, so this will not
-				// be a problem.
-			}
+			s2 = getNextSpinedLine(it, m);
+
 			manipulator = manipulatorCheck(s1, s2);
 			if (manipulator == NULL) {
 				continue;
@@ -7169,6 +7271,11 @@ void HumGrid::extendDurationToken(int slicei, int parti, int staffi,
 			cerr << "ERROR: Negative duration: " << timeleft << endl;
 			cerr << "\ttokendur = " << tokendur << endl;
 			cerr << "\tslicedur = " << slicedur << endl;
+			cerr << "\ttoken    = " << token << endl;
+			cerr << "\tCURRENT SLICE = " << m_allslices.at(slicei) << endl;
+			cerr << "\tTIMESTAMP " << currts << endl;
+			cerr << "\tNEXT SLICE = " << m_allslices.at(slicei) << endl;
+			cerr << "\tNEXT TIMESTAMP " << nextts << endl;
 			return;
 		}
 
@@ -7904,6 +8011,20 @@ void HumGrid::removeRedundantClefChanges(void) {
 bool HumGrid::hasPickup(void) {
 	return m_pickup;
 }
+
+
+
+//////////////////////////////
+//
+// HumGrid::deleteMeasure --
+//
+
+void HumGrid::deleteMeasure(int index) {
+	delete this->at(index);
+	this->at(index) = NULL;
+	this->erase(this->begin() + index);
+}
+
 
 
 
@@ -24390,6 +24511,93 @@ void MxmlPart::printStaffVoiceInfo(void) {
 
 
 
+//////////////////////////
+//
+// MxmlPart::parsePartInfo -- find the part name and part abbreviation
+//    if there are any.
+//
+// Example:
+//     <score-part id="P1">
+//      <part-name>Alto</part-name>
+//      <part-name-display>
+//       <display-text>Alto</display-text>
+//      </part-name-display>
+//      <part-abbreviation> </part-abbreviation>
+//      <part-abbreviation-display>
+//       <display-text> </display-text>
+//      </part-abbreviation-display>
+//      <score-instrument id="P1-I1">
+//       <instrument-name> </instrument-name>
+//      </score-instrument>
+//     </score-part>
+//
+
+void MxmlPart::parsePartInfo(xml_node partinfo) {
+	xml_node partnamenode = partinfo.select_node("./part-name").node();
+	if (partnamenode) {
+		m_partname = cleanSpaces(partnamenode.child_value());
+	}
+	xml_node abbrnode = partinfo.select_node("./part-abbreviation").node();
+	if (abbrnode) {
+		m_partabbr = cleanSpaces(abbrnode.child_value());
+	}
+}
+
+
+
+//////////////////////////////
+//
+// MxmlPart::getPartName --
+//
+
+string MxmlPart::getPartName(void) const {
+	return m_partname;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlPart::getPartAbbr --
+//
+
+string MxmlPart::getPartAbbr(void) const {
+	return m_partabbr;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlPart::cleanSpaces -- remove leading/trailing spaces in string.
+//
+
+string MxmlPart::cleanSpaces(const string& input) {
+	string output;
+	int content = false;
+	for (int i=0; i<(int)input.size(); i++) {
+		if ((!content) && isspace(input[i]))  {
+			continue;
+		}
+		content = true;
+		if (isspace(input[i]) && isspace(input[i-1])) {
+			continue;
+		}
+		if (isspace(input[i])) {
+			output += ' ';
+		} else {
+			output += input[i];
+		}
+	}
+	if (isspace(output.back())) {
+		output.resize(output.size() - 1);
+	}
+
+	return output;
+}
+
+
+
 //////////////////////////////
 //
 // NoteCell::NoteCell -- Constructor.
@@ -31268,12 +31476,24 @@ void Tool_dissonant::suppressDissonances(HumdrumFile& infile, NoteGrid& grid,
 			// cerr << "\tCHECKING DISSONANCE " << results[v][i] << " for note " << token << endl;
 			HumNum notedur = token->getTiedDuration();
 
-			if ((results[v][i] == m_labels[PASSING_UP] ) ||
-					(  results[v][i] == m_labels[PASSING_DOWN] ) ||
-					(  results[v][i] == m_labels[NEIGHBOR_UP]  ) ||
-					(  results[v][i] == m_labels[NEIGHBOR_DOWN])
-					// ...etc. Include all weak dissonances here.
-					) {
+			if ((results[v][i] == m_labels[PASSING_DOWN]) ||
+				(results[v][i] == m_labels[PASSING_UP]) ||
+			    (results[v][i] == m_labels[NEIGHBOR_DOWN]) ||
+			    (results[v][i] == m_labels[NEIGHBOR_UP]) ||
+			    (results[v][i] == m_labels[CAMBIATA_DOWN_S]) ||
+			    (results[v][i] == m_labels[CAMBIATA_UP_S]) ||
+			    (results[v][i] == m_labels[CAMBIATA_DOWN_L]) ||
+			    (results[v][i] == m_labels[CAMBIATA_UP_L]) ||
+			    (results[v][i] == m_labels[ECHAPPEE_DOWN]) ||
+			    (results[v][i] == m_labels[ECHAPPEE_UP]) ||
+			    (results[v][i] == m_labels[ANT_DOWN]) ||
+			    (results[v][i] == m_labels[ANT_UP]) ||
+			    (results[v][i] == m_labels[REV_ECHAPPEE_DOWN]) ||
+			    (results[v][i] == m_labels[REV_ECHAPPEE_UP]) ||
+			    (results[v][i] == m_labels[REV_CAMBIATA_DOWN]) ||
+			    (results[v][i] == m_labels[REV_CAMBIATA_UP]) ||
+			    (results[v][i] == m_labels[DBL_NEIGHBOR_DOWN]) ||
+			    (results[v][i] == m_labels[DBL_NEIGHBOR_UP]) ) {
 				if (notedur > maxWeakDur) {
 					maxWeakDur = notedur;
 					maxToken = token;
@@ -31320,6 +31540,9 @@ void Tool_dissonant::suppressDissonances(HumdrumFile& infile, NoteGrid& grid,
 	for (int i=0; i<(int)attacks.size(); i++) {
 		suppressDissonancesInVoice(infile, grid, i, attacks[i], results[i]);
 	}
+	for (int i=0; i<(int)attacks.size(); i++) {
+		suppressSusOrnamentsInVoice(infile, grid, i, attacks[i], results[i]);
+	}
 
 }
 
@@ -31351,41 +31574,108 @@ void Tool_dissonant::suppressDissonancesInVoice(HumdrumFile& infile,
 			continue;
 		}
 
-		if ((results[lineindex] == m_labels[PASSING_DOWN]) ||
-				(results[lineindex] == m_labels[PASSING_UP]) ||
-			   (results[lineindex] == m_labels[NEIGHBOR_DOWN]) ||
-			   (results[lineindex] == m_labels[NEIGHBOR_UP]) ||
-			   (results[lineindex] == m_labels[CAMBIATA_DOWN_S]) ||
-			   (results[lineindex] == m_labels[CAMBIATA_UP_S]) ||
-			   (results[lineindex] == m_labels[CAMBIATA_DOWN_L]) ||
-			   (results[lineindex] == m_labels[CAMBIATA_UP_L]) ||
-			   (results[lineindex] == m_labels[ECHAPPEE_DOWN]) ||
-			   (results[lineindex] == m_labels[ECHAPPEE_UP]) ||
-			   (results[lineindex] == m_labels[ANT_DOWN]) ||
-			   (results[lineindex] == m_labels[ANT_UP]) ||
-			   (results[lineindex] == m_labels[REV_ECHAPPEE_DOWN]) ||
-			   (results[lineindex] == m_labels[REV_ECHAPPEE_UP]) ||
-			   (results[lineindex] == m_labels[REV_CAMBIATA_DOWN]) ||
-			   (results[lineindex] == m_labels[REV_CAMBIATA_UP]) ||
-			   (results[lineindex] == m_labels[DBL_NEIGHBOR_DOWN]) ||
-			   (results[lineindex] == m_labels[DBL_NEIGHBOR_UP]) ) {
-			// cerr << "MERGING " << infile.token(lineindex, fieldindex) << " with previous note" << endl;
-			// cerr << "\tDURATION OF NOTE " << infile.token(lineindex, fieldindex)->getDuration() << endl;
-			mergeWithPreviousNote(infile, lineindex, fieldindex);
-		} else if ((results[lineindex] == m_labels[THIRD_Q_PASS_UP]) ||
-			   (results[lineindex] == m_labels[THIRD_Q_PASS_DOWN]) ||
-			   (results[lineindex] == m_labels[THIRD_Q_LOWER_NEI]) ||
-			   (results[lineindex] == m_labels[THIRD_Q_UPPER_NEI]) ||
-			   (results[lineindex] == m_labels[ACC_PASSING_UP]) ||
-			   (results[lineindex] == m_labels[ACC_PASSING_DOWN]) ||
-			   (results[lineindex] == m_labels[ACC_LO_NEI]) ||
-			   (results[lineindex] == m_labels[ACC_UP_NEI]) ||
-			   (results[lineindex] == m_labels[RES_PITCH]) ||
-			   (results[lineindex] == m_labels[APP_UPPER]) ||
-			   (results[lineindex] == m_labels[APP_LOWER]) ||
-			   (results[lineindex] == m_labels[CHANSON_IDIOM]) ) {
+		if ((results[lineindex] == m_labels[THIRD_Q_PASS_UP]) ||
+			(results[lineindex] == m_labels[THIRD_Q_PASS_DOWN]) ||
+			(results[lineindex] == m_labels[THIRD_Q_LOWER_NEI]) ||
+			(results[lineindex] == m_labels[THIRD_Q_UPPER_NEI]) ||
+			(results[lineindex] == m_labels[ACC_PASSING_UP]) ||
+			(results[lineindex] == m_labels[ACC_PASSING_DOWN]) ||
+			(results[lineindex] == m_labels[ACC_LO_NEI]) ||
+			(results[lineindex] == m_labels[ACC_UP_NEI]) ||
+			(results[lineindex] == m_labels[RES_PITCH]) ||
+			(results[lineindex] == m_labels[APP_UPPER]) ||
+			(results[lineindex] == m_labels[APP_LOWER]) ||
+			(results[lineindex] == m_labels[PARALLEL_DOWN]) ||
+			(results[lineindex] == m_labels[PARALLEL_UP]) ||
+			(results[lineindex] == m_labels[ORNAMENTAL_SUS]) ||
+			(results[lineindex] == m_labels[CHANSON_IDIOM]) ) {
 			// cerr << "MERGING " << token << " with next note" << endl;
 			mergeWithNextNote(infile, lineindex, fieldindex);
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_dissonant::suppressDissonancesInVoice --
+//
+
+void Tool_dissonant::suppressSusOrnamentsInVoice(HumdrumFile& infile,
+		NoteGrid& grid, int vindex, vector<NoteCell*>& attacks,
+		vector<string>& results) {
+
+	for (int i=0; i<(int)attacks.size(); i++) {
+		int lineindex = attacks[i]->getLineIndex();
+		int fieldindex = attacks[i]->getFieldIndex();
+		if ((results[lineindex] == "") || (results[lineindex] == ".") ) {
+			continue;
+		}
+
+		HTp token = infile.token(lineindex, fieldindex);
+		if (token->isNull()) {
+			// The note was removed already in stage 1.
+			continue;
+		}
+		if (!token->isNoteAttack()) {
+			// The note was already merged with the previous note.
+			continue;
+		}
+
+		if (((results[lineindex] == m_labels[SUS_BIN]) ||
+			 (results[lineindex] == m_labels[SUS_TERN])) &&
+			(i < (attacks.size() - 3)) ) {
+			HumNum durn   = attacks[i+1]->getDuration();
+			HumNum durnn  = attacks[i+2]->getDuration();
+			HumNum durnnn  = attacks[i+3]->getDuration();
+			double intn   = *attacks[i+1] - *attacks[i];
+			double intnn  = *attacks[i+2] - *attacks[i+1];
+			double intnnn = *attacks[i+3] - *attacks[i+2];
+			double levn   = attacks[i+1]->getMetricLevel();
+			double levnn  = attacks[i+2]->getMetricLevel();
+			double levnnn = attacks[i+3]->getMetricLevel();
+			int lineindexn = attacks[i+1]->getLineIndex();
+			int lineindexnn = attacks[i+2]->getLineIndex();
+			int lineindexnnn = attacks[i+3]->getLineIndex();
+			HTp tokenn = infile.token(lineindexn, fieldindex);
+			HTp tokennn = infile.token(lineindexnn, fieldindex);
+			HTp tokennnn = infile.token(lineindexnnn, fieldindex);
+
+			if ((durn == durnn) && (durn < durnnn) && (levn > levnnn) && 
+				(intn == -1) && (intnn == -1) && (intnnn == 1) ) { // turn figure anticipation of resolution phase
+				if ((results[lineindexnn] == ".") && (!tokennn->isNull()) &&
+					(tokennn->isNoteAttack()) ) {
+					mergeWithPreviousNote(infile, lineindexnn, vindex);
+				}
+				if ((results[lineindexn] == ".") && (!tokenn->isNull()) &&
+					(tokenn->isNoteAttack()) ) {
+					mergeWithPreviousNote(infile, lineindexn, vindex);
+				}
+			} else if ((durn == durnn) && (durn == durnnn) && (levn > levnn) && 
+				(levnn < levnnn) && (intn == -1) && (intnn == 0) && 
+				(intnnn == -1) && (results[lineindexnnn] == ".") && 
+				(!tokennnn->isNull()) && (tokennnn->isNoteAttack()) ) { // Du Fay ornament
+				mergeWithPreviousNote(infile, lineindexnnn, vindex);
+			}
+		}
+		if (((results[lineindex] == m_labels[SUS_BIN]) ||
+			 (results[lineindex] == m_labels[SUS_TERN])) &&
+			(i < (attacks.size() - 2)) ) {
+			HumNum durn  = attacks[i+1]->getDuration();
+			HumNum durnn = attacks[i+2]->getDuration();
+			double intn  = *attacks[i+1] - *attacks[i];
+			double intnn = *attacks[i+2] - *attacks[i+1];
+			double levn  = attacks[i+1]->getMetricLevel();
+			double levnn = attacks[i+2]->getMetricLevel();
+			int lineindexn = attacks[i+1]->getLineIndex();
+			HTp tokenn = infile.token(lineindexn, fieldindex);
+
+			if ((durn <= durnn) && (levn >= levnn) && (intn == -1) && 
+				(intnn == 0) && (results[lineindexn] == ".") &&
+				(!tokenn->isNull()) && (tokenn->isNoteAttack()) ) { // anticipation of resolution phase
+				mergeWithPreviousNote(infile, lineindexn, vindex);	
+			}
 		}
 	}
 }
@@ -31590,6 +31880,46 @@ void Tool_dissonant::simplePreviousMerge(HTp pnote, HTp cnote) {
 
 //////////////////////////////
 //
+// Tool_dissonant::simpleNextMerge -- Merge two notes which are in the same measure
+//   and generate a printable duration when summed together.  Also deal with tied notes
+//   attached to the cnote.  Does not work with chords. Makes the pitch of the 
+//   next note start at the time point of the current note and last for the 
+//   comibined duration of the two original notes. The next note gets replaced
+//   with a placeholder token.
+//
+
+void Tool_dissonant::simpleNextMerge(HTp cnote, HTp nnote) {
+	bool ctie = cnote->find("]") != string::npos;
+	bool ntie = nnote->find("[") != string::npos;
+
+	if (ctie && ntie) {
+		// Current note is part of a tie group and ctie is part of a tie group
+		// so the merged tie will be parts of both previous and current groups.
+		auto loc = cnote->find("]");
+		if (loc != string::npos) {
+			string text = *cnote;
+			text.replace(loc, 1, "_");
+		}
+	} else if ((!ctie) && ntie) {
+		// Next note is tied to other notes, so the current note, which is an
+		// attack, should be converted to be the start of a tie group.
+		string text = "[" + *cnote;
+		cnote->setText(text);
+	}
+
+	HumNum cdur = cnote->getDuration();
+	HumNum ndur = nnote->getDuration();
+	HumNum dur = cdur + ndur;
+	changeDurationOfNote(cnote, dur);
+	changePitch(cnote, nnote);
+	nnote->setText(".");
+	return;
+}
+
+
+
+//////////////////////////////
+//
 // Tool_dissonant::changePitchOfTieGroupFollowing -- 
 //
 
@@ -31658,22 +31988,48 @@ void Tool_dissonant::changeDurationOfNote(HTp note, HumNum dur) {
 //
 
 void Tool_dissonant::mergeWithNextNote(HumdrumFile& infile, int line, int field) {
-	HTp token = infile.token(line, field);
-	if (!token) {
+	HTp cnote = infile.token(line, field);  // current note (attack)
+	if (!cnote) {
 		return;
 	}
-	token = token->getNextNNDT();
-	if (!token) {
+	HTp nnote = cnote->getNextNNDT();   // next note
+	if (!nnote) {
 		return;
 	}
-	if (token->isNull()) {
+	if (nnote->isNull()) {
+		return;
+	}
+	if (nnote->isRest()) {
+		// next event is a rest, so don't merge.
 		return;
 	}
 
-	int lineindex = token->getLineIndex();
-	int fieldindex = token->getFieldIndex();
+	int cline = cnote->getLineIndex();   // current note's line
+	int nline = nnote->getLineIndex();   // next note's line
+	bool barline = false;
+	for (int i=cline; i<=nline; i++) {
+		if (infile[i].isBarline()) {
+			barline = true;
+			break;
+		}
+	}
 
-	mergeWithPreviousNote(infile, lineindex, fieldindex);
+	if (!barline) {
+		// cerr << "\tNOTES IN SAME MEASURE, MERGE IF REASONABLE RHYTHM" << endl;
+		HumNum cdur = cnote->getDuration();
+		HumNum ndur = nnote->getDuration();
+		HumNum dur = cdur + ndur;
+		string recip = Convert::durationToRecip(dur);
+		// cerr << "\tCOMBINED RHYTHM OF NOTES IS " << recip << endl;
+		if (recip.find("%") == string::npos) {
+			simpleNextMerge(cnote, nnote);   // TODO: Make a "simpleNextMerge(cnote, nnote)"
+			return;
+		}
+	}
+
+	// I'm not sure if a version of this function will be necessary for 
+	// next-note/strong-dissonance reduction.
+	// mergeWithNextNoteViaTies(pnote, cnote); 
 }
 
 
@@ -37456,7 +37812,7 @@ int Tool_imitation::compareSequences(vector<NoteCell*>& attack1,
 
 #define QUARTER_CONVERT * 4
 #define ELEMENT_DEBUG_STATEMENT(X)
-// #define ELEMENT_DEBUG_STATEMENT(X)  cerr << #X << endl;
+//#define ELEMENT_DEBUG_STATEMENT(X)  cerr << #X << endl;
 
 #define NODE_VERIFY(ELEMENT, RETURNVALUE)        \
 	if (!ELEMENT) {                               \
@@ -37486,6 +37842,7 @@ Tool_mei2hum::Tool_mei2hum(void) {
 	define("app|app-label=s", "app label to follow");
 	define("r|recip=b", "output **recip spine");
 	define("s|stems=b", "include stems in output");
+	define("P|no-place=b", "Do not convert placement attribute");
 
 	m_maxverse.resize(m_maxstaff);
 	fill(m_maxverse.begin(), m_maxverse.end(), 0);
@@ -37553,7 +37910,7 @@ bool Tool_mei2hum::convert(ostream& out, xml_document& doc) {
 	auto score = doc.select_node("/mei/music/body/mdiv/score").node();
 
 	if (!score) {
-		cerr << "Cannot find score, so cannot convert MDI file to Humdrum";
+		cerr << "Cannot find score, so cannot convert MEI file to Humdrum";
 		cerr << endl;
 		cerr << "Perhaps there is a problem in the XML structure of the file.";
 		cerr << endl;
@@ -37594,7 +37951,21 @@ bool Tool_mei2hum::convert(ostream& out, xml_document& doc) {
 		m_outdata.setDynamicsPresent(i);
 	}
 
-	m_outdata.transferTokens(outfile);
+	auto measure = doc.select_node("/mei/music/body/mdiv/score/section/measure").node();
+	auto number = measure.attribute("n");
+	int measurenumber = 0;
+
+	if (number) {
+		measurenumber = number.as_int();
+	} else {
+		measurenumber = 0;
+	}
+
+	if (measurenumber > 1) {
+		m_outdata.transferTokens(outfile, measurenumber);
+	} else {
+		m_outdata.transferTokens(outfile);
+	}
 
 	addHeaderRecords(outfile, doc);
 	addExtMetaRecords(outfile, doc);
@@ -37679,6 +38050,7 @@ void Tool_mei2hum::processHairpin(hairpin_info& info) {
 
 	while (it != gm->end()) {
 		if (!(*it)->isDataSlice()) {
+			it++;
 			continue;
 		}
 		timestamp = (*it)->getTimestamp();
@@ -37702,7 +38074,6 @@ void Tool_mei2hum::processHairpin(hairpin_info& info) {
 		m_outdata.setDynamicsPresent(staffnum-1);
 	}
 
-
 	myit += measure;
 	mindex += measure;
 	gm = *myit;
@@ -37711,6 +38082,7 @@ void Tool_mei2hum::processHairpin(hairpin_info& info) {
 	found = false;
 	while (it != gm->end()) {
 		if (!(*it)->isDataSlice()) {
+			it++;
 			continue;
 		}
 		timestamp = (*it)->getTimestamp();
@@ -37734,7 +38106,6 @@ void Tool_mei2hum::processHairpin(hairpin_info& info) {
 		m_outdata.setDynamicsPresent(staffnum-1);
 	}
 
-	
 // ggg
 }
 
@@ -37825,6 +38196,10 @@ void Tool_mei2hum::addHeaderRecords(HumdrumFile& outfile, xml_document& doc) {
 	// lyricist is at /mei/meiHead/fileDesc/titleStmt/respStmt/persName@role="lyricist"
 	string lyricist = cleanReferenceRecordText(doc.select_node("/mei/meiHead/fileDesc/titleStmt/respStmt/persName[@role='lyricist']").node().child_value());
 
+	if (!m_systemDecoration.empty()) {
+		outfile.insertLine(0, "!!!system-decoration: " + m_systemDecoration);
+	}
+
 	if (!title.empty()) {
 		outfile.insertLine(0, "!!!OTL: " + title);
 	}
@@ -37834,6 +38209,7 @@ void Tool_mei2hum::addHeaderRecords(HumdrumFile& outfile, xml_document& doc) {
 	if (!composer.empty()) {
 		outfile.insertLine(0, "!!!COM: " + composer);
 	}
+
 }
 
 
@@ -37936,12 +38312,126 @@ void Tool_mei2hum::parseScoreDef(xml_node scoreDef, HumNum starttime) {
 		}
 	}
 
+	if (!children.empty()) {
+		string deco = prepareSystemDecoration(scoreDef);
+		if (!deco.empty()) {
+			m_systemDecoration = prepareSystemDecoration(scoreDef);
+		}
+	}
 }
+
 
 
 //////////////////////////////
 //
-// Tool_mei2hum::processPgFoot -- Dummy function since scoreDef/pgFoot is ignored.
+// Tool_mei2hum::prepareSystemDecoration --
+//
+
+string Tool_mei2hum::prepareSystemDecoration(xml_node scoreDef) {
+	NODE_VERIFY(scoreDef, "")
+	MAKE_CHILD_LIST(children, scoreDef);
+
+	if (children.empty()) {
+		return "";
+	}
+
+	string output;
+	for (int i=0; i<(int)children.size(); i++) {
+		getRecursiveSDString(output, children[i]);
+	}
+	string newoutput;
+	for (int i=0; i<(int)output.size(); i++) {
+		newoutput += output[i];
+		if (i < (int)output.size() - 1) {
+			if (std::isdigit(output[i]) && (output[i+1] == 's')) {
+				newoutput += ',';
+			}
+		}
+	}
+	return newoutput;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::getRecursiveSDString --
+//    <scoreDef key.sig="0" key.mode="minor" meter.count="4" meter.unit="4" meter.sym="common">
+//       <staffGrp n="1" barthru="false" symbol="bracket">
+//          <staffDef n="1" lines="5" clef.line="2" clef.shape="G"/>
+//          <staffDef n="2" lines="5" clef.line="4" clef.shape="F"/>
+//       </staffGrp>
+//    </scoreDef>
+//
+
+void Tool_mei2hum::getRecursiveSDString(string& output, xml_node current) {
+	string name = current.name();
+
+	if (name == "staffDef") {
+		xml_attribute natt = current.attribute("n");
+		if (!natt) {
+			cerr << "Error: unknown staff number for staffDef" << endl;
+			return;
+		}
+		int n = natt.as_int();
+		if (n < 1) {
+			cerr << "Staff number " << n << " must be positive" << endl;
+			return;
+		}
+		output += "s" + to_string(n);
+		return;
+	} else if (name == "staffGrp") {
+		vector<xml_node> children;
+		getChildrenVector(children, current);
+		if (children.empty()) {
+			// strange: no children in a staffGrp...
+			return;
+		}
+
+		bool barthru = true;
+		xml_attribute barthruatt = current.attribute("barthru");
+		if (barthruatt) {
+			string value = barthruatt.value();
+			if (value == "false")  {
+				barthru = false;
+			}
+		}
+		string prestring = "";
+		string poststring = "";
+		xml_attribute symbolattr = current.attribute("symbol");
+		if (symbolattr) {
+			string value = symbolattr.value();
+			if (value == "bracket") {
+				prestring = "[";
+				poststring = "]";
+			} else if (value == "brace") {
+				prestring = "{";
+				poststring = "}";
+			}
+		}
+		if (barthru) {
+			prestring += "(";
+			poststring.insert(0, ")");
+		}
+		output += prestring;
+		for (int i=0; i<(int)children.size(); i++) {
+			getRecursiveSDString(output, children[i]);
+		}
+		output += poststring;
+	} else if (name == "pgHead") {
+		return;
+	} else if (name == "pgFoot") {
+		return;
+	} else {
+		cerr << "Unknown element in scoreDef descendant: " << name << endl;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::processPgFoot -- Dummy function since scoreDef/pgFoot is currently ignored.
 //
 
 void Tool_mei2hum::processPgFoot(xml_node pgFoot, HumNum starttime) {
@@ -37953,7 +38443,7 @@ void Tool_mei2hum::processPgFoot(xml_node pgFoot, HumNum starttime) {
 
 //////////////////////////////
 //
-// Tool_mei2hum::processPgHead -- Dummy function since scoreDef/pgHead is ignored.
+// Tool_mei2hum::processPgHead -- Dummy function since scoreDef/pgHead is currently ignored.
 //
 
 void Tool_mei2hum::processPgHead(xml_node pgHead, HumNum starttime) {
@@ -38332,8 +38822,10 @@ HumNum Tool_mei2hum::parseSection(xml_node section, HumNum starttime) {
 			parseSb(children[i], starttime);
 		} else if (nodename == "pb") {   // page break;
 			parseSb(children[i], starttime);
-		} else if (nodename == "scoreDef") {   // usually page size information;
+		} else if (nodename == "scoreDef") {   // usually page size information
 			parseScoreDef(children[i], starttime);
+		} else if (nodename == "staffDef") {   // will this have any useful info?
+		   // ignore for now
 		} else {
 			cerr << DKHTP << section.name() << "/" << nodename << CURRLOC << endl;
 		}
@@ -38350,7 +38842,7 @@ HumNum Tool_mei2hum::parseSection(xml_node section, HumNum starttime) {
 //   later at if ever has musical content.
 //
 // Example:
-// 	<scoreDef page.height="1973" page.width="1524" page.leftmar="179" 
+// 	<scoreDef page.height="1973" page.width="1524" page.leftmar="179"
 //                 page.rightmar="90" page.topmar="118" page.botmar="112"/>
 //
 
@@ -38537,6 +39029,8 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 			// handled in process processNode(Start|Stop)Links()
 		} else if (nodename == "tupletSpan") {
 			// handled in process processNode(Start|Stop)Links()
+		} else if (nodename == "trill") {
+			// handled in process processNode(Start|Stop)Links()
 		} else if (nodename == "dynam") {
 			parseDynam(children[i], starttime);
 		} else if (nodename == "hairpin") {
@@ -38567,36 +39061,80 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 	}
 
 	HumNum measuredur = durations[0];
-	HumNum targetDur = m_measureDuration.at(0);
+	HumNum targetDur = m_measureDuration.at(0) / 4;
+	HumNum maxdur = 0;
+	bool overfilledQ = false;
 	if (!allequal) {
 		measuredur = targetDur;
 		for (int i=0; i<durations.size(); i++) {
+			if (durations[i] > maxdur) {
+				maxdur = durations[i];
+			}
 			if (durations[i] == targetDur) {
 				continue;
 			}
-			if (durations[i] QUARTER_CONVERT < targetDur) {
+			if (durations[i] < targetDur) {
+
+				HumNum difference = targetDur - durations[i];
+				string spacer = Convert::durationToRecip(difference QUARTER_CONVERT);
+				spacer += "ryy";
+
 				std::ostringstream message;
 				message << "Error: measure " << m_currentMeasure;
-				message << " staff " << i+1 << " is underfilled: ";
-				message << (durations[i] QUARTER_CONVERT).getFloat();
-				message << " quarter notes instead of ";
-// ggg
-				// message << (targetDur QUARTER_CONVERT).getFloat() << ".";
-				message << targetDur.getFloat() << ".";
+				message << ", staff " << i+1 << " is underfilled: ";
+				message << "adding token " << spacer;
+				message << " at end of measure to complete its duration.";
 				cerr << message.str() << endl;
+
+				// Add an invisible rest to fill in the problem spot.
+				// staff with multiple layers will have to be addressed as well...
+				m_outdata.back()->addDataToken(spacer, starttime QUARTER_CONVERT + 
+						durations[i] QUARTER_CONVERT, i, 0, 0, m_staffcount); 
+
+				// put an error message at the start of the measure warning about being underfilled
 				m_outdata.back()->addGlobalComment("!!" + message.str(), starttime QUARTER_CONVERT);
-			} else if (durations[i] QUARTER_CONVERT > targetDur) {
+
+			} else if (durations[i] > targetDur) {
 				std::ostringstream message;
 				message << "Error: measure " << m_currentMeasure;
 				message << " staff " << i+1 << " is overfilled: ";
 				message << (durations[i] QUARTER_CONVERT).getFloat();
 				message << " quarter notes instead of ";
-// ggg
-				// message << (targetDur QUARTER_CONVERT).getFloat() << ".";
-				message << targetDur.getFloat() << ".";
+				message << targetDur.getFloat() * 4 << ".";
 				cerr << message.str() << endl;
 				m_outdata.back()->addGlobalComment("!!" + message.str(), starttime QUARTER_CONVERT);
+
+				overfilledQ = true;
 			}
+		}
+	}
+
+	if (overfilledQ) {
+		// pad measures that are not under filled so that all 
+		// parts have the same maximum overfilling.
+		for (int i=0; i<durations.size(); i++) {
+			if (durations[i] == maxdur) {
+				continue;
+			}
+			HumNum difference = maxdur - durations[i];
+			string spacer = Convert::durationToRecip(difference QUARTER_CONVERT);
+			spacer += "ryy";
+
+			std::ostringstream message;
+			message << "Warning: measure " << m_currentMeasure;
+			message << ", staff " << i+1 << " padded. ";
+			message << "adding token " << spacer;
+			message << " at end ot measure to extend its duration.";
+			// cerr << message.str() << endl;
+
+			// Add an invisible rest to fill in the problem spot.
+			// staff with multiple layers will have to be addressed as well...
+			m_outdata.back()->addDataToken(spacer, starttime QUARTER_CONVERT + 
+					durations[i] QUARTER_CONVERT, i, 0, 0, m_staffcount); 
+
+			// put an error message at the start of the measure warning about being underfilled
+			m_outdata.back()->addGlobalComment("!!" + message.str(), starttime QUARTER_CONVERT);
+
 		}
 	}
 
@@ -38613,7 +39151,11 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 		gm->setRepeatBackwardStyle();
 	}
 
-	return starttime + measuredur;
+	if (overfilledQ) {
+		return starttime + maxdur;
+	} else {
+		return starttime + measuredur;
+	}
 }
 
 
@@ -38621,7 +39163,7 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 //////////////////////////////
 //
 // Tool_mei2hum::parseHairpin -- Process crescendo or dimuendo.
-// 
+//
 //    <hairpin tstamp="1" form="dim" place="below" staff="8" opening="0" endto="4" tstamp2="0m+4.667"/>
 //
 
@@ -38634,7 +39176,7 @@ void Tool_mei2hum::parseHairpin(xml_node hairpin, HumNum starttime) {
 		cerr << DKHTP << hairpin.name() << "/" << nodename << CURRLOC << endl;
 	}
 
-	// Store the hairpin for later parsing when more of the 
+	// Store the hairpin for later parsing when more of the
 	// score is known:
 	auto it = m_outdata.end();
 	it--;
@@ -38682,28 +39224,40 @@ HumNum Tool_mei2hum::parseStaff(xml_node staff, HumNum starttime) {
 	string n = staff.attribute("n").value();
 	int nnum = 0;
 	if (n.empty()) {
-		cerr << "Warning: no staff number on staff element" << endl;
+		cerr << "Warning: no staff number on staff element in measure " << m_currentMeasure << endl;
 	} else {
 		nnum = stoi(n);
 	}
 	if (nnum < 1) {
 		cerr << "Error: invalid staff number: " << nnum << endl;
+		m_currentStaff++;
+	} else {
+		m_currentStaff = nnum;
 	}
-	m_currentStaff = nnum;
 
 	if (m_maxStaffInFile < m_currentStaff) {
 		m_maxStaffInFile = m_currentStaff;
 	}
 
+	vector<bool> layerPresent;
 	vector<HumNum> durations;
 
 	for (int i=0; i<(int)children.size(); i++) {
 		string nodename = children[i].name();
 		if (nodename == "layer") {
-			durations.push_back(parseLayer(children[i], starttime) - starttime);
+			durations.push_back(parseLayer(children[i], starttime, layerPresent) - starttime);
 		} else {
 			cerr << DKHTP << staff.name() << "/" << nodename << CURRLOC << endl;
 		}
+	}
+
+	bool complete = true;
+	for (int i=0; i<(int)layerPresent.size(); i++) {
+		complete &= layerPresent[i];
+	}
+	if (!complete) {
+		// need to add invisible rests in un-specified layers.
+		cerr << "INCOMPLETE LAYERS IN STAFF" << endl;
 	}
 
 	// Check that the duration of each layer is the same here.
@@ -38721,40 +39275,6 @@ HumNum Tool_mei2hum::parseStaff(xml_node staff, HumNum starttime) {
 	}
 
 	HumNum staffdur = durations[0];
-
-	HumNum targetDur = m_measureDuration.at(m_currentStaff-1) / 4;;
-	if (!allequal) {
-		staffdur = targetDur;
-		for (int i=0; i<durations.size(); i++) {
-			if (durations[i] QUARTER_CONVERT == targetDur) {
-				continue;
-			}
-			if (durations[i] < targetDur) {
-				std::ostringstream message;
-				message << "Error: measure " << m_currentMeasure;
-				message << " staff " << m_currentStaff;
-				message << " layer " << i+1;
-				message << " is underfilled: ";
-				message << (durations[i] QUARTER_CONVERT).getFloat();
-				message << " quarter notes instead of ";
-				message << (targetDur QUARTER_CONVERT).getFloat() << ".";
-				cerr << message.str() << endl;
-				m_outdata.back()->addGlobalComment("!!" + message.str(), starttime QUARTER_CONVERT);
-			} else if (durations[i] > targetDur) {
-				std::ostringstream message;
-				message << "Error: measure " << m_currentMeasure;
-				message << " staff " << m_currentStaff;
-				message << " layer " << i+1;
-				message << " is overfilled: ";
-				message << (durations[i] QUARTER_CONVERT).getFloat();
-				message << " quarter notes instead of ";
-				message << (targetDur QUARTER_CONVERT).getFloat() << ".";
-				cerr << message.str() << endl;
-				m_outdata.back()->addGlobalComment("!!" + message.str(), starttime QUARTER_CONVERT);
-			}
-		}
-	}
-
 	m_currentStaff = 0;
 
 	return starttime + staffdur;
@@ -38767,22 +39287,50 @@ HumNum Tool_mei2hum::parseStaff(xml_node staff, HumNum starttime) {
 // Tool_mei2hum::parseLayer --
 //
 
-HumNum Tool_mei2hum::parseLayer(xml_node layer, HumNum starttime) {
+HumNum Tool_mei2hum::parseLayer(xml_node layer, HumNum starttime, vector<bool>& layerPresent) {
 	NODE_VERIFY(layer, starttime)
 	MAKE_CHILD_LIST(children, layer);
 
-
-	string n = layer.attribute("n").value();
 	int nnum = 0;
-	if (n.empty()) {
-		cerr << "Warning: no layer number on layer element" << endl;
+	xml_attribute nattr = layer.attribute("n");
+	if (!nattr) {
+		cerr << "Warning: no number on layer element, assigning it " << ++m_currentLayer << endl;
+		nnum = m_currentLayer;
 	} else {
-		nnum = stoi(n);
+		nnum = nattr.as_int();
 	}
 	if (nnum < 1) {
-		cerr << "Error: invalid layer number: " << nnum << endl;
+		cerr << "Error: Ignoring layer with invalid number: " << nnum 
+		     << " in measure " << m_currentMeasure
+		     << ", staff " << m_currentStaff << endl;
+		return starttime;
+	}
+	if (nnum > 8) {
+		cerr << "Error: Ignoring layer with ridiculous number: " << nnum 
+		     << " in measure " << m_currentMeasure
+		     << ", staff " << m_currentStaff << endl;
+		return starttime;
 	}
 	m_currentLayer = nnum;
+
+	// grow Layer array if necessary:
+	if (layerPresent.size() < m_currentLayer) {
+		int oldsize = (int)layerPresent.size();
+		layerPresent.resize(m_currentLayer);
+		for (int i=oldsize; i<m_currentLayer; i++) {
+			layerPresent.at(i) = false;
+		}
+   }
+
+	if (layerPresent.at(m_currentLayer - 1)) {
+		cerr << "Error: measure " << m_currentMeasure
+		     << ", staff " << m_currentStaff
+		     << ": layer " << m_currentLayer << " is duplicated on staff: "
+		     << m_currentStaff << ". Ignoring duplicate layer." << endl;
+		return starttime;
+	} else {
+		layerPresent.at(m_currentLayer - 1) = true;
+	}
 
 	HumNum  starting = starttime;
 	string dummy;
@@ -39068,7 +39616,7 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output,
 					cerr << "STRANGE ERROR IN GRACE NOTE PARSING" << endl;
 					cerr << "\tSTARTTIME: " << starttime << endl;
 					cerr << "\tGRACETIME: " << m_gracetime << endl;
-				} 
+				}
 			} else {
 				m_gracetime = starttime;
 			}
@@ -39172,6 +39720,9 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output,
 		if ((nodename == "verse") && (dataslice != NULL)) {
 			hasverse = true;
 			parseVerse(children[i], dataslice->at(m_currentStaff-1)->at(0));
+		} else if ((nodename == "syl") && (dataslice != NULL)) {
+			hasverse = true;
+			parseBareSyl(children[i], dataslice->at(m_currentStaff-1)->at(0));
 		} else if (nodename == "artic") {
 			// handled elsewhere: don't do anything
 		} else if (nodename == "accid") {
@@ -39203,7 +39754,7 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output,
 
 //////////////////////////////
 //
-// Tool_mei2hum::parseSylAttribute -- 
+// Tool_mei2hum::parseSylAttribute --
 //
 
 void Tool_mei2hum::parseSylAttribute(const string& attsyl, GridStaff* staff) {
@@ -39538,6 +40089,9 @@ string Tool_mei2hum::getHumdrumArticulation(const string& tag, const string& hum
 //
 
 string Tool_mei2hum::setPlacement(const string& placement) {
+	if (!m_placeQ) {
+		return "";
+	}
 	if (placement == "above") {
 		m_aboveQ = true;
 		return ">";
@@ -39611,10 +40165,17 @@ void Tool_mei2hum::processLinkedNodes(string& output, xml_node node) {
 
 //////////////////////////////
 //
-// Tool_mei2hum::getDotCount --
+// Tool_mei2hum::getDotCount --  Get dot count from first note in chord if no @dur on chord.
 //
 
 int Tool_mei2hum::getDotCount(xml_node node) {
+	string name = node.name();
+	if (name == "chord") {
+		if (!node.attribute("dur")) {
+			node = node.select_node(".//note").node();
+		}
+	}
+
 	string dots = node.attribute("dots").value();
 	int dotcount = 0;
 	if (dots != "") {
@@ -39641,6 +40202,8 @@ void Tool_mei2hum::processNodeStartLinks(string& output, xml_node node,
 			parseSlurStart(output, node, nodelist[i]);
 		} else if (nodename == "tie") {
 			parseTieStart(output, node, nodelist[i]);
+		} else if (nodename == "trill") {
+			parseTrill(output, node, nodelist[i]);
 		} else if (nodename == "arpeg") {
 			parseArpeg(output, node, nodelist[i]);
 		} else if (nodename == "tupletSpan") {
@@ -39656,7 +40219,7 @@ void Tool_mei2hum::processNodeStartLinks(string& output, xml_node node,
 
 //////////////////////////////
 //
-// Tool_mei2hum::processNodeStartLinks2 -- process tupletSpan before the 
+// Tool_mei2hum::processNodeStartLinks2 -- process tupletSpan before the
 //     duration of the note/rest/chord is calculated.
 //
 
@@ -39674,14 +40237,14 @@ void Tool_mei2hum::processNodeStartLinks2(xml_node node,
 
 //////////////////////////////
 //
-// Tool_mei2hum::parseTupletSpanStart -- 
+// Tool_mei2hum::parseTupletSpanStart --
 //     Such as:
 //          <tupletSpan staff="10" num="3" numbase="2" num.visible="true"
 //                num.place="below" num.format="count" startid="#4235235"
 //                endid="#532532"/>
 //
 
-void Tool_mei2hum::parseTupletSpanStart(xml_node node, 
+void Tool_mei2hum::parseTupletSpanStart(xml_node node,
 		xml_node tupletSpan) {
 	NODE_VERIFY(tupletSpan, )
 
@@ -39722,14 +40285,14 @@ void Tool_mei2hum::parseTupletSpanStart(xml_node node,
 
 //////////////////////////////
 //
-// Tool_mei2hum::parseTupletSpanStop -- 
+// Tool_mei2hum::parseTupletSpanStop --
 //     Such as:
 //          <tupletSpan staff="10" num="3" numbase="2" num.visible="true"
 //                num.place="below" num.format="count" startid="#4235235"
 //                endid="#532532"/>
 //
 
-void Tool_mei2hum::parseTupletSpanStop(string& output, xml_node node, 
+void Tool_mei2hum::parseTupletSpanStop(string& output, xml_node node,
 		xml_node tupletSpan) {
 	NODE_VERIFY(tupletSpan, )
 
@@ -39897,6 +40460,33 @@ void Tool_mei2hum::parseTieStart(string& output, xml_node node, xml_node tie) {
 		     << nodename << " element" << endl;
 		return;
 	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::parseTrill --
+//
+
+void Tool_mei2hum::parseTrill(string& output, xml_node node, xml_node trill) {
+	NODE_VERIFY(trill, )
+
+	auto loc = output.find(";");
+	if (loc != string::npos) {
+		output.insert(loc, "T");
+		return;
+	}
+
+	loc = output.find(")");
+	if (loc != string::npos) {
+		output.insert(loc, "T");
+		return;
+	}
+
+	output += "T";
+
+	// Deal with endid attribute on trills later.
 }
 
 
@@ -40088,11 +40678,32 @@ string Tool_mei2hum::getHumdrumPitch(xml_node note) {
 
 //////////////////////////////
 //
-// Tool_mei2hum::getDuration --
+// Tool_mei2hum::getDuration -- Get duration from note or chord.  If chord does not
+//    have @dur then use @dur of first note in children elements.
 //
 
 HumNum Tool_mei2hum::getDuration(xml_node element) {
-	string dur = element.attribute("dur").value();
+	xml_attribute dur_attr = element.attribute("dur");
+	string name = element.name();
+	if ((!dur_attr) && (name == "note")) {
+		// real notes must have durations, but this one
+		// does not, so assign zero duration
+		return 0;
+	}
+	if ((!dur_attr) && (name == "chord")) {
+		// if there is no dur attribute on a chord, then look for it
+		// on the first note subelement of the chord.
+		auto newelement = element.select_node(".//note").node();
+		if (newelement) {
+			element = newelement;
+			dur_attr = element.attribute("dur");
+			name = element.name();
+		} else {
+			return 0;
+		}
+	}
+
+	string dur = dur_attr.value();
 	if (dur == "") {
 		return 0;
 	}
@@ -40146,7 +40757,7 @@ HumNum Tool_mei2hum::getDuration(xml_node element) {
 
 //////////////////////////////
 //
-// Tool_mei2hum::parseVerse -- 
+// Tool_mei2hum::parseVerse --
 //
 
 void Tool_mei2hum::parseVerse(xml_node verse, GridStaff* staff) {
@@ -40181,6 +40792,42 @@ void Tool_mei2hum::parseVerse(xml_node verse, GridStaff* staff) {
 			cerr << DKHTP << verse.name() << "/" << nodename << CURRLOC << endl;
 		}
 	}
+
+	if (versetext == "") {
+		// nothing to store
+		return;
+	}
+
+	staff->setVerse(nnum-1, versetext);
+	reportVerseNumber(nnum, m_currentStaff-1);
+
+	return;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::parseBareSyl -- Only one syl allows as a bar child of note element.
+//     This function is used to process syl elements that are not wrapped in a verse element.
+//
+
+void Tool_mei2hum::parseBareSyl(xml_node syl, GridStaff* staff) {
+	NODE_VERIFY(syl, )
+
+	int nnum = 1;
+	xml_attribute n_attr = syl.attribute("n");
+	if (n_attr) {
+		nnum = n_attr.as_int();
+	}
+	
+	if (nnum < 1) {
+		cerr << "Warning: invalid layer number: " << nnum << endl;
+		cerr << "Setting it to 1." << endl;
+		nnum = 1;
+	}
+
+	string versetext = parseSyl(syl);
 
 	if (versetext == "") {
 		// nothing to store
@@ -40370,9 +41017,10 @@ void Tool_mei2hum::getChildrenVector(vector<xml_node>& children,
 //
 
 void Tool_mei2hum::initialize(void) {
-	m_recipQ   = getBoolean("recip");
-	m_stemsQ   = getBoolean("stems");
-	m_appLabel = getString("app-label");
+	m_recipQ   =  getBoolean("recip");
+	m_stemsQ   =  getBoolean("stems");
+	m_appLabel =  getString("app-label");
+	m_placeQ   = !getBoolean("no-place");
 }
 
 
@@ -40514,14 +41162,22 @@ void Tool_mei2hum::parseDir(xml_node dir, HumNum starttime) {
 		return;
 	}
 
-	int staffnum = dir.attribute("staff").as_int();
-	if (staffnum == 0) {
-		cerr << "Error: staff number required on dir element in measure " << m_currentMeasure  << endl;
+	xml_attribute atstaffnum = dir.attribute("staff");
+	if (!atstaffnum) {
+		cerr << "Error: staff number required on dir element in measure "
+		     << m_currentMeasure  << " (ignoring text: " << cleanWhiteSpace(text) << ")" << endl;
 		return;
 	}
-	double meterunit = m_currentMeterUnit[staffnum - 1];
+	int staffnum = dir.attribute("staff").as_int();
+	if (staffnum <= 0) {
+		cerr << "Error: staff number on dir element in measure should be positive.\n";
+		cerr << "Instead the staff number is: " << m_currentMeasure  << " (ignoring text: " <<  cleanWhiteSpace(text) << ")" << endl;
+		return;
+	}
 
+	double meterunit = m_currentMeterUnit[staffnum - 1];
 	double tsd = (stof(ts)-1) * 4.0 / meterunit;
+
 	GridMeasure* gm = m_outdata.back();
 	double tsm = gm->getTimestamp().getFloat();
 	bool foundslice = false;
@@ -40587,13 +41243,11 @@ void Tool_mei2hum::parseDir(xml_node dir, HumNum starttime) {
 
 //////////////////////////////
 //
-// Tool_mei2hum::cleanDirText -- convert ":" to "&colon;".
-//     Remove tabs and newlines, and trim spaces.  Maybe allow
-//     newlines using "\n" and allow font changes in the future.
-//     Do accents later perhaps or monitor for UTF-8.
+// Tool_mei2hum::cleanWhiteSpace -- Convert newlines to "\n", and trim spaces.
+//    Also remove more than one space in a row.
 //
 
-string Tool_mei2hum::cleanDirText(const string& input) {
+string Tool_mei2hum::cleanWhiteSpace(const string& input) {
 	string output;
 	output.reserve(input.size() + 8);
 	bool foundstart = false;
@@ -40602,12 +41256,18 @@ string Tool_mei2hum::cleanDirText(const string& input) {
 			continue;
 		}
 		foundstart = true;
-		if (input[i] == ':') {
-			output += "&colon;";
-		} else if (input[i] == '\t') {
-			output += ' ';
+		if (input[i] == '\t') {
+			if ((!output.empty()) && (output.back() != ' ')) {
+				output += ' ';
+			}
 		} else if (input[i] == '\n') {
-			output += ' ';
+			if ((!output.empty()) && (output.back() != ' ')) {
+				output += ' ';
+			}
+		} else if (input[i] == ' ') {
+			if ((!output.empty()) && (output.back() != ' ')) {
+				output += ' ';
+			}
 		} else {
 			output += input[i];
 		}
@@ -40623,8 +41283,53 @@ string Tool_mei2hum::cleanDirText(const string& input) {
 
 //////////////////////////////
 //
-// Tool_mei2hum::cleanVerseText -- 
-//     Remove tabs and newlines, and trim spaces. 
+// Tool_mei2hum::cleanDirText -- convert ":" to "&colon;".
+//     Remove tabs and newlines, and trim spaces.  Maybe allow
+//     newlines using "\n" and allow font changes in the future.
+//     Remove redundant whitespace. Do accents later perhaps or
+//     monitor for UTF-8.
+//
+
+string Tool_mei2hum::cleanDirText(const string& input) {
+	string output;
+	output.reserve(input.size() + 8);
+	bool foundstart = false;
+	for (int i=0; i<(int)input.size(); i++) {
+		if ((!foundstart) && std::isspace(input[i])) {
+			continue;
+		}
+		foundstart = true;
+		if (input[i] == ':') {
+			output += "&colon;";
+		} else if (input[i] == '\t') {
+			if ((!output.empty()) && (output.back() != ' ')) {
+				output += ' ';
+			}
+		} else if (input[i] == '\n') {
+			if ((!output.empty()) && (output.back() != ' ')) {
+				output += ' ';
+			}
+		} else if (input[i] == ' ') {
+			if ((!output.empty()) && (output.back() != ' ')) {
+				output += ' ';
+			}
+		} else {
+			output += input[i];
+		}
+	}
+	while ((!output.empty()) && (output.back() == ' ')) {
+		output.pop_back();
+	}
+
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::cleanVerseText --
+//     Remove tabs and newlines, and trim spaces.
 //     Do accents later perhaps or monitor for UTF-8.
 //
 
@@ -40710,12 +41415,12 @@ string Tool_mei2hum::cleanReferenceRecordText(const string& input) {
 //
 // tempo@midi.bpm == tempo per quarter note (Same as Humdrum *MM value)
 //
-// tempo@midi.mspb == microseconds per quarter note ( bpm = mspb * 60 / 1000000) 
+// tempo@midi.mspb == microseconds per quarter note ( bpm = mspb * 60 / 1000000)
 //
 // tempo@mm == tempo per beat (bpm = mm / unit(dots))
 // tempo@mm.unit == beat unit for tempo@mm
 // tempo@mm.dots == dots for tempo@unit
-// 
+//
 // Free-form text:
 //
 // &#xE1D5; == quarter note
@@ -40796,7 +41501,7 @@ void Tool_mei2hum::parseTempo(xml_node tempo, HumNum starttime) {
 		return;
 	}
 
-	// insert tempo 
+	// insert tempo
 	GridMeasure* gm = m_outdata.back();
 	GridSlice* gs = new GridSlice(gm, starttime, SliceType::Tempos, m_maxStaffInFile);
 	stringstream stok;
@@ -40845,9 +41550,39 @@ void Tool_mei2hum::parseTempo(xml_node tempo, HumNum starttime) {
 
 void Tool_mei2hum::parseDynam(xml_node dynam, HumNum starttime) {
 	NODE_VERIFY(dynam, )
+	MAKE_CHILD_LIST(children, dynam);
 
 	string text = dynam.child_value();
-	// maybe check for valid text content here.
+
+	if (text.empty()) { // looking at <rend> sub-elements
+		int count = 0;
+		for (int i=0; i<(int)children.size(); i++) {
+			string nodename = children[i].name();
+			if (nodename == "rend") {
+				if (count) {
+					text += " ";
+				}
+				count++;
+				text += children[i].child_value();
+				//if (strcmp(children[i].attribute("fontstyle").value(), "normal") == 0) {
+				//	font = "";  // normal is default in Humdrum layout
+				//}
+				//if (strcmp(children[i].attribute("fontweight").value(), "bold") == 0) {
+				//	font += "B";  // normal is default in Humdrum layout
+				//}
+			} else if (nodename == "") {
+				// text node
+				if (count) {
+					text += " ";
+				}
+				count++;
+				text += children[i].value();
+			} else {
+				cerr << DKHTP << dynam.name() << "/" << nodename << CURRLOC << endl;
+			}
+		}
+	}
+
 	if (text.empty()) {
 		return;
 	}
@@ -40886,7 +41621,7 @@ void Tool_mei2hum::parseDynam(xml_node dynam, HumNum starttime) {
 		double gsts = gs->getTimestamp().getFloat();
 		double difference = (gsts-tsm) - tsd;
 		if (difference < tolerance) {
-			// did not find data line at exact timestamp, so move 
+			// did not find data line at exact timestamp, so move
 			// the dynamic to the next event. Maybe think about adding
 			// a new timeslice for the dynamic.
 			nextgs = gs;
@@ -41714,6 +42449,8 @@ bool Tool_musicxml2hum::convert(ostream& out, const char* input) {
 bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	initialize();
 
+// ggg
+
 	bool status = true; // for keeping track of problems in conversion process.
 
 	setSoftwareInfo(doc);
@@ -41748,8 +42485,19 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	}
 	status &= stitchParts(outdata, partids, partinfo, partcontent, partdata);
 
+	if (outdata.size() > 2) {
+		if (outdata.at(0)->getDuration() == 0) {
+			while (!outdata.at(0)->empty()) {
+				outdata.at(1)->push_front(outdata.at(0)->back());
+				outdata.at(0)->pop_back();
+			}
+			outdata.deleteMeasure(0);
+		}
+	}
+
 	outdata.removeRedundantClefChanges();
 	outdata.removeSibeliusIncipit();
+	m_systemDecoration = getSystemDecoration(doc, outdata, partids);
 
 	// tranfer verse counts from parts/staves to HumGrid:
 	// should also do part verse counts here (-1 staffindex).
@@ -41856,6 +42604,10 @@ string Tool_musicxml2hum::cleanSpaces(string& input) {
 void Tool_musicxml2hum::addHeaderRecords(HumdrumFile& outfile, xml_document& doc) {
 	string xpath;
 	HumRegex hre;
+
+	if (!m_systemDecoration.empty()) {
+		outfile.insertLine(0, "!!!system-decoration: " + m_systemDecoration);
+	}
 
 	// OTL: title //////////////////////////////////////////////////////////
 
@@ -42135,6 +42887,9 @@ bool Tool_musicxml2hum::fillPartData(MxmlPart& partdata,
 	if (m_stemsQ) {
 		partdata.enableStems();
 	}
+
+	partdata.parsePartInfo(partdeclaration);
+	
 	int count;
 	auto measures = partcontent.select_nodes("./measure");
 	for (int i=0; i<(int)measures.size(); i++) {
@@ -42204,7 +42959,75 @@ void Tool_musicxml2hum::printPartInfo(vector<string>& partids,
 
 //////////////////////////////
 //
-// stitchParts -- Merge individual parts into a single score sequence.
+// Tool_musicxml2hum::insertPartNames -- 
+//
+
+void Tool_musicxml2hum::insertPartNames(HumGrid& outdata, vector<MxmlPart>& partdata) {
+
+	bool hasname = false;
+	bool hasabbr = false;
+
+	for (int i=0; i<(int)partdata.size(); i++) {
+		string value;
+		value = partdata[i].getPartName();
+		if (!value.empty()) {
+			hasname = true;
+			break;
+		}
+	}
+
+	for (int i=0; i<(int)partdata.size(); i++) {
+		string value;
+		value = partdata[i].getPartAbbr();
+		if (!value.empty()) {
+			hasabbr = true;
+			break;
+		}
+	}
+
+	if (!(hasabbr || hasname)) {
+		return;
+	}
+
+	GridMeasure* gm;
+	if (outdata.empty()) {
+		gm = new GridMeasure(&outdata);
+		outdata.push_back(gm);
+	} else {
+		gm = outdata.back();
+	}
+
+	if (hasname) {
+		for (int i=0; i<(int)partdata.size(); i++) {
+			string partname = partdata[i].getPartName();
+			if (partname.empty()) {
+				continue;
+			}
+			string name = "*I\"" + partname;
+			gm->addLabelToken(name, 0, i, 0, 0, (int)partdata.size());
+		}
+	}
+
+	if (hasabbr) {
+		for (int i=0; i<(int)partdata.size(); i++) {
+			string partabbr = partdata[i].getPartAbbr();
+			if (partabbr.empty()) {
+				continue;
+			}
+			string abbr = "*I'" + partabbr;
+			gm->addLabelAbbrToken(abbr, 0, i, 0, 0, (int)partdata.size());
+		}
+	}
+// ggg
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::stitchParts -- Merge individual parts into a 
+//     single score sequence.
 //
 
 bool Tool_musicxml2hum::stitchParts(HumGrid& outdata,
@@ -42230,6 +43053,8 @@ bool Tool_musicxml2hum::stitchParts(HumGrid& outdata,
 	for (i=0; i<(int)partstaves.size(); i++) {
 		partstaves[i] = partdata[i].getStaffCount();
 	}
+
+	insertPartNames(outdata, partdata);
 
 	bool status = true;
 	int m;
@@ -44351,6 +45176,165 @@ void Tool_musicxml2hum::printAttributes(xml_node node) {
 		     << "\tname  = " << at.name()
 		     << "\tvalue = " << at.value()
 		     << endl;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::getSystemDecoration --
+//
+// Example:  [1,2]{(3,4)}
+//
+//  <part-list>
+//    <part-group type="start" number="1">
+//      <group-symbol>bracket</group-symbol>
+//    </part-group>
+//
+//    <score-part id="P1">
+//      <part-name>S A</part-name>
+//      <score-instrument id="P1-I1">
+//        <instrument-name>Soprano/Alto</instrument-name>
+//      </score-instrument>
+//      <midi-device id="P1-I1" port="1"></midi-device>
+//      <midi-instrument id="P1-I1">
+//        <midi-channel>1</midi-channel>
+//        <midi-program>53</midi-program>
+//        <volume>78.7402</volume>
+//        <pan>0</pan>
+//      </midi-instrument>
+//    </score-part>
+//
+//    <score-part id="P2">
+//      <part-name>T B</part-name>
+//      <score-instrument id="P2-I1">
+//        <instrument-name>Tenor/Bass</instrument-name>
+//      </score-instrument>
+//      <midi-device id="P2-I1" port="1"></midi-device>
+//      <midi-instrument id="P2-I1">
+//        <midi-channel>2</midi-channel>
+//        <midi-program>53</midi-program>
+//        <volume>78.7402</volume>
+//        <pan>0</pan>
+//      </midi-instrument>
+//    </score-part>
+// 
+//    <part-group type="stop" number="1"/>
+//
+//    <score-part id="P3">
+//      <part-name>Organ</part-name>
+//      <part-abbreviation>Org.</part-abbreviation>
+//      <score-instrument id="P3-I1">
+//        <instrument-name>Pipe Organ</instrument-name>
+//      </score-instrument>
+//      <midi-device id="P3-I1" port="1"></midi-device>
+//      <midi-instrument id="P3-I1">
+//        <midi-channel>3</midi-channel>
+//        <midi-program>76</midi-program>
+//        <volume>78.7402</volume>
+//        <pan>0</pan>
+//      </midi-instrument>
+//    </score-part>
+//
+//  </part-list>
+//
+
+string Tool_musicxml2hum::getSystemDecoration(xml_document& doc, HumGrid& grid, 
+	vector<string>& partids) {
+
+	xml_node partlist = doc.select_node("/score-partwise/part-list").node();
+	if (!partlist) {
+		cerr << "Error: cannot find partlist\n";
+		return "";
+	}
+	vector<xml_node> children;
+	getChildrenVector(children, partlist);
+
+	vector<vector<int>> staffnumbers;
+	int pcount = grid.getPartCount();
+	staffnumbers.resize(pcount);
+
+	int scounter = 1;
+	for (int i=0; i<pcount; i++) {
+		int staffcount = grid.getStaffCount(i);
+		for (int j=0; j<staffcount; j++) {
+			staffnumbers[i].push_back(scounter++);
+		}
+	}
+
+	string output;
+
+	// part-group @type=start @number=1
+   //   <group-symbol>bracket</group-symbol>
+	// score-part
+	// score-part
+	// part-group @type=stop @number=1
+	// score-part
+	int pcounter = 0;
+	scounter = 1;
+	vector<string> typeendings(100);
+	for (int i=0; i<(int)children.size(); i++) {
+		string name = children[i].name();
+		if (name == "part-group") {
+			string grouptype = children[i].attribute("type").value();
+			string gsymbol = "";
+			int number = children[i].attribute("number").as_int();
+			if (grouptype == "start") {
+				string g = children[i].select_node("//group-symbol").node().child_value();
+				if (g == "bracket") {
+					output += "[(";
+					typeendings[number] = ")]";
+				} else if (g == "brace") {
+					output += "[(";
+					typeendings[number] = ")]";
+				} else {
+					cerr << "Unknown part grouping symbol: " << g << endl;
+				}
+			} else if (grouptype == "stop") {
+				output += typeendings[number];
+				typeendings[number].clear();
+			}
+		} else if (name == "score-part") {
+			pcounter++;
+			int staffcount = grid.getStaffCount(pcounter-1);
+			if (staffcount == 1) {
+				output += "s" + to_string(scounter++);
+			} else if (staffcount > 1) {
+				output += "{(";
+				for (int k=0; k<staffcount; k++) {
+					output += "s" + to_string(scounter++);
+				}
+				output += ")}";
+			}
+		}
+	}
+
+	string newoutput;
+	for (int i=0; i<output.size(); i++) {
+		if ((i>0) && (output[i] == 's') && isdigit(output[i-1])) {
+			newoutput += ',';
+		}
+		newoutput += output[i];
+	}
+
+	return newoutput;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::getChildrenVector -- Return a list of all children elements
+//   of a given element.  Pugixml does not allow random access, but storing
+//   them in a vector allows that possibility.
+//
+
+void Tool_musicxml2hum::getChildrenVector(vector<xml_node>& children,
+		xml_node parent) {
+	children.clear();
+	for (xml_node child : parent.children()) {
+		children.push_back(child);
 	}
 }
 
