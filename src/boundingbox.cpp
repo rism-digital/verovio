@@ -60,16 +60,16 @@ void BoundingBox::UpdateContentBBoxX(int x1, int x2)
 {
     // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
 
-    int min_x = std::min(x1, x2);
-    int max_x = std::max(x1, x2);
+    int minX = std::min(x1, x2);
+    int maxX = std::max(x1, x2);
 
     int drawingX = GetDrawingX();
 
-    min_x -= drawingX;
-    max_x -= drawingX;
+    minX -= drawingX;
+    maxX -= drawingX;
 
-    if (m_contentBB_x1 > min_x) m_contentBB_x1 = min_x;
-    if (m_contentBB_x2 < max_x) m_contentBB_x2 = max_x;
+    if (m_contentBB_x1 > minX) m_contentBB_x1 = minX;
+    if (m_contentBB_x2 < maxX) m_contentBB_x2 = maxX;
 
     // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
     // GetClassName().c_str());
@@ -98,16 +98,16 @@ void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
 {
     // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 
-    int min_x = std::min(x1, x2);
-    int max_x = std::max(x1, x2);
+    int minX = std::min(x1, x2);
+    int maxX = std::max(x1, x2);
 
     int drawingX = GetDrawingX();
 
-    min_x -= drawingX;
-    max_x -= drawingX;
+    minX -= drawingX;
+    maxX -= drawingX;
 
-    if (m_selfBB_x1 > min_x) m_selfBB_x1 = min_x;
-    if (m_selfBB_x2 < max_x) m_selfBB_x2 = max_x;
+    if (m_selfBB_x1 > minX) m_selfBB_x1 = minX;
+    if (m_selfBB_x2 < maxX) m_selfBB_x2 = maxX;
 
     m_updatedBBoxX = true;
 
