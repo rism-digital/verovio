@@ -57,7 +57,7 @@ bool dir_exists(string dir)
 
 void display_version()
 {
-    cerr << "Verovio " << GetVersion() << endl;
+    cerr << "Verovio " << vrv::GetVersion() << endl;
 }
 
 void display_usage()
@@ -360,7 +360,7 @@ int main(int argc, char **argv)
         }
     }
 
-    if (outformat != "svg" && outformat != "mei" && outformat != "midi" && outformat != "humdrum") {
+    if (outformat != "svg" && outformat != "mei" && outformat != "midi" && outformat != "humdrum" && outformat != "svgmidi") {
         cerr << "Output format can only be 'mei', 'svg', 'midi', or 'humdrum'." << endl;
         exit(1);
     }
@@ -454,6 +454,38 @@ int main(int argc, char **argv)
             cerr << "Output written to " << outfile << "." << endl;
         }
     }
+	else if (outformat == "svgmidi") {
+		outfile += ".mid";
+		if (std_output) {
+			cerr << "Midi cannot write to standard output." << endl;
+			exit(1);
+		}
+		else if (!toolkit.RenderToMidiFile(outfile)) {
+			cerr << "Unable to write MIDI to " << outfile << "." << endl;
+			exit(1);
+		}
+		else {
+			cerr << "Output written to " << outfile << "." << endl;
+			int p;
+			for (p = from; p < to; p++) {
+				std::string cur_outfile = outfile;
+				if (all_pages) {
+					cur_outfile += StringFormat("_%03d", p);
+				}
+				cur_outfile += ".svg";
+				if (std_output) {
+					cout << toolkit.RenderToSvg(p);
+				}
+				else if (!toolkit.RenderToSvgFile(cur_outfile, p)) {
+					cerr << "Unable to write SVG to " << cur_outfile << "." << endl;
+					exit(1);
+				}
+				else {
+					cerr << "Output written to " << cur_outfile << "." << endl;
+				}
+			}
+		}
+	}
     else if (outformat == "humdrum") {
         outfile += ".krn";
         if (std_output) {

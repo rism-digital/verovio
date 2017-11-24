@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
@@ -1202,10 +1203,13 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
             dur = chord->GetAlignmentDuration();
         else
             dur = note->GetAlignmentDuration();
-        dur = dur * params->m_currentBpm / (DUR_MAX / DURATION_4);
+		dur = dur * params->m_currentBpm / (DUR_MAX / DURATION_4);
 
-        // LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
-        // note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
+        // 
+		//LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
+		
+		std::cout << "Note: ID: " << note->GetUuid() << " " << " Dur: " << dur << " " << std::endl;
+		// note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
         // LogDebug("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
 
         Accid *accid = note->GetDrawingAccid();
