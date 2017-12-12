@@ -152,7 +152,7 @@ bool LayerElement::GetDrawingCueSize()
     return m_drawingCueSize;
 }
 
-bool LayerElement::IsInLigature()
+bool LayerElement::IsInLigature() const
 {
     if (!this->Is(NOTE)) return false;
     return (this->GetFirstParent(LIGATURE, MAX_LIGATURE_DEPTH));
@@ -566,7 +566,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         assert(false);
     }
     // We do not align these (formely container). Any other?
-    else if (this->Is({ BEAM, FTREM, TUPLET })) {
+    else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
         return FUNCTOR_CONTINUE;
     }
     else if (this->Is(BARLINE)) {

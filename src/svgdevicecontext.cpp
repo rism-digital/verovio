@@ -41,7 +41,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
     SetBrush(AxBLACK, AxSOLID);
     SetPen(AxBLACK, 1, AxSOLID);
 
-    m_smufl_glyphs.clear();
+    m_smuflGlyphs.clear();
 
     m_committed = false;
     m_vrvTextFont = false;
@@ -103,14 +103,14 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     }
 
     // header
-    if (m_smufl_glyphs.size() > 0) {
+    if (m_smuflGlyphs.size() > 0) {
 
         pugi::xml_node defs = m_svgNode.prepend_child("defs");
         pugi::xml_document sourceDoc;
 
         // for each needed glyph
         std::vector<std::string>::const_iterator it;
-        for (it = m_smufl_glyphs.begin(); it != m_smufl_glyphs.end(); ++it) {
+        for (it = m_smuflGlyphs.begin(); it != m_smuflGlyphs.end(); ++it) {
             // load the XML file that contains it as a pugi::xml_document
             std::ifstream source((*it).c_str());
             sourceDoc.load(source);
@@ -749,9 +749,9 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         std::string path = glyph->GetPath();
 
         // Add the glyph to the array for the <defs>
-        std::vector<std::string>::const_iterator it = std::find(m_smufl_glyphs.begin(), m_smufl_glyphs.end(), path);
-        if (it == m_smufl_glyphs.end()) {
-            m_smufl_glyphs.push_back(path);
+        std::vector<std::string>::const_iterator it = std::find(m_smuflGlyphs.begin(), m_smuflGlyphs.end(), path);
+        if (it == m_smuflGlyphs.end()) {
+            m_smuflGlyphs.push_back(path);
         }
 
         // Write the char in the SVG

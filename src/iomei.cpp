@@ -376,9 +376,8 @@ bool MeiOutput::WriteObject(Object *object)
         WriteMeiKeySig(m_currentNode, dynamic_cast<KeySig *>(object));
     }
     else if (object->Is(LIGATURE)) {
-        LogError("WriteMeiLigature not implemented. (MeiOutput::WriteObject)");
-        // m_currentNode = m_currentNode.append_child("ligature");
-        // WriteMeiLigature(m_currentNode, dynamic_cast<KeySig *>(object));
+        m_currentNode = m_currentNode.append_child("ligature");
+        WriteMeiLigature(m_currentNode, dynamic_cast<Ligature *>(object));
     }
     else if (object->Is(MENSUR)) {
         m_currentNode = m_currentNode.append_child("mensur");
@@ -1165,6 +1164,14 @@ void MeiOutput::WriteMeiKeySig(pugi::xml_node currentNode, KeySig *keySig)
     keySig->WritePitch(currentNode);
 }
 
+void MeiOutput::WriteMeiLigature(pugi::xml_node currentNode, Ligature *ligature)
+{
+    assert(ligature);
+
+    WriteLayerElement(currentNode, ligature);
+    ligature->WriteLigatureLog(currentNode);
+}
+    
 void MeiOutput::WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur)
 {
     assert(mensur);
@@ -3222,10 +3229,7 @@ bool MeiInput::ReadMeiLigature(Object *parent, pugi::xml_node ligature)
     Ligature *vrvLigature = new Ligature();
     SetMeiUuid(ligature, vrvLigature);
 
-    ReadDurationInterface(ligature, vrvLigature);
-    vrvLigature->ReadStems(ligature);
-    vrvLigature->ReadStemsCmn(ligature);
-    vrvLigature->ReadTiePresent(ligature);
+    vrvLigature->ReadLigatureLog(ligature);
 
     parent->AddChild(vrvLigature);
     return ReadMeiLayerChildren(vrvLigature, ligature, vrvLigature);

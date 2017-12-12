@@ -296,22 +296,22 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
 
         // Calculate position for number 0x82
         // since the number is slanted, move the center left
-        int txt_x = x1 - (extend.m_width / 2);
+        int txtX = x1 - (extend.m_width / 2);
         // and move it further, when it is under the stave
         if (direction == STEMDIRECTION_down) {
-            txt_x -= staff->m_drawingStaffSize;
+            txtX -= staff->m_drawingStaffSize;
         }
         // we need to move down the figure of half of it height, which is about an accid width;
         // also, cue size is not supported. Does it has to?
         int txt_y
             = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, drawingCueSize);
 
-        DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->m_drawingStaffSize);
+        DrawSmuflString(dc, txtX, txt_y, notes, false, staff->m_drawingStaffSize);
 
         // x1 = 10 pixels before the number
-        x1 = ((txt_x - 40) > start.x) ? txt_x - 40 : start.x;
+        x1 = ((txtX - 40) > start.x) ? txtX - 40 : start.x;
         // x2 = just after, the number is abundant so I do not add anything
-        x2 = txt_x + extend.m_width + 20;
+        x2 = txtX + extend.m_width + 20;
 
         dc->ResetFont();
     }
