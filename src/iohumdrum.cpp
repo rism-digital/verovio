@@ -6628,7 +6628,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     string edittype;
     if (!m_signifiers.editacc.empty()) {
         for (int x = 0; x < (int)m_signifiers.editacc.size(); x++) {
-            if (token->find(m_signifiers.editacc[x]) != string::npos) {
+            if (tstring.find(m_signifiers.editacc[x]) != string::npos) {
                 editorialQ = true;
                 edittype = m_signifiers.edittype[x];
                 break;
