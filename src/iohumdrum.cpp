@@ -1475,7 +1475,6 @@ void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart)
     while (kernpart != NULL) {
         if (kernpart->isData()) {
             break;
-            ;
         }
         if (!kernpart->isInterpretation()) {
             kernpart = kernpart->getNextToken();
@@ -2178,7 +2177,7 @@ void HumdrumInput::checkForOmd(int startline, int endline)
             value = infile[i].getReferenceValue();
             Tempo *tempo = new Tempo;
             setLocationId(tempo, infile.token(i, 0));
-            m_measure->AddChild(tempo);
+            m_measure->AddChildBack(tempo);
             addTextElement(tempo, value);
             tempo->SetTstamp(1.0);
             setStaff(tempo, 1);
@@ -4330,7 +4329,6 @@ void HumdrumInput::addDirection(
 {
 
     Dir *dir = new Dir;
-    m_measure->AddChild(dir);
     setStaff(dir, m_currentstaff);
     setLocationId(dir, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
@@ -4339,11 +4337,15 @@ void HumdrumInput::addDirection(
     if (placement == "above") {
         // 300: dir->SetPlace(STAFFREL_above);
         setPlace(dir, "above");
+    	m_measure->AddChild(dir);
     }
     else if (placement == "below") {
         // 300: dir->SetPlace(STAFFREL_below);
         setPlace(dir, "below");
-    }
+    	m_measure->AddChildBack(dir);
+    } else {
+    	m_measure->AddChild(dir);
+	}
     if ((!italic) || bold) {
         Rend *rend = new Rend;
         dir->AddChild(rend);
