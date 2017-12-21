@@ -160,7 +160,18 @@ void Measure::AddChildBack(Object *child)
     }
 
     child->SetParent(this);
-    m_children.insert(m_children.begin(), child);
+    if (m_children.empty()) {
+        m_children.push_back(child);
+    } else if (m_children.back()->Is(STAFF)) {
+        m_children.push_back(child);
+    } else {
+       for (auto it = m_children.begin(); it != m_children.end(); it++) {
+           if (!(*it)->Is(STAFF)) {
+               m_children.insert(it, child);
+               break;
+           }
+       }
+    }
     Modify();
 }
 

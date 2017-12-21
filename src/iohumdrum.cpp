@@ -4089,7 +4089,6 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
     }
 
     Dir *dir = new Dir;
-    m_measure->AddChild(dir);
     setStaff(dir, m_currentstaff);
     setLocationId(dir, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
@@ -4097,9 +4096,13 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
 
     if (placement == "above") {
         setPlace(dir, "above");
+        m_measure->AddChild(dir);
     }
     else if (placement == "below") {
         setPlace(dir, "below");
+        m_measure->AddChildBack(dir);
+    } else {
+        m_measure->AddChild(dir);
     }
     if ((!italic) || bold) {
         Rend *rend = new Rend;
