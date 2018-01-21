@@ -338,16 +338,15 @@ bool Chord::IsVisible()
             assert(note);
 
             // If it doesn't have a visibility tag, then it's default value is that it's visible, so return that the chord is visible
-            if (!note->HasVisible()) 
+            if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true)
             {
                 return true;
             }
-            else if(note->GetVisible() == BOOLEAN_true)
+            else
             {
-                return true;
+                // if it's visibility is false, continue on and see if any of the other notes are false.
+                // All of the notes must not be visible in order for the chord to not be visible.
             }
-            // if it's visibility is false, continue on and see if any of hte others are false
-            else {}
         }
         return false;
     }
