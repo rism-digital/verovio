@@ -320,6 +320,39 @@ Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
+bool Chord::IsVisible()
+{
+    if (this->HasVisible())
+    {
+        return this->GetVisible() == BOOLEAN_true;
+    }
+    // if the chord doens't have it, see if all the children are invisible
+    else
+    {
+        ListOfObjects::const_iterator iter;
+        const ListOfObjects *notes = this->GetList(this);
+        assert(notes);
+
+        for (iter = notes->begin(); iter != notes->end(); iter++) {
+            Note *note = dynamic_cast<Note *>(*iter);
+            assert(note);
+
+            // If it doesn't have a visibility tag, then it's default value is that it's visible, so return that the chord is visible
+            if (!note->HasVisible()) 
+            {
+                return true;
+            }
+            else if(note->GetVisible() == BOOLEAN_true)
+            {
+                return true;
+            }
+            // if it's visibility is false, continue on and see if any of hte others are false
+            else {}
+        }
+        return false;
+    }
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -368,6 +401,11 @@ int Chord::CalcStem(FunctorParams *functorParams)
     // Stems have been calculated previously in Beam or FTrem - siblings becasue flags do not need to
     // be processed either
     if (this->IsInBeam() || this->IsInFTrem()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // if the chord isn't visible, carry on
+    if (!this->IsVisible()) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -434,6 +472,10 @@ int Chord::CalcDots(FunctorParams *functorParams)
     CalcDotsParams *params = dynamic_cast<CalcDotsParams *>(functorParams);
     assert(params);
 
+    // if the chord isn't visible, carry on
+    if (!this->IsVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
     if (!this->HasDots()) {
         return FUNCTOR_SIBLINGS;
     }

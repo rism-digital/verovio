@@ -125,6 +125,9 @@ public:
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
     ///@}
 
+    // Calculates if the chord and all of its children are visible
+    bool IsVisible();
+
     //----------//
     // Functors //
     //----------//
