@@ -65,6 +65,7 @@ class Layer;
 class LayerElement;
 class Lb;
 class Lem;
+class Ligature;
 class Measure;
 class Mensur;
 class MeterSig;
@@ -221,6 +222,7 @@ private:
     void WriteMeiDot(pugi::xml_node currentNode, Dot *dot);
     void WriteMeiFTrem(pugi::xml_node currentNode, FTrem *fTrem);
     void WriteMeiKeySig(pugi::xml_node currentNode, KeySig *keySig);
+    void WriteMeiLigature(pugi::xml_node currentNode, Ligature *ligature);
     void WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur);
     void WriteMeiMeterSig(pugi::xml_node currentNode, MeterSig *meterSig);
     void WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest);

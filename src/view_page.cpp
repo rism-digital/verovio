@@ -292,7 +292,7 @@ void View::DrawStaffGrp(
         int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
 
         dc->SetBrush(m_currentColour, AxSOLID);
-        
+
         FontInfo grpTxt;
         if (!dc->UseGlobalStyling()) {
             grpTxt.SetFaceName("Times");

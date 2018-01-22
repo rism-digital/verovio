@@ -1466,13 +1466,14 @@ void View::DrawTrillExtension(
     if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
         x1 += m_doc->GetGlyphWidth(SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false);
     }
-    
+
     // Adjust the x2 for extensions with @endid
     if ((spanningType == SPANNING_END) || (spanningType == SPANNING_START_END)) {
         LayerElement *end = trill->GetEnd();
         assert(end);
         if (!end->Is(TIMESTAMP_ATTR)) {
-            x2 = end->GetContentLeft() - m_doc->GetGlyphWidth(SMUFL_E59D_ornamentZigZagLineNoRightEnd, staff->m_drawingStaffSize, false) / 2;
+            x2 = end->GetContentLeft()
+                - m_doc->GetGlyphWidth(SMUFL_E59D_ornamentZigZagLineNoRightEnd, staff->m_drawingStaffSize, false) / 2;
         }
     }
 
@@ -1611,18 +1612,18 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     Note *bottomNote = NULL;
 
     arpeg->GetDrawingTopBottomNotes(topNote, bottomNote);
-    
+
     // We cannot draw without a top and bottom note
     if (!topNote || !bottomNote) return;
-    
+
     int top = topNote->GetDrawingY();
     int bottom = bottomNote->GetDrawingY();
-    
+
     // We arbitrarily look at the top note
     Staff *staff = dynamic_cast<Staff *>(topNote->GetFirstParent(STAFF));
     assert(staff);
     bool drawingCueSize = topNote->GetDrawingCueSize();
-    
+
     // We are going to have only one FloatingPositioner - staff will be the top note one
     system->SetCurrentFloatingPositioner(staff->GetN(), arpeg, topNote, staff);
     // Special case: because the positionner objects are reset in ResetVerticalAlignment we
@@ -1635,18 +1636,18 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     int y = bottom - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int x = arpeg->GetDrawingX();
     int angle = -90;
-    
+
     wchar_t fillGlyph = SMUFL_EAA9_wiggleArpeggiatoUp;
     wchar_t endGlyph = (arpeg->GetArrow()) ? SMUFL_EAAD_wiggleArpeggiatoUpArrow : 0;
-    
+
     if (arpeg->GetOrder() == arpegLog_ORDER_down) {
         y = top + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        x -=  m_doc->GetGlyphWidth(SMUFL_EAAA_wiggleArpeggiatoDown, staff->m_drawingStaffSize, drawingCueSize) / 2;
+        x -= m_doc->GetGlyphWidth(SMUFL_EAAA_wiggleArpeggiatoDown, staff->m_drawingStaffSize, drawingCueSize) / 2;
         fillGlyph = SMUFL_EAAA_wiggleArpeggiatoDown;
         endGlyph = (arpeg->GetArrow()) ? SMUFL_EAAE_wiggleArpeggiatoDownArrow : 0;
         angle = 90;
     }
-    
+
     Point orig(x, y);
 
     dc->StartGraphic(arpeg, "", arpeg->GetUuid());

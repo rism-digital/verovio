@@ -72,8 +72,6 @@ public:
      */
     virtual void AddChild(Object *object);
 
-    virtual void FilterList(ListOfObjects *childlist);
-
     /**
      * Return the maximum and minimum Y positions of the notes in the chord
      */
@@ -132,6 +130,14 @@ public:
     //----------//
 
     /**
+     * See Object::ConvertAnalyticalMarkup
+     */
+    ///@{
+    virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
+    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *functorParams);
+    ///@}
+
+    /**
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *functorParams);
@@ -147,12 +153,6 @@ public:
     virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareTieAttr
-     */
-    virtual int PrepareTieAttr(FunctorParams *functorParams);
-    virtual int PrepareTieAttrEnd(FunctorParams *functorParams);
-
-    /**
      * See Object::GenerateMIDIEnd
      */
     virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams);
@@ -162,6 +162,11 @@ protected:
      * Clear the m_clusters vector and delete all the objects.
      */
     void ClearClusters() const;
+
+    /**
+     * Filter the flat list and keep only Note elements.
+     */
+    virtual void FilterList(ListOfObjects *childlist);
 
 public:
     mutable std::list<ChordCluster *> m_clusters;

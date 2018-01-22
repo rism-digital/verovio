@@ -456,6 +456,4 @@ int ScoreDef::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-
-
 } // namespace vrv

@@ -218,7 +218,7 @@ public:
     /**
      * @name Children count, with or without a ClassId.
      * Used for classes with several types of children.
-     * The method with a ClassId only searches at the first level.
+     * The methods count at the first level.
      */
     ///@{
     int GetChildCount() const { return (int)m_children.size(); }
@@ -512,6 +512,15 @@ public:
     ///@{
     virtual int ConvertToPageBased(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int ConvertToPageBasedEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Convert analytical markup (@fermata, @tie) to elements.
+     * See Doc::ConvertAnalyticalMarkupDoc
+     */
+    ///@{
+    virtual int ConvertAnalyticalMarkup(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -811,17 +820,6 @@ public:
     ///@{
     virtual int PrepareTimestamps(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int PrepareTimestampsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    ///@}
-
-    /**
-     * Process Chord and Note for matching @tie by processing by Layer and by looking
-     * at the Pname and Oct.
-     * At the end, processes Chord and Note for matching @tie by processing by Layer; resets the
-     * Chord pointer to NULL at the end of a chord.
-     */
-    ///@{
-    virtual int PrepareTieAttr(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int PrepareTieAttrEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**

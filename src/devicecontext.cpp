@@ -168,27 +168,27 @@ void DeviceContext::AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend)
     assert(glyph);
     assert(extend);
 
-    int x, y, partial_w, partial_h, adv_x;
+    int x, y, partialWidth, partialHeight, advX;
     double tmp;
 
-    glyph->GetBoundingBox(x, y, partial_w, partial_h);
+    glyph->GetBoundingBox(x, y, partialWidth, partialHeight);
 
-    tmp = partial_w * m_fontStack.top()->GetPointSize();
-    partial_w = ceil(tmp / (double)glyph->GetUnitsPerEm());
-    tmp = partial_h * m_fontStack.top()->GetPointSize();
-    partial_h = ceil(tmp / (double)glyph->GetUnitsPerEm());
+    tmp = partialWidth * m_fontStack.top()->GetPointSize();
+    partialWidth = ceil(tmp / (double)glyph->GetUnitsPerEm());
+    tmp = partialHeight * m_fontStack.top()->GetPointSize();
+    partialHeight = ceil(tmp / (double)glyph->GetUnitsPerEm());
     tmp = y * m_fontStack.top()->GetPointSize();
     y = ceil(tmp / (double)glyph->GetUnitsPerEm());
     tmp = x * m_fontStack.top()->GetPointSize();
     x = ceil(tmp / (double)glyph->GetUnitsPerEm());
 
-    adv_x = glyph->GetHorizAdvX();
-    tmp = adv_x * m_fontStack.top()->GetPointSize();
-    adv_x = ceil(tmp / (double)glyph->GetUnitsPerEm());
+    advX = glyph->GetHorizAdvX();
+    tmp = advX * m_fontStack.top()->GetPointSize();
+    advX = ceil(tmp / (double)glyph->GetUnitsPerEm());
 
-    extend->m_width += std::max(partial_w + x, adv_x);
-    extend->m_height = std::max(partial_h, extend->m_height);
-    extend->m_ascent = std::max(partial_h + y, extend->m_ascent);
+    extend->m_width += std::max(partialWidth + x, advX);
+    extend->m_height = std::max(partialHeight, extend->m_height);
+    extend->m_ascent = std::max(partialHeight + y, extend->m_ascent);
     extend->m_descent = std::max(-y, extend->m_descent);
 }
 

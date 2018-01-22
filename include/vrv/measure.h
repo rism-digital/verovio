@@ -185,6 +185,11 @@ public:
     //----------//
 
     /**
+     * See Object::ConvertAnalyticalMarkup
+     */
+    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *functorParams);
+
+    /**
      * See Object::ConvertToPageBased
      */
     virtual int ConvertToPageBased(FunctorParams *functorParams);
@@ -227,12 +232,12 @@ public:
      * See Object::SetAlignmentXPos
      */
     virtual int SetAlignmentXPos(FunctorParams *functorParams);
-    
+
     /**
      * See Object::AdjustArpeg
      */
     virtual int AdjustArpegEnd(FunctorParams *functorParams);
-    
+
     /**
      * See Object::AdjustLayers
      */

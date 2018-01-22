@@ -189,21 +189,21 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     UpdateBB(x1 - p1, y1 - p1, x2 + p2, y2 + p2);
 }
 
-void BBoxDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style)
+void BBoxDeviceContext::DrawPolygon(int n, Point points[], int xOffset, int yOffset, int fillStyle)
 {
     if (n == 0) {
         return;
     }
-    int x1 = points[0].x + xoffset;
+    int x1 = points[0].x + xOffset;
     int x2 = x1;
-    int y1 = points[0].y + yoffset;
+    int y1 = points[0].y + yOffset;
     int y2 = y1;
 
     for (int i = 0; i < n; i++) {
-        if (points[i].x + xoffset < x1) x1 = points[i].x + xoffset;
-        if (points[i].x + xoffset > x2) x2 = points[i].x + xoffset;
-        if (points[i].y + yoffset < y1) y1 = points[i].y + yoffset;
-        if (points[i].y + yoffset > y2) y2 = points[i].y + yoffset;
+        if (points[i].x + xOffset < x1) x1 = points[i].x + xOffset;
+        if (points[i].x + xOffset > x2) x2 = points[i].x + xOffset;
+        if (points[i].y + yOffset < y1) y1 = points[i].y + yOffset;
+        if (points[i].y + yOffset > y2) y2 = points[i].y + yOffset;
     }
     UpdateBB(x1, y1, x2, y2);
 }

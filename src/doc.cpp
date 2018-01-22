@@ -93,6 +93,7 @@ void Doc::Reset()
     m_currentScoreDefDone = false;
     m_drawingPreparationDone = false;
     m_hasMidiTimemap = false;
+    m_hasAnalyticalMarkup = false;
 
     m_scoreDef.Reset();
     if (m_scoreBuffer) {
@@ -182,7 +183,7 @@ bool Doc::GenerateDocumentScoreDef()
 bool Doc::GenerateDocumentPgHead()
 {
     PgHead *pgHead = new PgHead();
-    //pgHead->SetAttribute(true);
+    pgHead->IsAttribute(true);
     pgHead->GenerateFromMEIHeader(m_header);
     m_scoreDef.AddChild(pgHead);
 
@@ -505,41 +506,9 @@ void Doc::PrepareDrawing()
     IntTree_t::iterator layers;
     IntTree_t::iterator verses;
 
-    /************ Resolve ties ************/
-
-    // Process by layer for matching @tie attribute - we process notes and chords, looking at
-    // GetTie values and pitch and oct for matching notes
-    std::vector<AttComparison *> filters;
-    for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
-        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-            filters.clear();
-            // Create ad comparison object for each type / @n
-            AttNIntegerComparison matchStaff(STAFF, staves->first);
-            AttNIntegerComparison matchLayer(LAYER, layers->first);
-            filters.push_back(&matchStaff);
-            filters.push_back(&matchLayer);
-
-            PrepareTieAttrParams prepareTieAttrParams;
-            Functor prepareTieAttr(&Object::PrepareTieAttr);
-            Functor prepareTieAttrEnd(&Object::PrepareTieAttrEnd);
-            this->Process(&prepareTieAttr, &prepareTieAttrParams, &prepareTieAttrEnd, &filters);
-
-            // After having processed one layer, we check if we have open ties - if yes, we
-            // must reset them and they will be ignored.
-            if (!prepareTieAttrParams.m_currentNotes.empty()) {
-                std::vector<Note *>::iterator iter;
-                for (iter = prepareTieAttrParams.m_currentNotes.begin();
-                     iter != prepareTieAttrParams.m_currentNotes.end(); iter++) {
-                    LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetUuid().c_str());
-                    (*iter)->ResetDrawingTieAttr();
-                }
-            }
-        }
-    }
-
     /************ Resolve some pointers by layer ************/
 
+    std::vector<AttComparison *> filters;
     for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
          staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
@@ -867,6 +836,59 @@ void Doc::ConvertToPageBasedDoc()
     this->ResetDrawingPage();
 }
 
+void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
+{
+    if (!m_hasAnalyticalMarkup) return;
+
+    LogMessage("Converting analytical markup...");
+
+    /************ Prepare processing by staff/layer/verse ************/
+
+    // We need to populate processing lists for processing the document by Layer (for matching @tie) and
+    // by Verse (for matching syllable connectors)
+    PrepareProcessingListsParams prepareProcessingListsParams;
+
+    // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
+    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
+    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+
+    IntTree_t::iterator staves;
+    IntTree_t::iterator layers;
+
+    /************ Resolve ties ************/
+
+    // Process by layer for matching @tie attribute - we process notes and chords, looking at
+    // GetTie values and pitch and oct for matching notes
+    std::vector<AttComparison *> filters;
+    for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
+         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+            filters.clear();
+            // Create ad comparison object for each type / @n
+            AttNIntegerComparison matchStaff(STAFF, staves->first);
+            AttNIntegerComparison matchLayer(LAYER, layers->first);
+            filters.push_back(&matchStaff);
+            filters.push_back(&matchLayer);
+
+            ConvertAnalyticalMarkupParams convertAnalyticalMarkupParams(permanent);
+            Functor convertAnalyticalMarkup(&Object::ConvertAnalyticalMarkup);
+            Functor convertAnalyticalMarkupEnd(&Object::ConvertAnalyticalMarkupEnd);
+            this->Process(
+                &convertAnalyticalMarkup, &convertAnalyticalMarkupParams, &convertAnalyticalMarkupEnd, &filters);
+
+            // After having processed one layer, we check if we have open ties - if yes, we
+            // must reset them and they will be ignored.
+            if (!convertAnalyticalMarkupParams.m_currentNotes.empty()) {
+                std::vector<Note *>::iterator iter;
+                for (iter = convertAnalyticalMarkupParams.m_currentNotes.begin();
+                     iter != convertAnalyticalMarkupParams.m_currentNotes.end(); iter++) {
+                    LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetUuid().c_str());
+                }
+            }
+        }
+    }
+}
+
 bool Doc::HasPage(int pageIdx) const
 {
     return ((pageIdx >= 0) && (pageIdx < GetChildCount()));
@@ -1063,7 +1085,7 @@ int Doc::GetCueSize(int value) const
     return value * this->m_style->m_graceNum / this->m_style->m_graceDen;
 }
 
-void Doc::SetDrawingSmuflFontName(const std::string & fontName)
+void Doc::SetDrawingSmuflFontName(const std::string &fontName)
 {
     m_drawingSmuflFont.SetFaceName(fontName.c_str());
 }

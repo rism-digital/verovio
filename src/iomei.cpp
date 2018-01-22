@@ -300,8 +300,10 @@ bool MeiOutput::WriteObject(Object *object)
         WriteMeiDynam(m_currentNode, dynamic_cast<Dynam *>(object));
     }
     else if (object->Is(FERMATA)) {
-        m_currentNode = m_currentNode.append_child("fermata");
-        WriteMeiFermata(m_currentNode, dynamic_cast<Fermata *>(object));
+        if (!object->IsAttribute()) {
+            m_currentNode = m_currentNode.append_child("fermata");
+            WriteMeiFermata(m_currentNode, dynamic_cast<Fermata *>(object));
+        }
     }
     else if (object->Is(HAIRPIN)) {
         m_currentNode = m_currentNode.append_child("hairpin");
@@ -332,8 +334,10 @@ bool MeiOutput::WriteObject(Object *object)
         WriteMeiTempo(m_currentNode, dynamic_cast<Tempo *>(object));
     }
     else if (object->Is(TIE)) {
-        m_currentNode = m_currentNode.append_child("tie");
-        WriteMeiTie(m_currentNode, dynamic_cast<Tie *>(object));
+        if (!object->IsAttribute()) {
+            m_currentNode = m_currentNode.append_child("tie");
+            WriteMeiTie(m_currentNode, dynamic_cast<Tie *>(object));
+        }
     }
     else if (object->Is(TRILL)) {
         m_currentNode = m_currentNode.append_child("trill");
@@ -396,9 +400,8 @@ bool MeiOutput::WriteObject(Object *object)
         WriteMeiKeySig(m_currentNode, dynamic_cast<KeySig *>(object));
     }
     else if (object->Is(LIGATURE)) {
-        LogError("WriteMeiLigature not implemented. (MeiOutput::WriteObject)");
-        // m_currentNode = m_currentNode.append_child("ligature");
-        // WriteMeiLigature(m_currentNode, dynamic_cast<KeySig *>(object));
+        m_currentNode = m_currentNode.append_child("ligature");
+        WriteMeiLigature(m_currentNode, dynamic_cast<Ligature *>(object));
     }
     else if (object->Is(MENSUR)) {
         m_currentNode = m_currentNode.append_child("mensur");
@@ -1235,6 +1238,14 @@ void MeiOutput::WriteMeiKeySig(pugi::xml_node currentNode, KeySig *keySig)
     keySig->WritePitch(currentNode);
 }
 
+void MeiOutput::WriteMeiLigature(pugi::xml_node currentNode, Ligature *ligature)
+{
+    assert(ligature);
+
+    WriteLayerElement(currentNode, ligature);
+    ligature->WriteLigatureLog(currentNode);
+}
+    
 void MeiOutput::WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur)
 {
     assert(mensur);
@@ -2136,6 +2147,7 @@ bool MeiInput::ReadMei(pugi::xml_node root)
         }
         if (success) {
             m_doc->ConvertToPageBasedDoc();
+            m_doc->ConvertAnalyticalMarkupDoc();
         }
     }
     
@@ -3386,6 +3398,10 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
         vrvArtic->SetArtic(artic.GetArtic());
         vrvChord->AddChild(vrvArtic);
     }
+    
+    if (vrvChord->HasTie()) {
+        m_doc->SetAnalyticalMarkup(true);
+    }
 
     parent->AddChild(vrvChord);
     return ReadMeiLayerChildren(vrvChord, chord, vrvChord);
@@ -3463,10 +3479,7 @@ bool MeiInput::ReadMeiLigature(Object *parent, pugi::xml_node ligature)
     Ligature *vrvLigature = new Ligature();
     SetMeiUuid(ligature, vrvLigature);
 
-    ReadDurationInterface(ligature, vrvLigature);
-    vrvLigature->ReadStems(ligature);
-    vrvLigature->ReadStemsCmn(ligature);
-    vrvLigature->ReadTiePresent(ligature);
+    vrvLigature->ReadLigatureLog(ligature);
 
     parent->AddChild(vrvLigature);
     return ReadMeiLayerChildren(vrvLigature, ligature, vrvLigature);
@@ -3510,6 +3523,10 @@ bool MeiInput::ReadMeiMRest(Object *parent, pugi::xml_node mRest)
     vrvMRest->ReadCue(mRest);
     vrvMRest->ReadFermataPresent(mRest);
     vrvMRest->ReadVisibility(mRest);
+    
+    if (vrvMRest->HasFermata()) {
+        m_doc->SetAnalyticalMarkup(true);
+    }
 
     parent->AddChild(vrvMRest);
     return true;
@@ -3593,6 +3610,10 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
         vrvAccid->SetAccid(accidental.GetAccid());
         vrvAccid->SetAccidGes(accidentalGestural.GetAccidGes());
         vrvNote->AddChild(vrvAccid);
+    }
+    
+    if (vrvNote->HasTie()) {
+        m_doc->SetAnalyticalMarkup(true);
     }
 
     parent->AddChild(vrvNote);
@@ -3839,6 +3860,11 @@ bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
     interface->ReadDurationRatio(element);
     interface->ReadFermataPresent(element);
     interface->ReadStaffIdent(element);
+    
+    if (interface->HasFermata()) {
+        m_doc->SetAnalyticalMarkup(true);
+    }
+    
     return true;
 }
 

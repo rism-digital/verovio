@@ -49,44 +49,44 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
 {
     assert(dc);
 
-    std::size_t prev_pos = 0, pos;
-    while ((pos = s.find_first_of(L"\u266D\u266E\u266F", prev_pos)) != std::wstring::npos) {
+    std::size_t prevPos = 0, pos;
+    while ((pos = s.find_first_of(L"\u266D\u266E\u266F", prevPos)) != std::wstring::npos) {
         // If pos is > than the previous, it is the substring to extract
-        if (pos > prev_pos) {
-            std::wstring substr = s.substr(prev_pos, pos - prev_pos);
+        if (pos > prevPos) {
+            std::wstring substr = s.substr(prevPos, pos - prevPos);
             dc->DrawText(UTF16to8(substr), substr);
         }
 
         // if it is the same or we still have space, it is the accidental
-        if (pos == prev_pos || pos < s.length()) {
+        if (pos == prevPos || pos < s.length()) {
             // Then the accidental
             std::wstring accid = s.substr(pos, 1);
-            std::wstring smufl_accid;
+            std::wstring smuflAccid;
             if (accid == L"\u266D") { // MUSIC FLAT SIGN
-                smufl_accid.push_back(SMUFL_E260_accidentalFlat);
+                smuflAccid.push_back(SMUFL_E260_accidentalFlat);
             }
             else if (accid == L"\u266E") { // MUSIC NATURAL SIGN
-                smufl_accid.push_back(SMUFL_E261_accidentalNatural);
+                smuflAccid.push_back(SMUFL_E261_accidentalNatural);
             }
             else if (accid == L"\u266F") { // MUSIC SHARP SIGN
-                smufl_accid.push_back(SMUFL_E262_accidentalSharp);
+                smuflAccid.push_back(SMUFL_E262_accidentalSharp);
             }
             else {
-                smufl_accid.push_back(0xE26D);
+                smuflAccid.push_back(0xE26D);
             }
 
             FontInfo vrvTxt;
             vrvTxt.SetFaceName("VerovioText");
             dc->SetFont(&vrvTxt);
-            dc->DrawText(UTF16to8(smufl_accid), smufl_accid);
+            dc->DrawText(UTF16to8(smuflAccid), smuflAccid);
             dc->ResetFont();
         }
         // Skip the accidental and continue
-        prev_pos = pos + 1;
+        prevPos = pos + 1;
     }
     // Print the remainder of the string, or the full string if no accid
-    if (prev_pos < s.length()) {
-        std::wstring substr = s.substr(prev_pos, std::wstring::npos);
+    if (prevPos < s.length()) {
+        std::wstring substr = s.substr(prevPos, std::wstring::npos);
         dc->DrawText(UTF16to8(substr), substr);
     }
 }

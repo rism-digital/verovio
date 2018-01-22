@@ -208,8 +208,7 @@ public:
 
 protected:
     /**
-     * Filter the list for a specific class.
-     * For example, keep staffGrp for fast access.
+     * Filter the flat list and keep only StaffGrp elements.
      */
     virtual void FilterList(ListOfObjects *childList);
 

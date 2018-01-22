@@ -41,7 +41,7 @@ SvgDeviceContext::SvgDeviceContext() : DeviceContext()
     SetBrush(AxBLACK, AxSOLID);
     SetPen(AxBLACK, 1, AxSOLID);
 
-    m_smufl_glyphs.clear();
+    m_smuflGlyphs.clear();
 
     m_committed = false;
     m_vrvTextFont = false;
@@ -84,8 +84,10 @@ void SvgDeviceContext::Commit(bool xml_declaration)
 
     // take care of width/height once userScale is updated
     if (m_mmOutput) {
-        m_svgNode.prepend_attribute("height") = StringFormat("%.2fmm", ((double)GetHeight() * GetUserScaleY()) / 10).c_str();
-        m_svgNode.prepend_attribute("width") = StringFormat("%.2fmm", ((double)GetWidth() * GetUserScaleX()) / 10).c_str();
+        m_svgNode.prepend_attribute("height")
+            = StringFormat("%.2fmm", ((double)GetHeight() * GetUserScaleY()) / 10).c_str();
+        m_svgNode.prepend_attribute("width")
+            = StringFormat("%.2fmm", ((double)GetWidth() * GetUserScaleX()) / 10).c_str();
     }
     else {
         m_svgNode.prepend_attribute("height") = StringFormat("%.2fpx", ((double)GetHeight() * GetUserScaleY())).c_str();
@@ -101,14 +103,14 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     }
 
     // header
-    if (m_smufl_glyphs.size() > 0) {
+    if (m_smuflGlyphs.size() > 0) {
 
         pugi::xml_node defs = m_svgNode.prepend_child("defs");
         pugi::xml_document sourceDoc;
 
         // for each needed glyph
         std::vector<std::string>::const_iterator it;
-        for (it = m_smufl_glyphs.begin(); it != m_smufl_glyphs.end(); ++it) {
+        for (it = m_smuflGlyphs.begin(); it != m_smuflGlyphs.end(); ++it) {
             // load the XML file that contains it as a pugi::xml_document
             std::ifstream source((*it).c_str());
             sourceDoc.load(source);
@@ -721,9 +723,10 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
         svgText.replace(0, 1, "\xC2\xA0");
     }
 
-    std::string currentFaceName = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
+    std::string currentFaceName
+        = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
     std::string fontFaceName = m_fontStack.top()->GetFaceName();
-    
+
     pugi::xml_node textChild = AppendChild("tspan");
     // Set the @font-family only if it is not the same as in the parent node
     if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {
@@ -765,9 +768,9 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         std::string path = glyph->GetPath();
 
         // Add the glyph to the array for the <defs>
-        std::vector<std::string>::const_iterator it = std::find(m_smufl_glyphs.begin(), m_smufl_glyphs.end(), path);
-        if (it == m_smufl_glyphs.end()) {
-            m_smufl_glyphs.push_back(path);
+        std::vector<std::string>::const_iterator it = std::find(m_smuflGlyphs.begin(), m_smuflGlyphs.end(), path);
+        if (it == m_smuflGlyphs.end()) {
+            m_smuflGlyphs.push_back(path);
         }
 
         // Write the char in the SVG
