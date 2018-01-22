@@ -29,6 +29,7 @@
 #include "multirest.h"
 #include "note.h"
 #include "page.h"
+#include "pghead.h"
 #include "rpt.h"
 #include "runningelement.h"
 #include "score.h"
@@ -174,6 +175,16 @@ bool Doc::GenerateDocumentScoreDef()
     m_scoreDef.AddChild(staffGrp);
 
     LogMessage("ScoreDef generated");
+
+    return true;
+}
+    
+bool Doc::GenerateDocumentPgHead()
+{
+    PgHead *pgHead = new PgHead();
+    //pgHead->SetAttribute(true);
+    pgHead->GenerateFromMEIHeader(m_header);
+    m_scoreDef.AddChild(pgHead);
 
     return true;
 }

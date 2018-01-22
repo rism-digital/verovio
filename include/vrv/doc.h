@@ -64,6 +64,11 @@ public:
      * This only looks at the content first system of the document.
      */
     bool GenerateDocumentScoreDef();
+    
+    /**
+     * Generate a document pgHead from the MEI header if none is provided.
+     */
+    bool GenerateDocumentPgHead();
 
     /**
      * Getter and setter for the DocType.

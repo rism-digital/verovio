@@ -33,6 +33,8 @@ public:
     virtual std::string GetClassName() const { return "PgHead"; }
     virtual ClassId GetClassId() const { return PGHEAD; }
     ///@}
+    
+    bool GenerateFromMEIHeader(pugi::xml_document &header);
 
     //----------//
     // Functors //

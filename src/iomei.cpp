@@ -2138,6 +2138,10 @@ bool MeiInput::ReadMei(pugi::xml_node root)
             m_doc->ConvertToPageBasedDoc();
         }
     }
+    
+    if (success) {
+        success = m_doc->GenerateDocumentPgHead();
+    }
 
     if (success && !m_hasScoreDef) {
         LogMessage("No scoreDef provided, trying to generate one...");
