@@ -245,9 +245,10 @@ std::string Att::FontsizenumericToStr(data_FONTSIZENUMERIC data) const
 
 data_FONTSIZENUMERIC Att::StrToFontsizenumeric(std::string value, bool logWarning) const
 {
-    std::regex test("[0-9](\\.[0-9]+)?(pt)");
-    if (std::regex_match(value, test)) {
+    std::regex test("[0-9]*(\\.[0-9]+)?(pt)");
+    if (!std::regex_match(value, test)) {
         if (logWarning) LogWarning("Unsupported data.FONTSIZENUMERIC '%s'", value.c_str());
+        return VRV_UNSET;
     }
     return atof(value.substr(0, value.find("pt")).c_str());
 }
@@ -429,8 +430,9 @@ std::string Att::PercentToStr(data_PERCENT data) const
 data_PERCENT Att::StrToPercent(std::string value, bool logWarning) const
 {
     std::regex test("[0-9]+(\\.?[0-9]*)?%");
-    if (std::regex_match(value, test)) {
+    if (!std::regex_match(value, test)) {
         if (logWarning) LogWarning("Unsupported data.PERCENT '%s'", value.c_str());
+        return 0;
     }
     return atof(value.substr(0, value.find("%")).c_str());
 }

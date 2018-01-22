@@ -92,6 +92,7 @@ public:
         m_laidOut = false;
         m_newLine = false;
         m_alignment = HORIZONTALALIGNMENT_left;
+        m_pointSize = 0;
     }
     virtual ~TextDrawingParams(){};
 
@@ -101,6 +102,7 @@ public:
     bool m_laidOut;
     bool m_newLine;
     data_HORIZONTALALIGNMENT m_alignment;
+    int m_pointSize;
 };
     
 } // namespace vrv

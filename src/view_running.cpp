@@ -65,8 +65,9 @@ void View::DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader)
     params.m_width = pgHeader->GetWidth();
     params.m_alignment = HORIZONTALALIGNMENT_NONE;
     params.m_laidOut = true;
+    params.m_pointSize = m_doc->GetDrawingLyricFont(100)->GetPointSize();
     
-    pgHeadTxt.SetPointSize(m_doc->GetDrawingLyricFont(100)->GetPointSize());
+    pgHeadTxt.SetPointSize(params.m_pointSize);
     
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(&pgHeadTxt);

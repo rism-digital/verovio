@@ -166,7 +166,26 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         if (rend->HasFontname()) rendFont.SetFaceName(rend->GetFontname().c_str());
         if (rend->HasFontsize()) {
             data_FONTSIZE *fs = rend->GetFontsizeAlternate();
-            if (fs->GetType() == FONTSIZE_fontSizeNumeric) rendFont.SetPointSize(fs->GetFontSizeNumeric());
+            if (fs->GetType() == FONTSIZE_fontSizeNumeric) {
+                rendFont.SetPointSize(fs->GetFontSizeNumeric());
+            }
+            else if (fs->GetType() == FONTSIZE_term) {
+                int percent = 100;
+                switch (fs->GetTerm()) {
+                    case (FONTSIZETERM_xx_large): percent = 200; break;
+                    case (FONTSIZETERM_x_large): percent = 150; break;
+                    case (FONTSIZETERM_large): percent = 110; break;
+                    case (FONTSIZETERM_small): percent = 80; break;
+                    case (FONTSIZETERM_x_small): percent = 60; break;
+                    case (FONTSIZETERM_xx_small): percent = 50; break;
+                    default:
+                        break;
+                }
+                rendFont.SetPointSize(params.m_pointSize * percent / 100);
+            }
+            else if (fs->GetType() == FONTSIZE_percent) {
+                rendFont.SetPointSize(params.m_pointSize * fs->GetPercent() / 100);
+            }
         }
         if (rend->HasFontstyle()) rendFont.SetStyle(rend->GetFontstyle());
         if (rend->HasFontweight()) rendFont.SetWeight(rend->GetFontweight());

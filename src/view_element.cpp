@@ -1281,6 +1281,8 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     TextDrawingParams params;
     params.m_x = syl->GetDrawingX();
     params.m_y = syl->GetDrawingY();
+    assert(dc->GetFont());
+    params.m_pointSize = dc->GetFont()->GetPointSize();
 
     dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
     DrawTextChildren(dc, syl, params);

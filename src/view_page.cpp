@@ -298,14 +298,15 @@ void View::DrawStaffGrp(
             grpTxt.SetFaceName("Times");
         }
         
-        grpTxt.SetPointSize(m_doc->GetDrawingLyricFont(100)->GetPointSize());
-        dc->SetFont(&grpTxt);
-
-        dc->GetTextExtent(labelStr, &extend);
-
         TextDrawingParams params;
         params.m_x = xLabel;
         params.m_y = yLabel;
+        params.m_pointSize = m_doc->GetDrawingLyricFont(100)->GetPointSize();
+        
+        grpTxt.SetPointSize(params.m_pointSize);
+        dc->SetFont(&grpTxt);
+
+        dc->GetTextExtent(labelStr, &extend);
 
         dc->StartGraphic(graphic, "", graphic->GetUuid());
 
@@ -415,16 +416,17 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
             labelTxt.SetFaceName("Times");
         }
         
-        labelTxt.SetPointSize(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize());
+        TextDrawingParams params;
+        params.m_x = x;
+        params.m_y = y;
+        params.m_pointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize();
+        
+        labelTxt.SetPointSize(params.m_pointSize);
         
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&labelTxt);
 
         dc->GetTextExtent(labelStr, &extend);
-
-        TextDrawingParams params;
-        params.m_x = x;
-        params.m_y = y;
 
         dc->StartGraphic(graphic, "", graphic->GetUuid());
 
@@ -783,6 +785,7 @@ void View::DrawMNum(DeviceContext *dc, Measure *measure)
         // HARDCODED
         params.m_x = staff->GetDrawingX();
         params.m_y = staff->GetDrawingY() + 2.5 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        params.m_pointSize = currentFont.GetPointSize();
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_center);
         DrawTextElement(dc, &text, params);
