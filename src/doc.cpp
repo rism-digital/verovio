@@ -30,6 +30,7 @@
 #include "note.h"
 #include "page.h"
 #include "rpt.h"
+#include "runningelement.h"
 #include "score.h"
 #include "slur.h"
 #include "smufl.h"
@@ -719,20 +720,20 @@ void Doc::CastOffDoc()
 
     // Here we redo the alignment because of the new scoreDefs
     // We can actually optimise this and have a custom version that does not redo all the calculation
-    // contentPage->LayOutHorizontally();
-
     contentPage->LayOutVertically();
 
     // Detach the contentPage
     this->DetachChild(0);
     assert(contentPage && !contentPage->GetParent());
+    this->ResetDrawingPage();
 
     Page *currentPage = new Page();
-    this->AddChild(currentPage);
     CastOffPagesParams castOffPagesParams(contentPage, this, currentPage);
+    CastOffRunningElements(&castOffPagesParams);
     castOffPagesParams.m_pageHeight
         = this->m_drawingPageHeight - this->m_drawingPageTopMar; // obviously we need a bottom margin
     Functor castOffPages(&Object::CastOffPages);
+    this->AddChild(currentPage);
     contentPage->Process(&castOffPages, &castOffPagesParams);
     delete contentPage;
 
@@ -740,8 +741,41 @@ void Doc::CastOffDoc()
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
-    this->ResetDrawingPage();
     this->CollectScoreDefs(true);
+}
+    
+void Doc::CastOffRunningElements(CastOffPagesParams *params)
+{
+    assert(m_children.empty());
+    
+    Page *page1 = new Page();
+    this->AddChild(page1);
+    this->SetDrawingPage(0);
+    page1->LayOutVertically();
+    
+    if (page1->GetHeader()) {
+        params->m_pgHeadHeight = page1->GetHeader()->GetTotalHeight();
+    }
+    if (page1->GetFooter()) {
+        params->m_pgFootHeight = page1->GetFooter()->GetTotalHeight();
+    }
+    
+    Page *page2 = new Page();
+    this->AddChild(page2);
+    this->SetDrawingPage(1);
+    page2->LayOutVertically();
+    
+    if (page2->GetHeader()) {
+        params->m_pgHead2Height = page2->GetHeader()->GetTotalHeight();
+    }
+    if (page2->GetFooter()) {
+        params->m_pgFoot2Height = page2->GetFooter()->GetTotalHeight();
+    }
+    
+    DeleteChild(page1);
+    DeleteChild(page2);
+
+    this->ResetDrawingPage();
 }
 
 void Doc::UnCastOffDoc()

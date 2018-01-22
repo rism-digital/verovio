@@ -382,9 +382,15 @@ void Page::LayOutVertically()
     
     int header = 0;
     if (this->GetHeader()) {
-        //header = this->GetHeader()->CalcTotalHeight();
-        this->GetHeader()->AdjustDrawingScaling(5000);
+        //header = this->GetHeader()->GetTotalHeight();
+        //this->GetHeader()->AdjustDrawingScaling(5000);
         this->GetHeader()->AdjustYPos();
+    }
+    
+    if (this->GetFooter()) {
+        //header = this->GetHeader()->GetTotalHeight();
+        //this->GetHeader()->AdjustDrawingScaling(5000);
+        this->GetFooter()->AdjustYPos();
     }
 
     // Adjust system Y position
@@ -449,7 +455,7 @@ int Page::GetContentHeight() const
     
     // Not sure what to do with the footer when adjusted page height is requested...
     //if (this->GetFooter()) {
-    //    height += this->GetFooter()->CalcTotalHeight();
+    //    height += this->GetFooter()->GetTotalHeight();
     //}
     
     return height;
@@ -579,7 +585,7 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
     if (footer) {
         footer->Process(&resetVerticalAlignment, NULL);
         footer->SetDrawingPage(this);
-        header->SetDrawingYRel(0);
+        footer->SetDrawingYRel(0);
         footer->Process(params->m_functor, params, params->m_functorEnd);
     }
 
@@ -594,14 +600,14 @@ int Page::AlignSystems(FunctorParams *functorParams)
     RunningElement *header = this->GetHeader();
     if (header) {
         header->SetDrawingYRel(params->m_shift);
-        params->m_shift -= header->CalcTotalHeight();
+        params->m_shift -= header->GetTotalHeight();
     }
     RunningElement *footer = this->GetFooter();
     if (footer) {
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
         assert(doc);
         // We add twice the top margin, once for the origin moved at the top and one for the bottom margin
-        footer->SetDrawingYRel(footer->CalcTotalHeight() + doc->m_drawingPageTopMar * 2);
+        footer->SetDrawingYRel(footer->GetTotalHeight() + doc->m_drawingPageTopMar * 2);
     }
 
     return FUNCTOR_CONTINUE;

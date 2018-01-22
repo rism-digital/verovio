@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "editorial.h"
 #include "fig.h"
 #include "functorparams.h"
@@ -103,7 +104,7 @@ void RunningElement::FilterList(ListOfObjects *childList)
     
     int i;
     for (i = 0; i < 9; i++) {
-        m_positionnedObjects[i].clear();
+        m_cells[i].clear();
     }
     for (i = 0; i < 3; i++) {
         m_drawingScalingPercent[i] = 100;
@@ -116,7 +117,7 @@ void RunningElement::FilterList(ListOfObjects *childList)
         pos = this->GetAlignmentPos(interface->GetHalign(), interface->GetValign());
         TextElement *text = dynamic_cast<TextElement *>(*iter);
         assert(text);
-        m_positionnedObjects[pos].push_back(text);
+        m_cells[pos].push_back(text);
     }
 }
     
@@ -155,7 +156,11 @@ int RunningElement::GetWidth() const
 {
     if (!m_drawingPage) return 0;
     
-    return m_drawingPage->GetContentWidth();
+    Doc *doc = dynamic_cast<Doc*>(m_drawingPage->GetFirstParent(DOC));
+    if (!doc) return 0;
+    
+    return (doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar);
+    //return m_drawingPage->GetContentWidth();
 }
     
 void RunningElement::SetDrawingPage(Page *page)
@@ -166,26 +171,56 @@ void RunningElement::SetDrawingPage(Page *page)
     m_drawingPage = page;
 }
 
-int RunningElement::CalcTotalHeight()
+int RunningElement::GetTotalHeight()
 {
     int height = 0;
-    int i, j;
+    int i;
     for (i = 0; i < 3; i++) {
-        int columnHeight = 0;
-        for (j = 0; j < 3; j++) {
-            ArrayOfTextElements *textElements = &m_positionnedObjects[i + j * 3];
-            ArrayOfTextElements::iterator iter;
-            for (iter = textElements->begin(); iter != textElements->end(); iter++) {
-                if ((*iter)->HasContentBB()) {
-                    columnHeight += (*iter)->GetContentY2() - (*iter)->GetContentY1();
-                }
-            }
-        }
-        height = std::max(height, columnHeight);
+        height += this->GetRowHeight(i);
     }
     return height;
 }
     
+int RunningElement::GetRowHeight(int row)
+{
+    assert((row >= 0) && (row < 3));
+    
+    int i;
+    int height = 0;
+    for (i = 0; i < 3; i++) {
+        height = std::max(height, this->GetCellHeight(row * 3 + i));
+    }
+    return height;
+}
+
+int RunningElement::GetColHeight(int col)
+{
+    assert((col >= 0) && (col < 3));
+    
+    int i;
+    int height = 0;
+    for (i = 0; i < 3; i++) {
+        height += this->GetCellHeight(i * 3 + col);
+    }
+    return height;
+}
+
+    
+int RunningElement::GetCellHeight(int cell)
+{
+    assert((cell >= 0) && (cell < 9));
+    
+    int columnHeight = 0;
+    ArrayOfTextElements *textElements = &m_cells[cell];
+    ArrayOfTextElements::iterator iter;
+    for (iter = textElements->begin(); iter != textElements->end(); iter++) {
+        if ((*iter)->HasContentBB()) {
+            columnHeight += (*iter)->GetContentY2() - (*iter)->GetContentY1();
+        }
+    }
+    return columnHeight;
+}
+
 bool RunningElement::AdjustDrawingScaling(int width)
 {
     int i, j;
@@ -195,7 +230,7 @@ bool RunningElement::AdjustDrawingScaling(int width)
         int rowWidth = 0;
         // For each column
         for (j = 0; j < 3; j++) {
-            ArrayOfTextElements *textElements = &m_positionnedObjects[i * 3 + j ];
+            ArrayOfTextElements *textElements = &m_cells[i * 3 + j ];
             ArrayOfTextElements::iterator iter;
             int columnWidth = 0;
             // For each object
@@ -217,29 +252,55 @@ bool RunningElement::AdjustDrawingScaling(int width)
     
 bool RunningElement::AdjustYPos()
 {
-    int i;
-    for (i = 0; i < 9; i++) {
-        ArrayOfTextElements *textElements = &m_positionnedObjects[i];
-        ArrayOfTextElements::iterator iter;
-        int cumulatedYRel = 0;
-        for (iter = textElements->begin(); iter != textElements->end(); iter++) {
-            if ((*iter)->HasContentBB()) {
-                int yShift = (*iter)->GetContentY2();
-                if ((*iter)->Is(REND)) {
-                    Rend *rend = dynamic_cast<Rend *>(*iter);
-                    assert(rend);
-                    rend->SetDrawingYRel(cumulatedYRel - yShift);
+    int i, j;
+    ArrayOfTextElements::iterator iter;
 
-                }
-                else {
-                    Fig *fig = dynamic_cast<Fig *>(*iter);
-                    assert(fig);
-                    fig->SetDrawingYRel(cumulatedYRel - yShift);
-                }
-                cumulatedYRel += ((*iter)->GetContentY1() - (*iter)->GetContentY2());
+    // First adjust the content of each cell
+    for (i = 0; i < 9; i++) {
+        int cumulatedYRel = 0;
+        ArrayOfTextElements *textElements = &m_cells[i];
+        // For each object
+        for (iter = textElements->begin(); iter != textElements->end(); iter++) {
+            if (!(*iter)->HasContentBB()) {
+                continue;
             }
+            int yShift = (*iter)->GetContentY2();
+            (*iter)->SetDrawingYRel(cumulatedYRel - yShift);
+            cumulatedYRel += ((*iter)->GetContentY1() - (*iter)->GetContentY2());
         }
     }
+    
+    
+    int rowYRel = 0;
+    // For each row
+    for (i = 0; i < 3; i++) {
+        int currentRowHeigt = this->GetRowHeight(i);
+        // For each column
+        for (j = 0; j < 3; j++) {
+            int cell = i * 3 + j;
+            int colYShift = 0;
+            // middle row - it needs to be middle-aligned so calculate the colYShift accordingly
+            if (i == 1) {
+                colYShift = (currentRowHeigt - this->GetCellHeight(cell)) / 2;
+            }
+            // bottom row - it needs to be bottom-aligned so calculate the colYShift accordingly
+            else if (i == 2) {
+                colYShift = (currentRowHeigt - this->GetCellHeight(cell));
+            }
+            
+            ArrayOfTextElements *textElements = &m_cells[cell];
+            ArrayOfTextElements::iterator iter;
+            // For each object - adjust the yRel according to the rowYRel and the colYshift
+            for (iter = textElements->begin(); iter != textElements->end(); iter++) {
+                if (!(*iter)->HasContentBB()) {
+                    continue;
+                }
+                (*iter)->SetDrawingYRel((*iter)->GetDrawingYRel() + rowYRel - colYShift);
+            }
+        }
+        rowYRel -= currentRowHeigt;
+    }
+
     return true;
 }
         

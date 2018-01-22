@@ -632,11 +632,12 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute("width") = width;
     if (radius != 0) rectChild.append_attribute("rx") = radius;
     // for empty rectangles with bounding boxes
-    
+    /*
     rectChild.append_attribute("fill-opacity") = "0.0";
     rectChild.append_attribute("stroke-opacity") = "1.0";
     rectChild.append_attribute("stroke-width") = "10";
     rectChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
+     */
     
 }
 
@@ -843,7 +844,7 @@ std::string SvgDeviceContext::GetStringSVG(bool xml_declaration)
     
 void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 {
-    bool drawBoundingBox = true;
+    bool drawBoundingBox = false;
     if (drawBoundingBox && view) {
         BoundingBox *box = object;
         // For floating elements, get the current bounding box set by System::SetCurrentFloatingPositioner

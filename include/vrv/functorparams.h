@@ -681,12 +681,20 @@ public:
         m_currentPage = currentPage;
         m_shift = 0;
         m_pageHeight = 0;
+        m_pgHeadHeight = 0;
+        m_pgFootHeight = 0;
+        m_pgHead2Height = 0;
+        m_pgFoot2Height = 0;
     }
     Page *m_contentPage;
     Doc *m_doc;
     Page *m_currentPage;
     int m_shift;
     int m_pageHeight;
+    int m_pgHeadHeight;
+    int m_pgFootHeight;
+    int m_pgHead2Height;
+    int m_pgFoot2Height;
 };
 
 //----------------------------------------------------------------------------

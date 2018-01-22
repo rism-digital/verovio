@@ -16,6 +16,7 @@ class MidiFile;
 
 namespace vrv {
 
+class CastOffPagesParams;
 class FontInfo;
 class Glyph;
 class Page;
@@ -265,6 +266,15 @@ public:
      * Starting from a single system, create and fill pages and systems.
      */
     void CastOffDoc();
+    
+    /**
+     * Casts off the running elements (headers and footer)
+     * Called from Doc::CastOffDoc
+     * The doc needs to be empty, the methods adds two empty pages to calculate the
+     * size of the header and footer of the page one and two.
+     * Calcultated sizes are set in the CastOffPagesParams object.
+     */
+    void CastOffRunningElements(CastOffPagesParams *params);
 
     /**
      * Undo the cast off of the entire document.

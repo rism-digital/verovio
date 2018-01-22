@@ -78,9 +78,20 @@ public:
     int GetDrawingYRel() const { return m_drawingYRel; }
     virtual void SetDrawingYRel(int drawingYRel);
     ///@}
-    
-    int CalcTotalHeight();
-    
+
+    /**
+     * @name Get the size of row, cols or cells
+     */
+    ///@{
+    int GetTotalHeight();
+    /** Row from 0 to 2 */
+    int GetRowHeight(int row);
+    /** Col from 0 to 2 */
+    int GetColHeight(int col);
+    /** Row from 0 to 8 */
+    int GetCellHeight(int cell);
+    ///@}
+
     bool AdjustDrawingScaling(int width);
     
     bool AdjustYPos();
@@ -126,7 +137,7 @@ private:
      * Stored the top <rend> or <fig> with the 9 possible positioning combinations, from
      * top-left to bottom-right (going left to right first)
      */
-    ArrayOfTextElements m_positionnedObjects[9];
+    ArrayOfTextElements m_cells[9];
     
     /**
      *
