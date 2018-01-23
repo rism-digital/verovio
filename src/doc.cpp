@@ -189,18 +189,18 @@ bool Doc::GenerateHeaderAndFooter()
     }
     
     PgHead *pgHead = new PgHead();
-    // We mark it as attribute for not having it written in the output
-    pgHead->IsAttribute(true);
+    // We mark it as generated for not having it written in the output
+    pgHead->IsGenerated(true);
     pgHead->GenerateFromMEIHeader(m_header);
     m_scoreDef.AddChild(pgHead);
     
     PgFoot *pgFoot = new PgFoot();
-    pgFoot->IsAttribute(true);
+    pgFoot->IsGenerated(true);
     pgFoot->LoadFooter();
     m_scoreDef.AddChild(pgFoot);
     
     PgFoot2 *pgFoot2 = new PgFoot2();
-    pgFoot2->IsAttribute(true);
+    pgFoot2->IsGenerated(true);
     pgFoot2->LoadFooter();
     m_scoreDef.AddChild(pgFoot2);
 

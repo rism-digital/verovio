@@ -56,6 +56,8 @@ void RunningElement::Reset()
     ResetHorizontalAlign();
     ResetTyped();
     
+    m_isGenerated = false;
+    
     m_drawingPage = NULL;
     m_drawingYRel = 0;
     
@@ -343,7 +345,23 @@ void RunningElement::LoadFooter()
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+    
+int RunningElement::Save(FunctorParams *functorParams)
+{
+    if (this->IsGenerated())
+        return FUNCTOR_SIBLINGS;
+    else
+        return Object::Save(functorParams);
+}
 
+int RunningElement::SaveEnd(FunctorParams *functorParams)
+{
+    if (this->IsGenerated())
+        return FUNCTOR_SIBLINGS;
+    else
+        return Object::SaveEnd(functorParams);
+}
+    
 int RunningElement::AlignVertically(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);

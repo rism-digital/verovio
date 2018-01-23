@@ -53,6 +53,14 @@ public:
     ///@}
     
     /**
+     * @name Setter and getter of the generated flag
+     */
+    ///@{
+    bool IsGenerated() const { return m_isGenerated; }
+    void IsGenerated(bool isGenerated) { m_isGenerated = isGenerated; }
+    ///@}
+    
+    /**
      * @name Get and set the X and Y drawing position
      */
     ///@{
@@ -113,6 +121,14 @@ public:
     //----------//
     
     /**
+     * See Object::Save
+     */
+    ///@{
+    virtual int Save(FunctorParams *functorParams);
+    virtual int SaveEnd(FunctorParams *functorParams);
+    ///@}
+    
+    /**
      * See Object::AlignVertically
      */
     ///@{
@@ -150,6 +166,11 @@ private:
      * top-left to bottom-right (going left to right first)
      */
     ArrayOfTextElements m_cells[9];
+    
+    /**
+     * Flag indicating whereas if the element was generated or not
+     */
+    bool m_isGenerated;
     
     /**
      *
