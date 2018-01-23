@@ -598,9 +598,9 @@ bool Toolkit::LoadData(const std::string &data)
         return false;
     }
     
-    // generate the page header if necessary
+    // generate the page header and footer if necessary
     if (true) {// change this to an option
-        m_doc.GenerateDocumentPgHead();
+        m_doc.GenerateHeaderAndFooter();
     }
 
     m_doc.SetPageHeight(this->GetPageHeight());

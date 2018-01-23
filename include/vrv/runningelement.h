@@ -41,10 +41,9 @@ public:
     
     /**
      * Disable cloning of the running elements (for now?).
-     * It does not make sense you carry copying the running element acrosse the systems.
+     * It does not make sense you carry copying the running element across the systems.
      */
     virtual Object *Clone() const { return NULL; }
-    
     
     /**
      * @name Methods for adding allowed content
@@ -92,9 +91,22 @@ public:
     int GetCellHeight(int cell);
     ///@}
 
+    /**
+     * Scale the content of the running element.
+     * Currently unused.
+     */
     bool AdjustDrawingScaling(int width);
     
+    /**
+     * Adjust the postition of the content of the running element.
+     * First adjust the content of each cell, and then the cells themselves.
+     */
     bool AdjustYPos();
+    
+    /**
+     * Load the footer from the resources (footer.svg)
+     */
+    void LoadFooter();
 
     //----------//
     // Functors //

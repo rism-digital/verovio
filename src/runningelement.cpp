@@ -20,6 +20,7 @@
 #include "page.h"
 #include "rend.h"
 #include "staff.h"
+#include "svg.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -322,6 +323,21 @@ int RunningElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALI
             pos += POSITION_MIDDLE; break;
     }
     return pos;
+}
+    
+void RunningElement::LoadFooter()
+{
+    Fig *fig = new Fig();
+    Svg *svg = new Svg();
+    
+    std::string footer = Resources::GetPath() + "/footer.svg";
+    pugi::xml_document footerDoc;
+    footerDoc.load_file(footer.c_str());
+    svg->Set(footerDoc.first_child());
+    fig->AddChild(svg);
+    fig->SetHalign(HORIZONTALALIGNMENT_center);
+    fig->SetValign(VERTICALALIGNMENT_bottom);
+    this->AddChild(fig);
 }
     
 //----------------------------------------------------------------------------

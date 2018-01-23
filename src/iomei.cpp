@@ -242,12 +242,18 @@ bool MeiOutput::WriteObject(Object *object)
         WriteMeiScoreDef(m_currentNode, dynamic_cast<ScoreDef *>(object));
     }
     else if (object->Is(PGFOOT)) {
-        m_currentNode = m_currentNode.append_child("pgFoot");
-        WriteMeiPgFoot(m_currentNode, dynamic_cast<PgFoot *>(object));
+        // Do not write generated pgHead (marked as attribute)
+        if (!object->IsAttribute()) {
+            m_currentNode = m_currentNode.append_child("pgFoot");
+            WriteMeiPgFoot(m_currentNode, dynamic_cast<PgFoot *>(object));
+        }
     }
     else if (object->Is(PGFOOT2)) {
-        m_currentNode = m_currentNode.append_child("pgFoot2");
-        WriteMeiPgFoot2(m_currentNode, dynamic_cast<PgFoot2 *>(object));
+        // Do not write generated pgHead (marked as attribute)
+        if (!object->IsAttribute()) {
+            m_currentNode = m_currentNode.append_child("pgFoot2");
+            WriteMeiPgFoot2(m_currentNode, dynamic_cast<PgFoot2 *>(object));
+        }
     }
     else if (object->Is(PGHEAD)) {
         // Do not write generated pgHead (marked as attribute)
@@ -257,8 +263,11 @@ bool MeiOutput::WriteObject(Object *object)
         }
     }
     else if (object->Is(PGHEAD2)) {
-        m_currentNode = m_currentNode.append_child("pgHead2");
-        WriteMeiPgHead2(m_currentNode, dynamic_cast<PgHead2 *>(object));
+        // Do not write generated pgHead (marked as attribute)
+        if (!object->IsAttribute()) {
+            m_currentNode = m_currentNode.append_child("pgHead2");
+            WriteMeiPgHead2(m_currentNode, dynamic_cast<PgHead2 *>(object));
+        }
     }
     else if (object->Is(STAFFGRP)) {
         m_currentNode = m_currentNode.append_child("staffGrp");

@@ -30,6 +30,8 @@
 #include "note.h"
 #include "page.h"
 #include "pghead.h"
+#include "pgfoot.h"
+#include "pgfoot2.h"
 #include "rpt.h"
 #include "runningelement.h"
 #include "score.h"
@@ -180,9 +182,9 @@ bool Doc::GenerateDocumentScoreDef()
     return true;
 }
     
-bool Doc::GenerateDocumentPgHead()
+bool Doc::GenerateHeaderAndFooter()
 {
-    if (m_scoreDef.FindChildByType(PGHEAD)) {
+    if (m_scoreDef.FindChildByType(PGHEAD) || m_scoreDef.FindChildByType(PGFOOT)) {
         return false;
     }
     
@@ -191,6 +193,16 @@ bool Doc::GenerateDocumentPgHead()
     pgHead->IsAttribute(true);
     pgHead->GenerateFromMEIHeader(m_header);
     m_scoreDef.AddChild(pgHead);
+    
+    PgFoot *pgFoot = new PgFoot();
+    pgFoot->IsAttribute(true);
+    pgFoot->LoadFooter();
+    m_scoreDef.AddChild(pgFoot);
+    
+    PgFoot2 *pgFoot2 = new PgFoot2();
+    pgFoot2->IsAttribute(true);
+    pgFoot2->LoadFooter();
+    m_scoreDef.AddChild(pgFoot2);
 
     return true;
 }

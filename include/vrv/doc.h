@@ -68,7 +68,7 @@ public:
     /**
      * Generate a document pgHead from the MEI header if none is provided.
      */
-    bool GenerateDocumentPgHead();
+    bool GenerateHeaderAndFooter();
 
     /**
      * Getter and setter for the DocType.
