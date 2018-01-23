@@ -597,6 +597,11 @@ bool Toolkit::LoadData(const std::string &data)
         delete input;
         return false;
     }
+    
+    // generate the page header if necessary
+    if (true) {// change this to an option
+        m_doc.GenerateDocumentPgHead();
+    }
 
     m_doc.SetPageHeight(this->GetPageHeight());
     m_doc.SetPageWidth(this->GetPageWidth());

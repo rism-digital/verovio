@@ -182,7 +182,12 @@ bool Doc::GenerateDocumentScoreDef()
     
 bool Doc::GenerateDocumentPgHead()
 {
+    if (m_scoreDef.FindChildByType(PGHEAD)) {
+        return false;
+    }
+    
     PgHead *pgHead = new PgHead();
+    // We mark it as attribute for not having it written in the output
     pgHead->IsAttribute(true);
     pgHead->GenerateFromMEIHeader(m_header);
     m_scoreDef.AddChild(pgHead);

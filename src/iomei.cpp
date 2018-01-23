@@ -250,8 +250,11 @@ bool MeiOutput::WriteObject(Object *object)
         WriteMeiPgFoot2(m_currentNode, dynamic_cast<PgFoot2 *>(object));
     }
     else if (object->Is(PGHEAD)) {
-        m_currentNode = m_currentNode.append_child("pgHead");
-        WriteMeiPgHead(m_currentNode, dynamic_cast<PgHead *>(object));
+        // Do not write generated pgHead (marked as attribute)
+        if (!object->IsAttribute()) {
+            m_currentNode = m_currentNode.append_child("pgHead");
+            WriteMeiPgHead(m_currentNode, dynamic_cast<PgHead *>(object));
+        }
     }
     else if (object->Is(PGHEAD2)) {
         m_currentNode = m_currentNode.append_child("pgHead2");
@@ -2151,10 +2154,6 @@ bool MeiInput::ReadMei(pugi::xml_node root)
         }
     }
     
-    if (success) {
-        success = m_doc->GenerateDocumentPgHead();
-    }
-
     if (success && !m_hasScoreDef) {
         LogMessage("No scoreDef provided, trying to generate one...");
         success = m_doc->GenerateDocumentScoreDef();
