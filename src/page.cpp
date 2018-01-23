@@ -380,16 +380,13 @@ void Page::LayOutVertically()
     AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
     this->Process(&adjustYPos, &adjustYPosParams);
     
-    int header = 0;
     if (this->GetHeader()) {
-        //header = this->GetHeader()->GetTotalHeight();
-        //this->GetHeader()->AdjustDrawingScaling(5000);
+        this->GetHeader()->SetCurrentPageNum(this->GetIdx() + 1);
         this->GetHeader()->AdjustYPos();
     }
     
     if (this->GetFooter()) {
-        //header = this->GetHeader()->GetTotalHeight();
-        //this->GetHeader()->AdjustDrawingScaling(5000);
+        this->GetFooter()->SetCurrentPageNum(this->GetIdx() + 1);
         this->GetFooter()->AdjustYPos();
     }
 

@@ -17,6 +17,7 @@
 #include "editorial.h"
 #include "fig.h"
 #include "functorparams.h"
+#include "num.h"
 #include "page.h"
 #include "rend.h"
 #include "staff.h"
@@ -327,6 +328,20 @@ int RunningElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALI
     return pos;
 }
     
+void RunningElement::SetCurrentPageNum(int currentNum)
+{
+    Num *num = dynamic_cast<Num*>(this->FindChildByType(NUM));
+    if (!num || (num->GetLabel() != "page")) return;
+    
+    Text *text = dynamic_cast<Text *>(num->FindChildByType(TEXT));
+    if (!text || (text->GetText() != L"#")) return;
+    
+    Text *currentText = num->GetCurrentText();
+    assert(currentText);
+    
+    currentText->SetText(UTF8to16(StringFormat("%d", currentNum)));
+}
+    
 void RunningElement::LoadFooter()
 {
     Fig *fig = new Fig();
@@ -340,6 +355,30 @@ void RunningElement::LoadFooter()
     fig->SetHalign(HORIZONTALALIGNMENT_center);
     fig->SetValign(VERTICALALIGNMENT_bottom);
     this->AddChild(fig);
+}
+    
+void RunningElement::AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALALIGNMENT valign)
+{
+    Rend *rend = new Rend();
+    data_FONTSIZE fs;
+    fs.SetTerm(FONTSIZETERM_small);
+    rend->SetFontsize(fs);
+    rend->SetHalign(halign);
+    rend->SetValign(valign);
+    Text *dash1 = new Text();
+    dash1->SetText(L"– ");
+    Num *num = new Num();
+    num->SetLabel("page");
+    Text *text = new Text();
+    text->SetText(L"#");
+    Text *dash2 = new Text();
+    dash2->SetText(L" –");
+    
+    num->AddChild(text);
+    rend->AddChild(dash1);
+    rend->AddChild(num);
+    rend->AddChild(dash2);
+    this->AddChild(rend);
 }
     
 //----------------------------------------------------------------------------

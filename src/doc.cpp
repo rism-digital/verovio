@@ -29,9 +29,10 @@
 #include "multirest.h"
 #include "note.h"
 #include "page.h"
-#include "pghead.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
+#include "pghead.h"
+#include "pghead2.h"
 #include "rpt.h"
 #include "runningelement.h"
 #include "score.h"
@@ -198,6 +199,11 @@ bool Doc::GenerateHeaderAndFooter()
     pgFoot->IsGenerated(true);
     pgFoot->LoadFooter();
     m_scoreDef.AddChild(pgFoot);
+
+    PgHead2 *pgHead2 = new PgHead2();
+    pgHead2->IsGenerated(true);
+    pgHead2->AddPageNum(HORIZONTALALIGNMENT_center, VERTICALALIGNMENT_top);
+    m_scoreDef.AddChild(pgHead2);
     
     PgFoot2 *pgFoot2 = new PgFoot2();
     pgFoot2->IsGenerated(true);

@@ -10,6 +10,7 @@
 
 #include "atts_shared.h"
 #include "textelement.h"
+#include "text.h"
 
 namespace vrv {
 
@@ -39,12 +40,22 @@ public:
      * Add an element (text) to a num.
      */
     virtual void AddChild(Object *object);
+    
+    /**
+     * Return a pointer to the current text object.
+     */
+    Text *GetCurrentText() { return &m_currentText; }
 
 private:
     //
 public:
     //
 private:
+    /**
+     * Current text for templated number (<num label="page">#</num>).
+     * Filled by RunningElement::SetCurrentPageNum and used by View::DrawNum
+     */
+    Text m_currentText;
 };
 
 } // namespace vrv

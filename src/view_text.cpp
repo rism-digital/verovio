@@ -151,7 +151,13 @@ void View::DrawNum(DeviceContext *dc, Num *num, TextDrawingParams &params)
 
     dc->StartTextGraphic(num, "", num->GetUuid());
     
-    DrawTextChildren(dc, num, params);
+    Text *currentText = num->GetCurrentText();
+    if (currentText && (currentText->GetText().length() > 0)) {
+        DrawText(dc, num->GetCurrentText(), params);
+    }
+    else {
+        DrawTextChildren(dc, num, params);
+    }
     
     dc->EndTextGraphic(num, this);
 }

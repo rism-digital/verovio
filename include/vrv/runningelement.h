@@ -112,9 +112,19 @@ public:
     bool AdjustYPos();
     
     /**
+     * Set the current page number by looking for a <num label="page">#</num> element.
+     */
+    void SetCurrentPageNum(int currentNum);
+    
+    /**
      * Load the footer from the resources (footer.svg)
      */
     void LoadFooter();
+    
+    /**
+     * Add page numbering to the running element.
+     */
+    void AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALALIGNMENT valign);
 
     //----------//
     // Functors //
