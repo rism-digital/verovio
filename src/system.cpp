@@ -447,10 +447,21 @@ int System::CastOffPages(FunctorParams *functorParams)
 {
     CastOffPagesParams *params = dynamic_cast<CastOffPagesParams *>(functorParams);
     assert(params);
+    
+    int currentShift = params->m_shift;
+    // We use params->m_pageHeadHeight to check if we have passed the first page already
+    if (params->m_pgHeadHeight != VRV_UNSET) {
+        currentShift += params->m_pgHeadHeight + params->m_pgFootHeight;
+    }
+    else {
+        currentShift += params->m_pgHead2Height + params->m_pgFoot2Height;
+    }
 
     if ((params->m_currentPage->GetChildCount() > 0)
-        && (this->m_drawingYRel - this->GetHeight() - params->m_shift < 0)) {
+        && (this->m_drawingYRel - this->GetHeight() - currentShift < 0)) {
         params->m_currentPage = new Page();
+        // Use VRV_UNSET value as a flag
+        params->m_pgHeadHeight = VRV_UNSET;
         params->m_doc->AddChild(params->m_currentPage);
         params->m_shift = this->m_drawingYRel - params->m_pageHeight;
     }
