@@ -16,6 +16,7 @@
 #include "editorial.h"
 #include "functorparams.h"
 #include "lb.h"
+#include "num.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -54,6 +55,9 @@ void Rend::AddChild(Object *child)
 {
     if (child->Is(LB)) {
         assert(dynamic_cast<Lb *>(child));
+    }
+    else if (child->Is(NUM)) {
+        assert(dynamic_cast<Num *>(child));
     }
     else if (child->Is(REND)) {
         assert(dynamic_cast<Rend *>(child));

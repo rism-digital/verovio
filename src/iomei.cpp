@@ -50,6 +50,7 @@
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
+#include "num.h"
 #include "octave.h"
 #include "page.h"
 #include "pedal.h"
@@ -476,6 +477,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(LB)) {
         m_currentNode = m_currentNode.append_child("lb");
         WriteMeiLb(m_currentNode, dynamic_cast<Lb *>(object));
+    }
+    else if (object->Is(NUM)) {
+        m_currentNode = m_currentNode.append_child("num");
+        WriteMeiNum(m_currentNode, dynamic_cast<Num *>(object));
     }
     else if (object->Is(REND)) {
         m_currentNode = m_currentNode.append_child("rend");
@@ -1420,6 +1425,15 @@ void MeiOutput::WriteMeiLb(pugi::xml_node currentNode, Lb *lb)
     WriteTextElement(currentNode, lb);
 }
     
+void MeiOutput::WriteMeiNum(pugi::xml_node currentNode, Num *num)
+{
+    assert(num);
+    
+    num->WriteLabelled(currentNode);
+    
+    WriteTextElement(currentNode, num);
+}
+    
 void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
 {
     assert(rend);
@@ -1837,6 +1851,14 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    else if (filterParent->Is(NUM)) {
+        if (element == "") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for harm
     else if (filterParent->Is(HARM)) {
         if (element == "") {
@@ -1858,6 +1880,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return true;
         }
         else if (element == "lb") {
+            return true;
+        }
+        else if (element == "num") {
             return true;
         }
         else if (element == "rend") {
@@ -3723,6 +3748,9 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
         else if (elementName == "lb") {
             success = ReadMeiLb(parent, xmlElement);
         }
+        else if (elementName == "num") {
+            success = ReadMeiNum(parent, xmlElement);
+        }
         else if (elementName == "rend") {
             success = ReadMeiRend(parent, xmlElement);
         }
@@ -3782,6 +3810,17 @@ bool MeiInput::ReadMeiLb(Object *parent, pugi::xml_node lb)
 
     parent->AddChild(vrvLb);
     return true;
+}
+    
+bool MeiInput::ReadMeiNum(Object *parent, pugi::xml_node num)
+{
+    Num *vrvNum = new Num();
+    ReadTextElement(num, vrvNum);
+    
+    vrvNum->ReadLabelled(num);
+    
+    parent->AddChild(vrvNum);
+    return ReadMeiTextChildren(vrvNum, num, vrvNum);
 }
     
 bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)

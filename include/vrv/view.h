@@ -21,6 +21,7 @@ class Beam;
 class BeamDrawingParams;
 class Breath;
 class Chord;
+class ControlElement;
 class DeviceContext;
 class Dir;
 class Doc;
@@ -38,7 +39,7 @@ class LayerElement;
 class Lb;
 class Measure;
 class Mordent;
-class ControlElement;
+class Num;
 class Octave;
 class Page;
 class Pedal;
@@ -336,6 +337,7 @@ protected:
     ///@{
     void DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params);
     void DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params);
+    void DrawNum(DeviceContext *dc, Num *num, TextDrawingParams &params);
     void DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params);
     void DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params);
     void DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params);

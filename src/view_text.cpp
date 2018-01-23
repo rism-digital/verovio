@@ -20,6 +20,7 @@
 #include "fb.h"
 #include "fig.h"
 #include "lb.h"
+#include "num.h"
 #include "rend.h"
 #include "smufl.h"
 #include "style.h"
@@ -106,6 +107,11 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingP
         assert(lb);
         DrawLb(dc, lb, params);
     }
+    else if (element->Is(NUM)) {
+        Num *num = dynamic_cast<Num *>(element);
+        assert(num);
+        DrawNum(dc, num, params);
+    }
     else if (element->Is(REND)) {
         Rend *rend = dynamic_cast<Rend *>(element);
         assert(rend);
@@ -115,6 +121,9 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingP
         Text *text = dynamic_cast<Text *>(element);
         assert(text);
         DrawText(dc, text, params);
+    }
+    else {
+        assert(false);
     }
 }
 
@@ -133,6 +142,18 @@ void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
     params.m_newLine = true;
     
     dc->EndTextGraphic(lb, this);
+}
+    
+void View::DrawNum(DeviceContext *dc, Num *num, TextDrawingParams &params)
+{
+    assert(dc);
+    assert(num);
+
+    dc->StartTextGraphic(num, "", num->GetUuid());
+    
+    DrawTextChildren(dc, num, params);
+    
+    dc->EndTextGraphic(num, this);
 }
 
 void View::DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params)

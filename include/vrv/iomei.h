@@ -76,6 +76,7 @@ class MRpt2;
 class MultiRest;
 class MultiRpt;
 class Note;
+class Num;
 class Octave;
 class Orig;
 class Pb;
@@ -266,6 +267,7 @@ private:
     void WriteMeiF(pugi::xml_node currentNode, F *f);
     void WriteMeiFig(pugi::xml_node currentNode, Fig *fig);
     void WriteMeiLb(pugi::xml_node currentNode, Lb *lb);
+    void WriteMeiNum(pugi::xml_node currentNode, Num *num);
     void WriteMeiRend(pugi::xml_node currentNode, Rend *rend);
     void WriteMeiSvg(pugi::xml_node currentNode, Svg *svg);
     void WriteMeiText(pugi::xml_node currentNode, Text *text);
@@ -443,6 +445,7 @@ private:
     bool ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiFb(Object *parent, pugi::xml_node fb);
     bool ReadMeiFbChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeiNum(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiStaff(Object *parent, pugi::xml_node staff);
     bool ReadMeiStaffChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiLayer(Object *parent, pugi::xml_node layer);

@@ -212,6 +212,10 @@
 		4D796B5E1D78641900A15238 /* harm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D796B5D1D78641900A15238 /* harm.cpp */; };
 		4D798CBD1B8AEDBA007281CA /* drawinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */; };
 		4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */; };
+		4D89F90C201771A700A4D336 /* num.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D89F90B201771A700A4D336 /* num.h */; };
+		4D89F90E201771AE00A4D336 /* num.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F90D201771AE00A4D336 /* num.cpp */; };
+		4D89F90F201771AE00A4D336 /* num.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F90D201771AE00A4D336 /* num.cpp */; };
+		4D89F910201771AE00A4D336 /* num.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F90D201771AE00A4D336 /* num.cpp */; };
 		4D8CD8A61B4E922A00F0756F /* atts_critapp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28F31940BCC100C76319 /* atts_critapp.cpp */; };
 		4D8CD8A71B4E927300F0756F /* atts_critapp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28F31940BCC100C76319 /* atts_critapp.cpp */; };
 		4D95D4F21D6E042400B2B856 /* section.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F11D6E042400B2B856 /* section.cpp */; };
@@ -650,6 +654,8 @@
 		4D796B5D1D78641900A15238 /* harm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = harm.cpp; path = src/harm.cpp; sourceTree = "<group>"; };
 		4D797B041A67C55F007637BD /* devicecontextbase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = devicecontextbase.h; path = include/vrv/devicecontextbase.h; sourceTree = "<group>"; };
 		4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = drawinginterface.cpp; path = src/drawinginterface.cpp; sourceTree = "<group>"; };
+		4D89F90B201771A700A4D336 /* num.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = num.h; path = include/vrv/num.h; sourceTree = "<group>"; };
+		4D89F90D201771AE00A4D336 /* num.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = num.cpp; path = src/num.cpp; sourceTree = "<group>"; };
 		4D9234F11A586AE100763251 /* attcomparison.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attcomparison.h; path = include/vrv/attcomparison.h; sourceTree = "<group>"; };
 		4D95D4F01D6E041E00B2B856 /* section.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = section.h; path = include/vrv/section.h; sourceTree = "<group>"; };
 		4D95D4F11D6E042400B2B856 /* section.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = section.cpp; path = src/section.cpp; sourceTree = "<group>"; };
@@ -947,6 +953,8 @@
 				4DB3D89C1F7E7F9D00B5FC2B /* fig.h */,
 				4DB3D8951F7C2B0E00B5FC2B /* lb.cpp */,
 				4DB3D8971F7C2B2900B5FC2B /* lb.h */,
+				4D89F90D201771AE00A4D336 /* num.cpp */,
+				4D89F90B201771A700A4D336 /* num.h */,
 				4D6122BD1F77E1E000FC90A0 /* rend.cpp */,
 				4D6122BB1F77E1B900FC90A0 /* rend.h */,
 				4DB3D8A01F7E812300B5FC2B /* svg.cpp */,
@@ -1395,6 +1403,7 @@
 				4DB3D8DD1F83D14B00B5FC2B /* artic.h in Headers */,
 				4DF28A031A754DE400BA9F7D /* controlelement.h in Headers */,
 				4DB3D8F11F83D1AA00B5FC2B /* fig.h in Headers */,
+				4D89F90C201771A700A4D336 /* num.h in Headers */,
 				4DB3D8FE1F83D20100B5FC2B /* horizontalaligner.h in Headers */,
 				4D1031881DECB83E0098EA1C /* atts_externalsymbols.h in Headers */,
 				4DB3D8F21F83D1B100B5FC2B /* svg.h in Headers */,
@@ -1577,6 +1586,7 @@
 			files = (
 				4D1693F51E3A44F300569BF4 /* verticalaligner.cpp in Sources */,
 				4D1693F61E3A44F300569BF4 /* barline.cpp in Sources */,
+				4D89F90F201771AE00A4D336 /* num.cpp in Sources */,
 				4D1693F71E3A44F300569BF4 /* bboxdevicecontext.cpp in Sources */,
 				4D1693F81E3A44F300569BF4 /* beam.cpp in Sources */,
 				4D4FCD131F54570E0009C455 /* staffdef.cpp in Sources */,
@@ -1841,6 +1851,7 @@
 				4DF28A051A754DF000BA9F7D /* floatingobject.cpp in Sources */,
 				4DF9D2831C18DC490069E8C8 /* atts_mei.cpp in Sources */,
 				4D3FF8DB19BADD7A00B105B5 /* atts_pagebased.cpp in Sources */,
+				4D89F90E201771AE00A4D336 /* num.cpp in Sources */,
 				4DB351131C8040B1002DD057 /* anchoredtext.cpp in Sources */,
 				4DC34BA819BC4A83006175CD /* accid.cpp in Sources */,
 				4DC34BAA19BC4A83006175CD /* custos.cpp in Sources */,
@@ -1979,6 +1990,7 @@
 				4DA3FCD419B61DB400CBDFE6 /* atts_cmn.cpp in Sources */,
 				4DC34BA919BC4A83006175CD /* accid.cpp in Sources */,
 				4DC34BAB19BC4A83006175CD /* custos.cpp in Sources */,
+				4D89F910201771AE00A4D336 /* num.cpp in Sources */,
 				4D4335D11ED4502C003BE1A9 /* atts_visual.cpp in Sources */,
 				4D6331FD1F46DD3A00A0D6BF /* plistinterface.cpp in Sources */,
 				4DC34BAD19BC4A83006175CD /* dot.cpp in Sources */,
