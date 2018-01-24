@@ -290,7 +290,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
         // Skip it if we do not have it in the font (for now - we should log / document this somewhere)
         if (code == 0) {
-            articPart->SetEmptyBB(true);
+            articPart->SetEmptyBB();
             continue;
         }
 

@@ -73,7 +73,6 @@ set(all_SRC
     ${hum_SRC}
     ${midi_SRC}
     ../src/pugi/pugixml.cpp
-    ../src/pugi/svg.cpp
     ../libmei/attconverter.cpp
     ../libmei/atts_analytical.cpp
     ../libmei/atts_cmn.cpp

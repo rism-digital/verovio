@@ -204,7 +204,7 @@ int Measure::GetLeftBarLineXRel() const
 int Measure::GetLeftBarLineLeft() const
 {
     int x = GetLeftBarLineXRel();
-    if (m_leftBarLine.HasUpdatedBB()) {
+    if (m_leftBarLine.HasSelfBB()) {
         x += m_leftBarLine.GetContentX1();
     }
     return x;
@@ -213,7 +213,7 @@ int Measure::GetLeftBarLineLeft() const
 int Measure::GetLeftBarLineRight() const
 {
     int x = GetLeftBarLineXRel();
-    if (m_leftBarLine.HasUpdatedBB()) {
+    if (m_leftBarLine.HasSelfBB()) {
         x += m_leftBarLine.GetContentX2();
     }
     return x;
@@ -230,7 +230,7 @@ int Measure::GetRightBarLineXRel() const
 int Measure::GetRightBarLineLeft() const
 {
     int x = GetRightBarLineXRel();
-    if (m_rightBarLine.HasUpdatedBB()) {
+    if (m_rightBarLine.HasSelfBB()) {
         x += m_rightBarLine.GetContentX1();
     }
     return x;
@@ -239,7 +239,7 @@ int Measure::GetRightBarLineLeft() const
 int Measure::GetRightBarLineRight() const
 {
     int x = GetRightBarLineXRel();
-    if (m_rightBarLine.HasUpdatedBB()) {
+    if (m_rightBarLine.HasSelfBB()) {
         x += m_rightBarLine.GetContentX2();
     }
     return x;
@@ -641,7 +641,7 @@ int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
 
     // Here we also need to handle the last syl or the measure - we check the alignment with the right barline
     if (params->m_previousSyl) {
-        int overlap = params->m_previousSyl->GetSelfRight() - this->GetRightBarLine()->GetAlignment()->GetXRel();
+        int overlap = params->m_previousSyl->GetContentRight() - this->GetRightBarLine()->GetAlignment()->GetXRel();
         if (overlap > 0) {
             params->m_overlapingSyl.push_back(std::make_tuple(
                 params->m_previousSyl->GetAlignment(), this->GetRightBarLine()->GetAlignment(), overlap));
