@@ -1532,11 +1532,14 @@ void View::DrawSylConnector(
         // nothing to adjust
     }
 
+    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instanciate a temporary object
+    // in order not to reset the Syl bounding box.
+    Syl sylConnector;
     if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     }
     else
-        dc->StartGraphic(syl, "spanning-connector", "");
+        dc->StartGraphic(&sylConnector, "spanning-connector", "");
 
     dc->DeactivateGraphic();
 
@@ -1547,7 +1550,7 @@ void View::DrawSylConnector(
         dc->EndResumedGraphic(graphic, this);
     }
     else
-        dc->EndGraphic(syl, this);
+        dc->EndGraphic(&sylConnector, this);
 }
 
 void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff)
