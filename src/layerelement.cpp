@@ -851,7 +851,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
 
     // These are the only ones we want to keep for further collision detection
     // Eventually  we also need stem for overlapping voices
-    if (this->Is({ DOTS, NOTE }) && this->HasUpdatedBB()) {
+    if (this->Is({ DOTS, NOTE }) && this->HasSelfBB()) {
         params->m_current.push_back(this);
     }
 
@@ -935,7 +935,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     if (!this->HasGraceAlignment()) return FUNCTOR_SIBLINGS;
 
-    if (!this->HasUpdatedBB() || this->HasEmptyBB()) {
+    if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
         return FUNCTOR_SIBLINGS;
     }
@@ -973,7 +973,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     }
 
     int selfLeft;
-    if (!this->HasUpdatedBB() || this->HasEmptyBB()) {
+    if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
         // assert(this->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT }));
         // This should happen for invis barline attribute but also chords in beam. Otherwise the BB should be set to
@@ -998,7 +998,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     }
 
     int selfRight;
-    if (!this->HasUpdatedBB() || this->HasEmptyBB())
+    if (!this->HasSelfBB() || this->HasEmptyBB())
         selfRight = this->GetAlignment()->GetXRel()
             + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
                 / PARAM_DENOMINATOR;
@@ -1016,7 +1016,7 @@ int LayerElement::AdjustXRelForTranscription(FunctorParams *)
 {
     if (this->m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
 
-    if (!this->HasUpdatedBB()) return FUNCTOR_CONTINUE;
+    if (!this->HasSelfBB()) return FUNCTOR_CONTINUE;
 
     this->SetDrawingXRel(-this->GetSelfX1());
 
