@@ -63,6 +63,7 @@
 #include "octave.h"
 #include "page.h"
 #include "pedal.h"
+#include "rend.h"
 #include "rest.h"
 #include "score.h"
 #include "section.h"
@@ -1377,7 +1378,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         StaffGrp *root_sg = new StaffGrp();
         root_sg->SetBarthru(BOOLEAN_false);
         m_doc->m_scoreDef.AddChild(root_sg);
-        for (int i = 0; i < newgroups.size(); i++) {
+        for (int i = 0; i < (int)newgroups.size(); i++) {
             if (newgroups[i].size() == 1) {
                 // insert staffDef directly in root_sg:
                 root_sg->AddChild(m_staffdef[newgroups[i][0]]);
