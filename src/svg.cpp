@@ -35,13 +35,13 @@ void Svg::Reset()
 {
     Object::Reset();
 }
-    
+
 void Svg::Set(pugi::xml_node svg)
 {
     m_svg.reset();
     m_svg.append_copy(svg);
 }
-    
+
 int Svg::GetWidth() const
 {
     if (m_svg && m_svg.first_child() && m_svg.first_child().attribute("width")) {
@@ -49,7 +49,7 @@ int Svg::GetWidth() const
     }
     return 0;
 }
-        
+
 int Svg::GetHeight() const
 {
     if (m_svg && m_svg.first_child() && m_svg.first_child().attribute("height")) {
@@ -57,5 +57,5 @@ int Svg::GetHeight() const
     }
     return 0;
 }
-    
+
 } // namespace vrv

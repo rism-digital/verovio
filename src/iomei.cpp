@@ -792,7 +792,7 @@ void MeiOutput::WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
     WriteScoreDefInterface(currentNode, scoreDef);
     scoreDef->WriteEndings(currentNode);
 }
-    
+
 void MeiOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *runningElement)
 {
     assert(runningElement);
@@ -802,25 +802,24 @@ void MeiOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *
     runningElement->WriteTyped(currentNode);
 }
 
-
 void MeiOutput::WriteMeiPgFoot(pugi::xml_node currentNode, PgFoot *pgFoot)
 {
     assert(pgFoot);
-    
+
     WriteRunningElement(currentNode, pgFoot);
 }
 
 void MeiOutput::WriteMeiPgFoot2(pugi::xml_node currentNode, PgFoot2 *pgFoot2)
 {
     assert(pgFoot2);
-    
+
     WriteRunningElement(currentNode, pgFoot2);
 }
 
 void MeiOutput::WriteMeiPgHead(pugi::xml_node currentNode, PgHead *pgHead)
 {
     assert(pgHead);
-    
+
     WriteRunningElement(currentNode, pgHead);
 }
 
@@ -1250,7 +1249,7 @@ void MeiOutput::WriteMeiLigature(pugi::xml_node currentNode, Ligature *ligature)
     WriteLayerElement(currentNode, ligature);
     ligature->WriteLigatureLog(currentNode);
 }
-    
+
 void MeiOutput::WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur)
 {
     assert(mensur);
@@ -1408,32 +1407,31 @@ void MeiOutput::WriteMeiF(pugi::xml_node currentNode, F *figure)
 
     WriteTextElement(currentNode, figure);
 };
-    
+
 void MeiOutput::WriteMeiFig(pugi::xml_node currentNode, Fig *fig)
 {
     assert(fig);
 
     WriteTextElement(currentNode, fig);
     WriteAreaPosInterface(currentNode, fig);
-
 };
-    
+
 void MeiOutput::WriteMeiLb(pugi::xml_node currentNode, Lb *lb)
 {
     assert(lb);
 
     WriteTextElement(currentNode, lb);
 }
-    
+
 void MeiOutput::WriteMeiNum(pugi::xml_node currentNode, Num *num)
 {
     assert(num);
-    
+
     num->WriteLabelled(currentNode);
-    
+
     WriteTextElement(currentNode, num);
 }
-    
+
 void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
 {
     assert(rend);
@@ -1445,19 +1443,19 @@ void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
     rend->WriteTypography(currentNode);
     rend->WriteWhitespace(currentNode);
 }
-    
+
 void MeiOutput::WriteMeiSvg(pugi::xml_node currentNode, Svg *svg)
 {
     assert(svg);
-    
+
     WriteXmlId(currentNode, svg);
-    
+
     pugi::xml_node svgNode = svg->Get();
-    for (pugi::xml_attribute attr: svgNode.attributes()) {
+    for (pugi::xml_attribute attr : svgNode.attributes()) {
         currentNode.append_attribute(attr.name()) = attr.value();
     }
-    
-    for (pugi::xml_node child: svgNode.children()) {
+
+    for (pugi::xml_node child : svgNode.children()) {
         currentNode.append_copy(child);
     }
 };
@@ -1478,7 +1476,7 @@ void MeiOutput::WriteAreaPosInterface(pugi::xml_node element, AreaPosInterface *
     interface->WriteHorizontalAlign(element);
     interface->WriteVerticalAlign(element);
 }
-    
+
 void MeiOutput::WriteDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
     assert(interface);
@@ -2175,7 +2173,7 @@ bool MeiInput::ReadMei(pugi::xml_node root)
             m_doc->ConvertAnalyticalMarkupDoc();
         }
     }
-    
+
     if (success && !m_hasScoreDef) {
         LogMessage("No scoreDef provided, trying to generate one...");
         success = m_doc->GenerateDocumentScoreDef();
@@ -2622,7 +2620,7 @@ bool MeiInput::ReadMeiStaffGrpChildren(Object *parent, pugi::xml_node parentNode
     }
     return success;
 }
-    
+
 bool MeiInput::ReadRunningElement(pugi::xml_node element, RunningElement *object)
 {
     SetMeiUuid(element, object);
@@ -2632,12 +2630,11 @@ bool MeiInput::ReadRunningElement(pugi::xml_node element, RunningElement *object
     return true;
 }
 
-
 bool MeiInput::ReadMeiPgFoot(Object *parent, pugi::xml_node pgFoot)
 {
     PgFoot *vrvPgFoot = new PgFoot();
     ReadRunningElement(pgFoot, vrvPgFoot);
-    
+
     parent->AddChild(vrvPgFoot);
     return ReadMeiRunningChildren(vrvPgFoot, pgFoot, vrvPgFoot);
 }
@@ -2646,7 +2643,7 @@ bool MeiInput::ReadMeiPgFoot2(Object *parent, pugi::xml_node pgFoot2)
 {
     PgFoot2 *vrvPgFoot2 = new PgFoot2();
     ReadRunningElement(pgFoot2, vrvPgFoot2);
-    
+
     parent->AddChild(vrvPgFoot2);
     return ReadMeiRunningChildren(vrvPgFoot2, pgFoot2, vrvPgFoot2);
 }
@@ -2655,7 +2652,7 @@ bool MeiInput::ReadMeiPgHead(Object *parent, pugi::xml_node pgHead)
 {
     PgHead *vrvPgHead = new PgHead();
     ReadRunningElement(pgHead, vrvPgHead);
-    
+
     parent->AddChild(vrvPgHead);
     return ReadMeiRunningChildren(vrvPgHead, pgHead, vrvPgHead);
 }
@@ -2664,11 +2661,11 @@ bool MeiInput::ReadMeiPgHead2(Object *parent, pugi::xml_node pgHead2)
 {
     PgHead2 *vrvPgHead2 = new PgHead2();
     ReadRunningElement(pgHead2, vrvPgHead2);
-    
+
     parent->AddChild(vrvPgHead2);
     return ReadMeiRunningChildren(vrvPgHead2, pgHead2, vrvPgHead2);
 }
-    
+
 bool MeiInput::ReadMeiRunningChildren(Object *parent, pugi::xml_node parentNode, Object *filter)
 {
     bool success = true;
@@ -3419,7 +3416,7 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
         vrvArtic->SetArtic(artic.GetArtic());
         vrvChord->AddChild(vrvArtic);
     }
-    
+
     if (vrvChord->HasTie()) {
         m_doc->SetAnalyticalMarkup(true);
     }
@@ -3544,7 +3541,7 @@ bool MeiInput::ReadMeiMRest(Object *parent, pugi::xml_node mRest)
     vrvMRest->ReadCue(mRest);
     vrvMRest->ReadFermataPresent(mRest);
     vrvMRest->ReadVisibility(mRest);
-    
+
     if (vrvMRest->HasFermata()) {
         m_doc->SetAnalyticalMarkup(true);
     }
@@ -3632,7 +3629,7 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
         vrvAccid->SetAccidGes(accidentalGestural.GetAccidGes());
         vrvNote->AddChild(vrvAccid);
     }
-    
+
     if (vrvNote->HasTie()) {
         m_doc->SetAnalyticalMarkup(true);
     }
@@ -3791,18 +3788,18 @@ bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node f)
     parent->AddChild(vrvF);
     return ReadMeiTextChildren(vrvF, f);
 }
-    
+
 bool MeiInput::ReadMeiFig(Object *parent, pugi::xml_node fig)
 {
     Fig *vrvFig = new Fig();
     ReadTextElement(fig, vrvFig);
-    
+
     ReadAreaPosInterface(fig, vrvFig);
-    
+
     parent->AddChild(vrvFig);
     return ReadMeiTextChildren(vrvFig, fig, vrvFig);
 }
-    
+
 bool MeiInput::ReadMeiLb(Object *parent, pugi::xml_node lb)
 {
     Lb *vrvLb = new Lb();
@@ -3811,23 +3808,23 @@ bool MeiInput::ReadMeiLb(Object *parent, pugi::xml_node lb)
     parent->AddChild(vrvLb);
     return true;
 }
-    
+
 bool MeiInput::ReadMeiNum(Object *parent, pugi::xml_node num)
 {
     Num *vrvNum = new Num();
     ReadTextElement(num, vrvNum);
-    
+
     vrvNum->ReadLabelled(num);
-    
+
     parent->AddChild(vrvNum);
     return ReadMeiTextChildren(vrvNum, num, vrvNum);
 }
-    
+
 bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
 {
     Rend *vrvRend = new Rend();
     ReadTextElement(rend, vrvRend);
-    
+
     ReadAreaPosInterface(rend, vrvRend);
 
     vrvRend->ReadColor(rend);
@@ -3836,22 +3833,22 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
     vrvRend->ReadWhitespace(rend);
 
     parent->AddChild(vrvRend);
-    
+
     if (vrvRend->GetFirstParent(REND) && (vrvRend->HasHalign() || vrvRend->HasValign())) {
-        LogWarning ("@halign or @valign in nested <rend> element <rend> %s will be ignored", vrvRend->GetUuid().c_str());
+        LogWarning("@halign or @valign in nested <rend> element <rend> %s will be ignored", vrvRend->GetUuid().c_str());
         // Eventually to be added to unsupported attributes?
         vrvRend->SetHalign(HORIZONTALALIGNMENT_NONE);
         vrvRend->SetValign(VERTICALALIGNMENT_NONE);
     }
-    
+
     return ReadMeiTextChildren(vrvRend, rend, vrvRend);
 }
-    
+
 bool MeiInput::ReadMeiSvg(Object *parent, pugi::xml_node svg)
 {
     Svg *vrvSvg = new Svg();
     SetMeiUuid(svg, vrvSvg);
-    
+
     if (std::string(svg.name()) == "svg") {
         vrvSvg->Set(svg);
     }
@@ -3860,7 +3857,7 @@ bool MeiInput::ReadMeiSvg(Object *parent, pugi::xml_node svg)
     }
 
     parent->AddChild(vrvSvg);
-    
+
     return true;
 }
 
@@ -3885,7 +3882,7 @@ bool MeiInput::ReadAreaPosInterface(pugi::xml_node element, AreaPosInterface *in
     interface->ReadVerticalAlign(element);
     return true;
 }
-    
+
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
     interface->ReadAugmentDots(element);
@@ -3895,11 +3892,11 @@ bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
     interface->ReadDurationRatio(element);
     interface->ReadFermataPresent(element);
     interface->ReadStaffIdent(element);
-    
+
     if (interface->HasFermata()) {
         m_doc->SetAnalyticalMarkup(true);
     }
-    
+
     return true;
 }
 

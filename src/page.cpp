@@ -21,8 +21,8 @@
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
-#include "system.h"
 #include "staff.h"
+#include "system.h"
 #include "view.h"
 #include "vrv.h"
 
@@ -72,14 +72,14 @@ void Page::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-    
+
 RunningElement *Page::GetHeader() const
 {
-    Doc *doc = dynamic_cast<Doc*>(this->GetFirstParent(DOC));
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
     if (!doc) {
         return NULL;
     }
-    
+
     // first page?
     if (doc->GetFirst() == this) {
         return doc->m_scoreDef.GetPgHead();
@@ -88,14 +88,14 @@ RunningElement *Page::GetHeader() const
         return doc->m_scoreDef.GetPgHead2();
     }
 }
-    
+
 RunningElement *Page::GetFooter() const
 {
-    Doc *doc = dynamic_cast<Doc*>(this->GetFirstParent(DOC));
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
     if (!doc) {
         return NULL;
     }
-    
+
     // first page?
     if (doc->GetFirst() == this) {
         return doc->m_scoreDef.GetPgFoot();
@@ -104,7 +104,7 @@ RunningElement *Page::GetFooter() const
         return doc->m_scoreDef.GetPgFoot2();
     }
 }
-    
+
 void Page::LayOut(bool force)
 {
     if (m_layoutDone && !force) {
@@ -382,11 +382,11 @@ void Page::LayOutVertically()
     Functor adjustYPos(&Object::AdjustYPos);
     AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
     this->Process(&adjustYPos, &adjustYPosParams);
-    
+
     if (this->GetHeader()) {
         this->GetHeader()->AdjustYPos();
     }
-    
+
     if (this->GetFooter()) {
         this->GetFooter()->AdjustYPos();
     }
@@ -450,12 +450,12 @@ int Page::GetContentHeight() const
     System *last = dynamic_cast<System *>(m_children.back());
     assert(last);
     int height = doc->m_drawingPageHeight - doc->m_drawingPageTopMar - last->GetDrawingYRel() + last->GetHeight();
-    
+
     // Not sure what to do with the footer when adjusted page height is requested...
-    //if (this->GetFooter()) {
+    // if (this->GetFooter()) {
     //    height += this->GetFooter()->GetTotalHeight();
     //}
-    
+
     return height;
 }
 
@@ -529,15 +529,15 @@ int Page::ApplyPPUFactor(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Page::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
     assert(doc);
-    
+
     // Same functor, but we have not FunctorParams so we just re-instanciate it
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
-    
+
     RunningElement *header = this->GetHeader();
     if (header) {
         header->Process(&resetVerticalAlignment, NULL);
@@ -553,16 +553,16 @@ int Page::ResetVerticalAlignment(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Page::AlignVerticallyEnd(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
     params->m_cumulatedShift = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
-    
+
     // Also align the header and footer
-    
+
     RunningElement *header = this->GetHeader();
     if (header) {
         header->SetDrawingPage(this);
@@ -583,7 +583,7 @@ int Page::AlignSystems(FunctorParams *functorParams)
 {
     AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
     assert(params);
-    
+
     RunningElement *header = this->GetHeader();
     if (header) {
         header->SetDrawingYRel(params->m_shift);

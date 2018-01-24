@@ -37,14 +37,14 @@ void PgHead::Reset()
 {
     RunningElement::Reset();
 }
-    
+
 bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
 {
     pugi::xpath_node node;
     pugi::xpath_node_set nodeSet;
     pugi::xpath_node_set::const_iterator iter;
     data_FONTSIZE fs;
-    
+
     // Title
     nodeSet = header.select_nodes("//fileDesc/titleStmt/title");
     if (!nodeSet.empty()) {
@@ -56,7 +56,6 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
             if (iter == nodeSet.begin()) {
                 fs.SetTerm(FONTSIZETERM_x_large);
                 rend->SetFontsize(fs);
-                
             }
             else {
                 titleRend->AddChild(new Lb());
@@ -89,5 +88,5 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
-    
+
 } // namespace vrv

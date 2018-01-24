@@ -182,19 +182,19 @@ bool Doc::GenerateDocumentScoreDef()
 
     return true;
 }
-    
+
 bool Doc::GenerateHeaderAndFooter()
 {
     if (m_scoreDef.FindChildByType(PGHEAD) || m_scoreDef.FindChildByType(PGFOOT)) {
         return false;
     }
-    
+
     PgHead *pgHead = new PgHead();
     // We mark it as generated for not having it written in the output
     pgHead->IsGenerated(true);
     pgHead->GenerateFromMEIHeader(m_header);
     m_scoreDef.AddChild(pgHead);
-    
+
     PgFoot *pgFoot = new PgFoot();
     pgFoot->IsGenerated(true);
     pgFoot->LoadFooter();
@@ -204,7 +204,7 @@ bool Doc::GenerateHeaderAndFooter()
     pgHead2->IsGenerated(true);
     pgHead2->AddPageNum(HORIZONTALALIGNMENT_center, VERTICALALIGNMENT_top);
     m_scoreDef.AddChild(pgHead2);
-    
+
     PgFoot2 *pgFoot2 = new PgFoot2();
     pgFoot2->IsGenerated(true);
     pgFoot2->LoadFooter();
@@ -746,35 +746,35 @@ void Doc::CastOffDoc()
     // because idx will still be 0 but contentPage is dead!
     this->CollectScoreDefs(true);
 }
-    
+
 void Doc::CastOffRunningElements(CastOffPagesParams *params)
 {
     assert(m_children.empty());
-    
+
     Page *page1 = new Page();
     this->AddChild(page1);
     this->SetDrawingPage(0);
     page1->LayOutVertically();
-    
+
     if (page1->GetHeader()) {
         params->m_pgHeadHeight = page1->GetHeader()->GetTotalHeight();
     }
     if (page1->GetFooter()) {
         params->m_pgFootHeight = page1->GetFooter()->GetTotalHeight();
     }
-    
+
     Page *page2 = new Page();
     this->AddChild(page2);
     this->SetDrawingPage(1);
     page2->LayOutVertically();
-    
+
     if (page2->GetHeader()) {
         params->m_pgHead2Height = page2->GetHeader()->GetTotalHeight();
     }
     if (page2->GetFooter()) {
         params->m_pgFoot2Height = page2->GetFooter()->GetTotalHeight();
     }
-    
+
     DeleteChild(page1);
     DeleteChild(page2);
 

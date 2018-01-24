@@ -77,16 +77,16 @@ void Rend::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-    
+
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
-    
+
 int Rend::AlignVertically(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
-    
+
     if (this->GetHalign()) {
         switch (this->GetHalign()) {
             case (HORIZONTALALIGNMENT_right): this->SetDrawingXRel(params->m_pageWidth); break;

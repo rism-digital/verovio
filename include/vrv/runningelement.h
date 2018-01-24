@@ -16,7 +16,7 @@ namespace vrv {
 class Page;
 class Staff;
 class TextElement;
-    
+
 //----------------------------------------------------------------------------
 // RunningElement
 //----------------------------------------------------------------------------
@@ -38,20 +38,20 @@ public:
     virtual void Reset();
     virtual ClassId GetClassId() const { return RUNNING_ELEMENT; }
     ///@}
-    
+
     /**
      * Disable cloning of the running elements (for now?).
      * It does not make sense you carry copying the running element across the systems.
      */
     virtual Object *Clone() const { return NULL; }
-    
+
     /**
      * @name Methods for adding allowed content
      */
     ///@{
     virtual void AddChild(Object *object);
     ///@}
-    
+
     /**
      * @name Setter and getter of the generated flag
      */
@@ -59,7 +59,7 @@ public:
     bool IsGenerated() const { return m_isGenerated; }
     void IsGenerated(bool isGenerated) { m_isGenerated = isGenerated; }
     ///@}
-    
+
     /**
      * @name Get and set the X and Y drawing position
      */
@@ -67,9 +67,9 @@ public:
     virtual int GetDrawingX() const;
     virtual int GetDrawingY() const;
     ///@}
-    
+
     int GetWidth() const;
-    
+
     /*
      * @name Setter and getter for the current drawing page
      */
@@ -77,7 +77,7 @@ public:
     void SetDrawingPage(Page *page);
     Page *GetDrawingPage() { return m_drawingPage; }
     ///@}
-    
+
     /**
      * @name Get and set the X and Y drawing relative positions
      */
@@ -104,23 +104,23 @@ public:
      * Currently unused.
      */
     bool AdjustDrawingScaling(int width);
-    
+
     /**
      * Adjust the postition of the content of the running element.
      * First adjust the content of each cell, and then the cells themselves.
      */
     bool AdjustYPos();
-    
+
     /**
      * Set the current page number by looking for a <num label="page">#</num> element.
      */
     void SetCurrentPageNum(Page *currentPage);
-    
+
     /**
      * Load the footer from the resources (footer.svg)
      */
     void LoadFooter();
-    
+
     /**
      * Add page numbering to the running element.
      */
@@ -129,7 +129,7 @@ public:
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * See Object::Save
      */
@@ -137,14 +137,14 @@ public:
     virtual int Save(FunctorParams *functorParams);
     virtual int SaveEnd(FunctorParams *functorParams);
     ///@}
-    
+
     /**
      * See Object::AlignVertically
      */
     ///@{
     virtual int AlignVertically(FunctorParams *functorParams);
     ///@}
-    
+
 protected:
     /**
      * Filter the list for a specific class.
@@ -165,23 +165,23 @@ private:
      * The page we are drawing (for the x position)
      */
     Page *m_drawingPage;
-    
+
     /**
      * The y position of the running element
      */
     int m_drawingYRel;
-    
+
     /**
      * Stored the top <rend> or <fig> with the 9 possible positioning combinations, from
      * top-left to bottom-right (going left to right first)
      */
     ArrayOfTextElements m_cells[9];
-    
+
     /**
      * Flag indicating whereas if the element was generated or not
      */
     bool m_isGenerated;
-    
+
     /**
      *
      */

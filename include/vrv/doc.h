@@ -64,7 +64,7 @@ public:
      * This only looks at the content first system of the document.
      */
     bool GenerateDocumentScoreDef();
-    
+
     /**
      * Generate a document pgHead from the MEI header if none is provided.
      */
@@ -271,7 +271,7 @@ public:
      * Starting from a single system, create and fill pages and systems.
      */
     void CastOffDoc();
-    
+
     /**
      * Casts off the running elements (headers and footer)
      * Called from Doc::CastOffDoc
@@ -345,7 +345,7 @@ public:
      * This includes the appropriate top and bottom margin (using top as bottom).
      */
     int GetAdjustedDrawingPageHeight() const;
-    
+
     /**
      * Setter for analytical markup flag
      */

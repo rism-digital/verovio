@@ -257,7 +257,7 @@ typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
 typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
 
 typedef std::vector<LedgerLine> ArrayOfLedgerLines;
-    
+
 typedef std::vector<TextElement *> ArrayOfTextElements;
 
 typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
@@ -383,7 +383,7 @@ enum { DRAWING_GRP_NONE = 0, DRAWING_GRP_VERSE, DRAWING_GRP_HARM, DRAWING_GRP_OT
 //----------------------------------------------------------------------------
 
 enum ArticPartType { ARTIC_PART_INSIDE = 0, ARTIC_PART_OUTSIDE };
-    
+
 //----------------------------------------------------------------------------
 // Layout positions (3 x 3 grid)
 //----------------------------------------------------------------------------
@@ -393,7 +393,7 @@ enum {
     POSITION_CENTER,
     POSITION_RIGHT,
 };
-    
+
 enum {
     POSITION_TOP = 0,
     POSITION_MIDDLE = 3,

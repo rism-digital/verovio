@@ -1719,7 +1719,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     }
 
     TextDrawingParams params;
-    
+
     // If we have not timestamp
     params.m_x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
 
@@ -1734,14 +1734,14 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
         params.m_y = dir->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
-        
+
         dirTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&dirTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
-        
+
         DrawTextChildren(dc, dir, params);
         dc->EndText();
 
@@ -1775,12 +1775,11 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         dynamTxt.SetFaceName("Times");
         dynamTxt.SetStyle(FONTSTYLE_italic);
     }
-    
+
     TextDrawingParams params;
 
     // If we have not timestamp
     params.m_x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
-
 
     data_HORIZONTALALIGNMENT alignment = dynam->GetChildRendAlignment();
     // Dynam are left aligned by default;
@@ -1932,12 +1931,11 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     if (!dc->UseGlobalStyling()) {
         harmTxt.SetFaceName("Times");
     }
-    
+
     TextDrawingParams params;
 
     // If we have not timestamp
     params.m_x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
-
 
     data_HORIZONTALALIGNMENT alignment = harm->GetChildRendAlignment();
     // Harm are centered aligned by default;
@@ -1958,7 +1956,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         }
         else {
             params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
-            
+
             harmTxt.SetPointSize(params.m_pointSize);
 
             dc->SetBrush(m_currentColour, AxSOLID);
@@ -2135,8 +2133,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         tempoTxt.SetFaceName("Times");
         tempoTxt.SetWeight(FONTWEIGHT_bold);
     }
-    
-    
+
     TextDrawingParams params;
 
     // If we have not timestamp
@@ -2166,7 +2163,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
         params.m_y = tempo->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
-        
+
         tempoTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
@@ -2467,12 +2464,12 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
                 textX += m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
             }
-            
+
             TextDrawingParams params;
             params.m_x = textX;
             params.m_y = y1;
             params.m_pointSize = currentFont.GetPointSize();
-            
+
             dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
             DrawTextElement(dc, &text, params);
             dc->EndText();

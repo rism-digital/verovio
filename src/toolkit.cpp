@@ -597,9 +597,9 @@ bool Toolkit::LoadData(const std::string &data)
         delete input;
         return false;
     }
-    
+
     // generate the page header and footer if necessary
-    if (true) {// change this to an option
+    if (true) { // change this to an option
         m_doc.GenerateHeaderAndFooter();
     }
 

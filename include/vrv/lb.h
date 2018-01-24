@@ -38,7 +38,7 @@ public:
     /**
      * Lb is an empty element
      */
-    virtual void AddChild(Object *object) {};
+    virtual void AddChild(Object *object){};
 
 private:
     //

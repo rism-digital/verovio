@@ -33,7 +33,7 @@ public:
     virtual std::string GetClassName() const { return "Svg"; }
     virtual ClassId GetClassId() const { return SVG; }
     ///@}
-    
+
     /**
      * @name Setter and getter for the svg figure (stored as pugi::xml_node)
      */
@@ -41,7 +41,7 @@ public:
     void Set(pugi::xml_node svg);
     pugi::xml_node Get() { return m_svg.first_child(); }
     ///@}
-    
+
     /**
      * @name Get the width and height of the svg (as given in the svg root)
      */
@@ -59,7 +59,6 @@ private:
      * Tthe svg stored as pugi::xml_document
      */
     pugi::xml_document m_svg;
-
 };
 
 } // namespace vrv

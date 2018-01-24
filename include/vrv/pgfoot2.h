@@ -17,7 +17,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
- * This class represents an MEI pgFoot2. 
+ * This class represents an MEI pgFoot2.
  */
 class PgFoot2 : public RunningElement {
 public:

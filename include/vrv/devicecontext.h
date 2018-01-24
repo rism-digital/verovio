@@ -111,7 +111,7 @@ public:
     virtual void SetTextBackground(int colour) = 0;
     virtual void SetLogicalOrigin(int x, int y) = 0;
     ///}
-    
+
     /**
      * @name Getters
      */
@@ -148,7 +148,8 @@ public:
     virtual void DrawRectangle(int x, int y, int width, int height) = 0;
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle) = 0;
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius) = 0;
-    virtual void DrawText(const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET) = 0;
+    virtual void DrawText(const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET)
+        = 0;
     virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false) = 0;
     virtual void DrawSpline(int n, Point points[]) = 0;
     virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) = 0;
