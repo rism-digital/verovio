@@ -175,7 +175,7 @@ public:
     int GetDrawingWidth() const { return m_drawingWidth; }
     void SetDrawingWidth(int drawingWidth);
     ///@}
-    
+
     /**
      * @name Getters for running elements
      */

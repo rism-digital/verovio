@@ -273,7 +273,7 @@ void BBoxDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignm
 void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y)
 {
     assert(m_fontStack.top());
-    
+
     if ((x != VRV_UNSET) && (y != VRV_UNSET)) {
         m_textX = x;
         m_textY = y;
@@ -339,12 +339,12 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bo
 void BBoxDeviceContext::DrawSpline(int n, Point points[])
 {
 }
-    
+
 void BBoxDeviceContext::DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg)
 {
     DrawRoundedRectangle(x, y, width, height, 0);
 }
-    
+
 void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, wchar_t glyph)
 {
     if (m_isDeactivatedX && m_isDeactivatedY) {

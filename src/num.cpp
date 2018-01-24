@@ -35,11 +35,11 @@ Num::~Num()
 void Num::Reset()
 {
     ResetLabelled();
-    
+
     m_currentText.SetParent(this);
     m_currentText.SetText(L"");
 }
-    
+
 void Num::AddChild(Object *child)
 {
     if (child->Is(TEXT)) {

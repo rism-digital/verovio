@@ -40,7 +40,7 @@ public:
     virtual std::string GetClassName() const { return "Rend"; }
     virtual ClassId GetClassId() const { return REND; }
     ///@}
-        
+
     /**
      * @name Getter to interfaces
      */
@@ -57,7 +57,7 @@ public:
     //----------//
     // Functors //
     //----------//
-                 
+
     /**
      * See Object::AlignVertically
      */

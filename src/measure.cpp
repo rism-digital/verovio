@@ -377,7 +377,7 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
         this->SetDrawingLeftBarLine(this->GetLeft());
     }
 }
-    
+
 //----------------------------------------------------------------------------
 // Measure functor methods
 //----------------------------------------------------------------------------
@@ -386,17 +386,17 @@ int Measure::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
 {
     ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
     assert(params);
-    
+
     ArrayOfObjects::iterator iter;
     for (iter = params->m_controlEvents.begin(); iter != params->m_controlEvents.end(); iter++) {
         this->AddChild(*iter);
     }
-    
+
     params->m_controlEvents.clear();
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Measure::ConvertToPageBased(FunctorParams *functorParams)
 {
     ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);

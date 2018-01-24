@@ -25,19 +25,18 @@
 #include "vrv.h"
 
 namespace vrv {
-    
+
 void View::DrawRunningElements(DeviceContext *dc, Page *page)
 {
     assert(dc);
     assert(page);
-    
+
     if (dc->Is(BBOX_DEVICE_CONTEXT)) {
         BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) return;
     }
-    
-    
+
     RunningElement *header = page->GetHeader();
     if (header) {
         DrawPgHeader(dc, header);
@@ -47,18 +46,18 @@ void View::DrawRunningElements(DeviceContext *dc, Page *page)
         DrawPgHeader(dc, footer);
     }
 }
-    
+
 void View::DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader)
 {
     assert(dc);
     assert(pgHeader);
-    
+
     dc->StartGraphic(pgHeader, "", pgHeader->GetUuid());
-    
+
     FontInfo pgHeadTxt;
-    
+
     TextDrawingParams params;
-    
+
     // If we have not timestamp
     params.m_x = pgHeader->GetDrawingX();
     params.m_y = pgHeader->GetDrawingY();
@@ -66,14 +65,14 @@ void View::DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader)
     params.m_alignment = HORIZONTALALIGNMENT_NONE;
     params.m_laidOut = true;
     params.m_pointSize = m_doc->GetDrawingLyricFont(100)->GetPointSize();
-    
+
     pgHeadTxt.SetPointSize(params.m_pointSize);
-    
+
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(&pgHeadTxt);
-    
+
     DrawRunningChildren(dc, pgHeader, params);
-    
+
     dc->ResetFont();
     dc->ResetBrush();
 

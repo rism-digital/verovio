@@ -41,7 +41,7 @@ void TextElement::Reset()
 {
     Object::Reset();
     ResetTyped();
-    
+
     m_drawingYRel = 0;
     m_drawingXRel = 0;
 }
@@ -61,10 +61,10 @@ int TextElement::GetDrawingX() const
     if (runningElement) {
         return (runningElement->GetDrawingX() + this->GetDrawingXRel());
     }
-    
+
     return Object::GetDrawingX();
 }
-    
+
 int TextElement::GetDrawingY() const
 {
     // No cache for text elements
@@ -80,7 +80,7 @@ int TextElement::GetDrawingY() const
     if (runningElement) {
         return (runningElement->GetDrawingY() + this->GetDrawingYRel());
     }
-    
+
     // TextElement not within RunningElement;
     return Object::GetDrawingY();
 }
@@ -100,7 +100,7 @@ void TextElement::SetDrawingYRel(int drawingYRel)
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
-    
+
 int TextElement::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     SetDrawingXRel(0);

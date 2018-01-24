@@ -24,11 +24,10 @@ namespace vrv {
 // Ligature
 //----------------------------------------------------------------------------
 
-Ligature::Ligature()
-    : LayerElement("ligature-"), ObjectListInterface(), AttLigatureLog()
+Ligature::Ligature() : LayerElement("ligature-"), ObjectListInterface(), AttLigatureLog()
 {
     RegisterAttClass(ATT_LIGATURELOG);
-    
+
     Reset();
 }
 
@@ -129,25 +128,25 @@ int Ligature::PositionInLigature(Note *note)
     assert(position != -1);
     return position;
 }
-    
+
 Note *Ligature::GetFirstNote()
 {
     const ListOfObjects *list = this->GetList(this);
-    if  (list->empty()) {
+    if (list->empty()) {
         return NULL;
     }
-    return dynamic_cast<Note*>(list->front());
+    return dynamic_cast<Note *>(list->front());
 }
-    
+
 Note *Ligature::GetLastNote()
 {
     const ListOfObjects *list = this->GetList(this);
-    if  (list->empty()) {
+    if (list->empty()) {
         return NULL;
     }
-    return dynamic_cast<Note*>(list->back());
+    return dynamic_cast<Note *>(list->back());
 }
-    
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------

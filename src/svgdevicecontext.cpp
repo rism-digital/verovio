@@ -386,7 +386,7 @@ void SvgDeviceContext::StartPage()
     m_currentNode.append_attribute("class") = "page-margin";
     m_currentNode.append_attribute("transform")
         = StringFormat("translate(%d, %d)", (int)((double)m_originX), (int)((double)m_originY)).c_str();
-    
+
     m_pageNode = m_currentNode;
 }
 
@@ -640,7 +640,6 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute("stroke-width") = "10";
     rectChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
      */
-    
 }
 
 void SvgDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignment)
@@ -739,7 +738,7 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     }
     textChild.append_attribute("class") = "text";
     textChild.append_child(pugi::node_pcdata).set_value(svgText.c_str());
-    
+
     if ((x != VRV_UNSET) && (y != VRV_UNSET)) {
         textChild.append_attribute("x") = StringFormat("%d", x).c_str();
         textChild.append_attribute("y") = StringFormat("%d", y).c_str();
@@ -798,13 +797,13 @@ void SvgDeviceContext::DrawSpline(int n, Point points[])
 void SvgDeviceContext::DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg)
 {
     m_currentNode.append_attribute("transform")
-    = StringFormat("translate(%d, %d) scale(%d, %d)", x, y, DEFINITION_FACTOR, DEFINITION_FACTOR).c_str();
-    
-    for (pugi::xml_node child: svg.children()) {
+        = StringFormat("translate(%d, %d) scale(%d, %d)", x, y, DEFINITION_FACTOR, DEFINITION_FACTOR).c_str();
+
+    for (pugi::xml_node child : svg.children()) {
         m_currentNode.append_copy(child);
     }
 }
-    
+
 void SvgDeviceContext::DrawBackgroundImage(int x, int y)
 {
 }
@@ -844,7 +843,7 @@ std::string SvgDeviceContext::GetStringSVG(bool xml_declaration)
 
     return m_outdata.str();
 }
-    
+
 void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 {
     bool drawBoundingBox = false;
@@ -908,13 +907,13 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         }
 
         EndGraphic(object, NULL);
-        
+
         m_currentNode = m_pageNode;
 
-        //Rend *rend = dynamic_cast<Rend *>(object);
-        //if (rend && rend->HasHalign()) {
+        // Rend *rend = dynamic_cast<Rend *>(object);
+        // if (rend && rend->HasHalign()) {
         if (object->IsTextElement()) {
-            
+
             SetPen(AxBLUE, 20, AxDOT_DASH);
             StartGraphic(object, "content-bounding-box", "cbbox-" + object->GetUuid());
             if (object->HasContentBB()) {
@@ -927,7 +926,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
             }
             EndGraphic(object, NULL);
         }
-        
+
         m_currentNode = currentNode;
 
         SetPen(AxBLACK, 1, AxSOLID);
