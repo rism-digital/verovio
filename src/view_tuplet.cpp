@@ -127,8 +127,15 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
 
     // Return the start and end position for the brackets
     // starting from the first edge and last of the BBoxes
-    start->x = firstElement->GetSelfX1() + firstElement->GetDrawingX();
-    end->x = lastElement->GetSelfX2() + lastElement->GetDrawingX();
+    if (firstElement->HasSelfBB())
+        start->x = firstElement->GetSelfLeft();
+    else
+        start->x = firstElement->GetContentLeft();
+
+    if (lastElement->HasSelfBB())
+        end->x = lastElement->GetSelfRight();
+    else
+        end->x = lastElement->GetContentRight();
 
     // The first step is to calculate all the stem directions
     // cycle into the elements and count the up and down dirs

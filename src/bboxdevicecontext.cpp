@@ -33,7 +33,7 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
     m_userScaleY = 1.0;
 
     m_drawingText = false;
-    m_textAlignment = LEFT;
+    m_textAlignment = HORIZONTALALIGNMENT_left;
 
     SetBrush(AxBLACK, AxSOLID);
     SetPen(AxBLACK, 1, AxSOLID);
@@ -238,7 +238,7 @@ void BBoxDeviceContext::DrawPlaceholder(int x, int y)
     UpdateBB(x, y, x, y);
 }
 
-void BBoxDeviceContext::StartText(int x, int y, char alignment)
+void BBoxDeviceContext::StartText(int x, int y, data_HORIZONTALALIGNMENT alignment)
 {
     assert(!m_drawingText);
     m_drawingText = true;
@@ -256,16 +256,32 @@ void BBoxDeviceContext::EndText()
     m_drawingText = false;
 }
 
-void BBoxDeviceContext::MoveTextTo(int x, int y)
+void BBoxDeviceContext::MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment)
 {
     assert(m_drawingText);
     m_textX = x;
     m_textY = y;
+    m_textWidth = 0;
+    m_textHeight = 0;
+    m_textAscent = 0;
+    m_textDescent = 0;
+    if (alignment != HORIZONTALALIGNMENT_NONE) {
+        m_textAlignment = alignment;
+    }
 }
 
-void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wtext)
+void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wtext, int x, int y)
 {
     assert(m_fontStack.top());
+    
+    if ((x != VRV_UNSET) && (y != VRV_UNSET)) {
+        m_textX = x;
+        m_textY = y;
+        m_textWidth = 0;
+        m_textHeight = 0;
+        m_textAscent = 0;
+        m_textDescent = 0;
+    }
 
     TextExtend extend;
     GetTextExtent(wtext, &extend);
@@ -274,10 +290,10 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
     m_textAscent = std::max(m_textAscent, extend.m_ascent);
     m_textDescent = std::max(m_textDescent, extend.m_descent);
     m_textHeight = m_textAscent + m_textDescent;
-    if (m_textAlignment == RIGHT) {
+    if (m_textAlignment == HORIZONTALALIGNMENT_right) {
         m_textX -= extend.m_width;
     }
-    else if (m_textAlignment == CENTER) {
+    else if (m_textAlignment == HORIZONTALALIGNMENT_center) {
         m_textX -= (extend.m_width / 2);
     }
     UpdateBB(m_textX, m_textY + m_textDescent, m_textX + m_textWidth, m_textY - m_textAscent);
@@ -323,7 +339,12 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bo
 void BBoxDeviceContext::DrawSpline(int n, Point points[])
 {
 }
-
+    
+void BBoxDeviceContext::DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg)
+{
+    DrawRoundedRectangle(x, y, width, height, 0);
+}
+    
 void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2, wchar_t glyph)
 {
     if (m_isDeactivatedX && m_isDeactivatedY) {

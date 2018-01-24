@@ -20,6 +20,10 @@
 #include "label.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "pgfoot.h"
+#include "pgfoot2.h"
+#include "pghead.h"
+#include "pghead2.h"
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "system.h"
@@ -212,6 +216,9 @@ void ScoreDef::AddChild(Object *child)
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
     }
+    else if (child->IsRunningElement()) {
+        assert(dynamic_cast<RunningElement *>(child));
+    }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         assert(false);
@@ -378,6 +385,26 @@ void ScoreDef::SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig
 void ScoreDef::SetDrawingWidth(int drawingWidth)
 {
     m_drawingWidth = drawingWidth;
+}
+    
+PgFoot *ScoreDef::GetPgFoot()
+{
+    return dynamic_cast<PgFoot *>(this->FindChildByType(PGFOOT));
+}
+
+PgFoot2 *ScoreDef::GetPgFoot2()
+{
+    return dynamic_cast<PgFoot2 *>(this->FindChildByType(PGFOOT2));
+}
+
+PgHead *ScoreDef::GetPgHead()
+{
+    return dynamic_cast<PgHead *>(this->FindChildByType(PGHEAD));
+}
+
+PgHead2 *ScoreDef::GetPgHead2()
+{
+    return dynamic_cast<PgHead2 *>(this->FindChildByType(PGHEAD2));
 }
 
 //----------------------------------------------------------------------------

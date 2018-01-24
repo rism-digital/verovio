@@ -21,8 +21,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "pugixml.hpp"
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -83,9 +81,10 @@ public:
     virtual void DrawRectangle(int x, int y, int width, int height);
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle);
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius);
-    virtual void DrawText(const std::string &text, const std::wstring wtext = L"");
+    virtual void DrawText(const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET);
     virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false);
     virtual void DrawSpline(int n, Point points[]);
+    virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg);
     virtual void DrawBackgroundImage(int x = 0, int y = 0);
     ///@}
 
@@ -93,13 +92,13 @@ public:
      * @name Method for starting and ending a text
      */
     ///@{
-    virtual void StartText(int x, int y, char alignement = LEFT);
+    virtual void StartText(int x, int y, data_HORIZONTALALIGNMENT alignement = HORIZONTALALIGNMENT_left);
     virtual void EndText();
 
     /**
-     * Move a text to the specified position, for example when starting a new line
+     * Move a text to the specified position
      */
-    virtual void MoveTextTo(int x, int y);
+    virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment);
 
     /**
      * @name Method for starting and ending a graphic
@@ -220,6 +219,7 @@ private:
     // pugixml data
     pugi::xml_document m_svgDoc;
     pugi::xml_node m_svgNode;
+    pugi::xml_node m_pageNode;
     pugi::xml_node m_currentNode;
     std::list<pugi::xml_node> m_svgNodeStack;
 

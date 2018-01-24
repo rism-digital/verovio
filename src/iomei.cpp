@@ -33,6 +33,7 @@
 #include "expansion.h"
 #include "fb.h"
 #include "fermata.h"
+#include "fig.h"
 #include "ftrem.h"
 #include "functorparams.h"
 #include "hairpin.h"
@@ -40,6 +41,7 @@
 #include "keysig.h"
 #include "label.h"
 #include "layer.h"
+#include "lb.h"
 #include "ligature.h"
 #include "measure.h"
 #include "mensur.h"
@@ -48,10 +50,16 @@
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
+#include "num.h"
 #include "octave.h"
 #include "page.h"
 #include "pedal.h"
+#include "pgfoot.h"
+#include "pgfoot2.h"
+#include "pghead.h"
+#include "pghead2.h"
 #include "proport.h"
+#include "rend.h"
 #include "rest.h"
 #include "rpt.h"
 #include "score.h"
@@ -61,6 +69,7 @@
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "svg.h"
 #include "syl.h"
 #include "system.h"
 #include "tempo.h"
@@ -232,6 +241,22 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(SCOREDEF)) {
         m_currentNode = m_currentNode.append_child("scoreDef");
         WriteMeiScoreDef(m_currentNode, dynamic_cast<ScoreDef *>(object));
+    }
+    else if (object->Is(PGFOOT)) {
+        m_currentNode = m_currentNode.append_child("pgFoot");
+        WriteMeiPgFoot(m_currentNode, dynamic_cast<PgFoot *>(object));
+    }
+    else if (object->Is(PGFOOT2)) {
+        m_currentNode = m_currentNode.append_child("pgFoot2");
+        WriteMeiPgFoot2(m_currentNode, dynamic_cast<PgFoot2 *>(object));
+    }
+    else if (object->Is(PGHEAD)) {
+        m_currentNode = m_currentNode.append_child("pgHead");
+        WriteMeiPgHead(m_currentNode, dynamic_cast<PgHead *>(object));
+    }
+    else if (object->Is(PGHEAD2)) {
+        m_currentNode = m_currentNode.append_child("pgHead2");
+        WriteMeiPgHead2(m_currentNode, dynamic_cast<PgHead2 *>(object));
     }
     else if (object->Is(STAFFGRP)) {
         m_currentNode = m_currentNode.append_child("staffGrp");
@@ -437,6 +462,10 @@ bool MeiOutput::WriteObject(Object *object)
     }
 
     // Text elements
+    else if (object->Is(FIG)) {
+        m_currentNode = m_currentNode.append_child("fig");
+        WriteMeiFig(m_currentNode, dynamic_cast<Fig *>(object));
+    }
     else if (object->Is(FIGURE)) {
         m_currentNode = m_currentNode.append_child("f");
         WriteMeiF(m_currentNode, dynamic_cast<F *>(object));
@@ -445,9 +474,21 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("fb");
         WriteMeiFb(m_currentNode, dynamic_cast<Fb *>(object));
     }
+    else if (object->Is(LB)) {
+        m_currentNode = m_currentNode.append_child("lb");
+        WriteMeiLb(m_currentNode, dynamic_cast<Lb *>(object));
+    }
+    else if (object->Is(NUM)) {
+        m_currentNode = m_currentNode.append_child("num");
+        WriteMeiNum(m_currentNode, dynamic_cast<Num *>(object));
+    }
     else if (object->Is(REND)) {
         m_currentNode = m_currentNode.append_child("rend");
         WriteMeiRend(m_currentNode, dynamic_cast<Rend *>(object));
+    }
+    else if (object->Is(SVG)) {
+        m_currentNode = m_currentNode.append_child("svg");
+        WriteMeiSvg(m_currentNode, dynamic_cast<Svg *>(object));
     }
     else if (object->Is(TEXT)) {
         WriteMeiText(m_currentNode, dynamic_cast<Text *>(object));
@@ -750,6 +791,44 @@ void MeiOutput::WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
     WriteScoreDefElement(currentNode, scoreDef);
     WriteScoreDefInterface(currentNode, scoreDef);
     scoreDef->WriteEndings(currentNode);
+}
+    
+void MeiOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *runningElement)
+{
+    assert(runningElement);
+
+    WriteXmlId(currentNode, runningElement);
+    runningElement->WriteHorizontalAlign(currentNode);
+    runningElement->WriteTyped(currentNode);
+}
+
+
+void MeiOutput::WriteMeiPgFoot(pugi::xml_node currentNode, PgFoot *pgFoot)
+{
+    assert(pgFoot);
+    
+    WriteRunningElement(currentNode, pgFoot);
+}
+
+void MeiOutput::WriteMeiPgFoot2(pugi::xml_node currentNode, PgFoot2 *pgFoot2)
+{
+    assert(pgFoot2);
+    
+    WriteRunningElement(currentNode, pgFoot2);
+}
+
+void MeiOutput::WriteMeiPgHead(pugi::xml_node currentNode, PgHead *pgHead)
+{
+    assert(pgHead);
+    
+    WriteRunningElement(currentNode, pgHead);
+}
+
+void MeiOutput::WriteMeiPgHead2(pugi::xml_node currentNode, PgHead2 *pgHead2)
+{
+    assert(pgHead2);
+
+    WriteRunningElement(currentNode, pgHead2);
 }
 
 void MeiOutput::WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp)
@@ -1329,18 +1408,59 @@ void MeiOutput::WriteMeiF(pugi::xml_node currentNode, F *figure)
 
     WriteTextElement(currentNode, figure);
 };
+    
+void MeiOutput::WriteMeiFig(pugi::xml_node currentNode, Fig *fig)
+{
+    assert(fig);
 
+    WriteTextElement(currentNode, fig);
+    WriteAreaPosInterface(currentNode, fig);
+
+};
+    
+void MeiOutput::WriteMeiLb(pugi::xml_node currentNode, Lb *lb)
+{
+    assert(lb);
+
+    WriteTextElement(currentNode, lb);
+}
+    
+void MeiOutput::WriteMeiNum(pugi::xml_node currentNode, Num *num)
+{
+    assert(num);
+    
+    num->WriteLabelled(currentNode);
+    
+    WriteTextElement(currentNode, num);
+}
+    
 void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
 {
     assert(rend);
 
     WriteTextElement(currentNode, rend);
+    WriteAreaPosInterface(currentNode, rend);
     rend->WriteColor(currentNode);
-    rend->WriteHorizontalAlign(currentNode);
     rend->WriteLang(currentNode);
     rend->WriteTypography(currentNode);
     rend->WriteWhitespace(currentNode);
 }
+    
+void MeiOutput::WriteMeiSvg(pugi::xml_node currentNode, Svg *svg)
+{
+    assert(svg);
+    
+    WriteXmlId(currentNode, svg);
+    
+    pugi::xml_node svgNode = svg->Get();
+    for (pugi::xml_attribute attr: svgNode.attributes()) {
+        currentNode.append_attribute(attr.name()) = attr.value();
+    }
+    
+    for (pugi::xml_node child: svgNode.children()) {
+        currentNode.append_copy(child);
+    }
+};
 
 void MeiOutput::WriteMeiText(pugi::xml_node element, Text *text)
 {
@@ -1351,6 +1471,14 @@ void MeiOutput::WriteMeiText(pugi::xml_node element, Text *text)
     }
 }
 
+void MeiOutput::WriteAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface)
+{
+    assert(interface);
+
+    interface->WriteHorizontalAlign(element);
+    interface->WriteVerticalAlign(element);
+}
+    
 void MeiOutput::WriteDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
     assert(interface);
@@ -1715,6 +1843,22 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    else if (filterParent->Is(FIG)) {
+        if (element == "svg") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    else if (filterParent->Is(NUM)) {
+        if (element == "") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for harm
     else if (filterParent->Is(HARM)) {
         if (element == "") {
@@ -1730,9 +1874,39 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for rend
+    else if (filterParent->Is(REND)) {
+        if (element == "") {
+            return true;
+        }
+        else if (element == "lb") {
+            return true;
+        }
+        else if (element == "num") {
+            return true;
+        }
+        else if (element == "rend") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for any other control element
     else if (filterParent->IsControlElement()) {
         if (element == "") {
+            return true;
+        }
+        else if (element == "rend") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for any other control element
+    else if (filterParent->IsRunningElement()) {
+        if (element == "fig") {
             return true;
         }
         else if (element == "rend") {
@@ -2001,7 +2175,7 @@ bool MeiInput::ReadMei(pugi::xml_node root)
             m_doc->ConvertAnalyticalMarkupDoc();
         }
     }
-
+    
     if (success && !m_hasScoreDef) {
         LogMessage("No scoreDef provided, trying to generate one...");
         success = m_doc->GenerateDocumentScoreDef();
@@ -2372,6 +2546,19 @@ bool MeiInput::ReadMeiScoreDefChildren(Object *parent, pugi::xml_node parentNode
         else if (IsEditorialElementName(current.name())) {
             success = ReadMeiEditorialElement(parent, current, EDITORIAL_SCOREDEF);
         }
+        // headers and footers
+        else if (std::string(current.name()) == "pgFoot") {
+            success = ReadMeiPgFoot(parent, current);
+        }
+        else if (std::string(current.name()) == "pgFoot2") {
+            success = ReadMeiPgFoot2(parent, current);
+        }
+        else if (std::string(current.name()) == "pgHead") {
+            success = ReadMeiPgHead(parent, current);
+        }
+        else if (std::string(current.name()) == "pgHead2") {
+            success = ReadMeiPgHead2(parent, current);
+        }
         // content
         else if (std::string(current.name()) == "staffGrp") {
             success = ReadMeiStaffGrp(parent, current);
@@ -2432,6 +2619,90 @@ bool MeiInput::ReadMeiStaffGrpChildren(Object *parent, pugi::xml_node parentNode
         else {
             LogWarning("Unsupported '<%s>' within <staffGrp>", current.name());
         }
+    }
+    return success;
+}
+    
+bool MeiInput::ReadRunningElement(pugi::xml_node element, RunningElement *object)
+{
+    SetMeiUuid(element, object);
+    object->ReadHorizontalAlign(element);
+    object->ReadTyped(element);
+
+    return true;
+}
+
+
+bool MeiInput::ReadMeiPgFoot(Object *parent, pugi::xml_node pgFoot)
+{
+    PgFoot *vrvPgFoot = new PgFoot();
+    ReadRunningElement(pgFoot, vrvPgFoot);
+    
+    parent->AddChild(vrvPgFoot);
+    return ReadMeiRunningChildren(vrvPgFoot, pgFoot, vrvPgFoot);
+}
+
+bool MeiInput::ReadMeiPgFoot2(Object *parent, pugi::xml_node pgFoot2)
+{
+    PgFoot2 *vrvPgFoot2 = new PgFoot2();
+    ReadRunningElement(pgFoot2, vrvPgFoot2);
+    
+    parent->AddChild(vrvPgFoot2);
+    return ReadMeiRunningChildren(vrvPgFoot2, pgFoot2, vrvPgFoot2);
+}
+
+bool MeiInput::ReadMeiPgHead(Object *parent, pugi::xml_node pgHead)
+{
+    PgHead *vrvPgHead = new PgHead();
+    ReadRunningElement(pgHead, vrvPgHead);
+    
+    parent->AddChild(vrvPgHead);
+    return ReadMeiRunningChildren(vrvPgHead, pgHead, vrvPgHead);
+}
+
+bool MeiInput::ReadMeiPgHead2(Object *parent, pugi::xml_node pgHead2)
+{
+    PgHead2 *vrvPgHead2 = new PgHead2();
+    ReadRunningElement(pgHead2, vrvPgHead2);
+    
+    parent->AddChild(vrvPgHead2);
+    return ReadMeiRunningChildren(vrvPgHead2, pgHead2, vrvPgHead2);
+}
+    
+bool MeiInput::ReadMeiRunningChildren(Object *parent, pugi::xml_node parentNode, Object *filter)
+{
+    bool success = true;
+    pugi::xml_node xmlElement;
+    std::string elementName;
+    int i = 0;
+    for (xmlElement = parentNode.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
+        if (!success) {
+            break;
+        }
+        elementName = std::string(xmlElement.name());
+        if (filter && !IsAllowed(elementName, filter)) {
+            std::string meiElementName = filter->GetClassName();
+            std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
+            LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
+                meiElementName.c_str());
+            continue;
+        }
+        // editorial
+        if (IsEditorialElementName(xmlElement.name())) {
+            success = ReadMeiEditorialElement(parent, xmlElement, EDITORIAL_RUNNING, filter);
+        }
+        // content
+        else if (elementName == "fig") {
+            success = ReadMeiFig(parent, xmlElement);
+        }
+        else if (elementName == "rend") {
+            success = ReadMeiRend(parent, xmlElement);
+        }
+        // unknown
+        else {
+            LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
+        }
+        i++;
     }
     return success;
 }
@@ -3471,8 +3742,20 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
             success = ReadMeiEditorialElement(parent, xmlElement, EDITORIAL_TEXT, filter);
         }
         // content
+        else if (elementName == "fig") {
+            success = ReadMeiFig(parent, xmlElement);
+        }
+        else if (elementName == "lb") {
+            success = ReadMeiLb(parent, xmlElement);
+        }
+        else if (elementName == "num") {
+            success = ReadMeiNum(parent, xmlElement);
+        }
         else if (elementName == "rend") {
             success = ReadMeiRend(parent, xmlElement);
+        }
+        else if (elementName == "svg") {
+            success = ReadMeiSvg(parent, xmlElement);
         }
         else if (xmlElement.text()) {
             bool trimLeft = (i == 0);
@@ -3508,20 +3791,77 @@ bool MeiInput::ReadMeiF(Object *parent, pugi::xml_node f)
     parent->AddChild(vrvF);
     return ReadMeiTextChildren(vrvF, f);
 }
+    
+bool MeiInput::ReadMeiFig(Object *parent, pugi::xml_node fig)
+{
+    Fig *vrvFig = new Fig();
+    ReadTextElement(fig, vrvFig);
+    
+    ReadAreaPosInterface(fig, vrvFig);
+    
+    parent->AddChild(vrvFig);
+    return ReadMeiTextChildren(vrvFig, fig, vrvFig);
+}
+    
+bool MeiInput::ReadMeiLb(Object *parent, pugi::xml_node lb)
+{
+    Lb *vrvLb = new Lb();
+    ReadTextElement(lb, vrvLb);
 
+    parent->AddChild(vrvLb);
+    return true;
+}
+    
+bool MeiInput::ReadMeiNum(Object *parent, pugi::xml_node num)
+{
+    Num *vrvNum = new Num();
+    ReadTextElement(num, vrvNum);
+    
+    vrvNum->ReadLabelled(num);
+    
+    parent->AddChild(vrvNum);
+    return ReadMeiTextChildren(vrvNum, num, vrvNum);
+}
+    
 bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
 {
     Rend *vrvRend = new Rend();
     ReadTextElement(rend, vrvRend);
+    
+    ReadAreaPosInterface(rend, vrvRend);
 
     vrvRend->ReadColor(rend);
-    vrvRend->ReadHorizontalAlign(rend);
     vrvRend->ReadLang(rend);
     vrvRend->ReadTypography(rend);
     vrvRend->ReadWhitespace(rend);
 
     parent->AddChild(vrvRend);
-    return ReadMeiTextChildren(vrvRend, rend);
+    
+    if (vrvRend->GetFirstParent(REND) && (vrvRend->HasHalign() || vrvRend->HasValign())) {
+        LogWarning ("@halign or @valign in nested <rend> element <rend> %s will be ignored", vrvRend->GetUuid().c_str());
+        // Eventually to be added to unsupported attributes?
+        vrvRend->SetHalign(HORIZONTALALIGNMENT_NONE);
+        vrvRend->SetValign(VERTICALALIGNMENT_NONE);
+    }
+    
+    return ReadMeiTextChildren(vrvRend, rend, vrvRend);
+}
+    
+bool MeiInput::ReadMeiSvg(Object *parent, pugi::xml_node svg)
+{
+    Svg *vrvSvg = new Svg();
+    SetMeiUuid(svg, vrvSvg);
+    
+    if (std::string(svg.name()) == "svg") {
+        vrvSvg->Set(svg);
+    }
+    else {
+        LogWarning("No svg content found for <fig> %s", parent->GetUuid().c_str());
+    }
+
+    parent->AddChild(vrvSvg);
+    
+    return true;
 }
 
 bool MeiInput::ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight)
@@ -3539,6 +3879,13 @@ bool MeiInput::ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, b
     return true;
 }
 
+bool MeiInput::ReadAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface)
+{
+    interface->ReadHorizontalAlign(element);
+    interface->ReadVerticalAlign(element);
+    return true;
+}
+    
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
     interface->ReadAugmentDots(element);
@@ -4045,6 +4392,9 @@ bool MeiInput::ReadMeiEditorialChildren(Object *parent, pugi::xml_node parentNod
     }
     else if (level == EDITORIAL_FB) {
         return ReadMeiFbChildren(parent, parentNode);
+    }
+    else if (level == EDITORIAL_RUNNING) {
+        return ReadMeiRunningChildren(parent, parentNode, filter);
     }
     else {
         return false;
