@@ -4096,13 +4096,14 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
 
     if (placement == "above") {
         setPlace(dir, "above");
-        m_measure->AddChild(dir);
+        m_measure->AddChildBack(dir);
     }
     else if (placement == "below") {
         setPlace(dir, "below");
-        m_measure->AddChildBack(dir);
-    } else {
         m_measure->AddChild(dir);
+    }
+    else {
+        m_measure->AddChildBack(dir);
     }
     if ((!italic) || bold) {
         Rend *rend = new Rend;
@@ -4340,15 +4341,16 @@ void HumdrumInput::addDirection(
     if (placement == "above") {
         // 300: dir->SetPlace(STAFFREL_above);
         setPlace(dir, "above");
-    	m_measure->AddChild(dir);
+        m_measure->AddChildBack(dir);
     }
     else if (placement == "below") {
         // 300: dir->SetPlace(STAFFREL_below);
         setPlace(dir, "below");
-    	m_measure->AddChildBack(dir);
-    } else {
-    	m_measure->AddChild(dir);
-	}
+        m_measure->AddChild(dir);
+    }
+    else {
+        m_measure->AddChildBack(dir);
+    }
     if ((!italic) || bold) {
         Rend *rend = new Rend;
         dir->AddChild(rend);

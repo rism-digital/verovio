@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Nov 19 23:19:26 PST 2017
+// Last Modified: Thu Dec 21 22:36:38 PST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -1087,7 +1087,8 @@ int Convert::kernToBase40(const string& kerndata) {
 //////////////////////////////
 //
 // Convert::kernToBase12PC -- Convert **kern pitch to a base-12 pitch-class.
-//   C=0, C#/D-flat=1, D=2, etc.
+//   C=0, C#/D-flat=1, D=2, etc.  Will return -1 instead of 11 for C-, and
+//   will return 12 instead of 0 for B#.
 //
 
 int Convert::kernToBase12PC(const string& kerndata) {
@@ -1120,9 +1121,6 @@ int Convert::kernToBase12PC(const string& kerndata) {
 
 int Convert::kernToBase12(const string& kerndata) {
 	int pc = Convert::kernToBase12PC(kerndata);
-	if (pc < 0) {
-		return pc;
-	}
 	int octave = Convert::kernToOctaveNumber(kerndata);
 	return pc + 12 * octave;
 }
@@ -1319,9 +1317,6 @@ int Convert::base40ToAccidental(int b40) {
 
 int Convert::kernToMidiNoteNumber(const string& kerndata) {
 	int pc = Convert::kernToBase12PC(kerndata);
-	if (pc < 0) {
-		return pc;
-	}
 	int octave = Convert::kernToOctaveNumber(kerndata);
 	return pc + 12 * (octave + 1);
 }
@@ -14356,7 +14351,19 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 						dstates[rindex][diatonic] = -1000 + accid;
 						gdstates[rindex][diatonic] = -1000 + accid;
 					}
-					continue;
+					auto loc = subtok.find('X');
+					if (loc == string::npos) {
+						continue;
+					} else if (loc == 0) {
+						continue;
+					} else {
+						if (!((subtok[loc-1] == '#') || (subtok[loc-1] == '-') ||
+								(subtok[loc-1] == 'n'))) {
+							continue;
+						} else {
+							// an accidental should be fored at end of tie
+						}
+					}
 				}
 
 				size_t loc;
@@ -20624,7 +20631,24 @@ int HumdrumToken::addLinkedParameter(HTp token) {
 		}
 	}
 
-	m_linkedParameters.push_back(token);
+	if (m_linkedParameters.empty()) {
+		m_linkedParameters.push_back(token);
+	} else {
+		int lineindex = token->getLineIndex();
+		if (lineindex >= m_linkedParameters.back()->getLineIndex()) {
+			m_linkedParameters.push_back(token);
+		} else {
+			// Store sorted by line number
+			for (auto it = m_linkedParameters.begin(); it != m_linkedParameters.end(); it++) {
+				if (lineindex < (*it)->getLineIndex()) {
+					m_linkedParameters.insert(it, token);
+					break;
+				}
+			}
+		}
+		
+	}
+
 	return (int)m_linkedParameters.size() - 1;
 }
 
@@ -24533,8 +24557,10 @@ void MxmlPart::printStaffVoiceInfo(void) {
 //
 
 void MxmlPart::parsePartInfo(xml_node partinfo) {
+// ggg cerr << "PART INFO ID " << partinfo.attribute("id").value() << endl;
 	xml_node partnamenode = partinfo.select_node("./part-name").node();
 	if (partnamenode) {
+// ggg cerr << "PART NAME " << partnamenode.child_value() << endl;
 		m_partname = cleanSpaces(partnamenode.child_value());
 	}
 	xml_node abbrnode = partinfo.select_node("./part-abbreviation").node();
@@ -39251,8 +39277,17 @@ HumNum Tool_mei2hum::parseStaff(xml_node staff, HumNum starttime) {
 		}
 	}
 
+// ggg
+// if ((m_currentMeasure == 12) && (m_currentStaff == 6)) {
+// cerr << "============= LAYER COUNT " << layerPresent.size() << endl;
+// }
+
 	bool complete = true;
 	for (int i=0; i<(int)layerPresent.size(); i++) {
+// ggg
+// if ((m_currentMeasure == 12) && (m_currentStaff == 6)) {
+// cerr << "============= LAYER " << i+1 << " : " << layerPresent[i] << endl;
+// }
 		complete &= layerPresent[i];
 	}
 	if (!complete) {
@@ -39313,6 +39348,11 @@ HumNum Tool_mei2hum::parseLayer(xml_node layer, HumNum starttime, vector<bool>& 
 	}
 	m_currentLayer = nnum;
 
+// ggg
+// if ((m_currentMeasure == 12) && (m_currentStaff == 6)) {
+// cerr << "CURRENT LAYER " << m_currentLayer << endl;
+// }
+
 	// grow Layer array if necessary:
 	if (layerPresent.size() < m_currentLayer) {
 		int oldsize = (int)layerPresent.size();
@@ -39321,6 +39361,11 @@ HumNum Tool_mei2hum::parseLayer(xml_node layer, HumNum starttime, vector<bool>& 
 			layerPresent.at(i) = false;
 		}
    }
+// ggg
+// if ((m_currentMeasure == 12) && (m_currentStaff == 6)) {
+// cerr << "LAYER CHECKER SIZE IS " << layerPresent.size() << endl;
+// }
+
 
 	if (layerPresent.at(m_currentLayer - 1)) {
 		cerr << "Error: measure " << m_currentMeasure
@@ -42888,6 +42933,9 @@ bool Tool_musicxml2hum::fillPartData(MxmlPart& partdata,
 		partdata.enableStems();
 	}
 
+// ggg
+// cerr << "GOT HERE XXX PREPARING ID " << id << endl;
+
 	partdata.parsePartInfo(partdeclaration);
 	
 	int count;
@@ -45097,11 +45145,15 @@ bool Tool_musicxml2hum::getPartContent(
 
 bool Tool_musicxml2hum::getPartInfo(map<string, xml_node>& partinfo,
 		vector<string>& partids, xml_document& doc) {
+// ggg
+// cerr << "GOT HERE AAA" << endl;
 	auto scoreparts = doc.select_nodes("/score-partwise/part-list/score-part");
 	partids.reserve(scoreparts.size());
 	bool output = true;
+// cerr << "PARTS SIZE " << scoreparts.size() << endl;
 	for (auto el : scoreparts) {
 		partids.emplace_back(getAttributeValue(el.node(), "id"));
+// cerr << "\tPART ID = " << partids.back() << endl;
 		auto status = partinfo.insert(make_pair(partids.back(), el.node()));
 		if (status.second == false) {
 			cerr << "Error: ID " << partids.back()
