@@ -367,6 +367,7 @@ protected:
     std::string getSystemDecoration(const std::string &tag);
     void processStaffDecoration(const std::string &decoration);
     int getStaffNumberLabel(hum::HTp spinestart);
+	bool isFirstTokenOnStaff(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

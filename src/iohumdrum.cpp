@@ -4205,11 +4205,49 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
 
 //////////////////////////////
 //
+// HumdrumInput::isFirstTokenOnStaff -- Used to control global
+//     directions: only one token will be used to generate a direction.
+//
+
+bool HumdrumInput::isFirstTokenOnStaff(hum::HTp token)
+{
+    int target = token->getTrack();
+    int track;
+    hum::HTp tok = token->getPreviousFieldToken();
+    while (tok != NULL) {
+        track = tok->getTrack();
+        if (track != target) {
+            return true;
+        }
+        if (tok->isNull()) {
+            // need to check further
+        }
+        else {
+            return false;
+        }
+        tok = tok->getPreviousFieldToken();
+    }
+    return true;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::processLinkedDirection --
 //
 
 void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffindex)
 {
+    bool globalQ = token->linkedParameterIsGlobal(index);
+    bool firstQ = true;
+    if (globalQ) {
+        firstQ = isFirstTokenOnStaff(token);
+    }
+
+    if (!firstQ) {
+        // Don't insert multiple global directions.
+        return;
+    }
+
     hum::HumParamSet *hps = token->getLinkedParameter(index);
     if (hps == NULL) {
         return;
