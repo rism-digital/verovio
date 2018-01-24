@@ -108,6 +108,9 @@ RunningElement *Page::GetFooter() const
 void Page::LayOut(bool force)
 {
     if (m_layoutDone && !force) {
+        // We only need to reset the header - this will adjust the page number if necessary
+        if (this->GetHeader()) this->GetHeader()->SetDrawingPage(this);
+        if (this->GetFooter()) this->GetFooter()->SetDrawingPage(this);
         return;
     }
 
@@ -381,12 +384,10 @@ void Page::LayOutVertically()
     this->Process(&adjustYPos, &adjustYPosParams);
     
     if (this->GetHeader()) {
-        this->GetHeader()->SetCurrentPageNum(this->GetIdx() + 1);
         this->GetHeader()->AdjustYPos();
     }
     
     if (this->GetFooter()) {
-        this->GetFooter()->SetCurrentPageNum(this->GetIdx() + 1);
         this->GetFooter()->AdjustYPos();
     }
 
@@ -534,25 +535,20 @@ int Page::ResetVerticalAlignment(FunctorParams *functorParams)
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
     assert(doc);
     
-    PgHead *pgHead = doc->m_scoreDef.GetPgHead();
-    if (pgHead) {
-        pgHead->SetDrawingPage(NULL);
-        pgHead->SetDrawingYRel(0);
+    // Same functor, but we have not FunctorParams so we just re-instanciate it
+    Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
+    
+    RunningElement *header = this->GetHeader();
+    if (header) {
+        header->Process(&resetVerticalAlignment, NULL);
+        header->SetDrawingPage(NULL);
+        header->SetDrawingYRel(0);
     }
-    PgFoot *pgFoot = doc->m_scoreDef.GetPgFoot();
-    if (pgFoot) {
-        pgFoot->SetDrawingPage(NULL);
-        pgFoot->SetDrawingYRel(0);
-    }
-    PgHead2 *pgHead2 = doc->m_scoreDef.GetPgHead2();
-    if (pgHead2) {
-        pgHead2->SetDrawingPage(NULL);
-        pgHead2->SetDrawingYRel(0);
-    }
-    PgFoot2 *pgFoot2 = doc->m_scoreDef.GetPgFoot2();
-    if (pgFoot2) {
-        pgFoot2->SetDrawingPage(NULL);
-        pgFoot2->SetDrawingYRel(0);
+    RunningElement *footer = this->GetFooter();
+    if (footer) {
+        footer->Process(&resetVerticalAlignment, NULL);
+        footer->SetDrawingPage(NULL);
+        footer->SetDrawingYRel(0);
     }
 
     return FUNCTOR_CONTINUE;
@@ -567,20 +563,14 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
     
     // Also align the header and footer
     
-    // Special case where we need to reset the vertical alignment here.
-    // The reason is the the RunningElement are not reset when ResetVerticalAlignment is previously called
-    Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
-    
     RunningElement *header = this->GetHeader();
     if (header) {
-        header->Process(&resetVerticalAlignment, NULL);
         header->SetDrawingPage(this);
         header->SetDrawingYRel(0);
         header->Process(params->m_functor, params, params->m_functorEnd);
     }
     RunningElement *footer = this->GetFooter();
     if (footer) {
-        footer->Process(&resetVerticalAlignment, NULL);
         footer->SetDrawingPage(this);
         footer->SetDrawingYRel(0);
         footer->Process(params->m_functor, params, params->m_functorEnd);

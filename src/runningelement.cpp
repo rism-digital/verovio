@@ -169,10 +169,15 @@ int RunningElement::GetWidth() const
     
 void RunningElement::SetDrawingPage(Page *page)
 {
+
     ResetList(this);
     
     ResetCachedDrawingX();
     m_drawingPage = page;
+    
+    if (page) {
+        this->SetCurrentPageNum(page);
+    }
 }
 
 int RunningElement::GetTotalHeight()
@@ -328,8 +333,12 @@ int RunningElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALI
     return pos;
 }
     
-void RunningElement::SetCurrentPageNum(int currentNum)
+void RunningElement::SetCurrentPageNum(Page *currentPage)
 {
+    assert(currentPage);
+    
+    int currentNum = currentPage->GetIdx() + 1;
+    
     Num *num = dynamic_cast<Num*>(this->FindChildByType(NUM));
     if (!num || (num->GetLabel() != "page")) return;
     

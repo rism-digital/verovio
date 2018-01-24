@@ -114,7 +114,7 @@ public:
     /**
      * Set the current page number by looking for a <num label="page">#</num> element.
      */
-    void SetCurrentPageNum(int currentNum);
+    void SetCurrentPageNum(Page *currentPage);
     
     /**
      * Load the footer from the resources (footer.svg)
