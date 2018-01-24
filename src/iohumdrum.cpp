@@ -4442,14 +4442,8 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     if (token->find("z") != string::npos) {
         if (token->find("zy") == string::npos) { // don't show invisible sfz.
 
-            bool aboveQ = token->getValueBool("LO", "DY", "a");
-            bool belowQ = token->getValueBool("LO", "DY", "b");
-            if (token->isDefined("LO", "DY", "Z")) {
-                aboveQ = true;
-            }
-            else if (token->isDefined("LO", "DY", "Y")) {
-                belowQ = true;
-            }
+            bool aboveQ = hasAboveParameter(token, "DY");
+            bool belowQ = hasBelowParameter(token, "DY");
 
             Dynam *dynam = new Dynam;
             m_measure->AddChild(dynam);
@@ -4576,15 +4570,8 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         }
 
         if (!dynamic.empty()) {
-            bool aboveQ = line->token(i)->getValueBool("LO", "DY", "a");
-            bool belowQ = line->token(i)->getValueBool("LO", "DY", "b");
-
-            if (line->token(i)->isDefined("LO", "DY", "Z")) {
-                aboveQ = true;
-            }
-            else if (line->token(i)->isDefined("LO", "DY", "Y")) {
-                belowQ = true;
-            }
+            bool aboveQ = hasAboveParameter(line->token(i), "DY");
+            bool belowQ = hasBelowParameter(line->token(i), "DY");
 
             Dynam *dynam = new Dynam;
             m_measure->AddChild(dynam);
@@ -4616,14 +4603,8 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 endtok = getCrescendoEnd(line->token(i));
             }
             if (endtok != NULL) {
-                bool aboveQ = line->token(i)->getValueBool("LO", "HP", "a");
-                bool belowQ = line->token(i)->getValueBool("LO", "HP", "b");
-                if (line->token(i)->isDefined("LO", "HP", "Z")) {
-                    aboveQ = true;
-                }
-                else if (line->token(i)->isDefined("LO", "HP", "Y")) {
-                    belowQ = true;
-                }
+                bool aboveQ = hasAboveParameter(line->token(i), "HP");
+                bool belowQ = hasBelowParameter(line->token(i), "HP");
 
                 Hairpin *hairpin = new Hairpin;
                 setStaff(hairpin, m_currentstaff);
@@ -4660,14 +4641,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 endtok = getDecrescendoEnd(line->token(i));
             }
             if (endtok != NULL) {
-                bool aboveQ = line->token(i)->getValueBool("LO", "HP", "a");
-                bool belowQ = line->token(i)->getValueBool("LO", "HP", "b");
-                if (line->token(i)->isDefined("LO", "HP", "Z")) {
-                    aboveQ = true;
-                }
-                else if (line->token(i)->isDefined("LO", "HP", "Y")) {
-                    belowQ = true;
-                }
+                bool aboveQ = hasAboveParameter(token, "HP");
+                bool belowQ = hasBelowParameter(token, "HP");
+
                 Hairpin *hairpin = new Hairpin;
                 setStaff(hairpin, m_currentstaff);
                 setLocationId(hairpin, line->token(i), -1);
@@ -4713,6 +4689,80 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     // legitimate reasons).  Maybe make this more efficient later, such as
     // do a separate parse of dynamics data in a different loop.
     processDynamics(token, staffindex);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::hasAboveParameter -- true if has an "a" parameter or has a "Z" parameter set to anything.
+//
+
+bool HumdrumInput::hasAboveParameter(hum::HTp token, const string &category)
+{
+    int lcount = token->getLinkedParameterCount();
+    if (lcount == 0) {
+        return 0;
+    }
+
+    for (int p = 0; p < token->getLinkedParameterCount(); p++) {
+        hum::HumParamSet *hps = token->getLinkedParameter(p);
+        if (hps == NULL) {
+            continue;
+        }
+        if (hps->getNamespace1() != "LO") {
+            continue;
+        }
+        if (hps->getNamespace2() != category) {
+            continue;
+        }
+        for (int q = 0; q < hps->getCount(); q++) {
+            string key = hps->getParameterName(q);
+            string value = hps->getParameterValue(q);
+            if (key == "a") {
+                return true;
+            }
+            if (key == "Z") {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::hasBelowParameter -- true if has an "a" parameter or has a "Z" parameter set to anything.
+//
+
+bool HumdrumInput::hasBelowParameter(hum::HTp token, const string &category)
+{
+    int lcount = token->getLinkedParameterCount();
+    if (lcount == 0) {
+        return 0;
+    }
+
+    for (int p = 0; p < token->getLinkedParameterCount(); p++) {
+        hum::HumParamSet *hps = token->getLinkedParameter(p);
+        if (hps == NULL) {
+            continue;
+        }
+        if (hps->getNamespace1() != "LO") {
+            continue;
+        }
+        if (hps->getNamespace2() != category) {
+            continue;
+        }
+        for (int q = 0; q < hps->getCount(); q++) {
+            string key = hps->getParameterName(q);
+            string value = hps->getParameterValue(q);
+            if (key == "b") {
+                return true;
+            }
+            if (key == "Y") {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 //////////////////////////////
@@ -4899,11 +4949,10 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
         startmeasure->AddChild(slur);
         setStaff(slur, m_currentstaff);
 
-        if (slurstart->getValueBool("LO", "S", "a")) {
+        if (hasAboveParameter(slurstart, "S")) {
             slur->SetCurvedir(curvature_CURVEDIR_above);
         }
-
-        if (slurstart->getValueBool("LO", "S", "b")) {
+        else if (hasBelowParameter(slurstart, "S")) {
             slur->SetCurvedir(curvature_CURVEDIR_below);
         }
 

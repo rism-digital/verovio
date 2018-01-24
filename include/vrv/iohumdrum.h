@@ -368,6 +368,8 @@ protected:
     void processStaffDecoration(const std::string &decoration);
     int getStaffNumberLabel(hum::HTp spinestart);
 	bool isFirstTokenOnStaff(hum::HTp token);
+	bool hasAboveParameter(hum::HTp token, const string& category);
+	bool hasBelowParameter(hum::HTp token, const string& category);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
