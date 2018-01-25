@@ -430,7 +430,7 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
     }
 
     // Add a margin
-    maxOverlfowAbove += params->m_doc->GetBottomMargin(STAFF) * params->m_doc->GetDrawingUnit(this->GetStaffSize());
+    maxOverflowAbove += params->m_doc->GetBottomMargin(STAFF) * params->m_doc->GetDrawingUnit(this->GetStaffSize());
        
 
     // Is the maximum the overflow (+ overlap) shift, or the default ?

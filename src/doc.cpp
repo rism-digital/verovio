@@ -952,7 +952,7 @@ int Doc::GetGlyphAdvX(wchar_t code, int staffSize, bool graceSize) const
     assert(glyph);
     int advX = glyph->GetHorizAdvX();
     advX = advX * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
-    if (graceSize) advX = advX * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    if (graceSize) advX = advX * this->m_style->m_graceFactor.GetValue();
     advX = advX * staffSize / 100;
     return advX;
 }

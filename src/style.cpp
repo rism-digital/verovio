@@ -177,11 +177,11 @@ Style::Style()
     m_params["pageTopMar"] = &m_pageTopMar;
     
     /** The staff minimal spacing (in MEI units) */
-    m_spacingStaff.Init(10, 0, 24);
+    m_spacingStaff.Init(8, 0, 24);
     m_params["spacingStaff"] = &m_spacingStaff;
     
     /** The system minimal spacing */
-    m_spacingSystem.Init(6, 0, 12);
+    m_spacingSystem.Init(3, 0, 12);
     m_params["spacingSystem"] = &m_spacingSystem;
     
     /** The minimal measure width in units */

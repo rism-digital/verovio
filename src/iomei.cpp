@@ -4623,7 +4623,7 @@ void MeiInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
     // Once we have the GetPPU in Page through LibMEI, call this from Doc::SetDrawingPage and
     // use m_unit instead of DEFAULT_UNIT - For the upgraded call Page->SetPPU(12.5);
 
-    page->m_PPUFactor = (25.0 / 2.0 / DEFAULT_UNIT);
+    page->m_PPUFactor = (25.0 / 2.0 / doc->GetStyle()->m_unit.GetDefault());
     // LogDebug("PPUFactor: %f", m_PPUFactor);
 }
 
