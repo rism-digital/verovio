@@ -170,10 +170,10 @@ public:
      * @name Getters for tie and slur parameters
      */
     ///@{
-    int GetTieThickness() const { return m_style->m_tieThickness.GetValue(); }
-    int GetSlurMinHeight() const { return m_style->m_minSlurHeight.GetValue(); }
-    int GetSlurMaxHeight() const { return m_style->m_maxSlurHeight.GetValue(); }
-    int GetSlurThickness() const { return m_style->m_slurThickness.GetValue(); }
+    double GetTieThickness() const { return m_style->m_tieThickness.GetValue(); }
+    double GetSlurMinHeight() const { return m_style->m_minSlurHeight.GetValue(); }
+    double GetSlurMaxHeight() const { return m_style->m_maxSlurHeight.GetValue(); }
+    double GetSlurThickness() const { return m_style->m_slurThickness.GetValue(); }
     ///@}
 
     /**

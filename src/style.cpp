@@ -216,7 +216,7 @@ Style::Style()
     
     /********* The layout left margin by element *********/
     
-    m_leftMarginAccid.Init(0.0, 0.0, 2.0);
+    m_leftMarginAccid.Init(1.0, 0.0, 2.0);
     m_params["leftMarginAccid"] = &m_leftMarginAccid;
     
     m_leftMarginBarLine.Init(0.0, 0.0, 2.0);
@@ -231,19 +231,19 @@ Style::Style()
     m_leftMarginBeatRpt.Init(2.0, 0.0, 2.0);
     m_params["leftMarginBeatRpt"] = &m_leftMarginBeatRpt;
     
-    m_leftMarginChord.Init(0.0, 0.0, 2.0);
+    m_leftMarginChord.Init(1.0, 0.0, 2.0);
     m_params["leftMarginChord"] = &m_leftMarginChord;
     
-    m_leftMarginClef.Init(0.0, 0.0, 2.0);;
+    m_leftMarginClef.Init(1.0, 0.0, 2.0);;
     m_params["leftMarginClef"] = &m_leftMarginClef;
     
-    m_leftMarginKeySig.Init(0.0, 0.0, 2.0);;
+    m_leftMarginKeySig.Init(1.0, 0.0, 2.0);;
     m_params["leftMarginKeySig"] = &m_leftMarginKeySig;
     
-    m_leftMarginMensur.Init(0.0, 0.0, 2.0);;
+    m_leftMarginMensur.Init(1.0, 0.0, 2.0);;
     m_params["leftMarginMensur"] = &m_leftMarginMensur;
     
-    m_leftMarginMeterSig.Init(0.0, 0.0, 2.0);;
+    m_leftMarginMeterSig.Init(1.0, 0.0, 2.0);;
     m_params["leftMarginMeterSig"] = &m_leftMarginMeterSig;
     
     m_leftMarginMRest.Init(0.0, 0.0, 2.0);;
@@ -258,10 +258,10 @@ Style::Style()
     m_leftMarginMultiRpt.Init(0.0, 0.0, 2.0);;
     m_params["leftMarginMultiRpt"] = &m_leftMarginMultiRpt;
     
-    m_leftMarginNote.Init(0.0, 0.0, 2.0);;
+    m_leftMarginNote.Init(1.0, 0.0, 2.0);;
     m_params["leftMarginNote"] = &m_leftMarginNote;
     
-    m_leftMarginRest.Init(0.0, 0.0, 2.0);;
+    m_leftMarginRest.Init(1.0, 0.0, 2.0);;
     m_params["leftMarginRest"] = &m_leftMarginRest;
     
     /** The default left margin */
@@ -276,7 +276,7 @@ Style::Style()
     m_rightMarginBarLine.Init(0.0, 0.0, 2.0);;
     m_params["rightMarginBarLine"] = &m_rightMarginBarLine;
     
-    m_rightMarginBarLineAttrLeft.Init(0.0, 0.0, 2.0);;
+    m_rightMarginBarLineAttrLeft.Init(1.0, 0.0, 2.0);;
     m_params["rightMarginBarLineAttrLeft"] = &m_rightMarginBarLineAttrLeft;
     
     m_rightMarginBarLineAttrRight.Init(0.0, 0.0, 2.0);;
@@ -288,16 +288,16 @@ Style::Style()
     m_rightMarginChord.Init(0.0, 0.0, 2.0);;
     m_params["rightMarginChord"] = &m_rightMarginChord;
     
-    m_rightMarginClef.Init(0.0, 0.0, 2.0);;
+    m_rightMarginClef.Init(1.0, 0.0, 2.0);;
     m_params["rightMarginClef"] = &m_rightMarginClef;
     
-    m_rightMarginKeySig.Init(0.0, 0.0, 2.0);;
+    m_rightMarginKeySig.Init(1.0, 0.0, 2.0);;
     m_params["rightMarginKeySig"] = &m_rightMarginKeySig;
     
-    m_rightMarginMensur.Init(0.0, 0.0, 2.0);;
+    m_rightMarginMensur.Init(1.0, 0.0, 2.0);;
     m_params["rightMarginMensur"] = &m_rightMarginMensur;
     
-    m_rightMarginMeterSig.Init(0.0, 0.0, 2.0);;
+    m_rightMarginMeterSig.Init(1.0, 0.0, 2.0);;
     m_params["rightMarginMeterSig"] = &m_rightMarginMeterSig;
     
     m_rightMarginMRest.Init(0.0, 0.0, 2.0);;
@@ -320,11 +320,11 @@ Style::Style()
     m_params["rightMarginRest"] = &m_rightMarginRest;
     
     /** The default right margin */
-    m_bottomMarginDefault.Init(0.0, 0.0, 2.0);;
+    m_bottomMarginDefault.Init(0.5, 0.0, 5.0);;
     m_params["bottomMarginDefault"] = &m_bottomMarginDefault;
     
     /** The default right margin */
-    m_topMarginDefault.Init(0.0, 0.0, 2.0);;
+    m_topMarginDefault.Init(0.5, 0.0, 6.0);;
     m_params["topMarginDefault"] = &m_topMarginDefault;
     
     m_margin.Init(2100, 10, 21000);

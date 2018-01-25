@@ -908,10 +908,10 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     else {
         int dist = abs(p2->x - p1->x);
         height
-            = std::max(m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) ,
+            = std::max(int(m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) ,
                 dist / TEMP_SLUR_HEIGHT_FACTOR);
-        height = std::min(
-            m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) , height);
+        height = std::min(int(
+            m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) , height);
     }
 
     // the height of the control points
