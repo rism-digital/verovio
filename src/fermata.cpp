@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functorparams.h"
 #include "verticalaligner.h"
 
 namespace vrv {
@@ -42,6 +43,20 @@ void Fermata::Reset()
     ResetColor();
     ResetFermataVis();
     ResetPlacement();
+}
+
+void Fermata::ConvertFromAnalyticalMarkup(
+    AttFermataPresent *fermataPresent, const std::string &uuid, ConvertAnalyticalMarkupParams *params)
+{
+    this->GetPlace().SetBasic(fermataPresent->GetFermata());
+    if (params->m_permanent) {
+        fermataPresent->ResetFermataPresent();
+    }
+    else {
+        this->IsAttribute(true);
+    }
+    this->SetStartid("#" + uuid);
+    params->m_controlEvents.push_back(this);
 }
 
 //----------------------------------------------------------------------------

@@ -30,7 +30,7 @@ class Staff;
  * This class represents a system in a laid-out score (Doc).
  * A System is contained in a Page.
  * It contains Staff objects.
-*/
+ */
 class System : public Object, public DrawingListInterface, public AttTyped {
 public:
     /**
@@ -99,6 +99,12 @@ public:
     ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
     void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
     ///@}
+
+    /**
+     * Check if the notes between the start and end have mixed drawing stem directions.
+     * The start and end element are expected to be on the same staff and same layer.
+     */
+    bool HasMixedDrawingStemDir(LayerElement *start, LayerElement *end);
 
     //----------//
     // Functors //

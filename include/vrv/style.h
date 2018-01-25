@@ -46,6 +46,32 @@ namespace vrv {
 #define MIN_SCALE 1
 #define MAX_SCALE 1000
 
+#define DEFAULT_SPACING_STAFF 8
+#define MIN_SPACING_STAFF 0
+#define MAX_SPACING_STAFF 24
+
+#define DEFAULT_SPACING_SYSTEM 3
+#define MIN_SPACING_SYSTEM 0
+#define MAX_SPACING_SYSTEM 12
+
+#define DEFAULT_HAIRPIN_SIZE 3.0
+#define MIN_HAIRPIN_SIZE 2.0
+#define MAX_HAIRPIN_SIZE 8.0
+
+#define DEFAULT_LYRIC_SIZE 4.5
+#define MIN_LYRIC_SIZE 2.0
+#define MAX_LYRIC_SIZE 8.0
+
+#define DEFAULT_MEASURE_WIDTH 15.0
+#define MIN_MEASURE_WIDTH 1.0
+#define MAX_MEASURE_WIDTH 30.0
+
+#define DEFAULT_TIE_THICKNESS 0.5
+
+#define DEFAULT_MIN_SLUR_HEIGHT 1.2
+#define DEFAULT_MAX_SLUR_HEIGHT 3.0
+#define DEFAULT_SLUR_THICKNESS 0.6
+
 /** The default position at the beginning of a measure */
 #define DEFAULT_LEFT_POSITION 0.8
 

@@ -8,6 +8,7 @@
 #ifndef __VRV_MEASURE_H__
 #define __VRV_MEASURE_H__
 
+#include "atts_cmn.h"
 #include "atts_shared.h"
 #include "barline.h"
 #include "horizontalaligner.h"
@@ -111,8 +112,8 @@ public:
      * not for creating other measure objects.
      */
     ///@{
-    BarLine *const GetLeftBarLine() { return &m_leftBarLine; }
-    BarLine *const GetRightBarLine() { return &m_rightBarLine; }
+    BarLine *GetLeftBarLine() { return &m_leftBarLine; }
+    BarLine *GetRightBarLine() { return &m_rightBarLine; }
     ///@}
 
     /**
@@ -169,11 +170,6 @@ public:
     std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
 
     /**
-     * Custom method for upgrading page-based unmeasured transcription data
-     */
-    void UpgradePageBasedMEI(System *system);
-
-    /**
      * Check if the measure encloses the given time (in millisecond)
      * Return the playing repeat time (1-based), 0 otherwise
      */
@@ -187,6 +183,11 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ConvertAnalyticalMarkup
+     */
+    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *functorParams);
 
     /**
      * See Object::ConvertToPageBased
@@ -231,6 +232,11 @@ public:
      * See Object::SetAlignmentXPos
      */
     virtual int SetAlignmentXPos(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustArpeg
+     */
+    virtual int AdjustArpegEnd(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustLayers
@@ -317,6 +323,13 @@ public:
      */
     ///@{
     virtual int GenerateMIDI(FunctorParams *functorParams);
+    ///@}
+
+    /**
+     * @name See Object::GenerateTimemap
+     */
+    ///@{
+    virtual int GenerateTimemap(FunctorParams *functorParams);
     ///@}
 
     /**

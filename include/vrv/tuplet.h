@@ -40,8 +40,6 @@ public:
     virtual ClassId GetClassId() const { return TUPLET; }
     ///@}
 
-    int GetNoteCount() const { return this->GetChildCount(NOTE); }
-
     /**
      * Add an element (a note or a rest) to a tuplet.
      * Only Note or Rest elements will be actually added to the beam.
@@ -50,8 +48,7 @@ public:
 
 protected:
     /**
-     * Filter the list for a specific class.
-     * For example, keep only notes in Beam
+     * Filter the flat list and keep only Note elements.
      */
     virtual void FilterList(ListOfObjects *childList);
 

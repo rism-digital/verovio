@@ -78,8 +78,11 @@ public:
     }
     ///@}
 
-    /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    /**
+     * Override the method since alignment is required.
+     * For notes we want not to align notes within a ligature (except first and last)
+     */
+    virtual bool HasToBeAligned() const;
 
     /**
      * Add an element (a verse or an accid) to a note.
@@ -92,9 +95,6 @@ public:
      */
     ///@{
     Accid *GetDrawingAccid();
-    void ResetDrawingTieAttr();
-    void SetDrawingTieAttr();
-    Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; }
     ///@}
 
     /**
@@ -138,11 +138,6 @@ public:
     ///}
 
     /**
-     * Get the drawing radius of the note head taking into accound the note duration
-     */
-    int GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) const;
-
-    /**
      * Returns a single integer representing pitch and octave.
      */
     int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; }
@@ -152,8 +147,8 @@ public:
      * If necessary look at the glyph anchor (if any).
      */
     ///@{
-    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize);
-    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize);
+    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
+    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
     ///@}
 
     /**
@@ -170,17 +165,22 @@ public:
     void SetScoreTimeOffset(double scoreTime);
     void SetRealTimeOffsetSeconds(double timeInSeconds);
     void SetScoreTimeTiedDuration(double timeInSeconds);
-    double GetScoreTimeOnset(void);
-    int GetRealTimeOnsetMilliseconds(void);
-    double GetScoreTimeOffset(void);
-    double GetScoreTimeTiedDuration(void);
-    int GetRealTimeOffsetMilliseconds(void);
-    double GetScoreTimeDuration(void);
+    double GetScoreTimeOnset();
+    int GetRealTimeOnsetMilliseconds();
+    double GetScoreTimeOffset();
+    double GetScoreTimeTiedDuration();
+    int GetRealTimeOffsetMilliseconds();
+    double GetScoreTimeDuration();
     ///@}
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ConvertAnalyticalMarkup
+     */
+    virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
 
     /**
      * See Object::CalcStem
@@ -203,14 +203,9 @@ public:
     virtual int CalcLedgerLines(FunctorParams *functorParams);
 
     /**
-    * See Object::PrepareLayerElementParts
-    */
-    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
-
-    /**
-     * See Object::PrepareTieAttr
+     * See Object::PrepareLayerElementParts
      */
-    virtual int PrepareTieAttr(FunctorParams *functorParams);
+    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareLyrics
@@ -221,11 +216,6 @@ public:
      * See Object::PreparePointersByLayer
      */
     virtual int PreparePointersByLayer(FunctorParams *functorParams);
-
-    /**
-     * See Object::FillStaffCurrentTimeSpanning
-     */
-    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing
@@ -242,18 +232,16 @@ public:
      */
     virtual int GenerateMIDI(FunctorParams *functorParams);
 
+    /**
+     * See Object::GenerateTimemap
+     */
+    virtual int GenerateTimemap(FunctorParams *functorParams);
+
 private:
     //
 public:
     //
 private:
-    /**
-     * Tie attributes are represented a pointers to Tie objects.
-     * There is one pointer for the initial attribute (TIE_i or TIE_m).
-     * The note with the initial attribute owns the Tie object and takes care of deleting it
-     */
-    Tie *m_drawingTieAttr;
-
     /**
      * The drawing location of the note
      */

@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "arpeg.h"
 #include "attcomparison.h"
 #include "doc.h"
 #include "floatingobject.h"
@@ -23,6 +24,7 @@
 #include "note.h"
 #include "smufl.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "style.h"
 #include "timestamp.h"
 #include "vrv.h"
@@ -122,7 +124,7 @@ void MeasureAligner::Reset()
 Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
 {
     int idx; // the index if we reach the end.
-    time = round(time * (pow(10, 10)) / pow(10, 10));
+    time = durRound(time);
     Alignment *alignment = this->SearchAlignmentAtTime(time, type, idx);
     // we already have a alignment of the type at that time
     if (alignment != NULL) return alignment;
@@ -303,7 +305,7 @@ void GraceAligner::Reset()
 Alignment *GraceAligner::GetAlignmentAtTime(double time, AlignmentType type)
 {
     int idx; // the index if we reach the end.
-    time = round(time * (pow(10, 10)) / pow(10, 10));
+    time = round(time);
     Alignment *alignment = this->SearchAlignmentAtTime(time, type, idx);
     // we already have a alignment of the type at that time
     if (alignment != NULL) return alignment;
@@ -369,7 +371,7 @@ int GraceAligner::GetGraceGroupLeft(int staffN)
     // First we need to get the left alignment with an alignment reference with staffN
     Alignment *leftAlignment = NULL;
     if (staffN != VRV_UNSET) {
-        AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+        AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
         Object *reference = this->FindChildByAttComparison(&matchStaff);
         if (!reference) return -VRV_UNSET;
         // The alignment is its parent
@@ -462,7 +464,7 @@ void Alignment::AddChild(Object *child)
 
 AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
-    AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+    AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
     AlignmentReference *alignmentRef
         = dynamic_cast<AlignmentReference *>(this->FindChildByAttComparison(&matchStaff, 1));
     if (!alignmentRef) {
@@ -533,7 +535,7 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
 
     if (staffN != VRV_UNSET) {
         std::vector<AttComparison *> filters;
-        AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+        AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
         filters.push_back(&matchStaff);
         this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
     }
@@ -614,7 +616,7 @@ void AlignmentReference::Reset()
     ResetNInteger();
 
     m_accidSpace.clear();
-    m_multipleLayer = false;
+    m_layerCount = 0;
 }
 
 void AlignmentReference::AddChild(Object *child)
@@ -626,9 +628,9 @@ void AlignmentReference::AddChild(Object *child)
     // Check if the we will have a reference with multiple layers
     for (childrenIter = m_children.begin(); childrenIter != m_children.end(); childrenIter++) {
         LayerElement *element = dynamic_cast<LayerElement *>(*childrenIter);
-        if (childElement->GetAlignmentLayerN() != element->GetAlignmentLayerN()) break;
+        if (childElement->GetAlignmentLayerN() == element->GetAlignmentLayerN()) break;
     }
-    if (!m_children.empty() && (childrenIter != m_children.end())) m_multipleLayer = true;
+    if (childrenIter == m_children.end()) m_layerCount++;
 
     // Specical case where we do not set the parent because the reference will not have ownership
     // Children will be treated as relinquished objects in the desctructor
@@ -739,6 +741,57 @@ int MeasureAligner::JustifyX(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Alignment::AdjustArpeg(FunctorParams *functorParams)
+{
+    AdjustArpegParams *params = dynamic_cast<AdjustArpegParams *>(functorParams);
+    assert(params);
+
+    // An array of Alignment / Arpeg / staffN / bool (for indicating if we have reached the aligment yet)
+    ArrayOfAligmentArpegTuples::iterator iter = params->m_alignmentArpegTuples.begin();
+
+    while (iter != params->m_alignmentArpegTuples.end()) {
+        // We are reaching the alignment to which an arpeg points to (i.e, the topNote one)
+        if (std::get<0>(*iter) == this) {
+            std::get<3>(*iter) = true;
+            iter++;
+            continue;
+        }
+        // We have not reached the alignment of the arpeg, just continue (backwards)
+        else if (std::get<3>(*iter) == false) {
+            iter++;
+            continue;
+        }
+        // We are now in an alignment preceeding an arpeg - check for overlap
+        int minLeft, maxRight;
+        this->GetLeftRight(std::get<2>(*iter), minLeft, maxRight);
+
+        // Nothing for the staff we are looking at, we also need to check with barlines
+        if (maxRight == VRV_UNSET) {
+            this->GetLeftRight(-1, minLeft, maxRight);
+        }
+
+        // Nothing, just continue
+        if (maxRight == VRV_UNSET) {
+            iter++;
+            continue;
+        }
+
+        int overlap = maxRight - std::get<1>(*iter)->GetCurrentFloatingPositioner()->GetSelfLeft();
+        // HARDCODED
+        overlap += params->m_doc->GetDrawingUnit(100) / 2;
+        // LogDebug("maxRight %d, %d %d", maxRight, std::get<2>(*iter), overlap);
+        if (overlap > 0) {
+            ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this, std::get<0>(*iter), overlap) };
+            params->m_measureAligner->AdjustProportionally(boundaries);
+        }
+
+        // We can remove it from the list
+        iter = params->m_alignmentArpegTuples.erase(iter);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
 {
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
@@ -792,7 +845,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             params->m_graceCumulatedXShift = VRV_UNSET;
             filters.clear();
             // Create ad comparison object for each type / @n
-            AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
+            AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
             filters.push_back(&matchStaff);
 
             m_graceAligner->Process(
@@ -957,7 +1010,7 @@ int AlignmentReference::AdjustLayers(FunctorParams *functorParams)
     AdjustLayersParams *params = dynamic_cast<AdjustLayersParams *>(functorParams);
     assert(params);
 
-    if (!m_multipleLayer) return FUNCTOR_SIBLINGS;
+    if (!this->HasMultipleLayer()) return FUNCTOR_SIBLINGS;
 
     params->m_currentLayerN = VRV_UNSET;
     params->m_currentNote = NULL;
@@ -1050,6 +1103,20 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     }
 
     return FUNCTOR_SIBLINGS;
+}
+
+int AlignmentReference::FindSpaceInReferenceAlignments(FunctorParams *functorParams)
+{
+    FindSpaceInAlignmentParams *params = dynamic_cast<FindSpaceInAlignmentParams *>(functorParams);
+    assert(params);
+
+    if (!this->HasMultipleLayer()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    params->m_layerCount = this->m_layerCount;
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

@@ -133,14 +133,14 @@ private:
      * @name Methods for reading the content of a MusicXml measure.
      */
     ///@{
-    void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, int measureNum);
-    void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, int measureNum);
-    void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, int measureNum);
-    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, int measureNum);
-    void ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, int measureNum);
-    void ReadMusicXmlForward(pugi::xml_node, Measure *measure, int measureNum);
-    void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, int measureNum);
-    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, int measureNum);
+    void ReadMusicXmlAttributes(pugi::xml_node, Section *section, Measure *measure, std::string measureNum);
+    void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, std::string measureNum);
+    void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, std::string measureNum);
+    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, std::string measureNum);
+    void ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, std::string measureNum);
+    void ReadMusicXmlForward(pugi::xml_node, Measure *measure, std::string measureNum);
+    void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, std::string measureNum);
+    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, std::string measureNum);
     void ReadMusicXmlPrint(pugi::xml_node, Section *section);
     ///@}
 
@@ -248,6 +248,8 @@ private:
     fermataVis_SHAPE ConvertFermataShape(std::string);
     pedalLog_DIR ConvertPedalTypeToDir(std::string value);
     tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);
+    std::string ConvertAlterToSymbol(std::string value);
+    std::string ConvertKindToSymbol(std::string value);
     ///@}
 
 private:
@@ -285,9 +287,9 @@ private:
      * The stack of floating elements (tie, slur, etc.) to be added at the
      * end of each measure
      */
-    std::vector<std::pair<int, ControlElement *> > m_controlElements;
+    std::vector<std::pair<std::string, ControlElement *> > m_controlElements;
 };
 
-} // namespace vrv {
+} // namespace vrv
 
 #endif // __VRV_IOMUSXML_H__

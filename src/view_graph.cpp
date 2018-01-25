@@ -163,9 +163,6 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staf
 
     if (code == 0) return;
 
-    dc->SetBackground(AxBLUE);
-    dc->SetBackgroundMode(AxTRANSPARENT);
-
     std::wstring str;
     str.push_back(code);
 
@@ -178,6 +175,44 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staf
     dc->ResetBrush();
 
     return;
+}
+
+void View::DrawSmuflLine(
+    DeviceContext *dc, Point orig, int length, int staffSize, bool dimin, wchar_t fill, wchar_t start, wchar_t end)
+{
+    assert(dc);
+
+    int startWidth = (start == 0) ? 0 : m_doc->GetGlyphAdvX(start, staffSize, dimin);
+    int fillWidth = m_doc->GetGlyphAdvX(fill, staffSize, dimin);
+    int endWidth = (end == 0) ? 0 : m_doc->GetGlyphAdvX(end, staffSize, dimin);
+
+    if (length <= 0) return;
+
+    // We add half a fill length for an average shorter / longer line result
+    int count = (length + fillWidth / 2 - startWidth - endWidth) / fillWidth;
+
+    dc->SetBrush(m_currentColour, AxSOLID);
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
+
+    std::wstring str;
+
+    if (start != 0) {
+        str.push_back(start);
+    }
+
+    int i;
+    for (i = 0; i < count; i++) {
+        str.push_back(fill);
+    }
+
+    if (end != 0) {
+        str.push_back(end);
+    }
+
+    dc->DrawMusicText(str, ToDeviceContextX(orig.x), ToDeviceContextY(orig.y), false);
+
+    dc->ResetFont();
+    dc->ResetBrush();
 }
 
 void View::DrawSmuflString(

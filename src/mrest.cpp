@@ -7,6 +7,15 @@
 
 #include "mrest.h"
 
+//----------------------------------------------------------------------------
+
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
+#include "fermata.h"
+#include "functorparams.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -39,6 +48,19 @@ void MRest::Reset()
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int MRest::ConvertAnalyticalMarkup(FunctorParams *functorParams)
+{
+    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    assert(params);
+
+    if (this->HasFermata()) {
+        Fermata *fermata = new Fermata();
+        fermata->ConvertFromAnalyticalMarkup(this, this->GetUuid(), params);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int MRest::ResetDrawing(FunctorParams *functorParams)
 {

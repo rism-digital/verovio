@@ -35,10 +35,9 @@ bool View::OneBeamInTuplet(Tuplet *tuplet)
     assert(tuplet);
 
     Beam *currentBeam = NULL;
-    ArrayOfObjects elems;
 
     // Are we contained in a beam?
-    if (tuplet->GetFirstParent(BEAM, 1) && (tuplet->GetNoteCount() != 0)) {
+    if (tuplet->GetFirstParent(BEAM, MAX_BEAM_DEPTH)) {
         // is only the tuplet beamed and no other tuplet contained?
         currentBeam = dynamic_cast<Beam *>(tuplet->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
         if ((currentBeam->GetChildCount() == 1) && (tuplet->GetChildCount(TUPLET) == 0)) return true;
@@ -113,7 +112,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
     int x, y;
     data_STEMDIRECTION direction = STEMDIRECTION_up;
 
-    ListOfObjects *tupletChildren = tuplet->GetList(tuplet);
+    const ListOfObjects *tupletChildren = tuplet->GetList(tuplet);
     LayerElement *firstElement = dynamic_cast<LayerElement *>(tupletChildren->front());
     LayerElement *lastElement = dynamic_cast<LayerElement *>(tupletChildren->back());
 
@@ -128,12 +127,19 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
 
     // Return the start and end position for the brackets
     // starting from the first edge and last of the BBoxes
-    start->x = firstElement->GetSelfX1() + firstElement->GetDrawingX();
-    end->x = lastElement->GetSelfX2() + lastElement->GetDrawingX();
+    if (firstElement->HasSelfBB())
+        start->x = firstElement->GetSelfLeft();
+    else
+        start->x = firstElement->GetContentLeft();
+
+    if (lastElement->HasSelfBB())
+        end->x = lastElement->GetSelfRight();
+    else
+        end->x = lastElement->GetContentRight();
 
     // The first step is to calculate all the stem directions
     // cycle into the elements and count the up and down dirs
-    ListOfObjects::iterator iter = tupletChildren->begin();
+    ListOfObjects::const_iterator iter = tupletChildren->begin();
     while (iter != tupletChildren->end()) {
         if ((*iter)->Is(NOTE)) {
             Note *currentNote = dynamic_cast<Note *>(*iter);
@@ -286,7 +292,7 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
 
     // draw tuplet numerator
     if ((tuplet->GetNum() > 0) && (tuplet->GetNumVisible() != BOOLEAN_false)) {
-        bool drawingCueSize = tuplet->IsCueSize();
+        bool drawingCueSize = tuplet->GetDrawingCueSize();
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
         notes = IntToTupletFigures((short int)tuplet->GetNum());
         if (tuplet->GetNumFormat() == tupletVis_NUMFORMAT_ratio) {
@@ -297,22 +303,22 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
 
         // Calculate position for number 0x82
         // since the number is slanted, move the center left
-        int txt_x = x1 - (extend.m_width / 2);
+        int txtX = x1 - (extend.m_width / 2);
         // and move it further, when it is under the stave
         if (direction == STEMDIRECTION_down) {
-            txt_x -= staff->m_drawingStaffSize;
+            txtX -= staff->m_drawingStaffSize;
         }
         // we need to move down the figure of half of it height, which is about an accid width;
         // also, cue size is not supported. Does it has to?
         int txt_y
             = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, drawingCueSize);
 
-        DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->m_drawingStaffSize);
+        DrawSmuflString(dc, txtX, txt_y, notes, false, staff->m_drawingStaffSize);
 
         // x1 = 10 pixels before the number
-        x1 = txt_x - 40;
+        x1 = ((txtX - 40) > start.x) ? txtX - 40 : start.x;
         // x2 = just after, the number is abundant so I do not add anything
-        x2 = txt_x + extend.m_width + 20;
+        x2 = txtX + extend.m_width + 20;
 
         dc->ResetFont();
     }
@@ -352,12 +358,18 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
 
     // vertical bracket lines
     if (direction == STEMDIRECTION_up) {
-        dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y - verticalLine));
-        dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y - verticalLine));
+        dc->DrawLine(start.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(start.y),
+            start.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
+            ToDeviceContextY(start.y - verticalLine));
+        dc->DrawLine(end.x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(end.y),
+            end.x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(end.y - verticalLine));
     }
     else {
-        dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y + verticalLine));
-        dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y + verticalLine));
+        dc->DrawLine(start.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(start.y),
+            start.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
+            ToDeviceContextY(start.y + verticalLine));
+        dc->DrawLine(end.x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(end.y),
+            end.x - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, ToDeviceContextY(end.y + verticalLine));
     }
 
     dc->ResetPen();

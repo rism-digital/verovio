@@ -26,7 +26,7 @@
 
 namespace vrv {
 
-enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM, MIDI };
+enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM, MEIHUM, ESAC, MIDI, TIMEMAP };
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -42,6 +42,9 @@ public:
     Toolkit(bool initFont = true);
     virtual ~Toolkit();
     ///@}
+    
+    /** We just use the doc uuid as uuid */
+    std::string GetUuid() { return m_doc.GetUuid(); }
 
     /**
      * Set the resource path. To be called if the constructor had initFont=false.
@@ -96,6 +99,12 @@ public:
     void ResetLogBuffer();
 
     /**
+     * Render the page to the deviceContext.
+     * Page number is 1-based.
+     */
+    bool RenderToDeviceContext(int pageNo, DeviceContext *deviceContext);
+
+    /**
      * Render the page in SVG and returns it as a string.
      * Page number is 1-based
      */
@@ -117,6 +126,12 @@ public:
      * Creates a midi file, opens it, and returns it (base64 encoded).
      */
     std::string RenderToMidi();
+
+    /**
+     * Creates a timemap file, and return it as a JSON string.
+     */
+    std::string RenderToTimemap();
+    bool RenderToTimemapFile(const std::string &filename);
 
     const char *GetHumdrumBuffer();
     void SetHumdrumBuffer(const char *contents);
@@ -168,16 +183,6 @@ public:
      * Returns 0 if no element is found.
      */
     int GetTimeForElement(const std::string &xmlId);
-
-    /**
-    * @name Set and get a std::string into a char * buffer.
-    * This is used for returning a string buffer to emscripten.
-    * The buffer is freed when reset or in MusController destructor.
-    */
-    ///@{
-    void SetCString(const std::string &data);
-    const char *GetCString();
-    ///@}
 
     /**
      * @name Set and get the border
@@ -277,6 +282,14 @@ public:
     ///@{
     void SetEvenNoteSpacing(bool even) { m_evenNoteSpacing = even; }
     int GetEvenNoteSpacing() { return m_evenNoteSpacing; }
+    ///@}
+
+    /**
+     * @name Set SVG output in mm (for PDF generation with a 72 dpi)
+     */
+    ///@{
+    void SetMMOutput(bool mmOutput) { m_mmOutput = mmOutput; }
+    int GetMMOutput() { return m_mmOutput; }
     ///@}
 
     /**
@@ -421,12 +434,12 @@ private:
     bool m_evenNoteSpacing;
     float m_spacingLinear;
     float m_spacingNonLinear;
+    bool m_mmOutput;
     // for debugging
     bool m_noJustification;
     bool m_showBoundingBoxes;
 
     static char *m_humdrumBuffer;
-    char *m_cString;
 };
 
 } // namespace vrv

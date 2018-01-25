@@ -51,6 +51,15 @@ public:
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::FindSpaceInReferenceAlignments
+     */
+    virtual int FindSpaceInReferenceAlignments(FunctorParams *functorParams);
+
 private:
     //
 public:

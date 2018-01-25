@@ -17,6 +17,11 @@
 #include "bboxdevicecontext.h"
 #include "doc.h"
 #include "functorparams.h"
+#include "pgfoot.h"
+#include "pgfoot2.h"
+#include "pghead.h"
+#include "pghead2.h"
+#include "staff.h"
 #include "system.h"
 #include "view.h"
 #include "vrv.h"
@@ -68,9 +73,44 @@ void Page::AddChild(Object *child)
     Modify();
 }
 
+RunningElement *Page::GetHeader() const
+{
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    if (!doc) {
+        return NULL;
+    }
+
+    // first page?
+    if (doc->GetFirst() == this) {
+        return doc->m_scoreDef.GetPgHead();
+    }
+    else {
+        return doc->m_scoreDef.GetPgHead2();
+    }
+}
+
+RunningElement *Page::GetFooter() const
+{
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    if (!doc) {
+        return NULL;
+    }
+
+    // first page?
+    if (doc->GetFirst() == this) {
+        return doc->m_scoreDef.GetPgFoot();
+    }
+    else {
+        return doc->m_scoreDef.GetPgFoot2();
+    }
+}
+
 void Page::LayOut(bool force)
 {
     if (m_layoutDone && !force) {
+        // We only need to reset the header - this will adjust the page number if necessary
+        if (this->GetHeader()) this->GetHeader()->SetDrawingPage(this);
+        if (this->GetFooter()) this->GetFooter()->SetDrawingPage(this);
         return;
     }
 
@@ -115,7 +155,7 @@ void Page::LayOutTranscription(bool force)
     // - each Staff object will then have its StaffAlignment pointer initialized
     Functor alignVertically(&Object::AlignVertically);
     Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
-    AlignVerticallyParams alignVerticallyParams(doc, &alignVerticallyEnd);
+    AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Set the pitch / pos alignement
@@ -183,7 +223,7 @@ void Page::LayOutHorizontally()
     // - each Staff object will then have its StaffAlignment pointer initialized
     Functor alignVertically(&Object::AlignVertically);
     Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
-    AlignVerticallyParams alignVerticallyParams(doc, &alignVerticallyEnd);
+    AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
@@ -265,6 +305,12 @@ void Page::LayOutHorizontally()
 
     this->AdjustSylSpacingByVerse(prepareProcessingListsParams, doc);
 
+    // Adjust the arpeg
+    Functor adjustArpeg(&Object::AdjustArpeg);
+    Functor adjustArpegEnd(&Object::AdjustArpegEnd);
+    AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
+    this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
+
     // Adjust measure X position
     AlignMeasuresParams alignMeasuresParams;
     Functor alignMeasures(&Object::AlignMeasures);
@@ -294,7 +340,7 @@ void Page::LayOutVertically()
     // - each Staff object will then have its StaffAlignment pointer initialized
     Functor alignVertically(&Object::AlignVertically);
     Functor alignVerticallyEnd(&Object::AlignVerticallyEnd);
-    AlignVerticallyParams alignVerticallyParams(doc, &alignVerticallyEnd);
+    AlignVerticallyParams alignVerticallyParams(doc, &alignVertically, &alignVerticallyEnd);
     this->Process(&alignVertically, &alignVerticallyParams, &alignVerticallyEnd);
 
     // Adjust the position of outside articulations
@@ -337,9 +383,17 @@ void Page::LayOutVertically()
     AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
     this->Process(&adjustYPos, &adjustYPosParams);
 
+    if (this->GetHeader()) {
+        this->GetHeader()->AdjustYPos();
+    }
+
+    if (this->GetFooter()) {
+        this->GetFooter()->AdjustYPos();
+    }
+
     // Adjust system Y position
     AlignSystemsParams alignSystemsParams;
-    alignSystemsParams.m_shift = doc->m_drawingPageHeight - doc->m_drawingPageTopMar;
+    alignSystemsParams.m_shift = doc->m_drawingPageHeight;
     alignSystemsParams.m_systemMargin = (doc->GetSpacingSystem()) * doc->GetDrawingUnit(100);
     Functor alignSystems(&Object::AlignSystems);
     this->Process(&alignSystems, &alignSystemsParams);
@@ -395,7 +449,14 @@ int Page::GetContentHeight() const
 
     System *last = dynamic_cast<System *>(m_children.back());
     assert(last);
-    return doc->m_drawingPageHeight - doc->m_drawingPageTopMar - last->GetDrawingYRel() + last->GetHeight();
+    int height = doc->m_drawingPageHeight - doc->m_drawingPageTopMar - last->GetDrawingYRel() + last->GetHeight();
+
+    // Not sure what to do with the footer when adjusted page height is requested...
+    // if (this->GetFooter()) {
+    //    height += this->GetFooter()->GetTotalHeight();
+    //}
+
+    return height;
 }
 
 int Page::GetContentWidth() const
@@ -434,9 +495,9 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 // Create ad comparison object for each type / @n
-                AttCommonNComparison matchStaff(STAFF, staves->first);
-                AttCommonNComparison matchLayer(LAYER, layers->first);
-                AttCommonNComparison matchVerse(VERSE, verses->first);
+                AttNIntegerComparison matchStaff(STAFF, staves->first);
+                AttNIntegerComparison matchLayer(LAYER, layers->first);
+                AttNIntegerComparison matchVerse(VERSE, verses->first);
                 filters = { &matchStaff, &matchLayer, &matchVerse };
 
                 // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
@@ -450,15 +511,9 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
     }
 }
 
-void Page::UpgradePageBasedMEI(Doc *doc)
-{
-    // Once we have the GetPPU in Page through LibMEI, call this from Doc::SetDrawingPage and
-    // use m_unit instead of the default - For the upgraded call Page->SetPPU(12.5);
-
-    assert(doc->GetStyle());
-    m_PPUFactor = 25.0 / 2.0 / doc->GetStyle()->m_unit.GetDefault();
-    // LogDebug("PPUFactor: %f", m_PPUFactor);
-}
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
 
 int Page::ApplyPPUFactor(FunctorParams *functorParams)
 {
@@ -471,6 +526,76 @@ int Page::ApplyPPUFactor(FunctorParams *functorParams)
     this->m_pageTopMar /= params->m_page->GetPPUFactor();
     this->m_pageLeftMar /= params->m_page->GetPPUFactor();
     this->m_pageRightMar /= params->m_page->GetPPUFactor();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Page::ResetVerticalAlignment(FunctorParams *functorParams)
+{
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    assert(doc);
+
+    // Same functor, but we have not FunctorParams so we just re-instanciate it
+    Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
+
+    RunningElement *header = this->GetHeader();
+    if (header) {
+        header->Process(&resetVerticalAlignment, NULL);
+        header->SetDrawingPage(NULL);
+        header->SetDrawingYRel(0);
+    }
+    RunningElement *footer = this->GetFooter();
+    if (footer) {
+        footer->Process(&resetVerticalAlignment, NULL);
+        footer->SetDrawingPage(NULL);
+        footer->SetDrawingYRel(0);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Page::AlignVerticallyEnd(FunctorParams *functorParams)
+{
+    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    assert(params);
+
+    params->m_cumulatedShift = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+
+    // Also align the header and footer
+
+    RunningElement *header = this->GetHeader();
+    if (header) {
+        header->SetDrawingPage(this);
+        header->SetDrawingYRel(0);
+        header->Process(params->m_functor, params, params->m_functorEnd);
+    }
+    RunningElement *footer = this->GetFooter();
+    if (footer) {
+        footer->SetDrawingPage(this);
+        footer->SetDrawingYRel(0);
+        footer->Process(params->m_functor, params, params->m_functorEnd);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Page::AlignSystems(FunctorParams *functorParams)
+{
+    AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
+    assert(params);
+
+    RunningElement *header = this->GetHeader();
+    if (header) {
+        header->SetDrawingYRel(params->m_shift);
+        params->m_shift -= header->GetTotalHeight();
+    }
+    RunningElement *footer = this->GetFooter();
+    if (footer) {
+        Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+        assert(doc);
+        // We add twice the top margin, once for the origin moved at the top and one for the bottom margin
+        footer->SetDrawingYRel(footer->GetTotalHeight() + doc->m_drawingPageTopMar * 2);
+    }
 
     return FUNCTOR_CONTINUE;
 }

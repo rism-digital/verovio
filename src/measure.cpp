@@ -23,6 +23,7 @@
 #include "functorparams.h"
 #include "page.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "syl.h"
 #include "system.h"
 #include "tempo.h"
@@ -165,7 +166,7 @@ int Measure::GetLeftBarLineXRel() const
 int Measure::GetLeftBarLineLeft() const
 {
     int x = GetLeftBarLineXRel();
-    if (m_leftBarLine.HasUpdatedBB()) {
+    if (m_leftBarLine.HasSelfBB()) {
         x += m_leftBarLine.GetContentX1();
     }
     return x;
@@ -174,7 +175,7 @@ int Measure::GetLeftBarLineLeft() const
 int Measure::GetLeftBarLineRight() const
 {
     int x = GetLeftBarLineXRel();
-    if (m_leftBarLine.HasUpdatedBB()) {
+    if (m_leftBarLine.HasSelfBB()) {
         x += m_leftBarLine.GetContentX2();
     }
     return x;
@@ -191,7 +192,7 @@ int Measure::GetRightBarLineXRel() const
 int Measure::GetRightBarLineLeft() const
 {
     int x = GetRightBarLineXRel();
-    if (m_rightBarLine.HasUpdatedBB()) {
+    if (m_rightBarLine.HasSelfBB()) {
         x += m_rightBarLine.GetContentX1();
     }
     return x;
@@ -200,7 +201,7 @@ int Measure::GetRightBarLineLeft() const
 int Measure::GetRightBarLineRight() const
 {
     int x = GetRightBarLineXRel();
-    if (m_rightBarLine.HasUpdatedBB()) {
+    if (m_rightBarLine.HasSelfBB()) {
         x += m_rightBarLine.GetContentX2();
     }
     return x;
@@ -254,7 +255,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 
     // Get the corresponding staves in the measure
     for (iter = staffList.begin(); iter != staffList.end(); iter++) {
-        AttCommonNComparison matchN(STAFF, *iter);
+        AttNIntegerComparison matchN(STAFF, *iter);
         Staff *staff = dynamic_cast<Staff *>(this->FindChildByAttComparison(&matchN, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
@@ -266,24 +267,11 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     return staves;
 }
 
-void Measure::UpgradePageBasedMEI(System *system)
-{
-    assert(!this->IsMeasuredMusic());
-
-    if (system->m_yAbs == VRV_UNSET) return;
-    if (system->m_systemRightMar == VRV_UNSET) return;
-    if (system->m_systemRightMar == VRV_UNSET) return;
-
-    Page *page = dynamic_cast<Page *>(system->GetFirstParent(PAGE));
-    assert(page);
-    this->m_xAbs = system->m_systemLeftMar;
-    this->m_xAbs2 = page->m_pageWidth - system->m_systemRightMar;
-}
-
 int Measure::EnclosesTime(int time) const
 {
     int repeat = 1;
-    int timeDuration = int(m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5);
+    int timeDuration = int(
+        m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5);
     std::vector<int>::const_iterator iter;
     for (iter = m_realTimeOffsetMilliseconds.begin(); iter != m_realTimeOffsetMilliseconds.end(); iter++) {
         if ((time >= *iter) && (time <= *iter + timeDuration)) return repeat;
@@ -297,47 +285,6 @@ int Measure::GetRealTimeOffsetMilliseconds(int repeat) const
     if ((repeat < 1) || repeat > (int)m_realTimeOffsetMilliseconds.size()) return 0;
     return m_realTimeOffsetMilliseconds.at(repeat - 1);
 }
-
-//----------------------------------------------------------------------------
-// Measure functor methods
-//----------------------------------------------------------------------------
-
-int Measure::ConvertToPageBased(FunctorParams *functorParams)
-{
-    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
-    assert(params);
-
-    // Move itself to the pageBasedSystem - do not process children
-    this->MoveItselfTo(params->m_pageBasedSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::Save(FunctorParams *functorParams)
-{
-    if (this->IsMeasuredMusic())
-        return Object::Save(functorParams);
-    else
-        return FUNCTOR_CONTINUE;
-}
-
-int Measure::SaveEnd(FunctorParams *functorParams)
-{
-    if (this->IsMeasuredMusic())
-        return Object::SaveEnd(functorParams);
-    else
-        return FUNCTOR_CONTINUE;
-}
-
-int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
-{
-    if (m_drawingScoreDef) {
-        delete m_drawingScoreDef;
-        m_drawingScoreDef = NULL;
-    }
-
-    return FUNCTOR_CONTINUE;
-};
 
 void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool scoreDefInsert)
 {
@@ -392,6 +339,62 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
         this->SetDrawingLeftBarLine(this->GetLeft());
     }
 }
+
+//----------------------------------------------------------------------------
+// Measure functor methods
+//----------------------------------------------------------------------------
+
+int Measure::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
+{
+    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    assert(params);
+
+    ArrayOfObjects::iterator iter;
+    for (iter = params->m_controlEvents.begin(); iter != params->m_controlEvents.end(); iter++) {
+        this->AddChild(*iter);
+    }
+
+    params->m_controlEvents.clear();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::ConvertToPageBased(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    // Move itself to the pageBasedSystem - do not process children
+    this->MoveItselfTo(params->m_pageBasedSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Measure::Save(FunctorParams *functorParams)
+{
+    if (this->IsMeasuredMusic())
+        return Object::Save(functorParams);
+    else
+        return FUNCTOR_CONTINUE;
+}
+
+int Measure::SaveEnd(FunctorParams *functorParams)
+{
+    if (this->IsMeasuredMusic())
+        return Object::SaveEnd(functorParams);
+    else
+        return FUNCTOR_CONTINUE;
+}
+
+int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
+{
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+};
 
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
@@ -472,6 +475,20 @@ int Measure::AlignVertically(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::AdjustArpegEnd(FunctorParams *functorParams)
+{
+    AdjustArpegParams *params = dynamic_cast<AdjustArpegParams *>(functorParams);
+    assert(params);
+
+    if (!params->m_alignmentArpegTuples.empty()) {
+        params->m_measureAligner = &m_measureAligner;
+        m_measureAligner.Process(params->m_functor, params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+        params->m_alignmentArpegTuples.clear();
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::AdjustLayers(FunctorParams *functorParams)
 {
     AdjustLayersParams *params = dynamic_cast<AdjustLayersParams *>(functorParams);
@@ -488,7 +505,7 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(*iter);
-        AttCommonNComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
+        AttNIntegerComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, NULL, &filters);
@@ -546,7 +563,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         // -1 for barline attributes that need to be taken into account each time
         ns.push_back(-1);
         ns.push_back(*iter);
-        AttCommonNComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
+        AttNIntegerComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
@@ -559,7 +576,15 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_FULLMEASURE2);
     Alignment *fullMeasure2
         = dynamic_cast<Alignment *>(m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
-    if (fullMeasure2 != NULL) minMeasureWidth *= 2;
+
+    // With a double measure with element (mRpt2, multiRpt)
+    if (fullMeasure2 != NULL) {
+        minMeasureWidth *= 2;
+    }
+    // Nothing if the measure has at least one note - can be improved
+    else if (this->FindChildByType(NOTE) != NULL) {
+        minMeasureWidth = 0;
+    }
 
     int currentMeasureWidth = this->GetRightBarLineLeft() - this->GetLeftBarLineRight();
     if (currentMeasureWidth < minMeasureWidth) {
@@ -578,7 +603,7 @@ int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
 
     // Here we also need to handle the last syl or the measure - we check the alignment with the right barline
     if (params->m_previousSyl) {
-        int overlap = params->m_previousSyl->GetSelfRight() - this->GetRightBarLine()->GetAlignment()->GetXRel();
+        int overlap = params->m_previousSyl->GetContentRight() - this->GetRightBarLine()->GetAlignment()->GetXRel();
         if (overlap > 0) {
             params->m_overlapingSyl.push_back(std::make_tuple(
                 params->m_previousSyl->GetAlignment(), this->GetRightBarLine()->GetAlignment(), overlap));
@@ -756,7 +781,7 @@ int Measure::PrepareTimePointingEnd(FunctorParams *functorParams)
     assert(params);
 
     if (!params->m_timePointingInterfaces.empty()) {
-        LogWarning("%d time pointing element(s) could not be matched in mesure %s",
+        LogWarning("%d time pointing element(s) could not be matched in measure %s",
             params->m_timePointingInterfaces.size(), this->GetUuid().c_str());
     }
 
@@ -864,8 +889,21 @@ int Measure::GenerateMIDI(FunctorParams *functorParams)
 
     if (m_currentTempo != params->m_currentTempo) {
         params->m_midiFile->addTempo(0, m_scoreTimeOffset.back() * params->m_midiFile->getTPQ(), m_currentTempo);
-        m_currentTempo = params->m_currentTempo;
+        params->m_currentTempo = m_currentTempo;
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::GenerateTimemap(FunctorParams *functorParams)
+{
+    GenerateTimemapParams *params = dynamic_cast<GenerateTimemapParams *>(functorParams);
+    assert(params);
+
+    // Deal with repeated music later, for now get the last times.
+    params->m_scoreTimeOffset = m_scoreTimeOffset.back();
+    params->m_realTimeOffsetMilliseconds = m_realTimeOffsetMilliseconds.back();
+    params->m_currentTempo = m_currentTempo;
 
     return FUNCTOR_CONTINUE;
 }

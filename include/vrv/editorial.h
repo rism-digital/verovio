@@ -155,7 +155,7 @@ private:
 // Annot
 //----------------------------------------------------------------------------
 
-class Annot : public EditorialElement, public AttPlist, public AttSource {
+class Annot : public EditorialElement, public TextListInterface, public AttPlist, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -168,6 +168,12 @@ public:
     virtual std::string GetClassName() const { return "Annot"; }
     virtual ClassId GetClassId() const { return ANNOT; }
     ///@}
+
+    /**
+     * Add a text element to an annotation.
+     * Only supported elements will be actually added to the child list.
+     */
+    virtual void AddChild(Object *object);
 
 private:
     //

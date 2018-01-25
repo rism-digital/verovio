@@ -32,7 +32,9 @@
 #include "metersig.h"
 #include "note.h"
 #include "page.h"
+#include "plistinterface.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "system.h"
 #include "tempo.h"
 #include "text.h"
@@ -76,16 +78,23 @@ Object::Object(const Object &object) : BoundingBox(object)
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
     m_parent = NULL;
     m_classid = object.m_classid;
+    m_attClasses = object.m_attClasses;
+    m_interfaces = object.m_interfaces;
     m_isReferencObject = object.m_isReferencObject;
-    m_uuid = object.m_uuid; // for now copy the uuid - to be decided
     m_isModified = true;
+    // For now do now copy them
+    // m_uuid = object.m_uuid;
+    // m_unsupported = object.m_unsupported;
+
     int i;
     for (i = 0; i < (int)object.m_children.size(); i++) {
         Object *current = object.m_children.at(i);
         Object *copy = current->Clone();
-        copy->Modify();
-        copy->SetParent(this);
-        m_children.push_back(copy);
+        if (copy) {
+            copy->Modify();
+            copy->SetParent(this);
+            m_children.push_back(copy);
+        }
     }
 }
 
@@ -97,9 +106,13 @@ Object &Object::operator=(const Object &object)
         ResetBoundingBox(); // It does not make sense to keep the values of the BBox
         m_parent = NULL;
         m_classid = object.m_classid;
+        m_attClasses = object.m_attClasses;
+        m_interfaces = object.m_interfaces;
         m_isReferencObject = object.m_isReferencObject;
-        m_uuid = object.m_uuid; // for now copy the uuid - to be decided
         m_isModified = true;
+        // For now do now copy them
+        // m_uuid = object.m_uuid;
+        // m_unsupported = object.m_unsupported;
 
         int i;
         for (i = 0; i < (int)object.m_children.size(); i++) {
@@ -393,6 +406,17 @@ void Object::FindAllChildByAttComparison(
     this->Process(&findAllByAttComparison, &findAllByAttComparisonParams, NULL, NULL, deepness, direction);
 }
 
+void Object::FindAllChildBetween(
+    ArrayOfObjects *objects, AttComparison *attComparison, Object *start, Object *end, bool clear)
+{
+    assert(objects);
+    if (clear) objects->clear();
+
+    Functor findAllBetween(&Object::FindAllBetween);
+    FindAllBetweenParams findAllBetweenParams(attComparison, objects, start, end);
+    this->Process(&findAllBetween, &findAllBetweenParams);
+}
+
 Object *Object::GetChild(int idx) const
 {
     if ((idx < 0) || (idx >= (int)m_children.size())) {
@@ -682,7 +706,7 @@ void ObjectListInterface::ResetList(Object *node)
     this->FilterList(&m_list);
 }
 
-ListOfObjects *ObjectListInterface::GetList(Object *node)
+const ListOfObjects *ObjectListInterface::GetList(Object *node)
 {
     ResetList(node);
     return &m_list;
@@ -763,8 +787,8 @@ std::wstring TextListInterface::GetText(Object *node)
 {
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
-    ListOfObjects *childList = this->GetList(node); // make sure it's initialized
-    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+    const ListOfObjects *childList = this->GetList(node); // make sure it's initialized
+    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); it++) {
         Text *text = dynamic_cast<Text *>(*it);
         assert(text);
         concatText += text->GetText();
@@ -775,7 +799,6 @@ std::wstring TextListInterface::GetText(Object *node)
 void TextListInterface::FilterList(ListOfObjects *childList)
 {
     ListOfObjects::iterator iter = childList->begin();
-
     while (iter != childList->end()) {
         if (!(*iter)->Is(TEXT)) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
@@ -887,6 +910,57 @@ int Object::FindAllByAttComparison(FunctorParams *functorParams)
         params->m_elements->push_back(this);
     }
     // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::FindAllBetween(FunctorParams *functorParams)
+{
+    FindAllBetweenParams *params = dynamic_cast<FindAllBetweenParams *>(functorParams);
+    assert(params);
+
+    // We are reaching the start of the range
+    if (params->m_start == this) {
+        // Setting the start to NULL indicates that we are in the range
+        params->m_start = NULL;
+    }
+    // We have not reached the start yet
+    else if (params->m_start) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // evaluate by applying the AttComparison operator()
+    if ((*params->m_attComparison)(this)) {
+        params->m_elements->push_back(this);
+    }
+
+    // We have reached the end of the range
+    if (params->m_end == this) {
+        return FUNCTOR_STOP;
+    }
+
+    // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::PreparePlist(FunctorParams *functorParams)
+{
+    PreparePlistParams *params = dynamic_cast<PreparePlistParams *>(functorParams);
+    assert(params);
+
+    if (params->m_fillList && this->HasInterface(INTERFACE_PLIST)) {
+        PlistInterface *interface = this->GetPlistInterface();
+        assert(interface);
+        return interface->InterfacePreparePlist(functorParams, this);
+    }
+
+    std::string uuid = this->GetUuid();
+    auto i = std::find_if(params->m_interfaceUuidPairs.begin(), params->m_interfaceUuidPairs.end(),
+        [uuid](std::pair<PlistInterface *, std::string> pair) { return (pair.second == uuid); });
+    if (i != params->m_interfaceUuidPairs.end()) {
+        i->first->SetRef(this);
+        params->m_interfaceUuidPairs.erase(i);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -1018,17 +1092,6 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     if (this->Is(LAYER)) {
         Layer *layer = dynamic_cast<Layer *>(this);
         assert(layer);
-        // setting the layer stem direction. Alternatively, this could be done in
-        // View::DrawLayer. If this (and other things) is kept here, renaming the method to something
-        // more generic (PrepareDrawing?) might be a good idea...
-        if (layer->GetParent()->GetChildCount() > 1) {
-            if (layer->GetParent()->GetChildIndex(layer) == 0) {
-                layer->SetDrawingStemDir(STEMDIRECTION_up);
-            }
-            else {
-                layer->SetDrawingStemDir(STEMDIRECTION_down);
-            }
-        }
         if (params->m_doc->GetType() != Transcription) layer->SetDrawingStaffDefValues(params->m_currentStaffDef);
         return FUNCTOR_CONTINUE;
     }
@@ -1067,7 +1130,7 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 
     if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
 
-    if (!this->HasUpdatedBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
+    if (!this->HasSelfBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
 
     int refLeft = this->GetSelfLeft();
     if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
@@ -1135,7 +1198,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (!this->HasUpdatedBB()) {
+    if (!this->HasSelfBB()) {
         // if nothing was drawn, do not take it into account
         return FUNCTOR_CONTINUE;
     }

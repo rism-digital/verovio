@@ -72,8 +72,6 @@ public:
      */
     virtual void AddChild(Object *object);
 
-    virtual void FilterList(ListOfObjects *childlist);
-
     /**
      * Return the maximum and minimum Y positions of the notes in the chord
      */
@@ -123,13 +121,21 @@ public:
      * If necessary look at the glyph anchor (if any).
      */
     ///@{
-    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize);
-    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize);
+    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool isCueSize);
+    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool isCueSize);
     ///@}
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ConvertAnalyticalMarkup
+     */
+    ///@{
+    virtual int ConvertAnalyticalMarkup(FunctorParams *functorParams);
+    virtual int ConvertAnalyticalMarkupEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::CalcStem
@@ -147,12 +153,6 @@ public:
     virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareTieAttr
-     */
-    virtual int PrepareTieAttr(FunctorParams *functorParams);
-    virtual int PrepareTieAttrEnd(FunctorParams *functorParams);
-
-    /**
      * See Object::GenerateMIDIEnd
      */
     virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams);
@@ -162,6 +162,11 @@ protected:
      * Clear the m_clusters vector and delete all the objects.
      */
     void ClearClusters() const;
+
+    /**
+     * Filter the flat list and keep only Note elements.
+     */
+    virtual void FilterList(ListOfObjects *childlist);
 
 public:
     mutable std::list<ChordCluster *> m_clusters;

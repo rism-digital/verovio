@@ -20,6 +20,10 @@ class Clef;
 class KeySig;
 class Mensur;
 class MeterSig;
+class PgFoot;
+class PgFoot2;
+class PgHead;
+class PgHead2;
 class StaffGrp;
 class StaffDef;
 
@@ -110,7 +114,7 @@ private:
 /**
  * This class represents a MEI scoreDef.
  * It contains StaffGrp objects.
-*/
+ */
 class ScoreDef : public ScoreDefElement, public ObjectListInterface, public AttEndings {
 public:
     /**
@@ -172,6 +176,16 @@ public:
     void SetDrawingWidth(int drawingWidth);
     ///@}
 
+    /**
+     * @name Getters for running elements
+     */
+    ///@{
+    PgFoot *GetPgFoot();
+    PgFoot2 *GetPgFoot2();
+    PgHead *GetPgHead();
+    PgHead2 *GetPgHead2();
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -194,8 +208,7 @@ public:
 
 protected:
     /**
-     * Filter the list for a specific class.
-     * For example, keep staffGrp for fast access.
+     * Filter the flat list and keep only StaffGrp elements.
      */
     virtual void FilterList(ListOfObjects *childList);
 
@@ -209,115 +222,6 @@ private:
     bool m_drawLabels;
     /** Store the drawing width (clef and key sig) of the scoreDef */
     int m_drawingWidth;
-};
-
-//----------------------------------------------------------------------------
-// StaffGrp
-//----------------------------------------------------------------------------
-
-/**
- * This class represents a MEI staffGrp.
- * It contains StaffDef objects.
- */
-class StaffGrp : public Object,
-                 public ObjectListInterface,
-                 public AttBasic,
-                 public AttLabelled,
-                 // FIXME changed in MEI 4.0.0
-                 // public AttLabelsAddl,
-                 public AttStaffGroupingSym,
-                 public AttStaffGrpVis,
-                 public AttTyped {
-public:
-    /**
-     * @name Constructors, destructors, and other standard methods
-     * Reset method resets all attribute classes
-     */
-    ///@{
-    StaffGrp();
-    virtual ~StaffGrp();
-    virtual Object *Clone() const { return new StaffGrp(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "StaffGrp"; }
-    virtual ClassId GetClassId() const { return STAFFGRP; }
-    ///@}
-
-    /**
-     * @name Methods for adding allowed content
-     */
-    ///@{
-    virtual void AddChild(Object *object);
-    ///@}
-
-    //----------//
-    // Functors //
-    //----------//
-
-protected:
-    /**
-     * Filter the list for a specific class.
-     * For example, keep staffDef for fast access.
-     */
-    virtual void FilterList(ListOfObjects *childList);
-
-private:
-    //
-public:
-    //
-private:
-};
-
-//----------------------------------------------------------------------------
-// StaffDef
-//----------------------------------------------------------------------------
-
-/**
- * This class represents a MEI staffDef.
- */
-class StaffDef : public ScoreDefElement,
-                 public StaffDefDrawingInterface,
-                 public AttDistances,
-                 public AttLabelled,
-                 // FIXME changed in MEI 4.0.0
-                 // public AttLabelsAddl,
-                 public AttNInteger,
-                 public AttNotationType,
-                 public AttScalable,
-                 public AttStaffDefLog,
-                 public AttTransposition {
-public:
-    /**
-     * @name Constructors, destructors, and other standard methods
-     * Reset method resets all attribute classes
-     */
-    ///@{
-    StaffDef();
-    virtual ~StaffDef();
-    virtual Object *Clone() const { return new StaffDef(*this); }
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "StaffDef"; }
-    virtual ClassId GetClassId() const { return STAFFDEF; }
-    ///@}
-
-    //----------//
-    // Functors //
-    //----------//
-
-    /**
-     * See Object::ReplaceDrawingValuesInStaffDef
-     */
-    virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams);
-
-    /**
-     * See Object::SetStaffDefRedrawFlags
-     */
-    virtual int SetStaffDefRedrawFlags(FunctorParams *functorParams);
-
-private:
-    //
-public:
-    //
-private:
 };
 
 } // namespace vrv

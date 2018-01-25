@@ -245,9 +245,10 @@ std::string Att::FontsizenumericToStr(data_FONTSIZENUMERIC data) const
 
 data_FONTSIZENUMERIC Att::StrToFontsizenumeric(std::string value, bool logWarning) const
 {
-    std::regex test("[0-9](\\.[0-9]+)?(pt)");
-    if (std::regex_match(value, test)) {
+    std::regex test("[0-9]*(\\.[0-9]+)?(pt)");
+    if (!std::regex_match(value, test)) {
         if (logWarning) LogWarning("Unsupported data.FONTSIZENUMERIC '%s'", value.c_str());
+        return VRV_UNSET;
     }
     return atof(value.substr(0, value.find("pt")).c_str());
 }
@@ -429,8 +430,9 @@ std::string Att::PercentToStr(data_PERCENT data) const
 data_PERCENT Att::StrToPercent(std::string value, bool logWarning) const
 {
     std::regex test("[0-9]+(\\.?[0-9]*)?%");
-    if (std::regex_match(value, test)) {
+    if (!std::regex_match(value, test)) {
         if (logWarning) LogWarning("Unsupported data.PERCENT '%s'", value.c_str());
+        return 0;
     }
     return atof(value.substr(0, value.find("%")).c_str());
 }
@@ -624,6 +626,27 @@ data_TIE Att::StrToTie(std::string value, bool logWarning) const
     if (value == "t") return TIE_t;
     if (logWarning) LogWarning("Unsupported tie '%s'", value.c_str());
     return TIE_NONE;
+}
+
+std::string Att::XsdAnyURIListToStr(xsdAnyURI_List data) const
+{
+    std::ostringstream ss;
+    for (size_t i = 0; i < data.size(); ++i) {
+        if (i != 0) ss << " ";
+        ss << data[i];
+    }
+    return ss.str();
+}
+
+xsdAnyURI_List Att::StrToXsdAnyURIList(std::string value) const
+{
+    xsdAnyURI_List list;
+    std::istringstream iss(value);
+    std::string token;
+    while (std::getline(iss, token, ' ')) {
+        list.push_back(token.c_str());
+    }
+    return list;
 }
 
 std::string Att::XsdPositiveIntegerListToStr(xsdPositiveInteger_List data) const

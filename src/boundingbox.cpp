@@ -60,16 +60,16 @@ void BoundingBox::UpdateContentBBoxX(int x1, int x2)
 {
     // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
 
-    int min_x = std::min(x1, x2);
-    int max_x = std::max(x1, x2);
+    int minX = std::min(x1, x2);
+    int maxX = std::max(x1, x2);
 
     int drawingX = GetDrawingX();
 
-    min_x -= drawingX;
-    max_x -= drawingX;
+    minX -= drawingX;
+    maxX -= drawingX;
 
-    if (m_contentBB_x1 > min_x) m_contentBB_x1 = min_x;
-    if (m_contentBB_x2 < max_x) m_contentBB_x2 = max_x;
+    if (m_contentBB_x1 > minX) m_contentBB_x1 = minX;
+    if (m_contentBB_x2 < maxX) m_contentBB_x2 = maxX;
 
     // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
     // GetClassName().c_str());
@@ -98,18 +98,16 @@ void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
 {
     // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 
-    int min_x = std::min(x1, x2);
-    int max_x = std::max(x1, x2);
+    int minX = std::min(x1, x2);
+    int maxX = std::max(x1, x2);
 
     int drawingX = GetDrawingX();
 
-    min_x -= drawingX;
-    max_x -= drawingX;
+    minX -= drawingX;
+    maxX -= drawingX;
 
-    if (m_selfBB_x1 > min_x) m_selfBB_x1 = min_x;
-    if (m_selfBB_x2 < max_x) m_selfBB_x2 = max_x;
-
-    m_updatedBBoxX = true;
+    if (m_selfBB_x1 > minX) m_selfBB_x1 = minX;
+    if (m_selfBB_x2 < maxX) m_selfBB_x2 = maxX;
 
     // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 }
@@ -128,8 +126,6 @@ void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
 
     if (m_selfBB_y1 > min_y) m_selfBB_y1 = min_y;
     if (m_selfBB_y2 < max_y) m_selfBB_y2 = max_y;
-
-    m_updatedBBoxY = true;
 
     // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 }
@@ -150,15 +146,10 @@ void BoundingBox::ResetBoundingBox()
 
     m_smuflGlyph = 0;
     m_smuflGlyphFontSize = 100;
-
-    m_updatedBBoxX = false;
-    m_updatedBBoxY = false;
 }
 
-void BoundingBox::SetEmptyBB(bool onlyIfUnset)
+void BoundingBox::SetEmptyBB()
 {
-    // if (onlyIfUnset && this->HasContentBB() && this->HasSelfBB()) return;
-
     m_contentBB_x1 = 0;
     m_contentBB_y1 = 0;
     m_contentBB_x2 = 0;
@@ -167,27 +158,42 @@ void BoundingBox::SetEmptyBB(bool onlyIfUnset)
     m_selfBB_y1 = 0;
     m_selfBB_x2 = 0;
     m_selfBB_y2 = 0;
-
-    m_updatedBBoxX = true;
-    m_updatedBBoxY = true;
 }
 
 bool BoundingBox::HasEmptyBB() const
 {
-    return (HasUpdatedBB() && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0)
-        && (m_contentBB_y2 == 0));
+    // We are checking only the content bounding box - this should be OK
+    return ((m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0) && (m_contentBB_y2 == 0));
 }
 
 bool BoundingBox::HasContentBB() const
 {
-    return ((m_contentBB_x1 != -VRV_UNSET) && (m_contentBB_y1 != -VRV_UNSET) && (m_contentBB_x2 != VRV_UNSET)
-        && (m_contentBB_y2 != VRV_UNSET));
+    return (HasContentHorizontalBB() && HasContentVerticalBB());
+}
+
+bool BoundingBox::HasContentHorizontalBB() const
+{
+    return ((m_contentBB_x1 != -VRV_UNSET) && (m_contentBB_x2 != VRV_UNSET));
+}
+
+bool BoundingBox::HasContentVerticalBB() const
+{
+    return ((m_contentBB_y1 != -VRV_UNSET) && (m_contentBB_y2 != VRV_UNSET));
 }
 
 bool BoundingBox::HasSelfBB() const
 {
-    return ((m_selfBB_x1 != -VRV_UNSET) && (m_selfBB_y1 != -VRV_UNSET) && (m_selfBB_x2 != VRV_UNSET)
-        && (m_selfBB_y2 != VRV_UNSET));
+    return (HasSelfHorizontalBB() && HasSelfVerticalBB());
+}
+
+bool BoundingBox::HasSelfHorizontalBB() const
+{
+    return ((m_selfBB_x1 != -VRV_UNSET) && (m_selfBB_x2 != VRV_UNSET));
+}
+
+bool BoundingBox::HasSelfVerticalBB() const
+{
+    return ((m_selfBB_y1 != -VRV_UNSET) && (m_selfBB_y2 != VRV_UNSET));
 }
 
 void BoundingBox::SetBoundingBoxGlyph(wchar_t smuflGlyph, int fontSize)
@@ -676,10 +682,10 @@ void BoundingBox::Swap(int &v1, int &v2)
     v2 = tmp;
 }
 
-Point BoundingBox::CalcPositionAfterRotation(Point point, float rot_alpha, Point center)
+Point BoundingBox::CalcPositionAfterRotation(Point point, float alpha, Point center)
 {
-    float s = sin(rot_alpha);
-    float c = cos(rot_alpha);
+    float s = sin(alpha);
+    float c = cos(alpha);
 
     // translate point back to origin:
     point.x -= center.x;

@@ -25,7 +25,7 @@ class Measure;
  * It can be both a container (in score-based MEI) and a boundary (in page-based MEI).
  * It inherits from FloatingElement for spanning drawing features.
  */
-class Ending : public SystemElement, public BoundaryStartInterface, public AttNNumberLike {
+class Ending : public SystemElement, public BoundaryStartInterface, public AttLineRend, public AttNNumberLike {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

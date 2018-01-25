@@ -75,13 +75,15 @@ public:
     virtual void DrawEllipse(int x, int y, int width, int height);
     virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end);
     virtual void DrawLine(int x1, int y1, int x2, int y2);
-    virtual void DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style = AxODDEVEN_RULE);
+    virtual void DrawPolygon(int n, Point points[], int xOffset, int yOffset, int fillStyle = AxODDEVEN_RULE);
     virtual void DrawRectangle(int x, int y, int width, int height);
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle);
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius);
-    virtual void DrawText(const std::string &text, const std::wstring wtext = L"");
+    virtual void DrawText(
+        const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET);
     virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false);
     virtual void DrawSpline(int n, Point points[]);
+    virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg);
     virtual void DrawBackgroundImage(int x = 0, int y = 0){};
     ///@}
 
@@ -95,13 +97,13 @@ public:
      * @name Method for starting and ending a text
      */
     ///@{
-    virtual void StartText(int x, int y, char alignement = LEFT);
+    virtual void StartText(int x, int y, data_HORIZONTALALIGNMENT alignement = HORIZONTALALIGNMENT_left);
     virtual void EndText();
 
     /**
      * Move a text to the specified position, for example when starting a new line.
      */
-    virtual void MoveTextTo(int x, int y);
+    virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment);
 
     /**
      * @name Method for starting and ending a graphic
@@ -120,6 +122,13 @@ public:
     ///@}
 
     /**
+     * @name Method for rotating a graphic (clockwise).
+     */
+    ///@{
+    virtual void RotateGraphic(Point const &orig, double angle);
+    ///@}
+
+    /**
      * @name Method for starting and ending page
      */
     ///@{
@@ -130,11 +139,42 @@ public:
     bool UpdateHorizontalValues() { return (m_update != BBOX_VERTICAL_ONLY); }
     bool UpdateVerticalValues() { return (m_update != BBOX_HORIZONTAL_ONLY); }
 
+    /**
+     * @name Method for adding description element
+     */
+    ///@{
+    virtual void AddDescription(const std::string &text){};
+    ///@}
+
 private:
+    /**
+     *
+     */
+    void ResetGraphicRotation();
+
+public:
+    //
+private:
+    /**
+     * Size and scale members
+     */
+    ///@{
     int m_width, m_height;
     double m_userScaleX, m_userScaleY;
+    ///@}
 
+    /**
+     * Indicates whereas we need to update bounding boxes horizontally and/or vertically
+     */
     unsigned char m_update;
+
+    /**
+     * The rotation values by RotateGraphic
+     */
+    ///@{{
+    Point m_rotationOrigin;
+    double m_rotationAngle;
+    ///@}
 
     /**
      * members for keeping track of the text bounding box.
@@ -142,7 +182,7 @@ private:
      */
     int m_textX, m_textY, m_textWidth, m_textHeight, m_textAscent, m_textDescent;
     bool m_drawingText;
-    char m_textAlignment;
+    data_HORIZONTALALIGNMENT m_textAlignment;
 
     /**
      * The array containing the object for which the bounding box needs to be updated

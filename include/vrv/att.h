@@ -28,7 +28,7 @@ class Object;
  * This is the base class for all MEI att classes.
  * It is not an abstract class but it should not be instanciated directly.
  * The att classes are generated with the libmei parser for Verovio.
-*/
+ */
 class Att : public AttConverter {
 public:
     /** @name Constructors and destructor */
@@ -171,6 +171,9 @@ public:
 
     std::string TieToStr(data_TIE data) const;
     data_TIE StrToTie(std::string value, bool logWarning = true) const;
+
+    std::string XsdAnyURIListToStr(xsdAnyURI_List data) const;
+    xsdAnyURI_List StrToXsdAnyURIList(std::string value) const;
 
     std::string XsdPositiveIntegerListToStr(xsdPositiveInteger_List data) const;
     xsdPositiveInteger_List StrToXsdPositiveIntegerList(std::string value) const;

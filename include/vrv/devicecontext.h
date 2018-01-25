@@ -8,6 +8,8 @@
 #ifndef __VRV_DC_H__
 #define __VRV_DC_H__
 
+#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
+#include <math.h>
 #include <stack>
 #include <string>
 
@@ -16,11 +18,26 @@
 #include "devicecontextbase.h"
 #include "vrvdef.h"
 
+//----------------------------------------------------------------------------
+
+#include "pugixml.hpp"
+
 namespace vrv {
 
 class Glyph;
 class Object;
 class View;
+
+extern "C" {
+static inline double DegToRad(double deg)
+{
+    return (deg * M_PI) / 180.0;
+}
+static inline double RadToDeg(double deg)
+{
+    return (deg * 180.0) / M_PI;
+}
+}
 
 // ---------------------------------------------------------------------------
 // DeviceContext
@@ -35,7 +52,7 @@ class View;
  *  MusCairoDC - a wrapper to a Cairo surface;
  * The class uses int-based colour encoding (instead of wxColour in wxDC).
  * It uses FontInfo (instead of wxFont in wxDC).
-*/
+ */
 
 class DeviceContext {
 public:
@@ -48,10 +65,32 @@ public:
         m_drawingBoundingBoxes = false;
         m_isDeactivatedX = false;
         m_isDeactivatedY = false;
+        m_width = 0;
+        m_height = 0;
+        m_userScaleX = 1.0;
+        m_userScaleY = 1.0;
     }
     virtual ~DeviceContext(){};
     virtual ClassId GetClassId() const;
     bool Is(ClassId classId) const { return (this->GetClassId() == classId); }
+    ///@}
+
+    /**
+     * @name Getters and setters for common attributes.
+     * Non-virtual methods cannot be overridden and manage the width, height and user-scale
+     */
+    ///@{
+    void SetWidth(int width) { m_width = width; }
+    void SetHeight(int height) { m_height = height; }
+    void SetUserScale(double scaleX, double scaleY)
+    {
+        m_userScaleX = scaleX;
+        m_userScaleY = scaleY;
+    }
+    int GetWidth() { return m_width; }
+    int GetHeight() { return m_height; }
+    double GetUserScaleX() { return m_userScaleX; }
+    double GetUserScaleY() { return m_userScaleY; }
     ///@}
 
     /**
@@ -72,6 +111,13 @@ public:
     virtual void SetTextBackground(int colour) = 0;
     virtual void SetLogicalOrigin(int x, int y) = 0;
     ///}
+
+    /**
+     * @name Getters
+     */
+    ///@{
+    FontInfo *GetFont();
+    ///@}
 
     /**
      * @name Getters for text extend (non-virtual)
@@ -102,9 +148,11 @@ public:
     virtual void DrawRectangle(int x, int y, int width, int height) = 0;
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle) = 0;
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius) = 0;
-    virtual void DrawText(const std::string &text, const std::wstring wtext = L"") = 0;
+    virtual void DrawText(const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET)
+        = 0;
     virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false) = 0;
     virtual void DrawSpline(int n, Point points[]) = 0;
+    virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) = 0;
     virtual void DrawBackgroundImage(int x = 0, int y = 0) = 0;
     ///@}
 
@@ -120,14 +168,14 @@ public:
      * Font can be changed between called for DrawText
      */
     ///@{
-    virtual void StartText(int x, int y, char alignement = LEFT) = 0;
+    virtual void StartText(int x, int y, data_HORIZONTALALIGNMENT alignement = HORIZONTALALIGNMENT_left) = 0;
     virtual void EndText() = 0;
 
     /**
      * Move a text to the specified position, for example when starting a new line.
      * This method should be called only between a StartText and EndText call.
      */
-    virtual void MoveTextTo(int x, int y) = 0;
+    virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment) = 0;
 
     /**
      * @name Temporarily deactivate a graphic
@@ -184,6 +232,14 @@ public:
     ///@}
 
     /**
+     * @name Method for rotating a graphic (clockwise).
+     * This should be called only once per graphic and before drawing anything in it.
+     */
+    ///@{
+    virtual void RotateGraphic(Point const &orig, double angle) = 0;
+    ///@}
+
+    /**
      * @name Method for starting and ending page
      */
     ///@{
@@ -202,6 +258,20 @@ public:
     virtual bool GetDrawBoundingBoxes() { return m_drawingBoundingBoxes; }
     ///@}
 
+    /**
+     * @name Method for adding description element
+     */
+    ///@{
+    virtual void AddDescription(const std::string &text){};
+    ///@}
+
+    /**
+     * Method indicating if default global styling is used. Typically this is the case with SVG and CSS.
+     * When global styling is used, some elements will not set corresponding styles.
+     * Global styling is false by default.
+     */
+    virtual bool UseGlobalStyling() { return false; }
+
 private:
     void AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend);
 
@@ -217,6 +287,15 @@ protected:
     /** flag for indicating if the graphic is deactivated */
     bool m_isDeactivatedX;
     bool m_isDeactivatedY;
+
+private:
+    /** stores the width and height of the device context */
+    int m_width;
+    int m_height;
+
+    /** stores the scale as requested by the used */
+    double m_userScaleX;
+    double m_userScaleY;
 };
 
 } // namespace vrv

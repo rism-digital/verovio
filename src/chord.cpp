@@ -18,6 +18,7 @@
 #include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
+#include "fermata.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
 #include "layer.h"
@@ -139,6 +140,13 @@ void Chord::FilterList(ListOfObjects *childList)
 
     std::sort(childList->begin(), childList->end(), DiatonicSort());
 
+    if (childList->empty()) {
+        LogWarning("Chord '%s' has no child note - a default note is added", this->GetUuid().c_str());
+        Note *rescueNote = new Note();
+        this->AddChild(rescueNote);
+        childList->push_back(rescueNote);
+    }
+
     iter = childList->begin();
 
     this->ClearClusters();
@@ -190,7 +198,7 @@ int Chord::PositionInChord(Note *note)
 
 void Chord::GetYExtremes(int &yMax, int &yMin)
 {
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The first note is the bottom
@@ -201,7 +209,7 @@ void Chord::GetYExtremes(int &yMax, int &yMin)
 
 int Chord::GetYTop()
 {
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The last note is the top
@@ -210,7 +218,7 @@ int Chord::GetYTop()
 
 int Chord::GetYBottom()
 {
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The first note is the bottom
@@ -219,7 +227,7 @@ int Chord::GetYBottom()
 
 Note *Chord::GetTopNote()
 {
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     Note *topNote = dynamic_cast<Note *>(childList->back());
@@ -229,7 +237,7 @@ Note *Chord::GetTopNote()
 
 Note *Chord::GetBottomNote()
 {
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
 
     // The first note is the bottom
@@ -298,23 +306,56 @@ bool Chord::HasCrossStaff()
     return ((staffAbove != NULL) || (staffBelow != NULL));
 }
 
-Point Chord::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
+Point Chord::GetStemUpSE(Doc *doc, int staffSize, bool isCueSize)
 {
     Note *bottomNote = this->GetBottomNote();
     assert(bottomNote);
-    return bottomNote->GetStemUpSE(doc, staffSize, graceSize);
+    return bottomNote->GetStemUpSE(doc, staffSize, isCueSize);
 }
 
-Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
+Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 {
     Note *topNote = this->GetTopNote();
     assert(topNote);
-    return topNote->GetStemDownNW(doc, staffSize, graceSize);
+    return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int Chord::ConvertAnalyticalMarkup(FunctorParams *functorParams)
+{
+    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    assert(params);
+
+    assert(!params->m_currentChord);
+    params->m_currentChord = this;
+
+    /****** fermata ******/
+
+    if (this->HasFermata()) {
+        Fermata *fermata = new Fermata();
+        fermata->ConvertFromAnalyticalMarkup(this, this->GetUuid(), params);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
+{
+    ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
+    assert(params);
+
+    if (params->m_permanent) {
+        this->ResetTiePresent();
+    }
+
+    assert(params->m_currentChord);
+    params->m_currentChord = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Chord::CalcStem(FunctorParams *functorParams)
 {
@@ -363,13 +404,14 @@ int Chord::CalcStem(FunctorParams *functorParams)
     int staffSize = staff->m_drawingStaffSize;
     params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
 
+    data_STEMDIRECTION layerStemDir;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
     if (stem->HasStemDir()) {
         stemDir = stem->GetStemDir();
     }
-    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        stemDir = layer->GetDrawingStemDir();
+    else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
+        stemDir = layerStemDir;
     }
     else {
         stemDir = (yMax - params->m_verticalCenter >= params->m_verticalCenter - yMin) ? STEMDIRECTION_down
@@ -403,8 +445,8 @@ int Chord::CalcDots(FunctorParams *functorParams)
     params->m_chordDrawingX = this->GetDrawingX();
     params->m_chordStemDir = this->GetDrawingStemDir();
 
-    ListOfObjects::reverse_iterator rit;
-    ListOfObjects *notes = this->GetList(this);
+    ListOfObjects::const_reverse_iterator rit;
+    const ListOfObjects *notes = this->GetList(this);
     assert(notes);
 
     assert(this->GetTopNote());
@@ -481,6 +523,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
             currentStem = new Stem();
             this->AddChild(currentStem);
         }
+        currentStem->AttGraced::operator=(*this);
         currentStem->AttStems::operator=(*this);
         currentStem->AttStemsCmn::operator=(*this);
     }
@@ -510,8 +553,8 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     SetDrawingStem(currentStem);
 
     // Also set the drawing stem object (or NULL) to all child notes
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+    const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); it++) {
         assert((*it)->Is(NOTE));
         Note *note = dynamic_cast<Note *>(*it);
         assert(note);
@@ -536,30 +579,13 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
         }
     }
 
+    /************ Prepare the drawing cue size ************/
+
+    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
+    this->Process(&prepareDrawingCueSize, NULL);
+
     return FUNCTOR_CONTINUE;
 };
-
-int Chord::PrepareTieAttr(FunctorParams *functorParams)
-{
-    PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
-    assert(params);
-
-    assert(!params->m_currentChord);
-    params->m_currentChord = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Chord::PrepareTieAttrEnd(FunctorParams *functorParams)
-{
-    PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
-    assert(params);
-
-    assert(params->m_currentChord);
-    params->m_currentChord = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
 
 int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
 {
@@ -574,4 +600,4 @@ int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-}
+} // namespace vrv

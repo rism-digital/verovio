@@ -170,6 +170,9 @@ public:
     std::string TextrenditionlistToStr(data_TEXTRENDITIONLIST data) const;
     data_TEXTRENDITIONLIST StrToTextrenditionlist(std::string value, bool logWarning = true) const;
 
+    std::string VerticalalignmentToStr(data_VERTICALALIGNMENT data) const;
+    data_VERTICALALIGNMENT StrToVerticalalignment(std::string value, bool logWarning = true) const;
+
     std::string AccidLogFuncToStr(accidLog_FUNC data) const;
     accidLog_FUNC StrToAccidLogFunc(std::string value, bool logWarning = true) const;
 

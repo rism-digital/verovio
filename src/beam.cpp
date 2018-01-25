@@ -44,6 +44,7 @@ void BeamDrawingParams::Reset()
     m_beamHasChord = false;
     m_hasMultipleStemDir = false;
     m_cueSize = false;
+    m_crossStaff = false;
     m_shortestDur = 0;
     m_stemDir = STEMDIRECTION_NONE;
 }
@@ -89,12 +90,6 @@ void BeamDrawingParams::CalcBeam(
 
     int last = elementCount - 1;
 
-    // x-offset values for stem bases, dx[y] where y = element->m_cueSize
-    stemX[0] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false) / 2
-        - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    stemX[1] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true) / 2
-        - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-
     /******************************************************************/
     // Calculate the extreme values
 
@@ -137,17 +132,14 @@ void BeamDrawingParams::CalcBeam(
     avgY /= elementCount;
 
     // If we have one stem direction in the beam, then don't look at the layer
-    if (this->m_stemDir == STEMDIRECTION_NONE)
-        this->m_stemDir = layer->GetDrawingStemDir(); // force layer direction if it exists
+    // We probably do not want to call this if we have a cross-staff situation
+    if (!this->m_crossStaff && (this->m_stemDir == STEMDIRECTION_NONE)) {
+        this->m_stemDir = layer->GetDrawingStemDir(beamElementCoords); // force layer direction if it exists
+    }
 
     // Automatic stem direction if nothing in the notes or in the layer
     if (this->m_stemDir == STEMDIRECTION_NONE) {
-        /*if (this->m_beamHasChord)
-         this->m_stemDir = (yExtreme < verticalCenter)
-         ? STEMDIRECTION_up
-         : STEMDIRECTION_down; // if it has a chord, go by the most extreme position
-         else */
-        this->m_stemDir = (avgY < verticalCenter) ? STEMDIRECTION_up : STEMDIRECTION_down; // otherwise go by average
+        this->m_stemDir = (avgY < verticalCenter) ? STEMDIRECTION_up : STEMDIRECTION_down;
     }
 
     if (this->m_stemDir == STEMDIRECTION_up) { // set stem direction for all the notes
@@ -172,7 +164,7 @@ void BeamDrawingParams::CalcBeam(
     verticalShift = ((this->m_shortestDur - DUR_8) * (this->m_beamWidth));
 
     // if the beam has smaller-size notes
-    if ((*beamElementCoords).at(last)->m_element->IsCueSize()) {
+    if ((*beamElementCoords).at(last)->m_element->GetDrawingCueSize()) {
         verticalShift += doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5;
     }
     else {
@@ -182,9 +174,16 @@ void BeamDrawingParams::CalcBeam(
     }
 
     // swap x position and verticalShift direction with stem down
-    if (this->m_stemDir == STEMDIRECTION_down) {
-        stemX[0] = -stemX[0];
-        stemX[1] = -stemX[1];
+    if (this->m_stemDir == STEMDIRECTION_up) {
+        // x-offset values for stem bases, dx[y] where y = element->m_cueSize
+        stemX[0] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false)
+            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+        stemX[1] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true)
+            - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    }
+    else {
+        stemX[0] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+        stemX[1] = (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
         verticalShift = -verticalShift;
     }
 
@@ -259,7 +258,7 @@ void BeamDrawingParams::CalcBeam(
             minDistToCenter = verticalCenter - (*beamElementCoords).at(i)->m_yBeam;
         }
     }
-    minDistToCenter += (this->m_beamWidthBlack / 2) + doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
+
     if (minDistToCenter < 0) {
         this->m_startingY += (this->m_stemDir == STEMDIRECTION_down) ? minDistToCenter : -minDistToCenter;
         for (i = 0; i < elementCount; i++) {
@@ -475,6 +474,8 @@ void Beam::InitCoords(ListOfObjects *childList)
     // need for redoing it everytime it is drawn.
 
     data_STEMDIRECTION currentStemDir;
+    Layer *layer = NULL;
+    Staff *currentStaff = NULL;
 
     int elementCount = 0;
 
@@ -499,6 +500,12 @@ void Beam::InitCoords(ListOfObjects *childList)
             if (!m_drawingParams.m_changingDur) m_drawingParams.m_changingDur = true;
             m_beamElementCoords.at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();
         }
+
+        Staff *staff = current->GetCrossStaff(layer);
+        if (staff != currentStaff) {
+            m_drawingParams.m_crossStaff = true;
+        }
+        currentStaff = staff;
 
         // Skip rests
         if (current->Is({ NOTE, CHORD })) {
@@ -550,7 +557,12 @@ void Beam::InitCoords(ListOfObjects *childList)
     int last = elementCount - 1;
 
     // We look only at the last note for checking if cue-sized. Somehow arbitrarily
-    m_drawingParams.m_cueSize = m_beamElementCoords.at(last)->m_element->IsCueSize();
+    m_drawingParams.m_cueSize = m_beamElementCoords.at(last)->m_element->GetDrawingCueSize();
+
+    // Always set stem diretion to up for grace note beam unless stem direction is provided
+    if (this->m_drawingParams.m_cueSize && (this->m_drawingParams.m_stemDir == STEMDIRECTION_NONE)) {
+        this->m_drawingParams.m_stemDir = STEMDIRECTION_up;
+    }
 }
 
 void Beam::ClearCoords()
@@ -580,7 +592,7 @@ int Beam::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    ListOfObjects *beamChildren = this->GetList(this);
+    const ListOfObjects *beamChildren = this->GetList(this);
 
     // Should we assert this at the beginning?
     if (beamChildren->empty()) {

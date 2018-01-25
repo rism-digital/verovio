@@ -16,6 +16,7 @@ class MidiFile;
 
 namespace vrv {
 
+class CastOffPagesParams;
 class FontInfo;
 class Glyph;
 class Page;
@@ -70,6 +71,11 @@ public:
     bool GenerateDocumentScoreDef();
 
     /**
+     * Generate a document pgHead from the MEI header if none is provided.
+     */
+    bool GenerateHeaderAndFooter();
+
+    /**
      * Getter and setter for the DocType.
      * The setter resets the document.
      */
@@ -90,8 +96,8 @@ public:
     Score *CreateScoreBuffer();
 
     /**
-    * Get the total page count
-    */
+     * Get the total page count
+     */
     int GetPageCount() const;
 
     bool GetMidiExportDone() const;
@@ -103,6 +109,7 @@ public:
     int GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const;
     int GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const;
     int GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const;
+    int GetGlyphAdvX(wchar_t code, int staffSize, bool graceSize) const;
     int GetDrawingUnit(int staffSize) const;
     int GetDrawingDoubleUnit(int staffSize) const;
     int GetDrawingStaffSize(int staffSize) const;
@@ -140,6 +147,11 @@ public:
     FontInfo *GetDrawingSmuflFont(int staffSize, bool graceSize);
     FontInfo *GetDrawingLyricFont(int staffSize);
     ///@}
+
+    /**
+     * Set the name of the used Smufl-font.
+     */
+    void SetDrawingSmuflFontName(const std::string &fontName);
 
     /**
      * @name Setters for the page dimensions and margins
@@ -215,10 +227,32 @@ public:
     ///@}
 
     /**
+     * Prepare the MIDI timemap for MIDI and timemap file export.
+     * Run trough all the layers and fill the score-time and performance timing variables.
+     */
+    void CalculateMidiTimemap();
+
+    /**
+     * Check to see if the MIDI timemap has already been calculated.  This needs to return
+     * true before ExportMIDI() or ExportTimemap() can export anything (These two functions
+     * will automatically run CalculateMidiTimemap() if HasMidiTimemap() return false.
+     */
+    bool HasMidiTimemap();
+
+    /**
      * Export the document to a MIDI file.
-     * Run trough all the layer and fill the midi file content.
+     * Run trough all the layers and fill the midi file content.
      */
     void ExportMIDI(MidiFile *midiFile);
+
+    /**
+     * Extract a timemap from the document to a JSON string.
+     * Run trough all the layers and fill the timemap file content.
+     */
+    bool ExportTimemap(std::string &output);
+    void PrepareJsonTimemap(std::string &output, std::map<int, double> &realTimeToScoreTime,
+        std::map<int, std::vector<std::string> > &realTimeToOnElements,
+        std::map<int, std::vector<std::string> > &realTimeToOffElements, std::map<int, int> &realTimeToTempo);
 
     /**
      * Set the initial scoreDef of each page.
@@ -242,6 +276,15 @@ public:
     void CastOffDoc();
 
     /**
+     * Casts off the running elements (headers and footer)
+     * Called from Doc::CastOffDoc
+     * The doc needs to be empty, the methods adds two empty pages to calculate the
+     * size of the header and footer of the page one and two.
+     * Calcultated sizes are set in the CastOffPagesParams object.
+     */
+    void CastOffRunningElements(CastOffPagesParams *params);
+
+    /**
      * Undo the cast off of the entire document.
      * The document will then contain one single page with one single system.
      */
@@ -259,6 +302,13 @@ public:
      * Does not perform any check if the data needs or can be converted.
      */
     void ConvertToPageBasedDoc();
+
+    /**
+     * Convert analytical encoding (@fermata, @tie) to correpsonding elements
+     * By default, the element are used only for the rendering and not preserved in the MEI output
+     * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
+     */
+    void ConvertAnalyticalMarkupDoc(bool permanent = false);
 
     /**
      * To be implemented.
@@ -298,6 +348,11 @@ public:
      * This includes the appropriate top and bottom margin (using top as bottom).
      */
     int GetAdjustedDrawingPageHeight() const;
+
+    /**
+     * Setter for analytical markup flag
+     */
+    void SetAnalyticalMarkup(bool hasAnalyticalMarkup) { m_hasAnalyticalMarkup = hasAnalyticalMarkup; }
 
     //----------//
     // Functors //
@@ -416,10 +471,18 @@ private:
     bool m_drawingPreparationDone;
 
     /**
-     * A flag to indicate if the MIDI export has been done.
-     * This is necessary for retrieving notes being played at a certain time.
+     * A flag to indicate that the MIDI timemap has been calculated.  The
+     * timemap needs to be prepared before MIDI files or timemap JSON files
+     * are generated.
      */
-    bool m_midiExportDone;
+    bool m_hasMidiTimemap;
+
+    /**
+     * A flag to indicate whereash the document contains analytical markup to be converted.
+     * This is currently limited to @fermata and @tie. Other attribute markup (@accid and @artic)
+     * is converted during the import in MeiInput.
+     */
+    bool m_hasAnalyticalMarkup;
 
     /** Page width (MEI scoredef@page.width) - currently not saved */
     int m_pageWidth;

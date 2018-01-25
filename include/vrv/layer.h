@@ -17,6 +17,7 @@ namespace vrv {
 class Clef;
 class DeviceContext;
 class LayerElement;
+class Measure;
 class Note;
 class StaffDef;
 
@@ -28,12 +29,13 @@ class StaffDef;
  * This class represents a layer in a laid-out score (Doc).
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
-*/
+ */
 class Layer : public Object,
               public DrawingListInterface,
               public ObjectListInterface,
               public AttNInteger,
-              public AttTyped {
+              public AttTyped,
+              public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -84,7 +86,9 @@ public:
      */
     ///@{
     void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; }
-    data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; }
+    data_STEMDIRECTION GetDrawingStemDir(LayerElement *element);
+    data_STEMDIRECTION GetDrawingStemDir(const ArrayOfBeamElementCoords *coords);
+    data_STEMDIRECTION GetDrawingStemDir(double time, double duration, Measure *measure, int staff);
     ///@}
 
     Clef *GetCurrentClef() const;
@@ -152,6 +156,11 @@ public:
      * See Object::PrepareRpt
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcStem
+     */
+    virtual int CalcStem(FunctorParams *);
 
     /**
      * See Object::AdjustSylSpacing
