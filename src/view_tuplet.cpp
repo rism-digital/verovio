@@ -17,9 +17,9 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "note.h"
+#include "options.h"
 #include "smufl.h"
 #include "staff.h"
-#include "style.h"
 #include "tuplet.h"
 
 namespace vrv {

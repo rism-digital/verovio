@@ -22,9 +22,9 @@
 #include "layer.h"
 #include "measure.h"
 #include "note.h"
+#include "options.h"
 #include "page.h"
 #include "slur.h"
-#include "style.h"
 #include "svgdevicecontext.h"
 #include "vrv.h"
 
@@ -51,20 +51,8 @@ Toolkit::Toolkit(bool initFont)
     m_format = AUTO;
 
     // default page size
-    m_pageHeight = m_doc.GetStyle()->m_pageHeight.GetDefault();
-    m_pageWidth = m_doc.GetStyle()->m_pageWidth.GetDefault();;
-    m_border = m_doc.GetStyle()->m_pageLeftMar.GetDefault();
-    m_spacingLinear = DEFAULT_SPACING_LINEAR;
-    m_spacingNonLinear = DEFAULT_SPACING_NON_LINEAR;
-    m_spacingStaff = m_doc.GetStyle()->m_spacingStaff.GetDefault();
-    m_spacingSystem = m_doc.GetStyle()->m_spacingSystem.GetDefault();;
 
-    m_noLayout = false;
-    m_ignoreLayout = false;
-    m_adjustPageHeight = false;
-    m_mmOutput = false;
     m_noJustification = false;
-    m_evenNoteSpacing = false;
     m_showBoundingBoxes = false;
     m_scoreBasedMei = false;
 
@@ -73,6 +61,8 @@ Toolkit::Toolkit(bool initFont)
     if (initFont) {
         Resources::InitFonts();
     }
+    
+    m_options = m_doc.GetOptions();
 }
 
 Toolkit::~Toolkit()
@@ -89,12 +79,6 @@ bool Toolkit::SetResourcePath(const std::string &path)
     return Resources::InitFonts();
 };
 
-bool Toolkit::SetBorder(int border)
-{
-    assert(m_doc.GetStyle());
-    return (m_doc.GetStyle()->m_pageLeftMar.SetValue(border) && m_doc.GetStyle()->m_pageRightMar.SetValue(border) && m_doc.GetStyle()->m_pageTopMar.SetValue(border));
-}
-
 bool Toolkit::SetScale(int scale)
 {
     if (scale < MIN_SCALE || scale > MAX_SCALE) {
@@ -103,48 +87,6 @@ bool Toolkit::SetScale(int scale)
         return false;
     }
     m_scale = scale;
-    return true;
-}
-
-bool Toolkit::SetPageHeight(int h)
-{
-    assert(m_doc.GetStyle());
-    return (m_doc.GetStyle()->m_pageHeight.SetValue(h));
-}
-
-bool Toolkit::SetPageWidth(int w)
-{
-    assert(m_doc.GetStyle());
-    return (m_doc.GetStyle()->m_pageWidth.SetValue(w));
-};
-
-bool Toolkit::SetSpacingStaff(int spacingStaff)
-{
-    assert(m_doc.GetStyle());
-    return (m_doc.GetStyle()->m_spacingStaff.SetValue(spacingStaff));
-}
-
-bool Toolkit::SetSpacingSystem(int spacingSystem)
-{
-    assert(m_doc.GetStyle());
-    return (m_doc.GetStyle()->m_spacingSystem.SetValue(spacingSystem));
-}
-
-bool Toolkit::SetSpacingLinear(float spacingLinear)
-{
-    assert(m_doc.GetStyle());
-    return false;
-    //return (m_doc.GetStyle()->m_.SetValue(h));
-}
-
-bool Toolkit::SetSpacingNonLinear(float spacingNonLinear)
-{
-    if (spacingNonLinear < MIN_SPACING_NON_LINEAR || spacingNonLinear > MAX_SPACING_NON_LINEAR) {
-        LogError("Spacing (non-linear) out of bounds; default is %d, minimum is %d, and maximum is %d",
-            DEFAULT_SPACING_NON_LINEAR, MIN_SPACING_NON_LINEAR, MAX_SPACING_NON_LINEAR);
-        return false;
-    }
-    m_spacingNonLinear = spacingNonLinear;
     return true;
 }
 
@@ -203,22 +145,6 @@ bool Toolkit::SetFormat(std::string const &informat)
         return false;
     }
     return true;
-}
-
-void Toolkit::SetAppXPathQueries(std::vector<std::string> const &xPathQueries)
-{
-    m_appXPathQueries = xPathQueries;
-    m_appXPathQueries.erase(std::remove_if(m_appXPathQueries.begin(), m_appXPathQueries.end(),
-                                [](const std::string &s) { return s.empty(); }),
-        m_appXPathQueries.end());
-}
-
-void Toolkit::SetChoiceXPathQueries(std::vector<std::string> const &xPathQueries)
-{
-    m_choiceXPathQueries = xPathQueries;
-    m_choiceXPathQueries.erase(std::remove_if(m_choiceXPathQueries.begin(), m_choiceXPathQueries.end(),
-                                   [](const std::string &s) { return s.empty(); }),
-        m_choiceXPathQueries.end());
 }
 
 FileFormat Toolkit::IdentifyInputFormat(const string &data)
@@ -300,12 +226,6 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
     // This means that DARMS cannot be auto detected.
     return MEI;
 }
-
-bool Toolkit::SetFont(std::string const &font)
-{
-    m_doc.SetDrawingSmuflFontName(font);
-    return Resources::SetFont(font);
-};
 
 bool Toolkit::LoadFile(const std::string &filename)
 {
@@ -545,17 +465,6 @@ bool Toolkit::LoadData(const std::string &data)
         return false;
     }
 
-    // xpath queries?
-    if (m_appXPathQueries.size() > 0) {
-        input->SetAppXPathQueries(m_appXPathQueries);
-    }
-    if (m_choiceXPathQueries.size() > 0) {
-        input->SetChoiceXPathQueries(m_choiceXPathQueries);
-    }
-    if (m_mdivXPathQuery.length() > 0) {
-        input->SetMdivXPathQuery(m_mdivXPathQuery);
-    }
-
     // load the file
     if (!input->ImportString(newData.size() ? newData : data)) {
         LogError("Error importing data");
@@ -568,25 +477,14 @@ bool Toolkit::LoadData(const std::string &data)
         m_doc.GenerateHeaderAndFooter();
     }
 
-    m_doc.SetPageHeight(this->GetPageHeight());
-    m_doc.SetPageWidth(this->GetPageWidth());
-    m_doc.SetPageRightMar(this->GetBorder());
-    m_doc.SetPageLeftMar(this->GetBorder());
-    m_doc.SetPageTopMar(this->GetBorder());
-    m_doc.SetSpacingLinear(this->GetSpacingLinear());
-    m_doc.SetSpacingNonLinear(this->GetSpacingNonLinear());
-    m_doc.SetSpacingStaff(this->GetSpacingStaff());
-    m_doc.SetSpacingSystem(this->GetSpacingSystem());
-    m_doc.SetEvenSpacing(this->GetEvenNoteSpacing());
-
     m_doc.PrepareDrawing();
 
     // Do the layout? this depends on the options and the file. PAE and
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --ignore-layout option.
     // Regardless, we won't do layout if the --no-layout option was set.
-    if (!m_noLayout) {
-        if (input->HasLayoutInformation() && !m_ignoreLayout) {
+    if (!m_options->m_noLayout.GetValue()) {
+        if (input->HasLayoutInformation() && !m_options->m_ignoreLayout.GetValue()) {
             // LogElapsedTimeStart();
             m_doc.CastOffEncodingDoc();
             // LogElapsedTimeEnd("layout");
@@ -599,7 +497,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     // disable justification if there's no layout or no justification
-    if (m_noLayout || m_noJustification) {
+    if (m_options->m_noLayout.GetValue() || m_noJustification) {
         m_doc.SetJustificationX(false);
     }
 
@@ -837,14 +735,6 @@ void Toolkit::RedoLayout()
         return;
     }
 
-    m_doc.SetPageHeight(this->GetPageHeight());
-    m_doc.SetPageWidth(this->GetPageWidth());
-    m_doc.SetPageRightMar(this->GetBorder());
-    m_doc.SetPageLeftMar(this->GetBorder());
-    m_doc.SetPageTopMar(this->GetBorder());
-    m_doc.SetSpacingStaff(this->GetSpacingStaff());
-    m_doc.SetSpacingSystem(this->GetSpacingSystem());
-
     m_doc.UnCastOffDoc();
     m_doc.CastOffDoc();
 }
@@ -870,11 +760,11 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     m_view.SetPage(pageNo);
 
     // Adjusting page width and height according to the options
-    int width = m_pageWidth;
-    int height = m_pageHeight;
+    int width = m_options->m_pageWidth.GetUnfactoredValue();
+    int height = m_options->m_pageHeight.GetUnfactoredValue();
 
-    if (m_noLayout) width = m_doc.GetAdjustedDrawingPageWidth();
-    if (m_adjustPageHeight || m_noLayout) height = m_doc.GetAdjustedDrawingPageHeight();
+    if (m_options->m_noLayout.GetValue()) width = m_doc.GetAdjustedDrawingPageWidth();
+    if (m_options->m_adjustPageHeight.GetValue() || m_options->m_noLayout.GetValue()) height = m_doc.GetAdjustedDrawingPageHeight();
 
     // set dimensions
     deviceContext->SetWidth(width);
@@ -894,7 +784,7 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
     // We will need to set the size of the page after having drawn it depending on the options
     SvgDeviceContext svg;
 
-    if (m_mmOutput) {
+    if (m_options->m_mmOutput.GetValue()) {
         svg.SetMMOutput(true);
     }
 

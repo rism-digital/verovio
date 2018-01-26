@@ -7,6 +7,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <sys/stat.h>
@@ -19,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "style.h"
+#include "options.h"
 #include "toolkit.h"
 #include "vrv.h"
 
@@ -42,6 +43,35 @@ std::string removeExtension(std::string const &filename)
 {
     std::string::const_reverse_iterator pivot = std::find(filename.rbegin(), filename.rend(), '.');
     return pivot == filename.rend() ? filename : std::string(filename.begin(), pivot.base() - 1);
+}
+
+std::string fromCamelCase(const std::string &s)
+{
+    std::regex regExp1("(.)([A-Z][a-z]+)");
+    std::regex regExp2("([a-z0-9])([A-Z])");
+    
+    std::string result = s;
+    result = std::regex_replace (result, regExp1, "$1-$2");
+    result = std::regex_replace (result, regExp2, "$1-$2");
+    
+    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+    return result;
+}
+
+std::string toCamelCase(const std::string& s)
+{
+    std::istringstream iss(s);
+    std::string token;
+    std::string result;
+    
+    while (getline(iss, token, '-')) {
+        token[0] = toupper(token[0]);
+        result += token;
+    }
+    
+    result[0] = tolower(result[0]);
+    
+    return result;
 }
 
 bool dir_exists(string dir)
@@ -72,7 +102,7 @@ void display_usage()
     // -then options with long forms only
     // -then debugging options
     
-    Style style;
+    Options style;
 
     // Options with both short and long forms
     cerr << "Options (marked as * are repeatable)" << endl;
@@ -191,6 +221,36 @@ int main(int argc, char **argv)
         exit(1);
     }
     int c;
+    
+    Options defaultStyle;
+    const MapOfStrStyleParams *params = defaultStyle.GetParams();
+    MapOfStrStyleParams::const_iterator iter;
+    for (iter = params->begin(); iter != params->end(); iter++) {
+        cerr << toCamelCase(fromCamelCase(iter->first)) << endl;
+    }
+    
+    /*
+    struct option *long_options;
+    int n = 10;
+    int i;
+    long_options = (struct option *)malloc(sizeof(struct option) * (n+2));
+    for (i=0;i<n;i++) {
+        long_options[i].name = "test";//unaccelerate(opts[i].name);
+        long_options[i].has_arg = opts[i].has_arg;
+        long_options[i].flag = 0;
+        long_options[i].val = accelerate(opts[i].name);
+        if (long_options[i].val && long_options[i].val < 0xFF) {
+            optstr[j++] = long_options[i].val;
+            if (long_options[i].has_arg > 0) {
+                optstr[j++] = ':';
+            }
+            if (long_options[i].has_arg > 1) {
+                optstr[j++] = ':';
+            }
+            optstr[j] = 0;
+        }
+    }
+    */
 
     static struct option long_options[] = { { "adjust-page-height", no_argument, &adjust_page_height, 1 },
         { "all-pages", no_argument, &all_pages, 1 }, { "app-xpath-query", required_argument, 0, 0 },
@@ -213,6 +273,7 @@ int main(int argc, char **argv)
     while ((c = getopt_long(argc, argv, "b:f:h:o:p:r:s:t:w:v", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
+                /*
                 if (long_options[option_index].flag != 0)
                     break;
                 else if (strcmp(long_options[option_index].name, "app-xpath-query") == 0) {
@@ -257,12 +318,15 @@ int main(int argc, char **argv)
                     Object::SeedUuid(atoi(optarg));
                 }
                 break;
+                */
 
+            /*
             case 'b':
                 if (!toolkit.SetBorder(atoi(optarg))) {
                     exit(1);
                 }
                 break;
+            */
 
             case 'f':
                 if (!toolkit.SetFormat(string(optarg))) {
@@ -270,11 +334,13 @@ int main(int argc, char **argv)
                 };
                 break;
 
+            /*
             case 'h':
                 if (!toolkit.SetPageHeight(atoi(optarg))) {
                     exit(1);
                 };
                 break;
+            */
 
             case 'o': outfile = string(optarg); break;
 
@@ -293,11 +359,13 @@ int main(int argc, char **argv)
 
             case 'v': show_version = 1; break;
 
+            /*
             case 'w':
                 if (!toolkit.SetPageWidth(atoi(optarg))) {
                     exit(1);
                 }
                 break;
+            */
 
             case '?':
                 display_usage();
@@ -308,12 +376,14 @@ int main(int argc, char **argv)
         }
     }
 
+    /*
     if (appXPathQueries.size() > 0) {
         toolkit.SetAppXPathQueries(appXPathQueries);
     }
     if (choiceXPathQueries.size() > 0) {
         toolkit.SetChoiceXPathQueries(choiceXPathQueries);
-    }
+     }
+     */
 
     if (show_version) {
         display_version();
@@ -325,6 +395,7 @@ int main(int argc, char **argv)
         exit(0);
     }
 
+    /*
     // Set the various flags in accordance with the options given
     toolkit.SetAdjustPageHeight(adjust_page_height);
     toolkit.SetNoLayout(no_layout);
@@ -334,7 +405,8 @@ int main(int argc, char **argv)
     toolkit.SetNoJustification(no_justification);
     toolkit.SetEvenNoteSpacing(even_note_spacing);
     toolkit.SetShowBoundingBoxes(show_bounding_boxes);
-
+    */
+     
     if (optind <= argc - 1) {
         infile = string(argv[optind]);
     }
@@ -359,10 +431,12 @@ int main(int argc, char **argv)
     }
 
     // Load a specified font
+    /*
     if (!font.empty() && !toolkit.SetFont(font)) {
         cerr << "Font '" << font << "' could not be loaded." << endl;
         exit(1);
     }
+    */
 
     if ((outformat != "svg") && (outformat != "mei") && (outformat != "midi") && (outformat != "timemap")
         && (outformat != "humdrum") && (outformat != "hum")) {

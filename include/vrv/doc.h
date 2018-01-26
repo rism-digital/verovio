@@ -10,7 +10,7 @@
 
 #include "devicecontextbase.h"
 #include "scoredef.h"
-#include "style.h"
+#include "options.h"
 
 class MidiFile;
 
@@ -60,9 +60,9 @@ public:
     virtual void Refresh();
     
     /**
-     * Getter for the style
+     * Getter for the options
      */
-    Style *GetStyle() const { return m_style; }
+    Options *GetOptions() const { return m_options; }
 
     /**
      * Generate a document scoreDef when none is provided.
@@ -147,41 +147,23 @@ public:
     FontInfo *GetDrawingSmuflFont(int staffSize, bool graceSize);
     FontInfo *GetDrawingLyricFont(int staffSize);
     ///@}
-
-    /**
-     * Set the name of the used Smufl-font.
-     */
-    void SetDrawingSmuflFontName(const std::string &fontName);
-
-    /**
-     * @name Setters for the page dimensions and margins
-     */
-    ///@{
-    void SetPageHeight(int pageHeight);
-    void SetPageWidth(int pageWidth);
-    void SetPageLeftMar(short pageLeftMar);
-    void SetPageRightMar(short pageRightMar);
-    void SetPageTopMar(short pageTopMar);
-    void SetSpacingStaff(short spacingStaff);
-    void SetSpacingSystem(short spacingSystem);
-    ///@}
-
+    
     /**
      * @name Getters for tie and slur parameters
      */
     ///@{
-    double GetTieThickness() const { return m_style->m_tieThickness.GetValue(); }
-    double GetSlurMinHeight() const { return m_style->m_minSlurHeight.GetValue(); }
-    double GetSlurMaxHeight() const { return m_style->m_maxSlurHeight.GetValue(); }
-    double GetSlurThickness() const { return m_style->m_slurThickness.GetValue(); }
+    double GetTieThickness() const { return m_options->m_tieThickness.GetValue(); }
+    double GetSlurMinHeight() const { return m_options->m_minSlurHeight.GetValue(); }
+    double GetSlurMaxHeight() const { return m_options->m_maxSlurHeight.GetValue(); }
+    double GetSlurThickness() const { return m_options->m_slurThickness.GetValue(); }
     ///@}
 
     /**
      * @name Getters for the page dimensions and margins
      */
     ///@{
-    short GetSpacingStaff() const { return m_spacingStaff; }
-    short GetSpacingSystem() const { return m_spacingSystem; }
+    int GetSpacingStaff() const { return m_options->m_spacingStaff.GetValue(); }
+    int GetSpacingSystem() const { return m_options->m_spacingSystem.GetValue(); }
     ///@}
 
     /**
@@ -418,7 +400,7 @@ private:
      * The object with the default values.
      * This could be saved somewhere as preferences (todo).
      */
-    Style *m_style;
+    Options *m_options;
 
     /*
      * The following values are set in the Doc::SetDrawingPage.
@@ -494,10 +476,6 @@ private:
     short m_pageRightMar;
     /** Page top margin (MEI scoredef@page.topmar) - currently not saved */
     short m_pageTopMar;
-    /** Staff minimal spacing (MEI scoredef@spacing.staff) - currently not saved */
-    short m_spacingStaff;
-    /** System minimal spacing (MEI scoredef@spacing.system) - currently not saved */
-    short m_spacingSystem;
 
     /**
      * A score buffer for loading or creating a scoreBased MEI.

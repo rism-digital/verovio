@@ -1,15 +1,15 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        style.h
+// Name:        options.h
 // Author:      Laurent Pugin
 // Created:     2005
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_STYLE_H__
-#define __VRV_STYLE_H__
+#ifndef __VRV_OPTIONS_H__
+#define __VRV_OPTIONS_H__
 
-#ifdef CUSTOM_VEROVIO_STYLE
-#include "custom_style.h"
+#ifdef CUSTOM_VEROVIO_OPTIONS
+#include "custom_options.h"
 #else
 
 #include <map>
@@ -54,7 +54,7 @@ namespace vrv {
 #define MAX_SPACING_SYSTEM 12
 
 //----------------------------------------------------------------------------
-// Style
+// Options
 //----------------------------------------------------------------------------
 
 // the space between each lyric line in units
@@ -69,7 +69,7 @@ namespace vrv {
 #define TEMP_SLUR_HEIGHT_FACTOR 8 // high value means flatter slurs
 #define TEMP_SLUR_CONTROL_POINT_FACTOR 5 // higher value means more curved at the end
 
-/* Style parameters for mensural notation */
+/* Options parameters for mensural notation */
 // Ratios of mensural notehead, accidental, aug. dot size to CMN for the same staff size
 #define TEMP_MNOTEHEAD_SIZE_FACTOR 1.0
 #define TEMP_MACCID_SIZE_FACTOR 1.0
@@ -88,7 +88,7 @@ namespace vrv {
 #define MENSURAL_LINEWIDTH_FACTOR 1.0
 
 //----------------------------------------------------------------------------
-// Style defines
+// Options defines
 //----------------------------------------------------------------------------
 
 enum style_MEASURENUMBER
@@ -98,17 +98,19 @@ enum style_MEASURENUMBER
 };
     
 //----------------------------------------------------------------------------
-// StyleParam
+// Option
 //----------------------------------------------------------------------------
     
 /**
  * This class is a base class of each styling parameter
  */
-class StyleParam {
+class Option {
 public:
     // constructors and destructors
-    StyleParam() {}
-    virtual ~StyleParam() {}
+    Option() {}
+    virtual ~Option() {}
+    
+    virtual bool SetValue(std::string) = 0;
     
     void SetInfo(std::string title, std::string description);
     
@@ -120,18 +122,20 @@ protected:
 };
 
 //----------------------------------------------------------------------------
-// StyleParamBool
+// OptionBool
 //----------------------------------------------------------------------------
 
 /**
  * This class is for boolean styling params
  */
-class StyleParamBool : public StyleParam {
+class OptionBool : public Option {
 public:
     // constructors and destructors
-    StyleParamBool() {}
-    virtual ~StyleParamBool() {}
+    OptionBool() {}
+    virtual ~OptionBool() {}
     void Init(bool defaultValue);
+    
+    virtual bool SetValue(std::string value);
     
     bool GetValue() { return m_value; }
     bool GetDefault() { return m_defaultValue; }
@@ -147,18 +151,20 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// StyleParamDbl
+// OptionDbl
 //----------------------------------------------------------------------------
 
 /**
  * This class is for integer styling params
  */
-class StyleParamDbl : public StyleParam {
+class OptionDbl : public Option {
 public:
     // constructors and destructors
-    StyleParamDbl() {}
-    virtual ~StyleParamDbl() {}
+    OptionDbl() {}
+    virtual ~OptionDbl() {}
     void Init(double defaultValue, double minValue, double maxValue);
+    
+    virtual bool SetValue(std::string value);
     
     double GetValue() { return m_value; }
     double GetDefault() { return m_defaultValue; }
@@ -178,20 +184,23 @@ private:
 };
     
 //----------------------------------------------------------------------------
-// StyleParamInt
+// OptionInt
 //----------------------------------------------------------------------------
 
 /**
  * This class is for integer styling params
  */
-class StyleParamInt : public StyleParam {
+class OptionInt : public Option {
 public:
     // constructors and destructors
-    StyleParamInt() {}
-    virtual ~StyleParamInt() {}
+    OptionInt() {}
+    virtual ~OptionInt() {}
     void Init(int defaultValue, int minValue, int maxValue, bool definitionFactor = false);
     
+    virtual bool SetValue(std::string value);
+    
     int GetValue();
+    int GetUnfactoredValue();
     int GetDefault() { return m_defaultValue; }
     int GetMin() { return m_minValue; }
     int GetMax() { return m_maxValue; }
@@ -208,23 +217,80 @@ private:
     int m_maxValue;
     bool m_definitionFactor;
 };
+
+//----------------------------------------------------------------------------
+// OptionString
+//----------------------------------------------------------------------------
+
+/**
+ * This class is for string styling params
+ */
+class OptionString : public Option {
+public:
+    // constructors and destructors
+    OptionString() {}
+    virtual ~OptionString() {}
+    void Init(std::string defaultValue);
     
+    virtual bool SetValue(std::string value);
+    
+    std::string GetValue() { return m_value; }
+    std::string GetDefault() { return m_defaultValue; }
+
+private:
+    //
+public:
+    //
+private:
+    std::string m_value;
+    std::string m_defaultValue;
+};
     
 //----------------------------------------------------------------------------
-// StyleParamMeasureNumber
+// OptionArray
+//----------------------------------------------------------------------------
+
+/**
+ * This class is for array (string) styling params
+ */
+class OptionArray : public Option {
+public:
+    // constructors and destructors
+    OptionArray() {}
+    virtual ~OptionArray() {}
+    void Init();
+    
+    virtual bool SetValue(std::string value);
+    
+    std::vector<std::string> GetValue() { return m_values; }
+    std::vector<std::string> GetDefault() { return m_defaultValues; }
+    bool SetValue(std::vector<std::string> const &values);
+
+private:
+    //
+public:
+    //
+private:
+    std::vector<std::string> m_values;
+    std::vector<std::string> m_defaultValues;
+};
+    
+//----------------------------------------------------------------------------
+// OptionMeasureNumber
 //----------------------------------------------------------------------------
 
 /**
  * This class is for map styling params
  */
-class StyleParamMeasureNumber : public StyleParam {
+class OptionMeasureNumber : public Option {
 public:
     // constructors and destructors
-    StyleParamMeasureNumber() {};
-    virtual ~StyleParamMeasureNumber() {};
+    OptionMeasureNumber() {};
+    virtual ~OptionMeasureNumber() {};
 
     void Init(style_MEASURENUMBER defaultValue);
-    bool SetValue(std::string value);
+    
+    virtual bool SetValue(std::string value);
     
     style_MEASURENUMBER GetValue() { return m_value; }
     style_MEASURENUMBER GetDefault() { return m_defaultValue; }
@@ -239,21 +305,22 @@ private:
 };
     
 //----------------------------------------------------------------------------
-// StyleParamStaffrel
+// OptionStaffrel
 //----------------------------------------------------------------------------
 
 /**
  * This class is for map styling params
  */
-class StyleParamStaffrel : public StyleParam {
+class OptionStaffrel : public Option {
 public:
     // constructors and destructors
-    StyleParamStaffrel() {};
-    virtual ~StyleParamStaffrel() {};
+    OptionStaffrel() {};
+    virtual ~OptionStaffrel() {};
     
     // Alternate type style cannot have a restricted list of possible values
     void Init(data_STAFFREL defaultValue);
-    bool SetValue(std::string value);
+    
+    virtual bool SetValue(std::string value);
     
     // For altenate types return a reference to the value
     // Alternatively we can have a values vector for each sub-type
@@ -270,20 +337,21 @@ private:
 };
     
 //----------------------------------------------------------------------------
-// StyleParamStaffrelBasic
+// OptionStaffrelBasic
 //----------------------------------------------------------------------------
 
 /**
  * This class is for map styling params
  */
-class StyleParamStaffrelBasic : public StyleParam {
+class OptionStaffrelBasic : public Option {
 public:
     // constructors and destructors
-    StyleParamStaffrelBasic() {};
-    virtual ~StyleParamStaffrelBasic() {};
+    OptionStaffrelBasic() {};
+    virtual ~OptionStaffrelBasic() {};
 
     void Init(data_STAFFREL_basic defaultValue, const std::vector<data_STAFFREL_basic> &values);
-    bool SetValue(std::string value);
+
+    virtual bool SetValue(std::string value);
     
     data_STAFFREL_basic GetValue() { return m_value; }
     data_STAFFREL_basic GetDefault() { return m_defaultValue; }
@@ -299,123 +367,141 @@ private:
 };
     
 //----------------------------------------------------------------------------
-// Style
+// Options
 //----------------------------------------------------------------------------
     
 /**
  * This class contains the document styling parameters.
  */
-class Style {
+class Options {
 public:
     // constructors and destructors
-    Style();
-    virtual ~Style();
+    Options();
+    virtual ~Options();
+    
+    const MapOfStrStyleParams *GetParams() { return &m_params; }
 
 public:
     
+    /** */
+    OptionArray m_appXPathQuery;
+    OptionArray m_choiceXPathQuery;
+    OptionString m_mdivXPathQuery;
+    OptionBool m_evenNoteSpacing;
+    OptionString m_font;
+
+    OptionBool m_adjustPageHeight;
+    OptionBool m_ignoreLayout;
+    OptionBool m_noLayout;
+    
+    OptionBool m_mmOutput;
+    
+    OptionDbl m_spacingLinear;
+    OptionDbl m_spacingNonLinear;
+    
     /** The unit (1Ú2 of the distance between staff lines) **/
-    StyleParamInt m_unit;
+    OptionInt m_unit;
     /** The landscape paper orientation flag */
-    StyleParamBool m_landscape;
+    OptionBool m_landscape;
     /** The staff line width */
-    StyleParamDbl m_staffLineWidth;
+    OptionDbl m_staffLineWidth;
     /** The stem width */
-    StyleParamDbl m_stemWidth;
+    OptionDbl m_stemWidth;
     /** The barLine width */
-    StyleParamDbl m_barLineWidth;
+    OptionDbl m_barLineWidth;
     /** The maximum beam slope */
-    StyleParamInt m_beamMaxSlope;
+    OptionInt m_beamMaxSlope;
     /** The minimum beam slope */
-    StyleParamInt m_beamMinSlope;
+    OptionInt m_beamMinSlope;
     /** The grace size ratio numerator */
-    StyleParamDbl m_graceFactor;
+    OptionDbl m_graceFactor;
     /** The page height */
-    StyleParamInt m_pageHeight;
+    OptionInt m_pageHeight;
     /** The page width */
-    StyleParamInt m_pageWidth;
+    OptionInt m_pageWidth;
     /** The page left margin */
-    StyleParamInt m_pageLeftMar;
+    OptionInt m_pageLeftMar;
     /** The page right margin */
-    StyleParamInt m_pageRightMar;
+    OptionInt m_pageRightMar;
     /** The page top margin */
-    StyleParamInt m_pageTopMar;
+    OptionInt m_pageTopMar;
     /** The staff minimal spacing */
-    StyleParamInt m_spacingStaff;
+    OptionInt m_spacingStaff;
     /** The system minimal spacing */
-    StyleParamInt m_spacingSystem;
+    OptionInt m_spacingSystem;
 
     /** The minimal measure width (in units) */
-    StyleParamInt m_minMeasureWidth;
+    OptionInt m_minMeasureWidth;
     /** The lyrics size (in units) */
-    StyleParamDbl m_lyricSize;
+    OptionDbl m_lyricSize;
     /** haripin size (in units) */
-    StyleParamDbl m_hairpinSize;
+    OptionDbl m_hairpinSize;
 
     /** ties and slurs */
-    StyleParamDbl m_tieThickness;
-    StyleParamDbl m_minSlurHeight;
-    StyleParamDbl m_maxSlurHeight;
-    StyleParamDbl m_slurThickness;
+    OptionDbl m_tieThickness;
+    OptionDbl m_minSlurHeight;
+    OptionDbl m_maxSlurHeight;
+    OptionDbl m_slurThickness;
 
     /** The left position */
-    StyleParamDbl m_leftPosition;
+    OptionDbl m_leftPosition;
 
     /** The layout left margin by element */
-    StyleParamDbl m_leftMarginAccid;
-    StyleParamDbl m_leftMarginBarLine;
-    StyleParamDbl m_leftMarginBarLineAttrLeft;
-    StyleParamDbl m_leftMarginBarLineAttrRight;
-    StyleParamDbl m_leftMarginBeatRpt;
-    StyleParamDbl m_leftMarginChord;
-    StyleParamDbl m_leftMarginClef;
-    StyleParamDbl m_leftMarginKeySig;
-    StyleParamDbl m_leftMarginMensur;
-    StyleParamDbl m_leftMarginMeterSig;
-    StyleParamDbl m_leftMarginMRest;
-    StyleParamDbl m_leftMarginMRpt2;
-    StyleParamDbl m_leftMarginMultiRest;
-    StyleParamDbl m_leftMarginMultiRpt;
-    StyleParamDbl m_leftMarginNote;
-    StyleParamDbl m_leftMarginRest;
+    OptionDbl m_leftMarginAccid;
+    OptionDbl m_leftMarginBarLine;
+    OptionDbl m_leftMarginBarLineAttrLeft;
+    OptionDbl m_leftMarginBarLineAttrRight;
+    OptionDbl m_leftMarginBeatRpt;
+    OptionDbl m_leftMarginChord;
+    OptionDbl m_leftMarginClef;
+    OptionDbl m_leftMarginKeySig;
+    OptionDbl m_leftMarginMensur;
+    OptionDbl m_leftMarginMeterSig;
+    OptionDbl m_leftMarginMRest;
+    OptionDbl m_leftMarginMRpt2;
+    OptionDbl m_leftMarginMultiRest;
+    OptionDbl m_leftMarginMultiRpt;
+    OptionDbl m_leftMarginNote;
+    OptionDbl m_leftMarginRest;
     /** The default left margin */
-    StyleParamDbl m_leftMarginDefault;
+    OptionDbl m_leftMarginDefault;
 
     /** The layout right margin by element */
-    StyleParamDbl m_rightMarginAccid;
-    StyleParamDbl m_rightMarginBarLine;
-    StyleParamDbl m_rightMarginBarLineAttrLeft;
-    StyleParamDbl m_rightMarginBarLineAttrRight;
-    StyleParamDbl m_rightMarginBeatRpt;
-    StyleParamDbl m_rightMarginChord;
-    StyleParamDbl m_rightMarginClef;
-    StyleParamDbl m_rightMarginKeySig;
-    StyleParamDbl m_rightMarginMensur;
-    StyleParamDbl m_rightMarginMeterSig;
-    StyleParamDbl m_rightMarginMRest;
-    StyleParamDbl m_rightMarginMRpt2;
-    StyleParamDbl m_rightMarginMultiRest;
-    StyleParamDbl m_rightMarginMultiRpt;
-    StyleParamDbl m_rightMarginNote;
-    StyleParamDbl m_rightMarginRest;
+    OptionDbl m_rightMarginAccid;
+    OptionDbl m_rightMarginBarLine;
+    OptionDbl m_rightMarginBarLineAttrLeft;
+    OptionDbl m_rightMarginBarLineAttrRight;
+    OptionDbl m_rightMarginBeatRpt;
+    OptionDbl m_rightMarginChord;
+    OptionDbl m_rightMarginClef;
+    OptionDbl m_rightMarginKeySig;
+    OptionDbl m_rightMarginMensur;
+    OptionDbl m_rightMarginMeterSig;
+    OptionDbl m_rightMarginMRest;
+    OptionDbl m_rightMarginMRpt2;
+    OptionDbl m_rightMarginMultiRest;
+    OptionDbl m_rightMarginMultiRpt;
+    OptionDbl m_rightMarginNote;
+    OptionDbl m_rightMarginRest;
     /** The default right margin */
-    StyleParamDbl m_rightMarginDefault;
+    OptionDbl m_rightMarginDefault;
 
     /** The default right margin */
-    StyleParamDbl m_bottomMarginDefault;
+    OptionDbl m_bottomMarginDefault;
 
     /** The default right margin */
-    StyleParamDbl m_topMarginDefault;
+    OptionDbl m_topMarginDefault;
     
 private:
     /** The array of style parameters */
-    std::map<std::string, const StyleParam*> m_params;
+    MapOfStrStyleParams m_params;
     
-    StyleParamInt m_margin;
-    StyleParamMeasureNumber m_measureNumber;
+    OptionInt m_margin;
+    OptionMeasureNumber m_measureNumber;
 };
 
 } // namespace vrv
 
-#endif // CUSTOM_VEROVIO_STYLE
+#endif // CUSTOM_VEROVIO_OPTIONS
 
 #endif // __VRV_DEF_H__

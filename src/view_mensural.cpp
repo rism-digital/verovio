@@ -21,11 +21,11 @@
 #include "ligature.h"
 #include "mensur.h"
 #include "note.h"
+#include "options.h"
 #include "proport.h"
 #include "rest.h"
 #include "smufl.h"
 #include "staff.h"
-#include "style.h"
 
 namespace vrv {
 

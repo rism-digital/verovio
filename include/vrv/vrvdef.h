@@ -224,6 +224,7 @@ class Object;
 class PlistInterface;
 class Point;
 class Staff;
+class Option;
 class TextElement;
 class TimePointInterface;
 class TimeSpanningInterface;
@@ -261,6 +262,8 @@ typedef std::vector<LedgerLine> ArrayOfLedgerLines;
 typedef std::vector<TextElement *> ArrayOfTextElements;
 
 typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
+    
+typedef std::map<std::string, const Option*> MapOfStrStyleParams;
 
 //----------------------------------------------------------------------------
 // Global defines

@@ -22,10 +22,10 @@
 #include "layer.h"
 #include "measure.h"
 #include "note.h"
+#include "options.h"
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
-#include "style.h"
 #include "timestamp.h"
 #include "vrv.h"
 

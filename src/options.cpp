@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        style.cpp
+// Name:        options.cpp
 // Author:      Laurent Pugin
 // Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "style.h"
+#include "options.h"
 
 //----------------------------------------------------------------------------
 
@@ -19,40 +19,59 @@
 
 namespace vrv {
 
-std::map<style_MEASURENUMBER, std::string> StyleParamMeasureNumber::values
+std::map<style_MEASURENUMBER, std::string> OptionMeasureNumber::values
     = { { MEASURENUMBER_system, "system" }, { MEASURENUMBER_interval, "interval" } };
 
 //----------------------------------------------------------------------------
-// Style
+// Option
 //----------------------------------------------------------------------------
     
-void StyleParam::SetInfo(std::string title, std::string description)
+void Option::SetInfo(std::string title, std::string description)
 {
     m_title = title;
     m_description = description;
 }
     
-void StyleParamBool::Init(bool defaultValue)
+//----------------------------------------------------------------------------
+// OptionBool
+//----------------------------------------------------------------------------
+
+void OptionBool::Init(bool defaultValue)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
 }
-    
-bool StyleParamBool::SetValue(bool value)
+
+bool OptionBool::SetValue(std::string value)
+{
+    bool b = (value == "true") ? true : false;
+    return SetValue(b);
+}
+
+bool OptionBool::SetValue(bool value)
 {
     m_value = value;
     return true;
 }
+    
+//----------------------------------------------------------------------------
+// OptionDbl
+//----------------------------------------------------------------------------
 
-void StyleParamDbl::Init(double defaultValue, double minValue, double maxValue)
+void OptionDbl::Init(double defaultValue, double minValue, double maxValue)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
     m_minValue = minValue;
     m_maxValue = maxValue;
 }
+ 
+bool OptionDbl::SetValue(std::string value)
+{
+    return SetValue(atof(value.c_str()));
+}
     
-bool StyleParamDbl::SetValue(double value)
+bool OptionDbl::SetValue(double value)
 {
     if ((value < m_minValue) || (value > m_maxValue)) {
         LogError("Parameter out of bounds; default is %f, minimum is %f, and maximum is %f", m_defaultValue, m_minValue, m_maxValue);
@@ -62,7 +81,11 @@ bool StyleParamDbl::SetValue(double value)
     return true;
 }
     
-void StyleParamInt::Init(int defaultValue, int minValue, int maxValue, bool definitionFactor)
+//----------------------------------------------------------------------------
+// OptionInt
+//----------------------------------------------------------------------------
+    
+void OptionInt::Init(int defaultValue, int minValue, int maxValue, bool definitionFactor)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
@@ -70,13 +93,24 @@ void StyleParamInt::Init(int defaultValue, int minValue, int maxValue, bool defi
     m_maxValue = maxValue;
     m_definitionFactor = definitionFactor;
 }
+ 
+bool OptionInt::SetValue(std::string value)
+{
+    return SetValue(atoi(value.c_str()));
+}
     
-int StyleParamInt::GetValue()
+int OptionInt::GetValue()
 {
     return (m_definitionFactor) ? m_value * DEFINITION_FACTOR : m_value;
 }
+    
+int OptionInt::GetUnfactoredValue()
+{
+    assert(m_definitionFactor);
+    return m_value;
+}
 
-bool StyleParamInt::SetValue(int value)
+bool OptionInt::SetValue(int value)
 {
     if ((value < m_minValue) || (value > m_maxValue)) {
         LogError("Parameter out of bounds; default is %d, minimum is %d, and maximum is %d", m_defaultValue, m_minValue, m_maxValue);
@@ -86,16 +120,20 @@ bool StyleParamInt::SetValue(int value)
     return true;
 }
     
-void StyleParamMeasureNumber::Init(style_MEASURENUMBER defaultValue)
+//----------------------------------------------------------------------------
+// OptionMeasureNumber
+//----------------------------------------------------------------------------
+    
+void OptionMeasureNumber::Init(style_MEASURENUMBER defaultValue)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
 }
 
-bool StyleParamMeasureNumber::SetValue(std::string value)
+bool OptionMeasureNumber::SetValue(std::string value)
 {
     std::map<style_MEASURENUMBER, std::string>::iterator it;
-    for (it = StyleParamMeasureNumber::values.begin(); it != StyleParamMeasureNumber::values.end(); ++it)
+    for (it = OptionMeasureNumber::values.begin(); it != OptionMeasureNumber::values.end(); ++it)
         if (it->second == value) {
             m_value = it->first;
             return true;
@@ -104,13 +142,58 @@ bool StyleParamMeasureNumber::SetValue(std::string value)
     return false;
 }
     
-void StyleParamStaffrel::Init(data_STAFFREL defaultValue)
+//----------------------------------------------------------------------------
+// OptionString
+//----------------------------------------------------------------------------
+    
+void OptionString::Init(std::string defaultValue)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
 }
 
-bool StyleParamStaffrel::SetValue(std::string value)
+bool OptionString::SetValue(std::string value)
+{
+    m_value = value;
+    return true;
+}
+ 
+//----------------------------------------------------------------------------
+// OptionArray
+//----------------------------------------------------------------------------
+    
+void OptionArray::Init()
+{
+    m_values.empty();
+    m_defaultValues.empty();
+}
+
+bool OptionArray::SetValue(std::string value)
+{
+    m_values.push_back(value);
+    return true;
+}
+    
+bool OptionArray::SetValue(std::vector<std::string> const &values)
+{
+    m_values = values;
+    m_values.erase(std::remove_if(m_values.begin(), m_values.end(),
+                                [](const std::string &s) { return s.empty(); }),
+        m_values.end());
+    return true;
+}
+    
+//----------------------------------------------------------------------------
+// OptionStaffRel
+//----------------------------------------------------------------------------
+    
+void OptionStaffrel::Init(data_STAFFREL defaultValue)
+{
+    m_value = defaultValue;
+    m_defaultValue = defaultValue;
+}
+
+bool OptionStaffrel::SetValue(std::string value)
 {
     Att converter;
     data_STAFFREL staffrel = converter.StrToStaffrel(value);
@@ -122,8 +205,28 @@ bool StyleParamStaffrel::SetValue(std::string value)
     return true;
 }
 
-Style::Style()
+//----------------------------------------------------------------------------
+// Options
+//----------------------------------------------------------------------------
+    
+Options::Options()
 {
+    m_appXPathQuery.Init();
+    m_choiceXPathQuery.Init();
+    m_mdivXPathQuery.Init("");
+    m_evenNoteSpacing.Init(false);
+    m_font.Init("Leipzig");
+    
+    m_adjustPageHeight.Init(false);
+    m_ignoreLayout.Init(false);
+    m_noLayout.Init(false);
+    
+    m_mmOutput.Init(false);
+    
+    m_spacingLinear.Init(0.25, 0.0, 1.0);
+    m_spacingNonLinear.Init(0.6, 0.0, 1.0);
+    
+    
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
     m_unit.Init(9, 6, 20, true);
     m_params["unit"] = &m_unit;
@@ -336,18 +439,18 @@ Style::Style()
     //m_measureNumber.SetValue("interval");
 
     // Example of a staffRel param
-    StyleParamStaffrel rel;
+    OptionStaffrel rel;
     data_STAFFREL staffrel;
     staffrel.SetBasic(STAFFREL_basic_above);
     rel.Init(staffrel);
     // within is not allowed for this param
     //rel.SetValue("within");
     
-    if (rel.GetValueAlternate()->GetType() == STAFFREL_basic)
-        LogMessage("Prout");
+    //if (rel.GetValueAlternate()->GetType() == STAFFREL_basic)
+    //    LogMessage("Prout");
 }
 
-Style::~Style()
+Options::~Options()
 {
 }
 

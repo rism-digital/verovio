@@ -378,27 +378,6 @@ public:
     virtual bool ImportFile();
     virtual bool ImportString(std::string const &mei);
 
-    /**
-     * Set the xPath queries for selecting specific <rdg>.
-     * By default, the first <lem> or <rdg> is loaded.
-     * If one (or more) query is provided, the element matching the specified xPath
-     * query will be selected (if any, otherwise the first one will be used).
-     */
-    virtual void SetAppXPathQueries(std::vector<std::string> &xPathQueries) { m_appXPathQueries = xPathQueries; }
-
-    /**
-     * Set the xPath queries for selecting <choice> children.
-     * Works similarly as SetAppXPathQueries. By default, the first child is made visible
-     */
-    virtual void SetChoiceXPathQueries(std::vector<std::string> &xPathQueries) { m_choiceXPathQueries = xPathQueries; }
-
-    /**
-     * Set the XPath query for selecting a specific <mdiv>
-     * Only one mdiv can be selected. This also works differently that <app> and <choice> selection because only the
-     * selected mdiv will be loaded.
-     */
-    virtual void SetMdivXPathQuery(std::string &xPathQuery) { m_mdivXPathQuery = xPathQuery; }
-
 private:
     bool ReadMei(pugi::xml_node root);
 
