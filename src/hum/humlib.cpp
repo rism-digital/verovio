@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jan 24 21:35:42 PST 2018
+// Last Modified: Fri Jan 26 03:51:57 PST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -17097,7 +17097,7 @@ HumdrumLine::HumdrumLine(const char* aString) : string(aString) {
 }
 
 
-HumdrumLine::HumdrumLine(HumdrumLine& line) {
+HumdrumLine::HumdrumLine(HumdrumLine& line)  : string((string)line) {
 	m_lineindex           = line.m_lineindex;
 	m_duration            = line.m_duration;
 	m_durationFromStart   = line.m_durationFromStart;
@@ -17111,7 +17111,7 @@ HumdrumLine::HumdrumLine(HumdrumLine& line) {
 }
 
 
-HumdrumLine::HumdrumLine(HumdrumLine& line, void* owner) {
+HumdrumLine::HumdrumLine(HumdrumLine& line, void* owner) : string((string)line) {
 	m_lineindex           = line.m_lineindex;
 	m_duration            = line.m_duration;
 	m_durationFromStart   = line.m_durationFromStart;
@@ -25951,8 +25951,7 @@ ostream& Option_register::print(ostream& out) {
 	out << "modifiedQ:\t\t"    << m_modifiedQ      << endl;
 	out << "type:\t\t"         << m_type           << endl;
 	return out;
-};
-
+}
 
 
 
@@ -34853,6 +34852,7 @@ bool Tool_esac2hum::getNoteList(vector<string>& song, vector<NoteData>& songdata
 					 break;
 				case '\0':
 					phend = 1;
+					break;
 				default: nextstate = -1;
 			}
 
