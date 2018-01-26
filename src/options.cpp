@@ -74,7 +74,7 @@ bool OptionDbl::SetValue(std::string value)
 bool OptionDbl::SetValue(double value)
 {
     if ((value < m_minValue) || (value > m_maxValue)) {
-        LogError("Parameter out of bounds; default is %f, minimum is %f, and maximum is %f", m_defaultValue, m_minValue, m_maxValue);
+        LogError("Parameter value %f out of bounds; default is %f, minimum %f, and maximum %f", value, m_defaultValue, m_minValue, m_maxValue);
         return false;
     }
     m_value = value;
@@ -113,7 +113,7 @@ int OptionInt::GetUnfactoredValue()
 bool OptionInt::SetValue(int value)
 {
     if ((value < m_minValue) || (value > m_maxValue)) {
-        LogError("Parameter out of bounds; default is %d, minimum is %d, and maximum is %d", m_defaultValue, m_minValue, m_maxValue);
+        LogError("Parameter value %d out of bounds; default is %d, minimum %d, and maximum %d", value, m_defaultValue, m_minValue, m_maxValue);
         return false;
     }
     m_value = value;
@@ -138,7 +138,7 @@ bool OptionMeasureNumber::SetValue(std::string value)
             m_value = it->first;
             return true;
         }
-    LogError("Parameter '%s' not valie", value.c_str());
+    LogError("Parameter '%s' not valid", value.c_str());
     return false;
 }
     

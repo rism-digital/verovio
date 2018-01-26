@@ -45,6 +45,9 @@ public:
     
     /** We just use the doc uuid as uuid */
     std::string GetUuid() { return m_doc.GetUuid(); }
+    
+    /** We just use the doc options */
+    Options *GetOptions() { return m_options; }
 
     /**
      * Set the resource path. To be called if the constructor had initFont=false.

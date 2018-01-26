@@ -197,19 +197,11 @@ int main(int argc, char **argv)
     string svgdir;
     string outfile;
     string outformat = "svg";
-    string font = "";
-    vector<string> appXPathQueries;
-    vector<string> choiceXPathQueries;
     bool std_output = false;
 
-    int adjust_page_height = 0;
     int all_pages = 0;
-    int no_layout = 0;
     int hum_type = 0;
-    int ignore_layout = 0;
     int no_justification = 0;
-    int even_note_spacing = 0;
-    int mm_output = 0;
     int show_bounding_boxes = 0;
     int page = 1;
     int show_help = 0;
@@ -227,8 +219,12 @@ int main(int argc, char **argv)
     }
 
     static struct option base_options[] = {
+        { "all-pages", no_argument, 0, 'a' },
+        // deprecated
         { "border", required_argument, 0, 'b' },
         { "format", required_argument, 0, 'f' },
+        // deprecated
+        { "page-height-deprecated", required_argument, 0, 'h' },
         { "help", no_argument, 0, '?' },
         { "hum-type", no_argument, &hum_type, 1 },
         { "no-justification", no_argument, &no_justification, 1 },
@@ -239,24 +235,27 @@ int main(int argc, char **argv)
         { "show-bounding-boxes", no_argument, &show_bounding_boxes, 1 },
         { "type", required_argument, 0, 't' },
         { "version", no_argument, 0, 'v' },
+        // deprecated
+        { "page-width-deprecated", required_argument, 0, 'w' },
         { "xml-id-seed", required_argument, 0, 'x' },
         { 0, 0, 0, 0 }
     };
     
     int baseSize = sizeof(base_options) / sizeof(option);
     
-    Options defaults;
-    MapOfStrOptions *params = defaults.GetParams();
+    Options *options = toolkit.GetOptions();
+    MapOfStrOptions *params = options->GetParams();
     int mapSize = (int)params->size();
 
     struct option *long_options;
     int i = 0;
     long_options = (struct option *)malloc(sizeof(struct option) * (baseSize + mapSize));
     
+    // A vector of string for storing names as const char* for long_options
     std::vector<std::string> optNames;
     optNames.reserve(mapSize);
     
-    MapOfStrOptions::const_iterator iter;
+    MapOfStrOptions::iterator iter;
     for (iter = params->begin(); iter != params->end(); iter++) {
         // Double check that back and forth convertion is correct
         assert(toCamelCase(fromCamelCase(iter->first)) == iter->first);
@@ -270,6 +269,7 @@ int main(int argc, char **argv)
         i++;
     }
     
+    // Concatenate the base options
     assert(i == mapSize);
     for (; i < mapSize + baseSize; i++) {
         long_options[i].name = base_options[i - mapSize].name;
@@ -278,29 +278,24 @@ int main(int argc, char **argv)
         long_options[i].val = base_options[i - mapSize].val;
     }
     
-    for (i = 0; i < mapSize + baseSize; i++) {
-        LogMessage("%s", long_options[i].name);
-    }
-    
     int c;
     std::string key;
     int option_index = 0;
     Option *opt = NULL;
     OptionBool *optBool = NULL;
-    while ((c = getopt_long(argc, argv, "?b:f:h:o:p:r:s:t:w:vx:", long_options, &option_index)) != -1) {
+    while ((c = getopt_long(argc, argv, "?ab:f:h:o:p:r:s:t:w:vx:", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
                 key = long_options[option_index].name;
-                LogMessage(key.c_str());
                 opt = params->at(toCamelCase(key));
                 optBool = dynamic_cast<OptionBool *>(opt);
                 if (optBool) {
                     optBool->SetValue(true);
-                    LogDebug("Setting option %s with true", long_options[option_index].name);
                 }
                 else if (opt) {
-                    opt->SetValue(optarg);
-                    LogDebug("Setting option %s with %s", long_options[option_index].name, optarg);
+                    if (!opt->SetValue(optarg)) {
+                        LogWarning("Setting option %s with %s failed, default value used", long_options[option_index].name, optarg);
+                    } 
                 }
                 else {
                     LogError("Something went wrong with option %s", long_options[option_index].name);
@@ -308,13 +303,17 @@ int main(int argc, char **argv)
                 }
                 break;
 
-            /*
-            case 'b':
-                if (!toolkit.SetBorder(atoi(optarg))) {
-                    exit(1);
-                }
+             case 'a':
+                all_pages = 1;
                 break;
-            */
+            
+            
+            case 'b':
+                LogWarning("Option -b and --border is deprecated. Use --page-left-mar, --page-right-mar and --page-top-mar instead");
+                options->m_pageLeftMar.SetValue(optarg);
+                options->m_pageRightMar.SetValue(optarg);
+                options->m_pageTopMar.SetValue(optarg);
+                break;
 
             case 'f':
                 if (!toolkit.SetFormat(string(optarg))) {
@@ -322,13 +321,10 @@ int main(int argc, char **argv)
                 };
                 break;
 
-            /*
             case 'h':
-                if (!toolkit.SetPageHeight(atoi(optarg))) {
-                    exit(1);
-                };
+                LogWarning("Option -h is deprecated. Use --page-height instead");
+                options->m_pageHeight.SetValue(optarg);
                 break;
-            */
 
             case 'o': outfile = string(optarg); break;
 
@@ -347,13 +343,10 @@ int main(int argc, char **argv)
 
             case 'v': show_version = 1; break;
 
-            /*
             case 'w':
-                if (!toolkit.SetPageWidth(atoi(optarg))) {
-                    exit(1);
-                }
+                LogWarning("Option -w is deprecated. Use --page-width instead");
+                options->m_pageWidth.SetValue(optarg);
                 break;
-            */
                 
             case 'x':
                 Object::SeedUuid(atoi(optarg));
@@ -368,15 +361,6 @@ int main(int argc, char **argv)
         }
     }
 
-    /*
-    if (appXPathQueries.size() > 0) {
-        toolkit.SetAppXPathQueries(appXPathQueries);
-    }
-    if (choiceXPathQueries.size() > 0) {
-        toolkit.SetChoiceXPathQueries(choiceXPathQueries);
-     }
-     */
-
     if (show_version) {
         display_version();
         exit(0);
@@ -386,18 +370,6 @@ int main(int argc, char **argv)
         display_usage();
         exit(0);
     }
-
-    /*
-    // Set the various flags in accordance with the options given
-    toolkit.SetAdjustPageHeight(adjust_page_height);
-    toolkit.SetNoLayout(no_layout);
-    toolkit.SetHumType(hum_type);
-    toolkit.SetIgnoreLayout(ignore_layout);
-    toolkit.SetMMOutput(mm_output);
-    toolkit.SetNoJustification(no_justification);
-    toolkit.SetEvenNoteSpacing(even_note_spacing);
-    toolkit.SetShowBoundingBoxes(show_bounding_boxes);
-    */
      
     if (optind <= argc - 1) {
         infile = string(argv[optind]);
@@ -423,12 +395,10 @@ int main(int argc, char **argv)
     }
 
     // Load a specified font
-    /*
-    if (!font.empty() && !toolkit.SetFont(font)) {
-        cerr << "Font '" << font << "' could not be loaded." << endl;
+    if (!Resources::SetFont(options->m_font.GetValue())) {
+        cerr << "Font '" << options->m_font.GetValue() << "' could not be loaded." << endl;
         exit(1);
     }
-    */
 
     if ((outformat != "svg") && (outformat != "mei") && (outformat != "midi") && (outformat != "timemap")
         && (outformat != "humdrum") && (outformat != "hum")) {
