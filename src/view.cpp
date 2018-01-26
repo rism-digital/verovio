@@ -160,9 +160,6 @@ std::wstring View::IntToTimeSigFigures(unsigned short number)
 
 std::wstring View::IntToSmuflFigures(unsigned short number, int offset)
 {
-    // We do not convert more that FF values
-    if (number > 0xFFFF) number = 0xFFFF;
-
     std::wostringstream stream;
     stream << number;
     std::wstring str = stream.str();
