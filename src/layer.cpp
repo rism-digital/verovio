@@ -382,7 +382,7 @@ int Layer::UnsetCurrentScoreDef(FunctorParams *functorParams)
     ResetStaffDefObjects();
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Layer::AlignHorizontally(FunctorParams *functorParams)
 {

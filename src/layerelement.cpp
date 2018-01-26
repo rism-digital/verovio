@@ -1279,6 +1279,6 @@ int LayerElement::ResetDrawing(FunctorParams *)
     m_drawingCueSize = false;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 } // namespace vrv

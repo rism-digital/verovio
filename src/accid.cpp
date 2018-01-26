@@ -189,7 +189,7 @@ int Accid::ResetDrawing(FunctorParams *functorParams)
     PositionInterface::InterfaceResetDrawing(functorParams, this);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Accid::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

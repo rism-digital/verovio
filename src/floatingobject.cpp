@@ -212,7 +212,7 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
         m_place = STAFFREL_basic_NONE;
     }
     ResetPositioner();
-};
+}
 
 void FloatingPositioner::ResetPositioner()
 {
@@ -302,7 +302,7 @@ void FloatingPositioner::SetDrawingXRel(int drawingXRel)
 {
     ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
-};
+}
 
 void FloatingPositioner::SetDrawingYRel(int drawingYRel)
 {
@@ -313,7 +313,7 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel)
     else {
         if (drawingYRel > m_drawingYRel) m_drawingYRel = drawingYRel;
     }
-};
+}
 
 bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox)
 {
@@ -473,7 +473,7 @@ int FloatingObject::ResetDrawing(FunctorParams *functorParams)
     }
     m_drawingGrpId = DRAWING_GRP_NONE;
     return FUNCTOR_CONTINUE;
-};
+}
 
 int FloatingObject::UnCastOff(FunctorParams *functorParams)
 {

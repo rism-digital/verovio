@@ -591,7 +591,7 @@ int EditorialElement::ResetDrawing(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int EditorialElement::CastOffSystems(FunctorParams *functorParams)
 {

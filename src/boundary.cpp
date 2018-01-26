@@ -112,7 +112,7 @@ int BoundaryEnd::ResetDrawing(FunctorParams *functorParams)
     this->SetMeasure(NULL);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int BoundaryEnd::CastOffSystems(FunctorParams *functorParams)
 {
@@ -176,6 +176,6 @@ int BoundaryStartInterface::InterfaceResetDrawing(FunctorParams *functorParams)
     m_drawingMeasure = NULL;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 } // namespace vrv

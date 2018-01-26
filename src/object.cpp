@@ -148,7 +148,7 @@ ClassId Object::GetClassId() const
     // we should always have the method overridden
     assert(false);
     return OBJECT;
-};
+}
 
 void Object::SetAsReferenceObject()
 {
@@ -161,7 +161,7 @@ void Object::Reset()
 {
     ClearChildren();
     ResetBoundingBox();
-};
+}
 
 void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId interfaceId)
 {
@@ -216,7 +216,7 @@ void Object::MoveItselfTo(Object *targetParent)
 void Object::SetUuid(std::string uuid)
 {
     m_uuid = uuid;
-};
+}
 
 void Object::ClearChildren()
 {

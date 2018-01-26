@@ -585,7 +585,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     this->Process(&prepareDrawingCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
 {
