@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Dec 21 00:43:01 PST 2017
+// Last Modified: Wed Jan 24 21:35:42 PST 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -3363,7 +3363,7 @@ class Options {
 		bool            process           (const vector<string>& argv,
 		                                      int error_check = 1,
 		                                      int suppress = 0);
-		bool            process           (string& argv, int error_check = 1,
+		bool            process           (const string& argv, int error_check = 1,
 		                                      int suppress = 0);
 		void            reset             (void);
 		void            xverify           (int argc, char** argv,
@@ -3376,13 +3376,13 @@ class Options {
 		                                   const string& optionValue);
 		void            setOptions        (int argc, char** argv);
 		void            setOptions        (const vector<string>& argv);
-		void            setOptions        (string& args);
+		void            setOptions        (const string& args);
 		void            appendOptions     (int argc, char** argv);
 		void            appendOptions     (string& args);
 		void            appendOptions     (vector<string>& argv);
 		ostream&        printRegister     (ostream& out);
 		int             isDefined         (const string& name);
-		static vector<string>  tokenizeCommandLine(string& args);
+		static vector<string> tokenizeCommandLine(const string& args);
 		bool            hasParseError     (void);
 		string          getParseError     (void);
 		ostream&        getParseError     (ostream& out);
@@ -4811,6 +4811,8 @@ class Tool_musicxml2hum : public HumTool {
 		void insertPartClefs   (xml_node clef, GridPart& part);
 		xml_node convertClefToHumdrum(xml_node clef, HTp& token, int& staffindex);
 
+		void addTranspositionLine(GridMeasure* outdata, vector<vector<xml_node> >& transpositions,
+		                       vector<MxmlPart>& partdata, HumNum nowtime);
 		void addKeySigLine    (GridMeasure* outdata, vector<vector<xml_node> >& keysigs,
 		                        vector<MxmlPart>& partdata, HumNum nowtime);
 		void insertPartKeySigs (xml_node keysig, GridPart& part);
@@ -4850,6 +4852,8 @@ class Tool_musicxml2hum : public HumTool {
 		void setSoftwareInfo   (xml_document& doc);
 		string getSystemDecoration(xml_document& doc, HumGrid& grid, vector<string>& partids);
 		void getChildrenVector (vector<xml_node>& children, xml_node parent);
+		void insertPartTranspositions(xml_node transposition, GridPart& part);
+		xml_node convertTranspositionToHumdrum(xml_node transpose, HTp& token, int& staffindex);
 
 	public:
 
@@ -4870,6 +4874,7 @@ class Tool_musicxml2hum : public HumTool {
 
 		xml_node m_current_dynamic = xml_node(NULL);
 		vector<xml_node> m_current_text;
+		bool m_hasTransposition = false;
 
 };
 

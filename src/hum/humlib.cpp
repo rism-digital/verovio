@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jan 24 02:42:07 PST 2018
+// Last Modified: Wed Jan 24 21:35:42 PST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -26490,7 +26490,7 @@ void Options::setOptions(const vector<string>& argv) {
 }
 
 
-void Options::setOptions(string& args) {
+void Options::setOptions(const string& args) {
 	m_processedQ = 0;
    m_argv = tokenizeCommandLine(args);
 }
@@ -26545,7 +26545,7 @@ void Options::appendOptions(string& args) {
 //    command-line strings.
 //
 
-vector<string> Options::tokenizeCommandLine(string& arguments) {
+vector<string> Options::tokenizeCommandLine(const string& arguments) {
 	char ch;
 	int doublequote = 0;
 	int singlequote = 0;
@@ -26610,7 +26610,6 @@ vector<string> Options::tokenizeCommandLine(string& arguments) {
 	}
 
 	return tokens;
-
 }
 
 
@@ -26651,7 +26650,7 @@ bool Options::process(const vector<string>& argv, int error_check, int suppress)
 }
 
 
-bool Options::process(string& argv, int error_check, int suppress) {
+bool Options::process(const string& argv, int error_check, int suppress) {
 	setOptions(argv);
 	xverify(error_check, suppress);
 	return !hasParseError();
@@ -42494,8 +42493,6 @@ bool Tool_musicxml2hum::convert(ostream& out, const char* input) {
 bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	initialize();
 
-// ggg
-
 	bool status = true; // for keeping track of problems in conversion process.
 
 	setSoftwareInfo(doc);
@@ -42581,10 +42578,24 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	Tool_ruthfix ruthfix;
 	ruthfix.run(outfile);
 
-	for (int i=0; i<outfile.getLineCount(); i++) {
-		outfile[i].createLineFromTokens();
+	if (m_hasTransposition) {
+		Tool_transpose transpose;
+
+		vector<string> argv;
+		argv.push_back("transpose");
+		argv.push_back("-C");  // transpose to concert pitch
+		transpose.process(argv);
+		transpose.run(outfile);
+		if (transpose.hasHumdrumText()) {
+			transpose.getHumdrumText(out);
+		}
+
+	} else {
+		for (int i=0; i<outfile.getLineCount(); i++) {
+			outfile[i].createLineFromTokens();
+		}
+		out << outfile;
 	}
-	out << outfile;
 
 	// add RDFs
 	if (m_slurabove) {
@@ -42733,6 +42744,9 @@ void Tool_musicxml2hum::addFooterRecords(HumdrumFile& outfile, xml_document& doc
 	string copy = doc.select_single_node("/score-partwise/identification/rights").node().child_value();
 	bool validcopy = true;
 	if (copy == "") {
+		validcopy = false;
+	}
+	if ((copy.length() == 2) && ((unsigned char)copy[0] == 0xc2) && ((unsigned char)copy[1] == 0xa9)) {
 		validcopy = false;
 	}
 	if ((copy.find("opyright") != std::string::npos) && (copy.size() < 15)) {
@@ -44372,16 +44386,18 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 		vector<SimultaneousEvents*>& nowevents, HumNum nowtime,
 		vector<MxmlPart>& partdata) {
 
-	bool hasclef    = false;
-	bool haskeysig  = false;
-	bool hastimesig = false;
+	bool hasclef          = false;
+	bool haskeysig        = false;
+	bool hastransposition = false;
+	bool hastimesig       = false;
 
-	vector<vector<xml_node> > clefs(partdata.size());
-	vector<vector<xml_node> > keysigs(partdata.size());
-	vector<vector<xml_node> > timesigs(partdata.size());
+	vector<vector<xml_node>> clefs(partdata.size());
+	vector<vector<xml_node>> keysigs(partdata.size());
+	vector<vector<xml_node>> transpositions(partdata.size());
+	vector<vector<xml_node>> timesigs(partdata.size());
 
-	vector<vector<vector<vector<MxmlEvent*> > > > gracebefore(partdata.size());
-	vector<vector<vector<vector<MxmlEvent*> > > > graceafter(partdata.size());
+	vector<vector<vector<vector<MxmlEvent*>>>> gracebefore(partdata.size());
+	vector<vector<vector<vector<MxmlEvent*>>>> graceafter(partdata.size());
 	bool foundnongrace = false;
 
 	int pindex = 0;
@@ -44408,12 +44424,17 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 						foundnongrace = true;
 					}
 
+					if (nodeType(child, "transpose")) {
+						transpositions[pindex].push_back(child);
+						hastransposition = true;
+						foundnongrace = true;
+					}
+
 					if (nodeType(child, "time")) {
 						timesigs[pindex].push_back(child);
 						hastimesig = true;
 						foundnongrace = true;
 					}
-
 					child = child.next_sibling();
 				}
 			} else if (nodeType(element, "direction")) {
@@ -44445,6 +44466,10 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 
 	if (hasclef) {
 		addClefLine(outdata, clefs, partdata, nowtime);
+	}
+
+	if (hastransposition) {
+		addTranspositionLine(outdata, transpositions, partdata, nowtime);
 	}
 
 	if (haskeysig) {
@@ -44632,6 +44657,32 @@ void Tool_musicxml2hum::addKeySigLine(GridMeasure* outdata,
 
 //////////////////////////////
 //
+// Tool_musicxml2hum::addTranspositionLine -- Transposition codes to 
+//   produce written parts.
+//
+
+void Tool_musicxml2hum::addTranspositionLine(GridMeasure* outdata,
+		vector<vector<xml_node> >& transpositions,
+		vector<MxmlPart>& partdata, HumNum nowtime) {
+
+	GridSlice* slice = new GridSlice(outdata, nowtime,
+		SliceType::Transpositions);
+	outdata->push_back(slice);
+	slice->initializePartStaves(partdata);
+
+	for (int i=0; i<(int)partdata.size(); i++) {
+		for (int j=0; j<(int)transpositions[i].size(); j++) {
+			if (transpositions[i][j]) {
+				insertPartTranspositions(transpositions[i][j], *slice->at(i));
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
 // Tool_musicxml2hum::insertPartClefs --
 //
 
@@ -44704,6 +44755,38 @@ void Tool_musicxml2hum::insertPartKeySigs(xml_node keysig, GridPart& part) {
 		keysig = convertKeySigToHumdrum(keysig, token, staffnum);
 		if (staffnum < 0) {
 			// key signature applies to all staves in part (most common case)
+			for (int s=0; s<(int)part.size(); s++) {
+				if (s==0) {
+					part[s]->setTokenLayer(0, token, 0);
+				} else {
+					HTp token2 = new HumdrumToken(*token);
+					part[s]->setTokenLayer(0, token2, 0);
+				}
+			}
+		} else {
+			part[staffnum]->setTokenLayer(0, token, 0);
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::insertPartTranspositions --
+//
+
+void Tool_musicxml2hum::insertPartTranspositions(xml_node transposition, GridPart& part) {
+	if (!transposition) {
+		return;
+	}
+
+	HTp token;
+	int staffnum = 0;
+	while (transposition) {
+		transposition = convertTranspositionToHumdrum(transposition, token, staffnum);
+		if (staffnum < 0) {
+			// Transposition applies to all staves in part (most common case)
 			for (int s=0; s<(int)part.size(); s++) {
 				if (s==0) {
 					part[s]->setTokenLayer(0, token, 0);
@@ -44814,6 +44897,69 @@ bool Tool_musicxml2hum::checkForMensuration(xml_node timesig) {
 		return false;
 	}
 }
+
+
+//////////////////////////////
+//
+//	Tool_musicxml2hum::convertTranspositionToHumdrum --
+//
+//  <transpose>
+//     <diatonic>-1</diatonic>
+//     <chromatic>-2</chromatic>
+//
+
+xml_node Tool_musicxml2hum::convertTranspositionToHumdrum(xml_node transpose,
+		HTp& token, int& staffindex) {
+
+	if (!transpose) {
+		return transpose;
+	}
+
+	staffindex = -1;
+	xml_attribute sn = transpose.attribute("number");
+	if (sn) {
+		staffindex = atoi(sn.value()) - 1;
+	}
+
+	int diatonic = 0;
+	int chromatic = 0;
+
+	xml_node child = transpose.first_child();
+	while (child) {
+		if (nodeType(child, "diatonic")) {
+			diatonic = atoi(child.child_value());
+		} else if (nodeType(child, "chromatic")) {
+			chromatic = atoi(child.child_value());
+		}
+		child = child.next_sibling();
+	}
+
+
+	// Switching to sounding viewpoint: transposition to get written pitch:
+	diatonic = -diatonic;
+	chromatic = -chromatic;
+
+	stringstream ss;
+	ss << "*Trd" << diatonic << "c" << chromatic;
+
+	token = new HumdrumToken(ss.str());
+
+	int base40 = -Convert::transToBase40(ss.str());
+	if (base40 != 0) {
+		m_hasTransposition = true;
+	}
+
+	transpose = transpose.next_sibling();
+	if (!transpose) {
+		return transpose;
+	}
+	if (nodeType(transpose, "transpose")) {
+		return transpose;
+	} else {
+		return xml_node(NULL);
+	}
+}
+
 
 
 //////////////////////////////
@@ -48755,6 +48901,7 @@ Tool_transpose::Tool_transpose(void) {
 	define("I|instrument=b", "insert instrument code (*ITr) as well");
 	define("C|concert=b",    "transpose written score to concert pitch");
 	define("W|written=b",    "trans. concert pitch score to written score");
+	define("n|negate=b",     "negate transposition indications");
 	define("rotation=b",     "display transposition in half-steps");
 
 	define("author=b",  "author of program");
@@ -48849,8 +48996,8 @@ bool Tool_transpose::run(HumdrumFile& infile) {
 //
 
 void Tool_transpose::convertScore(HumdrumFile& infile, int style) {
-	vector<int> tvals;  // transposition values for each spine
-	tvals.reserve(infile.getMaxTrack() + 1);
+	// transposition values for each spine
+	vector<int> tvals(infile.getMaxTrack()+1, 0);  
 
 	int ptrack;
 	int i, j;
@@ -48859,8 +49006,6 @@ void Tool_transpose::convertScore(HumdrumFile& infile, int style) {
 				// scan the line for transposition codes
 				// as well as key signatures and key markers
 				processInterpretationLine(infile, i, tvals, style);
-				break;
-
 		} else if (infile[i].isData()) {
 			// transpose notes according to tvals data
 			for (j=0; j<infile[i].getFieldCount(); j++) {
@@ -48882,8 +49027,6 @@ void Tool_transpose::convertScore(HumdrumFile& infile, int style) {
 				}
 			}
 			m_humdrum_text << "\n";
-			break;
-
 		} else {
 			m_humdrum_text << infile[i] << "\n";
 		}
@@ -49081,13 +49224,12 @@ int Tool_transpose::isKeyMarker(const string& str) {
 //
 
 void Tool_transpose::printTransposedToken(HumdrumFile& infile, int row, int col, int transval) {
-	if (infile.token(row, col)->isKern()) {
+	if (!infile.token(row, col)->isKern()) {
 		// don't know how to transpose this type of data, so leave it as is
 		m_humdrum_text << infile.token(row, col);
-		return;
+	} else {
+		printHumdrumKernToken(infile[row], col, transval);
 	}
-
-	printHumdrumKernToken(infile[row], col, transval);
 }
 
 
@@ -49280,7 +49422,8 @@ int Tool_transpose::getTransposeInfo(HumdrumFile& infile, int row, int col) {
 				base = Convert::transToBase40(*infile.token(i, j));
 				output += base;
 				// erase the *Tr value because it will be printed elsewhere
-				infile.token(i, j)->setText("*deletedTr");
+				infile.token(i, j)->setText("*XTr");
+				// ggg
 			}
 		}
 	}
