@@ -113,6 +113,8 @@ public:
     virtual bool SetValue(std::string) = 0;
     
     void SetInfo(std::string title, std::string description);
+    std::string GetTitle() const { return m_title; }
+    std::string GetDescription() const { return m_description; }
     
 public:
     //
@@ -137,8 +139,8 @@ public:
     
     virtual bool SetValue(std::string value);
     
-    bool GetValue() { return m_value; }
-    bool GetDefault() { return m_defaultValue; }
+    bool GetValue() const { return m_value; }
+    bool GetDefault() const { return m_defaultValue; }
     bool SetValue(bool m_value);
   
 private:
@@ -166,10 +168,10 @@ public:
     
     virtual bool SetValue(std::string value);
     
-    double GetValue() { return m_value; }
-    double GetDefault() { return m_defaultValue; }
-    double GetMin() { return m_minValue; }
-    double GetMax() { return m_maxValue; }
+    double GetValue() const { return m_value; }
+    double GetDefault() const { return m_defaultValue; }
+    double GetMin() const { return m_minValue; }
+    double GetMax() const { return m_maxValue; }
     bool SetValue(double value);
 
 private:
@@ -201,9 +203,9 @@ public:
     
     int GetValue();
     int GetUnfactoredValue();
-    int GetDefault() { return m_defaultValue; }
-    int GetMin() { return m_minValue; }
-    int GetMax() { return m_maxValue; }
+    int GetDefault() const { return m_defaultValue; }
+    int GetMin() const { return m_minValue; }
+    int GetMax() const { return m_maxValue; }
     bool SetValue(int value);
 
 private:
@@ -234,8 +236,8 @@ public:
     
     virtual bool SetValue(std::string value);
     
-    std::string GetValue() { return m_value; }
-    std::string GetDefault() { return m_defaultValue; }
+    std::string GetValue() const { return m_value; }
+    std::string GetDefault() const { return m_defaultValue; }
 
 private:
     //
@@ -262,8 +264,8 @@ public:
     
     virtual bool SetValue(std::string value);
     
-    std::vector<std::string> GetValue() { return m_values; }
-    std::vector<std::string> GetDefault() { return m_defaultValues; }
+    std::vector<std::string> GetValue() const { return m_values; }
+    std::vector<std::string> GetDefault() const { return m_defaultValues; }
     bool SetValue(std::vector<std::string> const &values);
 
 private:
@@ -292,8 +294,8 @@ public:
     
     virtual bool SetValue(std::string value);
     
-    style_MEASURENUMBER GetValue() { return m_value; }
-    style_MEASURENUMBER GetDefault() { return m_defaultValue; }
+    style_MEASURENUMBER GetValue() const { return m_value; }
+    style_MEASURENUMBER GetDefault() const { return m_defaultValue; }
 
 private:
     //
@@ -324,8 +326,8 @@ public:
     
     // For altenate types return a reference to the value
     // Alternatively we can have a values vector for each sub-type
-    data_STAFFREL *GetValueAlternate() { return &m_value; }
-    data_STAFFREL *GetDefaultAlernate() { return &m_defaultValue; }
+    const data_STAFFREL *GetValueAlternate() const { return &m_value; }
+    const data_STAFFREL *GetDefaultAlernate() const { return &m_defaultValue; }
     
 private:
     //
@@ -353,8 +355,8 @@ public:
 
     virtual bool SetValue(std::string value);
     
-    data_STAFFREL_basic GetValue() { return m_value; }
-    data_STAFFREL_basic GetDefault() { return m_defaultValue; }
+    data_STAFFREL_basic GetValue() const { return m_value; }
+    data_STAFFREL_basic GetDefault() const { return m_defaultValue; }
 
 private:
     //
@@ -379,65 +381,45 @@ public:
     Options();
     virtual ~Options();
     
-    const MapOfStrStyleParams *GetParams() { return &m_params; }
+    MapOfStrOptions *GetParams() { return &m_params; }
 
 public:
-    
-    /** */
+    /**
+     * Comments in implementation file options.cpp
+     */
     OptionArray m_appXPathQuery;
     OptionArray m_choiceXPathQuery;
     OptionString m_mdivXPathQuery;
-    OptionBool m_evenNoteSpacing;
-    OptionString m_font;
 
     OptionBool m_adjustPageHeight;
+    OptionBool m_evenNoteSpacing;
+    OptionString m_font;
     OptionBool m_ignoreLayout;
-    OptionBool m_noLayout;
-    
     OptionBool m_mmOutput;
-    
+    OptionBool m_noLayout;
     OptionDbl m_spacingLinear;
     OptionDbl m_spacingNonLinear;
     
-    /** The unit (1Ú2 of the distance between staff lines) **/
     OptionInt m_unit;
-    /** The landscape paper orientation flag */
     OptionBool m_landscape;
-    /** The staff line width */
     OptionDbl m_staffLineWidth;
-    /** The stem width */
     OptionDbl m_stemWidth;
-    /** The barLine width */
     OptionDbl m_barLineWidth;
-    /** The maximum beam slope */
     OptionInt m_beamMaxSlope;
-    /** The minimum beam slope */
     OptionInt m_beamMinSlope;
-    /** The grace size ratio numerator */
     OptionDbl m_graceFactor;
-    /** The page height */
     OptionInt m_pageHeight;
-    /** The page width */
     OptionInt m_pageWidth;
-    /** The page left margin */
     OptionInt m_pageLeftMar;
-    /** The page right margin */
     OptionInt m_pageRightMar;
-    /** The page top margin */
     OptionInt m_pageTopMar;
-    /** The staff minimal spacing */
     OptionInt m_spacingStaff;
-    /** The system minimal spacing */
     OptionInt m_spacingSystem;
 
-    /** The minimal measure width (in units) */
     OptionInt m_minMeasureWidth;
-    /** The lyrics size (in units) */
     OptionDbl m_lyricSize;
-    /** haripin size (in units) */
     OptionDbl m_hairpinSize;
 
-    /** ties and slurs */
     OptionDbl m_tieThickness;
     OptionDbl m_minSlurHeight;
     OptionDbl m_maxSlurHeight;
@@ -449,8 +431,8 @@ public:
     /** The layout left margin by element */
     OptionDbl m_leftMarginAccid;
     OptionDbl m_leftMarginBarLine;
-    OptionDbl m_leftMarginBarLineAttrLeft;
-    OptionDbl m_leftMarginBarLineAttrRight;
+    OptionDbl m_leftMarginLeftBarLine;
+    OptionDbl m_leftMarginRightBarLine;
     OptionDbl m_leftMarginBeatRpt;
     OptionDbl m_leftMarginChord;
     OptionDbl m_leftMarginClef;
@@ -469,8 +451,8 @@ public:
     /** The layout right margin by element */
     OptionDbl m_rightMarginAccid;
     OptionDbl m_rightMarginBarLine;
-    OptionDbl m_rightMarginBarLineAttrLeft;
-    OptionDbl m_rightMarginBarLineAttrRight;
+    OptionDbl m_rightMarginLeftBarLine;
+    OptionDbl m_rightMarginRightBarLine;
     OptionDbl m_rightMarginBeatRpt;
     OptionDbl m_rightMarginChord;
     OptionDbl m_rightMarginClef;
@@ -494,9 +476,8 @@ public:
     
 private:
     /** The array of style parameters */
-    MapOfStrStyleParams m_params;
+    MapOfStrOptions m_params;
     
-    OptionInt m_margin;
     OptionMeasureNumber m_measureNumber;
 };
 

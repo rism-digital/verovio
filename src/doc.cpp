@@ -1121,8 +1121,8 @@ double Doc::GetLeftMargin(const ClassId classId) const
 {
     if (classId == ACCID) return m_options->m_leftMarginAccid.GetValue();
     if (classId == BARLINE) return m_options->m_leftMarginBarLine.GetValue();
-    if (classId == BARLINE_ATTR_LEFT) return m_options->m_leftMarginBarLineAttrLeft.GetValue();
-    if (classId == BARLINE_ATTR_RIGHT) return m_options->m_leftMarginBarLineAttrRight.GetValue();
+    if (classId == BARLINE_ATTR_LEFT) return m_options->m_leftMarginLeftBarLine.GetValue();
+    if (classId == BARLINE_ATTR_RIGHT) return m_options->m_leftMarginRightBarLine.GetValue();
     if (classId == BEATRPT) return m_options->m_leftMarginBeatRpt.GetValue();
     if (classId == CHORD) return m_options->m_leftMarginChord.GetValue();
     if (classId == CLEF) return m_options->m_leftMarginClef.GetValue();
@@ -1142,8 +1142,8 @@ double Doc::GetRightMargin(const ClassId classId) const
 {
     if (classId == ACCID) return m_options->m_rightMarginAccid.GetValue();
     if (classId == BARLINE) return m_options->m_rightMarginBarLine.GetValue();
-    if (classId == BARLINE_ATTR_LEFT) return m_options->m_rightMarginBarLineAttrLeft.GetValue();
-    if (classId == BARLINE_ATTR_RIGHT) return m_options->m_rightMarginBarLineAttrRight.GetValue();
+    if (classId == BARLINE_ATTR_LEFT) return m_options->m_rightMarginLeftBarLine.GetValue();
+    if (classId == BARLINE_ATTR_RIGHT) return m_options->m_rightMarginRightBarLine.GetValue();
     if (classId == BEATRPT) return m_options->m_rightMarginBeatRpt.GetValue();
     if (classId == CHORD) return m_options->m_rightMarginChord.GetValue();
     if (classId == CLEF) return m_options->m_rightMarginClef.GetValue();

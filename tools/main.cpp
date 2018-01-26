@@ -107,72 +107,79 @@ void display_usage()
     // Options with both short and long forms
     cerr << "Options (marked as * are repeatable)" << endl;
 
-    cerr << " -                          Use \"-\" as input file for reading from the standard input" << endl;
-
-    cerr << " -b, --border=BORDER        Add border (default is " << style.m_pageLeftMar.GetDefault() << ")" << endl;
-
-    cerr << " -f, --format=INPUT_FORMAT  Select input format: darms, mei, pae, xml (default is mei)" << endl;
-
-    cerr << " -h, --page-height=HEIGHT   Specify the page height (default is " << style.m_pageHeight.GetDefault()  << ")" << endl;
-
-    cerr << " -o, --outfile=FILE_NAME    Output file name (use \"-\" for standard output)" << endl;
-
-    cerr << " -r, --resources=PATH       Path to SVG resources (default is " << vrv::Resources::GetPath() << ")"
-         << endl;
-
-    cerr << " -s, --scale=FACTOR         Scale percent (default is " << DEFAULT_SCALE << ")" << endl;
-
-    cerr << " -t, --type=OUTPUT_TYPE     Select output format: mei, svg, or midi (default is svg)" << endl;
-
-    cerr << " -v, --version              Display the version number" << endl;
-
-    cerr << " -w, --page-width=WIDTH     Specify the page width (default is " << style.m_pageWidth.GetDefault()  << ")" << endl;
+    cerr << " -                     Use \"-\" as input file for reading from the standard input" << endl;
+    cerr << " -?, --help            Display this message" << endl;
+    cerr << " -a, --all-pages       Output all pages" << endl;
+    cerr << " -f, --format <s>      Select input format: darms, mei, pae, xml (default is mei)" << endl;
+    cerr << " -o, --outfile <s>     Output file name (use \"-\" for standard output)" << endl;
+    cerr << " -p, --page <i>        Select the page to engrave (default is 1)" << endl;
+    cerr << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")" << endl;
+    cerr << " -s, --scale <i>       Scale percent (default is " << DEFAULT_SCALE << ")" << endl;
+    cerr << " -t, --type <s>        Select output format: mei, svg, or midi (default is svg)" << endl;
+    cerr << " -v, --version         Display the version number" << endl;
+    cerr << " -x, --xml-id-seed <i> Seed the random number generator for XML IDs" << endl;
 
     // Options with long forms only
     cerr << endl << "Additional options" << endl;
+    
+    Options options;
+    const MapOfStrOptions *params = options.GetParams();
+    MapOfStrOptions::const_iterator iter;
+    for (iter = params->begin(); iter != params->end(); iter++) {
+        //cerr << toCamelCase(fromCamelCase(iter->first)) << endl;
+        std::string option = fromCamelCase(iter->first);
+    
+        const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(iter->second);
+        const OptionInt *optInt = dynamic_cast<const OptionInt *>(iter->second);
+        const OptionString *optString = dynamic_cast<const OptionString *>(iter->second);
+        const OptionArray *optArray = dynamic_cast<const OptionArray *>(iter->second);
+        const OptionBool *optBool = dynamic_cast<const OptionBool *>(iter->second);
+    
+        if (optDbl) {
+            option.append(" <f>");
+        }
+        else if (optInt) {
+            option.append(" <i>");
+        }
+        else if (optString) {
+            option.append(" <s>");
+        }
+        else if (optArray) {
+            option.append("* <s>");
+        }
+        else if (!optBool) {
+            option.append(" <s>");
+        }
+        
+        if (option.size() < 30) {
+            option.insert(option.end(), 30 - option.size(), ' ');
+        }
+        else {
+            option.append("\t");
+        }
+        
+        cerr << " --" << option << iter->second->GetDescription();
 
-    cerr << " --adjust-page-height       Crop the page height to the height of the content" << endl;
+        if (optInt) {
+            cerr << " (default: " << optInt->GetDefault();
+            cerr << "; min: " << optInt->GetMin();
+            cerr << "; max: " << optInt->GetMax() << ")";
+        }
+        if (optDbl) {
+            cerr << " (default: " << optDbl->GetDefault();
+            cerr << "; min: " << optDbl->GetMin();
+            cerr << "; max: " << optDbl->GetMax() << ")";
+        }
+        if (optString) {
+            cerr << " (default: \"" << optString->GetDefault() << "\")";
+        }
+        cerr << endl;
+    }
 
-    cerr << " --all-pages                Output all pages with one output file per page" << endl;
-
-    cerr << " --app-xpath-query=QR*      Set the xPath query for selecting <app> child elements," << endl;
-    cerr << "                            for example: \"./rdg[contains(@source, 'source-id')]\";" << endl;
-    cerr << "                            by default the <lem> or the first <rdg> is selected" << endl;
-
-    cerr << " --choice-xpath-query=QR*   Set the xPath query for selecting <choice> child elements," << endl;
-    cerr << "                            for example: \"./orig\"; by default the first child is selected" << endl;
-
-    cerr << " --even-note-spacing        Space notes evenly and close together regardless of their durations" << endl;
-
-    cerr << " --font=FONT                Select the music font to use (default is Leipzig;" << endl;
-    cerr << "                            Bravura and Gootville are also available)" << endl;
-
-    cerr << " --help                     Display this message" << endl;
 
     cerr << " --hum-type                 Include type attributes when importing from Humdrum" << endl;
 
-    cerr << " --ignore-layout            Ignore all encoded layout information (if any)" << endl;
-    cerr << "                            and fully recalculate the layout" << endl;
 
-    cerr << " --mdiv-xpath-query=QR      Set the xPath query for selecting the <mdiv> to be rendered;" << endl;
-    cerr << "                            only one <mdiv> can be rendered" << endl;
-
-    cerr << " --mm-ouptut                Specify that the output in the SVG is given in mm (default is px)" << endl;
-
-    cerr << " --no-layout                Ignore all encoded layout information (if any)" << endl;
-    cerr << "                            and output one single page with one single system" << endl;
-
-    cerr << " --page=PAGE                Select the page to engrave (default is 1)" << endl;
-
-    cerr << " --spacing-linear=SP        Specify the linear spacing factor (default is " << DEFAULT_SPACING_LINEAR
-         << ")" << endl;
-
-    cerr << " --spacing-non-linear=SP    Specify the non-linear spacing factor (default is "
-         << DEFAULT_SPACING_NON_LINEAR << ")" << endl;
-
-    cerr << " --spacing-staff=SP         Specify the spacing above each staff (in MEI vu)" << endl;
-
-    cerr << " --spacing-system=SP        Specify the spacing above each system (in MEI vu)" << endl;
 
     cerr << " --xml-id-seed=INT          Seed the random number generator for XML IDs" << endl;
 
@@ -186,7 +193,6 @@ void display_usage()
 
 int main(int argc, char **argv)
 {
-
     string infile;
     string svgdir;
     string outfile;
@@ -196,7 +202,6 @@ int main(int argc, char **argv)
     vector<string> choiceXPathQueries;
     bool std_output = false;
 
-    int no_mei_hdr = 0;
     int adjust_page_height = 0;
     int all_pages = 0;
     int no_layout = 0;
@@ -220,105 +225,88 @@ int main(int argc, char **argv)
         display_usage();
         exit(1);
     }
-    int c;
+
+    static struct option base_options[] = {
+        { "border", required_argument, 0, 'b' },
+        { "format", required_argument, 0, 'f' },
+        { "help", no_argument, 0, '?' },
+        { "hum-type", no_argument, &hum_type, 1 },
+        { "no-justification", no_argument, &no_justification, 1 },
+        { "outfile", required_argument, 0, 'o' },
+        { "page", required_argument, 0, 0 },
+        { "resources", required_argument, 0, 'r' },
+        { "scale", required_argument, 0, 's' },
+        { "show-bounding-boxes", no_argument, &show_bounding_boxes, 1 },
+        { "type", required_argument, 0, 't' },
+        { "version", no_argument, 0, 'v' },
+        { "xml-id-seed", required_argument, 0, 'x' },
+        { 0, 0, 0, 0 }
+    };
     
-    Options defaultStyle;
-    const MapOfStrStyleParams *params = defaultStyle.GetParams();
-    MapOfStrStyleParams::const_iterator iter;
-    for (iter = params->begin(); iter != params->end(); iter++) {
-        cerr << toCamelCase(fromCamelCase(iter->first)) << endl;
-    }
+    int baseSize = sizeof(base_options) / sizeof(option);
     
-    /*
+    Options defaults;
+    MapOfStrOptions *params = defaults.GetParams();
+    int mapSize = (int)params->size();
+
     struct option *long_options;
-    int n = 10;
-    int i;
-    long_options = (struct option *)malloc(sizeof(struct option) * (n+2));
-    for (i=0;i<n;i++) {
-        long_options[i].name = "test";//unaccelerate(opts[i].name);
-        long_options[i].has_arg = opts[i].has_arg;
+    int i = 0;
+    long_options = (struct option *)malloc(sizeof(struct option) * (baseSize + mapSize));
+    
+    std::vector<std::string> optNames;
+    optNames.reserve(mapSize);
+    
+    MapOfStrOptions::const_iterator iter;
+    for (iter = params->begin(); iter != params->end(); iter++) {
+        // Double check that back and forth convertion is correct
+        assert(toCamelCase(fromCamelCase(iter->first)) == iter->first);
+        
+        optNames.push_back(fromCamelCase(iter->first));
+        long_options[i].name = optNames.at(i).c_str();
+        OptionBool *optBool = dynamic_cast<OptionBool *>(iter->second);
+        long_options[i].has_arg = (optBool) ? no_argument : required_argument;
         long_options[i].flag = 0;
-        long_options[i].val = accelerate(opts[i].name);
-        if (long_options[i].val && long_options[i].val < 0xFF) {
-            optstr[j++] = long_options[i].val;
-            if (long_options[i].has_arg > 0) {
-                optstr[j++] = ':';
-            }
-            if (long_options[i].has_arg > 1) {
-                optstr[j++] = ':';
-            }
-            optstr[j] = 0;
-        }
+        long_options[i].val = 0;
+        i++;
     }
-    */
-
-    static struct option long_options[] = { { "adjust-page-height", no_argument, &adjust_page_height, 1 },
-        { "all-pages", no_argument, &all_pages, 1 }, { "app-xpath-query", required_argument, 0, 0 },
-        { "border", required_argument, 0, 'b' }, { "choice-xpath-query", required_argument, 0, 0 },
-        { "even-note-spacing", no_argument, &even_note_spacing, 1 }, { "font", required_argument, 0, 0 },
-        { "format", required_argument, 0, 'f' }, { "help", no_argument, &show_help, 1 },
-        { "hum-type", no_argument, &hum_type, 1 }, { "ignore-layout", no_argument, &ignore_layout, 1 },
-        { "mdiv-xpath-query", required_argument, 0, 0 }, { "no-layout", no_argument, &no_layout, 1 },
-        { "mm-output", no_argument, &mm_output, 1 }, { "no-mei-hdr", no_argument, &no_mei_hdr, 1 },
-        { "no-justification", no_argument, &no_justification, 1 }, { "outfile", required_argument, 0, 'o' },
-        { "page", required_argument, 0, 0 }, { "page-height", required_argument, 0, 'h' },
-        { "page-width", required_argument, 0, 'w' }, { "resources", required_argument, 0, 'r' },
-        { "scale", required_argument, 0, 's' }, { "show-bounding-boxes", no_argument, &show_bounding_boxes, 1 },
-        { "spacing-linear", required_argument, 0, 0 }, { "spacing-non-linear", required_argument, 0, 0 },
-        { "spacing-staff", required_argument, 0, 0 }, { "spacing-system", required_argument, 0, 0 },
-        { "type", required_argument, 0, 't' }, { "version", no_argument, &show_version, 1 },
-        { "xml-id-seed", required_argument, 0, 0 }, { 0, 0, 0, 0 } };
-
+    
+    assert(i == mapSize);
+    for (; i < mapSize + baseSize; i++) {
+        long_options[i].name = base_options[i - mapSize].name;
+        long_options[i].has_arg = base_options[i - mapSize].has_arg;
+        long_options[i].flag = base_options[i - mapSize].flag;
+        long_options[i].val = base_options[i - mapSize].val;
+    }
+    
+    for (i = 0; i < mapSize + baseSize; i++) {
+        LogMessage("%s", long_options[i].name);
+    }
+    
+    int c;
+    std::string key;
     int option_index = 0;
-    while ((c = getopt_long(argc, argv, "b:f:h:o:p:r:s:t:w:v", long_options, &option_index)) != -1) {
+    Option *opt = NULL;
+    OptionBool *optBool = NULL;
+    while ((c = getopt_long(argc, argv, "?b:f:h:o:p:r:s:t:w:vx:", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
-                /*
-                if (long_options[option_index].flag != 0)
-                    break;
-                else if (strcmp(long_options[option_index].name, "app-xpath-query") == 0) {
-                    cout << string(optarg) << endl;
-                    appXPathQueries.push_back(string(optarg));
+                key = long_options[option_index].name;
+                LogMessage(key.c_str());
+                opt = params->at(toCamelCase(key));
+                optBool = dynamic_cast<OptionBool *>(opt);
+                if (optBool) {
+                    optBool->SetValue(true);
+                    LogDebug("Setting option %s with true", long_options[option_index].name);
                 }
-                else if (strcmp(long_options[option_index].name, "choice-xpath-query") == 0) {
-                    cout << string(optarg) << endl;
-                    choiceXPathQueries.push_back(string(optarg));
+                else if (opt) {
+                    opt->SetValue(optarg);
+                    LogDebug("Setting option %s with %s", long_options[option_index].name, optarg);
                 }
-                if (strcmp(long_options[option_index].name, "font") == 0) {
-                    font = string(optarg);
-                }
-                else if (strcmp(long_options[option_index].name, "mdiv-xpath-query") == 0) {
-                    cout << string(optarg) << endl;
-                    toolkit.SetMdivXPathQuery(string(optarg));
-                }
-                else if (strcmp(long_options[option_index].name, "page") == 0) {
-                    page = atoi(optarg);
-                }
-                else if (strcmp(long_options[option_index].name, "spacing-linear") == 0) {
-                    if (!toolkit.SetSpacingLinear(atof(optarg))) {
-                        exit(1);
-                    }
-                }
-                else if (strcmp(long_options[option_index].name, "spacing-non-linear") == 0) {
-                    if (!toolkit.SetSpacingNonLinear(atof(optarg))) {
-                        exit(1);
-                    }
-                }
-                else if (strcmp(long_options[option_index].name, "spacing-staff") == 0) {
-                    if (!toolkit.SetSpacingStaff(atoi(optarg))) {
-                        exit(1);
-                    }
-                }
-                else if (strcmp(long_options[option_index].name, "spacing-system") == 0) {
-                    if (!toolkit.SetSpacingSystem(atoi(optarg))) {
-                        exit(1);
-                    }
-                }
-                else if (strcmp(long_options[option_index].name, "xml-id-seed") == 0) {
-                    Object::SeedUuid(atoi(optarg));
+                else {
+                    LogError("Something went wrong with option %s", long_options[option_index].name);
+                    exit(1);
                 }
                 break;
-                */
 
             /*
             case 'b':
@@ -366,6 +354,10 @@ int main(int argc, char **argv)
                 }
                 break;
             */
+                
+            case 'x':
+                Object::SeedUuid(atoi(optarg));
+                break;
 
             case '?':
                 display_usage();

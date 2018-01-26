@@ -263,7 +263,7 @@ typedef std::vector<TextElement *> ArrayOfTextElements;
 
 typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
     
-typedef std::map<std::string, const Option*> MapOfStrStyleParams;
+typedef std::map<std::string, Option*> MapOfStrOptions;
 
 //----------------------------------------------------------------------------
 // Global defines
