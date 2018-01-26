@@ -1187,37 +1187,37 @@ char Doc::GetLeftPosition() const
 void Doc::SetPageHeight(int pageHeight)
 {
     m_pageHeight = pageHeight * DEFINITION_FACTOR;
-};
+}
 
 void Doc::SetPageWidth(int pageWidth)
 {
     m_pageWidth = pageWidth * DEFINITION_FACTOR;
-};
+}
 
 void Doc::SetPageLeftMar(short pageLeftMar)
 {
     m_pageLeftMar = pageLeftMar * DEFINITION_FACTOR;
-};
+}
 
 void Doc::SetPageRightMar(short pageRightMar)
 {
     m_pageRightMar = pageRightMar * DEFINITION_FACTOR;
-};
+}
 
 void Doc::SetPageTopMar(short pageTopMar)
 {
     m_pageTopMar = pageTopMar * DEFINITION_FACTOR;
-};
+}
 
 void Doc::SetSpacingStaff(short spacingStaff)
 {
     m_spacingStaff = spacingStaff;
-};
+}
 
 void Doc::SetSpacingSystem(short spacingSystem)
 {
     m_spacingSystem = spacingSystem;
-};
+}
 
 Page *Doc::SetDrawingPage(int pageIdx)
 {

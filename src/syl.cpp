@@ -157,6 +157,6 @@ int Syl::ResetDrawing(FunctorParams *functorParams)
 
     // Pass it to the pseudo functor of the interface
     return TimeSpanningInterface::InterfaceResetDrawing(functorParams, this);
-};
+}
 
 } // namespace vrv

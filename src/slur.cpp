@@ -113,6 +113,6 @@ int Slur::ResetDrawing(FunctorParams *functorParams)
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 } // namespace vrv

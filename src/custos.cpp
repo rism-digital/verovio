@@ -45,7 +45,7 @@ int Custos::ResetDrawing(FunctorParams *functorParams)
     PositionInterface::InterfaceResetDrawing(functorParams, this);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Custos::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

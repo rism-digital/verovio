@@ -110,13 +110,13 @@ void View::Next(bool forward)
 int View::ToDeviceContextX(int i)
 {
     return i;
-}; // the same
+} // the same
 
 /** x value in the Logical world */
 int View::ToLogicalX(int i)
 {
     return i;
-};
+}
 
 /** y value in the View */
 int View::ToDeviceContextY(int i)

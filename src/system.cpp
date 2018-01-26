@@ -223,7 +223,7 @@ int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
