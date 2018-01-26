@@ -2331,6 +2331,33 @@ data_TEXTRENDITIONLIST AttConverter::StrToTextrenditionlist(std::string value, b
     return TEXTRENDITIONLIST_NONE;
 }
 
+std::string AttConverter::VerticalalignmentToStr(data_VERTICALALIGNMENT data) const
+{
+    std::string value;
+    switch (data) {
+        case VERTICALALIGNMENT_top: value = "top"; break;
+        case VERTICALALIGNMENT_middle: value = "middle"; break;
+        case VERTICALALIGNMENT_bottom: value = "bottom"; break;
+        case VERTICALALIGNMENT_baseline: value = "baseline"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.VERTICALALIGNMENT", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_VERTICALALIGNMENT AttConverter::StrToVerticalalignment(std::string value, bool logWarning) const
+{
+    if (value == "top") return VERTICALALIGNMENT_top;
+    if (value == "middle") return VERTICALALIGNMENT_middle;
+    if (value == "bottom") return VERTICALALIGNMENT_bottom;
+    if (value == "baseline") return VERTICALALIGNMENT_baseline;
+    if (logWarning)
+        LogWarning("Unsupported value '%s' for data.VERTICALALIGNMENT", value.c_str());
+    return VERTICALALIGNMENT_NONE;
+}
+
 std::string AttConverter::AccidLogFuncToStr(accidLog_FUNC data) const
 {
     std::string value;

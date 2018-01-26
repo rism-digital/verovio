@@ -461,18 +461,21 @@ public:
  * member 1: the staffIdx
  * member 2: the staffN
  * member 3: the cumulated shift for the default alignment
+ * member 4: the functor (for redirecting from page running elements)
  * member 4: the end functor (for redirecting from measure)
  * member 5: the doc
  **/
 
 class AlignVerticallyParams : public FunctorParams {
 public:
-    AlignVerticallyParams(Doc *doc, Functor *functorEnd)
+    AlignVerticallyParams(Doc *doc, Functor *functor, Functor *functorEnd)
     {
         m_systemAligner = NULL;
         m_staffIdx = 0;
         m_staffN = 0;
         m_cumulatedShift = 0;
+        m_pageWidth = 0;
+        m_functor = functor;
         m_functorEnd = functorEnd;
         m_doc = doc;
     }
@@ -480,6 +483,8 @@ public:
     int m_staffIdx;
     int m_staffN;
     int m_cumulatedShift;
+    int m_pageWidth;
+    Functor *m_functor;
     Functor *m_functorEnd;
     Doc *m_doc;
 };
@@ -677,12 +682,20 @@ public:
         m_currentPage = currentPage;
         m_shift = 0;
         m_pageHeight = 0;
+        m_pgHeadHeight = 0;
+        m_pgFootHeight = 0;
+        m_pgHead2Height = 0;
+        m_pgFoot2Height = 0;
     }
     Page *m_contentPage;
     Doc *m_doc;
     Page *m_currentPage;
     int m_shift;
     int m_pageHeight;
+    int m_pgHeadHeight;
+    int m_pgFootHeight;
+    int m_pgHead2Height;
+    int m_pgFoot2Height;
 };
 
 //----------------------------------------------------------------------------

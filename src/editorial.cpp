@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "controlelement.h"
+#include "fig.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"

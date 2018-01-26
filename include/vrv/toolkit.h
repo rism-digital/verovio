@@ -43,6 +43,9 @@ public:
     Toolkit(bool initFont = true);
     virtual ~Toolkit();
     ///@}
+    
+    /** We just use the doc uuid as uuid */
+    std::string GetUuid() { return m_doc.GetUuid(); }
 
     /**
      * Set the resource path. To be called if the constructor had initFont=false.
@@ -181,16 +184,6 @@ public:
      * Returns 0 if no element is found.
      */
     int GetTimeForElement(const std::string &xmlId);
-
-    /**
-     * @name Set and get a std::string into a char * buffer.
-     * This is used for returning a string buffer to emscripten.
-     * The buffer is freed when reset or in MusController destructor.
-     */
-    ///@{
-    void SetCString(const std::string &data);
-    const char *GetCString();
-    ///@}
 
     /**
      * @name Set and get the border
@@ -448,7 +441,6 @@ private:
     bool m_showBoundingBoxes;
 
     static char *m_humdrumBuffer;
-    char *m_cString;
 };
 
 } // namespace vrv

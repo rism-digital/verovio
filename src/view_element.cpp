@@ -46,6 +46,7 @@
 #include "style.h"
 #include "syl.h"
 #include "system.h"
+#include "textelement.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
@@ -289,7 +290,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
         // Skip it if we do not have it in the font (for now - we should log / document this somewhere)
         if (code == 0) {
-            articPart->SetEmptyBB(true);
+            articPart->SetEmptyBB();
             continue;
         }
 
@@ -1247,13 +1248,14 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
     }
 
-    bool setX = false;
-    bool setY = false;
-    int x = syl->GetDrawingX();
-    int y = syl->GetDrawingY();
+    TextDrawingParams params;
+    params.m_x = syl->GetDrawingX();
+    params.m_y = syl->GetDrawingY();
+    assert(dc->GetFont());
+    params.m_pointSize = dc->GetFont()->GetPointSize();
 
-    dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y));
-    DrawTextChildren(dc, syl, ToDeviceContextX(x), ToDeviceContextY(y), setX, setY);
+    dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
+    DrawTextChildren(dc, syl, params);
     dc->EndText();
 
     dc->ResetFont();

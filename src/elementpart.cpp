@@ -134,20 +134,20 @@ Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code
 }
 
 //----------------------------------------------------------------------------
-// Num
+// TupletNum
 //----------------------------------------------------------------------------
 
-Num::Num() : LayerElement("num-")
+TupletNum::TupletNum() : LayerElement("num-")
 {
 
     Reset();
 }
 
-Num::~Num()
+TupletNum::~TupletNum()
 {
 }
 
-void Num::Reset()
+void TupletNum::Reset()
 {
     LayerElement::Reset();
 }
@@ -236,7 +236,7 @@ int Flag::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 };
 
-int Num::ResetDrawing(FunctorParams *functorParams)
+int TupletNum::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);

@@ -46,6 +46,7 @@
 #include "system.h"
 #include "tempo.h"
 #include "text.h"
+#include "textelement.h"
 #include "tie.h"
 #include "timeinterface.h"
 #include "trill.h"
@@ -1531,11 +1532,14 @@ void View::DrawSylConnector(
         // nothing to adjust
     }
 
+    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instanciate a temporary object
+    // in order not to reset the Syl bounding box.
+    Syl sylConnector;
     if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     }
     else
-        dc->StartGraphic(syl, "spanning-connector", "");
+        dc->StartGraphic(&sylConnector, "spanning-connector", "");
 
     dc->DeactivateGraphic();
 
@@ -1546,7 +1550,7 @@ void View::DrawSylConnector(
         dc->EndResumedGraphic(graphic, this);
     }
     else
-        dc->EndGraphic(syl, this);
+        dc->EndGraphic(&sylConnector, this);
 }
 
 void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff)
@@ -1717,30 +1721,31 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         dirTxt.SetStyle(FONTSTYLE_italic);
     }
 
+    TextDrawingParams params;
+
     // If we have not timestamp
-    int x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
+    params.m_x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
 
-    bool setX = false;
-    bool setY = false;
-
-    char alignment = dir->GetAlignment();
+    data_HORIZONTALALIGNMENT alignment = dir->GetChildRendAlignment();
     // Dir are left aligned by default (with both @tstamp and @startid)
-    if (alignment == 0) alignment = LEFT;
+    if (alignment == HORIZONTALALIGNMENT_NONE) alignment = HORIZONTALALIGNMENT_left;
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dir->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, dir->GetStart(), *staffIter);
 
-        int y = dir->GetDrawingY();
+        params.m_y = dir->GetDrawingY();
+        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
-        dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+        dirTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&dirTxt);
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
-        DrawTextChildren(dc, dir, x, y, setX, setY);
+        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+
+        DrawTextChildren(dc, dir, params);
         dc->EndText();
 
         dc->ResetFont();
@@ -1774,17 +1779,16 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         dynamTxt.SetStyle(FONTSTYLE_italic);
     }
 
+    TextDrawingParams params;
+
     // If we have not timestamp
-    int x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
+    params.m_x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
 
-    bool setX = false;
-    bool setY = false;
-
-    char alignment = dynam->GetAlignment();
+    data_HORIZONTALALIGNMENT alignment = dynam->GetChildRendAlignment();
     // Dynam are left aligned by default;
     if (alignment == 0) {
         // centre the dynam only with @stratid
-        alignment = (dynam->GetStart()->Is(TIMESTAMP_ATTR)) ? LEFT : CENTER;
+        alignment = (dynam->GetStart()->Is(TIMESTAMP_ATTR)) ? HORIZONTALALIGNMENT_left : HORIZONTALALIGNMENT_center;
     }
 
     std::vector<Staff *>::iterator staffIter;
@@ -1792,24 +1796,25 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dynam, dynam->GetStart(), *staffIter);
 
-        int y = dynam->GetDrawingY();
+        params.m_y = dynam->GetDrawingY();
+        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
-        dynamTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+        dynamTxt.SetPointSize(params.m_pointSize);
 
         // If the dynamic is a symbol (pp, mf, etc.) draw it as one smufl string. This will not take into account
         // editorial element within the dynam as it would with text. Also, it is center only if it is a symbol.
         if (isSymbolOnly) {
-            bool centered = (alignment == CENTER) ? true : false;
+            bool centered = (alignment == HORIZONTALALIGNMENT_center) ? true : false;
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-            DrawSmuflString(dc, x, y, dynamSymbol, centered, (*staffIter)->m_drawingStaffSize);
+            DrawSmuflString(dc, params.m_x, params.m_y, dynamSymbol, centered, (*staffIter)->m_drawingStaffSize);
             dc->ResetFont();
         }
         else {
             dc->SetBrush(m_currentColour, AxSOLID);
             dc->SetFont(&dynamTxt);
 
-            dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
-            DrawTextChildren(dc, dynam, x, y, setX, setY);
+            dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+            DrawTextChildren(dc, dynam, params);
             dc->EndText();
 
             dc->ResetFont();
@@ -1820,7 +1825,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     dc->EndGraphic(dynam, this);
 }
 
-void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, int x, int y, bool &setX, bool &setY)
+void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &params)
 {
     assert(dc);
     assert(fb);
@@ -1838,21 +1843,21 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, int x, int y, bool &s
 
     Object *current;
     for (current = fb->GetFirst(); current; current = fb->GetNext()) {
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
+        dc->StartText(ToDeviceContextX(params.m_y), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
         if (current->Is(FIGURE)) {
             // dynamic_cast assert in DrawF
-            DrawF(dc, dynamic_cast<F *>(current), x, y, setX, setY);
+            DrawF(dc, dynamic_cast<F *>(current), params);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawLayerEditorialElement
-            DrawFbEditorialElement(dc, dynamic_cast<EditorialElement *>(current), x, y, setX, setY);
+            DrawFbEditorialElement(dc, dynamic_cast<EditorialElement *>(current), params);
         }
         else {
             assert(false);
         }
         dc->EndText();
 
-        y -= (descender + height);
+        params.m_y -= (descender + height);
     }
 
     dc->ResetFont();
@@ -1930,17 +1935,16 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         harmTxt.SetFaceName("Times");
     }
 
+    TextDrawingParams params;
+
     // If we have not timestamp
-    int x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
+    params.m_x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
 
-    bool setX = false;
-    bool setY = false;
-
-    char alignment = harm->GetAlignment();
+    data_HORIZONTALALIGNMENT alignment = harm->GetChildRendAlignment();
     // Harm are centered aligned by default;
     if (alignment == 0) {
         // centre the harm only with @stratid
-        alignment = (harm->GetStart()->Is(TIMESTAMP_ATTR)) ? LEFT : CENTER;
+        alignment = (harm->GetStart()->Is(TIMESTAMP_ATTR)) ? HORIZONTALALIGNMENT_left : HORIZONTALALIGNMENT_center;
     }
 
     std::vector<Staff *>::iterator staffIter;
@@ -1948,19 +1952,21 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), harm, harm->GetStart(), *staffIter);
 
-        int y = harm->GetDrawingY();
+        params.m_y = harm->GetDrawingY();
 
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
-            DrawFb(dc, *staffIter, dynamic_cast<Fb *>(harm->GetFirst()), x, y, setX, setY);
+            DrawFb(dc, *staffIter, dynamic_cast<Fb *>(harm->GetFirst()), params);
         }
         else {
-            harmTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+            params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
+
+            harmTxt.SetPointSize(params.m_pointSize);
 
             dc->SetBrush(m_currentColour, AxSOLID);
             dc->SetFont(&harmTxt);
 
-            dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
-            DrawTextChildren(dc, harm, x, y, setX, setY);
+            dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+            DrawTextChildren(dc, harm, params);
             dc->EndText();
 
             dc->ResetFont();
@@ -2131,8 +2137,10 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         tempoTxt.SetWeight(FONTWEIGHT_bold);
     }
 
+    TextDrawingParams params;
+
     // If we have not timestamp
-    int x = measure->GetDrawingX();
+    params.m_x = measure->GetDrawingX();
     // First try to see if we have a meter sig attribute for this measure
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
     Alignment *pos
@@ -2144,30 +2152,28 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     }
     // if we found one, use it
     if (pos) {
-        x += pos->GetXRel();
+        params.m_x += pos->GetXRel();
     }
 
-    bool setX = false;
-    bool setY = false;
-
-    char alignment = tempo->GetAlignment();
+    data_HORIZONTALALIGNMENT alignment = tempo->GetChildRendAlignment();
     // Tempo are left aligned by default;
-    if (alignment == 0) alignment = LEFT;
+    if (alignment == 0) alignment = HORIZONTALALIGNMENT_left;
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = tempo->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), tempo, tempo->GetStart(), *staffIter);
 
-        tempoTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+        params.m_y = tempo->GetDrawingY();
+        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
-        int y = tempo->GetDrawingY();
+        tempoTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&tempoTxt);
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
-        DrawTextChildren(dc, tempo, x, y, setX, setY);
+        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+        DrawTextChildren(dc, tempo, params);
         dc->EndText();
 
         dc->ResetFont();
@@ -2454,17 +2460,21 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << ")";
 
             Text text;
+            text.SetParent(ending);
             text.SetText(UTF8to16(strStream.str()));
-
-            bool setX = false;
-            bool setY = false;
 
             int textX = x1;
             if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
                 textX += m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
             }
-            dc->StartText(ToDeviceContextX(textX), ToDeviceContextY(y1), LEFT);
-            DrawTextElement(dc, &text, textX, y1, setX, setY);
+
+            TextDrawingParams params;
+            params.m_x = textX;
+            params.m_y = y1;
+            params.m_pointSize = currentFont.GetPointSize();
+
+            dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
+            DrawTextElement(dc, &text, params);
             dc->EndText();
         }
 

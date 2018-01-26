@@ -63,6 +63,7 @@
 #include "octave.h"
 #include "page.h"
 #include "pedal.h"
+#include "rend.h"
 #include "rest.h"
 #include "score.h"
 #include "section.h"

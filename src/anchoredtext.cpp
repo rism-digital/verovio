@@ -43,7 +43,7 @@ void AnchoredText::Reset()
 
 void AnchoredText::AddChild(Object *child)
 {
-    if (child->IsTextElement()) {
+    if (child->Is(TEXT)) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {

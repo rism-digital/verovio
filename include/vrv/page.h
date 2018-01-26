@@ -15,6 +15,7 @@ namespace vrv {
 
 class DeviceContext;
 class PrepareProcessingListsParams;
+class RunningElement;
 class Staff;
 class System;
 
@@ -59,6 +60,15 @@ public:
     ///@{
     double GetPPUFactor() const { return m_PPUFactor; }
     void SetPPUFactor(double PPUFactor) { m_PPUFactor = PPUFactor; }
+    ///@}
+
+    /**
+     * @name Getter header and footer.
+     * Looks if the page is the first one or not
+     */
+    ///@{
+    RunningElement *GetHeader() const;
+    RunningElement *GetFooter() const;
     ///@}
 
     /**
@@ -132,6 +142,23 @@ public:
      * Apply the Pixel Per Unit factor of the page to its elements.
      */
     virtual int ApplyPPUFactor(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetVerticalAlignment
+     */
+    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+
+    /**
+     * See Object::AlignVertically
+     */
+    ///@{
+    virtual int AlignVerticallyEnd(FunctorParams *functorParams);
+    ///@}
+
+    /**
+     * See Object::AlignSystems
+     */
+    virtual int AlignSystems(FunctorParams *functorParams);
 
 private:
     /**

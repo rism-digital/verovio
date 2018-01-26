@@ -281,6 +281,45 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttSectionGes
+//----------------------------------------------------------------------------
+
+class AttSectionGes : public Att {
+public:
+    AttSectionGes();
+    virtual ~AttSectionGes();
+
+    /** Reset the default values for the attribute class **/
+    void ResetSectionGes();
+
+    /** Read the values for the attribute class **/
+    bool ReadSectionGes(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteSectionGes(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetAttacca(data_BOOLEAN attacca_) { m_attacca = attacca_; }
+    data_BOOLEAN GetAttacca() const { return m_attacca; }
+    bool HasAttacca() const;
+    ///@}
+
+private:
+    /**
+     * Indicates that the performance of the next section should begin immediately
+     * following this one.
+     **/
+    data_BOOLEAN m_attacca;
+
+    /* include <attattacca> */
+};
+
+//----------------------------------------------------------------------------
 // AttTimestampGestural
 //----------------------------------------------------------------------------
 

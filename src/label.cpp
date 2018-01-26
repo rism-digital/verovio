@@ -39,7 +39,7 @@ void Label::Reset()
 
 void Label::AddChild(Object *child)
 {
-    if (child->IsTextElement()) {
+    if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else {
@@ -72,7 +72,7 @@ void LabelAbbr::Reset()
 
 void LabelAbbr::AddChild(Object *child)
 {
-    if (child->IsTextElement()) {
+    if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else {
