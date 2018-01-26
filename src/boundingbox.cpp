@@ -49,7 +49,7 @@ ClassId BoundingBox::GetClassId() const
     // we should always have the method overridden
     assert(false);
     return BOUNDING_BOX;
-};
+}
 
 bool BoundingBox::Is(const std::vector<ClassId> &classIds) const
 {

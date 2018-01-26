@@ -154,7 +154,7 @@ int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
     this->Process(&prepareDrawingCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Rest::CalcDots(FunctorParams *functorParams)
 {
@@ -226,7 +226,7 @@ int Rest::ResetDrawing(FunctorParams *functorParams)
     PositionInterface::InterfaceResetDrawing(functorParams, this);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Rest::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

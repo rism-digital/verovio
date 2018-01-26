@@ -55,7 +55,7 @@ pitchmap DarmsInput::PitchMap[] = {
     { 7, PITCHNAME_a }, { 7, PITCHNAME_b },
     /* 49 */ { 8, PITCHNAME_c }, { 8, PITCHNAME_d }, { 8, PITCHNAME_e }, { 8, PITCHNAME_f }, { 8, PITCHNAME_g },
     { 8, PITCHNAME_a }, { 8, PITCHNAME_b },
-};
+}
 
 DarmsInput::DarmsInput(Doc *doc, std::string filename) : FileInputStream(doc)
 {

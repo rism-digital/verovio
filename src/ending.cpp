@@ -119,7 +119,7 @@ int Ending::ResetDrawing(FunctorParams *functorParams)
     this->BoundaryStartInterface::InterfaceResetDrawing(functorParams);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Ending::CastOffSystems(FunctorParams *functorParams)
 {

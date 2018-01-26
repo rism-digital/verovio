@@ -67,7 +67,7 @@ int Dot::ResetDrawing(FunctorParams *functorParams)
 
     this->m_drawingNote = NULL;
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Dot::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

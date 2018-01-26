@@ -155,7 +155,7 @@ int Section::ResetDrawing(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 //----------------------------------------------------------------------------
 // Pb functor methods

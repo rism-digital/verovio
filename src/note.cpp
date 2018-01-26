@@ -761,7 +761,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     this->Process(&prepareDrawingCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Note::PrepareLyrics(FunctorParams *functorParams)
 {
@@ -794,7 +794,7 @@ int Note::ResetDrawing(FunctorParams *functorParams)
     m_flippedNotehead = false;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

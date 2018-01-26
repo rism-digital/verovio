@@ -110,13 +110,13 @@ void View::Next(bool forward)
 int View::ToDeviceContextX(int i)
 {
     return i;
-}; // the same
+} // the same
 
 /** x value in the Logical world */
 int View::ToLogicalX(int i)
 {
     return i;
-};
+}
 
 /** y value in the View */
 int View::ToDeviceContextY(int i)
@@ -160,9 +160,6 @@ std::wstring View::IntToTimeSigFigures(unsigned short number)
 
 std::wstring View::IntToSmuflFigures(unsigned short number, int offset)
 {
-    // We do not convert more that FF values
-    if (number > 0xFFFF) number = 0xFFFF;
-
     std::wostringstream stream;
     stream << number;
     std::wstring str = stream.str();

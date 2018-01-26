@@ -233,7 +233,7 @@ int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
     m_drawingStaffDef = NULL;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
 {
@@ -326,7 +326,7 @@ int Staff::ResetDrawing(FunctorParams *functorParams)
     this->m_timeSpanningElements.clear();
     ClearLedgerLines();
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Staff::PrepareRpt(FunctorParams *functorParams)
 {
