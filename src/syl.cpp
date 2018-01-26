@@ -55,7 +55,7 @@ void Syl::Reset()
 
 void Syl::AddChild(Object *child)
 {
-    if (child->IsTextElement()) {
+    if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -131,14 +131,14 @@ int Syl::AdjustSylSpacing(FunctorParams *functorParams)
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
 
-    if (!this->HasUpdatedHorizontalBB()) {
+    if (!this->HasContentHorizontalBB()) {
         LogDebug("Syl %s is skipped in alignment - it is probably empty", this->GetUuid().c_str());
         return FUNCTOR_CONTINUE;
     }
 
     if (params->m_previousSyl) {
-        int overlap
-            = params->m_previousSyl->GetSelfRight() - this->GetSelfLeft() + params->m_doc->GetDrawingDoubleUnit(100);
+        int overlap = params->m_previousSyl->GetContentRight() - this->GetContentLeft()
+            + params->m_doc->GetDrawingDoubleUnit(100);
         if (overlap > 0) {
             params->m_overlapingSyl.push_back(
                 std::make_tuple(params->m_previousSyl->GetAlignment(), this->GetAlignment(), overlap));

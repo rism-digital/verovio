@@ -1101,6 +1101,18 @@ enum data_TEXTRENDITIONLIST {
 };
 
 /**
+ * MEI data.VERTICALALIGNMENT
+ */
+enum data_VERTICALALIGNMENT {
+    VERTICALALIGNMENT_NONE = 0,
+    VERTICALALIGNMENT_top,
+    VERTICALALIGNMENT_middle,
+    VERTICALALIGNMENT_bottom,
+    VERTICALALIGNMENT_baseline,
+    VERTICALALIGNMENT_MAX
+};
+
+/**
  * MEI att.accid.log@func
  */
 enum accidLog_FUNC {

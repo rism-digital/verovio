@@ -68,7 +68,6 @@ Toolkit::Toolkit(bool initFont)
     m_showBoundingBoxes = false;
     m_scoreBasedMei = false;
 
-    m_cString = NULL;
     m_humdrumBuffer = NULL;
 
     if (initFont) {
@@ -78,10 +77,6 @@ Toolkit::Toolkit(bool initFont)
 
 Toolkit::~Toolkit()
 {
-    if (m_cString) {
-        free(m_cString);
-        m_cString = NULL;
-    }
     if (m_humdrumBuffer) {
         free(m_humdrumBuffer);
         m_humdrumBuffer = NULL;
@@ -596,6 +591,11 @@ bool Toolkit::LoadData(const std::string &data)
         LogError("Error importing data");
         delete input;
         return false;
+    }
+
+    // generate the page header and footer if necessary
+    if (true) { // change this to an option
+        m_doc.GenerateHeaderAndFooter();
     }
 
     m_doc.SetPageHeight(this->GetPageHeight());
@@ -1114,22 +1114,6 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     return timeofElement;
 }
 
-void Toolkit::SetCString(const std::string &data)
-{
-    if (m_cString) {
-        free(m_cString);
-        m_cString = NULL;
-    }
-
-    m_cString = (char *)malloc(strlen(data.c_str()) + 1);
-
-    // something went wrong
-    if (!m_cString) {
-        return;
-    }
-    strcpy(m_cString, data.c_str());
-}
-
 void Toolkit::SetHumdrumBuffer(const char *data)
 {
     if (m_humdrumBuffer) {
@@ -1182,17 +1166,6 @@ void Toolkit::SetHumdrumBuffer(const char *data)
     strcpy(m_humdrumBuffer, data);
 #endif
 }
-
-const char *Toolkit::GetCString()
-{
-    if (m_cString) {
-        return m_cString;
-    }
-    else {
-        return "[unspecified]";
-    }
-}
-
 const char *Toolkit::GetHumdrumBuffer()
 {
     if (m_humdrumBuffer) {

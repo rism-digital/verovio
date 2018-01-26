@@ -90,9 +90,11 @@ Object::Object(const Object &object) : BoundingBox(object)
     for (i = 0; i < (int)object.m_children.size(); i++) {
         Object *current = object.m_children.at(i);
         Object *copy = current->Clone();
-        copy->Modify();
-        copy->SetParent(this);
-        m_children.push_back(copy);
+        if (copy) {
+            copy->Modify();
+            copy->SetParent(this);
+            m_children.push_back(copy);
+        }
     }
 }
 
@@ -1128,7 +1130,7 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 
     if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
 
-    if (!this->HasUpdatedBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
+    if (!this->HasSelfBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
 
     int refLeft = this->GetSelfLeft();
     if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
@@ -1196,7 +1198,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (!this->HasUpdatedBB()) {
+    if (!this->HasSelfBB()) {
         // if nothing was drawn, do not take it into account
         return FUNCTOR_CONTINUE;
     }

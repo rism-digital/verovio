@@ -18,6 +18,10 @@
 #include "devicecontextbase.h"
 #include "vrvdef.h"
 
+//----------------------------------------------------------------------------
+
+#include "pugixml.hpp"
+
 namespace vrv {
 
 class Glyph;
@@ -109,6 +113,13 @@ public:
     ///}
 
     /**
+     * @name Getters
+     */
+    ///@{
+    FontInfo *GetFont();
+    ///@}
+
+    /**
      * @name Getters for text extend (non-virtual)
      */
     ///@{
@@ -137,9 +148,11 @@ public:
     virtual void DrawRectangle(int x, int y, int width, int height) = 0;
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle) = 0;
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius) = 0;
-    virtual void DrawText(const std::string &text, const std::wstring wtext = L"") = 0;
+    virtual void DrawText(const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET)
+        = 0;
     virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false) = 0;
     virtual void DrawSpline(int n, Point points[]) = 0;
+    virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) = 0;
     virtual void DrawBackgroundImage(int x = 0, int y = 0) = 0;
     ///@}
 
@@ -155,14 +168,14 @@ public:
      * Font can be changed between called for DrawText
      */
     ///@{
-    virtual void StartText(int x, int y, char alignement = LEFT) = 0;
+    virtual void StartText(int x, int y, data_HORIZONTALALIGNMENT alignement = HORIZONTALALIGNMENT_left) = 0;
     virtual void EndText() = 0;
 
     /**
      * Move a text to the specified position, for example when starting a new line.
      * This method should be called only between a StartText and EndText call.
      */
-    virtual void MoveTextTo(int x, int y) = 0;
+    virtual void MoveTextTo(int x, int y, data_HORIZONTALALIGNMENT alignment) = 0;
 
     /**
      * @name Temporarily deactivate a graphic

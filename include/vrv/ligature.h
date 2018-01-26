@@ -25,9 +25,7 @@ namespace vrv {
  * It contains notes.
  */
 
-class Ligature : public LayerElement,
-                 public ObjectListInterface,
-                 public AttLigatureLog {
+class Ligature : public LayerElement, public ObjectListInterface, public AttLigatureLog {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -48,13 +46,13 @@ public:
      * Add children (notes or editorial markup)
      */
     virtual void AddChild(Object *object);
-                     
+
     /**
      * Return information about the note's position in the ligature
      * Assume that the note is in the ligature and does not check for that.
      */
     int PositionInLigature(Note *note);
-    
+
     /**
      * @name Return the first and last note in the ligature (NULL if empty)
      */
@@ -72,7 +70,7 @@ protected:
      * Clear the m_clusters vector and delete all the objects.
      */
     void ClearClusters();
-                     
+
     /**
      * Filter the flat list and keep only Note elements.
      */

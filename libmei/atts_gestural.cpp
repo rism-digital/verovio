@@ -378,6 +378,52 @@ bool AttScoreDefGes::HasTuneTemper() const
 /* include <atttune.temper> */
 
 //----------------------------------------------------------------------------
+// AttSectionGes
+//----------------------------------------------------------------------------
+
+AttSectionGes::AttSectionGes() : Att()
+{
+    ResetSectionGes();
+}
+
+AttSectionGes::~AttSectionGes()
+{
+}
+
+void AttSectionGes::ResetSectionGes()
+{
+    m_attacca = BOOLEAN_NONE;
+}
+
+bool AttSectionGes::ReadSectionGes(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("attacca")) {
+        this->SetAttacca(StrToBoolean(element.attribute("attacca").value()));
+        element.remove_attribute("attacca");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttSectionGes::WriteSectionGes(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasAttacca()) {
+        element.append_attribute("attacca") = BooleanToStr(this->GetAttacca()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttSectionGes::HasAttacca() const
+{
+    return (m_attacca != BOOLEAN_NONE);
+}
+
+/* include <attattacca> */
+
+//----------------------------------------------------------------------------
 // AttTimestampGestural
 //----------------------------------------------------------------------------
 
@@ -508,6 +554,14 @@ bool Att::SetGestural(Object *element, std::string attrType, std::string attrVal
             return true;
         }
     }
+    if (element->HasAttClass(ATT_SECTIONGES)) {
+        AttSectionGes *att = dynamic_cast<AttSectionGes *>(element);
+        assert(att);
+        if (attrType == "attacca") {
+            att->SetAttacca(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_TIMESTAMPGESTURAL)) {
         AttTimestampGestural *att = dynamic_cast<AttTimestampGestural *>(element);
         assert(att);
@@ -581,6 +635,13 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasTuneTemper()) {
             attributes->push_back(std::make_pair("tune.temper", att->TemperamentToStr(att->GetTuneTemper())));
+        }
+    }
+    if (element->HasAttClass(ATT_SECTIONGES)) {
+        const AttSectionGes *att = dynamic_cast<const AttSectionGes *>(element);
+        assert(att);
+        if (att->HasAttacca()) {
+            attributes->push_back(std::make_pair("attacca", att->BooleanToStr(att->GetAttacca())));
         }
     }
     if (element->HasAttClass(ATT_TIMESTAMPGESTURAL)) {

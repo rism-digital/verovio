@@ -39,7 +39,7 @@ public:
     /**
      * Check if the ControlElement has a Rend child and return its @halign equivalent (if any)
      */
-    char GetAlignment();
+    data_HORIZONTALALIGNMENT GetChildRendAlignment();
 
     //----------//
     // Functors //

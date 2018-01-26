@@ -69,6 +69,12 @@ void DeviceContext::SetFont(FontInfo *font)
     m_fontStack.push(font);
 }
 
+FontInfo *DeviceContext::GetFont()
+{
+    assert(m_fontStack.top());
+    return m_fontStack.top();
+}
+
 void DeviceContext::ResetPen()
 {
     m_penStack.pop();
