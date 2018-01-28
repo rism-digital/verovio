@@ -24,18 +24,8 @@
 //----------------------------------------------------------------------------
 
 namespace vrv {
-
-//----------------------------------------------------------------------------
-// Default layout values
-//----------------------------------------------------------------------------
-
-#define DEFAULT_SPACING_LINEAR 0.25
-#define MIN_SPACING_LINEAR 0.0
-#define MAX_SPACING_LINEAR 1.0
-
-#define DEFAULT_SPACING_NON_LINEAR 0.6
-#define MIN_SPACING_NON_LINEAR 0.0
-#define MAX_SPACING_NON_LINEAR 1.0
+    
+class OptionGrp;
 
 //----------------------------------------------------------------------------
 // Default scaling (%) and spacing (units) values
@@ -44,14 +34,6 @@ namespace vrv {
 #define DEFAULT_SCALE 100
 #define MIN_SCALE 1
 #define MAX_SCALE 1000
-
-#define DEFAULT_SPACING_STAFF 8
-#define MIN_SPACING_STAFF 0
-#define MAX_SPACING_STAFF 24
-
-#define DEFAULT_SPACING_SYSTEM 3
-#define MIN_SPACING_SYSTEM 0
-#define MAX_SPACING_SYSTEM 12
 
 //----------------------------------------------------------------------------
 // Options
@@ -88,7 +70,7 @@ namespace vrv {
 #define MENSURAL_LINEWIDTH_FACTOR 1.0
 
 //----------------------------------------------------------------------------
-// Options defines
+// Option defines
 //----------------------------------------------------------------------------
 
 enum style_MEASURENUMBER
@@ -135,7 +117,7 @@ public:
     // constructors and destructors
     OptionBool() {}
     virtual ~OptionBool() {}
-    void Init(bool defaultValue);
+    void Init(bool defaultValue, OptionGrp *grp = NULL);
     
     virtual bool SetValue(std::string value);
     
@@ -164,7 +146,7 @@ public:
     // constructors and destructors
     OptionDbl() {}
     virtual ~OptionDbl() {}
-    void Init(double defaultValue, double minValue, double maxValue);
+    void Init(double defaultValue, double minValue, double maxValue, OptionGrp *grp = NULL);
     
     virtual bool SetValue(std::string value);
     
@@ -197,7 +179,7 @@ public:
     // constructors and destructors
     OptionInt() {}
     virtual ~OptionInt() {}
-    void Init(int defaultValue, int minValue, int maxValue, bool definitionFactor = false);
+    void Init(int defaultValue, int minValue, int maxValue, bool definitionFactor = false, OptionGrp *grp = NULL);
     
     virtual bool SetValue(std::string value);
     
@@ -232,7 +214,7 @@ public:
     // constructors and destructors
     OptionString() {}
     virtual ~OptionString() {}
-    void Init(std::string defaultValue);
+    void Init(std::string defaultValue, OptionGrp *grp = NULL);
     
     virtual bool SetValue(std::string value);
     
@@ -260,7 +242,7 @@ public:
     // constructors and destructors
     OptionArray() {}
     virtual ~OptionArray() {}
-    void Init();
+    void Init(OptionGrp *grp = NULL);
     
     virtual bool SetValue(std::string value);
     
@@ -290,7 +272,7 @@ public:
     OptionMeasureNumber() {};
     virtual ~OptionMeasureNumber() {};
 
-    void Init(style_MEASURENUMBER defaultValue);
+    void Init(style_MEASURENUMBER defaultValue, OptionGrp *grp = NULL);
     
     virtual bool SetValue(std::string value);
     
@@ -320,7 +302,7 @@ public:
     virtual ~OptionStaffrel() {};
     
     // Alternate type style cannot have a restricted list of possible values
-    void Init(data_STAFFREL defaultValue);
+    void Init(data_STAFFREL defaultValue, OptionGrp *grp = NULL);
     
     virtual bool SetValue(std::string value);
     
@@ -351,7 +333,7 @@ public:
     OptionStaffrelBasic() {};
     virtual ~OptionStaffrelBasic() {};
 
-    void Init(data_STAFFREL_basic defaultValue, const std::vector<data_STAFFREL_basic> &values);
+    void Init(data_STAFFREL_basic defaultValue, const std::vector<data_STAFFREL_basic> &values, OptionGrp *grp = NULL);
 
     virtual bool SetValue(std::string value);
     
@@ -369,6 +351,33 @@ private:
 };
     
 //----------------------------------------------------------------------------
+// OptionGrp
+//----------------------------------------------------------------------------
+    
+/**
+ * This class is a base class of each styling parameter
+ */
+class OptionGrp {
+public:
+    // constructors and destructors
+    OptionGrp() {}
+    virtual ~OptionGrp() {}
+    
+    void SetLabel(const std::string &label) { m_label = label; }
+    std::string GetLabel() const { return m_label; }
+    
+    void AddOption(Option *option) { m_options.push_back(option); }
+    
+    const std::vector<Option *> *GetOptions() const { return &m_options; }
+public:
+    //
+protected:
+    std::string m_label;
+    std::vector<Option *> m_options;
+};
+
+    
+//----------------------------------------------------------------------------
 // Options
 //----------------------------------------------------------------------------
     
@@ -381,16 +390,19 @@ public:
     Options();
     virtual ~Options();
     
-    MapOfStrOptions *GetParams() { return &m_params; }
+    MapOfStrOptions *GetItems() { return &m_items; }
+    
+    std::vector<OptionGrp *> *GetGrps() { return &m_grps; }
 
 public:
     /**
      * Comments in implementation file options.cpp
      */
-    OptionArray m_appXPathQuery;
-    OptionArray m_choiceXPathQuery;
-    OptionString m_mdivXPathQuery;
 
+    /**
+     * General layout - to be sorted
+     */
+    OptionGrp m_generalLayout;
     OptionBool m_adjustPageHeight;
     OptionBool m_evenNoteSpacing;
     OptionString m_font;
@@ -399,7 +411,6 @@ public:
     OptionBool m_noLayout;
     OptionDbl m_spacingLinear;
     OptionDbl m_spacingNonLinear;
-    
     OptionInt m_unit;
     OptionBool m_landscape;
     OptionDbl m_staffLineWidth;
@@ -415,19 +426,28 @@ public:
     OptionInt m_pageTopMar;
     OptionInt m_spacingStaff;
     OptionInt m_spacingSystem;
-
     OptionInt m_minMeasureWidth;
     OptionDbl m_lyricSize;
     OptionDbl m_hairpinSize;
-
     OptionDbl m_tieThickness;
     OptionDbl m_minSlurHeight;
     OptionDbl m_maxSlurHeight;
     OptionDbl m_slurThickness;
-
     /** The left position */
     OptionDbl m_leftPosition;
+    
+    /**
+     * Selectors
+     */
+    OptionGrp m_selectors;
+    OptionArray m_appXPathQuery;
+    OptionArray m_choiceXPathQuery;
+    OptionString m_mdivXPathQuery;
 
+    /**
+     * Element margins
+     */
+    OptionGrp m_elementMargins;
     /** The layout left margin by element */
     OptionDbl m_leftMarginAccid;
     OptionDbl m_leftMarginBarLine;
@@ -447,7 +467,6 @@ public:
     OptionDbl m_leftMarginRest;
     /** The default left margin */
     OptionDbl m_leftMarginDefault;
-
     /** The layout right margin by element */
     OptionDbl m_rightMarginAccid;
     OptionDbl m_rightMarginBarLine;
@@ -467,16 +486,16 @@ public:
     OptionDbl m_rightMarginRest;
     /** The default right margin */
     OptionDbl m_rightMarginDefault;
-
     /** The default right margin */
     OptionDbl m_bottomMarginDefault;
-
     /** The default right margin */
     OptionDbl m_topMarginDefault;
     
 private:
     /** The array of style parameters */
-    MapOfStrOptions m_params;
+    MapOfStrOptions m_items;
+    
+    std::vector<OptionGrp *> m_grps;
     
     OptionMeasureNumber m_measureNumber;
 };

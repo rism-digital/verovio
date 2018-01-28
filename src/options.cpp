@@ -36,7 +36,7 @@ void Option::SetInfo(std::string title, std::string description)
 // OptionBool
 //----------------------------------------------------------------------------
 
-void OptionBool::Init(bool defaultValue)
+void OptionBool::Init(bool defaultValue, OptionGrp *grp)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
@@ -58,7 +58,7 @@ bool OptionBool::SetValue(bool value)
 // OptionDbl
 //----------------------------------------------------------------------------
 
-void OptionDbl::Init(double defaultValue, double minValue, double maxValue)
+void OptionDbl::Init(double defaultValue, double minValue, double maxValue, OptionGrp *grp)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
@@ -85,7 +85,7 @@ bool OptionDbl::SetValue(double value)
 // OptionInt
 //----------------------------------------------------------------------------
     
-void OptionInt::Init(int defaultValue, int minValue, int maxValue, bool definitionFactor)
+void OptionInt::Init(int defaultValue, int minValue, int maxValue, bool definitionFactor, OptionGrp *grp)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
@@ -124,7 +124,7 @@ bool OptionInt::SetValue(int value)
 // OptionMeasureNumber
 //----------------------------------------------------------------------------
     
-void OptionMeasureNumber::Init(style_MEASURENUMBER defaultValue)
+void OptionMeasureNumber::Init(style_MEASURENUMBER defaultValue, OptionGrp *grp)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
@@ -146,7 +146,7 @@ bool OptionMeasureNumber::SetValue(std::string value)
 // OptionString
 //----------------------------------------------------------------------------
     
-void OptionString::Init(std::string defaultValue)
+void OptionString::Init(std::string defaultValue, OptionGrp *grp)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
@@ -162,7 +162,7 @@ bool OptionString::SetValue(std::string value)
 // OptionArray
 //----------------------------------------------------------------------------
     
-void OptionArray::Init()
+void OptionArray::Init(OptionGrp *grp)
 {
     m_values.empty();
     m_defaultValues.empty();
@@ -187,7 +187,7 @@ bool OptionArray::SetValue(std::vector<std::string> const &values)
 // OptionStaffRel
 //----------------------------------------------------------------------------
     
-void OptionStaffrel::Init(data_STAFFREL defaultValue)
+void OptionStaffrel::Init(data_STAFFREL defaultValue, OptionGrp *grp)
 {
     m_value = defaultValue;
     m_defaultValue = defaultValue;
@@ -211,305 +211,309 @@ bool OptionStaffrel::SetValue(std::string value)
     
 Options::Options()
 {
-    /********* selectors *********/
-    
-    m_appXPathQuery.SetInfo("App xPath query", "Set the xPath query for selecting <app> child elements, for example: \"./rdg[contains(@source, 'source-id')]\"; by default the <lem> or the first <rdg> is selected");
-    m_appXPathQuery.Init();
-    m_params["appXPathQuery"] = &m_appXPathQuery;
-    
-    m_choiceXPathQuery.SetInfo("Choice xPath query", "Set the xPath query for selecting <choice> child elements, for example: \"./orig\"; by default the first child is selected");
-    m_choiceXPathQuery.Init();
-    m_params["choiceXPathQuery"] = &m_choiceXPathQuery;
-    
-    m_mdivXPathQuery.SetInfo("Mdiv xPath query", "Set the xPath query for selecting the <mdiv> to be rendered; only one <mdiv> can be rendered");
-    m_mdivXPathQuery.Init("");
-    m_params["mdivXPathQuery"] = &m_mdivXPathQuery;
-    
     /********* layout *********/
     
+    m_generalLayout.SetLabel("General layout options");
+    
     m_adjustPageHeight.SetInfo("Adjust page height", "Crop the page height to the height of the content");
-    m_adjustPageHeight.Init(false);
-    m_params["adjustPageHeight"] = &m_adjustPageHeight;
+    m_adjustPageHeight.Init(false, &m_generalLayout);
+    m_items["adjustPageHeight"] = &m_adjustPageHeight;
     
     m_evenNoteSpacing.SetInfo("Even note spacing", "Specify the linear spacing factor");
-    m_evenNoteSpacing.Init(false);
-    m_params["evenNoteSpacing"] = &m_evenNoteSpacing;
+    m_evenNoteSpacing.Init(false, &m_generalLayout);
+    m_items["evenNoteSpacing"] = &m_evenNoteSpacing;
     
     m_font.SetInfo("Font", "Set the music font");
-    m_font.Init("Leipzig");
-    m_params["font"] = &m_font;
+    m_font.Init("Leipzig", &m_generalLayout);
+    m_items["font"] = &m_font;
 
     m_ignoreLayout.SetInfo("Ignore layout", "Ignore all encoded layout information (if any) and fully recalculate the layout");
-    m_ignoreLayout.Init(false);
-    m_params["ignoreLayout"] = &m_ignoreLayout;
+    m_ignoreLayout.Init(false, &m_generalLayout);
+    m_items["ignoreLayout"] = &m_ignoreLayout;
     
     m_mmOutput.SetInfo("MM output", "Specify that the output in the SVG is given in mm (default is px)");
-    m_mmOutput.Init(false);
-    m_params["mmOutput"] = &m_mmOutput;
+    m_mmOutput.Init(false, &m_generalLayout);
+    m_items["mmOutput"] = &m_mmOutput;
     
     m_noLayout.SetInfo("No layout", "Ignore all encoded layout information (if any) and output one single page with one single system");
-    m_noLayout.Init(false);
-    m_params["noLayout"] = &m_noLayout;
+    m_noLayout.Init(false, &m_generalLayout);
+    m_items["noLayout"] = &m_noLayout;
 
     m_spacingLinear.SetInfo("Spacing linear", "Specify the linear spacing factor");
-    m_spacingLinear.Init(0.25, 0.0, 1.0);
-    m_params["spacingLinear"] = &m_spacingLinear;
+    m_spacingLinear.Init(0.25, 0.0, 1.0, &m_generalLayout);
+    m_items["spacingLinear"] = &m_spacingLinear;
     
     m_spacingNonLinear.SetInfo("Spacing non linear", "Specify the non-linear spacing factor");
-    m_spacingNonLinear.Init(0.6, 0.0, 1.0);
-    m_params["spacingNonLinear"] = &m_spacingNonLinear;
+    m_spacingNonLinear.Init(0.6, 0.0, 1.0, &m_generalLayout);
+    m_items["spacingNonLinear"] = &m_spacingNonLinear;
     
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
-    m_unit.Init(9, 6, 20, true);
-    m_params["unit"] = &m_unit;
+    m_unit.Init(9, 6, 20, true, &m_generalLayout);
+    m_items["unit"] = &m_unit;
     
     m_landscape.SetInfo("Landscape orientation", "The landscape paper orientation flag");
     m_landscape.Init(false);
-    m_params["landscape"] = &m_landscape;
+    m_items["landscape"] = &m_landscape;
     
     m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
-    m_staffLineWidth.Init(0.15, 0.10, 0.30);
-    m_params["staffLineWidth"] = &m_staffLineWidth;
+    m_staffLineWidth.Init(0.15, 0.10, 0.30, &m_generalLayout);
+    m_items["staffLineWidth"] = &m_staffLineWidth;
     
     m_stemWidth.SetInfo("Stem width", "The stem width");
-    m_stemWidth.Init(0.20, 0.10, 0.);
-    m_params["stemWidth"] = &m_stemWidth;
+    m_stemWidth.Init(0.20, 0.10, 0.0, &m_generalLayout);
+    m_items["stemWidth"] = &m_stemWidth;
     
     m_barLineWidth.SetInfo("Bar line width", "The barLine width");
-    m_barLineWidth.Init(0.30, 0.10, 0.80);
-    m_params["barLineWidth"] = &m_barLineWidth;
+    m_barLineWidth.Init(0.30, 0.10, 0.80, &m_generalLayout);
+    m_items["barLineWidth"] = &m_barLineWidth;
     
     m_beamMaxSlope.SetInfo("Beam max slope", "The maximum beam slope");
-    m_beamMaxSlope.Init(10, 1, 20);
-    m_params["beamMaxSlope"] = &m_beamMaxSlope;
+    m_beamMaxSlope.Init(10, 1, 20, false, &m_generalLayout);
+    m_items["beamMaxSlope"] = &m_beamMaxSlope;
     
     m_beamMinSlope.SetInfo("Beam min slope", "The minimum beam slope");
-    m_beamMinSlope.Init(0, 0, 0);
-    m_params["beamMinSlope"] = &m_beamMinSlope;
+    m_beamMinSlope.Init(0, 0, 0, false, &m_generalLayout);
+    m_items["beamMinSlope"] = &m_beamMinSlope;
     
     m_graceFactor.SetInfo("Grace factor", "The grace size ratio numerator");
-    m_graceFactor.Init(0.75, 0.5, 1.0);
-    m_params["graceFactor"] = &m_graceFactor;
+    m_graceFactor.Init(0.75, 0.5, 1.0, &m_generalLayout);
+    m_items["graceFactor"] = &m_graceFactor;
    
     m_pageHeight.SetInfo("Page height", "The page height");
-    m_pageHeight.Init(2970, 100, 60000, true);
-    m_params["pageHeight"] = &m_pageHeight;
+    m_pageHeight.Init(2970, 100, 60000, true, &m_generalLayout);
+    m_items["pageHeight"] = &m_pageHeight;
     
     m_pageWidth.SetInfo("Page width", "The page width");
-    m_pageWidth.Init(2100, 100, 60000, true);
-    m_params["pageWidth"] = &m_pageWidth;
+    m_pageWidth.Init(2100, 100, 60000, true, &m_generalLayout);
+    m_items["pageWidth"] = &m_pageWidth;
    
     m_pageLeftMar.SetInfo("Page left mar", "The page left margin");
     m_pageLeftMar.Init(50, 0, 500, true);
-    m_params["pageLeftMar"] = &m_pageLeftMar;
+    m_items["pageLeftMar"] = &m_pageLeftMar;
     
     m_pageRightMar.SetInfo("Page right mar", "The page right margin");
-    m_pageRightMar.Init(50, 0, 500, true);
-    m_params["pageRightMar"] = &m_pageRightMar;
+    m_pageRightMar.Init(50, 0, 500, true, &m_generalLayout);
+    m_items["pageRightMar"] = &m_pageRightMar;
     
     m_pageTopMar.SetInfo("Page top mar", "The page top margin");
-    m_pageTopMar.Init(50, 0, 500, true);
-    m_params["pageTopMar"] = &m_pageTopMar;
+    m_pageTopMar.Init(50, 0, 500, true, &m_generalLayout);
+    m_items["pageTopMar"] = &m_pageTopMar;
     
     m_spacingStaff.SetInfo("Spacing staff", "The staff minimal spacing in MEI units");
-    m_spacingStaff.Init(8, 0, 24);
-    m_params["spacingStaff"] = &m_spacingStaff;
+    m_spacingStaff.Init(8, 0, 24, false, &m_generalLayout);
+    m_items["spacingStaff"] = &m_spacingStaff;
     
     m_spacingSystem.SetInfo("Spacing system", "The system minimal spacing");
-    m_spacingSystem.Init(3, 0, 12);
-    m_params["spacingSystem"] = &m_spacingSystem;
+    m_spacingSystem.Init(3, 0, 12, false, &m_generalLayout);
+    m_items["spacingSystem"] = &m_spacingSystem;
     
     m_minMeasureWidth.SetInfo("Min measure width", "The minimal measure width in MEI units");
-    m_minMeasureWidth.Init(15, 1, 30);
-    m_params["minMeasureWidth"] = &m_minMeasureWidth;
+    m_minMeasureWidth.Init(15, 1, 30, false, &m_generalLayout);
+    m_items["minMeasureWidth"] = &m_minMeasureWidth;
     
     m_leftPosition.SetInfo("Left position", "The left position");
-    m_leftPosition.Init(0.8, 0.0, 2.0);
-    m_params["leftPosition"] = &m_leftPosition;
+    m_leftPosition.Init(0.8, 0.0, 2.0, &m_generalLayout);
+    m_items["leftPosition"] = &m_leftPosition;
     
     m_lyricSize.SetInfo("Lyric size", "The lyrics size in MEI units");
-    m_lyricSize.Init(4.5, 2.0, 8.0);
-    m_params["lyricSize"] = &m_lyricSize;
+    m_lyricSize.Init(4.5, 2.0, 8.0, &m_generalLayout);
+    m_items["lyricSize"] = &m_lyricSize;
     
     m_hairpinSize.SetInfo("Hairpin size", "The haripin size in MEI units");
-    m_hairpinSize.Init(3.0, 1.0, 8.0);
-    m_params["hairpinSize"] = &m_hairpinSize;
-    
-    /********* ties and slurs *********/
+    m_hairpinSize.Init(3.0, 1.0, 8.0, &m_generalLayout);
+    m_items["hairpinSize"] = &m_hairpinSize;
     
     m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
-    m_tieThickness.Init(0.5, 0.2, 1.0);
-    m_params["tieThickness"] = &m_tieThickness;
+    m_tieThickness.Init(0.5, 0.2, 1.0, &m_generalLayout);
+    m_items["tieThickness"] = &m_tieThickness;
     
     m_minSlurHeight.SetInfo("Min slur height", "The minimum slur height in MEI units");
-    m_minSlurHeight.Init(1.2, 0.3, 2.0);
-    m_params["minSlurHeight"] = &m_minSlurHeight;
+    m_minSlurHeight.Init(1.2, 0.3, 2.0, &m_generalLayout);
+    m_items["minSlurHeight"] = &m_minSlurHeight;
     
     m_maxSlurHeight.SetInfo("Max slur height", "The maximum slur height in MEI units");
-    m_maxSlurHeight.Init(3.0, 2.0, 4.0);
-    m_params["maxSlurHeight"] = &m_maxSlurHeight;
+    m_maxSlurHeight.Init(3.0, 2.0, 4.0, &m_generalLayout);
+    m_items["maxSlurHeight"] = &m_maxSlurHeight;
     
     m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
-    m_slurThickness.Init(0.6, 0.2, 1.2);
-    m_params["slurThickness"] = &m_slurThickness;
+    m_slurThickness.Init(0.6, 0.2, 1.2, &m_generalLayout);
+    m_items["slurThickness"] = &m_slurThickness;
+    
+    /********* selectors *********/
+    
+    m_selectors.SetLabel("Element selectors");
+    
+    m_appXPathQuery.SetInfo("App xPath query", "Set the xPath query for selecting <app> child elements, for example: \"./rdg[contains(@source, 'source-id')]\"; by default the <lem> or the first <rdg> is selected");
+    m_appXPathQuery.Init(&m_selectors);
+    m_items["appXPathQuery"] = &m_appXPathQuery;
+    
+    m_choiceXPathQuery.SetInfo("Choice xPath query", "Set the xPath query for selecting <choice> child elements, for example: \"./orig\"; by default the first child is selected");
+    m_choiceXPathQuery.Init(&m_selectors);
+    m_items["choiceXPathQuery"] = &m_choiceXPathQuery;
+    
+    m_mdivXPathQuery.SetInfo("Mdiv xPath query", "Set the xPath query for selecting the <mdiv> to be rendered; only one <mdiv> can be rendered");
+    m_mdivXPathQuery.Init("", &m_selectors);
+    m_items["mdivXPathQuery"] = &m_mdivXPathQuery;
     
     /********* The layout left margin by element *********/
     
+    m_elementMargins.SetLabel("Element margins");
+    
     m_leftMarginAccid.SetInfo("Left margin accid", "The margin for accid in MEI units");
-    m_leftMarginAccid.Init(1.0, 0.0, 2.0);
-    m_params["leftMarginAccid"] = &m_leftMarginAccid;
+    m_leftMarginAccid.Init(1.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginAccid"] = &m_leftMarginAccid;
     
     m_leftMarginBarLine.SetInfo("Left margin barLine", "The margin for barLine in MEI units");
-    m_leftMarginBarLine.Init(0.0, 0.0, 2.0);
-    m_params["leftMarginBarLine"] = &m_leftMarginBarLine;
+    m_leftMarginBarLine.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginBarLine"] = &m_leftMarginBarLine;
     
     m_leftMarginLeftBarLine.SetInfo("Left margin left barLine", "The margin for left barLine in MEI units");
-    m_leftMarginLeftBarLine.Init(0.0, 0.0, 2.0);
-    m_params["leftMarginLeftBarLine"] = &m_leftMarginLeftBarLine;
+    m_leftMarginLeftBarLine.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginLeftBarLine"] = &m_leftMarginLeftBarLine;
     
     m_leftMarginRightBarLine.SetInfo("Left margin right barLine", "The margin for right barLine in MEI units");
-    m_leftMarginRightBarLine.Init(1.0, 0.0, 2.0);
-    m_params["leftMarginRightBarLine"] = &m_leftMarginRightBarLine;
+    m_leftMarginRightBarLine.Init(1.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginRightBarLine"] = &m_leftMarginRightBarLine;
     
     m_leftMarginBeatRpt.SetInfo("Left margin beatRpt", "The margin for beatRpt in MEI units");
-    m_leftMarginBeatRpt.Init(2.0, 0.0, 2.0);
-    m_params["leftMarginBeatRpt"] = &m_leftMarginBeatRpt;
+    m_leftMarginBeatRpt.Init(2.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginBeatRpt"] = &m_leftMarginBeatRpt;
     
     m_leftMarginChord.SetInfo("Left margin chord", "The margin for chord in MEI units");
-    m_leftMarginChord.Init(1.0, 0.0, 2.0);
-    m_params["leftMarginChord"] = &m_leftMarginChord;
+    m_leftMarginChord.Init(1.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginChord"] = &m_leftMarginChord;
     
     m_leftMarginClef.SetInfo("Left margin clef", "The margin for clef in MEI units");
-    m_leftMarginClef.Init(1.0, 0.0, 2.0);;
-    m_params["leftMarginClef"] = &m_leftMarginClef;
+    m_leftMarginClef.Init(1.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginClef"] = &m_leftMarginClef;
     
     m_leftMarginKeySig.SetInfo("Left margin keySig", "The margin for keySig in MEI units");
-    m_leftMarginKeySig.Init(1.0, 0.0, 2.0);;
-    m_params["leftMarginKeySig"] = &m_leftMarginKeySig;
+    m_leftMarginKeySig.Init(1.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginKeySig"] = &m_leftMarginKeySig;
     
     m_leftMarginMensur.SetInfo("Left margin mensur", "The margin for mensur in MEI units");
-    m_leftMarginMensur.Init(1.0, 0.0, 2.0);;
-    m_params["leftMarginMensur"] = &m_leftMarginMensur;
+    m_leftMarginMensur.Init(1.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginMensur"] = &m_leftMarginMensur;
     
     m_leftMarginMeterSig.SetInfo("Left margin meterSig", "The margin for meterSig in MEI units");
-    m_leftMarginMeterSig.Init(1.0, 0.0, 2.0);;
-    m_params["leftMarginMeterSig"] = &m_leftMarginMeterSig;
+    m_leftMarginMeterSig.Init(1.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginMeterSig"] = &m_leftMarginMeterSig;
     
     m_leftMarginMRest.SetInfo("Left margin mRest", "The margin for mRest in MEI units");
-    m_leftMarginMRest.Init(0.0, 0.0, 2.0);;
-    m_params["leftMarginMRest"] = &m_leftMarginMRest;
+    m_leftMarginMRest.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginMRest"] = &m_leftMarginMRest;
     
     m_leftMarginMRpt2.SetInfo("Left margin mRpt2", "The margin for mRpt2 in MEI units");
-    m_leftMarginMRpt2.Init(0.0, 0.0, 2.0);;
-    m_params["leftMarginMRpt2"] = &m_leftMarginMRpt2;
+    m_leftMarginMRpt2.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginMRpt2"] = &m_leftMarginMRpt2;
     
     m_leftMarginMultiRest.SetInfo("Left margin multiRest", "The margin for multiRest in MEI units");
-    m_leftMarginMultiRest.Init(0.0, 0.0, 2.0);
-    m_params["leftMarginMultiRest"] = &m_leftMarginMultiRest;
+    m_leftMarginMultiRest.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginMultiRest"] = &m_leftMarginMultiRest;
     
     m_leftMarginMultiRpt.SetInfo("Left margin multiRpt", "The margin for multiRpt in MEI units");
-    m_leftMarginMultiRpt.Init(0.0, 0.0, 2.0);;
-    m_params["leftMarginMultiRpt"] = &m_leftMarginMultiRpt;
+    m_leftMarginMultiRpt.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginMultiRpt"] = &m_leftMarginMultiRpt;
     
     m_leftMarginNote.SetInfo("Left margin note", "The margin for note in MEI units");
-    m_leftMarginNote.Init(1.0, 0.0, 2.0);;
-    m_params["leftMarginNote"] = &m_leftMarginNote;
+    m_leftMarginNote.Init(1.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginNote"] = &m_leftMarginNote;
     
     m_leftMarginRest.SetInfo("Left margin rest", "The margin for rest in MEI units");
-    m_leftMarginRest.Init(1.0, 0.0, 2.0);;
-    m_params["leftMarginRest"] = &m_leftMarginRest;
+    m_leftMarginRest.Init(1.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginRest"] = &m_leftMarginRest;
     
     m_leftMarginDefault.SetInfo("Left margin default", "The default left margin");
-    m_leftMarginDefault.Init(0.0, 0.0, 2.0);;
-    m_params["leftMarginDefault"] = &m_leftMarginDefault;
+    m_leftMarginDefault.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["leftMarginDefault"] = &m_leftMarginDefault;
     
     /********* The layout right margin by element *********/
 
     m_rightMarginAccid.SetInfo("Right margin accid", "The right margin for accid in MEI units");
-    m_rightMarginAccid.Init(0.0, 0.0, 2.0);;
-    m_params["rightMarginAccid"] = &m_rightMarginAccid;
+    m_rightMarginAccid.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginAccid"] = &m_rightMarginAccid;
     
     m_rightMarginBarLine.SetInfo("Right margin barLine", "The right margin for barLine in MEI units");
-    m_rightMarginBarLine.Init(0.0, 0.0, 2.0);;
-    m_params["rightMarginBarLine"] = &m_rightMarginBarLine;
+    m_rightMarginBarLine.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginBarLine"] = &m_rightMarginBarLine;
     
     m_rightMarginLeftBarLine.SetInfo("Right margin left barLine", "The right margin for left barLine in MEI units");
-    m_rightMarginLeftBarLine.Init(1.0, 0.0, 2.0);;
-    m_params["rightMarginLeftBarLine"] = &m_rightMarginLeftBarLine;
+    m_rightMarginLeftBarLine.Init(1.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginLeftBarLine"] = &m_rightMarginLeftBarLine;
     
     m_rightMarginRightBarLine.SetInfo("Right margin right barLine", "The right margin for right barLine in MEI units");
-    m_rightMarginRightBarLine.Init(0.0, 0.0, 2.0);;
-    m_params["rightMarginRightBarLine"] = &m_rightMarginRightBarLine;
+    m_rightMarginRightBarLine.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginRightBarLine"] = &m_rightMarginRightBarLine;
     
     m_rightMarginBeatRpt.SetInfo("Right margin beatRpt", "The right margin for beatRpt in MEI units");
-    m_rightMarginBeatRpt.Init(0.0, 0.0, 2.0);;
-    m_params["rightMarginBeatRpt"] = &m_rightMarginBeatRpt;
+    m_rightMarginBeatRpt.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginBeatRpt"] = &m_rightMarginBeatRpt;
     
     m_rightMarginChord.SetInfo("Right margin chord", "The right margin for chord in MEI units");
-    m_rightMarginChord.Init(0.0, 0.0, 2.0);;
-    m_params["rightMarginChord"] = &m_rightMarginChord;
+    m_rightMarginChord.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginChord"] = &m_rightMarginChord;
     
     m_rightMarginClef.SetInfo("Right margin clef", "The right margin for clef in MEI units");
-    m_rightMarginClef.Init(1.0, 0.0, 2.0);;
-    m_params["rightMarginClef"] = &m_rightMarginClef;
+    m_rightMarginClef.Init(1.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginClef"] = &m_rightMarginClef;
     
     m_rightMarginKeySig.SetInfo("Right margin keySig", "The right margin for keySig in MEI units");
-    m_rightMarginKeySig.Init(1.0, 0.0, 2.0);;
-    m_params["rightMarginKeySig"] = &m_rightMarginKeySig;
+    m_rightMarginKeySig.Init(1.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginKeySig"] = &m_rightMarginKeySig;
     
     m_rightMarginMensur.SetInfo("Right margin mensur", "The right margin for mensur in MEI units");
-    m_rightMarginMensur.Init(1.0, 0.0, 2.0);;
-    m_params["rightMarginMensur"] = &m_rightMarginMensur;
+    m_rightMarginMensur.Init(1.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginMensur"] = &m_rightMarginMensur;
     
     m_rightMarginMeterSig.SetInfo("Right margin meterSig", "The right margin for meterSig in MEI units");
-    m_rightMarginMeterSig.Init(1.0, 0.0, 2.0);;
-    m_params["rightMarginMeterSig"] = &m_rightMarginMeterSig;
+    m_rightMarginMeterSig.Init(1.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginMeterSig"] = &m_rightMarginMeterSig;
     
     m_rightMarginMRest.SetInfo("Right margin mRest", "The right margin for mRest in MEI units");
-    m_rightMarginMRest.Init(0.0, 0.0, 2.0);;
-    m_params["rightMarginMRest"] = &m_rightMarginMRest;
+    m_rightMarginMRest.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginMRest"] = &m_rightMarginMRest;
     
     m_rightMarginMRpt2.SetInfo("Right margin mRpt2", "The right margin for mRpt2 in MEI units");
-    m_rightMarginMRpt2.Init(0.0, 0.0, 2.0);;
-    m_params["rightMarginMRpt2"] = &m_rightMarginMRpt2;
+    m_rightMarginMRpt2.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginMRpt2"] = &m_rightMarginMRpt2;
     
     m_rightMarginMultiRest.SetInfo("Right margin multiRest", "The right margin for multiRest in MEI units");
-    m_rightMarginMultiRest.Init(0.0, 0.0, 2.0);;
-    m_params["rightMarginMultiRest"] = &m_rightMarginMultiRest;
+    m_rightMarginMultiRest.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginMultiRest"] = &m_rightMarginMultiRest;
     
     m_rightMarginMultiRpt.SetInfo("Right margin multiRpt", "The right margin for multiRpt in MEI units");
-    m_rightMarginMultiRpt.Init(0.0, 0.0, 2.0);;
-    m_params["rightMarginMultiRpt"] = &m_rightMarginMultiRpt;
+    m_rightMarginMultiRpt.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginMultiRpt"] = &m_rightMarginMultiRpt;
     
     m_rightMarginNote.SetInfo("Right margin note", "The right margin for note in MEI units");
-    m_rightMarginNote.Init(0.0, 0.0, 2.0);;
-    m_params["rightMarginNote"] = &m_rightMarginNote;
+    m_rightMarginNote.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginNote"] = &m_rightMarginNote;
 
     m_rightMarginRest.SetInfo("Right margin rest", "The right margin for rest in MEI units");
-    m_rightMarginRest.Init(0.0, 0.0, 2.0);;
-    m_params["rightMarginRest"] = &m_rightMarginRest;
+    m_rightMarginRest.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginRest"] = &m_rightMarginRest;
 
     m_rightMarginDefault.SetInfo("Right margin default", "The default right margin");
-    m_rightMarginDefault.Init(0.0, 0.0, 2.0);;
-    m_params["rightMarginDefault"] = &m_rightMarginDefault;
+    m_rightMarginDefault.Init(0.0, 0.0, 2.0, &m_elementMargins);
+    m_items["rightMarginDefault"] = &m_rightMarginDefault;
     
     /********* The layout top margin by element *********/
     
     m_topMarginDefault.SetInfo("Top margin default", "The default top margin");
-    m_topMarginDefault.Init(0.5, 0.0, 6.0);;
-    m_params["topMarginDefault"] = &m_topMarginDefault;
+    m_topMarginDefault.Init(0.5, 0.0, 6.0, &m_elementMargins);
+    m_items["topMarginDefault"] = &m_topMarginDefault;
     
     /********* The layout bottom margin by element *********/
     
     m_bottomMarginDefault.SetInfo("Bottom margin default", "The default bottom margin");
-    m_bottomMarginDefault.Init(0.5, 0.0, 5.0);;
-    m_params["bottomMarginDefault"] = &m_bottomMarginDefault;
+    m_bottomMarginDefault.Init(0.5, 0.0, 5.0, &m_elementMargins);
+    m_items["bottomMarginDefault"] = &m_bottomMarginDefault;
     
     /********* Display options *********/
     
     m_measureNumber.SetInfo("Measure number","The measure numbering rule (unused)");
     m_measureNumber.Init(MEASURENUMBER_system);
-    m_params["measureNumber"] = &m_measureNumber;
+    m_items["measureNumber"] = &m_measureNumber;
 
     /*
     // Example of a staffRel param

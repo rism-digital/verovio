@@ -122,58 +122,71 @@ void display_usage()
     // Options with long forms only
     cerr << endl << "Additional options" << endl;
     
+    
     Options options;
-    const MapOfStrOptions *params = options.GetParams();
-    MapOfStrOptions::const_iterator iter;
-    for (iter = params->begin(); iter != params->end(); iter++) {
-        //cerr << toCamelCase(fromCamelCase(iter->first)) << endl;
-        std::string option = fromCamelCase(iter->first);
+    std::vector<OptionGrp *> *grp = options.GetGrps();
+    std::vector<OptionGrp *>::iterator grpIter;
     
-        const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(iter->second);
-        const OptionInt *optInt = dynamic_cast<const OptionInt *>(iter->second);
-        const OptionString *optString = dynamic_cast<const OptionString *>(iter->second);
-        const OptionArray *optArray = dynamic_cast<const OptionArray *>(iter->second);
-        const OptionBool *optBool = dynamic_cast<const OptionBool *>(iter->second);
+    //const MapOfStrOptions *params = options.GetItems();
+    //MapOfStrOptions::const_iterator iter;
+    //for (iter = params->begin(); iter != params->end(); iter++) {
     
-        if (optDbl) {
-            option.append(" <f>");
-        }
-        else if (optInt) {
-            option.append(" <i>");
-        }
-        else if (optString) {
-            option.append(" <s>");
-        }
-        else if (optArray) {
-            option.append("* <s>");
-        }
-        else if (!optBool) {
-            option.append(" <s>");
-        }
+    for(grpIter = grp->begin(); grpIter != grp->end(); grpIter++) {
         
-        if (option.size() < 30) {
-            option.insert(option.end(), 30 - option.size(), ' ');
-        }
-        else {
-            option.append("\t");
-        }
+        const std::vector<Option *> *options = (*grpIter)->GetOptions();
+        std::vector<Option *>::const_iterator iter;
         
-        cerr << " --" << option << iter->second->GetDescription();
+        for (iter = options->begin(); iter != options->end(); iter++) {
+    
+            //cerr << toCamelCase(fromCamelCase(iter->first)) << endl;
+            std::string option = fromCamelCase(iter->first);
+        
+            const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(iter->second);
+            const OptionInt *optInt = dynamic_cast<const OptionInt *>(iter->second);
+            const OptionString *optString = dynamic_cast<const OptionString *>(iter->second);
+            const OptionArray *optArray = dynamic_cast<const OptionArray *>(iter->second);
+            const OptionBool *optBool = dynamic_cast<const OptionBool *>(iter->second);
+        
+            if (optDbl) {
+                option.append(" <f>");
+            }
+            else if (optInt) {
+                option.append(" <i>");
+            }
+            else if (optString) {
+                option.append(" <s>");
+            }
+            else if (optArray) {
+                option.append("* <s>");
+            }
+            else if (!optBool) {
+                option.append(" <s>");
+            }
+            
+            if (option.size() < 30) {
+                option.insert(option.end(), 30 - option.size(), ' ');
+            }
+            else {
+                option.append("\t");
+            }
+            
+            cerr << " --" << option << iter->second->GetDescription();
 
-        if (optInt) {
-            cerr << " (default: " << optInt->GetDefault();
-            cerr << "; min: " << optInt->GetMin();
-            cerr << "; max: " << optInt->GetMax() << ")";
+            if (optInt) {
+                cerr << " (default: " << optInt->GetDefault();
+                cerr << "; min: " << optInt->GetMin();
+                cerr << "; max: " << optInt->GetMax() << ")";
+            }
+            if (optDbl) {
+                cerr << " (default: " << optDbl->GetDefault();
+                cerr << "; min: " << optDbl->GetMin();
+                cerr << "; max: " << optDbl->GetMax() << ")";
+            }
+            if (optString) {
+                cerr << " (default: \"" << optString->GetDefault() << "\")";
+            }
+            cerr << endl;
         }
-        if (optDbl) {
-            cerr << " (default: " << optDbl->GetDefault();
-            cerr << "; min: " << optDbl->GetMin();
-            cerr << "; max: " << optDbl->GetMax() << ")";
-        }
-        if (optString) {
-            cerr << " (default: \"" << optString->GetDefault() << "\")";
-        }
-        cerr << endl;
     }
 
 
@@ -244,7 +257,7 @@ int main(int argc, char **argv)
     int baseSize = sizeof(base_options) / sizeof(option);
     
     Options *options = toolkit.GetOptions();
-    MapOfStrOptions *params = options->GetParams();
+    MapOfStrOptions *params = options->GetItems();
     int mapSize = (int)params->size();
 
     struct option *long_options;
