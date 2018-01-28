@@ -1,6 +1,3 @@
-
-var verovio = verovio || {};
-
 /***************************************************************************************************************************/
 // Proxy the exported c++ methods
 verovio.vrvToolkit = verovio.vrvToolkit || {};

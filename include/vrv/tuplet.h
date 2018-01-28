@@ -48,8 +48,7 @@ public:
 
 protected:
     /**
-     * Filter the list for a specific class.
-     * For example, keep only notes in Beam
+     * Filter the flat list and keep only Note elements.
      */
     virtual void FilterList(ListOfObjects *childList);
 

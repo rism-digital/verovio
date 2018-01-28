@@ -47,9 +47,11 @@
 
 #ifndef NO_ABC_SUPPORT
 #include <regex>
-#endif
+#endif /* NO_ABC_SUPPORT */
 
 namespace vrv {
+
+#ifndef NO_ABC_SUPPORT
 
 // Global variables:
 char abcLine[10001] = { 0 };
@@ -84,30 +86,18 @@ AbcInput::~AbcInput()
 
 bool AbcInput::ImportFile()
 {
-#ifndef NO_ABC_SUPPORT
     std::ifstream infile;
     infile.open(m_filename.c_str());
     parseABC(infile);
     return true;
-#else
-    LogError("ABC import is not supported in the build.");
-    return false;
-#endif
 }
 
 bool AbcInput::ImportString(std::string const &abc)
 {
-#ifndef NO_ABC_SUPPORT
     std::istringstream in_stream(abc);
     parseABC(in_stream);
     return true;
-#else
-    LogError("ABC import is not supported in the build.");
-    return false;
-#endif
 }
-
-#ifndef NO_ABC_SUPPORT
 
 //////////////////////////////
 //
@@ -983,6 +973,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
     }
 }
 
-#endif // NO_ABC_SUPPORT
+#endif /* NO_ABC_SUPPORT */
 
 } // namespace vrv
