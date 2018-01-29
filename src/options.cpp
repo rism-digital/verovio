@@ -25,6 +25,12 @@ std::map<style_MEASURENUMBER, std::string> OptionMeasureNumber::values
 //----------------------------------------------------------------------------
 // Option
 //----------------------------------------------------------------------------
+  
+void Option::CopyTo(Option *option)
+{
+    // Make sure it is overriden
+    assert(false);
+}
     
 void Option::SetInfo(std::string title, std::string description)
 {
@@ -57,6 +63,13 @@ bool Option::SetValue(std::string value)
 // OptionBool
 //----------------------------------------------------------------------------
 
+void OptionBool::CopyTo(Option *option)
+{
+    OptionBool *child = dynamic_cast<OptionBool *>(option);
+    assert(child);
+    *child = *this;
+}
+    
 void OptionBool::Init(bool defaultValue)
 {
     m_value = defaultValue;
@@ -88,7 +101,14 @@ bool OptionBool::SetValue(bool value)
 //----------------------------------------------------------------------------
 // OptionDbl
 //----------------------------------------------------------------------------
-
+    
+void OptionDbl::CopyTo(Option *option)
+{
+    OptionDbl *child = dynamic_cast<OptionDbl *>(option);
+    assert(child);
+    *child = *this;
+}
+    
 void OptionDbl::Init(double defaultValue, double minValue, double maxValue)
 {
     m_value = defaultValue;
@@ -121,6 +141,13 @@ bool OptionDbl::SetValue(double value)
 // OptionInt
 //----------------------------------------------------------------------------
     
+void OptionInt::CopyTo(Option *option)
+{
+    OptionInt *child = dynamic_cast<OptionInt *>(option);
+    assert(child);
+    *child = *this;
+}
+
 void OptionInt::Init(int defaultValue, int minValue, int maxValue, bool definitionFactor)
 {
     m_value = defaultValue;
@@ -164,7 +191,14 @@ bool OptionInt::SetValue(int value)
 //----------------------------------------------------------------------------
 // OptionMeasureNumber
 //----------------------------------------------------------------------------
-    
+
+void OptionMeasureNumber::CopyTo(Option *option)
+{
+    OptionMeasureNumber *child = dynamic_cast<OptionMeasureNumber *>(option);
+    assert(child);
+    *child = *this;
+}
+
 void OptionMeasureNumber::Init(style_MEASURENUMBER defaultValue)
 {
     m_value = defaultValue;
@@ -186,7 +220,14 @@ bool OptionMeasureNumber::SetValue(std::string value)
 //----------------------------------------------------------------------------
 // OptionString
 //----------------------------------------------------------------------------
-    
+
+void OptionString::CopyTo(Option *option)
+{
+    OptionString *child = dynamic_cast<OptionString *>(option);
+    assert(child);
+    *child = *this;
+}
+
 void OptionString::Init(std::string defaultValue)
 {
     m_value = defaultValue;
@@ -202,7 +243,14 @@ bool OptionString::SetValue(std::string value)
 //----------------------------------------------------------------------------
 // OptionArray
 //----------------------------------------------------------------------------
-    
+
+void OptionArray::CopyTo(Option *option)
+{
+    OptionArray *child = dynamic_cast<OptionArray *>(option);
+    assert(child);
+    *child = *this;
+}
+
 void OptionArray::Init(OptionGrp *grp)
 {
     m_values.empty();
@@ -225,9 +273,16 @@ bool OptionArray::SetValue(std::vector<std::string> const &values)
 }
     
 //----------------------------------------------------------------------------
-// OptionStaffRel
+// OptionStaffrel
 //----------------------------------------------------------------------------
-    
+
+void OptionStaffrel::CopyTo(Option *option)
+{
+    OptionStaffrel *child = dynamic_cast<OptionStaffrel *>(option);
+    assert(child);
+    *child = *this;
+}
+
 void OptionStaffrel::Init(data_STAFFREL defaultValue)
 {
     m_value = defaultValue;
@@ -421,15 +476,15 @@ Options::Options()
     
     m_defaultLeftMargin.SetInfo("Default left margin", "The default left margin");
     m_defaultLeftMargin.Init(0.0, 0.0, 2.0);
-    this->Register(&m_defaultLeftMargin, "DefaulteftMargin", &m_elementMargins);
+    this->Register(&m_defaultLeftMargin, "defaultLeftMargin", &m_elementMargins);
     
     m_defaultRightMargin.SetInfo("Default right margin", "The default right margin");
     m_defaultRightMargin.Init(0.0, 0.0, 2.0);
-    this->Register(&m_defaultRightMargin, "DefaultRightMargin", &m_elementMargins);
+    this->Register(&m_defaultRightMargin, "defaultRightMargin", &m_elementMargins);
     
     m_defaultTopMargin.SetInfo("Default top margin", "The default top margin");
     m_defaultTopMargin.Init(0.5, 0.0, 6.0);
-    this->Register(&m_defaultTopMargin, "DefaultTopMargin", &m_elementMargins);
+    this->Register(&m_defaultTopMargin, "defaultTopMargin", &m_elementMargins);
     
     m_leftMarginAccid.SetInfo("Left margin accid", "The margin for accid in MEI units");
     m_leftMarginAccid.Init(1.0, 0.0, 2.0);
@@ -581,6 +636,16 @@ Options &Options::operator=(const Options &options)
     // not self assignement
     if (this == &options) {
         return *this;
+    }
+    
+    // Make sure we copy only the option values and not the pointers to members
+    
+    MapOfStrOptions const *items = options.GetItems();
+    MapOfStrOptions::const_iterator iter;
+    for (iter = items->begin(); iter != items->end(); iter++) {
+        Option *opt = m_items.at(iter->first);
+        assert(opt);
+        iter->second->CopyTo(opt);
     }
 
     return *this;

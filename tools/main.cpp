@@ -240,7 +240,7 @@ int main(int argc, char **argv)
     int baseSize = sizeof(base_options) / sizeof(option);
     
     Options *options = toolkit.GetOptions();
-    MapOfStrOptions *params = options->GetItems();
+    const MapOfStrOptions *params = options->GetItems();
     int mapSize = (int)params->size();
 
     struct option *long_options;
@@ -251,7 +251,7 @@ int main(int argc, char **argv)
     std::vector<std::string> optNames;
     optNames.reserve(mapSize);
     
-    MapOfStrOptions::iterator iter;
+    MapOfStrOptions::const_iterator iter;
     for (iter = params->begin(); iter != params->end(); iter++) {
         // Double check that back and forth convertion is correct
         assert(toCamelCase(fromCamelCase(iter->first)) == iter->first);

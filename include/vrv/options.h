@@ -91,6 +91,7 @@ public:
     // constructors and destructors
     Option() {}
     virtual ~Option() {}
+    virtual void CopyTo(Option *option);
     
     void SetKey(std::string key) { m_key = key; }
     std::string GetKey() const { return m_key; }
@@ -125,6 +126,7 @@ public:
     // constructors and destructors
     OptionBool() {}
     virtual ~OptionBool() {}
+    virtual void CopyTo(Option *option);
     void Init(bool defaultValue);
     
     virtual bool SetValueBool(bool value);
@@ -156,6 +158,7 @@ public:
     // constructors and destructors
     OptionDbl() {}
     virtual ~OptionDbl() {}
+    virtual void CopyTo(Option *option);
     void Init(double defaultValue, double minValue, double maxValue);
     
     virtual bool SetValueDbl(double value);
@@ -190,6 +193,7 @@ public:
     // constructors and destructors
     OptionInt() {}
     virtual ~OptionInt() {}
+    virtual void CopyTo(Option *option);
     void Init(int defaultValue, int minValue, int maxValue, bool definitionFactor = false);
     
     virtual bool SetValueDbl(double value);
@@ -226,6 +230,7 @@ public:
     // constructors and destructors
     OptionString() {}
     virtual ~OptionString() {}
+    virtual void CopyTo(Option *option);
     void Init(std::string defaultValue);
     
     virtual bool SetValue(std::string value);
@@ -254,6 +259,7 @@ public:
     // constructors and destructors
     OptionArray() {}
     virtual ~OptionArray() {}
+    virtual void CopyTo(Option *option);
     void Init(OptionGrp *grp = NULL);
     
     virtual bool SetValue(std::string value);
@@ -283,7 +289,7 @@ public:
     // constructors and destructors
     OptionMeasureNumber() {};
     virtual ~OptionMeasureNumber() {};
-
+    virtual void CopyTo(Option *option);
     void Init(style_MEASURENUMBER defaultValue);
     
     virtual bool SetValue(std::string value);
@@ -312,7 +318,7 @@ public:
     // constructors and destructors
     OptionStaffrel() {};
     virtual ~OptionStaffrel() {};
-    
+    virtual void CopyTo(Option *option);
     // Alternate type style cannot have a restricted list of possible values
     void Init(data_STAFFREL defaultValue);
     
@@ -344,7 +350,7 @@ public:
     // constructors and destructors
     OptionStaffrelBasic() {};
     virtual ~OptionStaffrelBasic() {};
-
+    virtual void CopyTo(Option *option);
     void Init(data_STAFFREL_basic defaultValue, const std::vector<data_STAFFREL_basic> &values);
 
     virtual bool SetValue(std::string value);
@@ -405,7 +411,7 @@ public:
     Options(const Options &options);
     Options &operator=(const Options &options);
     
-    MapOfStrOptions *GetItems() { return &m_items; }
+    const MapOfStrOptions *GetItems() const { return &m_items; }
     
     std::vector<OptionGrp *> *GetGrps() { return &m_grps; }
     

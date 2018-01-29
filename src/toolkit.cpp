@@ -568,19 +568,9 @@ bool Toolkit::ParseOptions(const std::string &json_options)
                     SetFormat(json.get<jsonxx::String>("inputFormat"));
                 }
             }
-            else if (iter->first == "noJustification") {
-                if (json.has<jsonxx::Boolean>("noJustification")) {
-                    SetNoJustification(json.get<jsonxx::Boolean>("noJustification"));
-                }
-            }
             else if (iter->first == "scale") {
                 if (json.has<jsonxx::Number>("scale")) {
                     SetScale(json.get<jsonxx::Number>("scale"));
-                }
-            }
-            else if (iter->first == "showBoundingBoxes") {
-                if (json.has<jsonxx::Boolean>("showBoundingBoxes")) {
-                    SetShowBoundingBoxes(json.get<jsonxx::Boolean>("showBoundingBoxes"));
                 }
             }
             else if (iter->first == "xmlIdSeed") {
