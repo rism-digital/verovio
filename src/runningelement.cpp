@@ -258,7 +258,7 @@ bool RunningElement::AdjustDrawingScaling(int width)
     return scale;
 }
 
-bool RunningElement::AdjustYPos()
+bool RunningElement::AdjustRunningElementYPos()
 {
     int i, j;
     ArrayOfTextElements::iterator iter;

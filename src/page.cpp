@@ -384,11 +384,11 @@ void Page::LayOutVertically()
     this->Process(&adjustYPos, &adjustYPosParams);
 
     if (this->GetHeader()) {
-        this->GetHeader()->AdjustYPos();
+        this->GetHeader()->AdjustRunningElementYPos();
     }
 
     if (this->GetFooter()) {
-        this->GetFooter()->AdjustYPos();
+        this->GetFooter()->AdjustRunningElementYPos();
     }
 
     // Adjust system Y position
@@ -532,9 +532,6 @@ int Page::ApplyPPUFactor(FunctorParams *functorParams)
 
 int Page::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
-    assert(doc);
-
     // Same functor, but we have not FunctorParams so we just re-instanciate it
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
 
