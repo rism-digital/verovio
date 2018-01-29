@@ -407,7 +407,7 @@ int StaffAlignment::AlignVerticallyEnd(FunctorParams *functorParams)
 
     SetYRel(-params->m_cumulatedShift);
 
-    params->m_cumulatedShift += m_staffHeight + params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+    params->m_cumulatedShift += m_staffHeight + params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
 
     return FUNCTOR_CONTINUE;
 }
@@ -434,7 +434,7 @@ int StaffAlignment::AdjustYPos(FunctorParams *functorParams)
        
 
     // Is the maximum the overflow (+ overlap) shift, or the default ?
-    maxOverflowAbove -= params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+    maxOverflowAbove -= params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
     // Is the maximum the overflow (+ overlap) shift, or the default ?
     int shift = std::max(0, maxOverflowAbove);
 

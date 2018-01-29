@@ -228,7 +228,7 @@ void Page::LayOutHorizontally()
 
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
-    if (!doc->GetEvenSpacing()) {
+    if (!doc->GetOptions()->m_evenNoteSpacing.GetValue()) {
         int longestActualDur = DUR_4;
         // Get the longest duration in the piece
         AttDurExtreme durExtremeComparison(LONGEST);
@@ -394,7 +394,7 @@ void Page::LayOutVertically()
     // Adjust system Y position
     AlignSystemsParams alignSystemsParams;
     alignSystemsParams.m_shift = doc->m_drawingPageHeight;
-    alignSystemsParams.m_systemMargin = (doc->GetSpacingSystem()) * doc->GetDrawingUnit(100);
+    alignSystemsParams.m_systemMargin = (doc->GetOptions()->m_spacingSystem.GetValue()) * doc->GetDrawingUnit(100);
     Functor alignSystems(&Object::AlignSystems);
     this->Process(&alignSystems, &alignSystemsParams);
 }
@@ -559,7 +559,7 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    params->m_cumulatedShift = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+    params->m_cumulatedShift = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
 
     // Also align the header and footer
 

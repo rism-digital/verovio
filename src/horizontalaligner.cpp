@@ -961,7 +961,7 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
 
     if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
-            params->m_doc->GetSpacingLinear(), params->m_doc->GetSpacingNonLinear());
+            params->m_doc->GetOptions()->m_spacingLinear.GetValue(), params->m_doc->GetOptions()->m_spacingNonLinear.GetValue());
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
 

@@ -86,7 +86,6 @@ void Doc::Reset()
 
     m_drawingPage = NULL;
     m_drawingJustifyX = true;
-    m_drawingEvenSpacing = false;
     m_currentScoreDefDone = false;
     m_drawingPreparationDone = false;
     m_hasMidiTimemap = false;
@@ -1022,22 +1021,22 @@ int Doc::GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) con
 
 int Doc::GetDrawingUnit(int staffSize) const
 {
-    return m_drawingUnit * staffSize / 100;
+    return m_options->m_unit.GetValue() * staffSize / 100;
 }
 
 int Doc::GetDrawingDoubleUnit(int staffSize) const
 {
-    return m_drawingDoubleUnit * staffSize / 100;
+    return m_options->m_unit.GetValue() * 2 * staffSize / 100;
 }
 
 int Doc::GetDrawingStaffSize(int staffSize) const
 {
-    return m_drawingStaffSize * staffSize / 100;
+    return m_options->m_unit.GetValue() * 8 * staffSize / 100;
 }
 
 int Doc::GetDrawingOctaveSize(int staffSize) const
 {
-    return m_drawingOctaveSize * staffSize / 100;
+    return m_options->m_unit.GetValue() * 7 * staffSize / 100;
 }
 
 int Doc::GetDrawingBrevisWidth(int staffSize) const
@@ -1229,17 +1228,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     m_drawingBeamMinSlope = this->m_options->m_beamMinSlope.GetValue();
     m_drawingBeamMaxSlope /= 100;
     m_drawingBeamMinSlope /= 100;
-
-    // half of the space between two lines
-    m_drawingUnit = m_options->m_unit.GetValue();
-    // space between two lines
-    m_drawingDoubleUnit = m_drawingUnit * 2;
-    // staff (with five lines)
-    m_drawingStaffSize = m_drawingDoubleUnit * 4;
-    // octave height
-    m_drawingOctaveSize = m_drawingUnit * 7;
-    // measure minimal width
-    m_drawingMinMeasureWidth = m_drawingUnit * m_options->m_minMeasureWidth.GetValue();
+    
 
     // values for beams
     m_drawingBeamWidth = this->m_options->m_unit.GetValue();
@@ -1247,7 +1236,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
 
     // values for fonts
     m_drawingSmuflFontSize = CalcMusicFontSize();
-    m_drawingLyricFontSize = m_drawingUnit * m_options->m_lyricSize.GetValue();
+    m_drawingLyricFontSize = m_options->m_unit.GetValue() * m_options->m_lyricSize.GetValue();
 
     glyph_size = GetGlyphWidth(SMUFL_E0A3_noteheadHalf, 100, 0);
     m_drawingLedgerLine = glyph_size * 72 / 100;

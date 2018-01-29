@@ -147,24 +147,6 @@ public:
     FontInfo *GetDrawingSmuflFont(int staffSize, bool graceSize);
     FontInfo *GetDrawingLyricFont(int staffSize);
     ///@}
-    
-    /**
-     * @name Getters for tie and slur parameters
-     */
-    ///@{
-    double GetTieThickness() const { return m_options->m_tieThickness.GetValue(); }
-    double GetSlurMinHeight() const { return m_options->m_minSlurHeight.GetValue(); }
-    double GetSlurMaxHeight() const { return m_options->m_maxSlurHeight.GetValue(); }
-    double GetSlurThickness() const { return m_options->m_slurThickness.GetValue(); }
-    ///@}
-
-    /**
-     * @name Getters for the page dimensions and margins
-     */
-    ///@{
-    int GetSpacingStaff() const { return m_options->m_spacingStaff.GetValue(); }
-    int GetSpacingSystem() const { return m_options->m_spacingSystem.GetValue(); }
-    ///@}
 
     /**
      * @name Getters for the object margins (left and right).
@@ -186,26 +168,6 @@ public:
     ///@{
     void SetJustificationX(bool drawingJustifyX) { m_drawingJustifyX = drawingJustifyX; }
     bool GetJustificationX() const { return m_drawingJustifyX; }
-    ///@}
-
-    /*
-     * @name Setter and getter for the duration-based-spacing flag.
-     * Spacing by duration is always used with CMN, and it's enabled by default.
-     * It should be disabled (so we get "even" note spacing) for mensural notation.
-     */
-    ///@{
-    void SetEvenSpacing(bool drawingEvenSpacing) { m_drawingEvenSpacing = drawingEvenSpacing; }
-    bool GetEvenSpacing() const { return m_drawingEvenSpacing; }
-    ///@}
-
-    /*
-     * @name Setter and getter for linear and non-linear spacing parameters
-     */
-    ///@{
-    void SetSpacingLinear(double drawingSpacingLinear) { m_drawingSpacingLinear = drawingSpacingLinear; }
-    double GetSpacingLinear() const { return m_drawingSpacingLinear; }
-    void SetSpacingNonLinear(double drawingSpacingNonLinear) { m_drawingSpacingNonLinear = drawingSpacingNonLinear; }
-    double GetSpacingNonLinear() const { return m_drawingSpacingNonLinear; }
     ///@}
 
     /**
@@ -379,14 +341,6 @@ public:
     float m_drawingBeamMaxSlope;
     /** flag for disabling justification */
     bool m_drawingJustifyX;
-    /** flag for disabling spacing by duration */
-    bool m_drawingEvenSpacing;
-    /** value of the linear spacing factor */
-    double m_drawingSpacingLinear;
-    /** value of the non linear spacing factor */
-    double m_drawingSpacingNonLinear;
-    /** minimum measure width */
-    int m_drawingMinMeasureWidth;
 
 private:
     /**
@@ -413,14 +367,6 @@ private:
 
     /** The page currently being drawn */
     Page *m_drawingPage;
-    /** Half a the space between to staff lines */
-    int m_drawingUnit;
-    /** Space between to staff lines */
-    int m_drawingDoubleUnit;
-    /** Height of a five line staff */
-    int m_drawingStaffSize;
-    /** Height of an octave */
-    int m_drawingOctaveSize;
     /** Height of a beam (10 and 6 by default) */
     int m_drawingBeamWidth;
     /** Height of a beam spacing (white) (10 and 6 by default) */
