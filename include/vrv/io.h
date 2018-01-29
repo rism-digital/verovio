@@ -81,11 +81,6 @@ public:
      */
     bool HasLayoutInformation() { return m_hasLayoutInformation; }
 
-    /**
-     * Set Humdrum import type option (Humdrum only)
-     */
-    virtual void SetTypeOption(int value) {}
-
 private:
     /**
      * Init values (called by the constructors)

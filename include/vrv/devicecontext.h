@@ -62,7 +62,6 @@ public:
     ///@{
     DeviceContext()
     {
-        m_drawingBoundingBoxes = false;
         m_isDeactivatedX = false;
         m_isDeactivatedY = false;
         m_width = 0;
@@ -251,14 +250,6 @@ public:
     static int RGB2Int(char red, char green, char blue) { return (red << 16 | green << 8 | blue); }
 
     /**
-     * @name Getter and setter for drawing bounding box option (debug)
-     */
-    ///@{
-    virtual void SetDrawBoundingBoxes(bool b) { m_drawingBoundingBoxes = b; }
-    virtual bool GetDrawBoundingBoxes() { return m_drawingBoundingBoxes; }
-    ///@}
-
-    /**
      * @name Method for adding description element
      */
     ///@{
@@ -278,8 +269,6 @@ private:
 public:
     //
 protected:
-    bool m_drawingBoundingBoxes;
-
     std::stack<Pen> m_penStack;
     std::stack<Brush> m_brushStack;
     std::stack<FontInfo *> m_fontStack;

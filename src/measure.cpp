@@ -571,7 +571,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
 
     // m_measureAligner.Process(params->m_functor, params, params->m_functorEnd);
 
-    int minMeasureWidth = params->m_doc->GetOptions()->m_unit.GetValue() * params->m_doc->GetOptions()->m_minMeasureWidth.GetValue();
+    int minMeasureWidth = params->m_doc->GetOptions()->m_unit.GetValue() * params->m_doc->GetOptions()->m_measureMinWidth.GetValue();
     // First try to see if we have a double measure length element
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_FULLMEASURE2);
     Alignment *fullMeasure2

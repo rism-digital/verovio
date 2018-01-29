@@ -85,7 +85,6 @@ void Doc::Reset()
     m_pageTopMar = 0;
 
     m_drawingPage = NULL;
-    m_drawingJustifyX = true;
     m_currentScoreDefDone = false;
     m_drawingPreparationDone = false;
     m_hasMidiTimemap = false;
@@ -1134,7 +1133,7 @@ double Doc::GetLeftMargin(const ClassId classId) const
     if (classId == MULTIRPT) return m_options->m_leftMarginMultiRpt.GetValue();
     if (classId == NOTE) return m_options->m_leftMarginNote.GetValue();
     if (classId == REST) return m_options->m_leftMarginRest.GetValue();
-    return m_options->m_leftMarginDefault.GetValue();
+    return m_options->m_defaultLeftMargin.GetValue();
 }
 
 double Doc::GetRightMargin(const ClassId classId) const
@@ -1155,17 +1154,17 @@ double Doc::GetRightMargin(const ClassId classId) const
     if (classId == MULTIRPT) return m_options->m_rightMarginMultiRpt.GetValue();
     if (classId == NOTE) return m_options->m_rightMarginNote.GetValue();
     if (classId == REST) return m_options->m_rightMarginRest.GetValue();
-    return m_options->m_rightMarginDefault.GetValue();
+    return m_options->m_defaultRightMargin.GetValue();
 }
 
 double Doc::GetBottomMargin(const ClassId classId) const
 {
-    return m_options->m_bottomMarginDefault.GetValue();
+    return m_options->m_defaultBottomMargin.GetValue();
 }
 
 double Doc::GetTopMargin(const ClassId classId) const
 {
-    return m_options->m_topMarginDefault.GetValue();
+    return m_options->m_defaultTopMargin.GetValue();
 }
 
 double Doc::GetLeftPosition() const

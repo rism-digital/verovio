@@ -63,6 +63,7 @@ public:
      * Getter for the options
      */
     Options *GetOptions() const { return m_options; }
+    void SetOptions(Options *options) { (*m_options) = *options; };
 
     /**
      * Generate a document scoreDef when none is provided.
@@ -158,16 +159,6 @@ public:
     double GetLeftPosition() const;
     double GetBottomMargin(const ClassId classId) const;
     double GetTopMargin(const ClassId classId) const;
-    ///@}
-
-    /*
-     * @name Setter and getter for the justification (x-axis) flag.
-     * Justification is enabled by default. It needs to be disabled
-     * for drawing the entire document on one single system.
-     */
-    ///@{
-    void SetJustificationX(bool drawingJustifyX) { m_drawingJustifyX = drawingJustifyX; }
-    bool GetJustificationX() const { return m_drawingJustifyX; }
     ///@}
 
     /**
@@ -339,8 +330,6 @@ public:
     float m_drawingBeamMinSlope;
     /** the current beam maximal slope */
     float m_drawingBeamMaxSlope;
-    /** flag for disabling justification */
-    bool m_drawingJustifyX;
 
 private:
     /**

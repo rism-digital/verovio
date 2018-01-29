@@ -402,6 +402,9 @@ public:
     Options();
     virtual ~Options();
     
+    Options(const Options &options);
+    Options &operator=(const Options &options);
+    
     MapOfStrOptions *GetItems() { return &m_items; }
     
     std::vector<OptionGrp *> *GetGrps() { return &m_grps; }
@@ -417,41 +420,41 @@ public:
     /**
      * General layout - to be sorted
      */
-    OptionGrp m_generalLayout;
     OptionBool m_adjustPageHeight;
-    OptionBool m_evenNoteSpacing;
-    OptionString m_font;
-    OptionBool m_ignoreLayout;
-    OptionBool m_mmOutput;
-    OptionBool m_noLayout;
-    OptionDbl m_spacingLinear;
-    OptionDbl m_spacingNonLinear;
-    OptionInt m_unit;
-    OptionBool m_landscape;
-    OptionDbl m_staffLineWidth;
-    OptionDbl m_stemWidth;
     OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
+    OptionGrp m_generalLayout;
+    OptionBool m_evenNoteSpacing;
+    OptionString m_font;
     OptionDbl m_graceFactor;
+    OptionDbl m_hairpinSize;
+    OptionBool m_humType;
+    OptionBool m_ignoreLayout;
+    OptionBool m_landscape;
+    OptionDbl m_leftPosition;
+    OptionDbl m_lyricSize;
+    OptionInt m_measureMinWidth;
+    OptionMeasureNumber m_measureNumber;
+    OptionBool m_mmOutput;
+    OptionBool m_noJustification;
+    OptionBool m_noLayout;
     OptionInt m_pageHeight;
-    OptionInt m_pageWidth;
     OptionInt m_pageLeftMar;
     OptionInt m_pageRightMar;
     OptionInt m_pageTopMar;
+    OptionInt m_pageWidth;
+    OptionDbl m_slurMaxHeight;
+    OptionDbl m_slurMinHeight;
+    OptionDbl m_slurThickness;
+    OptionDbl m_spacingLinear;
+    OptionDbl m_spacingNonLinear;
     OptionInt m_spacingStaff;
     OptionInt m_spacingSystem;
-    OptionInt m_minMeasureWidth;
-    OptionDbl m_lyricSize;
-    OptionDbl m_hairpinSize;
+    OptionDbl m_staffLineWidth;
+    OptionDbl m_stemWidth;
     OptionDbl m_tieThickness;
-    OptionDbl m_minSlurHeight;
-    OptionDbl m_maxSlurHeight;
-    OptionDbl m_slurThickness;
-    /** The left position */
-    OptionDbl m_leftPosition;
-    /** measure number layout (unused) */
-    OptionMeasureNumber m_measureNumber;
+    OptionInt m_unit;
     
     /**
      * Selectors
@@ -465,15 +468,18 @@ public:
      * Element margins
      */
     OptionGrp m_elementMargins;
-    /** The layout left margin by element */
+    
+    OptionDbl m_defaultBottomMargin;
+    OptionDbl m_defaultLeftMargin;
+    OptionDbl m_defaultRightMargin;
+    OptionDbl m_defaultTopMargin;
     OptionDbl m_leftMarginAccid;
     OptionDbl m_leftMarginBarLine;
-    OptionDbl m_leftMarginLeftBarLine;
-    OptionDbl m_leftMarginRightBarLine;
     OptionDbl m_leftMarginBeatRpt;
     OptionDbl m_leftMarginChord;
     OptionDbl m_leftMarginClef;
     OptionDbl m_leftMarginKeySig;
+    OptionDbl m_leftMarginLeftBarLine;
     OptionDbl m_leftMarginMensur;
     OptionDbl m_leftMarginMeterSig;
     OptionDbl m_leftMarginMRest;
@@ -482,17 +488,14 @@ public:
     OptionDbl m_leftMarginMultiRpt;
     OptionDbl m_leftMarginNote;
     OptionDbl m_leftMarginRest;
-    /** The default left margin */
-    OptionDbl m_leftMarginDefault;
-    /** The layout right margin by element */
+    OptionDbl m_leftMarginRightBarLine;
     OptionDbl m_rightMarginAccid;
     OptionDbl m_rightMarginBarLine;
-    OptionDbl m_rightMarginLeftBarLine;
-    OptionDbl m_rightMarginRightBarLine;
     OptionDbl m_rightMarginBeatRpt;
     OptionDbl m_rightMarginChord;
     OptionDbl m_rightMarginClef;
     OptionDbl m_rightMarginKeySig;
+    OptionDbl m_rightMarginLeftBarLine;
     OptionDbl m_rightMarginMensur;
     OptionDbl m_rightMarginMeterSig;
     OptionDbl m_rightMarginMRest;
@@ -501,12 +504,7 @@ public:
     OptionDbl m_rightMarginMultiRpt;
     OptionDbl m_rightMarginNote;
     OptionDbl m_rightMarginRest;
-    /** The default right margin */
-    OptionDbl m_rightMarginDefault;
-    /** The default right margin */
-    OptionDbl m_bottomMarginDefault;
-    /** The default right margin */
-    OptionDbl m_topMarginDefault;
+    OptionDbl m_rightMarginRightBarLine;
     
 private:
     /** The array of style parameters */

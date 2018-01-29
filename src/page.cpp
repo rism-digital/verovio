@@ -404,7 +404,7 @@ void Page::JustifyHorizontally()
     Doc *doc = dynamic_cast<Doc *>(GetParent());
     assert(doc);
 
-    if (!doc->GetJustificationX()) {
+    if (doc->GetOptions()->m_noLayout.GetValue() || doc->GetOptions()->m_noJustification.GetValue()) {
         return;
     }
 

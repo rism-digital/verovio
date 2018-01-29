@@ -51,9 +51,6 @@ Toolkit::Toolkit(bool initFont)
     m_format = AUTO;
 
     // default page size
-
-    m_noJustification = false;
-    m_showBoundingBoxes = false;
     m_scoreBasedMei = false;
 
     m_humdrumBuffer = NULL;
@@ -331,9 +328,8 @@ bool Toolkit::LoadData(const std::string &data)
         // LogMessage("Importing Humdrum data");
 
         Doc tempdoc;
+        tempdoc.SetOptions(m_doc.GetOptions());
         HumdrumInput *tempinput = new HumdrumInput(&tempdoc, "");
-        tempinput->SetTypeOption(GetHumType());
-
         if (GetOutputFormat() == HUMDRUM) {
             tempinput->SetOutputFormat("humdrum");
         }
@@ -382,8 +378,8 @@ bool Toolkit::LoadData(const std::string &data)
 
         // Now convert Humdrum into MEI:
         Doc tempdoc;
+        tempdoc.SetOptions(m_doc.GetOptions());
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
-        tempinput->SetTypeOption(GetHumType());
         if (!tempinput->ImportString(conversion.str())) {
             LogError("Error importing Humdrum data");
             delete tempinput;
@@ -412,8 +408,8 @@ bool Toolkit::LoadData(const std::string &data)
 
         // Now convert Humdrum into MEI:
         Doc tempdoc;
+        tempdoc.SetOptions(m_doc.GetOptions());
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
-        tempinput->SetTypeOption(GetHumType());
         if (!tempinput->ImportString(conversion.str())) {
             LogError("Error importing Humdrum data");
             delete tempinput;
@@ -440,8 +436,8 @@ bool Toolkit::LoadData(const std::string &data)
 
         // Now convert Humdrum into MEI:
         Doc tempdoc;
+        tempdoc.SetOptions(m_doc.GetOptions());
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
-        tempinput->SetTypeOption(GetHumType());
         if (!tempinput->ImportString(conversion.str())) {
             LogError("Error importing Humdrum data");
             delete tempinput;
@@ -497,9 +493,9 @@ bool Toolkit::LoadData(const std::string &data)
     }
 
     // disable justification if there's no layout or no justification
-    if (m_options->m_noLayout.GetValue() || m_noJustification) {
-        m_doc.SetJustificationX(false);
-    }
+    //if (m_options->m_noLayout.GetValue() || m_noJustification) {
+    //    m_doc.SetJustificationX(false);
+    //}
 
     delete input;
     m_view.SetDoc(&m_doc);
@@ -805,9 +801,6 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
     if (m_options->m_mmOutput.GetValue()) {
         svg.SetMMOutput(true);
     }
-
-    // debug BB?
-    svg.SetDrawBoundingBoxes(m_showBoundingBoxes);
 
     // render the page
     RenderToDeviceContext(pageNo, &svg);

@@ -202,9 +202,6 @@ int main(int argc, char **argv)
     bool std_output = false;
 
     int all_pages = 0;
-    int hum_type = 0;
-    int no_justification = 0;
-    int show_bounding_boxes = 0;
     int page = 1;
     int show_help = 0;
     int show_version = 0;
@@ -228,13 +225,10 @@ int main(int argc, char **argv)
         // deprecated
         { "page-height-deprecated", required_argument, 0, 'h' },
         { "help", no_argument, 0, '?' },
-        { "hum-type", no_argument, &hum_type, 1 },
-        { "no-justification", no_argument, &no_justification, 1 },
         { "outfile", required_argument, 0, 'o' },
-        { "page", required_argument, 0, 0 },
+        { "page", required_argument, 0, 'p' },
         { "resources", required_argument, 0, 'r' },
         { "scale", required_argument, 0, 's' },
-        { "show-bounding-boxes", no_argument, &show_bounding_boxes, 1 },
         { "type", required_argument, 0, 't' },
         { "version", no_argument, 0, 'v' },
         // deprecated
@@ -329,6 +323,8 @@ int main(int argc, char **argv)
                 break;
 
             case 'o': outfile = string(optarg); break;
+                
+            case 'p': page = atoi(optarg); break;
 
             case 'r': vrv::Resources::SetPath(optarg); break;
 

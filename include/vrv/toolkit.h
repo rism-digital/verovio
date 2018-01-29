@@ -196,22 +196,6 @@ public:
     ///@}
 
     /**
-     * @name Do not justify the system (for debugging purposes)
-     */
-    ///@{
-    void SetNoJustification(bool j) { m_noJustification = j; }
-    int GetNoJustification() { return m_noJustification; }
-    ///@}
-
-    /**
-     * @name Do not justify the system (for debugging purposes)
-     */
-    ///@{
-    void SetShowBoundingBoxes(bool b) { m_showBoundingBoxes = b; }
-    int GetShowBoundingBoxes() { return m_showBoundingBoxes; }
-    ///@}
-
-    /**
      * @name Get the input file format (defined as FileFormat)
      * The SetFormat with FileFormat does not perform any validation
      */
@@ -288,10 +272,6 @@ private:
     FileFormat m_format;
     FileFormat m_outformat;
     bool m_scoreBasedMei;
-    
-    // for debugging
-    bool m_noJustification;
-    bool m_showBoundingBoxes;
 
     static char *m_humdrumBuffer;
     
