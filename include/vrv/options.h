@@ -92,6 +92,9 @@ public:
     Option() {}
     virtual ~Option() {}
     
+    void SetKey(std::string key) { m_key = key; }
+    std::string GetKey() const { return m_key; }
+    
     virtual bool SetValue(std::string) = 0;
     
     void SetInfo(std::string title, std::string description);
@@ -103,6 +106,9 @@ public:
 protected:
     std::string m_title;
     std::string m_description;
+    
+private:
+    std::string m_key;
 };
 
 //----------------------------------------------------------------------------
@@ -117,7 +123,7 @@ public:
     // constructors and destructors
     OptionBool() {}
     virtual ~OptionBool() {}
-    void Init(bool defaultValue, OptionGrp *grp = NULL);
+    void Init(bool defaultValue);
     
     virtual bool SetValue(std::string value);
     
@@ -146,7 +152,7 @@ public:
     // constructors and destructors
     OptionDbl() {}
     virtual ~OptionDbl() {}
-    void Init(double defaultValue, double minValue, double maxValue, OptionGrp *grp = NULL);
+    void Init(double defaultValue, double minValue, double maxValue);
     
     virtual bool SetValue(std::string value);
     
@@ -179,7 +185,7 @@ public:
     // constructors and destructors
     OptionInt() {}
     virtual ~OptionInt() {}
-    void Init(int defaultValue, int minValue, int maxValue, bool definitionFactor = false, OptionGrp *grp = NULL);
+    void Init(int defaultValue, int minValue, int maxValue, bool definitionFactor = false);
     
     virtual bool SetValue(std::string value);
     
@@ -214,7 +220,7 @@ public:
     // constructors and destructors
     OptionString() {}
     virtual ~OptionString() {}
-    void Init(std::string defaultValue, OptionGrp *grp = NULL);
+    void Init(std::string defaultValue);
     
     virtual bool SetValue(std::string value);
     
@@ -272,7 +278,7 @@ public:
     OptionMeasureNumber() {};
     virtual ~OptionMeasureNumber() {};
 
-    void Init(style_MEASURENUMBER defaultValue, OptionGrp *grp = NULL);
+    void Init(style_MEASURENUMBER defaultValue);
     
     virtual bool SetValue(std::string value);
     
@@ -302,7 +308,7 @@ public:
     virtual ~OptionStaffrel() {};
     
     // Alternate type style cannot have a restricted list of possible values
-    void Init(data_STAFFREL defaultValue, OptionGrp *grp = NULL);
+    void Init(data_STAFFREL defaultValue);
     
     virtual bool SetValue(std::string value);
     
@@ -333,7 +339,7 @@ public:
     OptionStaffrelBasic() {};
     virtual ~OptionStaffrelBasic() {};
 
-    void Init(data_STAFFREL_basic defaultValue, const std::vector<data_STAFFREL_basic> &values, OptionGrp *grp = NULL);
+    void Init(data_STAFFREL_basic defaultValue, const std::vector<data_STAFFREL_basic> &values);
 
     virtual bool SetValue(std::string value);
     
@@ -393,6 +399,9 @@ public:
     MapOfStrOptions *GetItems() { return &m_items; }
     
     std::vector<OptionGrp *> *GetGrps() { return &m_grps; }
+    
+private:
+    void Register(Option *option, std::string key, OptionGrp *grp);
 
 public:
     /**
@@ -435,6 +444,8 @@ public:
     OptionDbl m_slurThickness;
     /** The left position */
     OptionDbl m_leftPosition;
+    /** measure number layout (unused) */
+    OptionMeasureNumber m_measureNumber;
     
     /**
      * Selectors
@@ -496,8 +507,6 @@ private:
     MapOfStrOptions m_items;
     
     std::vector<OptionGrp *> m_grps;
-    
-    OptionMeasureNumber m_measureNumber;
 };
 
 } // namespace vrv

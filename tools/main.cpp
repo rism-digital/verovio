@@ -139,13 +139,13 @@ void display_usage()
         for (iter = options->begin(); iter != options->end(); iter++) {
     
             //cerr << toCamelCase(fromCamelCase(iter->first)) << endl;
-            std::string option = fromCamelCase(iter->first);
+            std::string option = fromCamelCase((*iter)->GetKey());
         
-            const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(iter->second);
-            const OptionInt *optInt = dynamic_cast<const OptionInt *>(iter->second);
-            const OptionString *optString = dynamic_cast<const OptionString *>(iter->second);
-            const OptionArray *optArray = dynamic_cast<const OptionArray *>(iter->second);
-            const OptionBool *optBool = dynamic_cast<const OptionBool *>(iter->second);
+            const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(*iter);
+            const OptionInt *optInt = dynamic_cast<const OptionInt *>(*iter);
+            const OptionString *optString = dynamic_cast<const OptionString *>(*iter);
+            const OptionArray *optArray = dynamic_cast<const OptionArray *>(*iter);
+            const OptionBool *optBool = dynamic_cast<const OptionBool *>(*iter);
         
             if (optDbl) {
                 option.append(" <f>");
@@ -170,7 +170,7 @@ void display_usage()
                 option.append("\t");
             }
             
-            cerr << " --" << option << iter->second->GetDescription();
+            cerr << " --" << option << (*iter)->GetDescription();
 
             if (optInt) {
                 cerr << " (default: " << optInt->GetDefault();
