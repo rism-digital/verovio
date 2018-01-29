@@ -118,27 +118,20 @@ void display_usage()
     cerr << " -t, --type <s>        Select output format: mei, svg, or midi (default is svg)" << endl;
     cerr << " -v, --version         Display the version number" << endl;
     cerr << " -x, --xml-id-seed <i> Seed the random number generator for XML IDs" << endl;
-
-    // Options with long forms only
-    cerr << endl << "Additional options" << endl;
-    
     
     Options options;
     std::vector<OptionGrp *> *grp = options.GetGrps();
     std::vector<OptionGrp *>::iterator grpIter;
     
-    //const MapOfStrOptions *params = options.GetItems();
-    //MapOfStrOptions::const_iterator iter;
-    //for (iter = params->begin(); iter != params->end(); iter++) {
-    
     for(grpIter = grp->begin(); grpIter != grp->end(); grpIter++) {
         
+        // Options with long forms only
+        cerr << endl << (*grpIter)->GetLabel() << endl;
         const std::vector<Option *> *options = (*grpIter)->GetOptions();
         std::vector<Option *>::const_iterator iter;
         
         for (iter = options->begin(); iter != options->end(); iter++) {
     
-            //cerr << toCamelCase(fromCamelCase(iter->first)) << endl;
             std::string option = fromCamelCase((*iter)->GetKey());
         
             const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(*iter);
@@ -191,10 +184,6 @@ void display_usage()
 
 
     cerr << " --hum-type                 Include type attributes when importing from Humdrum" << endl;
-
-
-
-    cerr << " --xml-id-seed=INT          Seed the random number generator for XML IDs" << endl;
 
     // Debugging options
     cerr << endl << "Debugging options" << endl;

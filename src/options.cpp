@@ -214,6 +214,7 @@ Options::Options()
     /********* layout *********/
     
     m_generalLayout.SetLabel("General layout options");
+    m_grps.push_back(&m_generalLayout);
     
     m_adjustPageHeight.SetInfo("Adjust page height", "Crop the page height to the height of the content");
     m_adjustPageHeight.Init(false);
@@ -346,6 +347,7 @@ Options::Options()
     /********* selectors *********/
     
     m_selectors.SetLabel("Element selectors");
+    m_grps.push_back(&m_selectors);
     
     m_appXPathQuery.SetInfo("App xPath query", "Set the xPath query for selecting <app> child elements, for example: \"./rdg[contains(@source, 'source-id')]\"; by default the <lem> or the first <rdg> is selected");
     m_appXPathQuery.Init();
@@ -362,6 +364,7 @@ Options::Options()
     /********* The layout left margin by element *********/
     
     m_elementMargins.SetLabel("Element margins");
+    m_grps.push_back(&m_elementMargins);
     
     m_leftMarginAccid.SetInfo("Left margin accid", "The margin for accid in MEI units");
     m_leftMarginAccid.Init(1.0, 0.0, 2.0);
