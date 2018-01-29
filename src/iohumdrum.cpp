@@ -3777,7 +3777,6 @@ template <class ELEMENT> void HumdrumInput::verticalRest(ELEMENT element, const 
     int base40 = hum::Convert::kernToBase40(result);
     int oct = base40 / 40;
     int base7chroma = hum::Convert::base40ToDiatonic(base40) % 7;
-    string pname;
     switch (base7chroma) {
         case 0: element->SetPloc(PITCHNAME_c); break;
         case 1: element->SetPloc(PITCHNAME_d); break;
