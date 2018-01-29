@@ -31,6 +31,27 @@ void Option::SetInfo(std::string title, std::string description)
     m_title = title;
     m_description = description;
 }
+
+bool Option::SetValueBool(bool value)
+{
+    // If not overriden
+    LogError("Unsupported type bool for %s", m_key.c_str());
+    return false;
+}
+    
+bool Option::SetValueDbl(double value)
+{
+    // If not overriden
+    LogError("Unsupported type double for %s", m_key.c_str());
+    return false;
+}
+    
+bool Option::SetValue(std::string value)
+{
+    // If not overriden
+    LogError("Unsupported type string for %s", m_key.c_str());
+    return false;
+}
     
 //----------------------------------------------------------------------------
 // OptionBool
@@ -47,7 +68,17 @@ bool OptionBool::SetValue(std::string value)
     bool b = (value == "true") ? true : false;
     return SetValue(b);
 }
+    
+bool OptionBool::SetValueDbl(double value)
+{
+    return SetValue((bool)value);
+}
 
+bool OptionBool::SetValueBool(bool value)
+{
+    return SetValue(value);
+}
+    
 bool OptionBool::SetValue(bool value)
 {
     m_value = value;
@@ -65,10 +96,15 @@ void OptionDbl::Init(double defaultValue, double minValue, double maxValue)
     m_minValue = minValue;
     m_maxValue = maxValue;
 }
- 
+    
 bool OptionDbl::SetValue(std::string value)
 {
     return SetValue(atof(value.c_str()));
+}
+    
+bool OptionDbl::SetValueDbl(double value)
+{
+    return SetValue(value);
 }
     
 bool OptionDbl::SetValue(double value)
@@ -92,6 +128,11 @@ void OptionInt::Init(int defaultValue, int minValue, int maxValue, bool definiti
     m_minValue = minValue;
     m_maxValue = maxValue;
     m_definitionFactor = definitionFactor;
+}
+
+bool OptionInt::SetValueDbl(double value)
+{
+    return SetValue((int)value);
 }
  
 bool OptionInt::SetValue(std::string value)

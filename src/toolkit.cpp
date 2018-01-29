@@ -539,85 +539,103 @@ bool Toolkit::ParseOptions(const std::string &json_options)
         LogError("Can not parse JSON string.");
         return false;
     }
-
-    if (json.has<jsonxx::String>("inputFormat")) SetFormat(json.get<jsonxx::String>("inputFormat"));
-
-    if (json.has<jsonxx::Number>("scale")) SetScale(json.get<jsonxx::Number>("scale"));
-
-    if (json.has<jsonxx::Number>("border")) SetBorder(json.get<jsonxx::Number>("border"));
-
-    if (json.has<jsonxx::String>("font")) SetFont(json.get<jsonxx::String>("font"));
-
-    if (json.has<jsonxx::Number>("mmOutput")) SetMMOutput(json.get<jsonxx::Number>("mmOutput"));
-
-    if (json.has<jsonxx::Number>("pageWidth")) SetPageWidth(json.get<jsonxx::Number>("pageWidth"));
-
-    if (json.has<jsonxx::Number>("pageHeight")) SetPageHeight(json.get<jsonxx::Number>("pageHeight"));
-
-    if (json.has<jsonxx::Number>("spacingLinear")) SetSpacingLinear(json.get<jsonxx::Number>("spacingLinear"));
-
-    if (json.has<jsonxx::Number>("spacingNonLinear")) SetSpacingNonLinear(json.get<jsonxx::Number>("spacingNonLinear"));
-
-    if (json.has<jsonxx::Number>("spacingStaff")) SetSpacingStaff(json.get<jsonxx::Number>("spacingStaff"));
-
-    if (json.has<jsonxx::Number>("spacingSystem")) SetSpacingSystem(json.get<jsonxx::Number>("spacingSystem"));
-
-    if (json.has<jsonxx::String>("appXPathQuery")) {
-        std::vector<std::string> queries = { json.get<jsonxx::String>("appXPathQuery") };
-        SetAppXPathQueries(queries);
-    }
-
-    if (json.has<jsonxx::Array>("appXPathQueries")) {
-        jsonxx::Array values = json.get<jsonxx::Array>("appXPathQueries");
-        std::vector<std::string> queries;
-        int i;
-        for (i = 0; i < values.size(); i++) {
-            if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
+    
+    std::map<std::string, jsonxx::Value*> jsonMap = json.kv_map();
+    std::map<std::string, jsonxx::Value*>::const_iterator iter;
+    for (iter = jsonMap.begin(); iter != jsonMap.end(); iter++)
+    {
+        if (m_options->GetItems()->count(iter->first) == 0) {
+            // JSON array options - we set them one by one
+            if (iter->first == "appXPathQueries") {
+                jsonxx::Array values = json.get<jsonxx::Array>("appXPathQueries");
+                std::vector<std::string> queries;
+                Option *opt = m_options->GetItems()->at("appXPathQuery");
+                assert(opt);
+                int i;
+                for (i = 0; i < values.size(); i++) {
+                    if (values.has<jsonxx::String>(i)) opt->SetValue(values.get<jsonxx::String>(i));
+                }
+            }
+            else if (iter->first == "choiceXPathQueries") {
+                jsonxx::Array values = json.get<jsonxx::Array>("choiceXPathQueries");
+                std::vector<std::string> queries;
+                Option *opt = m_options->GetItems()->at("choiceXPathQuery");
+                assert(opt);
+                int i;
+                for (i = 0; i < values.size(); i++) {
+                    if (values.has<jsonxx::String>(i)) opt->SetValue(values.get<jsonxx::String>(i));
+                }
+            }
+            // Base options
+            else if (iter->first == "inputFormat") {
+                if (json.has<jsonxx::String>("inputFormat")) {
+                    SetFormat(json.get<jsonxx::String>("inputFormat"));
+                }
+            }
+            else if (iter->first == "noJustification") {
+                if (json.has<jsonxx::Boolean>("noJustification")) {
+                    SetNoJustification(json.get<jsonxx::Boolean>("noJustification"));
+                }
+            }
+            else if (iter->first == "scale") {
+                if (json.has<jsonxx::Number>("scale")) {
+                    SetScale(json.get<jsonxx::Number>("scale"));
+                }
+            }
+            else if (iter->first == "showBoundingBoxes") {
+                if (json.has<jsonxx::Boolean>("showBoundingBoxes")) {
+                    SetShowBoundingBoxes(json.get<jsonxx::Boolean>("showBoundingBoxes"));
+                }
+            }
+            else if (iter->first == "xmlIdSeed") {
+                if (json.has<jsonxx::Number>("xmlIdSeed")) {
+                    Object::SeedUuid(json.get<jsonxx::Number>("xmlIdSeed"));
+                }
+            }
+            // Deprecated option
+            else if (iter->first == "border") {
+                LogWarning("Option border is deprecated; use pageLeftMar, pageRightMar and pageTopMar instead");
+                Option *opt = NULL;
+                if (json.has<jsonxx::Number>("border")){
+                    double border = json.get<jsonxx::Number>("border");
+                    opt = m_options->GetItems()->at("pageLeftMar");
+                    assert(opt);
+                    opt->SetValueDbl(border);
+                    opt = m_options->GetItems()->at("pageRightMar");
+                    assert(opt);
+                    opt->SetValueDbl(border);
+                    opt = m_options->GetItems()->at("pageTopMar");
+                    assert(opt);
+                    opt->SetValueDbl(border);
+                }
+            }
+            else {
+                LogError("Unsupported option '%s'", iter->first.c_str());
+            }
+            continue;
         }
-        SetAppXPathQueries(queries);
-    }
-
-    if (json.has<jsonxx::String>("choiceXPathQuery")) {
-        std::vector<std::string> queries = { json.get<jsonxx::String>("choiceXPathQuery") };
-        SetChoiceXPathQueries(queries);
-    }
-
-    if (json.has<jsonxx::Array>("choiceXPathQueries")) {
-        jsonxx::Array values = json.get<jsonxx::Array>("choiceXPathQueries");
-        std::vector<std::string> queries;
-        int i;
-        for (i = 0; i < values.size(); i++) {
-            if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
+        
+        // Mapped options
+        
+        Option *opt = m_options->GetItems()->at(iter->first);
+        assert(opt);
+        
+        if (json.has<jsonxx::Number>(iter->first)) {
+            opt->SetValueDbl(json.get<jsonxx::Number>(iter->first));
+            //LogMessage("Double: %f", json.get<jsonxx::Number>(iter->first));
         }
-        SetChoiceXPathQueries(queries);
+        else if (json.has<jsonxx::Boolean>(iter->first)) {
+            opt->SetValueBool(json.get<jsonxx::Boolean>(iter->first));
+            //LogMessage("Bool: %d", json.get<jsonxx::Boolean>(iter->first));
+        }
+        else if (json.has<jsonxx::String>(iter->first)) {
+            opt->SetValue(json.get<jsonxx::String>(iter->first));
+            //LogMessage("String: %s", json.get<jsonxx::String>(iter->first).c_str());
+        }
+        else {
+            LogError("Unsupported type for option '%s'", iter->first.c_str());
+        }
     }
-
-    if (json.has<jsonxx::String>("mdivXPathQuery")) SetMdivXPathQuery(json.get<jsonxx::String>("mdivXPathQuery"));
-
-    if (json.has<jsonxx::Number>("xmlIdSeed")) Object::SeedUuid(json.get<jsonxx::Number>("xmlIdSeed"));
-
-    // Parse the various flags
-    // Note: it seems that there is a bug with jsonxx and emscripten
-    // Boolean value false won't be parsed properly. We have to use Number instead
-
-    if (json.has<jsonxx::Number>("noLayout")) SetNoLayout(json.get<jsonxx::Number>("noLayout"));
-
-    if (json.has<jsonxx::Number>("ignoreLayout")) SetIgnoreLayout(json.get<jsonxx::Number>("ignoreLayout"));
-
-    if (json.has<jsonxx::Number>("adjustPageHeight")) SetAdjustPageHeight(json.get<jsonxx::Number>("adjustPageHeight"));
-
-    if (json.has<jsonxx::Number>("noJustification")) SetNoJustification(json.get<jsonxx::Number>("noJustification"));
-
-    if (json.has<jsonxx::Number>("evenNoteSpacing")) {
-        SetEvenNoteSpacing(json.get<jsonxx::Number>("evenNoteSpacing"));
-    }
-
-    if (json.has<jsonxx::Number>("humType")) {
-        SetHumType(json.get<jsonxx::Number>("humType"));
-    }
-
-    if (json.has<jsonxx::Number>("showBoundingBoxes"))
-        SetShowBoundingBoxes(json.get<jsonxx::Number>("showBoundingBoxes"));
 
     return true;
 #else

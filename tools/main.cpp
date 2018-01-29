@@ -311,7 +311,7 @@ int main(int argc, char **argv)
             
             
             case 'b':
-                LogWarning("Option -b and --border is deprecated. Use --page-left-mar, --page-right-mar and --page-top-mar instead");
+                LogWarning("Option -b and --border is deprecated; use --page-left-mar, --page-right-mar and --page-top-mar instead");
                 options->m_pageLeftMar.SetValue(optarg);
                 options->m_pageRightMar.SetValue(optarg);
                 options->m_pageTopMar.SetValue(optarg);
@@ -324,7 +324,7 @@ int main(int argc, char **argv)
                 break;
 
             case 'h':
-                LogWarning("Option -h is deprecated. Use --page-height instead");
+                LogWarning("Option -h is deprecated; use --page-height instead");
                 options->m_pageHeight.SetValue(optarg);
                 break;
 
@@ -346,7 +346,7 @@ int main(int argc, char **argv)
             case 'v': show_version = 1; break;
 
             case 'w':
-                LogWarning("Option -w is deprecated. Use --page-width instead");
+                LogWarning("Option -w is deprecated; use --page-width instead");
                 options->m_pageWidth.SetValue(optarg);
                 break;
                 

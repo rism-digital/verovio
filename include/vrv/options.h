@@ -95,7 +95,9 @@ public:
     void SetKey(std::string key) { m_key = key; }
     std::string GetKey() const { return m_key; }
     
-    virtual bool SetValue(std::string) = 0;
+    virtual bool SetValueBool(bool value);
+    virtual bool SetValueDbl(double value);
+    virtual bool SetValue(std::string value);
     
     void SetInfo(std::string title, std::string description);
     std::string GetTitle() const { return m_title; }
@@ -125,11 +127,13 @@ public:
     virtual ~OptionBool() {}
     void Init(bool defaultValue);
     
+    virtual bool SetValueBool(bool value);
+    virtual bool SetValueDbl(double value);
     virtual bool SetValue(std::string value);
     
     bool GetValue() const { return m_value; }
     bool GetDefault() const { return m_defaultValue; }
-    bool SetValue(bool m_value);
+    bool SetValue(bool value);
   
 private:
     //
@@ -154,6 +158,7 @@ public:
     virtual ~OptionDbl() {}
     void Init(double defaultValue, double minValue, double maxValue);
     
+    virtual bool SetValueDbl(double value);
     virtual bool SetValue(std::string value);
     
     double GetValue() const { return m_value; }
@@ -187,6 +192,7 @@ public:
     virtual ~OptionInt() {}
     void Init(int defaultValue, int minValue, int maxValue, bool definitionFactor = false);
     
+    virtual bool SetValueDbl(double value);
     virtual bool SetValue(std::string value);
     
     int GetValue();
