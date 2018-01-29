@@ -1534,6 +1534,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     std::string primarymensuration;
+    bool haslabel = false;
     std::string label;
     std::string abbreviation;
     std::string clef;
@@ -1575,6 +1576,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
         else if (part->compare(0, 3, "*I\"") == 0) {
             label = part->substr(3);
+            haslabel = true;
         }
         else if (part->compare(0, 5, "*met(") == 0) {
             auto ploc = part->rfind(")");
@@ -1635,9 +1637,12 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         setDynamicTransposition(partnumber - 1, m_staffdef.back(), itranspose);
     }
 
-    if (label.size() > 0) {
-        // 300: m_staffdef.back()->SetLabel(label);
+    if (haslabel) {
         setInstrumentName(m_staffdef.back(), label);
+    }
+    else if (partnumber == 1) {
+        // setInstrumentName(m_staffdef.back(), "&#160;&#160;&#160;&#160;");
+        setInstrumentName(m_staffdef.back(), "\xc2\xa0\xc2\xa0\xc2\xa0\xc2\xa0");
     }
 
     if (abbreviation.size() > 0) {
@@ -3255,6 +3260,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     int line = layerdata[i]->getLineIndex();
                     int field = layerdata[i]->getFieldIndex();
                     colorRest(rest, *layerdata[i], line, field);
+                    verticalRest(rest, *layerdata[i]);
                 }
             }
             else {
@@ -3299,6 +3305,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 int line = layerdata[i]->getLineIndex();
                 int field = layerdata[i]->getFieldIndex();
                 colorRest(rest, *layerdata[i], line, field);
+                verticalRest(rest, *layerdata[i]);
             }
         }
         else if (!layerdata[i]->isNote()) {
@@ -3751,6 +3758,37 @@ template <class ELEMENT> void HumdrumInput::appendTypeTag(ELEMENT *note, const s
 template <class ELEMENT> void HumdrumInput::setPlace(ELEMENT *element, const std::string &place)
 {
     element->SetPlace(element->AttPlacement::StrToStaffrel(place));
+}
+
+/////////////////////////////
+//
+// HumdrumInput::verticalRest -- If the rest has pitch information, set the vertical
+//    position of the rest from the pitch.
+//
+
+template <class ELEMENT> void HumdrumInput::verticalRest(ELEMENT element, const std::string &token)
+{
+    hum::HumRegex hre;
+    if (!hre.search(token, "([A-Ga-g]+)")) {
+        return;
+    }
+    string result = hre.getMatch(1);
+
+    int base40 = hum::Convert::kernToBase40(result);
+    int oct = base40 / 40;
+    int base7chroma = hum::Convert::base40ToDiatonic(base40) % 7;
+    string pname;
+    switch (base7chroma) {
+        case 0: element->SetPloc(PITCHNAME_c); break;
+        case 1: element->SetPloc(PITCHNAME_d); break;
+        case 2: element->SetPloc(PITCHNAME_e); break;
+        case 3: element->SetPloc(PITCHNAME_f); break;
+        case 4: element->SetPloc(PITCHNAME_g); break;
+        case 5: element->SetPloc(PITCHNAME_a); break;
+        case 6: element->SetPloc(PITCHNAME_b); break;
+    }
+
+    element->SetOloc(oct);
 }
 
 //////////////////////////////
