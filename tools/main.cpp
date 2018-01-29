@@ -156,8 +156,8 @@ void display_usage()
                 option.append(" <s>");
             }
             
-            if (option.size() < 30) {
-                option.insert(option.end(), 30 - option.size(), ' ');
+            if (option.size() < 32) {
+                option.insert(option.end(), 32 - option.size(), ' ');
             }
             else {
                 option.append("\t");
@@ -181,16 +181,6 @@ void display_usage()
             cerr << endl;
         }
     }
-
-
-    cerr << " --hum-type                 Include type attributes when importing from Humdrum" << endl;
-
-    // Debugging options
-    cerr << endl << "Debugging options" << endl;
-
-    cerr << " --no-justification         Do not justify the system" << endl;
-
-    cerr << " --show-bounding-boxes      Show symbol bounding boxes" << endl;
 }
 
 int main(int argc, char **argv)

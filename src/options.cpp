@@ -437,7 +437,7 @@ Options::Options()
     this->Register(&m_staffLineWidth, "staffLineWidth", &m_generalLayout);
     
     m_stemWidth.SetInfo("Stem width", "The stem width");
-    m_stemWidth.Init(0.20, 0.10, 0.0);
+    m_stemWidth.Init(0.20, 0.10, 0.50);
     this->Register(&m_stemWidth, "stemWidth", &m_generalLayout);
     
     m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
