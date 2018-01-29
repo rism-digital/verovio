@@ -354,6 +354,8 @@
 		4DB726C51B8BB0E80040231B /* text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB726C41B8BB0E80040231B /* text.cpp */; };
 		4DB726C61B8BB0E80040231B /* text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB726C41B8BB0E80040231B /* text.cpp */; };
 		4DB726C81B8BB0F30040231B /* text.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB726C71B8BB0F30040231B /* text.h */; };
+		4DB78742201F9F7200394520 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F9112018A93200A4D336 /* svg.cpp */; };
+		4DB78743201F9F7300394520 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F9112018A93200A4D336 /* svg.cpp */; };
 		4DC12A571F716E1C000440E9 /* pghead.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC12A561F716E1C000440E9 /* pghead.h */; };
 		4DC12A591F716E27000440E9 /* pghead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A581F716E27000440E9 /* pghead.cpp */; };
 		4DC12A5A1F716E27000440E9 /* pghead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A581F716E27000440E9 /* pghead.cpp */; };
@@ -1686,6 +1688,7 @@
 				4D16943E1E3A44F300569BF4 /* view_graph.cpp in Sources */,
 				4D16943F1E3A44F300569BF4 /* view_page.cpp in Sources */,
 				4D1694401E3A44F300569BF4 /* view_tuplet.cpp in Sources */,
+				4DB78742201F9F7200394520 /* svg.cpp in Sources */,
 				4DB3D8EF1F83D1A600B5FC2B /* fig.cpp in Sources */,
 				4D1694411E3A44F300569BF4 /* rpt.cpp in Sources */,
 				4D1694421E3A44F300569BF4 /* chord.cpp in Sources */,
@@ -1948,6 +1951,7 @@
 				4DB3D8D71F83D13600B5FC2B /* trill.cpp in Sources */,
 				4DB3D8EB1F83D18000B5FC2B /* proport.cpp in Sources */,
 				4D6331F71F46D2CB00A0D6BF /* arpeg.cpp in Sources */,
+				4DB78743201F9F7300394520 /* svg.cpp in Sources */,
 				4DB3D8F61F83D1DC00B5FC2B /* view_mensural.cpp in Sources */,
 				4DB3D8E41F83D16400B5FC2B /* elementpart.cpp in Sources */,
 				8F3DD33818854B250051330C /* system.cpp in Sources */,

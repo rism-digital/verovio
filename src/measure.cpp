@@ -394,7 +394,7 @@ int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
@@ -664,7 +664,7 @@ int Measure::ResetDrawing(FunctorParams *functorParams)
     this->m_timestampAligner.Reset();
     m_drawingEnding = NULL;
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Measure::CastOffSystems(FunctorParams *functorParams)
 {
@@ -877,7 +877,7 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Measure::GenerateMIDI(FunctorParams *functorParams)
 {

@@ -437,7 +437,7 @@ int Artic::PrepareLayerElementParts(FunctorParams *functorParams)
     this->Process(&prepareDrawingCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Artic::ResetDrawing(FunctorParams *functorParams)
 {
@@ -448,7 +448,7 @@ int Artic::ResetDrawing(FunctorParams *functorParams)
     ClearChildren();
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int ArticPart::ResetVerticalAlignment(FunctorParams *functorParams)
 {
