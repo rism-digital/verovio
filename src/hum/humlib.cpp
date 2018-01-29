@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jan 28 11:36:13 PST 2018
+// Last Modified: Mon Jan 29 05:28:59 PST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -41878,10 +41878,12 @@ void Tool_metlev::fillVoiceResults(vector<vector<double> >& results,
 //
 
 Tool_msearch::Tool_msearch(void) {
-	define("debug=b",       "diatonic search");
-	define("q|query=s:c d e f g",  "query string");
-	define("t|text=s:",  "lyrical text query string");
-	define("x|cross=b",     "search across parts");
+	define("debug=b",           "diatonic search");
+	define("q|query=s:cdefg",   "query string");
+	define("t|text=s:",         "lyrical text query string");
+	define("x|cross=b",         "search across parts");
+	define("c|color=s",         "highlight color");
+	define("m|mark|marker=s:@", "marking character");
 }
 
 
@@ -41920,6 +41922,7 @@ bool Tool_msearch::run(HumdrumFile& infile) {
 		grid.printGridInfo(cerr);
 		// return 1;
 	}
+	initialize();
 
 	if (getBoolean("text")) {
 		m_text = getString("text");
@@ -41936,6 +41939,18 @@ bool Tool_msearch::run(HumdrumFile& infile) {
 	}
 
 	return 1;
+}
+
+
+//////////////////////////////
+//
+// Tool_msearch::initialize --
+//
+
+void Tool_msearch::initialize(void) {
+	m_marker = getString("marker");
+	m_marker = m_marker[0];
+
 }
 
 
@@ -42025,7 +42040,11 @@ void Tool_msearch::doTextSearch(HumdrumFile& infile, NoteGrid& grid,
 	}
 
 	if (tcount) {
-		infile.appendLine("!!!RDF**kern: @ = marked note");
+		string content = "!!!RDF**kern: " + m_marker + " = marked note";
+		if (getBoolean("color")) {
+			content += ", color=\"" + getString("color") + "\"";
+		}
+		infile.appendLine(content);
 		infile.createLinesFromTokens();
 	}
 
@@ -42066,7 +42085,11 @@ void Tool_msearch::doMusicSearch(HumdrumFile& infile, NoteGrid& grid,
 	}
 	
 	if (mcount) {
-		infile.appendLine("!!!RDF**kern: @ = marked note");
+		string content = "!!!RDF**kern: " + m_marker + " = marked note";
+		if (getBoolean("color")) {
+			content += ", color=\"" + getString("color") + "\"";
+		}
+		infile.appendLine(content);
 		infile.createLinesFromTokens();
 	}
 }
@@ -42093,8 +42116,7 @@ void Tool_msearch::markMatch(HumdrumFile& infile, vector<NoteCell*>& match) {
 		if (!tok->isData()) {
 			return;
 		}
-		text = tok->getText();
-		text += '@';
+		text = tok->getText() + m_marker;
 		tok->setText(text);
 		tok = tok->getNextNNDT();
 	}
@@ -42140,8 +42162,7 @@ void Tool_msearch::markTextMatch(HumdrumFile& infile, TextInfo& word) {
 		if (!tok->isData()) {
 			return;
 		}
-		text = tok->getText();
-		text += '@';
+		text = tok->getText() + m_marker;
 		tok->setText(text);
 		tok = tok->getNextNNDT();
 	}
