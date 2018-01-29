@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jan 26 03:51:57 PST 2018
+// Last Modified: Sun Jan 28 11:36:13 PST 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2768,10 +2768,12 @@ class GridMeasure : public list<GridSlice*> {
 		                             int part, int staff, int voice, int maxstaff);
 		GridSlice*   addTransposeToken(const string& tok, HumNum timestamp,
 		                             int part, int staff, int voice, int maxstaff);
-		GridSlice*   addLabelToken(const string& tok, HumNum timestamp,
-		                             int part, int staff, int voice, int maxstaff);
+		GridSlice*   addLabelToken  (const string& tok, HumNum timestamp,
+		                             int part, int staff, int voice, int maxpart,
+		                             int maxstaff);
 		GridSlice*   addLabelAbbrToken(const string& tok, HumNum timestamp,
-		                             int part, int staff, int voice, int maxstaff);
+		                             int part, int staff, int voice, int maxpart,
+		                             int maxstaff);
 		GridSlice*   addDataToken   (const string& tok, HumNum timestamp,
 		                             int part, int staff, int voice, int maxstaff);
 		GridSlice*   addGraceToken  (const string& tok, HumNum timestamp,
