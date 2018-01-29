@@ -367,9 +367,9 @@ protected:
     std::string getSystemDecoration(const std::string &tag);
     void processStaffDecoration(const std::string &decoration);
     int getStaffNumberLabel(hum::HTp spinestart);
-	bool isFirstTokenOnStaff(hum::HTp token);
-	bool hasAboveParameter(hum::HTp token, const string& category);
-	bool hasBelowParameter(hum::HTp token, const string& category);
+    bool isFirstTokenOnStaff(hum::HTp token);
+    bool hasAboveParameter(hum::HTp token, const string &category);
+    bool hasBelowParameter(hum::HTp token, const string &category);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -381,6 +381,7 @@ protected:
     void insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<std::string> > &respPeople);
 
     /// Templates ///////////////////////////////////////////////////////////
+    template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);
     template <class ELEMENT> void setKeySig(int partindex, ELEMENT element, const std::string &keysig);
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
