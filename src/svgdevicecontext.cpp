@@ -721,12 +721,17 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     if ((svgText.length() > 0) && (svgText[0] == ' ')) {
         svgText.replace(0, 1, "\xC2\xA0");
     }
+    if ((svgText.length() > 0) && (svgText[svgText.size() - 1] == ' ')) {
+        svgText.replace(svgText.size() - 1, 1, "\xC2\xA0");
+    }
 
     std::string currentFaceName
         = (m_currentNode.attribute("font-family")) ? m_currentNode.attribute("font-family").value() : "";
     std::string fontFaceName = m_fontStack.top()->GetFaceName();
 
     pugi::xml_node textChild = AppendChild("tspan");
+    // We still add @xml::space
+    textChild.append_attribute("xml:space") = "preserve";
     // Set the @font-family only if it is not the same as in the parent node
     if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {
         textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
