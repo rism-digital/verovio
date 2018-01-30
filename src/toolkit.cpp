@@ -477,25 +477,23 @@ bool Toolkit::LoadData(const std::string &data)
 
     // Do the layout? this depends on the options and the file. PAE and
     // DARMS have no layout information. MEI files _can_ have it, but it
-    // might have been ignored because of the --ignore-layout option.
-    // Regardless, we won't do layout if the --no-layout option was set.
-    if (!m_options->m_noLayout.GetValue()) {
-        if (input->HasLayoutInformation() && !m_options->m_ignoreLayout.GetValue()) {
+    // might have been ignored because of the --breaks auto option.
+    // Regardless, we won't do layout if the --breaks none option was set.
+    if (m_options->m_breaks.GetValue() != BREAKS_none) {
+        if (input->HasLayoutInformation() && (m_options->m_breaks.GetValue() == BREAKS_encoded)) {
             // LogElapsedTimeStart();
             m_doc.CastOffEncodingDoc();
             // LogElapsedTimeEnd("layout");
         }
         else {
+            if (m_options->m_breaks.GetValue() == BREAKS_encoded) {
+                LogWarning("Requesting layout with encoded breaks but nothing provided in the data");
+            }
             // LogElapsedTimeStart();
             m_doc.CastOffDoc();
             // LogElapsedTimeEnd("layout");
         }
     }
-
-    // disable justification if there's no layout or no justification
-    //if (m_options->m_noLayout.GetValue() || m_noJustification) {
-    //    m_doc.SetJustificationX(false);
-    //}
 
     delete input;
     m_view.SetDoc(&m_doc);
@@ -593,6 +591,34 @@ bool Toolkit::ParseOptions(const std::string &json_options)
                     opt = m_options->GetItems()->at("pageTopMar");
                     assert(opt);
                     opt->SetValueDbl(border);
+                }
+            }
+            else if (iter->first == "ignoreLayout") {
+                LogWarning("Option ignoreLayout is deprecated; use breaks: \"auto\"|\"encoded\" instead");
+                Option *opt = NULL;
+                opt = m_options->GetItems()->at("breaks");
+                assert(opt);
+                if (json.has<jsonxx::Number>("ignoreLayout")) {
+                    if ((int)json.get<jsonxx::Number>("ignoreLayout") == 1) {
+                        opt->SetValue("auto");
+                    }
+                    else {
+                        opt->SetValue("encoded");
+                    }
+                }
+            }
+            else if (iter->first == "noLayout") {
+                LogWarning("Option noLayout is deprecated; use breaks: \"auto\"|\"none\" instead");
+                Option *opt = NULL;
+                opt = m_options->GetItems()->at("breaks");
+                assert(opt);
+                if (json.has<jsonxx::Number>("noLayout")) {
+                    if ((int)json.get<jsonxx::Number>("noLayout") == 1) {
+                        opt->SetValue("none");
+                    }
+                    else {
+                        opt->SetValue("auto");
+                    }
                 }
             }
             else {
@@ -767,8 +793,8 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     int width = m_options->m_pageWidth.GetUnfactoredValue();
     int height = m_options->m_pageHeight.GetUnfactoredValue();
 
-    if (m_options->m_noLayout.GetValue()) width = m_doc.GetAdjustedDrawingPageWidth();
-    if (m_options->m_adjustPageHeight.GetValue() || m_options->m_noLayout.GetValue()) height = m_doc.GetAdjustedDrawingPageHeight();
+    if (m_options->m_breaks.GetValue() == BREAKS_none) width = m_doc.GetAdjustedDrawingPageWidth();
+    if (m_options->m_adjustPageHeight.GetValue() || (m_options->m_breaks.GetValue() == BREAKS_none)) height = m_doc.GetAdjustedDrawingPageHeight();
 
     // set dimensions
     deviceContext->SetWidth(width);

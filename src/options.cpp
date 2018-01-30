@@ -422,10 +422,6 @@ Options::Options()
     m_humType.SetInfo("Humdrum type", "Include type attributes when importing from Humdrum");
     m_humType.Init(false);
     this->Register(&m_humType, "humType", &m_generalLayout);
-
-    m_ignoreLayout.SetInfo("Ignore layout", "Ignore all encoded layout information (if any) and fully recalculate the layout");
-    m_ignoreLayout.Init(false);
-    this->Register(&m_ignoreLayout, "ignoreLayout", &m_generalLayout);
     
     m_landscape.SetInfo("Landscape orientation", "The landscape paper orientation flag");
     m_landscape.Init(false);
@@ -462,10 +458,6 @@ Options::Options()
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
     this->Register(&m_noJustification, "noJustification", &m_generalLayout);
-    
-    m_noLayout.SetInfo("No layout", "Ignore all encoded layout information (if any) and output one single page with one single system");
-    m_noLayout.Init(false);
-    this->Register(&m_noLayout, "noLayout", &m_generalLayout);
     
     m_pageHeight.SetInfo("Page height", "The page height");
     m_pageHeight.Init(2970, 100, 60000, true);

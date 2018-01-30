@@ -317,13 +317,13 @@ int main(int argc, char **argv)
                 break;
             
             case 'i':
-                LogWarning("Option --ignore is deprecated; use --breaks auto");
-                options->m_pageHeight.SetValue(optarg);
+                LogWarning("Option --ignore-layout is deprecated; use --breaks auto");
+                options->m_breaks.SetValue(BREAKS_auto);
                 break;
             
             case 'n':
                 LogWarning("Option --no-layout is deprecated; use --breaks none");
-                options->m_pageHeight.SetValue(optarg);
+                options->m_breaks.SetValue(BREAKS_none);
                 break;
 
             case 'o': outfile = string(optarg); break;

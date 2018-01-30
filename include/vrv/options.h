@@ -443,18 +443,18 @@ public:
     /**
      * General layout - to be sorted
      */
+    OptionGrp m_generalLayout;
+
     OptionBool m_adjustPageHeight;
     OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
     OptionIntMap m_breaks;
-    OptionGrp m_generalLayout;
     OptionBool m_evenNoteSpacing;
     OptionString m_font;
     OptionDbl m_graceFactor;
     OptionDbl m_hairpinSize;
     OptionBool m_humType;
-    OptionBool m_ignoreLayout;
     OptionBool m_landscape;
     OptionDbl m_leftPosition;
     OptionDbl m_lyricSize;
@@ -464,7 +464,6 @@ public:
     OptionBool m_noFooter;
     OptionBool m_noHeader;
     OptionBool m_noJustification;
-    OptionBool m_noLayout;
     OptionInt m_pageHeight;
     OptionInt m_pageLeftMar;
     OptionInt m_pageRightMar;
@@ -486,6 +485,7 @@ public:
      * Selectors
      */
     OptionGrp m_selectors;
+    
     OptionArray m_appXPathQuery;
     OptionArray m_choiceXPathQuery;
     OptionString m_mdivXPathQuery;
