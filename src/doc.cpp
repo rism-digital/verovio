@@ -802,6 +802,8 @@ void Doc::CastOffEncodingDoc()
 
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
+    
+    contentPage->LayOutHorizontally();
 
     System *contentSystem = dynamic_cast<System *>(contentPage->FindChildByType(SYSTEM));
     assert(contentSystem);
