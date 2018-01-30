@@ -73,7 +73,14 @@ class OptionGrp;
 // Option defines
 //----------------------------------------------------------------------------
 
-enum style_MEASURENUMBER
+enum option_BREAKS
+{
+    BREAKS_none = 0,
+    BREAKS_auto,
+    BREAKS_encoded
+};
+    
+enum option_MEASURENUMBER
 {
     MEASURENUMBER_system = 0,
     MEASURENUMBER_interval
@@ -105,7 +112,11 @@ public:
     std::string GetDescription() const { return m_description; }
     
 public:
-    //
+    /**
+     * Static maps used my OptionIntMap objects. Set in OptIntMap::Init
+     */
+    static std::map<int, std::string> s_breaks;
+    static std::map<int, std::string> s_measureNumber;
 protected:
     std::string m_title;
     std::string m_description;
@@ -276,34 +287,40 @@ private:
     std::vector<std::string> m_values;
     std::vector<std::string> m_defaultValues;
 };
-    
+
 //----------------------------------------------------------------------------
-// OptionMeasureNumber
+// OptionIntMap
 //----------------------------------------------------------------------------
 
 /**
- * This class is for map styling params
+ * This class is for map break options
  */
-class OptionMeasureNumber : public Option {
+class OptionIntMap : public Option {
 public:
     // constructors and destructors
-    OptionMeasureNumber() {};
-    virtual ~OptionMeasureNumber() {};
+    OptionIntMap();
+    virtual ~OptionIntMap() {}
     virtual void CopyTo(Option *option);
-    void Init(style_MEASURENUMBER defaultValue);
+    void Init(int defaultValue, std::map<int, std::string> *values);
     
     virtual bool SetValue(std::string value);
     
-    style_MEASURENUMBER GetValue() const { return m_value; }
-    style_MEASURENUMBER GetDefault() const { return m_defaultValue; }
+    int GetValue() const { return m_value; }
+    int GetDefault() const { return m_defaultValue; }
+    bool SetValue(int value);
 
+    std::string GetStrValue() const;
+    std::string GetDefaultStrValue() const;
+    std::vector<std::string> GetStrValues(bool withoutDefault) const;
+    std::string GetStrValuesAtStr(bool withoutDefault) const;
 private:
     //
 public:
-    static std::map<style_MEASURENUMBER, std::string> values;
+    //
 private:
-    style_MEASURENUMBER m_value;
-    style_MEASURENUMBER m_defaultValue;
+    std::map<int, std::string> *m_values;
+    int m_value;
+    int m_defaultValue;
 };
     
 //----------------------------------------------------------------------------
@@ -430,6 +447,7 @@ public:
     OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
+    OptionIntMap m_breaks;
     OptionGrp m_generalLayout;
     OptionBool m_evenNoteSpacing;
     OptionString m_font;
@@ -441,7 +459,7 @@ public:
     OptionDbl m_leftPosition;
     OptionDbl m_lyricSize;
     OptionInt m_measureMinWidth;
-    OptionMeasureNumber m_measureNumber;
+    OptionIntMap m_measureNumber;
     OptionBool m_mmOutput;
     OptionBool m_noFooter;
     OptionBool m_noHeader;

@@ -136,6 +136,7 @@ void display_usage()
         
             const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(*iter);
             const OptionInt *optInt = dynamic_cast<const OptionInt *>(*iter);
+            const OptionIntMap *optIntMap = dynamic_cast<const OptionIntMap *>(*iter);
             const OptionString *optString = dynamic_cast<const OptionString *>(*iter);
             const OptionArray *optArray = dynamic_cast<const OptionArray *>(*iter);
             const OptionBool *optBool = dynamic_cast<const OptionBool *>(*iter);
@@ -178,6 +179,9 @@ void display_usage()
             if (optString) {
                 cerr << " (default: \"" << optString->GetDefault() << "\")";
             }
+            if (optIntMap) {
+                cerr << " (default: \"" << optIntMap->GetDefaultStrValue() << "\"; other values: " << optIntMap->GetStrValuesAtStr(true) << ")";
+            }
             cerr << endl;
         }
     }
@@ -209,11 +213,7 @@ int main(int argc, char **argv)
 
     static struct option base_options[] = {
         { "all-pages", no_argument, 0, 'a' },
-        // deprecated
-        { "border", required_argument, 0, 'b' },
         { "format", required_argument, 0, 'f' },
-        // deprecated
-        { "page-height-deprecated", required_argument, 0, 'h' },
         { "help", no_argument, 0, '?' },
         { "outfile", required_argument, 0, 'o' },
         { "page", required_argument, 0, 'p' },
@@ -221,9 +221,13 @@ int main(int argc, char **argv)
         { "scale", required_argument, 0, 's' },
         { "type", required_argument, 0, 't' },
         { "version", no_argument, 0, 'v' },
-        // deprecated
-        { "page-width-deprecated", required_argument, 0, 'w' },
         { "xml-id-seed", required_argument, 0, 'x' },
+        // deprecated - some use undocumented short options to catch them as such
+        { "border", required_argument, 0, 'b' },
+        { "ignore-layout", no_argument, 0, 'i' },
+        { "no-layout", no_argument, 0, 'n' },
+        { "page-height-deprecated", required_argument, 0, 'h' },
+        { "page-width-deprecated", required_argument, 0, 'w' },
         { 0, 0, 0, 0 }
     };
     
@@ -269,7 +273,7 @@ int main(int argc, char **argv)
     int option_index = 0;
     Option *opt = NULL;
     OptionBool *optBool = NULL;
-    while ((c = getopt_long(argc, argv, "?ab:f:h:o:p:r:s:t:w:vx:", long_options, &option_index)) != -1) {
+    while ((c = getopt_long(argc, argv, "?ab:f:h:ino:p:r:s:t:w:vx:", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
                 key = long_options[option_index].name;
@@ -309,6 +313,16 @@ int main(int argc, char **argv)
 
             case 'h':
                 LogWarning("Option -h is deprecated; use --page-height instead");
+                options->m_pageHeight.SetValue(optarg);
+                break;
+            
+            case 'i':
+                LogWarning("Option --ignore is deprecated; use --breaks auto");
+                options->m_pageHeight.SetValue(optarg);
+                break;
+            
+            case 'n':
+                LogWarning("Option --no-layout is deprecated; use --breaks none");
                 options->m_pageHeight.SetValue(optarg);
                 break;
 

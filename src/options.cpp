@@ -10,16 +10,19 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 
 #include "att.h"
 #include "vrv.h"
-#include "vrvdef.h"
 
 namespace vrv {
-
-std::map<style_MEASURENUMBER, std::string> OptionMeasureNumber::values
+    
+std::map<int, std::string> Option::s_breaks
+    = { { BREAKS_none, "none" }, { BREAKS_auto, "auto" }, { BREAKS_encoded, "encoded" }  };
+    
+std::map<int, std::string> Option::s_measureNumber
     = { { MEASURENUMBER_system, "system" }, { MEASURENUMBER_interval, "interval" } };
 
 //----------------------------------------------------------------------------
@@ -130,7 +133,7 @@ bool OptionDbl::SetValueDbl(double value)
 bool OptionDbl::SetValue(double value)
 {
     if ((value < m_minValue) || (value > m_maxValue)) {
-        LogError("Parameter value %f for '%s' out of bounds; default is %f, minimum %f, and maximum %f", value, m_title.c_str(), m_defaultValue, m_minValue, m_maxValue);
+        LogError("Parameter value %f for '%s' out of bounds; default is %f, minimum %f, and maximum %f", value, GetKey().c_str(), m_defaultValue, m_minValue, m_maxValue);
         return false;
     }
     m_value = value;
@@ -181,40 +184,11 @@ int OptionInt::GetUnfactoredValue()
 bool OptionInt::SetValue(int value)
 {
     if ((value < m_minValue) || (value > m_maxValue)) {
-        LogError("Parameter value %d for '%s' out of bounds; default is %d, minimum %d, and maximum %d", value, m_title.c_str(), m_defaultValue, m_minValue, m_maxValue);
+        LogError("Parameter value %d for '%s' out of bounds; default is %d, minimum %d, and maximum %d", value, GetKey().c_str(), m_defaultValue, m_minValue, m_maxValue);
         return false;
     }
     m_value = value;
     return true;
-}
-    
-//----------------------------------------------------------------------------
-// OptionMeasureNumber
-//----------------------------------------------------------------------------
-
-void OptionMeasureNumber::CopyTo(Option *option)
-{
-    OptionMeasureNumber *child = dynamic_cast<OptionMeasureNumber *>(option);
-    assert(child);
-    *child = *this;
-}
-
-void OptionMeasureNumber::Init(style_MEASURENUMBER defaultValue)
-{
-    m_value = defaultValue;
-    m_defaultValue = defaultValue;
-}
-
-bool OptionMeasureNumber::SetValue(std::string value)
-{
-    std::map<style_MEASURENUMBER, std::string>::iterator it;
-    for (it = OptionMeasureNumber::values.begin(); it != OptionMeasureNumber::values.end(); ++it)
-        if (it->second == value) {
-            m_value = it->first;
-            return true;
-        }
-    LogError("Parameter '%s' not valid", value.c_str());
-    return false;
 }
     
 //----------------------------------------------------------------------------
@@ -273,6 +247,103 @@ bool OptionArray::SetValue(std::vector<std::string> const &values)
 }
     
 //----------------------------------------------------------------------------
+// OptionIntMap
+//----------------------------------------------------------------------------
+
+OptionIntMap::OptionIntMap()
+{
+    m_values = NULL;
+    m_value = 0,
+    m_defaultValue = 0;
+}
+    
+void OptionIntMap::CopyTo(Option *option)
+{
+    OptionIntMap *child = dynamic_cast<OptionIntMap *>(option);
+    assert(child);
+    *child = *this;
+}
+
+void OptionIntMap::Init(int defaultValue,  std::map<int, std::string> *values)
+{
+    m_value = defaultValue;
+    m_defaultValue = defaultValue;
+    
+    m_values = values;
+}
+
+bool OptionIntMap::SetValue(std::string value)
+{
+    assert(m_values);
+    
+    std::map<int, std::string>::iterator it;
+    for (it = m_values->begin(); it != m_values->end(); ++it)
+        if (it->second == value) {
+            m_value = it->first;
+            return true;
+        }
+    LogError("Parameter '%s' not valid for '%s'", value.c_str(), GetKey().c_str());
+    return false;
+}
+    
+bool OptionIntMap::SetValue(int value)
+{
+    assert(m_values);
+    assert(m_values->count(value));
+    
+    m_value = value;
+    
+    return true;
+}
+    
+std::string OptionIntMap::GetStrValue() const
+{
+    assert(m_values);
+    assert(m_values->count(m_value));
+    
+    return (m_values->at(m_value));
+}
+
+std::string OptionIntMap::GetDefaultStrValue() const
+{
+    assert(m_values);
+    assert(m_values->count(m_defaultValue));
+    
+    return (m_values->at(m_defaultValue));
+}
+
+std::vector<std::string> OptionIntMap::GetStrValues(bool withoutDefault) const
+{
+    assert(m_values);
+    
+    std::vector<std::string> strValues;
+    strValues.reserve(m_values->size());
+    std::map<int, std::string>::iterator it;
+    for (it = m_values->begin(); it != m_values->end(); ++it) {
+        if (withoutDefault && (it->first == m_defaultValue)) {
+            continue;
+        }
+        strValues.push_back(it->second);
+    }
+    
+    return strValues;
+}
+    
+std::string OptionIntMap::GetStrValuesAtStr(bool withoutDefault) const
+{
+    std::vector<std::string> strValues = GetStrValues(withoutDefault);
+    std::stringstream ss;
+    int i;
+    for(i = 0; i < (int)strValues.size(); ++i) {
+        if(i != 0) {
+            ss << ", ";
+        }
+        ss << "\""<< strValues.at(i) << "\"";
+    }
+    return ss.str();
+}
+    
+//----------------------------------------------------------------------------
 // OptionStaffrel
 //----------------------------------------------------------------------------
 
@@ -328,6 +399,10 @@ Options::Options()
     m_beamMinSlope.Init(0, 0, 0);
     this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
     
+    m_breaks.SetInfo("Breaks", "Define page and system breaks layout");
+    m_breaks.Init(BREAKS_auto, &Option::s_breaks);
+    this->Register(&m_breaks, "breaks", &m_generalLayout);
+    
     m_evenNoteSpacing.SetInfo("Even note spacing", "Specify the linear spacing factor");
     m_evenNoteSpacing.Init(false);
     this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_generalLayout);
@@ -369,7 +444,7 @@ Options::Options()
     this->Register(&m_measureMinWidth, "minMeasureWidth", &m_generalLayout);
     
     m_measureNumber.SetInfo("Measure number","The measure numbering rule (unused)");
-    m_measureNumber.Init(MEASURENUMBER_system);
+    m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
     this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
     
     m_mmOutput.SetInfo("MM output", "Specify that the output in the SVG is given in mm (default is px)");
