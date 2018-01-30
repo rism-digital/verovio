@@ -330,7 +330,6 @@ bool Toolkit::LoadData(const std::string &data)
         Doc tempdoc;
         tempdoc.SetOptions(m_doc.GetOptions());
         HumdrumInput *tempinput = new HumdrumInput(&tempdoc, "");
-        tempinput->SetTypeOption(m_options->m_humType.GetValue());
         if (GetOutputFormat() == HUMDRUM) {
             tempinput->SetOutputFormat("humdrum");
         }
