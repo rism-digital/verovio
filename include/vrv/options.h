@@ -443,6 +443,8 @@ public:
     OptionInt m_measureMinWidth;
     OptionMeasureNumber m_measureNumber;
     OptionBool m_mmOutput;
+    OptionBool m_noFooter;
+    OptionBool m_noHeader;
     OptionBool m_noJustification;
     OptionBool m_noLayout;
     OptionInt m_pageHeight;

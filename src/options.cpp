@@ -376,6 +376,14 @@ Options::Options()
     m_mmOutput.Init(false);
     this->Register(&m_mmOutput, "mmOutput", &m_generalLayout);
     
+    m_noFooter.SetInfo("No footer", "Do not add any footer");
+    m_noFooter.Init(false);
+    this->Register(&m_noFooter, "noFooter", &m_generalLayout);
+    
+    m_noHeader.SetInfo("No header", "Do not add any header");
+    m_noHeader.Init(false);
+    this->Register(&m_noHeader, "noHeader", &m_generalLayout);
+    
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
     this->Register(&m_noJustification, "noJustification", &m_generalLayout);
