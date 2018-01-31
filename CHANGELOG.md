@@ -2,10 +2,25 @@
 
 ## [Unreleased]
 ### Added
+* Adding several layout options
+* Support for `<pgHead>`, `<pgHead2>`, `<pgFoot>` and `<pgFoot2>`
+* Support for `<lb>` within `<rend>`
+* Generation of header and footer form the MEI header when none provided
+* Support for `<fig>` and `<svg>`
+* Distribution as NPM package 
+* Adding Qt binding (@yeonoson)
+* Support for `<arpeg>`
+* Adding mmOutput option for better PDF generation
+* Support for trill extensions
+* Upgrade to MEI 4.0 (in preparation)
 
 ### Changed
-
-### Removed
+* Option -b/--border (CLI) and border (JS) deprecated
+* Option -h/--height and -w/--width (CLI) deprecated
+* Option --ignore-layout (CLI) and ignoreLayout deprecated
+* Option --no-layout (CLI) and noLayout deprecated
+* Handling `@tie` one `<note>` as `<tie>` internally
+* Handling `@fermata` as `<fermata>` internally
 
 ## [1.1.6] - 2017-07-11
 * Fix for Plain and Easy ties
