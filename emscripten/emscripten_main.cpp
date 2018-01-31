@@ -139,7 +139,7 @@ const char *vrvToolkit_renderData(ToolkitManager *tkm, const char *data, const c
 
 void vrvToolkit_setOptions(ToolkitManager *tkm, const char *options)
 {
-    if (!tkm->GetInstance()->ParseOptions(options)) {
+    if (!tkm->GetInstance()->SetOptions(options)) {
         LogError("Could not load JSON options.");
     }
 }

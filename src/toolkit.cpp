@@ -522,7 +522,7 @@ bool Toolkit::SaveFile(const std::string &filename)
     return true;
 }
 
-bool Toolkit::ParseOptions(const std::string &json_options)
+bool Toolkit::SetOptions(const std::string &json_options)
 {
     jsonxx::Object json;
 

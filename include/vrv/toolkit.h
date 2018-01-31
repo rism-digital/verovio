@@ -71,7 +71,7 @@ public:
      * Parse the options passed as JSON string.
      * Only available for Emscripten-based compiles
      **/
-    bool ParseOptions(const std::string &json_options);
+    bool SetOptions(const std::string &json_options);
 
     /**
      * Parse the editor actions passed as JSON string.
