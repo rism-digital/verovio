@@ -398,8 +398,9 @@ public:
     OptionGrp() {}
     virtual ~OptionGrp() {}
     
-    void SetLabel(const std::string &label) { m_label = label; }
+    void SetLabel(const std::string &label, const std::string &id) { m_label = label; m_id = id; }
     std::string GetLabel() const { return m_label; }
+    std::string GetId() const { return m_id; }
     
     void AddOption(Option *option) { m_options.push_back(option); }
     
@@ -407,6 +408,7 @@ public:
 public:
     //
 protected:
+    std::string m_id;
     std::string m_label;
     std::vector<Option *> m_options;
 };
