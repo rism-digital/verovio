@@ -544,7 +544,7 @@ bool Toolkit::ParseOptions(const std::string &json_options)
                 Option *opt = m_options->GetItems()->at("appXPathQuery");
                 assert(opt);
                 int i;
-                for (i = 0; i < values.size(); i++) {
+                for (i = 0; i < (int)values.size(); i++) {
                     if (values.has<jsonxx::String>(i)) opt->SetValue(values.get<jsonxx::String>(i));
                 }
             }
@@ -554,7 +554,7 @@ bool Toolkit::ParseOptions(const std::string &json_options)
                 Option *opt = m_options->GetItems()->at("choiceXPathQuery");
                 assert(opt);
                 int i;
-                for (i = 0; i < values.size(); i++) {
+                for (i = 0; i < (int)values.size(); i++) {
                     if (values.has<jsonxx::String>(i)) opt->SetValue(values.get<jsonxx::String>(i));
                 }
             }
