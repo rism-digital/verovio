@@ -16,6 +16,7 @@ extern "C" {
 /****************************************************************
 * Methods exported to use the Toolkit class from js
 ****************************************************************/
+    
 void *vrvToolkit_constructor()
 {
 
@@ -30,18 +31,45 @@ void vrvToolkit_destructor(ToolkitManager *tkm)
     delete tkm;
 }
 
+bool vrvToolkit_edit(ToolkitManager *tkm, const char *editorAction)
+{
+    if (!tkm->GetInstance()->Edit(editorAction)) {
+        LogError("Could not perform editor action.");
+        return false;
+    }
+    return true;
+}
+   
+const char *vrvToolkit_getElementsAtTime(ToolkitManager *tkm, int millisec)
+{
+    tkm->SetCString(tkm->GetInstance()->GetElementsAtTime(millisec));
+    return tkm->GetCString();
+}
+
+const char *vrvToolkit_getElementAttr(ToolkitManager *tkm, const char *xmlId)
+{
+    tkm->SetCString(tkm->GetInstance()->GetElementAttr(xmlId));
+    return tkm->GetCString();
+}
+  
+const char *vrvToolkit_getHumdrum(ToolkitManager *tkm)
+{
+    const char* buffer = tkm->GetInstance()->GetHumdrumBuffer();
+    return buffer;
+}
+
 const char *vrvToolkit_getLog(ToolkitManager *tkm)
 {
-    tkm->SetCString(tkm->GetInstance()->GetLogString());
+    tkm->SetCString(tkm->GetInstance()->GetLog());
     return tkm->GetCString();
 }
 
-const char *vrvToolkit_getVersion(ToolkitManager *tkm)
+const char *vrvToolkit_getMEI(ToolkitManager *tkm, int page_no, bool score_based)
 {
-    tkm->SetCString(tkm->GetInstance()->GetVersion());
+    tkm->SetCString(tkm->GetInstance()->GetMEI(page_no, score_based));
     return tkm->GetCString();
 }
-
+    
 int vrvToolkit_getPageCount(ToolkitManager *tkm)
 {
     return tkm->GetInstance()->GetPageCount();
@@ -57,22 +85,16 @@ double vrvToolkit_getTimeForElement(ToolkitManager *tkm, const char *xmlId)
     return tkm->GetInstance()->GetTimeForElement(xmlId);
 }
 
+const char *vrvToolkit_getVersion(ToolkitManager *tkm)
+{
+    tkm->SetCString(tkm->GetInstance()->GetVersion());
+    return tkm->GetCString();
+}
+ 
 bool vrvToolkit_loadData(ToolkitManager *tkm, const char *data)
 {
     tkm->GetInstance()->ResetLogBuffer();
     return tkm->GetInstance()->LoadData(data);
-}
-
-const char *vrvToolkit_getMEI(ToolkitManager *tkm, int page_no, bool score_based)
-{
-    tkm->SetCString(tkm->GetInstance()->GetMEI(page_no, score_based));
-    return tkm->GetCString();
-}
-
-const char *vrvToolkit_getHumdrum(ToolkitManager *tkm)
-{
-    const char* buffer = tkm->GetInstance()->GetHumdrumBuffer();
-    return buffer;
 }
 
 const char *vrvToolkit_renderPage(ToolkitManager *tkm, int page_no, const char *c_options)
@@ -96,19 +118,6 @@ const char *vrvToolkit_renderToTimemap(ToolkitManager *tkm)
     return tkm->GetCString();
 }
 
-const char *vrvToolkit_getElementsAtTime(ToolkitManager *tkm, int millisec)
-{
-    tkm->SetCString(tkm->GetInstance()->GetElementsAtTime(millisec));
-    return tkm->GetCString();
-}
-
-void vrvToolkit_setOptions(ToolkitManager *tkm, const char *options)
-{
-    if (!tkm->GetInstance()->ParseOptions(options)) {
-        LogError("Could not load JSON options.");
-    }
-}
-
 void vrvToolkit_redoLayout(ToolkitManager *tkm)
 {
     tkm->GetInstance()->RedoLayout();
@@ -128,19 +137,11 @@ const char *vrvToolkit_renderData(ToolkitManager *tkm, const char *data, const c
     return vrvToolkit_renderPage(tkm, 1, options);
 }
 
-bool vrvToolkit_edit(ToolkitManager *tkm, const char *editorAction)
+void vrvToolkit_setOptions(ToolkitManager *tkm, const char *options)
 {
-    if (!tkm->GetInstance()->Edit(editorAction)) {
-        LogError("Could not perform editor action.");
-        return false;
+    if (!tkm->GetInstance()->ParseOptions(options)) {
+        LogError("Could not load JSON options.");
     }
-    return true;
 }
 
-const char *vrvToolkit_getElementAttr(ToolkitManager *tkm, const char *xmlId)
-{
-    tkm->SetCString(tkm->GetInstance()->GetElementAttr(xmlId));
-    return tkm->GetCString();
-}
-    
 } // extern C

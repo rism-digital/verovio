@@ -17,11 +17,8 @@
 
 //----------------------------------------------------------------------------
 
-#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
-#include "jsonxx.h"
-#endif
-
 #include "checked.h"
+#include "jsonxx.h"
 #include "unchecked.h"
 
 namespace vrv {
@@ -87,7 +84,7 @@ public:
      * This is used only for Emscripten-based compilation.
      * The vrv::logBuffer is filled by the vrv::LogXXX functions.
      */
-    std::string GetLogString();
+    std::string GetLog();
 
     /**
      * Returns the version number as a string.

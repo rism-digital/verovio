@@ -524,8 +524,6 @@ bool Toolkit::SaveFile(const std::string &filename)
 
 bool Toolkit::ParseOptions(const std::string &json_options)
 {
-#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
-
     jsonxx::Object json;
 
     // Read JSON options
@@ -650,15 +648,10 @@ bool Toolkit::ParseOptions(const std::string &json_options)
     }
 
     return true;
-#else
-    // The non-js version of the app should not use this function.
-    return false;
-#endif
 }
 
 std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
-#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
     jsonxx::Object o;
 
     if (!m_doc.GetDrawingPage()) return o.json();
@@ -679,11 +672,6 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
         // LogMessage("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str());
     }
     return o.json();
-
-#else
-    // The non-js version of the app should not use this function.
-    return "";
-#endif
 }
 
 bool Toolkit::Edit(const std::string &json_editorAction)
@@ -732,7 +720,7 @@ bool Toolkit::Edit(const std::string &json_editorAction)
 #endif
 }
 
-std::string Toolkit::GetLogString()
+std::string Toolkit::GetLog()
 {
 #ifdef USE_EMSCRIPTEN
     std::string str;
@@ -891,7 +879,6 @@ std::string Toolkit::RenderToTimemap()
 
 std::string Toolkit::GetElementsAtTime(int millisec)
 {
-#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
     jsonxx::Object o;
     jsonxx::Array a;
 
@@ -929,10 +916,6 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     o << "page" << pageNo;
 
     return o.json();
-#else
-    // The non-js version of the app should not use this function.
-    return "";
-#endif
 }
 
 bool Toolkit::RenderToMidiFile(const std::string &filename)
