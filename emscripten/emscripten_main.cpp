@@ -16,7 +16,7 @@ extern "C" {
 /****************************************************************
 * Methods exported to use the Toolkit class from js
 ****************************************************************/
-    
+
 void *vrvToolkit_constructor()
 {
 
@@ -39,7 +39,7 @@ bool vrvToolkit_edit(ToolkitManager *tkm, const char *editorAction)
     }
     return true;
 }
-   
+
 const char *vrvToolkit_getElementsAtTime(ToolkitManager *tkm, int millisec)
 {
     tkm->SetCString(tkm->GetInstance()->GetElementsAtTime(millisec));
@@ -51,10 +51,10 @@ const char *vrvToolkit_getElementAttr(ToolkitManager *tkm, const char *xmlId)
     tkm->SetCString(tkm->GetInstance()->GetElementAttr(xmlId));
     return tkm->GetCString();
 }
-  
+
 const char *vrvToolkit_getHumdrum(ToolkitManager *tkm)
 {
-    const char* buffer = tkm->GetInstance()->GetHumdrumBuffer();
+    const char *buffer = tkm->GetInstance()->GetHumdrumBuffer();
     return buffer;
 }
 
@@ -69,7 +69,7 @@ const char *vrvToolkit_getMEI(ToolkitManager *tkm, int page_no, bool score_based
     tkm->SetCString(tkm->GetInstance()->GetMEI(page_no, score_based));
     return tkm->GetCString();
 }
-    
+
 int vrvToolkit_getPageCount(ToolkitManager *tkm)
 {
     return tkm->GetInstance()->GetPageCount();
@@ -90,7 +90,7 @@ const char *vrvToolkit_getVersion(ToolkitManager *tkm)
     tkm->SetCString(tkm->GetInstance()->GetVersion());
     return tkm->GetCString();
 }
- 
+
 bool vrvToolkit_loadData(ToolkitManager *tkm, const char *data)
 {
     tkm->GetInstance()->ResetLogBuffer();
@@ -127,7 +127,7 @@ void vrvToolkit_redoPagePitchPosLayout(ToolkitManager *tkm)
 {
     tkm->GetInstance()->RedoPagePitchPosLayout();
 }
-    
+
 const char *vrvToolkit_renderData(ToolkitManager *tkm, const char *data, const char *options)
 {
     tkm->GetInstance()->ResetLogBuffer();

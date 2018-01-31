@@ -266,7 +266,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
     wchar_t code;
 
     int x = articPart->GetDrawingX();
-    // HARDCODED value, we double the default margin for now - should go in styling    
+    // HARDCODED value, we double the default margin for now - should go in styling
     int yShift = 2 * m_doc->GetTopMargin(articPart->GetClassId()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int direction = (articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) ? 1 : -1;
 

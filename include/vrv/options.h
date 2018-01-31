@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------
 
 namespace vrv {
-    
+
 class OptionGrp;
 
 //----------------------------------------------------------------------------
@@ -73,23 +73,14 @@ class OptionGrp;
 // Option defines
 //----------------------------------------------------------------------------
 
-enum option_BREAKS
-{
-    BREAKS_none = 0,
-    BREAKS_auto,
-    BREAKS_encoded
-};
-    
-enum option_MEASURENUMBER
-{
-    MEASURENUMBER_system = 0,
-    MEASURENUMBER_interval
-};
-    
+enum option_BREAKS { BREAKS_none = 0, BREAKS_auto, BREAKS_encoded };
+
+enum option_MEASURENUMBER { MEASURENUMBER_system = 0, MEASURENUMBER_interval };
+
 //----------------------------------------------------------------------------
 // Option
 //----------------------------------------------------------------------------
-    
+
 /**
  * This class is a base class of each styling parameter
  */
@@ -99,28 +90,29 @@ public:
     Option() {}
     virtual ~Option() {}
     virtual void CopyTo(Option *option);
-    
+
     void SetKey(std::string key) { m_key = key; }
     std::string GetKey() const { return m_key; }
-    
+
     virtual bool SetValueBool(bool value);
     virtual bool SetValueDbl(double value);
     virtual bool SetValue(std::string value);
-    
+
     void SetInfo(std::string title, std::string description);
     std::string GetTitle() const { return m_title; }
     std::string GetDescription() const { return m_description; }
-    
+
 public:
     /**
      * Static maps used my OptionIntMap objects. Set in OptIntMap::Init
      */
     static std::map<int, std::string> s_breaks;
     static std::map<int, std::string> s_measureNumber;
+
 protected:
     std::string m_title;
     std::string m_description;
-    
+
 private:
     std::string m_key;
 };
@@ -139,15 +131,15 @@ public:
     virtual ~OptionBool() {}
     virtual void CopyTo(Option *option);
     void Init(bool defaultValue);
-    
+
     virtual bool SetValueBool(bool value);
     virtual bool SetValueDbl(double value);
     virtual bool SetValue(std::string value);
-    
+
     bool GetValue() const { return m_value; }
     bool GetDefault() const { return m_defaultValue; }
     bool SetValue(bool value);
-  
+
 private:
     //
 public:
@@ -171,10 +163,10 @@ public:
     virtual ~OptionDbl() {}
     virtual void CopyTo(Option *option);
     void Init(double defaultValue, double minValue, double maxValue);
-    
+
     virtual bool SetValueDbl(double value);
     virtual bool SetValue(std::string value);
-    
+
     double GetValue() const { return m_value; }
     double GetDefault() const { return m_defaultValue; }
     double GetMin() const { return m_minValue; }
@@ -191,7 +183,7 @@ private:
     double m_minValue;
     double m_maxValue;
 };
-    
+
 //----------------------------------------------------------------------------
 // OptionInt
 //----------------------------------------------------------------------------
@@ -206,10 +198,10 @@ public:
     virtual ~OptionInt() {}
     virtual void CopyTo(Option *option);
     void Init(int defaultValue, int minValue, int maxValue, bool definitionFactor = false);
-    
+
     virtual bool SetValueDbl(double value);
     virtual bool SetValue(std::string value);
-    
+
     int GetValue();
     int GetUnfactoredValue();
     int GetDefault() const { return m_defaultValue; }
@@ -243,9 +235,9 @@ public:
     virtual ~OptionString() {}
     virtual void CopyTo(Option *option);
     void Init(std::string defaultValue);
-    
+
     virtual bool SetValue(std::string value);
-    
+
     std::string GetValue() const { return m_value; }
     std::string GetDefault() const { return m_defaultValue; }
 
@@ -257,7 +249,7 @@ private:
     std::string m_value;
     std::string m_defaultValue;
 };
-    
+
 //----------------------------------------------------------------------------
 // OptionArray
 //----------------------------------------------------------------------------
@@ -272,9 +264,9 @@ public:
     virtual ~OptionArray() {}
     virtual void CopyTo(Option *option);
     void Init(OptionGrp *grp = NULL);
-    
+
     virtual bool SetValue(std::string value);
-    
+
     std::vector<std::string> GetValue() const { return m_values; }
     std::vector<std::string> GetDefault() const { return m_defaultValues; }
     bool SetValue(std::vector<std::string> const &values);
@@ -302,9 +294,9 @@ public:
     virtual ~OptionIntMap() {}
     virtual void CopyTo(Option *option);
     void Init(int defaultValue, std::map<int, std::string> *values);
-    
+
     virtual bool SetValue(std::string value);
-    
+
     int GetValue() const { return m_value; }
     int GetDefault() const { return m_defaultValue; }
     bool SetValue(int value);
@@ -313,6 +305,7 @@ public:
     std::string GetDefaultStrValue() const;
     std::vector<std::string> GetStrValues(bool withoutDefault) const;
     std::string GetStrValuesAtStr(bool withoutDefault) const;
+
 private:
     //
 public:
@@ -322,7 +315,7 @@ private:
     int m_value;
     int m_defaultValue;
 };
-    
+
 //----------------------------------------------------------------------------
 // OptionStaffrel
 //----------------------------------------------------------------------------
@@ -333,19 +326,19 @@ private:
 class OptionStaffrel : public Option {
 public:
     // constructors and destructors
-    OptionStaffrel() {};
-    virtual ~OptionStaffrel() {};
+    OptionStaffrel(){};
+    virtual ~OptionStaffrel(){};
     virtual void CopyTo(Option *option);
     // Alternate type style cannot have a restricted list of possible values
     void Init(data_STAFFREL defaultValue);
-    
+
     virtual bool SetValue(std::string value);
-    
+
     // For altenate types return a reference to the value
     // Alternatively we can have a values vector for each sub-type
     const data_STAFFREL *GetValueAlternate() const { return &m_value; }
     const data_STAFFREL *GetDefaultAlernate() const { return &m_defaultValue; }
-    
+
 private:
     //
 public:
@@ -354,7 +347,7 @@ private:
     data_STAFFREL m_value;
     data_STAFFREL m_defaultValue;
 };
-    
+
 //----------------------------------------------------------------------------
 // OptionStaffrelBasic
 //----------------------------------------------------------------------------
@@ -365,13 +358,13 @@ private:
 class OptionStaffrelBasic : public Option {
 public:
     // constructors and destructors
-    OptionStaffrelBasic() {};
-    virtual ~OptionStaffrelBasic() {};
+    OptionStaffrelBasic(){};
+    virtual ~OptionStaffrelBasic(){};
     virtual void CopyTo(Option *option);
     void Init(data_STAFFREL_basic defaultValue, const std::vector<data_STAFFREL_basic> &values);
 
     virtual bool SetValue(std::string value);
-    
+
     data_STAFFREL_basic GetValue() const { return m_value; }
     data_STAFFREL_basic GetDefault() const { return m_defaultValue; }
 
@@ -384,11 +377,11 @@ private:
     data_STAFFREL_basic m_value;
     data_STAFFREL_basic m_defaultValue;
 };
-    
+
 //----------------------------------------------------------------------------
 // OptionGrp
 //----------------------------------------------------------------------------
-    
+
 /**
  * This class is a base class of each styling parameter
  */
@@ -397,14 +390,19 @@ public:
     // constructors and destructors
     OptionGrp() {}
     virtual ~OptionGrp() {}
-    
-    void SetLabel(const std::string &label, const std::string &id) { m_label = label; m_id = id; }
+
+    void SetLabel(const std::string &label, const std::string &id)
+    {
+        m_label = label;
+        m_id = id;
+    }
     std::string GetLabel() const { return m_label; }
     std::string GetId() const { return m_id; }
-    
+
     void AddOption(Option *option) { m_options.push_back(option); }
-    
+
     const std::vector<Option *> *GetOptions() const { return &m_options; }
+
 public:
     //
 protected:
@@ -413,11 +411,10 @@ protected:
     std::vector<Option *> m_options;
 };
 
-    
 //----------------------------------------------------------------------------
 // Options
 //----------------------------------------------------------------------------
-    
+
 /**
  * This class contains the document styling parameters.
  */
@@ -426,14 +423,14 @@ public:
     // constructors and destructors
     Options();
     virtual ~Options();
-    
+
     Options(const Options &options);
     Options &operator=(const Options &options);
-    
+
     const MapOfStrOptions *GetItems() const { return &m_items; }
-    
+
     std::vector<OptionGrp *> *GetGrps() { return &m_grps; }
-    
+
 private:
     void Register(Option *option, std::string key, OptionGrp *grp);
 
@@ -482,12 +479,12 @@ public:
     OptionDbl m_stemWidth;
     OptionDbl m_tieThickness;
     OptionInt m_unit;
-    
+
     /**
      * Selectors
      */
     OptionGrp m_selectors;
-    
+
     OptionArray m_appXPathQuery;
     OptionArray m_choiceXPathQuery;
     OptionString m_mdivXPathQuery;
@@ -496,7 +493,7 @@ public:
      * Element margins
      */
     OptionGrp m_elementMargins;
-    
+
     OptionDbl m_defaultBottomMargin;
     OptionDbl m_defaultLeftMargin;
     OptionDbl m_defaultRightMargin;
@@ -533,11 +530,11 @@ public:
     OptionDbl m_rightMarginNote;
     OptionDbl m_rightMarginRest;
     OptionDbl m_rightMarginRightBarLine;
-    
+
 private:
     /** The array of style parameters */
     MapOfStrOptions m_items;
-    
+
     std::vector<OptionGrp *> m_grps;
 };
 

@@ -58,7 +58,7 @@ Toolkit::Toolkit(bool initFont)
     if (initFont) {
         Resources::InitFonts();
     }
-    
+
     m_options = m_doc.GetOptions();
 }
 
@@ -531,11 +531,10 @@ bool Toolkit::ParseOptions(const std::string &json_options)
         LogError("Can not parse JSON string.");
         return false;
     }
-    
-    std::map<std::string, jsonxx::Value*> jsonMap = json.kv_map();
-    std::map<std::string, jsonxx::Value*>::const_iterator iter;
-    for (iter = jsonMap.begin(); iter != jsonMap.end(); iter++)
-    {
+
+    std::map<std::string, jsonxx::Value *> jsonMap = json.kv_map();
+    std::map<std::string, jsonxx::Value *>::const_iterator iter;
+    for (iter = jsonMap.begin(); iter != jsonMap.end(); iter++) {
         if (m_options->GetItems()->count(iter->first) == 0) {
             // JSON array options - we set them one by one
             if (iter->first == "appXPathQueries") {
@@ -578,7 +577,7 @@ bool Toolkit::ParseOptions(const std::string &json_options)
             else if (iter->first == "border") {
                 LogWarning("Option border is deprecated; use pageLeftMar, pageRightMar and pageTopMar instead");
                 Option *opt = NULL;
-                if (json.has<jsonxx::Number>("border")){
+                if (json.has<jsonxx::Number>("border")) {
                     double border = json.get<jsonxx::Number>("border");
                     opt = m_options->GetItems()->at("pageLeftMar");
                     assert(opt);
@@ -624,23 +623,23 @@ bool Toolkit::ParseOptions(const std::string &json_options)
             }
             continue;
         }
-        
+
         // Mapped options
-        
+
         Option *opt = m_options->GetItems()->at(iter->first);
         assert(opt);
-        
+
         if (json.has<jsonxx::Number>(iter->first)) {
             opt->SetValueDbl(json.get<jsonxx::Number>(iter->first));
-            //LogMessage("Double: %f", json.get<jsonxx::Number>(iter->first));
+            // LogMessage("Double: %f", json.get<jsonxx::Number>(iter->first));
         }
         else if (json.has<jsonxx::Boolean>(iter->first)) {
             opt->SetValueBool(json.get<jsonxx::Boolean>(iter->first));
-            //LogMessage("Bool: %d", json.get<jsonxx::Boolean>(iter->first));
+            // LogMessage("Bool: %d", json.get<jsonxx::Boolean>(iter->first));
         }
         else if (json.has<jsonxx::String>(iter->first)) {
             opt->SetValue(json.get<jsonxx::String>(iter->first));
-            //LogMessage("String: %s", json.get<jsonxx::String>(iter->first).c_str());
+            // LogMessage("String: %s", json.get<jsonxx::String>(iter->first).c_str());
         }
         else {
             LogError("Unsupported type for option '%s'", iter->first.c_str());
@@ -782,7 +781,8 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     int height = m_options->m_pageHeight.GetUnfactoredValue();
 
     if (m_options->m_breaks.GetValue() == BREAKS_none) width = m_doc.GetAdjustedDrawingPageWidth();
-    if (m_options->m_adjustPageHeight.GetValue() || (m_options->m_breaks.GetValue() == BREAKS_none)) height = m_doc.GetAdjustedDrawingPageHeight();
+    if (m_options->m_adjustPageHeight.GetValue() || (m_options->m_breaks.GetValue() == BREAKS_none))
+        height = m_doc.GetAdjustedDrawingPageHeight();
 
     // set dimensions
     deviceContext->SetWidth(width);

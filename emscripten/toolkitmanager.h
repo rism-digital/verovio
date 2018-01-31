@@ -16,9 +16,9 @@
 #include "vrv.h"
 
 namespace vrv {
-    
+
 class Toolkit;
-    
+
 //----------------------------------------------------------------------------
 // ToolkitManager
 //----------------------------------------------------------------------------
@@ -37,19 +37,19 @@ public:
     ToolkitManager();
     virtual ~ToolkitManager();
     ///@}
-    
+
     /**
      * A getter for the current instance
      */
     Toolkit *GetInstance();
-    
+
     /**
      * Methods to implement - and to add to the JS proxy
      */
-    //std::string GetInstanceId();
-    //std::string CreateInstance();
-    //void SelectInstance(std::string id);
-    
+    // std::string GetInstanceId();
+    // std::string CreateInstance();
+    // void SelectInstance(std::string id);
+
     /**
      * @name Set and get a std::string into a char * buffer.
      * This is used for returning a string buffer to emscripten.
@@ -67,12 +67,12 @@ private:
      * The C buffer string.
      */
     char *m_cString;
-    
+
     /**
      * The current instance of the toolkit.
      */
     Toolkit *m_instance;
-    
+
     /**
      * A vector of instances.
      */

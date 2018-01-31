@@ -39,10 +39,10 @@ public:
     Toolkit(bool initFont = true);
     virtual ~Toolkit();
     ///@}
-    
+
     /** We just use the doc uuid as uuid */
     std::string GetUuid() { return m_doc.GetUuid(); }
-    
+
     /** We just use the doc options */
     Options *GetOptions() { return m_options; }
 
@@ -271,7 +271,7 @@ private:
     bool m_scoreBasedMei;
 
     static char *m_humdrumBuffer;
-    
+
     Options *m_options;
 };
 

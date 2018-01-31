@@ -907,11 +907,12 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     }
     else {
         int dist = abs(p2->x - p1->x);
-        height
-            = std::max(int(m_doc->GetOptions()->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) ,
-                dist / TEMP_SLUR_HEIGHT_FACTOR);
-        height = std::min(int(
-            m_doc->GetOptions()->m_slurMaxHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) , height);
+        height = std::max(
+            int(m_doc->GetOptions()->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
+            dist / TEMP_SLUR_HEIGHT_FACTOR);
+        height = std::min(
+            int(m_doc->GetOptions()->m_slurMaxHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
+            height);
     }
 
     // the height of the control points
@@ -1532,7 +1533,8 @@ void View::DrawSylConnector(
         // nothing to adjust
     }
 
-    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instanciate a temporary object
+    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instanciate a temporary
+    // object
     // in order not to reset the Syl bounding box.
     Syl sylConnector;
     if (graphic) {

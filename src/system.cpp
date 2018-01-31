@@ -282,7 +282,8 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    params->m_cumulatedShift = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
+    params->m_cumulatedShift
+        = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
 
     m_systemAligner.Process(params->m_functorEnd, params);
 

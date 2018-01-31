@@ -802,7 +802,7 @@ void Doc::CastOffEncodingDoc()
 
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
-    
+
     contentPage->LayOutHorizontally();
 
     System *contentSystem = dynamic_cast<System *>(contentPage->FindChildByType(SYSTEM));
@@ -1057,7 +1057,7 @@ int Doc::GetDrawingStaffLineWidth(int staffSize) const
 
 int Doc::GetDrawingStemWidth(int staffSize) const
 {
-    return m_options->m_stemWidth.GetValue()  * GetDrawingUnit(staffSize);
+    return m_options->m_stemWidth.GetValue() * GetDrawingUnit(staffSize);
 }
 
 int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin) const
@@ -1229,7 +1229,6 @@ Page *Doc::SetDrawingPage(int pageIdx)
     m_drawingBeamMinSlope = this->m_options->m_beamMinSlope.GetValue();
     m_drawingBeamMaxSlope /= 100;
     m_drawingBeamMinSlope /= 100;
-    
 
     // values for beams
     m_drawingBeamWidth = this->m_options->m_unit.GetValue();

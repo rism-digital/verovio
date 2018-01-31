@@ -327,13 +327,12 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         if (this->m_place == STAFFREL_basic_above) {
             yRel = GetContentY1();
             yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
-               
+
             this->SetDrawingYRel(yRel);
         }
         else {
             yRel = staffAlignment->GetStaffHeight() + GetContentY2();
-            yRel
-            += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+            yRel += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
             this->SetDrawingYRel(yRel);
         }
     }
@@ -342,8 +341,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         if (curve) {
             assert(curve->m_object);
         }
-        int margin
-        = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+        int margin = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
 
         if (this->m_place == STAFFREL_basic_above) {
             if (curve && curve->m_object->Is({ SLUR, TIE })) {

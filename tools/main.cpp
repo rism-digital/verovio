@@ -49,28 +49,28 @@ std::string fromCamelCase(const std::string &s)
 {
     std::regex regExp1("(.)([A-Z][a-z]+)");
     std::regex regExp2("([a-z0-9])([A-Z])");
-    
+
     std::string result = s;
-    result = std::regex_replace (result, regExp1, "$1-$2");
-    result = std::regex_replace (result, regExp2, "$1-$2");
-    
+    result = std::regex_replace(result, regExp1, "$1-$2");
+    result = std::regex_replace(result, regExp2, "$1-$2");
+
     std::transform(result.begin(), result.end(), result.begin(), ::tolower);
     return result;
 }
 
-std::string toCamelCase(const std::string& s)
+std::string toCamelCase(const std::string &s)
 {
     std::istringstream iss(s);
     std::string token;
     std::string result;
-    
+
     while (getline(iss, token, '-')) {
         token[0] = toupper(token[0]);
         result += token;
     }
-    
+
     result[0] = tolower(result[0]);
-    
+
     return result;
 }
 
@@ -101,7 +101,7 @@ void display_usage()
     // -options with both short and long forms first
     // -then options with long forms only
     // -then debugging options
-    
+
     Options style;
 
     // Options with both short and long forms
@@ -118,29 +118,29 @@ void display_usage()
     cerr << " -t, --type <s>        Select output format: mei, svg, or midi (default is svg)" << endl;
     cerr << " -v, --version         Display the version number" << endl;
     cerr << " -x, --xml-id-seed <i> Seed the random number generator for XML IDs" << endl;
-    
+
     Options options;
     std::vector<OptionGrp *> *grp = options.GetGrps();
     std::vector<OptionGrp *>::iterator grpIter;
-    
-    for(grpIter = grp->begin(); grpIter != grp->end(); grpIter++) {
-        
+
+    for (grpIter = grp->begin(); grpIter != grp->end(); grpIter++) {
+
         // Options with long forms only
         cerr << endl << (*grpIter)->GetLabel() << endl;
         const std::vector<Option *> *options = (*grpIter)->GetOptions();
         std::vector<Option *>::const_iterator iter;
-        
+
         for (iter = options->begin(); iter != options->end(); iter++) {
-    
+
             std::string option = fromCamelCase((*iter)->GetKey());
-        
+
             const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(*iter);
             const OptionInt *optInt = dynamic_cast<const OptionInt *>(*iter);
             const OptionIntMap *optIntMap = dynamic_cast<const OptionIntMap *>(*iter);
             const OptionString *optString = dynamic_cast<const OptionString *>(*iter);
             const OptionArray *optArray = dynamic_cast<const OptionArray *>(*iter);
             const OptionBool *optBool = dynamic_cast<const OptionBool *>(*iter);
-        
+
             if (optDbl) {
                 option.append(" <f>");
             }
@@ -156,14 +156,14 @@ void display_usage()
             else if (!optBool) {
                 option.append(" <s>");
             }
-            
+
             if (option.size() < 32) {
                 option.insert(option.end(), 32 - option.size(), ' ');
             }
             else {
                 option.append("\t");
             }
-            
+
             cerr << " --" << option << (*iter)->GetDescription();
 
             if (optInt) {
@@ -180,7 +180,8 @@ void display_usage()
                 cerr << " (default: \"" << optString->GetDefault() << "\")";
             }
             if (optIntMap) {
-                cerr << " (default: \"" << optIntMap->GetDefaultStrValue() << "\"; other values: " << optIntMap->GetStrValuesAtStr(true) << ")";
+                cerr << " (default: \"" << optIntMap->GetDefaultStrValue()
+                     << "\"; other values: " << optIntMap->GetStrValuesAtStr(true) << ")";
             }
             cerr << endl;
         }
@@ -232,7 +233,7 @@ int main(int argc, char **argv)
     };
     
     int baseSize = sizeof(base_options) / sizeof(option);
-    
+
     Options *options = toolkit.GetOptions();
     const MapOfStrOptions *params = options->GetItems();
     int mapSize = (int)params->size();
@@ -240,16 +241,16 @@ int main(int argc, char **argv)
     struct option *long_options;
     int i = 0;
     long_options = (struct option *)malloc(sizeof(struct option) * (baseSize + mapSize));
-    
+
     // A vector of string for storing names as const char* for long_options
     std::vector<std::string> optNames;
     optNames.reserve(mapSize);
-    
+
     MapOfStrOptions::const_iterator iter;
     for (iter = params->begin(); iter != params->end(); iter++) {
         // Double check that back and forth convertion is correct
         assert(toCamelCase(fromCamelCase(iter->first)) == iter->first);
-        
+
         optNames.push_back(fromCamelCase(iter->first));
         long_options[i].name = optNames.at(i).c_str();
         OptionBool *optBool = dynamic_cast<OptionBool *>(iter->second);
@@ -258,7 +259,7 @@ int main(int argc, char **argv)
         long_options[i].val = 0;
         i++;
     }
-    
+
     // Concatenate the base options
     assert(i == mapSize);
     for (; i < mapSize + baseSize; i++) {
@@ -267,7 +268,7 @@ int main(int argc, char **argv)
         long_options[i].flag = base_options[i - mapSize].flag;
         long_options[i].val = base_options[i - mapSize].val;
     }
-    
+
     int c;
     std::string key;
     int option_index = 0;
@@ -284,8 +285,9 @@ int main(int argc, char **argv)
                 }
                 else if (opt) {
                     if (!opt->SetValue(optarg)) {
-                        LogWarning("Setting option %s with %s failed, default value used", long_options[option_index].name, optarg);
-                    } 
+                        LogWarning("Setting option %s with %s failed, default value used",
+                            long_options[option_index].name, optarg);
+                    }
                 }
                 else {
                     LogError("Something went wrong with option %s", long_options[option_index].name);
@@ -293,13 +295,11 @@ int main(int argc, char **argv)
                 }
                 break;
 
-             case 'a':
-                all_pages = 1;
-                break;
-            
-            
+            case 'a': all_pages = 1; break;
+
             case 'b':
-                LogWarning("Option -b and --border is deprecated; use --page-left-mar, --page-right-mar and --page-top-mar instead");
+                LogWarning("Option -b and --border is deprecated; use --page-left-mar, --page-right-mar and "
+                           "--page-top-mar instead");
                 options->m_pageLeftMar.SetValue(optarg);
                 options->m_pageRightMar.SetValue(optarg);
                 options->m_pageTopMar.SetValue(optarg);
@@ -315,19 +315,19 @@ int main(int argc, char **argv)
                 LogWarning("Option -h is deprecated; use --page-height instead");
                 options->m_pageHeight.SetValue(optarg);
                 break;
-            
+
             case 'i':
                 LogWarning("Option --ignore-layout is deprecated; use --breaks auto");
                 options->m_breaks.SetValue(BREAKS_auto);
                 break;
-            
+
             case 'n':
                 LogWarning("Option --no-layout is deprecated; use --breaks none");
                 options->m_breaks.SetValue(BREAKS_none);
                 break;
 
             case 'o': outfile = string(optarg); break;
-                
+
             case 'p': page = atoi(optarg); break;
 
             case 'r': vrv::Resources::SetPath(optarg); break;
@@ -349,10 +349,8 @@ int main(int argc, char **argv)
                 LogWarning("Option -w is deprecated; use --page-width instead");
                 options->m_pageWidth.SetValue(optarg);
                 break;
-                
-            case 'x':
-                Object::SeedUuid(atoi(optarg));
-                break;
+
+            case 'x': Object::SeedUuid(atoi(optarg)); break;
 
             case '?':
                 display_usage();
@@ -372,7 +370,7 @@ int main(int argc, char **argv)
         display_usage();
         exit(0);
     }
-     
+
     if (optind <= argc - 1) {
         infile = string(argv[optind]);
     }

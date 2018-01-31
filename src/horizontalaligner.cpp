@@ -826,8 +826,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
                 int minLeft, maxRight;
                 params->m_rightDefaultAlignment->GetLeftRight(*iter, minLeft, maxRight);
                 if (minLeft != -VRV_UNSET)
-                    graceMaxPos = minLeft
-                    - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75);
+                    graceMaxPos = minLeft - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75);
             }
             // This happens when grace notes are at the end of a measure before a barline
             else {
@@ -836,8 +835,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
                 // staffN -1 is barline
                 measureAligner->GetRightBarLineAlignment()->GetLeftRight(BARLINE_REFERENCES, minLeft, maxRight);
                 if (minLeft != -VRV_UNSET)
-                    graceMaxPos = minLeft
-                    - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75);
+                    graceMaxPos = minLeft - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75);
             }
 
             params->m_graceMaxPos = graceMaxPos;
@@ -961,7 +959,8 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
 
     if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
-            params->m_doc->GetOptions()->m_spacingLinear.GetValue(), params->m_doc->GetOptions()->m_spacingNonLinear.GetValue());
+            params->m_doc->GetOptions()->m_spacingLinear.GetValue(),
+            params->m_doc->GetOptions()->m_spacingNonLinear.GetValue());
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
 

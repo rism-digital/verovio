@@ -9,8 +9,8 @@
 #define __VRV_DOC_H__
 
 #include "devicecontextbase.h"
-#include "scoredef.h"
 #include "options.h"
+#include "scoredef.h"
 
 class MidiFile;
 
@@ -58,7 +58,7 @@ public:
      * Refreshes the views from Doc.
      */
     virtual void Refresh();
-    
+
     /**
      * Getter for the options
      */

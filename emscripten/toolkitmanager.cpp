@@ -34,7 +34,7 @@ ToolkitManager::~ToolkitManager()
     for (iter = m_instances.begin(); iter != m_instances.end(); iter++) {
         delete *iter;
     }
-    
+
     if (m_cString) {
         free(m_cString);
         m_cString = NULL;
@@ -46,7 +46,7 @@ Toolkit *ToolkitManager::GetInstance()
     assert(m_instance);
     return m_instance;
 }
-    
+
 void ToolkitManager::SetCString(const std::string &data)
 {
     if (m_cString) {
@@ -62,7 +62,7 @@ void ToolkitManager::SetCString(const std::string &data)
     }
     strcpy(m_cString, data.c_str());
 }
-    
+
 const char *ToolkitManager::GetCString()
 {
     if (m_cString) {
