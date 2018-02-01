@@ -17,9 +17,33 @@ extern "C" {
 * Methods exported to use the Toolkit class from js
 ****************************************************************/
 
+/** declarations */
+    
+void *vrvToolkit_constructor();
+void vrvToolkit_destructor(ToolkitManager *tkm);
+bool vrvToolkit_edit(ToolkitManager *tkm, const char *editorAction);
+const char *vrvToolkit_getElementsAtTime(ToolkitManager *tkm, int millisec);
+const char *vrvToolkit_getHumdrum(ToolkitManager *tkm);
+const char *vrvToolkit_getLog(ToolkitManager *tkm);
+const char *vrvToolkit_getMEI(ToolkitManager *tkm, int page_no, bool score_based);
+int vrvToolkit_getPageCount(ToolkitManager *tkm);
+int vrvToolkit_getPageWithElement(ToolkitManager *tkm, const char *xmlId);
+const char *vrvToolkit_getElementAttr(ToolkitManager *tkm, const char *xmlId);
+double vrvToolkit_getTimeForElement(ToolkitManager *tkm, const char *xmlId);
+const char *vrvToolkit_getVersion(ToolkitManager *tkm);
+bool vrvToolkit_loadData(ToolkitManager *tkm, const char *data);
+const char *vrvToolkit_renderPage(ToolkitManager *tkm, int page_no, const char *c_options);
+const char *vrvToolkit_renderToMidi(ToolkitManager *tkm, const char *c_options);
+const char *vrvToolkit_renderToTimemap(ToolkitManager *tkm);
+void vrvToolkit_redoLayout(ToolkitManager *tkm);
+void vrvToolkit_redoPagePitchPosLayout(ToolkitManager *tkm);
+const char *vrvToolkit_renderData(ToolkitManager *tkm, const char *data, const char *options);
+void vrvToolkit_setOptions(ToolkitManager *tkm, const char *options);
+   
+/** implementations */
+    
 void *vrvToolkit_constructor()
 {
-
     // set the resource path in the js blob
     Resources::SetPath("/data");
 
