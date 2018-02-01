@@ -92,6 +92,7 @@ void display_version()
 
 void display_usage()
 {
+    cout.precision(2);
 
     display_version();
     cout << endl << "Example usage:" << endl << endl;
@@ -172,9 +173,9 @@ void display_usage()
                 cout << "; max: " << optInt->GetMax() << ")";
             }
             if (optDbl) {
-                cout << " (default: " << optDbl->GetDefault();
-                cout << "; min: " << optDbl->GetMin();
-                cout << "; max: " << optDbl->GetMax() << ")";
+                cout << fixed << " (default: " << optDbl->GetDefault();
+                cout << fixed << "; min: " << optDbl->GetMin();
+                cout << fixed << "; max: " << optDbl->GetMax() << ")";
             }
             if (optString) {
                 cout << " (default: \"" << optString->GetDefault() << "\")";
