@@ -15,6 +15,7 @@
 * Upgrade to MEI 4.0 (in preparation)
 
 ### Changed
+* Output CLI help and version to standard output
 * Option -b/--border (CLI) and border (JS) deprecated
 * Option -h/--height and -w/--width (CLI) deprecated
 * Option --ignore-layout (CLI) and ignoreLayout deprecated
