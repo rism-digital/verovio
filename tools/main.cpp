@@ -87,15 +87,15 @@ bool dir_exists(string dir)
 
 void display_version()
 {
-    cerr << "Verovio " << vrv::GetVersion() << endl;
+    cout << "Verovio " << vrv::GetVersion() << endl;
 }
 
 void display_usage()
 {
 
     display_version();
-    cerr << endl << "Example usage:" << endl << endl;
-    cerr << " verovio [-s scale] [-t type] [-r resources] [-o outfile] infile" << endl << endl;
+    cout << endl << "Example usage:" << endl << endl;
+    cout << " verovio [-s scale] [-t type] [-r resources] [-o outfile] infile" << endl << endl;
 
     // These need to be kept in alphabetical order:
     // -options with both short and long forms first
@@ -105,19 +105,19 @@ void display_usage()
     Options style;
 
     // Options with both short and long forms
-    cerr << "Options (marked as * are repeatable)" << endl;
+    cout << "Options (marked as * are repeatable)" << endl;
 
-    cerr << " -                     Use \"-\" as input file for reading from the standard input" << endl;
-    cerr << " -?, --help            Display this message" << endl;
-    cerr << " -a, --all-pages       Output all pages" << endl;
-    cerr << " -f, --format <s>      Select input format: darms, mei, pae, xml (default is mei)" << endl;
-    cerr << " -o, --outfile <s>     Output file name (use \"-\" for standard output)" << endl;
-    cerr << " -p, --page <i>        Select the page to engrave (default is 1)" << endl;
-    cerr << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")" << endl;
-    cerr << " -s, --scale <i>       Scale percent (default is " << DEFAULT_SCALE << ")" << endl;
-    cerr << " -t, --type <s>        Select output format: mei, svg, or midi (default is svg)" << endl;
-    cerr << " -v, --version         Display the version number" << endl;
-    cerr << " -x, --xml-id-seed <i> Seed the random number generator for XML IDs" << endl;
+    cout << " -                     Use \"-\" as input file for reading from the standard input" << endl;
+    cout << " -?, --help            Display this message" << endl;
+    cout << " -a, --all-pages       Output all pages" << endl;
+    cout << " -f, --format <s>      Select input format: darms, mei, pae, xml (default is mei)" << endl;
+    cout << " -o, --outfile <s>     Output file name (use \"-\" for standard output)" << endl;
+    cout << " -p, --page <i>        Select the page to engrave (default is 1)" << endl;
+    cout << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")" << endl;
+    cout << " -s, --scale <i>       Scale percent (default is " << DEFAULT_SCALE << ")" << endl;
+    cout << " -t, --type <s>        Select output format: mei, svg, or midi (default is svg)" << endl;
+    cout << " -v, --version         Display the version number" << endl;
+    cout << " -x, --xml-id-seed <i> Seed the random number generator for XML IDs" << endl;
 
     Options options;
     std::vector<OptionGrp *> *grp = options.GetGrps();
@@ -126,7 +126,7 @@ void display_usage()
     for (grpIter = grp->begin(); grpIter != grp->end(); grpIter++) {
 
         // Options with long forms only
-        cerr << endl << (*grpIter)->GetLabel() << endl;
+        cout << endl << (*grpIter)->GetLabel() << endl;
         const std::vector<Option *> *options = (*grpIter)->GetOptions();
         std::vector<Option *>::const_iterator iter;
 
@@ -164,26 +164,26 @@ void display_usage()
                 option.append("\t");
             }
 
-            cerr << " --" << option << (*iter)->GetDescription();
+            cout << " --" << option << (*iter)->GetDescription();
 
             if (optInt) {
-                cerr << " (default: " << optInt->GetDefault();
-                cerr << "; min: " << optInt->GetMin();
-                cerr << "; max: " << optInt->GetMax() << ")";
+                cout << " (default: " << optInt->GetDefault();
+                cout << "; min: " << optInt->GetMin();
+                cout << "; max: " << optInt->GetMax() << ")";
             }
             if (optDbl) {
-                cerr << " (default: " << optDbl->GetDefault();
-                cerr << "; min: " << optDbl->GetMin();
-                cerr << "; max: " << optDbl->GetMax() << ")";
+                cout << " (default: " << optDbl->GetDefault();
+                cout << "; min: " << optDbl->GetMin();
+                cout << "; max: " << optDbl->GetMax() << ")";
             }
             if (optString) {
-                cerr << " (default: \"" << optString->GetDefault() << "\")";
+                cout << " (default: \"" << optString->GetDefault() << "\")";
             }
             if (optIntMap) {
-                cerr << " (default: \"" << optIntMap->GetDefaultStrValue()
+                cout << " (default: \"" << optIntMap->GetDefaultStrValue()
                      << "\"; other values: " << optIntMap->GetStrValuesAtStr(true) << ")";
             }
-            cerr << endl;
+            cout << endl;
         }
     }
 }
