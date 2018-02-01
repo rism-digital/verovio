@@ -649,6 +649,28 @@ bool Toolkit::SetOptions(const std::string &json_options)
     return true;
 }
 
+std::string Toolkit::GetOption(const std::string &option, bool defaultValue) const
+{
+    if (m_options->GetItems()->count(option) == 0) {
+        LogError("Unsupported option '%s'", option.c_str());
+        return "[unspecified]";
+    }
+    Option *opt = m_options->GetItems()->at(option);
+    assert(opt);
+    return (defaultValue) ? opt->GetDefaultStrValue() : opt->GetStrValue();
+}
+    
+bool Toolkit::SetOption(const std::string &option, const std::string &value)
+{
+    if (m_options->GetItems()->count(option) == 0) {
+        LogError("Unsupported option '%s'", option.c_str());
+        return false;
+    }
+    Option *opt = m_options->GetItems()->at(option);
+    assert(opt);
+    return opt->SetValue(value);
+}
+    
 std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
     jsonxx::Object o;
