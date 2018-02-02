@@ -356,10 +356,10 @@
 		4DB726C81B8BB0F30040231B /* text.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB726C71B8BB0F30040231B /* text.h */; };
 		4DB78742201F9F7200394520 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F9112018A93200A4D336 /* svg.cpp */; };
 		4DB78743201F9F7300394520 /* svg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D89F9112018A93200A4D336 /* svg.cpp */; };
-		4DB7875C2021B6D400394520 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4DB7875B2021B6D400394520 /* jsonxx.cc */; };
-		4DB7875D2021B6F900394520 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4DB7875B2021B6D400394520 /* jsonxx.cc */; };
-		4DB7875E2021B6FA00394520 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4DB7875B2021B6D400394520 /* jsonxx.cc */; };
-		4DB7875F2021B6FE00394520 /* jsonxx.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB7875A2021B6C400394520 /* jsonxx.h */; };
+		4DB787632022F0B700394520 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4DB787622022F0B700394520 /* jsonxx.cc */; };
+		4DB787642022F0BB00394520 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4DB787622022F0B700394520 /* jsonxx.cc */; };
+		4DB787652022F0BC00394520 /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4DB787622022F0B700394520 /* jsonxx.cc */; };
+		4DB787662022F0BF00394520 /* jsonxx.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB787612022F0AD00394520 /* jsonxx.h */; };
 		4DC12A571F716E1C000440E9 /* pghead.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC12A561F716E1C000440E9 /* pghead.h */; };
 		4DC12A591F716E27000440E9 /* pghead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A581F716E27000440E9 /* pghead.cpp */; };
 		4DC12A5A1F716E27000440E9 /* pghead.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC12A581F716E27000440E9 /* pghead.cpp */; };
@@ -710,8 +710,8 @@
 		4DB726C21B8B9F540040231B /* rpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rpt.h; path = include/vrv/rpt.h; sourceTree = "<group>"; };
 		4DB726C41B8BB0E80040231B /* text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = text.cpp; path = src/text.cpp; sourceTree = "<group>"; };
 		4DB726C71B8BB0F30040231B /* text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = text.h; path = include/vrv/text.h; sourceTree = "<group>"; };
-		4DB7875A2021B6C400394520 /* jsonxx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonxx.h; path = include/json/jsonxx.h; sourceTree = SOURCE_ROOT; };
-		4DB7875B2021B6D400394520 /* jsonxx.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsonxx.cc; path = src/json/jsonxx.cc; sourceTree = SOURCE_ROOT; };
+		4DB787612022F0AD00394520 /* jsonxx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonxx.h; path = include/json/jsonxx.h; sourceTree = "<group>"; };
+		4DB787622022F0B700394520 /* jsonxx.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsonxx.cc; path = src/json/jsonxx.cc; sourceTree = "<group>"; };
 		4DC12A561F716E1C000440E9 /* pghead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pghead.h; path = include/vrv/pghead.h; sourceTree = "<group>"; };
 		4DC12A581F716E27000440E9 /* pghead.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pghead.cpp; path = src/pghead.cpp; sourceTree = "<group>"; };
 		4DC12A5C1F73F888000440E9 /* pghead2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pghead2.h; path = include/vrv/pghead2.h; sourceTree = "<group>"; };
@@ -977,13 +977,13 @@
 			name = textelements;
 			sourceTree = "<group>";
 		};
-		4DB787592021B68200394520 /* jsonxx */ = {
+		4DB787602022EFA700394520 /* json */ = {
 			isa = PBXGroup;
 			children = (
-				4DB7875B2021B6D400394520 /* jsonxx.cc */,
-				4DB7875A2021B6C400394520 /* jsonxx.h */,
+				4DB787622022F0B700394520 /* jsonxx.cc */,
+				4DB787612022F0AD00394520 /* jsonxx.h */,
 			);
-			path = jsonxx;
+			name = json;
 			sourceTree = "<group>";
 		};
 		4DBC09271B51960100B1832C /* utf8 */ = {
@@ -1137,7 +1137,7 @@
 				4DEE28EC1940BCA100C76319 /* libmei */,
 				4D7D8A3C1886E36200D78B62 /* tools */,
 				8F086F351885397A0037FD8E /* source */,
-				4DB787592021B68200394520 /* jsonxx */,
+				4DB787602022EFA700394520 /* json */,
 				4D1BE7751C688F6F0086DC0E /* midi */,
 				4D22C42118891D7300D0831F /* pugixml */,
 				4DBC09271B51960100B1832C /* utf8 */,
@@ -1407,7 +1407,7 @@
 				4DB3D8B81F83D0B100B5FC2B /* score.h in Headers */,
 				4DB3D8AF1F83D05100B5FC2B /* atts_midi.h in Headers */,
 				4DA1448D1C2AB29400CB7CEE /* textelement.h in Headers */,
-				4DB7875F2021B6FE00394520 /* jsonxx.h in Headers */,
+				4DB787662022F0BF00394520 /* jsonxx.h in Headers */,
 				8F59294918854BF800FE51AD /* multirest.h in Headers */,
 				8F59294A18854BF800FE51AD /* note.h in Headers */,
 				8F59294B18854BF800FE51AD /* object.h in Headers */,
@@ -1732,7 +1732,7 @@
 				4D1694531E3A44F300569BF4 /* atts_cmn.cpp in Sources */,
 				4D1694541E3A44F300569BF4 /* floatingobject.cpp in Sources */,
 				4D1694551E3A44F300569BF4 /* atts_mei.cpp in Sources */,
-				4DB7875D2021B6F900394520 /* jsonxx.cc in Sources */,
+				4DB787642022F0BB00394520 /* jsonxx.cc in Sources */,
 				4D1694561E3A44F300569BF4 /* atts_pagebased.cpp in Sources */,
 				4D1694571E3A44F300569BF4 /* anchoredtext.cpp in Sources */,
 				4DB3D8C51F83D0F900B5FC2B /* breath.cpp in Sources */,
@@ -1851,7 +1851,7 @@
 				4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
 				40ABF1FF1E5DF23B00F32F41 /* expansion.cpp in Sources */,
 				152886C51C9CA86100B515BB /* ligature.cpp in Sources */,
-				4DB7875C2021B6D400394520 /* jsonxx.cc in Sources */,
+				4DB787632022F0B700394520 /* jsonxx.cc in Sources */,
 				4DEEDE641E617C930087E8BC /* elementpart.cpp in Sources */,
 				4D95D4F61D71866200B2B856 /* controlelement.cpp in Sources */,
 				4D983005192E959E00320037 /* main.cpp in Sources */,
@@ -1991,7 +1991,7 @@
 				4DA80D971A6ACF5D0089802D /* options.cpp in Sources */,
 				4D16947B1E41DCE100569BF4 /* atts_cmnornaments.cpp in Sources */,
 				4DB3D8E91F83D17400B5FC2B /* ligature.cpp in Sources */,
-				4DB7875E2021B6FA00394520 /* jsonxx.cc in Sources */,
+				4DB787652022F0BC00394520 /* jsonxx.cc in Sources */,
 				4DC12A831F741110000440E9 /* pgfoot.cpp in Sources */,
 				4DF9D29B1C1B3F0A0069E8C8 /* attconverter.cpp in Sources */,
 				4DB3D8BC1F83D0D200B5FC2B /* expansion.cpp in Sources */,

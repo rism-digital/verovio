@@ -61,6 +61,20 @@ bool Option::SetValue(std::string value)
     LogError("Unsupported type string for %s", m_key.c_str());
     return false;
 }
+    
+std::string Option::GetStrValue() const
+{
+    // If not overriden
+    assert(false);
+    return "[unspecified]";
+}
+    
+std::string Option::GetDefaultStrValue() const
+{
+    // If not overriden
+    assert(false);
+    return "[unspecified]";
+}
 
 //----------------------------------------------------------------------------
 // OptionBool
@@ -95,6 +109,16 @@ bool OptionBool::SetValueBool(bool value)
     return SetValue(value);
 }
 
+std::string OptionBool::GetStrValue() const
+{
+    return (m_value) ? "true" : "false";
+}
+    
+std::string OptionBool::GetDefaultStrValue() const
+{
+    return (m_defaultValue) ? "true" : "false";
+}
+
 bool OptionBool::SetValue(bool value)
 {
     m_value = value;
@@ -125,6 +149,16 @@ bool OptionDbl::SetValue(std::string value)
     return SetValue(atof(value.c_str()));
 }
 
+std::string OptionDbl::GetStrValue() const
+{
+    return StringFormat("%f", m_value);
+}
+    
+std::string OptionDbl::GetDefaultStrValue() const
+{
+    return StringFormat("%f", m_defaultValue);
+}
+    
 bool OptionDbl::SetValueDbl(double value)
 {
     return SetValue(value);
@@ -171,12 +205,22 @@ bool OptionInt::SetValue(std::string value)
     return SetValue(atoi(value.c_str()));
 }
 
-int OptionInt::GetValue()
+std::string OptionInt::GetStrValue() const
+{
+    return StringFormat("%d", m_value);
+}
+    
+std::string OptionInt::GetDefaultStrValue() const
+{
+    return StringFormat("%d", m_defaultValue);
+}
+    
+int OptionInt::GetValue() const
 {
     return (m_definitionFactor) ? m_value * DEFINITION_FACTOR : m_value;
 }
 
-int OptionInt::GetUnfactoredValue()
+int OptionInt::GetUnfactoredValue() const
 {
     assert(m_definitionFactor);
     return m_value;
@@ -238,6 +282,32 @@ bool OptionArray::SetValue(std::string value)
     m_values.push_back(value);
     return true;
 }
+    
+std::string OptionArray::GetStrValue() const
+{
+    std::stringstream ss;
+    int i;
+    for (i = 0; i < (int)m_values.size(); ++i) {
+        if (i != 0) {
+            ss << ", ";
+        }
+        ss << "\"" << m_values.at(i) << "\"";
+    }
+    return ss.str();
+}
+    
+std::string OptionArray::GetDefaultStrValue() const
+{
+    std::stringstream ss;
+    int i;
+    for (i = 0; i < (int)m_defaultValues.size(); ++i) {
+        if (i != 0) {
+            ss << ", ";
+        }
+        ss << "\"" << m_defaultValues.at(i) << "\"";
+    }
+    return ss.str();
+}
 
 bool OptionArray::SetValue(std::vector<std::string> const &values)
 {
@@ -286,6 +356,22 @@ bool OptionIntMap::SetValue(std::string value)
     return false;
 }
 
+std::string OptionIntMap::GetStrValue() const
+{
+    assert(m_values);
+    assert(m_values->count(m_value));
+    
+    return (m_values->at(m_value));
+}
+
+std::string OptionIntMap::GetDefaultStrValue() const
+{
+    assert(m_values);
+    assert(m_values->count(m_defaultValue));
+    
+    return (m_values->at(m_defaultValue));
+}
+    
 bool OptionIntMap::SetValue(int value)
 {
     assert(m_values);
@@ -294,22 +380,6 @@ bool OptionIntMap::SetValue(int value)
     m_value = value;
 
     return true;
-}
-
-std::string OptionIntMap::GetStrValue() const
-{
-    assert(m_values);
-    assert(m_values->count(m_value));
-
-    return (m_values->at(m_value));
-}
-
-std::string OptionIntMap::GetDefaultStrValue() const
-{
-    assert(m_values);
-    assert(m_values->count(m_defaultValue));
-
-    return (m_values->at(m_defaultValue));
 }
 
 std::vector<std::string> OptionIntMap::GetStrValues(bool withoutDefault) const
@@ -372,6 +442,18 @@ bool OptionStaffrel::SetValue(std::string value)
     return true;
 }
 
+std::string OptionStaffrel::GetStrValue() const
+{
+    Att converter;
+    return converter.StaffrelToStr(m_value);
+}
+
+std::string OptionStaffrel::GetDefaultStrValue() const
+{
+    Att converter;
+    return converter.StaffrelToStr(m_defaultValue);
+}
+    
 //----------------------------------------------------------------------------
 // Options
 //----------------------------------------------------------------------------

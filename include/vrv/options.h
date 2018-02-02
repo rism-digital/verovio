@@ -97,6 +97,8 @@ public:
     virtual bool SetValueBool(bool value);
     virtual bool SetValueDbl(double value);
     virtual bool SetValue(std::string value);
+    virtual std::string GetStrValue() const;
+    virtual std::string GetDefaultStrValue() const;
 
     void SetInfo(std::string title, std::string description);
     std::string GetTitle() const { return m_title; }
@@ -135,6 +137,8 @@ public:
     virtual bool SetValueBool(bool value);
     virtual bool SetValueDbl(double value);
     virtual bool SetValue(std::string value);
+    virtual std::string GetStrValue() const;
+    virtual std::string GetDefaultStrValue() const;
 
     bool GetValue() const { return m_value; }
     bool GetDefault() const { return m_defaultValue; }
@@ -166,6 +170,8 @@ public:
 
     virtual bool SetValueDbl(double value);
     virtual bool SetValue(std::string value);
+    virtual std::string GetStrValue() const;
+    virtual std::string GetDefaultStrValue() const;
 
     double GetValue() const { return m_value; }
     double GetDefault() const { return m_defaultValue; }
@@ -201,9 +207,11 @@ public:
 
     virtual bool SetValueDbl(double value);
     virtual bool SetValue(std::string value);
+    virtual std::string GetStrValue() const;
+    virtual std::string GetDefaultStrValue() const;
 
-    int GetValue();
-    int GetUnfactoredValue();
+    int GetValue() const;
+    int GetUnfactoredValue() const;
     int GetDefault() const { return m_defaultValue; }
     int GetMin() const { return m_minValue; }
     int GetMax() const { return m_maxValue; }
@@ -237,7 +245,9 @@ public:
     void Init(std::string defaultValue);
 
     virtual bool SetValue(std::string value);
-
+    virtual std::string GetStrValue() const { return m_value; }
+    virtual std::string GetDefaultStrValue() const { return m_defaultValue; }
+    
     std::string GetValue() const { return m_value; }
     std::string GetDefault() const { return m_defaultValue; }
 
@@ -266,6 +276,8 @@ public:
     void Init(OptionGrp *grp = NULL);
 
     virtual bool SetValue(std::string value);
+    virtual std::string GetStrValue() const;
+    virtual std::string GetDefaultStrValue() const;
 
     std::vector<std::string> GetValue() const { return m_values; }
     std::vector<std::string> GetDefault() const { return m_defaultValues; }
@@ -296,13 +308,13 @@ public:
     void Init(int defaultValue, std::map<int, std::string> *values);
 
     virtual bool SetValue(std::string value);
+    virtual std::string GetStrValue() const;
+    virtual std::string GetDefaultStrValue() const;
 
     int GetValue() const { return m_value; }
     int GetDefault() const { return m_defaultValue; }
     bool SetValue(int value);
 
-    std::string GetStrValue() const;
-    std::string GetDefaultStrValue() const;
     std::vector<std::string> GetStrValues(bool withoutDefault) const;
     std::string GetStrValuesAtStr(bool withoutDefault) const;
 
@@ -333,6 +345,8 @@ public:
     void Init(data_STAFFREL defaultValue);
 
     virtual bool SetValue(std::string value);
+    virtual std::string GetStrValue() const;
+    virtual std::string GetDefaultStrValue() const;
 
     // For altenate types return a reference to the value
     // Alternatively we can have a values vector for each sub-type
@@ -364,6 +378,8 @@ public:
     void Init(data_STAFFREL_basic defaultValue, const std::vector<data_STAFFREL_basic> &values);
 
     virtual bool SetValue(std::string value);
+    virtual std::string GetStrValue() const;
+    virtual std::string GetDefaultStrValue() const;
 
     data_STAFFREL_basic GetValue() const { return m_value; }
     data_STAFFREL_basic GetDefault() const { return m_defaultValue; }

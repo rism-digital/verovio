@@ -72,6 +72,14 @@ public:
      * Only available for Emscripten-based compiles
      **/
     bool SetOptions(const std::string &json_options);
+    
+    /**
+     * @name Getter and setter for single option
+     */
+    ///@{
+    std::string GetOption(const std::string &option, bool defaultValue = false) const;
+    bool SetOption(const std::string &option, const std::string &value);
+    ///@}
 
     /**
      * Parse the editor actions passed as JSON string.
