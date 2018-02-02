@@ -471,9 +471,9 @@ int main(int argc, char **argv)
             }
             cur_outfile += ".svg";
             if (std_output) {
-                cout << toolkit.RenderToSvg(p);
+                cout << toolkit.RenderToSVG(p);
             }
-            else if (!toolkit.RenderToSvgFile(cur_outfile, p)) {
+            else if (!toolkit.RenderToSVGFile(cur_outfile, p)) {
                 cerr << "Unable to write SVG to " << cur_outfile << "." << endl;
                 exit(1);
             }
@@ -489,7 +489,7 @@ int main(int argc, char **argv)
             cerr << "Midi cannot write to standard output." << endl;
             exit(1);
         }
-        else if (!toolkit.RenderToMidiFile(outfile)) {
+        else if (!toolkit.RenderToMIDIFile(outfile)) {
             cerr << "Unable to write MIDI to " << outfile << "." << endl;
             exit(1);
         }

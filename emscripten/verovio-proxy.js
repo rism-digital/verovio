@@ -57,11 +57,11 @@ verovio.vrvToolkit.redoPagePitchPosLayout = Module.cwrap('vrvToolkit_redoPagePit
 // char *renderData(Toolkit *ic, const char *data, const char *options)
 verovio.vrvToolkit.renderData = Module.cwrap('vrvToolkit_renderData', 'string', ['number', 'string', 'string']);
 
-// char *renderPage(Toolkit *ic, int pageNo, const char *rendering_options)
-verovio.vrvToolkit.renderPage = Module.cwrap('vrvToolkit_renderPage', 'string', ['number', 'number', 'string']);
-
 // char *renderToMidi(Toolkit *ic, const char *rendering_options)
-verovio.vrvToolkit.renderToMidi = Module.cwrap('vrvToolkit_renderToMidi', 'string', ['number', 'string']);
+verovio.vrvToolkit.renderToMIDI = Module.cwrap('vrvToolkit_renderToMIDI', 'string', ['number', 'string']);
+
+// char *renderToSvg(Toolkit *ic, int pageNo, const char *rendering_options)
+verovio.vrvToolkit.renderToSVG = Module.cwrap('vrvToolkit_renderToSVG', 'string', ['number', 'number', 'string']);
 
 // char *renderToTimemap(Toolkit *ic)
 verovio.vrvToolkit.renderToTimemap = Module.cwrap('vrvToolkit_renderToTimemap', 'string', ['number']);
@@ -152,11 +152,21 @@ verovio.toolkit.prototype.renderData = function (data, options) {
 };
 
 verovio.toolkit.prototype.renderPage = function (pageNo, options) {
-    return verovio.vrvToolkit.renderPage(this.ptr, pageNo, JSON.stringify(options));
+    console.warn("Method renderPage is deprecated; use renderToSVG instead");
+    return verovio.vrvToolkit.renderToSVG(this.ptr, pageNo, JSON.stringify(options));
 };
 
 verovio.toolkit.prototype.renderToMidi = function (options) {
     return verovio.vrvToolkit.renderToMidi(this.ptr, JSON.stringify(options));
+};
+
+verovio.toolkit.prototype.renderToMidi = function (options) {
+    console.warn("Method renderToMidi is deprecated; use renderToMIDI instead");
+    return verovio.vrvToolkit.renderToMIDI(this.ptr, JSON.stringify(options));
+};
+
+verovio.toolkit.prototype.renderToSVG = function (pageNo, options) {
+    return verovio.vrvToolkit.renderToSVG(this.ptr, pageNo, JSON.stringify(options));
 };
 
 verovio.toolkit.prototype.renderToTimemap = function () {

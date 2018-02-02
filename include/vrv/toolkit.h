@@ -119,24 +119,24 @@ public:
      * Render the page in SVG and returns it as a string.
      * Page number is 1-based
      */
-    std::string RenderToSvg(int pageNo = 1, bool xml_declaration = false);
+    std::string RenderToSVG(int pageNo = 1, bool xml_declaration = false);
 
     /**
      * Render the page in SVG and save it to the file.
      * Page number is 1-based.
      */
-    bool RenderToSvgFile(const std::string &filename, int pageNo = 1);
+    bool RenderToSVGFile(const std::string &filename, int pageNo = 1);
 
     /**
      * Creates a midi file, opens it, and writes to it.
      * currently generates a dummy midi file.
      */
-    bool RenderToMidiFile(const std::string &filename);
+    bool RenderToMIDIFile(const std::string &filename);
 
     /**
      * Creates a midi file, opens it, and returns it (base64 encoded).
      */
-    std::string RenderToMidi();
+    std::string RenderToMIDI();
 
     /**
      * Creates a timemap file, and return it as a JSON string.

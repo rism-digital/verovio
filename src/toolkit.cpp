@@ -968,7 +968,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     return true;
 }
 
-std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
+std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
 {
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
@@ -985,9 +985,9 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
     return out_str;
 }
 
-bool Toolkit::RenderToSvgFile(const std::string &filename, int pageNo)
+bool Toolkit::RenderToSVGFile(const std::string &filename, int pageNo)
 {
-    std::string output = RenderToSvg(pageNo, true);
+    std::string output = RenderToSVG(pageNo, true);
 
     std::ofstream outfile;
     outfile.open(filename.c_str());
@@ -1027,7 +1027,7 @@ void Toolkit::GetHumdrum(ostream &output)
     output << GetHumdrumBuffer();
 }
 
-std::string Toolkit::RenderToMidi()
+std::string Toolkit::RenderToMIDI()
 {
     MidiFile outputfile;
     outputfile.absoluteTicks();
@@ -1090,7 +1090,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     return o.json();
 }
 
-bool Toolkit::RenderToMidiFile(const std::string &filename)
+bool Toolkit::RenderToMIDIFile(const std::string &filename)
 {
     MidiFile outputfile;
     outputfile.absoluteTicks();

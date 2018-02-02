@@ -34,8 +34,8 @@ const char *vrvToolkit_getElementAttr(ToolkitManager *tkm, const char *xmlId);
 double vrvToolkit_getTimeForElement(ToolkitManager *tkm, const char *xmlId);
 const char *vrvToolkit_getVersion(ToolkitManager *tkm);
 bool vrvToolkit_loadData(ToolkitManager *tkm, const char *data);
-const char *vrvToolkit_renderPage(ToolkitManager *tkm, int page_no, const char *c_options);
 const char *vrvToolkit_renderToMidi(ToolkitManager *tkm, const char *c_options);
+const char *vrvToolkit_renderToSvg(ToolkitManager *tkm, int page_no, const char *c_options);
 const char *vrvToolkit_renderToTimemap(ToolkitManager *tkm);
 void vrvToolkit_redoLayout(ToolkitManager *tkm);
 void vrvToolkit_redoPagePitchPosLayout(ToolkitManager *tkm);
@@ -135,20 +135,20 @@ bool vrvToolkit_loadData(ToolkitManager *tkm, const char *data)
     return tkm->GetInstance()->LoadData(data);
 }
 
-const char *vrvToolkit_renderPage(ToolkitManager *tkm, int page_no, const char *c_options)
+const char *vrvToolkit_renderToMIDI(ToolkitManager *tkm, const char *c_options)
 {
     tkm->GetInstance()->ResetLogBuffer();
-    tkm->SetCString(tkm->GetInstance()->RenderToSvg(page_no, false));
+    tkm->SetCString(tkm->GetInstance()->RenderToMIDI());
     return tkm->GetCString();
 }
 
-const char *vrvToolkit_renderToMidi(ToolkitManager *tkm, const char *c_options)
+const char *vrvToolkit_renderToSVG(ToolkitManager *tkm, int page_no, const char *c_options)
 {
     tkm->GetInstance()->ResetLogBuffer();
-    tkm->SetCString(tkm->GetInstance()->RenderToMidi());
+    tkm->SetCString(tkm->GetInstance()->RenderToSVG(page_no, false));
     return tkm->GetCString();
 }
-
+    
 const char *vrvToolkit_renderToTimemap(ToolkitManager *tkm)
 {
     tkm->GetInstance()->ResetLogBuffer();
@@ -172,7 +172,7 @@ const char *vrvToolkit_renderData(ToolkitManager *tkm, const char *data, const c
     vrvToolkit_setOptions(tkm, options);
     vrvToolkit_loadData(tkm, data);
 
-    return vrvToolkit_renderPage(tkm, 1, options);
+    return vrvToolkit_renderToSvg(tkm, 1, options);
 }
 
 void vrvToolkit_setOptions(ToolkitManager *tkm, const char *options)
