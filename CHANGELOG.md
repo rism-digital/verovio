@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+* Adding getAvailableOptions and getOption(bool) methods to the JS toolkit
 * Adding several layout options
 * Support for `<pgHead>`, `<pgHead2>`, `<pgFoot>` and `<pgFoot2>`
 * Support for `<lb>` within `<rend>`
@@ -15,11 +16,15 @@
 * Upgrade to MEI 4.0 (in preparation)
 
 ### Changed
+* Method renderPage (JS) deprecated (use renderToSVG instead)
+* Method renderToMidi (JS) deprecated (use renderToMIDI instead)
+* Option --appXPathQueries (JS) deprecated (use appXPathQuery instead)
+* Option --choiceXPathQueries (JS) deprecated (use choiceXPathQuery instead)
 * Output CLI help and version to standard output
 * Option -b/--border (CLI) and border (JS) deprecated
 * Option -h/--height and -w/--width (CLI) deprecated
-* Option --ignore-layout (CLI) and ignoreLayout deprecated
-* Option --no-layout (CLI) and noLayout deprecated
+* Option --ignore-layout (CLI) and ignoreLayout deprecated (use breaks instead)
+* Option --no-layout (CLI) and noLayout deprecated (use breaks instead)
 * Handling `@tie` one `<note>` as `<tie>` internally
 * Handling `@fermata` as `<fermata>` internally
 
