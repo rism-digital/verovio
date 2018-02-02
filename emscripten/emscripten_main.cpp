@@ -35,7 +35,7 @@ double vrvToolkit_getTimeForElement(ToolkitManager *tkm, const char *xmlId);
 const char *vrvToolkit_getVersion(ToolkitManager *tkm);
 bool vrvToolkit_loadData(ToolkitManager *tkm, const char *data);
 const char *vrvToolkit_renderToMidi(ToolkitManager *tkm, const char *c_options);
-const char *vrvToolkit_renderToSvg(ToolkitManager *tkm, int page_no, const char *c_options);
+const char *vrvToolkit_renderToSVG(ToolkitManager *tkm, int page_no, const char *c_options);
 const char *vrvToolkit_renderToTimemap(ToolkitManager *tkm);
 void vrvToolkit_redoLayout(ToolkitManager *tkm);
 void vrvToolkit_redoPagePitchPosLayout(ToolkitManager *tkm);
@@ -172,7 +172,7 @@ const char *vrvToolkit_renderData(ToolkitManager *tkm, const char *data, const c
     vrvToolkit_setOptions(tkm, options);
     vrvToolkit_loadData(tkm, data);
 
-    return vrvToolkit_renderToSvg(tkm, 1, options);
+    return vrvToolkit_renderToSVG(tkm, 1, options);
 }
 
 void vrvToolkit_setOptions(ToolkitManager *tkm, const char *options)
