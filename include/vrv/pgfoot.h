@@ -12,13 +12,12 @@
 
 namespace vrv {
 
-
 //----------------------------------------------------------------------------
 // PgFoot
 //----------------------------------------------------------------------------
 
 /**
- * This class represents an MEI pgFoot. 
+ * This class represents an MEI pgFoot.
  */
 class PgFoot : public RunningElement {
 public:
@@ -33,7 +32,7 @@ public:
     virtual std::string GetClassName() const { return "PgFoot"; }
     virtual ClassId GetClassId() const { return PGFOOT; }
     ///@}
-    
+
     //----------//
     // Functors //
     //----------//

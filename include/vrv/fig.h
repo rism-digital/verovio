@@ -33,7 +33,7 @@ public:
     virtual std::string GetClassName() const { return "Fig"; }
     virtual ClassId GetClassId() const { return FIG; }
     ///@}
-    
+
     /**
      * @name Getter to interfaces
      */
@@ -46,7 +46,7 @@ public:
      * Only supported elements will be actually added to the child list.
      */
     virtual void AddChild(Object *object);
-    
+
     //----------//
     // Functors //
     //----------//
@@ -57,7 +57,7 @@ public:
     ///@{
     virtual int AlignVertically(FunctorParams *functorParams);
     ///@}
-    
+
 private:
     //
 public:

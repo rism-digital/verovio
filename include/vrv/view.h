@@ -201,7 +201,7 @@ protected:
     void DrawPgFooter(DeviceContext *dc, RunningElement *pgFooter);
     void DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader);
     ///@}
-    
+
     /**
      * @name Methods for drawing children
      * Defined in view_page.cpp

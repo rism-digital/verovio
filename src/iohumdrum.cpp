@@ -6701,7 +6701,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     int line = token->getLineIndex();
     int field = token->getFieldIndex();
     colorNote(note, tstring, line, field);
-    if (GetTypeOption()) {
+    if (m_doc->GetOptions()->m_humType.GetValue()) {
         embedQstampInClass(note, token, tstring);
         embedPitchInformationInClass(note, tstring);
         embedTieInformation(note, tstring);
@@ -7104,32 +7104,32 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             if (dashbegin && dashend) {
                 syl->SetWordpos(sylLog_WORDPOS_m);
                 syl->SetCon(sylLog_CON_d);
-                if (GetTypeOption()) {
+                if (m_doc->GetOptions()->m_humType.GetValue()) {
                     appendTypeTag(syl, "m");
                 }
             }
             else if (dashbegin) {
                 syl->SetWordpos(sylLog_WORDPOS_t);
-                if (GetTypeOption()) {
+                if (m_doc->GetOptions()->m_humType.GetValue()) {
                     appendTypeTag(syl, "t");
                 }
             }
             else if (dashend) {
                 syl->SetWordpos(sylLog_WORDPOS_i);
                 syl->SetCon(sylLog_CON_d);
-                if (GetTypeOption()) {
+                if (m_doc->GetOptions()->m_humType.GetValue()) {
                     appendTypeTag(syl, "i");
                 }
             }
             else if (extender) {
                 syl->SetWordpos(sylLog_WORDPOS_t);
                 syl->SetCon(sylLog_CON_u);
-                if (GetTypeOption()) {
+                if (m_doc->GetOptions()->m_humType.GetValue()) {
                     appendTypeTag(syl, "t");
                 }
             }
             else {
-                if (GetTypeOption()) {
+                if (m_doc->GetOptions()->m_humType.GetValue()) {
                     appendTypeTag(syl, "t");
                 }
             }
@@ -8220,7 +8220,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         setN(m_measure, measurenumber);
     }
 
-    if (GetTypeOption()) {
+    if (m_doc->GetOptions()->m_humType.GetValue()) {
         stringstream measuretag;
         measuretag << "m-" << measurenumber;
         appendTypeTag(m_measure, measuretag.str());

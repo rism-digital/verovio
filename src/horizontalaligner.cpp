@@ -22,10 +22,10 @@
 #include "layer.h"
 #include "measure.h"
 #include "note.h"
+#include "options.h"
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
-#include "style.h"
 #include "timestamp.h"
 #include "vrv.h"
 
@@ -275,7 +275,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
     // If not, move the aligments accordingly
     int left = alignment->GetGraceAligner()->GetGraceGroupLeft(staffN);
     // We also set artificially the margin with the previous note
-    if (left != -VRV_UNSET) left -= doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    if (left != -VRV_UNSET) left -= doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100);
     if (left < maxRight) {
         int spacing = (maxRight - left);
         ArrayOfAdjustmentTuples boundaries{ std::make_tuple(rightAlignment, alignment, spacing) };
@@ -826,8 +826,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
                 int minLeft, maxRight;
                 params->m_rightDefaultAlignment->GetLeftRight(*iter, minLeft, maxRight);
                 if (minLeft != -VRV_UNSET)
-                    graceMaxPos = minLeft
-                        - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75) / PARAM_DENOMINATOR;
+                    graceMaxPos = minLeft - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75);
             }
             // This happens when grace notes are at the end of a measure before a barline
             else {
@@ -836,8 +835,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
                 // staffN -1 is barline
                 measureAligner->GetRightBarLineAlignment()->GetLeftRight(BARLINE_REFERENCES, minLeft, maxRight);
                 if (minLeft != -VRV_UNSET)
-                    graceMaxPos = minLeft
-                        - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75) / PARAM_DENOMINATOR;
+                    graceMaxPos = minLeft - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75);
             }
 
             params->m_graceMaxPos = graceMaxPos;
@@ -961,7 +959,8 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
 
     if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
-            params->m_doc->GetSpacingLinear(), params->m_doc->GetSpacingNonLinear());
+            params->m_doc->GetOptions()->m_spacingLinear.GetValue(),
+            params->m_doc->GetOptions()->m_spacingNonLinear.GetValue());
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
 

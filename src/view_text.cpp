@@ -21,9 +21,9 @@
 #include "fig.h"
 #include "lb.h"
 #include "num.h"
+#include "options.h"
 #include "rend.h"
 #include "smufl.h"
-#include "style.h"
 #include "svg.h"
 #include "text.h"
 #include "vrv.h"
@@ -133,24 +133,24 @@ void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
     assert(lb);
 
     dc->StartTextGraphic(lb, "", lb->GetUuid());
-    
+
     FontInfo *currentFont = dc->GetFont();
     int descender = -m_doc->GetTextGlyphDescender(L'q', currentFont, false);
     int height = m_doc->GetTextGlyphHeight(L'I', currentFont, false);
-    
+
     params.m_y -= (descender + height);
     params.m_newLine = true;
-    
+
     dc->EndTextGraphic(lb, this);
 }
-    
+
 void View::DrawNum(DeviceContext *dc, Num *num, TextDrawingParams &params)
 {
     assert(dc);
     assert(num);
 
     dc->StartTextGraphic(num, "", num->GetUuid());
-    
+
     Text *currentText = num->GetCurrentText();
     if (currentText && (currentText->GetText().length() > 0)) {
         DrawText(dc, num->GetCurrentText(), params);
@@ -158,7 +158,7 @@ void View::DrawNum(DeviceContext *dc, Num *num, TextDrawingParams &params)
     else {
         DrawTextChildren(dc, num, params);
     }
-    
+
     dc->EndTextGraphic(num, this);
 }
 
@@ -168,17 +168,17 @@ void View::DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params)
     assert(fig);
 
     dc->StartGraphic(fig, "", fig->GetUuid());
-    
+
     Svg *svg = dynamic_cast<Svg *>(fig->FindChildByType(SVG));
     if (svg) {
         params.m_x = fig->GetDrawingX();
         params.m_y = fig->GetDrawingY();
         DrawSvg(dc, svg, params);
     }
-    
+
     dc->EndGraphic(fig, this);
 }
-    
+
 void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
 {
     assert(dc);
@@ -205,8 +205,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
                     case (FONTSIZETERM_small): percent = 80; break;
                     case (FONTSIZETERM_x_small): percent = 60; break;
                     case (FONTSIZETERM_xx_small): percent = 50; break;
-                    default:
-                        break;
+                    default: break;
                 }
                 rendFont.SetPointSize(params.m_pointSize * percent / 100);
             }
@@ -218,7 +217,7 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
         if (rend->HasFontweight()) rendFont.SetWeight(rend->GetFontweight());
     }
     if (customFont) dc->SetFont(&rendFont);
-    
+
     if (params.m_laidOut) {
         if (params.m_alignment == HORIZONTALALIGNMENT_NONE) {
             params.m_alignment = rend->HasHalign() ? rend->GetHalign() : HORIZONTALALIGNMENT_left;
@@ -243,7 +242,7 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
 {
     assert(dc);
     assert(text);
-    
+
     dc->StartTextGraphic(text, "", text->GetUuid());
 
     // special case where we want to replace the '#' or 'b' with a VerovioText glyphs
@@ -258,27 +257,28 @@ void View::DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params)
 
     else {
         if (params.m_laidOut && params.m_newLine) {
-            dc->DrawText(UTF16to8(text->GetText()), text->GetText(), ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
+            dc->DrawText(
+                UTF16to8(text->GetText()), text->GetText(), ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
             params.m_newLine = false;
         }
         else {
             dc->DrawText(UTF16to8(text->GetText()), text->GetText());
         }
     }
-    
+
     dc->EndTextGraphic(text, this);
 }
-    
+
 void View::DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params)
 {
     assert(dc);
     assert(svg);
 
     dc->StartGraphic(svg, "", svg->GetUuid());
-    
-    dc->DrawSvgShape(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y),
-                     svg->GetWidth(), svg->GetHeight(), svg->Get());
-    
+
+    dc->DrawSvgShape(
+        ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), svg->GetWidth(), svg->GetHeight(), svg->Get());
+
     dc->EndGraphic(svg, this);
 }
 

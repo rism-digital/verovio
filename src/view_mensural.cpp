@@ -21,11 +21,11 @@
 #include "ligature.h"
 #include "mensur.h"
 #include "note.h"
+#include "options.h"
 #include "proport.h"
 #include "rest.h"
 #include "smufl.h"
 #include "staff.h"
-#include "style.h"
 
 namespace vrv {
 
@@ -538,39 +538,39 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     Note *note = dynamic_cast<Note *>(element);
     assert(note);
-    
-    Ligature *ligature = dynamic_cast<Ligature*>(note->GetFirstParent(LIGATURE));
+
+    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstParent(LIGATURE));
     assert(ligature);
-    
+
     Note *firstNote = ligature->GetFirstNote();
     assert(firstNote);
-    
+
     int xLeft, xRight, yTop, yBottom, y3, y4;
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     bool fillNotehead = (mensural_black || note->GetColored()) && !(mensural_black && note->GetColored());
     int height = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) / 2;
-    
+
     // Calculate size of the rectangle
     xLeft = firstNote->GetDrawingX();
     xLeft += (2 * m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * ligature->PositionInLigature(note));
-    
+
     xRight = xLeft + 2 * m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
     if (note->GetActualDur() == DUR_MX) {
         // Maxima is twice the width of brevis
-        xRight += 2* m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+        xRight += 2 * m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
     }
-    
+
     int y = note->GetDrawingY();
     yTop = y + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     yBottom = y - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    
+
     y3 = yTop;
     y4 = yBottom;
     if (!mensural_black) {
         y3 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2; // partie d'encadrement qui depasse
         y4 -= (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
     }
-    
+
     if (!fillNotehead) {
         //    double the bases of rectangles
         DrawObliquePolygon(dc, xLeft, yTop, xRight, yTop, -height);
@@ -579,7 +579,7 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     else {
         DrawFilledRectangle(dc, xLeft, yTop, xRight, yBottom);
     }
-    
+
     DrawVerticalLine(dc, y3, y4, xLeft, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)); // corset lateral
     DrawVerticalLine(dc, y3, y4, xRight, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
 

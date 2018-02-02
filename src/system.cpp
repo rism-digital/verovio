@@ -223,7 +223,7 @@ int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
@@ -282,7 +282,8 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    params->m_cumulatedShift = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+    params->m_cumulatedShift
+        = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
 
     m_systemAligner.Process(params->m_functorEnd, params);
 
@@ -447,7 +448,7 @@ int System::CastOffPages(FunctorParams *functorParams)
 {
     CastOffPagesParams *params = dynamic_cast<CastOffPagesParams *>(functorParams);
     assert(params);
-    
+
     int currentShift = params->m_shift;
     // We use params->m_pageHeadHeight to check if we have passed the first page already
     if (params->m_pgHeadHeight != VRV_UNSET) {
@@ -457,8 +458,7 @@ int System::CastOffPages(FunctorParams *functorParams)
         currentShift += params->m_pgHead2Height + params->m_pgFoot2Height;
     }
 
-    if ((params->m_currentPage->GetChildCount() > 0)
-        && (this->m_drawingYRel - this->GetHeight() - currentShift < 0)) {
+    if ((params->m_currentPage->GetChildCount() > 0) && (this->m_drawingYRel - this->GetHeight() - currentShift < 0)) {
         params->m_currentPage = new Page();
         // Use VRV_UNSET value as a flag
         params->m_pgHeadHeight = VRV_UNSET;

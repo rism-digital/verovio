@@ -37,11 +37,11 @@
 #include "mordent.h"
 #include "note.h"
 #include "octave.h"
+#include "options.h"
 #include "pedal.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
-#include "style.h"
 #include "syl.h"
 #include "system.h"
 #include "tempo.h"
@@ -809,7 +809,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     float angle = AdjustSlur(slur, staff, layer1->GetN(), drawingCurveDir, points);
 
-    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / PARAM_DENOMINATOR;
+    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetOptions()->m_slurThickness.GetValue();
 
     assert(slur->GetCurrentFloatingPositioner());
     slur->GetCurrentFloatingPositioner()->UpdateCurvePosition(points, angle, thickness, drawingCurveDir);
@@ -907,11 +907,12 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     }
     else {
         int dist = abs(p2->x - p1->x);
-        height
-            = std::max(m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR,
-                dist / TEMP_SLUR_HEIGHT_FACTOR);
+        height = std::max(
+            int(m_doc->GetOptions()->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
+            dist / TEMP_SLUR_HEIGHT_FACTOR);
         height = std::min(
-            m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR, height);
+            int(m_doc->GetOptions()->m_slurMaxHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
+            height);
     }
 
     // the height of the control points
@@ -1411,7 +1412,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
             height += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         }
     }
-    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetTieThickness() / PARAM_DENOMINATOR;
+    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetOptions()->m_tieThickness.GetValue();
 
     // control points
     Point c1, c2;
@@ -1532,11 +1533,15 @@ void View::DrawSylConnector(
         // nothing to adjust
     }
 
+    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instanciate a temporary
+    // object
+    // in order not to reset the Syl bounding box.
+    Syl sylConnector;
     if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     }
     else
-        dc->StartGraphic(syl, "spanning-connector", "");
+        dc->StartGraphic(&sylConnector, "spanning-connector", "");
 
     dc->DeactivateGraphic();
 
@@ -1547,7 +1552,7 @@ void View::DrawSylConnector(
         dc->EndResumedGraphic(graphic, this);
     }
     else
-        dc->EndGraphic(syl, this);
+        dc->EndGraphic(&sylConnector, this);
 }
 
 void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff)
@@ -1719,7 +1724,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     }
 
     TextDrawingParams params;
-    
+
     // If we have not timestamp
     params.m_x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
 
@@ -1734,14 +1739,14 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
         params.m_y = dir->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
-        
+
         dirTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&dirTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
-        
+
         DrawTextChildren(dc, dir, params);
         dc->EndText();
 
@@ -1775,12 +1780,11 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         dynamTxt.SetFaceName("Times");
         dynamTxt.SetStyle(FONTSTYLE_italic);
     }
-    
+
     TextDrawingParams params;
 
     // If we have not timestamp
     params.m_x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
-
 
     data_HORIZONTALALIGNMENT alignment = dynam->GetChildRendAlignment();
     // Dynam are left aligned by default;
@@ -1932,12 +1936,11 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     if (!dc->UseGlobalStyling()) {
         harmTxt.SetFaceName("Times");
     }
-    
+
     TextDrawingParams params;
 
     // If we have not timestamp
     params.m_x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
-
 
     data_HORIZONTALALIGNMENT alignment = harm->GetChildRendAlignment();
     // Harm are centered aligned by default;
@@ -1958,7 +1961,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         }
         else {
             params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
-            
+
             harmTxt.SetPointSize(params.m_pointSize);
 
             dc->SetBrush(m_currentColour, AxSOLID);
@@ -2135,8 +2138,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         tempoTxt.SetFaceName("Times");
         tempoTxt.SetWeight(FONTWEIGHT_bold);
     }
-    
-    
+
     TextDrawingParams params;
 
     // If we have not timestamp
@@ -2166,7 +2168,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
         params.m_y = tempo->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
-        
+
         tempoTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
@@ -2467,12 +2469,12 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
                 textX += m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
             }
-            
+
             TextDrawingParams params;
             params.m_x = textX;
             params.m_y = y1;
             params.m_pointSize = currentFont.GetPointSize();
-            
+
             dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
             DrawTextElement(dc, &text, params);
             dc->EndText();

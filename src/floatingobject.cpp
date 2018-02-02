@@ -212,7 +212,7 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
         m_place = STAFFREL_basic_NONE;
     }
     ResetPositioner();
-};
+}
 
 void FloatingPositioner::ResetPositioner()
 {
@@ -302,7 +302,7 @@ void FloatingPositioner::SetDrawingXRel(int drawingXRel)
 {
     ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
-};
+}
 
 void FloatingPositioner::SetDrawingYRel(int drawingYRel)
 {
@@ -313,7 +313,7 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel)
     else {
         if (drawingYRel > m_drawingYRel) m_drawingYRel = drawingYRel;
     }
-};
+}
 
 bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox)
 {
@@ -326,14 +326,13 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     if (horizOverlapingBBox == NULL) {
         if (this->m_place == STAFFREL_basic_above) {
             yRel = GetContentY1();
-            yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize)
-                / PARAM_DENOMINATOR;
+            yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+
             this->SetDrawingYRel(yRel);
         }
         else {
             yRel = staffAlignment->GetStaffHeight() + GetContentY2();
-            yRel
-                += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            yRel += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
             this->SetDrawingYRel(yRel);
         }
     }
@@ -342,8 +341,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         if (curve) {
             assert(curve->m_object);
         }
-        int margin
-            = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+        int margin = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
 
         if (this->m_place == STAFFREL_basic_above) {
             if (curve && curve->m_object->Is({ SLUR, TIE })) {
@@ -473,7 +471,7 @@ int FloatingObject::ResetDrawing(FunctorParams *functorParams)
     }
     m_drawingGrpId = DRAWING_GRP_NONE;
     return FUNCTOR_CONTINUE;
-};
+}
 
 int FloatingObject::UnCastOff(FunctorParams *functorParams)
 {

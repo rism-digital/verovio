@@ -386,7 +386,7 @@ void ScoreDef::SetDrawingWidth(int drawingWidth)
 {
     m_drawingWidth = drawingWidth;
 }
-    
+
 PgFoot *ScoreDef::GetPgFoot()
 {
     return dynamic_cast<PgFoot *>(this->FindChildByType(PGFOOT));

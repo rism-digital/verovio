@@ -7,6 +7,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <sys/stat.h>
@@ -19,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "style.h"
+#include "options.h"
 #include "toolkit.h"
 #include "vrv.h"
 
@@ -42,6 +43,35 @@ std::string removeExtension(std::string const &filename)
 {
     std::string::const_reverse_iterator pivot = std::find(filename.rbegin(), filename.rend(), '.');
     return pivot == filename.rend() ? filename : std::string(filename.begin(), pivot.base() - 1);
+}
+
+std::string fromCamelCase(const std::string &s)
+{
+    std::regex regExp1("(.)([A-Z][a-z]+)");
+    std::regex regExp2("([a-z0-9])([A-Z])");
+
+    std::string result = s;
+    result = std::regex_replace(result, regExp1, "$1-$2");
+    result = std::regex_replace(result, regExp2, "$1-$2");
+
+    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+    return result;
+}
+
+std::string toCamelCase(const std::string &s)
+{
+    std::istringstream iss(s);
+    std::string token;
+    std::string result;
+
+    while (getline(iss, token, '-')) {
+        token[0] = toupper(token[0]);
+        result += token;
+    }
+
+    result[0] = tolower(result[0]);
+
+    return result;
 }
 
 bool dir_exists(string dir)
@@ -72,108 +102,101 @@ void display_usage()
     // -then options with long forms only
     // -then debugging options
 
+    Options style;
+
     // Options with both short and long forms
     cerr << "Options (marked as * are repeatable)" << endl;
 
-    cerr << " -                          Use \"-\" as input file for reading from the standard input" << endl;
+    cerr << " -                     Use \"-\" as input file for reading from the standard input" << endl;
+    cerr << " -?, --help            Display this message" << endl;
+    cerr << " -a, --all-pages       Output all pages" << endl;
+    cerr << " -f, --format <s>      Select input format: darms, mei, pae, xml (default is mei)" << endl;
+    cerr << " -o, --outfile <s>     Output file name (use \"-\" for standard output)" << endl;
+    cerr << " -p, --page <i>        Select the page to engrave (default is 1)" << endl;
+    cerr << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")" << endl;
+    cerr << " -s, --scale <i>       Scale percent (default is " << DEFAULT_SCALE << ")" << endl;
+    cerr << " -t, --type <s>        Select output format: mei, svg, or midi (default is svg)" << endl;
+    cerr << " -v, --version         Display the version number" << endl;
+    cerr << " -x, --xml-id-seed <i> Seed the random number generator for XML IDs" << endl;
 
-    cerr << " -b, --border=BORDER        Add border (default is " << DEFAULT_PAGE_LEFT_MAR << ")" << endl;
+    Options options;
+    std::vector<OptionGrp *> *grp = options.GetGrps();
+    std::vector<OptionGrp *>::iterator grpIter;
 
-    cerr << " -f, --format=INPUT_FORMAT  Select input format: darms, mei, pae, xml (default is mei)" << endl;
+    for (grpIter = grp->begin(); grpIter != grp->end(); grpIter++) {
 
-    cerr << " -h, --page-height=HEIGHT   Specify the page height (default is " << DEFAULT_PAGE_HEIGHT << ")" << endl;
+        // Options with long forms only
+        cerr << endl << (*grpIter)->GetLabel() << endl;
+        const std::vector<Option *> *options = (*grpIter)->GetOptions();
+        std::vector<Option *>::const_iterator iter;
 
-    cerr << " -o, --outfile=FILE_NAME    Output file name (use \"-\" for standard output)" << endl;
+        for (iter = options->begin(); iter != options->end(); iter++) {
 
-    cerr << " -r, --resources=PATH       Path to SVG resources (default is " << vrv::Resources::GetPath() << ")"
-         << endl;
+            std::string option = fromCamelCase((*iter)->GetKey());
 
-    cerr << " -s, --scale=FACTOR         Scale percent (default is " << DEFAULT_SCALE << ")" << endl;
+            const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(*iter);
+            const OptionInt *optInt = dynamic_cast<const OptionInt *>(*iter);
+            const OptionIntMap *optIntMap = dynamic_cast<const OptionIntMap *>(*iter);
+            const OptionString *optString = dynamic_cast<const OptionString *>(*iter);
+            const OptionArray *optArray = dynamic_cast<const OptionArray *>(*iter);
+            const OptionBool *optBool = dynamic_cast<const OptionBool *>(*iter);
 
-    cerr << " -t, --type=OUTPUT_TYPE     Select output format: mei, svg, or midi (default is svg)" << endl;
+            if (optDbl) {
+                option.append(" <f>");
+            }
+            else if (optInt) {
+                option.append(" <i>");
+            }
+            else if (optString) {
+                option.append(" <s>");
+            }
+            else if (optArray) {
+                option.append("* <s>");
+            }
+            else if (!optBool) {
+                option.append(" <s>");
+            }
 
-    cerr << " -v, --version              Display the version number" << endl;
+            if (option.size() < 32) {
+                option.insert(option.end(), 32 - option.size(), ' ');
+            }
+            else {
+                option.append("\t");
+            }
 
-    cerr << " -w, --page-width=WIDTH     Specify the page width (default is " << DEFAULT_PAGE_WIDTH << ")" << endl;
+            cerr << " --" << option << (*iter)->GetDescription();
 
-    // Options with long forms only
-    cerr << endl << "Additional options" << endl;
-
-    cerr << " --adjust-page-height       Crop the page height to the height of the content" << endl;
-
-    cerr << " --all-pages                Output all pages with one output file per page" << endl;
-
-    cerr << " --app-xpath-query=QR*      Set the xPath query for selecting <app> child elements," << endl;
-    cerr << "                            for example: \"./rdg[contains(@source, 'source-id')]\";" << endl;
-    cerr << "                            by default the <lem> or the first <rdg> is selected" << endl;
-
-    cerr << " --choice-xpath-query=QR*   Set the xPath query for selecting <choice> child elements," << endl;
-    cerr << "                            for example: \"./orig\"; by default the first child is selected" << endl;
-
-    cerr << " --even-note-spacing        Space notes evenly and close together regardless of their durations" << endl;
-
-    cerr << " --font=FONT                Select the music font to use (default is Leipzig;" << endl;
-    cerr << "                            Bravura and Gootville are also available)" << endl;
-
-    cerr << " --help                     Display this message" << endl;
-
-    cerr << " --hum-type                 Include type attributes when importing from Humdrum" << endl;
-
-    cerr << " --ignore-layout            Ignore all encoded layout information (if any)" << endl;
-    cerr << "                            and fully recalculate the layout" << endl;
-
-    cerr << " --mdiv-xpath-query=QR      Set the xPath query for selecting the <mdiv> to be rendered;" << endl;
-    cerr << "                            only one <mdiv> can be rendered" << endl;
-
-    cerr << " --mm-ouptut                Specify that the output in the SVG is given in mm (default is px)" << endl;
-
-    cerr << " --no-layout                Ignore all encoded layout information (if any)" << endl;
-    cerr << "                            and output one single page with one single system" << endl;
-
-    cerr << " --page=PAGE                Select the page to engrave (default is 1)" << endl;
-
-    cerr << " --spacing-linear=SP        Specify the linear spacing factor (default is " << DEFAULT_SPACING_LINEAR
-         << ")" << endl;
-
-    cerr << " --spacing-non-linear=SP    Specify the non-linear spacing factor (default is "
-         << DEFAULT_SPACING_NON_LINEAR << ")" << endl;
-
-    cerr << " --spacing-staff=SP         Specify the spacing above each staff (in MEI vu)" << endl;
-
-    cerr << " --spacing-system=SP        Specify the spacing above each system (in MEI vu)" << endl;
-
-    cerr << " --xml-id-seed=INT          Seed the random number generator for XML IDs" << endl;
-
-    // Debugging options
-    cerr << endl << "Debugging options" << endl;
-
-    cerr << " --no-justification         Do not justify the system" << endl;
-
-    cerr << " --show-bounding-boxes      Show symbol bounding boxes" << endl;
+            if (optInt) {
+                cerr << " (default: " << optInt->GetDefault();
+                cerr << "; min: " << optInt->GetMin();
+                cerr << "; max: " << optInt->GetMax() << ")";
+            }
+            if (optDbl) {
+                cerr << " (default: " << optDbl->GetDefault();
+                cerr << "; min: " << optDbl->GetMin();
+                cerr << "; max: " << optDbl->GetMax() << ")";
+            }
+            if (optString) {
+                cerr << " (default: \"" << optString->GetDefault() << "\")";
+            }
+            if (optIntMap) {
+                cerr << " (default: \"" << optIntMap->GetDefaultStrValue()
+                     << "\"; other values: " << optIntMap->GetStrValuesAtStr(true) << ")";
+            }
+            cerr << endl;
+        }
+    }
 }
 
 int main(int argc, char **argv)
 {
-
     string infile;
     string svgdir;
     string outfile;
     string outformat = "svg";
-    string font = "";
-    vector<string> appXPathQueries;
-    vector<string> choiceXPathQueries;
     bool std_output = false;
 
-    int no_mei_hdr = 0;
-    int adjust_page_height = 0;
     int all_pages = 0;
-    int no_layout = 0;
-    int hum_type = 0;
-    int ignore_layout = 0;
-    int no_justification = 0;
-    int even_note_spacing = 0;
-    int mm_output = 0;
-    int show_bounding_boxes = 0;
     int page = 1;
     int show_help = 0;
     int show_version = 0;
@@ -188,78 +211,98 @@ int main(int argc, char **argv)
         display_usage();
         exit(1);
     }
+
+    static struct option base_options[] = {
+        { "all-pages", no_argument, 0, 'a' },
+        { "format", required_argument, 0, 'f' },
+        { "help", no_argument, 0, '?' },
+        { "outfile", required_argument, 0, 'o' },
+        { "page", required_argument, 0, 'p' },
+        { "resources", required_argument, 0, 'r' },
+        { "scale", required_argument, 0, 's' },
+        { "type", required_argument, 0, 't' },
+        { "version", no_argument, 0, 'v' },
+        { "xml-id-seed", required_argument, 0, 'x' },
+        // deprecated - some use undocumented short options to catch them as such
+        { "border", required_argument, 0, 'b' },
+        { "ignore-layout", no_argument, 0, 'i' },
+        { "no-layout", no_argument, 0, 'n' },
+        { "page-height-deprecated", required_argument, 0, 'h' },
+        { "page-width-deprecated", required_argument, 0, 'w' },
+        { 0, 0, 0, 0 }
+    };
+    
+    int baseSize = sizeof(base_options) / sizeof(option);
+
+    Options *options = toolkit.GetOptions();
+    const MapOfStrOptions *params = options->GetItems();
+    int mapSize = (int)params->size();
+
+    struct option *long_options;
+    int i = 0;
+    long_options = (struct option *)malloc(sizeof(struct option) * (baseSize + mapSize));
+
+    // A vector of string for storing names as const char* for long_options
+    std::vector<std::string> optNames;
+    optNames.reserve(mapSize);
+
+    MapOfStrOptions::const_iterator iter;
+    for (iter = params->begin(); iter != params->end(); iter++) {
+        // Double check that back and forth convertion is correct
+        assert(toCamelCase(fromCamelCase(iter->first)) == iter->first);
+
+        optNames.push_back(fromCamelCase(iter->first));
+        long_options[i].name = optNames.at(i).c_str();
+        OptionBool *optBool = dynamic_cast<OptionBool *>(iter->second);
+        long_options[i].has_arg = (optBool) ? no_argument : required_argument;
+        long_options[i].flag = 0;
+        long_options[i].val = 0;
+        i++;
+    }
+
+    // Concatenate the base options
+    assert(i == mapSize);
+    for (; i < mapSize + baseSize; i++) {
+        long_options[i].name = base_options[i - mapSize].name;
+        long_options[i].has_arg = base_options[i - mapSize].has_arg;
+        long_options[i].flag = base_options[i - mapSize].flag;
+        long_options[i].val = base_options[i - mapSize].val;
+    }
+
     int c;
-
-    static struct option long_options[] = { { "adjust-page-height", no_argument, &adjust_page_height, 1 },
-        { "all-pages", no_argument, &all_pages, 1 }, { "app-xpath-query", required_argument, 0, 0 },
-        { "border", required_argument, 0, 'b' }, { "choice-xpath-query", required_argument, 0, 0 },
-        { "even-note-spacing", no_argument, &even_note_spacing, 1 }, { "font", required_argument, 0, 0 },
-        { "format", required_argument, 0, 'f' }, { "help", no_argument, &show_help, 1 },
-        { "hum-type", no_argument, &hum_type, 1 }, { "ignore-layout", no_argument, &ignore_layout, 1 },
-        { "mdiv-xpath-query", required_argument, 0, 0 }, { "no-layout", no_argument, &no_layout, 1 },
-        { "mm-output", no_argument, &mm_output, 1 }, { "no-mei-hdr", no_argument, &no_mei_hdr, 1 },
-        { "no-justification", no_argument, &no_justification, 1 }, { "outfile", required_argument, 0, 'o' },
-        { "page", required_argument, 0, 0 }, { "page-height", required_argument, 0, 'h' },
-        { "page-width", required_argument, 0, 'w' }, { "resources", required_argument, 0, 'r' },
-        { "scale", required_argument, 0, 's' }, { "show-bounding-boxes", no_argument, &show_bounding_boxes, 1 },
-        { "spacing-linear", required_argument, 0, 0 }, { "spacing-non-linear", required_argument, 0, 0 },
-        { "spacing-staff", required_argument, 0, 0 }, { "spacing-system", required_argument, 0, 0 },
-        { "type", required_argument, 0, 't' }, { "version", no_argument, &show_version, 1 },
-        { "xml-id-seed", required_argument, 0, 0 }, { 0, 0, 0, 0 } };
-
+    std::string key;
     int option_index = 0;
-    while ((c = getopt_long(argc, argv, "b:f:h:o:p:r:s:t:w:v", long_options, &option_index)) != -1) {
+    Option *opt = NULL;
+    OptionBool *optBool = NULL;
+    while ((c = getopt_long(argc, argv, "?ab:f:h:ino:p:r:s:t:w:vx:", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
-                if (long_options[option_index].flag != 0)
-                    break;
-                else if (strcmp(long_options[option_index].name, "app-xpath-query") == 0) {
-                    cout << string(optarg) << endl;
-                    appXPathQueries.push_back(string(optarg));
+                key = long_options[option_index].name;
+                opt = params->at(toCamelCase(key));
+                optBool = dynamic_cast<OptionBool *>(opt);
+                if (optBool) {
+                    optBool->SetValue(true);
                 }
-                else if (strcmp(long_options[option_index].name, "choice-xpath-query") == 0) {
-                    cout << string(optarg) << endl;
-                    choiceXPathQueries.push_back(string(optarg));
-                }
-                if (strcmp(long_options[option_index].name, "font") == 0) {
-                    font = string(optarg);
-                }
-                else if (strcmp(long_options[option_index].name, "mdiv-xpath-query") == 0) {
-                    cout << string(optarg) << endl;
-                    toolkit.SetMdivXPathQuery(string(optarg));
-                }
-                else if (strcmp(long_options[option_index].name, "page") == 0) {
-                    page = atoi(optarg);
-                }
-                else if (strcmp(long_options[option_index].name, "spacing-linear") == 0) {
-                    if (!toolkit.SetSpacingLinear(atof(optarg))) {
-                        exit(1);
+                else if (opt) {
+                    if (!opt->SetValue(optarg)) {
+                        LogWarning("Setting option %s with %s failed, default value used",
+                            long_options[option_index].name, optarg);
                     }
                 }
-                else if (strcmp(long_options[option_index].name, "spacing-non-linear") == 0) {
-                    if (!toolkit.SetSpacingNonLinear(atof(optarg))) {
-                        exit(1);
-                    }
-                }
-                else if (strcmp(long_options[option_index].name, "spacing-staff") == 0) {
-                    if (!toolkit.SetSpacingStaff(atoi(optarg))) {
-                        exit(1);
-                    }
-                }
-                else if (strcmp(long_options[option_index].name, "spacing-system") == 0) {
-                    if (!toolkit.SetSpacingSystem(atoi(optarg))) {
-                        exit(1);
-                    }
-                }
-                else if (strcmp(long_options[option_index].name, "xml-id-seed") == 0) {
-                    Object::SeedUuid(atoi(optarg));
+                else {
+                    LogError("Something went wrong with option %s", long_options[option_index].name);
+                    exit(1);
                 }
                 break;
 
+            case 'a': all_pages = 1; break;
+
             case 'b':
-                if (!toolkit.SetBorder(atoi(optarg))) {
-                    exit(1);
-                }
+                LogWarning("Option -b and --border is deprecated; use --page-left-mar, --page-right-mar and "
+                           "--page-top-mar instead");
+                options->m_pageLeftMar.SetValue(optarg);
+                options->m_pageRightMar.SetValue(optarg);
+                options->m_pageTopMar.SetValue(optarg);
                 break;
 
             case 'f':
@@ -269,12 +312,23 @@ int main(int argc, char **argv)
                 break;
 
             case 'h':
-                if (!toolkit.SetPageHeight(atoi(optarg))) {
-                    exit(1);
-                };
+                LogWarning("Option -h is deprecated; use --page-height instead");
+                options->m_pageHeight.SetValue(optarg);
+                break;
+
+            case 'i':
+                LogWarning("Option --ignore-layout is deprecated; use --breaks auto");
+                options->m_breaks.SetValue(BREAKS_auto);
+                break;
+
+            case 'n':
+                LogWarning("Option --no-layout is deprecated; use --breaks none");
+                options->m_breaks.SetValue(BREAKS_none);
                 break;
 
             case 'o': outfile = string(optarg); break;
+
+            case 'p': page = atoi(optarg); break;
 
             case 'r': vrv::Resources::SetPath(optarg); break;
 
@@ -292,10 +346,11 @@ int main(int argc, char **argv)
             case 'v': show_version = 1; break;
 
             case 'w':
-                if (!toolkit.SetPageWidth(atoi(optarg))) {
-                    exit(1);
-                }
+                LogWarning("Option -w is deprecated; use --page-width instead");
+                options->m_pageWidth.SetValue(optarg);
                 break;
+
+            case 'x': Object::SeedUuid(atoi(optarg)); break;
 
             case '?':
                 display_usage();
@@ -304,13 +359,6 @@ int main(int argc, char **argv)
 
             default: break;
         }
-    }
-
-    if (appXPathQueries.size() > 0) {
-        toolkit.SetAppXPathQueries(appXPathQueries);
-    }
-    if (choiceXPathQueries.size() > 0) {
-        toolkit.SetChoiceXPathQueries(choiceXPathQueries);
     }
 
     if (show_version) {
@@ -322,16 +370,6 @@ int main(int argc, char **argv)
         display_usage();
         exit(0);
     }
-
-    // Set the various flags in accordance with the options given
-    toolkit.SetAdjustPageHeight(adjust_page_height);
-    toolkit.SetNoLayout(no_layout);
-    toolkit.SetHumType(hum_type);
-    toolkit.SetIgnoreLayout(ignore_layout);
-    toolkit.SetMMOutput(mm_output);
-    toolkit.SetNoJustification(no_justification);
-    toolkit.SetEvenNoteSpacing(even_note_spacing);
-    toolkit.SetShowBoundingBoxes(show_bounding_boxes);
 
     if (optind <= argc - 1) {
         infile = string(argv[optind]);
@@ -357,8 +395,8 @@ int main(int argc, char **argv)
     }
 
     // Load a specified font
-    if (!font.empty() && !toolkit.SetFont(font)) {
-        cerr << "Font '" << font << "' could not be loaded." << endl;
+    if (!Resources::SetFont(options->m_font.GetValue())) {
+        cerr << "Font '" << options->m_font.GetValue() << "' could not be loaded." << endl;
         exit(1);
     }
 

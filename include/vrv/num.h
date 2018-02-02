@@ -9,8 +9,8 @@
 #define __VRV_NUM_H__
 
 #include "atts_shared.h"
-#include "textelement.h"
 #include "text.h"
+#include "textelement.h"
 
 namespace vrv {
 
@@ -40,7 +40,7 @@ public:
      * Add an element (text) to a num.
      */
     virtual void AddChild(Object *object);
-    
+
     /**
      * Return a pointer to the current text object.
      */

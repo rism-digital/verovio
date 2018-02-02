@@ -392,7 +392,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     if (insidePart && outsidePart) {
 
         int margin = params->m_doc->GetTopMargin(insidePart->GetClassId())
-            * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
+            * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         if (insidePart->GetPlace() == outsidePart->GetPlace()) {
             if (insidePart->GetPlace().GetBasic() == STAFFREL_basic_above) {
@@ -437,7 +437,7 @@ int Artic::PrepareLayerElementParts(FunctorParams *functorParams)
     this->Process(&prepareDrawingCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Artic::ResetDrawing(FunctorParams *functorParams)
 {
@@ -448,7 +448,7 @@ int Artic::ResetDrawing(FunctorParams *functorParams)
     ClearChildren();
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int ArticPart::ResetVerticalAlignment(FunctorParams *functorParams)
 {

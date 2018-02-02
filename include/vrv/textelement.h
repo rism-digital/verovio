@@ -31,7 +31,7 @@ public:
     virtual std::string GetClassName() const { return "TextElement"; }
     virtual ClassId GetClassId() const { return TEXT_ELEMENT; }
     ///@}
-    
+
     /**
      * @name Get the X and Y drawing position
      */
@@ -39,7 +39,7 @@ public:
     virtual int GetDrawingX() const;
     virtual int GetDrawingY() const;
     ///@}
-    
+
     /**
      * @name Get and set the X and Y drawing relative positions
      */
@@ -49,11 +49,11 @@ public:
     int GetDrawingYRel() const { return m_drawingYRel; }
     virtual void SetDrawingYRel(int drawingYRel);
     ///@}
-    
+
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * See Object::ResetVerticalAlignment
      */
@@ -68,7 +68,7 @@ private:
      * The Y drawing relative position of the object.
      */
     int m_drawingYRel;
-    
+
     /**
      * The X drawing relative position of the object.
      */
@@ -78,7 +78,7 @@ private:
 //----------------------------------------------------------------------------
 // TextDrawingParams
 //----------------------------------------------------------------------------
-    
+
 /**
  * This class stores current drawing parameters for text.
  */
@@ -104,7 +104,7 @@ public:
     data_HORIZONTALALIGNMENT m_alignment;
     int m_pointSize;
 };
-    
+
 } // namespace vrv
 
 #endif

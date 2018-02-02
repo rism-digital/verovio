@@ -377,7 +377,7 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
         this->SetDrawingLeftBarLine(this->GetLeft());
     }
 }
-    
+
 //----------------------------------------------------------------------------
 // Measure functor methods
 //----------------------------------------------------------------------------
@@ -386,17 +386,17 @@ int Measure::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
 {
     ConvertAnalyticalMarkupParams *params = dynamic_cast<ConvertAnalyticalMarkupParams *>(functorParams);
     assert(params);
-    
+
     ArrayOfObjects::iterator iter;
     for (iter = params->m_controlEvents.begin(); iter != params->m_controlEvents.end(); iter++) {
         this->AddChild(*iter);
     }
-    
+
     params->m_controlEvents.clear();
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Measure::ConvertToPageBased(FunctorParams *functorParams)
 {
     ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
@@ -432,7 +432,7 @@ int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
@@ -609,7 +609,8 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
 
     // m_measureAligner.Process(params->m_functor, params, params->m_functorEnd);
 
-    int minMeasureWidth = params->m_doc->m_drawingMinMeasureWidth;
+    int minMeasureWidth
+        = params->m_doc->GetOptions()->m_unit.GetValue() * params->m_doc->GetOptions()->m_measureMinWidth.GetValue();
     // First try to see if we have a double measure length element
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_FULLMEASURE2);
     Alignment *fullMeasure2
@@ -702,7 +703,7 @@ int Measure::ResetDrawing(FunctorParams *functorParams)
     this->m_timestampAligner.Reset();
     m_drawingEnding = NULL;
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Measure::CastOffSystems(FunctorParams *functorParams)
 {
@@ -915,7 +916,7 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Measure::GenerateMIDI(FunctorParams *functorParams)
 {

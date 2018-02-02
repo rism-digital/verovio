@@ -56,12 +56,12 @@ void RunningElement::Reset()
     Object::Reset();
     ResetHorizontalAlign();
     ResetTyped();
-    
+
     m_isGenerated = false;
-    
+
     m_drawingPage = NULL;
     m_drawingYRel = 0;
-    
+
     int i;
     for (i = 0; i < 3; i++) {
         m_drawingScalingPercent[i] = 100;
@@ -80,12 +80,12 @@ void RunningElement::AddChild(Object *child)
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
         assert(false);
     }
-    
+
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
 }
-    
+
 void RunningElement::FilterList(ListOfObjects *childList)
 {
     ListOfObjects::iterator iter = childList->begin();
@@ -105,7 +105,7 @@ void RunningElement::FilterList(ListOfObjects *childList)
         }
         iter++;
     }
-    
+
     int i;
     for (i = 0; i < 9; i++) {
         m_cells[i].clear();
@@ -113,7 +113,7 @@ void RunningElement::FilterList(ListOfObjects *childList)
     for (i = 0; i < 3; i++) {
         m_drawingScalingPercent[i] = 100;
     }
-    
+
     for (iter = childList->begin(); iter != childList->end(); iter++) {
         int pos = 0;
         AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
@@ -124,11 +124,11 @@ void RunningElement::FilterList(ListOfObjects *childList)
         m_cells[pos].push_back(text);
     }
 }
-    
+
 int RunningElement::GetDrawingX() const
 {
     if (!m_drawingPage) return 0;
-    
+
     /*
     if (this->GetHalign() == HORIZONTALALIGNMENT_left) {
         return 0;
@@ -140,7 +140,7 @@ int RunningElement::GetDrawingX() const
         return m_drawingPage->GetContentWidth();
     }
     */
-    
+
     return 0;
 }
 
@@ -155,24 +155,29 @@ void RunningElement::SetDrawingYRel(int drawingYRel)
     ResetCachedDrawingY();
     m_drawingYRel = drawingYRel;
 }
-    
+
 int RunningElement::GetWidth() const
 {
     if (!m_drawingPage) return 0;
-    
-    Doc *doc = dynamic_cast<Doc*>(m_drawingPage->GetFirstParent(DOC));
+
+    Doc *doc = dynamic_cast<Doc *>(m_drawingPage->GetFirstParent(DOC));
     if (!doc) return 0;
-    
+
     return (doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar);
-    //return m_drawingPage->GetContentWidth();
+    // return m_drawingPage->GetContentWidth();
 }
-    
+
 void RunningElement::SetDrawingPage(Page *page)
 {
+
     ResetList(this);
-    
+
     ResetCachedDrawingX();
     m_drawingPage = page;
+
+    if (page) {
+        this->SetCurrentPageNum(page);
+    }
 }
 
 int RunningElement::GetTotalHeight()
@@ -184,11 +189,11 @@ int RunningElement::GetTotalHeight()
     }
     return height;
 }
-    
+
 int RunningElement::GetRowHeight(int row)
 {
     assert((row >= 0) && (row < 3));
-    
+
     int i;
     int height = 0;
     for (i = 0; i < 3; i++) {
@@ -200,7 +205,7 @@ int RunningElement::GetRowHeight(int row)
 int RunningElement::GetColHeight(int col)
 {
     assert((col >= 0) && (col < 3));
-    
+
     int i;
     int height = 0;
     for (i = 0; i < 3; i++) {
@@ -209,11 +214,10 @@ int RunningElement::GetColHeight(int col)
     return height;
 }
 
-    
 int RunningElement::GetCellHeight(int cell)
 {
     assert((cell >= 0) && (cell < 9));
-    
+
     int columnHeight = 0;
     ArrayOfTextElements *textElements = &m_cells[cell];
     ArrayOfTextElements::iterator iter;
@@ -234,7 +238,7 @@ bool RunningElement::AdjustDrawingScaling(int width)
         int rowWidth = 0;
         // For each column
         for (j = 0; j < 3; j++) {
-            ArrayOfTextElements *textElements = &m_cells[i * 3 + j ];
+            ArrayOfTextElements *textElements = &m_cells[i * 3 + j];
             ArrayOfTextElements::iterator iter;
             int columnWidth = 0;
             // For each object
@@ -253,8 +257,8 @@ bool RunningElement::AdjustDrawingScaling(int width)
     }
     return scale;
 }
-    
-bool RunningElement::AdjustYPos()
+
+bool RunningElement::AdjustRunningElementYPos()
 {
     int i, j;
     ArrayOfTextElements::iterator iter;
@@ -273,8 +277,7 @@ bool RunningElement::AdjustYPos()
             cumulatedYRel += ((*iter)->GetContentY1() - (*iter)->GetContentY2());
         }
     }
-    
-    
+
     int rowYRel = 0;
     // For each row
     for (i = 0; i < 3; i++) {
@@ -291,7 +294,7 @@ bool RunningElement::AdjustYPos()
             else if (i == 2) {
                 colYShift = (currentRowHeigt - this->GetCellHeight(cell));
             }
-            
+
             ArrayOfTextElements *textElements = &m_cells[cell];
             ArrayOfTextElements::iterator iter;
             // For each object - adjust the yRel according to the rowYRel and the colYshift
@@ -307,46 +310,48 @@ bool RunningElement::AdjustYPos()
 
     return true;
 }
-        
+
 int RunningElement::GetAlignmentPos(data_HORIZONTALALIGNMENT h, data_VERTICALALIGNMENT v)
 {
     int pos = 0;
     switch (h) {
-        case (HORIZONTALALIGNMENT_left) : break;
-        case (HORIZONTALALIGNMENT_center) : pos += POSITION_CENTER; break;
-        case (HORIZONTALALIGNMENT_right) : pos += POSITION_RIGHT; break;
-        default:
-            pos += POSITION_LEFT; break;
+        case (HORIZONTALALIGNMENT_left): break;
+        case (HORIZONTALALIGNMENT_center): pos += POSITION_CENTER; break;
+        case (HORIZONTALALIGNMENT_right): pos += POSITION_RIGHT; break;
+        default: pos += POSITION_LEFT; break;
     }
     switch (v) {
-        case (VERTICALALIGNMENT_top) : break;
-        case (VERTICALALIGNMENT_middle) : pos += POSITION_MIDDLE; break;
-        case (VERTICALALIGNMENT_bottom) : pos += POSITION_BOTTOM; break;
-        default:
-            pos += POSITION_MIDDLE; break;
+        case (VERTICALALIGNMENT_top): break;
+        case (VERTICALALIGNMENT_middle): pos += POSITION_MIDDLE; break;
+        case (VERTICALALIGNMENT_bottom): pos += POSITION_BOTTOM; break;
+        default: pos += POSITION_MIDDLE; break;
     }
     return pos;
 }
-    
-void RunningElement::SetCurrentPageNum(int currentNum)
+
+void RunningElement::SetCurrentPageNum(Page *currentPage)
 {
-    Num *num = dynamic_cast<Num*>(this->FindChildByType(NUM));
+    assert(currentPage);
+
+    int currentNum = currentPage->GetIdx() + 1;
+
+    Num *num = dynamic_cast<Num *>(this->FindChildByType(NUM));
     if (!num || (num->GetLabel() != "page")) return;
-    
+
     Text *text = dynamic_cast<Text *>(num->FindChildByType(TEXT));
     if (!text || (text->GetText() != L"#")) return;
-    
+
     Text *currentText = num->GetCurrentText();
     assert(currentText);
-    
+
     currentText->SetText(UTF8to16(StringFormat("%d", currentNum)));
 }
-    
+
 void RunningElement::LoadFooter()
 {
     Fig *fig = new Fig();
     Svg *svg = new Svg();
-    
+
     std::string footer = Resources::GetPath() + "/footer.svg";
     pugi::xml_document footerDoc;
     footerDoc.load_file(footer.c_str());
@@ -356,7 +361,7 @@ void RunningElement::LoadFooter()
     fig->SetValign(VERTICALALIGNMENT_bottom);
     this->AddChild(fig);
 }
-    
+
 void RunningElement::AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALALIGNMENT valign)
 {
     Rend *rend = new Rend();
@@ -373,18 +378,18 @@ void RunningElement::AddPageNum(data_HORIZONTALALIGNMENT halign, data_VERTICALAL
     text->SetText(L"#");
     Text *dash2 = new Text();
     dash2->SetText(L" –");
-    
+
     num->AddChild(text);
     rend->AddChild(dash1);
     rend->AddChild(num);
     rend->AddChild(dash2);
     this->AddChild(rend);
 }
-    
+
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
-    
+
 int RunningElement::Save(FunctorParams *functorParams)
 {
     if (this->IsGenerated())
@@ -400,15 +405,15 @@ int RunningElement::SaveEnd(FunctorParams *functorParams)
     else
         return Object::SaveEnd(functorParams);
 }
-    
+
 int RunningElement::AlignVertically(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
-    
+
     params->m_pageWidth = this->GetWidth();
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 } // namespace vrv

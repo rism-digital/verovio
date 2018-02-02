@@ -21,8 +21,8 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
-#include "fig.h"
 #include "fb.h"
+#include "fig.h"
 #include "functorparams.h"
 #include "keysig.h"
 #include "label.h"
@@ -31,12 +31,12 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
+#include "options.h"
 #include "page.h"
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
-#include "style.h"
 #include "syl.h"
 #include "system.h"
 #include "text.h"
@@ -79,7 +79,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
         System *system = dynamic_cast<System *>(m_currentPage->GetChild(i));
         DrawSystem(dc, system);
     }
-    
+
     DrawRunningElements(dc, m_currentPage);
 
     dc->EndPage();
@@ -297,12 +297,12 @@ void View::DrawStaffGrp(
         if (!dc->UseGlobalStyling()) {
             grpTxt.SetFaceName("Times");
         }
-        
+
         TextDrawingParams params;
         params.m_x = xLabel;
         params.m_y = yLabel;
         params.m_pointSize = m_doc->GetDrawingLyricFont(100)->GetPointSize();
-        
+
         grpTxt.SetPointSize(params.m_pointSize);
         dc->SetFont(&grpTxt);
 
@@ -415,14 +415,14 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         if (!dc->UseGlobalStyling()) {
             labelTxt.SetFaceName("Times");
         }
-        
+
         TextDrawingParams params;
         params.m_x = x;
         params.m_y = y;
         params.m_pointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize();
-        
+
         labelTxt.SetPointSize(params.m_pointSize);
-        
+
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&labelTxt);
 
@@ -1229,7 +1229,7 @@ void View::DrawFbChildren(DeviceContext *dc, Object *parent, TextDrawingParams &
         }
     }
 }
-    
+
 void View::DrawRunningChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params)
 {
     assert(dc);
@@ -1399,7 +1399,6 @@ void View::DrawRunningEditorialElement(DeviceContext *dc, EditorialElement *elem
     dc->EndGraphic(element, this);
 }
 
-    
 void View::DrawAnnot(DeviceContext *dc, EditorialElement *element, bool isTextElement)
 {
     assert(element);

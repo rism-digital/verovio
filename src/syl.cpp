@@ -55,7 +55,7 @@ void Syl::Reset()
 
 void Syl::AddChild(Object *child)
 {
-    if (child->Is({REND, TEXT})) {
+    if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -137,8 +137,8 @@ int Syl::AdjustSylSpacing(FunctorParams *functorParams)
     }
 
     if (params->m_previousSyl) {
-        int overlap
-            = params->m_previousSyl->GetContentRight() - this->GetContentLeft() + params->m_doc->GetDrawingDoubleUnit(100);
+        int overlap = params->m_previousSyl->GetContentRight() - this->GetContentLeft()
+            + params->m_doc->GetDrawingDoubleUnit(100);
         if (overlap > 0) {
             params->m_overlapingSyl.push_back(
                 std::make_tuple(params->m_previousSyl->GetAlignment(), this->GetAlignment(), overlap));
@@ -157,6 +157,6 @@ int Syl::ResetDrawing(FunctorParams *functorParams)
 
     // Pass it to the pseudo functor of the interface
     return TimeSpanningInterface::InterfaceResetDrawing(functorParams, this);
-};
+}
 
 } // namespace vrv

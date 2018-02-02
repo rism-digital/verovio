@@ -50,7 +50,7 @@ void Dynam::Reset()
 
 void Dynam::AddChild(Object *child)
 {
-    if (child->Is({REND, TEXT})) {
+    if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {

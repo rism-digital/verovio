@@ -49,7 +49,7 @@ ClassId BoundingBox::GetClassId() const
     // we should always have the method overridden
     assert(false);
     return BOUNDING_BOX;
-};
+}
 
 bool BoundingBox::Is(const std::vector<ClassId> &classIds) const
 {
@@ -163,40 +163,39 @@ void BoundingBox::SetEmptyBB()
 bool BoundingBox::HasEmptyBB() const
 {
     // We are checking only the content bounding box - this should be OK
-    return ((m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0)
-        && (m_contentBB_y2 == 0));
+    return ((m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0) && (m_contentBB_y2 == 0));
 }
 
 bool BoundingBox::HasContentBB() const
 {
     return (HasContentHorizontalBB() && HasContentVerticalBB());
 }
-    
+
 bool BoundingBox::HasContentHorizontalBB() const
 {
     return ((m_contentBB_x1 != -VRV_UNSET) && (m_contentBB_x2 != VRV_UNSET));
 }
-    
+
 bool BoundingBox::HasContentVerticalBB() const
 {
     return ((m_contentBB_y1 != -VRV_UNSET) && (m_contentBB_y2 != VRV_UNSET));
 }
-    
+
 bool BoundingBox::HasSelfBB() const
 {
     return (HasSelfHorizontalBB() && HasSelfVerticalBB());
 }
-    
+
 bool BoundingBox::HasSelfHorizontalBB() const
 {
     return ((m_selfBB_x1 != -VRV_UNSET) && (m_selfBB_x2 != VRV_UNSET));
 }
-    
+
 bool BoundingBox::HasSelfVerticalBB() const
 {
     return ((m_selfBB_y1 != -VRV_UNSET) && (m_selfBB_y2 != VRV_UNSET));
 }
-    
+
 void BoundingBox::SetBoundingBoxGlyph(wchar_t smuflGlyph, int fontSize)
 {
     assert(smuflGlyph);

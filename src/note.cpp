@@ -107,12 +107,12 @@ void Note::Reset()
     m_realTimeOffsetMilliseconds = 0;
     m_scoreTimeTiedDuration = 0.0;
 }
-    
+
 bool Note::HasToBeAligned() const
 {
     if (!this->IsInLigature()) return true;
-    Note *note = const_cast<Note*>(this);
-    Ligature *ligature = dynamic_cast<Ligature*>(note->GetFirstParent(LIGATURE));
+    Note *note = const_cast<Note *>(this);
+    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstParent(LIGATURE));
     assert(ligature);
     return ((note == ligature->GetFirstNote()) || (note == ligature->GetLastNote()));
 }
@@ -761,7 +761,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     this->Process(&prepareDrawingCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Note::PrepareLyrics(FunctorParams *functorParams)
 {
@@ -794,7 +794,7 @@ int Note::ResetDrawing(FunctorParams *functorParams)
     m_flippedNotehead = false;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

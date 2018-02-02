@@ -17,11 +17,8 @@
 
 //----------------------------------------------------------------------------
 
-#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
-#include "jsonxx.h"
-#endif
-
 #include "checked.h"
+#include "jsonxx.h"
 #include "unchecked.h"
 
 namespace vrv {
@@ -42,6 +39,12 @@ public:
     Toolkit(bool initFont = true);
     virtual ~Toolkit();
     ///@}
+
+    /** We just use the doc uuid as uuid */
+    std::string GetUuid() { return m_doc.GetUuid(); }
+
+    /** We just use the doc options */
+    Options *GetOptions() { return m_options; }
 
     /**
      * Set the resource path. To be called if the constructor had initFont=false.
@@ -68,7 +71,7 @@ public:
      * Parse the options passed as JSON string.
      * Only available for Emscripten-based compiles
      **/
-    bool ParseOptions(const std::string &json_options);
+    bool SetOptions(const std::string &json_options);
 
     /**
      * Parse the editor actions passed as JSON string.
@@ -81,7 +84,7 @@ public:
      * This is used only for Emscripten-based compilation.
      * The vrv::logBuffer is filled by the vrv::LogXXX functions.
      */
-    std::string GetLogString();
+    std::string GetLog();
 
     /**
      * Returns the version number as a string.
@@ -182,137 +185,11 @@ public:
     int GetTimeForElement(const std::string &xmlId);
 
     /**
-     * @name Set and get a std::string into a char * buffer.
-     * This is used for returning a string buffer to emscripten.
-     * The buffer is freed when reset or in MusController destructor.
-     */
-    ///@{
-    void SetCString(const std::string &data);
-    const char *GetCString();
-    ///@}
-
-    /**
-     * @name Set and get the border
-     */
-    ///@{
-    bool SetBorder(int border);
-    int GetBorder() { return m_border; }
-    ///@}
-
-    /**
      * @name Set and get the scale
      */
     ///@{
     bool SetScale(int scale);
     int GetScale() { return m_scale; }
-    ///@}
-
-    /**
-     * @name Set and get the page height (in pixels)
-     */
-    ///@{
-    bool SetPageHeight(int h);
-    int GetPageHeight() { return m_pageHeight; }
-    ///@}
-
-    /**
-     * @name Set and get the page width (in pixels)
-     */
-    ///@{
-    bool SetPageWidth(int w);
-    int GetPageWidth() { return m_pageWidth; }
-    ///@}
-
-    /**
-     * @name Set and get the spacing staff and system
-     */
-    ///@{
-    bool SetSpacingStaff(int spacingStaff);
-    bool SetSpacingSystem(int spacingSystem);
-    int GetSpacingStaff() { return m_spacingStaff; }
-    int GetSpacingSystem() { return m_spacingSystem; }
-    ///@}
-
-    /**
-     * @name Space notes equally and close together (normally for mensural notation)
-     */
-    ///@{
-    bool SetSpacingLinear(float spacingLinear);
-    float GetSpacingLinear() { return m_spacingLinear; }
-    ///@}
-
-    /**
-     * @name Space notes equally and close together (normally for mensural notation)
-     */
-    ///@{
-    bool SetSpacingNonLinear(float spacingNonLinear);
-    float GetSpacingNonLinear() { return m_spacingNonLinear; }
-    ///@}
-
-    /**
-     * @name Ignore all encoded layout information (if any)
-     * and output one single page with one single system
-     */
-    ///@{
-    void SetNoLayout(bool l) { m_noLayout = l; }
-    int GetNoLayout() { return m_noLayout; }
-    ///@}
-
-    /**
-     * @name Include type attributes when importing from Humdrum
-     */
-    ///@{
-    void SetHumType(int l) { m_humType = l; }
-    int GetHumType() { return m_humType; }
-    ///@}
-
-    /**
-     * @name Ignore all encoded layout information (if any)
-     * and fully recalculate the layout
-     */
-    ///@{
-    void SetIgnoreLayout(bool l) { m_ignoreLayout = l; }
-    int GetIgnoreLayout() { return m_ignoreLayout; }
-    ///@}
-
-    /**
-     * @name Crop the page height to the height of the content
-     */
-    ///@{
-    void SetAdjustPageHeight(bool a) { m_adjustPageHeight = a; }
-    int GetAdjustPageHeight() { return m_adjustPageHeight; }
-    ///@}
-
-    /**
-     * @name Space notes equally and close together (normally for mensural notation)
-     */
-    ///@{
-    void SetEvenNoteSpacing(bool even) { m_evenNoteSpacing = even; }
-    int GetEvenNoteSpacing() { return m_evenNoteSpacing; }
-    ///@}
-
-    /**
-     * @name Set SVG output in mm (for PDF generation with a 72 dpi)
-     */
-    ///@{
-    void SetMMOutput(bool mmOutput) { m_mmOutput = mmOutput; }
-    int GetMMOutput() { return m_mmOutput; }
-    ///@}
-
-    /**
-     * @name Do not justify the system (for debugging purposes)
-     */
-    ///@{
-    void SetNoJustification(bool j) { m_noJustification = j; }
-    int GetNoJustification() { return m_noJustification; }
-    ///@}
-
-    /**
-     * @name Do not justify the system (for debugging purposes)
-     */
-    ///@{
-    void SetShowBoundingBoxes(bool b) { m_showBoundingBoxes = b; }
-    int GetShowBoundingBoxes() { return m_showBoundingBoxes; }
     ///@}
 
     /**
@@ -346,39 +223,8 @@ public:
      * @name Set and get the xPath query for selecting <app> (if any)
      */
     ///@{
-    void SetAppXPathQueries(std::vector<std::string> const &xPathQueries);
-    std::vector<std::string> GetAppXPathQuery() { return m_appXPathQueries; }
-    ///@}
-
-    /**
-     * @name Set and get the xPath queries for selecting <choice> (if any)
-     */
-    ///@{
-    void SetChoiceXPathQueries(std::vector<std::string> const &xPathQueries);
-    std::vector<std::string> GetChoiceXPathQueries() { return m_choiceXPathQueries; }
-    ///@}
-
-    /**
-     * @name Set and get the xPath query for selecting a <mdiv>
-     */
-    ///@{
-    void SetMdivXPathQuery(std::string const &xPathQuery) { m_mdivXPathQuery = xPathQuery; };
-    std::string GetMdivXPathQuery() { return m_mdivXPathQuery; };
-    ///@}
-
-    /**
-     * @name Set and get the xPath query for selecting <app> (if any)
-     */
-    ///@{
     void SetScoreBasedMei(bool scoreBasedMei) { m_scoreBasedMei = scoreBasedMei; }
     bool GetScoreBasedMei() { return m_scoreBasedMei; }
-    ///@}
-
-    /**
-     * @name Set a specific font
-     */
-    ///@{
-    bool SetFont(std::string const &font);
     ///@}
 
     /**
@@ -422,32 +268,11 @@ private:
     int m_scale;
     FileFormat m_format;
     FileFormat m_outformat;
-
-    int m_pageHeight;
-    int m_pageWidth;
-    int m_border; // to be replace by pageRightMar, pageLeftMar, pageTopMar
-    /** given in units **/
-    int m_spacingStaff;
-    int m_spacingSystem;
-
-    bool m_noLayout;
-    bool m_ignoreLayout;
-    int m_humType = 0;
-    bool m_adjustPageHeight;
-    std::vector<std::string> m_appXPathQueries;
-    std::vector<std::string> m_choiceXPathQueries;
-    std::string m_mdivXPathQuery;
     bool m_scoreBasedMei;
-    bool m_evenNoteSpacing;
-    float m_spacingLinear;
-    float m_spacingNonLinear;
-    bool m_mmOutput;
-    // for debugging
-    bool m_noJustification;
-    bool m_showBoundingBoxes;
 
     static char *m_humdrumBuffer;
-    char *m_cString;
+
+    Options *m_options;
 };
 
 } // namespace vrv

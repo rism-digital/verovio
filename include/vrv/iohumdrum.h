@@ -223,9 +223,6 @@ public:
     std::string GetHumdrumString();
     std::string GetMeiString();
 
-    int GetTypeOption() { return m_type; }
-    void SetTypeOption(int value) { m_type = value; }
-
 protected:
     void clear();
     bool convertHumdrum();
@@ -536,9 +533,6 @@ private:
     vector<int> m_transpose;
 
 #endif /* NO_HUMDRUM_SUPPORT */
-
-    // m_type == true means add type markup in Humdrum-to-MEI conversion.
-    bool m_type = true;
 };
 
 } // namespace vrv

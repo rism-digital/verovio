@@ -12,13 +12,12 @@
 
 namespace vrv {
 
-
 //----------------------------------------------------------------------------
 // PgHead
 //----------------------------------------------------------------------------
 
 /**
- * This class represents an MEI pgHead. 
+ * This class represents an MEI pgHead.
  */
 class PgHead : public RunningElement {
 public:
@@ -33,7 +32,7 @@ public:
     virtual std::string GetClassName() const { return "PgHead"; }
     virtual ClassId GetClassId() const { return PGHEAD; }
     ///@}
-    
+
     bool GenerateFromMEIHeader(pugi::xml_document &header);
 
     //----------//

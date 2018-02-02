@@ -21,8 +21,8 @@
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
-#include "system.h"
 #include "staff.h"
+#include "system.h"
 #include "view.h"
 #include "vrv.h"
 
@@ -72,14 +72,14 @@ void Page::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-    
+
 RunningElement *Page::GetHeader() const
 {
-    Doc *doc = dynamic_cast<Doc*>(this->GetFirstParent(DOC));
-    if (!doc) {
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    if (!doc || doc->GetOptions()->m_noHeader.GetValue()) {
         return NULL;
     }
-    
+
     // first page?
     if (doc->GetFirst() == this) {
         return doc->m_scoreDef.GetPgHead();
@@ -88,14 +88,14 @@ RunningElement *Page::GetHeader() const
         return doc->m_scoreDef.GetPgHead2();
     }
 }
-    
+
 RunningElement *Page::GetFooter() const
 {
-    Doc *doc = dynamic_cast<Doc*>(this->GetFirstParent(DOC));
-    if (!doc) {
+    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
+    if (!doc || doc->GetOptions()->m_noFooter.GetValue()) {
         return NULL;
     }
-    
+
     // first page?
     if (doc->GetFirst() == this) {
         return doc->m_scoreDef.GetPgFoot();
@@ -104,10 +104,13 @@ RunningElement *Page::GetFooter() const
         return doc->m_scoreDef.GetPgFoot2();
     }
 }
-    
+
 void Page::LayOut(bool force)
 {
     if (m_layoutDone && !force) {
+        // We only need to reset the header - this will adjust the page number if necessary
+        if (this->GetHeader()) this->GetHeader()->SetDrawingPage(this);
+        if (this->GetFooter()) this->GetFooter()->SetDrawingPage(this);
         return;
     }
 
@@ -225,7 +228,7 @@ void Page::LayOutHorizontally()
 
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
-    if (!doc->GetEvenSpacing()) {
+    if (!doc->GetOptions()->m_evenNoteSpacing.GetValue()) {
         int longestActualDur = DUR_4;
         // Get the longest duration in the piece
         AttDurExtreme durExtremeComparison(LONGEST);
@@ -379,21 +382,19 @@ void Page::LayOutVertically()
     Functor adjustYPos(&Object::AdjustYPos);
     AdjustYPosParams adjustYPosParams(doc, &adjustYPos);
     this->Process(&adjustYPos, &adjustYPosParams);
-    
+
     if (this->GetHeader()) {
-        this->GetHeader()->SetCurrentPageNum(this->GetIdx() + 1);
-        this->GetHeader()->AdjustYPos();
+        this->GetHeader()->AdjustRunningElementYPos();
     }
-    
+
     if (this->GetFooter()) {
-        this->GetFooter()->SetCurrentPageNum(this->GetIdx() + 1);
-        this->GetFooter()->AdjustYPos();
+        this->GetFooter()->AdjustRunningElementYPos();
     }
 
     // Adjust system Y position
     AlignSystemsParams alignSystemsParams;
     alignSystemsParams.m_shift = doc->m_drawingPageHeight;
-    alignSystemsParams.m_systemMargin = (doc->GetSpacingSystem()) * doc->GetDrawingUnit(100);
+    alignSystemsParams.m_systemMargin = (doc->GetOptions()->m_spacingSystem.GetValue()) * doc->GetDrawingUnit(100);
     Functor alignSystems(&Object::AlignSystems);
     this->Process(&alignSystems, &alignSystemsParams);
 }
@@ -403,7 +404,7 @@ void Page::JustifyHorizontally()
     Doc *doc = dynamic_cast<Doc *>(GetParent());
     assert(doc);
 
-    if (!doc->GetJustificationX()) {
+    if ((doc->GetOptions()->m_breaks.GetValue() == BREAKS_none) || doc->GetOptions()->m_noJustification.GetValue()) {
         return;
     }
 
@@ -449,12 +450,12 @@ int Page::GetContentHeight() const
     System *last = dynamic_cast<System *>(m_children.back());
     assert(last);
     int height = doc->m_drawingPageHeight - doc->m_drawingPageTopMar - last->GetDrawingYRel() + last->GetHeight();
-    
+
     // Not sure what to do with the footer when adjusted page height is requested...
-    //if (this->GetFooter()) {
+    // if (this->GetFooter()) {
     //    height += this->GetFooter()->GetTotalHeight();
     //}
-    
+
     return height;
 }
 
@@ -528,59 +529,46 @@ int Page::ApplyPPUFactor(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Page::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
-    assert(doc);
-    
-    PgHead *pgHead = doc->m_scoreDef.GetPgHead();
-    if (pgHead) {
-        pgHead->SetDrawingPage(NULL);
-        pgHead->SetDrawingYRel(0);
+    // Same functor, but we have not FunctorParams so we just re-instanciate it
+    Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
+
+    RunningElement *header = this->GetHeader();
+    if (header) {
+        header->Process(&resetVerticalAlignment, NULL);
+        header->SetDrawingPage(NULL);
+        header->SetDrawingYRel(0);
     }
-    PgFoot *pgFoot = doc->m_scoreDef.GetPgFoot();
-    if (pgFoot) {
-        pgFoot->SetDrawingPage(NULL);
-        pgFoot->SetDrawingYRel(0);
-    }
-    PgHead2 *pgHead2 = doc->m_scoreDef.GetPgHead2();
-    if (pgHead2) {
-        pgHead2->SetDrawingPage(NULL);
-        pgHead2->SetDrawingYRel(0);
-    }
-    PgFoot2 *pgFoot2 = doc->m_scoreDef.GetPgFoot2();
-    if (pgFoot2) {
-        pgFoot2->SetDrawingPage(NULL);
-        pgFoot2->SetDrawingYRel(0);
+    RunningElement *footer = this->GetFooter();
+    if (footer) {
+        footer->Process(&resetVerticalAlignment, NULL);
+        footer->SetDrawingPage(NULL);
+        footer->SetDrawingYRel(0);
     }
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Page::AlignVerticallyEnd(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    params->m_cumulatedShift = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
-    
+    params->m_cumulatedShift
+        = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
+
     // Also align the header and footer
-    
-    // Special case where we need to reset the vertical alignment here.
-    // The reason is the the RunningElement are not reset when ResetVerticalAlignment is previously called
-    Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
-    
+
     RunningElement *header = this->GetHeader();
     if (header) {
-        header->Process(&resetVerticalAlignment, NULL);
         header->SetDrawingPage(this);
         header->SetDrawingYRel(0);
         header->Process(params->m_functor, params, params->m_functorEnd);
     }
     RunningElement *footer = this->GetFooter();
     if (footer) {
-        footer->Process(&resetVerticalAlignment, NULL);
         footer->SetDrawingPage(this);
         footer->SetDrawingYRel(0);
         footer->Process(params->m_functor, params, params->m_functorEnd);
@@ -593,7 +581,7 @@ int Page::AlignSystems(FunctorParams *functorParams)
 {
     AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
     assert(params);
-    
+
     RunningElement *header = this->GetHeader();
     if (header) {
         header->SetDrawingYRel(params->m_shift);

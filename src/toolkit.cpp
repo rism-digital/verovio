@@ -22,9 +22,9 @@
 #include "layer.h"
 #include "measure.h"
 #include "note.h"
+#include "options.h"
 #include "page.h"
 #include "slur.h"
-#include "style.h"
 #include "svgdevicecontext.h"
 #include "vrv.h"
 
@@ -51,37 +51,19 @@ Toolkit::Toolkit(bool initFont)
     m_format = AUTO;
 
     // default page size
-    m_pageHeight = DEFAULT_PAGE_HEIGHT;
-    m_pageWidth = DEFAULT_PAGE_WIDTH;
-    m_border = DEFAULT_PAGE_LEFT_MAR;
-    m_spacingLinear = DEFAULT_SPACING_LINEAR;
-    m_spacingNonLinear = DEFAULT_SPACING_NON_LINEAR;
-    m_spacingStaff = DEFAULT_SPACING_STAFF;
-    m_spacingSystem = DEFAULT_SPACING_SYSTEM;
-
-    m_noLayout = false;
-    m_ignoreLayout = false;
-    m_adjustPageHeight = false;
-    m_mmOutput = false;
-    m_noJustification = false;
-    m_evenNoteSpacing = false;
-    m_showBoundingBoxes = false;
     m_scoreBasedMei = false;
 
-    m_cString = NULL;
     m_humdrumBuffer = NULL;
 
     if (initFont) {
         Resources::InitFonts();
     }
+
+    m_options = m_doc.GetOptions();
 }
 
 Toolkit::~Toolkit()
 {
-    if (m_cString) {
-        free(m_cString);
-        m_cString = NULL;
-    }
     if (m_humdrumBuffer) {
         free(m_humdrumBuffer);
         m_humdrumBuffer = NULL;
@@ -94,18 +76,6 @@ bool Toolkit::SetResourcePath(const std::string &path)
     return Resources::InitFonts();
 };
 
-bool Toolkit::SetBorder(int border)
-{
-    // We use left margin values because for now we cannot specify different values for each margin
-    if (border < MIN_PAGE_LEFT_MAR || border > MAX_PAGE_LEFT_MAR) {
-        LogError("Border out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_LEFT_MAR,
-            MIN_PAGE_LEFT_MAR, MAX_PAGE_LEFT_MAR);
-        return false;
-    }
-    m_border = border;
-    return true;
-}
-
 bool Toolkit::SetScale(int scale)
 {
     if (scale < MIN_SCALE || scale > MAX_SCALE) {
@@ -114,72 +84,6 @@ bool Toolkit::SetScale(int scale)
         return false;
     }
     m_scale = scale;
-    return true;
-}
-
-bool Toolkit::SetPageHeight(int h)
-{
-    if (h < MIN_PAGE_HEIGHT || h > MAX_PAGE_HEIGHT) {
-        LogError("Page height out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_HEIGHT,
-            MIN_PAGE_HEIGHT, MAX_PAGE_HEIGHT);
-        return false;
-    }
-    m_pageHeight = h;
-    return true;
-}
-
-bool Toolkit::SetPageWidth(int w)
-{
-    if (w < MIN_PAGE_WIDTH || w > MAX_PAGE_WIDTH) {
-        LogError("Page width out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_WIDTH,
-            MIN_PAGE_WIDTH, MAX_PAGE_WIDTH);
-        return false;
-    }
-    m_pageWidth = w;
-    return true;
-};
-
-bool Toolkit::SetSpacingStaff(int spacingStaff)
-{
-    if (spacingStaff < MIN_SPACING_STAFF || spacingStaff > MAX_SPACING_STAFF) {
-        LogError("Spacing staff out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SPACING_STAFF,
-            MIN_SPACING_STAFF, MAX_SPACING_STAFF);
-        return false;
-    }
-    m_spacingStaff = spacingStaff;
-    return true;
-}
-
-bool Toolkit::SetSpacingSystem(int spacingSystem)
-{
-    if (spacingSystem < MIN_SPACING_SYSTEM || spacingSystem > MAX_SPACING_SYSTEM) {
-        LogError("Spacing system out of bounds; default is %d, minimum is %d, and maximum is %d",
-            DEFAULT_SPACING_SYSTEM, MIN_SPACING_SYSTEM, MAX_SPACING_SYSTEM);
-        return false;
-    }
-    m_spacingSystem = spacingSystem;
-    return true;
-}
-
-bool Toolkit::SetSpacingLinear(float spacingLinear)
-{
-    if (spacingLinear < MIN_SPACING_LINEAR || spacingLinear > MAX_SPACING_LINEAR) {
-        LogError("Spacing (linear) out of bounds; default is %d, minimum is %d, and maximum is %d",
-            DEFAULT_SPACING_LINEAR, MIN_SPACING_LINEAR, MAX_SPACING_LINEAR);
-        return false;
-    }
-    m_spacingLinear = spacingLinear;
-    return true;
-}
-
-bool Toolkit::SetSpacingNonLinear(float spacingNonLinear)
-{
-    if (spacingNonLinear < MIN_SPACING_NON_LINEAR || spacingNonLinear > MAX_SPACING_NON_LINEAR) {
-        LogError("Spacing (non-linear) out of bounds; default is %d, minimum is %d, and maximum is %d",
-            DEFAULT_SPACING_NON_LINEAR, MIN_SPACING_NON_LINEAR, MAX_SPACING_NON_LINEAR);
-        return false;
-    }
-    m_spacingNonLinear = spacingNonLinear;
     return true;
 }
 
@@ -238,22 +142,6 @@ bool Toolkit::SetFormat(std::string const &informat)
         return false;
     }
     return true;
-}
-
-void Toolkit::SetAppXPathQueries(std::vector<std::string> const &xPathQueries)
-{
-    m_appXPathQueries = xPathQueries;
-    m_appXPathQueries.erase(std::remove_if(m_appXPathQueries.begin(), m_appXPathQueries.end(),
-                                [](const std::string &s) { return s.empty(); }),
-        m_appXPathQueries.end());
-}
-
-void Toolkit::SetChoiceXPathQueries(std::vector<std::string> const &xPathQueries)
-{
-    m_choiceXPathQueries = xPathQueries;
-    m_choiceXPathQueries.erase(std::remove_if(m_choiceXPathQueries.begin(), m_choiceXPathQueries.end(),
-                                   [](const std::string &s) { return s.empty(); }),
-        m_choiceXPathQueries.end());
 }
 
 FileFormat Toolkit::IdentifyInputFormat(const string &data)
@@ -335,12 +223,6 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
     // This means that DARMS cannot be auto detected.
     return MEI;
 }
-
-bool Toolkit::SetFont(std::string const &font)
-{
-    m_doc.SetDrawingSmuflFontName(font);
-    return Resources::SetFont(font);
-};
 
 bool Toolkit::LoadFile(const std::string &filename)
 {
@@ -446,9 +328,8 @@ bool Toolkit::LoadData(const std::string &data)
         // LogMessage("Importing Humdrum data");
 
         Doc tempdoc;
+        tempdoc.SetOptions(m_doc.GetOptions());
         HumdrumInput *tempinput = new HumdrumInput(&tempdoc, "");
-        tempinput->SetTypeOption(GetHumType());
-
         if (GetOutputFormat() == HUMDRUM) {
             tempinput->SetOutputFormat("humdrum");
         }
@@ -497,8 +378,8 @@ bool Toolkit::LoadData(const std::string &data)
 
         // Now convert Humdrum into MEI:
         Doc tempdoc;
+        tempdoc.SetOptions(m_doc.GetOptions());
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
-        tempinput->SetTypeOption(GetHumType());
         if (!tempinput->ImportString(conversion.str())) {
             LogError("Error importing Humdrum data");
             delete tempinput;
@@ -527,8 +408,8 @@ bool Toolkit::LoadData(const std::string &data)
 
         // Now convert Humdrum into MEI:
         Doc tempdoc;
+        tempdoc.SetOptions(m_doc.GetOptions());
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
-        tempinput->SetTypeOption(GetHumType());
         if (!tempinput->ImportString(conversion.str())) {
             LogError("Error importing Humdrum data");
             delete tempinput;
@@ -555,8 +436,8 @@ bool Toolkit::LoadData(const std::string &data)
 
         // Now convert Humdrum into MEI:
         Doc tempdoc;
+        tempdoc.SetOptions(m_doc.GetOptions());
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
-        tempinput->SetTypeOption(GetHumType());
         if (!tempinput->ImportString(conversion.str())) {
             LogError("Error importing Humdrum data");
             delete tempinput;
@@ -580,62 +461,38 @@ bool Toolkit::LoadData(const std::string &data)
         return false;
     }
 
-    // xpath queries?
-    if (m_appXPathQueries.size() > 0) {
-        input->SetAppXPathQueries(m_appXPathQueries);
-    }
-    if (m_choiceXPathQueries.size() > 0) {
-        input->SetChoiceXPathQueries(m_choiceXPathQueries);
-    }
-    if (m_mdivXPathQuery.length() > 0) {
-        input->SetMdivXPathQuery(m_mdivXPathQuery);
-    }
-
     // load the file
     if (!input->ImportString(newData.size() ? newData : data)) {
         LogError("Error importing data");
         delete input;
         return false;
     }
-    
+
     // generate the page header and footer if necessary
-    if (true) {// change this to an option
+    if (true) { // change this to an option
         m_doc.GenerateHeaderAndFooter();
     }
-
-    m_doc.SetPageHeight(this->GetPageHeight());
-    m_doc.SetPageWidth(this->GetPageWidth());
-    m_doc.SetPageRightMar(this->GetBorder());
-    m_doc.SetPageLeftMar(this->GetBorder());
-    m_doc.SetPageTopMar(this->GetBorder());
-    m_doc.SetSpacingLinear(this->GetSpacingLinear());
-    m_doc.SetSpacingNonLinear(this->GetSpacingNonLinear());
-    m_doc.SetSpacingStaff(this->GetSpacingStaff());
-    m_doc.SetSpacingSystem(this->GetSpacingSystem());
-    m_doc.SetEvenSpacing(this->GetEvenNoteSpacing());
 
     m_doc.PrepareDrawing();
 
     // Do the layout? this depends on the options and the file. PAE and
     // DARMS have no layout information. MEI files _can_ have it, but it
-    // might have been ignored because of the --ignore-layout option.
-    // Regardless, we won't do layout if the --no-layout option was set.
-    if (!m_noLayout) {
-        if (input->HasLayoutInformation() && !m_ignoreLayout) {
+    // might have been ignored because of the --breaks auto option.
+    // Regardless, we won't do layout if the --breaks none option was set.
+    if (m_options->m_breaks.GetValue() != BREAKS_none) {
+        if (input->HasLayoutInformation() && (m_options->m_breaks.GetValue() == BREAKS_encoded)) {
             // LogElapsedTimeStart();
             m_doc.CastOffEncodingDoc();
             // LogElapsedTimeEnd("layout");
         }
         else {
+            if (m_options->m_breaks.GetValue() == BREAKS_encoded) {
+                LogWarning("Requesting layout with encoded breaks but nothing provided in the data");
+            }
             // LogElapsedTimeStart();
             m_doc.CastOffDoc();
             // LogElapsedTimeEnd("layout");
         }
-    }
-
-    // disable justification if there's no layout or no justification
-    if (m_noLayout || m_noJustification) {
-        m_doc.SetJustificationX(false);
     }
 
     delete input;
@@ -665,10 +522,8 @@ bool Toolkit::SaveFile(const std::string &filename)
     return true;
 }
 
-bool Toolkit::ParseOptions(const std::string &json_options)
+bool Toolkit::SetOptions(const std::string &json_options)
 {
-#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
-
     jsonxx::Object json;
 
     // Read JSON options
@@ -677,95 +532,125 @@ bool Toolkit::ParseOptions(const std::string &json_options)
         return false;
     }
 
-    if (json.has<jsonxx::String>("inputFormat")) SetFormat(json.get<jsonxx::String>("inputFormat"));
-
-    if (json.has<jsonxx::Number>("scale")) SetScale(json.get<jsonxx::Number>("scale"));
-
-    if (json.has<jsonxx::Number>("border")) SetBorder(json.get<jsonxx::Number>("border"));
-
-    if (json.has<jsonxx::String>("font")) SetFont(json.get<jsonxx::String>("font"));
-
-    if (json.has<jsonxx::Number>("mmOutput")) SetMMOutput(json.get<jsonxx::Number>("mmOutput"));
-
-    if (json.has<jsonxx::Number>("pageWidth")) SetPageWidth(json.get<jsonxx::Number>("pageWidth"));
-
-    if (json.has<jsonxx::Number>("pageHeight")) SetPageHeight(json.get<jsonxx::Number>("pageHeight"));
-
-    if (json.has<jsonxx::Number>("spacingLinear")) SetSpacingLinear(json.get<jsonxx::Number>("spacingLinear"));
-
-    if (json.has<jsonxx::Number>("spacingNonLinear")) SetSpacingNonLinear(json.get<jsonxx::Number>("spacingNonLinear"));
-
-    if (json.has<jsonxx::Number>("spacingStaff")) SetSpacingStaff(json.get<jsonxx::Number>("spacingStaff"));
-
-    if (json.has<jsonxx::Number>("spacingSystem")) SetSpacingSystem(json.get<jsonxx::Number>("spacingSystem"));
-
-    if (json.has<jsonxx::String>("appXPathQuery")) {
-        std::vector<std::string> queries = { json.get<jsonxx::String>("appXPathQuery") };
-        SetAppXPathQueries(queries);
-    }
-
-    if (json.has<jsonxx::Array>("appXPathQueries")) {
-        jsonxx::Array values = json.get<jsonxx::Array>("appXPathQueries");
-        std::vector<std::string> queries;
-        int i;
-        for (i = 0; i < values.size(); i++) {
-            if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
+    std::map<std::string, jsonxx::Value *> jsonMap = json.kv_map();
+    std::map<std::string, jsonxx::Value *>::const_iterator iter;
+    for (iter = jsonMap.begin(); iter != jsonMap.end(); iter++) {
+        if (m_options->GetItems()->count(iter->first) == 0) {
+            // JSON array options - we set them one by one
+            if (iter->first == "appXPathQueries") {
+                jsonxx::Array values = json.get<jsonxx::Array>("appXPathQueries");
+                std::vector<std::string> queries;
+                Option *opt = m_options->GetItems()->at("appXPathQuery");
+                assert(opt);
+                int i;
+                for (i = 0; i < (int)values.size(); i++) {
+                    if (values.has<jsonxx::String>(i)) opt->SetValue(values.get<jsonxx::String>(i));
+                }
+            }
+            else if (iter->first == "choiceXPathQueries") {
+                jsonxx::Array values = json.get<jsonxx::Array>("choiceXPathQueries");
+                std::vector<std::string> queries;
+                Option *opt = m_options->GetItems()->at("choiceXPathQuery");
+                assert(opt);
+                int i;
+                for (i = 0; i < (int)values.size(); i++) {
+                    if (values.has<jsonxx::String>(i)) opt->SetValue(values.get<jsonxx::String>(i));
+                }
+            }
+            // Base options
+            else if (iter->first == "inputFormat") {
+                if (json.has<jsonxx::String>("inputFormat")) {
+                    SetFormat(json.get<jsonxx::String>("inputFormat"));
+                }
+            }
+            else if (iter->first == "scale") {
+                if (json.has<jsonxx::Number>("scale")) {
+                    SetScale(json.get<jsonxx::Number>("scale"));
+                }
+            }
+            else if (iter->first == "xmlIdSeed") {
+                if (json.has<jsonxx::Number>("xmlIdSeed")) {
+                    Object::SeedUuid(json.get<jsonxx::Number>("xmlIdSeed"));
+                }
+            }
+            // Deprecated option
+            else if (iter->first == "border") {
+                LogWarning("Option border is deprecated; use pageLeftMar, pageRightMar and pageTopMar instead");
+                Option *opt = NULL;
+                if (json.has<jsonxx::Number>("border")) {
+                    double border = json.get<jsonxx::Number>("border");
+                    opt = m_options->GetItems()->at("pageLeftMar");
+                    assert(opt);
+                    opt->SetValueDbl(border);
+                    opt = m_options->GetItems()->at("pageRightMar");
+                    assert(opt);
+                    opt->SetValueDbl(border);
+                    opt = m_options->GetItems()->at("pageTopMar");
+                    assert(opt);
+                    opt->SetValueDbl(border);
+                }
+            }
+            else if (iter->first == "ignoreLayout") {
+                LogWarning("Option ignoreLayout is deprecated; use breaks: \"auto\"|\"encoded\" instead");
+                Option *opt = NULL;
+                opt = m_options->GetItems()->at("breaks");
+                assert(opt);
+                if (json.has<jsonxx::Number>("ignoreLayout")) {
+                    if ((int)json.get<jsonxx::Number>("ignoreLayout") == 1) {
+                        opt->SetValue("auto");
+                    }
+                    else {
+                        opt->SetValue("encoded");
+                    }
+                }
+            }
+            else if (iter->first == "noLayout") {
+                LogWarning("Option noLayout is deprecated; use breaks: \"auto\"|\"none\" instead");
+                Option *opt = NULL;
+                opt = m_options->GetItems()->at("breaks");
+                assert(opt);
+                if (json.has<jsonxx::Number>("noLayout")) {
+                    if ((int)json.get<jsonxx::Number>("noLayout") == 1) {
+                        opt->SetValue("none");
+                    }
+                    else {
+                        opt->SetValue("auto");
+                    }
+                }
+            }
+            else {
+                LogError("Unsupported option '%s'", iter->first.c_str());
+            }
+            continue;
         }
-        SetAppXPathQueries(queries);
-    }
 
-    if (json.has<jsonxx::String>("choiceXPathQuery")) {
-        std::vector<std::string> queries = { json.get<jsonxx::String>("choiceXPathQuery") };
-        SetChoiceXPathQueries(queries);
-    }
+        // Mapped options
 
-    if (json.has<jsonxx::Array>("choiceXPathQueries")) {
-        jsonxx::Array values = json.get<jsonxx::Array>("choiceXPathQueries");
-        std::vector<std::string> queries;
-        int i;
-        for (i = 0; i < values.size(); i++) {
-            if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
+        Option *opt = m_options->GetItems()->at(iter->first);
+        assert(opt);
+
+        if (json.has<jsonxx::Number>(iter->first)) {
+            opt->SetValueDbl(json.get<jsonxx::Number>(iter->first));
+            // LogMessage("Double: %f", json.get<jsonxx::Number>(iter->first));
         }
-        SetChoiceXPathQueries(queries);
+        else if (json.has<jsonxx::Boolean>(iter->first)) {
+            opt->SetValueBool(json.get<jsonxx::Boolean>(iter->first));
+            // LogMessage("Bool: %d", json.get<jsonxx::Boolean>(iter->first));
+        }
+        else if (json.has<jsonxx::String>(iter->first)) {
+            opt->SetValue(json.get<jsonxx::String>(iter->first));
+            // LogMessage("String: %s", json.get<jsonxx::String>(iter->first).c_str());
+        }
+        else {
+            LogError("Unsupported type for option '%s'", iter->first.c_str());
+        }
     }
-
-    if (json.has<jsonxx::String>("mdivXPathQuery")) SetMdivXPathQuery(json.get<jsonxx::String>("mdivXPathQuery"));
-
-    if (json.has<jsonxx::Number>("xmlIdSeed")) Object::SeedUuid(json.get<jsonxx::Number>("xmlIdSeed"));
-
-    // Parse the various flags
-    // Note: it seems that there is a bug with jsonxx and emscripten
-    // Boolean value false won't be parsed properly. We have to use Number instead
-
-    if (json.has<jsonxx::Number>("noLayout")) SetNoLayout(json.get<jsonxx::Number>("noLayout"));
-
-    if (json.has<jsonxx::Number>("ignoreLayout")) SetIgnoreLayout(json.get<jsonxx::Number>("ignoreLayout"));
-
-    if (json.has<jsonxx::Number>("adjustPageHeight")) SetAdjustPageHeight(json.get<jsonxx::Number>("adjustPageHeight"));
-
-    if (json.has<jsonxx::Number>("noJustification")) SetNoJustification(json.get<jsonxx::Number>("noJustification"));
-
-    if (json.has<jsonxx::Number>("evenNoteSpacing")) {
-        SetEvenNoteSpacing(json.get<jsonxx::Number>("evenNoteSpacing"));
-    }
-
-    if (json.has<jsonxx::Number>("humType")) {
-        SetHumType(json.get<jsonxx::Number>("humType"));
-    }
-
-    if (json.has<jsonxx::Number>("showBoundingBoxes"))
-        SetShowBoundingBoxes(json.get<jsonxx::Number>("showBoundingBoxes"));
 
     return true;
-#else
-    // The non-js version of the app should not use this function.
-    return false;
-#endif
 }
 
 std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
-#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
     jsonxx::Object o;
 
     if (!m_doc.GetDrawingPage()) return o.json();
@@ -786,11 +671,6 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
         // LogMessage("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str());
     }
     return o.json();
-
-#else
-    // The non-js version of the app should not use this function.
-    return "";
-#endif
 }
 
 bool Toolkit::Edit(const std::string &json_editorAction)
@@ -839,7 +719,7 @@ bool Toolkit::Edit(const std::string &json_editorAction)
 #endif
 }
 
-std::string Toolkit::GetLogString()
+std::string Toolkit::GetLog()
 {
 #ifdef USE_EMSCRIPTEN
     std::string str;
@@ -872,14 +752,6 @@ void Toolkit::RedoLayout()
         return;
     }
 
-    m_doc.SetPageHeight(this->GetPageHeight());
-    m_doc.SetPageWidth(this->GetPageWidth());
-    m_doc.SetPageRightMar(this->GetBorder());
-    m_doc.SetPageLeftMar(this->GetBorder());
-    m_doc.SetPageTopMar(this->GetBorder());
-    m_doc.SetSpacingStaff(this->GetSpacingStaff());
-    m_doc.SetSpacingSystem(this->GetSpacingSystem());
-
     m_doc.UnCastOffDoc();
     m_doc.CastOffDoc();
 }
@@ -905,11 +777,12 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     m_view.SetPage(pageNo);
 
     // Adjusting page width and height according to the options
-    int width = m_pageWidth;
-    int height = m_pageHeight;
+    int width = m_options->m_pageWidth.GetUnfactoredValue();
+    int height = m_options->m_pageHeight.GetUnfactoredValue();
 
-    if (m_noLayout) width = m_doc.GetAdjustedDrawingPageWidth();
-    if (m_adjustPageHeight || m_noLayout) height = m_doc.GetAdjustedDrawingPageHeight();
+    if (m_options->m_breaks.GetValue() == BREAKS_none) width = m_doc.GetAdjustedDrawingPageWidth();
+    if (m_options->m_adjustPageHeight.GetValue() || (m_options->m_breaks.GetValue() == BREAKS_none))
+        height = m_doc.GetAdjustedDrawingPageHeight();
 
     // set dimensions
     deviceContext->SetWidth(width);
@@ -929,12 +802,9 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
     // We will need to set the size of the page after having drawn it depending on the options
     SvgDeviceContext svg;
 
-    if (m_mmOutput) {
+    if (m_options->m_mmOutput.GetValue()) {
         svg.SetMMOutput(true);
     }
-
-    // debug BB?
-    svg.SetDrawBoundingBoxes(m_showBoundingBoxes);
 
     // render the page
     RenderToDeviceContext(pageNo, &svg);
@@ -1009,7 +879,6 @@ std::string Toolkit::RenderToTimemap()
 
 std::string Toolkit::GetElementsAtTime(int millisec)
 {
-#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
     jsonxx::Object o;
     jsonxx::Array a;
 
@@ -1047,10 +916,6 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     o << "page" << pageNo;
 
     return o.json();
-#else
-    // The non-js version of the app should not use this function.
-    return "";
-#endif
 }
 
 bool Toolkit::RenderToMidiFile(const std::string &filename)
@@ -1119,22 +984,6 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     return timeofElement;
 }
 
-void Toolkit::SetCString(const std::string &data)
-{
-    if (m_cString) {
-        free(m_cString);
-        m_cString = NULL;
-    }
-
-    m_cString = (char *)malloc(strlen(data.c_str()) + 1);
-
-    // something went wrong
-    if (!m_cString) {
-        return;
-    }
-    strcpy(m_cString, data.c_str());
-}
-
 void Toolkit::SetHumdrumBuffer(const char *data)
 {
     if (m_humdrumBuffer) {
@@ -1187,17 +1036,6 @@ void Toolkit::SetHumdrumBuffer(const char *data)
     strcpy(m_humdrumBuffer, data);
 #endif
 }
-
-const char *Toolkit::GetCString()
-{
-    if (m_cString) {
-        return m_cString;
-    }
-    else {
-        return "[unspecified]";
-    }
-}
-
 const char *Toolkit::GetHumdrumBuffer()
 {
     if (m_humdrumBuffer) {
