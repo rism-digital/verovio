@@ -122,7 +122,7 @@ bool Toolkit::SetFormat(std::string const &informat)
     else if (informat == "mei") {
         m_format = MEI;
     }
-    else if (informat == "musicxml") {
+    else if ((informat == "musicxml") || (informat == "xml")) {
         m_format = MUSICXML;
     }
     else if (informat == "musicxml-hum") {
