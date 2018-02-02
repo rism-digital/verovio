@@ -163,7 +163,7 @@ int RunningElement::GetWidth() const
     Doc *doc = dynamic_cast<Doc *>(m_drawingPage->GetFirstParent(DOC));
     if (!doc) return 0;
 
-    return (doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar);
+    return (doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight);
     // return m_drawingPage->GetContentWidth();
 }
 

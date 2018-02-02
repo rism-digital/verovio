@@ -70,7 +70,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     dc->DrawBackgroundImage();
 
     Point origin = dc->GetLogicalOrigin();
-    dc->SetLogicalOrigin(origin.x - m_doc->m_drawingPageLeftMar, origin.y - m_doc->m_drawingPageTopMar);
+    dc->SetLogicalOrigin(origin.x - m_doc->m_drawingPageMarginLeft, origin.y - m_doc->m_drawingPageMarginTop);
 
     dc->StartPage();
 

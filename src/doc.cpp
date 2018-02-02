@@ -80,9 +80,10 @@ void Doc::Reset()
     m_type = Raw;
     m_pageWidth = -1;
     m_pageHeight = -1;
-    m_pageRightMar = 0;
-    m_pageLeftMar = 0;
-    m_pageTopMar = 0;
+    m_pageMarginBottom = 0;
+    m_pageMarginRight = 0;
+    m_pageMarginLeft = 0;
+    m_pageMarginTop = 0;
 
     m_drawingPage = NULL;
     m_currentScoreDefDone = false;
@@ -699,8 +700,8 @@ void Doc::CastOffDoc()
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
     CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem);
-    castOffSystemsParams.m_systemWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar
-        - this->m_drawingPageRightMar - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
+    castOffSystemsParams.m_systemWidth = this->m_drawingPageWidth - this->m_drawingPageMarginLeft
+        - this->m_drawingPageMarginRight - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
     castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();
     castOffSystemsParams.m_currentScoreDefWidth
         = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
@@ -726,7 +727,7 @@ void Doc::CastOffDoc()
     CastOffPagesParams castOffPagesParams(contentPage, this, currentPage);
     CastOffRunningElements(&castOffPagesParams);
     castOffPagesParams.m_pageHeight
-        = this->m_drawingPageHeight - this->m_drawingPageTopMar; // obviously we need a bottom margin
+        = this->m_drawingPageHeight - this->m_drawingPageMarginBot;
     Functor castOffPages(&Object::CastOffPages);
     this->AddChild(currentPage);
     contentPage->Process(&castOffPages, &castOffPagesParams);
@@ -1193,32 +1194,35 @@ Page *Doc::SetDrawingPage(int pageIdx)
     if (m_drawingPage->m_pageHeight != -1) {
         m_drawingPageHeight = m_drawingPage->m_pageHeight;
         m_drawingPageWidth = m_drawingPage->m_pageWidth;
-        m_drawingPageLeftMar = m_drawingPage->m_pageLeftMar;
-        m_drawingPageRightMar = m_drawingPage->m_pageRightMar;
-        m_drawingPageTopMar = m_drawingPage->m_pageTopMar;
+        m_drawingPageMarginBot = m_drawingPage->m_pageMarginBottom;
+        m_drawingPageMarginLeft = m_drawingPage->m_pageMarginLeft;
+        m_drawingPageMarginRight = m_drawingPage->m_pageMarginRight;
+        m_drawingPageMarginTop = m_drawingPage->m_pageMarginTop;
     }
     else if (this->m_pageHeight != -1) {
         m_drawingPageHeight = this->m_pageHeight;
         m_drawingPageWidth = this->m_pageWidth;
-        m_drawingPageLeftMar = this->m_pageLeftMar;
-        m_drawingPageRightMar = this->m_pageRightMar;
-        m_drawingPageTopMar = this->m_pageTopMar;
+        m_drawingPageMarginBot = this->m_pageMarginBottom;
+        m_drawingPageMarginLeft = this->m_pageMarginLeft;
+        m_drawingPageMarginRight = this->m_pageMarginRight;
+        m_drawingPageMarginTop = this->m_pageMarginTop;
     }
     else {
         m_drawingPageHeight = m_options->m_pageHeight.GetValue();
         m_drawingPageWidth = m_options->m_pageWidth.GetValue();
-        m_drawingPageLeftMar = m_options->m_pageLeftMar.GetValue();
-        m_drawingPageRightMar = m_options->m_pageRightMar.GetValue();
-        m_drawingPageTopMar = m_options->m_pageTopMar.GetValue();
+        m_drawingPageMarginBot = m_options->m_pageMarginBottom.GetValue();
+        m_drawingPageMarginLeft = m_options->m_pageMarginLeft.GetValue();
+        m_drawingPageMarginRight = m_options->m_pageMarginRight.GetValue();
+        m_drawingPageMarginTop = m_options->m_pageMarginTop.GetValue();
     }
 
     if (this->m_options->m_landscape.GetValue()) {
         int pageHeight = m_drawingPageWidth;
         m_drawingPageWidth = m_drawingPageHeight;
         m_drawingPageHeight = pageHeight;
-        int pageRightMar = m_drawingPageLeftMar;
-        m_drawingPageLeftMar = m_drawingPageRightMar;
-        m_drawingPageRightMar = pageRightMar;
+        int pageMarginRight = m_drawingPageMarginLeft;
+        m_drawingPageMarginLeft = m_drawingPageMarginRight;
+        m_drawingPageMarginRight = pageMarginRight;
     }
 
     // From here we could check if values have changed
@@ -1260,7 +1264,7 @@ int Doc::GetAdjustedDrawingPageHeight() const
     if (this->GetType() == Transcription) return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
 
     int contentHeight = m_drawingPage->GetContentHeight();
-    return (contentHeight + m_drawingPageTopMar * 2) / DEFINITION_FACTOR;
+    return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBot) / DEFINITION_FACTOR;
 }
 
 int Doc::GetAdjustedDrawingPageWidth() const
@@ -1270,7 +1274,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
     if (this->GetType() == Transcription) return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
 
     int contentWidth = m_drawingPage->GetContentWidth();
-    return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar) / DEFINITION_FACTOR;
+    return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;
 }
 
 //----------------------------------------------------------------------------

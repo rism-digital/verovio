@@ -299,11 +299,12 @@ int main(int argc, char **argv)
             case 'a': all_pages = 1; break;
 
             case 'b':
-                LogWarning("Option -b and --border is deprecated; use --page-left-mar, --page-right-mar and "
-                           "--page-top-mar instead");
-                options->m_pageLeftMar.SetValue(optarg);
-                options->m_pageRightMar.SetValue(optarg);
-                options->m_pageTopMar.SetValue(optarg);
+                LogWarning("Option -b and --border is deprecated; use --page-margin-bottom, --page-margin-left, --page-margin-right and "
+                           "--page-margin-top instead");
+                options->m_pageMarginBottom.SetValue(optarg);
+                options->m_pageMarginLeft.SetValue(optarg);
+                options->m_pageMarginRight.SetValue(optarg);
+                options->m_pageMarginTop.SetValue(optarg);
                 break;
 
             case 'f':

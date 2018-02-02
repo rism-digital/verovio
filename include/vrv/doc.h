@@ -318,14 +318,16 @@ public:
 
     /** The current page height */
     int m_drawingPageHeight;
-    /** The current page height */
+    /** The current page width */
     int m_drawingPageWidth;
-    /** The current page witdth */
-    int m_drawingPageLeftMar;
+    /** The current page bottom margin */
+    int m_drawingPageMarginBot;
     /** The current page left margin */
-    int m_drawingPageRightMar;
+    int m_drawingPageMarginLeft;
     /** The current page right margin */
-    int m_drawingPageTopMar;
+    int m_drawingPageMarginRight;
+    /** The current page top margin */
+    int m_drawingPageMarginTop;
     /** the current beam minimal slope */
     float m_drawingBeamMinSlope;
     /** the current beam maximal slope */
@@ -405,12 +407,14 @@ private:
     int m_pageWidth;
     /** Page height (MEI scoredef@page.height) - currently not saved */
     int m_pageHeight;
+    /** Page bottom margin (MEI scoredef@page.botmar) - currently not saved */
+    int m_pageMarginBottom;
     /** Page left margin (MEI scoredef@page.leftmar) - currently not saved */
-    short m_pageLeftMar;
+    int m_pageMarginLeft;
     /** Page right margin (MEI scoredef@page.rightmar) - currently not saved */
-    short m_pageRightMar;
+    int m_pageMarginRight;
     /** Page top margin (MEI scoredef@page.topmar) - currently not saved */
-    short m_pageTopMar;
+    int m_pageMarginTop;
 
     /**
      * A score buffer for loading or creating a scoreBased MEI.

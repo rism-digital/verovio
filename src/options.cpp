@@ -558,18 +558,22 @@ Options::Options()
     m_pageHeight.SetInfo("Page height", "The page height");
     m_pageHeight.Init(2970, 100, 60000, true);
     this->Register(&m_pageHeight, "pageHeight", &m_generalLayout);
+    
+    m_pageMarginBottom.SetInfo("Page bottom margin", "The page bottom margin");
+    m_pageMarginBottom.Init(50, 0, 500, true);
+    this->Register(&m_pageMarginBottom, "pageMarginBottom", &m_generalLayout);
 
-    m_pageLeftMar.SetInfo("Page left mar", "The page left margin");
-    m_pageLeftMar.Init(50, 0, 500, true);
-    this->Register(&m_pageLeftMar, "pageLeftMar", &m_generalLayout);
+    m_pageMarginLeft.SetInfo("Page left margin", "The page left margin");
+    m_pageMarginLeft.Init(50, 0, 500, true);
+    this->Register(&m_pageMarginLeft, "pageMarginLeft", &m_generalLayout);
 
-    m_pageRightMar.SetInfo("Page right mar", "The page right margin");
-    m_pageRightMar.Init(50, 0, 500, true);
-    this->Register(&m_pageRightMar, "pageRightMar", &m_generalLayout);
+    m_pageMarginRight.SetInfo("Page right margin", "The page right margin");
+    m_pageMarginRight.Init(50, 0, 500, true);
+    this->Register(&m_pageMarginRight, "pageMarginRight", &m_generalLayout);
 
-    m_pageTopMar.SetInfo("Page top mar", "The page top margin");
-    m_pageTopMar.Init(50, 0, 500, true);
-    this->Register(&m_pageTopMar, "pageTopMar", &m_generalLayout);
+    m_pageMarginTop.SetInfo("Page top margin", "The page top margin");
+    m_pageMarginTop.Init(50, 0, 500, true);
+    this->Register(&m_pageMarginTop, "pageMarginTop", &m_generalLayout);
 
     m_pageWidth.SetInfo("Page width", "The page width");
     m_pageWidth.Init(2100, 100, 60000, true);

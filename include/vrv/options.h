@@ -482,9 +482,10 @@ public:
     OptionBool m_noHeader;
     OptionBool m_noJustification;
     OptionInt m_pageHeight;
-    OptionInt m_pageLeftMar;
-    OptionInt m_pageRightMar;
-    OptionInt m_pageTopMar;
+    OptionInt m_pageMarginBottom;
+    OptionInt m_pageMarginLeft;
+    OptionInt m_pageMarginRight;
+    OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
     OptionDbl m_slurMaxHeight;
     OptionDbl m_slurMinHeight;

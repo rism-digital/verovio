@@ -703,17 +703,20 @@ bool Toolkit::SetOptions(const std::string &json_options)
                 
             }
             else if (iter->first == "border") {
-                LogWarning("Option border is deprecated; use pageLeftMar, pageRightMar and pageTopMar instead");
+                LogWarning("Option border is deprecated; use pageMarginBottom, pageMarginLeft, pageMarginRight and pageMarginTop instead");
                 Option *opt = NULL;
                 if (json.has<jsonxx::Number>("border")) {
                     double border = json.get<jsonxx::Number>("border");
-                    opt = m_options->GetItems()->at("pageLeftMar");
+                    opt = m_options->GetItems()->at("pageMarginBottom");
                     assert(opt);
                     opt->SetValueDbl(border);
-                    opt = m_options->GetItems()->at("pageRightMar");
+                    opt = m_options->GetItems()->at("pageMarginLeft");
                     assert(opt);
                     opt->SetValueDbl(border);
-                    opt = m_options->GetItems()->at("pageTopMar");
+                    opt = m_options->GetItems()->at("pageMarginRight");
+                    assert(opt);
+                    opt->SetValueDbl(border);
+                    opt = m_options->GetItems()->at("pageMarginTop");
                     assert(opt);
                     opt->SetValueDbl(border);
                 }
