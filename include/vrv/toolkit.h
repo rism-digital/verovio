@@ -68,10 +68,13 @@ public:
     bool SaveFile(const std::string &filename);
 
     /**
-     * Parse the options passed as JSON string.
-     * Only available for Emscripten-based compiles
-     **/
+     * @name Getter and setter for options as JSON string
+     */
+    ///@{
+    std::string GetOptions(bool defaultValues) const;
+    std::string GetAvailableOptions() const;
     bool SetOptions(const std::string &json_options);
+    ///@}
     
     /**
      * @name Getter and setter for single option

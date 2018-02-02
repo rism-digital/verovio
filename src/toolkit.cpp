@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "attcomparison.h"
+#include "functorparams.h"
 #include "iodarms.h"
 #include "iohumdrum.h"
 #include "iomei.h"
@@ -27,8 +28,6 @@
 #include "slur.h"
 #include "svgdevicecontext.h"
 #include "vrv.h"
-
-#include "functorparams.h"
 
 //----------------------------------------------------------------------------
 
@@ -521,7 +520,48 @@ bool Toolkit::SaveFile(const std::string &filename)
     }
     return true;
 }
+    
+std::string Toolkit::GetOptions(bool defaultValues) const
+{
+    jsonxx::Object o;
+    
+    const MapOfStrOptions *params = m_options->GetItems();
+    MapOfStrOptions::const_iterator iter;
+    for (iter = params->begin(); iter != params->end(); iter++) {
+        const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(iter->second);
+        const OptionInt *optInt = dynamic_cast<const OptionInt *>(iter->second);
+        const OptionBool *optBool = dynamic_cast<const OptionBool *>(iter->second);
+        
+        if (optDbl) {
+            double dblValue = (defaultValues) ? optDbl->GetDefault() : optDbl->GetValue();
+            jsonxx::Value value(dblValue);
+            value.precision_ = 2;
+            o << iter->first << value;
+        }
+        else if (optInt) {
+            int intValue = (defaultValues) ? optInt->GetDefault() : optInt->GetUnfactoredValue();
+            o << iter->first << intValue;
+        }
+        else if (optBool) {
+            int boolValue = (defaultValues) ? optBool->GetDefault() : optBool->GetValue();
+            o << iter->first << boolValue;
+        }
+        else {
+            std::string stringValue = (defaultValues) ? iter->second->GetDefaultStrValue() : iter->second->GetStrValue();
+            o << iter->first << stringValue;
+        }
+    }
 
+    return o.json();
+}
+
+std::string Toolkit::GetAvailableOptions() const
+{
+    jsonxx::Object o;
+
+    return o.json();
+}
+    
 bool Toolkit::SetOptions(const std::string &json_options)
 {
     jsonxx::Object json;

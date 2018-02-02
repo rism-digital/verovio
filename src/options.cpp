@@ -222,7 +222,6 @@ int OptionInt::GetValue() const
 
 int OptionInt::GetUnfactoredValue() const
 {
-    assert(m_definitionFactor);
     return m_value;
 }
 
