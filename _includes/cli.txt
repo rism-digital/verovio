@@ -1,0 +1,98 @@
+Verovio 2.0.0-dev-2d8621e
+
+Example usage:
+
+ verovio [-s scale] [-t type] [-r resources] [-o outfile] infile
+
+Options (marked as * are repeatable)
+ -                     Use "-" as input file for reading from the standard input
+ -?, --help            Display this message
+ -a, --all-pages       Output all pages
+ -f, --format <s>      Select input format: darms, mei, pae, xml (default is mei)
+ -o, --outfile <s>     Output file name (use "-" for standard output)
+ -p, --page <i>        Select the page to engrave (default is 1)
+ -r, --resources <s>   Path to SVG resources (default is /usr/local/share/verovio)
+ -s, --scale <i>       Scale percent (default is 100)
+ -t, --type <s>        Select output format: mei, svg, or midi (default is svg)
+ -v, --version         Display the version number
+ -x, --xml-id-seed <i> Seed the random number generator for XML IDs
+
+General layout options
+ --adjust-page-height              Crop the page height to the height of the content
+ --bar-line-width <f>              The barLine width (default: 0.3; min: 0.1; max: 0.8)
+ --beam-max-slope <i>              The maximum beam slope (default: 10; min: 1; max: 20)
+ --beam-min-slope <i>              The minimum beam slope (default: 0; min: 0; max: 0)
+ --breaks <s>                      Define page and system breaks layout (default: "auto"; other values: "none", "encoded")
+ --even-note-spacing               Specify the linear spacing factor
+ --font <s>                        Set the music font (default: "Leipzig")
+ --grace-factor <f>                The grace size ratio numerator (default: 0.75; min: 0.5; max: 1)
+ --hairpin-size <f>                The haripin size in MEI units (default: 3; min: 1; max: 8)
+ --hum-type                        Include type attributes when importing from Humdrum
+ --landscape                       The landscape paper orientation flag
+ --left-position <f>               The left position (default: 0.8; min: 0; max: 2)
+ --lyric-size <f>                  The lyrics size in MEI units (default: 4.5; min: 2; max: 8)
+ --min-measure-width <i>           The minimal measure width in MEI units (default: 15; min: 1; max: 30)
+ --measure-number <s>              The measure numbering rule (unused) (default: "system"; other values: "interval")
+ --mm-output                       Specify that the output in the SVG is given in mm (default is px)
+ --no-footer                       Do not add any footer
+ --no-header                       Do not add any header
+ --no-justification                Do not justify the system
+ --page-height <i>                 The page height (default: 2970; min: 100; max: 60000)
+ --page-left-mar <i>               The page left margin (default: 50; min: 0; max: 500)
+ --page-right-mar <i>              The page right margin (default: 50; min: 0; max: 500)
+ --page-top-mar <i>                The page top margin (default: 50; min: 0; max: 500)
+ --page-width <i>                  The page width (default: 2100; min: 100; max: 60000)
+ --min-slur-height <f>             The minimum slur height in MEI units (default: 1.2; min: 0.3; max: 2)
+ --max-slur-height <f>             The maximum slur height in MEI units (default: 3; min: 2; max: 4)
+ --slur-thickness <f>              The slur thickness in MEI units (default: 0.6; min: 0.2; max: 1.2)
+ --spacing-linear <f>              Specify the linear spacing factor (default: 0.25; min: 0; max: 1)
+ --spacing-non-linear <f>          Specify the non-linear spacing factor (default: 0.6; min: 0; max: 1)
+ --spacing-staff <i>               The staff minimal spacing in MEI units (default: 8; min: 0; max: 24)
+ --spacing-system <i>              The system minimal spacing in MEI units (default: 3; min: 0; max: 12)
+ --staff-line-width <f>            The staff line width in unit (default: 0.15; min: 0.1; max: 0.3)
+ --stem-width <f>                  The stem width (default: 0.2; min: 0.1; max: 0.5)
+ --tie-thickness <f>               The tie thickness in MEI units (default: 0.5; min: 0.2; max: 1)
+ --unit <i>                        The MEI unit (1⁄2 of the distance between the staff lines) (default: 9; min: 6; max: 20)
+
+Element selectors
+ --app-x-path-query* <s>           Set the xPath query for selecting <app> child elements, for example: "./rdg[contains(@source, 'source-id')]"; by default the <lem> or the first <rdg> is selected
+ --choice-x-path-query* <s>        Set the xPath query for selecting <choice> child elements, for example: "./orig"; by default the first child is selected
+ --mdiv-x-path-query <s>           Set the xPath query for selecting the <mdiv> to be rendered; only one <mdiv> can be rendered (default: "")
+
+Element margins
+ --default-bottom-margin <f>       The default bottom margin (default: 0.5; min: 0; max: 5)
+ --default-left-margin <f>         The default left margin (default: 0; min: 0; max: 2)
+ --default-right-margin <f>        The default right margin (default: 0; min: 0; max: 2)
+ --default-top-margin <f>          The default top margin (default: 0.5; min: 0; max: 6)
+ --left-margin-accid <f>           The margin for accid in MEI units (default: 1; min: 0; max: 2)
+ --left-margin-bar-line <f>        The margin for barLine in MEI units (default: 0; min: 0; max: 2)
+ --left-margin-beat-rpt <f>        The margin for beatRpt in MEI units (default: 2; min: 0; max: 2)
+ --left-margin-chord <f>           The margin for chord in MEI units (default: 1; min: 0; max: 2)
+ --left-margin-clef <f>            The margin for clef in MEI units (default: 1; min: 0; max: 2)
+ --left-margin-key-sig <f>         The margin for keySig in MEI units (default: 1; min: 0; max: 2)
+ --left-margin-left-bar-line <f>   The margin for left barLine in MEI units (default: 0; min: 0; max: 2)
+ --left-margin-mensur <f>          The margin for mensur in MEI units (default: 1; min: 0; max: 2)
+ --left-margin-meter-sig <f>       The margin for meterSig in MEI units (default: 1; min: 0; max: 2)
+ --left-margin-m-rest <f>          The margin for mRest in MEI units (default: 0; min: 0; max: 2)
+ --left-margin-m-rpt2 <f>          The margin for mRpt2 in MEI units (default: 0; min: 0; max: 2)
+ --left-margin-multi-rest <f>      The margin for multiRest in MEI units (default: 0; min: 0; max: 2)
+ --left-margin-multi-rpt <f>       The margin for multiRpt in MEI units (default: 0; min: 0; max: 2)
+ --left-margin-note <f>            The margin for note in MEI units (default: 1; min: 0; max: 2)
+ --left-margin-rest <f>            The margin for rest in MEI units (default: 1; min: 0; max: 2)
+ --left-margin-right-bar-line <f>  The margin for right barLine in MEI units (default: 1; min: 0; max: 2)
+ --right-margin-accid <f>          The right margin for accid in MEI units (default: 0; min: 0; max: 2)
+ --right-margin-bar-line <f>       The right margin for barLine in MEI units (default: 0; min: 0; max: 2)
+ --right-margin-beat-rpt <f>       The right margin for beatRpt in MEI units (default: 0; min: 0; max: 2)
+ --right-margin-chord <f>          The right margin for chord in MEI units (default: 0; min: 0; max: 2)
+ --right-margin-clef <f>           The right margin for clef in MEI units (default: 1; min: 0; max: 2)
+ --right-margin-key-sig <f>        The right margin for keySig in MEI units (default: 1; min: 0; max: 2)
+ --right-margin-left-bar-line <f>  The right margin for left barLine in MEI units (default: 1; min: 0; max: 2)
+ --right-margin-mensur <f>         The right margin for mensur in MEI units (default: 1; min: 0; max: 2)
+ --right-margin-meter-sig <f>      The right margin for meterSig in MEI units (default: 1; min: 0; max: 2)
+ --right-margin-m-rest <f>         The right margin for mRest in MEI units (default: 0; min: 0; max: 2)
+ --right-margin-m-rpt2 <f>         The right margin for mRpt2 in MEI units (default: 0; min: 0; max: 2)
+ --right-margin-multi-rest <f>     The right margin for multiRest in MEI units (default: 0; min: 0; max: 2)
+ --right-margin-multi-rpt <f>      The right margin for multiRpt in MEI units (default: 0; min: 0; max: 2)
+ --right-margin-note <f>           The right margin for note in MEI units (default: 0; min: 0; max: 2)
+ --right-margin-rest <f>           The right margin for rest in MEI units (default: 0; min: 0; max: 2)
+ --right-margin-right-bar-line <f> The right margin for right barLine in MEI units (default: 0; min: 0; max: 2)
