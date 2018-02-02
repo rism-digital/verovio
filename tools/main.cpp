@@ -182,7 +182,7 @@ void display_usage()
             }
             if (optIntMap) {
                 cout << " (default: \"" << optIntMap->GetDefaultStrValue()
-                     << "\"; other values: " << optIntMap->GetStrValuesAtStr(true) << ")";
+                     << "\"; other values: " << optIntMap->GetStrValuesAsStr(true) << ")";
             }
             cout << endl;
         }

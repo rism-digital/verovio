@@ -22,10 +22,12 @@ extern "C" {
 void *vrvToolkit_constructor();
 void vrvToolkit_destructor(ToolkitManager *tkm);
 bool vrvToolkit_edit(ToolkitManager *tkm, const char *editorAction);
+const char *vrvToolkit_getAvailableOptions(ToolkitManager *tkm);
 const char *vrvToolkit_getElementsAtTime(ToolkitManager *tkm, int millisec);
 const char *vrvToolkit_getHumdrum(ToolkitManager *tkm);
 const char *vrvToolkit_getLog(ToolkitManager *tkm);
 const char *vrvToolkit_getMEI(ToolkitManager *tkm, int page_no, bool score_based);
+const char *vrvToolkit_getOptions(ToolkitManager *tkm, bool default_values);
 int vrvToolkit_getPageCount(ToolkitManager *tkm);
 int vrvToolkit_getPageWithElement(ToolkitManager *tkm, const char *xmlId);
 const char *vrvToolkit_getElementAttr(ToolkitManager *tkm, const char *xmlId);
@@ -64,6 +66,12 @@ bool vrvToolkit_edit(ToolkitManager *tkm, const char *editorAction)
     return true;
 }
 
+const char *vrvToolkit_getAvailableOptions(ToolkitManager *tkm)
+{
+    tkm->SetCString(tkm->GetInstance()->GetAvailableOptions());
+    return tkm->GetCString();
+}
+
 const char *vrvToolkit_getElementsAtTime(ToolkitManager *tkm, int millisec)
 {
     tkm->SetCString(tkm->GetInstance()->GetElementsAtTime(millisec));
@@ -91,6 +99,12 @@ const char *vrvToolkit_getLog(ToolkitManager *tkm)
 const char *vrvToolkit_getMEI(ToolkitManager *tkm, int page_no, bool score_based)
 {
     tkm->SetCString(tkm->GetInstance()->GetMEI(page_no, score_based));
+    return tkm->GetCString();
+}
+
+const char *vrvToolkit_getOptions(ToolkitManager *tkm, bool default_values)
+{
+    tkm->SetCString(tkm->GetInstance()->GetOptions(default_values));
     return tkm->GetCString();
 }
 

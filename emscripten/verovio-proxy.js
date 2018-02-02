@@ -12,20 +12,26 @@ verovio.vrvToolkit.destructor = Module.cwrap('vrvToolkit_destructor', null, ['nu
 // bool edit(Toolkit *ic, const char *editorAction) 
 verovio.vrvToolkit.edit = Module.cwrap('vrvToolkit_edit', 'number', ['number', 'string']);
 
-// char *getElementsAtTime(Toolkit *ic, int time )
+// char *getAvailableOptions(Toolkit *ic)
+verovio.vrvToolkit.getAvailableOptions = Module.cwrap('vrvToolkit_getAvailableOptions', 'string', ['number']);
+
+// char *getElementsAtTime(Toolkit *ic, int time)
 verovio.vrvToolkit.getElementsAtTime = Module.cwrap('vrvToolkit_getElementsAtTime', 'string', ['number', 'number']);
 
-// char *getElementAttr(Toolkit *ic, const char *xmlId )
+// char *getElementAttr(Toolkit *ic, const char *xmlId)
 verovio.vrvToolkit.getElementAttr = Module.cwrap('vrvToolkit_getElementAttr', 'string', ['number', 'string']);
+
+// char *getHumdrum(Toolkit *ic)
+verovio.vrvToolkit.getHumdrum = Module.cwrap('vrvToolkit_getHumdrum', 'string');
 
 // char *getLog(Toolkit *ic)
 verovio.vrvToolkit.getLog = Module.cwrap('vrvToolkit_getLog', 'string', ['number']);
 
-// char *getMEI(Toolkit *ic, int pageNo, int scoreBased )
+// char *getMEI(Toolkit *ic, int pageNo, int scoreBased)
 verovio.vrvToolkit.getMEI = Module.cwrap('vrvToolkit_getMEI', 'string', ['number', 'number', 'number']);
 
-// char *getHumdrum(Toolkit *ic)
-verovio.vrvToolkit.getHumdrum = Module.cwrap('vrvToolkit_getHumdrum', 'string');
+// char *getOptions(Toolkit *ic, int defaultValues)
+verovio.vrvToolkit.getOptions = Module.cwrap('vrvToolkit_getOptions', 'string', ['number', 'number']);
 
 // int getPageCount(Toolkit *ic)
 verovio.vrvToolkit.getPageCount = Module.cwrap('vrvToolkit_getPageCount', 'number', ['number']);
@@ -39,7 +45,7 @@ verovio.vrvToolkit.getTimeForElement = Module.cwrap('vrvToolkit_getTimeForElemen
 // char *getVersion(Toolkit *ic)
 verovio.vrvToolkit.getVersion = Module.cwrap('vrvToolkit_getVersion', 'string', ['number']);
 
-// bool loadData(Toolkit *ic, const char *data )
+// bool loadData(Toolkit *ic, const char *data)
 verovio.vrvToolkit.loadData = Module.cwrap('vrvToolkit_loadData', 'number', ['number', 'string']);
 
 // void redoLayout(Toolkit *ic)
@@ -48,16 +54,16 @@ verovio.vrvToolkit.redoLayout = Module.cwrap('vrvToolkit_redoLayout', null, ['nu
 // void redoPagePitchPosLayout(Toolkit *ic)
 verovio.vrvToolkit.redoPagePitchPosLayout = Module.cwrap('vrvToolkit_redoPagePitchPosLayout', null, ['number']);
 
-// char *renderData(Toolkit *ic, const char *data, const char *options )
+// char *renderData(Toolkit *ic, const char *data, const char *options)
 verovio.vrvToolkit.renderData = Module.cwrap('vrvToolkit_renderData', 'string', ['number', 'string', 'string']);
 
-// char *renderPage(Toolkit *ic, int pageNo, const char *rendering_options )
+// char *renderPage(Toolkit *ic, int pageNo, const char *rendering_options)
 verovio.vrvToolkit.renderPage = Module.cwrap('vrvToolkit_renderPage', 'string', ['number', 'number', 'string']);
 
-// char *renderToMidi(Toolkit *ic, const char *rendering_options )
+// char *renderToMidi(Toolkit *ic, const char *rendering_options)
 verovio.vrvToolkit.renderToMidi = Module.cwrap('vrvToolkit_renderToMidi', 'string', ['number', 'string']);
 
-// char *renderToTimemap(Toolkit *ic )
+// char *renderToTimemap(Toolkit *ic)
 verovio.vrvToolkit.renderToTimemap = Module.cwrap('vrvToolkit_renderToTimemap', 'string', ['number']);
 
 // void setOptions(Toolkit *ic, const char *options) 
@@ -89,8 +95,16 @@ verovio.toolkit.prototype.edit = function (editorAction) {
 	return verovio.vrvToolkit.edit(this.ptr, JSON.stringify(editorAction));
 };
 
+verovio.toolkit.prototype.getAvailableOptions = function () {
+	return verovio.vrvToolkit.getAvailableOptions(this.ptr);
+};
+
 verovio.toolkit.prototype.getElementsAtTime = function (millisec) {
 	return JSON.parse(verovio.vrvToolkit.getElementsAtTime(this.ptr, millisec));
+};
+
+verovio.toolkit.prototype.getHumdrum = function () {
+	return verovio.vrvToolkit.getHumdrum(this.ptr);
 };
 
 verovio.toolkit.prototype.getLog = function () {
@@ -101,8 +115,8 @@ verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {
 	return verovio.vrvToolkit.getMEI(this.ptr, pageNo, scoreBased);
 };
 
-verovio.toolkit.prototype.getHumdrum = function () {
-	return verovio.vrvToolkit.getHumdrum(this.ptr);
+verovio.toolkit.prototype.getOptions = function (defaultValues) {
+	return verovio.vrvToolkit.getOptions(this.ptr, defaultValues);
 };
 
 verovio.toolkit.prototype.getPageCount = function () {

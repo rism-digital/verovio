@@ -54,6 +54,13 @@ bool Option::SetValueDbl(double value)
     LogError("Unsupported type double for %s", m_key.c_str());
     return false;
 }
+    
+bool Option::SetValueArray(const std::vector<std::string> &values)
+{
+    // If not overriden
+    LogError("Unsupported type array for %s", m_key.c_str());
+    return false;
+}
 
 bool Option::SetValue(std::string value)
 {
@@ -270,14 +277,22 @@ void OptionArray::CopyTo(Option *option)
     *child = *this;
 }
 
-void OptionArray::Init(OptionGrp *grp)
+void OptionArray::Init()
 {
     m_values.empty();
     m_defaultValues.empty();
 }
+    
+    
+bool OptionArray::SetValueArray(const std::vector<std::string> &values)
+{
+    m_values = values;
+    return true;
+}
 
 bool OptionArray::SetValue(std::string value)
 {
+    // Passing a single value to an array option adds it to the values and to not replace them
     m_values.push_back(value);
     return true;
 }
@@ -398,7 +413,7 @@ std::vector<std::string> OptionIntMap::GetStrValues(bool withoutDefault) const
     return strValues;
 }
 
-std::string OptionIntMap::GetStrValuesAtStr(bool withoutDefault) const
+std::string OptionIntMap::GetStrValuesAsStr(bool withoutDefault) const
 {
     std::vector<std::string> strValues = GetStrValues(withoutDefault);
     std::stringstream ss;

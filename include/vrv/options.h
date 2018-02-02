@@ -96,6 +96,7 @@ public:
 
     virtual bool SetValueBool(bool value);
     virtual bool SetValueDbl(double value);
+    virtual bool SetValueArray(const std::vector<std::string> &values);
     virtual bool SetValue(std::string value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
@@ -273,8 +274,9 @@ public:
     OptionArray() {}
     virtual ~OptionArray() {}
     virtual void CopyTo(Option *option);
-    void Init(OptionGrp *grp = NULL);
+    void Init();
 
+    virtual bool SetValueArray(const std::vector<std::string> &values);
     virtual bool SetValue(std::string value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
@@ -316,7 +318,7 @@ public:
     bool SetValue(int value);
 
     std::vector<std::string> GetStrValues(bool withoutDefault) const;
-    std::string GetStrValuesAtStr(bool withoutDefault) const;
+    std::string GetStrValuesAsStr(bool withoutDefault) const;
 
 private:
     //
