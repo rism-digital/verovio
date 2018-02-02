@@ -96,6 +96,7 @@ public:
 
     virtual bool SetValueBool(bool value);
     virtual bool SetValueDbl(double value);
+    virtual bool SetValueArray(const std::vector<std::string> &values);
     virtual bool SetValue(std::string value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
@@ -273,8 +274,9 @@ public:
     OptionArray() {}
     virtual ~OptionArray() {}
     virtual void CopyTo(Option *option);
-    void Init(OptionGrp *grp = NULL);
+    void Init();
 
+    virtual bool SetValueArray(const std::vector<std::string> &values);
     virtual bool SetValue(std::string value);
     virtual std::string GetStrValue() const;
     virtual std::string GetDefaultStrValue() const;
@@ -316,7 +318,7 @@ public:
     bool SetValue(int value);
 
     std::vector<std::string> GetStrValues(bool withoutDefault) const;
-    std::string GetStrValuesAtStr(bool withoutDefault) const;
+    std::string GetStrValuesAsStr(bool withoutDefault) const;
 
 private:
     //
@@ -480,9 +482,10 @@ public:
     OptionBool m_noHeader;
     OptionBool m_noJustification;
     OptionInt m_pageHeight;
-    OptionInt m_pageLeftMar;
-    OptionInt m_pageRightMar;
-    OptionInt m_pageTopMar;
+    OptionInt m_pageMarginBottom;
+    OptionInt m_pageMarginLeft;
+    OptionInt m_pageMarginRight;
+    OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
     OptionDbl m_slurMaxHeight;
     OptionDbl m_slurMinHeight;

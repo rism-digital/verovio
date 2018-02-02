@@ -686,11 +686,11 @@ void MeiOutput::WritePage(pugi::xml_node currentNode, Page *page)
         currentNode.append_attribute("page.height")
             = StringFormat("%d", page->m_pageHeight / DEFINITION_FACTOR).c_str();
         currentNode.append_attribute("page.leftmar")
-            = StringFormat("%d", page->m_pageLeftMar / DEFINITION_FACTOR).c_str();
+            = StringFormat("%d", page->m_pageMarginLeft / DEFINITION_FACTOR).c_str();
         currentNode.append_attribute("page.rightmar")
-            = StringFormat("%d", page->m_pageRightMar / DEFINITION_FACTOR).c_str();
+            = StringFormat("%d", page->m_pageMarginRight / DEFINITION_FACTOR).c_str();
         currentNode.append_attribute("page.rightmar")
-            = StringFormat("%d", page->m_pageRightMar / DEFINITION_FACTOR).c_str();
+            = StringFormat("%d", page->m_pageMarginRight / DEFINITION_FACTOR).c_str();
     }
     if (!page->m_surface.empty()) {
         currentNode.append_attribute("surface") = page->m_surface.c_str();
@@ -2335,14 +2335,17 @@ bool MeiInput::ReadPage(pugi::xml_node page)
     if (page.attribute("page.width")) {
         vrvPage->m_pageWidth = atoi(page.attribute("page.width").value()) * DEFINITION_FACTOR;
     }
+    if (page.attribute("page.botmar")) {
+        vrvPage->m_pageMarginBottom = atoi(page.attribute("page.botmar").value()) * DEFINITION_FACTOR;
+    }
     if (page.attribute("page.leftmar")) {
-        vrvPage->m_pageLeftMar = atoi(page.attribute("page.leftmar").value()) * DEFINITION_FACTOR;
+        vrvPage->m_pageMarginLeft = atoi(page.attribute("page.leftmar").value()) * DEFINITION_FACTOR;
     }
     if (page.attribute("page.rightmar")) {
-        vrvPage->m_pageRightMar = atoi(page.attribute("page.rightmar").value()) * DEFINITION_FACTOR;
+        vrvPage->m_pageMarginRight = atoi(page.attribute("page.rightmar").value()) * DEFINITION_FACTOR;
     }
     if (page.attribute("page.topmar")) {
-        vrvPage->m_pageTopMar = atoi(page.attribute("page.topmar").value()) * DEFINITION_FACTOR;
+        vrvPage->m_pageMarginTop = atoi(page.attribute("page.topmar").value()) * DEFINITION_FACTOR;
     }
     if (page.attribute("surface")) {
         vrvPage->m_surface = page.attribute("surface").value();

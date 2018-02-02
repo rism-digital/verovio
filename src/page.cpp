@@ -52,9 +52,10 @@ void Page::Reset()
     // by default we have no values and use the document ones
     m_pageHeight = -1;
     m_pageWidth = -1;
-    m_pageLeftMar = 0;
-    m_pageRightMar = 0;
-    m_pageTopMar = 0;
+    m_pageMarginBottom = 0;
+    m_pageMarginLeft = 0;
+    m_pageMarginRight = 0;
+    m_pageMarginTop = 0;
     m_PPUFactor = 1.0;
 }
 
@@ -415,7 +416,7 @@ void Page::JustifyHorizontally()
     // Justify X position
     Functor justifyX(&Object::JustifyX);
     JustifyXParams justifyXParams(&justifyX);
-    justifyXParams.m_systemFullWidth = doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar;
+    justifyXParams.m_systemFullWidth = doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight;
     this->Process(&justifyX, &justifyXParams);
 }
 
@@ -449,7 +450,7 @@ int Page::GetContentHeight() const
 
     System *last = dynamic_cast<System *>(m_children.back());
     assert(last);
-    int height = doc->m_drawingPageHeight - doc->m_drawingPageTopMar - last->GetDrawingYRel() + last->GetHeight();
+    int height = doc->m_drawingPageHeight - doc->m_drawingPageMarginTop - last->GetDrawingYRel() + last->GetHeight();
 
     // Not sure what to do with the footer when adjusted page height is requested...
     // if (this->GetFooter()) {
@@ -523,9 +524,10 @@ int Page::ApplyPPUFactor(FunctorParams *functorParams)
     params->m_page = this;
     this->m_pageWidth /= params->m_page->GetPPUFactor();
     this->m_pageHeight /= params->m_page->GetPPUFactor();
-    this->m_pageTopMar /= params->m_page->GetPPUFactor();
-    this->m_pageLeftMar /= params->m_page->GetPPUFactor();
-    this->m_pageRightMar /= params->m_page->GetPPUFactor();
+    this->m_pageMarginBottom /= params->m_page->GetPPUFactor();
+    this->m_pageMarginLeft /= params->m_page->GetPPUFactor();
+    this->m_pageMarginRight /= params->m_page->GetPPUFactor();
+    this->m_pageMarginTop /= params->m_page->GetPPUFactor();
 
     return FUNCTOR_CONTINUE;
 }
@@ -592,7 +594,7 @@ int Page::AlignSystems(FunctorParams *functorParams)
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
         assert(doc);
         // We add twice the top margin, once for the origin moved at the top and one for the bottom margin
-        footer->SetDrawingYRel(footer->GetTotalHeight() + doc->m_drawingPageTopMar * 2);
+        footer->SetDrawingYRel(footer->GetTotalHeight() + doc->m_drawingPageMarginTop + doc->m_drawingPageMarginBot);
     }
 
     return FUNCTOR_CONTINUE;

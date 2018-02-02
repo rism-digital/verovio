@@ -68,10 +68,13 @@ public:
     bool SaveFile(const std::string &filename);
 
     /**
-     * Parse the options passed as JSON string.
-     * Only available for Emscripten-based compiles
-     **/
+     * @name Getter and setter for options as JSON string
+     */
+    ///@{
+    std::string GetOptions(bool defaultValues) const;
+    std::string GetAvailableOptions() const;
     bool SetOptions(const std::string &json_options);
+    ///@}
     
     /**
      * @name Getter and setter for single option
@@ -116,24 +119,24 @@ public:
      * Render the page in SVG and returns it as a string.
      * Page number is 1-based
      */
-    std::string RenderToSvg(int pageNo = 1, bool xml_declaration = false);
+    std::string RenderToSVG(int pageNo = 1, bool xml_declaration = false);
 
     /**
      * Render the page in SVG and save it to the file.
      * Page number is 1-based.
      */
-    bool RenderToSvgFile(const std::string &filename, int pageNo = 1);
+    bool RenderToSVGFile(const std::string &filename, int pageNo = 1);
 
     /**
      * Creates a midi file, opens it, and writes to it.
      * currently generates a dummy midi file.
      */
-    bool RenderToMidiFile(const std::string &filename);
+    bool RenderToMIDIFile(const std::string &filename);
 
     /**
      * Creates a midi file, opens it, and returns it (base64 encoded).
      */
-    std::string RenderToMidi();
+    std::string RenderToMIDI();
 
     /**
      * Creates a timemap file, and return it as a JSON string.

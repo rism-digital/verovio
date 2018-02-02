@@ -182,7 +182,7 @@ void display_usage()
             }
             if (optIntMap) {
                 cout << " (default: \"" << optIntMap->GetDefaultStrValue()
-                     << "\"; other values: " << optIntMap->GetStrValuesAtStr(true) << ")";
+                     << "\"; other values: " << optIntMap->GetStrValuesAsStr(true) << ")";
             }
             cout << endl;
         }
@@ -299,11 +299,12 @@ int main(int argc, char **argv)
             case 'a': all_pages = 1; break;
 
             case 'b':
-                LogWarning("Option -b and --border is deprecated; use --page-left-mar, --page-right-mar and "
-                           "--page-top-mar instead");
-                options->m_pageLeftMar.SetValue(optarg);
-                options->m_pageRightMar.SetValue(optarg);
-                options->m_pageTopMar.SetValue(optarg);
+                LogWarning("Option -b and --border is deprecated; use --page-margin-bottom, --page-margin-left, --page-margin-right and "
+                           "--page-margin-top instead");
+                options->m_pageMarginBottom.SetValue(optarg);
+                options->m_pageMarginLeft.SetValue(optarg);
+                options->m_pageMarginRight.SetValue(optarg);
+                options->m_pageMarginTop.SetValue(optarg);
                 break;
 
             case 'f':
@@ -471,9 +472,9 @@ int main(int argc, char **argv)
             }
             cur_outfile += ".svg";
             if (std_output) {
-                cout << toolkit.RenderToSvg(p);
+                cout << toolkit.RenderToSVG(p);
             }
-            else if (!toolkit.RenderToSvgFile(cur_outfile, p)) {
+            else if (!toolkit.RenderToSVGFile(cur_outfile, p)) {
                 cerr << "Unable to write SVG to " << cur_outfile << "." << endl;
                 exit(1);
             }
@@ -489,7 +490,7 @@ int main(int argc, char **argv)
             cerr << "Midi cannot write to standard output." << endl;
             exit(1);
         }
-        else if (!toolkit.RenderToMidiFile(outfile)) {
+        else if (!toolkit.RenderToMIDIFile(outfile)) {
             cerr << "Unable to write MIDI to " << outfile << "." << endl;
             exit(1);
         }

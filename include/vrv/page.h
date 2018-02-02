@@ -172,12 +172,14 @@ public:
     int m_pageWidth;
     /** Page height (MEI scoredef@page.height). Saved if != -1 */
     int m_pageHeight;
+    /** Page bottom margin (MEI scoredef@page.botmar). Saved if != 0 */
+    int m_pageMarginBottom;
     /** Page left margin (MEI scoredef@page.leftmar). Saved if != 0 */
-    short m_pageLeftMar;
+    int m_pageMarginLeft;
     /** Page right margin (MEI scoredef@page.rightmar). Saved if != 0 */
-    short m_pageRightMar;
+    int m_pageMarginRight;
     /** Page top margin (MEI scoredef@page.topmar). Saved if != 0 */
-    short m_pageTopMar;
+    int m_pageMarginTop;
     /**
      * Surface (MEI @surface). Saved as facsimile for transciption layout.
      * For now, the target of the <graphic> element within surface is loaded here.
