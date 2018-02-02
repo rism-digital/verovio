@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 ### Added
-* Adding getAvailableOptions and getOption(bool) methods to the JS toolkit
+* Adding getAvailableOptions and getOptions(bool) methods to the JS toolkit
 * Adding several layout options
 * Support for `<pgHead>`, `<pgHead2>`, `<pgFoot>` and `<pgFoot2>`
 * Support for `<lb>` within `<rend>`
