@@ -115,5 +115,5 @@ install(
 install(
     DIRECTORY ../data/
     DESTINATION share/verovio
-    FILES_MATCHING PATTERN "*.xml"
+    FILES_MATCHING PATTERN "*.xml" PATTERN "*.svg"
 )
