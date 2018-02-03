@@ -73,7 +73,7 @@ bool Toolkit::SetResourcePath(const std::string &path)
 {
     Resources::SetPath(path);
     return Resources::InitFonts();
-};
+}
 
 bool Toolkit::SetScale(int scale)
 {
@@ -520,11 +520,11 @@ bool Toolkit::SaveFile(const std::string &filename)
     }
     return true;
 }
-    
+
 std::string Toolkit::GetOptions(bool defaultValues) const
 {
     jsonxx::Object o;
-    
+
     const MapOfStrOptions *params = m_options->GetItems();
     MapOfStrOptions::const_iterator iter;
     for (iter = params->begin(); iter != params->end(); iter++) {
@@ -532,7 +532,7 @@ std::string Toolkit::GetOptions(bool defaultValues) const
         const OptionInt *optInt = dynamic_cast<const OptionInt *>(iter->second);
         const OptionBool *optBool = dynamic_cast<const OptionBool *>(iter->second);
         const OptionArray *optArray = dynamic_cast<const OptionArray *>(iter->second);
-        
+
         if (optDbl) {
             double dblValue = (defaultValues) ? optDbl->GetDefault() : optDbl->GetValue();
             jsonxx::Value value(dblValue);
@@ -551,13 +551,14 @@ std::string Toolkit::GetOptions(bool defaultValues) const
             vector<string> strValues = (defaultValues) ? optArray->GetDefault() : optArray->GetValue();
             vector<string>::iterator strIter;
             jsonxx::Array values;
-            for(strIter = strValues.begin(); strIter != strValues.end(); strIter++) {
+            for (strIter = strValues.begin(); strIter != strValues.end(); strIter++) {
                 values << (*strIter);
             }
             o << iter->first << values;
         }
         else {
-            std::string stringValue = (defaultValues) ? iter->second->GetDefaultStrValue() : iter->second->GetStrValue();
+            std::string stringValue
+                = (defaultValues) ? iter->second->GetDefaultStrValue() : iter->second->GetStrValue();
             o << iter->first << stringValue;
         }
     }
@@ -569,40 +570,41 @@ std::string Toolkit::GetAvailableOptions() const
 {
     jsonxx::Object o;
     jsonxx::Object grps;
-    
+
     std::vector<OptionGrp *> *grp = m_options->GetGrps();
     std::vector<OptionGrp *>::iterator grpIter;
-    
+
     for (grpIter = grp->begin(); grpIter != grp->end(); grpIter++) {
-        
+
         jsonxx::Object grp;
         grp << "name" << (*grpIter)->GetLabel();
-        
+
         jsonxx::Object opts;
 
         const std::vector<Option *> *options = (*grpIter)->GetOptions();
         std::vector<Option *>::const_iterator iter;
-        
+
         for (iter = options->begin(); iter != options->end(); iter++) {
-            
+
             jsonxx::Object opt;
             opt << "title" << (*iter)->GetTitle();
             opt << "description" << (*iter)->GetDescription();
-            
+
             const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(*iter);
             const OptionInt *optInt = dynamic_cast<const OptionInt *>(*iter);
             const OptionIntMap *optIntMap = dynamic_cast<const OptionIntMap *>(*iter);
             const OptionString *optString = dynamic_cast<const OptionString *>(*iter);
             const OptionArray *optArray = dynamic_cast<const OptionArray *>(*iter);
             const OptionBool *optBool = dynamic_cast<const OptionBool *>(*iter);
-            
+
             if (optBool) {
-                opt << "type" << "bool";
+                opt << "type"
+                    << "bool";
                 opt << "default" << optBool->GetDefault();
-                
             }
             else if (optDbl) {
-                opt << "type" << "double";
+                opt << "type"
+                    << "double";
                 jsonxx::Value value(optDbl->GetDefault());
                 value.precision_ = 2;
                 opt << "default" << value;
@@ -614,32 +616,36 @@ std::string Toolkit::GetAvailableOptions() const
                 opt << "max" << value;
             }
             else if (optInt) {
-                opt << "type" << "int";
+                opt << "type"
+                    << "int";
                 opt << "default" << optInt->GetDefault();
                 opt << "min" << optInt->GetMin();
                 opt << "max" << optInt->GetMax();
             }
             else if (optString) {
-                opt << "type" << "string";
+                opt << "type"
+                    << "string";
                 opt << "default" << optString->GetDefault();
             }
             else if (optArray) {
-                opt << "type" << "array";
+                opt << "type"
+                    << "array";
                 vector<string> strValues = optArray->GetDefault();
                 vector<string>::iterator strIter;
                 jsonxx::Array values;
-                for(strIter = strValues.begin(); strIter != strValues.end(); strIter++) {
+                for (strIter = strValues.begin(); strIter != strValues.end(); strIter++) {
                     values << (*strIter);
                 }
                 opt << "default" << values;
             }
             else if (optIntMap) {
-                opt << "type" << "string";
+                opt << "type"
+                    << "string";
                 opt << "default" << optIntMap->GetDefaultStrValue();
                 vector<string> strValues = optIntMap->GetStrValues(false);
                 vector<string>::iterator strIter;
                 jsonxx::Array values;
-                for(strIter = strValues.begin(); strIter != strValues.end(); strIter++) {
+                for (strIter = strValues.begin(); strIter != strValues.end(); strIter++) {
                     values << (*strIter);
                 }
                 opt << "values" << values;
@@ -647,17 +653,16 @@ std::string Toolkit::GetAvailableOptions() const
 
             opts << (*iter)->GetKey() << opt;
         }
-        
+
         grp << "options" << opts;
         grps << (*grpIter)->GetId() << grp;
-        
     }
-    
+
     o << "groups" << grps;
 
     return o.json();
 }
-    
+
 bool Toolkit::SetOptions(const std::string &json_options)
 {
     jsonxx::Object json;
@@ -700,10 +705,10 @@ bool Toolkit::SetOptions(const std::string &json_options)
                     if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
                 }
                 opt->SetValueArray(queries);
-                
             }
             else if (iter->first == "border") {
-                LogWarning("Option border is deprecated; use pageMarginBottom, pageMarginLeft, pageMarginRight and pageMarginTop instead");
+                LogWarning("Option border is deprecated; use pageMarginBottom, pageMarginLeft, pageMarginRight and "
+                           "pageMarginTop instead");
                 Option *opt = NULL;
                 if (json.has<jsonxx::Number>("border")) {
                     double border = json.get<jsonxx::Number>("border");
@@ -812,7 +817,7 @@ std::string Toolkit::GetOption(const std::string &option, bool defaultValue) con
     assert(opt);
     return (defaultValue) ? opt->GetDefaultStrValue() : opt->GetStrValue();
 }
-    
+
 bool Toolkit::SetOption(const std::string &option, const std::string &value)
 {
     if (m_options->GetItems()->count(option) == 0) {
@@ -823,7 +828,7 @@ bool Toolkit::SetOption(const std::string &option, const std::string &value)
     assert(opt);
     return opt->SetValue(value);
 }
-    
+
 std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
     jsonxx::Object o;

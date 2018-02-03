@@ -891,7 +891,7 @@ void MeiOutput::WriteFb(pugi::xml_node currentNode, Fb *fb)
     assert(fb);
 
     WriteXmlId(currentNode, fb);
-};
+}
 
 void MeiOutput::WriteControlElement(pugi::xml_node currentNode, ControlElement *controlElement)
 {
@@ -920,7 +920,7 @@ void MeiOutput::WriteArpeg(pugi::xml_node currentNode, Arpeg *arpeg)
     arpeg->WriteArpegLog(currentNode);
     arpeg->WriteArpegVis(currentNode);
     arpeg->WriteColor(currentNode);
-};
+}
 
 void MeiOutput::WriteBreath(pugi::xml_node currentNode, Breath *breath)
 {
@@ -930,7 +930,7 @@ void MeiOutput::WriteBreath(pugi::xml_node currentNode, Breath *breath)
     WriteTimePointInterface(currentNode, breath);
     breath->WriteColor(currentNode);
     breath->WritePlacement(currentNode);
-};
+}
 
 void MeiOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
 {
@@ -940,7 +940,7 @@ void MeiOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
     WriteTextDirInterface(currentNode, dir);
     WriteTimeSpanningInterface(currentNode, dir);
     dir->WriteLang(currentNode);
-};
+}
 
 void MeiOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
 {
@@ -949,7 +949,7 @@ void MeiOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteControlElement(currentNode, dynam);
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
-};
+}
 
 void MeiOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
 {
@@ -960,7 +960,7 @@ void MeiOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
     fermata->WriteColor(currentNode);
     fermata->WriteFermataVis(currentNode);
     fermata->WritePlacement(currentNode);
-};
+}
 
 void MeiOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
 {
@@ -971,7 +971,7 @@ void MeiOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     hairpin->WriteColor(currentNode);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WritePlacement(currentNode);
-};
+}
 
 void MeiOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
 {
@@ -981,7 +981,7 @@ void MeiOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
     WriteTextDirInterface(currentNode, harm);
     WriteTimeSpanningInterface(currentNode, harm);
     harm->WriteLang(currentNode);
-};
+}
 
 void MeiOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
 {
@@ -993,7 +993,7 @@ void MeiOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
     mordent->WriteOrnamentAccid(currentNode);
     mordent->WritePlacement(currentNode);
     mordent->WriteMordentLog(currentNode);
-};
+}
 
 void MeiOutput::WriteOctave(pugi::xml_node currentNode, Octave *octave)
 {
@@ -1004,7 +1004,7 @@ void MeiOutput::WriteOctave(pugi::xml_node currentNode, Octave *octave)
     octave->WriteColor(currentNode);
     octave->WriteLineRendBase(currentNode);
     octave->WriteOctaveDisplacement(currentNode);
-};
+}
 
 void MeiOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
 {
@@ -1015,7 +1015,7 @@ void MeiOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WriteColor(currentNode);
     pedal->WritePedalLog(currentNode);
     pedal->WritePlacement(currentNode);
-};
+}
 
 void MeiOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
 {
@@ -1025,7 +1025,7 @@ void MeiOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
     WriteTimeSpanningInterface(currentNode, slur);
     slur->WriteColor(currentNode);
     slur->WriteCurvature(currentNode);
-};
+}
 
 void MeiOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
 {
@@ -1062,7 +1062,7 @@ void MeiOutput::WriteTie(pugi::xml_node currentNode, Tie *tie)
     WriteTimeSpanningInterface(currentNode, tie);
     tie->WriteColor(currentNode);
     tie->WriteCurvature(currentNode);
-};
+}
 
 void MeiOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
 {
@@ -1073,7 +1073,7 @@ void MeiOutput::WriteTrill(pugi::xml_node currentNode, Trill *trill)
     trill->WriteColor(currentNode);
     trill->WriteOrnamentAccid(currentNode);
     trill->WritePlacement(currentNode);
-};
+}
 
 void MeiOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
 {
@@ -1085,7 +1085,7 @@ void MeiOutput::WriteTurn(pugi::xml_node currentNode, Turn *turn)
     turn->WriteOrnamentAccid(currentNode);
     turn->WritePlacement(currentNode);
     turn->WriteTurnLog(currentNode);
-};
+}
 
 void MeiOutput::WriteLayer(pugi::xml_node currentNode, Layer *layer)
 {
@@ -1406,7 +1406,7 @@ void MeiOutput::WriteF(pugi::xml_node currentNode, F *figure)
     assert(figure);
 
     WriteTextElement(currentNode, figure);
-};
+}
 
 void MeiOutput::WriteFig(pugi::xml_node currentNode, Fig *fig)
 {
@@ -1414,7 +1414,7 @@ void MeiOutput::WriteFig(pugi::xml_node currentNode, Fig *fig)
 
     WriteTextElement(currentNode, fig);
     WriteAreaPosInterface(currentNode, fig);
-};
+}
 
 void MeiOutput::WriteLb(pugi::xml_node currentNode, Lb *lb)
 {
@@ -1458,7 +1458,7 @@ void MeiOutput::WriteSvg(pugi::xml_node currentNode, Svg *svg)
     for (pugi::xml_node child : svgNode.children()) {
         currentNode.append_copy(child);
     }
-};
+}
 
 void MeiOutput::WriteText(pugi::xml_node element, Text *text)
 {
@@ -1580,7 +1580,7 @@ void MeiOutput::WriteAbbr(pugi::xml_node currentNode, Abbr *abbr)
 
     WriteEditorialElement(currentNode, abbr);
     abbr->WriteSource(currentNode);
-};
+}
 
 void MeiOutput::WriteAdd(pugi::xml_node currentNode, Add *add)
 {
@@ -1588,7 +1588,7 @@ void MeiOutput::WriteAdd(pugi::xml_node currentNode, Add *add)
 
     WriteEditorialElement(currentNode, add);
     add->WriteSource(currentNode);
-};
+}
 
 void MeiOutput::WriteAnnot(pugi::xml_node currentNode, Annot *annot)
 {
@@ -1601,21 +1601,21 @@ void MeiOutput::WriteAnnot(pugi::xml_node currentNode, Annot *annot)
     for (pugi::xml_node child = annot->m_content.first_child(); child; child = child.next_sibling()) {
         currentNode.append_copy(child);
     }
-};
+}
 
 void MeiOutput::WriteApp(pugi::xml_node currentNode, App *app)
 {
     assert(app);
 
     WriteEditorialElement(currentNode, app);
-};
+}
 
 void MeiOutput::WriteChoice(pugi::xml_node currentNode, Choice *choice)
 {
     assert(choice);
 
     WriteEditorialElement(currentNode, choice);
-};
+}
 
 void MeiOutput::WriteCorr(pugi::xml_node currentNode, Corr *corr)
 {
@@ -1623,7 +1623,7 @@ void MeiOutput::WriteCorr(pugi::xml_node currentNode, Corr *corr)
 
     WriteEditorialElement(currentNode, corr);
     corr->WriteSource(currentNode);
-};
+}
 
 void MeiOutput::WriteDamage(pugi::xml_node currentNode, Damage *damage)
 {
@@ -1631,7 +1631,7 @@ void MeiOutput::WriteDamage(pugi::xml_node currentNode, Damage *damage)
 
     WriteEditorialElement(currentNode, damage);
     damage->WriteSource(currentNode);
-};
+}
 
 void MeiOutput::WriteDel(pugi::xml_node currentNode, Del *del)
 {
@@ -1639,7 +1639,7 @@ void MeiOutput::WriteDel(pugi::xml_node currentNode, Del *del)
 
     WriteEditorialElement(currentNode, del);
     del->WriteSource(currentNode);
-};
+}
 
 void MeiOutput::WriteExpan(pugi::xml_node currentNode, Expan *expan)
 {
@@ -1647,7 +1647,7 @@ void MeiOutput::WriteExpan(pugi::xml_node currentNode, Expan *expan)
 
     WriteEditorialElement(currentNode, expan);
     expan->WriteSource(currentNode);
-};
+}
 
 void MeiOutput::WriteLem(pugi::xml_node currentNode, Lem *lem)
 {
@@ -1655,7 +1655,7 @@ void MeiOutput::WriteLem(pugi::xml_node currentNode, Lem *lem)
 
     WriteEditorialElement(currentNode, lem);
     lem->WriteSource(currentNode);
-};
+}
 
 void MeiOutput::WriteOrig(pugi::xml_node currentNode, Orig *orig)
 {
@@ -1663,7 +1663,7 @@ void MeiOutput::WriteOrig(pugi::xml_node currentNode, Orig *orig)
 
     WriteEditorialElement(currentNode, orig);
     orig->WriteSource(currentNode);
-};
+}
 
 void MeiOutput::WriteRdg(pugi::xml_node currentNode, Rdg *rdg)
 {
@@ -1671,7 +1671,7 @@ void MeiOutput::WriteRdg(pugi::xml_node currentNode, Rdg *rdg)
 
     WriteEditorialElement(currentNode, rdg);
     rdg->WriteSource(currentNode);
-};
+}
 
 void MeiOutput::WriteReg(pugi::xml_node currentNode, Reg *reg)
 {
@@ -1679,7 +1679,7 @@ void MeiOutput::WriteReg(pugi::xml_node currentNode, Reg *reg)
 
     WriteEditorialElement(currentNode, reg);
     reg->WriteSource(currentNode);
-};
+}
 
 void MeiOutput::WriteRestore(pugi::xml_node currentNode, Restore *restore)
 {
@@ -1689,7 +1689,7 @@ void MeiOutput::WriteRestore(pugi::xml_node currentNode, Restore *restore)
     restore->WriteSource(currentNode);
 
     return;
-};
+}
 
 void MeiOutput::WriteSic(pugi::xml_node currentNode, Sic *sic)
 {
@@ -1697,7 +1697,7 @@ void MeiOutput::WriteSic(pugi::xml_node currentNode, Sic *sic)
 
     WriteEditorialElement(currentNode, sic);
     sic->WriteSource(currentNode);
-};
+}
 
 void MeiOutput::WriteSupplied(pugi::xml_node currentNode, Supplied *supplied)
 {
@@ -1705,7 +1705,7 @@ void MeiOutput::WriteSupplied(pugi::xml_node currentNode, Supplied *supplied)
 
     WriteEditorialElement(currentNode, supplied);
     supplied->WriteSource(currentNode);
-};
+}
 
 void MeiOutput::WriteUnclear(pugi::xml_node currentNode, Unclear *unclear)
 {
@@ -1713,7 +1713,7 @@ void MeiOutput::WriteUnclear(pugi::xml_node currentNode, Unclear *unclear)
 
     WriteEditorialElement(currentNode, unclear);
     unclear->WriteSource(currentNode);
-};
+}
 
 std::wstring MeiOutput::EscapeSMuFL(std::wstring data)
 {
