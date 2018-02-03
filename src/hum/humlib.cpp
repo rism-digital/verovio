@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jan 29 05:28:59 PST 2018
+// Last Modified: Fri Feb  2 21:58:15 PST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -4182,7 +4182,7 @@ void GridSlice::addToken(const string& tok, int parti, int staffi, int voicei) {
 	}
 
 	if (staffi >= (int)this->at(parti)->size()) {
-		int ssize = this->at(parti)->size();
+		int ssize = (int)this->at(parti)->size();
 		for (int i=ssize; i<=staffi; i++) {
 			GridStaff* gs = new GridStaff;
 			this->at(parti)->push_back(gs);
@@ -5678,7 +5678,7 @@ int  HumGrid::getPartCount(void) {
 		return 0;
 	}
 
-	return this->at(0)->back()->size();
+	return (int)this->at(0)->back()->size();
 }
 
 
@@ -5697,7 +5697,7 @@ int HumGrid::getStaffCount(int partindex) {
 		return 0;
 	}
 
-	return this->at(0)->back()->at(partindex)->size();
+	return (int)this->at(0)->back()->at(partindex)->size();
 }
 
 
@@ -39186,7 +39186,7 @@ void Tool_mei2hum::parseHairpin(xml_node hairpin, HumNum starttime) {
 		m_hairpins.resize(m_hairpins.size() + 1);
 		m_hairpins.back().hairpin = hairpin;
 		m_hairpins.back().gm = *it;
-		m_hairpins.back().mindex = m_currentMeterUnit.size() - 1;
+		m_hairpins.back().mindex = ((int)m_currentMeterUnit.size()) - 1;
 	}
 }
 
@@ -39587,7 +39587,7 @@ bool Tool_mei2hum::beamIsValid(vector<xml_node>& beamlist) {
 //
 
 void Tool_mei2hum::processGraceNotes(HumNum timestamp) {
-	int size = m_gracenotes.size();
+	int size = (int)m_gracenotes.size();
 	int counter = 1;
 	string output;
 	for (int i=size-1; i>=0; i--) {
@@ -43068,7 +43068,7 @@ void Tool_musicxml2hum::insertPartNames(HumGrid& outdata, vector<MxmlPart>& part
 			}
 			string abbr = "*I'" + partabbr;
 			maxstaff = outdata.getStaffCount(i);
-			gm->addLabelAbbrToken(abbr, 0, i, maxstaff-1, 0, partdata.size(), maxstaff);
+			gm->addLabelAbbrToken(abbr, 0, i, maxstaff-1, 0, (int)partdata.size(), maxstaff);
 		}
 	}
 
@@ -43088,7 +43088,7 @@ void Tool_musicxml2hum::insertPartNames(HumGrid& outdata, vector<MxmlPart>& part
 			}
 			string name = "*I\"" + partname;
 			maxstaff = outdata.getStaffCount(i);
-			gm->addLabelToken(name, 0, i, maxstaff-1, 0, partdata.size(), maxstaff);
+			gm->addLabelToken(name, 0, i, maxstaff-1, 0, (int)partdata.size(), maxstaff);
 		}
 	}
 
