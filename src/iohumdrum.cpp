@@ -51,6 +51,7 @@
 #include "ending.h"
 #include "fb.h"
 #include "fermata.h"
+#include "fig.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "iomei.h"
@@ -62,6 +63,7 @@
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
+#include "num.h"
 #include "octave.h"
 #include "page.h"
 #include "pedal.h"
@@ -610,7 +612,7 @@ void HumdrumInput::createHeader()
     std::string OTL = getReferenceValue("OTL", references);
     pugi::xml_node title = fileTitle.append_child("title");
     if (!OTL.empty()) {
-        title.append_child(pugi::node_pcdata).set_value(OTL.c_str());
+        title.append_child(pugi::node_pcdata).set_value(unescapeHtmlEntities(OTL).c_str());
     }
 
     // <pubStmt> /////////////
@@ -1442,8 +1444,9 @@ void HumdrumInput::prepareHeaderFooter()
 // <pgHead>
 //
 
-void HumdrumInput::prepareHeader(std::map<std::string, std::string> &refmap)
+bool HumdrumInput::prepareHeader(std::map<std::string, std::string> &refmap)
 {
+    std::string headerText;
     std::string title;
 
     auto it = refmap.find("OTL");
@@ -1457,41 +1460,17 @@ void HumdrumInput::prepareHeader(std::map<std::string, std::string> &refmap)
         rime = itrime->second;
     }
 
-    PgHead *pghead = NULL;
-
     // <rend fontsize="x-large">Non è questa la mano (<rend fontstyle="italic">Rime</rend> 47)</rend>
     if (!title.empty()) {
+        headerText += "<rend halign=\"center\" valign=\"middle\">\n";
+        headerText += "   <rend fontsize=\"x-large\">";
+        headerText += unescapeHtmlEntities(title);
         if (!rime.empty()) {
-            title += " (";
+            headerText += " (<rend fontstyle=\"italic\">Rime</rend> ";
+            headerText += rime;
+            headerText += ")</rend>\n";
         }
-        title = unescapeHtmlEntities(title);
-        pghead = new PgHead;
-        m_doc->m_scoreDef.AddChild(pghead);
-        Rend *rend1 = new Rend;
-        pghead->AddChild(rend1);
-        rend1->SetHalign(HORIZONTALALIGNMENT_center);
-        rend1->SetValign(VERTICALALIGNMENT_middle);
-        Att att;
-        rend1->SetFontsize(att.StrToFontsize("x-large", true));
-        Text *vrvTitle = new Text();
-        rend1->AddChild(vrvTitle);
-        std::wstring str = UTF8to16(title);
-        vrvTitle->SetText(str);
-        if (!rime.empty()) {
-            Rend *rend11 = new Rend;
-            rend1->AddChild(rend11);
-            rend11->SetFontstyle(FONTSTYLE_italic);
-            Text *vrvRime = new Text;
-            std::wstring str = UTF8to16("Rime");
-            vrvRime->SetText(str);
-            rend11->AddChild(vrvRime);
-            Text *vrvRime2 = new Text;
-            std::wstring str2 = UTF8to16(" " + rime + ")");
-            vrvRime2->SetText(str2);
-            rend1->AddChild(vrvRime2);
-            // Lb *lb = new Lb;
-            // rend1->AddChild(lb);
-        }
+        headerText += "</rend>\n";
     }
 
     std::string composer;
@@ -1509,24 +1488,194 @@ void HumdrumInput::prepareHeader(std::map<std::string, std::string> &refmap)
         }
     }
 
-    //     <rend halign="right" valign="bottom">Composer's name</rend>
+    // <rend fontsize="small" halign="right" valign="bottom">Composer's name</rend>
     if (!composer.empty()) {
-        composer = unescapeHtmlEntities(composer);
-        if (!pghead) {
-            pghead = new PgHead;
-            m_doc->m_scoreDef.AddChild(pghead);
-        }
-        Rend *rend2 = new Rend;
-        pghead->AddChild(rend2);
-        rend2->SetHalign(HORIZONTALALIGNMENT_right);
-        rend2->SetValign(VERTICALALIGNMENT_bottom);
-        Text *vrvComposer = new Text();
-        rend2->AddChild(vrvComposer);
-        std::wstring str = UTF8to16(composer);
-        vrvComposer->SetText(str);
-        Att att;
-        rend2->SetFontsize(att.StrToFontsize("small", true));
+        headerText += "<rend fontsize=\"small\" halign=\"right\" valign=\"bottom\">";
+        headerText += composer;
+        headerText += "</rend>\n";
     }
+
+    if (headerText.empty()) {
+        return false;
+    }
+
+    headerText = "<root>" + headerText + "</root>";
+
+    PgHead *pghead = new PgHead;
+    m_doc->m_scoreDef.AddChild(pghead);
+
+    pugi::xml_document tmpdoc;
+    pugi::xml_parse_result result = tmpdoc.load(headerText.c_str());
+    if (!result) {
+        // some sort of error, so give up;
+        cerr << "Page Header parse error: " << result.description() << endl;
+        cerr << headerText << endl;
+        return false;
+    }
+
+    // ReadRunningElement(tmpdoc.document_element(), pghead);
+    return ReadRunningChildren(pghead, tmpdoc.document_element(), pghead);
+    // gggg
+}
+
+//////////////////////////////
+//
+// HumdrumInput::ReadRunningChildren -- Adapted from MeiInput class.
+//
+
+bool HumdrumInput::ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Object *filter)
+{
+    bool success = true;
+    pugi::xml_node xmlElement;
+    std::string elementName;
+    int i = 0;
+    for (xmlElement = parentNode.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
+        if (!success) {
+            break;
+        }
+        elementName = std::string(xmlElement.name());
+        if (filter && !MeiInput::IsAllowed(elementName, filter)) {
+            std::string meiElementName = filter->GetClassName();
+            std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
+            LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
+                meiElementName.c_str());
+            continue;
+        }
+        // editorial
+        // if (IsEditorialElementName(xmlElement.name())) {
+        //     success = ReadEditorialElement(parent, xmlElement, EDITORIAL_RUNNING, filter);
+        // }
+        // content
+        else if (elementName == "fig") {
+            success = ReadFig(parent, xmlElement);
+        }
+        else if (elementName == "rend") {
+            success = ReadRend(parent, xmlElement);
+        }
+        // unknown
+        else {
+            LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
+        }
+        i++;
+    }
+    return success;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::ReadRend -- Adapted from MeiInput class.
+//
+
+bool HumdrumInput::ReadRend(Object *parent, pugi::xml_node rend)
+{
+    Rend *vrvRend = new Rend();
+    MeiInput::ReadTextElement(rend, vrvRend);
+    MeiInput::ReadAreaPosInterface(rend, vrvRend);
+
+    vrvRend->ReadColor(rend);
+    vrvRend->ReadLang(rend);
+    vrvRend->ReadTypography(rend);
+    vrvRend->ReadWhitespace(rend);
+
+    parent->AddChild(vrvRend);
+
+    if (vrvRend->GetFirstParent(REND) && (vrvRend->HasHalign() || vrvRend->HasValign())) {
+        LogWarning("@halign or @valign in nested <rend> element <rend> %s will be ignored", vrvRend->GetUuid().c_str());
+        // Eventually to be added to unsupported attributes?
+        vrvRend->SetHalign(HORIZONTALALIGNMENT_NONE);
+        vrvRend->SetValign(VERTICALALIGNMENT_NONE);
+    }
+
+    return ReadTextChildren(vrvRend, rend, vrvRend);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::ReadTextChildren -- Adapted from MeiInput class.
+//
+
+bool HumdrumInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Object *filter)
+{
+    bool success = true;
+    pugi::xml_node xmlElement;
+    std::string elementName;
+    int i = 0;
+    for (xmlElement = parentNode.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
+        if (!success) {
+            break;
+        }
+        elementName = std::string(xmlElement.name());
+        if (filter && !MeiInput::IsAllowed(elementName, filter)) {
+            std::string meiElementName = filter->GetClassName();
+            std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
+            LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
+                meiElementName.c_str());
+            continue;
+        }
+        // editorial
+        // else if (IsEditorialElementName(xmlElement.name())) {
+        //    success = ReadEditorialElement(parent, xmlElement, EDITORIAL_TEXT, filter);
+        //}
+        // content
+        else if (elementName == "fig") {
+            success = ReadFig(parent, xmlElement);
+        }
+        else if (elementName == "lb") {
+            success = MeiInput::ReadLb(parent, xmlElement);
+        }
+        else if (elementName == "num") {
+            success = ReadNum(parent, xmlElement);
+        }
+        else if (elementName == "rend") {
+            success = ReadRend(parent, xmlElement);
+        }
+        else if (elementName == "svg") {
+            success = MeiInput::ReadSvg(parent, xmlElement);
+        }
+        else if (xmlElement.text()) {
+            bool trimLeft = (i == 0);
+            bool trimRight = (!xmlElement.next_sibling());
+            success = MeiInput::ReadText(parent, xmlElement, trimLeft, trimRight);
+        }
+        // figured bass
+        else if (elementName == "fb") {
+            // success = ReadFb(parent, xmlElement);
+        }
+        // unknown
+        else {
+            LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
+        }
+        i++;
+    }
+    return success;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::ReadFig -- Adapted from MeiInput class.
+//
+
+bool HumdrumInput::ReadFig(Object *parent, pugi::xml_node fig)
+{
+    Fig *vrvFig = new Fig();
+    MeiInput::ReadTextElement(fig, vrvFig);
+    MeiInput::ReadAreaPosInterface(fig, vrvFig);
+    parent->AddChild(vrvFig);
+    return ReadTextChildren(vrvFig, fig, vrvFig);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::ReadNum -- Adpated from MeiInput class.
+//
+
+bool HumdrumInput::ReadNum(Object *parent, pugi::xml_node num)
+{
+    Num *vrvNum = new Num();
+    MeiInput::ReadTextElement(num, vrvNum);
+    vrvNum->ReadLabelled(num);
+    parent->AddChild(vrvNum);
+    return ReadTextChildren(vrvNum, num, vrvNum);
 }
 
 //////////////////////////////

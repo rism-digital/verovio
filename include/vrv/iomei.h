@@ -643,6 +643,8 @@ private:
      * A static array for storing the implemented editorial elements
      */
     static std::vector<std::string> s_editorialElementNames;
+
+    friend class HumdrumInput;
 };
 
 } // namespace vrv

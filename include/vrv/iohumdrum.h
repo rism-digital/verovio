@@ -19,6 +19,7 @@
 #include "clef.h"
 #include "ending.h"
 #include "io.h"
+#include "runningelement.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -368,7 +369,12 @@ protected:
     bool hasAboveParameter(hum::HTp token, const string &category);
     bool hasBelowParameter(hum::HTp token, const string &category);
     void prepareHeaderFooter();
-	void prepareHeader(std::map<std::string, std::string>& refmap);
+    bool prepareHeader(std::map<std::string, std::string> &refmap);
+    bool ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Object *filter);
+    bool ReadTextChildren(Object *parent, pugi::xml_node parentNode, Object *filter);
+    bool ReadRend(Object *parent, pugi::xml_node rend);
+    bool ReadFig(Object *parent, pugi::xml_node fig);
+    bool ReadNum(Object *parent, pugi::xml_node num);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
