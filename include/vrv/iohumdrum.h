@@ -367,6 +367,8 @@ protected:
     bool isFirstTokenOnStaff(hum::HTp token);
     bool hasAboveParameter(hum::HTp token, const string &category);
     bool hasBelowParameter(hum::HTp token, const string &category);
+    void prepareHeaderFooter();
+	void prepareHeader(std::map<std::string, std::string>& refmap);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

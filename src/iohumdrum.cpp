@@ -42,6 +42,7 @@
 #include "accid.h"
 #include "arpeg.h"
 #include "artic.h"
+#include "att.h"
 #include "beam.h"
 #include "chord.h"
 #include "dir.h"
@@ -55,6 +56,7 @@
 #include "iomei.h"
 #include "label.h"
 #include "layer.h"
+#include "lb.h"
 #include "measure.h"
 #include "mordent.h"
 #include "mrest.h"
@@ -63,6 +65,7 @@
 #include "octave.h"
 #include "page.h"
 #include "pedal.h"
+#include "pghead.h"
 #include "rend.h"
 #include "rest.h"
 #include "score.h"
@@ -525,6 +528,7 @@ bool HumdrumInput::convertHumdrum()
     prepareEndings();
 
     prepareStaffGroups();
+    prepareHeaderFooter();
 
     // m_meausreIndex not currently used but might be useful sometime.
     m_measureIndex = 0;
@@ -1399,6 +1403,129 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                 }
             }
         }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::prepareHeaderFooter --
+//
+//
+
+void HumdrumInput::prepareHeaderFooter()
+{
+    hum::HumdrumFile &infile = m_infile;
+
+    std::vector<hum::HumdrumLine *> records = infile.getReferenceRecords();
+    std::map<std::string, std::string> refmap;
+    for (int i = 0; i < (int)records.size(); i++) {
+        string key = records[i]->getReferenceKey();
+        string value = records[i]->getReferenceValue();
+        refmap[key] = value;
+    }
+
+    prepareHeader(refmap);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::prepareHeader --
+//
+// <pgHead>
+//     <rend halign="center" valign="middle">
+//         <rend fontsize="x-large">Non è questa la mano (<rend fontstyle="italic">Rime</rend> 47)</rend>
+//         <lb/>
+//         <rend fontsize="small"><rend fontstyle="italic">Il primo libro de madrigali a quattro voci. </rend>(Venice:
+//         Gardano, 1579)</rend>
+//     </rend>
+//     <rend halign="right" valign="bottom">Benedetto Pallavicino</rend>
+// <pgHead>
+//
+
+void HumdrumInput::prepareHeader(std::map<std::string, std::string> &refmap)
+{
+    std::string title;
+
+    auto it = refmap.find("OTL");
+    if (it != refmap.end()) {
+        title = it->second;
+    }
+
+    std::string rime;
+    auto itrime = refmap.find("rime");
+    if (itrime != refmap.end()) {
+        rime = itrime->second;
+    }
+
+    PgHead *pghead = NULL;
+
+    // <rend fontsize="x-large">Non è questa la mano (<rend fontstyle="italic">Rime</rend> 47)</rend>
+    if (!title.empty()) {
+        if (!rime.empty()) {
+            title += " (";
+        }
+        title = unescapeHtmlEntities(title);
+        pghead = new PgHead;
+        m_doc->m_scoreDef.AddChild(pghead);
+        Rend *rend1 = new Rend;
+        pghead->AddChild(rend1);
+        rend1->SetHalign(HORIZONTALALIGNMENT_center);
+        rend1->SetValign(VERTICALALIGNMENT_middle);
+        Att att;
+        rend1->SetFontsize(att.StrToFontsize("x-large", true));
+        Text *vrvTitle = new Text();
+        rend1->AddChild(vrvTitle);
+        std::wstring str = UTF8to16(title);
+        vrvTitle->SetText(str);
+        if (!rime.empty()) {
+            Rend *rend11 = new Rend;
+            rend1->AddChild(rend11);
+            rend11->SetFontstyle(FONTSTYLE_italic);
+            Text *vrvRime = new Text;
+            std::wstring str = UTF8to16("Rime");
+            vrvRime->SetText(str);
+            rend11->AddChild(vrvRime);
+            Text *vrvRime2 = new Text;
+            std::wstring str2 = UTF8to16(" " + rime + ")");
+            vrvRime2->SetText(str2);
+            rend1->AddChild(vrvRime2);
+            // Lb *lb = new Lb;
+            // rend1->AddChild(lb);
+        }
+    }
+
+    std::string composer;
+    auto it2 = refmap.find("COM");
+    if (it2 != refmap.end()) {
+        std::string name = it2->second;
+        auto pos = name.find(",");
+        if (pos == std::string::npos) {
+            composer = name;
+        }
+        else {
+            std::string lastname = name.substr(0, pos);
+            std::string firstname = name.substr(pos + 1);
+            composer = firstname + " " + lastname;
+        }
+    }
+
+    //     <rend halign="right" valign="bottom">Composer's name</rend>
+    if (!composer.empty()) {
+        composer = unescapeHtmlEntities(composer);
+        if (!pghead) {
+            pghead = new PgHead;
+            m_doc->m_scoreDef.AddChild(pghead);
+        }
+        Rend *rend2 = new Rend;
+        pghead->AddChild(rend2);
+        rend2->SetHalign(HORIZONTALALIGNMENT_right);
+        rend2->SetValign(VERTICALALIGNMENT_bottom);
+        Text *vrvComposer = new Text();
+        rend2->AddChild(vrvComposer);
+        std::wstring str = UTF8to16(composer);
+        vrvComposer->SetText(str);
+        Att att;
+        rend2->SetFontsize(att.StrToFontsize("small", true));
     }
 }
 
