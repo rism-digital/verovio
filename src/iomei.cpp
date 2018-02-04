@@ -3870,8 +3870,8 @@ bool MeiInput::ReadText(Object *parent, pugi::xml_node text, bool trimLeft, bool
 
     assert(text.text());
     std::wstring str = UTF8to16(text.text().as_string());
-    if (trimLeft) str = this->LeftTrim(str);
-    if (trimRight) str = this->RightTrim(str);
+    if (trimLeft) str = MeiInput::LeftTrim(str);
+    if (trimRight) str = MeiInput::RightTrim(str);
 
     vrvText->SetText(str);
 
