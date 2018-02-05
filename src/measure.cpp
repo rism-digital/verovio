@@ -42,9 +42,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Measure::Measure(bool measureMusic, int logMeasureNb)
-    : Object("measure-"), AttMeasureLog(), AttNNumberLike(), AttPointing(), AttTyped()
+    : Object("measure-"), AttMeasureLog(), AttMeterConformanceBar(), AttNNumberLike(), AttPointing(), AttTyped()
 {
     RegisterAttClass(ATT_MEASURELOG);
+    RegisterAttClass(ATT_METERCONFORMANCEBAR);
     RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_POINTING);
     RegisterAttClass(ATT_TYPED);
@@ -79,6 +80,7 @@ void Measure::Reset()
 {
     Object::Reset();
     ResetMeasureLog();
+    ResetMeterConformanceBar();
     ResetNNumberLike();
     ResetPointing();
     ResetTyped();
@@ -622,8 +624,8 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     if (fullMeasure2 != NULL) {
         minMeasureWidth *= 2;
     }
-    // Nothing if the measure has at least one note - can be improved
-    else if (this->FindChildByType(NOTE) != NULL) {
+    // Nothing if the measure has at least one note or @metcon="false"
+    else if ((this->FindChildByType(NOTE) != NULL) || (this->GetMetcon() == BOOLEAN_false)) {
         minMeasureWidth = 0;
     }
 
