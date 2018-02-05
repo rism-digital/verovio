@@ -1525,13 +1525,17 @@ bool HumdrumInput::prepareHeader(std::map<std::string, std::string> &refmap)
         return false;
     }
 
-    Object *detached = pghead->GetParent()->DetachChild(0);
+    int index = pghead->GetIdx();
+    if (index < 0) {
+        return false;
+    }
+    Object *detached = pghead->GetParent()->DetachChild(index);
     if (detached != pghead) {
         std::cerr << "Detached element is not the pgHead" << std::endl;
         return false;
     }
 
-    m_doc->m_scoreDef.AddChild((PgHead *)pghead);
+    m_doc->m_scoreDef.AddChild(pghead);
 
     return true;
 }
