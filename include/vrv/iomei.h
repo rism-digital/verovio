@@ -493,10 +493,10 @@ private:
     ///@{
     bool ReadF(Object *parent, pugi::xml_node f);
     bool ReadFig(Object *parent, pugi::xml_node fig);
-    static bool ReadLb(Object *parent, pugi::xml_node lb);
+    bool ReadLb(Object *parent, pugi::xml_node lb);
     bool ReadRend(Object *parent, pugi::xml_node rend);
-    static bool ReadSvg(Object *parent, pugi::xml_node svg);
-    static bool ReadText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight);
+    bool ReadSvg(Object *parent, pugi::xml_node svg);
+    bool ReadText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight);
     ///@}
 
     /**
@@ -532,14 +532,14 @@ private:
      */
     ///@{
     bool ReadControlElement(pugi::xml_node element, ControlElement *object);
-    static bool ReadEditorialElement(pugi::xml_node element, EditorialElement *object);
+    bool ReadEditorialElement(pugi::xml_node element, EditorialElement *object);
     bool ReadLayerElement(pugi::xml_node element, LayerElement *object);
-    static bool ReadRunningElement(pugi::xml_node element, RunningElement *object);
+    bool ReadRunningElement(pugi::xml_node element, RunningElement *object);
     bool ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object);
     bool ReadSystemElement(pugi::xml_node element, SystemElement *object);
-    static bool ReadTextElement(pugi::xml_node element, TextElement *object);
+    bool ReadTextElement(pugi::xml_node element, TextElement *object);
 
-    static bool ReadAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface);
+    bool ReadAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface);
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
     bool ReadPitchInterface(pugi::xml_node element, PitchInterface *interface);
     bool ReadPlistInterface(pugi::xml_node element, PlistInterface *interface);
@@ -565,7 +565,7 @@ private:
     /**
      * Returns true if the element is name is an editorial element (e.g., "app", "supplied", etc.)
      */
-    static bool IsEditorialElementName(std::string elementName);
+    bool IsEditorialElementName(std::string elementName);
 
     /**
      * Read score-based MEI.
@@ -578,10 +578,10 @@ private:
      * @name Various methods for reading / converting values.
      */
     ///@{
-    static void SetMeiUuid(pugi::xml_node element, Object *object);
+    void SetMeiUuid(pugi::xml_node element, Object *object);
     DocType StrToDocType(std::string type);
-    static std::wstring LeftTrim(std::wstring str);
-    static std::wstring RightTrim(std::wstring str);
+    std::wstring LeftTrim(std::wstring str);
+    std::wstring RightTrim(std::wstring str);
     ///@}
 
     /**
@@ -637,7 +637,7 @@ private:
     /**
      * Check if an element is allowed within a given parent
      */
-    static bool IsAllowed(std::string element, Object *filterParent);
+    bool IsAllowed(std::string element, Object *filterParent);
 
     /**
      * A static array for storing the implemented editorial elements
