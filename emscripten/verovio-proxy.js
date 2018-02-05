@@ -156,8 +156,8 @@ verovio.toolkit.prototype.renderPage = function (pageNo, options) {
     return verovio.vrvToolkit.renderToSVG(this.ptr, pageNo, JSON.stringify(options));
 };
 
-verovio.toolkit.prototype.renderToMidi = function (options) {
-    return verovio.vrvToolkit.renderToMidi(this.ptr, JSON.stringify(options));
+verovio.toolkit.prototype.renderToMIDI = function (options) {
+    return verovio.vrvToolkit.renderToMIDI(this.ptr, JSON.stringify(options));
 };
 
 verovio.toolkit.prototype.renderToMidi = function (options) {
