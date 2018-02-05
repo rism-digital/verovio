@@ -248,7 +248,7 @@ public:
     virtual bool SetValue(std::string value);
     virtual std::string GetStrValue() const { return m_value; }
     virtual std::string GetDefaultStrValue() const { return m_defaultValue; }
-    
+
     std::string GetValue() const { return m_value; }
     std::string GetDefault() const { return m_defaultValue; }
 

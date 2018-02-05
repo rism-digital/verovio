@@ -75,7 +75,7 @@ public:
     std::string GetAvailableOptions() const;
     bool SetOptions(const std::string &json_options);
     ///@}
-    
+
     /**
      * @name Getter and setter for single option
      */
