@@ -370,11 +370,6 @@ protected:
     bool hasBelowParameter(hum::HTp token, const string &category);
     void prepareHeaderFooter();
     bool prepareHeader(std::map<std::string, std::string> &refmap);
-    bool ReadRunningChildren(Object *parent, pugi::xml_node parentNode, Object *filter);
-    bool ReadTextChildren(Object *parent, pugi::xml_node parentNode, Object *filter);
-    bool ReadRend(Object *parent, pugi::xml_node rend);
-    bool ReadFig(Object *parent, pugi::xml_node fig);
-    bool ReadNum(Object *parent, pugi::xml_node num);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
