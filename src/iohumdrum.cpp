@@ -1418,16 +1418,19 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
 void HumdrumInput::prepareHeaderFooter()
 {
     hum::HumdrumFile &infile = m_infile;
+    std::vector<std::pair<string, string> > biblist;
 
     std::vector<hum::HumdrumLine *> records = infile.getReferenceRecords();
+    biblist.reserve(records.size());
     std::map<std::string, std::string> refmap;
     for (int i = 0; i < (int)records.size(); i++) {
         string key = records[i]->getReferenceKey();
         string value = records[i]->getReferenceValue();
         refmap[key] = value;
+        biblist.emplace_back(std::make_pair(key, value));
     }
 
-    prepareHeader(refmap);
+    prepareHeader(biblist, refmap);
 }
 
 //////////////////////////////
@@ -1445,7 +1448,8 @@ void HumdrumInput::prepareHeaderFooter()
 // <pgHead>
 //
 
-bool HumdrumInput::prepareHeader(std::map<std::string, std::string> &refmap)
+bool HumdrumInput::prepareHeader(
+    std::vector<std::pair<string, string> > biblist, std::map<std::string, std::string> &refmap)
 {
     std::string headerText;
     std::string title;
@@ -1453,6 +1457,15 @@ bool HumdrumInput::prepareHeader(std::map<std::string, std::string> &refmap)
     auto it = refmap.find("OTL");
     if (it != refmap.end()) {
         title = it->second;
+    }
+
+    if (title.empty()) {
+        for (int i = 0; i < (int)biblist.size(); i++) {
+            if (biblist[i].first.substr(0, 3) == "OTL") {
+                title = biblist[i].second;
+                break;
+            }
+        }
     }
 
     std::string rime;
@@ -1472,6 +1485,7 @@ bool HumdrumInput::prepareHeader(std::map<std::string, std::string> &refmap)
             headerText += ")";
         }
         headerText += "</rend>\n";
+        headerText += "<lb/>&#160;\n<lb/>&#160;\n";
         headerText += "</rend>\n";
     }
 
@@ -1495,6 +1509,74 @@ bool HumdrumInput::prepareHeader(std::map<std::string, std::string> &refmap)
         headerText += "<rend fontsize=\"small\" halign=\"right\" valign=\"bottom\">";
         headerText += composer;
         headerText += "</rend>\n";
+    }
+
+    std::string lyricist;
+    auto itL = refmap.find("LYR");
+    if (itL != refmap.end()) {
+        std::string name = itL->second;
+        auto pos = name.find(",");
+        if (pos == std::string::npos) {
+            lyricist = name;
+        }
+        else {
+            std::string lastname = name.substr(0, pos);
+            std::string firstname = name.substr(pos + 1);
+            lyricist = firstname + " " + lastname;
+        }
+        auto itLD = refmap.find("LDT");
+        if (itLD != refmap.end()) {
+            lyricist += " (" + itLD->second + ")";
+        }
+    }
+    if (!lyricist.empty()) {
+        headerText += "<rend fontsize=\"small\" halign=\"left\" valign=\"bottom\">";
+        headerText += lyricist;
+        headerText += "</rend>\n";
+    }
+
+    // Composer's dates
+    hum::HumRegex hre;
+    string cdates;
+    string outputdate;
+    auto it3 = refmap.find("CDT");
+    if (it3 != refmap.end()) {
+        cdates = it3->second;
+        string birth;
+        string death;
+        auto pos = cdates.find("-");
+        if (pos != std::string::npos) {
+            birth = cdates.substr(0, pos);
+            death = cdates.substr(pos + 1);
+            int birthyear = 0;
+            int deathyear = 0;
+            if (hre.search(birth, "(\\d\\d\\d\\d)")) {
+                birthyear = hre.getMatchInt(1);
+            }
+            if (hre.search(death, "(\\d\\d\\d\\d)")) {
+                deathyear = hre.getMatchInt(1);
+            }
+            if ((deathyear > 0) && (birthyear > 0)) {
+                outputdate = to_string(birthyear);
+                outputdate += "&#8211;";
+                if ((deathyear / 100) == (birthyear / 100)) {
+                    outputdate += to_string(deathyear % 100);
+                }
+                else {
+                    outputdate += to_string(deathyear);
+                }
+            }
+        }
+    }
+    if (!outputdate.empty()) {
+        headerText += "<rend fontsize=\"small\" halign=\"right\" valign=\"bottom\">";
+        headerText += outputdate;
+        headerText += "</rend>\n";
+        if (!lyricist.empty()) {
+            headerText += "<rend fontsize=\"small\" halign=\"left\" valign=\"bottom\">";
+            headerText += "&#160;";
+            headerText += "</rend>\n";
+        }
     }
 
     if (headerText.empty()) {
