@@ -1507,13 +1507,11 @@ bool HumdrumInput::prepareHeader(std::map<std::string, std::string> &refmap)
     meifile += "</pgHead></scoreDef></score></mdiv></body></music></mei>\n";
 
     Doc tempdoc;
-    FileInputStream *input = new MeiInput(&tempdoc, "");
-    if (!input->ImportString(meifile)) {
+    MeiInput input(&tempdoc, "");
+    if (!input.ImportString(meifile)) {
         LogError("Error importing data");
-        delete input;
         return false;
     }
-    delete input;
 
     // MeiOutput meioutput(&tempdoc, "");
     // meioutput.SetScoreBasedMEI(true);
