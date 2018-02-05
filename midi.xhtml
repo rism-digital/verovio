@@ -17,7 +17,7 @@ midiplayer: true
     var spacingStaff = 10;
     var spacingSystem = 0;
     var border = 20;
-    var adjustPageHeight = 1;
+    var adjustPageHeight = true;
     var vrvToolkit = new verovio.toolkit();
     var ids = []
 
@@ -25,15 +25,18 @@ midiplayer: true
         options = {
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
+                    pageMarginLeft: border,
+                    pageMarginRight: border,
+                    pageMarginTop: border,
+                    pageMarginBottom: border,
                     adjustPageHeight: adjustPageHeight,
                     spacingStaff: spacingStaff,
                     spacingSystem: spacingSystem,
-                    border: border,
                     scale: zoom
                 };
 
         var svg = vrvToolkit.renderData( data + "\n", options );
-        console.log( svg );
+        // console.log( svg );
         $("#svg_output").html(svg);
         $( ".note" ).click(function() {
             var id = $(this).attr("id");
@@ -44,7 +47,7 @@ midiplayer: true
     }
     
     function play_midi() {
-        var base64midi = vrvToolkit.renderToMidi();
+        var base64midi = vrvToolkit.renderToMIDI();
         var song = 'data:audio/midi;base64,' + base64midi;
         $("#play-button").hide();
         $("#player").show();
@@ -157,14 +160,14 @@ midiplayer: true
 {% highlight bash %}$ verovio -f midi -o output.midi Ahle_Jesu_meines_Herzens_Freud.mei{% endhighlight %}
             
             <p>
-                With the JavaScript toolkit, the MIDI output is available throught the <code>renderToMidi()</code> method. This returns a base64-coded MIDI file as string, which can be passed to a player or made available for download.
+                With the JavaScript toolkit, the MIDI output is available throught the <code>renderToMIDI()</code> method. This returns a base64-coded MIDI file as string, which can be passed to a player or made available for download.
             </p>
             
 {% highlight html %}
 <script type="text/javascript">
 var vrvToolkit = new verovio.toolkit();
 /* ... load the MEI file */
-var midiFileIn64Base = vrvToolkit.renderToMidi();
+var midiFileIn64Base = vrvToolkit.renderToMIDI();
 </script>
 {% endhighlight %}
 

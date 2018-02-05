@@ -57,14 +57,13 @@ context-menus:
     function set_options( ) {
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
         pageWidth = ($(document).width()) * 100 / zoom ; // - $( "#sidbar" ).width();
-        border = 50;
         options = {
+                    adjustPageHeight: true,
+                    breaks: "auto",
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
-                    border: border,
+                    noFooter: true,
                     scale: zoom,
-                    adjustPageHeight: 1,
-                    ignoreLayout: 1,
                     font: font
                 };
         vrvToolkit.setOptions( options );
@@ -84,7 +83,7 @@ context-menus:
         if ( !init_overlay) {
             vrvToolkit.redoPagePitchPosLayout();
         }
-        svg = vrvToolkit.renderPage(page, {});
+        svg = vrvToolkit.renderToSVG(page, {});
         $("#svg_output").html(svg);
         //d3.select("#svg_output").select("svg").selectAll(".note").on("mousedown", select);
         //d3.select("#svg_output").selectAll("*").style("opacity", "0.0");

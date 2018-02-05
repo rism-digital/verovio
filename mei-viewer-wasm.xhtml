@@ -58,16 +58,15 @@ downloads:
     function set_options( ) {
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
         pageWidth = ($(".row-offcanvas").width()) * 100 / zoom ; // - $( "#sidbar" ).width();
-        border = 50;
         options = {
+                    adjustPageHeight: true,
+                    breaks: "auto",
                     inputFormat: format,
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
-                    border: border,
+                    noFooter: true,
                     scale: zoom,
-                    spacingSystem: spacingSystem,
-                    adjustPageHeight: 1,
-                    ignoreLayout: 1
+                    spacingSystem: spacingSystem
                 };
         vrvToolkit.setOptions( options );
     }
@@ -123,7 +122,7 @@ downloads:
         $("#overlay").hide().css("cursor", "auto");
         $("#jump_text").val(page);
 
-        svg = vrvToolkit.renderPage(page, {});
+        svg = vrvToolkit.renderToSVG(page, {});
         $("#svg_output").html(svg);
 
         adjust_page_height();
@@ -282,7 +281,7 @@ downloads:
     }
 
     function play_midi() {
-        var base64midi = vrvToolkit.renderToMidi();
+        var base64midi = vrvToolkit.renderToMIDI();
         var song = 'data:audio/midi;base64,' + base64midi;
         $("#player").show();
         $("#play-button").hide();

@@ -46,7 +46,6 @@ downloads:
     var zoom = 40;
     var pageHeight = 2970;
     var pageWidth = 2100;
-    var spacingSystem = 2;
     var font = 'Leipzig';
     var swipe_pages = false;
     var format = 'mei';
@@ -54,12 +53,19 @@ downloads:
     var ids = [];
     var pdfFormat = "A4";
     var pdfOrientation = "portrait";
+    var savedOptions = undefined;
+    var customOptions = undefined;
+    var disabledOptions = ["adjustPageHeight", "pageHeight", "pageWidth", "noFooter"];
 
     // reload cookies
     if ( $.cookie('zoom') ) zoom = $.cookie('zoom');
     if ( $.cookie('font') ) font = $.cookie('font');
     if ( $.cookie('pdfFormat') ) pdfFormat = $.cookie('pdfFormat');
     if ( $.cookie('pdfOrientation') ) pdfOrientation = $.cookie('pdfOrientation');
+    
+    if (localStorage['customOptions']) {
+        customOptions = JSON.parse(localStorage['customOptions']);
+    }
 
     function calc_page_height() {
         return ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom;
@@ -72,7 +78,6 @@ downloads:
     function set_options( ) {
         pageHeight = calc_page_height();
         pageWidth = calc_page_width();
-        border = 50;
         options = {
                     adjustPageHeight: "true",
                     breaks: "auto",
@@ -81,20 +86,22 @@ downloads:
                     noFooter: "true",
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
-                    pageLeftMar: border,
-                    pageRightMar: border,
-                    pageTopMar: border,
                     scale: zoom,
-                    spacingSystem: spacingSystem,
                     font: font
                 };
-                
-        var mergedOptions = {};
-       // for(var key in defaultOptions) mergedOptions[key] = defaultOptions[key];
-       for(var key in options) mergedOptions[key] = options[key];
+          
+        if (customOptions !== undefined) {
+            localStorage['customOptions'] = JSON.stringify(customOptions);
+            var mergedOptions = {};
+            for(var key in customOptions) mergedOptions[key] = customOptions[key];
+            for(var key in options) mergedOptions[key] = options[key];
+            options = mergedOptions;
+        }
+        
+
         //console.log( options );
-        //vrvToolkit.setOptions( options );
-        vrvToolkit.setOptions( mergedOptions );
+        vrvToolkit.setOptions( options );
+        //vrvToolkit.setOptions( mergedOptions );
     }
 
     function upload_file() {
@@ -150,7 +157,7 @@ downloads:
         $("#overlay").hide().css("cursor", "auto");
         $("#jump_text").val(page);
 
-        svg = vrvToolkit.renderToSvg(page, {});
+        svg = vrvToolkit.renderToSVG(page, {});
         $("#svg_output").html(svg);
 
         adjust_page_height();
@@ -307,7 +314,7 @@ downloads:
     }
 
     function play_midi() {
-        var base64midi = vrvToolkit.renderToMidi();
+        var base64midi = vrvToolkit.renderToMIDI();
         var song = 'data:audio/midi;base64,' + base64midi;
         $("#player").show();
         $("#play-button").hide();
@@ -412,13 +419,9 @@ downloads:
                     breaks: "auto",
                     mmOutput: true,
                     noFooter: false,
-                    pageLeftMar: border,
-                    pageRightMar: border,
-                    pageTopMar: border,
                     pageHeight: pdfHeight,
                     pageWidth: pdfWidth,
                     scale: 100,
-                    spacingSystem: spacingSystem,
                     font: font
         }
         
@@ -426,7 +429,7 @@ downloads:
         vrvToolkit.redoLayout();
         for (i = 0; i < vrvToolkit.getPageCount(); i++) {
             doc.addPage({size: pdfFormat, layout: pdfOrientation});
-            SVGtoPDF(doc, vrvToolkit.renderToSvg(i + 1, {}), 0, 0, options);
+            SVGtoPDF(doc, vrvToolkit.renderToSVG(i + 1, {}), 0, 0, options);
         }        
         
         // Reset the options
@@ -434,6 +437,17 @@ downloads:
         vrvToolkit.redoLayout();
         
         doc.end();
+    }
+    
+    function non_default_options (options) {
+        var defaultOptions = vrvToolkit.getOptions(true);
+        var nonDefaultOptions = {};
+        for(var key in defaultOptions) {
+            if (options[key] && (defaultOptions[key] != options[key])) {
+                nonDefaultOptions[key] = options[key];
+            }
+        }
+        return nonDefaultOptions;
     }
 
 //]]>
@@ -684,14 +698,15 @@ downloads:
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                <h4>Option editor</h4>
+                <h4>Options</h4>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" id="optionDialogContent">
                 {% include option-form.html %}
             </div>
             <div class="modal-footer">
+                <button type="button" id="optionDefault" class="btn btn-default">Reset to default</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="button" id="pdfOK" class="btn btn-primary">OK</button>
+                <button type="button" id="optionOK" class="btn btn-primary">OK</button>
             </div>
         </div>
     </div>
@@ -821,6 +836,64 @@ downloads:
             $.cookie('pdfFormat', pdfFormat, { expires: 30 });
             $.cookie('pdfOrientation', pdfOrientation, { expires: 30 });
             generate_pdf();
+        });
+        
+        for (opt in disabledOptions) {
+            $("#option-form :input[name='" + disabledOptions[opt] + "']").prop("disabled", true);
+        }
+
+        $("#option-form :input").change(function() {
+            // Reset all options to default 
+            vrvToolkit.setOptions(vrvToolkit.getOptions(true));
+            // console.log("Applying options");
+            customOptions = non_default_options(JSON.parse($('#option-form').toJSON()));
+            apply_zoom();
+        });
+
+        $("#optionDialog").on("show.bs.modal", function () {
+            savedOptions = non_default_options(vrvToolkit.getOptions(false));
+            var currentOptions = vrvToolkit.getOptions(false)
+            var defaultOptions = vrvToolkit.getOptions(true);
+            for(var key in defaultOptions) {
+                
+                if (disabledOptions.includes(key)) {
+                    continue;
+                }
+                
+                if (!Array.isArray(defaultOptions[key]) && (defaultOptions[key] != currentOptions[key])) {
+                    $("label[for='" + key +"']").css("color", "#B00");
+                }
+                else {
+                    $("label[for='" + key +"']").css("color", "");
+                }
+            }
+            
+            $("#option-form").fromJSON(JSON.stringify(currentOptions)); 
+        });
+        
+        $("#optionDialog").on("hidden.bs.modal", function () {
+            // This means the dialog was dismissed
+            if (savedOptions !== undefined) {
+                customOptions = savedOptions;
+                savedOptions = undefined;
+                //console.debug("Restoring options");
+            }
+            apply_zoom();
+        });
+        
+        $('#optionOK').click(function () {
+            savedOptions = undefined;
+            $('#optionDialog').modal('hide');
+        });
+        
+        $('#optionDefault').click(function () {
+            savedOptions = undefined;
+            customOptions = undefined;
+            // Reset to default and clear local storage
+            vrvToolkit.setOptions(vrvToolkit.getOptions(true));
+            localStorage.clear('customOptions');
+            //console.debug("Resetting options");
+            $('#optionDialog').modal('hide');
         });
     });
 //]]>

@@ -1,643 +1,105 @@
-<div>
-    <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active">
-            <a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">General layout options</a>
-        </li>
-        <li role="presentation">
-            <a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">Element margins</a>
-        </li>
-    </ul>
-    <form class="form-horizontal" id="option-form">
-        <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active panel-body" id="tab1">
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="barLineWidth">Bar line width</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="barLineWidth" type="number" min="0.10" max="0.80" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The barLine width</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="beamMaxSlope">Beam max slope</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="beamMaxSlope" type="number" min="1" max="20" step="1" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The maximum beam slope</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="beamMinSlope">Beam min slope</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="beamMinSlope" type="number" min="0" max="0" step="1" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The minimum beam slope</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="evenNoteSpacing">Even note spacing</label>
-                    <div class="col-sm-3">
-                        <select class="form-control" name="evenNoteSpacing">
-                            <option value="false">off</option>
-                            <option value="true">on</option>
-                        </select>
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">Specify the linear spacing factor</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="graceFactor">Grace factor</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="graceFactor" type="number" min="0.50" max="1.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The grace size ratio numerator</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="hairpinSize">Hairpin size</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="hairpinSize" type="number" min="1.00" max="8.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The haripin size in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftPosition">Left position</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftPosition" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The left position</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="lyricSize">Lyric size</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="lyricSize" type="number" min="2.00" max="8.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The lyrics size in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="minMeasureWidth">Measure min width</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="minMeasureWidth" type="number" min="1" max="30" step="1" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The minimal measure width in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="measureNumber">Measure number</label>
-                    <div class="col-sm-3">
-                        <select class="form-control" name="measureNumber">
-                            <option value="system">system</option>
-                            <option value="interval">interval</option>
-                        </select>
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The measure numbering rule (unused)</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="noHeader">No header</label>
-                    <div class="col-sm-3">
-                        <select class="form-control" name="noHeader">
-                            <option value="false">off</option>
-                            <option value="true">on</option>
-                        </select>
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">Do not add any header</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="pageLeftMar">Page left mar</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="pageLeftMar" type="number" min="0" max="500" step="1" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The page left margin</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="pageRightMar">Page right mar</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="pageRightMar" type="number" min="0" max="500" step="1" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The page right margin</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="pageTopMar">Page top mar</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="pageTopMar" type="number" min="0" max="500" step="1" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The page top margin</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="minSlurHeight">Slur min height</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="minSlurHeight" type="number" min="0.30" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The minimum slur height in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="maxSlurHeight">Slur max height</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="maxSlurHeight" type="number" min="2.00" max="4.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The maximum slur height in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="slurThickness">Slur thickness</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="slurThickness" type="number" min="0.20" max="1.20" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The slur thickness in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="spacingLinear">Spacing linear</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="spacingLinear" type="number" min="0.00" max="1.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">Specify the linear spacing factor</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="spacingNonLinear">Spacing non linear</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="spacingNonLinear" type="number" min="0.00" max="1.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">Specify the non-linear spacing factor</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="spacingStaff">Spacing staff</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="spacingStaff" type="number" min="0" max="24" step="1" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The staff minimal spacing in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="spacingSystem">Spacing system</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="spacingSystem" type="number" min="0" max="12" step="1" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The system minimal spacing in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="staffLineWidth">Staff line width</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="staffLineWidth" type="number" min="0.10" max="0.30" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The staff line width in unit</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="stemWidth">Stem width</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="stemWidth" type="number" min="0.10" max="0.50" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The stem width</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="tieThickness">Tie thickness</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="tieThickness" type="number" min="0.20" max="1.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The tie thickness in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="unit">Unit</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="unit" type="number" min="6" max="20" step="1" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The MEI unit (1⁄2 of the distance between the staff lines)</p>
-                    </div>
-                </div>
-            </div>
-            <div role="tabpanel" class="tab-pane panel-body" id="tab2">
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="defaultBottomMargin">Default bottom margin</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="defaultBottomMargin" type="number" min="0.00" max="5.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The default bottom margin</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="defaultLeftMargin">Default left margin</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="defaultLeftMargin" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The default left margin</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="defaultRightMargin">Default right margin</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="defaultRightMargin" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The default right margin</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="defaultTopMargin">Default top margin</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="defaultTopMargin" type="number" min="0.00" max="6.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The default top margin</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginAccid">Left margin accid</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginAccid" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for accid in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginBarLine">Left margin barLine</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginBarLine" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for barLine in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginBeatRpt">Left margin beatRpt</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginBeatRpt" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for beatRpt in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginChord">Left margin chord</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginChord" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for chord in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginClef">Left margin clef</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginClef" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for clef in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginKeySig">Left margin keySig</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginKeySig" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for keySig in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginLeftBarLine">Left margin left barLine</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginLeftBarLine" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for left barLine in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginMensur">Left margin mensur</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginMensur" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for mensur in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginMeterSig">Left margin meterSig</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginMeterSig" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for meterSig in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginMRest">Left margin mRest</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginMRest" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for mRest in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginMRpt2">Left margin mRpt2</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginMRpt2" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for mRpt2 in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginMultiRest">Left margin multiRest</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginMultiRest" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for multiRest in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginMultiRpt">Left margin multiRpt</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginMultiRpt" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for multiRpt in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginNote">Left margin note</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginNote" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for note in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginRest">Left margin rest</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginRest" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for rest in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="leftMarginRightBarLine">Left margin right barLine</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="leftMarginRightBarLine" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The margin for right barLine in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginAccid">Right margin accid</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginAccid" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for accid in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginBarLine">Right margin barLine</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginBarLine" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for barLine in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginBeatRpt">Right margin beatRpt</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginBeatRpt" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for beatRpt in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginChord">Right margin chord</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginChord" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for chord in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginClef">Right margin clef</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginClef" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for clef in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginKeySig">Right margin keySig</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginKeySig" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for keySig in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginLeftBarLine">Right margin left barLine</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginLeftBarLine" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for left barLine in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginMensur">Right margin mensur</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginMensur" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for mensur in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginMeterSig">Right margin meterSig</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginMeterSig" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for meterSig in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginMRest">Right margin mRest</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginMRest" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for mRest in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginMRpt2">Right margin mRpt2</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginMRpt2" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for mRpt2 in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginMultiRest">Right margin multiRest</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginMultiRest" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for multiRest in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginMultiRpt">Right margin multiRpt</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginMultiRpt" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for multiRpt in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginNote">Right margin note</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginNote" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for note in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginRest">Right margin rest</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginRest" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for rest in MEI units</p>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-3 control-label" for="rightMarginRightBarLine">Right margin right barLine</label>
-                    <div class="col-sm-3">
-                        <input class="form-control" name="rightMarginRightBarLine" type="number" min="0.00" max="2.00" step="0.05" />
-                    </div>
-                    <div class="col-sm-6">
-                        <p class="help-block">The right margin for right barLine in MEI units</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
+<div id="option-div">
 </div>
 <script type="text/javascript">
 //<![CDATA[
-var defaultOptions = {
-    barLineWidth: 0.3,
-    beamMaxSlope: 10,
-    beamMinSlope: 0,
-    evenNoteSpacing: "false",
-    graceFactor: 0.75,
-    hairpinSize: 3,
-    leftPosition: 0.8,
-    lyricSize: 4.5,
-    minMeasureWidth: 15,
-    measureNumber: "system",
-    noHeader: "false",
-    pageLeftMar: 50,
-    pageRightMar: 50,
-    pageTopMar: 50,
-    minSlurHeight: 1.2,
-    maxSlurHeight: 3,
-    slurThickness: 0.6,
-    spacingLinear: 0.25,
-    spacingNonLinear: 0.6,
-    spacingStaff: 8,
-    spacingSystem: 3,
-    staffLineWidth: 0.15,
-    stemWidth: 0.2,
-    tieThickness: 0.5,
-    unit: 9,
-    defaultBottomMargin: 0.5,
-    defaultLeftMargin: 0,
-    defaultRightMargin: 0,
-    defaultTopMargin: 0.5,
-    leftMarginAccid: 1,
-    leftMarginBarLine: 0,
-    leftMarginBeatRpt: 2,
-    leftMarginChord: 1,
-    leftMarginClef: 1,
-    leftMarginKeySig: 1,
-    leftMarginLeftBarLine: 0,
-    leftMarginMensur: 1,
-    leftMarginMeterSig: 1,
-    leftMarginMRest: 0,
-    leftMarginMRpt2: 0,
-    leftMarginMultiRest: 0,
-    leftMarginMultiRpt: 0,
-    leftMarginNote: 1,
-    leftMarginRest: 1,
-    leftMarginRightBarLine: 1,
-    rightMarginAccid: 0,
-    rightMarginBarLine: 0,
-    rightMarginBeatRpt: 0,
-    rightMarginChord: 0,
-    rightMarginClef: 1,
-    rightMarginKeySig: 1,
-    rightMarginLeftBarLine: 1,
-    rightMarginMensur: 1,
-    rightMarginMeterSig: 1,
-    rightMarginMRest: 0,
-    rightMarginMRpt2: 0,
-    rightMarginMultiRest: 0,
-    rightMarginMultiRpt: 0,
-    rightMarginNote: 0,
-    rightMarginRest: 0,
-    rightMarginRightBarLine: 0
-};
+    options = vrvToolkit.getAvailableOptions();
+
+    var ul = $("<ul class='nav nav-tabs' role='tablist'></ul>");
+    $('#option-div').append(ul);
+    
+    var form = $("<form class='form-horizontal' id='option-form'></form>");
+    $('#option-div').append(form);
+    var tab_content = $("<div class='tab-content'></div>");
+    form.append(tab_content);
+    
+    var i = 0;
+    for (grp in options.groups) {
+        var li = $("<li role='presentation'></li>");
+        ul.append(li);
+        if (i == 0) {
+            li.attr("class", "active");
+        }
+
+        var a = $("<a></a>").attr("href", "#" + grp).attr("aria-controls", grp).attr("role", "tab").attr("data-toggle", "tab");
+        li.append(a);
+        a.append(options.groups[grp].name);
+        
+        var tab_panel = $("<div role='tabpanel'></div>");
+        tab_content.append(tab_panel);
+        if (i == 0) {
+            tab_panel.attr("class", "tab-pane active panel-body");
+        }
+        else {
+            tab_panel.attr("class", "tab-pane panel-body");
+        }
+        tab_panel.attr("id", grp);
+        
+        
+        for (opt in options.groups[grp].options) {
+            
+            var option = options.groups[grp].options[opt];
+            
+            var form_group = $("<div class='form-group'></div>");
+            tab_panel.append(form_group);
+            
+            var label = $("<label class='col-sm-3 control-label'></label>");
+            form_group.append(label);
+            label.attr("for", opt);
+            label.append(option.title);
+            
+            var input_div = $("<div class='col-sm-3'></div>");
+            form_group.append(input_div);
+    
+            if ((option.type == "double") || (option.type == "int") || (option.type == "string") || (option.type == "array")) {
+
+                var input = $("<input class='form-control'></input>");
+                input_div.append(input);
+                input.attr("name", opt);
+                
+                if ((option.type == "double") || (option.type == "int")) {
+                    input.attr("type", "number");
+                    input.attr("min", option.min);
+                    input.attr("max", option.max);
+                    if (option.type == "double") {
+                        input.attr("step", "0.05");
+                    }
+                    else {
+                        input.attr("step", "1");
+                    }
+                }
+                else {
+                    input.attr("type", "text");
+                }
+            }
+            else if (option.type == "string-list") {
+                var select = $("<select class='form-control'></select>");
+                input_div.append(select);
+                select.attr("name", opt);
+                
+                for (v in option.values) {
+                    var opt_select = $("<option></option>");
+                    select.append(opt_select);
+                    opt_select.attr("value", option.values[v]);
+                    opt_select.append(option.values[v]);
+                }
+            }
+            else if (option.type == "bool") {
+                var input = $("<input class='form-control' style='width: auto !important;' type='checkbox'></input>");
+                input_div.append(input);
+                input.attr("name", opt);
+            }
+            
+            var help_div = $("<div class='col-sm-6'></div>");
+            form_group.append(help_div);
+            
+            var help_p = $("<p class='help-block'></p>");
+            help_div.append(help_p);
+            help_p.append().text(option.description).html();
+            
+        }
+        
+        i = i + 1;
+        
+    }
 //]]>
 </script>

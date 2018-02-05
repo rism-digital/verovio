@@ -1,4 +1,4 @@
-Verovio 2.0.0-dev-b6087f3
+Verovio 2.0.0-dev-db65374
 
 Example usage:
 
@@ -17,22 +17,12 @@ Options (marked as * are repeatable)
  -v, --version         Display the version number
  -x, --xml-id-seed <i> Seed the random number generator for XML IDs
 
-General layout options
+Input and page layout options
  --adjust-page-height              Crop the page height to the height of the content
- --bar-line-width <f>              The barLine width (default: 0.30; min: 0.10; max: 0.80)
- --beam-max-slope <i>              The maximum beam slope (default: 10; min: 1; max: 20)
- --beam-min-slope <i>              The minimum beam slope (default: 0; min: 0; max: 0)
  --breaks <s>                      Define page and system breaks layout (default: "auto"; other values: "none", "encoded")
  --even-note-spacing               Specify the linear spacing factor
- --font <s>                        Set the music font (default: "Leipzig")
- --grace-factor <f>                The grace size ratio numerator (default: 0.75; min: 0.50; max: 1.00)
- --hairpin-size <f>                The haripin size in MEI units (default: 3.00; min: 1.00; max: 8.00)
  --hum-type                        Include type attributes when importing from Humdrum
  --landscape                       The landscape paper orientation flag
- --left-position <f>               The left position (default: 0.80; min: 0.00; max: 2.00)
- --lyric-size <f>                  The lyrics size in MEI units (default: 4.50; min: 2.00; max: 8.00)
- --min-measure-width <i>           The minimal measure width in MEI units (default: 15; min: 1; max: 30)
- --measure-number <s>              The measure numbering rule (unused) (default: "system"; other values: "interval")
  --mm-output                       Specify that the output in the SVG is given in mm (default is px)
  --no-footer                       Do not add any footer
  --no-header                       Do not add any header
@@ -43,8 +33,22 @@ General layout options
  --page-margin-right <i>           The page right margin (default: 50; min: 0; max: 500)
  --page-margin-top <i>             The page top margin (default: 50; min: 0; max: 500)
  --page-width <i>                  The page width (default: 2100; min: 100; max: 60000)
- --min-slur-height <f>             The minimum slur height in MEI units (default: 1.20; min: 0.30; max: 2.00)
- --max-slur-height <f>             The maximum slur height in MEI units (default: 3.00; min: 2.00; max: 4.00)
+ --unit <i>                        The MEI unit (1⁄2 of the distance between the staff lines) (default: 9; min: 6; max: 20)
+
+General layout options
+ --lyric-size <f>                  The lyrics size in MEI units (default: 4.50; min: 2.00; max: 8.00)
+ --bar-line-width <f>              The barLine width (default: 0.30; min: 0.10; max: 0.80)
+ --beam-max-slope <i>              The maximum beam slope (default: 10; min: 1; max: 20)
+ --beam-min-slope <i>              The minimum beam slope (default: 0; min: 0; max: 0)
+ --font <s>                        Set the music font (default: "Leipzig")
+ --grace-factor <f>                The grace size ratio numerator (default: 0.75; min: 0.50; max: 1.00)
+ --hairpin-size <f>                The haripin size in MEI units (default: 3.00; min: 1.00; max: 8.00)
+ --left-position <f>               The left position (default: 0.80; min: 0.00; max: 2.00)
+ --lyric-size <f>                  The lyrics size in MEI units (default: 4.50; min: 2.00; max: 8.00)
+ --min-measure-width <i>           The minimal measure width in MEI units (default: 15; min: 1; max: 30)
+ --measure-number <s>              The measure numbering rule (unused) (default: "system"; other values: "interval")
+ --slur-min-height <f>             The minimum slur height in MEI units (default: 1.20; min: 0.30; max: 2.00)
+ --slur-max-height <f>             The maximum slur height in MEI units (default: 3.00; min: 2.00; max: 4.00)
  --slur-thickness <f>              The slur thickness in MEI units (default: 0.60; min: 0.20; max: 1.20)
  --spacing-linear <f>              Specify the linear spacing factor (default: 0.25; min: 0.00; max: 1.00)
  --spacing-non-linear <f>          Specify the non-linear spacing factor (default: 0.60; min: 0.00; max: 1.00)
@@ -53,7 +57,6 @@ General layout options
  --staff-line-width <f>            The staff line width in unit (default: 0.15; min: 0.10; max: 0.30)
  --stem-width <f>                  The stem width (default: 0.20; min: 0.10; max: 0.50)
  --tie-thickness <f>               The tie thickness in MEI units (default: 0.50; min: 0.20; max: 1.00)
- --unit <i>                        The MEI unit (1⁄2 of the distance between the staff lines) (default: 9; min: 6; max: 20)
 
 Element selectors
  --app-x-path-query* <s>           Set the xPath query for selecting <app> child elements, for example: "./rdg[contains(@source, 'source-id')]"; by default the <lem> or the first <rdg> is selected
