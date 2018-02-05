@@ -1532,6 +1532,9 @@ bool HumdrumInput::prepareHeader(std::map<std::string, std::string> &refmap)
     Object *detached = pghead->GetParent()->DetachChild(index);
     if (detached != pghead) {
         std::cerr << "Detached element is not the pgHead" << std::endl;
+        if (detached) {
+            delete detached;
+        }
         return false;
     }
 
