@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <list>
 #include <map>
-#include <tuple>
 #include <vector>
 
 //----------------------------------------------------------------------------
