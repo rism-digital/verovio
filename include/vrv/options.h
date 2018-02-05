@@ -458,25 +458,15 @@ public:
      */
 
     /**
-     * General layout - to be sorted
+     * General
      */
-    OptionGrp m_generalLayout;
+    OptionGrp m_general;
 
     OptionBool m_adjustPageHeight;
-    OptionDbl m_barLineWidth;
-    OptionInt m_beamMaxSlope;
-    OptionInt m_beamMinSlope;
     OptionIntMap m_breaks;
     OptionBool m_evenNoteSpacing;
-    OptionString m_font;
-    OptionDbl m_graceFactor;
-    OptionDbl m_hairpinSize;
     OptionBool m_humType;
     OptionBool m_landscape;
-    OptionDbl m_leftPosition;
-    OptionDbl m_lyricSize;
-    OptionInt m_measureMinWidth;
-    OptionIntMap m_measureNumber;
     OptionBool m_mmOutput;
     OptionBool m_noFooter;
     OptionBool m_noHeader;
@@ -487,6 +477,23 @@ public:
     OptionInt m_pageMarginRight;
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
+    OptionInt m_unit;
+    
+    /**
+     * General layout
+     */
+    OptionGrp m_generalLayout;
+    
+    OptionDbl m_barLineWidth;
+    OptionInt m_beamMaxSlope;
+    OptionInt m_beamMinSlope;
+    OptionString m_font;
+    OptionDbl m_graceFactor;
+    OptionDbl m_hairpinSize;
+    OptionDbl m_leftPosition;
+    OptionDbl m_lyricSize;
+    OptionInt m_measureMinWidth;
+    OptionIntMap m_measureNumber;
     OptionDbl m_slurMaxHeight;
     OptionDbl m_slurMinHeight;
     OptionDbl m_slurThickness;
@@ -497,7 +504,6 @@ public:
     OptionDbl m_staffLineWidth;
     OptionDbl m_stemWidth;
     OptionDbl m_tieThickness;
-    OptionInt m_unit;
 
     /**
      * Selectors
