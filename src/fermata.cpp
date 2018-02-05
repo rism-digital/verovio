@@ -32,9 +32,7 @@ Fermata::Fermata() : ControlElement("fermata-"), TimePointInterface(), AttColor(
     Reset();
 }
 
-Fermata::~Fermata()
-{
-}
+Fermata::~Fermata() {}
 
 void Fermata::Reset()
 {

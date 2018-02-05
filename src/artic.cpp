@@ -43,9 +43,7 @@ Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlace
     Reset();
 }
 
-Artic::~Artic()
-{
-}
+Artic::~Artic() {}
 
 void Artic::Reset()
 {
@@ -212,9 +210,7 @@ ArticPart::ArticPart(ArticPartType type, Artic *artic)
     this->SetColor(artic->GetColor());
 }
 
-ArticPart::~ArticPart()
-{
-}
+ArticPart::~ArticPart() {}
 
 void ArticPart::Reset()
 {

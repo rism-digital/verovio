@@ -20,9 +20,7 @@ Proport::Proport() : LayerElement("prop-"), AttDurationRatio()
     Reset();
 }
 
-Proport::~Proport()
-{
-}
+Proport::~Proport() {}
 
 void Proport::Reset()
 {

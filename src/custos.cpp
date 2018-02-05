@@ -23,9 +23,7 @@ Custos::Custos() : LayerElement("custos-"), PositionInterface(), AttColor()
     Reset();
 }
 
-Custos::~Custos()
-{
-}
+Custos::~Custos() {}
 
 void Custos::Reset()
 {

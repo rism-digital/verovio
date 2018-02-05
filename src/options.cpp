@@ -54,7 +54,7 @@ bool Option::SetValueDbl(double value)
     LogError("Unsupported type double for %s", m_key.c_str());
     return false;
 }
-    
+
 bool Option::SetValueArray(const std::vector<std::string> &values)
 {
     // If not overriden
@@ -68,14 +68,14 @@ bool Option::SetValue(std::string value)
     LogError("Unsupported type string for %s", m_key.c_str());
     return false;
 }
-    
+
 std::string Option::GetStrValue() const
 {
     // If not overriden
     assert(false);
     return "[unspecified]";
 }
-    
+
 std::string Option::GetDefaultStrValue() const
 {
     // If not overriden
@@ -120,7 +120,7 @@ std::string OptionBool::GetStrValue() const
 {
     return (m_value) ? "true" : "false";
 }
-    
+
 std::string OptionBool::GetDefaultStrValue() const
 {
     return (m_defaultValue) ? "true" : "false";
@@ -160,12 +160,12 @@ std::string OptionDbl::GetStrValue() const
 {
     return StringFormat("%f", m_value);
 }
-    
+
 std::string OptionDbl::GetDefaultStrValue() const
 {
     return StringFormat("%f", m_defaultValue);
 }
-    
+
 bool OptionDbl::SetValueDbl(double value)
 {
     return SetValue(value);
@@ -216,12 +216,12 @@ std::string OptionInt::GetStrValue() const
 {
     return StringFormat("%d", m_value);
 }
-    
+
 std::string OptionInt::GetDefaultStrValue() const
 {
     return StringFormat("%d", m_defaultValue);
 }
-    
+
 int OptionInt::GetValue() const
 {
     return (m_definitionFactor) ? m_value * DEFINITION_FACTOR : m_value;
@@ -282,8 +282,7 @@ void OptionArray::Init()
     m_values.empty();
     m_defaultValues.empty();
 }
-    
-    
+
 bool OptionArray::SetValueArray(const std::vector<std::string> &values)
 {
     m_values = values;
@@ -296,7 +295,7 @@ bool OptionArray::SetValue(std::string value)
     m_values.push_back(value);
     return true;
 }
-    
+
 std::string OptionArray::GetStrValue() const
 {
     std::stringstream ss;
@@ -309,7 +308,7 @@ std::string OptionArray::GetStrValue() const
     }
     return ss.str();
 }
-    
+
 std::string OptionArray::GetDefaultStrValue() const
 {
     std::stringstream ss;
@@ -374,7 +373,7 @@ std::string OptionIntMap::GetStrValue() const
 {
     assert(m_values);
     assert(m_values->count(m_value));
-    
+
     return (m_values->at(m_value));
 }
 
@@ -382,10 +381,10 @@ std::string OptionIntMap::GetDefaultStrValue() const
 {
     assert(m_values);
     assert(m_values->count(m_defaultValue));
-    
+
     return (m_values->at(m_defaultValue));
 }
-    
+
 bool OptionIntMap::SetValue(int value)
 {
     assert(m_values);
@@ -467,175 +466,186 @@ std::string OptionStaffrel::GetDefaultStrValue() const
     Att converter;
     return converter.StaffrelToStr(m_defaultValue);
 }
-    
+
 //----------------------------------------------------------------------------
 // Options
 //----------------------------------------------------------------------------
 
 Options::Options()
 {
-    /********* layout *********/
+    /********* General *********/
 
-    m_generalLayout.SetLabel("General layout options", "generalLayout");
-    m_grps.push_back(&m_generalLayout);
+    m_general.SetLabel("Input and page layout options", "1-general");
+    m_grps.push_back(&m_general);
 
     m_adjustPageHeight.SetInfo("Adjust page height", "Crop the page height to the height of the content");
     m_adjustPageHeight.Init(false);
-    this->Register(&m_adjustPageHeight, "adjustPageHeight", &m_generalLayout);
-
-    m_barLineWidth.SetInfo("Bar line width", "The barLine width");
-    m_barLineWidth.Init(0.30, 0.10, 0.80);
-    this->Register(&m_barLineWidth, "barLineWidth", &m_generalLayout);
-
-    m_beamMaxSlope.SetInfo("Beam max slope", "The maximum beam slope");
-    m_beamMaxSlope.Init(10, 1, 20);
-    this->Register(&m_beamMaxSlope, "beamMaxSlope", &m_generalLayout);
-
-    m_beamMinSlope.SetInfo("Beam min slope", "The minimum beam slope");
-    m_beamMinSlope.Init(0, 0, 0);
-    this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
+    this->Register(&m_adjustPageHeight, "adjustPageHeight", &m_general);
 
     m_breaks.SetInfo("Breaks", "Define page and system breaks layout");
     m_breaks.Init(BREAKS_auto, &Option::s_breaks);
-    this->Register(&m_breaks, "breaks", &m_generalLayout);
+    this->Register(&m_breaks, "breaks", &m_general);
 
     m_evenNoteSpacing.SetInfo("Even note spacing", "Specify the linear spacing factor");
     m_evenNoteSpacing.Init(false);
-    this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_generalLayout);
-
-    m_font.SetInfo("Font", "Set the music font");
-    m_font.Init("Leipzig");
-    this->Register(&m_font, "font", &m_generalLayout);
-
-    m_graceFactor.SetInfo("Grace factor", "The grace size ratio numerator");
-    m_graceFactor.Init(0.75, 0.5, 1.0);
-    this->Register(&m_graceFactor, "graceFactor", &m_generalLayout);
-
-    m_hairpinSize.SetInfo("Hairpin size", "The haripin size in MEI units");
-    m_hairpinSize.Init(3.0, 1.0, 8.0);
-    this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);
+    this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_general);
 
     m_humType.SetInfo("Humdrum type", "Include type attributes when importing from Humdrum");
     m_humType.Init(false);
-    this->Register(&m_humType, "humType", &m_generalLayout);
+    this->Register(&m_humType, "humType", &m_general);
 
     m_landscape.SetInfo("Landscape orientation", "The landscape paper orientation flag");
     m_landscape.Init(false);
-    this->Register(&m_landscape, "landscape", &m_generalLayout);
-
-    m_leftPosition.SetInfo("Left position", "The left position");
-    m_leftPosition.Init(0.8, 0.0, 2.0);
-    this->Register(&m_leftPosition, "leftPosition", &m_generalLayout);
+    this->Register(&m_landscape, "landscape", &m_general);
 
     m_lyricSize.SetInfo("Lyric size", "The lyrics size in MEI units");
     m_lyricSize.Init(4.5, 2.0, 8.0);
     this->Register(&m_lyricSize, "lyricSize", &m_generalLayout);
 
-    m_measureMinWidth.SetInfo("Measure min width", "The minimal measure width in MEI units");
-    m_measureMinWidth.Init(15, 1, 30);
-    this->Register(&m_measureMinWidth, "minMeasureWidth", &m_generalLayout);
-
-    m_measureNumber.SetInfo("Measure number", "The measure numbering rule (unused)");
-    m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
-    this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
-
     m_mmOutput.SetInfo("MM output", "Specify that the output in the SVG is given in mm (default is px)");
     m_mmOutput.Init(false);
-    this->Register(&m_mmOutput, "mmOutput", &m_generalLayout);
+    this->Register(&m_mmOutput, "mmOutput", &m_general);
 
     m_noFooter.SetInfo("No footer", "Do not add any footer");
     m_noFooter.Init(false);
-    this->Register(&m_noFooter, "noFooter", &m_generalLayout);
+    this->Register(&m_noFooter, "noFooter", &m_general);
 
     m_noHeader.SetInfo("No header", "Do not add any header");
     m_noHeader.Init(false);
-    this->Register(&m_noHeader, "noHeader", &m_generalLayout);
+    this->Register(&m_noHeader, "noHeader", &m_general);
 
     m_noJustification.SetInfo("No justification", "Do not justify the system");
     m_noJustification.Init(false);
-    this->Register(&m_noJustification, "noJustification", &m_generalLayout);
+    this->Register(&m_noJustification, "noJustification", &m_general);
 
     m_pageHeight.SetInfo("Page height", "The page height");
     m_pageHeight.Init(2970, 100, 60000, true);
-    this->Register(&m_pageHeight, "pageHeight", &m_generalLayout);
-    
+    this->Register(&m_pageHeight, "pageHeight", &m_general);
+
     m_pageMarginBottom.SetInfo("Page bottom margin", "The page bottom margin");
     m_pageMarginBottom.Init(50, 0, 500, true);
-    this->Register(&m_pageMarginBottom, "pageMarginBottom", &m_generalLayout);
+    this->Register(&m_pageMarginBottom, "pageMarginBottom", &m_general);
 
     m_pageMarginLeft.SetInfo("Page left margin", "The page left margin");
     m_pageMarginLeft.Init(50, 0, 500, true);
-    this->Register(&m_pageMarginLeft, "pageMarginLeft", &m_generalLayout);
+    this->Register(&m_pageMarginLeft, "pageMarginLeft", &m_general);
 
     m_pageMarginRight.SetInfo("Page right margin", "The page right margin");
     m_pageMarginRight.Init(50, 0, 500, true);
-    this->Register(&m_pageMarginRight, "pageMarginRight", &m_generalLayout);
+    this->Register(&m_pageMarginRight, "pageMarginRight", &m_general);
 
     m_pageMarginTop.SetInfo("Page top margin", "The page top margin");
     m_pageMarginTop.Init(50, 0, 500, true);
-    this->Register(&m_pageMarginTop, "pageMarginTop", &m_generalLayout);
+    this->Register(&m_pageMarginTop, "pageMarginTop", &m_general);
 
     m_pageWidth.SetInfo("Page width", "The page width");
     m_pageWidth.Init(2100, 100, 60000, true);
-    this->Register(&m_pageWidth, "pageWidth", &m_generalLayout);
+    this->Register(&m_pageWidth, "pageWidth", &m_general);
 
+    m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
+    m_unit.Init(9, 6, 20, true);
+    this->Register(&m_unit, "unit", &m_general);
+    
+    /********* General layout *********/
+    
+    m_generalLayout.SetLabel("General layout options", "2-generalLayout");
+    m_grps.push_back(&m_generalLayout);
+    
+    m_barLineWidth.SetInfo("Bar line width", "The barLine width");
+    m_barLineWidth.Init(0.30, 0.10, 0.80);
+    this->Register(&m_barLineWidth, "barLineWidth", &m_generalLayout);
+    
+    m_beamMaxSlope.SetInfo("Beam max slope", "The maximum beam slope");
+    m_beamMaxSlope.Init(10, 1, 20);
+    this->Register(&m_beamMaxSlope, "beamMaxSlope", &m_generalLayout);
+    
+    m_beamMinSlope.SetInfo("Beam min slope", "The minimum beam slope");
+    m_beamMinSlope.Init(0, 0, 0);
+    this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
+    
+    m_font.SetInfo("Font", "Set the music font");
+    m_font.Init("Leipzig");
+    this->Register(&m_font, "font", &m_generalLayout);
+    
+    m_graceFactor.SetInfo("Grace factor", "The grace size ratio numerator");
+    m_graceFactor.Init(0.75, 0.5, 1.0);
+    this->Register(&m_graceFactor, "graceFactor", &m_generalLayout);
+    
+    m_hairpinSize.SetInfo("Hairpin size", "The haripin size in MEI units");
+    m_hairpinSize.Init(3.0, 1.0, 8.0);
+    this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);
+    
+    m_leftPosition.SetInfo("Left position", "The left position");
+    m_leftPosition.Init(0.8, 0.0, 2.0);
+    this->Register(&m_leftPosition, "leftPosition", &m_generalLayout);
+    
+    m_lyricSize.SetInfo("Lyric size", "The lyrics size in MEI units");
+    m_lyricSize.Init(4.5, 2.0, 8.0);
+    this->Register(&m_lyricSize, "lyricSize", &m_generalLayout);
+    
+    m_measureMinWidth.SetInfo("Measure min width", "The minimal measure width in MEI units");
+    m_measureMinWidth.Init(15, 1, 30);
+    this->Register(&m_measureMinWidth, "minMeasureWidth", &m_generalLayout);
+    
+    m_measureNumber.SetInfo("Measure number", "The measure numbering rule (unused)");
+    m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
+    this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
+    
     m_slurMinHeight.SetInfo("Slur min height", "The minimum slur height in MEI units");
     m_slurMinHeight.Init(1.2, 0.3, 2.0);
-    this->Register(&m_slurMinHeight, "minSlurHeight", &m_generalLayout);
-
+    this->Register(&m_slurMinHeight, "slurMinHeight", &m_generalLayout);
+    
     m_slurMaxHeight.SetInfo("Slur max height", "The maximum slur height in MEI units");
     m_slurMaxHeight.Init(3.0, 2.0, 4.0);
-    this->Register(&m_slurMaxHeight, "maxSlurHeight", &m_generalLayout);
-
+    this->Register(&m_slurMaxHeight, "slurMaxHeight", &m_generalLayout);
+    
     m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
     m_slurThickness.Init(0.6, 0.2, 1.2);
     this->Register(&m_slurThickness, "slurThickness", &m_generalLayout);
-
+    
     m_spacingLinear.SetInfo("Spacing linear", "Specify the linear spacing factor");
     m_spacingLinear.Init(0.25, 0.0, 1.0);
     this->Register(&m_spacingLinear, "spacingLinear", &m_generalLayout);
-
+    
     m_spacingNonLinear.SetInfo("Spacing non linear", "Specify the non-linear spacing factor");
     m_spacingNonLinear.Init(0.6, 0.0, 1.0);
     this->Register(&m_spacingNonLinear, "spacingNonLinear", &m_generalLayout);
-
+    
     m_spacingStaff.SetInfo("Spacing staff", "The staff minimal spacing in MEI units");
     m_spacingStaff.Init(8, 0, 24);
     this->Register(&m_spacingStaff, "spacingStaff", &m_generalLayout);
-
+    
     m_spacingSystem.SetInfo("Spacing system", "The system minimal spacing in MEI units");
     m_spacingSystem.Init(3, 0, 12);
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
-
+    
     m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
     m_staffLineWidth.Init(0.15, 0.10, 0.30);
     this->Register(&m_staffLineWidth, "staffLineWidth", &m_generalLayout);
-
+    
     m_stemWidth.SetInfo("Stem width", "The stem width");
     m_stemWidth.Init(0.20, 0.10, 0.50);
     this->Register(&m_stemWidth, "stemWidth", &m_generalLayout);
-
+    
     m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
     m_tieThickness.Init(0.5, 0.2, 1.0);
     this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);
 
-    m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
-    m_unit.Init(9, 6, 20, true);
-    this->Register(&m_unit, "unit", &m_generalLayout);
-
     /********* selectors *********/
 
-    m_selectors.SetLabel("Element selectors", "selectors");
+    m_selectors.SetLabel("Element selectors", "3-selectors");
     m_grps.push_back(&m_selectors);
 
-    m_appXPathQuery.SetInfo("App xPath query", "Set the xPath query for selecting <app> child elements, for example: "
-                                               "\"./rdg[contains(@source, 'source-id')]\"; by default the <lem> or the "
-                                               "first <rdg> is selected");
+    m_appXPathQuery.SetInfo("App xPath query",
+        "Set the xPath query for selecting <app> child elements, for example: "
+        "\"./rdg[contains(@source, 'source-id')]\"; by default the <lem> or the "
+        "first <rdg> is selected");
     m_appXPathQuery.Init();
     this->Register(&m_appXPathQuery, "appXPathQuery", &m_selectors);
 
-    m_choiceXPathQuery.SetInfo("Choice xPath query", "Set the xPath query for selecting <choice> child elements, for "
-                                                     "example: \"./orig\"; by default the first child is selected");
+    m_choiceXPathQuery.SetInfo("Choice xPath query",
+        "Set the xPath query for selecting <choice> child elements, for "
+        "example: \"./orig\"; by default the first child is selected");
     m_choiceXPathQuery.Init();
     this->Register(&m_choiceXPathQuery, "choiceXPathQuery", &m_selectors);
 
@@ -646,7 +656,7 @@ Options::Options()
 
     /********* The layout left margin by element *********/
 
-    m_elementMargins.SetLabel("Element margins", "elementMargins");
+    m_elementMargins.SetLabel("Element margins", "4-elementMargins");
     m_grps.push_back(&m_elementMargins);
 
     m_defaultBottomMargin.SetInfo("Default bottom margin", "The default bottom margin");
@@ -830,9 +840,7 @@ Options &Options::operator=(const Options &options)
     return *this;
 }
 
-Options::~Options()
-{
-}
+Options::~Options() {}
 
 void Options::Register(Option *option, std::string key, OptionGrp *grp)
 {

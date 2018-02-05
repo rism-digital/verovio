@@ -32,9 +32,7 @@ SystemAligner::SystemAligner() : Object()
     Reset();
 }
 
-SystemAligner::~SystemAligner()
-{
-}
+SystemAligner::~SystemAligner() {}
 
 void SystemAligner::Reset()
 {

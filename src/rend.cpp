@@ -37,9 +37,7 @@ Rend::Rend() : TextElement("rend-"), AreaPosInterface(), AttColor(), AttLang(), 
     Reset();
 }
 
-Rend::~Rend()
-{
-}
+Rend::~Rend() {}
 
 void Rend::Reset()
 {

@@ -86,9 +86,7 @@ PaeInput::PaeInput(Doc *doc, std::string filename)
     m_is_mensural = false;
 }
 
-PaeInput::~PaeInput()
-{
-}
+PaeInput::~PaeInput() {}
 
 //////////////////////////////////////////////////////////////////////////
 

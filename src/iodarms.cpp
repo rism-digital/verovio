@@ -66,9 +66,7 @@ DarmsInput::DarmsInput(Doc *doc, std::string filename) : FileInputStream(doc)
     m_filename = filename;
 }
 
-DarmsInput::~DarmsInput()
-{
-}
+DarmsInput::~DarmsInput() {}
 
 void DarmsInput::UnrollKeysig(int quantity, char alter)
 {

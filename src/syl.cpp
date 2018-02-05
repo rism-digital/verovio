@@ -38,9 +38,7 @@ Syl::Syl() : LayerElement("syl-"), TextListInterface(), TimeSpanningInterface(),
     Reset();
 }
 
-Syl::~Syl()
-{
-}
+Syl::~Syl() {}
 
 void Syl::Reset()
 {

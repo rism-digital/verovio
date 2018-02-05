@@ -640,7 +640,7 @@ std::string Toolkit::GetAvailableOptions() const
             }
             else if (optIntMap) {
                 opt << "type"
-                    << "string";
+                    << "string-list";
                 opt << "default" << optIntMap->GetDefaultStrValue();
                 vector<string> strValues = optIntMap->GetStrValues(false);
                 vector<string>::iterator strIter;

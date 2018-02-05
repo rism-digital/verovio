@@ -37,9 +37,7 @@ Dynam::Dynam() : ControlElement("dynam-"), TextListInterface(), TextDirInterface
     Reset();
 }
 
-Dynam::~Dynam()
-{
-}
+Dynam::~Dynam() {}
 
 void Dynam::Reset()
 {

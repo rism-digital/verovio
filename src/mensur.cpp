@@ -71,9 +71,7 @@ void Mensur::Init()
     Reset();
 }
 
-Mensur::~Mensur()
-{
-}
+Mensur::~Mensur() {}
 
 void Mensur::Reset()
 {

@@ -43,9 +43,7 @@ Tuplet::Tuplet()
     Reset();
 }
 
-Tuplet::~Tuplet()
-{
-}
+Tuplet::~Tuplet() {}
 
 void Tuplet::Reset()
 {

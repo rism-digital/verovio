@@ -33,9 +33,7 @@ PlistInterface::PlistInterface() : Interface(), AttPlist()
     Reset();
 }
 
-PlistInterface::~PlistInterface()
-{
-}
+PlistInterface::~PlistInterface() {}
 
 void PlistInterface::Reset()
 {

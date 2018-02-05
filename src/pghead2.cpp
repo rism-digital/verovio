@@ -24,9 +24,7 @@ PgHead2::PgHead2() : RunningElement("pghead2-")
     Reset();
 }
 
-PgHead2::~PgHead2()
-{
-}
+PgHead2::~PgHead2() {}
 
 void PgHead2::Reset()
 {

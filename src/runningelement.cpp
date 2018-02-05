@@ -47,9 +47,7 @@ RunningElement::RunningElement(std::string classid) : Object(classid), AttHorizo
     Reset();
 }
 
-RunningElement::~RunningElement()
-{
-}
+RunningElement::~RunningElement() {}
 
 void RunningElement::Reset()
 {

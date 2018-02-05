@@ -66,9 +66,7 @@ MusicXmlInput::MusicXmlInput(Doc *doc, std::string filename) : FileInputStream(d
     m_filename = filename;
 }
 
-MusicXmlInput::~MusicXmlInput()
-{
-}
+MusicXmlInput::~MusicXmlInput() {}
 
 bool MusicXmlInput::ImportFile()
 {

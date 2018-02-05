@@ -98,9 +98,7 @@ MeiOutput::MeiOutput(Doc *doc, std::string filename) : FileOutputStream(doc)
     m_scoreBasedMEI = false;
 }
 
-MeiOutput::~MeiOutput()
-{
-}
+MeiOutput::~MeiOutput() {}
 
 bool MeiOutput::ExportFile()
 {
@@ -877,6 +875,7 @@ void MeiOutput::WriteMeasure(pugi::xml_node currentNode, Measure *measure)
 
     WriteXmlId(currentNode, measure);
     measure->WriteMeasureLog(currentNode);
+    measure->WriteMeterConformanceBar(currentNode);
     measure->WriteNNumberLike(currentNode);
     measure->WritePointing(currentNode);
     measure->WriteTyped(currentNode);
@@ -1777,9 +1776,7 @@ MeiInput::MeiInput(Doc *doc, std::string filename) : FileInputStream(doc)
     m_version = MEI_UNDEFINED;
 }
 
-MeiInput::~MeiInput()
-{
-}
+MeiInput::~MeiInput() {}
 
 bool MeiInput::ImportFile()
 {
@@ -2783,6 +2780,7 @@ bool MeiInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     SetMeiUuid(measure, vrvMeasure);
 
     vrvMeasure->ReadMeasureLog(measure);
+    vrvMeasure->ReadMeterConformanceBar(measure);
     vrvMeasure->ReadNNumberLike(measure);
     vrvMeasure->ReadPointing(measure);
     vrvMeasure->ReadTyped(measure);

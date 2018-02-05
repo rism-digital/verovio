@@ -35,9 +35,7 @@ Ending::Ending() : SystemElement("ending-"), BoundaryStartInterface(), AttLineRe
     Reset();
 }
 
-Ending::~Ending()
-{
-}
+Ending::~Ending() {}
 
 void Ending::Reset()
 {
