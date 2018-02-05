@@ -96,7 +96,7 @@ verovio.toolkit.prototype.edit = function (editorAction) {
 };
 
 verovio.toolkit.prototype.getAvailableOptions = function () {
-	return verovio.vrvToolkit.getAvailableOptions(this.ptr);
+	return JSON.parse(verovio.vrvToolkit.getAvailableOptions(this.ptr));
 };
 
 verovio.toolkit.prototype.getElementsAtTime = function (millisec) {
@@ -116,7 +116,7 @@ verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {
 };
 
 verovio.toolkit.prototype.getOptions = function (defaultValues) {
-	return verovio.vrvToolkit.getOptions(this.ptr, defaultValues);
+	return JSON.parse(verovio.vrvToolkit.getOptions(this.ptr, defaultValues));
 };
 
 verovio.toolkit.prototype.getPageCount = function () {

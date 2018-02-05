@@ -593,11 +593,11 @@ Options::Options()
     
     m_slurMinHeight.SetInfo("Slur min height", "The minimum slur height in MEI units");
     m_slurMinHeight.Init(1.2, 0.3, 2.0);
-    this->Register(&m_slurMinHeight, "minSlurHeight", &m_generalLayout);
+    this->Register(&m_slurMinHeight, "slurMinHeight", &m_generalLayout);
     
     m_slurMaxHeight.SetInfo("Slur max height", "The maximum slur height in MEI units");
     m_slurMaxHeight.Init(3.0, 2.0, 4.0);
-    this->Register(&m_slurMaxHeight, "maxSlurHeight", &m_generalLayout);
+    this->Register(&m_slurMaxHeight, "slurMaxHeight", &m_generalLayout);
     
     m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
     m_slurThickness.Init(0.6, 0.2, 1.2);
