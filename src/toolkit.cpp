@@ -598,11 +598,13 @@ std::string Toolkit::GetAvailableOptions() const
             const OptionBool *optBool = dynamic_cast<const OptionBool *>(*iter);
 
             if (optBool) {
-                opt << "type" << "bool";
+                opt << "type"
+                    << "bool";
                 opt << "default" << optBool->GetDefault();
             }
             else if (optDbl) {
-                opt << "type" << "double";
+                opt << "type"
+                    << "double";
                 jsonxx::Value value(optDbl->GetDefault());
                 value.precision_ = 2;
                 opt << "default" << value;
@@ -614,17 +616,20 @@ std::string Toolkit::GetAvailableOptions() const
                 opt << "max" << value;
             }
             else if (optInt) {
-                opt << "type" << "int";
+                opt << "type"
+                    << "int";
                 opt << "default" << optInt->GetDefault();
                 opt << "min" << optInt->GetMin();
                 opt << "max" << optInt->GetMax();
             }
             else if (optString) {
-                opt << "type" << "string";
+                opt << "type"
+                    << "string";
                 opt << "default" << optString->GetDefault();
             }
             else if (optArray) {
-                opt << "type" << "array";
+                opt << "type"
+                    << "array";
                 vector<string> strValues = optArray->GetDefault();
                 vector<string>::iterator strIter;
                 jsonxx::Array values;
@@ -634,7 +639,8 @@ std::string Toolkit::GetAvailableOptions() const
                 opt << "default" << values;
             }
             else if (optIntMap) {
-                opt << "type" << "string-list";
+                opt << "type"
+                    << "string-list";
                 opt << "default" << optIntMap->GetDefaultStrValue();
                 vector<string> strValues = optIntMap->GetStrValues(false);
                 vector<string>::iterator strIter;

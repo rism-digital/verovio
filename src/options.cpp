@@ -54,7 +54,7 @@ bool Option::SetValueDbl(double value)
     LogError("Unsupported type double for %s", m_key.c_str());
     return false;
 }
-    
+
 bool Option::SetValueArray(const std::vector<std::string> &values)
 {
     // If not overriden
@@ -68,14 +68,14 @@ bool Option::SetValue(std::string value)
     LogError("Unsupported type string for %s", m_key.c_str());
     return false;
 }
-    
+
 std::string Option::GetStrValue() const
 {
     // If not overriden
     assert(false);
     return "[unspecified]";
 }
-    
+
 std::string Option::GetDefaultStrValue() const
 {
     // If not overriden
@@ -120,7 +120,7 @@ std::string OptionBool::GetStrValue() const
 {
     return (m_value) ? "true" : "false";
 }
-    
+
 std::string OptionBool::GetDefaultStrValue() const
 {
     return (m_defaultValue) ? "true" : "false";
@@ -160,12 +160,12 @@ std::string OptionDbl::GetStrValue() const
 {
     return StringFormat("%f", m_value);
 }
-    
+
 std::string OptionDbl::GetDefaultStrValue() const
 {
     return StringFormat("%f", m_defaultValue);
 }
-    
+
 bool OptionDbl::SetValueDbl(double value)
 {
     return SetValue(value);
@@ -216,12 +216,12 @@ std::string OptionInt::GetStrValue() const
 {
     return StringFormat("%d", m_value);
 }
-    
+
 std::string OptionInt::GetDefaultStrValue() const
 {
     return StringFormat("%d", m_defaultValue);
 }
-    
+
 int OptionInt::GetValue() const
 {
     return (m_definitionFactor) ? m_value * DEFINITION_FACTOR : m_value;
@@ -282,8 +282,7 @@ void OptionArray::Init()
     m_values.empty();
     m_defaultValues.empty();
 }
-    
-    
+
 bool OptionArray::SetValueArray(const std::vector<std::string> &values)
 {
     m_values = values;
@@ -296,7 +295,7 @@ bool OptionArray::SetValue(std::string value)
     m_values.push_back(value);
     return true;
 }
-    
+
 std::string OptionArray::GetStrValue() const
 {
     std::stringstream ss;
@@ -309,7 +308,7 @@ std::string OptionArray::GetStrValue() const
     }
     return ss.str();
 }
-    
+
 std::string OptionArray::GetDefaultStrValue() const
 {
     std::stringstream ss;
@@ -374,7 +373,7 @@ std::string OptionIntMap::GetStrValue() const
 {
     assert(m_values);
     assert(m_values->count(m_value));
-    
+
     return (m_values->at(m_value));
 }
 
@@ -382,10 +381,10 @@ std::string OptionIntMap::GetDefaultStrValue() const
 {
     assert(m_values);
     assert(m_values->count(m_defaultValue));
-    
+
     return (m_values->at(m_defaultValue));
 }
-    
+
 bool OptionIntMap::SetValue(int value)
 {
     assert(m_values);
@@ -467,7 +466,7 @@ std::string OptionStaffrel::GetDefaultStrValue() const
     Att converter;
     return converter.StaffrelToStr(m_defaultValue);
 }
-    
+
 //----------------------------------------------------------------------------
 // Options
 //----------------------------------------------------------------------------
@@ -558,7 +557,7 @@ Options::Options()
     m_pageHeight.SetInfo("Page height", "The page height");
     m_pageHeight.Init(2970, 100, 60000, true);
     this->Register(&m_pageHeight, "pageHeight", &m_generalLayout);
-    
+
     m_pageMarginBottom.SetInfo("Page bottom margin", "The page bottom margin");
     m_pageMarginBottom.Init(50, 0, 500, true);
     this->Register(&m_pageMarginBottom, "pageMarginBottom", &m_generalLayout);
@@ -628,14 +627,16 @@ Options::Options()
     m_selectors.SetLabel("Element selectors", "selectors");
     m_grps.push_back(&m_selectors);
 
-    m_appXPathQuery.SetInfo("App xPath query", "Set the xPath query for selecting <app> child elements, for example: "
-                                               "\"./rdg[contains(@source, 'source-id')]\"; by default the <lem> or the "
-                                               "first <rdg> is selected");
+    m_appXPathQuery.SetInfo("App xPath query",
+        "Set the xPath query for selecting <app> child elements, for example: "
+        "\"./rdg[contains(@source, 'source-id')]\"; by default the <lem> or the "
+        "first <rdg> is selected");
     m_appXPathQuery.Init();
     this->Register(&m_appXPathQuery, "appXPathQuery", &m_selectors);
 
-    m_choiceXPathQuery.SetInfo("Choice xPath query", "Set the xPath query for selecting <choice> child elements, for "
-                                                     "example: \"./orig\"; by default the first child is selected");
+    m_choiceXPathQuery.SetInfo("Choice xPath query",
+        "Set the xPath query for selecting <choice> child elements, for "
+        "example: \"./orig\"; by default the first child is selected");
     m_choiceXPathQuery.Init();
     this->Register(&m_choiceXPathQuery, "choiceXPathQuery", &m_selectors);
 
@@ -830,9 +831,7 @@ Options &Options::operator=(const Options &options)
     return *this;
 }
 
-Options::~Options()
-{
-}
+Options::~Options() {}
 
 void Options::Register(Option *option, std::string key, OptionGrp *grp)
 {

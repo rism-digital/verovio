@@ -40,9 +40,7 @@ HorizontalAligner::HorizontalAligner() : Object()
     Reset();
 }
 
-HorizontalAligner::~HorizontalAligner()
-{
-}
+HorizontalAligner::~HorizontalAligner() {}
 
 void HorizontalAligner::Reset()
 {
@@ -103,9 +101,7 @@ MeasureAligner::MeasureAligner() : HorizontalAligner()
     Reset();
 }
 
-MeasureAligner::~MeasureAligner()
-{
-}
+MeasureAligner::~MeasureAligner() {}
 
 void MeasureAligner::Reset()
 {
@@ -292,9 +288,7 @@ GraceAligner::GraceAligner() : HorizontalAligner()
     Reset();
 }
 
-GraceAligner::~GraceAligner()
-{
-}
+GraceAligner::~GraceAligner() {}
 
 void GraceAligner::Reset()
 {
@@ -606,9 +600,7 @@ AlignmentReference::AlignmentReference(int staffN) : Object(), AttNInteger()
     this->SetN(staffN);
 }
 
-AlignmentReference::~AlignmentReference()
-{
-}
+AlignmentReference::~AlignmentReference() {}
 
 void AlignmentReference::Reset()
 {
@@ -669,9 +661,7 @@ TimestampAligner::TimestampAligner() : Object()
     Reset();
 }
 
-TimestampAligner::~TimestampAligner()
-{
-}
+TimestampAligner::~TimestampAligner() {}
 
 void TimestampAligner::Reset()
 {

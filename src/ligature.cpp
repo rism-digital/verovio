@@ -44,9 +44,7 @@ void Ligature::Reset()
     ClearClusters();
 }
 
-void Ligature::ClearClusters()
-{
-}
+void Ligature::ClearClusters() {}
 
 void Ligature::AddChild(Object *child)
 {

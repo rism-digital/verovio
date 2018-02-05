@@ -30,9 +30,7 @@ DrawingListInterface::DrawingListInterface()
     Reset();
 }
 
-DrawingListInterface::~DrawingListInterface()
-{
-}
+DrawingListInterface::~DrawingListInterface() {}
 
 void DrawingListInterface::Reset()
 {
@@ -72,9 +70,7 @@ StaffDefDrawingInterface::StaffDefDrawingInterface()
     Reset();
 }
 
-StaffDefDrawingInterface::~StaffDefDrawingInterface()
-{
-}
+StaffDefDrawingInterface::~StaffDefDrawingInterface() {}
 
 void StaffDefDrawingInterface::Reset()
 {
@@ -134,9 +130,7 @@ StemmedDrawingInterface::StemmedDrawingInterface()
     Reset();
 }
 
-StemmedDrawingInterface::~StemmedDrawingInterface()
-{
-}
+StemmedDrawingInterface::~StemmedDrawingInterface() {}
 
 void StemmedDrawingInterface::Reset()
 {

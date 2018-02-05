@@ -36,9 +36,7 @@ SystemElement::SystemElement(std::string classid) : FloatingObject(classid), Att
     Reset();
 }
 
-SystemElement::~SystemElement()
-{
-}
+SystemElement::~SystemElement() {}
 
 void SystemElement::Reset()
 {

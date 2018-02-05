@@ -29,9 +29,7 @@ BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor()
     Reset();
 }
 
-BarLine::~BarLine()
-{
-}
+BarLine::~BarLine() {}
 
 void BarLine::Reset()
 {
@@ -64,8 +62,6 @@ BarLineAttr::BarLineAttr() : BarLine()
     m_isLeft = false;
 }
 
-BarLineAttr::~BarLineAttr()
-{
-}
+BarLineAttr::~BarLineAttr() {}
 
 } // namespace vrv

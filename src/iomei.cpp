@@ -98,9 +98,7 @@ MeiOutput::MeiOutput(Doc *doc, std::string filename) : FileOutputStream(doc)
     m_scoreBasedMEI = false;
 }
 
-MeiOutput::~MeiOutput()
-{
-}
+MeiOutput::~MeiOutput() {}
 
 bool MeiOutput::ExportFile()
 {
@@ -1777,9 +1775,7 @@ MeiInput::MeiInput(Doc *doc, std::string filename) : FileInputStream(doc)
     m_version = MEI_UNDEFINED;
 }
 
-MeiInput::~MeiInput()
-{
-}
+MeiInput::~MeiInput() {}
 
 bool MeiInput::ImportFile()
 {

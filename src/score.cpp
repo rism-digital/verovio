@@ -30,9 +30,7 @@ Score::Score() : Object("score-")
     Reset();
 }
 
-Score::~Score()
-{
-}
+Score::~Score() {}
 
 void Score::Reset()
 {

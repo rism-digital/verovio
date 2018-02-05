@@ -36,9 +36,7 @@ Section::Section() : SystemElement("section-"), BoundaryStartInterface(), AttNNu
     Reset();
 }
 
-Section::~Section()
-{
-}
+Section::~Section() {}
 
 void Section::Reset()
 {
@@ -82,9 +80,7 @@ Pb::Pb() : SystemElement("pb-"), AttNNumberLike()
     Reset();
 }
 
-Pb::~Pb()
-{
-}
+Pb::~Pb() {}
 
 void Pb::Reset()
 {
@@ -103,9 +99,7 @@ Sb::Sb() : SystemElement("sb-"), AttNNumberLike()
     Reset();
 }
 
-Sb::~Sb()
-{
-}
+Sb::~Sb() {}
 
 void Sb::Reset()
 {

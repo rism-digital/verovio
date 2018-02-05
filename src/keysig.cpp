@@ -116,9 +116,7 @@ void KeySig::Init()
     Reset();
 }
 
-KeySig::~KeySig()
-{
-}
+KeySig::~KeySig() {}
 
 void KeySig::Reset()
 {

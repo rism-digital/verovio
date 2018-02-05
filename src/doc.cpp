@@ -726,8 +726,7 @@ void Doc::CastOffDoc()
     Page *currentPage = new Page();
     CastOffPagesParams castOffPagesParams(contentPage, this, currentPage);
     CastOffRunningElements(&castOffPagesParams);
-    castOffPagesParams.m_pageHeight
-        = this->m_drawingPageHeight - this->m_drawingPageMarginBot;
+    castOffPagesParams.m_pageHeight = this->m_drawingPageHeight - this->m_drawingPageMarginBot;
     Functor castOffPages(&Object::CastOffPages);
     this->AddChild(currentPage);
     contentPage->Process(&castOffPages, &castOffPagesParams);

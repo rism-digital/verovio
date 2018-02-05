@@ -35,9 +35,7 @@ Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), Att
     Reset();
 }
 
-Slur::~Slur()
-{
-}
+Slur::~Slur() {}
 
 void Slur::Reset()
 {

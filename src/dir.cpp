@@ -33,9 +33,7 @@ Dir::Dir() : ControlElement("dir-"), TextListInterface(), TextDirInterface(), Ti
     Reset();
 }
 
-Dir::~Dir()
-{
-}
+Dir::~Dir() {}
 
 void Dir::Reset()
 {

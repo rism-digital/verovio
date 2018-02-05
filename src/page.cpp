@@ -37,9 +37,7 @@ Page::Page() : Object("page-")
     Reset();
 }
 
-Page::~Page()
-{
-}
+Page::~Page() {}
 
 void Page::Reset()
 {
@@ -416,7 +414,8 @@ void Page::JustifyHorizontally()
     // Justify X position
     Functor justifyX(&Object::JustifyX);
     JustifyXParams justifyXParams(&justifyX);
-    justifyXParams.m_systemFullWidth = doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight;
+    justifyXParams.m_systemFullWidth
+        = doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight;
     this->Process(&justifyX, &justifyXParams);
 }
 

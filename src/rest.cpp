@@ -39,9 +39,7 @@ Rest::Rest()
     Reset();
 }
 
-Rest::~Rest()
-{
-}
+Rest::~Rest() {}
 
 void Rest::Reset()
 {

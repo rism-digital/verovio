@@ -35,9 +35,7 @@ BeatRpt::BeatRpt() : LayerElement("beatrpt-"), AttColor(), AttBeatRptVis()
     Reset();
 }
 
-BeatRpt::~BeatRpt()
-{
-}
+BeatRpt::~BeatRpt() {}
 
 void BeatRpt::Reset()
 {
@@ -60,9 +58,7 @@ MRpt::MRpt() : LayerElement("mrpt-")
     Reset();
 }
 
-MRpt::~MRpt()
-{
-}
+MRpt::~MRpt() {}
 
 void MRpt::Reset()
 {
@@ -80,9 +76,7 @@ MRpt2::MRpt2() : LayerElement("mrpt2-")
     Reset();
 }
 
-MRpt2::~MRpt2()
-{
-}
+MRpt2::~MRpt2() {}
 
 void MRpt2::Reset()
 {
@@ -99,9 +93,7 @@ MultiRpt::MultiRpt() : LayerElement("multirpt-"), AttNumbered()
     Reset();
 }
 
-MultiRpt::~MultiRpt()
-{
-}
+MultiRpt::~MultiRpt() {}
 
 void MultiRpt::Reset()
 {

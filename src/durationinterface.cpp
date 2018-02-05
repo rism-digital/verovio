@@ -48,9 +48,7 @@ DurationInterface::DurationInterface()
     Reset();
 }
 
-DurationInterface::~DurationInterface()
-{
-}
+DurationInterface::~DurationInterface() {}
 
 void DurationInterface::Reset()
 {

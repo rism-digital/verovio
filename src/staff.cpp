@@ -187,9 +187,7 @@ LedgerLine::LedgerLine()
     Reset();
 }
 
-LedgerLine::~LedgerLine()
-{
-}
+LedgerLine::~LedgerLine() {}
 
 void LedgerLine::Reset()
 {

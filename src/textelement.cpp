@@ -33,9 +33,7 @@ TextElement::TextElement(std::string classid) : Object(classid), AttTyped()
     Reset();
 }
 
-TextElement::~TextElement()
-{
-}
+TextElement::~TextElement() {}
 
 void TextElement::Reset()
 {

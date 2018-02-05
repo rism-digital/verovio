@@ -32,9 +32,7 @@ Octave::Octave()
     Reset();
 }
 
-Octave::~Octave()
-{
-}
+Octave::~Octave() {}
 
 void Octave::Reset()
 {

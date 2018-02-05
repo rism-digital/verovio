@@ -74,9 +74,7 @@ Note::Note()
     Reset();
 }
 
-Note::~Note()
-{
-}
+Note::~Note() {}
 
 void Note::Reset()
 {

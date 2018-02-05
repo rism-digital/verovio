@@ -29,9 +29,7 @@ PgHead::PgHead() : RunningElement("pghead-")
     Reset();
 }
 
-PgHead::~PgHead()
-{
-}
+PgHead::~PgHead() {}
 
 void PgHead::Reset()
 {

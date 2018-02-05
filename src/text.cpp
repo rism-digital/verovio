@@ -27,9 +27,7 @@ Text::Text() : TextElement("text-")
     Reset();
 }
 
-Text::~Text()
-{
-}
+Text::~Text() {}
 
 void Text::Reset()
 {

@@ -50,9 +50,7 @@ FloatingObject::FloatingObject(std::string classid) : Object(classid)
     m_currentPositioner = NULL;
 }
 
-FloatingObject::~FloatingObject()
-{
-}
+FloatingObject::~FloatingObject() {}
 
 void FloatingObject::Reset()
 {

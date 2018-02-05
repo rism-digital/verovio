@@ -37,9 +37,7 @@ View::View()
     m_currentSystem = NULL;
 }
 
-View::~View()
-{
-}
+View::~View() {}
 
 void View::SetDoc(Doc *doc)
 {
