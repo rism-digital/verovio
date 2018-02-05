@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+* Adding support for `@metcon` on measure
 * Adding getAvailableOptions and getOptions(bool) methods to the JS toolkit
 * Adding several layout options
 * Support for `<pgHead>`, `<pgHead2>`, `<pgFoot>` and `<pgFoot2>`
