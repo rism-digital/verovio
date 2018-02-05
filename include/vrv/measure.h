@@ -57,6 +57,7 @@ public:
      */
     ///@{
     virtual void AddChild(Object *object);
+    void AddChildBack(Object *object);
     ///@}
 
     /**

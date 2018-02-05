@@ -4,6 +4,10 @@ project(Verovio)
 
 set(CMAKE_BUILD_TYPE Release)
 
+if (APPLE)
+       set(CMAKE_MACOSX_RPATH ON)
+endif (APPLE)
+
 option(NO_DARMS_SUPPORT         "Disable Humdrum support"                      ON)
 option(NO_PAE_SUPPORT           "Disable Plaine & Easie support"               OFF)
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
@@ -111,5 +115,5 @@ install(
 install(
     DIRECTORY ../data/
     DESTINATION share/verovio
-    FILES_MATCHING PATTERN "*.xml"
+    FILES_MATCHING PATTERN "*.xml" PATTERN "*.svg"
 )

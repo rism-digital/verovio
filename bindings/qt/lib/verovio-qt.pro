@@ -37,7 +37,7 @@ INCLUDEPATH += include
     INCLUDEPATH += ../../../include/pugi
     INCLUDEPATH += ../../../include/utf8
     INCLUDEPATH += ../../../libmei
-    LIBS += -L../../../tools -lverovio
+    LIBS += -L../../../build -lverovio
 }
 
 unix {
