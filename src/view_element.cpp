@@ -1486,15 +1486,15 @@ int View::GetSylYRel(Syl *syl, Staff *staff)
     assert(syl && staff);
 
     int y = 0;
-    StaffAlignment *aligment = staff->GetAlignment();
-    if (aligment) {
+    StaffAlignment *alignment = staff->GetAlignment();
+    if (alignment) {
         FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
         int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
         int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
         int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        y = -aligment->GetStaffHeight() - aligment->GetOverflowBelow()
-            + (aligment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
+        y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
+            + (alignment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
     }
     return y;
 }

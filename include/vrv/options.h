@@ -492,6 +492,7 @@ public:
     OptionDbl m_hairpinSize;
     OptionDbl m_leftPosition;
     OptionDbl m_lyricSize;
+    OptionDbl m_lyricTopMinMargin;
     OptionInt m_measureMinWidth;
     OptionIntMap m_measureNumber;
     OptionDbl m_slurMaxHeight;

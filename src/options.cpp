@@ -583,6 +583,10 @@ Options::Options()
     m_lyricSize.Init(4.5, 2.0, 8.0);
     this->Register(&m_lyricSize, "lyricSize", &m_generalLayout);
     
+    m_lyricTopMinMargin.SetInfo("Lyric top min margin", "The minmal margin above the lyrics in MEI units");
+    m_lyricTopMinMargin.Init(2.0, 0.0, 8.0);
+    this->Register(&m_lyricTopMinMargin, "lyricTopMinMargin", &m_generalLayout);
+    
     m_measureMinWidth.SetInfo("Measure min width", "The minimal measure width in MEI units");
     m_measureMinWidth.Init(15, 1, 30);
     this->Register(&m_measureMinWidth, "minMeasureWidth", &m_generalLayout);

@@ -1163,7 +1163,10 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         assert(currentLayer);
         // set scoreDef attr
         if (currentLayer->GetStaffDefClef()) {
-            currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
+            // Ignore system scoreDef clefs - clefs changes withing a staff are still taken into account    
+            if (currentLayer->GetStaffDefClef()->GetScoreDefRole() != SYSTEM_SCOREDEF) {
+                currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
+            }
         }
         if (currentLayer->GetStaffDefKeySig()) {
             currentLayer->GetStaffDefKeySig()->SetOverflowBBoxes(params);
