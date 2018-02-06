@@ -2234,6 +2234,7 @@ bool MeiInput::ReadSectionChildren(Object *parent, pugi::xml_node parentNode)
             if (!unmeasured) {
                 if (parent->Is(SECTION)) {
                     unmeasured = new Measure(false);
+                    m_doc->SetMensuralMusicOnly(true);
                     parent->AddChild(unmeasured);
                 }
                 else {
@@ -2452,6 +2453,7 @@ bool MeiInput::ReadSystemChildren(Object *parent, pugi::xml_node parentNode)
                     System *system = dynamic_cast<System *>(parent);
                     assert(system);
                     unmeasured = new Measure(false);
+                    m_doc->SetMensuralMusicOnly(true);
                     if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
                         UpgradeMeasureTo_3_0_0(unmeasured, system);
                     }
@@ -2777,6 +2779,10 @@ bool MeiInput::ReadLabelAbbr(Object *parent, pugi::xml_node labelAbbr)
 bool MeiInput::ReadMeasure(Object *parent, pugi::xml_node measure)
 {
     Measure *vrvMeasure = new Measure();
+    if (m_doc->IsMensuralMusicOnly()) {
+        LogWarning("Mixing mensural and non mensural music is not supported. Trying to go ahead...");
+        m_doc->SetMensuralMusicOnly(false);
+    }
     SetMeiUuid(measure, vrvMeasure);
 
     vrvMeasure->ReadMeasureLog(measure);

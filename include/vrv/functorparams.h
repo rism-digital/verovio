@@ -755,7 +755,43 @@ public:
     ArrayOfObjects m_controlEvents;
     bool m_permanent;
 };
+    
+//----------------------------------------------------------------------------
+// ConvertToCastOffMensuralParams
+//----------------------------------------------------------------------------
 
+
+/**
+ * member 0: a pointer the document we are adding pages to
+ * member 2: a pointer to the current page
+ * member 4: a pointer to the current system
+ * member 3: a pointer to the system we are taking the content from
+ * member 5: a flag indicating if we have processed the first pb
+ **/
+
+class ConvertToCastOffMensuralParams : public FunctorParams {
+public:
+    ConvertToCastOffMensuralParams(Doc *doc, System *targetSystem)
+    {
+        m_doc = doc;
+        m_targetSystem = targetSystem;
+        m_contentLayer = NULL;
+        m_targetMeasure = NULL;
+        m_segmentIdx = 0;
+        m_targetStaff = NULL;
+        m_targetLayer = NULL;
+    }
+    Doc *m_doc;
+    std::vector<int> m_staffNs;
+    Layer *m_contentLayer;
+    System *m_targetSystem;
+    Measure *m_targetMeasure;
+    int m_segmentIdx;
+    Staff *m_targetStaff;
+    Layer *m_targetLayer;;
+};
+    
+    
 //----------------------------------------------------------------------------
 // ConvertToPageBasedParams
 //----------------------------------------------------------------------------

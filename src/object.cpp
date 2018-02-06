@@ -82,9 +82,14 @@ Object::Object(const Object &object) : BoundingBox(object)
     m_interfaces = object.m_interfaces;
     m_isReferencObject = object.m_isReferencObject;
     m_isModified = true;
-    // For now do now copy them
+    this->GenerateUuid();
+    // For now do not copy them
     // m_uuid = object.m_uuid;
     // m_unsupported = object.m_unsupported;
+    
+    if (!object.CopyChildren()) {
+        return;
+    }
 
     int i;
     for (i = 0; i < (int)object.m_children.size(); i++) {
@@ -110,17 +115,20 @@ Object &Object::operator=(const Object &object)
         m_interfaces = object.m_interfaces;
         m_isReferencObject = object.m_isReferencObject;
         m_isModified = true;
+        this->GenerateUuid();
         // For now do now copy them
         // m_uuid = object.m_uuid;
         // m_unsupported = object.m_unsupported;
 
-        int i;
-        for (i = 0; i < (int)object.m_children.size(); i++) {
-            Object *current = object.m_children.at(i);
-            Object *copy = current->Clone();
-            copy->Modify();
-            copy->SetParent(this);
-            m_children.push_back(copy);
+        if (object.CopyChildren()) {
+            int i;
+            for (i = 0; i < (int)object.m_children.size(); i++) {
+                Object *current = object.m_children.at(i);
+                Object *copy = current->Clone();
+                copy->Modify();
+                copy->SetParent(this);
+                m_children.push_back(copy);
+            }
         }
     }
     return *this;
@@ -216,6 +224,14 @@ void Object::MoveItselfTo(Object *targetParent)
 void Object::SetUuid(std::string uuid)
 {
     m_uuid = uuid;
+}
+    
+void Object::SwapUuid(Object *other)
+{
+    assert(other);
+    std::string swapUuid = this->GetUuid();
+    this->SetUuid(other->GetUuid());
+    other->SetUuid(swapUuid);
 }
 
 void Object::ClearChildren()
@@ -942,6 +958,23 @@ int Object::FindAllBetween(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    assert(m_parent);
+    // We want to move only the children of the layer of any type (notes, editorial elements, etc)
+    if (this->m_parent->Is(LAYER)) {
+        assert(params->m_targetLayer);
+        this->MoveItselfTo(params->m_targetLayer);
+        // Do not precess children because we move the full sub-tree
+        return FUNCTOR_SIBLINGS;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+    
 int Object::PreparePlist(FunctorParams *functorParams)
 {
     PreparePlistParams *params = dynamic_cast<PreparePlistParams *>(functorParams);

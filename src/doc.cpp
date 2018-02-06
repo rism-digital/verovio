@@ -90,6 +90,7 @@ void Doc::Reset()
     m_drawingPreparationDone = false;
     m_hasMidiTimemap = false;
     m_hasAnalyticalMarkup = false;
+    m_isMensuralMusicOnly = false;
 
     m_scoreDef.Reset();
     if (m_scoreBuffer) {
@@ -851,6 +852,74 @@ void Doc::ConvertToPageBasedDoc()
     this->AddChild(page);
 
     this->ResetDrawingPage();
+}
+    
+void Doc::ConvertToCastOffMensuralDoc()
+{
+    if (!m_isMensuralMusicOnly) return;
+    
+    this->CollectScoreDefs();
+    
+    // We need to populate processing lists for processing the document by Layer
+    PrepareProcessingListsParams prepareProcessingListsParams;
+    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
+    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+    
+    // The means no content? Checking just in case
+    if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
+   
+    Page *contentPage = this->SetDrawingPage(0);
+    assert(contentPage);
+    Measure *contentMeasure = dynamic_cast<Measure *>(contentPage->FindChildByType(MEASURE));
+    assert(contentMeasure);
+    assert(!contentMeasure->IsMeasuredMusic());
+    
+    contentPage->LayOutHorizontally();
+    
+    Page *page = new Page();
+    this->AddChild(page);
+    System *system = new System();
+    page->AddChild(system);
+    // Create the first measure segment - problem: we are dropping the section element - we should create a score-based MEI file instead
+    Measure *measure = new Measure(false);
+    system->AddChild(measure);
+    
+    std::vector<AttComparison *> filters;
+    ConvertToCastOffMensuralParams convertToCastOffMensuralParams(this, system);
+    // Store the list of staff N for detecting barLines that are on all systems
+    for(auto const& staves: prepareProcessingListsParams.m_layerTree.child) {
+        convertToCastOffMensuralParams.m_staffNs.push_back(staves.first);
+    }
+    
+    // Now we can process by layer and move their content to (measure) segments
+    for (auto const& staves: prepareProcessingListsParams.m_layerTree.child) {
+        for (auto const& layers: staves.second.child) {
+            // Create ad comparison object for each type / @n
+            AttNIntegerComparison matchStaff(STAFF, staves.first);
+            AttNIntegerComparison matchLayer(LAYER, layers.first);
+            filters = { &matchStaff, &matchLayer };
+            
+            convertToCastOffMensuralParams.m_segmentIdx = 1;
+            convertToCastOffMensuralParams.m_targetMeasure = measure;
+
+            Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
+            Functor convertToCastOffMensuralEnd(&Object::ConvertToCastOffMensuralEnd);
+            contentMeasure->Process(&convertToCastOffMensural, &convertToCastOffMensuralParams, &convertToCastOffMensuralEnd, &filters);
+        }
+    }
+    
+    // Detach the contentPage
+    this->DetachChild(0);
+    assert(contentPage && !contentPage->GetParent());
+    delete contentPage;
+    
+    this->PrepareDrawing();
+    
+    // We need to reset the drawing page to NULL
+    // because idx will still be 0 but contentPage is dead!
+    this->ResetDrawingPage();
+    this->CollectScoreDefs(true);
+    
 }
 
 void Doc::ConvertAnalyticalMarkupDoc(bool permanent)

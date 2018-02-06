@@ -506,7 +506,7 @@ double LayerElement::GetAlignmentDuration(
 //----------------------------------------------------------------------------
 // LayerElement functors methods
 //----------------------------------------------------------------------------
-
+    
 int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     SetDrawingXRel(0);
