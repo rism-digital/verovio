@@ -369,8 +369,11 @@ protected:
     bool hasAboveParameter(hum::HTp token, const string &category);
     bool hasBelowParameter(hum::HTp token, const string &category);
     void prepareHeaderFooter();
-	bool prepareHeader(std::vector<std::pair<string, string>> biblist,
-		std::map<std::string, std::string> &refmap);
+    bool prepareHeader(std::vector<std::pair<string, string> > biblist, std::map<std::string, std::string> &refmap);
+    bool prepareFooter(std::vector<std::pair<string, string> > biblist, std::map<std::string, std::string> &refmap);
+    std::string processReferenceTemplate(const std::string &input, std::vector<std::pair<string, string> > biblist,
+        std::map<std::string, std::string> &refmap);
+    std::string processTemplateOperator(const std::string &value, const std::string &op);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

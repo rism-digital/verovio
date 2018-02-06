@@ -1431,6 +1431,303 @@ void HumdrumInput::prepareHeaderFooter()
     }
 
     prepareHeader(biblist, refmap);
+    prepareFooter(biblist, refmap);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processTemplateOperator --
+//      Operators:
+//           n = full name
+//           i = initials for given names and full last name
+//           l = last name
+//           f = first name
+//
+
+std::string HumdrumInput::processTemplateOperator(const std::string &value, const std::string &op)
+{
+    string output;
+
+    if (op.find("n") != std::string::npos) {
+        // full name: reverse strings separated by comma if there is one.
+        auto pos = value.find(",");
+        if (pos == std::string::npos) {
+            output = value;
+        }
+        else {
+            std::string lastname = value.substr(0, pos);
+            std::string firstname = value.substr(pos + 1);
+            output = firstname + " " + lastname;
+        }
+    }
+    else if (op.find("l") != std::string::npos) {
+        // last name: text before comma if there is one.
+        auto pos = value.find(",");
+        if (pos == std::string::npos) {
+            output = value;
+        }
+        else {
+            std::string lastname = value.substr(0, pos);
+            output = lastname;
+        }
+    }
+    else if (op.find("f") != std::string::npos) {
+        // first name: text after comma if there is one.
+        auto pos = value.find(",");
+        if (pos == std::string::npos) {
+            output = value;
+        }
+        else {
+            std::string firstname = value.substr(pos + 1);
+            output = firstname;
+        }
+    }
+    else if (op.find("i") != std::string::npos) {
+        // initialed name: first name converted to initials
+        auto pos = value.find(",");
+        if (pos == std::string::npos) {
+            output = value;
+        }
+        else {
+            std::string lastname = value.substr(0, pos);
+            std::string firstname = value.substr(pos + 1);
+            std::vector<std::string> pieces;
+            hum::HumRegex hre;
+            hre.split(pieces, firstname, " ");
+            firstname.clear();
+            for (int i = 0; i < (int)pieces.size(); i++) {
+                if (pieces[i].empty()) {
+                    continue;
+                }
+                if (std::isupper(pieces[i][0])) {
+                    pieces[i] = pieces[i][0];
+                    pieces[i] += ".";
+                    if (firstname.size() > 1) {
+                        if (firstname[firstname.size() - 2] == '.') {
+                            firstname.pop_back();
+                            firstname += pieces[i] + " ";
+                        }
+                        else {
+                            firstname += pieces[i] + " ";
+                        }
+                    }
+                    else {
+                        firstname += pieces[i] + " ";
+                    }
+                }
+                else {
+                    firstname += pieces[i] + " ";
+                }
+            }
+            output = firstname + lastname;
+        }
+    } else {
+		// unknown operator, so just echo input
+		output = value;
+	}
+
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processReferenceTemplate --
+//
+
+std::string HumdrumInput::processReferenceTemplate(const std::string &input,
+    std::vector<std::pair<string, string> > biblist, std::map<std::string, std::string> &refmap)
+{
+    std::string text = input;
+    hum::HumRegex hre;
+    std::string prefix;
+    std::string suffix;
+    std::string match;
+    std::string key;
+    std::string op;
+    while (hre.search(text, "@\\{(.*?)\\}")) {
+        match = hre.getMatch(1);
+        prefix = hre.getPrefix();
+        suffix = hre.getSuffix();
+        auto pos = match.find(":");
+        if (pos != std::string::npos) {
+            key = match.substr(0, pos);
+            op = match.substr(pos + 1);
+            match = processTemplateOperator(refmap[key], op);
+        }
+        else {
+            match = refmap[match];
+        }
+        text = prefix;
+        text += match;
+        text += suffix;
+    }
+    return unescapeHtmlEntities(text);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::prepareFooter --
+//
+//
+
+bool HumdrumInput::prepareFooter(
+    std::vector<std::pair<string, string> > biblist, std::map<std::string, std::string> &refmap)
+{
+
+    std::string footleft;
+    std::string footcenter;
+    std::string footright;
+    std::vector<std::string> pieces;
+    std::string tstring;
+
+    hum::HumRegex hre;
+
+    //   <rend halign="left" valign="bottom">
+    //      <rend fontsize="small">Footer L1</rend><lb/>
+    //      <rend fontsize="small">Footer L2</rend><lb/>
+    //      <rend fontsize="small">Footer L3</rend>
+    //   </rend>
+
+    auto itL = refmap.find("footer-left");
+    if (itL != refmap.end()) {
+        hre.split(pieces, itL->second, "\\\\n");
+        footleft += "<rend halign=\"left\" valign=\"bottom\">\n";
+        for (int i = 0; i < (int)pieces.size(); i++) {
+            footleft += "<rend fontsize=\"small\">";
+            tstring = processReferenceTemplate(pieces[i], biblist, refmap);
+            if (pieces[i].empty()) {
+                footleft += "&#160;";
+            }
+            else {
+                footleft += tstring;
+            }
+            footleft += "</rend>\n";
+            if (i < (int)pieces.size() - 1) {
+                footleft += "<lb/>\n";
+            }
+        }
+        footleft += "</rend>\n";
+    }
+
+    auto itC = refmap.find("footer-center");
+    if (itC != refmap.end()) {
+        hre.split(pieces, itC->second, "\\\\n");
+        footcenter += "<rend halign=\"center\" valign=\"bottom\">\n";
+        for (int i = 0; i < (int)pieces.size(); i++) {
+            footcenter += "<rend fontsize=\"small\">";
+            tstring = processReferenceTemplate(pieces[i], biblist, refmap);
+            if (pieces[i].empty()) {
+                footcenter += "&#160;";
+            }
+            else {
+                footcenter += tstring;
+            }
+            footcenter += "</rend>\n";
+            if (i < (int)pieces.size() - 1) {
+                footcenter += "<lb/>\n";
+            }
+        }
+        footcenter += "</rend>\n";
+    }
+
+    auto itR = refmap.find("footer-right");
+    if (itR != refmap.end()) {
+        hre.split(pieces, itR->second, "\\\\n");
+        footright += "<rend halign=\"right\" valign=\"bottom\">\n";
+        for (int i = 0; i < (int)pieces.size(); i++) {
+            footright += "<rend fontsize=\"small\">";
+            tstring = processReferenceTemplate(pieces[i], biblist, refmap);
+            if (pieces[i].empty()) {
+                footright += "&#160;";
+            }
+            else {
+                footright += tstring;
+            }
+            footright += "</rend>\n";
+            if (i < (int)pieces.size() - 1) {
+                footright += "<lb/>\n";
+            }
+        }
+        footright += "</rend>\n";
+    }
+
+    string footer;
+    footer += footleft;
+    footer += footcenter;
+    footer += footright;
+
+    if (footer.empty()) {
+        return false;
+    }
+
+    hre.replaceDestructive(footer, "</rend>", "</i>", "g");
+    hre.replaceDestructive(footer, "<rend fontstyle=\"italic\">", "<i>", "g");
+    hre.replaceDestructive(footer, "<rend><num label=\"page\">#</num></rend>", "%P", "g");
+
+    string meifile = "<mei xmlns=\"http://www.music-encoding.org/ns/mei\" meiversion=\"4.0.0\">\n";
+    meifile += "<music><body><mdiv><score><scoreDef>\n";
+    meifile += "<pgFoot>\n";
+    meifile += footer;
+    meifile += "</pgFoot>\n";
+    // Always putting footer on all pages for now:
+    meifile += "<pgFoot2>\n";
+    meifile += footer;
+    meifile += "</pgFoot2>\n";
+    meifile += "</scoreDef></score></mdiv></body></music></mei>\n";
+
+    Doc tempdoc;
+    MeiInput input(&tempdoc, "");
+    if (!input.ImportString(meifile)) {
+        LogError("Error importing data");
+        return false;
+    }
+
+    // MeiOutput meioutput(&tempdoc, "");
+    // meioutput.SetScoreBasedMEI(true);
+    // string meicontent = meioutput.GetOutput();
+    // std::cout << "MEI CONTENT " << meicontent << std::endl;
+
+    Object *pgfoot = tempdoc.m_scoreDef.FindChildByType(ClassId::PGFOOT);
+    if (pgfoot == NULL) {
+        return false;
+    }
+
+    int index = pgfoot->GetIdx();
+    if (index < 0) {
+        return false;
+    }
+    Object *detached = pgfoot->GetParent()->DetachChild(index);
+    if (detached != pgfoot) {
+        std::cerr << "Detached element is not the pgHead" << std::endl;
+        if (detached) {
+            delete detached;
+        }
+        return false;
+    }
+
+    m_doc->m_scoreDef.AddChild(pgfoot);
+
+    Object *pgfoot2 = tempdoc.m_scoreDef.FindChildByType(ClassId::PGFOOT2);
+    if (pgfoot2 == NULL) {
+        return true;
+    }
+
+    index = pgfoot2->GetIdx();
+    if (index < 0) {
+        return true;
+    }
+    detached = pgfoot2->GetParent()->DetachChild(index);
+    if (detached != pgfoot2) {
+        std::cerr << "Detached element is not a pgFoot2 element" << std::endl;
+        if (detached) {
+            delete detached;
+        }
+        return true;
+    }
+
+    m_doc->m_scoreDef.AddChild(pgfoot2);
+
+    return true;
 }
 
 //////////////////////////////
@@ -1507,7 +1804,7 @@ bool HumdrumInput::prepareHeader(
     // <rend fontsize="small" halign="right" valign="bottom">Composer's name</rend>
     if (!composer.empty()) {
         headerText += "<rend fontsize=\"small\" halign=\"right\" valign=\"bottom\">";
-        headerText += composer;
+        headerText += unescapeHtmlEntities(composer);
         headerText += "</rend>\n";
     }
 
@@ -1531,7 +1828,7 @@ bool HumdrumInput::prepareHeader(
     }
     if (!lyricist.empty()) {
         headerText += "<rend fontsize=\"small\" halign=\"left\" valign=\"bottom\">";
-        headerText += lyricist;
+        headerText += unescapeHtmlEntities(lyricist);
         headerText += "</rend>\n";
     }
 
@@ -1582,6 +1879,10 @@ bool HumdrumInput::prepareHeader(
     if (headerText.empty()) {
         return false;
     }
+
+    hre.replaceDestructive(headerText, "</rend>", "</i>", "g");
+    hre.replaceDestructive(headerText, "<rend fontstyle=\"italic\">", "<i>", "g");
+    hre.replaceDestructive(headerText, "<rend><num label=\"page\">#</num></rend>", "%P", "g");
 
     string meifile = "<mei xmlns=\"http://www.music-encoding.org/ns/mei\" meiversion=\"4.0.0\">\n";
     meifile += "<music><body><mdiv><score><scoreDef><pgHead>\n";
