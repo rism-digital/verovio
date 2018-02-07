@@ -498,10 +498,6 @@ Options::Options()
     m_landscape.Init(false);
     this->Register(&m_landscape, "landscape", &m_general);
 
-    m_lyricSize.SetInfo("Lyric size", "The lyrics size in MEI units");
-    m_lyricSize.Init(4.5, 2.0, 8.0);
-    this->Register(&m_lyricSize, "lyricSize", &m_generalLayout);
-
     m_mmOutput.SetInfo("MM output", "Specify that the output in the SVG is given in mm (default is px)");
     m_mmOutput.Init(false);
     this->Register(&m_mmOutput, "mmOutput", &m_general);
