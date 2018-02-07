@@ -491,6 +491,7 @@ public:
     OptionDbl m_graceFactor;
     OptionDbl m_hairpinSize;
     OptionDbl m_leftPosition;
+    OptionDbl m_lyricHyphenWidth;
     OptionDbl m_lyricSize;
     OptionDbl m_lyricTopMinMargin;
     OptionInt m_measureMinWidth;

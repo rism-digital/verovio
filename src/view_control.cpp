@@ -1558,9 +1558,13 @@ void View::DrawSylConnector(
 
 void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff)
 {
+    int width = m_doc->GetOptions()->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    // Adjust it proportionally to the lyric size
+    width *= m_doc->GetOptions()->m_lyricSize.GetValue() / m_doc->GetOptions()->m_lyricSize.GetDefault();
+    
     if (syl->GetCon() == sylLog_CON_d) {
 
-        y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3;
+        y += (m_doc->GetOptions()->m_lyricSize.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 5);
         // x position of the syl is two units back
         x2 -= 2 * (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
@@ -1595,14 +1599,14 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         for (i = 0; i < nbDashes; i++) {
             x = x1 + margin + (i * dashSpace);
             x = std::max(x, x1);
-            DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength,
-                y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+            
+            DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
         }
     }
     else if (syl->GetCon() == sylLog_CON_u) {
         x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         if (x2 > x1) {
-            DrawFilledRectangle(dc, x1, y, x2, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+            DrawFilledRectangle(dc, x1, y, x2, y + width);
         }
     }
 }

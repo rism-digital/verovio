@@ -579,6 +579,10 @@ Options::Options()
     m_leftPosition.Init(0.8, 0.0, 2.0);
     this->Register(&m_leftPosition, "leftPosition", &m_generalLayout);
     
+    m_lyricHyphenWidth.SetInfo("Lyric hyphen width", "The lyric hyphen and dash width");
+    m_lyricHyphenWidth.Init(0.20, 0.10, 0.50);
+    this->Register(&m_lyricHyphenWidth, "lyricHyphenWidth", &m_generalLayout);
+    
     m_lyricSize.SetInfo("Lyric size", "The lyrics size in MEI units");
     m_lyricSize.Init(4.5, 2.0, 8.0);
     this->Register(&m_lyricSize, "lyricSize", &m_generalLayout);
