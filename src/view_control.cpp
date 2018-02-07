@@ -2001,7 +2001,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
     // set norm as default
     int code = SMUFL_E56D_ornamentMordentInverted;
     if (mordent->GetForm() == mordentLog_FORM_upper) code = SMUFL_E56C_ornamentMordent;
-    if (mordent->GetLong() == true) code = SMUFL_E56E_ornamentTremblement;
+    if (mordent->GetLong() == BOOLEAN_true) code = SMUFL_E56E_ornamentTremblement;
 
     std::wstring str;
     str.push_back(code);
@@ -2267,7 +2267,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     dc->StartGraphic(turn, "", turn->GetUuid());
 
     int x = turn->GetStart()->GetDrawingX() + turn->GetStart()->GetDrawingRadius(m_doc);
-    if (turn->GetDelayed() == true) LogWarning("delayed turns not supported");
+    if (turn->GetDelayed() == BOOLEAN_true) LogWarning("delayed turns not supported");
 
     // set norm as default
     int code = SMUFL_E567_ornamentTurn;

@@ -1003,7 +1003,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     // We do not support more than three chars
     int num = std::min(multiRest->GetNum(), 999);
 
-    if (num > 2 || multiRest->GetBlock() == true) {
+    if ((num > 2) || (multiRest->GetBlock() == BOOLEAN_true)) {
         // This is 1/2 the length of the black rectangle
         length = width - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
