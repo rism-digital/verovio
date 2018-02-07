@@ -907,12 +907,10 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     }
     else {
         int dist = abs(p2->x - p1->x);
-        height = std::max(
-            int(m_options->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
+        height = std::max(int(m_options->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
             dist / TEMP_SLUR_HEIGHT_FACTOR);
         height = std::min(
-            int(m_options->m_slurMaxHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
-            height);
+            int(m_options->m_slurMaxHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)), height);
     }
 
     // the height of the control points
@@ -1561,7 +1559,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
     int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     // Adjust it proportionally to the lyric size
     width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
-    
+
     if (syl->GetCon() == sylLog_CON_d) {
 
         y += (m_options->m_lyricSize.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 5);
@@ -1599,7 +1597,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         for (i = 0; i < nbDashes; i++) {
             x = x1 + margin + (i * dashSpace);
             x = std::max(x, x1);
-            
+
             DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
         }
     }

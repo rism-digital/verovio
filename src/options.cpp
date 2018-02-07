@@ -545,96 +545,96 @@ Options::Options()
     m_unit.SetInfo("Unit", "The MEI unit (1⁄2 of the distance between the staff lines)");
     m_unit.Init(9, 6, 20, true);
     this->Register(&m_unit, "unit", &m_general);
-    
+
     /********* General layout *********/
-    
+
     m_generalLayout.SetLabel("General layout options", "2-generalLayout");
     m_grps.push_back(&m_generalLayout);
-    
+
     m_barLineWidth.SetInfo("Bar line width", "The barLine width");
     m_barLineWidth.Init(0.30, 0.10, 0.80);
     this->Register(&m_barLineWidth, "barLineWidth", &m_generalLayout);
-    
+
     m_beamMaxSlope.SetInfo("Beam max slope", "The maximum beam slope");
     m_beamMaxSlope.Init(10, 1, 20);
     this->Register(&m_beamMaxSlope, "beamMaxSlope", &m_generalLayout);
-    
+
     m_beamMinSlope.SetInfo("Beam min slope", "The minimum beam slope");
     m_beamMinSlope.Init(0, 0, 0);
     this->Register(&m_beamMinSlope, "beamMinSlope", &m_generalLayout);
-    
+
     m_font.SetInfo("Font", "Set the music font");
     m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);
-    
+
     m_graceFactor.SetInfo("Grace factor", "The grace size ratio numerator");
     m_graceFactor.Init(0.75, 0.5, 1.0);
     this->Register(&m_graceFactor, "graceFactor", &m_generalLayout);
-    
+
     m_hairpinSize.SetInfo("Hairpin size", "The haripin size in MEI units");
     m_hairpinSize.Init(3.0, 1.0, 8.0);
     this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);
-    
+
     m_leftPosition.SetInfo("Left position", "The left position");
     m_leftPosition.Init(0.8, 0.0, 2.0);
     this->Register(&m_leftPosition, "leftPosition", &m_generalLayout);
-    
+
     m_lyricHyphenWidth.SetInfo("Lyric hyphen width", "The lyric hyphen and dash width");
     m_lyricHyphenWidth.Init(0.20, 0.10, 0.50);
     this->Register(&m_lyricHyphenWidth, "lyricHyphenWidth", &m_generalLayout);
-    
+
     m_lyricSize.SetInfo("Lyric size", "The lyrics size in MEI units");
     m_lyricSize.Init(4.5, 2.0, 8.0);
     this->Register(&m_lyricSize, "lyricSize", &m_generalLayout);
-    
+
     m_lyricTopMinMargin.SetInfo("Lyric top min margin", "The minmal margin above the lyrics in MEI units");
     m_lyricTopMinMargin.Init(2.0, 0.0, 8.0);
     this->Register(&m_lyricTopMinMargin, "lyricTopMinMargin", &m_generalLayout);
-    
+
     m_measureMinWidth.SetInfo("Measure min width", "The minimal measure width in MEI units");
     m_measureMinWidth.Init(15, 1, 30);
     this->Register(&m_measureMinWidth, "minMeasureWidth", &m_generalLayout);
-    
+
     m_measureNumber.SetInfo("Measure number", "The measure numbering rule (unused)");
     m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
     this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
-    
+
     m_slurMinHeight.SetInfo("Slur min height", "The minimum slur height in MEI units");
     m_slurMinHeight.Init(1.2, 0.3, 2.0);
     this->Register(&m_slurMinHeight, "slurMinHeight", &m_generalLayout);
-    
+
     m_slurMaxHeight.SetInfo("Slur max height", "The maximum slur height in MEI units");
     m_slurMaxHeight.Init(3.0, 2.0, 4.0);
     this->Register(&m_slurMaxHeight, "slurMaxHeight", &m_generalLayout);
-    
+
     m_slurThickness.SetInfo("Slur thickness", "The slur thickness in MEI units");
     m_slurThickness.Init(0.6, 0.2, 1.2);
     this->Register(&m_slurThickness, "slurThickness", &m_generalLayout);
-    
+
     m_spacingLinear.SetInfo("Spacing linear", "Specify the linear spacing factor");
     m_spacingLinear.Init(0.25, 0.0, 1.0);
     this->Register(&m_spacingLinear, "spacingLinear", &m_generalLayout);
-    
+
     m_spacingNonLinear.SetInfo("Spacing non linear", "Specify the non-linear spacing factor");
     m_spacingNonLinear.Init(0.6, 0.0, 1.0);
     this->Register(&m_spacingNonLinear, "spacingNonLinear", &m_generalLayout);
-    
+
     m_spacingStaff.SetInfo("Spacing staff", "The staff minimal spacing in MEI units");
     m_spacingStaff.Init(8, 0, 24);
     this->Register(&m_spacingStaff, "spacingStaff", &m_generalLayout);
-    
+
     m_spacingSystem.SetInfo("Spacing system", "The system minimal spacing in MEI units");
     m_spacingSystem.Init(3, 0, 12);
     this->Register(&m_spacingSystem, "spacingSystem", &m_generalLayout);
-    
+
     m_staffLineWidth.SetInfo("Staff line width", "The staff line width in unit");
     m_staffLineWidth.Init(0.15, 0.10, 0.30);
     this->Register(&m_staffLineWidth, "staffLineWidth", &m_generalLayout);
-    
+
     m_stemWidth.SetInfo("Stem width", "The stem width");
     m_stemWidth.Init(0.20, 0.10, 0.50);
     this->Register(&m_stemWidth, "stemWidth", &m_generalLayout);
-    
+
     m_tieThickness.SetInfo("Tie thickness", "The tie thickness in MEI units");
     m_tieThickness.Init(0.5, 0.2, 1.0);
     this->Register(&m_tieThickness, "tieThickness", &m_generalLayout);

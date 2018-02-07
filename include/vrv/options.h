@@ -478,12 +478,12 @@ public:
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
     OptionInt m_unit;
-    
+
     /**
      * General layout
      */
     OptionGrp m_generalLayout;
-    
+
     OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
