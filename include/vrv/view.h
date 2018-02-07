@@ -41,6 +41,7 @@ class Measure;
 class Mordent;
 class Num;
 class Octave;
+class Options;
 class Page;
 class Pedal;
 class PgFoot;
@@ -505,6 +506,8 @@ private:
 public:
     /** Document */
     Doc *m_doc;
+    /** Options of the document */
+    Options *m_options;
     /** Index of the current page */
     int m_pageIdx;
 
