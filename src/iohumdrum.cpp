@@ -28,6 +28,7 @@
 #include <assert.h>
 #include <cctype>
 #include <cmath>
+#include <locale>
 #include <regex>
 #include <sstream>
 #include <vector>
@@ -1446,53 +1447,62 @@ void HumdrumInput::prepareHeaderFooter()
 
 std::string HumdrumInput::processTemplateOperator(const std::string &value, const std::string &op)
 {
+    string input = value;
     string output;
+    hum::HumRegex hre;
+
+    if (op.find("U") != std::string::npos) {
+        // Force all upper case (cannot handle HTML accents, so should be unescaped first)
+        std::locale loc;
+        for (int i = 0; i < (int)input.size(); i++) {
+            input[i] = std::toupper(input[i], loc);
+        }
+    }
 
     if (op.find("n") != std::string::npos) {
         // full name: reverse strings separated by comma if there is one.
-        auto pos = value.find(",");
+        auto pos = input.find(",");
         if (pos == std::string::npos) {
-            output = value;
+            output = input;
         }
         else {
-            std::string lastname = value.substr(0, pos);
-            std::string firstname = value.substr(pos + 1);
+            std::string lastname = input.substr(0, pos);
+            std::string firstname = input.substr(pos + 1);
             output = firstname + " " + lastname;
         }
     }
     else if (op.find("l") != std::string::npos) {
         // last name: text before comma if there is one.
-        auto pos = value.find(",");
+        auto pos = input.find(",");
         if (pos == std::string::npos) {
-            output = value;
+            output = input;
         }
         else {
-            std::string lastname = value.substr(0, pos);
+            std::string lastname = input.substr(0, pos);
             output = lastname;
         }
     }
     else if (op.find("f") != std::string::npos) {
         // first name: text after comma if there is one.
-        auto pos = value.find(",");
+        auto pos = input.find(",");
         if (pos == std::string::npos) {
-            output = value;
+            output = input;
         }
         else {
-            std::string firstname = value.substr(pos + 1);
+            std::string firstname = input.substr(pos + 1);
             output = firstname;
         }
     }
     else if (op.find("i") != std::string::npos) {
         // initialed name: first name converted to initials
-        auto pos = value.find(",");
+        auto pos = input.find(",");
         if (pos == std::string::npos) {
-            output = value;
+            output = input;
         }
         else {
-            std::string lastname = value.substr(0, pos);
-            std::string firstname = value.substr(pos + 1);
+            std::string lastname = input.substr(0, pos);
+            std::string firstname = input.substr(pos + 1);
             std::vector<std::string> pieces;
-            hum::HumRegex hre;
             hre.split(pieces, firstname, " ");
             firstname.clear();
             for (int i = 0; i < (int)pieces.size(); i++) {
@@ -1521,10 +1531,70 @@ std::string HumdrumInput::processTemplateOperator(const std::string &value, cons
             }
             output = firstname + lastname;
         }
-    } else {
-		// unknown operator, so just echo input
-		output = value;
-	}
+    }
+    else if (op.find("y") != std::string::npos) {
+        // Show only years for birth/death, and shorten if in same century.
+        // Still need to include circa, flourish, and birth/death only.
+        string cdates = input;
+        string outputdate;
+        string birth;
+        string death;
+        auto pos = cdates.find("-");
+        if (pos != std::string::npos) {
+            birth = cdates.substr(0, pos);
+            death = cdates.substr(pos + 1);
+            int birthyear = 0;
+            int deathyear = 0;
+            if (hre.search(birth, "(\\d\\d\\d\\d)")) {
+                birthyear = hre.getMatchInt(1);
+            }
+            if (hre.search(death, "(\\d\\d\\d\\d)")) {
+                deathyear = hre.getMatchInt(1);
+            }
+            if ((deathyear > 0) && (birthyear > 0)) {
+                outputdate = to_string(birthyear);
+                outputdate += "&#8211;";
+                if ((deathyear / 100) == (birthyear / 100)) {
+                    outputdate += to_string(deathyear % 100);
+                }
+                else {
+                    outputdate += to_string(deathyear);
+                }
+            }
+        }
+        output = outputdate;
+    }
+    else if (op.find("Y") != std::string::npos) {
+        // Show only years for birth/death, but do not shorten if in same century.
+        // Still need to include circa, flourish, and birth/death only.
+        string cdates = input;
+        string outputdate;
+        string birth;
+        string death;
+        auto pos = cdates.find("-");
+        if (pos != std::string::npos) {
+            birth = cdates.substr(0, pos);
+            death = cdates.substr(pos + 1);
+            int birthyear = 0;
+            int deathyear = 0;
+            if (hre.search(birth, "(\\d\\d\\d\\d)")) {
+                birthyear = hre.getMatchInt(1);
+            }
+            if (hre.search(death, "(\\d\\d\\d\\d)")) {
+                deathyear = hre.getMatchInt(1);
+            }
+            if ((deathyear > 0) && (birthyear > 0)) {
+                outputdate = to_string(birthyear);
+                outputdate += "&#8211;";
+                outputdate += to_string(deathyear);
+            }
+        }
+        output = outputdate;
+    }
+    else {
+        // unknown operator, so just echo input
+        output = input;
+    }
 
     return output;
 }
@@ -1535,7 +1605,7 @@ std::string HumdrumInput::processTemplateOperator(const std::string &value, cons
 //
 
 std::string HumdrumInput::processReferenceTemplate(const std::string &input,
-    std::vector<std::pair<string, string> > biblist, std::map<std::string, std::string> &refmap)
+    std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap)
 {
     std::string text = input;
     hum::HumRegex hre;
@@ -1568,10 +1638,9 @@ std::string HumdrumInput::processReferenceTemplate(const std::string &input,
 //
 // HumdrumInput::prepareFooter --
 //
-//
 
 bool HumdrumInput::prepareFooter(
-    std::vector<std::pair<string, string> > biblist, std::map<std::string, std::string> &refmap)
+    std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap)
 {
 
     std::string footleft;
@@ -1579,7 +1648,6 @@ bool HumdrumInput::prepareFooter(
     std::string footright;
     std::vector<std::string> pieces;
     std::string tstring;
-
     hum::HumRegex hre;
 
     //   <rend halign="left" valign="bottom">
@@ -1746,147 +1814,101 @@ bool HumdrumInput::prepareFooter(
 //
 
 bool HumdrumInput::prepareHeader(
-    std::vector<std::pair<string, string> > biblist, std::map<std::string, std::string> &refmap)
+    std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap)
 {
-    std::string headerText;
-    std::string title;
-
-    auto it = refmap.find("OTL");
-    if (it != refmap.end()) {
-        title = it->second;
-    }
-
-    if (title.empty()) {
-        for (int i = 0; i < (int)biblist.size(); i++) {
-            if (biblist[i].first.substr(0, 3) == "OTL") {
-                title = biblist[i].second;
-                break;
-            }
-        }
-    }
-
-    std::string rime;
-    auto itrime = refmap.find("rime");
-    if (itrime != refmap.end()) {
-        rime = itrime->second;
-    }
-
-    // <rend fontsize="x-large">Non è questa la mano (<rend fontstyle="italic">Rime</rend> 47)</rend>
-    if (!title.empty()) {
-        headerText += "<rend halign=\"center\" valign=\"middle\">\n";
-        headerText += "   <rend fontsize=\"x-large\">";
-        headerText += unescapeHtmlEntities(title);
-        if (!rime.empty()) {
-            headerText += " (<rend fontstyle=\"italic\">Rime</rend> ";
-            headerText += rime;
-            headerText += ")";
-        }
-        headerText += "</rend>\n";
-        headerText += "<lb/>&#160;\n<lb/>&#160;\n";
-        headerText += "</rend>\n";
-    }
-
-    std::string composer;
-    auto it2 = refmap.find("COM");
-    if (it2 != refmap.end()) {
-        std::string name = it2->second;
-        auto pos = name.find(",");
-        if (pos == std::string::npos) {
-            composer = name;
-        }
-        else {
-            std::string lastname = name.substr(0, pos);
-            std::string firstname = name.substr(pos + 1);
-            composer = firstname + " " + lastname;
-        }
-    }
-
-    // <rend fontsize="small" halign="right" valign="bottom">Composer's name</rend>
-    if (!composer.empty()) {
-        headerText += "<rend fontsize=\"small\" halign=\"right\" valign=\"bottom\">";
-        headerText += unescapeHtmlEntities(composer);
-        headerText += "</rend>\n";
-    }
-
-    std::string lyricist;
-    auto itL = refmap.find("LYR");
-    if (itL != refmap.end()) {
-        std::string name = itL->second;
-        auto pos = name.find(",");
-        if (pos == std::string::npos) {
-            lyricist = name;
-        }
-        else {
-            std::string lastname = name.substr(0, pos);
-            std::string firstname = name.substr(pos + 1);
-            lyricist = firstname + " " + lastname;
-        }
-        auto itLD = refmap.find("LDT");
-        if (itLD != refmap.end()) {
-            lyricist += " (" + itLD->second + ")";
-        }
-    }
-    if (!lyricist.empty()) {
-        headerText += "<rend fontsize=\"small\" halign=\"left\" valign=\"bottom\">";
-        headerText += unescapeHtmlEntities(lyricist);
-        headerText += "</rend>\n";
-    }
-
-    // Composer's dates
+    std::string headleft;
+    std::string headcenter;
+    std::string headright;
+    std::string tstring;
     hum::HumRegex hre;
-    string cdates;
-    string outputdate;
-    auto it3 = refmap.find("CDT");
-    if (it3 != refmap.end()) {
-        cdates = it3->second;
-        string birth;
-        string death;
-        auto pos = cdates.find("-");
-        if (pos != std::string::npos) {
-            birth = cdates.substr(0, pos);
-            death = cdates.substr(pos + 1);
-            int birthyear = 0;
-            int deathyear = 0;
-            if (hre.search(birth, "(\\d\\d\\d\\d)")) {
-                birthyear = hre.getMatchInt(1);
+    std::vector<std::string> pieces;
+
+    auto ithc = refmap.find("header-center");
+    if (ithc != refmap.end()) {
+        hre.split(pieces, ithc->second, "\\\\n");
+        headcenter = "<rend halign=\"center\" valign=\"middle\">\n";
+        for (int i = 0; i < (int)pieces.size(); i++) {
+            headcenter += "<rend fontsize=\"x-large\">";
+            tstring = processReferenceTemplate(pieces[i], biblist, refmap);
+            if (pieces[i].empty()) {
+                headcenter += "&#160;";
             }
-            if (hre.search(death, "(\\d\\d\\d\\d)")) {
-                deathyear = hre.getMatchInt(1);
+            else {
+                headcenter += tstring;
             }
-            if ((deathyear > 0) && (birthyear > 0)) {
-                outputdate = to_string(birthyear);
-                outputdate += "&#8211;";
-                if ((deathyear / 100) == (birthyear / 100)) {
-                    outputdate += to_string(deathyear % 100);
-                }
-                else {
-                    outputdate += to_string(deathyear);
-                }
+            headcenter += "</rend>\n";
+            if (i < (int)pieces.size() - 1) {
+                headcenter += "<lb/>\n";
             }
         }
+        headcenter += "</rend>\n";
     }
-    if (!outputdate.empty()) {
-        headerText += "<rend fontsize=\"small\" halign=\"right\" valign=\"bottom\">";
-        headerText += outputdate;
-        headerText += "</rend>\n";
-        if (!lyricist.empty()) {
-            headerText += "<rend fontsize=\"small\" halign=\"left\" valign=\"bottom\">";
-            headerText += "&#160;";
-            headerText += "</rend>\n";
-        }
+    else {
+        headcenter = automaticHeaderCenter(biblist, refmap);
     }
 
-    if (headerText.empty()) {
+    int linecount = 0;
+    auto ithr = refmap.find("header-right");
+    if (ithr != refmap.end()) {
+        hre.split(pieces, ithr->second, "\\\\n");
+        headright = "<rend halign=\"right\" valign=\"bottom\">\n";
+        for (int i = 0; i < (int)pieces.size(); i++) {
+            headright += "<rend fontsize=\"small\">";
+            tstring = processReferenceTemplate(pieces[i], biblist, refmap);
+            if (pieces[i].empty()) {
+                headright += "&#160;";
+            }
+            else {
+                headright += tstring;
+            }
+            headright += "</rend>\n";
+            if (i < (int)pieces.size() - 1) {
+                headright += "<lb/>\n";
+            }
+        }
+        headright += "</rend>\n";
+    }
+    else {
+        headright = automaticHeaderRight(biblist, refmap, linecount);
+    }
+
+    auto ithl = refmap.find("header-left");
+    if (ithl != refmap.end()) {
+        hre.split(pieces, ithl->second, "\\\\n");
+        headleft = "<rend halign=\"left\" valign=\"bottom\">\n";
+        for (int i = 0; i < (int)pieces.size(); i++) {
+            headleft += "<rend fontsize=\"small\">";
+            tstring = processReferenceTemplate(pieces[i], biblist, refmap);
+            if (pieces[i].empty()) {
+                headleft += "&#160;";
+            }
+            else {
+                headleft += tstring;
+            }
+            headleft += "</rend>\n";
+            if (i < (int)pieces.size() - 1) {
+                headleft += "<lb/>\n";
+            }
+        }
+        headleft += "</rend>\n";
+    }
+    else {
+        headleft = automaticHeaderLeft(biblist, refmap, linecount);
+    }
+
+    std::string head = headcenter + headleft + headright;
+
+    if (head.empty()) {
         return false;
     }
 
-    hre.replaceDestructive(headerText, "</rend>", "</i>", "g");
-    hre.replaceDestructive(headerText, "<rend fontstyle=\"italic\">", "<i>", "g");
-    hre.replaceDestructive(headerText, "<rend><num label=\"page\">#</num></rend>", "%P", "g");
+    hre.replaceDestructive(head, "</rend>", "</i>", "g");
+    hre.replaceDestructive(head, "<rend fontstyle=\"italic\">", "<i>", "g");
+    hre.replaceDestructive(head, "<rend><num label=\"page\">#</num></rend>", "%P", "g");
 
     string meifile = "<mei xmlns=\"http://www.music-encoding.org/ns/mei\" meiversion=\"4.0.0\">\n";
     meifile += "<music><body><mdiv><score><scoreDef><pgHead>\n";
-    meifile += headerText;
+    meifile += head;
     meifile += "</pgHead></scoreDef></score></mdiv></body></music></mei>\n";
 
     Doc tempdoc;
@@ -1922,6 +1944,151 @@ bool HumdrumInput::prepareHeader(
     m_doc->m_scoreDef.AddChild(pghead);
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::automaticHeaderLeft -- If there is no reference record "header-left",
+//     Then any "LYR" (lyricist) will be displayed, and if LDT (lyric composition date)
+//     is found, then that will be added in parenthese after the lyricist's name.
+//     The linecount variable is used to align the lyricist with the composer, depending
+//     on whether or not the composer's date are displayed.
+//
+
+std::string HumdrumInput::automaticHeaderLeft(
+    std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int linecount)
+{
+    std::string output;
+    std::string lyricist;
+
+    auto itL = refmap.find("LYR");
+    if (itL != refmap.end()) {
+        std::string name = itL->second;
+        auto pos = name.find(",");
+        if (pos == std::string::npos) {
+            lyricist = name;
+        }
+        else {
+            std::string lastname = name.substr(0, pos);
+            std::string firstname = name.substr(pos + 1);
+            lyricist = firstname + " " + lastname;
+        }
+        auto itLD = refmap.find("LDT");
+        if (itLD != refmap.end()) {
+            lyricist += " (" + itLD->second + ")";
+        }
+    }
+    if (!lyricist.empty()) {
+        output += "<rend fontsize=\"small\" halign=\"left\" valign=\"bottom\">";
+        output += unescapeHtmlEntities(lyricist);
+        output += "</rend>\n";
+        if (linecount > 1) {
+            output += "<rend fontsize=\"small\" halign=\"left\" valign=\"bottom\">";
+            output += "&#160;";
+            output += "</rend>\n";
+        }
+    }
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::automaticHeaderRight -- If there is no reference record "header-right",
+//     Then the "COM" (composer) will be displayed.  The full name will be displayed,
+//     and if the ordering of the name is "last, first" then it will be reversed to
+//     "first last".   If "CDT" is found (composer's dates), then it will be added
+//     underneath the composer's name.
+//     The linecount variable is used to align the lyricist with the composer, depending
+//     on whether or not the composer's date are displayed.
+//
+
+std::string HumdrumInput::automaticHeaderRight(
+    std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int &linecount)
+{
+
+    linecount = 0;
+    std::string output;
+
+    std::string composer;
+    auto it2 = refmap.find("COM");
+    if (it2 != refmap.end()) {
+        std::string name = it2->second;
+        auto pos = name.find(",");
+        if (pos == std::string::npos) {
+            composer = name;
+        }
+        else {
+            std::string lastname = name.substr(0, pos);
+            std::string firstname = name.substr(pos + 1);
+            composer = firstname + " " + lastname;
+        }
+    }
+    // <rend fontsize="small" halign="right" valign="bottom">Composer's name</rend>
+    if (!composer.empty()) {
+        output += "<rend fontsize=\"small\" halign=\"right\" valign=\"bottom\">";
+        output += unescapeHtmlEntities(composer);
+        output += "</rend>\n";
+        linecount++;
+    }
+    // Composer's dates
+    std::string outputdate = processReferenceTemplate("@{CDT:y}", biblist, refmap);
+
+    if (!outputdate.empty()) {
+        output += "<rend fontsize=\"small\" halign=\"right\" valign=\"bottom\">";
+        output += outputdate;
+        output += "</rend>\n";
+        linecount++;
+    }
+
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::automaticHeaderCenter --
+//
+
+std::string HumdrumInput::automaticHeaderCenter(
+    std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap)
+{
+    std::string output;
+    std::string title;
+
+    auto it = refmap.find("OTL");
+    if (it != refmap.end()) {
+        title = it->second;
+    }
+    if (title.empty()) {
+        for (int i = 0; i < (int)biblist.size(); i++) {
+            if (biblist[i].first.substr(0, 3) == "OTL") {
+                title = biblist[i].second;
+                break;
+            }
+        }
+    }
+
+    // Special code for Tasso in Music Project: Add rime number after title.
+    std::string rime;
+    auto itrime = refmap.find("rime");
+    if (itrime != refmap.end()) {
+        rime = itrime->second;
+    }
+    // <rend fontsize="x-large">Non è questa la mano (<rend fontstyle="italic">Rime</rend> 47)</rend>
+    if (!title.empty()) {
+        output += "<rend halign=\"center\" valign=\"middle\">\n";
+        output += "   <rend fontsize=\"x-large\">";
+        output += unescapeHtmlEntities(title);
+        if (!rime.empty()) {
+            output += " (<rend fontstyle=\"italic\">Rime</rend> ";
+            output += rime;
+            output += ")";
+        }
+        output += "</rend>\n";
+        output += "<lb/>&#160;\n<lb/>&#160;\n";
+        output += "</rend>\n";
+    }
+
+    return output;
 }
 
 //////////////////////////////
