@@ -419,10 +419,11 @@ protected:
     static std::string getDateString();
     static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
-    std::string cleanHarmString(const std::string &content);
-    std::string cleanHarmString2(const std::string &content);
-    std::string cleanHarmString3(const std::string &content);
-    std::vector<std::string> cleanFBString(const std::string &content);
+    static bool replace(std::wstring &str, const std::wstring &oldStr, const std::wstring &newStr);
+    std::wstring cleanHarmString(const std::string &content);
+    std::wstring cleanHarmString2(const std::string &content);
+    std::wstring cleanHarmString3(const std::string &content);
+    std::vector<std::wstring> cleanFBString(const std::string &content);
 
 private:
     std::string m_filename; // Filename to read/was read.
