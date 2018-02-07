@@ -164,7 +164,7 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
     if (data[0] == '*' || data[0] == '!') {
         return HUMDRUM;
     }
-    if ((unsigned int)data[0] == 0xff || (unsigned int)data[0] == 0xfe) {
+    if ((unsigned char)data[0] == 0xff || (unsigned char)data[0] == 0xfe) {
         // Handle UTF-16 content here later.
         cerr << "Warning: Cannot yet auto-detect format of UTF-16 data files." << endl;
         return UNKNOWN;
