@@ -1,4 +1,4 @@
-Verovio 2.0.0-dev-db65374
+Verovio 2.0.0-dev-45a4dc5
 
 Example usage:
 
@@ -44,7 +44,9 @@ General layout options
  --grace-factor <f>                The grace size ratio numerator (default: 0.75; min: 0.50; max: 1.00)
  --hairpin-size <f>                The haripin size in MEI units (default: 3.00; min: 1.00; max: 8.00)
  --left-position <f>               The left position (default: 0.80; min: 0.00; max: 2.00)
+ --lyric-hyphen-width <f>          The lyric hyphen and dash width (default: 0.20; min: 0.10; max: 0.50)
  --lyric-size <f>                  The lyrics size in MEI units (default: 4.50; min: 2.00; max: 8.00)
+ --lyric-top-min-margin <f>        The minmal margin above the lyrics in MEI units (default: 2.00; min: 0.00; max: 8.00)
  --min-measure-width <i>           The minimal measure width in MEI units (default: 15; min: 1; max: 30)
  --measure-number <s>              The measure numbering rule (unused) (default: "system"; other values: "interval")
  --slur-min-height <f>             The minimum slur height in MEI units (default: 1.20; min: 0.30; max: 2.00)
