@@ -1,4 +1,4 @@
-Verovio 2.0.0-dev-45a4dc5
+Verovio 2.0.0-dev-a64c23a
 
 Example usage:
 
@@ -36,7 +36,6 @@ Input and page layout options
  --unit <i>                        The MEI unit (1⁄2 of the distance between the staff lines) (default: 9; min: 6; max: 20)
 
 General layout options
- --lyric-size <f>                  The lyrics size in MEI units (default: 4.50; min: 2.00; max: 8.00)
  --bar-line-width <f>              The barLine width (default: 0.30; min: 0.10; max: 0.80)
  --beam-max-slope <i>              The maximum beam slope (default: 10; min: 1; max: 20)
  --beam-min-slope <i>              The minimum beam slope (default: 0; min: 0; max: 0)
