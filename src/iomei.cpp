@@ -2508,7 +2508,7 @@ bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
 
 bool MeiInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
 {
-    assert(dynamic_cast<Score *>(parent) || dynamic_cast<Section *>(parent) || dynamic_cast<System *>(parent)
+    assert(dynamic_cast<Score *>(parent) || dynamic_cast<Section *>(parent) || dynamic_cast<System *>(parent) || dynamic_cast<Ending *>(parent)
         || dynamic_cast<EditorialElement *>(parent));
 
     ScoreDef *vrvScoreDef;
