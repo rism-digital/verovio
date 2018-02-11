@@ -1295,18 +1295,24 @@ bool Toolkit::Set(std::string elementId, std::string attrType, std::string attrV
 {
     if (!m_doc.GetDrawingPage()) return false;
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
-    if (Att::SetAnalytical(element, attrType, attrValue)) return true;
-    if (Att::SetCmn(element, attrType, attrValue)) return true;
-    if (Att::SetCmnornaments(element, attrType, attrValue)) return true;
-    if (Att::SetCritapp(element, attrType, attrValue)) return true;
-    if (Att::SetGestural(element, attrType, attrValue)) return true;
-    if (Att::SetExternalsymbols(element, attrType, attrValue)) return true;
-    if (Att::SetMei(element, attrType, attrValue)) return true;
-    if (Att::SetMensural(element, attrType, attrValue)) return true;
-    if (Att::SetMidi(element, attrType, attrValue)) return true;
-    if (Att::SetPagebased(element, attrType, attrValue)) return true;
-    if (Att::SetShared(element, attrType, attrValue)) return true;
-    if (Att::SetVisual(element, attrType, attrValue)) return true;
+    bool success = false;
+    if (Att::SetAnalytical(element, attrType, attrValue)) success = true;
+    else if (Att::SetCmn(element, attrType, attrValue)) success = true;
+    else if (Att::SetCmnornaments(element, attrType, attrValue)) success = true;
+    else if (Att::SetCritapp(element, attrType, attrValue)) success = true;
+    else if (Att::SetExternalsymbols(element, attrType, attrValue)) success = true;
+    else if (Att::SetGestural(element, attrType, attrValue)) success = true;
+    else if (Att::SetMei(element, attrType, attrValue)) success = true;
+    else if (Att::SetMensural(element, attrType, attrValue)) success = true;
+    else if (Att::SetMidi(element, attrType, attrValue)) success = true;
+    else if (Att::SetPagebased(element, attrType, attrValue)) success = true;
+    else if (Att::SetShared(element, attrType, attrValue)) success = true;
+    else if (Att::SetVisual(element, attrType, attrValue)) success = true;
+    if (success) {
+        m_doc.PrepareDrawing();
+        m_doc.GetDrawingPage()->LayOut(true);
+        return true;
+    }
     return false;
 }
 
