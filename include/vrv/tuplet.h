@@ -46,6 +46,15 @@ public:
      */
     virtual void AddChild(Object *object);
 
+    //----------//
+    // Functors //
+    //----------//
+                   
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
 protected:
     /**
      * Filter the flat list and keep only Note elements.

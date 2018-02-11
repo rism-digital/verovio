@@ -64,6 +64,11 @@ public:
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 protected:
     /**

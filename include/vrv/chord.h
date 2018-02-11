@@ -156,6 +156,11 @@ public:
      * See Object::GenerateMIDIEnd
      */
     virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams);
+                  
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 protected:
     /**

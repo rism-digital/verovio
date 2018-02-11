@@ -108,6 +108,11 @@ public:
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *functorParams);
+    
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 protected:
     /**
