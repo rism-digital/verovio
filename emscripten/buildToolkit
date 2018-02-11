@@ -170,7 +170,9 @@ my $output  = "-o $BUILD_DIR/verovio.js";
 my $exports = "-s EXPORTED_FUNCTIONS=\"[";
 $exports .= "'_vrvToolkit_constructor',";
 $exports .= "'_vrvToolkit_destructor',";
+$exports .= "'_vrvToolkit_edit',";
 $exports .= "'_vrvToolkit_getAvailableOptions',";
+$exports .= "'_vrvToolkit_getElementAttr',";
 $exports .= "'_vrvToolkit_getElementsAtTime',";
 $exports .= "'_vrvToolkit_getHumdrum',";
 $exports .= "'_vrvToolkit_getLog',";
@@ -187,9 +189,7 @@ $exports .= "'_vrvToolkit_renderData',";
 $exports .= "'_vrvToolkit_renderToMIDI',";
 $exports .= "'_vrvToolkit_renderToSVG',";
 $exports .= "'_vrvToolkit_renderToTimemap',";
-$exports .= "'_vrvToolkit_setOptions',";
-$exports .= "'_vrvToolkit_edit',";
-$exports .= "'_vrvToolkit_getElementAttr'";
+$exports .= "'_vrvToolkit_setOptions'";
 $exports .= "]\"";
 
 my $extra_exports = "-s EXTRA_EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'";
@@ -243,7 +243,6 @@ exit 0;
 sub getSources {
 	my @sources;
 	push @sources, "./emscripten_main.cpp";
-	push @sources, "./toolkitmanager.cpp";
 	push @sources, glob "$VEROVIO_ROOT/src/*.cpp";
 	push @sources, glob "$VEROVIO_ROOT/src/*/*.cc";
 	if ($nohumdrum) {

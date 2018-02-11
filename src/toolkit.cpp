@@ -53,6 +53,7 @@ Toolkit::Toolkit(bool initFont)
     m_scoreBasedMei = false;
 
     m_humdrumBuffer = NULL;
+    m_cString = NULL;
 
     if (initFont) {
         Resources::InitFonts();
@@ -66,6 +67,10 @@ Toolkit::~Toolkit()
     if (m_humdrumBuffer) {
         free(m_humdrumBuffer);
         m_humdrumBuffer = NULL;
+    }
+    if (m_cString) {
+        free(m_cString);
+        m_cString = NULL;
     }
 }
 
@@ -1341,5 +1346,31 @@ bool Toolkit::ParseSetAction(
     return true;
 }
 #endif
+    
+void Toolkit::SetCString(const std::string &data)
+{
+    if (m_cString) {
+        free(m_cString);
+        m_cString = NULL;
+    }
+
+    m_cString = (char *)malloc(strlen(data.c_str()) + 1);
+
+    // something went wrong
+    if (!m_cString) {
+        return;
+    }
+    strcpy(m_cString, data.c_str());
+}
+
+const char *Toolkit::GetCString()
+{
+    if (m_cString) {
+        return m_cString;
+    }
+    else {
+        return "[unspecified]";
+    }
+}
 
 } // namespace vrv

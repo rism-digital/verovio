@@ -254,6 +254,16 @@ public:
     bool Insert(std::string elementType, std::string startId, std::string endId);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     ///@}
+    
+    /**
+     * @name Set and get a std::string into a char * buffer.
+     * This is used for returning a string buffer to emscripten.
+     * The buffer is freed when reset or in MusController destructor.
+     */
+    ///@{
+    void SetCString(const std::string &data);
+    const char *GetCString();
+    ///@}
 
 private:
     bool IsUTF16(const std::string &filename);
@@ -284,6 +294,11 @@ private:
     static char *m_humdrumBuffer;
 
     Options *m_options;
+    
+    /**
+     * The C buffer string.
+     */
+    char *m_cString;
 };
 
 } // namespace vrv
