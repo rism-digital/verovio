@@ -7065,12 +7065,15 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
     bool isnote = false;
     bool isrest = false;
     bool isrecip = false;
+    bool allinvis = true;
     for (int j = 0; j < scount; j++) {
-
         isnote = false;
         isrest = false;
         isrecip = false;
         tstring = token->getSubtoken(j);
+        if (token->find("yy") == std::string::npos) {
+            allinvis = false;
+        }
         if (tstring == "") {
             continue;
         }
@@ -7108,6 +7111,10 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
         setLocationId(note, token, j);
         appendElement(chord, note);
         convertNote(note, token, staffindex, j);
+    }
+
+    if (allinvis) {
+        chord->SetVisible(BOOLEAN_false);
     }
 
     // grace notes need to be done before rhythm since default
