@@ -13,6 +13,11 @@
 #include <stack>
 #include <string>
 
+// In case it is not defined before...
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
+
 //----------------------------------------------------------------------------
 
 #include "devicecontextbase.h"
