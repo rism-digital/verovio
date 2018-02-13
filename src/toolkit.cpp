@@ -20,7 +20,6 @@
 #include "iomei.h"
 #include "iomusxml.h"
 #include "iopae.h"
-#include "jsonxx.h"
 #include "layer.h"
 #include "measure.h"
 #include "note.h"
@@ -32,6 +31,9 @@
 
 //----------------------------------------------------------------------------
 
+#include "checked.h"
+#include "jsonxx.h"
+#include "unchecked.h"
 #include "MidiFile.h"
 
 namespace vrv {
