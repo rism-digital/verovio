@@ -31,7 +31,9 @@ Dot::Dot() : LayerElement("dot-"), PositionInterface(), AttColor(), AttDotLog()
     Reset();
 }
 
-Dot::~Dot() {}
+Dot::~Dot()
+{
+}
 
 void Dot::Reset()
 {
@@ -51,7 +53,6 @@ int Dot::PreparePointersByLayer(FunctorParams *functorParams)
 {
     PreparePointersByLayerParams *params = dynamic_cast<PreparePointersByLayerParams *>(functorParams);
     assert(params);
-
     m_drawingNote = params->m_currentNote;
 
     return FUNCTOR_CONTINUE;
@@ -62,8 +63,8 @@ int Dot::ResetDrawing(FunctorParams *functorParams)
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
     PositionInterface::InterfaceResetDrawing(functorParams, this);
-
     this->m_drawingNote = NULL;
+
     return FUNCTOR_CONTINUE;
 }
 

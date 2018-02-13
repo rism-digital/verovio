@@ -39,7 +39,9 @@ Rest::Rest()
     Reset();
 }
 
-Rest::~Rest() {}
+Rest::~Rest()
+{
+}
 
 void Rest::Reset()
 {
@@ -53,7 +55,10 @@ void Rest::Reset()
 
 void Rest::AddChild(Object *child)
 {
-    if (child->Is(DOTS)) {
+    if (child->Is(DOT)) {
+        assert(dynamic_cast<Dots *>(child));
+    }
+    else if (child->Is(DOTS)) {
         assert(dynamic_cast<Dots *>(child));
     }
     else if (child->IsEditorialElement()) {

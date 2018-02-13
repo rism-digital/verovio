@@ -117,7 +117,7 @@ bool Note::HasToBeAligned() const
 
 void Note::AddChild(Object *child)
 {
-    // additional verification for accid and artic - this will no be raised with editorial markup, though
+    // additional verification for accid and artic - this will not be raised with editorial markup, though
     if (child->Is(ACCID)) {
         IsAttributeComparison isAttributeComparison(ACCID);
         if (this->FindChildByAttComparison(&isAttributeComparison))
@@ -134,6 +134,9 @@ void Note::AddChild(Object *child)
     }
     else if (child->Is(ARTIC)) {
         assert(dynamic_cast<Artic *>(child));
+    }
+    else if (child->Is(DOT)) {
+        assert(dynamic_cast<Dots *>(child));
     }
     else if (child->Is(DOTS)) {
         assert(dynamic_cast<Dots *>(child));
