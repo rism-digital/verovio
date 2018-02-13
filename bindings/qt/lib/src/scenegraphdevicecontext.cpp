@@ -323,25 +323,23 @@ void SceneGraphDeviceContext::DrawRoundedRectangle(int, int, int, int, double)
     qWarning() << "Warning:" << __FUNCTION__ << "not supported";
 }
 
-void SceneGraphDeviceContext::StartText(int x, int y, char alignment)
+void SceneGraphDeviceContext::StartText(int x, int y, vrv::data_HORIZONTALALIGNMENT alignment)
 {
     Q_ASSERT(m_currentTextQuickItem == nullptr);
 
     // Memory management is handled by m_quickItem (set as parentItem in EndText)
     m_currentTextQuickItem = new TextQuickItem();
-    m_currentTextQuickItem->setX(static_cast<double>(translateX(x)));
-    m_currentTextQuickItem->setY(static_cast<double>(translateY(y)));
 
-    switch (alignment) {
-        case vrv::RIGHT: m_currentTextQuickItem->setAlignment(Qt::AlignRight); break;
-        case vrv::CENTER: m_currentTextQuickItem->setAlignment(Qt::AlignHCenter); break;
-        case vrv::LEFT: m_currentTextQuickItem->setAlignment(Qt::AlignLeft); break;
-    }
+    SetTextPositionAndAlignment(x, y, alignment);
 }
 
-void SceneGraphDeviceContext::DrawText(const std::string &text, const std::wstring)
+void SceneGraphDeviceContext::DrawText(const std::string &text, const std::wstring, int x, int y)
 {
     Q_ASSERT(m_currentTextQuickItem != nullptr);
+
+    if (x != VRV_UNSET || y != VRV_UNSET) {
+        qWarning() << "Warning:" << __FUNCTION__ << "does not yet support specifying x and y";
+    }
 
     QFont font(QString::fromStdString(m_fontStack.top()->GetFaceName()));
 
@@ -380,6 +378,44 @@ void SceneGraphDeviceContext::EndText()
     m_currentTextQuickItem = nullptr;
 }
 
+void SceneGraphDeviceContext::MoveTextTo(int x, int y, vrv::data_HORIZONTALALIGNMENT alignment)
+{
+    Q_ASSERT(m_currentTextQuickItem != nullptr);
+
+    // If the current text item already has some text, we have to create a new one which automatically sets the position
+    // and alignment. If no alignment is specified, we use the alignment of the current text item.
+    if (!m_currentTextQuickItem->isEmpty()) {
+        if (alignment == vrv::HORIZONTALALIGNMENT_NONE) {
+            switch (m_currentTextQuickItem->getAlignment()) {
+                case Qt::AlignLeft: alignment = vrv::HORIZONTALALIGNMENT_left; break;
+                case Qt::AlignRight: alignment = vrv::HORIZONTALALIGNMENT_right; break;
+                case Qt::AlignHCenter: alignment = vrv::HORIZONTALALIGNMENT_center; break;
+                case Qt::AlignJustify: alignment = vrv::HORIZONTALALIGNMENT_justify; break;
+            }
+        }
+        EndText();
+        StartText(x, y, alignment);
+        return;
+    }
+    else {
+        SetTextPositionAndAlignment(x, y, alignment);
+    }
+}
+
+void SceneGraphDeviceContext::SetTextPositionAndAlignment(int x, int y, vrv::data_HORIZONTALALIGNMENT alignment)
+{
+    m_currentTextQuickItem->setX(static_cast<double>(translateX(x)));
+    m_currentTextQuickItem->setY(static_cast<double>(translateY(y)));
+
+    switch (alignment) {
+        case vrv::HORIZONTALALIGNMENT_left: m_currentTextQuickItem->setAlignment(Qt::AlignLeft); break;
+        case vrv::HORIZONTALALIGNMENT_right: m_currentTextQuickItem->setAlignment(Qt::AlignRight); break;
+        case vrv::HORIZONTALALIGNMENT_center: m_currentTextQuickItem->setAlignment(Qt::AlignHCenter); break;
+        case vrv::HORIZONTALALIGNMENT_justify: m_currentTextQuickItem->setAlignment(Qt::AlignJustify); break;
+        default: break;
+    }
+}
+
 void SceneGraphDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool)
 {
     Q_ASSERT(m_fontStack.top());
@@ -408,12 +444,12 @@ void SceneGraphDeviceContext::DrawSpline(int, vrv::Point[])
     // This function is also not implemented for SvgDeviceContext
 }
 
-void SceneGraphDeviceContext::DrawBackgroundImage(int, int)
+void SceneGraphDeviceContext::DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg)
 {
-    // This function is also not implemented for SvgDeviceContext
+    // This function is not yet supported
 }
 
-void SceneGraphDeviceContext::MoveTextTo(int, int)
+void SceneGraphDeviceContext::DrawBackgroundImage(int, int)
 {
     // This function is also not implemented for SvgDeviceContext
 }

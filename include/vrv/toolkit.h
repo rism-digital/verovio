@@ -18,8 +18,11 @@
 //----------------------------------------------------------------------------
 
 #include "checked.h"
-#include "jsonxx.h"
 #include "unchecked.h"
+
+#ifdef USE_EMSCRIPTEN
+#include "jsonxx.h"
+#endif
 
 namespace vrv {
 
