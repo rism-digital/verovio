@@ -245,8 +245,10 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement())
-            system->SetCurrentFloatingPositioner(
-                (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), objectX, *staffIter);
+            if (!system->SetCurrentFloatingPositioner(
+                                                      (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), objectX, *staffIter)) {
+                continue;
+            }
 
         if (element->Is(HAIRPIN)) {
             // cast to Harprin check in DrawHairpin
@@ -1633,7 +1635,9 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     bool drawingCueSize = topNote->GetDrawingCueSize();
 
     // We are going to have only one FloatingPositioner - staff will be the top note one
-    system->SetCurrentFloatingPositioner(staff->GetN(), arpeg, topNote, staff);
+    if (!system->SetCurrentFloatingPositioner(staff->GetN(), arpeg, topNote, staff)) {
+        return;
+    }
     // Special case: because the positionner objects are reset in ResetVerticalAlignment we
     // need to reset the value of the DrawingXRel each time. The value is stored in Arpeg.
     arpeg->GetCurrentFloatingPositioner()->SetDrawingXRel(arpeg->GetDrawingXRel());
@@ -1697,7 +1701,9 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = breath->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), breath, breath->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), breath, breath->GetStart(), *staffIter)) {
+            continue;
+        }
         int y = breath->GetDrawingY();
 
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
@@ -1738,7 +1744,9 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dir->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, dir->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, dir->GetStart(), *staffIter)) {
+            continue;
+        }
 
         params.m_y = dir->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
@@ -1799,7 +1807,9 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dynam->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dynam, dynam->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dynam, dynam->GetStart(), *staffIter)) {
+            continue;
+        }
 
         params.m_y = dynam->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
@@ -1914,7 +1924,9 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = fermata->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), fermata, fermata->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), fermata, fermata->GetStart(), *staffIter)) {
+            continue;
+        }
         int y = fermata->GetDrawingY();
 
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
@@ -1957,7 +1969,9 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = harm->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), harm, harm->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), harm, harm->GetStart(), *staffIter)) {
+            continue;
+        }
 
         params.m_y = harm->GetDrawingY();
 
@@ -2010,7 +2024,9 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
     std::vector<Staff *> staffList = mordent->GetTstampStaves(measure);
     double xShift = 0.0;
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), mordent, mordent->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), mordent, mordent->GetStart(), *staffIter)) {
+            continue;
+        }
         int y = mordent->GetDrawingY();
 
         if (mordent->HasAccidlower()) {
@@ -2114,7 +2130,9 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, pedal->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, pedal->GetStart(), *staffIter)) {
+            continue;
+        }
         // Basic method that use bounding box
         int y = pedal->GetDrawingY();
 
@@ -2169,7 +2187,9 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = tempo->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), tempo, tempo->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), tempo, tempo->GetStart(), *staffIter)) {
+            continue;
+        }
 
         params.m_y = tempo->GetDrawingY();
         params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
@@ -2219,7 +2239,9 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = trill->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), trill, trill->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), trill, trill->GetStart(), *staffIter)) {
+            continue;
+        }
         int y = trill->GetDrawingY();
 
         // Upper and lower accidentals are currently exclusive, but sould both be allowed at the same time.
@@ -2285,7 +2307,9 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = turn->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), turn, turn->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), turn, turn->GetStart(), *staffIter)) {
+            continue;
+        }
         int y = turn->GetDrawingY();
 
         if (turn->HasAccidlower()) {
@@ -2447,7 +2471,9 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     }
 
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), ending, objectX, *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), ending, objectX, *staffIter)) {
+            continue;
+        }
 
         int y1 = ending->GetDrawingY();
 

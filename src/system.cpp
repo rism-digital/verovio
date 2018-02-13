@@ -148,15 +148,19 @@ void System::SetDrawingAbbrLabelsWidth(int width)
     }
 }
 
-void System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY)
+bool System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY)
 {
     assert(object);
 
     // If we have only the bottom alignment, then nothing to do (yet)
-    if (m_systemAligner.GetChildCount() == 1) return;
+    if (m_systemAligner.GetChildCount() == 1) return false;
     StaffAlignment *alignment = m_systemAligner.GetStaffAlignmentForStaffN(staffN);
-    assert(alignment);
+    if (!alignment) {
+        LogError("Staff @n='%d' for rendering control event %s %s not found", staffN, object->GetClassName().c_str(), object->GetUuid().c_str());
+        return false;
+    }
     alignment->SetCurrentFloatingPositioner(object, objectX, objectY);
+    return true;
 }
 
 void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
