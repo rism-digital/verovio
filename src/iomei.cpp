@@ -98,7 +98,9 @@ MeiOutput::MeiOutput(Doc *doc, std::string filename) : FileOutputStream(doc)
     m_scoreBasedMEI = false;
 }
 
-MeiOutput::~MeiOutput() {}
+MeiOutput::~MeiOutput()
+{
+}
 
 bool MeiOutput::ExportFile()
 {
@@ -1776,7 +1778,9 @@ MeiInput::MeiInput(Doc *doc, std::string filename) : FileInputStream(doc)
     m_version = MEI_UNDEFINED;
 }
 
-MeiInput::~MeiInput() {}
+MeiInput::~MeiInput()
+{
+}
 
 bool MeiInput::ImportFile()
 {
@@ -2023,10 +2027,34 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "artic") {
             return true;
         }
+        else if (element == "dot") {
+            return true;
+        }
         else if (element == "syl") {
             return true;
         }
         else if (element == "verse") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    // filter for rest
+    else if (filterParent->Is(REST)) {
+      if (element == "dot") {
+          return true;
+      }
+      else {
+          return false;
+      }
+    }
+    // filter for syl
+    else if (filterParent->Is(SYL)) {
+        if (element == "") {
+            return true;
+        }
+        else if (element == "rend") {
             return true;
         }
         else {
@@ -2063,18 +2091,6 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for verse
     else if (filterParent->Is(VERSE)) {
         if (element == "syl") {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    // filter for syl
-    else if (filterParent->Is(SYL)) {
-        if (element == "") {
-            return true;
-        }
-        else if (element == "rend") {
             return true;
         }
         else {
@@ -3651,7 +3667,7 @@ bool MeiInput::ReadRest(Object *parent, pugi::xml_node rest)
     vrvRest->ReadRestVisMensural(rest);
 
     parent->AddChild(vrvRest);
-    return true;
+    return ReadLayerChildren(vrvRest, rest, vrvRest);
 }
 
 bool MeiInput::ReadProport(Object *parent, pugi::xml_node proport)
