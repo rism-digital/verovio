@@ -56,7 +56,7 @@ void Rest::Reset()
 void Rest::AddChild(Object *child)
 {
     if (child->Is(DOT)) {
-        assert(dynamic_cast<Dots *>(child));
+        assert(dynamic_cast<Dot *>(child));
     }
     else if (child->Is(DOTS)) {
         assert(dynamic_cast<Dots *>(child));
