@@ -329,13 +329,11 @@ wchar_t Note::GetMensuralSmuflNoteHead()
 
 bool Note::IsVisible()
 {
-    if (this->HasVisible())
-    {
+    if (this->HasVisible()) {
         return this->GetVisible() == BOOLEAN_true;
     }
     // if the chord doens't have it, see if all the children are invisible
-    else if (GetParent()->Is(CHORD))
-    {
+    else if (GetParent() && GetParent()->Is(CHORD)) {
         Chord *chord = dynamic_cast<Chord *>(GetParent());
         assert(chord);
         return chord->IsVisible();

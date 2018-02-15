@@ -322,8 +322,7 @@ Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 
 bool Chord::IsVisible()
 {
-    if (this->HasVisible())
-    {
+    if (this->HasVisible()) {
         return this->GetVisible() == BOOLEAN_true;
     }
     // if the chord doens't have it, see if all the children are invisible
@@ -338,15 +337,11 @@ bool Chord::IsVisible()
             assert(note);
 
             // If it doesn't have a visibility tag, then it's default value is that it's visible, so return that the chord is visible
-            if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true)
-            {
+            if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true) {
                 return true;
             }
-            else
-            {
-                // if it's visibility is false, continue on and see if any of the other notes are false.
-                // All of the notes must not be visible in order for the chord to not be visible.
-            }
+            // if it's visibility is false, continue on and see if any of the other notes are false.
+            // All of the notes must not be visible in order for the chord to not be visible.
         }
         return false;
     }
@@ -471,10 +466,11 @@ int Chord::CalcDots(FunctorParams *functorParams)
     CalcDotsParams *params = dynamic_cast<CalcDotsParams *>(functorParams);
     assert(params);
 
-    // if the chord isn't visible, carry on
+    // if the chord isn't visible, stop here
     if (!this->IsVisible()) {
         return FUNCTOR_SIBLINGS;
     }
+    // if there aren't dot, stop here
     if (!this->HasDots()) {
         return FUNCTOR_SIBLINGS;
     }
