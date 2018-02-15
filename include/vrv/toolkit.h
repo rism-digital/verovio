@@ -254,7 +254,7 @@ public:
     bool Insert(std::string elementType, std::string startId, std::string endId);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     ///@}
-    
+
     /**
      * @name Set and get a std::string into a char * buffer.
      * This is used for returning a string buffer to emscripten.
@@ -294,7 +294,7 @@ private:
     static char *m_humdrumBuffer;
 
     Options *m_options;
-    
+
     /**
      * The C buffer string.
      */

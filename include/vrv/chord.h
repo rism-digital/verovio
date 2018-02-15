@@ -161,7 +161,7 @@ public:
      * See Object::GenerateMIDIEnd
      */
     virtual int CalcOnsetOffsetEnd(FunctorParams *functorParams);
-                  
+
     /**
      * See Object::ResetDrawing
      */

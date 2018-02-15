@@ -98,9 +98,7 @@ MeiOutput::MeiOutput(Doc *doc, std::string filename) : FileOutputStream(doc)
     m_scoreBasedMEI = false;
 }
 
-MeiOutput::~MeiOutput()
-{
-}
+MeiOutput::~MeiOutput() {}
 
 bool MeiOutput::ExportFile()
 {
@@ -1778,9 +1776,7 @@ MeiInput::MeiInput(Doc *doc, std::string filename) : FileInputStream(doc)
     m_version = MEI_UNDEFINED;
 }
 
-MeiInput::~MeiInput()
-{
-}
+MeiInput::~MeiInput() {}
 
 bool MeiInput::ImportFile()
 {
@@ -2516,8 +2512,8 @@ bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
 
 bool MeiInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
 {
-    assert(dynamic_cast<Score *>(parent) || dynamic_cast<Section *>(parent) || dynamic_cast<System *>(parent) || dynamic_cast<Ending *>(parent)
-        || dynamic_cast<EditorialElement *>(parent));
+    assert(dynamic_cast<Score *>(parent) || dynamic_cast<Section *>(parent) || dynamic_cast<System *>(parent)
+        || dynamic_cast<Ending *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     ScoreDef *vrvScoreDef;
     if (!m_hasScoreDef) {

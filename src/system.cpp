@@ -156,7 +156,8 @@ bool System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Ob
     if (m_systemAligner.GetChildCount() == 1) return false;
     StaffAlignment *alignment = m_systemAligner.GetStaffAlignmentForStaffN(staffN);
     if (!alignment) {
-        LogError("Staff @n='%d' for rendering control event %s %s not found", staffN, object->GetClassName().c_str(), object->GetUuid().c_str());
+        LogError("Staff @n='%d' for rendering control event %s %s not found", staffN, object->GetClassName().c_str(),
+            object->GetUuid().c_str());
         return false;
     }
     alignment->SetCurrentFloatingPositioner(object, objectX, objectY);

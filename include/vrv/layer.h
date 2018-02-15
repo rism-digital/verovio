@@ -136,7 +136,7 @@ public:
      * See Object::UnsetCurrentScoreDef
      */
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
-                  
+
     /**
      * See Object::ResetHorizontalAlignment
      */

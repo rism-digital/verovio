@@ -458,7 +458,7 @@ int Note::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
-    
+
     if (!this->IsVisible()) {
         return FUNCTOR_SIBLINGS;
     }

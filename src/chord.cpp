@@ -326,8 +326,7 @@ bool Chord::IsVisible()
         return this->GetVisible() == BOOLEAN_true;
     }
     // if the chord doens't have it, see if all the children are invisible
-    else
-    {
+    else {
         ListOfObjects::const_iterator iter;
         const ListOfObjects *notes = this->GetList(this);
         assert(notes);
@@ -336,7 +335,8 @@ bool Chord::IsVisible()
             Note *note = dynamic_cast<Note *>(*iter);
             assert(note);
 
-            // If it doesn't have a visibility tag, then it's default value is that it's visible, so return that the chord is visible
+            // If it doesn't have a visibility tag, then it's default value is that it's visible, so return that the
+            // chord is visible
             if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true) {
                 return true;
             }
@@ -644,5 +644,5 @@ int Chord::ResetDrawing(FunctorParams *functorParams)
     this->Modify();
     return FUNCTOR_CONTINUE;
 }
-    
+
 } // namespace vrv

@@ -64,7 +64,7 @@ public:
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * See Object::ResetDrawing
      */

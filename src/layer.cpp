@@ -383,7 +383,7 @@ int Layer::UnsetCurrentScoreDef(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Layer::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     if (this->GetStaffDefClef()) {
@@ -398,7 +398,7 @@ int Layer::ResetHorizontalAlignment(FunctorParams *functorParams)
     if (this->GetStaffDefMeterSig()) {
         GetStaffDefMeterSig()->ResetHorizontalAlignment(functorParams);
     }
-    
+
     if (this->GetCautionStaffDefClef()) {
         GetCautionStaffDefClef()->ResetHorizontalAlignment(functorParams);
     }

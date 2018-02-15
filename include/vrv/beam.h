@@ -108,7 +108,7 @@ public:
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *functorParams);
-    
+
     /**
      * See Object::ResetDrawing
      */
