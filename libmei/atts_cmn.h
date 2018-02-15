@@ -382,7 +382,7 @@ public:
     ///@}
 
 private:
-    /** "Cut-out" style indicated for this measure. **/
+    /** "Cut-out" style. **/
     cutout_CUTOUT m_cutout;
 
     /* include <attcutout> */

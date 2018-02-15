@@ -1222,6 +1222,16 @@ std::string AttConverter::LinestartendsymbolToStr(data_LINESTARTENDSYMBOL data) 
         case LINESTARTENDSYMBOL_arrowwhite: value = "arrowwhite"; break;
         case LINESTARTENDSYMBOL_harpoonleft: value = "harpoonleft"; break;
         case LINESTARTENDSYMBOL_harpoonright: value = "harpoonright"; break;
+        case LINESTARTENDSYMBOL_H: value = "H"; break;
+        case LINESTARTENDSYMBOL_N: value = "N"; break;
+        case LINESTARTENDSYMBOL_Th: value = "Th"; break;
+        case LINESTARTENDSYMBOL_ThRetro: value = "ThRetro"; break;
+        case LINESTARTENDSYMBOL_ThRetroInv: value = "ThRetroInv"; break;
+        case LINESTARTENDSYMBOL_ThInv: value = "ThInv"; break;
+        case LINESTARTENDSYMBOL_T: value = "T"; break;
+        case LINESTARTENDSYMBOL_TInv: value = "TInv"; break;
+        case LINESTARTENDSYMBOL_CH: value = "CH"; break;
+        case LINESTARTENDSYMBOL_RH: value = "RH"; break;
         case LINESTARTENDSYMBOL_none: value = "none"; break;
         default:
             LogWarning("Unknown value '%d' for data.LINESTARTENDSYMBOL", data);
@@ -1242,6 +1252,16 @@ data_LINESTARTENDSYMBOL AttConverter::StrToLinestartendsymbol(std::string value,
     if (value == "arrowwhite") return LINESTARTENDSYMBOL_arrowwhite;
     if (value == "harpoonleft") return LINESTARTENDSYMBOL_harpoonleft;
     if (value == "harpoonright") return LINESTARTENDSYMBOL_harpoonright;
+    if (value == "H") return LINESTARTENDSYMBOL_H;
+    if (value == "N") return LINESTARTENDSYMBOL_N;
+    if (value == "Th") return LINESTARTENDSYMBOL_Th;
+    if (value == "ThRetro") return LINESTARTENDSYMBOL_ThRetro;
+    if (value == "ThRetroInv") return LINESTARTENDSYMBOL_ThRetroInv;
+    if (value == "ThInv") return LINESTARTENDSYMBOL_ThInv;
+    if (value == "T") return LINESTARTENDSYMBOL_T;
+    if (value == "TInv") return LINESTARTENDSYMBOL_TInv;
+    if (value == "CH") return LINESTARTENDSYMBOL_CH;
+    if (value == "RH") return LINESTARTENDSYMBOL_RH;
     if (value == "none") return LINESTARTENDSYMBOL_none;
     if (logWarning)
         LogWarning("Unsupported value '%s' for data.LINESTARTENDSYMBOL", value.c_str());
@@ -3520,6 +3540,53 @@ pointing_XLINKSHOW AttConverter::StrToPointingXlinkshow(std::string value, bool 
     if (logWarning)
         LogWarning("Unsupported value '%s' for att.pointing@xlink:show", value.c_str());
     return pointing_XLINKSHOW_NONE;
+}
+
+std::string AttConverter::RecordTypeRecordtypeToStr(recordType_RECORDTYPE data) const
+{
+    std::string value;
+    switch (data) {
+        case recordType_RECORDTYPE_a: value = "a"; break;
+        case recordType_RECORDTYPE_c: value = "c"; break;
+        case recordType_RECORDTYPE_d: value = "d"; break;
+        case recordType_RECORDTYPE_e: value = "e"; break;
+        case recordType_RECORDTYPE_f: value = "f"; break;
+        case recordType_RECORDTYPE_g: value = "g"; break;
+        case recordType_RECORDTYPE_i: value = "i"; break;
+        case recordType_RECORDTYPE_j: value = "j"; break;
+        case recordType_RECORDTYPE_k: value = "k"; break;
+        case recordType_RECORDTYPE_m: value = "m"; break;
+        case recordType_RECORDTYPE_o: value = "o"; break;
+        case recordType_RECORDTYPE_p: value = "p"; break;
+        case recordType_RECORDTYPE_r: value = "r"; break;
+        case recordType_RECORDTYPE_t: value = "t"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.recordType@recordtype", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+recordType_RECORDTYPE AttConverter::StrToRecordTypeRecordtype(std::string value, bool logWarning) const
+{
+    if (value == "a") return recordType_RECORDTYPE_a;
+    if (value == "c") return recordType_RECORDTYPE_c;
+    if (value == "d") return recordType_RECORDTYPE_d;
+    if (value == "e") return recordType_RECORDTYPE_e;
+    if (value == "f") return recordType_RECORDTYPE_f;
+    if (value == "g") return recordType_RECORDTYPE_g;
+    if (value == "i") return recordType_RECORDTYPE_i;
+    if (value == "j") return recordType_RECORDTYPE_j;
+    if (value == "k") return recordType_RECORDTYPE_k;
+    if (value == "m") return recordType_RECORDTYPE_m;
+    if (value == "o") return recordType_RECORDTYPE_o;
+    if (value == "p") return recordType_RECORDTYPE_p;
+    if (value == "r") return recordType_RECORDTYPE_r;
+    if (value == "t") return recordType_RECORDTYPE_t;
+    if (logWarning)
+        LogWarning("Unsupported value '%s' for att.recordType@recordtype", value.c_str());
+    return recordType_RECORDTYPE_NONE;
 }
 
 std::string AttConverter::RegularMethodMethodToStr(regularMethod_METHOD data) const
