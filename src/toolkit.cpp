@@ -32,6 +32,9 @@
 //----------------------------------------------------------------------------
 
 #include "MidiFile.h"
+#include "checked.h"
+#include "jsonxx.h"
+#include "unchecked.h"
 
 namespace vrv {
 
@@ -53,6 +56,7 @@ Toolkit::Toolkit(bool initFont)
     m_scoreBasedMei = false;
 
     m_humdrumBuffer = NULL;
+    m_cString = NULL;
 
     if (initFont) {
         Resources::InitFonts();
@@ -66,6 +70,10 @@ Toolkit::~Toolkit()
     if (m_humdrumBuffer) {
         free(m_humdrumBuffer);
         m_humdrumBuffer = NULL;
+    }
+    if (m_cString) {
+        free(m_cString);
+        m_cString = NULL;
     }
 }
 
@@ -164,7 +172,7 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
     if (data[0] == '*' || data[0] == '!') {
         return HUMDRUM;
     }
-    if ((unsigned int)data[0] == 0xff || (unsigned int)data[0] == 0xfe) {
+    if ((unsigned char)data[0] == 0xff || (unsigned char)data[0] == 0xfe) {
         // Handle UTF-16 content here later.
         cerr << "Warning: Cannot yet auto-detect format of UTF-16 data files." << endl;
         return UNKNOWN;
@@ -1294,18 +1302,36 @@ bool Toolkit::Set(std::string elementId, std::string attrType, std::string attrV
 {
     if (!m_doc.GetDrawingPage()) return false;
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
-    if (Att::SetAnalytical(element, attrType, attrValue)) return true;
-    if (Att::SetCmn(element, attrType, attrValue)) return true;
-    if (Att::SetCmnornaments(element, attrType, attrValue)) return true;
-    if (Att::SetCritapp(element, attrType, attrValue)) return true;
-    if (Att::SetGestural(element, attrType, attrValue)) return true;
-    if (Att::SetExternalsymbols(element, attrType, attrValue)) return true;
-    if (Att::SetMei(element, attrType, attrValue)) return true;
-    if (Att::SetMensural(element, attrType, attrValue)) return true;
-    if (Att::SetMidi(element, attrType, attrValue)) return true;
-    if (Att::SetPagebased(element, attrType, attrValue)) return true;
-    if (Att::SetShared(element, attrType, attrValue)) return true;
-    if (Att::SetVisual(element, attrType, attrValue)) return true;
+    bool success = false;
+    if (Att::SetAnalytical(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetCmn(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetCmnornaments(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetCritapp(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetExternalsymbols(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetGestural(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetMei(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetMensural(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetMidi(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetPagebased(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetShared(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetVisual(element, attrType, attrValue))
+        success = true;
+    if (success) {
+        m_doc.PrepareDrawing();
+        m_doc.GetDrawingPage()->LayOut(true);
+        return true;
+    }
     return false;
 }
 
@@ -1345,5 +1371,31 @@ bool Toolkit::ParseSetAction(
     return true;
 }
 #endif
+
+void Toolkit::SetCString(const std::string &data)
+{
+    if (m_cString) {
+        free(m_cString);
+        m_cString = NULL;
+    }
+
+    m_cString = (char *)malloc(strlen(data.c_str()) + 1);
+
+    // something went wrong
+    if (!m_cString) {
+        return;
+    }
+    strcpy(m_cString, data.c_str());
+}
+
+const char *Toolkit::GetCString()
+{
+    if (m_cString) {
+        return m_cString;
+    }
+    else {
+        return "[unspecified]";
+    }
+}
 
 } // namespace vrv

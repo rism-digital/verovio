@@ -67,6 +67,11 @@ public:
      */
     virtual int CalcStem(FunctorParams *functorParams);
 
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
 private:
     //
 protected:

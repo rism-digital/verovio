@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+* Allowing multiple JS instances
 * Adding support for `@metcon` on measure
 * Adding getAvailableOptions and getOptions(bool) methods to the JS toolkit
 * Adding several layout options

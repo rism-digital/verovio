@@ -320,6 +320,33 @@ Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
     return topNote->GetStemDownNW(doc, staffSize, isCueSize);
 }
 
+bool Chord::IsVisible()
+{
+    if (this->HasVisible()) {
+        return this->GetVisible() == BOOLEAN_true;
+    }
+    // if the chord doens't have it, see if all the children are invisible
+    else {
+        ListOfObjects::const_iterator iter;
+        const ListOfObjects *notes = this->GetList(this);
+        assert(notes);
+
+        for (iter = notes->begin(); iter != notes->end(); iter++) {
+            Note *note = dynamic_cast<Note *>(*iter);
+            assert(note);
+
+            // If it doesn't have a visibility tag, then it's default value is that it's visible, so return that the
+            // chord is visible
+            if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true) {
+                return true;
+            }
+            // if it's visibility is false, continue on and see if any of the other notes are false.
+            // All of the notes must not be visible in order for the chord to not be visible.
+        }
+        return false;
+    }
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -368,6 +395,11 @@ int Chord::CalcStem(FunctorParams *functorParams)
     // Stems have been calculated previously in Beam or FTrem - siblings becasue flags do not need to
     // be processed either
     if (this->IsInBeam() || this->IsInFTrem()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // if the chord isn't visible, carry on
+    if (!this->IsVisible()) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -434,6 +466,11 @@ int Chord::CalcDots(FunctorParams *functorParams)
     CalcDotsParams *params = dynamic_cast<CalcDotsParams *>(functorParams);
     assert(params);
 
+    // if the chord isn't visible, stop here
+    if (!this->IsVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
+    // if there aren't dot, stop here
     if (!this->HasDots()) {
         return FUNCTOR_SIBLINGS;
     }
@@ -600,4 +637,12 @@ int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+
+int Chord::ResetDrawing(FunctorParams *functorParams)
+{
+    // We want the list of the ObjectListInterface to be re-generated
+    this->Modify();
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

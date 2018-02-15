@@ -153,6 +153,11 @@ public:
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+
+    /**
      * See Object::AlignHorizontally
      */
     virtual int AlignHorizontally(FunctorParams *functorParams);

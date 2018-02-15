@@ -417,6 +417,37 @@ int Layer::UnsetCurrentScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Layer::ResetHorizontalAlignment(FunctorParams *functorParams)
+{
+    if (this->GetStaffDefClef()) {
+        GetStaffDefClef()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetStaffDefKeySig()) {
+        GetStaffDefKeySig()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetStaffDefMensur()) {
+        GetStaffDefMensur()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetStaffDefMeterSig()) {
+        GetStaffDefMeterSig()->ResetHorizontalAlignment(functorParams);
+    }
+
+    if (this->GetCautionStaffDefClef()) {
+        GetCautionStaffDefClef()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetCautionStaffDefKeySig()) {
+        GetCautionStaffDefKeySig()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetCautionStaffDefMensur()) {
+        GetCautionStaffDefMensur()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetCautionStaffDefMeterSig()) {
+        GetCautionStaffDefMeterSig()->ResetHorizontalAlignment(functorParams);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Layer::AlignHorizontally(FunctorParams *functorParams)
 {
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);

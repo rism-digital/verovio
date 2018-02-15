@@ -2033,6 +2033,22 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for rest
+    else if (filterParent->Is(REST)) {
+        return false;
+    }
+    // filter for syl
+    else if (filterParent->Is(SYL)) {
+        if (element == "") {
+            return true;
+        }
+        else if (element == "rend") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for tuplet
     else if (filterParent->Is(TUPLET)) {
         if (element == "beam") {
@@ -2063,18 +2079,6 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for verse
     else if (filterParent->Is(VERSE)) {
         if (element == "syl") {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    // filter for syl
-    else if (filterParent->Is(SYL)) {
-        if (element == "") {
-            return true;
-        }
-        else if (element == "rend") {
             return true;
         }
         else {
@@ -2511,7 +2515,7 @@ bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
 bool MeiInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
 {
     assert(dynamic_cast<Score *>(parent) || dynamic_cast<Section *>(parent) || dynamic_cast<System *>(parent)
-        || dynamic_cast<EditorialElement *>(parent));
+        || dynamic_cast<Ending *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     ScoreDef *vrvScoreDef;
     if (!m_hasScoreDef) {
@@ -3657,7 +3661,7 @@ bool MeiInput::ReadRest(Object *parent, pugi::xml_node rest)
     vrvRest->ReadRestVisMensural(rest);
 
     parent->AddChild(vrvRest);
-    return true;
+    return ReadLayerChildren(vrvRest, rest, vrvRest);
 }
 
 bool MeiInput::ReadProport(Object *parent, pugi::xml_node proport)

@@ -1,6 +1,6 @@
 {
   "name": "verovio-dev",
-  "version": "2.0.0-10",
+  "version": "2.0.0-12",
   "description": "This is the development version of the verovio package",
   "main": "index.js",
   "keywords": [
