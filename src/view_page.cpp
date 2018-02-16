@@ -30,6 +30,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "mnum.h"
 #include "note.h"
 #include "options.h"
 #include "page.h"
@@ -732,11 +733,20 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     // Check if the first measure of the system
     Measure *systemStart = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
+    MNum *mnum = dynamic_cast<MNum *>(measure->FindChildByType(MNUM));
     if (measure == systemStart) {
-        // Draw measure number if > 1
+        // Draw auto measure number if > 1
         if ((measure->HasN()) && (measure->GetN() != "0") && (measure->GetN() != "1")) {
-            DrawMNum(dc, measure);
+            if (!mnum) {
+                mnum = new MNum;
+                Text *text = new Text;
+                text->SetText(UTF8to16(measure->GetN()));
+                mnum->AddChild(text);
+            }
         }
+    }
+    if (mnum) {
+        DrawMNum(dc, mnum, measure);
     }
 
     DrawMeasureChildren(dc, measure, measure, system);
@@ -759,16 +769,16 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     }
 }
 
-void View::DrawMNum(DeviceContext *dc, Measure *measure)
+void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
 {
     assert(dc);
     assert(measure);
+    assert(mnum);
 
     Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
     if (staff) {
 
-        // needs to be refined when mNum element is available
-        dc->StartCustomGraphic("mnum", "");
+        dc->StartGraphic(mnum, "", mnum->GetUuid());
 
         FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
         // HARDCODED
@@ -776,24 +786,20 @@ void View::DrawMNum(DeviceContext *dc, Measure *measure)
         currentFont.SetPointSize(currentFont.GetPointSize() * 4 / 5);
         dc->SetFont(&currentFont);
 
-        Text text;
-        text.SetParent(staff);
-        text.SetText(UTF8to16(measure->GetN()));
-
         TextDrawingParams params;
 
         // HARDCODED
         params.m_x = staff->GetDrawingX();
-        params.m_y = staff->GetDrawingY() + 2.5 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        params.m_y = staff->GetDrawingY() + 1.5 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         params.m_pointSize = currentFont.GetPointSize();
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_center);
-        DrawTextElement(dc, &text, params);
+        DrawTextChildren(dc, mnum, params);
         dc->EndText();
 
         dc->ResetFont();
 
-        dc->EndCustomGraphic();
+        dc->EndGraphic(mnum, this);
     }
 }
 

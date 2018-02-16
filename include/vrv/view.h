@@ -38,6 +38,7 @@ class Layer;
 class LayerElement;
 class Lb;
 class Measure;
+class MNum;
 class Mordent;
 class Num;
 class Octave;
@@ -186,7 +187,7 @@ protected:
     void DrawBarLineDots(DeviceContext *dc, StaffDef *staffDef, Staff *staff, BarLine *barLine);
     void DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *lines, bool below, bool cueSize);
     void DrawMeasure(DeviceContext *dc, Measure *measure, System *system);
-    void DrawMNum(DeviceContext *dc, Measure *measure);
+    void DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure);
     void DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure);
