@@ -62,6 +62,7 @@ int Pedal::GenerateMIDI(FunctorParams * functorParams)
     if (!HasDir()) return FUNCTOR_CONTINUE;
 
     int velocity;
+    int tickOffset = 0;
     switch (GetDir())
     {
     case pedalLog_DIR_down:
@@ -69,6 +70,11 @@ int Pedal::GenerateMIDI(FunctorParams * functorParams)
         break;
     case pedalLog_DIR_up:
         velocity = 0;
+
+        // if you have a pedal event that ends right as another begins (ex. one in the end of measure 1 and start of measure 2), 
+        // they will overlap because they occur at the same midi time
+        // so we just add a -1 offset to the ending time to remedy this until a better method is thought of
+        tickOffset = -1;
         break;
     default:
         return FUNCTOR_CONTINUE;
@@ -77,16 +83,10 @@ int Pedal::GenerateMIDI(FunctorParams * functorParams)
     // todo: check pedal @func to switch between sustain/soften/damper pedals?
 
     double pedalTime = GetStart()->GetAlignment()->GetTime() * DURATION_4 / DUR_MAX;
-
-    // Note: even though this time may be technically correct, 
-    // if you have a pedal event exactly at the start & end of a measure, 
-    // they will overlap because they occur at the same midi time
-    // 
-    // Maybe should add an offset to fix?
     double starttime = params->m_totalTime + pedalTime;
     int tpq = params->m_midiFile->getTPQ();
 
-    params->m_midiFile->addSustainPedal(params->m_midiTrack, starttime * tpq, params->m_midiChannel, velocity);
+    params->m_midiFile->addSustainPedal(params->m_midiTrack, (starttime * tpq) + tickOffset, params->m_midiChannel, velocity);
 
     return FUNCTOR_SIBLINGS;
 }
