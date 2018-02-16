@@ -1693,7 +1693,7 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
     str.push_back(code);
 
     bool centered = true;
-    // center the glyph only with @stratid
+    // center the glyph only with @startid
     if (breath->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
@@ -1800,7 +1800,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     data_HORIZONTALALIGNMENT alignment = dynam->GetChildRendAlignment();
     // Dynam are left aligned by default;
     if (alignment == 0) {
-        // centre the dynam only with @stratid
+        // centre the dynam only with @startid
         alignment = (dynam->GetStart()->Is(TIMESTAMP_ATTR)) ? HORIZONTALALIGNMENT_left : HORIZONTALALIGNMENT_center;
     }
 
@@ -1962,7 +1962,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     data_HORIZONTALALIGNMENT alignment = harm->GetChildRendAlignment();
     // Harm are centered aligned by default;
     if (alignment == 0) {
-        // centre the harm only with @stratid
+        // centre the harm only with @startid
         alignment = (harm->GetStart()->Is(TIMESTAMP_ATTR)) ? HORIZONTALALIGNMENT_left : HORIZONTALALIGNMENT_center;
     }
 
@@ -2117,7 +2117,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
 
     bool centered = true;
-    // center the pedal only with @stratid
+    // center the pedal only with @startid
     if (pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
@@ -2225,7 +2225,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     int x = trill->GetStart()->GetDrawingX() + trill->GetStart()->GetDrawingRadius(m_doc);
 
     bool centered = true;
-    // center the trill only with @stratid
+    // center the trill only with @startid
     if (trill->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
@@ -2296,7 +2296,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     if (turn->GetForm() == turnLog_FORM_upper) code = SMUFL_E568_ornamentTurnInverted;
 
     bool centered = true;
-    // center the turn only with @stratid
+    // center the turn only with @startid
     if (turn->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
