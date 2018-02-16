@@ -56,6 +56,10 @@ public:
      */
     virtual int PrepareFloatingGrps(FunctorParams *functoParams);
 
+    /**
+    * See Object::GenerateMIDI
+    */
+    virtual int GenerateMIDI(FunctorParams *functorParams);
 protected:
     //
 private:
