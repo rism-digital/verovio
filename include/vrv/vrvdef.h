@@ -120,6 +120,7 @@ enum ClassId {
     HAIRPIN,
     HARM,
     MORDENT,
+    MNUM,
     OCTAVE,
     PEDAL,
     SLUR,
