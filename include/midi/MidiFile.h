@@ -163,6 +163,8 @@ class MidiFile {
 		                                           int aChannel, int patchnum);
 		MidiEvent*        addPitchBend            (int aTrack, int aTick,
 		                                           int aChannel, double amount);
+      int       addSustainPedal           (int aTrack, int aTick, 
+                                           int aChannel, int velocity);
 
 		// Controller message adding convenience functions:
 		MidiEvent*        addSustain              (int aTrack, int aTick,
