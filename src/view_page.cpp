@@ -788,6 +788,10 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
 
         TextDrawingParams params;
 
+        data_HORIZONTALALIGNMENT alignment = mnum->GetChildRendAlignment();
+        // mNum are center aligned by default
+        if (alignment == HORIZONTALALIGNMENT_NONE) alignment = HORIZONTALALIGNMENT_center;
+
         // HARDCODED
         // we set mNum to a fixed height above the system and make it a bit smaller than other text
         params.m_x = staff->GetDrawingX();
@@ -799,7 +803,7 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&mnumTxt);
 
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_center);
+        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
         DrawTextChildren(dc, mnum, params);
         dc->EndText();
 
