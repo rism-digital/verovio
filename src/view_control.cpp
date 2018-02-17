@@ -1737,7 +1737,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     params.m_x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
 
     data_HORIZONTALALIGNMENT alignment = dir->GetChildRendAlignment();
-    // Dir are left aligned by default (with both @tstamp and @startid)
+    // dir are left aligned by default (with both @tstamp and @startid)
     if (alignment == HORIZONTALALIGNMENT_NONE) alignment = HORIZONTALALIGNMENT_left;
 
     std::vector<Staff *>::iterator staffIter;
@@ -1796,7 +1796,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     params.m_x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
 
     data_HORIZONTALALIGNMENT alignment = dynam->GetChildRendAlignment();
-    // Dynam are left aligned by default;
+    // dynam are left aligned by default;
     if (alignment == 0) {
         // centre the dynam only with @startid
         alignment = (dynam->GetStart()->Is(TIMESTAMP_ATTR)) ? HORIZONTALALIGNMENT_left : HORIZONTALALIGNMENT_center;
@@ -1956,7 +1956,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     params.m_x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
 
     data_HORIZONTALALIGNMENT alignment = harm->GetChildRendAlignment();
-    // Harm are centered aligned by default;
+    // harm are centered aligned by default;
     if (alignment == 0) {
         // centre the harm only with @startid
         alignment = (harm->GetStart()->Is(TIMESTAMP_ATTR)) ? HORIZONTALALIGNMENT_left : HORIZONTALALIGNMENT_center;
