@@ -160,7 +160,7 @@ public:
      * Get the MEI as a string.
      * Get all the pages unless a page number (1-based) is specified
      */
-    std::string GetMEI(int pageNo = 0, bool scoreBased = false);
+    std::string GetMEI(int pageNo = 0, bool scoreBased = true);
 
     /**
      * Return element attributes as a JSON string

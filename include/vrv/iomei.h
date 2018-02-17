@@ -66,6 +66,7 @@ class LayerElement;
 class Lb;
 class Lem;
 class Ligature;
+class Mdiv;
 class Measure;
 class Mensur;
 class MeterSig;
@@ -79,6 +80,8 @@ class Note;
 class Num;
 class Octave;
 class Orig;
+class Page;
+class Pages;
 class Pb;
 class Pedal;
 class PgFoot;
@@ -172,6 +175,15 @@ private:
      * Write the @xml:id to the currentNode
      */
     void WriteXmlId(pugi::xml_node currentNode, Object *object);
+
+    /**
+     * @name Methods for writing MEI body elements.
+     */
+    ///@{
+    void WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv);
+    void WritePages(pugi::xml_node currentNode, Pages *pages);
+    void WriteScore(pugi::xml_node currentNode, Score *score);
+    ///@}
 
     /**
      * @name Methods for writing MEI score-based elements
@@ -381,6 +393,13 @@ public:
 private:
     bool ReadDoc(pugi::xml_node root);
 
+    ///@{
+    bool ReadMdiv(Object *parent, pugi::xml_node parentNode, bool isVisible);
+    bool ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible);
+    bool ReadPages(Object *parent, pugi::xml_node parentNode);
+    bool ReadScore(Object *parent, pugi::xml_node parentNode);
+    ///@}
+
     /**
      * @name Methods for reading MEI score-based elements
      */
@@ -402,7 +421,7 @@ private:
      * children (see MeiInput::IsAllowed)
      */
     ///@{
-    bool ReadPage(pugi::xml_node page);
+    bool ReadPage(Object *parent, pugi::xml_node parentNode);
     bool ReadPageChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadSystem(Object *parent, pugi::xml_node system);
     bool ReadSystemChildren(Object *parent, pugi::xml_node parentNode);
@@ -643,6 +662,12 @@ private:
      * A static array for storing the implemented editorial elements
      */
     static std::vector<std::string> s_editorialElementNames;
+
+    /**
+     * The selected <mdiv>.
+     * If not specified by --mdiv-x-path query, then it is the first <mdiv> in the body
+     */
+    pugi::xml_node m_selectedMdiv;
 };
 
 } // namespace vrv

@@ -195,6 +195,12 @@ public:
     void MoveChildrenFrom(Object *sourceParent, int idx = -1, bool allowTypeChange = false);
 
     /**
+     * Replace the currentChild with the replacingChild.
+     * The currentChild is not deleted by the methods.
+     */
+    void ReplaceChild(Object *currentChild, Object *replacingChild);
+
+    /**
      * Move an object to another parent.
      * The object is relinquished from its current parent - see Object::Relinquish
      */
@@ -381,6 +387,11 @@ public:
      * This has to be used when children are moved but then the parent is not deleted.
      */
     void ClearRelinquishedChildren();
+
+    /**
+     * Clear the children vector and delete all the objects.
+     */
+    void ClearChildren();
 
     /**
      * Remove and delete the child.
@@ -968,11 +979,7 @@ public:
     ///@}
 
 protected:
-    /**
-     * Clear the children vector and delete all the objects.
-     */
-    void ClearChildren();
-
+    //
 private:
     /**
      * Method for generating the uuid.
