@@ -15,7 +15,6 @@
 
 #include "editorial.h"
 #include "text.h"
-#include "verticalaligner.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -24,11 +23,10 @@ namespace vrv {
 // MNum
 //----------------------------------------------------------------------------
 
-MNum::MNum() : ControlElement("mnum-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttColor(), AttLang()
+MNum::MNum() : ControlElement("mnum-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttLang()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_LANG);
 
     Reset();
@@ -41,7 +39,6 @@ void MNum::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
-    ResetColor();
     ResetLang();
 }
 

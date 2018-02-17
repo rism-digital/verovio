@@ -24,7 +24,6 @@ class MNum : public ControlElement,
             public TextListInterface,
             public TextDirInterface,
             public TimeSpanningInterface,
-            public AttColor,
             public AttLang {
 public:
     /**
