@@ -994,6 +994,7 @@ void MeiOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
     WriteControlElement(currentNode, mNum);
     WriteTextDirInterface(currentNode, mNum);
     WriteTimeSpanningInterface(currentNode, mNum);
+    mNum->WriteColor(currentNode);
     mNum->WriteLang(currentNode);
 }
 
@@ -3014,6 +3015,7 @@ bool MeiInput::ReadMNum(Object *parent, pugi::xml_node mNum)
 
     ReadTextDirInterface(mNum, vrvMNum);
     ReadTimeSpanningInterface(mNum, vrvMNum);
+    vrvMNum->ReadColor(mNum);
     vrvMNum->ReadLang(mNum);
 
     parent->AddChild(vrvMNum);
