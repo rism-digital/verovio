@@ -25,8 +25,11 @@ namespace vrv {
 // Score
 //----------------------------------------------------------------------------
 
-Score::Score() : Object("score-")
+Score::Score() : Object("score-"), AttLabelled(), AttNNumberLike()
 {
+    RegisterAttClass(ATT_LABELLED);
+    RegisterAttClass(ATT_NNUMBERLIKE);
+
     Reset();
 }
 
@@ -35,6 +38,8 @@ Score::~Score() {}
 void Score::Reset()
 {
     Object::Reset();
+    ResetLabelled();
+    ResetNNumberLike();
 }
 
 void Score::AddChild(Object *child)

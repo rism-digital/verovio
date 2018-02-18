@@ -825,6 +825,7 @@ void Doc::ConvertToPageBasedDoc()
     assert(score);
 
     Pages *pages = new Pages();
+    pages->ConvertFrom(score);
     Page *page = new Page();
     pages->AddChild(page);
     System *system = new System();

@@ -716,7 +716,9 @@ bool MeiOutput::WriteDoc(Doc *doc)
 void MeiOutput::WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv)
 {
     assert(mdiv);
-    // mdiv->WriteNNumberLike(currentNode);
+
+    mdiv->WriteLabelled(currentNode);
+    mdiv->WriteNNumberLike(currentNode);
 }
 
 void MeiOutput::WritePages(pugi::xml_node currentNode, Pages *pages)
@@ -728,14 +730,16 @@ void MeiOutput::WritePages(pugi::xml_node currentNode, Pages *pages)
         m_currentNode.append_child(pugi::node_comment).set_value("Coordinates in MEI axis direction");
     }
 
-    // pages->WriteNNumberLike(currentNode);
+    pages->WriteLabelled(currentNode);
+    pages->WriteNNumberLike(currentNode);
 }
 
 void MeiOutput::WriteScore(pugi::xml_node currentNode, Score *score)
 {
     assert(score);
 
-    // score->WriteNNumberLike(currentNode);
+    score->WriteLabelled(currentNode);
+    score->WriteNNumberLike(currentNode);
 }
 
 void MeiOutput::WritePage(pugi::xml_node currentNode, Page *page)
@@ -2265,6 +2269,9 @@ bool MeiInput::ReadMdiv(Object *parent, pugi::xml_node mdiv, bool isVisible)
     Mdiv *vrvMdiv = new Mdiv();
     SetMeiUuid(mdiv, vrvMdiv);
 
+    vrvMdiv->ReadLabelled(mdiv);
+    vrvMdiv->ReadNNumberLike(mdiv);
+
     parent->AddChild(vrvMdiv);
 
     if (isVisible) {
@@ -2313,6 +2320,9 @@ bool MeiInput::ReadPages(Object *parent, pugi::xml_node pages)
 {
     Pages *vrvPages = new Pages();
     SetMeiUuid(pages, vrvPages);
+
+    vrvPages->ReadLabelled(pages);
+    vrvPages->ReadNNumberLike(pages);
 
     parent->AddChild(vrvPages);
 
@@ -2363,6 +2373,9 @@ bool MeiInput::ReadScore(Object *parent, pugi::xml_node score)
 {
     Score *vrvScore = new Score();
     SetMeiUuid(score, vrvScore);
+
+    vrvScore->ReadLabelled(score);
+    vrvScore->ReadNNumberLike(score);
 
     parent->AddChild(vrvScore);
 

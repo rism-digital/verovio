@@ -8,9 +8,12 @@
 #ifndef __VRV_PAGES_H__
 #define __VRV_PAGES_H__
 
+#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
+
+class Score;
 
 //----------------------------------------------------------------------------
 // Pages
@@ -19,7 +22,7 @@ namespace vrv {
 /**
  * This class represent a <pages> in page-based MEI.
  */
-class Pages : public Object {
+class Pages : public Object, public AttLabelled, public AttNNumberLike {
 
 public:
     /**
@@ -40,6 +43,11 @@ public:
     ///@{
     virtual void AddChild(Object *object);
     ///@}
+
+    /**
+     *
+     */
+    void ConvertFrom(Score *score);
 
     //----------//
     // Functors //

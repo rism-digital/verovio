@@ -23,8 +23,11 @@ namespace vrv {
 // Mdiv
 //----------------------------------------------------------------------------
 
-Mdiv::Mdiv() : Object("mdiv-")
+Mdiv::Mdiv() : Object("mdiv-"), AttLabelled(), AttNNumberLike()
 {
+    RegisterAttClass(ATT_LABELLED);
+    RegisterAttClass(ATT_NNUMBERLIKE);
+
     Reset();
 }
 
@@ -33,6 +36,8 @@ Mdiv::~Mdiv() {}
 void Mdiv::Reset()
 {
     Object::Reset();
+    ResetLabelled();
+    ResetNNumberLike();
 
     m_visibility = Hidden;
 }

@@ -8,6 +8,7 @@
 #ifndef __VRV_MDIV_H__
 #define __VRV_MDIV_H__
 
+#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
@@ -19,7 +20,7 @@ namespace vrv {
 /**
  * This class represent a <pages> in page-based MEI.
  */
-class Mdiv : public Object {
+class Mdiv : public Object, public AttLabelled, public AttNNumberLike {
 
 public:
     /**

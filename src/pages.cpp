@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "page.h"
+#include "score.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -22,8 +23,11 @@ namespace vrv {
 // Pages
 //----------------------------------------------------------------------------
 
-Pages::Pages() : Object("pages-")
+Pages::Pages() : Object("pages-"), AttLabelled(), AttNNumberLike()
 {
+    RegisterAttClass(ATT_LABELLED);
+    RegisterAttClass(ATT_NNUMBERLIKE);
+
     Reset();
 }
 
@@ -32,6 +36,8 @@ Pages::~Pages() {}
 void Pages::Reset()
 {
     Object::Reset();
+    ResetLabelled();
+    ResetNNumberLike();
 }
 
 void Pages::AddChild(Object *child)
@@ -50,6 +56,12 @@ void Pages::AddChild(Object *child)
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
+}
+
+void Pages::ConvertFrom(Score *score)
+{
+    this->AttLabelled::operator=(*score);
+    this->AttNNumberLike::operator=(*score);
 }
 
 //----------------------------------------------------------------------------
