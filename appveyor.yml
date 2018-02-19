@@ -13,6 +13,7 @@ platform: x64
 before_build:
 - cmd: >-
     cd tools
+    
     cmake -DCMAKE_GENERATOR_PLATFORM=x64 .
 
 build:
