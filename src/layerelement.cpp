@@ -175,7 +175,6 @@ Beam *LayerElement::IsInBeam()
         if (this->IsGraceNote()) {
             LayerElement *graceNote = this;
             if (this->Is(STEM)) graceNote = dynamic_cast<LayerElement *>(this->GetFirstParent(NOTE, MAX_BEAM_DEPTH));
-<<<<<<< HEAD
             // Make sure the object list is set
             beamParent->GetList(beamParent);
             // If the note is part of the beam parent, this means we have a beam of graced notes
@@ -186,12 +185,6 @@ Beam *LayerElement::IsInBeam()
             else {
                 return NULL;
             }
-=======
-            // If the note is part of the beam parent, this means we
-            // have a beam of graced notes
-            if (beamParent->GetListIndex(graceNote) > -1) return beamParent;
-            // otherwise it is a non-beamed grace note within a beam - will return false
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
         }
         else {
             return beamParent;
@@ -560,6 +553,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
+    // if (m_alignment) LogDebug("Element %s %s", this->GetUuid().c_str(), this->GetClassName().c_str());
     assert(!m_alignment);
 
     this->SetScoreDefRole(params->m_scoreDefRole);
@@ -802,11 +796,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
             assert(staff);
             loc = staff->m_drawingLines - 1;
-<<<<<<< HEAD
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
-=======
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
             bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
@@ -842,11 +833,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
             assert(staff);
             loc = staff->m_drawingLines - 1;
-<<<<<<< HEAD
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
-=======
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
             bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
@@ -881,11 +869,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
 
     // These are the only ones we want to keep for further collision detection
     // Eventually  we also need stem for overlapping voices
-<<<<<<< HEAD
     if (this->Is({ DOTS, NOTE }) && this->HasSelfBB()) {
-=======
-    if (this->Is({ DOTS, NOTE }) && this->HasUpdatedBB()) {
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
         params->m_current.push_back(this);
     }
 

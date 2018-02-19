@@ -1,0 +1,968 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1308px" height="1720px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" overflow="visible">
+	<desc>Engraved by Verovio 1.1.4-26a3ad8-dirty</desc>
+	<defs>
+		<symbol id="E93D" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M155 194l157 -194l-157 -192l-155 192z" />
+		</symbol>
+		<symbol id="E909" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M1.60254 206.199l2.59082 430.861c-0.193359 24.9395 30.8066 18.9395 30.8906 0l2.62598 -203.986l2.62695 -317.585h78.4834s36.5801 -1.38965 43.1797 5.21094c9.90039 9.89941 8.38574 202.675 8.38574 202.675l3.68457 221.89s-1.44336 20.1357 18.6299 20.1357 c19.7998 0 12.2598 -20.1357 12.2598 -20.1357v-244.325s-0.959961 -179.74 -0.959961 -225.939c-1.14746 -7.73828 -0.700195 -12.3994 -4 -19c-6.60059 -6.59961 -8.12695 -7.09961 -16.2002 -7.09961c-44.7656 0 -71.085 -0.155273 -71.085 -0.155273l-68.6455 -2.86816 v-49.0859v-48.0859l63.6602 -2.88086l82.3701 -2.29004s4.60059 0.765625 7.90039 -2.53418s4.98926 -6.7998 4.98926 -6.7998l1 -151.832v-154.574s0.0107422 -19.7939 -13.1895 -19.3936c-9.81348 0.297852 -13.7998 4.59961 -15.7998 13.5996l-6.68555 137.93 l-2.50586 106.07s0.591797 3.59961 -2.70898 6.90039c-3.2998 3.2998 -8.89941 2.16406 -8.89941 2.16406h-40.3105h-70.2432l-2.78125 -115.013l-2.78125 -132.013s-0.0839844 -20.0391 -14.8838 -19.6387c-16.8208 0.455065 -18.7998 16.5 -18.7998 16.5 c-0.676758 26.1035 -4.29785 257.943 -2.79785 581.299z" />
+		</symbol>
+		<symbol id="E9F2" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M0 250h40v-500h-40v500z" />
+		</symbol>
+		<symbol id="E939" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M155 194l157 -194l-157 -192l-155 192zM125 111l-57 -73l122 -149l56 71z" />
+		</symbol>
+		<symbol id="E93C" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M155 194l157 -194l-157 -192l-155 192zM125 111l-57 -73l122 -149l56 71z" />
+		</symbol>
+		<symbol id="E262" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M136 186v169h17v-164l44 14v-91l-44 -14v-165l44 12v-91l-44 -13v-155h-17v150l-76 -22v-155h-17v149l-43 -13v90l43 14v167l-43 -14v92l43 13v169h17v-163zM60 73v-167l76 22v168z" />
+		</symbol>
+		<symbol id="E94A" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M0 -760h30l156 227h-30zM0 -760h30v760h-30v-760z" />
+		</symbol>
+		<symbol id="E949" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M0 760h30l156 -227h-30zM0 760h30v-760h-30v760z" />
+		</symbol>
+		<symbol id="E9F4" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M0 250h40v-140h-40v140z" />
+		</symbol>
+		<symbol id="E9F3" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M0 250h40v-250h-40v250z" />
+		</symbol>
+		<symbol id="E9F5" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M0 140h40v-140h-40v140z" />
+		</symbol>
+		<symbol id="E9F6" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M40 96v-96h-40v140h40l78 -69h-48z" />
+		</symbol>
+		<symbol id="E260" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M20 110c32 16 54 27 93 27c26 0 35 -3 54 -13c13 -7 24 -20 27 -38l4 -25c0 -28 -16 -57 -45 -89c-23 -25 -39 -44 -65 -68l-88 -79v644h20v-359zM90 106c-32 0 -48 -10 -70 -29v-194c31 31 54 59 71 84c21 32 32 59 32 84c0 9 1 16 1 20c0 14 -3 21 -11 30l-8 3z" />
+		</symbol>
+	</defs>
+	<style type="text/css">g.page-margin{font-family:Times;} g.tempo{font-weight:bold;} g.dir, g.dynam {font-style:italic;}</style>
+	<svg class="definition-scale" viewBox="0 0 9420 12390">
+		<g class="page-margin" transform="translate(0, 0)">
+			<g class="system" id="m-eb2c5be5-ff4f-4a65-b199-f45ac1e6506d">
+				<g class="staff" id="m-5daa6e16-b63c-43d3-be30-4e2bf15d34e1">
+					<path d="M153 1080 L9424 1080" stroke="#000000" stroke-width="20" />
+					<path d="M153 1260 L9424 1260" stroke="#000000" stroke-width="20" />
+					<path d="M153 1440 L9424 1440" stroke="#000000" stroke-width="20" />
+					<path d="M153 1620 L9424 1620" stroke="#000000" stroke-width="20" />
+					<path d="M153 1800 L9424 1800" stroke="#000000" stroke-width="20" />
+					<g class="ledgerLines below">
+						<path d="M669 1980 L995 1980" stroke="#000000" stroke-width="35" />
+						<path d="M669 2160 L995 2160" stroke="#000000" stroke-width="35" />
+					</g>
+					<g class="layer" id="m-507e3194-1373-46c5-9f23-b3c0bab1b7fa">
+						<g class="note" id="m-d7d6354c-eec4-475e-9d6a-1aec34ae9054">
+							<use xlink:href="#E93D" x="720" y="2160" height="720px" width="720px" />
+							<rect x="822" y="1440" height="639" width="20" />
+						</g>
+						<g class="note" id="m-f7525f68-7ddd-4cd3-8281-3ae8a56f6fec">
+							<polygon points="1817,1800 2049,1800 2049,1845 1817,1845 " />
+							<polygon points="1817,1980 2049,1980 2049,1935 1817,1935 " />
+							<path d="M1817 1755 L1817 2025" stroke="#000000" stroke-width="20" />
+							<path d="M2049 1755 L2049 2025" stroke="#000000" stroke-width="20" />
+							<path d="M2049 1800 L2049 1260" stroke="#000000" stroke-width="20" />
+						</g>
+						<g class="clef" id="m-cba8a1dd-8efc-4ca1-b06f-c92da0425a44">
+							<use xlink:href="#E909" x="3463" y="1620" height="720px" width="720px" />
+						</g>
+						<g class="mensur" id="m-3604130a-452a-4918-b329-f067d94c700d">
+							<path d="M4137 1331 A153 153 0.0 1 0 4137 1548" fill-opacity="0" stroke-width="20" stroke="#000000" />
+							<path d="M4029 1080 L4029 1800" stroke="#000000" stroke-width="20" />
+						</g>
+						<g class="rest" id="m-dbba57fd-af8b-4250-a1ff-98732a83ef40">
+							<use xlink:href="#E9F2" x="4168" y="1620" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-87d5ca51-5a7c-40fc-9e34-8a9f8effcf1d">
+							<use xlink:href="#E939" x="4370" y="1260" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-830ad877-f94e-402e-a8eb-fa5c71e6c25d">
+							<use xlink:href="#E93C" x="4687" y="1260" height="720px" width="720px" />
+							<rect x="4789" y="1341" height="549" width="20" />
+						</g>
+						<g class="note" id="m-51462c07-db96-48ad-946d-4a8f40a8d450">
+							<use xlink:href="#E93C" x="5032" y="1260" height="720px" width="720px" />
+							<rect x="5134" y="1341" height="549" width="20" />
+						</g>
+						<g class="note" id="m-f49c9a04-015b-4d7e-933c-80ce99b35998">
+							<use xlink:href="#E93C" x="5306" y="1260" height="720px" width="720px" />
+							<rect x="5408" y="1341" height="549" width="20" />
+						</g>
+						<g class="note" id="m-63fb62bb-4486-4dba-a9eb-cd2481ee934a">
+							<use xlink:href="#E93D" x="5608" y="1440" height="720px" width="720px" />
+							<rect x="5710" y="810" height="549" width="20" />
+						</g>
+						<g class="note" id="m-70c19e67-3e89-4a9e-beb8-97dc112da5a8">
+							<use xlink:href="#E93C" x="5940" y="1260" height="720px" width="720px" />
+							<rect x="6042" y="1341" height="549" width="20" />
+						</g>
+						<g class="accid" id="m-89e7486b-9bbe-4fb2-b0ed-7ab9eea0eb71">
+							<use xlink:href="#E262" x="6213" y="1350" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-1e2b0c67-bb33-4564-98ed-74e610f42dc0">
+							<use xlink:href="#E93D" x="6444" y="1350" height="720px" width="720px" />
+							<use xlink:href="#E94A" x="6546" y="1431" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-2ddef0dd-d6c4-40b0-a342-4a9c6da8ddd9">
+							<use xlink:href="#E93D" x="6732" y="1440" height="720px" width="720px" />
+							<use xlink:href="#E949" x="6834" y="1359" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-e72b25b7-a837-49dc-be84-76ea2f7d9cc2">
+							<use xlink:href="#E93C" x="7063" y="1350" height="720px" width="720px" />
+							<rect x="7165" y="1431" height="549" width="20" />
+						</g>
+						<g class="note" id="m-61b8d8fe-a7e5-49f1-927b-38025f140274">
+							<use xlink:href="#E939" x="7394" y="1260" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-59b7784b-6493-4783-8d43-08fb7c853ae3">
+							<use xlink:href="#E9F4" x="7682" y="1080" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-129c4e06-922c-4525-9e80-16ff5bb4f061">
+							<use xlink:href="#E9F3" x="7912" y="1440" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-17848414-27f2-4f56-9a90-c78b3eafe1ba">
+							<use xlink:href="#E93C" x="8100" y="1530" height="720px" width="720px" />
+							<rect x="8202" y="900" height="549" width="20" />
+						</g>
+						<g class="note" id="m-325768dd-1613-41f5-ad6b-a68b64d58a38">
+							<use xlink:href="#E93D" x="8460" y="1710" height="720px" width="720px" />
+							<rect x="8562" y="1080" height="549" width="20" />
+						</g>
+						<g class="dot" id="m-65b0defb-98e0-4f28-8902-5a3263762273">
+							<ellipse cx="8697" cy="1710" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-f46c4a03-57fe-4aca-8706-07296d521944">
+							<use xlink:href="#E93D" x="8848" y="1620" height="720px" width="720px" />
+							<use xlink:href="#E949" x="8950" y="1539" height="720px" width="720px" />
+						</g>
+						<g class="custos" id="m-128d8ba7-cd92-4826-8466-631bd025316d" />
+					</g>
+				</g>
+				<g class="barLineAttr" id="bline-0000000089493944" />
+			</g>
+			<g class="system" id="m-f637e9c5-cfde-427d-bc54-9057c02ef2ce">
+				<g class="staff" id="m-2612c060-f4cd-4bb7-8460-b548f1ebb736">
+					<path d="M0 2462 L9424 2462" stroke="#000000" stroke-width="20" />
+					<path d="M0 2642 L9424 2642" stroke="#000000" stroke-width="20" />
+					<path d="M0 2822 L9424 2822" stroke="#000000" stroke-width="20" />
+					<path d="M0 3002 L9424 3002" stroke="#000000" stroke-width="20" />
+					<path d="M0 3182 L9424 3182" stroke="#000000" stroke-width="20" />
+					<g class="layer" id="m-a907211e-c384-4bf8-a838-727e43494b6b">
+						<g class="clef" id="m-7a48ab9c-49b0-45e9-9485-c5a71de02553">
+							<use xlink:href="#E909" x="14" y="3002" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-1fea4eff-384e-448a-9bea-035798df4852">
+							<use xlink:href="#E93D" x="504" y="2912" height="720px" width="720px" />
+							<rect x="606" y="2282" height="549" width="20" />
+						</g>
+						<g class="note" id="m-3c9b0a1d-c80d-4741-b90e-31a8040b14b9">
+							<use xlink:href="#E93D" x="964" y="3272" height="720px" width="720px" />
+							<rect x="1066" y="2642" height="549" width="20" />
+						</g>
+						<g class="note" id="m-f358e7ea-743a-4200-9af0-59286382caa2">
+							<use xlink:href="#E93C" x="1382" y="2642" height="720px" width="720px" />
+							<rect x="1484" y="2723" height="549" width="20" />
+						</g>
+						<g class="dot" id="m-309920bb-4a4e-42e1-b044-fea350f7723f">
+							<ellipse cx="1605" cy="2552" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-99a6804f-8f60-4d1d-8192-e5cc693730d6">
+							<use xlink:href="#E93D" x="1771" y="2822" height="720px" width="720px" />
+							<rect x="1873" y="2192" height="549" width="20" />
+						</g>
+						<g class="note" id="m-73b822c0-e80b-45bd-b7d3-659386a216b4">
+							<use xlink:href="#E93C" x="2131" y="2912" height="720px" width="720px" />
+							<rect x="2233" y="2282" height="549" width="20" />
+						</g>
+						<g class="note" id="m-92f73062-5e68-4f28-a319-e7c1586a81fd">
+							<use xlink:href="#E93C" x="2520" y="2822" height="720px" width="720px" />
+							<rect x="2622" y="2192" height="549" width="20" />
+						</g>
+						<g class="rest" id="m-2c7bf7a6-ae63-49a0-910a-ffaa0c3d7af2">
+							<use xlink:href="#E9F5" x="2908" y="2822" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-362d1821-15cc-4f5a-b737-67e7d397f3de">
+							<use xlink:href="#E9F2" x="3153" y="2822" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-96b59eab-b7a8-4313-a92f-387e0e34974b">
+							<use xlink:href="#E939" x="3398" y="2372" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-4cfd89ce-4001-4054-a89e-4a4f476faf32">
+							<use xlink:href="#E93C" x="3758" y="2462" height="720px" width="720px" />
+							<rect x="3860" y="2543" height="549" width="20" />
+						</g>
+						<g class="note" id="m-aeafc5b3-3122-4a09-862a-ac17b3dde65c">
+							<use xlink:href="#E93C" x="4161" y="2552" height="720px" width="720px" />
+							<rect x="4263" y="2633" height="549" width="20" />
+						</g>
+						<g class="note" id="m-04805d81-3182-4209-a86d-1458318dda89">
+							<use xlink:href="#E93D" x="4564" y="2552" height="720px" width="720px" />
+							<rect x="4666" y="2633" height="549" width="20" />
+						</g>
+						<g class="note" id="m-117a1408-80f2-4989-81d5-64234dd950ed">
+							<use xlink:href="#E93D" x="4924" y="2552" height="720px" width="720px" />
+							<rect x="5026" y="2633" height="549" width="20" />
+						</g>
+						<g class="note" id="m-a1c38337-36e3-4970-b182-6ded8b88fd68">
+							<use xlink:href="#E93C" x="5284" y="2552" height="720px" width="720px" />
+							<rect x="5386" y="2633" height="549" width="20" />
+						</g>
+						<g class="note" id="m-88e0f569-bf13-4df0-9813-37173292bea7">
+							<use xlink:href="#E939" x="5616" y="2552" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-00e892b7-0dfe-449c-b7ce-1f8604a20abc">
+							<use xlink:href="#E9F2" x="6004" y="2822" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-18c26281-0c49-41f7-a2c1-c6f5624e6161">
+							<use xlink:href="#E9F3" x="6264" y="2642" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-a802d2ba-8912-4412-b944-c20a796f92e4">
+							<use xlink:href="#E9F4" x="6523" y="2282" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-9e7a35a8-f7f7-496f-bbc0-b2aabef59428">
+							<use xlink:href="#E939" x="6782" y="2372" height="720px" width="720px" />
+						</g>
+						<g class="dot" id="m-a56b6866-148d-41d6-a972-761fd317e641">
+							<ellipse cx="7034" cy="2372" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-5582d16c-1511-46ce-b691-463a14573a44">
+							<use xlink:href="#E93C" x="7214" y="2642" height="720px" width="720px" />
+							<rect x="7316" y="2723" height="549" width="20" />
+						</g>
+						<g class="note" id="m-acd822e9-784c-43ec-b03c-11fe7e64c19d">
+							<use xlink:href="#E939" x="7545" y="2552" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-9f7760a2-7ccc-4a3b-8dd9-dedc6bc71620">
+							<use xlink:href="#E93C" x="7948" y="2552" height="720px" width="720px" />
+							<rect x="8050" y="2633" height="549" width="20" />
+						</g>
+						<g class="note" id="m-f896ae41-b2b8-4c2b-9b4a-5ce24a378d4c">
+							<use xlink:href="#E93C" x="8352" y="2552" height="720px" width="720px" />
+							<rect x="8454" y="2633" height="549" width="20" />
+						</g>
+						<g class="note" id="m-658db465-7b45-4465-a705-5a2baf58f3a9">
+							<use xlink:href="#E939" x="8769" y="2642" height="720px" width="720px" />
+						</g>
+						<g class="custos" id="m-5ce2d3f4-5e72-4b35-a0ad-ed2bc668f76c" />
+					</g>
+				</g>
+				<g class="barLineAttr" id="bline-0000001217125136" />
+			</g>
+			<g class="system" id="m-c483bdad-f8ef-46b0-b628-e0dbc1be572c">
+				<g class="staff" id="m-883634e6-1634-4bdb-a1b4-00b8b319423a">
+					<path d="M0 3845 L9424 3845" stroke="#000000" stroke-width="20" />
+					<path d="M0 4025 L9424 4025" stroke="#000000" stroke-width="20" />
+					<path d="M0 4205 L9424 4205" stroke="#000000" stroke-width="20" />
+					<path d="M0 4385 L9424 4385" stroke="#000000" stroke-width="20" />
+					<path d="M0 4565 L9424 4565" stroke="#000000" stroke-width="20" />
+					<g class="layer" id="m-c1438f4e-e287-4f57-bec9-e699573d708f">
+						<g class="clef" id="m-f5e03520-4535-48a4-b243-a6b12cf7bf1e">
+							<use xlink:href="#E909" x="14" y="4385" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-e7b9e5c7-7a86-4bce-b2e1-4f300aafaaea">
+							<use xlink:href="#E93D" x="460" y="4025" height="720px" width="720px" />
+							<rect x="562" y="4106" height="549" width="20" />
+						</g>
+						<g class="note" id="m-a50aa324-96d6-41ed-beea-a7fbb21fdaaa">
+							<use xlink:href="#E93D" x="792" y="3755" height="720px" width="720px" />
+							<rect x="894" y="3836" height="549" width="20" />
+						</g>
+						<g class="note" id="m-064d61fa-8452-42d6-999d-d9f4330178eb">
+							<use xlink:href="#E93D" x="1180" y="3845" height="720px" width="720px" />
+							<rect x="1282" y="3926" height="549" width="20" />
+						</g>
+						<g class="note" id="m-46206820-b4f2-40f3-82af-a4c7ef101e07">
+							<use xlink:href="#E93C" x="1512" y="3845" height="720px" width="720px" />
+							<rect x="1614" y="3926" height="549" width="20" />
+						</g>
+						<g class="note" id="m-c24a60af-4518-4821-9b7e-d3084c4f8e68">
+							<use xlink:href="#E93D" x="1944" y="3845" height="720px" width="720px" />
+							<rect x="2046" y="3926" height="549" width="20" />
+						</g>
+						<g class="note" id="m-c98f6b18-3bc4-4e48-be39-19f6f192998f">
+							<use xlink:href="#E93C" x="2347" y="3845" height="720px" width="720px" />
+							<rect x="2449" y="3926" height="549" width="20" />
+						</g>
+						<g class="note" id="m-fe1cf86d-0265-4e10-a52c-5eb7977ca901">
+							<use xlink:href="#E93C" x="2692" y="3755" height="720px" width="720px" />
+							<rect x="2794" y="3836" height="549" width="20" />
+						</g>
+						<g class="note" id="m-359c6ed9-e874-471b-9660-2b8182587842">
+							<use xlink:href="#E93D" x="3081" y="4025" height="720px" width="720px" />
+							<rect x="3183" y="4106" height="549" width="20" />
+						</g>
+						<g class="note" id="m-99e90f8c-e67e-4c7f-b386-43af008de3e0">
+							<use xlink:href="#E93D" x="3427" y="4025" height="720px" width="720px" />
+							<rect x="3529" y="4106" height="549" width="20" />
+						</g>
+						<g class="note" id="m-52390191-55f1-45df-bdde-49c0a8be6df5">
+							<use xlink:href="#E93C" x="3758" y="3935" height="720px" width="720px" />
+							<rect x="3860" y="4016" height="549" width="20" />
+						</g>
+						<g class="note" id="m-d2cf97cc-c3e8-45bf-b1ca-b727c2917002">
+							<use xlink:href="#E93D" x="4132" y="3935" height="720px" width="720px" />
+							<rect x="4234" y="4016" height="549" width="20" />
+						</g>
+						<g class="note" id="m-5acbb8e6-1ef6-40e1-a8b0-72e9b142aa2f">
+							<use xlink:href="#E93D" x="4550" y="3935" height="720px" width="720px" />
+							<rect x="4652" y="4016" height="549" width="20" />
+						</g>
+						<g class="note" id="m-29f583d8-73b1-4592-8efb-8b2519c8e81d">
+							<use xlink:href="#E939" x="4910" y="4025" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-e13e43c8-aad4-4645-b27e-aa69934756ed">
+							<use xlink:href="#E939" x="5256" y="4025" height="720px" width="720px" />
+						</g>
+						<g class="dot" id="m-4e2bf4fc-abb7-48f8-9318-4ec507f9c307">
+							<ellipse cx="5565" cy="4115" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-c79c771b-2668-4773-b765-cb28df3cbd81">
+							<use xlink:href="#E939" x="5774" y="4115" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-8856de2d-d9cc-4b17-86be-f0e8a7ed6d05">
+							<use xlink:href="#E93C" x="6134" y="4025" height="720px" width="720px" />
+							<rect x="6236" y="4106" height="549" width="20" />
+						</g>
+						<g class="note" id="m-29782ecf-84ae-45fb-af2b-36e2613a41f8">
+							<use xlink:href="#E93D" x="6552" y="4025" height="720px" width="720px" />
+							<rect x="6654" y="4106" height="549" width="20" />
+						</g>
+						<g class="note" id="m-fc60fc6f-ead9-4114-b494-87033b3eae66">
+							<use xlink:href="#E93C" x="6897" y="4025" height="720px" width="720px" />
+							<rect x="6999" y="4106" height="549" width="20" />
+						</g>
+						<g class="note" id="m-11ee476f-fa41-413d-a69d-114d2ace4580">
+							<use xlink:href="#E93C" x="7243" y="4025" height="720px" width="720px" />
+							<rect x="7345" y="4106" height="549" width="20" />
+						</g>
+						<g class="dot" id="m-664b5391-694d-48f8-962f-6b44ab1f4cf9">
+							<ellipse cx="7567" cy="4115" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-bedb98c0-503e-4f54-9355-97428ddaffdc">
+							<use xlink:href="#E93C" x="7776" y="4115" height="720px" width="720px" />
+							<rect x="7878" y="4196" height="549" width="20" />
+						</g>
+						<g class="note" id="m-25df6067-e385-4f92-a1f5-73785865e578">
+							<use xlink:href="#E939" x="8121" y="4025" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-ad04cdc7-30ca-4932-ac5d-e1b2d8d96daf">
+							<use xlink:href="#E9F4" x="8409" y="3845" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-6283d081-4c0a-41b6-ab77-cbce7f274126">
+							<use xlink:href="#E9F5" x="8625" y="4025" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-07a06f87-079f-437d-bcf7-82967bc46c38">
+							<use xlink:href="#E93C" x="8841" y="3935" height="720px" width="720px" />
+							<rect x="8943" y="4016" height="549" width="20" />
+						</g>
+						<g class="custos" id="m-b233d79c-ae3d-4788-aa81-9e6a1911ccfd" />
+					</g>
+				</g>
+				<g class="barLineAttr" id="bline-0000001578838842" />
+			</g>
+			<g class="system" id="m-3921ba28-cb3d-4ebe-ae39-eea0ed971a81">
+				<g class="staff" id="m-97467e31-58e3-4a07-aca5-56df95cf3291">
+					<path d="M0 5227 L9424 5227" stroke="#000000" stroke-width="20" />
+					<path d="M0 5407 L9424 5407" stroke="#000000" stroke-width="20" />
+					<path d="M0 5587 L9424 5587" stroke="#000000" stroke-width="20" />
+					<path d="M0 5767 L9424 5767" stroke="#000000" stroke-width="20" />
+					<path d="M0 5947 L9424 5947" stroke="#000000" stroke-width="20" />
+					<g class="layer" id="m-cbd837c8-2486-410b-913d-59d62fca3e4f">
+						<g class="clef" id="m-9820533c-15c0-4b9c-b88f-0c4c1358d6e9">
+							<use xlink:href="#E909" x="14" y="5767" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-90129083-a0bc-4848-a7b6-d1908060e1b7">
+							<use xlink:href="#E93C" x="460" y="5407" height="720px" width="720px" />
+							<rect x="562" y="5488" height="549" width="20" />
+						</g>
+						<g class="dot" id="m-6359a04c-7954-4a05-a05d-bf79d21ed7c9">
+							<ellipse cx="712" cy="5317" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-6dbfcf36-bee1-4c3e-8803-71dc8f221b48">
+							<use xlink:href="#E93D" x="835" y="5407" height="720px" width="720px" />
+							<rect x="937" y="5488" height="549" width="20" />
+						</g>
+						<g class="note" id="m-093c18f5-778d-427d-a997-7e2068abe9be">
+							<use xlink:href="#E93D" x="1180" y="5317" height="720px" width="720px" />
+							<rect x="1282" y="5398" height="549" width="20" />
+						</g>
+						<g class="dot" id="m-67653770-0e61-447d-a70c-6e7b4a91457d">
+							<ellipse cx="1432" cy="5317" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-47d962a4-68b0-485d-8a5e-4ee3e621c48f">
+							<use xlink:href="#E93D" x="1584" y="5407" height="720px" width="720px" />
+							<use xlink:href="#E94A" x="1686" y="5488" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-2d271482-1dce-42f9-bbaa-9ce211d564a8">
+							<use xlink:href="#E93D" x="1958" y="5497" height="720px" width="720px" />
+							<rect x="2060" y="5578" height="549" width="20" />
+						</g>
+						<g class="dot" id="m-4abc5845-18b0-439b-a38d-972f85377030">
+							<ellipse cx="2196" cy="5497" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-dccf2618-686e-40ea-a3f0-55defb783999">
+							<use xlink:href="#E93D" x="2361" y="5587" height="720px" width="720px" />
+							<use xlink:href="#E949" x="2463" y="5506" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-eeae1f29-cc16-4844-9137-2f8678807cc5">
+							<use xlink:href="#E93C" x="2736" y="5677" height="720px" width="720px" />
+							<rect x="2838" y="5047" height="549" width="20" />
+						</g>
+						<g class="note" id="m-a6ae9437-8694-4f65-acf6-b4ba139e81e8">
+							<use xlink:href="#E93C" x="3124" y="5677" height="720px" width="720px" />
+							<rect x="3226" y="5047" height="549" width="20" />
+						</g>
+						<g class="rest" id="m-559a78f0-ea35-4fc7-8216-3dd8786bffd5">
+							<use xlink:href="#E9F4" x="3484" y="5407" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-f375385b-fab1-4a94-bc94-066536ab83f1">
+							<use xlink:href="#E9F6" x="3758" y="5767" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-94c798f8-7b0f-4568-a0f8-2cf6e7d5a4d4">
+							<use xlink:href="#E93C" x="4060" y="5407" height="720px" width="720px" />
+							<rect x="4162" y="5488" height="549" width="20" />
+						</g>
+						<g class="note" id="m-bccbe823-b3b5-43c0-9989-78d5bd58a416">
+							<use xlink:href="#E93C" x="4377" y="5677" height="720px" width="720px" />
+							<rect x="4479" y="5047" height="549" width="20" />
+						</g>
+						<g class="note" id="m-72596ef3-a5c7-421f-8891-4f2c505926ad">
+							<use xlink:href="#E93D" x="4680" y="5677" height="720px" width="720px" />
+							<rect x="4782" y="5047" height="549" width="20" />
+						</g>
+						<g class="note" id="m-c23f1170-86e1-4f83-8375-e7dd238841e7">
+							<use xlink:href="#E93C" x="5025" y="5317" height="720px" width="720px" />
+							<rect x="5127" y="5398" height="549" width="20" />
+						</g>
+						<g class="note" id="m-0808b64f-14f3-4990-9671-14509530bf2a">
+							<use xlink:href="#E939" x="5385" y="5227" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-20bcc666-5202-439d-9f6e-97b00e753166">
+							<use xlink:href="#E9F4" x="5745" y="5047" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-bd0142e7-0f2a-42f6-b2db-29add0c8520d">
+							<use xlink:href="#E9F3" x="6019" y="5587" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-05282ab7-29dd-46a5-aaa7-f65812654bf7">
+							<use xlink:href="#E9F5" x="6292" y="5587" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-cca33bef-edfd-4548-afb0-e9b50f6267c9">
+							<use xlink:href="#E93C" x="6552" y="5587" height="720px" width="720px" />
+							<rect x="6654" y="4957" height="549" width="20" />
+						</g>
+						<g class="note" id="m-22330cb4-8bdc-4617-a873-e4cdd5dc6441">
+							<use xlink:href="#E93C" x="6883" y="5317" height="720px" width="720px" />
+							<rect x="6985" y="5398" height="549" width="20" />
+						</g>
+						<g class="dot" id="m-0f16815c-e170-427a-b51a-53e538ed0ef5">
+							<ellipse cx="7135" cy="5317" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-31ca8557-53a4-4af4-8856-5cbd212a7067">
+							<use xlink:href="#E93D" x="7300" y="5317" height="720px" width="720px" />
+							<rect x="7402" y="5398" height="549" width="20" />
+						</g>
+						<g class="note" id="m-645b60c3-390c-4c96-8f35-8eb6402b9baf">
+							<use xlink:href="#E93C" x="7660" y="5407" height="720px" width="720px" />
+							<rect x="7762" y="5488" height="549" width="20" />
+						</g>
+						<g class="note" id="m-7df8b4c0-5a74-412f-8c04-dafe4a9e6edb">
+							<use xlink:href="#E93C" x="8006" y="5407" height="720px" width="720px" />
+							<rect x="8108" y="5488" height="549" width="20" />
+						</g>
+						<g class="note" id="m-898223a4-9d27-4c46-903a-dc4229947e91">
+							<use xlink:href="#E93C" x="8337" y="5137" height="720px" width="720px" />
+							<rect x="8439" y="5218" height="549" width="20" />
+						</g>
+						<g class="dot" id="m-0d650fc5-70eb-4b09-9e9a-1970c3a295b8">
+							<ellipse cx="8589" cy="5137" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-743560b5-cea4-4d21-9f5e-4e7820f482fd">
+							<use xlink:href="#E93D" x="8755" y="5137" height="720px" width="720px" />
+							<rect x="8857" y="5218" height="549" width="20" />
+						</g>
+						<g class="custos" id="m-c57a244e-b4d9-4c75-96bd-e801eb0313d5" />
+					</g>
+				</g>
+				<g class="barLineAttr" id="bline-0000000199878092" />
+			</g>
+			<g class="system" id="m-4fc92b10-8642-4253-a603-2e1b4c652d0f">
+				<g class="staff" id="m-ad546f4e-fd1e-482c-b961-289ec019de4e">
+					<path d="M0 6610 L9419 6610" stroke="#000000" stroke-width="20" />
+					<path d="M0 6790 L9419 6790" stroke="#000000" stroke-width="20" />
+					<path d="M0 6970 L9419 6970" stroke="#000000" stroke-width="20" />
+					<path d="M0 7150 L9419 7150" stroke="#000000" stroke-width="20" />
+					<path d="M0 7330 L9419 7330" stroke="#000000" stroke-width="20" />
+					<g class="layer" id="m-3ff00834-b4dc-48bd-b6b1-61234b8450c2">
+						<g class="clef" id="m-3c8fab43-ce1a-4405-a3ba-f3838057b76d">
+							<use xlink:href="#E909" x="14" y="7150" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-1491ec46-2cd8-45cb-9e39-0a7c2cbb4d6f">
+							<use xlink:href="#E93C" x="432" y="6700" height="720px" width="720px" />
+							<rect x="534" y="6781" height="549" width="20" />
+						</g>
+						<g class="note" id="m-c18bc9e9-f9bf-4263-860d-679229533f2d">
+							<use xlink:href="#E93D" x="806" y="6790" height="720px" width="720px" />
+							<rect x="908" y="6871" height="549" width="20" />
+						</g>
+						<g class="note" id="m-4e542c56-af67-463b-ae19-9f9e652d612e">
+							<use xlink:href="#E93C" x="1166" y="6790" height="720px" width="720px" />
+							<rect x="1268" y="6871" height="549" width="20" />
+						</g>
+						<g class="accid" id="m-f7e41be7-9f4b-405d-a70d-d14db3a38a50">
+							<use xlink:href="#E262" x="1454" y="6880" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-e55adfb9-b435-45f3-ad10-f60c81897655">
+							<use xlink:href="#E93D" x="1699" y="6880" height="720px" width="720px" />
+							<use xlink:href="#E94A" x="1801" y="6961" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-6be79470-0586-4517-918e-b8332d747ac5">
+							<use xlink:href="#E93D" x="2044" y="6970" height="720px" width="720px" />
+							<use xlink:href="#E949" x="2146" y="6889" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-b583863a-afb9-496b-b7ee-ce74029517a1">
+							<use xlink:href="#E93C" x="2433" y="6880" height="720px" width="720px" />
+							<rect x="2535" y="6961" height="549" width="20" />
+						</g>
+						<g class="note" id="m-5031ab9b-ab5b-44c8-b561-420d76bbeeb5">
+							<polygon points="2832,6700 3064,6700 3064,6745 2832,6745 " />
+							<polygon points="2832,6880 3064,6880 3064,6835 2832,6835 " />
+							<path d="M2832 6655 L2832 6925" stroke="#000000" stroke-width="20" />
+							<path d="M3064 6655 L3064 6925" stroke="#000000" stroke-width="20" />
+						</g>
+						<g class="mensur" id="m-152543ca-cf8e-4591-bc51-e7ab240dff01">
+							<path d="M3381 6861 A153 153 0.0 1 0 3381 7078" fill-opacity="0" stroke-width="20" stroke="#000000" />
+							<path d="M3273 6610 L3273 7330" stroke="#000000" stroke-width="20" />
+						</g>
+						<g class="accid" id="m-9f9ffe1c-a03b-498e-998b-300eb59f2684">
+							<use xlink:href="#E260" x="3499" y="7150" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-6afb9e6b-db38-4ebe-86aa-e422fb99d41b">
+							<use xlink:href="#E9F2" x="3758" y="7330" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-a3243315-d23c-4883-b2fc-5d098e259872">
+							<use xlink:href="#E9F2" x="4003" y="7330" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-26acb40f-7e1a-4db3-8455-40912df47225">
+							<use xlink:href="#E9F2" x="4233" y="7150" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-5093fe47-af21-4fa0-92ea-838687c6fc5b">
+							<use xlink:href="#E9F2" x="4492" y="7150" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-2f9fd59a-5e7f-4083-885c-1887e90d1cd5">
+							<use xlink:href="#E9F2" x="4752" y="6970" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-ef94e365-e6cc-4aed-aa19-2e6803c0fe12">
+							<use xlink:href="#E9F4" x="4982" y="6430" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-90ccb5fe-165b-4c02-b0ec-e8f9e585ddf8">
+							<use xlink:href="#E939" x="5212" y="6700" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-8ed790c4-47b5-4ce6-ba08-fe9cf889f4e3">
+							<use xlink:href="#E939" x="5572" y="6610" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-fbfe5a4d-5997-411b-92c4-3627ea562871">
+							<use xlink:href="#E93C" x="5904" y="6520" height="720px" width="720px" />
+							<rect x="6006" y="6601" height="549" width="20" />
+						</g>
+						<g class="note" id="m-ba4651b5-3c2e-46e6-9633-df17ee9e57b4">
+							<use xlink:href="#E939" x="6249" y="6520" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-dfe55a63-468f-4839-9f53-976b8a71b53b">
+							<use xlink:href="#E93C" x="6652" y="6520" height="720px" width="720px" />
+							<rect x="6754" y="6601" height="549" width="20" />
+						</g>
+						<g class="note" id="m-142b0cb6-8c3e-4e88-b5ce-7c802fc8df89">
+							<use xlink:href="#E939" x="7012" y="6610" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-fabae64d-eb4b-420d-8e1b-333526c3d869">
+							<use xlink:href="#E939" x="7315" y="6790" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-e0394bb7-a1ce-42aa-b039-c1adf5f887c0">
+							<use xlink:href="#E939" x="7603" y="6790" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-6c78f21b-c3d5-46d7-92cb-622b579f4d9b">
+							<use xlink:href="#E939" x="7905" y="6790" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-6c0114a2-2b9d-4919-9618-7d51f0a93c53">
+							<polygon points="8203,6700 8435,6700 8435,6745 8203,6745 " />
+							<polygon points="8203,6880 8435,6880 8435,6835 8203,6835 " />
+							<path d="M8203 6655 L8203 6925" stroke="#000000" stroke-width="20" />
+							<path d="M8435 6655 L8435 6925" stroke="#000000" stroke-width="20" />
+						</g>
+						<g class="note" id="m-1350b23a-27e2-4c06-91bf-5760d63ba2e4">
+							<use xlink:href="#E939" x="8553" y="6790" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-4a487d10-ed16-4a76-836e-659402d52812">
+							<use xlink:href="#E9F3" x="8899" y="6790" height="720px" width="720px" />
+						</g>
+						<g class="custos" id="m-fdaadfe1-0c8b-4443-a471-b111830b5ee9" />
+					</g>
+				</g>
+				<g class="barLineAttr" id="bline-0000001286585735" />
+			</g>
+			<g class="system" id="m-e681e831-e870-4378-b62f-a26f9a56552f">
+				<g class="staff" id="m-131f8968-c0e1-4309-ade7-07dedda44b43">
+					<path d="M0 8021 L9413 8021" stroke="#000000" stroke-width="20" />
+					<path d="M0 8201 L9413 8201" stroke="#000000" stroke-width="20" />
+					<path d="M0 8381 L9413 8381" stroke="#000000" stroke-width="20" />
+					<path d="M0 8561 L9413 8561" stroke="#000000" stroke-width="20" />
+					<path d="M0 8741 L9413 8741" stroke="#000000" stroke-width="20" />
+					<g class="layer" id="m-04d8c091-edb2-4007-9275-3af11248c324">
+						<g class="clef" id="m-6a1f766c-4573-4bca-8fe6-ab375a4db422">
+							<use xlink:href="#E909" x="14" y="8561" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-14121115-6b25-413f-ab19-024661fc9bf5">
+							<use xlink:href="#E939" x="446" y="8021" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-2dbef729-d7f8-47fe-a6be-c990a34698e4">
+							<use xlink:href="#E939" x="820" y="8021" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-e015390f-27bc-4654-afbc-42932cfb78b3">
+							<use xlink:href="#E939" x="1180" y="8021" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-979d82c4-5d23-4d21-a7c3-2a4e15792c2b">
+							<use xlink:href="#E939" x="1512" y="8111" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-98cd6294-975a-488e-b737-19d8ef8640fd">
+							<use xlink:href="#E93C" x="1857" y="8111" height="720px" width="720px" />
+							<rect x="1959" y="8192" height="549" width="20" />
+						</g>
+						<g class="note" id="m-99f8d66e-8abc-4d17-b078-dd0bfd5586c3">
+							<use xlink:href="#E939" x="2217" y="8381" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-8262ec8d-fdf6-4195-a8b8-8b211a970d3c">
+							<use xlink:href="#E93C" x="2620" y="8381" height="720px" width="720px" />
+							<rect x="2722" y="7751" height="549" width="20" />
+						</g>
+						<g class="note" id="m-ab9c2027-f692-4f9c-b181-f7dc5582034d">
+							<polygon points="2976,8291 3208,8291 3208,8336 2976,8336 " />
+							<polygon points="2976,8471 3208,8471 3208,8426 2976,8426 " />
+							<path d="M2976 8246 L2976 8516" stroke="#000000" stroke-width="20" />
+							<path d="M3208 8246 L3208 8516" stroke="#000000" stroke-width="20" />
+						</g>
+						<g class="note" id="m-2557c5eb-9c25-46c5-b340-8fc2ee397d65">
+							<polygon points="3365,8021 3597,8021 3597,8066 3365,8066 " />
+							<polygon points="3365,8201 3597,8201 3597,8156 3365,8156 " />
+							<path d="M3365 7976 L3365 8246" stroke="#000000" stroke-width="20" />
+							<path d="M3597 7976 L3597 8246" stroke="#000000" stroke-width="20" />
+						</g>
+						<g class="rest" id="m-869becab-65d4-4b63-bee0-4e43762cb122">
+							<use xlink:href="#E9F4" x="3657" y="7841" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-a9dea29f-6ece-4122-99b8-133a32e2dc1f">
+							<polygon points="3869,8111 4101,8111 4101,8156 3869,8156 " />
+							<polygon points="3869,8291 4101,8291 4101,8246 3869,8246 " />
+							<path d="M3869 8066 L3869 8336" stroke="#000000" stroke-width="20" />
+							<path d="M4101 8066 L4101 8336" stroke="#000000" stroke-width="20" />
+						</g>
+						<g class="note" id="m-7ea38f8b-5846-461d-ab92-cc0e88af73c9">
+							<use xlink:href="#E939" x="4233" y="8201" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-4421133d-1b7e-4b9f-bd91-c3bd3b7ea63a">
+							<use xlink:href="#E939" x="4651" y="7931" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-4d4a45b0-ef7f-4c4b-b72e-2262ffd51d7e">
+							<use xlink:href="#E939" x="5126" y="7931" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-6a6e44e3-d183-4b5c-9a92-e9254b320169">
+							<use xlink:href="#E939" x="5529" y="8021" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-3e8e576d-8aa5-4235-ac05-95a8102b786c">
+							<use xlink:href="#E93C" x="5889" y="8111" height="720px" width="720px" />
+							<rect x="5991" y="8192" height="549" width="20" />
+						</g>
+						<g class="note" id="m-4754c730-1d9f-4e68-95ca-70f1eaf967e1">
+							<use xlink:href="#E93C" x="6235" y="8201" height="720px" width="720px" />
+							<rect x="6337" y="8282" height="549" width="20" />
+						</g>
+						<g class="note" id="m-a3f62a05-cfb5-4566-b52b-c770a2b77014">
+							<use xlink:href="#E93C" x="6595" y="8111" height="720px" width="720px" />
+							<rect x="6697" y="8192" height="549" width="20" />
+						</g>
+						<g class="accid" id="m-554cb6f1-1ce4-4941-bb99-f2e41f6cb159">
+							<use xlink:href="#E260" x="6840" y="8201" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-88495314-356b-4dd8-ac41-3afdf272e101">
+							<use xlink:href="#E93C" x="7012" y="8021" height="720px" width="720px" />
+							<rect x="7114" y="8102" height="549" width="20" />
+						</g>
+						<g class="note" id="m-d74370eb-b8f8-4fc6-b3a3-fcaac7c4b648">
+							<use xlink:href="#E939" x="7372" y="8111" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-98302a27-7207-413e-a128-1300653e5cdb">
+							<use xlink:href="#E93C" x="7732" y="8201" height="720px" width="720px" />
+							<rect x="7834" y="8282" height="549" width="20" />
+						</g>
+						<g class="accid" id="m-b6578a1c-fa52-4b5e-8f54-c19a9f073238">
+							<use xlink:href="#E262" x="7948" y="8291" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-95bc1d1b-19bd-4e82-af7a-3d4caacfaf8a">
+							<use xlink:href="#E93C" x="8136" y="8291" height="720px" width="720px" />
+							<rect x="8238" y="8372" height="549" width="20" />
+						</g>
+						<g class="note" id="m-b922954d-2661-4354-8176-53242d1ed9aa">
+							<use xlink:href="#E939" x="8481" y="8201" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-a67e4d7e-e41f-4b2b-9fe9-2c5edc4bfc49">
+							<use xlink:href="#E939" x="8827" y="8201" height="720px" width="720px" />
+						</g>
+						<g class="dot" id="m-7126b3a7-40d2-4ac2-aa65-da78ac56c560">
+							<ellipse cx="9165" cy="8291" rx="36" ry="36" />
+						</g>
+					</g>
+				</g>
+				<g class="barLineAttr" id="bline-0000001437367070" />
+			</g>
+			<g class="system" id="m-060635eb-5a74-41ca-b6f3-dee2d94f6080">
+				<g class="staff" id="m-c4d52101-2a37-4141-884f-5a17bc2ce6e1">
+					<path d="M0 9432 L9411 9432" stroke="#000000" stroke-width="20" />
+					<path d="M0 9612 L9411 9612" stroke="#000000" stroke-width="20" />
+					<path d="M0 9792 L9411 9792" stroke="#000000" stroke-width="20" />
+					<path d="M0 9972 L9411 9972" stroke="#000000" stroke-width="20" />
+					<path d="M0 10152 L9411 10152" stroke="#000000" stroke-width="20" />
+					<g class="layer" id="m-2a219d87-67d3-40a2-a5c4-6cbc591b7377">
+						<g class="clef" id="m-9bc29df7-1620-40dd-ac1a-9b91e82ef135">
+							<use xlink:href="#E909" x="14" y="9972" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-9bbe4be7-12c2-4752-b157-42a04ff82a1f">
+							<polygon points="456,9432 688,9432 688,9477 456,9477 " />
+							<polygon points="456,9612 688,9612 688,9567 456,9567 " />
+							<path d="M456 9387 L456 9657" stroke="#000000" stroke-width="20" />
+							<path d="M688 9387 L688 9657" stroke="#000000" stroke-width="20" />
+						</g>
+						<g class="note" id="m-234c23b4-0813-4809-b463-e7f15480ded7">
+							<use xlink:href="#E939" x="806" y="9522" height="720px" width="720px" />
+						</g>
+						<g class="accid" id="m-3e8252cf-622e-4534-8e76-07973aaa4a5a">
+							<use xlink:href="#E262" x="1051" y="9702" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-bb93af53-592c-43c4-bbfa-d83df85f6ed5">
+							<use xlink:href="#E939" x="1224" y="9702" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-b5aa9f26-68c0-4a51-97cf-c054bb194f27">
+							<use xlink:href="#E93C" x="1584" y="9702" height="720px" width="720px" />
+							<rect x="1686" y="9783" height="549" width="20" />
+						</g>
+						<g class="note" id="m-2cf870b5-cb6e-4753-a9c6-556dc9f19c75">
+							<use xlink:href="#E939" x="1929" y="9702" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-5d33b508-8129-46f9-a800-6c8337a1f6dc">
+							<use xlink:href="#E93C" x="2289" y="9702" height="720px" width="720px" />
+							<rect x="2391" y="9783" height="549" width="20" />
+						</g>
+						<g class="note" id="m-74c16584-4ff5-458b-b685-4f20ae32e520">
+							<use xlink:href="#E939" x="2649" y="9432" height="720px" width="720px" />
+						</g>
+						<g class="dot" id="m-6d52022b-3c47-459f-96aa-8d2160f13ffd">
+							<ellipse cx="2887" cy="9342" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-d4e10b82-8a50-4579-9af7-21dfe326a1b7">
+							<use xlink:href="#E93D" x="2966" y="9522" height="720px" width="720px" />
+							<rect x="3068" y="9603" height="549" width="20" />
+						</g>
+						<g class="note" id="m-15825fe9-1338-4b54-8d64-f02b0cd5a8a0">
+							<use xlink:href="#E93D" x="3254" y="9612" height="720px" width="720px" />
+							<rect x="3356" y="9693" height="549" width="20" />
+						</g>
+						<g class="note" id="m-ee4fef34-8a06-4b64-bd7c-08e7aa6038c1">
+							<use xlink:href="#E93C" x="3542" y="9702" height="720px" width="720px" />
+							<rect x="3644" y="9783" height="549" width="20" />
+						</g>
+						<g class="note" id="m-2e10959f-78c4-4afb-98ab-d12112de00c9">
+							<use xlink:href="#E93C" x="3888" y="9612" height="720px" width="720px" />
+							<rect x="3990" y="9693" height="549" width="20" />
+						</g>
+						<g class="note" id="m-549ecea3-0563-45ea-a7e0-11469d2c292a">
+							<use xlink:href="#E939" x="4176" y="9522" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-2bfe2eab-b3fa-4c2b-b101-425cf0e273e7">
+							<polygon points="4531,9432 4763,9432 4763,9477 4531,9477 " />
+							<polygon points="4531,9612 4763,9612 4763,9567 4531,9567 " />
+							<path d="M4531 9387 L4531 9657" stroke="#000000" stroke-width="20" />
+							<path d="M4763 9387 L4763 9657" stroke="#000000" stroke-width="20" />
+						</g>
+						<g class="rest" id="m-2bc8cb65-eca6-491a-b20b-36e076f730a0">
+							<use xlink:href="#E9F3" x="4939" y="9612" height="720px" width="720px" />
+						</g>
+						<g class="dot" id="m-24596918-026c-4f96-b066-cf3437e6ba40">
+							<ellipse cx="5191" cy="9522" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-ddf0f71b-3c58-4113-bd2f-c60b470cb9dc">
+							<use xlink:href="#E939" x="5385" y="9342" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-186f2586-5bab-4f1b-8562-72bd85a96d32">
+							<use xlink:href="#E939" x="5875" y="9342" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-997ee233-b997-4dba-b0f3-2c749c268a51">
+							<use xlink:href="#E939" x="6235" y="9342" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-0540190c-797c-4b66-b5a3-776a8d5909ca">
+							<use xlink:href="#E93C" x="6580" y="9522" height="720px" width="720px" />
+							<rect x="6682" y="9603" height="549" width="20" />
+						</g>
+						<g class="note" id="m-f93c86c3-4191-49dd-b6ec-4bba0ba0417e">
+							<use xlink:href="#E93C" x="6897" y="9612" height="720px" width="720px" />
+							<rect x="6999" y="9693" height="549" width="20" />
+						</g>
+						<g class="note" id="m-d5df08b4-bd21-4feb-bbf2-6c4c96046a0a">
+							<use xlink:href="#E93C" x="7214" y="9522" height="720px" width="720px" />
+							<rect x="7316" y="9603" height="549" width="20" />
+						</g>
+						<g class="note" id="m-da400193-af46-4cf0-875f-56a0dc506c47">
+							<use xlink:href="#E93C" x="7516" y="9432" height="720px" width="720px" />
+							<rect x="7618" y="9513" height="549" width="20" />
+						</g>
+						<g class="note" id="m-bb66742d-18c2-4831-a82e-a2a1c3aa9ebe">
+							<use xlink:href="#E939" x="7819" y="9342" height="720px" width="720px" />
+						</g>
+						<g class="dot" id="m-46e1f9d9-22d0-4755-94c7-6c4faa409cf2">
+							<ellipse cx="8071" cy="9342" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-f0778af1-96e5-48fa-b6f6-167d72040d24">
+							<use xlink:href="#E93C" x="8150" y="9612" height="720px" width="720px" />
+							<rect x="8252" y="9693" height="549" width="20" />
+						</g>
+						<g class="dot" id="m-f9b5bd1c-07b5-4f6a-b356-7244cb5852e3">
+							<ellipse cx="8575" cy="9522" rx="36" ry="36" />
+						</g>
+						<g class="dot" id="m-0f7acbda-3a63-4845-b299-612247692257">
+							<ellipse cx="8719" cy="9522" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-95e3357b-16e2-476b-8730-8bda05b03ea7">
+							<use xlink:href="#E93C" x="8870" y="9432" height="720px" width="720px" />
+							<rect x="8972" y="9513" height="549" width="20" />
+						</g>
+						<g class="dot" id="m-c80cfb57-e71a-4f52-bb4e-c470a437f6ae">
+							<ellipse cx="9165" cy="9702" rx="36" ry="36" />
+						</g>
+					</g>
+				</g>
+				<g class="barLineAttr" id="bline-0000000049942418" />
+			</g>
+			<g class="system" id="m-4479b99a-8c0c-4f78-9d39-2615182f7940">
+				<g class="staff" id="m-04c5c9f1-5cc4-4702-938a-1782c6776906">
+					<path d="M0 10814 L9408 10814" stroke="#000000" stroke-width="20" />
+					<path d="M0 10994 L9408 10994" stroke="#000000" stroke-width="20" />
+					<path d="M0 11174 L9408 11174" stroke="#000000" stroke-width="20" />
+					<path d="M0 11354 L9408 11354" stroke="#000000" stroke-width="20" />
+					<path d="M0 11534 L9408 11534" stroke="#000000" stroke-width="20" />
+					<g class="layer" id="m-b011aa27-350f-418d-b2a6-42aacec348b8">
+						<g class="clef" id="m-3ebdeea4-830e-424f-b143-1a0d44f8af4f">
+							<use xlink:href="#E909" x="14" y="11354" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-4ff57e73-c8d6-4e1d-b642-038548ba07fc">
+							<polygon points="442,10814 674,10814 674,10859 442,10859 " />
+							<polygon points="442,10994 674,10994 674,10949 442,10949 " />
+							<path d="M442 10769 L442 11039" stroke="#000000" stroke-width="20" />
+							<path d="M674 10769 L674 11039" stroke="#000000" stroke-width="20" />
+						</g>
+						<g class="note" id="m-6a7186cb-7786-4fba-815b-b109fc55054d">
+							<use xlink:href="#E939" x="777" y="10904" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-264f624d-a549-4f51-a4a3-741033f00f7b">
+							<polygon points="1190,10814 1422,10814 1422,10859 1190,10859 " />
+							<polygon points="1190,10994 1422,10994 1422,10949 1190,10949 " />
+							<path d="M1190 10769 L1190 11039" stroke="#000000" stroke-width="20" />
+							<path d="M1422 10769 L1422 11039" stroke="#000000" stroke-width="20" />
+						</g>
+						<g class="note" id="m-386ef85a-dab8-4363-8312-e63b013cf8a0">
+							<use xlink:href="#E939" x="1540" y="10904" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-416fec54-5575-46eb-bdb6-46c331b8be2d">
+							<use xlink:href="#E9F4" x="1886" y="10814" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-1ebbddd7-b3bc-4623-8747-dc39ce0e9d6b">
+							<use xlink:href="#E939" x="2188" y="10994" height="720px" width="720px" />
+						</g>
+						<g class="dot" id="m-9f49c53b-a970-473e-8292-7a6c5f7c28b6">
+							<ellipse cx="2412" cy="10904" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-749a497d-83bb-47a4-9b2d-fabd644c0457">
+							<use xlink:href="#E93C" x="2606" y="10994" height="720px" width="720px" />
+							<rect x="2708" y="11075" height="549" width="20" />
+						</g>
+						<g class="note" id="m-e235e7e5-21c8-46d9-9439-5e6a0bfa4214">
+							<use xlink:href="#E93D" x="2937" y="11084" height="720px" width="720px" />
+							<rect x="3039" y="11165" height="549" width="20" />
+						</g>
+						<g class="note" id="m-3d992355-5d7c-4e16-88f9-a7915277125c">
+							<use xlink:href="#E93D" x="3340" y="10904" height="720px" width="720px" />
+							<rect x="3442" y="10985" height="549" width="20" />
+						</g>
+						<g class="note" id="m-1690cdc6-ad60-49b9-87df-73bb21f36b3d">
+							<polygon points="3754,10814 3986,10814 3986,10859 3754,10859 " />
+							<polygon points="3754,10994 3986,10994 3986,10949 3754,10949 " />
+							<path d="M3754 10769 L3754 11039" stroke="#000000" stroke-width="20" />
+							<path d="M3986 10769 L3986 11039" stroke="#000000" stroke-width="20" />
+						</g>
+						<g class="rest" id="m-4903be20-6887-4f98-9c0e-440e6845af71">
+							<use xlink:href="#E9F3" x="4104" y="10994" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-84021e3d-e4ef-4899-8230-9139e9e6d029">
+							<use xlink:href="#E939" x="4334" y="10904" height="720px" width="720px" />
+						</g>
+						<g class="dot" id="m-1f5723de-6c95-47bc-b8eb-e83260bdb1dd">
+							<ellipse cx="4586" cy="10904" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-af791b31-88d9-4023-8443-f62fc8a76213">
+							<use xlink:href="#E93C" x="4723" y="10994" height="720px" width="720px" />
+							<rect x="4825" y="11075" height="549" width="20" />
+						</g>
+						<g class="note" id="m-6852487b-fdd4-4d48-af9f-9c5eb4b0f1f7">
+							<use xlink:href="#E939" x="5068" y="10994" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-7e3a755c-d109-40bf-a56e-d25f342c3108">
+							<use xlink:href="#E9F3" x="5428" y="11174" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-0357c814-f819-4290-a046-c38f674a72d9">
+							<use xlink:href="#E939" x="5688" y="10994" height="720px" width="720px" />
+						</g>
+						<g class="dot" id="m-1800b97e-91f8-4e9e-bba1-22c06d6e2e43">
+							<ellipse cx="5911" cy="10904" rx="36" ry="36" />
+						</g>
+						<g class="note" id="m-7b608b4c-1151-4a1d-bfaf-c1d387ae4156">
+							<use xlink:href="#E93C" x="6062" y="10994" height="720px" width="720px" />
+							<rect x="6164" y="11075" height="549" width="20" />
+						</g>
+						<g class="note" id="m-090a525e-0cfd-4414-9f41-ee482924f35a">
+							<use xlink:href="#E939" x="6408" y="10994" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-a25b5003-97e0-4e86-a678-d84560685a8a">
+							<use xlink:href="#E9F2" x="6768" y="11174" height="720px" width="720px" />
+						</g>
+						<g class="rest" id="m-f478b20b-a57e-4b3e-ac59-66144138e950">
+							<use xlink:href="#E9F3" x="7027" y="10994" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-48fbe914-55e6-4aab-8ec1-3786549eae3c">
+							<use xlink:href="#E939" x="7300" y="10814" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-c26da8b4-baf9-46d5-a55a-4af25b3e96da">
+							<use xlink:href="#E939" x="7689" y="10814" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-2d4e104e-3cf2-490b-9968-54dc7fcdef82">
+							<use xlink:href="#E939" x="8092" y="10724" height="720px" width="720px" />
+						</g>
+						<g class="note" id="m-848a91d4-ec58-4d07-8742-655050313f82">
+							<polygon points="8434,10724 8666,10724 8666,10769 8434,10769 " />
+							<polygon points="8434,10904 8666,10904 8666,10859 8434,10859 " />
+							<path d="M8434 10679 L8434 10949" stroke="#000000" stroke-width="20" />
+							<path d="M8666 10679 L8666 10949" stroke="#000000" stroke-width="20" />
+						</g>
+						<g class="note" id="m-43fd75eb-1f89-4972-b94c-13f2317e6158">
+							<use xlink:href="#E939" x="8769" y="10724" height="720px" width="720px" />
+						</g>
+						<g class="dot" id="m-f7a84ebf-bf70-46cb-9f8f-636fcbca4da1">
+							<ellipse cx="9165" cy="10904" rx="36" ry="36" />
+						</g>
+					</g>
+				</g>
+				<g class="barLineAttr" id="bline-0000001608295534" />
+			</g>
+		</g>
+	</svg>
+</svg>

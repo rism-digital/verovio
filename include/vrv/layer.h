@@ -33,11 +33,7 @@ class StaffDef;
 class Layer : public Object,
               public DrawingListInterface,
               public ObjectListInterface,
-<<<<<<< HEAD
               public AttNInteger,
-=======
-              public AttCommon,
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
               public AttTyped,
               public AttVisibility {
 public:
@@ -142,6 +138,11 @@ public:
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+
+    /**
      * See Object::AlignHorizontally
      */
     virtual int AlignHorizontally(FunctorParams *functorParams);
@@ -164,11 +165,7 @@ public:
     /**
      * See Object::CalcStem
      */
-<<<<<<< HEAD
     virtual int CalcStem(FunctorParams *);
-=======
-    virtual int CalcStem(FunctorParams *functorParams);
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 
     /**
      * See Object::AdjustSylSpacing

@@ -55,6 +55,7 @@
 #include "iomei.h"
 #include "label.h"
 #include "layer.h"
+#include "mdiv.h"
 #include "measure.h"
 #include "mordent.h"
 #include "mrest.h"
@@ -2370,12 +2371,12 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
             }
             harm->AddChild(fb);
 
-            std::vector<std::string> content = cleanFBString(*token);
+            std::vector<std::wstring> content = cleanFBString(*token);
 
             for (int k = 0; k < (int)content.size(); k++) {
                 F *f = new F();
                 Text *text = new Text();
-                text->SetText(UTF8to16(content[k]));
+                text->SetText(content[k]);
                 f->AddChild(text);
                 fb->AddChild(f);
                 if (content.size() == 1) {
@@ -2451,7 +2452,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                     appendTypeTag(harm, subdatatype);
                 }
             }
-            std::string content;
+            std::wstring content;
             if (token->isDataType("**harm")) {
                 // 300: harm->SetPlace(STAFFREL_below);
                 setPlace(harm, "below");
@@ -2464,7 +2465,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             else {
                 content = cleanHarmString(*token);
             }
-            text->SetText(UTF8to16(content));
+            text->SetText(content);
             harm->AddChild(text);
             m_measure->AddChild(harm);
             hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
@@ -2480,10 +2481,10 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
 // HumdrumInput::cleanFBString --
 //
 
-vector<string> HumdrumInput::cleanFBString(const std::string &content)
+std::vector<std::wstring> HumdrumInput::cleanFBString(const std::string &content)
 {
 
-    vector<string> output(1);
+    std::vector<std::wstring> output(1);
 
     for (int i = 0; i < (int)content.size(); i++) {
         if (content[i] == ' ') {
@@ -2491,16 +2492,18 @@ vector<string> HumdrumInput::cleanFBString(const std::string &content)
             continue;
         }
         if (content[i] == '-') {
-            output.back() += "\u266D"; // unicode flat
+            output.back() += L"\u266D"; // unicode flat
         }
         else if (content[i] == '#') {
-            output.back() += "\u266F"; // unicode sharp
+            output.back() += L"\u266F"; // unicode sharp
         }
         else if (content[i] == 'n') {
-            output.back() += "\u266E"; // unicode natural
+            output.back() += L"\u266E"; // unicode natural
         }
         else {
-            output.back() += content[i];
+            string tdee;
+            tdee = content[i];
+            output.back() += UTF8to16(tdee);
         }
     }
 
@@ -2516,17 +2519,17 @@ vector<string> HumdrumInput::cleanFBString(const std::string &content)
 //     will be suppressed.
 //
 
-string HumdrumInput::cleanHarmString3(const std::string &content)
+std::wstring HumdrumInput::cleanHarmString3(const std::string &content)
 {
-    string temp;
+    std::string temp;
 
     // hide **rhrm token if not a harmony "attack":
 
     if (content.find("_") != string::npos) {
-        return "";
+        return L"";
     }
     if (content.find("]") != string::npos) {
-        return "";
+        return L"";
     }
 
     // skip over **recip data:
@@ -2554,7 +2557,7 @@ string HumdrumInput::cleanHarmString3(const std::string &content)
         if (content[ii] == '_') {
             continue;
         }
-        temp += content[ii];
+        temp += content[i];
     }
 
     return cleanHarmString2(temp);
@@ -2565,9 +2568,9 @@ string HumdrumInput::cleanHarmString3(const std::string &content)
 // HumdrumInput::cleanHarmString2 -- Adjust **harm text
 //
 
-string HumdrumInput::cleanHarmString2(const std::string &content)
+std::wstring HumdrumInput::cleanHarmString2(const std::string &content)
 {
-    string output;
+    std::wstring output;
     bool nonrhythm = false;
     for (int i = 0; i < (int)content.size(); i++) {
         if (!nonrhythm) {
@@ -2583,19 +2586,21 @@ string HumdrumInput::cleanHarmString2(const std::string &content)
         }
         nonrhythm = true;
         if (content[i] == '-') {
-            output += "\u266D"; // unicode flat
+            output += L"\u266D"; // unicode flat
         }
         else if (content[i] == '#') {
-            output += "\u266F"; // unicode sharp
+            output += L"\u266F"; // unicode sharp
         }
         else if (content[i] == 'D') {
-            output += "\u00F8"; // o-slash
+            output += L"\u00F8"; // o-slash
         }
         else if (content[i] == 'o') {
-            output += "\u00B0"; // degree sign
+            output += L"\u00B0"; // degree sign
         }
         else {
-            output.push_back(content[i]);
+            string tdee;
+            tdee = content[i];
+            output += UTF8to16(tdee);
         }
     }
 
@@ -2607,11 +2612,11 @@ string HumdrumInput::cleanHarmString2(const std::string &content)
 // HumdrumInput::cleanHarmString --
 //
 
-string HumdrumInput::cleanHarmString(const std::string &content)
+std::wstring HumdrumInput::cleanHarmString(const std::string &content)
 {
-    std::string root;
-    std::string kind;
-    std::string bass;
+    std::wstring root;
+    std::wstring kind;
+    std::wstring bass;
 
     bool foundspace = false;
     bool foundslash = false;
@@ -2620,7 +2625,9 @@ string HumdrumInput::cleanHarmString(const std::string &content)
             foundslash = true;
         }
         if (foundspace && !foundslash) {
-            kind.push_back(content[i]);
+            string tdee;
+            tdee = content[i];
+            kind += UTF8to16(tdee);
             continue;
         }
         if (content[i] == ' ') {
@@ -2633,24 +2640,28 @@ string HumdrumInput::cleanHarmString(const std::string &content)
         }
         if (!foundspace) {
             if (content[i] == '-') {
-                root += "\u266D"; // unicode flat
+                root += L"\u266D"; // unicode flat
             }
             else if (content[i] == '#') {
-                root += "\u266F"; // unicode sharp
+                root += L"\u266F"; // unicode sharp
             }
             else {
-                root.push_back(content[i]);
+                string tdee;
+                tdee = content[i];
+                root += UTF8to16(tdee);
             }
         }
         else if (foundslash) {
             if (content[i] == '-') {
-                bass += "\u266D"; // unicode flat
+                bass += L"\u266D"; // unicode flat
             }
             else if (content[i] == '#') {
-                bass += "\u266F"; // unicode sharp
+                bass += L"\u266F"; // unicode sharp
             }
             else {
-                bass.push_back(content[i]);
+                string tdee;
+                tdee = content[i];
+                bass += UTF8to16(tdee);
             }
         }
         else {
@@ -2659,123 +2670,123 @@ string HumdrumInput::cleanHarmString(const std::string &content)
     }
 
     bool replacing = false;
-    if (kind == "major-minor") {
-        kind = "Mm7";
+    if (kind == L"major-minor") {
+        kind = L"Mm7";
         replacing = true;
     }
-    else if (kind == "minor-major") {
-        kind = "mM7";
-        replacing = true;
-    }
-
-    if (replace(kind, "major-", "M")) {
-        replacing = true;
-    }
-    else if (replace(kind, "minor-", "m")) {
-        replacing = true;
-    }
-    else if (replace(kind, "dominant-", "dom")) {
-        replacing = true;
-    }
-    else if (replace(kind, "augmented-", "+")) {
-        replacing = true;
-    }
-    else if (replace(kind, "suspended-", "sus")) {
-        replacing = true;
-    }
-    else if (replace(kind, "diminished-", "\00B0")) { // degree sign
-        replacing = true;
-    }
-    if (replace(kind, "seventh", "7")) {
-        replacing = true;
-    }
-    else if (replace(kind, "ninth", "9")) {
-        replacing = true;
-    }
-    else if (replace(kind, "11th", "11")) {
-        replacing = true;
-    }
-    else if (replace(kind, "13th", "13")) {
-        replacing = true;
-    }
-    else if (replace(kind, "second", "2")) {
-        replacing = true;
-    }
-    else if (replace(kind, "fourth", "4")) {
-        replacing = true;
-    }
-    else if (replace(kind, "sixth", "6")) {
+    else if (kind == L"minor-major") {
+        kind = L"mM7";
         replacing = true;
     }
 
-    if (kind == "major") {
-        kind = "";
+    if (replace(kind, L"major-", L"M")) {
         replacing = true;
     }
-    else if (kind == "maj") {
-        kind = "";
+    else if (replace(kind, L"minor-", L"m")) {
         replacing = true;
     }
-    else if (kind == "ma") {
-        kind = ""; // degree sign
+    else if (replace(kind, L"dominant-", L"dom")) {
         replacing = true;
     }
-    else if (kind == "minor") {
-        kind = "m";
+    else if (replace(kind, L"augmented-", L"+")) {
         replacing = true;
     }
-    else if (kind == "min") {
-        kind = "m";
+    else if (replace(kind, L"suspended-", L"sus")) {
         replacing = true;
     }
-    else if (kind == "augmented") {
-        kind = "+";
+    else if (replace(kind, L"diminished-", L"\u00B0")) { // degree sign
         replacing = true;
     }
-    else if (kind == "minor-seventh") {
-        kind = "m7";
+    if (replace(kind, L"seventh", L"7")) {
         replacing = true;
     }
-    else if (kind == "major-seventh") {
-        kind = "M7";
+    else if (replace(kind, L"ninth", L"9")) {
         replacing = true;
     }
-    else if (kind == "dominant-11th") {
-        kind = "dom11";
+    else if (replace(kind, L"11th", L"11")) {
         replacing = true;
     }
-    else if (kind == "dominant-13th") {
-        kind = "dom13";
+    else if (replace(kind, L"13th", L"13")) {
         replacing = true;
     }
-    else if (kind == "dominant-ninth") {
-        kind = "dom9";
+    else if (replace(kind, L"second", L"2")) {
         replacing = true;
     }
-    else if (kind == "half-diminished") {
-        kind = "\u00F8"; // o-slash
+    else if (replace(kind, L"fourth", L"4")) {
         replacing = true;
     }
-    else if (kind == "diminished") {
-        kind = "\u00B0"; // degree sign
+    else if (replace(kind, L"sixth", L"6")) {
         replacing = true;
     }
-    else if (kind == "dominant") {
-        kind = "dom";
+
+    if (kind == L"major") {
+        kind = L"";
         replacing = true;
     }
-    else if (kind == "m7b5") {
+    else if (kind == L"maj") {
+        kind = L"";
         replacing = true;
-        kind = "m7\u266D"
-               "5";
     }
-    if ((kind != "") && !replacing) {
-        root += ' ';
+    else if (kind == L"ma") {
+        kind = L""; // degree sign
+        replacing = true;
     }
-    if (bass != "") {
-        kind += '/';
+    else if (kind == L"minor") {
+        kind = L"m";
+        replacing = true;
     }
-    std::string output = root + kind + bass;
+    else if (kind == L"min") {
+        kind = L"m";
+        replacing = true;
+    }
+    else if (kind == L"augmented") {
+        kind = L"+";
+        replacing = true;
+    }
+    else if (kind == L"minor-seventh") {
+        kind = L"m7";
+        replacing = true;
+    }
+    else if (kind == L"major-seventh") {
+        kind = L"M7";
+        replacing = true;
+    }
+    else if (kind == L"dominant-11th") {
+        kind = L"dom11";
+        replacing = true;
+    }
+    else if (kind == L"dominant-13th") {
+        kind = L"dom13";
+        replacing = true;
+    }
+    else if (kind == L"dominant-ninth") {
+        kind = L"dom9";
+        replacing = true;
+    }
+    else if (kind == L"half-diminished") {
+        kind = L"\u00F8"; // o-slash
+        replacing = true;
+    }
+    else if (kind == L"diminished") {
+        kind = L"\u00B0"; // degree sign
+        replacing = true;
+    }
+    else if (kind == L"dominant") {
+        kind = L"dom";
+        replacing = true;
+    }
+    else if (kind == L"m7b5") {
+        replacing = true;
+        kind = L"m7\u266D"
+               L"5";
+    }
+    if ((kind != L"") && !replacing) {
+        root += L' ';
+    }
+    if (bass != L"") {
+        kind += L'/';
+    }
+    std::wstring output = root + kind + bass;
     return output;
 }
 
@@ -2788,6 +2799,18 @@ string HumdrumInput::cleanHarmString(const std::string &content)
 bool HumdrumInput::replace(string &str, const std::string &oldStr, const std::string &newStr)
 {
     string::size_type pos = 0u;
+    bool output = false;
+    while ((pos = str.find(oldStr, pos)) != string::npos) {
+        output = true;
+        str.replace(pos, oldStr.length(), newStr);
+        pos += newStr.length();
+    }
+    return output;
+}
+
+bool HumdrumInput::replace(std::wstring &str, const std::wstring &oldStr, const std::wstring &newStr)
+{
+    std::wstring::size_type pos = 0u;
     bool output = false;
     while ((pos = str.find(oldStr, pos)) != string::npos) {
         output = true;
@@ -8431,8 +8454,16 @@ int HumdrumInput::getMeasureEndLine(int startline)
 
 void HumdrumInput::setupMeiDocument()
 {
-    m_score = m_doc->CreateScoreBuffer();
-
+    m_doc->Reset();
+    m_doc->SetType(Raw);
+    // The mdiv
+    Mdiv *mdiv = new Mdiv();
+    mdiv->m_visibility = Visible;
+    m_doc->AddChild(mdiv);
+    // The score
+    m_score = new Score();
+    mdiv->AddChild(m_score);
+    // the section
     Section *section = new Section();
     m_sections.push_back(section);
     m_score->AddChild(m_sections.back());

@@ -38,11 +38,7 @@
 #include "multirest.h"
 #include "neume.h"
 #include "note.h"
-<<<<<<< HEAD
 #include "options.h"
-=======
-#include "neume.h"
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 #include "proport.h"
 #include "rest.h"
 #include "rpt.h"
@@ -1026,7 +1022,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     // We do not support more than three chars
     int num = std::min(multiRest->GetNum(), 999);
 
-    if (num > 2 || multiRest->GetBlock() == true) {
+    if ((num > 2) || (multiRest->GetBlock() == BOOLEAN_true)) {
         // This is 1/2 the length of the black rectangle
         length = width - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
@@ -1509,15 +1505,15 @@ int View::GetSylYRel(Syl *syl, Staff *staff)
     assert(syl && staff);
 
     int y = 0;
-    StaffAlignment *aligment = staff->GetAlignment();
-    if (aligment) {
+    StaffAlignment *alignment = staff->GetAlignment();
+    if (alignment) {
         FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
         int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
         int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
         int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        y = -aligment->GetStaffHeight() - aligment->GetOverflowBelow()
-            + (aligment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
+        y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
+            + (alignment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
     }
     return y;
 }

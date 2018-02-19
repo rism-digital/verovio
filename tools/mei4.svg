@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="2100px" height="2970px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" overflow="visible">
+	<desc>Engraved by Verovio 1.1.4-26a3ad8-dirty</desc>
+	<defs>
+		<symbol id="E003" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M0 -0c49 0 97.5 -2.26367 135.5 4.73633c206 95 258.5 264.264 263.5 271.264c0 1 -14 7 -15 6c-88 -154 -251 -167 -321 -170c-1 0 -63 -1 -63 -1v-111z" />
+		</symbol>
+		<symbol id="E004" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M0 0c49 0 97.5 2.26367 135.5 -4.73633c206 -95 258.5 -264.264 263.5 -271.264c0 -1 -14 -7 -15 -6c-88 154 -251 167 -321 170c-1 0 -63 1 -63 1v111z" />
+		</symbol>
+		<symbol id="E906" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M181 -131c0 -20.6667 -3.33333 -36 -10 -46c-11.3333 -16.6667 -32.6667 -25 -64 -25c-46.6667 0 -77 9.33333 -91 28c-11.3333 15.3333 -17 46.6667 -17 94v43c0 13.3333 0.333333 25.6667 1 37v41c0 13.3333 -0.333333 26.3333 -1 39c0 48 5.33333 79.3333 16 94 c14 18.6667 44.6667 28 92 28c32 0 53.3333 -8 64 -24c6.66667 -10 10 -25.6667 10 -47c0 -28 -8.66667 -47.3333 -26 -58c-13.3333 -8 -32.6667 -12 -58 -12h-23c-7.33333 0 -14.3333 0.333333 -21 1c-17.3333 0 -26 -3.66667 -26 -11v-51v-51c0 -8 8 -12 24 -12 c4 0 11.3333 0.333333 22 1c10.6667 0.666667 19 1 25 1c25.3333 0 44 -3.66667 56 -11c18 -10.6667 27 -30.3333 27 -59z" />
+		</symbol>
+		<symbol id="E990" viewBox="0 0 1000 1000" overflow="inherit">
+			<path transform="scale(1,-1)" d="M160 48v-145q0 -4 -2 -4q-1 0 -5 4q-20 20 -68 20h-5q-40 -1 -72 -20q-2 -4 -6 -4q-2 0 -2 4v147q0 25 22 38.5t54 13.5q33 0 58.5 -14.5t25.5 -39.5z" />
+		</symbol>
+	</defs>
+	<style type="text/css">g.page-margin{font-family:Times;} g.tempo{font-weight:bold;} g.dir, g.dynam {font-style:italic;}</style>
+	<svg class="definition-scale" viewBox="0 0 21000 29700">
+		<g class="page-margin" transform="translate(500, 500)">
+			<g class="system" id="system-0000001369883625">
+				<path d="M15 1400 L15 1940" stroke="#000000" stroke-width="30" />
+				<use xlink:href="#E003" x="-165" y="1400" height="720px" width="720px" />
+				<use xlink:href="#E004" x="-165" y="1940" height="720px" width="720px" />
+				<rect x="-165" y="1380" height="580" width="90" />
+				<g class="section boundaryStart" id="section-0000001505306638" />
+				<g class="staff" id="staff-0000001613127602">
+					<path d="M0 1400 L4271 1400" stroke="#000000" stroke-width="20" />
+					<path d="M0 1580 L4271 1580" stroke="#000000" stroke-width="20" />
+					<path d="M0 1760 L4271 1760" stroke="#000000" stroke-width="20" />
+					<path d="M0 1940 L4271 1940" stroke="#000000" stroke-width="20" />
+					<g class="clef" id="clef-0000000454037272">
+						<use xlink:href="#E906" x="90" y="1760" height="720px" width="720px" />
+					</g>
+					<g class="layer" id="layer-0000002002047086">
+						<g class="syllable" id="syllable-0000001631593206">
+							<g class="neume" id="neume-0000001002139127">
+								<g class="nc" id="nc-0000000238064068">
+									<use xlink:href="#E990" x="401" y="1580" height="720px" width="720px" />
+								</g>
+								<g class="nc" id="nc-0000000380756515">
+									<use xlink:href="#E990" x="531" y="1670" height="720px" width="720px" />
+								</g>
+								<g class="nc" id="nc-0000002020963192">
+									<use xlink:href="#E990" x="661" y="1580" height="720px" width="720px" />
+								</g>
+							</g>
+						</g>
+						<g class="syllable" id="syllable-0000001727006992">
+							<g class="neume" id="neume-0000001338387338">
+								<g class="nc" id="nc-0000001532271088">
+									<use xlink:href="#E990" x="1111" y="1400" height="720px" width="720px" />
+								</g>
+								<g class="nc" id="nc-0000000256281192">
+									<use xlink:href="#E990" x="1241" y="1580" height="720px" width="720px" />
+								</g>
+							</g>
+							<g class="neume" id="neume-0000001613281709">
+								<g class="nc" id="nc-0000000297156141">
+									<use xlink:href="#E990" x="1691" y="1670" height="720px" width="720px" />
+								</g>
+								<g class="nc" id="nc-0000001403782512">
+									<use xlink:href="#E990" x="1821" y="1580" height="720px" width="720px" />
+								</g>
+							</g>
+						</g>
+						<g class="syllable" id="syllable-0000001117333242">
+							<g class="neume" id="neume-0000000688549898">
+								<g class="nc" id="nc-0000001816245650">
+									<use xlink:href="#E990" x="2271" y="1490" height="720px" width="720px" />
+								</g>
+								<g class="nc" id="nc-0000001308081092">
+									<use xlink:href="#E990" x="2401" y="1670" height="720px" width="720px" />
+								</g>
+								<g class="nc" id="nc-0000001128818905">
+									<use xlink:href="#E990" x="2531" y="1760" height="720px" width="720px" />
+								</g>
+							</g>
+						</g>
+						<g class="syllable" id="syllable-0000001188798737">
+							<g class="neume" id="neume-0000001494505957">
+								<g class="nc" id="nc-0000001192883987">
+									<use xlink:href="#E990" x="2981" y="1940" height="720px" width="720px" />
+								</g>
+								<g class="nc" id="nc-0000002041324764">
+									<use xlink:href="#E990" x="3111" y="1850" height="720px" width="720px" />
+								</g>
+								<g class="nc" id="nc-0000000346564076">
+									<use xlink:href="#E990" x="3241" y="1760" height="720px" width="720px" />
+								</g>
+							</g>
+						</g>
+						<g class="syllable" id="syllable-0000000726774668">
+							<g class="neume" id="neume-0000000380809635">
+								<g class="nc" id="nc-0000000766267385">
+									<use xlink:href="#E990" x="3691" y="1850" height="720px" width="720px" />
+								</g>
+								<g class="nc" id="nc-0000000196508636">
+									<use xlink:href="#E990" x="3821" y="1940" height="720px" width="720px" />
+								</g>
+							</g>
+						</g>
+					</g>
+				</g>
+				<g class="barLineAttr" id="bline-0000001879894838" />
+				<g class="boundaryEnd section-0000001505306638" id="bdend-0000000780507553" />
+			</g>
+		</g>
+	</svg>
+</svg>

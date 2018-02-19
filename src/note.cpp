@@ -325,6 +325,20 @@ wchar_t Note::GetMensuralSmuflNoteHead()
     return code;
 }
 
+bool Note::IsVisible()
+{
+    if (this->HasVisible()) {
+        return this->GetVisible() == BOOLEAN_true;
+    }
+    // if the chord doens't have it, see if all the children are invisible
+    else if (GetParent() && GetParent()->Is(CHORD)) {
+        Chord *chord = dynamic_cast<Chord *>(GetParent());
+        assert(chord);
+        return chord->IsVisible();
+    }
+    return true;
+}
+
 void Note::SetScoreTimeOnset(double scoreTime)
 {
     m_scoreTimeOnset = scoreTime;
@@ -445,6 +459,10 @@ int Note::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
+    if (!this->IsVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
     // Stems have been calculated previously in Beam or FTrem - siblings becasue flags do not need to
     // be processed either
     if (this->IsInBeam() || this->IsInFTrem()) {
@@ -504,13 +522,8 @@ int Note::CalcStem(FunctorParams *functorParams)
     else if (this->IsGraceNote()) {
         stemDir = STEMDIRECTION_up;
     }
-<<<<<<< HEAD
     else if ((layerStemDir = layer->GetDrawingStemDir(this)) != STEMDIRECTION_NONE) {
         stemDir = layerStemDir;
-=======
-    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        stemDir = layer->GetDrawingStemDir();
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
     }
     else {
         stemDir = (this->GetDrawingY() >= params->m_verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
@@ -585,6 +598,9 @@ int Note::CalcDots(FunctorParams *functorParams)
     if (this->IsMensural()) {
         return FUNCTOR_SIBLINGS;
     }
+    if (!this->IsVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
@@ -656,6 +672,10 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
+
+    if (!this->IsVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
 

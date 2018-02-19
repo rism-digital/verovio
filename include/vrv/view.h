@@ -42,12 +42,9 @@ class Measure;
 class Mordent;
 class Nc;
 class Neume;
-<<<<<<< HEAD
 class Num;
-=======
-class ControlElement;
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 class Octave;
+class Options;
 class Page;
 class Pedal;
 class PgFoot;
@@ -522,6 +519,8 @@ private:
 public:
     /** Document */
     Doc *m_doc;
+    /** Options of the document */
+    Options *m_options;
     /** Index of the current page */
     int m_pageIdx;
 

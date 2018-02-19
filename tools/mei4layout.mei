@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Mensural alignment example</title>
+            </titleStmt>
+            <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp symbol="bracket">
+                            <staffDef n="1" lines="4" clef.line="2" clef.shape="C" ulx="50" tempus="3" prolatio="3" proport.num="1" proport.numbase="3" notationtype="neume"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <staff n="1" label="feature-example" uly="300">
+                            <layer>
+                                <syllable>
+                                    <syl n= "initial">
+                                        <rend color= "red"> O </rend>
+                                    </syl>
+                                    <!-- porrectus -->
+                                    <neume>
+                                        <nc oct= "3" pname= "e" ulx="100"/>
+                                        <nc intm="d" oct= "3" pname= "d" ulx="150"/>
+                                        <nc intm="u" oct= "3" pname= "e" ulx="200"/>
+                                    </neume>
+                                </syllable>
+                                <syllable>
+                                    <syl>splen_ </syl>
+                                    <!-- clivis -->
+                                    <neume>
+                                        <nc oct= "3" pname= "g" ulx="250"/>
+                                        <nc intm="d" oct= "3" pname= "e" ulx="300"/>
+                                    </neume>
+                                    <!-- pes -->
+                                    <neume>
+                                        <nc oct= "3" pname= "d" ulx="350"/>
+                                        <nc intm="u" oct= "3" pname= "e" ulx="400"/>
+                                    </neume>
+                                </syllable>
+                                <syllable>
+                                    <syl>di_ </syl>
+                                    <!-- climacus -->
+                                    <neume>
+                                        <!-- virga -->
+                                        <nc diagonalright= "u" oct= "3" pname= "f" ulx="450"/>
+                                        <!-- punctum -->
+                                        <nc con= "g" intm= "d" oct= "3" pname= "d" ulx="500"/>
+                                        <!-- punctum -->
+                                        <nc con= "g" intm= "d" oct= "3" pname= "c" ulx="550"/>
+                                    </neume>
+                                </syllable>
+                                <syllable>
+                                    <syl>si_ </syl>
+                                    <!-- scandicus -->
+                                    <neume>
+                                        <!-- punctum -->
+                                        <nc oct= "2" pname= "a" ulx="650"/>
+                                        <!-- punctum -->
+                                        <nc con= "g" intm= "u" oct= "2" pname= "b" ulx="700"/>
+                                        <!-- virga -->
+                                        <nc con= "g"  intm= "u" diagonalright= "u" oct= "3" pname= "c" ulx="750"/>
+                                    </neume>
+                                </syllable>
+                                <syllable>
+                                    <syl>ma </syl>
+                                    <!-- clivis -->
+                                    <neume>
+                                        <nc oct= "2" pname= "b" ulx="800"/>
+                                        <nc intm="d" oct= "2" pname= "a" ulx="850"/>
+                                    </neume>
+                                </syllable>
+                            </layer>
+                        </staff>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

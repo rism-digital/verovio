@@ -15,11 +15,11 @@ verovio.vrvToolkit.edit = Module.cwrap('vrvToolkit_edit', 'number', ['number', '
 // char *getAvailableOptions(Toolkit *ic)
 verovio.vrvToolkit.getAvailableOptions = Module.cwrap('vrvToolkit_getAvailableOptions', 'string', ['number']);
 
-// char *getElementsAtTime(Toolkit *ic, int time)
-verovio.vrvToolkit.getElementsAtTime = Module.cwrap('vrvToolkit_getElementsAtTime', 'string', ['number', 'number']);
-
 // char *getElementAttr(Toolkit *ic, const char *xmlId)
 verovio.vrvToolkit.getElementAttr = Module.cwrap('vrvToolkit_getElementAttr', 'string', ['number', 'string']);
+
+// char *getElementsAtTime(Toolkit *ic, int time)
+verovio.vrvToolkit.getElementsAtTime = Module.cwrap('vrvToolkit_getElementsAtTime', 'string', ['number', 'number']);
 
 // char *getHumdrum(Toolkit *ic)
 verovio.vrvToolkit.getHumdrum = Module.cwrap('vrvToolkit_getHumdrum', 'string');
@@ -70,25 +70,20 @@ verovio.vrvToolkit.renderToTimemap = Module.cwrap('vrvToolkit_renderToTimemap', 
 verovio.vrvToolkit.setOptions = Module.cwrap('vrvToolkit_setOptions', null, ['number', 'string']);
 
 // A pointer to the object - only one instance can be created for now
-verovio.ptr = 0;
+verovio.instances = [];
 
 /***************************************************************************************************************************/
 
 verovio.toolkit = function() {
-	// check if we already have one instance
-	if (verovio.ptr !== 0) {
-		console.warn("For now only one instance of the toolkit can be created");
-		this.ptr = verovio.ptr;
-		return;
-	}
-	// if not, then create it
 	this.ptr = verovio.vrvToolkit.constructor();
-	verovio.ptr = this.ptr;
+	console.debug("Creating toolkit instance");
+	verovio.instances.push(this.ptr);
 }
 
 verovio.toolkit.prototype.destroy = function () {
+  verovio.instances.splice(verovio.instances.indexOf(this.ptr), 1);
+	console.debug("Deleting toolkit instance");
 	verovio.vrvToolkit.destructor(this.ptr);
-	verovio.ptr = 0;
 };
 
 verovio.toolkit.prototype.edit = function (editorAction) {
@@ -97,6 +92,10 @@ verovio.toolkit.prototype.edit = function (editorAction) {
 
 verovio.toolkit.prototype.getAvailableOptions = function () {
 	return JSON.parse(verovio.vrvToolkit.getAvailableOptions(this.ptr));
+};
+
+verovio.toolkit.prototype.getElementAttr = function (xmlId) {
+	return JSON.parse(verovio.vrvToolkit.getElementAttr(this.ptr, xmlId));
 };
 
 verovio.toolkit.prototype.getElementsAtTime = function (millisec) {
@@ -177,10 +176,6 @@ verovio.toolkit.prototype.setOptions = function (options) {
 	verovio.vrvToolkit.setOptions(this.ptr, JSON.stringify(options));
 };
 
-verovio.toolkit.prototype.getElementAttr = function (xmlId) {
-	return JSON.parse(verovio.vrvToolkit.getElementAttr(this.ptr, xmlId));
-};
-
 /***************************************************************************************************************************/
 
 // If the window object is defined (if we are not within a WebWorker)...
@@ -188,8 +183,8 @@ if ((typeof window !== "undefined") && (window.addEventListener))
 {
 	// Add a listener that will delete the object (if necessary) when the page is closed
 	window.addEventListener ("unload", function () {
-		if (verovio.ptr != 0) {
-			verovio.vrvToolkit.destructor( verovio.ptr );
+		for (var i = 0; i < verovio.instances.length; i++) {
+		  verovio.vrvToolkit.destructor(verovio.instances[i]);
 		}
 	});
 }

@@ -1,28 +1,28 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        score.h
+// Name:        pages.h
 // Author:      Laurent Pugin
-// Created:     29/08/2016
+// Created:     2018/02/15
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_SCORE_H__
-#define __VRV_SCORE_H__
+#ifndef __VRV_PAGES_H__
+#define __VRV_PAGES_H__
 
 #include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
 
+class Score;
+
 //----------------------------------------------------------------------------
-// Score
+// Pages
 //----------------------------------------------------------------------------
 
 /**
- * This class represent a <score> in MEI.
- * It is used only for loading score-based MEI documents before they are
- * converted to page-based MEI.
+ * This class represent a <pages> in page-based MEI.
  */
-class Score : public Object, public AttLabelled, public AttNNumberLike {
+class Pages : public Object, public AttLabelled, public AttNNumberLike {
 
 public:
     /**
@@ -30,11 +30,11 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Score();
-    virtual ~Score();
+    Pages();
+    virtual ~Pages();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Score"; }
-    virtual ClassId GetClassId() const { return SCORE; }
+    virtual std::string GetClassName() const { return "Pages"; }
+    virtual ClassId GetClassId() const { return PAGES; }
     ///@}
 
     /**
@@ -43,6 +43,11 @@ public:
     ///@{
     virtual void AddChild(Object *object);
     ///@}
+
+    /**
+     *
+     */
+    void ConvertFrom(Score *score);
 
     //----------//
     // Functors //

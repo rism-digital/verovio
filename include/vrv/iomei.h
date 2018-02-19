@@ -66,6 +66,7 @@ class LayerElement;
 class Lb;
 class Lem;
 class Ligature;
+class Mdiv;
 class Measure;
 class Mensur;
 class MeterSig;
@@ -77,14 +78,12 @@ class MultiRest;
 class MultiRpt;
 class Nc;
 class Neume;
-<<<<<<< HEAD
 class Note
 class Num;
-=======
-class Note;
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 class Octave;
 class Orig;
+class Page;
+class Pages;
 class Pb;
 class Pedal;
 class PgFoot;
@@ -181,6 +180,15 @@ private:
     void WriteXmlId(pugi::xml_node currentNode, Object *object);
 
     /**
+     * @name Methods for writing MEI body elements.
+     */
+    ///@{
+    void WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv);
+    void WritePages(pugi::xml_node currentNode, Pages *pages);
+    void WriteScore(pugi::xml_node currentNode, Score *score);
+    ///@}
+
+    /**
      * @name Methods for writing MEI score-based elements
      */
     ///@{
@@ -218,7 +226,6 @@ private:
      * Called from WriteLayerElement.
      */
     ///@{
-<<<<<<< HEAD
     void WriteAccid(pugi::xml_node currentNode, Accid *accid);
     void WriteArtic(pugi::xml_node currentNode, Artic *artic);
     void WriteBarLine(pugi::xml_node currentNode, BarLine *barLine);
@@ -239,7 +246,6 @@ private:
     void WriteMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2);
     void WriteMultiRest(pugi::xml_node currentNode, MultiRest *multiRest);
     void WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt);    
-    void WriteNc(pugi::xml_node currentNode, Nc *nc);
     void WriteNeume(pugi::xml_node currentNode, Neume *neume);
     void WriteNote(pugi::xml_node currentNode, Note *note);
     void WriteProport(pugi::xml_node currentNode, Proport *proport);
@@ -247,35 +253,6 @@ private:
     void WriteSpace(pugi::xml_node currentNode, Space *space);
     void WriteSyllable(pugi::xml_mode currentNode, Syllable *syllable);
     void WriteTuplet(pugi::xml_node currentNode, Tuplet *tuplet);
-=======
-    void WriteMeiAccid(pugi::xml_node currentNode, Accid *accid);
-    void WriteMeiArtic(pugi::xml_node currentNode, Artic *artic);
-    void WriteMeiBarLine(pugi::xml_node currentNode, BarLine *barLine);
-    void WriteMeiBeam(pugi::xml_node currentNode, Beam *beam);
-    void WriteMeiBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt);
-    void WriteMeiBTrem(pugi::xml_node currentNode, BTrem *bTrem);
-    void WriteMeiChord(pugi::xml_node currentNode, Chord *chord);
-    void WriteMeiClef(pugi::xml_node currentNode, Clef *clef);
-    void WriteMeiCustos(pugi::xml_node currentNode, Custos *custos);
-    void WriteMeiDot(pugi::xml_node currentNode, Dot *dot);
-    void WriteMeiFTrem(pugi::xml_node currentNode, FTrem *fTrem);
-    void WriteMeiKeySig(pugi::xml_node currentNode, KeySig *keySig);
-    void WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur);
-    void WriteMeiMeterSig(pugi::xml_node currentNode, MeterSig *meterSig);
-    void WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest);
-    void WriteMeiMRpt(pugi::xml_node currentNode, MRpt *mRpt);
-    void WriteMeiMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2);
-    void WriteMeiMultiRest(pugi::xml_node currentNode, MultiRest *multiRest);
-    void WriteMeiMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt);
-    void WriteMeiNc(pugi::xml_node currentNode, Nc *nc);
-    void WriteMeiNeume(pugi::xml_node currentNode, Neume *neume);
-    void WriteMeiNote(pugi::xml_node currentNode, Note *note);
-    void WriteMeiProport(pugi::xml_node currentNode, Proport *proport);
-    void WriteMeiRest(pugi::xml_node currentNode, Rest *rest);
-    void WriteMeiSpace(pugi::xml_node currentNode, Space *space);
-    void WriteMeiSyllable(pugi::xml_node currentNode, Syllable *syllable);
-    void WriteMeiTuplet(pugi::xml_node currentNode, Tuplet *tuplet);
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
     ///@}
 
     /**
@@ -421,6 +398,13 @@ public:
 private:
     bool ReadDoc(pugi::xml_node root);
 
+    ///@{
+    bool ReadMdiv(Object *parent, pugi::xml_node parentNode, bool isVisible);
+    bool ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible);
+    bool ReadPages(Object *parent, pugi::xml_node parentNode);
+    bool ReadScore(Object *parent, pugi::xml_node parentNode);
+    ///@}
+
     /**
      * @name Methods for reading MEI score-based elements
      */
@@ -442,7 +426,7 @@ private:
      * children (see MeiInput::IsAllowed)
      */
     ///@{
-    bool ReadPage(pugi::xml_node page);
+    bool ReadPage(Object *parent, pugi::xml_node parentNode);
     bool ReadPageChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadSystem(Object *parent, pugi::xml_node system);
     bool ReadSystemChildren(Object *parent, pugi::xml_node parentNode);
@@ -476,7 +460,6 @@ private:
      * @name Methods for reading MEI layer elements
      */
     ///@{
-<<<<<<< HEAD
     bool ReadAccid(Object *parent, pugi::xml_node accid);
     bool ReadArtic(Object *parent, pugi::xml_node artic);
     bool ReadBarLine(Object *parent, pugi::xml_node barLine);
@@ -507,38 +490,6 @@ private:
     bool ReadSyllable(Object *parent, pugi::xml_node syllable);
     bool ReadTuplet(Object *parent, pugi::xml_node tuplet);
     bool ReadVerse(Object *parent, pugi::xml_node verse);
-=======
-    bool ReadMeiAccid(Object *parent, pugi::xml_node accid);
-    bool ReadMeiArtic(Object *parent, pugi::xml_node artic);
-    bool ReadMeiBarLine(Object *parent, pugi::xml_node barLine);
-    bool ReadMeiBeam(Object *parent, pugi::xml_node beam);
-    bool ReadMeiBeatRpt(Object *parent, pugi::xml_node beatRpt);
-    bool ReadMeiBTrem(Object *parent, pugi::xml_node bTrem);
-    bool ReadMeiChord(Object *parent, pugi::xml_node chord);
-    bool ReadMeiClef(Object *parent, pugi::xml_node clef);
-    bool ReadMeiCustos(Object *parent, pugi::xml_node custos);
-    bool ReadMeiDot(Object *parent, pugi::xml_node dot);
-    bool ReadMeiFTrem(Object *parent, pugi::xml_node fTrem);
-    bool ReadMeiKeySig(Object *parent, pugi::xml_node keySig);
-    bool ReadMeiLigature(Object *parent, pugi::xml_node ligature);
-    bool ReadMeiMensur(Object *parent, pugi::xml_node mensur);
-    bool ReadMeiMeterSig(Object *parent, pugi::xml_node meterSig);
-    bool ReadMeiMRest(Object *parent, pugi::xml_node mRest);
-    bool ReadMeiMRpt(Object *parent, pugi::xml_node mRpt);
-    bool ReadMeiMRpt2(Object *parent, pugi::xml_node mRpt2);
-    bool ReadMeiMultiRest(Object *parent, pugi::xml_node multiRest);
-    bool ReadMeiMultiRpt(Object *parent, pugi::xml_node multiRpt);
-    bool ReadMeiNc(Object *parent, pugi::xml_node nc);
-    bool ReadMeiNeume(Object *parent, pugi::xml_node neume);
-    bool ReadMeiNote(Object *parent, pugi::xml_node note);
-    bool ReadMeiProport(Object *parent, pugi::xml_node proport);
-    bool ReadMeiRest(Object *parent, pugi::xml_node rest);
-    bool ReadMeiSpace(Object *parent, pugi::xml_node space);
-    bool ReadMeiSyl(Object *parent, pugi::xml_node syl);
-    bool ReadMeiSyllable(Object *parent, pugi::xml_node syllable);
-    bool ReadMeiTuplet(Object *parent, pugi::xml_node tuplet);
-    bool ReadMeiVerse(Object *parent, pugi::xml_node verse);
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
     ///@}
 
     /**
@@ -686,21 +637,6 @@ private:
     MEIVersion m_version;
 
     /**
-     * A vector for storing xpath queries for selecting <app> children
-     */
-    std::vector<std::string> m_appXPathQueries;
-
-    /**
-     * A vector the storing xpath queries for selecting <choice> children
-     */
-    std::vector<std::string> m_choiceXPathQueries;
-
-    /**
-     * A string for storing the xpath query for selecting a <mdiv>
-     */
-    std::string m_mdivXPathQuery;
-
-    /**
      * A flag indicating wheather we are reading page-based or score-based MEI
      */
     bool m_readingScoreBased;
@@ -719,6 +655,12 @@ private:
      * A static array for storing the implemented editorial elements
      */
     static std::vector<std::string> s_editorialElementNames;
+
+    /**
+     * The selected <mdiv>.
+     * If not specified by --mdiv-x-path query, then it is the first <mdiv> in the body
+     */
+    pugi::xml_node m_selectedMdiv;
 };
 
 } // namespace vrv

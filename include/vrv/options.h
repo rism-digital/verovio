@@ -478,12 +478,12 @@ public:
     OptionInt m_pageMarginTop;
     OptionInt m_pageWidth;
     OptionInt m_unit;
-    
+
     /**
      * General layout
      */
     OptionGrp m_generalLayout;
-    
+
     OptionDbl m_barLineWidth;
     OptionInt m_beamMaxSlope;
     OptionInt m_beamMinSlope;
@@ -491,7 +491,9 @@ public:
     OptionDbl m_graceFactor;
     OptionDbl m_hairpinSize;
     OptionDbl m_leftPosition;
+    OptionDbl m_lyricHyphenWidth;
     OptionDbl m_lyricSize;
+    OptionDbl m_lyricTopMinMargin;
     OptionInt m_measureMinWidth;
     OptionIntMap m_measureNumber;
     OptionDbl m_slurMaxHeight;

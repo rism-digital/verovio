@@ -50,6 +50,9 @@ void Ending::AddChild(Object *child)
     if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));
     }
+    else if (child->Is(SCOREDEF)) {
+        assert(dynamic_cast<ScoreDef *>(child));
+    }
     else if (child->IsSystemElement()) {
         assert(dynamic_cast<SystemElement *>(child));
         // here we are actually allowing ending withing ending, which is wrong

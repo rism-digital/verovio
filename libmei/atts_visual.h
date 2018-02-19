@@ -866,8 +866,9 @@ public:
 
 private:
     /**
-     * Indicates if the quotation is integrated into the flow of the text or interrupts
-     * it.
+     * When the block attribute is used, combinations of the 1, 2, and 4 measure rest
+     * forms (Read, p.
+     * 104) should be rendered instead of the modern form or an alternative symbol.
      **/
     data_BOOLEAN m_block;
 

@@ -30,13 +30,8 @@ class TimeSpanningInterface;
  * A Staff is contained in a System.
  * It contains Measure objects.
  * For unmeasured music, one single Measure is added for simplifying internal processing
-<<<<<<< HEAD
  */
 class Staff : public Object, public AttNInteger, public AttTyped, public AttVisibility {
-=======
-*/
-class Staff : public Object, public AttCommon, public AttTyped, public AttVisibility {
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 
 public:
     /**

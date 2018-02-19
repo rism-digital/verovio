@@ -113,13 +113,9 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
         Breath *breath = dynamic_cast<Breath *>(object);
         assert(breath);
         // breath above by default
-<<<<<<< HEAD
         m_place = (breath->GetPlaceAlternate()->GetBasic() != STAFFREL_basic_NONE)
             ? breath->GetPlaceAlternate()->GetBasic()
             : STAFFREL_basic_above;
-=======
-        m_place = breath->HasPlace() ? breath->GetPlace() : STAFFREL_above;
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
     }
     else if (object->Is(DIR)) {
         Dir *dir = dynamic_cast<Dir *>(object);
@@ -355,11 +351,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 return true;
             }
             yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1() - margin;
-<<<<<<< HEAD
             Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
-=======
-            Object *object = dynamic_cast<Object*>(horizOverlapingBBox);
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
             // With LayerElement always move them up
             if (object && object->IsLayerElement()) {
                 if (yRel < 0) this->SetDrawingYRel(yRel);
@@ -379,13 +371,8 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 return true;
             }
             yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
-<<<<<<< HEAD
                 + GetContentY2() + margin;
             Object *object = dynamic_cast<Object *>(horizOverlapingBBox);
-=======
-            + GetContentY2() + margin;
-            Object *object = dynamic_cast<Object*>(horizOverlapingBBox);
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
             // With LayerElement always move them down
             if (object && object->IsLayerElement()) {
                 if (yRel > 0) this->SetDrawingYRel(yRel);

@@ -43,6 +43,7 @@
 #include "layer.h"
 #include "lb.h"
 #include "ligature.h"
+#include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -51,13 +52,11 @@
 #include "multirest.h"
 #include "nc.h"
 #include "note.h"
-<<<<<<< HEAD
 #include "num.h"
-=======
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 #include "neume.h"
 #include "octave.h"
 #include "page.h"
+#include "pages.h"
 #include "pedal.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
@@ -142,7 +141,9 @@ bool MeiOutput::ExportFile()
                 LogError("Page %d does not exist", m_page);
                 return false;
             }
-            Page *page = dynamic_cast<Page *>(m_doc->GetChild(m_page));
+            Pages *pages = m_doc->GetPages();
+            assert(pages);
+            Page *page = dynamic_cast<Page *>(pages->GetChild(m_page));
             assert(page);
             if (m_scoreBasedMEI) {
                 m_currentNode = meiDoc.append_child("score");
@@ -198,16 +199,41 @@ bool MeiOutput::WriteObject(Object *object)
         return true;
     }
 
-    if (object->Is(PAGE)) {
+    if (object->Is(MDIV)) {
+        m_currentNode = m_currentNode.append_child("mdiv");
+        WriteMdiv(m_currentNode, dynamic_cast<Mdiv *>(object));
+    }
+    else if (object->Is(PAGES)) {
+        if (!m_scoreBasedMEI) {
+            m_currentNode = m_currentNode.append_child("pages");
+        }
+        else {
+            m_currentNode = m_currentNode.append_child("score");
+        }
+        WritePages(m_currentNode, dynamic_cast<Pages *>(object));
+    }
+    else if (object->Is(SCORE)) {
+        m_currentNode = m_currentNode.append_child("score");
+        WriteScore(m_currentNode, dynamic_cast<Score *>(object));
+    }
+
+    // Page and content
+    else if (object->Is(PAGE)) {
         if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("page");
             WritePage(m_currentNode, dynamic_cast<Page *>(object));
+        }
+        else {
+            return true;
         }
     }
     else if (object->Is(SYSTEM)) {
         if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("system");
             WriteSystem(m_currentNode, dynamic_cast<System *>(object));
+        }
+        else {
+            return true;
         }
     }
 
@@ -438,11 +464,7 @@ bool MeiOutput::WriteObject(Object *object)
     }
     else if (object->Is(NEUME)) {
         m_currentNode = m_currentNode.append_child("neume");
-        WriteMeiNeume(m_currentNode, dynamic_cast<Neume *>(object));
-    }
-    else if (object->Is(NEUME)) {
-        m_currentNode = m_currentNode.append_child("neume");
-        WriteMeiNeume(m_currentNode, dynamic_cast<Neume *>(object));
+        WriteNeume(m_currentNode, dynamic_cast<Neume *>(object));
     }
     else if (object->Is(NOTE)) {
         m_currentNode = m_currentNode.append_child("note");
@@ -586,8 +608,10 @@ bool MeiOutput::WriteObject(Object *object)
 
     // BoundaryEnd - nothing to add - only
     else if (object->Is(BOUNDARY_END)) {
-        if (m_scoreBasedMEI)
+        if (m_scoreBasedMEI) {
+            // LogDebug("No piling '%s'", object->GetClassName().c_str());
             return true;
+        }
         else {
             m_currentNode = m_currentNode.append_child("boundaryEnd");
             WriteBoundaryEnd(m_currentNode, dynamic_cast<BoundaryEnd *>(object));
@@ -603,15 +627,22 @@ bool MeiOutput::WriteObject(Object *object)
     // Object representing an attribute have no node to push
     if (!object->IsAttribute()) m_nodeStack.push_back(m_currentNode);
 
+    if (object->Is(PAGES) && (dynamic_cast<Pages *>(object) == m_doc->GetPages())) {
+        // First save the main scoreDef
+        m_doc->m_scoreDef.Save(this);
+    }
+    else if (object->Is(SCORE) && (dynamic_cast<Score *>(object) == m_doc->GetScore())) {
+        // First save the main scoreDef
+        m_doc->m_scoreDef.Save(this);
+    }
+
     return true;
 }
 
 bool MeiOutput::WriteObjectEnd(Object *object)
 {
     if (m_scoreBasedMEI && object->IsBoundaryElement()) {
-        BoundaryStartInterface *interface = dynamic_cast<BoundaryStartInterface *>(object);
-        assert(interface);
-        if (interface->IsBoundary()) return true;
+        return true;
     }
     // Object representing an attribute have no node to pop
     else if (object->IsAttribute()) {
@@ -676,9 +707,10 @@ bool MeiOutput::WriteDoc(Doc *doc)
     // ---- music ----
 
     pugi::xml_node music = m_mei.append_child("music");
-    pugi::xml_node body = music.append_child("body");
-    pugi::xml_node mdiv = body.append_child("mdiv");
+    m_currentNode = music.append_child("body");
+    m_nodeStack.push_back(m_currentNode);
 
+    /*
     if (m_scoreBasedMEI) {
         m_currentNode = mdiv.append_child("score");
         m_nodeStack.push_back(m_currentNode);
@@ -691,8 +723,38 @@ bool MeiOutput::WriteDoc(Doc *doc)
         m_currentNode.append_attribute("type") = DocTypeToStr(m_doc->GetType()).c_str();
         m_currentNode.append_child(pugi::node_comment).set_value("Coordinates in MEI axis direction");
     }
+     */
 
     return true;
+}
+
+void MeiOutput::WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv)
+{
+    assert(mdiv);
+
+    mdiv->WriteLabelled(currentNode);
+    mdiv->WriteNNumberLike(currentNode);
+}
+
+void MeiOutput::WritePages(pugi::xml_node currentNode, Pages *pages)
+{
+    assert(pages);
+
+    if (!m_scoreBasedMEI) {
+        m_currentNode.append_attribute("type") = DocTypeToStr(m_doc->GetType()).c_str();
+        m_currentNode.append_child(pugi::node_comment).set_value("Coordinates in MEI axis direction");
+    }
+
+    pages->WriteLabelled(currentNode);
+    pages->WriteNNumberLike(currentNode);
+}
+
+void MeiOutput::WriteScore(pugi::xml_node currentNode, Score *score)
+{
+    assert(score);
+
+    score->WriteLabelled(currentNode);
+    score->WriteNNumberLike(currentNode);
 }
 
 void MeiOutput::WritePage(pugi::xml_node currentNode, Page *page)
@@ -1271,31 +1333,14 @@ void MeiOutput::WriteLigature(pugi::xml_node currentNode, Ligature *ligature)
     ligature->WriteLigatureLog(currentNode);
 }
 
-void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
-{
-    assert(neume);
-
-    WriteLayerElement(currentNode, neume);
-    WriteDurationInterface(currentNode, neume);
-    WritePitchInterface(currentNode, neume);
-    WritePositionInterface(currentNode, neume);
-    neume->WriteColor(currentNode);;
-}
-
 void MeiOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
 {
     assert(mensur);
 
     WriteLayerElement(currentNode, mensur);
     mensur->WriteColor(currentNode);
-<<<<<<< HEAD
-<<<<<<< 4ea2fd75090a20eacc5a30ea79d48f8c915c5200
     mensur->WriteCue(currentNode);
     mensur->WriteDurationRatio(currentNode);
-=======
->>>>>>> Final cleanup
-=======
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
     mensur->WriteMensuralShared(currentNode);
     mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
@@ -1353,6 +1398,17 @@ void MeiOutput::WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt)
     multiRpt->WriteNumbered(currentNode);
 }
 
+void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
+{
+    assert(neume);
+
+    WriteLayerElement(currentNode, neume);
+    WriteDurationInterface(currentNode, neume);
+    WritePitchInterface(currentNode, neume);
+    WritePositionInterface(currentNode, neume);
+    neume->WriteColor(currentNode);;
+}
+
 void MeiOutput::WriteNote(pugi::xml_node currentNode, Note *note)
 {
     assert(note);
@@ -1372,23 +1428,8 @@ void MeiOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     note->WriteVisibility(currentNode);
 }
 
-<<<<<<< HEAD
-void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
-=======
-void MeiOutput::WriteMeiNeume(pugi::xml_node currentNode, Neume *neume)
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
-{
-    assert(neume);
 
-    WriteLayerElement(currentNode, neume);
-    neume->WriteColor(currentNode);;
-}
-
-<<<<<<< HEAD
 void MeiOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
-=======
-void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 {
     assert(rest);
 
@@ -1447,11 +1488,7 @@ void MeiOutput::WriteSyl(pugi::xml_node currentNode, Syl *syl)
     syl->WriteSylLog(currentNode);
 }
 
-<<<<<<< HEAD
 void MeiOutput::WriteSyllable(pugi::xml_node currentNode, Syllable *syllable)
-=======
-void MeiOutput::WriteMeiSyllable(pugi::xml_node currentNode, Syllable *syllable)
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 {
     assert(syllable);
 
@@ -1850,6 +1887,7 @@ MeiInput::~MeiInput() {}
 bool MeiInput::ImportFile()
 {
     try {
+        m_doc->Reset();
         m_doc->SetType(Raw);
         pugi::xml_document doc;
         pugi::xml_parse_result result = doc.load_file(m_filename.c_str(), pugi::parse_default & ~pugi::parse_eol);
@@ -1868,6 +1906,7 @@ bool MeiInput::ImportFile()
 bool MeiInput::ImportString(std::string const &mei)
 {
     try {
+        m_doc->Reset();
         m_doc->SetType(Raw);
         pugi::xml_document doc;
         doc.load(mei.c_str(), pugi::parse_default & ~pugi::parse_eol);
@@ -2102,6 +2141,22 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
+    // filter for rest
+    else if (filterParent->Is(REST)) {
+        return false;
+    }
+    // filter for syl
+    else if (filterParent->Is(SYL)) {
+        if (element == "") {
+            return true;
+        }
+        else if (element == "rend") {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     // filter for tuplet
     else if (filterParent->Is(TUPLET)) {
         if (element == "beam") {
@@ -2138,18 +2193,6 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
             return false;
         }
     }
-    // filter for syl
-    else if (filterParent->Is(SYL)) {
-        if (element == "") {
-            return true;
-        }
-        else if (element == "rend") {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
     else {
         LogDebug("Unknown filter for '%s'", filterParent->GetClassName().c_str());
         return true;
@@ -2162,7 +2205,16 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     bool success = true;
     m_readingScoreBased = false;
 
-    if (!root.empty() && (current = root.child("meiHead"))) {
+    if (root.empty()) {
+        LogError("The tree of the MEI data cannot be parsed (no root found)");
+        return false;
+    }
+
+    current = root.child("meiHead");
+    if (current.empty()) {
+        LogWarning("No header found in the MEI data, trying to proceed...");
+    }
+    else {
         m_doc->m_header.reset();
         // copy the complete header into the master document
         m_doc->m_header.append_copy(current);
@@ -2176,55 +2228,162 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
                 m_version = MEI_2013;
         }
     }
+
     // music
     pugi::xml_node music;
     pugi::xml_node body;
-    pugi::xml_node mdiv;
     pugi::xml_node pages;
-    if (!root.empty()) {
-        if (std::string(root.name()) == "music")
-            music = root;
-        else
-            music = root.child("music");
+
+    if (std::string(root.name()) == "music") {
+        music = root;
     }
-    if (!music.empty()) {
-        body = music.child("body");
+    else {
+        music = root.child("music");
     }
-    if (!body.empty()) {
-        if (!m_mdivXPathQuery.empty()) {
-            pugi::xpath_node selection = body.select_single_node(m_mdivXPathQuery.c_str());
-            if (selection)
-                mdiv = selection.node();
-            else {
-                LogError("the <mdiv> requested with the xpath query '%s' could not be found", m_mdivXPathQuery.c_str());
-                return false;
+    if (music.empty()) {
+        LogError("No <music> element found in the MEI data");
+        return false;
+    }
+
+    body = music.child("body");
+    if (body.empty()) {
+        LogError("No <body> element found in the MEI data");
+        return false;
+    }
+
+    // Select the first mdiv by default
+    m_selectedMdiv = body.child("mdiv");
+    if (m_selectedMdiv.empty()) {
+        LogError("No <mdiv> element found in the MEI data");
+        return false;
+    }
+
+    std::string xPathQuery = m_doc->GetOptions()->m_mdivXPathQuery.GetValue();
+    if (!xPathQuery.empty()) {
+        pugi::xpath_node selection = body.select_single_node(xPathQuery.c_str());
+        if (selection) {
+            m_selectedMdiv = selection.node();
+        }
+        else {
+            LogError("The <mdiv> requested with the xpath query '%s' could not be found", xPathQuery.c_str());
+            return false;
+        }
+    }
+    else {
+        // Try to select the mdiv above the first score (if any) - if not, we have pages or something is wrong
+        pugi::xpath_node scoreMdiv = body.select_node(".//mdiv[count(score)>0]");
+        if (scoreMdiv) {
+            m_selectedMdiv = scoreMdiv.node();
+        }
+    }
+
+    if (m_selectedMdiv.select_nodes(".//score").size() > 1) {
+        LogError("An <mdiv> with only one <score> descendant must be selected");
+        return false;
+    }
+
+    if (m_selectedMdiv.select_nodes(".//pages").size() > 1) {
+        LogError("An <mdiv> with only one <pages> descendant must be selected");
+        return false;
+    }
+
+    if ((m_selectedMdiv.select_nodes(".//score").size() > 0) && (m_selectedMdiv.select_nodes(".//pages").size() > 0)) {
+        LogError("An <mdiv> with only one <pages> or one <score> descendant must be selected");
+        return false;
+    }
+
+    success = ReadMdivChildren(m_doc, body, false);
+
+    if (success && m_readingScoreBased) {
+        m_doc->ConvertToPageBasedDoc();
+        m_doc->ConvertAnalyticalMarkupDoc();
+    }
+
+    if (success && !m_hasScoreDef) {
+        LogWarning("No scoreDef provided, trying to generate one...");
+        success = m_doc->GenerateDocumentScoreDef();
+    }
+
+    return success;
+}
+
+bool MeiInput::ReadMdiv(Object *parent, pugi::xml_node mdiv, bool isVisible)
+{
+    Mdiv *vrvMdiv = new Mdiv();
+    SetMeiUuid(mdiv, vrvMdiv);
+
+    vrvMdiv->ReadLabelled(mdiv);
+    vrvMdiv->ReadNNumberLike(mdiv);
+
+    parent->AddChild(vrvMdiv);
+
+    if (isVisible) {
+        vrvMdiv->MakeVisible();
+    }
+
+    return ReadMdivChildren(vrvMdiv, mdiv, isVisible);
+}
+
+bool MeiInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool isVisible)
+{
+    assert(dynamic_cast<Doc *>(parent) || dynamic_cast<Mdiv *>(parent));
+
+    pugi::xml_node current;
+    bool success = true;
+    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        // We make the mdiv visible if already set or if matching the desired selection
+        bool makeVisible = (isVisible || (m_selectedMdiv == current));
+        if (!success) break;
+        if (std::string(current.name()) == "mdiv") {
+            success = ReadMdiv(parent, current, makeVisible);
+        }
+        else if (std::string(current.name()) == "pages") {
+            success = ReadPages(parent, current);
+            if (parentNode.last_child() != current) {
+                LogWarning("Skipping nodes after <pages> element");
             }
+            break;
         }
-        else
-            mdiv = body.child("mdiv");
-    }
-
-    if (!mdiv.empty()) {
-        pages = mdiv.child("pages");
-    }
-    if (!pages.empty()) {
-
-        // check if there is a type attribute for the score
-        DocType type;
-        if (pages.attribute("type")) {
-            type = StrToDocType(pages.attribute("type").value());
-            m_doc->SetType(type);
-        }
-
-        // this is a page-based MEI file, we just loop trough the pages
-        if (pages.child("page")) {
-            // because we are in a page-based MEI
-            this->m_hasLayoutInformation = true;
-            for (current = pages.child("page"); current; current = current.next_sibling("page")) {
-                if (!success) break;
-                success = ReadPage(current);
+        else if (std::string(current.name()) == "score") {
+            success = ReadScore(parent, current);
+            if (parentNode.last_child() != current) {
+                LogWarning("Skipping nodes after <score> element");
             }
+            break;
         }
+        else {
+            LogWarning("Unsupported '<%s>' within <choice>", current.name());
+        }
+    }
+
+    return success;
+}
+
+bool MeiInput::ReadPages(Object *parent, pugi::xml_node pages)
+{
+    Pages *vrvPages = new Pages();
+    SetMeiUuid(pages, vrvPages);
+
+    vrvPages->ReadLabelled(pages);
+    vrvPages->ReadNNumberLike(pages);
+
+    parent->AddChild(vrvPages);
+
+    // check if there is a type attribute for the score
+    DocType type;
+    if (pages.attribute("type")) {
+        type = StrToDocType(pages.attribute("type").value());
+        m_doc->SetType(type);
+    }
+
+    // This is a page-based MEI file
+    this->m_hasLayoutInformation = true;
+
+    bool success = true;
+    // We require to have s <scoreDef> as first child of <score>
+    pugi::xml_node scoreDef = pages.first_child();
+    if (!scoreDef || (std::string(scoreDef.name()) != "scoreDef")) {
+        LogWarning("No <scoreDef> provided, trying to proceed... ");
     }
     else {
         DocType type;
@@ -2240,17 +2399,62 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
             if (!success) break;
             success = ReadScoreBasedMei(current, score);
         }
-        if (success) {
-            m_doc->ConvertToPageBasedDoc();
-            m_doc->ConvertAnalyticalMarkupDoc();
+        else if (std::string(current.name()) == "scoreDef") {
+            // Skipping scoreDefs, only the first one is possible
+            continue;
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <pages>", current.name());
         }
     }
 
-    if (success && !m_hasScoreDef) {
-        LogMessage("No scoreDef provided, trying to generate one...");
-        success = m_doc->GenerateDocumentScoreDef();
+    return success;
+}
+
+bool MeiInput::ReadScore(Object *parent, pugi::xml_node score)
+{
+    Score *vrvScore = new Score();
+    SetMeiUuid(score, vrvScore);
+
+    vrvScore->ReadLabelled(score);
+    vrvScore->ReadNNumberLike(score);
+
+    parent->AddChild(vrvScore);
+
+    // This is a score-based MEI file
+    this->m_readingScoreBased = true;
+
+    // We require to have s <scoreDef> as first child of <score>
+    pugi::xml_node scoreDef = score.first_child();
+    if (!scoreDef || (std::string(scoreDef.name()) != "scoreDef")) {
+        LogError("A <scoreDef> is required as first child of <score>");
+        return false;
     }
 
+    // This actually sets the Doc::m_scoreDef
+    bool success = ReadScoreDef(vrvScore, scoreDef);
+
+    if (!success) return false;
+
+    pugi::xml_node current;
+    for (current = scoreDef.next_sibling(); current; current = current.next_sibling()) {
+        if (!success) break;
+        std::string elementName = std::string(current.name());
+        // editorial
+        if (IsEditorialElementName(current.name())) {
+            success = ReadEditorialElement(vrvScore, current, EDITORIAL_TOPLEVEL);
+        }
+        // content
+        else if (elementName == "ending") {
+            success = ReadEnding(vrvScore, current);
+        }
+        else if (elementName == "section") {
+            success = ReadSection(vrvScore, current);
+        }
+        else {
+            LogWarning("Element <%s> within <score> is not supported and will be ignored ", elementName.c_str());
+        }
+    }
     return success;
 }
 
@@ -2392,7 +2596,7 @@ bool MeiInput::ReadSb(Object *parent, pugi::xml_node sb)
     return true;
 }
 
-bool MeiInput::ReadPage(pugi::xml_node page)
+bool MeiInput::ReadPage(Object *parent, pugi::xml_node page)
 {
     Page *vrvPage = new Page();
     SetMeiUuid(page, vrvPage);
@@ -2426,7 +2630,7 @@ bool MeiInput::ReadPage(pugi::xml_node page)
         // vrvPage->m_PPUFactor = 12.5; //atof(page.attribute("ppu").value());
     }
 
-    m_doc->AddChild(vrvPage);
+    parent->AddChild(vrvPage);
     bool success = ReadPageChildren(vrvPage, page);
 
     if (success && (m_doc->GetType() == Transcription) && (vrvPage->GetPPUFactor() != 1.0)) {
@@ -2488,12 +2692,7 @@ bool MeiInput::ReadSystem(Object *parent, pugi::xml_node system)
         vrvSystem->m_yAbs = atoi(system.attribute("uly").value()) * DEFINITION_FACTOR;
     }
 
-    // This could be moved to an AddSystem method for consistency with AddLayerElement
-    if (parent->Is(PAGE)) {
-        Page *page = dynamic_cast<Page *>(parent);
-        assert(page);
-        page->AddChild(vrvSystem);
-    }
+    parent->AddChild(vrvSystem);
     return ReadSystemChildren(vrvSystem, system);
 }
 
@@ -2583,8 +2782,10 @@ bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
 
 bool MeiInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
 {
-    assert(dynamic_cast<Score *>(parent) || dynamic_cast<Section *>(parent) || dynamic_cast<System *>(parent)
+    assert(dynamic_cast<Pages *>(parent) || dynamic_cast<Score *>(parent) || dynamic_cast<Section *>(parent)
+        || dynamic_cast<System *>(parent) || dynamic_cast<Ending *>(parent)
         || dynamic_cast<EditorialElement *>(parent));
+    // assert(dynamic_cast<Pages *>(parent));
 
     ScoreDef *vrvScoreDef;
     if (!m_hasScoreDef) {
@@ -3280,11 +3481,7 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
             break;
         }
         elementName = std::string(xmlElement.name());
-<<<<<<< HEAD
         // LogDebug("ReadLayerChildren: element <%s>", xmlElement.name());
-=======
-//         LogDebug("ReadMeiLayerChildren: element <%s>", xmlElement.name());
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
         if (!IsAllowed(elementName, filter)) {
             std::string meiElementName = filter->GetClassName();
             std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
@@ -3704,11 +3901,7 @@ bool MeiInput::ReadMultiRpt(Object *parent, pugi::xml_node multiRpt)
     return true;
 }
 
-<<<<<<< HEAD
 bool MeiInput::ReadNc(Object *parent, pugi::xml_node nc)
-=======
-bool MeiInput::ReadMeiNc(Object *parent, pugi::xml_node nc)
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 {
     Nc *vrvNc = new Nc();
     ReadLayerElement(nc, vrvNc);
@@ -3719,19 +3912,10 @@ bool MeiInput::ReadMeiNc(Object *parent, pugi::xml_node nc)
     vrvNc->ReadColor(nc);
 
     parent->AddChild(vrvNc);
-<<<<<<< HEAD
     return ReadLayerChildren(vrvNc, nc, vrvNc);
 }
 
-<<<<<<< 72f231ffc0e1cba7ce5bd9df11eff6db5cf050f2
-bool MeiInput::ReadNote(Object *parent, pugi::xml_node note)
-=======
-=======
-    return ReadMeiLayerChildren(vrvNc, nc, vrvNc);
-}
-
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
-bool MeiInput::ReadMeiNeume(Object *parent, pugi::xml_node neume)
+bool MeiInput::ReadNeume(Object *parent, pugi::xml_node neume)
 {
     Neume *vrvNeume = new Neume();
     ReadLayerElement(neume, vrvNeume);
@@ -3739,11 +3923,10 @@ bool MeiInput::ReadMeiNeume(Object *parent, pugi::xml_node neume)
     vrvNeume->ReadColor(neume);
 
     parent->AddChild(vrvNeume);
-    return ReadMeiLayerChildren(vrvNeume, neume, vrvNeume);
+    return ReadLayerChildren(vrvNeume, neume, vrvNeume);
 }
 
-bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
->>>>>>> Alphabetical + Author
+bool MeiInput::ReadNote(Object *parent, pugi::xml_node note)
 {
     Note *vrvNote = new Note();
     ReadLayerElement(note, vrvNote);
@@ -3802,7 +3985,7 @@ bool MeiInput::ReadRest(Object *parent, pugi::xml_node rest)
     vrvRest->ReadRestVisMensural(rest);
 
     parent->AddChild(vrvRest);
-    return true;
+    return ReadLayerChildren(vrvRest, rest, vrvRest);
 }
 
 bool MeiInput::ReadProport(Object *parent, pugi::xml_node proport)
@@ -3840,11 +4023,7 @@ bool MeiInput::ReadSyl(Object *parent, pugi::xml_node syl)
     return ReadTextChildren(vrvSyl, syl, vrvSyl);
 }
 
-<<<<<<< HEAD
 bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
-=======
-bool MeiInput::ReadMeiSyllable(Object *parent, pugi::xml_node syllable)
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 {
     Syllable *vrvSyllable = new Syllable();
     ReadLayerElement(syllable, vrvSyllable);
@@ -3855,17 +4034,10 @@ bool MeiInput::ReadMeiSyllable(Object *parent, pugi::xml_node syllable)
 
     parent->AddChild(vrvSyllable);
 
-<<<<<<< HEAD
     return ReadLayerChildren(vrvSyllable, syllable, vrvSyllable);
 }
 
 bool MeiInput::ReadTuplet(Object *parent, pugi::xml_node tuplet)
-=======
-    return ReadMeiLayerChildren(vrvSyllable, syllable, vrvSyllable);
-}
-
-bool MeiInput::ReadMeiTuplet(Object *parent, pugi::xml_node tuplet)
->>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 {
     Tuplet *vrvTuplet = new Tuplet();
     ReadLayerElement(tuplet, vrvTuplet);
@@ -4267,10 +4439,11 @@ bool MeiInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
 
     // Check if one child node matches the m_appXPathQuery
     pugi::xml_node selectedLemOrRdg;
-    if (m_appXPathQueries.size() > 0) {
-        auto i = std::find_if(m_appXPathQueries.begin(), m_appXPathQueries.end(),
+    std::vector<std::string> xPathQueries = m_doc->GetOptions()->m_appXPathQuery.GetValue();
+    if (xPathQueries.size() > 0) {
+        auto i = std::find_if(xPathQueries.begin(), xPathQueries.end(),
             [parentNode](std::string &query) { return (parentNode.select_single_node(query.c_str())); });
-        if (i != m_appXPathQueries.end()) selectedLemOrRdg = parentNode.select_single_node(i->c_str()).node();
+        if (i != xPathQueries.end()) selectedLemOrRdg = parentNode.select_single_node(i->c_str()).node();
     }
 
     bool success = true;
@@ -4331,10 +4504,13 @@ bool MeiInput::ReadChoiceChildren(Object *parent, pugi::xml_node parentNode, Edi
 
     // Check if one child node matches a value in m_choiceXPathQueries
     pugi::xml_node selectedChild;
-    if (m_choiceXPathQueries.size() > 0) {
-        auto i = std::find_if(m_choiceXPathQueries.begin(), m_choiceXPathQueries.end(),
+    std::vector<std::string> xPathQueries = m_doc->GetOptions()->m_choiceXPathQuery.GetValue();
+    if (xPathQueries.size() > 0) {
+        auto i = std::find_if(xPathQueries.begin(), xPathQueries.end(),
             [parentNode](std::string &query) { return (parentNode.select_single_node(query.c_str())); });
-        if (i != m_choiceXPathQueries.end()) selectedChild = parentNode.select_single_node(i->c_str()).node();
+        if (i != xPathQueries.end()) {
+            selectedChild = parentNode.select_single_node(i->c_str()).node();
+        }
     }
 
     bool success = true;
@@ -4573,53 +4749,6 @@ bool MeiInput::ReadEditorialChildren(Object *parent, pugi::xml_node parentNode, 
     else {
         return false;
     }
-}
-
-bool MeiInput::ReadScoreBasedMei(pugi::xml_node element, Score *parent)
-{
-    bool success = true;
-    // nested mdiv
-    if (std::string(element.name()) == "mdiv") {
-        if (!element.first_child()) {
-            LogError("No <mdiv> child found");
-            return false;
-        }
-        success = ReadScoreBasedMei(element.first_child(), parent);
-    }
-    else if (std::string(element.name()) == "score") {
-        pugi::xml_node scoreDef = element.first_child();
-        if (!scoreDef || (std::string(scoreDef.name()) != "scoreDef")) {
-            LogError("A <scoreDef> is required as first child of <score>");
-            return false;
-        }
-        // This actually sets the Doc::m_scoreDef
-        success = ReadScoreDef(parent, scoreDef);
-        if (!success) return false;
-        pugi::xml_node current;
-        for (current = scoreDef.next_sibling(); current; current = current.next_sibling()) {
-            if (!success) break;
-            std::string elementName = std::string(current.name());
-
-            // editorial
-            if (IsEditorialElementName(current.name())) {
-                success = ReadEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
-            }
-            // content
-            else if (elementName == "section") {
-                success = ReadSection(parent, current);
-            }
-            else if (elementName == "ending") {
-                success = ReadEnding(parent, current);
-            }
-            else {
-                LogWarning("Element <%s> within <score> is not supported and will be ignored ", elementName.c_str());
-            }
-        }
-    }
-    else {
-        LogWarning("Elements <%s> ignored", element.name());
-    }
-    return success;
 }
 
 bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan)
