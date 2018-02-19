@@ -18,7 +18,7 @@ next_id: topic10
 ////////////////////////////////////////////
 function play_midi() {
     if (isPlaying == false) {
-        var base64midi = vrvToolkit.renderToMidi();
+        var base64midi = vrvToolkit.renderToMIDI();
         var song = 'data:audio/midi;base64,' + base64midi;
         $("#player").show();
         $("#player").midiPlayer.play(song);

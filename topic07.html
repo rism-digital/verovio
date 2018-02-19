@@ -76,12 +76,12 @@ function choose(choice, child) {
     /* Keep track of the selected child for each choice */
     //////////////////////////////////////////////////////
     choices[choice] = child;
-    choiceXPathQueries = [];
+    choiceXPathQuery = [];
     //////////////////////////////////////
     /* Make each of them an xpath query */
     //////////////////////////////////////
     for (key in choices) {
-        choiceXPathQueries.push("./*[@xml:id='" + choices[key] + "']")
+        choiceXPathQuery.push("./*[@xml:id='" + choices[key] + "']")
     }
     choiceId = choice;
     loadFile();
