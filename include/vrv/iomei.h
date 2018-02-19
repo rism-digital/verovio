@@ -629,21 +629,6 @@ private:
     MEIVersion m_version;
 
     /**
-     * A vector for storing xpath queries for selecting <app> children
-     */
-    std::vector<std::string> m_appXPathQueries;
-
-    /**
-     * A vector the storing xpath queries for selecting <choice> children
-     */
-    std::vector<std::string> m_choiceXPathQueries;
-
-    /**
-     * A string for storing the xpath query for selecting a <mdiv>
-     */
-    std::string m_mdivXPathQuery;
-
-    /**
      * A flag indicating wheather we are reading page-based or score-based MEI
      */
     bool m_readingScoreBased;

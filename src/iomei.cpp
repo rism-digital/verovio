@@ -2216,13 +2216,14 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         return false;
     }
 
-    if (!m_mdivXPathQuery.empty()) {
-        pugi::xpath_node selection = body.select_single_node(m_mdivXPathQuery.c_str());
+    std::string xPathQuery = m_doc->GetOptions()->m_mdivXPathQuery.GetValue();
+    if (!xPathQuery.empty()) {
+        pugi::xpath_node selection = body.select_single_node(xPathQuery.c_str());
         if (selection) {
             m_selectedMdiv = selection.node();
         }
         else {
-            LogError("The <mdiv> requested with the xpath query '%s' could not be found", m_mdivXPathQuery.c_str());
+            LogError("The <mdiv> requested with the xpath query '%s' could not be found", xPathQuery.c_str());
             return false;
         }
     }
@@ -2257,7 +2258,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     }
 
     if (success && !m_hasScoreDef) {
-        LogMessage("No scoreDef provided, trying to generate one...");
+        LogWarning("No scoreDef provided, trying to generate one...");
         success = m_doc->GenerateDocumentScoreDef();
     }
 
@@ -2740,7 +2741,6 @@ bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *obje
 
 bool MeiInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
 {
-    LogMessage("%s", parent->GetClassName().c_str());
     assert(dynamic_cast<Pages *>(parent) || dynamic_cast<Score *>(parent) || dynamic_cast<Section *>(parent)
         || dynamic_cast<System *>(parent) || dynamic_cast<Ending *>(parent)
         || dynamic_cast<EditorialElement *>(parent));
@@ -4326,10 +4326,11 @@ bool MeiInput::ReadAppChildren(Object *parent, pugi::xml_node parentNode, Editor
 
     // Check if one child node matches the m_appXPathQuery
     pugi::xml_node selectedLemOrRdg;
-    if (m_appXPathQueries.size() > 0) {
-        auto i = std::find_if(m_appXPathQueries.begin(), m_appXPathQueries.end(),
+    std::vector<std::string> xPathQueries = m_doc->GetOptions()->m_appXPathQuery.GetValue();
+    if (xPathQueries.size() > 0) {
+        auto i = std::find_if(xPathQueries.begin(), xPathQueries.end(),
             [parentNode](std::string &query) { return (parentNode.select_single_node(query.c_str())); });
-        if (i != m_appXPathQueries.end()) selectedLemOrRdg = parentNode.select_single_node(i->c_str()).node();
+        if (i != xPathQueries.end()) selectedLemOrRdg = parentNode.select_single_node(i->c_str()).node();
     }
 
     bool success = true;
@@ -4390,10 +4391,13 @@ bool MeiInput::ReadChoiceChildren(Object *parent, pugi::xml_node parentNode, Edi
 
     // Check if one child node matches a value in m_choiceXPathQueries
     pugi::xml_node selectedChild;
-    if (m_choiceXPathQueries.size() > 0) {
-        auto i = std::find_if(m_choiceXPathQueries.begin(), m_choiceXPathQueries.end(),
+    std::vector<std::string> xPathQueries = m_doc->GetOptions()->m_choiceXPathQuery.GetValue();
+    if (xPathQueries.size() > 0) {
+        auto i = std::find_if(xPathQueries.begin(), xPathQueries.end(),
             [parentNode](std::string &query) { return (parentNode.select_single_node(query.c_str())); });
-        if (i != m_choiceXPathQueries.end()) selectedChild = parentNode.select_single_node(i->c_str()).node();
+        if (i != xPathQueries.end()) {
+            selectedChild = parentNode.select_single_node(i->c_str()).node();
+        }
     }
 
     bool success = true;
