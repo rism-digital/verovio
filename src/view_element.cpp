@@ -38,7 +38,11 @@
 #include "multirest.h"
 #include "neume.h"
 #include "note.h"
+<<<<<<< HEAD
 #include "options.h"
+=======
+#include "neume.h"
+>>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 #include "proport.h"
 #include "rest.h"
 #include "rpt.h"

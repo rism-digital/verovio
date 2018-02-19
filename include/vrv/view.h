@@ -42,7 +42,11 @@ class Measure;
 class Mordent;
 class Nc;
 class Neume;
+<<<<<<< HEAD
 class Num;
+=======
+class ControlElement;
+>>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 class Octave;
 class Page;
 class Pedal;

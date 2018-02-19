@@ -36,7 +36,11 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
+<<<<<<< HEAD
 Staff::Staff(int n) : Object("staff-"), AttNInteger(), AttTyped(), AttVisibility()
+=======
+Staff::Staff(int n) : Object("staff-"), AttCommon(), AttTyped(), AttVisibility()
+>>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 {
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);

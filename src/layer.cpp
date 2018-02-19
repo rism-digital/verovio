@@ -39,7 +39,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Layer::Layer(int n)
+<<<<<<< HEAD
     : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttNInteger(), AttTyped(), AttVisibility()
+=======
+    : Object("layer-"), DrawingListInterface(), ObjectListInterface(), AttCommon(), AttTyped(), AttVisibility()
+>>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
 {
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);
@@ -484,8 +488,16 @@ int Layer::PrepareRpt(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+<<<<<<< HEAD
 int Layer::CalcStem(FunctorParams *)
 {
+=======
+int Layer::CalcStem(FunctorParams *functorParams)
+{
+    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
+    assert(params);
+
+>>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
     // setting the layer stem direction
     if (this->GetParent()->GetChildCount(LAYER) > 1) {
         if (this->GetParent()->FindChildByType(LAYER) == this) {

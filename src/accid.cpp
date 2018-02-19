@@ -98,7 +98,11 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
     if (!this->VerticalSelfOverlap(element, verticalMargin)) return false;
 
     // Look for identical accidentals that needs to remain superimposed
+<<<<<<< HEAD
     if (element->Is(ACCID) && (this->GetDrawingY() == element->GetDrawingY())) {
+=======
+    if (element->Is(ACCID) && (this->GetDrawingX() == element->GetDrawingX())) {
+>>>>>>> a419c72545ba6fde620f65cc891f84b74a9db0c5
         Accid *accid = dynamic_cast<Accid *>(element);
         assert(accid);
         if (this->GetSymbolStr() == accid->GetSymbolStr()) {
