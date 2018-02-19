@@ -1,15 +1,20 @@
 version: 1.0.{build}
+
 branches:
   only:
-  - develop-win32
+  - develop
+
 image: Visual Studio 2015
+
 configuration: Release
+
 platform: x64
+
 before_build:
 - cmd: >-
     cd tools
-
     cmake -DCMAKE_GENERATOR_PLATFORM=x64 .
+
 build:
   project: tools/Verovio.sln
   verbosity: minimal
