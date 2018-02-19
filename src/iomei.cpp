@@ -2197,7 +2197,12 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     pugi::xml_node body;
     pugi::xml_node pages;
 
-    music = (std::string(root.name()) == "music") ? root : music = root.child("music");
+    if (std::string(root.name()) == "music") {
+        music = root;
+    }
+    else {
+        music = root.child("music");
+    }
     if (music.empty()) {
         LogError("No <music> element found in the MEI data");
         return false;
