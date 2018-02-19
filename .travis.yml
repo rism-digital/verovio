@@ -1,0 +1,9 @@
+language: cpp
+before_script:
+  - cd tools
+  - cmake .
+script: 
+  - make
+compiler:
+  - gcc
+  - clang
