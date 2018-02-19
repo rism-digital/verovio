@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+* Adding Travis CI (Linux and OS X)
 * Preservation of the full `<body>` subtree (`<mdiv>`, `<score>`) in the MEI output
 * Allowing multiple JS instances
 * Adding support for `@metcon` on measure
