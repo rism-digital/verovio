@@ -6,5 +6,4 @@ before_script:
 script: 
   - make
 compiler:
-  - gcc
   - clang
