@@ -24,10 +24,13 @@
 #include "harm.h"
 #include "keysig.h"
 #include "layer.h"
+#include "mdiv.h"
 #include "measure.h"
 #include "metersig.h"
 #include "multirest.h"
 #include "note.h"
+#include "pghead.h"
+#include "rend.h"
 #include "rest.h"
 #include "score.h"
 #include "scoredef.h"
@@ -115,9 +118,15 @@ void AbcInput::parseABC(std::istream &infile)
 
     std::vector<abc::Measure> staff;
 
-    // start with minimal MEI
+    m_doc->Reset();
     m_doc->SetType(Raw);
-    Score *score = m_doc->CreateScoreBuffer();
+    // The mdiv
+    Mdiv *mdiv = new Mdiv();
+    mdiv->m_visibility = Visible;
+    m_doc->AddChild(mdiv);
+    // The score
+    Score *score = new Score();
+    mdiv->AddChild(score);
     // the section
     Section *section = new Section();
     score->AddChild(section);
@@ -546,10 +555,27 @@ void AbcInput::parseTempo(std::string tempoString)
     LogWarning("ABC input: tempo definitions are not supported yet");
 }
 
+void AbcInput::parseTitle(std::string title)
+{
+    PgHead *pgHead = new PgHead;
+    Rend *titleRend = new Rend();
+    titleRend->SetHalign(HORIZONTALALIGNMENT_center);
+    titleRend->SetValign(VERTICALALIGNMENT_middle);
+    pgHead->AddChild(titleRend);
+    Text *text = new Text();
+    text->SetText(UTF8to16(title));
+    titleRend->AddChild(text);
+    m_doc->m_scoreDef.AddChild(pgHead);
+    LogWarning("ABC input: title not exported to MEI header");
+}
+
 void AbcInput::parseReferenceNumber(std::string referenceNumberString)
 {
-    // as it is not possible to SetN on mdiv we put it on scoreDef for now
-    m_doc->m_scoreDef.SetType(("X:" + referenceNumberString).c_str());
+    // reference number should be a string
+    int mDivNum = atoi(referenceNumberString.c_str());
+    Mdiv *mdiv = dynamic_cast<Mdiv *>(m_doc->FindChildByType(MDIV));
+    assert(mdiv);
+    mdiv->SetN(std::to_string(mDivNum));
 }
 
 //////////////////////////////
@@ -587,9 +613,10 @@ void AbcInput::readInformationField(char dataKey, std::string value, Score *scor
     else if (dataKey == 'Q') {
         parseTempo(value);
     }
+    else if (dataKey == 'T') {
+        parseTitle(value);
+    }
     else if (dataKey == 'X') {
-        score->SetN(value);
-        // re-adding dataKey for complete string
         parseReferenceNumber(value);
     }
     else

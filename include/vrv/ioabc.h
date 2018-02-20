@@ -260,6 +260,7 @@ private:
     void parseUnitNoteLength(std::string unitNoteLength); // L:
     void parseMeter(std::string meterString); // M:
     void parseTempo(std::string tempoString); // Q:
+    void parseTitle(std::string title); // Q:
     void parseReferenceNumber(std::string referenceNumberString); // X:
 
     // input functions
