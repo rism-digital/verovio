@@ -727,6 +727,7 @@ void MeiOutput::WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv)
 {
     assert(mdiv);
 
+    WriteXmlId(currentNode, mdiv);
     mdiv->WriteLabelled(currentNode);
     mdiv->WriteNNumberLike(currentNode);
 }
