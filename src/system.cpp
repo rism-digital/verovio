@@ -22,6 +22,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "page.h"
+#include "pages.h"
 #include "section.h"
 #include "staff.h"
 #include "vrv.h"
@@ -467,7 +468,8 @@ int System::CastOffPages(FunctorParams *functorParams)
         params->m_currentPage = new Page();
         // Use VRV_UNSET value as a flag
         params->m_pgHeadHeight = VRV_UNSET;
-        params->m_doc->AddChild(params->m_currentPage);
+        assert(params->m_doc->GetPages());
+        params->m_doc->GetPages()->AddChild(params->m_currentPage);
         params->m_shift = this->m_drawingYRel - params->m_pageHeight;
     }
 

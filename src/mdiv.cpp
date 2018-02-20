@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        score.cpp
+// Name:        mdiv.cpp
 // Author:      Laurent Pugin
-// Created:     29/08/2016
+// Created:     2018/02/15
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "score.h"
+#include "mdiv.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,19 +13,17 @@
 
 //----------------------------------------------------------------------------
 
-#include "editorial.h"
-#include "ending.h"
-#include "scoredef.h"
-#include "section.h"
+#include "pages.h"
+#include "score.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Score
+// Mdiv
 //----------------------------------------------------------------------------
 
-Score::Score() : Object("score-"), AttLabelled(), AttNNumberLike()
+Mdiv::Mdiv() : Object("mdiv-"), AttLabelled(), AttNNumberLike()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_NNUMBERLIKE);
@@ -33,28 +31,27 @@ Score::Score() : Object("score-"), AttLabelled(), AttNNumberLike()
     Reset();
 }
 
-Score::~Score() {}
+Mdiv::~Mdiv() {}
 
-void Score::Reset()
+void Mdiv::Reset()
 {
     Object::Reset();
     ResetLabelled();
     ResetNNumberLike();
+
+    m_visibility = Hidden;
 }
 
-void Score::AddChild(Object *child)
+void Mdiv::AddChild(Object *child)
 {
-    if (child->Is(SCOREDEF)) {
-        assert(dynamic_cast<ScoreDef *>(child));
+    if (child->Is(MDIV)) {
+        assert(dynamic_cast<Mdiv *>(child));
     }
-    else if (child->Is(SECTION)) {
-        assert(dynamic_cast<Section *>(child));
+    else if (child->Is(PAGES)) {
+        assert(dynamic_cast<Pages *>(child));
     }
-    else if (child->Is(ENDING)) {
-        assert(dynamic_cast<Ending *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
+    else if (child->Is(SCORE)) {
+        assert(dynamic_cast<Score *>(child));
     }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
@@ -64,6 +61,16 @@ void Score::AddChild(Object *child)
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
+}
+
+void Mdiv::MakeVisible()
+{
+    m_visibility = Visible;
+    if (GetParent() && GetParent()->Is(MDIV)) {
+        Mdiv *parent = dynamic_cast<Mdiv *>(GetParent());
+        assert(parent);
+        parent->MakeVisible();
+    }
 }
 
 //----------------------------------------------------------------------------

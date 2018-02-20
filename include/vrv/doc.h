@@ -19,6 +19,7 @@ namespace vrv {
 class CastOffPagesParams;
 class FontInfo;
 class Glyph;
+class Pages;
 class Page;
 class Score;
 
@@ -86,21 +87,29 @@ public:
     /**
      * Check if the document has a page with the specified value
      */
-    bool HasPage(int pageIdx) const;
+    bool HasPage(int pageIdx);
 
     /**
-     * Create a score buffer for loading or creating a scoreBased MEI document.
-     * Creating a mdiv buffer clear existing data (but not the header).
-     * The score buffer is owned by the Doc.
-     * Once the document is created, Doc::ConvertToPagePagedDoc should be called to convert it before rendering.
+     * Get the Score in the visible Mdiv.
+     * Will find it only when having read a score-based MEI file
      */
-    Score *CreateScoreBuffer();
+    Score *GetScore();
+
+    /**
+     * Get the Pages in the visible Mdiv.
+     * Will find it only when having read a pages-based MEI file,
+     * or when a file was converted to page-based MEI.
+     */
+    Pages *GetPages();
 
     /**
      * Get the total page count
      */
-    int GetPageCount() const;
+    int GetPageCount();
 
+    /**
+     * Return true if the MIDI generation is already done
+     */
     bool GetMidiExportDone() const;
 
     /**
@@ -440,11 +449,6 @@ private:
     int m_pageMarginRight;
     /** Page top margin (MEI scoredef@page.topmar) - currently not saved */
     int m_pageMarginTop;
-
-    /**
-     * A score buffer for loading or creating a scoreBased MEI.
-     */
-    Score *m_scoreBuffer;
 };
 
 } // namespace vrv

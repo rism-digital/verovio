@@ -79,6 +79,18 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
         composerRend->AddChild(composerText);
         this->AddChild(composerRend);
     }
+    
+    // Lyricist
+    node = header.select_single_node("//fileDesc/titleStmt/respStmt/persName[@role=\"lyricist\"]");
+    if (node) {
+        Rend *lyricistRend = new Rend();
+        lyricistRend->SetHalign(HORIZONTALALIGNMENT_left);
+        lyricistRend->SetValign(VERTICALALIGNMENT_bottom);
+        Text *lyricistText = new Text();
+        lyricistText->SetText(UTF8to16(node.node().text().as_string()));
+        lyricistRend->AddChild(lyricistText);
+        this->AddChild(lyricistRend);
+    }
 
     return true;
 }

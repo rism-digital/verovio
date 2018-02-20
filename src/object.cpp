@@ -27,6 +27,7 @@
 #include "io.h"
 #include "keysig.h"
 #include "layer.h"
+#include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -208,6 +209,18 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
             this->m_children.push_back(child);
         }
     }
+}
+
+void Object::ReplaceChild(Object *currentChild, Object *replacingChild)
+{
+    assert(this->GetChildIndex(currentChild) != -1);
+    assert(this->GetChildIndex(replacingChild) == -1);
+
+    int idx = this->GetChildIndex(currentChild);
+    currentChild->ResetParent();
+    m_children.at(idx) = replacingChild;
+    replacingChild->SetParent(this);
+    this->Modify();
 }
 
 void Object::MoveItselfTo(Object *targetParent)
@@ -605,11 +618,20 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
 
     bool processChildren = true;
-    if (functor->m_visibleOnly && this->IsEditorialElement()) {
-        EditorialElement *editorialElement = dynamic_cast<EditorialElement *>(this);
-        assert(editorialElement);
-        if (editorialElement->m_visibility == Hidden) {
-            processChildren = false;
+    if (functor->m_visibleOnly) {
+        if (this->IsEditorialElement()) {
+            EditorialElement *editorialElement = dynamic_cast<EditorialElement *>(this);
+            assert(editorialElement);
+            if (editorialElement->m_visibility == Hidden) {
+                processChildren = false;
+            }
+        }
+        else if (this->Is(MDIV)) {
+            Mdiv *mdiv = dynamic_cast<Mdiv *>(this);
+            assert(mdiv);
+            if (mdiv->m_visibility == Hidden) {
+                processChildren = false;
+            }
         }
     }
 

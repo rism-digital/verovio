@@ -543,7 +543,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
-    //if (m_alignment) LogDebug("Element %s %s", this->GetUuid().c_str(), this->GetClassName().c_str());
+    // if (m_alignment) LogDebug("Element %s %s", this->GetUuid().c_str(), this->GetClassName().c_str());
     assert(!m_alignment);
 
     this->SetScoreDefRole(params->m_scoreDefRole);
@@ -1242,7 +1242,9 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
 
         Chord *chord = note->IsChordTone();
 
-        if (chord) {
+        // If the note has a @dur or a @dur.ges, take it into account
+        // This means that overwriting only @dots or @dots.ges will not be taken into account
+        if (chord && !note->HasDur() && !note->HasDurGes()) {
             incrementScoreTime = chord->GetAlignmentDuration();
         }
         else {

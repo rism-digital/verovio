@@ -807,9 +807,9 @@ bool Toolkit::SetOptions(const std::string &json_options)
             int i;
             for (i = 0; i < (int)values.size(); i++) {
                 if (values.has<jsonxx::String>(i)) strValues.push_back(values.get<jsonxx::String>(i));
+                // LogDebug("String: %s", values.get<jsonxx::String>(i).c_str());
             }
             opt->SetValueArray(strValues);
-            // LogMessage("String: %s", json.get<jsonxx::String>(iter->first).c_str());
         }
         else {
             LogError("Unsupported type for option '%s'", iter->first.c_str());

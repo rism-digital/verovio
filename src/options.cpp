@@ -286,13 +286,18 @@ void OptionArray::Init()
 bool OptionArray::SetValueArray(const std::vector<std::string> &values)
 {
     m_values = values;
+    // m_values.erase(std::remove_if(m_values.begin(), m_values.end(),
+    //                                       [](const std::string &s) { return s.empty(); }),
+    //                        m_values.end());
     return true;
 }
 
 bool OptionArray::SetValue(std::string value)
 {
     // Passing a single value to an array option adds it to the values and to not replace them
-    m_values.push_back(value);
+    if (!value.empty()) {
+        m_values.push_back(value);
+    }
     return true;
 }
 
