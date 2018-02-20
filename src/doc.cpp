@@ -1251,7 +1251,6 @@ FontInfo *Doc::GetDrawingLyricFont(int staffSize)
 
 double Doc::GetLeftMargin(const ClassId classId) const
 {
-    return 0;
     if (classId == ACCID) return m_options->m_leftMarginAccid.GetValue();
     if (classId == BARLINE) return m_options->m_leftMarginBarLine.GetValue();
     if (classId == BARLINE_ATTR_LEFT) return m_options->m_leftMarginLeftBarLine.GetValue();
@@ -1273,7 +1272,6 @@ double Doc::GetLeftMargin(const ClassId classId) const
 
 double Doc::GetRightMargin(const ClassId classId) const
 {
-    return 0;
     if (classId == ACCID) return m_options->m_rightMarginAccid.GetValue();
     if (classId == BARLINE) return m_options->m_rightMarginBarLine.GetValue();
     if (classId == BARLINE_ATTR_LEFT) return m_options->m_rightMarginLeftBarLine.GetValue();
