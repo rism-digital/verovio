@@ -482,6 +482,7 @@ bool Toolkit::LoadData(const std::string &data)
     
     m_doc.PrepareDrawing();
     
+    // Convert pseudo-measures into distinct segments based on barLine elements
     if (m_doc.IsMensuralMusicOnly()) {
         m_doc.ConvertToCastOffMensuralDoc();
     }

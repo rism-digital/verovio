@@ -266,11 +266,12 @@ public:
      * GetFirst returns the first element child of the specified type.
      * Its position and the specified type are stored and used of accessing next elements
      * The methods returns NULL when no child is found or when the end is reached.
-     * Always call GetFirst before calling GetNext
+     * Always call GetFirst before calling GetNext() or call GetNext(child)
      */
     ///@{
     Object *GetFirst(const ClassId classId = UNSPECIFIED);
     Object *GetNext();
+    Object *GetNext(Object *child, const ClassId classId = UNSPECIFIED);
     ///@}
 
     /**
@@ -545,7 +546,7 @@ public:
      */
     ///@{
     virtual int ConvertToCastOffMensural(FunctorParams *functorParams);
-    virtual int ConvertToCastOffMensuralEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertToUnCastOffMensural(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**

@@ -130,10 +130,20 @@ bool MeiOutput::ExportFile()
             m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
             m_mei.append_attribute("meiversion") = "4.0.0";
 
+            // If the document is mensural, we have to undo the mensural (segments) cast off
+            m_doc->ConvertToUnCastOffMensuralDoc();
+            
             // this starts the call of all the functors
             m_doc->Save(this);
+            
+            // Redo the mensural segment cast of if necessary
+            m_doc->ConvertToCastOffMensuralDoc();
         }
         else {
+            if (m_doc->IsMensuralMusicOnly()) {
+                LogError("MEI output by page is not possible for mensural music");
+                return false;
+            }
             if (m_page >= m_doc->GetPageCount()) {
                 LogError("Page %d does not exist", m_page);
                 return false;
@@ -179,7 +189,7 @@ std::string MeiOutput::GetOutput(int page)
     this->ExportFile();
     m_writeToStreamString = false;
     m_page = -1;
-
+    
     return m_streamStringOutput.str();
 }
 

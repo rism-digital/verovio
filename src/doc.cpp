@@ -668,10 +668,15 @@ void Doc::CollectScoreDefs(bool force)
 
 void Doc::CastOffDoc()
 {
-    this->CollectScoreDefs();
-
     Pages *pages = this->GetPages();
     assert(pages);
+    
+    if (pages->GetChildCount() != 1) {
+        LogDebug("Document is already cast off");
+        return;
+    }
+    
+    this->CollectScoreDefs();
 
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
@@ -853,7 +858,15 @@ void Doc::ConvertToCastOffMensuralDoc()
 {
     if (!m_isMensuralMusicOnly) return;
     
+    // We are converting to measure music in a definitiv way
+    if (this->GetOptions()->m_mensuralToMeasure.GetValue()) {
+        m_isMensuralMusicOnly = false;
+    }
+    
     this->CollectScoreDefs();
+
+    Pages *pages = this->GetPages();
+    assert(pages);
     
     // We need to populate processing lists for processing the document by Layer
     PrepareProcessingListsParams prepareProcessingListsParams;
@@ -872,20 +885,55 @@ void Doc::ConvertToCastOffMensuralDoc()
     contentPage->LayOutHorizontally();
     
     Page *page = new Page();
-    this->AddChild(page);
+    pages->AddChild(page);
     System *system = new System();
     page->AddChild(system);
-    // Create the first measure segment - problem: we are dropping the section element - we should create a score-based MEI file instead
-    Measure *measure = new Measure(false);
-    system->AddChild(measure);
     
-    std::vector<AttComparison *> filters;
-    ConvertToCastOffMensuralParams convertToCastOffMensuralParams(this, system);
+    ConvertToCastOffMensuralParams convertToCastOffMensuralParams(this, system, &prepareProcessingListsParams.m_layerTree);
     // Store the list of staff N for detecting barLines that are on all systems
     for(auto const& staves: prepareProcessingListsParams.m_layerTree.child) {
         convertToCastOffMensuralParams.m_staffNs.push_back(staves.first);
     }
     
+    Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
+    contentPage->Process(&convertToCastOffMensural, &convertToCastOffMensuralParams);
+    
+    // Detach the contentPage
+    pages->DetachChild(0);
+    assert(contentPage && !contentPage->GetParent());
+    delete contentPage;
+    
+    this->PrepareDrawing();
+    
+    // We need to reset the drawing page to NULL
+    // because idx will still be 0 but contentPage is dead!
+    this->ResetDrawingPage();
+    this->CollectScoreDefs(true);
+    
+}
+    
+void Doc::ConvertToUnCastOffMensuralDoc()
+{
+    if (!m_isMensuralMusicOnly) return;
+    
+    Pages *pages = this->GetPages();
+    assert(pages);
+    if (pages->GetChildCount() > 1) {
+        LogWarning("Document has to be un-cast off for MEI output...");
+        this->UnCastOffDoc();
+    }
+    
+    // We need to populate processing lists for processing the document by Layer
+    PrepareProcessingListsParams prepareProcessingListsParams;
+    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
+    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+    
+    // The means no content? Checking just in case
+    if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
+
+    ConvertToUnCastOffMensuralParams convertToUnCastOffMensuralParams;
+    
+    std::vector<AttComparison *> filters;
     // Now we can process by layer and move their content to (measure) segments
     for (auto const& staves: prepareProcessingListsParams.m_layerTree.child) {
         for (auto const& layers: staves.second.child) {
@@ -894,19 +942,25 @@ void Doc::ConvertToCastOffMensuralDoc()
             AttNIntegerComparison matchLayer(LAYER, layers.first);
             filters = { &matchStaff, &matchLayer };
             
-            convertToCastOffMensuralParams.m_segmentIdx = 1;
-            convertToCastOffMensuralParams.m_targetMeasure = measure;
-
-            Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
-            Functor convertToCastOffMensuralEnd(&Object::ConvertToCastOffMensuralEnd);
-            contentMeasure->Process(&convertToCastOffMensural, &convertToCastOffMensuralParams, &convertToCastOffMensuralEnd, &filters);
+            convertToUnCastOffMensuralParams.m_contentMeasure = NULL;
+            convertToUnCastOffMensuralParams.m_contentLayer = NULL;
+            
+            Functor convertToUnCastOffMensural(&Object::ConvertToUnCastOffMensural);
+            this->Process(&convertToUnCastOffMensural, &convertToUnCastOffMensuralParams, NULL, &filters);
+            
+            convertToUnCastOffMensuralParams.m_addSegmentsToDelete = false;
         }
     }
     
+    Page *contentPage = this->SetDrawingPage(0);
+    assert(contentPage);
+    System *contentSystem = dynamic_cast<System *>(contentPage->FindChildByType(SYSTEM));
+    assert(contentSystem);
+    
     // Detach the contentPage
-    this->DetachChild(0);
-    assert(contentPage && !contentPage->GetParent());
-    delete contentPage;
+    for (auto& measure : convertToUnCastOffMensuralParams.m_segmentsToDelete) {
+        contentSystem->DeleteChild(measure);
+    }
     
     this->PrepareDrawing();
     
@@ -1197,6 +1251,7 @@ FontInfo *Doc::GetDrawingLyricFont(int staffSize)
 
 double Doc::GetLeftMargin(const ClassId classId) const
 {
+    return 0;
     if (classId == ACCID) return m_options->m_leftMarginAccid.GetValue();
     if (classId == BARLINE) return m_options->m_leftMarginBarLine.GetValue();
     if (classId == BARLINE_ATTR_LEFT) return m_options->m_leftMarginLeftBarLine.GetValue();
@@ -1218,6 +1273,7 @@ double Doc::GetLeftMargin(const ClassId classId) const
 
 double Doc::GetRightMargin(const ClassId classId) const
 {
+    return 0;
     if (classId == ACCID) return m_options->m_rightMarginAccid.GetValue();
     if (classId == BARLINE) return m_options->m_rightMarginBarLine.GetValue();
     if (classId == BARLINE_ATTR_LEFT) return m_options->m_rightMarginLeftBarLine.GetValue();

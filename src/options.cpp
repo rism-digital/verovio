@@ -490,7 +490,7 @@ Options::Options()
     m_breaks.SetInfo("Breaks", "Define page and system breaks layout");
     m_breaks.Init(BREAKS_auto, &Option::s_breaks);
     this->Register(&m_breaks, "breaks", &m_general);
-
+    
     m_evenNoteSpacing.SetInfo("Even note spacing", "Specify the linear spacing factor");
     m_evenNoteSpacing.Init(false);
     this->Register(&m_evenNoteSpacing, "evenNoteSpacing", &m_general);
@@ -502,6 +502,10 @@ Options::Options()
     m_landscape.SetInfo("Landscape orientation", "The landscape paper orientation flag");
     m_landscape.Init(false);
     this->Register(&m_landscape, "landscape", &m_general);
+    
+    m_mensuralToMeasure.SetInfo("Mensural to measure", "Convert mensural sections to measure-based MEI");
+    m_mensuralToMeasure.Init(false);
+    this->Register(&m_mensuralToMeasure, "mensuralToMeasure", &m_general);
 
     m_mmOutput.SetInfo("MM output", "Specify that the output in the SVG is given in mm (default is px)");
     m_mmOutput.Init(false);

@@ -316,6 +316,14 @@ Object *Object::GetNext()
     m_iteratorCurrent = std::find_if(m_iteratorCurrent, m_iteratorEnd, ObjectComparison(m_iteratorElementType));
     return (m_iteratorCurrent == m_iteratorEnd) ? NULL : *m_iteratorCurrent;
 }
+    
+Object *Object::GetNext(Object *child, const ClassId classId)
+{
+    m_iteratorElementType = classId;
+    m_iteratorEnd = m_children.end();
+    m_iteratorCurrent = std::find(m_children.begin(), m_iteratorEnd, child);
+    return (m_iteratorCurrent == m_iteratorEnd) ? NULL : this->GetNext();
+}
 
 Object *Object::GetLast() const
 {

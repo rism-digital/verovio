@@ -410,6 +410,21 @@ int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
     
+int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToUnCastOffMensuralParams *params = dynamic_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
+    assert(params);
+    
+    if (params->m_contentLayer == NULL) {
+        params->m_contentLayer = this;
+    }
+    else {
+        params->m_contentLayer->MoveChildrenFrom(this);
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+    
 int Layer::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {
     ResetStaffDefObjects();

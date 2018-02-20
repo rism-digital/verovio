@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "attcomparison.h"
+#include "doc.h"
 #include "functorparams.h"
 #include "horizontalaligner.h"
 #include "layer.h"
@@ -82,26 +83,44 @@ int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
     assert(params);
     
     assert(m_alignment);
-    assert(params->m_targetSystem);
+    assert(params->m_targetSubSystem);
     assert(params->m_targetLayer);
     
-    // In any case we move the barLine to the target layer
-    this->MoveItselfTo(params->m_targetLayer);
+    // If this is the last barline of the layer, we will just move it and do not create a new segment
+    bool isLast = (params->m_contentLayer->GetLast() == this) ? true : false;
+    Object *next = params->m_contentLayer->GetNext(this);
+    bool nextIsBarline = (next && next->Is(BARLINE)) ? true : false;
     
+    // See what if we create proper measures and what to do with the barLine
+    bool convertToMeasured = params->m_doc->GetOptions()->m_mensuralToMeasure.GetValue();
+    
+    if (convertToMeasured) {
+        // barLine object will be deleted
+        params->m_targetMeasure->SetRight(this->GetForm());
+    }
+    else {
+        this->MoveItselfTo(params->m_targetLayer);
+    }
+    
+    // Now we can return if this the end barLine
+    if (isLast || nextIsBarline) return FUNCTOR_SIBLINGS;
     
     for (auto const& staffN: params->m_staffNs) {
         // The barline is missing in at least one of the staves - do not break here
         if (!m_alignment->HasAlignmentReference(staffN)) {
-            //LogDebug("BarLine not on all staves", params->m_targetStaff->GetN());
+            // LogDebug("BarLine not on all staves %d %s", params->m_targetStaff->GetN(), this->GetClassName().c_str());
             return FUNCTOR_SIBLINGS;
         }
     }
     
     // Make a segment break
     // First case: new need to add a new measure segment (e.g, first pass)
-    if (params->m_targetSystem->GetChildCount() <= params->m_segmentIdx) {
-        params->m_targetMeasure = new Measure(false);
-        params->m_targetSystem->AddChild(params->m_targetMeasure);
+    if (params->m_targetSubSystem->GetChildCount() <= params->m_segmentIdx) {
+        params->m_targetMeasure = new Measure(convertToMeasured);
+        if (convertToMeasured) {
+            params->m_targetMeasure->SetN(StringFormat("%d", params->m_segmentTotal + 1 + params->m_segmentIdx));
+        }
+        params->m_targetSubSystem->AddChild(params->m_targetMeasure);
         // Add a staff with same attribute as in the previous segment
         params->m_targetStaff = new Staff(*params->m_targetStaff);
         params->m_targetStaff->CopyReset();
@@ -113,7 +132,7 @@ int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
     }
     // Second case: retrieve the approrpiate segment
     else {
-        params->m_targetMeasure = dynamic_cast<Measure *>(params->m_targetSystem->GetChild(params->m_segmentIdx));
+        params->m_targetMeasure = dynamic_cast<Measure *>(params->m_targetSubSystem->GetChild(params->m_segmentIdx));
         // It must be there
         assert(params->m_targetMeasure);
         

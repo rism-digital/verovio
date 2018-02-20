@@ -816,7 +816,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         keySig->SetEmptyBB();
         return;
     }
-
+    
     dc->StartGraphic(element, "", element->GetUuid());
 
     x = element->GetDrawingX();
