@@ -878,9 +878,6 @@ void Doc::ConvertToCastOffMensuralDoc()
    
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
-    Measure *contentMeasure = dynamic_cast<Measure *>(contentPage->FindChildByType(MEASURE));
-    assert(contentMeasure);
-    assert(!contentMeasure->IsMeasuredMusic());
     
     contentPage->LayOutHorizontally();
     
