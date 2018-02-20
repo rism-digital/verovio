@@ -1279,7 +1279,7 @@ void AttNcVis::ResetNcVis()
     m_con = ncVis_CON_NONE;
     m_curved = ncVis_CURVED_NONE;
     m_diagonalright = ncVis_DIAGONALRIGHT_NONE;
-    m_episima = BOOLEAN_NONE;
+    m_episema = BOOLEAN_NONE;
     m_extended = BOOLEAN_NONE;
     m_flat = BOOLEAN_NONE;
     m_jagged = BOOLEAN_NONE;
@@ -1313,9 +1313,9 @@ bool AttNcVis::ReadNcVis(pugi::xml_node element)
         element.remove_attribute("diagonalright");
         hasAttribute = true;
     }
-    if (element.attribute("episima")) {
-        this->SetEpisima(StrToBoolean(element.attribute("episima").value()));
-        element.remove_attribute("episima");
+    if (element.attribute("episema")) {
+        this->SetEpisema(StrToBoolean(element.attribute("episema").value()));
+        element.remove_attribute("episema");
         hasAttribute = true;
     }
     if (element.attribute("extended")) {
@@ -1380,8 +1380,8 @@ bool AttNcVis::WriteNcVis(pugi::xml_node element)
         element.append_attribute("diagonalright") = NcVisDiagonalrightToStr(this->GetDiagonalright()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasEpisima()) {
-        element.append_attribute("episima") = BooleanToStr(this->GetEpisima()).c_str();
+    if (this->HasEpisema()) {
+        element.append_attribute("episema") = BooleanToStr(this->GetEpisema()).c_str();
         wroteAttribute = true;
     }
     if (this->HasExtended()) {
@@ -1439,9 +1439,9 @@ bool AttNcVis::HasDiagonalright() const
     return (m_diagonalright != ncVis_DIAGONALRIGHT_NONE);
 }
 
-bool AttNcVis::HasEpisima() const
+bool AttNcVis::HasEpisema() const
 {
-    return (m_episima != BOOLEAN_NONE);
+    return (m_episema != BOOLEAN_NONE);
 }
 
 bool AttNcVis::HasExtended() const
@@ -2335,8 +2335,8 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             att->SetDiagonalright(att->StrToNcVisDiagonalright(attrValue));
             return true;
         }
-        if (attrType == "episima") {
-            att->SetEpisima(att->StrToBoolean(attrValue));
+        if (attrType == "episema") {
+            att->SetEpisema(att->StrToBoolean(attrValue));
             return true;
         }
         if (attrType == "extended") {
@@ -2710,8 +2710,8 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         if (att->HasDiagonalright()) {
             attributes->push_back(std::make_pair("diagonalright", att->NcVisDiagonalrightToStr(att->GetDiagonalright())));
         }
-        if (att->HasEpisima()) {
-            attributes->push_back(std::make_pair("episima", att->BooleanToStr(att->GetEpisima())));
+        if (att->HasEpisema()) {
+            attributes->push_back(std::make_pair("episema", att->BooleanToStr(att->GetEpisema())));
         }
         if (att->HasExtended()) {
             attributes->push_back(std::make_pair("extended", att->BooleanToStr(att->GetExtended())));

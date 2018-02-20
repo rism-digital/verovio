@@ -28,9 +28,7 @@ Label::Label() : Object("label-"), TextListInterface()
     Reset();
 }
 
-Label::~Label()
-{
-}
+Label::~Label() {}
 
 void Label::Reset()
 {
@@ -39,7 +37,7 @@ void Label::Reset()
 
 void Label::AddChild(Object *child)
 {
-    if (child->IsTextElement()) {
+    if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else {
@@ -61,9 +59,7 @@ LabelAbbr::LabelAbbr() : Object("labelAbbr-"), TextListInterface()
     Reset();
 }
 
-LabelAbbr::~LabelAbbr()
-{
-}
+LabelAbbr::~LabelAbbr() {}
 
 void LabelAbbr::Reset()
 {
@@ -72,7 +68,7 @@ void LabelAbbr::Reset()
 
 void LabelAbbr::AddChild(Object *child)
 {
-    if (child->IsTextElement()) {
+    if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else {

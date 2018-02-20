@@ -19,6 +19,7 @@
 #include "functorparams.h"
 #include "measure.h"
 #include "page.h"
+#include "pages.h"
 #include "scoredef.h"
 #include "system.h"
 #include "vrv.h"
@@ -36,9 +37,7 @@ Section::Section() : SystemElement("section-"), BoundaryStartInterface(), AttNNu
     Reset();
 }
 
-Section::~Section()
-{
-}
+Section::~Section() {}
 
 void Section::Reset()
 {
@@ -82,9 +81,7 @@ Pb::Pb() : SystemElement("pb-"), AttNNumberLike()
     Reset();
 }
 
-Pb::~Pb()
-{
-}
+Pb::~Pb() {}
 
 void Pb::Reset()
 {
@@ -103,9 +100,7 @@ Sb::Sb() : SystemElement("sb-"), AttNNumberLike()
     Reset();
 }
 
-Sb::~Sb()
-{
-}
+Sb::~Sb() {}
 
 void Sb::Reset()
 {
@@ -116,7 +111,7 @@ void Sb::Reset()
 //----------------------------------------------------------------------------
 // Section functor methods
 //----------------------------------------------------------------------------
-
+    
 int Section::ConvertToPageBased(FunctorParams *functorParams)
 {
     ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
@@ -134,6 +129,17 @@ int Section::ConvertToPageBasedEnd(FunctorParams *functorParams)
 
     ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
 
+    return FUNCTOR_CONTINUE;
+}
+    
+int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToUnCastOffMensuralParams *params = dynamic_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
+    assert(params);
+    
+    params->m_contentMeasure = NULL;
+    params->m_contentLayer = NULL;
+    
     return FUNCTOR_CONTINUE;
 }
 
@@ -155,7 +161,7 @@ int Section::ResetDrawing(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 //----------------------------------------------------------------------------
 // Pb functor methods
@@ -171,7 +177,8 @@ int Pb::CastOffEncoding(FunctorParams *functorParams)
     }
     else {
         params->m_currentPage = new Page();
-        params->m_doc->AddChild(params->m_currentPage);
+        assert(params->m_doc->GetPages());
+        params->m_doc->GetPages()->AddChild(params->m_currentPage);
         params->m_currentSystem = new System();
         params->m_currentPage->AddChild(params->m_currentSystem);
     }

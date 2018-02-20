@@ -35,9 +35,7 @@ Ending::Ending() : SystemElement("ending-"), BoundaryStartInterface(), AttLineRe
     Reset();
 }
 
-Ending::~Ending()
-{
-}
+Ending::~Ending() {}
 
 void Ending::Reset()
 {
@@ -51,6 +49,9 @@ void Ending::AddChild(Object *child)
 {
     if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));
+    }
+    else if (child->Is(SCOREDEF)) {
+        assert(dynamic_cast<ScoreDef *>(child));
     }
     else if (child->IsSystemElement()) {
         assert(dynamic_cast<SystemElement *>(child));
@@ -119,7 +120,7 @@ int Ending::ResetDrawing(FunctorParams *functorParams)
     this->BoundaryStartInterface::InterfaceResetDrawing(functorParams);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Ending::CastOffSystems(FunctorParams *functorParams)
 {

@@ -46,9 +46,14 @@ public:
     virtual void UpdateContentBBoxY(int y1, int y2);
     virtual void UpdateSelfBBoxX(int x1, int x2);
     virtual void UpdateSelfBBoxY(int y1, int y2);
-    bool HasContentBB() const;
+    void SetEmptyBB();
+    //
     bool HasSelfBB() const;
-    void SetEmptyBB(bool onlyIfUnset = false);
+    bool HasSelfHorizontalBB() const;
+    bool HasSelfVerticalBB() const;
+    bool HasContentBB() const;
+    bool HasContentHorizontalBB() const;
+    bool HasContentVerticalBB() const;
     bool HasEmptyBB() const;
     ///@}
 
@@ -105,16 +110,6 @@ public:
     int GetContentX2() const { return m_contentBB_x2; }
     int GetContentY1() const { return m_contentBB_y1; }
     int GetContentY2() const { return m_contentBB_y2; }
-    ///@}
-
-    /**
-     * @name Is true if the bounding box (self or content) has been updated at least once.
-     * We need this to avoid not updating bounding boxes to screw up the layout with their initial values.
-     */
-    ///@{
-    bool HasUpdatedBB() const { return (m_updatedBBoxX && m_updatedBBoxY); }
-    bool HasUpdatedHorizontalBB() const { return (m_updatedBBoxX); }
-    bool HasUpdatedVerticalBB() const { return (m_updatedBBoxY); }
     ///@}
 
     /**
@@ -229,14 +224,6 @@ protected:
     mutable int m_cachedDrawingY;
     ///@}
 private:
-    /**
-     * Flags for indicating whereas the bouding box was updated or not
-     */
-    ///@{
-    bool m_updatedBBoxX;
-    bool m_updatedBBoxY;
-    ///@}
-
     /**
      * Bounding box positions
      */

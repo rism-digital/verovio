@@ -36,9 +36,7 @@ SystemElement::SystemElement(std::string classid) : FloatingObject(classid), Att
     Reset();
 }
 
-SystemElement::~SystemElement()
-{
-}
+SystemElement::~SystemElement() {}
 
 void SystemElement::Reset()
 {
@@ -56,6 +54,18 @@ int SystemElement::ConvertToPageBased(FunctorParams *functorParams)
     assert(params);
 
     this->MoveItselfTo(params->m_pageBasedSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+    
+    
+int SystemElement::ConvertToCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    assert(params);
+    
+    assert(params->m_targetSystem);
+    this->MoveItselfTo(params->m_targetSystem);
 
     return FUNCTOR_CONTINUE;
 }

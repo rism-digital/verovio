@@ -183,25 +183,25 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// Num
+// TupletNum
 //----------------------------------------------------------------------------
 
 /**
- * This class models a num as a layer element part and has not direct MEI equivlatent.
+ * This class models a tuplet num as a layer element part and has not direct MEI equivlatent.
  * It is used to represent tuplet number
  */
-class Num : public LayerElement, public AttTupletVis {
+class TupletNum : public LayerElement, public AttTupletVis {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
      * Reset method resets all attribute classes
      */
     ///@{
-    Num();
-    virtual ~Num();
+    TupletNum();
+    virtual ~TupletNum();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Num"; }
-    virtual ClassId GetClassId() const { return NUM; }
+    virtual std::string GetClassName() const { return "TupletNum"; }
+    virtual ClassId GetClassId() const { return TUPLET_NUM; }
     ///@}
 
     //----------//

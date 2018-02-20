@@ -612,4 +612,11 @@ int Beam::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Beam::ResetDrawing(FunctorParams *functorParams)
+{
+    // We want the list of the ObjectListInterface to be re-generated
+    this->Modify();
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

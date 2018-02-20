@@ -24,13 +24,9 @@ namespace vrv {
 // Ligature
 //----------------------------------------------------------------------------
 
-Ligature::Ligature()
-    : LayerElement("ligature-"), ObjectListInterface(), DurationInterface(), AttStems(), AttStemsCmn(), AttTiePresent()
+Ligature::Ligature() : LayerElement("ligature-"), ObjectListInterface(), AttLigatureLog()
 {
-    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
-    RegisterAttClass(ATT_STEMS);
-    RegisterAttClass(ATT_STEMSCMN);
-    RegisterAttClass(ATT_TIEPRESENT);
+    RegisterAttClass(ATT_LIGATURELOG);
 
     Reset();
 }
@@ -43,17 +39,12 @@ Ligature::~Ligature()
 void Ligature::Reset()
 {
     LayerElement::Reset();
-    DurationInterface::Reset();
-    ResetStems();
-    ResetStemsCmn();
-    ResetTiePresent();
+    ResetLigatureLog();
 
     ClearClusters();
 }
 
-void Ligature::ClearClusters()
-{
-}
+void Ligature::ClearClusters() {}
 
 void Ligature::AddChild(Object *child)
 {
@@ -130,16 +121,39 @@ void Ligature::FilterList(ListOfObjects *childList)
 
 int Ligature::PositionInLigature(Note *note)
 {
-    int size = (int)this->GetList(this)->size();
+    this->GetList(this);
     int position = this->GetListIndex(note);
     assert(position != -1);
-    // this is the middle (only if odd)
-    if ((size % 2) && (position == (size - 1) / 2)) return 0;
-    if (position < (size / 2)) return -1;
-    return 1;
+    return position;
+}
+
+Note *Ligature::GetFirstNote()
+{
+    const ListOfObjects *list = this->GetList(this);
+    if (list->empty()) {
+        return NULL;
+    }
+    return dynamic_cast<Note *>(list->front());
+}
+
+Note *Ligature::GetLastNote()
+{
+    const ListOfObjects *list = this->GetList(this);
+    if (list->empty()) {
+        return NULL;
+    }
+    return dynamic_cast<Note *>(list->back());
 }
 
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int Ligature::ResetDrawing(FunctorParams *functorParams)
+{
+    // We want the list of the ObjectListInterface to be re-generated
+    this->Modify();
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

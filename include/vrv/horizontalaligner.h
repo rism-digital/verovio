@@ -167,6 +167,11 @@ public:
      */
     virtual int HorizontalSpaceForDuration(
         double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
+    
+    /**
+     * Return true if the alignment contains at least one reference with staffN
+     */
+    bool HasAlignmentReference(int staffN);
 
     //----------//
     // Functors //

@@ -22,6 +22,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "page.h"
+#include "pages.h"
 #include "section.h"
 #include "staff.h"
 #include "vrv.h"
@@ -148,15 +149,20 @@ void System::SetDrawingAbbrLabelsWidth(int width)
     }
 }
 
-void System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY)
+bool System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY)
 {
     assert(object);
 
     // If we have only the bottom alignment, then nothing to do (yet)
-    if (m_systemAligner.GetChildCount() == 1) return;
+    if (m_systemAligner.GetChildCount() == 1) return false;
     StaffAlignment *alignment = m_systemAligner.GetStaffAlignmentForStaffN(staffN);
-    assert(alignment);
+    if (!alignment) {
+        LogError("Staff @n='%d' for rendering control event %s %s not found", staffN, object->GetClassName().c_str(),
+            object->GetUuid().c_str());
+        return false;
+    }
     alignment->SetCurrentFloatingPositioner(object, objectX, objectY);
+    return true;
 }
 
 void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
@@ -223,7 +229,7 @@ int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
@@ -282,7 +288,8 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    params->m_cumulatedShift = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+    params->m_cumulatedShift
+        = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
 
     m_systemAligner.Process(params->m_functorEnd, params);
 
@@ -359,7 +366,7 @@ int System::JustifyX(FunctorParams *functorParams)
 
     if (params->m_justifiableRatio < 0.8) {
         // Arbitrary value for avoiding over-compressed justification
-        LogWarning("Justification stop because of a ratio smaller than 0.8: %lf", params->m_justifiableRatio);
+        LogWarning("Justification is highly compressed (ratio smaller than 0.8: %lf)", params->m_justifiableRatio);
         LogWarning("\tSystem full width: %d", params->m_systemFullWidth);
         LogWarning("\tNon-justifiable width: %d", nonJustifiableWidth);
         LogWarning("\tDrawing justifiable width: %d", m_drawingJustifiableWidth);
@@ -448,10 +455,21 @@ int System::CastOffPages(FunctorParams *functorParams)
     CastOffPagesParams *params = dynamic_cast<CastOffPagesParams *>(functorParams);
     assert(params);
 
-    if ((params->m_currentPage->GetChildCount() > 0)
-        && (this->m_drawingYRel - this->GetHeight() - params->m_shift < 0)) {
+    int currentShift = params->m_shift;
+    // We use params->m_pageHeadHeight to check if we have passed the first page already
+    if (params->m_pgHeadHeight != VRV_UNSET) {
+        currentShift += params->m_pgHeadHeight + params->m_pgFootHeight;
+    }
+    else {
+        currentShift += params->m_pgHead2Height + params->m_pgFoot2Height;
+    }
+
+    if ((params->m_currentPage->GetChildCount() > 0) && (this->m_drawingYRel - this->GetHeight() - currentShift < 0)) {
         params->m_currentPage = new Page();
-        params->m_doc->AddChild(params->m_currentPage);
+        // Use VRV_UNSET value as a flag
+        params->m_pgHeadHeight = VRV_UNSET;
+        assert(params->m_doc->GetPages());
+        params->m_doc->GetPages()->AddChild(params->m_currentPage);
         params->m_shift = this->m_drawingYRel - params->m_pageHeight;
     }
 

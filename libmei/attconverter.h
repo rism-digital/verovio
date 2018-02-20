@@ -170,6 +170,9 @@ public:
     std::string TextrenditionlistToStr(data_TEXTRENDITIONLIST data) const;
     data_TEXTRENDITIONLIST StrToTextrenditionlist(std::string value, bool logWarning = true) const;
 
+    std::string VerticalalignmentToStr(data_VERTICALALIGNMENT data) const;
+    data_VERTICALALIGNMENT StrToVerticalalignment(std::string value, bool logWarning = true) const;
+
     std::string AccidLogFuncToStr(accidLog_FUNC data) const;
     accidLog_FUNC StrToAccidLogFunc(std::string value, bool logWarning = true) const;
 
@@ -313,6 +316,9 @@ public:
 
     std::string PointingXlinkshowToStr(pointing_XLINKSHOW data) const;
     pointing_XLINKSHOW StrToPointingXlinkshow(std::string value, bool logWarning = true) const;
+
+    std::string RecordTypeRecordtypeToStr(recordType_RECORDTYPE data) const;
+    recordType_RECORDTYPE StrToRecordTypeRecordtype(std::string value, bool logWarning = true) const;
 
     std::string RegularMethodMethodToStr(regularMethod_METHOD data) const;
     regularMethod_METHOD StrToRegularMethodMethod(std::string value, bool logWarning = true) const;
