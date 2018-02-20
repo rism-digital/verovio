@@ -759,7 +759,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
         if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
     }
 
-    if (chord) SetDrawingStem(currentStem);
+    if (!chord) SetDrawingStem(currentStem);
 
     /************ dots ***********/
 
