@@ -325,26 +325,20 @@ bool Chord::IsVisible()
     if (this->HasVisible()) {
         return this->GetVisible() == BOOLEAN_true;
     }
+    
     // if the chord doens't have it, see if all the children are invisible
-    else {
-        ListOfObjects::const_iterator iter;
-        const ListOfObjects *notes = this->GetList(this);
-        assert(notes);
-
-        for (iter = notes->begin(); iter != notes->end(); iter++) {
-            Note *note = dynamic_cast<Note *>(*iter);
-            assert(note);
-
-            // If it doesn't have a visibility tag, then it's default value is that it's visible, so return that the
-            // chord is visible
-            if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true) {
-                return true;
-            }
-            // if it's visibility is false, continue on and see if any of the other notes are false.
-            // All of the notes must not be visible in order for the chord to not be visible.
+    const ListOfObjects *notes = this->GetList(this);
+    assert(notes);
+    
+    for (auto& iter : *notes) {
+        Note *note = dynamic_cast<Note *>(iter);
+        assert(note);
+        if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true) {
+            return true;
         }
-        return false;
     }
+    
+    return false;
 }
     
 bool Chord::HasNoteWithDots()
@@ -359,6 +353,7 @@ bool Chord::HasNoteWithDots()
             return true;
         }
     }
+    
     return false;
 }
 
