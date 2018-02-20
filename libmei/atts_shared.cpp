@@ -271,7 +271,7 @@ AttAugmentDots::~AttAugmentDots()
 
 void AttAugmentDots::ResetAugmentDots()
 {
-    m_dots = 0;
+    m_dots = -1;
 }
 
 bool AttAugmentDots::ReadAugmentDots(pugi::xml_node element)
@@ -297,7 +297,7 @@ bool AttAugmentDots::WriteAugmentDots(pugi::xml_node element)
 
 bool AttAugmentDots::HasDots() const
 {
-    return (m_dots != 0);
+    return (m_dots != -1);
 }
 
 /* include <attdots> */

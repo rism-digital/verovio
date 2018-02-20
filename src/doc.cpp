@@ -22,6 +22,7 @@
 #include "keysig.h"
 #include "label.h"
 #include "layer.h"
+#include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -29,6 +30,7 @@
 #include "multirest.h"
 #include "note.h"
 #include "page.h"
+#include "pages.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
 #include "pghead.h"
@@ -60,17 +62,12 @@ Doc::Doc() : Object("doc-")
 {
     m_options = new Options();
 
-    // owned pointers need to be set to NULL;
-    m_scoreBuffer = NULL;
     Reset();
 }
 
 Doc::~Doc()
 {
     delete m_options;
-    if (m_scoreBuffer) {
-        delete m_scoreBuffer;
-    }
 }
 
 void Doc::Reset()
@@ -90,12 +87,9 @@ void Doc::Reset()
     m_drawingPreparationDone = false;
     m_hasMidiTimemap = false;
     m_hasAnalyticalMarkup = false;
+    m_isMensuralMusicOnly = false;
 
     m_scoreDef.Reset();
-    if (m_scoreBuffer) {
-        delete m_scoreBuffer;
-        m_scoreBuffer = NULL;
-    }
 
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
@@ -103,16 +97,13 @@ void Doc::Reset()
 
 void Doc::SetType(DocType type)
 {
-    Reset();
     m_type = type;
 }
 
 void Doc::AddChild(Object *child)
 {
-    assert(!m_scoreBuffer); // Children cannot be added if a score buffer was created;
-
-    if (child->Is(PAGE)) {
-        assert(dynamic_cast<Page *>(child));
+    if (child->Is(MDIV)) {
+        assert(dynamic_cast<Mdiv *>(child));
     }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
@@ -122,17 +113,6 @@ void Doc::AddChild(Object *child)
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
-}
-
-Score *Doc::CreateScoreBuffer()
-{
-    assert(!m_scoreBuffer); // Should not be called twice - Call Doc::Reset() to Reset it if necessary
-
-    ClearChildren();
-    m_scoreDef.Reset();
-
-    m_scoreBuffer = new Score();
-    return m_scoreBuffer;
 }
 
 void Doc::Refresh()
@@ -216,7 +196,7 @@ void Doc::CalculateMidiTimemap()
     m_hasMidiTimemap = false;
 
     // This happens if the document was never cast off (no-layout option in the toolkit)
-    if (!m_drawingPage && GetChildCount() == 1) {
+    if (!m_drawingPage && GetPageCount() == 1) {
         Page *page = this->SetDrawingPage(0);
         if (!page) {
             return;
@@ -688,6 +668,14 @@ void Doc::CollectScoreDefs(bool force)
 
 void Doc::CastOffDoc()
 {
+    Pages *pages = this->GetPages();
+    assert(pages);
+    
+    if (pages->GetChildCount() != 1) {
+        LogDebug("Document is already cast off");
+        return;
+    }
+    
     this->CollectScoreDefs();
 
     Page *contentPage = this->SetDrawingPage(0);
@@ -719,7 +707,7 @@ void Doc::CastOffDoc()
     contentPage->LayOutVertically();
 
     // Detach the contentPage
-    this->DetachChild(0);
+    pages->DetachChild(0);
     assert(contentPage && !contentPage->GetParent());
     this->ResetDrawingPage();
 
@@ -728,7 +716,7 @@ void Doc::CastOffDoc()
     CastOffRunningElements(&castOffPagesParams);
     castOffPagesParams.m_pageHeight = this->m_drawingPageHeight - this->m_drawingPageMarginBot;
     Functor castOffPages(&Object::CastOffPages);
-    this->AddChild(currentPage);
+    pages->AddChild(currentPage);
     contentPage->Process(&castOffPages, &castOffPagesParams);
     delete contentPage;
 
@@ -741,10 +729,12 @@ void Doc::CastOffDoc()
 
 void Doc::CastOffRunningElements(CastOffPagesParams *params)
 {
-    assert(m_children.empty());
+    Pages *pages = this->GetPages();
+    assert(pages);
+    assert(pages->GetChildCount() == 0);
 
     Page *page1 = new Page();
-    this->AddChild(page1);
+    pages->AddChild(page1);
     this->SetDrawingPage(0);
     page1->LayOutVertically();
 
@@ -756,7 +746,7 @@ void Doc::CastOffRunningElements(CastOffPagesParams *params)
     }
 
     Page *page2 = new Page();
-    this->AddChild(page2);
+    pages->AddChild(page2);
     this->SetDrawingPage(1);
     page2->LayOutVertically();
 
@@ -767,14 +757,17 @@ void Doc::CastOffRunningElements(CastOffPagesParams *params)
         params->m_pgFoot2Height = page2->GetFooter()->GetTotalHeight();
     }
 
-    DeleteChild(page1);
-    DeleteChild(page2);
+    pages->DeleteChild(page1);
+    pages->DeleteChild(page2);
 
     this->ResetDrawingPage();
 }
 
 void Doc::UnCastOffDoc()
 {
+    Pages *pages = this->GetPages();
+    assert(pages);
+
     Page *contentPage = new Page();
     System *contentSystem = new System();
     contentPage->AddChild(contentSystem);
@@ -784,9 +777,9 @@ void Doc::UnCastOffDoc()
     Functor unCastOff(&Object::UnCastOff);
     this->Process(&unCastOff, &unCastOffParams);
 
-    this->ClearChildren();
+    pages->ClearChildren();
 
-    this->AddChild(contentPage);
+    pages->AddChild(contentPage);
 
     // LogDebug("ContinousLayout: %d pages", this->GetChildCount());
 
@@ -800,6 +793,9 @@ void Doc::CastOffEncodingDoc()
 {
     this->CollectScoreDefs();
 
+    Pages *pages = this->GetPages();
+    assert(pages);
+
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
 
@@ -809,11 +805,11 @@ void Doc::CastOffEncodingDoc()
     assert(contentSystem);
 
     // Detach the contentPage
-    this->DetachChild(0);
+    pages->DetachChild(0);
     assert(contentPage && !contentPage->GetParent());
 
     Page *page = new Page();
-    this->AddChild(page);
+    pages->AddChild(page);
     System *system = new System();
     page->AddChild(system);
 
@@ -831,26 +827,145 @@ void Doc::CastOffEncodingDoc()
 
 void Doc::ConvertToPageBasedDoc()
 {
-    assert(m_scoreBuffer); // Doc::CreateScoreBuffer needs to be called first;
+    Score *score = this->GetScore();
+    assert(score);
 
+    Pages *pages = new Pages();
+    pages->ConvertFrom(score);
     Page *page = new Page();
+    pages->AddChild(page);
     System *system = new System();
     page->AddChild(system);
 
     ConvertToPageBasedParams convertToPageBasedParams(system);
     Functor convertToPageBased(&Object::ConvertToPageBased);
     Functor convertToPageBasedEnd(&Object::ConvertToPageBasedEnd);
-    m_scoreBuffer->Process(&convertToPageBased, &convertToPageBasedParams, &convertToPageBasedEnd);
+    score->Process(&convertToPageBased, &convertToPageBasedParams, &convertToPageBasedEnd);
 
-    m_scoreBuffer->ClearRelinquishedChildren();
-    assert(m_scoreBuffer->GetChildCount() == 0);
+    score->ClearRelinquishedChildren();
+    assert(score->GetChildCount() == 0);
 
-    delete m_scoreBuffer;
-    m_scoreBuffer = NULL;
+    Mdiv *mdiv = dynamic_cast<Mdiv *>(score->GetParent());
+    assert(mdiv);
 
-    this->AddChild(page);
+    mdiv->ReplaceChild(score, pages);
+    delete score;
 
     this->ResetDrawingPage();
+}
+    
+void Doc::ConvertToCastOffMensuralDoc()
+{
+    if (!m_isMensuralMusicOnly) return;
+    
+    // We are converting to measure music in a definitiv way
+    if (this->GetOptions()->m_mensuralToMeasure.GetValue()) {
+        m_isMensuralMusicOnly = false;
+    }
+    
+    this->CollectScoreDefs();
+
+    Pages *pages = this->GetPages();
+    assert(pages);
+    
+    // We need to populate processing lists for processing the document by Layer
+    PrepareProcessingListsParams prepareProcessingListsParams;
+    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
+    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+    
+    // The means no content? Checking just in case
+    if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
+   
+    Page *contentPage = this->SetDrawingPage(0);
+    assert(contentPage);
+    
+    contentPage->LayOutHorizontally();
+    
+    Page *page = new Page();
+    pages->AddChild(page);
+    System *system = new System();
+    page->AddChild(system);
+    
+    ConvertToCastOffMensuralParams convertToCastOffMensuralParams(this, system, &prepareProcessingListsParams.m_layerTree);
+    // Store the list of staff N for detecting barLines that are on all systems
+    for(auto const& staves: prepareProcessingListsParams.m_layerTree.child) {
+        convertToCastOffMensuralParams.m_staffNs.push_back(staves.first);
+    }
+    
+    Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
+    contentPage->Process(&convertToCastOffMensural, &convertToCastOffMensuralParams);
+    
+    // Detach the contentPage
+    pages->DetachChild(0);
+    assert(contentPage && !contentPage->GetParent());
+    delete contentPage;
+    
+    this->PrepareDrawing();
+    
+    // We need to reset the drawing page to NULL
+    // because idx will still be 0 but contentPage is dead!
+    this->ResetDrawingPage();
+    this->CollectScoreDefs(true);
+    
+}
+    
+void Doc::ConvertToUnCastOffMensuralDoc()
+{
+    if (!m_isMensuralMusicOnly) return;
+    
+    Pages *pages = this->GetPages();
+    assert(pages);
+    if (pages->GetChildCount() > 1) {
+        LogWarning("Document has to be un-cast off for MEI output...");
+        this->UnCastOffDoc();
+    }
+    
+    // We need to populate processing lists for processing the document by Layer
+    PrepareProcessingListsParams prepareProcessingListsParams;
+    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
+    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+    
+    // The means no content? Checking just in case
+    if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
+
+    ConvertToUnCastOffMensuralParams convertToUnCastOffMensuralParams;
+    
+    std::vector<AttComparison *> filters;
+    // Now we can process by layer and move their content to (measure) segments
+    for (auto const& staves: prepareProcessingListsParams.m_layerTree.child) {
+        for (auto const& layers: staves.second.child) {
+            // Create ad comparison object for each type / @n
+            AttNIntegerComparison matchStaff(STAFF, staves.first);
+            AttNIntegerComparison matchLayer(LAYER, layers.first);
+            filters = { &matchStaff, &matchLayer };
+            
+            convertToUnCastOffMensuralParams.m_contentMeasure = NULL;
+            convertToUnCastOffMensuralParams.m_contentLayer = NULL;
+            
+            Functor convertToUnCastOffMensural(&Object::ConvertToUnCastOffMensural);
+            this->Process(&convertToUnCastOffMensural, &convertToUnCastOffMensuralParams, NULL, &filters);
+            
+            convertToUnCastOffMensuralParams.m_addSegmentsToDelete = false;
+        }
+    }
+    
+    Page *contentPage = this->SetDrawingPage(0);
+    assert(contentPage);
+    System *contentSystem = dynamic_cast<System *>(contentPage->FindChildByType(SYSTEM));
+    assert(contentSystem);
+    
+    // Detach the contentPage
+    for (auto& measure : convertToUnCastOffMensuralParams.m_segmentsToDelete) {
+        contentSystem->DeleteChild(measure);
+    }
+    
+    this->PrepareDrawing();
+    
+    // We need to reset the drawing page to NULL
+    // because idx will still be 0 but contentPage is dead!
+    this->ResetDrawingPage();
+    this->CollectScoreDefs(true);
+    
 }
 
 void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
@@ -906,14 +1021,28 @@ void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
     }
 }
 
-bool Doc::HasPage(int pageIdx) const
+bool Doc::HasPage(int pageIdx)
 {
-    return ((pageIdx >= 0) && (pageIdx < GetChildCount()));
+    Pages *pages = this->GetPages();
+    assert(pages);
+    return ((pageIdx >= 0) && (pageIdx < pages->GetChildCount()));
 }
 
-int Doc::GetPageCount() const
+Score *Doc::GetScore()
 {
-    return GetChildCount();
+    return dynamic_cast<Score *>(this->FindChildByType(SCORE));
+}
+
+Pages *Doc::GetPages()
+{
+    return dynamic_cast<Pages *>(this->FindChildByType(PAGES));
+}
+
+int Doc::GetPageCount()
+{
+    Pages *pages = this->GetPages();
+    assert(pages);
+    return pages->GetChildCount();
 }
 
 int Doc::GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const
@@ -1184,7 +1313,9 @@ Page *Doc::SetDrawingPage(int pageIdx)
     if (m_drawingPage && m_drawingPage->GetIdx() == pageIdx) {
         return m_drawingPage;
     }
-    m_drawingPage = dynamic_cast<Page *>(this->GetChild(pageIdx));
+    Pages *pages = this->GetPages();
+    assert(pages);
+    m_drawingPage = dynamic_cast<Page *>(pages->GetChild(pageIdx));
     assert(m_drawingPage);
 
     int glyph_size;

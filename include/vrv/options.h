@@ -467,6 +467,7 @@ public:
     OptionBool m_evenNoteSpacing;
     OptionBool m_humType;
     OptionBool m_landscape;
+    OptionBool m_mensuralToMeasure;
     OptionBool m_mmOutput;
     OptionBool m_noFooter;
     OptionBool m_noHeader;

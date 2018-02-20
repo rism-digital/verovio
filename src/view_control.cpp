@@ -1310,10 +1310,10 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         if (!isShortTie) {
             x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
             x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
-            if (note1->HasDots()) {
+            if (note1->GetDots() > 0) {
                 x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
             }
-            else if (parentChord1 && parentChord1->HasDots()) {
+            else if (parentChord1 && (parentChord1->GetDots() > 0)) {
                 x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * parentChord1->GetDots();
             }
         }

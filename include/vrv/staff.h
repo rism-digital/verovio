@@ -45,6 +45,16 @@ public:
     virtual std::string GetClassName() const { return "Staff"; }
     virtual ClassId GetClassId() const { return STAFF; }
     ///@}
+    
+    /**
+     * Do not copy children for layers
+     */
+    virtual bool CopyChildren() const { return false; }
+    
+    /**
+     * Overriding CopyReset() method to be called after copy / assignment calls.
+     */
+    virtual void CopyReset();
 
     /**
      * Delete all the legder line arrays.
@@ -101,6 +111,11 @@ public:
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     * See Object::ConvertToCastOffMensural
+     */
+    virtual int ConvertToCastOffMensural(FunctorParams *params);
 
     /**
      * See Object::UnsetCurrentScoreDef

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        measure.h
+// Name:        measure.cpp
 // Author:      Laurent Pugin
 // Created:     2012
 // Copyright (c) Authors and others. All rights reserved.
@@ -411,7 +411,74 @@ int Measure::ConvertToPageBased(FunctorParams *functorParams)
 
     return FUNCTOR_SIBLINGS;
 }
+    
+int Measure::ConvertToCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    assert(params);
+    
+    // We are processing by staff/layer from the call below - we obviously do not want to loop...
+    if (params->m_targetMeasure) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    bool convertToMeasured = params->m_doc->GetOptions()->m_mensuralToMeasure.GetValue();
+    
+    assert(params->m_targetSystem);
+    assert(params->m_layerTree);
+    
+    // Create a temporary subsystem for receiving the measure segments
+    System targetSubSystem;
+    params->m_targetSubSystem = &targetSubSystem;
+    
+    // Create the first measure segment - problem: we are dropping the section element - we should create a score-based MEI file instead
+    Measure *measure = new Measure(convertToMeasured);
+    if (convertToMeasured) {
+        measure->SetN(StringFormat("%d", params->m_segmentTotal + 1));
+    }
+    params->m_targetSubSystem->AddChild(measure);
+    
+    std::vector<AttComparison *> filters;
+    // Now we can process by layer and move their content to (measure) segments
+    for (auto const& staves: params->m_layerTree->child) {
+        for (auto const& layers: staves.second.child) {
+            // Create ad comparison object for each type / @n
+            AttNIntegerComparison matchStaff(STAFF, staves.first);
+            AttNIntegerComparison matchLayer(LAYER, layers.first);
+            filters = { &matchStaff, &matchLayer };
+            
+            params->m_segmentIdx = 1;
+            params->m_targetMeasure = measure;
+            
+            Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
+            this->Process(&convertToCastOffMensural, params, NULL, &filters);
+        }
+    }
+    
+    params->m_targetMeasure = NULL;
+    params->m_targetSubSystem = NULL;
+    params->m_segmentTotal = targetSubSystem.GetChildCount();
+    // Copy the measure segments to the final target segment
+    params->m_targetSystem->MoveChildrenFrom(&targetSubSystem);
 
+    return FUNCTOR_SIBLINGS;
+}
+    
+int Measure::ConvertToUnCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToUnCastOffMensuralParams *params = dynamic_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
+    assert(params);
+    
+    if (params->m_contentMeasure == NULL) {
+        params->m_contentMeasure = this;
+    }
+    else if (params->m_addSegmentsToDelete) {
+        params->m_segmentsToDelete.push_back(this);
+    }
+    
+    return FUNCTOR_CONTINUE;
+}
+    
 int Measure::Save(FunctorParams *functorParams)
 {
     if (this->IsMeasuredMusic())

@@ -22,6 +22,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "page.h"
+#include "pages.h"
 #include "section.h"
 #include "staff.h"
 #include "vrv.h"
@@ -365,7 +366,7 @@ int System::JustifyX(FunctorParams *functorParams)
 
     if (params->m_justifiableRatio < 0.8) {
         // Arbitrary value for avoiding over-compressed justification
-        LogWarning("Justification stop because of a ratio smaller than 0.8: %lf", params->m_justifiableRatio);
+        LogWarning("Justification is highly compressed (ratio smaller than 0.8: %lf)", params->m_justifiableRatio);
         LogWarning("\tSystem full width: %d", params->m_systemFullWidth);
         LogWarning("\tNon-justifiable width: %d", nonJustifiableWidth);
         LogWarning("\tDrawing justifiable width: %d", m_drawingJustifiableWidth);
@@ -467,7 +468,8 @@ int System::CastOffPages(FunctorParams *functorParams)
         params->m_currentPage = new Page();
         // Use VRV_UNSET value as a flag
         params->m_pgHeadHeight = VRV_UNSET;
-        params->m_doc->AddChild(params->m_currentPage);
+        assert(params->m_doc->GetPages());
+        params->m_doc->GetPages()->AddChild(params->m_currentPage);
         params->m_shift = this->m_drawingYRel - params->m_pageHeight;
     }
 

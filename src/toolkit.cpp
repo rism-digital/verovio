@@ -479,9 +479,14 @@ bool Toolkit::LoadData(const std::string &data)
     if (true) { // change this to an option
         m_doc.GenerateHeaderAndFooter();
     }
-
+    
     m_doc.PrepareDrawing();
-
+    
+    // Convert pseudo-measures into distinct segments based on barLine elements
+    if (m_doc.IsMensuralMusicOnly()) {
+        m_doc.ConvertToCastOffMensuralDoc();
+    }
+    
     // Do the layout? this depends on the options and the file. PAE and
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --breaks auto option.
@@ -803,9 +808,9 @@ bool Toolkit::SetOptions(const std::string &json_options)
             int i;
             for (i = 0; i < (int)values.size(); i++) {
                 if (values.has<jsonxx::String>(i)) strValues.push_back(values.get<jsonxx::String>(i));
+                // LogDebug("String: %s", values.get<jsonxx::String>(i).c_str());
             }
             opt->SetValueArray(strValues);
-            // LogMessage("String: %s", json.get<jsonxx::String>(iter->first).c_str());
         }
         else {
             LogError("Unsupported type for option '%s'", iter->first.c_str());

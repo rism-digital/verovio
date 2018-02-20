@@ -755,7 +755,55 @@ public:
     ArrayOfObjects m_controlEvents;
     bool m_permanent;
 };
+    
+//----------------------------------------------------------------------------
+// ConvertToCastOffMensuralParams
+//----------------------------------------------------------------------------
 
+/**
+ * member 0: a pointer the document we are adding pages to
+ * member 1: a vector of all the staff @n for finding spliting bar lines
+ * member 2: a pointer to the content Layer from which we are copying the elements
+ * member 3: a pointer to the target destination System
+ * member 4: a pointer to a sub-system (e.g., section) to add measure segments
+ * member 4: a pointer to the target destination System
+ * member 5: a pointer to the target destination Measure
+ * member 6: a pointer to the target destination Staff
+ * member 7: a pointer to the target destination Layer
+ * member 8: a counter for segments in the sub-system (section)
+ * member 9  a counter for the total number of segments (previous sections)
+ * member 10: a IntTree for precessing by Layer
+ **/
+
+class ConvertToCastOffMensuralParams : public FunctorParams {
+public:
+    ConvertToCastOffMensuralParams(Doc *doc, System *targetSystem, IntTree *layerTree)
+    {
+        m_doc = doc;
+        m_contentLayer = NULL;
+        m_targetSystem = targetSystem;
+        m_targetSubSystem = NULL;
+        m_targetMeasure = NULL;
+        m_targetStaff = NULL;
+        m_targetLayer = NULL;
+        m_segmentIdx = 0;
+        m_segmentTotal = 0;
+        m_layerTree = layerTree;
+        
+    }
+    Doc *m_doc;
+    std::vector<int> m_staffNs;
+    Layer *m_contentLayer;
+    System *m_targetSystem;
+    System *m_targetSubSystem;
+    Measure *m_targetMeasure;
+    Staff *m_targetStaff;
+    Layer *m_targetLayer;
+    int m_segmentIdx;
+    int m_segmentTotal;
+    IntTree *m_layerTree;
+};
+    
 //----------------------------------------------------------------------------
 // ConvertToPageBasedParams
 //----------------------------------------------------------------------------
@@ -770,6 +818,32 @@ public:
     System *m_pageBasedSystem;
 };
 
+//----------------------------------------------------------------------------
+// ConvertToUnCastOffMensuralParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the content / target Measure (NULL at the beginning of a section)
+ * member 1: a pointer to the content / target Layer (NULL at the beginning of a section)
+ * member 2: a flag indicating if we keep a reference of the measure segments to delete at the end
+ * member 3: a list of measure segments to delete at the end (fill in the first pass only)
+ **/
+
+class ConvertToUnCastOffMensuralParams : public FunctorParams {
+public:
+    ConvertToUnCastOffMensuralParams()
+    {
+        m_contentMeasure = NULL;
+        m_contentLayer = NULL;
+        m_addSegmentsToDelete = true;
+        
+    }
+    Measure *m_contentMeasure;
+    Layer *m_contentLayer;
+    bool m_addSegmentsToDelete;
+    ArrayOfObjects m_segmentsToDelete;
+};
+    
 //----------------------------------------------------------------------------
 // FillStaffCurrentTimeSpanningParams
 //----------------------------------------------------------------------------
