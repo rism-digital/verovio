@@ -346,6 +346,21 @@ bool Chord::IsVisible()
         return false;
     }
 }
+    
+bool Chord::HasNoteWithDots()
+{
+    const ListOfObjects *notes = this->GetList(this);
+    assert(notes);
+    
+    for (auto& iter : *notes) {
+        Note *note = dynamic_cast<Note *>(iter);
+        assert(note);
+        if (note->GetDots() > 0) {
+            return true;
+        }
+    }
+    return false;
+}
 
 //----------------------------------------------------------------------------
 // Functors methods
@@ -470,9 +485,14 @@ int Chord::CalcDots(FunctorParams *functorParams)
     if (!this->IsVisible()) {
         return FUNCTOR_SIBLINGS;
     }
-    // if there aren't dot, stop here
-    if (!this->HasDots()) {
-        return FUNCTOR_SIBLINGS;
+    // if there aren't dot, stop here but only if no note has a dot
+    if (this->GetDots() < 1) {
+        if (!this->HasNoteWithDots()) {
+            return FUNCTOR_SIBLINGS;
+        }
+        else {
+            return FUNCTOR_CONTINUE;
+        }
     }
 
     Dots *dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
@@ -492,6 +512,10 @@ int Chord::CalcDots(FunctorParams *functorParams)
     for (rit = notes->rbegin(); rit != notes->rend(); rit++) {
         Note *note = dynamic_cast<Note *>(*rit);
         assert(note);
+        
+        if (note->GetDots() == 0) {
+            continue;
+        }
 
         Layer *layer = NULL;
         Staff *staff = note->GetCrossStaff(layer);
