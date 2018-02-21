@@ -866,6 +866,7 @@ void MeiOutput::WriteScoreDefElement(pugi::xml_node currentNode, ScoreDefElement
     assert(scoreDefElement);
 
     WriteXmlId(currentNode, scoreDefElement);
+    scoreDefElement->WriteMeasureNumbers(currentNode);
     scoreDefElement->WriteTyped(currentNode);
 }
 
@@ -2772,6 +2773,7 @@ bool MeiInput::ReadBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd)
 bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object)
 {
     SetMeiUuid(element, object);
+    object->ReadMeasureNumbers(element);
     object->ReadTyped(element);
 
     return true;
