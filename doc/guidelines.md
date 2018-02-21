@@ -13,7 +13,7 @@ This document describes the coding style for the Verovio project.
 
 ## General remarks
 
-Verovio uses a [Clang-Format](http://clang.llvm.org/docs/ClangFormat.html) coding style based on the [WebKit](https://webkit.org/code-style-guidelines/) style, with a few minor modifications. The modifications include:
+Verovio uses a [Clang-Format](http://clang.llvm.org/docs/ClangFormat.html) (**5.0**) coding style based on the [WebKit](https://webkit.org/code-style-guidelines/) style, with a few minor modifications. The modifications include:
 
     AllowShortIfStatementsOnASingleLine: true
     AllowShortLoopsOnASingleLine: true
@@ -33,6 +33,8 @@ brew install clang-format
 ```
 
 ### Running clang-format
+
+*Please make sure you use version 5.0*
 
 To use clang-format to adjust a single file:
 
