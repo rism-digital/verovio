@@ -7183,14 +7183,14 @@ AttVerticalAlignment::~AttVerticalAlignment()
 
 void AttVerticalAlignment::ResetVerticalAlignment()
 {
-    m_vgrp = "";
+    m_vgrp = -1;
 }
 
 bool AttVerticalAlignment::ReadVerticalAlignment(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("vgrp")) {
-        this->SetVgrp(StrToStr(element.attribute("vgrp").value()));
+        this->SetVgrp(StrToInt(element.attribute("vgrp").value()));
         element.remove_attribute("vgrp");
         hasAttribute = true;
     }
@@ -7201,7 +7201,7 @@ bool AttVerticalAlignment::WriteVerticalAlignment(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasVgrp()) {
-        element.append_attribute("vgrp") = StrToStr(this->GetVgrp()).c_str();
+        element.append_attribute("vgrp") = IntToStr(this->GetVgrp()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -7209,7 +7209,7 @@ bool AttVerticalAlignment::WriteVerticalAlignment(pugi::xml_node element)
 
 bool AttVerticalAlignment::HasVgrp() const
 {
-    return (m_vgrp != "");
+    return (m_vgrp != -1);
 }
 
 /* include <attvgrp> */
@@ -9231,7 +9231,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttVerticalAlignment *att = dynamic_cast<AttVerticalAlignment *>(element);
         assert(att);
         if (attrType == "vgrp") {
-            att->SetVgrp(att->StrToStr(attrValue));
+            att->SetVgrp(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -10521,7 +10521,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttVerticalAlignment *att = dynamic_cast<const AttVerticalAlignment *>(element);
         assert(att);
         if (att->HasVgrp()) {
-            attributes->push_back(std::make_pair("vgrp", att->StrToStr(att->GetVgrp())));
+            attributes->push_back(std::make_pair("vgrp", att->IntToStr(att->GetVgrp())));
         }
     }
     if (element->HasAttClass(ATT_VISIBILITY)) {
