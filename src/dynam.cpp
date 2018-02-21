@@ -37,9 +37,7 @@ Dynam::Dynam() : ControlElement("dynam-"), TextListInterface(), TextDirInterface
     Reset();
 }
 
-Dynam::~Dynam()
-{
-}
+Dynam::~Dynam() {}
 
 void Dynam::Reset()
 {
@@ -50,7 +48,7 @@ void Dynam::Reset()
 
 void Dynam::AddChild(Object *child)
 {
-    if (child->IsTextElement()) {
+    if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {

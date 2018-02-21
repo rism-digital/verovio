@@ -29,9 +29,7 @@ Tie::Tie() : ControlElement("tie-"), TimeSpanningInterface(), AttColor(), AttCur
     Reset();
 }
 
-Tie::~Tie()
-{
-}
+Tie::~Tie() {}
 
 void Tie::Reset()
 {

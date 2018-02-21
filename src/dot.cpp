@@ -31,9 +31,7 @@ Dot::Dot() : LayerElement("dot-"), PositionInterface(), AttColor(), AttDotLog()
     Reset();
 }
 
-Dot::~Dot()
-{
-}
+Dot::~Dot() {}
 
 void Dot::Reset()
 {
@@ -67,7 +65,7 @@ int Dot::ResetDrawing(FunctorParams *functorParams)
 
     this->m_drawingNote = NULL;
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Dot::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

@@ -21,33 +21,44 @@ class Beam;
 class BeamDrawingParams;
 class Breath;
 class Chord;
+class ControlElement;
 class DeviceContext;
 class Dir;
 class Doc;
 class Dynam;
 class EditorialElement;
 class Ending;
-class Fb;
 class F;
+class Fb;
+class Fig;
 class Fermata;
 class Hairpin;
 class Harm;
 class Layer;
 class LayerElement;
+class Lb;
 class Measure;
 class Mordent;
-class ControlElement;
+class Num;
 class Octave;
+class Options;
 class Page;
 class Pedal;
+class PgFoot;
+class PgFoot;
+class PgHead;
+class PgHead2;
 class Rend;
+class RunningElement;
 class Slur;
 class Staff;
+class Svg;
 class Syl;
 class System;
 class SystemElement;
 class Tempo;
 class Text;
+class TextDrawingParams;
 class TextElement;
 class Tie;
 class Trill;
@@ -183,6 +194,16 @@ protected:
     ///@}
 
     /**
+     * @name Methods for drawing RunningElements (PgHead, PgFoot, etc.)
+     * Defined in view_running.cpp
+     */
+    ///@{
+    void DrawRunningElements(DeviceContext *dc, Page *page);
+    void DrawPgFooter(DeviceContext *dc, RunningElement *pgFooter);
+    void DrawPgHeader(DeviceContext *dc, RunningElement *pgHeader);
+    ///@}
+
+    /**
      * @name Methods for drawing children
      * Defined in view_page.cpp
      * For each method, we have a parent Object, that can be either the same as the next paremeter,
@@ -195,8 +216,9 @@ protected:
     void DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measure, System *system);
     void DrawStaffChildren(DeviceContext *dc, Object *parent, Staff *staff, Measure *measure);
     void DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, Staff *staff, Measure *measure);
-    void DrawTextChildren(DeviceContext *dc, Object *parent, int x, int y, bool &setX, bool &setY);
-    void DrawFbChildren(DeviceContext *dc, Object *parent, int x, int y, bool &setX, bool &setY);
+    void DrawTextChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params);
+    void DrawFbChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params);
+    void DrawRunningChildren(DeviceContext *dc, Object *parent, TextDrawingParams &params);
     ///@}
 
     /**
@@ -209,8 +231,9 @@ protected:
     void DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *element, Staff *staff, Measure *measure);
     void DrawLayerEditorialElement(
         DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure);
-    void DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY);
-    void DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY);
+    void DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element, TextDrawingParams &params);
+    void DrawFbEditorialElement(DeviceContext *dc, EditorialElement *element, TextDrawingParams &params);
+    void DrawRunningEditorialElement(DeviceContext *dc, EditorialElement *element, TextDrawingParams &params);
     ///@}
 
     /**
@@ -292,7 +315,7 @@ protected:
      * Defined in view_text.cpp
      */
     ///@{
-    void DrawTextElement(DeviceContext *dc, TextElement *element, int x, int y, bool &setX, bool &setY);
+    void DrawTextElement(DeviceContext *dc, TextElement *element, TextDrawingParams &params);
     ///@}
 
     /**
@@ -300,8 +323,8 @@ protected:
      * Defined in view_text.cpp
      */
     ///@{
-    void DrawFb(DeviceContext *dc, Staff *staff, Fb *element, int x, int y, bool &setX, bool &setY);
-    void DrawF(DeviceContext *dc, F *figure, int x, int y, bool &setX, bool &setY);
+    void DrawFb(DeviceContext *dc, Staff *staff, Fb *element, TextDrawingParams &params);
+    void DrawF(DeviceContext *dc, F *figure, TextDrawingParams &params);
 
     ///@}
 
@@ -313,8 +336,12 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawRend(DeviceContext *dc, Rend *rend, int x, int y, bool &setX, bool &setY);
-    void DrawText(DeviceContext *dc, Text *text, int x, int y, bool &setX, bool &setY);
+    void DrawFig(DeviceContext *dc, Fig *fig, TextDrawingParams &params);
+    void DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params);
+    void DrawNum(DeviceContext *dc, Num *num, TextDrawingParams &params);
+    void DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params);
+    void DrawSvg(DeviceContext *dc, Svg *svg, TextDrawingParams &params);
+    void DrawText(DeviceContext *dc, Text *text, TextDrawingParams &params);
 
     /**
      * @name Method for drawing Beam and FTrem.
@@ -479,6 +506,8 @@ private:
 public:
     /** Document */
     Doc *m_doc;
+    /** Options of the document */
+    Options *m_options;
     /** Index of the current page */
     int m_pageIdx;
 

@@ -35,9 +35,7 @@ Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), Att
     Reset();
 }
 
-Slur::~Slur()
-{
-}
+Slur::~Slur() {}
 
 void Slur::Reset()
 {
@@ -113,6 +111,6 @@ int Slur::ResetDrawing(FunctorParams *functorParams)
     m_drawingCurvedir = curvature_CURVEDIR_NONE;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 } // namespace vrv

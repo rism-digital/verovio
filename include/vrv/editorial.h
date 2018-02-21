@@ -25,8 +25,6 @@ class StaffDef;
 class StaffGrp;
 class TextElement;
 
-enum VisibilityType { Hidden = 0, Visible };
-
 //----------------------------------------------------------------------------
 // EditorialElement
 //----------------------------------------------------------------------------
@@ -93,7 +91,7 @@ private:
 public:
     /**
      * Holds the visibility (hidden or visible) for an editorial element.
-     * By defautl, all editorial elements are visible. However, in an <app>, only one <rdg> is visible at the time. When
+     * By default, all editorial elements are visible. However, in an <app>, only one <rdg> is visible at the time. When
      * loading the file, the first <rdg> (or the <lem>) is made visible.
      */
     VisibilityType m_visibility;

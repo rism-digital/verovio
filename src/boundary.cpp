@@ -31,9 +31,7 @@ BoundaryEnd::BoundaryEnd(Object *start) : SystemElement("bdend-")
     m_startClassName = start->GetClassName();
 }
 
-BoundaryEnd::~BoundaryEnd()
-{
-}
+BoundaryEnd::~BoundaryEnd() {}
 
 void BoundaryEnd::Reset()
 {
@@ -50,9 +48,7 @@ BoundaryStartInterface::BoundaryStartInterface()
     Reset();
 }
 
-BoundaryStartInterface::~BoundaryStartInterface()
-{
-}
+BoundaryStartInterface::~BoundaryStartInterface() {}
 
 void BoundaryStartInterface::Reset()
 {
@@ -112,7 +108,7 @@ int BoundaryEnd::ResetDrawing(FunctorParams *functorParams)
     this->SetMeasure(NULL);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int BoundaryEnd::CastOffSystems(FunctorParams *functorParams)
 {
@@ -176,6 +172,6 @@ int BoundaryStartInterface::InterfaceResetDrawing(FunctorParams *functorParams)
     m_drawingMeasure = NULL;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 } // namespace vrv

@@ -48,6 +48,15 @@ public:
      * Return true if the barLine type requires repetition dots to be drawn.
      */
     bool HasRepetitionDots() const;
+    
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::ConvertToCastOffMensural
+     */
+    virtual int ConvertToCastOffMensural(FunctorParams *params);
 
 private:
     //

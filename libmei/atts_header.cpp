@@ -27,6 +27,52 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// AttRecordType
+//----------------------------------------------------------------------------
+
+AttRecordType::AttRecordType() : Att()
+{
+    ResetRecordType();
+}
+
+AttRecordType::~AttRecordType()
+{
+}
+
+void AttRecordType::ResetRecordType()
+{
+    m_recordtype = recordType_RECORDTYPE_NONE;
+}
+
+bool AttRecordType::ReadRecordType(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("recordtype")) {
+        this->SetRecordtype(StrToRecordTypeRecordtype(element.attribute("recordtype").value()));
+        element.remove_attribute("recordtype");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttRecordType::WriteRecordType(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasRecordtype()) {
+        element.append_attribute("recordtype") = RecordTypeRecordtypeToStr(this->GetRecordtype()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttRecordType::HasRecordtype() const
+{
+    return (m_recordtype != recordType_RECORDTYPE_NONE);
+}
+
+/* include <attrecordtype> */
+
+//----------------------------------------------------------------------------
 // AttRegularMethod
 //----------------------------------------------------------------------------
 
@@ -74,6 +120,14 @@ bool AttRegularMethod::HasMethod() const
 
 bool Att::SetHeader(Object *element, std::string attrType, std::string attrValue)
 {
+    if (element->HasAttClass(ATT_RECORDTYPE)) {
+        AttRecordType *att = dynamic_cast<AttRecordType *>(element);
+        assert(att);
+        if (attrType == "recordtype") {
+            att->SetRecordtype(att->StrToRecordTypeRecordtype(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_REGULARMETHOD)) {
         AttRegularMethod *att = dynamic_cast<AttRegularMethod *>(element);
         assert(att);
@@ -88,6 +142,13 @@ bool Att::SetHeader(Object *element, std::string attrType, std::string attrValue
 
 void Att::GetHeader(const Object *element, ArrayOfStrAttr *attributes)
 {
+    if (element->HasAttClass(ATT_RECORDTYPE)) {
+        const AttRecordType *att = dynamic_cast<const AttRecordType *>(element);
+        assert(att);
+        if (att->HasRecordtype()) {
+            attributes->push_back(std::make_pair("recordtype", att->RecordTypeRecordtypeToStr(att->GetRecordtype())));
+        }
+    }
     if (element->HasAttClass(ATT_REGULARMETHOD)) {
         const AttRegularMethod *att = dynamic_cast<const AttRegularMethod *>(element);
         assert(att);

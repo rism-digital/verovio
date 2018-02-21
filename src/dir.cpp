@@ -33,9 +33,7 @@ Dir::Dir() : ControlElement("dir-"), TextListInterface(), TextDirInterface(), Ti
     Reset();
 }
 
-Dir::~Dir()
-{
-}
+Dir::~Dir() {}
 
 void Dir::Reset()
 {
@@ -47,7 +45,7 @@ void Dir::Reset()
 
 void Dir::AddChild(Object *child)
 {
-    if (child->IsTextElement()) {
+    if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else if (child->IsEditorialElement()) {

@@ -31,9 +31,7 @@ Hairpin::Hairpin() : ControlElement("hairpin-"), TimeSpanningInterface(), AttCol
     Reset();
 }
 
-Hairpin::~Hairpin()
-{
-}
+Hairpin::~Hairpin() {}
 
 void Hairpin::Reset()
 {

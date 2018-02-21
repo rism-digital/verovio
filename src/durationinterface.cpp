@@ -48,9 +48,7 @@ DurationInterface::DurationInterface()
     Reset();
 }
 
-DurationInterface::~DurationInterface()
-{
-}
+DurationInterface::~DurationInterface() {}
 
 void DurationInterface::Reset()
 {
@@ -65,22 +63,22 @@ void DurationInterface::Reset()
 
 double DurationInterface::GetInterfaceAlignmentDuration(int num, int numbase)
 {
-    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
+    int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
 
     if (this->HasNum()) num *= this->GetNum();
     if (this->HasNumbase()) numbase *= this->GetNumbase();
 
-    double duration = DUR_MAX / pow(2.0, (double)(note_dur - 2.0)) * numbase / num;
+    double duration = DUR_MAX / pow(2.0, (double)(noteDur - 2.0)) * numbase / num;
     if (GetDots() > 0) {
         duration = 2 * duration - (duration / pow(2, GetDots()));
     }
-    // LogDebug("Duration %d; Dot %d; Alignement %f", note_dur, GetDots(), duration);
+    // LogDebug("Duration %d; Dot %d; Alignement %f", noteDur, GetDots(), duration);
     return duration;
 }
 
 double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int numbase, Mensur *currentMensur)
 {
-    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
+    int noteDur = this->GetDurGes() != DURATION_NONE ? this->GetActualDurGes() : this->GetActualDur();
 
     if (!currentMensur) {
         LogWarning("No current mensur for calculating duration");
@@ -94,7 +92,7 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
 
     double ratio = 0.0;
     double duration = (double)DUR_MENSURAL_REF;
-    switch (note_dur) {
+    switch (noteDur) {
         case DUR_MX:
             duration *= (double)abs(currentMensur->GetModusminor()) * (double)abs(currentMensur->GetModusmaior());
             break;
@@ -102,12 +100,12 @@ double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int num
         case DUR_BR: break;
         case DUR_1: duration /= (double)abs(currentMensur->GetTempus()); break;
         default:
-            ratio = pow(2.0, (double)(note_dur - DUR_2));
+            ratio = pow(2.0, (double)(noteDur - DUR_2));
             duration /= (double)abs(currentMensur->GetTempus()) * (double)abs(currentMensur->GetProlatio()) * ratio;
             break;
     }
     duration *= (double)numbase / (double)num;
-    // LogDebug("Duration %d; %d/%d; Alignement %f; Ratio %f", note_dur, num, numbase, duration, ratio);
+    // LogDebug("Duration %d; %d/%d; Alignement %f; Ratio %f", noteDur, num, numbase, duration, ratio);
     duration = durRound(duration);
     return duration;
 }
@@ -163,7 +161,7 @@ int DurationInterface::GetNoteOrChordDur(LayerElement *element)
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
         Chord *chord = note->IsChordTone();
-        if (chord)
+        if (chord && !this->HasDur())
             return chord->GetActualDur();
         else
             return this->GetActualDur();

@@ -30,9 +30,7 @@ PositionInterface::PositionInterface() : Interface(), AttStaffLoc(), AttStaffLoc
     Reset();
 }
 
-PositionInterface::~PositionInterface()
-{
-}
+PositionInterface::~PositionInterface() {}
 
 void PositionInterface::Reset()
 {

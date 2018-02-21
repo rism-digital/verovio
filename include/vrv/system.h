@@ -90,7 +90,7 @@ public:
      */
     int GetSystemIdx() const { return Object::GetIdx(); }
 
-    void SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY);
+    bool SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY);
 
     /**
      * @name Setter and getter of the drawing scoreDef

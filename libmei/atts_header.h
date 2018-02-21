@@ -26,6 +26,42 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// AttRecordType
+//----------------------------------------------------------------------------
+
+class AttRecordType : public Att {
+public:
+    AttRecordType();
+    virtual ~AttRecordType();
+
+    /** Reset the default values for the attribute class **/
+    void ResetRecordType();
+
+    /** Read the values for the attribute class **/
+    bool ReadRecordType(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteRecordType(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetRecordtype(recordType_RECORDTYPE recordtype_) { m_recordtype = recordtype_; }
+    recordType_RECORDTYPE GetRecordtype() const { return m_recordtype; }
+    bool HasRecordtype() const;
+    ///@}
+
+private:
+    /** --- **/
+    recordType_RECORDTYPE m_recordtype;
+
+    /* include <attrecordtype> */
+};
+
+//----------------------------------------------------------------------------
 // AttRegularMethod
 //----------------------------------------------------------------------------
 
