@@ -1,4 +1,4 @@
-Verovio 2.0.0-dev-57334a9
+Verovio 2.0.0-dev-9803a0b
 
 Example usage:
 
@@ -23,6 +23,7 @@ Input and page layout options
  --even-note-spacing               Specify the linear spacing factor
  --hum-type                        Include type attributes when importing from Humdrum
  --landscape                       The landscape paper orientation flag
+ --mensural-to-measure             Convert mensural sections to measure-based MEI
  --mm-output                       Specify that the output in the SVG is given in mm (default is px)
  --no-footer                       Do not add any footer
  --no-header                       Do not add any header
