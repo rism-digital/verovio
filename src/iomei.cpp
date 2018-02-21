@@ -727,6 +727,7 @@ void MeiOutput::WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv)
 {
     assert(mdiv);
 
+    WriteXmlId(currentNode, mdiv);
     mdiv->WriteLabelled(currentNode);
     mdiv->WriteNNumberLike(currentNode);
 }
@@ -740,6 +741,7 @@ void MeiOutput::WritePages(pugi::xml_node currentNode, Pages *pages)
         m_currentNode.append_child(pugi::node_comment).set_value("Coordinates in MEI axis direction");
     }
 
+    WriteXmlId(currentNode, pages);
     pages->WriteLabelled(currentNode);
     pages->WriteNNumberLike(currentNode);
 }
@@ -748,6 +750,7 @@ void MeiOutput::WriteScore(pugi::xml_node currentNode, Score *score)
 {
     assert(score);
 
+    WriteXmlId(currentNode, score);
     score->WriteLabelled(currentNode);
     score->WriteNNumberLike(currentNode);
 }
