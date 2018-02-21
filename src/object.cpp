@@ -288,6 +288,10 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     Att::GetShared(this, attributes);
     Att::GetVisual(this, attributes);
 
+    for (auto &pair : m_unsupported) {
+        attributes->push_back(std::make_pair(pair.first, pair.second));
+    }
+
     return (int)attributes->size();
 }
 
