@@ -40,6 +40,7 @@
 #include "tempo.h"
 #include "text.h"
 #include "trill.h"
+#include "tuplet.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -106,12 +107,10 @@ bool AbcInput::ImportString(std::string const &abc)
 void AbcInput::parseABC(std::istream &infile)
 {
     // buffers
-    std::string c_clef = "treble";
     std::string music;
 
     std::string s_key;
     abc::Measure current_measure;
-    abc::Note current_note;
     Clef *staffDefClef = NULL;
 
     std::vector<abc::Measure> staff;
@@ -343,6 +342,22 @@ void AbcInput::AddBeam()
     m_noteStack.clear();
 }
 
+void AbcInput::AddTuplet()
+{
+    if (!m_noteStack.size()) {
+        return;
+    }
+    else {
+        Tuplet *tuplet = new Tuplet();
+        std::vector<LayerElement *>::iterator iter;
+        for (iter = m_noteStack.begin(); iter != m_noteStack.end(); iter++) {
+            tuplet->AddChild(*iter);
+        }
+        m_layer->AddChild(tuplet);
+    }
+    m_noteStack.clear();
+}
+
 void AbcInput::parseDecoration(std::string decorationString)
 {
     if (atoi(decorationString.c_str())) {
@@ -547,8 +562,11 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
 
 void AbcInput::readInformationField(char dataKey, std::string value, Score *score)
 {
+    assert(score);
+
     // remove comments
-    if (dataKey == '%') return;
+    if (dataKey == '%')
+        return;
     else if (value.find('%') != std::string::npos) {
         value = value.substr(0, value.find('%'));
         while (isspace(value[value.length() - 1])) value.pop_back();
@@ -570,6 +588,7 @@ void AbcInput::readInformationField(char dataKey, std::string value, Score *scor
         parseTempo(value);
     }
     else if (dataKey == 'X') {
+        score->SetN(value);
         // re-adding dataKey for complete string
         parseReferenceNumber(value);
     }
@@ -910,11 +929,11 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             else {
                 if (musicCode[i - 1] == ':')
                     measure->SetRight(BARRENDITION_rptend);
-                else if (musicCode[i + 1] == '|'){
+                else if (musicCode[i + 1] == '|') {
                     i++;
                     measure->SetRight(BARRENDITION_dbl);
                 }
-                else if (musicCode[i + 1] == ']'){
+                else if (musicCode[i + 1] == ']') {
                     i++;
                     measure->SetRight(BARRENDITION_end);
                 }
