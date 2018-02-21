@@ -61,6 +61,7 @@
 #include "pghead.h"
 #include "pghead2.h"
 #include "proport.h"
+#include "ref.h"
 #include "rend.h"
 #include "rest.h"
 #include "rpt.h"
@@ -86,7 +87,7 @@
 namespace vrv {
 
 std::vector<std::string> MeiInput::s_editorialElementNames = { "abbr", "add", "app", "annot", "choice", "corr",
-    "damage", "del", "expan", "orig", "reg", "restore", "sic", "supplied", "unclear" };
+    "damage", "del", "expan", "orig", "ref", "reg", "restore", "sic", "supplied", "unclear" };
 
 //----------------------------------------------------------------------------
 // MeiOutput
@@ -579,6 +580,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(RDG)) {
         m_currentNode = m_currentNode.append_child("rdg");
         WriteRdg(m_currentNode, dynamic_cast<Rdg *>(object));
+    }
+    else if (object->Is(REF)) {
+        m_currentNode = m_currentNode.append_child("ref");
+        WriteRef(m_currentNode, dynamic_cast<Ref *>(object));
     }
     else if (object->Is(REG)) {
         m_currentNode = m_currentNode.append_child("reg");
@@ -1754,6 +1759,13 @@ void MeiOutput::WriteRdg(pugi::xml_node currentNode, Rdg *rdg)
 
     WriteEditorialElement(currentNode, rdg);
     rdg->WriteSource(currentNode);
+}
+
+void MeiOutput::WriteRef(pugi::xml_node currentNode, Ref *ref)
+{
+    assert(ref);
+
+    WriteEditorialElement(currentNode, ref);
 }
 
 void MeiOutput::WriteReg(pugi::xml_node currentNode, Reg *reg)
@@ -4263,6 +4275,9 @@ bool MeiInput::ReadEditorialElement(Object *parent, pugi::xml_node current, Edit
     else if (std::string(current.name()) == "orig") {
         return ReadOrig(parent, current, level, filter);
     }
+    else if (std::string(current.name()) == "ref") {
+        return ReadRef(parent, current, level, filter);
+    }
     else if (std::string(current.name()) == "reg") {
         return ReadReg(parent, current, level, filter);
     }
@@ -4448,6 +4463,9 @@ bool MeiInput::ReadChoiceChildren(Object *parent, pugi::xml_node parentNode, Edi
         else if (std::string(current.name()) == "orig") {
             success = ReadOrig(parent, current, level, filter);
         }
+        else if (std::string(current.name()) == "ref") {
+            success = ReadRef(parent, current, level, filter);
+        }
         else if (std::string(current.name()) == "reg") {
             success = ReadReg(parent, current, level, filter);
         }
@@ -4570,6 +4588,15 @@ bool MeiInput::ReadRdg(Object *parent, pugi::xml_node rdg, EditorialLevel level,
 
     parent->AddChild(vrvRdg);
     return ReadEditorialChildren(vrvRdg, rdg, level, filter);
+}
+
+bool MeiInput::ReadRef(Object *parent, pugi::xml_node ref, EditorialLevel level, Object *filter)
+{
+    Ref *vrvRef = new Ref();
+    ReadEditorialElement(ref, vrvRef);
+    
+    parent->AddChild(vrvRef);
+    return ReadEditorialChildren(vrvRef, ref, level, filter);
 }
 
 bool MeiInput::ReadReg(Object *parent, pugi::xml_node reg, EditorialLevel level, Object *filter)

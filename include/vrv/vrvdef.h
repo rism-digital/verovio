@@ -89,6 +89,7 @@ enum ClassId {
     LEM,
     ORIG,
     RDG,
+    REF,
     REG,
     RESTORE,
     SIC,
