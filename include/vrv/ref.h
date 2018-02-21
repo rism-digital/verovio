@@ -12,7 +12,7 @@
 #include "editorial.h"
 
 namespace vrv {
-    
+
 //----------------------------------------------------------------------------
 // Ref
 //----------------------------------------------------------------------------
@@ -30,7 +30,7 @@ public:
     virtual std::string GetClassName() const { return "Ref"; }
     virtual ClassId GetClassId() const { return REF; }
     ///@}
-    
+
     //----------//
     // Functors //
     //----------//

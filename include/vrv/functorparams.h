@@ -21,8 +21,10 @@ class BoundaryStartInterface;
 class Chord;
 class Clef;
 class Dots;
+class Dynam;
 class Ending;
 class FileOutputStream;
+class Hairpin;
 class KeySig;
 class Layer;
 class LayerElement;
@@ -1156,6 +1158,8 @@ public:
 /**
  * member 0: the previous ending
  * member 1: the current grpId
+ * member 2: the dynam in the current Measure
+ * member 3: the current hairpin
  **/
 
 class PrepareFloatingGrpsParams : public FunctorParams {
@@ -1167,6 +1171,8 @@ public:
     }
     Ending *m_previousEnding;
     int m_drawingGrpId;
+    std::vector<Dynam *> m_dynams;
+    std::vector<Hairpin *> m_hairpins;
 };
 
 //----------------------------------------------------------------------------

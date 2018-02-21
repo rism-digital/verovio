@@ -596,7 +596,8 @@ void Doc::PrepareDrawing()
     // Prepare the floating drawing groups
     PrepareFloatingGrpsParams prepareFloatingGrpsParams;
     Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
-    this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams);
+    Functor prepareFloatingGrpsEnd(&Object::PrepareFloatingGrpsEnd);
+    this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams, &prepareFloatingGrpsEnd);
 
     /************ Resolve cue size ************/
 

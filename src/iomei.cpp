@@ -4692,7 +4692,7 @@ bool MeiInput::ReadRef(Object *parent, pugi::xml_node ref, EditorialLevel level,
 {
     Ref *vrvRef = new Ref();
     ReadEditorialElement(ref, vrvRef);
-    
+
     parent->AddChild(vrvRef);
     ReadUnsupportedAttr(ref, vrvRef);
     return ReadEditorialChildren(vrvRef, ref, level, filter);

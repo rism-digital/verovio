@@ -891,9 +891,13 @@ public:
     virtual int PrepareBoundaries(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Functor for grouping FloatingObject by drawingGrpId
+     * @name Functor for grouping FloatingObject by drawingGrpId.
+     * Also chains the Dynam and Hairpin
      */
-    virtual int PrepareFloatingGrps(FunctorParams *functoParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int PrepareFloatingGrps(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareFloatingGrpsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Go through all the TimeSpanningInterface elements and set them a current to each staff

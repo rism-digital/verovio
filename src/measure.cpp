@@ -21,6 +21,7 @@
 #include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
+#include "hairpin.h"
 #include "page.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -881,6 +882,28 @@ int Measure::PrepareFloatingGrps(FunctorParams *functorParams)
         // We have a measure in between endings and the previous one was group, so we need to increase the grpId
         if (params->m_previousEnding->GetDrawingGrpId() > DRAWING_GRP_NONE) params->m_drawingGrpId++;
         params->m_previousEnding = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::PrepareFloatingGrpsEnd(FunctorParams *functorParams)
+{
+    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    assert(params);
+
+    params->m_dynams.clear();
+
+    std::vector<Hairpin *>::iterator iter = params->m_hairpins.begin();
+    while (iter != params->m_hairpins.end()) {
+        assert((*iter)->GetEnd());
+        Measure *measureEnd = dynamic_cast<Measure *>((*iter)->GetEnd()->GetFirstParent(MEASURE));
+        if (measureEnd == this) {
+            iter = params->m_hairpins.erase(iter);
+        }
+        else {
+            iter++;
+        }
     }
 
     return FUNCTOR_CONTINUE;

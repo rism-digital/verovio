@@ -315,9 +315,12 @@ public:
     virtual int PrepareCrossStaff(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareFloatingGrps
+     * @name See Object::PrepareFloatingGrps
      */
+    ///@{
     virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+    virtual int PrepareFloatingGrpsEnd(FunctorParams *functoParams);
+    ///@}
 
     /**
      * See Object::PrepareTimePointingEnd
