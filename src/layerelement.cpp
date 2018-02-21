@@ -543,7 +543,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
-    //if (m_alignment) LogDebug("Element %s %s", this->GetUuid().c_str(), this->GetClassName().c_str());
+    // if (m_alignment) LogDebug("Element %s %s", this->GetUuid().c_str(), this->GetClassName().c_str());
     assert(!m_alignment);
 
     this->SetScoreDefRole(params->m_scoreDefRole);
@@ -684,12 +684,12 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         }
     }
 
+    // LogDebug("Element %f %s", params->m_time, this->GetClassName().c_str());
+
     if (!this->Is(TIMESTAMP_ATTR)) {
         // increase the time position, but only when not a timestamp (it would actually do nothing)
         params->m_time += duration;
     }
-
-    // LogDebug("AlignHorizontally: Time %f - %s", (*time), this->GetClassName().c_str());
 
     return FUNCTOR_CONTINUE;
 }
@@ -929,7 +929,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     if (params->m_graceCumulatedXShift == VRV_UNSET) params->m_graceCumulatedXShift = 0;
 
-    // LogDebug("Aligning %s", this->GetClassName().c_str());
+    // LogDebug("********* Aligning %s", this->GetClassName().c_str());
 
     // With non grace alignment we do not need to do this
     this->ResetCachedDrawingX();
@@ -995,17 +995,18 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() - offset);
         // Also move the cumultated x shift and the minimum position for the next alignment accordingly
         params->m_cumulatedXShift += (-offset);
-        params->m_upcomingMinPos += (-offset);
+        // params->m_upcomingMinPos += (-offset);
     }
 
     int selfRight;
-    if (!this->HasSelfBB() || this->HasEmptyBB())
+    if (!this->HasSelfBB() || this->HasEmptyBB()) {
         selfRight = this->GetAlignment()->GetXRel()
             + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
-
-    else
+    }
+    else {
         selfRight = this->GetSelfRight()
             + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+    }
 
     params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
 
@@ -1242,7 +1243,9 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
 
         Chord *chord = note->IsChordTone();
 
-        if (chord) {
+        // If the note has a @dur or a @dur.ges, take it into account
+        // This means that overwriting only @dots or @dots.ges will not be taken into account
+        if (chord && !note->HasDur() && !note->HasDurGes()) {
             incrementScoreTime = chord->GetAlignmentDuration();
         }
         else {

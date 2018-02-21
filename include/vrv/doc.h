@@ -19,6 +19,7 @@ namespace vrv {
 class CastOffPagesParams;
 class FontInfo;
 class Glyph;
+class Pages;
 class Page;
 class Score;
 
@@ -86,21 +87,29 @@ public:
     /**
      * Check if the document has a page with the specified value
      */
-    bool HasPage(int pageIdx) const;
+    bool HasPage(int pageIdx);
 
     /**
-     * Create a score buffer for loading or creating a scoreBased MEI document.
-     * Creating a mdiv buffer clear existing data (but not the header).
-     * The score buffer is owned by the Doc.
-     * Once the document is created, Doc::ConvertToPagePagedDoc should be called to convert it before rendering.
+     * Get the Score in the visible Mdiv.
+     * Will find it only when having read a score-based MEI file
      */
-    Score *CreateScoreBuffer();
+    Score *GetScore();
+
+    /**
+     * Get the Pages in the visible Mdiv.
+     * Will find it only when having read a pages-based MEI file,
+     * or when a file was converted to page-based MEI.
+     */
+    Pages *GetPages();
 
     /**
      * Get the total page count
      */
-    int GetPageCount() const;
+    int GetPageCount();
 
+    /**
+     * Return true if the MIDI generation is already done
+     */
     bool GetMidiExportDone() const;
 
     /**
@@ -239,6 +248,17 @@ public:
     void ConvertToPageBasedDoc();
 
     /**
+     * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
+     * Segment positions occur where a barLine is set on all staves.
+     */
+    void ConvertToCastOffMensuralDoc();
+
+    /**
+     * Reverse of ConvertToCastOffMensuralDoc()
+     */
+    void ConvertToUnCastOffMensuralDoc();
+
+    /**
      * Convert analytical encoding (@fermata, @tie) to correpsonding elements
      * By default, the element are used only for the rendering and not preserved in the MEI output
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
@@ -288,6 +308,14 @@ public:
      * Setter for analytical markup flag
      */
     void SetAnalyticalMarkup(bool hasAnalyticalMarkup) { m_hasAnalyticalMarkup = hasAnalyticalMarkup; }
+
+    /**
+     * @name Setter for and getter for mensural only flag
+     */
+    ///@{
+    void SetMensuralMusicOnly(bool isMensuralMusicOnly) { m_isMensuralMusicOnly = isMensuralMusicOnly; }
+    bool IsMensuralMusicOnly() const { return m_isMensuralMusicOnly; }
+    ///@}
 
     //----------//
     // Functors //
@@ -397,11 +425,17 @@ private:
     bool m_hasMidiTimemap;
 
     /**
-     * A flag to indicate whereash the document contains analytical markup to be converted.
+     * A flag to indicate whereas the document contains analytical markup to be converted.
      * This is currently limited to @fermata and @tie. Other attribute markup (@accid and @artic)
      * is converted during the import in MeiInput.
      */
     bool m_hasAnalyticalMarkup;
+
+    /**
+     * A flag to indicate whereas to document contains only mensural music.
+     * Mensural only music will be converted to cast-off segments by Doc::ConvertToCastOffMensuralDoc
+     */
+    bool m_isMensuralMusicOnly;
 
     /** Page width (MEI scoredef@page.width) - currently not saved */
     int m_pageWidth;
@@ -415,11 +449,6 @@ private:
     int m_pageMarginRight;
     /** Page top margin (MEI scoredef@page.topmar) - currently not saved */
     int m_pageMarginTop;
-
-    /**
-     * A score buffer for loading or creating a scoreBased MEI.
-     */
-    Score *m_scoreBuffer;
 };
 
 } // namespace vrv

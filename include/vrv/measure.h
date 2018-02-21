@@ -201,6 +201,16 @@ public:
     virtual int ConvertToPageBased(FunctorParams *functorParams);
 
     /**
+     * See Object::ConvertToCastOffMensural
+     */
+    virtual int ConvertToCastOffMensural(FunctorParams *params);
+
+    /**
+     * See Object::ConvertToUnCastOffMensural
+     */
+    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
+
+    /**
      * See Object::Save
      */
     ///@{

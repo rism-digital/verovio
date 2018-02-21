@@ -126,7 +126,7 @@ void Page::LayOutTranscription(bool force)
         return;
     }
 
-    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -194,7 +194,7 @@ void Page::LayOutTranscription(bool force)
 
 void Page::LayOutHorizontally()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -319,7 +319,7 @@ void Page::LayOutHorizontally()
 
 void Page::LayOutVertically()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -400,7 +400,7 @@ void Page::LayOutVertically()
 
 void Page::JustifyHorizontally()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
 
     if ((doc->GetOptions()->m_breaks.GetValue() == BREAKS_none) || doc->GetOptions()->m_noJustification.GetValue()) {
@@ -421,7 +421,7 @@ void Page::JustifyHorizontally()
 
 void Page::LayOutPitchPos()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -440,7 +440,7 @@ void Page::LayOutPitchPos()
 
 int Page::GetContentHeight() const
 {
-    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -461,7 +461,7 @@ int Page::GetContentHeight() const
 
 int Page::GetContentWidth() const
 {
-    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
     // in non debug
     if (!doc) return 0;

@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        score.cpp
+// Name:        pages.cpp
 // Author:      Laurent Pugin
-// Created:     29/08/2016
+// Created:     2018/02/15
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "score.h"
+#include "pages.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,19 +13,17 @@
 
 //----------------------------------------------------------------------------
 
-#include "editorial.h"
-#include "ending.h"
-#include "scoredef.h"
-#include "section.h"
+#include "page.h"
+#include "score.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Score
+// Pages
 //----------------------------------------------------------------------------
 
-Score::Score() : Object("score-"), AttLabelled(), AttNNumberLike()
+Pages::Pages() : Object("pages-"), AttLabelled(), AttNNumberLike()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_NNUMBERLIKE);
@@ -33,28 +31,22 @@ Score::Score() : Object("score-"), AttLabelled(), AttNNumberLike()
     Reset();
 }
 
-Score::~Score() {}
+Pages::~Pages() {}
 
-void Score::Reset()
+void Pages::Reset()
 {
     Object::Reset();
     ResetLabelled();
     ResetNNumberLike();
 }
 
-void Score::AddChild(Object *child)
+void Pages::AddChild(Object *child)
 {
-    if (child->Is(SCOREDEF)) {
+    if (child->Is(PAGE)) {
+        assert(dynamic_cast<Page *>(child));
+    }
+    else if (child->Is(SCOREDEF)) {
         assert(dynamic_cast<ScoreDef *>(child));
-    }
-    else if (child->Is(SECTION)) {
-        assert(dynamic_cast<Section *>(child));
-    }
-    else if (child->Is(ENDING)) {
-        assert(dynamic_cast<Ending *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
@@ -64,6 +56,13 @@ void Score::AddChild(Object *child)
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
+}
+
+void Pages::ConvertFrom(Score *score)
+{
+    score->SwapUuid(this);
+    this->AttLabelled::operator=(*score);
+    this->AttNNumberLike::operator=(*score);
 }
 
 //----------------------------------------------------------------------------

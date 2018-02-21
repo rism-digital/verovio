@@ -59,11 +59,13 @@ enum ClassId {
     LABEL,
     LABELABBR,
     LAYER,
+    MDIV,
     MEASURE,
     MEASURE_ALIGNER,
     MENSUR_ATTR,
     METERSIG_ATTR,
     PAGE,
+    PAGES,
     SCORE,
     STAFF,
     STAFF_ALIGNMENT,
@@ -346,6 +348,12 @@ enum EditorialLevel {
     EDITORIAL_FB,
     EDITORIAL_RUNNING,
 };
+
+//----------------------------------------------------------------------------
+// Visibility for editorial and mdiv elements
+//----------------------------------------------------------------------------
+
+enum VisibilityType { Hidden = 0, Visible };
 
 //----------------------------------------------------------------------------
 // The used SMuFL glyph anchors

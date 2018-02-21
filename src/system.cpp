@@ -22,6 +22,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "page.h"
+#include "pages.h"
 #include "section.h"
 #include "staff.h"
 #include "vrv.h"
@@ -365,7 +366,7 @@ int System::JustifyX(FunctorParams *functorParams)
 
     if (params->m_justifiableRatio < 0.8) {
         // Arbitrary value for avoiding over-compressed justification
-        LogWarning("Justification stop because of a ratio smaller than 0.8: %lf", params->m_justifiableRatio);
+        LogWarning("Justification is highly compressed (ratio smaller than 0.8: %lf)", params->m_justifiableRatio);
         LogWarning("\tSystem full width: %d", params->m_systemFullWidth);
         LogWarning("\tNon-justifiable width: %d", nonJustifiableWidth);
         LogWarning("\tDrawing justifiable width: %d", m_drawingJustifiableWidth);
@@ -405,39 +406,58 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
 
     params->m_classId = TIE;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = SLUR;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = MORDENT;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = TURN;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = TRILL;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = DYNAM;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = HAIRPIN;
     m_systemAligner.Process(params->m_functor, params);
+
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(DYNAM);
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(HAIRPIN);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+
     params->m_classId = OCTAVE;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = BREATH;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = FERMATA;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = DIR;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = TEMPO;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = PEDAL;
     m_systemAligner.Process(params->m_functor, params);
 
     params->m_classId = HARM;
     m_systemAligner.Process(params->m_functor, params);
+
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(HARM);
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
 
     params->m_classId = ENDING;
     m_systemAligner.Process(params->m_functor, params);
+
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(ENDING);
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
@@ -467,7 +487,8 @@ int System::CastOffPages(FunctorParams *functorParams)
         params->m_currentPage = new Page();
         // Use VRV_UNSET value as a flag
         params->m_pgHeadHeight = VRV_UNSET;
-        params->m_doc->AddChild(params->m_currentPage);
+        assert(params->m_doc->GetPages());
+        params->m_doc->GetPages()->AddChild(params->m_currentPage);
         params->m_shift = this->m_drawingYRel - params->m_pageHeight;
     }
 

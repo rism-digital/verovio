@@ -22,7 +22,8 @@ class Hairpin : public ControlElement,
                 public TimeSpanningInterface,
                 public AttColor,
                 public AttHairpinLog,
-                public AttPlacement {
+                public AttPlacement,
+                public AttVerticalAlignment {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -47,6 +48,11 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::PrepareFloatingGrps
+     */
+    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
 
 protected:
     //

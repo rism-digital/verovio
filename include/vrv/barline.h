@@ -49,6 +49,15 @@ public:
      */
     bool HasRepetitionDots() const;
 
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::ConvertToCastOffMensural
+     */
+    virtual int ConvertToCastOffMensural(FunctorParams *params);
+
 private:
     //
 public:

@@ -50,6 +50,16 @@ public:
     ///@}
 
     /**
+     * Do not copy children for layers
+     */
+    virtual bool CopyChildren() const { return false; }
+
+    /**
+     * Overriding CopyReset() method to be called after copy / assignment calls.
+     */
+    virtual void CopyReset();
+
+    /**
      * @name Methods for adding allowed content
      */
     ///@{
@@ -131,6 +141,16 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ConvertToCastOffMensural
+     */
+    virtual int ConvertToCastOffMensural(FunctorParams *params);
+
+    /**
+     * See Object::ConvertToUnCastOffMensural
+     */
+    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
 
     /**
      * See Object::UnsetCurrentScoreDef
