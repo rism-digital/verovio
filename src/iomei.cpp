@@ -1027,6 +1027,7 @@ void MeiOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteControlElement(currentNode, dynam);
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
+    dynam->WriteVerticalAlignment(currentNode);
 }
 
 void MeiOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
@@ -1049,6 +1050,7 @@ void MeiOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     hairpin->WriteColor(currentNode);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WritePlacement(currentNode);
+    hairpin->WriteVerticalAlignment(currentNode);
 }
 
 void MeiOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
@@ -3195,6 +3197,7 @@ bool MeiInput::ReadDynam(Object *parent, pugi::xml_node dynam)
 
     ReadTextDirInterface(dynam, vrvDynam);
     ReadTimeSpanningInterface(dynam, vrvDynam);
+    vrvDynam->ReadVerticalAlignment(dynam);
 
     parent->AddChild(vrvDynam);
     return ReadTextChildren(vrvDynam, dynam, vrvDynam);
@@ -3223,6 +3226,7 @@ bool MeiInput::ReadHairpin(Object *parent, pugi::xml_node hairpin)
     vrvHairpin->ReadColor(hairpin);
     vrvHairpin->ReadHairpinLog(hairpin);
     vrvHairpin->ReadPlacement(hairpin);
+    vrvHairpin->ReadVerticalAlignment(hairpin);
 
     parent->AddChild(vrvHairpin);
     return true;

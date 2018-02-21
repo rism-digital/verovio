@@ -20,7 +20,7 @@ class TextElement;
 // Dynam
 //----------------------------------------------------------------------------
 
-class Dynam : public ControlElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface {
+class Dynam : public ControlElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface, public AttVerticalAlignment {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -60,6 +60,11 @@ public:
     // Functors //
     //----------//
 
+    /**
+     * See Object::PrepareFloatingGrps
+     */
+    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+    
 protected:
     //
 private:

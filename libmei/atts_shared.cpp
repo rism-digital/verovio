@@ -7183,7 +7183,7 @@ AttVerticalAlignment::~AttVerticalAlignment()
 
 void AttVerticalAlignment::ResetVerticalAlignment()
 {
-    m_vgrp = -1;
+    m_vgrp = VRV_UNSET;
 }
 
 bool AttVerticalAlignment::ReadVerticalAlignment(pugi::xml_node element)
@@ -7209,7 +7209,7 @@ bool AttVerticalAlignment::WriteVerticalAlignment(pugi::xml_node element)
 
 bool AttVerticalAlignment::HasVgrp() const
 {
-    return (m_vgrp != -1);
+    return (m_vgrp != VRV_UNSET);
 }
 
 /* include <attvgrp> */
