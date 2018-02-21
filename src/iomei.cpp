@@ -2386,18 +2386,19 @@ bool MeiInput::ReadPages(Object *parent, pugi::xml_node pages)
         LogWarning("No <scoreDef> provided, trying to proceed... ");
     }
     else {
-        DocType type;
-        if (mdiv.first_child().attribute("type")) {
-            type = StrToDocType(mdiv.first_child().attribute("type").value());
-            m_doc->SetType(type);
-        }
+        // This actually sets the Doc::m_scoreDef
+        success = ReadScoreDef(vrvPages, scoreDef);
+    }
 
-        m_readingScoreBased = true;
-        Score *score = m_doc->CreateScoreBuffer();
-        pugi::xml_node current;
-        for (current = mdiv.first_child(); current; current = current.next_sibling()) {
-            if (!success) break;
-            success = ReadScoreBasedMei(current, score);
+    if (!success) return false;
+
+    // No need to have ReadPagesChildren for this...
+    pugi::xml_node current;
+    for (current = pages.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+        // page
+        if (std::string(current.name()) == "page") {
+            success = ReadPage(vrvPages, current);
         }
         else if (std::string(current.name()) == "scoreDef") {
             // Skipping scoreDefs, only the first one is possible
