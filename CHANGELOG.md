@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 ### Added
+* Preservation of unsupported attributes in the MEI output and in JS getElementAttr
+* Support for `<ref>` elements (preserved in the SVG but with no predefined behaviour)
 * Support for chords with mixed durations
 * Adding Travis CI (Linux and OS X)
 * Preservation of the full `<body>` subtree (`<mdiv>`, `<score>`) in the MEI output
