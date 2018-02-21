@@ -21,7 +21,13 @@ namespace vrv {
 // Hairpin
 //----------------------------------------------------------------------------
 
-Hairpin::Hairpin() : ControlElement("hairpin-"), TimeSpanningInterface(), AttColor(), AttHairpinLog(), AttPlacement(), AttVerticalAlignment()
+Hairpin::Hairpin()
+    : ControlElement("hairpin-")
+    , TimeSpanningInterface()
+    , AttColor()
+    , AttHairpinLog()
+    , AttPlacement()
+    , AttVerticalAlignment()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
@@ -59,5 +65,5 @@ int Hairpin::PrepareFloatingGrps(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 } // namespace vrv

@@ -325,35 +325,35 @@ bool Chord::IsVisible()
     if (this->HasVisible()) {
         return this->GetVisible() == BOOLEAN_true;
     }
-    
+
     // if the chord doens't have it, see if all the children are invisible
     const ListOfObjects *notes = this->GetList(this);
     assert(notes);
-    
-    for (auto& iter : *notes) {
+
+    for (auto &iter : *notes) {
         Note *note = dynamic_cast<Note *>(iter);
         assert(note);
         if (!note->HasVisible() || note->GetVisible() == BOOLEAN_true) {
             return true;
         }
     }
-    
+
     return false;
 }
-    
+
 bool Chord::HasNoteWithDots()
 {
     const ListOfObjects *notes = this->GetList(this);
     assert(notes);
-    
-    for (auto& iter : *notes) {
+
+    for (auto &iter : *notes) {
         Note *note = dynamic_cast<Note *>(iter);
         assert(note);
         if (note->GetDots() > 0) {
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -507,7 +507,7 @@ int Chord::CalcDots(FunctorParams *functorParams)
     for (rit = notes->rbegin(); rit != notes->rend(); rit++) {
         Note *note = dynamic_cast<Note *>(*rit);
         assert(note);
-        
+
         if (note->GetDots() == 0) {
             continue;
         }

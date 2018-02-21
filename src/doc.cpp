@@ -670,12 +670,12 @@ void Doc::CastOffDoc()
 {
     Pages *pages = this->GetPages();
     assert(pages);
-    
+
     if (pages->GetChildCount() != 1) {
         LogDebug("Document is already cast off");
         return;
     }
-    
+
     this->CollectScoreDefs();
 
     Page *contentPage = this->SetDrawingPage(0);
@@ -853,119 +853,118 @@ void Doc::ConvertToPageBasedDoc()
 
     this->ResetDrawingPage();
 }
-    
+
 void Doc::ConvertToCastOffMensuralDoc()
 {
     if (!m_isMensuralMusicOnly) return;
-    
+
     // We are converting to measure music in a definitiv way
     if (this->GetOptions()->m_mensuralToMeasure.GetValue()) {
         m_isMensuralMusicOnly = false;
     }
-    
+
     this->CollectScoreDefs();
 
     Pages *pages = this->GetPages();
     assert(pages);
-    
+
     // We need to populate processing lists for processing the document by Layer
     PrepareProcessingListsParams prepareProcessingListsParams;
     Functor prepareProcessingLists(&Object::PrepareProcessingLists);
     this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
-    
+
     // The means no content? Checking just in case
     if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
-   
+
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
-    
+
     contentPage->LayOutHorizontally();
-    
+
     Page *page = new Page();
     pages->AddChild(page);
     System *system = new System();
     page->AddChild(system);
-    
-    ConvertToCastOffMensuralParams convertToCastOffMensuralParams(this, system, &prepareProcessingListsParams.m_layerTree);
+
+    ConvertToCastOffMensuralParams convertToCastOffMensuralParams(
+        this, system, &prepareProcessingListsParams.m_layerTree);
     // Store the list of staff N for detecting barLines that are on all systems
-    for(auto const& staves: prepareProcessingListsParams.m_layerTree.child) {
+    for (auto const &staves : prepareProcessingListsParams.m_layerTree.child) {
         convertToCastOffMensuralParams.m_staffNs.push_back(staves.first);
     }
-    
+
     Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
     contentPage->Process(&convertToCastOffMensural, &convertToCastOffMensuralParams);
-    
+
     // Detach the contentPage
     pages->DetachChild(0);
     assert(contentPage && !contentPage->GetParent());
     delete contentPage;
-    
+
     this->PrepareDrawing();
-    
+
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
     this->CollectScoreDefs(true);
-    
 }
-    
+
 void Doc::ConvertToUnCastOffMensuralDoc()
 {
     if (!m_isMensuralMusicOnly) return;
-    
+
     Pages *pages = this->GetPages();
     assert(pages);
     if (pages->GetChildCount() > 1) {
         LogWarning("Document has to be un-cast off for MEI output...");
         this->UnCastOffDoc();
     }
-    
+
     // We need to populate processing lists for processing the document by Layer
     PrepareProcessingListsParams prepareProcessingListsParams;
     Functor prepareProcessingLists(&Object::PrepareProcessingLists);
     this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
-    
+
     // The means no content? Checking just in case
     if (prepareProcessingListsParams.m_layerTree.child.empty()) return;
 
     ConvertToUnCastOffMensuralParams convertToUnCastOffMensuralParams;
-    
+
     std::vector<AttComparison *> filters;
     // Now we can process by layer and move their content to (measure) segments
-    for (auto const& staves: prepareProcessingListsParams.m_layerTree.child) {
-        for (auto const& layers: staves.second.child) {
+    for (auto const &staves : prepareProcessingListsParams.m_layerTree.child) {
+        for (auto const &layers : staves.second.child) {
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(STAFF, staves.first);
             AttNIntegerComparison matchLayer(LAYER, layers.first);
             filters = { &matchStaff, &matchLayer };
-            
+
             convertToUnCastOffMensuralParams.m_contentMeasure = NULL;
             convertToUnCastOffMensuralParams.m_contentLayer = NULL;
-            
+
             Functor convertToUnCastOffMensural(&Object::ConvertToUnCastOffMensural);
             this->Process(&convertToUnCastOffMensural, &convertToUnCastOffMensuralParams, NULL, &filters);
-            
+
             convertToUnCastOffMensuralParams.m_addSegmentsToDelete = false;
         }
     }
-    
+
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
     System *contentSystem = dynamic_cast<System *>(contentPage->FindChildByType(SYSTEM));
     assert(contentSystem);
-    
+
     // Detach the contentPage
-    for (auto& measure : convertToUnCastOffMensuralParams.m_segmentsToDelete) {
+    for (auto &measure : convertToUnCastOffMensuralParams.m_segmentsToDelete) {
         contentSystem->DeleteChild(measure);
     }
-    
+
     this->PrepareDrawing();
-    
+
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
     this->CollectScoreDefs(true);
-    
 }
 
 void Doc::ConvertAnalyticalMarkupDoc(bool permanent)

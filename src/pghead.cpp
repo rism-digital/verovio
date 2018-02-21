@@ -79,7 +79,7 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
         composerRend->AddChild(composerText);
         this->AddChild(composerRend);
     }
-    
+
     // Lyricist
     node = header.select_single_node("//fileDesc/titleStmt/respStmt/persName[@role=\"lyricist\"]");
     if (node) {

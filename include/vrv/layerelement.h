@@ -169,7 +169,7 @@ public:
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * See Object::ResetHorizontalAlignment
      */

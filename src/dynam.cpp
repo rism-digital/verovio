@@ -29,7 +29,8 @@ std::wstring dynamSmufl[] = { L"\uE520", L"\uE521", L"\uE522", L"\uE523", L"\uE5
 // Dynam
 //----------------------------------------------------------------------------
 
-Dynam::Dynam() : ControlElement("dynam-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttVerticalAlignment()
+Dynam::Dynam()
+    : ControlElement("dynam-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttVerticalAlignment()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
@@ -171,5 +172,5 @@ int Dynam::PrepareFloatingGrps(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 } // namespace vrv

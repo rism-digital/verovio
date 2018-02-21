@@ -132,10 +132,10 @@ bool MeiOutput::ExportFile()
 
             // If the document is mensural, we have to undo the mensural (segments) cast off
             m_doc->ConvertToUnCastOffMensuralDoc();
-            
+
             // this starts the call of all the functors
             m_doc->Save(this);
-            
+
             // Redo the mensural segment cast of if necessary
             m_doc->ConvertToCastOffMensuralDoc();
         }
@@ -189,7 +189,7 @@ std::string MeiOutput::GetOutput(int page)
     this->ExportFile();
     m_writeToStreamString = false;
     m_page = -1;
-    
+
     return m_streamStringOutput.str();
 }
 
