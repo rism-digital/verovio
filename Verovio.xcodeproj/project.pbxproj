@@ -154,10 +154,10 @@
 		4D22C41918890E6100D0831F /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
 		4D22C41A18890E6100D0831F /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
 		4D22C41C18890E9900D0831F /* mrest.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D22C41B18890E9900D0831F /* mrest.h */; };
-		4D3080FB203DA09000BC44F6 /* ref.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D3080FA203DA09000BC44F6 /* ref.h */; };
-		4D3080FD203DA09D00BC44F6 /* ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3080FC203DA09D00BC44F6 /* ref.cpp */; };
-		4D3080FE203DA09D00BC44F6 /* ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3080FC203DA09D00BC44F6 /* ref.cpp */; };
-		4D3080FF203DA09D00BC44F6 /* ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3080FC203DA09D00BC44F6 /* ref.cpp */; };
+		4D308101203DB69D00BC44F6 /* ref.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D308100203DB69C00BC44F6 /* ref.h */; };
+		4D308104203DB6B500BC44F6 /* ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D308103203DB6B500BC44F6 /* ref.cpp */; };
+		4D308105203DB6B500BC44F6 /* ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D308103203DB6B500BC44F6 /* ref.cpp */; };
+		4D308106203DB6B500BC44F6 /* ref.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D308103203DB6B500BC44F6 /* ref.cpp */; };
 		4D3FF8DB19BADD7A00B105B5 /* atts_pagebased.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3FF8D919BADD7A00B105B5 /* atts_pagebased.cpp */; };
 		4D422101199805E400963292 /* att.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4220FF199805E400963292 /* att.h */; };
 		4D422102199805E400963292 /* attdef.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D422100199805E400963292 /* attdef.h */; };
@@ -628,8 +628,8 @@
 		4D22C41818890E6100D0831F /* mrest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mrest.cpp; path = src/mrest.cpp; sourceTree = "<group>"; };
 		4D22C41B18890E9900D0831F /* mrest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mrest.h; path = include/vrv/mrest.h; sourceTree = "<group>"; };
 		4D2E09B118A92371001EEEB8 /* emscripten_main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = emscripten_main.cpp; path = emscripten/emscripten_main.cpp; sourceTree = SOURCE_ROOT; };
-		4D3080FA203DA09000BC44F6 /* ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ref.h; sourceTree = "<group>"; };
-		4D3080FC203DA09D00BC44F6 /* ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ref.cpp; sourceTree = "<group>"; };
+		4D308100203DB69C00BC44F6 /* ref.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ref.h; path = include/vrv/ref.h; sourceTree = "<group>"; };
+		4D308103203DB6B500BC44F6 /* ref.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ref.cpp; path = src/ref.cpp; sourceTree = "<group>"; };
 		4D36C21C1EBCE14300A6DD1B /* fb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fb.h; path = include/vrv/fb.h; sourceTree = "<group>"; };
 		4D3FF8D919BADD7A00B105B5 /* atts_pagebased.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_pagebased.cpp; path = libmei/atts_pagebased.cpp; sourceTree = "<group>"; };
 		4D3FF8DA19BADD7A00B105B5 /* atts_pagebased.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_pagebased.h; path = libmei/atts_pagebased.h; sourceTree = "<group>"; };
@@ -946,8 +946,8 @@
 			children = (
 				4DCA95D71A515D0E008AD7E9 /* editorial.cpp */,
 				4DCA95DA1A515D33008AD7E9 /* editorial.h */,
-				4D3080FC203DA09D00BC44F6 /* ref.cpp */,
-				4D3080FA203DA09000BC44F6 /* ref.h */,
+				4D308103203DB6B500BC44F6 /* ref.cpp */,
+				4D308100203DB69C00BC44F6 /* ref.h */,
 			);
 			name = editorialelements;
 			sourceTree = "<group>";
@@ -1404,7 +1404,7 @@
 				8F59293D18854BF800FE51AD /* toolkit.h in Headers */,
 				4D1D733C1A1D0390001E08F6 /* smufl.h in Headers */,
 				4DB726C81B8BB0F30040231B /* text.h in Headers */,
-				4D3080FB203DA09000BC44F6 /* ref.h in Headers */,
+				4D308101203DB69D00BC44F6 /* ref.h in Headers */,
 				8F59293E18854BF800FE51AD /* io.h in Headers */,
 				8F59293F18854BF800FE51AD /* iodarms.h in Headers */,
 				4DDBBB571C7AE43E00054AFF /* hairpin.h in Headers */,
@@ -1681,7 +1681,7 @@
 				4D1694131E3A44F300569BF4 /* measure.cpp in Sources */,
 				4D1694141E3A44F300569BF4 /* systemelement.cpp in Sources */,
 				4D1694151E3A44F300569BF4 /* dynam.cpp in Sources */,
-				4D3080FE203DA09D00BC44F6 /* ref.cpp in Sources */,
+				4D308105203DB6B500BC44F6 /* ref.cpp in Sources */,
 				4D1694161E3A44F300569BF4 /* pedal.cpp in Sources */,
 				4D1694171E3A44F300569BF4 /* mensur.cpp in Sources */,
 				4D1694181E3A44F300569BF4 /* text.cpp in Sources */,
@@ -1833,7 +1833,7 @@
 				8F086EF7188539540037FD8E /* multirest.cpp in Sources */,
 				4DF440771D39575500152B7E /* ending.cpp in Sources */,
 				4DB351141C8040B1002DD057 /* dir.cpp in Sources */,
-				4D3080FD203DA09D00BC44F6 /* ref.cpp in Sources */,
+				4D308104203DB6B500BC44F6 /* ref.cpp in Sources */,
 				8F086EF8188539540037FD8E /* note.cpp in Sources */,
 				409B3DD91F2D1C2A0098A265 /* ftrem.cpp in Sources */,
 				4D5FA9111E16A93F00F3B919 /* boundingbox.cpp in Sources */,
@@ -1976,7 +1976,7 @@
 				4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
 				8F3DD34818854B2E0051330C /* mensur.cpp in Sources */,
 				4DB3D8F91F83D1EC00B5FC2B /* boundingbox.cpp in Sources */,
-				4D3080FF203DA09D00BC44F6 /* ref.cpp in Sources */,
+				4D308106203DB6B500BC44F6 /* ref.cpp in Sources */,
 				4DC12A5B1F716E27000440E9 /* pghead.cpp in Sources */,
 				8F3DD34A18854B2E0051330C /* multirest.cpp in Sources */,
 				8F3DD34C18854B2E0051330C /* note.cpp in Sources */,
