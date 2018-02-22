@@ -995,7 +995,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() - offset);
         // Also move the cumultated x shift and the minimum position for the next alignment accordingly
         params->m_cumulatedXShift += (-offset);
-        // params->m_upcomingMinPos += (-offset);
+        params->m_upcomingMinPos += (-offset);
     }
 
     int selfRight;

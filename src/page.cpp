@@ -17,6 +17,7 @@
 #include "bboxdevicecontext.h"
 #include "doc.h"
 #include "functorparams.h"
+#include "pages.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
 #include "pghead.h"
@@ -78,9 +79,12 @@ RunningElement *Page::GetHeader() const
     if (!doc || doc->GetOptions()->m_noHeader.GetValue()) {
         return NULL;
     }
+    
+    Pages *pages = doc->GetPages();
+    assert(pages);
 
     // first page?
-    if (doc->GetFirst() == this) {
+    if (pages->GetFirst() == this) {
         return doc->m_scoreDef.GetPgHead();
     }
     else {
@@ -94,9 +98,12 @@ RunningElement *Page::GetFooter() const
     if (!doc || doc->GetOptions()->m_noFooter.GetValue()) {
         return NULL;
     }
+    
+    Pages *pages = doc->GetPages();
+    assert(pages);
 
     // first page?
-    if (doc->GetFirst() == this) {
+    if (pages->GetFirst() == this) {
         return doc->m_scoreDef.GetPgFoot();
     }
     else {
