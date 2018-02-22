@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 ### Added
+* Support for mulitple lines or `<harm>` according to `@n` value
+* Adjustment of `<hairpin>` length with surrounding `<dynam>` or `<hairpin>`
+* Automatic vertical alignment of `<dynam>` and `<haripin>` starting / ending at the same xml:id or tstamp
+* Support for `@vgrp` on `<dynam>` and `<hairpin>`
 * Preservation of unsupported attributes in the MEI output and in JS getElementAttr
 * Support for `<ref>` elements (preserved in the SVG but with no predefined behaviour)
 * Support for chords with mixed durations
