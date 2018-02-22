@@ -77,7 +77,7 @@ void Layer::Reset()
 
     m_drawingStemDir = STEMDIRECTION_NONE;
 }
-    
+
 void Layer::CopyReset()
 {
     m_drawKeySigCancellation = false;
@@ -90,7 +90,7 @@ void Layer::CopyReset()
     m_cautionStaffDefKeySig = NULL;
     m_cautionStaffDefMensur = NULL;
     m_cautionStaffDefMeterSig = NULL;
-    
+
     m_drawingStemDir = STEMDIRECTION_NONE;
 }
 
@@ -392,14 +392,14 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
 //----------------------------------------------------------------------------
 // Layer functor methods
 //----------------------------------------------------------------------------
-    
+
 int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
     ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
     assert(params);
-    
+
     params->m_contentLayer = this;
-    
+
     params->m_targetLayer = new Layer(*this);
     params->m_targetLayer->CopyReset();
     // Keep the xml:id of the layer in the first segment
@@ -409,12 +409,12 @@ int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 {
     ConvertToUnCastOffMensuralParams *params = dynamic_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
     assert(params);
-    
+
     if (params->m_contentLayer == NULL) {
         params->m_contentLayer = this;
     }
@@ -424,7 +424,7 @@ int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 
     return FUNCTOR_SIBLINGS;
 }
-    
+
 int Layer::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {
     ResetStaffDefObjects();

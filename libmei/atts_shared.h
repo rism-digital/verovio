@@ -5436,14 +5436,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetVgrp(std::string vgrp_) { m_vgrp = vgrp_; }
-    std::string GetVgrp() const { return m_vgrp; }
+    void SetVgrp(int vgrp_) { m_vgrp = vgrp_; }
+    int GetVgrp() const { return m_vgrp; }
     bool HasVgrp() const;
     ///@}
 
 private:
     /** Provides a label for members of a vertically aligned group. **/
-    std::string m_vgrp;
+    int m_vgrp;
 
     /* include <attvgrp> */
 };

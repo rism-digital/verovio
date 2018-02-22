@@ -199,12 +199,12 @@ public:
      * See Object::ConvertToPageBased
      */
     virtual int ConvertToPageBased(FunctorParams *functorParams);
-                    
+
     /**
      * See Object::ConvertToCastOffMensural
      */
     virtual int ConvertToCastOffMensural(FunctorParams *params);
-                    
+
     /**
      * See Object::ConvertToUnCastOffMensural
      */

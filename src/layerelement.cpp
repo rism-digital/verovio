@@ -506,7 +506,7 @@ double LayerElement::GetAlignmentDuration(
 //----------------------------------------------------------------------------
 // LayerElement functors methods
 //----------------------------------------------------------------------------
-    
+
 int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     SetDrawingXRel(0);
@@ -685,7 +685,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
 
     // LogDebug("Element %f %s", params->m_time, this->GetClassName().c_str());
-    
+
     if (!this->Is(TIMESTAMP_ATTR)) {
         // increase the time position, but only when not a timestamp (it would actually do nothing)
         params->m_time += duration;
@@ -995,7 +995,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() - offset);
         // Also move the cumultated x shift and the minimum position for the next alignment accordingly
         params->m_cumulatedXShift += (-offset);
-        //params->m_upcomingMinPos += (-offset);
+        // params->m_upcomingMinPos += (-offset);
     }
 
     int selfRight;

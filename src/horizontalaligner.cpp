@@ -455,7 +455,7 @@ void Alignment::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-    
+
 bool Alignment::HasAlignmentReference(int staffN)
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);

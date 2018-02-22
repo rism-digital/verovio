@@ -246,13 +246,13 @@ public:
      * Does not perform any check if the data needs or can be converted.
      */
     void ConvertToPageBasedDoc();
-    
+
     /**
      * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
      * Segment positions occur where a barLine is set on all staves.
      */
     void ConvertToCastOffMensuralDoc();
-    
+
     /**
      * Reverse of ConvertToCastOffMensuralDoc()
      */
@@ -316,7 +316,7 @@ public:
     void SetMensuralMusicOnly(bool isMensuralMusicOnly) { m_isMensuralMusicOnly = isMensuralMusicOnly; }
     bool IsMensuralMusicOnly() const { return m_isMensuralMusicOnly; }
     ///@}
-    
+
     //----------//
     // Functors //
     //----------//
@@ -430,7 +430,7 @@ private:
      * is converted during the import in MeiInput.
      */
     bool m_hasAnalyticalMarkup;
-    
+
     /**
      * A flag to indicate whereas to document contains only mensural music.
      * Mensural only music will be converted to cast-off segments by Doc::ConvertToCastOffMensuralDoc

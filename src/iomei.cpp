@@ -133,10 +133,10 @@ bool MeiOutput::ExportFile()
 
             // If the document is mensural, we have to undo the mensural (segments) cast off
             m_doc->ConvertToUnCastOffMensuralDoc();
-            
+
             // this starts the call of all the functors
             m_doc->Save(this);
-            
+
             // Redo the mensural segment cast of if necessary
             m_doc->ConvertToCastOffMensuralDoc();
         }
@@ -190,7 +190,7 @@ std::string MeiOutput::GetOutput(int page)
     this->ExportFile();
     m_writeToStreamString = false;
     m_page = -1;
-    
+
     return m_streamStringOutput.str();
 }
 
@@ -732,6 +732,7 @@ void MeiOutput::WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv)
 {
     assert(mdiv);
 
+    WriteXmlId(currentNode, mdiv);
     mdiv->WriteLabelled(currentNode);
     mdiv->WriteNNumberLike(currentNode);
 }
@@ -745,6 +746,7 @@ void MeiOutput::WritePages(pugi::xml_node currentNode, Pages *pages)
         m_currentNode.append_child(pugi::node_comment).set_value("Coordinates in MEI axis direction");
     }
 
+    WriteXmlId(currentNode, pages);
     pages->WriteLabelled(currentNode);
     pages->WriteNNumberLike(currentNode);
 }
@@ -753,6 +755,7 @@ void MeiOutput::WriteScore(pugi::xml_node currentNode, Score *score)
 {
     assert(score);
 
+    WriteXmlId(currentNode, score);
     score->WriteLabelled(currentNode);
     score->WriteNNumberLike(currentNode);
 }
@@ -863,6 +866,7 @@ void MeiOutput::WriteScoreDefElement(pugi::xml_node currentNode, ScoreDefElement
     assert(scoreDefElement);
 
     WriteXmlId(currentNode, scoreDefElement);
+    scoreDefElement->WriteMeasureNumbers(currentNode);
     scoreDefElement->WriteTyped(currentNode);
 }
 
@@ -1032,6 +1036,7 @@ void MeiOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteControlElement(currentNode, dynam);
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
+    dynam->WriteVerticalAlignment(currentNode);
 }
 
 void MeiOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
@@ -1054,6 +1059,7 @@ void MeiOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     hairpin->WriteColor(currentNode);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WritePlacement(currentNode);
+    hairpin->WriteVerticalAlignment(currentNode);
 }
 
 void MeiOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
@@ -2767,6 +2773,7 @@ bool MeiInput::ReadBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd)
 bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object)
 {
     SetMeiUuid(element, object);
+    object->ReadMeasureNumbers(element);
     object->ReadTyped(element);
 
     return true;
@@ -3214,6 +3221,7 @@ bool MeiInput::ReadDynam(Object *parent, pugi::xml_node dynam)
 
     ReadTextDirInterface(dynam, vrvDynam);
     ReadTimeSpanningInterface(dynam, vrvDynam);
+    vrvDynam->ReadVerticalAlignment(dynam);
 
     parent->AddChild(vrvDynam);
     return ReadTextChildren(vrvDynam, dynam, vrvDynam);
@@ -3242,6 +3250,7 @@ bool MeiInput::ReadHairpin(Object *parent, pugi::xml_node hairpin)
     vrvHairpin->ReadColor(hairpin);
     vrvHairpin->ReadHairpinLog(hairpin);
     vrvHairpin->ReadPlacement(hairpin);
+    vrvHairpin->ReadVerticalAlignment(hairpin);
 
     parent->AddChild(vrvHairpin);
     return true;

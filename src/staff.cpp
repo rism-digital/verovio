@@ -65,7 +65,7 @@ void Staff::Reset()
     ResetVisibility();
 
     m_yAbs = VRV_UNSET;
-    
+
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
     m_drawingNotationType = NOTATIONTYPE_NONE;
@@ -75,14 +75,14 @@ void Staff::Reset()
 
     ClearLedgerLines();
 }
-    
+
 void Staff::CopyReset()
 {
     m_ledgerLinesAbove = NULL;
     m_ledgerLinesBelow = NULL;
     m_ledgerLinesAboveCue = NULL;
     m_ledgerLinesBelowCue = NULL;
-    
+
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
     m_drawingNotationType = NOTATIONTYPE_NONE;
@@ -90,7 +90,6 @@ void Staff::CopyReset()
     m_timeSpanningElements.clear();
     m_drawingStaffDef = NULL;
 }
-
 
 void Staff::ClearLedgerLines()
 {
@@ -247,7 +246,7 @@ int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
     ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
     assert(params);
-    
+
     params->m_targetStaff = new Staff(*this);
     params->m_targetStaff->CopyReset();
     // Keep the xml:id of the staff in the first staff segment
@@ -257,7 +256,7 @@ int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {
     m_drawingStaffDef = NULL;

@@ -54,7 +54,7 @@ public:
     virtual int ConvertToPageBased(FunctorParams *functorParams);
     virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
     ///@}
-    
+
     /**
      * See Object::ConvertToUnCastOffMensural
      */

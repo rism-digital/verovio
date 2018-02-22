@@ -755,7 +755,7 @@ public:
     ArrayOfObjects m_controlEvents;
     bool m_permanent;
 };
-    
+
 //----------------------------------------------------------------------------
 // ConvertToCastOffMensuralParams
 //----------------------------------------------------------------------------
@@ -789,7 +789,6 @@ public:
         m_segmentIdx = 0;
         m_segmentTotal = 0;
         m_layerTree = layerTree;
-        
     }
     Doc *m_doc;
     std::vector<int> m_staffNs;
@@ -803,7 +802,7 @@ public:
     int m_segmentTotal;
     IntTree *m_layerTree;
 };
-    
+
 //----------------------------------------------------------------------------
 // ConvertToPageBasedParams
 //----------------------------------------------------------------------------
@@ -836,14 +835,13 @@ public:
         m_contentMeasure = NULL;
         m_contentLayer = NULL;
         m_addSegmentsToDelete = true;
-        
     }
     Measure *m_contentMeasure;
     Layer *m_contentLayer;
     bool m_addSegmentsToDelete;
     ArrayOfObjects m_segmentsToDelete;
 };
-    
+
 //----------------------------------------------------------------------------
 // FillStaffCurrentTimeSpanningParams
 //----------------------------------------------------------------------------
