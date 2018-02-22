@@ -56,20 +56,20 @@ public:
     FloatingPositioner *GetCurrentFloatingPositioner() const { return m_currentPositioner; }
 
     /**
-     * @name Get and set the drawing group (id and object) for linking floating element horizontally
-     */
-    ///@{
-    int GetDrawingGrpId() const { return m_drawingGrpId; }
-    void SetDrawingGrpId(int drawingGrpId) { m_drawingGrpId = drawingGrpId; }
-    void *GetDrawingGrpObject() const { return m_drawingGrpObject; }
-    void SetDrawingGrpObject(void *drawingGrpObject) { m_drawingGrpObject = drawingGrpObject; }
-    ///@}
-    
-    /**
      * Look for the FloatingPositioner corresponding to the current one but for another object.
      * Return NULL if no current positioner or nothing found.
      */
     FloatingPositioner *GetCorrespFloatingPositioner(FloatingObject *object);
+
+    /**
+     * @name Get and set the drawing group for linking floating element horizontally.
+     * When setting it with an object, the corresponding id is returned (found or created)
+     */
+    ///@{
+    int GetDrawingGrpId() const { return m_drawingGrpId; }
+    void SetDrawingGrpId(int drawingGrpId) { m_drawingGrpId = drawingGrpId; }
+    int SetDrawingGrpObject(void *drawingGrpObject);
+    ///@}
 
     //----------//
     // Functors //
@@ -124,9 +124,14 @@ private:
 
     /* Drawing Id to group floating elements horizontally */
     int m_drawingGrpId;
-    
-    /* Drawing Uuid to group floating elements horizontally */
-    void *m_drawingGrpObject;
+
+    /**
+     * A vector for storing object / ids mapping.
+     * When a group is created based on an object address, it is stack on the vector.
+     * The ids of the group is then the position in the vector + GRPS_BASE_ID.
+     * Groups coded in MEI have negative ids (-@vgrp value)
+     */
+    static std::vector<void *> s_drawingObjectIds;
 };
 
 //----------------------------------------------------------------------------
@@ -211,7 +216,7 @@ protected:
      * A pointer to the FloatingObject it represents.
      */
     FloatingObject *m_object;
-    
+
     /**
      * A pointer to the StaffAlignment that owns it.
      */

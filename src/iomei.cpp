@@ -1071,6 +1071,7 @@ void MeiOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
     WriteTextDirInterface(currentNode, harm);
     WriteTimeSpanningInterface(currentNode, harm);
     harm->WriteLang(currentNode);
+    harm->WriteNNumberLike(currentNode);
 }
 
 void MeiOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
@@ -3300,6 +3301,7 @@ bool MeiInput::ReadHarm(Object *parent, pugi::xml_node harm)
     ReadTextDirInterface(harm, vrvHarm);
     ReadTimeSpanningInterface(harm, vrvHarm);
     vrvHarm->ReadLang(harm);
+    vrvHarm->ReadNNumberLike(harm);
 
     parent->AddChild(vrvHarm);
     ReadUnsupportedAttr(harm, vrvHarm);

@@ -16,6 +16,7 @@
 #include "dynam.h"
 #include "functorparams.h"
 #include "verticalaligner.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -54,29 +55,36 @@ void Hairpin::Reset()
     m_leftLink = NULL;
     m_rightLink = NULL;
 }
-    
+
 void Hairpin::SetLeftLink(ControlElement *leftLink)
 {
-    void *object = leftLink->GetDrawingGrpObject();
-    if (object == NULL) {
-        object = leftLink;
-        leftLink->SetDrawingGrpObject(object);
-    }
-    this->SetDrawingGrpObject(object);
     m_leftLink = leftLink;
+    if (this->GetDrawingGrpId() != 0) {
+        // LogDebug("Grp id LF already set %d", this->GetDrawingGrpId());
+        return;
+    }
+
+    int grpId = leftLink->GetDrawingGrpId();
+    if (grpId == 0) {
+        grpId = leftLink->SetDrawingGrpObject(leftLink);
+    }
+    this->SetDrawingGrpId(grpId);
 }
 
 void Hairpin::SetRightLink(ControlElement *rightLink)
 {
-    void *object = this->GetDrawingGrpObject();
-    if (object == NULL) {
-        object = this;
-        this->SetDrawingGrpObject(object);
-    }
-    rightLink->SetDrawingGrpObject(object);
     m_rightLink = rightLink;
-}
+    int grpId = this->GetDrawingGrpId();
+    if (grpId == 0) {
+        grpId = this->SetDrawingGrpObject(this);
+    }
 
+    if (rightLink->GetDrawingGrpId() != 0) {
+        // LogDebug("Grp id RL already set %d", rightLink->GetDrawingGrpId());
+        return;
+    }
+    rightLink->SetDrawingGrpId(grpId);
+}
 
 //----------------------------------------------------------------------------
 // Hairpin functor methods
@@ -111,7 +119,7 @@ int Hairpin::PrepareFloatingGrps(FunctorParams *functorParams)
             if (!this->m_rightLink) this->SetRightLink(hairpin);
         }
     }
-    
+
     params->m_hairpins.push_back(this);
 
     return FUNCTOR_CONTINUE;

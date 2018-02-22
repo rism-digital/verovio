@@ -295,7 +295,7 @@ void View::DrawHairpin(
 
     FloatingPositioner *leftLink = hairpin->GetCorrespFloatingPositioner(hairpin->GetLeftLink());
     FloatingPositioner *rightLink = hairpin->GetCorrespFloatingPositioner(hairpin->GetRightLink());
-    
+
     int adjustedX1 = x1;
     if (leftLink) {
         adjustedX1 = leftLink->GetContentRight() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
@@ -304,12 +304,22 @@ void View::DrawHairpin(
     if (rightLink) {
         adjustedX2 = rightLink->GetContentLeft() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
     }
-    // An hairpin should not be sorter than 3 units.
-    if ((adjustedX2 - adjustedX1) > m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3) {
+
+    // Beginning of a system, very short hairpin needs to be push left
+    if (spanningType == SPANNING_END) {
+        if ((adjustedX2 - adjustedX1) < (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2)) {
+            adjustedX1 = adjustedX2 - 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        }
+    }
+
+    // In any case, a hairpin should not be sorter than 2 units.
+    // If shorter, with groups, this will screw up vertical alignment and push everything down - to be improved by
+    // deactivating grp?
+    if ((adjustedX2 - adjustedX1) >= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2) {
         x1 = adjustedX1;
         x2 = adjustedX2;
     }
-    
+
     data_STAFFREL place = hairpin->GetPlace();
     hairpinLog_FORM form = hairpin->GetForm();
 

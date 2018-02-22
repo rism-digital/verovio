@@ -145,6 +145,10 @@ int BoundaryEnd::PrepareFloatingGrps(FunctorParams *functorParams)
     if (this->GetStart()->Is(ENDING)) {
         params->m_previousEnding = dynamic_cast<Ending *>(this->GetStart());
         assert(params->m_previousEnding);
+        // This is the end of the first ending - generate a grpId
+        if (params->m_previousEnding->GetDrawingGrpId() == 0) {
+            params->m_previousEnding->SetDrawingGrpObject(params->m_previousEnding);
+        }
     }
 
     return FUNCTOR_CONTINUE;

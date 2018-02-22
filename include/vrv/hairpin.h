@@ -81,7 +81,7 @@ private:
      * This is either another Hairpin or a Dynam that ends / appears at the same position.
      */
     ControlElement *m_leftLink;
-                    
+
     /**
      * A pointer to the possible right link of the Hairpin.
      * This is either another Hairpin or a Dynam that starts / appears at the same position.
