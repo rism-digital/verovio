@@ -187,19 +187,24 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
 
 void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY)
 {
+    FloatingPositioner *positioner = this->GetCorrespFloatingPositioner(object);
+    if (positioner == NULL) {
+        positioner = new FloatingPositioner(object, this);
+        m_floatingPositioners.push_back(positioner);
+    }
+    positioner->SetObjectXY(objectX, objectY);
+    // LogDebug("BB %d", item->second.m_contentBB_x1);
+    object->SetCurrentFloatingPositioner(positioner);
+}
+
+FloatingPositioner *StaffAlignment::GetCorrespFloatingPositioner(FloatingObject *object)
+{
     auto item = std::find_if(m_floatingPositioners.begin(), m_floatingPositioners.end(),
         [object](FloatingPositioner *positioner) { return positioner->GetObject() == object; });
     if (item != m_floatingPositioners.end()) {
-        // LogDebug("Found it!");
+        return *item;
     }
-    else {
-        FloatingPositioner *box = new FloatingPositioner(object);
-        m_floatingPositioners.push_back(box);
-        item = m_floatingPositioners.end() - 1;
-    }
-    (*item)->SetObjectXY(objectX, objectY);
-    // LogDebug("BB %d", item->second.m_contentBB_x1);
-    object->SetCurrentFloatingPositioner((*item));
+    return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -219,7 +224,10 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
             int descender = params->m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
             int height = params->m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
             int margin = params->m_doc->GetBottomMargin(SYL) * params->m_doc->GetDrawingUnit(staffSize);
-            this->SetOverflowBelow(this->m_overflowBelow + this->GetVerseCount() * (height - descender + margin));
+            int minMargin = std::max((int)(params->m_doc->GetOptions()->m_lyricTopMinMargin.GetValue()
+                                         * params->m_doc->GetDrawingUnit(staffSize)),
+                this->GetOverflowBelow());
+            this->SetOverflowBelow(minMargin + this->GetVerseCount() * (height - descender + margin));
             // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep them
             // and check if they are some lyrics in order to know if the overlap needs to be calculated or not.
             m_overflowBelowBBoxes.clear();
@@ -321,6 +329,8 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
 
     // A vector for storing a pair with the grpId and the min or max YRel
     std::vector<std::pair<int, int> > grpIdYRel;
+    // The same with grpObject YRel pairs
+    std::vector<std::pair<void *, int> > grpObjectYRel;
 
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
@@ -348,7 +358,7 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
         int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
         auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
             [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
-        // We must have find it
+        // We must have found it
         assert(i != grpIdYRel.end());
         (*iter)->SetDrawingYRel((*i).second);
     }
@@ -376,7 +386,7 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
         auto i = m_overflowAboveBBoxes.begin();
         auto end = m_overflowAboveBBoxes.end();
         while (i != end) {
-            // find all the elements from the bottom staff that have an overflow at the top with an horizontal overap
+            // find all the elements from the bottom staff that have an overflow at the top with an horizontal overlap
             i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
             if (i != end) {
                 // calculate the vertical overlap and see if this is more than the expected space

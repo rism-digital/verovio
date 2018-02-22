@@ -60,6 +60,7 @@
 #include "label.h"
 #include "layer.h"
 #include "lb.h"
+#include "mdiv.h"
 #include "measure.h"
 #include "mordent.h"
 #include "mrest.h"
@@ -9150,8 +9151,16 @@ int HumdrumInput::getMeasureEndLine(int startline)
 
 void HumdrumInput::setupMeiDocument()
 {
-    m_score = m_doc->CreateScoreBuffer();
-
+    m_doc->Reset();
+    m_doc->SetType(Raw);
+    // The mdiv
+    Mdiv *mdiv = new Mdiv();
+    mdiv->m_visibility = Visible;
+    m_doc->AddChild(mdiv);
+    // The score
+    m_score = new Score();
+    mdiv->AddChild(m_score);
+    // the section
     Section *section = new Section();
     m_sections.push_back(section);
     m_score->AddChild(m_sections.back());

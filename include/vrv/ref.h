@@ -1,47 +1,34 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        score.h
+// Name:        ref.h
 // Author:      Laurent Pugin
-// Created:     29/08/2016
+// Created:     2018/02/21
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_SCORE_H__
-#define __VRV_SCORE_H__
+#ifndef __VRV_REF_H__
+#define __VRV_REF_H__
 
 #include "atts_shared.h"
-#include "object.h"
+#include "editorial.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Score
+// Ref
 //----------------------------------------------------------------------------
 
-/**
- * This class represent a <score> in MEI.
- * It is used only for loading score-based MEI documents before they are
- * converted to page-based MEI.
- */
-class Score : public Object, public AttLabelled, public AttNNumberLike {
-
+class Ref : public EditorialElement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method resets all attribute classes
+     * Reset method reset all attribute classes
      */
     ///@{
-    Score();
-    virtual ~Score();
+    Ref();
+    virtual ~Ref();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Score"; }
-    virtual ClassId GetClassId() const { return SCORE; }
-    ///@}
-
-    /**
-     * @name Methods for adding allowed content
-     */
-    ///@{
-    virtual void AddChild(Object *object);
+    virtual std::string GetClassName() const { return "Ref"; }
+    virtual ClassId GetClassId() const { return REF; }
     ///@}
 
     //----------//
@@ -53,7 +40,6 @@ private:
 public:
     //
 private:
-    //
 };
 
 } // namespace vrv

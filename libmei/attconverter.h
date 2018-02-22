@@ -317,6 +317,9 @@ public:
     std::string PointingXlinkshowToStr(pointing_XLINKSHOW data) const;
     pointing_XLINKSHOW StrToPointingXlinkshow(std::string value, bool logWarning = true) const;
 
+    std::string RecordTypeRecordtypeToStr(recordType_RECORDTYPE data) const;
+    recordType_RECORDTYPE StrToRecordTypeRecordtype(std::string value, bool logWarning = true) const;
+
     std::string RegularMethodMethodToStr(regularMethod_METHOD data) const;
     regularMethod_METHOD StrToRegularMethodMethod(std::string value, bool logWarning = true) const;
 

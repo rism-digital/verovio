@@ -586,6 +586,16 @@ enum data_LINESTARTENDSYMBOL {
     LINESTARTENDSYMBOL_arrowwhite,
     LINESTARTENDSYMBOL_harpoonleft,
     LINESTARTENDSYMBOL_harpoonright,
+    LINESTARTENDSYMBOL_H,
+    LINESTARTENDSYMBOL_N,
+    LINESTARTENDSYMBOL_Th,
+    LINESTARTENDSYMBOL_ThRetro,
+    LINESTARTENDSYMBOL_ThRetroInv,
+    LINESTARTENDSYMBOL_ThInv,
+    LINESTARTENDSYMBOL_T,
+    LINESTARTENDSYMBOL_TInv,
+    LINESTARTENDSYMBOL_CH,
+    LINESTARTENDSYMBOL_RH,
     LINESTARTENDSYMBOL_none,
     LINESTARTENDSYMBOL_MAX
 };
@@ -1620,6 +1630,28 @@ enum pointing_XLINKSHOW {
     pointing_XLINKSHOW_none,
     pointing_XLINKSHOW_other,
     pointing_XLINKSHOW_MAX
+};
+
+/**
+ * MEI att.recordType@recordtype
+ */
+enum recordType_RECORDTYPE {
+    recordType_RECORDTYPE_NONE = 0,
+    recordType_RECORDTYPE_a,
+    recordType_RECORDTYPE_c,
+    recordType_RECORDTYPE_d,
+    recordType_RECORDTYPE_e,
+    recordType_RECORDTYPE_f,
+    recordType_RECORDTYPE_g,
+    recordType_RECORDTYPE_i,
+    recordType_RECORDTYPE_j,
+    recordType_RECORDTYPE_k,
+    recordType_RECORDTYPE_m,
+    recordType_RECORDTYPE_o,
+    recordType_RECORDTYPE_p,
+    recordType_RECORDTYPE_r,
+    recordType_RECORDTYPE_t,
+    recordType_RECORDTYPE_MAX
 };
 
 /**

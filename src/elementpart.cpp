@@ -45,7 +45,7 @@ void Bracket::Reset()
 // Dots
 //----------------------------------------------------------------------------
 
-Dots::Dots() : LayerElement("dots-"), vrv::AttAugmentDots()
+Dots::Dots() : LayerElement("dots-"), AttAugmentDots()
 {
     RegisterAttClass(ATT_AUGMENTDOTS);
 

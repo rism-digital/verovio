@@ -59,11 +59,13 @@ enum ClassId {
     LABEL,
     LABELABBR,
     LAYER,
+    MDIV,
     MEASURE,
     MEASURE_ALIGNER,
     MENSUR_ATTR,
     METERSIG_ATTR,
     PAGE,
+    PAGES,
     SCORE,
     STAFF,
     STAFF_ALIGNMENT,
@@ -87,6 +89,7 @@ enum ClassId {
     LEM,
     ORIG,
     RDG,
+    REF,
     REG,
     RESTORE,
     SIC,
@@ -347,6 +350,12 @@ enum EditorialLevel {
 };
 
 //----------------------------------------------------------------------------
+// Visibility for editorial and mdiv elements
+//----------------------------------------------------------------------------
+
+enum VisibilityType { Hidden = 0, Visible };
+
+//----------------------------------------------------------------------------
 // The used SMuFL glyph anchors
 //----------------------------------------------------------------------------
 
@@ -369,16 +378,6 @@ enum SMuFLGlyphAnchor {
  */
 
 enum ElementScoreDefRole { NONE = 0, SYSTEM_SCOREDEF, INTERMEDIATE_SCOREDEF, CAUTIONARY_SCOREDEF };
-
-//----------------------------------------------------------------------------
-// Drawing groups (reserved values)
-//----------------------------------------------------------------------------
-
-/**
- * We need fix values for types that are all groupes together
- */
-
-enum { DRAWING_GRP_NONE = 0, DRAWING_GRP_VERSE, DRAWING_GRP_HARM, DRAWING_GRP_OTHER };
 
 //----------------------------------------------------------------------------
 // Artic part types

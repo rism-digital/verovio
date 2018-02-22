@@ -13,6 +13,11 @@
 #include <stack>
 #include <string>
 
+// In case it is not defined before...
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 //----------------------------------------------------------------------------
 
 #include "devicecontextbase.h"
@@ -167,7 +172,7 @@ public:
      * Font can be changed between called for DrawText
      */
     ///@{
-    virtual void StartText(int x, int y, data_HORIZONTALALIGNMENT alignement = HORIZONTALALIGNMENT_left) = 0;
+    virtual void StartText(int x, int y, data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_left) = 0;
     virtual void EndText() = 0;
 
     /**

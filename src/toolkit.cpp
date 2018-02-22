@@ -32,6 +32,9 @@
 //----------------------------------------------------------------------------
 
 #include "MidiFile.h"
+#include "checked.h"
+#include "jsonxx.h"
+#include "unchecked.h"
 
 namespace vrv {
 
@@ -53,6 +56,7 @@ Toolkit::Toolkit(bool initFont)
     m_scoreBasedMei = false;
 
     m_humdrumBuffer = NULL;
+    m_cString = NULL;
 
     if (initFont) {
         Resources::InitFonts();
@@ -66,6 +70,10 @@ Toolkit::~Toolkit()
     if (m_humdrumBuffer) {
         free(m_humdrumBuffer);
         m_humdrumBuffer = NULL;
+    }
+    if (m_cString) {
+        free(m_cString);
+        m_cString = NULL;
     }
 }
 
@@ -474,6 +482,11 @@ bool Toolkit::LoadData(const std::string &data)
 
     m_doc.PrepareDrawing();
 
+    // Convert pseudo-measures into distinct segments based on barLine elements
+    if (m_doc.IsMensuralMusicOnly()) {
+        m_doc.ConvertToCastOffMensuralDoc();
+    }
+
     // Do the layout? this depends on the options and the file. PAE and
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --breaks auto option.
@@ -795,9 +808,9 @@ bool Toolkit::SetOptions(const std::string &json_options)
             int i;
             for (i = 0; i < (int)values.size(); i++) {
                 if (values.has<jsonxx::String>(i)) strValues.push_back(values.get<jsonxx::String>(i));
+                // LogDebug("String: %s", values.get<jsonxx::String>(i).c_str());
             }
             opt->SetValueArray(strValues);
-            // LogMessage("String: %s", json.get<jsonxx::String>(iter->first).c_str());
         }
         else {
             LogError("Unsupported type for option '%s'", iter->first.c_str());
@@ -1290,18 +1303,36 @@ bool Toolkit::Set(std::string elementId, std::string attrType, std::string attrV
 {
     if (!m_doc.GetDrawingPage()) return false;
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
-    if (Att::SetAnalytical(element, attrType, attrValue)) return true;
-    if (Att::SetCmn(element, attrType, attrValue)) return true;
-    if (Att::SetCmnornaments(element, attrType, attrValue)) return true;
-    if (Att::SetCritapp(element, attrType, attrValue)) return true;
-    if (Att::SetGestural(element, attrType, attrValue)) return true;
-    if (Att::SetExternalsymbols(element, attrType, attrValue)) return true;
-    if (Att::SetMei(element, attrType, attrValue)) return true;
-    if (Att::SetMensural(element, attrType, attrValue)) return true;
-    if (Att::SetMidi(element, attrType, attrValue)) return true;
-    if (Att::SetPagebased(element, attrType, attrValue)) return true;
-    if (Att::SetShared(element, attrType, attrValue)) return true;
-    if (Att::SetVisual(element, attrType, attrValue)) return true;
+    bool success = false;
+    if (Att::SetAnalytical(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetCmn(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetCmnornaments(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetCritapp(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetExternalsymbols(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetGestural(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetMei(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetMensural(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetMidi(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetPagebased(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetShared(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetVisual(element, attrType, attrValue))
+        success = true;
+    if (success) {
+        m_doc.PrepareDrawing();
+        m_doc.GetDrawingPage()->LayOut(true);
+        return true;
+    }
     return false;
 }
 
@@ -1341,5 +1372,31 @@ bool Toolkit::ParseSetAction(
     return true;
 }
 #endif
+
+void Toolkit::SetCString(const std::string &data)
+{
+    if (m_cString) {
+        free(m_cString);
+        m_cString = NULL;
+    }
+
+    m_cString = (char *)malloc(strlen(data.c_str()) + 1);
+
+    // something went wrong
+    if (!m_cString) {
+        return;
+    }
+    strcpy(m_cString, data.c_str());
+}
+
+const char *Toolkit::GetCString()
+{
+    if (m_cString) {
+        return m_cString;
+    }
+    else {
+        return "[unspecified]";
+    }
+}
 
 } // namespace vrv

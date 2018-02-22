@@ -32,7 +32,12 @@ class TimestampAttr;
  * It contains Layer objects.
  * For internally simplication of processing, unmeasured music is contained in one single measure object
  */
-class Measure : public Object, public AttMeasureLog, public AttMeterConformanceBar, public AttNNumberLike, public AttPointing, public AttTyped {
+class Measure : public Object,
+                public AttMeasureLog,
+                public AttMeterConformanceBar,
+                public AttNNumberLike,
+                public AttPointing,
+                public AttTyped {
 
 public:
     /**
@@ -196,6 +201,16 @@ public:
     virtual int ConvertToPageBased(FunctorParams *functorParams);
 
     /**
+     * See Object::ConvertToCastOffMensural
+     */
+    virtual int ConvertToCastOffMensural(FunctorParams *params);
+
+    /**
+     * See Object::ConvertToUnCastOffMensural
+     */
+    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
+
+    /**
      * See Object::Save
      */
     ///@{
@@ -300,9 +315,12 @@ public:
     virtual int PrepareCrossStaff(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareFloatingGrps
+     * @name See Object::PrepareFloatingGrps
      */
+    ///@{
     virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+    virtual int PrepareFloatingGrpsEnd(FunctorParams *functoParams);
+    ///@}
 
     /**
      * See Object::PrepareTimePointingEnd

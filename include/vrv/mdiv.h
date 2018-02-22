@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        score.h
+// Name:        mdiv.h
 // Author:      Laurent Pugin
-// Created:     29/08/2016
+// Created:     2018/02/15
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_SCORE_H__
-#define __VRV_SCORE_H__
+#ifndef __VRV_MDIV_H__
+#define __VRV_MDIV_H__
 
 #include "atts_shared.h"
 #include "object.h"
@@ -14,15 +14,13 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Score
+// Mdiv
 //----------------------------------------------------------------------------
 
 /**
- * This class represent a <score> in MEI.
- * It is used only for loading score-based MEI documents before they are
- * converted to page-based MEI.
+ * This class represent a <pages> in page-based MEI.
  */
-class Score : public Object, public AttLabelled, public AttNNumberLike {
+class Mdiv : public Object, public AttLabelled, public AttNNumberLike {
 
 public:
     /**
@@ -30,11 +28,11 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Score();
-    virtual ~Score();
+    Mdiv();
+    virtual ~Mdiv();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Score"; }
-    virtual ClassId GetClassId() const { return SCORE; }
+    virtual std::string GetClassName() const { return "Mdiv"; }
+    virtual ClassId GetClassId() const { return MDIV; }
     ///@}
 
     /**
@@ -44,6 +42,11 @@ public:
     virtual void AddChild(Object *object);
     ///@}
 
+    /**
+     * Make the mdiv and its parent (recursively) visible
+     */
+    void MakeVisible();
+
     //----------//
     // Functors //
     //----------//
@@ -51,7 +54,13 @@ public:
 private:
     //
 public:
-    //
+    /**
+     * Holds the visibility (hidden or visible) for an mdiv element.
+     * By default, a mdiv elements is hidden, and one <mdiv> branchn has to be made visible.
+     * See Mdiv::MakeVisible();
+     */
+    VisibilityType m_visibility;
+
 private:
     //
 };
