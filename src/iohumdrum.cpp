@@ -5644,7 +5644,8 @@ template <class ELEMENT> void HumdrumInput::addTextElement(ELEMENT *element, con
 {
     Text *text = new Text;
     element->AddChild(text);
-    text->SetText(UTF8to16(unescapeHtmlEntities(content)));
+    std::string data = unescapeHtmlEntities(content);
+    text->SetText(UTF8to16(data));
 }
 
 /////////////////////////////
