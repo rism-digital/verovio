@@ -35,10 +35,9 @@ namespace vrv {
 // ScoreDefElement
 //----------------------------------------------------------------------------
 
-ScoreDefElement::ScoreDefElement(std::string classid) : Object(classid), ScoreDefInterface(), AttMeasureNumbers(), AttTyped()
+ScoreDefElement::ScoreDefElement(std::string classid) : Object(classid), ScoreDefInterface(), AttTyped()
 {
     RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
-    RegisterAttClass(ATT_MEASURENUMBERS);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
@@ -50,7 +49,6 @@ void ScoreDefElement::Reset()
 {
     Object::Reset();
     ScoreDefInterface::Reset();
-    ResetMeasureNumbers();
     ResetTyped();
 }
 
