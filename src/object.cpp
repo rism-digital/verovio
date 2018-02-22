@@ -87,7 +87,7 @@ Object::Object(const Object &object) : BoundingBox(object)
     // For now do not copy them
     // m_uuid = object.m_uuid;
     // m_unsupported = object.m_unsupported;
-    
+
     if (!object.CopyChildren()) {
         return;
     }
@@ -238,7 +238,7 @@ void Object::SetUuid(std::string uuid)
 {
     m_uuid = uuid;
 }
-    
+
 void Object::SwapUuid(Object *other)
 {
     assert(other);
@@ -288,6 +288,10 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     Att::GetShared(this, attributes);
     Att::GetVisual(this, attributes);
 
+    for (auto &pair : m_unsupported) {
+        attributes->push_back(std::make_pair(pair.first, pair.second));
+    }
+
     return (int)attributes->size();
 }
 
@@ -316,7 +320,7 @@ Object *Object::GetNext()
     m_iteratorCurrent = std::find_if(m_iteratorCurrent, m_iteratorEnd, ObjectComparison(m_iteratorElementType));
     return (m_iteratorCurrent == m_iteratorEnd) ? NULL : *m_iteratorCurrent;
 }
-    
+
 Object *Object::GetNext(Object *child, const ClassId classId)
 {
     m_iteratorElementType = classId;
@@ -1004,7 +1008,7 @@ int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Object::PreparePlist(FunctorParams *functorParams)
 {
     PreparePlistParams *params = dynamic_cast<PreparePlistParams *>(functorParams);

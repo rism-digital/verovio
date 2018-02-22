@@ -93,6 +93,7 @@ class PlistInterface;
 class PositionInterface;
 class Proport;
 class Rdg;
+class Ref;
 class Reg;
 class Rend;
 class Rest;
@@ -301,6 +302,7 @@ private:
     void WriteLem(pugi::xml_node currentNode, Lem *lem);
     void WriteOrig(pugi::xml_node currentNode, Orig *orig);
     void WriteRdg(pugi::xml_node currentNode, Rdg *rdg);
+    void WriteRef(pugi::xml_node currentNode, Ref *Ref);
     void WriteReg(pugi::xml_node currentNode, Reg *Reg);
     void WriteRestore(pugi::xml_node currentNode, Restore *restore);
     void WriteSic(pugi::xml_node currentNode, Sic *sic);
@@ -538,6 +540,7 @@ private:
     bool ReadLem(Object *parent, pugi::xml_node lem, EditorialLevel level, Object *filter = NULL);
     bool ReadOrig(Object *parent, pugi::xml_node orig, EditorialLevel level, Object *filter = NULL);
     bool ReadRdg(Object *parent, pugi::xml_node rdg, EditorialLevel level, Object *filter = NULL);
+    bool ReadRef(Object *parent, pugi::xml_node ref, EditorialLevel level, Object *filter = NULL);
     bool ReadReg(Object *parent, pugi::xml_node reg, EditorialLevel level, Object *filter = NULL);
     bool ReadRestore(Object *parent, pugi::xml_node restore, EditorialLevel level, Object *filter = NULL);
     bool ReadSic(Object *parent, pugi::xml_node sic, EditorialLevel level, Object *filter = NULL);

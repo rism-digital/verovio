@@ -111,7 +111,7 @@ void Sb::Reset()
 //----------------------------------------------------------------------------
 // Section functor methods
 //----------------------------------------------------------------------------
-    
+
 int Section::ConvertToPageBased(FunctorParams *functorParams)
 {
     ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
@@ -131,15 +131,15 @@ int Section::ConvertToPageBasedEnd(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 {
     ConvertToUnCastOffMensuralParams *params = dynamic_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
     assert(params);
-    
+
     params->m_contentMeasure = NULL;
     params->m_contentLayer = NULL;
-    
+
     return FUNCTOR_CONTINUE;
 }
 

@@ -21,8 +21,10 @@ class BoundaryStartInterface;
 class Chord;
 class Clef;
 class Dots;
+class Dynam;
 class Ending;
 class FileOutputStream;
+class Hairpin;
 class KeySig;
 class Layer;
 class LayerElement;
@@ -755,7 +757,7 @@ public:
     ArrayOfObjects m_controlEvents;
     bool m_permanent;
 };
-    
+
 //----------------------------------------------------------------------------
 // ConvertToCastOffMensuralParams
 //----------------------------------------------------------------------------
@@ -789,7 +791,6 @@ public:
         m_segmentIdx = 0;
         m_segmentTotal = 0;
         m_layerTree = layerTree;
-        
     }
     Doc *m_doc;
     std::vector<int> m_staffNs;
@@ -803,7 +804,7 @@ public:
     int m_segmentTotal;
     IntTree *m_layerTree;
 };
-    
+
 //----------------------------------------------------------------------------
 // ConvertToPageBasedParams
 //----------------------------------------------------------------------------
@@ -836,14 +837,13 @@ public:
         m_contentMeasure = NULL;
         m_contentLayer = NULL;
         m_addSegmentsToDelete = true;
-        
     }
     Measure *m_contentMeasure;
     Layer *m_contentLayer;
     bool m_addSegmentsToDelete;
     ArrayOfObjects m_segmentsToDelete;
 };
-    
+
 //----------------------------------------------------------------------------
 // FillStaffCurrentTimeSpanningParams
 //----------------------------------------------------------------------------
@@ -1158,6 +1158,8 @@ public:
 /**
  * member 0: the previous ending
  * member 1: the current grpId
+ * member 2: the dynam in the current Measure
+ * member 3: the current hairpin
  **/
 
 class PrepareFloatingGrpsParams : public FunctorParams {
@@ -1169,6 +1171,8 @@ public:
     }
     Ending *m_previousEnding;
     int m_drawingGrpId;
+    std::vector<Dynam *> m_dynams;
+    std::vector<Hairpin *> m_hairpins;
 };
 
 //----------------------------------------------------------------------------

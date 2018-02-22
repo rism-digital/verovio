@@ -48,12 +48,12 @@ public:
     virtual std::string GetClassName() const { return "Layer"; }
     virtual ClassId GetClassId() const { return LAYER; }
     ///@}
-            
+
     /**
      * Do not copy children for layers
      */
     virtual bool CopyChildren() const { return false; }
-      
+
     /**
      * Overriding CopyReset() method to be called after copy / assignment calls.
      */
@@ -141,12 +141,12 @@ public:
     //----------//
     // Functors //
     //----------//
-                  
+
     /**
      * See Object::ConvertToCastOffMensural
      */
     virtual int ConvertToCastOffMensural(FunctorParams *params);
-    
+
     /**
      * See Object::ConvertToUnCastOffMensural
      */

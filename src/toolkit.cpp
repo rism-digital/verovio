@@ -493,14 +493,14 @@ bool Toolkit::LoadData(const std::string &data)
     if (true) { // change this to an option
         m_doc.GenerateHeaderAndFooter();
     }
-    
+
     m_doc.PrepareDrawing();
-    
+
     // Convert pseudo-measures into distinct segments based on barLine elements
     if (m_doc.IsMensuralMusicOnly()) {
         m_doc.ConvertToCastOffMensuralDoc();
     }
-    
+
     // Do the layout? this depends on the options and the file. PAE and
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --breaks auto option.

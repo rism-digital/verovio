@@ -21,6 +21,7 @@
 #include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
+#include "hairpin.h"
 #include "page.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -411,50 +412,51 @@ int Measure::ConvertToPageBased(FunctorParams *functorParams)
 
     return FUNCTOR_SIBLINGS;
 }
-    
+
 int Measure::ConvertToCastOffMensural(FunctorParams *functorParams)
 {
     ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
     assert(params);
-    
+
     // We are processing by staff/layer from the call below - we obviously do not want to loop...
     if (params->m_targetMeasure) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     bool convertToMeasured = params->m_doc->GetOptions()->m_mensuralToMeasure.GetValue();
-    
+
     assert(params->m_targetSystem);
     assert(params->m_layerTree);
-    
+
     // Create a temporary subsystem for receiving the measure segments
     System targetSubSystem;
     params->m_targetSubSystem = &targetSubSystem;
-    
-    // Create the first measure segment - problem: we are dropping the section element - we should create a score-based MEI file instead
+
+    // Create the first measure segment - problem: we are dropping the section element - we should create a score-based
+    // MEI file instead
     Measure *measure = new Measure(convertToMeasured);
     if (convertToMeasured) {
         measure->SetN(StringFormat("%d", params->m_segmentTotal + 1));
     }
     params->m_targetSubSystem->AddChild(measure);
-    
+
     std::vector<AttComparison *> filters;
     // Now we can process by layer and move their content to (measure) segments
-    for (auto const& staves: params->m_layerTree->child) {
-        for (auto const& layers: staves.second.child) {
+    for (auto const &staves : params->m_layerTree->child) {
+        for (auto const &layers : staves.second.child) {
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(STAFF, staves.first);
             AttNIntegerComparison matchLayer(LAYER, layers.first);
             filters = { &matchStaff, &matchLayer };
-            
+
             params->m_segmentIdx = 1;
             params->m_targetMeasure = measure;
-            
+
             Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
             this->Process(&convertToCastOffMensural, params, NULL, &filters);
         }
     }
-    
+
     params->m_targetMeasure = NULL;
     params->m_targetSubSystem = NULL;
     params->m_segmentTotal = targetSubSystem.GetChildCount();
@@ -463,22 +465,22 @@ int Measure::ConvertToCastOffMensural(FunctorParams *functorParams)
 
     return FUNCTOR_SIBLINGS;
 }
-    
+
 int Measure::ConvertToUnCastOffMensural(FunctorParams *functorParams)
 {
     ConvertToUnCastOffMensuralParams *params = dynamic_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
     assert(params);
-    
+
     if (params->m_contentMeasure == NULL) {
         params->m_contentMeasure = this;
     }
     else if (params->m_addSegmentsToDelete) {
         params->m_segmentsToDelete.push_back(this);
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Measure::Save(FunctorParams *functorParams)
 {
     if (this->IsMeasuredMusic())
@@ -880,6 +882,28 @@ int Measure::PrepareFloatingGrps(FunctorParams *functorParams)
         // We have a measure in between endings and the previous one was group, so we need to increase the grpId
         if (params->m_previousEnding->GetDrawingGrpId() > DRAWING_GRP_NONE) params->m_drawingGrpId++;
         params->m_previousEnding = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::PrepareFloatingGrpsEnd(FunctorParams *functorParams)
+{
+    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    assert(params);
+
+    params->m_dynams.clear();
+
+    std::vector<Hairpin *>::iterator iter = params->m_hairpins.begin();
+    while (iter != params->m_hairpins.end()) {
+        assert((*iter)->GetEnd());
+        Measure *measureEnd = dynamic_cast<Measure *>((*iter)->GetEnd()->GetFirstParent(MEASURE));
+        if (measureEnd == this) {
+            iter = params->m_hairpins.erase(iter);
+        }
+        else {
+            iter++;
+        }
     }
 
     return FUNCTOR_CONTINUE;
