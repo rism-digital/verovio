@@ -187,19 +187,25 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
 
 void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY)
 {
-    auto item = std::find_if(m_floatingPositioners.begin(), m_floatingPositioners.end(),
-        [object](FloatingPositioner *positioner) { return positioner->GetObject() == object; });
-    if (item != m_floatingPositioners.end()) {
-        // LogDebug("Found it!");
+    FloatingPositioner *positioner = this->GetCorrespFloatingPositioner(object);
+    if (positioner == NULL) {
+        positioner = new FloatingPositioner(object, this);
+        m_floatingPositioners.push_back(positioner);
     }
-    else {
-        FloatingPositioner *box = new FloatingPositioner(object);
-        m_floatingPositioners.push_back(box);
-        item = m_floatingPositioners.end() - 1;
-    }
-    (*item)->SetObjectXY(objectX, objectY);
+    positioner->SetObjectXY(objectX, objectY);
     // LogDebug("BB %d", item->second.m_contentBB_x1);
-    object->SetCurrentFloatingPositioner((*item));
+    object->SetCurrentFloatingPositioner(positioner);
+}
+    
+FloatingPositioner *StaffAlignment::GetCorrespFloatingPositioner(FloatingObject *object)
+{
+    auto item = std::find_if(m_floatingPositioners.begin(), m_floatingPositioners.end(),
+                             [object](FloatingPositioner *positioner) { return positioner->GetObject() == object; });
+    if (item != m_floatingPositioners.end()) {
+        return *item;
+    }
+    return NULL;
+    
 }
 
 //----------------------------------------------------------------------------
@@ -319,41 +325,77 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
             return (
                 (std::find(params->m_classIds.begin(), params->m_classIds.end(), positioner->GetObject()->GetClassId())
                     != params->m_classIds.end())
-                && (positioner->GetObject()->GetDrawingGrpId() != 0));
+                && ((positioner->GetObject()->GetDrawingGrpId() != 0) || (positioner->GetObject()->GetDrawingGrpObject() != NULL)));
         });
 
     // A vector for storing a pair with the grpId and the min or max YRel
     std::vector<std::pair<int, int> > grpIdYRel;
+    // The same with grpObject YRel pairs
+    std::vector<std::pair<void *, int> > grpObjectYRel;
 
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
         int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
-        // Look if we already have a pair for this grpId
-        auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
-            [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
-        // if not, then just add a new pair with the YRel of the current positioner
-        if (i == grpIdYRel.end()) {
-            grpIdYRel.push_back(std::make_pair(currentGrpId, (*iter)->GetDrawingYRel()));
-        }
-        // else, adjust the min or max YRel of the pair if necessary
-        else {
-            if ((*iter)->GetDrawingPlace() == STAFFREL_basic_above) {
-                if ((*iter)->GetDrawingYRel() < (*i).second) (*i).second = (*iter)->GetDrawingYRel();
+        void *currentGrpObject = (*iter)->GetObject()->GetDrawingGrpObject();
+        if (currentGrpId != 0) {
+            // Look if we already have a pair for this grpId
+            auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
+                [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
+            // if not, then just add a new pair with the YRel of the current positioner
+            if (i == grpIdYRel.end()) {
+                grpIdYRel.push_back(std::make_pair(currentGrpId, (*iter)->GetDrawingYRel()));
             }
+            // else, adjust the min or max YRel of the pair if necessary
             else {
-                if ((*iter)->GetDrawingYRel() > (*i).second) (*i).second = (*iter)->GetDrawingYRel();
+                if ((*iter)->GetDrawingPlace() == STAFFREL_basic_above) {
+                    if ((*iter)->GetDrawingYRel() < (*i).second) (*i).second = (*iter)->GetDrawingYRel();
+                }
+                else {
+                    if ((*iter)->GetDrawingYRel() > (*i).second) (*i).second = (*iter)->GetDrawingYRel();
+                }
             }
+        }
+        // Grouping by grpObject
+        else {
+            // Look if we already have a pair for this grpId
+            auto i = std::find_if(grpObjectYRel.begin(), grpObjectYRel.end(),
+                [currentGrpObject](std::pair<void *, int> &pair) { return (pair.first == currentGrpObject); });
+            // if not, then just add a new pair with the YRel of the current positioner
+            if (i == grpObjectYRel.end()) {
+                grpObjectYRel.push_back(std::make_pair(currentGrpObject, (*iter)->GetDrawingYRel()));
+            }
+            // else, adjust the min or max YRel of the pair if necessary
+            else {
+                if ((*iter)->GetDrawingPlace() == STAFFREL_basic_above) {
+                    if ((*iter)->GetDrawingYRel() < (*i).second) (*i).second = (*iter)->GetDrawingYRel();
+                }
+                else {
+                    if ((*iter)->GetDrawingYRel() > (*i).second) (*i).second = (*iter)->GetDrawingYRel();
+                }
+            }
+            
         }
     }
 
     // Now go through all the positioners again and ajust the YRel with the value of the pair
     for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
         int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
-        auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
-            [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
-        // We must have find it
-        assert(i != grpIdYRel.end());
-        (*iter)->SetDrawingYRel((*i).second);
+        void *currentGrpObject = (*iter)->GetObject()->GetDrawingGrpObject();
+        if (currentGrpId != 0) {
+            auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
+                [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
+            // We must have found it
+            assert(i != grpIdYRel.end());
+            (*iter)->SetDrawingYRel((*i).second);
+        }
+        // Grouping by grpObject
+        else {
+            auto i = std::find_if(grpObjectYRel.begin(), grpObjectYRel.end(),
+                                  [currentGrpObject](std::pair<void *, int> &pair) { return (pair.first == currentGrpObject); });
+            // We must have found it
+            assert(i != grpObjectYRel.end());
+            (*iter)->SetDrawingYRel((*i).second);
+        }
     }
 
     return FUNCTOR_SIBLINGS;
@@ -379,7 +421,7 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
         auto i = m_overflowAboveBBoxes.begin();
         auto end = m_overflowAboveBBoxes.end();
         while (i != end) {
-            // find all the elements from the bottom staff that have an overflow at the top with an horizontal overap
+            // find all the elements from the bottom staff that have an overflow at the top with an horizontal overlap
             i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
             if (i != end) {
                 // calculate the vertical overlap and see if this is more than the expected space

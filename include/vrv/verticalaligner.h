@@ -108,6 +108,12 @@ public:
      * Retrieves or creates the FloatingPositioner for the FloatingObject on this staff.
      */
     void SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY);
+    
+    /**
+     * Look for the FloatingPositioner corresponding to the FloatingObject.
+     * Return NULL if not found and does not create anything.
+     */
+    FloatingPositioner *GetCorrespFloatingPositioner(FloatingObject *object);
 
     /**
      * @name Setter and getter of the staff from which the alignment is created alignment.

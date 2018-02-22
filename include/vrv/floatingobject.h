@@ -56,12 +56,20 @@ public:
     FloatingPositioner *GetCurrentFloatingPositioner() const { return m_currentPositioner; }
 
     /**
-     * @name Get and set the drawing group id for linking floating element horizontally
+     * @name Get and set the drawing group (id and object) for linking floating element horizontally
      */
     ///@{
     int GetDrawingGrpId() const { return m_drawingGrpId; }
     void SetDrawingGrpId(int drawingGrpId) { m_drawingGrpId = drawingGrpId; }
+    void *GetDrawingGrpObject() const { return m_drawingGrpObject; }
+    void SetDrawingGrpObject(void *drawingGrpObject) { m_drawingGrpObject = drawingGrpObject; }
     ///@}
+    
+    /**
+     * Look for the FloatingPositioner corresponding to the current one but for another object.
+     * Return NULL if no current positioner or nothing found.
+     */
+    FloatingPositioner *GetCorrespFloatingPositioner(FloatingObject *object);
 
     //----------//
     // Functors //
@@ -116,6 +124,9 @@ private:
 
     /* Drawing Id to group floating elements horizontally */
     int m_drawingGrpId;
+    
+    /* Drawing Uuid to group floating elements horizontally */
+    void *m_drawingGrpObject;
 };
 
 //----------------------------------------------------------------------------
@@ -128,7 +139,7 @@ private:
 class FloatingPositioner : public BoundingBox {
 public:
     // constructors and destructors
-    FloatingPositioner(FloatingObject *object);
+    FloatingPositioner(FloatingObject *object, StaffAlignment *alignment);
     virtual ~FloatingPositioner(){};
     virtual ClassId GetClassId() const { return FLOATING_POSITIONER; }
 
@@ -145,9 +156,20 @@ public:
     virtual void ResetCachedDrawingX() const;
     virtual void ResetCachedDrawingY() const;
 
+    /**
+     * Setter for the objectX and Y
+     */
     void SetObjectXY(Object *objectX, Object *objectY);
 
+    /**
+     * Getter for the FloatingObject (asserted, cannot be NULL)
+     */
     FloatingObject *GetObject() const { return m_object; }
+
+    /**
+     * Getter for the StaffAlignment (asserted, cannot be NULL)
+     */
+    StaffAlignment *GetAlignment() const { return m_alignment; }
 
     bool CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox);
 
@@ -185,7 +207,15 @@ protected:
      */
     int m_drawingYRel;
 
+    /**
+     * A pointer to the FloatingObject it represents.
+     */
     FloatingObject *m_object;
+    
+    /**
+     * A pointer to the StaffAlignment that owns it.
+     */
+    StaffAlignment *m_alignment;
 
     data_STAFFREL_basic m_place;
 

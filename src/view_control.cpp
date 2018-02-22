@@ -293,6 +293,23 @@ void View::DrawHairpin(
         return;
     }
 
+    FloatingPositioner *leftLink = hairpin->GetCorrespFloatingPositioner(hairpin->GetLeftLink());
+    FloatingPositioner *rightLink = hairpin->GetCorrespFloatingPositioner(hairpin->GetRightLink());
+    
+    int adjustedX1 = x1;
+    if (leftLink) {
+        adjustedX1 = leftLink->GetContentRight() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    }
+    int adjustedX2 = x2;
+    if (rightLink) {
+        adjustedX2 = rightLink->GetContentLeft() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    }
+    // An hairpin should not be sorter than 3 units.
+    if ((adjustedX2 - adjustedX1) > m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3) {
+        x1 = adjustedX1;
+        x2 = adjustedX2;
+    }
+    
     data_STAFFREL place = hairpin->GetPlace();
     hairpinLog_FORM form = hairpin->GetForm();
 
@@ -303,7 +320,7 @@ void View::DrawHairpin(
     if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);
 
     // int y1 = GetHairpinY(hairpin->GetPlace(), staff);
-    int y1 = hairpin->GetDrawingY();
+    int y1 = hairpin->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int y2 = y1;
 
     /************** start / end opening **************/

@@ -57,6 +57,7 @@ void FloatingObject::Reset()
     Object::Reset();
 
     m_drawingGrpId = DRAWING_GRP_NONE;
+    m_drawingGrpObject = NULL;
 }
 
 void FloatingObject::UpdateContentBBoxX(int x1, int x2)
@@ -100,15 +101,25 @@ void FloatingObject::SetCurrentFloatingPositioner(FloatingPositioner *boundingBo
     m_currentPositioner = boundingBox;
 }
 
+FloatingPositioner *FloatingObject::GetCorrespFloatingPositioner(FloatingObject *object)
+{
+    if (!object || !m_currentPositioner) return NULL;
+    
+    return m_currentPositioner->GetAlignment()->GetCorrespFloatingPositioner(object);
+}
+    
 //----------------------------------------------------------------------------
 // FloatingPositioner
 //----------------------------------------------------------------------------
 
-FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
+FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *alignment) : BoundingBox()
 {
     assert(object);
+    assert(alignment);
 
     m_object = object;
+    m_alignment = alignment;
+    
     if (object->Is(BREATH)) {
         Breath *breath = dynamic_cast<Breath *>(object);
         assert(breath);
@@ -468,6 +479,7 @@ int FloatingObject::ResetDrawing(FunctorParams *functorParams)
         return interface->InterfaceResetDrawing(functorParams, this);
     }
     m_drawingGrpId = DRAWING_GRP_NONE;
+    m_drawingGrpObject = NULL;
     return FUNCTOR_CONTINUE;
 }
 

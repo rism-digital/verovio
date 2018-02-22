@@ -51,9 +51,32 @@ void Hairpin::Reset()
     ResetPlacement();
     AttVerticalAlignment::ResetVerticalAlignment();
 
-    m_rightLink = NULL;
     m_leftLink = NULL;
+    m_rightLink = NULL;
 }
+    
+void Hairpin::SetLeftLink(ControlElement *leftLink)
+{
+    void *object = leftLink->GetDrawingGrpObject();
+    if (object == NULL) {
+        object = leftLink;
+        leftLink->SetDrawingGrpObject(object);
+    }
+    this->SetDrawingGrpObject(object);
+    m_leftLink = leftLink;
+}
+
+void Hairpin::SetRightLink(ControlElement *rightLink)
+{
+    void *object = this->GetDrawingGrpObject();
+    if (object == NULL) {
+        object = this;
+        this->SetDrawingGrpObject(object);
+    }
+    rightLink->SetDrawingGrpObject(object);
+    m_rightLink = rightLink;
+}
+
 
 //----------------------------------------------------------------------------
 // Hairpin functor methods
@@ -71,22 +94,25 @@ int Hairpin::PrepareFloatingGrps(FunctorParams *functorParams)
     // Only try to link them if start and end are resolved
     if (!this->GetStart() || !this->GetEnd()) return FUNCTOR_CONTINUE;
 
-    params->m_hairpins.push_back(this);
-
     for (auto &dynam : params->m_dynams) {
         if (dynam->GetStart() == this->GetStart() && (dynam->GetStaff() == this->GetStaff())) {
-            this->m_leftLink = dynam;
+            this->SetLeftLink(dynam);
+        }
+        else if (dynam->GetStart() == this->GetEnd() && (dynam->GetStaff() == this->GetStaff())) {
+            this->SetRightLink(dynam);
         }
     }
 
     for (auto &hairpin : params->m_hairpins) {
         if (hairpin->GetEnd() == this->GetStart() && (hairpin->GetStaff() == this->GetStaff())) {
-            if (!this->m_leftLink) this->m_leftLink = hairpin;
+            if (!this->m_leftLink) this->SetLeftLink(hairpin);
         }
         if (hairpin->GetEnd() == this->GetStart() && (hairpin->GetStaff() == this->GetStaff())) {
-            if (!this->m_rightLink) this->m_rightLink = hairpin;
+            if (!this->m_rightLink) this->SetRightLink(hairpin);
         }
     }
+    
+    params->m_hairpins.push_back(this);
 
     return FUNCTOR_CONTINUE;
 }
@@ -96,8 +122,8 @@ int Hairpin::ResetDrawing(FunctorParams *functorParams)
     // Call parent one too
     ControlElement::ResetDrawing(functorParams);
 
-    m_rightLink = NULL;
     m_leftLink = NULL;
+    m_rightLink = NULL;
 
     return FUNCTOR_CONTINUE;
 }
