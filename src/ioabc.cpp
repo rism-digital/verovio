@@ -118,18 +118,22 @@ void AbcInput::parseABC(std::istream &infile)
 
     std::vector<abc::Measure> staff;
 
+    // create mdiv and score
     m_doc->Reset();
     m_doc->SetType(Raw);
-    // The mdiv
+    // the mdiv
     Mdiv *mdiv = new Mdiv();
     mdiv->m_visibility = Visible;
     m_doc->AddChild(mdiv);
-    // The score
+    // the score
     Score *score = new Score();
     mdiv->AddChild(score);
     // the section
     Section *section = new Section();
     score->AddChild(section);
+    // create page head
+    PgHead *pgHead = new PgHead;
+    m_doc->m_scoreDef.AddChild(pgHead);
 
     // find first tune
     while (abcLine[0] != 'X') {
@@ -404,6 +408,20 @@ void AbcInput::parseDecoration(std::string decorationString)
 // parse information fields
 //
 
+void AbcInput::parseComposer(std::string composer)
+{
+    PgHead *pgHead = dynamic_cast<PgHead *>(m_doc->m_scoreDef.FindChildByType(PGHEAD));
+    assert(pgHead);
+    Rend *compRend = new Rend();
+    compRend->SetHalign(HORIZONTALALIGNMENT_right);
+    compRend->SetValign(VERTICALALIGNMENT_bottom);
+    Text *text = new Text();
+    text->SetText(UTF8to16(composer));
+    compRend->AddChild(text);
+    pgHead->AddChild(compRend);
+    LogMessage("ABC input: composer not exported to MEI header");
+}
+
 void AbcInput::parseInstruction(std::string instruction)
 {
     if (!strncmp(instruction.c_str(), "abc-include", 11)) {
@@ -557,25 +575,28 @@ void AbcInput::parseTempo(std::string tempoString)
 
 void AbcInput::parseTitle(std::string title)
 {
-    PgHead *pgHead = new PgHead;
+    PgHead *pgHead = dynamic_cast<PgHead *>(m_doc->m_scoreDef.FindChildByType(PGHEAD));
+    assert(pgHead);
     Rend *titleRend = new Rend();
     titleRend->SetHalign(HORIZONTALALIGNMENT_center);
     titleRend->SetValign(VERTICALALIGNMENT_middle);
-    pgHead->AddChild(titleRend);
     Text *text = new Text();
     text->SetText(UTF8to16(title));
     titleRend->AddChild(text);
-    m_doc->m_scoreDef.AddChild(pgHead);
-    LogWarning("ABC input: title not exported to MEI header");
+    pgHead->AddChild(titleRend);
+    LogMessage("ABC input: title not exported to MEI header");
 }
 
 void AbcInput::parseReferenceNumber(std::string referenceNumberString)
 {
-    // reference number should be a string
-    int mDivNum = atoi(referenceNumberString.c_str());
+    int mdivNum = atoi(referenceNumberString.c_str());
+    if (mdivNum < 1) {
+        LogError("ABC input: reference number should be a positive integer");
+        return;
+    }
     Mdiv *mdiv = dynamic_cast<Mdiv *>(m_doc->FindChildByType(MDIV));
     assert(mdiv);
-    mdiv->SetN(std::to_string(mDivNum));
+    mdiv->SetN(std::to_string(mdivNum));
 }
 
 //////////////////////////////
@@ -598,7 +619,10 @@ void AbcInput::readInformationField(char dataKey, std::string value, Score *scor
         while (isspace(value[value.length() - 1])) value.pop_back();
     }
 
-    if (dataKey == 'I') {
+    if (dataKey == 'C') {
+        parseComposer(value);
+    }
+    else if (dataKey == 'I') {
         parseInstruction(value);
     }
     else if (dataKey == 'K') {
@@ -792,12 +816,12 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             if (chord) {
                 chord->AddChild(note);
                 if (!chord->HasDur()) {
-                    chord->SetDots(dots);
+                    if (dots > 0) chord->SetDots(dots);
                     chord->SetDur(note->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
                 }
             }
             else {
-                note->SetDots(dots);
+                if (dots > 0) note->SetDots(dots);
                 note->SetDur(note->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
                 if (note->GetDur() < DURATION_8) {
                     // if note cannot beamed, write it directly to the layer
@@ -842,7 +866,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 num = num - num / 3;
             }
             if ((numbase & (numbase - 1)) != 0) LogError("ABC input: note length divider must be power of 2");
-            space->SetDots(dots);
+            if (dots > 0) space->SetDots(dots);
             space->SetDur(space->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
 
             m_noteStack.push_back(space);

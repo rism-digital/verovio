@@ -255,12 +255,13 @@ private:
     void pushContainer(LayerElement *container);
 
     // parse information fields
+    void parseComposer(std::string composer); // C:
     void parseInstruction(std::string keyString); // I:
     void parseKey(std::string keyString); // K:
     void parseUnitNoteLength(std::string unitNoteLength); // L:
     void parseMeter(std::string meterString); // M:
     void parseTempo(std::string tempoString); // Q:
-    void parseTitle(std::string title); // Q:
+    void parseTitle(std::string title); // T:
     void parseReferenceNumber(std::string referenceNumberString); // X:
 
     // input functions
