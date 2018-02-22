@@ -43,7 +43,7 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
     data_FONTSIZE fs;
 
     // title
-    nodeSet = header.select_nodes("//fileDesc/titleStmt/title");
+    nodeSet = header.select_nodes("//fileDesc/titleStmt/title[text()]");
     if (!nodeSet.empty()) {
         Rend *titleRend = new Rend();
         titleRend->SetHalign(HORIZONTALALIGNMENT_center);
