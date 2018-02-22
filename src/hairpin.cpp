@@ -103,19 +103,19 @@ int Hairpin::PrepareFloatingGrps(FunctorParams *functorParams)
     if (!this->GetStart() || !this->GetEnd()) return FUNCTOR_CONTINUE;
 
     for (auto &dynam : params->m_dynams) {
-        if (dynam->GetStart() == this->GetStart() && (dynam->GetStaff() == this->GetStaff())) {
-            this->SetLeftLink(dynam);
+        if ((dynam->GetStart() == this->GetStart()) && (dynam->GetStaff() == this->GetStaff())) {
+            if (!this->m_leftLink) this->SetLeftLink(dynam);
         }
-        else if (dynam->GetStart() == this->GetEnd() && (dynam->GetStaff() == this->GetStaff())) {
-            this->SetRightLink(dynam);
+        else if ((dynam->GetStart() == this->GetEnd()) && (dynam->GetStaff() == this->GetStaff())) {
+            if (!this->m_rightLink) this->SetRightLink(dynam);
         }
     }
 
     for (auto &hairpin : params->m_hairpins) {
-        if (hairpin->GetEnd() == this->GetStart() && (hairpin->GetStaff() == this->GetStaff())) {
+        if ((hairpin->GetEnd() == this->GetStart()) && (hairpin->GetStaff() == this->GetStaff())) {
             if (!this->m_leftLink) this->SetLeftLink(hairpin);
         }
-        if (hairpin->GetEnd() == this->GetStart() && (hairpin->GetStaff() == this->GetStaff())) {
+        if ((hairpin->GetStart() == this->GetEnd()) && (hairpin->GetStaff() == this->GetStaff())) {
             if (!this->m_rightLink) this->SetRightLink(hairpin);
         }
     }
