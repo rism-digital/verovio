@@ -17,7 +17,7 @@ namespace vrv {
 // TextElement
 //----------------------------------------------------------------------------
 
-class TextElement : public Object, public AttTyped {
+class TextElement : public Object, public AttLabelled, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
