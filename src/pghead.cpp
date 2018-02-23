@@ -62,6 +62,7 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
             }
             Text *text = new Text();
             text->SetText(UTF8to16(titleNode.node().text().as_string()));
+            rend->SetLang(titleNode.node().attribute("xml:lang").as_string());
             rend->AddChild(text);
             titleRend->AddChild(rend);
         }
@@ -77,6 +78,7 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
         composerRend->SetLabel("composer");
         Text *composerText = new Text();
         composerText->SetText(UTF8to16(node.node().text().as_string()));
+        composerRend->SetLang(node.node().attribute("xml:lang").as_string());
         composerRend->AddChild(composerText);
         this->AddChild(composerRend);
     }
@@ -90,6 +92,7 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
         lyricistRend->SetLabel("lyricist");
         Text *lyricistText = new Text();
         lyricistText->SetText(UTF8to16(node.node().text().as_string()));
+        lyricistRend->SetLang(node.node().attribute("xml:lang").as_string());
         lyricistRend->AddChild(lyricistText);
         this->AddChild(lyricistRend);
     }
