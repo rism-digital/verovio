@@ -329,8 +329,6 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
 
     // A vector for storing a pair with the grpId and the min or max YRel
     std::vector<std::pair<int, int> > grpIdYRel;
-    // The same with grpObject YRel pairs
-    std::vector<std::pair<void *, int> > grpObjectYRel;
 
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
