@@ -137,13 +137,15 @@ int FloatingObject::SetDrawingGrpObject(void *drawingGrpObject)
 // FloatingPositioner
 //----------------------------------------------------------------------------
 
-FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *alignment) : BoundingBox()
+FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType)
+    : BoundingBox()
 {
     assert(object);
     assert(alignment);
 
     m_object = object;
     m_alignment = alignment;
+    m_spanningType = spanningType;
 
     if (object->Is(BREATH)) {
         Breath *breath = dynamic_cast<Breath *>(object);

@@ -50,7 +50,7 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
         titleRend->SetValign(VERTICALALIGNMENT_middle);
         titleRend->SetLabel("title");
         for (auto titleNode : nodeSet) {
-          Rend *rend = new Rend();
+            Rend *rend = new Rend();
             if (titleNode == nodeSet.first()) {
                 fs.SetTerm(FONTSIZETERM_x_large);
                 rend->SetFontsize(fs);

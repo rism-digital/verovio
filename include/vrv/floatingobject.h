@@ -144,7 +144,7 @@ private:
 class FloatingPositioner : public BoundingBox {
 public:
     // constructors and destructors
-    FloatingPositioner(FloatingObject *object, StaffAlignment *alignment);
+    FloatingPositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType);
     virtual ~FloatingPositioner(){};
     virtual ClassId GetClassId() const { return FLOATING_POSITIONER; }
 
@@ -175,6 +175,11 @@ public:
      * Getter for the StaffAlignment (asserted, cannot be NULL)
      */
     StaffAlignment *GetAlignment() const { return m_alignment; }
+
+    /**
+     * Getter for the spanning type
+     */
+    char GetSpanningType() { return m_spanningType; }
 
     bool CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox);
 
@@ -230,6 +235,11 @@ public:
     int m_cuvreThickness;
     curvature_CURVEDIR m_cuvreDir;
     int m_cuvreXMinMaxY;
+
+    /**
+     * The spanning type of the positionner for spanning control elements
+     */
+    char m_spanningType;
 };
 
 } // namespace vrv

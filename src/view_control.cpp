@@ -246,7 +246,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement())
             if (!system->SetCurrentFloatingPositioner(
-                    (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), objectX, *staffIter)) {
+                    (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), objectX, *staffIter, spanningType)) {
                 continue;
             }
 
@@ -320,24 +320,18 @@ void View::DrawHairpin(
         x2 = adjustedX2;
     }
 
+    // Store the full drawing length
+    if (spanningType == SPANNING_START_END) {
+        hairpin->SetDrawingLength(x2 - x1);
+    }
+
     data_STAFFREL place = hairpin->GetPlace();
     hairpinLog_FORM form = hairpin->GetForm();
 
     int startY = 0;
-    int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
+    int endY = hairpin->CalcHeight(m_doc, staff->m_drawingStaffSize, spanningType, leftLink, rightLink);
 
-    //*** Cap the angle of hairpins ***//
-    if (x2 > x1) {
-        // Given height and width, calculate hairpin angle
-        float theta =  2.0 * atan((endY / 2.0) / (x2 - x1));
-        // Convert to Radians
-        theta *= (360.0 / (2.0 * M_PI));
-        // If the angle is too big, restrict endY
-        if (theta > 16){
-            theta = 16;
-            endY = 2 * (x2 - x1) * tan((M_PI / 360) * theta);
-        }
-    }
+    m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
 
     // We calculate points for cresc by default. Start/End have to be swapped
     if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);

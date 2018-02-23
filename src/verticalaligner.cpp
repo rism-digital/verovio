@@ -185,11 +185,12 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
     return -(box->GetSelfBottom() + m_staffHeight - this->GetYRel());
 }
 
-void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY)
+void StaffAlignment::SetCurrentFloatingPositioner(
+    FloatingObject *object, Object *objectX, Object *objectY, char spanningType)
 {
     FloatingPositioner *positioner = this->GetCorrespFloatingPositioner(object);
     if (positioner == NULL) {
-        positioner = new FloatingPositioner(object, this);
+        positioner = new FloatingPositioner(object, this, spanningType);
         m_floatingPositioners.push_back(positioner);
     }
     positioner->SetObjectXY(objectX, objectY);
