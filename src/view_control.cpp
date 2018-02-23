@@ -258,6 +258,18 @@ void View::DrawHairpin(
     int startY = 0;
     int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
 
+    //*** Cap the angle of hairpins ***//
+    //
+    // Given height and width, calculate hairpin angle 
+    float theta =  2.0 * atan((endY / 2.0) / (x2 - x1)); 
+    // Convert to Radians
+    theta *= (360.0 / (2.0 * M_PI));
+    // If the angle is too big, restrict endY
+    if (theta > 16){
+        theta = 16;
+        endY = 2 * (x2 - x1) * tan((M_PI / 360) * theta);
+    }
+
     // We calculate points for cresc by default. Start/End have to be swapped
     if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);
 
@@ -303,11 +315,11 @@ void View::DrawHairpin(
         if (spanningType == SPANNING_START_END) {
             // nothing to adjust
         }
-        // In this case, we are drawing the first half a a cresc. Reduce the openning end
+        // In this case, we are drawing the first half a a cresc. Reduce the opening end
         else if (spanningType == SPANNING_START) {
             endY = endY / 2;
         }
-        // Now this is the case we are drawing the end of a cresc. Increase the openning start
+        // Now this is the case we are drawing the end of a cresc. Increase the opening start
         else if (spanningType == SPANNING_END) {
             startY = endY / 2;
         }
@@ -322,11 +334,11 @@ void View::DrawHairpin(
         if (spanningType == SPANNING_START_END) {
             // nothing to adjust
         }
-        // In this case, we are drawing the first half a a dim. Increase the openning end
+        // In this case, we are drawing the first half a a dim. Increase the opening end
         else if (spanningType == SPANNING_START) {
             endY = startY / 2;
         }
-        // Now this is the case we are drawing the end of a dim. Reduce the openning start
+        // Now this is the case we are drawing the end of a dim. Reduce the opening start
         else if (spanningType == SPANNING_END) {
             startY = startY / 2;
         }
