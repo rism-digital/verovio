@@ -44,9 +44,7 @@ StaffDef::StaffDef()
     Reset();
 }
 
-StaffDef::~StaffDef()
-{
-}
+StaffDef::~StaffDef() {}
 
 void StaffDef::Reset()
 {

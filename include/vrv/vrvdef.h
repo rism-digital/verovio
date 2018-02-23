@@ -59,11 +59,13 @@ enum ClassId {
     LABEL,
     LABELABBR,
     LAYER,
+    MDIV,
     MEASURE,
     MEASURE_ALIGNER,
     MENSUR_ATTR,
     METERSIG_ATTR,
     PAGE,
+    PAGES,
     SCORE,
     STAFF,
     STAFF_ALIGNMENT,
@@ -87,6 +89,7 @@ enum ClassId {
     LEM,
     ORIG,
     RDG,
+    REF,
     REG,
     RESTORE,
     SIC,
@@ -224,6 +227,7 @@ class Object;
 class PlistInterface;
 class Point;
 class Staff;
+class Option;
 class TextElement;
 class TimePointInterface;
 class TimeSpanningInterface;
@@ -262,12 +266,13 @@ typedef std::vector<TextElement *> ArrayOfTextElements;
 
 typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
 
+typedef std::map<std::string, Option *> MapOfStrOptions;
+
 //----------------------------------------------------------------------------
 // Global defines
 //----------------------------------------------------------------------------
 
 #define DEFINITION_FACTOR 10
-#define PARAM_DENOMINATOR 10
 
 #define isIn(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
 
@@ -343,6 +348,12 @@ enum EditorialLevel {
     EDITORIAL_FB,
     EDITORIAL_RUNNING,
 };
+
+//----------------------------------------------------------------------------
+// Visibility for editorial and mdiv elements
+//----------------------------------------------------------------------------
+
+enum VisibilityType { Hidden = 0, Visible };
 
 //----------------------------------------------------------------------------
 // The used SMuFL glyph anchors

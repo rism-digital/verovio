@@ -43,9 +43,7 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned
     ResetGraphicRotation();
 }
 
-BBoxDeviceContext::~BBoxDeviceContext()
-{
-}
+BBoxDeviceContext::~BBoxDeviceContext() {}
 
 void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId)
 {
@@ -85,13 +83,9 @@ void BBoxDeviceContext::RotateGraphic(Point const &orig, double angle)
     m_rotationOrigin = orig;
 }
 
-void BBoxDeviceContext::StartPage()
-{
-}
+void BBoxDeviceContext::StartPage() {}
 
-void BBoxDeviceContext::EndPage()
-{
-}
+void BBoxDeviceContext::EndPage() {}
 
 void BBoxDeviceContext::SetBackground(int colour, int style)
 {
@@ -103,18 +97,14 @@ void BBoxDeviceContext::SetBackgroundMode(int mode)
     // nothing to do, we do not handle Background Mode
 }
 
-void BBoxDeviceContext::SetTextForeground(int colour)
-{
-}
+void BBoxDeviceContext::SetTextForeground(int colour) {}
 
 void BBoxDeviceContext::SetTextBackground(int colour)
 {
     // nothing to do, we do not handle Text Background Mode
 }
 
-void BBoxDeviceContext::SetLogicalOrigin(int x, int y)
-{
-}
+void BBoxDeviceContext::SetLogicalOrigin(int x, int y) {}
 
 void BBoxDeviceContext::SetUserScale(double xScale, double yScale)
 {
@@ -336,9 +326,7 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bo
     }
 }
 
-void BBoxDeviceContext::DrawSpline(int n, Point points[])
-{
-}
+void BBoxDeviceContext::DrawSpline(int n, Point points[]) {}
 
 void BBoxDeviceContext::DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg)
 {

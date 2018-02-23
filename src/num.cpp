@@ -28,9 +28,7 @@ Num::Num() : TextElement("num-"), AttLabelled()
     Reset();
 }
 
-Num::~Num()
-{
-}
+Num::~Num() {}
 
 void Num::Reset()
 {

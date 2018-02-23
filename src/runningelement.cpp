@@ -47,9 +47,7 @@ RunningElement::RunningElement(std::string classid) : Object(classid), AttHorizo
     Reset();
 }
 
-RunningElement::~RunningElement()
-{
-}
+RunningElement::~RunningElement() {}
 
 void RunningElement::Reset()
 {
@@ -163,7 +161,7 @@ int RunningElement::GetWidth() const
     Doc *doc = dynamic_cast<Doc *>(m_drawingPage->GetFirstParent(DOC));
     if (!doc) return 0;
 
-    return (doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar);
+    return (doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight);
     // return m_drawingPage->GetContentWidth();
 }
 
@@ -258,7 +256,7 @@ bool RunningElement::AdjustDrawingScaling(int width)
     return scale;
 }
 
-bool RunningElement::AdjustYPos()
+bool RunningElement::AdjustRunningElementYPos()
 {
     int i, j;
     ArrayOfTextElements::iterator iter;

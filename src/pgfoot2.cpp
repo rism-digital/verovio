@@ -24,9 +24,7 @@ PgFoot2::PgFoot2() : RunningElement("pgfoot2-")
     Reset();
 }
 
-PgFoot2::~PgFoot2()
-{
-}
+PgFoot2::~PgFoot2() {}
 
 void PgFoot2::Reset()
 {

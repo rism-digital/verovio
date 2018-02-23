@@ -31,9 +31,7 @@ BoundaryEnd::BoundaryEnd(Object *start) : SystemElement("bdend-")
     m_startClassName = start->GetClassName();
 }
 
-BoundaryEnd::~BoundaryEnd()
-{
-}
+BoundaryEnd::~BoundaryEnd() {}
 
 void BoundaryEnd::Reset()
 {
@@ -50,9 +48,7 @@ BoundaryStartInterface::BoundaryStartInterface()
     Reset();
 }
 
-BoundaryStartInterface::~BoundaryStartInterface()
-{
-}
+BoundaryStartInterface::~BoundaryStartInterface() {}
 
 void BoundaryStartInterface::Reset()
 {

@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "keysig.h"
 #include "layer.h"
+#include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
 #include "note.h"
@@ -55,7 +56,7 @@ pitchmap DarmsInput::PitchMap[] = {
     { 7, PITCHNAME_a }, { 7, PITCHNAME_b },
     /* 49 */ { 8, PITCHNAME_c }, { 8, PITCHNAME_d }, { 8, PITCHNAME_e }, { 8, PITCHNAME_f }, { 8, PITCHNAME_g },
     { 8, PITCHNAME_a }, { 8, PITCHNAME_b },
-}
+};
 
 DarmsInput::DarmsInput(Doc *doc, std::string filename) : FileInputStream(doc)
 {
@@ -66,9 +67,7 @@ DarmsInput::DarmsInput(Doc *doc, std::string filename) : FileInputStream(doc)
     m_filename = filename;
 }
 
-DarmsInput::~DarmsInput()
-{
-}
+DarmsInput::~DarmsInput() {}
 
 void DarmsInput::UnrollKeysig(int quantity, char alter)
 {
@@ -440,8 +439,15 @@ bool DarmsInput::ImportString(std::string const &data_str)
     const char *data = data_str.c_str();
     len = (int)data_str.length();
 
+    m_doc->Reset();
     m_doc->SetType(Raw);
-    Score *score = m_doc->CreateScoreBuffer();
+    // The mdiv
+    Mdiv *mdiv = new Mdiv();
+    mdiv->m_visibility = Visible;
+    m_doc->AddChild(mdiv);
+    // The score
+    Score *score = new Score();
+    mdiv->AddChild(score);
     // the section
     Section *section = new Section();
     score->AddChild(section);

@@ -31,9 +31,7 @@ AnchoredText::AnchoredText() : ControlElement("anchtxt-"), TextDirInterface()
     Reset();
 }
 
-AnchoredText::~AnchoredText()
-{
-}
+AnchoredText::~AnchoredText() {}
 
 void AnchoredText::Reset()
 {

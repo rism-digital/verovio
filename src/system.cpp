@@ -22,6 +22,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "page.h"
+#include "pages.h"
 #include "section.h"
 #include "staff.h"
 #include "vrv.h"
@@ -148,15 +149,20 @@ void System::SetDrawingAbbrLabelsWidth(int width)
     }
 }
 
-void System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY)
+bool System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY)
 {
     assert(object);
 
     // If we have only the bottom alignment, then nothing to do (yet)
-    if (m_systemAligner.GetChildCount() == 1) return;
+    if (m_systemAligner.GetChildCount() == 1) return false;
     StaffAlignment *alignment = m_systemAligner.GetStaffAlignmentForStaffN(staffN);
-    assert(alignment);
+    if (!alignment) {
+        LogError("Staff @n='%d' for rendering control event %s %s not found", staffN, object->GetClassName().c_str(),
+            object->GetUuid().c_str());
+        return false;
+    }
     alignment->SetCurrentFloatingPositioner(object, objectX, objectY);
+    return true;
 }
 
 void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
@@ -282,7 +288,8 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    params->m_cumulatedShift = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+    params->m_cumulatedShift
+        = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
 
     m_systemAligner.Process(params->m_functorEnd, params);
 
@@ -359,7 +366,7 @@ int System::JustifyX(FunctorParams *functorParams)
 
     if (params->m_justifiableRatio < 0.8) {
         // Arbitrary value for avoiding over-compressed justification
-        LogWarning("Justification stop because of a ratio smaller than 0.8: %lf", params->m_justifiableRatio);
+        LogWarning("Justification is highly compressed (ratio smaller than 0.8: %lf)", params->m_justifiableRatio);
         LogWarning("\tSystem full width: %d", params->m_systemFullWidth);
         LogWarning("\tNon-justifiable width: %d", nonJustifiableWidth);
         LogWarning("\tDrawing justifiable width: %d", m_drawingJustifiableWidth);
@@ -399,39 +406,58 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
 
     params->m_classId = TIE;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = SLUR;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = MORDENT;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = TURN;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = TRILL;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = DYNAM;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = HAIRPIN;
     m_systemAligner.Process(params->m_functor, params);
+
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(DYNAM);
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(HAIRPIN);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+
     params->m_classId = OCTAVE;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = BREATH;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = FERMATA;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = DIR;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = TEMPO;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = PEDAL;
     m_systemAligner.Process(params->m_functor, params);
 
     params->m_classId = HARM;
     m_systemAligner.Process(params->m_functor, params);
+
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(HARM);
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
 
     params->m_classId = ENDING;
     m_systemAligner.Process(params->m_functor, params);
+
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(ENDING);
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
@@ -461,7 +487,8 @@ int System::CastOffPages(FunctorParams *functorParams)
         params->m_currentPage = new Page();
         // Use VRV_UNSET value as a flag
         params->m_pgHeadHeight = VRV_UNSET;
-        params->m_doc->AddChild(params->m_currentPage);
+        assert(params->m_doc->GetPages());
+        params->m_doc->GetPages()->AddChild(params->m_currentPage);
         params->m_shift = this->m_drawingYRel - params->m_pageHeight;
     }
 

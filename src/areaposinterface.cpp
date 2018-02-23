@@ -27,9 +27,7 @@ AreaPosInterface::AreaPosInterface() : Interface(), AttHorizontalAlign(), AttVer
     Reset();
 }
 
-AreaPosInterface::~AreaPosInterface()
-{
-}
+AreaPosInterface::~AreaPosInterface() {}
 
 void AreaPosInterface::Reset()
 {

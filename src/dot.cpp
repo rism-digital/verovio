@@ -31,9 +31,7 @@ Dot::Dot() : LayerElement("dot-"), PositionInterface(), AttColor(), AttDotLog()
     Reset();
 }
 
-Dot::~Dot()
-{
-}
+Dot::~Dot() {}
 
 void Dot::Reset()
 {

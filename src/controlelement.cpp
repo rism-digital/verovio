@@ -38,9 +38,7 @@ ControlElement::ControlElement(std::string classid) : FloatingObject(classid), A
     Reset();
 }
 
-ControlElement::~ControlElement()
-{
-}
+ControlElement::~ControlElement() {}
 
 void ControlElement::Reset()
 {

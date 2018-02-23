@@ -45,9 +45,7 @@ Accid::Accid()
     Reset();
 }
 
-Accid::~Accid()
-{
-}
+Accid::~Accid() {}
 
 void Accid::Reset()
 {

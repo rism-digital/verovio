@@ -27,6 +27,7 @@ namespace vrv {
 View::View()
 {
     m_doc = NULL;
+    m_options = NULL;
     m_pageIdx = 0;
 
     m_currentColour = AxBLACK;
@@ -37,19 +38,19 @@ View::View()
     m_currentSystem = NULL;
 }
 
-View::~View()
-{
-}
+View::~View() {}
 
 void View::SetDoc(Doc *doc)
 {
     // Unset the doc
     if (doc == NULL) {
         m_doc = NULL;
+        m_options = NULL;
         DoReset();
     }
     else {
         m_doc = doc;
+        m_options = doc->GetOptions();
     }
     m_currentElement = NULL;
     m_currentLayer = NULL;

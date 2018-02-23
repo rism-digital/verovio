@@ -43,9 +43,7 @@ ScoreDefElement::ScoreDefElement(std::string classid) : Object(classid), ScoreDe
     Reset();
 }
 
-ScoreDefElement::~ScoreDefElement()
-{
-}
+ScoreDefElement::~ScoreDefElement() {}
 
 void ScoreDefElement::Reset()
 {
@@ -194,9 +192,7 @@ ScoreDef::ScoreDef() : ScoreDefElement("scoredef-"), ObjectListInterface(), AttE
     Reset();
 }
 
-ScoreDef::~ScoreDef()
-{
-}
+ScoreDef::~ScoreDef() {}
 
 void ScoreDef::Reset()
 {

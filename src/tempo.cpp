@@ -36,9 +36,7 @@ Tempo::Tempo()
     Reset();
 }
 
-Tempo::~Tempo()
-{
-}
+Tempo::~Tempo() {}
 
 void Tempo::Reset()
 {

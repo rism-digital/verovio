@@ -27,9 +27,7 @@ Svg::Svg() : Object("fig-")
     Reset();
 }
 
-Svg::~Svg()
-{
-}
+Svg::~Svg() {}
 
 void Svg::Reset()
 {

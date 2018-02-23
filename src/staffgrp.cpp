@@ -42,9 +42,7 @@ StaffGrp::StaffGrp()
     Reset();
 }
 
-StaffGrp::~StaffGrp()
-{
-}
+StaffGrp::~StaffGrp() {}
 
 void StaffGrp::Reset()
 {

@@ -35,9 +35,7 @@ Harm::Harm() : ControlElement("harm-"), TextListInterface(), TextDirInterface(),
     Reset();
 }
 
-Harm::~Harm()
-{
-}
+Harm::~Harm() {}
 
 void Harm::Reset()
 {

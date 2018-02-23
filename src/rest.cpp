@@ -39,9 +39,7 @@ Rest::Rest()
     Reset();
 }
 
-Rest::~Rest()
-{
-}
+Rest::~Rest() {}
 
 void Rest::Reset()
 {
@@ -134,7 +132,7 @@ int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Dots *currentDots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
 
-    if ((this->GetDur() > DUR_BR) && this->HasDots()) {
+    if ((this->GetDur() > DUR_BR) && (this->GetDots() > 0)) {
         if (!currentDots) {
             currentDots = new Dots();
             this->AddChild(currentDots);
@@ -167,7 +165,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     }
 
     // Nothing to do
-    if ((this->GetDur() <= DUR_BR) || !this->HasDots()) {
+    if ((this->GetDur() <= DUR_BR) || (this->GetDots() < 1)) {
         return FUNCTOR_SIBLINGS;
     }
 

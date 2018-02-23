@@ -13,6 +13,11 @@
 #include <stack>
 #include <string>
 
+// In case it is not defined before...
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 //----------------------------------------------------------------------------
 
 #include "devicecontextbase.h"
@@ -62,7 +67,6 @@ public:
     ///@{
     DeviceContext()
     {
-        m_drawingBoundingBoxes = false;
         m_isDeactivatedX = false;
         m_isDeactivatedY = false;
         m_width = 0;
@@ -168,7 +172,7 @@ public:
      * Font can be changed between called for DrawText
      */
     ///@{
-    virtual void StartText(int x, int y, data_HORIZONTALALIGNMENT alignement = HORIZONTALALIGNMENT_left) = 0;
+    virtual void StartText(int x, int y, data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_left) = 0;
     virtual void EndText() = 0;
 
     /**
@@ -251,14 +255,6 @@ public:
     static int RGB2Int(char red, char green, char blue) { return (red << 16 | green << 8 | blue); }
 
     /**
-     * @name Getter and setter for drawing bounding box option (debug)
-     */
-    ///@{
-    virtual void SetDrawBoundingBoxes(bool b) { m_drawingBoundingBoxes = b; }
-    virtual bool GetDrawBoundingBoxes() { return m_drawingBoundingBoxes; }
-    ///@}
-
-    /**
      * @name Method for adding description element
      */
     ///@{
@@ -278,8 +274,6 @@ private:
 public:
     //
 protected:
-    bool m_drawingBoundingBoxes;
-
     std::stack<Pen> m_penStack;
     std::stack<Brush> m_brushStack;
     std::stack<FontInfo *> m_fontStack;

@@ -157,6 +157,11 @@ public:
     wchar_t GetMensuralSmuflNoteHead();
 
     /**
+     * Check if a note or its parent chord are visible
+     */
+    bool IsVisible();
+
+    /**
      * MIDI timing information
      */
     ///@{

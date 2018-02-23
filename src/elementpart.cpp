@@ -34,9 +34,7 @@ Bracket::Bracket() : LayerElement("bracket-")
     Reset();
 }
 
-Bracket::~Bracket()
-{
-}
+Bracket::~Bracket() {}
 
 void Bracket::Reset()
 {
@@ -47,16 +45,14 @@ void Bracket::Reset()
 // Dots
 //----------------------------------------------------------------------------
 
-Dots::Dots() : LayerElement("dots-"), vrv::AttAugmentDots()
+Dots::Dots() : LayerElement("dots-"), AttAugmentDots()
 {
     RegisterAttClass(ATT_AUGMENTDOTS);
 
     Reset();
 }
 
-Dots::~Dots()
-{
-}
+Dots::~Dots() {}
 
 void Dots::Reset()
 {
@@ -81,9 +77,7 @@ Flag::Flag() : LayerElement("flag-")
     Reset();
 }
 
-Flag::~Flag()
-{
-}
+Flag::~Flag() {}
 
 void Flag::Reset()
 {
@@ -143,9 +137,7 @@ TupletNum::TupletNum() : LayerElement("num-")
     Reset();
 }
 
-TupletNum::~TupletNum()
-{
-}
+TupletNum::~TupletNum() {}
 
 void TupletNum::Reset()
 {
@@ -165,9 +157,7 @@ Stem::Stem() : LayerElement("stem-"), AttGraced(), AttStems(), AttStemsCmn()
     Reset();
 }
 
-Stem::~Stem()
-{
-}
+Stem::~Stem() {}
 
 void Stem::Reset()
 {

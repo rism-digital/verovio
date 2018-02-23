@@ -28,9 +28,7 @@ Label::Label() : Object("label-"), TextListInterface()
     Reset();
 }
 
-Label::~Label()
-{
-}
+Label::~Label() {}
 
 void Label::Reset()
 {
@@ -61,9 +59,7 @@ LabelAbbr::LabelAbbr() : Object("labelAbbr-"), TextListInterface()
     Reset();
 }
 
-LabelAbbr::~LabelAbbr()
-{
-}
+LabelAbbr::~LabelAbbr() {}
 
 void LabelAbbr::Reset()
 {

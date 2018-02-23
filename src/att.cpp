@@ -24,13 +24,9 @@ namespace vrv {
 // Att
 //----------------------------------------------------------------------------
 
-Att::Att() : AttConverter()
-{
-}
+Att::Att() : AttConverter() {}
 
-Att::~Att()
-{
-}
+Att::~Att() {}
 
 std::string Att::StrToStr(std::string str) const
 {

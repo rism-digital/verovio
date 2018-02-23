@@ -39,9 +39,7 @@ Arpeg::Arpeg()
     Reset();
 }
 
-Arpeg::~Arpeg()
-{
-}
+Arpeg::~Arpeg() {}
 
 void Arpeg::Reset()
 {

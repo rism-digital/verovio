@@ -64,15 +64,31 @@ void Staff::Reset()
     ResetTyped();
     ResetVisibility();
 
+    m_yAbs = VRV_UNSET;
+
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
     m_drawingNotationType = NOTATIONTYPE_NONE;
-    m_yAbs = VRV_UNSET;
     m_staffAlignment = NULL;
     m_timeSpanningElements.clear();
     m_drawingStaffDef = NULL;
 
     ClearLedgerLines();
+}
+
+void Staff::CopyReset()
+{
+    m_ledgerLinesAbove = NULL;
+    m_ledgerLinesBelow = NULL;
+    m_ledgerLinesAboveCue = NULL;
+    m_ledgerLinesBelowCue = NULL;
+
+    m_drawingStaffSize = 100;
+    m_drawingLines = 5;
+    m_drawingNotationType = NOTATIONTYPE_NONE;
+    m_staffAlignment = NULL;
+    m_timeSpanningElements.clear();
+    m_drawingStaffDef = NULL;
 }
 
 void Staff::ClearLedgerLines()
@@ -187,9 +203,7 @@ LedgerLine::LedgerLine()
     Reset();
 }
 
-LedgerLine::~LedgerLine()
-{
-}
+LedgerLine::~LedgerLine() {}
 
 void LedgerLine::Reset()
 {
@@ -227,6 +241,21 @@ void LedgerLine::AddDash(int left, int right)
 //----------------------------------------------------------------------------
 // Staff functor methods
 //----------------------------------------------------------------------------
+
+int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    params->m_targetStaff = new Staff(*this);
+    params->m_targetStaff->CopyReset();
+    // Keep the xml:id of the staff in the first staff segment
+    params->m_targetStaff->SwapUuid(this);
+    assert(params->m_targetMeasure);
+    params->m_targetMeasure->AddChild(params->m_targetStaff);
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {

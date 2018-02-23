@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        measure.h
+// Name:        measure.cpp
 // Author:      Laurent Pugin
 // Created:     2012
 // Copyright (c) Authors and others. All rights reserved.
@@ -21,6 +21,7 @@
 #include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
+#include "hairpin.h"
 #include "page.h"
 #include "staff.h"
 #include "staffdef.h"
@@ -42,9 +43,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Measure::Measure(bool measureMusic, int logMeasureNb)
-    : Object("measure-"), AttMeasureLog(), AttNNumberLike(), AttPointing(), AttTyped()
+    : Object("measure-"), AttMeasureLog(), AttMeterConformanceBar(), AttNNumberLike(), AttPointing(), AttTyped()
 {
     RegisterAttClass(ATT_MEASURELOG);
+    RegisterAttClass(ATT_METERCONFORMANCEBAR);
     RegisterAttClass(ATT_NNUMBERLIKE);
     RegisterAttClass(ATT_POINTING);
     RegisterAttClass(ATT_TYPED);
@@ -79,6 +81,7 @@ void Measure::Reset()
 {
     Object::Reset();
     ResetMeasureLog();
+    ResetMeterConformanceBar();
     ResetNNumberLike();
     ResetPointing();
     ResetTyped();
@@ -134,6 +137,46 @@ void Measure::AddChild(Object *child)
 
     child->SetParent(this);
     m_children.push_back(child);
+    Modify();
+}
+
+void Measure::AddChildBack(Object *child)
+{
+    if (child->IsControlElement()) {
+        assert(dynamic_cast<ControlElement *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else if (child->Is(STAFF)) {
+        Staff *staff = dynamic_cast<Staff *>(child);
+        assert(staff);
+        if (staff && (staff->GetN() < 1)) {
+            // This is not 100% safe if we have a <app> and <rdg> with more than
+            // one staff as a previous child.
+            staff->SetN(this->GetChildCount());
+        }
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    if (m_children.empty()) {
+        m_children.push_back(child);
+    }
+    else if (m_children.back()->Is(STAFF)) {
+        m_children.push_back(child);
+    }
+    else {
+        for (auto it = m_children.begin(); it != m_children.end(); it++) {
+            if (!(*it)->Is(STAFF)) {
+                m_children.insert(it, child);
+                break;
+            }
+        }
+    }
     Modify();
 }
 
@@ -370,6 +413,74 @@ int Measure::ConvertToPageBased(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int Measure::ConvertToCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    // We are processing by staff/layer from the call below - we obviously do not want to loop...
+    if (params->m_targetMeasure) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    bool convertToMeasured = params->m_doc->GetOptions()->m_mensuralToMeasure.GetValue();
+
+    assert(params->m_targetSystem);
+    assert(params->m_layerTree);
+
+    // Create a temporary subsystem for receiving the measure segments
+    System targetSubSystem;
+    params->m_targetSubSystem = &targetSubSystem;
+
+    // Create the first measure segment - problem: we are dropping the section element - we should create a score-based
+    // MEI file instead
+    Measure *measure = new Measure(convertToMeasured);
+    if (convertToMeasured) {
+        measure->SetN(StringFormat("%d", params->m_segmentTotal + 1));
+    }
+    params->m_targetSubSystem->AddChild(measure);
+
+    std::vector<AttComparison *> filters;
+    // Now we can process by layer and move their content to (measure) segments
+    for (auto const &staves : params->m_layerTree->child) {
+        for (auto const &layers : staves.second.child) {
+            // Create ad comparison object for each type / @n
+            AttNIntegerComparison matchStaff(STAFF, staves.first);
+            AttNIntegerComparison matchLayer(LAYER, layers.first);
+            filters = { &matchStaff, &matchLayer };
+
+            params->m_segmentIdx = 1;
+            params->m_targetMeasure = measure;
+
+            Functor convertToCastOffMensural(&Object::ConvertToCastOffMensural);
+            this->Process(&convertToCastOffMensural, params, NULL, &filters);
+        }
+    }
+
+    params->m_targetMeasure = NULL;
+    params->m_targetSubSystem = NULL;
+    params->m_segmentTotal = targetSubSystem.GetChildCount();
+    // Copy the measure segments to the final target segment
+    params->m_targetSystem->MoveChildrenFrom(&targetSubSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Measure::ConvertToUnCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToUnCastOffMensuralParams *params = dynamic_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    if (params->m_contentMeasure == NULL) {
+        params->m_contentMeasure = this;
+    }
+    else if (params->m_addSegmentsToDelete) {
+        params->m_segmentsToDelete.push_back(this);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::Save(FunctorParams *functorParams)
 {
     if (this->IsMeasuredMusic())
@@ -571,7 +682,8 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
 
     // m_measureAligner.Process(params->m_functor, params, params->m_functorEnd);
 
-    int minMeasureWidth = params->m_doc->m_drawingMinMeasureWidth;
+    int minMeasureWidth
+        = params->m_doc->GetOptions()->m_unit.GetValue() * params->m_doc->GetOptions()->m_measureMinWidth.GetValue();
     // First try to see if we have a double measure length element
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_FULLMEASURE2);
     Alignment *fullMeasure2
@@ -581,8 +693,8 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     if (fullMeasure2 != NULL) {
         minMeasureWidth *= 2;
     }
-    // Nothing if the measure has at least one note - can be improved
-    else if (this->FindChildByType(NOTE) != NULL) {
+    // Nothing if the measure has at least one note or @metcon="false"
+    else if ((this->FindChildByType(NOTE) != NULL) || (this->GetMetcon() == BOOLEAN_false)) {
         minMeasureWidth = 0;
     }
 
@@ -770,6 +882,28 @@ int Measure::PrepareFloatingGrps(FunctorParams *functorParams)
         // We have a measure in between endings and the previous one was group, so we need to increase the grpId
         if (params->m_previousEnding->GetDrawingGrpId() > DRAWING_GRP_NONE) params->m_drawingGrpId++;
         params->m_previousEnding = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::PrepareFloatingGrpsEnd(FunctorParams *functorParams)
+{
+    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    assert(params);
+
+    params->m_dynams.clear();
+
+    std::vector<Hairpin *>::iterator iter = params->m_hairpins.begin();
+    while (iter != params->m_hairpins.end()) {
+        assert((*iter)->GetEnd());
+        Measure *measureEnd = dynamic_cast<Measure *>((*iter)->GetEnd()->GetFirstParent(MEASURE));
+        if (measureEnd == this) {
+            iter = params->m_hairpins.erase(iter);
+        }
+        else {
+            iter++;
+        }
     }
 
     return FUNCTOR_CONTINUE;

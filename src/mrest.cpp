@@ -32,9 +32,7 @@ MRest::MRest() : LayerElement("mrest-"), PositionInterface(), AttCue(), AttFerma
     Reset();
 }
 
-MRest::~MRest()
-{
-}
+MRest::~MRest() {}
 
 void MRest::Reset()
 {
