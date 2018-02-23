@@ -1489,6 +1489,7 @@ void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textEl
     assert(textElement);
 
     WriteXmlId(currentNode, textElement);
+    textElement->WriteLabelled(currentNode);
     textElement->WriteTyped(currentNode);
 }
 
@@ -1517,8 +1518,6 @@ void MeiOutput::WriteLb(pugi::xml_node currentNode, Lb *lb)
 void MeiOutput::WriteNum(pugi::xml_node currentNode, Num *num)
 {
     assert(num);
-
-    num->WriteLabelled(currentNode);
 
     WriteTextElement(currentNode, num);
 }
@@ -4137,6 +4136,7 @@ bool MeiInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
 bool MeiInput::ReadTextElement(pugi::xml_node element, TextElement *object)
 {
     SetMeiUuid(element, object);
+    object->ReadLabelled(element);
     object->ReadTyped(element);
 
     return true;
@@ -4178,8 +4178,6 @@ bool MeiInput::ReadNum(Object *parent, pugi::xml_node num)
 {
     Num *vrvNum = new Num();
     ReadTextElement(num, vrvNum);
-
-    vrvNum->ReadLabelled(num);
 
     parent->AddChild(vrvNum);
     ReadUnsupportedAttr(num, vrvNum);

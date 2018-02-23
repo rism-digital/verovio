@@ -279,6 +279,16 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         if (att->HasColor()) m_currentNode.append_attribute("fill") = att->GetColor().c_str();
     }
 
+    if (object->HasAttClass(ATT_LABELLED)) {
+        AttLabelled *att = dynamic_cast<AttLabelled *>(object);
+        assert(att);
+        if (att->HasLabel()) {
+            pugi::xml_node svgTitle = m_currentNode.prepend_child("title");
+            svgTitle.append_attribute("class") = "labelAttr";
+            svgTitle.append_child(pugi::node_pcdata).set_value(att->GetLabel().c_str());
+        }
+    }
+
     if (object->HasAttClass(ATT_LANG)) {
         AttLang *att = dynamic_cast<AttLang *>(object);
         assert(att);
