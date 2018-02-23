@@ -25,7 +25,8 @@ class MNum : public ControlElement,
             public TextDirInterface,
             public TimeSpanningInterface,
             public AttColor,
-            public AttLang {
+            public AttLang,
+            public AttTypography {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

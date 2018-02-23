@@ -24,12 +24,13 @@ namespace vrv {
 // MNum
 //----------------------------------------------------------------------------
 
-MNum::MNum() : ControlElement("mnum-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttColor(), AttLang()
+MNum::MNum() : ControlElement("mnum-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttColor(), AttLang(), vrv::AttTypography()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_LANG);
+    RegisterAttClass(ATT_TYPOGRAPHY);
 
     Reset();
 }
@@ -43,6 +44,7 @@ void MNum::Reset()
     TimeSpanningInterface::Reset();
     ResetColor();
     ResetLang();
+    ResetTypography();
 }
 
 void MNum::AddChild(Object *child)

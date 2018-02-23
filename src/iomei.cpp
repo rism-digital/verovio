@@ -1081,6 +1081,7 @@ void MeiOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
     WriteTimeSpanningInterface(currentNode, mNum);
     mNum->WriteColor(currentNode);
     mNum->WriteLang(currentNode);
+    mNum->WriteTypography(currentNode);
 }
 
 void MeiOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
@@ -3278,6 +3279,7 @@ bool MeiInput::ReadMNum(Object *parent, pugi::xml_node mNum)
     ReadTimeSpanningInterface(mNum, vrvMNum);
     vrvMNum->ReadColor(mNum);
     vrvMNum->ReadLang(mNum);
+    vrvMNum->ReadTypography(mNum);
 
     parent->AddChild(vrvMNum);
     return ReadTextChildren(vrvMNum, mNum, vrvMNum);
