@@ -327,15 +327,16 @@ void View::DrawHairpin(
     int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
 
     //*** Cap the angle of hairpins ***//
-    //
-    // Given height and width, calculate hairpin angle 
-    float theta =  2.0 * atan((endY / 2.0) / (x2 - x1)); 
-    // Convert to Radians
-    theta *= (360.0 / (2.0 * M_PI));
-    // If the angle is too big, restrict endY
-    if (theta > 16){
-        theta = 16;
-        endY = 2 * (x2 - x1) * tan((M_PI / 360) * theta);
+    if (x2 > x1) {
+        // Given height and width, calculate hairpin angle
+        float theta =  2.0 * atan((endY / 2.0) / (x2 - x1));
+        // Convert to Radians
+        theta *= (360.0 / (2.0 * M_PI));
+        // If the angle is too big, restrict endY
+        if (theta > 16){
+            theta = 16;
+            endY = 2 * (x2 - x1) * tan((M_PI / 360) * theta);
+        }
     }
 
     // We calculate points for cresc by default. Start/End have to be swapped
