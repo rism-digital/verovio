@@ -55,6 +55,14 @@ public:
      */
     virtual void AddChild(Object *object);
 
+    /**
+     * @name Setter and getter of the generated flag
+     */
+    ///@{
+    bool IsGenerated() const { return m_isGenerated; }
+    void IsGenerated(bool isGenerated) { m_isGenerated = isGenerated; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -74,7 +82,10 @@ private:
 public:
     //
 private:
-    //
+    /**
+     * Flag indicating whereas if the element was generated or not
+     */
+    bool m_isGenerated;
 };
 
 } // namespace vrv
