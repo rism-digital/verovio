@@ -56,11 +56,19 @@ public:
     FloatingPositioner *GetCurrentFloatingPositioner() const { return m_currentPositioner; }
 
     /**
-     * @name Get and set the drawing group id for linking floating element horizontally
+     * Look for the FloatingPositioner corresponding to the current one but for another object.
+     * Return NULL if no current positioner or nothing found.
+     */
+    FloatingPositioner *GetCorrespFloatingPositioner(FloatingObject *object);
+
+    /**
+     * @name Get and set the drawing group for linking floating element horizontally.
+     * When setting it with an object, the corresponding id is returned (found or created)
      */
     ///@{
     int GetDrawingGrpId() const { return m_drawingGrpId; }
     void SetDrawingGrpId(int drawingGrpId) { m_drawingGrpId = drawingGrpId; }
+    int SetDrawingGrpObject(void *drawingGrpObject);
     ///@}
 
     //----------//
@@ -116,6 +124,14 @@ private:
 
     /* Drawing Id to group floating elements horizontally */
     int m_drawingGrpId;
+
+    /**
+     * A vector for storing object / ids mapping.
+     * When a group is created based on an object address, it is stack on the vector.
+     * The ids of the group is then the position in the vector + GRPS_BASE_ID.
+     * Groups coded in MEI have negative ids (-@vgrp value)
+     */
+    static std::vector<void *> s_drawingObjectIds;
 };
 
 //----------------------------------------------------------------------------
@@ -128,7 +144,7 @@ private:
 class FloatingPositioner : public BoundingBox {
 public:
     // constructors and destructors
-    FloatingPositioner(FloatingObject *object);
+    FloatingPositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType);
     virtual ~FloatingPositioner(){};
     virtual ClassId GetClassId() const { return FLOATING_POSITIONER; }
 
@@ -145,9 +161,25 @@ public:
     virtual void ResetCachedDrawingX() const;
     virtual void ResetCachedDrawingY() const;
 
+    /**
+     * Setter for the objectX and Y
+     */
     void SetObjectXY(Object *objectX, Object *objectY);
 
+    /**
+     * Getter for the FloatingObject (asserted, cannot be NULL)
+     */
     FloatingObject *GetObject() const { return m_object; }
+
+    /**
+     * Getter for the StaffAlignment (asserted, cannot be NULL)
+     */
+    StaffAlignment *GetAlignment() const { return m_alignment; }
+
+    /**
+     * Getter for the spanning type
+     */
+    char GetSpanningType() { return m_spanningType; }
 
     bool CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox);
 
@@ -185,7 +217,15 @@ protected:
      */
     int m_drawingYRel;
 
+    /**
+     * A pointer to the FloatingObject it represents.
+     */
     FloatingObject *m_object;
+
+    /**
+     * A pointer to the StaffAlignment that owns it.
+     */
+    StaffAlignment *m_alignment;
 
     data_STAFFREL_basic m_place;
 
@@ -195,6 +235,11 @@ public:
     int m_cuvreThickness;
     curvature_CURVEDIR m_cuvreDir;
     int m_cuvreXMinMaxY;
+
+    /**
+     * The spanning type of the positionner for spanning control elements
+     */
+    char m_spanningType;
 };
 
 } // namespace vrv

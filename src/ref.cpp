@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        num.cpp
+// Name:        ref.cpp
 // Author:      Laurent Pugin
-// Created:     2018
+// Created:     2018/02/21
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "num.h"
+#include "ref.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,42 +13,28 @@
 
 //----------------------------------------------------------------------------
 
-#include "editorial.h"
-#include "text.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Num
+// Abbr
 //----------------------------------------------------------------------------
 
-Num::Num() : TextElement("num-")
+Ref::Ref() : EditorialElement("ref-")
 {
     Reset();
 }
 
-Num::~Num() {}
+Ref::~Ref() {}
 
-void Num::Reset()
+void Ref::Reset()
 {
-    m_currentText.SetParent(this);
-    m_currentText.SetText(L"");
+    EditorialElement::Reset();
 }
 
-void Num::AddChild(Object *child)
-{
-    if (child->Is(TEXT)) {
-        assert(dynamic_cast<Text *>(child));
-    }
-    else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
-    }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
 
 } // namespace vrv

@@ -66,8 +66,6 @@ class Turn;
 class Tuplet;
 class Verse;
 
-enum { SPANNING_START_END = 0, SPANNING_START, SPANNING_END, SPANNING_MIDDLE };
-
 //----------------------------------------------------------------------------
 // View
 //----------------------------------------------------------------------------

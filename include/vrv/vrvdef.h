@@ -89,6 +89,7 @@ enum ClassId {
     LEM,
     ORIG,
     RDG,
+    REF,
     REG,
     RESTORE,
     SIC,
@@ -368,6 +369,12 @@ enum SMuFLGlyphAnchor {
 };
 
 //----------------------------------------------------------------------------
+// Spanning types for control events
+//----------------------------------------------------------------------------
+
+enum { SPANNING_START_END = 0, SPANNING_START, SPANNING_END, SPANNING_MIDDLE };
+
+//----------------------------------------------------------------------------
 // Types for layer element
 //----------------------------------------------------------------------------
 
@@ -377,16 +384,6 @@ enum SMuFLGlyphAnchor {
  */
 
 enum ElementScoreDefRole { NONE = 0, SYSTEM_SCOREDEF, INTERMEDIATE_SCOREDEF, CAUTIONARY_SCOREDEF };
-
-//----------------------------------------------------------------------------
-// Drawing groups (reserved values)
-//----------------------------------------------------------------------------
-
-/**
- * We need fix values for types that are all groupes together
- */
-
-enum { DRAWING_GRP_NONE = 0, DRAWING_GRP_VERSE, DRAWING_GRP_HARM, DRAWING_GRP_OTHER };
 
 //----------------------------------------------------------------------------
 // Artic part types

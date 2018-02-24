@@ -149,7 +149,8 @@ void System::SetDrawingAbbrLabelsWidth(int width)
     }
 }
 
-bool System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY)
+bool System::SetCurrentFloatingPositioner(
+    int staffN, FloatingObject *object, Object *objectX, Object *objectY, char spanningType)
 {
     assert(object);
 
@@ -161,7 +162,7 @@ bool System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Ob
             object->GetUuid().c_str());
         return false;
     }
-    alignment->SetCurrentFloatingPositioner(object, objectX, objectY);
+    alignment->SetCurrentFloatingPositioner(object, objectX, objectY, spanningType);
     return true;
 }
 
@@ -406,39 +407,58 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
 
     params->m_classId = TIE;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = SLUR;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = MORDENT;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = TURN;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = TRILL;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = DYNAM;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = HAIRPIN;
     m_systemAligner.Process(params->m_functor, params);
+
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(DYNAM);
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(HAIRPIN);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+
     params->m_classId = OCTAVE;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = BREATH;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = FERMATA;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = DIR;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = TEMPO;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = PEDAL;
     m_systemAligner.Process(params->m_functor, params);
 
     params->m_classId = HARM;
     m_systemAligner.Process(params->m_functor, params);
+
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(HARM);
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
 
     params->m_classId = ENDING;
     m_systemAligner.Process(params->m_functor, params);
+
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(ENDING);
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);

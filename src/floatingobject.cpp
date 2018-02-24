@@ -35,6 +35,12 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// Static members
+//----------------------------------------------------------------------------
+
+std::vector<void *> FloatingObject::s_drawingObjectIds;
+
+//----------------------------------------------------------------------------
 // FloatingObject
 //----------------------------------------------------------------------------
 
@@ -56,7 +62,7 @@ void FloatingObject::Reset()
 {
     Object::Reset();
 
-    m_drawingGrpId = DRAWING_GRP_NONE;
+    m_drawingGrpId = 0;
 }
 
 void FloatingObject::UpdateContentBBoxX(int x1, int x2)
@@ -100,15 +106,47 @@ void FloatingObject::SetCurrentFloatingPositioner(FloatingPositioner *boundingBo
     m_currentPositioner = boundingBox;
 }
 
+FloatingPositioner *FloatingObject::GetCorrespFloatingPositioner(FloatingObject *object)
+{
+    if (!object || !m_currentPositioner) return NULL;
+
+    return m_currentPositioner->GetAlignment()->GetCorrespFloatingPositioner(object);
+}
+
+int FloatingObject::SetDrawingGrpObject(void *drawingGrpObject)
+{
+    assert(drawingGrpObject);
+
+    int idx = 0;
+    std::vector<void *>::const_iterator it
+        = std::find(s_drawingObjectIds.begin(), s_drawingObjectIds.end(), drawingGrpObject);
+    if (it == s_drawingObjectIds.end()) {
+        idx = (int)s_drawingObjectIds.size();
+        s_drawingObjectIds.push_back(drawingGrpObject);
+        // LogDebug("Creating grpId %d", idx);
+    }
+    else {
+        idx = (int)(it - s_drawingObjectIds.begin());
+        // LogDebug("Using grpId %d", idx);
+    }
+    m_drawingGrpId = idx + 1000;
+    return m_drawingGrpId;
+}
+
 //----------------------------------------------------------------------------
 // FloatingPositioner
 //----------------------------------------------------------------------------
 
-FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
+FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType)
+    : BoundingBox()
 {
     assert(object);
+    assert(alignment);
 
     m_object = object;
+    m_alignment = alignment;
+    m_spanningType = spanningType;
+
     if (object->Is(BREATH)) {
         Breath *breath = dynamic_cast<Breath *>(object);
         assert(breath);
@@ -455,6 +493,9 @@ int FloatingObject::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
 
 int FloatingObject::ResetDrawing(FunctorParams *functorParams)
 {
+    // Clear all
+    FloatingObject::s_drawingObjectIds.clear();
+
     m_currentPositioner = NULL;
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
@@ -467,7 +508,7 @@ int FloatingObject::ResetDrawing(FunctorParams *functorParams)
         assert(interface);
         return interface->InterfaceResetDrawing(functorParams, this);
     }
-    m_drawingGrpId = DRAWING_GRP_NONE;
+    m_drawingGrpId = 0;
     return FUNCTOR_CONTINUE;
 }
 

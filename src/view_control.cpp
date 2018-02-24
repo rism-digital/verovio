@@ -246,7 +246,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement())
             if (!system->SetCurrentFloatingPositioner(
-                    (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), objectX, *staffIter)) {
+                    (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), objectX, *staffIter, spanningType)) {
                 continue;
             }
 
@@ -293,17 +293,51 @@ void View::DrawHairpin(
         return;
     }
 
+    FloatingPositioner *leftLink = hairpin->GetCorrespFloatingPositioner(hairpin->GetLeftLink());
+    FloatingPositioner *rightLink = hairpin->GetCorrespFloatingPositioner(hairpin->GetRightLink());
+
+    int adjustedX1 = x1;
+    if (leftLink) {
+        adjustedX1 = leftLink->GetContentRight() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    }
+    int adjustedX2 = x2;
+    if (rightLink) {
+        adjustedX2 = rightLink->GetContentLeft() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    }
+
+    // Beginning of a system, very short hairpin needs to be push left
+    if (spanningType == SPANNING_END) {
+        if ((adjustedX2 - adjustedX1) < (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2)) {
+            adjustedX1 = adjustedX2 - 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        }
+    }
+
+    // In any case, a hairpin should not be sorter than 2 units.
+    // If shorter, with groups, this will screw up vertical alignment and push everything down - to be improved by
+    // deactivating grp?
+    if ((adjustedX2 - adjustedX1) >= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2) {
+        x1 = adjustedX1;
+        x2 = adjustedX2;
+    }
+
+    // Store the full drawing length
+    if (spanningType == SPANNING_START_END) {
+        hairpin->SetDrawingLength(x2 - x1);
+    }
+
     data_STAFFREL place = hairpin->GetPlace();
     hairpinLog_FORM form = hairpin->GetForm();
 
     int startY = 0;
-    int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
+    int endY = hairpin->CalcHeight(m_doc, staff->m_drawingStaffSize, spanningType, leftLink, rightLink);
+
+    m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
 
     // We calculate points for cresc by default. Start/End have to be swapped
     if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);
 
     // int y1 = GetHairpinY(hairpin->GetPlace(), staff);
-    int y1 = hairpin->GetDrawingY();
+    int y1 = hairpin->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int y2 = y1;
 
     /************** start / end opening **************/
@@ -313,11 +347,11 @@ void View::DrawHairpin(
         if (spanningType == SPANNING_START_END) {
             // nothing to adjust
         }
-        // In this case, we are drawing the first half a a cresc. Reduce the openning end
+        // In this case, we are drawing the first half a a cresc. Reduce the opening end
         else if (spanningType == SPANNING_START) {
             endY = endY / 2;
         }
-        // Now this is the case we are drawing the end of a cresc. Increase the openning start
+        // Now this is the case we are drawing the end of a cresc. Increase the opening start
         else if (spanningType == SPANNING_END) {
             startY = endY / 2;
         }
@@ -332,11 +366,11 @@ void View::DrawHairpin(
         if (spanningType == SPANNING_START_END) {
             // nothing to adjust
         }
-        // In this case, we are drawing the first half a a dim. Increase the openning end
+        // In this case, we are drawing the first half a a dim. Increase the opening end
         else if (spanningType == SPANNING_START) {
             endY = startY / 2;
         }
-        // Now this is the case we are drawing the end of a dim. Reduce the openning start
+        // Now this is the case we are drawing the end of a dim. Reduce the opening start
         else if (spanningType == SPANNING_END) {
             startY = startY / 2;
         }

@@ -279,6 +279,16 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         if (att->HasColor()) m_currentNode.append_attribute("fill") = att->GetColor().c_str();
     }
 
+    if (object->HasAttClass(ATT_LABELLED)) {
+        AttLabelled *att = dynamic_cast<AttLabelled *>(object);
+        assert(att);
+        if (att->HasLabel()) {
+            pugi::xml_node svgTitle = m_currentNode.prepend_child("title");
+            svgTitle.append_attribute("class") = "labelAttr";
+            svgTitle.append_child(pugi::node_pcdata).set_value(att->GetLabel().c_str());
+        }
+    }
+
     if (object->HasAttClass(ATT_LANG)) {
         AttLang *att = dynamic_cast<AttLang *>(object);
         assert(att);
@@ -727,8 +737,8 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     std::string fontFaceName = m_fontStack.top()->GetFaceName();
 
     pugi::xml_node textChild = AppendChild("tspan");
-    // We still add @xml::space
-    textChild.append_attribute("xml:space") = "preserve";
+    // We still add @xml::space (No: this seems to create problems with Safari)
+    // textChild.append_attribute("xml:space") = "preserve";
     // Set the @font-family only if it is not the same as in the parent node
     if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {
         textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();

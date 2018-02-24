@@ -61,6 +61,7 @@
 #include "pghead.h"
 #include "pghead2.h"
 #include "proport.h"
+#include "ref.h"
 #include "rend.h"
 #include "rest.h"
 #include "rpt.h"
@@ -86,7 +87,7 @@
 namespace vrv {
 
 std::vector<std::string> MeiInput::s_editorialElementNames = { "abbr", "add", "app", "annot", "choice", "corr",
-    "damage", "del", "expan", "orig", "reg", "restore", "sic", "supplied", "unclear" };
+    "damage", "del", "expan", "orig", "ref", "reg", "restore", "sic", "supplied", "unclear" };
 
 //----------------------------------------------------------------------------
 // MeiOutput
@@ -132,10 +133,10 @@ bool MeiOutput::ExportFile()
 
             // If the document is mensural, we have to undo the mensural (segments) cast off
             m_doc->ConvertToUnCastOffMensuralDoc();
-            
+
             // this starts the call of all the functors
             m_doc->Save(this);
-            
+
             // Redo the mensural segment cast of if necessary
             m_doc->ConvertToCastOffMensuralDoc();
         }
@@ -189,7 +190,7 @@ std::string MeiOutput::GetOutput(int page)
     this->ExportFile();
     m_writeToStreamString = false;
     m_page = -1;
-    
+
     return m_streamStringOutput.str();
 }
 
@@ -580,6 +581,10 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("rdg");
         WriteRdg(m_currentNode, dynamic_cast<Rdg *>(object));
     }
+    else if (object->Is(REF)) {
+        m_currentNode = m_currentNode.append_child("ref");
+        WriteRef(m_currentNode, dynamic_cast<Ref *>(object));
+    }
     else if (object->Is(REG)) {
         m_currentNode = m_currentNode.append_child("reg");
         WriteReg(m_currentNode, dynamic_cast<Reg *>(object));
@@ -630,6 +635,8 @@ bool MeiOutput::WriteObject(Object *object)
         // First save the main scoreDef
         m_doc->m_scoreDef.Save(this);
     }
+
+    WriteUnsupportedAttr(m_currentNode, object);
 
     return true;
 }
@@ -727,6 +734,7 @@ void MeiOutput::WriteMdiv(pugi::xml_node currentNode, Mdiv *mdiv)
 {
     assert(mdiv);
 
+    WriteXmlId(currentNode, mdiv);
     mdiv->WriteLabelled(currentNode);
     mdiv->WriteNNumberLike(currentNode);
 }
@@ -740,6 +748,7 @@ void MeiOutput::WritePages(pugi::xml_node currentNode, Pages *pages)
         m_currentNode.append_child(pugi::node_comment).set_value("Coordinates in MEI axis direction");
     }
 
+    WriteXmlId(currentNode, pages);
     pages->WriteLabelled(currentNode);
     pages->WriteNNumberLike(currentNode);
 }
@@ -748,6 +757,7 @@ void MeiOutput::WriteScore(pugi::xml_node currentNode, Score *score)
 {
     assert(score);
 
+    WriteXmlId(currentNode, score);
     score->WriteLabelled(currentNode);
     score->WriteNNumberLike(currentNode);
 }
@@ -1027,6 +1037,7 @@ void MeiOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteControlElement(currentNode, dynam);
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
+    dynam->WriteVerticalAlignment(currentNode);
 }
 
 void MeiOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
@@ -1049,6 +1060,7 @@ void MeiOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     hairpin->WriteColor(currentNode);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WritePlacement(currentNode);
+    hairpin->WriteVerticalAlignment(currentNode);
 }
 
 void MeiOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
@@ -1059,6 +1071,7 @@ void MeiOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
     WriteTextDirInterface(currentNode, harm);
     WriteTimeSpanningInterface(currentNode, harm);
     harm->WriteLang(currentNode);
+    harm->WriteNNumberLike(currentNode);
 }
 
 void MeiOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
@@ -1477,6 +1490,7 @@ void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textEl
     assert(textElement);
 
     WriteXmlId(currentNode, textElement);
+    textElement->WriteLabelled(currentNode);
     textElement->WriteTyped(currentNode);
 }
 
@@ -1505,8 +1519,6 @@ void MeiOutput::WriteLb(pugi::xml_node currentNode, Lb *lb)
 void MeiOutput::WriteNum(pugi::xml_node currentNode, Num *num)
 {
     assert(num);
-
-    num->WriteLabelled(currentNode);
 
     WriteTextElement(currentNode, num);
 }
@@ -1638,9 +1650,13 @@ void MeiOutput::WriteTimeSpanningInterface(pugi::xml_node element, TimeSpanningI
 
 void MeiOutput::WriteUnsupportedAttr(pugi::xml_node element, Object *object)
 {
-    ArrayOfStrAttr::iterator iter;
-    for (iter = object->m_unsupported.begin(); iter != object->m_unsupported.end(); iter++) {
-        element.append_attribute((*iter).first.c_str()) = (*iter).second.c_str();
+    for (auto &pair : object->m_unsupported) {
+        if (element.attribute(pair.first.c_str())) {
+            LogDebug("Attribute '%s' for '%s' is supported", pair.first.c_str(), object->GetClassName().c_str());
+        }
+        else {
+            element.append_attribute(pair.first.c_str()) = pair.second.c_str();
+        }
     }
 }
 
@@ -1750,6 +1766,13 @@ void MeiOutput::WriteRdg(pugi::xml_node currentNode, Rdg *rdg)
 
     WriteEditorialElement(currentNode, rdg);
     rdg->WriteSource(currentNode);
+}
+
+void MeiOutput::WriteRef(pugi::xml_node currentNode, Ref *ref)
+{
+    assert(ref);
+
+    WriteEditorialElement(currentNode, ref);
 }
 
 void MeiOutput::WriteReg(pugi::xml_node currentNode, Reg *reg)
@@ -2295,6 +2318,7 @@ bool MeiInput::ReadMdiv(Object *parent, pugi::xml_node mdiv, bool isVisible)
         vrvMdiv->MakeVisible();
     }
 
+    ReadUnsupportedAttr(mdiv, vrvMdiv);
     return ReadMdivChildren(vrvMdiv, mdiv, isVisible);
 }
 
@@ -2348,6 +2372,7 @@ bool MeiInput::ReadPages(Object *parent, pugi::xml_node pages)
     if (pages.attribute("type")) {
         type = StrToDocType(pages.attribute("type").value());
         m_doc->SetType(type);
+        pages.remove_attribute("type");
     }
 
     // This is a page-based MEI file
@@ -2383,6 +2408,7 @@ bool MeiInput::ReadPages(Object *parent, pugi::xml_node pages)
         }
     }
 
+    ReadUnsupportedAttr(pages, vrvPages);
     return success;
 }
 
@@ -2430,6 +2456,8 @@ bool MeiInput::ReadScore(Object *parent, pugi::xml_node score)
             LogWarning("Element <%s> within <score> is not supported and will be ignored ", elementName.c_str());
         }
     }
+
+    ReadUnsupportedAttr(score, vrvScore);
     return success;
 }
 
@@ -2441,6 +2469,7 @@ bool MeiInput::ReadSection(Object *parent, pugi::xml_node section)
     vrvSection->ReadNNumberLike(section);
 
     parent->AddChild(vrvSection);
+    ReadUnsupportedAttr(section, vrvSection);
     if (m_readingScoreBased)
         return ReadSectionChildren(vrvSection, section);
     else
@@ -2530,6 +2559,7 @@ bool MeiInput::ReadEnding(Object *parent, pugi::xml_node ending)
     vrvEnding->ReadNNumberLike(ending);
 
     parent->AddChild(vrvEnding);
+    ReadUnsupportedAttr(ending, vrvEnding);
     if (m_readingScoreBased)
         return ReadSectionChildren(vrvEnding, ending);
     else
@@ -2542,6 +2572,7 @@ bool MeiInput::ReadExpansion(Object *parent, pugi::xml_node expansion)
     ReadSystemElement(expansion, vrvExpansion);
 
     parent->AddChild(vrvExpansion);
+    ReadUnsupportedAttr(expansion, vrvExpansion);
     if (m_readingScoreBased)
         return ReadSectionChildren(vrvExpansion, expansion);
     else
@@ -2558,6 +2589,7 @@ bool MeiInput::ReadPb(Object *parent, pugi::xml_node pb)
     vrvPb->ReadNNumberLike(pb);
 
     parent->AddChild(vrvPb);
+    ReadUnsupportedAttr(pb, vrvPb);
     return true;
 }
 
@@ -2569,6 +2601,7 @@ bool MeiInput::ReadSb(Object *parent, pugi::xml_node sb)
     vrvSb->ReadNNumberLike(sb);
 
     parent->AddChild(vrvSb);
+    ReadUnsupportedAttr(sb, vrvSb);
     return true;
 }
 
@@ -2583,24 +2616,31 @@ bool MeiInput::ReadPage(Object *parent, pugi::xml_node page)
 
     if (page.attribute("page.height")) {
         vrvPage->m_pageHeight = atoi(page.attribute("page.height").value()) * DEFINITION_FACTOR;
+        page.remove_attribute("page.height");
     }
     if (page.attribute("page.width")) {
         vrvPage->m_pageWidth = atoi(page.attribute("page.width").value()) * DEFINITION_FACTOR;
+        page.remove_attribute("page.width");
     }
     if (page.attribute("page.botmar")) {
         vrvPage->m_pageMarginBottom = atoi(page.attribute("page.botmar").value()) * DEFINITION_FACTOR;
+        page.remove_attribute("page.botmar");
     }
     if (page.attribute("page.leftmar")) {
         vrvPage->m_pageMarginLeft = atoi(page.attribute("page.leftmar").value()) * DEFINITION_FACTOR;
+        page.remove_attribute("page.leftmar");
     }
     if (page.attribute("page.rightmar")) {
         vrvPage->m_pageMarginRight = atoi(page.attribute("page.rightmar").value()) * DEFINITION_FACTOR;
+        page.remove_attribute("page.rightmar");
     }
     if (page.attribute("page.topmar")) {
         vrvPage->m_pageMarginTop = atoi(page.attribute("page.topmar").value()) * DEFINITION_FACTOR;
+        page.remove_attribute("page.topmar");
     }
     if (page.attribute("surface")) {
         vrvPage->m_surface = page.attribute("surface").value();
+        page.remove_attribute("surface");
     }
     if (page.attribute("ppu")) {
         // vrvPage->m_PPUFactor = 12.5; //atof(page.attribute("ppu").value());
@@ -2615,6 +2655,7 @@ bool MeiInput::ReadPage(Object *parent, pugi::xml_node page)
         vrvPage->Process(&applyPPUFactor, &applyPPUFactorParams);
     }
 
+    ReadUnsupportedAttr(page, vrvPage);
     return success;
 }
 
@@ -2660,15 +2701,19 @@ bool MeiInput::ReadSystem(Object *parent, pugi::xml_node system)
 
     if (system.attribute("system.leftmar")) {
         vrvSystem->m_systemLeftMar = atoi(system.attribute("system.leftmar").value());
+        system.remove_attribute("system.leftmar");
     }
     if (system.attribute("system.rightmar")) {
         vrvSystem->m_systemRightMar = atoi(system.attribute("system.rightmar").value());
+        system.remove_attribute("system.rightmar");
     }
     if (system.attribute("uly") && (this->m_doc->GetType() == Transcription)) {
         vrvSystem->m_yAbs = atoi(system.attribute("uly").value()) * DEFINITION_FACTOR;
+        system.remove_attribute("uly");
     }
 
     parent->AddChild(vrvSystem);
+    ReadUnsupportedAttr(system, vrvSystem);
     return ReadSystemChildren(vrvSystem, system);
 }
 
@@ -2782,6 +2827,7 @@ bool MeiInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
     else {
         parent->AddChild(vrvScoreDef);
     }
+    ReadUnsupportedAttr(scoreDef, vrvScoreDef);
     return ReadScoreDefChildren(vrvScoreDef, scoreDef);
 }
 
@@ -2839,6 +2885,7 @@ bool MeiInput::ReadStaffGrp(Object *parent, pugi::xml_node staffGrp)
     vrvStaffGrp->ReadTyped(staffGrp);
 
     parent->AddChild(vrvStaffGrp);
+    ReadUnsupportedAttr(staffGrp, vrvStaffGrp);
     return ReadStaffGrpChildren(vrvStaffGrp, staffGrp);
 }
 
@@ -2889,6 +2936,7 @@ bool MeiInput::ReadPgFoot(Object *parent, pugi::xml_node pgFoot)
     ReadRunningElement(pgFoot, vrvPgFoot);
 
     parent->AddChild(vrvPgFoot);
+    ReadUnsupportedAttr(pgFoot, vrvPgFoot);
     return ReadRunningChildren(vrvPgFoot, pgFoot, vrvPgFoot);
 }
 
@@ -2898,6 +2946,7 @@ bool MeiInput::ReadPgFoot2(Object *parent, pugi::xml_node pgFoot2)
     ReadRunningElement(pgFoot2, vrvPgFoot2);
 
     parent->AddChild(vrvPgFoot2);
+    ReadUnsupportedAttr(pgFoot2, vrvPgFoot2);
     return ReadRunningChildren(vrvPgFoot2, pgFoot2, vrvPgFoot2);
 }
 
@@ -2907,6 +2956,7 @@ bool MeiInput::ReadPgHead(Object *parent, pugi::xml_node pgHead)
     ReadRunningElement(pgHead, vrvPgHead);
 
     parent->AddChild(vrvPgHead);
+    ReadUnsupportedAttr(pgHead, vrvPgHead);
     return ReadRunningChildren(vrvPgHead, pgHead, vrvPgHead);
 }
 
@@ -2916,6 +2966,7 @@ bool MeiInput::ReadPgHead2(Object *parent, pugi::xml_node pgHead2)
     ReadRunningElement(pgHead2, vrvPgHead2);
 
     parent->AddChild(vrvPgHead2);
+    ReadUnsupportedAttr(pgHead2, vrvPgHead2);
     return ReadRunningChildren(vrvPgHead2, pgHead2, vrvPgHead2);
 }
 
@@ -2983,7 +3034,7 @@ bool MeiInput::ReadStaffDef(Object *parent, pugi::xml_node staffDef)
     ReadScoreDefInterface(staffDef, vrvStaffDef);
 
     parent->AddChild(vrvStaffDef);
-
+    ReadUnsupportedAttr(staffDef, vrvStaffDef);
     return ReadStaffDefChildren(vrvStaffDef, staffDef);
 }
 
@@ -3015,6 +3066,7 @@ bool MeiInput::ReadLabel(Object *parent, pugi::xml_node label)
     SetMeiUuid(label, vrvLabel);
 
     parent->AddChild(vrvLabel);
+    ReadUnsupportedAttr(label, vrvLabel);
     return ReadTextChildren(vrvLabel, label, vrvLabel);
 }
 
@@ -3024,6 +3076,7 @@ bool MeiInput::ReadLabelAbbr(Object *parent, pugi::xml_node labelAbbr)
     SetMeiUuid(labelAbbr, vrvLabelAbbr);
 
     parent->AddChild(vrvLabelAbbr);
+    ReadUnsupportedAttr(labelAbbr, vrvLabelAbbr);
     return ReadTextChildren(vrvLabelAbbr, labelAbbr, vrvLabelAbbr);
 }
 
@@ -3045,10 +3098,12 @@ bool MeiInput::ReadMeasure(Object *parent, pugi::xml_node measure)
     if (measure.attribute("ulx") && measure.attribute("lrx") && (this->m_doc->GetType() == Transcription)) {
         vrvMeasure->m_xAbs = atoi(measure.attribute("ulx").value()) * DEFINITION_FACTOR;
         vrvMeasure->m_xAbs2 = atoi(measure.attribute("lrx").value()) * DEFINITION_FACTOR;
+        measure.remove_attribute("ulx");
+        measure.remove_attribute("lrx");
     }
 
-    // This could be moved to an AddMeasure method for consistency with AddLayerElement
     parent->AddChild(vrvMeasure);
+    ReadUnsupportedAttr(measure, vrvMeasure);
     return ReadMeasureChildren(vrvMeasure, measure);
 }
 
@@ -3144,6 +3199,7 @@ bool MeiInput::ReadAnchoredText(Object *parent, pugi::xml_node anchoredText)
 
     ReadTextDirInterface(anchoredText, vrvAnchoredText);
 
+    ReadUnsupportedAttr(anchoredText, vrvAnchoredText);
     parent->AddChild(vrvAnchoredText);
     return ReadTextChildren(vrvAnchoredText, anchoredText, vrvAnchoredText);
 }
@@ -3160,6 +3216,7 @@ bool MeiInput::ReadArpeg(Object *parent, pugi::xml_node arpeg)
     vrvArpeg->ReadColor(arpeg);
 
     parent->AddChild(vrvArpeg);
+    ReadUnsupportedAttr(arpeg, vrvArpeg);
     return true;
 }
 
@@ -3173,6 +3230,7 @@ bool MeiInput::ReadBreath(Object *parent, pugi::xml_node breath)
     vrvBreath->ReadPlacement(breath);
 
     parent->AddChild(vrvBreath);
+    ReadUnsupportedAttr(breath, vrvBreath);
     return true;
 }
 
@@ -3186,6 +3244,7 @@ bool MeiInput::ReadDir(Object *parent, pugi::xml_node dir)
     vrvDir->ReadLang(dir);
 
     parent->AddChild(vrvDir);
+    ReadUnsupportedAttr(dir, vrvDir);
     return ReadTextChildren(vrvDir, dir, vrvDir);
 }
 
@@ -3196,8 +3255,10 @@ bool MeiInput::ReadDynam(Object *parent, pugi::xml_node dynam)
 
     ReadTextDirInterface(dynam, vrvDynam);
     ReadTimeSpanningInterface(dynam, vrvDynam);
+    vrvDynam->ReadVerticalAlignment(dynam);
 
     parent->AddChild(vrvDynam);
+    ReadUnsupportedAttr(dynam, vrvDynam);
     return ReadTextChildren(vrvDynam, dynam, vrvDynam);
 }
 
@@ -3212,6 +3273,7 @@ bool MeiInput::ReadFermata(Object *parent, pugi::xml_node fermata)
     vrvFermata->ReadPlacement(fermata);
 
     parent->AddChild(vrvFermata);
+    ReadUnsupportedAttr(fermata, vrvFermata);
     return true;
 }
 
@@ -3224,8 +3286,10 @@ bool MeiInput::ReadHairpin(Object *parent, pugi::xml_node hairpin)
     vrvHairpin->ReadColor(hairpin);
     vrvHairpin->ReadHairpinLog(hairpin);
     vrvHairpin->ReadPlacement(hairpin);
+    vrvHairpin->ReadVerticalAlignment(hairpin);
 
     parent->AddChild(vrvHairpin);
+    ReadUnsupportedAttr(hairpin, vrvHairpin);
     return true;
 }
 
@@ -3237,8 +3301,10 @@ bool MeiInput::ReadHarm(Object *parent, pugi::xml_node harm)
     ReadTextDirInterface(harm, vrvHarm);
     ReadTimeSpanningInterface(harm, vrvHarm);
     vrvHarm->ReadLang(harm);
+    vrvHarm->ReadNNumberLike(harm);
 
     parent->AddChild(vrvHarm);
+    ReadUnsupportedAttr(harm, vrvHarm);
     return ReadTextChildren(vrvHarm, harm, vrvHarm);
 }
 
@@ -3254,6 +3320,7 @@ bool MeiInput::ReadMordent(Object *parent, pugi::xml_node mordent)
     vrvMordent->ReadMordentLog(mordent);
 
     parent->AddChild(vrvMordent);
+    ReadUnsupportedAttr(mordent, vrvMordent);
     return true;
 }
 
@@ -3269,6 +3336,7 @@ bool MeiInput::ReadOctave(Object *parent, pugi::xml_node octave)
     vrvOctave->ReadOctaveDisplacement(octave);
 
     parent->AddChild(vrvOctave);
+    ReadUnsupportedAttr(octave, vrvOctave);
     return true;
 }
 
@@ -3283,6 +3351,7 @@ bool MeiInput::ReadPedal(Object *parent, pugi::xml_node pedal)
     vrvPedal->ReadPlacement(pedal);
 
     parent->AddChild(vrvPedal);
+    ReadUnsupportedAttr(pedal, vrvPedal);
     return true;
 }
 
@@ -3296,6 +3365,7 @@ bool MeiInput::ReadSlur(Object *parent, pugi::xml_node slur)
     vrvSlur->ReadCurvature(slur);
 
     parent->AddChild(vrvSlur);
+    ReadUnsupportedAttr(slur, vrvSlur);
     return true;
 }
 
@@ -3311,6 +3381,7 @@ bool MeiInput::ReadTempo(Object *parent, pugi::xml_node tempo)
     vrvTempo->ReadMmTempo(tempo);
 
     parent->AddChild(vrvTempo);
+    ReadUnsupportedAttr(tempo, vrvTempo);
     return ReadTextChildren(vrvTempo, tempo, vrvTempo);
 }
 
@@ -3324,6 +3395,7 @@ bool MeiInput::ReadTie(Object *parent, pugi::xml_node tie)
     vrvTie->ReadCurvature(tie);
 
     parent->AddChild(vrvTie);
+    ReadUnsupportedAttr(tie, vrvTie);
     return true;
 }
 
@@ -3338,6 +3410,7 @@ bool MeiInput::ReadTrill(Object *parent, pugi::xml_node trill)
     vrvTrill->ReadPlacement(trill);
 
     parent->AddChild(vrvTrill);
+    ReadUnsupportedAttr(trill, vrvTrill);
     return true;
 }
 
@@ -3353,6 +3426,7 @@ bool MeiInput::ReadTurn(Object *parent, pugi::xml_node turn)
     vrvTurn->ReadTurnLog(turn);
 
     parent->AddChild(vrvTurn);
+    ReadUnsupportedAttr(turn, vrvTurn);
     return true;
 }
 
@@ -3362,6 +3436,7 @@ bool MeiInput::ReadFb(Object *parent, pugi::xml_node fb)
     SetMeiUuid(fb, vrvFb);
 
     parent->AddChild(vrvFb);
+    ReadUnsupportedAttr(fb, vrvFb);
     return ReadFbChildren(vrvFb, fb);
 }
 
@@ -3399,6 +3474,7 @@ bool MeiInput::ReadStaff(Object *parent, pugi::xml_node staff)
 
     if (staff.attribute("uly") && (this->m_doc->GetType() == Transcription)) {
         vrvStaff->m_yAbs = atoi(staff.attribute("uly").value()) * DEFINITION_FACTOR;
+        staff.remove_attribute("uly");
     }
 
     if (!vrvStaff->HasN() || (vrvStaff->GetN() == 0)) {
@@ -3406,6 +3482,7 @@ bool MeiInput::ReadStaff(Object *parent, pugi::xml_node staff)
     }
 
     parent->AddChild(vrvStaff);
+    ReadUnsupportedAttr(staff, vrvStaff);
     return ReadStaffChildren(vrvStaff, staff);
 }
 
@@ -3449,6 +3526,7 @@ bool MeiInput::ReadLayer(Object *parent, pugi::xml_node layer)
     }
 
     parent->AddChild(vrvLayer);
+    ReadUnsupportedAttr(layer, vrvLayer);
     return ReadLayerChildren(vrvLayer, layer);
 }
 
@@ -3568,6 +3646,7 @@ bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
 {
     if (element.attribute("ulx") && (this->m_doc->GetType() == Transcription)) {
         object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITION_FACTOR;
+        element.remove_attribute("ulx");
     }
 
     SetMeiUuid(element, object);
@@ -3590,6 +3669,7 @@ bool MeiInput::ReadAccid(Object *parent, pugi::xml_node accid)
     vrvAccid->ReadEnclosingChars(accid);
 
     parent->AddChild(vrvAccid);
+    ReadUnsupportedAttr(accid, vrvAccid);
     return true;
 }
 
@@ -3603,6 +3683,7 @@ bool MeiInput::ReadArtic(Object *parent, pugi::xml_node artic)
     vrvArtic->ReadPlacement(artic);
 
     parent->AddChild(vrvArtic);
+    ReadUnsupportedAttr(artic, vrvArtic);
     return true;
 }
 
@@ -3615,6 +3696,7 @@ bool MeiInput::ReadBarLine(Object *parent, pugi::xml_node barLine)
     vrvBarLine->ReadColor(barLine);
 
     parent->AddChild(vrvBarLine);
+    ReadUnsupportedAttr(barLine, vrvBarLine);
     return true;
 }
 
@@ -3626,7 +3708,7 @@ bool MeiInput::ReadBeam(Object *parent, pugi::xml_node beam)
     vrvBeam->ReadColor(beam);
 
     parent->AddChild(vrvBeam);
-
+    ReadUnsupportedAttr(beam, vrvBeam);
     return ReadLayerChildren(vrvBeam, beam, vrvBeam);
 }
 
@@ -3639,6 +3721,7 @@ bool MeiInput::ReadBeatRpt(Object *parent, pugi::xml_node beatRpt)
     vrvBeatRpt->ReadBeatRptVis(beatRpt);
 
     parent->AddChild(vrvBeatRpt);
+    ReadUnsupportedAttr(beatRpt, vrvBeatRpt);
     return true;
 }
 
@@ -3650,6 +3733,7 @@ bool MeiInput::ReadBTrem(Object *parent, pugi::xml_node bTrem)
     vrvBTrem->ReadTremMeasured(bTrem);
 
     parent->AddChild(vrvBTrem);
+    ReadUnsupportedAttr(bTrem, vrvBTrem);
     return ReadLayerChildren(vrvBTrem, bTrem, vrvBTrem);
 }
 
@@ -3681,6 +3765,7 @@ bool MeiInput::ReadChord(Object *parent, pugi::xml_node chord)
     }
 
     parent->AddChild(vrvChord);
+    ReadUnsupportedAttr(chord, vrvChord);
     return ReadLayerChildren(vrvChord, chord, vrvChord);
 }
 
@@ -3695,6 +3780,7 @@ bool MeiInput::ReadClef(Object *parent, pugi::xml_node clef)
     vrvClef->ReadOctaveDisplacement(clef);
 
     parent->AddChild(vrvClef);
+    ReadUnsupportedAttr(clef, vrvClef);
     return true;
 }
 
@@ -3704,10 +3790,10 @@ bool MeiInput::ReadCustos(Object *parent, pugi::xml_node custos)
     ReadLayerElement(custos, vrvCustos);
 
     ReadPositionInterface(custos, vrvCustos);
-
     vrvCustos->ReadColor(custos);
 
     parent->AddChild(vrvCustos);
+    ReadUnsupportedAttr(custos, vrvCustos);
     return true;
 }
 
@@ -3721,6 +3807,7 @@ bool MeiInput::ReadDot(Object *parent, pugi::xml_node dot)
     vrvDot->ReadDotLog(dot);
 
     parent->AddChild(vrvDot);
+    ReadUnsupportedAttr(dot, vrvDot);
     return true;
 }
 
@@ -3733,6 +3820,7 @@ bool MeiInput::ReadFTrem(Object *parent, pugi::xml_node fTrem)
     vrvFTrem->ReadTremMeasured(fTrem);
 
     parent->AddChild(vrvFTrem);
+    ReadUnsupportedAttr(fTrem, vrvFTrem);
     return ReadLayerChildren(vrvFTrem, fTrem, vrvFTrem);
 }
 
@@ -3748,6 +3836,7 @@ bool MeiInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
     vrvKeySig->ConvertToInternal();
 
     parent->AddChild(vrvKeySig);
+    ReadUnsupportedAttr(keySig, vrvKeySig);
     return true;
 }
 
@@ -3759,6 +3848,7 @@ bool MeiInput::ReadLigature(Object *parent, pugi::xml_node ligature)
     vrvLigature->ReadLigatureLog(ligature);
 
     parent->AddChild(vrvLigature);
+    ReadUnsupportedAttr(ligature, vrvLigature);
     return ReadLayerChildren(vrvLigature, ligature, vrvLigature);
 }
 
@@ -3776,6 +3866,7 @@ bool MeiInput::ReadMensur(Object *parent, pugi::xml_node mensur)
     vrvMensur->ReadSlashCount(mensur);
 
     parent->AddChild(vrvMensur);
+    ReadUnsupportedAttr(mensur, vrvMensur);
     return true;
 }
 
@@ -3788,6 +3879,7 @@ bool MeiInput::ReadMeterSig(Object *parent, pugi::xml_node meterSig)
     vrvMeterSig->ReadMeterSigVis(meterSig);
 
     parent->AddChild(vrvMeterSig);
+    ReadUnsupportedAttr(meterSig, vrvMeterSig);
     return true;
 }
 
@@ -3806,6 +3898,7 @@ bool MeiInput::ReadMRest(Object *parent, pugi::xml_node mRest)
     }
 
     parent->AddChild(vrvMRest);
+    ReadUnsupportedAttr(mRest, vrvMRest);
     return true;
 }
 
@@ -3815,6 +3908,7 @@ bool MeiInput::ReadMRpt(Object *parent, pugi::xml_node mRpt)
     ReadLayerElement(mRpt, vrvMRpt);
 
     parent->AddChild(vrvMRpt);
+    ReadUnsupportedAttr(mRpt, vrvMRpt);
     return true;
 }
 
@@ -3824,6 +3918,7 @@ bool MeiInput::ReadMRpt2(Object *parent, pugi::xml_node mRpt2)
     ReadLayerElement(mRpt2, vrvMRpt2);
 
     parent->AddChild(vrvMRpt2);
+    ReadUnsupportedAttr(mRpt2, vrvMRpt2);
     return true;
 }
 
@@ -3836,6 +3931,7 @@ bool MeiInput::ReadMultiRest(Object *parent, pugi::xml_node multiRest)
     vrvMultiRest->ReadNumbered(multiRest);
 
     parent->AddChild(vrvMultiRest);
+    ReadUnsupportedAttr(multiRest, vrvMultiRest);
     return true;
 }
 
@@ -3847,6 +3943,7 @@ bool MeiInput::ReadMultiRpt(Object *parent, pugi::xml_node multiRpt)
     vrvMultiRpt->ReadNumbered(multiRpt);
 
     parent->AddChild(vrvMultiRpt);
+    ReadUnsupportedAttr(multiRpt, vrvMultiRpt);
     return true;
 }
 
@@ -3894,6 +3991,7 @@ bool MeiInput::ReadNote(Object *parent, pugi::xml_node note)
     }
 
     parent->AddChild(vrvNote);
+    ReadUnsupportedAttr(note, vrvNote);
     return ReadLayerChildren(vrvNote, note, vrvNote);
 }
 
@@ -3909,6 +4007,7 @@ bool MeiInput::ReadRest(Object *parent, pugi::xml_node rest)
     vrvRest->ReadRestVisMensural(rest);
 
     parent->AddChild(vrvRest);
+    ReadUnsupportedAttr(rest, vrvRest);
     return ReadLayerChildren(vrvRest, rest, vrvRest);
 }
 
@@ -3920,6 +4019,7 @@ bool MeiInput::ReadProport(Object *parent, pugi::xml_node proport)
     vrvProport->ReadDurationRatio(proport);
 
     parent->AddChild(vrvProport);
+    ReadUnsupportedAttr(proport, vrvProport);
     return true;
 }
 
@@ -3931,6 +4031,7 @@ bool MeiInput::ReadSpace(Object *parent, pugi::xml_node space)
     ReadDurationInterface(space, vrvSpace);
 
     parent->AddChild(vrvSpace);
+    ReadUnsupportedAttr(space, vrvSpace);
     return true;
 }
 
@@ -3944,6 +4045,7 @@ bool MeiInput::ReadSyl(Object *parent, pugi::xml_node syl)
     vrvSyl->ReadSylLog(syl);
 
     parent->AddChild(vrvSyl);
+    ReadUnsupportedAttr(syl, vrvSyl);
     return ReadTextChildren(vrvSyl, syl, vrvSyl);
 }
 
@@ -3958,6 +4060,7 @@ bool MeiInput::ReadTuplet(Object *parent, pugi::xml_node tuplet)
     vrvTuplet->ReadTupletVis(tuplet);
 
     parent->AddChild(vrvTuplet);
+    ReadUnsupportedAttr(tuplet, vrvTuplet);
     return ReadLayerChildren(vrvTuplet, tuplet, vrvTuplet);
 }
 
@@ -3972,6 +4075,7 @@ bool MeiInput::ReadVerse(Object *parent, pugi::xml_node verse)
     vrvVerse->ReadTypography(verse);
 
     parent->AddChild(vrvVerse);
+    ReadUnsupportedAttr(verse, vrvVerse);
     return ReadLayerChildren(vrvVerse, verse, vrvVerse);
 }
 
@@ -4034,6 +4138,7 @@ bool MeiInput::ReadTextChildren(Object *parent, pugi::xml_node parentNode, Objec
 bool MeiInput::ReadTextElement(pugi::xml_node element, TextElement *object)
 {
     SetMeiUuid(element, object);
+    object->ReadLabelled(element);
     object->ReadTyped(element);
 
     return true;
@@ -4045,6 +4150,7 @@ bool MeiInput::ReadF(Object *parent, pugi::xml_node f)
     ReadTextElement(f, vrvF);
 
     parent->AddChild(vrvF);
+    ReadUnsupportedAttr(f, vrvF);
     return ReadTextChildren(vrvF, f);
 }
 
@@ -4056,6 +4162,7 @@ bool MeiInput::ReadFig(Object *parent, pugi::xml_node fig)
     ReadAreaPosInterface(fig, vrvFig);
 
     parent->AddChild(vrvFig);
+    ReadUnsupportedAttr(fig, vrvFig);
     return ReadTextChildren(vrvFig, fig, vrvFig);
 }
 
@@ -4065,6 +4172,7 @@ bool MeiInput::ReadLb(Object *parent, pugi::xml_node lb)
     ReadTextElement(lb, vrvLb);
 
     parent->AddChild(vrvLb);
+    ReadUnsupportedAttr(lb, vrvLb);
     return true;
 }
 
@@ -4073,9 +4181,8 @@ bool MeiInput::ReadNum(Object *parent, pugi::xml_node num)
     Num *vrvNum = new Num();
     ReadTextElement(num, vrvNum);
 
-    vrvNum->ReadLabelled(num);
-
     parent->AddChild(vrvNum);
+    ReadUnsupportedAttr(num, vrvNum);
     return ReadTextChildren(vrvNum, num, vrvNum);
 }
 
@@ -4091,8 +4198,6 @@ bool MeiInput::ReadRend(Object *parent, pugi::xml_node rend)
     vrvRend->ReadTypography(rend);
     vrvRend->ReadWhitespace(rend);
 
-    parent->AddChild(vrvRend);
-
     if (vrvRend->GetFirstParent(REND) && (vrvRend->HasHalign() || vrvRend->HasValign())) {
         LogWarning("@halign or @valign in nested <rend> element <rend> %s will be ignored", vrvRend->GetUuid().c_str());
         // Eventually to be added to unsupported attributes?
@@ -4100,6 +4205,8 @@ bool MeiInput::ReadRend(Object *parent, pugi::xml_node rend)
         vrvRend->SetValign(VERTICALALIGNMENT_NONE);
     }
 
+    parent->AddChild(vrvRend);
+    ReadUnsupportedAttr(rend, vrvRend);
     return ReadTextChildren(vrvRend, rend, vrvRend);
 }
 
@@ -4116,7 +4223,7 @@ bool MeiInput::ReadSvg(Object *parent, pugi::xml_node svg)
     }
 
     parent->AddChild(vrvSvg);
-
+    ReadUnsupportedAttr(svg, vrvSvg);
     return true;
 }
 
@@ -4258,6 +4365,9 @@ bool MeiInput::ReadEditorialElement(Object *parent, pugi::xml_node current, Edit
     else if (std::string(current.name()) == "orig") {
         return ReadOrig(parent, current, level, filter);
     }
+    else if (std::string(current.name()) == "ref") {
+        return ReadRef(parent, current, level, filter);
+    }
     else if (std::string(current.name()) == "reg") {
         return ReadReg(parent, current, level, filter);
     }
@@ -4297,6 +4407,7 @@ bool MeiInput::ReadAbbr(Object *parent, pugi::xml_node abbr, EditorialLevel leve
     vrvAbbr->ReadSource(abbr);
 
     parent->AddChild(vrvAbbr);
+    ReadUnsupportedAttr(abbr, vrvAbbr);
     return ReadEditorialChildren(vrvAbbr, abbr, level, filter);
 }
 
@@ -4308,6 +4419,7 @@ bool MeiInput::ReadAdd(Object *parent, pugi::xml_node add, EditorialLevel level,
     vrvAdd->ReadSource(add);
 
     parent->AddChild(vrvAdd);
+    ReadUnsupportedAttr(add, vrvAdd);
     return ReadEditorialChildren(vrvAdd, add, level, filter);
 }
 
@@ -4326,6 +4438,7 @@ bool MeiInput::ReadAnnot(Object *parent, pugi::xml_node annot)
     }
 
     parent->AddChild(vrvAnnot);
+    ReadUnsupportedAttr(annot, vrvAnnot);
     return ReadTextChildren(vrvAnnot, annot, vrvAnnot);
 }
 
@@ -4339,7 +4452,7 @@ bool MeiInput::ReadApp(Object *parent, pugi::xml_node app, EditorialLevel level,
     ReadEditorialElement(app, vrvApp);
 
     parent->AddChild(vrvApp);
-
+    ReadUnsupportedAttr(app, vrvApp);
     return ReadAppChildren(vrvApp, app, level, filter);
 }
 
@@ -4404,7 +4517,7 @@ bool MeiInput::ReadChoice(Object *parent, pugi::xml_node choice, EditorialLevel 
     ReadEditorialElement(choice, vrvChoice);
 
     parent->AddChild(vrvChoice);
-
+    ReadUnsupportedAttr(choice, vrvChoice);
     return ReadChoiceChildren(vrvChoice, choice, level, filter);
 }
 
@@ -4442,6 +4555,9 @@ bool MeiInput::ReadChoiceChildren(Object *parent, pugi::xml_node parentNode, Edi
         }
         else if (std::string(current.name()) == "orig") {
             success = ReadOrig(parent, current, level, filter);
+        }
+        else if (std::string(current.name()) == "ref") {
+            success = ReadRef(parent, current, level, filter);
         }
         else if (std::string(current.name()) == "reg") {
             success = ReadReg(parent, current, level, filter);
@@ -4490,6 +4606,7 @@ bool MeiInput::ReadCorr(Object *parent, pugi::xml_node corr, EditorialLevel leve
     vrvCorr->ReadSource(corr);
 
     parent->AddChild(vrvCorr);
+    ReadUnsupportedAttr(corr, vrvCorr);
     return ReadEditorialChildren(vrvCorr, corr, level, filter);
 }
 
@@ -4501,6 +4618,7 @@ bool MeiInput::ReadDamage(Object *parent, pugi::xml_node damage, EditorialLevel 
     vrvDamage->ReadSource(damage);
 
     parent->AddChild(vrvDamage);
+    ReadUnsupportedAttr(damage, vrvDamage);
     return ReadEditorialChildren(vrvDamage, damage, level, filter);
 }
 
@@ -4512,6 +4630,7 @@ bool MeiInput::ReadDel(Object *parent, pugi::xml_node del, EditorialLevel level,
     vrvDel->ReadSource(del);
 
     parent->AddChild(vrvDel);
+    ReadUnsupportedAttr(del, vrvDel);
     return ReadEditorialChildren(vrvDel, del, level, filter);
 }
 
@@ -4523,6 +4642,7 @@ bool MeiInput::ReadExpan(Object *parent, pugi::xml_node expan, EditorialLevel le
     vrvExpan->ReadSource(expan);
 
     parent->AddChild(vrvExpan);
+    ReadUnsupportedAttr(expan, vrvExpan);
     return ReadEditorialChildren(vrvExpan, expan, level, filter);
 }
 
@@ -4538,6 +4658,7 @@ bool MeiInput::ReadLem(Object *parent, pugi::xml_node lem, EditorialLevel level,
     vrvLem->ReadSource(lem);
 
     parent->AddChild(vrvLem);
+    ReadUnsupportedAttr(lem, vrvLem);
     return ReadEditorialChildren(vrvLem, lem, level, filter);
 }
 
@@ -4549,6 +4670,7 @@ bool MeiInput::ReadOrig(Object *parent, pugi::xml_node orig, EditorialLevel leve
     vrvOrig->ReadSource(orig);
 
     parent->AddChild(vrvOrig);
+    ReadUnsupportedAttr(orig, vrvOrig);
     return ReadEditorialChildren(vrvOrig, orig, level, filter);
 }
 
@@ -4564,7 +4686,18 @@ bool MeiInput::ReadRdg(Object *parent, pugi::xml_node rdg, EditorialLevel level,
     vrvRdg->ReadSource(rdg);
 
     parent->AddChild(vrvRdg);
+    ReadUnsupportedAttr(rdg, vrvRdg);
     return ReadEditorialChildren(vrvRdg, rdg, level, filter);
+}
+
+bool MeiInput::ReadRef(Object *parent, pugi::xml_node ref, EditorialLevel level, Object *filter)
+{
+    Ref *vrvRef = new Ref();
+    ReadEditorialElement(ref, vrvRef);
+
+    parent->AddChild(vrvRef);
+    ReadUnsupportedAttr(ref, vrvRef);
+    return ReadEditorialChildren(vrvRef, ref, level, filter);
 }
 
 bool MeiInput::ReadReg(Object *parent, pugi::xml_node reg, EditorialLevel level, Object *filter)
@@ -4575,6 +4708,7 @@ bool MeiInput::ReadReg(Object *parent, pugi::xml_node reg, EditorialLevel level,
     vrvReg->ReadSource(reg);
 
     parent->AddChild(vrvReg);
+    ReadUnsupportedAttr(reg, vrvReg);
     return ReadEditorialChildren(vrvReg, reg, level, filter);
 }
 
@@ -4586,6 +4720,7 @@ bool MeiInput::ReadRestore(Object *parent, pugi::xml_node restore, EditorialLeve
     vrvRestore->ReadSource(restore);
 
     parent->AddChild(vrvRestore);
+    ReadUnsupportedAttr(restore, vrvRestore);
     return ReadEditorialChildren(vrvRestore, restore, level, filter);
 }
 
@@ -4597,6 +4732,7 @@ bool MeiInput::ReadSic(Object *parent, pugi::xml_node sic, EditorialLevel level,
     vrvSic->ReadSource(sic);
 
     parent->AddChild(vrvSic);
+    ReadUnsupportedAttr(sic, vrvSic);
     return ReadEditorialChildren(vrvSic, sic, level, filter);
 }
 
@@ -4608,6 +4744,7 @@ bool MeiInput::ReadSupplied(Object *parent, pugi::xml_node supplied, EditorialLe
     vrvSupplied->ReadSource(supplied);
 
     parent->AddChild(vrvSupplied);
+    ReadUnsupportedAttr(supplied, vrvSupplied);
     return ReadEditorialChildren(vrvSupplied, supplied, level, filter);
 }
 
@@ -4619,6 +4756,7 @@ bool MeiInput::ReadUnclear(Object *parent, pugi::xml_node unclear, EditorialLeve
     vrvUnclear->ReadSource(unclear);
 
     parent->AddChild(vrvUnclear);
+    ReadUnsupportedAttr(unclear, vrvUnclear);
     return ReadEditorialChildren(vrvUnclear, unclear, level, filter);
 }
 

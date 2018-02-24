@@ -14,6 +14,8 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functorparams.h"
+#include "hairpin.h"
 #include "smufl.h"
 #include "text.h"
 #include "verticalaligner.h"
@@ -29,10 +31,12 @@ std::wstring dynamSmufl[] = { L"\uE520", L"\uE521", L"\uE522", L"\uE523", L"\uE5
 // Dynam
 //----------------------------------------------------------------------------
 
-Dynam::Dynam() : ControlElement("dynam-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
+Dynam::Dynam()
+    : ControlElement("dynam-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttVerticalAlignment()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_VERTICALALIGNMENT);
 
     Reset();
 }
@@ -44,6 +48,7 @@ void Dynam::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
+    AttVerticalAlignment::ResetVerticalAlignment();
 }
 
 void Dynam::AddChild(Object *child)
@@ -157,5 +162,28 @@ std::wstring Dynam::GetSymbolStr() const
 //----------------------------------------------------------------------------
 // Dynam functor methods
 //----------------------------------------------------------------------------
+
+int Dynam::PrepareFloatingGrps(FunctorParams *functorParams)
+{
+    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    assert(params);
+
+    if (this->HasVgrp()) {
+        this->SetDrawingGrpId(-this->GetVgrp());
+    }
+
+    // Keep it for linking only if start is resolved
+    if (!this->GetStart()) return FUNCTOR_CONTINUE;
+
+    params->m_dynams.push_back(this);
+
+    for (auto &hairpin : params->m_hairpins) {
+        if ((hairpin->GetEnd() == this->GetStart()) && (hairpin->GetStaff() == this->GetStaff())) {
+            if (!hairpin->GetRightLink()) hairpin->SetRightLink(this);
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv
