@@ -732,13 +732,13 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     }
 
     if (m_drawingScoreDef.GetMnumVisible() != BOOLEAN_false) {
-        // Check if the first measure of the system
-        Measure *systemStart = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
         MNum *mnum = dynamic_cast<MNum *>(measure->FindChildByType(MNUM));
-        if (measure == systemStart) {
-            // Draw auto measure number if > 1
-            if ((measure->HasN()) && (measure->GetN() != "0") && (measure->GetN() != "1")) {
-                if (mnum) {
+        if (mnum) {
+            // this should be an option
+            Measure *systemStart = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
+            if (measure == systemStart || !mnum->IsGenerated()) {
+                // Draw measure numbers > 1
+                if ((measure->GetN() != "0") && (measure->GetN()) != "1") {
                     DrawMNum(dc, mnum, measure);
                 }
             }
