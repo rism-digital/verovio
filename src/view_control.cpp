@@ -2162,7 +2162,12 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
 
     int code = SMUFL_E655_keyboardPedalUp;
     std::wstring str;
-    if (pedal->GetDir() == pedalLog_DIR_bounce) str.push_back(code);
+    if (pedal->GetDir() == pedalLog_DIR_bounce) {
+        str.push_back(code);
+        TextExtend bounceOffset;
+        dc->GetSmuflTextExtent(str, &bounceOffset);
+        x -= bounceOffset.m_width;
+    }
     if (pedal->GetDir() != pedalLog_DIR_up) code = SMUFL_E650_keyboardPedalPed;
     str.push_back(code);
 
