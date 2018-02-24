@@ -431,7 +431,7 @@ void View::DrawOctave(
     end = dynamic_cast<LayerElement *>(octave->GetEnd());
 
     if (!start || !end) {
-        // no start and end, obviously nothing to do...
+        // no start or end, obviously nothing to do …
         return;
     }
 
@@ -468,27 +468,29 @@ void View::DrawOctave(
             default: break;
         }
     }
-    int lineWidthFactor = 1;
     std::wstring str;
     str.push_back(code);
-    if (octave->HasLwidth()) {
-        if (octave->GetLwidth() == "wide") {
-            lineWidthFactor *= 4;
-        }
-        else if (octave->GetLwidth() == "medium") {
-            lineWidthFactor *= 2;
-        }
-    }
-    int lineWidth = lineWidthFactor * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
-    TextExtend extend;
-    dc->GetSmuflTextExtent(str, &extend);
-    int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
-    DrawSmuflCode(dc, x1 - extend.m_width, yCode, code, staff->m_drawingStaffSize, false);
-    dc->ResetFont();
 
     if (octave->GetExtender() != BOOLEAN_false) {
-        y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
+        int lineWidthFactor = 1;
+        if (octave->HasLwidth()) {
+            if (octave->GetLwidth() == "wide") {
+                lineWidthFactor *= 4;
+            }
+            else if (octave->GetLwidth() == "medium") {
+                lineWidthFactor *= 2;
+            }
+        }
+        int lineWidth = lineWidthFactor * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+        TextExtend extend;
+        dc->GetSmuflTextExtent(str, &extend);
+        int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
+        DrawSmuflCode(dc, x1 - extend.m_width, yCode, code, staff->m_drawingStaffSize, false);
+        dc->ResetFont();
+
+        if (octave->GetLendsym() != LINESTARTENDSYMBOL_none)
+                y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
         // adjust is to avoid the figure to touch the line
         x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
 
@@ -2158,9 +2160,10 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
         centered = false;
     }
 
-    int code = SMUFL_E650_keyboardPedalPed;
-    if (pedal->GetDir() == pedalLog_DIR_up) code = SMUFL_E655_keyboardPedalUp;
+    int code = SMUFL_E655_keyboardPedalUp;
     std::wstring str;
+    if (pedal->GetDir() == pedalLog_DIR_bounce) str.push_back(code);
+    if (pedal->GetDir() != pedalLog_DIR_up) code = SMUFL_E650_keyboardPedalPed;
     str.push_back(code);
 
     std::vector<Staff *>::iterator staffIter;

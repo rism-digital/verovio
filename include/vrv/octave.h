@@ -23,6 +23,7 @@ class Octave : public ControlElement,
                public TimeSpanningInterface,
                public AttColor,
                public AttExtender,
+               public AttLineRend,
                public AttLineRendBase,
                public AttOctaveDisplacement {
 public:

@@ -26,12 +26,14 @@ Octave::Octave()
     , TimeSpanningInterface()
     , AttColor()
     , AttExtender()
+    , AttLineRend()
     , AttLineRendBase()
     , AttOctaveDisplacement()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_EXTENDER);
+    RegisterAttClass(ATT_LINEREND);
     RegisterAttClass(ATT_LINERENDBASE);
     RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
 
@@ -46,6 +48,7 @@ void Octave::Reset()
     TimeSpanningInterface::Reset();
     ResetColor();
     ResetExtender();
+    ResetLineRend();
     ResetLineRendBase();
     ResetOctaveDisplacement();
 }
