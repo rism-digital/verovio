@@ -21,12 +21,12 @@ class TextElement;
 //----------------------------------------------------------------------------
 
 class MNum : public ControlElement,
-            public TextListInterface,
-            public TextDirInterface,
-            public TimeSpanningInterface,
-            public AttColor,
-            public AttLang,
-            public AttTypography {
+             public TextListInterface,
+             public TextDirInterface,
+             public TimeSpanningInterface,
+             public AttColor,
+             public AttLang,
+             public AttTypography {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -58,6 +58,14 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::Save
+     */
+    ///@{
+    virtual int Save(FunctorParams *functorParams);
+    virtual int SaveEnd(FunctorParams *functorParams);
+    ///@}
 
 protected:
     //
