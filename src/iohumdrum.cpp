@@ -7453,9 +7453,73 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     // Add the pitch information
     int base40 = hum::Convert::kernToBase40(tstring);
     base40 += m_transpose[staffindex];
-
     int diatonic = hum::Convert::base40ToDiatonic(base40);
     int octave = diatonic / 7;
+
+    int testaccid = 0;
+    for (int i = 0; i < (int)tstring.size(); i++) {
+        if (tstring[i] == '-') {
+            testaccid--;
+        }
+        else if (tstring[i] == '#') {
+            testaccid++;
+        }
+    }
+
+    if ((testaccid > 2) || (testaccid < -2)) {
+        // reconsider notes that cannot be represented in base-40
+        diatonic = -1;
+        string dia;
+        for (int i = 0; i < (int)tstring.size(); i++) {
+            switch (tstring[i]) {
+                case 'c':
+                case 'C':
+                    diatonic = 0;
+                    dia += tstring[i];
+                    break;
+                case 'd':
+                case 'D':
+                    diatonic = 1;
+                    dia += tstring[i];
+                    break;
+                case 'e':
+                case 'E':
+                    diatonic = 2;
+                    dia += tstring[i];
+                    break;
+                case 'f':
+                case 'F':
+                    diatonic = 3;
+                    dia += tstring[i];
+                    break;
+                case 'g':
+                case 'G':
+                    diatonic = 4;
+                    dia += tstring[i];
+                    break;
+                case 'a':
+                case 'A':
+                    diatonic = 5;
+                    dia += tstring[i];
+                    break;
+                case 'b':
+                case 'B':
+                    diatonic = 6;
+                    dia += tstring[i];
+                    break;
+            }
+        }
+        octave = (int)dia.size();
+        if (octave > 0) {
+            if (std::islower(dia[0])) {
+                octave = octave + 3;
+            }
+            else {
+                octave = 4 - octave;
+            }
+        }
+    }
+
     if (octaveupQ) {
         // @oct required even if @oct.ges given.
         note->SetOctGes(octave);
@@ -7489,6 +7553,9 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     }
 
     int accidCount = hum::Convert::base40ToAccidental(base40);
+    if ((testaccid > 2) || (testaccid < -2)) {
+        accidCount = testaccid;
+    }
     // int accidCount = hum::Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
     bool showInAccidGes = !showInAccid;
@@ -7510,13 +7577,14 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     if (!editorialQ) {
         if (showInAccid) {
             switch (accidCount) {
-                // case +3: accid->SetAccid(ACCIDENTAL_WRITTEN_ts); break;
-                // case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
+                case +3: accid->SetAccid(ACCIDENTAL_WRITTEN_xs); break;
                 case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
                 case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
                 case 0: accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
                 case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
                 case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
+                case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
+                default: std::cerr << "Do not know how to convert accidental: " << accidCount << endl;
             }
         }
     }
