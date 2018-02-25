@@ -380,6 +380,7 @@ protected:
         std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
     std::string automaticHeaderRight(
         std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int &linecount);
+    std::string getLayoutParameter(hum::HTp token, const std::string &category, const std::string &keyname);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

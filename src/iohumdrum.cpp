@@ -2376,9 +2376,11 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 
 void HumdrumInput::setInstrumentName(vrv::StaffDef *staffdef, const string &name)
 {
+    hum::HumRegex hre;
+    string newname = hre.replaceCopy(name, "\xc2\xa0", " ", "g");
     Label *label = new Label();
     Text *text = new Text;
-    text->SetText(UTF8to16(name));
+    text->SetText(UTF8to16(newname));
     label->AddChild(text);
     staffdef->AddChild(label);
 }
@@ -5331,6 +5333,18 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
             dynam->SetTstamp(barstamp.getFloat());
 
+            std::string verticalgroup = getLayoutParameter(line->token(i), "DY", "vg");
+            if (verticalgroup.empty()) {
+                // 100 is the default group:
+                dynam->SetVgrp(100);
+            }
+            else if (std::isdigit(verticalgroup[0])) {
+                dynam->SetVgrp(stoi(verticalgroup));
+            }
+            else {
+                // don't set a vertical group for this token
+            }
+
             if (aboveQ) {
                 setPlace(dynam, "above");
             }
@@ -5366,6 +5380,19 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 pair<int, double> ts2(measures, tstamp2.getFloat());
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_cres);
+
+                std::string verticalgroup = getLayoutParameter(line->token(i), "HP", "vg");
+                if (verticalgroup.empty()) {
+                    // 100 is the default group:
+                    hairpin->SetVgrp(100);
+                }
+                else if (std::isdigit(verticalgroup[0])) {
+                    hairpin->SetVgrp(stoi(verticalgroup));
+                }
+                else {
+                    // don't set a vertical group for this token
+                }
+
                 m_measure->AddChild(hairpin);
 
                 if (aboveQ) {
@@ -5405,6 +5432,19 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_dim);
                 m_measure->AddChild(hairpin);
+
+                std::string verticalgroup = getLayoutParameter(line->token(i), "HP", "vg");
+                if (verticalgroup.empty()) {
+                    // 100 is the default group:
+                    hairpin->SetVgrp(100);
+                }
+                else if (std::isdigit(verticalgroup[0])) {
+                    hairpin->SetVgrp(stoi(verticalgroup));
+                }
+                else {
+                    // don't set a vertical group for this token
+                }
+
                 if (aboveQ) {
                     // 300: hairpin->SetPlace(STAFFREL_above);
                     setPlace(hairpin, "above");
@@ -5439,6 +5479,40 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     // legitimate reasons).  Maybe make this more efficient later, such as
     // do a separate parse of dynamics data in a different loop.
     processDynamics(token, staffindex);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getLayoutParameter -- returns empty string if no given layout parameter, or
+//      the non-empty parameter as a string.
+//
+
+std::string HumdrumInput::getLayoutParameter(hum::HTp token, const std::string &category, const std::string &keyname)
+{
+    int lcount = token->getLinkedParameterCount();
+    if (lcount == 0) {
+        return "";
+    }
+
+    for (int p = 0; p < token->getLinkedParameterCount(); p++) {
+        hum::HumParamSet *hps = token->getLinkedParameter(p);
+        if (hps == NULL) {
+            continue;
+        }
+        if (hps->getNamespace1() != "LO") {
+            continue;
+        }
+        if (hps->getNamespace2() != category) {
+            continue;
+        }
+        for (int q = 0; q < hps->getCount(); q++) {
+            string key = hps->getParameterName(q);
+            if (key == keyname) {
+                return hps->getParameterValue(q);
+            }
+        }
+    }
+    return "";
 }
 
 //////////////////////////////
