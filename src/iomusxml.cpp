@@ -1100,7 +1100,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     // Hairpins
     pugi::xpath_node wedge = type.node().select_single_node("wedge");
     if (wedge) {
-        int hairpinNumber = atoi(GetAttributeValue(wedge.node(), "number").c_str());
+        int hairpinNumber = wedge.node().attribute("number").as_int();
         hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
         if (HasAttributeWithValue(wedge.node(), "type", "stop")) {
             std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
@@ -1374,11 +1374,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         }
         if (!GetAttributeValue(tupletStart.node(), "placement").empty()) {
             tuplet->SetNumPlace(
-                tuplet->AttTupletVis::StrToStaffrelBasic(GetAttributeValue(tupletStart.node(), "placement")));
+                tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
             tuplet->SetBracketPlace(
-                tuplet->AttTupletVis::StrToStaffrelBasic(GetAttributeValue(tupletStart.node(), "placement")));
+                tuplet->AttTupletVis::StrToStaffrelBasic(tupletStart.node().attribute("placement").as_string()));
         }
-        tuplet->SetNumFormat(ConvertTupletNumberValue(GetAttributeValue(tupletStart.node(), "show-number")));
+        tuplet->SetNumFormat(ConvertTupletNumberValue(tupletStart.node().attribute("show-number").as_string()));
         if (HasAttributeWithValue(tupletStart.node(), "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
         tuplet->SetBracketVisible(ConvertWordToBool(tupletStart.node().attribute("bracket").as_string()));
     }
@@ -1499,7 +1499,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // grace notes
         pugi::xpath_node grace = node.select_single_node("grace");
         if (grace) {
-            std::string slashStr = GetAttributeValue(grace.node(), "slash");
+            std::string slashStr = grace.node().attribute("slash").as_string();
             if (slashStr == "no") {
                 note->SetGrace(GRACE_acc);
             }
@@ -1526,10 +1526,12 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         pugi::xpath_node_set lyrics = node.select_nodes("lyric");
         for (pugi::xpath_node_set::const_iterator it = lyrics.begin(); it != lyrics.end(); ++it) {
             pugi::xml_node lyric = it->node();
+            int lyricNumber = lyric.attribute("number").as_int();
+            lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
             Verse *verse = new Verse();
             verse->SetColor(lyric.attribute("color").as_string());
             verse->SetLabel(lyric.attribute("name").as_string());
-            verse->SetN(lyric.attribute("number").as_int());
+            verse->SetN(lyricNumber);
             for (pugi::xml_node textNode = lyric.child("text"); textNode; textNode = textNode.next_sibling("text")) {
                 if (GetAttributeValue(lyric, "print-object") != "no") {
                     // std::string textColor = GetAttributeValue(textNode.node(), "color");
