@@ -944,7 +944,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     else {
         int dist = abs(p2->x - p1->x);
         height = std::max(int(m_options->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
-            dist / TEMP_SLUR_HEIGHT_FACTOR);
+            dist / m_options->m_slurHeightFactor.GetValue());
         height = std::min(
             int(m_options->m_slurMaxHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)), height);
     }
@@ -1064,7 +1064,7 @@ void View::GetControlPoints(
     Point *p1, Point *p2, Point *c1, Point *c2, curvature_CURVEDIR curveDir, int height, int staffSize)
 {
     // Set the x position of the control points
-    int cPos = std::min((p2->x - p1->x) / TEMP_SLUR_CONTROL_POINT_FACTOR, m_doc->GetDrawingStaffSize(staffSize));
+    int cPos = std::min((p2->x - p1->x) / m_options->m_slurControlPoints.GetValue(), m_doc->GetDrawingStaffSize(staffSize));
     c1->x = p1->x + cPos;
     c2->x = p2->x - cPos;
 
@@ -1125,7 +1125,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
     float maxHeightFactor = std::max(0.2f, fabsf(angle));
     maxHeight = dist
         / (maxHeightFactor
-              * (TEMP_SLUR_CURVE_FACTOR + 5)); // 5 is the minimum - can be increased for limiting curvature
+              * (m_options->m_slurCurveFactor.GetValue() + 5)); // 5 is the minimum - can be increased for limiting curvature
 
     maxHeight = std::max(maxHeight, currentHeight);
 

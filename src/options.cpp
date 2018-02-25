@@ -604,6 +604,18 @@ Options::Options()
     m_measureNumber.Init(MEASURENUMBER_system, &Option::s_measureNumber);
     this->Register(&m_measureNumber, "measureNumber", &m_generalLayout);
 
+    m_slurControlPoints.SetInfo("Slur control points", "Slur control points - higher value means more curved at the end");
+    m_slurControlPoints.Init(5,1,10);
+    this->Register(&m_slurControlPoints, "slurControlPointsr", &m_generalLayout);
+    
+    m_slurCurveFactor.SetInfo("Slur curve factor", "Slur curve factor - high value means rounder slurs");
+    m_slurCurveFactor.Init(10,1,100);
+    this->Register(&m_slurCurveFactor, "slurCurveFactor", &m_generalLayout);
+    
+    m_slurHeightFactor.SetInfo("Slur height factor", "Slur height factor -  high value means flatter slurs");
+    m_slurHeightFactor.Init(8,1,100);
+    this->Register(&m_slurHeightFactor, "slurHeightFactor", &m_generalLayout);
+    
     m_slurMinHeight.SetInfo("Slur min height", "The minimum slur height in MEI units");
     m_slurMinHeight.Init(1.2, 0.3, 2.0);
     this->Register(&m_slurMinHeight, "slurMinHeight", &m_generalLayout);

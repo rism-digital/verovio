@@ -47,7 +47,7 @@ class OptionGrp;
 
 // the maximum angle of a slur
 #define TEMP_SLUR_MAX_SLOPE (45 * M_PI / 180)
-#define TEMP_SLUR_CURVE_FACTOR 40 // a factor to allow more (0) or less (100) curved slurs
+#define TEMP_SLUR_CURVE_FACTOR 10 // a factor to allow more (0) or less (100) curved slurs
 #define TEMP_SLUR_HEIGHT_FACTOR 8 // high value means flatter slurs
 #define TEMP_SLUR_CONTROL_POINT_FACTOR 5 // higher value means more curved at the end
 
@@ -497,6 +497,9 @@ public:
     OptionDbl m_lyricTopMinMargin;
     OptionInt m_measureMinWidth;
     OptionIntMap m_measureNumber;
+    OptionInt m_slurControlPoints;
+    OptionInt m_slurCurveFactor;
+    OptionInt m_slurHeightFactor;
     OptionDbl m_slurMaxHeight;
     OptionDbl m_slurMinHeight;
     OptionDbl m_slurThickness;
