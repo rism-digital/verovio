@@ -246,7 +246,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement())
             if (!system->SetCurrentFloatingPositioner(
-                    (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), objectX, *staffIter)) {
+                    (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), objectX, *staffIter, spanningType)) {
                 continue;
             }
 
@@ -320,11 +320,18 @@ void View::DrawHairpin(
         x2 = adjustedX2;
     }
 
+    // Store the full drawing length
+    if (spanningType == SPANNING_START_END) {
+        hairpin->SetDrawingLength(x2 - x1);
+    }
+
     data_STAFFREL place = hairpin->GetPlace();
     hairpinLog_FORM form = hairpin->GetForm();
 
     int startY = 0;
-    int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
+    int endY = hairpin->CalcHeight(m_doc, staff->m_drawingStaffSize, spanningType, leftLink, rightLink);
+
+    m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
 
     // We calculate points for cresc by default. Start/End have to be swapped
     if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);
@@ -340,11 +347,11 @@ void View::DrawHairpin(
         if (spanningType == SPANNING_START_END) {
             // nothing to adjust
         }
-        // In this case, we are drawing the first half a a cresc. Reduce the openning end
+        // In this case, we are drawing the first half a a cresc. Reduce the opening end
         else if (spanningType == SPANNING_START) {
             endY = endY / 2;
         }
-        // Now this is the case we are drawing the end of a cresc. Increase the openning start
+        // Now this is the case we are drawing the end of a cresc. Increase the opening start
         else if (spanningType == SPANNING_END) {
             startY = endY / 2;
         }
@@ -359,11 +366,11 @@ void View::DrawHairpin(
         if (spanningType == SPANNING_START_END) {
             // nothing to adjust
         }
-        // In this case, we are drawing the first half a a dim. Increase the openning end
+        // In this case, we are drawing the first half a a dim. Increase the opening end
         else if (spanningType == SPANNING_START) {
             endY = startY / 2;
         }
-        // Now this is the case we are drawing the end of a dim. Reduce the openning start
+        // Now this is the case we are drawing the end of a dim. Reduce the opening start
         else if (spanningType == SPANNING_END) {
             startY = startY / 2;
         }

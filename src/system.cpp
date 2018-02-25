@@ -149,7 +149,8 @@ void System::SetDrawingAbbrLabelsWidth(int width)
     }
 }
 
-bool System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY)
+bool System::SetCurrentFloatingPositioner(
+    int staffN, FloatingObject *object, Object *objectX, Object *objectY, char spanningType)
 {
     assert(object);
 
@@ -161,7 +162,7 @@ bool System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Ob
             object->GetUuid().c_str());
         return false;
     }
-    alignment->SetCurrentFloatingPositioner(object, objectX, objectY);
+    alignment->SetCurrentFloatingPositioner(object, objectX, objectY, spanningType);
     return true;
 }
 

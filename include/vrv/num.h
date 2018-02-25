@@ -21,7 +21,7 @@ namespace vrv {
 /**
  * This class models the MEI <num>
  */
-class Num : public TextElement, public AttLabelled {
+class Num : public TextElement {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

@@ -46,6 +46,18 @@ public:
     ///@}
 
     /**
+     * @name Getter, setter and checker for the drawing length
+     */
+    ///@{
+    int GetDrawingLength() const { return m_drawingLength; }
+    void SetDrawingLength(int length) { m_drawingLength = length; }
+    bool HasDrawingLength() const { return (m_drawingLength > 0); }
+    ///@}
+
+    int CalcHeight(
+        Doc *doc, int staffSize, char spanningType, FloatingPositioner *leftHairpin, FloatingPositioner *rightHaipin);
+
+    /**
      * @name Setter and getter for left and right links
      */
     ///@{
@@ -87,6 +99,11 @@ private:
      * This is either another Hairpin or a Dynam that starts / appears at the same position.
      */
     ControlElement *m_rightLink;
+
+    /**
+     * The drawing length (uninterrupted) stored for matching height of linked hairpins
+     */
+    int m_drawingLength;
 };
 
 } // namespace vrv

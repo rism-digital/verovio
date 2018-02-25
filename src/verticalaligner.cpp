@@ -185,11 +185,12 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
     return -(box->GetSelfBottom() + m_staffHeight - this->GetYRel());
 }
 
-void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY)
+void StaffAlignment::SetCurrentFloatingPositioner(
+    FloatingObject *object, Object *objectX, Object *objectY, char spanningType)
 {
     FloatingPositioner *positioner = this->GetCorrespFloatingPositioner(object);
     if (positioner == NULL) {
-        positioner = new FloatingPositioner(object, this);
+        positioner = new FloatingPositioner(object, this, spanningType);
         m_floatingPositioners.push_back(positioner);
     }
     positioner->SetObjectXY(objectX, objectY);
@@ -329,8 +330,6 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
 
     // A vector for storing a pair with the grpId and the min or max YRel
     std::vector<std::pair<int, int> > grpIdYRel;
-    // The same with grpObject YRel pairs
-    std::vector<std::pair<void *, int> > grpObjectYRel;
 
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = positioners.begin(); iter != positioners.end(); ++iter) {

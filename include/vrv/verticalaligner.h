@@ -107,7 +107,7 @@ public:
     /**
      * Retrieves or creates the FloatingPositioner for the FloatingObject on this staff.
      */
-    void SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY);
+    void SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY, char spanningType);
 
     /**
      * Look for the FloatingPositioner corresponding to the FloatingObject.
