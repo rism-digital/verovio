@@ -503,7 +503,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 if (!partAbbr.empty()) {
                     LabelAbbr *labelAbbr = new LabelAbbr();
                     Text *text = new Text();
-                    text->SetText(UTF8to16(partName));
+                    text->SetText(UTF8to16(partAbbr));
                     labelAbbr->AddChild(text);
                     partStaffGrp->AddChild(labelAbbr);
                 }
@@ -524,7 +524,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     if (!partAbbr.empty()) {
                         LabelAbbr *labelAbbr = new LabelAbbr();
                         Text *text = new Text();
-                        text->SetText(UTF8to16(partName));
+                        text->SetText(UTF8to16(partAbbr));
                         labelAbbr->AddChild(text);
                         staffDef->AddChild(labelAbbr);
                     }
