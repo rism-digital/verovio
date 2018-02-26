@@ -431,7 +431,7 @@ void View::DrawOctave(
     end = dynamic_cast<LayerElement *>(octave->GetEnd());
 
     if (!start || !end) {
-        // no start and end, obviously nothing to do...
+        // no start or end, obviously nothing to do …
         return;
     }
 
@@ -468,46 +468,50 @@ void View::DrawOctave(
             default: break;
         }
     }
-    int lineWidthFactor = 1;
     std::wstring str;
     str.push_back(code);
-    if (octave->HasLwidth()) {
-        if (octave->GetLwidth() == "wide") {
-            lineWidthFactor *= 4;
+
+    if (octave->GetExtender() != BOOLEAN_false) {
+        int lineWidthFactor = 1;
+        if (octave->HasLwidth()) {
+            if (octave->GetLwidth() == "wide") {
+                lineWidthFactor *= 4;
+            }
+            else if (octave->GetLwidth() == "medium") {
+                lineWidthFactor *= 2;
+            }
         }
-        else if (octave->GetLwidth() == "medium") {
-            lineWidthFactor *= 2;
+        int lineWidth = lineWidthFactor * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+        TextExtend extend;
+        dc->GetSmuflTextExtent(str, &extend);
+        int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
+        DrawSmuflCode(dc, x1 - extend.m_width, yCode, code, staff->m_drawingStaffSize, false);
+        dc->ResetFont();
+
+        if (octave->GetLendsym() != LINESTARTENDSYMBOL_none)
+                y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
+        // adjust is to avoid the figure to touch the line
+        x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+
+        if (octave->HasLform()) {
+            if (octave->GetLform() == LINEFORM_solid) {
+                extend.m_height *= 0;
+            }
         }
+
+        dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
+        dc->SetBrush(m_currentColour, AxSOLID);
+
+        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+        // draw the ending vertical line if not the end of the system
+        if (spanningType != SPANNING_START)
+            dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
+                ToDeviceContextY(y2 + lineWidth / 2));
+
+        dc->ResetPen();
+        dc->ResetBrush();
     }
-    int lineWidth = lineWidthFactor * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
-    TextExtend extend;
-    dc->GetSmuflTextExtent(str, &extend);
-    int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
-    DrawSmuflCode(dc, x1 - extend.m_width, yCode, code, staff->m_drawingStaffSize, false);
-    dc->ResetFont();
-
-    y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
-    // adjust is to avoid the figure to touch the line
-    x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-
-    if (octave->HasLform()) {
-        if (octave->GetLform() == LINEFORM_solid) {
-            extend.m_height *= 0;
-        }
-    }
-
-    dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
-    dc->SetBrush(m_currentColour, AxSOLID);
-
-    dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
-    // draw the ending vertical line if not the end of the system
-    if (spanningType != SPANNING_START)
-        dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
-            ToDeviceContextY(y2 + lineWidth / 2));
-
-    dc->ResetPen();
-    dc->ResetBrush();
 
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
@@ -2152,9 +2156,15 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
         centered = false;
     }
 
-    int code = SMUFL_E650_keyboardPedalPed;
-    if (pedal->GetDir() == pedalLog_DIR_up) code = SMUFL_E655_keyboardPedalUp;
+    int code = SMUFL_E655_keyboardPedalUp;
     std::wstring str;
+    if (pedal->GetDir() == pedalLog_DIR_bounce) {
+        str.push_back(code);
+        TextExtend bounceOffset;
+        dc->GetSmuflTextExtent(str, &bounceOffset);
+        x -= bounceOffset.m_width;
+    }
+    if (pedal->GetDir() != pedalLog_DIR_up) code = SMUFL_E650_keyboardPedalPed;
     str.push_back(code);
 
     std::vector<Staff *>::iterator staffIter;
