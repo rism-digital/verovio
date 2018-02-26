@@ -70,6 +70,7 @@ class Mdiv;
 class Measure;
 class Mensur;
 class MeterSig;
+class MNum;
 class Mordent;
 class MRest;
 class MRpt;
@@ -263,6 +264,7 @@ private:
     void WriteFermata(pugi::xml_node currentNode, Fermata *fermata);
     void WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteHarm(pugi::xml_node currentNode, Harm *harm);
+    void WriteMNum(pugi::xml_node currentNode, MNum *mnum);
     void WriteMordent(pugi::xml_node currentNode, Mordent *mordent);
     void WriteOctave(pugi::xml_node currentNode, Octave *octave);
     void WritePedal(pugi::xml_node currentNode, Pedal *pedal);
@@ -498,6 +500,7 @@ private:
     bool ReadFermata(Object *parent, pugi::xml_node fermata);
     bool ReadHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadHarm(Object *parent, pugi::xml_node harm);
+    bool ReadMNum(Object *parent, pugi::xml_node mnum);
     bool ReadMordent(Object *parent, pugi::xml_node mordent);
     bool ReadOctave(Object *parent, pugi::xml_node octave);
     bool ReadPedal(Object *parent, pugi::xml_node pedal);

@@ -1123,9 +1123,8 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
 
     // 0.2 for avoiding / by 0 (below)
     float maxHeightFactor = std::max(0.2f, fabsf(angle));
-    maxHeight = dist
-        / (maxHeightFactor
-              * (TEMP_SLUR_CURVE_FACTOR + 5)); // 5 is the minimum - can be increased for limiting curvature
+    maxHeight = dist / (maxHeightFactor * (TEMP_SLUR_CURVE_FACTOR
+                                              + 5)); // 5 is the minimum - can be increased for limiting curvature
 
     maxHeight = std::max(maxHeight, currentHeight);
 
@@ -1727,7 +1726,7 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
     str.push_back(code);
 
     bool centered = true;
-    // center the glyph only with @stratid
+    // center the glyph only with @startid
     if (breath->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
@@ -1772,7 +1771,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     params.m_x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
 
     data_HORIZONTALALIGNMENT alignment = dir->GetChildRendAlignment();
-    // Dir are left aligned by default (with both @tstamp and @startid)
+    // dir are left aligned by default (with both @tstamp and @startid)
     if (alignment == HORIZONTALALIGNMENT_NONE) alignment = HORIZONTALALIGNMENT_left;
 
     std::vector<Staff *>::iterator staffIter;
@@ -1791,7 +1790,6 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         dc->SetFont(&dirTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
-
         DrawTextChildren(dc, dir, params);
         dc->EndText();
 
@@ -1832,9 +1830,9 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     params.m_x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
 
     data_HORIZONTALALIGNMENT alignment = dynam->GetChildRendAlignment();
-    // Dynam are left aligned by default;
+    // dynam are left aligned by default;
     if (alignment == 0) {
-        // centre the dynam only with @stratid
+        // centre the dynam only with @startid
         alignment = (dynam->GetStart()->Is(TIMESTAMP_ATTR)) ? HORIZONTALALIGNMENT_left : HORIZONTALALIGNMENT_center;
     }
 
@@ -1933,17 +1931,15 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     int code = SMUFL_E4C0_fermataAbove;
     // check for shape
     if (fermata->GetShape() == fermataVis_SHAPE_angular) {
-        if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
-                   && !(fermata->GetForm() == fermataVis_FORM_norm)))
+        if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
+                                                             && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C5_fermataShortBelow;
         else
             code = SMUFL_E4C4_fermataShortAbove;
     }
     else if (fermata->GetShape() == fermataVis_SHAPE_square) {
-        if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
-                   && !(fermata->GetForm() == fermataVis_FORM_norm)))
+        if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
+                                                             && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C7_fermataLongBelow;
         else
             code = SMUFL_E4C6_fermataLongAbove;
@@ -1994,9 +1990,9 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     params.m_x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
 
     data_HORIZONTALALIGNMENT alignment = harm->GetChildRendAlignment();
-    // Harm are centered aligned by default;
+    // harm are centered aligned by default;
     if (alignment == 0) {
-        // centre the harm only with @stratid
+        // centre the harm only with @startid
         alignment = (harm->GetStart()->Is(TIMESTAMP_ATTR)) ? HORIZONTALALIGNMENT_left : HORIZONTALALIGNMENT_center;
     }
 
@@ -2151,7 +2147,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
 
     bool centered = true;
-    // center the pedal only with @stratid
+    // center the pedal only with @startid
     if (pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
@@ -2259,7 +2255,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     int x = trill->GetStart()->GetDrawingX() + trill->GetStart()->GetDrawingRadius(m_doc);
 
     bool centered = true;
-    // center the trill only with @stratid
+    // center the trill only with @startid
     if (trill->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
@@ -2330,7 +2326,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     if (turn->GetForm() == turnLog_FORM_upper) code = SMUFL_E568_ornamentTurnInverted;
 
     bool centered = true;
-    // center the turn only with @stratid
+    // center the turn only with @startid
     if (turn->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }

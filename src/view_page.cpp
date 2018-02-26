@@ -30,6 +30,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "mnum.h"
 #include "note.h"
 #include "options.h"
 #include "page.h"
@@ -730,12 +731,17 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
         dc->StartGraphic(measure, "", measure->GetUuid());
     }
 
-    // Check if the first measure of the system
-    Measure *systemStart = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
-    if (measure == systemStart) {
-        // Draw measure number if > 1
-        if ((measure->HasN()) && (measure->GetN() != "0") && (measure->GetN() != "1")) {
-            DrawMNum(dc, measure);
+    if (m_drawingScoreDef.GetMnumVisible() != BOOLEAN_false) {
+        MNum *mnum = dynamic_cast<MNum *>(measure->FindChildByType(MNUM));
+        if (mnum) {
+            // this should be an option
+            Measure *systemStart = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
+            if (measure == systemStart || !mnum->IsGenerated()) {
+                // Draw measure numbers > 1
+                if ((measure->GetN() != "0") && (measure->GetN()) != "1") {
+                    DrawMNum(dc, mnum, measure);
+                }
+            }
         }
     }
 
@@ -759,41 +765,47 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     }
 }
 
-void View::DrawMNum(DeviceContext *dc, Measure *measure)
+void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
 {
     assert(dc);
     assert(measure);
+    assert(mnum);
 
     Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
     if (staff) {
 
-        // needs to be refined when mNum element is available
-        dc->StartCustomGraphic("mnum", "");
+        dc->StartGraphic(mnum, "", mnum->GetUuid());
 
-        FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-        // HARDCODED
-        currentFont.SetStyle(FONTSTYLE_italic);
-        currentFont.SetPointSize(currentFont.GetPointSize() * 4 / 5);
-        dc->SetFont(&currentFont);
-
-        Text text;
-        text.SetParent(staff);
-        text.SetText(UTF8to16(measure->GetN()));
+        FontInfo mnumTxt;
+        if (!dc->UseGlobalStyling()) {
+            mnumTxt.SetFaceName("Times");
+            mnumTxt.SetStyle(FONTSTYLE_italic);
+        }
 
         TextDrawingParams params;
 
-        // HARDCODED
-        params.m_x = staff->GetDrawingX();
-        params.m_y = staff->GetDrawingY() + 2.5 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        params.m_pointSize = currentFont.GetPointSize();
+        data_HORIZONTALALIGNMENT alignment = mnum->GetChildRendAlignment();
+        // mNum are center aligned by default
+        if (alignment == HORIZONTALALIGNMENT_NONE) alignment = HORIZONTALALIGNMENT_center;
 
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_center);
-        DrawTextElement(dc, &text, params);
+        // HARDCODED
+        // we set mNum to a fixed height above the system and make it a bit smaller than other text
+        params.m_x = staff->GetDrawingX();
+        params.m_y = staff->GetDrawingY() + 1.5 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        params.m_pointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize() * 4 / 5;
+
+        mnumTxt.SetPointSize(params.m_pointSize);
+
+        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetFont(&mnumTxt);
+
+        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+        DrawTextChildren(dc, mnum, params);
         dc->EndText();
 
         dc->ResetFont();
 
-        dc->EndCustomGraphic();
+        dc->EndGraphic(mnum, this);
     }
 }
 

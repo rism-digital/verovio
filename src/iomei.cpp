@@ -47,6 +47,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "mnum.h"
 #include "mordent.h"
 #include "mrest.h"
 #include "multirest.h"
@@ -351,6 +352,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(HARM)) {
         m_currentNode = m_currentNode.append_child("harm");
         WriteHarm(m_currentNode, dynamic_cast<Harm *>(object));
+    }
+    else if (object->Is(MNUM)) {
+        m_currentNode = m_currentNode.append_child("mNum");
+        WriteMNum(m_currentNode, dynamic_cast<MNum *>(object));
     }
     else if (object->Is(MORDENT)) {
         m_currentNode = m_currentNode.append_child("mordent");
@@ -868,6 +873,7 @@ void MeiOutput::WriteScoreDefElement(pugi::xml_node currentNode, ScoreDefElement
     assert(scoreDefElement);
 
     WriteXmlId(currentNode, scoreDefElement);
+    scoreDefElement->WriteMeasureNumbers(currentNode);
     scoreDefElement->WriteTyped(currentNode);
 }
 
@@ -1072,6 +1078,18 @@ void MeiOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
     WriteTimeSpanningInterface(currentNode, harm);
     harm->WriteLang(currentNode);
     harm->WriteNNumberLike(currentNode);
+}
+
+void MeiOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
+{
+    assert(mNum);
+
+    WriteControlElement(currentNode, mNum);
+    WriteTextDirInterface(currentNode, mNum);
+    WriteTimeSpanningInterface(currentNode, mNum);
+    mNum->WriteColor(currentNode);
+    mNum->WriteLang(currentNode);
+    mNum->WriteTypography(currentNode);
 }
 
 void MeiOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
@@ -2796,6 +2814,7 @@ bool MeiInput::ReadBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd)
 bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object)
 {
     SetMeiUuid(element, object);
+    object->ReadMeasureNumbers(element);
     object->ReadTyped(element);
 
     return true;
@@ -3143,6 +3162,9 @@ bool MeiInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "harm") {
             success = ReadHarm(parent, current);
         }
+        else if (std::string(current.name()) == "mNum") {
+            success = ReadMNum(parent, current);
+        }
         else if (std::string(current.name()) == "mordent") {
             success = ReadMordent(parent, current);
         }
@@ -3305,6 +3327,21 @@ bool MeiInput::ReadHarm(Object *parent, pugi::xml_node harm)
     parent->AddChild(vrvHarm);
     ReadUnsupportedAttr(harm, vrvHarm);
     return ReadTextChildren(vrvHarm, harm, vrvHarm);
+}
+
+bool MeiInput::ReadMNum(Object *parent, pugi::xml_node mNum)
+{
+    MNum *vrvMNum = new MNum();
+    ReadControlElement(mNum, vrvMNum);
+
+    ReadTextDirInterface(mNum, vrvMNum);
+    ReadTimeSpanningInterface(mNum, vrvMNum);
+    vrvMNum->ReadColor(mNum);
+    vrvMNum->ReadLang(mNum);
+    vrvMNum->ReadTypography(mNum);
+
+    parent->AddChild(vrvMNum);
+    return ReadTextChildren(vrvMNum, mNum, vrvMNum);
 }
 
 bool MeiInput::ReadMordent(Object *parent, pugi::xml_node mordent)
