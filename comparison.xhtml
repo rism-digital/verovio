@@ -1,0 +1,153 @@
+---
+layout: comparison
+title: Verovio – Test suite
+versions:
+    - url: "/javascript/latest/verovio-toolkit.js"
+      name: "Latest release"
+      
+    - url: "https://rawgithub.com/rism-ch/verovio/68b7634d95aafac06437982b5e7a4d42a27908e3/javascript/develop/verovio-toolkit.js"
+      name: "Verovio 2.0.0-dev-369db96 (npm-16)"
+    - url: "https://rawgithub.com/rism-ch/verovio/3e6ba6dca94d7e0c9da771a77284190a4319f563/javascript/develop/verovio-toolkit.js"
+      name: "Verovio 2.0.0-dev-911b518 (npm-15)"
+    - url: "https://rawgithub.com/rism-ch/verovio/55d81e0d2d614b03a988cf565f96738f37f5c276/javascript/develop/verovio-toolkit.js"
+      name: "Verovio 2.0.0-dev-9803a0b (npm-14)"
+    - url: "https://rawgithub.com/rism-ch/verovio/bd830586736120fc164c8b22db3fbb2bd258a441/javascript/develop/verovio-toolkit.js"
+      name: "Verovio 2.0.0-dev-57334a9 (npm-13)"
+    - url: "https://rawgithub.com/rism-ch/verovio/25f19b2bdc94a584564f04f8015605238df733bc/javascript/develop/verovio-toolkit.js"
+      name: "Verovio 2.0.0-dev-5f5fec7 (npm-12)"
+    - url: "https://rawgithub.com/rism-ch/verovio/6eec4d6a0cf3fdf53e14116bc5852e553659fc99/javascript/develop/verovio-toolkit.js"
+      name: "Verovio 2.0.0-dev-a64c23a (npm-11)"
+      
+    - url: "/javascript/1.1.6/verovio-toolkit.js"
+      name: "Version 1.1.6"
+    - url: "/javascript/1.1.5/verovio-toolkit.js"
+      name: "Version 1.1.5"
+    - url: "/javascript/1.1.4/verovio-toolkit.js"
+      name: "Version 1.1.4"
+    - url: "/javascript/1.1.3/verovio-toolkit.js"
+      name: "Version 1.1.3"
+    - url: "/javascript/1.1.2/verovio-toolkit.js"
+      name: "Version 1.1.2"
+    - url: "/javascript/1.1.1/verovio-toolkit.js"
+      name: "Version 1.1.1"
+    - url: "/javascript/1.1.0/verovio-toolkit.js"
+      name: "Version 1.1.0"
+      
+    - url: "/javascript/1.0.0/verovio-toolkit.js"
+      name: "Version 1.0.0"
+---
+
+<!-- top navbar -->
+<div class="container-fluid tests">
+    <div class="row header-tests">
+        <div class="col-lg-12">
+                <a class="navbar-brand logo-nav" href="{{ site.baseurl }}/index.xhtml"><img src="{{ site.baseurl }}/images/verovio-fadded-50.png" /></a>
+        </div>
+    </div>
+
+    <div class="row">
+        
+        <div class="col-lg-2 sidebar-tests">
+            
+            <div class="row">
+                
+                <div class="col-xs-12">
+                    
+                    <p>The left panel is the latest build from the develop branch. The right panel is the latest release. You can select another version to be loaded in the right panel. You can also select a local MEI file to compare.</p>
+
+                    <h4>Select a version</h4>
+
+                    <select class="form-control" id="versionSelect">
+                        <option value=""></option>
+                        {% for v in page.versions %}
+                        <option value="{{ v.url }}">{{ v.name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <h4>Select an MEI file</h4>
+            
+                     
+                    <form id="upload_form" onsubmit="uploadFile( $('#upload_form') ); return false" role="form">
+                        <input type="file" id="mei_files" onchange="$('#submit-btn').popover('show');" name="file" style="margin: 4px 0px 8px 0px;"/>
+                        
+                        <p>Additional options</p>
+                        <textarea id="testOptions" class="form-control" rows="5"></textarea>
+                        
+                        <div style="margin-top: 10px;">
+                            <button type="submit" id="submit-btn" class="btn btn-default btn-sm popover-btn" data-container="body" data-toggle="popover" data-placement="right" data-content="Click to display the MEI file!" data-trigger="manual">Refresh</button>
+                            <button id="reset-btn" class="btn btn-default btn-sm">Reset</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="col-lg-5">
+            <iframe id="frame1" src="./test-frame.xhtml?iframe=1"></iframe>
+        </div>
+    
+        <div class="col-lg-5">
+            <iframe id="iframe2" src="./test-frame.xhtml?iframe=2"></iframe>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+    
+    $("#versionSelect").change(function() {
+        console.log($(this).val());
+        localStorage['iframe2'] = $(this).val();
+        location.reload();
+    });
+    
+    $('#reset-btn').click(function () {
+        localStorage.removeItem('testData');
+        localStorage.removeItem('testOptions');
+        localStorage.removeItem('iframe2');
+        location.reload();
+        return false;
+    });
+    
+    function uploadFile() {
+
+        localStorage['testOptions'] = $("#testOptions").val();
+
+        var f = $("#mei_files").prop('files')[0];
+        
+        if (f === undefined) {
+            location.reload();
+            return;
+        }
+        
+        var reader = new FileReader();
+
+        // Closure to capture the file information.
+        reader.onload = (function(theFile) {
+            outputFilename = theFile.name;
+            return function(e) {
+                localStorage['testData'] = e.target.result;
+                location.reload();
+            };
+        })(f);
+
+        // Read in the image file as a data URL.
+        reader.readAsText(f);
+    };
+    
+    function adjustSize() {
+        $('iframe').height($(document).height() - 120);
+        $('iframe').width($(document).width() * 0.4 - 10);
+        
+        if (localStorage['testOptions']) {
+             $("#testOptions").val(localStorage['testOptions']);
+        }
+    }
+    
+    $( document ).ready(function() {
+        adjustSize();
+    });
+//]]>
+</script>
