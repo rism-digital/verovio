@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+* Implementation of `<mNum>` and generation from `measure@n` if necessary
 * Support for mulitple lines or `<harm>` according to `@n` value
 * Adjustment of `<hairpin>` length with surrounding `<dynam>` or `<hairpin>`
 * Automatic vertical alignment of `<dynam>` and `<haripin>` starting / ending at the same xml:id or tstamp
