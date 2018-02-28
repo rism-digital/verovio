@@ -1,0 +1,279 @@
+<script type="text/javascript">
+//<![CDATA[
+    var examples = new Array();
+    var vrvToolkit = null;
+    var vrvVersion = "1_0";
+    var customExample = null;
+    
+    /////////////////////////////
+    ////////// Options //////////
+    /////////////////////////////
+    
+    var defaultOptions_1_0 = {
+        adjustPageHeight: 1,
+        ignoreLayout: 1,
+        pageHeight: 2970,
+        pageWidth: 2100,
+        scale: 40,
+        spacingSystem: 0,
+        spacingStaff: 4
+    };
+    
+    // Same as before
+    var defaultOptions_1_1 = defaultOptions_1_0;
+    
+    var defaultOptions_2_0 = {
+        adjustPageHeight: "true",
+        breaks: "auto",
+        pageHeight: 2970,
+        pageWidth: 2100,
+        noHeader: "true",
+        noFooter: "true",
+        scale: 40,
+        spacingSystem: 0,
+        spacingStaff: 4,
+    };
+    
+    /////////////////////////////
+    ///// Loading functions /////
+    /////////////////////////////
+    
+    function loadExample_1_0(data, div, options, page = 1) {
+        vrvToolkit.setOptions( options );
+        try {
+            vrvToolkit.loadData(data);
+            $(div + '-meiCode pre').text(vrvToolkit.getMEI(-1, true));
+            $(div + '-meiDiv').show();
+        }
+        catch(err) {
+            $(div + '-errLog pre').html(err);
+            $(div + '-errDiv').show();
+        }
+        svg = vrvToolkit.renderPage(page, {});
+        $(div).html(svg);
+    }
+    
+    // Same as before
+    loadExample_1_1 = loadExample_1_0;
+    
+    function loadExample_2_0(data, div, options, page = 1) {
+        vrvToolkit.setOptions( options );
+        try {
+            vrvToolkit.loadData(data);
+            $(div + '-meiCode pre').text(vrvToolkit.getMEI(-1, true));
+            $(div + '-meiDiv').show();
+        }
+        catch(err) {
+            $(div + '-errLog pre').html(err);
+            $(div + '-errDiv').show();
+        }
+        svg = vrvToolkit.renderToSVG(page, {});
+        $(div).html(svg);
+    }
+    
+    /////////////////////////////
+    
+    function loadExamples() {
+        for(i in examples) {
+            examples[i].load();
+        }
+    }
+    
+    function loadCustomFile() {
+        options = window["defaultOptions_" + vrvVersion];
+        options.pageWidth = ($("#00").width()) * 100 / options.scale ;
+        
+        if (localStorage['testOptions']) {
+            testOptions = JSON.parse(localStorage['testOptions']);
+            console.log(testOptions);
+            for(var key in testOptions) {
+                options[key] = testOptions[key];
+                console.log(options[key]);
+            }
+        }
+        page = 1;
+        if (localStorage['testPage']) {
+            page = localStorage['testPage'];
+        }
+        
+        // load function for the current version
+        loadFunction = window["loadExample_" + vrvVersion]; 
+        loadFunction(customExample, "#00", options, page );
+    }
+    
+    function onVerovioLoaded() {
+
+        vrvToolkit = new verovio.toolkit();
+        vrvVersion = vrvToolkit.getVersion().slice(0,3).replace(".", "_");
+
+        var strVersion = vrvToolkit.getVersion();
+        var n = strVersion.lastIndexOf('-');
+        var commit = strVersion.substring(n + 1);
+        $('#loading').hide();
+        $('#version').text( "Version " + strVersion );
+        $("#version").attr( "href", "http://github.com/rism-ch/verovio/commit/" + commit ) ;
+
+        if (customExample == null) {
+            loadExamples();    
+        }
+        else {
+             loadCustomFile();
+        }
+       
+    }
+    
+    function getParameterByName(name) {
+        var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
+    
+    function nsResolver(prefix) {
+        return 'http://www.music-encoding.org/ns/mei';
+    }
+
+//]]>
+</script>
+
+<div class="container-fluid">
+
+    <div class="panel">
+        <h2 class="text-center"><span id="loading">Loading ...</span><a href="" id="version"></a></h2>
+    </div>
+    
+    {% for t in site.data.mei-tests.tests %}
+    <div class="panel test-group" id="{{ t.id }}">
+
+        <h3 class="text-center">
+            {{ t.chapter }} 
+        </h3>
+
+        <div>
+            {% for f in t.files %}
+                {% assign id = f.file | remove:'.mei' %}
+                <h4 class="test-xmlfile">{{ f.title }}</h4>
+                <p id="note-{{ id }}"></p>
+
+                {% if f.comment %}
+                <p><strong>Additional comment:</strong> {{ f.comment }}</p>
+                {% endif %}
+
+                <p>
+                {% if f.verovio == 0 %}
+                    <span class="label label-danger">Failed – {{ f.version }}</span>
+                {% elsif f.verovio == 1 %}
+                    <span class="label label-warning">To improve – {{ f.version }}</span>
+                {% elsif f.verovio == 2 %}
+                    <span class="label label-success">OK – {{ f.version }}</span>
+                {% else %}
+                    <span class="label label-default">Status unknown</span>
+                {% endif %}
+                </p>
+                
+                <div id="{{ id }}-meiDiv" style="display: none;">
+                    <p>
+                        <a href="javascript:return false;" data-toggle="collapse" data-target="#{{ id }}-meiCode" aria-expanded="false" aria-controls="{{ id }}-meiCode">Show MEI</a> | 
+                        <a href="{{ site.data.mei-tests.edit-path }}/{{ f.file }}" target="_blank">Edit MEI</a> | 
+                        <a href="{{ site.data.mei-tests.status-path }}" target="_blank">Edit status</a> |
+                        <a href="{{ site.data.mei-tests.mei-path }}/{{ f.link }}" target="_blank">MEI Guidelines</a>
+                    </p>
+                </div>
+
+                <div id="{{ id }}"></div>
+
+                <div id="{{ id }}-errDiv" style="display: none;">
+                    <p>
+                    <div class="alert alert-danger" role="alert" id="{{ id }}-err">Verovio failed to render the MEI file.</div>
+                        <a href="javascript: return false;" data-toggle="collapse" data-target="#{{ id }}-errLog" aria-expanded="false" aria-controls="{{ id }}-errLog">Show the error log</a>
+                    </p>
+                    <div class="collapse" id="{{ id }}-errLog">
+                        <pre></pre>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="collapse" id="{{ id }}-meiCode">
+                        <pre></pre>
+                    </div>
+                </div>
+
+                <script type="text/javascript">
+                //<![CDATA[
+                    examples.push({
+                        load: function() {
+                            $.ajax({
+                                url: "examples/features/{{ f.file }}"
+                                , dataType: "text"
+                                , success: function(data) {
+                                    
+                                    // Get the description from the /notesStmt/annot
+                                    xml = new window.DOMParser().parseFromString(data, "text/xml")
+                                    var nodes = xml.evaluate("//mei:notesStmt/mei:annot", xml, nsResolver, XPathResult.ANY_TYPE, null);
+                                    var result = nodes.iterateNext();
+                                    var txt = "";
+                                    while (result) {
+                                        txt += result.childNodes[0].nodeValue + "<br />";
+                                        result = nodes.iterateNext();
+                                    }
+                                    $('#note-{{ id }}').html(txt);
+                                    
+                                    // default options for the current version
+                                    options = window["defaultOptions_" + vrvVersion];
+                                    options.pageWidth = ($("#{{ id }}").width()) * 100 / options.scale ;
+                                    // load function for the current version
+                                    loadFunction = window["loadExample_" + vrvVersion]; 
+                                    loadFunction(data, "#{{ id }}", options );
+                                }
+                            });
+                        }
+                    });
+                //]]>
+                </script>
+
+            {% endfor %}
+        </div>
+
+    </div>
+    {% endfor %}
+    
+</div>
+
+
+
+<script type="text/javascript">
+    //<![CDATA[
+    $(document).ready(function() {
+        
+        // The default is the latest develop build
+        vrv = "{{ site.baseurl }}/javascript/develop/verovio-toolkit.js";
+        
+        // Hide the custom file placeholder
+        $(".test-group").last().hide();
+        
+        var iframe = getParameterByName("iframe");
+        // IFrame loading and custom file stored
+        if ((iframe != null) && localStorage['testData']) {
+            customExample = localStorage['testData'];
+            // Swap display
+            $(".test-group").hide();
+            $(".test-group").last().show();
+            // Empty the list of examples to load
+            examples = [];
+        }
+        
+        // Version in the second frame ?
+        if (iframe == "2") {
+            if (localStorage['iframe2']) {
+                vrv = localStorage['iframe2'];
+            }
+            else {
+                vrv = "{{ site.baseurl }}/javascript/latest/verovio-toolkit.js";
+            }
+        }
+        
+        var element = document.createElement("script");
+        element.src = vrv;
+        document.body.appendChild(element);
+        element.onload = onVerovioLoaded;
+    });
+    //]]>
+</script>

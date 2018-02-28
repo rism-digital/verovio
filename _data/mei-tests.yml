@@ -1,233 +1,825 @@
----
-show_all_tests: false
+edit-path: "https://github.com/rism-ch/verovio/edit/gh-pages/examples/features/"
+status-path: "https://github.com/rism-ch/verovio/tree/gh-pages/_data/mei-tests.yml"
+mei-path: "http://music-encoding.org/guidelines/v3/guidelines"
+
 tests:
-- section_name: Shared
-  sections:
-  - id: '1'
-    version-check: 0.9.10-dev-8a635ad
-    name: Tempi and directives
-    files:
-    - name: dir1.mei
-    - name: dir2.mei
-    - name: dir3.mei
-    - name: tempo1.mei
-    - name: tempo2.mei
-  - id: '2'
-    version-check: 0.9.10-dev-8a635ad
-    name: Colors
-    files:
-    - name: color1.mei
-- section_name: Common Music Notation
-  sections:
-  - id: '3'
-    version-check: 0.9.10-dev-8a635ad
-    name: Measure elements
-    files:
-    - name: layer1.mei
-    - name: space.mei
-    - name: spacing.mei
-  - id: '4'
-    version-check: 0.9.10-dev-8a635ad
-    name: Score and barlines
-    files:
-    - name: barlines.mei
-    - name: score.mei
-    - name: score2.mei
-    - name: time-sign.mei
-  - id: '5'
-    version-check: 0.9.10-dev-8a635ad
-    name: Score changes
-    files:
-    - name: clef-changes.mei
-    - name: key-change.mei
-    - name: scoredef-changes.mei
-    - name: scoredef-changes2.mei
-  - id: '6'
-    version-check: 0.9.10-dev-8a635ad
-    name: Notes and chords
-    files:
-    - name: basics.mei
-    - name: dots.mei
-    - name: notes.mei
-    - name: unison1.mei
-    - name: unison2.mei
-    - name: chords.mei
-    - name: chords2.mei
-    - name: chords3.mei
-  - id: '7'
-    version-check: 0.9.10-dev-8a635ad
-    name: Grace notes
-    files:
-    - name: gracenotes.mei
-    - name: gracenotes2.mei
-  - id: '8'
-    version-check: 0.9.10-dev-8a635ad
-    name: Cross-staff notation
-    files:
-    - name: cross-staff.mei
-    - name: cross-staff2.mei
-    - name: cross-staff3.mei
-  - id: '9'
-    version-check: 0.9.10-dev-8a635ad
-    name: Rests
-    files:
-    - name: rests.mei
-    - name: rests2.mei
-    - name: rests3.mei
-  - id: '10'
-    version-check: 0.9.10-dev-8a635ad
-    name: Beams
-    files:
-    - name: beam-breaks.mei
-    - name: beam2.mei
-    - name: beam3.mei
-    - name: beam4.mei
-    - name: beam5.mei
-  - id: '11'
-    version-check: 0.9.10-dev-8a635ad
-    name: Ties and slurs
-    files:
-    - name: slur1.mei
-    - name: slur2.mei
-    - name: slur3.mei
-    - name: slur4.mei
-    - name: tie-chords1.mei
-    - name: tie-chords2.mei
-    - name: tie-chords3.mei
-    - name: tie.mei
-  - id: '12'
-    version-check: 0.9.10-dev-8a635ad
-    name: Dynamics and hairpins
-    files:
-    - name: dynam1.mei
-    - name: dynam2.mei
-    - name: dynam3.mei
-    - name: dynam4.mei
-    - name: hairpin1.mei
-    - name: hairpin2.mei
-  - id: '13'
-    version-check: 0.9.10-dev-8a635ad
-    name: Tuplets
-    files:
-    - name: tuplet.mei
-    - name: tuplet11.mei
-    - name: tuplet12.mei
-    - name: tuplet13.mei
-    - name: tuplet14.mei
-    - name: tuplet2.mei
-    - name: tuplet3.mei
-    - name: tuplet4.mei
-    - name: tuplet5.mei
-    - name: tuplet6.mei
-    - name: tuplet8.mei
-    - name: tupletspan.mei
-  - id: '14'
-    version-check: 0.9.10-dev-8a635ad
-    name: Articulations
-    files:
-    - name: artic1.mei
-    - name: artic2.mei
-    - name: artic3.mei
-    - name: artic4.mei
-  - id: '15'
-    version-check: 0.9.10-dev-8a635ad
-    name: Tremolos
-    files:
-    - name: btrem.mei
-    - name: ftrem.mei
-  - id: '16'
-    version-check: 0.9.10-dev-8a635ad
-    name: Fermatas
-    files:
-    - name: fermata1.mei
-    - name: fermata2.mei
-    - name: fermata3.mei
-  - id: '17'
-    version-check: 0.9.10-dev-8a635ad
-    name: Octave shifts
-    files:
-    - name: octave-shift1.mei
-    - name: octave-shift2.mei
-    - name: octave-shift3.mei
-  - id: '18'
-    version-check: 0.9.10-dev-8a635ad
-    name: Piano pedals
-    files:
-    - name: piano-pedal.mei
-  - id: '19'
-    version-check: 0.9.10-dev-8a635ad
-    name: Structural repetitions
-    files:
-    - name: endings.mei
-    - name: endings2.mei
-    - name: endings3.mei
-  - id: '20'
-    version-check: 0.9.10-dev-8a635ad
-    name: Low-level repetitions
-    files:
-    - name: beatrpt1.mei
-    - name: beatrpt2.mei
-    - name: mrpt.mei
-    - name: mrpt2.mei
-    - name: multirpt.mei
-- section_name: Mensural notation
-  sections:
-  - id: '21'
-    version-check: 0.9.10-dev-8a635ad
-    name: Mensural notation
-    files:
-    - name: mensural.mei
-- section_name: Common Music Notation Ornaments
-  sections:
-  - id: '22'
-    version-check: 0.9.10-dev-8a635ad
-    name: Trills
-    files:
-    - name: trills.mei
-- section_name: Critical apparatus
-  sections:
-  - id: '23'
-    version-check: 0.9.10-dev-8a635ad
-    name: Apps and readings
-    files:
-    - name: app-nested.mei
-    - name: app.mei
-    - name: app2.mei
-- section_name: Editorial markup
-  sections:
-  - id: '24'
-    version-check: 0.9.10-dev-8a635ad
-    name: Editorial and choice markup
-    files:
-    - name: choice.mei
-    - name: editorial1.mei
-    - name: editorial2.mei
-- section_name: Harmony
-  sections:
-  - id: '25'
-    version-check: 0.9.10-dev-8a635ad
-    name: Indications of harmony
-    files:
-    - name: harm.mei
-    - name: harm2.mei
-    - name: harm3.mei
-  - id: '26'
-    version-check: 0.9.10-dev-8a635ad
-    name: Figured bass
-    files:
-    - name: 
-- section_name: Vocal text
-  sections:
-  - id: '27'
-    version-check: 0.9.10-dev-8a635ad
-    name: Lyrics
-    files:
-    - name: lyrics1.mei
-    - name: lyrics2.mei
-    - name: lyrics3.mei
-    - name: lyrics4.mei
-    - name: lyrics5.mei
-    - name: lyrics6.mei
-    - name: lyrics7.mei
-    - name: lyrics8.mei
-    - name: multilingual.mei
+    - id: "01"
+      chapter: "Shared"
+      files:
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: dir1.mei 
+            title: "Directives example"
+            verovio: 2
+            version: "2.0.0"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: dir2.mei
+            title: "Tests in space"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: dir3.mei
+            title: "Tempi/directives collisions"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: dir4.mei
+            title: "Tempi/directives vertical alignment"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: dir5.mei
+            title: "Directives and cross-staff"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: dir6.mei
+            title: "Fermatas/directives vertical alignment"
+            verovio: 1
+            version: "2.0.0"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: tempo1.mei 
+            title: "Rendering tempo elements"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: tempo2.mei 
+            title: "Formatting tempo elements"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: tempo3.mei
+            title: "Tempo and beam interaction"
+          - section: "Annotations"
+            link: shared#sharedAnnotations
+            file: annot1.mei
+            title: "Support for annotations"
+          - section: "Text rendition"
+            link: shared#sharedTextRendition
+            file: color1.mei 
+            title: "Color example"
+          - section: "Text rendition"
+            link: shared#sharedTextRendition
+            file: color2.mei
+            title: "Color example (2)"
+          - section: "Text rendition"
+            link: shared#sharedTextRendition
+            file: color3.mei
+            title: "Colouring beams"
+          - section: "Text rendition"
+            link: shared#sharedTextRendition
+            file: color4.mei
+            title: "Colouring noteheads"
+            
+    - id: "02"
+      chapter: "Common music notation"
+      files:
+          - section: "The Role of the Measure Element"
+            link: cmn#cmnMeasures
+            file: layer1.mei
+            title: "Autodetection of partial layer"
+          - section: "The Role of the Measure Element"
+            link: cmn#cmnMeasures
+            file: layer2.mei
+            title: "Collision between layers"
+          - section: "The Role of the Measure Element"
+            link: cmn#cmnMeasures
+            file: layer3.mei
+            title: "Shared accidentals between notes in separate layers"
+          - section: "The Role of the Measure Element"
+            link: cmn#cmnMeasures
+            file: layer4.mei
+            title: "Syllable width in alternating layers"
+          - section: "The Role of the Measure Element"
+            link: cmn#cmnMeasures
+            file: space.mei 
+            title: "Space example"
+          - section: "The Role of the Measure Element"
+            link: cmn#cmnMeasures
+            file: spacing.mei 
+            title: "Spacing example"
+          - section: "Defining Score Parameters for CMN"
+            link: cmn#cmnDefs
+            file: barlines.mei 
+            title: "Measure barline example"
+          - section: "Defining Score Parameters for CMN"
+            link: cmn#cmnDefs
+            file: barlines2.mei
+            title: "Measure barline example (2)"
+          - section: "Defining Score Parameters for CMN"
+            link: cmn#cmnDefs
+            file: measure-n.mei
+            title: "Measure numbers example"
+          - section: "Defining Score Parameters for CMN"
+            link: cmn#cmnDefs
+            file: score.mei 
+            title: "Score and barlines example"
+          - section: "Defining Score Parameters for CMN"
+            link: cmn#cmnDefs
+            file: score2.mei
+            title: "Spacing in pickup measures and first measures in system"
+          - section: "Defining Score Parameters for CMN"
+            link: cmn#cmnDefs
+            file: staff.mei
+            title: "Symbols centred con non-5-line staff"
+          - section: "Defining Score Parameters for CMN"
+            link: cmn#cmnDefs
+            file: time-sign.mei
+            title: "Support for invisible or one-number meter"
+          - section: "Redefinition of Score Parameters"
+            link: cmn#cmnReDef
+            file: clef-changes.mei 
+            title: "Clef change example"
+          - section: "Redefinition of Score Parameters"
+            link: cmn#cmnReDef
+            file: key-change.mei 
+            title: "Key changes example"
+          - section: "Redefinition of Score Parameters"
+            link: cmn#cmnReDef
+            file: scoredef-changes.mei 
+            title: "ScoreDef change example"
+          - section: "Redefinition of Score Parameters"
+            link: cmn#cmnReDef
+            file: scoredef-changes2.mei
+            title: "Clef changes at system break"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: accid2.mei
+            title: "Rendering accidentals"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: accid3.mei
+            title: "Alignment of editorial accidentals"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: accid4.mei
+            title: "Alignment of editorial accidentals"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: basics.mei
+            title: "Notes without stem"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: basics2.mei
+            title: "Notes without pname"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: chords.mei 
+            title: "Chord example"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: chords2.mei
+            title: "Chords Alignment and justification"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: chords3.mei
+            title: "Chords with notational features on individual notes"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: chords4.mei
+            title: "Accidental adjustment on chords"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: dots.mei
+            title: "Dot placement with various note duration"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: dots2.mei
+            title: "Dot placement with multiple layers"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: dots3.mei
+            title: "Dot and flag interaction"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: notes.mei
+            title: "Hidden notes"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: notes2.mei
+            title: "Pickup note spacing"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: notes3.mei
+            title: "Ledger line adjustment"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: notes4.mei
+            title: "Visual note values"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: size.mei
+            title: "Cue-sized notes"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: stem.mei
+            title: "Stem length adjustment"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: stem2.mei
+            title: "Stem direction"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: stem3.mei
+            title: "Stem length adjustment for bTrem slashes"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: stem4.mei
+            title: "Stem length adjustment for tuplets"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: stemless.mei
+            title: "Notes without stem (2)"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: stemless2.mei
+            title: "Notes without stem (3)"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: unison1.mei
+            title: "Note-head placement in unison (1)"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: unison2.mei
+            title: "Note-head placement in unison (2)"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: unison3.mei
+            title: "Accidental placement on unison"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: unison4.mei
+            title: "Dots merge when note-heads merge on unisons"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: unison5.mei
+            title: "Accidental placement on unison (2)"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes.mei 
+            title: "Grace notes example"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes10.mei
+            title: "Grace note and clef interaction (2)"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes11.mei
+            title: "Slurred grace notes"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes12.mei
+            title: "Slashes on grace notes (2)"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes2.mei
+            title: "Slashes on grace notes"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes3.mei
+            title: "Cue-sized grace notes"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes4.mei
+            title: "Grace note interaction with spacing"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes5.mei
+            title: "Grace note chords"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes6.mei
+            title: "Grace note chords (2)"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes7.mei
+            title: "Grace note chords (3)"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes8.mei
+            title: "Grace note chords (4)"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes9.mei
+            title: "Grace note and clef interaction"
+          - section: "Stem Modifications"
+            link: cmn#cmnNotesStems
+            file: cross-staff.mei 
+            title: "Cross-staff notation example"
+          - section: "Stem Modifications"
+            link: cmn#cmnNotesStems
+            file: cross-staff2.mei
+            title: "Lowest note in cross-staff chords"
+          - section: "Stem Modifications"
+            link: cmn#cmnNotesStems
+            file: cross-staff3.mei
+            title: "Accidentals in cross-staff chords"
+          - section: "Stem Modifications"
+            link: cmn#cmnNotesStems
+            file: cross-staff4.mei
+            title: "Cross-staff beams"
+          - section: "Stem Modifications"
+            link: cmn#cmnNotesStems
+            file: cross-staff5.mei
+            title: "Cross-staff layers"
+          - section: "Stem Modifications"
+            link: cmn#cmnNotesStems
+            file: cross-staff6.mei
+            title: "Non-adjacent seconds in cross staff chords"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests.mei 
+            title: "Rests and dotted rests"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests2.mei
+            title: "Rest placement"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests3.mei
+            title: "Vertical placement of rests"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests4.mei
+            title: "Note and rest collision between different layers"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests5.mei
+            title: "Vertical placement of rests (2)"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests6.mei
+            title: "Measure rest symbol"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests7.mei
+            title: "Vertical placement of rests (3)"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests8.mei
+            title: "Block in MultiRest"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests9.mei
+            title: "Vertical placement of rests (4)"
+          - section: "Beams"
+            link: cmn#cmnBeams
+            file: beam-breaks.mei 
+            title: "Beam break example"
+          - section: "Beams"
+            link: cmn#cmnBeams
+            file: beam2.mei
+            title: "Interaction grace note beams and regular beams"
+          - section: "Beams"
+            link: cmn#cmnBeams
+            file: beam3.mei
+            title: "Horizontal beams"
+          - section: "Beams"
+            link: cmn#cmnBeams
+            file: beam4.mei
+            title: "Adding space to beams"
+          - section: "Beams"
+            link: cmn#cmnBeams
+            file: beam5.mei
+            title: "Beams on staff lines"
+          - section: "Beams"
+            link: cmn#cmnBeams
+            file: beam6.mei
+            title: "Partial beams"
+          - section: "Beams"
+            link: cmn#cmnBeams
+            file: beam7.mei
+            title: "Beams and stem directions"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur1.mei
+            title: "Slur starting on staff line"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur2.mei
+            title: "Slurs on mixed stem directions"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur3.mei
+            title: "Slur and directives interactions"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur4.mei
+            title: "Portato rendering"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur5.mei
+            title: "Multiple slurs"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur6.mei
+            title: "Alignment of stem-side slurs"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur7.mei
+            title: "Slur angles"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur8.mei
+            title: "Slur and beam/stem direction"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: tie-chords1.mei 
+            title: "Ties on chords example"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: tie-chords2.mei 
+            title: "Ties on chords example (2)"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: tie-chords3.mei 
+            title: "Ties on chords example (3)"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: tie.mei 
+            title: "Tie example"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: tie2.mei
+            title: "Tied longa notes"
+          - section: "Dynamics in CMN"
+            link: cmn#cmnDynam
+            file: dynam1.mei 
+            title: "Dynamic example"
+          - section: "Dynamics in CMN"
+            link: cmn#cmnDynam
+            file: dynam2.mei 
+            title: "Dynamic example (2)"
+          - section: "Dynamics in CMN"
+            link: cmn#cmnDynam
+            file: dynam3.mei 
+            title: "Dynamic example with place"
+          - section: "Dynamics in CMN"
+            link: cmn#cmnDynam
+            file: dynam4.mei
+            title: "Scope and placement of dynamics"
+          - section: "Dynamics in CMN"
+            link: cmn#cmnDynam
+            file: hairpin1.mei 
+            title: "Hairpin example on multiple lines"
+          - section: "Dynamics in CMN"
+            link: cmn#cmnDynam
+            file: hairpin2.mei 
+            title: "Example with hairpin on several staves"
+          - section: "Dynamics in CMN"
+            link: cmn#cmnDynam
+            file: hairpin3.mei
+            title: "Hairpin example with various angles"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet.mei 
+            title: "Tuplet example"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet10.mei
+            title: "Nested tuplets"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet11.mei
+            title: "Space within tuplets"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet12.mei
+            title: "Staff spacing with tuplets"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet13.mei
+            title: "Tuplets on rests (1)"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet14.mei
+            title: "Tuplets on rests (2)"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet15.mei
+            title: "Nested tuplets"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet16.mei
+            title: "Tuplet options"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet2.mei
+            title: "Placement of tuplet brackets"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet3.mei
+            title: "Collision between tuplet bracket and staff"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet4.mei
+            title: "Tuplet bracket on whole notes"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet5.mei
+            title: "Tuplet bracket inside of beam"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet6.mei
+            title: "Tuplet number format"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet8.mei
+            title: "Tuplets with stemless notes"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tupletspan.mei 
+            title: "TupletSpan example"
+          - section: "Articulation and Performance Instructions in CMN"
+            link: cmn#cmnArtic
+            file: artic1.mei 
+            title: "Articulation example"
+          - section: "Articulation and Performance Instructions in CMN"
+            link: cmn#cmnArtic
+            file: artic2.mei 
+            title: "Articulation example (2)"
+          - section: "Articulation and Performance Instructions in CMN"
+            link: cmn#cmnArtic
+            file: artic3.mei
+            title: "Avoiding crowded articulations"
+          - section: "Articulation and Performance Instructions in CMN"
+            link: cmn#cmnArtic
+            file: artic4.mei
+            title: "Articulation and stave spacing interaction"
+          - section: "Articulation and Performance Instructions in CMN"
+            link: cmn#cmnArtic
+            file: artic5.mei
+            title: "Staccato dots in staff space"
+          - section: "Articulation and Performance Instructions in CMN"
+            link: cmn#cmnArtic
+            file: artic6.mei
+            title: "Avoiding collisions articulation/tuplets"
+          - section: "Arpeggio and Glissando"
+            link: cmn#cmnArpegGliss
+            file: gliss.mei
+            title: "Glissando"
+          - section: "Tremolandi"
+            link: cmn#cmnTrem
+            file: btrem.mei 
+            title: "Single-note (bowed) temolo example"
+          - section: "Tremolandi"
+            link: cmn#cmnTrem
+            file: ftrem.mei
+            title: "Two-note (fingered) temolo example"
+          - section: "Fermata"
+            link: cmn#cmnFermata
+            file: fermata1.mei 
+            title: "Fermata attribute example"
+          - section: "Fermata"
+            link: cmn#cmnFermata
+            file: fermata2.mei 
+            title: "Fermata element example"
+          - section: "Fermata"
+            link: cmn#cmnFermata
+            file: fermata3.mei
+            title: "Fermatas on whole measures in different layers"
+          - section: "Fermata"
+            link: cmn#cmnFermata
+            file: fermata4.mei
+            title: "Fermatas and slur interaction"
+          - section: "Fermata"
+            link: cmn#cmnFermata
+            file: fermata5.mei
+            title: "Fermatas and editorial accidentals interaction"
+          - section: "Fermata"
+            link: cmn#cmnFermata
+            file: fermata6.mei
+            title: "Fermata centred on rests and fermata heigt"
+          - section: "Octave shift"
+            link: cmn#cmnOctave
+            file: octave-shift1.mei 
+            title: "Octave shift example"
+          - section: "Octave shift"
+            link: cmn#cmnOctave
+            file: octave-shift2.mei 
+            title: "Octave shift example (below and with 'tstamp' attribute)"
+          - section: "Octave shift"
+            link: cmn#cmnOctave
+            file: octave-shift3.mei 
+            title: "Octave shift example (style)"
+          - section: "Breath marks"
+            link: cmn#cmnBreath
+            file: breath.mei
+            title: "Taking breath"
+          - section: "Piano pedal"
+            link: cmn#cmnPedal
+            file: piano-pedal.mei 
+            title: "Piano pedal example"
+          - section: "Piano pedal"
+            link: cmn#cmnPedal
+            file: piano-pedal2.mei 
+            title: "Piano pedal and measure rests"
+          - section: "Structural repetition"
+            link: cmn#cmnRepStruct
+            file: endings.mei 
+            title: "Ending example"
+          - section: "Structural repetition"
+            link: cmn#cmnRepStruct
+            file: endings2.mei
+            title: "Repeats and endings sections and expansion lists"
+          - section: "Structural repetition"
+            link: cmn#cmnRepStruct
+            file: endings3.mei
+            title: "Left/right repeats at line ends"
+          - section: "Measure-Level Repetition Symbols"
+            link: cmn#cmnRepSym
+            file: beatrpt1.mei 
+            title: "Beat repetition example (1)"
+          - section: "Measure-Level Repetition Symbols"
+            link: cmn#cmnRepSym
+            file: beatrpt2.mei 
+            title: "Beat repetition example (2)"
+          - section: "Measure-Level Repetition Symbols"
+            link: cmn#cmnRepSym
+            file: mrpt.mei 
+            title: "Measure repetition example (1)"
+          - section: "Measure-Level Repetition Symbols"
+            link: cmn#cmnRepSym
+            file: mrpt2.mei 
+            title: "Measure repetition example (2)"
+          - section: "Measure-Level Repetition Symbols"
+            link: cmn#cmnRepSym
+            file: multirpt.mei 
+            title: "Multi-measure repeat example"
+          
+    - id: "03"
+      chapter: "Mensural notation"
+      files:
+          - section: ""
+            link: mensural
+            file: mensural.mei 
+            title: "Mensural alignment example"
+          - section: ""
+            link: mensural
+            file: mensural2.mei
+            title: "Mensural rests"
+            
+    - id: "04"
+      chapter: "Common music notation ornaments"
+      files:
+          - section: "Mordents"
+            link: cmnOrnaments#cmnOrnamentsMordents
+            file: mordent.mei
+            title: "Mordents example"
+          - section: "Mordents"
+            link: cmnOrnaments#cmnOrnamentsMordents
+            file: mordent2.mei
+            title: "Mordents example (2)"
+          - section: "Mordents"
+            link: cmnOrnaments#cmnOrnamentsMordents
+            file: mordent3.mei
+            title: "Mordents example (3)"
+          - section: "Trills"
+            link: cmnOrnaments#cmnOrnamentsTrills
+            file: trills.mei 
+            title: "Trills example"
+          - section: "Trills"
+            link: cmnOrnaments#cmnOrnamentsTrills
+            file: trills2.mei
+            title: "Trills example (2)"
+          - section: "Trills"
+            link: cmnOrnaments#cmnOrnamentsTrills
+            file: trills3.mei
+            title: "Trills example (3)"
+          - section: "Trills"
+            link: cmnOrnaments#cmnOrnamentsTrills
+            file: trills4.mei
+            title: "Trills example (4)"
+          - section: "Trills"
+            link: cmnOrnaments#cmnOrnamentsTrills
+            file: trills5.mei
+            title: "Ornament placement"
+          - section: "Turns"
+            link: cmnOrnaments#cmnOrnamentsTurns
+            file: turn1.mei
+            title: "Turns example"
+          - section: "Turns"
+            link: cmnOrnaments#cmnOrnamentsTurns
+            file: turn2.mei
+            title: "Turns example"
+          
+    - id: "05"
+      chapter: "Critical apparatus"
+      files:
+          - section: ""
+            link: critApp
+            file: accid.mei
+            title: "Display of editorial accidentals"
+          - section: ""
+            link: critApp
+            file: accid5.mei
+            title: "Display of editorial accidentals (2)"
+          - section: ""
+            link: critApp
+            file: app-nested.mei 
+            title: "Critical apparatus example with nested elements"
+          - section: ""
+            link: critApp
+            file: app.mei 
+            title: "Critical apparatus example"
+          - section: ""
+            link: critApp
+            file: app2.mei
+            title: "Display of original and editorial clefs"
+          
+    - id: "06"
+      chapter: "Editorial markup"
+      files:
+          - section: ""
+            link: editTrans
+            file: choice.mei 
+            title: "Choice"
+          - section: ""
+            link: editTrans
+            file: editorial1.mei 
+            title: "Editorial markup example"
+          - section: ""
+            link: editTrans
+            file: editorial2.mei 
+            title: "Editorial markup (text) example"
+    
+    - id: "07"
+      chapter: "Harmony"
+      files:
+          - section: "Indications of harmony"
+            link: harmony#harmonyDetails
+            file: harm.mei 
+            title: "Harmony indications"
+          - section: "Indications of harmony"
+            link: harmony#harmonyDetails
+            file: harm2.mei
+            title: "Multiple harmonic analyses"
+          - section: "Indications of harmony"
+            link: harmony#harmonyDetails
+            file: harm3.mei
+            title: "Vertical offset and font kerning in harmony indications"
+          - section: "Indications of harmony"
+            link: harmony#harmonyDetails
+            file: harm4.mei
+            title: "Horizontal offset of harm indications"
+          - section: "Figured bass"
+            link: harmony#harmonyFigbass
+            file: fb1.mei
+            title: "Figured bass example (1)"
+          - section: "Figured bass"
+            link: harmony#harmonyFigbass
+            file: fb2.mei
+            title: "Figured bass example (2)"
+          
+    - id: "08"
+      chapter: "Vocal text"
+      files:
+          - section: ""
+            link: lyricsDesc
+            file: lyrics1.mei 
+            title: "Lyric example"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics10.mei
+            title: "Lyrics placement related to rhythmic values"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics2.mei 
+            title: "Multiple verse example"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics3.mei 
+            title: "Lyric connector example"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics4.mei 
+            title: "Lyrics styling example"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics5.mei
+            title: "Hyphen removal"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics6.mei
+            title: "Hyphen justification"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics7.mei
+            title: "Elision rendering"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics8.mei
+            title: "Line-break hyphenation"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics9.mei
+            title: "Minimal space between words"
+          - section: ""
+            link: lyricsDesc
+            file: multilingual.mei 
+            title: "Multilingual"
+    
+    # Placeholder for custom file
+    
+    - id: "00"
+      version-check: "custom"
+      name: "Custom file"
+      files:
+          - name: "Custom file"
+            title: ""
