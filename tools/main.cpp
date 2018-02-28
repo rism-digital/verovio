@@ -551,6 +551,6 @@ int main(int argc, char **argv)
         }
     }
 
-    free(long_options)x;
+    free(long_options);
     return 0;
 }
