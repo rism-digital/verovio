@@ -91,9 +91,14 @@
                 console.log(options[key]);
             }
         }
+        page = 1;
+        if (localStorage['testPage']) {
+            page = localStorage['testPage'];
+        }
+        
         // load function for the current version
         loadFunction = window["loadExample_" + vrvVersion]; 
-        loadFunction(customExample, "#00", options, 1 );
+        loadFunction(customExample, "#00", options, page );
     }
     
     function onVerovioLoaded() {
@@ -132,8 +137,6 @@
     </div>
     
     {% for t in site.data.mei-tests.tests %}
-        {% if t.version-check == null %}{% continue %}{% endif %}
-    
     <div class="panel test-group" id="{{ t.id }}">
 
         <h3 class="text-center">
@@ -145,7 +148,8 @@
 
         <div>
             {% for f in t.files %}
-                {% assign id = f.name | remove:'.xml' %}
+                {% assign id = f.file | remove:'.mei' %}
+                {{ f }}
                 <h4 class="test-xmlfile">{{ f.name }}</h4>
                 <p>
                     Original LilyPond comment: {{ f.description }}
@@ -233,20 +237,24 @@
     //<![CDATA[
     $(document).ready(function() {
         
+        // The default is the latest develop build
         vrv = "{{ site.baseurl }}/javascript/develop/verovio-toolkit.js";
         
+        // Hide the custom file placeholder
         $(".test-group").last().hide();
         
         var iframe = getParameterByName("iframe");
-        if (iframe != null) {
-            if (localStorage['testData']) {
-                customExample = localStorage['testData'];
-                $(".test-group").hide();
-                $(".test-group").last().show();
-                examples = [];
-            }
+        // IFrame loading and custom file stored
+        if ((iframe != null) && localStorage['testData']) {
+            customExample = localStorage['testData'];
+            // Swap display
+            $(".test-group").hide();
+            $(".test-group").last().show();
+            // Empty the list of examples to load
+            examples = [];
         }
         
+        // Version in the second frame ?
         if (iframe == "2") {
             if (localStorage['iframe2']) {
                 vrv = localStorage['iframe2'];
@@ -260,7 +268,6 @@
         element.src = vrv;
         document.body.appendChild(element);
         element.onload = onVerovioLoaded;
-    
     });
     //]]>
 </script>

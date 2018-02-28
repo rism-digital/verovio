@@ -47,7 +47,7 @@ versions:
 
     <div class="row">
         
-        <div class="col-lg-2 sidebar-tests">
+        <div class="col-sm-2 col-xs-12 sidebar-tests">
             
             <div class="row">
                 
@@ -73,6 +73,9 @@ versions:
                         <p>Additional options</p>
                         <textarea id="testOptions" class="form-control" rows="5"></textarea>
                         
+                        <p>Optional page number</p>
+                        <input type="number" id="testPage" min="1" max="1000" class="form-control"></input>
+                        
                         <div style="margin-top: 10px;">
                             <button type="submit" id="submit-btn" class="btn btn-default btn-sm popover-btn" data-container="body" data-toggle="popover" data-placement="right" data-content="Click to display the MEI file!" data-trigger="manual">Refresh</button>
                             <button id="reset-btn" class="btn btn-default btn-sm">Reset</button>
@@ -84,11 +87,11 @@ versions:
             
         </div>
 
-        <div class="col-lg-5">
+        <div class="col-sm-5 col-xs-6">
             <iframe id="frame1" src="./test-frame.xhtml?iframe=1"></iframe>
         </div>
     
-        <div class="col-lg-5">
+        <div class="col-sm-5 col-xs-6">
             <iframe id="iframe2" src="./test-frame.xhtml?iframe=2"></iframe>
         </div>
     </div>
@@ -106,14 +109,23 @@ versions:
     $('#reset-btn').click(function () {
         localStorage.removeItem('testData');
         localStorage.removeItem('testOptions');
+        localStorage.removeItem('testPage');
         localStorage.removeItem('iframe2');
         location.reload();
         return false;
     });
     
+    $('#testPage').click(function () {
+        localStorage['testPage'] = $("#testPage").val();
+        location.reload();
+    });
+    
     function uploadFile() {
 
         localStorage['testOptions'] = $("#testOptions").val();
+        if ($("#testPage").val() != "") {
+            localStorage['testPage'] = $("#testPage").val();
+        }
 
         var f = $("#mei_files").prop('files')[0];
         
@@ -137,14 +149,24 @@ versions:
         reader.readAsText(f);
     };
     
-    function adjustSize() {
-        $('iframe').height($(document).height() - 120);
-        $('iframe').width($(document).width() * 0.4 - 10);
+    function adjustSize(firstLoad = true) {
+        $('iframe').height($(window).height() - 120);
+        $('iframe').width($(window).width() * 0.4 - 10);
         
-        if (localStorage['testOptions']) {
-             $("#testOptions").val(localStorage['testOptions']);
+        if (firstLoad) {
+            if (localStorage['testOptions']) {
+                 $("#testOptions").val(localStorage['testOptions']);
+            }
+            if (localStorage['testPage']) {
+                 $("#testPage").val(localStorage['testPage']);
+            }
         }
     }
+    
+    $( window ).resize(function() {
+        adjustSize(false)
+    });
+    
     
     $( document ).ready(function() {
         adjustSize();

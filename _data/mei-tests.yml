@@ -1,634 +1,782 @@
 tests:
     - id: "01"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Pitches"
       files:
-          - name: "01a-Pitches-Pitches.xml"
-            description: "All pitches from G to c”” in ascending steps; First without accidentals, then with a sharp and then with a flat accidental. Double alterations and cautionary accidentals are tested at the end."
-            mei: 2
-            verovio: 2
-          - name: "01b-Pitches-Intervals.xml"
-            description: "All pitch intervals in ascending jump size"
-            mei: 2
-            verovio: 2
-          - name: "01c-Pitches-NoVoiceElement.xml"
-            description: "The /voice element of notes is optional in MusicXML (although Dolet always writes it out). Here, there is one note with lyrics, but without a voice assigned. It should still be correctly converted."
-            mei: 2
-            verovio: 2
-          - name: "01d-Pitches-Microtones.xml"
-            description: "Some microtones: c flat-and-a-half, d half-flat, e half-sharp, f sharp-and-a half. Once in the lower and once in the upper region of the staff."
-            mei: 2
-            verovio: 2
-          - name: "01e-Pitches-ParenthesizedAccidentals.xml"
-            description: "Accidentals can be cautionary or editorial. Each measure has a normal accidental, an editorial, a cautionary and an editioal and cautionary accidental."
-            comment: "In MEI an accidental is either editorial or cautionary."
-            mei: 1
-            verovio: 2
-          - name: "01f-Pitches-ParenthesizedMicrotoneAccidentals.xml"
-            description: "Microtone accidentals can be cautionary or editorial. Each measure has a normal accidental, an editorial, a cautionary and an editioal and cautionary accidental."
-            mei: 1
-            verovio: 2
-
-    - id: "02"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Rests"
-      files:
-          - name: "02a-Rests-Durations.xml"
-            description: "All different rest lengths: A two-bar multi-measure rest, a whole rest, a half, etc. until a 128th-rest; Then the same with dotted durations"
-            comment: "Multi-measure rests need to be fixed."
-            mei: 1
-            verovio: 2
-          - name: "02b-Rests-PitchedRests.xml"
-            description: "Rests can have explicit pitches, where they are displayed. The first rest uses no explicit position and should use the default position, all others are explicitly positioned somewhere else."
-            mei: 2
-            verovio: 1
-          - name: "02c-Rests-MultiMeasureRests.xml"
-            description: "Four multi-measure rests: 3 measures, 15 measures, 1 measure, and 12 measures."
-            mei: 0
-            verovio: 0
-          - name: "02d-Rests-Multimeasure-TimeSignatures.xml"
-            description: "Four multi-measure rests: 3 measures, 15 measures, 1 measure, and 12 measures."
-            mei: 0
-            verovio: 0
-          - name: "02e-Rests-NoType.xml"
-            description: "In some cases, a rest might not have its type attribute set (this happens, for example, with voices in Finale, where you don’t manually insert a rest)."
-            mei: 2
-            verovio: 2
-
-    - id: "03"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Rhythm"
-      files:
-          - name: "03a-Rhythm-Durations.xml"
-            description: "All note durations, from long, brevis, whole until 128th; First with their plain values, then dotted and finally doubly-dotted."
-            comment: "Time signatures are ignored."
-            mei: 2
-            verovio: 2
-          - name: "03b-Rhythm-Backup.xml"
-            description: "Two voices with a backup, that does not jump to the beginning for the measure for voice 2, but somewhere in the middle. Voice 2 thus won’t have any notes or rests for the first beat of the measures."
-            mei: 2
-            verovio: 2
-          - name: "03c-Rhythm-DivisionChange.xml"
-            description: "Although uncommon, the divisions of a quarter note can change somewhere in the middle of a MusicXML file. Here, the first half measure uses a division of 1, which then changes to 8 in the middle of the first measure and to 38 in the middle of the second measure."
-            comment: "Will need to be updated for handling @dur.ges."
-            mei: 1
-            verovio: 2
-          - name: "03d-Rhythm-DottedDurations-Factors.xml"
-            description: "Several durations can be written with dots. For multimeasure rests, we can also have durations that cannot be expressed with dotted notes (like 5/8)."
-            comment: "Will need to be updated for handling @dur.ges."
-            mei: 1
-            verovio: 2
-    - id: "11"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Time signatures"
-      files:
-          - name: "11a-TimeSignatures.xml"
-            description: "Various time signatures: 2/2 (alla breve), 4/4 (C), 2/2, 3/2, 2/4, 3/4, 4/4, 5/4, 3/8, 6/8, 12/8"
-            mei: 0
-            verovio: 0
-          - name: "11b-TimeSignatures-NoTime.xml"
-            description: "A score without a time signature (but with a key and clefs)"
-            mei: 2
-            verovio: 2
-          - name: "11c-TimeSignatures-CompoundSimple.xml"
-            description: "Compound time signatures with same denominator: (3+2)/8 and (5+3+1)/4."
-            comment: "Will need LibMEI update."
-            mei: 1
-            verovio: 1
-          - name: "11d-TimeSignatures-CompoundMultiple.xml"
-            description: "Compound time signatures with separate fractions displayed: 3/8+2/8+3/4 and 5/2+1/8."
-            mei: 0
-            verovio: 0
-          - name: "11e-TimeSignatures-CompoundMixed.xml"
-            description: "Compound time signatures of mixed type: (3+2)/8+3/4."
-            mei: 0
-            verovio: 0
-          - name: "11f-TimeSignatures-SymbolMeaning.xml"
-            description: "A time signature of 3/8 with the symbol='cut' attribute and two symbol='single-number' attributes with compound time signatures. Shall the symbol be ignored in this case?"
-            mei: 0
-            verovio: 0
-          - name: "11g-TimeSignatures-SingleNumber.xml"
-            description: "Time signature displayed as a single number."
-            mei: 2
-            verovio: 2
-          - name: "11h-TimeSignatures-SenzaMisura.xml"
-            description: "Senza-misura time signature"
-            mei: 2
-            verovio: 2
-    - id: "12"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Clefs"
-      files:
-          - name: "12a-Clefs.xml"
-            description: "Various clefs: G, C, F, percussion, TAB and none; some are also possible with transposition and on other staff lines than their default (e.g. soprano/alto/tenor/baritone C clefs); Each measure shows a different clef (measure 17 has the 'none' clef), only measure 18 has the same treble clef as measure 1."
-            comment: "'TAB' and 'percussion' missing."
-            mei: 1
-            verovio: 1
-          - name: "12b-Clefs-NoKeyOrClef.xml"
-            description: "A score without any key or clef defined. The default (4/4 in treble clef) should be used."
-            comment: "The expected behavior is hard to define. Verovio shows the equivalent of C-1 without a clef."
-            mei: 2
-            verovio: 2
-    - id: "13"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Key signatures"
-      files:
-          - name: "13a-KeySignatures.xml"
-            description: "Various key signature: from 11 flats to 11 sharps (each one first one measure in major, then one measure in minor)"
-            comment: "Key changes are not supported, yet."
-            mei: 1
-            verovio: 2
-          - name: "13b-KeySignatures-ChurchModes.xml"
-            description: "All different modes: major, minor, ionian, dorian, phrygian, lydian, mixolydian, aeolian, and locrian; All modes are given with 2 sharps."
-            mei: 1
-            verovio: 2
-          - name: "13c-KeySignatures-NonTraditional.xml"
-            description: "Non-traditional key signatures, where each alteration is separately given. Here we have (f sharp, a flat, b flat) and (c flatflat, g sharp sharp, d flat, b sharp, f natural), where in the second case an explicit octave is given for each alteration."
-            mei: 0
-            verovio: 0
-          - name: "13d-KeySignatures-Microtones.xml"
-            description: "Non-traditional key signatures with microtone alterations: (g flat-and-a-half, a flat, b half-flat, c natural, d half-sharp, e sharp, f sharp-and-a-half)."
-            mei: 0
-            verovio: 0
-    - id: "14"
-      name: "Staff attributes"
-      files:
-          - name: "14a-StaffDetails-LineChanges.xml"
-            description: "The number of staff lines can be modified by using the staff-lines child of the staff-details attribute. This can happen globally (the first staff has one line globally) or during the part at the beginning of a measure and even inside a measure (the second part has 5 lines initially, 4 at the beginning of the second measure, and 3 starting in the middle of the third measure)."
-            mei: -1
-            verovio: -1
-    - id: "21"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Chorded notes"
-      files:
-          - name: "21a-Chord-Basic.xml"
-            description: "One simple chord consisting of two notes."
-            mei: 2
-            verovio: 2
-          - name: "21b-Chords-TwoNotes.xml"
-            description: "Some subsequent (identical) two-note chords."
-            mei: 2
-            verovio: 2
-          - name: "21c-Chords-ThreeNotesDuration.xml"
-            description: "Some three-note chords, with various durations."
-            mei: 2
-            verovio: 2
-          - name: "21d-Chords-SchubertStabatMater.xml"
-            description: "Chords in the second measure, after several ornaments in the first measure and a p at the beginning of the second measure."
-            mei: 2
-            verovio: 2
-          - name: "21e-Chords-PickupMeasures.xml"
-            description: "Check for proper chord detection after a pickup measure (i.e. the first beat of the measure is not aligned with multiples of the time signature)!"
-            mei: 2
-            verovio: 2
-          - name: "21f-Chord-ElementInBetween.xml"
-            description: "Between the individual notes of a chord there can be direction or harmony elements, which should be properly assigned to the chord (or the position of the chord)."
-            mei: 1
-            verovio: 2
-    - id: "22"
-      name: "Note settings, heads, etc."
-      files:
-          - name: "22a-Noteheads.xml"
-            description: "Different note styles, using the <notehead> element. First, each note head style is printed with four quarter notes, two with filled heads, two with unfilled heads, where first the stem is up and then the stem is down. After that, each note head style is printed with a half note (should have an unfilled head by default). Finally, the Aiken note head styles are tested, once with stem up and once with stem down."
-            mei: -1
-            verovio: -1
-          - name: "22b-Staff-Notestyles.xml"
-            description: "Staff-connected note styles: slash notation, hidden notes (with and without hidden staff lines)"
-            mei: -1
-            verovio: -1
-          - name: "22c-Noteheads-Chords.xml"
-            description: "Different note styles for individual notes inside a chord, using the notehead element."
-            mei: -1
-            verovio: -1
-          - name: "22d-Parenthesized-Noteheads.xml"
-            description: "Parenthesized note heads. First, a single parenthesized note is tested, once with a normal and then with a non-standard notehead, then two chords with some/all parenthesized noteheads and finally a parenthesized rest."
-            mei: -1
-            verovio: -1
-    - id: "23"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Triplets, Tuplets"
-      files:
-          - name: "23a-Tuplets.xml"
-            description: "Some tuplets (3:2, 3:2, 3:2, 4:2, 4:1, 7:3, 6:2) with the default tuplet bracket displaying the number of actual notes played. The second tuplet does not have a number attribute set."
-            mei: 2
-            verovio: 2
-          - name: "23b-Tuplets-Styles.xml"
-            description: "Different tuplet styles: default, none, x:y, x:y-note; Each with bracket, slur and none. Finally, non-standard 4:3 and 17:2 tuplets are given."
-            comment: "Some style information is missing."
-            mei: 1
-            verovio: 1
-          - name: "23c-Tuplet-Display-NonStandard.xml"
-            description: "Displaying tuplet note types, that might not coincide with the displayed note. The first two tuplets take the type from the note, the second two from the time-modification element, the remaining pair of tuplets from the tuplet notation element. The tuplets in measure 3 specify both a number of notes and a type inside the tuplet-actual and tuplet-normal elements, the ones in measure 4 specify only a note type (but no number), and the ones in measure 5 specify only a number of tuplet-notes (but no type, which is deduced from the note’s type). The first tuplet of measures 3-5 uses ’display-type='actual'’, the second one ’display-type='both'’. FIXME: The tuplet-normal should coincide with the real notes!"
-            mei: 2
-            verovio: 1
-          - name: "23d-Tuplets-Nested.xml"
-            description: "Tuplets can be nested. Here there is a 5:2 tuplet inside a 3:2 tuple (all consisting of written eighth notes)."
-            mei: 0
-            verovio: 0
-          - name: "23e-Tuplets-Tremolo.xml"
-            description: "Tremolo tuplets are tuplets on single notes with a tremolo ornament. The application shall correctly import these notes with 2/3 or their time..."
-            mei: 0
-            verovio: 0
-          - name: "23f-Tuplets-DurationButNoBracket.xml"
-            comment: "How to convert this without visual information?"
-            description: "Some 'triplets' on the end of the first and in the second staff, using only time-modification, but not explicit tuplet bracket. Thus, the duration of the notes in the second staff should be scaled properly in comparison to staff 1, but no visual indication about the tuplets is given."
-            mei: 0
-            verovio: 0
-    - id: "24"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Grace notes"
-      files:
-          - name: "24a-GraceNotes.xml"
-            description: "Different kinds of grace notes: acciaccatura, appoggiatura; beamed grace notes; grace notes with accidentals; different durations of the grace notes."
-            mei: 2
-            verovio: 2
-          - name: "24b-ChordAsGraceNote.xml"
-            description: "Chords as grace notes."
-            mei: 1
-            verovio: 1
-          - name: "24c-GraceNote-MeasureEnd.xml"
-            description: "A grace note that appears at the measure end (without any steal-from-* attribute set). Some applications need to convert this into an after-grace."
-            mei: 1
-            verovio: 2
-          - name: "24d-AfterGrace.xml"
-            description: "Some grace notes and after-graces (indicated by steal-time-previous and steal-time-following)."
-            mei: 1
-            verovio: 2
-          - name: "24e-GraceNote-StaffChange.xml"
-            description: "A grace note on a different staff than the actual note."
-            mei: 0
-            verovio: 0
-          - name: "24f-GraceNote-Slur.xml"
-            description: "A grace note with a slur to the actual note. This can be interpreted as acciaccatura or appoggiatura, depending on the existence of a slash."
-            mei: 2
-            verovio: 2
-    - id: "31"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Dynamics and other single symbols"
-      files:
-          - name: "31a-Directions.xml"
-            description: "All direction elements defined in MusicXML. The lyrics for each note describes the direction element assigned to that note."
-            mei: 1
-            verovio: 1
-          - name: "31c-MetronomeMarks.xml"
-            description: "Tempo Markings: note=bpm, text (note=bpm), note=note, (note=note), (note=bpm)"
-            mei: 1
-            verovio: 1
-    - id: "32"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Notations and Articulations"
-      files:
-          - name: "32a-Notations.xml"
-            description: "All notation elements defined in MusicXML. The lyrics show the notation assigned to each note."
-            mei: 1
-            verovio: 1
-          - name: "32b-Articulations-Texts.xml"
-            description: "Text markup: different font sizes, weights and colors."
-            comment: "Text rendition gets converted, but some directions are missing @tstamp/@startid"
-            mei: 1
-            verovio: 1
-          - name: "32c-MultipleNotationChildren.xml"
-            description: "It should not make any difference whether two articulations are given inside two different notation elements, inside two different articulations children of the same notation element or inside the same articulations element. Thus, all three notes should have a staccato and an accent."
-            mei: 2
-            verovio: 2
-          - name: "32d-Arpeggio.xml"
-            description: "Different Arpeggio directions (normal, up, down, non-arpeggiate)"
-            mei: -1
-            verovio: -1
-    - id: "33"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Spanners"
-      files:
-          - name: "33a-Spanners.xml"
-            description: "Several spanners defined in MusicXML: tuplet, slur (solid, dashed), tie, wedge (cresc, dim), tr + wavy-line, single-note trill spanner, octave-shift (8va,15mb), bracket (solid down/down, dashed down/down, solid none/down, dashed none/up, solid none/none), dashes, glissando (wavy), bend-alter, slide (solid), grouping, two-note tremolo, hammer-on, pull-off, pedal (down, change, up)."
-            comment: "Only some spanners are currently supported."
-            mei: 1
-            verovio: 1
-          - name: "33b-Spanners-Tie.xml"
-            description: "Two simple tied whole notes"
-            mei: 2
-            verovio: 2
-          - name: "33c-Spanners-Slurs.xml"
-            description: "A note can be the end of one slur and the start of a new slur. Also, in MusicXML, nested slurs are possible like in the second measure where one slur goes over all four notes, and another slur goes from the second to the third note."
-            mei: 2
-            verovio: 2
-          - name: "33d-Spanners-OctaveShifts.xml"
-            description: "All types of octave shifts (15ma, 15mb, 8va, 8vb)"
-            mei: 2
-            verovio: 2
-          - name: "33e-Spanners-OctaveShifts-InvalidSize.xml"
-            description: "Invalid octave-shifts: 27 down, 11 up."
-            comment: "Not supported in MEI."
-            mei: 2
-            verovio: 2
-          - name: "33f-Trill-EndingOnGraceNote.xml"
-            description: "A trill spanner that spans a grace note and ends on an after-grace note at the end of the measure."
-            mei: 0
-            verovio: 0
-          - name: "33g-Slur-ChordedNotes.xml"
-            description: "Slurs on chorded notes: Only the first note of the chord should get the slur notation. Some applications print out the slur for all notes – these should be ignored."
-            mei: 2
-            verovio: 2
-          - name: "33h-Spanners-Glissando.xml"
-            description: "All different types of glissando defined in MusicXML"
-            mei: 0
-            verovio: 0
-          - name: "33i-Ties-NotEnded.xml"
-            description: "Several ties that have their end tag missing."
-            mei: 2
-            verovio: 2
-    - id: "41"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Multiple parts (staves)"
-      files:
-          - name: "41a-MultiParts-Partorder.xml"
-            description: "A piece with four parts (P0, P1, P2, P3; different from what Finale creates!). Are they converted in the correct order?"
-            mei: 2
-            verovio: 2
-          - name: "41b-MultiParts-MoreThan10.xml"
-            description: "A piece with 20 parts to check whether an application supports that many parts and whether they are correctly sorted."
-            mei: 2
-            verovio: 2
-          - name: "41c-StaffGroups.xml"
-            description: "A huge orchestra score with 28 parts and different kinds of nested bracketed groups. Each part/group is assigned a name and an abbreviation to be shown before the staff. Also, most of the groups show unbroken barlines, while the barlines are broken between the groups."
-            comment: "the placement of the labels needs to be improved."
-            mei: 2
-            verovio: 1
-          - name: "41d-StaffGroups-Nested.xml"
-            description: "Two properly nested part groups: One group (with a square bracket) goes from staff 2 to 4) and another group (with a curly bracket) goes from staff 3 to 4."
-            comment: "Not possible in MEI."
-            mei: -1
-            verovio: -1
-          - name: "41e-StaffGroups-InstrumentNames-Linebroken.xml"
-            description: "Part names and abbreviations can contain line breaks."
-            mei: 0
-            verovio: 0
-          - name: "41f-StaffGroups-Overlapping.xml"
-            description: "MusicXML allows for overlapping part-groups, while many applications do not allow overlapping groups, but require them to be properly nested. In this case, one group (with a square bracket) goes from staff 2 to 4) and another group (with a curly bracket) goes from staff 3 to 5."
-            mei: 0
-            verovio: 0
-          - name: "41g-PartNoId.xml"
-            description: "A part with no id attribute. Since this piece has only one part, it is clear which part is described by the one part element."
-            mei: 0
-            verovio: 0
-          - name: "41h-TooManyParts.xml"
-            description: "This piece has more part elements than the part-list section gives. One can either convert all the parts present, but not listed in the part-list, or simply not import / ignore them."
-            mei: 0
-            verovio: 0
-          - name: "41i-PartNameDisplay-Override.xml"
-            description: "MusicXML allows part-name and part-name-display in the score-part element. If part-name-display is given, it overrides the part-name for display. The first staff uses only part-name, while the second one (same part-name) overrides it with a custom text. Similar for the part-abbreviation used in subsequent staves."
-            mei: 0
-            verovio: 0
-    - id: "42"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Multiple voices per staff"
-      files:
-          - name: "42a-MultiVoice-TwoVoicesOnStaff-Lyrics.xml"
-            description: "Two voices share one staff. Each voice is assigned some lyrics."
-            mei: 2
-            verovio: 2
-          - name: "42b-MultiVoice-MidMeasureClefChange.xml"
-            description: "A multi-voice / multi-staff part with a clef change in the middle of a measure and a backward for voice 2 jumping back beyond that clef change."
-            mei: 0
-            verovio: 0
-    - id: "43"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "One part on multiple staves"
-      files:
-          - name: "43a-PianoStaff.xml"
-            description: "A simple piano staff"
-            mei: 2
-            verovio: 2
-          - name: "43b-MultiStaff-DifferentKeys.xml"
-            description: "A piano staff with different keys and clefs for each of its staves. The keys and clefs for both staves are given at the very beginning of the measure."
-            mei: 2
-            verovio: 2
-          - name: "43c-MultiStaff-DifferentKeysAfterBackup.xml"
-            description: "A piano staff with different keys and clefs for each of its staves. The key and clef for the second staff is given only after a backward, just before the first note of the second staff is given, but after the whole measure for staff 1 has been given."
-            mei: 0
-            verovio: 0
-          - name: "43d-MultiStaff-StaffChange.xml"
-            description: "Staff changes in a piano staff. The voice from the second staff has some notes/chords on the first staff. The final two chords have some notes on the first, some on the second staff."
-            mei: 0
-            verovio: 0
-          - name: "43e-Multistaff-ClefDynamics.xml"
-            description: "A piano staff with dynamics and clef changes, where each element (ffff, wedge and clef changes) applies only to one voice or one staff, respectively."
-            comment: "the placement of the clef is problematic."
-            mei: 0
-            verovio: 0
-    - id: "45"
-      name: "Repeats"
-      files:
-          - name: "45a-SimpleRepeat.xml"
-            description: "A simple, repeated measure (repeated 5 times)"
-            mei: -1
-            verovio: -1
-          - name: "45b-RepeatWithAlternatives.xml"
-            description: "A simple repeat with two alternative endings (volta brackets)."
-            mei: -1
-            verovio: -1
-          - name: "45c-RepeatMultipleTimes.xml"
-            description: "Repeats can also be nested."
-            mei: -1
-            verovio: -1
-          - name: "45d-Repeats-Nested-Alternatives.xml"
-            description: "Nested repeats, each with alternative endings."
-            mei: -1
-            verovio: -1
-          - name: "45e-Repeats-Nested-Alternatives.xml"
-            description: "Some more nested repeats with alternatives. The barline between measure 7 and 8 will probably be messed up! (Should be a repeat on both sides!)"
-            mei: -1
-            verovio: -1
-          - name: "45f-Repeats-InvalidEndings.xml"
-            description: "Some more nested repeats with alternatives, where the MusicXML file does not make sense in the first place. How well are applications able to cope with improper repeats and alternatives?"
-            mei: -1
-            verovio: -1
-          - name: "45g-Repeats-NotEnded.xml"
-            description: "A forward-repeating bar line without an ending repeat bar."
-            mei: -1
-            verovio: -1
-    - id: "46"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Barlines, Measures"
-      files:
-          - name: "46a-Barlines.xml"
-            description: "Different types of (non-repeat) barlines: default (no setting), regular, dotted, dashed, heavy, light-light, light-heavy, heavy-light, heavy-heavy, tick, short, none."
-            mei: 2
-            verovio: 1
-          - name: "46b-MidmeasureBarline.xml"
-            description: "Barlines can appear at mid-measure positions, without using an implicit measure!"
-            mei: 1
-            verovio: 1
-          - name: "46c-Midmeasure-Clef.xml"
-            description: "A clef change in the middle of a measure, using either an implicit measure or simply placing the attributes in the middle of the measure."
-            mei: 1
-            verovio: 1
-          - name: "46d-PickupMeasure-ImplicitMeasures.xml"
-            description: "A 3/8 pickup measure, a measure that is split into one (incomplete, only 2/4) measure and an implicit measure, and an incomplete measure (containg 3/4)."
-            mei: 0
-            verovio: 0
-          - name: "46e-PickupMeasure-SecondVoiceStartsLater.xml"
-            description: "Voice 2 should start at 2nd beat of first full measure."
-            mei: 2
-            verovio: 2
-          - name: "46f-IncompleteMeasures.xml"
-            description: "Measures can contain less notes than the time signature says. Here, the first and third measures contain only two quarters instead of four."
-            comment: "no additional spacing is displayed."
-            mei: 2
-            verovio: 2
-          - name: "46g-PickupMeasure-Chordnames-FiguredBass.xml"
-            description: "Pickup measure with chord names and figured bass."
-            mei: 0
-            verovio: 0
-    - id: "51"
-      name: "Header information"
-      files:
-          - name: "51b-Header-Quotes.xml"
-            description: "Several header fields and part names can contain quotes. This test checks whether they are converted/imported without problems (i.e. whether they are correctly escaped when converting)."
-            mei: -1
-            verovio: -1
-          - name: "51c-MultipleRights.xml"
-            description: "There can be multiple <rights> tags in the identification element of the score. The conversion shall still work, ideally using both of them."
-            mei: -1
-            verovio: -1
-          - name: "51d-EmptyTitle.xml"
-            description: "A piece with an empty (but existing) work-title, but a non-empty movement-title. In this case the movement-title should be chosen, even though the work-title exists."
-            mei: -1
-            verovio: -1
-    - id: "52"
-      name: "Page layout"
-      files:
-          - name: "52a-PageLayout.xml"
-            description: "Several page layout settings: paper size, margins, system margins and distances, different fonts, etc."
-            mei: -1
-            verovio: -1
-          - name: "52b-Breaks.xml"
-            description: "System and page breaks, given in a print element"
-            mei: -1
-            verovio: -1
-    - id: "61"
-      version-check: "0.9.14-dev-ccb4fb5"
-      name: "Lyrics"
-      files:
-          - name: "61a-Lyrics.xml"
-            description: "Some notes with simple lyrics: Syllables, notes without a syllable, syllable spanners."
-            mei: 2
-            verovio: 2
-          - name: "61b-MultipleLyrics.xml"
-            description: "Multiple (simple) lyrics. The order of the exported stanzas is relevant (identified by the number attribute in this test case)"
-            mei: 2
-            verovio: 2
-          - name: "61c-Lyrics-Pianostaff.xml"
-            description: "Lyrics assigned to the voices of a piano staff containing two simple staves. Each staff is assigned exactly one lyrics line."
-            mei: 2
-            verovio: 2
-          - name: "61d-Lyrics-Melisma.xml"
-            description: "How to treat lyrics and slurred notes. Normally, a slurred group of notes is assigned only one lyrics syllable."
-            mei: 2
-            verovio: 2
-          - name: "61e-Lyrics-Chords.xml"
-            description: "Assigning lyrics to chorded notes."
-            mei: 0
-            verovio: 0
-          - name: "61f-Lyrics-GracedNotes.xml"
-            description: "Grace notes shall not mess up the lyrics, and they shall not be assigned a syllable."
-            comment: "there is a problem with one slur."
-            mei: 2
-            verovio: 1
-          - name: "61g-Lyrics-NameNumber.xml"
-            description: "A lyrics syllable can have both a number and a name attribute. The question is: What should be used to put syllables of the same voice together. This example uses different number/name combinations to check how different applications handle this unspecified case (The advice on the MusicXML mailing list was 'there is no correct way, each application can do what it thinks is best')."
-            mei: 0
-            verovio: 0
-          - name: "61h-Lyrics-BeamsMelismata.xml"
-            description: "Beaming or slurs can indicate melismata for lyrics. Also make sure that notes without an explicit syllable are treated as if they were part of a melisma."
-            mei: 2
-            verovio: 2
-          - name: "61i-Lyrics-Chords.xml"
-            description: "Each note of a chord can have some lyrics attached. In this case, each note of the chord has lyrics of the form 'Lyrics [123]' attached, where each lyrics has a different number attribute to distinguish them. These syllables should be imported into three different stanzas and the timing should be correct."
-            mei: 0
-            verovio: 0
-          - name: "61j-Lyrics-Elisions.xml"
-            description: "Multiple lyrics syllables assigned to a single note are implemented either using a space in the lyrics or by using the elision lyrics element. This testcase checks both of them. First, a note with on syllable is given, then a note with two syllables separated by a spcae and finally a note with two and one with three syllables implemented using elision is given."
-            mei: 2
-            verovio: 0
-          - name: "61k-Lyrics-SpannersExtenders.xml"
-            description: "Lyrics spanners: continued syllables and extenders, possibly spanning multiple notes. The intermediate notes do not have any lyric element."
-            mei: 2
-            verovio: 2
-    - id: "71"
-      name: "Guitar notation"
-      files:
-          - name: "71a-Chordnames.xml"
-            description: "A normal staff with several (complex) chord names displayed."
-            mei: -1
-            verovio: -1
-          - name: "71c-ChordsFrets.xml"
-            description: "A staff with chord names and some fretboards shown. The fretboards can have an arbitrary number of frets/strings, can start at an arbitrary fret and can even contain fingering information."
-            mei: -1
-            verovio: -1
-          - name: "71d-ChordsFrets-Multistaff.xml"
-            description: "Chords and fretboards assigned to the voices in a multi-voice, multi-staff part. There should be fret diagrams above each of the two staves"
-            mei: -1
-            verovio: -1
-          - name: "71e-TabStaves.xml"
-            description: "Some tablature staves, with explicit fingering information and different string tunings given in the MusicXML file."
-            mei: -1
-            verovio: -1
-          - name: "71f-AllChordTypes.xml"
-            description: "All chord types defined in MusicXML. The staff will only contain one c’ note (NO chord) for all of them, but the chord names should be properly printed."
-            mei: -1
-            verovio: -1
-          - name: "71g-MultipleChordnames.xml"
-            description: "There can be multiple subsequent harmony elements, indicating a harmony change during a note"
-            mei: -1
-            verovio: -1
-    - id: "72"
-      name: "Transposing intruments"
-      files:
-          - name: "72a-TransposingInstruments.xml"
-            description: "Transposing instruments: Trumpet in Bb, Horn in Eb, Piano; All of them show the C major scale (the trumpet with 2 sharp, the horn with 3 sharp)."
-            mei: -1
-            verovio: -1
-          - name: "72b-TransposingInstruments-Full.xml"
-            description: "Various transposition. Each part plays a c”, just displayed in different display pitches. The second-to-last staff uses a transposition where the displayed c’ is an actual f”’ concert pitch. The final staff is an untransposed instrument."
-            mei: -1
-            verovio: -1
-          - name: "72c-TransposingInstruments-Change.xml"
-            description: "An instrument change from one transposition (Clarinet in Eb) to another transposing instrument (Clarinet in Bb). The displayed instrument name should also be updated. The whole piece is in Bb major (sounding), so first the key signature should be one flat, after the change it should have no accidentals."
-            mei: -1
-            verovio: -1
-    - id: "73"
-      name: "Percussion"
-      files:
-          - name: "73a-Percussion.xml"
-            description: "Three types of percussion staves: A five-line staff with bass clef for Timpani, a five-line staff with percussion clef, and a one-line percussion staff with only unpitched notes."
-            mei: -1
-            verovio: -1
-    - id: "74"
-      name: "Figured bass"
-      files:
-          - name: "74a-FiguredBass.xml"
-            description: "Some figured bass containing alterated figures, bracketed figures and slashed figures. The last note contains an empty figured-bass element, which is invalid MusicXML, to check how well applications cope with malformed files. Note that this file does not contain any extenders!"
-            mei: -1
-            verovio: -1
-    - id: "75"
-      name: "Other instrumental notation"
-      files:
-          - name: "75a-AccordionRegistrations.xml"
-            description: "All possible accordion registrations."
-            mei: -1
-            verovio: -1
-    - id: "99"
-      name: "Compatibility with broken MusicXML"
-      files:
-          - name: "99a-Sibelius5-IgnoreBeaming.xml"
-            description: "Dolet 3 for Sibelius (5.1) did not print out any closing beam tags, only starting and continuing beam tags. For such files, one either needs to ignore all beaming information or close all beams"
-            mei: -1
-            verovio: -1
-          - name: "99b-Lyrics-BeamsMelismata-IgnoreBeams.xml"
-            description: "If we properly ignore all beaming information from the Dolet 3 for Sibelius export file, make sure that the lyrics syllables are still assigned to the correct notes."
-            mei: -1
-            verovio: -1
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: dir1.mei 
+            description: "Directives example"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: dir2.mei
+            description: "Tests in space"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: dir3.mei
+            description: "Tempi/directives collisions"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: dir4.mei
+            description: "Tempi/directives vertical alignment"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: dir5.mei
+            description: "Directives and cross-staff"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: dir6.mei
+            description: "Fermatas/directives vertical alignment"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: tempo1.mei 
+            description: "Rendering tempo elements"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: tempo2.mei 
+            description: "Formatting tempo elements"
+          - section: "Tempi and directives"
+            link: shared#sharedTextDirectives
+            file: tempo3.mei
+            description: "Tempo and beam interaction"
+          - section: "Annotations"
+            link: shared#sharedAnnotations
+            file: annot1.mei
+            description: "Support for annotations"
+          - section: "Text rendition"
+            link: shared#sharedTextRendition
+            file: color1.mei 
+            description: "Color example"
+          - section: "Text rendition"
+            link: shared#sharedTextRendition
+            file: color2.mei
+            description: "Color example (2)"
+          - section: "Text rendition"
+            link: shared#sharedTextRendition
+            file: color3.mei
+            description: "Colouring beams"
+          - section: "Text rendition"
+            link: shared#sharedTextRendition
+            file: color4.mei
+            description: "Colouring noteheads"
+          - section: "The Role of the Measure Element"
+            link: cmn#cmnMeasures
+            file: layer1.mei
+            description: "Autodetection of partial layer"
+          - section: "The Role of the Measure Element"
+            link: cmn#cmnMeasures
+            file: layer2.mei
+            description: "Collision between layers"
+          - section: "The Role of the Measure Element"
+            link: cmn#cmnMeasures
+            file: layer3.mei
+            description: "Shared accidentals between notes in separate layers"
+          - section: "The Role of the Measure Element"
+            link: cmn#cmnMeasures
+            file: layer4.mei
+            description: "Syllable width in alternating layers"
+          - section: "The Role of the Measure Element"
+            link: cmn#cmnMeasures
+            file: space.mei 
+            description: "Space example"
+          - section: "The Role of the Measure Element"
+            link: cmn#cmnMeasures
+            file: spacing.mei 
+            description: "Spacing example"
+          - section: "Defining Score Parameters for CMN"
+            link: cmn#cmnDefs
+            file: barlines.mei 
+            description: "Measure barline example"
+          - section: "Defining Score Parameters for CMN"
+            link: cmn#cmnDefs
+            file: barlines2.mei
+            description: "Measure barline example (2)"
+          - section: "Defining Score Parameters for CMN"
+            link: cmn#cmnDefs
+            file: measure-n.mei
+            description: "Measure numbers example"
+          - section: "Defining Score Parameters for CMN"
+            link: cmn#cmnDefs
+            file: score.mei 
+            description: "Score and barlines example"
+          - section: "Defining Score Parameters for CMN"
+            link: cmn#cmnDefs
+            file: score2.mei
+            description: "Spacing in pickup measures and first measures in system"
+          - section: "Defining Score Parameters for CMN"
+            link: cmn#cmnDefs
+            file: staff.mei
+            description: "Symbols centred con non-5-line staff"
+          - section: "Defining Score Parameters for CMN"
+            link: cmn#cmnDefs
+            file: time-sign.mei
+            description: "Support for invisible or one-number meter"
+          - section: "Redefinition of Score Parameters"
+            link: cmn#cmnReDef
+            file: clef-changes.mei 
+            description: "Clef change example"
+          - section: "Redefinition of Score Parameters"
+            link: cmn#cmnReDef
+            file: key-change.mei 
+            description: "Key changes example"
+          - section: "Redefinition of Score Parameters"
+            link: cmn#cmnReDef
+            file: scoredef-changes.mei 
+            description: "ScoreDef change example"
+          - section: "Redefinition of Score Parameters"
+            link: cmn#cmnReDef
+            file: scoredef-changes2.mei
+            description: "Clef changes at system break"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: accid2.mei
+            description: "Rendering accidentals"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: accid3.mei
+            description: "Alignment of editorial accidentals"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: accid4.mei
+            description: "Alignment of editorial accidentals"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: basics.mei
+            description: "Notes without stem"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: basics2.mei
+            description: "Notes without pname"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: chords.mei 
+            description: "Chord example"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: chords2.mei
+            description: "Chords Alignment and justification"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: chords3.mei
+            description: "Chords with notational features on individual notes"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: chords4.mei
+            description: "Accidental adjustment on chords"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: dots.mei
+            description: "Dot placement with various note duration"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: dots2.mei
+            description: "Dot placement with multiple layers"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: dots3.mei
+            description: "Dot and flag interaction"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: notes.mei
+            description: "Hidden notes"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: notes2.mei
+            description: "Pickup note spacing"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: notes3.mei
+            description: "Ledger line adjustment"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: notes4.mei
+            description: "Visual note values"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: size.mei
+            description: "Cue-sized notes"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: stem.mei
+            description: "Stem length adjustment"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: stem2.mei
+            description: "Stem direction"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: stem3.mei
+            description: "Stem length adjustment for bTrem slashes"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: stem4.mei
+            description: "Stem length adjustment for tuplets"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: stemless.mei
+            description: "Notes without stem (2)"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: stemless2.mei
+            description: "Notes without stem (3)"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: unison1.mei
+            description: "Note-head placement in unison (1)"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: unison2.mei
+            description: "Note-head placement in unison (2)"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: unison3.mei
+            description: "Accidental placement on unison"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: unison4.mei
+            description: "Dots merge when note-heads merge on unisons"
+          - section: "Notes, Chords and Rests in CMN"
+            link: cmn#cmnNotesChords
+            file: unison5.mei
+            description: "Accidental placement on unison (2)"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes.mei 
+            description: "Grace notes example"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes10.mei
+            description: "Grace note and clef interaction (2)"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes11.mei
+            description: "Slurred grace notes"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes12.mei
+            description: "Slashes on grace notes (2)"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes2.mei
+            description: "Slashes on grace notes"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes3.mei
+            description: "Cue-sized grace notes"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes4.mei
+            description: "Grace note interaction with spacing"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes5.mei
+            description: "Grace note chords"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes6.mei
+            description: "Grace note chords (2)"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes7.mei
+            description: "Grace note chords (3)"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes8.mei
+            description: "Grace note chords (4)"
+          - section: "Grace notes"
+            link: cmn#cmnNotesGrace
+            file: gracenotes9.mei
+            description: "Grace note and clef interaction"
+          - section: "Stem Modifications"
+            link: cmn#cmnNotesStems
+            file: cross-staff.mei 
+            description: "Cross-staff notation example"
+          - section: "Stem Modifications"
+            link: cmn#cmnNotesStems
+            file: cross-staff2.mei
+            description: "Lowest note in cross-staff chords"
+          - section: "Stem Modifications"
+            link: cmn#cmnNotesStems
+            file: cross-staff3.mei
+            description: "Accidentals in cross-staff chords"
+          - section: "Stem Modifications"
+            link: cmn#cmnNotesStems
+            file: cross-staff4.mei
+            description: "Cross-staff beams"
+          - section: "Stem Modifications"
+            link: cmn#cmnNotesStems
+            file: cross-staff5.mei
+            description: "Cross-staff layers"
+          - section: "Stem Modifications"
+            link: cmn#cmnNotesStems
+            file: cross-staff6.mei
+            description: "Non-adjacent seconds in cross staff chords"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests.mei 
+            description: "Rests and dotted rests"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests2.mei
+            description: "Rest placement"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests3.mei
+            description: "Vertical placement of rests"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests4.mei
+            description: "Note and rest collision between different layers"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests5.mei
+            description: "Vertical placement of rests (2)"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests6.mei
+            description: "Measure rest symbol"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests7.mei
+            description: "Vertical placement of rests (3)"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests8.mei
+            description: "Block in MultiRest"
+          - section: "Rests"
+            link: cmn#cmnRests
+            file: rests9.mei
+            description: "Vertical placement of rests (4)"
+          - section: "Beams"
+            link: cmn#cmnBeams
+            file: beam-breaks.mei 
+            description: "Beam break example"
+          - section: "Beams"
+            link: cmn#cmnBeams
+            file: beam2.mei
+            description: "Interaction grace note beams and regular beams"
+          - section: "Beams"
+            link: cmn#cmnBeams
+            file: beam3.mei
+            description: "Horizontal beams"
+          - section: "Beams"
+            link: cmn#cmnBeams
+            file: beam4.mei
+            description: "Adding space to beams"
+          - section: "Beams"
+            link: cmn#cmnBeams
+            file: beam5.mei
+            description: "Beams on staff lines"
+          - section: "Beams"
+            link: cmn#cmnBeams
+            file: beam6.mei
+            description: "Partial beams"
+          - section: "Beams"
+            link: cmn#cmnBeams
+            file: beam7.mei
+            description: "Beams and stem directions"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur1.mei
+            description: "Slur starting on staff line"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur2.mei
+            description: "Slurs on mixed stem directions"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur3.mei
+            description: "Slur and directives interactions"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur4.mei
+            description: "Portato rendering"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur5.mei
+            description: "Multiple slurs"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur6.mei
+            description: "Alignment of stem-side slurs"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur7.mei
+            description: "Slur angles"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: slur8.mei
+            description: "Slur and beam/stem direction"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: tie-chords1.mei 
+            description: "Ties on chords example"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: tie-chords2.mei 
+            description: "Ties on chords example (2)"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: tie-chords3.mei 
+            description: "Ties on chords example (3)"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: tie.mei 
+            description: "Tie example"
+          - section: "Ties, Slurs and Phrase Marks"
+            link: cmn#cmnSlurTies
+            file: tie2.mei
+            description: "Tied longa notes"
+          - section: "Dynamics in CMN"
+            link: cmn#cmnDynam
+            file: dynam1.mei 
+            description: "Dynamic example"
+          - section: "Dynamics in CMN"
+            link: cmn#cmnDynam
+            file: dynam2.mei 
+            description: "Dynamic example (2)"
+          - section: "Dynamics in CMN"
+            link: cmn#cmnDynam
+            file: dynam3.mei 
+            description: "Dynamic example with place"
+          - section: "Dynamics in CMN"
+            link: cmn#cmnDynam
+            file: dynam4.mei
+            description: "Scope and placement of dynamics"
+          - section: "Dynamics in CMN"
+            link: cmn#cmnDynam
+            file: hairpin1.mei 
+            description: "Hairpin example on multiple lines"
+          - section: "Dynamics in CMN"
+            link: cmn#cmnDynam
+            file: hairpin2.mei 
+            description: "Example with hairpin on several staves"
+          - section: "Dynamics in CMN"
+            link: cmn#cmnDynam
+            file: hairpin3.mei
+            description: "Hairpin example with various angles"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet.mei 
+            description: "Tuplet example"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet10.mei
+            description: "Nested tuplets"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet11.mei
+            description: "Space within tuplets"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet12.mei
+            description: "Staff spacing with tuplets"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet13.mei
+            description: "Tuplets on rests (1)"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet14.mei
+            description: "Tuplets on rests (2)"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet15.mei
+            description: "Nested tuplets"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet16.mei
+            description: "Tuplet options"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet2.mei
+            description: "Placement of tuplet brackets"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet3.mei
+            description: "Collision between tuplet bracket and staff"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet4.mei
+            description: "Tuplet bracket on whole notes"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet5.mei
+            description: "Tuplet bracket inside of beam"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet6.mei
+            description: "Tuplet number format"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tuplet8.mei
+            description: "Tuplets with stemless notes"
+          - section: "Tuplets"
+            link: cmn#cmnTuplets
+            file: tupletspan.mei 
+            description: "TupletSpan example"
+          - section: "Articulation and Performance Instructions in CMN"
+            link: cmn#cmnArtic
+            file: artic1.mei 
+            description: "Articulation example"
+          - section: "Articulation and Performance Instructions in CMN"
+            link: cmn#cmnArtic
+            file: artic2.mei 
+            description: "Articulation example (2)"
+          - section: "Articulation and Performance Instructions in CMN"
+            link: cmn#cmnArtic
+            file: artic3.mei
+            description: "Avoiding crowded articulations"
+          - section: "Articulation and Performance Instructions in CMN"
+            link: cmn#cmnArtic
+            file: artic4.mei
+            description: "Articulation and stave spacing interaction"
+          - section: "Articulation and Performance Instructions in CMN"
+            link: cmn#cmnArtic
+            file: artic5.mei
+            description: "Staccato dots in staff space"
+          - section: "Articulation and Performance Instructions in CMN"
+            link: cmn#cmnArtic
+            file: artic6.mei
+            description: "Avoiding collisions articulation/tuplets"
+          - section: "Arpeggio and Glissando"
+            link: cmn#cmnArpegGliss
+            file: gliss.mei
+            description: "Glissando"
+          - section: "Tremolandi"
+            link: cmn#cmnTrem
+            file: btrem.mei 
+            description: "Single-note (bowed) temolo example"
+          - section: "Tremolandi"
+            link: cmn#cmnTrem
+            file: ftrem.mei
+            description: "Two-note (fingered) temolo example"
+          - section: "Fermata"
+            link: cmn#cmnFermata
+            file: fermata1.mei 
+            description: "Fermata attribute example"
+          - section: "Fermata"
+            link: cmn#cmnFermata
+            file: fermata2.mei 
+            description: "Fermata element example"
+          - section: "Fermata"
+            link: cmn#cmnFermata
+            file: fermata3.mei
+            description: "Fermatas on whole measures in different layers"
+          - section: "Fermata"
+            link: cmn#cmnFermata
+            file: fermata4.mei
+            description: "Fermatas and slur interaction"
+          - section: "Fermata"
+            link: cmn#cmnFermata
+            file: fermata5.mei
+            description: "Fermatas and editorial accidentals interaction"
+          - section: "Fermata"
+            link: cmn#cmnFermata
+            file: fermata6.mei
+            description: "Fermata centred on rests and fermata heigt"
+          - section: "Octave shift"
+            link: cmn#cmnOctave
+            file: octave-shift1.mei 
+            description: "Octave shift example"
+          - section: "Octave shift"
+            link: cmn#cmnOctave
+            file: octave-shift2.mei 
+            description: "Octave shift example (below and with 'tstamp' attribute)"
+          - section: "Octave shift"
+            link: cmn#cmnOctave
+            file: octave-shift3.mei 
+            description: "Octave shift example (style)"
+          - section: "Breath marks"
+            link: cmn#cmnBreath
+            file: breath.mei
+            description: "Taking breath"
+          - section: "Piano pedal"
+            link: cmn#cmnPedal
+            file: piano-pedal.mei 
+            description: "Piano pedal example"
+          - section: "Piano pedal"
+            link: cmn#cmnPedal
+            file: piano-pedal2.mei 
+            description: "Piano pedal and measure rests"
+          - section: "Structural repetition"
+            link: cmn#cmnRepStruct
+            file: endings.mei 
+            description: "Ending example"
+          - section: "Structural repetition"
+            link: cmn#cmnRepStruct
+            file: endings2.mei
+            description: "Repeats and endings sections and expansion lists"
+          - section: "Structural repetition"
+            link: cmn#cmnRepStruct
+            file: endings3.mei
+            description: "Left/right repeats at line ends"
+          - section: "Measure-Level Repetition Symbols"
+            link: cmn#cmnRepSym
+            file: beatrpt1.mei 
+            description: "Beat repetition example (1)"
+          - section: "Measure-Level Repetition Symbols"
+            link: cmn#cmnRepSym
+            file: beatrpt2.mei 
+            description: "Beat repetition example (2)"
+          - section: "Measure-Level Repetition Symbols"
+            link: cmn#cmnRepSym
+            file: mrpt.mei 
+            description: "Measure repetition example (1)"
+          - section: "Measure-Level Repetition Symbols"
+            link: cmn#cmnRepSym
+            file: mrpt2.mei 
+            description: "Measure repetition example (2)"
+          - section: "Measure-Level Repetition Symbols"
+            link: cmn#cmnRepSym
+            file: multirpt.mei 
+            description: "Multi-measure repeat example"
+          - section: ""
+            link: mensural
+            file: mensural.mei 
+            description: "Mensural alignment example"
+          - section: ""
+            link: mensural
+            file: mensural2.mei
+            description: "Mensural rests"
+          - section: "Mordents"
+            link: cmnOrnaments#cmnOrnamentsMordents
+            file: mordent.mei
+            description: "Mordents example"
+          - section: "Mordents"
+            link: cmnOrnaments#cmnOrnamentsMordents
+            file: mordent2.mei
+            description: "Mordents example (2)"
+          - section: "Mordents"
+            link: cmnOrnaments#cmnOrnamentsMordents
+            file: mordent3.mei
+            description: "Mordents example (3)"
+          - section: "Trills"
+            link: cmnOrnaments#cmnOrnamentsTrills
+            file: trills.mei 
+            description: "Trills example"
+          - section: "Trills"
+            link: cmnOrnaments#cmnOrnamentsTrills
+            file: trills2.mei
+            description: "Trills example (2)"
+          - section: "Trills"
+            link: cmnOrnaments#cmnOrnamentsTrills
+            file: trills3.mei
+            description: "Trills example (3)"
+          - section: "Trills"
+            link: cmnOrnaments#cmnOrnamentsTrills
+            file: trills4.mei
+            description: "Trills example (4)"
+          - section: "Trills"
+            link: cmnOrnaments#cmnOrnamentsTrills
+            file: trills5.mei
+            description: "Ornament placement"
+          - section: "Turns"
+            link: cmnOrnaments#cmnOrnamentsTurns
+            file: turn1.mei
+            description: "Turns example"
+          - section: "Turns"
+            link: cmnOrnaments#cmnOrnamentsTurns
+            file: turn2.mei
+            description: "Turns example"
+          - section: ""
+            link: critApp
+            file: accid.mei
+            description: "Display of editorial accidentals"
+          - section: ""
+            link: critApp
+            file: accid5.mei
+            description: "Display of editorial accidentals (2)"
+          - section: ""
+            link: critApp
+            file: app-nested.mei 
+            description: "Critical apparatus example with nested elements"
+          - section: ""
+            link: critApp
+            file: app.mei 
+            description: "Critical apparatus example"
+          - section: ""
+            link: critApp
+            file: app2.mei
+            description: "Display of original and editorial clefs"
+          - section: ""
+            link: editTrans
+            file: choice.mei 
+            description: "Choice"
+          - section: ""
+            link: editTrans
+            file: editorial1.mei 
+            description: "Editorial markup example"
+          - section: ""
+            link: editTrans
+            file: editorial2.mei 
+            description: "Editorial markup (text) example"
+          - section: "Indications of harmony"
+            link: harmony#harmonyDetails
+            file: harm.mei 
+            description: "Harmony indications"
+          - section: "Indications of harmony"
+            link: harmony#harmonyDetails
+            file: harm2.mei
+            description: "Multiple harmonic analyses"
+          - section: "Indications of harmony"
+            link: harmony#harmonyDetails
+            file: harm3.mei
+            description: "Vertical offset and font kerning in harmony indications"
+          - section: "Indications of harmony"
+            link: harmony#harmonyDetails
+            file: harm4.mei
+            description: "Horizontal offset of harm indications"
+          - section: "Figured bass"
+            link: harmony#harmonyFigbass
+            file: fb1.mei
+            description: "Figured bass example (1)"
+          - section: "Figured bass"
+            link: harmony#harmonyFigbass
+            file: fb2.mei
+            description: "Figured bass example (2)"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics1.mei 
+            description: "Lyric example"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics10.mei
+            description: "Lyrics placement related to rhythmic values"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics2.mei 
+            description: "Multiple verse example"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics3.mei 
+            description: "Lyric connector example"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics4.mei 
+            description: "Lyrics styling example"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics5.mei
+            description: "Hyphen removal"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics6.mei
+            description: "Hyphen justification"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics7.mei
+            description: "Elision rendering"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics8.mei
+            description: "Line-break hyphenation"
+          - section: ""
+            link: lyricsDesc
+            file: lyrics9.mei
+            description: "Minimal space between words"
+          - section: ""
+            link: lyricsDesc
+            file: multilingual.mei 
+            description: "Multilingual"
     
     # Placeholder for custom file
     
