@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Grace note and clef interaction (2)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Grace notes align correctly with cautionary clefs on other staves.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000000250946586">
+                        <staffGrp xml:id="staffgrp-0000001606506541" symbol="brace" barthru="true">
+                            <staffDef xml:id="staffdef-0000002019828797" clef.shape="G" clef.line="2" key.sig="0" n="1" lines="5" />
+                            <staffDef xml:id="staffdef-0000002025678036" clef.shape="F" clef.line="4" key.sig="0" n="2" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000001356227289">
+                        <measure xml:id="measure-L5" n="10">
+                            <staff xml:id="staff-L5F3N1" n="1">
+                                <layer xml:id="layer-L5F3N1" n="1">
+                                    <note xml:id="note-L6F3" dur="4" oct="4" pname="c" stem.dir="up">
+                                        <accid xml:id="accid-L6F3" accid.ges="n" />
+                                    </note>
+                                    <rest xml:id="rest-L8F3" dur="8" />
+                                    <note xml:id="note-L9F3" dur="8" oct="4" pname="g" stem.dir="up">
+                                        <accid xml:id="accid-L9F3" accid.ges="n" />
+                                    </note>
+                                    <beam xml:id="beam-L10F3-L11F3">
+                                        <note xml:id="note-L10F3" dur="16" oct="4" pname="f" grace="unacc" stem.dir="up">
+                                            <accid xml:id="accid-L10F3" accid="s" />
+                                        </note>
+                                        <note xml:id="note-L11F3" dur="16" oct="4" pname="g" grace="unacc" stem.dir="up">
+                                            <accid xml:id="accid-L11F3" accid.ges="n" />
+                                        </note>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-L5F1N1" n="2">
+                                <layer xml:id="layer-L5F1N1" n="1">
+                                    <beam xml:id="beam-L6F1-L7F1">
+                                        <note xml:id="note-L6F1" dur="8" oct="3" pname="c" stem.dir="up">
+                                            <accid xml:id="accid-L6F1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L7F1" dur="8" oct="2" pname="g" stem.dir="up">
+                                            <accid xml:id="accid-L7F1" accid.ges="n" />
+                                        </note>
+                                    </beam>
+                                    <note xml:id="note-L8F1" dur="4" oct="2" pname="c" stem.dir="up">
+                                        <accid xml:id="accid-L8F1" accid.ges="n" />
+                                    </note>
+                                    <clef xml:id="clef-L12F1" shape="G" line="2" />
+                                </layer>
+                            </staff>
+                            <trill xml:id="trill-L9F3" staff="1" tstamp="2.500000" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

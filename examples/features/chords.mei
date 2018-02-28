@@ -8,14 +8,19 @@
                 <title>Chord example</title>
             </titleStmt>
             <pubStmt>
-                <respStmt>
-                    <corpName role="publisher">DDMAL</corpName>
-                </respStmt>
+                <date>2017-05-04</date>
             </pubStmt>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <notesStmt>
+                <annot>Verovio supports chords with a optimized placement of note-heads, dots and accidental. The chords in the example were chosen following the Steinberg accidental stacking comparison.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Grace note and clef interaction</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Grace notes do not collide with cautionary clefs.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000000523474533">
+                        <staffGrp xml:id="staffgrp-0000000946453167" symbol="brace" barthru="true">
+                            <staffDef xml:id="staffdef-0000001659860916" clef.shape="G" clef.line="2" key.sig="2s" meter.count="2" meter.unit="2" meter.sym="cut" n="1" lines="5" />
+                            <staffDef xml:id="staffdef-0000001202181059" clef.shape="F" clef.line="4" key.sig="2s" meter.count="2" meter.unit="2" meter.sym="cut" n="2" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000075200307">
+                        <measure xml:id="measure-L167" n="12">
+                            <staff xml:id="staff-L167F2N1" n="1">
+                                <layer xml:id="layer-L167F2N1" n="1">
+                                    <note xml:id="note-L168F2" dur="4" oct="5" pname="g">
+                                        <accid xml:id="accid-L168F2" accid="s" />
+                                    </note>
+                                    <note xml:id="note-L169F2" dur="8" oct="5" pname="a">
+                                        <accid xml:id="accid-L169F2" accid.ges="n" />
+                                    </note>
+                                    <rest xml:id="rest-L170F2" dur="8" />
+                                    <beam xml:id="beam-L172F2-L173F2">
+                                        <note xml:id="note-L172F2" dur="32" oct="4" pname="c" grace="unacc">
+                                            <accid xml:id="accid-L172F2" accid.ges="s" />
+                                        </note>
+                                        <note xml:id="note-L173F2" dur="32" oct="4" pname="d" grace="unacc">
+                                            <accid xml:id="accid-L173F2" accid.ges="n" />
+                                        </note>
+                                    </beam>
+                                    <note xml:id="note-L174F2" dur="4" oct="4" pname="e">
+                                        <accid xml:id="accid-L174F2" accid.ges="n" />
+                                    </note>
+                                    <beam xml:id="beam-L175F2-L178F2">
+                                        <note xml:id="note-L175F2" dur="16" oct="4" pname="d">
+                                            <accid xml:id="accid-L175F2" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L176F2" dur="16" oct="4" pname="c">
+                                            <accid xml:id="accid-L176F2" accid.ges="s" />
+                                        </note>
+                                        <note xml:id="note-L177F2" dur="16" oct="3" pname="b">
+                                            <accid xml:id="accid-L177F2" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L178F2" dur="16" oct="3" pname="a">
+                                            <accid xml:id="accid-L178F2" accid.ges="n" />
+                                        </note>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-L167F1N1" n="2">
+                                <layer xml:id="layer-L167F1N1" n="1">
+                                    <chord xml:id="chord-L168F1" dur="4">
+                                        <note xml:id="note-L168F1S1" oct="3" pname="a">
+                                            <accid xml:id="accid-L168F1S1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L168F1S2" oct="4" pname="d">
+                                            <accid xml:id="accid-L168F1S2" accid.ges="n" />
+                                        </note>
+                                    </chord>
+                                    <chord xml:id="chord-L169F1" dur="8">
+                                        <note xml:id="note-L169F1S1" oct="3" pname="a">
+                                            <accid xml:id="accid-L169F1S1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L169F1S2" oct="4" pname="c">
+                                            <accid xml:id="accid-L169F1S2" accid.ges="s" />
+                                        </note>
+                                    </chord>
+                                    <rest xml:id="rest-L170F1" dur="8" />
+                                    <clef xml:id="clef-L171F1" shape="F" line="4" />
+                                    <beam xml:id="beam-L172F1-L173F1">
+                                        <note xml:id="note-L172F1" dur="32" oct="3" pname="c" grace="unacc">
+                                            <accid xml:id="accid-L172F1" accid.ges="s" />
+                                        </note>
+                                        <note xml:id="note-L173F1" dur="32" oct="3" pname="d" grace="unacc">
+                                            <accid xml:id="accid-L173F1" accid.ges="n" />
+                                        </note>
+                                    </beam>
+                                    <note xml:id="note-L174F1" dur="4" oct="3" pname="e">
+                                        <accid xml:id="accid-L174F1" accid.ges="n" />
+                                    </note>
+                                    <beam xml:id="beam-L175F1-L178F1">
+                                        <note xml:id="note-L175F1" dur="16" oct="3" pname="d">
+                                            <accid xml:id="accid-L175F1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L176F1" dur="16" oct="3" pname="c">
+                                            <accid xml:id="accid-L176F1" accid.ges="s" />
+                                        </note>
+                                        <note xml:id="note-L177F1" dur="16" oct="2" pname="b">
+                                            <accid xml:id="accid-L177F1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L178F1" dur="16" oct="2" pname="a">
+                                            <accid xml:id="accid-L178F1" accid.ges="n" />
+                                        </note>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <slur xml:id="slur-L168F2-L169F2N1" staff="1" startid="#note-L168F2" endid="#note-L169F2" />
+                            <dynam xml:id="dynam-0000000228271873" staff="1" tstamp="2.000000">f</dynam>
+                            <tie xml:id="tie-L168F1S1-L169F1S1" startid="#note-L168F1S1" endid="#note-L169F1S1" />
+                            <slur xml:id="slur-L168F1-L169F1N1" staff="2" startid="#chord-L168F1" endid="#chord-L169F1" curvedir="above" />
+                            <slur xml:id="slur-L172F1-L174F1N1" staff="2" startid="#note-L172F1" endid="#note-L174F1" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

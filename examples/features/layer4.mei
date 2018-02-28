@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Syllable width in alternating layers</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-07-28</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>In spacing lyrics, Verovio takes into account the width of syllables present in other, alternating layers.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef>
+            <staffGrp>
+              <staffDef clef.shape="F" clef.line="4" n="1" lines="5" />
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure>
+              <staff n="1">
+                <layer n="1">
+                  <note dur="4" oct="3" pname="a" stem.dir="up" />
+                  <note dur="4" oct="3" pname="c" stem.dir="up">
+                    <verse n="1">
+                      <syl>humm</syl>
+                    </verse>
+                  </note>
+                  <note dur="4" oct="3" pname="f" stem.dir="up">
+                    <verse n="1">
+                      <syl>humm</syl>
+                    </verse>
+                  </note>
+                  <rest dur="4" />
+                </layer>
+                <layer n="2">
+                  <note dur="4" oct="3" pname="f" stem.dir="down">
+                    <verse n="1">
+                      <syl>humm</syl>
+                    </verse>
+                  </note>
+                  <rest dur="2" />
+                  <note dur="4" oct="3" pname="c" stem.dir="down">
+                    <verse n="1">
+                      <syl>humm</syl>
+                    </verse>
+                  </note>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

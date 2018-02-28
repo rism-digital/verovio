@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei meiversion="3.0.0" xmlns="http://www.music-encoding.org/ns/mei"    xmlns:xlink="http://www.w3.org/1999/xlink">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Ornament placement</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Trills and other ornaments are correctly placed in presence of other notational elements.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+  </meiHead>
+  <music xml:id="m-22">
+    <body xml:id="m-23">
+      <mdiv xml:id="m-24">
+        <score xml:id="m-25">
+          <scoreDef xml:id="m-26" meter.count="2" meter.unit="4" ppq="256">
+            <staffGrp xml:id="m-27">
+              <staffGrp xml:id="m-34" n="1" symbol="brace">
+                <staffDef xml:id="m-28" clef.line="2" clef.shape="G"                                    key.mode="major" key.sig="2f" label="" lines="5" n="1">
+                </staffDef>
+                <staffDef xml:id="m-31" clef.line="4" clef.shape="F"                                    key.mode="major" key.sig="2f" label="" lines="5" n="2"                                >
+                </staffDef>
+              </staffGrp>
+            </staffGrp>
+          </scoreDef>
+          <section xml:id="m-35">
+            <measure xml:id="m-69" n="2">
+              <staff xml:id="m-70" n="1">
+                <layer xml:id="m-71" n="1">
+                  <beam xml:id="m-74">
+                    <note xml:id="m-72" dur="8" dur.ges="128p" oct="4" pname="b"                                            pnum="70" stem.dir="down">
+                      <accid xml:id="m-73" accid.ges="f"/>
+                    </note>
+                    <note xml:id="m-75" dur="8" dur.ges="128p" oct="5" pname="b"                                            pnum="82" stem.dir="down">
+                      <accid xml:id="m-76" accid.ges="f"/>
+                    </note>
+                  </beam>
+                  <beam xml:id="m-79">
+                    <note xml:id="m-77" dots="1" dur="8" dur.ges="192p" oct="5"                                            pname="a" pnum="80" stem.dir="down">
+                      <accid xml:id="m-78" accid="f"/>
+                    </note>
+                    <note xml:id="m-80" dur="32" dur.ges="32p" oct="5" pname="g"                                            pnum="79" stem.dir="down"/>
+                    <note xml:id="m-81" dur="32" dur.ges="32p" oct="5" pname="f"                                            pnum="78" stem.dir="down">
+                      <accid xml:id="m-82" accid="s"/>
+                    </note>
+                  </beam>
+                </layer>
+              </staff>
+              <staff xml:id="m-85" n="2">
+                <layer xml:id="m-86" n="1">
+                  <chord xml:id="m-87" dur="8" dur.ges="128p" stem.dir="down">
+                    <note xml:id="m-88" dur="8" dur.ges="128p" oct="3" pname="g"                                            pnum="55"/>
+                    <note xml:id="m-89" dur="8" dur.ges="128p" oct="4" pname="d"                                            pnum="62"/>
+                  </chord>
+                  <rest xml:id="m-90" dur="8" dur.ges="128p"/>
+                  <chord xml:id="m-91" dur="4" dur.ges="256p" stem.dir="down">
+                    <note xml:id="m-92" dur="4" dur.ges="256p" oct="3" pname="d"                                            pnum="50"/>
+                    <note xml:id="m-93" dur="4" dur.ges="256p" oct="3" pname="b"                                            pnum="58">
+                      <accid xml:id="m-94" accid.ges="f"/>
+                    </note>
+                  </chord>
+                </layer>
+              </staff>
+              <turn xml:id="m-83" form="norm" layer="1" staff="1" startid="#m-72"/>
+              <trill xml:id="m-84" ho="0.1562mm" layer="1" staff="1" startid="#m-77"/>
+            </measure>
+            <measure xml:id="m-169" n="2">
+              <staff xml:id="m-170" n="1">
+                <layer xml:id="m-171" n="1">
+                  <note xml:id="m-172" dur="8" dur.ges="128p" oct="4" pname="b"                                            pnum="70" stem.dir="down">
+                    <accid xml:id="m-173" accid.ges="f"/>
+                  </note>
+                  <note xml:id="m-175" dur="8" dur.ges="128p" oct="5" pname="b"                                            pnum="82" stem.dir="down">
+                    <accid xml:id="m-176" accid.ges="f"/>
+                  </note>
+                  <beam xml:id="m-179">
+                    <note xml:id="m-177" dots="1" dur="8" dur.ges="192p" oct="5"                                            pname="a" pnum="80" stem.dir="down">
+                    </note>
+                    <note xml:id="m-180" dur="32" dur.ges="32p" oct="5" pname="g"                                            pnum="79" stem.dir="down"/>
+                    <note xml:id="m-181" dur="32" dur.ges="32p" oct="5" pname="f"                                            pnum="78" stem.dir="down">
+                      <accid xml:id="m-182" accid="s"/>
+                    </note>
+                  </beam>
+                </layer>
+              </staff>
+              <staff xml:id="m-185" n="2">
+                <layer xml:id="m-186" n="1">
+                  <chord xml:id="m-187" dur="8" dur.ges="128p" stem.dir="down">
+                    <note xml:id="m-188" dur="8" dur.ges="128p" oct="3" pname="g"                                            pnum="55"/>
+                    <note xml:id="m-189" dur="8" dur.ges="128p" oct="4" pname="d"                                            pnum="62"/>
+                  </chord>
+                  <rest xml:id="m-190" dur="8" dur.ges="128p"/>
+                  <chord xml:id="m-191" dur="4" dur.ges="256p" stem.dir="down">
+                    <note xml:id="m-192" dur="4" dur.ges="256p" oct="3" pname="d"                                            pnum="50"/>
+                    <note xml:id="m-193" dur="4" dur.ges="256p" oct="3" pname="b"                                            pnum="58">
+                      <accid xml:id="m-194" accid.ges="f"/>
+                    </note>
+                  </chord>
+                </layer>
+              </staff>
+              <turn xml:id="m-183" form="norm" layer="1" staff="1" startid="#m-172"/>
+              <trill xml:id="m-184" ho="0.1562mm" layer="1" staff="1" startid="#m-177"/>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

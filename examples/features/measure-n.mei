@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Measure numbers example</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio automatically renders measure numbers as encoded in the "n" attribute of the "measure" element.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000000593602135">
+                        <staffGrp xml:id="staffgrp-0000001824208189">
+                            <staffDef xml:id="staffdef-0000000813423728" n="1" clef.shape="G" clef.line="2" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000825956962">
+                        <measure xml:id="measure-L2" n="1" type="m-1">
+                            <staff xml:id="staff-L2F1N1" n="1">
+                                <layer xml:id="layer-L2F1N1" n="1">
+                                    <note xml:id="note-L3F1" dur="1" oct="4" pname="c">
+                                        <accid xml:id="accid-L3F1" accid.ges="n" />
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L4" n="2" right="end" type="m-2">
+                            <staff xml:id="staff-L4F1N1" n="1">
+                                <layer xml:id="layer-L4F1N1" n="1">
+                                    <note xml:id="note-L5F1" dur="1" oct="4" pname="d">
+                                        <accid xml:id="accid-L5F1" accid.ges="n" />
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
