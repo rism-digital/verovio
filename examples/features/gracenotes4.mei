@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Grace note interaction with spacing</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Grace notes usually do not affect the spacing on other staves.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp symbol="brace" barthru="true">
+                            <staffDef clef.shape="F" clef.line="4" n="1" lines="5" />
+                            <staffDef clef.shape="G" clef.line="2" n="2" lines="5" />
+                            <staffDef clef.shape="F" clef.line="4" n="3" lines="5" />
+                            <staffDef clef.shape="G" clef.line="2" n="4" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <beam>
+                                        <tuplet num="6" numbase="4" bracket.visible="false" num.format="count">
+                                            <note dur="16" oct="3" pname="c">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="3" pname="c">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="3" pname="c">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="8" oct="3" pname="c">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="3" pname="c">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                        </tuplet>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <beam>
+                                        <note dur="8" oct="4" dots="1" pname="a">
+                                            <accid accid.ges="n" />
+                                        </note>
+                                        <note dur="16" oct="4" pname="b">
+                                        </note>
+                                        <beam>
+                                            <note dur="16" oct="4" pname="g" grace="unacc">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="4" pname="a" grace="unacc">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="4" pname="g" grace="unacc">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="4" pname="a" grace="unacc">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="4" pname="g" grace="unacc">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="4" pname="a" grace="unacc">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="4" pname="g" grace="unacc">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="4" pname="a" grace="unacc">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                        </beam>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <beam>
+                                        <tuplet num="6" numbase="4" bracket.visible="false" num.format="count">
+                                            <note dur="8" oct="3" pname="c">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <beam>
+                                                <note dur="8" oct="3" pname="c" grace="unacc">
+                                                    <accid accid.ges="n" />
+                                                </note>
+                                                <note dur="8" oct="2" pname="b" grace="unacc">
+                                                    <accid accid.ges="n" />
+                                                </note>
+                                                <note dur="8" oct="3" pname="c" grace="unacc">
+                                                    <accid accid.ges="n" />
+                                                </note>
+                                                <note dur="8" oct="2" pname="b" grace="unacc">
+                                                    <accid accid.ges="n" />
+                                                </note>
+                                            </beam>
+                                            <note dur="16" oct="3" pname="c">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="8" oct="3" pname="c">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="3" pname="c">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                        </tuplet>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="4">
+                                <layer n="1">
+                                    <beam>
+                                        <note dur="8" oct="4" dots="1" pname="a">
+                                            <accid accid.ges="n" />
+                                        </note>
+                                        <beam>
+                                            <note dur="16" oct="4" pname="g" grace="unacc">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="4" pname="a" grace="unacc">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="4" pname="g" grace="unacc">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="4" pname="a" grace="unacc">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="4" pname="g" grace="unacc">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                            <note dur="16" oct="4" pname="a" grace="unacc">
+                                                <accid accid.ges="n" />
+                                            </note>
+                                        </beam>
+                                        <note dur="16" oct="4" pname="b">
+                                            <accid accid="n" enclose="brack" />
+                                        </note>
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

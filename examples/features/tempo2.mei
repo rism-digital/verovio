@@ -5,13 +5,22 @@
     <meiHead>
         <fileDesc>
             <titleStmt>
-                <title>Hairpin example on multiple lines</title>
+                <title>Formatting tempo elements</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-04</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>By default, tempi indications are rendered in bold. This can be modified by including a "rend" element in the text. It is also possible to have nested "rend" elements.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

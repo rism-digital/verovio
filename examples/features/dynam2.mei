@@ -5,13 +5,22 @@
     <meiHead>
         <fileDesc>
             <titleStmt>
-                <title>Dynamic example</title>
+                <title>Dynamic example (2)</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-04</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Dynamics for which the text does not correspond to a SMuFL code are rendered in italic. The text is then left-aligned.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

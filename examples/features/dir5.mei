@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Directives and cross-staff</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Performing directives take into account cross-staff notation.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+   </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000004975186">
+                        <staffGrp xml:id="m-000000194549189" symbol="brace" barthru="true">
+                            <staffDef xml:id="staffdef-000000066788070" clef.shape="G" clef.line="2" n="1" lines="5" />
+                            <staffDef xml:id="staffdef-000000202535746" clef.shape="F" clef.line="4" n="2" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000104681998">
+                        <measure xml:id="measure-L3" n="1">
+                            <staff xml:id="staff-L3F2" n="1">
+                                <layer xml:id="layer-L3F2" n="1">
+                                    <note xml:id="note-L5F2" dur="4" oct="5" pname="d" accid.ges="n" stem.dir="up" />
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-L3F1" n="2">
+                                <layer xml:id="layer-L3F1" n="1">
+                                    <chord xml:id="chord-L5F1" dur="4">
+                                        <note xml:id="note-L5F1S1" oct="3" pname="b" accid.ges="n" />
+                                        <note xml:id="note-L5F1S2" staff="1" oct="4" pname="d" accid.ges="n" />
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <dir xml:id="dir-000000032097156" place="below" staff="2" tstamp="1.000000">legato</dir>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

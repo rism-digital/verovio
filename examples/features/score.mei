@@ -7,11 +7,20 @@
             <titleStmt>
                 <title>Score and barlines example</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports the score parameters defined in the "scoreDef", "staffGrp" and "staffDef" elements with some of their attributes. Verovio also supports various types of barline for the "measure" elements. It also supports the "scale" attribute on the "staffDef" element.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

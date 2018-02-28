@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Hairpin example with different widths</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Short hairpin ends are not as wide as the ends of long hairpins.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000201540999">
+                        <staffGrp xml:id="m-000000150502018">
+                            <staffDef xml:id="staffdef-000000183058674" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000015777043">
+                        <measure xml:id="measure-L3" n="1">
+                            <staff xml:id="staff-L3F1" n="1">
+                                <layer xml:id="layer-L3F1" n="1">
+                                    <note xml:id="note-L4F1" dur="1" oct="4" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <hairpin xml:id="hairpin-000000110600477" staff="1" tstamp="1.000000" tstamp2="1m+1.0" form="cres" />
+                        </measure>
+                        <measure xml:id="measure-L5" n="2">
+                            <staff xml:id="staff-L5F1" n="1">
+                                <layer xml:id="layer-L5F1" n="1">
+                                    <note xml:id="note-L6F1" dur="1" oct="4" pname="d" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L7" n="3">
+                            <staff xml:id="staff-L7F1" n="1">
+                                <layer xml:id="layer-L7F1" n="1">
+                                    <beam xml:id="beam-000000181289448">
+                                        <note xml:id="note-L8F1" dur="8" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L9F1" dur="8" oct="4" pname="f" accid.ges="n" />
+                                    </beam>
+                                    <space xml:id="space-L10F1" dots="1" dur="2" />
+                                </layer>
+                            </staff>
+                            <hairpin xml:id="hairpin-000000192494598" staff="1" tstamp="1.000000" tstamp2="0m+1.5" form="cres" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

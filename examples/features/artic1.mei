@@ -7,11 +7,20 @@
             <titleStmt>
                 <title>Articulation example</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-03</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports both "artic" attribute on notes and "artic" element for encoding articulations. Currently, the articulation values supported are: acc, stacc, ten, stacciss, marc, marc-stacc, spicc, ten-stacc, dnbow, upbow, harm.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

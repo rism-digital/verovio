@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Fermatas/directives vertical alignment</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-07-28</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Fermatas are placed nearer to the note than directives.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000001593646911" midi.bpm="400">
+                        <staffGrp xml:id="staffgrp-0000000199167088">
+                            <staffDef xml:id="staffdef-0000001216164164" clef.shape="G" clef.line="2" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000346937772">
+                        <measure xml:id="measure-L1" n="0">
+                            <staff xml:id="staff-0000001251545435" n="1">
+                                <layer xml:id="layer-L1F1N1" n="1">
+                                    <note xml:id="note-L3F1" dur="2" oct="5" pname="a" accid.ges="n" />
+                                    <note xml:id="note-L4F1" dur="2" oct="5" pname="b" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <dir xml:id="dir-L3F1" place="above" staff="1" tstamp="1.000000">
+                                <rend xml:id="rend-0000001080045944" fontstyle="normal">some long text</rend>
+                            </dir>
+                            <fermata xml:id="fermata-L4F1" staff="1" tstamp="3.000000" place="above" />
+                        </measure>
+                        <measure xml:id="measure-L5" right="end">
+                            <staff xml:id="staff-L5F1N1" n="1">
+                                <layer xml:id="layer-L5F1N1" n="1">
+                                    <note xml:id="note-L7F1" dur="1" oct="3" pname="b" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <fermata xml:id="fermata-L7F1" staff="1" tstamp="1.000000" place="below" />
+                            <dir xml:id="dir-L7F1" place="below" staff="1" tstamp="1.000000">
+                                <rend xml:id="rend-0000001906023452" fontstyle="normal">text</rend>
+                            </dir>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

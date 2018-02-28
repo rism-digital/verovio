@@ -7,11 +7,20 @@
         <titleStmt>
             <title>Fermata attribute example</title>
         </titleStmt>
-        <pubStmt/>
-        <seriesStmt>
-            <title>Verovio feature examples</title>
-        </seriesStmt>
-    </fileDesc>
+            <pubStmt>
+                <date>2017-05-04</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports the fermata attribute on chord, note, and rest elements.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
 </meiHead>
     <music>
         <body>

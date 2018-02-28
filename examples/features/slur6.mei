@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Alignment of stem-side slurs</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-04-25</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio aligns stem-side slurs to the note stem, and note-side slurs to the centre of the notehead.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000176424965">
+                        <staffGrp xml:id="m-000000113087431" symbol="brace">
+                            <staffDef xml:id="staffdef-000000137435306" clef.shape="G" clef.line="2" meter.count="3" meter.unit="4" n="1" lines="5" />
+                            <staffDef xml:id="staffdef-000000041780590" clef.shape="F" clef.line="4" meter.count="3" meter.unit="4" n="2" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="measure-000000193975287" n="0">
+                            <staff xml:id="staff-000000074086866" n="1">
+                                <!-- kern: **kern  *clefG2  *M3/4  *^  !LO:TX:a:t=ten.  4r  8r  (8f# 8aL  8g 8bn  8a 8ccJ)  = -->
+                                <layer xml:id="layer-000000066945054" n="1">
+                                    <rest xml:id="rest-000000078843276" dur="4" />
+                                    <rest xml:id="rest-000000086871002" dur="8" />
+                                    <beam xml:id="beam-000000181552425">
+                                        <chord xml:id="chord-000000206849720" dur="8">
+                                            <note xml:id="note-000000176731402" accid="s" oct="4" pname="f" />
+                                            <note xml:id="note-000000140053013" oct="4" pname="a" accid.ges="n" />
+                                        </chord>
+                                        <chord xml:id="chord-000000136088704" dur="8">
+                                            <note xml:id="note-000000172779199" oct="4" pname="g" accid.ges="n" />
+                                            <note xml:id="note-000000072615161" accid="n" oct="4" pname="b" />
+                                        </chord>
+                                        <chord xml:id="chord-000000028066101" dur="8">
+                                            <note xml:id="note-000000119564071" oct="4" pname="a" accid.ges="n" />
+                                            <note xml:id="note-000000112899521" oct="5" pname="c" accid.ges="n" />
+                                        </chord>
+                                    </beam>
+                                </layer>
+                                <!-- kern: 2.dz  = -->
+                                <layer xml:id="layer-000000200031568" n="2">
+                                    <note xml:id="note-000000044913997" dots="1" dur="2" oct="4" pname="d" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <dir xml:id="dir-000000121531213" place="above" staff="1" tstamp="1.000000">ten.</dir>
+                            <dynam xml:id="dynam-000000014167375" staff="1" tstamp="2.500000">pp</dynam>
+                            <slur xml:id="slur-000000200462448" staff="1" startid="#chord-000000206849720" endid="#chord-000000028066101" />
+                            <dynam xml:id="dynam-000000029054062" staff="1" tstamp="1.000000">sf</dynam>
+                            <staff xml:id="staff-000000111786009" n="2">
+                                <!-- kern: **kern  *clefF4  *M3/4  *^  4r  8r  (8cnL  8B  8AJ)  *v  = -->
+                                <layer xml:id="layer-000000168758867" n="1">
+                                    <rest xml:id="rest-000000148631798" dur="4" />
+                                    <rest xml:id="rest-000000101665921" dur="8" />
+                                    <beam xml:id="beam-000000161159820">
+                                        <note xml:id="note-000000206720824" dur="8" accid="n" oct="4" pname="c" />
+                                        <note xml:id="note-000000157849893" dur="8" oct="3" pname="b" accid.ges="n" />
+                                        <note xml:id="note-000000196610915" dur="8" oct="3" pname="a" accid.ges="n" />
+                                    </beam>
+                                </layer>
+                                <!-- kern: DDq/  2.Dzy  *v -->
+                                <layer xml:id="layer-000000078424344" n="2">
+                                    <note xml:id="note-000000167240486" dur="8" oct="2" pname="d" accid.ges="n" grace="acc" stem.dir="up" />
+                                    <note xml:id="note-000000184254369" dots="1" dur="2" oct="3" pname="d" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <slur xml:id="slur-000000106567488" staff="2" startid="#note-000000206720824" endid="#note-000000196610915" />
+                        </measure>
+                        <measure xml:id="measure-000000091774254">
+                            <staff xml:id="staff-000000190703126" n="1">
+                                <!-- kern: =  (8bL  8ccJ  4dd)  4g  8gq  *v  = -->
+                                <layer xml:id="layer-000000028095534" n="1">
+                                    <beam xml:id="beam-000000184742730">
+                                        <note xml:id="note-000000139221403" dur="8" oct="4" pname="b" accid.ges="n" />
+                                        <note xml:id="note-000000210698579" dur="8" oct="5" pname="c" accid.ges="n" />
+                                    </beam>
+                                    <note xml:id="note-000000010490072" dur="4" oct="5" pname="d" accid.ges="n" />
+                                    <note xml:id="note-000000157996364" dur="4" oct="4" pname="g" accid.ges="n" />
+                                    <note xml:id="note-000000081375358" dur="8" oct="4" pname="g" accid.ges="n" grace="acc" />
+                                </layer>
+                                <!-- kern: =  2fn  4ryy  *v -->
+                                <layer xml:id="layer-000000158068942" n="2">
+                                    <note xml:id="note-000000012688490" dur="2" accid="n" oct="4" pname="f" />
+                                    <space xml:id="space-000000010330325" dur="4" />
+                                </layer>
+                            </staff>
+                            <slur xml:id="slur-000000212994495" staff="1" startid="#note-000000139221403" endid="#note-000000010490072" />
+                            <staff xml:id="staff-000000105093597" n="2">
+                                <!-- kern: =  !LO:TX:a:t=riten.  (8dL  8AJ  4B)  (8AL  8GJ)  = -->
+                                <layer xml:id="layer-000000002791844" n="1">
+                                    <beam xml:id="beam-000000107383645">
+                                        <note xml:id="note-000000051672979" dur="8" oct="4" pname="d" accid.ges="n" />
+                                        <note xml:id="note-000000161052493" dur="8" oct="3" pname="a" accid.ges="n" />
+                                    </beam>
+                                    <note xml:id="note-000000120866214" dur="4" oct="3" pname="b" accid.ges="n" />
+                                    <beam xml:id="beam-000000193831723">
+                                        <note xml:id="note-000000211839453" dur="8" oct="3" pname="a" accid.ges="n" />
+                                        <note xml:id="note-000000072548209" dur="8" oct="3" pname="g" accid.ges="n" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <dir xml:id="dir-000000025382971" place="above" staff="2" tstamp="1.000000">riten.</dir>
+                            <slur xml:id="slur-000000093682042" staff="2" startid="#note-000000051672979" endid="#note-000000120866214" />
+                            <slur xml:id="slur-000000191294026" staff="2" startid="#note-000000211839453" endid="#note-000000072548209" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

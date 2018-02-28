@@ -7,8 +7,20 @@
             <titleStmt>
                 <title>Octave shift example</title>
             </titleStmt>
-            <pubStmt/>
+            <pubStmt>
+                <date>2017-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports the "octave" element for octave shifts. For correct MIDI output, the "oct.ges" attribute needs to be provided.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

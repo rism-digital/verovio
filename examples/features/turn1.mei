@@ -7,11 +7,20 @@
             <titleStmt>
                 <title>Turns example</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports <turn> elements with several attributes. Like trills, turns are placed above the staff by default.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>
@@ -22,7 +31,7 @@
                             <staffDef clef.shape="G" clef.line="2" n="1" key.mode="major" key.pname="f" lines="5"/>
                         </staffGrp>
                     </scoreDef>
-                    <section label="feature-example">
+                    <section>
                         <measure n="1">
                             <staff n="1">
                                 <layer n="1">

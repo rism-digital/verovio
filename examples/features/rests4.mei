@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Note and rest collision between different layers</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>When a rest occurs at the same time as a note in two different layers, Verovio moves the rest vertically to avoid the note.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000001345158322">
+                        <staffGrp xml:id="staffgrp-0000000640251317">
+                            <staffDef xml:id="staffdef-0000001810813349" n="1" clef.shape="G" clef.line="2" meter.count="6" meter.unit="8" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000812292128">
+                        <measure xml:id="measure-L1" n="0">
+                            <staff xml:id="staff-0000000528776225" n="1">
+                                <layer xml:id="layer-L1F1N1" n="1">
+                                    <rest xml:id="rest-L4F1" dots="1" dur="4" />
+                                    <note xml:id="note-L5F1" dots="1" dur="4" oct="5" pname="e">
+                                        <accid xml:id="accid-L5F1" accid.ges="n" />
+                                    </note>
+                                </layer>
+                                <layer xml:id="layer-L4F2N2" n="2">
+                                    <note xml:id="note-L4F2" dots="1" dur="4" oct="4" pname="f">
+                                        <accid xml:id="accid-L4F2" accid.ges="n" />
+                                    </note>
+                                    <note xml:id="note-L5F2" dots="1" dur="4" oct="4" pname="e">
+                                        <accid xml:id="accid-L5F2" accid.ges="n" />
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L6">
+                            <staff xml:id="staff-L6F1N1" n="1">
+                                <layer xml:id="layer-L6F1N1" n="1">
+                                    <rest xml:id="rest-L7F1" dur="4" />
+                                    <rest xml:id="rest-L8F1" dur="8" />
+                                    <note xml:id="note-L9F1" dots="1" dur="4" oct="5" pname="e">
+                                        <accid xml:id="accid-L9F1" accid.ges="n" />
+                                    </note>
+                                </layer>
+                                <layer xml:id="layer-L6F2N2" n="2">
+                                    <note xml:id="note-L7F2" dots="1" dur="4" oct="5" pname="f">
+                                        <accid xml:id="accid-L7F2" accid.ges="n" />
+                                    </note>
+                                    <note xml:id="note-L9F2" dots="1" dur="4" oct="4" pname="e">
+                                        <accid xml:id="accid-L9F2" accid.ges="n" />
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

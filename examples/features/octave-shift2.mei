@@ -7,11 +7,20 @@
             <titleStmt>
                 <title>Octave shift example (below and with @tstamp)</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>For ottava bassa displacements the "place" attribute has to have the value "below". The quindicesima displacement is also supported. The scope of the octave shift can be specified either with "startid / endid" or with "tstamp / tstamp2" attributes.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

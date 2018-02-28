@@ -7,11 +7,20 @@
             <titleStmt>
                 <title>Key changes example</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio takes into account the "key.sig.showchange" and "key.sig.show" attributes which are assumed to be respectively false and true if not specified. It also shows cautionary key and time signatures at the end of a system when necessary.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
     <body>

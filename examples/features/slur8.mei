@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Slur and beam/stem direction</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-07-28</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>The slur direction is independent of the forced direction of the beams or stems.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000000018764039">
+                        <staffGrp xml:id="staffgrp-0000000634101773">
+                            <staffDef xml:id="staffdef-0000000626972708" clef.shape="G" clef.line="2" key.sig="3s" meter.count="6" meter.unit="8" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000001986380150">
+                        <measure xml:id="measure-L1" n="0" type="m-0">
+                            <staff xml:id="staff-0000000734403237" n="1">
+                                <layer xml:id="layer-L1F1N1" n="1">
+                                    <beam xml:id="beam-L5F1-L7F1">
+                                        <note xml:id="note-L5F1" dur="8" oct="4" pname="f" accid.ges="s" />
+                                        <note xml:id="note-L6F1" dur="8" oct="5" pname="c" accid.ges="s" />
+                                        <note xml:id="note-L7F1" dur="8" oct="4" pname="a" accid.ges="n">
+                                            <artic xml:id="artic-L7F1" artic="stacc" />
+                                        </note>
+                                    </beam>
+                                    <beam xml:id="beam-L8F1-L10F1">
+                                        <note xml:id="note-L8F1" dur="8" oct="4" pname="f" stem.dir="down" accid.ges="s" />
+                                        <note xml:id="note-L9F1" dur="8" oct="5" pname="c" stem.dir="down" accid.ges="s" />
+                                        <note xml:id="note-L10F1" dur="8" oct="4" pname="a" stem.dir="down" accid.ges="n">
+                                            <artic xml:id="artic-L10F1" artic="stacc" />
+                                        </note>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <slur xml:id="slur-L5F1-L6F1N1" staff="1" startid="#note-L5F1" endid="#note-L6F1" />
+                            <slur xml:id="slur-L8F1-L9F1N1" staff="1" startid="#note-L8F1" endid="#note-L9F1" />
+                        </measure>
+                        <measure xml:id="measure-L11" n="2" type="m-2">
+                            <staff xml:id="staff-L11F1N1" n="1">
+                                <layer xml:id="layer-L11F1N1" n="1">
+                                    <beam xml:id="beam-L12F1-L14F1">
+                                        <note xml:id="note-L12F1" dur="8" oct="4" pname="f" stem.dir="up" accid.ges="s" />
+                                        <note xml:id="note-L13F1" dur="8" oct="5" pname="c" stem.dir="up" accid.ges="s" />
+                                        <note xml:id="note-L14F1" dur="8" oct="4" pname="a" stem.dir="up" accid.ges="n">
+                                            <artic xml:id="artic-L14F1" artic="stacc" />
+                                        </note>
+                                    </beam>
+                                    <beam xml:id="beam-L15F1-L17F1">
+                                        <note xml:id="note-L15F1" dur="8" oct="4" pname="f" stem.dir="down" accid.ges="s" />
+                                        <note xml:id="note-L16F1" dur="8" oct="5" pname="c" stem.dir="down" accid.ges="s" />
+                                        <note xml:id="note-L17F1" dur="8" oct="4" pname="a" stem.dir="down" accid.ges="n">
+                                            <artic xml:id="artic-L17F1" artic="stacc" />
+                                        </note>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <slur xml:id="slur-L12F1-L13F1N1" staff="1" startid="#note-L12F1" endid="#note-L13F1" />
+                            <slur xml:id="slur-L15F1-L16F1N1" staff="1" startid="#note-L15F1" endid="#note-L16F1" curvedir="above" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

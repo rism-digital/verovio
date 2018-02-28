@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Ledger line adjustment</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-07-28</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio adjusts the length of ledger lines according to the context.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000001046439247" midi.bpm="400">
+                        <staffGrp xml:id="staffgrp-0000000057228057">
+                            <staffDef xml:id="staffdef-0000001374527676" clef.shape="G" clef.line="2" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000001556906253">
+                        <measure xml:id="measure-L2" n="1">
+                            <staff xml:id="staff-L2F1N1" n="1">
+                                <layer xml:id="layer-L2F1N1" n="1">
+                                    <note xml:id="note-L3F1"  dur="1" oct="6" pname="e" color="red" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L4" n="2">
+                            <staff xml:id="staff-L4F1N1" n="1">
+                                <layer xml:id="layer-L4F1N1" n="1">
+                                    <note xml:id="note-L5F1"  dur="2" oct="6" pname="e" color="red" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L6" n="3">
+                            <staff xml:id="staff-L6F1N1" n="1">
+                                <layer xml:id="layer-L6F1N1" n="1">
+                                    <note xml:id="note-L7F1"  dur="4" oct="6" pname="e" color="red" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L8" n="4">
+                            <staff xml:id="staff-L8F1N1" n="1">
+                                <layer xml:id="layer-L8F1N1" n="1">
+                                    <note xml:id="note-L9F1"  dur="8" oct="6" pname="e" color="red" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L10" n="5">
+                            <staff xml:id="staff-L10F1N1" n="1">
+                                <layer xml:id="layer-L10F1N1" n="1">
+                                    <note xml:id="note-L11F1"  dur="16" oct="6" pname="e" color="red" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L12" n="6">
+                            <staff xml:id="staff-L12F1N1" n="1">
+                                <layer xml:id="layer-L12F1N1" n="1">
+                                    <note xml:id="note-L13F1"  dur="breve" oct="6" pname="e" color="red" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L14" n="7">
+                            <staff xml:id="staff-L14F1N1" n="1">
+                                <layer xml:id="layer-L14F1N1" n="1">
+                                    <note xml:id="note-L15F1"  dur="long" oct="6" pname="e" color="red" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L16" right="end" n="8">
+                            <staff xml:id="staff-L16F1N1" n="1">
+                                <layer xml:id="layer-L16F1N1" n="1">
+                                    <note xml:id="note-L17F1"  dur="maxima" oct="6" pname="e" color="red" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

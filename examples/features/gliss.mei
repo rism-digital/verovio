@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Glissando</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-10-03</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports the "gliss" element.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000002008350576" midi.bpm="400">
+                        <staffGrp xml:id="staffgrp-0000001349870367">
+                            <staffDef xml:id="staffdef-0000001286798938" clef.shape="G" clef.line="2" n="1" lines="5">
+                                <label>Canto</label>
+                            </staffDef>
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000001070859477">
+                        <measure xml:id="measure-L1" n="0">
+                            <staff xml:id="staff-0000000787584638" n="1">
+                                <layer xml:id="layer-L1F1N1" n="1">
+                                    <note dur="1" oct="4" pname="c" xml:id="start-note">
+                                    </note>
+                                    <note dur="1" oct="5" pname="c" xml:id="end-note">
+                                    </note>
+                                </layer>
+                            </staff>
+                            <gliss startid="#start-note" endid="#end-note"></gliss>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

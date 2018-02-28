@@ -5,10 +5,10 @@
     <meiHead>
         <fileDesc>
             <titleStmt>
-                <title>Dot placememt with various note duration</title>
+                <title>Dot placement with various note durations</title>
             </titleStmt>
             <pubStmt>
-                <date>2017-04-20</date>
+                <date>2017-05-04</date>
             </pubStmt>
             <notesStmt>
                 <annot>Verovio adjusts the dot position according to the note duration and to double stemmed situations.</annot>
@@ -16,19 +16,11 @@
         </fileDesc>
         <encodingDesc>
             <appInfo>
-                <application isodate="2017-02-21T10:16:12" version="0.9.14-dev-204a0ac-dirty">
+                <application version="0.9.13">
                     <name>Verovio</name>
-                    <p>Transcoded from Humdrum</p>
                 </application>
             </appInfo>
         </encodingDesc>
-        <workDesc>
-            <work>
-                <titleStmt>
-                    <title />
-                </titleStmt>
-            </work>
-        </workDesc>
     </meiHead>
     <music>
         <body>
