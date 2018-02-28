@@ -10,11 +10,11 @@ fontforge generate_ff.py $font
 
 # base64
 woffFont=${1%.sfd}.woff
-w=`base64 $woffFont`
+w=$(base64 $woffFont)
 
 # output
-cat woff-1.txt > woff.xml 
+cat woff-1.txt > woff.xml
 echo $w >> woff.xml
-cat woff-2.txt >> woff.xml 
+cat woff-2.txt >> woff.xml
 
 mv woff.xml ../data
