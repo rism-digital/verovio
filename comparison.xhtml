@@ -54,18 +54,18 @@ versions:
                 <div class="col-xs-12">
                     
                     <p>The left panel is the latest build from the develop branch. The right panel is the latest release. You can select another version to be loaded in the right panel. You can also select a local MEI file to compare.</p>
-
+                    
                     <h4>Select a version</h4>
-
+                    
                     <select class="form-control" id="versionSelect">
                         <option value=""></option>
                         {% for v in page.versions %}
                         <option value="{{ v.url }}">{{ v.name }}</option>
                         {% endfor %}
                     </select>
-
+                    
                     <h4>Select an MEI file</h4>
-            
+                    
                      
                     <form id="upload_form" onsubmit="uploadFile( $('#upload_form') ); return false" role="form">
                         <input type="file" id="mei_files" onchange="$('#submit-btn').popover('show');" name="file" style="margin: 4px 0px 8px 0px;"/>
