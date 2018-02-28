@@ -433,7 +433,7 @@ int Note::ConvertAnalyticalMarkup(FunctorParams *functorParams)
             // we are done for this note
             break;
         }
-        iter++;
+        ++iter;
     }
 
     if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_i)) {
