@@ -19,6 +19,7 @@
 #include "clef.h"
 #include "ending.h"
 #include "io.h"
+#include "runningelement.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -367,6 +368,19 @@ protected:
     bool isFirstTokenOnStaff(hum::HTp token);
     bool hasAboveParameter(hum::HTp token, const string &category);
     bool hasBelowParameter(hum::HTp token, const string &category);
+    void prepareHeaderFooter();
+    bool prepareHeader(std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
+    bool prepareFooter(std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
+    std::string processReferenceTemplate(const std::string &input, std::vector<std::pair<string, string> > &biblist,
+        std::map<std::string, std::string> &refmap);
+    std::string processTemplateOperator(const std::string &value, const std::string &op);
+    std::string automaticHeaderLeft(
+        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int linecount);
+    std::string automaticHeaderCenter(
+        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
+    std::string automaticHeaderRight(
+        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int &linecount);
+    std::string getLayoutParameter(hum::HTp token, const std::string &category, const std::string &keyname);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

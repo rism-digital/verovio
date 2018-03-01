@@ -18,6 +18,7 @@
 //
 
 #include "iohumdrum.h"
+#include "iomei.h"
 
 //----------------------------------------------------------------------------
 
@@ -27,6 +28,7 @@
 #include <assert.h>
 #include <cctype>
 #include <cmath>
+#include <locale>
 #include <regex>
 #include <sstream>
 #include <vector>
@@ -42,6 +44,7 @@
 #include "accid.h"
 #include "arpeg.h"
 #include "artic.h"
+#include "att.h"
 #include "beam.h"
 #include "chord.h"
 #include "dir.h"
@@ -50,20 +53,24 @@
 #include "ending.h"
 #include "fb.h"
 #include "fermata.h"
+#include "fig.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "iomei.h"
 #include "label.h"
 #include "layer.h"
+#include "lb.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "mordent.h"
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
+#include "num.h"
 #include "octave.h"
 #include "page.h"
 #include "pedal.h"
+#include "pghead.h"
 #include "rend.h"
 #include "rest.h"
 #include "score.h"
@@ -526,6 +533,7 @@ bool HumdrumInput::convertHumdrum()
     prepareEndings();
 
     prepareStaffGroups();
+    prepareHeaderFooter();
 
     // m_meausreIndex not currently used but might be useful sometime.
     m_measureIndex = 0;
@@ -607,7 +615,7 @@ void HumdrumInput::createHeader()
     std::string OTL = getReferenceValue("OTL", references);
     pugi::xml_node title = fileTitle.append_child("title");
     if (!OTL.empty()) {
-        title.append_child(pugi::node_pcdata).set_value(OTL.c_str());
+        title.append_child(pugi::node_pcdata).set_value(unescapeHtmlEntities(OTL).c_str());
     }
 
     // <pubStmt> /////////////
@@ -1405,6 +1413,687 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
 
 //////////////////////////////
 //
+// HumdrumInput::prepareHeaderFooter --
+//
+//
+
+void HumdrumInput::prepareHeaderFooter()
+{
+    hum::HumdrumFile &infile = m_infile;
+    std::vector<std::pair<string, string> > biblist;
+
+    std::vector<hum::HumdrumLine *> records = infile.getReferenceRecords();
+    biblist.reserve(records.size());
+    std::map<std::string, std::string> refmap;
+    for (int i = 0; i < (int)records.size(); i++) {
+        string key = records[i]->getReferenceKey();
+        string value = records[i]->getReferenceValue();
+        refmap[key] = value;
+        biblist.emplace_back(std::make_pair(key, value));
+    }
+
+    prepareHeader(biblist, refmap);
+    prepareFooter(biblist, refmap);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processTemplateOperator --
+//      Operators:
+//           n = full name
+//           i = initials for given names and full last name
+//           l = last name
+//           f = first name
+//
+
+std::string HumdrumInput::processTemplateOperator(const std::string &value, const std::string &op)
+{
+    string input = value;
+    string output;
+    hum::HumRegex hre;
+
+    if (op.find("U") != std::string::npos) {
+        // Force all upper case (cannot handle HTML accents, so should be unescaped first)
+        std::locale loc;
+        for (int i = 0; i < (int)input.size(); i++) {
+            input[i] = std::toupper(input[i], loc);
+        }
+    }
+
+    if (op.find("n") != std::string::npos) {
+        // full name: reverse strings separated by comma if there is one.
+        auto pos = input.find(",");
+        if (pos == std::string::npos) {
+            output = input;
+        }
+        else {
+            std::string lastname = input.substr(0, pos);
+            std::string firstname = input.substr(pos + 1);
+            output = firstname + " " + lastname;
+        }
+    }
+    else if (op.find("l") != std::string::npos) {
+        // last name: text before comma if there is one.
+        auto pos = input.find(",");
+        if (pos == std::string::npos) {
+            output = input;
+        }
+        else {
+            std::string lastname = input.substr(0, pos);
+            output = lastname;
+        }
+    }
+    else if (op.find("f") != std::string::npos) {
+        // first name: text after comma if there is one.
+        auto pos = input.find(",");
+        if (pos == std::string::npos) {
+            output = input;
+        }
+        else {
+            std::string firstname = input.substr(pos + 1);
+            output = firstname;
+        }
+    }
+    else if (op.find("i") != std::string::npos) {
+        // initialed name: first name converted to initials
+        auto pos = input.find(",");
+        if (pos == std::string::npos) {
+            output = input;
+        }
+        else {
+            std::string lastname = input.substr(0, pos);
+            std::string firstname = input.substr(pos + 1);
+            std::vector<std::string> pieces;
+            hre.split(pieces, firstname, " ");
+            firstname.clear();
+            for (int i = 0; i < (int)pieces.size(); i++) {
+                if (pieces[i].empty()) {
+                    continue;
+                }
+                if (std::isupper(pieces[i][0])) {
+                    pieces[i] = pieces[i][0];
+                    pieces[i] += ".";
+                    if (firstname.size() > 1) {
+                        if (firstname[firstname.size() - 2] == '.') {
+                            firstname.pop_back();
+                            firstname += pieces[i] + " ";
+                        }
+                        else {
+                            firstname += pieces[i] + " ";
+                        }
+                    }
+                    else {
+                        firstname += pieces[i] + " ";
+                    }
+                }
+                else {
+                    firstname += pieces[i] + " ";
+                }
+            }
+            output = firstname + lastname;
+        }
+    }
+    else if (op.find("y") != std::string::npos) {
+        // Show only years for birth/death, and shorten if in same century.
+        // Still need to include circa, flourish, and birth/death only.
+        string cdates = input;
+        string outputdate;
+        string birth;
+        string death;
+        auto pos = cdates.find("-");
+        if (pos != std::string::npos) {
+            birth = cdates.substr(0, pos);
+            death = cdates.substr(pos + 1);
+            int birthyear = 0;
+            int deathyear = 0;
+            if (hre.search(birth, "(\\d\\d\\d\\d)")) {
+                birthyear = hre.getMatchInt(1);
+            }
+            if (hre.search(death, "(\\d\\d\\d\\d)")) {
+                deathyear = hre.getMatchInt(1);
+            }
+            if ((deathyear > 0) && (birthyear > 0)) {
+                outputdate = to_string(birthyear);
+                outputdate += "&#8211;";
+                if ((deathyear / 100) == (birthyear / 100)) {
+                    outputdate += to_string(deathyear % 100);
+                }
+                else {
+                    outputdate += to_string(deathyear);
+                }
+            }
+        }
+        output = outputdate;
+    }
+    else if (op.find("Y") != std::string::npos) {
+        // Show only years for birth/death, but do not shorten if in same century.
+        // Still need to include circa, flourish, and birth/death only.
+        string cdates = input;
+        string outputdate;
+        string birth;
+        string death;
+        auto pos = cdates.find("-");
+        if (pos != std::string::npos) {
+            birth = cdates.substr(0, pos);
+            death = cdates.substr(pos + 1);
+            int birthyear = 0;
+            int deathyear = 0;
+            if (hre.search(birth, "(\\d\\d\\d\\d)")) {
+                birthyear = hre.getMatchInt(1);
+            }
+            if (hre.search(death, "(\\d\\d\\d\\d)")) {
+                deathyear = hre.getMatchInt(1);
+            }
+            if ((deathyear > 0) && (birthyear > 0)) {
+                outputdate = to_string(birthyear);
+                outputdate += "&#8211;";
+                outputdate += to_string(deathyear);
+            }
+        }
+        output = outputdate;
+    }
+    else {
+        // unknown operator, so just echo input
+        output = input;
+    }
+
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processReferenceTemplate --
+//
+
+std::string HumdrumInput::processReferenceTemplate(const std::string &input,
+    std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap)
+{
+    std::string text = input;
+    hum::HumRegex hre;
+    std::string prefix;
+    std::string suffix;
+    std::string match;
+    std::string key;
+    std::string op;
+    while (hre.search(text, "@\\{(.*?)\\}")) {
+        match = hre.getMatch(1);
+        prefix = hre.getPrefix();
+        suffix = hre.getSuffix();
+        auto pos = match.find(":");
+        if (pos != std::string::npos) {
+            key = match.substr(0, pos);
+            op = match.substr(pos + 1);
+            match = processTemplateOperator(refmap[key], op);
+        }
+        else {
+            match = refmap[match];
+        }
+        text = prefix;
+        text += match;
+        text += suffix;
+    }
+    return unescapeHtmlEntities(text);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::prepareFooter --
+//
+
+bool HumdrumInput::prepareFooter(
+    std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap)
+{
+
+    std::string footleft;
+    std::string footcenter;
+    std::string footright;
+    std::vector<std::string> pieces;
+    std::string tstring;
+    hum::HumRegex hre;
+
+    //   <rend halign="left" valign="bottom">
+    //      <rend fontsize="small">Footer L1</rend><lb/>
+    //      <rend fontsize="small">Footer L2</rend><lb/>
+    //      <rend fontsize="small">Footer L3</rend>
+    //   </rend>
+
+    auto itL = refmap.find("footer-left");
+    if (itL != refmap.end()) {
+        hre.split(pieces, itL->second, "\\\\n");
+        footleft += "<rend halign=\"left\" valign=\"bottom\">\n";
+        for (int i = 0; i < (int)pieces.size(); i++) {
+            footleft += "<rend fontsize=\"small\">";
+            tstring = processReferenceTemplate(pieces[i], biblist, refmap);
+            if (pieces[i].empty()) {
+                footleft += "&#160;";
+            }
+            else {
+                footleft += tstring;
+            }
+            footleft += "</rend>\n";
+            if (i < (int)pieces.size() - 1) {
+                footleft += "<lb/>\n";
+            }
+        }
+        footleft += "</rend>\n";
+    }
+
+    auto itC = refmap.find("footer-center");
+    if (itC != refmap.end()) {
+        hre.split(pieces, itC->second, "\\\\n");
+        footcenter += "<rend halign=\"center\" valign=\"bottom\">\n";
+        for (int i = 0; i < (int)pieces.size(); i++) {
+            footcenter += "<rend fontsize=\"small\">";
+            tstring = processReferenceTemplate(pieces[i], biblist, refmap);
+            if (pieces[i].empty()) {
+                footcenter += "&#160;";
+            }
+            else {
+                footcenter += tstring;
+            }
+            footcenter += "</rend>\n";
+            if (i < (int)pieces.size() - 1) {
+                footcenter += "<lb/>\n";
+            }
+        }
+        footcenter += "</rend>\n";
+    }
+
+    auto itR = refmap.find("footer-right");
+    if (itR != refmap.end()) {
+        hre.split(pieces, itR->second, "\\\\n");
+        footright += "<rend halign=\"right\" valign=\"bottom\">\n";
+        for (int i = 0; i < (int)pieces.size(); i++) {
+            footright += "<rend fontsize=\"small\">";
+            tstring = processReferenceTemplate(pieces[i], biblist, refmap);
+            if (pieces[i].empty()) {
+                footright += "&#160;";
+            }
+            else {
+                footright += tstring;
+            }
+            footright += "</rend>\n";
+            if (i < (int)pieces.size() - 1) {
+                footright += "<lb/>\n";
+            }
+        }
+        footright += "</rend>\n";
+    }
+
+    string footer;
+    footer += footleft;
+    footer += footcenter;
+    footer += footright;
+
+    if (footer.empty()) {
+        return false;
+    }
+
+    hre.replaceDestructive(footer, "</rend>", "</i>", "g");
+    hre.replaceDestructive(footer, "<rend fontstyle=\"italic\">", "<i>", "g");
+    hre.replaceDestructive(footer, "<rend><num label=\"page\">#</num></rend>", "%P", "g");
+
+    string meifile = "<mei xmlns=\"http://www.music-encoding.org/ns/mei\" meiversion=\"4.0.0\">\n";
+    meifile += "<music><body><mdiv><score><scoreDef>\n";
+    meifile += "<pgFoot>\n";
+    meifile += footer;
+    meifile += "</pgFoot>\n";
+    // Always putting footer on all pages for now:
+    meifile += "<pgFoot2>\n";
+    meifile += footer;
+    meifile += "</pgFoot2>\n";
+    meifile += "</scoreDef></score></mdiv></body></music></mei>\n";
+
+    Doc tempdoc;
+    MeiInput input(&tempdoc, "");
+    if (!input.ImportString(meifile)) {
+        LogError("Error importing data");
+        return false;
+    }
+
+    // MeiOutput meioutput(&tempdoc, "");
+    // meioutput.SetScoreBasedMEI(true);
+    // string meicontent = meioutput.GetOutput();
+    // std::cout << "MEI CONTENT " << meicontent << std::endl;
+
+    Object *pgfoot = tempdoc.m_scoreDef.FindChildByType(ClassId::PGFOOT);
+    if (pgfoot == NULL) {
+        return false;
+    }
+
+    int index = pgfoot->GetIdx();
+    if (index < 0) {
+        return false;
+    }
+    Object *detached = pgfoot->GetParent()->DetachChild(index);
+    if (detached != pgfoot) {
+        std::cerr << "Detached element is not the pgHead" << std::endl;
+        if (detached) {
+            delete detached;
+        }
+        return false;
+    }
+
+    m_doc->m_scoreDef.AddChild(pgfoot);
+
+    Object *pgfoot2 = tempdoc.m_scoreDef.FindChildByType(ClassId::PGFOOT2);
+    if (pgfoot2 == NULL) {
+        return true;
+    }
+
+    index = pgfoot2->GetIdx();
+    if (index < 0) {
+        return true;
+    }
+    detached = pgfoot2->GetParent()->DetachChild(index);
+    if (detached != pgfoot2) {
+        std::cerr << "Detached element is not a pgFoot2 element" << std::endl;
+        if (detached) {
+            delete detached;
+        }
+        return true;
+    }
+
+    m_doc->m_scoreDef.AddChild(pgfoot2);
+
+    return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::prepareHeader --
+//
+// <pgHead>
+//     <rend halign="center" valign="middle">
+//         <rend fontsize="x-large">Non è questa la mano (<rend fontstyle="italic">Rime</rend> 47)</rend>
+//         <lb/>
+//         <rend fontsize="small"><rend fontstyle="italic">Il primo libro de madrigali a quattro voci. </rend>(Venice:
+//         Gardano, 1579)</rend>
+//     </rend>
+//     <rend halign="right" valign="bottom">Benedetto Pallavicino</rend>
+// <pgHead>
+//
+
+bool HumdrumInput::prepareHeader(
+    std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap)
+{
+    std::string headleft;
+    std::string headcenter;
+    std::string headright;
+    std::string tstring;
+    hum::HumRegex hre;
+    std::vector<std::string> pieces;
+
+    auto ithc = refmap.find("header-center");
+    if (ithc != refmap.end()) {
+        hre.split(pieces, ithc->second, "\\\\n");
+        headcenter = "<rend halign=\"center\" valign=\"middle\">\n";
+        for (int i = 0; i < (int)pieces.size(); i++) {
+            headcenter += "<rend fontsize=\"x-large\">";
+            tstring = processReferenceTemplate(pieces[i], biblist, refmap);
+            if (pieces[i].empty()) {
+                headcenter += "&#160;";
+            }
+            else {
+                headcenter += tstring;
+            }
+            headcenter += "</rend>\n";
+            if (i < (int)pieces.size() - 1) {
+                headcenter += "<lb/>\n";
+            }
+        }
+        headcenter += "</rend>\n";
+    }
+    else {
+        headcenter = automaticHeaderCenter(biblist, refmap);
+    }
+
+    int linecount = 0;
+    auto ithr = refmap.find("header-right");
+    if (ithr != refmap.end()) {
+        hre.split(pieces, ithr->second, "\\\\n");
+        headright = "<rend halign=\"right\" valign=\"bottom\">\n";
+        for (int i = 0; i < (int)pieces.size(); i++) {
+            headright += "<rend fontsize=\"small\">";
+            tstring = processReferenceTemplate(pieces[i], biblist, refmap);
+            if (pieces[i].empty()) {
+                headright += "&#160;";
+            }
+            else {
+                headright += tstring;
+            }
+            headright += "</rend>\n";
+            if (i < (int)pieces.size() - 1) {
+                headright += "<lb/>\n";
+            }
+        }
+        headright += "</rend>\n";
+    }
+    else {
+        headright = automaticHeaderRight(biblist, refmap, linecount);
+    }
+
+    auto ithl = refmap.find("header-left");
+    if (ithl != refmap.end()) {
+        hre.split(pieces, ithl->second, "\\\\n");
+        headleft = "<rend halign=\"left\" valign=\"bottom\">\n";
+        for (int i = 0; i < (int)pieces.size(); i++) {
+            headleft += "<rend fontsize=\"small\">";
+            tstring = processReferenceTemplate(pieces[i], biblist, refmap);
+            if (pieces[i].empty()) {
+                headleft += "&#160;";
+            }
+            else {
+                headleft += tstring;
+            }
+            headleft += "</rend>\n";
+            if (i < (int)pieces.size() - 1) {
+                headleft += "<lb/>\n";
+            }
+        }
+        headleft += "</rend>\n";
+    }
+    else {
+        headleft = automaticHeaderLeft(biblist, refmap, linecount);
+    }
+
+    std::string head = headcenter + headleft + headright;
+
+    if (head.empty()) {
+        return false;
+    }
+
+    hre.replaceDestructive(head, "</rend>", "</i>", "g");
+    hre.replaceDestructive(head, "<rend fontstyle=\"italic\">", "<i>", "g");
+    hre.replaceDestructive(head, "<rend><num label=\"page\">#</num></rend>", "%P", "g");
+
+    string meifile = "<mei xmlns=\"http://www.music-encoding.org/ns/mei\" meiversion=\"4.0.0\">\n";
+    meifile += "<music><body><mdiv><score><scoreDef><pgHead>\n";
+    meifile += head;
+    meifile += "</pgHead></scoreDef></score></mdiv></body></music></mei>\n";
+
+    Doc tempdoc;
+    MeiInput input(&tempdoc, "");
+    if (!input.ImportString(meifile)) {
+        LogError("Error importing data");
+        return false;
+    }
+
+    // MeiOutput meioutput(&tempdoc, "");
+    // meioutput.SetScoreBasedMEI(true);
+    // string meicontent = meioutput.GetOutput();
+    // std::cout << "MEI CONTENT " << meicontent << std::endl;
+
+    Object *pghead = tempdoc.m_scoreDef.FindChildByType(ClassId::PGHEAD);
+    if (pghead == NULL) {
+        return false;
+    }
+
+    int index = pghead->GetIdx();
+    if (index < 0) {
+        return false;
+    }
+    Object *detached = pghead->GetParent()->DetachChild(index);
+    if (detached != pghead) {
+        std::cerr << "Detached element is not the pgHead" << std::endl;
+        if (detached) {
+            delete detached;
+        }
+        return false;
+    }
+
+    m_doc->m_scoreDef.AddChild(pghead);
+
+    return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::automaticHeaderLeft -- If there is no reference record "header-left",
+//     Then any "LYR" (lyricist) will be displayed, and if LDT (lyric composition date)
+//     is found, then that will be added in parenthese after the lyricist's name.
+//     The linecount variable is used to align the lyricist with the composer, depending
+//     on whether or not the composer's date are displayed.
+//
+
+std::string HumdrumInput::automaticHeaderLeft(
+    std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int linecount)
+{
+    std::string output;
+    std::string lyricist;
+
+    auto itL = refmap.find("LYR");
+    if (itL != refmap.end()) {
+        std::string name = itL->second;
+        auto pos = name.find(",");
+        if (pos == std::string::npos) {
+            lyricist = name;
+        }
+        else {
+            std::string lastname = name.substr(0, pos);
+            std::string firstname = name.substr(pos + 1);
+            lyricist = firstname + " " + lastname;
+        }
+        auto itLD = refmap.find("LDT");
+        if (itLD != refmap.end()) {
+            lyricist += " (" + itLD->second + ")";
+        }
+    }
+    if (!lyricist.empty()) {
+        output += "<rend fontsize=\"small\" halign=\"left\" valign=\"bottom\">";
+        output += unescapeHtmlEntities(lyricist);
+        output += "</rend>\n";
+        if (linecount > 1) {
+            output += "<rend fontsize=\"small\" halign=\"left\" valign=\"bottom\">";
+            output += "&#160;";
+            output += "</rend>\n";
+        }
+    }
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::automaticHeaderRight -- If there is no reference record "header-right",
+//     Then the "COM" (composer) will be displayed.  The full name will be displayed,
+//     and if the ordering of the name is "last, first" then it will be reversed to
+//     "first last".   If "CDT" is found (composer's dates), then it will be added
+//     underneath the composer's name.
+//     The linecount variable is used to align the lyricist with the composer, depending
+//     on whether or not the composer's date are displayed.
+//
+
+std::string HumdrumInput::automaticHeaderRight(
+    std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int &linecount)
+{
+
+    linecount = 0;
+    std::string output;
+
+    std::string composer;
+    auto it2 = refmap.find("COM");
+    if (it2 != refmap.end()) {
+        std::string name = it2->second;
+        auto pos = name.find(",");
+        if (pos == std::string::npos) {
+            composer = name;
+        }
+        else {
+            std::string lastname = name.substr(0, pos);
+            std::string firstname = name.substr(pos + 1);
+            composer = firstname + " " + lastname;
+        }
+    }
+    // <rend fontsize="small" halign="right" valign="bottom">Composer's name</rend>
+    if (!composer.empty()) {
+        output += "<rend fontsize=\"small\" halign=\"right\" valign=\"bottom\">";
+        output += unescapeHtmlEntities(composer);
+        output += "</rend>\n";
+        linecount++;
+    }
+    // Composer's dates
+    std::string outputdate = processReferenceTemplate("@{CDT:y}", biblist, refmap);
+
+    if (!outputdate.empty()) {
+        output += "<rend fontsize=\"small\" halign=\"right\" valign=\"bottom\">";
+        output += outputdate;
+        output += "</rend>\n";
+        linecount++;
+    }
+
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::automaticHeaderCenter --
+//
+
+std::string HumdrumInput::automaticHeaderCenter(
+    std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap)
+{
+    std::string output;
+    std::string title;
+
+    auto it = refmap.find("OTL");
+    if (it != refmap.end()) {
+        title = it->second;
+    }
+    if (title.empty()) {
+        for (int i = 0; i < (int)biblist.size(); i++) {
+            if (biblist[i].first.substr(0, 3) == "OTL") {
+                title = biblist[i].second;
+                break;
+            }
+        }
+    }
+
+    // Special code for Tasso in Music Project: Add rime number after title.
+    std::string rime;
+    auto itrime = refmap.find("rime");
+    if (itrime != refmap.end()) {
+        rime = itrime->second;
+    }
+    // <rend fontsize="x-large">Non è questa la mano (<rend fontstyle="italic">Rime</rend> 47)</rend>
+    if (!title.empty()) {
+        output += "<rend halign=\"center\" valign=\"middle\">\n";
+        output += "   <rend fontsize=\"x-large\">";
+        output += unescapeHtmlEntities(title);
+        if (!rime.empty()) {
+            output += " (<rend fontstyle=\"italic\">Rime</rend> ";
+            output += rime;
+            output += ")";
+        }
+        output += "</rend>\n";
+        output += "<lb/>&#160;\n<lb/>&#160;\n";
+        output += "</rend>\n";
+    }
+
+    return output;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::getStaffNumberLabel -- Return number 12 in pattern *staff12.
 //
 
@@ -1687,9 +2376,11 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 
 void HumdrumInput::setInstrumentName(vrv::StaffDef *staffdef, const string &name)
 {
+    hum::HumRegex hre;
+    string newname = hre.replaceCopy(name, "\xc2\xa0", " ", "g");
     Label *label = new Label();
     Text *text = new Text;
-    text->SetText(UTF8to16(name));
+    text->SetText(UTF8to16(newname));
     label->AddChild(text);
     staffdef->AddChild(label);
 }
@@ -4642,6 +5333,18 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
             dynam->SetTstamp(barstamp.getFloat());
 
+            std::string verticalgroup = getLayoutParameter(line->token(i), "DY", "vg");
+            if (verticalgroup.empty()) {
+                // 100 is the default group:
+                dynam->SetVgrp(100);
+            }
+            else if (std::isdigit(verticalgroup[0])) {
+                dynam->SetVgrp(stoi(verticalgroup));
+            }
+            else {
+                // don't set a vertical group for this token
+            }
+
             if (aboveQ) {
                 setPlace(dynam, "above");
             }
@@ -4677,6 +5380,19 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 pair<int, double> ts2(measures, tstamp2.getFloat());
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_cres);
+
+                std::string verticalgroup = getLayoutParameter(line->token(i), "HP", "vg");
+                if (verticalgroup.empty()) {
+                    // 100 is the default group:
+                    hairpin->SetVgrp(100);
+                }
+                else if (std::isdigit(verticalgroup[0])) {
+                    hairpin->SetVgrp(stoi(verticalgroup));
+                }
+                else {
+                    // don't set a vertical group for this token
+                }
+
                 m_measure->AddChild(hairpin);
 
                 if (aboveQ) {
@@ -4716,6 +5432,19 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_dim);
                 m_measure->AddChild(hairpin);
+
+                std::string verticalgroup = getLayoutParameter(line->token(i), "HP", "vg");
+                if (verticalgroup.empty()) {
+                    // 100 is the default group:
+                    hairpin->SetVgrp(100);
+                }
+                else if (std::isdigit(verticalgroup[0])) {
+                    hairpin->SetVgrp(stoi(verticalgroup));
+                }
+                else {
+                    // don't set a vertical group for this token
+                }
+
                 if (aboveQ) {
                     // 300: hairpin->SetPlace(STAFFREL_above);
                     setPlace(hairpin, "above");
@@ -4750,6 +5479,40 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     // legitimate reasons).  Maybe make this more efficient later, such as
     // do a separate parse of dynamics data in a different loop.
     processDynamics(token, staffindex);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getLayoutParameter -- returns empty string if no given layout parameter, or
+//      the non-empty parameter as a string.
+//
+
+std::string HumdrumInput::getLayoutParameter(hum::HTp token, const std::string &category, const std::string &keyname)
+{
+    int lcount = token->getLinkedParameterCount();
+    if (lcount == 0) {
+        return "";
+    }
+
+    for (int p = 0; p < token->getLinkedParameterCount(); p++) {
+        hum::HumParamSet *hps = token->getLinkedParameter(p);
+        if (hps == NULL) {
+            continue;
+        }
+        if (hps->getNamespace1() != "LO") {
+            continue;
+        }
+        if (hps->getNamespace2() != category) {
+            continue;
+        }
+        for (int q = 0; q < hps->getCount(); q++) {
+            string key = hps->getParameterName(q);
+            if (key == keyname) {
+                return hps->getParameterValue(q);
+            }
+        }
+    }
+    return "";
 }
 
 //////////////////////////////
@@ -4956,7 +5719,8 @@ template <class ELEMENT> void HumdrumInput::addTextElement(ELEMENT *element, con
 {
     Text *text = new Text;
     element->AddChild(text);
-    text->SetText(UTF8to16(unescapeHtmlEntities(content)));
+    std::string data = unescapeHtmlEntities(content);
+    text->SetText(UTF8to16(data));
 }
 
 /////////////////////////////
@@ -6377,12 +7141,15 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
     bool isnote = false;
     bool isrest = false;
     bool isrecip = false;
+    bool allinvis = true;
     for (int j = 0; j < scount; j++) {
-
         isnote = false;
         isrest = false;
         isrecip = false;
         tstring = token->getSubtoken(j);
+        if (token->find("yy") == std::string::npos) {
+            allinvis = false;
+        }
         if (tstring == "") {
             continue;
         }
@@ -6420,6 +7187,10 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
         setLocationId(note, token, j);
         appendElement(chord, note);
         convertNote(note, token, staffindex, j);
+    }
+
+    if (allinvis) {
+        chord->SetVisible(BOOLEAN_false);
     }
 
     // grace notes need to be done before rhythm since default
@@ -6756,9 +7527,73 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     // Add the pitch information
     int base40 = hum::Convert::kernToBase40(tstring);
     base40 += m_transpose[staffindex];
-
     int diatonic = hum::Convert::base40ToDiatonic(base40);
     int octave = diatonic / 7;
+
+    int testaccid = 0;
+    for (int i = 0; i < (int)tstring.size(); i++) {
+        if (tstring[i] == '-') {
+            testaccid--;
+        }
+        else if (tstring[i] == '#') {
+            testaccid++;
+        }
+    }
+
+    if ((testaccid > 2) || (testaccid < -2)) {
+        // reconsider notes that cannot be represented in base-40
+        diatonic = -1;
+        string dia;
+        for (int i = 0; i < (int)tstring.size(); i++) {
+            switch (tstring[i]) {
+                case 'c':
+                case 'C':
+                    diatonic = 0;
+                    dia += tstring[i];
+                    break;
+                case 'd':
+                case 'D':
+                    diatonic = 1;
+                    dia += tstring[i];
+                    break;
+                case 'e':
+                case 'E':
+                    diatonic = 2;
+                    dia += tstring[i];
+                    break;
+                case 'f':
+                case 'F':
+                    diatonic = 3;
+                    dia += tstring[i];
+                    break;
+                case 'g':
+                case 'G':
+                    diatonic = 4;
+                    dia += tstring[i];
+                    break;
+                case 'a':
+                case 'A':
+                    diatonic = 5;
+                    dia += tstring[i];
+                    break;
+                case 'b':
+                case 'B':
+                    diatonic = 6;
+                    dia += tstring[i];
+                    break;
+            }
+        }
+        octave = (int)dia.size();
+        if (octave > 0) {
+            if (std::islower(dia[0])) {
+                octave = octave + 3;
+            }
+            else {
+                octave = 4 - octave;
+            }
+        }
+    }
+
     if (octaveupQ) {
         // @oct required even if @oct.ges given.
         note->SetOctGes(octave);
@@ -6792,6 +7627,9 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     }
 
     int accidCount = hum::Convert::base40ToAccidental(base40);
+    if ((testaccid > 2) || (testaccid < -2)) {
+        accidCount = testaccid;
+    }
     // int accidCount = hum::Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
     bool showInAccidGes = !showInAccid;
@@ -6813,13 +7651,14 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     if (!editorialQ) {
         if (showInAccid) {
             switch (accidCount) {
-                // case +3: accid->SetAccid(ACCIDENTAL_WRITTEN_ts); break;
-                // case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
+                case +3: accid->SetAccid(ACCIDENTAL_WRITTEN_xs); break;
                 case +2: accid->SetAccid(ACCIDENTAL_WRITTEN_x); break;
                 case +1: accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
                 case 0: accid->SetAccid(ACCIDENTAL_WRITTEN_n); break;
                 case -1: accid->SetAccid(ACCIDENTAL_WRITTEN_f); break;
                 case -2: accid->SetAccid(ACCIDENTAL_WRITTEN_ff); break;
+                case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
+                default: std::cerr << "Do not know how to convert accidental: " << accidCount << endl;
             }
         }
     }
