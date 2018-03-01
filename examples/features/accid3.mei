@@ -52,7 +52,7 @@
                                         <accid xml:id="accid-000000208946960" accid="n" func="edit" />
                                     </note>
                                     <note xml:id="note-L6F1" dur="1" oct="5" pname="f">
-                                        <accid xml:id="accid-000000207644959" accid="ss" func="edit" />
+                                        <accid xml:id="accid-000000207644959" accid="x" func="edit" />
                                     </note>
                                     <note xml:id="note-L7F1" dur="1" oct="5" pname="f">
                                         <accid xml:id="accid-000000179518178" accid="ff" func="edit" />
