@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Feb 11 11:28:05 PST 2018
+// Last Modified: Sun Feb 25 23:10:00 PST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -43292,9 +43292,6 @@ bool Tool_musicxml2hum::fillPartData(MxmlPart& partdata,
 		partdata.enableStems();
 	}
 
-// ggg
-// cerr << "GOT HERE XXX PREPARING ID " << id << endl;
-
 	partdata.parsePartInfo(partdeclaration);
 	
 	int count;
@@ -44814,6 +44811,8 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 				} else {
 					addEventToList(gracebefore, nowevents[i]->zerodur[j]);
 				}
+			} else if (nodeType(element, "print")) {
+				processPrintElement(outdata, element, nowtime);
 			}
 		}
 	}
@@ -44839,6 +44838,37 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 	addGraceLines(outdata, graceafter, partdata, nowtime);
 }
 
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::processPrintElement --
+//      <print new-page="yes">
+//      <print new-system="yes">
+//
+
+void Tool_musicxml2hum::processPrintElement(GridMeasure* outdata, xml_node element,
+		HumNum timestamp) {
+	bool isPageBreak = false;
+	bool isSystemBreak = false;
+	string pageparam = element.attribute("new-page").value();
+	string systemparam = element.attribute("new-system").value();
+	if (pageparam == "yes") {
+		isPageBreak = true;
+	}
+	if (systemparam == "yes") {
+		isSystemBreak = true;
+	}
+
+	if (!(isPageBreak || isSystemBreak)) {
+		return;
+	}
+	if (isPageBreak) {
+		outdata->addGlobalComment("!!pagebreak:original", timestamp);
+	} else if (isSystemBreak) {
+		outdata->addGlobalComment("!!linebreak:original", timestamp);
+	}
+}
 
 
 ///////////////////////////////
@@ -45647,15 +45677,11 @@ bool Tool_musicxml2hum::getPartContent(
 
 bool Tool_musicxml2hum::getPartInfo(map<string, xml_node>& partinfo,
 		vector<string>& partids, xml_document& doc) {
-// ggg
-// cerr << "GOT HERE AAA" << endl;
 	auto scoreparts = doc.select_nodes("/score-partwise/part-list/score-part");
 	partids.reserve(scoreparts.size());
 	bool output = true;
-// cerr << "PARTS SIZE " << scoreparts.size() << endl;
 	for (auto el : scoreparts) {
 		partids.emplace_back(getAttributeValue(el.node(), "id"));
-// cerr << "\tPART ID = " << partids.back() << endl;
 		auto status = partinfo.insert(make_pair(partids.back(), el.node()));
 		if (status.second == false) {
 			cerr << "Error: ID " << partids.back()

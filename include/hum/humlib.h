@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Feb 11 01:45:33 PST 2018
+// Last Modified: Sun Feb 25 23:10:00 PST 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -4833,6 +4833,7 @@ class Tool_musicxml2hum : public HumTool {
 		void insertSingleMeasure(HumdrumFile& outfile);
 		void cleanupMeasures   (HumdrumFile& outfile,
 		                        vector<HumdrumLine*> measures);
+		void processPrintElement(GridMeasure* outdata, xml_node element, HumNum timestamp);
 
 		void addClefLine       (GridMeasure* outdata, vector<vector<xml_node> >& clefs,
 		                        vector<MxmlPart>& partdata, HumNum nowtime);
