@@ -76,18 +76,26 @@ tests:
             link: cmn#cmnMeasures
             file: layer1.mei
             title: "Autodetection of partial layer"
+            verovio: 2
+            version: "2.0.0"
           - section: "The Role of the Measure Element"
             link: cmn#cmnMeasures
             file: layer2.mei
             title: "Collision between layers"
+            verovio: 2
+            version: "2.0.0"
           - section: "The Role of the Measure Element"
             link: cmn#cmnMeasures
             file: layer3.mei
             title: "Shared accidentals between notes in separate layers"
+            verovio: 2
+            version: "2.0.0"
           - section: "The Role of the Measure Element"
             link: cmn#cmnMeasures
             file: layer4.mei
             title: "Syllable width in alternating layers"
+            verovio: 1
+            version: "2.0.0"
           - section: "The Role of the Measure Element"
             link: cmn#cmnMeasures
             file: space.mei 
@@ -120,18 +128,26 @@ tests:
             link: cmn#cmnDefs
             file: staff.mei
             title: "Symbols centred con non-5-line staff"
+            verovio: 2
+            version: "2.0.0"
           - section: "Defining Score Parameters for CMN"
             link: cmn#cmnDefs
             file: time-sign.mei
             title: "Support for invisible or one-number meter"
+            verovio: 2
+            version: "2.0.0"
           - section: "Redefinition of Score Parameters"
             link: cmn#cmnReDef
             file: clef-changes.mei 
             title: "Clef change example"
+            verovio: 2
+            version: "2.0.0"
           - section: "Redefinition of Score Parameters"
             link: cmn#cmnReDef
             file: key-change.mei 
             title: "Key changes example"
+            verovio: 1
+            version: "2.0.0"
           - section: "Redefinition of Score Parameters"
             link: cmn#cmnReDef
             file: scoredef-changes.mei 
@@ -144,6 +160,8 @@ tests:
             link: cmn#cmnNotesChords
             file: accid2.mei
             title: "Rendering accidentals"
+            verovio: 2
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: accid3.mei
