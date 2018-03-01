@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Feb 25 23:10:00 PST 2018
+// Last Modified: Wed Feb 28 17:54:56 PST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2704,7 +2704,7 @@ GridSlice* GridMeasure::addGraceToken(const string& tok, HumNum timestamp,
 	}
 
 	GridSlice* gs = NULL;
-	GridSlice* datatarget = NULL;
+	// GridSlice* datatarget = NULL;
 	auto iterator = this->begin();
 	if (this->empty()) {
 		// add a new GridSlice to an empty list or at end of list if timestamp
@@ -2755,7 +2755,7 @@ GridSlice* GridMeasure::addGraceToken(const string& tok, HumNum timestamp,
 			if ((*iterator)->isDataSlice()) {
 				if ((*iterator)->getTimestamp() == timestamp) {
 					// found dataslice just before graceslice(s)
-					datatarget = *iterator;
+					// datatarget = *iterator;
 					break;
 				}
 			}
@@ -38391,7 +38391,7 @@ void Tool_mei2hum::processHairpin(hairpin_info& info) {
 	double threshold = 0.001;
 	auto it = gm->begin();
 	GridSlice *lastgs = NULL;
-	bool found = false;
+	// bool found = false;
 
 	while (it != gm->end()) {
 		if (!(*it)->isDataSlice()) {
@@ -38402,11 +38402,11 @@ void Tool_mei2hum::processHairpin(hairpin_info& info) {
 		mtimestamp = (timestamp - measurestart) * 4.0 / m_currentMeterUnit[mindex];
 		double diff = starttime - mtimestamp.getFloat();
 		if (diff < threshold) {
-			found = true;
+			// found = true;
 			lastgs = *it;
 			break;
 		} else if (diff < 0.0) {
-			found = true;
+			// found = true;
 			lastgs = *it;
 			break;
 		}
@@ -38424,7 +38424,7 @@ void Tool_mei2hum::processHairpin(hairpin_info& info) {
 	gm = *myit;
 	it = gm->begin();
 	lastgs = NULL;
-	found = false;
+	// found = false;
 	while (it != gm->end()) {
 		if (!(*it)->isDataSlice()) {
 			it++;
@@ -38434,11 +38434,11 @@ void Tool_mei2hum::processHairpin(hairpin_info& info) {
 		mtimestamp = (timestamp - measurestart) * 4.0 / m_currentMeterUnit[mindex];
 		double diff = endtime - mtimestamp.getFloat();
 		if (diff < threshold) {
-			found = true;
+			// found = true;
 			lastgs = *it;
 			break;
 		} else if (diff < 0.0) {
-			found = true;
+			// found = true;
 			lastgs = *it;
 			break;
 		}
@@ -39016,8 +39016,8 @@ void Tool_mei2hum::fillWithStaffDefAttributes(mei_staffDef& staffinfo, xml_node 
 	string midibpm;
 	string label;
 	string labelabbr;
-	int transsemi;
-	int transdiat;
+	int transsemi = 0;
+	int transdiat = 0;
 
 	string nodename = element.name();
 
@@ -39620,10 +39620,10 @@ HumNum Tool_mei2hum::parseStaff(xml_node staff, HumNum starttime) {
 		return starttime;
 	}
 
-	bool allequal = true;
+	// bool allequal = true;
 	for (int i=1; i<(int)durations.size(); i++) {
 		if (durations[i] != durations[0]) {
-			allequal = false;
+			// allequal = false;
 			break;
 		}
 	}
@@ -49183,49 +49183,63 @@ void Tool_tassoize::updateKeySignatures(HumdrumFile& infile, int lineindex) {
 				case 'a': case 'A':
 					switch (text[j+1]) {
 						case '#': m_pstates[track][5] = +1;
+						break;
 						case '-': m_pstates[track][5] = -1;
+						break;
 					}
 					break;
 
 				case 'b': case 'B':
 					switch (text[j+1]) {
 						case '#': m_pstates[track][6] = +1;
+						break;
 						case '-': m_pstates[track][6] = -1;
+						break;
 					}
 					break;
 
 				case 'c': case 'C':
 					switch (text[j+1]) {
 						case '#': m_pstates[track][0] = +1;
+						break;
 						case '-': m_pstates[track][0] = -1;
+						break;
 					}
 					break;
 
 				case 'd': case 'D':
 					switch (text[j+1]) {
 						case '#': m_pstates[track][1] = +1;
+						break;
 						case '-': m_pstates[track][1] = -1;
+						break;
 					}
 					break;
 
 				case 'e': case 'E':
 					switch (text[j+1]) {
 						case '#': m_pstates[track][2] = +1;
+						break;
 						case '-': m_pstates[track][2] = -1;
+						break;
 					}
 					break;
 
 				case 'f': case 'F':
 					switch (text[j+1]) {
 						case '#': m_pstates[track][3] = +1;
+						break;
 						case '-': m_pstates[track][3] = -1;
+						break;
 					}
 					break;
 
 				case 'g': case 'G':
 					switch (text[j+1]) {
 						case '#': m_pstates[track][4] = +1;
+						break;
 						case '-': m_pstates[track][4] = -1;
+						break;
 					}
 					break;
 			}
