@@ -194,30 +194,44 @@ tests:
             link: cmn#cmnNotesChords
             file: chords4.mei
             title: "Accidental adjustment on chords"
+            verovio: 2
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: dots.mei
             title: "Dot placement with various note duration"
+            verovio: 1
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: dots2.mei
             title: "Dot placement with multiple layers"
+            verovio: 1
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: dots3.mei
             title: "Dot and flag interaction"
+            verovio: 1
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: notes.mei
             title: "Hidden notes"
+            verovio: 2
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: notes2.mei
             title: "Pickup note spacing"
+            verovio: 2
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: notes3.mei
             title: "Ledger line adjustment"
+            verovio: 2
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: notes4.mei
@@ -226,18 +240,26 @@ tests:
             link: cmn#cmnNotesChords
             file: size.mei
             title: "Cue-sized notes"
+            verovio: 1
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: stem.mei
             title: "Stem length adjustment"
+            verovio: 2
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: stem2.mei
             title: "Stem direction"
+            verovio: 1
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: stem3.mei
             title: "Stem length adjustment for bTrem slashes"
+            verovio: 1
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: stem4.mei
@@ -246,6 +268,8 @@ tests:
             link: cmn#cmnNotesChords
             file: stemless.mei
             title: "Notes without stem (2)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: stemless2.mei
@@ -254,22 +278,32 @@ tests:
             link: cmn#cmnNotesChords
             file: unison1.mei
             title: "Note-head placement in unison (1)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: unison2.mei
             title: "Note-head placement in unison (2)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: unison3.mei
             title: "Accidental placement on unison"
+            verovio: 2
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: unison4.mei
             title: "Dots merge when note-heads merge on unisons"
+            verovio: 1
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: unison5.mei
             title: "Accidental placement on unison (2)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Grace notes"
             link: cmn#cmnNotesGrace
             file: gracenotes.mei 
@@ -278,26 +312,38 @@ tests:
             link: cmn#cmnNotesGrace
             file: gracenotes10.mei
             title: "Grace note and clef interaction (2)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Grace notes"
             link: cmn#cmnNotesGrace
             file: gracenotes11.mei
             title: "Slurred grace notes"
+            verovio: 1
+            version: "2.0.0"
           - section: "Grace notes"
             link: cmn#cmnNotesGrace
             file: gracenotes12.mei
             title: "Slashes on grace notes (2)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Grace notes"
             link: cmn#cmnNotesGrace
             file: gracenotes2.mei
             title: "Slashes on grace notes"
+            verovio: 2
+            version: "2.0.0"
           - section: "Grace notes"
             link: cmn#cmnNotesGrace
             file: gracenotes3.mei
             title: "Cue-sized grace notes"
+            verovio: 1
+            version: "2.0.0"
           - section: "Grace notes"
             link: cmn#cmnNotesGrace
             file: gracenotes4.mei
             title: "Grace note interaction with spacing"
+            verovio: 2
+            version: "2.0.0"
           - section: "Grace notes"
             link: cmn#cmnNotesGrace
             file: gracenotes5.mei
@@ -306,18 +352,26 @@ tests:
             link: cmn#cmnNotesGrace
             file: gracenotes6.mei
             title: "Grace note chords (2)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Grace notes"
             link: cmn#cmnNotesGrace
             file: gracenotes7.mei
             title: "Grace note chords (3)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Grace notes"
             link: cmn#cmnNotesGrace
             file: gracenotes8.mei
             title: "Grace note chords (4)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Grace notes"
             link: cmn#cmnNotesGrace
             file: gracenotes9.mei
             title: "Grace note and clef interaction"
+            verovio: 2
+            version: "2.0.0"
           - section: "Stem Modifications"
             link: cmn#cmnNotesStems
             file: cross-staff.mei 
@@ -326,10 +380,14 @@ tests:
             link: cmn#cmnNotesStems
             file: cross-staff2.mei
             title: "Lowest note in cross-staff chords"
+            verovio: 1
+            version: "2.0.0"
           - section: "Stem Modifications"
             link: cmn#cmnNotesStems
             file: cross-staff3.mei
             title: "Accidentals in cross-staff chords"
+            verovio: 2
+            version: "2.0.0"
           - section: "Stem Modifications"
             link: cmn#cmnNotesStems
             file: cross-staff4.mei
@@ -346,30 +404,44 @@ tests:
             link: cmn#cmnRests
             file: rests.mei 
             title: "Rests and dotted rests"
+            verovio: 2
+            version: "2.0.0"
           - section: "Rests"
             link: cmn#cmnRests
             file: rests2.mei
             title: "Rest placement"
+            verovio: 2
+            version: "2.0.0"
           - section: "Rests"
             link: cmn#cmnRests
             file: rests3.mei
             title: "Vertical placement of rests"
+            verovio: 2
+            version: "2.0.0"
           - section: "Rests"
             link: cmn#cmnRests
             file: rests4.mei
             title: "Note and rest collision between different layers"
+            verovio: 1
+            version: "2.0.0"
           - section: "Rests"
             link: cmn#cmnRests
             file: rests5.mei
             title: "Vertical placement of rests (2)"
+            verovio: 1
+            version: "2.0.0"
           - section: "Rests"
             link: cmn#cmnRests
             file: rests6.mei
             title: "Measure rest symbol"
+            verovio: 2
+            version: "2.0.0"
           - section: "Rests"
             link: cmn#cmnRests
             file: rests7.mei
             title: "Vertical placement of rests (3)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Rests"
             link: cmn#cmnRests
             file: rests8.mei
@@ -378,18 +450,26 @@ tests:
             link: cmn#cmnRests
             file: rests9.mei
             title: "Vertical placement of rests (4)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Beams"
             link: cmn#cmnBeams
             file: beam-breaks.mei 
             title: "Beam break example"
+            verovio: 2
+            version: "2.0.0"
           - section: "Beams"
             link: cmn#cmnBeams
             file: beam2.mei
             title: "Interaction grace note beams and regular beams"
+            verovio: 1
+            version: "2.0.0"
           - section: "Beams"
             link: cmn#cmnBeams
             file: beam3.mei
             title: "Horizontal beams"
+            verovio: 1
+            version: "2.0.0"
           - section: "Beams"
             link: cmn#cmnBeams
             file: beam4.mei
@@ -402,6 +482,8 @@ tests:
             link: cmn#cmnBeams
             file: beam6.mei
             title: "Partial beams"
+            verovio: 1
+            version: "2.0.0"
           - section: "Beams"
             link: cmn#cmnBeams
             file: beam7.mei
@@ -414,18 +496,26 @@ tests:
             link: cmn#cmnSlurTies
             file: slur2.mei
             title: "Slurs on mixed stem directions"
+            verovio: 2
+            version: "2.0.0"
           - section: "Ties, Slurs and Phrase Marks"
             link: cmn#cmnSlurTies
             file: slur3.mei
             title: "Slur and directives interactions"
+            verovio: 2
+            version: "2.0.0"
           - section: "Ties, Slurs and Phrase Marks"
             link: cmn#cmnSlurTies
             file: slur4.mei
             title: "Portato rendering"
+            verovio: 1
+            version: "2.0.0"
           - section: "Ties, Slurs and Phrase Marks"
             link: cmn#cmnSlurTies
             file: slur5.mei
             title: "Multiple slurs"
+            verovio: 1
+            version: "2.0.0"
           - section: "Ties, Slurs and Phrase Marks"
             link: cmn#cmnSlurTies
             file: slur6.mei
@@ -434,6 +524,8 @@ tests:
             link: cmn#cmnSlurTies
             file: slur7.mei
             title: "Slur angles"
+            verovio: 1
+            version: "2.0.0"
           - section: "Ties, Slurs and Phrase Marks"
             link: cmn#cmnSlurTies
             file: slur8.mei
@@ -442,6 +534,8 @@ tests:
             link: cmn#cmnSlurTies
             file: tie-chords1.mei 
             title: "Ties on chords example"
+            verovio: 2
+            version: "2.0.0"
           - section: "Ties, Slurs and Phrase Marks"
             link: cmn#cmnSlurTies
             file: tie-chords2.mei 
@@ -458,6 +552,8 @@ tests:
             link: cmn#cmnSlurTies
             file: tie2.mei
             title: "Tied longa notes"
+            verovio: 2
+            version: "2.0.0"
           - section: "Dynamics in CMN"
             link: cmn#cmnDynam
             file: dynam1.mei 
@@ -470,10 +566,14 @@ tests:
             link: cmn#cmnDynam
             file: dynam3.mei 
             title: "Dynamic example with place"
+            verovio: 2
+            version: "2.0.0"
           - section: "Dynamics in CMN"
             link: cmn#cmnDynam
             file: dynam4.mei
             title: "Scope and placement of dynamics"
+            verovio: 2
+            version: "2.0.0"
           - section: "Dynamics in CMN"
             link: cmn#cmnDynam
             file: hairpin1.mei 
@@ -490,6 +590,8 @@ tests:
             link: cmn#cmnTuplets
             file: tuplet.mei 
             title: "Tuplet example"
+            verovio: 2
+            version: "2.0.0"
           - section: "Tuplets"
             link: cmn#cmnTuplets
             file: tuplet10.mei
@@ -498,6 +600,8 @@ tests:
             link: cmn#cmnTuplets
             file: tuplet11.mei
             title: "Space within tuplets"
+            verovio: 2
+            version: "2.0.0"
           - section: "Tuplets"
             link: cmn#cmnTuplets
             file: tuplet12.mei
@@ -506,10 +610,14 @@ tests:
             link: cmn#cmnTuplets
             file: tuplet13.mei
             title: "Tuplets on rests (1)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Tuplets"
             link: cmn#cmnTuplets
             file: tuplet14.mei
             title: "Tuplets on rests (2)"
+            verovio: 1
+            version: "2.0.0"
           - section: "Tuplets"
             link: cmn#cmnTuplets
             file: tuplet15.mei
@@ -518,6 +626,8 @@ tests:
             link: cmn#cmnTuplets
             file: tuplet16.mei
             title: "Tuplet options"
+            verovio: 2
+            version: "2.0.0"
           - section: "Tuplets"
             link: cmn#cmnTuplets
             file: tuplet2.mei
@@ -526,22 +636,32 @@ tests:
             link: cmn#cmnTuplets
             file: tuplet3.mei
             title: "Collision between tuplet bracket and staff"
+            verovio: 1
+            version: "2.0.0"
           - section: "Tuplets"
             link: cmn#cmnTuplets
             file: tuplet4.mei
             title: "Tuplet bracket on whole notes"
+            verovio: 2
+            version: "2.0.0"
           - section: "Tuplets"
             link: cmn#cmnTuplets
             file: tuplet5.mei
             title: "Tuplet bracket inside of beam"
+            verovio: 2
+            version: "2.0.0"
           - section: "Tuplets"
             link: cmn#cmnTuplets
             file: tuplet6.mei
             title: "Tuplet number format"
+            verovio: 2
+            version: "2.0.0"
           - section: "Tuplets"
             link: cmn#cmnTuplets
             file: tuplet8.mei
             title: "Tuplets with stemless notes"
+            verovio: 1
+            version: "2.0.0"
           - section: "Tuplets"
             link: cmn#cmnTuplets
             file: tupletspan.mei 
@@ -550,34 +670,50 @@ tests:
             link: cmn#cmnArtic
             file: artic1.mei 
             title: "Articulation example"
+            verovio: 2
+            version: "2.0.0"
           - section: "Articulation and Performance Instructions in CMN"
             link: cmn#cmnArtic
             file: artic2.mei 
             title: "Articulation example (2)"
+            verovio: 1
+            version: "2.0.0"
           - section: "Articulation and Performance Instructions in CMN"
             link: cmn#cmnArtic
             file: artic3.mei
             title: "Avoiding crowded articulations"
+            verovio: 2
+            version: "2.0.0"
           - section: "Articulation and Performance Instructions in CMN"
             link: cmn#cmnArtic
             file: artic4.mei
             title: "Articulation and stave spacing interaction"
+            verovio: 1
+            version: "2.0.0"
           - section: "Articulation and Performance Instructions in CMN"
             link: cmn#cmnArtic
             file: artic5.mei
             title: "Staccato dots in staff space"
+            verovio: 2
+            version: "2.0.0"
           - section: "Articulation and Performance Instructions in CMN"
             link: cmn#cmnArtic
             file: artic6.mei
             title: "Avoiding collisions articulation/tuplets"
+            verovio: 2
+            version: "2.0.0"
           - section: "Arpeggio and Glissando"
             link: cmn#cmnArpegGliss
             file: gliss.mei
             title: "Glissando"
+            verovio: 1
+            version: "2.0.0"
           - section: "Tremolandi"
             link: cmn#cmnTrem
             file: btrem.mei 
             title: "Single-note (bowed) temolo example"
+            verovio: 1
+            version: "2.0.0"
           - section: "Tremolandi"
             link: cmn#cmnTrem
             file: ftrem.mei
@@ -594,6 +730,8 @@ tests:
             link: cmn#cmnFermata
             file: fermata3.mei
             title: "Fermatas on whole measures in different layers"
+            verovio: 2
+            version: "2.0.0"
           - section: "Fermata"
             link: cmn#cmnFermata
             file: fermata4.mei
@@ -602,38 +740,56 @@ tests:
             link: cmn#cmnFermata
             file: fermata5.mei
             title: "Fermatas and editorial accidentals interaction"
+            verovio: 2
+            version: "2.0.0"
           - section: "Fermata"
             link: cmn#cmnFermata
             file: fermata6.mei
             title: "Fermata centred on rests and fermata heigt"
+            verovio: 2
+            version: "2.0.0"
           - section: "Octave shift"
             link: cmn#cmnOctave
             file: octave-shift1.mei 
             title: "Octave shift example"
+            verovio: 2
+            version: "2.0.0"
           - section: "Octave shift"
             link: cmn#cmnOctave
             file: octave-shift2.mei 
             title: "Octave shift example (below and with 'tstamp' attribute)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Octave shift"
             link: cmn#cmnOctave
             file: octave-shift3.mei 
             title: "Octave shift example (style)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Breath marks"
             link: cmn#cmnBreath
             file: breath.mei
             title: "Taking breath"
+            verovio: 2
+            version: "2.0.0"
           - section: "Piano pedal"
             link: cmn#cmnPedal
             file: piano-pedal.mei 
             title: "Piano pedal example"
+            verovio: 2
+            version: "2.0.0"
           - section: "Piano pedal"
             link: cmn#cmnPedal
             file: piano-pedal2.mei 
             title: "Piano pedal and measure rests"
+            verovio: 2
+            version: "2.0.0"
           - section: "Structural repetition"
             link: cmn#cmnRepStruct
             file: endings.mei 
             title: "Ending example"
+            verovio: 2
+            version: "2.0.0"
           - section: "Structural repetition"
             link: cmn#cmnRepStruct
             file: endings2.mei
@@ -646,6 +802,8 @@ tests:
             link: cmn#cmnRepSym
             file: beatrpt1.mei 
             title: "Beat repetition example (1)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Measure-Level Repetition Symbols"
             link: cmn#cmnRepSym
             file: beatrpt2.mei 
@@ -654,10 +812,14 @@ tests:
             link: cmn#cmnRepSym
             file: mrpt.mei 
             title: "Measure repetition example (1)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Measure-Level Repetition Symbols"
             link: cmn#cmnRepSym
             file: mrpt2.mei 
             title: "Measure repetition example (2)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Measure-Level Repetition Symbols"
             link: cmn#cmnRepSym
             file: multirpt.mei 
@@ -682,30 +844,44 @@ tests:
             link: cmnOrnaments#cmnOrnamentsMordents
             file: mordent.mei
             title: "Mordents example"
+            verovio: 2
+            version: "2.0.0"
           - section: "Mordents"
             link: cmnOrnaments#cmnOrnamentsMordents
             file: mordent2.mei
             title: "Mordents example (2)"
+            verovio: 1
+            version: "2.0.0"
           - section: "Mordents"
             link: cmnOrnaments#cmnOrnamentsMordents
             file: mordent3.mei
             title: "Mordents example (3)"
+            verovio: 1
+            version: "2.0.0"
           - section: "Trills"
             link: cmnOrnaments#cmnOrnamentsTrills
             file: trills.mei 
             title: "Trills example"
+            verovio: 2
+            version: "2.0.0"
           - section: "Trills"
             link: cmnOrnaments#cmnOrnamentsTrills
             file: trills2.mei
             title: "Trills example (2)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Trills"
             link: cmnOrnaments#cmnOrnamentsTrills
             file: trills3.mei
             title: "Trills example (3)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Trills"
             link: cmnOrnaments#cmnOrnamentsTrills
             file: trills4.mei
             title: "Trills example (4)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Trills"
             link: cmnOrnaments#cmnOrnamentsTrills
             file: trills5.mei
