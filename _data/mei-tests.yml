@@ -24,6 +24,8 @@ tests:
             link: shared#sharedTextDirectives
             file: dir4.mei
             title: "Tempi/directives vertical alignment"
+            verovio: 2
+            version: "2.0.0"
           - section: "Tempi and directives"
             link: shared#sharedTextDirectives
             file: dir5.mei
