@@ -16,9 +16,15 @@
 #include "doc.h"
 #include "floatingobject.h"
 #include "glyph.h"
+#include "layer.h"
 #include "layerelement.h"
 #include "staff.h"
+<<<<<<< HEAD
 #include "staffdef.h"
+=======
+#include "note.h"
+#include "measure.h"
+>>>>>>> master
 #include "view.h"
 #include "vrv.h"
 
@@ -195,12 +201,123 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         AttColor *att = dynamic_cast<AttColor *>(object);
         assert(att);
         if (att->HasColor()) {
-            m_currentNode.append_attribute("fill") = att->GetColor().c_str();
+            // SS Ignore color
+			//m_currentNode.append_attribute("fill") = att->GetColor().c_str();
         }
     }
 
+<<<<<<< HEAD
     if (object->HasAttClass(ATT_LABELLED)) {
         AttLabelled *att = dynamic_cast<AttLabelled *>(object);
+=======
+	if (object->Is(NOTE)) {
+		Note *note = dynamic_cast<Note *>(object);
+		assert(note);
+		double timeofElementOn = note->m_playingOnset *1000 / 120;
+		double timeofElementOff = note->m_playingOffset *1000 / 120;
+		double timeofElementDuration = timeofElementOff - timeofElementOn;
+
+		int measureNoteIdx = -1;
+
+		/*
+		Object *m_obj = object->GetFirstParent(MEASURE);
+		if (m_obj != NULL) {
+			Measure *measure = dynamic_cast<Measure *>(m_obj);
+			measureNoteIdx = measure->GetChildIndex(note);
+			Object *current_note_obj = measure->GetFirst(NOTE);
+			Note *first_note = dynamic_cast<Note *>(current_note_obj);
+
+			float measureOnRaw = first_note->m_playingOnset;
+			float measureOffRaw = first_note->m_playingOffset;
+
+			while (current_note_obj) {
+				current_note_obj->GetNext();
+				Note *current_note = dynamic_cast<Note *>(current_note_obj);
+				if (current_note->m_playingOffset > measureOffRaw) {
+					measureOffRaw = current_note->m_playingOffset;
+				}
+			}
+			float measureOn = measureOnRaw * 1000 / 120;
+			float measureOff = measureOffRaw * 1000 / 120;
+			m_currentNode.append_attribute("m_on") = measureOn;
+			m_currentNode.append_attribute("m_off") = measureOff;
+		}
+		*/
+
+		Accid *accid = note->GetDrawingAccid();
+
+		// Create midi note
+		int midiBase = 0;
+		data_PITCHNAME pname = note->GetPname();
+		switch (pname) {
+		case PITCHNAME_c: midiBase = 0; break;
+		case PITCHNAME_d: midiBase = 2; break;
+		case PITCHNAME_e: midiBase = 4; break;
+		case PITCHNAME_f: midiBase = 5; break;
+		case PITCHNAME_g: midiBase = 7; break;
+		case PITCHNAME_a: midiBase = 9; break;
+		case PITCHNAME_b: midiBase = 11; break;
+		case PITCHNAME_NONE: break;
+		}
+		// Check for accidentals
+		if (accid && accid->HasAccidGes()) {
+			data_ACCIDENTAL_IMPLICIT accImp = accid->GetAccidGes();
+			switch (accImp) {
+			case ACCIDENTAL_IMPLICIT_s: midiBase += 1; break;
+			case ACCIDENTAL_IMPLICIT_f: midiBase -= 1; break;
+			case ACCIDENTAL_IMPLICIT_ss: midiBase += 2; break;
+			case ACCIDENTAL_IMPLICIT_ff: midiBase -= 2; break;
+			default: break;
+			}
+		}
+		else if (accid) {
+			data_ACCIDENTAL_EXPLICIT accExp = accid->GetAccid();
+			switch (accExp) {
+			case ACCIDENTAL_EXPLICIT_s: midiBase += 1; break;
+			case ACCIDENTAL_EXPLICIT_f: midiBase -= 1; break;
+			case ACCIDENTAL_EXPLICIT_ss: midiBase += 2; break;
+			case ACCIDENTAL_EXPLICIT_x: midiBase += 2; break;
+			case ACCIDENTAL_EXPLICIT_ff: midiBase -= 2; break;
+			case ACCIDENTAL_EXPLICIT_xs: midiBase += 3; break;
+			case ACCIDENTAL_EXPLICIT_ts: midiBase += 3; break;
+			case ACCIDENTAL_EXPLICIT_tf: midiBase -= 3; break;
+			case ACCIDENTAL_EXPLICIT_nf: midiBase -= 1; break;
+			case ACCIDENTAL_EXPLICIT_ns: midiBase += 1; break;
+			default: break;
+			}
+		}
+
+		// Adjustment for transposition intruments
+		// SS is this needed ?
+		//midiBase += params->m_transSemi;
+
+
+		int oct = note->GetOct();
+		if (note->HasOctGes()) oct = note->GetOctGes();
+
+		int pitch = midiBase + (oct + 1) * 12;
+
+		int inBeam = false;
+		if (note->IsInBeam() != NULL) {
+			inBeam = true;
+		}
+
+		Object *layer_obj = object->GetFirstParent(LAYER);
+		if (layer_obj != NULL) {
+			Layer *layer = dynamic_cast<Layer *>(layer_obj);
+		}
+
+		m_currentNode.append_attribute("time_on") = timeofElementOn;
+		m_currentNode.append_attribute("time_off") = timeofElementOff;
+		m_currentNode.append_attribute("time_len") = timeofElementDuration;
+		m_currentNode.append_attribute("fill") = vrv::RGBToHexStr(0,pitch,0).c_str();
+		
+		//m_currentNode.append_attribute("fill") = "red";
+	}
+
+    if (object->HasAttClass(ATT_COMMONPART)) {
+        AttCommonPart *att = dynamic_cast<AttCommonPart *>(object);
+>>>>>>> master
         assert(att);
         if (att->HasLabel()) {
             pugi::xml_node svgTitle = m_currentNode.prepend_child("title");
@@ -448,9 +565,10 @@ void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d")
         = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", bezier1[0].x, bezier1[0].y, // M command
-            bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
-            bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
-            ).c_str();
+              bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
+              bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
+              )
+              .c_str();
     // pathChild.append_attribute("fill") = "#000000";
     // pathChild.append_attribute("fill-opacity") = "1";
     pathChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
@@ -550,8 +668,8 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
 
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d", int(xs), int(ys), abs(int(rx)),
-        abs(int(ry)), fArc, fSweep, int(xe),
-        int(ye)).c_str();
+                                          abs(int(ry)), fArc, fSweep, int(xe), int(ye))
+                                          .c_str();
     // pathChild.append_attribute("fill") = "#000000";
     if (currentBrush.GetOpacity() != 1.0) pathChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
     if (currentPen.GetOpacity() != 1.0) pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();

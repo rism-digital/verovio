@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
@@ -174,6 +175,7 @@ Beam *LayerElement::IsInBeam()
         if (this->IsGraceNote()) {
             LayerElement *graceNote = this;
             if (this->Is(STEM)) graceNote = dynamic_cast<LayerElement *>(this->GetFirstParent(NOTE, MAX_BEAM_DEPTH));
+<<<<<<< HEAD
             // Make sure the object list is set
             beamParent->GetList(beamParent);
             // If the note is part of the beam parent, this means we have a beam of graced notes
@@ -184,6 +186,12 @@ Beam *LayerElement::IsInBeam()
             else {
                 return NULL;
             }
+=======
+            // If the note is part of the beam parent, this means we
+            // have a beam of graced notes
+            if (beamParent->GetListIndex(graceNote) > -1) return beamParent;
+            // otherwise it is a non-beamed grace note within a beam - will return false
+>>>>>>> master
         }
         else {
             return beamParent;
@@ -778,8 +786,11 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
             assert(staff);
             loc = staff->m_drawingLines - 1;
+<<<<<<< HEAD
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
+=======
+>>>>>>> master
             bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
@@ -815,8 +826,11 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
             assert(staff);
             loc = staff->m_drawingLines - 1;
+<<<<<<< HEAD
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
+=======
+>>>>>>> master
             bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
@@ -1242,6 +1256,7 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
 
         Chord *chord = note->IsChordTone();
 
+<<<<<<< HEAD
         if (chord) {
             incrementScoreTime = chord->GetAlignmentDuration();
         }
@@ -1250,9 +1265,20 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         }
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
+=======
+        double dur;
+        if (chord)
+            dur = chord->GetAlignmentDuration();
+        else
+            dur = note->GetAlignmentDuration();
+		dur = dur * params->m_currentBpm / (DUR_MAX / DURATION_4);
+>>>>>>> master
 
-        // LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
-        // note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
+        // 
+		//LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
+		
+		std::cout << "Note: ID: " << note->GetUuid() << " " << " Dur: " << dur << " " << std::endl;
+		// note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
         // LogDebug("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
 
         note->SetScoreTimeOnset(params->m_currentScoreTime);

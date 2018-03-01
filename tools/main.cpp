@@ -362,9 +362,14 @@ int main(int argc, char **argv)
         exit(1);
     }
 
+<<<<<<< HEAD
     if ((outformat != "svg") && (outformat != "mei") && (outformat != "midi") && (outformat != "timemap")
         && (outformat != "humdrum") && (outformat != "hum")) {
         cerr << "Output format (" << outformat << ") can only be 'mei', 'svg', 'midi', or 'humdrum'." << endl;
+=======
+    if (outformat != "svg" && outformat != "mei" && outformat != "midi" && outformat != "humdrum" && outformat != "svgmidi") {
+        cerr << "Output format can only be 'mei', 'svg', 'midi', or 'humdrum'." << endl;
+>>>>>>> master
         exit(1);
     }
 
@@ -458,6 +463,7 @@ int main(int argc, char **argv)
             cerr << "Output written to " << outfile << "." << endl;
         }
     }
+<<<<<<< HEAD
     else if (outformat == "timemap") {
         outfile += ".json";
         if (std_output) {
@@ -473,6 +479,41 @@ int main(int argc, char **argv)
         }
     }
     else if (outformat == "humdrum" || outformat == "hum") {
+=======
+	else if (outformat == "svgmidi") {
+		outfile += ".mid";
+		if (std_output) {
+			cerr << "Midi cannot write to standard output." << endl;
+			exit(1);
+		}
+		else if (!toolkit.RenderToMidiFile(outfile)) {
+			cerr << "Unable to write MIDI to " << outfile << "." << endl;
+			exit(1);
+		}
+		else {
+			cerr << "Output written to " << outfile << "." << endl;
+			int p;
+			for (p = from; p < to; p++) {
+				std::string cur_outfile = outfile;
+				if (all_pages) {
+					cur_outfile += StringFormat("_%03d", p);
+				}
+				cur_outfile += ".svg";
+				if (std_output) {
+					cout << toolkit.RenderToSvg(p);
+				}
+				else if (!toolkit.RenderToSvgFile(cur_outfile, p)) {
+					cerr << "Unable to write SVG to " << cur_outfile << "." << endl;
+					exit(1);
+				}
+				else {
+					cerr << "Output written to " << cur_outfile << "." << endl;
+				}
+			}
+		}
+	}
+    else if (outformat == "humdrum") {
+>>>>>>> master
         outfile += ".krn";
         if (std_output) {
             toolkit.GetHumdrum(std::cout);
