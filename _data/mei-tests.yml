@@ -52,6 +52,7 @@ tests:
             link: shared#sharedAnnotations
             file: annot1.mei
             title: "Support for annotations"
+          
           - section: "Text rendition"
             link: shared#sharedTextRendition
             file: color1.mei 
@@ -104,6 +105,7 @@ tests:
             link: cmn#cmnMeasures
             file: spacing.mei 
             title: "Spacing example"
+          
           - section: "Defining Score Parameters for CMN"
             link: cmn#cmnDefs
             file: barlines.mei 
@@ -136,6 +138,7 @@ tests:
             title: "Support for invisible or one-number meter"
             verovio: 2
             version: "2.0.0"
+          
           - section: "Redefinition of Score Parameters"
             link: cmn#cmnReDef
             file: clef-changes.mei 
@@ -156,6 +159,7 @@ tests:
             link: cmn#cmnReDef
             file: scoredef-changes2.mei
             title: "Clef changes at system break"
+          
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: accid2.mei
@@ -304,6 +308,7 @@ tests:
             title: "Accidental placement on unison (2)"
             verovio: 2
             version: "2.0.0"
+          
           - section: "Grace notes"
             link: cmn#cmnNotesGrace
             file: gracenotes.mei 
@@ -372,6 +377,7 @@ tests:
             title: "Grace note and clef interaction"
             verovio: 2
             version: "2.0.0"
+          
           - section: "Stem Modifications"
             link: cmn#cmnNotesStems
             file: cross-staff.mei 
@@ -452,6 +458,7 @@ tests:
             title: "Vertical placement of rests (4)"
             verovio: 2
             version: "2.0.0"
+          
           - section: "Beams"
             link: cmn#cmnBeams
             file: beam-breaks.mei 
@@ -488,6 +495,7 @@ tests:
             link: cmn#cmnBeams
             file: beam7.mei
             title: "Beams and stem directions"
+          
           - section: "Ties, Slurs and Phrase Marks"
             link: cmn#cmnSlurTies
             file: slur1.mei
@@ -554,6 +562,7 @@ tests:
             title: "Tied longa notes"
             verovio: 2
             version: "2.0.0"
+          
           - section: "Dynamics in CMN"
             link: cmn#cmnDynam
             file: dynam1.mei 
@@ -586,6 +595,7 @@ tests:
             link: cmn#cmnDynam
             file: hairpin3.mei
             title: "Hairpin example with various angles"
+          
           - section: "Tuplets"
             link: cmn#cmnTuplets
             file: tuplet.mei 
@@ -666,6 +676,7 @@ tests:
             link: cmn#cmnTuplets
             file: tupletspan.mei 
             title: "TupletSpan example"
+          
           - section: "Articulation and Performance Instructions in CMN"
             link: cmn#cmnArtic
             file: artic1.mei 
@@ -702,12 +713,14 @@ tests:
             title: "Avoiding collisions articulation/tuplets"
             verovio: 2
             version: "2.0.0"
+          
           - section: "Arpeggio and Glissando"
             link: cmn#cmnArpegGliss
             file: gliss.mei
             title: "Glissando"
             verovio: 1
             version: "2.0.0"
+          
           - section: "Tremolandi"
             link: cmn#cmnTrem
             file: btrem.mei 
@@ -718,6 +731,7 @@ tests:
             link: cmn#cmnTrem
             file: ftrem.mei
             title: "Two-note (fingered) temolo example"
+          
           - section: "Fermata"
             link: cmn#cmnFermata
             file: fermata1.mei 
@@ -748,6 +762,7 @@ tests:
             title: "Fermata centred on rests and fermata heigt"
             verovio: 2
             version: "2.0.0"
+          
           - section: "Octave shift"
             link: cmn#cmnOctave
             file: octave-shift1.mei 
@@ -766,12 +781,14 @@ tests:
             title: "Octave shift example (style)"
             verovio: 2
             version: "2.0.0"
+          
           - section: "Breath marks"
             link: cmn#cmnBreath
             file: breath.mei
             title: "Taking breath"
             verovio: 2
             version: "2.0.0"
+          
           - section: "Piano pedal"
             link: cmn#cmnPedal
             file: piano-pedal.mei 
@@ -783,6 +800,7 @@ tests:
             file: piano-pedal2.mei 
             title: "Piano pedal and measure rests"
             verovio: 2
+          
             version: "2.0.0"
           - section: "Structural repetition"
             link: cmn#cmnRepStruct
@@ -798,6 +816,7 @@ tests:
             link: cmn#cmnRepStruct
             file: endings3.mei
             title: "Left/right repeats at line ends"
+          
           - section: "Measure-Level Repetition Symbols"
             link: cmn#cmnRepSym
             file: beatrpt1.mei 
@@ -858,6 +877,7 @@ tests:
             title: "Mordents example (3)"
             verovio: 1
             version: "2.0.0"
+          
           - section: "Trills"
             link: cmnOrnaments#cmnOrnamentsTrills
             file: trills.mei 
@@ -886,6 +906,7 @@ tests:
             link: cmnOrnaments#cmnOrnamentsTrills
             file: trills5.mei
             title: "Ornament placement"
+          
           - section: "Turns"
             link: cmnOrnaments#cmnOrnamentsTurns
             file: turn1.mei
@@ -954,6 +975,7 @@ tests:
             link: harmony#harmonyDetails
             file: harm4.mei
             title: "Horizontal offset of harm indications"
+          
           - section: "Figured bass"
             link: harmony#harmonyFigbass
             file: fb1.mei
