@@ -35,9 +35,7 @@ TimePointInterface::TimePointInterface() : Interface(), AttStaffIdent(), AttStar
     Reset();
 }
 
-TimePointInterface::~TimePointInterface()
-{
-}
+TimePointInterface::~TimePointInterface() {}
 
 void TimePointInterface::Reset()
 {
@@ -145,9 +143,7 @@ TimeSpanningInterface::TimeSpanningInterface() : TimePointInterface(), AttStartE
     Reset();
 }
 
-TimeSpanningInterface::~TimeSpanningInterface()
-{
-}
+TimeSpanningInterface::~TimeSpanningInterface() {}
 
 void TimeSpanningInterface::Reset()
 {

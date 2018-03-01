@@ -31,9 +31,7 @@ Pedal::Pedal() : ControlElement("pedal-"), TimePointInterface(), AttColor(), Att
     Reset();
 }
 
-Pedal::~Pedal()
-{
-}
+Pedal::~Pedal() {}
 
 void Pedal::Reset()
 {

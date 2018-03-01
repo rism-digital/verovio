@@ -866,8 +866,9 @@ public:
 
 private:
     /**
-     * Indicates if the quotation is integrated into the flow of the text or interrupts
-     * it.
+     * When the block attribute is used, combinations of the 1, 2, and 4 measure rest
+     * forms (Read, p.
+     * 104) should be rendered instead of the modern form or an alternative symbol.
      **/
     data_BOOLEAN m_block;
 
@@ -914,9 +915,9 @@ public:
     ncVis_DIAGONALRIGHT GetDiagonalright() const { return m_diagonalright; }
     bool HasDiagonalright() const;
     //
-    void SetEpisima(data_BOOLEAN episima_) { m_episima = episima_; }
-    data_BOOLEAN GetEpisima() const { return m_episima; }
-    bool HasEpisima() const;
+    void SetEpisema(data_BOOLEAN episema_) { m_episema = episema_; }
+    data_BOOLEAN GetEpisema() const { return m_episema; }
+    bool HasEpisema() const;
     //
     void SetExtended(data_BOOLEAN extended_) { m_extended = extended_; }
     data_BOOLEAN GetExtended() const { return m_extended; }
@@ -964,7 +965,7 @@ private:
     /** --- **/
     ncVis_DIAGONALRIGHT m_diagonalright;
     /** --- **/
-    data_BOOLEAN m_episima;
+    data_BOOLEAN m_episema;
     /** --- **/
     data_BOOLEAN m_extended;
     /** --- **/

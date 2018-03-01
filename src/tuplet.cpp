@@ -43,9 +43,7 @@ Tuplet::Tuplet()
     Reset();
 }
 
-Tuplet::~Tuplet()
-{
-}
+Tuplet::~Tuplet() {}
 
 void Tuplet::Reset()
 {
@@ -103,9 +101,20 @@ void Tuplet::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
+}
+
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int Tuplet::ResetDrawing(FunctorParams *functorParams)
+{
+    // We want the list of the ObjectListInterface to be re-generated
+    this->Modify();
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

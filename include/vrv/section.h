@@ -56,6 +56,11 @@ public:
     ///@}
 
     /**
+     * See Object::ConvertToUnCastOffMensural
+     */
+    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
+
+    /**
      * See Object::PrepareBoundaries
      */
     virtual int PrepareBoundaries(FunctorParams *functorParams);

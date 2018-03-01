@@ -19,6 +19,7 @@
 #include "clef.h"
 #include "ending.h"
 #include "io.h"
+#include "runningelement.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -181,6 +182,7 @@ public:
     // boolean switches:
     char nostem = '\0'; // !!!RDF**kern: i = no stem
     char cuesize = '\0'; // !!!RDF**kern: i = cue size
+    char terminallong = '\0'; // !!!RDF**kern: i = terminal long
     vector<char> editacc; // !!!RDF**kern: i = editorial accidental
     vector<string> edittype; // !!!RDF**kern: i= editoral accidental, brack[ets]/paren[theses]
     char below = '\0'; // !!!RDF**kern: i = below (previous signifier is "below")
@@ -222,9 +224,6 @@ public:
     std::string GetHumdrumString();
     std::string GetMeiString();
 
-    int GetTypeOption() { return m_type; }
-    void SetTypeOption(int value) { m_type = value; }
-
 protected:
     void clear();
     bool convertHumdrum();
@@ -240,8 +239,10 @@ protected:
     void calculateLayout();
     void setSystemMeasureStyle(int startline, int endline);
     std::vector<int> getStaffLayerCounts();
-    void prepareStaffGroup();
+    void prepareStaffGroups();
     void setClef(StaffDef *part, const std::string &clef);
+    void setTransposition(StaffDef *part, const std::string &transpose);
+    void setDynamicTransposition(int partindex, StaffDef *part, const std::string &itranspose);
     void setTimeSig(StaffDef *part, const std::string &timesig);
     void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
@@ -359,6 +360,27 @@ protected:
     hum::HTp getRightmostSystemArpeggio(hum::HTp token);
     void addDirection(
         const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token, int staffindex);
+    void processTerminalLong(hum::HTp token);
+    void removeCharacter(hum::HTp token, char removechar);
+    std::string getSystemDecoration(const std::string &tag);
+    void processStaffDecoration(const std::string &decoration);
+    int getStaffNumberLabel(hum::HTp spinestart);
+    bool isFirstTokenOnStaff(hum::HTp token);
+    bool hasAboveParameter(hum::HTp token, const string &category);
+    bool hasBelowParameter(hum::HTp token, const string &category);
+    void prepareHeaderFooter();
+    bool prepareHeader(std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
+    bool prepareFooter(std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
+    std::string processReferenceTemplate(const std::string &input, std::vector<std::pair<string, string> > &biblist,
+        std::map<std::string, std::string> &refmap);
+    std::string processTemplateOperator(const std::string &value, const std::string &op);
+    std::string automaticHeaderLeft(
+        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int linecount);
+    std::string automaticHeaderCenter(
+        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
+    std::string automaticHeaderRight(
+        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int &linecount);
+    std::string getLayoutParameter(hum::HTp token, const std::string &category, const std::string &keyname);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -370,7 +392,8 @@ protected:
     void insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<std::string> > &respPeople);
 
     /// Templates ///////////////////////////////////////////////////////////
-    template <class ELEMENT> void setKeySig(ELEMENT element, const std::string &keysig);
+    template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);
+    template <class ELEMENT> void setKeySig(int partindex, ELEMENT element, const std::string &keysig);
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
     template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
@@ -397,10 +420,11 @@ protected:
     static std::string getDateString();
     static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
-    std::string cleanHarmString(const std::string &content);
-    std::string cleanHarmString2(const std::string &content);
-    std::string cleanHarmString3(const std::string &content);
-    std::vector<std::string> cleanFBString(const std::string &content);
+    static bool replace(std::wstring &str, const std::wstring &oldStr, const std::wstring &newStr);
+    std::wstring cleanHarmString(const std::string &content);
+    std::wstring cleanHarmString2(const std::string &content);
+    std::wstring cleanHarmString3(const std::string &content);
+    std::vector<std::wstring> cleanFBString(const std::string &content);
 
 private:
     std::string m_filename; // Filename to read/was read.
@@ -427,7 +451,8 @@ private:
     //
 
     // m_staffgroup == information about parts
-    vrv::StaffGrp *m_staffgroup = NULL;
+    // no longer used
+    // vrv::StaffGrp *m_staffgroup = NULL;
 
     // m_staffdef == information about a staff.
     std::vector<vrv::StaffDef *> m_staffdef;
@@ -519,10 +544,10 @@ private:
     // m_has_color_spine == true if a color spine is present.
     bool m_has_color_spine = false;
 
-#endif /* NO_HUMDRUM_SUPPORT */
+    // m_traspose == transposition to go from sounding to written pitch.
+    vector<int> m_transpose;
 
-    // m_type == true means add type markup in Humdrum-to-MEI conversion.
-    bool m_type = true;
+#endif /* NO_HUMDRUM_SUPPORT */
 };
 
 } // namespace vrv

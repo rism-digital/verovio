@@ -78,6 +78,22 @@ void Layer::Reset()
     m_drawingStemDir = STEMDIRECTION_NONE;
 }
 
+void Layer::CopyReset()
+{
+    m_drawKeySigCancellation = false;
+    m_staffDefClef = NULL;
+    m_staffDefKeySig = NULL;
+    m_staffDefMensur = NULL;
+    m_staffDefMeterSig = NULL;
+    m_drawCautionKeySigCancel = false;
+    m_cautionStaffDefClef = NULL;
+    m_cautionStaffDefKeySig = NULL;
+    m_cautionStaffDefMensur = NULL;
+    m_cautionStaffDefMeterSig = NULL;
+
+    m_drawingStemDir = STEMDIRECTION_NONE;
+}
+
 void Layer::ResetStaffDefObjects()
 {
     m_drawKeySigCancellation = false;
@@ -377,12 +393,75 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
 // Layer functor methods
 //----------------------------------------------------------------------------
 
+int Layer::ConvertToCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    params->m_contentLayer = this;
+
+    params->m_targetLayer = new Layer(*this);
+    params->m_targetLayer->CopyReset();
+    // Keep the xml:id of the layer in the first segment
+    params->m_targetLayer->SwapUuid(this);
+    assert(params->m_targetStaff);
+    params->m_targetStaff->AddChild(params->m_targetLayer);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Layer::ConvertToUnCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToUnCastOffMensuralParams *params = dynamic_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    if (params->m_contentLayer == NULL) {
+        params->m_contentLayer = this;
+    }
+    else {
+        params->m_contentLayer->MoveChildrenFrom(this);
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int Layer::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {
     ResetStaffDefObjects();
 
     return FUNCTOR_CONTINUE;
-};
+}
+
+int Layer::ResetHorizontalAlignment(FunctorParams *functorParams)
+{
+    if (this->GetStaffDefClef()) {
+        GetStaffDefClef()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetStaffDefKeySig()) {
+        GetStaffDefKeySig()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetStaffDefMensur()) {
+        GetStaffDefMensur()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetStaffDefMeterSig()) {
+        GetStaffDefMeterSig()->ResetHorizontalAlignment(functorParams);
+    }
+
+    if (this->GetCautionStaffDefClef()) {
+        GetCautionStaffDefClef()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetCautionStaffDefKeySig()) {
+        GetCautionStaffDefKeySig()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetCautionStaffDefMensur()) {
+        GetCautionStaffDefMensur()->ResetHorizontalAlignment(functorParams);
+    }
+    if (this->GetCautionStaffDefMeterSig()) {
+        GetCautionStaffDefMeterSig()->ResetHorizontalAlignment(functorParams);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Layer::AlignHorizontally(FunctorParams *functorParams)
 {

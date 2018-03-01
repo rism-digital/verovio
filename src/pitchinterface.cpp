@@ -30,9 +30,7 @@ PitchInterface::PitchInterface() : Interface(), AttNoteGes(), AttOctave(), AttPi
     Reset();
 }
 
-PitchInterface::~PitchInterface()
-{
-}
+PitchInterface::~PitchInterface() {}
 
 void PitchInterface::Reset()
 {

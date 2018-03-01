@@ -45,9 +45,7 @@ Accid::Accid()
     Reset();
 }
 
-Accid::~Accid()
-{
-}
+Accid::~Accid() {}
 
 void Accid::Reset()
 {
@@ -189,7 +187,7 @@ int Accid::ResetDrawing(FunctorParams *functorParams)
     PositionInterface::InterfaceResetDrawing(functorParams, this);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Accid::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

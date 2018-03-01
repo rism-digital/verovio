@@ -38,13 +38,6 @@ enum {
     AxTRANSPARENT
 };
 
-enum {
-    /*  text alignment */
-    LEFT = 1,
-    RIGHT,
-    CENTER
-};
-
 // ---------------------------------------------------------------------------
 // Pen/Brush
 // ---------------------------------------------------------------------------
@@ -71,7 +64,7 @@ public:
     float GetOpacity() const { return m_penOpacity; }
     void SetOpacity(float opacity) { m_penOpacity = opacity; }
 
-public:
+private:
     int m_penColour, m_penWidth, m_dashLength;
     float m_penOpacity;
 };
@@ -86,7 +79,7 @@ public:
     float GetOpacity() const { return m_brushOpacity; }
     void SetOpacity(float opacity) { m_brushOpacity = opacity; }
 
-public:
+private:
     int m_brushColour;
     float m_brushOpacity;
 };
@@ -103,40 +96,41 @@ class FontInfo {
 public:
     FontInfo()
     {
-        pointSize = 0;
-        family = 0; // was wxFONTFAMILY_DEFAULT;
-        style = FONTSTYLE_NONE;
-        weight = FONTWEIGHT_NONE;
-        underlined = false;
-        faceName.clear();
-        encoding = 0; // was wxFONTENCODING_DEFAULT;
+        m_pointSize = 0;
+        m_family = 0; // was wxFONTFAMILY_DEFAULT;
+        m_style = FONTSTYLE_NONE;
+        m_weight = FONTWEIGHT_NONE;
+        m_underlined = false;
+        m_faceName.clear();
+        m_encoding = 0; // was wxFONTENCODING_DEFAULT;
     }
     virtual ~FontInfo(){};
 
     // accessors and modifiers for the font elements
-    int GetPointSize() { return pointSize; }
-    int GetStyle() { return style; }
-    int GetWeight() { return weight; }
-    bool GetUnderlined() { return underlined; }
-    std::string GetFaceName() { return faceName; }
-    int GetFamily() { return family; }
-    int GetEncoding() { return encoding; }
+    int GetPointSize() { return m_pointSize; }
+    int GetStyle() { return m_style; }
+    int GetWeight() { return m_weight; }
+    bool GetUnderlined() { return m_underlined; }
+    std::string GetFaceName() { return m_faceName; }
+    int GetFamily() { return m_family; }
+    int GetEncoding() { return m_encoding; }
 
-    void SetPointSize(int pointSize_) { pointSize = pointSize_; }
-    void SetStyle(data_FONTSTYLE style_) { style = style_; }
-    void SetWeight(data_FONTWEIGHT weight_) { weight = weight_; }
-    void SetUnderlined(bool underlined_) { underlined = underlined_; }
-    void SetFaceName(const char *faceName_) { faceName = faceName_; }
-    void SetFamily(int family_) { family = family_; }
-    void SetEncoding(int encoding_) { encoding = encoding_; }
+    void SetPointSize(int pointSize) { m_pointSize = pointSize; }
+    void SetStyle(data_FONTSTYLE style) { m_style = style; }
+    void SetWeight(data_FONTWEIGHT weight) { m_weight = weight; }
+    void SetUnderlined(bool underlined) { m_underlined = underlined; }
+    void SetFaceName(const char *faceName) { m_faceName = faceName; }
+    void SetFamily(int family) { m_family = family; }
+    void SetEncoding(int encoding) { m_encoding = encoding; }
 
-    int pointSize;
-    int family;
-    data_FONTSTYLE style;
-    data_FONTWEIGHT weight;
-    bool underlined;
-    std::string faceName;
-    int encoding;
+private:
+    int m_pointSize;
+    int m_family;
+    data_FONTSTYLE m_style;
+    data_FONTWEIGHT m_weight;
+    bool m_underlined;
+    std::string m_faceName;
+    int m_encoding;
 };
 
 // ---------------------------------------------------------------------------

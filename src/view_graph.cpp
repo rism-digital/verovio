@@ -16,7 +16,7 @@
 
 #include "devicecontext.h"
 #include "doc.h"
-#include "style.h"
+#include "options.h"
 #include "vrv.h"
 
 namespace vrv {

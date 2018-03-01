@@ -123,6 +123,10 @@ public:
     {
         return (this->GetClassId() > LAYER_ELEMENT && this->GetClassId() < LAYER_ELEMENT_max);
     }
+    bool IsRunningElement() const
+    {
+        return (this->GetClassId() > RUNNING_ELEMENT && this->GetClassId() < RUNNING_ELEMENT_max);
+    }
     bool IsScoreDefElement() const
     {
         return (this->GetClassId() > SCOREDEF_ELEMENT && this->GetClassId() < SCOREDEF_ELEMENT_max);
@@ -191,6 +195,12 @@ public:
     void MoveChildrenFrom(Object *sourceParent, int idx = -1, bool allowTypeChange = false);
 
     /**
+     * Replace the currentChild with the replacingChild.
+     * The currentChild is not deleted by the methods.
+     */
+    void ReplaceChild(Object *currentChild, Object *replacingChild);
+
+    /**
      * Move an object to another parent.
      * The object is relinquished from its current parent - see Object::Relinquish
      */
@@ -202,8 +212,22 @@ public:
      */
     virtual Object *Clone() const;
 
+    /**
+     * Indicate whereas children have to be copied in copy / assignment constructors.
+     * This is true by default but can be overriden (e.g., for Staff, Layer)
+     */
+    virtual bool CopyChildren() const { return true; }
+
+    /**
+     * Reset pointers after a copy and assignment constructor call.
+     * This methods has to be called expicitly when overriden because it is not called from the constructors.
+     * Do not forget to call base-class equivalent whenever applicable (e.g, with more than one hierarchy level).
+     */
+    virtual void CopyReset(){};
+
     std::string GetUuid() const { return m_uuid; }
     void SetUuid(std::string uuid);
+    void SwapUuid(Object *other);
     void ResetUuid();
     static void SeedUuid(unsigned int seed = 0);
 
@@ -242,11 +266,12 @@ public:
      * GetFirst returns the first element child of the specified type.
      * Its position and the specified type are stored and used of accessing next elements
      * The methods returns NULL when no child is found or when the end is reached.
-     * Always call GetFirst before calling GetNext
+     * Always call GetFirst before calling GetNext() or call GetNext(child)
      */
     ///@{
     Object *GetFirst(const ClassId classId = UNSPECIFIED);
     Object *GetNext();
+    Object *GetNext(Object *child, const ClassId classId = UNSPECIFIED);
     ///@}
 
     /**
@@ -379,6 +404,11 @@ public:
     void ClearRelinquishedChildren();
 
     /**
+     * Clear the children vector and delete all the objects.
+     */
+    void ClearChildren();
+
+    /**
      * Remove and delete the child.
      * Return false if the child could not be found. In that case it will not be deleted.
      */
@@ -508,6 +538,15 @@ public:
     ///@{
     virtual int ConvertToPageBased(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int ConvertToPageBasedEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
+     * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
+     * Segment positions occur where a barLine is set on all staves.
+     */
+    ///@{
+    virtual int ConvertToCastOffMensural(FunctorParams *functorParams);
+    virtual int ConvertToUnCastOffMensural(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
     /**
@@ -852,9 +891,13 @@ public:
     virtual int PrepareBoundaries(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Functor for grouping FloatingObject by drawingGrpId
+     * @name Functor for grouping FloatingObject by drawingGrpId.
+     * Also chains the Dynam and Hairpin
      */
-    virtual int PrepareFloatingGrps(FunctorParams *functoParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int PrepareFloatingGrps(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareFloatingGrpsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Go through all the TimeSpanningInterface elements and set them a current to each staff
@@ -964,11 +1007,7 @@ public:
     ///@}
 
 protected:
-    /**
-     * Clear the children vector and delete all the objects.
-     */
-    void ClearChildren();
-
+    //
 private:
     /**
      * Method for generating the uuid.

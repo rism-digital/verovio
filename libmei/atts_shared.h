@@ -140,6 +140,42 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttAttaccaLog
+//----------------------------------------------------------------------------
+
+class AttAttaccaLog : public Att {
+public:
+    AttAttaccaLog();
+    virtual ~AttAttaccaLog();
+
+    /** Reset the default values for the attribute class **/
+    void ResetAttaccaLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadAttaccaLog(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteAttaccaLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetTarget(std::string target_) { m_target = target_; }
+    std::string GetTarget() const { return m_target; }
+    bool HasTarget() const;
+    ///@}
+
+private:
+    /** Indicates the next section or movement to be performed. **/
+    std::string m_target;
+
+    /* include <atttarget> */
+};
+
+//----------------------------------------------------------------------------
 // AttAudience
 //----------------------------------------------------------------------------
 
@@ -246,13 +282,13 @@ public:
 
 private:
     /**
-     * A name or label associated with the controlled vocabulary from which the value
-     * is taken.
+     * A name or label associated with a controlled vocabulary or other authoritative
+     * source for this element or its content.
      **/
     std::string m_auth;
     /**
-     * The web-accessible location of the controlled vocabulary from which the value is
-     * taken.
+     * A web-accessible location of the controlled vocabulary or other authoritative
+     * source for this element or its content.
      **/
     std::string m_authUri;
 
@@ -319,6 +355,10 @@ public:
      * to the default value)
      **/
     ///@{
+    void SetBarlinelen(double barlinelen_) { m_barlinelen = barlinelen_; }
+    double GetBarlinelen() const { return m_barlinelen; }
+    bool HasBarlinelen() const;
+    //
     void SetBarplace(data_BARPLACE barplace_) { m_barplace = barplace_; }
     data_BARPLACE GetBarplace() const { return m_barplace; }
     bool HasBarplace() const;
@@ -329,6 +369,12 @@ public:
     ///@}
 
 private:
+    /**
+     * States the length of a barline.
+     * Must be greater than 0 and less than or equal to (2 times number of staff lines)
+     * + 2, e.g., between 0 and 12 for a 5-line staff.
+     **/
+    double m_barlinelen;
     /** Records the location of a bar line. **/
     data_BARPLACE m_barplace;
     /**
@@ -491,8 +537,9 @@ public:
 
 private:
     /**
-     * A value that represents or identifies the element content.
-     * May serve as a primary key in a web-accessible database identified by the
+     * A value that represents or identifies other data.
+     * Often, it is a primary key in the database or a unique value in the coded list
+     * identified by the
      **/
     std::string m_codedval;
 
@@ -974,10 +1021,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Encodes the target note when its pitch differs from the pitch at which the
-     * custos appears.
-     **/
+    /** Indicates the next section or movement to be performed. **/
     std::string m_target;
 
     /* include <atttarget> */
@@ -1463,7 +1507,6 @@ private:
     /**
      * Indicates the nature of the evidence supporting the reliability or accuracy of
      * the intervention or interpretation.
-     * Suggested values include: 'internal', 'external', 'conjecture'.
      **/
     std::string m_evidence;
 
@@ -1616,7 +1659,7 @@ public:
 
 private:
     /**
-     * Holds the number of initial characters (such as those constituing an article or
+     * Holds the number of initial characters (such as those constituting an article or
      * preposition) that should not be used for sorting a title or name.
      **/
     int m_nonfiling;
@@ -1957,8 +2000,9 @@ public:
 
 private:
     /**
-     * Provides a name or label for an element.
-     * Should not be used to capture document content.
+     * Captures text to be used to generate a label for the element to which it's
+     * attached, a "tool tip" or prefatory text, for example.
+     * Should not be used to record document content.
      **/
     std::string m_label;
 
@@ -2353,52 +2397,6 @@ private:
     data_FONTWEIGHT m_lyricWeight;
 
     /* include <attlyric.weight> */
-};
-
-//----------------------------------------------------------------------------
-// AttMeasureLog
-//----------------------------------------------------------------------------
-
-class AttMeasureLog : public Att {
-public:
-    AttMeasureLog();
-    virtual ~AttMeasureLog();
-
-    /** Reset the default values for the attribute class **/
-    void ResetMeasureLog();
-
-    /** Read the values for the attribute class **/
-    bool ReadMeasureLog(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteMeasureLog(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetLeft(data_BARRENDITION left_) { m_left = left_; }
-    data_BARRENDITION GetLeft() const { return m_left; }
-    bool HasLeft() const;
-    //
-    void SetRight(data_BARRENDITION right_) { m_right = right_; }
-    data_BARRENDITION GetRight() const { return m_right; }
-    bool HasRight() const;
-    ///@}
-
-private:
-    /**
-     * Indicates the visual rendition of the left bar line.
-     * It is present here only for facilitation of translation from legacy encodings
-     * which use it. Usually, it can be safely ignored.
-     **/
-    data_BARRENDITION m_left;
-    /** Indicates the function of the right bar line and is structurally important. **/
-    data_BARRENDITION m_right;
-
-    /* include <attright> */
 };
 
 //----------------------------------------------------------------------------
@@ -3697,6 +3695,54 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttPartIdent
+//----------------------------------------------------------------------------
+
+class AttPartIdent : public Att {
+public:
+    AttPartIdent();
+    virtual ~AttPartIdent();
+
+    /** Reset the default values for the attribute class **/
+    void ResetPartIdent();
+
+    /** Read the values for the attribute class **/
+    bool ReadPartIdent(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WritePartIdent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetPart(std::string part_) { m_part = part_; }
+    std::string GetPart() const { return m_part; }
+    bool HasPart() const;
+    //
+    void SetPartstaff(std::string partstaff_) { m_partstaff = partstaff_; }
+    std::string GetPartstaff() const { return m_partstaff; }
+    bool HasPartstaff() const;
+    ///@}
+
+private:
+    /**
+     * Indicates the part in which the current feature should appear.
+     * Use '%all' when the feature should occur in every part.
+     **/
+    std::string m_part;
+    /**
+     * Signifies the part staff on which a notated feature occurs.
+     * Use '%all' when the feature should occur on every staff.
+     **/
+    std::string m_partstaff;
+
+    /* include <attpartstaff> */
+};
+
+//----------------------------------------------------------------------------
 // AttPitch
 //----------------------------------------------------------------------------
 
@@ -3867,10 +3913,7 @@ private:
     std::string m_role;
     /** --- **/
     std::string m_show;
-    /**
-     * Encodes the target note when its pitch differs from the pitch at which the
-     * custos appears.
-     **/
+    /** Indicates the next section or movement to be performed. **/
     std::string m_target;
     /**
      * Characterization of target resource(s) using any convenient classification
@@ -3913,11 +3956,81 @@ public:
 private:
     /**
      * Numeric value capturing a measurement or count.
-     * Can only be interpreted in combination with the unit or currency attribute.
+     * Can only be interpreted in combination with the unit attribute.
      **/
     double m_quantity;
 
     /* include <attquantity> */
+};
+
+//----------------------------------------------------------------------------
+// AttRanging
+//----------------------------------------------------------------------------
+
+class AttRanging : public Att {
+public:
+    AttRanging();
+    virtual ~AttRanging();
+
+    /** Reset the default values for the attribute class **/
+    void ResetRanging();
+
+    /** Read the values for the attribute class **/
+    bool ReadRanging(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteRanging(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetAtleast(double atleast_) { m_atleast = atleast_; }
+    double GetAtleast() const { return m_atleast; }
+    bool HasAtleast() const;
+    //
+    void SetAtmost(double atmost_) { m_atmost = atmost_; }
+    double GetAtmost() const { return m_atmost; }
+    bool HasAtmost() const;
+    //
+    void SetMin(double min_) { m_min = min_; }
+    double GetMin() const { return m_min; }
+    bool HasMin() const;
+    //
+    void SetMax(double max_) { m_max = max_; }
+    double GetMax() const { return m_max; }
+    bool HasMax() const;
+    //
+    void SetConfidence(double confidence_) { m_confidence = confidence_; }
+    double GetConfidence() const { return m_confidence; }
+    bool HasConfidence() const;
+    ///@}
+
+private:
+    /** Gives a minimum estimated value for an approximate measurement. **/
+    double m_atleast;
+    /** Gives a maximum estimated value for an approximate measurement. **/
+    double m_atmost;
+    /**
+     * Where the measurement summarizes more than one observation or a range of values,
+     * supplies the minimum value observed.
+     **/
+    double m_min;
+    /**
+     * Where the measurement summarizes more than one observation or a range of values,
+     * supplies the maximum value observed.
+     **/
+    double m_max;
+    /**
+     * Specifies the degree of statistical confidence (between zero and one) that a
+     * value falls within the range specified by min and max, or the proportion of
+     * observed values that fall within that range.
+     **/
+    double m_confidence;
+
+    /* include <attconfidence> */
 };
 
 //----------------------------------------------------------------------------
@@ -5264,6 +5377,42 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttVerticalAlign
+//----------------------------------------------------------------------------
+
+class AttVerticalAlign : public Att {
+public:
+    AttVerticalAlign();
+    virtual ~AttVerticalAlign();
+
+    /** Reset the default values for the attribute class **/
+    void ResetVerticalAlign();
+
+    /** Read the values for the attribute class **/
+    bool ReadVerticalAlign(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteVerticalAlign(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetValign(data_VERTICALALIGNMENT valign_) { m_valign = valign_; }
+    data_VERTICALALIGNMENT GetValign() const { return m_valign; }
+    bool HasValign() const;
+    ///@}
+
+private:
+    /** Records vertical alignment. **/
+    data_VERTICALALIGNMENT m_valign;
+
+    /* include <attvalign> */
+};
+
+//----------------------------------------------------------------------------
 // AttVerticalAlignment
 //----------------------------------------------------------------------------
 
@@ -5287,14 +5436,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetVgrp(std::string vgrp_) { m_vgrp = vgrp_; }
-    std::string GetVgrp() const { return m_vgrp; }
+    void SetVgrp(int vgrp_) { m_vgrp = vgrp_; }
+    int GetVgrp() const { return m_vgrp; }
     bool HasVgrp() const;
     ///@}
 
 private:
-    /** --- **/
-    std::string m_vgrp;
+    /** Provides a label for members of a vertically aligned group. **/
+    int m_vgrp;
 
     /* include <attvgrp> */
 };

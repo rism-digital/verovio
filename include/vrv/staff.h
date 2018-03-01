@@ -47,6 +47,16 @@ public:
     ///@}
 
     /**
+     * Do not copy children for layers
+     */
+    virtual bool CopyChildren() const { return false; }
+
+    /**
+     * Overriding CopyReset() method to be called after copy / assignment calls.
+     */
+    virtual void CopyReset();
+
+    /**
      * Delete all the legder line arrays.
      */
     void ClearLedgerLines();
@@ -101,6 +111,11 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ConvertToCastOffMensural
+     */
+    virtual int ConvertToCastOffMensural(FunctorParams *params);
 
     /**
      * See Object::UnsetCurrentScoreDef

@@ -37,15 +37,16 @@
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
+#include "options.h"
 #include "proport.h"
 #include "rest.h"
 #include "rpt.h"
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
-#include "style.h"
 #include "syl.h"
 #include "system.h"
+#include "textelement.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
@@ -262,12 +263,9 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     /************** draw the artic **************/
 
-    wchar_t code;
-
     int x = articPart->GetDrawingX();
     // HARDCODED value, we double the default margin for now - should go in styling
-    int yShift = 2 * m_doc->GetTopMargin(articPart->GetClassId()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
-        / PARAM_DENOMINATOR;
+    int yShift = 2 * m_doc->GetTopMargin(articPart->GetClassId()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int direction = (articPart->GetPlaceAlternate()->GetBasic() == STAFFREL_basic_above) ? 1 : -1;
 
     int y = articPart->GetDrawingY();
@@ -283,13 +281,13 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     std::vector<data_ARTICULATION>::iterator articIter;
     std::vector<data_ARTICULATION> articList = articPart->GetArtic();
-    for (articIter = articList.begin(); articIter != articList.end(); articIter++) {
+    for (articIter = articList.begin(); articIter != articList.end(); ++articIter) {
 
-        code = Artic::GetSmuflCode(*articIter, articPart->GetPlace());
+        wchar_t code = Artic::GetSmuflCode(*articIter, articPart->GetPlace());
 
         // Skip it if we do not have it in the font (for now - we should log / document this somewhere)
         if (code == 0) {
-            articPart->SetEmptyBB(true);
+            articPart->SetEmptyBB();
             continue;
         }
 
@@ -713,14 +711,14 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     MapOfDotLocs::const_iterator iter;
     const MapOfDotLocs *map = dots->GetMapOfDotLocs();
-    for (iter = map->begin(); iter != map->end(); iter++) {
+    for (iter = map->begin(); iter != map->end(); ++iter) {
         Staff *dotStaff = (iter->first) ? iter->first : staff;
         int y = dotStaff->GetDrawingY()
             - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (dotStaff->m_drawingLines - 1);
         int x = dots->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const std::list<int> *dotLocs = &iter->second;
         std::list<int>::const_iterator intIter;
-        for (intIter = dotLocs->begin(); intIter != dotLocs->end(); intIter++) {
+        for (intIter = dotLocs->begin(); intIter != dotLocs->end(); ++intIter) {
             DrawDotsPart(
                 dc, x, y + (*intIter) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(), dotStaff);
         }
@@ -1003,7 +1001,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     // We do not support more than three chars
     int num = std::min(multiRest->GetNum(), 999);
 
-    if (num > 2 || multiRest->GetBlock() == true) {
+    if ((num > 2) || (multiRest->GetBlock() == BOOLEAN_true)) {
         // This is 1/2 the length of the black rectangle
         length = width - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
@@ -1247,13 +1245,14 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
     }
 
-    bool setX = false;
-    bool setY = false;
-    int x = syl->GetDrawingX();
-    int y = syl->GetDrawingY();
+    TextDrawingParams params;
+    params.m_x = syl->GetDrawingX();
+    params.m_y = syl->GetDrawingY();
+    assert(dc->GetFont());
+    params.m_pointSize = dc->GetFont()->GetPointSize();
 
-    dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y));
-    DrawTextChildren(dc, syl, ToDeviceContextX(x), ToDeviceContextY(y), setX, setY);
+    dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y));
+    DrawTextChildren(dc, syl, params);
     dc->EndText();
 
     dc->ResetFont();
@@ -1485,15 +1484,15 @@ int View::GetSylYRel(Syl *syl, Staff *staff)
     assert(syl && staff);
 
     int y = 0;
-    StaffAlignment *aligment = staff->GetAlignment();
-    if (aligment) {
+    StaffAlignment *alignment = staff->GetAlignment();
+    if (alignment) {
         FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
         int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
         int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
-        int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
+        int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        y = -aligment->GetStaffHeight() - aligment->GetOverflowBelow()
-            + (aligment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
+        y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
+            + (alignment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
     }
     return y;
 }

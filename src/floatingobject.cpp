@@ -35,6 +35,12 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// Static members
+//----------------------------------------------------------------------------
+
+std::vector<void *> FloatingObject::s_drawingObjectIds;
+
+//----------------------------------------------------------------------------
 // FloatingObject
 //----------------------------------------------------------------------------
 
@@ -50,15 +56,13 @@ FloatingObject::FloatingObject(std::string classid) : Object(classid)
     m_currentPositioner = NULL;
 }
 
-FloatingObject::~FloatingObject()
-{
-}
+FloatingObject::~FloatingObject() {}
 
 void FloatingObject::Reset()
 {
     Object::Reset();
 
-    m_drawingGrpId = DRAWING_GRP_NONE;
+    m_drawingGrpId = 0;
 }
 
 void FloatingObject::UpdateContentBBoxX(int x1, int x2)
@@ -102,15 +106,47 @@ void FloatingObject::SetCurrentFloatingPositioner(FloatingPositioner *boundingBo
     m_currentPositioner = boundingBox;
 }
 
+FloatingPositioner *FloatingObject::GetCorrespFloatingPositioner(FloatingObject *object)
+{
+    if (!object || !m_currentPositioner) return NULL;
+
+    return m_currentPositioner->GetAlignment()->GetCorrespFloatingPositioner(object);
+}
+
+int FloatingObject::SetDrawingGrpObject(void *drawingGrpObject)
+{
+    assert(drawingGrpObject);
+
+    int idx = 0;
+    std::vector<void *>::const_iterator it
+        = std::find(s_drawingObjectIds.begin(), s_drawingObjectIds.end(), drawingGrpObject);
+    if (it == s_drawingObjectIds.end()) {
+        idx = (int)s_drawingObjectIds.size();
+        s_drawingObjectIds.push_back(drawingGrpObject);
+        // LogDebug("Creating grpId %d", idx);
+    }
+    else {
+        idx = (int)(it - s_drawingObjectIds.begin());
+        // LogDebug("Using grpId %d", idx);
+    }
+    m_drawingGrpId = idx + 1000;
+    return m_drawingGrpId;
+}
+
 //----------------------------------------------------------------------------
 // FloatingPositioner
 //----------------------------------------------------------------------------
 
-FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
+FloatingPositioner::FloatingPositioner(FloatingObject *object, StaffAlignment *alignment, char spanningType)
+    : BoundingBox()
 {
     assert(object);
+    assert(alignment);
 
     m_object = object;
+    m_alignment = alignment;
+    m_spanningType = spanningType;
+
     if (object->Is(BREATH)) {
         Breath *breath = dynamic_cast<Breath *>(object);
         assert(breath);
@@ -212,7 +248,7 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
         m_place = STAFFREL_basic_NONE;
     }
     ResetPositioner();
-};
+}
 
 void FloatingPositioner::ResetPositioner()
 {
@@ -302,7 +338,7 @@ void FloatingPositioner::SetDrawingXRel(int drawingXRel)
 {
     ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
-};
+}
 
 void FloatingPositioner::SetDrawingYRel(int drawingYRel)
 {
@@ -313,7 +349,7 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel)
     else {
         if (drawingYRel > m_drawingYRel) m_drawingYRel = drawingYRel;
     }
-};
+}
 
 bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox)
 {
@@ -326,14 +362,13 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     if (horizOverlapingBBox == NULL) {
         if (this->m_place == STAFFREL_basic_above) {
             yRel = GetContentY1();
-            yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize)
-                / PARAM_DENOMINATOR;
+            yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
+
             this->SetDrawingYRel(yRel);
         }
         else {
             yRel = staffAlignment->GetStaffHeight() + GetContentY2();
-            yRel
-                += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            yRel += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
             this->SetDrawingYRel(yRel);
         }
     }
@@ -342,8 +377,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         if (curve) {
             assert(curve->m_object);
         }
-        int margin
-            = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+        int margin = doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize);
 
         if (this->m_place == STAFFREL_basic_above) {
             if (curve && curve->m_object->Is({ SLUR, TIE })) {
@@ -459,6 +493,9 @@ int FloatingObject::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
 
 int FloatingObject::ResetDrawing(FunctorParams *functorParams)
 {
+    // Clear all
+    FloatingObject::s_drawingObjectIds.clear();
+
     m_currentPositioner = NULL;
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
@@ -471,9 +508,9 @@ int FloatingObject::ResetDrawing(FunctorParams *functorParams)
         assert(interface);
         return interface->InterfaceResetDrawing(functorParams, this);
     }
-    m_drawingGrpId = DRAWING_GRP_NONE;
+    m_drawingGrpId = 0;
     return FUNCTOR_CONTINUE;
-};
+}
 
 int FloatingObject::UnCastOff(FunctorParams *functorParams)
 {

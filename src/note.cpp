@@ -23,6 +23,7 @@
 #include "functorparams.h"
 #include "glyph.h"
 #include "layer.h"
+#include "ligature.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -73,9 +74,7 @@ Note::Note()
     Reset();
 }
 
-Note::~Note()
-{
-}
+Note::~Note() {}
 
 void Note::Reset()
 {
@@ -105,6 +104,15 @@ void Note::Reset()
     m_realTimeOnsetMilliseconds = 0;
     m_realTimeOffsetMilliseconds = 0;
     m_scoreTimeTiedDuration = 0.0;
+}
+
+bool Note::HasToBeAligned() const
+{
+    if (!this->IsInLigature()) return true;
+    Note *note = const_cast<Note *>(this);
+    Ligature *ligature = dynamic_cast<Ligature *>(note->GetFirstParent(LIGATURE));
+    assert(ligature);
+    return ((note == ligature->GetFirstNote()) || (note == ligature->GetLastNote()));
 }
 
 void Note::AddChild(Object *child)
@@ -172,7 +180,7 @@ Chord *Note::IsChordTone() const
 int Note::GetDrawingDur() const
 {
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
-    if (chordParent) {
+    if (chordParent && !this->HasDur()) {
         return chordParent->GetActualDur();
     }
     else {
@@ -317,6 +325,20 @@ wchar_t Note::GetMensuralSmuflNoteHead()
     return code;
 }
 
+bool Note::IsVisible()
+{
+    if (this->HasVisible()) {
+        return this->GetVisible() == BOOLEAN_true;
+    }
+    // if the chord doens't have it, see if all the children are invisible
+    else if (GetParent() && GetParent()->Is(CHORD)) {
+        Chord *chord = dynamic_cast<Chord *>(GetParent());
+        assert(chord);
+        return chord->IsVisible();
+    }
+    return true;
+}
+
 void Note::SetScoreTimeOnset(double scoreTime)
 {
     m_scoreTimeOnset = scoreTime;
@@ -411,7 +433,7 @@ int Note::ConvertAnalyticalMarkup(FunctorParams *functorParams)
             // we are done for this note
             break;
         }
-        iter++;
+        ++iter;
     }
 
     if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_i)) {
@@ -436,6 +458,10 @@ int Note::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
+
+    if (!this->IsVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     // Stems have been calculated previously in Beam or FTrem - siblings becasue flags do not need to
     // be processed either
@@ -572,6 +598,9 @@ int Note::CalcDots(FunctorParams *functorParams)
     if (this->IsMensural()) {
         return FUNCTOR_SIBLINGS;
     }
+    if (!this->IsVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
@@ -587,12 +616,13 @@ int Note::CalcDots(FunctorParams *functorParams)
     // The shift to the left when a stem flag requires it
     int flagShift = 0;
 
-    if (chord) {
+    if (chord && (chord->GetDots() > 0)) {
         dots = params->m_chordDots;
         assert(dots);
 
         // Stem up, shorter than 4th and not in beam
-        if ((params->m_chordStemDir == STEMDIRECTION_up) && (this->GetDrawingDur() > DUR_4) && !this->IsInBeam()) {
+        if ((this->GetDots() != 0) && (params->m_chordStemDir == STEMDIRECTION_up) && (this->GetDrawingDur() > DUR_4)
+            && !this->IsInBeam()) {
             // Shift according to the flag width if the top note is not flipped
             if ((this == chord->GetTopNote()) && !this->GetFlippedNotehead()) {
                 // HARDCODED
@@ -600,7 +630,7 @@ int Note::CalcDots(FunctorParams *functorParams)
             }
         }
     }
-    else if (this->HasDots()) {
+    else if (this->GetDots() > 0) {
         // For single notes we need here to set the dot loc
         dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
         assert(dots);
@@ -643,6 +673,10 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
 
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
+
+    if (!this->IsVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     if (this->m_crossStaff) staff = this->m_crossStaff;
 
@@ -691,6 +725,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM, 1));
     Flag *currentFlag = NULL;
+    Chord *chord = this->IsChordTone();
     if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG, 1));
 
     if ((this->GetActualDur() > DUR_1) && !this->IsChordTone() && !this->IsMensural()) {
@@ -725,13 +760,17 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
         if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
     }
 
-    if (!this->IsChordTone()) SetDrawingStem(currentStem);
+    if (!chord) SetDrawingStem(currentStem);
 
     /************ dots ***********/
 
     Dots *currentDots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
 
     if (this->GetDots() > 0) {
+        if (chord && (chord->GetDots() == this->GetDots())) {
+            LogWarning(
+                "Note '%s' with a @dots attribute with the same value as its chord parent", this->GetUuid().c_str());
+        }
         if (!currentDots) {
             currentDots = new Dots();
             this->AddChild(currentDots);
@@ -751,7 +790,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     this->Process(&prepareDrawingCueSize, NULL);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Note::PrepareLyrics(FunctorParams *functorParams)
 {
@@ -784,7 +823,7 @@ int Note::ResetDrawing(FunctorParams *functorParams)
     m_flippedNotehead = false;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

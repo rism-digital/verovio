@@ -153,7 +153,7 @@ bool LayerElement::GetDrawingCueSize()
     return m_drawingCueSize;
 }
 
-bool LayerElement::IsInLigature()
+bool LayerElement::IsInLigature() const
 {
     if (!this->Is(NOTE)) return false;
     return (this->GetFirstParent(LIGATURE, MAX_LIGATURE_DEPTH));
@@ -176,6 +176,9 @@ Beam *LayerElement::IsInBeam()
             LayerElement *graceNote = this;
             if (this->Is(STEM)) graceNote = dynamic_cast<LayerElement *>(this->GetFirstParent(NOTE, MAX_BEAM_DEPTH));
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> upstream/develop
             // Make sure the object list is set
             beamParent->GetList(beamParent);
             // If the note is part of the beam parent, this means we have a beam of graced notes
@@ -186,12 +189,15 @@ Beam *LayerElement::IsInBeam()
             else {
                 return NULL;
             }
+<<<<<<< HEAD
 =======
             // If the note is part of the beam parent, this means we
             // have a beam of graced notes
             if (beamParent->GetListIndex(graceNote) > -1) return beamParent;
             // otherwise it is a non-beamed grace note within a beam - will return false
 >>>>>>> master
+=======
+>>>>>>> upstream/develop
         }
         else {
             return beamParent;
@@ -551,6 +557,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
+    // if (m_alignment) LogDebug("Element %s %s", this->GetUuid().c_str(), this->GetClassName().c_str());
     assert(!m_alignment);
 
     this->SetScoreDefRole(params->m_scoreDefRole);
@@ -574,7 +581,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         assert(false);
     }
     // We do not align these (formely container). Any other?
-    else if (this->Is({ BEAM, FTREM, TUPLET })) {
+    else if (this->Is({ BEAM, LIGATURE, FTREM, TUPLET })) {
         return FUNCTOR_CONTINUE;
     }
     else if (this->Is(BARLINE)) {
@@ -691,12 +698,12 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         }
     }
 
+    // LogDebug("Element %f %s", params->m_time, this->GetClassName().c_str());
+
     if (!this->Is(TIMESTAMP_ATTR)) {
         // increase the time position, but only when not a timestamp (it would actually do nothing)
         params->m_time += duration;
     }
-
-    // LogDebug("AlignHorizontally: Time %f - %s", (*time), this->GetClassName().c_str());
 
     return FUNCTOR_CONTINUE;
 }
@@ -787,10 +794,15 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             assert(staff);
             loc = staff->m_drawingLines - 1;
 <<<<<<< HEAD
+<<<<<<< HEAD
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
 =======
 >>>>>>> master
+=======
+            // Limitation: GetLayerCount does not take into account editorial markup
+            // should be refined later
+>>>>>>> upstream/develop
             bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
@@ -827,10 +839,15 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             assert(staff);
             loc = staff->m_drawingLines - 1;
 <<<<<<< HEAD
+<<<<<<< HEAD
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
 =======
 >>>>>>> master
+=======
+            // Limitation: GetLayerCount does not take into account editorial markup
+            // should be refined later
+>>>>>>> upstream/develop
             bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
@@ -865,7 +882,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
 
     // These are the only ones we want to keep for further collision detection
     // Eventually  we also need stem for overlapping voices
-    if (this->Is({ DOTS, NOTE }) && this->HasUpdatedBB()) {
+    if (this->Is({ DOTS, NOTE }) && this->HasSelfBB()) {
         params->m_current.push_back(this);
     }
 
@@ -942,14 +959,14 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     if (params->m_graceCumulatedXShift == VRV_UNSET) params->m_graceCumulatedXShift = 0;
 
-    // LogDebug("Aligning %s", this->GetClassName().c_str());
+    // LogDebug("********* Aligning %s", this->GetClassName().c_str());
 
     // With non grace alignment we do not need to do this
     this->ResetCachedDrawingX();
 
     if (!this->HasGraceAlignment()) return FUNCTOR_SIBLINGS;
 
-    if (!this->HasUpdatedBB() || this->HasEmptyBB()) {
+    if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
         return FUNCTOR_SIBLINGS;
     }
@@ -965,7 +982,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     int selfLeft = this->GetSelfLeft()
         - params->m_doc->GetLeftMargin(this->GetClassId())
-            * params->m_doc->GetDrawingUnit(params->m_doc->GetCueSize(100)) / PARAM_DENOMINATOR;
+            * params->m_doc->GetDrawingUnit(params->m_doc->GetCueSize(100));
 
     params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
 
@@ -987,7 +1004,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     }
 
     int selfLeft;
-    if (!this->HasUpdatedBB() || this->HasEmptyBB()) {
+    if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
         // assert(this->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT }));
         // This should happen for invis barline attribute but also chords in beam. Otherwise the BB should be set to
@@ -1000,7 +1017,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // We add it to the upcoming bouding boxes
         params->m_upcomingBoundingBoxes.push_back(this);
         selfLeft = this->GetSelfLeft()
-            - params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+            - params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
     }
 
     int offset = selfLeft - params->m_minPos;
@@ -1012,14 +1029,14 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     }
 
     int selfRight;
-    if (!this->HasUpdatedBB() || this->HasEmptyBB())
+    if (!this->HasSelfBB() || this->HasEmptyBB()) {
         selfRight = this->GetAlignment()->GetXRel()
-            + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-                / PARAM_DENOMINATOR;
-    else
+            + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+    }
+    else {
         selfRight = this->GetSelfRight()
-            + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-                / PARAM_DENOMINATOR;
+            + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+    }
 
     params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
 
@@ -1030,7 +1047,7 @@ int LayerElement::AdjustXRelForTranscription(FunctorParams *)
 {
     if (this->m_xAbs == VRV_UNSET) return FUNCTOR_CONTINUE;
 
-    if (!this->HasUpdatedBB()) return FUNCTOR_CONTINUE;
+    if (!this->HasSelfBB()) return FUNCTOR_CONTINUE;
 
     this->SetDrawingXRel(-this->GetSelfX1());
 
@@ -1257,7 +1274,13 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         Chord *chord = note->IsChordTone();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         if (chord) {
+=======
+        // If the note has a @dur or a @dur.ges, take it into account
+        // This means that overwriting only @dots or @dots.ges will not be taken into account
+        if (chord && !note->HasDur() && !note->HasDurGes()) {
+>>>>>>> upstream/develop
             incrementScoreTime = chord->GetAlignmentDuration();
         }
         else {
@@ -1305,6 +1328,6 @@ int LayerElement::ResetDrawing(FunctorParams *)
     m_drawingCueSize = false;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 } // namespace vrv

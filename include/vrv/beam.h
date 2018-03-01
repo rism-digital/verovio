@@ -109,6 +109,11 @@ public:
      */
     virtual int CalcStem(FunctorParams *functorParams);
 
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
 protected:
     /**
      * Filter the flat list and keep only Note and Chords elements.

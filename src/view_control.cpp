@@ -37,15 +37,16 @@
 #include "mordent.h"
 #include "note.h"
 #include "octave.h"
+#include "options.h"
 #include "pedal.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
-#include "style.h"
 #include "syl.h"
 #include "system.h"
 #include "tempo.h"
 #include "text.h"
+#include "textelement.h"
 #include "tie.h"
 #include "timeinterface.h"
 #include "trill.h"
@@ -244,8 +245,10 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement())
-            system->SetCurrentFloatingPositioner(
-                (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), objectX, *staffIter);
+            if (!system->SetCurrentFloatingPositioner(
+                    (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), objectX, *staffIter, spanningType)) {
+                continue;
+            }
 
         if (element->Is(HAIRPIN)) {
             // cast to Harprin check in DrawHairpin
@@ -290,17 +293,51 @@ void View::DrawHairpin(
         return;
     }
 
+    FloatingPositioner *leftLink = hairpin->GetCorrespFloatingPositioner(hairpin->GetLeftLink());
+    FloatingPositioner *rightLink = hairpin->GetCorrespFloatingPositioner(hairpin->GetRightLink());
+
+    int adjustedX1 = x1;
+    if (leftLink) {
+        adjustedX1 = leftLink->GetContentRight() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    }
+    int adjustedX2 = x2;
+    if (rightLink) {
+        adjustedX2 = rightLink->GetContentLeft() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+    }
+
+    // Beginning of a system, very short hairpin needs to be push left
+    if (spanningType == SPANNING_END) {
+        if ((adjustedX2 - adjustedX1) < (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2)) {
+            adjustedX1 = adjustedX2 - 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        }
+    }
+
+    // In any case, a hairpin should not be sorter than 2 units.
+    // If shorter, with groups, this will screw up vertical alignment and push everything down - to be improved by
+    // deactivating grp?
+    if ((adjustedX2 - adjustedX1) >= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2) {
+        x1 = adjustedX1;
+        x2 = adjustedX2;
+    }
+
+    // Store the full drawing length
+    if (spanningType == SPANNING_START_END) {
+        hairpin->SetDrawingLength(x2 - x1);
+    }
+
     data_STAFFREL place = hairpin->GetPlace();
     hairpinLog_FORM form = hairpin->GetForm();
 
     int startY = 0;
-    int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
+    int endY = hairpin->CalcHeight(m_doc, staff->m_drawingStaffSize, spanningType, leftLink, rightLink);
+
+    m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
 
     // We calculate points for cresc by default. Start/End have to be swapped
     if (form == hairpinLog_FORM_dim) BoundingBox::Swap(startY, endY);
 
     // int y1 = GetHairpinY(hairpin->GetPlace(), staff);
-    int y1 = hairpin->GetDrawingY();
+    int y1 = hairpin->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int y2 = y1;
 
     /************** start / end opening **************/
@@ -310,11 +347,11 @@ void View::DrawHairpin(
         if (spanningType == SPANNING_START_END) {
             // nothing to adjust
         }
-        // In this case, we are drawing the first half a a cresc. Reduce the openning end
+        // In this case, we are drawing the first half a a cresc. Reduce the opening end
         else if (spanningType == SPANNING_START) {
             endY = endY / 2;
         }
-        // Now this is the case we are drawing the end of a cresc. Increase the openning start
+        // Now this is the case we are drawing the end of a cresc. Increase the opening start
         else if (spanningType == SPANNING_END) {
             startY = endY / 2;
         }
@@ -329,11 +366,11 @@ void View::DrawHairpin(
         if (spanningType == SPANNING_START_END) {
             // nothing to adjust
         }
-        // In this case, we are drawing the first half a a dim. Increase the openning end
+        // In this case, we are drawing the first half a a dim. Increase the opening end
         else if (spanningType == SPANNING_START) {
             endY = startY / 2;
         }
-        // Now this is the case we are drawing the end of a dim. Reduce the openning start
+        // Now this is the case we are drawing the end of a dim. Reduce the opening start
         else if (spanningType == SPANNING_END) {
             startY = startY / 2;
         }
@@ -394,7 +431,7 @@ void View::DrawOctave(
     end = dynamic_cast<LayerElement *>(octave->GetEnd());
 
     if (!start || !end) {
-        // no start and end, obviously nothing to do...
+        // no start or end, obviously nothing to do …
         return;
     }
 
@@ -431,46 +468,50 @@ void View::DrawOctave(
             default: break;
         }
     }
-    int lineWidthFactor = 1;
     std::wstring str;
     str.push_back(code);
-    if (octave->HasLwidth()) {
-        if (octave->GetLwidth() == "wide") {
-            lineWidthFactor *= 4;
+
+    if (octave->GetExtender() != BOOLEAN_false) {
+        int lineWidthFactor = 1;
+        if (octave->HasLwidth()) {
+            if (octave->GetLwidth() == "wide") {
+                lineWidthFactor *= 4;
+            }
+            else if (octave->GetLwidth() == "medium") {
+                lineWidthFactor *= 2;
+            }
         }
-        else if (octave->GetLwidth() == "medium") {
-            lineWidthFactor *= 2;
+        int lineWidth = lineWidthFactor * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+        TextExtend extend;
+        dc->GetSmuflTextExtent(str, &extend);
+        int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
+        DrawSmuflCode(dc, x1 - extend.m_width, yCode, code, staff->m_drawingStaffSize, false);
+        dc->ResetFont();
+
+        if (octave->GetLendsym() != LINESTARTENDSYMBOL_none)
+                y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
+        // adjust is to avoid the figure to touch the line
+        x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+
+        if (octave->HasLform()) {
+            if (octave->GetLform() == LINEFORM_solid) {
+                extend.m_height *= 0;
+            }
         }
+
+        dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
+        dc->SetBrush(m_currentColour, AxSOLID);
+
+        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+        // draw the ending vertical line if not the end of the system
+        if (spanningType != SPANNING_START)
+            dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
+                ToDeviceContextY(y2 + lineWidth / 2));
+
+        dc->ResetPen();
+        dc->ResetBrush();
     }
-    int lineWidth = lineWidthFactor * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
-    TextExtend extend;
-    dc->GetSmuflTextExtent(str, &extend);
-    int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
-    DrawSmuflCode(dc, x1 - extend.m_width, yCode, code, staff->m_drawingStaffSize, false);
-    dc->ResetFont();
-
-    y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
-    // adjust is to avoid the figure to touch the line
-    x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-
-    if (octave->HasLform()) {
-        if (octave->GetLform() == LINEFORM_solid) {
-            extend.m_height *= 0;
-        }
-    }
-
-    dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
-    dc->SetBrush(m_currentColour, AxSOLID);
-
-    dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
-    // draw the ending vertical line if not the end of the system
-    if (spanningType != SPANNING_START)
-        dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
-            ToDeviceContextY(y2 + lineWidth / 2));
-
-    dc->ResetPen();
-    dc->ResetBrush();
 
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
@@ -808,7 +849,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     float angle = AdjustSlur(slur, staff, layer1->GetN(), drawingCurveDir, points);
 
-    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / PARAM_DENOMINATOR;
+    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_slurThickness.GetValue();
 
     assert(slur->GetCurrentFloatingPositioner());
     slur->GetCurrentFloatingPositioner()->UpdateCurvePosition(points, angle, thickness, drawingCurveDir);
@@ -906,11 +947,10 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     }
     else {
         int dist = abs(p2->x - p1->x);
-        height
-            = std::max(m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR,
-                dist / TEMP_SLUR_HEIGHT_FACTOR);
+        height = std::max(int(m_options->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
+            dist / TEMP_SLUR_HEIGHT_FACTOR);
         height = std::min(
-            m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR, height);
+            int(m_options->m_slurMaxHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)), height);
     }
 
     // the height of the control points
@@ -1308,10 +1348,10 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         if (!isShortTie) {
             x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
             x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
-            if (note1->HasDots()) {
+            if (note1->GetDots() > 0) {
                 x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
             }
-            else if (parentChord1 && parentChord1->HasDots()) {
+            else if (parentChord1 && (parentChord1->GetDots() > 0)) {
                 x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * parentChord1->GetDots();
             }
         }
@@ -1410,7 +1450,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
             height += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         }
     }
-    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetTieThickness() / PARAM_DENOMINATOR;
+    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_options->m_tieThickness.GetValue();
 
     // control points
     Point c1, c2;
@@ -1531,11 +1571,15 @@ void View::DrawSylConnector(
         // nothing to adjust
     }
 
+    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instanciate a temporary
+    // object
+    // in order not to reset the Syl bounding box.
+    Syl sylConnector;
     if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     }
     else
-        dc->StartGraphic(syl, "spanning-connector", "");
+        dc->StartGraphic(&sylConnector, "spanning-connector", "");
 
     dc->DeactivateGraphic();
 
@@ -1546,14 +1590,18 @@ void View::DrawSylConnector(
         dc->EndResumedGraphic(graphic, this);
     }
     else
-        dc->EndGraphic(syl, this);
+        dc->EndGraphic(&sylConnector, this);
 }
 
 void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff)
 {
+    int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    // Adjust it proportionally to the lyric size
+    width *= m_options->m_lyricSize.GetValue() / m_options->m_lyricSize.GetDefault();
+
     if (syl->GetCon() == sylLog_CON_d) {
 
-        y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3;
+        y += (m_options->m_lyricSize.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 5);
         // x position of the syl is two units back
         x2 -= 2 * (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
@@ -1588,14 +1636,14 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         for (i = 0; i < nbDashes; i++) {
             x = x1 + margin + (i * dashSpace);
             x = std::max(x, x1);
-            DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength,
-                y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+
+            DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
         }
     }
     else if (syl->GetCon() == sylLog_CON_u) {
         x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         if (x2 > x1) {
-            DrawFilledRectangle(dc, x1, y, x2, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+            DrawFilledRectangle(dc, x1, y, x2, y + width);
         }
     }
 }
@@ -1624,7 +1672,9 @@ void View::DrawArpeg(DeviceContext *dc, Arpeg *arpeg, Measure *measure, System *
     bool drawingCueSize = topNote->GetDrawingCueSize();
 
     // We are going to have only one FloatingPositioner - staff will be the top note one
-    system->SetCurrentFloatingPositioner(staff->GetN(), arpeg, topNote, staff);
+    if (!system->SetCurrentFloatingPositioner(staff->GetN(), arpeg, topNote, staff)) {
+        return;
+    }
     // Special case: because the positionner objects are reset in ResetVerticalAlignment we
     // need to reset the value of the DrawingXRel each time. The value is stored in Arpeg.
     arpeg->GetCurrentFloatingPositioner()->SetDrawingXRel(arpeg->GetDrawingXRel());
@@ -1680,7 +1730,7 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
     str.push_back(code);
 
     bool centered = true;
-    // center the glyph only with @stratid
+    // center the glyph only with @startid
     if (breath->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
@@ -1688,7 +1738,9 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = breath->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), breath, breath->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), breath, breath->GetStart(), *staffIter)) {
+            continue;
+        }
         int y = breath->GetDrawingY();
 
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
@@ -1717,30 +1769,32 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         dirTxt.SetStyle(FONTSTYLE_italic);
     }
 
+    TextDrawingParams params;
+
     // If we have not timestamp
-    int x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
+    params.m_x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
 
-    bool setX = false;
-    bool setY = false;
-
-    char alignment = dir->GetAlignment();
-    // Dir are left aligned by default (with both @tstamp and @startid)
-    if (alignment == 0) alignment = LEFT;
+    data_HORIZONTALALIGNMENT alignment = dir->GetChildRendAlignment();
+    // dir are left aligned by default (with both @tstamp and @startid)
+    if (alignment == HORIZONTALALIGNMENT_NONE) alignment = HORIZONTALALIGNMENT_left;
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dir->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, dir->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, dir->GetStart(), *staffIter)) {
+            continue;
+        }
 
-        int y = dir->GetDrawingY();
+        params.m_y = dir->GetDrawingY();
+        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
-        dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+        dirTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&dirTxt);
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
-        DrawTextChildren(dc, dir, x, y, setX, setY);
+        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+        DrawTextChildren(dc, dir, params);
         dc->EndText();
 
         dc->ResetFont();
@@ -1774,42 +1828,44 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         dynamTxt.SetStyle(FONTSTYLE_italic);
     }
 
+    TextDrawingParams params;
+
     // If we have not timestamp
-    int x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
+    params.m_x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
 
-    bool setX = false;
-    bool setY = false;
-
-    char alignment = dynam->GetAlignment();
-    // Dynam are left aligned by default;
+    data_HORIZONTALALIGNMENT alignment = dynam->GetChildRendAlignment();
+    // dynam are left aligned by default;
     if (alignment == 0) {
-        // centre the dynam only with @stratid
-        alignment = (dynam->GetStart()->Is(TIMESTAMP_ATTR)) ? LEFT : CENTER;
+        // centre the dynam only with @startid
+        alignment = (dynam->GetStart()->Is(TIMESTAMP_ATTR)) ? HORIZONTALALIGNMENT_left : HORIZONTALALIGNMENT_center;
     }
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dynam->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dynam, dynam->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dynam, dynam->GetStart(), *staffIter)) {
+            continue;
+        }
 
-        int y = dynam->GetDrawingY();
+        params.m_y = dynam->GetDrawingY();
+        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
-        dynamTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+        dynamTxt.SetPointSize(params.m_pointSize);
 
         // If the dynamic is a symbol (pp, mf, etc.) draw it as one smufl string. This will not take into account
         // editorial element within the dynam as it would with text. Also, it is center only if it is a symbol.
         if (isSymbolOnly) {
-            bool centered = (alignment == CENTER) ? true : false;
+            bool centered = (alignment == HORIZONTALALIGNMENT_center) ? true : false;
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-            DrawSmuflString(dc, x, y, dynamSymbol, centered, (*staffIter)->m_drawingStaffSize);
+            DrawSmuflString(dc, params.m_x, params.m_y, dynamSymbol, centered, (*staffIter)->m_drawingStaffSize);
             dc->ResetFont();
         }
         else {
             dc->SetBrush(m_currentColour, AxSOLID);
             dc->SetFont(&dynamTxt);
 
-            dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
-            DrawTextChildren(dc, dynam, x, y, setX, setY);
+            dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+            DrawTextChildren(dc, dynam, params);
             dc->EndText();
 
             dc->ResetFont();
@@ -1820,7 +1876,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     dc->EndGraphic(dynam, this);
 }
 
-void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, int x, int y, bool &setX, bool &setY)
+void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, TextDrawingParams &params)
 {
     assert(dc);
     assert(fb);
@@ -1838,21 +1894,21 @@ void View::DrawFb(DeviceContext *dc, Staff *staff, Fb *fb, int x, int y, bool &s
 
     Object *current;
     for (current = fb->GetFirst(); current; current = fb->GetNext()) {
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
+        dc->StartText(ToDeviceContextX(params.m_y), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
         if (current->Is(FIGURE)) {
             // dynamic_cast assert in DrawF
-            DrawF(dc, dynamic_cast<F *>(current), x, y, setX, setY);
+            DrawF(dc, dynamic_cast<F *>(current), params);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawLayerEditorialElement
-            DrawFbEditorialElement(dc, dynamic_cast<EditorialElement *>(current), x, y, setX, setY);
+            DrawFbEditorialElement(dc, dynamic_cast<EditorialElement *>(current), params);
         }
         else {
             assert(false);
         }
         dc->EndText();
 
-        y -= (descender + height);
+        params.m_y -= (descender + height);
     }
 
     dc->ResetFont();
@@ -1902,7 +1958,9 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = fermata->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), fermata, fermata->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), fermata, fermata->GetStart(), *staffIter)) {
+            continue;
+        }
         int y = fermata->GetDrawingY();
 
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
@@ -1930,37 +1988,40 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         harmTxt.SetFaceName("Times");
     }
 
+    TextDrawingParams params;
+
     // If we have not timestamp
-    int x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
+    params.m_x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
 
-    bool setX = false;
-    bool setY = false;
-
-    char alignment = harm->GetAlignment();
-    // Harm are centered aligned by default;
+    data_HORIZONTALALIGNMENT alignment = harm->GetChildRendAlignment();
+    // harm are centered aligned by default;
     if (alignment == 0) {
-        // centre the harm only with @stratid
-        alignment = (harm->GetStart()->Is(TIMESTAMP_ATTR)) ? LEFT : CENTER;
+        // centre the harm only with @startid
+        alignment = (harm->GetStart()->Is(TIMESTAMP_ATTR)) ? HORIZONTALALIGNMENT_left : HORIZONTALALIGNMENT_center;
     }
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = harm->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), harm, harm->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), harm, harm->GetStart(), *staffIter)) {
+            continue;
+        }
 
-        int y = harm->GetDrawingY();
+        params.m_y = harm->GetDrawingY();
 
         if (harm->GetFirst() && harm->GetFirst()->Is(FB)) {
-            DrawFb(dc, *staffIter, dynamic_cast<Fb *>(harm->GetFirst()), x, y, setX, setY);
+            DrawFb(dc, *staffIter, dynamic_cast<Fb *>(harm->GetFirst()), params);
         }
         else {
-            harmTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+            params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
+
+            harmTxt.SetPointSize(params.m_pointSize);
 
             dc->SetBrush(m_currentColour, AxSOLID);
             dc->SetFont(&harmTxt);
 
-            dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
-            DrawTextChildren(dc, harm, x, y, setX, setY);
+            dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+            DrawTextChildren(dc, harm, params);
             dc->EndText();
 
             dc->ResetFont();
@@ -1988,7 +2049,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
     // set norm as default
     int code = SMUFL_E56D_ornamentMordentInverted;
     if (mordent->GetForm() == mordentLog_FORM_upper) code = SMUFL_E56C_ornamentMordent;
-    if (mordent->GetLong() == true) code = SMUFL_E56E_ornamentTremblement;
+    if (mordent->GetLong() == BOOLEAN_true) code = SMUFL_E56E_ornamentTremblement;
 
     std::wstring str;
     str.push_back(code);
@@ -1997,7 +2058,9 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
     std::vector<Staff *> staffList = mordent->GetTstampStaves(measure);
     double xShift = 0.0;
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), mordent, mordent->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), mordent, mordent->GetStart(), *staffIter)) {
+            continue;
+        }
         int y = mordent->GetDrawingY();
 
         if (mordent->HasAccidlower()) {
@@ -2088,20 +2151,28 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
 
     bool centered = true;
-    // center the pedal only with @stratid
+    // center the pedal only with @startid
     if (pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
 
-    int code = SMUFL_E650_keyboardPedalPed;
-    if (pedal->GetDir() == pedalLog_DIR_up) code = SMUFL_E655_keyboardPedalUp;
+    int code = SMUFL_E655_keyboardPedalUp;
     std::wstring str;
+    if (pedal->GetDir() == pedalLog_DIR_bounce) {
+        str.push_back(code);
+        TextExtend bounceOffset;
+        dc->GetSmuflTextExtent(str, &bounceOffset);
+        x -= bounceOffset.m_width;
+    }
+    if (pedal->GetDir() != pedalLog_DIR_up) code = SMUFL_E650_keyboardPedalPed;
     str.push_back(code);
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, pedal->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, pedal->GetStart(), *staffIter)) {
+            continue;
+        }
         // Basic method that use bounding box
         int y = pedal->GetDrawingY();
 
@@ -2131,8 +2202,10 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         tempoTxt.SetWeight(FONTWEIGHT_bold);
     }
 
+    TextDrawingParams params;
+
     // If we have not timestamp
-    int x = measure->GetDrawingX();
+    params.m_x = measure->GetDrawingX();
     // First try to see if we have a meter sig attribute for this measure
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
     Alignment *pos
@@ -2144,30 +2217,30 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     }
     // if we found one, use it
     if (pos) {
-        x += pos->GetXRel();
+        params.m_x += pos->GetXRel();
     }
 
-    bool setX = false;
-    bool setY = false;
-
-    char alignment = tempo->GetAlignment();
+    data_HORIZONTALALIGNMENT alignment = tempo->GetChildRendAlignment();
     // Tempo are left aligned by default;
-    if (alignment == 0) alignment = LEFT;
+    if (alignment == 0) alignment = HORIZONTALALIGNMENT_left;
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = tempo->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), tempo, tempo->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), tempo, tempo->GetStart(), *staffIter)) {
+            continue;
+        }
 
-        tempoTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+        params.m_y = tempo->GetDrawingY();
+        params.m_pointSize = m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize();
 
-        int y = tempo->GetDrawingY();
+        tempoTxt.SetPointSize(params.m_pointSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&tempoTxt);
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
-        DrawTextChildren(dc, tempo, x, y, setX, setY);
+        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+        DrawTextChildren(dc, tempo, params);
         dc->EndText();
 
         dc->ResetFont();
@@ -2192,7 +2265,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     int x = trill->GetStart()->GetDrawingX() + trill->GetStart()->GetDrawingRadius(m_doc);
 
     bool centered = true;
-    // center the trill only with @stratid
+    // center the trill only with @startid
     if (trill->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
@@ -2206,7 +2279,9 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = trill->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), trill, trill->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), trill, trill->GetStart(), *staffIter)) {
+            continue;
+        }
         int y = trill->GetDrawingY();
 
         // Upper and lower accidentals are currently exclusive, but sould both be allowed at the same time.
@@ -2254,14 +2329,14 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     dc->StartGraphic(turn, "", turn->GetUuid());
 
     int x = turn->GetStart()->GetDrawingX() + turn->GetStart()->GetDrawingRadius(m_doc);
-    if (turn->GetDelayed() == true) LogWarning("delayed turns not supported");
+    if (turn->GetDelayed() == BOOLEAN_true) LogWarning("delayed turns not supported");
 
     // set norm as default
     int code = SMUFL_E567_ornamentTurn;
     if (turn->GetForm() == turnLog_FORM_upper) code = SMUFL_E568_ornamentTurnInverted;
 
     bool centered = true;
-    // center the turn only with @stratid
+    // center the turn only with @startid
     if (turn->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
@@ -2272,7 +2347,9 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = turn->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), turn, turn->GetStart(), *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), turn, turn->GetStart(), *staffIter)) {
+            continue;
+        }
         int y = turn->GetDrawingY();
 
         if (turn->HasAccidlower()) {
@@ -2434,7 +2511,9 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     }
 
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), ending, objectX, *staffIter);
+        if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), ending, objectX, *staffIter)) {
+            continue;
+        }
 
         int y1 = ending->GetDrawingY();
 
@@ -2454,17 +2533,21 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
             if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << ")";
 
             Text text;
+            text.SetParent(ending);
             text.SetText(UTF8to16(strStream.str()));
-
-            bool setX = false;
-            bool setY = false;
 
             int textX = x1;
             if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
                 textX += m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
             }
-            dc->StartText(ToDeviceContextX(textX), ToDeviceContextY(y1), LEFT);
-            DrawTextElement(dc, &text, textX, y1, setX, setY);
+
+            TextDrawingParams params;
+            params.m_x = textX;
+            params.m_y = y1;
+            params.m_pointSize = currentFont.GetPointSize();
+
+            dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_left);
+            DrawTextElement(dc, &text, params);
             dc->EndText();
         }
 

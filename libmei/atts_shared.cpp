@@ -165,6 +165,52 @@ bool AttArticulation::HasArtic() const
 /* include <attartic> */
 
 //----------------------------------------------------------------------------
+// AttAttaccaLog
+//----------------------------------------------------------------------------
+
+AttAttaccaLog::AttAttaccaLog() : Att()
+{
+    ResetAttaccaLog();
+}
+
+AttAttaccaLog::~AttAttaccaLog()
+{
+}
+
+void AttAttaccaLog::ResetAttaccaLog()
+{
+    m_target = "";
+}
+
+bool AttAttaccaLog::ReadAttaccaLog(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("target")) {
+        this->SetTarget(StrToStr(element.attribute("target").value()));
+        element.remove_attribute("target");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttAttaccaLog::WriteAttaccaLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasTarget()) {
+        element.append_attribute("target") = StrToStr(this->GetTarget()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttAttaccaLog::HasTarget() const
+{
+    return (m_target != "");
+}
+
+/* include <atttarget> */
+
+//----------------------------------------------------------------------------
 // AttAudience
 //----------------------------------------------------------------------------
 
@@ -225,7 +271,7 @@ AttAugmentDots::~AttAugmentDots()
 
 void AttAugmentDots::ResetAugmentDots()
 {
-    m_dots = 0;
+    m_dots = -1;
 }
 
 bool AttAugmentDots::ReadAugmentDots(pugi::xml_node element)
@@ -251,7 +297,7 @@ bool AttAugmentDots::WriteAugmentDots(pugi::xml_node element)
 
 bool AttAugmentDots::HasDots() const
 {
-    return (m_dots != 0);
+    return (m_dots != -1);
 }
 
 /* include <attdots> */
@@ -378,6 +424,7 @@ AttBarPlacement::~AttBarPlacement()
 
 void AttBarPlacement::ResetBarPlacement()
 {
+    m_barlinelen = 0.0;
     m_barplace = BARPLACE_NONE;
     m_taktplace = 0;
 }
@@ -385,6 +432,11 @@ void AttBarPlacement::ResetBarPlacement()
 bool AttBarPlacement::ReadBarPlacement(pugi::xml_node element)
 {
     bool hasAttribute = false;
+    if (element.attribute("barlinelen")) {
+        this->SetBarlinelen(StrToDbl(element.attribute("barlinelen").value()));
+        element.remove_attribute("barlinelen");
+        hasAttribute = true;
+    }
     if (element.attribute("barplace")) {
         this->SetBarplace(StrToBarplace(element.attribute("barplace").value()));
         element.remove_attribute("barplace");
@@ -401,6 +453,10 @@ bool AttBarPlacement::ReadBarPlacement(pugi::xml_node element)
 bool AttBarPlacement::WriteBarPlacement(pugi::xml_node element)
 {
     bool wroteAttribute = false;
+    if (this->HasBarlinelen()) {
+        element.append_attribute("barlinelen") = DblToStr(this->GetBarlinelen()).c_str();
+        wroteAttribute = true;
+    }
     if (this->HasBarplace()) {
         element.append_attribute("barplace") = BarplaceToStr(this->GetBarplace()).c_str();
         wroteAttribute = true;
@@ -410,6 +466,11 @@ bool AttBarPlacement::WriteBarPlacement(pugi::xml_node element)
         wroteAttribute = true;
     }
     return wroteAttribute;
+}
+
+bool AttBarPlacement::HasBarlinelen() const
+{
+    return (m_barlinelen != 0.0);
 }
 
 bool AttBarPlacement::HasBarplace() const
@@ -3097,67 +3158,6 @@ bool AttLyricStyle::HasLyricWeight() const
 /* include <attlyric.weight> */
 
 //----------------------------------------------------------------------------
-// AttMeasureLog
-//----------------------------------------------------------------------------
-
-AttMeasureLog::AttMeasureLog() : Att()
-{
-    ResetMeasureLog();
-}
-
-AttMeasureLog::~AttMeasureLog()
-{
-}
-
-void AttMeasureLog::ResetMeasureLog()
-{
-    m_left = BARRENDITION_NONE;
-    m_right = BARRENDITION_NONE;
-}
-
-bool AttMeasureLog::ReadMeasureLog(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("left")) {
-        this->SetLeft(StrToBarrendition(element.attribute("left").value()));
-        element.remove_attribute("left");
-        hasAttribute = true;
-    }
-    if (element.attribute("right")) {
-        this->SetRight(StrToBarrendition(element.attribute("right").value()));
-        element.remove_attribute("right");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttMeasureLog::WriteMeasureLog(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasLeft()) {
-        element.append_attribute("left") = BarrenditionToStr(this->GetLeft()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasRight()) {
-        element.append_attribute("right") = BarrenditionToStr(this->GetRight()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttMeasureLog::HasLeft() const
-{
-    return (m_left != BARRENDITION_NONE);
-}
-
-bool AttMeasureLog::HasRight() const
-{
-    return (m_right != BARRENDITION_NONE);
-}
-
-/* include <attright> */
-
-//----------------------------------------------------------------------------
 // AttMeasureNumbers
 //----------------------------------------------------------------------------
 
@@ -4896,6 +4896,67 @@ bool AttPages::HasPageScale() const
 /* include <attpage.scale> */
 
 //----------------------------------------------------------------------------
+// AttPartIdent
+//----------------------------------------------------------------------------
+
+AttPartIdent::AttPartIdent() : Att()
+{
+    ResetPartIdent();
+}
+
+AttPartIdent::~AttPartIdent()
+{
+}
+
+void AttPartIdent::ResetPartIdent()
+{
+    m_part = "";
+    m_partstaff = "";
+}
+
+bool AttPartIdent::ReadPartIdent(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("part")) {
+        this->SetPart(StrToStr(element.attribute("part").value()));
+        element.remove_attribute("part");
+        hasAttribute = true;
+    }
+    if (element.attribute("partstaff")) {
+        this->SetPartstaff(StrToStr(element.attribute("partstaff").value()));
+        element.remove_attribute("partstaff");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttPartIdent::WritePartIdent(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasPart()) {
+        element.append_attribute("part") = StrToStr(this->GetPart()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPartstaff()) {
+        element.append_attribute("partstaff") = StrToStr(this->GetPartstaff()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttPartIdent::HasPart() const
+{
+    return (m_part != "");
+}
+
+bool AttPartIdent::HasPartstaff() const
+{
+    return (m_partstaff != "");
+}
+
+/* include <attpartstaff> */
+
+//----------------------------------------------------------------------------
 // AttPitch
 //----------------------------------------------------------------------------
 
@@ -5184,6 +5245,112 @@ bool AttQuantity::HasQuantity() const
 }
 
 /* include <attquantity> */
+
+//----------------------------------------------------------------------------
+// AttRanging
+//----------------------------------------------------------------------------
+
+AttRanging::AttRanging() : Att()
+{
+    ResetRanging();
+}
+
+AttRanging::~AttRanging()
+{
+}
+
+void AttRanging::ResetRanging()
+{
+    m_atleast = 0.0;
+    m_atmost = 0.0;
+    m_min = 0.0;
+    m_max = 0.0;
+    m_confidence = 0.0;
+}
+
+bool AttRanging::ReadRanging(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("atleast")) {
+        this->SetAtleast(StrToDbl(element.attribute("atleast").value()));
+        element.remove_attribute("atleast");
+        hasAttribute = true;
+    }
+    if (element.attribute("atmost")) {
+        this->SetAtmost(StrToDbl(element.attribute("atmost").value()));
+        element.remove_attribute("atmost");
+        hasAttribute = true;
+    }
+    if (element.attribute("min")) {
+        this->SetMin(StrToDbl(element.attribute("min").value()));
+        element.remove_attribute("min");
+        hasAttribute = true;
+    }
+    if (element.attribute("max")) {
+        this->SetMax(StrToDbl(element.attribute("max").value()));
+        element.remove_attribute("max");
+        hasAttribute = true;
+    }
+    if (element.attribute("confidence")) {
+        this->SetConfidence(StrToDbl(element.attribute("confidence").value()));
+        element.remove_attribute("confidence");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttRanging::WriteRanging(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasAtleast()) {
+        element.append_attribute("atleast") = DblToStr(this->GetAtleast()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasAtmost()) {
+        element.append_attribute("atmost") = DblToStr(this->GetAtmost()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasMin()) {
+        element.append_attribute("min") = DblToStr(this->GetMin()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasMax()) {
+        element.append_attribute("max") = DblToStr(this->GetMax()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasConfidence()) {
+        element.append_attribute("confidence") = DblToStr(this->GetConfidence()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttRanging::HasAtleast() const
+{
+    return (m_atleast != 0.0);
+}
+
+bool AttRanging::HasAtmost() const
+{
+    return (m_atmost != 0.0);
+}
+
+bool AttRanging::HasMin() const
+{
+    return (m_min != 0.0);
+}
+
+bool AttRanging::HasMax() const
+{
+    return (m_max != 0.0);
+}
+
+bool AttRanging::HasConfidence() const
+{
+    return (m_confidence != 0.0);
+}
+
+/* include <attconfidence> */
 
 //----------------------------------------------------------------------------
 // AttResponsibility
@@ -6956,6 +7123,52 @@ bool AttTypography::HasFontweight() const
 /* include <attfontweight> */
 
 //----------------------------------------------------------------------------
+// AttVerticalAlign
+//----------------------------------------------------------------------------
+
+AttVerticalAlign::AttVerticalAlign() : Att()
+{
+    ResetVerticalAlign();
+}
+
+AttVerticalAlign::~AttVerticalAlign()
+{
+}
+
+void AttVerticalAlign::ResetVerticalAlign()
+{
+    m_valign = VERTICALALIGNMENT_NONE;
+}
+
+bool AttVerticalAlign::ReadVerticalAlign(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("valign")) {
+        this->SetValign(StrToVerticalalignment(element.attribute("valign").value()));
+        element.remove_attribute("valign");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttVerticalAlign::WriteVerticalAlign(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasValign()) {
+        element.append_attribute("valign") = VerticalalignmentToStr(this->GetValign()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttVerticalAlign::HasValign() const
+{
+    return (m_valign != VERTICALALIGNMENT_NONE);
+}
+
+/* include <attvalign> */
+
+//----------------------------------------------------------------------------
 // AttVerticalAlignment
 //----------------------------------------------------------------------------
 
@@ -6970,14 +7183,14 @@ AttVerticalAlignment::~AttVerticalAlignment()
 
 void AttVerticalAlignment::ResetVerticalAlignment()
 {
-    m_vgrp = "";
+    m_vgrp = VRV_UNSET;
 }
 
 bool AttVerticalAlignment::ReadVerticalAlignment(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("vgrp")) {
-        this->SetVgrp(StrToStr(element.attribute("vgrp").value()));
+        this->SetVgrp(StrToInt(element.attribute("vgrp").value()));
         element.remove_attribute("vgrp");
         hasAttribute = true;
     }
@@ -6988,7 +7201,7 @@ bool AttVerticalAlignment::WriteVerticalAlignment(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasVgrp()) {
-        element.append_attribute("vgrp") = StrToStr(this->GetVgrp()).c_str();
+        element.append_attribute("vgrp") = IntToStr(this->GetVgrp()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -6996,7 +7209,7 @@ bool AttVerticalAlignment::WriteVerticalAlignment(pugi::xml_node element)
 
 bool AttVerticalAlignment::HasVgrp() const
 {
-    return (m_vgrp != "");
+    return (m_vgrp != VRV_UNSET);
 }
 
 /* include <attvgrp> */
@@ -7654,6 +7867,14 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
     }
+    if (element->HasAttClass(ATT_ATTACCALOG)) {
+        AttAttaccaLog *att = dynamic_cast<AttAttaccaLog *>(element);
+        assert(att);
+        if (attrType == "target") {
+            att->SetTarget(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_AUDIENCE)) {
         AttAudience *att = dynamic_cast<AttAudience *>(element);
         assert(att);
@@ -7693,6 +7914,10 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
     if (element->HasAttClass(ATT_BARPLACEMENT)) {
         AttBarPlacement *att = dynamic_cast<AttBarPlacement *>(element);
         assert(att);
+        if (attrType == "barlinelen") {
+            att->SetBarlinelen(att->StrToDbl(attrValue));
+            return true;
+        }
         if (attrType == "barplace") {
             att->SetBarplace(att->StrToBarplace(attrValue));
             return true;
@@ -8214,18 +8439,6 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
     }
-    if (element->HasAttClass(ATT_MEASURELOG)) {
-        AttMeasureLog *att = dynamic_cast<AttMeasureLog *>(element);
-        assert(att);
-        if (attrType == "left") {
-            att->SetLeft(att->StrToBarrendition(attrValue));
-            return true;
-        }
-        if (attrType == "right") {
-            att->SetRight(att->StrToBarrendition(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass(ATT_MEASURENUMBERS)) {
         AttMeasureNumbers *att = dynamic_cast<AttMeasureNumbers *>(element);
         assert(att);
@@ -8570,6 +8783,18 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
     }
+    if (element->HasAttClass(ATT_PARTIDENT)) {
+        AttPartIdent *att = dynamic_cast<AttPartIdent *>(element);
+        assert(att);
+        if (attrType == "part") {
+            att->SetPart(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "partstaff") {
+            att->SetPartstaff(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_PITCH)) {
         AttPitch *att = dynamic_cast<AttPitch *>(element);
         assert(att);
@@ -8623,6 +8848,30 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         assert(att);
         if (attrType == "quantity") {
             att->SetQuantity(att->StrToDbl(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_RANGING)) {
+        AttRanging *att = dynamic_cast<AttRanging *>(element);
+        assert(att);
+        if (attrType == "atleast") {
+            att->SetAtleast(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "atmost") {
+            att->SetAtmost(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "min") {
+            att->SetMin(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "max") {
+            att->SetMax(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "confidence") {
+            att->SetConfidence(att->StrToDbl(attrValue));
             return true;
         }
     }
@@ -8970,11 +9219,19 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
     }
+    if (element->HasAttClass(ATT_VERTICALALIGN)) {
+        AttVerticalAlign *att = dynamic_cast<AttVerticalAlign *>(element);
+        assert(att);
+        if (attrType == "valign") {
+            att->SetValign(att->StrToVerticalalignment(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_VERTICALALIGNMENT)) {
         AttVerticalAlignment *att = dynamic_cast<AttVerticalAlignment *>(element);
         assert(att);
         if (attrType == "vgrp") {
-            att->SetVgrp(att->StrToStr(attrValue));
+            att->SetVgrp(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -9121,6 +9378,13 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("artic", att->ArticulationListToStr(att->GetArtic())));
         }
     }
+    if (element->HasAttClass(ATT_ATTACCALOG)) {
+        const AttAttaccaLog *att = dynamic_cast<const AttAttaccaLog *>(element);
+        assert(att);
+        if (att->HasTarget()) {
+            attributes->push_back(std::make_pair("target", att->StrToStr(att->GetTarget())));
+        }
+    }
     if (element->HasAttClass(ATT_AUDIENCE)) {
         const AttAudience *att = dynamic_cast<const AttAudience *>(element);
         assert(att);
@@ -9155,6 +9419,9 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_BARPLACEMENT)) {
         const AttBarPlacement *att = dynamic_cast<const AttBarPlacement *>(element);
         assert(att);
+        if (att->HasBarlinelen()) {
+            attributes->push_back(std::make_pair("barlinelen", att->DblToStr(att->GetBarlinelen())));
+        }
         if (att->HasBarplace()) {
             attributes->push_back(std::make_pair("barplace", att->BarplaceToStr(att->GetBarplace())));
         }
@@ -9593,16 +9860,6 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("lyric.weight", att->FontweightToStr(att->GetLyricWeight())));
         }
     }
-    if (element->HasAttClass(ATT_MEASURELOG)) {
-        const AttMeasureLog *att = dynamic_cast<const AttMeasureLog *>(element);
-        assert(att);
-        if (att->HasLeft()) {
-            attributes->push_back(std::make_pair("left", att->BarrenditionToStr(att->GetLeft())));
-        }
-        if (att->HasRight()) {
-            attributes->push_back(std::make_pair("right", att->BarrenditionToStr(att->GetRight())));
-        }
-    }
     if (element->HasAttClass(ATT_MEASURENUMBERS)) {
         const AttMeasureNumbers *att = dynamic_cast<const AttMeasureNumbers *>(element);
         assert(att);
@@ -9889,6 +10146,16 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("page.scale", att->StrToStr(att->GetPageScale())));
         }
     }
+    if (element->HasAttClass(ATT_PARTIDENT)) {
+        const AttPartIdent *att = dynamic_cast<const AttPartIdent *>(element);
+        assert(att);
+        if (att->HasPart()) {
+            attributes->push_back(std::make_pair("part", att->StrToStr(att->GetPart())));
+        }
+        if (att->HasPartstaff()) {
+            attributes->push_back(std::make_pair("partstaff", att->StrToStr(att->GetPartstaff())));
+        }
+    }
     if (element->HasAttClass(ATT_PITCH)) {
         const AttPitch *att = dynamic_cast<const AttPitch *>(element);
         assert(att);
@@ -9934,6 +10201,25 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasQuantity()) {
             attributes->push_back(std::make_pair("quantity", att->DblToStr(att->GetQuantity())));
+        }
+    }
+    if (element->HasAttClass(ATT_RANGING)) {
+        const AttRanging *att = dynamic_cast<const AttRanging *>(element);
+        assert(att);
+        if (att->HasAtleast()) {
+            attributes->push_back(std::make_pair("atleast", att->DblToStr(att->GetAtleast())));
+        }
+        if (att->HasAtmost()) {
+            attributes->push_back(std::make_pair("atmost", att->DblToStr(att->GetAtmost())));
+        }
+        if (att->HasMin()) {
+            attributes->push_back(std::make_pair("min", att->DblToStr(att->GetMin())));
+        }
+        if (att->HasMax()) {
+            attributes->push_back(std::make_pair("max", att->DblToStr(att->GetMax())));
+        }
+        if (att->HasConfidence()) {
+            attributes->push_back(std::make_pair("confidence", att->DblToStr(att->GetConfidence())));
         }
     }
     if (element->HasAttClass(ATT_RESPONSIBILITY)) {
@@ -10224,11 +10510,18 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("fontweight", att->FontweightToStr(att->GetFontweight())));
         }
     }
+    if (element->HasAttClass(ATT_VERTICALALIGN)) {
+        const AttVerticalAlign *att = dynamic_cast<const AttVerticalAlign *>(element);
+        assert(att);
+        if (att->HasValign()) {
+            attributes->push_back(std::make_pair("valign", att->VerticalalignmentToStr(att->GetValign())));
+        }
+    }
     if (element->HasAttClass(ATT_VERTICALALIGNMENT)) {
         const AttVerticalAlignment *att = dynamic_cast<const AttVerticalAlignment *>(element);
         assert(att);
         if (att->HasVgrp()) {
-            attributes->push_back(std::make_pair("vgrp", att->StrToStr(att->GetVgrp())));
+            attributes->push_back(std::make_pair("vgrp", att->IntToStr(att->GetVgrp())));
         }
     }
     if (element->HasAttClass(ATT_VISIBILITY)) {

@@ -26,9 +26,7 @@ TextDirInterface::TextDirInterface() : Interface(), AttPlacement()
     Reset();
 }
 
-TextDirInterface::~TextDirInterface()
-{
-}
+TextDirInterface::~TextDirInterface() {}
 
 void TextDirInterface::Reset()
 {
