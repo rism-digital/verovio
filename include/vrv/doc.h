@@ -73,9 +73,14 @@ public:
     bool GenerateDocumentScoreDef();
 
     /**
-     * Generate a document pgHead from the MEI header if none is provided.
+     * Generate a document pgHead from the MEI header if none is provided
      */
     bool GenerateHeaderAndFooter();
+
+    /**
+     * Generate measure numbers from measure attributes
+     */
+    bool GenerateMeasureNumbers();
 
     /**
      * Getter and setter for the DocType.

@@ -480,6 +480,9 @@ bool Toolkit::LoadData(const std::string &data)
         m_doc.GenerateHeaderAndFooter();
     }
 
+    // generate missing measure numbers
+    m_doc.GenerateMeasureNumbers();
+
     m_doc.PrepareDrawing();
 
     // Convert pseudo-measures into distinct segments based on barLine elements

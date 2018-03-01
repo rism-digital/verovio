@@ -121,14 +121,14 @@ void display_usage()
     std::vector<vrv::OptionGrp *> *grp = options.GetGrps();
     std::vector<vrv::OptionGrp *>::iterator grpIter;
 
-    for (grpIter = grp->begin(); grpIter != grp->end(); grpIter++) {
+    for (grpIter = grp->begin(); grpIter != grp->end(); ++grpIter) {
 
         // Options with long forms only
         std::cout << std::endl << (*grpIter)->GetLabel() << std::endl;
         const std::vector<vrv::Option *> *options = (*grpIter)->GetOptions();
         std::vector<vrv::Option *>::const_iterator iter;
 
-        for (iter = options->begin(); iter != options->end(); iter++) {
+        for (iter = options->begin(); iter != options->end(); ++iter) {
 
             std::string option = fromCamelCase((*iter)->GetKey());
 
@@ -229,7 +229,7 @@ int main(int argc, char **argv)
         { "page-width-deprecated", required_argument, 0, 'w' },
         { 0, 0, 0, 0 }
     };
-    
+
     int baseSize = sizeof(base_options) / sizeof(option);
 
     vrv::Options *options = toolkit.GetOptions();
@@ -245,7 +245,7 @@ int main(int argc, char **argv)
     optNames.reserve(mapSize);
 
     vrv::MapOfStrOptions::const_iterator iter;
-    for (iter = params->begin(); iter != params->end(); iter++) {
+    for (iter = params->begin(); iter != params->end(); ++iter) {
         // Double check that back and forth convertion is correct
         assert(toCamelCase(fromCamelCase(iter->first)) == iter->first);
 
@@ -260,7 +260,7 @@ int main(int argc, char **argv)
 
     // Concatenate the base options
     assert(i == mapSize);
-    for (; i < mapSize + baseSize; i++) {
+    for (; i < mapSize + baseSize; ++i) {
         long_options[i].name = base_options[i - mapSize].name;
         long_options[i].has_arg = base_options[i - mapSize].has_arg;
         long_options[i].flag = base_options[i - mapSize].flag;
@@ -462,7 +462,7 @@ int main(int argc, char **argv)
 
     if (outformat == "svg") {
         int p;
-        for (p = from; p < to; p++) {
+        for (p = from; p < to; ++p) {
             std::string cur_outfile = outfile;
             if (all_pages) {
                 cur_outfile += vrv::StringFormat("_%03d", p);
@@ -551,5 +551,6 @@ int main(int argc, char **argv)
         }
     }
 
+    free(long_options);
     return 0;
 }

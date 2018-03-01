@@ -263,8 +263,6 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     /************** draw the artic **************/
 
-    wchar_t code;
-
     int x = articPart->GetDrawingX();
     // HARDCODED value, we double the default margin for now - should go in styling
     int yShift = 2 * m_doc->GetTopMargin(articPart->GetClassId()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -283,9 +281,9 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     std::vector<data_ARTICULATION>::iterator articIter;
     std::vector<data_ARTICULATION> articList = articPart->GetArtic();
-    for (articIter = articList.begin(); articIter != articList.end(); articIter++) {
+    for (articIter = articList.begin(); articIter != articList.end(); ++articIter) {
 
-        code = Artic::GetSmuflCode(*articIter, articPart->GetPlace());
+        wchar_t code = Artic::GetSmuflCode(*articIter, articPart->GetPlace());
 
         // Skip it if we do not have it in the font (for now - we should log / document this somewhere)
         if (code == 0) {
@@ -713,14 +711,14 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     MapOfDotLocs::const_iterator iter;
     const MapOfDotLocs *map = dots->GetMapOfDotLocs();
-    for (iter = map->begin(); iter != map->end(); iter++) {
+    for (iter = map->begin(); iter != map->end(); ++iter) {
         Staff *dotStaff = (iter->first) ? iter->first : staff;
         int y = dotStaff->GetDrawingY()
             - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (dotStaff->m_drawingLines - 1);
         int x = dots->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const std::list<int> *dotLocs = &iter->second;
         std::list<int>::const_iterator intIter;
-        for (intIter = dotLocs->begin(); intIter != dotLocs->end(); intIter++) {
+        for (intIter = dotLocs->begin(); intIter != dotLocs->end(); ++intIter) {
             DrawDotsPart(
                 dc, x, y + (*intIter) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(), dotStaff);
         }

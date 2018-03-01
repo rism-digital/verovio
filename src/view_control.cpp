@@ -431,7 +431,7 @@ void View::DrawOctave(
     end = dynamic_cast<LayerElement *>(octave->GetEnd());
 
     if (!start || !end) {
-        // no start and end, obviously nothing to do...
+        // no start or end, obviously nothing to do …
         return;
     }
 
@@ -468,46 +468,50 @@ void View::DrawOctave(
             default: break;
         }
     }
-    int lineWidthFactor = 1;
     std::wstring str;
     str.push_back(code);
-    if (octave->HasLwidth()) {
-        if (octave->GetLwidth() == "wide") {
-            lineWidthFactor *= 4;
+
+    if (octave->GetExtender() != BOOLEAN_false) {
+        int lineWidthFactor = 1;
+        if (octave->HasLwidth()) {
+            if (octave->GetLwidth() == "wide") {
+                lineWidthFactor *= 4;
+            }
+            else if (octave->GetLwidth() == "medium") {
+                lineWidthFactor *= 2;
+            }
         }
-        else if (octave->GetLwidth() == "medium") {
-            lineWidthFactor *= 2;
+        int lineWidth = lineWidthFactor * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+        TextExtend extend;
+        dc->GetSmuflTextExtent(str, &extend);
+        int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
+        DrawSmuflCode(dc, x1 - extend.m_width, yCode, code, staff->m_drawingStaffSize, false);
+        dc->ResetFont();
+
+        if (octave->GetLendsym() != LINESTARTENDSYMBOL_none)
+                y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
+        // adjust is to avoid the figure to touch the line
+        x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+
+        if (octave->HasLform()) {
+            if (octave->GetLform() == LINEFORM_solid) {
+                extend.m_height *= 0;
+            }
         }
+
+        dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
+        dc->SetBrush(m_currentColour, AxSOLID);
+
+        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+        // draw the ending vertical line if not the end of the system
+        if (spanningType != SPANNING_START)
+            dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
+                ToDeviceContextY(y2 + lineWidth / 2));
+
+        dc->ResetPen();
+        dc->ResetBrush();
     }
-    int lineWidth = lineWidthFactor * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
-    TextExtend extend;
-    dc->GetSmuflTextExtent(str, &extend);
-    int yCode = (disPlace == STAFFREL_basic_above) ? y1 - extend.m_height : y1;
-    DrawSmuflCode(dc, x1 - extend.m_width, yCode, code, staff->m_drawingStaffSize, false);
-    dc->ResetFont();
-
-    y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
-    // adjust is to avoid the figure to touch the line
-    x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-
-    if (octave->HasLform()) {
-        if (octave->GetLform() == LINEFORM_solid) {
-            extend.m_height *= 0;
-        }
-    }
-
-    dc->SetPen(m_currentColour, lineWidth, AxSOLID, extend.m_height / 3);
-    dc->SetBrush(m_currentColour, AxSOLID);
-
-    dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
-    // draw the ending vertical line if not the end of the system
-    if (spanningType != SPANNING_START)
-        dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
-            ToDeviceContextY(y2 + lineWidth / 2));
-
-    dc->ResetPen();
-    dc->ResetBrush();
 
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
@@ -1123,9 +1127,8 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
 
     // 0.2 for avoiding / by 0 (below)
     float maxHeightFactor = std::max(0.2f, fabsf(angle));
-    maxHeight = dist
-        / (maxHeightFactor
-              * (TEMP_SLUR_CURVE_FACTOR + 5)); // 5 is the minimum - can be increased for limiting curvature
+    maxHeight = dist / (maxHeightFactor * (TEMP_SLUR_CURVE_FACTOR
+                                              + 5)); // 5 is the minimum - can be increased for limiting curvature
 
     maxHeight = std::max(maxHeight, currentHeight);
 
@@ -1727,7 +1730,7 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
     str.push_back(code);
 
     bool centered = true;
-    // center the glyph only with @stratid
+    // center the glyph only with @startid
     if (breath->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
@@ -1772,7 +1775,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     params.m_x = dir->GetStart()->GetDrawingX() + dir->GetStart()->GetDrawingRadius(m_doc);
 
     data_HORIZONTALALIGNMENT alignment = dir->GetChildRendAlignment();
-    // Dir are left aligned by default (with both @tstamp and @startid)
+    // dir are left aligned by default (with both @tstamp and @startid)
     if (alignment == HORIZONTALALIGNMENT_NONE) alignment = HORIZONTALALIGNMENT_left;
 
     std::vector<Staff *>::iterator staffIter;
@@ -1791,7 +1794,6 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         dc->SetFont(&dirTxt);
 
         dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
-
         DrawTextChildren(dc, dir, params);
         dc->EndText();
 
@@ -1832,9 +1834,9 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     params.m_x = dynam->GetStart()->GetDrawingX() + dynam->GetStart()->GetDrawingRadius(m_doc);
 
     data_HORIZONTALALIGNMENT alignment = dynam->GetChildRendAlignment();
-    // Dynam are left aligned by default;
+    // dynam are left aligned by default;
     if (alignment == 0) {
-        // centre the dynam only with @stratid
+        // centre the dynam only with @startid
         alignment = (dynam->GetStart()->Is(TIMESTAMP_ATTR)) ? HORIZONTALALIGNMENT_left : HORIZONTALALIGNMENT_center;
     }
 
@@ -1933,17 +1935,15 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     int code = SMUFL_E4C0_fermataAbove;
     // check for shape
     if (fermata->GetShape() == fermataVis_SHAPE_angular) {
-        if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
-                   && !(fermata->GetForm() == fermataVis_FORM_norm)))
+        if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
+                                                             && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C5_fermataShortBelow;
         else
             code = SMUFL_E4C4_fermataShortAbove;
     }
     else if (fermata->GetShape() == fermataVis_SHAPE_square) {
-        if (fermata->GetForm() == fermataVis_FORM_inv
-            || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
-                   && !(fermata->GetForm() == fermataVis_FORM_norm)))
+        if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
+                                                             && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C7_fermataLongBelow;
         else
             code = SMUFL_E4C6_fermataLongAbove;
@@ -1994,9 +1994,9 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     params.m_x = harm->GetStart()->GetDrawingX() + harm->GetStart()->GetDrawingRadius(m_doc);
 
     data_HORIZONTALALIGNMENT alignment = harm->GetChildRendAlignment();
-    // Harm are centered aligned by default;
+    // harm are centered aligned by default;
     if (alignment == 0) {
-        // centre the harm only with @stratid
+        // centre the harm only with @startid
         alignment = (harm->GetStart()->Is(TIMESTAMP_ATTR)) ? HORIZONTALALIGNMENT_left : HORIZONTALALIGNMENT_center;
     }
 
@@ -2151,14 +2151,20 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
 
     bool centered = true;
-    // center the pedal only with @stratid
+    // center the pedal only with @startid
     if (pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
 
-    int code = SMUFL_E650_keyboardPedalPed;
-    if (pedal->GetDir() == pedalLog_DIR_up) code = SMUFL_E655_keyboardPedalUp;
+    int code = SMUFL_E655_keyboardPedalUp;
     std::wstring str;
+    if (pedal->GetDir() == pedalLog_DIR_bounce) {
+        str.push_back(code);
+        TextExtend bounceOffset;
+        dc->GetSmuflTextExtent(str, &bounceOffset);
+        x -= bounceOffset.m_width;
+    }
+    if (pedal->GetDir() != pedalLog_DIR_up) code = SMUFL_E650_keyboardPedalPed;
     str.push_back(code);
 
     std::vector<Staff *>::iterator staffIter;
@@ -2259,7 +2265,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     int x = trill->GetStart()->GetDrawingX() + trill->GetStart()->GetDrawingRadius(m_doc);
 
     bool centered = true;
-    // center the trill only with @stratid
+    // center the trill only with @startid
     if (trill->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
@@ -2330,7 +2336,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     if (turn->GetForm() == turnLog_FORM_upper) code = SMUFL_E568_ornamentTurnInverted;
 
     bool centered = true;
-    // center the turn only with @stratid
+    // center the turn only with @startid
     if (turn->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }

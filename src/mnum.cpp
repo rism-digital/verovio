@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        dir.cpp
-// Author:      Laurent Pugin
-// Created:     2016
+// Name:        mnum.cpp
+// Author:      Klaus Rettinghaus
+// Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "dir.h"
+#include "mnum.h"
 
 //----------------------------------------------------------------------------
 
@@ -21,29 +21,40 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Dir
+// MNum
 //----------------------------------------------------------------------------
 
-Dir::Dir() : ControlElement("dir-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttLang()
+MNum::MNum()
+    : ControlElement("mnum-")
+    , TextListInterface()
+    , TextDirInterface()
+    , TimeSpanningInterface()
+    , AttColor()
+    , AttLang()
+    , AttTypography()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_LANG);
+    RegisterAttClass(ATT_TYPOGRAPHY);
 
     Reset();
 }
 
-Dir::~Dir() {}
+MNum::~MNum() {}
 
-void Dir::Reset()
+void MNum::Reset()
 {
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
+    ResetColor();
     ResetLang();
+    ResetTypography();
 }
 
-void Dir::AddChild(Object *child)
+void MNum::AddChild(Object *child)
 {
     if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
@@ -62,7 +73,23 @@ void Dir::AddChild(Object *child)
 }
 
 //----------------------------------------------------------------------------
-// Dir functor methods
+// MNum functor methods
 //----------------------------------------------------------------------------
+
+int MNum::Save(FunctorParams *functorParams)
+{
+    if (this->IsGenerated())
+        return FUNCTOR_SIBLINGS;
+    else
+        return Object::Save(functorParams);
+}
+
+int MNum::SaveEnd(FunctorParams *functorParams)
+{
+    if (this->IsGenerated())
+        return FUNCTOR_SIBLINGS;
+    else
+        return Object::SaveEnd(functorParams);
+}
 
 } // namespace vrv
