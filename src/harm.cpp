@@ -55,8 +55,11 @@ void Harm::Reset()
 
 void Harm::AddChild(Object *child)
 {
-    if (child->Is({ FB, REND, TEXT })) {
+    if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
+    }
+    else if (child->Is(FB)) {
+        assert(dynamic_cast<Fb *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
