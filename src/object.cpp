@@ -93,7 +93,7 @@ Object::Object(const Object &object) : BoundingBox(object)
     }
 
     int i;
-    for (i = 0; i < (int)object.m_children.size(); i++) {
+    for (i = 0; i < (int)object.m_children.size(); ++i) {
         Object *current = object.m_children.at(i);
         Object *copy = current->Clone();
         if (copy) {
@@ -123,7 +123,7 @@ Object &Object::operator=(const Object &object)
 
         if (object.CopyChildren()) {
             int i;
-            for (i = 0; i < (int)object.m_children.size(); i++) {
+            for (i = 0; i < (int)object.m_children.size(); ++i) {
                 Object *current = object.m_children.at(i);
                 Object *copy = current->Clone();
                 copy->Modify();
@@ -198,7 +198,7 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
     }
 
     int i;
-    for (i = 0; i < (int)sourceParent->m_children.size(); i++) {
+    for (i = 0; i < (int)sourceParent->m_children.size(); ++i) {
         Object *child = sourceParent->Relinquish(i);
         child->SetParent(this);
         if (idx != -1) {
@@ -300,7 +300,7 @@ bool Object::HasAttribute(std::string attribute, std::string value) const
     ArrayOfStrAttr attributes;
     this->GetAttributes(&attributes);
     ArrayOfStrAttr::iterator iter;
-    for (iter = attributes.begin(); iter != attributes.end(); iter++) {
+    for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
         if (((*iter).first == attribute) && ((*iter).second == value)) return true;
     }
     return false;
@@ -371,7 +371,7 @@ bool Object::HasChild(Object *child, int deepness) const
 {
     ArrayOfObjects::const_iterator iter;
 
-    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+    for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         if (child == (*iter))
             return true;
         else if (deepness == 0)
@@ -537,7 +537,7 @@ void Object::ResetCachedDrawingX() const
     // if (m_cachedDrawingX == VRV_UNSET) return;
     m_cachedDrawingX = VRV_UNSET;
     ArrayOfObjects::const_iterator iter;
-    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+    for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         (*iter)->ResetCachedDrawingX();
     }
 }
@@ -547,7 +547,7 @@ void Object::ResetCachedDrawingY() const
     // if (m_cachedDrawingY == VRV_UNSET) return;
     m_cachedDrawingY = VRV_UNSET;
     ArrayOfObjects::const_iterator iter;
-    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+    for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         (*iter)->ResetCachedDrawingY();
     }
 }
@@ -681,7 +681,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
                 bool hasAttComparison = false;
                 // first we look if there is a comparison object for the object type (e.g., a Staff)
                 ArrayOfAttComparisons::iterator attComparisonIter;
-                for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); attComparisonIter++) {
+                for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); ++attComparisonIter) {
                     // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
                     // the attribute (see below)
                     Object *o = *iter;

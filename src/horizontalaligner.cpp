@@ -53,7 +53,7 @@ Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType t
     idx = -1; // the index if we reach the end.
     Alignment *alignment = NULL;
     // First try to see if we already have something at the time position
-    for (i = 0; i < GetAlignmentCount(); i++) {
+    for (i = 0; i < GetAlignmentCount(); ++i) {
         alignment = dynamic_cast<Alignment *>(m_children.at(i));
         assert(alignment);
 
@@ -154,7 +154,7 @@ void MeasureAligner::SetMaxTime(double time)
     int i;
     Alignment *alignment = NULL;
     // Increase the time position for all alignment from the right barline
-    for (i = idx; i < GetAlignmentCount(); i++) {
+    for (i = idx; i < GetAlignmentCount(); ++i) {
         alignment = dynamic_cast<Alignment *>(m_children.at(i));
         assert(alignment);
         // Change it only if higher than before
@@ -173,7 +173,7 @@ double MeasureAligner::GetMaxTime() const
 void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments)
 {
     ArrayOfAdjustmentTuples::const_iterator iter;
-    for (iter = adjustments.begin(); iter != adjustments.end(); iter++) {
+    for (iter = adjustments.begin(); iter != adjustments.end(); ++iter) {
         Alignment *start = std::get<0>(*iter);
         assert(start);
         Alignment *end = std::get<1>(*iter);
@@ -188,7 +188,7 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
         int endX = end->GetXRel();
         // We use a reverse iterator
         ArrayOfObjects::iterator alignIter;
-        for (alignIter = m_children.begin(); alignIter != m_children.end(); alignIter++) {
+        for (alignIter = m_children.begin(); alignIter != m_children.end(); ++alignIter) {
             Alignment *current = dynamic_cast<Alignment *>(*alignIter);
             assert(current);
             // Nothing to do once we passed the start aligment
@@ -211,7 +211,7 @@ void MeasureAligner::PushAlignmentsRight()
 {
     Alignment *previous = NULL;
     ArrayOfObjects::reverse_iterator riter;
-    for (riter = m_children.rbegin(); riter != m_children.rend(); riter++) {
+    for (riter = m_children.rbegin(); riter != m_children.rend(); ++riter) {
         Alignment *current = dynamic_cast<Alignment *>(*riter);
         assert(current);
         if (current->IsOfType({ ALIGNMENT_GRACENOTE })) {
@@ -243,7 +243,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
 
     bool found = false;
     ArrayOfObjects::reverse_iterator riter;
-    for (riter = m_children.rbegin(); riter != m_children.rend(); riter++) {
+    for (riter = m_children.rbegin(); riter != m_children.rend(); ++riter) {
         if (!found) {
             if ((*riter) == alignment) found = true;
             continue;
@@ -347,7 +347,7 @@ void GraceAligner::AlignStack()
         alignment->AddLayerElementRef(element);
 
         // Set the grace alignmnet to all children
-        for (childrenIter = children.begin(); childrenIter != children.end(); childrenIter++) {
+        for (childrenIter = children.begin(); childrenIter != children.end(); ++childrenIter) {
             // Trick : FindAllChildByAttComparison include the element, which is probably a problem.
             // With note, we want to set only accid, so make sure we do not set it twice
             if (*childrenIter == element) continue;
@@ -404,7 +404,7 @@ void GraceAligner::SetGraceAligmentXPos(Doc *doc)
 
     int i = 0;
     // Then the @n of each first staffDef
-    for (childrenIter = m_children.rbegin(); childrenIter != m_children.rend(); childrenIter++) {
+    for (childrenIter = m_children.rbegin(); childrenIter != m_children.rend(); ++childrenIter) {
         Alignment *alignment = dynamic_cast<Alignment *>(*childrenIter);
         assert(alignment);
         // We space with a notehead (non grace size) which seems to be a reasonable default spacing with margin
@@ -559,7 +559,7 @@ AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, in
     ArrayOfObjects::iterator iter;
     AlignmentReference *reference = NULL;
 
-    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+    for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         reference = dynamic_cast<AlignmentReference *>(*iter);
         if (reference->GetN() == staffN) {
             return reference;
@@ -624,7 +624,7 @@ void AlignmentReference::AddChild(Object *child)
 
     ArrayOfObjects::iterator childrenIter;
     // Check if the we will have a reference with multiple layers
-    for (childrenIter = m_children.begin(); childrenIter != m_children.end(); childrenIter++) {
+    for (childrenIter = m_children.begin(); childrenIter != m_children.end(); ++childrenIter) {
         LayerElement *element = dynamic_cast<LayerElement *>(*childrenIter);
         if (childElement->GetAlignmentLayerN() == element->GetAlignmentLayerN()) break;
     }
@@ -653,7 +653,7 @@ void AlignmentReference::AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int s
 
     ArrayOfObjects::iterator iter;
     // bottom one
-    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+    for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         accid->AdjustX(dynamic_cast<LayerElement *>(*iter), doc, staffSize, leftAccids);
     }
 }
@@ -682,7 +682,7 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
     time = time - 1.0;
     TimestampAttr *timestampAttr = NULL;
     // First try to see if we already have something at the time position
-    for (i = 0; i < GetChildCount(); i++) {
+    for (i = 0; i < GetChildCount(); ++i) {
         timestampAttr = dynamic_cast<TimestampAttr *>(m_children.at(i));
         assert(timestampAttr);
 
@@ -812,7 +812,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
 
         std::vector<int>::iterator iter;
         std::vector<AttComparison *> filters;
-        for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
+        for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
 
             // Rescue value, used at the end of a measure without a barline
             int graceMaxPos = this->GetXRel() - params->m_doc->GetDrawingUnit(100);
@@ -1026,7 +1026,7 @@ int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
     // Because we are processing grace notes aligment backward (see Alignment::AdjustGraceXPos) we need
     // to process the children (LayerElement) "by hand" in FORWARD manner
     // (filters can be NULL because filtering was already applied in the parent)
-    for (childrenIter = m_children.begin(); childrenIter != m_children.end(); childrenIter++) {
+    for (childrenIter = m_children.begin(); childrenIter != m_children.end(); ++childrenIter) {
         (*childrenIter)->Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, FORWARD);
     }
 
@@ -1048,11 +1048,11 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
 
     // Detect the octave and mark them
     std::vector<Accid *>::iterator iter, octaveIter;
-    for (iter = m_accidSpace.begin(); iter != m_accidSpace.end() - 1; iter++) {
+    for (iter = m_accidSpace.begin(); iter != m_accidSpace.end() - 1; ++iter) {
         Note *note = dynamic_cast<Note *>((*iter)->GetFirstParent(NOTE));
         assert(note);
         if (!note) continue;
-        for (octaveIter = iter + 1; octaveIter != m_accidSpace.end(); octaveIter++) {
+        for (octaveIter = iter + 1; octaveIter != m_accidSpace.end(); ++octaveIter) {
             Note *octave = dynamic_cast<Note *>((*octaveIter)->GetFirstParent(NOTE));
             assert(octave);
             if (!octave) continue;
@@ -1069,7 +1069,7 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     int i, j;
 
     // Align the octaves
-    for (i = 0; i < count - 1; i++) {
+    for (i = 0; i < count - 1; ++i) {
         if (m_accidSpace.at(i)->GetDrawingOctaveAccid() != NULL) {
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
             this->AdjustAccidWithAccidSpace(m_accidSpace.at(i)->GetDrawingOctaveAccid(), params->m_doc, staffSize);
