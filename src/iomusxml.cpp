@@ -1199,9 +1199,9 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
         Harm *harm = new Harm();
         Fb *fb = new Fb();
 
-        std::string textColor = node.attribute("color").as_string();
-        std::string textStyle = node.attribute("font-style").as_string();
-        std::string textWeight = node.attribute("font-weight").as_string();
+        //std::string textColor = node.attribute("color").as_string();
+        //std::string textStyle = node.attribute("font-style").as_string();
+        //std::string textWeight = node.attribute("font-weight").as_string();
         for (pugi::xml_node figure = node.child("figure"); figure; figure = figure.next_sibling("figure")) {
             std::string textStr = GetContent(figure.select_single_node("figure-number").node());
             F *f = new F();
