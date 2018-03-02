@@ -290,7 +290,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     if (dir == STEMDIRECTION_up) {
 
         if (nbFlags > 0) {
-            for (int i = 0; i < nbFlags; i++)
+            for (int i = 0; i < nbFlags; ++i)
                 DrawSmuflCode(dc, x2 - halfStemWidth, stemY1 - i * flagStemHeight,
                     SMUFL_E949_mensuralCombStemUpFlagSemiminima, staff->m_drawingStaffSize, drawingCueSize);
         }
@@ -299,7 +299,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     }
     else {
         if (nbFlags > 0) {
-            for (int i = 0; i < nbFlags; i++)
+            for (int i = 0; i < nbFlags; ++i)
                 DrawSmuflCode(dc, x2 - halfStemWidth, stemY1 + i * flagStemHeight,
                     SMUFL_E94A_mensuralCombStemDownFlagSemiminima, staff->m_drawingStaffSize, drawingCueSize);
         }

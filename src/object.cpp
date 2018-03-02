@@ -556,7 +556,7 @@ int Object::GetChildIndex(const Object *child)
 {
     ArrayOfObjects::iterator iter;
     int i;
-    for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, i++) {
+    for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, ++i) {
         if (child == *iter) {
             return i;
         }
@@ -766,7 +766,7 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
 {
     ListOfObjects::iterator iter;
     int i;
-    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, i++) {
+    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
             return i;
         }
@@ -799,7 +799,7 @@ Object *ObjectListInterface::GetListPrevious(Object *listElement)
 {
     ListOfObjects::iterator iter;
     int i;
-    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, i++) {
+    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
             if (i > 0) {
                 return *(--iter);
@@ -816,7 +816,7 @@ Object *ObjectListInterface::GetListNext(Object *listElement)
 {
     ListOfObjects::reverse_iterator iter;
     int i;
-    for (iter = m_list.rbegin(), i = 0; iter != m_list.rend(); ++iter, i++) {
+    for (iter = m_list.rbegin(), i = 0; iter != m_list.rend(); ++iter, ++i) {
         if (listElement == *iter) {
             if (i > 0) {
                 return *(--iter);
@@ -838,7 +838,7 @@ std::wstring TextListInterface::GetText(Object *node)
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
     const ListOfObjects *childList = this->GetList(node); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); it++) {
+    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
         Text *text = dynamic_cast<Text *>(*it);
         assert(text);
         concatText += text->GetText();

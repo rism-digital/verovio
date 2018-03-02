@@ -90,7 +90,7 @@ bool TimePointInterface::IsOnStaff(int n)
     if (this->HasStaff()) {
         std::vector<int> staffList = this->GetStaff();
         std::vector<int>::iterator iter;
-        for (iter = staffList.begin(); iter != staffList.end(); iter++) {
+        for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
             if (*iter == n) return true;
         }
         return false;
@@ -118,7 +118,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
         // If we have no @staff or startid but only one staff child assume it is the first one (@n1 is assumed)
         staffList.push_back(1);
     }
-    for (iter = staffList.begin(); iter != staffList.end(); iter++) {
+    for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
         AttNIntegerComparison comparison(STAFF, *iter);
         Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
         if (!staff) {

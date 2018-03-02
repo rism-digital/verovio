@@ -844,7 +844,7 @@ Options &Options::operator=(const Options &options)
 
     MapOfStrOptions const *items = options.GetItems();
     MapOfStrOptions::const_iterator iter;
-    for (iter = items->begin(); iter != items->end(); iter++) {
+    for (iter = items->begin(); iter != items->end(); ++iter) {
         Option *opt = m_items.at(iter->first);
         assert(opt);
         iter->second->CopyTo(opt);

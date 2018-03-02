@@ -306,7 +306,7 @@ std::string Att::MeasurebeatToStr(data_MEASUREBEAT data) const
 
 data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool logWarning) const
 {
-    for (size_t i = 0; i < value.length(); i++) {
+    for (size_t i = 0; i < value.length(); ++i) {
         if (iswspace(value[i])) {
             value.erase(i, 1);
             i--;

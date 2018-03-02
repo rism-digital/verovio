@@ -189,7 +189,7 @@ void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int ri
 
     if ((int)lines->size() < count) lines->resize(count);
     int i = 0;
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < count; ++i) {
         lines->at(i).AddDash(left, right);
     }
 }
@@ -217,7 +217,7 @@ void LedgerLine::AddDash(int left, int right)
     std::list<std::pair<int, int> >::iterator iter;
 
     // First add the dash
-    for (iter = m_dashes.begin(); iter != m_dashes.end(); iter++) {
+    for (iter = m_dashes.begin(); iter != m_dashes.end(); ++iter) {
         if (iter->first > left) break;
     }
     m_dashes.insert(iter, std::make_pair(left, right));

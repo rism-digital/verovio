@@ -101,7 +101,7 @@ void RunningElement::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
-        ++iter;
+        iter++;
     }
 
     int i;
