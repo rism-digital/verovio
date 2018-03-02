@@ -543,7 +543,7 @@ std::string Toolkit::GetOptions(bool defaultValues) const
 
     const MapOfStrOptions *params = m_options->GetItems();
     MapOfStrOptions::const_iterator iter;
-    for (iter = params->begin(); iter != params->end(); iter++) {
+    for (iter = params->begin(); iter != params->end(); ++iter) {
         const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(iter->second);
         const OptionInt *optInt = dynamic_cast<const OptionInt *>(iter->second);
         const OptionBool *optBool = dynamic_cast<const OptionBool *>(iter->second);
@@ -567,7 +567,7 @@ std::string Toolkit::GetOptions(bool defaultValues) const
             vector<string> strValues = (defaultValues) ? optArray->GetDefault() : optArray->GetValue();
             vector<string>::iterator strIter;
             jsonxx::Array values;
-            for (strIter = strValues.begin(); strIter != strValues.end(); strIter++) {
+            for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
                 values << (*strIter);
             }
             o << iter->first << values;
@@ -590,7 +590,7 @@ std::string Toolkit::GetAvailableOptions() const
     std::vector<OptionGrp *> *grp = m_options->GetGrps();
     std::vector<OptionGrp *>::iterator grpIter;
 
-    for (grpIter = grp->begin(); grpIter != grp->end(); grpIter++) {
+    for (grpIter = grp->begin(); grpIter != grp->end(); ++grpIter) {
 
         jsonxx::Object grp;
         grp << "name" << (*grpIter)->GetLabel();
@@ -600,7 +600,7 @@ std::string Toolkit::GetAvailableOptions() const
         const std::vector<Option *> *options = (*grpIter)->GetOptions();
         std::vector<Option *>::const_iterator iter;
 
-        for (iter = options->begin(); iter != options->end(); iter++) {
+        for (iter = options->begin(); iter != options->end(); ++iter) {
 
             jsonxx::Object opt;
             opt << "title" << (*iter)->GetTitle();
@@ -649,7 +649,7 @@ std::string Toolkit::GetAvailableOptions() const
                 vector<string> strValues = optArray->GetDefault();
                 vector<string>::iterator strIter;
                 jsonxx::Array values;
-                for (strIter = strValues.begin(); strIter != strValues.end(); strIter++) {
+                for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
                     values << (*strIter);
                 }
                 opt << "default" << values;
@@ -661,7 +661,7 @@ std::string Toolkit::GetAvailableOptions() const
                 vector<string> strValues = optIntMap->GetStrValues(false);
                 vector<string>::iterator strIter;
                 jsonxx::Array values;
-                for (strIter = strValues.begin(); strIter != strValues.end(); strIter++) {
+                for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
                     values << (*strIter);
                 }
                 opt << "values" << values;
@@ -691,7 +691,7 @@ bool Toolkit::SetOptions(const std::string &json_options)
 
     std::map<std::string, jsonxx::Value *> jsonMap = json.kv_map();
     std::map<std::string, jsonxx::Value *>::const_iterator iter;
-    for (iter = jsonMap.begin(); iter != jsonMap.end(); iter++) {
+    for (iter = jsonMap.begin(); iter != jsonMap.end(); ++iter) {
         if (m_options->GetItems()->count(iter->first) == 0) {
             // Base options
             if (iter->first == "inputFormat") {
@@ -717,7 +717,7 @@ bool Toolkit::SetOptions(const std::string &json_options)
                 Option *opt = m_options->GetItems()->at("appXPathQuery");
                 assert(opt);
                 int i;
-                for (i = 0; i < (int)values.size(); i++) {
+                for (i = 0; i < (int)values.size(); ++i) {
                     if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
                 }
                 opt->SetValueArray(queries);
@@ -749,7 +749,7 @@ bool Toolkit::SetOptions(const std::string &json_options)
                 Option *opt = m_options->GetItems()->at("choiceXPathQuery");
                 assert(opt);
                 int i;
-                for (i = 0; i < (int)values.size(); i++) {
+                for (i = 0; i < (int)values.size(); ++i) {
                     if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
                 }
                 opt->SetValueArray(queries);
@@ -809,7 +809,7 @@ bool Toolkit::SetOptions(const std::string &json_options)
             jsonxx::Array values = json.get<jsonxx::Array>(iter->first);
             std::vector<std::string> strValues;
             int i;
-            for (i = 0; i < (int)values.size(); i++) {
+            for (i = 0; i < (int)values.size(); ++i) {
                 if (values.has<jsonxx::String>(i)) strValues.push_back(values.get<jsonxx::String>(i));
                 // LogDebug("String: %s", values.get<jsonxx::String>(i).c_str());
             }
@@ -862,7 +862,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 
     // Fill the JSON object
     ArrayOfStrAttr::iterator iter;
-    for (iter = attributes.begin(); iter != attributes.end(); iter++) {
+    for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
         o << (*iter).first << (*iter).second;
         // LogMessage("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str());
     }
@@ -920,7 +920,7 @@ std::string Toolkit::GetLog()
 #ifdef USE_EMSCRIPTEN
     std::string str;
     std::vector<std::string>::iterator iter;
-    for (iter = logBuffer.begin(); iter != logBuffer.end(); iter++) {
+    for (iter = logBuffer.begin(); iter != logBuffer.end(); ++iter) {
         str += (*iter);
     }
     return str;
@@ -1105,7 +1105,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     // Fill the JSON object
     ArrayOfObjects::iterator iter;
-    for (iter = notes.begin(); iter != notes.end(); iter++) {
+    for (iter = notes.begin(); iter != notes.end(); ++iter) {
         a << (*iter)->GetUuid();
     }
     o << "notes" << a;

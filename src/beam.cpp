@@ -75,7 +75,7 @@ void BeamDrawingParams::CalcBeam(
     /******************************************************************/
     // initialization
 
-    for (i = 0; i < elementCount; i++) {
+    for (i = 0; i < elementCount; ++i) {
         (*beamElementCoords).at(i)->m_x = (*beamElementCoords).at(i)->m_element->GetDrawingX();
     }
 
@@ -96,7 +96,7 @@ void BeamDrawingParams::CalcBeam(
     int yMax = 0, yMin = 0;
     int curY;
     // elementCount holds the last one
-    for (i = 0; i < elementCount; i++) {
+    for (i = 0; i < elementCount; ++i) {
 
         if ((*beamElementCoords).at(i)->m_element->Is(CHORD)) {
             Chord *chord = dynamic_cast<Chord *>((*beamElementCoords).at(i)->m_element);
@@ -143,12 +143,12 @@ void BeamDrawingParams::CalcBeam(
     }
 
     if (this->m_stemDir == STEMDIRECTION_up) { // set stem direction for all the notes
-        for (i = 0; i < elementCount; i++) {
+        for (i = 0; i < elementCount; ++i) {
             (*beamElementCoords).at(i)->m_y = (*beamElementCoords).at(i)->m_yTop;
         }
     }
     else {
-        for (i = 0; i < elementCount; i++) {
+        for (i = 0; i < elementCount; ++i) {
             (*beamElementCoords).at(i)->m_y = (*beamElementCoords).at(i)->m_yBottom;
         }
     }
@@ -187,7 +187,7 @@ void BeamDrawingParams::CalcBeam(
         verticalShift = -verticalShift;
     }
 
-    for (i = 0; i < elementCount; i++) {
+    for (i = 0; i < elementCount; ++i) {
         // change the stem dir for all objects
         if ((*beamElementCoords).at(i)->m_element->Is(NOTE)) {
             ((Note *)(*beamElementCoords).at(i)->m_element)->SetDrawingStemDir(this->m_stemDir);
@@ -231,7 +231,7 @@ void BeamDrawingParams::CalcBeam(
     // first check that the stem length is long enough (to be improved?)
     double oldYPos; // holds y position before calculation to determine if beam needs extra height
     double expectedY;
-    for (i = 0; i < elementCount; i++) {
+    for (i = 0; i < elementCount; ++i) {
         oldYPos = (*beamElementCoords).at(i)->m_yBeam;
         expectedY = this->m_startingY + this->m_verticalBoost + this->m_beamSlope * (*beamElementCoords).at(i)->m_x;
 
@@ -241,14 +241,14 @@ void BeamDrawingParams::CalcBeam(
             this->m_verticalBoost += oldYPos - expectedY;
         }
     }
-    for (i = 0; i < elementCount; i++) {
+    for (i = 0; i < elementCount; ++i) {
         (*beamElementCoords).at(i)->m_yBeam
             = this->m_startingY + this->m_verticalBoost + this->m_beamSlope * (*beamElementCoords).at(i)->m_x;
     }
 
     // then check that the stem length reaches the center for the staff
     double minDistToCenter = -VRV_UNSET;
-    for (i = 0; i < elementCount; i++) {
+    for (i = 0; i < elementCount; ++i) {
         if ((this->m_stemDir == STEMDIRECTION_up)
             && ((*beamElementCoords).at(i)->m_yBeam - verticalCenter < minDistToCenter)) {
             minDistToCenter = (*beamElementCoords).at(i)->m_yBeam - verticalCenter;
@@ -261,13 +261,13 @@ void BeamDrawingParams::CalcBeam(
 
     if (minDistToCenter < 0) {
         this->m_startingY += (this->m_stemDir == STEMDIRECTION_down) ? minDistToCenter : -minDistToCenter;
-        for (i = 0; i < elementCount; i++) {
+        for (i = 0; i < elementCount; ++i) {
             (*beamElementCoords).at(i)->m_yBeam
                 += (this->m_stemDir == STEMDIRECTION_down) ? minDistToCenter : -minDistToCenter;
         }
     }
 
-    for (i = 0; i < elementCount; i++) {
+    for (i = 0; i < elementCount; ++i) {
         // All notes and chords get their stem value stored
         LayerElement *el = (*beamElementCoords).at(i)->m_element;
         if ((el->Is(NOTE)) || (el->Is(CHORD))) {
@@ -457,7 +457,7 @@ void Beam::InitCoords(ListOfObjects *childList)
 
     m_beamElementCoords.reserve(childList->size());
     int i;
-    for (i = 0; i < (int)childList->size(); i++) {
+    for (i = 0; i < (int)childList->size(); ++i) {
         m_beamElementCoords.push_back(new BeamElementCoord());
     }
 
