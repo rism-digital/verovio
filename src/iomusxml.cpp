@@ -111,7 +111,7 @@ bool MusicXmlInput::HasAttributeWithValue(pugi::xml_node node, std::string attri
 {
     assert(node);
 
-    if (GetAttributeValue(node, attribute) == value) {
+    if (node.attribute(attribute.c_str()).value() == value) {
         return true;
     }
     return false;
@@ -142,16 +142,6 @@ bool MusicXmlInput::HasContent(pugi::xml_node node)
     assert(node);
 
     return (node.text());
-}
-
-std::string MusicXmlInput::GetAttributeValue(pugi::xml_node node, std::string attribute)
-{
-    assert(node);
-
-    if (node.attribute(attribute.c_str())) {
-        return std::string(node.attribute(attribute.c_str()).value());
-    }
-    return "";
 }
 
 std::string MusicXmlInput::GetContent(pugi::xml_node node)
@@ -370,12 +360,12 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
     for (pugi::xpath_node_set::const_iterator it = words.begin(); it != words.end(); ++it) {
         pugi::xml_node textNode = it->node();
         std::string textStr = GetContent(textNode);
-        std::string textAlign = GetAttributeValue(textNode, "halign");
-        std::string textColor = GetAttributeValue(textNode, "color");
-        std::string textFont = GetAttributeValue(textNode, "font-family");
-        std::string textStyle = GetAttributeValue(textNode, "font-style");
-        std::string textWeight = GetAttributeValue(textNode, "font-weight");
-        std::string lang = GetAttributeValue(textNode, "xml:lang");
+        std::string textAlign = textNode.attribute("halign").as_string();
+        std::string textColor = textNode.attribute("color").as_string();
+        std::string textFont = textNode.attribute("font-family").as_string();
+        std::string textStyle = textNode.attribute("font-style").as_string();
+        std::string textWeight = textNode.attribute("font-weight").as_string();
+        std::string lang = textNode.attribute("xml:lang").as_string();
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
         if (!textColor.empty() || !textFont.empty() || !textStyle.empty() || !textWeight.empty()) {
@@ -411,7 +401,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
     if (metronome.select_single_node("beat-unit-dot")) {
         tempo->SetMmDots((int)metronome.select_nodes("beat-unit-dot").size());
     }
-    if (GetAttributeValue(metronome, "parentheses") == "yes") tempoText = "(" + tempoText + ")";
+    if (HasAttributeWithValue(metronome, "parentheses", "yes")) tempoText = "(" + tempoText + ")";
     Text *text = new Text();
     text->SetText(UTF8to16(tempoText));
     tempo->AddChild(text);
@@ -980,7 +970,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(
 
     pugi::xpath_node measureRepeat = node.select_single_node("measure-style/measure-repeat");
     if (measureRepeat) {
-        if (GetAttributeValue(measureRepeat.node(), "type") == "start")
+        if (HasAttributeWithValue(measureRepeat.node(), "type", "start"))
             m_mRpt = true;
         else
             m_mRpt = false;
@@ -1153,7 +1143,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
             octave->SetStaff(octave->AttStaffIdent::StrToXsdPositiveIntegerList(std::to_string(staffN)));
             octave->SetDis(
                 octave->AttOctaveDisplacement::StrToOctaveDis(xmlShift.node().attribute("size").as_string()));
-            m_octDis[staffN] = (atoi(GetAttributeValue(xmlShift.node(), "size").c_str()) + 2) / 8;
+            m_octDis[staffN] = (xmlShift.node().attribute("size").as_int() + 2) / 8;
             if (HasAttributeWithValue(xmlShift.node(), "type", "down")) {
                 octave->SetDisPlace(STAFFREL_basic_below);
                 m_octDis[staffN] = -1 * m_octDis[staffN];
@@ -1170,7 +1160,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     if (xmlPedal) {
         Pedal *pedal = new Pedal();
         if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
-        std::string pedalType = GetAttributeValue(xmlPedal.node(), "type");
+        std::string pedalType = xmlPedal.node().attribute("type").as_string();
         if (!pedalType.empty()) pedal->SetDir(ConvertPedalTypeToDir(pedalType));
         if (pedalType == "stop") pedal->SetStartid(m_ID);
         m_controlElements.push_back(std::make_pair(measureNum, pedal));
@@ -1205,13 +1195,13 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
     assert(node);
     assert(measure);
 
-    if (GetAttributeValue(node, "print-object") != "no") {
+    if (!HasAttributeWithValue(node, "print-object", "no")) {
         Harm *harm = new Harm();
         Fb *fb = new Fb();
 
-        std::string textColor = GetAttributeValue(node, "color");
-        std::string textStyle = GetAttributeValue(node, "font-style");
-        std::string textWeight = GetAttributeValue(node, "font-weight");
+        std::string textColor = node.attribute("color").as_string();
+        std::string textStyle = node.attribute("font-style").as_string();
+        std::string textWeight = node.attribute("font-weight").as_string();
         for (pugi::xml_node figure = node.child("figure"); figure; figure = figure.next_sibling("figure")) {
             std::string textStr = GetContent(figure.select_single_node("figure-number").node());
             F *f = new F();
@@ -1255,7 +1245,6 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
     assert(node);
     assert(measure);
 
-    std::string placeStr = GetAttributeValue(node, "placement");
     int durOffset = 0;
 
     std::string harmText = GetContentOfChild(node, "root/root-step");
@@ -1263,7 +1252,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
     harmText += ConvertAlterToSymbol(GetContent(alter.node()));
     pugi::xpath_node kind = node.select_single_node("kind");
     if (kind) {
-        harmText = harmText + GetAttributeValue(kind.node(), "text").c_str();
+        harmText = harmText + kind.node().attribute("text").as_string();
         if (HasAttributeWithValue(kind.node(), "use-symbols", "yes"))
             harmText = harmText + ConvertKindToSymbol(GetContent(kind.node()));
     }
@@ -1281,7 +1270,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, s
     Harm *harm = new Harm();
     Text *text = new Text();
     text->SetText(UTF8to16(harmText));
-    harm->SetPlace(harm->AttPlacement::StrToStaffrel(placeStr.c_str()));
+    harm->SetPlace(harm->AttPlacement::StrToStaffrel(node.attribute("placement").as_string()));
     harm->SetType(node.attribute("type").as_string());
     harm->AddChild(text);
     pugi::xpath_node offset = node.select_single_node("offset");
@@ -1527,11 +1516,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             verse->SetLabel(lyric.attribute("name").as_string());
             verse->SetN(lyricNumber);
             for (pugi::xml_node textNode = lyric.child("text"); textNode; textNode = textNode.next_sibling("text")) {
-                if (GetAttributeValue(lyric, "print-object") != "no") {
-                    // std::string textColor = GetAttributeValue(textNode.node(), "color");
-                    std::string textStyle = GetAttributeValue(textNode, "font-style");
-                    std::string textWeight = GetAttributeValue(textNode, "font-weight");
-                    std::string lang = GetAttributeValue(textNode, "xml:lang");
+                if (!HasAttributeWithValue(lyric, "print-object", "no")) {
+                    // std::string textColor = textNode.attribute("color").as_string();
+                    std::string textStyle = textNode.attribute("font-style").as_string();
+                    std::string textWeight = textNode.attribute("font-weight").as_string();
+                    std::string lang = textNode.attribute("xml:lang").as_string();
                     std::string textStr = GetContent(textNode);
                     Syl *syl = new Syl();
                     syl->SetLang(lang.c_str());
@@ -1749,7 +1738,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             // color
             meiSlur->SetColor(slur.attribute("color").as_string());
             // lineform
-            // meiSlur->SetLform(meiSlur->AttLineVis::StrToLineform(GetAttributeValue(slur, "line-type ").c_str()));
+            // meiSlur->SetLform(meiSlur->AttLineVis::StrToLineform(slur.attribute("line-type ").as_string()));
             // placement and orientation
             meiSlur->SetCurvedir(ConvertOrientationToCurvedir(slur.attribute("orientation").as_string()));
             meiSlur->SetCurvedir(

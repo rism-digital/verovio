@@ -193,7 +193,6 @@ private:
      * @name Helper methods for retrieving attribute values or element content
      */
     ///@{
-    std::string GetAttributeValue(pugi::xml_node node, std::string attribute);
     std::string GetContent(pugi::xml_node node);
     std::string GetContentOfChild(pugi::xml_node node, std::string child);
     ///@}
