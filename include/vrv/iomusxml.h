@@ -186,7 +186,6 @@ private:
     bool HasAttributeWithValue(pugi::xml_node node, std::string attribute, std::string value);
     bool IsElement(pugi::xml_node node, std::string name);
     bool HasContentWithValue(pugi::xml_node node, std::string value);
-    bool HasContent(pugi::xml_node);
     ///@}
 
     /*
