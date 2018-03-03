@@ -327,6 +327,9 @@ void Beam::AddChild(Object *child)
     if (child->Is(BEAM)) {
         assert(dynamic_cast<Beam *>(child));
     }
+    else if (child->Is(BTREM)) {
+        assert(dynamic_cast<Chord *>(child));
+    }
     else if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));
     }

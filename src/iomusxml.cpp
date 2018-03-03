@@ -1315,6 +1315,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     std::string typeStr = GetContentOfChild(node, "type");
     int dots = (int)node.select_nodes("dot").size();
 
+    // beam start
+    bool beamStart = node.select_single_node("beam[@number='1'][text()='begin']");
+    if (beamStart) {
+      Beam *beam = new Beam();
+      AddLayerElement(layer, beam);
+      m_elementStack.push_back(beam);
+    }
+
     // tremolos
     pugi::xpath_node tremolo = notations.node().select_single_node("ornaments/tremolo");
     std::string tremSlashNum = "0";
@@ -1331,14 +1339,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             m_elementStack.push_back(fTrem);
             fTrem->SetSlash(atoi(GetContent(tremolo.node()).c_str()));
         }
-    }
-
-    // beam start
-    bool beamStart = node.select_single_node("beam[@number='1'][text()='begin']");
-    if (beamStart) {
-        Beam *beam = new Beam();
-        AddLayerElement(layer, beam);
-        m_elementStack.push_back(beam);
     }
 
     // tuplet start
