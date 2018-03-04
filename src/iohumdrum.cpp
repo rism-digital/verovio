@@ -2080,7 +2080,7 @@ std::string HumdrumInput::automaticHeaderCenter(
         output += "   <rend fontsize=\"x-large\">";
         output += unescapeHtmlEntities(title);
         if (!rime.empty()) {
-            output += " (<rend fontstyle=\"italic\">Rime</rend> ";
+            output += " (<rend fontstyle=\"italic\">Rime</rend>&#160;";
             output += rime;
             output += ")";
         }
