@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Mar  2 11:06:27 PST 2018
+// Last Modified: Sat Mar  3 20:16:35 PST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -10874,7 +10874,7 @@ void HumRegex::setGlobal(void) {
 
 bool HumRegex::getGlobal(void) {
 	auto value = m_searchflags & std::regex_constants::format_first_only;
-	return value.none();
+	return !value;
 }
 
 
