@@ -7843,6 +7843,7 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
         }
     }
 
+    hum::HumRegex hre;
     vector<string> vtexts;
     std::string content;
     hum::HumdrumLine &line = *token->getLine();
@@ -7864,10 +7865,11 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
         lyricQ = false;
         vdataQ = false;
         vvdataQ = false;
-        if (line.token(i)->isDataType("**text") || line.token(i)->isDataType("**silbe")) {
+        if (line.token(i)->isDataType("**text")) {
             lyricQ = true;
-        }
-        else if (line.token(i)->getDataType().compare(0, 7, "**vdata") == 0) {
+        } else if (line.token(i)->isDataType("**silbe")) {
+			lyricQ = true;
+		} else if (line.token(i)->getDataType().compare(0, 7, "**vdata") == 0) {
             vdataQ = true;
             lyricQ = true;
         }
@@ -7884,9 +7886,24 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             versenum++;
             continue;
         }
+        if (line.token(i)->isDataType("**silbe")) {
+			if (line.token(i)->getText() == "|") {
+				versenum++;
+				continue;
+			}
+		}
 
         vtexts.clear();
-        vtexts.push_back(*line.token(i));
+        if (line.token(i)->isDataType("**silbe")) {
+			string value = line.token(i)->getText();
+			hre.replaceDestructive(value, "", "\\|", "g");
+			hre.replaceDestructive(value, "&uuml;", "u2", "g");
+			hre.replaceDestructive(value, "&auml;", "a2", "g");
+			hre.replaceDestructive(value, "&ouml;", "o2", "g");
+        	vtexts.push_back(value);
+		} else {
+        	vtexts.push_back(*line.token(i));
+		}
         if (vvdataQ) {
             splitSyllableBySpaces(vtexts);
         }
