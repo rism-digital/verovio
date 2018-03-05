@@ -525,7 +525,7 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     params->m_scoreDefRole = NONE;
 
     int i;
-    for (i = 0; i < params->m_measureAligner->GetChildCount(); i++) {
+    for (i = 0; i < params->m_measureAligner->GetChildCount(); ++i) {
         Alignment *alignment = dynamic_cast<Alignment *>(params->m_measureAligner->GetChild(i));
         assert(alignment);
         if (alignment->HasGraceAligner()) {
