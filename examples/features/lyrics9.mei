@@ -186,7 +186,7 @@
                                     <note xml:id="note-L24F1" dur="2" oct="4" pname="b" stem.dir="down">
                                         <accid xml:id="accid-L24F1" accid.ges="n" />
                                         <verse xml:id="verse-L24F2" n="1">
-                                            <syl xml:id="syl-L24F2">Lied;</syl>
+                                            <syl xml:id="syl-L24F2">Leid;</syl>
                                         </verse>
                                         <verse xml:id="verse-L24F3" n="2">
                                             <syl xml:id="syl-L24F3">Leib.</syl>
