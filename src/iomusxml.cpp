@@ -33,6 +33,7 @@
 #include "measure.h"
 #include "mordent.h"
 #include "mrest.h"
+#include "multirest.h"
 #include "note.h"
 #include "octave.h"
 #include "pedal.h"
@@ -162,7 +163,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     assert(i >= 0);
 
     // we just need to add a measure
-    if (i == section->GetChildCount(MEASURE)) {
+    if (section->GetChildCount(MEASURE) <= i) {
         section->AddChild(measure);
     }
     // otherwise copy the content to the corresponding existing measure
@@ -796,10 +797,15 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     int i = 0;
     for (pugi::xpath_node_set::const_iterator it = measures.begin(); it != measures.end(); ++it) {
         pugi::xpath_node xmlMeasure = *it;
-        Measure *measure = new Measure();
-        ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset);
-        // Add the measure to the system - if already there from a previous part we'll just merge the content
-        AddMeasure(section, measure, i);
+        if (m_multiRest != 0) {
+          m_multiRest--;
+        }
+        else {
+          Measure *measure = new Measure();
+          ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset);
+          // Add the measure to the system - if already there from a previous part we'll just merge the content
+          AddMeasure(section, measure, i);
+        }
         i++;
     }
     return false;
@@ -833,6 +839,16 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
 
     // read the content of the measure
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
+        // first check if there is a multi measure rest
+        if (it->select_single_node(".//multiple-rest")) {
+            m_multiRest = it->select_single_node(".//multiple-rest").node().text().as_int();
+            MultiRest * multiRest = new MultiRest;
+            multiRest->SetNum(m_multiRest);
+            Layer *layer = SelectLayer(1, measure);
+            AddLayerElement(layer, multiRest);
+            --m_multiRest;
+            break;
+        }
         if (IsElement(*it, "attributes")) {
             ReadMusicXmlAttributes(*it, section, measure, measureNum);
         }
