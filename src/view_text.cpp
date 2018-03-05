@@ -147,7 +147,7 @@ void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
     int descender = -m_doc->GetTextGlyphDescender(L'q', currentFont, false);
     int height = m_doc->GetTextGlyphHeight(L'I', currentFont, false);
 
-    params.m_y -= (descender + height);
+    params.m_y -= ((descender + height) * 1.1);
     params.m_newLine = true;
 
     dc->EndTextGraphic(lb, this);

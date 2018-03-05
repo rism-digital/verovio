@@ -307,7 +307,7 @@ void View::DrawStaffGrp(
         grpTxt.SetPointSize(params.m_pointSize);
         dc->SetFont(&grpTxt);
 
-        dc->GetTextExtent(labelStr, &extend);
+        dc->GetTextExtent(labelStr, &extend, true);
 
         dc->StartGraphic(graphic, "", graphic->GetUuid());
 
@@ -325,7 +325,7 @@ void View::DrawStaffGrp(
 
         // also store in the system the maximum width with abbreviations
         if (system && !abbreviations && (labelAbbrStr.length() > 0)) {
-            dc->GetTextExtent(labelAbbrStr, &extend);
+            dc->GetTextExtent(labelAbbrStr, &extend, true);
             system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
         }
 
@@ -427,7 +427,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&labelTxt);
 
-        dc->GetTextExtent(labelStr, &extend);
+        dc->GetTextExtent(labelStr, &extend, true);
 
         dc->StartGraphic(graphic, "", graphic->GetUuid());
 
@@ -441,7 +441,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         system->SetDrawingLabelsWidth(extend.m_width + space);
         // also store in the system the maximum width with abbreviations for justification
         if (!abbreviations && (labelAbbrStr.length() > 0)) {
-            dc->GetTextExtent(labelAbbrStr, &extend);
+            dc->GetTextExtent(labelAbbrStr, &extend, true);
             system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
         }
 

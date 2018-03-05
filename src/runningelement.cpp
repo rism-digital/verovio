@@ -223,7 +223,7 @@ int RunningElement::GetCellHeight(int cell)
         if ((*iter)->HasContentBB()) {
             columnHeight += (*iter)->GetContentY2() - (*iter)->GetContentY1();
         }
-    }
+    } 
     return columnHeight;
 }
 

@@ -116,19 +116,25 @@ void DeviceContext::ReactivateGraphic()
     m_isDeactivatedX = false;
 }
 
-void DeviceContext::GetTextExtent(const std::string &string, TextExtend *extend)
+void DeviceContext::GetTextExtent(const std::string &string, TextExtend *extend, bool typeSize)
 {
     std::wstring wtext(string.begin(), string.end());
-    GetTextExtent(wtext, extend);
+    GetTextExtent(wtext, extend, typeSize);
 }
 
-void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend)
+void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend, bool typeSize)
 {
     assert(m_fontStack.top());
     assert(extend);
-
+    
     extend->m_width = 0;
     extend->m_height = 0;
+    
+    if (typeSize) {
+        AddGlyphToTextExtend(Resources::GetTextGlyph(L'p'), extend);
+        AddGlyphToTextExtend(Resources::GetTextGlyph(L'M'), extend);
+        extend->m_width = 0;
+    }
 
     Glyph *unkown = Resources::GetTextGlyph(L'o');
 
