@@ -88,7 +88,7 @@ function serialize(glyphAnchors) {
 
 function extract() {
     return function (status) {
-        if (status != "success") {
+        if (status !== "success") {
             console.log("Failed to open the page.");
         } else {
             var code = page.evaluate(serialize, glyphAnchors);

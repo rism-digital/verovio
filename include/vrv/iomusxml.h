@@ -186,14 +186,12 @@ private:
     bool HasAttributeWithValue(pugi::xml_node node, std::string attribute, std::string value);
     bool IsElement(pugi::xml_node node, std::string name);
     bool HasContentWithValue(pugi::xml_node node, std::string value);
-    bool HasContent(pugi::xml_node);
     ///@}
 
     /*
      * @name Helper methods for retrieving attribute values or element content
      */
     ///@{
-    std::string GetAttributeValue(pugi::xml_node node, std::string attribute);
     std::string GetContent(pugi::xml_node node);
     std::string GetContentOfChild(pugi::xml_node node, std::string child);
     ///@}
