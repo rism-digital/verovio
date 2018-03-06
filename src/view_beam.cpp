@@ -235,16 +235,14 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 else if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_RIGHT) {
                     y1 = beamElementCoords->at(idx)->m_yBeam + barY;
                     int x2 = beamElementCoords->at(idx)->m_x + fractBeamWidth;
-                    y2 = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_verticalBoost + barY
-                        + beam->m_drawingParams.m_beamSlope * x2;
+                    y2 = beam->m_drawingParams.m_startingY + barY + beam->m_drawingParams.m_beamSlope * (x2 - beam->m_drawingParams.m_startingX);
                     polygonHeight = beam->m_drawingParams.m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, beamElementCoords->at(idx)->m_x, y1, x2, y2, polygonHeight);
                 }
                 else if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_LEFT) {
                     y2 = beamElementCoords->at(idx)->m_yBeam + barY;
                     int x1 = beamElementCoords->at(idx)->m_x - fractBeamWidth;
-                    y1 = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_verticalBoost + barY
-                        + beam->m_drawingParams.m_beamSlope * x1;
+                    y1 = beam->m_drawingParams.m_startingY + barY + beam->m_drawingParams.m_beamSlope * (x1 - beam->m_drawingParams.m_startingX);
                     polygonHeight = beam->m_drawingParams.m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, x1, y1, beamElementCoords->at(idx)->m_x, y2, polygonHeight);
                 }
