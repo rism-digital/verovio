@@ -1054,6 +1054,16 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     Tempo *tempo = dynamic_cast<Tempo *>(this->FindChildByType(TEMPO));
     if (tempo && tempo->HasMidiBpm()) {
         params->m_currentTempo = tempo->GetMidiBpm();
+    } else if (tempo && tempo->HasMm()) {
+        int mm = tempo->GetMm();
+        int mmUnit = 4;
+        if (tempo->GetMmUnit()) {
+            mmUnit = pow(2, (int)tempo->GetMmUnit());
+        }
+        if (tempo->HasMmDots()) {
+            mmUnit = 2 * mmUnit - (mmUnit / pow(2, tempo->GetMmDots()));
+        }
+        params->m_currentTempo = int(mm * 4.0 / mmUnit);
     }
     m_currentTempo = params->m_currentTempo;
 

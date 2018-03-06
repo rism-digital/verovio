@@ -385,7 +385,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
     std::string tempoText = "M.M.";
     if (metronome.select_single_node("per-minute").node()) {
         std::string mm = GetContent(metronome.select_single_node("per-minute").node());
-        if (atoi(mm.c_str())) tempo->SetMm(mm.c_str());
+        if (atoi(mm.c_str())) tempo->SetMm(atoi(mm.c_str()));
         tempoText = tempoText + StringFormat(" = %s", mm.c_str());
     }
     if (metronome.select_single_node("beat-unit").node()) {
