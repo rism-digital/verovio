@@ -142,7 +142,7 @@ bool Doc::GenerateDocumentScoreDef()
     m_scoreDef.Reset();
     StaffGrp *staffGrp = new StaffGrp();
     ArrayOfObjects::iterator iter;
-    for (iter = staves.begin(); iter != staves.end(); iter++) {
+    for (iter = staves.begin(); iter != staves.end(); ++iter) {
         Staff *staff = dynamic_cast<Staff *>(*iter);
         assert(staff);
         StaffDef *staffDef = new StaffDef();
@@ -202,7 +202,7 @@ bool Doc::GenerateMeasureNumbers()
     this->FindAllChildByAttComparison(&measures, &matchType);
 
     // run through all measures and generate missing mNum from attribute
-    for (measureIter = measures.begin(); measureIter != measures.end(); measureIter++) {
+    for (measureIter = measures.begin(); measureIter != measures.end(); ++measureIter) {
         Measure *measure = dynamic_cast<Measure *>(*measureIter);
         if (measure->HasN() && !measure->FindChildByType(MNUM)) {
             MNum *mnum = new MNum;
@@ -378,7 +378,7 @@ void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTim
     output += "[\n";
     auto lastit = realTimeToScoreTime.end();
     lastit--;
-    for (auto it = realTimeToScoreTime.begin(); it != realTimeToScoreTime.end(); it++) {
+    for (auto it = realTimeToScoreTime.begin(); it != realTimeToScoreTime.end(); ++it) {
         output += "\t{\n";
         output += "\t\t\"tstamp\":\t";
         output += to_string(it->first);
@@ -399,7 +399,7 @@ void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTim
         auto iton = realTimeToOnElements.find(it->first);
         if (iton != realTimeToOnElements.end()) {
             output += ",\n\t\t\"on\":\t[";
-            for (int ion = 0; ion < (int)iton->second.size(); ion++) {
+            for (int ion = 0; ion < (int)iton->second.size(); ++ion) {
                 output += "\"";
                 output += iton->second[ion];
                 output += "\"";
@@ -413,7 +413,7 @@ void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTim
         auto itoff = realTimeToOffElements.find(it->first);
         if (itoff != realTimeToOffElements.end()) {
             output += ",\n\t\t\"off\":\t[";
-            for (int ioff = 0; ioff < (int)itoff->second.size(); ioff++) {
+            for (int ioff = 0; ioff < (int)itoff->second.size(); ++ioff) {
                 output += "\"";
                 output += itoff->second[ioff];
                 output += "\"";
@@ -1045,7 +1045,7 @@ void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
             if (!convertAnalyticalMarkupParams.m_currentNotes.empty()) {
                 std::vector<Note *>::iterator iter;
                 for (iter = convertAnalyticalMarkupParams.m_currentNotes.begin();
-                     iter != convertAnalyticalMarkupParams.m_currentNotes.end(); iter++) {
+                     iter != convertAnalyticalMarkupParams.m_currentNotes.end(); ++iter) {
                     LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetUuid().c_str());
                 }
             }
