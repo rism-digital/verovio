@@ -1057,13 +1057,13 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     } else if (tempo && tempo->HasMm()) {
         int mm = tempo->GetMm();
         int mmUnit = 4;
-        if (tempo->GetMmUnit()) {
-            mmUnit = pow(2, (int)tempo->GetMmUnit());
+        if (tempo->HasMmUnit() && (tempo->GetMmUnit() > DURATION_breve)) {
+            mmUnit = pow(2, (int)tempo->GetMmUnit() - 2);
         }
         if (tempo->HasMmDots()) {
             mmUnit = 2 * mmUnit - (mmUnit / pow(2, tempo->GetMmDots()));
         }
-        params->m_currentTempo = int(mm * 4.0 / mmUnit);
+        params->m_currentTempo = int(mm * 4.0 / mmUnit + 0.5);
     }
     m_currentTempo = params->m_currentTempo;
 
