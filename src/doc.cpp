@@ -321,9 +321,8 @@ void Doc::ExportMIDI(MidiFile *midiFile)
                 instrdef = dynamic_cast<InstrDef *>(staffGrp->FindChildByType(INSTRDEF, 1));
             }
             if (instrdef) {
-                midiChannel = instrdef->GetMidiChannel() - 1;
-                LogWarning("%d", midiChannel);
-                midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum() - 1);
+                if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel() - 1;
+                if (instrdef->HasMidiInstrnum()) midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum() - 1);
             }
             Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
             if (!label) {
@@ -346,6 +345,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             filters.push_back(&matchLayer);
 
             GenerateMIDIParams generateMIDIParams(midiFile);
+            generateMIDIParams.m_midiChannel = midiChannel;
             generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
             generateMIDIParams.m_currentTempo = tempo;
