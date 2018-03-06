@@ -733,7 +733,6 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             // P(_)
             else {
                 // put it on the side, but no need to move it left
-                y1 = start->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
                 if (startChord || startParentChord)
                     y1 = yChordMin - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
                 else

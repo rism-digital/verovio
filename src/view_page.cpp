@@ -286,7 +286,7 @@ void View::DrawStaffGrp(
         graphic = labelAbbr;
     }
 
-    if (labelStr.length() != 0) {
+    if (graphic && (labelStr.length() != 0)) {
         // HARDCODED
         int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
         int xLabel = x - space;
@@ -400,8 +400,9 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
             labelStr = labelAbbrStr;
             graphic = labelAbbr;
         }
+        
 
-        if (labelStr.length() == 0) {
+        if (!graphic || (labelStr.length() == 0)) {
             ++iter;
             continue;
         }

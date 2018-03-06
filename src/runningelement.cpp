@@ -248,7 +248,7 @@ bool RunningElement::AdjustDrawingScaling(int width)
             }
             rowWidth += columnWidth;
         }
-        if (rowWidth > width) {
+        if (rowWidth && (rowWidth > width)) {
             m_drawingScalingPercent[i] = width * 100 / rowWidth;
             scale = true;
         }

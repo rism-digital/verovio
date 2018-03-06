@@ -162,7 +162,6 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
 
         // Calculate the average between the first and last stem
         // set center, start and end too.
-        y = firstElement->GetDrawingY();
         if (firstNote && lastNote) {
             if (direction == STEMDIRECTION_up) { // up
                 y = lastNote->GetDrawingStemEnd(lastNote).y
