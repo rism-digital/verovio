@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "instrdef.h"
 #include "label.h"
 #include "staffdef.h"
 #include "vrv.h"
@@ -56,17 +57,20 @@ void StaffGrp::Reset()
 
 void StaffGrp::AddChild(Object *child)
 {
-    if (child->Is(STAFFDEF)) {
-        assert(dynamic_cast<StaffDef *>(child));
-    }
-    else if (child->Is(STAFFGRP)) {
-        assert(dynamic_cast<StaffGrp *>(child));
+    if (child->Is(INSTRDEF)) {
+        assert(dynamic_cast<InstrDef *>(child));
     }
     else if (child->Is(LABEL)) {
         assert(dynamic_cast<Label *>(child));
     }
     else if (child->Is(LABELABBR)) {
         assert(dynamic_cast<LabelAbbr *>(child));
+    }
+    else if (child->Is(STAFFDEF)) {
+        assert(dynamic_cast<StaffDef *>(child));
+    }
+    else if (child->Is(STAFFGRP)) {
+        assert(dynamic_cast<StaffGrp *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
