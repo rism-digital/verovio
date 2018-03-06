@@ -261,9 +261,8 @@ int LayerElement::GetDrawingY() const
 {
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
-    Object *object = NULL;
-    // Otherwise look if we have a crossStaff situation
-    if (!object) object = this->m_crossStaff; // GetCrossStaff();
+    // Look if we have a crossStaff situation
+    Object *object = this->m_crossStaff; // GetCrossStaff();
     // First get the first layerElement parent (if any) but only if the element is not directly relative to staff (e.g.,
     // artic, syl)
     if (!object && !this->IsRelativeToStaff()) object = this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max);
@@ -1174,7 +1173,7 @@ int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
             iter = params->m_timePointingInterfaces.erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 
@@ -1196,7 +1195,7 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 

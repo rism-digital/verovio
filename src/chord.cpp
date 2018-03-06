@@ -133,7 +133,7 @@ void Chord::FilterList(ListOfObjects *childList)
 
     while (iter != childList->end()) {
         if ((*iter)->Is(NOTE))
-            iter++;
+            ++iter;
         else
             iter = childList->erase(iter);
     }
@@ -156,7 +156,7 @@ void Chord::FilterList(ListOfObjects *childList)
     int curPitch, lastPitch = lastNote->GetDiatonicPitch();
     ChordCluster *curCluster = NULL;
 
-    iter++;
+    ++iter;
 
     Layer *layer1 = NULL;
     Layer *layer2 = NULL;
@@ -181,7 +181,7 @@ void Chord::FilterList(ListOfObjects *childList)
         lastNote = curNote;
         lastPitch = curPitch;
 
-        iter++;
+        ++iter;
     }
 }
 

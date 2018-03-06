@@ -416,9 +416,6 @@ void View::DrawOctave(
         return;
     }
 
-    LayerElement *start = NULL;
-    LayerElement *end = NULL;
-
     data_OCTAVE_DIS dis = octave->GetDis();
     data_STAFFREL_basic disPlace = octave->GetDisPlace();
 
@@ -427,8 +424,8 @@ void View::DrawOctave(
 
     /************** parent layers **************/
 
-    start = dynamic_cast<LayerElement *>(octave->GetStart());
-    end = dynamic_cast<LayerElement *>(octave->GetEnd());
+    LayerElement *start  = dynamic_cast<LayerElement *>(octave->GetStart());
+    LayerElement *end = dynamic_cast<LayerElement *>(octave->GetEnd());
 
     if (!start || !end) {
         // no start or end, obviously nothing to do …
@@ -525,8 +522,6 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     assert(slur);
     assert(staff);
 
-    LayerElement *start = NULL;
-    LayerElement *end = NULL;
     Beam *parentBeam = NULL;
     Chord *startParentChord = NULL;
     Chord *endParentChord = NULL;
@@ -544,8 +539,8 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     /************** parent layers **************/
 
-    start = dynamic_cast<LayerElement *>(slur->GetStart());
-    end = dynamic_cast<LayerElement *>(slur->GetEnd());
+    LayerElement *start = dynamic_cast<LayerElement *>(slur->GetStart());
+    LayerElement *end = dynamic_cast<LayerElement *>(slur->GetEnd());
 
     if (!start || !end) {
         // no start and end, obviously nothing to do...
@@ -1154,7 +1149,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
                 if (y < itPoint->second.y) {
                     float ratio = (float)(p1->y - itPoint->second.y) / (float)(p1->y - y) * posXRatio;
                     maxRatio = ratio > maxRatio ? ratio : maxRatio;
-                    itPoint++;
+                    ++itPoint;
                 }
                 // The point is below, we can drop it
                 else {
@@ -1165,7 +1160,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
                 if (y > itPoint->second.y) {
                     float ratio = (float)(p1->y - itPoint->second.y) / (float)(p1->y - y) * posXRatio;
                     maxRatio = ratio > maxRatio ? ratio : maxRatio;
-                    itPoint++;
+                    ++itPoint;
                 }
                 // the point is above, we can drop it
                 else {
@@ -1204,13 +1199,13 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
             if (y >= itPoint->second.y)
                 itPoint = spanningPoints->erase(itPoint);
             else
-                itPoint++;
+                ++itPoint;
         }
         else {
             if (y <= itPoint->second.y)
                 itPoint = spanningPoints->erase(itPoint);
             else
-                itPoint++;
+                ++itPoint;
         }
     }
 
@@ -1234,18 +1229,15 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
 
     int dist = abs(p2->x - p1->x);
     float posXRatio = 1.0;
-    int posX;
-
+    
     ArrayOfLayerElementPointPairs::iterator itPoint;
-    int y;
-
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
-        y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
+        int y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
 
         // Weight the desired height according to the x position on the other side
         posXRatio = 1.0;
         bool leftPoint = true;
-        posX = itPoint->second.x - p1->x;
+        int posX = itPoint->second.x - p1->x;
         if (posX > dist / 2) {
             posX = p2->x - itPoint->second.x;
             leftPoint = false;
@@ -1269,11 +1261,11 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
             rightShift = (forceBothSides || !leftPoint) ? shift : shift * posXRatio;
             maxShiftLeft = leftShift > maxShiftLeft ? leftShift : maxShiftLeft;
             maxShiftRight = rightShift > maxShiftRight ? rightShift : maxShiftRight;
-            itPoint++;
+            ++itPoint;
         }
         else {
             // itPoint = spanningPoints->erase(itPoint);
-            itPoint++;
+            ++itPoint;
         }
     }
 
@@ -1302,18 +1294,14 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     assert(tie);
     assert(staff);
 
-    Note *note1 = NULL;
-    Note *note2 = NULL;
-    Chord *parentChord1 = NULL;
-
     curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
     data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
     int y1, y2;
 
     /************** parent layers **************/
 
-    note1 = dynamic_cast<Note *>(tie->GetStart());
-    note2 = dynamic_cast<Note *>(tie->GetEnd());
+    Note *note1 = dynamic_cast<Note *>(tie->GetStart());
+    Note *note2 = dynamic_cast<Note *>(tie->GetEnd());
 
     if (!note1 || !note2) {
         // no note, obviously nothing to do...
@@ -1322,7 +1310,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     }
 
     LayerElement *durElement = note1;
-    parentChord1 = note1->IsChordTone();
+    Chord *parentChord1 = note1->IsChordTone();
     if (parentChord1) {
         durElement = parentChord1;
     }

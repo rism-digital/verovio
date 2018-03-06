@@ -835,7 +835,7 @@ int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
             iter = params->m_timeSpanningElements.erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
     return FUNCTOR_CONTINUE;
@@ -901,7 +901,7 @@ int Measure::PrepareFloatingGrpsEnd(FunctorParams *functorParams)
             iter = params->m_hairpins.erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 
@@ -942,7 +942,7 @@ int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 
@@ -1005,7 +1005,7 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
         // we have not reached the correct end measure yet
         else {
             (*iter).second.first--;
-            iter++;
+            ++iter;
         }
     }
 
