@@ -1035,12 +1035,14 @@ public:
     GenerateMIDIParams(MidiFile *midiFile)
     {
         m_midiFile = midiFile;
+        m_midiChannel = 0;
         m_midiTrack = 1;
         m_totalTime = 0.0;
         m_transSemi = 0;
         m_currentTempo = 120;
     }
     MidiFile *m_midiFile;
+    int m_midiChannel;
     int m_midiTrack;
     double m_totalTime;
     int m_transSemi;
