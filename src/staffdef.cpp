@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "functorparams.h"
+#include "instrdef.h"
 #include "label.h"
 #include "vrv.h"
 
@@ -61,7 +62,10 @@ void StaffDef::Reset()
 
 void StaffDef::AddChild(Object *child)
 {
-    if (child->Is(LABEL)) {
+    if (child->Is(INSTRDEF)) {
+        assert(dynamic_cast<InstrDef *>(child));
+    }
+    else if (child->Is(LABEL)) {
         assert(dynamic_cast<Label *>(child));
     }
     else if (child->Is(LABELABBR)) {

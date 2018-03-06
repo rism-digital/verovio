@@ -19,6 +19,7 @@
 #include "chord.h"
 #include "functorparams.h"
 #include "glyph.h"
+#include "instrdef.h"
 #include "keysig.h"
 #include "label.h"
 #include "layer.h"
@@ -312,6 +313,15 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
             midiTrack = staffDef->GetN();
             midiFile->addTrack();
+            InstrDef *instrdef = dynamic_cast<InstrDef *>(staffDef->FindChildByType(INSTRDEF, 1));
+            if (!instrdef) {
+                StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDef->GetFirstParent(STAFFGRP));
+                assert(staffGrp);
+                instrdef = dynamic_cast<InstrDef *>(staffGrp->FindChildByType(INSTRDEF, 1));
+            }
+            if (instrdef) {
+                midiFile->addInstrumentName(<#int aTrack#>, <#int aTick#>, <#const string &name#>)
+            }
             Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
             if (!label) {
                 StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDef->GetFirstParent(STAFFGRP));

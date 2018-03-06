@@ -172,6 +172,7 @@ enum ClassId {
     VERSE,
     LAYER_ELEMENT_max,
     // Ids for ScoreDefElement child classes
+    INSTRDEF,
     SCOREDEF_ELEMENT,
     SCOREDEF,
     STAFFDEF,
