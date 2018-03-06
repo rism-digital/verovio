@@ -490,7 +490,7 @@ void View::DrawOctave(
         dc->ResetFont();
 
         if (octave->GetLendsym() != LINESTARTENDSYMBOL_none)
-                y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
+            y2 += (disPlace == STAFFREL_basic_above) ? -extend.m_height : extend.m_height;
         // adjust is to avoid the figure to touch the line
         x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
 
@@ -1127,8 +1127,9 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
 
     // 0.2 for avoiding / by 0 (below)
     float maxHeightFactor = std::max(0.2f, fabsf(angle));
-    maxHeight = dist / (maxHeightFactor * (TEMP_SLUR_CURVE_FACTOR
-                                              + 5)); // 5 is the minimum - can be increased for limiting curvature
+    maxHeight = dist
+        / (maxHeightFactor
+              * (TEMP_SLUR_CURVE_FACTOR + 5)); // 5 is the minimum - can be increased for limiting curvature
 
     maxHeight = std::max(maxHeight, currentHeight);
 
@@ -1935,15 +1936,17 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     int code = SMUFL_E4C0_fermataAbove;
     // check for shape
     if (fermata->GetShape() == fermataVis_SHAPE_angular) {
-        if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
-                                                             && !(fermata->GetForm() == fermataVis_FORM_norm)))
+        if (fermata->GetForm() == fermataVis_FORM_inv
+            || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
+                   && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C5_fermataShortBelow;
         else
             code = SMUFL_E4C4_fermataShortAbove;
     }
     else if (fermata->GetShape() == fermataVis_SHAPE_square) {
-        if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
-                                                             && !(fermata->GetForm() == fermataVis_FORM_norm)))
+        if (fermata->GetForm() == fermataVis_FORM_inv
+            || (fermata->GetPlace().GetBasic() == STAFFREL_basic_below
+                   && !(fermata->GetForm() == fermataVis_FORM_norm)))
             code = SMUFL_E4C7_fermataLongBelow;
         else
             code = SMUFL_E4C6_fermataLongAbove;

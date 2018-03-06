@@ -1192,9 +1192,9 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
         Harm *harm = new Harm();
         Fb *fb = new Fb();
 
-        //std::string textColor = node.attribute("color").as_string();
-        //std::string textStyle = node.attribute("font-style").as_string();
-        //std::string textWeight = node.attribute("font-weight").as_string();
+        // std::string textColor = node.attribute("color").as_string();
+        // std::string textStyle = node.attribute("font-style").as_string();
+        // std::string textWeight = node.attribute("font-weight").as_string();
         for (pugi::xml_node figure = node.child("figure"); figure; figure = figure.next_sibling("figure")) {
             std::string textStr = GetContent(figure.select_single_node("figure-number").node());
             F *f = new F();
@@ -1311,9 +1311,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     // beam start
     bool beamStart = node.select_single_node("beam[@number='1'][text()='begin']");
     if (beamStart) {
-      Beam *beam = new Beam();
-      AddLayerElement(layer, beam);
-      m_elementStack.push_back(beam);
+        Beam *beam = new Beam();
+        AddLayerElement(layer, beam);
+        m_elementStack.push_back(beam);
     }
 
     // tremolos
@@ -1465,7 +1465,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                 chord->SetStemDir(stemDir);
                 // FIXME MEI 4.0.0
                 // if (cue) chord->SetSize(SIZE_cue);
-                if (tremSlashNum != 0) chord->SetStemMod(chord->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
+                if (tremSlashNum != 0)
+                    chord->SetStemMod(chord->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
                 AddLayerElement(layer, chord);
                 m_elementStack.push_back(chord);
                 element = chord;
@@ -1495,7 +1496,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             note->SetStemDir(stemDir);
             // FIXME MEI 4.0.0
             // if (cue) note->SetSize(SIZE_cue);
-            if (tremSlashNum != 0) note->SetStemMod(note->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
+            if (tremSlashNum != 0)
+                note->SetStemMod(note->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
         }
 
         // verse / syl
@@ -1559,7 +1561,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             // placement and orientation
             tie->SetCurvedir(ConvertOrientationToCurvedir(startTie.node().attribute("orientation").as_string()));
             tie->SetCurvedir(
-                    tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
+                tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, tie));
             OpenTie(staff, layer, note, tie);
@@ -1675,7 +1677,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // long
         mordent->SetLong(ConvertWordToBool(xmlMordentInv.node().attribute("long").as_string()));
         // place
-        mordent->SetPlace(mordent->AttPlacement::StrToStaffrel(xmlMordentInv.node().attribute("placement").as_string()));
+        mordent->SetPlace(
+            mordent->AttPlacement::StrToStaffrel(xmlMordentInv.node().attribute("placement").as_string()));
     }
 
     // trill
@@ -1735,7 +1738,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             // placement and orientation
             meiSlur->SetCurvedir(ConvertOrientationToCurvedir(slur.attribute("orientation").as_string()));
             meiSlur->SetCurvedir(
-                    meiSlur->AttCurvature::StrToCurvatureCurvedir(slur.attribute("placement").as_string()));
+                meiSlur->AttCurvature::StrToCurvatureCurvedir(slur.attribute("placement").as_string()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
             OpenSlur(staff, layer, slurNumber, meiSlur);

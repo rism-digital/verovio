@@ -492,8 +492,8 @@ std::string GetVersion()
  */
 
 static const std::string base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                        "abcdefghijklmnopqrstuvwxyz"
-                                        "0123456789+/";
+                                       "abcdefghijklmnopqrstuvwxyz"
+                                       "0123456789+/";
 
 std::string Base64Encode(unsigned char const *bytesToEncode, unsigned int inLen)
 {

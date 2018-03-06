@@ -47,7 +47,7 @@ void BeamDrawingParams::Reset()
     m_crossStaff = false;
     m_shortestDur = 0;
     m_stemDir = STEMDIRECTION_NONE;
-    
+
     m_beamWidth = 0;
     m_beamWidthBlack = 0;
     m_beamWidthWhite = 0;
@@ -63,7 +63,7 @@ void BeamDrawingParams::CalcBeam(
     assert(staff);
     assert(doc);
     assert(elementCount > 0);
-    
+
     int y1, y2, avgY, high, low, verticalCenter, verticalShift;
     double xr, verticalShiftFactor;
 
@@ -86,7 +86,7 @@ void BeamDrawingParams::CalcBeam(
     for (i = 0; i < elementCount; ++i) {
         (*beamElementCoords).at(i)->m_x = (*beamElementCoords).at(i)->m_element->GetDrawingX();
     }
-    
+
     // make it relative to the first x / staff y
     int xRel = (*beamElementCoords).at(0)->m_x;
     int yRel = staff->GetDrawingY();
@@ -210,7 +210,7 @@ void BeamDrawingParams::CalcBeam(
         (*beamElementCoords).at(i)->m_yBeam = (*beamElementCoords).at(i)->m_y + verticalShift;
         (*beamElementCoords).at(i)->m_x += stemX[this->m_cueSize];
     }
-    
+
     for (i = 0; i < elementCount; i++) {
         s_y += (*beamElementCoords).at(i)->m_yBeam - yRel;
         s_y2 += pow((*beamElementCoords).at(i)->m_yBeam - yRel, 2);
@@ -229,7 +229,7 @@ void BeamDrawingParams::CalcBeam(
     else {
         this->m_beamSlope = 0.0;
     }
-    
+
     /* Correction esthetique : */
     if (fabs(this->m_beamSlope) < doc->m_drawingBeamMinSlope) this->m_beamSlope = 0.0;
     if (fabs(this->m_beamSlope) > doc->m_drawingBeamMaxSlope)
@@ -248,7 +248,8 @@ void BeamDrawingParams::CalcBeam(
     int verticalAdjustment = 0;
     for (i = 0; i < elementCount; i++) {
         oldYPos = (*beamElementCoords).at(i)->m_yBeam;
-        expectedY = this->m_startingY + verticalAdjustment + this->m_beamSlope * ((*beamElementCoords).at(i)->m_x - this->m_startingX);
+        expectedY = this->m_startingY + verticalAdjustment
+            + this->m_beamSlope * ((*beamElementCoords).at(i)->m_x - this->m_startingX);
 
         // if the stem is not long enough, add extra stem length needed to all members of the beam
         if ((this->m_stemDir == STEMDIRECTION_up && (oldYPos > expectedY))
@@ -256,7 +257,7 @@ void BeamDrawingParams::CalcBeam(
             verticalAdjustment += oldYPos - expectedY;
         }
     }
-    
+
     // Now adjust the startingY position and all the elements
     this->m_startingY += verticalAdjustment;
     for (i = 0; i < elementCount; i++) {

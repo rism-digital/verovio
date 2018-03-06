@@ -256,6 +256,6 @@ enum {
 /** The number of glyphs for verification **/
 #define SMUFL_COUNT 229
 
-} // vrv namespace
+} // namespace vrv
 
 #endif

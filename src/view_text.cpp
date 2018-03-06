@@ -49,7 +49,7 @@ void View::DrawF(DeviceContext *dc, F *f, TextDrawingParams &params)
 void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
 {
     assert(dc);
-    
+
     int toDcX = ToDeviceContextX(x);
     int toDcY = ToDeviceContextY(y);
 
