@@ -320,7 +320,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
                 instrdef = dynamic_cast<InstrDef *>(staffGrp->FindChildByType(INSTRDEF, 1));
             }
             if (instrdef) {
-                midiFile->addInstrumentName(<#int aTrack#>, <#int aTick#>, <#const string &name#>)
+                midiFile->addPatchChange(midiTrack, 0, 0, instrdef->GetMidiInstrnum());
             }
             Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
             if (!label) {
