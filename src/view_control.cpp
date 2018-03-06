@@ -241,7 +241,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = interface->GetTstampStaves(measure);
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
 
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement())
@@ -865,7 +865,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         start->FindAllChildByAttComparison(&artics, &matchType);
         // Then the @n of each first staffDef
-        for (articIter = artics.begin(); articIter != artics.end(); articIter++) {
+        for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
             Artic *artic = dynamic_cast<Artic *>(*articIter);
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
@@ -885,7 +885,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     if ((spanningType == SPANNING_START_END) || (SPANNING_END)) {
         end->FindAllChildByAttComparison(&artics, &matchType);
         // Then the @n of each first staffDef
-        for (articIter = artics.begin(); articIter != artics.end(); articIter++) {
+        for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
             Artic *artic = dynamic_cast<Artic *>(*articIter);
             assert(artic);
             ArticPart *outsidePart = artic->GetOutsidePart();
@@ -912,7 +912,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     /*
     int i;
     int dist = (points[3].x - points[0].x) / 10;
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 10; ++i) {
         int x = points[0].x + (i * dist);
         int y = BoundingBox::CalcBezierAtPosition(points, x);
         DrawDot(dc, x, y, staff->m_drawingStaffSize);
@@ -983,7 +983,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     ArrayOfLayerElementPointPairs spanningContentPoints;
     std::vector<LayerElement *>::iterator it;
     for (it = findTimeSpanningLayerElementsParams.m_spanningContent.begin();
-         it != findTimeSpanningLayerElementsParams.m_spanningContent.end(); it++) {
+         it != findTimeSpanningLayerElementsParams.m_spanningContent.end(); ++it) {
         // We skip the start or end of the slur
         if ((*it == slur->GetStart()) || (*it == slur->GetEnd())) continue;
 
@@ -1086,7 +1086,7 @@ void View::GetSpanningPointPositions(
     ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, curvature_CURVEDIR curveDir, int staffSize)
 {
     ArrayOfLayerElementPointPairs::iterator itPoint;
-    for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end(); itPoint++) {
+    for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end(); ++itPoint) {
         Point p;
         if (curveDir == curvature_CURVEDIR_above) {
             p.y = itPoint->first->GetDrawingTop(m_doc, staffSize, true, ARTIC_PART_OUTSIDE);
@@ -1633,7 +1633,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         }
 
         int i, x;
-        for (i = 0; i < nbDashes; i++) {
+        for (i = 0; i < nbDashes; ++i) {
             x = x1 + margin + (i * dashSpace);
             x = std::max(x, x1);
 
@@ -1737,7 +1737,7 @@ void View::DrawBreath(DeviceContext *dc, Breath *breath, Measure *measure, Syste
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = breath->GetTstampStaves(measure);
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), breath, breath->GetStart(), *staffIter)) {
             continue;
         }
@@ -1780,7 +1780,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dir->GetTstampStaves(measure);
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, dir->GetStart(), *staffIter)) {
             continue;
         }
@@ -1842,7 +1842,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dynam->GetTstampStaves(measure);
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dynam, dynam->GetStart(), *staffIter)) {
             continue;
         }
@@ -1957,7 +1957,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = fermata->GetTstampStaves(measure);
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), fermata, fermata->GetStart(), *staffIter)) {
             continue;
         }
@@ -2002,7 +2002,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = harm->GetTstampStaves(measure);
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), harm, harm->GetStart(), *staffIter)) {
             continue;
         }
@@ -2057,7 +2057,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = mordent->GetTstampStaves(measure);
     double xShift = 0.0;
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), mordent, mordent->GetStart(), *staffIter)) {
             continue;
         }
@@ -2169,7 +2169,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, pedal->GetStart(), *staffIter)) {
             continue;
         }
@@ -2226,7 +2226,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = tempo->GetTstampStaves(measure);
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), tempo, tempo->GetStart(), *staffIter)) {
             continue;
         }
@@ -2278,7 +2278,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = trill->GetTstampStaves(measure);
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), trill, trill->GetStart(), *staffIter)) {
             continue;
         }
@@ -2346,7 +2346,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = turn->GetTstampStaves(measure);
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), turn, turn->GetStart(), *staffIter)) {
             continue;
         }
@@ -2510,7 +2510,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         staffList = measure->GetFirstStaffGrpStaves(system->GetDrawingScoreDef());
     }
 
-    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), ending, objectX, *staffIter)) {
             continue;
         }

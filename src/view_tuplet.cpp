@@ -55,7 +55,7 @@ int View::NestedTuplets(Object *object)
 
     int tupletDepth = 1;
 
-    for (int i = 0; i < object->GetChildCount(); i++) {
+    for (int i = 0; i < object->GetChildCount(); ++i) {
         int tupletCount = 1;
 
         // check how many nested tuplets there are
