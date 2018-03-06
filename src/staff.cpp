@@ -225,7 +225,7 @@ void LedgerLine::AddDash(int left, int right)
     // Merge overlapping dashes
     std::list<std::pair<int, int> >::iterator previous = m_dashes.begin();
     iter = m_dashes.begin();
-    iter++;
+    ++iter;
     while (iter != m_dashes.end()) {
         if (previous->second > iter->first) {
             previous->second = std::max(iter->second, previous->second);
@@ -233,7 +233,7 @@ void LedgerLine::AddDash(int left, int right)
         }
         else {
             previous = iter;
-            iter++;
+            ++iter;
         }
     }
 }
@@ -345,7 +345,7 @@ int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
         if ((interface->GetStartMeasure() != currentMeasure) && (interface->IsOnStaff(this->GetN()))) {
             m_timeSpanningElements.push_back(*iter);
         }
-        iter++;
+        ++iter;
     }
     return FUNCTOR_CONTINUE;
 }
