@@ -401,7 +401,7 @@ void Object::ClearRelinquishedChildren()
             iter = m_children.erase(iter);
         }
         else
-            iter++;
+            ++iter;
     }
 }
 
@@ -855,7 +855,7 @@ void TextListInterface::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
-        iter++;
+        ++iter;
     }
 }
 

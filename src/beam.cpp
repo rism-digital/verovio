@@ -423,7 +423,7 @@ void Beam::FilterList(ListOfObjects *childList)
                     continue;
                 }
             }
-            iter++;
+            ++iter;
         }
     }
 
@@ -558,7 +558,7 @@ void Beam::InitCoords(ListOfObjects *childList)
 
         elementCount++;
 
-        iter++;
+        ++iter;
         if (iter == childList->end()) {
             break;
         }

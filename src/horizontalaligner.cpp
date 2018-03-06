@@ -749,12 +749,12 @@ int Alignment::AdjustArpeg(FunctorParams *functorParams)
         // We are reaching the alignment to which an arpeg points to (i.e, the topNote one)
         if (std::get<0>(*iter) == this) {
             std::get<3>(*iter) = true;
-            iter++;
+            ++iter;
             continue;
         }
         // We have not reached the alignment of the arpeg, just continue (backwards)
         else if (std::get<3>(*iter) == false) {
-            iter++;
+            ++iter;
             continue;
         }
         // We are now in an alignment preceeding an arpeg - check for overlap
@@ -768,7 +768,7 @@ int Alignment::AdjustArpeg(FunctorParams *functorParams)
 
         // Nothing, just continue
         if (maxRight == VRV_UNSET) {
-            iter++;
+            ++iter;
             continue;
         }
 
