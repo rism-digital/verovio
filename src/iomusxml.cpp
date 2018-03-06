@@ -474,9 +474,10 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             std::string partAbbr = GetContentOfChild(xpathNode.node(), "part-abbreviation[not(@print-object='no')]");
             pugi::xpath_node midiInstrument = xpathNode.node().select_single_node("midi-instrument");
             pugi::xpath_node midiChannel = midiInstrument.node().select_single_node("midi-channel");
+            pugi::xpath_node midiName = midiInstrument.node().select_single_node("midi-name");
+            pugi::xpath_node midiPan = midiInstrument.node().select_single_node("pan");
             pugi::xpath_node midiProgram = midiInstrument.node().select_single_node("midi-program");
             pugi::xpath_node midiVolume = midiInstrument.node().select_single_node("volume");
-            pugi::xpath_node midiPan = midiInstrument.node().select_single_node("pan");
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
             int nbStaves = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
@@ -498,10 +499,11 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 }
                 if (midiInstrument) {
                     InstrDef *instrdef = new InstrDef;
+                    instrdef->SetMidiInstrname(instrdef->AttMidiInstrument::StrToMidinames(midiName.node().text().as_string()));
                     if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int());
+                    if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
                     if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int());
                     if (midiVolume) instrdef->SetMidiVolume(midiVolume.node().text().as_int());
-                    if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
                     partStaffGrp->AddChild(instrdef);
                 }
                 partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
