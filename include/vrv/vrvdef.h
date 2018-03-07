@@ -48,13 +48,14 @@ enum ClassId {
     DEVICE_CONTEXT, // Should not be instanciated as is,
     FLOATING_OBJECT,
     FLOATING_POSITIONER,
-    //
+    // Ids for ungrouped objects
     ALIGNMENT,
     ALIGNMENT_REFERENCE,
     CLEF_ATTR,
     DOC,
     FB,
     GRACE_ALIGNER,
+    INSTRDEF,
     KEYSIG_ATTR,
     LABEL,
     LABELABBR,
@@ -172,7 +173,6 @@ enum ClassId {
     VERSE,
     LAYER_ELEMENT_max,
     // Ids for ScoreDefElement child classes
-    INSTRDEF,
     SCOREDEF_ELEMENT,
     SCOREDEF,
     STAFFDEF,
