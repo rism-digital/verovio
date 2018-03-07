@@ -16,6 +16,7 @@
 #include "functorparams.h"
 #include "instrdef.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "vrv.h"
 
 namespace vrv {
