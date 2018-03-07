@@ -36,7 +36,7 @@ function play_midi() {
 /* Two callback functions passed to the MIDI player */
 //////////////////////////////////////////////////////
 var midiUpdate = function(time) {
-    var vrvTime = Math.max(0, 2 * time - 800);
+    var vrvTime = Math.max(0, time - 400);
     var elementsattime = vrvToolkit.getElementsAtTime(vrvTime);
     if (elementsattime.page > 0) {
         if (elementsattime.page != page) {
