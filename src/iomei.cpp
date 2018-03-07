@@ -38,6 +38,7 @@
 #include "functorparams.h"
 #include "hairpin.h"
 #include "harm.h"
+#include "instrdef.h"
 #include "keysig.h"
 #include "label.h"
 #include "layer.h"
@@ -272,6 +273,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(LABEL)) {
         m_currentNode = m_currentNode.append_child("label");
         WriteLabel(m_currentNode, dynamic_cast<Label *>(object));
+    }
+    else if (object->Is(INSTRDEF)) {
+        m_currentNode = m_currentNode.append_child("instrdef");
+        WriteInstrDef(m_currentNode, dynamic_cast<InstrDef *>(object));
     }
     else if (object->Is(LABELABBR)) {
         m_currentNode = m_currentNode.append_child("labelAbbr");
@@ -948,6 +953,17 @@ void MeiOutput::WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
     staffDef->WriteScalable(currentNode);
     staffDef->WriteStaffDefLog(currentNode);
     staffDef->WriteTransposition(currentNode);
+}
+
+void MeiOutput::WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef)
+{
+    assert(instrDef);
+    
+    WriteXmlId(currentNode, instrDef);
+    instrDef->WriteChannelized(currentNode);
+    instrDef->WriteLabelled(currentNode);
+    instrDef->WriteMidiInstrument(currentNode);
+    instrDef->WriteNNumberLike(currentNode);
 }
 
 void MeiOutput::WriteLabel(pugi::xml_node currentNode, Label *label)
@@ -2922,6 +2938,9 @@ bool MeiInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
             success = ReadEditorialElement(parent, current, EDITORIAL_STAFFGRP);
         }
         // content
+        else if (std::string(current.name()) == "instrDef") {
+            success = ReadInstrDef(parent, current);
+        }
         else if (std::string(current.name()) == "label") {
             success = ReadLabel(parent, current);
         }
@@ -3067,6 +3086,9 @@ bool MeiInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
         // content
+        else if (std::string(current.name()) == "instrDef") {
+            success = ReadInstrDef(parent, current);
+        }
         else if (std::string(current.name()) == "label") {
             success = ReadLabel(parent, current);
         }
@@ -3078,6 +3100,20 @@ bool MeiInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
         }
     }
     return success;
+}
+
+bool MeiInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
+{
+    InstrDef *vrvInstrDef = new InstrDef();
+    SetMeiUuid(instrDef, vrvInstrDef);
+    
+    parent->AddChild(vrvInstrDef);
+    vrvInstrDef->ReadChannelized(instrDef);
+    vrvInstrDef->ReadLabelled(instrDef);
+    vrvInstrDef->ReadMidiInstrument(instrDef);
+    vrvInstrDef->ReadNNumberLike(instrDef);
+
+    return true;
 }
 
 bool MeiInput::ReadLabel(Object *parent, pugi::xml_node label)

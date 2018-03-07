@@ -17,6 +17,10 @@
 		409B3DDB1F2D1C550098A265 /* btrem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 409B3DDA1F2D1C550098A265 /* btrem.cpp */; };
 		40ABF1FF1E5DF23B00F32F41 /* expansion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */; };
 		40D0D5E21E3BD7FE00E6BF5C /* turn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40D0D5E01E3BD7FE00E6BF5C /* turn.cpp */; };
+		40D45EC1204EEAE1009C1EC9 /* instrdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40D45EBF204EEAE0009C1EC9 /* instrdef.cpp */; };
+		40D45EC2204EEAFB009C1EC9 /* instrdef.h in Headers */ = {isa = PBXBuildFile; fileRef = 40D45EC0204EEAE0009C1EC9 /* instrdef.h */; };
+		40D45EC3204EEAFE009C1EC9 /* instrdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40D45EBF204EEAE0009C1EC9 /* instrdef.cpp */; };
+		40D45EC4204EEB03009C1EC9 /* instrdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40D45EBF204EEAE0009C1EC9 /* instrdef.cpp */; };
 		40F910081E2799740081B7BB /* trill.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40F910071E2799740081B7BB /* trill.cpp */; };
 		4D09D3ED1EA8AD8500A420E6 /* horizontalaligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */; };
 		4D09FAED1D78B8C40099FDFE /* atts_midi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29051940BCC100C76319 /* atts_midi.cpp */; };
@@ -603,6 +607,8 @@
 		40CA06581E351161009CFDD7 /* humlib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = humlib.cpp; path = src/hum/humlib.cpp; sourceTree = "<group>"; };
 		40D0D5E01E3BD7FE00E6BF5C /* turn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = turn.cpp; path = src/turn.cpp; sourceTree = "<group>"; };
 		40D0D5E11E3BD7FE00E6BF5C /* turn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = turn.h; path = include/vrv/turn.h; sourceTree = "<group>"; };
+		40D45EBF204EEAE0009C1EC9 /* instrdef.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = instrdef.cpp; path = src/instrdef.cpp; sourceTree = "<group>"; };
+		40D45EC0204EEAE0009C1EC9 /* instrdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = instrdef.h; path = include/vrv/instrdef.h; sourceTree = "<group>"; };
 		40F910061E2799640081B7BB /* trill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = trill.h; path = include/vrv/trill.h; sourceTree = "<group>"; };
 		40F910071E2799740081B7BB /* trill.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = trill.cpp; path = src/trill.cpp; sourceTree = "<group>"; };
 		4D09D3EC1EA8AD8500A420E6 /* horizontalaligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = horizontalaligner.cpp; path = src/horizontalaligner.cpp; sourceTree = "<group>"; };
@@ -1265,6 +1271,8 @@
 		8F086F38188539F00037FD8E /* containers */ = {
 			isa = PBXGroup;
 			children = (
+				40D45EBF204EEAE0009C1EC9 /* instrdef.cpp */,
+				40D45EC0204EEAE0009C1EC9 /* instrdef.h */,
 				4D4C26EC1EF7E75400681770 /* label.cpp */,
 				4D4C26EB1EF7E73000681770 /* label.h */,
 				8F086EC6188539540037FD8E /* layer.cpp */,
@@ -1509,6 +1517,7 @@
 				4DF4407A1D3D085600152B7E /* functorparams.h in Headers */,
 				4D763EC91987D067003FCAB5 /* metersig.h in Headers */,
 				4DB3D8CD1F83D11100B5FC2B /* harm.h in Headers */,
+				40D45EC2204EEAFB009C1EC9 /* instrdef.h in Headers */,
 				4D422101199805E400963292 /* att.h in Headers */,
 				4D422102199805E400963292 /* attdef.h in Headers */,
 				4D16947C1E41DE7200569BF4 /* atts_cmnornaments.h in Headers */,
@@ -1739,6 +1748,7 @@
 				4D16943A1E3A44F300569BF4 /* pugixml.cpp in Sources */,
 				4D16943B1E3A44F300569BF4 /* Binasc.cpp in Sources */,
 				4D16943C1E3A44F300569BF4 /* view_beam.cpp in Sources */,
+				40D45EC3204EEAFE009C1EC9 /* instrdef.cpp in Sources */,
 				4D16943D1E3A44F300569BF4 /* view_element.cpp in Sources */,
 				4D16943E1E3A44F300569BF4 /* view_graph.cpp in Sources */,
 				4D16943F1E3A44F300569BF4 /* view_page.cpp in Sources */,
@@ -1883,6 +1893,7 @@
 				8F086F0A188539540037FD8E /* view_page.cpp in Sources */,
 				8F086F0B188539540037FD8E /* view_tuplet.cpp in Sources */,
 				4D4C26ED1EF7E75400681770 /* label.cpp in Sources */,
+				40D45EC1204EEAE1009C1EC9 /* instrdef.cpp in Sources */,
 				40910FEC1E42734C00DB1FA5 /* mordent.cpp in Sources */,
 				4DB726C01B8B9F480040231B /* rpt.cpp in Sources */,
 				2D2A799A1A69812C000A441B /* chord.cpp in Sources */,
@@ -2055,6 +2066,7 @@
 				4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */,
 				4D4335CB1ED00A33003BE1A9 /* atts_gestural.cpp in Sources */,
 				4DB0B0171C44129300DBDCC3 /* timestamp.cpp in Sources */,
+				40D45EC4204EEB03009C1EC9 /* instrdef.cpp in Sources */,
 				4DF28A061A754DF000BA9F7D /* floatingobject.cpp in Sources */,
 				4DB3D8991F7C325D00B5FC2B /* lb.cpp in Sources */,
 				4DA3FCD419B61DB400CBDFE6 /* atts_cmn.cpp in Sources */,
