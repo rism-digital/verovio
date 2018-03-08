@@ -1,25 +1,24 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        label.h
-// Author:      Laurent Pugin
-// Created:     19/06/2017
+// Name:        instrdef.h
+// Author:      Klaus Rettinghaus
+// Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_LABEL_H__
-#define __VRV_LABEL_H__
+#ifndef __VRV_INSTRDEF_H__
+#define __VRV_INSTRDEF_H__
 
+#include "atts_shared.h"
+#include "atts_midi.h"
 #include "object.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Label
+// InstrDef
 //----------------------------------------------------------------------------
 
-/**
- * This class represent a <label> in MEI.
- */
-class Label : public Object, public TextListInterface {
+class InstrDef : public Object, public AttChannelized, public AttLabelled, public AttMidiInstrument, public AttNNumberLike {
 
 public:
     /**
@@ -27,19 +26,12 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Label();
-    virtual ~Label();
-    virtual Object *Clone() const { return new Label(*this); }
+    InstrDef();
+    virtual ~InstrDef();
+    virtual Object *Clone() const { return new InstrDef(*this); }
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Label"; }
-    virtual ClassId GetClassId() const { return LABEL; }
-    ///@}
-
-    /**
-     * @name Methods for adding allowed content
-     */
-    ///@{
-    virtual void AddChild(Object *object);
+    virtual std::string GetClassName() const { return "InstrDef"; }
+    virtual ClassId GetClassId() const { return INSTRDEF; }
     ///@}
 
     //----------//

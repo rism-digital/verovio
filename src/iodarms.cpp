@@ -94,7 +94,7 @@ void DarmsInput::UnrollKeysig(int quantity, char alter)
     return;
     //////
     /*
-    for (int i = 0; i < quantity; i++) {
+    for (int i = 0; i < quantity; ++i) {
         Accid *alter = new Accid();
         alter->SetOloc(4);
         alter->SetPloc(alteration_set[i]);

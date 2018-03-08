@@ -433,7 +433,7 @@ int Note::ConvertAnalyticalMarkup(FunctorParams *functorParams)
             // we are done for this note
             break;
         }
-        iter++;
+        ++iter;
     }
 
     if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_i)) {
@@ -901,7 +901,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     if (this->HasOctGes()) oct = this->GetOctGes();
 
     int pitch = midiBase + (oct + 1) * 12;
-    int channel = 0;
+    int channel = params->m_midiChannel;
     int velocity = 64;
 
     double starttime = params->m_totalTime + this->GetScoreTimeOnset();

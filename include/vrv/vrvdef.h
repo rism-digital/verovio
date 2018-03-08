@@ -48,13 +48,14 @@ enum ClassId {
     DEVICE_CONTEXT, // Should not be instanciated as is,
     FLOATING_OBJECT,
     FLOATING_POSITIONER,
-    //
+    // Ids for ungrouped objects
     ALIGNMENT,
     ALIGNMENT_REFERENCE,
     CLEF_ATTR,
     DOC,
     FB,
     GRACE_ALIGNER,
+    INSTRDEF,
     KEYSIG_ATTR,
     LABEL,
     LABELABBR,
@@ -123,6 +124,7 @@ enum ClassId {
     HAIRPIN,
     HARM,
     MORDENT,
+    MNUM,
     OCTAVE,
     PEDAL,
     SLUR,
@@ -369,6 +371,12 @@ enum SMuFLGlyphAnchor {
 };
 
 //----------------------------------------------------------------------------
+// Spanning types for control events
+//----------------------------------------------------------------------------
+
+enum { SPANNING_START_END = 0, SPANNING_START, SPANNING_END, SPANNING_MIDDLE };
+
+//----------------------------------------------------------------------------
 // Types for layer element
 //----------------------------------------------------------------------------
 
@@ -378,16 +386,6 @@ enum SMuFLGlyphAnchor {
  */
 
 enum ElementScoreDefRole { NONE = 0, SYSTEM_SCOREDEF, INTERMEDIATE_SCOREDEF, CAUTIONARY_SCOREDEF };
-
-//----------------------------------------------------------------------------
-// Drawing groups (reserved values)
-//----------------------------------------------------------------------------
-
-/**
- * We need fix values for types that are all groupes together
- */
-
-enum { DRAWING_GRP_NONE = 0, DRAWING_GRP_VERSE, DRAWING_GRP_HARM, DRAWING_GRP_OTHER };
 
 //----------------------------------------------------------------------------
 // Artic part types

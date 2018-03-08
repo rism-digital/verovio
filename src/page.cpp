@@ -79,7 +79,7 @@ RunningElement *Page::GetHeader() const
     if (!doc || doc->GetOptions()->m_noHeader.GetValue()) {
         return NULL;
     }
-    
+
     Pages *pages = doc->GetPages();
     assert(pages);
 
@@ -98,7 +98,7 @@ RunningElement *Page::GetFooter() const
     if (!doc || doc->GetOptions()->m_noFooter.GetValue()) {
         return NULL;
     }
-    
+
     Pages *pages = doc->GetPages();
     assert(pages);
 

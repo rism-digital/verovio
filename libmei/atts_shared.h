@@ -2909,8 +2909,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMm(std::string mm_) { m_mm = mm_; }
-    std::string GetMm() const { return m_mm; }
+    void SetMm(int mm_) { m_mm = mm_; }
+    int GetMm() const { return m_mm; }
     bool HasMm() const;
     //
     void SetMmUnit(data_DURATION mmUnit_) { m_mmUnit = mmUnit_; }
@@ -2930,7 +2930,7 @@ private:
      * In MIDI, a beat is always defined as a quarter note, *not the numerator of the
      * time signature or the metronomic indication*.
      **/
-    std::string m_mm;
+    int m_mm;
     /** Captures the metronomic unit. **/
     data_DURATION m_mmUnit;
     /** Records the number of augmentation dots required by a dotted metronome unit. **/

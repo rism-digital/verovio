@@ -46,13 +46,25 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for right and left links
+     * @name Getter, setter and checker for the drawing length
      */
     ///@{
-    void SetRightLink(ControlElement *rightLink) { m_rightLink = rightLink; }
-    ControlElement *GetRightLink() { return m_rightLink; }
-    void SetLeftLink(ControlElement *leftLink) { m_leftLink = leftLink; }
+    int GetDrawingLength() const { return m_drawingLength; }
+    void SetDrawingLength(int length) { m_drawingLength = length; }
+    bool HasDrawingLength() const { return (m_drawingLength > 0); }
+    ///@}
+
+    int CalcHeight(
+        Doc *doc, int staffSize, char spanningType, FloatingPositioner *leftHairpin, FloatingPositioner *rightHaipin);
+
+    /**
+     * @name Setter and getter for left and right links
+     */
+    ///@{
+    void SetLeftLink(ControlElement *leftLink);
     ControlElement *GetLeftLink() { return m_leftLink; }
+    void SetRightLink(ControlElement *rightLink);
+    ControlElement *GetRightLink() { return m_rightLink; }
     ///@}
 
     //----------//
@@ -77,16 +89,21 @@ public:
     //
 private:
     /**
+     * A pointer to the possible left link of the Hairpin.
+     * This is either another Hairpin or a Dynam that ends / appears at the same position.
+     */
+    ControlElement *m_leftLink;
+
+    /**
      * A pointer to the possible right link of the Hairpin.
-     * This is either another Haipin or a Dynam that ends / appears at the same position.
+     * This is either another Hairpin or a Dynam that starts / appears at the same position.
      */
     ControlElement *m_rightLink;
 
     /**
-     * A pointer to the possible left link of the Hairpin.
-     * This is either another Haipin or a Dynam that starts / appears at the same position.
+     * The drawing length (uninterrupted) stored for matching height of linked hairpins
      */
-    ControlElement *m_leftLink;
+    int m_drawingLength;
 };
 
 } // namespace vrv

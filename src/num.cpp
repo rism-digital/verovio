@@ -23,7 +23,7 @@ namespace vrv {
 // Num
 //----------------------------------------------------------------------------
 
-Num::Num() : TextElement("num-"), AttLabelled()
+Num::Num() : TextElement("num-")
 {
     Reset();
 }
@@ -32,8 +32,6 @@ Num::~Num() {}
 
 void Num::Reset()
 {
-    ResetLabelled();
-
     m_currentText.SetParent(this);
     m_currentText.SetText(L"");
 }

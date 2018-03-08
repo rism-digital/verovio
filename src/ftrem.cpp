@@ -91,7 +91,7 @@ void FTrem::FilterList(ListOfObjects *childList)
                 continue;
             }
         }
-        iter++;
+        ++iter;
     }
 
     InitCoords(childList);

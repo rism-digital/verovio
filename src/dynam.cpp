@@ -150,7 +150,7 @@ std::wstring Dynam::GetSymbolStr() const
     dynam = m_symbolStr;
     int i;
     std::wstring from, to;
-    for (i = 0; i < DYNAM_CHARS; i++) {
+    for (i = 0; i < DYNAM_CHARS; ++i) {
         from = dynamChars[i];
         to = dynamSmufl[i];
         for (size_t pos = 0; (pos = dynam.find(from, pos)) != std::string::npos; pos += to.size())
@@ -178,8 +178,8 @@ int Dynam::PrepareFloatingGrps(FunctorParams *functorParams)
     params->m_dynams.push_back(this);
 
     for (auto &hairpin : params->m_hairpins) {
-        if (hairpin->GetEnd() == this->GetStart() && (hairpin->GetStaff() == this->GetStaff())) {
-            hairpin->SetRightLink(this);
+        if ((hairpin->GetEnd() == this->GetStart()) && (hairpin->GetStaff() == this->GetStaff())) {
+            if (!hairpin->GetRightLink()) hairpin->SetRightLink(this);
         }
     }
 

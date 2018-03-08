@@ -25,6 +25,7 @@ class Dynam;
 class Ending;
 class FileOutputStream;
 class Hairpin;
+class Harm;
 class KeySig;
 class Layer;
 class LayerElement;
@@ -1034,12 +1035,14 @@ public:
     GenerateMIDIParams(MidiFile *midiFile)
     {
         m_midiFile = midiFile;
+        m_midiChannel = 0;
         m_midiTrack = 1;
         m_totalTime = 0.0;
         m_transSemi = 0;
         m_currentTempo = 120;
     }
     MidiFile *m_midiFile;
+    int m_midiChannel;
     int m_midiTrack;
     double m_totalTime;
     int m_transSemi;
@@ -1158,21 +1161,18 @@ public:
 /**
  * member 0: the previous ending
  * member 1: the current grpId
- * member 2: the dynam in the current Measure
- * member 3: the current hairpin
+ * member 2: the dynam in the current measure
+ * member 3: the current hairpins to be linked / grouped
+ * member 4: the map of existing harms (based on @n)
  **/
 
 class PrepareFloatingGrpsParams : public FunctorParams {
 public:
-    PrepareFloatingGrpsParams()
-    {
-        m_previousEnding = NULL;
-        m_drawingGrpId = DRAWING_GRP_OTHER;
-    }
+    PrepareFloatingGrpsParams() { m_previousEnding = NULL; }
     Ending *m_previousEnding;
-    int m_drawingGrpId;
     std::vector<Dynam *> m_dynams;
     std::vector<Hairpin *> m_hairpins;
+    std::map<std::string, Harm *> m_harms;
 };
 
 //----------------------------------------------------------------------------

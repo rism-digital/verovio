@@ -75,7 +75,7 @@ StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) const
 {
     StaffAlignment *alignment = NULL;
     int i;
-    for (i = 0; i < this->GetChildCount(); i++) {
+    for (i = 0; i < this->GetChildCount(); ++i) {
         alignment = dynamic_cast<StaffAlignment *>(m_children.at(i));
         assert(alignment);
 
@@ -185,21 +185,27 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
     return -(box->GetSelfBottom() + m_staffHeight - this->GetYRel());
 }
 
-void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY)
+void StaffAlignment::SetCurrentFloatingPositioner(
+    FloatingObject *object, Object *objectX, Object *objectY, char spanningType)
+{
+    FloatingPositioner *positioner = this->GetCorrespFloatingPositioner(object);
+    if (positioner == NULL) {
+        positioner = new FloatingPositioner(object, this, spanningType);
+        m_floatingPositioners.push_back(positioner);
+    }
+    positioner->SetObjectXY(objectX, objectY);
+    // LogDebug("BB %d", item->second.m_contentBB_x1);
+    object->SetCurrentFloatingPositioner(positioner);
+}
+
+FloatingPositioner *StaffAlignment::GetCorrespFloatingPositioner(FloatingObject *object)
 {
     auto item = std::find_if(m_floatingPositioners.begin(), m_floatingPositioners.end(),
         [object](FloatingPositioner *positioner) { return positioner->GetObject() == object; });
     if (item != m_floatingPositioners.end()) {
-        // LogDebug("Found it!");
+        return *item;
     }
-    else {
-        FloatingPositioner *box = new FloatingPositioner(object);
-        m_floatingPositioners.push_back(box);
-        item = m_floatingPositioners.end() - 1;
-    }
-    (*item)->SetObjectXY(objectX, objectY);
-    // LogDebug("BB %d", item->second.m_contentBB_x1);
-    object->SetCurrentFloatingPositioner((*item));
+    return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -351,7 +357,7 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
         int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
         auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
             [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
-        // We must have find it
+        // We must have found it
         assert(i != grpIdYRel.end());
         (*iter)->SetDrawingYRel((*i).second);
     }
@@ -375,11 +381,11 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
     ArrayOfBoundingBoxes::iterator iter;
     // go through all the elements of the top staff that have an overflow below
     for (iter = params->m_previous->m_overflowBelowBBoxes.begin();
-         iter != params->m_previous->m_overflowBelowBBoxes.end(); iter++) {
+         iter != params->m_previous->m_overflowBelowBBoxes.end(); ++iter) {
         auto i = m_overflowAboveBBoxes.begin();
         auto end = m_overflowAboveBBoxes.end();
         while (i != end) {
-            // find all the elements from the bottom staff that have an overflow at the top with an horizontal overap
+            // find all the elements from the bottom staff that have an overflow at the top with an horizontal overlap
             i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
             if (i != end) {
                 // calculate the vertical overlap and see if this is more than the expected space

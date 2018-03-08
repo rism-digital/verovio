@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        harm.cpp
-// Author:      Laurent Pugin
-// Created:     2016
+// Name:        mnum.cpp
+// Author:      Klaus Rettinghaus
+// Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "harm.h"
+#include "mnum.h"
 
 //----------------------------------------------------------------------------
 
@@ -14,8 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
-#include "fb.h"
-#include "functorparams.h"
 #include "text.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -23,43 +21,43 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Harm
+// MNum
 //----------------------------------------------------------------------------
 
-Harm::Harm()
-    : ControlElement("harm-")
+MNum::MNum()
+    : ControlElement("mnum-")
     , TextListInterface()
     , TextDirInterface()
     , TimeSpanningInterface()
+    , AttColor()
     , AttLang()
-    , AttNNumberLike()
+    , AttTypography()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_LANG);
-    RegisterAttClass(ATT_NNUMBERLIKE);
+    RegisterAttClass(ATT_TYPOGRAPHY);
 
     Reset();
 }
 
-Harm::~Harm() {}
+MNum::~MNum() {}
 
-void Harm::Reset()
+void MNum::Reset()
 {
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
+    ResetColor();
     ResetLang();
-    ResetNNumberLike();
+    ResetTypography();
 }
 
-void Harm::AddChild(Object *child)
+void MNum::AddChild(Object *child)
 {
     if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
-    }
-    else if (child->Is(FB)) {
-        assert(dynamic_cast<Fb *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
@@ -75,28 +73,23 @@ void Harm::AddChild(Object *child)
 }
 
 //----------------------------------------------------------------------------
-// Harm functor methods
+// MNum functor methods
 //----------------------------------------------------------------------------
 
-int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
+int MNum::Save(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
+    if (this->IsGenerated())
+        return FUNCTOR_SIBLINGS;
+    else
+        return Object::Save(functorParams);
+}
 
-    std::string n = this->GetN();
-
-    for (auto &kv : params->m_harms) {
-        if (kv.first == n) {
-            this->SetDrawingGrpId(kv.second->GetDrawingGrpId());
-            return FUNCTOR_CONTINUE;
-        }
-    }
-
-    // first harm@n, create a new group
-    this->SetDrawingGrpObject(this);
-    params->m_harms.insert(std::make_pair(n, this));
-
-    return FUNCTOR_CONTINUE;
+int MNum::SaveEnd(FunctorParams *functorParams)
+{
+    if (this->IsGenerated())
+        return FUNCTOR_SIBLINGS;
+    else
+        return Object::SaveEnd(functorParams);
 }
 
 } // namespace vrv
