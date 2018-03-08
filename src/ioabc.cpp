@@ -584,7 +584,6 @@ void AbcInput::parseTitle(std::string title)
     text->SetText(UTF8to16(title));
     titleRend->AddChild(text);
     pgHead->AddChild(titleRend);
-    LogMessage("ABC input: title not exported to MEI header");
 }
 
 void AbcInput::parseReferenceNumber(std::string referenceNumberString)
