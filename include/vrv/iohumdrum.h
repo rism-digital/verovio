@@ -20,6 +20,7 @@
 #include "ending.h"
 #include "io.h"
 #include "runningelement.h"
+#include "verse.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -202,6 +203,8 @@ public:
     // !!!RDF**kern: i = marked note
     std::vector<char> mark;
     std::vector<std::string> mcolor;
+    std::vector<char> textmark;
+    std::vector<std::string> textcolor;
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */
@@ -339,6 +342,7 @@ protected:
     std::string getAutoClef(hum::HTp partstart, int partnumber);
     void colorNote(vrv::Note *note, const std::string &token, int line, int field);
     void colorRest(vrv::Rest *rest, const std::string &token, int line, int field);
+	void colorVerse(Verse *verse, std::string &token);
     std::string getSpineColor(int line, int field);
     void checkForColorSpine(hum::HumdrumFile &infile);
     std::vector<int> analyzeMultiRest(hum::HumdrumFile &infile);

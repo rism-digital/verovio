@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Mar  3 20:37:23 PST 2018
+// Last Modified: Tue Mar  6 22:23:33 PST 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -10,7 +10,7 @@
 // Description:   Include file for humlib library.
 //
 /*
-Copyright (c) 2015, 2016, 2017 Craig Stuart Sapp
+Copyright (c) 2015, 2016, 2017, 2018 Craig Stuart Sapp
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -3723,6 +3723,28 @@ class Tool_autostem : public HumTool {
 		int    Borderline    = 0;       // really used with -u option
 		int    notlongQ      = 0;       // used with -L option
 		bool   m_quit        = false;
+
+};
+
+
+class Tool_binroll : public HumTool {
+	public:
+		         Tool_binroll      (void);
+		        ~Tool_binroll      () {};
+
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     processStrand     (vector<vector<char>>& roll, HTp starting,
+		                            HTp ending);
+		void     printAnalysis     (HumdrumFile& infile,
+		                            vector<vector<char>>& roll);
+
+	private:
+		HumNum    m_duration;
 
 };
 

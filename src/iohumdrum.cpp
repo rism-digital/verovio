@@ -4220,6 +4220,14 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         artics.push_back(ARTICULATION_harm);
         positions.push_back(articpos['o']);
     }
+    if (articloc['v']) {
+        artics.push_back(ARTICULATION_upbow);
+        positions.push_back(articpos['v']);
+    }
+    if (articloc['u']) {
+        artics.push_back(ARTICULATION_dnbow);
+        positions.push_back(articpos['u']);
+    }
 
     if (artics.empty()) {
         return;
@@ -4443,6 +4451,34 @@ void HumdrumInput::colorNote(Note *note, const std::string &token, int line, int
             break;
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::colorVerse --
+//
+
+void HumdrumInput::colorVerse(Verse *verse, std::string &token)
+{
+    hum::HumRegex hre;
+    for (int i = 0; i < (int)m_signifiers.textmark.size(); ++i) {
+        if (token.find(m_signifiers.textmark[i]) != std::string::npos) {
+            verse->SetColor(m_signifiers.textcolor[i]);
+            // appendTypeTag(verse, "marked");
+            // remove mark character from text (so that it does not display):
+            std::string mystring;
+            mystring += m_signifiers.textmark[i];
+            hre.replaceDestructive(token, "", mystring, "g");
+            return;
+        }
+    }
+    if (m_signifiers.mark.empty()) {
+        return;
+    }
+
+    // force the verse text black so that it is not
+    // highlighted when notes are highlighted.
+    verse->SetColor("black");
 }
 
 //////////////////////////////
@@ -7867,9 +7903,11 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
         vvdataQ = false;
         if (line.token(i)->isDataType("**text")) {
             lyricQ = true;
-        } else if (line.token(i)->isDataType("**silbe")) {
-			lyricQ = true;
-		} else if (line.token(i)->getDataType().compare(0, 7, "**vdata") == 0) {
+        }
+        else if (line.token(i)->isDataType("**silbe")) {
+            lyricQ = true;
+        }
+        else if (line.token(i)->getDataType().compare(0, 7, "**vdata") == 0) {
             vdataQ = true;
             lyricQ = true;
         }
@@ -7887,23 +7925,24 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             continue;
         }
         if (line.token(i)->isDataType("**silbe")) {
-			if (line.token(i)->getText() == "|") {
-				versenum++;
-				continue;
-			}
-		}
+            if (line.token(i)->getText() == "|") {
+                versenum++;
+                continue;
+            }
+        }
 
         vtexts.clear();
         if (line.token(i)->isDataType("**silbe")) {
-			string value = line.token(i)->getText();
-			hre.replaceDestructive(value, "", "\\|", "g");
-			hre.replaceDestructive(value, "&uuml;", "u2", "g");
-			hre.replaceDestructive(value, "&auml;", "a2", "g");
-			hre.replaceDestructive(value, "&ouml;", "o2", "g");
-        	vtexts.push_back(value);
-		} else {
-        	vtexts.push_back(*line.token(i));
-		}
+            string value = line.token(i)->getText();
+            hre.replaceDestructive(value, "", "\\|", "g");
+            hre.replaceDestructive(value, "&uuml;", "u2", "g");
+            hre.replaceDestructive(value, "&auml;", "a2", "g");
+            hre.replaceDestructive(value, "&ouml;", "o2", "g");
+            vtexts.push_back(value);
+        }
+        else {
+            vtexts.push_back(*line.token(i));
+        }
         if (vvdataQ) {
             splitSyllableBySpaces(vtexts);
         }
@@ -7953,6 +7992,8 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
                 addTextElement(syl, content);
                 continue;
             }
+
+            colorVerse(verse, content);
 
             bool dashbegin = false;
             bool dashend = false;
@@ -9962,12 +10003,10 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
     std::vector<hum::HumdrumLine *> refs = infile.getReferenceRecords();
     for (int i = 0; i < (int)refs.size(); ++i) {
         std::string key = refs[i]->getReferenceKey();
-        if (key != "RDF**kern") {
-            continue;
-        }
         std::string value = refs[i]->getReferenceValue();
         auto equals = value.substr(0, 8).find('=');
-        if (equals == string::npos) {
+
+        if ((equals == string::npos) && (key == "RDF**kern")) {
             // meta signifiers (no actual signifier)
 
             // colored spaces (meta signifiers)
@@ -10022,6 +10061,21 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             continue;
         }
         // check for known signifier meanings:
+
+        if (((key == "RDF**silbe") || (key == "RDF**text")) && hre.search(value, "marked text|matched text")) {
+            // for **text and **silbe
+            m_signifiers.textmark.push_back(signifier);
+            if (hre.search(value, "color\\s*=\\s*\"?([^\"\\s]+)\"?")) {
+                m_signifiers.textcolor.push_back(hre.getMatch(1));
+            }
+            else {
+                m_signifiers.textcolor.push_back("red");
+            }
+        }
+
+        if (key != "RDF**kern") {
+            continue;
+        }
 
         // stemless note:
         // !!!RDF**kern: i = no stem
