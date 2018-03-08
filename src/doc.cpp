@@ -19,6 +19,7 @@
 #include "chord.h"
 #include "functorparams.h"
 #include "glyph.h"
+#include "instrdef.h"
 #include "keysig.h"
 #include "label.h"
 #include "layer.h"
@@ -301,6 +302,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
     // Process notes and chords, rests, spaces layer by layer
     // track 0 (included by default) is reserved for meta messages common to all tracks
+    int midiChannel = 0;
     int midiTrack = 1;
     std::vector<AttComparison *> filters;
     for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
@@ -312,6 +314,16 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
             midiTrack = staffDef->GetN();
             midiFile->addTrack();
+            InstrDef *instrdef = dynamic_cast<InstrDef *>(staffDef->FindChildByType(INSTRDEF, 1));
+            if (!instrdef) {
+                StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDef->GetFirstParent(STAFFGRP));
+                assert(staffGrp);
+                instrdef = dynamic_cast<InstrDef *>(staffGrp->FindChildByType(INSTRDEF, 1));
+            }
+            if (instrdef) {
+                if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel() - 1;
+                if (instrdef->HasMidiInstrnum()) midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum() - 1);
+            }
             Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
             if (!label) {
                 StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDef->GetFirstParent(STAFFGRP));
@@ -333,6 +345,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             filters.push_back(&matchLayer);
 
             GenerateMIDIParams generateMIDIParams(midiFile);
+            generateMIDIParams.m_midiChannel = midiChannel;
             generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
             generateMIDIParams.m_currentTempo = tempo;

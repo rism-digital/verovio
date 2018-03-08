@@ -58,6 +58,7 @@
 #include "harm.h"
 #include "iomei.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "layer.h"
 #include "lb.h"
 #include "mdiv.h"

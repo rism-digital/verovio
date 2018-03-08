@@ -2136,6 +2136,9 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     // Cannot draw a pedal that has no start position
     if (!pedal->GetStart()) return;
 
+    // just as without a dir attribute
+    if (!pedal->HasDir()) return;
+    
     dc->StartGraphic(pedal, "", pedal->GetUuid());
 
     int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
@@ -2154,8 +2157,12 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
         dc->GetSmuflTextExtent(str, &bounceOffset);
         x -= bounceOffset.m_width;
     }
-    if (pedal->GetDir() != pedalLog_DIR_up) code = SMUFL_E650_keyboardPedalPed;
+    if (pedal->GetDir() != pedalLog_DIR_up) {
+        if (pedal->GetFunc() == "sostenuto") code = SMUFL_E659_keyboardPedalSost;
+        else code = SMUFL_E650_keyboardPedalPed;
+    }
     str.push_back(code);
+    
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);

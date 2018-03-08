@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        label.cpp
-// Author:      Laurent Pugin
-// Created:     19/06/2017
+// Name:        instrdef.cpp
+// Author:      Klaus Rettinghaus
+// Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "label.h"
+#include "instrdef.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,41 +13,34 @@
 
 //----------------------------------------------------------------------------
 
-#include "editorial.h"
-#include "text.h"
+#include "scoredef.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Label
+// InstrDef
 //----------------------------------------------------------------------------
 
-Label::Label() : Object("label-"), TextListInterface()
+InstrDef::InstrDef() : Object("instrdef-"), AttChannelized(), AttLabelled(), AttMidiInstrument(), AttNNumberLike()
 {
+    RegisterAttClass(ATT_CHANNELIZED);
+    RegisterAttClass(ATT_LABELLED);
+    RegisterAttClass(ATT_MIDIINSTRUMENT);
+    RegisterAttClass(ATT_NNUMBERLIKE);
+
     Reset();
 }
 
-Label::~Label() {}
+InstrDef::~InstrDef() {}
 
-void Label::Reset()
+void InstrDef::Reset()
 {
     Object::Reset();
-}
-
-void Label::AddChild(Object *child)
-{
-    if (child->Is({ REND, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
-    }
-    else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
-    }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    ResetChannelized();
+    ResetLabelled();
+    ResetMidiInstrument();
+    ResetNNumberLike();
 }
 
 //----------------------------------------------------------------------------

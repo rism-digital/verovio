@@ -106,7 +106,7 @@ int Hairpin::CalcHeight(
     /************** cap the angle of hairpins **************/
 
     // Given height and width, calculate hairpin angle
-    float theta = 2.0 * atan((endY / 2.0) / length);
+    double theta = 2.0 * atan((endY / 2.0) / length);
     // Convert to Radians
     theta *= (360.0 / (2.0 * M_PI));
     // If the angle is too big, restrict endY

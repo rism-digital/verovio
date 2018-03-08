@@ -26,6 +26,7 @@
 #include "functorparams.h"
 #include "keysig.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "layer.h"
 #include "measure.h"
 #include "mensur.h"
