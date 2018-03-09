@@ -16,6 +16,14 @@
 		409B3DD91F2D1C2A0098A265 /* ftrem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 409B3DD81F2D1C2A0098A265 /* ftrem.cpp */; };
 		409B3DDB1F2D1C550098A265 /* btrem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 409B3DDA1F2D1C550098A265 /* btrem.cpp */; };
 		40ABF1FF1E5DF23B00F32F41 /* expansion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */; };
+		40C2E41E2052A6E00003625F /* sb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40C2E41A2052A6DF0003625F /* sb.cpp */; };
+		40C2E41F2052A6E00003625F /* pb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40C2E41B2052A6E00003625F /* pb.cpp */; };
+		40C2E4202052A6E90003625F /* sb.h in Headers */ = {isa = PBXBuildFile; fileRef = 40C2E41C2052A6E00003625F /* sb.h */; };
+		40C2E4212052A6EC0003625F /* pb.h in Headers */ = {isa = PBXBuildFile; fileRef = 40C2E41D2052A6E00003625F /* pb.h */; };
+		40C2E4222052A6F60003625F /* pb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40C2E41B2052A6E00003625F /* pb.cpp */; };
+		40C2E4232052A6F70003625F /* pb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40C2E41B2052A6E00003625F /* pb.cpp */; };
+		40C2E4242052A6FA0003625F /* sb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40C2E41A2052A6DF0003625F /* sb.cpp */; };
+		40C2E4252052A6FA0003625F /* sb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40C2E41A2052A6DF0003625F /* sb.cpp */; };
 		40D0D5E21E3BD7FE00E6BF5C /* turn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40D0D5E01E3BD7FE00E6BF5C /* turn.cpp */; };
 		40D45EC1204EEAE1009C1EC9 /* instrdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40D45EBF204EEAE0009C1EC9 /* instrdef.cpp */; };
 		40D45EC2204EEAFB009C1EC9 /* instrdef.h in Headers */ = {isa = PBXBuildFile; fileRef = 40D45EC0204EEAE0009C1EC9 /* instrdef.h */; };
@@ -607,6 +615,10 @@
 		409B3DDA1F2D1C550098A265 /* btrem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = btrem.cpp; path = src/btrem.cpp; sourceTree = "<group>"; };
 		40ABF1FD1E5DF23B00F32F41 /* expansion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = expansion.h; path = include/vrv/expansion.h; sourceTree = "<group>"; };
 		40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = expansion.cpp; path = src/expansion.cpp; sourceTree = "<group>"; };
+		40C2E41A2052A6DF0003625F /* sb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sb.cpp; path = src/sb.cpp; sourceTree = "<group>"; };
+		40C2E41B2052A6E00003625F /* pb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pb.cpp; path = src/pb.cpp; sourceTree = "<group>"; };
+		40C2E41C2052A6E00003625F /* sb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sb.h; path = include/vrv/sb.h; sourceTree = "<group>"; };
+		40C2E41D2052A6E00003625F /* pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pb.h; path = include/vrv/pb.h; sourceTree = "<group>"; };
 		40CA064C1E351125009CFDD7 /* humlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = humlib.h; path = include/hum/humlib.h; sourceTree = "<group>"; };
 		40CA06581E351161009CFDD7 /* humlib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = humlib.cpp; path = src/hum/humlib.cpp; sourceTree = "<group>"; };
 		40D0D5E01E3BD7FE00E6BF5C /* turn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = turn.cpp; path = src/turn.cpp; sourceTree = "<group>"; };
@@ -1293,6 +1305,10 @@
 				8F59292518854BF800FE51AD /* page.h */,
 				4D6413772035F58200BB630E /* pages.cpp */,
 				4D6413752035F57800BB630E /* pages.h */,
+				40C2E41B2052A6E00003625F /* pb.cpp */,
+				40C2E41D2052A6E00003625F /* pb.h */,
+				40C2E41A2052A6DF0003625F /* sb.cpp */,
+				40C2E41C2052A6E00003625F /* sb.h */,
 				4D95D4FB1D74551100B2B856 /* score.cpp */,
 				4D95D4FA1D74549700B2B856 /* score.h */,
 				8F086ED2188539540037FD8E /* scoredef.cpp */,
@@ -1425,6 +1441,7 @@
 				4DF9D2991C1B3F0A0069E8C8 /* attclasses.h in Headers */,
 				8F59293D18854BF800FE51AD /* toolkit.h in Headers */,
 				4D1D733C1A1D0390001E08F6 /* smufl.h in Headers */,
+				40C2E4212052A6EC0003625F /* pb.h in Headers */,
 				4DB726C81B8BB0F30040231B /* text.h in Headers */,
 				4D308101203DB69D00BC44F6 /* ref.h in Headers */,
 				8F59293E18854BF800FE51AD /* io.h in Headers */,
@@ -1438,6 +1455,7 @@
 				4DB3D8D41F83D12600B5FC2B /* pedal.h in Headers */,
 				4DB3D8BA1F83D0CA00B5FC2B /* boundary.h in Headers */,
 				4DCA95DB1A515D33008AD7E9 /* editorial.h in Headers */,
+				40C2E4202052A6E90003625F /* sb.h in Headers */,
 				4DB3D8B61F83D09700B5FC2B /* iohumdrum.h in Headers */,
 				4DB3D8DB1F83D13F00B5FC2B /* turn.h in Headers */,
 				8F59294118854BF800FE51AD /* iomusxml.h in Headers */,
@@ -1724,6 +1742,7 @@
 				4D1694221E3A44F300569BF4 /* page.cpp in Sources */,
 				4DC12A791F7400B9000440E9 /* runningelement.cpp in Sources */,
 				4D1694231E3A44F300569BF4 /* pitchinterface.cpp in Sources */,
+				40C2E4222052A6F60003625F /* pb.cpp in Sources */,
 				4D1694241E3A44F300569BF4 /* positioninterface.cpp in Sources */,
 				4D1694251E3A44F300569BF4 /* timestamp.cpp in Sources */,
 				4D1694261E3A44F300569BF4 /* MidiEventList.cpp in Sources */,
@@ -1769,6 +1788,7 @@
 				4D1694421E3A44F300569BF4 /* chord.cpp in Sources */,
 				4D1694431E3A44F300569BF4 /* view.cpp in Sources */,
 				8F7DD0561EAF3682001B072A /* fb.cpp in Sources */,
+				40C2E4242052A6FA0003625F /* sb.cpp in Sources */,
 				4D1694441E3A44F300569BF4 /* vrv.cpp in Sources */,
 				4D1694451E3A44F300569BF4 /* mrest.cpp in Sources */,
 				4D1694461E3A44F300569BF4 /* textdirinterface.cpp in Sources */,
@@ -1825,6 +1845,7 @@
 				8F086EEA188539540037FD8E /* durationinterface.cpp in Sources */,
 				8F086EEB188539540037FD8E /* toolkit.cpp in Sources */,
 				40D0D5E21E3BD7FE00E6BF5C /* turn.cpp in Sources */,
+				40C2E41E2052A6E00003625F /* sb.cpp in Sources */,
 				4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
 				8F086EEC188539540037FD8E /* io.cpp in Sources */,
 				4D796B5E1D78641900A15238 /* harm.cpp in Sources */,
@@ -1858,6 +1879,7 @@
 				4DDBBCC51C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				4D6122BE1F77E1E000FC90A0 /* rend.cpp in Sources */,
 				8F086EF7188539540037FD8E /* multirest.cpp in Sources */,
+				40C2E41F2052A6E00003625F /* pb.cpp in Sources */,
 				4DF440771D39575500152B7E /* ending.cpp in Sources */,
 				4DB351141C8040B1002DD057 /* dir.cpp in Sources */,
 				4D308104203DB6B500BC44F6 /* ref.cpp in Sources */,
@@ -1971,6 +1993,7 @@
 				8F3DD36018854B390051330C /* view_beam.cpp in Sources */,
 				8F3DD36218854B390051330C /* view_element.cpp in Sources */,
 				4DB3D8E11F83D15900B5FC2B /* chord.cpp in Sources */,
+				40C2E4252052A6FA0003625F /* sb.cpp in Sources */,
 				4D4FCD0E1F5455FF0009C455 /* staffgrp.cpp in Sources */,
 				8F3DD36318854B390051330C /* view_graph.cpp in Sources */,
 				4D1D73411A1D08DC001E08F6 /* glyph.cpp in Sources */,
@@ -2018,6 +2041,7 @@
 				4DB3D8ED1F83D18C00B5FC2B /* space.cpp in Sources */,
 				8F3DD35218854B2E0051330C /* rest.cpp in Sources */,
 				8F3DD35418854B2E0051330C /* slur.cpp in Sources */,
+				40C2E4232052A6F70003625F /* pb.cpp in Sources */,
 				4D64137A2035F58200BB630E /* pages.cpp in Sources */,
 				4D1694741E3A455200569BF4 /* humlib.cpp in Sources */,
 				4DB3D8C31F83D0EF00B5FC2B /* anchoredtext.cpp in Sources */,
