@@ -16,6 +16,7 @@
 #include "editorial.h"
 #include "instrdef.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "staffdef.h"
 #include "vrv.h"
 

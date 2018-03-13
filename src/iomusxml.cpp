@@ -29,6 +29,7 @@
 #include "harm.h"
 #include "instrdef.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "layer.h"
 #include "mdiv.h"
 #include "measure.h"

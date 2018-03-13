@@ -41,6 +41,7 @@
 #include "instrdef.h"
 #include "keysig.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "layer.h"
 #include "lb.h"
 #include "ligature.h"
