@@ -414,7 +414,7 @@ int LayerElement::GetDrawingRadius(Doc *doc)
 {
     assert(doc);
 
-    if (!this->Is({ NOTE, CHORD })) return 0;
+    if (!this->Is({ CHORD, NOTE, REST })) return 0;
 
     int dur = DUR_4;
     if (this->Is(NOTE)) {
@@ -422,7 +422,7 @@ int LayerElement::GetDrawingRadius(Doc *doc)
         assert(note);
         dur = note->GetDrawingDur();
     }
-    else {
+    else if (this->Is(CHORD)) {
         Chord *chord = dynamic_cast<Chord *>(this);
         assert(chord);
         dur = chord->GetActualDur();
