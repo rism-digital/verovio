@@ -25,8 +25,7 @@ class ScoreDefInterface;
 class Syllable : public LayerElement,
                  public ObjectListInterface,
                public AttColor,
-               public AttRelativesize,
-               public AttSlashcount {
+               public AttSlashCount {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

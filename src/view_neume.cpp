@@ -27,7 +27,6 @@
 #include "rpt.h"
 #include "smufl.h"
 #include "staff.h"
-#include "style.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -56,7 +55,7 @@ void View::DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     /******************************************************************/
     // Draw the children
-    ListOfObjects *syllableChildren = syllable->GetList(syllable);
+    const ListOfObjects *syllableChildren = syllable->GetList(syllable);
 
     DrawLayerChildren(dc, syllable, layer, staff, measure);
 

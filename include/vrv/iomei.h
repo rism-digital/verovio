@@ -78,7 +78,7 @@ class MultiRest;
 class MultiRpt;
 class Nc;
 class Neume;
-class Note
+class Note;
 class Num;
 class Octave;
 class Orig;
@@ -251,7 +251,7 @@ private:
     void WriteProport(pugi::xml_node currentNode, Proport *proport);
     void WriteRest(pugi::xml_node currentNode, Rest *rest);
     void WriteSpace(pugi::xml_node currentNode, Space *space);
-    void WriteSyllable(pugi::xml_mode currentNode, Syllable *syllable);
+    void WriteSyllable(pugi::xml_node currentNode, Syllable *syllable);
     void WriteTuplet(pugi::xml_node currentNode, Tuplet *tuplet);
     ///@}
 

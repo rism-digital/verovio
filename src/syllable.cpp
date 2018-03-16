@@ -28,8 +28,7 @@ Syllable::Syllable()
     : LayerElement("syllable-")
     , ObjectListInterface()
     , AttColor()
-    , AttRelativesize()
-    , AttSlashcount()
+    , AttSlashCount()
 {
     Init();
 }
@@ -37,7 +36,6 @@ Syllable::Syllable()
 void Syllable::Init()
 {
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_SLASHCOUNT);
 
     Reset();
@@ -70,8 +68,7 @@ void Syllable::Reset()
 {
     LayerElement::Reset();
     ResetColor();
-    ResetRelativesize();
-    ResetSlashcount();
+    ResetSlashCount();
 }
 
 } // namespace vrv

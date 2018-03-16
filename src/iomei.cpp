@@ -492,7 +492,7 @@ bool MeiOutput::WriteObject(Object *object)
     }
     else if (object->Is(SYLLABLE)) {
         m_currentNode = m_currentNode.append_child("syllable");
-        WriteMeiSyllable(m_currentNode, dynamic_cast<Syllable *>(object));
+        WriteSyllable(m_currentNode, dynamic_cast<Syllable *>(object));
     }
     else if (object->Is(TUPLET)) {
         m_currentNode = m_currentNode.append_child("tuplet");
@@ -1403,9 +1403,6 @@ void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
     assert(neume);
 
     WriteLayerElement(currentNode, neume);
-    WriteDurationInterface(currentNode, neume);
-    WritePitchInterface(currentNode, neume);
-    WritePositionInterface(currentNode, neume);
     neume->WriteColor(currentNode);;
 }
 
@@ -1494,8 +1491,7 @@ void MeiOutput::WriteSyllable(pugi::xml_node currentNode, Syllable *syllable)
 
     WriteLayerElement(currentNode, syllable);
     syllable->WriteColor(currentNode);
-    syllable->WriteRelativesize(currentNode);
-    syllable->WriteSlashcount(currentNode);
+    syllable->WriteSlashCount(currentNode);
 }
 
 void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textElement)
@@ -2386,18 +2382,19 @@ bool MeiInput::ReadPages(Object *parent, pugi::xml_node pages)
         LogWarning("No <scoreDef> provided, trying to proceed... ");
     }
     else {
-        DocType type;
-        if (mdiv.first_child().attribute("type")) {
-            type = StrToDocType(mdiv.first_child().attribute("type").value());
-            m_doc->SetType(type);
-        }
+        // This actually sets the Doc::m_scoreDef
+        success = ReadScoreDef(vrvPages, scoreDef);
+    }
 
-        m_readingScoreBased = true;
-        Score *score = m_doc->CreateScoreBuffer();
-        pugi::xml_node current;
-        for (current = mdiv.first_child(); current; current = current.next_sibling()) {
-            if (!success) break;
-            success = ReadScoreBasedMei(current, score);
+    if (!success) return false;
+
+    // No need to have ReadPagesChildren for this...
+    pugi::xml_node current;
+    for (current = pages.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+        // page
+        if (std::string(current.name()) == "page") {
+            success = ReadPage(vrvPages, current);
         }
         else if (std::string(current.name()) == "scoreDef") {
             // Skipping scoreDefs, only the first one is possible
@@ -3545,14 +3542,8 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "neume") {
             success = ReadNeume(parent, xmlElement);
         }
-        else if (elementName == "nc") {
-            success = ReadMeiNc(parent, xmlElement);
-        }
-        else if (elementName == "neume") {
-            success = ReadMeiNeume(parent, xmlElement);
-        }
         else if (elementName == "note") {
-            success = ReadMeiNote(parent, xmlElement);
+            success = ReadNote(parent, xmlElement);
         }
         else if (elementName == "rest") {
             success = ReadRest(parent, xmlElement);
@@ -3583,9 +3574,6 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         else if (elementName == "syllable") {
             success = ReadSyllable(parent, xmlElement);
-        }
-        else if (elementName == "syllable") {
-            success = ReadMeiSyllable(parent, xmlElement);
         }
         else if (elementName == "tuplet") {
             success = ReadTuplet(parent, xmlElement);
@@ -3797,20 +3785,6 @@ bool MeiInput::ReadLigature(Object *parent, pugi::xml_node ligature)
 
     parent->AddChild(vrvLigature);
     return ReadLayerChildren(vrvLigature, ligature, vrvLigature);
-}
-
-bool MeiInput::ReadNeume(Object *parent, pugi::xml_node neume)
-{
-    Neume *vrvNeume = new Neume();
-    ReadLayerElement(neume, vrvNeume);
-
-    ReadDurationInterface(neume, vrvNeume);
-    ReadPitchInterface(neume, vrvNeume);
-    ReadPositionInterface(neume, vrvNeume);
-    vrvNeume->ReadColor(neume);
-
-    parent->AddChild(vrvNeume);
-    return ReadLayerChildren(vrvNeume, neume, vrvNeume);
 }
 
 bool MeiInput::ReadMensur(Object *parent, pugi::xml_node mensur)
@@ -4029,8 +4003,7 @@ bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
     ReadLayerElement(syllable, vrvSyllable);
 
     vrvSyllable->ReadColor(syllable);
-    vrvSyllable->ReadRelativesize(syllable);
-    vrvSyllable->ReadSlashcount(syllable);
+    vrvSyllable->ReadSlashCount(syllable);
 
     parent->AddChild(vrvSyllable);
 
