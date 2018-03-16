@@ -77,7 +77,7 @@ void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<d
     auto end = Artic::s_outStaffArtic.end();
     std::vector<data_ARTICULATION> articList = this->GetArtic();
 
-    for (iter = articList.begin(); iter != articList.end(); iter++) {
+    for (iter = articList.begin(); iter != articList.end(); ++iter) {
         // return false if one cannot be rendered on the staff
         auto i = std::find(Artic::s_outStaffArtic.begin(), end, *iter);
         if (i != end)
@@ -226,7 +226,7 @@ bool ArticPart::AlwaysAbove()
     auto end = Artic::s_aboveStaffArtic.end();
     std::vector<data_ARTICULATION> articList = this->GetArtic();
 
-    for (iter = articList.begin(); iter != articList.end(); iter++) {
+    for (iter = articList.begin(); iter != articList.end(); ++iter) {
         // return false if one has always to be rendered above the staff
         auto i = std::find(Artic::s_aboveStaffArtic.begin(), end, *iter);
         if (i != end) {
@@ -462,7 +462,7 @@ int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
     if (m_startSlurPositioners.empty() && m_endSlurPositioners.empty()) return FUNCTOR_CONTINUE;
 
     std::vector<FloatingPositioner *>::iterator iter;
-    for (iter = m_endSlurPositioners.begin(); iter != m_endSlurPositioners.end(); iter++) {
+    for (iter = m_endSlurPositioners.begin(); iter != m_endSlurPositioners.end(); ++iter) {
         // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
         int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
         if (shift != 0) {
@@ -471,7 +471,7 @@ int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
         }
     }
 
-    for (iter = m_startSlurPositioners.begin(); iter != m_startSlurPositioners.end(); iter++) {
+    for (iter = m_startSlurPositioners.begin(); iter != m_startSlurPositioners.end(); ++iter) {
         // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
         int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
         if (shift != 0) {

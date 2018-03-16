@@ -261,9 +261,8 @@ int LayerElement::GetDrawingY() const
 {
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
-    Object *object = NULL;
-    // Otherwise look if we have a crossStaff situation
-    if (!object) object = this->m_crossStaff; // GetCrossStaff();
+    // Look if we have a crossStaff situation
+    Object *object = this->m_crossStaff; // GetCrossStaff();
     // First get the first layerElement parent (if any) but only if the element is not directly relative to staff (e.g.,
     // artic, syl)
     if (!object && !this->IsRelativeToStaff()) object = this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max);
@@ -415,7 +414,7 @@ int LayerElement::GetDrawingRadius(Doc *doc)
 {
     assert(doc);
 
-    if (!this->Is({ NOTE, CHORD })) return 0;
+    if (!this->Is({ CHORD, NOTE, REST })) return 0;
 
     int dur = DUR_4;
     if (this->Is(NOTE)) {
@@ -423,7 +422,7 @@ int LayerElement::GetDrawingRadius(Doc *doc)
         assert(note);
         dur = note->GetDrawingDur();
     }
-    else {
+    else if (this->Is(CHORD)) {
         Chord *chord = dynamic_cast<Chord *>(this);
         assert(chord);
         dur = chord->GetActualDur();
@@ -876,7 +875,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
         assert(staff);
 
         std::vector<LayerElement *>::iterator iter;
-        for (iter = params->m_previous.begin(); iter != params->m_previous.end(); iter++) {
+        for (iter = params->m_previous.begin(); iter != params->m_previous.end(); ++iter) {
 
             int verticalMargin = 0; // 1 * params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             int horizontalMargin = 2 * params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
@@ -1174,7 +1173,7 @@ int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
             iter = params->m_timePointingInterfaces.erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 
@@ -1196,7 +1195,7 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 

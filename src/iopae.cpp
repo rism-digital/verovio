@@ -413,7 +413,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     int measure_count = 1;
 
     std::vector<pae::Measure>::iterator it;
-    for (it = staff.begin(); it < staff.end(); it++) {
+    for (it = staff.begin(); it < staff.end(); ++it) {
 
         m_staff = new Staff(1);
         m_measure = new Measure(true, measure_count);
@@ -1066,7 +1066,7 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
         int abbreviation_stop = (int)measure->notes.size();
         while ((i + 1 < length) && (incipit[i + 1] == 'f')) {
             i++;
-            for (j = measure->abbreviation_offset; j < abbreviation_stop; j++) {
+            for (j = measure->abbreviation_offset; j < abbreviation_stop; ++j) {
                 measure->notes.push_back(measure->notes[j]);
             }
         }
@@ -1242,7 +1242,7 @@ void PaeInput::convertMeasure(pae::Measure *measure)
 
     m_nested_objects.clear();
 
-    for (unsigned int i = 0; i < measure->notes.size(); i++) {
+    for (unsigned int i = 0; i < measure->notes.size(); ++i) {
         pae::Note *note = &measure->notes[i];
         parseNote(note);
     }

@@ -27,7 +27,9 @@
 #include "ftrem.h"
 #include "hairpin.h"
 #include "harm.h"
+#include "instrdef.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "layer.h"
 #include "mdiv.h"
 #include "measure.h"
@@ -386,7 +388,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
     std::string tempoText = "M.M.";
     if (metronome.select_single_node("per-minute").node()) {
         std::string mm = GetContent(metronome.select_single_node("per-minute").node());
-        if (atoi(mm.c_str())) tempo->SetMm(mm.c_str());
+        if (atoi(mm.c_str())) tempo->SetMm(atoi(mm.c_str()));
         tempoText = tempoText + StringFormat(" = %s", mm.c_str());
     }
     if (metronome.select_single_node("beat-unit").node()) {
@@ -472,6 +474,12 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             // part-name should be revised, as soon MEI can suppress labels
             std::string partName = GetContentOfChild(xpathNode.node(), "part-name[not(@print-object='no')]");
             std::string partAbbr = GetContentOfChild(xpathNode.node(), "part-abbreviation[not(@print-object='no')]");
+            pugi::xpath_node midiInstrument = xpathNode.node().select_single_node("midi-instrument");
+            pugi::xpath_node midiChannel = midiInstrument.node().select_single_node("midi-channel");
+            pugi::xpath_node midiName = midiInstrument.node().select_single_node("midi-name");
+            pugi::xpath_node midiPan = midiInstrument.node().select_single_node("pan");
+            pugi::xpath_node midiProgram = midiInstrument.node().select_single_node("midi-program");
+            pugi::xpath_node midiVolume = midiInstrument.node().select_single_node("volume");
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
             int nbStaves = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
@@ -490,6 +498,15 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     text->SetText(UTF8to16(partAbbr));
                     labelAbbr->AddChild(text);
                     partStaffGrp->AddChild(labelAbbr);
+                }
+                if (midiInstrument) {
+                    InstrDef *instrdef = new InstrDef;
+                    instrdef->SetMidiInstrname(instrdef->AttMidiInstrument::StrToMidinames(midiName.node().text().as_string()));
+                    if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int());
+                    if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
+                    if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int());
+                    if (midiVolume) instrdef->SetMidiVolume(midiVolume.node().text().as_int());
+                    partStaffGrp->AddChild(instrdef);
                 }
                 partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
                 partStaffGrp->SetBarthru(BOOLEAN_true);
@@ -511,6 +528,14 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                         text->SetText(UTF8to16(partAbbr));
                         labelAbbr->AddChild(text);
                         staffDef->AddChild(labelAbbr);
+                    }
+                    if (midiInstrument) {
+                        InstrDef *instrdef = new InstrDef;
+                        if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int());
+                        if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int());
+                        if (midiVolume) instrdef->SetMidiVolume(midiVolume.node().text().as_int());
+                        if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
+                        staffDef->AddChild(instrdef);
                     }
                 }
                 m_staffGrpStack.back()->MoveChildrenFrom(partStaffGrp);
@@ -1208,9 +1233,9 @@ void MusicXmlInput::ReadMusicXmlFigures(pugi::xml_node node, Measure *measure, s
         Harm *harm = new Harm();
         Fb *fb = new Fb();
 
-        //std::string textColor = node.attribute("color").as_string();
-        //std::string textStyle = node.attribute("font-style").as_string();
-        //std::string textWeight = node.attribute("font-weight").as_string();
+        // std::string textColor = node.attribute("color").as_string();
+        // std::string textStyle = node.attribute("font-style").as_string();
+        // std::string textWeight = node.attribute("font-weight").as_string();
         for (pugi::xml_node figure = node.child("figure"); figure; figure = figure.next_sibling("figure")) {
             std::string textStr = GetContent(figure.select_single_node("figure-number").node());
             F *f = new F();
@@ -1327,9 +1352,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
     // beam start
     bool beamStart = node.select_single_node("beam[@number='1'][text()='begin']");
     if (beamStart) {
-      Beam *beam = new Beam();
-      AddLayerElement(layer, beam);
-      m_elementStack.push_back(beam);
+        Beam *beam = new Beam();
+        AddLayerElement(layer, beam);
+        m_elementStack.push_back(beam);
     }
 
     // tremolos
@@ -1481,7 +1506,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
                 chord->SetStemDir(stemDir);
                 // FIXME MEI 4.0.0
                 // if (cue) chord->SetSize(SIZE_cue);
-                if (tremSlashNum != 0) chord->SetStemMod(chord->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
+                if (tremSlashNum != 0)
+                    chord->SetStemMod(chord->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
                 AddLayerElement(layer, chord);
                 m_elementStack.push_back(chord);
                 element = chord;
@@ -1511,7 +1537,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             note->SetStemDir(stemDir);
             // FIXME MEI 4.0.0
             // if (cue) note->SetSize(SIZE_cue);
-            if (tremSlashNum != 0) note->SetStemMod(note->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
+            if (tremSlashNum != 0)
+                note->SetStemMod(note->AttStems::StrToStemmodifier(std::to_string(tremSlashNum) + "slash"));
         }
 
         // verse / syl
@@ -1575,7 +1602,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             // placement and orientation
             tie->SetCurvedir(ConvertOrientationToCurvedir(startTie.node().attribute("orientation").as_string()));
             tie->SetCurvedir(
-                    tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
+                tie->AttCurvature::StrToCurvatureCurvedir(startTie.node().attribute("placement").as_string()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, tie));
             OpenTie(staff, layer, note, tie);
@@ -1691,7 +1718,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // long
         mordent->SetLong(ConvertWordToBool(xmlMordentInv.node().attribute("long").as_string()));
         // place
-        mordent->SetPlace(mordent->AttPlacement::StrToStaffrel(xmlMordentInv.node().attribute("placement").as_string()));
+        mordent->SetPlace(
+            mordent->AttPlacement::StrToStaffrel(xmlMordentInv.node().attribute("placement").as_string()));
     }
 
     // trill
@@ -1751,7 +1779,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             // placement and orientation
             meiSlur->SetCurvedir(ConvertOrientationToCurvedir(slur.attribute("orientation").as_string()));
             meiSlur->SetCurvedir(
-                    meiSlur->AttCurvature::StrToCurvatureCurvedir(slur.attribute("placement").as_string()));
+                meiSlur->AttCurvature::StrToCurvatureCurvedir(slur.attribute("placement").as_string()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
             OpenSlur(staff, layer, slurNumber, meiSlur);

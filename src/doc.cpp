@@ -19,6 +19,7 @@
 #include "chord.h"
 #include "functorparams.h"
 #include "glyph.h"
+#include "instrdef.h"
 #include "keysig.h"
 #include "label.h"
 #include "layer.h"
@@ -142,7 +143,7 @@ bool Doc::GenerateDocumentScoreDef()
     m_scoreDef.Reset();
     StaffGrp *staffGrp = new StaffGrp();
     ArrayOfObjects::iterator iter;
-    for (iter = staves.begin(); iter != staves.end(); iter++) {
+    for (iter = staves.begin(); iter != staves.end(); ++iter) {
         Staff *staff = dynamic_cast<Staff *>(*iter);
         assert(staff);
         StaffDef *staffDef = new StaffDef();
@@ -202,7 +203,7 @@ bool Doc::GenerateMeasureNumbers()
     this->FindAllChildByAttComparison(&measures, &matchType);
 
     // run through all measures and generate missing mNum from attribute
-    for (measureIter = measures.begin(); measureIter != measures.end(); measureIter++) {
+    for (measureIter = measures.begin(); measureIter != measures.end(); ++measureIter) {
         Measure *measure = dynamic_cast<Measure *>(*measureIter);
         if (measure->HasN() && !measure->FindChildByType(MNUM)) {
             MNum *mnum = new MNum;
@@ -301,6 +302,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
     // Process notes and chords, rests, spaces layer by layer
     // track 0 (included by default) is reserved for meta messages common to all tracks
+    int midiChannel = 0;
     int midiTrack = 1;
     std::vector<AttComparison *> filters;
     for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
@@ -312,6 +314,16 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
             midiTrack = staffDef->GetN();
             midiFile->addTrack();
+            InstrDef *instrdef = dynamic_cast<InstrDef *>(staffDef->FindChildByType(INSTRDEF, 1));
+            if (!instrdef) {
+                StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDef->GetFirstParent(STAFFGRP));
+                assert(staffGrp);
+                instrdef = dynamic_cast<InstrDef *>(staffGrp->FindChildByType(INSTRDEF, 1));
+            }
+            if (instrdef) {
+                if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel() - 1;
+                if (instrdef->HasMidiInstrnum()) midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum() - 1);
+            }
             Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
             if (!label) {
                 StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDef->GetFirstParent(STAFFGRP));
@@ -333,6 +345,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             filters.push_back(&matchLayer);
 
             GenerateMIDIParams generateMIDIParams(midiFile);
+            generateMIDIParams.m_midiChannel = midiChannel;
             generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
             generateMIDIParams.m_currentTempo = tempo;
@@ -378,7 +391,7 @@ void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTim
     output += "[\n";
     auto lastit = realTimeToScoreTime.end();
     lastit--;
-    for (auto it = realTimeToScoreTime.begin(); it != realTimeToScoreTime.end(); it++) {
+    for (auto it = realTimeToScoreTime.begin(); it != realTimeToScoreTime.end(); ++it) {
         output += "\t{\n";
         output += "\t\t\"tstamp\":\t";
         output += to_string(it->first);
@@ -399,7 +412,7 @@ void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTim
         auto iton = realTimeToOnElements.find(it->first);
         if (iton != realTimeToOnElements.end()) {
             output += ",\n\t\t\"on\":\t[";
-            for (int ion = 0; ion < (int)iton->second.size(); ion++) {
+            for (int ion = 0; ion < (int)iton->second.size(); ++ion) {
                 output += "\"";
                 output += iton->second[ion];
                 output += "\"";
@@ -413,7 +426,7 @@ void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTim
         auto itoff = realTimeToOffElements.find(it->first);
         if (itoff != realTimeToOffElements.end()) {
             output += ",\n\t\t\"off\":\t[";
-            for (int ioff = 0; ioff < (int)itoff->second.size(); ioff++) {
+            for (int ioff = 0; ioff < (int)itoff->second.size(); ++ioff) {
                 output += "\"";
                 output += itoff->second[ioff];
                 output += "\"";
@@ -1045,7 +1058,7 @@ void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
             if (!convertAnalyticalMarkupParams.m_currentNotes.empty()) {
                 std::vector<Note *>::iterator iter;
                 for (iter = convertAnalyticalMarkupParams.m_currentNotes.begin();
-                     iter != convertAnalyticalMarkupParams.m_currentNotes.end(); iter++) {
+                     iter != convertAnalyticalMarkupParams.m_currentNotes.end(); ++iter) {
                     LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetUuid().c_str());
                 }
             }

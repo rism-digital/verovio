@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        label.cpp
-// Author:      Laurent Pugin
-// Created:     19/06/2017
+// Name:        labelabbr.cpp
+// Author:      Klaus Rettinghaus
+// Created:     07/03/2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "label.h"
+#include "labelabbr.h"
 
 //----------------------------------------------------------------------------
 
@@ -20,22 +20,22 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Label
+// LabelAbbr
 //----------------------------------------------------------------------------
 
-Label::Label() : Object("label-"), TextListInterface()
+LabelAbbr::LabelAbbr() : Object("labelAbbr-"), TextListInterface()
 {
     Reset();
 }
 
-Label::~Label() {}
+LabelAbbr::~LabelAbbr() {}
 
-void Label::Reset()
+void LabelAbbr::Reset()
 {
     Object::Reset();
 }
 
-void Label::AddChild(Object *child)
+void LabelAbbr::AddChild(Object *child)
 {
     if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));

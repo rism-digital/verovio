@@ -75,7 +75,7 @@ StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) const
 {
     StaffAlignment *alignment = NULL;
     int i;
-    for (i = 0; i < this->GetChildCount(); i++) {
+    for (i = 0; i < this->GetChildCount(); ++i) {
         alignment = dynamic_cast<StaffAlignment *>(m_children.at(i));
         assert(alignment);
 
@@ -381,7 +381,7 @@ int StaffAlignment::AdjustStaffOverlap(FunctorParams *functorParams)
     ArrayOfBoundingBoxes::iterator iter;
     // go through all the elements of the top staff that have an overflow below
     for (iter = params->m_previous->m_overflowBelowBBoxes.begin();
-         iter != params->m_previous->m_overflowBelowBBoxes.end(); iter++) {
+         iter != params->m_previous->m_overflowBelowBBoxes.end(); ++iter) {
         auto i = m_overflowAboveBBoxes.begin();
         auto end = m_overflowAboveBBoxes.end();
         while (i != end) {

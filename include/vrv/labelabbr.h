@@ -1,25 +1,25 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        label.h
-// Author:      Laurent Pugin
-// Created:     19/06/2017
+// Name:        labelabbr.h
+// Author:      Klaus Rettinghaus
+// Created:     07/03/2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_LABEL_H__
-#define __VRV_LABEL_H__
+#ifndef __VRV_LABELABBR_H__
+#define __VRV_LABELABBR_H__
 
 #include "object.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Label
+// LabelAbbr
 //----------------------------------------------------------------------------
 
 /**
- * This class represent a <label> in MEI.
+ * This class represent a <labelAbbr> in MEI.
  */
-class Label : public Object, public TextListInterface {
+class LabelAbbr : public Object, public TextListInterface {
 
 public:
     /**
@@ -27,12 +27,12 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Label();
-    virtual ~Label();
-    virtual Object *Clone() const { return new Label(*this); }
+    LabelAbbr();
+    virtual ~LabelAbbr();
+    virtual Object *Clone() const { return new LabelAbbr(*this); }
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Label"; }
-    virtual ClassId GetClassId() const { return LABEL; }
+    virtual std::string GetClassName() const { return "LabelAbbr"; }
+    virtual ClassId GetClassId() const { return LABELABBR; }
     ///@}
 
     /**

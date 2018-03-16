@@ -50,12 +50,18 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
 {
     assert(dc);
 
+    int toDcX = ToDeviceContextX(x);
+    int toDcY = ToDeviceContextY(y);
+
     std::size_t prevPos = 0, pos;
     while ((pos = s.find_first_of(L"\u266D\u266E\u266F", prevPos)) != std::wstring::npos) {
         // If pos is > than the previous, it is the substring to extract
         if (pos > prevPos) {
             std::wstring substr = s.substr(prevPos, pos - prevPos);
-            dc->DrawText(UTF16to8(substr), substr);
+            dc->DrawText(UTF16to8(substr), substr, toDcX, toDcY);
+            // Once we have rendered the some text to not pass x / y anymore
+            toDcX = VRV_UNSET;
+            toDcY = VRV_UNSET;
         }
 
         // if it is the same or we still have space, it is the accidental
@@ -79,8 +85,11 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
             FontInfo vrvTxt;
             vrvTxt.SetFaceName("VerovioText");
             dc->SetFont(&vrvTxt);
-            dc->DrawText(UTF16to8(smuflAccid), smuflAccid);
+            // Once we have rendered the some text to not pass x / y anymore
+            dc->DrawText(UTF16to8(smuflAccid), smuflAccid, toDcX, toDcY);
             dc->ResetFont();
+            toDcX = VRV_UNSET;
+            toDcY = VRV_UNSET;
         }
         // Skip the accidental and continue
         prevPos = pos + 1;
@@ -88,7 +97,7 @@ void View::DrawHarmString(DeviceContext *dc, int x, int y, std::wstring s)
     // Print the remainder of the string, or the full string if no accid
     if (prevPos < s.length()) {
         std::wstring substr = s.substr(prevPos, std::wstring::npos);
-        dc->DrawText(UTF16to8(substr), substr);
+        dc->DrawText(UTF16to8(substr), substr, toDcX, toDcY);
     }
 }
 
@@ -138,7 +147,7 @@ void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
     int descender = -m_doc->GetTextGlyphDescender(L'q', currentFont, false);
     int height = m_doc->GetTextGlyphHeight(L'I', currentFont, false);
 
-    params.m_y -= (descender + height);
+    params.m_y -= ((descender + height) * 1.1);
     params.m_newLine = true;
 
     dc->EndTextGraphic(lb, this);

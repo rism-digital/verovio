@@ -170,7 +170,7 @@ void Measure::AddChildBack(Object *child)
         m_children.push_back(child);
     }
     else {
-        for (auto it = m_children.begin(); it != m_children.end(); it++) {
+        for (auto it = m_children.begin(); it != m_children.end(); ++it) {
             if (!(*it)->Is(STAFF)) {
                 m_children.insert(it, child);
                 break;
@@ -291,13 +291,13 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     scoreDef->FindAllChildByAttComparison(&staffGrps, &matchType);
 
     // Then the @n of each first staffDef
-    for (staffGrpIter = staffGrps.begin(); staffGrpIter != staffGrps.end(); staffGrpIter++) {
+    for (staffGrpIter = staffGrps.begin(); staffGrpIter != staffGrps.end(); ++staffGrpIter) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>((*staffGrpIter)->GetFirst(STAFFDEF));
         if (staffDef) staffList.push_back(staffDef->GetN());
     }
 
     // Get the corresponding staves in the measure
-    for (iter = staffList.begin(); iter != staffList.end(); iter++) {
+    for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
         AttNIntegerComparison matchN(STAFF, *iter);
         Staff *staff = dynamic_cast<Staff *>(this->FindChildByAttComparison(&matchN, 1));
         if (!staff) {
@@ -316,7 +316,7 @@ int Measure::EnclosesTime(int time) const
     int timeDuration = int(
         m_measureAligner.GetRightAlignment()->GetTime() * DURATION_4 / DUR_MAX * 60.0 / m_currentTempo * 1000.0 + 0.5);
     std::vector<int>::const_iterator iter;
-    for (iter = m_realTimeOffsetMilliseconds.begin(); iter != m_realTimeOffsetMilliseconds.end(); iter++) {
+    for (iter = m_realTimeOffsetMilliseconds.begin(); iter != m_realTimeOffsetMilliseconds.end(); ++iter) {
         if ((time >= *iter) && (time <= *iter + timeDuration)) return repeat;
         repeat++;
     }
@@ -393,7 +393,7 @@ int Measure::ConvertAnalyticalMarkupEnd(FunctorParams *functorParams)
     assert(params);
 
     ArrayOfObjects::iterator iter;
-    for (iter = params->m_controlEvents.begin(); iter != params->m_controlEvents.end(); iter++) {
+    for (iter = params->m_controlEvents.begin(); iter != params->m_controlEvents.end(); ++iter) {
         this->AddChild(*iter);
     }
 
@@ -609,7 +609,7 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
 
     std::vector<int>::iterator iter;
     std::vector<AttComparison *> filters;
-    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
+    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
         filters.clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
@@ -663,7 +663,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
 
     std::vector<int>::iterator iter;
     std::vector<AttComparison *> filters;
-    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
+    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
         params->m_minPos = 0;
         params->m_upcomingMinPos = VRV_UNSET;
         params->m_cumulatedXShift = 0;
@@ -793,7 +793,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
 
     // First add all pendings objects
     ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); iter++) {
+    for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); ++iter) {
         params->m_currentSystem->AddChild(*iter);
     }
     params->m_pendingObjects.clear();
@@ -835,7 +835,7 @@ int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
             iter = params->m_timeSpanningElements.erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
     return FUNCTOR_CONTINUE;
@@ -847,7 +847,7 @@ int Measure::PrepareBoundaries(FunctorParams *functorParams)
     assert(params);
 
     std::vector<BoundaryStartInterface *>::iterator iter;
-    for (iter = params->m_startBoundaries.begin(); iter != params->m_startBoundaries.end(); iter++) {
+    for (iter = params->m_startBoundaries.begin(); iter != params->m_startBoundaries.end(); ++iter) {
         (*iter)->SetMeasure(this);
     }
     params->m_startBoundaries.clear();
@@ -901,7 +901,7 @@ int Measure::PrepareFloatingGrpsEnd(FunctorParams *functorParams)
             iter = params->m_hairpins.erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 
@@ -942,7 +942,7 @@ int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 
@@ -1005,7 +1005,7 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
         // we have not reached the correct end measure yet
         else {
             (*iter).second.first--;
-            iter++;
+            ++iter;
         }
     }
 
@@ -1054,6 +1054,16 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     Tempo *tempo = dynamic_cast<Tempo *>(this->FindChildByType(TEMPO));
     if (tempo && tempo->HasMidiBpm()) {
         params->m_currentTempo = tempo->GetMidiBpm();
+    } else if (tempo && tempo->HasMm()) {
+        int mm = tempo->GetMm();
+        int mmUnit = 4;
+        if (tempo->HasMmUnit() && (tempo->GetMmUnit() > DURATION_breve)) {
+            mmUnit = pow(2, (int)tempo->GetMmUnit() - 2);
+        }
+        if (tempo->HasMmDots()) {
+            mmUnit = 2 * mmUnit - (mmUnit / pow(2, tempo->GetMmDots()));
+        }
+        params->m_currentTempo = int(mm * 4.0 / mmUnit + 0.5);
     }
     m_currentTempo = params->m_currentTempo;
 

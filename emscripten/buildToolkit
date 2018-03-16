@@ -89,11 +89,6 @@ GetOptions (
 if ($wasmQ) {
 	print "Creating WASM toolkit version\n";
 	$FLAGS = "-O3";
-	# tried this for find the integer overflow runtime error but g4 does not work, so line number is missing
-	# should be fixed in the next version of emscripten (https://github.com/kripken/emscripten/issues/5718)
-	# $FLAGS = "-g4 -O0 --emit-symbol-map"; 
-	# this is for now necessary to avoid integer overflow runtime error
-	$FLAGS .= " -s \"BINARYEN_TRAP_MODE='clamp'\"";
 	$FLAGS .= " -DNDEBUG";
 	$FLAGS .= " --memory-init-file 0";
 	$FLAGS .= " -std=c++11";

@@ -26,6 +26,7 @@
 #include "functorparams.h"
 #include "keysig.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "layer.h"
 #include "measure.h"
 #include "mensur.h"
@@ -75,7 +76,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
 
     dc->StartPage();
 
-    for (i = 0; i < m_currentPage->GetSystemCount(); i++) {
+    for (i = 0; i < m_currentPage->GetSystemCount(); ++i) {
         // cast to System check in DrawSystem
         System *system = dynamic_cast<System *>(m_currentPage->GetChild(i));
         DrawSystem(dc, system);
@@ -110,7 +111,7 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
 
     // longest key signature of the staffDefs
     const ListOfObjects *scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = scoreDefList->begin(); it != scoreDefList->end(); it++) {
+    for (ListOfObjects::const_iterator it = scoreDefList->begin(); it != scoreDefList->end(); ++it) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*it);
         assert(staffDef);
         if (!staffDef->HasKeySigInfo()) continue;
@@ -286,7 +287,7 @@ void View::DrawStaffGrp(
         graphic = labelAbbr;
     }
 
-    if (labelStr.length() != 0) {
+    if (graphic && (labelStr.length() != 0)) {
         // HARDCODED
         int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
         int xLabel = x - space;
@@ -307,7 +308,7 @@ void View::DrawStaffGrp(
         grpTxt.SetPointSize(params.m_pointSize);
         dc->SetFont(&grpTxt);
 
-        dc->GetTextExtent(labelStr, &extend);
+        dc->GetTextExtent(labelStr, &extend, true);
 
         dc->StartGraphic(graphic, "", graphic->GetUuid());
 
@@ -325,7 +326,7 @@ void View::DrawStaffGrp(
 
         // also store in the system the maximum width with abbreviations
         if (system && !abbreviations && (labelAbbrStr.length() > 0)) {
-            dc->GetTextExtent(labelAbbrStr, &extend);
+            dc->GetTextExtent(labelAbbrStr, &extend, true);
             system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
         }
 
@@ -352,7 +353,7 @@ void View::DrawStaffGrp(
     // recursively draw the children
     int i;
     StaffGrp *childStaffGrp = NULL;
-    for (i = 0; i < staffGrp->GetChildCount(); i++) {
+    for (i = 0; i < staffGrp->GetChildCount(); ++i) {
         childStaffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetChild(i));
         if (childStaffGrp) {
             DrawStaffGrp(dc, measure, childStaffGrp, x, false, abbreviations);
@@ -400,8 +401,9 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
             labelStr = labelAbbrStr;
             graphic = labelAbbr;
         }
+        
 
-        if (labelStr.length() == 0) {
+        if (!graphic || (labelStr.length() == 0)) {
             ++iter;
             continue;
         }
@@ -427,7 +429,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&labelTxt);
 
-        dc->GetTextExtent(labelStr, &extend);
+        dc->GetTextExtent(labelStr, &extend, true);
 
         dc->StartGraphic(graphic, "", graphic->GetUuid());
 
@@ -441,7 +443,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         system->SetDrawingLabelsWidth(extend.m_width + space);
         // also store in the system the maximum width with abbreviations for justification
         if (!abbreviations && (labelAbbrStr.length() > 0)) {
-            dc->GetTextExtent(labelAbbrStr, &extend);
+            dc->GetTextExtent(labelAbbrStr, &extend, true);
             system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
         }
 
@@ -561,7 +563,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         int i;
         StaffGrp *childStaffGrp = NULL;
         StaffDef *childStaffDef = NULL;
-        for (i = 0; i < staffGrp->GetChildCount(); i++) {
+        for (i = 0; i < staffGrp->GetChildCount(); ++i) {
             childStaffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetChild(i));
             childStaffDef = dynamic_cast<StaffDef *>(staffGrp->GetChild(i));
             if (childStaffGrp) {
@@ -623,7 +625,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         if (barLine->HasRepetitionDots()) {
             StaffDef *childStaffDef = NULL;
             const ListOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
-            for (ListOfObjects::const_reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
+            for (ListOfObjects::const_reverse_iterator it = childList->rbegin(); it != childList->rend(); ++it) {
                 childStaffDef = dynamic_cast<StaffDef *>((*it));
                 if (childStaffDef) {
                     AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
@@ -869,7 +871,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-    for (j = 0; j < staff->m_drawingLines; j++) {
+    for (j = 0; j < staff->m_drawingLines; ++j) {
         dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
         // For drawing rectangles instead of lines
         y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -916,8 +918,8 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *
     std::list<std::pair<int, int> >::iterator iterDashes;
 
     // First add the dash
-    for (iter = lines->begin(); iter != lines->end(); iter++) {
-        for (iterDashes = (*iter).m_dashes.begin(); iterDashes != (*iter).m_dashes.end(); iterDashes++) {
+    for (iter = lines->begin(); iter != lines->end(); ++iter) {
+        for (iterDashes = (*iter).m_dashes.begin(); iterDashes != (*iter).m_dashes.end(); ++iterDashes) {
             dc->DrawLine(ToDeviceContextX(x + iterDashes->first), ToDeviceContextY(y),
                 ToDeviceContextX(x + iterDashes->second), ToDeviceContextY(y));
         }

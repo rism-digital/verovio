@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Feb 28 17:54:56 PST 2018
+// Last Modified: Sat Mar  3 20:37:23 PST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -10873,7 +10873,8 @@ void HumRegex::setGlobal(void) {
 //
 
 bool HumRegex::getGlobal(void) {
-	return !(m_searchflags & std::regex_constants::format_first_only);
+	auto value = m_searchflags & std::regex_constants::format_first_only;
+	return !value;
 }
 
 
@@ -24054,7 +24055,14 @@ int MxmlPart::getMeasureCount(void) const {
 //
 
 MxmlMeasure* MxmlPart::getMeasure(int index) const {
-	return ((index >= 0) && (index < (int)m_measures.size())) ? m_measures[index] : NULL;
+	if (index < 0) {
+		return NULL;
+	}
+	int stupidwarningsuppression = (int)m_measures.size();
+	if ((index - stupidwarningsuppression) >= 0) {
+		return NULL;
+	}
+	return m_measures[index];
 }
 
 
@@ -33374,7 +33382,7 @@ void Tool_dissonant::findAppoggiaturas(vector<vector<string> >& results, NoteGri
 void Tool_dissonant::findCadentialVoiceFunctions(vector<vector<string> >& results, NoteGrid& grid,
 		vector<NoteCell*>& attacks, vector<vector<string> >& voiceFuncs, int vindex) {
 	double int2;      // diatonic interval to next melodic note
-	double int3;      // diatonic interval from next melodic note to following note
+	double int3 = -22; // diatonic interval from next melodic note to following note
 	double int4;      // diatonic interval from note three to note four
 	double oint2;     // diatonic interval to next melodic note in other voice
 	double oint3;     // diatonic interval from next melodic note to following note

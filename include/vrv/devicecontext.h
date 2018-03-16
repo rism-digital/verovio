@@ -127,8 +127,8 @@ public:
      * @name Getters for text extend (non-virtual)
      */
     ///@{
-    virtual void GetTextExtent(const std::string &string, TextExtend *extend);
-    virtual void GetTextExtent(const std::wstring &string, TextExtend *extend);
+    virtual void GetTextExtent(const std::string &string, TextExtend *extend, bool typeSize);
+    virtual void GetTextExtent(const std::wstring &string, TextExtend *extend, bool typeSize);
     virtual void GetSmuflTextExtent(const std::wstring &string, TextExtend *extend);
 
     /**

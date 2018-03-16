@@ -59,6 +59,7 @@ class FloatingElement;
 class FTrem;
 class Hairpin;
 class Harm;
+class InstrDef;
 class Label;
 class LabelAbbr;
 class Layer;
@@ -212,6 +213,7 @@ private:
     void WritePgHead2(pugi::xml_node currentNode, PgHead2 *pgHead2);
     void WriteStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp);
     void WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef);
+    void WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef);
     void WriteLabel(pugi::xml_node currentNode, Label *label);
     void WriteLabelAbbr(pugi::xml_node currentNode, LabelAbbr *labelAbbr);
     void WriteMeasure(pugi::xml_node currentNode, Measure *measure);
@@ -441,6 +443,7 @@ private:
     bool ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadStaffDef(Object *parent, pugi::xml_node staffDef);
     bool ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadInstrDef(Object *parent, pugi::xml_node instrDef);
     bool ReadLabel(Object *parent, pugi::xml_node label);
     bool ReadLabelAbbr(Object *parent, pugi::xml_node labelAbbr);
     bool ReadMeasure(Object *parent, pugi::xml_node measure);
