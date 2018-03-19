@@ -137,7 +137,7 @@ function completeConversion(status) {
     midiPlayer_convertionJob = null;
     // Not a pause
     if (_EM_signalStop != 2) {
-        stop();   
+        setTimeout(stop, 1000);   
     }
 }
 
@@ -162,7 +162,7 @@ var midiPlayer_input = null;
 var midiPlayer_lastMillisec = 0;
 var midiPlayer_midiName = ''
 var midiPlayer_convertionJob = null;
-var midiPlayer_currentSamples = 0;
+var midiPlayer_currentSamples = ULONG_MAX;
 var midiPlayer_totalSamples = 0;
 var midiPlayer_updateRate = 50;
 var midiPlayer_drainBuffer = false;
@@ -287,7 +287,7 @@ function stop() {
     circularBuffer.reset();
     
     midiPlayer_totalSamples = 0;
-    midiPlayer_currentSamples = 0;
+    midiPlayer_currentSamples = ULONG_MAX;
     midiPlayer_progress.style.width = '0%';
     midiPlayer_playingTime.innerHTML = "00.00";
     midiPlayer_totalTime.innerHTML = "00.00";
@@ -309,7 +309,7 @@ function runConversion() {
     
     var sleep = 10;
     circularBuffer.reset();
-    setTimeout(startAudio, 100);
+    startAudio();
 
     console.log(midiPlayer_convertionJob);
         
