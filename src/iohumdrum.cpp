@@ -498,6 +498,9 @@ bool HumdrumInput::convertHumdrum()
         if (it->isDataType("**fing")) {
             m_fing = true;
         }
+        if (it->isDataType("**string")) {
+            m_string = true;
+        }
         if (it->isDataType("**harm")) {
             m_harm = true;
         }
@@ -3023,6 +3026,10 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
         addFingeringsForMeasure(startline, endline);
     }
 
+    if (m_string) {
+        addStringNumbersForMeasure(startline, endline);
+    }
+
     if (m_fb) {
         addFiguredBassForMeasure(startline, endline);
     }
@@ -3161,6 +3168,64 @@ void HumdrumInput::addFingeringsForMeasure(int startline, int endline)
             hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
             dir->SetTstamp(tstamp.getFloat());
             setLocationId(dir, token);
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addStringNumbersForMeasure --
+//
+
+void HumdrumInput::addStringNumbersForMeasure(int startline, int endline)
+{
+    if (!m_measure) {
+        return;
+    }
+    int xstaffindex;
+    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+    hum::HumdrumFile &infile = m_infile;
+    for (int i = startline; i < endline; ++i) {
+        if (!infile[i].isData()) {
+            continue;
+        }
+        int track = 0;
+        for (int j = 0; j < infile[i].getFieldCount(); ++j) {
+            hum::HTp token = infile.token(i, j);
+            if (token->isDataType("**kern")) {
+                track = token->getTrack();
+            }
+            if (token->isNull()) {
+                continue;
+            }
+            if (!token->isDataType("**string")) {
+                continue;
+            }
+            Harm *harm = new Harm;
+            Text *text = new Text;
+
+            int staffindex = m_rkern[track];
+
+            if (staffindex >= 0) {
+                xstaffindex = staffindex;
+                setStaff(harm, staffindex + 1);
+            }
+            else {
+                // data is not attached to a **kern spine since it comes before
+                // any **kern data.  Treat it as attached to the bottom staff.
+                // (or the top staff depending on @place="above|below".
+                xstaffindex = (int)kernstarts.size() - 1;
+                setStaff(harm, xstaffindex + 1);
+            }
+            std::wstring content;
+            content = cleanStringString(*token);
+            text->SetText(content);
+            harm->AddChild(text);
+            m_measure->AddChild(harm);
+            hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
+            harm->SetTstamp(tstamp.getFloat());
+            appendTypeTag(harm, "string");
+            setLocationId(harm, token);
         }
     }
 }
@@ -3371,6 +3436,37 @@ std::wstring HumdrumInput::cleanHarmString2(const std::string &content)
         }
     }
 
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::cleanStringString -- Add circles around string numbers.
+//    see: https://www.fileformat.info/info/unicode/block/enclosed_alphanumerics/utf8test.htm
+//
+
+std::wstring HumdrumInput::cleanStringString(const std::string &content)
+{
+    std::wstring output;
+    std::string value;
+    for (int i = 0; i < (int)content.size(); i++) {
+        switch (content[i]) {
+            case '0': output += L"\u24ea"; break; // 0 in circle
+            case '1': output += L"\u2460"; break; // 1 in circle
+            case '2': output += L"\u2461"; break; // 2 in circle
+            case '3': output += L"\u2462"; break; // 3 in circle
+            case '4': output += L"\u2463"; break; // 4 in circle
+            case '5': output += L"\u2464"; break; // 5 in circle
+            case '6': output += L"\u2465"; break; // 6 in circle
+            case '7': output += L"\u2466"; break; // 7 in circle
+            case '8': output += L"\u2467"; break; // 8 in circle
+            case '9': output += L"\u2468"; break; // 9 in circle
+            default:
+                value.clear();
+                value.push_back(content[i]);
+                output += UTF8to16(value);
+        }
+    }
     return output;
 }
 

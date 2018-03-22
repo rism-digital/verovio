@@ -307,6 +307,7 @@ protected:
     int getSlurEndIndex(hum::HTp token, std::string targetid, std::vector<bool> &indexused);
     void addHarmFloatsForMeasure(int startine, int endline);
     void addFingeringsForMeasure(int startline, int endline);
+    void addStringNumbersForMeasure(int startline, int endline);
     void addFiguredBassForMeasure(int startline, int endline);
     void processDynamics(hum::HTp token, int staffindex);
     void processDirections(hum::HTp token, int staffindex);
@@ -429,6 +430,7 @@ protected:
     std::wstring cleanHarmString(const std::string &content);
     std::wstring cleanHarmString2(const std::string &content);
     std::wstring cleanHarmString3(const std::string &content);
+    std::wstring cleanStringString(const std::string &content);
     std::vector<std::wstring> cleanFBString(const std::string &content);
 
 private:
@@ -523,6 +525,11 @@ private:
     // the file to convert contains **fing spines that should be
     // converted into <fing> elements in the MEI conversion.
     bool m_fing = false;
+
+    // m_string == state variable for keeping track of whether or not
+    // the file to convert contains **string spines that should be
+    // converted into <string> elements in the MEI conversion.
+    bool m_string = false;
 
     // m_fb == state variable for keeping track of whether or not
     // the file to convert contains **Bnum spines that should be
