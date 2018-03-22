@@ -306,6 +306,7 @@ protected:
     void processSlurs(hum::HTp token);
     int getSlurEndIndex(hum::HTp token, std::string targetid, std::vector<bool> &indexused);
     void addHarmFloatsForMeasure(int startine, int endline);
+    void addFingeringsForMeasure(int startline, int endline);
     void addFiguredBassForMeasure(int startline, int endline);
     void processDynamics(hum::HTp token, int staffindex);
     void processDirections(hum::HTp token, int staffindex);
@@ -342,7 +343,7 @@ protected:
     std::string getAutoClef(hum::HTp partstart, int partnumber);
     void colorNote(vrv::Note *note, const std::string &token, int line, int field);
     void colorRest(vrv::Rest *rest, const std::string &token, int line, int field);
-	void colorVerse(Verse *verse, std::string &token);
+    void colorVerse(Verse *verse, std::string &token);
     std::string getSpineColor(int line, int field);
     void checkForColorSpine(hum::HumdrumFile &infile);
     std::vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
@@ -516,12 +517,17 @@ private:
     // m_harm == state variable for keeping track of whether or not
     // the file to convert contains **mxhm spines that should be
     // converted into <harm> element in the MEI conversion.
-    bool m_harm;
+    bool m_harm = false;
+
+    // m_fing == state variable for keeping track of whether or not
+    // the file to convert contains **fing spines that should be
+    // converted into <fing> elements in the MEI conversion.
+    bool m_fing = false;
 
     // m_fb == state variable for keeping track of whether or not
     // the file to convert contains **Bnum spines that should be
     // converted into <harm> element in the MEI conversion.
-    bool m_fb;
+    bool m_fb = false;
 
     // m_leftbarstyle is a barline left-hand style to store in the next measure.
     // When processing a measure, this variable should be checked and used

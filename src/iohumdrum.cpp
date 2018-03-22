@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 // Name:        iohumdrum.cpp
 // Author:      Craig Stuart Sapp
 // Created:     06/06/2016
@@ -494,6 +494,9 @@ bool HumdrumInput::convertHumdrum()
     for (auto it : spinestarts) {
         if (it->isDataType("**mxhm")) {
             m_harm = true;
+        }
+        if (it->isDataType("**fing")) {
+            m_fing = true;
         }
         if (it->isDataType("**harm")) {
             m_harm = true;
@@ -3016,6 +3019,10 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
         addHarmFloatsForMeasure(startline, endline);
     }
 
+    if (m_fing) {
+        addFingeringsForMeasure(startline, endline);
+    }
+
     if (m_fb) {
         addFiguredBassForMeasure(startline, endline);
     }
@@ -3086,6 +3093,74 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
             setStaff(harm, staffindex + 1);
             setLocationId(harm, token);
             setLocationId(fb, token);
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addFingeringsForMeasure --
+//
+
+void HumdrumInput::addFingeringsForMeasure(int startline, int endline)
+{
+    if (!m_measure) {
+        return;
+    }
+    int xstaffindex;
+    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+    hum::HumdrumFile &infile = m_infile;
+
+    for (int i = startline; i < endline; ++i) {
+        if (!infile[i].isData()) {
+            continue;
+        }
+        int track = 0;
+        for (int j = 0; j < infile[i].getFieldCount(); ++j) {
+            hum::HTp token = infile.token(i, j);
+            if (token->isDataType("**kern")) {
+                track = token->getTrack();
+            }
+            if (token->isNull()) {
+                continue;
+            }
+            if (!token->isDataType("**fing")) {
+                continue;
+            }
+            std::string content = token->getText();
+            if (content.empty()) {
+                continue;
+            }
+
+            Dir *dir = new Dir;
+
+            int staffindex = m_rkern[track];
+
+            if (staffindex >= 0) {
+                xstaffindex = staffindex;
+                setStaff(dir, staffindex + 1);
+            }
+            else {
+                // data is not attached to a **kern spine since it comes before
+                // any **kern data.  Treat it as attached to the bottom staff.
+                // (or the top staff depending on @place="above|below".
+                xstaffindex = (int)kernstarts.size() - 1;
+                setStaff(dir, xstaffindex + 1);
+            }
+
+            Rend *rend = new Rend;
+            data_FONTSIZE fs;
+            fs.SetTerm(FONTSIZETERM_x_small);
+            rend->SetFontsize(fs);
+            rend->SetFontstyle(FONTSTYLE_normal);
+            addTextElement(rend, content);
+            dir->AddChild(rend);
+            appendTypeTag(dir, "fingering");
+            setPlace(dir, "above");
+            m_measure->AddChild(dir);
+            hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
+            dir->SetTstamp(tstamp.getFloat());
+            setLocationId(dir, token);
         }
     }
 }
