@@ -3114,10 +3114,11 @@ void HumdrumInput::addFingeringsForMeasure(int startline, int endline)
     if (!m_measure) {
         return;
     }
-    int xstaffindex;
     const std::vector<hum::HTp> &kernstarts = m_kernstarts;
     hum::HumdrumFile &infile = m_infile;
     bool aboveQ = true;
+    hum::HumRegex hre;
+    vector<std::string> nums;
 
     for (int i = startline; i < endline; ++i) {
         if (!infile[i].isData()) {
@@ -3140,6 +3141,8 @@ void HumdrumInput::addFingeringsForMeasure(int startline, int endline)
                 continue;
             }
 
+            hre.split(nums, content, " ");
+
             int ztrack = token->getTrack();
             aboveQ = true;
             if ((j > 0) && infile.token(i, j - 1)->isDataType("**fing")) {
@@ -3148,42 +3151,65 @@ void HumdrumInput::addFingeringsForMeasure(int startline, int endline)
                     aboveQ = false;
                 }
             }
-            Dir *dir = new Dir;
 
             int staffindex = m_rkern[track];
+            int maxstaff = (int)kernstarts.size();
 
-            if (staffindex >= 0) {
-                xstaffindex = staffindex;
-                setStaff(dir, staffindex + 1);
-            }
-            else {
-                // data is not attached to a **kern spine since it comes before
-                // any **kern data.  Treat it as attached to the bottom staff.
-                // (or the top staff depending on @place="above|below".
-                xstaffindex = (int)kernstarts.size() - 1;
-                setStaff(dir, xstaffindex + 1);
-            }
-
-            Rend *rend = new Rend;
-            data_FONTSIZE fs;
-            fs.SetTerm(FONTSIZETERM_x_small);
-            rend->SetFontsize(fs);
-            rend->SetFontstyle(FONTSTYLE_normal);
-            addTextElement(rend, content);
-            dir->AddChild(rend);
-            appendTypeTag(dir, "fingering");
             if (aboveQ) {
-                setPlace(dir, "above");
+                for (int k = 0; k < (int)nums.size(); k++) {
+                    insertFingerNumberInMeasure(nums[k], staffindex, token, maxstaff, aboveQ);
+                }
             }
             else {
-                setPlace(dir, "below");
+                for (int k = 0; k < (int)nums.size(); k++) {
+                    insertFingerNumberInMeasure(nums[k], staffindex, token, maxstaff, aboveQ);
+                }
             }
-            m_measure->AddChild(dir);
-            hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
-            dir->SetTstamp(tstamp.getFloat());
-            setLocationId(dir, token);
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertFingerNumberInMeasure --
+//
+
+void HumdrumInput::insertFingerNumberInMeasure(
+    const std::string &text, int staffindex, hum::HTp token, int maxstaff, bool aboveQ)
+{
+
+    Dir *dir = new Dir;
+    int xstaffindex = 0;
+    if (staffindex >= 0) {
+        xstaffindex = staffindex;
+        setStaff(dir, staffindex + 1);
+    }
+    else {
+        // data is not attached to a **kern spine since it comes before
+        // any **kern data.  Treat it as attached to the bottom staff.
+        // (or the top staff depending on @place="above|below".
+        xstaffindex = maxstaff - 1;
+        setStaff(dir, xstaffindex + 1);
+    }
+
+    Rend *rend = new Rend;
+    data_FONTSIZE fs;
+    fs.SetTerm(FONTSIZETERM_x_small);
+    rend->SetFontsize(fs);
+    rend->SetFontstyle(FONTSTYLE_normal);
+    addTextElement(rend, text);
+    dir->AddChild(rend);
+    appendTypeTag(dir, "fingering");
+    if (aboveQ) {
+        setPlace(dir, "above");
+    }
+    else {
+        setPlace(dir, "below");
+    }
+    m_measure->AddChild(dir);
+    hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
+    dir->SetTstamp(tstamp.getFloat());
+    setLocationId(dir, token);
 }
 
 //////////////////////////////

@@ -307,6 +307,8 @@ protected:
     int getSlurEndIndex(hum::HTp token, std::string targetid, std::vector<bool> &indexused);
     void addHarmFloatsForMeasure(int startine, int endline);
     void addFingeringsForMeasure(int startline, int endline);
+    void insertFingerNumberInMeasure(
+        const std::string &text, int staffindex, hum::HTp token, int maxstaff, bool aboveQ);
     void addStringNumbersForMeasure(int startline, int endline);
     void addFiguredBassForMeasure(int startline, int endline);
     void processDynamics(hum::HTp token, int staffindex);
