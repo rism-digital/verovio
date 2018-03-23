@@ -3117,6 +3117,7 @@ void HumdrumInput::addFingeringsForMeasure(int startline, int endline)
     int xstaffindex;
     const std::vector<hum::HTp> &kernstarts = m_kernstarts;
     hum::HumdrumFile &infile = m_infile;
+    bool aboveQ = true;
 
     for (int i = startline; i < endline; ++i) {
         if (!infile[i].isData()) {
@@ -3139,6 +3140,14 @@ void HumdrumInput::addFingeringsForMeasure(int startline, int endline)
                 continue;
             }
 
+            int ztrack = token->getTrack();
+            aboveQ = true;
+            if ((j > 0) && infile.token(i, j - 1)->isDataType("**fing")) {
+                int ptrack = infile.token(i, j - 1)->getTrack();
+                if (ztrack == ptrack) {
+                    aboveQ = false;
+                }
+            }
             Dir *dir = new Dir;
 
             int staffindex = m_rkern[track];
@@ -3163,7 +3172,12 @@ void HumdrumInput::addFingeringsForMeasure(int startline, int endline)
             addTextElement(rend, content);
             dir->AddChild(rend);
             appendTypeTag(dir, "fingering");
-            setPlace(dir, "above");
+            if (aboveQ) {
+                setPlace(dir, "above");
+            }
+            else {
+                setPlace(dir, "below");
+            }
             m_measure->AddChild(dir);
             hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
             dir->SetTstamp(tstamp.getFloat());
