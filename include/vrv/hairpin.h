@@ -23,7 +23,7 @@ class Hairpin : public ControlElement,
                 public AttColor,
                 public AttHairpinLog,
                 public AttPlacement,
-                public AttVerticalAlignment {
+                public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
