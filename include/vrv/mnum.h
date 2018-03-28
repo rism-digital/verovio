@@ -21,7 +21,7 @@ class TextElement;
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <mNum>
+ * This class models the MEI <mNum> element.
  */
 class MNum : public ControlElement,
              public TextListInterface,

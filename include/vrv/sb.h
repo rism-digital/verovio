@@ -19,7 +19,7 @@ namespace vrv {
 
 /**
  * This class represents a MEI sb in score-based MEI.
- * In page-based MEI, it remains as is as. Actuall systems are represented by System objects.
+ * In page-based MEI, it remains as it is. Actual systems are represented by System objects.
  */
 class Sb : public SystemElement, public AttNNumberLike {
 public:

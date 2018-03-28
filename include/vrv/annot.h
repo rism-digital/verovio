@@ -17,6 +17,9 @@ namespace vrv {
 // Annot
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <annot> element.
+ */
 class Annot : public EditorialElement, public TextListInterface, public AttPlist, public AttSource {
 public:
     /**

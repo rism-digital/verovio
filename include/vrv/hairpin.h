@@ -18,6 +18,9 @@ namespace vrv {
 // Hairpin
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <hairpin> element.
+ */
 class Hairpin : public ControlElement,
                 public TimeSpanningInterface,
                 public AttColor,

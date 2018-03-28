@@ -16,11 +16,11 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// BeatRpt
+// BeatRpt (beat repeat)
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <beatRpt>
+ * This class models the MEI <beatRpt> element.
  */
 class BeatRpt : public LayerElement, public AttColor, public AttBeatRptVis {
 public:
@@ -53,11 +53,11 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// MRpt
+// MRpt (measure repeat)
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <mRpt>
+ * This class models the MEI <mRpt> element.
  */
 class MRpt : public LayerElement {
 public:
@@ -92,11 +92,11 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// MRpt2
+// MRpt2 (2-measure repeat)
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <mRpt2>
+ * This class models the MEI <mRpt2> element.
  */
 class MRpt2 : public LayerElement {
 public:
@@ -120,11 +120,11 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// MultiRpt
+// MultiRpt (multiple repeat)
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <multiRpt>
+ * This class models the MEI <multiRpt> element.
  */
 class MultiRpt : public LayerElement, public AttNumbered {
 public:

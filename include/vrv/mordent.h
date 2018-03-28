@@ -19,6 +19,9 @@ namespace vrv {
 // Mordent
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <mordent> element.
+ */
 class Mordent : public ControlElement,
                 public TimePointInterface,
                 public AttColor,
