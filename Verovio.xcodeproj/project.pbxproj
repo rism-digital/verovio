@@ -16,6 +16,10 @@
 		409B3DD91F2D1C2A0098A265 /* ftrem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 409B3DD81F2D1C2A0098A265 /* ftrem.cpp */; };
 		409B3DDB1F2D1C550098A265 /* btrem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 409B3DDA1F2D1C550098A265 /* btrem.cpp */; };
 		40ABF1FF1E5DF23B00F32F41 /* expansion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */; };
+		40BD9390206B95060037BF8E /* annot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40BD938E206B95050037BF8E /* annot.cpp */; };
+		40BD9391206B950B0037BF8E /* annot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40BD938E206B95050037BF8E /* annot.cpp */; };
+		40BD9392206B950C0037BF8E /* annot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40BD938E206B95050037BF8E /* annot.cpp */; };
+		40BD9393206B95120037BF8E /* annot.h in Headers */ = {isa = PBXBuildFile; fileRef = 40BD938F206B95060037BF8E /* annot.h */; };
 		40C2E41E2052A6E00003625F /* sb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40C2E41A2052A6DF0003625F /* sb.cpp */; };
 		40C2E41F2052A6E00003625F /* pb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40C2E41B2052A6E00003625F /* pb.cpp */; };
 		40C2E4202052A6E90003625F /* sb.h in Headers */ = {isa = PBXBuildFile; fileRef = 40C2E41C2052A6E00003625F /* sb.h */; };
@@ -615,6 +619,8 @@
 		409B3DDA1F2D1C550098A265 /* btrem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = btrem.cpp; path = src/btrem.cpp; sourceTree = "<group>"; };
 		40ABF1FD1E5DF23B00F32F41 /* expansion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = expansion.h; path = include/vrv/expansion.h; sourceTree = "<group>"; };
 		40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = expansion.cpp; path = src/expansion.cpp; sourceTree = "<group>"; };
+		40BD938E206B95050037BF8E /* annot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = annot.cpp; path = src/annot.cpp; sourceTree = "<group>"; };
+		40BD938F206B95060037BF8E /* annot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = annot.h; path = include/vrv/annot.h; sourceTree = "<group>"; };
 		40C2E41A2052A6DF0003625F /* sb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sb.cpp; path = src/sb.cpp; sourceTree = "<group>"; };
 		40C2E41B2052A6E00003625F /* pb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pb.cpp; path = src/pb.cpp; sourceTree = "<group>"; };
 		40C2E41C2052A6E00003625F /* sb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sb.h; path = include/vrv/sb.h; sourceTree = "<group>"; };
@@ -973,6 +979,8 @@
 			children = (
 				4DCA95D71A515D0E008AD7E9 /* editorial.cpp */,
 				4DCA95DA1A515D33008AD7E9 /* editorial.h */,
+				40BD938E206B95050037BF8E /* annot.cpp */,
+				40BD938F206B95060037BF8E /* annot.h */,
 				4D308103203DB6B500BC44F6 /* ref.cpp */,
 				4D308100203DB69C00BC44F6 /* ref.h */,
 			);
@@ -1442,6 +1450,7 @@
 				8F59293D18854BF800FE51AD /* toolkit.h in Headers */,
 				4D1D733C1A1D0390001E08F6 /* smufl.h in Headers */,
 				40C2E4212052A6EC0003625F /* pb.h in Headers */,
+				40BD9393206B95120037BF8E /* annot.h in Headers */,
 				4DB726C81B8BB0F30040231B /* text.h in Headers */,
 				4D308101203DB69D00BC44F6 /* ref.h in Headers */,
 				8F59293E18854BF800FE51AD /* io.h in Headers */,
@@ -1809,6 +1818,7 @@
 				4D1694521E3A44F300569BF4 /* syl.cpp in Sources */,
 				4D1694531E3A44F300569BF4 /* atts_cmn.cpp in Sources */,
 				4D1694541E3A44F300569BF4 /* floatingobject.cpp in Sources */,
+				40BD9392206B950C0037BF8E /* annot.cpp in Sources */,
 				4D1694551E3A44F300569BF4 /* atts_mei.cpp in Sources */,
 				4DB787642022F0BB00394520 /* jsonxx.cc in Sources */,
 				4D64137F2035F68600BB630E /* mdiv.cpp in Sources */,
@@ -1957,6 +1967,7 @@
 				4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */,
 				4D4335C91ECF2310003BE1A9 /* atts_visual.cpp in Sources */,
 				4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */,
+				40BD9390206B95060037BF8E /* annot.cpp in Sources */,
 				4DC12A591F716E27000440E9 /* pghead.cpp in Sources */,
 				4DF28A051A754DF000BA9F7D /* floatingobject.cpp in Sources */,
 				4DF9D2831C18DC490069E8C8 /* atts_mei.cpp in Sources */,
@@ -2020,6 +2031,7 @@
 				4D1BE76E1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
 				4DF9D2841C18DC490069E8C8 /* atts_mei.cpp in Sources */,
 				4DA60EE71B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
+				40BD9391206B950B0037BF8E /* annot.cpp in Sources */,
 				4DB3D8B51F83D09100B5FC2B /* iohumdrum.cpp in Sources */,
 				4DDBBCC61C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				8F3DD34618854B2E0051330C /* layerelement.cpp in Sources */,

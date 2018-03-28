@@ -16,6 +16,7 @@
 
 #include "accid.h"
 #include "anchoredtext.h"
+#include "annot.h"
 #include "arpeg.h"
 #include "artic.h"
 #include "beam.h"
