@@ -20,6 +20,7 @@
 #include "arpeg.h"
 #include "artic.h"
 #include "beam.h"
+#include "beatrpt.h"
 #include "boundary.h"
 #include "breath.h"
 #include "btrem.h"
@@ -53,7 +54,10 @@
 #include "mnum.h"
 #include "mordent.h"
 #include "mrest.h"
+#include "mrpt.h"
+#include "mrpt2.h"
 #include "multirest.h"
+#include "multirpt.h"
 #include "note.h"
 #include "num.h"
 #include "octave.h"
@@ -69,7 +73,6 @@
 #include "ref.h"
 #include "rend.h"
 #include "rest.h"
-#include "rpt.h"
 #include "sb.h"
 #include "score.h"
 #include "section.h"
@@ -962,7 +965,7 @@ void MeiOutput::WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
 void MeiOutput::WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef)
 {
     assert(instrDef);
-    
+
     WriteXmlId(currentNode, instrDef);
     instrDef->WriteChannelized(currentNode);
     instrDef->WriteLabelled(currentNode);
@@ -3110,7 +3113,7 @@ bool MeiInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
 {
     InstrDef *vrvInstrDef = new InstrDef();
     SetMeiUuid(instrDef, vrvInstrDef);
-    
+
     parent->AddChild(vrvInstrDef);
     vrvInstrDef->ReadChannelized(instrDef);
     vrvInstrDef->ReadLabelled(instrDef);

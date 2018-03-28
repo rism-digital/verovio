@@ -16,6 +16,7 @@
 
 #include "attcomparison.h"
 #include "barline.h"
+#include "beatrpt.h"
 #include "chord.h"
 #include "functorparams.h"
 #include "glyph.h"
@@ -29,7 +30,10 @@
 #include "metersig.h"
 #include "mnum.h"
 #include "mrest.h"
+#include "mrpt.h"
+#include "mrpt2.h"
 #include "multirest.h"
+#include "multirpt.h"
 #include "note.h"
 #include "page.h"
 #include "pages.h"
@@ -37,7 +41,6 @@
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
-#include "rpt.h"
 #include "runningelement.h"
 #include "score.h"
 #include "slur.h"
@@ -322,7 +325,8 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             }
             if (instrdef) {
                 if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel() - 1;
-                if (instrdef->HasMidiInstrnum()) midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum() - 1);
+                if (instrdef->HasMidiInstrnum())
+                    midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum() - 1);
             }
             Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
             if (!label) {

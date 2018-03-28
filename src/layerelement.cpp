@@ -16,6 +16,7 @@
 #include "attcomparison.h"
 #include "barline.h"
 #include "beam.h"
+#include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
@@ -31,11 +32,13 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
+#include "mrpt.h"
+#include "mrpt2.h"
 #include "multirest.h"
+#include "multirpt.h"
 #include "note.h"
 #include "page.h"
 #include "rest.h"
-#include "rpt.h"
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
@@ -490,7 +493,7 @@ double LayerElement::GetAlignmentDuration(
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     // We align all full measure element to the current time signature, even the ones that last longer than one measure
-    else if (this->Is({ MREST, MULTIREST, MRPT, MRPT2, MULTIREST })) {
+    else if (this->Is({ MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
         int meterUnit = 4;
         int meterCount = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();

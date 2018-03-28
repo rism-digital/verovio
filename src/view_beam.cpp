@@ -24,7 +24,6 @@
 #include "layerelement.h"
 #include "note.h"
 #include "options.h"
-#include "rpt.h"
 #include "smufl.h"
 #include "staff.h"
 #include "vrv.h"

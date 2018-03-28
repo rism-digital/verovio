@@ -18,6 +18,7 @@
 #include "accid.h"
 #include "artic.h"
 #include "beam.h"
+#include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
@@ -35,12 +36,14 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
+#include "mrpt.h"
+#include "mrpt2.h"
 #include "multirest.h"
+#include "multirpt.h"
 #include "note.h"
 #include "options.h"
 #include "proport.h"
 #include "rest.h"
-#include "rpt.h"
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
@@ -1370,7 +1373,8 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    std::wstring widthText = (timeSigCombNumerator.length() > timeSigCombDenominator.length()) ? timeSigCombNumerator : timeSigCombDenominator;
+    std::wstring widthText = (timeSigCombNumerator.length() > timeSigCombDenominator.length()) ? timeSigCombNumerator
+                                                                                               : timeSigCombDenominator;
 
     TextExtend extend;
     dc->GetSmuflTextExtent(widthText, &extend);
