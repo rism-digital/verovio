@@ -6,7 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef __VRV_MULTIRPT_H__
-#define __VRV_MUTLIRPT_H__
+#define __VRV_MULTIRPT_H__
 
 #include "atts_cmn.h"
 #include "atts_shared.h"
