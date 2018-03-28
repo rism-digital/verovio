@@ -1365,25 +1365,25 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den
     assert(dc);
     assert(staff);
 
-    std::wstring numText = IntToTimeSigFigures(num), denText;
-    if (den) denText = IntToTimeSigFigures(den);
+    std::wstring timeSigCombNumerator = IntToTimeSigFigures(num), timeSigCombDenominator;
+    if (den) timeSigCombDenominator = IntToTimeSigFigures(den);
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    std::wstring widthText = (numText.length() > denText.length()) ? numText : denText;
+    std::wstring widthText = (timeSigCombNumerator.length() > timeSigCombDenominator.length()) ? timeSigCombNumerator : timeSigCombDenominator;
 
     TextExtend extend;
     dc->GetSmuflTextExtent(widthText, &extend);
     x += (extend.m_width / 2);
 
     if (den) {
-        DrawSmuflString(dc, x, y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), numText, true,
+        DrawSmuflString(dc, x, y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombNumerator, true,
             staff->m_drawingStaffSize);
-        DrawSmuflString(dc, x, y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), denText, true,
+        DrawSmuflString(dc, x, y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombDenominator, true,
             staff->m_drawingStaffSize);
     }
     else
-        DrawSmuflString(dc, x, y, numText, true, staff->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y, timeSigCombNumerator, true, staff->m_drawingStaffSize);
 
     dc->ResetFont();
 }
