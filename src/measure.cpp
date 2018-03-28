@@ -933,10 +933,8 @@ int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
 
     ArrayOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
-        // At the end of the measure (going backward) we remove element for which we do not need to match the end
-        // (for
-        // now). Eventually, we could consider them, for example if we want to display their spanning or for
-        // improved
+        // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
+        // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
         // midi output
         if ((iter->second == DIR) || (iter->second == DYNAM) || (iter->second == HARM)) {
             iter = params->m_timeSpanningInterfaces.erase(iter);
@@ -1054,7 +1052,8 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     Tempo *tempo = dynamic_cast<Tempo *>(this->FindChildByType(TEMPO));
     if (tempo && tempo->HasMidiBpm()) {
         params->m_currentTempo = tempo->GetMidiBpm();
-    } else if (tempo && tempo->HasMm()) {
+    }
+    else if (tempo && tempo->HasMm()) {
         int mm = tempo->GetMm();
         int mmUnit = 4;
         if (tempo->HasMmUnit() && (tempo->GetMmUnit() > DURATION_breve)) {
