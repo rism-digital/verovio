@@ -241,7 +241,7 @@ public:
     ///@}
 
 private:
-    /** Records the number of augmentation dots required by a dotted duration. **/
+    /** Records the number of augmentation dots required by a written dotted duration. **/
     int m_dots;
 
     /* include <attdots> */
@@ -5137,8 +5137,8 @@ public:
 
 private:
     /**
-     * Encodes the onset time in terms of musical time, i.e.,
-     * beats[.fractional_beat_part].
+     * Encodes the onset time in terms of musical time, i.e., beats[.fractional beat
+     * part], as expressed in the written time signature.
      **/
     double m_tstamp;
 
@@ -5176,8 +5176,8 @@ public:
 
 private:
     /**
-     * Encodes the ending point of an event in terms of musical time, i.e., a count of
-     * measures plus a beat location.
+     * Encodes the ending point of an event, i.e., a count of measures plus a beat
+     * location in the ending measure.
      **/
     data_MEASUREBEAT m_tstamp2;
 
@@ -5413,22 +5413,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttVerticalAlignment
+// AttVerticalGroup
 //----------------------------------------------------------------------------
 
-class AttVerticalAlignment : public Att {
+class AttVerticalGroup : public Att {
 public:
-    AttVerticalAlignment();
-    virtual ~AttVerticalAlignment();
+    AttVerticalGroup();
+    virtual ~AttVerticalGroup();
 
     /** Reset the default values for the attribute class **/
-    void ResetVerticalAlignment();
+    void ResetVerticalGroup();
 
     /** Read the values for the attribute class **/
-    bool ReadVerticalAlignment(pugi::xml_node element);
+    bool ReadVerticalGroup(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteVerticalAlignment(pugi::xml_node element);
+    bool WriteVerticalGroup(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
