@@ -5947,6 +5947,30 @@ hum::HumNum HumdrumInput::getMeasureTstamp(hum::HTp token, int staffindex, hum::
 
 //////////////////////////////
 //
+// HumdrumInput::getMeasureTstampPlusDur --  Similar to getMeasureTstamp, but also include
+//     duration of token (to get endpoint of token in measure).
+//     default value: fract = 0.0;
+//
+
+hum::HumNum HumdrumInput::getMeasureTstampPlusDur(hum::HTp token, int staffindex, hum::HumNum fract)
+{
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    hum::HumNum qbeat = token->getDurationFromBarline() + token->getDuration();
+    if (fract > 0) {
+        // what is this for? Causes problems with pedal markings.
+        // qbeat += fract * token->getDuration().getAbs();
+    }
+    hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
+    // if (ss[staffindex].meter_bottom == 0) {
+    // 	mfactor = 1;
+    // 	mfactor /= 8;
+    // }
+    hum::HumNum mbeat = qbeat * mfactor + 1;
+    return mbeat;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::getMeasureEndTstamp -- Return the tstamp of the end of the
 //     measure (the next barline). (@meter.count + 1)
 //     default value: fract = 0.0;
@@ -8666,6 +8690,8 @@ bool HumdrumInput::leftmostSystemArpeggio(hum::HTp token)
 //   t  = trill, minor second
 //   TT  = trill, major second with wavy line after it
 //   tt  = trill, minor second with wavy line after it
+//   TTT = trill, continuing a major second with wavy line after it
+//   ttt = trill, continuing a minor second with wavy line after it
 //
 //   S[Ss]?[Ss]? = turn
 //   $[Ss]?[Ss]? = inverted turn
@@ -8992,6 +9018,15 @@ void HumdrumInput::addTrill(hum::HTp token)
         return;
     }
 
+    if (token->find("TTT") != std::string::npos) {
+        // continuation trill, so don't start a new one
+        return;
+    }
+    if (token->find("ttt") != std::string::npos) {
+        // continuation trill, so don't start a new one
+        return;
+    }
+
     if ((subtok == 0) && token->find(" ") == std::string::npos) {
         subtok = -1;
     }
@@ -9002,9 +9037,14 @@ void HumdrumInput::addTrill(hum::HTp token)
     appendElement(m_measure, trill);
     setStaff(trill, staff);
 
-    // hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
-    // trill->SetTstamp(tstamp.getFloat());
-    trill->SetStartid("#" + getLocationId("note", token, subtok));
+    int staffindex = m_currentstaff - 1;
+
+    // hum::HumNum tstamp = getMeasureTstamp(token, staffindex)
+    // trill->SetStartid("#" + getLocationId("note", token, subtok));
+
+    hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+    trill->SetTstamp(tstamp.getFloat());
+
     setLocationId(trill, token, subtok);
     if (m_signifiers.above) {
         if (tpos < token->size() - 1) {
@@ -9040,6 +9080,31 @@ void HumdrumInput::addTrill(hum::HTp token)
             case 2: trill->SetAccidupper(ACCIDENTAL_WRITTEN_x); break;
         }
     }
+
+    if ((token->find("TT") == std::string::npos) && (token->find("tt") == std::string::npos)) {
+        // no line extension needed fro the trill
+        return;
+    }
+
+    // find the ending note after the trill line.  Multiple trill line extensions for chord notes
+    // are not handled by this algorithm, but these should be rare in notation.
+    hum::HTp endtok = token->getNextNNDT();
+    hum::HTp lasttok = token;
+    while (endtok) {
+        if ((endtok->find("TTT") == std::string::npos) && (endtok->find("ttt") == std::string::npos)) {
+            break;
+        }
+        lasttok = endtok;
+        endtok = endtok->getNextNNDT();
+    }
+    if (!lasttok) {
+        return;
+    }
+
+    hum::HumNum tstamp2 = getMeasureTstampPlusDur(lasttok, staffindex);
+    int measures = getMeasureDifference(token, lasttok);
+    std::pair<int, double> ts2(measures, tstamp2.getFloat());
+    trill->SetTstamp2(ts2);
 }
 
 //////////////////////////////
