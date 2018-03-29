@@ -482,7 +482,7 @@ double LayerElement::GetAlignmentDuration(
         BeatRpt *beatRpt = dynamic_cast<BeatRpt *>(this);
         assert(beatRpt);
         int meterUnit = 4;
-        if (meterSig && meterSig->HasUnit()) meterSig->GetUnit();
+        if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
         return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
     else if (this->Is(TIMESTAMP_ATTR)) {
