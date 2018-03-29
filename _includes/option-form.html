@@ -1,0 +1,105 @@
+<div id="option-div">
+</div>
+<script type="text/javascript">
+//<![CDATA[
+    options = vrvToolkit.getAvailableOptions();
+
+    var ul = $("<ul class='nav nav-tabs' role='tablist'></ul>");
+    $('#option-div').append(ul);
+    
+    var form = $("<form class='form-horizontal' id='option-form'></form>");
+    $('#option-div').append(form);
+    var tab_content = $("<div class='tab-content'></div>");
+    form.append(tab_content);
+    
+    var i = 0;
+    for (grp in options.groups) {
+        var li = $("<li role='presentation'></li>");
+        ul.append(li);
+        if (i == 0) {
+            li.attr("class", "active");
+        }
+
+        var a = $("<a></a>").attr("href", "#" + grp).attr("aria-controls", grp).attr("role", "tab").attr("data-toggle", "tab");
+        li.append(a);
+        a.append(options.groups[grp].name);
+        
+        var tab_panel = $("<div role='tabpanel'></div>");
+        tab_content.append(tab_panel);
+        if (i == 0) {
+            tab_panel.attr("class", "tab-pane active panel-body");
+        }
+        else {
+            tab_panel.attr("class", "tab-pane panel-body");
+        }
+        tab_panel.attr("id", grp);
+        
+        
+        for (opt in options.groups[grp].options) {
+            
+            var option = options.groups[grp].options[opt];
+            
+            var form_group = $("<div class='form-group'></div>");
+            tab_panel.append(form_group);
+            
+            var label = $("<label class='col-sm-3 control-label'></label>");
+            form_group.append(label);
+            label.attr("for", opt);
+            label.append(option.title);
+            
+            var input_div = $("<div class='col-sm-3'></div>");
+            form_group.append(input_div);
+    
+            if ((option.type == "double") || (option.type == "int") || (option.type == "string") || (option.type == "array")) {
+
+                var input = $("<input class='form-control'></input>");
+                input_div.append(input);
+                input.attr("name", opt);
+                
+                if ((option.type == "double") || (option.type == "int")) {
+                    input.attr("type", "number");
+                    input.attr("min", option.min);
+                    input.attr("max", option.max);
+                    if (option.type == "double") {
+                        input.attr("step", "0.05");
+                    }
+                    else {
+                        input.attr("step", "1");
+                    }
+                }
+                else {
+                    input.attr("type", "text");
+                }
+            }
+            else if (option.type == "string-list") {
+                var select = $("<select class='form-control'></select>");
+                input_div.append(select);
+                select.attr("name", opt);
+                
+                for (v in option.values) {
+                    var opt_select = $("<option></option>");
+                    select.append(opt_select);
+                    opt_select.attr("value", option.values[v]);
+                    opt_select.append(option.values[v]);
+                }
+            }
+            else if (option.type == "bool") {
+                var input = $("<input class='form-control' style='width: auto !important;' type='checkbox'></input>");
+                input_div.append(input);
+                input.attr("name", opt);
+            }
+            
+            var help_div = $("<div class='col-sm-6'></div>");
+            form_group.append(help_div);
+            
+            var help_p = $("<p class='help-block'></p>");
+            help_div.append(help_p);
+            help_p.append().text(option.description).html();
+            
+        }
+        
+        i = i + 1;
+        
+    }
+//]]>
+</script>
