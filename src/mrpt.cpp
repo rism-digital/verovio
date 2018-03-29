@@ -50,8 +50,8 @@ int MRpt::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
-
-    // Here we need to find a previous measure with at least one note.
+    
+    LogWarning("MRpt produces empty MIDI output");
 
     return FUNCTOR_CONTINUE;
 }
