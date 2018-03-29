@@ -1225,12 +1225,8 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    // Here we need to check if the LayerElement has a duration, otherwise we can continue
-    if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
-
     double incrementScoreTime;
 
-    // Now deal with the different elements
     if (this->Is(REST) || this->Is(SPACE)) {
         double incrementScoreTime = GetAlignmentDuration() / (DUR_MAX / DURATION_4);
         params->m_currentScoreTime += incrementScoreTime;
@@ -1270,6 +1266,11 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
             params->m_currentScoreTime += incrementScoreTime;
             params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
         }
+    }
+    else if (this->Is(BEATRPT)) {
+        double incrementScoreTime = GetAlignmentDuration() / (DUR_MAX / DURATION_4);
+        params->m_currentScoreTime += incrementScoreTime;
+        params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
     return FUNCTOR_CONTINUE;
 }
