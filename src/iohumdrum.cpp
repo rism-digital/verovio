@@ -271,7 +271,11 @@ namespace humaux {
 
     /////////////////////////////////////////////////////////////////////
 
-    StaffStateVariables::StaffStateVariables() { clear(); }
+    StaffStateVariables::StaffStateVariables()
+    {
+        cue_size.resize(100);
+        clear();
+    }
     StaffStateVariables::~StaffStateVariables() { clear(); }
     void StaffStateVariables::clear()
     {
@@ -283,6 +287,7 @@ namespace humaux {
         ties.clear();
         meter_bottom = 4;
         meter_top = 4;
+        std::fill(cue_size.begin(), cue_size.end(), false);
     }
 
 } // end namespace humaux
@@ -4274,8 +4279,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 note->SetStemLen(0);
             }
             if (m_signifiers.cuesize && layerdata[i]->find(m_signifiers.cuesize) != string::npos) {
-                // 400: MEI 4.0.0: still to be implemented
-                // note->SetSize(SIZE_cue);
+                note->SetCue(BOOLEAN_true);
+            }
+            else if (m_staffstates.at(staffindex).cue_size.at(m_currentlayer)) {
+                note->SetCue(BOOLEAN_true);
             }
             addArticulations(note, layerdata[i]);
             addOrnaments(note, layerdata[i]);
@@ -4992,10 +4999,13 @@ void HumdrumInput::processChordSignifiers(Chord *chord, hum::HTp token, int staf
             }
         }
         if ((cuecount > 0) && (tcount == cuecount)) {
-            // 400: MEI 4.0.0 still to be implemented
-            // chord->SetSize(SIZE_cue);
+            chord->SetCue(BOOLEAN_true);
         }
     }
+    else if (m_staffstates.at(staffindex).cue_size.at(m_currentlayer)) {
+        chord->SetCue(BOOLEAN_true);
+    }
+
     processTerminalLong(token); // Not tested and probably won't work yet on chords.
 }
 
@@ -7193,17 +7203,20 @@ hum::HumNum HumdrumInput::removeFactorsOfTwo(hum::HumNum value, int &tcount, int
 //     that are turned on/off by interpretation tokens.
 //
 // Controls that this function deals with:
-//    *Xtuplet = suppress beam and bracket tuplet numbers
-//    *tuplet = display beam and bracket tuplet numbers
-//    *Xbeamtup = suppress beam tuplet numbers
-//    *beamtup  = display beam tuplet numbers
+//    *Xtuplet     = suppress beam and bracket tuplet numbers
+//    *tuplet      = display beam and bracket tuplet numbers
+//    *Xbeamtup    = suppress beam tuplet numbers
+//    *beamtup     = display beam tuplet numbers
 //    *Xbrackettup = suppress tuplet brackets
 //    *brackettup  = display tuplet brackets
+//    *Xcue        = notes back to regular size (operates at layer level rather than staff level).
+//    *cue         = display notes in cue size (operates at layer level rather than staff level).
 //
 
 void HumdrumInput::handleStaffStateVariables(hum::HTp token)
 {
     int staffindex = m_currentstaff - 1;
+    int layernum = m_currentlayer;
     std::string value = *token;
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     if (value == "*Xbeamtup") {
@@ -7222,9 +7235,15 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
         ss[staffindex].suppress_beam_tuplet = true;
         ss[staffindex].suppress_bracket_tuplet = true;
     }
-    if (value == "*tuplet") {
+    else if (value == "*tuplet") {
         ss[staffindex].suppress_beam_tuplet = false;
         ss[staffindex].suppress_bracket_tuplet = false;
+    }
+    if (value == "*Xcue") {
+        ss[staffindex].cue_size.at(layernum) = false;
+    }
+    else if (value == "*cue") {
+        ss[staffindex].cue_size.at(layernum) = true;
     }
 }
 
@@ -8051,8 +8070,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
 
     // check for cue-size signifier:
     if (m_signifiers.cuesize && tstring.find(m_signifiers.cuesize) != string::npos) {
-        // 400: cue size not yet implemented
-        // note->SetSize(SIZE_cue);
+        note->SetCue(BOOLEAN_true);
+    }
+    else if (m_staffstates.at(staffindex).cue_size.at(m_currentlayer)) {
+        note->SetCue(BOOLEAN_true);
     }
 
     // If the note is the start or stop of an analytic phrase,

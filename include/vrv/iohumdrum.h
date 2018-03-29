@@ -150,6 +150,11 @@ namespace humaux {
         // brackets should be displayed.
         bool suppress_bracket_tuplet;
 
+        // cue_size == keeps track of whether or not the notes in the current
+        // staff/layer should be cue sized.  Index 0 is used to control all
+        // layers.
+        vector<bool> cue_size;
+
         // ottavanote == keep track of ottava marks: stores the starting note of
         // an ottava line which will be turned off later.  ottavameasure == the
         // starting measure of the ottava mark.
