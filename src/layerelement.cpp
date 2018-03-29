@@ -1268,7 +1268,11 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         }
     }
     else if (this->Is(BEATRPT)) {
-        double incrementScoreTime = GetAlignmentDuration() / (DUR_MAX / DURATION_4);
+        BeatRpt *rpt = dynamic_cast<BeatRpt *>(this);
+        assert(rpt);
+
+        double incrementScoreTime = rpt->GetAlignmentDuration() / (DUR_MAX / DURATION_4);
+        rpt->SetScoreTimeOnset(params->m_currentScoreTime);
         params->m_currentScoreTime += incrementScoreTime;
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }

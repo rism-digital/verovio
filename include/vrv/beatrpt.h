@@ -45,11 +45,34 @@ public:
 
     double GetBeatRptAlignmentDuration(int meterUnit) const;
 
+    /**
+     * MIDI timing information
+     */
+    ///@{
+    void SetScoreTimeOnset(double scoreTime);
+    double GetScoreTimeOnset();
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * @name See Object::GenerateMIDI
+     */
+    ///@{
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+    ///@}
+
 private:
     //
 public:
     //
 private:
+    /**
+     * The score-time onset of the note in the measure (duration from the start of measure in
+     * quarter notes).
+     */
+    double m_scoreTimeOnset;
 };
 
 } // namespace vrv
