@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+* Additional options for controlling grace notes alignment
 * Support for `<instrDef>` (@rettinghaus)
 * Support for `mnum.visible` on `<scoreDef>` (@rettinghaus)
 * Implementation of `<mNum>` and generation from `measure@n` if necessary (@rettinghaus)
