@@ -1,4 +1,4 @@
-Verovio 2.0.0-dev-4577d83
+Verovio 2.0.0-dev-154a220
 
 Example usage:
 
@@ -41,6 +41,9 @@ General layout options
  --beam-max-slope <i>              The maximum beam slope (default: 10; min: 1; max: 20)
  --beam-min-slope <i>              The minimum beam slope (default: 0; min: 0; max: 0)
  --font <s>                        Set the music font (default: "Leipzig")
+ --grace-factor <f>                The grace size ratio numerator (default: 0.75; min: 0.50; max: 1.00)
+ --grace-rhythm-align              Align grace notes rhythmically with all staves
+ --grace-right-align               Align the right position of a grace group with all staves
  --grace-factor <f>                The grace size ratio numerator (default: 0.75; min: 0.50; max: 1.00)
  --hairpin-size <f>                The haripin size in MEI units (default: 3.00; min: 1.00; max: 8.00)
  --left-position <f>               The left position (default: 0.80; min: 0.00; max: 2.00)
