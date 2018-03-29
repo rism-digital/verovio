@@ -523,13 +523,17 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     }
 
     params->m_scoreDefRole = NONE;
+    
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+    int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
 
     int i;
     for (i = 0; i < params->m_measureAligner->GetChildCount(); ++i) {
         Alignment *alignment = dynamic_cast<Alignment *>(params->m_measureAligner->GetChild(i));
         assert(alignment);
-        if (alignment->HasGraceAligner()) {
-            alignment->GetGraceAligner()->AlignStack();
+        if (alignment->HasGraceAligner(graceAlignerId)) {
+            alignment->GetGraceAligner(graceAlignerId)->AlignStack();
         }
     }
 

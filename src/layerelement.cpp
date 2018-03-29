@@ -676,7 +676,10 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else {
         assert(this->IsGraceNote());
         if (this->Is(CHORD) || (this->Is(NOTE) && !chordParent)) {
-            GraceAligner *graceAligner = m_alignment->GetGraceAligner();
+            Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+            assert(staff);
+            int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
+            GraceAligner *graceAligner = m_alignment->GetGraceAligner(graceAlignerId);
             // We know that this is a note or a chord - we stack them and they will be added at the end of the layer
             // This will also see it for all their children
             graceAligner->StackGraceElement(this);

@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <assert.h>
 #include <math.h>
 
@@ -643,11 +644,25 @@ int Measure::AdjustGraceXPos(FunctorParams *functorParams)
     assert(params);
 
     m_measureAligner.PushAlignmentsRight();
-
     params->m_rightDefaultAlignment = NULL;
-
+    
     // We process it backward because we want to get the rightDefaultAlignment
     m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
+    
+    // We need to process the staves in the reverse order
+    std::vector<int> staffNs = params->m_staffNs;
+    std::vector<int> staffNsReversed;
+    staffNsReversed.resize(staffNs.size());
+    std::reverse_copy(staffNs.begin(), staffNs.end(), staffNsReversed.begin());
+    
+    m_measureAligner.PushAlignmentsRight();
+    params->m_rightDefaultAlignment = NULL;
+    
+    params->m_staffNs = staffNsReversed;
+    m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
+    
+    // Put params back
+    params->m_staffNs = staffNs;
 
     return FUNCTOR_SIBLINGS;
 }
