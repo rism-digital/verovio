@@ -261,9 +261,8 @@ int LayerElement::GetDrawingY() const
 {
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
-    Object *object = NULL;
-    // Otherwise look if we have a crossStaff situation
-    if (!object) object = this->m_crossStaff; // GetCrossStaff();
+    // Look if we have a crossStaff situation
+    Object *object = this->m_crossStaff; // GetCrossStaff();
     // First get the first layerElement parent (if any) but only if the element is not directly relative to staff (e.g.,
     // artic, syl)
     if (!object && !this->IsRelativeToStaff()) object = this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max);
@@ -415,7 +414,7 @@ int LayerElement::GetDrawingRadius(Doc *doc)
 {
     assert(doc);
 
-    if (!this->Is({ NOTE, CHORD })) return 0;
+    if (!this->Is({ CHORD, NOTE, REST })) return 0;
 
     int dur = DUR_4;
     if (this->Is(NOTE)) {
@@ -423,7 +422,7 @@ int LayerElement::GetDrawingRadius(Doc *doc)
         assert(note);
         dur = note->GetDrawingDur();
     }
-    else {
+    else if (this->Is(CHORD)) {
         Chord *chord = dynamic_cast<Chord *>(this);
         assert(chord);
         dur = chord->GetActualDur();
@@ -677,7 +676,10 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else {
         assert(this->IsGraceNote());
         if (this->Is(CHORD) || (this->Is(NOTE) && !chordParent)) {
-            GraceAligner *graceAligner = m_alignment->GetGraceAligner();
+            Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+            assert(staff);
+            int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
+            GraceAligner *graceAligner = m_alignment->GetGraceAligner(graceAlignerId);
             // We know that this is a note or a chord - we stack them and they will be added at the end of the layer
             // This will also see it for all their children
             graceAligner->StackGraceElement(this);
@@ -876,7 +878,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
         assert(staff);
 
         std::vector<LayerElement *>::iterator iter;
-        for (iter = params->m_previous.begin(); iter != params->m_previous.end(); iter++) {
+        for (iter = params->m_previous.begin(); iter != params->m_previous.end(); ++iter) {
 
             int verticalMargin = 0; // 1 * params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             int horizontalMargin = 2 * params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
@@ -1174,7 +1176,7 @@ int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
             iter = params->m_timePointingInterfaces.erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 
@@ -1196,7 +1198,7 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 

@@ -38,8 +38,10 @@
 #include "functorparams.h"
 #include "hairpin.h"
 #include "harm.h"
+#include "instrdef.h"
 #include "keysig.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "layer.h"
 #include "lb.h"
 #include "ligature.h"
@@ -47,6 +49,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "mnum.h"
 #include "mordent.h"
 #include "mrest.h"
 #include "multirest.h"
@@ -272,6 +275,10 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("label");
         WriteLabel(m_currentNode, dynamic_cast<Label *>(object));
     }
+    else if (object->Is(INSTRDEF)) {
+        m_currentNode = m_currentNode.append_child("instrdef");
+        WriteInstrDef(m_currentNode, dynamic_cast<InstrDef *>(object));
+    }
     else if (object->Is(LABELABBR)) {
         m_currentNode = m_currentNode.append_child("labelAbbr");
         WriteLabelAbbr(m_currentNode, dynamic_cast<LabelAbbr *>(object));
@@ -351,6 +358,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(HARM)) {
         m_currentNode = m_currentNode.append_child("harm");
         WriteHarm(m_currentNode, dynamic_cast<Harm *>(object));
+    }
+    else if (object->Is(MNUM)) {
+        m_currentNode = m_currentNode.append_child("mNum");
+        WriteMNum(m_currentNode, dynamic_cast<MNum *>(object));
     }
     else if (object->Is(MORDENT)) {
         m_currentNode = m_currentNode.append_child("mordent");
@@ -868,6 +879,7 @@ void MeiOutput::WriteScoreDefElement(pugi::xml_node currentNode, ScoreDefElement
     assert(scoreDefElement);
 
     WriteXmlId(currentNode, scoreDefElement);
+    scoreDefElement->WriteMeasureNumbers(currentNode);
     scoreDefElement->WriteTyped(currentNode);
 }
 
@@ -942,6 +954,17 @@ void MeiOutput::WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
     staffDef->WriteScalable(currentNode);
     staffDef->WriteStaffDefLog(currentNode);
     staffDef->WriteTransposition(currentNode);
+}
+
+void MeiOutput::WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef)
+{
+    assert(instrDef);
+    
+    WriteXmlId(currentNode, instrDef);
+    instrDef->WriteChannelized(currentNode);
+    instrDef->WriteLabelled(currentNode);
+    instrDef->WriteMidiInstrument(currentNode);
+    instrDef->WriteNNumberLike(currentNode);
 }
 
 void MeiOutput::WriteLabel(pugi::xml_node currentNode, Label *label)
@@ -1037,7 +1060,7 @@ void MeiOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteControlElement(currentNode, dynam);
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
-    dynam->WriteVerticalAlignment(currentNode);
+    dynam->WriteVerticalGroup(currentNode);
 }
 
 void MeiOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
@@ -1060,7 +1083,7 @@ void MeiOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     hairpin->WriteColor(currentNode);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WritePlacement(currentNode);
-    hairpin->WriteVerticalAlignment(currentNode);
+    hairpin->WriteVerticalGroup(currentNode);
 }
 
 void MeiOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
@@ -1072,6 +1095,18 @@ void MeiOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
     WriteTimeSpanningInterface(currentNode, harm);
     harm->WriteLang(currentNode);
     harm->WriteNNumberLike(currentNode);
+}
+
+void MeiOutput::WriteMNum(pugi::xml_node currentNode, MNum *mNum)
+{
+    assert(mNum);
+
+    WriteControlElement(currentNode, mNum);
+    WriteTextDirInterface(currentNode, mNum);
+    WriteTimeSpanningInterface(currentNode, mNum);
+    mNum->WriteColor(currentNode);
+    mNum->WriteLang(currentNode);
+    mNum->WriteTypography(currentNode);
 }
 
 void MeiOutput::WriteMordent(pugi::xml_node currentNode, Mordent *mordent)
@@ -1093,6 +1128,8 @@ void MeiOutput::WriteOctave(pugi::xml_node currentNode, Octave *octave)
     WriteControlElement(currentNode, octave);
     WriteTimeSpanningInterface(currentNode, octave);
     octave->WriteColor(currentNode);
+    octave->WriteExtender(currentNode);
+    octave->WriteLineRend(currentNode);
     octave->WriteLineRendBase(currentNode);
     octave->WriteOctaveDisplacement(currentNode);
 }
@@ -2796,6 +2833,7 @@ bool MeiInput::ReadBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd)
 bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object)
 {
     SetMeiUuid(element, object);
+    object->ReadMeasureNumbers(element);
     object->ReadTyped(element);
 
     return true;
@@ -2901,6 +2939,9 @@ bool MeiInput::ReadStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
             success = ReadEditorialElement(parent, current, EDITORIAL_STAFFGRP);
         }
         // content
+        else if (std::string(current.name()) == "instrDef") {
+            success = ReadInstrDef(parent, current);
+        }
         else if (std::string(current.name()) == "label") {
             success = ReadLabel(parent, current);
         }
@@ -3046,6 +3087,9 @@ bool MeiInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         if (!success) break;
         // content
+        else if (std::string(current.name()) == "instrDef") {
+            success = ReadInstrDef(parent, current);
+        }
         else if (std::string(current.name()) == "label") {
             success = ReadLabel(parent, current);
         }
@@ -3057,6 +3101,20 @@ bool MeiInput::ReadStaffDefChildren(Object *parent, pugi::xml_node parentNode)
         }
     }
     return success;
+}
+
+bool MeiInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
+{
+    InstrDef *vrvInstrDef = new InstrDef();
+    SetMeiUuid(instrDef, vrvInstrDef);
+    
+    parent->AddChild(vrvInstrDef);
+    vrvInstrDef->ReadChannelized(instrDef);
+    vrvInstrDef->ReadLabelled(instrDef);
+    vrvInstrDef->ReadMidiInstrument(instrDef);
+    vrvInstrDef->ReadNNumberLike(instrDef);
+
+    return true;
 }
 
 bool MeiInput::ReadLabel(Object *parent, pugi::xml_node label)
@@ -3142,6 +3200,9 @@ bool MeiInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "harm") {
             success = ReadHarm(parent, current);
+        }
+        else if (std::string(current.name()) == "mNum") {
+            success = ReadMNum(parent, current);
         }
         else if (std::string(current.name()) == "mordent") {
             success = ReadMordent(parent, current);
@@ -3254,7 +3315,7 @@ bool MeiInput::ReadDynam(Object *parent, pugi::xml_node dynam)
 
     ReadTextDirInterface(dynam, vrvDynam);
     ReadTimeSpanningInterface(dynam, vrvDynam);
-    vrvDynam->ReadVerticalAlignment(dynam);
+    vrvDynam->ReadVerticalGroup(dynam);
 
     parent->AddChild(vrvDynam);
     ReadUnsupportedAttr(dynam, vrvDynam);
@@ -3285,7 +3346,7 @@ bool MeiInput::ReadHairpin(Object *parent, pugi::xml_node hairpin)
     vrvHairpin->ReadColor(hairpin);
     vrvHairpin->ReadHairpinLog(hairpin);
     vrvHairpin->ReadPlacement(hairpin);
-    vrvHairpin->ReadVerticalAlignment(hairpin);
+    vrvHairpin->ReadVerticalGroup(hairpin);
 
     parent->AddChild(vrvHairpin);
     ReadUnsupportedAttr(hairpin, vrvHairpin);
@@ -3305,6 +3366,21 @@ bool MeiInput::ReadHarm(Object *parent, pugi::xml_node harm)
     parent->AddChild(vrvHarm);
     ReadUnsupportedAttr(harm, vrvHarm);
     return ReadTextChildren(vrvHarm, harm, vrvHarm);
+}
+
+bool MeiInput::ReadMNum(Object *parent, pugi::xml_node mNum)
+{
+    MNum *vrvMNum = new MNum();
+    ReadControlElement(mNum, vrvMNum);
+
+    ReadTextDirInterface(mNum, vrvMNum);
+    ReadTimeSpanningInterface(mNum, vrvMNum);
+    vrvMNum->ReadColor(mNum);
+    vrvMNum->ReadLang(mNum);
+    vrvMNum->ReadTypography(mNum);
+
+    parent->AddChild(vrvMNum);
+    return ReadTextChildren(vrvMNum, mNum, vrvMNum);
 }
 
 bool MeiInput::ReadMordent(Object *parent, pugi::xml_node mordent)
@@ -3330,6 +3406,8 @@ bool MeiInput::ReadOctave(Object *parent, pugi::xml_node octave)
 
     ReadTimeSpanningInterface(octave, vrvOctave);
     vrvOctave->ReadColor(octave);
+    vrvOctave->ReadExtender(octave);
+    vrvOctave->ReadLineRend(octave);
     vrvOctave->ReadLineRendBase(octave);
     vrvOctave->ReadOctaveDisplacement(octave);
 

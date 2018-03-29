@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        dynam.h
-// Author:      Laurent Pugin
-// Created:     2016
+// Name:        mnum.h
+// Author:      Klaus Rettinghaus
+// Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_DYNAM_H__
-#define __VRV_DYNAM_H__
+#ifndef __VRV_MNUM_H__
+#define __VRV_MNUM_H__
 
 #include "controlelement.h"
 #include "textdirinterface.h"
@@ -17,25 +17,27 @@ namespace vrv {
 class TextElement;
 
 //----------------------------------------------------------------------------
-// Dynam
+// MNum
 //----------------------------------------------------------------------------
 
-class Dynam : public ControlElement,
-              public TextListInterface,
-              public TextDirInterface,
-              public TimeSpanningInterface,
-              public AttVerticalGroup {
+class MNum : public ControlElement,
+             public TextListInterface,
+             public TextDirInterface,
+             public TimeSpanningInterface,
+             public AttColor,
+             public AttLang,
+             public AttTypography {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method reset all attribute classes
      */
     ///@{
-    Dynam();
-    virtual ~Dynam();
+    MNum();
+    virtual ~MNum();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Dynam"; }
-    virtual ClassId GetClassId() const { return DYNAM; }
+    virtual std::string GetClassName() const { return "MNum"; }
+    virtual ClassId GetClassId() const { return MNUM; }
     ///@}
 
     /**
@@ -54,20 +56,24 @@ public:
     virtual void AddChild(Object *object);
 
     /**
-     * Return true if the dynam text is only composed of f, p, r, z, etc. letters (e.g. sfz)
+     * @name Setter and getter of the generated flag
      */
-    bool IsSymbolOnly();
-
-    std::wstring GetSymbolStr() const;
+    ///@{
+    bool IsGenerated() const { return m_isGenerated; }
+    void IsGenerated(bool isGenerated) { m_isGenerated = isGenerated; }
+    ///@}
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::PrepareFloatingGrps
+     * See Object::Save
      */
-    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+    ///@{
+    virtual int Save(FunctorParams *functorParams);
+    virtual int SaveEnd(FunctorParams *functorParams);
+    ///@}
 
 protected:
     //
@@ -76,8 +82,10 @@ private:
 public:
     //
 private:
-    /** A cached version of the symbol str instanciated by IsSymbolOnly() */
-    std::wstring m_symbolStr;
+    /**
+     * Flag indicating whereas if the element was generated or not
+     */
+    bool m_isGenerated;
 };
 
 } // namespace vrv

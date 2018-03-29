@@ -32,11 +32,11 @@ std::wstring dynamSmufl[] = { L"\uE520", L"\uE521", L"\uE522", L"\uE523", L"\uE5
 //----------------------------------------------------------------------------
 
 Dynam::Dynam()
-    : ControlElement("dynam-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttVerticalAlignment()
+    : ControlElement("dynam-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttVerticalGroup()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_VERTICALALIGNMENT);
+    RegisterAttClass(ATT_VERTICALGROUP);
 
     Reset();
 }
@@ -48,7 +48,7 @@ void Dynam::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
-    AttVerticalAlignment::ResetVerticalAlignment();
+    AttVerticalGroup::ResetVerticalGroup();
 }
 
 void Dynam::AddChild(Object *child)
@@ -150,7 +150,7 @@ std::wstring Dynam::GetSymbolStr() const
     dynam = m_symbolStr;
     int i;
     std::wstring from, to;
-    for (i = 0; i < DYNAM_CHARS; i++) {
+    for (i = 0; i < DYNAM_CHARS; ++i) {
         from = dynamChars[i];
         to = dynamSmufl[i];
         for (size_t pos = 0; (pos = dynam.find(from, pos)) != std::string::npos; pos += to.size())

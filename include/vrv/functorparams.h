@@ -387,11 +387,12 @@ public:
  * member 5: a flag indicating whereas we are processing the caution scoreDef
  * member 6: a flag indicating is we are in the first measure (for the scoreDef role)
  * member 7: a flag indicating if we had mutliple layer alignment reference in the measure
+ * member 8: the doc
  **/
 
 class AlignHorizontallyParams : public FunctorParams {
 public:
-    AlignHorizontallyParams(Functor *functor)
+    AlignHorizontallyParams(Functor *functor, Doc *doc)
     {
         m_measureAligner = NULL;
         m_time = 0.0;
@@ -402,6 +403,7 @@ public:
         m_scoreDefRole = NONE;
         m_isFirstMeasure = false;
         m_hasMultipleLayer = false;
+        m_doc = doc;
     }
     MeasureAligner *m_measureAligner;
     double m_time;
@@ -412,6 +414,7 @@ public:
     ElementScoreDefRole m_scoreDefRole;
     bool m_isFirstMeasure;
     bool m_hasMultipleLayer;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -1035,12 +1038,14 @@ public:
     GenerateMIDIParams(MidiFile *midiFile)
     {
         m_midiFile = midiFile;
+        m_midiChannel = 0;
         m_midiTrack = 1;
         m_totalTime = 0.0;
         m_transSemi = 0;
         m_currentTempo = 120;
     }
     MidiFile *m_midiFile;
+    int m_midiChannel;
     int m_midiTrack;
     double m_totalTime;
     int m_transSemi;

@@ -164,18 +164,52 @@ public:
     void SetDurGes(data_DURATION durGes_) { m_durGes = durGes_; }
     data_DURATION GetDurGes() const { return m_durGes; }
     bool HasDurGes() const;
+    //
+    void SetDotsGes(int dotsGes_) { m_dotsGes = dotsGes_; }
+    int GetDotsGes() const { return m_dotsGes; }
+    bool HasDotsGes() const;
+    //
+    void SetDurMetrical(double durMetrical_) { m_durMetrical = durMetrical_; }
+    double GetDurMetrical() const { return m_durMetrical; }
+    bool HasDurMetrical() const;
+    //
+    void SetDurPpq(int durPpq_) { m_durPpq = durPpq_; }
+    int GetDurPpq() const { return m_durPpq; }
+    bool HasDurPpq() const;
+    //
+    void SetDurReal(double durReal_) { m_durReal = durReal_; }
+    double GetDurReal() const { return m_durReal; }
+    bool HasDurReal() const;
+    //
+    void SetDurRecip(std::string durRecip_) { m_durRecip = durRecip_; }
+    std::string GetDurRecip() const { return m_durRecip; }
+    bool HasDurRecip() const;
     ///@}
 
 private:
-    /**
-     * Records performed duration information that differs from the written duration.
-     * Its value may be expressed in several forms; that is, ppq (MIDI clicks and
-     * MusicXML 'divisions'), Humdrum **recip values, beats, seconds, or mensural
-     * duration values.
-     **/
+    /** Records performed duration information that differs from the written duration. **/
     data_DURATION m_durGes;
+    /**
+     * Number of dots required for a gestural duration when different from that of the
+     * written duration.
+     **/
+    int m_dotsGes;
+    /** Duration as a count of units provided in the time signature denominator. **/
+    double m_durMetrical;
+    /**
+     * Duration recorded as pulses-per-quarter note, e.g.
+     * MIDI clicks or MusicXML divisions.
+     **/
+    int m_durPpq;
+    /**
+     * Duration in seconds, e.g.
+     * '1.732'.
+     **/
+    double m_durReal;
+    /** Duration as an optionally dotted Humdrum *recip value. **/
+    std::string m_durRecip;
 
-    /* include <attdur.ges> */
+    /* include <attdur.recip> */
 };
 
 //----------------------------------------------------------------------------
@@ -343,8 +377,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTstampGes(data_DURATION tstampGes_) { m_tstampGes = tstampGes_; }
-    data_DURATION GetTstampGes() const { return m_tstampGes; }
+    void SetTstampGes(double tstampGes_) { m_tstampGes = tstampGes_; }
+    double GetTstampGes() const { return m_tstampGes; }
     bool HasTstampGes() const;
     //
     void SetTstampReal(std::string tstampReal_) { m_tstampReal = tstampReal_; }
@@ -354,15 +388,59 @@ public:
 
 private:
     /**
-     * Captures performed onset time in several forms; that is, ppq (MIDI clicks and
-     * MusicXML 'divisions'), Humdrum **recip values, beats, seconds, or mensural
-     * duration values.
+     * Encodes the onset time in terms of musical time, i.e., beats[.fractional beat
+     * part], as expressed in the written time signature.
      **/
-    data_DURATION m_tstampGes;
-    /** Used to record the onset time in terms of ISO time. **/
+    double m_tstampGes;
+    /** Records the onset time in terms of ISO time. **/
     std::string m_tstampReal;
 
     /* include <atttstamp.real> */
+};
+
+//----------------------------------------------------------------------------
+// AttTimestamp2Gestural
+//----------------------------------------------------------------------------
+
+class AttTimestamp2Gestural : public Att {
+public:
+    AttTimestamp2Gestural();
+    virtual ~AttTimestamp2Gestural();
+
+    /** Reset the default values for the attribute class **/
+    void ResetTimestamp2Gestural();
+
+    /** Read the values for the attribute class **/
+    bool ReadTimestamp2Gestural(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteTimestamp2Gestural(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetTstamp2Ges(data_MEASUREBEAT tstamp2Ges_) { m_tstamp2Ges = tstamp2Ges_; }
+    data_MEASUREBEAT GetTstamp2Ges() const { return m_tstamp2Ges; }
+    bool HasTstamp2Ges() const;
+    //
+    void SetTstamp2Real(std::string tstamp2Real_) { m_tstamp2Real = tstamp2Real_; }
+    std::string GetTstamp2Real() const { return m_tstamp2Real; }
+    bool HasTstamp2Real() const;
+    ///@}
+
+private:
+    /**
+     * Encodes the ending point of an event, i.e., a count of measures plus a beat
+     * location in the ending measure.
+     **/
+    data_MEASUREBEAT m_tstamp2Ges;
+    /** Records the ending point of an event in terms of ISO time. **/
+    std::string m_tstamp2Real;
+
+    /* include <atttstamp2.real> */
 };
 
 } // vrv namespace

@@ -48,13 +48,14 @@ enum ClassId {
     DEVICE_CONTEXT, // Should not be instanciated as is,
     FLOATING_OBJECT,
     FLOATING_POSITIONER,
-    //
+    // Ids for ungrouped objects
     ALIGNMENT,
     ALIGNMENT_REFERENCE,
     CLEF_ATTR,
     DOC,
     FB,
     GRACE_ALIGNER,
+    INSTRDEF,
     KEYSIG_ATTR,
     LABEL,
     LABELABBR,
@@ -123,6 +124,7 @@ enum ClassId {
     HAIRPIN,
     HARM,
     MORDENT,
+    MNUM,
     OCTAVE,
     PEDAL,
     SLUR,
@@ -220,6 +222,7 @@ class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
 class FloatingPositioner;
+class GraceAligner;
 class LayerElement;
 class LedgerLine;
 class Note;
@@ -267,6 +270,8 @@ typedef std::vector<TextElement *> ArrayOfTextElements;
 typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
 
 typedef std::map<std::string, Option *> MapOfStrOptions;
+    
+typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
 
 //----------------------------------------------------------------------------
 // Global defines

@@ -33,13 +33,13 @@ Hairpin::Hairpin()
     , AttColor()
     , AttHairpinLog()
     , AttPlacement()
-    , AttVerticalAlignment()
+    , AttVerticalGroup()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_HAIRPINLOG);
     RegisterAttClass(ATT_PLACEMENT);
-    RegisterAttClass(ATT_VERTICALALIGNMENT);
+    RegisterAttClass(ATT_VERTICALGROUP);
 
     Reset();
 }
@@ -53,7 +53,7 @@ void Hairpin::Reset()
     ResetColor();
     ResetHairpinLog();
     ResetPlacement();
-    AttVerticalAlignment::ResetVerticalAlignment();
+    AttVerticalGroup::ResetVerticalGroup();
 
     m_leftLink = NULL;
     m_rightLink = NULL;
@@ -106,7 +106,7 @@ int Hairpin::CalcHeight(
     /************** cap the angle of hairpins **************/
 
     // Given height and width, calculate hairpin angle
-    float theta = 2.0 * atan((endY / 2.0) / length);
+    double theta = 2.0 * atan((endY / 2.0) / length);
     // Convert to Radians
     theta *= (360.0 / (2.0 * M_PI));
     // If the angle is too big, restrict endY

@@ -61,7 +61,7 @@ void RunningElement::Reset()
     m_drawingYRel = 0;
 
     int i;
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 3; ++i) {
         m_drawingScalingPercent[i] = 100;
     }
 }
@@ -101,18 +101,18 @@ void RunningElement::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
-        iter++;
+        ++iter;
     }
 
     int i;
-    for (i = 0; i < 9; i++) {
+    for (i = 0; i < 9; ++i) {
         m_cells[i].clear();
     }
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 3; ++i) {
         m_drawingScalingPercent[i] = 100;
     }
 
-    for (iter = childList->begin(); iter != childList->end(); iter++) {
+    for (iter = childList->begin(); iter != childList->end(); ++iter) {
         int pos = 0;
         AreaPosInterface *interface = dynamic_cast<AreaPosInterface *>(*iter);
         assert(interface);
@@ -182,7 +182,7 @@ int RunningElement::GetTotalHeight()
 {
     int height = 0;
     int i;
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 3; ++i) {
         height += this->GetRowHeight(i);
     }
     return height;
@@ -194,7 +194,7 @@ int RunningElement::GetRowHeight(int row)
 
     int i;
     int height = 0;
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 3; ++i) {
         height = std::max(height, this->GetCellHeight(row * 3 + i));
     }
     return height;
@@ -206,7 +206,7 @@ int RunningElement::GetColHeight(int col)
 
     int i;
     int height = 0;
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 3; ++i) {
         height += this->GetCellHeight(i * 3 + col);
     }
     return height;
@@ -219,7 +219,7 @@ int RunningElement::GetCellHeight(int cell)
     int columnHeight = 0;
     ArrayOfTextElements *textElements = &m_cells[cell];
     ArrayOfTextElements::iterator iter;
-    for (iter = textElements->begin(); iter != textElements->end(); iter++) {
+    for (iter = textElements->begin(); iter != textElements->end(); ++iter) {
         if ((*iter)->HasContentBB()) {
             columnHeight += (*iter)->GetContentY2() - (*iter)->GetContentY1();
         }
@@ -232,15 +232,15 @@ bool RunningElement::AdjustDrawingScaling(int width)
     int i, j;
     bool scale = false;
     // For each row
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 3; ++i) {
         int rowWidth = 0;
         // For each column
-        for (j = 0; j < 3; j++) {
+        for (j = 0; j < 3; ++j) {
             ArrayOfTextElements *textElements = &m_cells[i * 3 + j];
             ArrayOfTextElements::iterator iter;
             int columnWidth = 0;
             // For each object
-            for (iter = textElements->begin(); iter != textElements->end(); iter++) {
+            for (iter = textElements->begin(); iter != textElements->end(); ++iter) {
                 if ((*iter)->HasContentBB()) {
                     int iterWidth = (*iter)->GetContentX2() - (*iter)->GetContentX1();
                     columnWidth = std::max(columnWidth, iterWidth);
@@ -248,7 +248,7 @@ bool RunningElement::AdjustDrawingScaling(int width)
             }
             rowWidth += columnWidth;
         }
-        if (rowWidth > width) {
+        if (rowWidth && (rowWidth > width)) {
             m_drawingScalingPercent[i] = width * 100 / rowWidth;
             scale = true;
         }
@@ -262,11 +262,11 @@ bool RunningElement::AdjustRunningElementYPos()
     ArrayOfTextElements::iterator iter;
 
     // First adjust the content of each cell
-    for (i = 0; i < 9; i++) {
+    for (i = 0; i < 9; ++i) {
         int cumulatedYRel = 0;
         ArrayOfTextElements *textElements = &m_cells[i];
         // For each object
-        for (iter = textElements->begin(); iter != textElements->end(); iter++) {
+        for (iter = textElements->begin(); iter != textElements->end(); ++iter) {
             if (!(*iter)->HasContentBB()) {
                 continue;
             }
@@ -278,10 +278,10 @@ bool RunningElement::AdjustRunningElementYPos()
 
     int rowYRel = 0;
     // For each row
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 3; ++i) {
         int currentRowHeigt = this->GetRowHeight(i);
         // For each column
-        for (j = 0; j < 3; j++) {
+        for (j = 0; j < 3; ++j) {
             int cell = i * 3 + j;
             int colYShift = 0;
             // middle row - it needs to be middle-aligned so calculate the colYShift accordingly
@@ -296,7 +296,7 @@ bool RunningElement::AdjustRunningElementYPos()
             ArrayOfTextElements *textElements = &m_cells[cell];
             ArrayOfTextElements::iterator iter;
             // For each object - adjust the yRel according to the rowYRel and the colYshift
-            for (iter = textElements->begin(); iter != textElements->end(); iter++) {
+            for (iter = textElements->begin(); iter != textElements->end(); ++iter) {
                 if (!(*iter)->HasContentBB()) {
                     continue;
                 }
