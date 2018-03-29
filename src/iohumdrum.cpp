@@ -9038,6 +9038,11 @@ void HumdrumInput::addTrill(hum::HTp token)
     setStaff(trill, staff);
 
     int staffindex = m_currentstaff - 1;
+    int layer = m_currentlayer;
+
+    if (layer == 2) {
+        setPlace(trill, "below");
+    }
 
     // hum::HumNum tstamp = getMeasureTstamp(token, staffindex)
     // trill->SetStartid("#" + getLocationId("note", token, subtok));
@@ -9088,14 +9093,22 @@ void HumdrumInput::addTrill(hum::HTp token)
 
     // find the ending note after the trill line.  Multiple trill line extensions for chord notes
     // are not handled by this algorithm, but these should be rare in notation.
-    hum::HTp endtok = token->getNextNNDT();
+    hum::HTp endtok = token->getNextToken();
     hum::HTp lasttok = token;
     while (endtok) {
+        if (!endtok->isData()) {
+            endtok = endtok->getNextToken();
+            continue;
+        }
+        if (endtok->isNull()) {
+            endtok = endtok->getNextToken();
+            continue;
+        }
         if ((endtok->find("TTT") == std::string::npos) && (endtok->find("ttt") == std::string::npos)) {
             break;
         }
         lasttok = endtok;
-        endtok = endtok->getNextNNDT();
+        endtok = endtok->getNextToken();
     }
     if (!lasttok) {
         return;
