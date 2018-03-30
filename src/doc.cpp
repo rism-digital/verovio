@@ -16,6 +16,7 @@
 
 #include "attcomparison.h"
 #include "barline.h"
+#include "beatrpt.h"
 #include "chord.h"
 #include "functorparams.h"
 #include "glyph.h"
@@ -29,7 +30,10 @@
 #include "metersig.h"
 #include "mnum.h"
 #include "mrest.h"
+#include "mrpt.h"
+#include "mrpt2.h"
 #include "multirest.h"
+#include "multirpt.h"
 #include "note.h"
 #include "page.h"
 #include "pages.h"
@@ -37,7 +41,6 @@
 #include "pgfoot2.h"
 #include "pghead.h"
 #include "pghead2.h"
-#include "rpt.h"
 #include "runningelement.h"
 #include "score.h"
 #include "slur.h"
@@ -277,7 +280,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
     int tempo = 120;
 
-    // Set tempo
+    // set MIDI tempo
     if (m_scoreDef.HasMidiBpm()) {
         tempo = m_scoreDef.GetMidiBpm();
     }
@@ -309,11 +312,12 @@ void Doc::ExportMIDI(MidiFile *midiFile)
          staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
 
         int transSemi = 0;
-        // Get the transposition (semi-tone) value for the staff
         if (StaffDef *staffDef = this->m_scoreDef.GetStaffDef(staves->first)) {
+            // get the transposition (semi-tone) value for the staff
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
             midiTrack = staffDef->GetN();
             midiFile->addTrack();
+            // set MIDI channel and instrument
             InstrDef *instrdef = dynamic_cast<InstrDef *>(staffDef->FindChildByType(INSTRDEF, 1));
             if (!instrdef) {
                 StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDef->GetFirstParent(STAFFGRP));
@@ -322,8 +326,10 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             }
             if (instrdef) {
                 if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel() - 1;
-                if (instrdef->HasMidiInstrnum()) midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum() - 1);
+                if (instrdef->HasMidiInstrnum())
+                    midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum() - 1);
             }
+            // set MIDI track name
             Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
             if (!label) {
                 StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(staffDef->GetFirstParent(STAFFGRP));
@@ -333,6 +339,10 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             if (label) {
                 std::string trackName = UTF16to8(label->GetText(label)).c_str();
                 if (!trackName.empty()) midiFile->addTrackName(midiTrack, 0, trackName);
+            }
+            // set MIDI time signature
+            if (this->m_scoreDef.HasMeterCount()) {
+                midiFile->addTimeSignature(midiTrack, 0, this->m_scoreDef.GetMeterCount(), this->m_scoreDef.GetMeterUnit());
             }
         }
 

@@ -228,7 +228,9 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
     assert(doc);
     assert(alignment);
     assert(alignment->GetType() == ALIGNMENT_GRACENOTE);
-    assert(alignment->GetGraceAligner());
+    
+    int graceAlignerId = doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staffN;
+    assert(alignment->HasGraceAligner(graceAlignerId));
 
     Measure *measure = dynamic_cast<Measure *>(this->GetParent());
     assert(measure);
@@ -236,10 +238,10 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
     int maxRight = VRV_UNSET;
     Alignment *rightAlignment = NULL;
 
-    // We can set staffN as VRV_UNSET to align all staves (this should be an option)
-    // We can also define somewhere vector of staffDef@n to be aligned together
+    // Set staffNGrp as VRV_UNSET to align all staves
+    // We could eventually also define somewhere vector of staffDef@n to be aligned together
     // For this we would need an alternate version GetLeftRight that can take a vector of staffNs
-    // staffN = VRV_UNSET;
+    int staffNGrp = doc->GetOptions()->m_graceRightAlign.GetValue() ? VRV_UNSET : staffN;
 
     bool found = false;
     ArrayOfObjects::reverse_iterator riter;
@@ -259,7 +261,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
         }
 
         int minLeft;
-        rightAlignment->GetLeftRight(staffN, minLeft, maxRight);
+        rightAlignment->GetLeftRight(staffNGrp, minLeft, maxRight);
 
         if (maxRight != VRV_UNSET) break;
     }
@@ -269,7 +271,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
 
     // Check if the left position of the group is on the right of the previous maxRight
     // If not, move the aligments accordingly
-    int left = alignment->GetGraceAligner()->GetGraceGroupLeft(staffN);
+    int left = alignment->GetGraceAligner(graceAlignerId)->GetGraceGroupLeft(staffN);
     // We also set artificially the margin with the previous note
     if (left != -VRV_UNSET) left -= doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100);
     if (left < maxRight) {
@@ -437,16 +439,24 @@ void Alignment::Reset()
     m_xRel = 0;
     m_time = 0.0;
     m_type = ALIGNMENT_DEFAULT;
-    m_graceAligner = NULL;
+    
+    ClearGraceAligners();
 }
 
 Alignment::~Alignment()
 {
-    if (m_graceAligner) {
-        delete m_graceAligner;
-    }
+    ClearGraceAligners();
 }
 
+void Alignment::ClearGraceAligners()
+{
+    MapOfIntGraceAligners::const_iterator iter;
+    for (iter = m_graceAligners.begin(); iter != m_graceAligners.end(); ++iter) {
+        delete iter->second;
+    }
+    m_graceAligners.clear();
+}
+    
 void Alignment::AddChild(Object *child)
 {
     assert(dynamic_cast<AlignmentReference *>(child));
@@ -546,12 +556,17 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
     maxRight = getAlignmentLeftRightParams.m_maxRight;
 }
 
-GraceAligner *Alignment::GetGraceAligner()
+GraceAligner *Alignment::GetGraceAligner(int id)
 {
-    if (!m_graceAligner) {
-        m_graceAligner = new GraceAligner();
+    if (m_graceAligners.count(id) == 0) {
+        m_graceAligners[id] = new GraceAligner();
     }
-    return m_graceAligner;
+    return m_graceAligners[id];
+}
+    
+bool Alignment::HasGraceAligner(int id) const
+{
+    return (m_graceAligners.count(id) == 1);
 }
 
 AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, int staffN)
@@ -796,7 +811,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
     // We are in a Measure aligner - redirect to the GraceAligner when it is a ALIGNMENT_GRACENOTE
     if (!params->m_isGraceAlignment) {
         // Do not process AlignmentReference children if no GraceAligner
-        if (!m_graceAligner) {
+        if (m_graceAligners.empty()) {
             // We store the default alignment before we hit the grace alignment
             if (m_type == ALIGNMENT_DEFAULT) params->m_rightDefaultAlignment = this;
             return FUNCTOR_SIBLINGS;
@@ -841,15 +856,19 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
             filters.push_back(&matchStaff);
+            
+            int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : *iter;
 
-            m_graceAligner->Process(
-                params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
+            if (HasGraceAligner(graceAlignerId)) {
+                GetGraceAligner(graceAlignerId)->Process(
+                    params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
 
-            // There was not grace notes for that staff
-            if (params->m_graceCumulatedXShift == VRV_UNSET) continue;
+                // There was not grace notes for that staff
+                if (params->m_graceCumulatedXShift == VRV_UNSET) continue;
 
-            // Now we need to adjust the space for the grace not group
-            measureAligner->AdjustGraceNoteSpacing(params->m_doc, this, (*iter));
+                // Now we need to adjust the space for the grace not group
+                measureAligner->AdjustGraceNoteSpacing(params->m_doc, this, (*iter));
+            }
         }
 
         // Change the flag back
@@ -922,7 +941,10 @@ int Alignment::AdjustAccidX(FunctorParams *functorParams)
     AdjustAccidXParams *params = dynamic_cast<AdjustAccidXParams *>(functorParams);
     assert(params);
 
-    if (this->m_graceAligner) this->m_graceAligner->Process(params->m_functor, functorParams);
+    MapOfIntGraceAligners::const_iterator iter;
+    for (iter = m_graceAligners.begin(); iter != m_graceAligners.end(); ++iter) {
+        iter->second->Process(params->m_functor, functorParams);
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -960,8 +982,9 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
 
-    if (m_graceAligner) {
-        m_graceAligner->SetGraceAligmentXPos(params->m_doc);
+    MapOfIntGraceAligners::const_iterator iter;
+    for (iter = m_graceAligners.begin(); iter != m_graceAligners.end(); ++iter) {
+        iter->second->SetGraceAligmentXPos(params->m_doc);
     }
 
     SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);

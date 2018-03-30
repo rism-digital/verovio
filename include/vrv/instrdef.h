@@ -18,6 +18,9 @@ namespace vrv {
 // InstrDef
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <instrDef> element.
+ */
 class InstrDef : public Object, public AttChannelized, public AttLabelled, public AttMidiInstrument, public AttNNumberLike {
 
 public:

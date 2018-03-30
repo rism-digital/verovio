@@ -1,40 +1,45 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        ref.cpp
-// Author:      Laurent Pugin
-// Created:     2018/02/21
+// Name:        multirpt.cpp
+// Author:      Klaus Rettinghaus
+// Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "ref.h"
+#include "multirpt.h"
 
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <math.h>
 
 //----------------------------------------------------------------------------
 
+#include "chord.h"
+#include "editorial.h"
+#include "functorparams.h"
+#include "layer.h"
+#include "note.h"
+#include "staff.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Ref
+// MultiRpt
 //----------------------------------------------------------------------------
 
-Ref::Ref() : EditorialElement("ref-")
+MultiRpt::MultiRpt() : LayerElement("multirpt-"), AttNumbered()
 {
+    RegisterAttClass(ATT_NUMBERED);
     Reset();
 }
 
-Ref::~Ref() {}
+MultiRpt::~MultiRpt() {}
 
-void Ref::Reset()
+void MultiRpt::Reset()
 {
-    EditorialElement::Reset();
+    LayerElement::Reset();
+    ResetNumbered();
 }
-
-//----------------------------------------------------------------------------
-// Functor methods
-//----------------------------------------------------------------------------
 
 } // namespace vrv

@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <assert.h>
 #include <math.h>
 
@@ -643,11 +644,25 @@ int Measure::AdjustGraceXPos(FunctorParams *functorParams)
     assert(params);
 
     m_measureAligner.PushAlignmentsRight();
-
     params->m_rightDefaultAlignment = NULL;
-
+    
     // We process it backward because we want to get the rightDefaultAlignment
     m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
+    
+    // We need to process the staves in the reverse order
+    std::vector<int> staffNs = params->m_staffNs;
+    std::vector<int> staffNsReversed;
+    staffNsReversed.resize(staffNs.size());
+    std::reverse_copy(staffNs.begin(), staffNs.end(), staffNsReversed.begin());
+    
+    m_measureAligner.PushAlignmentsRight();
+    params->m_rightDefaultAlignment = NULL;
+    
+    params->m_staffNs = staffNsReversed;
+    m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
+    
+    // Put params back
+    params->m_staffNs = staffNs;
 
     return FUNCTOR_SIBLINGS;
 }
@@ -933,10 +948,8 @@ int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
 
     ArrayOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
-        // At the end of the measure (going backward) we remove element for which we do not need to match the end
-        // (for
-        // now). Eventually, we could consider them, for example if we want to display their spanning or for
-        // improved
+        // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
+        // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
         // midi output
         if ((iter->second == DIR) || (iter->second == DYNAM) || (iter->second == HARM)) {
             iter = params->m_timeSpanningInterfaces.erase(iter);
@@ -1054,7 +1067,8 @@ int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
     Tempo *tempo = dynamic_cast<Tempo *>(this->FindChildByType(TEMPO));
     if (tempo && tempo->HasMidiBpm()) {
         params->m_currentTempo = tempo->GetMidiBpm();
-    } else if (tempo && tempo->HasMm()) {
+    }
+    else if (tempo && tempo->HasMm()) {
         int mm = tempo->GetMm();
         int mmUnit = 4;
         if (tempo->HasMmUnit() && (tempo->GetMmUnit() > DURATION_breve)) {

@@ -1,44 +1,40 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        btrem.h
-// Author:      Laurent Pugin
-// Created:     2015
+// Name:        multirpt.h
+// Author:      Klaus Rettinghaus
+// Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_BTREM_H__
-#define __VRV_BTREM_H__
+#ifndef __VRV_MULTIRPT_H__
+#define __VRV_MULTIRPT_H__
 
 #include "atts_cmn.h"
+#include "atts_shared.h"
+#include "beam.h"
 #include "layerelement.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// BTrem (bowed tremolo)
+// MultiRpt (multiple repeat)
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <bTrem> element.
+ * This class models the MEI <multiRpt> element.
  */
-class BTrem : public LayerElement, public AttTremMeasured {
+class MultiRpt : public LayerElement, public AttNumbered {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
      * Reset method resets all attribute classes
      */
     ///@{
-    BTrem();
-    virtual ~BTrem();
+    MultiRpt();
+    virtual ~MultiRpt();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "BTrem"; }
-    virtual ClassId GetClassId() const { return BTREM; }
+    virtual std::string GetClassName() const { return "MultiRpt"; }
+    virtual ClassId GetClassId() const { return MULTIRPT; }
     ///@}
-
-    /**
-     * Add an element (a note or a chord) to a fTrem.
-     * Only Note or Chord elements will be actually added to the fTrem.
-     */
-    virtual void AddChild(Object *object);
 
 private:
     //

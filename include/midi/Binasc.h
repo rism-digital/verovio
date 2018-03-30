@@ -75,21 +75,21 @@ class Binasc {
 
    protected:
       // helper functions for reading ASCII content to conver to binary:
-      int      processLine        (ostream& out, const string& input, 
+      int      processLine        (ostream& out, const string& input,
                                    int lineNum);
-      int      processAsciiWord   (ostream& out, const string& input, 
+      int      processAsciiWord   (ostream& out, const string& input,
                                    int lineNum);
-      int      processStringWord  (ostream& out, const string& input, 
+      int      processStringWord  (ostream& out, const string& input,
                                    int lineNum);
-      int      processBinaryWord  (ostream& out, const string& input, 
+      int      processBinaryWord  (ostream& out, const string& input,
                                    int lineNum);
-      int      processDecimalWord (ostream& out, const string& input, 
+      int      processDecimalWord (ostream& out, const string& input,
                                    int lineNum);
-      int      processHexWord     (ostream& out, const string& input, 
+      int      processHexWord     (ostream& out, const string& input,
                                    int lineNum);
-      int      processVlvWord     (ostream& out, const string& input, 
+      int      processVlvWord     (ostream& out, const string& input,
                                    int lineNum);
-      int      processMidiPitchBendWord(ostream& out, const string& input, 
+      int      processMidiPitchBendWord(ostream& out, const string& input,
                                    int lineNum);
       int      processMidiTempoWord(ostream& out, const string& input,
                                    int lineNum);
@@ -101,12 +101,12 @@ class Binasc {
       int      outputStyleMidi    (ostream& out, istream& input);
 
       // MIDI parsing helper functions:
-      int      readMidiEvent  (ostream& out, istream& infile, int& trackbytes, 
+      int      readMidiEvent  (ostream& out, istream& infile, int& trackbytes,
                                int& command);
       int      getVLV         (istream& infile, int& trackbytes);
-      int      getWord        (string& word, const string& input, 
+      int      getWord        (string& word, const string& input,
                                const string& terminators, int index);
-     
+
 
    private:
       int bytesQ;        // option for printing hex bytes in ASCII output.

@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        labelabbr.cpp
+// Name:        annot.cpp
 // Author:      Klaus Rettinghaus
-// Created:     07/03/2018
+// Created:     2018/03/28
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "labelabbr.h"
+#include "annot.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,32 +13,39 @@
 
 //----------------------------------------------------------------------------
 
-#include "editorial.h"
 #include "text.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// LabelAbbr
+// Annot
 //----------------------------------------------------------------------------
 
-LabelAbbr::LabelAbbr() : Object("labelAbbr-"), TextListInterface()
+Annot::Annot() : EditorialElement("annot-"), TextListInterface(), AttPlist(), AttSource()
 {
+    RegisterAttClass(ATT_PLIST);
+    RegisterAttClass(ATT_SOURCE);
+
     Reset();
 }
 
-LabelAbbr::~LabelAbbr() {}
+Annot::~Annot() {}
 
-void LabelAbbr::Reset()
+void Annot::Reset()
 {
-    Object::Reset();
+    EditorialElement::Reset();
+    ResetPlist();
+    ResetSource();
 }
 
-void LabelAbbr::AddChild(Object *child)
+void Annot::AddChild(Object *child)
 {
-    if (child->Is({ LB, REND, TEXT })) {
+    if (child->IsTextElement()) {
         assert(dynamic_cast<TextElement *>(child));
+    }
+    else if (child->Is(ANNOT)) {
+        assert(dynamic_cast<Annot *>(child));
     }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());

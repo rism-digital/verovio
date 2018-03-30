@@ -18,7 +18,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <space>
+ * This class models the MEI <space> element.
  */
 class Space : public LayerElement, public DurationInterface {
 public:

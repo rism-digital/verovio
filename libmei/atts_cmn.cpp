@@ -423,14 +423,14 @@ AttBeatRptLog::~AttBeatRptLog()
 
 void AttBeatRptLog::ResetBeatRptLog()
 {
-    m_beatdef = DURATION_NONE;
+    m_beatdef = 0.0;
 }
 
 bool AttBeatRptLog::ReadBeatRptLog(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("beatdef")) {
-        this->SetBeatdef(StrToDuration(element.attribute("beatdef").value()));
+        this->SetBeatdef(StrToDbl(element.attribute("beatdef").value()));
         element.remove_attribute("beatdef");
         hasAttribute = true;
     }
@@ -441,7 +441,7 @@ bool AttBeatRptLog::WriteBeatRptLog(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasBeatdef()) {
-        element.append_attribute("beatdef") = DurationToStr(this->GetBeatdef()).c_str();
+        element.append_attribute("beatdef") = DblToStr(this->GetBeatdef()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -449,7 +449,7 @@ bool AttBeatRptLog::WriteBeatRptLog(pugi::xml_node element)
 
 bool AttBeatRptLog::HasBeatdef() const
 {
-    return (m_beatdef != DURATION_NONE);
+    return (m_beatdef != 0.0);
 }
 
 /* include <attbeatdef> */
@@ -1739,7 +1739,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         AttBeatRptLog *att = dynamic_cast<AttBeatRptLog *>(element);
         assert(att);
         if (attrType == "beatdef") {
-            att->SetBeatdef(att->StrToDuration(attrValue));
+            att->SetBeatdef(att->StrToDbl(attrValue));
             return true;
         }
     }
@@ -2042,7 +2042,7 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         const AttBeatRptLog *att = dynamic_cast<const AttBeatRptLog *>(element);
         assert(att);
         if (att->HasBeatdef()) {
-            attributes->push_back(std::make_pair("beatdef", att->DurationToStr(att->GetBeatdef())));
+            attributes->push_back(std::make_pair("beatdef", att->DblToStr(att->GetBeatdef())));
         }
     }
     if (element->HasAttClass(ATT_CUTOUT)) {

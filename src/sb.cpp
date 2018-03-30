@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        labelabbr.cpp
+// Name:        sb.cpp
 // Author:      Klaus Rettinghaus
-// Created:     07/03/2018
+// Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "labelabbr.h"
+#include "sb.h"
 
 //----------------------------------------------------------------------------
 
@@ -14,44 +14,47 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
-#include "text.h"
+#include "functorparams.h"
+#include "page.h"
+#include "system.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// LabelAbbr
+// Sb
 //----------------------------------------------------------------------------
 
-LabelAbbr::LabelAbbr() : Object("labelAbbr-"), TextListInterface()
+Sb::Sb() : SystemElement("sb-"), AttNNumberLike()
 {
+    RegisterAttClass(ATT_NNUMBERLIKE);
+
     Reset();
 }
 
-LabelAbbr::~LabelAbbr() {}
+Sb::~Sb() {}
 
-void LabelAbbr::Reset()
+void Sb::Reset()
 {
-    Object::Reset();
-}
-
-void LabelAbbr::AddChild(Object *child)
-{
-    if (child->Is({ LB, REND, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
-    }
-    else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
-    }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    SystemElement::Reset();
+    ResetNNumberLike();
 }
 
 //----------------------------------------------------------------------------
-// Functor methods
+// Sb functor methods
 //----------------------------------------------------------------------------
+
+int Sb::CastOffEncoding(FunctorParams *functorParams)
+{
+    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    params->m_currentSystem = new System();
+    params->m_currentPage->AddChild(params->m_currentSystem);
+
+    MoveItselfTo(params->m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
 
 } // namespace vrv

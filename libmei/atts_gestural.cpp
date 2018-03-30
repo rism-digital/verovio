@@ -180,6 +180,11 @@ AttDurationGestural::~AttDurationGestural()
 void AttDurationGestural::ResetDurationGestural()
 {
     m_durGes = DURATION_NONE;
+    m_dotsGes = 0;
+    m_durMetrical = 0.0;
+    m_durPpq = 0;
+    m_durReal = 0.0;
+    m_durRecip = "";
 }
 
 bool AttDurationGestural::ReadDurationGestural(pugi::xml_node element)
@@ -188,6 +193,31 @@ bool AttDurationGestural::ReadDurationGestural(pugi::xml_node element)
     if (element.attribute("dur.ges")) {
         this->SetDurGes(StrToDuration(element.attribute("dur.ges").value()));
         element.remove_attribute("dur.ges");
+        hasAttribute = true;
+    }
+    if (element.attribute("dots.ges")) {
+        this->SetDotsGes(StrToInt(element.attribute("dots.ges").value()));
+        element.remove_attribute("dots.ges");
+        hasAttribute = true;
+    }
+    if (element.attribute("dur.metrical")) {
+        this->SetDurMetrical(StrToDbl(element.attribute("dur.metrical").value()));
+        element.remove_attribute("dur.metrical");
+        hasAttribute = true;
+    }
+    if (element.attribute("dur.ppq")) {
+        this->SetDurPpq(StrToInt(element.attribute("dur.ppq").value()));
+        element.remove_attribute("dur.ppq");
+        hasAttribute = true;
+    }
+    if (element.attribute("dur.real")) {
+        this->SetDurReal(StrToDbl(element.attribute("dur.real").value()));
+        element.remove_attribute("dur.real");
+        hasAttribute = true;
+    }
+    if (element.attribute("dur.recip")) {
+        this->SetDurRecip(StrToStr(element.attribute("dur.recip").value()));
+        element.remove_attribute("dur.recip");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -200,6 +230,26 @@ bool AttDurationGestural::WriteDurationGestural(pugi::xml_node element)
         element.append_attribute("dur.ges") = DurationToStr(this->GetDurGes()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasDotsGes()) {
+        element.append_attribute("dots.ges") = IntToStr(this->GetDotsGes()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasDurMetrical()) {
+        element.append_attribute("dur.metrical") = DblToStr(this->GetDurMetrical()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasDurPpq()) {
+        element.append_attribute("dur.ppq") = IntToStr(this->GetDurPpq()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasDurReal()) {
+        element.append_attribute("dur.real") = DblToStr(this->GetDurReal()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasDurRecip()) {
+        element.append_attribute("dur.recip") = StrToStr(this->GetDurRecip()).c_str();
+        wroteAttribute = true;
+    }
     return wroteAttribute;
 }
 
@@ -208,7 +258,32 @@ bool AttDurationGestural::HasDurGes() const
     return (m_durGes != DURATION_NONE);
 }
 
-/* include <attdur.ges> */
+bool AttDurationGestural::HasDotsGes() const
+{
+    return (m_dotsGes != 0);
+}
+
+bool AttDurationGestural::HasDurMetrical() const
+{
+    return (m_durMetrical != 0.0);
+}
+
+bool AttDurationGestural::HasDurPpq() const
+{
+    return (m_durPpq != 0);
+}
+
+bool AttDurationGestural::HasDurReal() const
+{
+    return (m_durReal != 0.0);
+}
+
+bool AttDurationGestural::HasDurRecip() const
+{
+    return (m_durRecip != "");
+}
+
+/* include <attdur.recip> */
 
 //----------------------------------------------------------------------------
 // AttNoteGes
@@ -438,7 +513,7 @@ AttTimestampGestural::~AttTimestampGestural()
 
 void AttTimestampGestural::ResetTimestampGestural()
 {
-    m_tstampGes = DURATION_NONE;
+    m_tstampGes = 0.0;
     m_tstampReal = "";
 }
 
@@ -446,7 +521,7 @@ bool AttTimestampGestural::ReadTimestampGestural(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("tstamp.ges")) {
-        this->SetTstampGes(StrToDuration(element.attribute("tstamp.ges").value()));
+        this->SetTstampGes(StrToDbl(element.attribute("tstamp.ges").value()));
         element.remove_attribute("tstamp.ges");
         hasAttribute = true;
     }
@@ -462,7 +537,7 @@ bool AttTimestampGestural::WriteTimestampGestural(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasTstampGes()) {
-        element.append_attribute("tstamp.ges") = DurationToStr(this->GetTstampGes()).c_str();
+        element.append_attribute("tstamp.ges") = DblToStr(this->GetTstampGes()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTstampReal()) {
@@ -474,7 +549,7 @@ bool AttTimestampGestural::WriteTimestampGestural(pugi::xml_node element)
 
 bool AttTimestampGestural::HasTstampGes() const
 {
-    return (m_tstampGes != DURATION_NONE);
+    return (m_tstampGes != 0.0);
 }
 
 bool AttTimestampGestural::HasTstampReal() const
@@ -483,6 +558,67 @@ bool AttTimestampGestural::HasTstampReal() const
 }
 
 /* include <atttstamp.real> */
+
+//----------------------------------------------------------------------------
+// AttTimestamp2Gestural
+//----------------------------------------------------------------------------
+
+AttTimestamp2Gestural::AttTimestamp2Gestural() : Att()
+{
+    ResetTimestamp2Gestural();
+}
+
+AttTimestamp2Gestural::~AttTimestamp2Gestural()
+{
+}
+
+void AttTimestamp2Gestural::ResetTimestamp2Gestural()
+{
+    m_tstamp2Ges = std::make_pair(-1, -1.0);
+    m_tstamp2Real = "";
+}
+
+bool AttTimestamp2Gestural::ReadTimestamp2Gestural(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("tstamp2.ges")) {
+        this->SetTstamp2Ges(StrToMeasurebeat(element.attribute("tstamp2.ges").value()));
+        element.remove_attribute("tstamp2.ges");
+        hasAttribute = true;
+    }
+    if (element.attribute("tstamp2.real")) {
+        this->SetTstamp2Real(StrToStr(element.attribute("tstamp2.real").value()));
+        element.remove_attribute("tstamp2.real");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttTimestamp2Gestural::WriteTimestamp2Gestural(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasTstamp2Ges()) {
+        element.append_attribute("tstamp2.ges") = MeasurebeatToStr(this->GetTstamp2Ges()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasTstamp2Real()) {
+        element.append_attribute("tstamp2.real") = StrToStr(this->GetTstamp2Real()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttTimestamp2Gestural::HasTstamp2Ges() const
+{
+    return (m_tstamp2Ges != std::make_pair(-1, -1.0));
+}
+
+bool AttTimestamp2Gestural::HasTstamp2Real() const
+{
+    return (m_tstamp2Real != "");
+}
+
+/* include <atttstamp2.real> */
 
 bool Att::SetGestural(Object *element, std::string attrType, std::string attrValue)
 {
@@ -515,6 +651,26 @@ bool Att::SetGestural(Object *element, std::string attrType, std::string attrVal
         assert(att);
         if (attrType == "dur.ges") {
             att->SetDurGes(att->StrToDuration(attrValue));
+            return true;
+        }
+        if (attrType == "dots.ges") {
+            att->SetDotsGes(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "dur.metrical") {
+            att->SetDurMetrical(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "dur.ppq") {
+            att->SetDurPpq(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "dur.real") {
+            att->SetDurReal(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "dur.recip") {
+            att->SetDurRecip(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -566,11 +722,23 @@ bool Att::SetGestural(Object *element, std::string attrType, std::string attrVal
         AttTimestampGestural *att = dynamic_cast<AttTimestampGestural *>(element);
         assert(att);
         if (attrType == "tstamp.ges") {
-            att->SetTstampGes(att->StrToDuration(attrValue));
+            att->SetTstampGes(att->StrToDbl(attrValue));
             return true;
         }
         if (attrType == "tstamp.real") {
             att->SetTstampReal(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_TIMESTAMP2GESTURAL)) {
+        AttTimestamp2Gestural *att = dynamic_cast<AttTimestamp2Gestural *>(element);
+        assert(att);
+        if (attrType == "tstamp2.ges") {
+            att->SetTstamp2Ges(att->StrToMeasurebeat(attrValue));
+            return true;
+        }
+        if (attrType == "tstamp2.real") {
+            att->SetTstamp2Real(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -606,6 +774,21 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasDurGes()) {
             attributes->push_back(std::make_pair("dur.ges", att->DurationToStr(att->GetDurGes())));
+        }
+        if (att->HasDotsGes()) {
+            attributes->push_back(std::make_pair("dots.ges", att->IntToStr(att->GetDotsGes())));
+        }
+        if (att->HasDurMetrical()) {
+            attributes->push_back(std::make_pair("dur.metrical", att->DblToStr(att->GetDurMetrical())));
+        }
+        if (att->HasDurPpq()) {
+            attributes->push_back(std::make_pair("dur.ppq", att->IntToStr(att->GetDurPpq())));
+        }
+        if (att->HasDurReal()) {
+            attributes->push_back(std::make_pair("dur.real", att->DblToStr(att->GetDurReal())));
+        }
+        if (att->HasDurRecip()) {
+            attributes->push_back(std::make_pair("dur.recip", att->StrToStr(att->GetDurRecip())));
         }
     }
     if (element->HasAttClass(ATT_NOTEGES)) {
@@ -648,10 +831,20 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
         const AttTimestampGestural *att = dynamic_cast<const AttTimestampGestural *>(element);
         assert(att);
         if (att->HasTstampGes()) {
-            attributes->push_back(std::make_pair("tstamp.ges", att->DurationToStr(att->GetTstampGes())));
+            attributes->push_back(std::make_pair("tstamp.ges", att->DblToStr(att->GetTstampGes())));
         }
         if (att->HasTstampReal()) {
             attributes->push_back(std::make_pair("tstamp.real", att->StrToStr(att->GetTstampReal())));
+        }
+    }
+    if (element->HasAttClass(ATT_TIMESTAMP2GESTURAL)) {
+        const AttTimestamp2Gestural *att = dynamic_cast<const AttTimestamp2Gestural *>(element);
+        assert(att);
+        if (att->HasTstamp2Ges()) {
+            attributes->push_back(std::make_pair("tstamp2.ges", att->MeasurebeatToStr(att->GetTstamp2Ges())));
+        }
+        if (att->HasTstamp2Real()) {
+            attributes->push_back(std::make_pair("tstamp2.real", att->StrToStr(att->GetTstamp2Real())));
         }
     }
 }

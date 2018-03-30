@@ -17,9 +17,12 @@ namespace vrv {
 class TextElement;
 
 //----------------------------------------------------------------------------
-// Dir
+// Dir (directive)
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <dir> element.
+ */
 class Dir : public ControlElement,
             public TextListInterface,
             public TextDirInterface,
