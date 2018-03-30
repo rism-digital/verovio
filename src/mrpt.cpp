@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        rpt.cpp
-// Author:      Laurent Pugin
-// Created:     2015
+// Name:        mrpt.cpp
+// Author:      Klaus Rettinghaus
+// Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "rpt.h"
+#include "mrpt.h"
 
 //----------------------------------------------------------------------------
 
@@ -23,31 +23,6 @@
 #include "vrv.h"
 
 namespace vrv {
-
-//----------------------------------------------------------------------------
-// BeatRpt
-//----------------------------------------------------------------------------
-
-BeatRpt::BeatRpt() : LayerElement("beatrpt-"), AttColor(), AttBeatRptVis()
-{
-    RegisterAttClass(ATT_BEATRPTVIS);
-    RegisterAttClass(ATT_COLOR);
-    Reset();
-}
-
-BeatRpt::~BeatRpt() {}
-
-void BeatRpt::Reset()
-{
-    LayerElement::Reset();
-    ResetBeatRptVis();
-    ResetColor();
-}
-
-double BeatRpt::GetBeatRptAlignmentDuration(int meterUnit) const
-{
-    return DUR_MAX / meterUnit;
-}
 
 //----------------------------------------------------------------------------
 // MRpt
@@ -68,42 +43,18 @@ void MRpt::Reset()
 }
 
 //----------------------------------------------------------------------------
-// MRpt2
-//----------------------------------------------------------------------------
-
-MRpt2::MRpt2() : LayerElement("mrpt2-")
-{
-    Reset();
-}
-
-MRpt2::~MRpt2() {}
-
-void MRpt2::Reset()
-{
-    LayerElement::Reset();
-}
-
-//----------------------------------------------------------------------------
-// MultiRpt
-//----------------------------------------------------------------------------
-
-MultiRpt::MultiRpt() : LayerElement("multirpt-"), AttNumbered()
-{
-    RegisterAttClass(ATT_NUMBERED);
-    Reset();
-}
-
-MultiRpt::~MultiRpt() {}
-
-void MultiRpt::Reset()
-{
-    LayerElement::Reset();
-    ResetNumbered();
-}
-
-//----------------------------------------------------------------------------
 // MRpt functor methods
 //----------------------------------------------------------------------------
+
+int MRpt::GenerateMIDI(FunctorParams *functorParams)
+{
+    // GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    // assert(params);
+    
+    LogWarning("MRpt produces empty MIDI output");
+
+    return FUNCTOR_CONTINUE;
+}
 
 int MRpt::PrepareRpt(FunctorParams *functorParams)
 {

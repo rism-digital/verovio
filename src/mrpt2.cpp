@@ -1,40 +1,43 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        ref.cpp
-// Author:      Laurent Pugin
-// Created:     2018/02/21
+// Name:        mrpt2.cpp
+// Author:      Klaus Rettinghaus
+// Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "ref.h"
+#include "mrpt2.h"
 
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <math.h>
 
 //----------------------------------------------------------------------------
 
+#include "chord.h"
+#include "editorial.h"
+#include "functorparams.h"
+#include "layer.h"
+#include "note.h"
+#include "staff.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Ref
+// MRpt2
 //----------------------------------------------------------------------------
 
-Ref::Ref() : EditorialElement("ref-")
+MRpt2::MRpt2() : LayerElement("mrpt2-")
 {
     Reset();
 }
 
-Ref::~Ref() {}
+MRpt2::~MRpt2() {}
 
-void Ref::Reset()
+void MRpt2::Reset()
 {
-    EditorialElement::Reset();
+    LayerElement::Reset();
 }
-
-//----------------------------------------------------------------------------
-// Functor methods
-//----------------------------------------------------------------------------
 
 } // namespace vrv
