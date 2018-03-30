@@ -33,13 +33,13 @@ Hairpin::Hairpin()
     , AttColor()
     , AttHairpinLog()
     , AttPlacement()
-    , AttVerticalAlignment()
+    , AttVerticalGroup()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_HAIRPINLOG);
     RegisterAttClass(ATT_PLACEMENT);
-    RegisterAttClass(ATT_VERTICALALIGNMENT);
+    RegisterAttClass(ATT_VERTICALGROUP);
 
     Reset();
 }
@@ -53,7 +53,7 @@ void Hairpin::Reset()
     ResetColor();
     ResetHairpinLog();
     ResetPlacement();
-    AttVerticalAlignment::ResetVerticalAlignment();
+    AttVerticalGroup::ResetVerticalGroup();
 
     m_leftLink = NULL;
     m_rightLink = NULL;

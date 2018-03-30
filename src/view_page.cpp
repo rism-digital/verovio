@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "annot.h"
 #include "attcomparison.h"
 #include "beam.h"
 #include "clef.h"

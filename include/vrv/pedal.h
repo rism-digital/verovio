@@ -18,6 +18,9 @@ namespace vrv {
 // Pedal
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <pedal> element.
+ */
 class Pedal : public ControlElement,
               public TimePointInterface,
               public AttColor,

@@ -16,9 +16,11 @@
 
 #include "accid.h"
 #include "anchoredtext.h"
+#include "annot.h"
 #include "arpeg.h"
 #include "artic.h"
 #include "beam.h"
+#include "beatrpt.h"
 #include "boundary.h"
 #include "breath.h"
 #include "btrem.h"
@@ -52,12 +54,16 @@
 #include "mnum.h"
 #include "mordent.h"
 #include "mrest.h"
+#include "mrpt.h"
+#include "mrpt2.h"
 #include "multirest.h"
+#include "multirpt.h"
 #include "note.h"
 #include "num.h"
 #include "octave.h"
 #include "page.h"
 #include "pages.h"
+#include "pb.h"
 #include "pedal.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
@@ -67,7 +73,7 @@
 #include "ref.h"
 #include "rend.h"
 #include "rest.h"
-#include "rpt.h"
+#include "sb.h"
 #include "score.h"
 #include "section.h"
 #include "slur.h"
@@ -959,7 +965,7 @@ void MeiOutput::WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
 void MeiOutput::WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef)
 {
     assert(instrDef);
-    
+
     WriteXmlId(currentNode, instrDef);
     instrDef->WriteChannelized(currentNode);
     instrDef->WriteLabelled(currentNode);
@@ -1060,7 +1066,7 @@ void MeiOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteControlElement(currentNode, dynam);
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
-    dynam->WriteVerticalAlignment(currentNode);
+    dynam->WriteVerticalGroup(currentNode);
 }
 
 void MeiOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
@@ -1083,7 +1089,7 @@ void MeiOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     hairpin->WriteColor(currentNode);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WritePlacement(currentNode);
-    hairpin->WriteVerticalAlignment(currentNode);
+    hairpin->WriteVerticalGroup(currentNode);
 }
 
 void MeiOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
@@ -3110,7 +3116,7 @@ bool MeiInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
 {
     InstrDef *vrvInstrDef = new InstrDef();
     SetMeiUuid(instrDef, vrvInstrDef);
-    
+
     parent->AddChild(vrvInstrDef);
     vrvInstrDef->ReadChannelized(instrDef);
     vrvInstrDef->ReadLabelled(instrDef);
@@ -3318,7 +3324,7 @@ bool MeiInput::ReadDynam(Object *parent, pugi::xml_node dynam)
 
     ReadTextDirInterface(dynam, vrvDynam);
     ReadTimeSpanningInterface(dynam, vrvDynam);
-    vrvDynam->ReadVerticalAlignment(dynam);
+    vrvDynam->ReadVerticalGroup(dynam);
 
     parent->AddChild(vrvDynam);
     ReadUnsupportedAttr(dynam, vrvDynam);
@@ -3349,7 +3355,7 @@ bool MeiInput::ReadHairpin(Object *parent, pugi::xml_node hairpin)
     vrvHairpin->ReadColor(hairpin);
     vrvHairpin->ReadHairpinLog(hairpin);
     vrvHairpin->ReadPlacement(hairpin);
-    vrvHairpin->ReadVerticalAlignment(hairpin);
+    vrvHairpin->ReadVerticalGroup(hairpin);
 
     parent->AddChild(vrvHairpin);
     ReadUnsupportedAttr(hairpin, vrvHairpin);
