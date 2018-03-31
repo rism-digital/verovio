@@ -20,6 +20,9 @@ class AlignmentReference;
 // Accid
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <accid> element.
+ */
 class Accid : public LayerElement,
               public PositionInterface,
               public AttAccidental,

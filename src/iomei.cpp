@@ -16,9 +16,11 @@
 
 #include "accid.h"
 #include "anchoredtext.h"
+#include "annot.h"
 #include "arpeg.h"
 #include "artic.h"
 #include "beam.h"
+#include "beatrpt.h"
 #include "boundary.h"
 #include "breath.h"
 #include "btrem.h"
@@ -52,12 +54,16 @@
 #include "mnum.h"
 #include "mordent.h"
 #include "mrest.h"
+#include "mrpt.h"
+#include "mrpt2.h"
 #include "multirest.h"
+#include "multirpt.h"
 #include "note.h"
 #include "num.h"
 #include "octave.h"
 #include "page.h"
 #include "pages.h"
+#include "pb.h"
 #include "pedal.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
@@ -67,7 +73,7 @@
 #include "ref.h"
 #include "rend.h"
 #include "rest.h"
-#include "rpt.h"
+#include "sb.h"
 #include "score.h"
 #include "section.h"
 #include "slur.h"
@@ -276,7 +282,7 @@ bool MeiOutput::WriteObject(Object *object)
         WriteLabel(m_currentNode, dynamic_cast<Label *>(object));
     }
     else if (object->Is(INSTRDEF)) {
-        m_currentNode = m_currentNode.append_child("instrdef");
+        m_currentNode = m_currentNode.append_child("instrDef");
         WriteInstrDef(m_currentNode, dynamic_cast<InstrDef *>(object));
     }
     else if (object->Is(LABELABBR)) {
@@ -959,7 +965,7 @@ void MeiOutput::WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
 void MeiOutput::WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef)
 {
     assert(instrDef);
-    
+
     WriteXmlId(currentNode, instrDef);
     instrDef->WriteChannelized(currentNode);
     instrDef->WriteLabelled(currentNode);
@@ -3107,7 +3113,7 @@ bool MeiInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
 {
     InstrDef *vrvInstrDef = new InstrDef();
     SetMeiUuid(instrDef, vrvInstrDef);
-    
+
     parent->AddChild(vrvInstrDef);
     vrvInstrDef->ReadChannelized(instrDef);
     vrvInstrDef->ReadLabelled(instrDef);

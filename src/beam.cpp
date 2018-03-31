@@ -122,7 +122,7 @@ void BeamDrawingParams::CalcBeam(
             high = std::max(yMax, high);
             low = std::min(yMin, low);
         }
-        else {
+        else if ((*beamElementCoords).at(i)->m_element->Is(NOTE)) {
             (*beamElementCoords).at(i)->m_y = (*beamElementCoords).at(i)->m_element->GetDrawingY();
 
             // highest and lowest value;
@@ -133,6 +133,13 @@ void BeamDrawingParams::CalcBeam(
             (*beamElementCoords).at(i)->m_yTop = curY;
             (*beamElementCoords).at(i)->m_yBottom = curY;
             avgY += (*beamElementCoords).at(i)->m_y;
+        }
+        else {
+            (*beamElementCoords).at(i)->m_y = (*beamElementCoords).at(i)->m_element->GetDrawingY();
+            
+            curY = (*beamElementCoords).at(i)->m_element->GetDrawingY();
+            (*beamElementCoords).at(i)->m_yTop = curY;
+            (*beamElementCoords).at(i)->m_yBottom = curY;
         }
     }
 
@@ -247,6 +254,11 @@ void BeamDrawingParams::CalcBeam(
     double expectedY;
     int verticalAdjustment = 0;
     for (i = 0; i < elementCount; i++) {
+        if ((*beamElementCoords).at(i)->m_element->Is(REST)) {
+            // Here we need to take into account the bounding box of the rest
+            continue;
+        }
+        
         oldYPos = (*beamElementCoords).at(i)->m_yBeam;
         expectedY = this->m_startingY + verticalAdjustment
             + this->m_beamSlope * ((*beamElementCoords).at(i)->m_x - this->m_startingX);
@@ -549,9 +561,9 @@ void Beam::InitCoords(ListOfObjects *childList)
                     m_drawingParams.m_stemDir = currentStemDir;
                 }
             }
+            // keep the shortest dur in the beam
+            m_drawingParams.m_shortestDur = std::max(currentDur, m_drawingParams.m_shortestDur);
         }
-        // keep the shortest dur in the beam
-        m_drawingParams.m_shortestDur = std::max(currentDur, m_drawingParams.m_shortestDur);
         // check if we have more than duration in the beam
         if (!m_drawingParams.m_changingDur && currentDur != lastDur) m_drawingParams.m_changingDur = true;
         lastDur = currentDur;
