@@ -56,6 +56,7 @@
 #include "fig.h"
 #include "hairpin.h"
 #include "harm.h"
+#include "instrdef.h"
 #include "iomei.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -2543,20 +2544,19 @@ void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, hum::HTp partstar
         return;
     }
 
-    // InstrDef* idef = new InstrDef;
-    // staffdef->AddInstrDef(idef);
+    // Allowing users to assign MIDI instrument numbers in data would be useful, but
+    // currently only allowed via insturment codes.
+    static hum::HumInstrument imap;
+    int gmpc = imap.getGM(*instcode);
 
-    // Allowing users to assign MIDI instrument numbers in data would be useful.
-    //  static HumInstrument imap;
-    //  int gmpc = imap.getGM(*instcode);
+    //   gmpc is -1 if no mapping, so don't add General MIDI insturment number in that case
+    if (gmpc < 0) {
+        return;
+    }
 
-    //   m_staffdef.push_back(new StaffDef());
-    //   m_staffgroup->AddStaffDef(m_staffdef.back());
-
-    //   gmpc is -1 if no mapping (probably assign to 0 in those cases).
-    //   if (instcode) {
-    //   std::cerr << "GOT HERE " << *instcode << " " << gmpc << std::endl;
-    //   }
+    InstrDef *idef = new InstrDef;
+    staffdef->AddChild(idef);
+    idef->SetMidiInstrnum(gmpc + 1); // offset from 1 in MEI
 }
 
 //////////////////////////////
