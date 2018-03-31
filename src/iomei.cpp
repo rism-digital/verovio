@@ -282,7 +282,7 @@ bool MeiOutput::WriteObject(Object *object)
         WriteLabel(m_currentNode, dynamic_cast<Label *>(object));
     }
     else if (object->Is(INSTRDEF)) {
-        m_currentNode = m_currentNode.append_child("instrdef");
+        m_currentNode = m_currentNode.append_child("instrDef");
         WriteInstrDef(m_currentNode, dynamic_cast<InstrDef *>(object));
     }
     else if (object->Is(LABELABBR)) {
