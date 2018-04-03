@@ -47,26 +47,12 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
-    int noteY = element->GetDrawingY();
-    int xNote, xStem;
-    int drawingDur;
+    int yNote = element->GetDrawingY();
+    int xNote = element->GetDrawingX();
+    int drawingDur = note->GetDrawingDur();
+    int radius = note->GetDrawingRadius(m_doc);
     int staffY = staff->GetDrawingY();
-    wchar_t charCode;
     int verticalCenter = 0;
-    bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
-
-    xStem = element->GetDrawingX();
-
-    drawingDur = note->GetDrawingDur();
-
-    int radius = m_doc->GetGlyphWidth(SMUFL_E93C_mensuralNoteheadMinimaWhite, staff->m_drawingStaffSize, false) / 2;
-
-    if (drawingDur > DUR_1) {
-        if (mensural_black) radius *= TEMP_MINIMA_WIDTH_FACTOR;
-    }
-    else {
-        radius += radius / 3;
-    }
 
     /************** Stem/notehead direction: **************/
 
@@ -84,10 +70,8 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         if (drawingDur < DUR_1)
             stemDir = STEMDIRECTION_down;
         else
-            stemDir = (noteY > verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+            stemDir = (yNote > verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
     }
-
-    xNote = xStem - radius;
 
     /************** Noteheads: **************/
 
@@ -96,38 +80,15 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         DrawLigatureNote(dc, element, layer, staff);
     }
     else if (drawingDur < DUR_1) {
-        DrawMaximaToBrevis(dc, noteY, element, layer, staff);
+        DrawMaximaToBrevis(dc, yNote, element, layer, staff);
     }
-    // Semibrevis
-    else if (drawingDur == DUR_1) {
-        if (mensural_black) {
-            int sbStaffSize = 0.8 * staff->m_drawingStaffSize;
-            DrawDiamond(dc, xNote, noteY, 2 * sbStaffSize, (int)(1.2 * sbStaffSize), !note->GetColored(), 20);
-        }
-        else {
-            // Maybe we can add this to Note::GetMensuralSmuflNoteHead?
-            if (note->GetColored())
-                charCode = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
-            else
-                charCode = SMUFL_E939_mensuralNoteheadSemibrevisVoid;
-
-            DrawSmuflCode(dc, xNote, noteY, charCode, staff->m_drawingStaffSize, false);
-        }
-    }
-    // Shorter values
+    // Semibrevis and shorter
     else {
-        if (mensural_black) {
-            // SMuFL 1.20 doesn't have a codepoint for the "colored" semibrevis and minima head in black
-            // mensural notation. But an unfilled (void) narrow diamond is fine, so we draw one.
-            int sbStaffSize = 0.8 * staff->m_drawingStaffSize;
-            DrawDiamond(dc, xNote, noteY, 2 * sbStaffSize, (int)(TEMP_MINIMA_WIDTH_FACTOR * 2 * sbStaffSize),
-                !note->GetColored(), 20);
+        wchar_t code = note->GetMensuralSmuflNoteHead();
+        DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
+        if (drawingDur > DUR_1) {
+            DrawMensuralStem(dc, note, staff, stemDir, radius, xNote, yNote);
         }
-        else {
-            DrawSmuflCode(dc, xNote, noteY, note->GetMensuralSmuflNoteHead(), staff->m_drawingStaffSize, false);
-        }
-
-        DrawMensuralStem(dc, note, staff, stemDir, radius, xStem, noteY);
     }
 
     /************ Draw children (verse / syl) ************/
@@ -217,16 +178,17 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 /* This function draws any flags as well as the stem. */
 
-void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius,
+void View::DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_STEMDIRECTION dir, int radius,
     int xn, int originY, int heightY)
 {
-    assert(object->GetDurationInterface());
+    assert(note);
 
     int staffSize = staff->m_drawingStaffSize;
     int staffY = staff->GetDrawingY();
     int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
-    int drawingDur = (object->GetDurationInterface())->GetActualDur();
-    bool drawingCueSize = object->GetDrawingCueSize();
+    int drawingDur = note->GetDrawingDur();
+    // Cue size is currently disabled
+    bool drawingCueSize = false;
     int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
@@ -258,11 +220,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     // If we have flags, add them to the height.
     int y1 = originY;
     int y2 = ((nbFlags > 0) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem)) + heightY;
-    int x2;
-    if (drawingDur < DUR_BR)
-        x2 = xn + radius;
-    else
-        x2 = xn;
+    int x2 = xn + radius;
 
     if ((dir == STEMDIRECTION_up) && (y2 < verticalCenter)) {
         y2 = verticalCenter;
@@ -290,27 +248,29 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     if (dir == STEMDIRECTION_up) {
 
         if (nbFlags > 0) {
-            for (int i = 0; i < nbFlags; ++i)
+            for (int i = 0; i < nbFlags; ++i) {
                 DrawSmuflCode(dc, x2 - halfStemWidth, stemY1 - i * flagStemHeight,
                     SMUFL_E949_mensuralCombStemUpFlagSemiminima, staff->m_drawingStaffSize, drawingCueSize);
+            }
         }
-        else
+        else {
             DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
+        }
     }
     else {
         if (nbFlags > 0) {
-            for (int i = 0; i < nbFlags; ++i)
+            for (int i = 0; i < nbFlags; ++i) {
                 DrawSmuflCode(dc, x2 - halfStemWidth, stemY1 + i * flagStemHeight,
                     SMUFL_E94A_mensuralCombStemDownFlagSemiminima, staff->m_drawingStaffSize, drawingCueSize);
+            }
         }
-        else
+        else {
             DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
+        }
     }
 
-    // Store the start and end values
-    StemmedDrawingInterface *interface = object->GetStemmedDrawingInterface();
-    assert(interface);
-    interface->SetDrawingStemDir(dir);
+    // Store the stem direction ?
+    note->SetDrawingStemDir(dir);
 }
 
 void View::DrawMensurCircle(DeviceContext *dc, int x, int yy, Staff *staff)
@@ -457,10 +417,14 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
 
     // Calculate size of the rectangle
     xLeft = element->GetDrawingX();
-    xRight = xLeft + 2 * m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+    int width =  2 * m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+    if (mensural_black) {
+        width = width * 0.8;
+    }
+    xRight = xLeft + width;
     if (note->GetActualDur() == DUR_MX) {
         // Maxima is twice the width of brevis
-        xRight += 2 * m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+        xRight += 2 * width;
     }
     yTop = y + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     yBottom = y - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);

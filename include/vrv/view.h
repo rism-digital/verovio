@@ -413,7 +413,7 @@ protected:
      * Defined in view_mensural.cpp
      */
     ///@{
-    void DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius,
+    void DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_STEMDIRECTION dir, int radius,
         int xn, int originY, int heightY = 0);
     void DrawMensurCircle(DeviceContext *dc, int x, int yy, Staff *staff);
     void DrawMensurDot(DeviceContext *dc, int x, int yy, Staff *staff);
