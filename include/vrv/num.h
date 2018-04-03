@@ -15,11 +15,11 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Num
+// Num (number)
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <num>
+ * This class models the MEI <num> element.
  */
 class Num : public TextElement {
 public:

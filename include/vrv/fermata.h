@@ -21,6 +21,9 @@ class ConvertAnalyticalMarkupParams;
 // Fermata
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <fermata> element.
+ */
 class Fermata : public ControlElement,
                 public TimePointInterface,
                 public AttColor,

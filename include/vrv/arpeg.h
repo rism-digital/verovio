@@ -20,6 +20,9 @@ namespace vrv {
 // Arpeg
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <arpeg> element.
+ */
 class Arpeg : public ControlElement,
               public PlistInterface,
               public TimePointInterface,

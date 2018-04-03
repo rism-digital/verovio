@@ -20,6 +20,7 @@
 #include "ending.h"
 #include "io.h"
 #include "runningelement.h"
+#include "verse.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -149,6 +150,11 @@ namespace humaux {
         // brackets should be displayed.
         bool suppress_bracket_tuplet;
 
+        // cue_size == keeps track of whether or not the notes in the current
+        // staff/layer should be cue sized.  Index 0 is used to control all
+        // layers.
+        vector<bool> cue_size;
+
         // ottavanote == keep track of ottava marks: stores the starting note of
         // an ottava line which will be turned off later.  ottavameasure == the
         // starting measure of the ottava mark.
@@ -202,6 +208,8 @@ public:
     // !!!RDF**kern: i = marked note
     std::vector<char> mark;
     std::vector<std::string> mcolor;
+    std::vector<char> textmark;
+    std::vector<std::string> textcolor;
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */
@@ -303,6 +311,10 @@ protected:
     void processSlurs(hum::HTp token);
     int getSlurEndIndex(hum::HTp token, std::string targetid, std::vector<bool> &indexused);
     void addHarmFloatsForMeasure(int startine, int endline);
+    void addFingeringsForMeasure(int startline, int endline);
+    void insertFingerNumberInMeasure(
+        const std::string &text, int staffindex, hum::HTp token, int maxstaff, bool aboveQ);
+    void addStringNumbersForMeasure(int startline, int endline);
     void addFiguredBassForMeasure(int startline, int endline);
     void processDynamics(hum::HTp token, int staffindex);
     void processDirections(hum::HTp token, int staffindex);
@@ -310,6 +322,7 @@ protected:
     void processGlobalDirections(hum::HTp token, int staffindex);
     void processChordSignifiers(Chord *chord, hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum frac = 0);
+    hum::HumNum getMeasureTstampPlusDur(hum::HTp token, int staffindex, hum::HumNum fract = 0);
     hum::HumNum getMeasureEndTstamp(int staffindex);
     hum::HTp getPreviousDataToken(hum::HTp token);
     hum::HTp getHairpinEnd(hum::HTp token, const std::string &endchar);
@@ -339,6 +352,7 @@ protected:
     std::string getAutoClef(hum::HTp partstart, int partnumber);
     void colorNote(vrv::Note *note, const std::string &token, int line, int field);
     void colorRest(vrv::Rest *rest, const std::string &token, int line, int field);
+    void colorVerse(Verse *verse, std::string &token);
     std::string getSpineColor(int line, int field);
     void checkForColorSpine(hum::HumdrumFile &infile);
     std::vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
@@ -424,6 +438,7 @@ protected:
     std::wstring cleanHarmString(const std::string &content);
     std::wstring cleanHarmString2(const std::string &content);
     std::wstring cleanHarmString3(const std::string &content);
+    std::wstring cleanStringString(const std::string &content);
     std::vector<std::wstring> cleanFBString(const std::string &content);
 
 private:
@@ -512,12 +527,22 @@ private:
     // m_harm == state variable for keeping track of whether or not
     // the file to convert contains **mxhm spines that should be
     // converted into <harm> element in the MEI conversion.
-    bool m_harm;
+    bool m_harm = false;
+
+    // m_fing == state variable for keeping track of whether or not
+    // the file to convert contains **fing spines that should be
+    // converted into <fing> elements in the MEI conversion.
+    bool m_fing = false;
+
+    // m_string == state variable for keeping track of whether or not
+    // the file to convert contains **string spines that should be
+    // converted into <string> elements in the MEI conversion.
+    bool m_string = false;
 
     // m_fb == state variable for keeping track of whether or not
     // the file to convert contains **Bnum spines that should be
     // converted into <harm> element in the MEI conversion.
-    bool m_fb;
+    bool m_fb = false;
 
     // m_leftbarstyle is a barline left-hand style to store in the next measure.
     // When processing a measure, this variable should be checked and used

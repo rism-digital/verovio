@@ -16,6 +16,7 @@
 #include "attcomparison.h"
 #include "barline.h"
 #include "beam.h"
+#include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
@@ -31,11 +32,13 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
+#include "mrpt.h"
+#include "mrpt2.h"
 #include "multirest.h"
+#include "multirpt.h"
 #include "note.h"
 #include "page.h"
 #include "rest.h"
-#include "rpt.h"
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
@@ -489,7 +492,7 @@ double LayerElement::GetAlignmentDuration(
         BeatRpt *beatRpt = dynamic_cast<BeatRpt *>(this);
         assert(beatRpt);
         int meterUnit = 4;
-        if (meterSig && meterSig->HasUnit()) meterSig->GetUnit();
+        if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
         return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
     else if (this->Is(TIMESTAMP_ATTR)) {
@@ -500,7 +503,7 @@ double LayerElement::GetAlignmentDuration(
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     // We align all full measure element to the current time signature, even the ones that last longer than one measure
-    else if (this->Is({ MREST, MULTIREST, MRPT, MRPT2, MULTIREST })) {
+    else if (this->Is({ MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
         int meterUnit = 4;
         int meterCount = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
@@ -1235,12 +1238,8 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    // Here we need to check if the LayerElement has a duration, otherwise we can continue
-    if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
-
     double incrementScoreTime;
 
-    // Now deal with the different elements
     if (this->Is(REST) || this->Is(SPACE)) {
         double incrementScoreTime = GetAlignmentDuration() / (DUR_MAX / DURATION_4);
         params->m_currentScoreTime += incrementScoreTime;
@@ -1280,6 +1279,15 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
             params->m_currentScoreTime += incrementScoreTime;
             params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
         }
+    }
+    else if (this->Is(BEATRPT)) {
+        BeatRpt *rpt = dynamic_cast<BeatRpt *>(this);
+        assert(rpt);
+
+        double incrementScoreTime = rpt->GetAlignmentDuration() / (DUR_MAX / DURATION_4);
+        rpt->SetScoreTimeOnset(params->m_currentScoreTime);
+        params->m_currentScoreTime += incrementScoreTime;
+        params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
     return FUNCTOR_CONTINUE;
 }

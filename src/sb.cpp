@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        ref.cpp
-// Author:      Laurent Pugin
-// Created:     2018/02/21
+// Name:        sb.cpp
+// Author:      Klaus Rettinghaus
+// Created:     2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "ref.h"
+#include "sb.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,28 +13,48 @@
 
 //----------------------------------------------------------------------------
 
+#include "editorial.h"
+#include "functorparams.h"
+#include "page.h"
+#include "system.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Ref
+// Sb
 //----------------------------------------------------------------------------
 
-Ref::Ref() : EditorialElement("ref-")
+Sb::Sb() : SystemElement("sb-"), AttNNumberLike()
 {
+    RegisterAttClass(ATT_NNUMBERLIKE);
+
     Reset();
 }
 
-Ref::~Ref() {}
+Sb::~Sb() {}
 
-void Ref::Reset()
+void Sb::Reset()
 {
-    EditorialElement::Reset();
+    SystemElement::Reset();
+    ResetNNumberLike();
 }
 
 //----------------------------------------------------------------------------
-// Functor methods
+// Sb functor methods
 //----------------------------------------------------------------------------
+
+int Sb::CastOffEncoding(FunctorParams *functorParams)
+{
+    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    params->m_currentSystem = new System();
+    params->m_currentPage->AddChild(params->m_currentSystem);
+
+    MoveItselfTo(params->m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
 
 } // namespace vrv
