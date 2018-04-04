@@ -409,18 +409,15 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     assert(note);
 
     int xLeft, xRight, yTop, yBottom, y3, y4;
-    // int yy2, y5; // unused
-    int verticalCenter, up, height;
+    bool up;
+    int height;
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     bool fillNotehead = (mensural_black || note->GetColored()) && !(mensural_black && note->GetColored());
     height = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) / 2;
 
     // Calculate size of the rectangle
     xLeft = element->GetDrawingX();
-    int width =  2 * m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
-    if (mensural_black) {
-        width = width * 0.8;
-    }
+    int width =  2 * note->GetDrawingRadius(m_doc);
     xRight = xLeft + width;
     if (note->GetActualDur() == DUR_MX) {
         // Maxima is twice the width of brevis
@@ -450,17 +447,10 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
 
     // stem
     if (note->GetActualDur() < DUR_BR) {
-        verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-        up = (y < verticalCenter) ? true : false;
+        up = false;
         if (note->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-            if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
-                up = true;
-            }
-            else {
-                up = false;
-            }
+            up = (note->GetDrawingStemDir() == STEMDIRECTION_up) ? true : false;
         }
-
         if (!up) {
             y3 = yTop - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 8;
             yBottom = yTop;

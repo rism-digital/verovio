@@ -444,7 +444,12 @@ int LayerElement::GetDrawingRadius(Doc *doc)
         return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
     }
     else if (dur <= DUR_BR) {
-        return doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+        if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
+            return doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * 0.8;
+        }
+        else {
+            return doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+        }
     }
     else if (dur == DUR_1) {
          return doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
