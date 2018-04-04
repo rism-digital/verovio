@@ -41,6 +41,7 @@ void Dot::Reset()
     ResetDotLog();
 
     m_drawingNote = NULL;
+    m_drawingNextElement = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -53,6 +54,7 @@ int Dot::PreparePointersByLayer(FunctorParams *functorParams)
     assert(params);
 
     m_drawingNote = params->m_currentNote;
+    params->m_lastDot = this;
 
     return FUNCTOR_CONTINUE;
 }
@@ -64,6 +66,8 @@ int Dot::ResetDrawing(FunctorParams *functorParams)
     PositionInterface::InterfaceResetDrawing(functorParams, this);
 
     this->m_drawingNote = NULL;
+    this->m_drawingNextElement = NULL;
+    
     return FUNCTOR_CONTINUE;
 }
 

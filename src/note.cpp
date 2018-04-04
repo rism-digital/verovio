@@ -298,6 +298,13 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 wchar_t Note::GetMensuralSmuflNoteHead()
 {
     assert(this->IsMensural());
+    
+    int drawingDur = this->GetDrawingDur();
+    
+    // No SMuFL code used for these values
+    if (drawingDur < DUR_1) {
+        return 0;
+    }
 
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
@@ -308,18 +315,21 @@ wchar_t Note::GetMensuralSmuflNoteHead()
         code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
     }
     else {
-        int drawingDur = this->GetDrawingDur();
-        if (this->GetColored()) {
-            if (drawingDur == DUR_2)
-                code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
-            else
+        if (this->GetColored() == BOOLEAN_true) {
+            if (drawingDur > DUR_2) {
                 code = SMUFL_E93C_mensuralNoteheadMinimaWhite;
+            }
+            else {
+                code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+            }
         }
         else {
-            if (drawingDur == DUR_2)
-                code = SMUFL_E93C_mensuralNoteheadMinimaWhite;
-            else
+            if (drawingDur > DUR_2) {
                 code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+            }
+            else {
+                code = SMUFL_E93C_mensuralNoteheadMinimaWhite;
+            }
         }
     }
     return code;
@@ -805,6 +815,9 @@ int Note::PrepareLyrics(FunctorParams *functorParams)
 
 int Note::PreparePointersByLayer(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::PreparePointersByLayer(functorParams);
+    
     PreparePointersByLayerParams *params = dynamic_cast<PreparePointersByLayerParams *>(functorParams);
     assert(params);
 
