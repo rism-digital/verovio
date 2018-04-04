@@ -2556,7 +2556,10 @@ void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, hum::HTp partstar
 
     InstrDef *idef = new InstrDef;
     staffdef->AddChild(idef);
-    idef->SetMidiInstrnum(gmpc + 1); // offset from 1 in MEI
+    int offset = 1; // currently 1, should be 0 in MEI 4
+    idef->SetMidiInstrnum(gmpc + offset); // offset from 1 in MEI
+    data_MIDINAMES idval = (data_MIDINAMES)(gmpc + 1);
+    idef->SetMidiInstrname(idval);
 }
 
 //////////////////////////////
