@@ -640,7 +640,15 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         type = ALIGNMENT_FULLMEASURE2;
     }
     else if (this->Is(DOT)) {
-        type = ALIGNMENT_DOT;
+        Dot *dot = dynamic_cast<Dot *>(this);
+        assert(dot);
+        if (dot->m_drawingNote) {
+            m_alignment = dot->m_drawingNote->GetAlignment();
+        }
+        else {
+            // Create an alignment only if the dot has no resolved preceeding note
+            type = ALIGNMENT_DOT;
+        }
     }
     else if (this->Is(ACCID)) {
         // accid within note was already taken into account by noteParent
@@ -1169,6 +1177,23 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
     if (durElement->HasStaff()) {
         params->m_currentCrossStaff = NULL;
         params->m_currentCrossLayer = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::PreparePointersByLayer(FunctorParams *functorParams)
+{
+    PreparePointersByLayerParams *params = dynamic_cast<PreparePointersByLayerParams *>(functorParams);
+    assert(params);
+
+    if (params->m_lastDot) {
+        params->m_lastDot->m_drawingNextElement = this;
+        params->m_lastDot = NULL;
+    }
+    if (this->Is(BARLINE)) {
+        // Do not attach a note when a barline is passed
+        params->m_currentNote = NULL;
     }
 
     return FUNCTOR_CONTINUE;
