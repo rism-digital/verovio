@@ -28,12 +28,8 @@ Lb::Lb() : TextElement("lb-")
     Reset();
 }
 
-Lb::~Lb()
-{
-}
+Lb::~Lb() {}
 
-void Lb::Reset()
-{
-}
+void Lb::Reset() {}
 
 } // namespace vrv

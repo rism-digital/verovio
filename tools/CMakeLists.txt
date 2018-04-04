@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.4)
 
 project(Verovio)
 
@@ -22,6 +22,7 @@ include_directories(
     ../include
     ../include/midi
     ../include/hum
+    ../include/json
     ../include/pugi
     ../include/utf8
     ../include/vrv
@@ -34,7 +35,8 @@ if(MSVC)
     add_definitions(-DNO_PAE_SUPPORT) # regex is working differently under Windows so PAE is not supported (yet)
     include_directories(../include/win32)
 else()
-    add_definitions(-Wall -W -pedantic -Wno-unused-parameter)
+    # jsonxx raises -Wdollar-in-identifier-extension
+    add_definitions(-Wall -W -pedantic -Wno-unused-parameter -Wno-dollar-in-identifier-extension)
     add_definitions(-g)
     add_definitions(-std=c++11)
 endif()
@@ -72,6 +74,7 @@ set(all_SRC
     ${verovio_SRC}
     ${hum_SRC}
     ${midi_SRC}
+    ../src/json/jsonxx.cc
     ../src/pugi/pugixml.cpp
     ../libmei/attconverter.cpp
     ../libmei/atts_analytical.cpp
@@ -112,5 +115,5 @@ install(
 install(
     DIRECTORY ../data/
     DESTINATION share/verovio
-    FILES_MATCHING PATTERN "*.xml"
+    FILES_MATCHING PATTERN "*.xml" PATTERN "*.svg"
 )

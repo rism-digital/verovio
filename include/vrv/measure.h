@@ -32,7 +32,12 @@ class TimestampAttr;
  * It contains Layer objects.
  * For internally simplication of processing, unmeasured music is contained in one single measure object
  */
-class Measure : public Object, public AttMeasureLog, public AttNNumberLike, public AttPointing, public AttTyped {
+class Measure : public Object,
+                public AttMeasureLog,
+                public AttMeterConformanceBar,
+                public AttNNumberLike,
+                public AttPointing,
+                public AttTyped {
 
 public:
     /**
@@ -87,8 +92,8 @@ public:
     /**
      * @name Set and get the left and right barline types
      * This somehow conflicts with AttMeasureLog, which is transfered from and to the
-     * Barline object when reading and writing MEI. See MeiInput::ReadMeiMeasure and
-     * MeiOutput::ReadMeiMeasure
+     * Barline object when reading and writing MEI. See MeiInput::ReadMeasure and
+     * MeiOutput::WriteMeasure
      * Alternatively, we could keep them in sync here:
      * data_BARRENDITION GetDrawingLeftBarLine() { m_leftBarLine.SetRend(GetRight()); return m_leftBarLine.GetRend(); }
      * void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetRend(type); SetLeft(type); }
@@ -196,6 +201,16 @@ public:
     virtual int ConvertToPageBased(FunctorParams *functorParams);
 
     /**
+     * See Object::ConvertToCastOffMensural
+     */
+    virtual int ConvertToCastOffMensural(FunctorParams *params);
+
+    /**
+     * See Object::ConvertToUnCastOffMensural
+     */
+    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
+
+    /**
      * See Object::Save
      */
     ///@{
@@ -300,9 +315,12 @@ public:
     virtual int PrepareCrossStaff(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareFloatingGrps
+     * @name See Object::PrepareFloatingGrps
      */
+    ///@{
     virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+    virtual int PrepareFloatingGrpsEnd(FunctorParams *functoParams);
+    ///@}
 
     /**
      * See Object::PrepareTimePointingEnd

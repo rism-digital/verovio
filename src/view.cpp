@@ -27,6 +27,7 @@ namespace vrv {
 View::View()
 {
     m_doc = NULL;
+    m_options = NULL;
     m_pageIdx = 0;
 
     m_currentColour = AxBLACK;
@@ -37,19 +38,19 @@ View::View()
     m_currentSystem = NULL;
 }
 
-View::~View()
-{
-}
+View::~View() {}
 
 void View::SetDoc(Doc *doc)
 {
     // Unset the doc
     if (doc == NULL) {
         m_doc = NULL;
+        m_options = NULL;
         DoReset();
     }
     else {
         m_doc = doc;
+        m_options = doc->GetOptions();
     }
     m_currentElement = NULL;
     m_currentLayer = NULL;
@@ -110,13 +111,13 @@ void View::Next(bool forward)
 int View::ToDeviceContextX(int i)
 {
     return i;
-}; // the same
+} // the same
 
 /** x value in the Logical world */
 int View::ToLogicalX(int i)
 {
     return i;
-};
+}
 
 /** y value in the View */
 int View::ToDeviceContextY(int i)
@@ -160,15 +161,12 @@ std::wstring View::IntToTimeSigFigures(unsigned short number)
 
 std::wstring View::IntToSmuflFigures(unsigned short number, int offset)
 {
-    // We do not convert more that FF values
-    if (number > 0xFFFF) number = 0xFFFF;
-
     std::wostringstream stream;
     stream << number;
     std::wstring str = stream.str();
 
     int i;
-    for (i = 0; i < (int)str.size(); i++) {
+    for (i = 0; i < (int)str.size(); ++i) {
         str[i] += offset - 48;
     }
     return str;

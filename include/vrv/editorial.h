@@ -25,8 +25,6 @@ class StaffDef;
 class StaffGrp;
 class TextElement;
 
-enum VisibilityType { Hidden = 0, Visible };
-
 //----------------------------------------------------------------------------
 // EditorialElement
 //----------------------------------------------------------------------------
@@ -93,7 +91,7 @@ private:
 public:
     /**
      * Holds the visibility (hidden or visible) for an editorial element.
-     * By defautl, all editorial elements are visible. However, in an <app>, only one <rdg> is visible at the time. When
+     * By default, all editorial elements are visible. However, in an <app>, only one <rdg> is visible at the time. When
      * loading the file, the first <rdg> (or the <lem>) is made visible.
      */
     VisibilityType m_visibility;
@@ -148,41 +146,6 @@ private:
     //
 public:
     //
-private:
-};
-
-//----------------------------------------------------------------------------
-// Annot
-//----------------------------------------------------------------------------
-
-class Annot : public EditorialElement, public TextListInterface, public AttPlist, public AttSource {
-public:
-    /**
-     * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
-     */
-    ///@{
-    Annot();
-    virtual ~Annot();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Annot"; }
-    virtual ClassId GetClassId() const { return ANNOT; }
-    ///@}
-
-    /**
-     * Add a text element to an annotation.
-     * Only supported elements will be actually added to the child list.
-     */
-    virtual void AddChild(Object *object);
-
-private:
-    //
-public:
-    /**
-     * A copy of the annot content tree stored as pugi::xml_document
-     */
-    pugi::xml_document m_content;
-
 private:
 };
 

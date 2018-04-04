@@ -109,7 +109,7 @@ public:
      * Adjust the postition of the content of the running element.
      * First adjust the content of each cell, and then the cells themselves.
      */
-    bool AdjustYPos();
+    bool AdjustRunningElementYPos();
 
     /**
      * Set the current page number by looking for a <num label="page">#</num> element.

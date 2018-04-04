@@ -16,7 +16,7 @@
 
 #include "devicecontext.h"
 #include "doc.h"
-#include "style.h"
+#include "options.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -201,7 +201,7 @@ void View::DrawSmuflLine(
     }
 
     int i;
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < count; ++i) {
         str.push_back(fill);
     }
 

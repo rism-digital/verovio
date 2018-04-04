@@ -64,15 +64,31 @@ void Staff::Reset()
     ResetTyped();
     ResetVisibility();
 
+    m_yAbs = VRV_UNSET;
+
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
     m_drawingNotationType = NOTATIONTYPE_NONE;
-    m_yAbs = VRV_UNSET;
     m_staffAlignment = NULL;
     m_timeSpanningElements.clear();
     m_drawingStaffDef = NULL;
 
     ClearLedgerLines();
+}
+
+void Staff::CopyReset()
+{
+    m_ledgerLinesAbove = NULL;
+    m_ledgerLinesBelow = NULL;
+    m_ledgerLinesAboveCue = NULL;
+    m_ledgerLinesBelowCue = NULL;
+
+    m_drawingStaffSize = 100;
+    m_drawingLines = 5;
+    m_drawingNotationType = NOTATIONTYPE_NONE;
+    m_staffAlignment = NULL;
+    m_timeSpanningElements.clear();
+    m_drawingStaffDef = NULL;
 }
 
 void Staff::ClearLedgerLines()
@@ -173,7 +189,7 @@ void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int ri
 
     if ((int)lines->size() < count) lines->resize(count);
     int i = 0;
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < count; ++i) {
         lines->at(i).AddDash(left, right);
     }
 }
@@ -187,9 +203,7 @@ LedgerLine::LedgerLine()
     Reset();
 }
 
-LedgerLine::~LedgerLine()
-{
-}
+LedgerLine::~LedgerLine() {}
 
 void LedgerLine::Reset()
 {
@@ -203,7 +217,7 @@ void LedgerLine::AddDash(int left, int right)
     std::list<std::pair<int, int> >::iterator iter;
 
     // First add the dash
-    for (iter = m_dashes.begin(); iter != m_dashes.end(); iter++) {
+    for (iter = m_dashes.begin(); iter != m_dashes.end(); ++iter) {
         if (iter->first > left) break;
     }
     m_dashes.insert(iter, std::make_pair(left, right));
@@ -211,7 +225,7 @@ void LedgerLine::AddDash(int left, int right)
     // Merge overlapping dashes
     std::list<std::pair<int, int> >::iterator previous = m_dashes.begin();
     iter = m_dashes.begin();
-    iter++;
+    ++iter;
     while (iter != m_dashes.end()) {
         if (previous->second > iter->first) {
             previous->second = std::max(iter->second, previous->second);
@@ -219,7 +233,7 @@ void LedgerLine::AddDash(int left, int right)
         }
         else {
             previous = iter;
-            iter++;
+            ++iter;
         }
     }
 }
@@ -228,12 +242,27 @@ void LedgerLine::AddDash(int left, int right)
 // Staff functor methods
 //----------------------------------------------------------------------------
 
+int Staff::ConvertToCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    params->m_targetStaff = new Staff(*this);
+    params->m_targetStaff->CopyReset();
+    // Keep the xml:id of the staff in the first staff segment
+    params->m_targetStaff->SwapUuid(this);
+    assert(params->m_targetMeasure);
+    params->m_targetMeasure->AddChild(params->m_targetStaff);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {
     m_drawingStaffDef = NULL;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
 {
@@ -316,7 +345,7 @@ int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
         if ((interface->GetStartMeasure() != currentMeasure) && (interface->IsOnStaff(this->GetN()))) {
             m_timeSpanningElements.push_back(*iter);
         }
-        iter++;
+        ++iter;
     }
     return FUNCTOR_CONTINUE;
 }
@@ -326,7 +355,7 @@ int Staff::ResetDrawing(FunctorParams *functorParams)
     this->m_timeSpanningElements.clear();
     ClearLedgerLines();
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Staff::PrepareRpt(FunctorParams *functorParams)
 {

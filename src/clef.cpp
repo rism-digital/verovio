@@ -40,9 +40,7 @@ void Clef::Init()
     Reset();
 }
 
-Clef::~Clef()
-{
-}
+Clef::~Clef() {}
 
 void Clef::Reset()
 {

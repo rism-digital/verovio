@@ -30,9 +30,7 @@ Space::Space() : LayerElement("space-"), DurationInterface()
     Reset();
 }
 
-Space::~Space()
-{
-}
+Space::~Space() {}
 
 void Space::Reset()
 {

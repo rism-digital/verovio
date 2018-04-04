@@ -33,9 +33,7 @@ Turn::Turn()
     Reset();
 }
 
-Turn::~Turn()
-{
-}
+Turn::~Turn() {}
 
 void Turn::Reset()
 {

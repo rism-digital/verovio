@@ -30,9 +30,7 @@ Fig::Fig() : TextElement("fig-"), AreaPosInterface()
     Reset();
 }
 
-Fig::~Fig()
-{
-}
+Fig::~Fig() {}
 
 void Fig::Reset()
 {

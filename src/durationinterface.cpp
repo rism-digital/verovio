@@ -48,9 +48,7 @@ DurationInterface::DurationInterface()
     Reset();
 }
 
-DurationInterface::~DurationInterface()
-{
-}
+DurationInterface::~DurationInterface() {}
 
 void DurationInterface::Reset()
 {
@@ -163,7 +161,7 @@ int DurationInterface::GetNoteOrChordDur(LayerElement *element)
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
         Chord *chord = note->IsChordTone();
-        if (chord)
+        if (chord && !this->HasDur())
             return chord->GetActualDur();
         else
             return this->GetActualDur();

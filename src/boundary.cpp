@@ -31,9 +31,7 @@ BoundaryEnd::BoundaryEnd(Object *start) : SystemElement("bdend-")
     m_startClassName = start->GetClassName();
 }
 
-BoundaryEnd::~BoundaryEnd()
-{
-}
+BoundaryEnd::~BoundaryEnd() {}
 
 void BoundaryEnd::Reset()
 {
@@ -50,9 +48,7 @@ BoundaryStartInterface::BoundaryStartInterface()
     Reset();
 }
 
-BoundaryStartInterface::~BoundaryStartInterface()
-{
-}
+BoundaryStartInterface::~BoundaryStartInterface() {}
 
 void BoundaryStartInterface::Reset()
 {
@@ -112,7 +108,7 @@ int BoundaryEnd::ResetDrawing(FunctorParams *functorParams)
     this->SetMeasure(NULL);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int BoundaryEnd::CastOffSystems(FunctorParams *functorParams)
 {
@@ -149,6 +145,10 @@ int BoundaryEnd::PrepareFloatingGrps(FunctorParams *functorParams)
     if (this->GetStart()->Is(ENDING)) {
         params->m_previousEnding = dynamic_cast<Ending *>(this->GetStart());
         assert(params->m_previousEnding);
+        // This is the end of the first ending - generate a grpId
+        if (params->m_previousEnding->GetDrawingGrpId() == 0) {
+            params->m_previousEnding->SetDrawingGrpObject(params->m_previousEnding);
+        }
     }
 
     return FUNCTOR_CONTINUE;
@@ -176,6 +176,6 @@ int BoundaryStartInterface::InterfaceResetDrawing(FunctorParams *functorParams)
     m_drawingMeasure = NULL;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 } // namespace vrv

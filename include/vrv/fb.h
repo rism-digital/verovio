@@ -14,11 +14,11 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Fb
+// Fb (figured bass)
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <fb>
+ * This class models the MEI <fb> element.
  */
 class Fb : public Object {
 public:
@@ -48,11 +48,11 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// F / Figure
+// F (figure)
 //----------------------------------------------------------------------------
 
 /**
- * This if the Figure class
+ * This class models the MEI <f> element.
  */
 class F : public TextElement {
 public:

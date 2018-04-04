@@ -19,6 +19,8 @@
 #include "clef.h"
 #include "ending.h"
 #include "io.h"
+#include "runningelement.h"
+#include "verse.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -148,6 +150,11 @@ namespace humaux {
         // brackets should be displayed.
         bool suppress_bracket_tuplet;
 
+        // cue_size == keeps track of whether or not the notes in the current
+        // staff/layer should be cue sized.  Index 0 is used to control all
+        // layers.
+        vector<bool> cue_size;
+
         // ottavanote == keep track of ottava marks: stores the starting note of
         // an ottava line which will be turned off later.  ottavameasure == the
         // starting measure of the ottava mark.
@@ -201,6 +208,8 @@ public:
     // !!!RDF**kern: i = marked note
     std::vector<char> mark;
     std::vector<std::string> mcolor;
+    std::vector<char> textmark;
+    std::vector<std::string> textcolor;
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */
@@ -222,9 +231,6 @@ public:
 
     std::string GetHumdrumString();
     std::string GetMeiString();
-
-    int GetTypeOption() { return m_type; }
-    void SetTypeOption(int value) { m_type = value; }
 
 protected:
     void clear();
@@ -305,6 +311,10 @@ protected:
     void processSlurs(hum::HTp token);
     int getSlurEndIndex(hum::HTp token, std::string targetid, std::vector<bool> &indexused);
     void addHarmFloatsForMeasure(int startine, int endline);
+    void addFingeringsForMeasure(int startline, int endline);
+    void insertFingerNumberInMeasure(
+        const std::string &text, int staffindex, hum::HTp token, int maxstaff, bool aboveQ);
+    void addStringNumbersForMeasure(int startline, int endline);
     void addFiguredBassForMeasure(int startline, int endline);
     void processDynamics(hum::HTp token, int staffindex);
     void processDirections(hum::HTp token, int staffindex);
@@ -312,6 +322,7 @@ protected:
     void processGlobalDirections(hum::HTp token, int staffindex);
     void processChordSignifiers(Chord *chord, hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum frac = 0);
+    hum::HumNum getMeasureTstampPlusDur(hum::HTp token, int staffindex, hum::HumNum fract = 0);
     hum::HumNum getMeasureEndTstamp(int staffindex);
     hum::HTp getPreviousDataToken(hum::HTp token);
     hum::HTp getHairpinEnd(hum::HTp token, const std::string &endchar);
@@ -341,6 +352,7 @@ protected:
     std::string getAutoClef(hum::HTp partstart, int partnumber);
     void colorNote(vrv::Note *note, const std::string &token, int line, int field);
     void colorRest(vrv::Rest *rest, const std::string &token, int line, int field);
+    void colorVerse(Verse *verse, std::string &token);
     std::string getSpineColor(int line, int field);
     void checkForColorSpine(hum::HumdrumFile &infile);
     std::vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
@@ -367,9 +379,22 @@ protected:
     std::string getSystemDecoration(const std::string &tag);
     void processStaffDecoration(const std::string &decoration);
     int getStaffNumberLabel(hum::HTp spinestart);
-	bool isFirstTokenOnStaff(hum::HTp token);
-	bool hasAboveParameter(hum::HTp token, const string& category);
-	bool hasBelowParameter(hum::HTp token, const string& category);
+    bool isFirstTokenOnStaff(hum::HTp token);
+    bool hasAboveParameter(hum::HTp token, const string &category);
+    bool hasBelowParameter(hum::HTp token, const string &category);
+    void prepareHeaderFooter();
+    bool prepareHeader(std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
+    bool prepareFooter(std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
+    std::string processReferenceTemplate(const std::string &input, std::vector<std::pair<string, string> > &biblist,
+        std::map<std::string, std::string> &refmap);
+    std::string processTemplateOperator(const std::string &value, const std::string &op);
+    std::string automaticHeaderLeft(
+        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int linecount);
+    std::string automaticHeaderCenter(
+        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
+    std::string automaticHeaderRight(
+        std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int &linecount);
+    std::string getLayoutParameter(hum::HTp token, const std::string &category, const std::string &keyname);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -381,6 +406,7 @@ protected:
     void insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<std::string> > &respPeople);
 
     /// Templates ///////////////////////////////////////////////////////////
+    template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);
     template <class ELEMENT> void setKeySig(int partindex, ELEMENT element, const std::string &keysig);
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
@@ -408,10 +434,12 @@ protected:
     static std::string getDateString();
     static std::string getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references);
     static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
-    std::string cleanHarmString(const std::string &content);
-    std::string cleanHarmString2(const std::string &content);
-    std::string cleanHarmString3(const std::string &content);
-    std::vector<std::string> cleanFBString(const std::string &content);
+    static bool replace(std::wstring &str, const std::wstring &oldStr, const std::wstring &newStr);
+    std::wstring cleanHarmString(const std::string &content);
+    std::wstring cleanHarmString2(const std::string &content);
+    std::wstring cleanHarmString3(const std::string &content);
+    std::wstring cleanStringString(const std::string &content);
+    std::vector<std::wstring> cleanFBString(const std::string &content);
 
 private:
     std::string m_filename; // Filename to read/was read.
@@ -499,12 +527,22 @@ private:
     // m_harm == state variable for keeping track of whether or not
     // the file to convert contains **mxhm spines that should be
     // converted into <harm> element in the MEI conversion.
-    bool m_harm;
+    bool m_harm = false;
+
+    // m_fing == state variable for keeping track of whether or not
+    // the file to convert contains **fing spines that should be
+    // converted into <fing> elements in the MEI conversion.
+    bool m_fing = false;
+
+    // m_string == state variable for keeping track of whether or not
+    // the file to convert contains **string spines that should be
+    // converted into <string> elements in the MEI conversion.
+    bool m_string = false;
 
     // m_fb == state variable for keeping track of whether or not
     // the file to convert contains **Bnum spines that should be
     // converted into <harm> element in the MEI conversion.
-    bool m_fb;
+    bool m_fb = false;
 
     // m_leftbarstyle is a barline left-hand style to store in the next measure.
     // When processing a measure, this variable should be checked and used
@@ -535,9 +573,6 @@ private:
     vector<int> m_transpose;
 
 #endif /* NO_HUMDRUM_SUPPORT */
-
-    // m_type == true means add type markup in Humdrum-to-MEI conversion.
-    bool m_type = true;
 };
 
 } // namespace vrv

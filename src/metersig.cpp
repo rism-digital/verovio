@@ -46,9 +46,7 @@ void MeterSig::Init()
     Reset();
 }
 
-MeterSig::~MeterSig()
-{
-}
+MeterSig::~MeterSig() {}
 
 void MeterSig::Reset()
 {

@@ -29,9 +29,7 @@ Tie::Tie() : ControlElement("tie-"), TimeSpanningInterface(), AttColor(), AttCur
     Reset();
 }
 
-Tie::~Tie()
-{
-}
+Tie::~Tie() {}
 
 void Tie::Reset()
 {
@@ -47,11 +45,8 @@ void Tie::Reset()
 
 int Tie::ResolveMIDITies(FunctorParams *)
 {
-    Note *note1 = NULL;
-    Note *note2 = NULL;
-
-    note1 = dynamic_cast<Note *>(this->GetStart());
-    note2 = dynamic_cast<Note *>(this->GetEnd());
+    Note *note1 = dynamic_cast<Note *>(this->GetStart());
+    Note *note2 = dynamic_cast<Note *>(this->GetEnd());
 
     if (!note1 || !note2) {
         return FUNCTOR_CONTINUE;

@@ -16,11 +16,11 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// FTrem
+// FTrem (fingered tremolo)
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <fTrem>
+ * This class models the MEI <fTrem> element.
  */
 class FTrem : public LayerElement, public ObjectListInterface, public AttSlashCount, public AttTremMeasured {
 public:
@@ -66,6 +66,11 @@ public:
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 private:
     //

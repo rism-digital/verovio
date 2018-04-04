@@ -65,6 +65,11 @@ public:
     // Functors //
     //----------//
 
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
 protected:
     /**
      * Clear the m_clusters vector and delete all the objects.

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        dir.h
+// Name:        dir.cpp
 // Author:      Laurent Pugin
 // Created:     2016
 // Copyright (c) Authors and others. All rights reserved.
@@ -33,9 +33,7 @@ Dir::Dir() : ControlElement("dir-"), TextListInterface(), TextDirInterface(), Ti
     Reset();
 }
 
-Dir::~Dir()
-{
-}
+Dir::~Dir() {}
 
 void Dir::Reset()
 {

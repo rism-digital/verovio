@@ -19,27 +19,28 @@ namespace vrv {
 // TextElement
 //----------------------------------------------------------------------------
 
-TextElement::TextElement() : Object("te-"), AttTyped()
+TextElement::TextElement() : Object("te-"), AttLabelled(), AttTyped()
 {
+    RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
 
-TextElement::TextElement(std::string classid) : Object(classid), AttTyped()
+TextElement::TextElement(std::string classid) : Object(classid), AttLabelled(), AttTyped()
 {
+    RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
 
-TextElement::~TextElement()
-{
-}
+TextElement::~TextElement() {}
 
 void TextElement::Reset()
 {
     Object::Reset();
+    ResetLabelled();
     ResetTyped();
 
     m_drawingYRel = 0;

@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "annot.h"
 #include "attcomparison.h"
 #include "beam.h"
 #include "clef.h"
@@ -26,17 +27,19 @@
 #include "functorparams.h"
 #include "keysig.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "layer.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "mnum.h"
 #include "note.h"
+#include "options.h"
 #include "page.h"
 #include "smufl.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
-#include "style.h"
 #include "syl.h"
 #include "system.h"
 #include "text.h"
@@ -70,11 +73,11 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     dc->DrawBackgroundImage();
 
     Point origin = dc->GetLogicalOrigin();
-    dc->SetLogicalOrigin(origin.x - m_doc->m_drawingPageLeftMar, origin.y - m_doc->m_drawingPageTopMar);
+    dc->SetLogicalOrigin(origin.x - m_doc->m_drawingPageMarginLeft, origin.y - m_doc->m_drawingPageMarginTop);
 
     dc->StartPage();
 
-    for (i = 0; i < m_currentPage->GetSystemCount(); i++) {
+    for (i = 0; i < m_currentPage->GetSystemCount(); ++i) {
         // cast to System check in DrawSystem
         System *system = dynamic_cast<System *>(m_currentPage->GetChild(i));
         DrawSystem(dc, system);
@@ -109,7 +112,7 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
 
     // longest key signature of the staffDefs
     const ListOfObjects *scoreDefList = scoreDef->GetList(scoreDef); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = scoreDefList->begin(); it != scoreDefList->end(); it++) {
+    for (ListOfObjects::const_iterator it = scoreDefList->begin(); it != scoreDefList->end(); ++it) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*it);
         assert(staffDef);
         if (!staffDef->HasKeySigInfo()) continue;
@@ -285,7 +288,7 @@ void View::DrawStaffGrp(
         graphic = labelAbbr;
     }
 
-    if (labelStr.length() != 0) {
+    if (graphic && (labelStr.length() != 0)) {
         // HARDCODED
         int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
         int xLabel = x - space;
@@ -306,7 +309,7 @@ void View::DrawStaffGrp(
         grpTxt.SetPointSize(params.m_pointSize);
         dc->SetFont(&grpTxt);
 
-        dc->GetTextExtent(labelStr, &extend);
+        dc->GetTextExtent(labelStr, &extend, true);
 
         dc->StartGraphic(graphic, "", graphic->GetUuid());
 
@@ -324,7 +327,7 @@ void View::DrawStaffGrp(
 
         // also store in the system the maximum width with abbreviations
         if (system && !abbreviations && (labelAbbrStr.length() > 0)) {
-            dc->GetTextExtent(labelAbbrStr, &extend);
+            dc->GetTextExtent(labelAbbrStr, &extend, true);
             system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
         }
 
@@ -351,7 +354,7 @@ void View::DrawStaffGrp(
     // recursively draw the children
     int i;
     StaffGrp *childStaffGrp = NULL;
-    for (i = 0; i < staffGrp->GetChildCount(); i++) {
+    for (i = 0; i < staffGrp->GetChildCount(); ++i) {
         childStaffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetChild(i));
         if (childStaffGrp) {
             DrawStaffGrp(dc, measure, childStaffGrp, x, false, abbreviations);
@@ -399,8 +402,9 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
             labelStr = labelAbbrStr;
             graphic = labelAbbr;
         }
+        
 
-        if (labelStr.length() == 0) {
+        if (!graphic || (labelStr.length() == 0)) {
             ++iter;
             continue;
         }
@@ -426,7 +430,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&labelTxt);
 
-        dc->GetTextExtent(labelStr, &extend);
+        dc->GetTextExtent(labelStr, &extend, true);
 
         dc->StartGraphic(graphic, "", graphic->GetUuid());
 
@@ -440,7 +444,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         system->SetDrawingLabelsWidth(extend.m_width + space);
         // also store in the system the maximum width with abbreviations for justification
         if (!abbreviations && (labelAbbrStr.length() > 0)) {
-            dc->GetTextExtent(labelAbbrStr, &extend);
+            dc->GetTextExtent(labelAbbrStr, &extend, true);
             system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
         }
 
@@ -560,7 +564,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         int i;
         StaffGrp *childStaffGrp = NULL;
         StaffDef *childStaffDef = NULL;
-        for (i = 0; i < staffGrp->GetChildCount(); i++) {
+        for (i = 0; i < staffGrp->GetChildCount(); ++i) {
             childStaffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetChild(i));
             childStaffDef = dynamic_cast<StaffDef *>(staffGrp->GetChild(i));
             if (childStaffGrp) {
@@ -622,7 +626,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         if (barLine->HasRepetitionDots()) {
             StaffDef *childStaffDef = NULL;
             const ListOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
-            for (ListOfObjects::const_reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
+            for (ListOfObjects::const_reverse_iterator it = childList->rbegin(); it != childList->rend(); ++it) {
                 childStaffDef = dynamic_cast<StaffDef *>((*it));
                 if (childStaffDef) {
                     AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
@@ -730,12 +734,17 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
         dc->StartGraphic(measure, "", measure->GetUuid());
     }
 
-    // Check if the first measure of the system
-    Measure *systemStart = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
-    if (measure == systemStart) {
-        // Draw measure number if > 1
-        if ((measure->HasN()) && (measure->GetN() != "0") && (measure->GetN() != "1")) {
-            DrawMNum(dc, measure);
+    if (m_drawingScoreDef.GetMnumVisible() != BOOLEAN_false) {
+        MNum *mnum = dynamic_cast<MNum *>(measure->FindChildByType(MNUM));
+        if (mnum) {
+            // this should be an option
+            Measure *systemStart = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
+            if (measure == systemStart || !mnum->IsGenerated()) {
+                // Draw measure numbers > 1
+                if ((measure->GetN() != "0") && (measure->GetN()) != "1") {
+                    DrawMNum(dc, mnum, measure);
+                }
+            }
         }
     }
 
@@ -759,41 +768,47 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     }
 }
 
-void View::DrawMNum(DeviceContext *dc, Measure *measure)
+void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
 {
     assert(dc);
     assert(measure);
+    assert(mnum);
 
     Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
     if (staff) {
 
-        // needs to be refined when mNum element is available
-        dc->StartCustomGraphic("mnum", "");
+        dc->StartGraphic(mnum, "", mnum->GetUuid());
 
-        FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-        // HARDCODED
-        currentFont.SetStyle(FONTSTYLE_italic);
-        currentFont.SetPointSize(currentFont.GetPointSize() * 4 / 5);
-        dc->SetFont(&currentFont);
-
-        Text text;
-        text.SetParent(staff);
-        text.SetText(UTF8to16(measure->GetN()));
+        FontInfo mnumTxt;
+        if (!dc->UseGlobalStyling()) {
+            mnumTxt.SetFaceName("Times");
+            mnumTxt.SetStyle(FONTSTYLE_italic);
+        }
 
         TextDrawingParams params;
 
-        // HARDCODED
-        params.m_x = staff->GetDrawingX();
-        params.m_y = staff->GetDrawingY() + 2.5 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        params.m_pointSize = currentFont.GetPointSize();
+        data_HORIZONTALALIGNMENT alignment = mnum->GetChildRendAlignment();
+        // mNum are center aligned by default
+        if (alignment == HORIZONTALALIGNMENT_NONE) alignment = HORIZONTALALIGNMENT_center;
 
-        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), HORIZONTALALIGNMENT_center);
-        DrawTextElement(dc, &text, params);
+        // HARDCODED
+        // we set mNum to a fixed height above the system and make it a bit smaller than other text
+        params.m_x = staff->GetDrawingX();
+        params.m_y = staff->GetDrawingY() + 1.5 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        params.m_pointSize = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize() * 4 / 5;
+
+        mnumTxt.SetPointSize(params.m_pointSize);
+
+        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetFont(&mnumTxt);
+
+        dc->StartText(ToDeviceContextX(params.m_x), ToDeviceContextY(params.m_y), alignment);
+        DrawTextChildren(dc, mnum, params);
         dc->EndText();
 
         dc->ResetFont();
 
-        dc->EndCustomGraphic();
+        dc->EndGraphic(mnum, this);
     }
 }
 
@@ -857,7 +872,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-    for (j = 0; j < staff->m_drawingLines; j++) {
+    for (j = 0; j < staff->m_drawingLines; ++j) {
         dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
         // For drawing rectangles instead of lines
         y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -904,8 +919,8 @@ void View::DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *
     std::list<std::pair<int, int> >::iterator iterDashes;
 
     // First add the dash
-    for (iter = lines->begin(); iter != lines->end(); iter++) {
-        for (iterDashes = (*iter).m_dashes.begin(); iterDashes != (*iter).m_dashes.end(); iterDashes++) {
+    for (iter = lines->begin(); iter != lines->end(); ++iter) {
+        for (iterDashes = (*iter).m_dashes.begin(); iterDashes != (*iter).m_dashes.end(); ++iterDashes) {
             dc->DrawLine(ToDeviceContextX(x + iterDashes->first), ToDeviceContextY(y),
                 ToDeviceContextX(x + iterDashes->second), ToDeviceContextY(y));
         }

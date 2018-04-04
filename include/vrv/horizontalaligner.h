@@ -78,6 +78,11 @@ public:
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT; }
     ///@}
+    
+    /**
+     * Delete the grace aligners in the map
+     */
+    void ClearGraceAligners();
 
     /**
      * Override the method of adding AlignmentReference children
@@ -131,12 +136,12 @@ public:
      * Returns the GraceAligner for the Alignment.
      * Create it if necessary.
      */
-    GraceAligner *GetGraceAligner();
+    GraceAligner *GetGraceAligner(int id);
 
     /**
      * Returns true if the aligner has a GraceAligner
      */
-    bool HasGraceAligner() const { return (m_graceAligner != NULL); }
+    bool HasGraceAligner(int id) const;
 
     /**
      * Return the AlignmentReference holding the element.
@@ -167,6 +172,11 @@ public:
      */
     virtual int HorizontalSpaceForDuration(
         double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
+
+    /**
+     * Return true if the alignment contains at least one reference with staffN
+     */
+    bool HasAlignmentReference(int staffN);
 
     //----------//
     // Functors //
@@ -241,10 +251,10 @@ private:
      */
     AlignmentType m_type;
     /**
-     * A pointer to a GraceAligner if any.
-     * The Alignment owns it.
+     * A map of GraceAligners if any.
+     * The Alignment owns them.
      */
-    GraceAligner *m_graceAligner;
+    MapOfIntGraceAligners m_graceAligners;
 };
 
 //----------------------------------------------------------------------------

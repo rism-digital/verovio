@@ -21,8 +21,11 @@ class BoundaryStartInterface;
 class Chord;
 class Clef;
 class Dots;
+class Dynam;
 class Ending;
 class FileOutputStream;
+class Hairpin;
+class Harm;
 class KeySig;
 class Layer;
 class LayerElement;
@@ -384,11 +387,12 @@ public:
  * member 5: a flag indicating whereas we are processing the caution scoreDef
  * member 6: a flag indicating is we are in the first measure (for the scoreDef role)
  * member 7: a flag indicating if we had mutliple layer alignment reference in the measure
+ * member 8: the doc
  **/
 
 class AlignHorizontallyParams : public FunctorParams {
 public:
-    AlignHorizontallyParams(Functor *functor)
+    AlignHorizontallyParams(Functor *functor, Doc *doc)
     {
         m_measureAligner = NULL;
         m_time = 0.0;
@@ -399,6 +403,7 @@ public:
         m_scoreDefRole = NONE;
         m_isFirstMeasure = false;
         m_hasMultipleLayer = false;
+        m_doc = doc;
     }
     MeasureAligner *m_measureAligner;
     double m_time;
@@ -409,6 +414,7 @@ public:
     ElementScoreDefRole m_scoreDefRole;
     bool m_isFirstMeasure;
     bool m_hasMultipleLayer;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -757,6 +763,53 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// ConvertToCastOffMensuralParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer the document we are adding pages to
+ * member 1: a vector of all the staff @n for finding spliting bar lines
+ * member 2: a pointer to the content Layer from which we are copying the elements
+ * member 3: a pointer to the target destination System
+ * member 4: a pointer to a sub-system (e.g., section) to add measure segments
+ * member 4: a pointer to the target destination System
+ * member 5: a pointer to the target destination Measure
+ * member 6: a pointer to the target destination Staff
+ * member 7: a pointer to the target destination Layer
+ * member 8: a counter for segments in the sub-system (section)
+ * member 9  a counter for the total number of segments (previous sections)
+ * member 10: a IntTree for precessing by Layer
+ **/
+
+class ConvertToCastOffMensuralParams : public FunctorParams {
+public:
+    ConvertToCastOffMensuralParams(Doc *doc, System *targetSystem, IntTree *layerTree)
+    {
+        m_doc = doc;
+        m_contentLayer = NULL;
+        m_targetSystem = targetSystem;
+        m_targetSubSystem = NULL;
+        m_targetMeasure = NULL;
+        m_targetStaff = NULL;
+        m_targetLayer = NULL;
+        m_segmentIdx = 0;
+        m_segmentTotal = 0;
+        m_layerTree = layerTree;
+    }
+    Doc *m_doc;
+    std::vector<int> m_staffNs;
+    Layer *m_contentLayer;
+    System *m_targetSystem;
+    System *m_targetSubSystem;
+    Measure *m_targetMeasure;
+    Staff *m_targetStaff;
+    Layer *m_targetLayer;
+    int m_segmentIdx;
+    int m_segmentTotal;
+    IntTree *m_layerTree;
+};
+
+//----------------------------------------------------------------------------
 // ConvertToPageBasedParams
 //----------------------------------------------------------------------------
 
@@ -768,6 +821,31 @@ class ConvertToPageBasedParams : public FunctorParams {
 public:
     ConvertToPageBasedParams(System *pageBasedSystem) { m_pageBasedSystem = pageBasedSystem; }
     System *m_pageBasedSystem;
+};
+
+//----------------------------------------------------------------------------
+// ConvertToUnCastOffMensuralParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the content / target Measure (NULL at the beginning of a section)
+ * member 1: a pointer to the content / target Layer (NULL at the beginning of a section)
+ * member 2: a flag indicating if we keep a reference of the measure segments to delete at the end
+ * member 3: a list of measure segments to delete at the end (fill in the first pass only)
+ **/
+
+class ConvertToUnCastOffMensuralParams : public FunctorParams {
+public:
+    ConvertToUnCastOffMensuralParams()
+    {
+        m_contentMeasure = NULL;
+        m_contentLayer = NULL;
+        m_addSegmentsToDelete = true;
+    }
+    Measure *m_contentMeasure;
+    Layer *m_contentLayer;
+    bool m_addSegmentsToDelete;
+    ArrayOfObjects m_segmentsToDelete;
 };
 
 //----------------------------------------------------------------------------
@@ -960,12 +1038,14 @@ public:
     GenerateMIDIParams(MidiFile *midiFile)
     {
         m_midiFile = midiFile;
+        m_midiChannel = 0;
         m_midiTrack = 1;
         m_totalTime = 0.0;
         m_transSemi = 0;
         m_currentTempo = 120;
     }
     MidiFile *m_midiFile;
+    int m_midiChannel;
     int m_midiTrack;
     double m_totalTime;
     int m_transSemi;
@@ -1084,17 +1164,18 @@ public:
 /**
  * member 0: the previous ending
  * member 1: the current grpId
+ * member 2: the dynam in the current measure
+ * member 3: the current hairpins to be linked / grouped
+ * member 4: the map of existing harms (based on @n)
  **/
 
 class PrepareFloatingGrpsParams : public FunctorParams {
 public:
-    PrepareFloatingGrpsParams()
-    {
-        m_previousEnding = NULL;
-        m_drawingGrpId = DRAWING_GRP_OTHER;
-    }
+    PrepareFloatingGrpsParams() { m_previousEnding = NULL; }
     Ending *m_previousEnding;
-    int m_drawingGrpId;
+    std::vector<Dynam *> m_dynams;
+    std::vector<Hairpin *> m_hairpins;
+    std::map<std::string, Harm *> m_harms;
 };
 
 //----------------------------------------------------------------------------

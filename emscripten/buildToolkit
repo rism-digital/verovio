@@ -89,11 +89,6 @@ GetOptions (
 if ($wasmQ) {
 	print "Creating WASM toolkit version\n";
 	$FLAGS = "-O3";
-	# tried this for find the integer overflow runtime error but g4 does not work, so line number is missing
-	# should be fixed in the next version of emscripten (https://github.com/kripken/emscripten/issues/5718)
-	# $FLAGS = "-g4 -O0 --emit-symbol-map"; 
-	# this is for now necessary to avoid integer overflow runtime error
-	$FLAGS .= " -s \"BINARYEN_TRAP_MODE='clamp'\"";
 	$FLAGS .= " -DNDEBUG";
 	$FLAGS .= " --memory-init-file 0";
 	$FLAGS .= " -std=c++11";
@@ -170,24 +165,26 @@ my $output  = "-o $BUILD_DIR/verovio.js";
 my $exports = "-s EXPORTED_FUNCTIONS=\"[";
 $exports .= "'_vrvToolkit_constructor',";
 $exports .= "'_vrvToolkit_destructor',";
+$exports .= "'_vrvToolkit_edit',";
+$exports .= "'_vrvToolkit_getAvailableOptions',";
+$exports .= "'_vrvToolkit_getElementAttr',";
 $exports .= "'_vrvToolkit_getElementsAtTime',";
-$exports .= "'_vrvToolkit_getLog',";
-$exports .= "'_vrvToolkit_getVersion',";
-$exports .= "'_vrvToolkit_getMEI',";
 $exports .= "'_vrvToolkit_getHumdrum',";
+$exports .= "'_vrvToolkit_getLog',";
+$exports .= "'_vrvToolkit_getMEI',";
+$exports .= "'_vrvToolkit_getOptions',";
 $exports .= "'_vrvToolkit_getPageCount',";
 $exports .= "'_vrvToolkit_getPageWithElement',";
 $exports .= "'_vrvToolkit_getTimeForElement',";
+$exports .= "'_vrvToolkit_getVersion',";
 $exports .= "'_vrvToolkit_loadData',";
 $exports .= "'_vrvToolkit_redoLayout',";
 $exports .= "'_vrvToolkit_redoPagePitchPosLayout',";
 $exports .= "'_vrvToolkit_renderData',";
-$exports .= "'_vrvToolkit_renderPage',";
-$exports .= "'_vrvToolkit_renderToMidi',";
+$exports .= "'_vrvToolkit_renderToMIDI',";
+$exports .= "'_vrvToolkit_renderToSVG',";
 $exports .= "'_vrvToolkit_renderToTimemap',";
-$exports .= "'_vrvToolkit_setOptions',";
-$exports .= "'_vrvToolkit_edit',";
-$exports .= "'_vrvToolkit_getElementAttr'";
+$exports .= "'_vrvToolkit_setOptions'";
 $exports .= "]\"";
 
 my $extra_exports = "-s EXTRA_EXPORTED_RUNTIME_METHODS='[\"cwrap\"]'";

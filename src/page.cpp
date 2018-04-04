@@ -17,6 +17,7 @@
 #include "bboxdevicecontext.h"
 #include "doc.h"
 #include "functorparams.h"
+#include "pages.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
 #include "pghead.h"
@@ -37,9 +38,7 @@ Page::Page() : Object("page-")
     Reset();
 }
 
-Page::~Page()
-{
-}
+Page::~Page() {}
 
 void Page::Reset()
 {
@@ -52,9 +51,10 @@ void Page::Reset()
     // by default we have no values and use the document ones
     m_pageHeight = -1;
     m_pageWidth = -1;
-    m_pageLeftMar = 0;
-    m_pageRightMar = 0;
-    m_pageTopMar = 0;
+    m_pageMarginBottom = 0;
+    m_pageMarginLeft = 0;
+    m_pageMarginRight = 0;
+    m_pageMarginTop = 0;
     m_PPUFactor = 1.0;
 }
 
@@ -76,12 +76,15 @@ void Page::AddChild(Object *child)
 RunningElement *Page::GetHeader() const
 {
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
-    if (!doc) {
+    if (!doc || doc->GetOptions()->m_noHeader.GetValue()) {
         return NULL;
     }
 
+    Pages *pages = doc->GetPages();
+    assert(pages);
+
     // first page?
-    if (doc->GetFirst() == this) {
+    if (pages->GetFirst() == this) {
         return doc->m_scoreDef.GetPgHead();
     }
     else {
@@ -92,12 +95,15 @@ RunningElement *Page::GetHeader() const
 RunningElement *Page::GetFooter() const
 {
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
-    if (!doc) {
+    if (!doc || doc->GetOptions()->m_noFooter.GetValue()) {
         return NULL;
     }
 
+    Pages *pages = doc->GetPages();
+    assert(pages);
+
     // first page?
-    if (doc->GetFirst() == this) {
+    if (pages->GetFirst() == this) {
         return doc->m_scoreDef.GetPgFoot();
     }
     else {
@@ -127,7 +133,7 @@ void Page::LayOutTranscription(bool force)
         return;
     }
 
-    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -147,7 +153,7 @@ void Page::LayOutTranscription(bool force)
     // - each LayerElement object will have its Alignment pointer initialized
     Functor alignHorizontally(&Object::AlignHorizontally);
     Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
-    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally);
+    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally, doc);
     this->Process(&alignHorizontally, &alignHorizontallyParams, &alignHorizontallyEnd);
 
     // Align the content of the page using system aligners
@@ -195,7 +201,7 @@ void Page::LayOutTranscription(bool force)
 
 void Page::LayOutHorizontally()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -215,7 +221,7 @@ void Page::LayOutHorizontally()
     // - each LayerElement object will have its Alignment pointer initialized
     Functor alignHorizontally(&Object::AlignHorizontally);
     Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
-    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally);
+    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally, doc);
     this->Process(&alignHorizontally, &alignHorizontallyParams, &alignHorizontallyEnd);
 
     // Align the content of the page using system aligners
@@ -228,7 +234,7 @@ void Page::LayOutHorizontally()
 
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
-    if (!doc->GetEvenSpacing()) {
+    if (!doc->GetOptions()->m_evenNoteSpacing.GetValue()) {
         int longestActualDur = DUR_4;
         // Get the longest duration in the piece
         AttDurExtreme durExtremeComparison(LONGEST);
@@ -320,7 +326,7 @@ void Page::LayOutHorizontally()
 
 void Page::LayOutVertically()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -384,27 +390,27 @@ void Page::LayOutVertically()
     this->Process(&adjustYPos, &adjustYPosParams);
 
     if (this->GetHeader()) {
-        this->GetHeader()->AdjustYPos();
+        this->GetHeader()->AdjustRunningElementYPos();
     }
 
     if (this->GetFooter()) {
-        this->GetFooter()->AdjustYPos();
+        this->GetFooter()->AdjustRunningElementYPos();
     }
 
     // Adjust system Y position
     AlignSystemsParams alignSystemsParams;
     alignSystemsParams.m_shift = doc->m_drawingPageHeight;
-    alignSystemsParams.m_systemMargin = (doc->GetSpacingSystem()) * doc->GetDrawingUnit(100);
+    alignSystemsParams.m_systemMargin = (doc->GetOptions()->m_spacingSystem.GetValue()) * doc->GetDrawingUnit(100);
     Functor alignSystems(&Object::AlignSystems);
     this->Process(&alignSystems, &alignSystemsParams);
 }
 
 void Page::JustifyHorizontally()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
 
-    if (!doc->GetJustificationX()) {
+    if ((doc->GetOptions()->m_breaks.GetValue() == BREAKS_none) || doc->GetOptions()->m_noJustification.GetValue()) {
         return;
     }
 
@@ -415,13 +421,14 @@ void Page::JustifyHorizontally()
     // Justify X position
     Functor justifyX(&Object::JustifyX);
     JustifyXParams justifyXParams(&justifyX);
-    justifyXParams.m_systemFullWidth = doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar;
+    justifyXParams.m_systemFullWidth
+        = doc->m_drawingPageWidth - doc->m_drawingPageMarginLeft - doc->m_drawingPageMarginRight;
     this->Process(&justifyX, &justifyXParams);
 }
 
 void Page::LayOutPitchPos()
 {
-    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -440,7 +447,7 @@ void Page::LayOutPitchPos()
 
 int Page::GetContentHeight() const
 {
-    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -449,7 +456,7 @@ int Page::GetContentHeight() const
 
     System *last = dynamic_cast<System *>(m_children.back());
     assert(last);
-    int height = doc->m_drawingPageHeight - doc->m_drawingPageTopMar - last->GetDrawingYRel() + last->GetHeight();
+    int height = doc->m_drawingPageHeight - doc->m_drawingPageMarginTop - last->GetDrawingYRel() + last->GetHeight();
 
     // Not sure what to do with the footer when adjusted page height is requested...
     // if (this->GetFooter()) {
@@ -461,7 +468,7 @@ int Page::GetContentHeight() const
 
 int Page::GetContentWidth() const
 {
-    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    Doc *doc = dynamic_cast<Doc *>(GetFirstParent(DOC));
     assert(doc);
     // in non debug
     if (!doc) return 0;
@@ -523,18 +530,16 @@ int Page::ApplyPPUFactor(FunctorParams *functorParams)
     params->m_page = this;
     this->m_pageWidth /= params->m_page->GetPPUFactor();
     this->m_pageHeight /= params->m_page->GetPPUFactor();
-    this->m_pageTopMar /= params->m_page->GetPPUFactor();
-    this->m_pageLeftMar /= params->m_page->GetPPUFactor();
-    this->m_pageRightMar /= params->m_page->GetPPUFactor();
+    this->m_pageMarginBottom /= params->m_page->GetPPUFactor();
+    this->m_pageMarginLeft /= params->m_page->GetPPUFactor();
+    this->m_pageMarginRight /= params->m_page->GetPPUFactor();
+    this->m_pageMarginTop /= params->m_page->GetPPUFactor();
 
     return FUNCTOR_CONTINUE;
 }
 
 int Page::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
-    assert(doc);
-
     // Same functor, but we have not FunctorParams so we just re-instanciate it
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
 
@@ -559,7 +564,8 @@ int Page::AlignVerticallyEnd(FunctorParams *functorParams)
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    params->m_cumulatedShift = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+    params->m_cumulatedShift
+        = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
 
     // Also align the header and footer
 
@@ -594,7 +600,7 @@ int Page::AlignSystems(FunctorParams *functorParams)
         Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
         assert(doc);
         // We add twice the top margin, once for the origin moved at the top and one for the bottom margin
-        footer->SetDrawingYRel(footer->GetTotalHeight() + doc->m_drawingPageTopMar * 2);
+        footer->SetDrawingYRel(footer->GetTotalHeight() + doc->m_drawingPageMarginTop + doc->m_drawingPageMarginBot);
     }
 
     return FUNCTOR_CONTINUE;

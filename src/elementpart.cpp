@@ -34,9 +34,7 @@ Bracket::Bracket() : LayerElement("bracket-")
     Reset();
 }
 
-Bracket::~Bracket()
-{
-}
+Bracket::~Bracket() {}
 
 void Bracket::Reset()
 {
@@ -47,16 +45,14 @@ void Bracket::Reset()
 // Dots
 //----------------------------------------------------------------------------
 
-Dots::Dots() : LayerElement("dots-"), vrv::AttAugmentDots()
+Dots::Dots() : LayerElement("dots-"), AttAugmentDots()
 {
     RegisterAttClass(ATT_AUGMENTDOTS);
 
     Reset();
 }
 
-Dots::~Dots()
-{
-}
+Dots::~Dots() {}
 
 void Dots::Reset()
 {
@@ -81,9 +77,7 @@ Flag::Flag() : LayerElement("flag-")
     Reset();
 }
 
-Flag::~Flag()
-{
-}
+Flag::~Flag() {}
 
 void Flag::Reset()
 {
@@ -143,9 +137,7 @@ TupletNum::TupletNum() : LayerElement("num-")
     Reset();
 }
 
-TupletNum::~TupletNum()
-{
-}
+TupletNum::~TupletNum() {}
 
 void TupletNum::Reset()
 {
@@ -165,9 +157,7 @@ Stem::Stem() : LayerElement("stem-"), AttGraced(), AttStems(), AttStemsCmn()
     Reset();
 }
 
-Stem::~Stem()
-{
-}
+Stem::~Stem() {}
 
 void Stem::Reset()
 {
@@ -205,7 +195,7 @@ int Bracket::ResetDrawing(FunctorParams *functorParams)
     LayerElement::ResetDrawing(functorParams);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Dots::ResetDrawing(FunctorParams *functorParams)
 {
@@ -215,7 +205,7 @@ int Dots::ResetDrawing(FunctorParams *functorParams)
     m_dotLocsByStaff.clear();
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Dots::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
@@ -234,7 +224,7 @@ int Flag::ResetDrawing(FunctorParams *functorParams)
     m_drawingNbFlags = 0;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int TupletNum::ResetDrawing(FunctorParams *functorParams)
 {
@@ -242,7 +232,7 @@ int TupletNum::ResetDrawing(FunctorParams *functorParams)
     LayerElement::ResetDrawing(functorParams);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int Stem::CalcStem(FunctorParams *functorParams)
 {
@@ -350,6 +340,6 @@ int Stem::ResetDrawing(FunctorParams *functorParams)
     m_drawingStemLen = 0;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 } // namespace vrv

@@ -241,7 +241,7 @@ public:
     ///@}
 
 private:
-    /** Records the number of augmentation dots required by a dotted duration. **/
+    /** Records the number of augmentation dots required by a written dotted duration. **/
     int m_dots;
 
     /* include <attdots> */
@@ -2909,8 +2909,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMm(std::string mm_) { m_mm = mm_; }
-    std::string GetMm() const { return m_mm; }
+    void SetMm(int mm_) { m_mm = mm_; }
+    int GetMm() const { return m_mm; }
     bool HasMm() const;
     //
     void SetMmUnit(data_DURATION mmUnit_) { m_mmUnit = mmUnit_; }
@@ -2930,7 +2930,7 @@ private:
      * In MIDI, a beat is always defined as a quarter note, *not the numerator of the
      * time signature or the metronomic indication*.
      **/
-    std::string m_mm;
+    int m_mm;
     /** Captures the metronomic unit. **/
     data_DURATION m_mmUnit;
     /** Records the number of augmentation dots required by a dotted metronome unit. **/
@@ -3695,6 +3695,54 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttPartIdent
+//----------------------------------------------------------------------------
+
+class AttPartIdent : public Att {
+public:
+    AttPartIdent();
+    virtual ~AttPartIdent();
+
+    /** Reset the default values for the attribute class **/
+    void ResetPartIdent();
+
+    /** Read the values for the attribute class **/
+    bool ReadPartIdent(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WritePartIdent(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetPart(std::string part_) { m_part = part_; }
+    std::string GetPart() const { return m_part; }
+    bool HasPart() const;
+    //
+    void SetPartstaff(std::string partstaff_) { m_partstaff = partstaff_; }
+    std::string GetPartstaff() const { return m_partstaff; }
+    bool HasPartstaff() const;
+    ///@}
+
+private:
+    /**
+     * Indicates the part in which the current feature should appear.
+     * Use '%all' when the feature should occur in every part.
+     **/
+    std::string m_part;
+    /**
+     * Signifies the part staff on which a notated feature occurs.
+     * Use '%all' when the feature should occur on every staff.
+     **/
+    std::string m_partstaff;
+
+    /* include <attpartstaff> */
+};
+
+//----------------------------------------------------------------------------
 // AttPitch
 //----------------------------------------------------------------------------
 
@@ -3908,11 +3956,81 @@ public:
 private:
     /**
      * Numeric value capturing a measurement or count.
-     * Can only be interpreted in combination with the unit or currency attribute.
+     * Can only be interpreted in combination with the unit attribute.
      **/
     double m_quantity;
 
     /* include <attquantity> */
+};
+
+//----------------------------------------------------------------------------
+// AttRanging
+//----------------------------------------------------------------------------
+
+class AttRanging : public Att {
+public:
+    AttRanging();
+    virtual ~AttRanging();
+
+    /** Reset the default values for the attribute class **/
+    void ResetRanging();
+
+    /** Read the values for the attribute class **/
+    bool ReadRanging(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteRanging(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetAtleast(double atleast_) { m_atleast = atleast_; }
+    double GetAtleast() const { return m_atleast; }
+    bool HasAtleast() const;
+    //
+    void SetAtmost(double atmost_) { m_atmost = atmost_; }
+    double GetAtmost() const { return m_atmost; }
+    bool HasAtmost() const;
+    //
+    void SetMin(double min_) { m_min = min_; }
+    double GetMin() const { return m_min; }
+    bool HasMin() const;
+    //
+    void SetMax(double max_) { m_max = max_; }
+    double GetMax() const { return m_max; }
+    bool HasMax() const;
+    //
+    void SetConfidence(double confidence_) { m_confidence = confidence_; }
+    double GetConfidence() const { return m_confidence; }
+    bool HasConfidence() const;
+    ///@}
+
+private:
+    /** Gives a minimum estimated value for an approximate measurement. **/
+    double m_atleast;
+    /** Gives a maximum estimated value for an approximate measurement. **/
+    double m_atmost;
+    /**
+     * Where the measurement summarizes more than one observation or a range of values,
+     * supplies the minimum value observed.
+     **/
+    double m_min;
+    /**
+     * Where the measurement summarizes more than one observation or a range of values,
+     * supplies the maximum value observed.
+     **/
+    double m_max;
+    /**
+     * Specifies the degree of statistical confidence (between zero and one) that a
+     * value falls within the range specified by min and max, or the proportion of
+     * observed values that fall within that range.
+     **/
+    double m_confidence;
+
+    /* include <attconfidence> */
 };
 
 //----------------------------------------------------------------------------
@@ -5019,8 +5137,8 @@ public:
 
 private:
     /**
-     * Encodes the onset time in terms of musical time, i.e.,
-     * beats[.fractional_beat_part].
+     * Encodes the onset time in terms of musical time, i.e., beats[.fractional beat
+     * part], as expressed in the written time signature.
      **/
     double m_tstamp;
 
@@ -5058,8 +5176,8 @@ public:
 
 private:
     /**
-     * Encodes the ending point of an event in terms of musical time, i.e., a count of
-     * measures plus a beat location.
+     * Encodes the ending point of an event, i.e., a count of measures plus a beat
+     * location in the ending measure.
      **/
     data_MEASUREBEAT m_tstamp2;
 
@@ -5295,22 +5413,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttVerticalAlignment
+// AttVerticalGroup
 //----------------------------------------------------------------------------
 
-class AttVerticalAlignment : public Att {
+class AttVerticalGroup : public Att {
 public:
-    AttVerticalAlignment();
-    virtual ~AttVerticalAlignment();
+    AttVerticalGroup();
+    virtual ~AttVerticalGroup();
 
     /** Reset the default values for the attribute class **/
-    void ResetVerticalAlignment();
+    void ResetVerticalGroup();
 
     /** Read the values for the attribute class **/
-    bool ReadVerticalAlignment(pugi::xml_node element);
+    bool ReadVerticalGroup(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteVerticalAlignment(pugi::xml_node element);
+    bool WriteVerticalGroup(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -5318,14 +5436,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetVgrp(std::string vgrp_) { m_vgrp = vgrp_; }
-    std::string GetVgrp() const { return m_vgrp; }
+    void SetVgrp(int vgrp_) { m_vgrp = vgrp_; }
+    int GetVgrp() const { return m_vgrp; }
     bool HasVgrp() const;
     ///@}
 
 private:
-    /** --- **/
-    std::string m_vgrp;
+    /** Provides a label for members of a vertically aligned group. **/
+    int m_vgrp;
 
     /* include <attvgrp> */
 };

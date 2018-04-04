@@ -29,9 +29,7 @@ Fb::Fb() : Object("fb-")
     Reset();
 }
 
-Fb::~Fb()
-{
-}
+Fb::~Fb() {}
 
 void Fb::Reset()
 {
@@ -65,9 +63,7 @@ F::F() : TextElement("f-")
     Reset();
 }
 
-F::~F()
-{
-}
+F::~F() {}
 
 void F::Reset()
 {

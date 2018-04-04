@@ -91,7 +91,7 @@ void FTrem::FilterList(ListOfObjects *childList)
                 continue;
             }
         }
-        iter++;
+        ++iter;
     }
 
     InitCoords(childList);
@@ -184,6 +184,13 @@ int FTrem::CalcStem(FunctorParams *functorParams)
 
     this->m_drawingParams.CalcBeam(layer, staff, params->m_doc, beamElementCoords, elementCount);
 
+    return FUNCTOR_CONTINUE;
+}
+
+int FTrem::ResetDrawing(FunctorParams *functorParams)
+{
+    // We want the list of the ObjectListInterface to be re-generated
+    this->Modify();
     return FUNCTOR_CONTINUE;
 }
 

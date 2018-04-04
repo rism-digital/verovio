@@ -16,6 +16,7 @@
 #include "attcomparison.h"
 #include "barline.h"
 #include "beam.h"
+#include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
@@ -31,11 +32,13 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
+#include "mrpt.h"
+#include "mrpt2.h"
 #include "multirest.h"
+#include "multirpt.h"
 #include "note.h"
 #include "page.h"
 #include "rest.h"
-#include "rpt.h"
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
@@ -261,9 +264,8 @@ int LayerElement::GetDrawingY() const
 {
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
-    Object *object = NULL;
-    // Otherwise look if we have a crossStaff situation
-    if (!object) object = this->m_crossStaff; // GetCrossStaff();
+    // Look if we have a crossStaff situation
+    Object *object = this->m_crossStaff; // GetCrossStaff();
     // First get the first layerElement parent (if any) but only if the element is not directly relative to staff (e.g.,
     // artic, syl)
     if (!object && !this->IsRelativeToStaff()) object = this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max);
@@ -415,7 +417,7 @@ int LayerElement::GetDrawingRadius(Doc *doc)
 {
     assert(doc);
 
-    if (!this->Is({ NOTE, CHORD })) return 0;
+    if (!this->Is({ CHORD, NOTE, REST })) return 0;
 
     int dur = DUR_4;
     if (this->Is(NOTE)) {
@@ -423,7 +425,7 @@ int LayerElement::GetDrawingRadius(Doc *doc)
         assert(note);
         dur = note->GetDrawingDur();
     }
-    else {
+    else if (this->Is(CHORD)) {
         Chord *chord = dynamic_cast<Chord *>(this);
         assert(chord);
         dur = chord->GetActualDur();
@@ -480,7 +482,7 @@ double LayerElement::GetAlignmentDuration(
         BeatRpt *beatRpt = dynamic_cast<BeatRpt *>(this);
         assert(beatRpt);
         int meterUnit = 4;
-        if (meterSig && meterSig->HasUnit()) meterSig->GetUnit();
+        if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
         return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
     else if (this->Is(TIMESTAMP_ATTR)) {
@@ -491,7 +493,7 @@ double LayerElement::GetAlignmentDuration(
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     // We align all full measure element to the current time signature, even the ones that last longer than one measure
-    else if (this->Is({ MREST, MULTIREST, MRPT, MRPT2, MULTIREST })) {
+    else if (this->Is({ MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
         int meterUnit = 4;
         int meterCount = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
@@ -543,6 +545,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
+    // if (m_alignment) LogDebug("Element %s %s", this->GetUuid().c_str(), this->GetClassName().c_str());
     assert(!m_alignment);
 
     this->SetScoreDefRole(params->m_scoreDefRole);
@@ -676,19 +679,22 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else {
         assert(this->IsGraceNote());
         if (this->Is(CHORD) || (this->Is(NOTE) && !chordParent)) {
-            GraceAligner *graceAligner = m_alignment->GetGraceAligner();
+            Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+            assert(staff);
+            int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
+            GraceAligner *graceAligner = m_alignment->GetGraceAligner(graceAlignerId);
             // We know that this is a note or a chord - we stack them and they will be added at the end of the layer
             // This will also see it for all their children
             graceAligner->StackGraceElement(this);
         }
     }
 
+    // LogDebug("Element %f %s", params->m_time, this->GetClassName().c_str());
+
     if (!this->Is(TIMESTAMP_ATTR)) {
         // increase the time position, but only when not a timestamp (it would actually do nothing)
         params->m_time += duration;
     }
-
-    // LogDebug("AlignHorizontally: Time %f - %s", (*time), this->GetClassName().c_str());
 
     return FUNCTOR_CONTINUE;
 }
@@ -875,7 +881,7 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
         assert(staff);
 
         std::vector<LayerElement *>::iterator iter;
-        for (iter = params->m_previous.begin(); iter != params->m_previous.end(); iter++) {
+        for (iter = params->m_previous.begin(); iter != params->m_previous.end(); ++iter) {
 
             int verticalMargin = 0; // 1 * params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
             int horizontalMargin = 2 * params->m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
@@ -928,7 +934,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     if (params->m_graceCumulatedXShift == VRV_UNSET) params->m_graceCumulatedXShift = 0;
 
-    // LogDebug("Aligning %s", this->GetClassName().c_str());
+    // LogDebug("********* Aligning %s", this->GetClassName().c_str());
 
     // With non grace alignment we do not need to do this
     this->ResetCachedDrawingX();
@@ -951,7 +957,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     int selfLeft = this->GetSelfLeft()
         - params->m_doc->GetLeftMargin(this->GetClassId())
-            * params->m_doc->GetDrawingUnit(params->m_doc->GetCueSize(100)) / PARAM_DENOMINATOR;
+            * params->m_doc->GetDrawingUnit(params->m_doc->GetCueSize(100));
 
     params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
 
@@ -986,7 +992,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // We add it to the upcoming bouding boxes
         params->m_upcomingBoundingBoxes.push_back(this);
         selfLeft = this->GetSelfLeft()
-            - params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+            - params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
     }
 
     int offset = selfLeft - params->m_minPos;
@@ -998,14 +1004,14 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     }
 
     int selfRight;
-    if (!this->HasSelfBB() || this->HasEmptyBB())
+    if (!this->HasSelfBB() || this->HasEmptyBB()) {
         selfRight = this->GetAlignment()->GetXRel()
-            + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-                / PARAM_DENOMINATOR;
-    else
+            + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+    }
+    else {
         selfRight = this->GetSelfRight()
-            + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-                / PARAM_DENOMINATOR;
+            + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100);
+    }
 
     params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
 
@@ -1173,7 +1179,7 @@ int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
             iter = params->m_timePointingInterfaces.erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 
@@ -1195,7 +1201,7 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 
@@ -1222,12 +1228,8 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    // Here we need to check if the LayerElement has a duration, otherwise we can continue
-    if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
-
     double incrementScoreTime;
 
-    // Now deal with the different elements
     if (this->Is(REST) || this->Is(SPACE)) {
         double incrementScoreTime = GetAlignmentDuration() / (DUR_MAX / DURATION_4);
         params->m_currentScoreTime += incrementScoreTime;
@@ -1242,7 +1244,9 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
 
         Chord *chord = note->IsChordTone();
 
-        if (chord) {
+        // If the note has a @dur or a @dur.ges, take it into account
+        // This means that overwriting only @dots or @dots.ges will not be taken into account
+        if (chord && !note->HasDur() && !note->HasDurGes()) {
             incrementScoreTime = chord->GetAlignmentDuration();
         }
         else {
@@ -1266,6 +1270,15 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
             params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
         }
     }
+    else if (this->Is(BEATRPT)) {
+        BeatRpt *rpt = dynamic_cast<BeatRpt *>(this);
+        assert(rpt);
+
+        double incrementScoreTime = rpt->GetAlignmentDuration() / (DUR_MAX / DURATION_4);
+        rpt->SetScoreTimeOnset(params->m_currentScoreTime);
+        params->m_currentScoreTime += incrementScoreTime;
+        params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
+    }
     return FUNCTOR_CONTINUE;
 }
 
@@ -1279,6 +1292,6 @@ int LayerElement::ResetDrawing(FunctorParams *)
     m_drawingCueSize = false;
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 } // namespace vrv

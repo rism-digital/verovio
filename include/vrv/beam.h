@@ -55,9 +55,9 @@ public:
     int m_beamWidth;
     int m_beamWidthBlack;
     int m_beamWidthWhite;
-    double m_startingY; // the initial position of the beam
+    int m_startingX; // the initial X position of the beam
+    int m_startingY; // the initial Y position of the beam
     double m_beamSlope; // the slope of the beam
-    double m_verticalBoost; // extra height to ensure the beam clears all the noteheads
 };
 
 //----------------------------------------------------------------------------
@@ -108,6 +108,11 @@ public:
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 protected:
     /**
