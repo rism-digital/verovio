@@ -20,6 +20,7 @@ class AttComparison;
 class BoundaryStartInterface;
 class Chord;
 class Clef;
+class Dot;
 class Dots;
 class Dynam;
 class Ending;
@@ -1243,12 +1244,18 @@ public:
 
 /**
  * member 0: the current Note
+ * member 1: the last Dot
  **/
 
 class PreparePointersByLayerParams : public FunctorParams {
 public:
-    PreparePointersByLayerParams() { m_currentNote = NULL; }
+    PreparePointersByLayerParams()
+    {
+        m_currentNote = NULL;
+        m_lastDot = NULL;
+    }
     Note *m_currentNote;
+    Dot *m_lastDot;
 };
 
 //----------------------------------------------------------------------------
