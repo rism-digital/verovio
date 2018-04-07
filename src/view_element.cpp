@@ -688,10 +688,17 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
-    // Use the note to which the points to for position
-    if (dot->m_drawingNote && (m_doc->GetType() != Transcription)) {
-        x = dot->m_drawingNote->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
-        y = dot->m_drawingNote->GetDrawingY();
+    if (m_doc->GetType() != Transcription) {
+        // Use the note to which the points to for position
+        if (dot->m_drawingNote && !dot->m_drawingNextElement) {
+            x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
+            y = dot->m_drawingNote->GetDrawingY();
+        }
+        if (dot->m_drawingNote && dot->m_drawingNextElement) {
+            x += ((dot->m_drawingNextElement->GetDrawingX() - dot->m_drawingNote->GetDrawingX()) / 2);
+            x += dot->m_drawingNote->GetDrawingRadius(m_doc);
+            y = dot->m_drawingNote->GetDrawingY();
+        }
     }
 
     DrawDotsPart(dc, x, y, 1, staff);

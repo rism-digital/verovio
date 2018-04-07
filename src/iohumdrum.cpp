@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 // Name:        iohumdrum.cpp
 // Author:      Craig Stuart Sapp
 // Created:     06/06/2016
@@ -56,6 +56,7 @@
 #include "fig.h"
 #include "hairpin.h"
 #include "harm.h"
+#include "instrdef.h"
 #include "iomei.h"
 #include "label.h"
 #include "labelabbr.h"
@@ -271,7 +272,11 @@ namespace humaux {
 
     /////////////////////////////////////////////////////////////////////
 
-    StaffStateVariables::StaffStateVariables() { clear(); }
+    StaffStateVariables::StaffStateVariables()
+    {
+        cue_size.resize(100);
+        clear();
+    }
     StaffStateVariables::~StaffStateVariables() { clear(); }
     void StaffStateVariables::clear()
     {
@@ -283,6 +288,7 @@ namespace humaux {
         ties.clear();
         meter_bottom = 4;
         meter_top = 4;
+        std::fill(cue_size.begin(), cue_size.end(), false);
     }
 
 } // end namespace humaux
@@ -494,6 +500,12 @@ bool HumdrumInput::convertHumdrum()
     for (auto it : spinestarts) {
         if (it->isDataType("**mxhm")) {
             m_harm = true;
+        }
+        if (it->isDataType("**fing")) {
+            m_fing = true;
+        }
+        if (it->isDataType("**string")) {
+            m_string = true;
         }
         if (it->isDataType("**harm")) {
             m_harm = true;
@@ -2532,20 +2544,19 @@ void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, hum::HTp partstar
         return;
     }
 
-    // InstrDef* idef = new InstrDef;
-    // staffdef->AddInstrDef(idef);
+    // Allowing users to assign MIDI instrument numbers in data would be useful, but
+    // currently only allowed via insturment codes.
+    static hum::HumInstrument imap;
+    int gmpc = imap.getGM(*instcode);
 
-    // Allowing users to assign MIDI instrument numbers in data would be useful.
-    //  static HumInstrument imap;
-    //  int gmpc = imap.getGM(*instcode);
+    //   gmpc is -1 if no mapping, so don't add General MIDI insturment number in that case
+    if (gmpc < 0) {
+        return;
+    }
 
-    //   m_staffdef.push_back(new StaffDef());
-    //   m_staffgroup->AddStaffDef(m_staffdef.back());
-
-    //   gmpc is -1 if no mapping (probably assign to 0 in those cases).
-    //   if (instcode) {
-    //   std::cerr << "GOT HERE " << *instcode << " " << gmpc << std::endl;
-    //   }
+    InstrDef *idef = new InstrDef;
+    staffdef->AddChild(idef);
+    idef->SetMidiInstrnum(gmpc + 1); // offset from 1 in MEI
 }
 
 //////////////////////////////
@@ -3016,6 +3027,14 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
         addHarmFloatsForMeasure(startline, endline);
     }
 
+    if (m_fing) {
+        addFingeringsForMeasure(startline, endline);
+    }
+
+    if (m_string) {
+        addStringNumbersForMeasure(startline, endline);
+    }
+
     if (m_fb) {
         addFiguredBassForMeasure(startline, endline);
     }
@@ -3086,6 +3105,172 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
             setStaff(harm, staffindex + 1);
             setLocationId(harm, token);
             setLocationId(fb, token);
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addFingeringsForMeasure --
+//
+
+void HumdrumInput::addFingeringsForMeasure(int startline, int endline)
+{
+    if (!m_measure) {
+        return;
+    }
+    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+    hum::HumdrumFile &infile = m_infile;
+    bool aboveQ = true;
+    hum::HumRegex hre;
+    vector<std::string> nums;
+
+    for (int i = startline; i < endline; ++i) {
+        if (!infile[i].isData()) {
+            continue;
+        }
+        int track = 0;
+        for (int j = 0; j < infile[i].getFieldCount(); ++j) {
+            hum::HTp token = infile.token(i, j);
+            if (token->isDataType("**kern")) {
+                track = token->getTrack();
+            }
+            if (token->isNull()) {
+                continue;
+            }
+            if (!token->isDataType("**fing")) {
+                continue;
+            }
+            std::string content = token->getText();
+            if (content.empty()) {
+                continue;
+            }
+
+            hre.split(nums, content, " ");
+
+            int ztrack = token->getTrack();
+            aboveQ = true;
+            if ((j > 0) && infile.token(i, j - 1)->isDataType("**fing")) {
+                int ptrack = infile.token(i, j - 1)->getTrack();
+                if (ztrack == ptrack) {
+                    aboveQ = false;
+                }
+            }
+
+            int staffindex = m_rkern[track];
+            int maxstaff = (int)kernstarts.size();
+
+            if (aboveQ) {
+                for (int k = 0; k < (int)nums.size(); k++) {
+                    insertFingerNumberInMeasure(nums[k], staffindex, token, maxstaff, aboveQ);
+                }
+            }
+            else {
+                for (int k = 0; k < (int)nums.size(); k++) {
+                    insertFingerNumberInMeasure(nums[k], staffindex, token, maxstaff, aboveQ);
+                }
+            }
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertFingerNumberInMeasure --
+//
+
+void HumdrumInput::insertFingerNumberInMeasure(
+    const std::string &text, int staffindex, hum::HTp token, int maxstaff, bool aboveQ)
+{
+
+    Dir *dir = new Dir;
+    int xstaffindex = 0;
+    if (staffindex >= 0) {
+        xstaffindex = staffindex;
+        setStaff(dir, staffindex + 1);
+    }
+    else {
+        // data is not attached to a **kern spine since it comes before
+        // any **kern data.  Treat it as attached to the bottom staff.
+        // (or the top staff depending on @place="above|below".
+        xstaffindex = maxstaff - 1;
+        setStaff(dir, xstaffindex + 1);
+    }
+
+    Rend *rend = new Rend;
+    data_FONTSIZE fs;
+    fs.SetTerm(FONTSIZETERM_x_small);
+    rend->SetFontsize(fs);
+    rend->SetFontstyle(FONTSTYLE_normal);
+    addTextElement(rend, text);
+    dir->AddChild(rend);
+    appendTypeTag(dir, "fingering");
+    if (aboveQ) {
+        setPlace(dir, "above");
+    }
+    else {
+        setPlace(dir, "below");
+    }
+    m_measure->AddChild(dir);
+    hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
+    dir->SetTstamp(tstamp.getFloat());
+    setLocationId(dir, token);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addStringNumbersForMeasure --
+//
+
+void HumdrumInput::addStringNumbersForMeasure(int startline, int endline)
+{
+    if (!m_measure) {
+        return;
+    }
+    int xstaffindex;
+    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+    hum::HumdrumFile &infile = m_infile;
+    for (int i = startline; i < endline; ++i) {
+        if (!infile[i].isData()) {
+            continue;
+        }
+        int track = 0;
+        for (int j = 0; j < infile[i].getFieldCount(); ++j) {
+            hum::HTp token = infile.token(i, j);
+            if (token->isDataType("**kern")) {
+                track = token->getTrack();
+            }
+            if (token->isNull()) {
+                continue;
+            }
+            if (!token->isDataType("**string")) {
+                continue;
+            }
+            Harm *harm = new Harm;
+            Text *text = new Text;
+
+            int staffindex = m_rkern[track];
+
+            if (staffindex >= 0) {
+                xstaffindex = staffindex;
+                setStaff(harm, staffindex + 1);
+            }
+            else {
+                // data is not attached to a **kern spine since it comes before
+                // any **kern data.  Treat it as attached to the bottom staff.
+                // (or the top staff depending on @place="above|below".
+                xstaffindex = (int)kernstarts.size() - 1;
+                setStaff(harm, xstaffindex + 1);
+            }
+            std::wstring content;
+            content = cleanStringString(*token);
+            text->SetText(content);
+            harm->AddChild(text);
+            m_measure->AddChild(harm);
+            hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
+            harm->SetTstamp(tstamp.getFloat());
+            appendTypeTag(harm, "string");
+            setLocationId(harm, token);
         }
     }
 }
@@ -3296,6 +3481,37 @@ std::wstring HumdrumInput::cleanHarmString2(const std::string &content)
         }
     }
 
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::cleanStringString -- Add circles around string numbers.
+//    see: https://www.fileformat.info/info/unicode/block/enclosed_alphanumerics/utf8test.htm
+//
+
+std::wstring HumdrumInput::cleanStringString(const std::string &content)
+{
+    std::wstring output;
+    std::string value;
+    for (int i = 0; i < (int)content.size(); i++) {
+        switch (content[i]) {
+            case '0': output += L"\u24ea"; break; // 0 in circle
+            case '1': output += L"\u2460"; break; // 1 in circle
+            case '2': output += L"\u2461"; break; // 2 in circle
+            case '3': output += L"\u2462"; break; // 3 in circle
+            case '4': output += L"\u2463"; break; // 4 in circle
+            case '5': output += L"\u2464"; break; // 5 in circle
+            case '6': output += L"\u2465"; break; // 6 in circle
+            case '7': output += L"\u2466"; break; // 7 in circle
+            case '8': output += L"\u2467"; break; // 8 in circle
+            case '9': output += L"\u2468"; break; // 9 in circle
+            default:
+                value.clear();
+                value.push_back(content[i]);
+                output += UTF8to16(value);
+        }
+    }
     return output;
 }
 
@@ -4063,8 +4279,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 note->SetStemLen(0);
             }
             if (m_signifiers.cuesize && layerdata[i]->find(m_signifiers.cuesize) != string::npos) {
-                // 400: MEI 4.0.0: still to be implemented
-                // note->SetSize(SIZE_cue);
+                note->SetCue(BOOLEAN_true);
+            }
+            else if (m_staffstates.at(staffindex).cue_size.at(m_currentlayer)) {
+                note->SetCue(BOOLEAN_true);
             }
             addArticulations(note, layerdata[i]);
             addOrnaments(note, layerdata[i]);
@@ -4220,6 +4438,14 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
     if (articloc['o']) {
         artics.push_back(ARTICULATION_harm);
         positions.push_back(articpos['o']);
+    }
+    if (articloc['v']) {
+        artics.push_back(ARTICULATION_upbow);
+        positions.push_back(articpos['v']);
+    }
+    if (articloc['u']) {
+        artics.push_back(ARTICULATION_dnbow);
+        positions.push_back(articpos['u']);
     }
 
     if (artics.empty()) {
@@ -4444,6 +4670,34 @@ void HumdrumInput::colorNote(Note *note, const std::string &token, int line, int
             break;
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::colorVerse --
+//
+
+void HumdrumInput::colorVerse(Verse *verse, std::string &token)
+{
+    hum::HumRegex hre;
+    for (int i = 0; i < (int)m_signifiers.textmark.size(); ++i) {
+        if (token.find(m_signifiers.textmark[i]) != std::string::npos) {
+            verse->SetColor(m_signifiers.textcolor[i]);
+            // appendTypeTag(verse, "marked");
+            // remove mark character from text (so that it does not display):
+            std::string mystring;
+            mystring += m_signifiers.textmark[i];
+            hre.replaceDestructive(token, "", mystring, "g");
+            return;
+        }
+    }
+    if (m_signifiers.mark.empty()) {
+        return;
+    }
+
+    // force the verse text black so that it is not
+    // highlighted when notes are highlighted.
+    verse->SetColor("black");
 }
 
 //////////////////////////////
@@ -4745,10 +4999,13 @@ void HumdrumInput::processChordSignifiers(Chord *chord, hum::HTp token, int staf
             }
         }
         if ((cuecount > 0) && (tcount == cuecount)) {
-            // 400: MEI 4.0.0 still to be implemented
-            // chord->SetSize(SIZE_cue);
+            chord->SetCue(BOOLEAN_true);
         }
     }
+    else if (m_staffstates.at(staffindex).cue_size.at(m_currentlayer)) {
+        chord->SetCue(BOOLEAN_true);
+    }
+
     processTerminalLong(token); // Not tested and probably won't work yet on chords.
 }
 
@@ -5685,6 +5942,30 @@ hum::HumNum HumdrumInput::getMeasureTstamp(hum::HTp token, int staffindex, hum::
 {
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumNum qbeat = token->getDurationFromBarline();
+    if (fract > 0) {
+        // what is this for? Causes problems with pedal markings.
+        // qbeat += fract * token->getDuration().getAbs();
+    }
+    hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
+    // if (ss[staffindex].meter_bottom == 0) {
+    // 	mfactor = 1;
+    // 	mfactor /= 8;
+    // }
+    hum::HumNum mbeat = qbeat * mfactor + 1;
+    return mbeat;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getMeasureTstampPlusDur --  Similar to getMeasureTstamp, but also include
+//     duration of token (to get endpoint of token in measure).
+//     default value: fract = 0.0;
+//
+
+hum::HumNum HumdrumInput::getMeasureTstampPlusDur(hum::HTp token, int staffindex, hum::HumNum fract)
+{
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    hum::HumNum qbeat = token->getDurationFromBarline() + token->getDuration();
     if (fract > 0) {
         // what is this for? Causes problems with pedal markings.
         // qbeat += fract * token->getDuration().getAbs();
@@ -6922,17 +7203,20 @@ hum::HumNum HumdrumInput::removeFactorsOfTwo(hum::HumNum value, int &tcount, int
 //     that are turned on/off by interpretation tokens.
 //
 // Controls that this function deals with:
-//    *Xtuplet = suppress beam and bracket tuplet numbers
-//    *tuplet = display beam and bracket tuplet numbers
-//    *Xbeamtup = suppress beam tuplet numbers
-//    *beamtup  = display beam tuplet numbers
+//    *Xtuplet     = suppress beam and bracket tuplet numbers
+//    *tuplet      = display beam and bracket tuplet numbers
+//    *Xbeamtup    = suppress beam tuplet numbers
+//    *beamtup     = display beam tuplet numbers
 //    *Xbrackettup = suppress tuplet brackets
 //    *brackettup  = display tuplet brackets
+//    *Xcue        = notes back to regular size (operates at layer level rather than staff level).
+//    *cue         = display notes in cue size (operates at layer level rather than staff level).
 //
 
 void HumdrumInput::handleStaffStateVariables(hum::HTp token)
 {
     int staffindex = m_currentstaff - 1;
+    int layernum = m_currentlayer;
     std::string value = *token;
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     if (value == "*Xbeamtup") {
@@ -6951,9 +7235,15 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
         ss[staffindex].suppress_beam_tuplet = true;
         ss[staffindex].suppress_bracket_tuplet = true;
     }
-    if (value == "*tuplet") {
+    else if (value == "*tuplet") {
         ss[staffindex].suppress_beam_tuplet = false;
         ss[staffindex].suppress_bracket_tuplet = false;
+    }
+    if (value == "*Xcue") {
+        ss[staffindex].cue_size.at(layernum) = false;
+    }
+    else if (value == "*cue") {
+        ss[staffindex].cue_size.at(layernum) = true;
     }
 }
 
@@ -7780,8 +8070,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
 
     // check for cue-size signifier:
     if (m_signifiers.cuesize && tstring.find(m_signifiers.cuesize) != string::npos) {
-        // 400: cue size not yet implemented
-        // note->SetSize(SIZE_cue);
+        note->SetCue(BOOLEAN_true);
+    }
+    else if (m_staffstates.at(staffindex).cue_size.at(m_currentlayer)) {
+        note->SetCue(BOOLEAN_true);
     }
 
     // If the note is the start or stop of an analytic phrase,
@@ -7868,9 +8160,11 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
         vvdataQ = false;
         if (line.token(i)->isDataType("**text")) {
             lyricQ = true;
-        } else if (line.token(i)->isDataType("**silbe")) {
-			lyricQ = true;
-		} else if (line.token(i)->getDataType().compare(0, 7, "**vdata") == 0) {
+        }
+        else if (line.token(i)->isDataType("**silbe")) {
+            lyricQ = true;
+        }
+        else if (line.token(i)->getDataType().compare(0, 7, "**vdata") == 0) {
             vdataQ = true;
             lyricQ = true;
         }
@@ -7888,23 +8182,24 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             continue;
         }
         if (line.token(i)->isDataType("**silbe")) {
-			if (line.token(i)->getText() == "|") {
-				versenum++;
-				continue;
-			}
-		}
+            if (line.token(i)->getText() == "|") {
+                versenum++;
+                continue;
+            }
+        }
 
         vtexts.clear();
         if (line.token(i)->isDataType("**silbe")) {
-			string value = line.token(i)->getText();
-			hre.replaceDestructive(value, "", "\\|", "g");
-			hre.replaceDestructive(value, "&uuml;", "u2", "g");
-			hre.replaceDestructive(value, "&auml;", "a2", "g");
-			hre.replaceDestructive(value, "&ouml;", "o2", "g");
-        	vtexts.push_back(value);
-		} else {
-        	vtexts.push_back(*line.token(i));
-		}
+            string value = line.token(i)->getText();
+            hre.replaceDestructive(value, "", "\\|", "g");
+            hre.replaceDestructive(value, "&uuml;", "u2", "g");
+            hre.replaceDestructive(value, "&auml;", "a2", "g");
+            hre.replaceDestructive(value, "&ouml;", "o2", "g");
+            vtexts.push_back(value);
+        }
+        else {
+            vtexts.push_back(*line.token(i));
+        }
         if (vvdataQ) {
             splitSyllableBySpaces(vtexts);
         }
@@ -7954,6 +8249,8 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
                 addTextElement(syl, content);
                 continue;
             }
+
+            colorVerse(verse, content);
 
             bool dashbegin = false;
             bool dashend = false;
@@ -8414,6 +8711,8 @@ bool HumdrumInput::leftmostSystemArpeggio(hum::HTp token)
 //   t  = trill, minor second
 //   TT  = trill, major second with wavy line after it
 //   tt  = trill, minor second with wavy line after it
+//   TTT = trill, continuing a major second with wavy line after it
+//   ttt = trill, continuing a minor second with wavy line after it
 //
 //   S[Ss]?[Ss]? = turn
 //   $[Ss]?[Ss]? = inverted turn
@@ -8740,6 +9039,15 @@ void HumdrumInput::addTrill(hum::HTp token)
         return;
     }
 
+    if (token->find("TTT") != std::string::npos) {
+        // continuation trill, so don't start a new one
+        return;
+    }
+    if (token->find("ttt") != std::string::npos) {
+        // continuation trill, so don't start a new one
+        return;
+    }
+
     if ((subtok == 0) && token->find(" ") == std::string::npos) {
         subtok = -1;
     }
@@ -8750,9 +9058,19 @@ void HumdrumInput::addTrill(hum::HTp token)
     appendElement(m_measure, trill);
     setStaff(trill, staff);
 
-    // hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
-    // trill->SetTstamp(tstamp.getFloat());
-    trill->SetStartid("#" + getLocationId("note", token, subtok));
+    int staffindex = m_currentstaff - 1;
+    int layer = m_currentlayer;
+
+    if (layer == 2) {
+        setPlace(trill, "below");
+    }
+
+    // hum::HumNum tstamp = getMeasureTstamp(token, staffindex)
+    // trill->SetStartid("#" + getLocationId("note", token, subtok));
+
+    hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+    trill->SetTstamp(tstamp.getFloat());
+
     setLocationId(trill, token, subtok);
     if (m_signifiers.above) {
         if (tpos < token->size() - 1) {
@@ -8788,6 +9106,39 @@ void HumdrumInput::addTrill(hum::HTp token)
             case 2: trill->SetAccidupper(ACCIDENTAL_WRITTEN_x); break;
         }
     }
+
+    if ((token->find("TT") == std::string::npos) && (token->find("tt") == std::string::npos)) {
+        // no line extension needed fro the trill
+        return;
+    }
+
+    // find the ending note after the trill line.  Multiple trill line extensions for chord notes
+    // are not handled by this algorithm, but these should be rare in notation.
+    hum::HTp endtok = token->getNextToken();
+    hum::HTp lasttok = token;
+    while (endtok) {
+        if (!endtok->isData()) {
+            endtok = endtok->getNextToken();
+            continue;
+        }
+        if (endtok->isNull()) {
+            endtok = endtok->getNextToken();
+            continue;
+        }
+        if ((endtok->find("TTT") == std::string::npos) && (endtok->find("ttt") == std::string::npos)) {
+            break;
+        }
+        lasttok = endtok;
+        endtok = endtok->getNextToken();
+    }
+    if (!lasttok) {
+        return;
+    }
+
+    hum::HumNum tstamp2 = getMeasureTstampPlusDur(lasttok, staffindex);
+    int measures = getMeasureDifference(token, lasttok);
+    std::pair<int, double> ts2(measures, tstamp2.getFloat());
+    trill->SetTstamp2(ts2);
 }
 
 //////////////////////////////
@@ -9963,12 +10314,10 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
     std::vector<hum::HumdrumLine *> refs = infile.getReferenceRecords();
     for (int i = 0; i < (int)refs.size(); ++i) {
         std::string key = refs[i]->getReferenceKey();
-        if (key != "RDF**kern") {
-            continue;
-        }
         std::string value = refs[i]->getReferenceValue();
         auto equals = value.substr(0, 8).find('=');
-        if (equals == string::npos) {
+
+        if ((equals == string::npos) && (key == "RDF**kern")) {
             // meta signifiers (no actual signifier)
 
             // colored spaces (meta signifiers)
@@ -10023,6 +10372,21 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             continue;
         }
         // check for known signifier meanings:
+
+        if (((key == "RDF**silbe") || (key == "RDF**text")) && hre.search(value, "marked text|matched text")) {
+            // for **text and **silbe
+            m_signifiers.textmark.push_back(signifier);
+            if (hre.search(value, "color\\s*=\\s*\"?([^\"\\s]+)\"?")) {
+                m_signifiers.textcolor.push_back(hre.getMatch(1));
+            }
+            else {
+                m_signifiers.textcolor.push_back("red");
+            }
+        }
+
+        if (key != "RDF**kern") {
+            continue;
+        }
 
         // stemless note:
         // !!!RDF**kern: i = no stem
