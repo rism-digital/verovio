@@ -86,7 +86,8 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     else {
         wchar_t code = note->GetMensuralSmuflNoteHead();
         DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
-        if (drawingDur > DUR_1) {
+        // For semibrevis with stem in black notation, encoded with an explicit stem direction
+        if ((drawingDur > DUR_1) || (note->GetStemDir() != STEMDIRECTION_NONE)) {
             DrawMensuralStem(dc, note, staff, stemDir, radius, xNote, yNote);
         }
     }
