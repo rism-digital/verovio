@@ -162,6 +162,27 @@ namespace humaux {
         Note *ottavanoteend;
         Measure *ottavameasure;
 
+        // ottavadownnote == keep track of ottava down marks: stores the starting note of
+        // an ottava down line which will be turned off later.  ottavadownmeasure == the
+        // starting measure of the ottava down mark.
+        Note *ottavadownnotestart;
+        Note *ottavadownnoteend;
+        Measure *ottavadownmeasure;
+
+        // ottava2note == keep track of ottava2 marks: stores the starting note of
+        // an ottava2 line which will be turned off later.  ottava2measure == the
+        // starting measure of the ottava2 mark.
+        Note *ottava2notestart;
+        Note *ottava2noteend;
+        Measure *ottava2measure;
+
+        // ottava2downnote == keep track of ottava2 down marks: stores the starting note of
+        // an ottava2 down line which will be turned off later.  ottava2downmeasure == the
+        // starting measure of the ottava2 down mark.
+        Note *ottava2downnotestart;
+        Note *ottava2downnoteend;
+        Measure *ottava2downmeasure;
+
         // meter_bottom == Used to keep track of bottom value of time signature.
         // This is needed to calculate tstamps.
         hum::HumNum meter_bottom;

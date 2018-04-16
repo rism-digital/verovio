@@ -6,6 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "iomusxml.h"
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
@@ -503,9 +504,11 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 if (midiInstrument) {
                     InstrDef *instrdef = new InstrDef;
                     instrdef->SetMidiInstrname(instrdef->AttMidiInstrument::StrToMidinames(midiName.node().text().as_string()));
+std::cerr << "FOUND INSTRUMENT " << midiName.node().text().as_string() << std::endl;
                     if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int());
                     if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
                     if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int());
+std::cerr << "FOUND INSTRUMENT NUMBER " << midiProgram.node().text().as_int() << std::endl;
                     if (midiVolume) instrdef->SetMidiVolume(midiVolume.node().text().as_int());
                     partStaffGrp->AddChild(instrdef);
                 }
