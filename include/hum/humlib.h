@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Mar  8 12:21:07 PST 2018
+// Last Modified: Mon Apr 16 18:58:38 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2591,6 +2591,7 @@ enum class SliceType {
 				Tempos,
 				Labels,
 				LabelAbbrs,
+				Ottavas,
 			_RegularInterpretation,
 				Exclusives,
 				Terminators,
@@ -2865,6 +2866,7 @@ class GridSlice : public vector<GridPart*> {
 		bool isGlobalComment(void)    { return m_type == SliceType::GlobalComments;   }
 		bool isGlobalLayout(void)     { return m_type == SliceType::GlobalLayouts;    }
 		bool isReferenceRecord(void)  { return m_type == SliceType::ReferenceRecords; }
+		bool isOttavaRecord(void)     { return m_type == SliceType::Ottavas; }
 		bool isInterpretationSlice(void);
 		bool isDataSlice(void);
 		bool hasSpines(void);
@@ -4860,8 +4862,13 @@ class Tool_musicxml2hum : public HumTool {
 
 		void addClefLine       (GridMeasure* outdata, vector<vector<xml_node> >& clefs,
 		                        vector<MxmlPart>& partdata, HumNum nowtime);
+		void addOttavaLine     (GridMeasure* outdata, vector<vector<xml_node> >& ottavas,
+		                        vector<MxmlPart>& partdata, HumNum nowtime);
 		void insertPartClefs   (xml_node clef, GridPart& part);
+		void insertPartOttavas (xml_node ottava, GridPart& part, int partindex, int partstaffindex);
 		xml_node convertClefToHumdrum(xml_node clef, HTp& token, int& staffindex);
+		xml_node convertOttavaToHumdrum(xml_node ottava, HTp& token, int& staffindex,
+		                        int partindex, int partstaffindex);
 
 		void addTranspositionLine(GridMeasure* outdata, vector<vector<xml_node> >& transpositions,
 		                       vector<MxmlPart>& partdata, HumNum nowtime);
@@ -4920,6 +4927,7 @@ class Tool_musicxml2hum : public HumTool {
 		int m_slurabove = 0;
 		int m_slurbelow = 0;
 		char m_hasEditorial = '\0';
+		vector<vector<string>> m_last_ottava_direction;
 
 		string m_software;
 		string m_systemDecoration;
