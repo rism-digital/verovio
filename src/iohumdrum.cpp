@@ -7329,7 +7329,7 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
         // When a new note is read, check if ottavadownmeasure
         // is non-null, and if so, store the new note in ottavadownnotestart.
     }
-    else if (*token == "*15mb") {
+    else if (*token == "*15ba") {
         // turn on two ottava down
         ss[staffindex].ottava2downmeasure = m_measure;
         ss[staffindex].ottava2downnotestart = NULL;
@@ -7393,7 +7393,7 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
         ss[staffindex].ottava2noteend = NULL;
         ss[staffindex].ottava2measure = NULL;
     }
-    else if (*token == "*X15mb") {
+    else if (*token == "*X15ba") {
         // turn off ottava2 down
         if ((ss[staffindex].ottava2downmeasure != NULL) && (ss[staffindex].ottava2downnotestart != NULL)
             && (ss[staffindex].ottava2downnoteend != NULL)) {
