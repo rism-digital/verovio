@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Apr 16 18:58:38 PDT 2018
+// Last Modified: Mon Apr 16 19:09:46 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -45961,7 +45961,7 @@ xml_node Tool_musicxml2hum::convertOttavaToHumdrum(xml_node ottava,
 			ss += "ba";
 		} else if (otype == "stop") {
 			if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "up") {
-				ss += "vb";
+				ss += "ba";
 			} else if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "down") {
 				ss += "va";
 			}
@@ -45974,7 +45974,7 @@ xml_node Tool_musicxml2hum::convertOttavaToHumdrum(xml_node ottava,
 			ss += "ba";
 		} else if (otype == "stop") {
 			if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "up") {
-				ss += "vb";
+				ss += "ba";
 			} else if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "down") {
 				ss += "va";
 			}
