@@ -2,9 +2,10 @@
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Mon Feb 16 12:26:32 PST 2015 Adapted from binasc program.
 // Last Modified: Wed Feb 18 14:48:21 PST 2015
-// Filename:      midifile/include/Binasc.cpp
+// Filename:      midifile/include/Binasc.h
+// Website:       http://midifile.sapp.org
 // Syntax:        C++11
-// vim:           ts=3 expandtab
+// vim:           ts=3 noexpandtab
 //
 // description:   Interface to convert bytes between binary and ASCII forms.
 //
@@ -15,6 +16,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstdlib>
+#include <stdlib.h>
 
 using namespace std;
 
