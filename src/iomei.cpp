@@ -277,13 +277,13 @@ bool MeiOutput::WriteObject(Object *object)
     }
 
     // ScoreDef related
-    else if (object->Is(LABEL)) {
-        m_currentNode = m_currentNode.append_child("label");
-        WriteLabel(m_currentNode, dynamic_cast<Label *>(object));
-    }
     else if (object->Is(INSTRDEF)) {
         m_currentNode = m_currentNode.append_child("instrDef");
         WriteInstrDef(m_currentNode, dynamic_cast<InstrDef *>(object));
+    }
+    else if (object->Is(LABEL)) {
+        m_currentNode = m_currentNode.append_child("label");
+        WriteLabel(m_currentNode, dynamic_cast<Label *>(object));
     }
     else if (object->Is(LABELABBR)) {
         m_currentNode = m_currentNode.append_child("labelAbbr");
@@ -2130,6 +2130,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for label
     else if (filterParent->Is(LABEL)) {
         if (element == "") {
+            return true;
+        }
+        else if (element == "lb") {
             return true;
         }
         else if (element == "rend") {
