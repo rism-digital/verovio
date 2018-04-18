@@ -24,6 +24,7 @@
 #include "chord.h"
 #include "clef.h"
 #include "doc.h"
+#include "dot.h"
 #include "fermata.h"
 #include "keysig.h"
 #include "layer.h"
@@ -1259,8 +1260,11 @@ void PaeInput::parseNote(pae::Note *note)
     if (note->rest) {
         Rest *rest = new Rest();
 
-        rest->SetDots(note->dots);
         rest->SetDur(note->duration);
+
+        if (!m_is_mensural) {
+          rest->SetDots(note->dots);
+        }
 
         if (note->fermata) {
             Fermata *fermata = new Fermata();
@@ -1287,14 +1291,18 @@ void PaeInput::parseNote(pae::Note *note)
             accid->SetAccidGes(note->accidGes);
         }
 
-        mnote->SetDots(note->dots);
         mnote->SetDur(note->duration);
+
+        if (!m_is_mensural) {
+          mnote->SetDots(note->dots);
+        }
 
         // pseudo chant notation with 7. in PAE - make quater notes without stem
         if ((mnote->GetDur() == DURATION_128) && (mnote->GetDots() == 1)) {
             mnote->SetDur(DURATION_4);
             mnote->SetDots(0);
             mnote->SetStemLen(0);
+            mnote->SetStemVisible(BOOLEAN_false);
         }
 
         if (note->fermata) {
@@ -1394,6 +1402,10 @@ void PaeInput::parseNote(pae::Note *note)
 
     // Add the note to the current container
     addLayerElement(element);
+    if (m_is_mensural && note->dots > 0) {
+      Dot *dot = new Dot;
+      addLayerElement(dot);
+    }
 
     // the last note counts always '1'
     // insert the tuplet elem
