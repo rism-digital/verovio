@@ -1403,7 +1403,7 @@ void PaeInput::parseNote(pae::Note *note)
     // Add the note to the current container
     addLayerElement(element);
     if (m_is_mensural && note->dots > 0) {
-      Dot *dot = new Dot;
+      Dot *dot = new Dot();
       addLayerElement(dot);
     }
 
