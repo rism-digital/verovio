@@ -72,8 +72,7 @@ namespace pae {
         void clear()
         {
             appoggiatura = 0;
-            acciaccatura = fermata = trill = chord = false;
-            tie = 0;
+            acciaccatura = fermata = tie = trill = chord = false;
 
             octave = 4;
             beam = 0;
