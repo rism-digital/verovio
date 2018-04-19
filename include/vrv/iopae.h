@@ -128,12 +128,12 @@ namespace pae {
         int tuplet_notes; // quantity of notes in the tuplet
         int tuplet_note; // indicates this note is the nth in the tuplet
 
-        int tie;
         bool acciaccatura;
         int appoggiatura;
-        bool fermata;
-        bool trill;
         bool chord;
+        bool fermata;
+        bool tie;
+        bool trill;
 
         char octave;
         unsigned char beam;
