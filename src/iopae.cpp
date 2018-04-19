@@ -259,7 +259,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
             in_beam--;
         }
 
-        // slurs are read when adding the note
+        // ties are read when adding the note
         else if (incipit[i] == '+') {
         }
 
@@ -1262,7 +1262,7 @@ void PaeInput::parseNote(pae::Note *note)
 
         rest->SetDur(note->duration);
 
-        if (!m_is_mensural) {
+        if (!m_is_mensural && note->dots != 0) {
           rest->SetDots(note->dots);
         }
 
@@ -1293,7 +1293,7 @@ void PaeInput::parseNote(pae::Note *note)
 
         mnote->SetDur(note->duration);
 
-        if (!m_is_mensural) {
+        if (!m_is_mensural && note->dots != 0) {
           mnote->SetDots(note->dots);
         }
 
@@ -1396,14 +1396,14 @@ void PaeInput::parseNote(pae::Note *note)
             pushContainer(chord);
             m_is_in_chord = true;
         }
-        mnote->SetDots(0);
-        mnote->SetDur(DURATION_NONE);
+        mnote->ResetAugmentDots();
+        mnote->ResetDurationLogical();
     }
 
     // Add the note to the current container
     addLayerElement(element);
     if (m_is_mensural && note->dots > 0) {
-      Dot *dot = new Dot;
+      Dot *dot = new Dot();
       addLayerElement(dot);
     }
 
@@ -1422,8 +1422,8 @@ void PaeInput::parseNote(pae::Note *note)
     if (!note->chord && m_is_in_chord) {
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
-        mnote->SetDots(0);
-        mnote->SetDur(DURATION_NONE);
+        mnote->ResetAugmentDots();
+        mnote->ResetDurationLogical();
         popContainer();
         m_is_in_chord = false;
     }
