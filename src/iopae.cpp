@@ -83,7 +83,7 @@ PaeInput::PaeInput(Doc *doc, std::string filename)
     m_staff = NULL;
     m_measure = NULL;
     m_layer = NULL;
-    m_last_tied_note = NULL;
+    m_tie = NULL;
     m_is_in_chord = false;
     m_is_mensural = false;
 }
@@ -1317,17 +1317,15 @@ void PaeInput::parseNote(pae::Note *note)
             m_measure->AddChild(trill);
         }
 
-        if (m_last_tied_note != NULL) {
-            mnote->SetTie(TIE_t);
-            m_last_tied_note = NULL;
+        if (m_tie != NULL) {
+            m_tie->SetEndid(mnote->GetUuid());
+            m_measure->AddChild(m_tie);
+            m_tie = NULL;
         }
 
         if (note->tie) {
-            if (mnote->GetTie() == TIE_t)
-                mnote->SetTie(TIE_m);
-            else
-                mnote->SetTie(TIE_i);
-            m_last_tied_note = mnote;
+            Tie m_tie = new Tie();
+            m_tie->SetStartid(mnote->GetUuid());
         }
 
         element = mnote;

@@ -282,7 +282,7 @@ private:
     Staff *m_staff;
     Measure *m_measure;
     Layer *m_layer;
-    Note *m_last_tied_note;
+    Tie *m_tie;
     bool m_is_in_chord;
     bool m_is_mensural;
     std::string m_keySigString;
