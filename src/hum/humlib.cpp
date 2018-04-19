@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Mar  8 12:21:07 PST 2018
+// Last Modified: Mon Apr 16 19:09:46 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -24338,7 +24338,7 @@ void MxmlPart::trackStaffVoices(int staffnum, int voicenum) {
 
 //////////////////////////////
 //
-// MxmlPart::prepareVoiceIndex -- Takes the histogram of staff/voice
+// MxmlPart::prepareVoiceMapping -- Takes the histogram of staff/voice
 //    pairings and create a list of new voice indexes for each
 //    staff.  In Finale & Sibelius, four voices are hardwired to each
 //    staff: staff1 {1, 2, 3, 4}, staff2 {5, 6, 7, 8}.  But some
@@ -43097,6 +43097,8 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	getPartContent(partcontent, partids, doc);
 	vector<MxmlPart> partdata;
 	partdata.resize(partids.size());
+	m_last_ottava_direction.resize(partids.size());
+
 	fillPartData(partdata, partids, partinfo, partcontent);
 
 	// for debugging:
@@ -43268,7 +43270,7 @@ void Tool_musicxml2hum::addHeaderRecords(HumdrumFile& outfile, xml_document& doc
 	xpath = "/score-partwise/work/work-title";
 	string worktitle = cleanSpaces(doc.select_single_node(xpath.c_str()).node().child_value());
 	bool worktitleQ = false;
-	if (worktitle != "") {
+	if ((worktitle != "") && (worktitle != "Title")) {
 		string otl_record = "!!!OTL:\t";
 		otl_record += worktitle;
 		outfile.insertLine(0, otl_record);
@@ -43320,7 +43322,7 @@ void Tool_musicxml2hum::addHeaderRecords(HumdrumFile& outfile, xml_document& doc
 		outfile.insertLine(0, cdt_record);
 	}
 
-	if (composer != "") {
+	if ((composer != "") && (composer != "Composer")) {
 		string com_record = "!!!COM:\t";
 		com_record += composer;
 		outfile.insertLine(0, com_record);
@@ -43545,7 +43547,8 @@ bool Tool_musicxml2hum::fillPartData(MxmlPart& partdata,
 	}
 
 	partdata.parsePartInfo(partdeclaration);
-	
+	m_last_ottava_direction.at(partdata.getPartIndex()).resize(partdata.getStaffCount());
+
 	int count;
 	auto measures = partcontent.select_nodes("./measure");
 	for (int i=0; i<(int)measures.size(); i++) {
@@ -44995,11 +44998,13 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 	bool haskeysig        = false;
 	bool hastransposition = false;
 	bool hastimesig       = false;
+	bool hasottava        = false;
 
 	vector<vector<xml_node>> clefs(partdata.size());
 	vector<vector<xml_node>> keysigs(partdata.size());
 	vector<vector<xml_node>> transpositions(partdata.size());
 	vector<vector<xml_node>> timesigs(partdata.size());
+	vector<vector<xml_node>> ottavas(partdata.size());
 
 	vector<vector<vector<vector<MxmlEvent*>>>> gracebefore(partdata.size());
 	vector<vector<vector<vector<MxmlEvent*>>>> graceafter(partdata.size());
@@ -45045,6 +45050,7 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 			} else if (nodeType(element, "direction")) {
 				// direction -> direction-type -> words
 				// direction -> direction-type -> dynamics
+				// direction -> direction-type -> octave-shift
 				child = element.first_child();
 				if (nodeType(child, "direction-type")) {
 					grandchild = child.first_child();
@@ -45052,6 +45058,10 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 						m_current_text.push_back(element);
 					} else if (nodeType(grandchild, "dynamics")) {
 						m_current_dynamic = element;
+					} else if (nodeType(grandchild, "octave-shift")) {
+						pindex = nowevents[i]->zerodur[j]->getPartIndex();
+						ottavas[pindex].push_back(grandchild);
+						hasottava = true;
 					} else if (nodeType(grandchild, "wedge")) {
 						m_current_dynamic = element;
 					}
@@ -45085,6 +45095,10 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 
 	if (hastimesig) {
 		addTimeSigLine(outdata, timesigs, partdata, nowtime);
+	}
+
+	if (hasottava) {
+		addOttavaLine(outdata, ottavas, partdata, nowtime);
 	}
 
 	addGraceLines(outdata, graceafter, partdata, nowtime);
@@ -45261,8 +45275,33 @@ void Tool_musicxml2hum::addTimeSigLine(GridMeasure* outdata,
 			}
 		}
 	}
+}
 
 
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::addOttavaLine -- Probably there will be a problem if
+//    an ottava line ends and another one starts at the same timestamp.
+//    Maybe may OttavaStart and OttavaEnd be separate categories?
+//
+
+void Tool_musicxml2hum::addOttavaLine(GridMeasure* outdata,
+		vector<vector<xml_node> >& ottavas, vector<MxmlPart>& partdata,
+		HumNum nowtime) {
+
+	GridSlice* slice = new GridSlice(outdata, nowtime,
+		SliceType::Ottavas);
+	outdata->push_back(slice);
+	slice->initializePartStaves(partdata);
+
+	for (int i=0; i<(int)partdata.size(); i++) {
+		for (int j=0; j<(int)ottavas[i].size(); j++) {
+			if (ottavas[i][j]) {
+				insertPartOttavas(ottavas[i][j], *slice->at(i), i, j);
+			}
+		}
+	}
 }
 
 
@@ -45334,6 +45373,31 @@ void Tool_musicxml2hum::insertPartClefs(xml_node clef, GridPart& part) {
 	int staffnum = 0;
 	while (clef) {
 		clef = convertClefToHumdrum(clef, token, staffnum);
+		part[staffnum]->setTokenLayer(0, token, 0);
+	}
+
+	// go back and fill in all NULL pointers with null interpretations
+	fillEmpties(&part, "*");
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::insertPartOttavas --
+//
+
+void Tool_musicxml2hum::insertPartOttavas(xml_node ottava, GridPart& part, int partindex, 
+		int partstaffindex) {
+	if (!ottava) {
+		// no ottava for some reason.
+		return;
+	}
+
+	HTp token;
+	int staffnum = 0;
+	while (ottava) {
+		ottava = convertOttavaToHumdrum(ottava, token, staffnum, partindex, partstaffindex);
 		part[staffnum]->setTokenLayer(0, token, 0);
 	}
 
@@ -45825,6 +45889,105 @@ xml_node Tool_musicxml2hum::convertClefToHumdrum(xml_node clef,
 	}
 	if (nodeType(clef, "clef")) {
 		return clef;
+	} else {
+		return xml_node(NULL);
+	}
+}
+
+
+
+//////////////////////////////
+//
+//	Tool_musicxml2hum::convertOttavaToHumdrum --
+//    Example:
+//      <direction placement="above">
+//        <direction-type>
+//          <octave-shift type="down" size="8" number="1"/>
+//        </direction-type>
+//      </direction>
+//      ...
+//      <direction placement="above">
+//        <direction-type>
+//          <octave-shift type="stop" size="8" number="1"/>
+//        </direction-type>
+//      </direction>
+//
+//
+
+xml_node Tool_musicxml2hum::convertOttavaToHumdrum(xml_node ottava,
+		HTp& token, int& staffindex, int partindex, int partstaffindex) {
+
+	if (!ottava) {
+		// no clef for some reason.
+		return ottava;
+	}
+
+	staffindex = 0;
+	xml_attribute sn = ottava.attribute("number");
+	if (sn) {
+		staffindex = atoi(sn.value()) - 1;
+	}
+
+	int interval = 0;
+
+	interval = ottava.attribute("size").as_int();
+	string otype = ottava.attribute("type").as_string();
+
+	string ss;
+	ss = "*";
+	if (otype == "stop") {
+		ss += "X";
+	} else {
+	   m_last_ottava_direction.at(partindex).at(partstaffindex) = otype;
+   }
+	if (interval == 15) {
+		ss += "15";
+		if (otype == "down") {
+			ss += "ma";
+		} else if (otype == "up") {
+			ss += "ba";
+		} else if (otype == "stop") {
+			if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "up") {
+				ss += "ba";
+			} else if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "down") {
+				ss += "ma";
+			}
+		} 
+	} else if (interval == 8) {
+		ss += "8";
+		if (otype == "down") {
+			ss += "va";
+		} else if (otype == "up") {
+			ss += "ba";
+		} else if (otype == "stop") {
+			if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "up") {
+				ss += "ba";
+			} else if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "down") {
+				ss += "va";
+			}
+		}
+	} else {
+		ss += "*8";
+		if (otype == "down") {
+			ss += "va";
+		} else if (otype == "up") {
+			ss += "ba";
+		} else if (otype == "stop") {
+			if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "up") {
+				ss += "ba";
+			} else if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "down") {
+				ss += "va";
+			}
+		}
+	}
+	token = new HumdrumToken(ss);
+
+	ottava = ottava.next_sibling();
+	if (!ottava) {
+		return ottava;
+	}
+	if (nodeType(ottava, "octave-shift")) {
+		return ottava;
 	} else {
 		return xml_node(NULL);
 	}

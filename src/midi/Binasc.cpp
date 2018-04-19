@@ -4,7 +4,7 @@
 // Last Modified: Thu Feb 18 21:03:54 PST 2016 Added quoted string literals.
 // Filename:      midifile/src-library/Binasc.cpp
 // Syntax:        C++11
-// vim:           ts=3 expandtab
+// vim:           ts=3 noexpandtab
 //
 // description:   Interface to convert bytes between binary and ASCII forms.
 //
@@ -259,7 +259,10 @@ int Binasc::writeToBinary(ostream& out, istream& input) {
    input.getline(inputLine, 1024, '\n');
    lineNum++;
    while (!input.eof()) {
-      processLine(out, inputLine, lineNum);
+      int status = processLine(out, inputLine, lineNum);
+      if (!status) {
+         return 0;
+      }
       input.getline(inputLine, 1024, '\n');
       lineNum++;
    }
@@ -1039,12 +1042,12 @@ int Binasc::outputStyleMidi(ostream& out, istream& input) {
    input.read((char*)&byte2, 1);
    if (byte1 & 0x80) {
       // SMPTE divisions
-      tempout << "1'-" << 0xff - (ulong)byte1 + 1;
+      tempout << "'-" << 0xff - (ulong)byte1 + 1;
       if (commentsQ) {
          tempout << "\t\t\t; SMPTE frames/second";
       }
       tempout << endl;
-      tempout << "1'" << dec << (long)byte2;
+      tempout << "'" << dec << (long)byte2;
       if (commentsQ) {
          tempout << "\t\t\t; subframes per frame";
       }
