@@ -1,0 +1,5 @@
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/src-library/Binasc.cpp -O Binasc.cpp
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/src-library/MidiEvent.cpp -O MidiEvent.cpp
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/src-library/MidiEventList.cpp -O MidiEventList.cpp
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/src-library/MidiFile.cpp -O MidiFile.cpp
+wget https://raw.githubusercontent.com/craigsapp/midifile/master/src-library/MidiMessage.cpp -O MidiMessage.cpp

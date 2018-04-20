@@ -395,14 +395,13 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(staffDef->FindChildByType(LABELABBR, 1));
         Object *graphic = label;
 
-        std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
         std::wstring labelStr = (label) ? label->GetText(label) : L"";
+        std::wstring labelAbbrStr = (labelAbbr) ? labelAbbr->GetText(labelAbbr) : L"";
 
         if (abbreviations) {
             labelStr = labelAbbrStr;
             graphic = labelAbbr;
         }
-        
 
         if (!graphic || (labelStr.length() == 0)) {
             ++iter;

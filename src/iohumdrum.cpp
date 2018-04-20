@@ -283,8 +283,19 @@ namespace humaux {
         verse = false;
         suppress_beam_tuplet = false;
         suppress_bracket_tuplet = false;
+
         ottavanotestart = ottavanoteend = NULL;
         ottavameasure = NULL;
+
+        ottavadownnotestart = ottavadownnoteend = NULL;
+        ottavadownmeasure = NULL;
+
+        ottava2notestart = ottava2noteend = NULL;
+        ottava2measure = NULL;
+
+        ottava2downnotestart = ottava2downnoteend = NULL;
+        ottava2downmeasure = NULL;
+
         ties.clear();
         meter_bottom = 4;
         meter_top = 4;
@@ -2556,7 +2567,10 @@ void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, hum::HTp partstar
 
     InstrDef *idef = new InstrDef;
     staffdef->AddChild(idef);
-    idef->SetMidiInstrnum(gmpc + 1); // offset from 1 in MEI
+    int offset = 1; // currently 1, should be 0 in MEI 4
+    idef->SetMidiInstrnum(gmpc + offset); // offset from 1 in MEI
+    data_MIDINAMES idval = (data_MIDINAMES)(gmpc + 1);
+    idef->SetMidiInstrname(idval);
 }
 
 //////////////////////////////
@@ -7307,6 +7321,30 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
         // When a new note is read, check if ottavameasure
         // is non-null, and if so, store the new note in ottavanotestart.
     }
+    else if (*token == "*8ba") {
+        // turn on ottava down
+        ss[staffindex].ottavadownmeasure = m_measure;
+        ss[staffindex].ottavadownnotestart = NULL;
+        ss[staffindex].ottavadownnoteend = NULL;
+        // When a new note is read, check if ottavadownmeasure
+        // is non-null, and if so, store the new note in ottavadownnotestart.
+    }
+    else if (*token == "*15ba") {
+        // turn on two ottava down
+        ss[staffindex].ottava2downmeasure = m_measure;
+        ss[staffindex].ottava2downnotestart = NULL;
+        ss[staffindex].ottava2downnoteend = NULL;
+        // When a new note is read, check if ottava2downmeasure
+        // is non-null, and if so, store the new note in ottava2downnotestart.
+    }
+    else if (*token == "*15ma") {
+        // turn on ottava
+        ss[staffindex].ottava2measure = m_measure;
+        ss[staffindex].ottava2notestart = NULL;
+        ss[staffindex].ottava2noteend = NULL;
+        // When a new note is read, check if ottava2measure
+        // is non-null, and if so, store the new note in ottava2notestart.
+    }
     else if (*token == "*X8va") {
         // turn off ottava
         if ((ss[staffindex].ottavameasure != NULL) && (ss[staffindex].ottavanotestart != NULL)
@@ -7322,6 +7360,54 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
         ss[staffindex].ottavanotestart = NULL;
         ss[staffindex].ottavanoteend = NULL;
         ss[staffindex].ottavameasure = NULL;
+    }
+    else if (*token == "*X8ba") {
+        // turn off ottava down
+        if ((ss[staffindex].ottavadownmeasure != NULL) && (ss[staffindex].ottavadownnotestart != NULL)
+            && (ss[staffindex].ottavadownnoteend != NULL)) {
+            Octave *octave = new Octave;
+            ss[staffindex].ottavadownmeasure->AddChild(octave);
+            setStaff(octave, staffindex + 1);
+            octave->SetDis(OCTAVE_DIS_8);
+            octave->SetStartid("#" + ss[staffindex].ottavadownnotestart->GetUuid());
+            octave->SetEndid("#" + ss[staffindex].ottavadownnoteend->GetUuid());
+            octave->SetDisPlace(STAFFREL_basic_below);
+        }
+        ss[staffindex].ottavadownnotestart = NULL;
+        ss[staffindex].ottavadownnoteend = NULL;
+        ss[staffindex].ottavadownmeasure = NULL;
+    }
+    else if (*token == "*X15ma") {
+        // turn off ottava2 up
+        if ((ss[staffindex].ottava2measure != NULL) && (ss[staffindex].ottava2notestart != NULL)
+            && (ss[staffindex].ottava2noteend != NULL)) {
+            Octave *octave = new Octave;
+            ss[staffindex].ottava2measure->AddChild(octave);
+            setStaff(octave, staffindex + 1);
+            octave->SetDis(OCTAVE_DIS_15);
+            octave->SetStartid("#" + ss[staffindex].ottava2notestart->GetUuid());
+            octave->SetEndid("#" + ss[staffindex].ottava2noteend->GetUuid());
+            octave->SetDisPlace(STAFFREL_basic_above);
+        }
+        ss[staffindex].ottava2notestart = NULL;
+        ss[staffindex].ottava2noteend = NULL;
+        ss[staffindex].ottava2measure = NULL;
+    }
+    else if (*token == "*X15ba") {
+        // turn off ottava2 down
+        if ((ss[staffindex].ottava2downmeasure != NULL) && (ss[staffindex].ottava2downnotestart != NULL)
+            && (ss[staffindex].ottava2downnoteend != NULL)) {
+            Octave *octave = new Octave;
+            ss[staffindex].ottava2downmeasure->AddChild(octave);
+            setStaff(octave, staffindex + 1);
+            octave->SetDis(OCTAVE_DIS_15);
+            octave->SetStartid("#" + ss[staffindex].ottava2downnotestart->GetUuid());
+            octave->SetEndid("#" + ss[staffindex].ottava2downnoteend->GetUuid());
+            octave->SetDisPlace(STAFFREL_basic_below);
+        }
+        ss[staffindex].ottava2downnotestart = NULL;
+        ss[staffindex].ottava2downnoteend = NULL;
+        ss[staffindex].ottava2downmeasure = NULL;
     }
 }
 
@@ -7782,6 +7868,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     processTerminalLong(token); // do this before assigning rhythmic value.
 
     bool octaveupQ = ss[staffindex].ottavameasure ? true : false;
+    bool octavedownQ = ss[staffindex].ottavadownmeasure ? true : false;
+
+    bool octave2upQ = ss[staffindex].ottava2measure ? true : false;
+    bool octave2downQ = ss[staffindex].ottava2downmeasure ? true : false;
 
     int line = token->getLineIndex();
     int field = token->getFieldIndex();
@@ -7795,7 +7885,20 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     if ((ss[staffindex].ottavameasure != NULL) && (ss[staffindex].ottavanotestart == NULL)) {
         ss[staffindex].ottavanotestart = note;
     }
+    if ((ss[staffindex].ottavadownmeasure != NULL) && (ss[staffindex].ottavadownnotestart == NULL)) {
+        ss[staffindex].ottavadownnotestart = note;
+    }
+    if ((ss[staffindex].ottava2measure != NULL) && (ss[staffindex].ottava2notestart == NULL)) {
+        ss[staffindex].ottava2notestart = note;
+    }
+    if ((ss[staffindex].ottava2downmeasure != NULL) && (ss[staffindex].ottava2downnotestart == NULL)) {
+        ss[staffindex].ottava2downnotestart = note;
+    }
+
     ss[staffindex].ottavanoteend = note;
+    ss[staffindex].ottavadownnoteend = note;
+    ss[staffindex].ottava2noteend = note;
+    ss[staffindex].ottava2downnoteend = note;
 
     if (!chordQ) {
         // acc/unacc need to be switched in verovio, so switch also here later:
@@ -7889,6 +7992,21 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
         // @oct required even if @oct.ges given.
         note->SetOctGes(octave);
         note->SetOct(octave - 1);
+    }
+    else if (octavedownQ) {
+        // @oct required even if @oct.ges given.
+        note->SetOctGes(octave);
+        note->SetOct(octave + 1);
+    }
+    else if (octave2upQ) {
+        // @oct required even if @oct.ges given.
+        note->SetOctGes(octave);
+        note->SetOct(octave - 2);
+    }
+    else if (octave2downQ) {
+        // @oct required even if @oct.ges given.
+        note->SetOctGes(octave);
+        note->SetOct(octave + 2);
     }
     else {
         note->SetOct(octave);

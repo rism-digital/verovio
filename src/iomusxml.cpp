@@ -1164,7 +1164,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
             octave->SetDis(
                 octave->AttOctaveDisplacement::StrToOctaveDis(xmlShift.node().attribute("size").as_string()));
             m_octDis[staffN] = (xmlShift.node().attribute("size").as_int() + 2) / 8;
-            if (HasAttributeWithValue(xmlShift.node(), "type", "down")) {
+            if (HasAttributeWithValue(xmlShift.node(), "type", "up")) {
                 octave->SetDisPlace(STAFFREL_basic_below);
                 m_octDis[staffN] = -1 * m_octDis[staffN];
             }
@@ -1455,7 +1455,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             std::string octaveStr = GetContentOfChild(pitch.node(), "octave");
             if (!octaveStr.empty()) {
                 if (m_octDis[staff->GetN()] != 0) {
-                    note->SetOct(atoi(octaveStr.c_str()) + m_octDis[staff->GetN()]);
+                    note->SetOct(atoi(octaveStr.c_str()) - m_octDis[staff->GetN()]);
                     note->SetOctGes(atoi(octaveStr.c_str()));
                 }
                 else
