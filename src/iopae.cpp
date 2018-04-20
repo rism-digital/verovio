@@ -1326,8 +1326,12 @@ void PaeInput::parseNote(pae::Note *note)
         }
 
         if (note->tie) {
-            m_tie = new Tie();
-            m_tie->SetStartid(mnote->GetUuid());
+            if (m_tie == NULL) {
+                m_tie = new Tie();
+                m_tie->SetStartid(mnote->GetUuid());
+            }
+            else
+                delete m_tie;
         }
 
         element = mnote;
