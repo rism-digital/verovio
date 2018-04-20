@@ -41,6 +41,7 @@
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "tie.h"
 #include "trill.h"
 #include "tuplet.h"
 #include "vrv.h"
@@ -83,12 +84,14 @@ PaeInput::PaeInput(Doc *doc, std::string filename)
     m_staff = NULL;
     m_measure = NULL;
     m_layer = NULL;
-    m_last_tied_note = NULL;
+    m_tie = NULL;
     m_is_in_chord = false;
     m_is_mensural = false;
 }
 
-PaeInput::~PaeInput() {}
+PaeInput::~PaeInput()
+{
+}
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -482,6 +485,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         m_doc->m_scoreDef.SetProportNum(scoreDefMensur->GetNum());
         m_doc->m_scoreDef.SetProportNumbase(scoreDefMensur->GetNumbase());
         delete scoreDefMensur;
+    }
+    if (m_tie != NULL) {
+      delete m_tie;
+      m_tie = NULL;
     }
     staffGrp->AddChild(staffDef);
     m_doc->m_scoreDef.AddChild(staffGrp);
@@ -1164,20 +1171,19 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
         note->rest = true;
     }
 
-    // trills
-    if (regex_search(incipit + i + 1, std::regex("^[^A-G]*t"))) {
-        note->trill = true;
+    // chord
+    if (regex_search(incipit + i + 1, std::regex("^[^A-G]*\\^"))) {
+        note->chord = true;
     }
 
     // tie
     if (regex_search(incipit + i + 1, std::regex("^[^A-G]*\\+"))) {
-        // reset 1 for first note, >1 for next ones is incremented under
-        if (note->tie == 0) note->tie = 1;
+        note->tie = true;
     }
 
-    // chord
-    if (regex_search(incipit + i + 1, std::regex("^[^A-G]*\\^"))) {
-        note->chord = true;
+    // trills
+    if (regex_search(incipit + i + 1, std::regex("^[^A-G]*t"))) {
+        note->trill = true;
     }
 
     oct = note->octave;
@@ -1263,7 +1269,7 @@ void PaeInput::parseNote(pae::Note *note)
         rest->SetDur(note->duration);
 
         if (!m_is_mensural && note->dots != 0) {
-          rest->SetDots(note->dots);
+            rest->SetDots(note->dots);
         }
 
         if (note->fermata) {
@@ -1294,7 +1300,7 @@ void PaeInput::parseNote(pae::Note *note)
         mnote->SetDur(note->duration);
 
         if (!m_is_mensural && note->dots != 0) {
-          mnote->SetDots(note->dots);
+            mnote->SetDots(note->dots);
         }
 
         // pseudo chant notation with 7. in PAE - make quater notes without stem
@@ -1317,17 +1323,15 @@ void PaeInput::parseNote(pae::Note *note)
             m_measure->AddChild(trill);
         }
 
-        if (m_last_tied_note != NULL) {
-            mnote->SetTie(TIE_t);
-            m_last_tied_note = NULL;
+        if (m_tie != NULL) {
+            m_tie->SetEndid(mnote->GetUuid());
+            m_measure->AddChild(m_tie);
+            m_tie = NULL;
         }
 
         if (note->tie) {
-            if (mnote->GetTie() == TIE_t)
-                mnote->SetTie(TIE_m);
-            else
-                mnote->SetTie(TIE_i);
-            m_last_tied_note = mnote;
+            m_tie = new Tie();
+            m_tie->SetStartid(mnote->GetUuid());
         }
 
         element = mnote;
@@ -1403,8 +1407,8 @@ void PaeInput::parseNote(pae::Note *note)
     // Add the note to the current container
     addLayerElement(element);
     if (m_is_mensural && note->dots > 0) {
-      Dot *dot = new Dot();
-      addLayerElement(dot);
+        Dot *dot = new Dot();
+        addLayerElement(dot);
     }
 
     // the last note counts always '1'
