@@ -486,6 +486,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         m_doc->m_scoreDef.SetProportNumbase(scoreDefMensur->GetNumbase());
         delete scoreDefMensur;
     }
+    if (m_tie != NULL) delete m_tie;
     staffGrp->AddChild(staffDef);
     m_doc->m_scoreDef.AddChild(staffGrp);
 
@@ -1326,12 +1327,8 @@ void PaeInput::parseNote(pae::Note *note)
         }
 
         if (note->tie) {
-            if (m_tie == NULL) {
-                m_tie = new Tie();
-                m_tie->SetStartid(mnote->GetUuid());
-            }
-            else
-                delete m_tie;
+            m_tie = new Tie();
+            m_tie->SetStartid(mnote->GetUuid());
         }
 
         element = mnote;
