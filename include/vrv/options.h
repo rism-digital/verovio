@@ -518,6 +518,7 @@ public:
     OptionArray m_appXPathQuery;
     OptionArray m_choiceXPathQuery;
     OptionString m_mdivXPathQuery;
+    OptionArray m_substXPathQuery;
 
     /**
      * Element margins

@@ -111,6 +111,7 @@ class Sic;
 class Slur;
 class Space;
 class Staff;
+class Subst;
 class Supplied;
 class Svg;
 class Syl;
@@ -310,6 +311,7 @@ private:
     void WriteReg(pugi::xml_node currentNode, Reg *Reg);
     void WriteRestore(pugi::xml_node currentNode, Restore *restore);
     void WriteSic(pugi::xml_node currentNode, Sic *sic);
+    void WriteSubst(pugi::xml_node currentNode, Subst *subst);
     void WriteSupplied(pugi::xml_node currentNode, Supplied *supplied);
     void WriteUnclear(pugi::xml_node currentNode, Unclear *unclear);
     ///@}
@@ -550,6 +552,8 @@ private:
     bool ReadReg(Object *parent, pugi::xml_node reg, EditorialLevel level, Object *filter = NULL);
     bool ReadRestore(Object *parent, pugi::xml_node restore, EditorialLevel level, Object *filter = NULL);
     bool ReadSic(Object *parent, pugi::xml_node sic, EditorialLevel level, Object *filter = NULL);
+    bool ReadSubst(Object *parent, pugi::xml_node subst, EditorialLevel level, Object *filter = NULL);
+    bool ReadSubstChildren(Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL);
     bool ReadSupplied(Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL);
     bool ReadUnclear(Object *parent, pugi::xml_node unclear, EditorialLevel level, Object *filter = NULL);
     bool ReadEditorialChildren(Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL);

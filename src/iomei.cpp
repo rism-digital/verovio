@@ -81,6 +81,7 @@
 #include "staff.h"
 #include "staffdef.h"
 #include "staffgrp.h"
+#include "subst.h"
 #include "svg.h"
 #include "syl.h"
 #include "system.h"
@@ -96,7 +97,7 @@
 namespace vrv {
 
 std::vector<std::string> MeiInput::s_editorialElementNames = { "abbr", "add", "app", "annot", "choice", "corr",
-    "damage", "del", "expan", "orig", "ref", "reg", "restore", "sic", "supplied", "unclear" };
+    "damage", "del", "expan", "orig", "ref", "reg", "restore", "sic", "subst", "supplied", "unclear" };
 
 //----------------------------------------------------------------------------
 // MeiOutput
@@ -613,6 +614,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(SIC)) {
         m_currentNode = m_currentNode.append_child("sic");
         WriteSic(m_currentNode, dynamic_cast<Sic *>(object));
+    }
+    else if (object->Is(SUBST)) {
+        m_currentNode = m_currentNode.append_child("subst");
+        WriteSubst(m_currentNode, dynamic_cast<Subst *>(object));
     }
     else if (object->Is(SUPPLIED)) {
         m_currentNode = m_currentNode.append_child("supplied");
@@ -1842,6 +1847,13 @@ void MeiOutput::WriteSic(pugi::xml_node currentNode, Sic *sic)
     WriteEditorialElement(currentNode, sic);
     sic->WriteSource(currentNode);
 }
+    
+void MeiOutput::WriteSubst(pugi::xml_node currentNode, Subst *subst)
+{
+    assert(subst);
+
+    WriteEditorialElement(currentNode, subst);
+}
 
 void MeiOutput::WriteSupplied(pugi::xml_node currentNode, Supplied *supplied)
 {
@@ -2392,7 +2404,7 @@ bool MeiInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
             break;
         }
         else {
-            LogWarning("Unsupported '<%s>' within <choice>", current.name());
+            LogWarning("Unsupported '<%s>' within <mdiv>", current.name());
         }
     }
 
@@ -4459,6 +4471,9 @@ bool MeiInput::ReadEditorialElement(Object *parent, pugi::xml_node current, Edit
     else if (std::string(current.name()) == "sic") {
         return ReadSic(parent, current, level, filter);
     }
+    else if (std::string(current.name()) == "subst") {
+        return ReadSubst(parent, current, level, filter);
+    }
     else if (std::string(current.name()) == "supplied") {
         return ReadSupplied(parent, current, level, filter);
     }
@@ -4816,6 +4831,80 @@ bool MeiInput::ReadSic(Object *parent, pugi::xml_node sic, EditorialLevel level,
     parent->AddChild(vrvSic);
     ReadUnsupportedAttr(sic, vrvSic);
     return ReadEditorialChildren(vrvSic, sic, level, filter);
+}
+    
+
+bool MeiInput::ReadSubst(Object *parent, pugi::xml_node subst, EditorialLevel level, Object *filter)
+{
+    if (!m_hasScoreDef) {
+        LogError("<subst> before any <scoreDef> is not supported");
+        return false;
+    }
+    Subst *vrvSubst = new Subst(level);
+    ReadEditorialElement(subst, vrvSubst);
+
+    parent->AddChild(vrvSubst);
+    ReadUnsupportedAttr(subst, vrvSubst);
+    return ReadSubstChildren(vrvSubst, subst, level, filter);
+}
+
+bool MeiInput::ReadSubstChildren(Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter)
+{
+    assert(dynamic_cast<Subst *>(parent));
+
+    // Check if one child node matches a value in m_substXPathQueries
+    pugi::xml_node selectedChild;
+    std::vector<std::string> xPathQueries = m_doc->GetOptions()->m_substXPathQuery.GetValue();
+    if (xPathQueries.size() > 0) {
+        auto i = std::find_if(xPathQueries.begin(), xPathQueries.end(),
+            [parentNode](std::string &query) { return (parentNode.select_single_node(query.c_str())); });
+        if (i != xPathQueries.end()) {
+            selectedChild = parentNode.select_single_node(i->c_str()).node();
+        }
+    }
+
+    bool success = true;
+    bool hasXPathSelected = false;
+    pugi::xml_node current;
+    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+        if (std::string(current.name()) == "add") {
+            success = ReadAdd(parent, current, level, filter);
+        }
+        else if (std::string(current.name()) == "del") {
+            success = ReadDel(parent, current, level, filter);
+        }
+        else if (std::string(current.name()) == "subst") {
+            success = ReadSubst(parent, current, level, filter);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <subst>", current.name());
+        }
+        // Now we check if the xpath selection (if any) matches the current node.
+        // If yes, make it visible
+        EditorialElement *last = dynamic_cast<EditorialElement *>(parent->GetLast());
+        if (success && last) {
+            if (selectedChild == current) {
+                last->m_visibility = Visible;
+                hasXPathSelected = true;
+            }
+            else {
+                last->m_visibility = Hidden;
+            }
+        }
+    }
+
+    // If no child was made visible through the xpath selection, make the first one visible
+    if (!hasXPathSelected) {
+        EditorialElement *first = dynamic_cast<EditorialElement *>(parent->GetFirst());
+        if (first) {
+            first->m_visibility = Visible;
+        }
+        else {
+            LogWarning("Could not make one child of <subst> visible");
+        }
+    }
+    return success;
 }
 
 bool MeiInput::ReadSupplied(Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter)
