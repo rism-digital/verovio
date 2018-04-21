@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Feb 14 21:55:38 PST 2015
-// Last Modified: Sat Feb 14 21:55:40 PST 2015
+// Last Modified: Sat Apr 21 10:52:19 PDT 2018 Removed using namespace std;
 // Filename:      midifile/src-library/MidiEventList.cpp
 // Website:       http://midifile.sapp.org
 // Syntax:        C++11
@@ -14,13 +14,12 @@
 #include "MidiEventList.h"
 
 #include <vector>
-#include <iostream>
 #include <algorithm>
 #include <iterator>
 #include <utility>
 
-using namespace std;
 
+namespace smf {
 
 //////////////////////////////
 //
@@ -236,12 +235,11 @@ void MidiEventList::removeEmpties(void) {
 			list[i] = NULL;
 			count++;
 		}
-		vector<MidiEvent*>     list;
 	}
 	if (count == 0) {
 		return;
 	}
-	vector<MidiEvent*> newlist;
+	std::vector<MidiEvent*> newlist;
 	newlist.reserve(list.size() - count);
 	for (int i=0; i<(int)list.size(); i++) {
 		if (list[i]) {
@@ -276,7 +274,7 @@ int MidiEventList::linkNotePairs(void) {
 	// dimension 1: MIDI channel (0-15)
 	// dimension 2: MIDI key     (0-127)  (but 0 not used for note-ons)
 	// dimension 3: List of active note-ons or note-offs.
-	vector<vector<vector<MidiEvent*> > > noteons;
+	std::vector<std::vector<std::vector<MidiEvent*>>> noteons;
 	noteons.resize(16);
 	int i;
 	for (i=0; i<(int)noteons.size(); i++) {
@@ -306,10 +304,10 @@ int MidiEventList::linkNotePairs(void) {
 	// 7A 122   Local Keyboard On/Off                   0..63=off  64..127=on
 
 	// first keep track of whether the controller is an on/off switch:
-	vector<pair<int, int> > contmap;
+	std::vector<std::pair<int, int>> contmap;
 	contmap.resize(128);
-	pair<int, int> zero(0, 0);
-	fill(contmap.begin(), contmap.end(), zero);
+	std::pair<int, int> zero(0, 0);
+	std::fill(contmap.begin(), contmap.end(), zero);
 	contmap[64].first  = 1;   contmap[64].second = 0;
 	contmap[65].first  = 1;   contmap[65].second = 1;
 	contmap[66].first  = 1;   contmap[66].second = 2;
@@ -332,15 +330,15 @@ int MidiEventList::linkNotePairs(void) {
 	// dimensions:
 	// 1: mapped controller (0 to 17)
 	// 2: channel (0 to 15)
-	vector<vector<MidiEvent*> > contevents;
+	std::vector<std::vector<MidiEvent*>> contevents;
 	contevents.resize(18);
-	vector<vector<int> > oldstates;
+	std::vector<std::vector<int>> oldstates;
 	oldstates.resize(18);
 	for (int i=0; i<18; i++) {
 		contevents[i].resize(16);
-		fill(contevents[i].begin(), contevents[i].end(), nullptr);
+		std::fill(contevents[i].begin(), contevents[i].end(), nullptr);
 		oldstates[i].resize(16);
-		fill(oldstates[i].begin(), oldstates[i].end(), -1);
+		std::fill(oldstates[i].begin(), oldstates[i].end(), -1);
 	}
 
 	// Now iterate through the MidiEventList keeping track of note and
@@ -440,9 +438,9 @@ void MidiEventList::clearSequence(void) {
 //   every MidiEvent in the event list.  This is useful if you want
 //   to preseve the order of MIDI messages in a track when they occur
 //   at the same tick time.  Particularly for use with joinTracks()
-//   or sortTracks().  markSequence will be done automatically when 
+//   or sortTracks().  markSequence will be done automatically when
 //   a MIDI file is read, in case the ordering of events occuring at
-//   the same time is important.  Use clearSequence() to use the 
+//   the same time is important.  Use clearSequence() to use the
 //   default sorting behavior of sortTracks() when events occur at the
 //   same time.  Returns the next serial number that has not yet been
 //   used.
@@ -495,7 +493,7 @@ int MidiEventList::push_back_no_copy(MidiEvent* event) {
 // MidiEventList::operator=(MidiEventList) -- Assignment.
 //
 
-MidiEventList& MidiEventList::operator=(MidiEventList other) {
+MidiEventList& MidiEventList::operator=(MidiEventList& other) {
 	list.swap(other.list);
 	return *this;
 }
@@ -510,7 +508,8 @@ MidiEventList& MidiEventList::operator=(MidiEventList other) {
 //
 // MidiEventList::sort -- Private because the MidiFile class keeps
 //    track of delta versus absolute tick states of the MidiEventList,
-//    and sorting is only allowed in absolute tick state.
+//    and sorting is only allowed in absolute tick state (The MidiEventList
+//    does not know about delta/absolute tick states of its contents).
 //
 
 void MidiEventList::sort(void) {
@@ -602,6 +601,9 @@ int eventcompare(const void* a, const void* b) {
 		return 0;
 	}
 }
+
+
+} // end namespace smf
 
 
 

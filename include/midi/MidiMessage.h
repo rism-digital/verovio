@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Feb 14 20:36:32 PST 2015
-// Last Modified: Sun Feb 15 20:32:19 PST 2015
+// Last Modified: Sat Apr 21 10:52:19 PDT 2018 Removed using namespace std;
 // Filename:      midifile/include/MidiMessage.h
 // Website:       http://midifile.sapp.org
 // Syntax:        C++11
@@ -17,29 +17,30 @@
 #include <vector>
 #include <string>
 
-using namespace std;
+namespace smf {
 
 typedef unsigned char  uchar;
 typedef unsigned short ushort;
 typedef unsigned long  ulong;
 
-class MidiMessage : public vector<uchar> {
+class MidiMessage : public std::vector<uchar> {
+
 	public:
 		               MidiMessage          (void);
 		               MidiMessage          (int command);
 		               MidiMessage          (int command, int p1);
 		               MidiMessage          (int command, int p1, int p2);
 		               MidiMessage          (const MidiMessage& message);
-		               MidiMessage          (const vector<uchar>& message);
-		               MidiMessage          (const vector<char>& message);
-		               MidiMessage          (const vector<int>& message);
+		               MidiMessage          (const std::vector<uchar>& message);
+		               MidiMessage          (const std::vector<char>& message);
+		               MidiMessage          (const std::vector<int>& message);
 
 		              ~MidiMessage          ();
 
 		MidiMessage&   operator=            (const MidiMessage& message);
-		MidiMessage&   operator=            (const vector<uchar>& bytes);
-		MidiMessage&   operator=            (const vector<char>& bytes);
-		MidiMessage&   operator=            (const vector<int>& bytes);
+		MidiMessage&   operator=            (const std::vector<uchar>& bytes);
+		MidiMessage&   operator=            (const std::vector<char>& bytes);
+		MidiMessage&   operator=            (const std::vector<int>& bytes);
 
 		void           sortTrack            (void);
 		void           sortTrackWithSequence(void);
@@ -85,9 +86,9 @@ class MidiMessage : public vector<uchar> {
 		void           setChannel           (int value);
 		void           setParameters        (int p1, int p2);
 		void           setParameters        (int p1);
-		void           setMessage           (const vector<uchar>& message);
-		void           setMessage           (const vector<char>& message);
-		void           setMessage           (const vector<int>& message);
+		void           setMessage           (const std::vector<uchar>& message);
+		void           setMessage           (const std::vector<char>& message);
+		void           setMessage           (const std::vector<int>& message);
 
 		// message-type convenience functions:
 		bool           isMetaMessage        (void) const;
@@ -121,14 +122,14 @@ class MidiMessage : public vector<uchar> {
 		void           makeSustainPedalOff  (int channel);
 
 		// meta-message creation and helper functions:
-		void           makeMetaMessage      (int mnum, const string& data);
-		void           makeText             (const string& name);
-		void           makeCopyright        (const string& text);
-		void           makeTrackName        (const string& name);
-		void           makeInstrumentName   (const string& name);
-		void           makeLyric            (const string& text);
-		void           makeMarker           (const string& text);
-		void           makeCue              (const string& text);
+		void           makeMetaMessage      (int mnum, const std::string& data);
+		void           makeText             (const std::string& name);
+		void           makeCopyright        (const std::string& text);
+		void           makeTrackName        (const std::string& name);
+		void           makeInstrumentName   (const std::string& name);
+		void           makeLyric            (const std::string& text);
+		void           makeMarker           (const std::string& text);
+		void           makeCue              (const std::string& text);
 		void           makeTimeSignature    (int top, int bottom,
 		                                     int clocksPerClick = 24,
 		                                     int num32dsPerQuarter = 8);
@@ -153,14 +154,15 @@ class MidiMessage : public vector<uchar> {
 		bool           isKeySignature       (void) const;
 		bool           isEndOfTrack         (void) const;
 
-		string         getMetaContent       (void);
-		void           setMetaContent       (const string& content);
+		std::string    getMetaContent       (void);
+		void           setMetaContent       (const std::string& content);
 		void           setTempo             (double tempo);
 		void           setTempoMicroseconds (int microseconds);
 		void           setMetaTempo         (double tempo);
 
 };
 
+} // end of namespace smf
 
 #endif /* _MIDIMESSAGE_H_INCLUDED */
 

@@ -267,7 +267,7 @@ void Doc::CalculateMidiTimemap()
     m_hasMidiTimemap = true;
 }
 
-void Doc::ExportMIDI(MidiFile *midiFile)
+void Doc::ExportMIDI(smf::MidiFile *midiFile)
 {
 
     if (!Doc::HasMidiTimemap()) {
@@ -367,7 +367,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
     }
 }
 
-bool Doc::ExportTimemap(string &output)
+bool Doc::ExportTimemap(std::string &output)
 {
     if (!Doc::HasMidiTimemap()) {
         // generate MIDI timemap before progressing
@@ -389,7 +389,7 @@ bool Doc::ExportTimemap(string &output)
 }
 
 void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTimeToScoreTime,
-    std::map<int, vector<string> > &realTimeToOnElements, std::map<int, vector<string> > &realTimeToOffElements,
+    std::map<int, std::vector<std::string> > &realTimeToOnElements, std::map<int, std::vector<std::string> > &realTimeToOffElements,
     std::map<int, int> &realTimeToTempo)
 {
 
@@ -404,10 +404,10 @@ void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTim
     for (auto it = realTimeToScoreTime.begin(); it != realTimeToScoreTime.end(); ++it) {
         output += "\t{\n";
         output += "\t\t\"tstamp\":\t";
-        output += to_string(it->first);
+        output += std::to_string(it->first);
         output += ",\n";
         output += "\t\t\"qstamp\":\t";
-        output += to_string(it->second);
+        output += std::to_string(it->second);
 
         auto ittempo = realTimeToTempo.find(it->first);
         if (ittempo != realTimeToTempo.end()) {
@@ -415,7 +415,7 @@ void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTim
             if (newTempo != currentTempo) {
                 currentTempo = newTempo;
                 output += ",\n\t\t\"tempo\":\t";
-                output += to_string(currentTempo);
+                output += std::to_string(currentTempo);
             }
         }
 

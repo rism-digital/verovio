@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Feb 14 21:47:39 PST 2015
-// Last Modified: Sat Feb 14 21:54:52 PST 2015
+// Last Modified: Sat Apr 21 10:52:19 PDT 2018 Removed using namespace std;
 // Filename:      midifile/include/MidiEvent.h
 // Website:       http://midifile.sapp.org
 // Syntax:        C++11
@@ -17,26 +17,27 @@
 #include "MidiMessage.h"
 #include <vector>
 
-using namespace std;
-
+namespace smf {
 
 class MidiEvent : public MidiMessage {
 	public:
-		           MidiEvent     (void);
-		           MidiEvent     (int command);
-		           MidiEvent     (int command, int param1);
-		           MidiEvent     (int command, int param1, int param2);
-		           MidiEvent     (int aTime, int aTrack, vector<uchar>& message);
-		           MidiEvent     (const MidiMessage& message);
-		           MidiEvent     (const MidiEvent& mfevent);
+		           MidiEvent             (void);
+		           MidiEvent             (int command);
+		           MidiEvent             (int command, int param1);
+		           MidiEvent             (int command, int param1, int param2);
+		           MidiEvent             (const MidiMessage& message);
+		           MidiEvent             (const MidiEvent& mfevent);
+		           MidiEvent             (int aTime, int aTrack,
+		                                  std::vector<uchar>& message);
 
-		          ~MidiEvent     ();
+		          ~MidiEvent             ();
 
 		MidiEvent& operator=             (const MidiEvent& mfevent);
 		MidiEvent& operator=             (const MidiMessage& message);
-		MidiEvent& operator=             (const vector<uchar>& bytes);
-		MidiEvent& operator=             (const vector<char>& bytes);
-		MidiEvent& operator=             (const vector<int>& bytes);
+		MidiEvent& operator=             (const std::vector<uchar>& bytes);
+		MidiEvent& operator=             (const std::vector<char>& bytes);
+		MidiEvent& operator=             (const std::vector<int>& bytes);
+
 		void       clearVariables        (void);
 
 		// functions related to event linking (note-ons to note-offs).
@@ -51,16 +52,17 @@ class MidiEvent : public MidiMessage {
 		int        getTickDuration       (void);
 		double     getDurationInSeconds  (void);
 
-	 	int       tick;     // delta or absolute MIDI ticks
-		int       track;    // [original] track number of event in MIDI file
-		double    seconds;  // calculated time in sec. (doTimeAnalysis())
-		int       seq;      // sorting sequence number of event
+		int        tick;     // delta or absolute MIDI ticks
+		int        track;    // [original] track number of event in MIDI file
+		double     seconds;  // calculated time in sec. (after doTimeAnalysis())
+		int        seq;      // sorting sequence number of event
 
 	private:
-		MidiEvent* eventlink;  // used to match note-ons and note-offs
+		MidiEvent* m_eventlink;  // used to match note-ons and note-offs
 
 };
 
+} // end of namespace smf
 
 #endif /* _MIDIEVENT_H_INCLUDED */
 
