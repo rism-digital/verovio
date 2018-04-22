@@ -54,7 +54,7 @@ MidiEvent::MidiEvent(int aTime, int aTrack, vector<uchar>& message)
 }
 
 
-MidiEvent::MidiEvent(const MidiEvent& mfevent) {
+MidiEvent::MidiEvent(const MidiEvent& mfevent) : MidiMessage() {
 	track   = mfevent.track;
 	tick    = mfevent.tick;
 	seconds = mfevent.seconds;

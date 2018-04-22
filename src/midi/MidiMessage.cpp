@@ -25,48 +25,45 @@ namespace smf {
 // MidiMessage::MidiMessage -- Constructor.
 //
 
-MidiMessage::MidiMessage(void) {
+MidiMessage::MidiMessage(void) : vector<uchar>() {
 	// do nothing
 }
 
 
-MidiMessage::MidiMessage(int command) {
-	this->resize(1);
-	(*this)[0] = (uchar)command;
+MidiMessage::MidiMessage(int command) : vector<uchar>(1, (uchar)command) {
+	// do nothing
 }
 
 
-MidiMessage::MidiMessage(int command, int p1) {
-	this->resize(2);
+MidiMessage::MidiMessage(int command, int p1) : vector<uchar>(2) {
 	(*this)[0] = (uchar)command;
 	(*this)[1] = (uchar)p1;
 }
 
 
-MidiMessage::MidiMessage(int command, int p1, int p2) {
-	this->resize(3);
+MidiMessage::MidiMessage(int command, int p1, int p2) : vector<uchar>(3) {
 	(*this)[0] = (uchar)command;
 	(*this)[1] = (uchar)p1;
 	(*this)[2] = (uchar)p2;
 }
 
 
-MidiMessage::MidiMessage(const MidiMessage& message) {
+MidiMessage::MidiMessage(const MidiMessage& message) : vector<uchar>() {
 	(*this) = message;
 }
 
 
-MidiMessage::MidiMessage(const std::vector<uchar>& message) {
+MidiMessage::MidiMessage(const std::vector<uchar>& message) : vector<uchar>() {
 	setMessage(message);
 }
 
 
-MidiMessage::MidiMessage(const std::vector<char>& message) {
+MidiMessage::MidiMessage(const std::vector<char>& message) : vector<uchar>() {
 	setMessage(message);
 }
 
 
-MidiMessage::MidiMessage(const std::vector<int>& message) {
+MidiMessage::MidiMessage(const std::vector<int>& message) : vector<uchar>() {
 	setMessage(message);
 }
 
