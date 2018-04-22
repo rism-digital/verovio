@@ -545,11 +545,11 @@ int eventcompare(const void* a, const void* b) {
 	} else if (aevent.tick < bevent.tick) {
 		// aevent occurs before bevent
 		return -1;
-	} else if (aevent.seq > bevent.seq) {
+	} else if ((aevent.seq != 0) && (bevent.seq != 0) && (aevent.seq > bevent.seq)) {
 		// aevent sequencing state occurs after bevent
 		// see MidiEventList::markSequence()
 		return +1;
-	} else if (aevent.seq < bevent.seq) {
+	} else if ((aevent.seq != 0) && (bevent.seq != 0) && (aevent.seq < bevent.seq)) {
 		// aevent sequencing state occurs before bevent
 		// see MidiEventList::markSequence()
 		return -1;

@@ -39,35 +39,30 @@ class _TickTime {
 class MidiFile {
 	public:
 		               MidiFile                    (void);
-		               MidiFile                    (const char* aFile);
 		               MidiFile                    (const std::string& aFile);
 		               MidiFile                    (std::istream& input);
 		               MidiFile                    (const MidiFile& other);
 		               MidiFile                    (MidiFile&& other);
+
 		              ~MidiFile                    ();
 
-		MidiFile&      operator=                   (MidiFile other);
+		MidiFile&      operator=                   (const MidiFile& other);
+		MidiFile&      operator=                   (MidiFile&& other);
 
 		// reading/writing functions:
-		int            read                        (const char* aFile);
-		int            read                        (const std::string& aFile);
-		int            read                        (std::istream& instream);
-		int            write                       (const char* aFile);
-		int            write                       (const std::string& aFile);
-		int            write                       (std::ostream& out);
-		int            writeHex                    (const char* aFile,
+		bool           read                        (const std::string& filename);
+		bool           read                        (std::istream& instream);
+		bool           write                       (const std::string& filename);
+		bool           write                       (std::ostream& out);
+		bool           writeHex                    (const std::string& filename,
 		                                            int width = 25);
-		int            writeHex                    (const std::string& aFile,
+		bool           writeHex                    (std::ostream& out,
 		                                            int width = 25);
-		int            writeHex                    (std::ostream& out,
-		                                            int width = 25);
-		int            writeBinasc                 (const char* aFile);
-		int            writeBinasc                 (const std::string& aFile);
-		int            writeBinasc                 (std::ostream& out);
-		int            writeBinascWithComments     (const char* aFile);
-		int            writeBinascWithComments     (const std::string& aFile);
-		int            writeBinascWithComments     (std::ostream& out);
-		int            status                      (void);
+		bool           writeBinasc                 (const std::string& filename);
+		bool           writeBinasc                 (std::ostream& out);
+		bool           writeBinascWithComments     (const std::string& filename);
+		bool           writeBinascWithComments     (std::ostream& out);
+		bool           status                      (void) const;
 
 		// track-related functions:
 		const MidiEventList& operator[]            (int aTrack) const;
@@ -78,7 +73,9 @@ class MidiFile {
 		void             removeEmpties             (void);
 
 		// tick-related functions:
+		void             makeDeltaTicks            (void);
 		void             deltaTicks                (void);
+		void             makeAbsoluteTicks         (void);
 		void             absoluteTicks             (void);
 		int              getTickState              (void);
 		int              isDeltaTicks              (void);
@@ -113,8 +110,8 @@ class MidiFile {
 
 		// ticks-per-quarter related functions:
 		void             setMillisecondTicks       (void);
-		int              getTicksPerQuarterNote    (void);
-		int              getTPQ                    (void);
+		int              getTicksPerQuarterNote    (void) const;
+		int              getTPQ                    (void) const;
 		void             setTicksPerQuarterNote    (int ticks);
 		void             setTPQ                    (int ticks);
 
@@ -133,7 +130,6 @@ class MidiFile {
 		void             clearLinks                (void);
 
 		// filename functions:
-		void             setFilename               (const char* aname);
 		void             setFilename               (const std::string& aname);
 		const char*      getFilename               (void);
 
@@ -142,8 +138,8 @@ class MidiFile {
 		                                            std::vector<uchar>& midiData);
 		MidiEvent*       addEvent                  (MidiEvent& mfevent);
 		MidiEvent&       getEvent                  (int aTrack, int anIndex);
-		int              getEventCount             (int aTrack);
-		int              getNumEvents              (int aTrack);
+		int              getEventCount             (int aTrack) const;
+		int              getNumEvents              (int aTrack) const;
 		void             allocateEvents            (int track, int aSize);
 		void             erase                     (void);
 		void             clear                     (void);
@@ -245,15 +241,42 @@ class MidiFile {
 		                                              double value);
 
 	protected:
-		std::vector<MidiEventList*> m_events;         // MIDI file events
-		int                         m_ticksPerQuarterNote; // time base of file
-		int                         m_trackCount;     // # of tracks in file
-		int                         m_theTrackState;  // joined or split
-		int                         m_theTimeState;   // absolute or delta
-		std::string                 m_readFileName;   // read file name
-		int                         m_timemapvalid;
-		std::vector<_TickTime>      m_timemap;
-		int                         m_rwstatus;       // read/write success flag
+		// m_events == Lists of MidiEvents for each MIDI file track.
+		std::vector<MidiEventList*> m_events;
+
+		// m_ticksPerQuarterNote == A value for the MIDI file header
+		// which represents the number of ticks in a quarter note
+		// that are used as units for the delta times for MIDI events
+		// in MIDI file track data.
+		int m_ticksPerQuarterNote = 120;
+
+		// m_trackCount == the number of tracks in the file.
+		int m_trackCount = 1;
+
+		// m_theTrackState == state variable for whether the tracks
+		// are joined or split.
+		int m_theTrackState = TRACK_STATE_SPLIT;
+
+		// m_theTimeState == state variable for whether the MidiEvent::tick
+		// variable contain absolute ticks since the start of the file's
+		// time, or delta ticks since the last MIDI event in the track.
+		int m_theTimeState = TIME_STATE_ABSOLUTE;
+
+		// m_readFileName == the filename of the last file read into
+		// the object.
+		std::string m_readFileName;
+
+		// m_timemapvalid ==
+		bool m_timemapvalid = false;
+
+		// m_timemap == 
+		std::vector<_TickTime> m_timemap;
+
+		// m_rwstatus == True if last read was successful, false if a problem.
+		bool m_rwstatus = true;
+
+		// m_linkedEventQ == True if link analysis has been done.
+		bool m_linkedEventsQ = false;
 
 	private:
 		int        extractMidiData                 (std::istream& inputfile,
