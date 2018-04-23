@@ -670,7 +670,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
     if (is_tuplet) {
         int t = i;
         int t2 = 0;
-        int tuplet_val = 0;
+        int tuplet_val = 3; // triplets are default
         char *buf;
 
         // Triplets are in the form (4ABC)
@@ -715,10 +715,6 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 
             tuplet_val = atoi(buf);
             free(buf); // dispose of the buffer
-        }
-        else { // it is a triplet
-            // don't care to parse all the stuff
-            tuplet_val = 3;
         }
 
         // this is the first note, the total number of notes = tuplet_val
@@ -1380,7 +1376,7 @@ void PaeInput::parseNote(pae::Note *note)
     if (note->tuplet_note > 0 && note->tuplet_notes == note->tuplet_note) { // first elem in tuplet
         Tuplet *newTuplet = new Tuplet();
         newTuplet->SetNum(note->tuplet_notes);
-        newTuplet->SetNumbase(note->tuplet_notes);
+        newTuplet->SetNumbase(2);
         pushContainer(newTuplet);
     }
 
