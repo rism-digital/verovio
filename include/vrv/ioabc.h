@@ -285,6 +285,7 @@ private:
     char m_decoration = '!';
     char m_linebreak = '$';
     int m_lineNum = 0;
+    int m_broken = 0;
     std::vector<std::string> m_title;
     std::vector<std::string> m_composer;
     std::vector<std::string> m_origin;
