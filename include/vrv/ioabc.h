@@ -253,13 +253,11 @@ private:
     void pushContainer(LayerElement *container);
 
     // parse information fields
-    void parseComposer(std::string composer); // C:
     void parseInstruction(std::string keyString); // I:
     void parseKey(std::string keyString); // K:
     void parseUnitNoteLength(std::string unitNoteLength); // L:
     void parseMeter(std::string meterString); // M:
     void parseTempo(std::string tempoString); // Q:
-    void parseTitle(std::string title); // T:
     void parseReferenceNumber(std::string referenceNumberString); // X:
 
     // input functions
@@ -267,6 +265,9 @@ private:
     void readMusicCode(const char *musicCode, Section *section);
 
     void parseDecoration(std::string decorationString);
+
+    // additional functions
+    void printHeader();
 
 #endif // NO_ABC_SUPPORT
 
@@ -284,6 +285,9 @@ private:
     char m_decoration = '!';
     char m_linebreak = '$';
     int m_lineNum = 0;
+    std::vector<std::string> m_title;
+    std::vector<std::string> m_composer;
+    std::vector<std::string> m_origin;
 
     std::vector<ControlElement *> m_controlElements;
 

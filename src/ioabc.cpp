@@ -156,6 +156,7 @@ void AbcInput::parseABC(std::istream &infile)
     if (m_durDefault == DURATION_NONE) {
         calcUnitNoteLength();
     }
+    printHeader();
     // read music code
     while (!infile.eof()) {
         infile.getline(abcLine, 10000);
@@ -410,20 +411,6 @@ void AbcInput::parseDecoration(std::string decorationString)
 // parse information fields
 //
 
-void AbcInput::parseComposer(std::string composer)
-{
-    PgHead *pgHead = dynamic_cast<PgHead *>(m_doc->m_scoreDef.FindChildByType(PGHEAD));
-    assert(pgHead);
-    Rend *compRend = new Rend();
-    compRend->SetHalign(HORIZONTALALIGNMENT_right);
-    compRend->SetValign(VERTICALALIGNMENT_bottom);
-    Text *text = new Text();
-    text->SetText(UTF8to16(composer));
-    compRend->AddChild(text);
-    pgHead->AddChild(compRend);
-    LogMessage("ABC input: composer not exported to MEI header");
-}
-
 void AbcInput::parseInstruction(std::string instruction)
 {
     if (!strncmp(instruction.c_str(), "abc-include", 11)) {
@@ -571,21 +558,17 @@ void AbcInput::parseMeter(std::string meterString)
 void AbcInput::parseTempo(std::string tempoString)
 {
     Tempo *tempo = new Tempo;
+    if (tempoString.find('\"') != std::string::npos) {
+        std::string tempoWord = tempoString.substr(tempoString.find('\"') + 1);
+        tempoWord = tempoWord.substr(0, tempoWord.find('\"'));
+        Text *text = new Text();
+        text->SetText(UTF8to16(tempoWord));
+        tempo->AddChild(text);
+        // this has to be fixed
+        tempo->SetTstamp(1);
+    }
     m_controlElements.push_back(tempo);
-    LogWarning("ABC input: tempo definitions are not supported yet");
-}
-
-void AbcInput::parseTitle(std::string title)
-{
-    PgHead *pgHead = dynamic_cast<PgHead *>(m_doc->m_scoreDef.FindChildByType(PGHEAD));
-    assert(pgHead);
-    Rend *titleRend = new Rend();
-    titleRend->SetHalign(HORIZONTALALIGNMENT_center);
-    titleRend->SetValign(VERTICALALIGNMENT_middle);
-    Text *text = new Text();
-    text->SetText(UTF8to16(title));
-    titleRend->AddChild(text);
-    pgHead->AddChild(titleRend);
+    LogWarning("ABC input: tempo definitions are not fully supported yet");
 }
 
 void AbcInput::parseReferenceNumber(std::string referenceNumberString)
@@ -600,6 +583,37 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
     mdiv->SetN(std::to_string(mdivNum));
 }
 
+void AbcInput::printHeader()
+{
+    for (auto it = m_title.begin(); it != m_title.end(); ++it) {
+        PgHead *pgHead = dynamic_cast<PgHead *>(m_doc->m_scoreDef.FindChildByType(PGHEAD));
+        assert(pgHead);
+        Rend *titleRend = new Rend();
+        titleRend->SetHalign(HORIZONTALALIGNMENT_center);
+        titleRend->SetValign(VERTICALALIGNMENT_middle);
+        if (it != m_title.begin()) {
+            data_FONTSIZE fontsize;
+            fontsize.SetTerm(FONTSIZETERM_small);
+            titleRend->SetFontsize(fontsize);
+        }
+        Text *text = new Text();
+        text->SetText(UTF8to16(*it));
+        titleRend->AddChild(text);
+        pgHead->AddChild(titleRend);
+    }
+    for (auto it = m_composer.begin(); it != m_composer.end(); ++it) {
+        PgHead *pgHead = dynamic_cast<PgHead *>(m_doc->m_scoreDef.FindChildByType(PGHEAD));
+        assert(pgHead);
+        Rend *compRend = new Rend();
+        compRend->SetHalign(HORIZONTALALIGNMENT_right);
+        compRend->SetValign(VERTICALALIGNMENT_bottom);
+        Text *text = new Text();
+        text->SetText(UTF8to16(*it));
+        compRend->AddChild(text);
+        pgHead->AddChild(compRend);
+    }
+}
+
 //////////////////////////////
 //
 // readInformationField --
@@ -612,16 +626,16 @@ void AbcInput::readInformationField(char dataKey, std::string value, Score *scor
 {
     assert(score);
 
-    // remove comments
+    // remove comments and trailing whitespace
     if (dataKey == '%')
         return;
     else if (value.find('%') != std::string::npos) {
         value = value.substr(0, value.find('%'));
-        while (isspace(value[value.length() - 1])) value.pop_back();
     }
+    while (isspace(value[value.length() - 1])) value.pop_back();
 
     if (dataKey == 'C') {
-        parseComposer(value);
+        m_composer.push_back(value);
     }
     else if (dataKey == 'I') {
         parseInstruction(value);
@@ -635,11 +649,14 @@ void AbcInput::readInformationField(char dataKey, std::string value, Score *scor
     else if (dataKey == 'M') {
         parseMeter(value);
     }
+    else if (dataKey == 'O') {
+        if (!m_composer.empty()) m_composer[0] = m_composer[0] + " (" + value + ")";
+    }
     else if (dataKey == 'Q') {
         parseTempo(value);
     }
     else if (dataKey == 'T') {
-        parseTitle(value);
+        m_title.push_back(value);
     }
     else if (dataKey == 'X') {
         parseReferenceNumber(value);
@@ -1000,6 +1017,10 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                     }
                     m_harmStack.clear();
                 }
+                for (auto it = m_controlElements.begin(); it != m_controlElements.end(); ++it) {
+                    measure->AddChild(*it);
+                }
+                m_controlElements.clear();
                 section->AddChild(measure);
                 measure = new Measure();
                 staff = new Staff();
