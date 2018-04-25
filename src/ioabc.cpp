@@ -733,7 +733,13 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
         else if (musicCode[i] == ']' && musicCode[i - 1] != '|') {
             // end chord
-            m_noteStack.push_back(chord);
+            if (chord->GetDur() < DURATION_8) {
+                // if chord cannot be beamed, write it directly to the layer
+                if (m_noteStack.size() > 0) AddBeam();
+                m_layer->AddChild(chord);
+            }
+            else
+                m_noteStack.push_back(chord);
             chord = NULL;
         }
 
@@ -792,8 +798,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             std::string numStr, numbaseStr;
             int dots = 0;
             if (m_broken < 0) {
-              dots = -m_broken;
-              m_broken = 0;
+                dots = -m_broken;
+                m_broken = 0;
             }
             while (musicCode[i + 1] == '>') {
                 i++;
@@ -851,16 +857,14 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 if (dots > 0) note->SetDots(dots);
                 int dur = m_unitDur * numbase / num;
                 if (m_broken < 0) {
-                  for (int i = 0; i != -m_broken; ++i)
-                  dur = dur * 2;
+                    for (int i = 0; i != -m_broken; ++i) dur = dur * 2;
                 }
                 else if (!note->HasDots() && m_broken > 0) {
-                    for (; m_broken != 0; --m_broken)
-                    dur = dur * 2;
+                    for (; m_broken != 0; --m_broken) dur = dur * 2;
                 }
                 note->SetDur(note->AttDurationLogical::StrToDuration(std::to_string(dur)));
                 if (note->GetDur() < DURATION_8) {
-                    // if note cannot beamed, write it directly to the layer
+                    // if note cannot be beamed, write it directly to the layer
                     if (m_noteStack.size() > 0) AddBeam();
                     m_layer->AddChild(note);
                 }
