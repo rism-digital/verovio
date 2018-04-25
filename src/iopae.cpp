@@ -805,7 +805,7 @@ data_PITCHNAME PaeInput::getPitch(char c_note)
 
 //////////////////////////////
 //
-// getTimeInfo -- read the key signature.
+// getTimeInfo -- read the meter signature
 //
 
 int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, int index)
@@ -918,7 +918,7 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
 
 //////////////////////////////
 //
-// getClefInfo -- read the key signature.
+// getClefInfo -- read the clef.
 //
 
 int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
