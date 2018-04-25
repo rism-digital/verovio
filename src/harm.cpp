@@ -26,11 +26,18 @@ namespace vrv {
 // Harm
 //----------------------------------------------------------------------------
 
-Harm::Harm() : ControlElement("harm-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttLang()
+Harm::Harm()
+    : ControlElement("harm-")
+    , TextListInterface()
+    , TextDirInterface()
+    , TimeSpanningInterface()
+    , AttLang()
+    , AttNNumberLike()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_LANG);
+    RegisterAttClass(ATT_NNUMBERLIKE);
 
     Reset();
 }
@@ -43,18 +50,19 @@ void Harm::Reset()
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
     ResetLang();
+    ResetNNumberLike();
 }
 
 void Harm::AddChild(Object *child)
 {
-    if (child->Is({ FB, REND, TEXT })) {
+    if (child->Is({ REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
-    }
-    else if (child->IsEditorialElement()) {
-        assert(dynamic_cast<EditorialElement *>(child));
     }
     else if (child->Is(FB)) {
         assert(dynamic_cast<Fb *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
@@ -72,10 +80,21 @@ void Harm::AddChild(Object *child)
 
 int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    // PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
-    // assert(params);
+    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    assert(params);
 
-    this->SetDrawingGrpId(DRAWING_GRP_HARM);
+    std::string n = this->GetN();
+
+    for (auto &kv : params->m_harms) {
+        if (kv.first == n) {
+            this->SetDrawingGrpId(kv.second->GetDrawingGrpId());
+            return FUNCTOR_CONTINUE;
+        }
+    }
+
+    // first harm@n, create a new group
+    this->SetDrawingGrpObject(this);
+    params->m_harms.insert(std::make_pair(n, this));
 
     return FUNCTOR_CONTINUE;
 }

@@ -133,7 +133,7 @@ void Chord::FilterList(ListOfObjects *childList)
 
     while (iter != childList->end()) {
         if ((*iter)->Is(NOTE))
-            iter++;
+            ++iter;
         else
             iter = childList->erase(iter);
     }
@@ -156,7 +156,7 @@ void Chord::FilterList(ListOfObjects *childList)
     int curPitch, lastPitch = lastNote->GetDiatonicPitch();
     ChordCluster *curCluster = NULL;
 
-    iter++;
+    ++iter;
 
     Layer *layer1 = NULL;
     Layer *layer2 = NULL;
@@ -181,7 +181,7 @@ void Chord::FilterList(ListOfObjects *childList)
         lastNote = curNote;
         lastPitch = curPitch;
 
-        iter++;
+        ++iter;
     }
 }
 
@@ -409,7 +409,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
     }
 
     // if the chord isn't visible, carry on
-    if (!this->IsVisible()) {
+    if (!this->IsVisible() || (this->GetStemVisible() == BOOLEAN_false)) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -504,7 +504,7 @@ int Chord::CalcDots(FunctorParams *functorParams)
     assert(this->GetTopNote());
     assert(this->GetBottomNote());
 
-    for (rit = notes->rbegin(); rit != notes->rend(); rit++) {
+    for (rit = notes->rbegin(); rit != notes->rend(); ++rit) {
         Note *note = dynamic_cast<Note *>(*rit);
         assert(note);
 
@@ -610,7 +610,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 
     // Also set the drawing stem object (or NULL) to all child notes
     const ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); it++) {
+    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
         assert((*it)->Is(NOTE));
         Note *note = dynamic_cast<Note *>(*it);
         assert(note);

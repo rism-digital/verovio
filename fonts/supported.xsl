@@ -1517,7 +1517,7 @@
             <!--<glyph glyph-code="E656" smufl-name="keyboardPedalHalf"/>-->
             <!--<glyph glyph-code="E657" smufl-name="keyboardPedalUpNotch"/>-->
             <!--<glyph glyph-code="E658" smufl-name="keyboardPedalHyphen"/>-->
-            <!--<glyph glyph-code="E659" smufl-name="keyboardPedalSost"/>-->
+            <glyph glyph-code="E659" smufl-name="keyboardPedalSost"/>
             <!--<glyph glyph-code="E65A" smufl-name="keyboardPedalS"/>-->
             <!--<glyph glyph-code="E65B" smufl-name="keyboardPedalHalf2"/>-->
             <!--<glyph glyph-code="E65C" smufl-name="keyboardPedalHalf3"/>-->

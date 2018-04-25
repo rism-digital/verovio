@@ -79,7 +79,7 @@ RunningElement *Page::GetHeader() const
     if (!doc || doc->GetOptions()->m_noHeader.GetValue()) {
         return NULL;
     }
-    
+
     Pages *pages = doc->GetPages();
     assert(pages);
 
@@ -98,7 +98,7 @@ RunningElement *Page::GetFooter() const
     if (!doc || doc->GetOptions()->m_noFooter.GetValue()) {
         return NULL;
     }
-    
+
     Pages *pages = doc->GetPages();
     assert(pages);
 
@@ -153,7 +153,7 @@ void Page::LayOutTranscription(bool force)
     // - each LayerElement object will have its Alignment pointer initialized
     Functor alignHorizontally(&Object::AlignHorizontally);
     Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
-    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally);
+    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally, doc);
     this->Process(&alignHorizontally, &alignHorizontallyParams, &alignHorizontallyEnd);
 
     // Align the content of the page using system aligners
@@ -221,7 +221,7 @@ void Page::LayOutHorizontally()
     // - each LayerElement object will have its Alignment pointer initialized
     Functor alignHorizontally(&Object::AlignHorizontally);
     Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
-    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally);
+    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally, doc);
     this->Process(&alignHorizontally, &alignHorizontallyParams, &alignHorizontallyEnd);
 
     // Align the content of the page using system aligners

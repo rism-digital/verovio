@@ -274,7 +274,7 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
     }
 
     TextExtend extend;
-    GetTextExtent(wtext, &extend);
+    GetTextExtent(wtext, &extend, true);
     m_textWidth += extend.m_width;
     // keep that maximum values for ascent and descent
     m_textAscent = std::max(m_textAscent, extend.m_ascent);

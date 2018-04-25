@@ -66,7 +66,7 @@ void PlistInterface::SetUuidStrs()
 
     xsdAnyURI_List list = this->GetPlist();
     xsdAnyURI_List::iterator iter;
-    for (iter = list.begin(); iter != list.end(); iter++) {
+    for (iter = list.begin(); iter != list.end(); ++iter) {
         std::string uuid = ExtractUuidFragment(*iter);
         if (!uuid.empty()) {
             m_uuids.push_back(uuid);
@@ -94,7 +94,7 @@ int PlistInterface::InterfacePreparePlist(FunctorParams *functorParams, Object *
     this->SetUuidStrs();
 
     std::vector<std::string>::iterator iter;
-    for (iter = m_uuids.begin(); iter != m_uuids.end(); iter++) {
+    for (iter = m_uuids.begin(); iter != m_uuids.end(); ++iter) {
         params->m_interfaceUuidPairs.push_back(std::make_pair(this, *iter));
     }
 

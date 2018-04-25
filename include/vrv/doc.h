@@ -12,7 +12,9 @@
 #include "options.h"
 #include "scoredef.h"
 
-class MidiFile;
+namespace smf {
+    class MidiFile;
+}
 
 namespace vrv {
 
@@ -73,9 +75,14 @@ public:
     bool GenerateDocumentScoreDef();
 
     /**
-     * Generate a document pgHead from the MEI header if none is provided.
+     * Generate a document pgHead from the MEI header if none is provided
      */
     bool GenerateHeaderAndFooter();
+
+    /**
+     * Generate measure numbers from measure attributes
+     */
+    bool GenerateMeasureNumbers();
 
     /**
      * Getter and setter for the DocType.
@@ -187,7 +194,7 @@ public:
      * Export the document to a MIDI file.
      * Run trough all the layers and fill the midi file content.
      */
-    void ExportMIDI(MidiFile *midiFile);
+    void ExportMIDI(smf::MidiFile *midiFile);
 
     /**
      * Extract a timemap from the document to a JSON string.

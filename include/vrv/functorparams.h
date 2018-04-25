@@ -12,7 +12,9 @@
 
 #include "vrvdef.h"
 
-class MidiFile;
+namespace smf {
+    class MidiFile;
+}
 
 namespace vrv {
 
@@ -20,11 +22,13 @@ class AttComparison;
 class BoundaryStartInterface;
 class Chord;
 class Clef;
+class Dot;
 class Dots;
 class Dynam;
 class Ending;
 class FileOutputStream;
 class Hairpin;
+class Harm;
 class KeySig;
 class Layer;
 class LayerElement;
@@ -386,11 +390,12 @@ public:
  * member 5: a flag indicating whereas we are processing the caution scoreDef
  * member 6: a flag indicating is we are in the first measure (for the scoreDef role)
  * member 7: a flag indicating if we had mutliple layer alignment reference in the measure
+ * member 8: the doc
  **/
 
 class AlignHorizontallyParams : public FunctorParams {
 public:
-    AlignHorizontallyParams(Functor *functor)
+    AlignHorizontallyParams(Functor *functor, Doc *doc)
     {
         m_measureAligner = NULL;
         m_time = 0.0;
@@ -401,6 +406,7 @@ public:
         m_scoreDefRole = NONE;
         m_isFirstMeasure = false;
         m_hasMultipleLayer = false;
+        m_doc = doc;
     }
     MeasureAligner *m_measureAligner;
     double m_time;
@@ -411,6 +417,7 @@ public:
     ElementScoreDefRole m_scoreDefRole;
     bool m_isFirstMeasure;
     bool m_hasMultipleLayer;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -1031,15 +1038,17 @@ public:
 
 class GenerateMIDIParams : public FunctorParams {
 public:
-    GenerateMIDIParams(MidiFile *midiFile)
+    GenerateMIDIParams(smf::MidiFile *midiFile)
     {
         m_midiFile = midiFile;
+        m_midiChannel = 0;
         m_midiTrack = 1;
         m_totalTime = 0.0;
         m_transSemi = 0;
         m_currentTempo = 120;
     }
-    MidiFile *m_midiFile;
+    smf::MidiFile *m_midiFile;
+    int m_midiChannel;
     int m_midiTrack;
     double m_totalTime;
     int m_transSemi;
@@ -1158,21 +1167,18 @@ public:
 /**
  * member 0: the previous ending
  * member 1: the current grpId
- * member 2: the dynam in the current Measure
- * member 3: the current hairpin
+ * member 2: the dynam in the current measure
+ * member 3: the current hairpins to be linked / grouped
+ * member 4: the map of existing harms (based on @n)
  **/
 
 class PrepareFloatingGrpsParams : public FunctorParams {
 public:
-    PrepareFloatingGrpsParams()
-    {
-        m_previousEnding = NULL;
-        m_drawingGrpId = DRAWING_GRP_OTHER;
-    }
+    PrepareFloatingGrpsParams() { m_previousEnding = NULL; }
     Ending *m_previousEnding;
-    int m_drawingGrpId;
     std::vector<Dynam *> m_dynams;
     std::vector<Hairpin *> m_hairpins;
+    std::map<std::string, Harm *> m_harms;
 };
 
 //----------------------------------------------------------------------------
@@ -1240,12 +1246,18 @@ public:
 
 /**
  * member 0: the current Note
+ * member 1: the last Dot
  **/
 
 class PreparePointersByLayerParams : public FunctorParams {
 public:
-    PreparePointersByLayerParams() { m_currentNote = NULL; }
+    PreparePointersByLayerParams()
+    {
+        m_currentNote = NULL;
+        m_lastDot = NULL;
+    }
     Note *m_currentNote;
+    Dot *m_lastDot;
 };
 
 //----------------------------------------------------------------------------

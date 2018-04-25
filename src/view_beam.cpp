@@ -24,7 +24,6 @@
 #include "layerelement.h"
 #include "note.h"
 #include "options.h"
-#include "rpt.h"
 #include "smufl.h"
 #include "staff.h"
 #include "vrv.h"
@@ -111,7 +110,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // For acc and rit beam (see AttBeamingVis set
     // s_y = 0 and s_y2 = 0 respectively
 
-    for (j = 0; j < fullBars; j++) {
+    for (j = 0; j < fullBars; ++j) {
         polygonHeight = beam->m_drawingParams.m_beamWidthBlack * shiftY;
         DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
         y1 += polygonHeight;
@@ -146,7 +145,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // Map the indexes of the notes/chords since we need to ignore rests when drawing partials
     // However, exception for the first and last element of a beam
     std::vector<int> noteIndexes;
-    for (i = 0; i < elementCount; i++) {
+    for (i = 0; i < elementCount; ++i) {
         if (beamElementCoords->at(i)->m_element->Is(REST))
             if (i > 0 && i < elementCount - 1) continue;
         noteIndexes.push_back(i);
@@ -174,7 +173,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             int nextIdx = 0;
 
             // all but the last one
-            for (i = 0; i < noteCount - 1; i++) {
+            for (i = 0; i < noteCount - 1; ++i) {
                 idx = noteIndexes.at(i);
                 nextIdx = noteIndexes.at(i + 1);
 
@@ -220,7 +219,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             }
 
             // draw them
-            for (i = 0; i < noteCount; i++) {
+            for (i = 0; i < noteCount; ++i) {
                 idx = noteIndexes.at(i);
                 if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_THROUGH) {
                     // through should never be set on the last one
@@ -235,16 +234,16 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 else if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_RIGHT) {
                     y1 = beamElementCoords->at(idx)->m_yBeam + barY;
                     int x2 = beamElementCoords->at(idx)->m_x + fractBeamWidth;
-                    y2 = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_verticalBoost + barY
-                        + beam->m_drawingParams.m_beamSlope * x2;
+                    y2 = beam->m_drawingParams.m_startingY + barY
+                        + beam->m_drawingParams.m_beamSlope * (x2 - beam->m_drawingParams.m_startingX);
                     polygonHeight = beam->m_drawingParams.m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, beamElementCoords->at(idx)->m_x, y1, x2, y2, polygonHeight);
                 }
                 else if (beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_LEFT) {
                     y2 = beamElementCoords->at(idx)->m_yBeam + barY;
                     int x1 = beamElementCoords->at(idx)->m_x - fractBeamWidth;
-                    y1 = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_verticalBoost + barY
-                        + beam->m_drawingParams.m_beamSlope * x1;
+                    y1 = beam->m_drawingParams.m_startingY + barY
+                        + beam->m_drawingParams.m_beamSlope * (x1 - beam->m_drawingParams.m_startingX);
                     polygonHeight = beam->m_drawingParams.m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, x1, y1, beamElementCoords->at(idx)->m_x, y2, polygonHeight);
                 }
@@ -321,7 +320,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int dur = (dynamic_cast<AttDurationLogical *>(firstElement->m_element))->GetDur();
 
     if (dur > DUR_1) {
-        for (i = 0; i < elementCount; i++) {
+        for (i = 0; i < elementCount; ++i) {
             LayerElement *el = beamElementCoords->at(i)->m_element;
             if (((el->Is(NOTE)) && !(dynamic_cast<Note *>(el))->IsChordTone()) || (el->Is(CHORD))) {
                 StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
@@ -369,7 +368,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y2 -= space * fTrem->m_drawingParams.m_beamSlope;
     }
 
-    for (j = 0; j < fullBars; j++) {
+    for (j = 0; j < fullBars; ++j) {
         DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
         y1 += polygonHeight;
         y2 += polygonHeight;

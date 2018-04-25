@@ -490,6 +490,8 @@ public:
     OptionInt m_beamMinSlope;
     OptionString m_font;
     OptionDbl m_graceFactor;
+    OptionBool m_graceRhythmAlign;
+    OptionBool m_graceRightAlign;
     OptionDbl m_hairpinSize;
     OptionDbl m_leftPosition;
     OptionDbl m_lyricHyphenWidth;
