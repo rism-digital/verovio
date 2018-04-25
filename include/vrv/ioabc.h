@@ -18,8 +18,6 @@
 
 namespace vrv {
 
-class Accid;
-class Artic;
 class Beam;
 class Clef;
 class ControlElement;

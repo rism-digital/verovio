@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "annot.h"
 #include "artic.h"
 #include "beam.h"
 #include "chord.h"
@@ -32,6 +33,7 @@
 #include "pghead.h"
 #include "rend.h"
 #include "rest.h"
+#include "sb.h"
 #include "score.h"
 #include "scoredef.h"
 #include "section.h"

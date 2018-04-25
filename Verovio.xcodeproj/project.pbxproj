@@ -10,8 +10,8 @@
 		152886C51C9CA86100B515BB /* ligature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 152886C41C9CA86100B515BB /* ligature.cpp */; };
 		1579B3431B15033100B16F5C /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
-		4026FBE4203C827E0076535E /* mnum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4026FBE3203C827D0076535E /* mnum.cpp */; };
 		402197941F2E09DA00182DF1 /* ioabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 402197931F2E09DA00182DF1 /* ioabc.cpp */; };
+		4026FBE4203C827E0076535E /* mnum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4026FBE3203C827D0076535E /* mnum.cpp */; };
 		403BEFED206C00B500D022D5 /* beatrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFE7206C00B400D022D5 /* beatrpt.cpp */; };
 		403BEFEE206C00B500D022D5 /* mrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEA206C00B400D022D5 /* mrpt.cpp */; };
 		403BEFEF206C00B500D022D5 /* mrpt2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEB206C00B400D022D5 /* mrpt2.cpp */; };
@@ -47,6 +47,8 @@
 		40D45EC2204EEAFB009C1EC9 /* instrdef.h in Headers */ = {isa = PBXBuildFile; fileRef = 40D45EC0204EEAE0009C1EC9 /* instrdef.h */; };
 		40D45EC3204EEAFE009C1EC9 /* instrdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40D45EBF204EEAE0009C1EC9 /* instrdef.cpp */; };
 		40D45EC4204EEB03009C1EC9 /* instrdef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40D45EBF204EEAE0009C1EC9 /* instrdef.cpp */; };
+		40DA9C3620905CE8006BED92 /* ioabc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 402197931F2E09DA00182DF1 /* ioabc.cpp */; };
+		40DA9C3720905CEB006BED92 /* ioabc.h in Headers */ = {isa = PBXBuildFile; fileRef = 402197921F2E09CB00182DF1 /* ioabc.h */; };
 		40E1CEDE205060E20007C8AF /* labelabbr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40E1CEDD205060E20007C8AF /* labelabbr.cpp */; };
 		40E1CEDF205060FD0007C8AF /* labelabbr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40E1CEDD205060E20007C8AF /* labelabbr.cpp */; };
 		40E1CEE0205060FD0007C8AF /* labelabbr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40E1CEDD205060E20007C8AF /* labelabbr.cpp */; };
@@ -1588,6 +1590,7 @@
 				4D9C53121B52E4AE0003C6EC /* core.h in Headers */,
 				4DF4407A1D3D085600152B7E /* functorparams.h in Headers */,
 				4D763EC91987D067003FCAB5 /* metersig.h in Headers */,
+				40DA9C3720905CEB006BED92 /* ioabc.h in Headers */,
 				4DB3D8CD1F83D11100B5FC2B /* harm.h in Headers */,
 				40D45EC2204EEAFB009C1EC9 /* instrdef.h in Headers */,
 				4D422101199805E400963292 /* att.h in Headers */,
@@ -2156,6 +2159,7 @@
 				4D422105199805F800963292 /* att.cpp in Sources */,
 				4D4221071998A8CE00963292 /* atts_mensural.cpp in Sources */,
 				4D50B53B1C1B47540081D56E /* atts_pagebased.cpp in Sources */,
+				40DA9C3620905CE8006BED92 /* ioabc.cpp in Sources */,
 				4D1BE76C1C688F5A0086DC0E /* Binasc.cpp in Sources */,
 				4D9A9C1A199F561200028D93 /* verse.cpp in Sources */,
 				4DB3D8DC1F83D14900B5FC2B /* artic.cpp in Sources */,
