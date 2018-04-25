@@ -64,7 +64,7 @@ char abcLine[10001] = { 0 };
 char dataKey[MAX_DATA_LEN];
 char dataValue[MAX_DATA_LEN]; // ditto as above
 
-std::string pitch = "abcdefgABCDEFG";
+std::string pitch = "FCGDAEB";
 std::string shorthandDecoration = ".~HLMOPSTuv";
 
 //----------------------------------------------------------------------------
@@ -427,35 +427,41 @@ void AbcInput::parseInstruction(std::string instruction)
 void AbcInput::parseKey(std::string keyString)
 {
     int i = 0;
+    int accidNum = 0;
     data_MODE mode = MODE_NONE;
-    while (isspace(keyString[i])) i++;
+    while (isspace(keyString[i])) ++i;
 
     // set key.pname
     if (pitch.find(keyString[i]) != std::string::npos) {
+        accidNum = pitch.find(keyString[i]) - 1;
         keyString[i] = tolower(keyString[i]);
         m_doc->m_scoreDef.SetKeyPname((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToPitchname(keyString.substr(i, 1)));
-        i += 1;
+        ++i;
     }
-    while (isspace(keyString[i])) i++;
+    while (isspace(keyString[i])) ++i;
+    LogWarning("%d", accidNum);
 
     // set key.accid
     switch (keyString[i]) {
         case '#':
             m_doc->m_scoreDef.SetKeyAccid(ACCIDENTAL_GESTURAL_s);
-            i += 1;
+            accidNum += 7;
+            ++i;
             break;
         case 'b':
             m_doc->m_scoreDef.SetKeyAccid(ACCIDENTAL_GESTURAL_f);
-            i += 1;
+            accidNum -= 7;
+            ++i;
             break;
         default: break;
     }
+    LogWarning("%d", accidNum);
 
     // set key.mode
     if (m_doc->m_scoreDef.HasKeyPname()) {
         // when no mode is indicated, major is assumed
         mode = MODE_major;
-        while (keyString[i] == ' ') i += 1;
+        while (isspace(keyString[i])) ++i;
 
         if (keyString[i]) {
             std::string modeString(&keyString[i]);
@@ -466,29 +472,58 @@ void AbcInput::parseKey(std::string keyString)
                 c = tolower(c);
             }
 
-            if (modeString == "min" || modeString == "m")
+            if (modeString[0] == 'm' && modeString[2] != 'x') { // should mean "min"
                 mode = MODE_minor;
-            else if (modeString == "dor")
+                accidNum -= 3;
+            }
+            else if (modeString == "ion") {
                 mode = MODE_dorian;
-            else if (modeString == "phr")
+            }
+            else if (modeString == "dor") {
+                mode = MODE_dorian;
+                accidNum -= 2;
+            }
+            else if (modeString == "phr") {
                 mode = MODE_phrygian;
-            else if (modeString == "lyd")
+                accidNum -= 4;
+            }
+            else if (modeString == "lyd") {
                 mode = MODE_lydian;
-            else if (modeString == "mix")
+                accidNum += 1;
+            }
+            else if (modeString == "mix") {
                 mode = MODE_mixolydian;
-            else if (modeString == "aeo")
+                accidNum -= 1;
+            }
+            else if (modeString == "aeo") {
                 mode = MODE_aeolian;
-            else if (modeString == "mix")
+                accidNum -= 3;
+            }
+            else if (modeString == "loc") {
                 mode = MODE_locrian;
+                accidNum -= 5;
+            }
         }
     }
     m_doc->m_scoreDef.SetKeyMode(mode);
+    LogWarning("%d", accidNum);
+
+    // we need set @key.sig for correct rendering
+    if (accidNum != 0) {
+        std::string keySig;
+        if (accidNum < 0)
+            keySig = StringFormat("%df", abs(accidNum));
+        else if (accidNum > 0)
+            keySig = StringFormat("%ds", accidNum);
+        m_doc->m_scoreDef.SetKeySig((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToKeysignature(keySig));
+    }
 
     // set clef
     // <clef name> - may be treble, alto, tenor, bass, perc or none. perc selects the drum clef. clef= may be omitted.
     // [<line number>] - indicates on which staff line the base clef is written. Defaults are: treble: 2; alto: 3;
     // tenor: 4; bass: 4.
     // [+8 | -8] - draws '8' above or below the staff. The player will transpose the notes one octave higher or lower.
+    if (keyString.find("clef") != std::string::npos) LogWarning("ABC input: 'clef' is not supported yet.");
 
     // for now only default treble clef
     m_doc->m_scoreDef.SetClefShape(CLEFSHAPE_G);
@@ -500,13 +535,17 @@ void AbcInput::parseKey(std::string keyString)
         int trans = 1;
         if (keyString[i] == '-') {
             trans = -1;
-            i++;
+            ++i;
         }
         while (isdigit(keyString[i])) {
             transStr.push_back(keyString[i]);
-            i++;
+            ++i;
         }
         trans = trans * atoi(transStr.c_str());
+    }
+
+    if (keyString.find("stafflines=", i) != std::string::npos) {
+      LogWarning("ABC input: 'stafflines' is not supported yet.");
     }
 }
 
@@ -713,11 +752,11 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             parseDecoration(shorthandDecorationString);
         }
         else if (musicCode[i] == m_decoration) {
-            i++;
+            ++i;
             std::string decorationString;
             while (musicCode[i] != m_decoration) {
                 decorationString.push_back(musicCode[i]);
-                i++;
+                ++i;
             }
             parseDecoration(decorationString);
         }
@@ -751,7 +790,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 grace = GRACE_acc;
                 if ((musicCode[i + 1] == '/')) {
                     grace = GRACE_unacc;
-                    i++;
+                    ++i;
                 }
             }
             // end grace group
@@ -761,7 +800,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
         // note
         // getNote also creates a new note object
-        else if (pitch.find(musicCode[i]) != std::string::npos) {
+        else if (pitch.find(toupper(musicCode[i])) != std::string::npos) {
             int oct = 0;
             Note *note = new Note;
 
@@ -790,7 +829,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                     oct -= 1;
                 else
                     oct += 1;
-                i++;
+                ++i;
             }
             note->SetOct(oct);
 
@@ -802,22 +841,22 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 m_broken = 0;
             }
             while (musicCode[i + 1] == '>') {
-                i++;
+                ++i;
                 ++m_broken;
                 ++dots;
             }
             while (musicCode[i + 1] == '<') {
-                i++;
+                ++i;
                 --m_broken;
             }
             while (isdigit(musicCode[i + 1])) {
-                i++;
+                ++i;
                 numStr.push_back(musicCode[i]);
             }
             if (musicCode[i + 1] == '/') {
-                i++;
+                ++i;
                 while (isdigit(musicCode[i + 1])) {
-                    i++;
+                    ++i;
                     numbaseStr.push_back(musicCode[i]);
                 }
             }
@@ -884,17 +923,17 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             std::string numStr, numbaseStr;
             int dots = 0;
             if (musicCode[i + 1] == '>') {
-                i++;
+                ++i;
                 LogWarning("ABC input: Broken rhythms not supported");
             }
             while (isdigit(musicCode[i + 1])) {
-                i++;
+                ++i;
                 numStr.push_back(musicCode[i]);
             }
             if (musicCode[i + 1] == '/') {
-                i++;
+                ++i;
                 while (isdigit(musicCode[i + 1])) {
-                    i++;
+                    ++i;
                     numbaseStr.push_back(musicCode[i]);
                 }
             }
@@ -925,17 +964,17 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             std::string numStr, numbaseStr;
             int dots = 0;
             if (musicCode[i + 1] == '>') {
-                i++;
+                ++i;
                 LogWarning("ABC input: Broken rhythms not supported");
             }
             while (isdigit(musicCode[i + 1])) {
-                i++;
+                ++i;
                 numStr.push_back(musicCode[i]);
             }
             if (musicCode[i + 1] == '/') {
-                i++;
+                ++i;
                 while (isdigit(musicCode[i + 1])) {
-                    i++;
+                    ++i;
                     numbaseStr.push_back(musicCode[i]);
                 }
             }
@@ -959,7 +998,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             std::string numString;
             while (isdigit(musicCode[i + 1])) {
                 numString.push_back(musicCode[i + 1]);
-                i++;
+                ++i;
             }
             multiRest->SetNum(atoi(numString.c_str()));
             m_layer->AddChild(multiRest);
@@ -967,12 +1006,12 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
         // text elements
         else if (musicCode[i] == '\"') {
-            i++;
+            ++i;
             Harm *harm = new Harm();
             std::string chordSymbol;
             while (musicCode[i] != '\"') {
                 chordSymbol.push_back(musicCode[i]);
-                i++;
+                ++i;
             }
             Text *text = new Text();
             text->SetText(UTF8to16(chordSymbol));
@@ -997,7 +1036,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             std::string remark;
             while (musicCode[i] != ']') {
                 remark.push_back(musicCode[i]);
-                i++;
+                ++i;
             }
             Text *text = new Text();
             text->SetText(UTF8to16(remark));
@@ -1021,11 +1060,11 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 if (musicCode[i - 1] == ':')
                     measure->SetRight(BARRENDITION_rptend);
                 else if (musicCode[i + 1] == '|') {
-                    i++;
+                    ++i;
                     measure->SetRight(BARRENDITION_dbl);
                 }
                 else if (musicCode[i + 1] == ']') {
-                    i++;
+                    ++i;
                     measure->SetRight(BARRENDITION_end);
                 }
                 else
@@ -1050,7 +1089,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             }
         }
 
-        i++;
+        ++i;
     }
 
     // in case of not empty layer
