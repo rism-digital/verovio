@@ -432,11 +432,16 @@ void View::DrawOctave(
         return;
     }
 
-    /********** adjust the end position ***********/
+    /********** adjust the start / end positions ***********/
 
+    if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) {
+        x1 += (m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2);
+    }
+    
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
-        if (octave->HasEndid())
+        if (octave->HasEndid()) {
             x2 += (m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2);
+        }
     }
 
     /************** draw it **************/

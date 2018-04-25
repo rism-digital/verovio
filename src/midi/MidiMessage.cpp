@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Feb 14 20:49:21 PST 2015
-// Last Modified: Sat Feb 14 21:40:31 PST 2015
+// Last Modified: Sun Apr 15 11:11:05 PDT 2018 Added event removal system.
 // Filename:      midifile/src-library/MidiMessage.cpp
 // Website:       http://midifile.sapp.org
 // Syntax:        C++11
@@ -17,56 +17,53 @@
 #include <iostream>
 #include <iterator>
 
-using namespace std;
 
+namespace smf {
 
 //////////////////////////////
 //
 // MidiMessage::MidiMessage -- Constructor.
 //
 
-MidiMessage::MidiMessage(void) {
+MidiMessage::MidiMessage(void) : vector<uchar>() {
 	// do nothing
 }
 
 
-MidiMessage::MidiMessage(int command) {
-	this->resize(1);
-	(*this)[0] = (uchar)command;
+MidiMessage::MidiMessage(int command) : vector<uchar>(1, (uchar)command) {
+	// do nothing
 }
 
 
-MidiMessage::MidiMessage(int command, int p1) {
-	this->resize(2);
+MidiMessage::MidiMessage(int command, int p1) : vector<uchar>(2) {
 	(*this)[0] = (uchar)command;
 	(*this)[1] = (uchar)p1;
 }
 
 
-MidiMessage::MidiMessage(int command, int p1, int p2) {
-	this->resize(3);
+MidiMessage::MidiMessage(int command, int p1, int p2) : vector<uchar>(3) {
 	(*this)[0] = (uchar)command;
 	(*this)[1] = (uchar)p1;
 	(*this)[2] = (uchar)p2;
 }
 
 
-MidiMessage::MidiMessage(const MidiMessage& message) {
+MidiMessage::MidiMessage(const MidiMessage& message) : vector<uchar>() {
 	(*this) = message;
 }
 
 
-MidiMessage::MidiMessage(const vector<uchar>& message) {
+MidiMessage::MidiMessage(const std::vector<uchar>& message) : vector<uchar>() {
 	setMessage(message);
 }
 
 
-MidiMessage::MidiMessage(const vector<char>& message) {
+MidiMessage::MidiMessage(const std::vector<char>& message) : vector<uchar>() {
 	setMessage(message);
 }
 
 
-MidiMessage::MidiMessage(const vector<int>& message) {
+MidiMessage::MidiMessage(const std::vector<int>& message) : vector<uchar>() {
 	setMessage(message);
 }
 
@@ -97,7 +94,7 @@ MidiMessage& MidiMessage::operator=(const MidiMessage& message) {
 }
 
 
-MidiMessage& MidiMessage::operator=(const vector<uchar>& bytes) {
+MidiMessage& MidiMessage::operator=(const std::vector<uchar>& bytes) {
 	if (this == &bytes) {
 		return *this;
 	}
@@ -106,13 +103,13 @@ MidiMessage& MidiMessage::operator=(const vector<uchar>& bytes) {
 }
 
 
-MidiMessage& MidiMessage::operator=(const vector<char>& bytes) {
+MidiMessage& MidiMessage::operator=(const std::vector<char>& bytes) {
 	setMessage(bytes);
 	return *this;
 }
 
 
-MidiMessage& MidiMessage::operator=(const vector<int>& bytes) {
+MidiMessage& MidiMessage::operator=(const std::vector<int>& bytes) {
 	setMessage(bytes);
 	return *this;
 }
@@ -1087,7 +1084,7 @@ void MidiMessage::setParameters(int p1, int p2) {
 //   input list of bytes.
 //
 
-void MidiMessage::setMessage(const vector<uchar>& message) {
+void MidiMessage::setMessage(const std::vector<uchar>& message) {
 	this->resize(message.size());
 	for (int i=0; i<(int)this->size(); i++) {
 		(*this)[i] = message[i];
@@ -1095,7 +1092,7 @@ void MidiMessage::setMessage(const vector<uchar>& message) {
 }
 
 
-void MidiMessage::setMessage(const vector<char>& message) {
+void MidiMessage::setMessage(const std::vector<char>& message) {
 	resize(message.size());
 	for (int i=0; i<(int)size(); i++) {
 		(*this)[i] = (uchar)message[i];
@@ -1103,7 +1100,7 @@ void MidiMessage::setMessage(const vector<char>& message) {
 }
 
 
-void MidiMessage::setMessage(const vector<int>& message) {
+void MidiMessage::setMessage(const std::vector<int>& message) {
 	resize(message.size());
 	for (int i=0; i<(int)size(); i++) {
 		(*this)[i] = (uchar)message[i];
@@ -1380,8 +1377,8 @@ void MidiMessage::getSpelling(int& base7, int& accidental) {
 //   message after the length (which is a variable-length-value).
 //
 
-string MidiMessage::getMetaContent(void) {
-	string output;
+std::string MidiMessage::getMetaContent(void) {
+	std::string output;
 	if (!isMetaMessage()) {
 		return output;
 	}
@@ -1417,7 +1414,7 @@ string MidiMessage::getMetaContent(void) {
 //    a meta-message type.
 //
 
-void MidiMessage::setMetaContent(const string& content) {
+void MidiMessage::setMetaContent(const std::string& content) {
 	if (this->size() < 2) {
 		// invalid message, so ignore request
 		return;
@@ -1718,7 +1715,7 @@ void MidiMessage::makeSustainPedalOff(int channel) {
 //   will contain more than one byte.
 //
 
-void MidiMessage::makeMetaMessage(int mnum, const string& data) {
+void MidiMessage::makeMetaMessage(int mnum, const std::string& data) {
 	resize(0);
 	push_back(0xff);
 	push_back(mnum & 0x7f); // max meta-message number is 0x7f.
@@ -1734,7 +1731,7 @@ void MidiMessage::makeMetaMessage(int mnum, const string& data) {
 //    within Standard MIDI Files.
 //
 
-void MidiMessage::makeText(const string& text) {
+void MidiMessage::makeText(const std::string& text) {
 	makeMetaMessage(0x01, text);
 }
 
@@ -1747,7 +1744,7 @@ void MidiMessage::makeText(const string& text) {
 //    within Standard MIDI Files.
 //
 
-void MidiMessage::makeCopyright(const string& text) {
+void MidiMessage::makeCopyright(const std::string& text) {
 	makeMetaMessage(0x02, text);
 }
 
@@ -1760,7 +1757,7 @@ void MidiMessage::makeCopyright(const string& text) {
 //    within Standard MIDI Files.
 //
 
-void MidiMessage::makeTrackName(const string& name) {
+void MidiMessage::makeTrackName(const std::string& name) {
 	makeMetaMessage(0x03, name);
 }
 
@@ -1773,7 +1770,7 @@ void MidiMessage::makeTrackName(const string& name) {
 //    within Standard MIDI Files.
 //
 
-void MidiMessage::makeInstrumentName(const string& name) {
+void MidiMessage::makeInstrumentName(const std::string& name) {
 	makeMetaMessage(0x04, name);
 }
 
@@ -1786,7 +1783,7 @@ void MidiMessage::makeInstrumentName(const string& name) {
 //    within Standard MIDI Files.
 //
 
-void MidiMessage::makeLyric(const string& text) {
+void MidiMessage::makeLyric(const std::string& text) {
 	makeMetaMessage(0x05, text);
 }
 
@@ -1799,7 +1796,7 @@ void MidiMessage::makeLyric(const string& text) {
 //    within Standard MIDI Files.
 //
 
-void MidiMessage::makeMarker(const string& text) {
+void MidiMessage::makeMarker(const std::string& text) {
 	makeMetaMessage(0x06, text);
 }
 
@@ -1812,9 +1809,12 @@ void MidiMessage::makeMarker(const string& text) {
 //    within Standard MIDI Files.
 //
 
-void MidiMessage::makeCue(const string& text) {
+void MidiMessage::makeCue(const std::string& text) {
 	makeMetaMessage(0x07, text);
 }
+
+
+} // end namespace smf
 
 
 

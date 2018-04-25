@@ -250,6 +250,13 @@
 		4D64137E2035F68600BB630E /* mdiv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64137D2035F68600BB630E /* mdiv.cpp */; };
 		4D64137F2035F68600BB630E /* mdiv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64137D2035F68600BB630E /* mdiv.cpp */; };
 		4D6413802035F68600BB630E /* mdiv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D64137D2035F68600BB630E /* mdiv.cpp */; };
+		4D72A5DD208A37D1009DEC1E /* mrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEA206C00B400D022D5 /* mrpt.cpp */; };
+		4D72A5DE208A37D5009DEC1E /* mrpt2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEB206C00B400D022D5 /* mrpt2.cpp */; };
+		4D72A5DF208A37DC009DEC1E /* multirpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFEC206C00B400D022D5 /* multirpt.cpp */; };
+		4D72A5E0208A37F0009DEC1E /* mnum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4026FBE3203C827D0076535E /* mnum.cpp */; };
+		4D72A5E1208A37F0009DEC1E /* mnum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4026FBE3203C827D0076535E /* mnum.cpp */; };
+		4D72A5E2208A37F4009DEC1E /* mnum.h in Headers */ = {isa = PBXBuildFile; fileRef = 4026FBE2203C827D0076535E /* mnum.h */; };
+		4D72A5E3208A3822009DEC1E /* beatrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 403BEFE7206C00B400D022D5 /* beatrpt.cpp */; };
 		4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
 		4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
 		4D763EC91987D067003FCAB5 /* metersig.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D763EC81987D067003FCAB5 /* metersig.h */; };
@@ -1522,6 +1529,7 @@
 				4D1BE77F1C69434C0086DC0E /* Binasc.h in Headers */,
 				4DB3D8EA1F83D17700B5FC2B /* ligature.h in Headers */,
 				4DB3D8B11F83D05B00B5FC2B /* atts_shared.h in Headers */,
+				4D72A5E2208A37F4009DEC1E /* mnum.h in Headers */,
 				4D9C53131B52E4AE0003C6EC /* unchecked.h in Headers */,
 				4DB3D8FB1F83D1F700B5FC2B /* floatingobject.h in Headers */,
 				4DB3D8B21F83D06100B5FC2B /* atts_visual.h in Headers */,
@@ -1768,8 +1776,10 @@
 				4D1694191E3A44F300569BF4 /* drawinginterface.cpp in Sources */,
 				4D16947A1E41DCE000569BF4 /* atts_cmnornaments.cpp in Sources */,
 				4D16946A1E3A455100569BF4 /* humlib.cpp in Sources */,
+				4D72A5E3208A3822009DEC1E /* beatrpt.cpp in Sources */,
 				4D16941A1E3A44F300569BF4 /* view_text.cpp in Sources */,
 				4DC12A641F73F898000440E9 /* pghead2.cpp in Sources */,
+				4D72A5DE208A37D5009DEC1E /* mrpt2.cpp in Sources */,
 				4D16941C1E3A44F300569BF4 /* ending.cpp in Sources */,
 				4D16941D1E3A44F300569BF4 /* dir.cpp in Sources */,
 				4D16941E1E3A44F300569BF4 /* note.cpp in Sources */,
@@ -1791,11 +1801,13 @@
 				4DB3D8E61F83D16A00B5FC2B /* ftrem.cpp in Sources */,
 				4DC12A5A1F716E27000440E9 /* pghead.cpp in Sources */,
 				4DB3D8A81F828EA900B5FC2B /* areaposinterface.cpp in Sources */,
+				4D72A5DF208A37DC009DEC1E /* multirpt.cpp in Sources */,
 				4D4335CA1ED00A33003BE1A9 /* atts_gestural.cpp in Sources */,
 				4D16942D1E3A44F300569BF4 /* trill.cpp in Sources */,
 				4D6413792035F58200BB630E /* pages.cpp in Sources */,
 				4D16942E1E3A44F300569BF4 /* textelement.cpp in Sources */,
 				4D16942F1E3A44F300569BF4 /* svgdevicecontext.cpp in Sources */,
+				4D72A5DD208A37D1009DEC1E /* mrpt.cpp in Sources */,
 				4D1694301E3A44F300569BF4 /* options.cpp in Sources */,
 				4D1694311E3A44F300569BF4 /* system.cpp in Sources */,
 				4D1694321E3A44F300569BF4 /* scoredefinterface.cpp in Sources */,
@@ -1809,6 +1821,7 @@
 				4DB3D8CE1F83D11500B5FC2B /* mordent.cpp in Sources */,
 				4D6331FC1F46DD3A00A0D6BF /* plistinterface.cpp in Sources */,
 				4D1694391E3A44F300569BF4 /* tuplet.cpp in Sources */,
+				4D72A5E0208A37F0009DEC1E /* mnum.cpp in Sources */,
 				4D4FCD0D1F5455FF0009C455 /* staffgrp.cpp in Sources */,
 				4D16943A1E3A44F300569BF4 /* pugixml.cpp in Sources */,
 				403BEFF5206C00E900D022D5 /* multirest.cpp in Sources */,
@@ -2113,6 +2126,7 @@
 				4DB3D8F61F83D1DC00B5FC2B /* view_mensural.cpp in Sources */,
 				4DB3D8E41F83D16400B5FC2B /* elementpart.cpp in Sources */,
 				8F3DD33818854B250051330C /* system.cpp in Sources */,
+				4D72A5E1208A37F0009DEC1E /* mnum.cpp in Sources */,
 				8F3DD32418854B090051330C /* io.cpp in Sources */,
 				4DB3D8BE1F83D0D800B5FC2B /* section.cpp in Sources */,
 				8F3DD32618854B090051330C /* iodarms.cpp in Sources */,

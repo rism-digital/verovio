@@ -409,7 +409,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
     }
 
     // if the chord isn't visible, carry on
-    if (!this->IsVisible()) {
+    if (!this->IsVisible() || (this->GetStemVisible() == BOOLEAN_false)) {
         return FUNCTOR_SIBLINGS;
     }
 

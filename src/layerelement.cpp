@@ -928,6 +928,10 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                 else if (abs(previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc()) > 1)
                     continue;
             }
+            
+            if (this->Is(DOTS) && (*iter)->Is(DOTS)) {
+                    continue;
+            }
 
             // Nothing to do if we have no vertical overlap
             if (!this->VerticalSelfOverlap(*iter, verticalMargin)) continue;

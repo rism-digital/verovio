@@ -1067,7 +1067,7 @@ void Toolkit::GetHumdrum(ostream &output)
 
 std::string Toolkit::RenderToMIDI()
 {
-    MidiFile outputfile;
+    smf::MidiFile outputfile;
     outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
     outputfile.sortTracks();
@@ -1130,7 +1130,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
 bool Toolkit::RenderToMIDIFile(const std::string &filename)
 {
-    MidiFile outputfile;
+    smf::MidiFile outputfile;
     outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
     outputfile.sortTracks();

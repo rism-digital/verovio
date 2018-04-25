@@ -12,7 +12,9 @@
 
 #include "vrvdef.h"
 
-class MidiFile;
+namespace smf {
+    class MidiFile;
+}
 
 namespace vrv {
 
@@ -1036,7 +1038,7 @@ public:
 
 class GenerateMIDIParams : public FunctorParams {
 public:
-    GenerateMIDIParams(MidiFile *midiFile)
+    GenerateMIDIParams(smf::MidiFile *midiFile)
     {
         m_midiFile = midiFile;
         m_midiChannel = 0;
@@ -1045,7 +1047,7 @@ public:
         m_transSemi = 0;
         m_currentTempo = 120;
     }
-    MidiFile *m_midiFile;
+    smf::MidiFile *m_midiFile;
     int m_midiChannel;
     int m_midiTrack;
     double m_totalTime;
