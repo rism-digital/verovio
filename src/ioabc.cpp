@@ -71,17 +71,13 @@ std::string shorthandDecoration = ".~HLMOPSTuv";
 // AbcInput
 //----------------------------------------------------------------------------
 
-AbcInput::AbcInput(Doc *doc, std::string filename)
-    : // This is pretty bad. We open a bad fileoinputstream as we don't use it
-    FileInputStream(doc)
+AbcInput::AbcInput(Doc *doc, std::string filename) : FileInputStream(doc)
 {
     m_filename = filename;
     m_mdiv = NULL;
     m_staff = NULL;
     m_measure = NULL;
     m_layer = NULL;
-    m_last_tied_note = NULL;
-    m_is_in_chord = false;
 }
 
 AbcInput::~AbcInput()
@@ -146,8 +142,7 @@ void AbcInput::parseABC(std::istream &infile)
     Pb *pb = new Pb();
     section->AddChild(pb);
     // create page head
-    PgHead *pgHead = new PgHead;
-    m_doc->m_scoreDef.AddChild(pgHead);
+    printInformationFields();
     // create staff group
     StaffGrp *staffGrp = new StaffGrp();
     m_doc->m_scoreDef.AddChild(staffGrp);
@@ -155,7 +150,6 @@ void AbcInput::parseABC(std::istream &infile)
     if (m_durDefault == DURATION_NONE) {
         calcUnitNoteLength();
     }
-    printHeader();
     // read music code
     while (!infile.eof()) {
         infile.getline(abcLine, 10000);
@@ -171,6 +165,8 @@ void AbcInput::parseABC(std::istream &infile)
             readMusicCode(abcLine, section);
         }
     }
+
+    createHeader();
 
     // add staff definition
     StaffDef *staffDef = new StaffDef();
@@ -551,11 +547,10 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
     m_doc->AddChild(m_mdiv);
 }
 
-void AbcInput::printHeader()
+void AbcInput::printInformationFields()
 {
+    PgHead *pgHead = new PgHead();
     for (auto it = m_title.begin(); it != m_title.end(); ++it) {
-        PgHead *pgHead = dynamic_cast<PgHead *>(m_doc->m_scoreDef.FindChildByType(PGHEAD));
-        assert(pgHead);
         Rend *titleRend = new Rend();
         titleRend->SetHalign(HORIZONTALALIGNMENT_center);
         titleRend->SetValign(VERTICALALIGNMENT_middle);
@@ -570,8 +565,6 @@ void AbcInput::printHeader()
         pgHead->AddChild(titleRend);
     }
     for (auto it = m_composer.begin(); it != m_composer.end(); ++it) {
-        PgHead *pgHead = dynamic_cast<PgHead *>(m_doc->m_scoreDef.FindChildByType(PGHEAD));
-        assert(pgHead);
         Rend *compRend = new Rend();
         compRend->SetHalign(HORIZONTALALIGNMENT_right);
         compRend->SetValign(VERTICALALIGNMENT_bottom);
@@ -580,6 +573,37 @@ void AbcInput::printHeader()
         compRend->AddChild(text);
         pgHead->AddChild(compRend);
     }
+    m_doc->m_scoreDef.AddChild(pgHead);
+}
+
+void AbcInput::createHeader()
+{
+    pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
+
+    // <fileDesc> /////////////
+    pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
+    pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
+    pugi::xml_node meiTitle = titleStmt.append_child("title");
+    meiTitle.text().set(m_filename.c_str());
+
+    pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
+    pubStmt.append_child(pugi::node_pcdata);
+
+    pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
+    pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
+    pugi::xml_node app = appInfo.append_child("application");
+    pugi::xml_node appName = app.append_child("name");
+    appName.append_child(pugi::node_pcdata).set_value("Verovio");
+    pugi::xml_node appText = app.append_child("p");
+    appText.append_child(pugi::node_pcdata).set_value("Transcoded from abc music");
+
+    // isodate and version
+    time_t t = time(0); // get time now
+    struct tm *now = localtime(&t);
+    std::string dateStr = StringFormat("%d-%02d-%02dT%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+        now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
+    app.append_attribute("isodate").set_value(dateStr.c_str());
+    app.append_attribute("version").set_value(GetVersion().c_str());
 }
 
 //////////////////////////////

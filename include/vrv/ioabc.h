@@ -80,7 +80,8 @@ private:
     void parseDecoration(std::string decorationString);
 
     // additional functions
-    void printHeader();
+    void printInformationFields();
+    void createHeader();
 
 #endif // NO_ABC_SUPPORT
 
@@ -105,9 +106,6 @@ private:
     std::vector<std::string> m_origin;
 
     std::vector<ControlElement *> m_controlElements;
-
-    Note *m_last_tied_note;
-    bool m_is_in_chord;
 
     std::vector<LayerElement *> m_layerElements;
     std::vector<LayerElement *> m_noteStack;
