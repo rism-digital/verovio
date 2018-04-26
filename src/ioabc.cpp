@@ -30,6 +30,7 @@
 #include "metersig.h"
 #include "multirest.h"
 #include "note.h"
+#include "pb.h"
 #include "pghead.h"
 #include "rend.h"
 #include "rest.h"
@@ -51,7 +52,6 @@
 //----------------------------------------------------------------------------
 
 #ifndef NO_ABC_SUPPORT
-#include <regex>
 #endif /* NO_ABC_SUPPORT */
 
 namespace vrv {
@@ -76,6 +76,7 @@ AbcInput::AbcInput(Doc *doc, std::string filename)
     FileInputStream(doc)
 {
     m_filename = filename;
+    m_mdiv = NULL;
     m_staff = NULL;
     m_measure = NULL;
     m_layer = NULL;
@@ -113,29 +114,11 @@ void AbcInput::parseABC(std::istream &infile)
 {
     // buffers
     std::string music;
-
     std::string s_key;
-    abc::Measure current_measure;
-    Clef *staffDefClef = NULL;
-
-    std::vector<abc::Measure> staff;
 
     // create mdiv and score
     m_doc->Reset();
     m_doc->SetType(Raw);
-    // the mdiv
-    Mdiv *mdiv = new Mdiv();
-    mdiv->m_visibility = Visible;
-    m_doc->AddChild(mdiv);
-    // the score
-    Score *score = new Score();
-    mdiv->AddChild(score);
-    // the section
-    Section *section = new Section();
-    score->AddChild(section);
-    // create page head
-    PgHead *pgHead = new PgHead;
-    m_doc->m_scoreDef.AddChild(pgHead);
 
     // find first tune
     while (abcLine[0] != 'X') {
@@ -146,12 +129,28 @@ void AbcInput::parseABC(std::istream &infile)
         m_lineNum++;
     }
     // read tune header
-    readInformationField('X', &abcLine[2], score);
+    readInformationField('X', &abcLine[2]);
     while (abcLine[0] != 'K') {
         infile.getline(abcLine, 10000);
         m_lineNum++;
-        readInformationField(abcLine[0], &abcLine[2], score);
+        readInformationField(abcLine[0], &abcLine[2]);
     }
+    // create score
+    assert(m_mdiv);
+    Score *score = new Score();
+    m_mdiv->AddChild(score);
+    // create section
+    Section *section = new Section();
+    score->AddChild(section);
+    // start with a new page
+    Pb *pb = new Pb();
+    section->AddChild(pb);
+    // create page head
+    PgHead *pgHead = new PgHead;
+    m_doc->m_scoreDef.AddChild(pgHead);
+    // create staff group
+    StaffGrp *staffGrp = new StaffGrp();
+    m_doc->m_scoreDef.AddChild(staffGrp);
     // calculate default unit note length
     if (m_durDefault == DURATION_NONE) {
         calcUnitNoteLength();
@@ -161,59 +160,23 @@ void AbcInput::parseABC(std::istream &infile)
     while (!infile.eof()) {
         infile.getline(abcLine, 10000);
         m_lineNum++;
-        if (abcLine[0] == 'X' && m_doc->m_scoreDef.HasType()) {
+        if (abcLine[0] == 'X') {
             LogDebug("Reading only first tune in file");
             break;
         }
         else if (abcLine[1] == ':' && abcLine[0] != '|') {
             LogWarning("ABC input: Information fields in music code not supported");
-            break;
         }
         else {
             readMusicCode(abcLine, section);
         }
     }
 
-    // we need to add the last measure if it has no barLine at the end
-    if (current_measure.notes.size() != 0) {
-        // current_measure.barLine = "=-";
-        staff.push_back(current_measure);
-        current_measure.notes.clear();
-    }
-
-    int measure_count = 1;
-
-    std::vector<abc::Measure>::iterator it;
-    for (it = staff.begin(); it < staff.end(); it++) {
-
-        m_staff = new Staff(1);
-        m_measure = new Measure(true, measure_count);
-
-        m_staff->AddChild(m_layer);
-        m_measure->AddChild(m_staff);
-
-        abc::Measure obj = *it;
-
-        section->AddChild(m_measure);
-
-        convertMeasure(&obj);
-        measure_count++;
-    }
-
-    // add minimal scoreDef
-    StaffGrp *staffGrp = new StaffGrp();
+    // add staff definition
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN(1);
     staffDef->SetLines(5);
-    if (staffDefClef) {
-        staffDef->SetClefShape(staffDefClef->GetShape());
-        staffDef->SetClefLine(staffDefClef->GetLine());
-        staffDef->SetClefDis(staffDefClef->GetDis());
-        staffDef->SetClefDisPlace(staffDefClef->GetDisPlace());
-        delete staffDefClef;
-    }
     staffGrp->AddChild(staffDef);
-    m_doc->m_scoreDef.AddChild(staffGrp);
 
     m_doc->ConvertToPageBasedDoc();
 }
@@ -279,23 +242,6 @@ int AbcInput::getBarLine(const char *music, data_BARRENDITION *output, int index
     return i;
 }
 
-//////////////////////////////
-//
-// convertMeasure --
-//
-
-void AbcInput::convertMeasure(abc::Measure *measure)
-{
-    if (measure->clef != NULL) {
-        m_layer->AddChild(measure->clef);
-    }
-
-    m_layerElements.clear();
-
-    // Set barLine
-    m_measure->SetRight(measure->barLine);
-}
-
 void AbcInput::calcUnitNoteLength()
 {
     if (!m_doc->m_scoreDef.HasMeterUnit()
@@ -308,24 +254,6 @@ void AbcInput::calcUnitNoteLength()
         m_unitDur = 16;
         m_durDefault = DURATION_16;
         // m_doc->m_scoreDef.SetDurDefault(DURATION_16);
-    }
-}
-
-void AbcInput::pushContainer(LayerElement *container)
-{
-    addLayerElement(container);
-    m_layerElements.push_back(container);
-}
-
-void AbcInput::popContainer()
-{
-    // assert(m_layerElements.size() > 0);
-    if (m_layerElements.size() == 0) {
-        LogError("ABC input: tried to pop an object from empty stack. "
-                 "Cross-measure objects (tuplets, beams) are not supported.");
-    }
-    else {
-        m_layerElements.pop_back();
     }
 }
 
@@ -439,7 +367,6 @@ void AbcInput::parseKey(std::string keyString)
         ++i;
     }
     while (isspace(keyString[i])) ++i;
-    LogWarning("%d", accidNum);
 
     // set key.accid
     switch (keyString[i]) {
@@ -455,7 +382,6 @@ void AbcInput::parseKey(std::string keyString)
             break;
         default: break;
     }
-    LogWarning("%d", accidNum);
 
     // set key.mode
     if (m_doc->m_scoreDef.HasKeyPname()) {
@@ -506,7 +432,6 @@ void AbcInput::parseKey(std::string keyString)
         }
     }
     m_doc->m_scoreDef.SetKeyMode(mode);
-    LogWarning("%d", accidNum);
 
     // we need set @key.sig for correct rendering
     if (accidNum != 0) {
@@ -545,7 +470,7 @@ void AbcInput::parseKey(std::string keyString)
     }
 
     if (keyString.find("stafflines=", i) != std::string::npos) {
-      LogWarning("ABC input: 'stafflines' is not supported yet.");
+        LogWarning("ABC input: 'stafflines' is not supported yet.");
     }
 }
 
@@ -612,14 +537,18 @@ void AbcInput::parseTempo(std::string tempoString)
 
 void AbcInput::parseReferenceNumber(std::string referenceNumberString)
 {
-    int mdivNum = atoi(referenceNumberString.c_str());
-    if (mdivNum < 1) {
-        LogError("ABC input: reference number should be a positive integer");
-        return;
+    // The X: field is also used to indicate the start of the tune
+    m_mdiv = new Mdiv();
+    m_mdiv->m_visibility = Visible;
+    if (!referenceNumberString.empty()) {
+        int mdivNum = atoi(referenceNumberString.c_str());
+        if (mdivNum < 1) {
+            LogError("ABC input: reference number should be a positive integer");
+            return;
+        }
+        m_mdiv->SetN(std::to_string(mdivNum));
     }
-    Mdiv *mdiv = dynamic_cast<Mdiv *>(m_doc->FindChildByType(MDIV));
-    assert(mdiv);
-    mdiv->SetN(std::to_string(mdivNum));
+    m_doc->AddChild(m_mdiv);
 }
 
 void AbcInput::printHeader()
@@ -632,7 +561,7 @@ void AbcInput::printHeader()
         titleRend->SetValign(VERTICALALIGNMENT_middle);
         if (it != m_title.begin()) {
             data_FONTSIZE fontsize;
-            fontsize.SetTerm(FONTSIZETERM_smaller);
+            fontsize.SetTerm(FONTSIZETERM_small);
             titleRend->SetFontsize(fontsize);
         }
         Text *text = new Text();
@@ -661,10 +590,8 @@ void AbcInput::printHeader()
 // followed by a single colon
 //
 
-void AbcInput::readInformationField(char dataKey, std::string value, Score *score)
+void AbcInput::readInformationField(char dataKey, std::string value)
 {
-    assert(score);
-
     // remove comments and trailing whitespace
     if (dataKey == '%')
         return;
@@ -1101,7 +1028,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
     // by default, line-breaks in the code generate line-breaks in the typeset score
     // has to be refined later
-    if (sysBreak) {
+    if (sysBreak && (m_linebreak == '\n')) {
         Sb *sb = new Sb();
         section->AddChild(sb);
     }
