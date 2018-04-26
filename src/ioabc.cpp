@@ -112,7 +112,7 @@ void AbcInput::parseABC(std::istream &infile)
     std::string music;
     std::string s_key;
 
-    // create mdiv and score
+    // initialize doc
     m_doc->Reset();
     m_doc->SetType(Raw);
 
@@ -153,7 +153,7 @@ void AbcInput::parseABC(std::istream &infile)
     // read music code
     while (!infile.eof()) {
         infile.getline(abcLine, 10000);
-        m_lineNum++;
+        ++m_lineNum;
         if (abcLine[0] == 'X') {
             LogDebug("Reading only first tune in file");
             break;
@@ -175,6 +175,8 @@ void AbcInput::parseABC(std::istream &infile)
     staffGrp->AddChild(staffDef);
 
     m_doc->ConvertToPageBasedDoc();
+    m_composer.clear();
+    m_title.clear();
 }
 
 /**********************************

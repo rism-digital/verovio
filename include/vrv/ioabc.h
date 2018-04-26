@@ -27,13 +27,9 @@ class Harm;
 class Mdiv;
 class Measure;
 class MeterSig;
-class Note;
-class Score;
 class Section;
 class Slur;
 class Staff;
-class Tie;
-class Tuplet;
 class KeySig;
 class BarLine;
 
