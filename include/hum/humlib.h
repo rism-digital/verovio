@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Apr 16 19:09:46 PDT 2018
+// Last Modified: Wed Apr 25 12:08:23 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -3306,7 +3306,7 @@ class Option_register {
 		string   getOption          (void);
 		string   getModified        (void);
 		string   getDescription     (void);
-		int      isModified         (void);
+		bool     isModified         (void);
 		char     getType            (void);
 		void     reset              (void);
 		void     setDefault         (const string& aString);
@@ -3321,7 +3321,7 @@ class Option_register {
 		string       m_description;
 		string       m_defaultOption;
 		string       m_modifiedOption;
-		int          m_modifiedQ;
+		bool         m_modifiedQ;
 		char         m_type;
 };
 
@@ -3345,7 +3345,7 @@ class Options {
 		int             getArgumentCount  (void);
 		vector<string>& getArgList        (vector<string>& output);
 		vector<string>& getArgumentList   (vector<string>& output);
-		int             getBoolean        (const string& optionName);
+		bool            getBoolean        (const string& optionName);
 		string          getCommand        (void);
 		string          getCommandLine    (void);
 		string          getDefinition     (const string& optionName);
