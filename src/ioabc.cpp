@@ -345,7 +345,7 @@ void AbcInput::parseInstruction(std::string instruction)
         LogWarning("ABC input: Include field is ignored");
     }
     else if (!strncmp(instruction.c_str(), "linebreak", 8)) {
-        LogWarning("ABC input: Default linebreak is used for now.");
+        LogWarning("ABC input: Default linebreaks are used for now.");
     }
     else if (!strncmp(instruction.c_str(), "decoration", 10)) {
         m_decoration = instruction[11];

@@ -97,7 +97,7 @@ private:
     data_DURATION m_durDefault = DURATION_NONE; // todo: switch to MEI
     int m_unitDur;
     char m_decoration = '!';
-    char m_linebreak = '\n';
+    char m_linebreak = '$';
     int m_lineNum = 0;
     int m_broken = 0;
     std::vector<std::string> m_title;
