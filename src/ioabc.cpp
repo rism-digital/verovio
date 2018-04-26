@@ -580,15 +580,16 @@ void AbcInput::createHeader()
 {
     pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
 
-    // <fileDesc> /////////////
+    // <fileDesc> //
     pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
-    pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
-    pugi::xml_node meiTitle = titleStmt.append_child("title");
-    meiTitle.text().set(m_filename.c_str());
+    pugi::xml_node fileTitleStmt = fileDesc.append_child("titleStmt");
+    pugi::xml_node fileTitle = fileTitleStmt.append_child("title");
+    fileTitle.text().set(m_filename.c_str());
 
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pubStmt.append_child(pugi::node_pcdata);
 
+    // <encodingDesc> //
     pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
     pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
     pugi::xml_node app = appInfo.append_child("application");
@@ -597,13 +598,30 @@ void AbcInput::createHeader()
     pugi::xml_node appText = app.append_child("p");
     appText.append_child(pugi::node_pcdata).set_value("Transcoded from abc music");
 
-    // isodate and version
+    // isodate and version //
     time_t t = time(0); // get time now
     struct tm *now = localtime(&t);
     std::string dateStr = StringFormat("%d-%02d-%02dT%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     app.append_attribute("isodate").set_value(dateStr.c_str());
     app.append_attribute("version").set_value(GetVersion().c_str());
+
+    // <workDesc> //
+    pugi::xml_node workDesc = meiHead.append_child("workDesc");
+    pugi::xml_node work = workDesc.append_child("work");
+    work.append_attribute("n").set_value(m_mdiv->GetN().c_str());
+    work.append_attribute("data").set_value(StringFormat("#%s", m_mdiv->GetUuid().c_str()).c_str());
+    pugi::xml_node workTitleStmt = work.append_child("titleStmt");
+    for (auto it = m_title.begin(); it != m_title.end(); ++it) {
+        pugi::xml_node workTitle = workTitleStmt.append_child("title");
+        workTitle.text().set((*it).c_str());
+        if (it == m_title.begin()) {
+            workTitle.append_attribute("type").set_value("main");
+        }
+        else {
+            workTitle.append_attribute("type").set_value("alternative");
+        }
+    }
 }
 
 //////////////////////////////
