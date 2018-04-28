@@ -61,7 +61,7 @@ int KeySig::octave_map[2][9][7] = {
 // KeySig
 //----------------------------------------------------------------------------
 
-KeySig::KeySig() : LayerElement("keysig-"), AttAccidental(), AttPitch()
+KeySig::KeySig() : LayerElement("keysig-"), AttAccidental(), AttPitch(), AttKeySigAnl()
 {
     Init();
 }
@@ -75,7 +75,8 @@ KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_WRITTEN alterationType)
     m_alterationType = alterationType;
 }
 
-KeySig::KeySig(const ScoreDefInterface *keySigAttr) : LayerElement("keysig-"), AttAccidental(), AttPitch()
+KeySig::KeySig(const ScoreDefInterface *keySigAttr)
+    : LayerElement("keysig-"), AttAccidental(), AttPitch(), AttKeySigAnl()
 {
     Init();
 
@@ -112,6 +113,7 @@ void KeySig::Init()
 {
     RegisterAttClass(ATT_ACCIDENTAL);
     RegisterAttClass(ATT_PITCH);
+    RegisterAttClass(ATT_KEYSIGANL);
 
     Reset();
 }
@@ -123,6 +125,7 @@ void KeySig::Reset()
     LayerElement::Reset();
     ResetAccidental();
     ResetPitch();
+    ResetKeySigAnl();
 
     m_alterationNumber = 0;
     m_alterationType = ACCIDENTAL_WRITTEN_NONE;
@@ -225,9 +228,7 @@ int KeySig::GetOctave(data_ACCIDENTAL_WRITTEN alterationType, data_PITCHNAME pit
 
         case (CLEFSHAPE_F << 8 | 3): key_set = 6; break;
         case (CLEFSHAPE_F << 8 | 4): key_set = 7; break;
-        case (CLEFSHAPE_F << 8 | 5):
-            key_set = 8;
-            break;
+        case (CLEFSHAPE_F << 8 | 5): key_set = 8; break;
 
         // does not really exist but just to make it somehow aligned with the clef
         case (CLEFSHAPE_F << 8 | 1): key_set = 8; break;
