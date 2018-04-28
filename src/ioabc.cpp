@@ -19,11 +19,9 @@
 #include "artic.h"
 #include "beam.h"
 #include "chord.h"
-#include "clef.h"
 #include "doc.h"
 #include "editorial.h"
 #include "harm.h"
-#include "keysig.h"
 #include "layer.h"
 #include "mdiv.h"
 #include "measure.h"
@@ -74,10 +72,6 @@ std::string shorthandDecoration = ".~HLMOPSTuv";
 AbcInput::AbcInput(Doc *doc, std::string filename) : FileInputStream(doc)
 {
     m_filename = filename;
-    m_mdiv = NULL;
-    m_staff = NULL;
-    m_measure = NULL;
-    m_layer = NULL;
 }
 
 AbcInput::~AbcInput()
@@ -126,15 +120,22 @@ void AbcInput::parseABC(std::istream &infile)
     }
     // read tune header
     readInformationField('X', &abcLine[2]);
+    // create score
+    assert(m_mdiv != NULL);
+    Score *score = new Score();
+    m_mdiv->AddChild(score);
     while (abcLine[0] != 'K') {
         infile.getline(abcLine, 10000);
         m_lineNum++;
         readInformationField(abcLine[0], &abcLine[2]);
     }
-    // create score
-    assert(m_mdiv);
-    Score *score = new Score();
-    m_mdiv->AddChild(score);
+    if (m_meter) {
+      m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
+      m_doc->m_scoreDef.SetMeterUnit(m_meter->GetUnit());
+      m_doc->m_scoreDef.SetMeterSym(m_meter->GetSym());
+      delete m_meter;
+      m_meter = NULL;
+    }
     // create section
     Section *section = new Section();
     score->AddChild(section);
@@ -143,9 +144,6 @@ void AbcInput::parseABC(std::istream &infile)
     section->AddChild(pb);
     // create page head
     printInformationFields();
-    // create staff group
-    StaffGrp *staffGrp = new StaffGrp();
-    m_doc->m_scoreDef.AddChild(staffGrp);
     // calculate default unit note length
     if (m_durDefault == DURATION_NONE) {
         calcUnitNoteLength();
@@ -167,13 +165,6 @@ void AbcInput::parseABC(std::istream &infile)
     }
 
     createHeader();
-
-    // add staff definition
-    StaffDef *staffDef = new StaffDef();
-    staffDef->SetN(1);
-    staffDef->SetLines(5);
-    staffGrp->AddChild(staffDef);
-
     m_doc->ConvertToPageBasedDoc();
     m_composer.clear();
     m_title.clear();
@@ -495,16 +486,17 @@ void AbcInput::parseUnitNoteLength(std::string unitNoteLength)
 
 void AbcInput::parseMeter(std::string meterString)
 {
+    m_meter = new MeterSig();
     if (meterString.find('C') != std::string::npos) {
         if (meterString[meterString.find('C') + 1] == '|') {
-            m_doc->m_scoreDef.SetMeterSym(METERSIGN_cut);
-            m_doc->m_scoreDef.SetMeterCount(2);
-            m_doc->m_scoreDef.SetMeterUnit(2);
+            m_meter->SetSym(METERSIGN_cut);
+            m_meter->SetCount(2);
+            m_meter->SetUnit(2);
         }
         else {
-            m_doc->m_scoreDef.SetMeterSym(METERSIGN_common);
-            m_doc->m_scoreDef.SetMeterCount(4);
-            m_doc->m_scoreDef.SetMeterUnit(4);
+            m_meter->SetSym(METERSIGN_common);
+            m_meter->SetCount(4);
+            m_meter->SetUnit(4);
         }
     }
     else if (meterString.find('/')) {
@@ -512,8 +504,8 @@ void AbcInput::parseMeter(std::string meterString)
         if (meterCount.front() == '(' && meterCount.back() == ')')
             meterCount = meterCount.substr(1, meterCount.length() - 1);
         // this is a little "hack", until libMEI is fixed
-        m_doc->m_scoreDef.SetMeterCount(atoi(meterCount.c_str()));
-        m_doc->m_scoreDef.SetMeterUnit(atoi(&meterString[meterString.find('/') + 1]));
+        m_meter->SetCount(atoi(meterCount.c_str()));
+        m_meter->SetUnit(atoi(&meterString[meterString.find('/') + 1]));
     }
 }
 
@@ -547,6 +539,12 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
         m_mdiv->SetN(std::to_string(mdivNum));
     }
     m_doc->AddChild(m_mdiv);
+    StaffGrp *staffGrp = new StaffGrp();
+    m_doc->m_scoreDef.AddChild(staffGrp);
+    StaffDef *staffDef = new StaffDef();
+    staffDef->SetN(1);
+    staffDef->SetLines(5);
+    staffGrp->AddChild(staffDef);
 }
 
 void AbcInput::printInformationFields()
@@ -668,6 +666,9 @@ void AbcInput::readInformationField(char dataKey, std::string value)
     else if (dataKey == 'T') {
         m_title.push_back(value);
     }
+    else if (dataKey == 'V') {
+      LogWarning("ABC input: multi-voice music is not supported");
+    }
     else if (dataKey == 'X') {
         parseReferenceNumber(value);
     }
@@ -737,7 +738,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // chords
-        else if (musicCode[i] == '[' && !isdigit(musicCode[i + 1]) && musicCode[i + 2] != ':') {
+        else if (musicCode[i] == '[' && pitch.find(toupper(musicCode[i+1])) != std::string::npos) {
             // start chord
             chord = new Chord();
         }
@@ -754,10 +755,10 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // grace notes
-        else if ((musicCode[i] == '\{') || (musicCode[i] == '}')) {
+        else if ((musicCode[i] == '{') || (musicCode[i] == '}')) {
             // !to be refined when graceGrp is added!
             // start grace group
-            if ((musicCode[i] == '\{')) {
+            if ((musicCode[i] == '{')) {
                 grace = GRACE_acc;
                 if ((musicCode[i + 1] == '/')) {
                     grace = GRACE_unacc;
@@ -765,8 +766,11 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 }
             }
             // end grace group
-            else
-                grace = GRACE_NONE;
+            else {
+              grace = GRACE_NONE;
+              if (m_gracecount > 1) AddBeam();
+              m_gracecount = 0;
+            }
         }
 
         // note
@@ -807,7 +811,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             // set duration
             std::string numStr, numbaseStr;
             int dots = 0;
-            if (m_broken < 0) {
+            if ((m_broken < 0) && (grace == GRACE_NONE)) {
                 dots = -m_broken;
                 m_broken = 0;
             }
@@ -842,6 +846,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
             // set grace
             if (grace != GRACE_NONE) {
+                ++m_gracecount;
                 note->SetGrace(grace);
                 // "The unit duration to use for gracenotes is not specified by the abc file"
                 // setting it to an eighth by default for now
@@ -866,10 +871,10 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             else {
                 if (dots > 0) note->SetDots(dots);
                 int dur = m_unitDur * numbase / num;
-                if (m_broken < 0) {
+                if ((m_broken < 0) && (grace == GRACE_NONE)) {
                     for (int i = 0; i != -m_broken; ++i) dur = dur * 2;
                 }
-                else if (!note->HasDots() && m_broken > 0) {
+                else if (!note->HasDots() && (m_broken > 0) && (grace == GRACE_NONE)) {
                     for (; m_broken != 0; --m_broken) dur = dur * 2;
                 }
                 note->SetDur(note->AttDurationLogical::StrToDuration(std::to_string(dur)));
