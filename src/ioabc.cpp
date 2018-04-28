@@ -74,9 +74,7 @@ AbcInput::AbcInput(Doc *doc, std::string filename) : FileInputStream(doc)
     m_filename = filename;
 }
 
-AbcInput::~AbcInput()
-{
-}
+AbcInput::~AbcInput() {}
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -110,14 +108,18 @@ void AbcInput::parseABC(std::istream &infile)
     m_doc->Reset();
     m_doc->SetType(Raw);
 
-    // find first tune
+    infile.getline(abcLine, 10000);
+
+    // read file header
     while (abcLine[0] != 'X') {
-        if (abcLine[0] == '%') {
-            // LogWarning("comment: %s", section);
-        }
         infile.getline(abcLine, 10000);
         m_lineNum++;
+        if (abcLine[1] == '%')
+            LogWarning("ABC input: Stylesheet directives are ignored");
+        else
+            readInformationField(abcLine[0], &abcLine[2]);
     }
+
     // read tune header
     readInformationField('X', &abcLine[2]);
     // create score
@@ -130,11 +132,11 @@ void AbcInput::parseABC(std::istream &infile)
         readInformationField(abcLine[0], &abcLine[2]);
     }
     if (m_meter) {
-      m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
-      m_doc->m_scoreDef.SetMeterUnit(m_meter->GetUnit());
-      m_doc->m_scoreDef.SetMeterSym(m_meter->GetSym());
-      delete m_meter;
-      m_meter = NULL;
+        m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
+        m_doc->m_scoreDef.SetMeterUnit(m_meter->GetUnit());
+        m_doc->m_scoreDef.SetMeterSym(m_meter->GetSym());
+        delete m_meter;
+        m_meter = NULL;
     }
     // create section
     Section *section = new Section();
@@ -148,12 +150,13 @@ void AbcInput::parseABC(std::istream &infile)
     if (m_durDefault == DURATION_NONE) {
         calcUnitNoteLength();
     }
+
     // read music code
     while (!infile.eof()) {
         infile.getline(abcLine, 10000);
         ++m_lineNum;
         if (abcLine[0] == 'X') {
-            LogDebug("Reading only first tune in file");
+            LogDebug("ABC input: Reading only first tune in file");
             break;
         }
         else if (abcLine[1] == ':' && abcLine[0] != '|') {
@@ -568,9 +571,14 @@ void AbcInput::printInformationFields()
         Rend *compRend = new Rend();
         compRend->SetHalign(HORIZONTALALIGNMENT_right);
         compRend->SetValign(VERTICALALIGNMENT_bottom);
-        Text *text = new Text();
-        text->SetText(UTF8to16(*it));
-        compRend->AddChild(text);
+        Text *composer = new Text();
+        composer->SetText(UTF8to16(*it));
+        compRend->AddChild(composer);
+        if (!m_origin.empty()) {
+            Text *origin = new Text();
+            origin->SetText(UTF8to16(" (" + m_origin.front() + ")"));
+            compRend->AddChild(origin);
+        }
         pgHead->AddChild(compRend);
     }
     m_doc->m_scoreDef.AddChild(pgHead);
@@ -641,6 +649,7 @@ void AbcInput::readInformationField(char dataKey, std::string value)
         value = value.substr(0, value.find('%'));
     }
     while (isspace(value[value.length() - 1])) value.pop_back();
+    if (value.empty()) return;
 
     if (dataKey == 'C') {
         m_composer.push_back(value);
@@ -658,7 +667,7 @@ void AbcInput::readInformationField(char dataKey, std::string value)
         parseMeter(value);
     }
     else if (dataKey == 'O') {
-        if (!m_composer.empty()) m_composer[0] = m_composer[0] + " (" + value + ")";
+        m_origin.push_back(value);
     }
     else if (dataKey == 'Q') {
         parseTempo(value);
@@ -667,13 +676,13 @@ void AbcInput::readInformationField(char dataKey, std::string value)
         m_title.push_back(value);
     }
     else if (dataKey == 'V') {
-      LogWarning("ABC input: multi-voice music is not supported");
+        LogWarning("ABC input: Multi-voice music is not supported");
     }
     else if (dataKey == 'X') {
         parseReferenceNumber(value);
     }
     else
-        LogWarning("ABC input: information field %c is ignored", dataKey);
+        LogWarning("ABC input: Information field %c is ignored", dataKey);
 }
 
 //////////////////////////////
@@ -738,7 +747,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // chords
-        else if (musicCode[i] == '[' && pitch.find(toupper(musicCode[i+1])) != std::string::npos) {
+        else if (musicCode[i] == '[' && pitch.find(toupper(musicCode[i + 1])) != std::string::npos) {
             // start chord
             chord = new Chord();
         }
@@ -767,9 +776,9 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             }
             // end grace group
             else {
-              grace = GRACE_NONE;
-              if (m_gracecount > 1) AddBeam();
-              m_gracecount = 0;
+                grace = GRACE_NONE;
+                if (m_gracecount > 1) AddBeam();
+                m_gracecount = 0;
             }
         }
 
