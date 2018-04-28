@@ -100,6 +100,7 @@ private:
     int m_gracecount = 0;
     std::vector<std::string> m_title;
     std::vector<std::string> m_composer;
+    std::vector<std::string> m_history;
     std::vector<std::string> m_origin;
 
     std::vector<ControlElement *> m_controlElements;

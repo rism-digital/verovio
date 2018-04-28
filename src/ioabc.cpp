@@ -108,12 +108,11 @@ void AbcInput::parseABC(std::istream &infile)
     m_doc->Reset();
     m_doc->SetType(Raw);
 
-    infile.getline(abcLine, 10000);
-
     // read file header
     while (abcLine[0] != 'X') {
         infile.getline(abcLine, 10000);
         m_lineNum++;
+        if (abcLine[0] == 'X') break;
         if (abcLine[1] == '%')
             LogWarning("ABC input: Stylesheet directives are ignored");
         else
@@ -131,6 +130,14 @@ void AbcInput::parseABC(std::istream &infile)
         m_lineNum++;
         readInformationField(abcLine[0], &abcLine[2]);
     }
+    // create page head
+    printInformationFields();
+    StaffGrp *staffGrp = new StaffGrp();
+    m_doc->m_scoreDef.AddChild(staffGrp);
+    StaffDef *staffDef = new StaffDef();
+    staffDef->SetN(1);
+    staffDef->SetLines(5);
+    staffGrp->AddChild(staffDef);
     if (m_meter) {
         m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
         m_doc->m_scoreDef.SetMeterUnit(m_meter->GetUnit());
@@ -144,8 +151,6 @@ void AbcInput::parseABC(std::istream &infile)
     // start with a new page
     Pb *pb = new Pb();
     section->AddChild(pb);
-    // create page head
-    printInformationFields();
     // calculate default unit note length
     if (m_durDefault == DURATION_NONE) {
         calcUnitNoteLength();
@@ -542,12 +547,6 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
         m_mdiv->SetN(std::to_string(mdivNum));
     }
     m_doc->AddChild(m_mdiv);
-    StaffGrp *staffGrp = new StaffGrp();
-    m_doc->m_scoreDef.AddChild(staffGrp);
-    StaffDef *staffDef = new StaffDef();
-    staffDef->SetN(1);
-    staffDef->SetLines(5);
-    staffGrp->AddChild(staffDef);
 }
 
 void AbcInput::printInformationFields()
@@ -619,15 +618,27 @@ void AbcInput::createHeader()
     pugi::xml_node work = workDesc.append_child("work");
     work.append_attribute("n").set_value(m_mdiv->GetN().c_str());
     work.append_attribute("data").set_value(StringFormat("#%s", m_mdiv->GetUuid().c_str()).c_str());
-    pugi::xml_node workTitleStmt = work.append_child("titleStmt");
     for (auto it = m_title.begin(); it != m_title.end(); ++it) {
-        pugi::xml_node workTitle = workTitleStmt.append_child("title");
+        pugi::xml_node workTitle = work.append_child("title");
         workTitle.text().set((*it).c_str());
         if (it == m_title.begin()) {
             workTitle.append_attribute("type").set_value("main");
         }
         else {
             workTitle.append_attribute("type").set_value("alternative");
+        }
+    }
+    if (!m_composer.empty()) {
+        for (auto it = m_composer.begin(); it != m_composer.end(); ++it) {
+            pugi::xml_node composer = work.append_child("composer");
+            composer.text().set((*it).c_str());
+        }
+    }
+    if (!m_history.empty()) {
+        pugi::xml_node workHistory = work.append_child("history");
+        for (auto it = m_history.begin(); it != m_history.end(); ++it) {
+            pugi::xml_node histLine = workHistory.append_child("p");
+            histLine.text().set((*it).c_str());
         }
     }
 }
@@ -653,6 +664,9 @@ void AbcInput::readInformationField(char dataKey, std::string value)
 
     if (dataKey == 'C') {
         m_composer.push_back(value);
+    }
+    else if (dataKey == 'H') {
+        m_history.push_back(value);
     }
     else if (dataKey == 'I') {
         parseInstruction(value);
