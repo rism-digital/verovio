@@ -1374,6 +1374,7 @@ void MeiOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
     WriteLayerElement(currentNode, keySig);
     keySig->WriteAccidental(currentNode);
     keySig->WritePitch(currentNode);
+    keySig->WriteKeySigAnl(currentNode);
 }
 
 void MeiOutput::WriteLigature(pugi::xml_node currentNode, Ligature *ligature)
@@ -3916,6 +3917,7 @@ bool MeiInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
 
     vrvKeySig->ReadAccidental(keySig);
     vrvKeySig->ReadPitch(keySig);
+    vrvKeySig->ReadKeySigAnl(keySig);
 
     // special processing required
     vrvKeySig->ConvertToInternal();
