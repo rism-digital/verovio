@@ -601,6 +601,9 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
 
     params->m_currentScoreTime = 0.0;
     params->m_currentRealTimeSeconds = 0.0;
+    
+    params->m_currentMensur = GetCurrentMensur();
+    params->m_currentMeterSig = GetCurrentMeterSig();
 
     return FUNCTOR_CONTINUE;
 }

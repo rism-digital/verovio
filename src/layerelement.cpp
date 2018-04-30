@@ -1275,7 +1275,8 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
     double incrementScoreTime;
 
     if (this->Is(REST) || this->Is(SPACE)) {
-        double incrementScoreTime = GetAlignmentDuration() / (DUR_MAX / DURATION_4);
+        incrementScoreTime = this->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         params->m_currentScoreTime += incrementScoreTime;
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
@@ -1291,10 +1292,10 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         // If the note has a @dur or a @dur.ges, take it into account
         // This means that overwriting only @dots or @dots.ges will not be taken into account
         if (chord && !note->HasDur() && !note->HasDurGes()) {
-            incrementScoreTime = chord->GetAlignmentDuration();
+            incrementScoreTime = chord->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         }
         else {
-            incrementScoreTime = note->GetAlignmentDuration();
+            incrementScoreTime = note->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         }
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
@@ -1318,7 +1319,8 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         BeatRpt *rpt = dynamic_cast<BeatRpt *>(this);
         assert(rpt);
 
-        double incrementScoreTime = rpt->GetAlignmentDuration() / (DUR_MAX / DURATION_4);
+        incrementScoreTime = rpt->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         rpt->SetScoreTimeOnset(params->m_currentScoreTime);
         params->m_currentScoreTime += incrementScoreTime;
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
