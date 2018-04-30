@@ -36,6 +36,8 @@
 #include "jsonxx.h"
 #include "unchecked.h"
 
+using namespace std;
+
 namespace vrv {
 
 const char *UTF_16_BE_BOM = "\xFE\xFF";
