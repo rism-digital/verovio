@@ -149,6 +149,7 @@ void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
 
     params.m_y -= ((descender + height) * 1.1);
     params.m_newLine = true;
+    params.m_laidOut = true;
 
     dc->EndTextGraphic(lb, this);
 }

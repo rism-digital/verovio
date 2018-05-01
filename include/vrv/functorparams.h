@@ -386,11 +386,12 @@ public:
  * member 1: the time
  * member 2: the current Mensur
  * member 3: the current MeterSig
- * member 4: the functor for passing it to the TimeStampAligner
- * member 5: a flag indicating whereas we are processing the caution scoreDef
- * member 6: a flag indicating is we are in the first measure (for the scoreDef role)
- * member 7: a flag indicating if we had mutliple layer alignment reference in the measure
- * member 8: the doc
+ * member 4: the current notation type
+ * member 5: the functor for passing it to the TimeStampAligner
+ * member 6: a flag indicating whereas we are processing the caution scoreDef
+ * member 7: a flag indicating is we are in the first measure (for the scoreDef role)
+ * member 8: a flag indicating if we had mutliple layer alignment reference in the measure
+ * member 9: the doc
  **/
 
 class AlignHorizontallyParams : public FunctorParams {
@@ -588,6 +589,10 @@ public:
 /**
  * member 0: double: the current score time in the measure (incremented by each element)
  * member 1: double: the current real time in seconds in the measure (incremented by each element)
+ * member 2: the current Mensur
+ * member 3: the current MeterSig
+ * member 4: the current notation type
+ * member 5: the current tempo
  **/
 
 class CalcOnsetOffsetParams : public FunctorParams {
@@ -596,10 +601,16 @@ public:
     {
         m_currentScoreTime = 0.0;
         m_currentRealTimeSeconds = 0.0;
+        m_currentMensur = NULL;
+        m_currentMeterSig = NULL;
+        m_notationType = NOTATIONTYPE_cmn;
         m_currentTempo = 120;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
+    Mensur *m_currentMensur;
+    MeterSig *m_currentMeterSig;
+    data_NOTATIONTYPE m_notationType;
     int m_currentTempo;
 };
 
