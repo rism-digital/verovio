@@ -923,6 +923,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             // set duration
             std::string numStr, numbaseStr;
             int dots = 0;
+            int numbase = 1;
             if (musicCode[i + 1] == '>') {
                 ++i;
                 LogWarning("ABC input: Broken rhythms not supported");
@@ -939,7 +940,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 }
             }
             int num = (numStr.empty()) ? 1 : std::atoi(numStr.c_str());
-            int numbase = (numbaseStr.empty()) ? 1 : std::atoi(numbaseStr.c_str());
+            numbase = (numbaseStr.empty()) ? numbase : std::atoi(numbaseStr.c_str());
             while ((num & (num - 1)) != 0) {
                 dots++;
                 // won't work for num > 12
@@ -964,6 +965,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             // set duration
             std::string numStr, numbaseStr;
             int dots = 0;
+            int numbase = 1;
             if (musicCode[i + 1] == '>') {
                 ++i;
                 LogWarning("ABC input: Broken rhythms not supported");
@@ -980,7 +982,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 }
             }
             int num = (numStr.empty()) ? 1 : std::atoi(numStr.c_str());
-            int numbase = (numbaseStr.empty()) ? 1 : std::atoi(numbaseStr.c_str());
+            numbase = (numbaseStr.empty()) ? numbase : std::atoi(numbaseStr.c_str());
             while ((num & (num - 1)) != 0) {
                 dots++;
                 // won't work for num > 12
@@ -1056,7 +1058,10 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             // add stacked elements to layer
             AddBeam();
             if (musicCode[i + 1] == ':')
-                measure->SetLeft(BARRENDITION_rptstart);
+                if (!m_layer->FindChildByType(NOTE))
+                    measure->SetLeft(BARRENDITION_rptstart);
+                else
+                    measure->SetRight(BARRENDITION_rptstart);
             else {
                 if (musicCode[i - 1] == ':')
                     measure->SetRight(BARRENDITION_rptend);
@@ -1073,9 +1078,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 staff->AddChild(m_layer);
                 measure->AddChild(staff);
                 if (!m_harmStack.empty()) {
-                    std::vector<Harm *>::iterator iter;
-                    for (iter = m_harmStack.begin(); iter != m_harmStack.end(); iter++) {
-                        measure->AddChild(*iter);
+                    for (auto it = m_harmStack.begin(); it != m_harmStack.end(); ++it) {
+                        measure->AddChild(*it);
                     }
                     m_harmStack.clear();
                 }
@@ -1102,7 +1106,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
     // by default, line-breaks in the code generate line-breaks in the typeset score
     // has to be refined later
-    if (sysBreak && (m_linebreak == '\n')) {
+    if (sysBreak) {
         Sb *sb = new Sb();
         section->AddChild(sb);
     }
