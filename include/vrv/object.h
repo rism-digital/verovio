@@ -650,6 +650,16 @@ public:
      * Adjust the x position of accidental.
      */
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    
+    /**
+     * Adjust the x position of a right barline in order to make sure the is no text content
+     * overlflowing in the right margin
+     */
+    ///@{
+    virtual int AdjustXOverflow(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustXOverflowEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
 
     /**
      * Lay out the X positions of the staff content looking at the bounding boxes.

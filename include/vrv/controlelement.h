@@ -44,6 +44,11 @@ public:
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     * See Object::AdjustXOverflow
+     */
+    virtual int AdjustXOverflow(FunctorParams *functorParams);
 
 private:
     //

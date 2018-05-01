@@ -296,6 +296,26 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
 
     return FUNCTOR_SIBLINGS;
 }
+    
+int System::AdjustXOverflow(FunctorParams *functorParams)
+{
+    AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
+    assert(params);
+    
+    params->m_currentSystem = this;
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+int System::AdjustXOverflowEnd(FunctorParams *functorParams)
+{
+    AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
+    assert(params);
+    
+    //params->m_lastMeasure = this;
+
+    return FUNCTOR_CONTINUE;
+}
 
 int System::AdjustYPos(FunctorParams *functorParams)
 {

@@ -744,6 +744,16 @@ int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::AdjustXOverflow(FunctorParams *functorParams)
+{
+    AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
+    assert(params);
+    
+    params->m_lastMeasure = this;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::SetAlignmentXPos(FunctorParams *functorParams)
 {
     SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
