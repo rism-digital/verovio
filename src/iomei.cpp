@@ -462,6 +462,10 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("multiRpt");
         WriteMultiRpt(m_currentNode, dynamic_cast<MultiRpt *>(object));
     }
+    else if (object->Is(NC)) {
+        m_currentNode = m_currentNode.append_child("nc");
+        WriteNc(m_currentNode, dynamic_cast<Nc *>(object));
+    }
     else if (object->Is(NEUME)) {
         m_currentNode = m_currentNode.append_child("neume");
         WriteNeume(m_currentNode, dynamic_cast<Neume *>(object));
@@ -1396,6 +1400,18 @@ void MeiOutput::WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt)
 
     WriteLayerElement(currentNode, multiRpt);
     multiRpt->WriteNumbered(currentNode);
+}
+
+void MeiOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
+{
+    assert(nc);
+
+    WriteDurationInterface(currentNode, nc);
+    WritePitchInterface(currentNode, nc);
+    WritePositionInterface(currentNode, nc);
+
+    WriteLayerElement(currentNode, nc);
+    nc->WriteColor(currentNode);;
 }
 
 void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
