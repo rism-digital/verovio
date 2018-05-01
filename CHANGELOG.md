@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+* Improvement of MIDI output for mensural notation
 * Support for `@stem.visible` on `<note>` and `<chord>`
 * Fix for Plaine & Easie chords and ties
 * Fix for Plaine & Easie dots in mensural notation
