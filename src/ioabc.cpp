@@ -352,13 +352,13 @@ void AbcInput::parseInstruction(std::string instruction)
 void AbcInput::parseKey(std::string keyString)
 {
     int i = 0;
-    int accidNum = 0;
+    short int accidNum = 0;
     data_MODE mode = MODE_NONE;
     while (isspace(keyString[i])) ++i;
 
     // set key.pname
     if (pitch.find(keyString[i]) != std::string::npos) {
-        accidNum = pitch.find(keyString[i]) - 1;
+        accidNum = int(pitch.find(keyString[i])) - 1;
         keyString[i] = tolower(keyString[i]);
         m_doc->m_scoreDef.SetKeyPname((m_doc->m_scoreDef).AttKeySigDefaultLog::StrToPitchname(keyString.substr(i, 1)));
         ++i;
@@ -834,6 +834,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             // set duration
             std::string numStr, numbaseStr;
             int dots = 0;
+            int numbase = 1;
             if ((m_broken < 0) && (grace == GRACE_NONE)) {
                 dots = -m_broken;
                 m_broken = 0;
@@ -851,15 +852,16 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 ++i;
                 numStr.push_back(musicCode[i]);
             }
-            if (musicCode[i + 1] == '/') {
+            while (musicCode[i + 1] == '/') {
                 ++i;
-                while (isdigit(musicCode[i + 1])) {
-                    ++i;
-                    numbaseStr.push_back(musicCode[i]);
-                }
+                numbase *= 2;
+            }
+            while (isdigit(musicCode[i + 1])) {
+                ++i;
+                numbaseStr.push_back(musicCode[i]);
             }
             int num = (numStr.empty()) ? 1 : std::atoi(numStr.c_str());
-            int numbase = (numbaseStr.empty()) ? 1 : std::atoi(numbaseStr.c_str());
+            numbase = (numbaseStr.empty()) ? numbase : std::atoi(numbaseStr.c_str());
             while ((num & (num - 1)) != 0) {
                 dots++;
                 // won't work for num > 12
