@@ -72,6 +72,7 @@ std::string shorthandDecoration = ".~HLMOPSTuv";
 AbcInput::AbcInput(Doc *doc, std::string filename) : FileInputStream(doc)
 {
     m_filename = filename;
+    m_hasLayoutInformation = true;
 }
 
 AbcInput::~AbcInput() {}
@@ -149,8 +150,10 @@ void AbcInput::parseABC(std::istream &infile)
     Section *section = new Section();
     score->AddChild(section);
     // start with a new page
-    Pb *pb = new Pb();
-    section->AddChild(pb);
+    if (m_linebreak != '\0') {
+      Pb *pb = new Pb();
+      section->AddChild(pb);
+    }
     // calculate default unit note length
     if (m_durDefault == DURATION_NONE) {
         calcUnitNoteLength();
@@ -341,8 +344,12 @@ void AbcInput::parseInstruction(std::string instruction)
     if (!strncmp(instruction.c_str(), "abc-include", 11)) {
         LogWarning("ABC input: Include field is ignored");
     }
-    else if (!strncmp(instruction.c_str(), "linebreak", 8)) {
-        LogWarning("ABC input: Default linebreaks are used for now.");
+    else if (!strncmp(instruction.c_str(), "linebreak", 9)) {
+        if (instruction.find("<none>") != std::string::npos) {
+            m_linebreak = '\0';
+            m_hasLayoutInformation = false;
+        }
+        else LogWarning("ABC input: Default linebreaks are used for now.");
     }
     else if (!strncmp(instruction.c_str(), "decoration", 10)) {
         m_decoration = instruction[11];
@@ -1106,7 +1113,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
     // by default, line-breaks in the code generate line-breaks in the typeset score
     // has to be refined later
-    if (sysBreak) {
+    if (sysBreak && (m_linebreak != '\0')) {
         Sb *sb = new Sb();
         section->AddChild(sb);
     }
