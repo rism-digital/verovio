@@ -425,10 +425,10 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     score->AddChild(section);
     // initialize layout
     if (root.select_single_node("/score-partwise/identification/encoding/supports[@element='print']")) {
-      m_hasLayoutInformation = true;
-      // always start with a new page
-      Pb *pb = new Pb();
-      section->AddChild(pb);
+        m_hasLayoutInformation = true;
+        // always start with a new page
+        Pb *pb = new Pb();
+        section->AddChild(pb);
     }
 
     std::vector<StaffGrp *> m_staffGrpStack;
