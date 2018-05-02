@@ -490,11 +490,19 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     params->m_classId = DIR;
     m_systemAligner.Process(params->m_functor, params);
 
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(DIR);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+
     params->m_classId = TEMPO;
     m_systemAligner.Process(params->m_functor, params);
 
     params->m_classId = PEDAL;
     m_systemAligner.Process(params->m_functor, params);
+
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(PEDAL);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
 
     params->m_classId = HARM;
     m_systemAligner.Process(params->m_functor, params);
