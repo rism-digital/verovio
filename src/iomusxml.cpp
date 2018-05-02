@@ -413,16 +413,19 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
     ReadMusicXmlTitle(root);
 
-    // The mdiv
+    // the mdiv
     Mdiv *mdiv = new Mdiv();
     mdiv->m_visibility = Visible;
     m_doc->AddChild(mdiv);
-    // The score
+    // the score
     Score *score = new Score();
     mdiv->AddChild(score);
     // the section
     Section *section = new Section();
     score->AddChild(section);
+    // always start with a new page
+    Pb *pb = new Pb();
+    section->AddChild(pb);
 
     std::vector<StaffGrp *> m_staffGrpStack;
     StaffGrp *staffGrp = new StaffGrp();
