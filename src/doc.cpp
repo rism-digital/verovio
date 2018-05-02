@@ -743,7 +743,7 @@ void Doc::CastOffDoc()
 
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
-    CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem);
+    CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this);
     castOffSystemsParams.m_systemWidth = this->m_drawingPageWidth - this->m_drawingPageMarginLeft
         - this->m_drawingPageMarginRight - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
     castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();

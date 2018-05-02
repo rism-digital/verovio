@@ -320,7 +320,8 @@ int System::AdjustXOverflowEnd(FunctorParams *functorParams)
     }
 
     // Continue if the right position of the measure is larger than the widest element right
-    if (params->m_lastMeasure->GetContentRight() > params->m_currentWidest->GetContentRight()) {
+    int measureRightX = params->m_lastMeasure->GetDrawingX() + params->m_lastMeasure->GetWidth();
+    if (measureRightX > params->m_currentWidest->GetContentRight()) {
         return FUNCTOR_CONTINUE;
     }
     
@@ -333,10 +334,12 @@ int System::AdjustXOverflowEnd(FunctorParams *functorParams)
     if (objectXMeasure != params->m_lastMeasure) {
         left = params->m_lastMeasure->GetLeftBarLine()->GetAlignment();
     }
-        
-    int overflow = params->m_currentWidest->GetContentRight() - params->m_lastMeasure->GetRightBarLineRight();
-    ArrayOfAdjustmentTuples boundaries{ std::make_tuple(left, params->m_lastMeasure->GetRightBarLine()->GetAlignment(), overflow) };
-    params->m_lastMeasure->m_measureAligner.AdjustProportionally(boundaries);
+    
+    int overflow = params->m_currentWidest->GetContentRight() - measureRightX;
+    if (overflow > 0) {
+        ArrayOfAdjustmentTuples boundaries{ std::make_tuple(left, params->m_lastMeasure->GetRightBarLine()->GetAlignment(), overflow) };
+        params->m_lastMeasure->m_measureAligner.AdjustProportionally(boundaries);
+    }
 
     return FUNCTOR_CONTINUE;
 }

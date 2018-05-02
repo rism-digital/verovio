@@ -153,6 +153,12 @@ public:
      * Return the center x of the inner of the measure
      */
     int GetInnerCenterX() const;
+                    
+    /**
+     * Return the right overlow of the control events in the measure.
+     * Takes into account Dir, Dynam, and Tempo.
+     */
+    int GetDrawingOverflow();
 
     /**
      * @name Setter and getter of the drawing scoreDef

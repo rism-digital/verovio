@@ -753,11 +753,12 @@ public:
  * member 4: the system width
  * member 5: the current scoreDef width
  * member 6: the current pending objects (ScoreDef, Endings, etc.) to be place at the beginning of a system
+ * member 7: the doc
  **/
 
 class CastOffSystemsParams : public FunctorParams {
 public:
-    CastOffSystemsParams(System *contentSystem, Page *page, System *currentSystem)
+    CastOffSystemsParams(System *contentSystem, Page *page, System *currentSystem, Doc *doc)
     {
         m_contentSystem = contentSystem;
         m_page = page;
@@ -765,6 +766,7 @@ public:
         m_shift = 0;
         m_systemWidth = 0;
         m_currentScoreDefWidth = 0;
+        m_doc = doc;
     }
     System *m_contentSystem;
     Page *m_page;
@@ -773,6 +775,7 @@ public:
     int m_systemWidth;
     int m_currentScoreDefWidth;
     ArrayOfObjects m_pendingObjects;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
