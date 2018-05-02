@@ -270,7 +270,7 @@ typedef std::vector<TextElement *> ArrayOfTextElements;
 typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
 
 typedef std::map<std::string, Option *> MapOfStrOptions;
-    
+
 typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
 
 //----------------------------------------------------------------------------

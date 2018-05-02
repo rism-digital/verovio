@@ -136,7 +136,7 @@ public:
      * See Object::AlignHorizontally
      */
     virtual int AlignHorizontally(FunctorParams *functorParams);
-    
+
     /**
      * See Object::AdjustXOverflow
      */

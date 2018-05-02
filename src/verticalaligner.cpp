@@ -84,13 +84,13 @@ StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) const
     LogDebug("Staff alignment for staff %d not found", staffN);
     return NULL;
 }
-    
+
 void SystemAligner::FindAllPositionerPointingTo(ArrayOfFloatingPositioners *positioners, FloatingObject *object)
 {
     assert(positioners);
-    
+
     positioners->clear();
-    
+
     StaffAlignment *alignment = NULL;
     int i;
     for (i = 0; i < this->GetChildCount(); ++i) {
@@ -101,7 +101,6 @@ void SystemAligner::FindAllPositionerPointingTo(ArrayOfFloatingPositioners *posi
             positioners->push_back(positioner);
         }
     }
-    
 }
 
 //----------------------------------------------------------------------------

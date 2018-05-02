@@ -657,7 +657,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     int x2 = x + m_doc->GetDrawingBeamWidth(100, false) + barLineWidth;
     // optimized for five line staves
     int dashLength = m_doc->GetDrawingUnit(100) * 8 / 13;
-    
+
     if (barLine->GetForm() == BARRENDITION_single) {
         DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth);
     }

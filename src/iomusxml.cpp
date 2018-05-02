@@ -505,7 +505,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 }
                 if (midiInstrument) {
                     InstrDef *instrdef = new InstrDef;
-                    instrdef->SetMidiInstrname(instrdef->AttMidiInstrument::StrToMidinames(midiName.node().text().as_string()));
+                    instrdef->SetMidiInstrname(
+                        instrdef->AttMidiInstrument::StrToMidinames(midiName.node().text().as_string()));
                     if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int() - 1);
                     // if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
                     if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int() - 1);

@@ -44,7 +44,7 @@ public:
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * See Object::AdjustXOverflow
      */

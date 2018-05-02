@@ -58,7 +58,7 @@ public:
      * Return NULL if not found.
      */
     StaffAlignment *GetStaffAlignmentForStaffN(int staffN) const;
-    
+
     /**
      * Find all the positioners pointing to an object;
      */

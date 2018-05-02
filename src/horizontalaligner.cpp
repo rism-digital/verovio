@@ -228,7 +228,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
     assert(doc);
     assert(alignment);
     assert(alignment->GetType() == ALIGNMENT_GRACENOTE);
-    
+
     int graceAlignerId = doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staffN;
     assert(alignment->HasGraceAligner(graceAlignerId));
 
@@ -439,7 +439,7 @@ void Alignment::Reset()
     m_xRel = 0;
     m_time = 0.0;
     m_type = ALIGNMENT_DEFAULT;
-    
+
     ClearGraceAligners();
 }
 
@@ -456,7 +456,7 @@ void Alignment::ClearGraceAligners()
     }
     m_graceAligners.clear();
 }
-    
+
 void Alignment::AddChild(Object *child)
 {
     assert(dynamic_cast<AlignmentReference *>(child));
@@ -563,7 +563,7 @@ GraceAligner *Alignment::GetGraceAligner(int id)
     }
     return m_graceAligners[id];
 }
-    
+
 bool Alignment::HasGraceAligner(int id) const
 {
     return (m_graceAligners.count(id) == 1);
@@ -856,12 +856,12 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
             filters.push_back(&matchStaff);
-            
+
             int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : *iter;
 
             if (HasGraceAligner(graceAlignerId)) {
-                GetGraceAligner(graceAlignerId)->Process(
-                    params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
+                GetGraceAligner(graceAlignerId)
+                    ->Process(params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
 
                 // There was not grace notes for that staff
                 if (params->m_graceCumulatedXShift == VRV_UNSET) continue;

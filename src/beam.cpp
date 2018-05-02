@@ -136,7 +136,7 @@ void BeamDrawingParams::CalcBeam(
         }
         else {
             (*beamElementCoords).at(i)->m_y = (*beamElementCoords).at(i)->m_element->GetDrawingY();
-            
+
             curY = (*beamElementCoords).at(i)->m_element->GetDrawingY();
             (*beamElementCoords).at(i)->m_yTop = curY;
             (*beamElementCoords).at(i)->m_yBottom = curY;
@@ -258,7 +258,7 @@ void BeamDrawingParams::CalcBeam(
             // Here we need to take into account the bounding box of the rest
             continue;
         }
-        
+
         oldYPos = (*beamElementCoords).at(i)->m_yBeam;
         expectedY = this->m_startingY + verticalAdjustment
             + this->m_beamSlope * ((*beamElementCoords).at(i)->m_x - this->m_startingX);

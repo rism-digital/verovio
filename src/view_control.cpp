@@ -424,7 +424,7 @@ void View::DrawOctave(
 
     /************** parent layers **************/
 
-    LayerElement *start  = dynamic_cast<LayerElement *>(octave->GetStart());
+    LayerElement *start = dynamic_cast<LayerElement *>(octave->GetStart());
     LayerElement *end = dynamic_cast<LayerElement *>(octave->GetEnd());
 
     if (!start || !end) {
@@ -437,7 +437,7 @@ void View::DrawOctave(
     if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) {
         x1 += (m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2);
     }
-    
+
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
         if (octave->HasEndid()) {
             x2 += (m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2);
@@ -1234,7 +1234,7 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
 
     int dist = abs(p2->x - p1->x);
     float posXRatio = 1.0;
-    
+
     ArrayOfLayerElementPointPairs::iterator itPoint;
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
         int y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
@@ -2143,7 +2143,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
 
     // just as without a dir attribute
     if (!pedal->HasDir()) return;
-    
+
     dc->StartGraphic(pedal, "", pedal->GetUuid());
 
     int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
@@ -2163,11 +2163,12 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
         x -= bounceOffset.m_width;
     }
     if (pedal->GetDir() != pedalLog_DIR_up) {
-        if (pedal->GetFunc() == "sostenuto") code = SMUFL_E659_keyboardPedalSost;
-        else code = SMUFL_E650_keyboardPedalPed;
+        if (pedal->GetFunc() == "sostenuto")
+            code = SMUFL_E659_keyboardPedalSost;
+        else
+            code = SMUFL_E650_keyboardPedalPed;
     }
     str.push_back(code);
-    
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);

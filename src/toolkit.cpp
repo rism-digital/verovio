@@ -1046,7 +1046,7 @@ bool Toolkit::GetHumdrumFile(const std::string &filename)
     return true;
 }
 
-    void Toolkit::GetHumdrum(std::ostream &output)
+void Toolkit::GetHumdrum(std::ostream &output)
 {
     output << GetHumdrumBuffer();
 }

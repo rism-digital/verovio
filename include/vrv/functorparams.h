@@ -13,7 +13,7 @@
 #include "vrvdef.h"
 
 namespace smf {
-    class MidiFile;
+class MidiFile;
 }
 
 namespace vrv {
@@ -304,7 +304,7 @@ public:
     Syl *m_previousSyl;
     Doc *m_doc;
 };
-    
+
 //----------------------------------------------------------------------------
 // AdjustXOverflowParams
 //----------------------------------------------------------------------------

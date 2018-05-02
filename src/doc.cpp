@@ -342,7 +342,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             }
             // set MIDI time signature
             if (this->m_scoreDef.HasMeterCount()) {
-                midiFile->addTimeSignature(midiTrack, 0, this->m_scoreDef.GetMeterCount(), this->m_scoreDef.GetMeterUnit());
+                midiFile->addTimeSignature(
+                    midiTrack, 0, this->m_scoreDef.GetMeterCount(), this->m_scoreDef.GetMeterUnit());
             }
         }
 
@@ -389,8 +390,8 @@ bool Doc::ExportTimemap(std::string &output)
 }
 
 void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTimeToScoreTime,
-    std::map<int, std::vector<std::string> > &realTimeToOnElements, std::map<int, std::vector<std::string> > &realTimeToOffElements,
-    std::map<int, int> &realTimeToTempo)
+    std::map<int, std::vector<std::string> > &realTimeToOnElements,
+    std::map<int, std::vector<std::string> > &realTimeToOffElements, std::map<int, int> &realTimeToTempo)
 {
 
     int currentTempo = -1000;

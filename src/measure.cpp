@@ -269,7 +269,7 @@ int Measure::GetInnerCenterX() const
 {
     return (this->GetDrawingX() + this->GetLeftBarLineRight() + this->GetInnerWidth() / 2);
 }
-    
+
 int Measure::GetDrawingOverflow()
 {
     Functor adjustXOverlfow(&Object::AdjustXOverflow);
@@ -280,7 +280,7 @@ int Measure::GetDrawingOverflow()
     adjustXOverflowParams.m_lastMeasure = this;
     this->Process(&adjustXOverlfow, &adjustXOverflowParams, &adjustXOverlfowEnd);
     if (!adjustXOverflowParams.m_currentWidest) return 0;
-    
+
     int measureRightX = this->GetDrawingX() + this->GetWidth();
     int overflow = adjustXOverflowParams.m_currentWidest->GetContentRight() - measureRightX;
     return std::max(0, overflow);
@@ -662,22 +662,22 @@ int Measure::AdjustGraceXPos(FunctorParams *functorParams)
 
     m_measureAligner.PushAlignmentsRight();
     params->m_rightDefaultAlignment = NULL;
-    
+
     // We process it backward because we want to get the rightDefaultAlignment
     m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
-    
+
     // We need to process the staves in the reverse order
     std::vector<int> staffNs = params->m_staffNs;
     std::vector<int> staffNsReversed;
     staffNsReversed.resize(staffNs.size());
     std::reverse_copy(staffNs.begin(), staffNs.end(), staffNsReversed.begin());
-    
+
     m_measureAligner.PushAlignmentsRight();
     params->m_rightDefaultAlignment = NULL;
-    
+
     params->m_staffNs = staffNsReversed;
     m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
-    
+
     // Put params back
     params->m_staffNs = staffNs;
 
@@ -765,7 +765,7 @@ int Measure::AdjustXOverflow(FunctorParams *functorParams)
 {
     AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
     assert(params);
-    
+
     params->m_lastMeasure = this;
     // For now look only at the content of the last measure, so discard any previous control event.
     // We need to do this because AdjustXOverflow is run before measures are aligned, so the right
@@ -829,13 +829,13 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
-    
+
     // Check if the measure has some overlfowing control elements
     int overflow = this->GetDrawingOverflow();
 
     if (params->m_currentSystem->GetChildCount() > 0) {
         // We have overflowing content (dir, dynam, tempo) larger than 5 units, keep it as pending
-        if (overflow > (params->m_doc->GetDrawingUnit(100) *5)) {
+        if (overflow > (params->m_doc->GetDrawingUnit(100) * 5)) {
             Measure *measure = dynamic_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));
             assert(measure);
             // move as pending since we want it not to be broken with the next measure
@@ -844,7 +844,8 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
         // Break it if necessary
-        else if (this->m_drawingXRel + this->GetWidth() + params->m_currentScoreDefWidth - params->m_shift > params->m_systemWidth) {
+        else if (this->m_drawingXRel + this->GetWidth() + params->m_currentScoreDefWidth - params->m_shift
+            > params->m_systemWidth) {
             params->m_currentSystem = new System();
             params->m_page->AddChild(params->m_currentSystem);
             params->m_shift = this->m_drawingXRel;
