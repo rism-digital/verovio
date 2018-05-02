@@ -270,6 +270,11 @@ public:
     virtual int AdjustGraceXPos(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustXOverflow
+     */
+    virtual int AdjustXOverflow(FunctorParams *functorParams);
+                    
+    /**
      * See Object::AdjustXPos
      */
     virtual int AdjustXPos(FunctorParams *functorParams);

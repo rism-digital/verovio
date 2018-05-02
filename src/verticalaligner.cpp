@@ -84,6 +84,25 @@ StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) const
     LogDebug("Staff alignment for staff %d not found", staffN);
     return NULL;
 }
+    
+void SystemAligner::FindAllPositionerPointingTo(ArrayOfFloatingPositioners *positioners, FloatingObject *object)
+{
+    assert(positioners);
+    
+    positioners->clear();
+    
+    StaffAlignment *alignment = NULL;
+    int i;
+    for (i = 0; i < this->GetChildCount(); ++i) {
+        alignment = dynamic_cast<StaffAlignment *>(m_children.at(i));
+        assert(alignment);
+        FloatingPositioner *positioner = alignment->GetCorrespFloatingPositioner(object);
+        if (positioner && (positioner->GetObject() == object)) {
+            positioners->push_back(positioner);
+        }
+    }
+    
+}
 
 //----------------------------------------------------------------------------
 // StaffAlignment

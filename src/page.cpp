@@ -316,12 +316,19 @@ void Page::LayOutHorizontally()
     Functor adjustArpegEnd(&Object::AdjustArpegEnd);
     AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
     this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
-
+    
     // Adjust measure X position
     AlignMeasuresParams alignMeasuresParams;
     Functor alignMeasures(&Object::AlignMeasures);
     Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
     this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
+    
+    // Prevent a margin overflow
+    Functor adjustXOverlfow(&Object::AdjustXOverflow);
+    Functor adjustXOverlfowEnd(&Object::AdjustXOverflowEnd);
+    AdjustXOverflowParams adjustXOverflowParams;
+    this->Process(&adjustXOverlfow, &adjustXOverflowParams, &adjustXOverlfowEnd);
+
 }
 
 void Page::LayOutVertically()

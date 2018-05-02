@@ -136,6 +136,14 @@ public:
      * See Object::AlignHorizontally
      */
     virtual int AlignHorizontally(FunctorParams *functorParams);
+    
+    /**
+     * See Object::AdjustXOverflow
+     */
+    ///@{
+    virtual int AdjustXOverflow(FunctorParams *functorParams);
+    virtual int AdjustXOverflowEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::AlignVertically

@@ -304,6 +304,29 @@ public:
     Syl *m_previousSyl;
     Doc *m_doc;
 };
+    
+//----------------------------------------------------------------------------
+// AdjustXOverflowParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current system
+ * member 1: the last measure;
+ * member 2: the current widest control event
+ **/
+
+class AdjustXOverflowParams : public FunctorParams {
+public:
+    AdjustXOverflowParams()
+    {
+        m_currentSystem = NULL;
+        m_lastMeasure = NULL;
+        m_currentWidest = NULL;
+    }
+    System *m_currentSystem;
+    Measure *m_lastMeasure;
+    FloatingPositioner *m_currentWidest;
+};
 
 //----------------------------------------------------------------------------
 // AdjustXPosParams
