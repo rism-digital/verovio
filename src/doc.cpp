@@ -325,9 +325,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 instrdef = dynamic_cast<InstrDef *>(staffGrp->FindChildByType(INSTRDEF, 1));
             }
             if (instrdef) {
-                if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel() - 1;
+                if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel();
                 if (instrdef->HasMidiInstrnum())
-                    midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum() - 1);
+                    midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum());
             }
             // set MIDI track name
             Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
