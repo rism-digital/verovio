@@ -111,7 +111,7 @@ void AbcInput::parseABC(std::istream &infile)
     // read file header
     while (abcLine[0] != 'X') {
         infile.getline(abcLine, 10000);
-        m_lineNum++;
+        ++m_lineNum;
         if (abcLine[0] == 'X') break;
         if (abcLine[1] == '%')
             LogWarning("ABC input: Stylesheet directives are ignored");
@@ -127,7 +127,7 @@ void AbcInput::parseABC(std::istream &infile)
     m_mdiv->AddChild(score);
     while (abcLine[0] != 'K') {
         infile.getline(abcLine, 10000);
-        m_lineNum++;
+        ++m_lineNum;
         readInformationField(abcLine[0], &abcLine[2]);
     }
     // create page head
@@ -275,7 +275,7 @@ void AbcInput::AddBeam()
     else {
         Beam *beam = new Beam();
         std::vector<LayerElement *>::iterator iter;
-        for (iter = m_noteStack.begin(); iter != m_noteStack.end(); iter++) {
+        for (iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
             beam->AddChild(*iter);
         }
         m_layer->AddChild(beam);
@@ -291,7 +291,7 @@ void AbcInput::AddTuplet()
     else {
         Tuplet *tuplet = new Tuplet();
         std::vector<LayerElement *>::iterator iter;
-        for (iter = m_noteStack.begin(); iter != m_noteStack.end(); iter++) {
+        for (iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
             tuplet->AddChild(*iter);
         }
         m_layer->AddChild(tuplet);
@@ -863,7 +863,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             int num = (numStr.empty()) ? 1 : std::atoi(numStr.c_str());
             numbase = (numbaseStr.empty()) ? numbase : std::atoi(numbaseStr.c_str());
             while ((num & (num - 1)) != 0) {
-                dots++;
+                ++dots;
                 // won't work for num > 12
                 num = num - num / 3;
             }
@@ -942,7 +942,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             int num = (numStr.empty()) ? 1 : std::atoi(numStr.c_str());
             numbase = (numbaseStr.empty()) ? numbase : std::atoi(numbaseStr.c_str());
             while ((num & (num - 1)) != 0) {
-                dots++;
+                ++dots;
                 // won't work for num > 12
                 num = num - num / 3;
             }
@@ -984,7 +984,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             int num = (numStr.empty()) ? 1 : std::atoi(numStr.c_str());
             numbase = (numbaseStr.empty()) ? numbase : std::atoi(numbaseStr.c_str());
             while ((num & (num - 1)) != 0) {
-                dots++;
+                ++dots;
                 // won't work for num > 12
                 num = num - num / 3;
             }
