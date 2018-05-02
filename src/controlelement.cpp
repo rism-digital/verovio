@@ -67,7 +67,7 @@ int ControlElement::AdjustXOverflow(FunctorParams *functorParams)
     AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
     assert(params);
     
-    if (!this->Is({ DIR, TEMPO })) {
+    if (!this->Is({ DIR, DYNAM, TEMPO })) {
         return FUNCTOR_SIBLINGS;
     }
     
