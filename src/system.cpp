@@ -303,6 +303,8 @@ int System::AdjustXOverflow(FunctorParams *functorParams)
     assert(params);
     
     params->m_currentSystem = this;
+    params->m_lastMeasure = NULL;
+    params->m_currentWidest = NULL;
     
     return FUNCTOR_CONTINUE;
 }
@@ -312,7 +314,29 @@ int System::AdjustXOverflowEnd(FunctorParams *functorParams)
     AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
     assert(params);
     
-    //params->m_lastMeasure = this;
+    // Continue if no measure of not widest element
+    if (!params->m_lastMeasure || !params->m_currentWidest) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    // Continue if the right position of the measure is larger than the widest element right
+    if (params->m_lastMeasure->GetContentRight() > params->m_currentWidest->GetContentRight()) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    LayerElement *objectX = dynamic_cast<LayerElement *>(params->m_currentWidest->GetObjectX());
+    if (!objectX) {
+        return FUNCTOR_CONTINUE;
+    }
+    Alignment *left = objectX->GetAlignment();
+    Measure *objectXMeasure = dynamic_cast<Measure*>(objectX->GetFirstParent(MEASURE));
+    if (objectXMeasure != params->m_lastMeasure) {
+        left = params->m_lastMeasure->GetLeftBarLine()->GetAlignment();
+    }
+    
+    int overflow = params->m_currentWidest->GetContentRight() - params->m_lastMeasure->GetRightBarLineRight();
+    ArrayOfAdjustmentTuples boundaries{ std::make_tuple(left, params->m_lastMeasure->GetRightBarLine()->GetAlignment(), overflow) };
+    params->m_lastMeasure->m_measureAligner.AdjustProportionally(boundaries);
 
     return FUNCTOR_CONTINUE;
 }

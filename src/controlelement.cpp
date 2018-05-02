@@ -84,7 +84,7 @@ int ControlElement::AdjustXOverflow(FunctorParams *functorParams)
     }
     
     // Keep the one with the highest right position
-    for( auto const &positoner : positioners) {
+    for(auto const &positoner : positioners) {
         if (!params->m_currentWidest || (params->m_currentWidest->GetContentRight() < positoner->GetContentRight())) {
             params->m_currentWidest = positoner;
         }
