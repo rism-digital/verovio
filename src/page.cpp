@@ -328,6 +328,7 @@ void Page::LayOutHorizontally()
     Functor adjustXOverlfowEnd(&Object::AdjustXOverflowEnd);
     AdjustXOverflowParams adjustXOverflowParams;
     this->Process(&adjustXOverlfow, &adjustXOverflowParams, &adjustXOverlfowEnd);
+
 }
 
 void Page::LayOutVertically()

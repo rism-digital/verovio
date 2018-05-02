@@ -196,6 +196,7 @@ int Measure::GetDrawingX() const
 void Measure::SetDrawingXRel(int drawingXRel)
 {
     ResetCachedDrawingX();
+    m_timestampAligner.ResetCachedDrawingX();
     m_drawingXRel = drawingXRel;
 }
 
@@ -750,6 +751,11 @@ int Measure::AdjustXOverflow(FunctorParams *functorParams)
     assert(params);
     
     params->m_lastMeasure = this;
+    // For now look only at the content of the last measure, so discard any previous control event.
+    // We need to do this because AdjustXOverflow is run before measures are aligned, so the right
+    // position comparison do not actually tell us which one is the longest. This is not optimal
+    // and can be improved.
+    params->m_currentWidest = NULL;
 
     return FUNCTOR_CONTINUE;
 }
