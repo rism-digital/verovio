@@ -101,10 +101,6 @@ bool AbcInput::ImportString(std::string const &abc)
 
 void AbcInput::parseABC(std::istream &infile)
 {
-    // buffers
-    std::string music;
-    std::string s_key;
-
     // initialize doc
     m_doc->Reset();
     m_doc->SetType(Raw);
@@ -151,8 +147,8 @@ void AbcInput::parseABC(std::istream &infile)
     score->AddChild(section);
     // start with a new page
     if (m_linebreak != '\0') {
-      Pb *pb = new Pb();
-      section->AddChild(pb);
+        Pb *pb = new Pb();
+        section->AddChild(pb);
     }
     // calculate default unit note length
     if (m_durDefault == DURATION_NONE) {
