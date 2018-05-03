@@ -55,7 +55,6 @@ private:
     // parsing functions
     int getBarLine(const char *incipit, data_BARRENDITION *output, int index);
 
-    void addLayerElement(LayerElement *element);
     void calcUnitNoteLength();
     void AddBeam();
     void AddTuplet();

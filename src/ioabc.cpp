@@ -257,16 +257,6 @@ void AbcInput::calcUnitNoteLength()
     }
 }
 
-void AbcInput::addLayerElement(LayerElement *element)
-{
-    if (m_layerElements.size() > 0) {
-        m_layerElements.back()->AddChild(element);
-    }
-    else {
-        m_layer->AddChild(element);
-    }
-}
-
 void AbcInput::AddBeam()
 {
     if (!m_noteStack.size()) {
@@ -349,7 +339,11 @@ void AbcInput::parseInstruction(std::string instruction)
             m_linebreak = '\0';
             m_hasLayoutInformation = false;
         }
-        else LogWarning("ABC input: Default linebreaks are used for now.");
+        else {
+            m_linebreak = '$';
+            m_hasLayoutInformation = true;
+            LogWarning("ABC input: Default linebreaks are used for now.");
+        }
     }
     else if (!strncmp(instruction.c_str(), "decoration", 10)) {
         m_decoration = instruction[11];
@@ -804,7 +798,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // note
-        // getNote also creates a new note object
         else if (pitch.find(toupper(musicCode[i])) != std::string::npos) {
             int oct = 0;
             Note *note = new Note;
@@ -923,7 +916,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             }
         }
 
-        // Spaces
+        // spaces
         else if (musicCode[i] == 'x') {
             Space *space = new Space();
 
@@ -960,12 +953,12 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             m_noteStack.push_back(space);
         }
 
-        // Padding
+        // padding
         else if (musicCode[i] == 'y') {
             // Pad *pad = new Pad;
         }
 
-        // Rests
+        // rests
         else if (musicCode[i] == 'z') {
             Rest *rest = new Rest();
 
@@ -1002,7 +995,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             m_noteStack.push_back(rest);
         }
 
-        // Multi-measure rests
+        // multi-measure rests
         else if (musicCode[i] == 'Z') {
             MultiRest *multiRest = new MultiRest();
             std::string numString;
