@@ -5,13 +5,22 @@
     <meiHead>
         <fileDesc>
             <titleStmt>
-                <title>Turns example</title>
+                <title>Turns example (2)</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>For delayed turns you have to use and adjust the "tstamp" attribute.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>
@@ -23,7 +32,7 @@
                         </staffGrp>
                     </scoreDef>
                     <section>
-                        <measure label="feature-example">
+                        <measure>
                             <staff n="1">
                                 <layer n="1">
                                     <note dots="1" dur="4" oct="5" pname="g" stem.dir="down" tie="i"/>

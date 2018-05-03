@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Figured bass example (2)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Currently figures are aligned like other "harm" elements and placed above by default.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef meter.count="4" meter.unit="4" meter.sym="common">
+                        <staffGrp symbol="brace" barthru="true">
+                            <staffDef n="1" clef.shape="G" clef.line="2" lines="5"/>
+                            <staffDef n="2" clef.shape="F" clef.line="4" lines="5"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1" right="end">
+                            <staff n="1">
+                                <layer n="1">
+                                    <multiRest num="1"/>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="5">
+                                    <note dur="4" oct="3" pname="c" stem.dir="up"/>
+                                    <note dur="4" oct="3" pname="e" stem.dir="down"/>
+                                    <note dur="2" oct="3" pname="g" stem.dir="down"/>
+                                </layer>
+                            </staff>
+                            <harm tstamp="1" place="above" staff="2">
+                                <fb>
+                                    <f>♭</f>
+                                </fb>
+                            </harm>
+                            <harm tstamp="2" place="below" staff="2">
+                                <fb>
+                                    <f>6♭</f>
+                                    <f>4</f>
+                                </fb>
+                            </harm>
+                            <harm tstamp="3" place="below" staff="2">
+                                <fb>
+                                    <f>7</f>
+                                    <f>5</f>
+                                    <f>4</f>
+                                </fb>
+                            </harm>
+                            <harm tstamp="4" place="below" staff="2">
+                                <fb>
+                                    <f>_</f>
+                                    <f>_</f>
+                                    <f>♯</f>
+                                </fb>
+                            </harm>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

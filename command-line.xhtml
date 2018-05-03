@@ -4,31 +4,6 @@ verovio-light: true
 title: Verovio Command-line interface
 active: how
 how-active: how-cmd
-options:
-  - ["-", "Use \"-\" as input file for reading from the standard input"]
-  - ["-b, --border=BORDER", "Add border (default is 50)"]
-  - ["-f, --format=INPUT_FORMAT", "Select input format: darms, mei, pae, xml (default is pae)"]
-  - ["-h, --page-height=HEIGHT", "Specify the page height (default is 2970)"]
-  - ["-o, --outfile=FILE_NAME", "Output file name (use \"-\" for standard output)"]
-  - ["-r, --resources=PATH", "Path to SVG resources (default is /usr/local/share/verovio)"]
-  - ["-s, --scale=FACTOR", "Scale percent (default is 100)"]
-  - ["-t, --type=OUTPUT_TYPE", "Select output format: mei, svg, or midi (default is svg)"]
-  - ["-v, --version", "Display the version number"]
-  - ["-w, --page-width=WIDTH", "Specify the page width (default is 2100)"]
-additional-options:
-  - ["--adjust-page-height", "Crop the page height to the height of the content"]
-  - ["--all-pages", "Output all pages with one output file per page"]
-  - ["--even-note-spacing", "Space notes evenly and close together regardless of their durations"]
-  - ["--font=FONT", "Select the music font to use (default is Leipzig; Bravura and Gootville are also available)"]
-  - ["--help", "Display this message"]
-  - ["--ignore-layout", "Ignore all encoded layout information (if any) and fully recalculate the layout"]
-  - ["--no-layout", "Ignore all encoded layout information (if any) and output one single page with one single system"]
-  - ["--page=PAGE", "Select the page to engrave (default is 1)"]
-  - ["--app-xpath-query=QUERY", "Set the xPath query for selecting &lt;app&gt; child elements, for example: \"./rdg[contains(@source, 'source-id')]\""]
-  - ["--spacing-linear=SP", "Specify the linear spacing factor (default is 0.25)"]
-  - ["--spacing-non-linear=SP", "Specify the non-linear spacing factor (default is 0.6)"]
-  - ["--spacing-staff=SP", "Specify the spacing above each staff (in MEI vu)"]
-  - ["--spacing-system=SP", "Specify the spacing above each system (in MEI vu)"]
 ---
 
 <div class="row">
@@ -61,31 +36,20 @@ additional-options:
                 {% include svg/hummel-p1.svg %}
             </div>
             
-            <h4>Typesetting options</h4>
-            {% for option in page.options %}
-            <div class="panel panel-default">
-              <div class="panel-heading panel-option"><code>{{ option[0] }}</code></div>
-              <div class="panel-body panel-option">
-                {{ option[1] }}
-              </div>
+            <h4>Typesetting options (develop version)</h4>
+            <div style="overflow-y: scroll;">
+                <p style="min-width: 1000px;">
+{% highlight sh %}
+{% include cli.txt %}
+{% endhighlight %}
+                </p>
             </div>
-            {% endfor %}
-
-            <h4>Additional typesetting options</h4>
-            {% for option in page.additional-options %}
-            <div class="panel panel-default">
-              <div class="panel-heading panel-option"><code>{{ option[0] }}</code></div>
-              <div class="panel-body panel-option">
-                {{ option[1] }}
-              </div>
-            </div>
-            {% endfor %}
             
             <h4>Usage with options</h4>
             <p>
                 The following example shows how to ignore the layout information contained in the MEI file and to let it recalculated by Verovio, here with a specific page width and page height. The second page of the <a href="{{ site.baseurl }}/examples/downloads/Guami_Canzona_24.mei">Guami canzona</a> example can be typeset with the following command:
             </p>
-            {% highlight bash %}$ verovio -f mei --ignore-layout -h 2100 -w 4200 -b 100 --page=2 -o output.svg Guami_Canzona_24.mei{% endhighlight %}
+            {% highlight bash %}$ verovio -f mei --breaks none --page-height 2100 --page-width 4200 --page 2 -o output.svg Guami_Canzona_24.mei{% endhighlight %}
             <div id="guami-p2" style="display: none;">
                 {% include svg/guami-p2.svg %}
             </div>

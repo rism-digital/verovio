@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Trills example (4)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Trilled notes can be followed by grace notes which specify how to end the trill.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000001835298309">
+                        <staffGrp xml:id="staffgrp-0000000206039567">
+                            <staffDef xml:id="staffdef-0000001163363605" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000319445181">
+                        <measure xml:id="measure-L3" n="1">
+                            <staff xml:id="staff-L3F1N1" n="1">
+                                <layer xml:id="layer-L3F1N1" n="1">
+                                    <note xml:id="note-L4F1" dur="1" oct="4" pname="g">
+                                        <accid xml:id="accid-L4F1" accid.ges="n" />
+                                    </note>
+                                    <beam xml:id="beam-L5F1-L6F1">
+                                        <note xml:id="note-L5F1" dur="8" oct="4" pname="f" grace="unacc">
+                                            <accid xml:id="accid-L5F1" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L6F1" dur="8" oct="4" pname="g" grace="unacc">
+                                            <accid xml:id="accid-L6F1" accid.ges="n" />
+                                        </note>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <trill xml:id="trill-L4F1" staff="1" tstamp="1.000000" />
+                        </measure>
+                        <measure xml:id="measure-L7" n="2" right="end">
+                            <staff xml:id="staff-L7F1N1" n="1">
+                                <layer xml:id="layer-L7F1N1" n="1">
+                                    <note xml:id="note-L8F1" dur="1" oct="4" pname="f">
+                                        <accid xml:id="accid-L8F1" accid.ges="n" />
+                                    </note>
+                                </layer>
+                            </staff>
+                            <fermata xml:id="fermata-L8F1" staff="1" tstamp="1.000000" place="above" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

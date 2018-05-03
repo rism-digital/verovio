@@ -5,13 +5,22 @@
     <meiHead>
         <fileDesc>
             <titleStmt>
-                <title>Octave shift example (below and with @tstamp)</title>
+                <title>Octave shift example (style)</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Basic styling options for the "octave" element are provided via the "lform" and "lwidth" attributes.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

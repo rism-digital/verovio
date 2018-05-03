@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Alignment of editorial accidentals</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Editorial accidentals are aligned on the centre of the notehead.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000027977328">
+                        <staffGrp xml:id="m-000000028778056">
+                            <staffDef xml:id="staffdef-000000129725177" clef.shape="G" clef.line="2" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000076944697">
+                        <measure xml:id="measure-L2" n="1" right="end">
+                            <staff xml:id="staff-L2F1" n="1">
+                                <layer xml:id="layer-L2F1" n="1">
+                                    <note xml:id="note-L3F1" dur="1" oct="5" pname="f">
+                                        <accid xml:id="accid-000000113038940" accid="s" func="edit" />
+                                    </note>
+                                    <note xml:id="note-L4F1" dur="1" oct="5" pname="f">
+                                        <accid xml:id="accid-000000162539045" accid="f" func="edit" />
+                                    </note>
+                                    <note xml:id="note-L5F1" dur="1" oct="5" pname="f">
+                                        <accid xml:id="accid-000000208946960" accid="n" func="edit" />
+                                    </note>
+                                    <note xml:id="note-L6F1" dur="1" oct="5" pname="f">
+                                        <accid xml:id="accid-000000207644959" accid="x" func="edit" />
+                                    </note>
+                                    <note xml:id="note-L7F1" dur="1" oct="5" pname="f">
+                                        <accid xml:id="accid-000000179518178" accid="ff" func="edit" />
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

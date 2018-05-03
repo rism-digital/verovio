@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Display of editorial accidentals (2)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-07-28</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Alternatively, editorial accidentals can be rendered in brackets or parentheses.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+  </meiHead>
+	<music>
+		<body>
+			<mdiv>
+				<score>
+					<scoreDef>
+						<staffGrp>
+							<staffDef clef.shape="G" clef.line="2" n="1" lines="5" />
+						</staffGrp>
+					</scoreDef>
+					<section>
+					<measure n="1" xml:id="m_sc_1" left="invis" >
+						<staff n="1">
+							<layer n="1">
+								<note xml:id="n_sc_2_0" pname="c" oct="4" dur="4">
+									<accid accid="ff" func="edit"/>
+								</note>
+								<note xml:id="n_sc_3_0" pname="d" oct="4" dur="4">
+									<accid accid="f" func="edit"/>
+								</note>
+								<note xml:id="n_sc_4_0" pname="e" oct="4" dur="4">
+									<accid accid="n" func="edit"/>
+								</note>
+								<note xml:id="n_sc_5_0" pname="f" oct="4" dur="4">
+									<accid accid="s" func="edit"/>
+								</note>
+								<note xml:id="n_sc_6_0" pname="g" oct="4" dur="4">
+									<accid accid="ss" func="edit"/>
+								</note>
+							</layer>
+						</staff>
+					</measure>
+					<measure n="2" xml:id="m_sc_7" >
+						<staff n="1">
+							<layer n="1">
+								<note xml:id="n_sc_8_0" pname="c" accid="ff" oct="4" dur="4"/>
+								<note xml:id="n_sc_9_0" pname="d" accid="f" oct="4" dur="4"/>
+								<note xml:id="n_sc_10_0" pname="e" accid="n" oct="4" dur="4"/>
+								<note xml:id="n_sc_11_0" pname="f" accid="s" oct="4" dur="4"/>
+								<note xml:id="n_sc_12_0" pname="g" accid="ss" oct="4" dur="4"/>
+							</layer>
+						</staff>
+					</measure>
+					<measure n="3" xml:id="m_sc_13" >
+						<staff n="1">
+							<layer n="1">
+								<note xml:id="n_sc_14_0" pname="c" accid="ff" oct="4" dur="4"/>
+								<note xml:id="n_sc_15_0" pname="d" accid="f" oct="4" dur="4"/>
+								<note xml:id="n_sc_16_0" pname="e" accid="n" oct="4" dur="4"/>
+								<note xml:id="n_sc_17_0" pname="f" accid="s" oct="4" dur="4"/>
+								<note xml:id="n_sc_18_0" pname="g" accid="ss" oct="4" dur="4"/>
+							</layer>
+						</staff>
+					</measure>
+					<measure n="4" xml:id="m_sc_19" >
+						<staff n="1">
+							<layer n="1">
+								<note xml:id="n_sc_20_0" pname="f" oct="5" dur="1">
+									<accid accid="ff" func="edit"/>
+								</note>
+								<note xml:id="n_sc_21_0" pname="f" oct="5" dur="1">
+									<accid accid="f" func="edit"/>
+								</note>
+								<note xml:id="n_sc_22_0" pname="f" oct="5" dur="1">
+									<accid accid="n" func="edit"/>
+								</note>
+								<note xml:id="n_sc_23_0" pname="f" oct="5" dur="1">
+									<accid accid="s" func="edit"/>
+								</note>
+								<note xml:id="n_sc_24_0" pname="f" oct="5" dur="1">
+									<accid accid="ss" func="edit"/>
+								</note>
+							</layer>
+						</staff>
+					</measure>
+					</section>
+				</score>
+			</mdiv>
+		</body>
+	</music>
+</mei>

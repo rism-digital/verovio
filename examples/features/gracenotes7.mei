@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Grace note chords (3)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Accidentals on grace notes are spaced proportionally.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000032150074">
+                        <staffGrp xml:id="m-000000011837969">
+                            <staffDef xml:id="staffdef-000000056257951" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000100617986">
+                        <measure xml:id="measure-L3" n="1" right="end">
+                            <staff xml:id="staff-L3F1" n="1">
+                                <layer xml:id="layer-L3F1" n="1">
+                                    <note xml:id="note-L4F1" dur="16" accid="s" oct="4" pname="g" grace="unacc" />
+                                    <note xml:id="note-L5F1" dur="4" oct="4" pname="f" accid.ges="n" />
+                                    <chord xml:id="chord-L6F1" dur="16" grace="unacc">
+                                        <note xml:id="note-L6F1S1" dur="8" accid="s" oct="4" pname="f" />
+                                        <note xml:id="note-L6F1S2" dur="8" accid="s" oct="4" pname="a" />
+                                    </chord>
+                                    <note xml:id="note-L7F1" dur="4" oct="4" pname="g" accid.ges="s">
+                                        <accid xml:id="accid-000000018631947" accid="s" func="caution" />
+                                    </note>
+                                    <note xml:id="note-L8F1" dur="4" oct="4" pname="a" accid.ges="s">
+                                        <accid xml:id="accid-000000200954498" accid="s" func="caution" />
+                                    </note>
+                                    <note xml:id="note-L9F1" dur="4" oct="4" pname="b" accid.ges="n" />
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Beams and stem directions</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>If there is a "stem.dir" attribute in a note within a beam, this sets the direction of all the notes in the beam, wherever the note is in the beam.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000111948200">
+                        <staffGrp xml:id="m-000000126868489">
+                            <staffDef xml:id="staffdef-000000042193281" clef.shape="G" clef.line="2" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000014356475">
+                        <measure xml:id="measure-L2" n="1" right="end">
+                            <staff xml:id="staff-L2F1" n="1">
+                                <layer xml:id="layer-L2F1" n="1">
+                                    <beam xml:id="beam-000000116637527">
+                                        <note xml:id="note-L3F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L4F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L5F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L6F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                    </beam>
+                                    <beam xml:id="beam-000000124634882">
+                                        <note xml:id="note-L7F1" dur="16" oct="4" pname="e" accid.ges="n" stem.dir="down" />
+                                        <note xml:id="note-L8F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L9F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L10F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                    </beam>
+                                    <beam xml:id="beam-000000102697413">
+                                        <note xml:id="note-L11F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L12F1" dur="16" oct="4" pname="e" accid.ges="n" stem.dir="down" />
+                                        <note xml:id="note-L13F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L14F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                    </beam>
+                                    <beam xml:id="beam-000000070967754">
+                                        <note xml:id="note-L15F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L16F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L17F1" dur="16" oct="4" pname="e" accid.ges="n" stem.dir="down" />
+                                        <note xml:id="note-L18F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                    </beam>
+                                    <beam xml:id="beam-000000050287486">
+                                        <note xml:id="note-L19F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L20F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L21F1" dur="16" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L22F1" dur="16" oct="4" pname="e" accid.ges="n" stem.dir="down" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

@@ -307,6 +307,15 @@
             </changeDesc>
             <date isodate="2016-12-13"/>
          </change>
+         <change n="15">
+            <respStmt>
+               <persName>Laurent Pugin</persName>
+            </respStmt>
+            <changeDesc>
+               <p>Removing @fermata</p>
+            </changeDesc>
+            <date isodate="2017-11-01"/>
+         </change>
       </revisionDesc>
    </meiHead>
    <music>
@@ -10690,7 +10699,7 @@
                      <staff n="3">
                         <layer n="1">
                            <rest xml:id="d648110e53698" dur="4"/>
-                           <chord xml:id="d650809e1" dur="2" stem.dir="up" fermata="above">
+                           <chord xml:id="d650809e1" dur="2" stem.dir="up">
                               <note xml:id="d648110e53713" pname="e" oct="3" accid.ges="f"/>
                               <note xml:id="d648110e53731" pname="c" oct="4"/>
                            </chord>
@@ -10699,7 +10708,7 @@
                      <staff n="4">
                         <layer n="1">
                            <rest xml:id="d648110e53750" dur="4"/>
-                           <chord xml:id="d650813e1" dur="2" stem.dir="up" fermata="above">
+                           <chord xml:id="d650813e1" dur="2" stem.dir="up">
                               <note xml:id="d648110e53771" pname="a" oct="2" accid.ges="f"/>
                               <note xml:id="d648110e53789" pname="e" oct="3" accid.ges="f"/>
                            </chord>
@@ -10708,7 +10717,7 @@
                      <dir tstamp="2" place="above" staff="1">pizz.</dir>
                      <fermata place="above" staff="1" startid="#d648110e53623" form="norm"/>
                      <dir tstamp="2" place="above" staff="2">pizz.</dir>
-                     <fermata place="above" staff="4" startid="#d648110e53684" form="norm"/>
+                     <fermata place="above" staff="2" startid="#d648110e53684" form="norm"/>
                      <dynam tstamp="1.75" place="below" startto="-6" staff="3">pp</dynam>
                      <fermata place="above" staff="3" startid="#d648110e53713" form="norm"/>
                      <dir tstamp="2" place="above" staff="4">arco</dir>

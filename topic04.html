@@ -33,7 +33,7 @@ function loadPage() {
         page = elementPage;
     }
 
-    svg = vrvToolkit.renderPage(page, {});
+    svg = vrvToolkit.renderToSVG(page, {});
     $("#svg_output").html(svg);
 
     ///////////////////////////

@@ -8,11 +8,20 @@
             <titleStmt>
                 <title>Lyrics styling example</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio offers lyric styling (choice of font, style, and weight) on a per staff basis.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

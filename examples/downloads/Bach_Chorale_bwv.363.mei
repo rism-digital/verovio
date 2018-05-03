@@ -21,7 +21,7 @@
         <body>
             <mdiv>
                 <score>
-                    <scoreDef>
+                    <scoreDef midi.bpm="80">
                         <staffGrp symbol="bracket">
                             <staffDef  clef.shape="G" clef.line="2" key.sig="1s" meter.count="4" meter.unit="4" n="1" label="Soprano" lines="5" />
                             <staffDef  clef.shape="G" clef.line="2" key.sig="1s" meter.count="4" meter.unit="4" n="2" label="Alto" lines="5" />

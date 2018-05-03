@@ -18,14 +18,13 @@ next_id: topic07
 ///////////////////////////////////////////////////
 /* A variable for selecting the <rdg> in a <app> */
 ///////////////////////////////////////////////////
-var appXPath = "";
+var appXPath = [];
 
 options = {
             pageHeight: pageHeight,
             pageWidth: pageWidth,
             scale: zoom,
-            adjustPageHeight: 1,
-            ignoreLayout: 1,
+            adjustPageHeight: true,
             appXPathQuery: appXPath
         };
 vrvToolkit.setOptions(options);
@@ -44,11 +43,11 @@ vrvToolkit.setOptions(options);
 /* Key events for switching the reading */
 //////////////////////////////////////////
 if (event.keyCode == 49) {
-    appXPath = ""
+    appXPath = [];
     loadFile();
 }
 else if (event.keyCode == 50) {
-    appXPath = "./rdg[contains(@source, '#source.1570')]";
+    appXPath = ["./rdg[contains(@source, '#source.1570')]"];
     loadFile();
 }
 {% endhighlight %}

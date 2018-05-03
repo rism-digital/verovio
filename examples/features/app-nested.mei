@@ -7,16 +7,20 @@
             <titleStmt>
                 <title>Critical apparatus example with nested elements</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
-            <sourceDesc>
-                <source xml:id="src1"></source>
-                <source xml:id="src2"></source>
-                <source xml:id="src3"></source>
-            </sourceDesc>
+            <pubStmt>
+                <date>2017-05-03</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports nested apparati when differences between sources occur at different levels.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

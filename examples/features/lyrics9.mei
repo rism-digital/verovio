@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Minimal space between words</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>When rendering lyrics, Verovio retains a minimal space between words. Personal preferences may be specified in styling.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000000819873579">
+                        <staffGrp xml:id="staffgrp-0000001809865136">
+                            <staffDef xml:id="staffdef-0000001270463040" clef.shape="G" clef.line="2" key.sig="2s" meter.count="4" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000075200307">
+                        <measure xml:id="measure-L1" n="0">
+                            <staff xml:id="staff-0000000164784165" n="1">
+                                <layer xml:id="layer-L1F1N1" n="1">
+                                    <note xml:id="note-L7F1" dur="4" oct="5" pname="d" stem.dir="down">
+                                        <accid xml:id="accid-L7F1" accid.ges="n" />
+                                        <verse xml:id="verse-L7F2" n="1">
+                                            <syl xml:id="syl-L7F2">Mein</syl>
+                                        </verse>
+                                        <verse xml:id="verse-L7F3" n="2">
+                                            <syl xml:id="syl-L7F3">mein'</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L8" n="1">
+                            <staff xml:id="staff-L8F1N1" n="1">
+                                <layer xml:id="layer-L8F1N1" n="1">
+                                    <note xml:id="note-L9F1" dur="4" oct="5" pname="c" stem.dir="down">
+                                        <accid xml:id="accid-L9F1" accid.ges="s" />
+                                        <verse xml:id="verse-L9F2" n="1">
+                                            <syl xml:id="syl-L9F2" con="d" wordpos="i">jun</syl>
+                                        </verse>
+                                        <verse xml:id="verse-L9F3" n="2">
+                                            <syl xml:id="syl-L9F3" con="d" wordpos="i">ar</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L10F1" dur="4" oct="4" pname="b" stem.dir="down">
+                                        <accid xml:id="accid-L10F1" accid.ges="n" />
+                                        <verse xml:id="verse-L10F2" n="1">
+                                            <syl xml:id="syl-L10F2" wordpos="t">ges</syl>
+                                        </verse>
+                                        <verse xml:id="verse-L10F3" n="2">
+                                            <syl xml:id="syl-L10F3" wordpos="t">me</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L11F1" dur="4" oct="4" pname="a" stem.dir="up">
+                                        <accid xml:id="accid-L11F1" accid.ges="n" />
+                                        <verse xml:id="verse-L11F2" n="1">
+                                            <syl xml:id="syl-L11F2" con="d" wordpos="i">Le</syl>
+                                        </verse>
+                                        <verse xml:id="verse-L11F3" n="2">
+                                            <syl xml:id="syl-L11F3" con="d" wordpos="i">See</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L12F1" dur="4" oct="4" pname="g" stem.dir="up">
+                                        <accid xml:id="accid-L12F1" accid.ges="n" />
+                                        <verse xml:id="verse-L12F2" n="1">
+                                            <syl xml:id="syl-L12F2" wordpos="t">ben</syl>
+                                        </verse>
+                                        <verse xml:id="verse-L12F3" n="2">
+                                            <syl xml:id="syl-L12F3" wordpos="t">le</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L13" n="2">
+                            <staff xml:id="staff-L13F1N1" n="1">
+                                <layer xml:id="layer-L13F1N1" n="1">
+                                    <note xml:id="note-L14F1" dots="1" dur="4" oct="4" pname="f" stem.dir="up">
+                                        <accid xml:id="accid-L14F1" accid.ges="s" />
+                                        <verse xml:id="verse-L14F2" n="1">
+                                            <syl xml:id="syl-L14F2">hat</syl>
+                                        </verse>
+                                        <verse xml:id="verse-L14F3" n="2">
+                                            <syl xml:id="syl-L14F3">soll</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L15F1" dur="8" oct="4" pname="e" stem.dir="up">
+                                        <accid xml:id="accid-L15F1" accid.ges="n" />
+                                        <verse xml:id="verse-L15F2" n="1">
+                                            <syl xml:id="syl-L15F2">em</syl>
+                                        </verse>
+                                        <verse xml:id="verse-L15F3" n="2">
+                                            <syl xml:id="syl-L15F3" con="d" wordpos="i">be</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L16F1" dur="4" oct="4" pname="d" stem.dir="up">
+                                        <accid xml:id="accid-L16F1" accid.ges="n" />
+                                        <verse xml:id="verse-L16F2" n="1">
+                                            <syl xml:id="syl-L16F2">End',</syl>
+                                        </verse>
+                                        <verse xml:id="verse-L16F3" n="2">
+                                            <syl xml:id="syl-L16F3" wordpos="t">hend</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L17F1" dur="4" oct="5" pname="d" stem.dir="down">
+                                        <accid xml:id="accid-L17F1" accid.ges="n" />
+                                        <verse xml:id="verse-L17F2" n="1">
+                                            <syl xml:id="syl-L17F2">mein</syl>
+                                        </verse>
+                                        <verse xml:id="verse-L17F3" n="2">
+                                            <syl xml:id="syl-L17F3" con="d" wordpos="i">schei</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L18" n="3">
+                            <staff xml:id="staff-L18F1N1" n="1">
+                                <layer xml:id="layer-L18F1N1" n="1">
+                                    <note xml:id="note-L19F1" dur="4" oct="5" pname="c" stem.dir="down">
+                                        <accid xml:id="accid-L19F1" accid.ges="s" />
+                                        <verse xml:id="verse-L19F2" n="1">
+                                            <syl xml:id="syl-L19F2">Freud</syl>
+                                        </verse>
+                                        <verse xml:id="verse-L19F3" n="2">
+                                            <syl xml:id="syl-L19F3" wordpos="t">den</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L20F1" dur="4" oct="4" pname="b" stem.dir="down">
+                                        <accid xml:id="accid-L20F1" accid.ges="n" />
+                                        <verse xml:id="verse-L20F2" n="1">
+                                            <syl xml:id="syl-L20F2">und</syl>
+                                        </verse>
+                                        <verse xml:id="verse-L20F3" n="2">
+                                            <syl xml:id="syl-L20F3">von</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L21F1" dur="4" oct="5" pname="e" stem.dir="down">
+                                        <accid xml:id="accid-L21F1" accid.ges="n" />
+                                        <verse xml:id="verse-L21F2" n="1">
+                                            <syl xml:id="syl-L21F2">auch</syl>
+                                        </verse>
+                                        <verse xml:id="verse-L21F3" n="2">
+                                            <syl xml:id="syl-L21F3" con="d" wordpos="i">mei</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L22F1" dur="4" oct="5" pname="c" stem.dir="down">
+                                        <accid xml:id="accid-L22F1" accid.ges="s" />
+                                        <verse xml:id="verse-L22F2" n="1">
+                                            <syl xml:id="syl-L22F2">mein</syl>
+                                        </verse>
+                                        <verse xml:id="verse-L22F3" n="2">
+                                            <syl xml:id="syl-L22F3" wordpos="t">nem</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L23" n="4" right="rptend">
+                            <staff xml:id="staff-L23F1N1" n="1">
+                                <layer xml:id="layer-L23F1N1" n="1">
+                                    <note xml:id="note-L24F1" dur="2" oct="4" pname="b" stem.dir="down">
+                                        <accid xml:id="accid-L24F1" accid.ges="n" />
+                                        <verse xml:id="verse-L24F2" n="1">
+                                            <syl xml:id="syl-L24F2">Leid;</syl>
+                                        </verse>
+                                        <verse xml:id="verse-L24F3" n="2">
+                                            <syl xml:id="syl-L24F3">Leib.</syl>
+                                        </verse>
+                                    </note>
+                                    <rest xml:id="rest-L25F1" dur="4" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L26">
+                            <staff xml:id="staff-L26F1N1" n="1">
+                                <layer xml:id="layer-L26F1N1" n="1">
+                                    <note xml:id="note-L27F1" dur="4" oct="4" pname="f" stem.dir="up">
+                                        <accid xml:id="accid-L27F1" accid.ges="s" />
+                                        <verse xml:id="verse-L27F2" n="1">
+                                            <syl xml:id="syl-L27F2">Mein</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L28" n="5">
+                            <staff xml:id="staff-L28F1N1" n="1">
+                                <layer xml:id="layer-L28F1N1" n="1">
+                                    <note xml:id="note-L29F1" dots="1" dur="4" oct="4" pname="f" stem.dir="up">
+                                        <accid xml:id="accid-L29F1" accid.ges="s" />
+                                        <verse xml:id="verse-L29F2" n="1">
+                                            <syl xml:id="syl-L29F2" con="d" wordpos="i">Le</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L30F1" dur="8" oct="4" pname="g" stem.dir="up">
+                                        <accid xml:id="accid-L30F1" accid="s" />
+                                        <verse xml:id="verse-L30F2" n="1">
+                                            <syl xml:id="syl-L30F2" wordpos="t">ben</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L31F1" dur="4" oct="4" pname="a" stem.dir="up">
+                                        <accid xml:id="accid-L31F1" accid.ges="n" />
+                                        <verse xml:id="verse-L31F2" n="1">
+                                            <syl xml:id="syl-L31F2">kann</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L32F1" dur="4" oct="4" pname="b" stem.dir="down">
+                                        <accid xml:id="accid-L32F1" accid.ges="n" />
+                                        <verse xml:id="verse-L32F2" n="1">
+                                            <syl xml:id="syl-L32F2">nicht</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L33" n="6">
+                            <staff xml:id="staff-L33F1N1" n="1">
+                                <layer xml:id="layer-L33F1N1" n="1">
+                                    <note xml:id="note-L34F1" dur="4" oct="5" pname="c" stem.dir="down">
+                                        <accid xml:id="accid-L34F1" accid.ges="s" />
+                                        <verse xml:id="verse-L34F2" n="1">
+                                            <syl xml:id="syl-L34F2" con="d" wordpos="i">län</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L35F1" dur="4" oct="4" pname="g" stem.dir="up">
+                                        <accid xml:id="accid-L35F1" accid="s" />
+                                        <verse xml:id="verse-L35F2" n="1">
+                                            <syl xml:id="syl-L35F2" wordpos="t">ger</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L36F1" dur="2" oct="4" pname="f" stem.dir="up">
+                                        <accid xml:id="accid-L36F1" accid.ges="s" />
+                                        <verse xml:id="verse-L36F2" n="1">
+                                            <syl xml:id="syl-L36F2">stehn,</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L37" n="7">
+                            <staff xml:id="staff-L37F1N1" n="1">
+                                <layer xml:id="layer-L37F1N1" n="1">
+                                    <note xml:id="note-L38F1" dots="1" dur="4" oct="4" pname="f" stem.dir="up">
+                                        <accid xml:id="accid-L38F1" accid.ges="s" />
+                                        <verse xml:id="verse-L38F2" n="1">
+                                            <syl xml:id="syl-L38F2">es</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L39F1" dur="8" oct="4" pname="g" stem.dir="up">
+                                        <accid xml:id="accid-L39F1" accid="s" />
+                                        <verse xml:id="verse-L39F2" n="1">
+                                            <syl xml:id="syl-L39F2">ist</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L40F1" dur="4" oct="4" pname="a" stem.dir="up">
+                                        <accid xml:id="accid-L40F1" accid.ges="n" />
+                                        <verse xml:id="verse-L40F2" n="1">
+                                            <syl xml:id="syl-L40F2">schwach,</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L41F1" dur="4" oct="4" pname="b" stem.dir="down">
+                                        <accid xml:id="accid-L41F1" accid.ges="n" />
+                                        <verse xml:id="verse-L41F2" n="1">
+                                            <syl xml:id="syl-L41F2">es</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L42" n="8">
+                            <staff xml:id="staff-L42F1N1" n="1">
+                                <layer xml:id="layer-L42F1N1" n="1">
+                                    <note xml:id="note-L43F1" dur="4" oct="5" pname="c" stem.dir="down">
+                                        <accid xml:id="accid-L43F1" accid.ges="s" />
+                                        <verse xml:id="verse-L43F2" n="1">
+                                            <syl xml:id="syl-L43F2">muß</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L44F1" dur="4" oct="4" pname="g" stem.dir="up">
+                                        <accid xml:id="accid-L44F1" accid="s" />
+                                        <verse xml:id="verse-L44F2" n="1">
+                                            <syl xml:id="syl-L44F2" con="d" wordpos="i">ver</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L45F1" dur="4" oct="4" pname="f" stem.dir="up">
+                                        <accid xml:id="accid-L45F1" accid.ges="s" />
+                                        <verse xml:id="verse-L45F2" n="1">
+                                            <syl xml:id="syl-L45F2" wordpos="t">gehn,</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L46F1" dur="4" oct="5" pname="d" stem.dir="down">
+                                        <accid xml:id="accid-L46F1" accid.ges="n" />
+                                        <verse xml:id="verse-L46F2" n="1">
+                                            <syl xml:id="syl-L46F2">es</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L47" n="9">
+                            <staff xml:id="staff-L47F1N1" n="1">
+                                <layer xml:id="layer-L47F1N1" n="1">
+                                    <note xml:id="note-L48F1" dur="4" oct="5" pname="c" stem.dir="down">
+                                        <accid xml:id="accid-L48F1" accid.ges="s" />
+                                        <verse xml:id="verse-L48F2" n="1">
+                                            <syl xml:id="syl-L48F2">fährt</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L49F1" dur="4" oct="4" pname="b" stem.dir="down">
+                                        <accid xml:id="accid-L49F1" accid.ges="n" />
+                                        <verse xml:id="verse-L49F2" n="1">
+                                            <syl xml:id="syl-L49F2" con="d" wordpos="i">da</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L50F1" dur="4" oct="5" pname="e" stem.dir="down">
+                                        <accid xml:id="accid-L50F1" accid.ges="n" />
+                                        <verse xml:id="verse-L50F2" n="1">
+                                            <syl xml:id="syl-L50F2" wordpos="t">hin</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="note-L51F1" dur="4" oct="5" pname="c" stem.dir="down">
+                                        <accid xml:id="accid-L51F1" accid.ges="s" />
+                                        <verse xml:id="verse-L51F2" n="1">
+                                            <syl xml:id="syl-L51F2">mein</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L52" n="10" right="end">
+                            <staff xml:id="staff-L52F1N1" n="1">
+                                <layer xml:id="layer-L52F1N1" n="1">
+                                    <note xml:id="note-L53F1" dur="2" oct="4" pname="b" stem.dir="down">
+                                        <accid xml:id="accid-L53F1" accid.ges="n" />
+                                        <verse xml:id="verse-L53F2" n="1">
+                                            <syl xml:id="syl-L53F2">Freud.</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

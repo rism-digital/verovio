@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Piano pedal and measure rests</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-15</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Pedal markings interact with measure spacing and take into account measure rests.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-000000077439690">
+                        <staffGrp xml:id="m-000000195283903">
+                            <staffDef xml:id="staffdef-000000137301691" clef.shape="F" clef.line="4" meter.count="3" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-000000006144731">
+                        <measure xml:id="measure-L4" n="1">
+                            <staff xml:id="staff-L4F1" n="1">
+                                <layer xml:id="layer-L4F1" n="1">
+                                    <note xml:id="note-L6F1" dur="4" oct="2" pname="b" accid.ges="n" />
+                                    <note xml:id="note-L7F1" dur="4" oct="3" pname="d" accid.ges="n" />
+                                    <note xml:id="note-L8F1" dur="4" oct="3" pname="g" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <pedal xml:id="pedal-000000063705428" staff="1" tstamp="1.000000" dir="down" />
+                            <pedal xml:id="pedal-000000184178647" staff="1" tstamp="3.750000" dir="up" />
+                        </measure>
+                        <measure xml:id="measure-L10" n="2">
+                            <staff xml:id="staff-L10F1" n="1">
+                                <layer xml:id="layer-L10F1" n="1">
+                                    <note xml:id="note-L12F1" dur="4" oct="3" pname="c" accid.ges="n" />
+                                    <note xml:id="note-L13F1" dur="4" oct="3" pname="e" accid.ges="n" />
+                                    <note xml:id="note-L14F1" dur="4" oct="3" pname="g" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <pedal xml:id="pedal-000000112752505" staff="1" tstamp="1.000000" dir="down" />
+                        </measure>
+                        <measure xml:id="measure-L15" n="3" right="end">
+                            <staff xml:id="staff-L15F1" n="1">
+                                <layer xml:id="layer-L15F1" n="1">
+                                    <mRest xml:id="mrest-000000020800024" fermata="above" />
+                                </layer>
+                            </staff>
+                            <pedal xml:id="pedal-000000236243324" staff="1" tstamp="3.750000" dir="up" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

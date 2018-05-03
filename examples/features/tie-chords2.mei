@@ -7,11 +7,20 @@
             <titleStmt>
                 <title>Ties on chords example (2)</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>With chords, the "tie" attribute can be set in the chord or in the notes. It can also be overwritten in the note if necessary.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

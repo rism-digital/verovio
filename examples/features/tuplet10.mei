@@ -20,45 +20,49 @@
                     <name>Verovio</name>
                 </application>
             </appInfo>
-        </encodingDesc>    </meiHead>
-    <music>
-        <body>
-            <mdiv>
-                <score>
-                    <scoreDef>
-                        <staffGrp>
-                            <staffDef n="1" clef.shape="G" clef.line="2" meter.count="2" meter.unit="4" lines="5" />
-                        </staffGrp>
-                    </scoreDef>
-                    <section>
-                        <measure n="1" right="end">
-                            <staff n="1">
-                                <layer n="1">
-                                    <beam>
-                                        <tuplet num="3" numbase="2" bracket.visible="true">
-                                            <note dur="8" oct="4" pname="b" />
-                                            <note dur="8" oct="4" pname="b" />
-                                            <beam>
-                                                <tuplet num="15" numbase="4" bracket.visible="true">
-                                                    <note dur="8" oct="4" pname="b" />
-                                                    <note dur="8" oct="4" pname="b" />
-                                                    <note dur="8" oct="4" pname="b" />
-                                                    <note dur="8" oct="4" pname="b" />
-                                                    <note dur="8" oct="4" pname="b" />
-                                                </tuplet>
-                                            </beam>
-                                            <beam>
-                                                <note dur="8" oct="4" pname="b" />
-                                                <note dur="8" oct="4" pname="b" />
-                                            </beam>
-                                        </tuplet>
-                                    </beam>
-                                </layer>
-                            </staff>
-                        </measure>
-                    </section>
-                </score>
-            </mdiv>
-        </body>
-    </music>
+        </encodingDesc>    
+    </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef meter.count="4" meter.unit="4">
+            <staffGrp>
+              <staffDef n="1" clef.line="1" clef.shape="C" lines="5"/>
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure>
+              <staff n="1">
+                <layer n="1">
+                  <tuplet num="7" numbase="8">
+                    <note pname="c" oct="5" dur="8"/>
+                    <note pname="c" oct="4" dur="8"/>
+                    <beam>
+                      <tuplet num="5" numbase="4" num.format="ratio">
+                        <tuplet num="3" numbase="2">
+                          <note pname="e" oct="4" dur="8"/>
+                          <note pname="f" oct="4" dur="8"/>
+                          <note pname="g" oct="4" dur="8"/>
+                        </tuplet>
+                        <beam>
+                          <tuplet num="3" numbase="2">
+                            <note pname="b" oct="4" dur="8"/>
+                            <note pname="e" oct="4" dur="8"/>
+                            <note pname="b" oct="3" dur="8"/>
+                          </tuplet>
+                        </beam>
+                        <note pname="c" oct="4" dur="8"/>
+                      </tuplet>
+                    </beam>
+                    <note pname="a" oct="4" dur="8"/>
+                  </tuplet>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
 </mei>

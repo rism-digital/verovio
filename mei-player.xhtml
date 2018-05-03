@@ -29,21 +29,20 @@ downloads:
     
     // reload cookies
     if ( $.cookie('zoom') ) zoom = $.cookie('zoom');
-    console.log(zoom);
+    //console.log(zoom);
     
     function set_options( ) {
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
         pageWidth = ($(document).width()) * 100 / zoom ; // - $( "#sidbar" ).width();
-        border = 50;
         options = {
+                    adjustPageHeight: true,
+                    breaks: "auto",
                     inputFormat: format,
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
-                    border: border,
+                    noFooter: true,
                     scale: zoom,
-                    spacingSystem: spacingSystem,
-                    adjustPageHeight: 1,
-                    ignoreLayout: 1
+                    spacingSystem: spacingSystem
                 };
         //console.log( options );
         vrvToolkit.setOptions( options );
@@ -52,11 +51,11 @@ downloads:
     function load_data(data) {
         set_options();
         
-        console.time("loading");
+        // console.time("loading");
         try {
             vrvToolkit.loadData(data);
             // Also render to midi for sync
-            var base64midi = vrvToolkit.renderToMidi();
+            var base64midi = vrvToolkit.renderToMIDI();
             if (log) {
                 str = vrvToolkit.getLog();
                 $("#log_p").html( str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\n/g, "<br/>") );
@@ -72,14 +71,14 @@ downloads:
             $('#err').html(err);
             $('#errorDialog').modal();
         }
-        console.timeEnd("loading");
+        // console.timeEnd("loading");
     }
 
     function load_page() {
         $("#overlay").hide().css("cursor", "auto");
         $("#jump_text").val(page);
 
-        svg = vrvToolkit.renderPage(page, {});
+        svg = vrvToolkit.renderToSVG(page, {});
         $("#svg_output").html(svg);
 
         adjust_page_height();
@@ -232,7 +231,7 @@ downloads:
     }
     
     function play_midi() {
-        var base64midi = vrvToolkit.renderToMidi();
+        var base64midi = vrvToolkit.renderToMIDI();
         var song = 'data:audio/midi;base64,' + base64midi;
         $("#player").show();
         $("#play-button").hide();
@@ -240,7 +239,7 @@ downloads:
     }
     
     var midiUpdate = function(time) {
-        var vrvTime = Math.max(0, 2 * time);
+        var vrvTime = Math.max(0, time);
         var elementsattime = vrvToolkit.getElementsAtTime(vrvTime);
         if (elementsattime.page > 0) {
             if (elementsattime.page != page) {
@@ -283,7 +282,7 @@ downloads:
         var syncTime = syncData.dataset.point[i].frame * 1024 / 44100;
         syncTime = Math.floor((syncTime + currentTime - mapSyncTime) / 10);
         syncTime = syncTime * 10;
-        console.log(syncTime); //, currentTime);
+        // console.log(syncTime); //, currentTime);
         midiUpdate(syncTime);
     }
     
@@ -530,7 +529,7 @@ downloads:
         }
         //get JSON and assign response to var json and log data
         $.getJSON( audio + ".json", function(data){
-            syncData = data; console.log(data);
+            syncData = data; // console.log(data);
         }, 'json');
         $("#overlay").show();
         $.ajax({

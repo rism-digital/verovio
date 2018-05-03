@@ -7,8 +7,20 @@
             <titleStmt>
                 <title>ScoreDef change example</title>
             </titleStmt>
-            <pubStmt/>
+            <pubStmt>
+                <date>2017-05-09</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports "scoreDef" element redefinitions between measures. Any attribute supported by Verovio can be redefined.</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>

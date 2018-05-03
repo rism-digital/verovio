@@ -28,12 +28,16 @@
     <script src="{{ site.baseurl }}/javascript/FileSaver.min.js" type="text/javascript"></script>
     <script src="{{ site.baseurl }}/javascript/d3.min.js" type="text/javascript"></script>
     <script src="{{ site.baseurl }}/javascript/jquery.cookie.js" type="text/javascript"></script>
+    <script src="{{ site.baseurl }}/javascript/jsonform.js" type="text/javascript"></script>
     <!-- verovio -->
+    <!-- use this to increase the memory for verovio -->
+    <!--<script src="{{ site.baseurl }}/javascript/develop/verovio-memory.js" type="text/javascript"></script>-->
     {% if page.verovio-light %}
     <script src="{{ site.baseurl }}/javascript/develop/verovio-toolkit-light.js" type="text/javascript"></script>
     {% elsif page.verovio-wasm %}
     <!-- verovio is preloaded in the page -->
     {% else %}
+    <!--<script src="{{ site.baseurl }}/javascript/develop/verovio-memory.js" type="text/javascript"></script>-->
     <script src="{{ site.baseurl }}/javascript/develop/verovio-toolkit.js" type="text/javascript"></script>
     {% endif %}
     <!-- midi-player -->
@@ -50,6 +54,13 @@
     <script src="{{ site.baseurl }}/javascript/Window/DOMLoader.XMLHttp.js" type="text/javascript"></script>
     <script src="{{ site.baseurl }}/javascript/inc/Base64.js" type="text/javascript"></script>
     <script src="{{ site.baseurl }}/javascript/inc/base64binary.js" type="text/javascript"></script>
+    {% endif %}
+    <!-- pdf kit -->
+    {% if page.pdfkit %}
+    <script src="{{ site.baseurl }}/javascript/pdfkit/blobstream.js" type="text/javascript"></script>
+    <script src="{{ site.baseurl }}/javascript/pdfkit/pdfkit.js" type="text/javascript"></script>
+    <script src="{{ site.baseurl }}/javascript/pdfkit/source.js" type="text/javascript"></script>
+    <script src="{{ site.baseurl }}/javascript/pdfkit/vrv-ttf.js" type="text/javascript"></script>
     {% endif %}
 
 </head>

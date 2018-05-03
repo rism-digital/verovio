@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Vertical placement of rests (3)</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio correctly renders the placement of rests in presence of the "loc", "ploc" and "oloc" attributes.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+  </meiHead>
+  <music>
+    <body>
+      <mdiv>
+        <score>
+          <scoreDef>
+            <staffGrp n="1" >
+              <staffDef n="1" lines="5" clef.line="2" clef.shape="G"/>
+            </staffGrp>
+          </scoreDef>
+          <section>
+            <measure right="dbl">
+              <staff n="1">
+                <layer n="1">
+                  <rest dur="4"/>
+                  <rest dur="4" loc="0"/>
+                  <rest dur="4" loc="2"/>
+                  <rest dur="4" loc="4"/>
+                  <rest dur="4" loc="6"/>
+                  <rest dur="4" loc="8"/>
+                  <rest dur="4" oloc="4" ploc="c"/>
+                  <rest dur="4" oloc="4" ploc="e"/>
+                  <rest dur="4" oloc="4" ploc="g"/>
+                  <rest dur="4" oloc="4" ploc="b"/>
+                  <rest dur="4" oloc="5" ploc="d"/>
+                  <rest dur="4" oloc="5" ploc="f"/>
+                  <rest dur="4" oloc="5" ploc="a"/>
+                </layer>
+              </staff>
+            </measure>
+          </section>
+        </score>
+      </mdiv>
+    </body>
+  </music>
+</mei>

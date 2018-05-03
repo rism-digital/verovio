@@ -7,11 +7,20 @@
             <titleStmt>
                 <title>Choice</title>
             </titleStmt>
-            <pubStmt/>
-            <seriesStmt>
-                <title>Verovio feature examples</title>
-            </seriesStmt>
+            <pubStmt>
+                <date>2017-05-04</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio supports "choice" elements. During rendering, only one version is rendered. The first is chosen by default. Optionally, a specific other versions may be rendered (e.g., the corrected version vs. the original reading).</annot>
+            </notesStmt>
         </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
     </meiHead>
     <music>
         <body>
@@ -34,7 +43,7 @@
                                     </beam>
                                     <choice>
                                         <orig>
-                                            <beatRpt rend="1"/>
+                                            <beatRpt form="16"/>
                                         </orig>
                                         <reg>
                                             <beam>

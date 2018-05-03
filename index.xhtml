@@ -10,6 +10,8 @@ projects:
     - [["http://www.rism.info", "rism"], ["http://kern.ccarh.org", "ccarh"], ["http://en.chopin.nifc.pl/institute/library/archives", "nifc"]]
     - [["http://dme.mozarteum.at/DME/main/index.php", "dme"], ["http://www.oeaw.ac.at/ikm/forschung/digital-musicology/digitale-musikanalyse-mit-mei/", "oeaw"], ["http://www.gluck-gesamtausgabe.de/impressum.html", "gga"]]
     - [["http://opac.sbn.it/opacsbn/opac/iccu/musica.jsp", "iccu"],["http://www.tassomusic.org/", "tasso"], ["https://www.bach-digital.de", "bach"]]
+    - [["http://folksong.eu", "folk-song-index"], ["http://mac.kaist.ac.kr/research.html", "kaist-maclab"], ["http://www.motetcycles.com/", "mcb"]]
+    - [["http://ricercar.cesr.univ-tours.fr/", "cesr"], [], []]
 ---
 <div class="row home-row home-row-flex">
     <div class="col-md-5 col-sm-12">
@@ -50,7 +52,7 @@ projects:
 <div class="row home-row">
     <div class="col-md-6 col-sm-12">
         <h4>News</h4>
-        {% for p in site.posts limit:3 %}
+        {% for p in site.posts limit:4 %}
         <hr class="news-row"/>
         <h5>{{ p.date | date: '%B %d, %Y' }} – {{ p.title }}</h5>
         <div class="content">
@@ -64,9 +66,17 @@ projects:
     </div>
     <div class="col-md-6 col-sm-12">  
         <hr class="hidden-lg hidden-md"/>
+        
         <p>
-            Verovio is developed by the <a href="http://rism-ch.org/" target="_blank">Swiss RISM Office</a> and is supported by the Swiss National Science Foundation and the Salzburg Mozarteum Foundation. 
+            Verovio is developed by the <a href="http://rism-ch.org/" target="_blank">Swiss RISM Office</a> with the support of the Swiss National Science Foundation. The project receives dedicated financial support from the Digital Mozart Edition, a joint project of the Salzburg Mozarteum Foundation and the Packard Humanities Institute, Los Altos/CA. It also receives in-kind support from the Saxon Academy of Sciences in Leipzig.
         </p>
+        
+        <div style="float: right;">
+            <!-- Place this tag where you want the button to render. -->
+            <a class="github-button" href="https://github.com/rism-ch/verovio/subscription" data-icon="octicon-eye" data-size="large" data-show-count="false" aria-label="Watch rism-ch/verovio on GitHub">Watch</a>
+            <a class="github-button" href="https://github.com/rism-ch/verovio" data-icon="octicon-star" data-size="large" data-show-count="false" aria-label="Star rism-ch/verovio on GitHub">Star</a>
+        </div>
+        
         <p>
             The source code is available on <a href="https://github.com/rism-ch/verovio">GitHub</a> under the <a href="http://www.gnu.org/copyleft/lgpl.html" target="_blank">LGPLv3 license</a>.
         </p>
@@ -75,21 +85,29 @@ projects:
             <tr>
                 <td>
                     <a href="http://www.rism-ch.org" target="_blank">
-                        <img alt="RISM logo" src="{{ site.baseurl }}/images/rism-ch.png" style="padding: 10px" class="img-responsive"/>
+                        <img alt="RISM logo" src="{{ site.baseurl }}/images/rism-ch.png" class="support-logo img-responsive"/>
                     </a>
                 </td>
                 <td>
                     <a href="http://www.snf.ch" target="_blank">
-                        <img alt="SNF logo" src="{{ site.baseurl }}/images/snf.png" style="padding: 10px" class="img-responsive"/>
+                        <img alt="SNF logo" src="{{ site.baseurl }}/images/snf.png" class="support-logo img-responsive"/>
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="http://www.mozarteum.at" target="_blank">
+                        <img alt="Mozarteum logo" src="{{ site.baseurl }}/images/mozarteum.png" class="support-logo img-responsive"/>
                     </a>
                 </td>
                 <td>
                     <a href="http://www.mozarteum.at" target="_blank">
-                        <img alt="SNF logo" src="{{ site.baseurl }}/images/mozarteum.png" style="padding: 10px;" class="img-responsive"/>
+                        <img alt="SNF logo" src="{{ site.baseurl }}/images/saw.png" class="support-logo img-responsive"/>
                     </a>
                 </td>
             </tr>
         </table>
+        
     </div>   
 </div>
 
@@ -174,13 +192,13 @@ projects:
             {% for line in page.projects %}
             <tr>
                 {% for p in line %}
-                    {% if p != empty %}
-                       <td align="center">
+                    <td align="center">
+                    {%- if p != empty -%}
                            <a href="{{ p[0] }}" target="_blank">
                                <img src="{{ site.baseurl }}/images/projects/{{ p[1] }}.png" style="padding: 10px" class="img-responsive"/>
                            </a>
-                       </td>
-                    {% endif %}
+                    {%- endif -%}
+                    </td>
                 {% endfor %}
             </tr>
             {% endfor %}
@@ -209,6 +227,7 @@ projects:
     </div>
 </div>
 
+<script async="true" defer="true" src="https://buttons.github.io/buttons.js"></script>
 <script type="text/javascript">
 //<![CDATA[
     $( document ).ready(function() {

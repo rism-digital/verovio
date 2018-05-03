@@ -71,12 +71,7 @@ features:
       menu: "Vocal text"
     - id: "lyrics"
       name: "Lyrics"
-
 version-footer: true
-
-
-#cautionary
-#choice
 ---
 
 <div class="row">
@@ -123,8 +118,8 @@ version-footer: true
     var adjustPageHeight = 1;
     var border = 25;
     var spacingStaff = 4;
-    var appXPathQuery = "";
-    var choiceXPathQueries = ""
+    var appXPathQuery = [];
+    var choiceXPathQuery = [];
     var noLayout = 0;
     var vrvToolkit = new verovio.toolkit();
 
@@ -136,9 +131,10 @@ version-footer: true
                     border: border,
                     spacingStaff: spacingStaff,
                     appXPathQuery: appXPathQuery,
-                    choiceXPathQueries: choiceXPathQueries,
+                    choiceXPathQuery: choiceXPathQuery,
                     noLayout: noLayout,
-                    scale: zoom
+                    scale: zoom,
+                    noHeader: true
                 };
         console.log(options);
         var svg = vrvToolkit.renderData( data, options );

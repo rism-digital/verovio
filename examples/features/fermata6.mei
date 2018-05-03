@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+  <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Fermata centred on rests and fermata heigt</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-07-28</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Fermatas (whether as elements or as attributes) are placed at an appropriate distance from elements, and they are centred on rests.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="1.1">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+  </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000001776971154" midi.bpm="400">
+                        <staffGrp xml:id="staffgrp-0000000750438175">
+                            <staffDef xml:id="staffdef-0000000442948394" clef.shape="G" clef.line="2" meter.count="4" meter.unit="4" n="1" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000410963161">
+                        <measure xml:id="measure-L3" n="1">
+                            <staff xml:id="staff-L3F1N1" n="1">
+                                <layer xml:id="layer-L3F1N1" n="1">
+                                    <mRest xml:id="mrest-0000002017130879" fermata="above" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure xml:id="measure-L5" n="2">
+                            <staff xml:id="staff-L5F1N1" n="1">
+                                <layer xml:id="layer-L5F1N1" n="1">
+                                    <note xml:id="note-L6F1" dur="1" oct="5" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <fermata xml:id="fermata-L6F1" staff="1" startid="#note-L6F1" place="above" />
+                            <fermata xml:id="fermata-L7F1" staff="1" tstamp="5.000000" place="above" />
+                        </measure>
+                        <measure xml:id="measure-L7" n="3">
+                            <staff xml:id="staff-L7F1N1" n="1">
+                                <layer xml:id="layer-L7F1N1" n="1">
+                                    <note xml:id="note-L8F1" dur="2" oct="4" pname="d" accid.ges="n" />
+                                    <note xml:id="note-L9F1" dur="2" oct="4" pname="e" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <fermata xml:id="fermata-L9F1" staff="1" startid="#note-L9F1" place="above" />
+                        </measure>
+                        <measure xml:id="measure-L10" right="end" n="4">
+                            <staff xml:id="staff-L10F1N1" n="1">
+                                <layer xml:id="layer-L10F1N1" n="1">
+                                    <rest xml:id="rest-L11F1" dur="4" fermata="above" />
+                                    <rest xml:id="rest-L12F1" dur="2" />
+                                    <chord xml:id="chord-L13F1" dur="4">
+                                        <note xml:id="note-L13F1S1" oct="4" pname="c" accid.ges="n" />
+                                        <note xml:id="note-L13F1S2" oct="4" pname="e" accid.ges="n" />
+                                        <note xml:id="note-L13F1S3" oct="4" pname="g" accid.ges="n" />
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <fermata xml:id="fermata-L13F1" staff="1" startid="#chord-L13F1" place="above" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

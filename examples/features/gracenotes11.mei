@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Slurred grace notes</title>
+            </titleStmt>
+            <pubStmt>
+                <date>2017-05-17</date>
+            </pubStmt>
+            <notesStmt>
+                <annot>Verovio draws a short, thin, horizontal slur between a grace note and the adjacent (downstem) note.</annot>
+            </notesStmt>
+        </fileDesc>
+        <encodingDesc>
+            <appInfo>
+                <application version="0.9.13">
+                    <name>Verovio</name>
+                </application>
+            </appInfo>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <titleStmt>
+                    <title />
+                </titleStmt>
+            </work>
+        </workDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef xml:id="scoredef-0000001006259882" midi.bpm="120">
+                        <staffGrp xml:id="staffgrp-0000000752792052" symbol="brace" barthru="true">
+                            <staffDef xml:id="staffdef-0000001349853487" n="1" clef.shape="G" clef.line="2" key.sig="0" meter.count="4" meter.unit="4" meter.sym="common" lines="5" />
+                            <staffDef xml:id="staffdef-0000000386919599" n="2" clef.shape="F" clef.line="4" key.sig="0" meter.count="4" meter.unit="4" meter.sym="common" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section xml:id="section-0000000376847865">
+                        <measure xml:id="measure-L12" n="29">
+                            <staff xml:id="staff-L12F2N1" n="1">
+                                <layer xml:id="layer-L12F2N1" n="1">
+                                    <note xml:id="note-L13F2" dur="32" oct="4" pname="g" grace="acc" stem.dir="up">
+                                        <accid xml:id="accid-L13F2" accid="s" />
+                                    </note>
+                                    <beam xml:id="beam-L14F2-L20F2">
+                                        <note xml:id="note-L14F2" dur="8" oct="4" pname="a">
+                                            <accid xml:id="accid-L14F2" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L15F2" dur="32" oct="4" pname="b" grace="acc" stem.dir="up">
+                                            <accid xml:id="accid-L15F2" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L16F2" dur="8" oct="5" pname="c">
+                                            <accid xml:id="accid-L16F2" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L17F2" dur="32" oct="5" pname="d" grace="acc" stem.dir="up">
+                                            <accid xml:id="accid-L17F2" accid="s" />
+                                        </note>
+                                        <note xml:id="note-L18F2" dur="8" oct="5" pname="e">
+                                            <accid xml:id="accid-L18F2" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L19F2" dur="32" oct="5" pname="g" grace="acc" stem.dir="up">
+                                            <accid xml:id="accid-L19F2" accid="s" />
+                                        </note>
+                                        <note xml:id="note-L20F2" dur="8" oct="5" pname="a">
+                                            <accid xml:id="accid-L20F2" accid.ges="n" />
+                                        </note>
+                                    </beam>
+                                    <note xml:id="note-L21F2" dur="32" oct="5" pname="b" grace="acc" stem.dir="up">
+                                        <accid xml:id="accid-L21F2" accid.ges="n" />
+                                    </note>
+                                    <beam xml:id="beam-L22F2-L28F2">
+                                        <note xml:id="note-L22F2" dur="8" oct="6" pname="c">
+                                            <accid xml:id="accid-L22F2" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L23F2" dur="32" oct="5" pname="g" grace="acc" stem.dir="up">
+                                            <accid xml:id="accid-L23F2" accid="s" func="caution" />
+                                        </note>
+                                        <note xml:id="note-L24F2" dur="8" oct="5" pname="a">
+                                            <accid xml:id="accid-L24F2" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L25F2" dur="32" oct="5" pname="d" grace="acc" stem.dir="up">
+                                            <accid xml:id="accid-L25F2" accid="s" func="caution" />
+                                        </note>
+                                        <note xml:id="note-L26F2" dur="8" oct="5" pname="e">
+                                            <accid xml:id="accid-L26F2" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L27F2" dur="32" oct="4" pname="b" grace="acc" stem.dir="up">
+                                            <accid xml:id="accid-L27F2" accid.ges="n" />
+                                        </note>
+                                        <note xml:id="note-L28F2" dur="8" oct="5" pname="c">
+                                            <accid xml:id="accid-L28F2" accid.ges="n" />
+                                        </note>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff xml:id="staff-L12F1N1" n="2">
+                                <layer xml:id="layer-L12F1N1" n="1">
+                                    <mRest xml:id="mrest-0000000705272222" />
+                                    <clef xml:id="clef-0000001547987361" shape="F" line="4" />
+                                </layer>
+                            </staff>
+                            <slur xml:id="slur-L13F2-L14F2N1" staff="1" startid="#note-L13F2" endid="#note-L14F2" />
+                            <slur xml:id="slur-L15F2-L16F2N1" staff="1" startid="#note-L15F2" endid="#note-L16F2" />
+                            <slur xml:id="slur-L17F2-L18F2N1" staff="1" startid="#note-L17F2" endid="#note-L18F2" />
+                            <slur xml:id="slur-L19F2-L20F2N1" staff="1" startid="#note-L19F2" endid="#note-L20F2" />
+                            <slur xml:id="slur-L21F2-L22F2N1" staff="1" startid="#note-L21F2" endid="#note-L22F2" />
+                            <slur xml:id="slur-L23F2-L24F2N1" staff="1" startid="#note-L23F2" endid="#note-L24F2" />
+                            <slur xml:id="slur-L25F2-L26F2N1" staff="1" startid="#note-L25F2" endid="#note-L26F2" />
+                            <slur xml:id="slur-L27F2-L28F2N1" staff="1" startid="#note-L27F2" endid="#note-L28F2" />
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

@@ -58,18 +58,16 @@ downloads:
     function set_options( ) {
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
         pageWidth = ($(".row-offcanvas").width()) * 100 / zoom ; // - $( "#sidbar" ).width();
-        border = 50;
         options = {
+                    adjustPageHeight: true,
+                    breaks: "auto",
                     inputFormat: format,
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
-                    border: border,
+                    noFooter: true,
                     scale: zoom,
-                    spacingSystem: spacingSystem,
-                    adjustPageHeight: 1,
-                    ignoreLayout: 1
+                    spacingSystem: spacingSystem
                 };
-        //console.log( options );
         vrvToolkit.setOptions( options );
     }
 
@@ -124,7 +122,7 @@ downloads:
         $("#overlay").hide().css("cursor", "auto");
         $("#jump_text").val(page);
 
-        svg = vrvToolkit.renderPage(page, {});
+        svg = vrvToolkit.renderToSVG(page, {});
         $("#svg_output").html(svg);
 
         adjust_page_height();
@@ -160,7 +158,10 @@ downloads:
 
     function apply_zoom() {
         console.log("apply zoom")
+        // make sure we the toolkit exists
         if (vrvToolkit === undefined) return;
+        // make sure we have loaded a file
+        if (vrvToolkit.getPageCount() == 0) return;
         
         $.cookie('zoom', zoom, { expires: 30 });
         set_options();
@@ -280,7 +281,7 @@ downloads:
     }
 
     function play_midi() {
-        var base64midi = vrvToolkit.renderToMidi();
+        var base64midi = vrvToolkit.renderToMIDI();
         var song = 'data:audio/midi;base64,' + base64midi;
         $("#player").show();
         $("#play-button").hide();
@@ -288,7 +289,7 @@ downloads:
     }
 
     var midiUpdate = function(time) {
-        var vrvTime = Math.max(0, 2 * time - 800);
+        var vrvTime = Math.max(0, time - 400);
         var elementsattime = vrvToolkit.getElementsAtTime(vrvTime);
         if (elementsattime.page > 0) {
             if (elementsattime.page != page) {
@@ -592,7 +593,7 @@ downloads:
         });
         $("#player").midiPlayer({
             color: "#c00",
-            onUnpdate: midiUpdate,
+            onUpdate: midiUpdate,
             onStop: midiStop,
             width: 250
         });
