@@ -31,12 +31,14 @@ Nc::Nc()
         , PitchInterface()
         , PositionInterface()
         , AttColor()
+        , AttCoordinated()
 
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_COORDINATED);
 
     Reset();
 }
@@ -53,6 +55,7 @@ void Nc::Reset()
     PitchInterface::Reset();
     PositionInterface::Reset();
     ResetColor();
+    ResetCoordinated();
 }
 
 }

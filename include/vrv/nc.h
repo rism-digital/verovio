@@ -32,7 +32,8 @@ class Nc :   public LayerElement,
              public DurationInterface,
              public PitchInterface,
              public PositionInterface,
-             public AttColor {
+             public AttColor,
+             public AttCoordinated {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
