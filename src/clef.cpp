@@ -14,7 +14,7 @@ namespace vrv {
 // Clef
 //----------------------------------------------------------------------------
 
-Clef::Clef() : LayerElement("clef-"), AttClefShape(), AttColor(), AttLineLoc(), AttOctaveDisplacement()
+Clef::Clef() : LayerElement("clef-"), AttClefShape(), AttColor(), AttLineLoc(), AttOctaveDisplacement(), AttCoordinated()
 {
     Init();
 }
@@ -34,6 +34,7 @@ void Clef::Init()
 {
     RegisterAttClass(ATT_CLEFSHAPE);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_COORDINATED);
     RegisterAttClass(ATT_LINELOC);
     RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
 
@@ -47,6 +48,7 @@ void Clef::Reset()
     LayerElement::Reset();
     ResetClefShape();
     ResetColor();
+    ResetCoordinated();
     ResetLineLoc();
     ResetOctaveDisplacement();
 }

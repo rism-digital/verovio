@@ -1288,6 +1288,7 @@ void MeiOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     WriteLayerElement(currentNode, clef);
     clef->WriteClefShape(currentNode);
     clef->WriteColor(currentNode);
+    clef->WriteCoordinated(currentNode);
     clef->WriteLineLoc(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
 }
@@ -3733,6 +3734,7 @@ bool MeiInput::ReadClef(Object *parent, pugi::xml_node clef)
 
     vrvClef->ReadClefShape(clef);
     vrvClef->ReadColor(clef);
+    vrvClef->ReadCoordinated(clef);
     vrvClef->ReadLineLoc(clef);
     vrvClef->ReadOctaveDisplacement(clef);
 
