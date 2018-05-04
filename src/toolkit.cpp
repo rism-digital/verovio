@@ -22,6 +22,7 @@
 #include "iopae.h"
 #include "layer.h"
 #include "measure.h"
+#include "nc.h"
 #include "note.h"
 #include "options.h"
 #include "page.h"
@@ -1255,6 +1256,19 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
             = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), note->GetDrawingX(), &oct);
         note->SetPname(pname);
         note->SetOct(oct);
+        return true;
+    }
+    if (element->Is(NC)) {
+        Nc *nc = dynamic_cast<Nc *>(element);
+        assert(nc);
+        Layer *layer = dynamic_cast<Layer *>(nc->GetFirstParent(LAYER));
+        if (!layer) return false;
+        int oct;
+        data_PITCHNAME pname
+            = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), nc->GetDrawingX(), &oct);
+        nc->SetPname(pname);
+        nc->SetOct(oct);
+        nc->SetUlx(x);
         return true;
     }
     return false;
