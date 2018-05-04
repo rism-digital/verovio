@@ -118,20 +118,20 @@ bool MeiOutput::ExportFile()
             // schema processing instruction
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "http://music-encoding.org/schema/4.0.0/mei-all.rng";
+            decl.append_attribute("href") = "http://music-encoding.org/schema/3.0.0/mei-all.rng";
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://relaxng.org/ns/structure/1.0";
 
             // schematron processing instruction
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "http://music-encoding.org/schema/4.0.0/mei-all.rng";
+            decl.append_attribute("href") = "http://music-encoding.org/schema/3.0.0/mei-all.rng";
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
 
             m_mei = meiDoc.append_child("mei");
             m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
-            m_mei.append_attribute("meiversion") = "4.0.0";
+            m_mei.append_attribute("meiversion") = "2013";
 
             // this starts the call of all the functors
             m_doc->Save(this);
@@ -1192,7 +1192,7 @@ void MeiOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *elem
     element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
     if (element->m_xAbs != VRV_UNSET) {
-        currentNode.append_attribute("ulx") = StringFormat("%d", element->m_xAbs / DEFINITION_FACTOR).c_str();
+        currentNode.attribute("ulx") = StringFormat("%d", element->m_xAbs / DEFINITION_FACTOR).c_str();
     }
 }
 
@@ -1412,6 +1412,7 @@ void MeiOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
 
     WriteLayerElement(currentNode, nc);
     nc->WriteColor(currentNode);;
+    nc->WriteCoordinated(currentNode);;
 }
 
 void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
@@ -2615,7 +2616,7 @@ bool MeiInput::ReadPage(Object *parent, pugi::xml_node page)
     SetMeiUuid(page, vrvPage);
 
     if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
-        UpgradePageTo_3_0_0(vrvPage, m_doc);
+        // UpgradePageTo_3_0_0(vrvPage, m_doc);
     }
 
     if (page.attribute("page.height")) {
@@ -3900,6 +3901,7 @@ bool MeiInput::ReadNc(Object *parent, pugi::xml_node nc)
     ReadPitchInterface(nc, vrvNc);
     ReadPositionInterface(nc, vrvNc);
     vrvNc->ReadColor(nc);
+    vrvNc->ReadCoordinated(nc);
 
     parent->AddChild(vrvNc);
     return ReadLayerChildren(vrvNc, nc, vrvNc);
