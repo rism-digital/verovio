@@ -87,7 +87,8 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         wchar_t code = note->GetMensuralSmuflNoteHead();
         DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
         // For semibrevis with stem in black notation, encoded with an explicit stem direction
-        if ((drawingDur > DUR_1) || (note->GetStemDir() != STEMDIRECTION_NONE)) {
+        if (((drawingDur > DUR_1) || (note->GetStemDir() != STEMDIRECTION_NONE))
+            && note->GetStemVisible() != BOOLEAN_false) {
             DrawMensuralStem(dc, note, staff, stemDir, radius, xNote, yNote);
         }
     }
@@ -124,8 +125,7 @@ void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *lay
         case DUR_4: charCode = SMUFL_E9F6_mensuralRestSemiminima; break;
         case DUR_8: charCode = SMUFL_E9F7_mensuralRestFusa; break;
         case DUR_16: charCode = SMUFL_E9F8_mensuralRestSemifusa; break;
-        default:
-            charCode = 0; // This should never happen
+        default: charCode = 0; // This should never happen
     }
     DrawSmuflCode(dc, x, y, charCode, staff->m_drawingStaffSize, drawingCueSize);
 }
