@@ -13,7 +13,7 @@
 #include "scoredef.h"
 
 namespace smf {
-    class MidiFile;
+class MidiFile;
 }
 
 namespace vrv {

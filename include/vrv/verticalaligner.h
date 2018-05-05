@@ -59,6 +59,11 @@ public:
      */
     StaffAlignment *GetStaffAlignmentForStaffN(int staffN) const;
 
+    /**
+     * Find all the positioners pointing to an object;
+     */
+    void FindAllPositionerPointingTo(ArrayOfFloatingPositioners *positioners, FloatingObject *object);
+
 private:
     //
 public:

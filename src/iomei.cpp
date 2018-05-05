@@ -1057,6 +1057,7 @@ void MeiOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
     WriteTextDirInterface(currentNode, dir);
     WriteTimeSpanningInterface(currentNode, dir);
     dir->WriteLang(currentNode);
+    dir->WriteVerticalGroup(currentNode);
 }
 
 void MeiOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
@@ -1149,6 +1150,7 @@ void MeiOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WriteColor(currentNode);
     pedal->WritePedalLog(currentNode);
     pedal->WritePlacement(currentNode);
+    pedal->WriteVerticalGroup(currentNode);
 }
 
 void MeiOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
@@ -3311,6 +3313,7 @@ bool MeiInput::ReadDir(Object *parent, pugi::xml_node dir)
     ReadTextDirInterface(dir, vrvDir);
     ReadTimeSpanningInterface(dir, vrvDir);
     vrvDir->ReadLang(dir);
+    vrvDir->ReadVerticalGroup(dir);
 
     parent->AddChild(vrvDir);
     ReadUnsupportedAttr(dir, vrvDir);
@@ -3434,6 +3437,7 @@ bool MeiInput::ReadPedal(Object *parent, pugi::xml_node pedal)
     vrvPedal->ReadColor(pedal);
     vrvPedal->ReadPedalLog(pedal);
     vrvPedal->ReadPlacement(pedal);
+    vrvPedal->ReadVerticalGroup(pedal);
 
     parent->AddChild(vrvPedal);
     ReadUnsupportedAttr(pedal, vrvPedal);

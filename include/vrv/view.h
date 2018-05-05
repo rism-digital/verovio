@@ -413,8 +413,8 @@ protected:
      * Defined in view_mensural.cpp
      */
     ///@{
-    void DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_STEMDIRECTION dir, int radius,
-        int xn, int originY, int heightY = 0);
+    void DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_STEMDIRECTION dir, int radius, int xn,
+        int originY, int heightY = 0);
     void DrawMensurCircle(DeviceContext *dc, int x, int yy, Staff *staff);
     void DrawMensurDot(DeviceContext *dc, int x, int yy, Staff *staff);
     void DrawMensurHalfCircle(DeviceContext *dc, int x, int yy, Staff *staff);
@@ -438,8 +438,8 @@ protected:
      * Defined in view_graph.cpp
      */
     ///@{
-    void DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int nbr);
-    void DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int nbr);
+    void DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width, int dashLength = 0);
+    void DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int width, int dashLength = 0);
     void DrawSmuflCode(
         DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph = false);
     void DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle = 0.0);

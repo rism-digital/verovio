@@ -21,11 +21,11 @@
 
 namespace vrv {
 
-void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int nbr)
+void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int width, int dashLength)
 {
     assert(dc);
 
-    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(nbr)), AxSOLID);
+    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x1), ToDeviceContextY(y2));
@@ -35,11 +35,11 @@ void View::DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int nbr)
     return;
 }
 
-void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int nbr)
+void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int width, int dashLength)
 {
     assert(dc);
 
-    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(nbr)), AxSOLID);
+    dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(width)), AxSOLID, dashLength);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));

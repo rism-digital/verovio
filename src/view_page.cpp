@@ -655,9 +655,14 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     int barLineWidth = m_doc->GetDrawingBarLineWidth(100);
     int x1 = x - m_doc->GetDrawingBeamWidth(100, false) - barLineWidth;
     int x2 = x + m_doc->GetDrawingBeamWidth(100, false) + barLineWidth;
+    // optimized for five line staves
+    int dashLength = m_doc->GetDrawingUnit(100) * 8 / 13;
 
     if (barLine->GetForm() == BARRENDITION_single) {
         DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth);
+    }
+    else if (barLine->GetForm() == BARRENDITION_dashed) {
+        DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth, dashLength);
     }
     else if (barLine->GetForm() == BARRENDITION_rptend) {
         DrawVerticalLine(dc, yTop, yBottom, x1, barLineWidth);
@@ -684,6 +689,11 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
         x2 -= barLineWidth;
         DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth);
         DrawVerticalLine(dc, yTop, yBottom, x2, barLineWidth);
+    }
+    else if (barLine->GetForm() == BARRENDITION_dbldashed) {
+        x2 -= barLineWidth;
+        DrawVerticalLine(dc, yTop, yBottom, x, barLineWidth, dashLength);
+        DrawVerticalLine(dc, yTop, yBottom, x2, barLineWidth, dashLength);
     }
     else {
         // Use solid barline as fallback
