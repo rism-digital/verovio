@@ -63,6 +63,7 @@
 #include "labelabbr.h"
 #include "layer.h"
 #include "lb.h"
+#include "ligature.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "mordent.h"
@@ -4232,8 +4233,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 pointers.push_back((void *)chord);
                 processChordSignifiers(chord, layerdata[i], staffindex);
                 convertChord(chord, layerdata[i], staffindex);
-                elements.pop_back();
-                pointers.pop_back();
+                popElementStack(elements, pointers);
                 processSlurs(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
                 addArticulations(chord, layerdata[i]);
@@ -4356,6 +4356,17 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     return true;
 }
 
+/////////////////////////////
+//
+// HumdrumInput::popElementStack --
+//
+
+void HumdrumInput::popElementStack(std::vector<string> &elements, std::vector<void *> &pointers)
+{
+    elements.pop_back();
+    pointers.pop_back();
+}
+
 //////////////////////////////
 //
 // HumdrumInput::convertMensuralToken --  Convert a mensural token to MEI.
@@ -4365,9 +4376,17 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 void HumdrumInput::convertMensuralToken(
     std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token, int staffindex)
 {
-
     if (token->isNull()) {
         return;
+    }
+    if (!token->isMens()) {
+        return;
+    }
+    if (token->hasLigatureBegin()) {
+        Ligature *ligature = new Ligature;
+        appendElement(elements, pointers, ligature);
+        elements.push_back("ligature");
+        pointers.push_back((void *)ligature);
     }
 
     if (token->isRest()) {
@@ -4383,24 +4402,15 @@ void HumdrumInput::convertMensuralToken(
             Dot *dot = new Dot();
             appendElement(elements, pointers, dot);
         }
+    }
 
-        /*
-                processSlurs(layerdata[i]);
-                processDynamics(layerdata[i], staffindex);
-                if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
-                    note->SetStemLen(0);
-                }
-                if (m_signifiers.cuesize && layerdata[i]->find(m_signifiers.cuesize) != string::npos) {
-                    note->SetCue(BOOLEAN_true);
-                }
-                else if (m_staffstates.at(staffindex).cue_size.at(m_currentlayer)) {
-                    note->SetCue(BOOLEAN_true);
-                }
-                addArticulations(note, layerdata[i]);
-                addOrnaments(note, layerdata[i]);
-                addArpeggio(note, layerdata[i]);
-                processDirections(layerdata[i], staffindex);
-        */
+    if (token->hasLigatureEnd()) {
+        if (elements.back() == "ligature") {
+            popElementStack(elements, pointers);
+        }
+        else {
+            std::cerr << "WARNING: unmatched ligature ending" << std::endl;
+        }
     }
 }
 
@@ -6582,8 +6592,7 @@ void HumdrumInput::removeBeam(std::vector<string> &elements, std::vector<void *>
         }
         return;
     }
-    elements.pop_back();
-    pointers.pop_back();
+    popElementStack(elements, pointers);
 }
 
 //////////////////////////////
@@ -6601,8 +6610,7 @@ void HumdrumInput::removeGBeam(std::vector<string> &elements, std::vector<void *
         }
         return;
     }
-    elements.pop_back();
-    pointers.pop_back();
+    popElementStack(elements, pointers);
 }
 
 //////////////////////////////
@@ -6621,8 +6629,7 @@ void HumdrumInput::removeTuplet(std::vector<string> &elements, std::vector<void 
         }
         return;
     }
-    elements.pop_back();
-    pointers.pop_back();
+    popElementStack(elements, pointers);
 
     // Need to fix this when nested tuplets are allowed:
     m_tupletscaling = 1;
@@ -7788,6 +7795,12 @@ void HumdrumInput::appendElement(const std::vector<string> &name, const std::vec
     else if (name.back() == "chord") {
         appendElement((Chord *)pointers.back(), child);
     }
+    else if (name.back() == "ligature") {
+        appendElement((Ligature *)pointers.back(), child);
+    }
+    else {
+        std::cerr << "WARNING: Cannot append to unknown element: " << name.back() << std::endl;
+    }
 }
 
 /////////////////////////////
@@ -8175,7 +8188,6 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
 
     if (!chordQ) {
         hum::HumNum dur = convertRhythm(note, token, subtoken);
-        // ggg
         if (dur == 0) {
             note->SetDur(DURATION_4);
             note->SetStemLen(0);

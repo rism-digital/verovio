@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat May  5 00:28:09 PDT 2018
+// Last Modified: Sat May  5 09:42:28 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -893,11 +893,11 @@ bool Convert::isMensNote(const string& mensdata) {
 
 //////////////////////////////
 //
-// Convert::hasLigatureStart -- Returns true if the input string
+// Convert::hasLigatureBegin -- Returns true if the input string
 //   has a '<' character.
 //
 
-bool Convert::hasLigatureStart(const string& mensdata) {
+bool Convert::hasLigatureBegin(const string& mensdata) {
 	return mensdata.find('<') != std::string::npos;
 }
 
@@ -20335,6 +20335,36 @@ int HumdrumToken::hasCautionaryAccidental(int subtokenIndex) const {
 		}
 	}
 	return getValueBool("auto", to_string(subtokenIndex), "cautionaryAccidental");
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::hasLigatureBegin --
+//
+
+bool HumdrumToken::hasLigatureBegin(void) {
+	if (isMens()) {
+		return Convert::hasLigatureBegin(*this);
+	} else {
+		return false;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::hasLigatureBegin --
+//
+
+bool HumdrumToken::hasLigatureEnd(void) {
+	if (isMens()) {
+		return Convert::hasLigatureEnd(*this);
+	} else {
+		return false;
+	}
 }
 
 

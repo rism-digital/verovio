@@ -441,6 +441,7 @@ protected:
 
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
+    void popElementStack(std::vector<string> &elements, std::vector<void *> &pointers);
 
     template <class ELEMENT> void addTextElement(ELEMENT *element, const std::string &content);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
