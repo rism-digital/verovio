@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Apr 25 12:08:23 PDT 2018
+// Last Modified: Tue May  1 21:42:40 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -11454,7 +11454,7 @@ ostream& HumTool::getFreeText(ostream& out) {
 //
 
 bool HumTool::hasJsonText(void) {
-	return m_json_text.rdbuf()->in_avail();
+	return m_json_text.rdbuf()->in_avail() ? true : false;
 }
 
 
@@ -11522,7 +11522,7 @@ bool HumTool::hasError(void) {
 	if (hasParseError()) {
 		return true;
 	}
-	return m_error_text.rdbuf()->in_avail();
+	return m_error_text.rdbuf()->in_avail() ? true : false;
 }
 
 
@@ -27319,7 +27319,7 @@ Tool_autostem::Tool_autostem(void) {
 
 bool Tool_autostem::run(const string& indata, ostream& out) {
 	HumdrumFile infile(indata);
-	int status = run(infile, out);
+	bool status = run(infile, out);
 	if (hasAnyText()) {
 		getAllText(out);
 	} else {
@@ -27330,7 +27330,7 @@ bool Tool_autostem::run(const string& indata, ostream& out) {
 
 
 bool Tool_autostem::run(HumdrumFile& infile, ostream& out) {
-	int status = run(infile);
+	bool status = run(infile);
 	if (hasAnyText()) {
 		getAllText(out);
 	} else {
@@ -37634,7 +37634,7 @@ bool Tool_filter::run(const string& indata, ostream& out) {
 
 
 bool Tool_filter::run(HumdrumFile& infile, ostream& out) {
-	int status = run(infile);
+	bool status = run(infile);
 	if (hasAnyText()) {
 		getAllText(out);
 	} else {
@@ -46390,7 +46390,7 @@ bool Tool_myank::run(const string& indata, ostream& out) {
 
 
 bool Tool_myank::run(HumdrumFile& infile, ostream& out) {
-	int status = run(infile);
+	bool status = run(infile);
 	if (hasAnyText()) {
 		getAllText(out);
 	} else {
