@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Apr 25 12:08:23 PDT 2018
+// Last Modified: Sat May  5 00:28:09 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1214,6 +1214,7 @@ class HumdrumToken : public string, public HumHash {
 		const string& getDataType          (void) const;
 		bool     isDataType                (string dtype) const;
 		bool     isKern                    (void) const;
+		bool     isMens                    (void) const;
 		string   getSpineInfo              (void) const;
 		int      getTrack                  (void) const;
 		int      getSubtrack               (void) const;
@@ -2505,6 +2506,23 @@ class Convert {
 		static string  keyNumberToKern      (int number);
 		static int     base7ToBase40        (int base7);
 		static int     base40IntervalToDiatonic(int base40interval);
+
+
+		// **mens, white mensual notation, defiend in Convert-mens.cpp
+		static bool    isMensRest           (const string& mensdata);
+		static bool    isMensNote           (const string& mensdata);
+		static bool    hasLigatureStart     (const string& mensdata);
+		static bool    hasLigatureEnd       (const string& mensdata);
+		static bool    getMensStemDirection (const string& mensdata);
+		static HumNum  mensToDuration       (const string& mensdata,
+		                                     HumNum scale = 4,
+		                                     const string& separator = " ");
+		static string  mensToRecip          (const string& mensdata,
+		                                     HumNum scale = 4,
+		                                     const string& separator = " ");
+		static HumNum  mensToDurationNoDots(const string& mensdata,
+		                                     HumNum scale = 4,
+		                                     const string& separator = " ");
 
 		// Harmony processing, defined in Convert-harmony.cpp
 		static vector<int> minorHScaleBase40(void);
