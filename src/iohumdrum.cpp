@@ -4390,7 +4390,10 @@ void HumdrumInput::convertMensuralToken(
     }
 
     if (token->isRest()) {
-        std::cerr << "NOT DEALING WITH MENSURAL RESTS YET" << endl;
+        Rest *rest = new Rest;
+        setLocationId(rest, token);
+        appendElement(elements, pointers, rest);
+        convertRest(rest, token, staffindex);
     }
     else if (token->isNote()) {
         Note *note = new Note;
