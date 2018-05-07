@@ -248,7 +248,7 @@ private:
      */
     static int s_deCasteljau[4][4];
 };
-    
+
 //----------------------------------------------------------------------------
 // SegmentedLine
 //----------------------------------------------------------------------------
@@ -263,24 +263,24 @@ public:
      */
     ///@{
     SegmentedLine(int start, int end);
-    virtual ~SegmentedLine() {};
+    virtual ~SegmentedLine(){};
     ///@}
-    
+
     /**
      * Check if the segmented line is empty
      */
     bool IsEmpty() { return (m_segments.empty()); }
-    
+
     /**
      * Check if the line is one single segment
      */
     bool IsUnsegmented() { return (m_segments.size() == 1); }
-    
+
     /**
      * The number of segments
      */
     int GetSegmentCount() { return (int)m_segments.size(); }
-    
+
     /**
      * Get the start and end of a segment
      */

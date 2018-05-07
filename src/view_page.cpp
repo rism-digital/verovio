@@ -618,7 +618,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         // for the bottom position we need to take into account the number of lines and the staff size
         int yBottom
             = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
-        
+
         // erase intersections only if we have more than one staff
         bool eraseIntersections = (first != last) ? true : false;
         DrawBarLine(dc, yTop, yBottom, barLine, eraseIntersections);
@@ -656,7 +656,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     int x2 = x + m_doc->GetDrawingBeamWidth(100, false) + barLineWidth;
     // optimized for five line staves
     int dashLength = m_doc->GetDrawingUnit(100) * 8 / 13;
-    
+
     SegmentedLine line(yTop, yBottom);
     // We do not need to do this during layout calculation
     if (eraseIntersections && !dc->Is(BBOX_DEVICE_CONTEXT)) {
@@ -683,7 +683,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             lines.UpdateContentBBoxX(minX, maxX);
             lines.UpdateContentBBoxY(yTop, yBottom);
             int margin = m_doc->GetDrawingUnit(100) / 2;
-            system->m_systemAligner.FindAllIntersectionPoints(line, lines, {DIR, DYNAM, TEMPO}, margin);
+            system->m_systemAligner.FindAllIntersectionPoints(line, lines, { DIR, DYNAM, TEMPO }, margin);
         }
     }
 

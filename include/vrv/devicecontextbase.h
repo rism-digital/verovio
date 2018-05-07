@@ -191,7 +191,7 @@ public:
 
     // no copy ctor or assignment operator - the defaults are ok
 };
-    
+
 } // namespace vrv
 
 #endif // __AX_DC_BASE_H__
