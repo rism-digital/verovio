@@ -27,6 +27,7 @@
 #include "options.h"
 #include "page.h"
 #include "slur.h"
+#include "staff.h"
 #include "svgdevicecontext.h"
 #include "vrv.h"
 
@@ -1271,6 +1272,23 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
         nc->SetUlx(x);
         return true;
     }
+    if (element->Is(CLEF)) {
+        Clef *clef = dynamic_cast<Clef *>(element);
+        assert(clef);
+        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
+        if (!layer) return false;
+        
+        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+        assert(staff);
+        // TODO
+        int staffy = staff->GetDrawingY();
+        int clefLine = staff->m_drawingLines - (staffy - y) / m_doc.GetDrawingDoubleUnit(staff->m_drawingStaffSize); 
+        clef->SetLine(clefLine);
+        clef->SetUlx(x);
+        
+        return true;
+    }
+        
     return false;
 }
 
