@@ -2378,23 +2378,23 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 
     if (primarymensuration.empty()) {
         if (timesig.size() > 0) {
-            setTimeSig(m_staffdef.back(), timesig);
+            setTimeSig(m_staffdef.back(), timesig, partstart);
         }
         if (metersig.size() > 0) {
-            setMeterSymbol(m_staffdef.back(), metersig);
+            setMeterSymbol(m_staffdef.back(), metersig, partstart);
         }
     }
     else {
         if ((primarymensuration == "C|") || (primarymensuration == "c|")) {
-            setTimeSig(m_staffdef.back(), "*M2/1");
-            setMeterSymbol(m_staffdef.back(), primarymensuration);
+            setTimeSig(m_staffdef.back(), "*M2/1", partstart);
+            setMeterSymbol(m_staffdef.back(), primarymensuration, partstart);
         }
         else if ((primarymensuration == "C") || (primarymensuration == "c")) {
-            setTimeSig(m_staffdef.back(), "*M4/1");
-            setMeterSymbol(m_staffdef.back(), primarymensuration);
+            setTimeSig(m_staffdef.back(), "*M4/1", partstart);
+            setMeterSymbol(m_staffdef.back(), primarymensuration, partstart);
         }
         else if ((primarymensuration == "O") || (primarymensuration == "o")) {
-            setTimeSig(m_staffdef.back(), "*M3/1");
+            setTimeSig(m_staffdef.back(), "*M3/1", partstart);
         }
     }
 
@@ -2587,12 +2587,16 @@ void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, hum::HTp partstar
 
 //////////////////////////////
 //
-// HumdrumInput::setMeterSymbol -- common time or cut time.
-//    (no other mensurations for now).
+// HumdrumInput::setMeterSymbol -- common time or cut time for CMN.
 //
 
-template <class ELEMENT> void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig)
+template <class ELEMENT>
+void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig, hum::HTp partstart)
 {
+    if ((partstart != NULL) && partstart->isMens()) {
+        setMensurationSymbol(element, metersig);
+        return;
+    }
 
     if (metersig == "C") {
         // This is used more strictly for C mensuration.
@@ -2626,11 +2630,41 @@ template <class ELEMENT> void HumdrumInput::setMeterSymbol(ELEMENT *element, con
 
 //////////////////////////////
 //
+// HumdrumInput::setMensurationSymbol --
+//
+
+template <class ELEMENT> void HumdrumInput::setMensurationSymbol(ELEMENT *element, const std::string &metersig)
+{
+    if (metersig.find('C') != std::string::npos) {
+        element->SetMensurSign(MENSURATIONSIGN_C);
+    }
+    else if (metersig.find('O') != std::string::npos) {
+        element->SetMensurSign(MENSURATIONSIGN_O);
+    }
+    else {
+        std::cerr << "Warning: do not understand mensuration " << metersig << std::endl;
+        return;
+    }
+
+    if (metersig.find('|') != std::string::npos) {
+        element->SetMensurSlash(1);
+    }
+    if (metersig.find('.') != std::string::npos) {
+        element->SetMensurDot(BOOLEAN_true);
+    }
+}
+
+//////////////////////////////
+//
 // HumdrumInput::setTimeSig -- Convert a Humdrum timesig to an MEI timesig.
 //
 
-void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig)
+void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, hum::HTp partstart)
 {
+    if ((partstart != NULL) && partstart->isMens()) {
+        // Don't display time signatures in mensural notation.
+        return;
+    }
     int top = -1000;
     int bot = -1000;
     int bot2 = -1000;

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat May  5 09:42:28 PDT 2018
+// Last Modified: Sun May  6 16:17:34 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -12496,6 +12496,7 @@ HumdrumLine& HumdrumFileBase::operator[](int index) {
 	}
 	if ((index < 0) || (index >= (int)m_lines.size())) {
 		cerr << "Error: invalid index: " << index << endl;
+		cerr << "Max index is " << m_lines.size() - 1 << endl;
 		index = (int)m_lines.size()-1;
 	}
 	return *m_lines[index];
@@ -19721,13 +19722,11 @@ HumNum HumdrumToken::getDuration(HumNum scale) const {
 
 HumNum HumdrumToken::getTiedDuration(void) {
 	HumNum output = m_duration;
-	if ((*this).find("[") == string::npos) {
-		return output;
-	}
+
 	// start of a tied group so add the durations of the other notes.
    int b40 = Convert::kernToBase40(*this);
-	HumdrumToken *note = this;
-	HumdrumToken *nnote = NULL;
+	HTp note = this;
+	HTp nnote = NULL;
 	int tcount;
 	while (note) {
 		tcount = note->getNextNonNullDataTokenCount();
@@ -19740,6 +19739,10 @@ HumNum HumdrumToken::getTiedDuration(void) {
 		}
 		for (int i=0; i<getNextNonNullDataTokenCount(); i++) {
 			nnote = note->getNextNNDT();
+			if ((nnote->find("_") == std::string::npos) &&
+			   (nnote->find("]") == std::string::npos)) {
+				return output;
+			}
 			if (!nnote->isData())  {
 				continue;
 			}
@@ -19747,9 +19750,10 @@ HumNum HumdrumToken::getTiedDuration(void) {
 			if (pitch2 != b40) {
 				continue;
 			}
-			if (nnote->find("_")  != string::npos) {
+
+			if (nnote->find("_")  != std::string::npos) {
 				output += nnote->getDuration();
-			} else if (nnote->find("]") != string::npos) {
+			} else if (nnote->find("]") != std::string::npos) {
 				output += nnote->getDuration();
 				return output;
 			}
@@ -37927,6 +37931,8 @@ bool Tool_filter::run(HumdrumFile& infile) {
 			RUNTOOL(msearch, infile, commands[i].second, status);
 		} else if (commands[i].first == "satb2gs") {
 			RUNTOOL(satb2gs, infile, commands[i].second, status);
+		} else if (commands[i].first == "kern2mens") {
+			RUNTOOL(kern2mens, infile, commands[i].second, status);
 		} else if (commands[i].first == "recip") {
 			RUNTOOL(recip, infile, commands[i].second, status);
 		} else if (commands[i].first == "transpose") {
@@ -38623,6 +38629,225 @@ int Tool_imitation::compareSequences(vector<NoteCell*>& attack1,
 	}
 
 	return count;
+}
+
+
+
+
+/////////////////////////////////
+//
+// Tool_kern2mens::Tool_kern2mens -- Set the recognized options for the tool.
+//
+
+Tool_kern2mens::Tool_kern2mens(void) {
+	define("N|no-measure-numbers=b", "remove measure numbers");
+	define("M|no-measures=b",        "remove measures ");
+	define("I|not-invisible=b",       "keep measures visible");
+	define("D|no-double-bar=b",       "keep thick final barlines");
+	define("c|clef=s",                "clef to use in mensural notation");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_kern2mens::run -- Do the main work of the tool.
+//
+
+bool Tool_kern2mens::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_kern2mens::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_kern2mens::run(HumdrumFile& infile) {
+	m_numbersQ   = !getBoolean("no-measure-numbers");
+	m_measuresQ  = !getBoolean("no-measures");
+	m_invisibleQ = !getBoolean("not-invisible");
+	m_doublebarQ = !getBoolean("no-double-bar");
+	m_clef       = getString("clef");
+	convertToMens(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_kern2mens::convertToMens -- 
+//
+
+void Tool_kern2mens::convertToMens(HumdrumFile& infile) {
+	int maxtrack = infile.getMaxTrack();
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isBarline()) {
+			printBarline(infile, i);
+			continue;
+		}
+		if (!infile[i].hasSpines()) {
+			m_humdrum_text << infile[i] << "\n";
+			continue;
+		}
+		if ((maxtrack == 1) && infile[i].isAllNull()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			m_humdrum_text << convertKernTokenToMens(token);
+			if (j < infile[i].getFieldCount() - 1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_kern2mens::convertKernTokenToMens --
+//
+
+string Tool_kern2mens::convertKernTokenToMens(HTp token) {
+	string data;
+	HumRegex hre;
+	if (!token->isKern()) {
+		return *token;
+	}
+	if (token->isNull()) {
+		return *token;
+	}
+	if (token->isExclusiveInterpretation()) {
+		return "**mens";
+	}
+	if (token->isInterpretation()) {
+		if (!m_clef.empty()) {
+			if (hre.search(token, "^\\*clef")) {
+				data = "*clef";
+				data += m_clef;
+				return data;
+			}
+		}
+	}
+	if (!token->isData()) {
+		return *token;
+	}
+	if (token->isSecondaryTiedNote()) {
+		return ".";
+	}
+	data = *token;
+	HumNum dur;
+	if (token->find("[") != std::string::npos) {
+		dur = token->getTiedDuration();
+		hre.replaceDestructive(data, "", "\\[");
+	} else {
+		dur = token->getDuration();
+	}
+	string rhythm = Convert::durationToRecip(dur);
+	hre.replaceDestructive(data, rhythm, "\\d+\\.*");
+	hre.replaceDestructive(data, "X", "000");
+	hre.replaceDestructive(data, "L", "00");
+	hre.replaceDestructive(data, "S", "0");
+	hre.replaceDestructive(data, "s", "1");
+	hre.replaceDestructive(data, "M", "2");
+	hre.replaceDestructive(data, "m", "4");
+	hre.replaceDestructive(data, "U", "8");
+	hre.replaceDestructive(data, "u", "16");
+	hre.replaceDestructive(data, ":", "\\.");
+	return data;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_kern2mens::printBarline --
+//
+
+void Tool_kern2mens::printBarline(HumdrumFile& infile, int line) {
+	bool doubleQ = false;
+	// keeping double barlines and final barlines.
+	if (infile.token(line, 0)->find("==") != std::string::npos) {
+		doubleQ = true;
+	} else if (infile.token(line, 0)->find("||") != std::string::npos) {
+		doubleQ = true;
+	} else if (!m_measuresQ) {
+		return;
+	}
+
+	HumRegex hre;
+	int dataline = line+1;
+	while (dataline < infile.getLineCount()) {
+		if (infile[dataline].isData()) {
+			break;
+		}
+		dataline++;
+	}
+	if (dataline >= infile.getLineCount()) {
+		dataline = infile.getLineCount() - 1;
+	}
+	if (infile[dataline].isData()) {
+		int attacks = true;
+		for (int j=0; j<infile[dataline].getFieldCount(); j++) {
+			HTp token = infile.token(dataline, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			if (token->isSecondaryTiedNote()) {
+				attacks = false;
+				break;
+			}
+		}
+		if ((!doubleQ) && (!attacks)) {
+			return;
+		}
+	}
+
+	for (int j=0; j<infile[line].getFieldCount(); j++) {
+		doubleQ = false;
+		string token = *infile.token(line, j);
+		if (m_doublebarQ && (token.find("==") != std::string::npos)) {
+			hre.replaceDestructive(token, "=||", "=+");
+			doubleQ = true;
+		}
+		if (m_doublebarQ && (token.find("||") != std::string::npos)) {
+			doubleQ = true;
+		}
+		if (!m_numbersQ) {
+			hre.replaceDestructive(token, "", "\\d+");
+		}
+		if (token.find("-") != std::string::npos) {
+			m_humdrum_text << token;
+		} else {
+			if ((!doubleQ) && m_invisibleQ) {
+				m_humdrum_text << token << "-";
+			} else {
+				m_humdrum_text << token;
+			}
+		}
+		if (j < infile[line].getFieldCount() - 1) {
+			m_humdrum_text << "\t";
+		}
+	}
+	m_humdrum_text << "\n";
 }
 
 

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat May  5 09:42:28 PDT 2018
+// Last Modified: Sun May  6 16:17:34 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -4406,6 +4406,30 @@ class Tool_imitation : public HumTool {
 		bool m_mark;
 		char m_marker = '@';
 		static int Enumerator;
+};
+
+
+class Tool_kern2mens : public HumTool {
+	public:
+		         Tool_kern2mens           (void);
+		        ~Tool_kern2mens           () {};
+
+		bool     run                      (HumdrumFile& infile);
+		bool     run                      (const string& indata, ostream& out);
+		bool     run                      (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     convertToMens            (HumdrumFile& infile);
+		string   convertKernTokenToMens   (HTp token);
+		void     printBarline             (HumdrumFile& infile, int line);
+
+	private:
+		bool     m_numbersQ   = true;      // used with -N option
+		bool     m_measuresQ  = true;      // used with -M option
+		bool     m_invisibleQ = true;      // used with -I option
+		bool     m_doublebarQ = true;      // used with -D option
+		string   m_clef;                   // used with -c option
+
 };
 
 
