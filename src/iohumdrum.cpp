@@ -2401,7 +2401,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     addInstrumentDefinition(m_staffdef.back(), partstart);
 
     if (partstart->isMens()) {
-        m_staffdef.back()->SetNotationtype(NOTATIONTYPE_mensural);
+        m_staffdef.back()->SetNotationtype(NOTATIONTYPE_mensural_white);
     }
 }
 
