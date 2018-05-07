@@ -246,7 +246,7 @@ void View::DrawMensuralStem(
 
     int halfStemWidth = m_doc->GetDrawingStemWidth(staffSize) / 2;
     // draw the stems and the flags
-    
+
     dc->StartCustomGraphic("stem");
     if (dir == STEMDIRECTION_up) {
 
@@ -327,26 +327,26 @@ void View::DrawMensurReversedHalfCircle(DeviceContext *dc, int x, int yy, Staff 
 {
     assert(dc);
     assert(staff);
-    
+
     int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     dc->SetPen(m_currentColour, lineWidth, AxSOLID);
     dc->SetBrush(m_currentColour, AxTRANSPARENT);
-    
+
     /* DrawEllipticArc expects x and y to specify the coordinates of the upper-left corner of the
      rectangle that contains the ellipse; y is not the center of the circle it's an arc of. */
     double halfDistBelowTop = MSIGN_STAFFLINES_BELOW_TOP - (MSIGN_CIRCLE_DIAM / 2.0);
     int y = ToDeviceContextY(yy - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * halfDistBelowTop);
     int r = ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
     r = (int)(MSIGN_CIRCLE_DIAM / 2.0 * r);
-    
+
     x = ToDeviceContextX(x);
     x -= 3 * r / 3;
-    
+
     dc->DrawEllipticArc(x, y, 2 * r, 2 * r, 140, 220);
-    
+
     dc->ResetPen();
     dc->ResetBrush();
-    
+
     return;
 }
 
@@ -375,7 +375,8 @@ void View::DrawMensurSlash(DeviceContext *dc, int a, int yy, Staff *staff)
     assert(staff);
 
     int y1 = yy - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int y2 = y1 - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int y2 = y1 - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)
+        + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
     DrawVerticalLine(dc, y1, y2, a, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
     return;
@@ -451,8 +452,10 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     }
 
     // corset lateral
-    DrawFilledRectangle(dc, xLeft - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3, xLeft + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y4);
-    DrawFilledRectangle(dc, xRight - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3, xRight + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y4);
+    DrawFilledRectangle(dc, xLeft - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3,
+        xLeft + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y4);
+    DrawFilledRectangle(dc, xRight - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3,
+        xRight + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y4);
 
     // stem
     if (note->GetActualDur() < DUR_BR) {
@@ -469,10 +472,10 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
             yBottom = yTop;
         }
         dc->StartCustomGraphic("stem");
-        
-        DrawFilledRectangle(dc, xRight - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3, xRight + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
-                            yBottom);
-        
+
+        DrawFilledRectangle(dc, xRight - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3,
+            xRight + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, yBottom);
+
         dc->EndCustomGraphic();
     }
 
