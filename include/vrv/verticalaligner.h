@@ -63,6 +63,11 @@ public:
      * Find all the positioners pointing to an object;
      */
     void FindAllPositionerPointingTo(ArrayOfFloatingPositioners *positioners, FloatingObject *object);
+    
+    /**
+     * Find all the intersection points with a vertical line (top to bottom)
+     */
+    void FindAllIntersectionPoints(std::vector<Point> &points, Point &top, Point &bottom, std::vector<ClassId> &classes);
 
 private:
     //
