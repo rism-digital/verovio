@@ -283,7 +283,7 @@ void View::DrawMensurCircle(DeviceContext *dc, int x, int yy, Staff *staff)
     int r = ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
     r = (int)(MSIGN_CIRCLE_DIAM / 2.0 * r);
 
-    int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
+    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     dc->SetPen(m_currentColour, lineWidth, AxSOLID);
     dc->SetBrush(m_currentColour, AxTRANSPARENT);
 
@@ -298,7 +298,7 @@ void View::DrawMensurHalfCircle(DeviceContext *dc, int x, int yy, Staff *staff)
     assert(dc);
     assert(staff);
 
-    int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
+    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     dc->SetPen(m_currentColour, lineWidth, AxSOLID);
     dc->SetBrush(m_currentColour, AxTRANSPARENT);
 
@@ -312,7 +312,7 @@ void View::DrawMensurHalfCircle(DeviceContext *dc, int x, int yy, Staff *staff)
     x = ToDeviceContextX(x);
     x -= 3 * r / 3;
 
-    dc->DrawEllipticArc(x, y, 2 * r, 2 * r, 45, 315);
+    dc->DrawEllipticArc(x, y, 2 * r, 2 * r, 40, 320);
 
     dc->ResetPen();
     dc->ResetBrush();
@@ -324,22 +324,26 @@ void View::DrawMensurReversedHalfCircle(DeviceContext *dc, int x, int yy, Staff 
 {
     assert(dc);
     assert(staff);
-
-    dc->SetPen(m_currentColour, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize), AxSOLID);
+    
+    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    dc->SetPen(m_currentColour, lineWidth, AxSOLID);
     dc->SetBrush(m_currentColour, AxTRANSPARENT);
-
-    int y = ToDeviceContextY(yy - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
+    
+    /* DrawEllipticArc expects x and y to specify the coordinates of the upper-left corner of the
+     rectangle that contains the ellipse; y is not the center of the circle it's an arc of. */
+    double halfDistBelowTop = MSIGN_STAFFLINES_BELOW_TOP - (MSIGN_CIRCLE_DIAM / 2.0);
+    int y = ToDeviceContextY(yy - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * halfDistBelowTop);
     int r = ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
-
-    // needs to be fixed
+    r = (int)(MSIGN_CIRCLE_DIAM / 2.0 * r);
+    
     x = ToDeviceContextX(x);
-    x -= 4 * r / 3;
-
-    dc->DrawEllipticArc(x, y, 2 * r, 2 * r, 225, 135);
-
+    x -= 3 * r / 3;
+    
+    dc->DrawEllipticArc(x, y, 2 * r, 2 * r, 140, 220);
+    
     dc->ResetPen();
     dc->ResetBrush();
-
+    
     return;
 }
 
@@ -367,10 +371,10 @@ void View::DrawMensurSlash(DeviceContext *dc, int a, int yy, Staff *staff)
     assert(dc);
     assert(staff);
 
-    int y1 = yy;
-    int y2 = y1 - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+    int y1 = yy - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    int y2 = y1 - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
-    DrawVerticalLine(dc, y1, y2, a, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize));
+    DrawVerticalLine(dc, y1, y2, a, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
     return;
 }
 
