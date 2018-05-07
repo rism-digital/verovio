@@ -2378,7 +2378,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 
     if (primarymensuration.empty()) {
         if (timesig.size() > 0) {
-            setTimeSig(m_staffdef.back(), timesig, partstart);
+            setTimeSig(m_staffdef.back(), timesig, metersig, partstart);
         }
         if (metersig.size() > 0) {
             setMeterSymbol(m_staffdef.back(), metersig, partstart);
@@ -2386,15 +2386,16 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
     else {
         if ((primarymensuration == "C|") || (primarymensuration == "c|")) {
-            setTimeSig(m_staffdef.back(), "*M2/1", partstart);
+            setTimeSig(m_staffdef.back(), "*M2/1", metersig, partstart);
             setMeterSymbol(m_staffdef.back(), primarymensuration, partstart);
         }
         else if ((primarymensuration == "C") || (primarymensuration == "c")) {
-            setTimeSig(m_staffdef.back(), "*M4/1", partstart);
+            setTimeSig(m_staffdef.back(), "*M4/1", metersig, partstart);
             setMeterSymbol(m_staffdef.back(), primarymensuration, partstart);
         }
         else if ((primarymensuration == "O") || (primarymensuration == "o")) {
-            setTimeSig(m_staffdef.back(), "*M3/1", partstart);
+            setTimeSig(m_staffdef.back(), "*M3/1", metersig, partstart);
+            setMeterSymbol(m_staffdef.back(), primarymensuration, partstart);
         }
     }
 
@@ -2598,6 +2599,16 @@ void HumdrumInput::setMeterSymbol(ELEMENT *element, const std::string &metersig,
         return;
     }
 
+    // handle mensuration displays:
+    if (metersig.find("C") != std::string::npos) {
+        setMensurationSymbol(element, metersig);
+        return;
+    }
+    if (metersig.find("O") != std::string::npos) {
+        setMensurationSymbol(element, metersig);
+        return;
+    }
+
     if (metersig == "C") {
         // This is used more strictly for C mensuration.
         element->SetMeterSym(METERSIGN_common);
@@ -2652,6 +2663,9 @@ template <class ELEMENT> void HumdrumInput::setMensurationSymbol(ELEMENT *elemen
     if (metersig.find('.') != std::string::npos) {
         element->SetMensurDot(BOOLEAN_true);
     }
+    // if (metersig.find('r') != std::string::npos) {
+    //    element->SetMensurOrient(ORIENTATION_reversed);
+    //}
 }
 
 //////////////////////////////
@@ -2659,12 +2673,23 @@ template <class ELEMENT> void HumdrumInput::setMensurationSymbol(ELEMENT *elemen
 // HumdrumInput::setTimeSig -- Convert a Humdrum timesig to an MEI timesig.
 //
 
-void HumdrumInput::setTimeSig(StaffDef *part, const std::string &timesig, hum::HTp partstart)
+void HumdrumInput::setTimeSig(
+    StaffDef *part, const std::string &timesig, const std::string &metersig, hum::HTp partstart)
 {
     if ((partstart != NULL) && partstart->isMens()) {
         // Don't display time signatures in mensural notation.
         return;
     }
+
+    // Don't store time signature if there is a mensuration to show
+    // (verivio will display both mensuration and time signature.
+    if (metersig.find("C") != std::string::npos) {
+        return;
+    }
+    if (metersig.find("O") != std::string::npos) {
+        return;
+    }
+
     int top = -1000;
     int bot = -1000;
     int bot2 = -1000;
@@ -6345,10 +6370,14 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         int unit = -1;
         std::smatch matches;
         if (regex_search(*timesig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
-            count = stoi(matches[1]);
-            unit = stoi(matches[2]);
-            scoreDef->SetMeterCount(count);
-            scoreDef->SetMeterUnit(unit);
+            if ((metersig->find('C') == std::string::npos) && (metersig->find('O') == std::string::npos)) {
+                // Only storing the time signature if there is no mensuration
+                // otherwise verovio will display both.
+                count = stoi(matches[1]);
+                unit = stoi(matches[2]);
+                scoreDef->SetMeterCount(count);
+                scoreDef->SetMeterUnit(unit);
+            }
             if (metersig) {
                 auto ploc = metersig->rfind(")");
                 if (ploc != string::npos) {
