@@ -496,7 +496,7 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     // Draw children (notes)
     DrawLayerChildren(dc, ligature, layer, staff, measure);
-    // dc->SetEmptyBB();    ...really shouldn't be needed.
+
     dc->EndGraphic(ligature, this);
 }
 
@@ -551,8 +551,11 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
         DrawFilledRectangle(dc, xLeft, yTop, xRight, yBottom);
     }
 
-    DrawVerticalLine(dc, y3, y4, xLeft, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)); // corset lateral
-    DrawVerticalLine(dc, y3, y4, xRight, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+    // corset lateral
+    DrawFilledRectangle(dc, xLeft - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3,
+        xLeft + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y4);
+    DrawFilledRectangle(dc, xRight - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3,
+        xRight + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y4);
 
     return;
 }
