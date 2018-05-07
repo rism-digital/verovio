@@ -246,6 +246,8 @@ void View::DrawMensuralStem(
 
     int halfStemWidth = m_doc->GetDrawingStemWidth(staffSize) / 2;
     // draw the stems and the flags
+    
+    dc->StartCustomGraphic("stem");
     if (dir == STEMDIRECTION_up) {
 
         if (nbFlags > 0) {
@@ -269,6 +271,7 @@ void View::DrawMensuralStem(
             DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
         }
     }
+    dc->EndCustomGraphic();
 
     // Store the stem direction ?
     note->SetDrawingStemDir(dir);
@@ -447,8 +450,9 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
         DrawFilledRectangle(dc, xLeft, yTop, xRight, yBottom);
     }
 
-    DrawVerticalLine(dc, y3, y4, xLeft, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)); // corset lateral
-    DrawVerticalLine(dc, y3, y4, xRight, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+    // corset lateral
+    DrawFilledRectangle(dc, xLeft - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3, xLeft + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y4);
+    DrawFilledRectangle(dc, xRight - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3, xRight + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y4);
 
     // stem
     if (note->GetActualDur() < DUR_BR) {
@@ -464,7 +468,12 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
             y3 = yTop + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
             yBottom = yTop;
         }
-        DrawVerticalLine(dc, yBottom, y3, xRight, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+        dc->StartCustomGraphic("stem");
+        
+        DrawFilledRectangle(dc, xRight - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3, xRight + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
+                            yBottom);
+        
+        dc->EndCustomGraphic();
     }
 
     return;
