@@ -1,4 +1,4 @@
 name: Verovio music engraving library
 markdown: kramdown
-baseurl: "http://www.verovio.org"
+baseurl: "https://www.verovio.org"
 exclude: []
