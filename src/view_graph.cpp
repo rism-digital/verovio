@@ -48,6 +48,25 @@ void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int wid
     dc->ResetBrush();
     return;
 }
+   
+
+void View::DrawVerticalSegmentedLine(DeviceContext *dc, int x1, SegmentedLine &line, int width, int dashLength)
+{
+    int i, start, end;
+    for (i = 0; i < line.GetSegmentCount(); i++) {
+        line.GetStartEnd(start, end, i);
+        DrawVerticalLine(dc, start, end, x1, width, dashLength);
+    }
+}
+
+void View::DrawHorizontalSegmentedLine(DeviceContext *dc, int y1, SegmentedLine &line, int width, int dashLength)
+{
+    int i, start, end;
+    for (i = 0; i < line.GetSegmentCount(); i++) {
+        line.GetStartEnd(start, end, i);
+        DrawHorizontalLine(dc, start, end, y1, width, dashLength);
+    }
+}
 
 /*
  * Draw rectangle partly filled in, as specified by <fillSection>: 1=top, 2=bottom, 3=left side,

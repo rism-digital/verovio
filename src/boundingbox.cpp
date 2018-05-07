@@ -862,5 +862,67 @@ int BoundingBox::RectBottomOverlap(const Point rect1[2], const Point rect2[2], i
     if ((rect1[0].x > rect2[1].x + hMargin) || (rect1[1].x < rect2[0].x - hMargin)) return 0;
     return std::max(0, rect2[1].y - rect1[0].y + margin);
 }
+    
+//----------------------------------------------------------------------------
+// SegmentedLine
+//----------------------------------------------------------------------------
+
+SegmentedLine::SegmentedLine(int start, int end)
+{
+    assert(start != end);
+    
+    if (start > end) {
+        BoundingBox::Swap(start, end);
+    }
+    m_segments.push_back(std::make_pair(start, end));
+}
+
+
+void SegmentedLine::GetStartEnd(int &start, int &end, int idx)
+{
+    assert(idx >= 0);
+    assert(idx < GetSegmentCount());
+    
+    start = m_segments.at(idx).first;
+    end = m_segments.at(idx).second;
+}
+
+void SegmentedLine::AddGap(int start, int end)
+{
+    assert(start != end);
+    
+    if (start > end) {
+        BoundingBox::Swap(start, end);
+    }
+    
+    // nothing to do
+    if (m_segments.empty()) return;
+    
+    // insert the gap
+    std::vector<std::pair<int, int> >::iterator iter = m_segments.begin();
+    while (iter != m_segments.end()) {
+        // drop the segment because the gap encompass it
+        if ((start <= iter->first) && (end >= iter->second)) {
+            iter = m_segments.erase(iter);
+            continue;
+        }
+        // cut the segment because the gap in within it
+        if ((iter->first <= start) && (iter->second >= end)) {
+            iter = m_segments.insert(iter, std::make_pair(iter->first, start));
+            iter++;
+            iter->first = end;
+            break;
+        }
+        // move the start of the segment
+        if ((start < iter->first) && (end >= iter->first)) {
+            iter->first = end;
+        }
+        // move the end of the segment
+        if ((end > iter->second) && (start <= iter->second)) {
+            iter->second = start;
+        }
+        ++iter;
+    }
+}
 
 } // namespace vrv

@@ -67,7 +67,7 @@ public:
     /**
      * Find all the intersection points with a vertical line (top to bottom)
      */
-    void FindAllIntersectionPoints(std::vector<Point> &points, Point &top, Point &bottom, std::vector<ClassId> &classes);
+    void FindAllIntersectionPoints(SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin);
 
 private:
     //
@@ -174,6 +174,11 @@ public:
      * Deletes all the FloatingPositioner objects.
      */
     void ClearPositioners();
+    
+    /**
+     * Find all the intersection points with a vertical line (top to bottom)
+     */
+    void FindAllIntersectionPoints(SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin);
 
     //----------//
     // Functors //

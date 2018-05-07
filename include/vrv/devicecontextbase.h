@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "attdef.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -190,7 +191,7 @@ public:
 
     // no copy ctor or assignment operator - the defaults are ok
 };
-
+    
 } // namespace vrv
 
 #endif // __AX_DC_BASE_H__
