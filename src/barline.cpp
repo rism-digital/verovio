@@ -29,10 +29,11 @@ namespace vrv {
 // BarLine
 //----------------------------------------------------------------------------
 
-BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor()
+BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor(), AttVisibility()
 {
     RegisterAttClass(ATT_BARLINELOG);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_VISIBILITY);
 
     Reset();
 }
@@ -45,6 +46,7 @@ void BarLine::Reset()
 
     ResetBarLineLog();
     ResetColor();
+    ResetVisibility();
 }
 
 bool BarLine::SetAlignment(Alignment *alignment)

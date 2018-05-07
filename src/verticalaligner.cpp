@@ -92,9 +92,8 @@ void SystemAligner::FindAllPositionerPointingTo(ArrayOfFloatingPositioners *posi
     positioners->clear();
 
     StaffAlignment *alignment = NULL;
-    int i;
-    for (i = 0; i < this->GetChildCount(); ++i) {
-        alignment = dynamic_cast<StaffAlignment *>(m_children.at(i));
+    for (auto &child : m_children) {
+        alignment = dynamic_cast<StaffAlignment *>(child);
         assert(alignment);
         FloatingPositioner *positioner = alignment->GetCorrespFloatingPositioner(object);
         if (positioner && (positioner->GetObject() == object)) {
@@ -103,6 +102,21 @@ void SystemAligner::FindAllPositionerPointingTo(ArrayOfFloatingPositioners *posi
     }
 }
 
+void SystemAligner::FindAllIntersectionPoints(std::vector<Point> &points, Point &top, Point &bottom, std::vector<ClassId> &classes)
+{
+    points.clear();
+
+    StaffAlignment *alignment = NULL;
+    for (auto &child : m_children) {
+        alignment = dynamic_cast<StaffAlignment *>(child);
+        assert(alignment);
+        //FloatingPositioner *positioner = alignment->GetCorrespFloatingPositioner(object);
+        //if (positioner && (positioner->GetObject())) {
+        //    //positioners->push_back(positioner);
+        //}
+    }
+}
+    
 //----------------------------------------------------------------------------
 // StaffAlignment
 //----------------------------------------------------------------------------
