@@ -16,9 +16,11 @@
 
 #include "accid.h"
 #include "anchoredtext.h"
+#include "annot.h"
 #include "arpeg.h"
 #include "artic.h"
 #include "beam.h"
+#include "beatrpt.h"
 #include "boundary.h"
 #include "breath.h"
 #include "btrem.h"
@@ -52,12 +54,16 @@
 #include "mnum.h"
 #include "mordent.h"
 #include "mrest.h"
+#include "mrpt.h"
+#include "mrpt2.h"
 #include "multirest.h"
+#include "multirpt.h"
 #include "note.h"
 #include "num.h"
 #include "octave.h"
 #include "page.h"
 #include "pages.h"
+#include "pb.h"
 #include "pedal.h"
 #include "pgfoot.h"
 #include "pgfoot2.h"
@@ -67,7 +73,7 @@
 #include "ref.h"
 #include "rend.h"
 #include "rest.h"
-#include "rpt.h"
+#include "sb.h"
 #include "score.h"
 #include "section.h"
 #include "slur.h"
@@ -271,13 +277,13 @@ bool MeiOutput::WriteObject(Object *object)
     }
 
     // ScoreDef related
+    else if (object->Is(INSTRDEF)) {
+        m_currentNode = m_currentNode.append_child("instrDef");
+        WriteInstrDef(m_currentNode, dynamic_cast<InstrDef *>(object));
+    }
     else if (object->Is(LABEL)) {
         m_currentNode = m_currentNode.append_child("label");
         WriteLabel(m_currentNode, dynamic_cast<Label *>(object));
-    }
-    else if (object->Is(INSTRDEF)) {
-        m_currentNode = m_currentNode.append_child("instrdef");
-        WriteInstrDef(m_currentNode, dynamic_cast<InstrDef *>(object));
     }
     else if (object->Is(LABELABBR)) {
         m_currentNode = m_currentNode.append_child("labelAbbr");
@@ -959,7 +965,7 @@ void MeiOutput::WriteStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
 void MeiOutput::WriteInstrDef(pugi::xml_node currentNode, InstrDef *instrDef)
 {
     assert(instrDef);
-    
+
     WriteXmlId(currentNode, instrDef);
     instrDef->WriteChannelized(currentNode);
     instrDef->WriteLabelled(currentNode);
@@ -1051,6 +1057,7 @@ void MeiOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
     WriteTextDirInterface(currentNode, dir);
     WriteTimeSpanningInterface(currentNode, dir);
     dir->WriteLang(currentNode);
+    dir->WriteVerticalGroup(currentNode);
 }
 
 void MeiOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
@@ -1060,7 +1067,7 @@ void MeiOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteControlElement(currentNode, dynam);
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
-    dynam->WriteVerticalAlignment(currentNode);
+    dynam->WriteVerticalGroup(currentNode);
 }
 
 void MeiOutput::WriteFermata(pugi::xml_node currentNode, Fermata *fermata)
@@ -1083,7 +1090,7 @@ void MeiOutput::WriteHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     hairpin->WriteColor(currentNode);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WritePlacement(currentNode);
-    hairpin->WriteVerticalAlignment(currentNode);
+    hairpin->WriteVerticalGroup(currentNode);
 }
 
 void MeiOutput::WriteHarm(pugi::xml_node currentNode, Harm *harm)
@@ -1143,6 +1150,7 @@ void MeiOutput::WritePedal(pugi::xml_node currentNode, Pedal *pedal)
     pedal->WriteColor(currentNode);
     pedal->WritePedalLog(currentNode);
     pedal->WritePlacement(currentNode);
+    pedal->WriteVerticalGroup(currentNode);
 }
 
 void MeiOutput::WriteSlur(pugi::xml_node currentNode, Slur *slur)
@@ -1280,6 +1288,7 @@ void MeiOutput::WriteBarLine(pugi::xml_node currentNode, BarLine *barLine)
     WriteLayerElement(currentNode, barLine);
     barLine->WriteBarLineLog(currentNode);
     barLine->WriteColor(currentNode);
+    barLine->WriteVisibility(currentNode);
 }
 
 void MeiOutput::WriteBeam(pugi::xml_node currentNode, Beam *beam)
@@ -2124,6 +2133,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for label
     else if (filterParent->Is(LABEL)) {
         if (element == "") {
+            return true;
+        }
+        else if (element == "lb") {
             return true;
         }
         else if (element == "rend") {
@@ -3107,7 +3119,7 @@ bool MeiInput::ReadInstrDef(Object *parent, pugi::xml_node instrDef)
 {
     InstrDef *vrvInstrDef = new InstrDef();
     SetMeiUuid(instrDef, vrvInstrDef);
-    
+
     parent->AddChild(vrvInstrDef);
     vrvInstrDef->ReadChannelized(instrDef);
     vrvInstrDef->ReadLabelled(instrDef);
@@ -3302,6 +3314,7 @@ bool MeiInput::ReadDir(Object *parent, pugi::xml_node dir)
     ReadTextDirInterface(dir, vrvDir);
     ReadTimeSpanningInterface(dir, vrvDir);
     vrvDir->ReadLang(dir);
+    vrvDir->ReadVerticalGroup(dir);
 
     parent->AddChild(vrvDir);
     ReadUnsupportedAttr(dir, vrvDir);
@@ -3315,7 +3328,7 @@ bool MeiInput::ReadDynam(Object *parent, pugi::xml_node dynam)
 
     ReadTextDirInterface(dynam, vrvDynam);
     ReadTimeSpanningInterface(dynam, vrvDynam);
-    vrvDynam->ReadVerticalAlignment(dynam);
+    vrvDynam->ReadVerticalGroup(dynam);
 
     parent->AddChild(vrvDynam);
     ReadUnsupportedAttr(dynam, vrvDynam);
@@ -3346,7 +3359,7 @@ bool MeiInput::ReadHairpin(Object *parent, pugi::xml_node hairpin)
     vrvHairpin->ReadColor(hairpin);
     vrvHairpin->ReadHairpinLog(hairpin);
     vrvHairpin->ReadPlacement(hairpin);
-    vrvHairpin->ReadVerticalAlignment(hairpin);
+    vrvHairpin->ReadVerticalGroup(hairpin);
 
     parent->AddChild(vrvHairpin);
     ReadUnsupportedAttr(hairpin, vrvHairpin);
@@ -3425,6 +3438,7 @@ bool MeiInput::ReadPedal(Object *parent, pugi::xml_node pedal)
     vrvPedal->ReadColor(pedal);
     vrvPedal->ReadPedalLog(pedal);
     vrvPedal->ReadPlacement(pedal);
+    vrvPedal->ReadVerticalGroup(pedal);
 
     parent->AddChild(vrvPedal);
     ReadUnsupportedAttr(pedal, vrvPedal);
@@ -3770,6 +3784,7 @@ bool MeiInput::ReadBarLine(Object *parent, pugi::xml_node barLine)
 
     vrvBarLine->ReadBarLineLog(barLine);
     vrvBarLine->ReadColor(barLine);
+    vrvBarLine->ReadVisibility(barLine);
 
     parent->AddChild(vrvBarLine);
     ReadUnsupportedAttr(barLine, vrvBarLine);

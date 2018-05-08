@@ -340,14 +340,17 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBeatdef(data_DURATION beatdef_) { m_beatdef = beatdef_; }
-    data_DURATION GetBeatdef() const { return m_beatdef; }
+    void SetBeatdef(double beatdef_) { m_beatdef = beatdef_; }
+    double GetBeatdef() const { return m_beatdef; }
     bool HasBeatdef() const;
     ///@}
 
 private:
-    /** Indicates the performed duration represented by the beatRpt symbol. **/
-    data_DURATION m_beatdef;
+    /**
+     * Indicates the performed duration represented by the beatRpt symbol; expressed in
+     * time signature denominator units.
+     **/
+    double m_beatdef;
 
     /* include <attbeatdef> */
 };

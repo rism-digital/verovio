@@ -153,7 +153,7 @@ void Page::LayOutTranscription(bool force)
     // - each LayerElement object will have its Alignment pointer initialized
     Functor alignHorizontally(&Object::AlignHorizontally);
     Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
-    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally);
+    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally, doc);
     this->Process(&alignHorizontally, &alignHorizontallyParams, &alignHorizontallyEnd);
 
     // Align the content of the page using system aligners
@@ -221,7 +221,7 @@ void Page::LayOutHorizontally()
     // - each LayerElement object will have its Alignment pointer initialized
     Functor alignHorizontally(&Object::AlignHorizontally);
     Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
-    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally);
+    AlignHorizontallyParams alignHorizontallyParams(&alignHorizontally, doc);
     this->Process(&alignHorizontally, &alignHorizontallyParams, &alignHorizontallyEnd);
 
     // Align the content of the page using system aligners
@@ -316,6 +316,12 @@ void Page::LayOutHorizontally()
     Functor adjustArpegEnd(&Object::AdjustArpegEnd);
     AdjustArpegParams adjustArpegParams(doc, &adjustArpeg);
     this->Process(&adjustArpeg, &adjustArpegParams, &adjustArpegEnd);
+
+    // Prevent a margin overflow
+    Functor adjustXOverlfow(&Object::AdjustXOverflow);
+    Functor adjustXOverlfowEnd(&Object::AdjustXOverflowEnd);
+    AdjustXOverflowParams adjustXOverflowParams(doc->GetDrawingUnit(100));
+    this->Process(&adjustXOverlfow, &adjustXOverflowParams, &adjustXOverlfowEnd);
 
     // Adjust measure X position
     AlignMeasuresParams alignMeasuresParams;

@@ -24,7 +24,6 @@
 #include "layerelement.h"
 #include "note.h"
 #include "options.h"
-#include "rpt.h"
 #include "smufl.h"
 #include "staff.h"
 #include "vrv.h"
@@ -193,9 +192,25 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                         if (start) {
                             beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_RIGHT;
                         }
-                        // or the previous one had no partial - put it left
+                        // or the previous one had no partial
                         else if (beamElementCoords->at(noteIndexes.at(i - 1))->m_dur < (char)testDur) {
-                            beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
+                            // if we are at the full bar level, put it left
+                            if (testDur == DUR_8 + fullBars) {
+                                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
+                            }
+                            // if the previous level underneath was a partial through, put it left
+                            else if (beamElementCoords->at(noteIndexes.at(i - 1))->m_partialFlags[testDur - 1 - DUR_8]
+                                == PARTIAL_THROUGH) {
+                                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
+                            }
+                            // if the level underneath was not left (right or through), put it right
+                            else if (beamElementCoords->at(idx)->m_partialFlags[testDur - 1 - DUR_8] != PARTIAL_LEFT) {
+                                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_RIGHT;
+                            }
+                            // it was put left before, put it left
+                            else {
+                                beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
+                            }
                         }
                     }
                 }

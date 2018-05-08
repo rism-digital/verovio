@@ -17,14 +17,18 @@ namespace vrv {
 class TextElement;
 
 //----------------------------------------------------------------------------
-// Dir
+// Dir (directive)
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <dir> element.
+ */
 class Dir : public ControlElement,
             public TextListInterface,
             public TextDirInterface,
             public TimeSpanningInterface,
-            public AttLang {
+            public AttLang,
+            public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -56,6 +60,11 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::PrepareFloatingGrps
+     */
+    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
 
 protected:
     //

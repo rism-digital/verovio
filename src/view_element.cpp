@@ -18,6 +18,7 @@
 #include "accid.h"
 #include "artic.h"
 #include "beam.h"
+#include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
@@ -35,12 +36,14 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
+#include "mrpt.h"
+#include "mrpt2.h"
 #include "multirest.h"
+#include "multirpt.h"
 #include "note.h"
 #include "options.h"
 #include "proport.h"
 #include "rest.h"
-#include "rpt.h"
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
@@ -685,10 +688,17 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
-    // Use the note to which the points to for position
-    if (dot->m_drawingNote && (m_doc->GetType() != Transcription)) {
-        x = dot->m_drawingNote->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
-        y = dot->m_drawingNote->GetDrawingY();
+    if (m_doc->GetType() != Transcription) {
+        // Use the note to which the points to for position
+        if (dot->m_drawingNote && !dot->m_drawingNextElement) {
+            x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
+            y = dot->m_drawingNote->GetDrawingY();
+        }
+        if (dot->m_drawingNote && dot->m_drawingNextElement) {
+            x += ((dot->m_drawingNextElement->GetDrawingX() - dot->m_drawingNote->GetDrawingX()) / 2);
+            x += dot->m_drawingNote->GetDrawingRadius(m_doc);
+            y = dot->m_drawingNote->GetDrawingY();
+        }
     }
 
     DrawDotsPart(dc, x, y, 1, staff);
@@ -1365,25 +1375,26 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den
     assert(dc);
     assert(staff);
 
-    std::wstring numText = IntToTimeSigFigures(num), denText;
-    if (den) denText = IntToTimeSigFigures(den);
+    std::wstring timeSigCombNumerator = IntToTimeSigFigures(num), timeSigCombDenominator;
+    if (den) timeSigCombDenominator = IntToTimeSigFigures(den);
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    std::wstring widthText = (numText.length() > denText.length()) ? numText : denText;
+    std::wstring widthText = (timeSigCombNumerator.length() > timeSigCombDenominator.length()) ? timeSigCombNumerator
+                                                                                               : timeSigCombDenominator;
 
     TextExtend extend;
     dc->GetSmuflTextExtent(widthText, &extend);
     x += (extend.m_width / 2);
 
     if (den) {
-        DrawSmuflString(dc, x, y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), numText, true,
+        DrawSmuflString(dc, x, y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombNumerator, true,
             staff->m_drawingStaffSize);
-        DrawSmuflString(dc, x, y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), denText, true,
+        DrawSmuflString(dc, x, y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombDenominator, true,
             staff->m_drawingStaffSize);
     }
     else
-        DrawSmuflString(dc, x, y, numText, true, staff->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y, timeSigCombNumerator, true, staff->m_drawingStaffSize);
 
     dc->ResetFont();
 }

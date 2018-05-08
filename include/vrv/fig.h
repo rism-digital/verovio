@@ -14,11 +14,11 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Fig
+// Fig (figure)
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <fig>
+ * This class models the MEI <fig> element.
  */
 class Fig : public TextElement, public AreaPosInterface {
 public:

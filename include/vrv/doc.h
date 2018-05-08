@@ -12,7 +12,9 @@
 #include "options.h"
 #include "scoredef.h"
 
+namespace smf {
 class MidiFile;
+}
 
 namespace vrv {
 
@@ -192,7 +194,7 @@ public:
      * Export the document to a MIDI file.
      * Run trough all the layers and fill the midi file content.
      */
-    void ExportMIDI(MidiFile *midiFile);
+    void ExportMIDI(smf::MidiFile *midiFile);
 
     /**
      * Extract a timemap from the document to a JSON string.

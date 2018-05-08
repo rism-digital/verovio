@@ -18,12 +18,15 @@ namespace vrv {
 // Hairpin
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <hairpin> element.
+ */
 class Hairpin : public ControlElement,
                 public TimeSpanningInterface,
                 public AttColor,
                 public AttHairpinLog,
                 public AttPlacement,
-                public AttVerticalAlignment {
+                public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

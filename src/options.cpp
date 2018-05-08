@@ -576,6 +576,14 @@ Options::Options()
     m_graceFactor.Init(0.75, 0.5, 1.0);
     this->Register(&m_graceFactor, "graceFactor", &m_generalLayout);
 
+    m_graceRhythmAlign.SetInfo("Grace rhythmic alignment", "Align grace notes rhythmically with all staves");
+    m_graceRhythmAlign.Init(false);
+    this->Register(&m_graceRhythmAlign, "graceRhythmAlign", &m_generalLayout);
+
+    m_graceRightAlign.SetInfo("Grace right alignment", "Align the right position of a grace group with all staves");
+    m_graceRightAlign.Init(false);
+    this->Register(&m_graceRightAlign, "graceRightAlign", &m_generalLayout);
+
     m_hairpinSize.SetInfo("Hairpin size", "The haripin size in MEI units");
     m_hairpinSize.Init(3.0, 1.0, 8.0);
     this->Register(&m_hairpinSize, "hairpinSize", &m_generalLayout);

@@ -652,6 +652,15 @@ public:
     virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Adjust the x position of a right barline in order to make sure the is no text content
+     * overlflowing in the right margin
+     */
+    ///@{
+    virtual int AdjustXOverflow(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustXOverflowEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+
+    /**
      * Lay out the X positions of the staff content looking at the bounding boxes.
      * The functor process by aligned-staff content, that is from a rediction in the
      * MeasureAligner and then staff by staff but taking into account cross-staff elements

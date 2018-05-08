@@ -157,6 +157,13 @@ public:
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
 
+    /**
+     * See Object::CalcOnsetOffset
+     */
+    ///@{
+    virtual int CalcOnsetOffset(FunctorParams *functorParams);
+    ///@}
+
 private:
     /**
      * Add the ledger line dashes to the legderline array.

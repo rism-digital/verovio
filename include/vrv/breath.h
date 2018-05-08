@@ -18,6 +18,9 @@ namespace vrv {
 // Breath
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <breath> element.
+ */
 class Breath : public ControlElement, public TimePointInterface, public AttColor, public AttPlacement {
 public:
     /**

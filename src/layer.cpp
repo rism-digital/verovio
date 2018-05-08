@@ -26,8 +26,8 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "mrpt.h"
 #include "note.h"
-#include "rpt.h"
 #include "staff.h"
 #include "staffdef.h"
 #include "vrv.h"
@@ -524,12 +524,16 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
 
     params->m_scoreDefRole = NONE;
 
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+    int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
+
     int i;
     for (i = 0; i < params->m_measureAligner->GetChildCount(); ++i) {
         Alignment *alignment = dynamic_cast<Alignment *>(params->m_measureAligner->GetChild(i));
         assert(alignment);
-        if (alignment->HasGraceAligner()) {
-            alignment->GetGraceAligner()->AlignStack();
+        if (alignment->HasGraceAligner(graceAlignerId)) {
+            alignment->GetGraceAligner(graceAlignerId)->AlignStack();
         }
     }
 
@@ -597,6 +601,9 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
 
     params->m_currentScoreTime = 0.0;
     params->m_currentRealTimeSeconds = 0.0;
+
+    params->m_currentMensur = GetCurrentMensur();
+    params->m_currentMeterSig = GetCurrentMeterSig();
 
     return FUNCTOR_CONTINUE;
 }

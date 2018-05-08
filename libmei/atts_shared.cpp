@@ -7169,24 +7169,24 @@ bool AttVerticalAlign::HasValign() const
 /* include <attvalign> */
 
 //----------------------------------------------------------------------------
-// AttVerticalAlignment
+// AttVerticalGroup
 //----------------------------------------------------------------------------
 
-AttVerticalAlignment::AttVerticalAlignment() : Att()
+AttVerticalGroup::AttVerticalGroup() : Att()
 {
-    ResetVerticalAlignment();
+    ResetVerticalGroup();
 }
 
-AttVerticalAlignment::~AttVerticalAlignment()
+AttVerticalGroup::~AttVerticalGroup()
 {
 }
 
-void AttVerticalAlignment::ResetVerticalAlignment()
+void AttVerticalGroup::ResetVerticalGroup()
 {
-    m_vgrp = VRV_UNSET;
+    m_vgrp = 0;
 }
 
-bool AttVerticalAlignment::ReadVerticalAlignment(pugi::xml_node element)
+bool AttVerticalGroup::ReadVerticalGroup(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("vgrp")) {
@@ -7197,7 +7197,7 @@ bool AttVerticalAlignment::ReadVerticalAlignment(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttVerticalAlignment::WriteVerticalAlignment(pugi::xml_node element)
+bool AttVerticalGroup::WriteVerticalGroup(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasVgrp()) {
@@ -7207,9 +7207,9 @@ bool AttVerticalAlignment::WriteVerticalAlignment(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttVerticalAlignment::HasVgrp() const
+bool AttVerticalGroup::HasVgrp() const
 {
-    return (m_vgrp != VRV_UNSET);
+    return (m_vgrp != 0);
 }
 
 /* include <attvgrp> */
@@ -9227,8 +9227,8 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
     }
-    if (element->HasAttClass(ATT_VERTICALALIGNMENT)) {
-        AttVerticalAlignment *att = dynamic_cast<AttVerticalAlignment *>(element);
+    if (element->HasAttClass(ATT_VERTICALGROUP)) {
+        AttVerticalGroup *att = dynamic_cast<AttVerticalGroup *>(element);
         assert(att);
         if (attrType == "vgrp") {
             att->SetVgrp(att->StrToInt(attrValue));
@@ -10517,8 +10517,8 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("valign", att->VerticalalignmentToStr(att->GetValign())));
         }
     }
-    if (element->HasAttClass(ATT_VERTICALALIGNMENT)) {
-        const AttVerticalAlignment *att = dynamic_cast<const AttVerticalAlignment *>(element);
+    if (element->HasAttClass(ATT_VERTICALGROUP)) {
+        const AttVerticalGroup *att = dynamic_cast<const AttVerticalGroup *>(element);
         assert(att);
         if (att->HasVgrp()) {
             attributes->push_back(std::make_pair("vgrp", att->IntToStr(att->GetVgrp())));
