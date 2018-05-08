@@ -244,7 +244,7 @@ void StaffAlignment::FindAllIntersectionPoints(
         if (!positioner->GetObject()->Is(classIds)) {
             continue;
         }
-        if (positioner->HorizontalContentOverlap(&boundingBox, margin)) {
+        if (positioner->HorizontalContentOverlap(&boundingBox, margin / 2)) {
             line.AddGap(positioner->GetContentTop() + margin, positioner->GetContentBottom() - margin);
         }
     }
