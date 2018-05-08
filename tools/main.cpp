@@ -18,11 +18,22 @@
 #include "win_getopt.h"
 #endif
 
+#ifndef USE_EMSCRIPTEN
+#define USE_EMSCRIPTEN
+#endif
+
+#ifndef EMSCRIPTEN
+#define EMSCRIPTEN
+#endif
+
 //----------------------------------------------------------------------------
 
 #include "options.h"
 #include "toolkit.h"
 #include "vrv.h"
+
+using namespace std;
+using namespace vrv;
 
 // Some redundant code to get basenames
 // and remove extensions
@@ -71,7 +82,7 @@ std::string toCamelCase(const std::string &s)
     return result;
 }
 
-bool dir_exists(std::string dir)
+bool dir_exists(string dir)
 {
     struct stat st;
     if ((stat(dir.c_str(), &st) == 0) && (((st.st_mode) & S_IFMT) == S_IFDIR)) {
@@ -84,60 +95,60 @@ bool dir_exists(std::string dir)
 
 void display_version()
 {
-    std::cout << "Verovio " << vrv::GetVersion() << std::endl;
+    cout << "Verovio " << vrv::GetVersion() << endl;
 }
 
 void display_usage()
 {
-    std::cout.precision(2);
+    cout.precision(2);
 
     display_version();
-    std::cout << std::endl << "Example usage:" << std::endl << std::endl;
-    std::cout << " verovio [-s scale] [-t type] [-r resources] [-o outfile] infile" << std::endl << std::endl;
+    cout << endl << "Example usage:" << endl << endl;
+    cout << " verovio [-s scale] [-t type] [-r resources] [-o outfile] infile" << endl << endl;
 
     // These need to be kept in alphabetical order:
     // -options with both short and long forms first
     // -then options with long forms only
     // -then debugging options
 
-    vrv::Options style;
+    Options style;
 
     // Options with both short and long forms
-    std::cout << "Options (marked as * are repeatable)" << std::endl;
+    cout << "Options (marked as * are repeatable)" << endl;
 
-    std::cout << " -                     Use \"-\" as input file for reading from the standard input" << std::endl;
-    std::cout << " -?, --help            Display this message" << std::endl;
-    std::cout << " -a, --all-pages       Output all pages" << std::endl;
-    std::cout << " -f, --format <s>      Select input format: darms, mei, pae, xml (default is mei)" << std::endl;
-    std::cout << " -o, --outfile <s>     Output file name (use \"-\" for standard output)" << std::endl;
-    std::cout << " -p, --page <i>        Select the page to engrave (default is 1)" << std::endl;
-    std::cout << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")" << std::endl;
-    std::cout << " -s, --scale <i>       Scale percent (default is " << DEFAULT_SCALE << ")" << std::endl;
-    std::cout << " -t, --type <s>        Select output format: mei, svg, or midi (default is svg)" << std::endl;
-    std::cout << " -v, --version         Display the version number" << std::endl;
-    std::cout << " -x, --xml-id-seed <i> Seed the random number generator for XML IDs" << std::endl;
+    cout << " -                     Use \"-\" as input file for reading from the standard input" << endl;
+    cout << " -?, --help            Display this message" << endl;
+    cout << " -a, --all-pages       Output all pages" << endl;
+    cout << " -f, --format <s>      Select input format: darms, mei, pae, xml (default is mei)" << endl;
+    cout << " -o, --outfile <s>     Output file name (use \"-\" for standard output)" << endl;
+    cout << " -p, --page <i>        Select the page to engrave (default is 1)" << endl;
+    cout << " -r, --resources <s>   Path to SVG resources (default is " << vrv::Resources::GetPath() << ")" << endl;
+    cout << " -s, --scale <i>       Scale percent (default is " << DEFAULT_SCALE << ")" << endl;
+    cout << " -t, --type <s>        Select output format: mei, svg, or midi (default is svg)" << endl;
+    cout << " -v, --version         Display the version number" << endl;
+    cout << " -x, --xml-id-seed <i> Seed the random number generator for XML IDs" << endl;
 
-    vrv::Options options;
-    std::vector<vrv::OptionGrp *> *grp = options.GetGrps();
-    std::vector<vrv::OptionGrp *>::iterator grpIter;
+    Options options;
+    std::vector<OptionGrp *> *grp = options.GetGrps();
+    std::vector<OptionGrp *>::iterator grpIter;
 
     for (grpIter = grp->begin(); grpIter != grp->end(); grpIter++) {
 
         // Options with long forms only
-        std::cout << std::endl << (*grpIter)->GetLabel() << std::endl;
-        const std::vector<vrv::Option *> *options = (*grpIter)->GetOptions();
-        std::vector<vrv::Option *>::const_iterator iter;
+        cout << endl << (*grpIter)->GetLabel() << endl;
+        const std::vector<Option *> *options = (*grpIter)->GetOptions();
+        std::vector<Option *>::const_iterator iter;
 
         for (iter = options->begin(); iter != options->end(); iter++) {
 
             std::string option = fromCamelCase((*iter)->GetKey());
 
-            const vrv::OptionDbl *optDbl = dynamic_cast<const vrv::OptionDbl *>(*iter);
-            const vrv::OptionInt *optInt = dynamic_cast<const vrv::OptionInt *>(*iter);
-            const vrv::OptionIntMap *optIntMap = dynamic_cast<const vrv::OptionIntMap *>(*iter);
-            const vrv::OptionString *optString = dynamic_cast<const vrv::OptionString *>(*iter);
-            const vrv::OptionArray *optArray = dynamic_cast<const vrv::OptionArray *>(*iter);
-            const vrv::OptionBool *optBool = dynamic_cast<const vrv::OptionBool *>(*iter);
+            const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(*iter);
+            const OptionInt *optInt = dynamic_cast<const OptionInt *>(*iter);
+            const OptionIntMap *optIntMap = dynamic_cast<const OptionIntMap *>(*iter);
+            const OptionString *optString = dynamic_cast<const OptionString *>(*iter);
+            const OptionArray *optArray = dynamic_cast<const OptionArray *>(*iter);
+            const OptionBool *optBool = dynamic_cast<const OptionBool *>(*iter);
 
             if (optDbl) {
                 option.append(" <f>");
@@ -162,43 +173,63 @@ void display_usage()
                 option.append("\t");
             }
 
-            std::cout << " --" << option << (*iter)->GetDescription();
+            cout << " --" << option << (*iter)->GetDescription();
 
             if (optInt) {
-                std::cout << " (default: " << optInt->GetDefault();
-                std::cout << "; min: " << optInt->GetMin();
-                std::cout << "; max: " << optInt->GetMax() << ")";
+                cout << " (default: " << optInt->GetDefault();
+                cout << "; min: " << optInt->GetMin();
+                cout << "; max: " << optInt->GetMax() << ")";
             }
             if (optDbl) {
-                std::cout << std::fixed << " (default: " << optDbl->GetDefault();
-                std::cout << std::fixed << "; min: " << optDbl->GetMin();
-                std::cout << std::fixed << "; max: " << optDbl->GetMax() << ")";
+                cout << fixed << " (default: " << optDbl->GetDefault();
+                cout << fixed << "; min: " << optDbl->GetMin();
+                cout << fixed << "; max: " << optDbl->GetMax() << ")";
             }
             if (optString) {
-                std::cout << " (default: \"" << optString->GetDefault() << "\")";
+                cout << " (default: \"" << optString->GetDefault() << "\")";
             }
             if (optIntMap) {
-                std::cout << " (default: \"" << optIntMap->GetDefaultStrValue()
+                cout << " (default: \"" << optIntMap->GetDefaultStrValue()
                      << "\"; other values: " << optIntMap->GetStrValuesAsStr(true) << ")";
             }
-            std::cout << std::endl;
+            cout << endl;
         }
     }
 }
 
 int runExtraTests(Toolkit *toolkit)
 {
-    string elementId = "nc-0000000172343843";
-    int x = 245, y = 1610;
-    return toolkit->Drag(elementId, x, y);
+    return 0;
 }
 
 int main(int argc, char **argv)
 {
-    std::string infile;
-    std::string svgdir;
-    std::string outfile;
-    std::string outformat = "svg";
+    string filename = "mei4page.mei";
+    string inputFormat = "mei";
+    string outputFormat = "svg";
+
+    string vrvOptions = "{\"noLayout\":1,\"noFooter\":1,\"noHeader\":1}"; // Taken from Neon2
+    string editorAction = "{\"action\":\"drag\",\"param\":{\"elementId\":\"nc-0000001233928944\",\"x\":648,\"y\":1260}}";
+
+    Toolkit toolkit;
+    toolkit.SetFormat(inputFormat);
+    toolkit.SetOutputFormat(outputFormat);
+    toolkit.SetOptions(vrvOptions);
+    toolkit.LoadFile(filename);
+    toolkit.RenderToSVGFile("output.svg", 1);
+    //toolkit.LoadData(toolkit.GetMEI());
+    toolkit.Edit(editorAction);
+
+    toolkit.RenderToSVGFile("output.svg", 1);
+    return 0; 
+}
+
+int main2(int argc, char **argv)
+{
+    string infile;
+    string svgdir;
+    string outfile;
+    string outformat = "svg";
     bool std_output = false;
 
     int all_pages = 0;
@@ -211,17 +242,16 @@ int main(int argc, char **argv)
     // Create the toolkit instance without loading the font because
     // the resource path might be specified in the parameters
     // The fonts will be loaded later with Resources::InitFonts()
-    vrv::Toolkit toolkit(false);
+    Toolkit toolkit(false);
 
     if (argc < 2) {
-        std::cerr << "Expected one input file but found none." << std::endl << std::endl;
+        cerr << "Expected one input file but found none." << endl << endl;
         display_usage();
         exit(1);
     }
 
     static struct option base_options[] = {
         { "all-pages", no_argument, 0, 'a' },
-        { "extra-test", no_argument, 0, 'd' },
         { "format", required_argument, 0, 'f' },
         { "help", no_argument, 0, '?' },
         { "outfile", required_argument, 0, 'o' },
@@ -242,8 +272,8 @@ int main(int argc, char **argv)
     
     int baseSize = sizeof(base_options) / sizeof(option);
 
-    vrv::Options *options = toolkit.GetOptions();
-    const vrv::MapOfStrOptions *params = options->GetItems();
+    Options *options = toolkit.GetOptions();
+    const MapOfStrOptions *params = options->GetItems();
     int mapSize = (int)params->size();
 
     struct option *long_options;
@@ -254,14 +284,14 @@ int main(int argc, char **argv)
     std::vector<std::string> optNames;
     optNames.reserve(mapSize);
 
-    vrv::MapOfStrOptions::const_iterator iter;
+    MapOfStrOptions::const_iterator iter;
     for (iter = params->begin(); iter != params->end(); iter++) {
         // Double check that back and forth convertion is correct
         assert(toCamelCase(fromCamelCase(iter->first)) == iter->first);
 
         optNames.push_back(fromCamelCase(iter->first));
         long_options[i].name = optNames.at(i).c_str();
-        vrv::OptionBool *optBool = dynamic_cast<vrv::OptionBool *>(iter->second);
+        OptionBool *optBool = dynamic_cast<OptionBool *>(iter->second);
         long_options[i].has_arg = (optBool) ? no_argument : required_argument;
         long_options[i].flag = 0;
         long_options[i].val = 0;
@@ -280,25 +310,25 @@ int main(int argc, char **argv)
     int c;
     std::string key;
     int option_index = 0;
-    vrv::Option *opt = NULL;
-    vrv::OptionBool *optBool = NULL;
-    while ((c = getopt_long(argc, argv, "?ab:d:f:h:ino:p:r:s:t:w:vx:", long_options, &option_index)) != -1) {
+    Option *opt = NULL;
+    OptionBool *optBool = NULL;
+    while ((c = getopt_long(argc, argv, "?ab:f:h:ino:p:r:s:t:w:vx:", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
                 key = long_options[option_index].name;
                 opt = params->at(toCamelCase(key));
-                optBool = dynamic_cast<vrv::OptionBool *>(opt);
+                optBool = dynamic_cast<OptionBool *>(opt);
                 if (optBool) {
                     optBool->SetValue(true);
                 }
                 else if (opt) {
                     if (!opt->SetValue(optarg)) {
-                        vrv::LogWarning("Setting option %s with %s failed, default value used",
+                        LogWarning("Setting option %s with %s failed, default value used",
                             long_options[option_index].name, optarg);
                     }
                 }
                 else {
-                    vrv::LogError("Something went wrong with option %s", long_options[option_index].name);
+                    LogError("Something went wrong with option %s", long_options[option_index].name);
                     exit(1);
                 }
                 break;
@@ -306,44 +336,45 @@ int main(int argc, char **argv)
             case 'a': all_pages = 1; break;
 
             case 'b':
-                vrv::LogWarning("Option -b and --border is deprecated; use --page-margin-bottom, --page-margin-left, --page-margin-right and "
+                LogWarning("Option -b and --border is deprecated; use --page-margin-bottom, --page-margin-left, --page-margin-right and "
                            "--page-margin-top instead");
                 options->m_pageMarginBottom.SetValue(optarg);
                 options->m_pageMarginLeft.SetValue(optarg);
                 options->m_pageMarginRight.SetValue(optarg);
                 options->m_pageMarginTop.SetValue(optarg);
                 break;
-            
+            case 'd':
+                drag_test = 1;
             case 'f':
-                if (!toolkit.SetFormat(std::string(optarg))) {
+                if (!toolkit.SetFormat(string(optarg))) {
                     exit(1);
                 };
                 break;
 
             case 'h':
-                vrv::LogWarning("Option -h is deprecated; use --page-height instead");
+                LogWarning("Option -h is deprecated; use --page-height instead");
                 options->m_pageHeight.SetValue(optarg);
                 break;
 
             case 'i':
-                vrv::LogWarning("Option --ignore-layout is deprecated; use --breaks auto");
-                options->m_breaks.SetValue(vrv::BREAKS_auto);
+                LogWarning("Option --ignore-layout is deprecated; use --breaks auto");
+                options->m_breaks.SetValue(BREAKS_auto);
                 break;
 
             case 'n':
-                vrv::LogWarning("Option --no-layout is deprecated; use --breaks none");
-                options->m_breaks.SetValue(vrv::BREAKS_none);
+                LogWarning("Option --no-layout is deprecated; use --breaks none");
+                options->m_breaks.SetValue(BREAKS_none);
                 break;
 
-            case 'o': outfile = std::string(optarg); break;
+            case 'o': outfile = string(optarg); break;
 
             case 'p': page = atoi(optarg); break;
 
             case 'r': vrv::Resources::SetPath(optarg); break;
 
             case 't':
-                outformat = std::string(optarg);
-                toolkit.SetOutputFormat(std::string(optarg));
+                outformat = string(optarg);
+                toolkit.SetOutputFormat(string(optarg));
                 break;
 
             case 's':
@@ -355,16 +386,11 @@ int main(int argc, char **argv)
             case 'v': show_version = 1; break;
 
             case 'w':
-                vrv::LogWarning("Option -w is deprecated; use --page-width instead");
+                LogWarning("Option -w is deprecated; use --page-width instead");
                 options->m_pageWidth.SetValue(optarg);
                 break;
 
-            case 'x': vrv::Object::SeedUuid(atoi(optarg)); break;
-
-            case 'd':
-                drag_test = 1;
-                cout << "Hello, world!" << endl;
-                break;
+            case 'x': Object::SeedUuid(atoi(optarg)); break;
 
             case '?':
                 display_usage();
@@ -386,10 +412,10 @@ int main(int argc, char **argv)
     }
 
     if (optind <= argc - 1) {
-        infile = std::string(argv[optind]);
+        infile = string(argv[optind]);
     }
     else {
-        std::cerr << "Incorrect number of arguments: expected one input file but found none." << std::endl << std::endl;
+        cerr << "Incorrect number of arguments: expected one input file but found none." << endl << endl;
         display_usage();
         exit(1);
     }
@@ -397,32 +423,32 @@ int main(int argc, char **argv)
     // Make sure the user uses a valid Resource path
     // Save many headaches for empty SVGs
     if (!dir_exists(vrv::Resources::GetPath())) {
-        std::cerr << "The resources path " << vrv::Resources::GetPath() << " could not be found; please use -r option."
-             << std::endl;
+        cerr << "The resources path " << vrv::Resources::GetPath() << " could not be found; please use -r option."
+             << endl;
         exit(1);
     }
 
     // Load the music font from the resource directory
-    if (!vrv::Resources::InitFonts()) {
-        std::cerr << "The music font could not be loaded; please check the contents of the resource directory." << std::endl;
+    if (!Resources::InitFonts()) {
+        cerr << "The music font could not be loaded; please check the contents of the resource directory." << endl;
         exit(1);
     }
 
     // Load a specified font
-    if (!vrv::Resources::SetFont(options->m_font.GetValue())) {
-        std::cerr << "Font '" << options->m_font.GetValue() << "' could not be loaded." << std::endl;
+    if (!Resources::SetFont(options->m_font.GetValue())) {
+        cerr << "Font '" << options->m_font.GetValue() << "' could not be loaded." << endl;
         exit(1);
     }
 
     if ((outformat != "svg") && (outformat != "mei") && (outformat != "midi") && (outformat != "timemap")
         && (outformat != "humdrum") && (outformat != "hum")) {
-        std::cerr << "Output format (" << outformat << ") can only be 'mei', 'svg', 'midi', or 'humdrum'." << std::endl;
+        cerr << "Output format (" << outformat << ") can only be 'mei', 'svg', 'midi', or 'humdrum'." << endl;
         exit(1);
     }
 
     // Make sure we provide a file name or output to std output with std input
     if ((infile == "-") && (outfile.empty())) {
-        std::cerr << "Standard input can be used only with standard output or output filename." << std::endl;
+        cerr << "Standard input can be used only with standard output or output filename." << endl;
         exit(1);
     }
 
@@ -440,31 +466,31 @@ int main(int argc, char **argv)
 
     // Load the std input or load the file
     if (infile == "-") {
-        std::ostringstream data_stream;
-        for (std::string line; getline(std::cin, line);) {
-            data_stream << line << std::endl;
+        ostringstream data_stream;
+        for (string line; getline(cin, line);) {
+            data_stream << line << endl;
         }
         if (!toolkit.LoadData(data_stream.str())) {
-            std::cerr << "The input could not be loaded." << std::endl;
+            cerr << "The input could not be loaded." << endl;
             exit(1);
         }
     }
     else {
         if (!toolkit.LoadFile(infile)) {
-            std::cerr << "The file '" << infile << "' could not be opened." << std::endl;
+            cerr << "The file '" << infile << "' could not be opened." << endl;
             exit(1);
         }
     }
 
-    if (toolkit.GetOutputFormat() != vrv::HUMDRUM) {
+    if (toolkit.GetOutputFormat() != HUMDRUM) {
         // Check the page range
         if (page > toolkit.GetPageCount()) {
-            std::cerr << "The page requested (" << page << ") is not in the page range (max is " << toolkit.GetPageCount()
-                 << ")." << std::endl;
+            cerr << "The page requested (" << page << ") is not in the page range (max is " << toolkit.GetPageCount()
+                 << ")." << endl;
             exit(1);
         }
         if (page < 1) {
-            std::cerr << "The page number has to be greater than 0." << std::endl;
+            cerr << "The page number has to be greater than 0." << endl;
             exit(1);
         }
     }
@@ -477,7 +503,7 @@ int main(int argc, char **argv)
 
     // Run extra test commands
     if (drag_test) {
-        if (runExtraTests(&toolkit)) {
+        if (!runExtraTests(&toolkit)) {
             cerr << "An error occured in the extra tests!" << endl;
             exit(1);
         }
@@ -488,18 +514,18 @@ int main(int argc, char **argv)
         for (p = from; p < to; p++) {
             std::string cur_outfile = outfile;
             if (all_pages) {
-                cur_outfile += vrv::StringFormat("_%03d", p);
+                cur_outfile += StringFormat("_%03d", p);
             }
             cur_outfile += ".svg";
             if (std_output) {
-                std::cout << toolkit.RenderToSVG(p);
+                cout << toolkit.RenderToSVG(p);
             }
             else if (!toolkit.RenderToSVGFile(cur_outfile, p)) {
-                std::cerr << "Unable to write SVG to " << cur_outfile << "." << std::endl;
+                cerr << "Unable to write SVG to " << cur_outfile << "." << endl;
                 exit(1);
             }
             else {
-                std::cerr << "Output written to " << cur_outfile << "." << std::endl;
+                cerr << "Output written to " << cur_outfile << "." << endl;
             }
         }
     }
@@ -507,15 +533,15 @@ int main(int argc, char **argv)
     else if (outformat == "midi") {
         outfile += ".mid";
         if (std_output) {
-            std::cerr << "Midi cannot write to standard output." << std::endl;
+            cerr << "Midi cannot write to standard output." << endl;
             exit(1);
         }
         else if (!toolkit.RenderToMIDIFile(outfile)) {
-            std::cerr << "Unable to write MIDI to " << outfile << "." << std::endl;
+            cerr << "Unable to write MIDI to " << outfile << "." << endl;
             exit(1);
         }
         else {
-            std::cerr << "Output written to " << outfile << "." << std::endl;
+            cerr << "Output written to " << outfile << "." << endl;
         }
     }
     else if (outformat == "timemap") {
@@ -525,11 +551,11 @@ int main(int argc, char **argv)
             std::cout << toolkit.RenderToTimemap();
         }
         else if (!toolkit.RenderToTimemapFile(outfile)) {
-            std::cerr << "Unable to write MIDI to " << outfile << "." << std::endl;
+            cerr << "Unable to write MIDI to " << outfile << "." << endl;
             exit(1);
         }
         else {
-            std::cerr << "Output written to " << outfile << "." << std::endl;
+            cerr << "Output written to " << outfile << "." << endl;
         }
     }
     else if (outformat == "humdrum" || outformat == "hum") {
@@ -539,11 +565,11 @@ int main(int argc, char **argv)
         }
         else {
             if (!toolkit.GetHumdrumFile(outfile)) {
-                std::cerr << "Unable to write Humdrum to " << outfile << "." << std::endl;
+                cerr << "Unable to write Humdrum to " << outfile << "." << endl;
                 exit(1);
             }
             else {
-                std::cerr << "Output written to " << outfile << "." << std::endl;
+                cerr << "Output written to " << outfile << "." << endl;
             }
         }
     }
@@ -552,23 +578,23 @@ int main(int argc, char **argv)
             toolkit.SetScoreBasedMei(true);
             outfile += ".mei";
             if (std_output) {
-                std::cerr << "MEI output of all pages to standard output is not possible." << std::endl;
+                cerr << "MEI output of all pages to standard output is not possible." << endl;
                 exit(1);
             }
             else if (!toolkit.SaveFile(outfile)) {
-                std::cerr << "Unable to write MEI to " << outfile << "." << std::endl;
+                cerr << "Unable to write MEI to " << outfile << "." << endl;
                 exit(1);
             }
             else {
-                std::cerr << "Output written to " << outfile << "." << std::endl;
+                cerr << "Output written to " << outfile << "." << endl;
             }
         }
         else {
             if (std_output) {
-                std::cout << toolkit.GetMEI(page);
+                cout << toolkit.GetMEI(page);
             }
             else {
-                std::cerr << "MEI output of one page is available only to standard output." << std::endl;
+                cerr << "MEI output of one page is available only to standard output." << endl;
                 exit(1);
             }
         }

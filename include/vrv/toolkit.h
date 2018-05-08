@@ -8,6 +8,10 @@
 #ifndef __VRV_TOOLKIT_H__
 #define __VRV_TOOLKIT_H__
 
+#ifndef USE_EMSCRIPTEN
+#define USE_EMSCRIPTEN
+#endif
+
 #include <string>
 
 //----------------------------------------------------------------------------

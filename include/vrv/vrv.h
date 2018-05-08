@@ -8,6 +8,11 @@
 #ifndef __VRV_H__
 #define __VRV_H__
 
+#ifndef EMSCRIPTEN
+#define EMSCRIPTEN
+#endif
+
+
 #include <cstring>
 #include <map>
 #include <stdarg.h>
