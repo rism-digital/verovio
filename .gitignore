@@ -55,6 +55,7 @@ bindings/qt/build-demo
 .DS_Store
 
 # Output files
+tools/*.svg
 output.svg
 output.mei
 index.js

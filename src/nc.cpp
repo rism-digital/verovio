@@ -32,6 +32,7 @@ Nc::Nc()
         , PositionInterface()
         , AttColor()
         , AttCoordinated()
+        , AttIntervalMelodic()
 
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
@@ -39,6 +40,7 @@ Nc::Nc()
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COORDINATED);
+    RegisterAttClass(ATT_INTERVALMELODIC);
 
     Reset();
 }
@@ -56,6 +58,7 @@ void Nc::Reset()
     PositionInterface::Reset();
     ResetColor();
     ResetCoordinated();
+    ResetIntervalMelodic();
 }
 
 }

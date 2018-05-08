@@ -1414,6 +1414,7 @@ void MeiOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
     WriteLayerElement(currentNode, nc);
     nc->WriteColor(currentNode);;
     nc->WriteCoordinated(currentNode);;
+    nc->WriteIntervalMelodic(currentNode);;
 }
 
 void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
@@ -3904,6 +3905,7 @@ bool MeiInput::ReadNc(Object *parent, pugi::xml_node nc)
     ReadPositionInterface(nc, vrvNc);
     vrvNc->ReadColor(nc);
     vrvNc->ReadCoordinated(nc);
+    vrvNc->ReadIntervalMelodic(nc);
 
     parent->AddChild(vrvNc);
     return ReadLayerChildren(vrvNc, nc, vrvNc);
