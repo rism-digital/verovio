@@ -4452,7 +4452,7 @@ void HumdrumInput::convertMensuralToken(
         Rest *rest = new Rest;
         setLocationId(rest, token);
         appendElement(elements, pointers, rest);
-        convertRest(rest, token, staffindex);
+        convertRest(rest, token, -1);
     }
     else if (token->isNote()) {
         Note *note = new Note;
@@ -8176,6 +8176,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
                 break;
             }
         }
+    }
+    if (token->isMens()) {
+        // mensural notes are indicated differently, so check here for their method.
+        editorialQ = false;
     }
 
     int accidCount = hum::Convert::base40ToAccidental(base40);

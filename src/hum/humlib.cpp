@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun May  6 22:28:20 PDT 2018
+// Last Modified: Mon May  7 21:41:51 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -38760,6 +38760,9 @@ string Tool_kern2mens::convertKernTokenToMens(HTp token) {
 		return ".";
 	}
 	data = *token;
+	// remove uninteresting characters (beams, articulations, slurs, etc).
+	hre.replaceDestructive(data, "", "[^A-Gnra-g#\\[\\]0-9%.-]", "g");
+	// but keep editorial accidental (probably i)
 	HumNum dur;
 	if (token->find("[") != std::string::npos) {
 		dur = token->getTiedDuration();
@@ -38768,6 +38771,10 @@ string Tool_kern2mens::convertKernTokenToMens(HTp token) {
 		dur = token->getDuration();
 	}
 	string rhythm = Convert::durationToRecip(dur);
+	bool perfect = false;
+	if (rhythm.find('.') != std::string::npos) {
+		perfect = true;
+	}
 	hre.replaceDestructive(data, rhythm, "\\d+\\.*");
 	hre.replaceDestructive(data, "X", "000");
 	hre.replaceDestructive(data, "L", "00");
@@ -38778,6 +38785,11 @@ string Tool_kern2mens::convertKernTokenToMens(HTp token) {
 	hre.replaceDestructive(data, "U", "8");
 	hre.replaceDestructive(data, "u", "16");
 	hre.replaceDestructive(data, ":", "\\.");
+	if (perfect) {
+		hre.replaceDestructive(data, "$1p", "([XLSsMmUu]+)");
+	} else {
+		hre.replaceDestructive(data, "$1i", "([XLSsMmUu]+)");
+	}
 	return data;
 }
 
