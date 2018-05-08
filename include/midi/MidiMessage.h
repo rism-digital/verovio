@@ -44,8 +44,6 @@ class MidiMessage : public std::vector<uchar> {
 
 		void           sortTrack            (void);
 		void           sortTrackWithSequence(void);
-      int            getControllerNumber  (void);
-      int            getControllerValue   (void);
 
 		// data access convenience functions (returns -1 if not present):
 		int            getP0                (void) const;

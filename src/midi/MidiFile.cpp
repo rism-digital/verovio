@@ -1995,22 +1995,6 @@ MidiEvent* MidiFile::addSustainPedalOff(int aTrack, int aTick, int aChannel) {
 
 //////////////////////////////
 //
-// MidiFile::addSustainPedal -- Adds a sustain pedal CC in the given
-//    track at the given tick time in the given channel
-//
-
-int MidiFile::addSustainPedal(int aTrack, int aTick, int aChannel, int velocity) {
-    MidiEvent* me = new MidiEvent;
-    me->makeController(aChannel, 64, velocity);
-    me->tick = aTick;
-    events[aTrack]->push_back_no_copy(me);
-    return events[aTrack]->size() - 1;
-}
-
-
-
-//////////////////////////////
-//
 // MidiFile::addTrack -- adds a blank track at end of the
 //    track list.  Returns the track number of the added
 //    track.

@@ -824,54 +824,6 @@ void MidiMessage::setP0(int value) {
 }
 
 
-//////////////////////////////
-//
-// MidiMessage::getControllerNumber -- Return the controller number (such as 1
-//   for modulation wheel).  If the message does not have a controller number
-//   parameter, then return -1.  If the controller number is invalid (above 127
-//   in value), then limit the range to to 0-127.
-//
-
-int MidiMessage::getControllerNumber(void) {
-    if (isController()) {
-        int output = getP1();
-        if (output < 0) {
-            return output;
-        }
-        else {
-            return 0xff & output;
-        }
-    }
-    else {
-        return -1;
-    }
-}
-
-
-
-//////////////////////////////
-//
-// MidiMessage::getControllervalue -- Return the controller value.  If the
-//   message is not a control change message, then return -1.  If the value is
-//   out of the range 0-127, then chop off the high-bits.
-//
-
-int MidiMessage::getControllerValue(void) {
-    if (isController()) {
-        int output = getP2();
-        if (output < 0) {
-            return output;
-        }
-        else {
-            return 0xff & output;
-        }
-    }
-    else {
-        return -1;
-    }
-}
-
-
 
 //////////////////////////////
 //
@@ -1751,24 +1703,6 @@ void MidiMessage::makeSustainOff(int channel) {
 
 void MidiMessage::makeSustainPedalOff(int channel) {
 	makeSustainOff(channel);
-}
-
-
-//////////////////////////////
-//
-// MidiMessage::makeController -- create a Control Change message. 
-//
-// default value: channel = 0
-//
-// Note: The channel parameter used to be last, but makes more sense to
-//   have it first...
-//
-
-void MidiMessage::makeController(int channel, int number, int value) {
-    resize(3);
-    (*this)[0] = 0xB0 | (0x0f & channel);
-    (*this)[1] = number & 0xff;
-    (*this)[2] = value & 0xff;
 }
 
 
