@@ -201,7 +201,8 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     }
 }
 
-void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine)
+void View::DrawScoreDef(
+    DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine, bool isLastMeasure)
 {
     assert(dc);
     assert(scoreDef);
@@ -223,7 +224,7 @@ void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure,
     }
     else {
         dc->StartGraphic(barLine, "", barLine->GetUuid());
-        DrawBarLines(dc, measure, staffGrp, barLine);
+        DrawBarLines(dc, measure, staffGrp, barLine, isLastMeasure);
         dc->EndGraphic(barLine, this);
     }
 
@@ -551,7 +552,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     return;
 }
 
-void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine)
+void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure)
 {
     assert(dc);
     assert(measure);
@@ -567,7 +568,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             childStaffGrp = dynamic_cast<StaffGrp *>(staffGrp->GetChild(i));
             childStaffDef = dynamic_cast<StaffDef *>(staffGrp->GetChild(i));
             if (childStaffGrp) {
-                DrawBarLines(dc, measure, childStaffGrp, barLine);
+                DrawBarLines(dc, measure, childStaffGrp, barLine, isLastMeasure);
             }
             else if (childStaffDef) {
                 AttNIntegerComparison comparison(STAFF, childStaffDef->GetN());
@@ -621,6 +622,10 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         // erase intersections only if we have more than one staff
         bool eraseIntersections = (first != last) ? true : false;
+        // do not erase intersections with right barline of the last measure of the system
+        if (isLastMeasure && barLine->Is(BARLINE_ATTR_RIGHT)) {
+            eraseIntersections = false;
+        }
         DrawBarLine(dc, yTop, yBottom, barLine, eraseIntersections);
 
         // Now we have a barthru barLine, but we have dots so we still need to go through each staff
@@ -788,13 +793,17 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     DrawMeasureChildren(dc, measure, measure, system);
 
-    if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
-        DrawScoreDef(
-            dc, &m_drawingScoreDef, measure, measure->GetLeftBarLine()->GetDrawingX(), measure->GetLeftBarLine());
-    }
-    if (measure->GetDrawingRightBarLine() != BARRENDITION_NONE) {
-        DrawScoreDef(
-            dc, &m_drawingScoreDef, measure, measure->GetRightBarLine()->GetDrawingX(), measure->GetRightBarLine());
+    // Draw the barlines only with measured music
+    if (measure->IsMeasuredMusic()) {
+        if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
+            DrawScoreDef(
+                dc, &m_drawingScoreDef, measure, measure->GetLeftBarLine()->GetDrawingX(), measure->GetLeftBarLine());
+        }
+        if (measure->GetDrawingRightBarLine() != BARRENDITION_NONE) {
+            bool isLast = (measure == system->FindChildByType(MEASURE, 1, BACKWARD)) ? true : false;
+            DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetRightBarLine()->GetDrawingX(),
+                measure->GetRightBarLine(), isLast);
+        }
     }
 
     if (measure->IsMeasuredMusic()) {

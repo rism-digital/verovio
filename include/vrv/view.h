@@ -172,7 +172,8 @@ protected:
     ///@{
     void DrawSystem(DeviceContext *dc, System *system);
     void DrawSystemList(DeviceContext *dc, System *system, const ClassId classId);
-    void DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine = NULL);
+    void DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine = NULL,
+        bool isLastMeasure = false);
     void DrawStaffGrp(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp = false,
         bool abbreviations = false);
     void DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure);
@@ -180,7 +181,7 @@ protected:
     void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations = false);
     void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
-    void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine);
+    void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine, bool isLastMeasure);
     void DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barLine, bool eraseIntersections = false);
     void DrawBarLineDots(DeviceContext *dc, StaffDef *staffDef, Staff *staff, BarLine *barLine);
     void DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *lines, bool below, bool cueSize);
