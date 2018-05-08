@@ -186,6 +186,13 @@ void display_usage()
     }
 }
 
+int runExtraTests(Toolkit *toolkit)
+{
+    string elementId = "nc-0000000172343843";
+    int x = 245, y = 1610;
+    return toolkit->Drag(elementId, x, y);
+}
+
 int main(int argc, char **argv)
 {
     std::string infile;
@@ -198,6 +205,8 @@ int main(int argc, char **argv)
     int page = 1;
     int show_help = 0;
     int show_version = 0;
+
+    int drag_test = 0;
 
     // Create the toolkit instance without loading the font because
     // the resource path might be specified in the parameters
@@ -212,6 +221,7 @@ int main(int argc, char **argv)
 
     static struct option base_options[] = {
         { "all-pages", no_argument, 0, 'a' },
+        { "extra-test", no_argument, 0, 'd' },
         { "format", required_argument, 0, 'f' },
         { "help", no_argument, 0, '?' },
         { "outfile", required_argument, 0, 'o' },
@@ -272,7 +282,7 @@ int main(int argc, char **argv)
     int option_index = 0;
     vrv::Option *opt = NULL;
     vrv::OptionBool *optBool = NULL;
-    while ((c = getopt_long(argc, argv, "?ab:f:h:ino:p:r:s:t:w:vx:", long_options, &option_index)) != -1) {
+    while ((c = getopt_long(argc, argv, "?ab:d:f:h:ino:p:r:s:t:w:vx:", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
                 key = long_options[option_index].name;
@@ -303,7 +313,7 @@ int main(int argc, char **argv)
                 options->m_pageMarginRight.SetValue(optarg);
                 options->m_pageMarginTop.SetValue(optarg);
                 break;
-
+            
             case 'f':
                 if (!toolkit.SetFormat(std::string(optarg))) {
                     exit(1);
@@ -350,6 +360,11 @@ int main(int argc, char **argv)
                 break;
 
             case 'x': vrv::Object::SeedUuid(atoi(optarg)); break;
+
+            case 'd':
+                drag_test = 1;
+                cout << "Hello, world!" << endl;
+                break;
 
             case '?':
                 display_usage();
@@ -458,6 +473,14 @@ int main(int argc, char **argv)
     int to = page + 1;
     if (all_pages) {
         to = toolkit.GetPageCount() + 1;
+    }
+
+    // Run extra test commands
+    if (drag_test) {
+        if (runExtraTests(&toolkit)) {
+            cerr << "An error occured in the extra tests!" << endl;
+            exit(1);
+        }
     }
 
     if (outformat == "svg") {
