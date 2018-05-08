@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.4)
 
 project(Verovio)
 
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 if (APPLE)
        set(CMAKE_MACOSX_RPATH ON)
@@ -26,6 +26,7 @@ include_directories(
     ../include/pugi
     ../include/utf8
     ../include/vrv
+    ../include/emscripten
     ../libmei
 )
 
