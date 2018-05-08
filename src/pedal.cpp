@@ -14,11 +14,13 @@
 //----------------------------------------------------------------------------
 
 #include "functorparams.h"
-#include "verticalaligner.h"
-#include "vrv.h"
-#include "MidiFile.h"
-#include "layerelement.h"
 #include "horizontalaligner.h"
+#include "layerelement.h"
+#include "vrv.h"
+
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
 
 namespace vrv {
 
@@ -61,34 +63,24 @@ int Pedal::GenerateMIDI(FunctorParams * functorParams)
 
     if (!HasDir()) return FUNCTOR_CONTINUE;
 
-    int velocity;
-    int tickOffset = 0;
+    double pedalTime = GetStart()->GetAlignment()->GetTime() * DURATION_4 / DUR_MAX;
+    double starttime = params->m_totalTime + pedalTime;
+    int tpq = params->m_midiFile->getTPQ();
+
+    // todo: check pedal @func to switch between sustain/soften/damper pedals?
     switch (GetDir())
     {
     case pedalLog_DIR_down:
-        velocity = 126;
+        params->m_midiFile->addSustainPedalOn(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
         break;
     case pedalLog_DIR_up:
-        velocity = 0;
-
-        // if you have a pedal event that ends right as another begins (ex. one in the end of measure 1 and start of measure 2), 
-        // they will overlap because they occur at the same midi time
-        // so we just add a -1 offset to the ending time to remedy this until a better method is thought of
-        tickOffset = -1;
+        params->m_midiFile->addSustainPedalOff(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
         break;
     default:
         return FUNCTOR_CONTINUE;
     }
 
-    // todo: check pedal @func to switch between sustain/soften/damper pedals?
-
-    double pedalTime = GetStart()->GetAlignment()->GetTime() * DURATION_4 / DUR_MAX;
-    double starttime = params->m_totalTime + pedalTime;
-    int tpq = params->m_midiFile->getTPQ();
-
-    params->m_midiFile->addSustainPedal(params->m_midiTrack, (starttime * tpq) + tickOffset, params->m_midiChannel, velocity);
-
-    return FUNCTOR_SIBLINGS;
+    return FUNCTOR_CONTINUE;
 }
 
 int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
