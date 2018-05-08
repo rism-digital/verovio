@@ -1399,6 +1399,7 @@ void MeiOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
     mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
     mensur->WriteSlashCount(currentNode);
+    mensur->WriteStaffLoc(currentNode);
 }
 
 void MeiOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
@@ -3956,6 +3957,7 @@ bool MeiInput::ReadMensur(Object *parent, pugi::xml_node mensur)
     vrvMensur->ReadMensurLog(mensur);
     vrvMensur->ReadMensurVis(mensur);
     vrvMensur->ReadSlashCount(mensur);
+    vrvMensur->ReadStaffLoc(mensur);
 
     parent->AddChild(vrvMensur);
     ReadUnsupportedAttr(mensur, vrvMensur);
