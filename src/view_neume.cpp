@@ -123,10 +123,17 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     /******************************************************************/
     // initialization
+    
+    const ListOfObjects *neumeChildren = neume->GetList(neume);
+    if (neumeChildren->empty()) {
+        return;
+    }
 
-//    ListOfObjects *beamChildren = beam->GetList(beam);
-
-
+    for (int i = 1; i < (int)neumeChildren[0].size(); i++) {
+         Nc *nc = dynamic_cast<Nc *>(neumeChildren[0][i]);
+        //  std::cout << nc->GetPname();
+    }
+    
     /******************************************************************/
     // Start the Neume graphic and draw the children
 
