@@ -320,7 +320,7 @@ void Page::LayOutHorizontally()
     // Prevent a margin overflow
     Functor adjustXOverlfow(&Object::AdjustXOverflow);
     Functor adjustXOverlfowEnd(&Object::AdjustXOverflowEnd);
-    AdjustXOverflowParams adjustXOverflowParams;
+    AdjustXOverflowParams adjustXOverflowParams(doc->GetDrawingUnit(100));
     this->Process(&adjustXOverlfow, &adjustXOverflowParams, &adjustXOverlfowEnd);
 
     // Adjust measure X position

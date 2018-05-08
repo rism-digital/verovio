@@ -313,19 +313,22 @@ public:
  * member 0: the current system
  * member 1: the last measure;
  * member 2: the current widest control event
+ * member 3: the margin
  **/
 
 class AdjustXOverflowParams : public FunctorParams {
 public:
-    AdjustXOverflowParams()
+    AdjustXOverflowParams(int margin)
     {
         m_currentSystem = NULL;
         m_lastMeasure = NULL;
         m_currentWidest = NULL;
+        m_margin = margin;
     }
     System *m_currentSystem;
     Measure *m_lastMeasure;
     FloatingPositioner *m_currentWidest;
+    int m_margin;
 };
 
 //----------------------------------------------------------------------------
