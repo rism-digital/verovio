@@ -416,11 +416,6 @@ protected:
     ///@{
     void DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_STEMDIRECTION dir, int radius, int xn,
         int originY, int heightY = 0);
-    void DrawMensurCircle(DeviceContext *dc, int x, int yy, Staff *staff);
-    void DrawMensurDot(DeviceContext *dc, int x, int yy, Staff *staff);
-    void DrawMensurHalfCircle(DeviceContext *dc, int x, int yy, Staff *staff);
-    void DrawMensurReversedHalfCircle(DeviceContext *dc, int x, int yy, Staff *staff);
-    void DrawMensurSlash(DeviceContext *dc, int x, int yy, Staff *staff);
     void DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff);
     void CalculateLigaturePosX(LayerElement *element, Layer *layer, Staff *staff);
     void DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);

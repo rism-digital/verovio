@@ -125,8 +125,7 @@ void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *lay
         case DUR_4: charCode = SMUFL_E9F6_mensuralRestSemiminima; break;
         case DUR_8: charCode = SMUFL_E9F7_mensuralRestFusa; break;
         case DUR_16: charCode = SMUFL_E9F8_mensuralRestSemifusa; break;
-        default:
-            charCode = 0; // This should never happen
+        default: charCode = 0; // This should never happen
     }
     DrawSmuflCode(dc, x, y, charCode, staff->m_drawingStaffSize, drawingCueSize);
 }
@@ -144,39 +143,72 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int x;
+    int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
+    int x = element->GetDrawingX();
+    int perfectRadius = m_doc->GetGlyphWidth(SMUFL_E910_mensuralProlation1, staff->m_drawingStaffSize, false) / 2;
+    int code = NULL;
 
-    if ((mensur->GetSign() == MENSURATIONSIGN_O) || (mensur->GetTempus() == TEMPUS_3)) {
-        DrawMensurCircle(dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+    if (mensur->HasLoc()) {
+        y = staff->GetDrawingY()
+            - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (2 * staff->m_drawingLines - 2 - mensur->GetLoc());
     }
-    else if (((mensur->GetSign() == MENSURATIONSIGN_C) && (mensur->GetOrient() != ORIENTATION_reversed))
-        || (mensur->GetTempus() == TEMPUS_2)) {
-        DrawMensurHalfCircle(dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+
+    if (mensur->HasSign()) {
+        if (mensur->GetSign() == MENSURATIONSIGN_O) {
+            code = SMUFL_E911_mensuralProlation2;
+        }
+        else if (mensur->GetSign() == MENSURATIONSIGN_C) {
+            if (mensur->GetOrient() == ORIENTATION_reversed) {
+                perfectRadius -= 2 * perfectRadius
+                    - m_doc->GetGlyphWidth(SMUFL_E916_mensuralProlation7, staff->m_drawingStaffSize, false);
+                code = SMUFL_E916_mensuralProlation7;
+            }
+            else {
+                code = SMUFL_E915_mensuralProlation6;
+            }
+        }
     }
-    else if (mensur->GetSign() == MENSURATIONSIGN_C && mensur->GetOrient() == ORIENTATION_reversed) {
-        DrawMensurReversedHalfCircle(dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+    else if (mensur->HasTempus()) {
+        if (mensur->GetTempus() == TEMPUS_3) {
+            if (mensur->GetProlatio() == PROLATIO_3)
+                code = SMUFL_E910_mensuralProlation1;
+            else
+                code = SMUFL_E911_mensuralProlation2;
+        }
+        else if (mensur->GetTempus() == TEMPUS_2) {
+            if (mensur->GetProlatio() == PROLATIO_3)
+                code = SMUFL_E914_mensuralProlation5;
+            else
+                code = SMUFL_E915_mensuralProlation6;
+        }
     }
-    // we handle only one single slash
+    DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
+
+    x += perfectRadius;
+    // only one slash supported
     if (mensur->HasSlash()) {
-        DrawMensurSlash(dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+        DrawSmuflCode(dc,
+            x - m_doc->GetGlyphWidth(SMUFL_E925_mensuralProlationCombiningStroke, staff->m_drawingStaffSize, false) / 2,
+            y, SMUFL_E925_mensuralProlationCombiningStroke, staff->m_drawingStaffSize, false);
     }
-    // we handle only one single dot
-    if (mensur->HasDot() || (mensur->GetProlatio() == PROLATIO_3)) {
-        DrawMensurDot(dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+    if (mensur->GetDot() == BOOLEAN_true) {
+        DrawSmuflCode(dc,
+            x - m_doc->GetGlyphWidth(SMUFL_E920_mensuralProlationCombiningDot, staff->m_drawingStaffSize, false) / 2, y,
+            SMUFL_E920_mensuralProlationCombiningDot, staff->m_drawingStaffSize, false);
     }
 
     if (mensur->HasNum()) {
         x = element->GetDrawingX();
-        if (mensur->GetSign() || mensur->HasTempus()) {
+        if (mensur->HasSign() || mensur->HasTempus()) {
             x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
-                * 5; // step forward because we have a sign or a meter symbol
+                * 6; // step forward because we have a sign or a meter symbol
         }
         int numbase = mensur->HasNumbase() ? mensur->GetNumbase() : 0;
-        DrawProportFigures(dc, x, staff->GetDrawingY(), mensur->GetNum(), numbase, staff);
+        DrawProportFigures(dc, x, y, mensur->GetNum(), numbase, staff);
     }
 
     dc->EndGraphic(element, this);
-}
+} // namespace vrv
 
 /* This function draws any flags as well as the stem. */
 
@@ -276,111 +308,6 @@ void View::DrawMensuralStem(
 
     // Store the stem direction ?
     note->SetDrawingStemDir(dir);
-}
-
-void View::DrawMensurCircle(DeviceContext *dc, int x, int yy, Staff *staff)
-{
-    assert(dc);
-    assert(staff);
-
-    int y = ToDeviceContextY(yy - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * MSIGN_STAFFLINES_BELOW_TOP);
-    int r = ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
-    r = (int)(MSIGN_CIRCLE_DIAM / 2.0 * r);
-
-    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    dc->SetPen(m_currentColour, lineWidth, AxSOLID);
-    dc->SetBrush(m_currentColour, AxTRANSPARENT);
-
-    dc->DrawCircle(ToDeviceContextX(x), y, r);
-
-    dc->ResetPen();
-    dc->ResetBrush();
-}
-
-void View::DrawMensurHalfCircle(DeviceContext *dc, int x, int yy, Staff *staff)
-{
-    assert(dc);
-    assert(staff);
-
-    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    dc->SetPen(m_currentColour, lineWidth, AxSOLID);
-    dc->SetBrush(m_currentColour, AxTRANSPARENT);
-
-    /* DrawEllipticArc expects x and y to specify the coordinates of the upper-left corner of the
-     rectangle that contains the ellipse; y is not the center of the circle it's an arc of. */
-    double halfDistBelowTop = MSIGN_STAFFLINES_BELOW_TOP - (MSIGN_CIRCLE_DIAM / 2.0);
-    int y = ToDeviceContextY(yy - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * halfDistBelowTop);
-    int r = ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
-    r = (int)(MSIGN_CIRCLE_DIAM / 2.0 * r);
-
-    x = ToDeviceContextX(x);
-    x -= 3 * r / 3;
-
-    dc->DrawEllipticArc(x, y, 2 * r, 2 * r, 40, 320);
-
-    dc->ResetPen();
-    dc->ResetBrush();
-
-    return;
-}
-
-void View::DrawMensurReversedHalfCircle(DeviceContext *dc, int x, int yy, Staff *staff)
-{
-    assert(dc);
-    assert(staff);
-
-    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    dc->SetPen(m_currentColour, lineWidth, AxSOLID);
-    dc->SetBrush(m_currentColour, AxTRANSPARENT);
-
-    /* DrawEllipticArc expects x and y to specify the coordinates of the upper-left corner of the
-     rectangle that contains the ellipse; y is not the center of the circle it's an arc of. */
-    double halfDistBelowTop = MSIGN_STAFFLINES_BELOW_TOP - (MSIGN_CIRCLE_DIAM / 2.0);
-    int y = ToDeviceContextY(yy - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * halfDistBelowTop);
-    int r = ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
-    r = (int)(MSIGN_CIRCLE_DIAM / 2.0 * r);
-
-    x = ToDeviceContextX(x);
-    x -= 3 * r / 3;
-
-    dc->DrawEllipticArc(x, y, 2 * r, 2 * r, 140, 220);
-
-    dc->ResetPen();
-    dc->ResetBrush();
-
-    return;
-}
-
-void View::DrawMensurDot(DeviceContext *dc, int x, int yy, Staff *staff)
-{
-    assert(dc);
-    assert(staff);
-
-    int y = ToDeviceContextY(yy - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * MSIGN_STAFFLINES_BELOW_TOP);
-    int r = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * MSIGN_DOT_DIAM;
-
-    dc->SetPen(m_currentColour, 1, AxSOLID);
-    dc->SetBrush(m_currentColour, AxSOLID);
-
-    dc->DrawCircle(ToDeviceContextX(x), y, r);
-
-    dc->ResetPen();
-    dc->ResetBrush();
-
-    return;
-}
-
-void View::DrawMensurSlash(DeviceContext *dc, int a, int yy, Staff *staff)
-{
-    assert(dc);
-    assert(staff);
-
-    int y1 = yy - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    int y2 = y1 - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)
-        + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-
-    DrawVerticalLine(dc, y1, y2, a, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
-    return;
 }
 
 void View::CalculateLigaturePosX(LayerElement *element, Layer *layer, Staff *staff)
@@ -571,11 +498,11 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
     std::wstring wtext;
 
     if (numBase) {
-        ynum = y - (m_doc->GetDrawingUnit(textSize) * 2);
-        yden = ynum - (m_doc->GetDrawingDoubleUnit(textSize) * 2);
+        ynum = y + m_doc->GetDrawingDoubleUnit(textSize);
+        yden = y - m_doc->GetDrawingDoubleUnit(textSize);
     }
     else
-        ynum = y - (m_doc->GetDrawingUnit(textSize) * 4);
+        ynum = y;
 
     if (numBase > 9 || num > 9) {
         x += m_doc->GetDrawingUnit(textSize) * 2;
@@ -626,7 +553,9 @@ void View::DrawProport(DeviceContext *dc, LayerElement *element, Layer *layer, S
                 * 5; // step forward because we have a sign or a meter symbol
         }
         int numbase = proport->HasNumbase() ? proport->GetNumbase() : 0;
-        DrawProportFigures(dc, x, staff->GetDrawingY(), proport->GetNum(), numbase, staff);
+        DrawProportFigures(dc, x,
+            staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1),
+            proport->GetNum(), numbase, staff);
     }
 
     dc->EndGraphic(element, this);
