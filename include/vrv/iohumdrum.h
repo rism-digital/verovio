@@ -162,6 +162,27 @@ namespace humaux {
         Note *ottavanoteend;
         Measure *ottavameasure;
 
+        // ottavadownnote == keep track of ottava down marks: stores the starting note of
+        // an ottava down line which will be turned off later.  ottavadownmeasure == the
+        // starting measure of the ottava down mark.
+        Note *ottavadownnotestart;
+        Note *ottavadownnoteend;
+        Measure *ottavadownmeasure;
+
+        // ottava2note == keep track of ottava2 marks: stores the starting note of
+        // an ottava2 line which will be turned off later.  ottava2measure == the
+        // starting measure of the ottava2 mark.
+        Note *ottava2notestart;
+        Note *ottava2noteend;
+        Measure *ottava2measure;
+
+        // ottava2downnote == keep track of ottava2 down marks: stores the starting note of
+        // an ottava2 down line which will be turned off later.  ottava2downmeasure == the
+        // starting measure of the ottava2 down mark.
+        Note *ottava2downnotestart;
+        Note *ottava2downnoteend;
+        Measure *ottava2downmeasure;
+
         // meter_bottom == Used to keep track of bottom value of time signature.
         // This is needed to calculate tstamps.
         hum::HumNum meter_bottom;
@@ -395,6 +416,8 @@ protected:
     std::string automaticHeaderRight(
         std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int &linecount);
     std::string getLayoutParameter(hum::HTp token, const std::string &category, const std::string &keyname);
+    void convertMensuralToken(
+        std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token, int staffindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -411,6 +434,7 @@ protected:
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
     template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
+    template <class ELEMENT> hum::HumNum convertMensuralRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
     template <class ELEMENT> void setN(ELEMENT element, int nvalue);
@@ -492,9 +516,10 @@ private:
     // converted.
     std::vector<std::vector<std::vector<hum::HTp> > > m_layertokens;
 
-    // m_kernspines == list of tracks in Humdrum file being parsed which
-    // contain **kern data.
-    std::vector<hum::HTp> m_kernstarts;
+    // m_staffstarts == list of tracks in Humdrum file being parsed which
+    // contain **kern, **mens data or whatever other data types
+    // will be converted into a staff in the conversion to MEI.
+    std::vector<hum::HTp> m_staffstarts;
 
     // m_rkern == reverse mapping of Humdrum track to staff number..
     std::vector<int> m_rkern;
@@ -538,6 +563,11 @@ private:
     // the file to convert contains **string spines that should be
     // converted into <string> elements in the MEI conversion.
     bool m_string = false;
+
+    // m_mens == state variable for keeping track of whether or not
+    // the file to convert contains **mens spines that should be
+    // converted into mensuration notation staves.
+    bool m_mens = false;
 
     // m_fb == state variable for keeping track of whether or not
     // the file to convert contains **Bnum spines that should be

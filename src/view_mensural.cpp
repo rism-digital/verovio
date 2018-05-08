@@ -87,7 +87,8 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         wchar_t code = note->GetMensuralSmuflNoteHead();
         DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
         // For semibrevis with stem in black notation, encoded with an explicit stem direction
-        if ((drawingDur > DUR_1) || (note->GetStemDir() != STEMDIRECTION_NONE)) {
+        if (((drawingDur > DUR_1) || (note->GetStemDir() != STEMDIRECTION_NONE))
+            && note->GetStemVisible() != BOOLEAN_false) {
             DrawMensuralStem(dc, note, staff, stemDir, radius, xNote, yNote);
         }
     }
@@ -179,8 +180,8 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 /* This function draws any flags as well as the stem. */
 
-void View::DrawMensuralStem(DeviceContext *dc, Note *note, Staff *staff, data_STEMDIRECTION dir, int radius,
-    int xn, int originY, int heightY)
+void View::DrawMensuralStem(
+    DeviceContext *dc, Note *note, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY)
 {
     assert(note);
 
@@ -418,7 +419,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
 
     // Calculate size of the rectangle
     xLeft = element->GetDrawingX();
-    int width =  2 * note->GetDrawingRadius(m_doc);
+    int width = 2 * note->GetDrawingRadius(m_doc);
     xRight = xLeft + width;
     if (note->GetActualDur() == DUR_MX) {
         // Maxima is twice the width of brevis

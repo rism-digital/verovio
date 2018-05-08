@@ -67,7 +67,7 @@ int Dot::ResetDrawing(FunctorParams *functorParams)
 
     this->m_drawingNote = NULL;
     this->m_drawingNextElement = NULL;
-    
+
     return FUNCTOR_CONTINUE;
 }
 

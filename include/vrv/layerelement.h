@@ -224,7 +224,7 @@ public:
     virtual int PrepareCrossStaff(FunctorParams *functorParams);
     virtual int PrepareCrossStaffEnd(FunctorParams *functorParams);
     ///@}
-    
+
     /**
      * See Object::PreparePointersByLayer
      */

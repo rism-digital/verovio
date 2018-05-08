@@ -12,7 +12,9 @@
 
 #include "vrvdef.h"
 
+namespace smf {
 class MidiFile;
+}
 
 namespace vrv {
 
@@ -304,6 +306,32 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustXOverflowParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current system
+ * member 1: the last measure;
+ * member 2: the current widest control event
+ * member 3: the margin
+ **/
+
+class AdjustXOverflowParams : public FunctorParams {
+public:
+    AdjustXOverflowParams(int margin)
+    {
+        m_currentSystem = NULL;
+        m_lastMeasure = NULL;
+        m_currentWidest = NULL;
+        m_margin = margin;
+    }
+    System *m_currentSystem;
+    Measure *m_lastMeasure;
+    FloatingPositioner *m_currentWidest;
+    int m_margin;
+};
+
+//----------------------------------------------------------------------------
 // AdjustXPosParams
 //----------------------------------------------------------------------------
 
@@ -384,11 +412,12 @@ public:
  * member 1: the time
  * member 2: the current Mensur
  * member 3: the current MeterSig
- * member 4: the functor for passing it to the TimeStampAligner
- * member 5: a flag indicating whereas we are processing the caution scoreDef
- * member 6: a flag indicating is we are in the first measure (for the scoreDef role)
- * member 7: a flag indicating if we had mutliple layer alignment reference in the measure
- * member 8: the doc
+ * member 4: the current notation type
+ * member 5: the functor for passing it to the TimeStampAligner
+ * member 6: a flag indicating whereas we are processing the caution scoreDef
+ * member 7: a flag indicating is we are in the first measure (for the scoreDef role)
+ * member 8: a flag indicating if we had mutliple layer alignment reference in the measure
+ * member 9: the doc
  **/
 
 class AlignHorizontallyParams : public FunctorParams {
@@ -586,6 +615,10 @@ public:
 /**
  * member 0: double: the current score time in the measure (incremented by each element)
  * member 1: double: the current real time in seconds in the measure (incremented by each element)
+ * member 2: the current Mensur
+ * member 3: the current MeterSig
+ * member 4: the current notation type
+ * member 5: the current tempo
  **/
 
 class CalcOnsetOffsetParams : public FunctorParams {
@@ -594,10 +627,16 @@ public:
     {
         m_currentScoreTime = 0.0;
         m_currentRealTimeSeconds = 0.0;
+        m_currentMensur = NULL;
+        m_currentMeterSig = NULL;
+        m_notationType = NOTATIONTYPE_cmn;
         m_currentTempo = 120;
     }
     double m_currentScoreTime;
     double m_currentRealTimeSeconds;
+    Mensur *m_currentMensur;
+    MeterSig *m_currentMeterSig;
+    data_NOTATIONTYPE m_notationType;
     int m_currentTempo;
 };
 
@@ -717,11 +756,12 @@ public:
  * member 4: the system width
  * member 5: the current scoreDef width
  * member 6: the current pending objects (ScoreDef, Endings, etc.) to be place at the beginning of a system
+ * member 7: the doc
  **/
 
 class CastOffSystemsParams : public FunctorParams {
 public:
-    CastOffSystemsParams(System *contentSystem, Page *page, System *currentSystem)
+    CastOffSystemsParams(System *contentSystem, Page *page, System *currentSystem, Doc *doc)
     {
         m_contentSystem = contentSystem;
         m_page = page;
@@ -729,6 +769,7 @@ public:
         m_shift = 0;
         m_systemWidth = 0;
         m_currentScoreDefWidth = 0;
+        m_doc = doc;
     }
     System *m_contentSystem;
     Page *m_page;
@@ -737,6 +778,7 @@ public:
     int m_systemWidth;
     int m_currentScoreDefWidth;
     ArrayOfObjects m_pendingObjects;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -1036,7 +1078,7 @@ public:
 
 class GenerateMIDIParams : public FunctorParams {
 public:
-    GenerateMIDIParams(MidiFile *midiFile)
+    GenerateMIDIParams(smf::MidiFile *midiFile)
     {
         m_midiFile = midiFile;
         m_midiChannel = 0;
@@ -1045,7 +1087,7 @@ public:
         m_transSemi = 0;
         m_currentTempo = 120;
     }
-    MidiFile *m_midiFile;
+    smf::MidiFile *m_midiFile;
     int m_midiChannel;
     int m_midiTrack;
     double m_totalTime;

@@ -79,7 +79,7 @@ int BeatRpt::GenerateMIDI(FunctorParams *functorParams)
     int tpq = params->m_midiFile->getTPQ();
 
     // filter last beat and copy all notes
-    MidiEvent event;
+    smf::MidiEvent event;
     int eventcount = params->m_midiFile->getEventCount(params->m_midiTrack);
     for (int i = 0; i < eventcount; i++) {
         event = params->m_midiFile->getEvent(params->m_midiTrack, i);
@@ -94,7 +94,7 @@ int BeatRpt::GenerateMIDI(FunctorParams *functorParams)
 
     for (int i = 0; i < beatLength * tpq; ++i) {
         // LogWarning("%i", i);
-        // MidiEvent event = params->m_midiFile->getEvent(params->m_midiTrack, starttime * tpq);
+        // smf::MidiEvent event = params->m_midiFile->getEvent(params->m_midiTrack, starttime * tpq);
         // event.clearVariables();
     }
 

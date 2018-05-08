@@ -571,15 +571,15 @@ Options::Options()
     m_font.SetInfo("Font", "Set the music font");
     m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);
-    
+
     m_graceFactor.SetInfo("Grace factor", "The grace size ratio numerator");
     m_graceFactor.Init(0.75, 0.5, 1.0);
     this->Register(&m_graceFactor, "graceFactor", &m_generalLayout);
-    
+
     m_graceRhythmAlign.SetInfo("Grace rhythmic alignment", "Align grace notes rhythmically with all staves");
     m_graceRhythmAlign.Init(false);
     this->Register(&m_graceRhythmAlign, "graceRhythmAlign", &m_generalLayout);
-    
+
     m_graceRightAlign.SetInfo("Grace right alignment", "Align the right position of a grace group with all staves");
     m_graceRightAlign.Init(false);
     this->Register(&m_graceRightAlign, "graceRightAlign", &m_generalLayout);

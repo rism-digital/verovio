@@ -48,6 +48,7 @@
 #include "beam.h"
 #include "chord.h"
 #include "dir.h"
+#include "dot.h"
 #include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
@@ -283,8 +284,19 @@ namespace humaux {
         verse = false;
         suppress_beam_tuplet = false;
         suppress_bracket_tuplet = false;
+
         ottavanotestart = ottavanoteend = NULL;
         ottavameasure = NULL;
+
+        ottavadownnotestart = ottavadownnoteend = NULL;
+        ottavadownmeasure = NULL;
+
+        ottava2notestart = ottava2noteend = NULL;
+        ottava2measure = NULL;
+
+        ottava2downnotestart = ottava2downnoteend = NULL;
+        ottava2downmeasure = NULL;
+
         ties.clear();
         meter_bottom = 4;
         meter_top = 4;
@@ -492,8 +504,11 @@ bool HumdrumInput::convertHumdrum()
     setupMeiDocument();
 
     // Create a list of the parts and which spine represents them.
-    std::vector<hum::HTp> &kernstarts = m_kernstarts;
-    kernstarts = infile.getKernSpineStartList();
+    std::vector<hum::HTp> &staffstarts = m_staffstarts;
+    std::vector<string> stafftypes;
+    stafftypes.push_back("**kern");
+    stafftypes.push_back("**mens");
+    infile.getSpineStartList(staffstarts, stafftypes);
 
     std::vector<hum::HTp> spinestarts;
     infile.getSpineStartList(spinestarts);
@@ -506,6 +521,9 @@ bool HumdrumInput::convertHumdrum()
         }
         if (it->isDataType("**string")) {
             m_string = true;
+        }
+        if (it->isDataType("**mens")) {
+            m_mens = true;
         }
         if (it->isDataType("**harm")) {
             m_harm = true;
@@ -528,18 +546,18 @@ bool HumdrumInput::convertHumdrum()
         }
     }
 
-    if (kernstarts.size() == 0) {
+    if (staffstarts.size() == 0) {
         // no parts in file, give up.  Perhaps return an error.
         return status;
     }
 
     // Reverse the order, since top part is last spine.
-    reverse(kernstarts.begin(), kernstarts.end());
+    reverse(staffstarts.begin(), staffstarts.end());
     calculateReverseKernIndex();
 
-    m_staffstates.resize(kernstarts.size());
+    m_staffstates.resize(staffstarts.size());
 
-    m_transpose.resize(kernstarts.size());
+    m_transpose.resize(staffstarts.size());
     std::fill(m_transpose.begin(), m_transpose.end(), 0);
 
     prepareVerses();
@@ -550,7 +568,7 @@ bool HumdrumInput::convertHumdrum()
 
     // m_meausreIndex not currently used but might be useful sometime.
     m_measureIndex = 0;
-    int line = kernstarts[0]->getLineIndex();
+    int line = staffstarts[0]->getLineIndex();
     while (line < infile.getLineCount() - 1 && (line >= 0)) {
         m_measureIndex++;
         status &= convertSystemMeasure(line);
@@ -1040,7 +1058,7 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const std::vector<hum:
 
 //////////////////////////////
 //
-// HumdrumInput::prepareVerses -- Assumes that m_kernstarts has been
+// HumdrumInput::prepareVerses -- Assumes that m_staffstarts has been
 //      filled already.
 //
 
@@ -1050,7 +1068,7 @@ void HumdrumInput::prepareVerses()
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     // ss[*].verse should already be set to false.
 
-    std::vector<hum::HTp> &kern = m_kernstarts;
+    std::vector<hum::HTp> &kern = m_staffstarts;
 
     if (kern.size() == 0) {
         return;
@@ -1165,12 +1183,12 @@ void HumdrumInput::calculateReverseKernIndex()
 {
     std::vector<int> &rkern = m_rkern;
     hum::HumdrumFile &infile = m_infile;
-    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+    const std::vector<hum::HTp> &staffstarts = m_staffstarts;
 
     rkern.resize(infile.getSpineCount() + 1);
     std::fill(rkern.begin(), rkern.end(), -1);
-    for (int i = 0; i < (int)kernstarts.size(); ++i) {
-        rkern[kernstarts[i]->getTrack()] = i;
+    for (int i = 0; i < (int)staffstarts.size(); ++i) {
+        rkern[staffstarts[i]->getTrack()] = i;
     }
 }
 
@@ -1182,21 +1200,21 @@ void HumdrumInput::calculateReverseKernIndex()
 
 void HumdrumInput::prepareStaffGroups()
 {
-    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+    const std::vector<hum::HTp> &staffstarts = m_staffstarts;
 
-    if (kernstarts.size() > 0) {
-        addMidiTempo(m_doc->m_scoreDef, kernstarts[0]);
+    if (staffstarts.size() > 0) {
+        addMidiTempo(m_doc->m_scoreDef, staffstarts[0]);
     }
-    for (int i = 0; i < (int)kernstarts.size(); ++i) {
+    for (int i = 0; i < (int)staffstarts.size(); ++i) {
         m_staffdef.push_back(new StaffDef());
         // m_staffgroup->AddChild(m_staffdef.back());
-        fillPartInfo(kernstarts[i], i + 1, (int)kernstarts.size());
+        fillPartInfo(staffstarts[i], i + 1, (int)staffstarts.size());
     }
 
     string decoration = getSystemDecoration("system-decoration");
 
     if (decoration == "") {
-        if (kernstarts.size() == 2) {
+        if (staffstarts.size() == 2) {
             StaffGrp *sg = new StaffGrp();
             m_doc->m_scoreDef.AddChild(sg);
             sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
@@ -1205,7 +1223,7 @@ void HumdrumInput::prepareStaffGroups()
             sg->AddChild(m_staffdef[1]);
         }
 
-        else if (kernstarts.size() > 2) {
+        else if (staffstarts.size() > 2) {
             StaffGrp *sg = new StaffGrp();
             m_doc->m_scoreDef.AddChild(sg);
             sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
@@ -1214,7 +1232,7 @@ void HumdrumInput::prepareStaffGroups()
             }
         }
 
-        else if (kernstarts.size() == 1) {
+        else if (staffstarts.size() == 1) {
             StaffGrp *sg = new StaffGrp();
             m_doc->m_scoreDef.AddChild(sg);
             sg->AddChild(m_staffdef[0]);
@@ -1237,7 +1255,7 @@ void HumdrumInput::prepareStaffGroups()
 
 void HumdrumInput::processStaffDecoration(const string &decoration)
 {
-    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+    const std::vector<hum::HTp> &staffstarts = m_staffstarts;
 
     bool validQ = true;
 
@@ -1253,8 +1271,8 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
     // in the score, then the results may have problems.
 
     map<int, int> staffToSpineMapping;
-    for (int i = 0; i < (int)kernstarts.size(); ++i) {
-        int staff = getStaffNumberLabel(kernstarts[i]);
+    for (int i = 0; i < (int)staffstarts.size(); ++i) {
+        int staff = getStaffNumberLabel(staffstarts[i]);
         if (staff <= 0) {
             continue;
         }
@@ -1307,7 +1325,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                 }
                 else {
                     value = value - 1;
-                    if (value >= (int)kernstarts.size()) {
+                    if (value >= (int)staffstarts.size()) {
                         value = -1;
                     }
                 }
@@ -1343,9 +1361,9 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         newstyles.push_back(groupstyle[i]);
     }
 
-    // Check to see that all kernstarts are represented in system decoration;
+    // Check to see that all staffstarts are represented in system decoration;
     // otherwise, declare that it is invalid and print a simple decoration.
-    vector<int> found(kernstarts.size(), 0);
+    vector<int> found(staffstarts.size(), 0);
 
     for (int i = 0; i < (int)newgroups.size(); ++i) {
         for (int j = 0; j < (int)newgroups[i].size(); ++j) {
@@ -2380,6 +2398,10 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     addInstrumentDefinition(m_staffdef.back(), partstart);
+
+    if (partstart->isMens()) {
+        m_staffdef.back()->SetNotationtype(NOTATIONTYPE_mensural);
+    }
 }
 
 //////////////////////////////
@@ -2556,7 +2578,10 @@ void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, hum::HTp partstar
 
     InstrDef *idef = new InstrDef;
     staffdef->AddChild(idef);
-    idef->SetMidiInstrnum(gmpc + 1); // offset from 1 in MEI
+    int offset = 1; // currently 1, should be 0 in MEI 4
+    idef->SetMidiInstrnum(gmpc + offset); // offset from 1 in MEI
+    data_MIDINAMES idval = (data_MIDINAMES)(gmpc + 1);
+    idef->SetMidiInstrname(idval);
 }
 
 //////////////////////////////
@@ -2825,7 +2850,8 @@ void HumdrumInput::setClef(StaffDef *part, const std::string &clef)
 
 //////////////////////////////
 //
-// HumdrumInput::convertSystemMeasure --
+// HumdrumInput::convertSystemMeasure -- Convert one measure of
+//     a Humdrum score into an MEI measure element.
 //
 
 bool HumdrumInput::convertSystemMeasure(int &line)
@@ -2868,8 +2894,8 @@ void HumdrumInput::checkForOmd(int startline, int endline)
     }
     m_omd = true;
 
-    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
-    if (kernstarts.size() == 0) {
+    const std::vector<hum::HTp> &staffstarts = m_staffstarts;
+    if (staffstarts.size() == 0) {
         return;
     }
     hum::HumdrumFile &infile = m_infile;
@@ -2926,15 +2952,15 @@ template <class ELEMENT> void HumdrumInput::setN(ELEMENT element, int nvalue)
 void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
 {
     hum::HumdrumFile &infile = m_infile;
-    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+    const std::vector<hum::HTp> &staffstarts = m_staffstarts;
     const std::vector<int> &rkern = m_rkern;
     std::vector<std::vector<std::vector<hum::HTp> > > &lt = m_layertokens;
 
     lt.clear();
-    lt.resize(kernstarts.size());
+    lt.resize(staffstarts.size());
 
     int i, j;
-    for (i = 0; i < (int)kernstarts.size(); ++i) {
+    for (i = 0; i < (int)staffstarts.size(); ++i) {
         lt[i].clear();
     }
 
@@ -2950,7 +2976,6 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
         for (j = 0; j < infile[i].getFieldCount(); ++j) {
             track = infile[i].token(j)->getTrack();
             if (track < 1) {
-                // not a kern spine.
                 continue;
             }
             staffindex = rkern[track];
@@ -2980,7 +3005,6 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
                 lt[staffindex].resize(lt[staffindex].size() + 1);
                 lt[staffindex].back().clear(); // probably not necessary
             }
-
             lt[staffindex][layerindex].push_back(infile[i].token(j));
         }
     }
@@ -2996,15 +3020,15 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
 
 bool HumdrumInput::convertMeasureStaves(int startline, int endline)
 {
-    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+    const std::vector<hum::HTp> &staffstarts = m_staffstarts;
 
     std::vector<int> layers = getStaffLayerCounts();
 
     int i;
 
     // pre-allocate
-    std::vector<Staff *> stafflist(kernstarts.size());
-    for (i = 0; i < (int)kernstarts.size(); ++i) {
+    std::vector<Staff *> stafflist(staffstarts.size());
+    for (i = 0; i < (int)staffstarts.size(); ++i) {
         stafflist[i] = new Staff();
         m_measure->AddChild(stafflist[i]);
     }
@@ -3012,12 +3036,12 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
     checkForOmd(startline, endline);
 
     bool status = true;
-    for (i = 0; i < (int)kernstarts.size(); ++i) {
+    for (i = 0; i < (int)staffstarts.size(); ++i) {
         m_currentstaff = i + 1;
         m_staff = stafflist[i];
         m_staff->SetN(m_currentstaff);
 
-        status &= convertMeasureStaff(kernstarts[i]->getTrack(), startline, endline, i + 1, layers[i]);
+        status &= convertMeasureStaff(staffstarts[i]->getTrack(), startline, endline, i + 1, layers[i]);
         if (!status) {
             break;
         }
@@ -3119,7 +3143,7 @@ void HumdrumInput::addFingeringsForMeasure(int startline, int endline)
     if (!m_measure) {
         return;
     }
-    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+    const std::vector<hum::HTp> &staffstarts = m_staffstarts;
     hum::HumdrumFile &infile = m_infile;
     bool aboveQ = true;
     hum::HumRegex hre;
@@ -3158,7 +3182,7 @@ void HumdrumInput::addFingeringsForMeasure(int startline, int endline)
             }
 
             int staffindex = m_rkern[track];
-            int maxstaff = (int)kernstarts.size();
+            int maxstaff = (int)staffstarts.size();
 
             if (aboveQ) {
                 for (int k = 0; k < (int)nums.size(); k++) {
@@ -3228,7 +3252,7 @@ void HumdrumInput::addStringNumbersForMeasure(int startline, int endline)
         return;
     }
     int xstaffindex;
-    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+    const std::vector<hum::HTp> &staffstarts = m_staffstarts;
     hum::HumdrumFile &infile = m_infile;
     for (int i = startline; i < endline; ++i) {
         if (!infile[i].isData()) {
@@ -3259,7 +3283,7 @@ void HumdrumInput::addStringNumbersForMeasure(int startline, int endline)
                 // data is not attached to a **kern spine since it comes before
                 // any **kern data.  Treat it as attached to the bottom staff.
                 // (or the top staff depending on @place="above|below".
-                xstaffindex = (int)kernstarts.size() - 1;
+                xstaffindex = (int)staffstarts.size() - 1;
                 setStaff(harm, xstaffindex + 1);
             }
             std::wstring content;
@@ -3286,7 +3310,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
         return;
     }
     int xstaffindex;
-    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+    const std::vector<hum::HTp> &staffstarts = m_staffstarts;
     hum::HumdrumFile &infile = m_infile;
     for (int i = startline; i < endline; ++i) {
         if (!infile[i].isData()) {
@@ -3318,7 +3342,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 // data is not attached to a **kern spine since it comes before
                 // any **kern data.  Treat it as attached to the bottom staff.
                 // (or the top staff depending on @place="above|below".
-                xstaffindex = (int)kernstarts.size() - 1;
+                xstaffindex = (int)staffstarts.size() - 1;
                 setStaff(harm, xstaffindex + 1);
             }
 
@@ -3978,11 +4002,11 @@ void HumdrumInput::handleGroupEnds(
 
 bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, int layerindex)
 {
-    int i;
     hum::HumdrumFile &infile = m_infile;
     std::vector<hum::HumNum> &timesigdurs = m_timesigdurs;
     std::vector<int> &rkern = m_rkern;
     int staffindex = rkern[track];
+
     if (staffindex < 0) {
         // not a kern spine.
         return false;
@@ -4079,7 +4103,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
 
         // Basic compensation for clef change (can be improved later):
-        for (i = 0; i < (int)layerdata.size(); ++i) {
+        for (int i = 0; i < (int)layerdata.size(); ++i) {
             if (!layerdata[i]->isClef()) {
                 continue;
             }
@@ -4116,7 +4140,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     // ggg	processGlobalDirections(token, staffindex);
 
-    for (i = 0; i < (int)layerdata.size(); ++i) {
+    for (int i = 0; i < (int)layerdata.size(); ++i) {
         if (prespace[i] > 0) {
             addSpace(elements, pointers, prespace[i]);
         }
@@ -4170,8 +4194,14 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             continue;
         }
 
+        if (layerdata[i]->isMens()) {
+            convertMensuralToken(elements, pointers, layerdata[i], staffindex);
+            continue;
+        }
+
         handleGroupStarts(tg, elements, pointers, layerdata, i);
 
+        // conversion of **kern data to MEI:
         if (layerdata[i]->isChord()) {
             int chordnotecount = getChordNoteCount(layerdata[i]);
             if (chordnotecount < 1) {
@@ -4324,6 +4354,54 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::convertMensuralToken --  Convert a mensural token to MEI.
+//     Not dealing with chords yet.
+//
+
+void HumdrumInput::convertMensuralToken(
+    std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token, int staffindex)
+{
+
+    if (token->isNull()) {
+        return;
+    }
+
+    if (token->isRest()) {
+        std::cerr << "NOT DEALING WITH MENSURAL RESTS YET" << endl;
+    }
+    else if (token->isNote()) {
+        Note *note = new Note;
+        setLocationId(note, token);
+        appendElement(elements, pointers, note);
+        convertNote(note, token, staffindex);
+
+        if (token->find(':') != std::string::npos) {
+            Dot *dot = new Dot();
+            appendElement(elements, pointers, dot);
+        }
+
+        /*
+                processSlurs(layerdata[i]);
+                processDynamics(layerdata[i], staffindex);
+                if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
+                    note->SetStemLen(0);
+                }
+                if (m_signifiers.cuesize && layerdata[i]->find(m_signifiers.cuesize) != string::npos) {
+                    note->SetCue(BOOLEAN_true);
+                }
+                else if (m_staffstates.at(staffindex).cue_size.at(m_currentlayer)) {
+                    note->SetCue(BOOLEAN_true);
+                }
+                addArticulations(note, layerdata[i]);
+                addOrnaments(note, layerdata[i]);
+                addArpeggio(note, layerdata[i]);
+                processDirections(layerdata[i], staffindex);
+        */
+    }
 }
 
 //////////////////////////////
@@ -5016,8 +5094,8 @@ void HumdrumInput::processChordSignifiers(Chord *chord, hum::HTp token, int staf
 
 void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
 {
-    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
-    int staffcount = (int)kernstarts.size();
+    const std::vector<hum::HTp> &staffstarts = m_staffstarts;
+    int staffcount = (int)staffstarts.size();
 
     // only put above or below system (no cases of intermediate
     // directions allowed for now)
@@ -5357,7 +5435,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     }
 
     if (token->linkedParameterIsGlobal(index)) {
-        int maxstaff = (int)m_kernstarts.size() - 1;
+        int maxstaff = (int)m_staffstarts.size() - 1;
 
         if ((placement == "below") && (staffindex == maxstaff)) {
             addDirection(text, placement, bold, italic, token, staffindex);
@@ -7307,6 +7385,30 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
         // When a new note is read, check if ottavameasure
         // is non-null, and if so, store the new note in ottavanotestart.
     }
+    else if (*token == "*8ba") {
+        // turn on ottava down
+        ss[staffindex].ottavadownmeasure = m_measure;
+        ss[staffindex].ottavadownnotestart = NULL;
+        ss[staffindex].ottavadownnoteend = NULL;
+        // When a new note is read, check if ottavadownmeasure
+        // is non-null, and if so, store the new note in ottavadownnotestart.
+    }
+    else if (*token == "*15ba") {
+        // turn on two ottava down
+        ss[staffindex].ottava2downmeasure = m_measure;
+        ss[staffindex].ottava2downnotestart = NULL;
+        ss[staffindex].ottava2downnoteend = NULL;
+        // When a new note is read, check if ottava2downmeasure
+        // is non-null, and if so, store the new note in ottava2downnotestart.
+    }
+    else if (*token == "*15ma") {
+        // turn on ottava
+        ss[staffindex].ottava2measure = m_measure;
+        ss[staffindex].ottava2notestart = NULL;
+        ss[staffindex].ottava2noteend = NULL;
+        // When a new note is read, check if ottava2measure
+        // is non-null, and if so, store the new note in ottava2notestart.
+    }
     else if (*token == "*X8va") {
         // turn off ottava
         if ((ss[staffindex].ottavameasure != NULL) && (ss[staffindex].ottavanotestart != NULL)
@@ -7322,6 +7424,54 @@ void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
         ss[staffindex].ottavanotestart = NULL;
         ss[staffindex].ottavanoteend = NULL;
         ss[staffindex].ottavameasure = NULL;
+    }
+    else if (*token == "*X8ba") {
+        // turn off ottava down
+        if ((ss[staffindex].ottavadownmeasure != NULL) && (ss[staffindex].ottavadownnotestart != NULL)
+            && (ss[staffindex].ottavadownnoteend != NULL)) {
+            Octave *octave = new Octave;
+            ss[staffindex].ottavadownmeasure->AddChild(octave);
+            setStaff(octave, staffindex + 1);
+            octave->SetDis(OCTAVE_DIS_8);
+            octave->SetStartid("#" + ss[staffindex].ottavadownnotestart->GetUuid());
+            octave->SetEndid("#" + ss[staffindex].ottavadownnoteend->GetUuid());
+            octave->SetDisPlace(STAFFREL_basic_below);
+        }
+        ss[staffindex].ottavadownnotestart = NULL;
+        ss[staffindex].ottavadownnoteend = NULL;
+        ss[staffindex].ottavadownmeasure = NULL;
+    }
+    else if (*token == "*X15ma") {
+        // turn off ottava2 up
+        if ((ss[staffindex].ottava2measure != NULL) && (ss[staffindex].ottava2notestart != NULL)
+            && (ss[staffindex].ottava2noteend != NULL)) {
+            Octave *octave = new Octave;
+            ss[staffindex].ottava2measure->AddChild(octave);
+            setStaff(octave, staffindex + 1);
+            octave->SetDis(OCTAVE_DIS_15);
+            octave->SetStartid("#" + ss[staffindex].ottava2notestart->GetUuid());
+            octave->SetEndid("#" + ss[staffindex].ottava2noteend->GetUuid());
+            octave->SetDisPlace(STAFFREL_basic_above);
+        }
+        ss[staffindex].ottava2notestart = NULL;
+        ss[staffindex].ottava2noteend = NULL;
+        ss[staffindex].ottava2measure = NULL;
+    }
+    else if (*token == "*X15ba") {
+        // turn off ottava2 down
+        if ((ss[staffindex].ottava2downmeasure != NULL) && (ss[staffindex].ottava2downnotestart != NULL)
+            && (ss[staffindex].ottava2downnoteend != NULL)) {
+            Octave *octave = new Octave;
+            ss[staffindex].ottava2downmeasure->AddChild(octave);
+            setStaff(octave, staffindex + 1);
+            octave->SetDis(OCTAVE_DIS_15);
+            octave->SetStartid("#" + ss[staffindex].ottava2downnotestart->GetUuid());
+            octave->SetEndid("#" + ss[staffindex].ottava2downnoteend->GetUuid());
+            octave->SetDisPlace(STAFFREL_basic_below);
+        }
+        ss[staffindex].ottava2downnotestart = NULL;
+        ss[staffindex].ottava2downnoteend = NULL;
+        ss[staffindex].ottava2downmeasure = NULL;
     }
 }
 
@@ -7667,7 +7817,7 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
         pattern.push_back(m_signifiers.above);
         if (regex_search(tstring, regex(pattern))) {
             int newstaff = m_currentstaff - 1;
-            if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
+            if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
                 setStaff(rest, newstaff);
             }
         }
@@ -7677,7 +7827,7 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
         pattern.push_back(m_signifiers.below);
         if (regex_search(tstring, regex(pattern))) {
             int newstaff = m_currentstaff + 1;
-            if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
+            if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
                 setStaff(rest, newstaff);
             }
         }
@@ -7686,13 +7836,13 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
     // Delete these temporary staff position methods later:
     if (tstring.find("jj") != string::npos) {
         int newstaff = m_currentstaff - 1;
-        if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
+        if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
             setStaff(rest, newstaff);
         }
     }
     else if (tstring.find("j") != string::npos) {
         int newstaff = m_currentstaff + 1;
-        if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
+        if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
             setStaff(rest, newstaff);
         }
     }
@@ -7782,6 +7932,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     processTerminalLong(token); // do this before assigning rhythmic value.
 
     bool octaveupQ = ss[staffindex].ottavameasure ? true : false;
+    bool octavedownQ = ss[staffindex].ottavadownmeasure ? true : false;
+
+    bool octave2upQ = ss[staffindex].ottava2measure ? true : false;
+    bool octave2downQ = ss[staffindex].ottava2downmeasure ? true : false;
 
     int line = token->getLineIndex();
     int field = token->getFieldIndex();
@@ -7795,7 +7949,20 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     if ((ss[staffindex].ottavameasure != NULL) && (ss[staffindex].ottavanotestart == NULL)) {
         ss[staffindex].ottavanotestart = note;
     }
+    if ((ss[staffindex].ottavadownmeasure != NULL) && (ss[staffindex].ottavadownnotestart == NULL)) {
+        ss[staffindex].ottavadownnotestart = note;
+    }
+    if ((ss[staffindex].ottava2measure != NULL) && (ss[staffindex].ottava2notestart == NULL)) {
+        ss[staffindex].ottava2notestart = note;
+    }
+    if ((ss[staffindex].ottava2downmeasure != NULL) && (ss[staffindex].ottava2downnotestart == NULL)) {
+        ss[staffindex].ottava2downnotestart = note;
+    }
+
     ss[staffindex].ottavanoteend = note;
+    ss[staffindex].ottavadownnoteend = note;
+    ss[staffindex].ottava2noteend = note;
+    ss[staffindex].ottava2downnoteend = note;
 
     if (!chordQ) {
         // acc/unacc need to be switched in verovio, so switch also here later:
@@ -7889,6 +8056,21 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
         // @oct required even if @oct.ges given.
         note->SetOctGes(octave);
         note->SetOct(octave - 1);
+    }
+    else if (octavedownQ) {
+        // @oct required even if @oct.ges given.
+        note->SetOctGes(octave);
+        note->SetOct(octave + 1);
+    }
+    else if (octave2upQ) {
+        // @oct required even if @oct.ges given.
+        note->SetOctGes(octave);
+        note->SetOct(octave - 2);
+    }
+    else if (octave2downQ) {
+        // @oct required even if @oct.ges given.
+        note->SetOctGes(octave);
+        note->SetOct(octave + 2);
     }
     else {
         note->SetOct(octave);
@@ -7993,6 +8175,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
 
     if (!chordQ) {
         hum::HumNum dur = convertRhythm(note, token, subtoken);
+        // ggg
         if (dur == 0) {
             note->SetDur(DURATION_4);
             note->SetStemLen(0);
@@ -8029,7 +8212,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
         pattern.push_back(m_signifiers.above);
         if (regex_search(tstring, regex(pattern))) {
             int newstaff = m_currentstaff - 1;
-            if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
+            if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
                 setStaff(note, newstaff);
             }
         }
@@ -8039,7 +8222,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
         pattern.push_back(m_signifiers.below);
         if (regex_search(tstring, regex(pattern))) {
             int newstaff = m_currentstaff + 1;
-            if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
+            if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
                 setStaff(note, newstaff);
             }
         }
@@ -8048,13 +8231,13 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     // Delete these temporary staff position methods later:
     if (tstring.find("jj") != string::npos) {
         int newstaff = m_currentstaff - 1;
-        if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
+        if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
             setStaff(note, newstaff);
         }
     }
     else if (tstring.find("j") != string::npos) {
         int newstaff = m_currentstaff + 1;
-        if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
+        if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
             setStaff(note, newstaff);
         }
     }
@@ -8349,6 +8532,147 @@ void HumdrumInput::splitSyllableBySpaces(vector<string> &vtext, char spacer)
 
 //////////////////////////////
 //
+// HumdrumInput::convertMensuralRhythm --
+//
+
+template <class ELEMENT> hum::HumNum HumdrumInput::convertMensuralRhythm(ELEMENT element, hum::HTp token, int subtoken)
+{
+
+    std::string tstring;
+    if (subtoken < 0) {
+        tstring = *token;
+        // strip off any leading spaces
+        auto first = tstring.find_first_not_of(' ');
+        if (first != string::npos) {
+            tstring = tstring.substr(first);
+        }
+    }
+    else {
+        tstring = token->getSubtoken(subtoken);
+    }
+
+    string vstring = token->getVisualDuration();
+    if (!vstring.empty()) {
+        int dotcount = characterCountInSubtoken(vstring, '.');
+        if (dotcount > 0) {
+            element->SetDots(dotcount);
+        }
+        // dotcount = characterCountInSubtoken(tstring, '.');
+        // if (dotcount > 0) {
+        //    element->SetDotsGes(dotcount);
+        //}
+    }
+    else {
+        int dotcount = characterCountInSubtoken(tstring, ':');
+        if (dotcount > 0) {
+            element->SetDots(dotcount);
+        }
+    }
+
+    // Tuplet durations are not handled below yet.
+    // dur is in units of quarter notes.
+
+    hum::HumNum dur;
+    hum::HumNum durges;
+
+    if (vstring.empty()) {
+        dur = hum::Convert::mensToDurationNoDots(tstring);
+        dur /= 4; // duration is now in whole note units;
+        dur *= m_tupletscaling;
+    }
+    else {
+        dur = hum::Convert::mensToDurationNoDots(vstring);
+        dur /= 4; // duration is now in whole note units;
+        dur *= m_tupletscaling;
+
+        durges = hum::Convert::mensToDurationNoDots(tstring);
+        durges /= 4; // duration is now in whole note units;
+        durges *= m_tupletscaling;
+    }
+
+    if (dur.isInteger()) {
+        switch (dur.getNumerator()) {
+            case 1: element->SetDur(DURATION_semibrevis); break;
+            case 2: element->SetDur(DURATION_brevis); break;
+            case 4: element->SetDur(DURATION_longa); break;
+            case 8: element->SetDur(DURATION_maxima); break;
+        }
+    }
+    else if (dur.getNumerator() == 1) {
+        switch (dur.getDenominator()) {
+            case 2: element->SetDur(DURATION_minima); break;
+            case 4: element->SetDur(DURATION_semiminima); break;
+            case 8: element->SetDur(DURATION_fusa); break;
+            case 16: element->SetDur(DURATION_semifusa); break;
+            case 32: element->SetDur(DURATION_32); break;
+            case 64: element->SetDur(DURATION_64); break;
+            case 128: element->SetDur(DURATION_128); break;
+            case 256: element->SetDur(DURATION_256); break;
+            case 512: element->SetDur(DURATION_512); break;
+            case 1024: element->SetDur(DURATION_1024); break;
+            case 2048: element->SetDur(DURATION_2048); break;
+        }
+    }
+
+    if (!vstring.empty()) {
+        if (durges.isInteger()) {
+            switch (durges.getNumerator()) {
+                case 1: element->SetDurGes(DURATION_semibrevis); break;
+                case 2: element->SetDurGes(DURATION_brevis); break;
+                case 4: element->SetDurGes(DURATION_longa); break;
+                case 8: element->SetDurGes(DURATION_maxima); break;
+            }
+        }
+        else if (durges.getNumerator() == 1) {
+            switch (durges.getDenominator()) {
+                case 2: element->SetDurGes(DURATION_minima); break;
+                case 4: element->SetDurGes(DURATION_semiminima); break;
+                case 8: element->SetDurGes(DURATION_fusa); break;
+                case 16: element->SetDurGes(DURATION_semifusa); break;
+                case 32: element->SetDurGes(DURATION_32); break;
+                case 64: element->SetDurGes(DURATION_64); break;
+                case 128: element->SetDurGes(DURATION_128); break;
+                case 256: element->SetDurGes(DURATION_256); break;
+                case 512: element->SetDurGes(DURATION_512); break;
+                case 1024: element->SetDurGes(DURATION_1024); break;
+                case 2048: element->SetDurGes(DURATION_2048); break;
+            }
+        }
+        return durges;
+    }
+    else {
+        /*
+                if (dur.isInteger()) {
+                        switch (dur.getNumerator()) {
+                        case 1: element->SetDurGes(DURATION_1); break;
+                        case 2: element->SetDurGes(DURATION_breve); break;
+                        case 4: element->SetDurGes(DURATION_long); break;
+                        case 8: element->SetDurGes(DURATION_maxima); break;
+                        }
+                }
+                else if (dur.getNumerator() == 1) {
+                        switch (dur.getDenominator()) {
+                        case 2: element->SetDurGes(DURATION_2); break;
+                        case 4: element->SetDurGes(DURATION_4); break;
+                        case 8: element->SetDurGes(DURATION_8); break;
+                        case 16: element->SetDurGes(DURATION_16); break;
+                        case 32: element->SetDurGes(DURATION_32); break;
+                        case 64: element->SetDurGes(DURATION_64); break;
+                        case 128: element->SetDurGes(DURATION_128); break;
+                        case 256: element->SetDurGes(DURATION_256); break;
+                        case 512: element->SetDurGes(DURATION_512); break;
+                        case 1024: element->SetDurGes(DURATION_1024); break;
+                        case 2048: element->SetDurGes(DURATION_2048); break;
+                        }
+                }
+        */
+    }
+
+    return dur;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::convertRhythm --
 //     default value:
 //         subtoken = -1;
@@ -8357,6 +8681,10 @@ void HumdrumInput::splitSyllableBySpaces(vector<string> &vtext, char spacer)
 
 template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element, hum::HTp token, int subtoken)
 {
+    if (token->isMens()) {
+        return convertMensuralRhythm(element, token, subtoken);
+    }
+
     std::string tstring;
     if (subtoken < 0) {
         tstring = *token;
@@ -8383,7 +8711,6 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         if (dotcount > 0) {
             element->SetDots(dotcount);
         }
-
         // dotcount = characterCountInSubtoken(tstring, '.');
         // if (dotcount > 0) {
         //    element->SetDotsGes(dotcount);

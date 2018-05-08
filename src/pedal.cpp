@@ -13,7 +13,9 @@
 
 //----------------------------------------------------------------------------
 
+#include "functorparams.h"
 #include "verticalaligner.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -21,12 +23,14 @@ namespace vrv {
 // Pedal
 //----------------------------------------------------------------------------
 
-Pedal::Pedal() : ControlElement("pedal-"), TimePointInterface(), AttColor(), AttPedalLog(), AttPlacement()
+Pedal::Pedal()
+    : ControlElement("pedal-"), TimePointInterface(), AttColor(), AttPedalLog(), AttPlacement(), AttVerticalGroup()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_PEDALLOG);
     RegisterAttClass(ATT_PLACEMENT);
+    RegisterAttClass(ATT_VERTICALGROUP);
 
     Reset();
 }
@@ -40,10 +44,23 @@ void Pedal::Reset()
     ResetColor();
     ResetPedalLog();
     ResetPlacement();
+    ResetVerticalGroup();
 }
 
 //----------------------------------------------------------------------------
 // Pedal functor methods
 //----------------------------------------------------------------------------
+
+int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
+{
+    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    assert(params);
+
+    if (this->HasVgrp()) {
+        this->SetDrawingGrpId(-this->GetVgrp());
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

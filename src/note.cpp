@@ -298,9 +298,9 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool isCueSize)
 wchar_t Note::GetMensuralSmuflNoteHead()
 {
     assert(this->IsMensural());
-    
+
     int drawingDur = this->GetDrawingDur();
-    
+
     // No SMuFL code used for these values
     if (drawingDur < DUR_1) {
         return 0;
@@ -469,7 +469,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    if (!this->IsVisible()) {
+    if (!this->IsVisible() || (this->GetStemVisible() == BOOLEAN_false)) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -817,7 +817,7 @@ int Note::PreparePointersByLayer(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::PreparePointersByLayer(functorParams);
-    
+
     PreparePointersByLayerParams *params = dynamic_cast<PreparePointersByLayerParams *>(functorParams);
     assert(params);
 

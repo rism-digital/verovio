@@ -59,6 +59,17 @@ public:
      */
     StaffAlignment *GetStaffAlignmentForStaffN(int staffN) const;
 
+    /**
+     * Find all the positioners pointing to an object;
+     */
+    void FindAllPositionerPointingTo(ArrayOfFloatingPositioners *positioners, FloatingObject *object);
+
+    /**
+     * Find all the intersection points with a vertical line (top to bottom)
+     */
+    void FindAllIntersectionPoints(
+        SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin);
+
 private:
     //
 public:
@@ -164,6 +175,12 @@ public:
      * Deletes all the FloatingPositioner objects.
      */
     void ClearPositioners();
+
+    /**
+     * Find all the intersection points with a vertical line (top to bottom)
+     */
+    void FindAllIntersectionPoints(
+        SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin);
 
     //----------//
     // Functors //

@@ -413,16 +413,23 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
     ReadMusicXmlTitle(root);
 
-    // The mdiv
+    // the mdiv
     Mdiv *mdiv = new Mdiv();
     mdiv->m_visibility = Visible;
     m_doc->AddChild(mdiv);
-    // The score
+    // the score
     Score *score = new Score();
     mdiv->AddChild(score);
     // the section
     Section *section = new Section();
     score->AddChild(section);
+    // initialize layout
+    if (root.select_single_node("/score-partwise/identification/encoding/supports[@element='print']")) {
+        m_hasLayoutInformation = true;
+        // always start with a new page
+        Pb *pb = new Pb();
+        section->AddChild(pb);
+    }
 
     std::vector<StaffGrp *> m_staffGrpStack;
     StaffGrp *staffGrp = new StaffGrp();
@@ -478,7 +485,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             pugi::xpath_node midiInstrument = xpathNode.node().select_single_node("midi-instrument");
             pugi::xpath_node midiChannel = midiInstrument.node().select_single_node("midi-channel");
             pugi::xpath_node midiName = midiInstrument.node().select_single_node("midi-name");
-            pugi::xpath_node midiPan = midiInstrument.node().select_single_node("pan");
+            // pugi::xpath_node midiPan = midiInstrument.node().select_single_node("pan");
             pugi::xpath_node midiProgram = midiInstrument.node().select_single_node("midi-program");
             pugi::xpath_node midiVolume = midiInstrument.node().select_single_node("volume");
             // create the staffDef(s)
@@ -502,10 +509,11 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 }
                 if (midiInstrument) {
                     InstrDef *instrdef = new InstrDef;
-                    instrdef->SetMidiInstrname(instrdef->AttMidiInstrument::StrToMidinames(midiName.node().text().as_string()));
-                    if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int());
-                    if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
-                    if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int());
+                    instrdef->SetMidiInstrname(
+                        instrdef->AttMidiInstrument::StrToMidinames(midiName.node().text().as_string()));
+                    if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int() - 1);
+                    // if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
+                    if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int() - 1);
                     if (midiVolume) instrdef->SetMidiVolume(midiVolume.node().text().as_int());
                     partStaffGrp->AddChild(instrdef);
                 }
@@ -532,10 +540,10 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     }
                     if (midiInstrument) {
                         InstrDef *instrdef = new InstrDef;
-                        if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int());
-                        if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int());
+                        if (midiChannel) instrdef->SetMidiChannel(midiChannel.node().text().as_int() - 1);
+                        // if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
+                        if (midiProgram) instrdef->SetMidiInstrnum(midiProgram.node().text().as_int() - 1);
                         if (midiVolume) instrdef->SetMidiVolume(midiVolume.node().text().as_int());
-                        if (midiPan) instrdef->SetMidiPan(midiPan.node().text().as_int());
                         staffDef->AddChild(instrdef);
                     }
                 }
@@ -1164,7 +1172,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
             octave->SetDis(
                 octave->AttOctaveDisplacement::StrToOctaveDis(xmlShift.node().attribute("size").as_string()));
             m_octDis[staffN] = (xmlShift.node().attribute("size").as_int() + 2) / 8;
-            if (HasAttributeWithValue(xmlShift.node(), "type", "down")) {
+            if (HasAttributeWithValue(xmlShift.node(), "type", "up")) {
                 octave->SetDisPlace(STAFFREL_basic_below);
                 m_octDis[staffN] = -1 * m_octDis[staffN];
             }
@@ -1455,7 +1463,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
             std::string octaveStr = GetContentOfChild(pitch.node(), "octave");
             if (!octaveStr.empty()) {
                 if (m_octDis[staff->GetN()] != 0) {
-                    note->SetOct(atoi(octaveStr.c_str()) + m_octDis[staff->GetN()]);
+                    note->SetOct(atoi(octaveStr.c_str()) - m_octDis[staff->GetN()]);
                     note->SetOctGes(atoi(octaveStr.c_str()));
                 }
                 else
