@@ -56,7 +56,7 @@ void Pedal::Reset()
 // Pedal functor methods
 //----------------------------------------------------------------------------
 
-int Pedal::GenerateMIDI(FunctorParams * functorParams)
+int Pedal::GenerateMIDI(FunctorParams *functorParams)
 {
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
@@ -68,16 +68,14 @@ int Pedal::GenerateMIDI(FunctorParams * functorParams)
     int tpq = params->m_midiFile->getTPQ();
 
     // todo: check pedal @func to switch between sustain/soften/damper pedals?
-    switch (GetDir())
-    {
-    case pedalLog_DIR_down:
-        params->m_midiFile->addSustainPedalOn(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
-        break;
-    case pedalLog_DIR_up:
-        params->m_midiFile->addSustainPedalOff(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
-        break;
-    default:
-        return FUNCTOR_CONTINUE;
+    switch (GetDir()) {
+        case pedalLog_DIR_down:
+            params->m_midiFile->addSustainPedalOn(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
+            break;
+        case pedalLog_DIR_up:
+            params->m_midiFile->addSustainPedalOff(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
+            break;
+        default: return FUNCTOR_CONTINUE;
     }
 
     return FUNCTOR_CONTINUE;

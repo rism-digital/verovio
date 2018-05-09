@@ -580,7 +580,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         assert(endChord);
         endStemDir = endChord->GetDrawingStemDir();
     }
-    
+
     if (startNote && endNote && startNote->IsGraceNote() && !endNote->IsGraceNote()) {
         isGraceToNoteSlur = true;
     }
@@ -792,7 +792,8 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
                 }
             }
             // (_)d
-            else if (endStemDir == STEMDIRECTION_up) y2 = end->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+            else if (endStemDir == STEMDIRECTION_up)
+                y2 = end->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
             // P(_)P
             else if (isShortSlur) {
                 y2 = end->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
