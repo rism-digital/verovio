@@ -159,9 +159,10 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
         else if (mensur->GetSign() == MENSURATIONSIGN_C) {
             if (mensur->GetOrient() == ORIENTATION_reversed) {
+                code = SMUFL_E916_mensuralProlation7;
+                // additional offset
                 perfectRadius -= 2 * perfectRadius
                     - m_doc->GetGlyphWidth(SMUFL_E916_mensuralProlation7, staff->m_drawingStaffSize, false);
-                code = SMUFL_E916_mensuralProlation7;
             }
             else {
                 code = SMUFL_E915_mensuralProlation6;
