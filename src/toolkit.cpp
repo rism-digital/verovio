@@ -1280,12 +1280,35 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
         
         Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
         assert(staff);
-        // TODO
-        int staffy = staff->GetDrawingY();
-        int clefLine = staff->m_drawingLines - (staffy - y) / m_doc.GetDrawingDoubleUnit(staff->m_drawingStaffSize); 
+        // Note that y param is relative to initial position for clefs
+        int initialClefLine = clef->GetLine();
+        int clefLine = round((double) y / (double) m_doc.GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
         clef->SetLine(clefLine);
         clef->SetUlx(x);
-        
+
+        if (initialClefLine != clefLine) {  // adjust notes so they stay in the same position
+            int lineDiff = clefLine - initialClefLine;
+            AttComparison comparison(NC);
+            ArrayOfObjects objects;
+            layer->FindAllChildByAttComparison(&objects, &comparison);
+            for (auto iter = objects.begin(); iter != objects.end(); iter++) {
+                Nc *nc = dynamic_cast<Nc *>(*iter);
+                int oct = nc->GetOct();
+                int pnameOriginal = nc->GetPname();
+                int pname = pnameOriginal - 2 * lineDiff;
+                while (pname < PITCHNAME_c) {
+                    oct--;
+                    pname += 7;
+                }
+                while (pname > PITCHNAME_b) {
+                    oct++;
+                    pname -= 7;
+                }
+                nc->SetPname((data_PITCHNAME)pname);
+                nc->SetOct(oct);
+            } 
+        }
+
         return true;
     }
         
