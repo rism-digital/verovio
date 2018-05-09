@@ -120,29 +120,22 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Neume *neume = dynamic_cast<Neume *>(element);
     assert(neume);
 
-    std::map<const char*, NeumeGroup> neumes = neume->GetGroups();
+
 
     /******************************************************************/
     // initialization
     
-    const ListOfObjects *neumeChildren = neume->GetList(neume);
-    if (neumeChildren->empty()) {
-        return;
-    }
+    std::map<std::string, NeumeGroup> neumeGroups = neume->GetGroups();
 
     std::string contour = "";
-    contour.append("du");
-    // for (int i = 1; i < (int)neumeChildren[0].size(); i++) {
-    //      Nc *nc = dynamic_cast<Nc *>(neumeChildren[0][i]);
-    //      if (i >= 2) {
-    //          std::strcat(contour, nc->GetIntm().c_str());
-    //      }
-    // }
-    std::cout << contour;
-    std::cout << contour.c_str();
-    std::cout << neumes[contour.c_str()];
-    std::cout << neumes["du"];
-    std::cout << "\n";
+    for (int i = 1; i < (int)neumeChildren[0].size(); i++) {
+         Nc *nc = dynamic_cast<Nc *>(neumeChildren[0][i]);
+         if (i >= 2) {
+             contour.append(nc->GetIntm());
+         }
+    }
+
+    neumeName = neumeGroup[contour];
 
     /******************************************************************/
     // Start the Neume graphic and draw the children

@@ -34,8 +34,20 @@ class Neume;
 // Note
 //----------------------------------------------------------------------------
 
+enum NeumeGroup {
+    PUNCTUM,
+    CLIVIS,
+    DISTROPHA,
+    PES,
+    CLIMACUS,
+    PORRECTUS, 
+    TRISTROPHA,
+    SCANDICUS,
+    TORCULUS
+};
+
 /**
- * This class models the MEI <note> element.
+ * This class models the MEI <neume> element.
  */
 
 class Neume : public LayerElement,
@@ -66,9 +78,11 @@ public:
 
     virtual int GetPosition(LayerElement *element);
     virtual bool IsLastInNeume(LayerElement *element);
-
+    virtual void InitNeumeGroups();
+    virtual std::map<std::string, NeumeGroup> GetGroups() { return neumes; };
 
 private:
+    std::map<std::string, NeumeGroup> neumes;
 };
 } // namespace vrv
 
