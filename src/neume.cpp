@@ -33,7 +33,7 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Note
+// Neume
 //----------------------------------------------------------------------------
 
 Neume::Neume()
@@ -42,7 +42,7 @@ Neume::Neume()
       AttColor()
 {
     RegisterAttClass(ATT_COLOR);
-
+    InitNeumeGroups();
     Reset();
 }
 
@@ -89,6 +89,17 @@ bool Neume::IsLastInNeume(LayerElement *element)
     // this is the last one
     if (position == (size - 1)) return true;
     return false;
+}
+
+void Neume::InitNeumeGroups() {
+    neumes["u"] = PES;
+    neumes["d"] = CLIVIS;
+    neumes["uu"] = SCANDICUS;
+    neumes["dd"] = CLIMACUS;
+    neumes["ud"] = TORCULUS;
+    neumes["du"] = PORRECTUS;
+    neumes["dd"] = CLIMACUS;
+    neumes["uu"] = SCANDICUS;
 }
 
 } // namespace vrv
