@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon May  7 21:41:51 PDT 2018
+// Last Modified: Wed May  9 07:15:32 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -13159,6 +13159,20 @@ ostream& HumdrumFileBase::printTrackInfo(ostream& out) {
 }
 
 
+//////////////////////////////
+//
+// HumdrumFileBase::getExinterpCount -- return the number of spines in
+//    the file that are of the given exinterp type.  The input string
+//    may optionally include the ** exinterp prefix.
+//
+
+int HumdrumFileBase::getExinterpCount(const string& exinterp) {
+	vector<HTp> spinestarts;
+	getSpineStartList(spinestarts, exinterp);
+	return (int)spinestarts.size();
+}
+
+
 
 //////////////////////////////
 //
@@ -13184,10 +13198,17 @@ void HumdrumFileBase::getSpineStartList(vector<HTp>& spinestarts) {
 
 void HumdrumFileBase::getSpineStartList(vector<HTp>& spinestarts,
 		const string& exinterp) {
+	string newexinterp;
+	if (exinterp.compare(0, 2, "**") == 0) {
+		newexinterp = exinterp;
+	} else {
+		newexinterp = "**";
+		newexinterp += exinterp;
+	}
 	spinestarts.reserve(m_trackstarts.size());
 	spinestarts.resize(0);
 	for (int i=1; i<(int)m_trackstarts.size(); i++) {
-		if (exinterp == *m_trackstarts[i]) {
+		if (newexinterp == *m_trackstarts[i]) {
 			spinestarts.push_back(m_trackstarts[i]);
 		}
 	}
@@ -13196,11 +13217,20 @@ void HumdrumFileBase::getSpineStartList(vector<HTp>& spinestarts,
 
 void HumdrumFileBase::getSpineStartList(vector<HTp>& spinestarts,
 		const vector<string>& exinterps) {
+	vector<string> newexinterps(exinterps.size());
+	for (int i=0; i<(int)exinterps.size(); i++) {
+		if (exinterps[i].compare(0, 2, "**") == 0) {
+			newexinterps[i] = exinterps[i];
+		} else {
+			newexinterps[i] = "**";
+			newexinterps[i] += exinterps[i];
+		}
+	}
 	spinestarts.reserve(m_trackstarts.size());
 	spinestarts.resize(0);
 	for (int i=1; i<(int)m_trackstarts.size(); i++) {
-		for (int j=0; j<(int)exinterps.size(); j++) {
-			if (exinterps[j] == *m_trackstarts[i]) {
+		for (int j=0; j<(int)newexinterps.size(); j++) {
+			if (newexinterps[j] == *m_trackstarts[i]) {
 				spinestarts.push_back(m_trackstarts[i]);
 			}
 		}
