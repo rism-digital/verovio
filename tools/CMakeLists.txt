@@ -8,6 +8,7 @@ if (APPLE)
        set(CMAKE_MACOSX_RPATH ON)
 endif (APPLE)
 
+option(DEBUG_TOOLKIT_JS         "Debug Javascript-only toolkit function"       ON)
 option(NO_DARMS_SUPPORT         "Disable Humdrum support"                      ON)
 option(NO_PAE_SUPPORT           "Disable Plaine & Easie support"               OFF)
 option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
@@ -62,6 +63,10 @@ else()
     if (MUSICXML_DEFAULT_HUMDRUM)
         add_definitions(-DMUSICXML_DEFAULT_HUMDRUM)
     endif()
+endif()
+
+if(DEBUG_TOOLKIT_JS)
+    add_definitions(-DTOOLKIT_DEBUG -DUSE_EMSCRIPTEN -DEMSCRIPTEN)
 endif()
 
 file(GLOB verovio_SRC "../src/*.cpp")
