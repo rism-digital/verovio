@@ -274,7 +274,7 @@ int Measure::GetDrawingOverflow()
 {
     Functor adjustXOverlfow(&Object::AdjustXOverflow);
     Functor adjustXOverlfowEnd(&Object::AdjustXOverflowEnd);
-    AdjustXOverflowParams adjustXOverflowParams;
+    AdjustXOverflowParams adjustXOverflowParams(0);
     adjustXOverflowParams.m_currentSystem = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
     assert(adjustXOverflowParams.m_currentSystem);
     adjustXOverflowParams.m_lastMeasure = this;

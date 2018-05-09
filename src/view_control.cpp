@@ -539,6 +539,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
     data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+    bool isGraceToNoteSlur = false;
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
 
@@ -578,6 +579,10 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         endChord = dynamic_cast<Chord *>(end);
         assert(endChord);
         endStemDir = endChord->GetDrawingStemDir();
+    }
+
+    if (startNote && endNote && startNote->IsGraceNote() && !endNote->IsGraceNote()) {
+        isGraceToNoteSlur = true;
     }
 
     Layer *layer1 = NULL;
@@ -649,6 +654,10 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     if (slur->HasCurvedir()) {
         drawingCurveDir
             = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+    }
+    // grace notes - always below unless we have a drawing stem direction on the layer
+    else if (isGraceToNoteSlur && (layer1->GetDrawingStemDir(startNote) == STEMDIRECTION_NONE)) {
+        drawingCurveDir = curvature_CURVEDIR_below;
     }
     // the normal case
     else if (slur->HasDrawingCurvedir()) {
@@ -772,8 +781,19 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             }
         }
         else {
+            if (isGraceToNoteSlur) {
+                if (endNote) {
+                    y2 = endNote->GetDrawingY();
+                    x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                    isShortSlur = true;
+                }
+                else {
+                    y2 = y1;
+                }
+            }
             // (_)d
-            if (endStemDir == STEMDIRECTION_up) y2 = end->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+            else if (endStemDir == STEMDIRECTION_up)
+                y2 = end->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
             // P(_)P
             else if (isShortSlur) {
                 y2 = end->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);

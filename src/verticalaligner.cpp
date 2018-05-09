@@ -102,21 +102,17 @@ void SystemAligner::FindAllPositionerPointingTo(ArrayOfFloatingPositioners *posi
     }
 }
 
-void SystemAligner::FindAllIntersectionPoints(std::vector<Point> &points, Point &top, Point &bottom, std::vector<ClassId> &classes)
+void SystemAligner::FindAllIntersectionPoints(
+    SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin)
 {
-    points.clear();
-
     StaffAlignment *alignment = NULL;
     for (auto &child : m_children) {
         alignment = dynamic_cast<StaffAlignment *>(child);
         assert(alignment);
-        //FloatingPositioner *positioner = alignment->GetCorrespFloatingPositioner(object);
-        //if (positioner && (positioner->GetObject())) {
-        //    //positioners->push_back(positioner);
-        //}
+        alignment->FindAllIntersectionPoints(line, boundingBox, classIds, margin);
     }
 }
-    
+
 //----------------------------------------------------------------------------
 // StaffAlignment
 //----------------------------------------------------------------------------
@@ -238,6 +234,20 @@ FloatingPositioner *StaffAlignment::GetCorrespFloatingPositioner(FloatingObject 
         return *item;
     }
     return NULL;
+}
+
+void StaffAlignment::FindAllIntersectionPoints(
+    SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin)
+{
+    for (auto &positioner : m_floatingPositioners) {
+        assert(positioner->GetObject());
+        if (!positioner->GetObject()->Is(classIds)) {
+            continue;
+        }
+        if (positioner->HorizontalContentOverlap(&boundingBox, margin / 2)) {
+            line.AddGap(positioner->GetContentTop() + margin, positioner->GetContentBottom() - margin);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------

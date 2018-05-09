@@ -199,7 +199,8 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                                 beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
                             }
                             // if the previous level underneath was a partial through, put it left
-                            else if (beamElementCoords->at(noteIndexes.at(i - 1))->m_partialFlags[testDur - 1 - DUR_8] == PARTIAL_THROUGH) {
+                            else if (beamElementCoords->at(noteIndexes.at(i - 1))->m_partialFlags[testDur - 1 - DUR_8]
+                                == PARTIAL_THROUGH) {
                                 beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
                             }
                             // if the level underneath was not left (right or through), put it right
@@ -210,7 +211,6 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                             else {
                                 beamElementCoords->at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
                             }
-                           
                         }
                     }
                 }
