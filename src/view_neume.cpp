@@ -124,8 +124,12 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     /******************************************************************/
     // initialization
-    
     std::map<std::string, NeumeGroup> neumeGroups = neume->GetGroups();
+    
+    const ListOfObjects *neumeChildren = neume->GetList(neume);
+    if (neumeChildren->empty()) {
+        return;
+    }
 
     std::string contour = "";
     for (int i = 1; i < (int)neumeChildren[0].size(); i++) {
@@ -135,7 +139,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
          }
     }
 
-    neumeName = neumeGroup[contour];
+    NeumeGroup neumeName = neumeGroups[contour];
 
     /******************************************************************/
     // Start the Neume graphic and draw the children
