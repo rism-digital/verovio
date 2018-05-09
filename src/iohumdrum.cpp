@@ -46,6 +46,7 @@
 #include "artic.h"
 #include "att.h"
 #include "beam.h"
+#include "breath.h"
 #include "chord.h"
 #include "dir.h"
 #include "dot.h"
@@ -4179,6 +4180,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (layerdata.back()->find(";") != std::string::npos) {
                 addFermata(layerdata.back(), NULL);
             }
+            if (layerdata.back()->find(",") != std::string::npos) {
+                addBreath(layerdata.back(), NULL);
+            }
         }
 
         // probably better to mark the rest in Humdrum data
@@ -4395,6 +4399,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     if ((layerindex == 0) && (!layerdata.empty()) && (layerdata.back()->at(0) == '=')) {
         if (layerdata.back()->find(";") != std::string::npos) {
             addFermata(layerdata.back(), NULL);
+        }
+        if (layerdata.back()->find(",") != std::string::npos) {
+            addBreath(layerdata.back(), NULL);
         }
 
         // check for rptend here, since the one for the last measure in
@@ -6107,6 +6114,18 @@ hum::HumNum HumdrumInput::getMeasureTstamp(hum::HTp token, int staffindex, hum::
 
 //////////////////////////////
 //
+// HumdrumInput::getMeasureFactor -- Get the metric unit of the current measure.
+//
+
+hum::HumNum HumdrumInput::getMeasureFactor(int staffindex)
+{
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
+    return mfactor;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::getMeasureTstampPlusDur --  Similar to getMeasureTstamp, but also include
 //     duration of token (to get endpoint of token in measure).
 //     default value: fract = 0.0;
@@ -6370,7 +6389,14 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         int unit = -1;
         std::smatch matches;
         if (regex_search(*timesig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
-            if ((metersig->find('C') == std::string::npos) && (metersig->find('O') == std::string::npos)) {
+            if (!metersig) {
+                count = stoi(matches[1]);
+                unit = stoi(matches[2]);
+                scoreDef->SetMeterCount(count);
+                scoreDef->SetMeterUnit(unit);
+            }
+            else if (metersig && (metersig->find('C') == std::string::npos)
+                && (metersig->find('O') == std::string::npos)) {
                 // Only storing the time signature if there is no mensuration
                 // otherwise verovio will display both.
                 count = stoi(matches[1]);
@@ -6393,7 +6419,6 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             }
         }
     }
-
     if (keysig) {
         // cerr << "KEYSIG = " << keysig << endl;
         setKeySig(-1, scoreDef, *((string *)keysig));
@@ -8893,6 +8918,69 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
 
 //////////////////////////////
 //
+// HumdrumInput::addBreath -- Add floating breath for note/chord.
+//     default value: parent = NULL
+//
+
+void HumdrumInput::addBreath(hum::HTp token, Object *parent)
+{
+    int layer = m_currentlayer;
+    int staff = m_currentstaff;
+
+    if (token->find(",") == std::string::npos) {
+        return;
+    }
+
+    if ((token->find("yy") == std::string::npos) && (token->find(",y") == std::string::npos)) {
+        Breath *breath = new Breath;
+        appendElement(m_measure, breath);
+        setStaff(breath, staff);
+
+        if (parent && (token->find("q") != std::string::npos)) {
+            // grace notes cannot be addressed with @tstamp, so
+            // have to use @startid.  Maybe allow @tstamp, since
+            // @startid will probably shift to the correct grace note
+            // position.
+            std::string id = "#" + parent->GetUuid();
+            breath->SetStartid(id);
+        }
+        else if (!token->empty() && (token->at(0) == '=')) {
+            // barline breath
+            if (parent) {
+                std::string id = "#" + parent->GetUuid();
+                breath->SetStartid(id);
+            }
+            else {
+                hum::HumNum tstamp = getMeasureEndTstamp(staff - 1);
+                breath->SetTstamp(tstamp.getFloat());
+            }
+        }
+        else {
+            hum::HumNum start = getMeasureTstamp(token, staff - 1);
+            hum::HumNum dur = token->getDuration() * getMeasureFactor(staff - 1);
+            hum::HumNum tstamp = start + ((dur * 4) / 5);
+            breath->SetTstamp(tstamp.getFloat());
+        }
+        setLocationId(breath, token);
+
+        int direction = getDirection(*token, ",");
+        if (direction < 0) {
+            setPlace(breath, "below");
+        }
+        else if (direction > 0) {
+            setPlace(breath, "above");
+        }
+        else if (layer == 1) {
+            setPlace(breath, "above");
+        }
+        else if (layer == 2) {
+            setPlace(breath, "below");
+        }
+    }
+}
+
+//////////////////////////////
+//
 // HumdrumInput::addFermata -- Add floating fermatas for note/chord.
 //     default value: parent = NULL
 //
@@ -9143,6 +9231,9 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
     }
     if (chartable[';']) {
         addFermata(token, object);
+    }
+    if (chartable[',']) {
+        addBreath(token, object);
     }
     if (chartable['W'] || chartable['w'] || chartable['M'] || chartable['m']) {
         addMordent(object, token);

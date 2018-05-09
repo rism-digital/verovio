@@ -1223,6 +1223,8 @@ void Toolkit::SetHumdrumBuffer(const char *data)
     }
     if (file.getExinterpCount("mens")) {
         m_options->m_evenNoteSpacing.SetValue(true);
+    } else {
+        m_options->m_evenNoteSpacing.SetValue(false);
     }
 
 #else

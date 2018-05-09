@@ -291,6 +291,7 @@ protected:
     void processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex);
     void processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex);
     void addFermata(hum::HTp token, vrv::Object *parent = NULL);
+    void addBreath(hum::HTp token, vrv::Object *parent = NULL);
     void addTrill(hum::HTp token);
     void addTurn(vrv::Object *linked, hum::HTp token);
     void addMordent(vrv::Object *linked, hum::HTp token);
@@ -346,6 +347,7 @@ protected:
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum frac = 0);
     hum::HumNum getMeasureTstampPlusDur(hum::HTp token, int staffindex, hum::HumNum fract = 0);
     hum::HumNum getMeasureEndTstamp(int staffindex);
+    hum::HumNum getMeasureFactor(int staffindex);
     hum::HTp getPreviousDataToken(hum::HTp token);
     hum::HTp getHairpinEnd(hum::HTp token, const std::string &endchar);
     hum::HTp getDecrescendoEnd(hum::HTp token);
