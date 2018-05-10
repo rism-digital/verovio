@@ -227,7 +227,6 @@ enum {
     SMUFL_E904_mensuralFclefPetrucci = 0xE904,
     SMUFL_E906_chantCclef = 0xE906,
     SMUFL_E909_mensuralCclefPetrucciPosMiddle = 0xE909,
-    SMUFL_E990_chantPunctum = 0xE990,
     SMUFL_E938_mensuralNoteheadSemibrevisBlack = 0xE938,
     SMUFL_E939_mensuralNoteheadSemibrevisVoid = 0xE939,
     SMUFL_E93C_mensuralNoteheadMinimaWhite = 0xE93C,
@@ -238,6 +237,24 @@ enum {
     SMUFL_E94A_mensuralCombStemDownFlagSemiminima = 0xE94A,
     SMUFL_E94B_mensuralCombStemUpFlagFusa = 0xE94B,
     SMUFL_E94C_mensuralCombStemDownFlagFusa = 0xE94C,
+    SMUFL_E990_chantPunctum = 0xE990,
+    SMUFL_E991_chantPunctumInclinatum = 0xE991,
+    SMUFL_E992_chantPunctumInclinatumAuctum = 0xE992,
+    SMUFL_E993_chantPunctumInclinatumDeminutum = 0xE993,
+    SMUFL_E994_chantAuctumAsc = 0xE994,
+    SMUFL_E995_chantAuctumDesc = 0xE995,
+    SMUFL_E996_chantPunctumVirga = 0xE996,
+    SMUFL_E997_chantPunctumVirgaReversed = 0xE997,
+    SMUFL_E998_chantPunctumCavum = 0xE998,
+    SMUFL_E999_chantPunctumLinea = 0xE999,
+    SMUFL_E99A_chantPunctumLineaCavum = 0xE99A,
+    SMUFL_E99B_chantQuilisma = 0xE99B,
+    SMUFL_E99C_chantOriscusAscending = 0xE99C,
+    SMUFL_E99D_chantOriscusDescending = 0xE99D,
+    SMUFL_E99E_chantOriscusLiquescens = 0xE99E,
+    SMUFL_E99F_chantStrophicus = 0xE99F,
+    SMUFL_E9A0_chantStrophicusAuctus = 0xE9A0,
+    SMUFL_E9A1_chantPunctumDeminutum = 0xE9A1,
     SMUFL_E9F0_mensuralRestMaxima = 0xE9F0,
     SMUFL_E9F1_mensuralRestLongaPerfecta = 0xE9F1,
     SMUFL_E9F2_mensuralRestLongaImperfecta = 0xE9F2,
@@ -247,6 +264,23 @@ enum {
     SMUFL_E9F6_mensuralRestSemiminima = 0xE9F6,
     SMUFL_E9F7_mensuralRestFusa = 0xE9F7,
     SMUFL_E9F8_mensuralRestSemifusa = 0xE9F8,
+    SMUFL_EA00_mensuralSignumUp = 0xEA00,
+    SMUFL_EA01_mensuralSignumDown = 0xEA01,
+    SMUFL_EA02_mensuralCustosUp = 0xEA02,
+    SMUFL_EA03_mensuralCustosDown = 0xEA03,
+    SMUFL_EA04_chantCustosStemUpPosLowest = 0xEA04,
+    SMUFL_EA05_chantCustosStemUpPosLow = 0xEA05,
+    SMUFL_EA06_chantCustosStemUpPosMiddle = 0xEA06,
+    SMUFL_EA07_chantCustosStemDownPosMiddle = 0xEA07,
+    SMUFL_EA08_chantCustosStemDownPosHigh = 0xEA08,
+    SMUFL_EA09_chantCustosStemDownPosHighest = 0xEA09,
+    SMUFL_EA0A_mensuralCustosCheckmark = 0xEA0A,
+    SMUFL_EA0B_mensuralCustosTurn = 0xEA0B,
+    SMUFL_EA0C_mensuralColorationStartSquare = 0xEA0C,
+    SMUFL_EA0D_mensuralColorationEndSquare = 0xEA0D,
+    SMUFL_EA0E_mensuralColorationStartRound = 0xEA0E,
+    SMUFL_EA0F_mensuralColorationEndRound = 0xEA0F,
+    SMUFL_EA10_mensuralAlterationSign = 0xEA10,
     SMUFL_EAA9_wiggleArpeggiatoUp = 0xEAA9,
     SMUFL_EAAA_wiggleArpeggiatoDown = 0xEAAA,
     SMUFL_EAAD_wiggleArpeggiatoUpArrow = 0xEAAD,
@@ -254,8 +288,8 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 228
+#define SMUFL_COUNT 263
 
-} // namespace vrv
+} // vrv namespace
 
 #endif
