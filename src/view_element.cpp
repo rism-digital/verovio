@@ -674,8 +674,8 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    // Custos *custos = dynamic_cast<Custos *>(element);
-    // assert(custos);
+    Custos *custos = dynamic_cast<Custos *>(element);
+    assert(custos);
 
     dc->StartGraphic(element, "", element->GetUuid());
 
@@ -683,9 +683,20 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int y = element->GetDrawingY();
 
     y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
+    
+    int sym = 0;
+     
+    switch (staff->m_drawingNotationType) {
+        case NOTATIONTYPE_mensural:
+            sym = 0xEA02; // mensuralCustosUp
+            break;
+        case NOTATIONTYPE_neume:
+            sym = 0xEA06; // chantCustosStemUpPosMiddle
+            break;
+        default: break;
+    }
 
-    // HARDCODED (smufl code wrong)
-    DrawSmuflCode(dc, x, y, 35, staff->m_drawingStaffSize, false);
+    DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
 
     dc->EndGraphic(element, this);
 }
