@@ -3750,9 +3750,11 @@ bool MeiInput::ReadCustos(Object *parent, pugi::xml_node custos)
     Custos *vrvCustos = new Custos();
     ReadLayerElement(custos, vrvCustos);
 
+    ReadPitchInterface(custos, vrvCustos);
     ReadPositionInterface(custos, vrvCustos);
 
     vrvCustos->ReadColor(custos);
+    vrvCustos->ReadCoordinated(custos);
 
     parent->AddChild(vrvCustos);
     return true;

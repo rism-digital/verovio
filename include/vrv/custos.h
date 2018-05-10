@@ -24,8 +24,7 @@ class Custos :  public LayerElement,
                 public PitchInterface,
                 public PositionInterface,
                 public AttColor,
-                public AttCoordinated,
-                public AttIntervalMelodic
+                public AttCoordinated
                 {
 public:
     /**
@@ -48,7 +47,7 @@ public:
     ///@}
 
     /** Override the method since alignment is required */
-    //virtual bool HasToBeAligned() const { return true; }
+    virtual bool HasToBeAligned() const { return true; }
 
     //----------//
     // Functors //

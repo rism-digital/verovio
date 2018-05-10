@@ -678,6 +678,18 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(custos);
 
     dc->StartGraphic(element, "", element->GetUuid());
+    
+    int sym = 0;
+    // Select glyph to use for this custos 
+    switch (staff->m_drawingNotationType) {
+        case NOTATIONTYPE_mensural:
+            sym = SMUFL_EA02_mensuralCustosUp; // mensuralCustosUp
+            break;
+        case NOTATIONTYPE_neume:
+            sym = SMUFL_EA06_chantCustosStemUpPosMiddle; // chantCustosStemUpPosMiddle
+            break;
+        default: break;
+    }
 
     // Calculate x and y position for custos graphic
     Clef *clef = layer->GetClef(element);
@@ -686,17 +698,17 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int clefLine = clef->GetLine();
 
     int x = element->GetDrawingX();
-    int y = element->GetDrawingY();
+    int y = staff->GetDrawingY();
 
     int clefY = y - (staffSize * (staffLineNumber - clefLine));
     int pitchOffset;
     int octaveOffset = (custos->GetOct() - 3) * ((staffSize / 2) * 7);
 
     if(clef->GetShape() == CLEFSHAPE_C) {
-        pitchOffset = (custos->GetPname() - 1) * (staffSize / 2);
+        pitchOffset = (custos->GetPname() - PITCHNAME_c) * (staffSize / 2);
     }
     else if (clef->GetShape() == CLEFSHAPE_F) {
-        pitchOffset = (custos->GetPname() - 4) * (staffSize / 2);
+        pitchOffset = (custos->GetPname() - PITCHNAME_f) * (staffSize / 2);
     }
     else {
         // This shouldn't happen
@@ -704,20 +716,8 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
 
     int actualY = clefY + pitchOffset + octaveOffset;
-
-    int sym = 0;
-    // Select glyph to use for this custos 
-    switch (staff->m_drawingNotationType) {
-        case NOTATIONTYPE_mensural:
-            sym = 0xEA02; // mensuralCustosUp
-            break;
-        case NOTATIONTYPE_neume:
-            sym = 0xEA06; // chantCustosStemUpPosMiddle
-            break;
-        default: break;
-    }
-
-    DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false);
+    
+    DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false, true);
 
     dc->EndGraphic(element, this);
 }
