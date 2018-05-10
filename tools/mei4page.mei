@@ -72,6 +72,7 @@
                                             <nc oct="2" pname="a" xml:id="nc-0000001233928944" ulx="850" />
                                         </neume>
                                     </syllable>
+                                    <custos oct="3" pname="e" ulx="900" />
                                 </layer>
                             </staff>
                             <staff xml:id="staff-0000000376958563" n="2" uly="350">
