@@ -193,7 +193,8 @@ int toolkitTest()
     std::string outputFormat = "svg";
     
     std::string vrvOptions = "{\"noLayout\":1,\"noFooter\":1,\"noHeader\":1}"; // Taken from Neon2
-    std::string editorAction = "{\"action\":\"drag\",\"param\":{\"elementId\":\"nc-0000001233928944\",\"x\":648,\"y\":1260}}";
+    std::string editorAction = "{\"action\":\"drag\",\"param\":{\"elementId\":\"custos-0000001360654074\",\"x\":1000,\"y\":1350}}";
+    std::string editorAction2 = "{\"action\":\"drag\",\"param\":{\"elementId\":\"nc-0000001233928944\",\"x\":854,\"y\":1290}}";
 
     vrv::Toolkit toolkit;
 
@@ -204,7 +205,8 @@ int toolkitTest()
     toolkit.RenderToSVGFile("output.svg", 1);
     //toolkit.LoadData(toolkit.GetMEI());
     toolkit.Edit(editorAction);
-
+    //toolkit.Edit(editorAction2);
+    std::cout << toolkit.GetMEI() << std::endl;
     toolkit.RenderToSVGFile("output.svg", 1);
     return 0; 
 }

@@ -8,7 +8,10 @@
 #ifndef __VRV_CUSTOS_H__
 #define __VRV_CUSTOS_H__
 
+#include "atts_shared.h"
+#include "atts_analytical.h"
 #include "layerelement.h"
+#include "pitchinterface.h"
 #include "positioninterface.h"
 
 namespace vrv {
@@ -17,7 +20,13 @@ namespace vrv {
 // Custos
 //----------------------------------------------------------------------------
 
-class Custos : public LayerElement, public PositionInterface, public AttColor {
+class Custos :  public LayerElement,
+                public PitchInterface,
+                public PositionInterface,
+                public AttColor,
+                public AttCoordinated,
+                public AttIntervalMelodic
+                {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -35,11 +44,11 @@ public:
      * @name Getter to interfaces
      */
     ///@{
-    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+    virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
+    //virtual bool HasToBeAligned() const { return true; }
 
     //----------//
     // Functors //

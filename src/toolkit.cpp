@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "attcomparison.h"
+#include "custos.h"
 #include "functorparams.h"
 #include "iodarms.h"
 #include "iohumdrum.h"
@@ -1311,7 +1312,19 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
 
         return true;
     }
-        
+    if (element->Is(CUSTOS)) {
+        Custos *custos = dynamic_cast<Custos *>(element);
+        assert(custos);
+        Layer *layer = dynamic_cast<Layer *>(custos->GetFirstParent(LAYER));
+        if (!layer) return false;
+        int oct;
+        data_PITCHNAME pname
+            = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), custos->GetDrawingX(), &oct);
+        custos->SetPname(pname);
+        custos->SetOct(oct);
+        custos->SetUlx(x);
+        return true;
+    }
     return false;
 }
 

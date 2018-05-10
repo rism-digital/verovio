@@ -1297,9 +1297,11 @@ void MeiOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
 {
     assert(custos);
 
-    WriteLayerElement(currentNode, custos);
+    WritePitchInterface(currentNode, custos);
     WritePositionInterface(currentNode, custos);
+    WriteLayerElement(currentNode, custos);
     custos->WriteColor(currentNode);
+    custos->WriteCoordinated(currentNode);
 }
 
 void MeiOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)

@@ -679,13 +679,34 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     dc->StartGraphic(element, "", element->GetUuid());
 
+    // Calculate x and y position for custos graphic
+    Clef *clef = layer->GetClef(element);
+    int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int staffLineNumber = staff->m_drawingLines;
+    int clefLine = clef->GetLine();
+
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
-    y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
-    
+    int clefY = y - (staffSize * (staffLineNumber - clefLine));
+    int pitchOffset;
+    int octaveOffset = (custos->GetOct() - 3) * ((staffSize / 2) * 7);
+
+    if(clef->GetShape() == CLEFSHAPE_C) {
+        pitchOffset = (custos->GetPname() - 1) * (staffSize / 2);
+    }
+    else if (clef->GetShape() == CLEFSHAPE_F) {
+        pitchOffset = (custos->GetPname() - 4) * (staffSize / 2);
+    }
+    else {
+        // This shouldn't happen
+        pitchOffset = 0;
+    }
+
+    int actualY = clefY + pitchOffset + octaveOffset;
+
     int sym = 0;
-     
+    // Select glyph to use for this custos 
     switch (staff->m_drawingNotationType) {
         case NOTATIONTYPE_mensural:
             sym = 0xEA02; // mensuralCustosUp
@@ -696,7 +717,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
         default: break;
     }
 
-    DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, false);
+    DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false);
 
     dc->EndGraphic(element, this);
 }
