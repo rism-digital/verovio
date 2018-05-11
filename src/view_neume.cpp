@@ -158,9 +158,15 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    /******************************************************************/
-    // Draw the children
-    DrawLayerChildren(dc, neume, layer, staff, measure);
+    // If there is a defined way to draw the neume grouping, we should use that to draw the specialized SVG shape,
+    // or else we draw each nc in the neume as a punctum.
+    switch (neumeName) {
+        case PORRECTUS:
+            std::cout << "hit me up fam";
+            break;
+        default: 
+            DrawLayerChildren(dc, neume, layer, staff, measure);
+    }
 
     dc->EndGraphic(element, this);
 }
