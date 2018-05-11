@@ -42,7 +42,6 @@ Neume::Neume()
       AttColor()
 {
     RegisterAttClass(ATT_COLOR);
-    InitNeumeGroups();
     Reset();
 }
 
@@ -91,15 +90,19 @@ bool Neume::IsLastInNeume(LayerElement *element)
     return false;
 }
 
-void Neume::InitNeumeGroups() {
-    neumes["u"] = PES;
-    neumes["d"] = CLIVIS;
-    neumes["uu"] = SCANDICUS;
-    neumes["dd"] = CLIMACUS;
-    neumes["ud"] = TORCULUS;
-    neumes["du"] = PORRECTUS;
-    neumes["dd"] = CLIMACUS;
-    neumes["uu"] = SCANDICUS;
+std::map<std::string, NeumeGroup> Neume::InitNeumeGroups() {
+    std::map<std::string, NeumeGroup> map;
+    map["u"] = PES;
+    map["d"] = CLIVIS;
+    map["uu"] = SCANDICUS;
+    map["dd"] = CLIMACUS;
+    map["ud"] = TORCULUS;
+    map["du"] = PORRECTUS;
+    map["dd"] = CLIMACUS;
+    map["uu"] = SCANDICUS;
+    return map;
 }
+
+std::map<std::string, NeumeGroup> Neume::neumes = Neume::InitNeumeGroups();
 
 } // namespace vrv

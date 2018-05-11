@@ -78,11 +78,11 @@ public:
 
     virtual int GetPosition(LayerElement *element);
     virtual bool IsLastInNeume(LayerElement *element);
-    virtual void InitNeumeGroups();
-    virtual std::map<std::string, NeumeGroup> GetGroups() { return neumes; };
+    static std::map<std::string, NeumeGroup> InitNeumeGroups();
+    static std::map<std::string, NeumeGroup> *GetGroups() { return &neumes; };
 
 private:
-    std::map<std::string, NeumeGroup> neumes;
+    static std::map<std::string, NeumeGroup> neumes;
 };
 } // namespace vrv
 
