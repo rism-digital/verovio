@@ -119,7 +119,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // If the shape cannot be found in the map, the neume size will be greater than 2, and the default for
     // std::map for keys that aren't in is 0. This won't conflict with actual Punctums because the size will always
     // be 2 in that case.
-    if ( (int)ncVector.size() > 1 && neumeGroups[contour] == 0) {
+    if ( (int)ncVector.size() > 1 && (*neumeGroups)[contour] == 0) {
         //TODO: Error Handling for unfound neumes
         std::cout << "Neume Grouping not found";
     }
@@ -138,7 +138,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             int noteSize = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
             wchar_t lineCode;
             wchar_t ligatureCode;
-            switch (pitchDifference)
+            switch (pitchDifference)    
             {
                 case -1: 
                     lineCode = SMUFL_E9B4_chantEntryLineAsc2nd;
@@ -157,6 +157,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                     ligatureCode = SMUFL_E9BC_chantLigaturaDesc5th;
                     break;
                 default:
+                    // TODO: Make default draw all 3 punctums individually
                     lineCode = SMUFL_E9B4_chantEntryLineAsc2nd;
                     ligatureCode = SMUFL_E9B9_chantLigaturaDesc2nd;
                     break;
