@@ -54,30 +54,6 @@ void View::DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, 
     dc->EndGraphic(element, this);
 }
 
-void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
-{
-    assert(dc);
-    assert(layer);
-    assert(staff);
-    assert(measure);
-
-    Nc *nc = dynamic_cast<Nc *>(element);
-    assert(nc);
-
-    /******************************************************************/
-    // Start the Neume graphic and draw the children
-
-    dc->StartGraphic(element, "", element->GetUuid());
-
-    /******************************************************************/
-    // Draw the children
-    DrawLayerChildren(dc, nc, layer, staff, measure);
-
-    DrawSmuflNc(dc, element, layer, staff, measure, SMUFL_E990_chantPunctum);
-    
-    dc->EndGraphic(element, this);
-}
-
 void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
@@ -166,8 +142,8 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                     ligatureCode = SMUFL_E9B9_chantLigaturaDesc2nd;
                     break;
             }
-            DrawSmuflNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, lineCode, 0, noteSize * pitchDifference);
-            DrawSmuflNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, ligatureCode);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, lineCode, 0, noteSize * pitchDifference);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, ligatureCode);
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[2]), layer, staff, measure);
             break;
         }
@@ -196,8 +172,8 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                     lineCode = SMUFL_E9BD_chantConnectingLineAsc2nd;
                     break;
             }
-            DrawSmuflNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, SMUFL_E990_chantPunctum, noteSize / 4, 0);
-            DrawSmuflNc(dc, dynamic_cast<LayerElement *>(ncVector[1]), layer, staff, measure, lineCode, 0, 0);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, SMUFL_E990_chantPunctum, noteSize / 4, 0);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[1]), layer, staff, measure, lineCode, 0, 0);
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[1]), layer, staff, measure);
             break;
         }
@@ -208,7 +184,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->EndGraphic(element, this);
 }
 
-void View::DrawSmuflNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, wchar_t fontNo, int xOffset, int yOffset) {
+void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, wchar_t fontNo, int xOffset, int yOffset) {
     Nc *nc = dynamic_cast<Nc *>(element);
     assert(nc);
 
