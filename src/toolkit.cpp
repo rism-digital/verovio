@@ -1095,7 +1095,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
     ArrayOfObjects notes;
-
+    
     measure->FindAllChildByAttComparison(&notes, &matchNoteTime);
 
     // Fill the JSON object
@@ -1248,30 +1248,18 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
     if (!element) {
         element = m_doc.FindChildByUuid(elementId);
     }
-    if (element->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(element);
-        assert(note);
-        Layer *layer = dynamic_cast<Layer *>(note->GetFirstParent(LAYER));
-        if (!layer) return false;
+    if (element->HasInterface(INTERFACE_PITCH) && element->HasInterface(INTERFACE_POSITION)) {
+        Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
+        if(!layer) return false;
         int oct;
         data_PITCHNAME pname
-            = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), note->GetDrawingX(), &oct);
-        note->SetPname(pname);
-        note->SetOct(oct);
-        return true;
-    }
-    if (element->Is(NC)) {
-        Nc *nc = dynamic_cast<Nc *>(element);
-        assert(nc);
-        Layer *layer = dynamic_cast<Layer *>(nc->GetFirstParent(LAYER));
-        if (!layer) return false;
-        int oct;
-        data_PITCHNAME pname
-            = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), nc->GetDrawingX(), &oct);
-        nc->SetPname(pname);
-        nc->SetOct(oct);
-        nc->SetUlx(x);
-        return true;
+            = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), element->GetDrawingX(), &oct);
+        element->GetPitchInterface()->SetPname(pname);
+        element->GetPitchInterface()->SetOct(oct);
+        if (element->HasAttClass(ATT_COORDINATED)) {
+            AttCoordinated *att = dynamic_cast<AttCoordinated *>(element);
+            att->SetUlx(x);
+        }
     }
     if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
@@ -1289,40 +1277,33 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
 
         if (initialClefLine != clefLine) {  // adjust notes so they stay in the same position
             int lineDiff = clefLine - initialClefLine;
-            AttComparison comparison(NC);
+            std::vector<ClassId> atts = { NC, NOTE, CUSTOS };
+            AttComparisonAny comparison(atts);
             ArrayOfObjects objects;
             layer->FindAllChildByAttComparison(&objects, &comparison);
+            
+            // Adjust all elements who are positioned relative to clef by pitch
             for (auto iter = objects.begin(); iter != objects.end(); iter++) {
-                Nc *nc = dynamic_cast<Nc *>(*iter);
-                int oct = nc->GetOct();
-                int pnameOriginal = nc->GetPname();
-                int pname = pnameOriginal - 2 * lineDiff;
-                while (pname < PITCHNAME_c) {
-                    oct--;
-                    pname += 7;
+                LayerElement *element = dynamic_cast<LayerElement *>(*iter);
+                if (element->HasInterface(INTERFACE_PITCH)) {   // Element must be controlled by pitch
+                    PitchInterface *pi = element->GetPitchInterface();
+                    int oct = pi->GetOct();
+                    int pnameOriginal = pi->GetPname();
+                    int pname = pnameOriginal - 2 * lineDiff;
+                    while (pname < PITCHNAME_c) {
+                        oct--;
+                        pname += 7;
+                    }
+                    while (pname > PITCHNAME_b) {
+                        oct++;
+                        pname -= 7;
+                    }
+                    pi->SetPname((data_PITCHNAME)pname);
+                    pi->SetOct(oct);
                 }
-                while (pname > PITCHNAME_b) {
-                    oct++;
-                    pname -= 7;
-                }
-                nc->SetPname((data_PITCHNAME)pname);
-                nc->SetOct(oct);
             } 
         }
 
-        return true;
-    }
-    if (element->Is(CUSTOS)) {
-        Custos *custos = dynamic_cast<Custos *>(element);
-        assert(custos);
-        Layer *layer = dynamic_cast<Layer *>(custos->GetFirstParent(LAYER));
-        if (!layer) return false;
-        int oct;
-        data_PITCHNAME pname
-            = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), custos->GetDrawingX(), &oct);
-        custos->SetPname(pname);
-        custos->SetOct(oct);
-        custos->SetUlx(x);
         return true;
     }
     return false;
