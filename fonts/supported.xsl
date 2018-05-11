@@ -229,7 +229,7 @@
             <!--<glyph glyph-code="E0D8" smufl-name="noteheadDiamondWhole"/>-->
             <!--<glyph glyph-code="E0D9" smufl-name="noteheadDiamondHalf"/>-->
             <!--<glyph glyph-code="E0DA" smufl-name="noteheadDiamondHalfWide"/>-->
-            <!--<glyph glyph-code="E0DB" smufl-name="noteheadDiamondBlack"/>-->
+            <glyph glyph-code="E0DB" smufl-name="noteheadDiamondBlack"/>
             <!--<glyph glyph-code="E0DC" smufl-name="noteheadDiamondBlackWide"/>-->
             <!--<glyph glyph-code="E0DD" smufl-name="noteheadDiamondWhite"/>-->
             <!--<glyph glyph-code="E0DE" smufl-name="noteheadDiamondWhiteWide"/>-->
@@ -2311,11 +2311,11 @@
             <glyph glyph-code="E9BA" smufl-name="chantLigaturaDesc3rd"/>
             <glyph glyph-code="E9BB" smufl-name="chantLigaturaDesc4th"/>
             <glyph glyph-code="E9BC" smufl-name="chantLigaturaDesc5th"/>
-            <!-- <glyph glyph-code="E9BD" smufl-name="chantConnectingLineAsc2nd"/> -->
-            <!-- <glyph glyph-code="E9BE" smufl-name="chantConnectingLineAsc3rd"/> -->
-            <!-- <glyph glyph-code="E9BF" smufl-name="chantConnectingLineAsc4th"/> -->
-            <!-- <glyph glyph-code="E9C0" smufl-name="chantConnectingLineAsc5th"/> -->
-            <!-- <glyph glyph-code="E9C1" smufl-name="chantConnectingLineAsc6th"/> -->
+            <glyph glyph-code="E9BD" smufl-name="chantConnectingLineAsc2nd"/>
+            <glyph glyph-code="E9BE" smufl-name="chantConnectingLineAsc3rd"/>
+            <glyph glyph-code="E9BF" smufl-name="chantConnectingLineAsc4th"/>
+            <glyph glyph-code="E9C0" smufl-name="chantConnectingLineAsc5th"/>
+            <glyph glyph-code="E9C1" smufl-name="chantConnectingLineAsc6th"/>
             <!--<glyph glyph-code="E9C2" smufl-name="chantStrophicusLiquescens2nd"/>-->
             <!--<glyph glyph-code="E9C3" smufl-name="chantStrophicusLiquescens3rd"/>-->
             <!--<glyph glyph-code="E9C4" smufl-name="chantStrophicusLiquescens4th"/>-->

@@ -60,6 +60,7 @@ enum {
     SMUFL_E0A2_noteheadWhole = 0xE0A2,
     SMUFL_E0A3_noteheadHalf = 0xE0A3,
     SMUFL_E0A4_noteheadBlack = 0xE0A4,
+    SMUFL_E0DB_noteheadDiamondBlack = 0xE0DB,
     SMUFL_E0FA_noteheadWholeFilled = 0xE0FA,
     SMUFL_E101_noteheadSlashHorizontalEnds = 0xE101,
     SMUFL_E220_tremolo1 = 0xE220,
@@ -227,7 +228,6 @@ enum {
     SMUFL_E904_mensuralFclefPetrucci = 0xE904,
     SMUFL_E906_chantCclef = 0xE906,
     SMUFL_E909_mensuralCclefPetrucciPosMiddle = 0xE909,
-    SMUFL_E990_chantPunctum = 0xE990,
     SMUFL_E938_mensuralNoteheadSemibrevisBlack = 0xE938,
     SMUFL_E939_mensuralNoteheadSemibrevisVoid = 0xE939,
     SMUFL_E93C_mensuralNoteheadMinimaWhite = 0xE93C,
@@ -238,6 +238,21 @@ enum {
     SMUFL_E94A_mensuralCombStemDownFlagSemiminima = 0xE94A,
     SMUFL_E94B_mensuralCombStemUpFlagFusa = 0xE94B,
     SMUFL_E94C_mensuralCombStemDownFlagFusa = 0xE94C,
+    SMUFL_E990_chantPunctum = 0xE990,
+    SMUFL_E9B4_chantEntryLineAsc2nd = 0xE9B4,
+    SMUFL_E9B5_chantEntryLineAsc3rd = 0xE9B5,
+    SMUFL_E9B6_chantEntryLineAsc4th = 0xE9B6,
+    SMUFL_E9B7_chantEntryLineAsc5th = 0xE9B7,
+    SMUFL_E9B8_chantEntryLineAsc6th = 0xE9B8,
+    SMUFL_E9B9_chantLigaturaDesc2nd = 0xE9B9,
+    SMUFL_E9BA_chantLigaturaDesc3rd = 0xE9BA,
+    SMUFL_E9BB_chantLigaturaDesc4th = 0xE9BB,
+    SMUFL_E9BC_chantLigaturaDesc5th = 0xE9BC,
+    SMUFL_E9BD_chantConnectingLineAsc2nd = 0xE9BD,
+    SMUFL_E9BE_chantConnectingLineAsc3rd = 0xE9BE,
+    SMUFL_E9BF_chantConnectingLineAsc4th = 0xE9BF,
+    SMUFL_E9C0_chantConnectingLineAsc5th = 0xE9C0,
+    SMUFL_E9C1_chantConnectingLineAsc6th = 0xE9C1,
     SMUFL_E9F0_mensuralRestMaxima = 0xE9F0,
     SMUFL_E9F1_mensuralRestLongaPerfecta = 0xE9F1,
     SMUFL_E9F2_mensuralRestLongaImperfecta = 0xE9F2,
@@ -254,8 +269,8 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 228
+#define SMUFL_COUNT 244
 
-} // namespace vrv
+} // vrv namespace
 
 #endif

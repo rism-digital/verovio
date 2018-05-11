@@ -120,9 +120,11 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // value is 0 and std::map returns 0 by default for missing keys.
     if (neumeName == NEUME_ERROR) {
         // TODO: Error Handling for unfound neumes
-        std::cout << "Neume Grouping not found";
+        std::cout << "Neume Grouping not found" << std::endl;
     }
-
+    else {
+        std::cout << neumeName << std::endl;
+    }
 
     /******************************************************************/
     // Start the Neume graphic and draw the children
@@ -167,6 +169,36 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             DrawSmuflNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, lineCode, 0, noteSize * pitchDifference);
             DrawSmuflNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, ligatureCode);
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[2]), layer, staff, measure);
+            break;
+        }
+        case CLIVIS:
+        {
+            int pitchDifference = ncVector[1]->GetPname() - ncVector[0]->GetPname();
+            int noteSize = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+            pitchDifference += (ncVector[1]->GetOct() - ncVector[0]->GetOct()) * 7;
+            wchar_t lineCode;
+            switch (pitchDifference)
+            {
+                case -1:
+                    lineCode = SMUFL_E9BD_chantConnectingLineAsc2nd;
+                    break;
+                case -2:
+                    lineCode = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                    break;
+                case -3:
+                    lineCode = SMUFL_E9BF_chantConnectingLineAsc4th;
+                    break;
+                case -4:
+                    lineCode = SMUFL_E9C0_chantConnectingLineAsc5th;
+                    break;
+                default:
+                    // TODO: Draw each punctum separately
+                    lineCode = SMUFL_E9BD_chantConnectingLineAsc2nd;
+                    break;
+            }
+            DrawSmuflNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, SMUFL_E990_chantPunctum, noteSize / 4, 0);
+            DrawSmuflNc(dc, dynamic_cast<LayerElement *>(ncVector[1]), layer, staff, measure, lineCode, 0, 0);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[1]), layer, staff, measure);
             break;
         }
         default: 
