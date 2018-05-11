@@ -98,8 +98,7 @@ std::map<std::string, NeumeGroup> Neume::InitNeumeGroups() {
     map["dd"] = CLIMACUS;
     map["ud"] = TORCULUS;
     map["du"] = PORRECTUS;
-    map["dd"] = CLIMACUS;
-    map["uu"] = SCANDICUS;
+    map["ddd"] = CLIMACUS;
     return map;
 }
 

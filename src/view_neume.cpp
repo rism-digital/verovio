@@ -181,8 +181,10 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         {
             wchar_t tailCode = SMUFL_E991_chantPunctumInclinatum;
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure);
-            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[1]), layer, staff, measure, tailCode);
-            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[2]), layer, staff, measure, tailCode);    
+            for (int i = 1; i < (int)ncVector.size(); i++)
+            {
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[i]), layer, staff, measure, tailCode);
+            }
             break;
         }
         default: 
