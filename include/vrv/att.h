@@ -263,6 +263,23 @@ protected:
     ClassId m_classId;
 };
 
+// What AttComparison is, but for Interfaces
+
+class InterfaceComparison {
+
+public:
+    InterfaceComparison(InterfaceId interfaceId) { m_interfaceId = interfaceId; }
+
+    virtual bool operator()(Object *object);
+
+    InterfaceId GetInterface() { return m_interfaceId; }
+
+    bool MatchesInterface(Object *object);
+
+protected:
+    InterfaceId m_interfaceId;
+};
+
 } // namespace vrv
 
 #endif

@@ -831,6 +831,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// FindAllByInterfaceComparisonParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the interfaceComparison text
+ * member 1: an array of all matching objects
+ **/
+
+class FindAllByInterfaceComparisonParams : public FunctorParams {
+public:
+    FindAllByInterfaceComparisonParams(InterfaceComparison *interfaceComparison, ArrayOfObjects *elements)
+    {
+        m_interfaceComparison = interfaceComparison;
+        m_elements = elements;
+    }
+    InterfaceComparison *m_interfaceComparison;
+    ArrayOfObjects *m_elements;
+};
+
+//----------------------------------------------------------------------------
 // FindByAttComparisonParams
 //----------------------------------------------------------------------------
 

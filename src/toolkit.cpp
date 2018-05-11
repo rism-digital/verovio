@@ -1248,7 +1248,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
     if (!element) {
         element = m_doc.FindChildByUuid(elementId);
     }
-    if (element->HasInterface(INTERFACE_PITCH) && element->HasInterface(INTERFACE_POSITION)) {
+    if (element->HasInterface(INTERFACE_PITCH)) {
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
         if(!layer) return false;
         int oct;
@@ -1277,30 +1277,31 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
 
         if (initialClefLine != clefLine) {  // adjust notes so they stay in the same position
             int lineDiff = clefLine - initialClefLine;
-            std::vector<ClassId> atts = { NC, NOTE, CUSTOS };
-            AttComparisonAny comparison(atts);
             ArrayOfObjects objects;
-            layer->FindAllChildByAttComparison(&objects, &comparison);
-            
+            InterfaceComparison ic(INTERFACE_PITCH);
+
+            layer->FindAllChildByInterfaceComparison(&objects, &ic); 
+
             // Adjust all elements who are positioned relative to clef by pitch
-            for (auto iter = objects.begin(); iter != objects.end(); iter++) {
-                LayerElement *element = dynamic_cast<LayerElement *>(*iter);
-                if (element->HasInterface(INTERFACE_PITCH)) {   // Element must be controlled by pitch
-                    PitchInterface *pi = element->GetPitchInterface();
-                    int oct = pi->GetOct();
-                    int pnameOriginal = pi->GetPname();
-                    int pname = pnameOriginal - 2 * lineDiff;
-                    while (pname < PITCHNAME_c) {
-                        oct--;
-                        pname += 7;
-                    }
-                    while (pname > PITCHNAME_b) {
-                        oct++;
-                        pname -= 7;
-                    }
-                    pi->SetPname((data_PITCHNAME)pname);
-                    pi->SetOct(oct);
+            for (auto it = objects.begin(); it != objects.end(); ++it) {
+                Object *child = dynamic_cast<Object *>(*it);
+                if (child == nullptr) continue;
+                PitchInterface *pi = child->GetPitchInterface();
+                assert(pi);
+                int oct = pi->GetOct();
+                int pname = pi->GetPname() - 2 * lineDiff;  // One line -> 2 pitches
+                // Adjust pitch name and octave
+                while (pname < PITCHNAME_c) {
+                    oct--;
+                    pname += 7;
                 }
+                while (pname > PITCHNAME_b) {
+                    oct++;
+                    pname -= 7;
+                }
+
+                pi->SetPname((data_PITCHNAME)pname);
+                pi->SetOct(oct);
             } 
         }
 
