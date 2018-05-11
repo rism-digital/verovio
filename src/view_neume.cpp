@@ -135,9 +135,11 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         {   
             // TODO: Check for octave switches
             int pitchDifference = ncVector[1]->GetPname() - ncVector[0]->GetPname();
+            int octaveDifference = ncVector[1]->GetOct() - ncVector[0]->GetOct();
             int noteSize = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
             wchar_t lineCode;
             wchar_t ligatureCode;
+            pitchDifference += octaveDifference * 7;
             switch (pitchDifference)    
             {
                 case -1: 
