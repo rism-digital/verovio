@@ -177,6 +177,14 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[1]), layer, staff, measure);
             break;
         }
+        case CLIMACUS:
+        {
+            wchar_t tailCode = SMUFL_E991_chantPunctumInclinatum;
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[1]), layer, staff, measure, tailCode);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[2]), layer, staff, measure, tailCode);    
+            break;
+        }
         default: 
             DrawLayerChildren(dc, neume, layer, staff, measure);
     }

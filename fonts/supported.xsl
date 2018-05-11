@@ -2276,7 +2276,7 @@
         <medievalAndRenaissancePlainchantSingleNoteForms>
             <description>Medieval and Renaissance plainchant single-note forms</description>
             <glyph glyph-code="E990" smufl-name="chantPunctum"/>
-            <!--<glyph glyph-code="E991" smufl-name="chantPunctumInclinatum"/>-->
+            <glyph glyph-code="E991" smufl-name="chantPunctumInclinatum"/>
             <!--<glyph glyph-code="E992" smufl-name="chantPunctumInclinatumAuctum"/>-->
             <!--<glyph glyph-code="E993" smufl-name="chantPunctumInclinatumDeminutum"/>-->
             <!--<glyph glyph-code="E994" smufl-name="chantAuctumAsc"/>-->

@@ -239,6 +239,7 @@ enum {
     SMUFL_E94B_mensuralCombStemUpFlagFusa = 0xE94B,
     SMUFL_E94C_mensuralCombStemDownFlagFusa = 0xE94C,
     SMUFL_E990_chantPunctum = 0xE990,
+    SMUFL_E991_chantPunctumInclinatum = 0xE991,
     SMUFL_E9B4_chantEntryLineAsc2nd = 0xE9B4,
     SMUFL_E9B5_chantEntryLineAsc3rd = 0xE9B5,
     SMUFL_E9B6_chantEntryLineAsc4th = 0xE9B6,
@@ -269,7 +270,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 244
+#define SMUFL_COUNT 245
 
 } // vrv namespace
 
