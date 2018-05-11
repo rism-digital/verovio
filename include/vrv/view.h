@@ -357,13 +357,14 @@ protected:
     ///@}
 
     /**
-     * @name Method for drawing Syllable.
+     * @name Methods for drawing neumes.
      * Defined in view_neume.cpp
      */
     ///@{
     void DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawSmuflNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, wchar_t fontNo, int xOffset = 0, int yOffset = 0);
     ///@}
     /**
      * @name Methods for drawing Floating child classes.
