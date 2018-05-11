@@ -116,13 +116,13 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // Obtaining the NeumeGroup enum name from the map 
     NeumeGroup neumeName = (*neumeGroups)[contour];
 
-    // If the shape cannot be found in the map, the neume size will be greater than 2, and the default for
-    // std::map for keys that aren't in is 0. This won't conflict with actual Punctums because the size will always
-    // be 2 in that case.
-    if ( (int)ncVector.size() > 1 && (*neumeGroups)[contour] == 0) {
-        //TODO: Error Handling for unfound neumes
+    // If the shape cannot be found in the map, NeumeGroup::ERROR will be returned since its
+    // value is 0 and std::map returns 0 by default for missing keys.
+    if (neumeName == NEUME_ERROR) {
+        // TODO: Error Handling for unfound neumes
         std::cout << "Neume Grouping not found";
     }
+
 
     /******************************************************************/
     // Start the Neume graphic and draw the children
