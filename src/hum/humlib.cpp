@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed May  9 07:15:32 PDT 2018
+// Last Modified: Fri May 11 21:23:19 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -21797,6 +21797,19 @@ void MxmlEvent::reportDynamicToOwner(void) {
 
 //////////////////////////////
 //
+// MxmlEvent::reportCaesuraToOwner -- inform the owner that there is a caesura
+//    that needs an RDF marker.
+// default value: letter = "Z"
+//
+
+void MxmlEvent::reportCaesuraToOwner(const string& letter) const {
+	m_owner->reportCaesuraToOwner(letter);
+}
+
+
+
+//////////////////////////////
+//
 // MxmlEvent::reportHarmonyCountToOwner --
 //
 
@@ -23063,6 +23076,8 @@ void MxmlEvent::addNotations(stringstream& ss, xml_node notations) const {
 	bool upbow          = false;
 	bool downbow        = false;
 	bool harmonic       = false;
+	bool breath         = false;
+	bool caesura        = false;
 
 	while (child) {
 		if (strcmp(child.name(), "articulations") == 0) {
@@ -23078,6 +23093,10 @@ void MxmlEvent::addNotations(stringstream& ss, xml_node notations) const {
 					accent = true;
 				} else if (strcmp(grandchild.name(), "tenuto") == 0) {
 					tenuto = true;
+				} else if (strcmp(grandchild.name(), "breath-mark") == 0) {
+					breath = true;
+				} else if (strcmp(grandchild.name(), "caesura") == 0) {
+					caesura = true;
 				} else if (strcmp(grandchild.name(), "strong-accent") == 0) {
 					strongaccent = true;
 				} else if (strcmp(grandchild.name(), "detached-legato") == 0) {
@@ -23137,6 +23156,11 @@ void MxmlEvent::addNotations(stringstream& ss, xml_node notations) const {
 	if (downbow)      { ss << "u";  }
 	if (umordent)     { ss << "m";  }  // figure out whole-tone mordents later
 	if (lmordent)     { ss << "w";  }  // figure out whole-tone mordents later
+	if (breath)       { ss << ",";  }
+	if (caesura)      { 
+		ss << "Z";  
+		reportCaesuraToOwner();
+	}
 
 }
 
@@ -23743,6 +23767,17 @@ void MxmlMeasure::reportHarmonyCountToOwner(int count) {
 
 void MxmlMeasure::reportDynamicToOwner(void) {
 	m_owner->receiveDynamic();
+}
+
+
+
+//////////////////////////////
+//
+// MxmlMeasure::reportCaesuraToOwner --
+//
+
+void MxmlMeasure::reportCaesuraToOwner(const string& letter) {
+	m_owner->receiveCaesura(letter);
 }
 
 
@@ -24512,6 +24547,18 @@ int MxmlPart::getVerseCount(int staffindex) const {
 
 //////////////////////////////
 //
+// MxmlPart::getCaesura -- Returns the RDF marker for a caesura in **kern
+//    data (or an empty string if there is no marker defined).
+//
+
+string MxmlPart::getCaesura(void) const {
+	return m_caesura;
+}
+
+
+
+//////////////////////////////
+//
 // MxmlPart::receiveHarmonyCount --
 //
 
@@ -24528,6 +24575,17 @@ void MxmlPart::receiveHarmonyCount(int count) {
 
 void MxmlPart::receiveDynamic(void) {
 	m_has_dynamics = true;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlPart::receiveCaesura --
+//
+
+void MxmlPart::receiveCaesura(const string& letter) {
+	m_caesura = letter;
 }
 
 
@@ -43716,14 +43774,16 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 		transpose.process(argv);
 		transpose.run(outfile);
 		if (transpose.hasHumdrumText()) {
-			transpose.getHumdrumText(out);
+			stringstream ss;
+			transpose.getHumdrumText(ss);
+			outfile.read(ss.str());
+			printResult(out, outfile);
 		}
-
 	} else {
 		for (int i=0; i<outfile.getLineCount(); i++) {
 			outfile[i].createLineFromTokens();
 		}
-		out << outfile;
+		printResult(out, outfile);
 	}
 
 	// add RDFs
@@ -43741,7 +43801,69 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 		}
 	}
 
+	// put the above code in here some time:
+	prepareRdfs(partdata);
+	printRdfs(out);
+
 	return status;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::printResult -- filter out
+//      some item if not necessary:
+//
+// MuseScore calls everything "Piano" by default, so suppress
+// this instrument name if there is only one **kern spine in
+// the file.
+//
+
+void Tool_musicxml2hum::printResult(ostream& out, HumdrumFile& outfile) {
+	vector<HTp> kernspines = outfile.getKernSpineStartList();
+	if (kernspines.size() > 1) {
+		out << outfile;
+	} else {
+		for (int i=0; i<outfile.getLineCount(); i++) {
+			bool isPianoLabel = false;
+			bool isPianoAbbr  = false;
+			bool isPartNum    = false;
+			bool isStaffNum   = false;
+			if (!outfile[i].isInterpretation()) {
+				out << outfile[i] << "\n";
+				continue;
+			}
+			for (int j=0; j<outfile[i].getFieldCount(); j++) {
+				if (*outfile.token(i, j) == "*I\"Piano") {
+					isPianoLabel = true;
+				} else if (*outfile.token(i, j) == "*I'Pno.") {
+					isPianoAbbr = true;
+				} else if (*outfile.token(i, j) == "*staff1") {
+					isStaffNum = true;
+				} else if (*outfile.token(i, j) == "*part1") {
+					isPartNum = true;
+				}
+			}
+			if (isPianoLabel || isPianoAbbr || isStaffNum || isPartNum) {
+				continue;
+			}
+			out << outfile[i] << "\n";
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::printRdfs --
+//
+
+void Tool_musicxml2hum::printRdfs(ostream& out) {
+	if (!m_caesura_rdf.empty()) {
+		out << m_caesura_rdf << "\n";
+	}
 }
 
 
@@ -43792,7 +43914,9 @@ void Tool_musicxml2hum::addHeaderRecords(HumdrumFile& outfile, xml_document& doc
 
 	if (!m_systemDecoration.empty()) {
 		// outfile.insertLine(0, "!!!system-decoration: " + m_systemDecoration);
-		outfile.appendLine("!!!system-decoration: " + m_systemDecoration);
+		if (m_systemDecoration != "s1") {
+			outfile.appendLine("!!!system-decoration: " + m_systemDecoration);
+		}
 	}
 
 	// OTL: title //////////////////////////////////////////////////////////
@@ -43925,6 +44049,27 @@ void Tool_musicxml2hum::reindexVoices(vector<MxmlPart>& partdata) {
 			reindexMeasure(measure);
 		}
 	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::prepareRdfs --
+//
+
+void Tool_musicxml2hum::prepareRdfs(vector<MxmlPart>& partdata) {
+	string caesura;
+	for (int i=0; i<(int)partdata.size(); i++) {
+		caesura = partdata[i].getCaesura();
+		if (!caesura.empty()) {
+		}
+	}
+
+	if (!caesura.empty()) {
+		m_caesura_rdf = "!!!RDF**kern: " + caesura + " = caesura";
+	}
+
 }
 
 

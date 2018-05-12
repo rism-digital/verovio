@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed May  9 07:15:32 PDT 2018
+// Last Modified: Fri May 11 21:23:19 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2669,6 +2669,7 @@ class MxmlPart {
 		int           getStaffCount        (void) const;
 		int           getVerseCount        (void) const;
 		int           getVerseCount        (int staffindex) const;
+		string        getCaesura           (void) const;
 		int           getHarmonyCount      (void) const;
 		void          trackStaffVoices     (int staffnum, int voicenum);
 		void          printStaffVoiceInfo  (void);
@@ -2690,6 +2691,7 @@ class MxmlPart {
 		void          receiveHarmonyCount         (int count);
 		void          receiveEditorialAccidental  (void);
 		void          receiveDynamic              (void);
+		void          receiveCaesura              (const string& letter);
 
 	protected:
 		vector<MxmlMeasure*> m_measures;
@@ -2703,6 +2705,7 @@ class MxmlPart {
 		bool                 m_has_dynamics = false;
 		string               m_partname;
 		string               m_partabbr;
+		string               m_caesura;
 
 		// m_staffvoicehist: counts of staff and voice numbers.  
 		// staff=0 is used for items such as measures.
@@ -3153,12 +3156,13 @@ class MxmlEvent {
 		string             getElementName     (void);
 		void               addNotations       (stringstream& ss, 
 		                                       xml_node notations) const;
-		void               reportVerseCountToOwner         (int count);
-		void               reportVerseCountToOwner         (int staffnum, int count);
-		void               reportHarmonyCountToOwner       (int count);
-		void               reportMeasureStyleToOwner       (MeasureStyle style);
+		void               reportVerseCountToOwner    (int count);
+		void               reportVerseCountToOwner    (int staffnum, int count);
+		void               reportHarmonyCountToOwner  (int count);
+		void               reportMeasureStyleToOwner  (MeasureStyle style);
 		void               reportEditorialAccidentalToOwner(void);
-		void               reportDynamicToOwner            (void);
+		void               reportDynamicToOwner       (void);
+		void               reportCaesuraToOwner       (const string& letter = "Z") const;
       void               makeDummyRest      (MxmlMeasure* owner, 
 		                                       HumNum startime,
 		                                       HumNum duration,
@@ -3289,6 +3293,7 @@ class MxmlMeasure {
 		void  reportHarmonyCountToOwner           (int count);
 		void  reportEditorialAccidentalToOwner    (void);
 		void  reportDynamicToOwner                (void);
+		void  reportCaesuraToOwner                (const string& letter);
 
 	protected:
 		HumNum             m_starttime; // start time of measure in quarter notes
@@ -4958,6 +4963,9 @@ class Tool_musicxml2hum : public HumTool {
 		void getChildrenVector (vector<xml_node>& children, xml_node parent);
 		void insertPartTranspositions(xml_node transposition, GridPart& part);
 		xml_node convertTranspositionToHumdrum(xml_node transpose, HTp& token, int& staffindex);
+		void prepareRdfs       (vector<MxmlPart>& partdata);
+		void printRdfs         (ostream& out);
+		void printResult       (ostream& out, HumdrumFile& outfile);
 
 	public:
 
@@ -4967,12 +4975,15 @@ class Tool_musicxml2hum : public HumTool {
 		Options m_options;
 		bool DebugQ;
 		bool VoiceDebugQ;
-		bool m_recipQ = false;
-		bool m_stemsQ = false;
-		int m_slurabove = 0;
-		int m_slurbelow = 0;
+		bool m_recipQ       = false;
+		bool m_stemsQ       = false;
+		int  m_slurabove    = 0;
+		int  m_slurbelow    = 0;
 		char m_hasEditorial = '\0';
 		vector<vector<string>> m_last_ottava_direction;
+
+		// RDF indications in **kern data:
+		string  m_caesura_rdf;
 
 		string m_software;
 		string m_systemDecoration;
