@@ -31,6 +31,7 @@ emscripten/data/
 emscripten/build/
 
 # python build
+python/
 bindings/python/verovio_wrap.cpp
 bindings/python/verovio.pyc
 bindings/python/verovio.py
@@ -59,6 +60,6 @@ bindings/qt/build-demo
 
 # Output files
 tools/*.svg
-tools/#.mei
+tools/*.mei
 index.js
 emscripten/npm-dev/node_modules
