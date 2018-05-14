@@ -146,7 +146,7 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
     int x = element->GetDrawingX();
     int perfectRadius = m_doc->GetGlyphWidth(SMUFL_E910_mensuralProlation1, staff->m_drawingStaffSize, false) / 2;
-    int code = NULL;
+    int code = 0;
 
     if (mensur->HasLoc()) {
         y = staff->GetDrawingY()
