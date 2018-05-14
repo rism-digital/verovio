@@ -13,9 +13,8 @@ if (!file || (file.length === 0)) {
 $.ajax({
     url: file
     , dataType: "text"
-    , success: function(data) {
-
-        outputFilename = file.replace(/^.*[\\\/]/, '')
+    , success(data) {
+        var outputFilename = file.replace(/^.*[\\\/]/, "");
         load_data( data );
     }
 });

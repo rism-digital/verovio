@@ -40,15 +40,12 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Beam *beam = dynamic_cast<Beam *>(element);
     assert(beam);
 
-    // duration variables
-    int testDur;
-
     // temporary coordinates
     int x1, x2, y1, y2;
 
     // temporary variables
     int shiftY;
-    int barY, fullBars, polygonHeight;
+    int fullBars, polygonHeight;
     double dy1, dy2;
 
     // loops
@@ -153,8 +150,8 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int noteCount = (int)noteIndexes.size();
 
     if (beam->m_drawingParams.m_changingDur && noteCount > 0) {
-        testDur = DUR_8 + fullBars;
-        barY = beam->m_drawingParams.m_beamWidth;
+        int testDur = DUR_8 + fullBars;
+        int barY = beam->m_drawingParams.m_beamWidth;
 
         if (beam->m_drawingParams.m_stemDir == STEMDIRECTION_up) {
             barY = -barY;
@@ -170,12 +167,11 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             bool start = true;
 
             int idx = 0;
-            int nextIdx = 0;
 
             // all but the last one
             for (i = 0; i < noteCount - 1; ++i) {
                 idx = noteIndexes.at(i);
-                nextIdx = noteIndexes.at(i + 1);
+                int nextIdx = noteIndexes.at(i + 1);
 
                 bool breakSec = ((beamElementCoords->at(idx)->m_breaksec)
                     && (testDur - DUR_8 >= beamElementCoords->at(idx)->m_breaksec));
@@ -292,9 +288,6 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int fullBars, polygonHeight;
     double dy1, dy2;
 
-    // loop
-    int i, j;
-
     /******************************************************************/
     // initialization
 
@@ -336,7 +329,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int dur = (dynamic_cast<AttDurationLogical *>(firstElement->m_element))->GetDur();
 
     if (dur > DUR_1) {
-        for (i = 0; i < elementCount; ++i) {
+        for (int i = 0; i < elementCount; ++i) {
             LayerElement *el = beamElementCoords->at(i)->m_element;
             if (((el->Is(NOTE)) && !(dynamic_cast<Note *>(el))->IsChordTone()) || (el->Is(CHORD))) {
                 StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
@@ -384,7 +377,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y2 -= space * fTrem->m_drawingParams.m_beamSlope;
     }
 
-    for (j = 0; j < fullBars; ++j) {
+    for (int j = 0; j < fullBars; ++j) {
         DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
         y1 += polygonHeight;
         y2 += polygonHeight;
