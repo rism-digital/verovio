@@ -1263,7 +1263,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
         }
     }
     if (element->Is(NEUME)) {
-        // Requires a relative y
+        // Requires a relative x and y
         Neume *neume = dynamic_cast<Neume *>(element);
         assert(neume);
         Layer *layer = dynamic_cast<Layer *>(neume->GetFirstParent(LAYER));
@@ -1297,7 +1297,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
             // Update neume component
             nc->SetPname((data_PITCHNAME)pname);
             nc->SetOct(oct);
-            //nc->SetUlx(nc->GetUlx() + x);
+            nc->SetUlx(nc->GetUlx() - x);
         }
     }
     if (element->Is(CLEF)) {
