@@ -38,11 +38,9 @@ enum NeumeGroup {
     NEUME_ERROR = 0,
     PUNCTUM,
     CLIVIS,
-    DISTROPHA,
     PES,
     CLIMACUS,
     PORRECTUS, 
-    TRISTROPHA,
     SCANDICUS,
     TORCULUS
 };
