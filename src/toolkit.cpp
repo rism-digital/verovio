@@ -1261,6 +1261,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
             AttCoordinated *att = dynamic_cast<AttCoordinated *>(element);
             att->SetUlx(x);
         }
+        return true;
     }
     if (element->Is(NEUME)) {
         // Requires a relative x and y
@@ -1284,6 +1285,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
             nc->AdjustPitchByOffset(pitchDifference); 
             nc->SetUlx(nc->GetUlx() - x);
         }
+        return true;
     }
     if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
