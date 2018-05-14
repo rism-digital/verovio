@@ -2667,6 +2667,18 @@ template <class ELEMENT> void HumdrumInput::setMensurationSymbol(ELEMENT *elemen
     if (metersig.find('r') != std::string::npos) {
         element->SetMensurOrient(ORIENTATION_reversed);
     }
+
+    hum::HumRegex hre;
+    if (hre.search(metersig, "(\\d+)/(\\d+)")) {
+        element->SetProportNum(hre.getMatchInt(1));
+        element->SetProportNumbase(hre.getMatchInt(2));
+    }
+    else if (hre.search(metersig, "/(\\d+)")) {
+        element->SetProportNumbase(hre.getMatchInt(1));
+    }
+    else if (hre.search(metersig, "(\\d+)")) {
+        element->SetProportNum(hre.getMatchInt(1));
+    }
 }
 
 //////////////////////////////
@@ -6317,11 +6329,11 @@ void HumdrumInput::insertMeterSigElement(
     std::smatch matches;
     int count = -1;
     int unit = -1;
-    if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
+    if (regex_search(*tsig, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
         count = stoi(matches[1]);
         unit = stoi(matches[2]);
     }
-    else if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)"))) {
+    else if (regex_search(*tsig, matches, regex("^\\*M(\\d+)"))) {
         count = stoi(matches[1]);
     }
     // deal with non-rational units here.
@@ -6361,13 +6373,13 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             continue;
         }
         for (int j = 0; j < infile[i].getFieldCount(); ++j) {
-            if ((!timesig) && regex_search(*infile.token(i, j), regex(R"(^\*M\d+/\d+)"))) {
+            if ((!timesig) && regex_search(*infile.token(i, j), regex("^\\*M\\d+/\\d+"))) {
                 timesig = infile.token(i, j);
             }
-            if ((!keysig) && regex_search(*infile.token(i, j), regex(R"(^\*k\[.*\])"))) {
+            if ((!keysig) && regex_search(*infile.token(i, j), regex("^\\*k\\[.*\\]"))) {
                 keysig = infile.token(i, j);
             }
-            if (timesig && regex_search(*infile.token(i, j), regex(R"(^\*met\(.*\))"))) {
+            if (timesig && regex_search(*infile.token(i, j), regex("^\\*met\\(.*\\)"))) {
                 metersig = infile.token(i, j);
             }
         }
@@ -6388,7 +6400,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         int count = -1;
         int unit = -1;
         std::smatch matches;
-        if (regex_search(*timesig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
+        if (regex_search(*timesig, matches, regex("^\\*M(\\d+)/(\\d+)"))) {
             if (!metersig) {
                 count = stoi(matches[1]);
                 unit = stoi(matches[2]);
