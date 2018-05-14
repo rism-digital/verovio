@@ -1642,9 +1642,9 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
             margin = (dist - ((nbDashes - 1) * dashSpace)) / 2;
         }
 
-        int i, x;
+        int i;
         for (i = 0; i < nbDashes; ++i) {
-            x = x1 + margin + (i * dashSpace);
+            int x = x1 + margin + (i * dashSpace);
             x = std::max(x, x1);
 
             DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
