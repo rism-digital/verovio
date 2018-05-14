@@ -69,7 +69,7 @@ public:
      * A pointer to the note the point relates to.
      */
     Note *m_drawingNote;
-    
+
     /**
      * A pointer to the next LayerElement (note, barLine, etc.)
      */

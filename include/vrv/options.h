@@ -58,12 +58,6 @@ class OptionGrp;
 #define TEMP_MAUGDOT_SIZE_FACTOR 1.0
 // Width of the minima diamond relative to its height
 #define TEMP_MINIMA_WIDTH_FACTOR 1.0
-// Size of mensuration sign circle relative to space between staff lines
-#define MSIGN_CIRCLE_DIAM 1.7
-// Vertical position of center of mensuration sign as distance below top of the staff
-#define MSIGN_STAFFLINES_BELOW_TOP 2.0
-// Size of dot inside mensuration signs relative to space between staff lines
-#define MSIGN_DOT_DIAM 0.4
 // Relative size of figures in proportions
 #define PROPRT_SIZE_FACTOR 1.0
 // Linewidth for staff lines in mensural notation, rel. to "normal" width of staff lines */

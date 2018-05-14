@@ -523,7 +523,7 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     }
 
     params->m_scoreDefRole = NONE;
-    
+
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
     int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staff->GetN();
@@ -601,7 +601,7 @@ int Layer::CalcOnsetOffset(FunctorParams *functorParams)
 
     params->m_currentScoreTime = 0.0;
     params->m_currentRealTimeSeconds = 0.0;
-    
+
     params->m_currentMensur = GetCurrentMensur();
     params->m_currentMeterSig = GetCurrentMeterSig();
 

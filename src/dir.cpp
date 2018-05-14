@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functorparams.h"
 #include "text.h"
 #include "verticalaligner.h"
 #include "vrv.h"
@@ -24,11 +25,18 @@ namespace vrv {
 // Dir
 //----------------------------------------------------------------------------
 
-Dir::Dir() : ControlElement("dir-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttLang()
+Dir::Dir()
+    : ControlElement("dir-")
+    , TextListInterface()
+    , TextDirInterface()
+    , TimeSpanningInterface()
+    , AttLang()
+    , AttVerticalGroup()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_LANG);
+    RegisterAttClass(ATT_VERTICALGROUP);
 
     Reset();
 }
@@ -41,6 +49,7 @@ void Dir::Reset()
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
     ResetLang();
+    ResetVerticalGroup();
 }
 
 void Dir::AddChild(Object *child)
@@ -64,5 +73,17 @@ void Dir::AddChild(Object *child)
 //----------------------------------------------------------------------------
 // Dir functor methods
 //----------------------------------------------------------------------------
+
+int Dir::PrepareFloatingGrps(FunctorParams *functorParams)
+{
+    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    assert(params);
+
+    if (this->HasVgrp()) {
+        this->SetDrawingGrpId(-this->GetVgrp());
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

@@ -89,9 +89,7 @@ PaeInput::PaeInput(Doc *doc, std::string filename)
     m_is_mensural = false;
 }
 
-PaeInput::~PaeInput()
-{
-}
+PaeInput::~PaeInput() {}
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -487,8 +485,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         delete scoreDefMensur;
     }
     if (m_tie != NULL) {
-      delete m_tie;
-      m_tie = NULL;
+        delete m_tie;
+        m_tie = NULL;
     }
     staffGrp->AddChild(staffDef);
     m_doc->m_scoreDef.AddChild(staffGrp);

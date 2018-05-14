@@ -50,7 +50,7 @@ int MRpt::GenerateMIDI(FunctorParams *functorParams)
 {
     // GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     // assert(params);
-    
+
     LogWarning("MRpt produces empty MIDI output");
 
     return FUNCTOR_CONTINUE;

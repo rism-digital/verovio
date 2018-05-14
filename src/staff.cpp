@@ -379,7 +379,7 @@ int Staff::PrepareRpt(FunctorParams *functorParams)
     params->m_multiNumber = BOOLEAN_true;
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Staff::CalcOnsetOffset(FunctorParams *functorParams)
 {
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);

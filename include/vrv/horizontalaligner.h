@@ -78,7 +78,7 @@ public:
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT; }
     ///@}
-    
+
     /**
      * Delete the grace aligners in the map
      */

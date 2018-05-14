@@ -25,7 +25,8 @@ class Pedal : public ControlElement,
               public TimePointInterface,
               public AttColor,
               public AttPedalLog,
-              public AttPlacement {
+              public AttPlacement,
+              public AttVerticalGroup {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -49,6 +50,16 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::PrepareFloatingGrps
+     */
+    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+
+    /**
+     * See Object::GenerateMIDI
+     */
+    virtual int GenerateMIDI(FunctorParams *functorParams);
 
 protected:
     //

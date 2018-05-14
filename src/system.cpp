@@ -297,6 +297,55 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int System::AdjustXOverflow(FunctorParams *functorParams)
+{
+    AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
+    assert(params);
+
+    params->m_currentSystem = this;
+    params->m_lastMeasure = NULL;
+    params->m_currentWidest = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::AdjustXOverflowEnd(FunctorParams *functorParams)
+{
+    AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
+    assert(params);
+
+    // Continue if no measure of not widest element
+    if (!params->m_lastMeasure || !params->m_currentWidest) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // Continue if the right position of the measure is larger than the widest element right
+    int measureRightX
+        = params->m_lastMeasure->GetDrawingX() + params->m_lastMeasure->GetInnerWidth() - params->m_margin;
+    if (measureRightX > params->m_currentWidest->GetContentRight()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    LayerElement *objectX = dynamic_cast<LayerElement *>(params->m_currentWidest->GetObjectX());
+    if (!objectX) {
+        return FUNCTOR_CONTINUE;
+    }
+    Alignment *left = objectX->GetAlignment();
+    Measure *objectXMeasure = dynamic_cast<Measure *>(objectX->GetFirstParent(MEASURE));
+    if (objectXMeasure != params->m_lastMeasure) {
+        left = params->m_lastMeasure->GetLeftBarLine()->GetAlignment();
+    }
+
+    int overflow = params->m_currentWidest->GetContentRight() - measureRightX;
+    if (overflow > 0) {
+        ArrayOfAdjustmentTuples boundaries{ std::make_tuple(
+            left, params->m_lastMeasure->GetRightBarLine()->GetAlignment(), overflow) };
+        params->m_lastMeasure->m_measureAligner.AdjustProportionally(boundaries);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int System::AdjustYPos(FunctorParams *functorParams)
 {
     AdjustYPosParams *params = dynamic_cast<AdjustYPosParams *>(functorParams);
@@ -443,11 +492,19 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     params->m_classId = DIR;
     m_systemAligner.Process(params->m_functor, params);
 
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(DIR);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+
     params->m_classId = TEMPO;
     m_systemAligner.Process(params->m_functor, params);
 
     params->m_classId = PEDAL;
     m_systemAligner.Process(params->m_functor, params);
+
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(PEDAL);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
 
     params->m_classId = HARM;
     m_systemAligner.Process(params->m_functor, params);

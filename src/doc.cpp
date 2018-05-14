@@ -325,9 +325,9 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                 instrdef = dynamic_cast<InstrDef *>(staffGrp->FindChildByType(INSTRDEF, 1));
             }
             if (instrdef) {
-                if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel() - 1;
+                if (instrdef->HasMidiChannel()) midiChannel = instrdef->GetMidiChannel();
                 if (instrdef->HasMidiInstrnum())
-                    midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum() - 1);
+                    midiFile->addPatchChange(midiTrack, 0, midiChannel, instrdef->GetMidiInstrnum());
             }
             // set MIDI track name
             Label *label = dynamic_cast<Label *>(staffDef->FindChildByType(LABEL, 1));
@@ -342,7 +342,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             }
             // set MIDI time signature
             if (this->m_scoreDef.HasMeterCount()) {
-                midiFile->addTimeSignature(midiTrack, 0, this->m_scoreDef.GetMeterCount(), this->m_scoreDef.GetMeterUnit());
+                midiFile->addTimeSignature(
+                    midiTrack, 0, this->m_scoreDef.GetMeterCount(), this->m_scoreDef.GetMeterUnit());
             }
         }
 
@@ -389,8 +390,8 @@ bool Doc::ExportTimemap(std::string &output)
 }
 
 void Doc::PrepareJsonTimemap(std::string &output, std::map<int, double> &realTimeToScoreTime,
-    std::map<int, std::vector<std::string> > &realTimeToOnElements, std::map<int, std::vector<std::string> > &realTimeToOffElements,
-    std::map<int, int> &realTimeToTempo)
+    std::map<int, std::vector<std::string> > &realTimeToOnElements,
+    std::map<int, std::vector<std::string> > &realTimeToOffElements, std::map<int, int> &realTimeToTempo)
 {
 
     int currentTempo = -1000;
@@ -743,7 +744,7 @@ void Doc::CastOffDoc()
 
     System *currentSystem = new System();
     contentPage->AddChild(currentSystem);
-    CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem);
+    CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem, this);
     castOffSystemsParams.m_systemWidth = this->m_drawingPageWidth - this->m_drawingPageMarginLeft
         - this->m_drawingPageMarginRight - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
     castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();

@@ -648,7 +648,8 @@ int Chord::CalcOnsetOffsetEnd(FunctorParams *functorParams)
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    double incrementScoreTime = this->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+    double incrementScoreTime
+        = this->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
     incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
     double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
 

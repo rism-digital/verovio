@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 ### Added
+* Barline segmentation with text and dynamic indications overlapping measures
+* Improved layout with text (dir, tempo, etc.) at the end of a system
+* Support for dashed bar lines
 * Improvement of MIDI output for mensural notation
 * Support for `@stem.visible` on `<note>` and `<chord>`
 * Fix for Plaine & Easie chords and ties

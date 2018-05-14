@@ -156,14 +156,13 @@ public:
      * See Object::PrepareRpt
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
-    
+
     /**
      * See Object::CalcOnsetOffset
      */
     ///@{
     virtual int CalcOnsetOffset(FunctorParams *functorParams);
     ///@}
-
 
 private:
     /**
