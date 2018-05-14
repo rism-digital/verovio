@@ -70,4 +70,25 @@ void PitchInterface::AdjustPname(int &pname, int &oct)
     }
 }
 
+void PitchInterface::AdjustPitchByOffset(int pitchOffset)
+{
+    int pname = this->GetPname() + pitchOffset;
+    int oct = this->GetOct();
+    
+    // Check if a change in octave is necessary
+    while (pname > PITCHNAME_b)
+    {
+        pname -= 7;
+        oct++;
+    }
+    while (pname < PITCHNAME_c)
+    {
+        pname += 7;
+        oct--;
+    }
+
+    this->SetPname((data_PITCHNAME) pname);
+    this->SetOct(oct);
+}
+
 } // namespace vrv

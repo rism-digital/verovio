@@ -1280,23 +1280,8 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
 
         for (auto it = objects.begin(); it != objects.end(); ++it) {
             Nc *nc = dynamic_cast<Nc *>(*it);
-            int oct = nc->GetOct();
-            int pname = nc->GetPname();
-            pname += pitchDifference;
-
-            // Check if a change in octave is necessary
-            while (pname > PITCHNAME_b) {
-                pname -= 7;
-                oct++;
-            }
-            while (pname < PITCHNAME_c) {
-                pname += 7;
-                oct--;
-            }
-
-            // Update neume component
-            nc->SetPname((data_PITCHNAME)pname);
-            nc->SetOct(oct);
+            // Update the neume component
+            nc->AdjustPitchByOffset(pitchDifference); 
             nc->SetUlx(nc->GetUlx() - x);
         }
     }
@@ -1327,20 +1312,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
                 if (child == nullptr) continue;
                 PitchInterface *pi = child->GetPitchInterface();
                 assert(pi);
-                int oct = pi->GetOct();
-                int pname = pi->GetPname() - 2 * lineDiff;  // One line -> 2 pitches
-                // Adjust pitch name and octave
-                while (pname < PITCHNAME_c) {
-                    oct--;
-                    pname += 7;
-                }
-                while (pname > PITCHNAME_b) {
-                    oct++;
-                    pname -= 7;
-                }
-
-                pi->SetPname((data_PITCHNAME)pname);
-                pi->SetOct(oct);
+                pi->AdjustPitchByOffset(-2 * lineDiff); // One line -> 2 pitches
             } 
         }
 
