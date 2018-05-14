@@ -87,6 +87,18 @@ void PitchInterface::AdjustPitchByOffset(int pitchOffset)
         oct--;
     }
 
+    // If it falls out of allowed range, set to allowed extreme values
+    if (oct > 9) 
+    {
+        oct = 9;
+        pname = PITCHNAME_b;
+    }
+    else if (oct < 0)
+    {
+        oct = 0;
+        pname = PITCHNAME_c;
+    }
+
     this->SetPname((data_PITCHNAME) pname);
     this->SetOct(oct);
 }
