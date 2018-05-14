@@ -229,7 +229,7 @@
             <!--<glyph glyph-code="E0D8" smufl-name="noteheadDiamondWhole"/>-->
             <!--<glyph glyph-code="E0D9" smufl-name="noteheadDiamondHalf"/>-->
             <!--<glyph glyph-code="E0DA" smufl-name="noteheadDiamondHalfWide"/>-->
-            <glyph glyph-code="E0DB" smufl-name="noteheadDiamondBlack"/>
+            <!-- <glyph glyph-code="E0DB" smufl-name="noteheadDiamondBlack"/> -->
             <!--<glyph glyph-code="E0DC" smufl-name="noteheadDiamondBlackWide"/>-->
             <!--<glyph glyph-code="E0DD" smufl-name="noteheadDiamondWhite"/>-->
             <!--<glyph glyph-code="E0DE" smufl-name="noteheadDiamondWhiteWide"/>-->
@@ -2277,22 +2277,22 @@
             <description>Medieval and Renaissance plainchant single-note forms</description>
             <glyph glyph-code="E990" smufl-name="chantPunctum"/>
             <glyph glyph-code="E991" smufl-name="chantPunctumInclinatum"/>
-            <!--<glyph glyph-code="E992" smufl-name="chantPunctumInclinatumAuctum"/>-->
-            <!--<glyph glyph-code="E993" smufl-name="chantPunctumInclinatumDeminutum"/>-->
-            <!--<glyph glyph-code="E994" smufl-name="chantAuctumAsc"/>-->
-            <!--<glyph glyph-code="E995" smufl-name="chantAuctumDesc"/>-->
-            <!--<glyph glyph-code="E996" smufl-name="chantPunctumVirga"/>-->
-            <!--<glyph glyph-code="E997" smufl-name="chantPunctumVirgaReversed"/>-->
-            <!--<glyph glyph-code="E998" smufl-name="chantPunctumCavum"/>-->
-            <!--<glyph glyph-code="E999" smufl-name="chantPunctumLinea"/>-->
-            <!--<glyph glyph-code="E99A" smufl-name="chantPunctumLineaCavum"/>-->
-            <!--<glyph glyph-code="E99B" smufl-name="chantQuilisma"/>-->
-            <!--<glyph glyph-code="E99C" smufl-name="chantOriscusAscending"/>-->
-            <!--<glyph glyph-code="E99D" smufl-name="chantOriscusDescending"/>-->
-            <!--<glyph glyph-code="E99E" smufl-name="chantOriscusLiquescens"/>-->
-            <!--<glyph glyph-code="E99F" smufl-name="chantStrophicus"/>-->
-            <!--<glyph glyph-code="E9A0" smufl-name="chantStrophicusAuctus"/>-->
-            <!--<glyph glyph-code="E9A1" smufl-name="chantPunctumDeminutum"/>-->
+            <glyph glyph-code="E992" smufl-name="chantPunctumInclinatumAuctum"/>
+            <glyph glyph-code="E993" smufl-name="chantPunctumInclinatumDeminutum"/>
+            <glyph glyph-code="E994" smufl-name="chantAuctumAsc"/>
+            <glyph glyph-code="E995" smufl-name="chantAuctumDesc"/>
+            <glyph glyph-code="E996" smufl-name="chantPunctumVirga"/>
+            <glyph glyph-code="E997" smufl-name="chantPunctumVirgaReversed"/>
+            <glyph glyph-code="E998" smufl-name="chantPunctumCavum"/>
+            <glyph glyph-code="E999" smufl-name="chantPunctumLinea"/>
+            <glyph glyph-code="E99A" smufl-name="chantPunctumLineaCavum"/>
+            <glyph glyph-code="E99B" smufl-name="chantQuilisma"/>
+            <glyph glyph-code="E99C" smufl-name="chantOriscusAscending"/>
+            <glyph glyph-code="E99D" smufl-name="chantOriscusDescending"/>
+            <glyph glyph-code="E99E" smufl-name="chantOriscusLiquescens"/>
+            <glyph glyph-code="E99F" smufl-name="chantStrophicus"/>
+            <glyph glyph-code="E9A0" smufl-name="chantStrophicusAuctus"/>
+            <glyph glyph-code="E9A1" smufl-name="chantPunctumDeminutum"/>
             <range_end>U+E9AF</range_end>
             <range_start>U+E990</range_start>
         </medievalAndRenaissancePlainchantSingleNoteForms>
@@ -2365,23 +2365,23 @@
         </medievalAndRenaissanceRests>
         <medievalAndRenaissanceMiscellany>
             <description>Medieval and Renaissance miscellany</description>
-            <!--<glyph glyph-code="EA00" smufl-name="mensuralSignumUp"/>-->
-            <!--<glyph glyph-code="EA01" smufl-name="mensuralSignumDown"/>-->
-            <!--<glyph glyph-code="EA02" smufl-name="mensuralCustosUp"/>-->
-            <!--<glyph glyph-code="EA03" smufl-name="mensuralCustosDown"/>-->
-            <!--<glyph glyph-code="EA04" smufl-name="chantCustosStemUpPosLowest"/>-->
-            <!--<glyph glyph-code="EA05" smufl-name="chantCustosStemUpPosLow"/>-->
-            <!--<glyph glyph-code="EA06" smufl-name="chantCustosStemUpPosMiddle"/>-->
-            <!--<glyph glyph-code="EA07" smufl-name="chantCustosStemDownPosMiddle"/>-->
-            <!--<glyph glyph-code="EA08" smufl-name="chantCustosStemDownPosHigh"/>-->
-            <!--<glyph glyph-code="EA09" smufl-name="chantCustosStemDownPosHighest"/>-->
-            <!--<glyph glyph-code="EA0A" smufl-name="mensuralCustosCheckmark"/>-->
-            <!--<glyph glyph-code="EA0B" smufl-name="mensuralCustosTurn"/>-->
-            <!--<glyph glyph-code="EA0C" smufl-name="mensuralColorationStartSquare"/>-->
-            <!--<glyph glyph-code="EA0D" smufl-name="mensuralColorationEndSquare"/>-->
-            <!--<glyph glyph-code="EA0E" smufl-name="mensuralColorationStartRound"/>-->
-            <!--<glyph glyph-code="EA0F" smufl-name="mensuralColorationEndRound"/>-->
-            <!--<glyph glyph-code="EA10" smufl-name="mensuralAlterationSign"/>-->
+            <glyph glyph-code="EA00" smufl-name="mensuralSignumUp"/>
+            <glyph glyph-code="EA01" smufl-name="mensuralSignumDown"/>
+            <glyph glyph-code="EA02" smufl-name="mensuralCustosUp"/>
+            <glyph glyph-code="EA03" smufl-name="mensuralCustosDown"/>
+            <glyph glyph-code="EA04" smufl-name="chantCustosStemUpPosLowest"/>
+            <glyph glyph-code="EA05" smufl-name="chantCustosStemUpPosLow"/>
+            <glyph glyph-code="EA06" smufl-name="chantCustosStemUpPosMiddle"/>
+            <glyph glyph-code="EA07" smufl-name="chantCustosStemDownPosMiddle"/>
+            <glyph glyph-code="EA08" smufl-name="chantCustosStemDownPosHigh"/>
+            <glyph glyph-code="EA09" smufl-name="chantCustosStemDownPosHighest"/>
+            <glyph glyph-code="EA0A" smufl-name="mensuralCustosCheckmark"/>
+            <glyph glyph-code="EA0B" smufl-name="mensuralCustosTurn"/>
+            <glyph glyph-code="EA0C" smufl-name="mensuralColorationStartSquare"/>
+            <glyph glyph-code="EA0D" smufl-name="mensuralColorationEndSquare"/>
+            <glyph glyph-code="EA0E" smufl-name="mensuralColorationStartRound"/>
+            <glyph glyph-code="EA0F" smufl-name="mensuralColorationEndRound"/>
+            <glyph glyph-code="EA10" smufl-name="mensuralAlterationSign"/>
             <range_end>U+EA1F</range_end>
             <range_start>U+EA00</range_start>
         </medievalAndRenaissanceMiscellany>

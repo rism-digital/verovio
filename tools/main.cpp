@@ -186,29 +186,6 @@ void display_usage()
     }
 }
 
-int toolkitTest()
-{
-    std::string filename = "mei4page.mei";
-    std::string inputFormat = "mei";
-    std::string outputFormat = "svg";
-    
-    std::string vrvOptions = "{\"noLayout\":1,\"noFooter\":1,\"noHeader\":1}"; // Taken from Neon2
-    std::string editorAction = "{\"action\":\"drag\",\"param\":{\"elementId\":\"nc-0000001233928944\",\"x\":648,\"y\":1260}}";
-
-    vrv::Toolkit toolkit;
-
-    toolkit.SetFormat(inputFormat);
-    toolkit.SetOutputFormat(outputFormat);
-    toolkit.SetOptions(vrvOptions);
-    toolkit.LoadFile(filename);
-    toolkit.RenderToSVGFile("output.svg", 1);
-    //toolkit.LoadData(toolkit.GetMEI());
-    toolkit.Edit(editorAction);
-
-    toolkit.RenderToSVGFile("output.svg", 1);
-    return 0; 
-}
-
 int main(int argc, char **argv)
 {
     std::string infile;
@@ -244,7 +221,6 @@ int main(int argc, char **argv)
         { "type", required_argument, 0, 't' },
         { "version", no_argument, 0, 'v' },
         { "xml-id-seed", required_argument, 0, 'x' },
-        { "toolkit-test", no_argument, 0, 'd' },
         // deprecated - some use undocumented short options to catch them as such
         { "border", required_argument, 0, 'b' },
         { "ignore-layout", no_argument, 0, 'i' },
@@ -296,7 +272,7 @@ int main(int argc, char **argv)
     int option_index = 0;
     vrv::Option *opt = NULL;
     vrv::OptionBool *optBool = NULL;
-    while ((c = getopt_long(argc, argv, "d?ab:f:h:ino:p:r:s:t:w:vx:", long_options, &option_index)) != -1) {
+    while ((c = getopt_long(argc, argv, "?ab:f:h:ino:p:r:s:t:w:vx:", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
                 key = long_options[option_index].name;
@@ -377,11 +353,6 @@ int main(int argc, char **argv)
 
             case '?':
                 display_usage();
-                exit(0);
-                break;
-
-            case 'd':
-                toolkitTest();
                 exit(0);
                 break;
 

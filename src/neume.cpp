@@ -28,7 +28,6 @@
 #include "tie.h"
 #include "verse.h"
 #include "vrv.h"
-#include "nc.h"
 
 namespace vrv {
 

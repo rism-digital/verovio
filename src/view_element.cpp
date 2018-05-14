@@ -674,18 +674,50 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    // Custos *custos = dynamic_cast<Custos *>(element);
-    // assert(custos);
+    Custos *custos = dynamic_cast<Custos *>(element);
+    assert(custos);
 
     dc->StartGraphic(element, "", element->GetUuid());
+    
+    int sym = 0;
+    // Select glyph to use for this custos 
+    switch (staff->m_drawingNotationType) {
+        case NOTATIONTYPE_mensural:
+            sym = SMUFL_EA02_mensuralCustosUp; // mensuralCustosUp
+            break;
+        case NOTATIONTYPE_neume:
+            sym = SMUFL_EA06_chantCustosStemUpPosMiddle; // chantCustosStemUpPosMiddle
+            break;
+        default: break;
+    }
+
+    // Calculate x and y position for custos graphic
+    Clef *clef = layer->GetClef(element);
+    int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int staffLineNumber = staff->m_drawingLines;
+    int clefLine = clef->GetLine();
 
     int x = element->GetDrawingX();
-    int y = element->GetDrawingY();
+    int y = staff->GetDrawingY();
 
-    y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
+    int clefY = y - (staffSize * (staffLineNumber - clefLine));
+    int pitchOffset;
+    int octaveOffset = (custos->GetOct() - 3) * ((staffSize / 2) * 7);
 
-    // HARDCODED (smufl code wrong)
-    DrawSmuflCode(dc, x, y, 35, staff->m_drawingStaffSize, false);
+    if(clef->GetShape() == CLEFSHAPE_C) {
+        pitchOffset = (custos->GetPname() - PITCHNAME_c) * (staffSize / 2);
+    }
+    else if (clef->GetShape() == CLEFSHAPE_F) {
+        pitchOffset = (custos->GetPname() - PITCHNAME_f) * (staffSize / 2);
+    }
+    else {
+        // This shouldn't happen
+        pitchOffset = 0;
+    }
+
+    int actualY = clefY + pitchOffset + octaveOffset;
+    
+    DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false, true);
 
     dc->EndGraphic(element, this);
 }

@@ -63,3 +63,7 @@ tools/*.svg
 tools/*.mei
 index.js
 emscripten/npm-dev/node_modules
+
+# Local
+*.swp
+compile_commands.json
