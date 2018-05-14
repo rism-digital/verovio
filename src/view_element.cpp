@@ -1208,7 +1208,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Stem *stem = dynamic_cast<Stem *>(element);
     assert(stem);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", "");
 
     DrawFilledRectangle(dc, stem->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
         stem->GetDrawingY(), stem->GetDrawingX() + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
