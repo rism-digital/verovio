@@ -239,6 +239,42 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             }
             break;
         }
+        case SCANDICUS:
+        {
+            int pitchDifference = ncVector[2]->GetPname() - ncVector[1]->GetPname();
+            pitchDifference += (ncVector[2]->GetOct() - ncVector[1]->GetOct()) * 7;
+            //// THIS DOESNT WORK YET BECAUSE GLYPHS NOT IN LEIPZIG
+            // int glyphSize = m_doc->GetGlyphWidth(SMUFL_E990_chantPunctum, staff->m_drawingStaffSize, 0);
+            int glyphSize = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+            int xOffset = 0;
+            int noteSize = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+            wchar_t lineCode;
+
+            switch (pitchDifference)
+            {
+                case 2:
+                    lineCode = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                    break;
+                case 3:
+                    lineCode = SMUFL_E9BF_chantConnectingLineAsc4th;
+                    break;
+                case 4:
+                    lineCode = SMUFL_E9C0_chantConnectingLineAsc5th;
+                    break;
+                default:
+                    // TODO: Draw each punctum separately
+                    lineCode = SMUFL_E9BD_chantConnectingLineAsc2nd;
+                    break;
+            }
+            if (pitchDifference > 1) {
+                xOffset = -1;   
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[2]), layer, staff, measure, lineCode, -glyphSize / 10, -noteSize * pitchDifference - 1);
+            }
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, SMUFL_E990_chantPunctum);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[1]), layer, staff, measure, SMUFL_E990_chantPunctum);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[2]), layer, staff, measure, SMUFL_E990_chantPunctum, xOffset * glyphSize);
+            break;
+        }
         default: 
             DrawLayerChildren(dc, neume, layer, staff, measure);
     }
