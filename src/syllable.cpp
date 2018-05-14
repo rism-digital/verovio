@@ -16,7 +16,6 @@
 //----------------------------------------------------------------------------
 
 #include "neume.h"
-#include "syl.h"
 #include "vrv.h"
 
 namespace vrv {
