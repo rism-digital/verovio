@@ -18,7 +18,7 @@ public class main {
          * (if the fonts are installed (see the ./tools) then there is not need to do this)
          */
         toolkit vrvToolkit = new toolkit(false);
-        vrvToolkit.setResourcePath("../../data");
+        vrvToolkit.setResourcePath("../../../data");
 
 		String s;
 		String out;
@@ -36,7 +36,7 @@ public class main {
 		vrvToolkit.loadData(s);
 
         /* convert it and write it to the standard output */
-		out = vrvToolkit.renderToSvg();
+		out = vrvToolkit.renderToSVG();
 		System.out.println(out);
 	}
 }
