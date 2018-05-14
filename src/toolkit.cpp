@@ -25,6 +25,7 @@
 #include "measure.h"
 #include "nc.h"
 #include "note.h"
+#include "neume.h"
 #include "options.h"
 #include "page.h"
 #include "slur.h"
@@ -1260,6 +1261,31 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
             AttCoordinated *att = dynamic_cast<AttCoordinated *>(element);
             att->SetUlx(x);
         }
+        return true;
+    }
+    if (element->Is(NEUME)) {
+        // Requires a relative x and y
+        Neume *neume = dynamic_cast<Neume *>(element);
+        assert(neume);
+        Layer *layer = dynamic_cast<Layer *>(neume->GetFirstParent(LAYER));
+        if (!layer) return false;
+        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+        assert(staff);
+        // Calculate difference in pitch based on y difference
+        int pitchDifference = round((double)y / (double)staff->m_drawingStaffSize);
+
+        // Get components of neume
+        AttComparison ac(NC);
+        ArrayOfObjects objects;
+        neume->FindAllChildByAttComparison(&objects, &ac);
+
+        for (auto it = objects.begin(); it != objects.end(); ++it) {
+            Nc *nc = dynamic_cast<Nc *>(*it);
+            // Update the neume component
+            nc->AdjustPitchByOffset(pitchDifference); 
+            nc->SetUlx(nc->GetUlx() - x);
+        }
+        return true;
     }
     if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
@@ -1288,20 +1314,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
                 if (child == nullptr) continue;
                 PitchInterface *pi = child->GetPitchInterface();
                 assert(pi);
-                int oct = pi->GetOct();
-                int pname = pi->GetPname() - 2 * lineDiff;  // One line -> 2 pitches
-                // Adjust pitch name and octave
-                while (pname < PITCHNAME_c) {
-                    oct--;
-                    pname += 7;
-                }
-                while (pname > PITCHNAME_b) {
-                    oct++;
-                    pname -= 7;
-                }
-
-                pi->SetPname((data_PITCHNAME)pname);
-                pi->SetOct(oct);
+                pi->AdjustPitchByOffset(-2 * lineDiff); // One line -> 2 pitches
             } 
         }
 
