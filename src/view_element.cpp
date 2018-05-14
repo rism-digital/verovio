@@ -412,12 +412,11 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int drawingDur;
     LayerElement *childElement = NULL;
     Note *childNote = NULL;
-    Chord *childChord = NULL;
     Point stemPoint;
     bool drawingCueSize = false;
     int x, y;
 
-    childChord = dynamic_cast<Chord *>(bTrem->FindChildByType(CHORD));
+    Chord *childChord = dynamic_cast<Chord *>(bTrem->FindChildByType(CHORD));
     // Get from the chord or note child
     if (childChord) {
         drawingDur = childChord->GetDur();
