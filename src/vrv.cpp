@@ -346,7 +346,7 @@ void DisableLog()
 }
 
 #ifdef EMSCRIPTEN
-bool LogBufferContains(std::string s)
+bool LogBufferContains(std::string &s)
 {
     std::vector<std::string>::iterator iter = logBuffer.begin();
     while (iter != logBuffer.end()) {
@@ -438,7 +438,7 @@ std::string GetFileVersion(int vmaj, int vmin, int vrev)
     return StringFormat("%04d.%04d.%04d", vmaj, vmin, vrev);
 }
 
-std::string GetFilename(std::string fullpath)
+std::string GetFilename(std::string &fullpath)
 {
     // remove extension
     std::string name = fullpath;
