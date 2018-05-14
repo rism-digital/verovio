@@ -25,6 +25,7 @@
 #include "measure.h"
 #include "nc.h"
 #include "note.h"
+#include "neume.h"
 #include "options.h"
 #include "page.h"
 #include "slur.h"
@@ -1259,6 +1260,44 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
         if (element->HasAttClass(ATT_COORDINATED)) {
             AttCoordinated *att = dynamic_cast<AttCoordinated *>(element);
             att->SetUlx(x);
+        }
+    }
+    if (element->Is(NEUME)) {
+        // Requires a relative y
+        Neume *neume = dynamic_cast<Neume *>(element);
+        assert(neume);
+        Layer *layer = dynamic_cast<Layer *>(neume->GetFirstParent(LAYER));
+        if (!layer) return false;
+        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+        assert(staff);
+        // Calculate difference in pitch based on y difference
+        int pitchDifference = round((double)y / (double)staff->m_drawingStaffSize);
+
+        // Get components of neume
+        AttComparison ac(NC);
+        ArrayOfObjects objects;
+        neume->FindAllChildByAttComparison(&objects, &ac);
+
+        for (auto it = objects.begin(); it != objects.end(); ++it) {
+            Nc *nc = dynamic_cast<Nc *>(*it);
+            int oct = nc->GetOct();
+            int pname = nc->GetPname();
+            pname += pitchDifference;
+
+            // Check if a change in octave is necessary
+            while (pname > PITCHNAME_b) {
+                pname -= 7;
+                oct++;
+            }
+            while (pname < PITCHNAME_c) {
+                pname += 7;
+                oct--;
+            }
+
+            // Update neume component
+            nc->SetPname((data_PITCHNAME)pname);
+            nc->SetOct(oct);
+            //nc->SetUlx(nc->GetUlx() + x);
         }
     }
     if (element->Is(CLEF)) {
