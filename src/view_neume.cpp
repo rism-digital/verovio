@@ -64,7 +64,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     assert(nc);
 
     dc->StartGraphic(element, "", element->GetUuid()); 
-    
+
     /******************************************************************/
     // Draw the children
     DrawLayerChildren(dc, nc, layer, staff, measure);
@@ -148,15 +148,28 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // If there is a defined way to draw the neume grouping, we should use that to draw the specialized SVG shape,
     // or else we draw each nc in the neume as a punctum.
     switch (neumeName) {
+        case PES: 
+        {
+            int pitchDifference = ncVector[1]->GetPname() - ncVector[0]->GetPname();
+            pitchDifference += (ncVector[1]->GetOct() - ncVector[0]->GetOct()) * 7;
+            //// THIS DOESNT WORK YET BECAUSE GLYPHS NOT IN LEIPZIG
+            // int glyphSize = m_doc->GetGlyphWidth(SMUFL_E990_chantPunctum, staff->m_drawingStaffSize, 0);
+            int glyphSize = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+            int xOffset = 0;
+            if (pitchDifference > 1) {
+                xOffset = -1;
+            }
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, SMUFL_E990_chantPunctum);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[1]), layer, staff, measure, SMUFL_E990_chantPunctum, xOffset * glyphSize);
+            break;
+        }
         case PORRECTUS:
         {   
-            // TODO: Check for octave switches
             int pitchDifference = ncVector[1]->GetPname() - ncVector[0]->GetPname();
-            int octaveDifference = ncVector[1]->GetOct() - ncVector[0]->GetOct();
+            pitchDifference += (ncVector[1]->GetOct() - ncVector[0]->GetOct()) * 7;
             int noteSize = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
             wchar_t lineCode;
             wchar_t ligatureCode;
-            pitchDifference += octaveDifference * 7;
             switch (pitchDifference)    
             {
                 case -1: 
@@ -189,8 +202,8 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         case CLIVIS:
         {
             int pitchDifference = ncVector[1]->GetPname() - ncVector[0]->GetPname();
-            int noteSize = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
             pitchDifference += (ncVector[1]->GetOct() - ncVector[0]->GetOct()) * 7;
+            int noteSize = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
             wchar_t lineCode;
             switch (pitchDifference)
             {
