@@ -110,7 +110,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     std::map<std::string, NeumeGroup> *neumeGroups = Neume::GetGroups();
     
 
-    // Obatining list of NC to extract intm data
+    // Obtaining list of NC to extract intm data
     // Format of *neumechildren, first object is <neume>, all objects after are <nc>
     const ListOfObjects neumeChildren = neume->GetList(neume)[0];
     if (neumeChildren.empty()) {
