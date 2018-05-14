@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "attcomparison.h"
+#include "custos.h"
 #include "functorparams.h"
 #include "iodarms.h"
 #include "iohumdrum.h"
@@ -1094,7 +1095,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
     ArrayOfObjects notes;
-
+    
     measure->FindAllChildByAttComparison(&notes, &matchNoteTime);
 
     // Fill the JSON object
@@ -1247,30 +1248,18 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
     if (!element) {
         element = m_doc.FindChildByUuid(elementId);
     }
-    if (element->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(element);
-        assert(note);
-        Layer *layer = dynamic_cast<Layer *>(note->GetFirstParent(LAYER));
-        if (!layer) return false;
+    if (element->HasInterface(INTERFACE_PITCH)) {
+        Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
+        if(!layer) return false;
         int oct;
         data_PITCHNAME pname
-            = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), note->GetDrawingX(), &oct);
-        note->SetPname(pname);
-        note->SetOct(oct);
-        return true;
-    }
-    if (element->Is(NC)) {
-        Nc *nc = dynamic_cast<Nc *>(element);
-        assert(nc);
-        Layer *layer = dynamic_cast<Layer *>(nc->GetFirstParent(LAYER));
-        if (!layer) return false;
-        int oct;
-        data_PITCHNAME pname
-            = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), nc->GetDrawingX(), &oct);
-        nc->SetPname(pname);
-        nc->SetOct(oct);
-        nc->SetUlx(x);
-        return true;
+            = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), element->GetDrawingX(), &oct);
+        element->GetPitchInterface()->SetPname(pname);
+        element->GetPitchInterface()->SetOct(oct);
+        if (element->HasAttClass(ATT_COORDINATED)) {
+            AttCoordinated *att = dynamic_cast<AttCoordinated *>(element);
+            att->SetUlx(x);
+        }
     }
     if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
@@ -1288,14 +1277,20 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
 
         if (initialClefLine != clefLine) {  // adjust notes so they stay in the same position
             int lineDiff = clefLine - initialClefLine;
-            AttComparison comparison(NC);
             ArrayOfObjects objects;
-            layer->FindAllChildByAttComparison(&objects, &comparison);
-            for (auto iter = objects.begin(); iter != objects.end(); iter++) {
-                Nc *nc = dynamic_cast<Nc *>(*iter);
-                int oct = nc->GetOct();
-                int pnameOriginal = nc->GetPname();
-                int pname = pnameOriginal - 2 * lineDiff;
+            InterfaceComparison ic(INTERFACE_PITCH);
+
+            layer->FindAllChildByInterfaceComparison(&objects, &ic); 
+
+            // Adjust all elements who are positioned relative to clef by pitch
+            for (auto it = objects.begin(); it != objects.end(); ++it) {
+                Object *child = dynamic_cast<Object *>(*it);
+                if (child == nullptr) continue;
+                PitchInterface *pi = child->GetPitchInterface();
+                assert(pi);
+                int oct = pi->GetOct();
+                int pname = pi->GetPname() - 2 * lineDiff;  // One line -> 2 pitches
+                // Adjust pitch name and octave
                 while (pname < PITCHNAME_c) {
                     oct--;
                     pname += 7;
@@ -1304,14 +1299,14 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
                     oct++;
                     pname -= 7;
                 }
-                nc->SetPname((data_PITCHNAME)pname);
-                nc->SetOct(oct);
+
+                pi->SetPname((data_PITCHNAME)pname);
+                pi->SetOct(oct);
             } 
         }
 
         return true;
     }
-        
     return false;
 }
 

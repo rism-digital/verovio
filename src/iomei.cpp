@@ -1297,9 +1297,11 @@ void MeiOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
 {
     assert(custos);
 
-    WriteLayerElement(currentNode, custos);
+    WritePitchInterface(currentNode, custos);
     WritePositionInterface(currentNode, custos);
+    WriteLayerElement(currentNode, custos);
     custos->WriteColor(currentNode);
+    custos->WriteCoordinated(currentNode);
 }
 
 void MeiOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
@@ -3748,9 +3750,11 @@ bool MeiInput::ReadCustos(Object *parent, pugi::xml_node custos)
     Custos *vrvCustos = new Custos();
     ReadLayerElement(custos, vrvCustos);
 
+    ReadPitchInterface(custos, vrvCustos);
     ReadPositionInterface(custos, vrvCustos);
 
     vrvCustos->ReadColor(custos);
+    vrvCustos->ReadCoordinated(custos);
 
     parent->AddChild(vrvCustos);
     return true;

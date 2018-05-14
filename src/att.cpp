@@ -686,4 +686,22 @@ bool AttComparison::MatchesType(Object *object)
     return false;
 }
 
+// InterfaceComparison
+
+bool InterfaceComparison::operator()(Object *object)
+{
+    if (object->HasInterface(m_interfaceId)) {
+        return true;
+    }
+    return false;
+}
+
+bool InterfaceComparison::MatchesInterface(Object *object)
+{
+    if (object->HasInterface(m_interfaceId)) {
+        return true;
+    }
+    return false;
+}
+
 } // namespace vrv

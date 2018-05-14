@@ -222,6 +222,7 @@ class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
 class FloatingPositioner;
+class InterfaceComparison;
 class LayerElement;
 class LedgerLine;
 class Nc;
