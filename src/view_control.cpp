@@ -585,20 +585,17 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         isGraceToNoteSlur = true;
     }
 
-    Layer *layer1 = NULL;
-    Layer *layer2 = NULL;
-
     // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
     // if (start->Is(TIMESTAMP_ATTR))
     //    layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
     // else
-    layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+    Layer *layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
 
     // idem
     // if (end->Is(TIMESTAMP_ATTR))
     //    layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
     // else
-    layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
+    Layer *layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
 
     assert(layer1 && layer2);
 
