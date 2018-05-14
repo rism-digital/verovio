@@ -4300,14 +4300,14 @@ AttOctave::~AttOctave()
 
 void AttOctave::ResetOctave()
 {
-    m_oct = 0;
+    m_oct = -127;
 }
 
 bool AttOctave::ReadOctave(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("oct")) {
-        this->SetOct(StrToInt(element.attribute("oct").value()));
+        this->SetOct(StrToOctave(element.attribute("oct").value()));
         element.remove_attribute("oct");
         hasAttribute = true;
     }
@@ -4318,7 +4318,7 @@ bool AttOctave::WriteOctave(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasOct()) {
-        element.append_attribute("oct") = IntToStr(this->GetOct()).c_str();
+        element.append_attribute("oct") = OctaveToStr(this->GetOct()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -4326,7 +4326,7 @@ bool AttOctave::WriteOctave(pugi::xml_node element)
 
 bool AttOctave::HasOct() const
 {
-    return (m_oct != 0);
+    return (m_oct != -127);
 }
 
 /* include <attoct> */
@@ -4346,14 +4346,14 @@ AttOctaveDefault::~AttOctaveDefault()
 
 void AttOctaveDefault::ResetOctaveDefault()
 {
-    m_octDefault = 0;
+    m_octDefault = -127;
 }
 
 bool AttOctaveDefault::ReadOctaveDefault(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("oct.default")) {
-        this->SetOctDefault(StrToInt(element.attribute("oct.default").value()));
+        this->SetOctDefault(StrToOctave(element.attribute("oct.default").value()));
         element.remove_attribute("oct.default");
         hasAttribute = true;
     }
@@ -4364,7 +4364,7 @@ bool AttOctaveDefault::WriteOctaveDefault(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasOctDefault()) {
-        element.append_attribute("oct.default") = IntToStr(this->GetOctDefault()).c_str();
+        element.append_attribute("oct.default") = OctaveToStr(this->GetOctDefault()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -4372,7 +4372,7 @@ bool AttOctaveDefault::WriteOctaveDefault(pugi::xml_node element)
 
 bool AttOctaveDefault::HasOctDefault() const
 {
-    return (m_octDefault != 0);
+    return (m_octDefault != -127);
 }
 
 /* include <attoct.default> */
@@ -5995,7 +5995,7 @@ AttStaffLocPitched::~AttStaffLocPitched()
 void AttStaffLocPitched::ResetStaffLocPitched()
 {
     m_ploc = PITCHNAME_NONE;
-    m_oloc = 0;
+    m_oloc = -127;
 }
 
 bool AttStaffLocPitched::ReadStaffLocPitched(pugi::xml_node element)
@@ -6007,7 +6007,7 @@ bool AttStaffLocPitched::ReadStaffLocPitched(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("oloc")) {
-        this->SetOloc(StrToInt(element.attribute("oloc").value()));
+        this->SetOloc(StrToOctave(element.attribute("oloc").value()));
         element.remove_attribute("oloc");
         hasAttribute = true;
     }
@@ -6022,7 +6022,7 @@ bool AttStaffLocPitched::WriteStaffLocPitched(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasOloc()) {
-        element.append_attribute("oloc") = IntToStr(this->GetOloc()).c_str();
+        element.append_attribute("oloc") = OctaveToStr(this->GetOloc()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -6035,7 +6035,7 @@ bool AttStaffLocPitched::HasPloc() const
 
 bool AttStaffLocPitched::HasOloc() const
 {
-    return (m_oloc != 0);
+    return (m_oloc != -127);
 }
 
 /* include <attoloc> */
@@ -8667,7 +8667,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttOctave *att = dynamic_cast<AttOctave *>(element);
         assert(att);
         if (attrType == "oct") {
-            att->SetOct(att->StrToInt(attrValue));
+            att->SetOct(att->StrToOctave(attrValue));
             return true;
         }
     }
@@ -8675,7 +8675,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttOctaveDefault *att = dynamic_cast<AttOctaveDefault *>(element);
         assert(att);
         if (attrType == "oct.default") {
-            att->SetOctDefault(att->StrToInt(attrValue));
+            att->SetOctDefault(att->StrToOctave(attrValue));
             return true;
         }
     }
@@ -8999,7 +8999,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "oloc") {
-            att->SetOloc(att->StrToInt(attrValue));
+            att->SetOloc(att->StrToOctave(attrValue));
             return true;
         }
     }
@@ -10050,14 +10050,14 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttOctave *att = dynamic_cast<const AttOctave *>(element);
         assert(att);
         if (att->HasOct()) {
-            attributes->push_back(std::make_pair("oct", att->IntToStr(att->GetOct())));
+            attributes->push_back(std::make_pair("oct", att->OctaveToStr(att->GetOct())));
         }
     }
     if (element->HasAttClass(ATT_OCTAVEDEFAULT)) {
         const AttOctaveDefault *att = dynamic_cast<const AttOctaveDefault *>(element);
         assert(att);
         if (att->HasOctDefault()) {
-            attributes->push_back(std::make_pair("oct.default", att->IntToStr(att->GetOctDefault())));
+            attributes->push_back(std::make_pair("oct.default", att->OctaveToStr(att->GetOctDefault())));
         }
     }
     if (element->HasAttClass(ATT_OCTAVEDISPLACEMENT)) {
@@ -10328,7 +10328,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("ploc", att->PitchnameToStr(att->GetPloc())));
         }
         if (att->HasOloc()) {
-            attributes->push_back(std::make_pair("oloc", att->IntToStr(att->GetOloc())));
+            attributes->push_back(std::make_pair("oloc", att->OctaveToStr(att->GetOloc())));
         }
     }
     if (element->HasAttClass(ATT_STARTENDID)) {
