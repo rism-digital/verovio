@@ -54,9 +54,11 @@ bindings/qt/build-demo
 # MacOS
 .DS_Store
 
+# VsCode
+.vscode 
+
 # Output files
 tools/*.svg
-output.svg
-output.mei
+tools/#.mei
 index.js
 emscripten/npm-dev/node_modules
