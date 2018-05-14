@@ -54,6 +54,47 @@ void View::DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, 
     dc->EndGraphic(element, this);
 }
 
+void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, wchar_t fontNo, int xOffset, int yOffset) {
+    assert(dc);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    Nc *nc = dynamic_cast<Nc *>(element);
+    assert(nc);
+
+    dc->StartGraphic(element, "", element->GetUuid()); 
+    
+    /******************************************************************/
+    // Draw the children
+    DrawLayerChildren(dc, nc, layer, staff, measure);
+
+    Clef *clef = layer->GetClef(element);
+    int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    int staffLineNumber = staff->m_drawingLines;
+    int clefLine = clef->GetLine();
+
+    int noteY = element->GetDrawingY();
+    int noteX = element->GetDrawingX();
+
+    int clefYPosition = noteY - ( staffSize * (staffLineNumber - clefLine) );
+    int pitchOffset;
+    int octaveOffset = (nc->GetOct() - 3) * ( (staffSize / 2) * 7);
+
+    if(clef->GetShape() == CLEFSHAPE_C){
+        pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
+    }
+    else if(clef->GetShape() == CLEFSHAPE_F){
+        pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
+    }
+
+    int yValue = clefYPosition + pitchOffset + octaveOffset;
+
+    DrawSmuflCode(dc, noteX + xOffset, yValue + yOffset, fontNo, staff->m_drawingStaffSize, false, true);
+
+    dc->EndGraphic(element, this);
+}
+
 void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
@@ -63,8 +104,6 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     Neume *neume = dynamic_cast<Neume *>(element);
     assert(neume);
-
-
 
     /******************************************************************/
     // initialization
@@ -192,35 +231,6 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     dc->EndGraphic(element, this);
-}
-
-void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, wchar_t fontNo, int xOffset, int yOffset) {
-    Nc *nc = dynamic_cast<Nc *>(element);
-    assert(nc);
-
-    Clef *clef = layer->GetClef(element);
-    int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    int staffLineNumber = staff->m_drawingLines;
-    int clefLine = clef->GetLine();
-
-    int noteY = element->GetDrawingY();
-    int noteX = element->GetDrawingX();
-
-    int clefYPosition = noteY - ( staffSize * (staffLineNumber - clefLine) );
-    int pitchOffset;
-    int octaveOffset = (nc->GetOct() - 3) * ( (staffSize / 2) * 7);
-
-    if(clef->GetShape() == CLEFSHAPE_C){
-        pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
-    }
-    else if(clef->GetShape() == CLEFSHAPE_F){
-        pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
-    }
-
-    int yValue = clefYPosition + pitchOffset + octaveOffset;
-
-    DrawSmuflCode(dc, noteX + xOffset, yValue + yOffset, fontNo, staff->m_drawingStaffSize, false, true);
-
 }
 
 } // namespace vrv
