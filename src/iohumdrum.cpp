@@ -2664,9 +2664,9 @@ template <class ELEMENT> void HumdrumInput::setMensurationSymbol(ELEMENT *elemen
     if (metersig.find('.') != std::string::npos) {
         element->SetMensurDot(BOOLEAN_true);
     }
-    // if (metersig.find('r') != std::string::npos) {
-    //    element->SetMensurOrient(ORIENTATION_reversed);
-    //}
+    if (metersig.find('r') != std::string::npos) {
+        element->SetMensurOrient(ORIENTATION_reversed);
+    }
 }
 
 //////////////////////////////
