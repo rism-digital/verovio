@@ -31,7 +31,8 @@ class Mensur : public LayerElement,
                public AttMensuralShared,
                public AttMensurLog,
                public AttMensurVis,
-               public AttSlashCount {
+               public AttSlashCount,
+               public AttStaffLoc {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
