@@ -365,6 +365,13 @@ public:
         int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool clear = true);
 
     /**
+     * Returns all the objects matching the InterfaceComparison functor
+     * Deepness allow to limit the depth search (EditorialElements are not count)
+     */
+    void FindAllChildByInterfaceComparison(ArrayOfObjects *objects, InterfaceComparison *interfaceComparison, 
+        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool clear = true);
+
+    /**
      * Return all the objects matching the AttComparison functor and being between start and end in the tree.
      * The start and end objects are included in the result set.
      */
@@ -488,6 +495,11 @@ public:
      * Find a all Object with an AttComparison functor.
      */
     virtual int FindAllByAttComparison(FunctorParams *functorParams);
+
+    /**
+     * Find all Objects with an InterfaceComparison functor.
+     */
+    virtual int FindAllByInterfaceComparison(FunctorParams *functorParams);
 
     /**
      * Find a all Object between a start and end Object and with an AttComparison functor.

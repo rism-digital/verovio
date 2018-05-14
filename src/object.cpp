@@ -419,6 +419,17 @@ void Object::FindAllChildByAttComparison(
     this->Process(&findAllByAttComparison, &findAllByAttComparisonParams, NULL, NULL, deepness, direction);
 }
 
+void Object::FindAllChildByInterfaceComparison(
+        ArrayOfObjects *objects, InterfaceComparison *interfaceComparison, int deepness, bool direction, bool clear)
+{
+    assert(objects);
+    if (clear) objects->clear();
+
+    Functor findAllByInterfaceComparison(&Object::FindAllByInterfaceComparison);
+    FindAllByInterfaceComparisonParams findAllByInterfaceComparisonParams(interfaceComparison, objects);
+    this->Process(&findAllByInterfaceComparison, &findAllByInterfaceComparisonParams, NULL, NULL, deepness, direction);
+}
+
 void Object::FindAllChildBetween(
     ArrayOfObjects *objects, AttComparison *attComparison, Object *start, Object *end, bool clear)
 {
@@ -932,6 +943,18 @@ int Object::FindAllByAttComparison(FunctorParams *functorParams)
         params->m_elements->push_back(this);
     }
     // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::FindAllByInterfaceComparison(FunctorParams *functorParams)
+{
+    FindAllByInterfaceComparisonParams *params = dynamic_cast<FindAllByInterfaceComparisonParams *>(functorParams);
+    assert(params);
+
+    if ((*params->m_interfaceComparison)(this)) {
+        params->m_elements->push_back(this);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
