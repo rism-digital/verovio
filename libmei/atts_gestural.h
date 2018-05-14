@@ -240,8 +240,8 @@ public:
     noteGes_EXTREMIS GetExtremis() const { return m_extremis; }
     bool HasExtremis() const;
     //
-    void SetOctGes(char octGes_) { m_octGes = octGes_; }
-    char GetOctGes() const { return m_octGes; }
+    void SetOctGes(data_OCTAVE octGes_) { m_octGes = octGes_; }
+    data_OCTAVE GetOctGes() const { return m_octGes; }
     bool HasOctGes() const;
     //
     void SetPnameGes(data_PITCHNAME pnameGes_) { m_pnameGes = pnameGes_; }
@@ -257,7 +257,7 @@ private:
     /** Indicates an extreme, indefinite performed pitch. **/
     noteGes_EXTREMIS m_extremis;
     /** Records performed octave information that differs from the written value. **/
-    char m_octGes;
+    data_OCTAVE m_octGes;
     /** Contains a performed pitch name that differs from the written value. **/
     data_PITCHNAME m_pnameGes;
     /** Holds a pitch-to-number mapping, a base-40 or MIDI note number, for example. **/
