@@ -21,6 +21,7 @@
 #include "functorparams.h"
 #include "glyph.h"
 #include "layer.h"
+#include "nc.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -88,6 +89,44 @@ bool Neume::IsLastInNeume(LayerElement *element)
     // this is the last one
     if (position == (size - 1)) return true;
     return false;
+}
+
+bool Neume::GenerateChildMelodic()
+{
+    ArrayOfObjects children;
+    AttComparison ac(NC);
+    this->FindAllChildByAttComparison(&children, &ac);
+
+    auto iter = children.begin();
+    Nc *head = dynamic_cast<Nc *>(*iter);
+    if (head == nullptr) return false;
+    iter++;
+
+    for (; iter != children.end(); iter++)
+    {
+        Nc *current = dynamic_cast<Nc *>(*iter);
+        assert(current);
+        std::string intmValue;
+
+        int pitchDifference = current->PitchDifferenceTo(head);
+        if (pitchDifference > 0)
+        {
+            intmValue = "u";
+        }
+        else if (pitchDifference < 0)
+        {
+            intmValue = "d";
+        }
+        else
+        {
+            intmValue = "s";
+        }
+
+        current->SetIntm(intmValue);
+        head = current;
+    }
+
+    return true;
 }
 
 } // namespace vrv

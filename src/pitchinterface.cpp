@@ -103,4 +103,15 @@ void PitchInterface::AdjustPitchByOffset(int pitchOffset)
     this->SetOct(oct);
 }
 
+int PitchInterface::PitchDifferenceTo(PitchInterface *pi)
+{
+    assert(pi);
+    int pitchDifference = 0;
+    
+    pitchDifference = this->GetPname() - pi->GetPname();
+    pitchDifference += 7 * (this->GetOct() - pi->GetOct());
+
+    return pitchDifference;
+}
+
 } // namespace vrv
