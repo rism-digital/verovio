@@ -166,7 +166,7 @@ std::wstring View::IntToSmuflFigures(unsigned short number, int offset)
     std::wstring str = stream.str();
 
     int i;
-    for (i = 0; i < (int)str.size(); i++) {
+    for (i = 0; i < (int)str.size(); ++i) {
         str[i] += offset - 48;
     }
     return str;

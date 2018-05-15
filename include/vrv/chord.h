@@ -130,6 +130,11 @@ public:
      */
     bool IsVisible();
 
+    /**
+     * Return true if the chord has at least one note with a @dots > 0
+     */
+    bool HasNoteWithDots();
+
     //----------//
     // Functors //
     //----------//

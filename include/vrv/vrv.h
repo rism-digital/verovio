@@ -43,7 +43,7 @@ void DisableLog();
 #ifdef EMSCRIPTEN
 enum consoleLogLevel { CONSOLE_LOG = 0, CONSOLE_INFO, CONSOLE_WARN, CONSOLE_ERROR };
 extern std::vector<std::string> logBuffer;
-bool LogBufferContains(std::string s);
+bool LogBufferContains(const std::string &s);
 void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel level);
 #endif
 

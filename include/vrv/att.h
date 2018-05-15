@@ -148,6 +148,9 @@ public:
     std::string MidivalueToStr(data_MIDIVALUE data) const { return IntToStr(data); }
     data_MIDIVALUE StrToMidivalue(std::string value) const { return StrToInt(value); }
 
+    std::string OctaveToStr(data_OCTAVE data) const { return IntToStr(data); }
+    data_OCTAVE StrToOctave(std::string value) const { return StrToInt(value); }
+    
     std::string OctaveDisToStr(data_OCTAVE_DIS data) const;
     data_OCTAVE_DIS StrToOctaveDis(std::string value, bool logWarning = true) const;
 

@@ -155,6 +155,12 @@ public:
     int GetInnerCenterX() const;
 
     /**
+     * Return the right overlow of the control events in the measure.
+     * Takes into account Dir, Dynam, and Tempo.
+     */
+    int GetDrawingOverflow();
+
+    /**
      * @name Setter and getter of the drawing scoreDef
      */
     ///@{
@@ -199,6 +205,16 @@ public:
      * See Object::ConvertToPageBased
      */
     virtual int ConvertToPageBased(FunctorParams *functorParams);
+
+    /**
+     * See Object::ConvertToCastOffMensural
+     */
+    virtual int ConvertToCastOffMensural(FunctorParams *params);
+
+    /**
+     * See Object::ConvertToUnCastOffMensural
+     */
+    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
 
     /**
      * See Object::Save
@@ -260,6 +276,11 @@ public:
     virtual int AdjustGraceXPos(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustXOverflow
+     */
+    virtual int AdjustXOverflow(FunctorParams *functorParams);
+
+    /**
      * See Object::AdjustXPos
      */
     virtual int AdjustXPos(FunctorParams *functorParams);
@@ -305,9 +326,12 @@ public:
     virtual int PrepareCrossStaff(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareFloatingGrps
+     * @name See Object::PrepareFloatingGrps
      */
+    ///@{
     virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+    virtual int PrepareFloatingGrpsEnd(FunctorParams *functoParams);
+    ///@}
 
     /**
      * See Object::PrepareTimePointingEnd

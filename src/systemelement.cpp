@@ -58,6 +58,17 @@ int SystemElement::ConvertToPageBased(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int SystemElement::ConvertToCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    assert(params->m_targetSystem);
+    this->MoveItselfTo(params->m_targetSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int SystemElement::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);

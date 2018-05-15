@@ -27,7 +27,7 @@ namespace vrv {
 #define VERSION_MINOR 0
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
-#define VERSION_DEV false
+#define VERSION_DEV true
 
 enum MEIVersion { MEI_UNDEFINED = 0, MEI_2013, MEI_3_0_0, MEI_4_0_0 };
 
@@ -48,13 +48,14 @@ enum ClassId {
     DEVICE_CONTEXT, // Should not be instanciated as is,
     FLOATING_OBJECT,
     FLOATING_POSITIONER,
-    //
+    // Ids for ungrouped objects
     ALIGNMENT,
     ALIGNMENT_REFERENCE,
     CLEF_ATTR,
     DOC,
     FB,
     GRACE_ALIGNER,
+    INSTRDEF,
     KEYSIG_ATTR,
     LABEL,
     LABELABBR,
@@ -89,6 +90,7 @@ enum ClassId {
     LEM,
     ORIG,
     RDG,
+    REF,
     REG,
     RESTORE,
     SIC,
@@ -122,6 +124,7 @@ enum ClassId {
     HAIRPIN,
     HARM,
     MORDENT,
+    MNUM,
     OCTAVE,
     PEDAL,
     SLUR,
@@ -222,6 +225,7 @@ class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
 class FloatingPositioner;
+class GraceAligner;
 class InterfaceComparison;
 class LayerElement;
 class LedgerLine;
@@ -272,6 +276,8 @@ typedef std::vector<TextElement *> ArrayOfTextElements;
 typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
 
 typedef std::map<std::string, Option *> MapOfStrOptions;
+
+typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
 
 //----------------------------------------------------------------------------
 // Global defines
@@ -374,6 +380,12 @@ enum SMuFLGlyphAnchor {
 };
 
 //----------------------------------------------------------------------------
+// Spanning types for control events
+//----------------------------------------------------------------------------
+
+enum { SPANNING_START_END = 0, SPANNING_START, SPANNING_END, SPANNING_MIDDLE };
+
+//----------------------------------------------------------------------------
 // Types for layer element
 //----------------------------------------------------------------------------
 
@@ -383,16 +395,6 @@ enum SMuFLGlyphAnchor {
  */
 
 enum ElementScoreDefRole { NONE = 0, SYSTEM_SCOREDEF, INTERMEDIATE_SCOREDEF, CAUTIONARY_SCOREDEF };
-
-//----------------------------------------------------------------------------
-// Drawing groups (reserved values)
-//----------------------------------------------------------------------------
-
-/**
- * We need fix values for types that are all groupes together
- */
-
-enum { DRAWING_GRP_NONE = 0, DRAWING_GRP_VERSE, DRAWING_GRP_HARM, DRAWING_GRP_OTHER };
 
 //----------------------------------------------------------------------------
 // Artic part types

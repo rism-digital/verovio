@@ -40,18 +40,18 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
 {
     pugi::xpath_node node;
     pugi::xpath_node_set nodeSet;
-    pugi::xpath_node_set::const_iterator iter;
     data_FONTSIZE fs;
 
-    // Title
-    nodeSet = header.select_nodes("//fileDesc/titleStmt/title");
+    // title
+    nodeSet = header.select_nodes("//fileDesc/titleStmt/title[text()]");
     if (!nodeSet.empty()) {
         Rend *titleRend = new Rend();
         titleRend->SetHalign(HORIZONTALALIGNMENT_center);
         titleRend->SetValign(VERTICALALIGNMENT_middle);
-        for (iter = nodeSet.begin(); iter != nodeSet.end(); iter++) {
+        titleRend->SetLabel("title");
+        for (auto titleNode : nodeSet) {
             Rend *rend = new Rend();
-            if (iter == nodeSet.begin()) {
+            if (titleNode == nodeSet.first()) {
                 fs.SetTerm(FONTSIZETERM_x_large);
                 rend->SetFontsize(fs);
             }
@@ -61,23 +61,40 @@ bool PgHead::GenerateFromMEIHeader(pugi::xml_document &header)
                 rend->SetFontsize(fs);
             }
             Text *text = new Text();
-            text->SetText(UTF8to16(iter->node().text().as_string()));
+            text->SetText(UTF8to16(titleNode.node().text().as_string()));
+            rend->SetLang(titleNode.node().attribute("xml:lang").as_string());
             rend->AddChild(text);
             titleRend->AddChild(rend);
         }
         this->AddChild(titleRend);
     }
 
-    // Composer
+    // composer
     node = header.select_single_node("//fileDesc/titleStmt/respStmt/persName[@role=\"composer\"]");
     if (node) {
         Rend *composerRend = new Rend();
         composerRend->SetHalign(HORIZONTALALIGNMENT_right);
         composerRend->SetValign(VERTICALALIGNMENT_bottom);
+        composerRend->SetLabel("composer");
         Text *composerText = new Text();
         composerText->SetText(UTF8to16(node.node().text().as_string()));
+        composerRend->SetLang(node.node().attribute("xml:lang").as_string());
         composerRend->AddChild(composerText);
         this->AddChild(composerRend);
+    }
+
+    // lyricist
+    node = header.select_single_node("//fileDesc/titleStmt/respStmt/persName[@role=\"lyricist\"]");
+    if (node) {
+        Rend *lyricistRend = new Rend();
+        lyricistRend->SetHalign(HORIZONTALALIGNMENT_left);
+        lyricistRend->SetValign(VERTICALALIGNMENT_bottom);
+        lyricistRend->SetLabel("lyricist");
+        Text *lyricistText = new Text();
+        lyricistText->SetText(UTF8to16(node.node().text().as_string()));
+        lyricistRend->SetLang(node.node().attribute("xml:lang").as_string());
+        lyricistRend->AddChild(lyricistText);
+        this->AddChild(lyricistRend);
     }
 
     return true;

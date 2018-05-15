@@ -249,6 +249,63 @@ private:
     static int s_deCasteljau[4][4];
 };
 
+//----------------------------------------------------------------------------
+// SegmentedLine
+//----------------------------------------------------------------------------
+
+/**
+ */
+class SegmentedLine {
+public:
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    SegmentedLine(int start, int end);
+    virtual ~SegmentedLine(){};
+    ///@}
+
+    /**
+     * Check if the segmented line is empty
+     */
+    bool IsEmpty() { return (m_segments.empty()); }
+
+    /**
+     * Check if the line is one single segment
+     */
+    bool IsUnsegmented() { return (m_segments.size() == 1); }
+
+    /**
+     * The number of segments
+     */
+    int GetSegmentCount() { return (int)m_segments.size(); }
+
+    /**
+     * Get the start and end of a segment
+     */
+    void GetStartEnd(int &start, int &end, int idx);
+
+    /**
+     * Add a gap in the line
+     */
+    void AddGap(int start, int end);
+
+protected:
+    //
+private:
+    //
+public:
+    //
+protected:
+    //
+private:
+    /**
+     * An vector of line segments
+     */
+    std::vector<std::pair<int, int> > m_segments;
+};
+
 } // namespace vrv
 
 #endif

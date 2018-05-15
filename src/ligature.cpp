@@ -85,7 +85,7 @@ void Ligature::FilterList(ListOfObjects *childList)
             Note *n = dynamic_cast<Note *>(currentElement);
 
             if (n) {
-                iter++;
+                ++iter;
             }
             else {
                 // if it is not a note, drop it
@@ -97,26 +97,6 @@ void Ligature::FilterList(ListOfObjects *childList)
     iter = childList->begin();
 
     this->ClearClusters();
-
-    Note *curNote, *lastNote = dynamic_cast<Note *>(*iter);
-    assert(lastNote);
-    int curPitch, lastPitch = lastNote->GetDiatonicPitch();
-
-    iter++;
-
-    while (iter != childList->end()) {
-        curNote = dynamic_cast<Note *>(*iter);
-        assert(curNote);
-        curPitch = curNote->GetDiatonicPitch();
-
-        if (curPitch - lastPitch == 1) {
-        }
-
-        lastNote = curNote;
-        lastPitch = curPitch;
-
-        iter++;
-    }
 }
 
 int Ligature::PositionInLigature(Note *note)

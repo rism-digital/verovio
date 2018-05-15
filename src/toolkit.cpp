@@ -155,7 +155,7 @@ bool Toolkit::SetFormat(std::string const &informat)
     return true;
 }
 
-FileFormat Toolkit::IdentifyInputFormat(const string &data)
+FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
 {
 #ifdef MUSICXML_DEFAULT_HUMDRUM
     FileFormat musicxmlDefault = MUSICXMLHUM;
@@ -178,7 +178,7 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
     }
     if ((unsigned char)data[0] == 0xff || (unsigned char)data[0] == 0xfe) {
         // Handle UTF-16 content here later.
-        cerr << "Warning: Cannot yet auto-detect format of UTF-16 data files." << endl;
+        std::cerr << "Warning: Cannot yet auto-detect format of UTF-16 data files." << std::endl;
         return UNKNOWN;
     }
     if (data[0] == '<') {
@@ -187,46 +187,46 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
         // <score-partwise> == root node for part-wise organization of MusicXML data
         // <score-timewise> == root node for time-wise organization of MusicXML data
         // <opus> == root node for multi-movement/work organization of MusicXML data
-        string initial = data.substr(0, searchLimit);
+        std::string initial = data.substr(0, searchLimit);
 
-        if (initial.find("<mei ") != string::npos) {
+        if (initial.find("<mei ") != std::string::npos) {
             return MEI;
         }
-        if (initial.find("<mei>") != string::npos) {
+        if (initial.find("<mei>") != std::string::npos) {
             return MEI;
         }
-        if (initial.find("<music>") != string::npos) {
+        if (initial.find("<music>") != std::string::npos) {
             return MEI;
         }
-        if (initial.find("<music ") != string::npos) {
+        if (initial.find("<music ") != std::string::npos) {
             return MEI;
         }
-        if (initial.find("<pages>") != string::npos) {
+        if (initial.find("<pages>") != std::string::npos) {
             return MEI;
         }
-        if (initial.find("<pages ") != string::npos) {
+        if (initial.find("<pages ") != std::string::npos) {
             return MEI;
         }
-        if (initial.find("<score-partwise>") != string::npos) {
+        if (initial.find("<score-partwise>") != std::string::npos) {
             return musicxmlDefault;
         }
-        if (initial.find("<score-timewise>") != string::npos) {
+        if (initial.find("<score-timewise>") != std::string::npos) {
             return musicxmlDefault;
         }
-        if (initial.find("<opus>") != string::npos) {
+        if (initial.find("<opus>") != std::string::npos) {
             return musicxmlDefault;
         }
-        if (initial.find("<score-partwise ") != string::npos) {
+        if (initial.find("<score-partwise ") != std::string::npos) {
             return musicxmlDefault;
         }
-        if (initial.find("<score-timewise ") != string::npos) {
+        if (initial.find("<score-timewise ") != std::string::npos) {
             return musicxmlDefault;
         }
-        if (initial.find("<opus ") != string::npos) {
+        if (initial.find("<opus ") != std::string::npos) {
             return musicxmlDefault;
         }
 
-        cerr << "Warning: Trying to load unknown XML data which cannot be identified." << endl;
+        std::cerr << "Warning: Trying to load unknown XML data which cannot be identified." << std::endl;
         return UNKNOWN;
     }
 
@@ -251,7 +251,7 @@ bool Toolkit::LoadFile(const std::string &filename)
     in.clear();
     in.seekg(0, std::ios::beg);
 
-    // read the file into the string:
+    // read the file into the std::string:
     std::string content(fileSize, 0);
     in.read(&content[0], fileSize);
 
@@ -310,7 +310,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
 
 bool Toolkit::LoadData(const std::string &data)
 {
-    string newData;
+    std::string newData;
     FileInputStream *input = NULL;
 
     auto inputFormat = m_format;
@@ -484,7 +484,15 @@ bool Toolkit::LoadData(const std::string &data)
         m_doc.GenerateHeaderAndFooter();
     }
 
+    // generate missing measure numbers
+    m_doc.GenerateMeasureNumbers();
+
     m_doc.PrepareDrawing();
+
+    // Convert pseudo-measures into distinct segments based on barLine elements
+    if (m_doc.IsMensuralMusicOnly()) {
+        m_doc.ConvertToCastOffMensuralDoc();
+    }
 
     // Do the layout? this depends on the options and the file. PAE and
     // DARMS have no layout information. MEI files _can_ have it, but it
@@ -539,7 +547,7 @@ std::string Toolkit::GetOptions(bool defaultValues) const
 
     const MapOfStrOptions *params = m_options->GetItems();
     MapOfStrOptions::const_iterator iter;
-    for (iter = params->begin(); iter != params->end(); iter++) {
+    for (iter = params->begin(); iter != params->end(); ++iter) {
         const OptionDbl *optDbl = dynamic_cast<const OptionDbl *>(iter->second);
         const OptionInt *optInt = dynamic_cast<const OptionInt *>(iter->second);
         const OptionBool *optBool = dynamic_cast<const OptionBool *>(iter->second);
@@ -560,10 +568,10 @@ std::string Toolkit::GetOptions(bool defaultValues) const
             o << iter->first << boolValue;
         }
         else if (optArray) {
-            vector<string> strValues = (defaultValues) ? optArray->GetDefault() : optArray->GetValue();
-            vector<string>::iterator strIter;
+            std::vector<std::string> strValues = (defaultValues) ? optArray->GetDefault() : optArray->GetValue();
+            std::vector<std::string>::iterator strIter;
             jsonxx::Array values;
-            for (strIter = strValues.begin(); strIter != strValues.end(); strIter++) {
+            for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
                 values << (*strIter);
             }
             o << iter->first << values;
@@ -586,7 +594,7 @@ std::string Toolkit::GetAvailableOptions() const
     std::vector<OptionGrp *> *grp = m_options->GetGrps();
     std::vector<OptionGrp *>::iterator grpIter;
 
-    for (grpIter = grp->begin(); grpIter != grp->end(); grpIter++) {
+    for (grpIter = grp->begin(); grpIter != grp->end(); ++grpIter) {
 
         jsonxx::Object grp;
         grp << "name" << (*grpIter)->GetLabel();
@@ -596,7 +604,7 @@ std::string Toolkit::GetAvailableOptions() const
         const std::vector<Option *> *options = (*grpIter)->GetOptions();
         std::vector<Option *>::const_iterator iter;
 
-        for (iter = options->begin(); iter != options->end(); iter++) {
+        for (iter = options->begin(); iter != options->end(); ++iter) {
 
             jsonxx::Object opt;
             opt << "title" << (*iter)->GetTitle();
@@ -636,28 +644,28 @@ std::string Toolkit::GetAvailableOptions() const
             }
             else if (optString) {
                 opt << "type"
-                    << "string";
+                    << "std::string";
                 opt << "default" << optString->GetDefault();
             }
             else if (optArray) {
                 opt << "type"
                     << "array";
-                vector<string> strValues = optArray->GetDefault();
-                vector<string>::iterator strIter;
+                std::vector<std::string> strValues = optArray->GetDefault();
+                std::vector<std::string>::iterator strIter;
                 jsonxx::Array values;
-                for (strIter = strValues.begin(); strIter != strValues.end(); strIter++) {
+                for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
                     values << (*strIter);
                 }
                 opt << "default" << values;
             }
             else if (optIntMap) {
                 opt << "type"
-                    << "string-list";
+                    << "std::string-list";
                 opt << "default" << optIntMap->GetDefaultStrValue();
-                vector<string> strValues = optIntMap->GetStrValues(false);
-                vector<string>::iterator strIter;
+                std::vector<std::string> strValues = optIntMap->GetStrValues(false);
+                std::vector<std::string>::iterator strIter;
                 jsonxx::Array values;
-                for (strIter = strValues.begin(); strIter != strValues.end(); strIter++) {
+                for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
                     values << (*strIter);
                 }
                 opt << "values" << values;
@@ -681,13 +689,13 @@ bool Toolkit::SetOptions(const std::string &json_options)
 
     // Read JSON options
     if (!json.parse(json_options)) {
-        LogError("Can not parse JSON string.");
+        LogError("Can not parse JSON std::string.");
         return false;
     }
 
     std::map<std::string, jsonxx::Value *> jsonMap = json.kv_map();
     std::map<std::string, jsonxx::Value *>::const_iterator iter;
-    for (iter = jsonMap.begin(); iter != jsonMap.end(); iter++) {
+    for (iter = jsonMap.begin(); iter != jsonMap.end(); ++iter) {
         if (m_options->GetItems()->count(iter->first) == 0) {
             // Base options
             if (iter->first == "inputFormat") {
@@ -713,7 +721,7 @@ bool Toolkit::SetOptions(const std::string &json_options)
                 Option *opt = m_options->GetItems()->at("appXPathQuery");
                 assert(opt);
                 int i;
-                for (i = 0; i < (int)values.size(); i++) {
+                for (i = 0; i < (int)values.size(); ++i) {
                     if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
                 }
                 opt->SetValueArray(queries);
@@ -745,7 +753,7 @@ bool Toolkit::SetOptions(const std::string &json_options)
                 Option *opt = m_options->GetItems()->at("choiceXPathQuery");
                 assert(opt);
                 int i;
-                for (i = 0; i < (int)values.size(); i++) {
+                for (i = 0; i < (int)values.size(); ++i) {
                     if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
                 }
                 opt->SetValueArray(queries);
@@ -805,7 +813,7 @@ bool Toolkit::SetOptions(const std::string &json_options)
             jsonxx::Array values = json.get<jsonxx::Array>(iter->first);
             std::vector<std::string> strValues;
             int i;
-            for (i = 0; i < (int)values.size(); i++) {
+            for (i = 0; i < (int)values.size(); ++i) {
                 if (values.has<jsonxx::String>(i)) strValues.push_back(values.get<jsonxx::String>(i));
                 // LogDebug("String: %s", values.get<jsonxx::String>(i).c_str());
             }
@@ -852,13 +860,13 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
         return o.json();
     }
 
-    // Fill the attribute array (pair of string) by looking at attributes for all available MEI modules
+    // Fill the attribute array (pair of std::string) by looking at attributes for all available MEI modules
     ArrayOfStrAttr attributes;
     element->GetAttributes(&attributes);
 
     // Fill the JSON object
     ArrayOfStrAttr::iterator iter;
-    for (iter = attributes.begin(); iter != attributes.end(); iter++) {
+    for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
         o << (*iter).first << (*iter).second;
         // LogMessage("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str());
     }
@@ -873,7 +881,7 @@ bool Toolkit::Edit(const std::string &json_editorAction)
 
     // Read JSON actions
     if (!json.parse(json_editorAction)) {
-        LogError("Can not parse JSON string.");
+        LogError("Can not parse JSON std::string.");
         return false;
     }
 
@@ -916,7 +924,7 @@ std::string Toolkit::GetLog()
 #ifdef USE_EMSCRIPTEN
     std::string str;
     std::vector<std::string>::iterator iter;
-    for (iter = logBuffer.begin(); iter != logBuffer.end(); iter++) {
+    for (iter = logBuffer.begin(); iter != logBuffer.end(); ++iter) {
         str += (*iter);
     }
     return str;
@@ -1042,19 +1050,19 @@ bool Toolkit::GetHumdrumFile(const std::string &filename)
     return true;
 }
 
-void Toolkit::GetHumdrum(ostream &output)
+void Toolkit::GetHumdrum(std::ostream &output)
 {
     output << GetHumdrumBuffer();
 }
 
 std::string Toolkit::RenderToMIDI()
 {
-    MidiFile outputfile;
+    smf::MidiFile outputfile;
     outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
     outputfile.sortTracks();
 
-    stringstream strstrem;
+    std::stringstream strstrem;
     outputfile.write(strstrem);
     std::string outputstr = Base64Encode(
         reinterpret_cast<const unsigned char *>(strstrem.str().c_str()), (unsigned int)strstrem.str().length());
@@ -1101,7 +1109,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     // Fill the JSON object
     ArrayOfObjects::iterator iter;
-    for (iter = notes.begin(); iter != notes.end(); iter++) {
+    for (iter = notes.begin(); iter != notes.end(); ++iter) {
         a << (*iter)->GetUuid();
     }
     o << "notes" << a;
@@ -1112,7 +1120,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
 bool Toolkit::RenderToMIDIFile(const std::string &filename)
 {
-    MidiFile outputfile;
+    smf::MidiFile outputfile;
     outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
     outputfile.sortTracks();
@@ -1188,7 +1196,7 @@ void Toolkit::SetHumdrumBuffer(const char *data)
     file.readString(data);
     // apply Humdrum tools if there are any filters in the file.
     if (file.hasFilters()) {
-        string output;
+        std::string output;
         hum::Tool_filter filter;
         filter.run(file);
         if (filter.hasHumdrumText()) {

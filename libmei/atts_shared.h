@@ -241,7 +241,7 @@ public:
     ///@}
 
 private:
-    /** Records the number of augmentation dots required by a dotted duration. **/
+    /** Records the number of augmentation dots required by a written dotted duration. **/
     int m_dots;
 
     /* include <attdots> */
@@ -2909,8 +2909,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMm(std::string mm_) { m_mm = mm_; }
-    std::string GetMm() const { return m_mm; }
+    void SetMm(int mm_) { m_mm = mm_; }
+    int GetMm() const { return m_mm; }
     bool HasMm() const;
     //
     void SetMmUnit(data_DURATION mmUnit_) { m_mmUnit = mmUnit_; }
@@ -2930,7 +2930,7 @@ private:
      * In MIDI, a beat is always defined as a quarter note, *not the numerator of the
      * time signature or the metronomic indication*.
      **/
-    std::string m_mm;
+    int m_mm;
     /** Captures the metronomic unit. **/
     data_DURATION m_mmUnit;
     /** Records the number of augmentation dots required by a dotted metronome unit. **/
@@ -3271,14 +3271,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOct(char oct_) { m_oct = oct_; }
-    char GetOct() const { return m_oct; }
+    void SetOct(data_OCTAVE oct_) { m_oct = oct_; }
+    data_OCTAVE GetOct() const { return m_oct; }
     bool HasOct() const;
     ///@}
 
 private:
     /** Captures written octave information. **/
-    char m_oct;
+    data_OCTAVE m_oct;
 
     /* include <attoct> */
 };
@@ -3307,8 +3307,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOctDefault(char octDefault_) { m_octDefault = octDefault_; }
-    char GetOctDefault() const { return m_octDefault; }
+    void SetOctDefault(data_OCTAVE octDefault_) { m_octDefault = octDefault_; }
+    data_OCTAVE GetOctDefault() const { return m_octDefault; }
     bool HasOctDefault() const;
     ///@}
 
@@ -3318,7 +3318,7 @@ private:
      * chord, etc.
      * in a measure does not have an octave value specified.
      **/
-    char m_octDefault;
+    data_OCTAVE m_octDefault;
 
     /* include <attoct.default> */
 };
@@ -4558,8 +4558,8 @@ public:
     data_PITCHNAME GetPloc() const { return m_ploc; }
     bool HasPloc() const;
     //
-    void SetOloc(char oloc_) { m_oloc = oloc_; }
-    char GetOloc() const { return m_oloc; }
+    void SetOloc(data_OCTAVE oloc_) { m_oloc = oloc_; }
+    data_OCTAVE GetOloc() const { return m_oloc; }
     bool HasOloc() const;
     ///@}
 
@@ -4567,7 +4567,7 @@ private:
     /** Captures staff location in terms of written pitch name. **/
     data_PITCHNAME m_ploc;
     /** Records staff location in terms of written octave. **/
-    char m_oloc;
+    data_OCTAVE m_oloc;
 
     /* include <attoloc> */
 };
@@ -5137,8 +5137,8 @@ public:
 
 private:
     /**
-     * Encodes the onset time in terms of musical time, i.e.,
-     * beats[.fractional_beat_part].
+     * Encodes the onset time in terms of musical time, i.e., beats[.fractional beat
+     * part], as expressed in the written time signature.
      **/
     double m_tstamp;
 
@@ -5176,8 +5176,8 @@ public:
 
 private:
     /**
-     * Encodes the ending point of an event in terms of musical time, i.e., a count of
-     * measures plus a beat location.
+     * Encodes the ending point of an event, i.e., a count of measures plus a beat
+     * location in the ending measure.
      **/
     data_MEASUREBEAT m_tstamp2;
 
@@ -5413,22 +5413,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttVerticalAlignment
+// AttVerticalGroup
 //----------------------------------------------------------------------------
 
-class AttVerticalAlignment : public Att {
+class AttVerticalGroup : public Att {
 public:
-    AttVerticalAlignment();
-    virtual ~AttVerticalAlignment();
+    AttVerticalGroup();
+    virtual ~AttVerticalGroup();
 
     /** Reset the default values for the attribute class **/
-    void ResetVerticalAlignment();
+    void ResetVerticalGroup();
 
     /** Read the values for the attribute class **/
-    bool ReadVerticalAlignment(pugi::xml_node element);
+    bool ReadVerticalGroup(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteVerticalAlignment(pugi::xml_node element);
+    bool WriteVerticalGroup(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -5436,14 +5436,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetVgrp(std::string vgrp_) { m_vgrp = vgrp_; }
-    std::string GetVgrp() const { return m_vgrp; }
+    void SetVgrp(int vgrp_) { m_vgrp = vgrp_; }
+    int GetVgrp() const { return m_vgrp; }
     bool HasVgrp() const;
     ///@}
 
 private:
     /** Provides a label for members of a vertically aligned group. **/
-    std::string m_vgrp;
+    int m_vgrp;
 
     /* include <attvgrp> */
 };

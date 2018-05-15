@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Feb  2 21:58:15 PST 2018
+// Last Modified: Sat May  5 00:28:09 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -10,7 +10,7 @@
 // Description:   Include file for humlib library.
 //
 /*
-Copyright (c) 2015, 2016, 2017 Craig Stuart Sapp
+Copyright (c) 2015, 2016, 2017, 2018 Craig Stuart Sapp
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 #include <cctype>
 #include <cmath>
+#include <cstring>
 #include <fstream>
 #include <functional>
 #include <iostream>
@@ -1213,6 +1214,7 @@ class HumdrumToken : public string, public HumHash {
 		const string& getDataType          (void) const;
 		bool     isDataType                (string dtype) const;
 		bool     isKern                    (void) const;
+		bool     isMens                    (void) const;
 		string   getSpineInfo              (void) const;
 		int      getTrack                  (void) const;
 		int      getSubtrack               (void) const;
@@ -2505,6 +2507,23 @@ class Convert {
 		static int     base7ToBase40        (int base7);
 		static int     base40IntervalToDiatonic(int base40interval);
 
+
+		// **mens, white mensual notation, defiend in Convert-mens.cpp
+		static bool    isMensRest           (const string& mensdata);
+		static bool    isMensNote           (const string& mensdata);
+		static bool    hasLigatureStart     (const string& mensdata);
+		static bool    hasLigatureEnd       (const string& mensdata);
+		static bool    getMensStemDirection (const string& mensdata);
+		static HumNum  mensToDuration       (const string& mensdata,
+		                                     HumNum scale = 4,
+		                                     const string& separator = " ");
+		static string  mensToRecip          (const string& mensdata,
+		                                     HumNum scale = 4,
+		                                     const string& separator = " ");
+		static HumNum  mensToDurationNoDots(const string& mensdata,
+		                                     HumNum scale = 4,
+		                                     const string& separator = " ");
+
 		// Harmony processing, defined in Convert-harmony.cpp
 		static vector<int> minorHScaleBase40(void);
 		static vector<int> majorScaleBase40 (void);
@@ -2590,6 +2609,7 @@ enum class SliceType {
 				Tempos,
 				Labels,
 				LabelAbbrs,
+				Ottavas,
 			_RegularInterpretation,
 				Exclusives,
 				Terminators,
@@ -2864,6 +2884,7 @@ class GridSlice : public vector<GridPart*> {
 		bool isGlobalComment(void)    { return m_type == SliceType::GlobalComments;   }
 		bool isGlobalLayout(void)     { return m_type == SliceType::GlobalLayouts;    }
 		bool isReferenceRecord(void)  { return m_type == SliceType::ReferenceRecords; }
+		bool isOttavaRecord(void)     { return m_type == SliceType::Ottavas; }
 		bool isInterpretationSlice(void);
 		bool isDataSlice(void);
 		bool hasSpines(void);
@@ -3303,7 +3324,7 @@ class Option_register {
 		string   getOption          (void);
 		string   getModified        (void);
 		string   getDescription     (void);
-		int      isModified         (void);
+		bool     isModified         (void);
 		char     getType            (void);
 		void     reset              (void);
 		void     setDefault         (const string& aString);
@@ -3318,7 +3339,7 @@ class Option_register {
 		string       m_description;
 		string       m_defaultOption;
 		string       m_modifiedOption;
-		int          m_modifiedQ;
+		bool         m_modifiedQ;
 		char         m_type;
 };
 
@@ -3342,7 +3363,7 @@ class Options {
 		int             getArgumentCount  (void);
 		vector<string>& getArgList        (vector<string>& output);
 		vector<string>& getArgumentList   (vector<string>& output);
-		int             getBoolean        (const string& optionName);
+		bool            getBoolean        (const string& optionName);
 		string          getCommand        (void);
 		string          getCommandLine    (void);
 		string          getDefinition     (const string& optionName);
@@ -3722,6 +3743,52 @@ class Tool_autostem : public HumTool {
 		int    Borderline    = 0;       // really used with -u option
 		int    notlongQ      = 0;       // used with -L option
 		bool   m_quit        = false;
+
+};
+
+
+class Tool_binroll : public HumTool {
+	public:
+		         Tool_binroll      (void);
+		        ~Tool_binroll      () {};
+
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     processStrand     (vector<vector<char>>& roll, HTp starting,
+		                            HTp ending);
+		void     printAnalysis     (HumdrumFile& infile,
+		                            vector<vector<char>>& roll);
+
+	private:
+		HumNum    m_duration;
+
+};
+
+
+class Tool_chord : public HumTool {
+	public:
+		         Tool_chord      (void);
+		        ~Tool_chord      () {};
+
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile, int direction);
+		void     processChord      (HTp tok, int direction);
+		void     initialize        (void);
+		void     minimizeChordPitches(vector<string>& notes, vector<pair<int,int>>& pitches);
+		void     maximizeChordPitches(vector<string>& notes, vector<pair<int,int>>& pitches);
+
+	private:
+		int       m_direction = 0;
+		int       m_spine     = -1;
+		int       m_primary   = 0;
 
 };
 
@@ -4809,11 +4876,17 @@ class Tool_musicxml2hum : public HumTool {
 		void insertSingleMeasure(HumdrumFile& outfile);
 		void cleanupMeasures   (HumdrumFile& outfile,
 		                        vector<HumdrumLine*> measures);
+		void processPrintElement(GridMeasure* outdata, xml_node element, HumNum timestamp);
 
 		void addClefLine       (GridMeasure* outdata, vector<vector<xml_node> >& clefs,
 		                        vector<MxmlPart>& partdata, HumNum nowtime);
+		void addOttavaLine     (GridMeasure* outdata, vector<vector<xml_node> >& ottavas,
+		                        vector<MxmlPart>& partdata, HumNum nowtime);
 		void insertPartClefs   (xml_node clef, GridPart& part);
+		void insertPartOttavas (xml_node ottava, GridPart& part, int partindex, int partstaffindex);
 		xml_node convertClefToHumdrum(xml_node clef, HTp& token, int& staffindex);
+		xml_node convertOttavaToHumdrum(xml_node ottava, HTp& token, int& staffindex,
+		                        int partindex, int partstaffindex);
 
 		void addTranspositionLine(GridMeasure* outdata, vector<vector<xml_node> >& transpositions,
 		                       vector<MxmlPart>& partdata, HumNum nowtime);
@@ -4872,6 +4945,7 @@ class Tool_musicxml2hum : public HumTool {
 		int m_slurabove = 0;
 		int m_slurbelow = 0;
 		char m_hasEditorial = '\0';
+		vector<vector<string>> m_last_ottava_direction;
 
 		string m_software;
 		string m_systemDecoration;

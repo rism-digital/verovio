@@ -279,6 +279,16 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         if (att->HasColor()) m_currentNode.append_attribute("fill") = att->GetColor().c_str();
     }
 
+    if (object->HasAttClass(ATT_LABELLED)) {
+        AttLabelled *att = dynamic_cast<AttLabelled *>(object);
+        assert(att);
+        if (att->HasLabel()) {
+            pugi::xml_node svgTitle = m_currentNode.prepend_child("title");
+            svgTitle.append_attribute("class") = "labelAttr";
+            svgTitle.append_child(pugi::node_pcdata).set_value(att->GetLabel().c_str());
+        }
+    }
+
     if (object->HasAttClass(ATT_LANG)) {
         AttLang *att = dynamic_cast<AttLang *>(object);
         assert(att);
@@ -366,8 +376,8 @@ void SvgDeviceContext::StartPage()
         m_currentNode.append_attribute("type") = "text/css";
         m_currentNode.append_child(pugi::node_pcdata)
             .set_value("g.page-margin{font-family:Times;} "
-                       "g.tempo{font-weight:bold;} g.dir, "
-                       "g.dynam{font-style:italic;} g.label{font-weight:normal;}");
+                       "g.tempo{font-weight:bold;} g.dir, g.dynam, "
+                       "g.mNum{font-style:italic;} g.label{font-weight:normal;}");
         m_currentNode = m_svgNodeStack.back();
     }
 
@@ -599,7 +609,7 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffs
         polygonChild.append_attribute("fill-opacity") = StringFormat("%f", currentBrush.GetOpacity()).c_str();
 
     std::string pointsString;
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; ++i) {
         pointsString += StringFormat("%d,%d ", points[i].x + xoffset, points[i].y + yoffset);
     }
     polygonChild.append_attribute("points") = pointsString.c_str();
@@ -727,8 +737,8 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     std::string fontFaceName = m_fontStack.top()->GetFaceName();
 
     pugi::xml_node textChild = AppendChild("tspan");
-    // We still add @xml::space
-    textChild.append_attribute("xml:space") = "preserve";
+    // We still add @xml::space (No: this seems to create problems with Safari)
+    // textChild.append_attribute("xml:space") = "preserve";
     // Set the @font-family only if it is not the same as in the parent node
     if (!fontFaceName.empty() && (fontFaceName != currentFaceName)) {
         textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
@@ -759,7 +769,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
     int w, h, gx, gy;
 
     // print chars one by one
-    for (unsigned int i = 0; i < text.length(); i++) {
+    for (unsigned int i = 0; i < text.length(); ++i) {
         wchar_t c = text.at(i);
         Glyph *glyph = Resources::GetGlyph(c);
         if (!glyph) {
@@ -877,7 +887,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         std::vector<SMuFLGlyphAnchor> anchors = { SMUFL_cutOutNE, SMUFL_cutOutNW, SMUFL_cutOutSE, SMUFL_cutOutSW };
         std::vector<SMuFLGlyphAnchor>::iterator iter;
 
-        for (iter = anchors.begin(); iter != anchors.end(); iter++) {
+        for (iter = anchors.begin(); iter != anchors.end(); ++iter) {
             if (object->GetBoundingBoxGlyph() != 0) {
                 Glyph *glyph = Resources::GetGlyph(object->GetBoundingBoxGlyph());
                 assert(glyph);

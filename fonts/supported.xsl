@@ -1517,7 +1517,7 @@
             <!--<glyph glyph-code="E656" smufl-name="keyboardPedalHalf"/>-->
             <!--<glyph glyph-code="E657" smufl-name="keyboardPedalUpNotch"/>-->
             <!--<glyph glyph-code="E658" smufl-name="keyboardPedalHyphen"/>-->
-            <!--<glyph glyph-code="E659" smufl-name="keyboardPedalSost"/>-->
+            <glyph glyph-code="E659" smufl-name="keyboardPedalSost"/>
             <!--<glyph glyph-code="E65A" smufl-name="keyboardPedalS"/>-->
             <!--<glyph glyph-code="E65B" smufl-name="keyboardPedalHalf2"/>-->
             <!--<glyph glyph-code="E65C" smufl-name="keyboardPedalHalf3"/>-->
@@ -2143,28 +2143,28 @@
         </medievalAndRenaissanceClefs>
         <medievalAndRenaissanceProlations>
             <description>Medieval and Renaissance prolations</description>
-            <!--<glyph glyph-code="E910" smufl-name="mensuralProlation1"/>-->
-            <!--<glyph glyph-code="E911" smufl-name="mensuralProlation2"/>-->
-            <!--<glyph glyph-code="E912" smufl-name="mensuralProlation3"/>-->
-            <!--<glyph glyph-code="E913" smufl-name="mensuralProlation4"/>-->
-            <!--<glyph glyph-code="E914" smufl-name="mensuralProlation5"/>-->
-            <!--<glyph glyph-code="E915" smufl-name="mensuralProlation6"/>-->
-            <!--<glyph glyph-code="E916" smufl-name="mensuralProlation7"/>-->
-            <!--<glyph glyph-code="E917" smufl-name="mensuralProlation8"/>-->
-            <!--<glyph glyph-code="E918" smufl-name="mensuralProlation9"/>-->
-            <!--<glyph glyph-code="E919" smufl-name="mensuralProlation10"/>-->
-            <!--<glyph glyph-code="E91A" smufl-name="mensuralProlation11"/>-->
-            <!--<glyph glyph-code="E91B" smufl-name="mensuralProportionTempusPerfectum"/>-->
-            <!--<glyph glyph-code="E91C" smufl-name="mensuralProportionProportioDupla1"/>-->
-            <!--<glyph glyph-code="E91D" smufl-name="mensuralProportionProportioDupla2"/>-->
-            <!--<glyph glyph-code="E91E" smufl-name="mensuralProportionProportioTripla"/>-->
-            <!--<glyph glyph-code="E91F" smufl-name="mensuralProportionProportioQuadrupla"/>-->
-            <!--<glyph glyph-code="E920" smufl-name="mensuralProlationCombiningDot"/>-->
-            <!--<glyph glyph-code="E921" smufl-name="mensuralProlationCombiningTwoDots"/>-->
-            <!--<glyph glyph-code="E922" smufl-name="mensuralProlationCombiningThreeDots"/>-->
-            <!--<glyph glyph-code="E923" smufl-name="mensuralProlationCombiningThreeDotsTri"/>-->
-            <!--<glyph glyph-code="E924" smufl-name="mensuralProlationCombiningDotVoid"/>-->
-            <!--<glyph glyph-code="E925" smufl-name="mensuralProlationCombiningStroke"/>-->
+            <glyph glyph-code="E910" smufl-name="mensuralProlation1"/>
+            <glyph glyph-code="E911" smufl-name="mensuralProlation2"/>
+            <glyph glyph-code="E912" smufl-name="mensuralProlation3"/>
+            <glyph glyph-code="E913" smufl-name="mensuralProlation4"/>
+            <glyph glyph-code="E914" smufl-name="mensuralProlation5"/>
+            <glyph glyph-code="E915" smufl-name="mensuralProlation6"/>
+            <glyph glyph-code="E916" smufl-name="mensuralProlation7"/>
+            <glyph glyph-code="E917" smufl-name="mensuralProlation8"/>
+            <glyph glyph-code="E918" smufl-name="mensuralProlation9"/>
+            <glyph glyph-code="E919" smufl-name="mensuralProlation10"/>
+            <glyph glyph-code="E91A" smufl-name="mensuralProlation11"/>
+            <glyph glyph-code="E91B" smufl-name="mensuralProportionTempusPerfectum"/>
+            <glyph glyph-code="E91C" smufl-name="mensuralProportionProportioDupla1"/>
+            <glyph glyph-code="E91D" smufl-name="mensuralProportionProportioDupla2"/>
+            <glyph glyph-code="E91E" smufl-name="mensuralProportionProportioTripla"/>
+            <glyph glyph-code="E91F" smufl-name="mensuralProportionProportioQuadrupla"/>
+            <glyph glyph-code="E920" smufl-name="mensuralProlationCombiningDot"/>
+            <glyph glyph-code="E921" smufl-name="mensuralProlationCombiningTwoDots"/>
+            <glyph glyph-code="E922" smufl-name="mensuralProlationCombiningThreeDots"/>
+            <glyph glyph-code="E923" smufl-name="mensuralProlationCombiningThreeDotsTri"/>
+            <glyph glyph-code="E924" smufl-name="mensuralProlationCombiningDotVoid"/>
+            <glyph glyph-code="E925" smufl-name="mensuralProlationCombiningStroke"/>
             <!--<glyph glyph-code="E926" smufl-name="mensuralProportion1"/>-->
             <!--<glyph glyph-code="E927" smufl-name="mensuralProportion2"/>-->
             <!--<glyph glyph-code="E928" smufl-name="mensuralProportion3"/>-->

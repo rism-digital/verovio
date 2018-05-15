@@ -37,38 +37,7 @@ void Label::Reset()
 
 void Label::AddChild(Object *child)
 {
-    if (child->Is({ REND, TEXT })) {
-        assert(dynamic_cast<TextElement *>(child));
-    }
-    else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
-    }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-//----------------------------------------------------------------------------
-// LabelAbbr
-//----------------------------------------------------------------------------
-
-LabelAbbr::LabelAbbr() : Object("labelAbbr-"), TextListInterface()
-{
-    Reset();
-}
-
-LabelAbbr::~LabelAbbr() {}
-
-void LabelAbbr::Reset()
-{
-    Object::Reset();
-}
-
-void LabelAbbr::AddChild(Object *child)
-{
-    if (child->Is({ REND, TEXT })) {
+    if (child->Is({ LB, REND, TEXT })) {
         assert(dynamic_cast<TextElement *>(child));
     }
     else {

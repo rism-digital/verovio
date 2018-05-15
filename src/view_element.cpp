@@ -18,6 +18,7 @@
 #include "accid.h"
 #include "artic.h"
 #include "beam.h"
+#include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
@@ -35,13 +36,15 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
+#include "mrpt.h"
+#include "mrpt2.h"
 #include "multirest.h"
+#include "multirpt.h"
 #include "neume.h"
 #include "note.h"
 #include "options.h"
 #include "proport.h"
 #include "rest.h"
-#include "rpt.h"
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
@@ -273,8 +276,6 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     /************** draw the artic **************/
 
-    wchar_t code;
-
     int x = articPart->GetDrawingX();
     // HARDCODED value, we double the default margin for now - should go in styling
     int yShift = 2 * m_doc->GetTopMargin(articPart->GetClassId()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -293,9 +294,9 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     std::vector<data_ARTICULATION>::iterator articIter;
     std::vector<data_ARTICULATION> articList = articPart->GetArtic();
-    for (articIter = articList.begin(); articIter != articList.end(); articIter++) {
+    for (articIter = articList.begin(); articIter != articList.end(); ++articIter) {
 
-        code = Artic::GetSmuflCode(*articIter, articPart->GetPlace());
+        wchar_t code = Artic::GetSmuflCode(*articIter, articPart->GetPlace());
 
         // Skip it if we do not have it in the font (for now - we should log / document this somewhere)
         if (code == 0) {
@@ -396,7 +397,7 @@ void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, S
         int halfWidth
             = m_doc->GetGlyphWidth(SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false) / 2;
         int i;
-        for (i = 0; i < additionalSlash; i++) {
+        for (i = 0; i < additionalSlash; ++i) {
             xSymbol += halfWidth;
             DrawSmuflCode(dc, xSymbol, y, SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false);
         }
@@ -421,12 +422,11 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int drawingDur;
     LayerElement *childElement = NULL;
     Note *childNote = NULL;
-    Chord *childChord = NULL;
     Point stemPoint;
     bool drawingCueSize = false;
     int x, y;
 
-    childChord = dynamic_cast<Chord *>(bTrem->FindChildByType(CHORD));
+    Chord *childChord = dynamic_cast<Chord *>(bTrem->FindChildByType(CHORD));
     // Get from the chord or note child
     if (childChord) {
         drawingDur = childChord->GetDur();
@@ -518,7 +518,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int s;
     // by default draw 3 slashes (e.g., for a temolo on a whole note)
     if (stemMod == STEMMODIFIER_NONE) stemMod = STEMMODIFIER_3slash;
-    for (s = 1; s < stemMod; s++) {
+    for (s = 1; s < stemMod; ++s) {
         DrawObliquePolygon(dc, x - width / 2, y, x + width / 2, y + height, height);
         y += step;
     }
@@ -738,10 +738,17 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
-    // Use the note to which the points to for position
-    if (dot->m_drawingNote && (m_doc->GetType() != Transcription)) {
-        x = dot->m_drawingNote->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
-        y = dot->m_drawingNote->GetDrawingY();
+    if (m_doc->GetType() != Transcription) {
+        // Use the note to which the points to for position
+        if (dot->m_drawingNote && !dot->m_drawingNextElement) {
+            x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
+            y = dot->m_drawingNote->GetDrawingY();
+        }
+        if (dot->m_drawingNote && dot->m_drawingNextElement) {
+            x += ((dot->m_drawingNextElement->GetDrawingX() - dot->m_drawingNote->GetDrawingX()) / 2);
+            x += dot->m_drawingNote->GetDrawingRadius(m_doc);
+            y = dot->m_drawingNote->GetDrawingY();
+        }
     }
 
     DrawDotsPart(dc, x, y, 1, staff);
@@ -764,14 +771,14 @@ void View::DrawDots(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     MapOfDotLocs::const_iterator iter;
     const MapOfDotLocs *map = dots->GetMapOfDotLocs();
-    for (iter = map->begin(); iter != map->end(); iter++) {
+    for (iter = map->begin(); iter != map->end(); ++iter) {
         Staff *dotStaff = (iter->first) ? iter->first : staff;
         int y = dotStaff->GetDrawingY()
             - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (dotStaff->m_drawingLines - 1);
         int x = dots->GetDrawingX() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         const std::list<int> *dotLocs = &iter->second;
         std::list<int>::const_iterator intIter;
-        for (intIter = dotLocs->begin(); intIter != dotLocs->end(); intIter++) {
+        for (intIter = dotLocs->begin(); intIter != dotLocs->end(); ++intIter) {
             DrawDotsPart(
                 dc, x, y + (*intIter) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), dots->GetDots(), dotStaff);
         }
@@ -883,7 +890,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         && ((keySig->GetAlterationNumber() == 0) || keySig->m_drawingShowchange)) {
         // The type of alteration is different (f/s or f/n or s/n) - cancel all accid in the normal order
         if (keySig->GetAlterationType() != keySig->m_drawingCancelAccidType) {
-            for (i = 0; i < keySig->m_drawingCancelAccidCount; i++) {
+            for (i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
                 data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
                 loc = PitchInterface::CalcLoc(
                     pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
@@ -895,7 +902,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
         // Cancel some of them if more accid before
         else if (keySig->GetAlterationNumber() < keySig->m_drawingCancelAccidCount) {
-            for (i = keySig->GetAlterationNumber(); i < keySig->m_drawingCancelAccidCount; i++) {
+            for (i = keySig->GetAlterationNumber(); i < keySig->m_drawingCancelAccidCount; ++i) {
                 data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
                 loc = PitchInterface::CalcLoc(
                     pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
@@ -907,7 +914,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
     }
 
-    for (i = 0; i < keySig->GetAlterationNumber(); i++) {
+    for (i = 0; i < keySig->GetAlterationNumber(); ++i) {
         data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->GetAlterationType(), i);
         loc = PitchInterface::CalcLoc(pitch, KeySig::GetOctave(keySig->GetAlterationType(), pitch, c), clefLocOffset);
         y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
@@ -950,7 +957,6 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
         else if (meterSig->GetSym() == METERSIGN_cut) {
             DrawSmuflCode(dc, x, y, SMUFL_E08B_timeSigCutCommon, staff->m_drawingStaffSize, false);
         }
-        x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5; // step forward because we have a symbol
     }
     else if (meterSig->GetForm() == meterSigVis_FORM_num) {
         DrawMeterSigFigures(dc, x, y, meterSig->GetCount(), NONE, staff);
@@ -1044,7 +1050,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     multiRest->CenterDrawingX();
 
-    int x1, x2, y1, y2, length;
+    int x1, x2, y1, y2;
 
     dc->StartGraphic(element, "", element->GetUuid());
 
@@ -1056,7 +1062,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     if ((num > 2) || (multiRest->GetBlock() == BOOLEAN_true)) {
         // This is 1/2 the length of the black rectangle
-        length = width - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        int length = width - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
         // a is the central point, claculate x and x2
         x1 = xCentered - length / 2;
@@ -1252,7 +1258,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Stem *stem = dynamic_cast<Stem *>(element);
     assert(stem);
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", "");
 
     DrawFilledRectangle(dc, stem->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
         stem->GetDrawingY(), stem->GetDrawingX() + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2,
@@ -1407,7 +1413,7 @@ void View::DrawDotsPart(DeviceContext *dc, int x, int y, unsigned char dots, Sta
     if (IsOnStaffLine(y, staff)) {
         y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
-    for (i = 0; i < dots; i++) {
+    for (i = 0; i < dots; ++i) {
         DrawDot(dc, x, y, staff->m_drawingStaffSize);
         // HARDCODED
         x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.5;
@@ -1419,25 +1425,26 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int den
     assert(dc);
     assert(staff);
 
-    std::wstring numText = IntToTimeSigFigures(num), denText;
-    if (den) denText = IntToTimeSigFigures(den);
+    std::wstring timeSigCombNumerator = IntToTimeSigFigures(num), timeSigCombDenominator;
+    if (den) timeSigCombDenominator = IntToTimeSigFigures(den);
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    std::wstring widthText = (numText.length() > denText.length()) ? numText : denText;
+    std::wstring widthText = (timeSigCombNumerator.length() > timeSigCombDenominator.length()) ? timeSigCombNumerator
+                                                                                               : timeSigCombDenominator;
 
     TextExtend extend;
     dc->GetSmuflTextExtent(widthText, &extend);
     x += (extend.m_width / 2);
 
     if (den) {
-        DrawSmuflString(dc, x, y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), numText, true,
+        DrawSmuflString(dc, x, y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombNumerator, true,
             staff->m_drawingStaffSize);
-        DrawSmuflString(dc, x, y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), denText, true,
+        DrawSmuflString(dc, x, y - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize), timeSigCombDenominator, true,
             staff->m_drawingStaffSize);
     }
     else
-        DrawSmuflString(dc, x, y, numText, true, staff->m_drawingStaffSize);
+        DrawSmuflString(dc, x, y, timeSigCombNumerator, true, staff->m_drawingStaffSize);
 
     dc->ResetFont();
 }

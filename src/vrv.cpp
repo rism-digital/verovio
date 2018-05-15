@@ -348,7 +348,7 @@ void DisableLog()
 }
 
 #ifdef EMSCRIPTEN
-bool LogBufferContains(std::string s)
+bool LogBufferContains(const std::string &s)
 {
     std::vector<std::string>::iterator iter = logBuffer.begin();
     while (iter != logBuffer.end()) {
@@ -440,7 +440,7 @@ std::string GetFileVersion(int vmaj, int vmin, int vrev)
     return StringFormat("%04d.%04d.%04d", vmaj, vmin, vrev);
 }
 
-std::string GetFilename(std::string fullpath)
+std::string GetFilename(std::string &fullpath)
 {
     // remove extension
     std::string name = fullpath;
@@ -493,40 +493,39 @@ std::string GetVersion()
 
  */
 
-static const std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                        "abcdefghijklmnopqrstuvwxyz"
-                                        "0123456789+/";
+static const std::string base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                       "abcdefghijklmnopqrstuvwxyz"
+                                       "0123456789+/";
 
-std::string Base64Encode(unsigned char const *bytes_to_encode, unsigned int in_len)
+std::string Base64Encode(unsigned char const *bytesToEncode, unsigned int inLen)
 {
     std::string ret;
     int i = 0;
-    int j = 0;
-    unsigned char char_array_3[3];
-    unsigned char char_array_4[4];
+    unsigned char charArray3[3];
+    unsigned char charArray4[4];
 
-    while (in_len--) {
-        char_array_3[i++] = *(bytes_to_encode++);
+    while (inLen--) {
+        charArray3[i++] = *(bytesToEncode++);
         if (i == 3) {
-            char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-            char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-            char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-            char_array_4[3] = char_array_3[2] & 0x3f;
+            charArray4[0] = (charArray3[0] & 0xfc) >> 2;
+            charArray4[1] = ((charArray3[0] & 0x03) << 4) + ((charArray3[1] & 0xf0) >> 4);
+            charArray4[2] = ((charArray3[1] & 0x0f) << 2) + ((charArray3[2] & 0xc0) >> 6);
+            charArray4[3] = charArray3[2] & 0x3f;
 
-            for (i = 0; (i < 4); i++) ret += base64_chars[char_array_4[i]];
+            for (i = 0; (i < 4); i++) ret += base64Chars[charArray4[i]];
             i = 0;
         }
     }
 
     if (i) {
-        for (j = i; j < 3; j++) char_array_3[j] = '\0';
+        for (int j = i; j < 3; j++) charArray3[j] = '\0';
 
-        char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-        char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-        char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-        char_array_4[3] = char_array_3[2] & 0x3f;
+        charArray4[0] = (charArray3[0] & 0xfc) >> 2;
+        charArray4[1] = ((charArray3[0] & 0x03) << 4) + ((charArray3[1] & 0xf0) >> 4);
+        charArray4[2] = ((charArray3[1] & 0x0f) << 2) + ((charArray3[2] & 0xc0) >> 6);
+        charArray4[3] = charArray3[2] & 0x3f;
 
-        for (j = 0; (j < i + 1); j++) ret += base64_chars[char_array_4[j]];
+        for (int j = 0; (j < i + 1); j++) ret += base64Chars[charArray4[j]];
 
         while ((i++ < 3)) ret += '=';
     }

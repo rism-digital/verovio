@@ -12,6 +12,7 @@
 #include "editorial.h"
 #include "object.h"
 #include "verticalaligner.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -90,7 +91,8 @@ public:
      */
     int GetSystemIdx() const { return Object::GetIdx(); }
 
-    bool SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY);
+    bool SetCurrentFloatingPositioner(
+        int staffN, FloatingObject *object, Object *objectX, Object *objectY, char spanningType = SPANNING_START_END);
 
     /**
      * @name Setter and getter of the drawing scoreDef
@@ -134,6 +136,14 @@ public:
      * See Object::AlignHorizontally
      */
     virtual int AlignHorizontally(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustXOverflow
+     */
+    ///@{
+    virtual int AdjustXOverflow(FunctorParams *functorParams);
+    virtual int AdjustXOverflowEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::AlignVertically

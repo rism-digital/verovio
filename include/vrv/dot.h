@@ -70,6 +70,11 @@ public:
      */
     Note *m_drawingNote;
 
+    /**
+     * A pointer to the next LayerElement (note, barLine, etc.)
+     */
+    LayerElement *m_drawingNextElement;
+
 private:
 };
 

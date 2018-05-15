@@ -271,7 +271,7 @@ AttAugmentDots::~AttAugmentDots()
 
 void AttAugmentDots::ResetAugmentDots()
 {
-    m_dots = 0;
+    m_dots = -1;
 }
 
 bool AttAugmentDots::ReadAugmentDots(pugi::xml_node element)
@@ -297,7 +297,7 @@ bool AttAugmentDots::WriteAugmentDots(pugi::xml_node element)
 
 bool AttAugmentDots::HasDots() const
 {
-    return (m_dots != 0);
+    return (m_dots != -1);
 }
 
 /* include <attdots> */
@@ -3798,7 +3798,7 @@ AttMmTempo::~AttMmTempo()
 
 void AttMmTempo::ResetMmTempo()
 {
-    m_mm = "";
+    m_mm = 0;
     m_mmUnit = DURATION_NONE;
     m_mmDots = 0;
 }
@@ -3807,7 +3807,7 @@ bool AttMmTempo::ReadMmTempo(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("mm")) {
-        this->SetMm(StrToStr(element.attribute("mm").value()));
+        this->SetMm(StrToInt(element.attribute("mm").value()));
         element.remove_attribute("mm");
         hasAttribute = true;
     }
@@ -3828,7 +3828,7 @@ bool AttMmTempo::WriteMmTempo(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasMm()) {
-        element.append_attribute("mm") = StrToStr(this->GetMm()).c_str();
+        element.append_attribute("mm") = IntToStr(this->GetMm()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMmUnit()) {
@@ -3844,7 +3844,7 @@ bool AttMmTempo::WriteMmTempo(pugi::xml_node element)
 
 bool AttMmTempo::HasMm() const
 {
-    return (m_mm != "");
+    return (m_mm != 0);
 }
 
 bool AttMmTempo::HasMmUnit() const
@@ -4300,14 +4300,14 @@ AttOctave::~AttOctave()
 
 void AttOctave::ResetOctave()
 {
-    m_oct = 0;
+    m_oct = -127;
 }
 
 bool AttOctave::ReadOctave(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("oct")) {
-        this->SetOct(StrToInt(element.attribute("oct").value()));
+        this->SetOct(StrToOctave(element.attribute("oct").value()));
         element.remove_attribute("oct");
         hasAttribute = true;
     }
@@ -4318,7 +4318,7 @@ bool AttOctave::WriteOctave(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasOct()) {
-        element.append_attribute("oct") = IntToStr(this->GetOct()).c_str();
+        element.append_attribute("oct") = OctaveToStr(this->GetOct()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -4326,7 +4326,7 @@ bool AttOctave::WriteOctave(pugi::xml_node element)
 
 bool AttOctave::HasOct() const
 {
-    return (m_oct != 0);
+    return (m_oct != -127);
 }
 
 /* include <attoct> */
@@ -4346,14 +4346,14 @@ AttOctaveDefault::~AttOctaveDefault()
 
 void AttOctaveDefault::ResetOctaveDefault()
 {
-    m_octDefault = 0;
+    m_octDefault = -127;
 }
 
 bool AttOctaveDefault::ReadOctaveDefault(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("oct.default")) {
-        this->SetOctDefault(StrToInt(element.attribute("oct.default").value()));
+        this->SetOctDefault(StrToOctave(element.attribute("oct.default").value()));
         element.remove_attribute("oct.default");
         hasAttribute = true;
     }
@@ -4364,7 +4364,7 @@ bool AttOctaveDefault::WriteOctaveDefault(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasOctDefault()) {
-        element.append_attribute("oct.default") = IntToStr(this->GetOctDefault()).c_str();
+        element.append_attribute("oct.default") = OctaveToStr(this->GetOctDefault()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -4372,7 +4372,7 @@ bool AttOctaveDefault::WriteOctaveDefault(pugi::xml_node element)
 
 bool AttOctaveDefault::HasOctDefault() const
 {
-    return (m_octDefault != 0);
+    return (m_octDefault != -127);
 }
 
 /* include <attoct.default> */
@@ -5995,7 +5995,7 @@ AttStaffLocPitched::~AttStaffLocPitched()
 void AttStaffLocPitched::ResetStaffLocPitched()
 {
     m_ploc = PITCHNAME_NONE;
-    m_oloc = 0;
+    m_oloc = -127;
 }
 
 bool AttStaffLocPitched::ReadStaffLocPitched(pugi::xml_node element)
@@ -6007,7 +6007,7 @@ bool AttStaffLocPitched::ReadStaffLocPitched(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("oloc")) {
-        this->SetOloc(StrToInt(element.attribute("oloc").value()));
+        this->SetOloc(StrToOctave(element.attribute("oloc").value()));
         element.remove_attribute("oloc");
         hasAttribute = true;
     }
@@ -6022,7 +6022,7 @@ bool AttStaffLocPitched::WriteStaffLocPitched(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasOloc()) {
-        element.append_attribute("oloc") = IntToStr(this->GetOloc()).c_str();
+        element.append_attribute("oloc") = OctaveToStr(this->GetOloc()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -6035,7 +6035,7 @@ bool AttStaffLocPitched::HasPloc() const
 
 bool AttStaffLocPitched::HasOloc() const
 {
-    return (m_oloc != 0);
+    return (m_oloc != -127);
 }
 
 /* include <attoloc> */
@@ -7169,47 +7169,47 @@ bool AttVerticalAlign::HasValign() const
 /* include <attvalign> */
 
 //----------------------------------------------------------------------------
-// AttVerticalAlignment
+// AttVerticalGroup
 //----------------------------------------------------------------------------
 
-AttVerticalAlignment::AttVerticalAlignment() : Att()
+AttVerticalGroup::AttVerticalGroup() : Att()
 {
-    ResetVerticalAlignment();
+    ResetVerticalGroup();
 }
 
-AttVerticalAlignment::~AttVerticalAlignment()
+AttVerticalGroup::~AttVerticalGroup()
 {
 }
 
-void AttVerticalAlignment::ResetVerticalAlignment()
+void AttVerticalGroup::ResetVerticalGroup()
 {
-    m_vgrp = "";
+    m_vgrp = 0;
 }
 
-bool AttVerticalAlignment::ReadVerticalAlignment(pugi::xml_node element)
+bool AttVerticalGroup::ReadVerticalGroup(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("vgrp")) {
-        this->SetVgrp(StrToStr(element.attribute("vgrp").value()));
+        this->SetVgrp(StrToInt(element.attribute("vgrp").value()));
         element.remove_attribute("vgrp");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttVerticalAlignment::WriteVerticalAlignment(pugi::xml_node element)
+bool AttVerticalGroup::WriteVerticalGroup(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasVgrp()) {
-        element.append_attribute("vgrp") = StrToStr(this->GetVgrp()).c_str();
+        element.append_attribute("vgrp") = IntToStr(this->GetVgrp()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttVerticalAlignment::HasVgrp() const
+bool AttVerticalGroup::HasVgrp() const
 {
-    return (m_vgrp != "");
+    return (m_vgrp != 0);
 }
 
 /* include <attvgrp> */
@@ -8563,7 +8563,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttMmTempo *att = dynamic_cast<AttMmTempo *>(element);
         assert(att);
         if (attrType == "mm") {
-            att->SetMm(att->StrToStr(attrValue));
+            att->SetMm(att->StrToInt(attrValue));
             return true;
         }
         if (attrType == "mm.unit") {
@@ -8667,7 +8667,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttOctave *att = dynamic_cast<AttOctave *>(element);
         assert(att);
         if (attrType == "oct") {
-            att->SetOct(att->StrToInt(attrValue));
+            att->SetOct(att->StrToOctave(attrValue));
             return true;
         }
     }
@@ -8675,7 +8675,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttOctaveDefault *att = dynamic_cast<AttOctaveDefault *>(element);
         assert(att);
         if (attrType == "oct.default") {
-            att->SetOctDefault(att->StrToInt(attrValue));
+            att->SetOctDefault(att->StrToOctave(attrValue));
             return true;
         }
     }
@@ -8999,7 +8999,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "oloc") {
-            att->SetOloc(att->StrToInt(attrValue));
+            att->SetOloc(att->StrToOctave(attrValue));
             return true;
         }
     }
@@ -9227,11 +9227,11 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
     }
-    if (element->HasAttClass(ATT_VERTICALALIGNMENT)) {
-        AttVerticalAlignment *att = dynamic_cast<AttVerticalAlignment *>(element);
+    if (element->HasAttClass(ATT_VERTICALGROUP)) {
+        AttVerticalGroup *att = dynamic_cast<AttVerticalGroup *>(element);
         assert(att);
         if (attrType == "vgrp") {
-            att->SetVgrp(att->StrToStr(attrValue));
+            att->SetVgrp(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -9965,7 +9965,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttMmTempo *att = dynamic_cast<const AttMmTempo *>(element);
         assert(att);
         if (att->HasMm()) {
-            attributes->push_back(std::make_pair("mm", att->StrToStr(att->GetMm())));
+            attributes->push_back(std::make_pair("mm", att->IntToStr(att->GetMm())));
         }
         if (att->HasMmUnit()) {
             attributes->push_back(std::make_pair("mm.unit", att->DurationToStr(att->GetMmUnit())));
@@ -10050,14 +10050,14 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttOctave *att = dynamic_cast<const AttOctave *>(element);
         assert(att);
         if (att->HasOct()) {
-            attributes->push_back(std::make_pair("oct", att->IntToStr(att->GetOct())));
+            attributes->push_back(std::make_pair("oct", att->OctaveToStr(att->GetOct())));
         }
     }
     if (element->HasAttClass(ATT_OCTAVEDEFAULT)) {
         const AttOctaveDefault *att = dynamic_cast<const AttOctaveDefault *>(element);
         assert(att);
         if (att->HasOctDefault()) {
-            attributes->push_back(std::make_pair("oct.default", att->IntToStr(att->GetOctDefault())));
+            attributes->push_back(std::make_pair("oct.default", att->OctaveToStr(att->GetOctDefault())));
         }
     }
     if (element->HasAttClass(ATT_OCTAVEDISPLACEMENT)) {
@@ -10328,7 +10328,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("ploc", att->PitchnameToStr(att->GetPloc())));
         }
         if (att->HasOloc()) {
-            attributes->push_back(std::make_pair("oloc", att->IntToStr(att->GetOloc())));
+            attributes->push_back(std::make_pair("oloc", att->OctaveToStr(att->GetOloc())));
         }
     }
     if (element->HasAttClass(ATT_STARTENDID)) {
@@ -10517,11 +10517,11 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("valign", att->VerticalalignmentToStr(att->GetValign())));
         }
     }
-    if (element->HasAttClass(ATT_VERTICALALIGNMENT)) {
-        const AttVerticalAlignment *att = dynamic_cast<const AttVerticalAlignment *>(element);
+    if (element->HasAttClass(ATT_VERTICALGROUP)) {
+        const AttVerticalGroup *att = dynamic_cast<const AttVerticalGroup *>(element);
         assert(att);
         if (att->HasVgrp()) {
-            attributes->push_back(std::make_pair("vgrp", att->StrToStr(att->GetVgrp())));
+            attributes->push_back(std::make_pair("vgrp", att->IntToStr(att->GetVgrp())));
         }
     }
     if (element->HasAttClass(ATT_VISIBILITY)) {

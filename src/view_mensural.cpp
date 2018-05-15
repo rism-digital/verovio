@@ -6,7 +6,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "view.h"
-#include "vrv.h"
 
 //----------------------------------------------------------------------------
 
@@ -26,6 +25,7 @@
 #include "rest.h"
 #include "smufl.h"
 #include "staff.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -47,26 +47,12 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
-    int noteY = element->GetDrawingY();
-    int xNote, xStem;
-    int drawingDur;
+    int yNote = element->GetDrawingY();
+    int xNote = element->GetDrawingX();
+    int drawingDur = note->GetDrawingDur();
+    int radius = note->GetDrawingRadius(m_doc);
     int staffY = staff->GetDrawingY();
-    wchar_t charCode;
     int verticalCenter = 0;
-    bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
-
-    xStem = element->GetDrawingX();
-
-    drawingDur = note->GetDrawingDur();
-
-    int radius = m_doc->GetGlyphWidth(SMUFL_E93C_mensuralNoteheadMinimaWhite, staff->m_drawingStaffSize, false) / 2;
-
-    if (drawingDur > DUR_1) {
-        if (mensural_black) radius *= TEMP_MINIMA_WIDTH_FACTOR;
-    }
-    else {
-        radius += radius / 3;
-    }
 
     /************** Stem/notehead direction: **************/
 
@@ -84,10 +70,8 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         if (drawingDur < DUR_1)
             stemDir = STEMDIRECTION_down;
         else
-            stemDir = (noteY > verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+            stemDir = (yNote > verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
     }
-
-    xNote = xStem - radius;
 
     /************** Noteheads: **************/
 
@@ -96,38 +80,17 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         DrawLigatureNote(dc, element, layer, staff);
     }
     else if (drawingDur < DUR_1) {
-        DrawMaximaToBrevis(dc, noteY, element, layer, staff);
+        DrawMaximaToBrevis(dc, yNote, element, layer, staff);
     }
-    // Semibrevis
-    else if (drawingDur == DUR_1) {
-        if (mensural_black) {
-            int sbStaffSize = 0.8 * staff->m_drawingStaffSize;
-            DrawDiamond(dc, xNote, noteY, 2 * sbStaffSize, (int)(1.2 * sbStaffSize), !note->GetColored(), 20);
-        }
-        else {
-            // Maybe we can add this to Note::GetMensuralSmuflNoteHead?
-            if (note->GetColored())
-                charCode = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
-            else
-                charCode = SMUFL_E939_mensuralNoteheadSemibrevisVoid;
-
-            DrawSmuflCode(dc, xNote, noteY, charCode, staff->m_drawingStaffSize, false);
-        }
-    }
-    // Shorter values
+    // Semibrevis and shorter
     else {
-        if (mensural_black) {
-            // SMuFL 1.20 doesn't have a codepoint for the "colored" semibrevis and minima head in black
-            // mensural notation. But an unfilled (void) narrow diamond is fine, so we draw one.
-            int sbStaffSize = 0.8 * staff->m_drawingStaffSize;
-            DrawDiamond(dc, xNote, noteY, 2 * sbStaffSize, (int)(TEMP_MINIMA_WIDTH_FACTOR * 2 * sbStaffSize),
-                !note->GetColored(), 20);
+        wchar_t code = note->GetMensuralSmuflNoteHead();
+        DrawSmuflCode(dc, xNote, yNote, code, staff->m_drawingStaffSize, false);
+        // For semibrevis with stem in black notation, encoded with an explicit stem direction
+        if (((drawingDur > DUR_1) || (note->GetStemDir() != STEMDIRECTION_NONE))
+            && note->GetStemVisible() != BOOLEAN_false) {
+            DrawMensuralStem(dc, note, staff, stemDir, radius, xNote, yNote);
         }
-        else {
-            DrawSmuflCode(dc, xNote, noteY, note->GetMensuralSmuflNoteHead(), staff->m_drawingStaffSize, false);
-        }
-
-        DrawMensuralStem(dc, note, staff, stemDir, radius, xStem, noteY);
     }
 
     /************ Draw children (verse / syl) ************/
@@ -162,8 +125,7 @@ void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *lay
         case DUR_4: charCode = SMUFL_E9F6_mensuralRestSemiminima; break;
         case DUR_8: charCode = SMUFL_E9F7_mensuralRestFusa; break;
         case DUR_16: charCode = SMUFL_E9F8_mensuralRestSemifusa; break;
-        default:
-            charCode = 0; // This should never happen
+        default: charCode = 0; // This should never happen
     }
     DrawSmuflCode(dc, x, y, charCode, staff->m_drawingStaffSize, drawingCueSize);
 }
@@ -181,52 +143,87 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int x;
+    int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
+    int x = element->GetDrawingX();
+    int perfectRadius = m_doc->GetGlyphWidth(SMUFL_E910_mensuralProlation1, staff->m_drawingStaffSize, false) / 2;
+    int code = 0;
 
-    if ((mensur->GetSign() == MENSURATIONSIGN_O) || (mensur->GetTempus() == TEMPUS_3)) {
-        DrawMensurCircle(dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+    if (mensur->HasLoc()) {
+        y = staff->GetDrawingY()
+            - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (2 * staff->m_drawingLines - 2 - mensur->GetLoc());
     }
-    else if (((mensur->GetSign() == MENSURATIONSIGN_C) && (mensur->GetOrient() != ORIENTATION_reversed))
-        || (mensur->GetTempus() == TEMPUS_2)) {
-        DrawMensurHalfCircle(dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+
+    if (mensur->HasSign()) {
+        if (mensur->GetSign() == MENSURATIONSIGN_O) {
+            code = SMUFL_E911_mensuralProlation2;
+        }
+        else if (mensur->GetSign() == MENSURATIONSIGN_C) {
+            if (mensur->GetOrient() == ORIENTATION_reversed) {
+                code = SMUFL_E916_mensuralProlation7;
+                // additional offset
+                // perfectRadius -= 2 * perfectRadius - m_doc->GetGlyphWidth(SMUFL_E916_mensuralProlation7,
+                // staff->m_drawingStaffSize, false);
+            }
+            else {
+                code = SMUFL_E915_mensuralProlation6;
+            }
+        }
     }
-    else if (mensur->GetSign() == MENSURATIONSIGN_C && mensur->GetOrient() == ORIENTATION_reversed) {
-        DrawMensurReversedHalfCircle(dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+    else if (mensur->HasTempus()) {
+        if (mensur->GetTempus() == TEMPUS_3) {
+            if (mensur->GetProlatio() == PROLATIO_3)
+                code = SMUFL_E910_mensuralProlation1;
+            else
+                code = SMUFL_E911_mensuralProlation2;
+        }
+        else if (mensur->GetTempus() == TEMPUS_2) {
+            if (mensur->GetProlatio() == PROLATIO_3)
+                code = SMUFL_E914_mensuralProlation5;
+            else
+                code = SMUFL_E915_mensuralProlation6;
+        }
     }
-    // we handle only one single slash
+    DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, false);
+
+    x += perfectRadius;
+    // only one slash supported
     if (mensur->HasSlash()) {
-        DrawMensurSlash(dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+        DrawSmuflCode(dc,
+            x - m_doc->GetGlyphWidth(SMUFL_E925_mensuralProlationCombiningStroke, staff->m_drawingStaffSize, false) / 2,
+            y, SMUFL_E925_mensuralProlationCombiningStroke, staff->m_drawingStaffSize, false);
     }
-    // we handle only one single dot
-    if (mensur->HasDot() || (mensur->GetProlatio() == PROLATIO_3)) {
-        DrawMensurDot(dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+    if (mensur->GetDot() == BOOLEAN_true) {
+        DrawSmuflCode(dc,
+            x - m_doc->GetGlyphWidth(SMUFL_E920_mensuralProlationCombiningDot, staff->m_drawingStaffSize, false) / 2, y,
+            SMUFL_E920_mensuralProlationCombiningDot, staff->m_drawingStaffSize, false);
     }
 
     if (mensur->HasNum()) {
         x = element->GetDrawingX();
-        if (mensur->GetSign() || mensur->HasTempus()) {
+        if (mensur->HasSign() || mensur->HasTempus()) {
             x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
-                * 5; // step forward because we have a sign or a meter symbol
+                * 6; // step forward because we have a sign or a meter symbol
         }
         int numbase = mensur->HasNumbase() ? mensur->GetNumbase() : 0;
-        DrawProportFigures(dc, x, staff->GetDrawingY(), mensur->GetNum(), numbase, staff);
+        DrawProportFigures(dc, x, y, mensur->GetNum(), numbase, staff);
     }
 
     dc->EndGraphic(element, this);
-}
+} // namespace vrv
 
 /* This function draws any flags as well as the stem. */
 
-void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius,
-    int xn, int originY, int heightY)
+void View::DrawMensuralStem(
+    DeviceContext *dc, Note *note, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY)
 {
-    assert(object->GetDurationInterface());
+    assert(note);
 
     int staffSize = staff->m_drawingStaffSize;
     int staffY = staff->GetDrawingY();
     int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
-    int drawingDur = (object->GetDurationInterface())->GetActualDur();
-    bool drawingCueSize = object->GetDrawingCueSize();
+    int drawingDur = note->GetDrawingDur();
+    // Cue size is currently disabled
+    bool drawingCueSize = false;
     int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
@@ -258,11 +255,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     // If we have flags, add them to the height.
     int y1 = originY;
     int y2 = ((nbFlags > 0) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem)) + heightY;
-    int x2;
-    if (drawingDur < DUR_BR)
-        x2 = xn + radius;
-    else
-        x2 = xn;
+    int x2 = xn + radius;
 
     if ((dir == STEMDIRECTION_up) && (y2 < verticalCenter)) {
         y2 = verticalCenter;
@@ -287,130 +280,35 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
 
     int halfStemWidth = m_doc->GetDrawingStemWidth(staffSize) / 2;
     // draw the stems and the flags
+
+    dc->StartCustomGraphic("stem");
     if (dir == STEMDIRECTION_up) {
 
         if (nbFlags > 0) {
-            for (int i = 0; i < nbFlags; i++)
+            for (int i = 0; i < nbFlags; ++i) {
                 DrawSmuflCode(dc, x2 - halfStemWidth, stemY1 - i * flagStemHeight,
                     SMUFL_E949_mensuralCombStemUpFlagSemiminima, staff->m_drawingStaffSize, drawingCueSize);
+            }
         }
-        else
+        else {
             DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
+        }
     }
     else {
         if (nbFlags > 0) {
-            for (int i = 0; i < nbFlags; i++)
+            for (int i = 0; i < nbFlags; ++i) {
                 DrawSmuflCode(dc, x2 - halfStemWidth, stemY1 + i * flagStemHeight,
                     SMUFL_E94A_mensuralCombStemDownFlagSemiminima, staff->m_drawingStaffSize, drawingCueSize);
+            }
         }
-        else
+        else {
             DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
+        }
     }
+    dc->EndCustomGraphic();
 
-    // Store the start and end values
-    StemmedDrawingInterface *interface = object->GetStemmedDrawingInterface();
-    assert(interface);
-    interface->SetDrawingStemDir(dir);
-}
-
-void View::DrawMensurCircle(DeviceContext *dc, int x, int yy, Staff *staff)
-{
-    assert(dc);
-    assert(staff);
-
-    int y = ToDeviceContextY(yy - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * MSIGN_STAFFLINES_BELOW_TOP);
-    int r = ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
-    r = (int)(MSIGN_CIRCLE_DIAM / 2.0 * r);
-
-    int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
-    dc->SetPen(m_currentColour, lineWidth, AxSOLID);
-    dc->SetBrush(m_currentColour, AxTRANSPARENT);
-
-    dc->DrawCircle(ToDeviceContextX(x), y, r);
-
-    dc->ResetPen();
-    dc->ResetBrush();
-}
-
-void View::DrawMensurHalfCircle(DeviceContext *dc, int x, int yy, Staff *staff)
-{
-    assert(dc);
-    assert(staff);
-
-    int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
-    dc->SetPen(m_currentColour, lineWidth, AxSOLID);
-    dc->SetBrush(m_currentColour, AxTRANSPARENT);
-
-    /* DrawEllipticArc expects x and y to specify the coordinates of the upper-left corner of the
-     rectangle that contains the ellipse; y is not the center of the circle it's an arc of. */
-    double halfDistBelowTop = MSIGN_STAFFLINES_BELOW_TOP - (MSIGN_CIRCLE_DIAM / 2.0);
-    int y = ToDeviceContextY(yy - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * halfDistBelowTop);
-    int r = ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
-    r = (int)(MSIGN_CIRCLE_DIAM / 2.0 * r);
-
-    x = ToDeviceContextX(x);
-    x -= 3 * r / 3;
-
-    dc->DrawEllipticArc(x, y, 2 * r, 2 * r, 45, 315);
-
-    dc->ResetPen();
-    dc->ResetBrush();
-
-    return;
-}
-
-void View::DrawMensurReversedHalfCircle(DeviceContext *dc, int x, int yy, Staff *staff)
-{
-    assert(dc);
-    assert(staff);
-
-    dc->SetPen(m_currentColour, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize), AxSOLID);
-    dc->SetBrush(m_currentColour, AxTRANSPARENT);
-
-    int y = ToDeviceContextY(yy - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
-    int r = ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
-
-    // needs to be fixed
-    x = ToDeviceContextX(x);
-    x -= 4 * r / 3;
-
-    dc->DrawEllipticArc(x, y, 2 * r, 2 * r, 225, 135);
-
-    dc->ResetPen();
-    dc->ResetBrush();
-
-    return;
-}
-
-void View::DrawMensurDot(DeviceContext *dc, int x, int yy, Staff *staff)
-{
-    assert(dc);
-    assert(staff);
-
-    int y = ToDeviceContextY(yy - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * MSIGN_STAFFLINES_BELOW_TOP);
-    int r = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * MSIGN_DOT_DIAM;
-
-    dc->SetPen(m_currentColour, 1, AxSOLID);
-    dc->SetBrush(m_currentColour, AxSOLID);
-
-    dc->DrawCircle(ToDeviceContextX(x), y, r);
-
-    dc->ResetPen();
-    dc->ResetBrush();
-
-    return;
-}
-
-void View::DrawMensurSlash(DeviceContext *dc, int a, int yy, Staff *staff)
-{
-    assert(dc);
-    assert(staff);
-
-    int y1 = yy;
-    int y2 = y1 - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
-
-    DrawVerticalLine(dc, y1, y2, a, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize));
-    return;
+    // Store the stem direction ?
+    note->SetDrawingStemDir(dir);
 }
 
 void View::CalculateLigaturePosX(LayerElement *element, Layer *layer, Staff *staff)
@@ -449,18 +347,17 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     assert(note);
 
     int xLeft, xRight, yTop, yBottom, y3, y4;
-    // int yy2, y5; // unused
-    int verticalCenter, up, height;
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     bool fillNotehead = (mensural_black || note->GetColored()) && !(mensural_black && note->GetColored());
-    height = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) / 2;
+    int height = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) / 2;
 
     // Calculate size of the rectangle
     xLeft = element->GetDrawingX();
-    xRight = xLeft + 2 * m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+    int width = 2 * note->GetDrawingRadius(m_doc);
+    xRight = xLeft + width;
     if (note->GetActualDur() == DUR_MX) {
         // Maxima is twice the width of brevis
-        xRight += 2 * m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+        xRight += 2 * width;
     }
     yTop = y + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     yBottom = y - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -481,22 +378,18 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
         DrawFilledRectangle(dc, xLeft, yTop, xRight, yBottom);
     }
 
-    DrawVerticalLine(dc, y3, y4, xLeft, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)); // corset lateral
-    DrawVerticalLine(dc, y3, y4, xRight, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+    // corset lateral
+    DrawFilledRectangle(dc, xLeft - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3,
+        xLeft + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y4);
+    DrawFilledRectangle(dc, xRight - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3,
+        xRight + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y4);
 
     // stem
     if (note->GetActualDur() < DUR_BR) {
-        verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-        up = (y < verticalCenter) ? true : false;
+        bool up = false;
         if (note->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-            if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
-                up = true;
-            }
-            else {
-                up = false;
-            }
+            up = (note->GetDrawingStemDir() == STEMDIRECTION_up) ? true : false;
         }
-
         if (!up) {
             y3 = yTop - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 8;
             yBottom = yTop;
@@ -505,7 +398,12 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
             y3 = yTop + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
             yBottom = yTop;
         }
-        DrawVerticalLine(dc, yBottom, y3, xRight, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+        dc->StartCustomGraphic("stem");
+
+        DrawFilledRectangle(dc, xRight - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3,
+            xRight + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, yBottom);
+
+        dc->EndCustomGraphic();
     }
 
     return;
@@ -525,7 +423,7 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     // Draw children (notes)
     DrawLayerChildren(dc, ligature, layer, staff, measure);
-    // dc->SetEmptyBB();    ...really shouldn't be needed.
+
     dc->EndGraphic(ligature, this);
 }
 
@@ -580,8 +478,11 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
         DrawFilledRectangle(dc, xLeft, yTop, xRight, yBottom);
     }
 
-    DrawVerticalLine(dc, y3, y4, xLeft, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)); // corset lateral
-    DrawVerticalLine(dc, y3, y4, xRight, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+    // corset lateral
+    DrawFilledRectangle(dc, xLeft - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3,
+        xLeft + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y4);
+    DrawFilledRectangle(dc, xRight - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y3,
+        xRight + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2, y4);
 
     return;
 }
@@ -596,11 +497,11 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
     std::wstring wtext;
 
     if (numBase) {
-        ynum = y - (m_doc->GetDrawingUnit(textSize) * 2);
-        yden = ynum - (m_doc->GetDrawingDoubleUnit(textSize) * 2);
+        ynum = y + m_doc->GetDrawingDoubleUnit(textSize);
+        yden = y - m_doc->GetDrawingDoubleUnit(textSize);
     }
     else
-        ynum = y - (m_doc->GetDrawingUnit(textSize) * 4);
+        ynum = y;
 
     if (numBase > 9 || num > 9) {
         x += m_doc->GetDrawingUnit(textSize) * 2;
@@ -651,7 +552,9 @@ void View::DrawProport(DeviceContext *dc, LayerElement *element, Layer *layer, S
                 * 5; // step forward because we have a sign or a meter symbol
         }
         int numbase = proport->HasNumbase() ? proport->GetNumbase() : 0;
-        DrawProportFigures(dc, x, staff->GetDrawingY(), proport->GetNum(), numbase, staff);
+        DrawProportFigures(dc, x,
+            staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1),
+            proport->GetNum(), numbase, staff);
     }
 
     dc->EndGraphic(element, this);

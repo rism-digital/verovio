@@ -322,7 +322,7 @@ void ScoreDef::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 }

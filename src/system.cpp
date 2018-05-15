@@ -149,7 +149,8 @@ void System::SetDrawingAbbrLabelsWidth(int width)
     }
 }
 
-bool System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY)
+bool System::SetCurrentFloatingPositioner(
+    int staffN, FloatingObject *object, Object *objectX, Object *objectY, char spanningType)
 {
     assert(object);
 
@@ -161,7 +162,7 @@ bool System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Ob
             object->GetUuid().c_str());
         return false;
     }
-    alignment->SetCurrentFloatingPositioner(object, objectX, objectY);
+    alignment->SetCurrentFloatingPositioner(object, objectX, objectY, spanningType);
     return true;
 }
 
@@ -188,7 +189,7 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
-    for (childrenIter = children.begin(); childrenIter != children.end(); childrenIter++) {
+    for (childrenIter = children.begin(); childrenIter != children.end(); ++childrenIter) {
         Layer *layer = dynamic_cast<Layer *>((*childrenIter)->GetFirstParent(LAYER));
         assert(layer);
         Staff *staff = dynamic_cast<Staff *>((*childrenIter)->GetFirstParent(STAFF));
@@ -296,6 +297,55 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int System::AdjustXOverflow(FunctorParams *functorParams)
+{
+    AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
+    assert(params);
+
+    params->m_currentSystem = this;
+    params->m_lastMeasure = NULL;
+    params->m_currentWidest = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::AdjustXOverflowEnd(FunctorParams *functorParams)
+{
+    AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
+    assert(params);
+
+    // Continue if no measure of not widest element
+    if (!params->m_lastMeasure || !params->m_currentWidest) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // Continue if the right position of the measure is larger than the widest element right
+    int measureRightX
+        = params->m_lastMeasure->GetDrawingX() + params->m_lastMeasure->GetInnerWidth() - params->m_margin;
+    if (measureRightX > params->m_currentWidest->GetContentRight()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    LayerElement *objectX = dynamic_cast<LayerElement *>(params->m_currentWidest->GetObjectX());
+    if (!objectX) {
+        return FUNCTOR_CONTINUE;
+    }
+    Alignment *left = objectX->GetAlignment();
+    Measure *objectXMeasure = dynamic_cast<Measure *>(objectX->GetFirstParent(MEASURE));
+    if (objectXMeasure != params->m_lastMeasure) {
+        left = params->m_lastMeasure->GetLeftBarLine()->GetAlignment();
+    }
+
+    int overflow = params->m_currentWidest->GetContentRight() - measureRightX;
+    if (overflow > 0) {
+        ArrayOfAdjustmentTuples boundaries{ std::make_tuple(
+            left, params->m_lastMeasure->GetRightBarLine()->GetAlignment(), overflow) };
+        params->m_lastMeasure->m_measureAligner.AdjustProportionally(boundaries);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int System::AdjustYPos(FunctorParams *functorParams)
 {
     AdjustYPosParams *params = dynamic_cast<AdjustYPosParams *>(functorParams);
@@ -366,7 +416,7 @@ int System::JustifyX(FunctorParams *functorParams)
 
     if (params->m_justifiableRatio < 0.8) {
         // Arbitrary value for avoiding over-compressed justification
-        LogWarning("Justification stop because of a ratio smaller than 0.8: %lf", params->m_justifiableRatio);
+        LogWarning("Justification is highly compressed (ratio smaller than 0.8: %lf)", params->m_justifiableRatio);
         LogWarning("\tSystem full width: %d", params->m_systemFullWidth);
         LogWarning("\tNon-justifiable width: %d", nonJustifiableWidth);
         LogWarning("\tDrawing justifiable width: %d", m_drawingJustifiableWidth);
@@ -406,39 +456,66 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
 
     params->m_classId = TIE;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = SLUR;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = MORDENT;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = TURN;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = TRILL;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = DYNAM;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = HAIRPIN;
     m_systemAligner.Process(params->m_functor, params);
+
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(DYNAM);
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(HAIRPIN);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+
     params->m_classId = OCTAVE;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = BREATH;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = FERMATA;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = DIR;
     m_systemAligner.Process(params->m_functor, params);
+
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(DIR);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+
     params->m_classId = TEMPO;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = PEDAL;
     m_systemAligner.Process(params->m_functor, params);
 
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(PEDAL);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+
     params->m_classId = HARM;
     m_systemAligner.Process(params->m_functor, params);
+
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(HARM);
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
 
     params->m_classId = ENDING;
     m_systemAligner.Process(params->m_functor, params);
+
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(ENDING);
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
@@ -506,7 +583,7 @@ int System::CastOffSystemsEnd(FunctorParams *functorParams)
 
     // Otherwise add all pendings objects
     ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); iter++) {
+    for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); ++iter) {
         params->m_currentSystem->AddChild(*iter);
     }
 

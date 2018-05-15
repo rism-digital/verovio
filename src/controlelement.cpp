@@ -13,8 +13,11 @@
 
 //----------------------------------------------------------------------------
 
+#include "functorparams.h"
 #include "rend.h"
+#include "system.h"
 #include "text.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -58,5 +61,37 @@ data_HORIZONTALALIGNMENT ControlElement::GetChildRendAlignment()
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+int ControlElement::AdjustXOverflow(FunctorParams *functorParams)
+{
+    AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
+    assert(params);
+
+    if (!this->Is({ DIR, DYNAM, TEMPO })) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    assert(params->m_currentSystem);
+
+    // Get all the positioners for this object - all of them (all staves) because we can have different staff sizes
+    ArrayOfFloatingPositioners positioners;
+    params->m_currentSystem->m_systemAligner.FindAllPositionerPointingTo(&positioners, this);
+
+    // Something is probably not right if nothing found - maybe no @staff
+    if (positioners.empty()) {
+        LogDebug("Something was wrong when searching positioners for %s '%s'", this->GetClassName().c_str(),
+            this->GetUuid().c_str());
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // Keep the one with the highest right position
+    for (auto const &positoner : positioners) {
+        if (!params->m_currentWidest || (params->m_currentWidest->GetContentRight() < positoner->GetContentRight())) {
+            params->m_currentWidest = positoner;
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

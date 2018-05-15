@@ -71,44 +71,6 @@ void Section::AddChild(Object *child)
 }
 
 //----------------------------------------------------------------------------
-// Pb
-//----------------------------------------------------------------------------
-
-Pb::Pb() : SystemElement("pb-"), AttNNumberLike()
-{
-    RegisterAttClass(ATT_NNUMBERLIKE);
-
-    Reset();
-}
-
-Pb::~Pb() {}
-
-void Pb::Reset()
-{
-    SystemElement::Reset();
-    ResetNNumberLike();
-}
-
-//----------------------------------------------------------------------------
-// Sb
-//----------------------------------------------------------------------------
-
-Sb::Sb() : SystemElement("sb-"), AttNNumberLike()
-{
-    RegisterAttClass(ATT_NNUMBERLIKE);
-
-    Reset();
-}
-
-Sb::~Sb() {}
-
-void Sb::Reset()
-{
-    SystemElement::Reset();
-    ResetNNumberLike();
-}
-
-//----------------------------------------------------------------------------
 // Section functor methods
 //----------------------------------------------------------------------------
 
@@ -132,6 +94,17 @@ int Section::ConvertToPageBasedEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Section::ConvertToUnCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToUnCastOffMensuralParams *params = dynamic_cast<ConvertToUnCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    params->m_contentMeasure = NULL;
+    params->m_contentLayer = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Section::PrepareBoundaries(FunctorParams *functorParams)
 {
     if (this->IsBoundary()) {
@@ -150,48 +123,6 @@ int Section::ResetDrawing(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-}
-
-//----------------------------------------------------------------------------
-// Pb functor methods
-//----------------------------------------------------------------------------
-
-int Pb::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    if (!params->m_firstPbProcessed) {
-        params->m_firstPbProcessed = true;
-    }
-    else {
-        params->m_currentPage = new Page();
-        assert(params->m_doc->GetPages());
-        params->m_doc->GetPages()->AddChild(params->m_currentPage);
-        params->m_currentSystem = new System();
-        params->m_currentPage->AddChild(params->m_currentSystem);
-    }
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-//----------------------------------------------------------------------------
-// Sb functor methods
-//----------------------------------------------------------------------------
-
-int Sb::CastOffEncoding(FunctorParams *functorParams)
-{
-    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
-    assert(params);
-
-    params->m_currentSystem = new System();
-    params->m_currentPage->AddChild(params->m_currentSystem);
-
-    MoveItselfTo(params->m_currentSystem);
-
-    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

@@ -12,7 +12,9 @@
 #include "options.h"
 #include "scoredef.h"
 
+namespace smf {
 class MidiFile;
+}
 
 namespace vrv {
 
@@ -73,9 +75,14 @@ public:
     bool GenerateDocumentScoreDef();
 
     /**
-     * Generate a document pgHead from the MEI header if none is provided.
+     * Generate a document pgHead from the MEI header if none is provided
      */
     bool GenerateHeaderAndFooter();
+
+    /**
+     * Generate measure numbers from measure attributes
+     */
+    bool GenerateMeasureNumbers();
 
     /**
      * Getter and setter for the DocType.
@@ -187,7 +194,7 @@ public:
      * Export the document to a MIDI file.
      * Run trough all the layers and fill the midi file content.
      */
-    void ExportMIDI(MidiFile *midiFile);
+    void ExportMIDI(smf::MidiFile *midiFile);
 
     /**
      * Extract a timemap from the document to a JSON string.
@@ -248,6 +255,17 @@ public:
     void ConvertToPageBasedDoc();
 
     /**
+     * Convert mensural MEI into cast-off (measure) segments looking at the barLine objects.
+     * Segment positions occur where a barLine is set on all staves.
+     */
+    void ConvertToCastOffMensuralDoc();
+
+    /**
+     * Reverse of ConvertToCastOffMensuralDoc()
+     */
+    void ConvertToUnCastOffMensuralDoc();
+
+    /**
      * Convert analytical encoding (@fermata, @tie) to correpsonding elements
      * By default, the element are used only for the rendering and not preserved in the MEI output
      * Permanent conversion discard analytical markup and elements will be preserved in the MEI output.
@@ -297,6 +315,14 @@ public:
      * Setter for analytical markup flag
      */
     void SetAnalyticalMarkup(bool hasAnalyticalMarkup) { m_hasAnalyticalMarkup = hasAnalyticalMarkup; }
+
+    /**
+     * @name Setter for and getter for mensural only flag
+     */
+    ///@{
+    void SetMensuralMusicOnly(bool isMensuralMusicOnly) { m_isMensuralMusicOnly = isMensuralMusicOnly; }
+    bool IsMensuralMusicOnly() const { return m_isMensuralMusicOnly; }
+    ///@}
 
     //----------//
     // Functors //
@@ -406,11 +432,17 @@ private:
     bool m_hasMidiTimemap;
 
     /**
-     * A flag to indicate whereash the document contains analytical markup to be converted.
+     * A flag to indicate whereas the document contains analytical markup to be converted.
      * This is currently limited to @fermata and @tie. Other attribute markup (@accid and @artic)
      * is converted during the import in MeiInput.
      */
     bool m_hasAnalyticalMarkup;
+
+    /**
+     * A flag to indicate whereas to document contains only mensural music.
+     * Mensural only music will be converted to cast-off segments by Doc::ConvertToCastOffMensuralDoc
+     */
+    bool m_isMensuralMusicOnly;
 
     /** Page width (MEI scoredef@page.width) - currently not saved */
     int m_pageWidth;

@@ -60,6 +60,7 @@ void Pages::AddChild(Object *child)
 
 void Pages::ConvertFrom(Score *score)
 {
+    score->SwapUuid(this);
     this->AttLabelled::operator=(*score);
     this->AttNNumberLike::operator=(*score);
 }

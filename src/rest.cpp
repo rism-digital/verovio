@@ -132,7 +132,7 @@ int Rest::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Dots *currentDots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
 
-    if ((this->GetDur() > DUR_BR) && this->HasDots()) {
+    if ((this->GetDur() > DUR_BR) && (this->GetDots() > 0)) {
         if (!currentDots) {
             currentDots = new Dots();
             this->AddChild(currentDots);
@@ -165,7 +165,7 @@ int Rest::CalcDots(FunctorParams *functorParams)
     }
 
     // Nothing to do
-    if ((this->GetDur() <= DUR_BR) || !this->HasDots()) {
+    if ((this->GetDur() <= DUR_BR) || (this->GetDots() < 1)) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -177,10 +177,8 @@ int Rest::CalcDots(FunctorParams *functorParams)
     bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;
 
-    Dots *dots = NULL;
-
-    // For single notes we need here to set the dot loc
-    dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+    // For single rests we need here to set the dot loc
+    Dots *dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
     assert(dots);
 
     std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);

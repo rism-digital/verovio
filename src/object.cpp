@@ -83,12 +83,17 @@ Object::Object(const Object &object) : BoundingBox(object)
     m_interfaces = object.m_interfaces;
     m_isReferencObject = object.m_isReferencObject;
     m_isModified = true;
-    // For now do now copy them
+    this->GenerateUuid();
+    // For now do not copy them
     // m_uuid = object.m_uuid;
     // m_unsupported = object.m_unsupported;
 
+    if (!object.CopyChildren()) {
+        return;
+    }
+
     int i;
-    for (i = 0; i < (int)object.m_children.size(); i++) {
+    for (i = 0; i < (int)object.m_children.size(); ++i) {
         Object *current = object.m_children.at(i);
         Object *copy = current->Clone();
         if (copy) {
@@ -111,17 +116,20 @@ Object &Object::operator=(const Object &object)
         m_interfaces = object.m_interfaces;
         m_isReferencObject = object.m_isReferencObject;
         m_isModified = true;
+        this->GenerateUuid();
         // For now do now copy them
         // m_uuid = object.m_uuid;
         // m_unsupported = object.m_unsupported;
 
-        int i;
-        for (i = 0; i < (int)object.m_children.size(); i++) {
-            Object *current = object.m_children.at(i);
-            Object *copy = current->Clone();
-            copy->Modify();
-            copy->SetParent(this);
-            m_children.push_back(copy);
+        if (object.CopyChildren()) {
+            int i;
+            for (i = 0; i < (int)object.m_children.size(); ++i) {
+                Object *current = object.m_children.at(i);
+                Object *copy = current->Clone();
+                copy->Modify();
+                copy->SetParent(this);
+                m_children.push_back(copy);
+            }
         }
     }
     return *this;
@@ -190,7 +198,7 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
     }
 
     int i;
-    for (i = 0; i < (int)sourceParent->m_children.size(); i++) {
+    for (i = 0; i < (int)sourceParent->m_children.size(); ++i) {
         Object *child = sourceParent->Relinquish(i);
         child->SetParent(this);
         if (idx != -1) {
@@ -229,6 +237,14 @@ void Object::MoveItselfTo(Object *targetParent)
 void Object::SetUuid(std::string uuid)
 {
     m_uuid = uuid;
+}
+
+void Object::SwapUuid(Object *other)
+{
+    assert(other);
+    std::string swapUuid = this->GetUuid();
+    this->SetUuid(other->GetUuid());
+    other->SetUuid(swapUuid);
 }
 
 void Object::ClearChildren()
@@ -272,6 +288,10 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     Att::GetShared(this, attributes);
     Att::GetVisual(this, attributes);
 
+    for (auto &pair : m_unsupported) {
+        attributes->push_back(std::make_pair(pair.first, pair.second));
+    }
+
     return (int)attributes->size();
 }
 
@@ -280,7 +300,7 @@ bool Object::HasAttribute(std::string attribute, std::string value) const
     ArrayOfStrAttr attributes;
     this->GetAttributes(&attributes);
     ArrayOfStrAttr::iterator iter;
-    for (iter = attributes.begin(); iter != attributes.end(); iter++) {
+    for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
         if (((*iter).first == attribute) && ((*iter).second == value)) return true;
     }
     return false;
@@ -299,6 +319,14 @@ Object *Object::GetNext()
     m_iteratorCurrent++;
     m_iteratorCurrent = std::find_if(m_iteratorCurrent, m_iteratorEnd, ObjectComparison(m_iteratorElementType));
     return (m_iteratorCurrent == m_iteratorEnd) ? NULL : *m_iteratorCurrent;
+}
+
+Object *Object::GetNext(Object *child, const ClassId classId)
+{
+    m_iteratorElementType = classId;
+    m_iteratorEnd = m_children.end();
+    m_iteratorCurrent = std::find(m_children.begin(), m_iteratorEnd, child);
+    return (m_iteratorCurrent == m_iteratorEnd) ? NULL : this->GetNext();
 }
 
 Object *Object::GetLast() const
@@ -343,7 +371,7 @@ bool Object::HasChild(Object *child, int deepness) const
 {
     ArrayOfObjects::const_iterator iter;
 
-    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+    for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         if (child == (*iter))
             return true;
         else if (deepness == 0)
@@ -373,7 +401,7 @@ void Object::ClearRelinquishedChildren()
             iter = m_children.erase(iter);
         }
         else
-            iter++;
+            ++iter;
     }
 }
 
@@ -520,7 +548,7 @@ void Object::ResetCachedDrawingX() const
     // if (m_cachedDrawingX == VRV_UNSET) return;
     m_cachedDrawingX = VRV_UNSET;
     ArrayOfObjects::const_iterator iter;
-    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+    for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         (*iter)->ResetCachedDrawingX();
     }
 }
@@ -530,7 +558,7 @@ void Object::ResetCachedDrawingY() const
     // if (m_cachedDrawingY == VRV_UNSET) return;
     m_cachedDrawingY = VRV_UNSET;
     ArrayOfObjects::const_iterator iter;
-    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+    for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         (*iter)->ResetCachedDrawingY();
     }
 }
@@ -539,7 +567,7 @@ int Object::GetChildIndex(const Object *child)
 {
     ArrayOfObjects::iterator iter;
     int i;
-    for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, i++) {
+    for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, ++i) {
         if (child == *iter) {
             return i;
         }
@@ -664,7 +692,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
                 bool hasAttComparison = false;
                 // first we look if there is a comparison object for the object type (e.g., a Staff)
                 ArrayOfAttComparisons::iterator attComparisonIter;
-                for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); attComparisonIter++) {
+                for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); ++attComparisonIter) {
                     // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
                     // the attribute (see below)
                     Object *o = *iter;
@@ -749,7 +777,7 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
 {
     ListOfObjects::iterator iter;
     int i;
-    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, i++) {
+    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
             return i;
         }
@@ -782,7 +810,7 @@ Object *ObjectListInterface::GetListPrevious(Object *listElement)
 {
     ListOfObjects::iterator iter;
     int i;
-    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, i++) {
+    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
             if (i > 0) {
                 return *(--iter);
@@ -799,7 +827,7 @@ Object *ObjectListInterface::GetListNext(Object *listElement)
 {
     ListOfObjects::reverse_iterator iter;
     int i;
-    for (iter = m_list.rbegin(), i = 0; iter != m_list.rend(); ++iter, i++) {
+    for (iter = m_list.rbegin(), i = 0; iter != m_list.rend(); ++iter, ++i) {
         if (listElement == *iter) {
             if (i > 0) {
                 return *(--iter);
@@ -821,7 +849,7 @@ std::wstring TextListInterface::GetText(Object *node)
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
     const ListOfObjects *childList = this->GetList(node); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); it++) {
+    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
         Text *text = dynamic_cast<Text *>(*it);
         assert(text);
         concatText += text->GetText();
@@ -838,7 +866,7 @@ void TextListInterface::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
-        iter++;
+        ++iter;
     }
 }
 
@@ -984,6 +1012,23 @@ int Object::FindAllBetween(FunctorParams *functorParams)
     }
 
     // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    assert(m_parent);
+    // We want to move only the children of the layer of any type (notes, editorial elements, etc)
+    if (this->m_parent->Is(LAYER)) {
+        assert(params->m_targetLayer);
+        this->MoveItselfTo(params->m_targetLayer);
+        // Do not precess children because we move the full sub-tree
+        return FUNCTOR_SIBLINGS;
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
