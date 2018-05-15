@@ -908,7 +908,7 @@ void SegmentedLine::AddGap(int start, int end)
         // cut the segment because the gap in within it
         if ((iter->first <= start) && (iter->second >= end)) {
             iter = m_segments.insert(iter, std::make_pair(iter->first, start));
-            iter++;
+            ++iter;
             iter->first = end;
             break;
         }
