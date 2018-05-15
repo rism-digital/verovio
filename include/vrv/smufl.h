@@ -255,6 +255,20 @@ enum {
     SMUFL_E99F_chantStrophicus = 0xE99F,
     SMUFL_E9A0_chantStrophicusAuctus = 0xE9A0,
     SMUFL_E9A1_chantPunctumDeminutum = 0xE9A1,
+    SMUFL_E9B4_chantEntryLineAsc2nd = 0xE9B4,
+    SMUFL_E9B5_chantEntryLineAsc3rd = 0xE9B5,
+    SMUFL_E9B6_chantEntryLineAsc4th = 0xE9B6,
+    SMUFL_E9B7_chantEntryLineAsc5th = 0xE9B7,
+    SMUFL_E9B8_chantEntryLineAsc6th = 0xE9B8,
+    SMUFL_E9B9_chantLigaturaDesc2nd = 0xE9B9,
+    SMUFL_E9BA_chantLigaturaDesc3rd = 0xE9BA,
+    SMUFL_E9BB_chantLigaturaDesc4th = 0xE9BB,
+    SMUFL_E9BC_chantLigaturaDesc5th = 0xE9BC,
+    SMUFL_E9BD_chantConnectingLineAsc2nd = 0xE9BD,
+    SMUFL_E9BE_chantConnectingLineAsc3rd = 0xE9BE,
+    SMUFL_E9BF_chantConnectingLineAsc4th = 0xE9BF,
+    SMUFL_E9C0_chantConnectingLineAsc5th = 0xE9C0,
+    SMUFL_E9C1_chantConnectingLineAsc6th = 0xE9C1,
     SMUFL_E9F0_mensuralRestMaxima = 0xE9F0,
     SMUFL_E9F1_mensuralRestLongaPerfecta = 0xE9F1,
     SMUFL_E9F2_mensuralRestLongaImperfecta = 0xE9F2,
@@ -288,7 +302,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 263
+#define SMUFL_COUNT 277
 
 } // vrv namespace
 

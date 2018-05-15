@@ -33,7 +33,7 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Note
+// Neume
 //----------------------------------------------------------------------------
 
 Neume::Neume()
@@ -42,7 +42,6 @@ Neume::Neume()
       AttColor()
 {
     RegisterAttClass(ATT_COLOR);
-
     Reset();
 }
 
@@ -91,6 +90,7 @@ bool Neume::IsLastInNeume(LayerElement *element)
     return false;
 }
 
+<<<<<<< HEAD
 bool Neume::GenerateChildMelodic()
 {
     ArrayOfObjects children;
@@ -129,4 +129,20 @@ bool Neume::GenerateChildMelodic()
     return true;
 }
 
+=======
+std::map<std::string, NeumeGroup> Neume::InitNeumeGroups() {
+    std::map<std::string, NeumeGroup> map;
+    map["u"] = PES;
+    map["d"] = CLIVIS;
+    map["uu"] = SCANDICUS;
+    map["dd"] = CLIMACUS;
+    map["ud"] = TORCULUS;
+    map["du"] = PORRECTUS;
+    map["ddd"] = CLIMACUS;
+    return map;
+}
+
+std::map<std::string, NeumeGroup> Neume::neumes = Neume::InitNeumeGroups();
+
+>>>>>>> feature/neumegroup
 } // namespace vrv
