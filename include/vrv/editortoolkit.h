@@ -42,19 +42,14 @@ public:
 
 protected:
 
-#ifdef USE_EMSCRIPTEN
-    /**
-     * Parse JSON instructions for experimental editor functions.
-     */
-    ///@{
     bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
-    ///@}
-#endif
-
+    
     Doc *m_doc;
     View *m_view;
 };
 
 } // namespace vrv
+
+#endif

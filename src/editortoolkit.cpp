@@ -15,17 +15,12 @@
 
 #include "clef.h"
 #include "custos.h"
-#include "layer.h"
-#include "measure.h"
-#include "nc.h"
-#include "neume.h"
-#include "page.h"
-#include "slur.h"
-#include "staff.h"
 #include "staffdef.h"
 #include "vrv.h"
 
 //--------------------------------------------------------------------------------
+
+#include "vrv.h"
 
 #include "jsonxx.h"
 
@@ -126,6 +121,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
         AttComparison ac(NC);
         ArrayOfObjects objects;
         neume->FindAllChildByComparison(&objects, &ac);
+        
         for (auto it = objects.begin(); it != objects.end(); ++it) {
             Nc *nc = dynamic_cast<Nc *>(*it);
             // Update the neume component
@@ -278,6 +274,4 @@ bool EditorToolkit::ParseSetAction(
     (*attrValue) = param.get<jsonxx::String>("attrValue");
     return true;
 }
-#endif
-// USE_EMSCRIPTEN
 } // namespace vrv
