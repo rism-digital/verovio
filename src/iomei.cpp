@@ -1417,12 +1417,13 @@ void MeiOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
     nc->WriteColor(currentNode);;
     nc->WriteCoordinated(currentNode);;
     nc->WriteIntervalMelodic(currentNode);;
+    
 }
 
 void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
 {
     assert(neume);
-
+    neume->GenerateChildMelodic();
     WriteLayerElement(currentNode, neume);
     neume->WriteColor(currentNode);;
 }

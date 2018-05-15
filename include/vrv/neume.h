@@ -67,6 +67,7 @@ public:
     virtual int GetPosition(LayerElement *element);
     virtual bool IsLastInNeume(LayerElement *element);
 
+    bool GenerateChildMelodic();
 
 private:
 };
