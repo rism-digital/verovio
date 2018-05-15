@@ -29,7 +29,6 @@ public:
 
 #ifdef USE_EMSCRIPTEN
     bool ParseEditorAction(const std::string &json_editorAction);
-    std::string ParseQueryAction(const std::string &json_editorAction);
 
     /**
      * Experimental editor functions.
@@ -71,6 +70,14 @@ protected:
     std::string PitchNameToString(int pname);
 #endif
 
+=======
+
+protected:
+    bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
+    bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
+    bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
+    
+>>>>>>> Change members of EditorToolkit to pointers
     Doc *m_doc;
     View *m_view;
 };

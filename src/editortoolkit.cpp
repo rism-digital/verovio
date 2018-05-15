@@ -73,36 +73,6 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
     return false;
 }
 
-std::string EditorToolkit::ParseQueryAction(const std::string &json_queryAction)
-{
-    jsonxx::Object json;
-
-    // Read JSON actions
-    if (!json.parse(json_queryAction)) {
-        LogError("Can not parse JSON std::string.");
-            return "";
-    }
-
-    if (!json.has<jsonxx::String>("action") || !json.has<jsonxx::Object>("param"))
-        return "";
-
-    std::string action = json.get<jsonxx::String>("action");
-
-    if (action == "element-info") {
-        std::string elementId;
-        if (this->ParseElementInfoAction(json.get<jsonxx::Object>("param"), &elementId)) {
-            return this->GetElementInfo(elementId);
-        }
-    }
-    else if (action == "clef-info") {
-        std::string staffId;
-        if (this->ParseElementInfoAction(json.get<jsonxx::Object>("param"), &staffId)) {
-            return this->GetClefInfo(staffId);
-        }
-    }
-    return "";
-}
-
 bool EditorToolkit::Drag(std::string elementId, int x, int y)
 {
     if (!m_doc->GetDrawingPage()) return false;
@@ -262,128 +232,6 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
     return false;
 }
 
-// Intended for use when the clef is not a separate element
-// from the StaffDef
-std::string EditorToolkit::GetClefInfo(std::string staffId)
-{
-    if (!m_doc->GetDrawingPage()) {
-        LogError("Drawing page does not exist.");
-        return "";
-    }
-    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(staffId);
-    if (element == nullptr) {
-        LogError("Element does not exist.");
-        return "";
-    }
-
-    Staff *staff = dynamic_cast<Staff *>(element);
-    assert(staff);
-    StaffDef *staffDef = staff->m_drawingStaffDef;
-    assert(staffDef);
-    if (staffDef->HasClefInfo()) {
-        Clef *clef = staffDef->GetClefCopy();
-        std::string clefInfo = "Clef on line " + std::to_string(clef->GetLine());
-        if (clef->GetShape() == CLEFSHAPE_C) {
-            clefInfo = "C " + clefInfo;
-        }
-        else if (clef->GetShape() == CLEFSHAPE_F) {
-            clefInfo = "F " + clefInfo;
-        }
-        delete clef; // Since it is a copy it's our responsability to delete it
-        return clefInfo;
-    }
-    else {
-        LogWarning("Staff does not have a clef.");
-    }
-    return "";
-}
-
-std::string EditorToolkit::GetElementInfo(std::string elementId)
-{
-    if (!m_doc->GetDrawingPage()) {
-        LogError("Drawing page does not exist.");
-        return "";
-    }
-    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
-    if (element == nullptr) {
-        LogError("Element does not exist.");
-        return "";
-    }
-
-    if (element->Is(CLEF)) {
-        Clef *clef = dynamic_cast<Clef *>(element);
-        assert(clef);
-
-        std::string clefInfo = "Clef on line ";
-        
-        clefInfo += std::to_string(clef->GetLine());
-
-        if (clef->GetShape() == CLEFSHAPE_C) {
-            clefInfo = "C " + clefInfo;
-        }
-        else if (clef->GetShape() == CLEFSHAPE_F) {
-            clefInfo = "F " + clefInfo;
-        }
-
-        return clefInfo;
-    }
-    else if (element->Is(CUSTOS)) {
-        Custos *custos = dynamic_cast<Custos *>(element);
-        assert(custos);
-
-        std::string custosInfo = "Custos ";
-
-        custosInfo += PitchNameToString(custos->GetPname()) + std::to_string(custos->GetOct());
-        return custosInfo;
-    }
-    else if (element->Is(NEUME)) {
-        Neume *neume = dynamic_cast<Neume *>(element);
-        assert(neume);
-
-        std::string neumeInfo = "";     // Stores the more specific info on steps between neume components
-        std::string neumeContour = "";  // Only stores direction of steps so we can map to a neume grouping name
-        ArrayOfObjects children;
-        AttComparison ac(NC);
-        // Get all neume components for this neume
-        neume->FindAllChildByComparison(&children, &ac);
-
-        auto it = children.begin();
-        Nc *previous = dynamic_cast<Nc *>(*it);
-        assert(previous);
-        it++;
-
-        // Compare successive neume components to establish contour
-        for (; it != children.end(); it++) {
-            Nc *current = dynamic_cast<Nc *>(*it);
-            assert(current);
-            int pitchDifference = current->PitchDifferenceTo(previous);
-            if (pitchDifference > 0)
-            {
-                neumeInfo += ".u" + std::to_string(pitchDifference);
-                neumeContour += "u";
-            }
-            else if (pitchDifference < 0)
-            {
-                neumeInfo += ".d" + std::to_string(pitchDifference * -1);
-                neumeContour += "d";
-            }
-            else
-            {
-                neumeInfo += ".s";
-                neumeContour += "s";
-            }
-            previous = current;
-        }
-        // Combine neume grouping name and specific info and return
-        neumeInfo = Neume::NeumeGroupToString(Neume::s_neumes[neumeContour]) + neumeInfo;
-        return neumeInfo;
-    }
-    else {
-        LogWarning("GetInfo query function not implemented for %s", element->GetClassId());
-    }
-    return "";
-} 
-
 bool EditorToolkit::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
@@ -417,36 +265,6 @@ bool EditorToolkit::ParseSetAction(
     if (!param.has<jsonxx::String>("attrValue")) return false;
     (*attrValue) = param.get<jsonxx::String>("attrValue");
     return true;
-}
-
-bool EditorToolkit::ParseElementInfoAction(
-    jsonxx::Object param, std::string *elementId)
-{
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    (*elementId) = param.get<jsonxx::String>("elementId");
-    return true;
-}
-
-std::string EditorToolkit::PitchNameToString(int pname)
-{
-    switch ((data_PITCHNAME)pname){
-        case PITCHNAME_a:
-            return "A";
-        case PITCHNAME_b:
-            return "B";
-        case PITCHNAME_c:
-            return "C";
-        case PITCHNAME_d:
-            return "D";
-        case PITCHNAME_e:
-            return "E";
-        case PITCHNAME_f:
-            return "F";
-        case PITCHNAME_g:
-            return "G";
-        default:
-            return "";
-    }
 }
 
 #endif
