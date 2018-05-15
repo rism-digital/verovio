@@ -20,6 +20,7 @@ class EditorToolkit {
 public:
     EditorToolkit(Doc *doc, View *view) { m_doc = doc; m_view = view; }
 
+#ifdef USE_EMSCRIPTEN
     bool ParseEditorAction(const std::string &json_editorAction);
 
     /**
@@ -30,12 +31,21 @@ public:
     bool Insert(std::string elementType, std::string startId, std::string endId);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     ///@}
+#endif
 
 protected:
+
+#ifdef USE_EMSCRIPTEN
+    /**
+     * Parse JSON instructions for experimental editor functions.
+     */
+    ///@{
     bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
-    
+    ///@}
+#endif USE_EMSCRIPTEN
+
     Doc *m_doc;
     View *m_view;
 };
