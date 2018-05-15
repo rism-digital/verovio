@@ -674,12 +674,18 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         assert(note);
         m_alignment = note->GetAlignment();
     }
-        //Have to add a case for SYL being different in 4.0
     else if (this->Is(SYL)) {
-//        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
-//        assert(note);
-//        m_alignment = note->GetAlignment();
-        type = ALIGNMENT_DEFAULT;
+        Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+        assert(staff);
+
+        if(staff->m_drawingNotationType == NOTATIONTYPE_neume) {
+            type = ALIGNMENT_DEFAULT;
+        }
+        else {
+            Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+            assert(note);
+            m_alignment = note->GetAlignment();
+        }
     }
     else if (this->Is(VERSE)) {
         // Idem

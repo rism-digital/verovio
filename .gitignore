@@ -32,7 +32,6 @@ emscripten/data/
 emscripten/build/
 
 # python build
-python/
 bindings/python/verovio_wrap.cpp
 bindings/python/verovio.pyc
 bindings/python/verovio.py
@@ -56,15 +55,8 @@ bindings/qt/build-demo
 # MacOS
 .DS_Store
 
-# VsCode
-.vscode 
-
 # Output files
-tools/*.svg
-tools/*.mei
+output.svg
+output.mei
 index.js
 emscripten/npm-dev/node_modules
-
-# Local
-*.swp
-compile_commands.json

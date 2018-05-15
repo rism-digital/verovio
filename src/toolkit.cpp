@@ -1104,7 +1104,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
     NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
     ArrayOfObjects notes;
-    
+
     measure->FindAllChildByAttComparison(&notes, &matchNoteTime);
 
     // Fill the JSON object
@@ -1292,7 +1292,8 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
             Nc *nc = dynamic_cast<Nc *>(*it);
             // Update the neume component
             nc->AdjustPitchByOffset(pitchDifference); 
-            nc->SetUlx(nc->GetUlx() - x);
+            //// Temporarily removing ULX attributes for coordinate refactor
+            // nc->SetUlx(nc->GetUlx() - x);
         }
         return true;
     }
@@ -1308,7 +1309,8 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
         int initialClefLine = clef->GetLine();
         int clefLine = round((double) y / (double) m_doc.GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
         clef->SetLine(clefLine);
-        clef->SetUlx(x);
+        //// Temporarily removing ULX attributes for coordinate refactor
+        // clef->SetUlx(x);
 
         if (initialClefLine != clefLine) {  // adjust notes so they stay in the same position
             int lineDiff = clefLine - initialClefLine;

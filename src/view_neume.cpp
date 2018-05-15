@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        view_syllable.cpp
-// Author:      Andrew Tran
+// Author:      Andrew Tran, Juliette Regimbal
 // Created:     2017
 // Copyright (c) Author and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
@@ -11,7 +11,6 @@
 
 #include <algorithm>
 #include <assert.h>
-#include <iostream>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -24,7 +23,7 @@
 #include "nc.h"
 #include "note.h"
 #include "neume.h"
-#include "rpt.h"
+#include "mrpt.h"
 #include "smufl.h"
 #include "staff.h"
 #include "vrv.h"
@@ -69,6 +68,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     // Draw the children
     DrawLayerChildren(dc, nc, layer, staff, measure);
 
+    // Intializing necessary variables
     Clef *clef = layer->GetClef(element);
     int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     int staffLineNumber = staff->m_drawingLines;
@@ -77,6 +77,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     int noteY = element->GetDrawingY();
     int noteX = element->GetDrawingX();
 
+    // Calculating proper y offset based on pname, clef, and staff
     int clefYPosition = noteY - ( staffSize * (staffLineNumber - clefLine) );
     int pitchOffset;
     int octaveOffset = (nc->GetOct() - 3) * ( (staffSize / 2) * 7);
@@ -144,10 +145,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // value is 0 and std::map returns 0 by default for missing keys.
     if (neumeName == NEUME_ERROR) {
         // TODO: Error Handling for unfound neumes
-        std::cout << "Neume Grouping not found" << std::endl;
-    }
-    else {
-        std::cout << neumeName << std::endl;
+        LogError("Neume Grouping not found");
     }
 
     /******************************************************************/

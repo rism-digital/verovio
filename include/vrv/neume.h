@@ -79,7 +79,6 @@ public:
     virtual bool IsLastInNeume(LayerElement *element);
 
     bool GenerateChildMelodic();
-    
     static std::map<std::string, NeumeGroup> InitNeumeGroups();
     static std::map<std::string, NeumeGroup> *GetGroups() { return &neumes; };
 

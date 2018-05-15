@@ -19,12 +19,10 @@ Custos::Custos() : LayerElement("custos-")
                  , PitchInterface()
                  , PositionInterface()
                  , AttColor()
-                 , AttCoordinated()
 {
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_COORDINATED);
 
     Reset();
 }
@@ -37,7 +35,6 @@ void Custos::Reset()
     PitchInterface::Reset();
     PositionInterface::Reset();
     ResetColor();
-    ResetCoordinated();
 }
 
 //----------------------------------------------------------------------------

@@ -107,7 +107,6 @@ bool Resources::LoadFont(std::string fontName)
     ::DIR *dir;
     dirent *pdir;
     std::string dirname = Resources::GetPath() + "/" + fontName;
-    std::cout << dirname << std::endl;
     dir = opendir(dirname.c_str());
 
     if (!dir) {
@@ -122,7 +121,6 @@ bool Resources::LoadFont(std::string fontName)
         if (strstr(pdir->d_name, ".xml")) {
             // E.g, : E053-gClef8va.xml => strtol extracts E053 as hex
             wchar_t smuflCode = (wchar_t)strtol(pdir->d_name, NULL, 16);
-
             if (smuflCode == 0) {
                 LogError("Invalid SMUFL code (0)");
                 continue;

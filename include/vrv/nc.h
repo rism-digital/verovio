@@ -34,7 +34,6 @@ class Nc :   public LayerElement,
              public PitchInterface,
              public PositionInterface,
              public AttColor,
-             public AttCoordinated,
              public AttIntervalMelodic
              {
 public:
