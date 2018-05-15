@@ -522,10 +522,6 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("syllable");
         WriteSyllable(m_currentNode, dynamic_cast<Syllable *>(object));
     }
-    else if (object->Is(SYLLABLE)) {
-        m_currentNode = m_currentNode.append_child("syllable");
-        WriteSyllable(m_currentNode, dynamic_cast<Syllable *>(object));
-    }
     else if (object->Is(TUPLET)) {
         m_currentNode = m_currentNode.append_child("tuplet");
         WriteTuplet(m_currentNode, dynamic_cast<Tuplet *>(object));
@@ -1490,7 +1486,6 @@ void MeiOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
 void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
 {
     assert(neume);
-    neume->GenerateChildMelodic();
     WriteLayerElement(currentNode, neume);
     neume->WriteColor(currentNode);;
 }

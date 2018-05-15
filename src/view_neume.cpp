@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        view_syllable.cpp
+// Name:        view_neume.cpp
 // Author:      Andrew Tran, Juliette Regimbal
 // Created:     2017
 // Copyright (c) Author and others. All rights reserved.
@@ -111,6 +111,9 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
     std::map<std::string, NeumeGroup> *neumeGroups = Neume::GetGroups();
     
+    // Generate intm attribute for all nc children except the first
+    // This is necessary to properly render the neume
+    neume->GenerateChildMelodic();
 
     // Obtaining list of NC to extract intm data
     // Format of *neumechildren, first object is <neume>, all objects after are <nc>

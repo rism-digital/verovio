@@ -50,6 +50,12 @@ Neume::~Neume()
 
 }
 
+void Neume::Reset()
+{
+    LayerElement::Reset();
+    ResetColor();
+}
+
 void Neume::AddChild(Object *child)
 {
     if (child->Is(NC)) {
@@ -63,12 +69,6 @@ void Neume::AddChild(Object *child)
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
-}
-
-void Neume::Reset()
-{
-    LayerElement::Reset();
-    ResetColor();
 }
 
 int Neume::GetPosition(LayerElement *element)

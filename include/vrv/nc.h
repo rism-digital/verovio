@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        note.h
+// Name:        nc.h
 // Author:      Andrew Tran
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
