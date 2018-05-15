@@ -106,7 +106,8 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(neume);
 
     /******************************************************************/
-    // initialization
+    // Initialization
+    
     std::map<std::string, NeumeGroup> *neumeGroups = Neume::GetGroups();
     
 
@@ -119,12 +120,20 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     // Loading the contour of the neume shape from the nc children
     std::vector<Nc *> ncVector;
+    std::vector<int> pitchDifferences;
     std::string contour = "";
     for (int i = 1; i < (int)neumeChildren.size(); i++) {
-         Nc *nc = dynamic_cast<Nc *>(neumeChildren[i]);
-         ncVector.push_back(nc);
-         if (i >= 2) {
-             contour.append(nc->GetIntm());
+        Nc *nc = dynamic_cast<Nc *>(neumeChildren[i]);
+        ncVector.push_back(nc);
+        if (i >= 2) {
+            // Adding to the countour from intm attribuets of nc
+            contour.append(nc->GetIntm());
+
+            // Calculate the pitch differences between each nc pair
+            Nc *prev_nc = dynamic_cast<Nc *>(neumeChildren[i-1]);
+            int pitchDifference = nc->GetPname() - prev_nc->GetPname();
+            pitchDifference += (nc->GetOct() - prev_nc->GetOct()) * 7;
+            pitchDifferences.push_back(pitchDifference);
          }
     }
 
@@ -147,30 +156,28 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->StartGraphic(element, "", element->GetUuid());
     // If there is a defined way to draw the neume grouping, we should use that to draw the specialized SVG shape,
     // or else we draw each nc in the neume as a punctum.
+
+    
+    //// THIS DOESNT WORK YET BECAUSE GLYPHS NOT IN LEIPZIG
+    // int glyphSize = m_doc->GetGlyphWidth(SMUFL_E990_chantPunctum, staff->m_drawingStaffSize, 0);
+    int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+    int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
     switch (neumeName) {
         case PES: 
         {
-            int pitchDifference = ncVector[1]->GetPname() - ncVector[0]->GetPname();
-            pitchDifference += (ncVector[1]->GetOct() - ncVector[0]->GetOct()) * 7;
-            //// THIS DOESNT WORK YET BECAUSE GLYPHS NOT IN LEIPZIG
-            // int glyphSize = m_doc->GetGlyphWidth(SMUFL_E990_chantPunctum, staff->m_drawingStaffSize, 0);
-            int glyphSize = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
             int xOffset = 0;
-            if (pitchDifference > 1) {
+            if (pitchDifferences.at(0) > 1) {
                 xOffset = -1;
             }
-            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, SMUFL_E990_chantPunctum);
-            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[1]), layer, staff, measure, SMUFL_E990_chantPunctum, xOffset * glyphSize);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(0)), layer, staff, measure, SMUFL_E990_chantPunctum);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(1)), layer, staff, measure, SMUFL_E990_chantPunctum, xOffset * noteWidth);
             break;
         }
         case PORRECTUS:
         {   
-            int pitchDifference = ncVector[1]->GetPname() - ncVector[0]->GetPname();
-            pitchDifference += (ncVector[1]->GetOct() - ncVector[0]->GetOct()) * 7;
-            int noteSize = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
             wchar_t lineCode;
             wchar_t ligatureCode;
-            switch (pitchDifference)    
+            switch (pitchDifferences.at(0))    
             {
                 case -1: 
                     lineCode = SMUFL_E9B4_chantEntryLineAsc2nd;
@@ -194,18 +201,15 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                     ligatureCode = SMUFL_E9B9_chantLigaturaDesc2nd;
                     break;
             }
-            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, lineCode, 0, noteSize * pitchDifference);
-            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, ligatureCode);
-            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[2]), layer, staff, measure);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(0)), layer, staff, measure, lineCode, 0, noteHeight * pitchDifferences.at(0));
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(0)), layer, staff, measure, ligatureCode);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(2)), layer, staff, measure);
             break;
         }
         case CLIVIS:
         {
-            int pitchDifference = ncVector[1]->GetPname() - ncVector[0]->GetPname();
-            pitchDifference += (ncVector[1]->GetOct() - ncVector[0]->GetOct()) * 7;
-            int noteSize = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
             wchar_t lineCode;
-            switch (pitchDifference)
+            switch (pitchDifferences.at(0))
             {
                 case -1:
                     lineCode = SMUFL_E9BD_chantConnectingLineAsc2nd;
@@ -224,33 +228,25 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                     lineCode = SMUFL_E9BD_chantConnectingLineAsc2nd;
                     break;
             }
-            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, SMUFL_E990_chantPunctum, noteSize / 4, 0);
-            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[1]), layer, staff, measure, lineCode, 0, 0);
-            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[1]), layer, staff, measure);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(0)), layer, staff, measure, SMUFL_E990_chantPunctum, noteHeight / 4, 0);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(1)), layer, staff, measure, lineCode, 0, 0);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(1)), layer, staff, measure);
             break;
         }
         case CLIMACUS:
         {
-            wchar_t tailCode = SMUFL_E991_chantPunctumInclinatum;
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure);
             for (int i = 1; i < (int)ncVector.size(); i++)
             {
-                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[i]), layer, staff, measure, tailCode);
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(i)), layer, staff, measure, SMUFL_E991_chantPunctumInclinatum);
             }
             break;
         }
         case SCANDICUS:
         {
-            int pitchDifference = ncVector[2]->GetPname() - ncVector[1]->GetPname();
-            pitchDifference += (ncVector[2]->GetOct() - ncVector[1]->GetOct()) * 7;
-            //// THIS DOESNT WORK YET BECAUSE GLYPHS NOT IN LEIPZIG
-            // int glyphSize = m_doc->GetGlyphWidth(SMUFL_E990_chantPunctum, staff->m_drawingStaffSize, 0);
-            int glyphSize = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
             int xOffset = 0;
-            int noteSize = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
             wchar_t lineCode;
-
-            switch (pitchDifference)
+            switch (pitchDifferences.at(1))
             {
                 case 2:
                     lineCode = SMUFL_E9BE_chantConnectingLineAsc3rd;
@@ -266,13 +262,13 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                     lineCode = SMUFL_E9BD_chantConnectingLineAsc2nd;
                     break;
             }
-            if (pitchDifference > 1) {
+            if (pitchDifferences.at(1) > 1) {
                 xOffset = -1;   
-                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[2]), layer, staff, measure, lineCode, -glyphSize / 10, -noteSize * pitchDifference - 1);
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(2)), layer, staff, measure, lineCode, -noteWidth / 10, -noteHeight * pitchDifferences.at(1) - 1);
             }
-            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure, SMUFL_E990_chantPunctum);
-            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[1]), layer, staff, measure, SMUFL_E990_chantPunctum);
-            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[2]), layer, staff, measure, SMUFL_E990_chantPunctum, xOffset * glyphSize);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(0)), layer, staff, measure, SMUFL_E990_chantPunctum);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(1)), layer, staff, measure, SMUFL_E990_chantPunctum);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(2)), layer, staff, measure, SMUFL_E990_chantPunctum, xOffset * noteWidth);
             break;
         }
         default: 
