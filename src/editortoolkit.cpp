@@ -266,6 +266,11 @@ bool EditorToolkit::ParseSetAction(
     (*attrValue) = param.get<jsonxx::String>("attrValue");
     return true;
 }
+<<<<<<< 6f652d9bc6dabc17a687b4daa5a2f7164e5041c8
 
 #endif
+=======
+#endif
+// USE_EMSCRIPTEN
+>>>>>>> Change members of EditorToolkit to pointers
 } // namespace vrv
