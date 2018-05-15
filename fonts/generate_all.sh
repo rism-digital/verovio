@@ -1,9 +1,9 @@
 #!/bin/bash
 
 
-# Requires saxon9ee9ee and phantomjs
-# saxon9ee9ee can be aliased from Oxygen in ~/.bash_profile
-# alias saxon9ee9ee="java -jar /Applications/oxygen/lib/saxon9ee9ee.jar"
+# Requires saxon9ee and phantomjs
+# saxon9ee can be aliased from Oxygen in ~/.bash_profile
+# alias saxon9ee="java -jar /Applications/oxygen/lib/saxon9ee.jar"
 
 shopt -s expand_aliases
 [[ -f ~/.bash_profile ]] && source ~/.bash_profile
