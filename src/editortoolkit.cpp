@@ -76,36 +76,6 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
     return false;
 }
 
-std::string EditorToolkit::ParseQueryAction(const std::string &json_queryAction)
-{
-    jsonxx::Object json;
-
-    // Read JSON actions
-    if (!json.parse(json_queryAction)) {
-        LogError("Can not parse JSON std::string.");
-            return "";
-    }
-
-    if (!json.has<jsonxx::String>("action") || !json.has<jsonxx::Object>("param"))
-        return "";
-
-    std::string action = json.get<jsonxx::String>("action");
-
-    if (action == "element-info") {
-        std::string elementId;
-        if (this->ParseElementInfoAction(json.get<jsonxx::Object>("param"), &elementId)) {
-            return this->GetElementInfo(elementId);
-        }
-    }
-    else if (action == "clef-info") {
-        std::string staffId;
-        if (this->ParseElementInfoAction(json.get<jsonxx::Object>("param"), &staffId)) {
-            return this->GetClefInfo(staffId);
-        }
-    }
-    return "";
-}
-
 bool EditorToolkit::Drag(std::string elementId, int x, int y)
 {
     if (!m_doc->GetDrawingPage()) {
