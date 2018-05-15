@@ -268,5 +268,4 @@ bool EditorToolkit::ParseSetAction(
 }
 
 #endif
-// USE_EMSCRIPTEN
 } // namespace vrv
