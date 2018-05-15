@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        neume.cpp
-// Author:      Andrew Tran
+// Author:      Andrew Tran, Juliette Regimbal
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
@@ -83,14 +83,13 @@ bool Neume::IsLastInNeume(LayerElement *element)
     int size = (int)this->GetList(this)->size();
     int position = this->GetPosition(element);
 
-    // This method should be called only if the note is part of a beam
+    // This method should be called only if the note is part of a neume
     assert(position != -1);
     // this is the last one
     if (position == (size - 1)) return true;
     return false;
 }
 
-<<<<<<< HEAD
 bool Neume::GenerateChildMelodic()
 {
     ArrayOfObjects children;
@@ -129,8 +128,8 @@ bool Neume::GenerateChildMelodic()
     return true;
 }
 
-=======
 std::map<std::string, NeumeGroup> Neume::InitNeumeGroups() {
+    // These string keys come from the contours of neume groupings as defined in MEI4
     std::map<std::string, NeumeGroup> map;
     map["u"] = PES;
     map["d"] = CLIVIS;
@@ -144,5 +143,4 @@ std::map<std::string, NeumeGroup> Neume::InitNeumeGroups() {
 
 std::map<std::string, NeumeGroup> Neume::neumes = Neume::InitNeumeGroups();
 
->>>>>>> feature/neumegroup
 } // namespace vrv

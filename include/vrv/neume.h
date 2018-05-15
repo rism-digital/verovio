@@ -77,13 +77,10 @@ public:
 
     virtual int GetPosition(LayerElement *element);
     virtual bool IsLastInNeume(LayerElement *element);
-<<<<<<< HEAD
 
     bool GenerateChildMelodic();
-=======
     static std::map<std::string, NeumeGroup> InitNeumeGroups();
     static std::map<std::string, NeumeGroup> *GetGroups() { return &neumes; };
->>>>>>> feature/neumegroup
 
 private:
     static std::map<std::string, NeumeGroup> neumes;

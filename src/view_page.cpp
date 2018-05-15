@@ -10,7 +10,6 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <iostream>
 
 //----------------------------------------------------------------------------
 
@@ -1177,7 +1176,6 @@ void View::DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, St
     assert(measure);
 
     Object *current;
-
     for (current = parent->GetFirst(); current; current = parent->GetNext()) {
         if (current->IsLayerElement()) {
             DrawLayerElement(dc, dynamic_cast<LayerElement *>(current), layer, staff, measure);
@@ -1187,7 +1185,6 @@ void View::DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, St
             DrawLayerEditorialElement(dc, dynamic_cast<EditorialElement *>(current), layer, staff, measure);
         }
         else {
-
             assert(false);
         }
     }

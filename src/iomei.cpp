@@ -118,20 +118,20 @@ bool MeiOutput::ExportFile()
             // schema processing instruction
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "http://music-encoding.org/schema/3.0.0/mei-all.rng";
+            decl.append_attribute("href") = "http://music-encoding.org/schema/4.0.0/mei-all.rng";
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://relaxng.org/ns/structure/1.0";
 
             // schematron processing instruction
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "http://music-encoding.org/schema/3.0.0/mei-all.rng";
+            decl.append_attribute("href") = "http://music-encoding.org/schema/4.0.0/mei-all.rng";
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
 
             m_mei = meiDoc.append_child("mei");
             m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
-            m_mei.append_attribute("meiversion") = "2013";
+            m_mei.append_attribute("meiversion") = "4.0.0";
 
             // this starts the call of all the functors
             m_doc->Save(this);
@@ -1288,7 +1288,6 @@ void MeiOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     WriteLayerElement(currentNode, clef);
     clef->WriteClefShape(currentNode);
     clef->WriteColor(currentNode);
-    clef->WriteCoordinated(currentNode);
     clef->WriteLineLoc(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
 }
@@ -1301,7 +1300,6 @@ void MeiOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
     WritePositionInterface(currentNode, custos);
     WriteLayerElement(currentNode, custos);
     custos->WriteColor(currentNode);
-    custos->WriteCoordinated(currentNode);
 }
 
 void MeiOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
@@ -1415,7 +1413,6 @@ void MeiOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
 
     WriteLayerElement(currentNode, nc);
     nc->WriteColor(currentNode);;
-    nc->WriteCoordinated(currentNode);;
     nc->WriteIntervalMelodic(currentNode);;
     
 }
@@ -1446,7 +1443,6 @@ void MeiOutput::WriteNote(pugi::xml_node currentNode, Note *note)
     note->WriteTiePresent(currentNode);
     note->WriteVisibility(currentNode);
 }
-
 
 void MeiOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
 {
@@ -2621,7 +2617,7 @@ bool MeiInput::ReadPage(Object *parent, pugi::xml_node page)
     SetMeiUuid(page, vrvPage);
 
     if ((m_doc->GetType() == Transcription) && (m_version == MEI_2013)) {
-        // UpgradePageTo_3_0_0(vrvPage, m_doc);
+        UpgradePageTo_3_0_0(vrvPage, m_doc);
     }
 
     if (page.attribute("page.height")) {
@@ -3495,7 +3491,6 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
     pugi::xml_node xmlElement;
     std::string elementName;
     for (xmlElement = parentNode.first_child(); xmlElement; xmlElement = xmlElement.next_sibling()) {
-
         if (!success) {
             break;
         }
@@ -3738,7 +3733,6 @@ bool MeiInput::ReadClef(Object *parent, pugi::xml_node clef)
 
     vrvClef->ReadClefShape(clef);
     vrvClef->ReadColor(clef);
-    vrvClef->ReadCoordinated(clef);
     vrvClef->ReadLineLoc(clef);
     vrvClef->ReadOctaveDisplacement(clef);
 
@@ -3755,7 +3749,6 @@ bool MeiInput::ReadCustos(Object *parent, pugi::xml_node custos)
     ReadPositionInterface(custos, vrvCustos);
 
     vrvCustos->ReadColor(custos);
-    vrvCustos->ReadCoordinated(custos);
 
     parent->AddChild(vrvCustos);
     return true;
@@ -3909,7 +3902,6 @@ bool MeiInput::ReadNc(Object *parent, pugi::xml_node nc)
     ReadPitchInterface(nc, vrvNc);
     ReadPositionInterface(nc, vrvNc);
     vrvNc->ReadColor(nc);
-    vrvNc->ReadCoordinated(nc);
     vrvNc->ReadIntervalMelodic(nc);
 
     parent->AddChild(vrvNc);

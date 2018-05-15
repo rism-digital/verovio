@@ -23,8 +23,7 @@ namespace vrv {
 class Custos :  public LayerElement,
                 public PitchInterface,
                 public PositionInterface,
-                public AttColor,
-                public AttCoordinated
+                public AttColor
                 {
 public:
     /**
