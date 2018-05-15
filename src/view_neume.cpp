@@ -79,7 +79,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     // Calculating proper y offset based on pname, clef, and staff
     int clefYPosition = noteY - ( staffSize * (staffLineNumber - clefLine) );
-    int pitchOffset;
+    int pitchOffset = 0;
     int octaveOffset = (nc->GetOct() - 3) * ( (staffSize / 2) * 7);
 
     if(clef->GetShape() == CLEFSHAPE_C){
