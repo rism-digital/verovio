@@ -686,7 +686,9 @@ bool AttComparison::MatchesType(Object *object)
     return false;
 }
 
+//----------------------------------------------------------------------------
 // InterfaceComparison
+//----------------------------------------------------------------------------
 
 bool InterfaceComparison::operator()(Object *object)
 {

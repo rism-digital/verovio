@@ -1249,6 +1249,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
     if (!element) {
         element = m_doc.FindChildByUuid(elementId);
     }
+    // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
         if(!layer) return false;

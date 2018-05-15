@@ -263,7 +263,9 @@ protected:
     ClassId m_classId;
 };
 
-// What AttComparison is, but for Interfaces
+//----------------------------------------------------------------------------
+// InterfaceComparison
+//----------------------------------------------------------------------------
 
 class InterfaceComparison {
 

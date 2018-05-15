@@ -90,18 +90,19 @@ bool Neume::IsLastInNeume(LayerElement *element)
     return false;
 }
 
-<<<<<<< HEAD
 bool Neume::GenerateChildMelodic()
 {
     ArrayOfObjects children;
     AttComparison ac(NC);
     this->FindAllChildByAttComparison(&children, &ac);
 
+    // Get the first neume component of the neume
     auto iter = children.begin();
     Nc *head = dynamic_cast<Nc *>(*iter);
     if (head == nullptr) return false;
     iter++;
 
+    // Iterate on second to last neume component and add intm value
     for (; iter != children.end(); iter++)
     {
         Nc *current = dynamic_cast<Nc *>(*iter);
@@ -129,7 +130,6 @@ bool Neume::GenerateChildMelodic()
     return true;
 }
 
-=======
 std::map<std::string, NeumeGroup> Neume::InitNeumeGroups() {
     std::map<std::string, NeumeGroup> map;
     map["u"] = PES;
@@ -144,5 +144,4 @@ std::map<std::string, NeumeGroup> Neume::InitNeumeGroups() {
 
 std::map<std::string, NeumeGroup> Neume::neumes = Neume::InitNeumeGroups();
 
->>>>>>> feature/neumegroup
 } // namespace vrv
