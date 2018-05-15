@@ -17,6 +17,7 @@
 
 namespace vrv {
 
+#ifdef USE_EMSCRIPTEN
 bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
 {
     jsonxx::Object json;
@@ -251,6 +252,6 @@ bool EditorToolkit::ParseSetAction(
     (*attrValue) = param.get<jsonxx::String>("attrValue");
     return true;
 }
-
+#endif // #ifdef USE_EMSCRIPTEN
 
 } // namespace vrv
