@@ -346,7 +346,7 @@ void DisableLog()
 }
 
 #ifdef EMSCRIPTEN
-bool LogBufferContains(std::string &s)
+bool LogBufferContains(const std::string &s)
 {
     std::vector<std::string>::iterator iter = logBuffer.begin();
     while (iter != logBuffer.end()) {
