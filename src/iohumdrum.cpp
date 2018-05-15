@@ -2340,6 +2340,11 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         part = part->getNextToken();
     }
 
+    // short-circuit *clef with *oclef for **mens data
+    if ((!m_oclef.empty()) && (partnumber == m_oclef.back().first)) {
+        clef = *m_oclef.back().second;
+    }
+
     m_staffdef.back()->SetN(partnumber);
     m_staffdef.back()->SetLines(5);
 
@@ -9995,6 +10000,21 @@ void HumdrumInput::storeOriginalClefMensurationApp()
         return;
     }
 
+    int kerncount = 0;
+    int menscount = 0;
+    for (int i = 0; i < (int)m_oclef.size(); i++) {
+        if (m_oclef[i].second->isKern()) {
+            kerncount++;
+        }
+        else if (m_oclef[i].second->isMens()) {
+            menscount++;
+        }
+    }
+
+    if (kerncount == 0) {
+        // Don't produce <app> for **mens data for now.
+    }
+
     App *app = new App;
     m_sections.back()->AddChild(app);
 
@@ -10010,15 +10030,14 @@ void HumdrumInput::storeOriginalClefMensurationApp()
 
     StaffGrp *staffgrp = new StaffGrp;
     scoredef->AddChild(staffgrp);
-    int i, j;
 
     if (m_oclef.size() > 0) {
-        for (i = 0; i < (int)m_oclef.size(); ++i) {
+        for (int i = 0; i < (int)m_oclef.size(); ++i) {
             StaffDef *staffdef = new StaffDef;
             staffgrp->AddChild(staffdef);
             setClef(staffdef, *m_oclef[i].second);
             staffdef->SetN(m_oclef[i].first);
-            for (j = 0; j < (int)m_omet.size(); ++j) {
+            for (int j = 0; j < (int)m_omet.size(); ++j) {
                 if (m_omet[j].first != m_oclef[i].first) {
                     continue;
                 }
@@ -10028,7 +10047,7 @@ void HumdrumInput::storeOriginalClefMensurationApp()
     }
     else if (m_omet.size() > 0) {
         // No oclefs, just omets.
-        for (i = 0; i < (int)m_oclef.size(); ++i) {
+        for (int i = 0; i < (int)m_oclef.size(); ++i) {
             StaffDef *staffdef = new StaffDef;
             staffgrp->AddChild(staffdef);
             setMeterSymbol(staffdef, *m_omet[i].second);
