@@ -1088,7 +1088,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     }
 
     MeasureOnsetOffsetComparison matchMeasureTime(millisec);
-    Measure *measure = dynamic_cast<Measure *>(m_doc.FindChildByAttComparison(&matchMeasureTime));
+    Measure *measure = dynamic_cast<Measure *>(m_doc.FindChildByComparison(&matchMeasureTime));
 
     if (!measure) {
         return o.json();
@@ -1105,7 +1105,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
     ArrayOfObjects notes;
 
-    measure->FindAllChildByAttComparison(&notes, &matchNoteTime);
+    measure->FindAllChildByComparison(&notes, &matchNoteTime);
 
     // Fill the JSON object
     ArrayOfObjects::iterator iter;
@@ -1286,7 +1286,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
         // Get components of neume
         AttComparison ac(NC);
         ArrayOfObjects objects;
-        neume->FindAllChildByAttComparison(&objects, &ac);
+        neume->FindAllChildByComparison(&objects, &ac);
 
         for (auto it = objects.begin(); it != objects.end(); ++it) {
             Nc *nc = dynamic_cast<Nc *>(*it);
@@ -1317,7 +1317,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
             ArrayOfObjects objects;
             InterfaceComparison ic(INTERFACE_PITCH);
 
-            layer->FindAllChildByInterfaceComparison(&objects, &ic); 
+            layer->FindAllChildByComparison(&objects, &ic); 
 
             // Adjust all elements who are positioned relative to clef by pitch
             for (auto it = objects.begin(); it != objects.end(); ++it) {

@@ -42,7 +42,7 @@ class TimeSpanningInterface;
  * all layer one by one, and so one (lyrics, etc.). In IntTree, we can store
  * @n with all existing values (1 => 1 => 1; 2 => 1 => 1)
  * The stucture must be filled first and can then be used by instanciating a vector
- * of corresponding AttComparison (typically AttNIntegerComparison for @n attribute).
+ * of corresponding Comparison (typically AttNIntegerComparison for @n attribute).
  * See Doc::PrepareDrawing for an example.
  */
 struct IntTree {
@@ -359,39 +359,32 @@ public:
     Object *FindChildByType(ClassId classId, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
-     * Return the first element matching the AttComparison functor
+     * Return the first element matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    Object *FindChildByAttComparison(
-        AttComparison *attComparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    Object *FindChildByComparison(
+        Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
-     * Return the element matching the extreme value with an AttComparison functor
+     * Return the element matching the extreme value with an Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    Object *FindChildExtremeByAttComparison(
-        AttComparison *attComparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    Object *FindChildExtremeByComparison(
+        Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
-     * Return all the objects matching the AttComparison functor
+     * Return all the objects matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    void FindAllChildByAttComparison(ArrayOfObjects *objects, AttComparison *attComparison,
+    void FindAllChildByComparison(ArrayOfObjects *objects, Comparison *comparison,
         int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool clear = true);
 
     /**
-     * Returns all the objects matching the InterfaceComparison functor
-     * Deepness allow to limit the depth search (EditorialElements are not count)
-     */
-    void FindAllChildByInterfaceComparison(ArrayOfObjects *objects, InterfaceComparison *interfaceComparison, 
-        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool clear = true);
-
-    /**
-     * Return all the objects matching the AttComparison functor and being between start and end in the tree.
+     * Return all the objects matching the Comparison functor and being between start and end in the tree.
      * The start and end objects are included in the result set.
      */
     void FindAllChildBetween(
-        ArrayOfObjects *objects, AttComparison *attComparison, Object *start, Object *end, bool clear = true);
+        ArrayOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear = true);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -469,14 +462,14 @@ public:
      * Main method that processes functors.
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
-     * The ArrayOfAttComparisons filter parameter makes is possible to process only objects of a
-     * type that matches the attribute value given in the AttComparison object.
+     * The ArrayOfComparisons filter parameter makes is possible to process only objects of a
+     * type that matches the attribute value given in the Comparison object.
      * This is the generic way for parsing the tree, e.g., for extracting one single staff or layer.
      * Deepness specifies how many child levels should be processed. UNLIMITED_DEPTH means no
      * limit (EditorialElement objects do not count).
      */
     virtual void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
-        ArrayOfAttComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+        ArrayOfComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     //----------//
     // Functors //
@@ -498,26 +491,21 @@ public:
     virtual int FindByUuid(FunctorParams *functorParams);
 
     /**
-     * Find a Object with a AttComparison functor .     */
-    virtual int FindByAttComparison(FunctorParams *functorParams);
+     * Find a Object with a Comparison functor .     */
+    virtual int FindByComparison(FunctorParams *functorParams);
 
     /**
-     * Find a Object with the extreme value with a AttComparison functor .
+     * Find a Object with the extreme value with a Comparison functor .
      */
-    virtual int FindExtremeByAttComparison(FunctorParams *functorParams);
+    virtual int FindExtremeByComparison(FunctorParams *functorParams);
 
     /**
-     * Find a all Object with an AttComparison functor.
+     * Find a all Object with an Comparison functor.
      */
-    virtual int FindAllByAttComparison(FunctorParams *functorParams);
+    virtual int FindAllByComparison(FunctorParams *functorParams);
 
     /**
-     * Find all Objects with an InterfaceComparison functor.
-     */
-    virtual int FindAllByInterfaceComparison(FunctorParams *functorParams);
-
-    /**
-     * Find a all Object between a start and end Object and with an AttComparison functor.
+     * Find a all Object between a start and end Object and with an Comparison functor.
      */
     virtual int FindAllBetween(FunctorParams *functorParams);
 
@@ -886,7 +874,7 @@ public:
 
     /**
      * Set wordpos and connector ends
-     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * The functor is processed by staff/layer/verse using an ArrayOfComparisons filter.
      * At the end, the functor is processed by doc at the end of a document of closing opened syl.
      */
     ///@{
@@ -902,7 +890,7 @@ public:
 
     /**
      * Functor for setting mRpt drawing numbers (if required)
-     * The functor is processed by staff/layer using an ArrayOfAttComparisons filter.
+     * The functor is processed by staff/layer using an ArrayOfComparisons filter.
      */
     virtual int PrepareRpt(FunctorParams *) { return FUNCTOR_CONTINUE; }
 

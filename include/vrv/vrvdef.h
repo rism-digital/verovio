@@ -224,6 +224,7 @@ class Arpeg;
 class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
+class Comparison;
 class FloatingPositioner;
 class GraceAligner;
 class InterfaceComparison;
@@ -245,7 +246,7 @@ typedef std::vector<Object *> ArrayOfObjects;
 
 typedef std::vector<Object *> ListOfObjects;
 
-typedef std::vector<AttComparison *> ArrayOfAttComparisons;
+typedef std::vector<Comparison *> ArrayOfComparisons;
 
 typedef std::vector<Note *> ChordCluster;
 

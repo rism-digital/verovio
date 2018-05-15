@@ -248,10 +248,21 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// Comparison
+//----------------------------------------------------------------------------
+
+class Comparison {
+
+public:
+    virtual bool operator()(Object *object) = 0;
+    virtual bool MatchesType(Object *object) = 0;
+};
+
+//----------------------------------------------------------------------------
 // AttComparison
 //----------------------------------------------------------------------------
 
-class AttComparison {
+class AttComparison : public Comparison {
 
 public:
     AttComparison(ClassId classId) { m_classId = classId; }
@@ -270,7 +281,7 @@ protected:
 // InterfaceComparison
 //----------------------------------------------------------------------------
 
-class InterfaceComparison {
+class InterfaceComparison : public Comparison {
 
 public:
     InterfaceComparison(InterfaceId interfaceId) { m_interfaceId = interfaceId; }
@@ -279,7 +290,7 @@ public:
 
     InterfaceId GetInterface() { return m_interfaceId; }
 
-    bool MatchesInterface(Object *object);
+    bool MatchesType(Object *object);
 
 protected:
     InterfaceId m_interfaceId;

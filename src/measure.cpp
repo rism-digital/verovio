@@ -306,7 +306,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     AttComparison matchType(STAFFGRP);
     ArrayOfObjects staffGrps;
     ArrayOfObjects::iterator staffGrpIter;
-    scoreDef->FindAllChildByAttComparison(&staffGrps, &matchType);
+    scoreDef->FindAllChildByComparison(&staffGrps, &matchType);
 
     // Then the @n of each first staffDef
     for (staffGrpIter = staffGrps.begin(); staffGrpIter != staffGrps.end(); ++staffGrpIter) {
@@ -317,7 +317,7 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
     // Get the corresponding staves in the measure
     for (iter = staffList.begin(); iter != staffList.end(); ++iter) {
         AttNIntegerComparison matchN(STAFF, *iter);
-        Staff *staff = dynamic_cast<Staff *>(this->FindChildByAttComparison(&matchN, 1));
+        Staff *staff = dynamic_cast<Staff *>(this->FindChildByComparison(&matchN, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
             continue;
@@ -458,7 +458,7 @@ int Measure::ConvertToCastOffMensural(FunctorParams *functorParams)
     }
     params->m_targetSubSystem->AddChild(measure);
 
-    std::vector<AttComparison *> filters;
+    ArrayOfComparisons filters;
     // Now we can process by layer and move their content to (measure) segments
     for (auto const &staves : params->m_layerTree->child) {
         for (auto const &layers : staves.second.child) {
@@ -626,7 +626,7 @@ int Measure::AdjustLayers(FunctorParams *functorParams)
     if (!m_hasAlignmentRefWithMultipleLayers) return FUNCTOR_SIBLINGS;
 
     std::vector<int>::iterator iter;
-    std::vector<AttComparison *> filters;
+    ArrayOfComparisons filters;
     for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
         filters.clear();
         // Create ad comparison object for each type / @n
@@ -694,7 +694,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     params->m_cumulatedXShift = 0;
 
     std::vector<int>::iterator iter;
-    std::vector<AttComparison *> filters;
+    ArrayOfComparisons filters;
     for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
         params->m_minPos = 0;
         params->m_upcomingMinPos = VRV_UNSET;
@@ -719,7 +719,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     // First try to see if we have a double measure length element
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_FULLMEASURE2);
     Alignment *fullMeasure2
-        = dynamic_cast<Alignment *>(m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+        = dynamic_cast<Alignment *>(m_measureAligner.FindChildByComparison(&alignmentComparison, 1));
 
     // With a double measure with element (mRpt2, multiRpt)
     if (fullMeasure2 != NULL) {

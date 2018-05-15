@@ -136,7 +136,7 @@ bool LayerElement::IsGraceNote()
     else if (this->Is(TUPLET)) {
         AttComparisonAny matchType({ NOTE, CHORD });
         ArrayOfObjects children;
-        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByAttComparison(&matchType));
+        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByComparison(&matchType));
         if (child) return child->IsGraceNote();
     }
     // For accid, artic, etc.. look at the parent note / chord
@@ -1100,7 +1100,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     else if (this->Is(TUPLET)) {
         AttComparisonAny matchType({ NOTE, CHORD });
         ArrayOfObjects children;
-        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByAttComparison(&matchType));
+        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByComparison(&matchType));
         if (child) m_drawingCueSize = child->GetDrawingCueSize();
     }
     // For accid, look at the parent if @func="edit" or otherwise to the parent note
@@ -1152,7 +1152,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     params->m_currentCrossLayer = NULL;
 
     AttNIntegerComparison comparisonFirst(STAFF, durElement->GetStaff().at(0));
-    m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindChildByAttComparison(&comparisonFirst, 1));
+    m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindChildByComparison(&comparisonFirst, 1));
     if (!m_crossStaff) {
         LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff().at(0),
             this->GetUuid().c_str());
@@ -1176,7 +1176,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     // When we will have allowed @layer in <note>, we will have to do:
     // int layerN = durElement->HasLayer() ? durElement->GetLayer() : (*currentLayer)->GetN();
     AttNIntegerComparison comparisonFirstLayer(LAYER, layerN);
-    m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByAttComparison(&comparisonFirstLayer, 1));
+    m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByComparison(&comparisonFirstLayer, 1));
     if (!m_crossLayer) {
         // Just try to pick the first one...
         m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByType(LAYER));

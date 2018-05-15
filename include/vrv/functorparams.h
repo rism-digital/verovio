@@ -918,21 +918,21 @@ public:
 
 class FindAllBetweenParams : public FunctorParams {
 public:
-    FindAllBetweenParams(AttComparison *attComparison, ArrayOfObjects *elements, Object *start, Object *end)
+    FindAllBetweenParams(Comparison *comparison, ArrayOfObjects *elements, Object *start, Object *end)
     {
-        m_attComparison = attComparison;
+        m_comparison = comparison;
         m_elements = elements;
         m_start = start;
         m_end = end;
     }
-    AttComparison *m_attComparison;
+    Comparison *m_comparison;
     ArrayOfObjects *m_elements;
     Object *m_start;
     Object *m_end;
 };
 
 //----------------------------------------------------------------------------
-// FindAllByAttComparisonParams
+// FindAllByComparisonParams
 //----------------------------------------------------------------------------
 
 /**
@@ -940,39 +940,19 @@ public:
  * member 1: an array of all matching objects
  **/
 
-class FindAllByAttComparisonParams : public FunctorParams {
+class FindAllByComparisonParams : public FunctorParams {
 public:
-    FindAllByAttComparisonParams(AttComparison *attComparison, ArrayOfObjects *elements)
+    FindAllByComparisonParams(Comparison *comparison, ArrayOfObjects *elements)
     {
-        m_attComparison = attComparison;
+        m_comparison = comparison;
         m_elements = elements;
     }
-    AttComparison *m_attComparison;
+    Comparison *m_comparison;
     ArrayOfObjects *m_elements;
 };
 
 //----------------------------------------------------------------------------
-// FindAllByInterfaceComparisonParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the interfaceComparison text
- * member 1: an array of all matching objects
- **/
-
-class FindAllByInterfaceComparisonParams : public FunctorParams {
-public:
-    FindAllByInterfaceComparisonParams(InterfaceComparison *interfaceComparison, ArrayOfObjects *elements)
-    {
-        m_interfaceComparison = interfaceComparison;
-        m_elements = elements;
-    }
-    InterfaceComparison *m_interfaceComparison;
-    ArrayOfObjects *m_elements;
-};
-
-//----------------------------------------------------------------------------
-// FindByAttComparisonParams
+// FindByComparisonParams
 //----------------------------------------------------------------------------
 
 /**
@@ -980,14 +960,14 @@ public:
  * member 1: the pointer to pointer to the Object
  **/
 
-class FindByAttComparisonParams : public FunctorParams {
+class FindByComparisonParams : public FunctorParams {
 public:
-    FindByAttComparisonParams(AttComparison *attComparison)
+    FindByComparisonParams(Comparison *comparison)
     {
-        m_attComparison = attComparison;
+        m_comparison = comparison;
         m_element = NULL;
     }
-    AttComparison *m_attComparison;
+    Comparison *m_comparison;
     Object *m_element;
 };
 
@@ -1008,7 +988,7 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// FindExtremeByAttComparisonParams
+// FindExtremeByComparisonParams
 //----------------------------------------------------------------------------
 
 /**
@@ -1016,14 +996,14 @@ public:
  * member 1: the pointer to pointer to the Object
  **/
 
-class FindExtremeByAttComparisonParams : public FunctorParams {
+class FindExtremeByComparisonParams : public FunctorParams {
 public:
-    FindExtremeByAttComparisonParams(AttComparison *attComparison)
+    FindExtremeByComparisonParams(Comparison *comparison)
     {
-        m_attComparison = attComparison;
+        m_comparison = comparison;
         m_element = NULL;
     }
-    AttComparison *m_attComparison;
+    Comparison *m_comparison;
     Object *m_element;
 };
 

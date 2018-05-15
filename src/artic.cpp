@@ -90,13 +90,13 @@ void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<d
 ArticPart *Artic::GetInsidePart()
 {
     ArticPartTypeComparison articPartComparison(ARTIC_PART_INSIDE);
-    return dynamic_cast<ArticPart *>(FindChildByAttComparison(&articPartComparison, 1));
+    return dynamic_cast<ArticPart *>(FindChildByComparison(&articPartComparison, 1));
 }
 
 ArticPart *Artic::GetOutsidePart()
 {
     ArticPartTypeComparison articPartComparison(ARTIC_PART_OUTSIDE);
-    return dynamic_cast<ArticPart *>(FindChildByAttComparison(&articPartComparison, 1));
+    return dynamic_cast<ArticPart *>(FindChildByComparison(&articPartComparison, 1));
 }
 
 wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)

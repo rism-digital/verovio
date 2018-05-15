@@ -94,7 +94,7 @@ bool Neume::GenerateChildMelodic()
 {
     ArrayOfObjects children;
     AttComparison ac(NC);
-    this->FindAllChildByAttComparison(&children, &ac);
+    this->FindAllChildByComparison(&children, &ac);
 
     // Get the first neume component of the neume
     auto iter = children.begin();

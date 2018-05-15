@@ -282,7 +282,7 @@ data_STEMDIRECTION Layer::GetDrawingStemDir(double time, double duration, Measur
     findSpaceInAlignmentParams.m_time = time;
     findSpaceInAlignmentParams.m_duration = duration;
 
-    std::vector<AttComparison *> filters;
+    ArrayOfComparisons filters;
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staff);
     filters.push_back(&matchStaff);
 

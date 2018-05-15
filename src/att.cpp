@@ -698,7 +698,7 @@ bool InterfaceComparison::operator()(Object *object)
     return false;
 }
 
-bool InterfaceComparison::MatchesInterface(Object *object)
+bool InterfaceComparison::MatchesType(Object *object)
 {
     if (object->HasInterface(m_interfaceId)) {
         return true;
