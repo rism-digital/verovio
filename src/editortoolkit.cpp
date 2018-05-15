@@ -274,4 +274,5 @@ bool EditorToolkit::ParseSetAction(
     (*attrValue) = param.get<jsonxx::String>("attrValue");
     return true;
 }
+#endif
 } // namespace vrv
