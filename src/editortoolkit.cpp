@@ -275,4 +275,5 @@ bool EditorToolkit::ParseSetAction(
     return true;
 }
 #endif
+
 } // namespace vrv
