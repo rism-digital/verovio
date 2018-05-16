@@ -139,7 +139,7 @@ int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
 
         // Look if we already have the staff (e.g., with more than one layer)
         AttNIntegerComparison comparisonStaffN(STAFF, params->m_targetStaff->GetN());
-        Staff *staff = dynamic_cast<Staff *>(params->m_targetMeasure->FindChildByAttComparison(&comparisonStaffN));
+        Staff *staff = dynamic_cast<Staff *>(params->m_targetMeasure->FindChildByComparison(&comparisonStaffN));
         if (!staff) {
             staff = new Staff(*params->m_targetStaff);
             staff->CopyReset();

@@ -238,7 +238,7 @@ void Page::LayOutHorizontally()
         int longestActualDur = DUR_4;
         // Get the longest duration in the piece
         AttDurExtreme durExtremeComparison(LONGEST);
-        Object *longestDur = this->FindChildExtremeByAttComparison(&durExtremeComparison);
+        Object *longestDur = this->FindChildExtremeByComparison(&durExtremeComparison);
         if (longestDur) {
             DurationInterface *interface = longestDur->GetDurationInterface();
             assert(interface);
@@ -501,7 +501,7 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
 
     if (listsParams.m_verseTree.child.empty()) return;
 
-    std::vector<AttComparison *> filters;
+    ArrayOfComparisons filters;
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
     for (staves = listsParams.m_verseTree.child.begin(); staves != listsParams.m_verseTree.child.end(); ++staves) {

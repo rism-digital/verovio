@@ -10,6 +10,7 @@
 
 #include "devicecontextbase.h"
 #include "scoredef.h"
+#include "smufl.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -20,6 +21,7 @@ class BarLine;
 class Beam;
 class BeamDrawingParams;
 class Breath;
+class ControlElement;
 class Chord;
 class ControlElement;
 class DeviceContext;
@@ -40,6 +42,8 @@ class Lb;
 class Measure;
 class MNum;
 class Mordent;
+class Nc;
+class Neume;
 class Num;
 class Octave;
 class Options;
@@ -55,6 +59,7 @@ class Slur;
 class Staff;
 class Svg;
 class Syl;
+class Syllable;
 class System;
 class SystemElement;
 class Tempo;
@@ -352,6 +357,15 @@ protected:
     void DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     ///@}
 
+    /**
+     * @name Methods for drawing neumes.
+     * Defined in view_neume.cpp
+     */
+    ///@{
+    void DrawSyllable(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, wchar_t fontNo = SMUFL_E990_chantPunctum, int xOffset = 0, int yOffset = 0);
+    void DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    ///@}
     /**
      * @name Methods for drawing Floating child classes.
      * They are base drawing methods that are called directly from DrawFloatingElement.
