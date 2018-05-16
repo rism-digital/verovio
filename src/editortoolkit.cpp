@@ -279,7 +279,6 @@ bool EditorToolkit::ParseSetAction(
     (*attrValue) = param.get<jsonxx::String>("attrValue");
     return true;
 }
-
 #endif
 
 // USE_EMSCRIPTEN
