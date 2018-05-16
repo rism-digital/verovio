@@ -2341,8 +2341,10 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     // short-circuit *clef with *oclef for **mens data
-    if ((!m_oclef.empty()) && (partnumber == m_oclef.back().first)) {
-        clef = *m_oclef.back().second;
+    if (partstart->isMens()) {
+        if ((!m_oclef.empty()) && (partnumber == m_oclef.back().first)) {
+            clef = *m_oclef.back().second;
+        }
     }
 
     m_staffdef.back()->SetN(partnumber);
