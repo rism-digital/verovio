@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri May 11 21:23:19 PDT 2018
+// Last Modified: Tue May 15 20:27:30 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1520,6 +1520,7 @@ class HumdrumFileBase : public HumHash {
 		void          example                  (void);
 
 		HTp           getTrackStart            (int track) const;
+		void          getSpineStopList         (vector<HTp>& spinestops);
 		HTp           getSpineStart            (int spine) const
 		                                       { return getTrackStart(spine+1); }
 		void          getSpineStartList        (vector<HTp>& spinestarts);

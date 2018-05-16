@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri May 11 21:23:19 PDT 2018
+// Last Modified: Tue May 15 20:27:30 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -159,12 +159,10 @@ void Convert::makeAdjustedKeyRootAndMode(const string& secondary, int& keyroot,
 	vector<string> roots;
 	HumRegex hre;
 	hre.split(roots, secondary, "/");
-	string piece;
-	int number;
 
 	for (int i=0; i<(int)roots.size(); i++) {
-		piece = roots[(int)roots.size() - i - 1];
-		number = Convert::romanNumeralToInteger(piece);
+		string piece = roots[(int)roots.size() - i - 1];
+		int number = Convert::romanNumeralToInteger(piece);
 		if (number == 0) {
 			continue;
 		} else if (number > 7) {
@@ -794,9 +792,6 @@ double Convert::pearsonCorrelation(vector<double> x, vector<double> y) {
 	double sumco = 0.0;
 	double meanx = x[0];
 	double meany = y[0];
-	double sweep;
-	double deltax;
-	double deltay;
 
 	int size = (int)x.size();
 	if ((int)y.size() < size) {
@@ -804,9 +799,9 @@ double Convert::pearsonCorrelation(vector<double> x, vector<double> y) {
 	}
 
 	for (int i=2; i<=size; i++) {
-		sweep = (i-1.0) / i;
-		deltax = x[i-1] - meanx;
-		deltay = y[i-1] - meany;
+		double sweep = (i-1.0) / i;
+		double deltax = x[i-1] - meanx;
+		double deltay = y[i-1] - meany;
 		sumx  += deltax * deltax * sweep;
 		sumy  += deltay * deltay * sweep;
 		sumco += deltax * deltay * sweep;
@@ -995,9 +990,7 @@ HumNum Convert::mensToDuration(const string& mensdata, HumNum scale,
 		output *= 3;
 		output /= 2;
 	}
-
 	output *= scale;
-
 	return output;
 }
 
@@ -1067,14 +1060,11 @@ string Convert::kernToScientificPitch(const string& kerndata,
 		string flat, string sharp, string separator) {
 	vector<string> subtokens = Convert::splitString(kerndata);
 	string output;
-	char   diatonic;
-	int    accidental;
-	int    octave;
 
 	for (int i=0; i<(int)subtokens.size(); i++) {
-		diatonic   = Convert::kernToDiatonicUC(subtokens[i]);
-		accidental = Convert::kernToAccidentalCount(subtokens[i]);
-		octave     = Convert::kernToOctaveNumber(subtokens[i]);
+		char diatonic   = Convert::kernToDiatonicUC(subtokens[i]);
+		int accidental = Convert::kernToAccidentalCount(subtokens[i]);
+		int octave     = Convert::kernToOctaveNumber(subtokens[i]);
 		if ((i > 0) && (i < (int)subtokens.size()-1)) {
 			output += " ";
 		}
@@ -6182,11 +6172,8 @@ void HumGrid::adjustExpansionsInStaff(GridSlice* newmanip, GridSlice* curr, int 
 	HTp token = NULL;
 	GridVoice* newvoice  = NULL;
 	GridVoice* curvoice  = NULL;
-	GridStaff* newstaff  = NULL;
-	GridStaff* curstaff  = NULL;
-
-	curstaff = curr->at(p)->at(s);
-	newstaff = newmanip->at(p)->at(s);
+	GridStaff* newstaff  = newmanip->at(p)->at(s);
+	GridStaff* curstaff  = curr->at(p)->at(s);
 
 	int originalsize = (int)curstaff->size();
 	int cv = 0;
@@ -7121,17 +7108,13 @@ void HumGrid::FillInNullTokensForClefChanges(GridSlice* clefslice,
 	// cerr << "\tnext\t" << nextnote << endl;
 
 	int partcount = (int)clefslice->size();
-	int staffcount;
-	int vgcount;
-	int v1count;
-	int v2count;
 
 	for (int p=0; p<partcount; p++) {
-		staffcount = (int)lastnote->at(p)->size();
+		int staffcount = (int)lastnote->at(p)->size();
 		for (int s=0; s<staffcount; s++) {
-			v1count = (int)lastnote->at(p)->at(s)->size();
-			v2count = (int)nextnote->at(p)->at(s)->size();
-			vgcount = (int)clefslice->at(p)->at(s)->size();
+			int v1count = (int)lastnote->at(p)->at(s)->size();
+			int v2count = (int)nextnote->at(p)->at(s)->size();
+			int vgcount = (int)clefslice->at(p)->at(s)->size();
 			// if (vgcount < 1) {
 			// 	vgcount = 1;
 			// }
@@ -8106,11 +8089,8 @@ void HumGrid::removeRedundantClefChanges(void) {
 	vector<vector<string> > curclef;
 
 	bool hasduplicate = false;
-	GridMeasure* measure;
-	GridVoice* voice;
-	HTp token;
 	for (int m=0; m<(int)this->size(); m++) {
-		measure = this->at(m);
+		GridMeasure* measure = this->at(m);
 		for (auto slice : *measure) {
 			if (!slice->isClefSlice()) {
 				continue;
@@ -8121,8 +8101,8 @@ void HumGrid::removeRedundantClefChanges(void) {
 					if (slice->at(p)->at(s)->size() < 1) {
 						continue;
 					}
-					voice = slice->at(p)->at(s)->at(0);
-					token = voice->getToken();
+					GridVoice* voice = slice->at(p)->at(s)->at(0);
+					HTp token = voice->getToken();
 					if (!token) {
 						continue;
 					}
@@ -13176,6 +13156,23 @@ int HumdrumFileBase::getExinterpCount(const string& exinterp) {
 
 //////////////////////////////
 //
+// HumdrumFileBase::getSpineStopList -- Return a list of the ending
+//     points of spine strands.
+//
+
+void HumdrumFileBase::getSpineStopList(vector<HTp>& spinestops) {
+	spinestops.reserve(m_trackends.size());
+	spinestops.resize(0);
+	for (int i=0; i<(int)m_trackends.size(); i++) {
+		for (int j=0; j<(int)m_trackends[i].size(); j++) {
+			spinestops.push_back(m_trackends[i][j]);
+		}
+	}
+}
+
+
+//////////////////////////////
+//
 // HumdrumFileBase::getSpineStartList -- Return a list of the exclustive
 //     interpretations starting spines in the data.  The single parameter
 //     version of the fuction returns all starting exclusive interpretations.
@@ -13963,32 +13960,36 @@ bool HumdrumFileBase::analyzeNonNullDataTokens(void) {
 	// tokens in spines for all types of line types  For now specify
 	// the next non-null data token for the exclusive interpretation token.
 	// Also this implementation does not consider that the first
-	// non-null data tokens may be from nultiple split tokens (fix later).
-	vector<HTp> starts;
-	vector<HTp> nexts;
-	getSpineStartList(starts);
-	nexts.resize(starts.size(), NULL);
-	for (int i=0; i<(int)starts.size(); i++) {
-		if (starts[i] == NULL) {
+	// non-null data tokens may be from multiple split tokens (fix later).
+
+	// This algorithm is probably not right, but good enough for now.
+	// There may be missing portions of the file for the analysis,
+	// and/or the algorithm is probably retracking tokens in the case
+	// of spine splits.
+
+	vector<HTp> stops;
+	getSpineStopList(stops);
+	HTp nexts = NULL;
+
+	for (int i=0; i<(int)stops.size(); i++) {
+		if (stops[i] == NULL) {
 			continue;
 		}
-		HTp token = starts[i];
-		token = token->getNextToken();
+		HTp token = stops[i];
+		if (token->isData() && !token->isNull()) {
+			nexts = token;
+		}
+		token = token->getPreviousToken();
+
 		while (token) {
-			if (token->isData()) {
-				if (!token->isNull()) {
-					nexts[i] = token;
-					break;
-				}
+			if (nexts) {
+				token->addNextNonNullToken(nexts);
 			}
-			token = token->getNextToken();
+			if (token->isData() && !token->isNull()) {
+				nexts = token;
+			}
+			token = token->getPreviousToken();
 		}
-	}
-	for (int i=0; i<(int)nexts.size(); i++) {
-		if (nexts[i] == NULL) {
-			continue;
-		}
-		starts[i]->addNextNonNullToken(nexts[i]);
 	}
 
 	return true;
@@ -19753,49 +19754,33 @@ HumNum HumdrumToken::getDuration(HumNum scale) const {
 //////////////////////////////
 //
 // HumdrumToken::getTiedDuration -- Returns the duration of the token and any
-//    tied notes attached to it.  Does not work well which chords.
+//    tied notes attached to it.  Does not work well which chords.  Does
+//    not work well with secondary spine splits.
 //
 
 HumNum HumdrumToken::getTiedDuration(void) {
 	HumNum output = m_duration;
-
 	// start of a tied group so add the durations of the other notes.
-   int b40 = Convert::kernToBase40(*this);
+   int b40 = Convert::kernToBase40(this);
 	HTp note = this;
 	HTp nnote = NULL;
-	int tcount;
 	while (note) {
-		tcount = note->getNextNonNullDataTokenCount();
-		if (tcount == 0) {
+		nnote = note->getNextNNDT();
+		if (!nnote) {
 			break;
 		}
-		if (!note->getNextNNDT()->isData()) {
-			note = note->getNextNNDT();
-			continue;
+		if (!nnote->isSecondaryTiedNote()) {
+			break;
 		}
-		for (int i=0; i<getNextNonNullDataTokenCount(); i++) {
-			nnote = note->getNextNNDT();
-			if ((nnote->find("_") == std::string::npos) &&
-			   (nnote->find("]") == std::string::npos)) {
-				return output;
-			}
-			if (!nnote->isData())  {
-				continue;
-			}
-			int pitch2 = Convert::kernToBase40(*nnote);
-			if (pitch2 != b40) {
-				continue;
-			}
-
-			if (nnote->find("_")  != std::string::npos) {
-				output += nnote->getDuration();
-			} else if (nnote->find("]") != std::string::npos) {
-				output += nnote->getDuration();
-				return output;
-			}
+		int nb40 = Convert::kernToBase40(this);
+		if (nb40 != b40) {
+			break;
 		}
-		note = getNextNNDT();
+		// note is tied to previous one, so add its curation to output.
+		output += nnote->getDuration();
+		note = nnote;
 	}
+
 	return output;
 }
 
@@ -44745,11 +44730,8 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 	string pitch;
 	string prefix;
 	string postfix;
-	bool grace = false;
 	bool invisible = false;
 	bool primarynote = true;
-	bool slurstart = false;
-	bool slurstop = false;
 	int slurdir = 0;
 
 	if (!event->isFloating()) {
@@ -44767,9 +44749,9 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 		pitch     = event->getKernPitch();
 		prefix    = event->getPrefixNoteInfo();
 		postfix   = event->getPostfixNoteInfo(primarynote);
-		grace     = event->isGrace();
-		slurstart = event->hasSlurStart(slurdir);
-		slurstop  = event->hasSlurStop();
+		bool grace     = event->isGrace();
+		bool slurstart = event->hasSlurStart(slurdir);
+		bool slurstop  = event->hasSlurStop();
 
 		if (slurstart) {
 			prefix.insert(0, "(");
