@@ -40,6 +40,10 @@
 #include "jsonxx.h"
 #include "unchecked.h"
 
+#ifdef USE_EMSCRIPTEN
+#include "editortoolkit.h"
+#endif
+
 namespace vrv {
 
 const char *UTF_16_BE_BOM = "\xFE\xFF";
@@ -876,7 +880,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 bool Toolkit::Edit(const std::string &json_editorAction)
 {
 #ifdef USE_EMSCRIPTEN
-    EditorToolkit editorToolkit(m_doc, m_view);
+    EditorToolkit editorToolkit(&m_doc, &m_view);
     return editorToolkit.ParseEditorAction(json_editorAction);
 #else
     // The non-js version of the app should not use this function.
