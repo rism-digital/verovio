@@ -130,7 +130,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             ArrayOfObjects objects;
             InterfaceComparison ic(INTERFACE_PITCH);
 
-            layer->FindAllChildByInterfaceComparison(&objects, &ic); 
+            layer->FindAllChildByComparison(&objects, &ic); 
 
             // Adjust all elements who are positioned relative to clef by pitch
             for (auto it = objects.begin(); it != objects.end(); ++it) {
@@ -252,6 +252,7 @@ bool EditorToolkit::ParseSetAction(
     (*attrValue) = param.get<jsonxx::String>("attrValue");
     return true;
 }
-#endif // #ifdef USE_EMSCRIPTEN
+#endif
+// USE_EMSCRIPTEN
 
 } // namespace vrv
