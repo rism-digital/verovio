@@ -6,7 +6,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "view.h"
-#include "vrv.h"
 
 //----------------------------------------------------------------------------
 
@@ -26,6 +25,7 @@
 #include "rest.h"
 #include "smufl.h"
 #include "staff.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -146,7 +146,7 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int y = staff->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - 1);
     int x = element->GetDrawingX();
     int perfectRadius = m_doc->GetGlyphWidth(SMUFL_E910_mensuralProlation1, staff->m_drawingStaffSize, false) / 2;
-    int code = NULL;
+    int code = 0;
 
     if (mensur->HasLoc()) {
         y = staff->GetDrawingY()
@@ -347,11 +347,9 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     assert(note);
 
     int xLeft, xRight, yTop, yBottom, y3, y4;
-    bool up;
-    int height;
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     bool fillNotehead = (mensural_black || note->GetColored()) && !(mensural_black && note->GetColored());
-    height = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) / 2;
+    int height = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) / 2;
 
     // Calculate size of the rectangle
     xLeft = element->GetDrawingX();
@@ -388,7 +386,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
 
     // stem
     if (note->GetActualDur() < DUR_BR) {
-        up = false;
+        bool up = false;
         if (note->GetDrawingStemDir() != STEMDIRECTION_NONE) {
             up = (note->GetDrawingStemDir() == STEMDIRECTION_up) ? true : false;
         }

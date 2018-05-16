@@ -301,7 +301,7 @@ AttNoteGes::~AttNoteGes()
 void AttNoteGes::ResetNoteGes()
 {
     m_extremis = noteGes_EXTREMIS_NONE;
-    m_octGes = 0;
+    m_octGes = -127;
     m_pnameGes = PITCHNAME_NONE;
     m_pnum = 0;
 }
@@ -315,7 +315,7 @@ bool AttNoteGes::ReadNoteGes(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("oct.ges")) {
-        this->SetOctGes(StrToInt(element.attribute("oct.ges").value()));
+        this->SetOctGes(StrToOctave(element.attribute("oct.ges").value()));
         element.remove_attribute("oct.ges");
         hasAttribute = true;
     }
@@ -340,7 +340,7 @@ bool AttNoteGes::WriteNoteGes(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasOctGes()) {
-        element.append_attribute("oct.ges") = IntToStr(this->GetOctGes()).c_str();
+        element.append_attribute("oct.ges") = OctaveToStr(this->GetOctGes()).c_str();
         wroteAttribute = true;
     }
     if (this->HasPnameGes()) {
@@ -361,7 +361,7 @@ bool AttNoteGes::HasExtremis() const
 
 bool AttNoteGes::HasOctGes() const
 {
-    return (m_octGes != 0);
+    return (m_octGes != -127);
 }
 
 bool AttNoteGes::HasPnameGes() const
@@ -682,7 +682,7 @@ bool Att::SetGestural(Object *element, std::string attrType, std::string attrVal
             return true;
         }
         if (attrType == "oct.ges") {
-            att->SetOctGes(att->StrToInt(attrValue));
+            att->SetOctGes(att->StrToOctave(attrValue));
             return true;
         }
         if (attrType == "pname.ges") {
@@ -798,7 +798,7 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("extremis", att->NoteGesExtremisToStr(att->GetExtremis())));
         }
         if (att->HasOctGes()) {
-            attributes->push_back(std::make_pair("oct.ges", att->IntToStr(att->GetOctGes())));
+            attributes->push_back(std::make_pair("oct.ges", att->OctaveToStr(att->GetOctGes())));
         }
         if (att->HasPnameGes()) {
             attributes->push_back(std::make_pair("pname.ges", att->PitchnameToStr(att->GetPnameGes())));

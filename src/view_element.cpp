@@ -412,12 +412,11 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int drawingDur;
     LayerElement *childElement = NULL;
     Note *childNote = NULL;
-    Chord *childChord = NULL;
     Point stemPoint;
     bool drawingCueSize = false;
     int x, y;
 
-    childChord = dynamic_cast<Chord *>(bTrem->FindChildByType(CHORD));
+    Chord *childChord = dynamic_cast<Chord *>(bTrem->FindChildByType(CHORD));
     // Get from the chord or note child
     if (childChord) {
         drawingDur = childChord->GetDur();
@@ -1000,7 +999,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     multiRest->CenterDrawingX();
 
-    int x1, x2, y1, y2, length;
+    int x1, x2, y1, y2;
 
     dc->StartGraphic(element, "", element->GetUuid());
 
@@ -1012,7 +1011,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     if ((num > 2) || (multiRest->GetBlock() == BOOLEAN_true)) {
         // This is 1/2 the length of the black rectangle
-        length = width - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        int length = width - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
         // a is the central point, claculate x and x2
         x1 = xCentered - length / 2;
