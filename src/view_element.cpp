@@ -1289,20 +1289,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     // move the position back - to be updated HARDCODED also see View::DrawSylConnector and View::DrawSylConnectorLines
     // assert(false);
     syl->SetDrawingXRel(-m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1);
-    if (isNeume) {
-        StaffAlignment *alignment = staff->GetAlignment();
-        assert(alignment);
-        FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-        int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
-        int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
-        int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-
-        int y = alignment->GetStaffHeight() + alignment->GetOverflowAbove() + (alignment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
-        syl->SetDrawingYRel(y);
-    }
-    else {
-        syl->SetDrawingYRel(GetSylYRel(syl, staff));
-    }
+    syl->SetDrawingYRel(GetSylYRel(syl, staff));
 
     dc->StartGraphic(syl, "", syl->GetUuid());
     dc->DeactivateGraphicY();
@@ -1565,8 +1552,14 @@ int View::GetSylYRel(Syl *syl, Staff *staff)
         int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
         int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
-            + (alignment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
+        if (staff->m_drawingNotationType == NOTATIONTYPE_neume) {
+            y = alignment->GetStaffHeight() + alignment->GetOverflowAbove()
+                + (alignment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
+        }
+        else {
+            y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
+                + (alignment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
+        }
     }
     return y;
 }
