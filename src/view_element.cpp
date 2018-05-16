@@ -1279,7 +1279,9 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     Syl *syl = dynamic_cast<Syl *>(element);
     assert(syl);
 
-    if (!syl->GetStart() && staff->m_drawingNotationType != NOTATIONTYPE_neume) {
+    bool isNeume = (staff->m_drawingNotationType == NOTATIONTYPE_neume);
+
+    if (!syl->GetStart() && !isNeume) {
         LogWarning("Parent note for <syl> was not found");
         return;
     }
@@ -1287,7 +1289,20 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     // move the position back - to be updated HARDCODED also see View::DrawSylConnector and View::DrawSylConnectorLines
     // assert(false);
     syl->SetDrawingXRel(-m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1);
-    syl->SetDrawingYRel(GetSylYRel(syl, staff));
+    if (isNeume) {
+        StaffAlignment *alignment = staff->GetAlignment();
+        assert(alignment);
+        FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+        int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
+        int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
+        int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+        int y = alignment->GetStaffHeight() + alignment->GetOverflowAbove() + (alignment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
+        syl->SetDrawingYRel(y);
+    }
+    else {
+        syl->SetDrawingYRel(GetSylYRel(syl, staff));
+    }
 
     dc->StartGraphic(syl, "", syl->GetUuid());
     dc->DeactivateGraphicY();
