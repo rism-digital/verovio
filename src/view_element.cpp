@@ -1279,7 +1279,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     Syl *syl = dynamic_cast<Syl *>(element);
     assert(syl);
 
-    if (!syl->GetStart()) {
+    if (!syl->GetStart() && staff->m_drawingNotationType != NOTATIONTYPE_neume) {
         LogWarning("Parent note for <syl> was not found");
         return;
     }
