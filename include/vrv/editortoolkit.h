@@ -66,6 +66,7 @@ protected:
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
     ///@}
+#endif
 
     Doc *m_doc;
     View *m_view;
