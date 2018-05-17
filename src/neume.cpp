@@ -140,6 +140,13 @@ std::map<std::string, NeumeGroup> Neume::InitNeumeGroups() {
     map["ud"] = TORCULUS;
     map["du"] = PORRECTUS;
     map["ddd"] = CLIMACUS;
+    map["ddu"] = CLIMACUS_RESUPINUS;
+    map["udu"] = TORCULUS_RESUPINUS;
+    map["dud"] = PORRECTUS_FLEXUS;
+    map["udd"] = PES_SUBPUNCTIS;
+    map["uud"] = SCANDICUS_FLEXUS;
+    map["uudd"] = SCANDICUS_SUBPUNCTIS;
+    map["dudd"] = PORRECTUS_SUBPUNCTIS;
     return map;
 }
 
