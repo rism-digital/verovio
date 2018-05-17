@@ -34,7 +34,23 @@ class Neume;
 // Note
 //----------------------------------------------------------------------------
 
-enum NeumeGroup { NEUME_ERROR = 0, PUNCTUM, CLIVIS, PES, CLIMACUS, PORRECTUS, SCANDICUS, TORCULUS };
+enum NeumeGroup {
+    NEUME_ERROR = 0,
+    PUNCTUM,
+    CLIVIS,
+    PES,
+    CLIMACUS,
+    PORRECTUS, 
+    SCANDICUS,
+    TORCULUS,
+    SCANDICUS_FLEXUS,
+    PORRECTUS_FLEXUS,
+    TORCULUS_RESUPINUS,
+    CLIMACUS_RESUPINUS,
+    PES_SUBPUNCTIS,
+    PORRECTUS_SUBPUNCTIS,
+    SCANDICUS_SUBPUNCTIS
+};
 
 /**
  * This class models the MEI <neume> element.
