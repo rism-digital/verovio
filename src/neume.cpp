@@ -33,7 +33,10 @@
 namespace vrv {
 
 std::map<std::string, NeumeGroup> Neume::s_neumes = { { "u", PES }, { "d", CLIVIS }, { "uu", SCANDICUS },
-    { "dd", CLIMACUS }, { "ud", TORCULUS }, { "du", PORRECTUS }, { "ddd", CLIMACUS } };
+    { "dd", CLIMACUS }, { "ud", TORCULUS }, { "du", PORRECTUS }, { "ddd", CLIMACUS }, 
+    { "ddu", CLIMACUS_RESUPINUS },{ "udu", TORCULUS_RESUPINUS }, { "dud", PORRECTUS_FLEXUS },
+    { "udd", PES_SUBPUNCTIS }, { "uud", SCANDICUS_FLEXUS }, { "uudd", SCANDICUS_SUBPUNCTIS },
+    { "dudd", PORRECTUS_SUBPUNCTIS } };
 
 //----------------------------------------------------------------------------
 // Neume
@@ -122,27 +125,4 @@ bool Neume::GenerateChildMelodic()
 
     return true;
 }
-
-std::map<std::string, NeumeGroup> Neume::InitNeumeGroups() {
-    // These string keys come from the contours of neume groupings as defined in MEI4
-    std::map<std::string, NeumeGroup> map;
-    map["u"] = PES;
-    map["d"] = CLIVIS;
-    map["uu"] = SCANDICUS;
-    map["dd"] = CLIMACUS;
-    map["ud"] = TORCULUS;
-    map["du"] = PORRECTUS;
-    map["ddd"] = CLIMACUS;
-    map["ddu"] = CLIMACUS_RESUPINUS;
-    map["udu"] = TORCULUS_RESUPINUS;
-    map["dud"] = PORRECTUS_FLEXUS;
-    map["udd"] = PES_SUBPUNCTIS;
-    map["uud"] = SCANDICUS_FLEXUS;
-    map["uudd"] = SCANDICUS_SUBPUNCTIS;
-    map["dudd"] = PORRECTUS_SUBPUNCTIS;
-    return map;
-}
-
-std::map<std::string, NeumeGroup> Neume::neumes = Neume::InitNeumeGroups();
-
 } // namespace vrv
