@@ -111,10 +111,6 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /******************************************************************/
     // Initialization
 
-    // Generate intm attribute for all nc children except the first
-    // This is necessary to properly render the neume
-    neume->GenerateChildMelodic();
-
     // Obtaining list of NC to extract intm data
     // Format of *neumechildren, first object is <neume>, all objects after are <nc>
     const ListOfObjects neumeChildren = neume->GetList(neume)[0];
@@ -122,17 +118,12 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         return;
     }
 
-    // Loading the contour of the neume shape from the nc children
     std::vector<Nc *> ncVector;
     std::vector<int> pitchDifferences;
-    std::string contour = "";
     for (int i = 1; i < (int)neumeChildren.size(); i++) {
         Nc *nc = dynamic_cast<Nc *>(neumeChildren[i]);
         ncVector.push_back(nc);
         if (i >= 2) {
-            // Adding to the countour from intm attribuets of nc
-            contour.append(nc->GetIntm());
-
             // Calculate the pitch differences between each nc pair
             Nc *prev_nc = dynamic_cast<Nc *>(neumeChildren[i - 1]);
             int pitchDifference = nc->GetPname() - prev_nc->GetPname();
@@ -142,7 +133,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     // Obtaining the NeumeGroup enum name from the map
-    NeumeGroup neumeName = Neume::s_neumes[contour];
+    NeumeGroup neumeName = neume->GetNeumeGroup();
 
     // If the shape cannot be found in the map, NeumeGroup::ERROR will be returned since its
     // value is 0 and std::map returns 0 by default for missing keys.

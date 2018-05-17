@@ -32,8 +32,8 @@
 
 namespace vrv {
 
-std::map<std::string, NeumeGroup> Neume::s_neumes = { { "u", PES }, { "d", CLIVIS }, { "uu", SCANDICUS },
-    { "dd", CLIMACUS }, { "ud", TORCULUS }, { "du", PORRECTUS }, { "ddd", CLIMACUS }, 
+std::map<std::string, NeumeGroup> Neume::s_neumes = { { "", PUNCTUM }, { "u", PES }, { "d", CLIVIS }, 
+    { "uu", SCANDICUS }, { "dd", CLIMACUS }, { "ud", TORCULUS }, { "du", PORRECTUS }, { "ddd", CLIMACUS }, 
     { "ddu", CLIMACUS_RESUPINUS },{ "udu", TORCULUS_RESUPINUS }, { "dud", PORRECTUS_FLEXUS },
     { "udd", PES_SUBPUNCTIS }, { "uud", SCANDICUS_FLEXUS }, { "uudd", SCANDICUS_SUBPUNCTIS },
     { "dudd", PORRECTUS_SUBPUNCTIS } };
@@ -88,6 +88,42 @@ bool Neume::IsLastInNeume(LayerElement *element)
     // this is the last one
     if (position == (size - 1)) return true;
     return false;
+}
+
+NeumeGroup Neume::GetNeumeGroup()
+{
+    ArrayOfObjects children;
+    AttComparison ac(NC);
+    this->FindAllChildByComparison(&children, &ac);
+
+    auto iter = children.begin();
+    Nc *previous = dynamic_cast<Nc *>(*iter);
+    if (previous == nullptr) return NEUME_ERROR;
+    iter++;
+    
+    std::string key = "";
+    
+    for (; iter != children.end(); iter++)
+    {
+        Nc *current = dynamic_cast<Nc *>(*iter);
+        assert(current);
+        
+        int pitchDifference = current->PitchDifferenceTo(previous);
+        if (pitchDifference > 0)
+        {
+            key += "u";
+        }
+        else if (pitchDifference < 0)
+        {
+            key += "d";
+        }
+        else
+        {
+            key += "s";
+        }
+        previous = current;
+    }
+    return s_neumes[key]; 
 }
 
 bool Neume::GenerateChildMelodic()
