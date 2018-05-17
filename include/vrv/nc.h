@@ -12,8 +12,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "atts_shared.h"
 #include "atts_analytical.h"
+#include "atts_shared.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
@@ -29,13 +29,12 @@ namespace vrv {
  * This class models the MEI <nc> element.
  */
 
-class Nc :   public LayerElement,
-             public DurationInterface,
-             public PitchInterface,
-             public PositionInterface,
-             public AttColor,
-             public AttIntervalMelodic
-             {
+class Nc : public LayerElement,
+           public DurationInterface,
+           public PitchInterface,
+           public PositionInterface,
+           public AttColor,
+           public AttIntervalMelodic {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -58,7 +57,6 @@ public:
     ///@}
 
 private:
-
 };
 
 } // namespace vrv

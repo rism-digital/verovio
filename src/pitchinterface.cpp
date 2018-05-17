@@ -74,32 +74,28 @@ void PitchInterface::AdjustPitchByOffset(int pitchOffset)
 {
     int pname = this->GetPname() + pitchOffset;
     int oct = this->GetOct();
-    
+
     // Check if a change in octave is necessary
-    while (pname > PITCHNAME_b)
-    {
+    while (pname > PITCHNAME_b) {
         pname -= 7;
         oct++;
     }
-    while (pname < PITCHNAME_c)
-    {
+    while (pname < PITCHNAME_c) {
         pname += 7;
         oct--;
     }
 
     // If it falls out of allowed range, set to allowed extreme values
-    if (oct > 9) 
-    {
+    if (oct > 9) {
         oct = 9;
         pname = PITCHNAME_b;
     }
-    else if (oct < 0)
-    {
+    else if (oct < 0) {
         oct = 0;
         pname = PITCHNAME_c;
     }
 
-    this->SetPname((data_PITCHNAME) pname);
+    this->SetPname((data_PITCHNAME)pname);
     this->SetOct(oct);
 }
 
@@ -107,7 +103,7 @@ int PitchInterface::PitchDifferenceTo(PitchInterface *pi)
 {
     assert(pi);
     int pitchDifference = 0;
-    
+
     pitchDifference = this->GetPname() - pi->GetPname();
     pitchDifference += 7 * (this->GetOct() - pi->GetOct());
 

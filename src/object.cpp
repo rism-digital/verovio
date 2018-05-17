@@ -622,8 +622,8 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
     }
 }
 
-void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor,
-    ArrayOfComparisons *filters, int deepness, bool direction)
+void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
+    int deepness, bool direction)
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;

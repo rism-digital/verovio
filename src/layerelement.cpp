@@ -36,8 +36,8 @@
 #include "mrpt2.h"
 #include "multirest.h"
 #include "multirpt.h"
-#include "note.h"
 #include "neume.h"
+#include "note.h"
 #include "page.h"
 #include "rest.h"
 #include "smufl.h"
@@ -485,9 +485,9 @@ double LayerElement::GetAlignmentDuration(
         if (duration->IsMensural() && (notationType != NOTATIONTYPE_cmn)) {
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
-        if (this->Is(NC)){
+        if (this->Is(NC)) {
             Neume *neume = dynamic_cast<Neume *>(this->GetFirstParent(NEUME));
-            if (neume->IsLastInNeume(this)){
+            if (neume->IsLastInNeume(this)) {
                 return 128;
             }
             else {
@@ -678,7 +678,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
         assert(staff);
 
-        if(staff->m_drawingNotationType == NOTATIONTYPE_neume) {
+        if (staff->m_drawingNotationType == NOTATIONTYPE_neume) {
             type = ALIGNMENT_DEFAULT;
         }
         else {

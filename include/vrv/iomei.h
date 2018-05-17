@@ -249,7 +249,7 @@ private:
     void WriteMRpt(pugi::xml_node currentNode, MRpt *mRpt);
     void WriteMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2);
     void WriteMultiRest(pugi::xml_node currentNode, MultiRest *multiRest);
-    void WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt);     
+    void WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt);
     void WriteNc(pugi::xml_node currentNode, Nc *nc);
     void WriteNeume(pugi::xml_node currentNode, Neume *neume);
     void WriteNote(pugi::xml_node currentNode, Note *note);

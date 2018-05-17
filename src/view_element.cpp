@@ -635,13 +635,12 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
     }
 
-    if(isNeume) {
+    if (isNeume) {
         if (clef->GetShape() == CLEFSHAPE_C)
             sym = SMUFL_E906_chantCclef;
-        else if(clef->GetShape() == CLEFSHAPE_F)
+        else if (clef->GetShape() == CLEFSHAPE_F)
             sym = SMUFL_E902_chantFclef;
     }
-
 
     if (sym == 0) {
         clef->SetEmptyBB();
@@ -678,9 +677,9 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(custos);
 
     dc->StartGraphic(element, "", element->GetUuid());
-    
+
     int sym = 0;
-    // Select glyph to use for this custos 
+    // Select glyph to use for this custos
     switch (staff->m_drawingNotationType) {
         case NOTATIONTYPE_mensural:
             sym = SMUFL_EA02_mensuralCustosUp; // mensuralCustosUp
@@ -704,7 +703,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int pitchOffset;
     int octaveOffset = (custos->GetOct() - 3) * ((staffSize / 2) * 7);
 
-    if(clef->GetShape() == CLEFSHAPE_C) {
+    if (clef->GetShape() == CLEFSHAPE_C) {
         pitchOffset = (custos->GetPname() - PITCHNAME_c) * (staffSize / 2);
     }
     else if (clef->GetShape() == CLEFSHAPE_F) {
@@ -716,7 +715,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
 
     int actualY = clefY + pitchOffset + octaveOffset;
-    
+
     DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false, true);
 
     dc->EndGraphic(element, this);

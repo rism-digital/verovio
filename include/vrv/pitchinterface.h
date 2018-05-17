@@ -52,7 +52,6 @@ public:
      */
     static void AdjustPname(int &pname, int &oct);
 
-
     /**
      * Shift pname and octave by a certain number of steps.
      */

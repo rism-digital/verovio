@@ -362,8 +362,7 @@ public:
      * Return the first element matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    Object *FindChildByComparison(
-        Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    Object *FindChildByComparison(Comparison *comparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
      * Return the element matching the extreme value with an Comparison functor
@@ -376,8 +375,8 @@ public:
      * Return all the objects matching the Comparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    void FindAllChildByComparison(ArrayOfObjects *objects, Comparison *comparison,
-        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool clear = true);
+    void FindAllChildByComparison(ArrayOfObjects *objects, Comparison *comparison, int deepness = UNLIMITED_DEPTH,
+        bool direction = FORWARD, bool clear = true);
 
     /**
      * Return all the objects matching the Comparison functor and being between start and end in the tree.

@@ -25,11 +25,7 @@ namespace vrv {
 // Syllable
 //----------------------------------------------------------------------------
 
-Syllable::Syllable()
-    : LayerElement("syllable-")
-    , ObjectListInterface()
-    , AttColor()
-    , AttSlashCount()
+Syllable::Syllable() : LayerElement("syllable-"), ObjectListInterface(), AttColor(), AttSlashCount()
 {
     Init();
 }
@@ -41,7 +37,6 @@ void Syllable::Init()
 
     Reset();
 }
-
 
 void Syllable::AddChild(Object *child)
 {
@@ -61,9 +56,7 @@ void Syllable::AddChild(Object *child)
     Modify();
 }
 
-Syllable::~Syllable()
-{
-}
+Syllable::~Syllable() {}
 
 void Syllable::Reset()
 {

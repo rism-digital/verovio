@@ -15,10 +15,7 @@ namespace vrv {
 // Custos
 //----------------------------------------------------------------------------
 
-Custos::Custos() : LayerElement("custos-")
-                 , PitchInterface()
-                 , PositionInterface()
-                 , AttColor()
+Custos::Custos() : LayerElement("custos-"), PitchInterface(), PositionInterface(), AttColor()
 {
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());

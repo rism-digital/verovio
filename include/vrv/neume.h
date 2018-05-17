@@ -34,24 +34,13 @@ class Neume;
 // Note
 //----------------------------------------------------------------------------
 
-enum NeumeGroup {
-    NEUME_ERROR = 0,
-    PUNCTUM,
-    CLIVIS,
-    PES,
-    CLIMACUS,
-    PORRECTUS, 
-    SCANDICUS,
-    TORCULUS
-};
+enum NeumeGroup { NEUME_ERROR = 0, PUNCTUM, CLIVIS, PES, CLIMACUS, PORRECTUS, SCANDICUS, TORCULUS };
 
 /**
  * This class models the MEI <neume> element.
  */
 
-class Neume : public LayerElement,
-              public ObjectListInterface,
-             public AttColor {
+class Neume : public LayerElement, public ObjectListInterface, public AttColor {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -70,9 +59,9 @@ public:
     ///@}
 
     /**
-    * Add an element (a note or a rest) to a syllable.
-    * Only syl or neume will be added.
-    */
+     * Add an element (a note or a rest) to a syllable.
+     * Only syl or neume will be added.
+     */
     virtual void AddChild(Object *object);
 
     virtual int GetPosition(LayerElement *element);
@@ -89,7 +78,6 @@ public:
     static std::map<std::string, NeumeGroup> s_neumes;
 
 private:
-                 
 };
 } // namespace vrv
 

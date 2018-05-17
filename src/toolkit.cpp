@@ -24,8 +24,8 @@
 #include "layer.h"
 #include "measure.h"
 #include "nc.h"
-#include "note.h"
 #include "neume.h"
+#include "note.h"
 #include "options.h"
 #include "page.h"
 #include "slur.h"
@@ -1260,7 +1260,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
-        if(!layer) return false;
+        if (!layer) return false;
         int oct;
         data_PITCHNAME pname
             = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), element->GetDrawingX(), &oct);
@@ -1291,7 +1291,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
         for (auto it = objects.begin(); it != objects.end(); ++it) {
             Nc *nc = dynamic_cast<Nc *>(*it);
             // Update the neume component
-            nc->AdjustPitchByOffset(pitchDifference); 
+            nc->AdjustPitchByOffset(pitchDifference);
             //// Temporarily removing ULX attributes for coordinate refactor
             // nc->SetUlx(nc->GetUlx() - x);
         }
@@ -1302,22 +1302,23 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
         assert(clef);
         Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
         if (!layer) return false;
-        
+
         Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
         assert(staff);
         // Note that y param is relative to initial position for clefs
         int initialClefLine = clef->GetLine();
-        int clefLine = round((double) y / (double) m_doc.GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
+        int clefLine
+            = round((double)y / (double)m_doc.GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
         clef->SetLine(clefLine);
         //// Temporarily removing ULX attributes for coordinate refactor
         // clef->SetUlx(x);
 
-        if (initialClefLine != clefLine) {  // adjust notes so they stay in the same position
+        if (initialClefLine != clefLine) { // adjust notes so they stay in the same position
             int lineDiff = clefLine - initialClefLine;
             ArrayOfObjects objects;
             InterfaceComparison ic(INTERFACE_PITCH);
 
-            layer->FindAllChildByComparison(&objects, &ic); 
+            layer->FindAllChildByComparison(&objects, &ic);
 
             // Adjust all elements who are positioned relative to clef by pitch
             for (auto it = objects.begin(); it != objects.end(); ++it) {
@@ -1326,7 +1327,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
                 PitchInterface *pi = child->GetPitchInterface();
                 assert(pi);
                 pi->AdjustPitchByOffset(-2 * lineDiff); // One line -> 2 pitches
-            } 
+            }
         }
 
         return true;

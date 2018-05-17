@@ -32,27 +32,20 @@
 
 namespace vrv {
 
-std::map<std::string, NeumeGroup> Neume::s_neumes = {
-    {"u", PES}, {"d", CLIVIS}, {"uu", SCANDICUS}, {"dd", CLIMACUS}, {"ud", TORCULUS}, {"du", PORRECTUS}, {"ddd", CLIMACUS}
-};
-    
+std::map<std::string, NeumeGroup> Neume::s_neumes = { { "u", PES }, { "d", CLIVIS }, { "uu", SCANDICUS },
+    { "dd", CLIMACUS }, { "ud", TORCULUS }, { "du", PORRECTUS }, { "ddd", CLIMACUS } };
+
 //----------------------------------------------------------------------------
 // Neume
 //----------------------------------------------------------------------------
 
-Neume::Neume()
-    : LayerElement("neume-"),
-      ObjectListInterface(),
-      AttColor()
+Neume::Neume() : LayerElement("neume-"), ObjectListInterface(), AttColor()
 {
     RegisterAttClass(ATT_COLOR);
     Reset();
 }
 
-Neume::~Neume()
-{
-
-}
+Neume::~Neume() {}
 
 void Neume::Reset()
 {
@@ -107,23 +100,19 @@ bool Neume::GenerateChildMelodic()
     iter++;
 
     // Iterate on second to last neume component and add intm value
-    for (; iter != children.end(); iter++)
-    {
+    for (; iter != children.end(); iter++) {
         Nc *current = dynamic_cast<Nc *>(*iter);
         assert(current);
         std::string intmValue;
 
         int pitchDifference = current->PitchDifferenceTo(head);
-        if (pitchDifference > 0)
-        {
+        if (pitchDifference > 0) {
             intmValue = "u";
         }
-        else if (pitchDifference < 0)
-        {
+        else if (pitchDifference < 0) {
             intmValue = "d";
         }
-        else
-        {
+        else {
             intmValue = "s";
         }
 

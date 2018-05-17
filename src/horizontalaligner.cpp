@@ -475,8 +475,7 @@ bool Alignment::HasAlignmentReference(int staffN)
 AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    AlignmentReference *alignmentRef
-        = dynamic_cast<AlignmentReference *>(this->FindChildByComparison(&matchStaff, 1));
+    AlignmentReference *alignmentRef = dynamic_cast<AlignmentReference *>(this->FindChildByComparison(&matchStaff, 1));
     if (!alignmentRef) {
         alignmentRef = new AlignmentReference(staffN);
         this->AddChild(alignmentRef);

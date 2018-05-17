@@ -59,9 +59,9 @@
 #include "multirest.h"
 #include "multirpt.h"
 #include "nc.h"
+#include "neume.h"
 #include "note.h"
 #include "num.h"
-#include "neume.h"
 #include "octave.h"
 #include "page.h"
 #include "pages.h"
@@ -1473,21 +1473,20 @@ void MeiOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
 {
     assert(nc);
 
+    WriteLayerElement(currentNode, nc);
     WriteDurationInterface(currentNode, nc);
     WritePitchInterface(currentNode, nc);
     WritePositionInterface(currentNode, nc);
-
-    WriteLayerElement(currentNode, nc);
-    nc->WriteColor(currentNode);;
-    nc->WriteIntervalMelodic(currentNode);;
-    
+    nc->WriteColor(currentNode);
+    nc->WriteIntervalMelodic(currentNode);
 }
 
 void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
 {
     assert(neume);
+    
     WriteLayerElement(currentNode, neume);
-    neume->WriteColor(currentNode);;
+    neume->WriteColor(currentNode);
 }
 
 void MeiOutput::WriteNote(pugi::xml_node currentNode, Note *note)

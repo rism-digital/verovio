@@ -22,10 +22,7 @@ class ScoreDefInterface;
 /**
  * This class models the MEI <mensur> element.
  */
-class Syllable : public LayerElement,
-                 public ObjectListInterface,
-               public AttColor,
-               public AttSlashCount {
+class Syllable : public LayerElement, public ObjectListInterface, public AttColor, public AttSlashCount {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -42,11 +39,10 @@ public:
     ///@}
 
     /**
-    * Add an element (a note or a rest) to a syllable.
-    * Only syl or neume will be added.
-    */
+     * Add an element (a note or a rest) to a syllable.
+     * Only syl or neume will be added.
+     */
     virtual void AddChild(Object *object);
-
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
@@ -54,7 +50,6 @@ public:
 private:
     //
 public:
-
 private:
 };
 
