@@ -3784,7 +3784,7 @@ std::wstring HumdrumInput::cleanHarmString(const std::string &content)
         replacing = true;
     }
     else if (kind == L"dominant") {
-        kind = L"dom";
+        kind = L"7";
         replacing = true;
     }
     else if (kind == L"m7b5") {

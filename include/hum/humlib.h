@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue May 15 20:27:30 PDT 2018
+// Last Modified: Wed May 16 23:22:23 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1214,7 +1214,7 @@ class HumdrumToken : public string, public HumHash {
 		int      getTokenIndex             (void) const;
 		int      getTokenNumber            (void) const;
 		const string& getDataType          (void) const;
-		bool     isDataType                (string dtype) const;
+		bool     isDataType                (const string& dtype) const;
 		bool     isKern                    (void) const;
 		bool     isMens                    (void) const;
 		string   getSpineInfo              (void) const;
@@ -5269,6 +5269,8 @@ class Tool_transpose : public HumTool {
 		                                 int index, int transval);
 		int      hasTrMarkers           (HumdrumFile& infile, int line);
 		void     printHumdrumKernToken  (HumdrumLine& record, int index,
+		                                 int transval);
+		void     printHumdrumMxhmToken(HumdrumLine& record, int index,
 		                                 int transval);
 		int      checkForDeletedLine    (HumdrumFile& infile, int line);
 		int      getBase40ValueFromInterval(const string& string);
