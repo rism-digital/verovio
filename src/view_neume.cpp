@@ -173,6 +173,11 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(0)), layer, staff, measure, SMUFL_E990_chantPunctum);
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(1)), layer, staff, measure, SMUFL_E990_chantPunctum,
                 xOffset * noteWidth);
+
+            if (neumeName == PES_SUBPUNCTIS) {
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(2)), layer, staff, measure, SMUFL_E991_chantPunctumInclinatum);
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(3)), layer, staff, measure, SMUFL_E991_chantPunctumInclinatum);
+            }
             break;
         }
         case PORRECTUS:
@@ -242,7 +247,8 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             int lastInclinatumIndex = (neumeName == CLIMACUS_RESUPINUS) ? ncVector.size() - 1 : ncVector.size();
             for (int i = 1; i < lastInclinatumIndex; i++)
             {
-                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(i)), layer, staff, measure, SMUFL_E991_chantPunctumInclinatum);
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(i)), layer, staff, measure,
+                    SMUFL_E991_chantPunctumInclinatum);
             }
             
             if (neumeName == CLIMACUS_RESUPINUS) {
@@ -272,7 +278,8 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             }
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(0)), layer, staff, measure, SMUFL_E990_chantPunctum);
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(1)), layer, staff, measure, SMUFL_E990_chantPunctum);
-            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(2)), layer, staff, measure, SMUFL_E990_chantPunctum, xOffset * noteWidth);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(2)), layer, staff, measure, SMUFL_E990_chantPunctum,
+                xOffset * noteWidth);
 
             if (neumeName == SCANDICUS_FLEXUS) {
                 DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(3)), layer, staff, measure);
