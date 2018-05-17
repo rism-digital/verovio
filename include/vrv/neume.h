@@ -84,6 +84,8 @@ public:
     virtual bool IsLastInNeume(LayerElement *element);
 
     bool GenerateChildMelodic();
+    
+    NeumeGroup GetNeumeGroup();
 
 private:
     //
