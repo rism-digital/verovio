@@ -79,11 +79,17 @@ public:
     virtual bool IsLastInNeume(LayerElement *element);
 
     bool GenerateChildMelodic();
-    static std::map<std::string, NeumeGroup> InitNeumeGroups();
-    static std::map<std::string, NeumeGroup> *GetGroups() { return &neumes; };
 
 private:
-    static std::map<std::string, NeumeGroup> neumes;
+    //
+public:
+    /**
+     * String keys come from the contours of neume groupings as defined in MEI4
+     */
+    static std::map<std::string, NeumeGroup> s_neumes;
+
+private:
+                 
 };
 } // namespace vrv
 

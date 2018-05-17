@@ -32,6 +32,10 @@
 
 namespace vrv {
 
+std::map<std::string, NeumeGroup> Neume::s_neumes = {
+    {"u", PES}, {"d", CLIVIS}, {"uu", SCANDICUS}, {"dd", CLIMACUS}, {"ud", TORCULUS}, {"du", PORRECTUS}, {"ddd", CLIMACUS}
+};
+    
 //----------------------------------------------------------------------------
 // Neume
 //----------------------------------------------------------------------------
@@ -129,20 +133,5 @@ bool Neume::GenerateChildMelodic()
 
     return true;
 }
-
-std::map<std::string, NeumeGroup> Neume::InitNeumeGroups() {
-    // These string keys come from the contours of neume groupings as defined in MEI4
-    std::map<std::string, NeumeGroup> map;
-    map["u"] = PES;
-    map["d"] = CLIVIS;
-    map["uu"] = SCANDICUS;
-    map["dd"] = CLIMACUS;
-    map["ud"] = TORCULUS;
-    map["du"] = PORRECTUS;
-    map["ddd"] = CLIMACUS;
-    return map;
-}
-
-std::map<std::string, NeumeGroup> Neume::neumes = Neume::InitNeumeGroups();
 
 } // namespace vrv

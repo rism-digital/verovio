@@ -108,9 +108,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     /******************************************************************/
     // Initialization
-    
-    std::map<std::string, NeumeGroup> *neumeGroups = Neume::GetGroups();
-    
+        
     // Generate intm attribute for all nc children except the first
     // This is necessary to properly render the neume
     neume->GenerateChildMelodic();
@@ -142,7 +140,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     // Obtaining the NeumeGroup enum name from the map 
-    NeumeGroup neumeName = (*neumeGroups)[contour];
+    NeumeGroup neumeName = Neume::s_neumes[contour];
 
     // If the shape cannot be found in the map, NeumeGroup::ERROR will be returned since its
     // value is 0 and std::map returns 0 by default for missing keys.
