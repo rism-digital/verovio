@@ -254,6 +254,10 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             if (neumeName == CLIMACUS_RESUPINUS) {
                 DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(3)), layer, staff, measure);
             }
+            
+            if (neumeName == CLIMACUS_RESUPINUS) {
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(3)), layer, staff, measure);
+            }
             break;
         }
         case SCANDICUS:
@@ -280,7 +284,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(1)), layer, staff, measure, SMUFL_E990_chantPunctum);
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(2)), layer, staff, measure, SMUFL_E990_chantPunctum,
                 xOffset * noteWidth);
-
+            
             if (neumeName == SCANDICUS_FLEXUS) {
                 DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(3)), layer, staff, measure);
             }
