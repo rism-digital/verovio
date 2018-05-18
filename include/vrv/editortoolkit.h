@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Name:        editortoolkit.h
+// Author:      Laurent Pugin, Juliette Regimbal
+// Created:     16/05/2018
+// Copyright (c) Authors and others. All rights reserved.
+/////////////////////////////////////////////////////////////////////////////
+
 #ifndef __VRV_EDITOR_TOOLKIT_H__
 #define __VRV_EDITOR_TOOLKIT_H__
 
