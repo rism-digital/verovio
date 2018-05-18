@@ -879,7 +879,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     // the normal case or start
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        start->FindAllChildByAttComparison(&artics, &matchType);
+        start->FindAllChildByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
         for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
             Artic *artic = dynamic_cast<Artic *>(*articIter);
@@ -899,7 +899,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     }
     // normal case or end
     if ((spanningType == SPANNING_START_END) || (SPANNING_END)) {
-        end->FindAllChildByAttComparison(&artics, &matchType);
+        end->FindAllChildByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
         for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
             Artic *artic = dynamic_cast<Artic *>(*articIter);
@@ -984,7 +984,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     FindTimeSpanningLayerElementsParams findTimeSpanningLayerElementsParams;
     findTimeSpanningLayerElementsParams.m_minPos = p1->x;
     findTimeSpanningLayerElementsParams.m_maxPos = p2->x;
-    std::vector<AttComparison *> filters;
+    ArrayOfComparisons filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
     AttNIntegerComparison matchStaff(STAFF, staff->GetN());
@@ -2229,11 +2229,11 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     // First try to see if we have a meter sig attribute for this measure
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
     Alignment *pos
-        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByComparison(&alignmentComparison, 1));
     if (!pos) {
         // if not, try to get the first beat element
         alignmentComparison.SetType(ALIGNMENT_DEFAULT);
-        pos = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+        pos = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByComparison(&alignmentComparison, 1));
     }
     // if we found one, use it
     if (pos) {

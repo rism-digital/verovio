@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "attcomparison.h"
+#include "custos.h"
 #include "functorparams.h"
 #include "iodarms.h"
 #include "iohumdrum.h"
@@ -22,10 +23,13 @@
 #include "iopae.h"
 #include "layer.h"
 #include "measure.h"
+#include "nc.h"
+#include "neume.h"
 #include "note.h"
 #include "options.h"
 #include "page.h"
 #include "slur.h"
+#include "staff.h"
 #include "svgdevicecontext.h"
 #include "vrv.h"
 
@@ -1084,7 +1088,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     }
 
     MeasureOnsetOffsetComparison matchMeasureTime(millisec);
-    Measure *measure = dynamic_cast<Measure *>(m_doc.FindChildByAttComparison(&matchMeasureTime));
+    Measure *measure = dynamic_cast<Measure *>(m_doc.FindChildByComparison(&matchMeasureTime));
 
     if (!measure) {
         return o.json();
@@ -1101,7 +1105,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
     ArrayOfObjects notes;
 
-    measure->FindAllChildByAttComparison(&notes, &matchNoteTime);
+    measure->FindAllChildByComparison(&notes, &matchNoteTime);
 
     // Fill the JSON object
     ArrayOfObjects::iterator iter;
@@ -1258,16 +1262,79 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
     if (!element) {
         element = m_doc.FindChildByUuid(elementId);
     }
-    if (element->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(element);
-        assert(note);
-        Layer *layer = dynamic_cast<Layer *>(note->GetFirstParent(LAYER));
+    // For elements whose y-position corresponds to a certain pitch
+    if (element->HasInterface(INTERFACE_PITCH)) {
+        Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
         if (!layer) return false;
         int oct;
         data_PITCHNAME pname
-            = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), note->GetDrawingX(), &oct);
-        note->SetPname(pname);
-        note->SetOct(oct);
+            = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), element->GetDrawingX(), &oct);
+        element->GetPitchInterface()->SetPname(pname);
+        element->GetPitchInterface()->SetOct(oct);
+        if (element->HasAttClass(ATT_COORDINATED)) {
+            AttCoordinated *att = dynamic_cast<AttCoordinated *>(element);
+            att->SetUlx(x);
+        }
+        return true;
+    }
+    if (element->Is(NEUME)) {
+        // Requires a relative x and y
+        Neume *neume = dynamic_cast<Neume *>(element);
+        assert(neume);
+        Layer *layer = dynamic_cast<Layer *>(neume->GetFirstParent(LAYER));
+        if (!layer) return false;
+        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+        assert(staff);
+        // Calculate difference in pitch based on y difference
+        int pitchDifference = round((double)y / (double)staff->m_drawingStaffSize);
+
+        // Get components of neume
+        AttComparison ac(NC);
+        ArrayOfObjects objects;
+        neume->FindAllChildByComparison(&objects, &ac);
+
+        for (auto it = objects.begin(); it != objects.end(); ++it) {
+            Nc *nc = dynamic_cast<Nc *>(*it);
+            // Update the neume component
+            nc->AdjustPitchByOffset(pitchDifference);
+            //// Temporarily removing ULX attributes for coordinate refactor
+            // nc->SetUlx(nc->GetUlx() - x);
+        }
+        return true;
+    }
+    if (element->Is(CLEF)) {
+        Clef *clef = dynamic_cast<Clef *>(element);
+        assert(clef);
+        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
+        if (!layer) return false;
+
+        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+        assert(staff);
+        // Note that y param is relative to initial position for clefs
+        int initialClefLine = clef->GetLine();
+        int clefLine
+            = round((double)y / (double)m_doc.GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
+        clef->SetLine(clefLine);
+        //// Temporarily removing ULX attributes for coordinate refactor
+        // clef->SetUlx(x);
+
+        if (initialClefLine != clefLine) { // adjust notes so they stay in the same position
+            int lineDiff = clefLine - initialClefLine;
+            ArrayOfObjects objects;
+            InterfaceComparison ic(INTERFACE_PITCH);
+
+            layer->FindAllChildByComparison(&objects, &ic);
+
+            // Adjust all elements who are positioned relative to clef by pitch
+            for (auto it = objects.begin(); it != objects.end(); ++it) {
+                Object *child = dynamic_cast<Object *>(*it);
+                if (child == nullptr) continue;
+                PitchInterface *pi = child->GetPitchInterface();
+                assert(pi);
+                pi->AdjustPitchByOffset(-2 * lineDiff); // One line -> 2 pitches
+            }
+        }
+
         return true;
     }
     return false;

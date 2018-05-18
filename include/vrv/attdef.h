@@ -199,7 +199,7 @@ enum data_OCTAVE_DIS { OCTAVE_DIS_NONE = 0, OCTAVE_DIS_8 = 8, OCTAVE_DIS_15 = 15
  * MEI data.OCTAVE
  */
 typedef signed char data_OCTAVE;
-    
+
 /**
  * MEI data.ORIENTATION
  */

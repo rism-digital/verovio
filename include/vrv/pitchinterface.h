@@ -52,6 +52,17 @@ public:
      */
     static void AdjustPname(int &pname, int &oct);
 
+    /**
+     * Shift pname and octave by a certain number of steps.
+     */
+    void AdjustPitchByOffset(int pitchOffset);
+
+    /**
+     * Get steps between calling object and parameter.
+     * Returns calling pitch minus parameter pitch.
+     */
+    int PitchDifferenceTo(PitchInterface *pi);
+
 private:
     //
 public:

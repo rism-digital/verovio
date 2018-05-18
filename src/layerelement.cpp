@@ -36,6 +36,7 @@
 #include "mrpt2.h"
 #include "multirest.h"
 #include "multirpt.h"
+#include "neume.h"
 #include "note.h"
 #include "page.h"
 #include "rest.h"
@@ -135,7 +136,7 @@ bool LayerElement::IsGraceNote()
     else if (this->Is(TUPLET)) {
         AttComparisonAny matchType({ NOTE, CHORD });
         ArrayOfObjects children;
-        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByAttComparison(&matchType));
+        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByComparison(&matchType));
         if (child) return child->IsGraceNote();
     }
     // For accid, artic, etc.. look at the parent note / chord
@@ -484,6 +485,15 @@ double LayerElement::GetAlignmentDuration(
         if (duration->IsMensural() && (notationType != NOTATIONTYPE_cmn)) {
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
+        if (this->Is(NC)) {
+            Neume *neume = dynamic_cast<Neume *>(this->GetFirstParent(NEUME));
+            if (neume->IsLastInNeume(this)) {
+                return 128;
+            }
+            else {
+                return 16;
+            }
+        }
         double durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
         // With fTrem we need to divide the duration by two
         FTrem *fTrem = dynamic_cast<FTrem *>(this->GetFirstParent(FTREM, MAX_FTREM_DEPTH));
@@ -658,11 +668,24 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         // accid within note was already taken into account by noteParent
         type = ALIGNMENT_ACCID;
     }
-    else if (this->Is({ ARTIC, ARTIC_PART, SYL })) {
+    else if (this->Is({ ARTIC, ARTIC_PART })) {
         // Refer to the note parent
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
         m_alignment = note->GetAlignment();
+    }
+    else if (this->Is(SYL)) {
+        Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+        assert(staff);
+
+        if (staff->m_drawingNotationType == NOTATIONTYPE_neume) {
+            type = ALIGNMENT_DEFAULT;
+        }
+        else {
+            Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+            assert(note);
+            m_alignment = note->GetAlignment();
+        }
     }
     else if (this->Is(VERSE)) {
         // Idem
@@ -1077,7 +1100,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     else if (this->Is(TUPLET)) {
         AttComparisonAny matchType({ NOTE, CHORD });
         ArrayOfObjects children;
-        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByAttComparison(&matchType));
+        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByComparison(&matchType));
         if (child) m_drawingCueSize = child->GetDrawingCueSize();
     }
     // For accid, look at the parent if @func="edit" or otherwise to the parent note
@@ -1129,7 +1152,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     params->m_currentCrossLayer = NULL;
 
     AttNIntegerComparison comparisonFirst(STAFF, durElement->GetStaff().at(0));
-    m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindChildByAttComparison(&comparisonFirst, 1));
+    m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindChildByComparison(&comparisonFirst, 1));
     if (!m_crossStaff) {
         LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff().at(0),
             this->GetUuid().c_str());
@@ -1153,7 +1176,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     // When we will have allowed @layer in <note>, we will have to do:
     // int layerN = durElement->HasLayer() ? durElement->GetLayer() : (*currentLayer)->GetN();
     AttNIntegerComparison comparisonFirstLayer(LAYER, layerN);
-    m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByAttComparison(&comparisonFirstLayer, 1));
+    m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByComparison(&comparisonFirstLayer, 1));
     if (!m_crossLayer) {
         // Just try to pick the first one...
         m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByType(LAYER));
