@@ -36,7 +36,7 @@ std::map<std::string, NeumeGroup> Neume::s_neumes = { { "", PUNCTUM }, { "u", PE
     { "uu", SCANDICUS }, { "dd", CLIMACUS }, { "ud", TORCULUS }, { "du", PORRECTUS }, { "ddd", CLIMACUS }, 
     { "ddu", CLIMACUS_RESUPINUS },{ "udu", TORCULUS_RESUPINUS }, { "dud", PORRECTUS_FLEXUS },
     { "udd", PES_SUBPUNCTIS }, { "uud", SCANDICUS_FLEXUS }, { "uudd", SCANDICUS_SUBPUNCTIS },
-    { "dudd", PORRECTUS_SUBPUNCTIS } };
+    { "dudd", PORRECTUS_SUBPUNCTIS }, { "sd", PRESSUS } };
 
 //----------------------------------------------------------------------------
 // Neume

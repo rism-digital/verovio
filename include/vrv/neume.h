@@ -39,6 +39,7 @@ enum NeumeGroup {
     PUNCTUM,
     CLIVIS,
     PES,
+    PRESSUS,
     CLIMACUS,
     PORRECTUS, 
     SCANDICUS,
