@@ -1,4 +1,13 @@
+/////////////////////////////////////////////////////////////////////////////
+// Name:        editortoolkit.cpp
+// Author:      Laurent Pugin, Juliette Regimbal
+// Created:     16/05/2018
+// Copyright (c) Authors and others. All rights reserved.
+/////////////////////////////////////////////////////////////////////////////
+
 #include "editortoolkit.h"
+
+//-------------------------------------------------------------------------------- 
 
 #include <cmath>
 
@@ -12,6 +21,8 @@
 #include "slur.h"
 #include "staff.h"
 #include "vrv.h"
+
+//--------------------------------------------------------------------------------
 
 #include "jsonxx.h"
 
