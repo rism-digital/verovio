@@ -316,6 +316,17 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             }
             break;
         }
+        case PRESSUS:
+        {
+            // Two punctums followed by a punctum inclinatum
+            // No additional logic required
+            
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(0)), layer, staff, measure);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(1)), layer, staff, measure);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(2)), layer, staff, measure,
+                    SMUFL_E991_chantPunctumInclinatum);
+            break;
+        }
         default: DrawLayerChildren(dc, neume, layer, staff, measure);
     }
 
