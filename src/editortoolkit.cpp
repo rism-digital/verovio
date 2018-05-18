@@ -70,23 +70,23 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
     if (!element) {
         element = m_doc->FindChildByUuid(elementId);
     }
+    // Use relative x and y for now on
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
         if(!layer) return false;
         int oct;
         data_PITCHNAME pname
-            = (data_PITCHNAME)m_view->CalculatePitchCode(layer, m_view->ToLogicalY(y), element->GetDrawingX(), &oct);
+            = (data_PITCHNAME)m_view->CalculatePitchCode(layer, element->GetDrawingY() + y, element->GetDrawingX(), &oct);
         element->GetPitchInterface()->SetPname(pname);
         element->GetPitchInterface()->SetOct(oct);
-        if (element->HasAttClass(ATT_COORDINATED)) {
+        /*if (element->HasAttClass(ATT_COORDINATED)) {
             AttCoordinated *att = dynamic_cast<AttCoordinated *>(element);
             att->SetUlx(x);
-        }
+        }*/
         return true;
     }
     if (element->Is(NEUME)) {
-        // Requires a relative x and y
         Neume *neume = dynamic_cast<Neume *>(element);
         assert(neume);
         Layer *layer = dynamic_cast<Layer *>(neume->GetFirstParent(LAYER));
