@@ -62,6 +62,7 @@ namespace pae {
             rest = old.rest;
 
             clef = old.clef;
+            mensur = old.mensur;
             meter = old.meter;
             key = old.key;
 
@@ -87,6 +88,7 @@ namespace pae {
             tuplet_note = 0;
 
             clef = NULL;
+            mensur = NULL;
             meter = NULL;
             key = NULL;
         }
@@ -112,6 +114,7 @@ namespace pae {
             rest = d.rest;
 
             clef = d.clef;
+            mensur = d.mensur;
             meter = d.meter;
             key = d.key;
 
@@ -145,6 +148,7 @@ namespace pae {
         bool rest;
 
         Clef *clef;
+        Mensur *mensur;
         MeterSig *meter;
         KeySig *key;
     };
