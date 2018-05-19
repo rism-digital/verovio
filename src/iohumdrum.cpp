@@ -4319,6 +4319,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 // invalid chord, so put a space in its place.
                 if (m_signifiers.irest_color.empty() && m_signifiers.space_color.empty()) {
                     Space *irest = new Space;
+    				if (m_doc->GetOptions()->m_humType.GetValue()) {
+        				embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+    				}
                     setLocationId(irest, layerdata[i]);
                     appendElement(elements, pointers, irest);
                     convertRhythm(irest, layerdata[i]);
@@ -4358,6 +4361,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 && m_signifiers.space_color.empty()) {
                 // Invisible rest (or note which should be invisible.
                 Space *irest = new Space;
+   				if (m_doc->GetOptions()->m_humType.GetValue()) {
+       				embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+				}
                 setLocationId(irest, layerdata[i]);
                 appendElement(elements, pointers, irest);
                 convertRhythm(irest, layerdata[i]);
@@ -4399,6 +4405,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             else {
                 Space *irest = new Space;
+   				if (m_doc->GetOptions()->m_humType.GetValue()) {
+       				embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+				}
                 setLocationId(irest, layerdata[i]);
                 appendElement(elements, pointers, irest);
                 convertRhythm(irest, layerdata[i]);
@@ -4878,6 +4887,28 @@ void HumdrumInput::embedQstampInClass(MRest *mrest, hum::HTp token, const std::s
     appendTypeTag(mrest, ssoff.str());
 }
 
+//
+// Space version (rqon/rqoff variant)
+//
+
+void HumdrumInput::embedQstampInClass(Space *irest, hum::HTp token, const std::string &tstring)
+{
+    hum::HumNum starttime = token->getDurationFromStart();
+    hum::HumNum endtime = starttime + token->getDuration();
+    stringstream sson;
+    stringstream ssoff;
+    sson << "rqon-" << starttime.getNumerator();
+    if (starttime.getDenominator() != 1) {
+        sson << "_" << starttime.getDenominator();
+    }
+    ssoff << "rqoff-" << endtime.getNumerator();
+    if (endtime.getDenominator() != 1) {
+        ssoff << "_" << endtime.getDenominator();
+    }
+    appendTypeTag(irest, sson.str());
+    appendTypeTag(irest, ssoff.str());
+}
+
 //////////////////////////////
 //
 // HumdrumInput::embedTieInformation --
@@ -5146,6 +5177,9 @@ void HumdrumInput::addSpace(std::vector<string> &elements, std::vector<void *> &
         }
         else {
             Space *space = new Space;
+			//if (m_doc->GetOptions()->m_humType.GetValue()) {
+   			//	embedQstampInClass(space, layerdata[i], *layerdata[i]);
+			//}
             appendElement(elements, pointers, space);
             duration -= setDuration(space, duration);
         }

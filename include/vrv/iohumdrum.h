@@ -48,6 +48,7 @@ class MRest;
 class Rest;
 class Score;
 class Section;
+class Space;
 class Staff;
 class StaffDef;
 class StaffGrp;
@@ -390,6 +391,7 @@ protected:
     void embedQstampInClass(vrv::Note *note, hum::HTp token, const std::string &tstring);
     void embedQstampInClass(vrv::Rest *note, hum::HTp token, const std::string &tstring);
     void embedQstampInClass(vrv::MRest *mrest, hum::HTp token, const std::string &tstring);
+    void embedQstampInClass(vrv::Space *irest, hum::HTp token, const std::string &tstring);
     void embedPitchInformationInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
     void splitSyllableBySpaces(vector<string> &vtext, char spacer = ' ');
