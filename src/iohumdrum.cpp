@@ -4319,9 +4319,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 // invalid chord, so put a space in its place.
                 if (m_signifiers.irest_color.empty() && m_signifiers.space_color.empty()) {
                     Space *irest = new Space;
-    				if (m_doc->GetOptions()->m_humType.GetValue()) {
-        				embedQstampInClass(irest, layerdata[i], *layerdata[i]);
-    				}
+                    if (m_doc->GetOptions()->m_humType.GetValue()) {
+                        embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                    }
                     setLocationId(irest, layerdata[i]);
                     appendElement(elements, pointers, irest);
                     convertRhythm(irest, layerdata[i]);
@@ -4361,9 +4361,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 && m_signifiers.space_color.empty()) {
                 // Invisible rest (or note which should be invisible.
                 Space *irest = new Space;
-   				if (m_doc->GetOptions()->m_humType.GetValue()) {
-       				embedQstampInClass(irest, layerdata[i], *layerdata[i]);
-				}
+                if (m_doc->GetOptions()->m_humType.GetValue()) {
+                    embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                }
                 setLocationId(irest, layerdata[i]);
                 appendElement(elements, pointers, irest);
                 convertRhythm(irest, layerdata[i]);
@@ -4405,9 +4405,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             else {
                 Space *irest = new Space;
-   				if (m_doc->GetOptions()->m_humType.GetValue()) {
-       				embedQstampInClass(irest, layerdata[i], *layerdata[i]);
-				}
+                if (m_doc->GetOptions()->m_humType.GetValue()) {
+                    embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                }
                 setLocationId(irest, layerdata[i]);
                 appendElement(elements, pointers, irest);
                 convertRhythm(irest, layerdata[i]);
@@ -5177,9 +5177,9 @@ void HumdrumInput::addSpace(std::vector<string> &elements, std::vector<void *> &
         }
         else {
             Space *space = new Space;
-			//if (m_doc->GetOptions()->m_humType.GetValue()) {
-   			//	embedQstampInClass(space, layerdata[i], *layerdata[i]);
-			//}
+            // if (m_doc->GetOptions()->m_humType.GetValue()) {
+            //	embedQstampInClass(space, layerdata[i], *layerdata[i]);
+            //}
             appendElement(elements, pointers, space);
             duration -= setDuration(space, duration);
         }
