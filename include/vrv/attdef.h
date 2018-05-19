@@ -209,6 +209,16 @@ enum data_ORIENTATION { ORIENTATION_NONE = 0, ORIENTATION_reversed, ORIENTATION_
  * MEI data.PERCENT
  */
 typedef double data_PERCENT;
+    
+/**
+ * MEI data.PERCENT
+ */
+typedef double data_PERCENT_LIMITED;
+    
+/**
+ * MEI data.PERCENT
+ */
+typedef double data_PERCENT_LIMITED_SIGNED;
 
 /**
  * MEI data.PITCHNAME

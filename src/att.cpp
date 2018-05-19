@@ -432,6 +432,36 @@ data_PERCENT Att::StrToPercent(std::string value, bool logWarning) const
     }
     return atof(value.substr(0, value.find("%")).c_str());
 }
+    
+std::string Att::PercentLimitedToStr(data_PERCENT_LIMITED data) const
+{
+    return StringFormat("%.2f%%", data);
+}
+
+data_PERCENT_LIMITED Att::StrToPercentLimited(std::string value, bool logWarning) const
+{
+    std::regex test("[0-9]+(\\.?[0-9]*)?%");
+    if (!std::regex_match(value, test)) {
+        if (logWarning) LogWarning("Unsupported data.PERCENT.LIMITED '%s'", value.c_str());
+        return 0;
+    }
+    return atof(value.substr(0, value.find("%")).c_str());
+}
+    
+std::string Att::PercentLimitedSignedToStr(data_PERCENT_LIMITED_SIGNED data) const
+{
+    return StringFormat("%.2f%%", data);
+}
+
+data_PERCENT_LIMITED_SIGNED Att::StrToPercentLimitedSigned(std::string value, bool logWarning) const
+{
+    std::regex test("(+|-)?[0-9]+(\\.?[0-9]*)?%");
+    if (!std::regex_match(value, test)) {
+        if (logWarning) LogWarning("Unsupported data.PERCENT.LIMITED.SIGNEd '%s'", value.c_str());
+        return 0;
+    }
+    return atof(value.substr(0, value.find("%")).c_str());
+}
 
 std::string Att::PitchnameToStr(data_PITCHNAME data) const
 {

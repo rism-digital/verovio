@@ -159,6 +159,12 @@ public:
 
     std::string PercentToStr(data_PERCENT data) const;
     data_PERCENT StrToPercent(std::string value, bool logWarning = true) const;
+    
+    std::string PercentLimitedToStr(data_PERCENT_LIMITED_SIGNED data) const;
+    data_PERCENT_LIMITED StrToPercentLimited(std::string value, bool logWarning = true) const;
+    
+    std::string PercentLimitedSignedToStr(data_PERCENT_LIMITED data) const;
+    data_PERCENT_LIMITED_SIGNED StrToPercentLimitedSigned(std::string value, bool logWarning = true) const;
 
     std::string PitchnameToStr(data_PITCHNAME data) const;
     data_PITCHNAME StrToPitchname(std::string value, bool logWarning = true) const;
