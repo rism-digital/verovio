@@ -4122,6 +4122,19 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             MRest *mrest = new MRest();
             m_layer->AddChild(mrest);
             // Assign a Humdrum ID here.
+            hum::HTp trest = NULL;
+            for (int i = 0; i < (int)layerdata.size(); i++) {
+                if (layerdata[i]->isRest()) {
+                    trest = layerdata[i];
+                    break;
+                }
+            }
+            if (trest) {
+                setLocationId(mrest, trest);
+                if (m_doc->GetOptions()->m_humType.GetValue()) {
+                    embedQstampInClass(mrest, trest, *trest);
+                }
+            }
         }
         else {
             Rest *rest = new Rest();
@@ -4151,6 +4164,19 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         else {
             MRest *mrest = new MRest();
             appendElement(layer, mrest);
+            hum::HTp trest = NULL;
+            for (int i = 0; i < (int)layerdata.size(); i++) {
+                if (layerdata[i]->isRest()) {
+                    trest = layerdata[i];
+                    break;
+                }
+            }
+            if (trest) {
+                setLocationId(mrest, trest);
+                if (m_doc->GetOptions()->m_humType.GetValue()) {
+                    embedQstampInClass(mrest, trest, *trest);
+                }
+            }
             int layer = m_currentlayer;
             for (int z = 0; z < (int)layerdata.size(); ++z) {
                 processDirections(layerdata[z], staffindex);
@@ -4806,6 +4832,50 @@ void HumdrumInput::embedQstampInClass(Note *note, hum::HTp token, const std::str
             }
             }
     */
+}
+
+//
+// Rest version (rqon/rqoff variant)
+//
+
+void HumdrumInput::embedQstampInClass(Rest *rest, hum::HTp token, const std::string &tstring)
+{
+    hum::HumNum starttime = token->getDurationFromStart();
+    hum::HumNum endtime = starttime + token->getDuration();
+    stringstream sson;
+    stringstream ssoff;
+    sson << "rqon-" << starttime.getNumerator();
+    if (starttime.getDenominator() != 1) {
+        sson << "_" << starttime.getDenominator();
+    }
+    ssoff << "rqoff-" << endtime.getNumerator();
+    if (endtime.getDenominator() != 1) {
+        ssoff << "_" << endtime.getDenominator();
+    }
+    appendTypeTag(rest, sson.str());
+    appendTypeTag(rest, ssoff.str());
+}
+
+//
+// MRest version (rqon/rqoff variant)
+//
+
+void HumdrumInput::embedQstampInClass(MRest *mrest, hum::HTp token, const std::string &tstring)
+{
+    hum::HumNum starttime = token->getDurationFromStart();
+    hum::HumNum endtime = starttime + token->getDuration();
+    stringstream sson;
+    stringstream ssoff;
+    sson << "rqon-" << starttime.getNumerator();
+    if (starttime.getDenominator() != 1) {
+        sson << "_" << starttime.getDenominator();
+    }
+    ssoff << "rqoff-" << endtime.getNumerator();
+    if (endtime.getDenominator() != 1) {
+        ssoff << "_" << endtime.getDenominator();
+    }
+    appendTypeTag(mrest, sson.str());
+    appendTypeTag(mrest, ssoff.str());
 }
 
 //////////////////////////////
@@ -7994,6 +8064,10 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
                 rest->SetFermata(STAFFREL_basic_above);
             }
         }
+    }
+
+    if (m_doc->GetOptions()->m_humType.GetValue()) {
+        embedQstampInClass(rest, token, tstring);
     }
 
     // If the rest is the start or stop of an analytic phrase,

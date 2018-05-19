@@ -44,6 +44,7 @@ class Measure;
 class ScoreDef;
 class Note;
 class Hairpin;
+class MRest;
 class Rest;
 class Score;
 class Section;
@@ -387,6 +388,8 @@ protected:
     void resolveTupletBeamStartTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
     void resolveTupletBeamEndTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
     void embedQstampInClass(vrv::Note *note, hum::HTp token, const std::string &tstring);
+    void embedQstampInClass(vrv::Rest *note, hum::HTp token, const std::string &tstring);
+    void embedQstampInClass(vrv::MRest *mrest, hum::HTp token, const std::string &tstring);
     void embedPitchInformationInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
     void splitSyllableBySpaces(vector<string> &vtext, char spacer = ' ');
