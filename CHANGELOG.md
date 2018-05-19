@@ -3,6 +3,7 @@
 ## [Unreleased]
 ### Added
 * Fix for Plaine & Easie mensur changes in mensural notation
+* Use SMuFL glyphs for mensural signs (@rettinghaus)
 * Barline segmentation with text and dynamic indications overlapping measures
 * Improved layout with text (dir, tempo, etc.) at the end of a system
 * Support for dashed bar lines
