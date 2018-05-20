@@ -2349,6 +2349,13 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         }
     }
 
+    // short-circuit *met with *omet for **mens data
+    if (partstart->isMens()) {
+        if ((!m_omet.empty()) && (partnumber == m_omet.back().first)) {
+            metersig = *m_omet.back().second;
+        }
+    }
+
     m_staffdef.back()->SetN(partnumber);
     m_staffdef.back()->SetLines(5);
 
