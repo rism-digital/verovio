@@ -2712,11 +2712,14 @@ void HumdrumInput::setTimeSig(
 
     // Don't store time signature if there is a mensuration to show
     // (verivio will display both mensuration and time signature.
+    bool mensuration = false;
     if (metersig.find("C") != std::string::npos) {
-        return;
+        mensuration = true;
+        ;
     }
     if (metersig.find("O") != std::string::npos) {
-        return;
+        mensuration = true;
+        ;
     }
 
     int top = -1000;
@@ -2728,11 +2731,19 @@ void HumdrumInput::setTimeSig(
     }
     else if (sscanf(timesig.c_str(), "*M%d/%d", &top, &bot) == 2) {
         if (bot == 0) {
-            part->SetMeterCount(top * 2);
+            if (!mensuration) {
+                // Can't add if there is a mensuration; otherwise,
+                // a time signature will be shown.
+                part->SetMeterCount(top * 2);
+            }
             part->SetMeterUnit(1);
         }
         else {
-            part->SetMeterCount(top);
+            if (!mensuration) {
+                // Can't add if there is a mensuration; otherwise,
+                // a time signature will be shown.
+                part->SetMeterCount(top);
+            }
             part->SetMeterUnit(bot);
         }
     }
@@ -6534,6 +6545,13 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
                 count = stoi(matches[1]);
                 unit = stoi(matches[2]);
                 scoreDef->SetMeterCount(count);
+                scoreDef->SetMeterUnit(unit);
+            }
+            else {
+                // But always need to provide @meter.unit since timestamps
+                // are in reference to it (can't add meter.count since
+                // this will also print a time signature.
+                unit = stoi(matches[2]);
                 scoreDef->SetMeterUnit(unit);
             }
             if (metersig) {
