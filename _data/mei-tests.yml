@@ -1,6 +1,6 @@
 edit-path: "https://github.com/rism-ch/verovio/edit/gh-pages/examples/features/"
 status-path: "https://github.com/rism-ch/verovio/tree/gh-pages/_data/mei-tests.yml"
-mei-path: "http://music-encoding.org/guidelines/v3/guidelines"
+mei-path: "http://music-encoding.org/guidelines/v3/content"
 
 tests:
     - id: "01"
