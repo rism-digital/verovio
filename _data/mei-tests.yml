@@ -860,59 +860,59 @@ tests:
       chapter: "Common music notation ornaments"
       files:
           - section: "Mordents"
-            link: cmnOrnaments#cmnOrnamentsMordents
+            link: cmnornaments#cmnOrnamentsMordents
             file: mordent.mei
             title: "Mordents example"
             verovio: 2
             version: "2.0.0"
           - section: "Mordents"
-            link: cmnOrnaments#cmnOrnamentsMordents
+            link: cmnornaments#cmnOrnamentsMordents
             file: mordent2.mei
             title: "Mordents example (2)"
             verovio: 1
             version: "2.0.0"
           - section: "Mordents"
-            link: cmnOrnaments#cmnOrnamentsMordents
+            link: cmnornaments#cmnOrnamentsMordents
             file: mordent3.mei
             title: "Mordents example (3)"
             verovio: 1
             version: "2.0.0"
           
           - section: "Trills"
-            link: cmnOrnaments#cmnOrnamentsTrills
+            link: cmnornaments#cmnOrnamentsTrills
             file: trills.mei 
             title: "Trills example"
             verovio: 2
             version: "2.0.0"
           - section: "Trills"
-            link: cmnOrnaments#cmnOrnamentsTrills
+            link: cmnornaments#cmnOrnamentsTrills
             file: trills2.mei
             title: "Trills example (2)"
             verovio: 2
             version: "2.0.0"
           - section: "Trills"
-            link: cmnOrnaments#cmnOrnamentsTrills
+            link: cmnornaments#cmnOrnamentsTrills
             file: trills3.mei
             title: "Trills example (3)"
             verovio: 2
             version: "2.0.0"
           - section: "Trills"
-            link: cmnOrnaments#cmnOrnamentsTrills
+            link: cmnornaments#cmnOrnamentsTrills
             file: trills4.mei
             title: "Trills example (4)"
             verovio: 2
             version: "2.0.0"
           - section: "Trills"
-            link: cmnOrnaments#cmnOrnamentsTrills
+            link: cmnornaments#cmnOrnamentsTrills
             file: trills5.mei
             title: "Ornament placement"
           
           - section: "Turns"
-            link: cmnOrnaments#cmnOrnamentsTurns
+            link: cmnornaments#cmnOrnamentsTurns
             file: turn1.mei
             title: "Turns example"
           - section: "Turns"
-            link: cmnOrnaments#cmnOrnamentsTurns
+            link: cmnornaments#cmnOrnamentsTurns
             file: turn2.mei
             title: "Turns example"
           
@@ -920,23 +920,23 @@ tests:
       chapter: "Critical apparatus"
       files:
           - section: ""
-            link: critApp
+            link: critapp
             file: accid.mei
             title: "Display of editorial accidentals"
           - section: ""
-            link: critApp
+            link: critapp
             file: accid5.mei
             title: "Display of editorial accidentals (2)"
           - section: ""
-            link: critApp
+            link: critapp
             file: app-nested.mei 
             title: "Critical apparatus example with nested elements"
           - section: ""
-            link: critApp
+            link: critapp
             file: app.mei 
             title: "Critical apparatus example"
           - section: ""
-            link: critApp
+            link: critapp
             file: app2.mei
             title: "Display of original and editorial clefs"
           
@@ -944,15 +944,15 @@ tests:
       chapter: "Editorial markup"
       files:
           - section: ""
-            link: editTrans
+            link: edittrans
             file: choice.mei 
             title: "Choice"
           - section: ""
-            link: editTrans
+            link: edittrans
             file: editorial1.mei 
             title: "Editorial markup example"
           - section: ""
-            link: editTrans
+            link: edittrans
             file: editorial2.mei 
             title: "Editorial markup (text) example"
     
@@ -989,47 +989,47 @@ tests:
       chapter: "Vocal text"
       files:
           - section: ""
-            link: lyricsDesc
+            link: lyricsdesc
             file: lyrics1.mei 
             title: "Lyric example"
           - section: ""
-            link: lyricsDesc
+            link: lyricsdesc
             file: lyrics10.mei
             title: "Lyrics placement related to rhythmic values"
           - section: ""
-            link: lyricsDesc
+            link: lyricsdesc
             file: lyrics2.mei 
             title: "Multiple verse example"
           - section: ""
-            link: lyricsDesc
+            link: lyricsdesc
             file: lyrics3.mei 
             title: "Lyric connector example"
           - section: ""
-            link: lyricsDesc
+            link: lyricsdesc
             file: lyrics4.mei 
             title: "Lyrics styling example"
           - section: ""
-            link: lyricsDesc
+            link: lyricsdesc
             file: lyrics5.mei
             title: "Hyphen removal"
           - section: ""
-            link: lyricsDesc
+            link: lyricsdesc
             file: lyrics6.mei
             title: "Hyphen justification"
           - section: ""
-            link: lyricsDesc
+            link: lyricsdesc
             file: lyrics7.mei
             title: "Elision rendering"
           - section: ""
-            link: lyricsDesc
+            link: lyricsdesc
             file: lyrics8.mei
             title: "Line-break hyphenation"
           - section: ""
-            link: lyricsDesc
+            link: lyricsdesc
             file: lyrics9.mei
             title: "Minimal space between words"
           - section: ""
-            link: lyricsDesc
+            link: lyricsdesc
             file: multilingual.mei 
             title: "Multilingual"
     
