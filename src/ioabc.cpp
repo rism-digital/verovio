@@ -787,8 +787,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             }
             // end grace group
             else {
+                if ((m_gracecount > 1) || (grace == GRACE_unacc)) AddBeam();
                 grace = GRACE_NONE;
-                if (m_gracecount > 1) AddBeam();
                 m_gracecount = 0;
             }
         }
@@ -872,6 +872,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 // "The unit duration to use for gracenotes is not specified by the abc file"
                 // setting it to an eighth by default for now
                 note->SetDur(DURATION_8);
+                if (grace == GRACE_unacc)
+                  note->SetStemMod(STEMMODIFIER_1slash);
             }
 
             // add articulation
