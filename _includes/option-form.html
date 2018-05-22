@@ -50,7 +50,7 @@
             var input_div = $("<div class='col-sm-3'></div>");
             form_group.append(input_div);
     
-            if ((option.type == "double") || (option.type == "int") || (option.type == "string") || (option.type == "array")) {
+            if ((option.type == "double") || (option.type == "int") || (option.type == "std::string") || (option.type == "array")) {
 
                 var input = $("<input class='form-control'></input>");
                 input_div.append(input);
@@ -71,7 +71,7 @@
                     input.attr("type", "text");
                 }
             }
-            else if (option.type == "string-list") {
+            else if (option.type == "std::string-list") {
                 var select = $("<select class='form-control'></select>");
                 input_div.append(select);
                 select.attr("name", opt);

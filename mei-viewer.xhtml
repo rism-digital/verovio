@@ -46,7 +46,6 @@ downloads:
     var zoom = 40;
     var pageHeight = 2970;
     var pageWidth = 2100;
-    var font = 'Leipzig';
     var swipe_pages = false;
     var format = 'mei';
     var outputFilename = 'output.mei'
@@ -59,7 +58,6 @@ downloads:
 
     // reload cookies
     if ( $.cookie('zoom') ) zoom = $.cookie('zoom');
-    if ( $.cookie('font') ) font = $.cookie('font');
     if ( $.cookie('pdfFormat') ) pdfFormat = $.cookie('pdfFormat');
     if ( $.cookie('pdfOrientation') ) pdfOrientation = $.cookie('pdfOrientation');
     
@@ -86,8 +84,7 @@ downloads:
                     noFooter: "true",
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
-                    scale: zoom,
-                    font: font
+                    scale: zoom
                 };
           
         if (customOptions !== undefined) {
@@ -421,8 +418,7 @@ downloads:
                     noFooter: false,
                     pageHeight: pdfHeight,
                     pageWidth: pdfWidth,
-                    scale: 100,
-                    font: font
+                    scale: 100
         }
         
         vrvToolkit.setOptions(pdfOptions);
@@ -538,22 +534,6 @@ downloads:
                 <!-- /input-group -->
             </div>
             <!-- /.col-md-6 -->
-        </div>
-        <div class="row sidebar-row">
-            <div class="col-md-12">
-                <p>
-                    Font:
-                </p>
-            </div>
-            <div class="col-md-12">
-                <div>
-                    <select class="form-control" id="fontSelect">
-                        <option value="Leipzig">Leipzig</option>
-                        <option value="Bravura">Bravura</option>
-                        <option value="Gootville">Gootville</option>
-                    </select>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -816,16 +796,6 @@ downloads:
             width: 250
         });
         
-        $("#fontSelect").val(font);
-        
-        $("#fontSelect").change(function() {
-            if (font == $(this).val()) return;
-            console.log($(this).val());
-            font = $(this).val();
-            $.cookie('font', font, { expires: 30 });
-            apply_zoom();
-        });
-        
         $("#pdfFormat").val(pdfFormat);
         $("#pdfOrientation").val(pdfOrientation);
         
@@ -873,6 +843,7 @@ downloads:
         
         $("#optionDialog").on("hidden.bs.modal", function () {
             // This means the dialog was dismissed
+            console.log(savedOptions);
             if (savedOptions !== undefined) {
                 customOptions = savedOptions;
                 savedOptions = undefined;
