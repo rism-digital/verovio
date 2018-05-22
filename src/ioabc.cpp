@@ -148,6 +148,7 @@ void AbcInput::parseABC(std::istream &infile)
     // start with a new page
     if (m_linebreak != '\0') {
         Pb *pb = new Pb();
+        pb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
         section->AddChild(pb);
     }
     // calculate default unit note length
@@ -1055,13 +1056,14 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         else if (musicCode[i] == '|') {
             // add stacked elements to layer
             AddBeam();
-            if (musicCode[i + 1] == ':')
-                if (!m_layer->FindChildByType(NOTE))
-                    measure->SetLeft(BARRENDITION_rptstart);
-                else
-                    measure->SetRight(BARRENDITION_rptstart);
+            if (!m_layer->FindChildByType(NOTE)) {
+                if (musicCode[i + 1] == ':')
+                      measure->SetLeft(BARRENDITION_rptstart);
+            }
             else {
-                if (musicCode[i - 1] == ':')
+                if (musicCode[i + 1] == ':')
+                      measure->SetRight(BARRENDITION_rptstart);
+                else if (musicCode[i - 1] == ':')
                     measure->SetRight(BARRENDITION_rptend);
                 else if (musicCode[i + 1] == '|') {
                     ++i;
@@ -1106,6 +1108,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
     // has to be refined later
     if (sysBreak && (m_linebreak != '\0')) {
         Sb *sb = new Sb();
+        sb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
         section->AddChild(sb);
     }
 }
