@@ -91,6 +91,12 @@ public:
     bool Edit(const std::string &json_editorAction);
 
     /**
+     * Parse the query actions passed as JSON string.
+     * Only available for Emscripten-based compiles
+     **/
+    std::string Query(const std::string &json_queryAction);
+
+    /**
      * Concatenates the vrv::logBuffer into a string an returns it.
      * This is used only for Emscripten-based compilation.
      * The vrv::logBuffer is filled by the vrv::LogXXX functions.

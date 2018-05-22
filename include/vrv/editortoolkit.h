@@ -29,6 +29,7 @@ public:
 
 #ifdef USE_EMSCRIPTEN
     bool ParseEditorAction(const std::string &json_editorAction);
+    std::string ParseQueryAction(const std::string &json_editorAction);
 
     /**
      * Experimental editor functions.
@@ -55,6 +56,7 @@ protected:
     bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
+    bool ParseNeumeInfoAction(jsonxx::Object param, std::string *elementId);
     ///@}
 #endif
 
