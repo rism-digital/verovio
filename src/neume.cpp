@@ -161,4 +161,44 @@ bool Neume::GenerateChildMelodic()
 
     return true;
 }
+
+std::string Neume::NeumeGroupToString(NeumeGroup group)
+{
+    switch (group)
+    {
+        case PUNCTUM:
+            return "Punctum";
+        case CLIVIS:
+            return "Clivis";
+        case PES:
+            return "Pes";
+        case PRESSUS:
+            return "Pressus";
+        case CLIMACUS:
+            return "Climacus";
+        case PORRECTUS:
+            return "Porrectus";
+        case SCANDICUS:
+            return "Scandicus";
+        case TORCULUS:
+            return "TORCULUS";
+        case SCANDICUS_FLEXUS:
+            return "Scandicus flexus";
+        case PORRECTUS_FLEXUS:
+            return "Porrectus flexus";
+        case TORCULUS_RESUPINUS:
+            return "Torculus resupinus";
+        case CLIMACUS_RESUPINUS:
+            return "Climacus resupinus";
+        case PES_SUBPUNCTIS:
+            return "Pes subpunctis";
+        case PORRECTUS_SUBPUNCTIS:
+            return "Porrectus subpunctis";
+        case SCANDICUS_SUBPUNCTIS:
+            return "Scandicus subpunctis"; 
+        default:
+            return "";
+    }
+}
+
 } // namespace vrv
