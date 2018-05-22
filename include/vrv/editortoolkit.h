@@ -38,6 +38,11 @@ public:
     bool Insert(std::string elementType, std::string startId, std::string endId);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     ///@}
+    
+    /**
+     * Get information on neume group by ID.
+     */
+    std::string GetNeumeInfo(std::string elementId);
 #endif
 
 protected:
