@@ -263,8 +263,36 @@ std::string EditorToolkit::GetNeumeInfo(std::string elementId)
     Neume *neume = dynamic_cast<Neume *>(element);
     assert(neume);
 
-    NeumeGroup group = neume->GetNeumeGroup();
-    return Neume::NeumeGroupToString(group);
+    std::string neumeInfo = "";
+    ArrayOfObjects children;
+    AttComparison ac(NC);
+    neume->FindAllChildByComparison(&children, &ac);
+
+    auto it = children.begin();
+    Nc *previous = dynamic_cast<Nc *>(*it);
+    assert(previous);
+    it++;
+
+    for (; it != children.end(); it++) {
+        Nc *current = dynamic_cast<Nc *>(*it);
+        assert(current);
+        int pitchDifference = current->PitchDifferenceTo(previous);
+        if (pitchDifference > 0)
+        {
+            neumeInfo += ".u" + std::to_string(pitchDifference);
+        }
+        else if (pitchDifference < 0)
+        {
+            neumeInfo += ".d" + std::to_string(pitchDifference * -1);
+        }
+        else
+        {
+            neumeInfo += ".s";
+        }
+        previous = current;
+    }
+    neumeInfo = Neume::NeumeGroupToString(neume->GetNeumeGroup()) + neumeInfo;
+    return neumeInfo;
 } 
 
 bool EditorToolkit::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
