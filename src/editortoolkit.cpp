@@ -73,6 +73,30 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
     return false;
 }
 
+std::string EditorToolkit::ParseQueryAction(const std::string &json_queryAction)
+{
+    jsonxx::Object json;
+
+    // Read JSON actions
+    if (!json.parse(json_queryAction)) {
+        LogError("Can not parse JSON std::string.");
+            return "";
+    }
+
+    if (!json.has<jsonxx::String>("action") || !json.has<jsonxx::Object>("param"))
+        return "";
+
+    std::string action = json.get<jsonxx::String>("action");
+
+    if (action == "neume-info") {
+        std::string elementId;
+        if (this->ParseNeumeInfoAction(json.get<jsonxx::Object>("param"), &elementId)) {
+            return this->GetNeumeInfo(elementId);
+        }
+    }
+    return "";
+}
+
 bool EditorToolkit::Drag(std::string elementId, int x, int y)
 {
     if (!m_doc->GetDrawingPage()) return false;
@@ -277,11 +301,6 @@ bool EditorToolkit::ParseSetAction(
     (*attrValue) = param.get<jsonxx::String>("attrValue");
     return true;
 }
-<<<<<<< 6f652d9bc6dabc17a687b4daa5a2f7164e5041c8
-
-#endif
-=======
 #endif
 // USE_EMSCRIPTEN
->>>>>>> Change members of EditorToolkit to pointers
 } // namespace vrv
