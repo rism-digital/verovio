@@ -70,6 +70,30 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
     return false;
 }
 
+std::string EditorToolkit::ParseQueryAction(const std::string &json_queryAction)
+{
+    jsonxx::Object json;
+
+    // Read JSON actions
+    if (!json.parse(json_queryAction)) {
+        LogError("Can not parse JSON std::string.");
+            return "";
+    }
+
+    if (!json.has<jsonxx::String>("action") || !json.has<jsonxx::Object>("param"))
+        return "";
+
+    std::string action = json.get<jsonxx::String>("action");
+
+    if (action == "neume-info") {
+        std::string elementId;
+        if (this->ParseNeumeInfoAction(json.get<jsonxx::Object>("param"), &elementId)) {
+            return this->GetNeumeInfo(elementId);
+        }
+    }
+    return "";
+}
+
 bool EditorToolkit::Drag(std::string elementId, int x, int y)
 {
     if (!m_doc->GetDrawingPage()) return false;
@@ -272,6 +296,14 @@ bool EditorToolkit::ParseSetAction(
     (*attrType) = param.get<jsonxx::String>("attrType");
     if (!param.has<jsonxx::String>("attrValue")) return false;
     (*attrValue) = param.get<jsonxx::String>("attrValue");
+    return true;
+}
+
+bool EditorToolkit::ParseNeumeInfoAction(
+    jsonxx::Object param, std::string *elementId)
+{
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    (*elementId) = param.get<jsonxx::String>("elementId");
     return true;
 }
 #endif
