@@ -232,7 +232,7 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
     return false;
 }
 
-std::string GetNeumeInfo(std::string elementId)
+std::string EditorToolkit::GetNeumeInfo(std::string elementId)
 {
     if (!m_doc->GetDrawingPage()) return "";
     Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
@@ -240,7 +240,7 @@ std::string GetNeumeInfo(std::string elementId)
     assert(neume);
 
     NeumeGroup group = neume->GetNeumeGroup();
-   return "";
+    return Neume::NeumeGroupToString(group);
 } 
 
 bool EditorToolkit::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
