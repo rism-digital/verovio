@@ -229,6 +229,17 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
     return false;
 }
 
+std::string GetNeumeInfo(std::string elementId)
+{
+    if (!m_doc->GetDrawingPage()) return "";
+    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    Neume *neume = dynamic_cast<Neume *>(element);
+    assert(neume);
+
+    NeumeGroup group = neume->GetNeumeGroup();
+   return "";
+} 
+
 bool EditorToolkit::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
