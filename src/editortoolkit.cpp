@@ -263,9 +263,11 @@ std::string EditorToolkit::GetNeumeInfo(std::string elementId)
     Neume *neume = dynamic_cast<Neume *>(element);
     assert(neume);
 
-    std::string neumeInfo = "";
+    std::string neumeInfo = "";     // Stores the more specific info on steps between neume components
+    std::string neumeContour = "";  // Only stores direction of steps so we can map to a neume grouping name
     ArrayOfObjects children;
     AttComparison ac(NC);
+    // Get all neume components for this neume
     neume->FindAllChildByComparison(&children, &ac);
 
     auto it = children.begin();
@@ -273,6 +275,7 @@ std::string EditorToolkit::GetNeumeInfo(std::string elementId)
     assert(previous);
     it++;
 
+    // Compare successive neume components to establish contour
     for (; it != children.end(); it++) {
         Nc *current = dynamic_cast<Nc *>(*it);
         assert(current);
@@ -280,18 +283,22 @@ std::string EditorToolkit::GetNeumeInfo(std::string elementId)
         if (pitchDifference > 0)
         {
             neumeInfo += ".u" + std::to_string(pitchDifference);
+            neumeContour += "u";
         }
         else if (pitchDifference < 0)
         {
             neumeInfo += ".d" + std::to_string(pitchDifference * -1);
+            neumeContour += "d";
         }
         else
         {
             neumeInfo += ".s";
+            neumeContour += "s";
         }
         previous = current;
     }
-    neumeInfo = Neume::NeumeGroupToString(neume->GetNeumeGroup()) + neumeInfo;
+    // Combine neume grouping name and specific info and return
+    neumeInfo = Neume::NeumeGroupToString(Neume::s_neumes[neumeContour]) + neumeInfo;
     return neumeInfo;
 } 
 
