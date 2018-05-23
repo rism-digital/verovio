@@ -3711,7 +3711,7 @@ std::wstring HumdrumInput::cleanHarmString(const std::string &content)
         replacing = true;
     }
 
-    if (replace(kind, L"major-", L"M")) {
+    if (replace(kind, L"major-", L"maj")) {
         replacing = true;
     }
     else if (replace(kind, L"minor-", L"m")) {
@@ -3780,19 +3780,19 @@ std::wstring HumdrumInput::cleanHarmString(const std::string &content)
         replacing = true;
     }
     else if (kind == L"major-seventh") {
-        kind = L"M7";
+        kind = L"maj7";
         replacing = true;
     }
-    else if (kind == L"dominant-11th") {
-        kind = L"dom11";
+    else if (kind == L"dom11") {
+        kind = L"11";
         replacing = true;
     }
-    else if (kind == L"dominant-13th") {
-        kind = L"dom13";
+    else if (kind == L"dom13") {
+        kind = L"13";
         replacing = true;
     }
-    else if (kind == L"dominant-ninth") {
-        kind = L"dom9";
+    else if (kind == L"dom9") {
+        kind = L"9";
         replacing = true;
     }
     else if (kind == L"half-diminished") {
@@ -3805,6 +3805,10 @@ std::wstring HumdrumInput::cleanHarmString(const std::string &content)
     }
     else if (kind == L"dominant") {
         kind = L"7";
+        replacing = true;
+    }
+    else if (kind == L"power") {
+        kind = L"5";
         replacing = true;
     }
     else if (kind == L"m7b5") {
