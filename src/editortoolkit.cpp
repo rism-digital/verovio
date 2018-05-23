@@ -13,6 +13,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include "custos.h"
 #include "layer.h"
 #include "measure.h"
 #include "nc.h"
@@ -85,10 +86,10 @@ std::string EditorToolkit::ParseQueryAction(const std::string &json_queryAction)
 
     std::string action = json.get<jsonxx::String>("action");
 
-    if (action == "neume-info") {
+    if (action == "element-info") {
         std::string elementId;
-        if (this->ParseNeumeInfoAction(json.get<jsonxx::Object>("param"), &elementId)) {
-            return this->GetNeumeInfo(elementId);
+        if (this->ParseElementInfoAction(json.get<jsonxx::Object>("param"), &elementId)) {
+            return this->GetElementInfo(elementId);
         }
     }
     return "";
@@ -253,50 +254,70 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
     return false;
 }
 
-std::string EditorToolkit::GetNeumeInfo(std::string elementId)
+std::string EditorToolkit::GetElementInfo(std::string elementId)
 {
-    if (!m_doc->GetDrawingPage()) return "";
-    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
-    Neume *neume = dynamic_cast<Neume *>(element);
-    assert(neume);
-
-    std::string neumeInfo = "";     // Stores the more specific info on steps between neume components
-    std::string neumeContour = "";  // Only stores direction of steps so we can map to a neume grouping name
-    ArrayOfObjects children;
-    AttComparison ac(NC);
-    // Get all neume components for this neume
-    neume->FindAllChildByComparison(&children, &ac);
-
-    auto it = children.begin();
-    Nc *previous = dynamic_cast<Nc *>(*it);
-    assert(previous);
-    it++;
-
-    // Compare successive neume components to establish contour
-    for (; it != children.end(); it++) {
-        Nc *current = dynamic_cast<Nc *>(*it);
-        assert(current);
-        int pitchDifference = current->PitchDifferenceTo(previous);
-        if (pitchDifference > 0)
-        {
-            neumeInfo += ".u" + std::to_string(pitchDifference);
-            neumeContour += "u";
-        }
-        else if (pitchDifference < 0)
-        {
-            neumeInfo += ".d" + std::to_string(pitchDifference * -1);
-            neumeContour += "d";
-        }
-        else
-        {
-            neumeInfo += ".s";
-            neumeContour += "s";
-        }
-        previous = current;
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Drawing page does not exist.");
+        return "";
     }
-    // Combine neume grouping name and specific info and return
-    neumeInfo = Neume::NeumeGroupToString(Neume::s_neumes[neumeContour]) + neumeInfo;
-    return neumeInfo;
+    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    if (element == nullptr) return "";
+
+    if (element->Is(CUSTOS)) {
+        Custos *custos = dynamic_cast<Custos *>(element);
+        assert(custos);
+
+        std::string custosInfo = "Custos ";
+
+        custosInfo += PitchNameToString(custos->GetPname()) + std::to_string(custos->GetOct());
+        return custosInfo;
+    }
+    else if (element->Is(NEUME)) {
+        Neume *neume = dynamic_cast<Neume *>(element);
+        assert(neume);
+
+        std::string neumeInfo = "";     // Stores the more specific info on steps between neume components
+        std::string neumeContour = "";  // Only stores direction of steps so we can map to a neume grouping name
+        ArrayOfObjects children;
+        AttComparison ac(NC);
+        // Get all neume components for this neume
+        neume->FindAllChildByComparison(&children, &ac);
+
+        auto it = children.begin();
+        Nc *previous = dynamic_cast<Nc *>(*it);
+        assert(previous);
+        it++;
+
+        // Compare successive neume components to establish contour
+        for (; it != children.end(); it++) {
+            Nc *current = dynamic_cast<Nc *>(*it);
+            assert(current);
+            int pitchDifference = current->PitchDifferenceTo(previous);
+            if (pitchDifference > 0)
+            {
+                neumeInfo += ".u" + std::to_string(pitchDifference);
+                neumeContour += "u";
+            }
+            else if (pitchDifference < 0)
+            {
+                neumeInfo += ".d" + std::to_string(pitchDifference * -1);
+                neumeContour += "d";
+            }
+            else
+            {
+                neumeInfo += ".s";
+                neumeContour += "s";
+            }
+            previous = current;
+        }
+        // Combine neume grouping name and specific info and return
+        neumeInfo = Neume::NeumeGroupToString(Neume::s_neumes[neumeContour]) + neumeInfo;
+        return neumeInfo;
+    }
+    else {
+        LogWarning("GetInfo query function not implemented for %s", element->GetClassId());
+    }
+    return "";
 } 
 
 bool EditorToolkit::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
@@ -334,13 +355,36 @@ bool EditorToolkit::ParseSetAction(
     return true;
 }
 
-bool EditorToolkit::ParseNeumeInfoAction(
+bool EditorToolkit::ParseElementInfoAction(
     jsonxx::Object param, std::string *elementId)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
     return true;
 }
+
+std::string EditorToolkit::PitchNameToString(int pname)
+{
+    switch ((data_PITCHNAME)pname){
+        case PITCHNAME_a:
+            return "A";
+        case PITCHNAME_b:
+            return "B";
+        case PITCHNAME_c:
+            return "C";
+        case PITCHNAME_d:
+            return "D";
+        case PITCHNAME_e:
+            return "E";
+        case PITCHNAME_f:
+            return "F";
+        case PITCHNAME_g:
+            return "G";
+        default:
+            return "";
+    }
+}
+
 #endif
 // USE_EMSCRIPTEN
 } // namespace vrv
