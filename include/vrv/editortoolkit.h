@@ -43,7 +43,7 @@ public:
     /**
      * Get information on neume group by ID.
      */
-    std::string GetNeumeInfo(std::string elementId);
+    std::string GetElementInfo(std::string elementId);
 #endif
 
 protected:
@@ -56,8 +56,10 @@ protected:
     bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
-    bool ParseNeumeInfoAction(jsonxx::Object param, std::string *elementId);
+    bool ParseElementInfoAction(jsonxx::Object param, std::string *elementId);
     ///@}
+    
+    std::string PitchNameToString(int pname);
 #endif
 
     Doc *m_doc;

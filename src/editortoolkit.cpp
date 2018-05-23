@@ -13,13 +13,14 @@
 
 //--------------------------------------------------------------------------------
 
-#include "clef.h"
 #include "custos.h"
-#include "staffdef.h"
-#include "vrv.h"
-
-//--------------------------------------------------------------------------------
-
+#include "layer.h"
+#include "measure.h"
+#include "nc.h"
+#include "neume.h"
+#include "page.h"
+#include "slur.h"
+#include "staff.h"
 #include "vrv.h"
 
 //--------------------------------------------------------------------------------
@@ -88,10 +89,10 @@ std::string EditorToolkit::ParseQueryAction(const std::string &json_queryAction)
 
     std::string action = json.get<jsonxx::String>("action");
 
-    if (action == "neume-info") {
+    if (action == "element-info") {
         std::string elementId;
-        if (this->ParseNeumeInfoAction(json.get<jsonxx::Object>("param"), &elementId)) {
-            return this->GetNeumeInfo(elementId);
+        if (this->ParseElementInfoAction(json.get<jsonxx::Object>("param"), &elementId)) {
+            return this->GetElementInfo(elementId);
         }
     }
     return "";
@@ -301,13 +302,36 @@ bool EditorToolkit::ParseSetAction(
     return true;
 }
 
-bool EditorToolkit::ParseNeumeInfoAction(
+bool EditorToolkit::ParseElementInfoAction(
     jsonxx::Object param, std::string *elementId)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
     return true;
 }
+
+std::string EditorToolkit::PitchNameToString(int pname)
+{
+    switch ((data_PITCHNAME)pname){
+        case PITCHNAME_a:
+            return "A";
+        case PITCHNAME_b:
+            return "B";
+        case PITCHNAME_c:
+            return "C";
+        case PITCHNAME_d:
+            return "D";
+        case PITCHNAME_e:
+            return "E";
+        case PITCHNAME_f:
+            return "F";
+        case PITCHNAME_g:
+            return "G";
+        default:
+            return "";
+    }
+}
+
 #endif
 
 // USE_EMSCRIPTEN
