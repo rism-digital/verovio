@@ -39,7 +39,6 @@ public:
     bool Insert(std::string elementType, std::string startId, std::string endId);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     ///@}
-
 #endif
 
 protected:
@@ -52,8 +51,10 @@ protected:
     bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
-    bool ParseNeumeInfoAction(jsonxx::Object param, std::string *elementId);
+    bool ParseElementInfoAction(jsonxx::Object param, std::string *elementId);
     ///@}
+    
+    std::string PitchNameToString(int pname);
 #endif
 
     Doc *m_doc;
