@@ -34,6 +34,7 @@ int vrvToolkit_getPageWithElement(Toolkit *tk, const char *xmlId);
 double vrvToolkit_getTimeForElement(Toolkit *tk, const char *xmlId);
 const char *vrvToolkit_getVersion(Toolkit *tk);
 bool vrvToolkit_loadData(Toolkit *tk, const char *data);
+const char *vrvToolkit_query(Toolkit *tk, const char *queryAction);
 const char *vrvToolkit_renderToMIDI(Toolkit *tk, const char *c_options);
 const char *vrvToolkit_renderToSVG(Toolkit *tk, int page_no, const char *c_options);
 const char *vrvToolkit_renderToTimemap(Toolkit *tk);
@@ -134,6 +135,11 @@ bool vrvToolkit_loadData(Toolkit *tk, const char *data)
     tk->ResetLogBuffer();
     return tk->LoadData(data);
 }
+
+const char *vrvToolkit_query(Toolkit *tk, const char *queryAction)
+{
+    return tk->Query(queryAction).c_str();
+}    
 
 const char *vrvToolkit_renderToMIDI(Toolkit *tk, const char *c_options)
 {
