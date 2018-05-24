@@ -13,6 +13,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include "clef.h"
 #include "custos.h"
 #include "layer.h"
 #include "measure.h"
@@ -21,6 +22,7 @@
 #include "page.h"
 #include "slur.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "vrv.h"
 
 //--------------------------------------------------------------------------------
@@ -93,6 +95,12 @@ std::string EditorToolkit::ParseQueryAction(const std::string &json_queryAction)
         std::string elementId;
         if (this->ParseElementInfoAction(json.get<jsonxx::Object>("param"), &elementId)) {
             return this->GetElementInfo(elementId);
+        }
+    }
+    else if (action == "clef-info") {
+        std::string staffId;
+        if (this->ParseElementInfoAction(json.get<jsonxx::Object>("param"), &staffId)) {
+            return this->GetClefInfo(staffId);
         }
     }
     return "";
@@ -300,36 +308,6 @@ bool EditorToolkit::ParseSetAction(
     if (!param.has<jsonxx::String>("attrValue")) return false;
     (*attrValue) = param.get<jsonxx::String>("attrValue");
     return true;
-}
-
-bool EditorToolkit::ParseElementInfoAction(
-    jsonxx::Object param, std::string *elementId)
-{
-    if (!param.has<jsonxx::String>("elementId")) return false;
-    (*elementId) = param.get<jsonxx::String>("elementId");
-    return true;
-}
-
-std::string EditorToolkit::PitchNameToString(int pname)
-{
-    switch ((data_PITCHNAME)pname){
-        case PITCHNAME_a:
-            return "A";
-        case PITCHNAME_b:
-            return "B";
-        case PITCHNAME_c:
-            return "C";
-        case PITCHNAME_d:
-            return "D";
-        case PITCHNAME_e:
-            return "E";
-        case PITCHNAME_f:
-            return "F";
-        case PITCHNAME_g:
-            return "G";
-        default:
-            return "";
-    }
 }
 
 #endif
