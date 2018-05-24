@@ -41,9 +41,18 @@ public:
     ///@}
     
     /**
-     * Get information on neume group by ID.
+     * Get information on element by ID.
      */
     std::string GetElementInfo(std::string elementId);
+
+    /**
+     * Get clef information by staff.
+     * Clefs aren't always their own element and may not
+     * be found by GetElementInfo, but they can be found
+     * through a parent staff element.
+     */
+    std::string GetClefInfo(std::string staffId);
+
 #endif
 
 protected:
