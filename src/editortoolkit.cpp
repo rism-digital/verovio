@@ -13,6 +13,7 @@
 
 //--------------------------------------------------------------------------------
 
+#include "clef.h"
 #include "custos.h"
 #include "layer.h"
 #include "measure.h"
@@ -21,6 +22,7 @@
 #include "page.h"
 #include "slur.h"
 #include "staff.h"
+#include "staffdef.h"
 #include "vrv.h"
 
 //--------------------------------------------------------------------------------
@@ -90,6 +92,12 @@ std::string EditorToolkit::ParseQueryAction(const std::string &json_queryAction)
         std::string elementId;
         if (this->ParseElementInfoAction(json.get<jsonxx::Object>("param"), &elementId)) {
             return this->GetElementInfo(elementId);
+        }
+    }
+    else if (action == "clef-info") {
+        std::string staffId;
+        if (this->ParseElementInfoAction(json.get<jsonxx::Object>("param"), &staffId)) {
+            return this->GetClefInfo(staffId);
         }
     }
     return "";
@@ -254,6 +262,42 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
     return false;
 }
 
+// Intended for use when the clef is not a separate element
+// from the StaffDef
+std::string EditorToolkit::GetClefInfo(std::string staffId)
+{
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Drawing page does not exist.");
+        return "";
+    }
+    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(staffId);
+    if (element == nullptr) {
+        LogError("Element does not exist.");
+        return "";
+    }
+
+    Staff *staff = dynamic_cast<Staff *>(element);
+    assert(staff);
+    StaffDef *staffDef = staff->m_drawingStaffDef;
+    assert(staffDef);
+    if (staffDef->HasClefInfo()) {
+        Clef *clef = staffDef->GetClefCopy();
+        std::string clefInfo = "Clef on line " + std::to_string(clef->GetLine());
+        if (clef->GetShape() == CLEFSHAPE_C) {
+            clefInfo = "C " + clefInfo;
+        }
+        else if (clef->GetShape() == CLEFSHAPE_F) {
+            clefInfo = "F " + clefInfo;
+        }
+        delete clef; // Since it is a copy it's our responsability to delete it
+        return clefInfo;
+    }
+    else {
+        LogWarning("Staff does not have a clef.");
+    }
+    return "";
+}
+
 std::string EditorToolkit::GetElementInfo(std::string elementId)
 {
     if (!m_doc->GetDrawingPage()) {
@@ -261,9 +305,29 @@ std::string EditorToolkit::GetElementInfo(std::string elementId)
         return "";
     }
     Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
-    if (element == nullptr) return "";
+    if (element == nullptr) {
+        LogError("Element does not exist.");
+        return "";
+    }
 
-    if (element->Is(CUSTOS)) {
+    if (element->Is(CLEF)) {
+        Clef *clef = dynamic_cast<Clef *>(element);
+        assert(clef);
+
+        std::string clefInfo = "Clef on line ";
+        
+        clefInfo += std::to_string(clef->GetLine());
+
+        if (clef->GetShape() == CLEFSHAPE_C) {
+            clefInfo = "C " + clefInfo;
+        }
+        else if (clef->GetShape() == CLEFSHAPE_F) {
+            clefInfo = "F " + clefInfo;
+        }
+
+        return clefInfo;
+    }
+    else if (element->Is(CUSTOS)) {
         Custos *custos = dynamic_cast<Custos *>(element);
         assert(custos);
 
