@@ -85,9 +85,7 @@ private:
     std::string m_filename;
     Mdiv *m_mdiv = NULL;
     MeterSig *m_meter = NULL;
-    Measure *m_measure = NULL;
     Layer *m_layer = NULL;
-    Staff *m_staff = NULL;
 
     std::vector<data_ARTICULATION> m_artic;
     data_DURATION m_durDefault = DURATION_NONE; // todo: switch to MEI
