@@ -126,6 +126,10 @@ void AbcInput::parseABC(std::istream &infile)
         infile.getline(abcLine, 10000);
         ++m_lineNum;
         readInformationField(abcLine[0], &abcLine[2]);
+        if (infile.eof()) {
+          LogWarning("ABC input: No music found");
+          break;
+        }
     }
     // create page head
     printInformationFields();
@@ -652,7 +656,7 @@ void AbcInput::createHeader()
 void AbcInput::readInformationField(char dataKey, std::string value)
 {
     // remove comments and trailing whitespace
-    if (dataKey == '%')
+    if (dataKey == '%' || dataKey == '\0')
         return;
     else if (value.find('%') != std::string::npos) {
         value = value.substr(0, value.find('%'));
