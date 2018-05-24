@@ -1,6 +1,7 @@
 branches:
   only:
   - develop
+  - develop-abc2  
 
 sudo: false
 dist: trusty
@@ -33,5 +34,5 @@ before_script:
   - cd tools
   - cmake .
 
-script: 
+script:
   - make
