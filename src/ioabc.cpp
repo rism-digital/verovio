@@ -955,6 +955,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         // padding
         else if (musicCode[i] == 'y') {
             // Pad *pad = new Pad;
+            LogWarning("ABC input: Extra space not supported");
         }
 
         // rests
