@@ -866,10 +866,96 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
             assert(staff);
             loc = staff->m_drawingLines - 1;
+
+            Beam *beam = dynamic_cast<Beam *>(this->GetFirstParent(BEAM, 1));
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
             bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
-            if (hasMultipleLayer) {
+
+            // If within a beam, calculate the rest's height based on it's relationship to the notes that surround it
+            if (beam) {
+                beam->ResetList(beam);
+
+                const ListOfObjects *beamList = beam->GetList(beam);
+                int restIndex = beam->GetChildIndex(rest);
+
+                int leftLoc = loc;
+                ListOfObjects::const_iterator it = beamList->begin();
+                std::advance(it, restIndex);
+                ListOfObjects::const_reverse_iterator rit(it);
+                for (; rit != beamList->rend(); ++rit) {
+                    if ((*rit)->Is(NOTE)) {
+                        Note *leftNote = dynamic_cast<Note *>(*rit);
+                        if (leftNote->HasPname()) {
+                            leftLoc = PitchInterface::CalcLoc(leftNote->GetPname(), leftNote->GetOct(),
+                                                              layerY->GetClefLocOffset(layerElementY));
+                        }
+                        break;
+                    }
+                    else if ((*rit)->Is(CHORD)) {
+                        Chord *leftChord = dynamic_cast<Chord *>(*rit);
+
+                        int topChordLoc = loc;
+                        Note *topChordNote = leftChord->GetTopNote();
+                        if (topChordNote->HasPname()) {
+                            topChordLoc = PitchInterface::CalcLoc(topChordNote->GetPname(), topChordNote->GetOct(),
+                                                                  layerY->GetClefLocOffset(layerElementY));
+                        }
+
+                        int bottomChordLoc = loc;
+                        Note *bottomChordNote = leftChord->GetBottomNote();
+                        if (bottomChordNote->HasPname()) {
+                            bottomChordLoc = PitchInterface::CalcLoc(bottomChordNote->GetPname(),
+                                                                     bottomChordNote->GetOct(),
+                                                                     layerY->GetClefLocOffset(layerElementY));
+                        }
+
+                        leftLoc = (topChordLoc + bottomChordLoc) / 2;
+                        break;
+                    }
+                }
+
+                int rightLoc = loc;
+                it = beamList->begin();
+                std::advance(it, restIndex);
+                for (; it != beamList->end(); ++it) {
+                    if ((*it)->Is(NOTE)) {
+                        Note *rightNote = dynamic_cast<Note *>(*it);
+                        if (rightNote->HasPname()) {
+                            rightLoc = PitchInterface::CalcLoc(rightNote->GetPname(), rightNote->GetOct(),
+                                                               layerY->GetClefLocOffset(layerElementY));
+                        }
+                        break;
+                    }
+                    else if ((*it)->Is(CHORD)) {
+                        Chord *rightChord = dynamic_cast<Chord *>(*it);
+
+                        int topChordLoc = loc;
+                        Note *topChordNote = rightChord->GetTopNote();
+                        if (topChordNote->HasPname()) {
+                            topChordLoc = PitchInterface::CalcLoc(topChordNote->GetPname(), topChordNote->GetOct(),
+                                                                  layerY->GetClefLocOffset(layerElementY));
+                        }
+
+                        int bottomChordLoc = loc;
+                        Note *bottomChordNote = rightChord->GetBottomNote();
+                        if (bottomChordNote->HasPname()) {
+                            bottomChordLoc = PitchInterface::CalcLoc(bottomChordNote->GetPname(),
+                                                                     bottomChordNote->GetOct(),
+                                                                     layerY->GetClefLocOffset(layerElementY));
+                        }
+
+                        rightLoc = (topChordLoc + bottomChordLoc) / 2;
+                        break;
+                    }
+                }
+
+                int locAvg = (rightLoc + leftLoc) / 2;
+                if (abs(locAvg - loc) > 3) {
+                    loc = locAvg;
+                }
+            }
+            else if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
                 if (firstLayer->GetN() == layerY->GetN())
