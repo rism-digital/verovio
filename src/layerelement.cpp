@@ -954,6 +954,14 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 if (abs(locAvg - loc) > 3) {
                     loc = locAvg;
                 }
+                // if loc is odd, we need to offset it to be even 
+                // so that the rest dots do not collide with the staff lines
+                if (loc % 2 != 0) {
+                    // if it's above the staff, offset downwards
+                    // if below the staff, offset upwards
+                    if (loc > 4) loc--;
+                    else loc++;
+                }
             }
             else if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
