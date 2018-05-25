@@ -128,11 +128,11 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             LogError("Element does not have Layer parent. This should not happen.");
             return false;
         }
-        int oct;
-        data_PITCHNAME pname
-            = (data_PITCHNAME)m_view->CalculatePitchCode(layer, element->GetDrawingY() + y, element->GetDrawingX(), &oct);
-        element->GetPitchInterface()->SetPname(pname);
-        element->GetPitchInterface()->SetOct(oct);
+        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+        assert(staff);
+        // Calculate pitch difference based on y difference
+        int pitchDifference = round((double) y / (double) staff->m_drawingStaffSize);
+        element->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
         /*if (element->HasAttClass(ATT_COORDINATED)) {
             AttCoordinated *att = dynamic_cast<AttCoordinated *>(element);
             att->SetUlx(x);
