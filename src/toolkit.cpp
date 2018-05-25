@@ -890,6 +890,7 @@ bool Toolkit::Edit(const std::string &json_editorAction)
     return editorToolkit.ParseEditorAction(json_editorAction);
 #else
     // The non-js version of the app should not use this function.
+    LogError("This function should not be accessed through the non-js version of the app.");
     return false;
 #endif
 }
