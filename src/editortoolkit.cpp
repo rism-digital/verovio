@@ -42,8 +42,10 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         return false;
     }
 
-    if (!json.has<jsonxx::String>("action") || !json.has<jsonxx::Object>("param"))
+    if (!json.has<jsonxx::String>("action") || !json.has<jsonxx::Object>("param")) {
+        LogWarning("Incorrectly formatted JSON action");
         return false;
+    }
 
     std::string action = json.get<jsonxx::String>("action");
 
@@ -70,6 +72,7 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
     else {
 
     }
+    LogWarning("Unknown action type.");
     return false;
 }
 
@@ -105,7 +108,10 @@ std::string EditorToolkit::ParseQueryAction(const std::string &json_queryAction)
 
 bool EditorToolkit::Drag(std::string elementId, int x, int y)
 {
-    if (!m_doc->GetDrawingPage()) return false;
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get drawing page.");
+        return false;
+    }
 
     // Try to get the element on the current drawing page
     Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
@@ -118,7 +124,10 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
     // For elements whose y-position corresponds to a certain pitch
     if (element->HasInterface(INTERFACE_PITCH)) {
         Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
-        if(!layer) return false;
+        if(!layer) {
+            LogError("Element does not have Layer parent. This should not happen.");
+            return false;
+        }
         int oct;
         data_PITCHNAME pname
             = (data_PITCHNAME)m_view->CalculatePitchCode(layer, element->GetDrawingY() + y, element->GetDrawingX(), &oct);
@@ -134,7 +143,10 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
         Neume *neume = dynamic_cast<Neume *>(element);
         assert(neume);
         Layer *layer = dynamic_cast<Layer *>(neume->GetFirstParent(LAYER));
-        if (!layer) return false;
+        if (!layer) {
+            LogError("Element does not have Layer parent. This should not occur.");
+            return false;
+        }
         Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
         assert(staff);
         // Calculate difference in pitch based on y difference
@@ -144,7 +156,6 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
         AttComparison ac(NC);
         ArrayOfObjects objects;
         neume->FindAllChildByComparison(&objects, &ac);
-
         for (auto it = objects.begin(); it != objects.end(); ++it) {
             Nc *nc = dynamic_cast<Nc *>(*it);
             // Update the neume component
@@ -188,6 +199,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
 
         return true;
     }
+    LogWarning("Unsupported element for dragging.");
     return false;
 }
 
