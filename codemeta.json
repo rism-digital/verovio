@@ -1,0 +1,41 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "identifier": "Verovio",
+  "name": "Verovio",
+  "description": "Verovio is a fast, portable and lightweight open-source library for engraving Music Encoding Initiative (MEI) music scores into SVG.",
+  "softwareVersion": "1.1.6",
+  "datePublished": "2017-07-11",
+  "license": "https://www.gnu.org/licenses/lgpl-3.0",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "identifier": "c++",
+    "name": "C++"
+  },
+  "codeRepository": "https://github.com/rism-ch/verovio",
+  "issueTracker": "https://github.com/rism-ch/verovio/issues",
+  "dateCreated": "2014-01-09T09:44:10Z",
+  "author": [{
+    "@id": "https://orcid.org/0000-0002-9525-4331",
+    "@type": "Person",
+    "givenName": "Laurent",
+    "familyName": "Pugin",
+  }],
+  "contributor": [{
+      "@id": "https://orcid.org/0000-0003-1898-2543",
+      "@type": "Person",
+      "givenName": "Klaus",
+      "familyName": "Rettinghaus",
+    },
+    {
+      "@type": "Person",
+      "givenName": "Craig",
+      "familyName": "Sapp",
+    },
+    {
+      "@type": "Person",
+      "givenName": "Horwitz",
+      "familyName": "Andrew",
+    }
+  ]
+}
