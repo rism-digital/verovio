@@ -65,6 +65,8 @@ tests:
             link: shared#sharedTextRendition
             file: color2.mei
             title: "Color example (2)"
+            verovio: 2
+            version: "1.0.0"
           - section: "Text rendition"
             link: shared#sharedTextRendition
             file: color3.mei
@@ -75,6 +77,8 @@ tests:
             link: shared#sharedTextRendition
             file: color4.mei
             title: "Colouring noteheads"
+            verovio: 1
+            version: "1.1.0"
 
     - id: "02"
       chapter: "Common music notation"
@@ -116,10 +120,14 @@ tests:
             link: cmn#cmnDefs
             file: barlines.mei
             title: "Measure barline example"
+            verovio: 2
+            version: "1.0.0"
           - section: "Defining Score Parameters for CMN"
             link: cmn#cmnDefs
             file: barlines2.mei
             title: "Measure barline example (2)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Defining Score Parameters for CMN"
             link: cmn#cmnDefs
             file: measure-n.mei
@@ -128,6 +136,8 @@ tests:
             link: cmn#cmnDefs
             file: score.mei
             title: "Score and barlines example"
+            verovio: 2
+            version: "1.0.0"
           - section: "Defining Score Parameters for CMN"
             link: cmn#cmnDefs
             file: score2.mei
@@ -135,7 +145,7 @@ tests:
           - section: "Defining Score Parameters for CMN"
             link: cmn#cmnDefs
             file: staff.mei
-            title: "Symbols centred con non-5-line staff"
+            title: "Symbols centred on non-5-line staff"
             verovio: 2
             version: "2.0.0"
           - section: "Defining Score Parameters for CMN"
@@ -144,7 +154,6 @@ tests:
             title: "Support for invisible or one-number meter"
             verovio: 2
             version: "2.0.0"
-
           - section: "Redefinition of Score Parameters"
             link: cmn#cmnReDef
             file: clef-changes.mei
@@ -161,10 +170,14 @@ tests:
             link: cmn#cmnReDef
             file: scoredef-changes.mei
             title: "ScoreDef change example"
+            verovio: 2
+            version: "1.0.0"
           - section: "Redefinition of Score Parameters"
             link: cmn#cmnReDef
             file: scoredef-changes2.mei
             title: "Clef changes at system break"
+            verovio: 1
+            version: "2.0.0"
 
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
@@ -176,6 +189,8 @@ tests:
             link: cmn#cmnNotesChords
             file: accid3.mei
             title: "Alignment of editorial accidentals"
+            verovio: 2
+            version: "1.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: accid4.mei
@@ -188,6 +203,8 @@ tests:
             link: cmn#cmnNotesChords
             file: basics2.mei
             title: "Notes without pname"
+            verovio: 2
+            version: "1.1.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: chords.mei
@@ -240,7 +257,7 @@ tests:
             link: cmn#cmnNotesChords
             file: notes3.mei
             title: "Ledger line adjustment"
-            verovio: 2
+            verovio: 1
             version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
@@ -257,7 +274,7 @@ tests:
             file: stem.mei
             title: "Stem length adjustment"
             verovio: 2
-            version: "2.0.0"
+            version: "1.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: stem2.mei
@@ -274,6 +291,8 @@ tests:
             link: cmn#cmnNotesChords
             file: stem4.mei
             title: "Stem length adjustment for tuplets"
+            verovio: 1
+            version: "2.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: stemless.mei
@@ -289,19 +308,19 @@ tests:
             file: unison1.mei
             title: "Note-head placement in unison (1)"
             verovio: 2
-            version: "2.0.0"
+            version: "1.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: unison2.mei
             title: "Note-head placement in unison (2)"
             verovio: 2
-            version: "2.0.0"
+            version: "1.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: unison3.mei
             title: "Accidental placement on unison"
             verovio: 2
-            version: "2.0.0"
+            version: "1.0.0"
           - section: "Notes, Chords and Rests in CMN"
             link: cmn#cmnNotesChords
             file: unison4.mei
@@ -968,6 +987,8 @@ tests:
           - section: "Indications of harmony"
             link: harmony#harmonyDetails
             file: harm.mei
+            verovio: 2
+            version: "1.0.0"
             title: "Harmony indications"
           - section: "Indications of harmony"
             link: harmony#harmonyDetails
@@ -986,10 +1007,14 @@ tests:
             link: harmony#harmonyFigbass
             file: fb1.mei
             title: "Figured bass example (1)"
+            verovio: 2
+            version: "2.0.0"
           - section: "Figured bass"
             link: harmony#harmonyFigbass
             file: fb2.mei
             title: "Figured bass example (2)"
+            verovio: 2
+            version: "2.0.0"
 
     - id: "08"
       chapter: "Vocal text"
