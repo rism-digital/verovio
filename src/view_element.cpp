@@ -1552,14 +1552,8 @@ int View::GetSylYRel(Syl *syl, Staff *staff)
         int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
         int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        if (staff->m_drawingNotationType == NOTATIONTYPE_neume) {
-            y = alignment->GetStaffHeight() + alignment->GetOverflowAbove()
-                + (alignment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
-        }
-        else {
-            y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
-                + (alignment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
-        }
+        y = -alignment->GetStaffHeight() - alignment->GetOverflowBelow()
+            + (alignment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
     }
     return y;
 }
