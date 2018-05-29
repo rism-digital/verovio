@@ -14,6 +14,7 @@
 
 #include "atts_analytical.h"
 #include "atts_shared.h"
+#include "atts_visual.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
@@ -34,7 +35,8 @@ class Nc : public LayerElement,
            public PitchInterface,
            public PositionInterface,
            public AttColor,
-           public AttIntervalMelodic {
+           public AttIntervalMelodic,
+           public AttNcVis {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
