@@ -74,11 +74,8 @@ void Dir::AddChild(Object *child)
 // Dir functor methods
 //----------------------------------------------------------------------------
 
-int Dir::PrepareFloatingGrps(FunctorParams *functorParams)
+int Dir::PrepareFloatingGrps(FunctorParams *)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
     if (this->HasVgrp()) {
         this->SetDrawingGrpId(-this->GetVgrp());
     }
