@@ -388,6 +388,7 @@ protected:
     void resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void resolveTupletBeamStartTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
     void resolveTupletBeamEndTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
+    void mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void embedQstampInClass(vrv::Note *note, hum::HTp token, const std::string &tstring);
     void embedQstampInClass(vrv::Rest *note, hum::HTp token, const std::string &tstring);
     void embedQstampInClass(vrv::MRest *mrest, hum::HTp token, const std::string &tstring);

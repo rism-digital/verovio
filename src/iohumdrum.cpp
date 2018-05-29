@@ -10,9 +10,7 @@
 //    http://humlib.humdrum.org
 //    http://music-encoding.org/support/tutorials/mei-1st
 //    http://music-encoding.org/support/guidelines
-//    http://music-encoding.org/documentation/2.1.1/elements
 //    http://music-encoding.org/documentation/3.0.0/elements
-//    http://music-encoding.org/documentation/2.1.1/atts
 //    http://music-encoding.org/documentation/3.0.0/atts
 //    http://pugixml.org/docs/manual.html
 //
@@ -6889,12 +6887,10 @@ void HumdrumInput::removeTuplet(std::vector<string> &elements, std::vector<void 
 void HumdrumInput::prepareBeamAndTupletGroups(
     const std::vector<hum::HTp> &layerdata, std::vector<humaux::HumdrumBeamAndTuplet> &tg)
 {
-
     std::vector<int> beamnum;
     std::vector<int> gbeamnum;
     analyzeLayerBeams(beamnum, gbeamnum, layerdata);
 
-    int i;
     tg.clear();
 
     // duritems == a list of items in the layer which have duration.
@@ -6913,7 +6909,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     std::vector<int> durbeamnum;
 
     // Extract a list of the layer items which have duration:
-    for (i = 0; i < (int)layerdata.size(); ++i) {
+    for (int i = 0; i < (int)layerdata.size(); ++i) {
         if (!layerdata[i]->isData()) {
             indexmapping2.push_back(-1);
             continue;
@@ -6944,7 +6940,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     std::vector<bool> poweroftwo(duritems.size());
     bool hastupletQ = false;
     std::vector<hum::HumNum> dotlessdur(duritems.size());
-    for (i = 0; i < (int)duritems.size(); ++i) {
+    for (int i = 0; i < (int)duritems.size(); ++i) {
         hum::HumNum duration = hum::Convert::recipToDurationNoDots(*duritems[i]);
         dotlessdur[i] = duration;
         poweroftwo[i] = duration.isPowerOfTwo();
@@ -6954,7 +6950,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // Count the number of beams.  The durbeamnum std::vector contains a list
     // of beam numbers starting from 1 (or 0 if a note/rest has no beam).
     int beamcount = 0;
-    for (i = 0; i < (int)durbeamnum.size(); ++i) {
+    for (int i = 0; i < (int)durbeamnum.size(); ++i) {
         if (durbeamnum[i] > beamcount) {
             beamcount = durbeamnum[i];
         }
@@ -6965,7 +6961,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // into the durlist std::vector (list of items which posses duration).
     std::vector<int> beamstarts(beamcount, -1);
     std::vector<int> beamends(beamcount, 0);
-    for (i = 0; i < (int)durbeamnum.size(); ++i) {
+    for (int i = 0; i < (int)durbeamnum.size(); ++i) {
         if (durbeamnum[i]) {
             if (beamstarts[durbeamnum[i] - 1] < 0) {
                 beamstarts[durbeamnum[i] - 1] = i;
@@ -6978,7 +6974,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // beamendboolean == ending of a beam on a particular note
     std::vector<int> beamstartboolean(durbeamnum.size(), 0);
     std::vector<int> beamendboolean(durbeamnum.size(), 0);
-    for (i = 0; i < (int)beamstarts.size(); ++i) {
+    for (int i = 0; i < (int)beamstarts.size(); ++i) {
         beamstartboolean[beamstarts[i]] = i + 1;
         beamendboolean[beamends[i]] = i + 1;
     }
@@ -6991,7 +6987,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     std::vector<int> gbeamstart(layerdata.size(), 0);
     std::vector<int> gbeamend(layerdata.size(), 0);
     std::vector<int> gstate(layerdata.size(), 0);
-    for (i = 0; i < (int)gbeamnum.size(); ++i) {
+    for (int i = 0; i < (int)gbeamnum.size(); ++i) {
         if (!gbeamnum[i]) {
             continue;
         }
@@ -7005,7 +7001,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     }
 
     std::fill(gstate.begin(), gstate.end(), 0);
-    for (i = (int)gbeamnum.size() - 1; i >= 0; i--) {
+    for (int i = (int)gbeamnum.size() - 1; i >= 0; i--) {
         if (!gbeamnum[i]) {
             continue;
         }
@@ -7020,7 +7016,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
 
     if (!hastupletQ) {
         tg.resize(layerdata.size());
-        for (i = 0; i < (int)layerdata.size(); ++i) {
+        for (int i = 0; i < (int)layerdata.size(); ++i) {
             tg[i].gbeamstart = gbeamstart[i];
             tg[i].gbeamend = gbeamend[i];
             if (indexmapping2[i] < 0) {
@@ -7042,7 +7038,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     hum::HumNum sum = 0;
     std::vector<int> twocounttop(dotlessdur.size(), 0);
     std::vector<int> twocountbot(dotlessdur.size(), 0);
-    for (i = 0; i < (int)dotlessdur.size(); ++i) {
+    for (int i = 0; i < (int)dotlessdur.size(); ++i) {
         dotlessdur[i] = removeFactorsOfTwo(dotlessdur[i], twocounttop[i], twocountbot[i]);
         fulldur[i] = hum::Convert::recipToDuration(*duritems[i]);
         dursum[i] = sum;
@@ -7051,7 +7047,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
 
     // beamdur = a list of the durations for each beam.
     std::vector<hum::HumNum> beamdur(beamstarts.size());
-    for (i = 0; i < (int)beamdur.size(); ++i) {
+    for (int i = 0; i < (int)beamdur.size(); ++i) {
         beamdur[i] = dursum[beamends[i]] - dursum[beamstarts[i]] + fulldur[beamends[i]];
     }
 
@@ -7059,12 +7055,12 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // the duration of the beam.  -1 means could not be made power of two with
     // dots.
     std::vector<int> beampowdot(beamstarts.size(), -1);
-    for (i = 0; i < (int)beampowdot.size(); ++i) {
+    for (int i = 0; i < (int)beampowdot.size(); ++i) {
         beampowdot[i] = getDotPowerOfTwo(beamdur[i]);
     }
 
     std::vector<bool> binarybeams(beamstarts.size(), false);
-    for (i = 0; i < (int)binarybeams.size(); ++i) {
+    for (int i = 0; i < (int)binarybeams.size(); ++i) {
         if (poweroftwo[beamstarts[i]]) {
             binarybeams[i] = true;
         }
@@ -7080,7 +7076,6 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // It will require a bracket if they are not all enclosed in a beam.
     std::vector<int> tupletbracket(poweroftwo.size(), -1);
     int tupletnum = 1;
-    int j;
 
     // adjusted tuplet number by tuplet group
     std::vector<int> adjustcount;
@@ -7094,7 +7089,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         }
         bool ingroup = false;
         if (beampowdot[i] >= 0) {
-            for (j = beamstarts[i]; j <= beamends[i]; ++j) {
+            for (int j = beamstarts[i]; j <= beamends[i]; ++j) {
                 // may have to deal with dotted triplets (which appear to be powers of
                 // two)
                 if (poweroftwo[j]) {
@@ -7165,7 +7160,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         }
         // At a tuplet which is not already in a tuplet group
         // search for how long the group should occur.
-        j = i + 1;
+        int j = i + 1;
         int ending = (int)poweroftwo.size() - 1;
         groupdur = 0;
         while (j < (int)poweroftwo.size()) {
@@ -7217,7 +7212,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     std::vector<int> tupletendboolean(tupletgroups.size(), 0);
     std::vector<bool> tstart(tupletgroups.size(), false);
     std::vector<bool> tend(tupletgroups.size(), false);
-    for (i = 0; i < (int)tupletgroups.size(); ++i) {
+    for (int i = 0; i < (int)tupletgroups.size(); ++i) {
         if (!tupletgroups[i]) {
             continue;
         }
@@ -7226,7 +7221,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             tstart[tupletgroups[i] - 1] = true;
         }
     }
-    for (i = (int)tupletgroups.size() - 1; i >= 0; i--) {
+    for (int i = (int)tupletgroups.size() - 1; i >= 0; i--) {
         if (!tupletgroups[i]) {
             continue;
         }
@@ -7238,7 +7233,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
 
     std::vector<int> tuptop(tupletgroups.size(), -1);
     std::vector<int> tupbot(tupletgroups.size(), -1);
-    for (i = 0; i < (int)tupletgroups.size(); ++i) {
+    for (int i = 0; i < (int)tupletgroups.size(); ++i) {
         if (!tupletgroups[i]) {
             continue;
         }
@@ -7266,7 +7261,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     hum::HumNum vdur;
     hum::HumNum val2;
     std::vector<int> tupletscale;
-    for (i = 0; i < (int)tupletstartboolean.size(); ++i) {
+    for (int i = 0; i < (int)tupletstartboolean.size(); ++i) {
         if (tupletstartboolean[i]) {
             state = 1;
             xmin = twocountbot[i];
@@ -7324,7 +7319,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     }
 
     tg.resize(layerdata.size());
-    for (i = 0; i < (int)layerdata.size(); ++i) {
+    for (int i = 0; i < (int)layerdata.size(); ++i) {
         if (indexmapping2[i] < 0) {
             tg[i].group = -1;
             tg[i].bracket = -1;
@@ -7368,7 +7363,72 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         }
     }
 
+    mergeTupletsCuttingBeam(tg);
     resolveTupletBeamTie(tg);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::mergeTupletCuttingBeam -- When a tuplet ends on a beamed note,
+//     but it can be continued with another tuplet of the same type, then merge the
+//     two tuplets.  These cases are caused by groupings needed at a higher level
+//     than the beat according to the time signature.
+//
+
+void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTuplet> &tg)
+{
+    vector<int> inbeam(tg.size(), 0);
+    for (int i = 0; i < (int)inbeam.size(); i++) {
+        if (tg[i].beamstart) {
+            inbeam[i] = tg[i].beamstart;
+        }
+        else if (tg[i].beamend) {
+            inbeam[i] = 0;
+        }
+        else if (i > 0) {
+            inbeam[i] = inbeam[i - 1];
+        }
+        else {
+            inbeam[i] = 0;
+        }
+    }
+
+    for (int i = 0; i < (int)tg.size(); i++) {
+        if (!(inbeam[i] && tg[i].tupletend)) {
+            continue;
+        }
+        if (i >= (int)tg.size() - 1) {
+            continue;
+        }
+        if (!tg[i + 1].tupletstart) {
+            continue;
+        }
+        if (tg[i].num != tg[i + 1].num) {
+            continue;
+        }
+        if (tg[i].numbase != tg[i + 1].numbase) {
+            continue;
+        }
+        // need to merge adjacent tuplets
+        tg[i].tupletend = 0;
+        tg[i + 1].tupletstart = 0;
+        for (int j = i + 2; j < (int)tg.size(); j++) {
+            if (tg[j].tupletstart) {
+                tg[j].tupletstart--;
+            }
+            if (tg[j].tupletend) {
+                tg[j].tupletend--;
+            }
+        }
+    }
+
+    if (m_debug) {
+        cerr << "INDEX\tBEAM\tTSTART\tTEND\tNUM\tNUMBASE\n";
+        for (int i = 0; i < (int)tg.size(); i++) {
+            cerr << "I " << i << ":\t" << inbeam[i] << "\t" << tg[i].tupletstart << "\t" << tg[i].tupletend << "\t"
+                 << tg[i].num << "\t" << tg[i].numbase << endl;
+        }
+    }
 }
 
 //////////////////////////////
