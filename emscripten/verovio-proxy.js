@@ -48,9 +48,6 @@ verovio.vrvToolkit.getVersion = Module.cwrap('vrvToolkit_getVersion', 'string', 
 // bool loadData(Toolkit *ic, const char *data)
 verovio.vrvToolkit.loadData = Module.cwrap('vrvToolkit_loadData', 'number', ['number', 'string']);
 
-// char *query(Toolkit *ic, const char *queryAction)
-verovio.vrvToolkit.query = Module.cwrap('vrvToolkit_query', 'string', ['number', 'string']);
-
 // void redoLayout(Toolkit *ic)
 verovio.vrvToolkit.redoLayout = Module.cwrap('vrvToolkit_redoLayout', null, ['number']);
 
@@ -139,10 +136,6 @@ verovio.toolkit.prototype.getVersion = function () {
 
 verovio.toolkit.prototype.loadData = function (data) {
 	return verovio.vrvToolkit.loadData(this.ptr, data);
-};
-
-verovio.toolkit.prototype.query = function (queryAction) {
-	return verovio.vrvToolkit.query(this.ptr, JSON.stringify(queryAction));
 };
 
 verovio.toolkit.prototype.redoLayout = function () {
