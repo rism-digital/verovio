@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "layer.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -51,11 +52,10 @@ bool PitchInterface::HasIdenticalPitchInterface(PitchInterface *otherPitchInterf
     }
     */
 }
-
-int PitchInterface::CalcLoc(data_PITCHNAME pname, int oct, int clefLocOffset)
+    
+int PitchInterface::CalcLoc(LayerElement *element, Layer *layer, bool topChordNote = true)
 {
-    // E.g., C4 with clef C1: (4 - 4 * 7) + (1 - 1) + 0;
-    return ((oct - OCTAVE_OFFSET) * 7 + (pname - 1) + clefLocOffset);
+    assert(element == this);
 }
 
 void PitchInterface::AdjustPname(int &pname, int &oct)
@@ -108,6 +108,16 @@ int PitchInterface::PitchDifferenceTo(PitchInterface *pi)
     pitchDifference += 7 * (this->GetOct() - pi->GetOct());
 
     return pitchDifference;
+}
+
+//----------------------------------------------------------------------------
+// Static methods
+//----------------------------------------------------------------------------
+    
+int PitchInterface::CalcLoc(data_PITCHNAME pname, int oct, int clefLocOffset)
+{
+    // E.g., C4 with clef C1: (4 - 4 * 7) + (1 - 1) + 0;
+    return ((oct - OCTAVE_OFFSET) * 7 + (pname - 1) + clefLocOffset);
 }
 
 } // namespace vrv
