@@ -895,16 +895,6 @@ bool Toolkit::Edit(const std::string &json_editorAction)
 #endif
 }
 
-std::string Toolkit::Query(const std::string &json_queryAction)
-{
-#ifdef USE_EMSCRIPTEN
-    EditorToolkit editorToolkit(&m_doc, &m_view);
-    return editorToolkit.ParseQueryAction(json_queryAction);
-#else
-    return "";
-#endif
-}
-
 std::string Toolkit::GetLog()
 {
 #ifdef USE_EMSCRIPTEN
