@@ -896,7 +896,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 // iterate through the elements from the rest to the end of the beam
                 // until we hit a note or chord, which we will use to determine where the rest should be placed
                 for (; it != beamList->end(); ++it) {
-                    LayerElement *layerElement = dynamic_cast<LayerElement *>(*rit);
+                    LayerElement *layerElement = dynamic_cast<LayerElement *>(*it);
                     assert(layerElement);
                     if (layerElement->Is(NOTE)) {
                         rightLoc = PitchInterface::CalcLoc(layerElement, layerY);
