@@ -81,11 +81,8 @@ int Pedal::GenerateMIDI(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
+int Pedal::PrepareFloatingGrps(FunctorParams *)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
-
     if (this->HasVgrp()) {
         this->SetDrawingGrpId(-this->GetVgrp());
     }

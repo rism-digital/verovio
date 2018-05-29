@@ -348,11 +348,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
             if (m_is_mensural) {
                 Mensur *mensur = new Mensur();
                 i += getTimeInfo(incipit, NULL, mensur, i + 1);
-                if (current_measure.mensur) {
-                    delete current_measure.mensur;
+                if (current_note.mensur) {
+                    delete current_note.mensur;
                 }
-                // When will this be deleted? Potential memory leak? LP
-                current_measure.mensur = mensur;
+                current_note.mensur = mensur;
             }
             else {
                 MeterSig *meter = new MeterSig;
@@ -803,7 +802,7 @@ data_PITCHNAME PaeInput::getPitch(char c_note)
 
 //////////////////////////////
 //
-// getTimeInfo -- read the key signature.
+// getTimeInfo -- read the time signature.
 //
 
 int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, int index)
@@ -885,7 +884,7 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
             if (matches[1] == "c") {
                 mensur->SetSign(MENSURATIONSIGN_C);
             }
-            // 0
+            // O
             else {
                 mensur->SetSign(MENSURATIONSIGN_O);
             }
@@ -916,7 +915,7 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, Mensur *mensur, 
 
 //////////////////////////////
 //
-// getClefInfo -- read the key signature.
+// getClefInfo -- read the clef.
 //
 
 int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
@@ -1341,6 +1340,9 @@ void PaeInput::parseNote(pae::Note *note)
     if (note->meter) {
         addLayerElement(note->meter);
     }
+    if (note->mensur) {
+        addLayerElement(note->mensur);
+    }
 
     // Handle key change. Evil if done in a beam
     if (note->key) {
@@ -1400,6 +1402,8 @@ void PaeInput::parseNote(pae::Note *note)
 
     // Add the note to the current container
     addLayerElement(element);
+
+    // Add mensural dot
     if (m_is_mensural && note->dots > 0) {
         Dot *dot = new Dot();
         addLayerElement(dot);
