@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed May 16 23:22:23 PDT 2018
+// Last Modified: Mon May 28 21:58:21 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -40150,7 +40150,7 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 	gm->setTimestamp(starttime QUARTER_CONVERT);
 
 	vector<HumNum> durations;
-	
+
 	for (int i=0; i<(int)children.size(); i++) {
 		string nodename = children[i].name();
 		if (nodename == "staff") {
@@ -40224,8 +40224,8 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 
 				// Add an invisible rest to fill in the problem spot.
 				// staff with multiple layers will have to be addressed as well...
-				m_outdata.back()->addDataToken(spacer, starttime QUARTER_CONVERT + 
-						durations[i] QUARTER_CONVERT, i, 0, 0, m_staffcount); 
+				m_outdata.back()->addDataToken(spacer, starttime QUARTER_CONVERT +
+						durations[i] QUARTER_CONVERT, i, 0, 0, m_staffcount);
 
 				// put an error message at the start of the measure warning about being underfilled
 				m_outdata.back()->addGlobalComment("!!" + message.str(), starttime QUARTER_CONVERT);
@@ -40246,7 +40246,7 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 	}
 
 	if (overfilledQ) {
-		// pad measures that are not under filled so that all 
+		// pad measures that are not under filled so that all
 		// parts have the same maximum overfilling.
 		for (int i=0; i<(int)durations.size(); i++) {
 			if (durations[i] == maxdur) {
@@ -40265,8 +40265,8 @@ HumNum Tool_mei2hum::parseMeasure(xml_node measure, HumNum starttime) {
 
 			// Add an invisible rest to fill in the problem spot.
 			// staff with multiple layers will have to be addressed as well...
-			m_outdata.back()->addDataToken(spacer, starttime QUARTER_CONVERT + 
-					durations[i] QUARTER_CONVERT, i, 0, 0, m_staffcount); 
+			m_outdata.back()->addDataToken(spacer, starttime QUARTER_CONVERT +
+					durations[i] QUARTER_CONVERT, i, 0, 0, m_staffcount);
 
 			// put an error message at the start of the measure warning about being underfilled
 			m_outdata.back()->addGlobalComment("!!" + message.str(), starttime QUARTER_CONVERT);
@@ -40445,13 +40445,13 @@ HumNum Tool_mei2hum::parseLayer(xml_node layer, HumNum starttime, vector<bool>& 
 		nnum = nattr.as_int();
 	}
 	if (nnum < 1) {
-		cerr << "Error: Ignoring layer with invalid number: " << nnum 
+		cerr << "Error: Ignoring layer with invalid number: " << nnum
 		     << " in measure " << m_currentMeasure
 		     << ", staff " << m_currentStaff << endl;
 		return starttime;
 	}
 	if (nnum > 8) {
-		cerr << "Error: Ignoring layer with ridiculous number: " << nnum 
+		cerr << "Error: Ignoring layer with ridiculous number: " << nnum
 		     << " in measure " << m_currentMeasure
 		     << ", staff " << m_currentStaff << endl;
 		return starttime;
@@ -40812,7 +40812,7 @@ HumNum Tool_mei2hum::parseNote(xml_node note, xml_node chord, string& output,
 	}
 
 	string recip = getHumdrumRecip(duration, dotcount);
-	string humpitch = getHumdrumPitch(note);
+	string humpitch = getHumdrumPitch(note, children);
 	string editorial = getEditorialAccidental(children);
 	string cautionary = getCautionaryAccidental(children);
 	if (!editorial.empty()) {
@@ -40978,24 +40978,9 @@ string Tool_mei2hum::getEditorialAccidental(vector<xml_node>& children) {
 		if (accid.empty()) {
 			continue;
 		}
-		if (accid == "n") {
-			output = "ni";
-		} else if (accid == "s") {
-			output = "#i";
-		} else if (accid == "f") {
-			output = "-i";
-		} else if (accid == "ff") {
-			output = "--i";
-		} else if (accid == "ss") {
-			output = "##i";
-		} else if (accid == "x") {
-			output = "##i";
-		} else if (accid == "nf") {
-			output = "-i";
-		} else if (accid == "ns") {
-			output = "#i";
-		} else {
-			cerr << "Don't know how to interpret " << accid << " accidental" << endl;
+		output = accidToKern(accid);
+		if (!output.empty()) {
+			output += "i";
 		}
 		m_editorialAccidentalQ = true;
 		break;
@@ -41032,28 +41017,52 @@ string Tool_mei2hum::getCautionaryAccidental(vector<xml_node>& children) {
 		if (accid.empty()) {
 			continue;
 		}
-		if (accid == "n") {
-			output = "n";
-		} else if (accid == "s") {
-			output = "#X";
-		} else if (accid == "f") {
-			output = "-X";
-		} else if (accid == "ff") {
-			output = "--X";
-		} else if (accid == "ss") {
-			output = "##X";
-		} else if (accid == "x") {
-			output = "##X";
-		} else if (accid == "nf") {
-			output = "-X";
-		} else if (accid == "ns") {
-			output = "#X";
-		} else {
-			cerr << "Don't know how to interpret " << accid << " accidental" << endl;
+		output = accidToKern(accid);
+		if ((!output.empty()) && (output != "n")) {
+			output += "X";
 		}
 		break;
 	}
 
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::accidToKern -- Convert accid string into **kern accidental.
+//
+
+string Tool_mei2hum::accidToKern(const string& accid) {
+	string output;
+	if (accid == "n") {
+		output = "n";
+	} else if (accid == "s") {
+		output = "#";
+	} else if (accid == "f") {
+		output = "-";
+	} else if (accid == "ff") {
+		output = "--";
+	} else if (accid == "ss") {
+		output = "##";
+	} else if (accid == "x") {
+		output = "##";
+	} else if (accid == "nf") {
+		output = "-";
+	} else if (accid == "ns") {
+		output = "#";
+	} else if (accid == "xs") {
+		output = "###";
+	} else if (accid == "sx") {
+		output = "###";
+	} else if (accid == "tf") {
+		output = "---";
+	} else if (accid == "ts") {
+		output = "###";
+	} else {
+		cerr << "Don't know how to interpret " << accid << " accidental" << endl;
+	}
 	return output;
 }
 
@@ -41083,7 +41092,7 @@ HumNum Tool_mei2hum::parseMRest(xml_node mrest, HumNum starttime) {
 		}
 	}
 	string tok = recip + "r";
-	// Add fermata on whole-measure rest if needed.	
+	// Add fermata on whole-measure rest if needed.
 
 	// Deal here with calculating number of dots needed for
 	// measure duration.
@@ -41749,13 +41758,73 @@ string Tool_mei2hum::getHumdrumRecip(HumNum duration, int dotcount) {
 
 //////////////////////////////
 //
+// Tool_mei2hum::getChildAccidVis -- Return accid@accid from any element
+//   in the list, if it is not editorial or cautionary.
+//
+
+string Tool_mei2hum::getChildAccidVis(vector<xml_node>& children) {
+	for (int i=0; i<(int)children.size(); i++) {
+		string nodename = children[i].name();
+		if (nodename != "accid") {
+			continue;
+		}
+		string func = children[i].attribute("func").value();
+		if (func == "caution") {
+			// cautionary accidental handled elsewhere
+			return "";
+		} else if (func == "edit") {
+			// editorial accidental handled elsewhere
+			return "";
+		}
+		string accid = children[i].attribute("accid").value();
+		return accid;
+	}
+	return "";
+}
+
+
+
+//////////////////////////////
+//
+// Tool_mei2hum::getChildAccidGes -- Return the accid@accid.ges value
+//    of any element in the input list, but not if the accidental is
+//    part of an cautionary or editorial accidental.
+//
+
+string Tool_mei2hum::getChildAccidGes(vector<xml_node>& children) {
+	for (int i=0; i<(int)children.size(); i++) {
+		string nodename = children[i].name();
+		if (nodename != "accid") {
+			continue;
+		}
+		string func = children[i].attribute("func").value();
+		if (func == "caution") {
+			// cautionary accidental handled elsewhere
+			return "";
+		} else if (func == "edit") {
+			// editorial accidental handled elsewhere
+			return "";
+		}
+		string accidges = children[i].attribute("accid.ges").value();
+		return accidges;
+	}
+	return "";
+}
+
+
+
+//////////////////////////////
+//
 // Tool_mei2hum::getHumdrumPitch --
 //
 
-string Tool_mei2hum::getHumdrumPitch(xml_node note) {
+string Tool_mei2hum::getHumdrumPitch(xml_node note, vector<xml_node>& children) {
 	string pname = note.attribute("pname").value();
 	string accidvis = note.attribute("accid").value();
 	string accidges = note.attribute("accid.ges").value();
+
+	string accidvischild = getChildAccidVis(children);
+	string accidgeschild = getChildAccidGes(children);
 
 	int octnum = 4;
 	string oct = note.attribute("oct").value();
@@ -41788,33 +41857,19 @@ string Tool_mei2hum::getHumdrumPitch(xml_node note) {
 	}
 
 	if (accidges != "") {
-		if (accidges == "n") {
-			// do nothing;
-		} else if (accidges == "f") {
-			output += "-";
-		} else if (accidges == "s") {
-			output += "#";
-		} else if (accidges == "ff") {
-			output += "--";
-		} else if (accidges == "ss") {
-			output += "##";
-		} else if (accidges == "x") {
-			output += "##";
+		string acc = accidToKern(accidges);
+		if (acc != "n") {
+			output += acc;
 		}
 	} else if (accidvis != "") {
-		if (accidvis == "n") {
-			// do nothing;
-		} else if (accidvis == "f") {
-			output += "-";
-		} else if (accidvis == "s") {
-			output += "#";
-		} else if (accidvis == "ff") {
-			output += "--";
-		} else if (accidvis == "ss") {
-			output += "##";
-		} else if (accidvis == "x") {
-			output += "##";
-		}
+		string acc = accidToKern(accidges);
+		output += acc;
+	} else if (accidvischild != "") {
+		string acc = accidToKern(accidvischild);
+		output += acc;
+	} else if (accidgeschild != "") {
+		string acc = accidToKern(accidgeschild);
+		output += acc;
 	}
 
 	// Transpose to C score if part is transposing:
@@ -41975,7 +42030,7 @@ void Tool_mei2hum::parseBareSyl(xml_node syl, GridStaff* staff) {
 	if (n_attr) {
 		nnum = n_attr.as_int();
 	}
-	
+
 	if (nnum < 1) {
 		cerr << "Warning: invalid layer number: " << nnum << endl;
 		cerr << "Setting it to 1." << endl;
@@ -42350,7 +42405,7 @@ void Tool_mei2hum::parseDir(xml_node dir, HumNum starttime) {
 		// GridVoice* voice = gs->at(staffnum-1)->at(0)->at(0);
 		// HTp token = voice->getToken();
 		// if (token != NULL) {
-		// 	token->setValue("LO", "TX", "t", text);	
+		// 	token->setValue("LO", "TX", "t", text);
 		// } else {
 		// 	cerr << "Strange null-token error while inserting dir element." << endl;
 		// }
@@ -42358,7 +42413,7 @@ void Tool_mei2hum::parseDir(xml_node dir, HumNum starttime) {
 
 		// Found data line which should prefixed with a layout line
 		// should be done with HumHash post-processing, but do it manually for now.
-	
+
 		auto previousit = gsit;
 		previousit--;
 		if (previousit == gm->end()) {
