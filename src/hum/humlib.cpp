@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon May 28 21:58:21 PDT 2018
+// Last Modified: Wed May 30 00:19:07 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -39476,15 +39476,21 @@ string Tool_mei2hum::prepareSystemDecoration(xml_node scoreDef) {
 		getRecursiveSDString(output, children[i]);
 	}
 	string newoutput;
+	int counter = 0;
 	for (int i=0; i<(int)output.size(); i++) {
 		newoutput += output[i];
 		if (i < (int)output.size() - 1) {
 			if (std::isdigit(output[i]) && (output[i+1] == 's')) {
 				newoutput += ',';
+				counter++;
 			}
 		}
 	}
-	return newoutput;
+	if (counter <= 1) {
+		return "";
+	} else {
+		return newoutput;
+	}
 }
 
 
@@ -41860,6 +41866,8 @@ string Tool_mei2hum::getHumdrumPitch(xml_node note, vector<xml_node>& children) 
 		string acc = accidToKern(accidges);
 		if (acc != "n") {
 			output += acc;
+			// accidental is not visible
+			output += "y";
 		}
 	} else if (accidvis != "") {
 		string acc = accidToKern(accidges);
@@ -41869,7 +41877,11 @@ string Tool_mei2hum::getHumdrumPitch(xml_node note, vector<xml_node>& children) 
 		output += acc;
 	} else if (accidgeschild != "") {
 		string acc = accidToKern(accidgeschild);
-		output += acc;
+		if (acc != "n") {
+			output += acc;
+			// accidental is not visible
+			output += "y";
+		}
 	}
 
 	// Transpose to C score if part is transposing:
