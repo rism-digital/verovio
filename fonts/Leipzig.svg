@@ -37,14 +37,15 @@ Version 5.2.31 - adding some arpegio glyphs (Mulit-segment lines)
 Version 5.2.32 - adding pedal sostenuto glyph
 Version 5.2.33 - adding mensural prolations
 Version 5.2.34 - adding some neume glyphs
+Version 5.2.35 - adding ncsign elements
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20170730 at Wed May 30 10:15:05 2018
- By Juliette Regimbal
+Created by FontForge 20170730 at Wed May 30 13:54:34 2018
+ By Zoe McLennan
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.34
+Version 5.2.35
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="1000" >
@@ -1202,5 +1203,14 @@ d="M0 450h14v-600h-14v600z" />
 d="M0 600h14v-750h-14v750z" />
     <glyph glyph-name="uniE9B8" unicode="&#xe9b8;" horiz-adv-x="14" 
 d="M0 750h14v-900h-14v900z" />
+    <glyph glyph-name="uniE99E" unicode="&#xe99e;" horiz-adv-x="153" 
+d="M153 49v-123c0 -45 0 -81 -12 -111c-11 -28 -39 -50 -85 -61c-4 0 -8 3 -10 10c0 6 3 10 8 13c13 4 27 10 39 17c15 8 26 22 30 39c6 21 5 46 6 68c0 12 0 33 -18 33c-5 0 -15 -5 -35 -15c-20 -11 -34 -16 -41 -16c-23 0 -35 16 -35 47v163c0 1 1 1 3 1c1 0 3 0 3 -1
+c1 -27 8 -47 29 -47c7 0 21 4 41 15c20 9 33 14 41 14c24 0 36 -15 36 -46z" />
+    <glyph glyph-name="uniE99B" unicode="&#xe99b;" horiz-adv-x="154" 
+d="M0 -76v132c9 -32 21 -48 34 -48c12 0 19 24 21 72c6 -19 11 -32 15 -39c5 -9 11 -12 19 -12s14 21 19 66c9 -35 17 -53 23 -53c8 0 17 24 23 73v-153c0 -28 -5 -41 -15 -41c-7 0 -14 9 -20 27c-4 -33 -12 -50 -28 -50c-12 0 -25 11 -38 34c-7 -32 -17 -47 -28 -47
+c-15 0 -25 19 -25 39z" />
+    <glyph glyph-name="uniE99F" unicode="&#xe99f;" horiz-adv-x="124" 
+d="M2 4l56 86c1 2 2 3 4 3c1 0 3 -1 5 -3c0 0 7 -24 21 -45c7 -11 16 -21 25 -30c5 -5 11 -10 11 -17c0 -2 -1 -4 -2 -6c-8 -17 -15 -34 -27 -49c-5 -7 -10 -13 -16 -19c-5 -5 -10 -10 -16 -13c-1 -1 -7 -3 -10 -3c-1 0 -3 0 -3 1s1 2 2 3c4 4 5 8 5 12c0 9 -7 18 -13 25
+l-32 34c-4 4 -8 7 -11 11c-1 2 -1 4 -1 5c0 2 0 3 2 5z" />
   </font>
 </defs></svg>
