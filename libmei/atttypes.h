@@ -1537,6 +1537,18 @@ enum ncVis_QUILISMA {
 };
 
 /**
+ * MEI att.nc.vis@ncsign 
+ */
+
+enum ncVis_NCSIGN {
+    ncVis_NCSIGN_NONE = 0,
+    ncVis_NCSIGN_ORISCUS,
+    ncVis_NCSIGN_QUILISMA,
+    ncVis_NCSIGN_STROPHICUS,
+    ncVis_NCSIGN_MAX
+};
+
+/**
  * MEI att.note.anl.mensural@lig
  */
 enum noteAnlMensural_LIG {
