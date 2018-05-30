@@ -4123,6 +4123,7 @@ bool MeiInput::ReadNc(Object *parent, pugi::xml_node nc)
     ReadPositionInterface(nc, vrvNc);
     vrvNc->ReadColor(nc);
     vrvNc->ReadIntervalMelodic(nc);
+    vrvNc->ReadNcVis(nc);
 
     parent->AddChild(vrvNc);
     return ReadLayerChildren(vrvNc, nc, vrvNc);
