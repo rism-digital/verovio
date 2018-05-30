@@ -3323,6 +3323,31 @@ ncVis_QUILISMA AttConverter::StrToNcVisQuilisma(std::string value, bool logWarni
     return ncVis_QUILISMA_NONE;
 }
 
+std::string AttConverter::NcVisNcSignToStr(ncVis_NCSIGN data) const
+{
+    std::string value;
+    switch (data) {
+        case ncVis_NCSIGN_ORISCUS: value = "oriscus"; break;
+        case ncVis_NCSIGN_QUILISMA: value = "quilisma"; break;
+        case ncVis_NCSIGN_STROPHICUS: value = "strophicus"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.nc.vis@ncsign", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+ncVis_NCSIGN AttConverter::StrToNcVisNcSign(std::string value, bool logWarning) const
+{
+    if (value == "oriscus") return ncVis_NCSIGN_ORISCUS;
+    if (value == "quilisma") return ncVis_NCSIGN_QUILISMA;
+    if (value == "strophicus") return ncVis_NCSIGN_STROPHICUS;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.nc.vis@ncsign", value.c_str());
+    return ncVis_NCSIGN_NONE;
+}
+
 std::string AttConverter::NoteAnlMensuralLigToStr(noteAnlMensural_LIG data) const
 {
     std::string value;

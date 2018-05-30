@@ -1358,6 +1358,11 @@ bool AttNcVis::ReadNcVis(pugi::xml_node element)
         element.remove_attribute("wavy");
         hasAttribute = true;
     }
+    if (element.attribute("ncsign")){
+        this->SetNcSign(StrToNcVisNcSign(element.attribute("ncsign").value()));
+        element.remove_attribute("ncsign");
+        hasAttribute = true;
+    }
     return hasAttribute;
 }
 
@@ -1415,6 +1420,10 @@ bool AttNcVis::WriteNcVis(pugi::xml_node element)
     if (this->HasWavy()) {
         element.append_attribute("wavy") = BooleanToStr(this->GetWavy()).c_str();
         wroteAttribute = true;
+    }
+    if (this->HasNcSign()) {
+        element.append_attribute("ncsign") = NcVisNcSignToStr(this->GetNcSign()).c_str();
+        wroteAttribute = true; 
     }
     return wroteAttribute;
 }
@@ -1482,6 +1491,11 @@ bool AttNcVis::HasStrophicus() const
 bool AttNcVis::HasWavy() const
 {
     return (m_wavy != BOOLEAN_NONE);
+}
+
+bool AttNcVis::HasNcSign() const
+{
+    return (m_ncsign != ncVis_NCSIGN_NONE);
 }
 
 /* include <attwavy> */
