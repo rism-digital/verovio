@@ -2286,11 +2286,11 @@
             <!--<glyph glyph-code="E998" smufl-name="chantPunctumCavum"/>-->
             <!--<glyph glyph-code="E999" smufl-name="chantPunctumLinea"/>-->
             <!--<glyph glyph-code="E99A" smufl-name="chantPunctumLineaCavum"/>-->
-            <!--<glyph glyph-code="E99B" smufl-name="chantQuilisma"/>-->
+            <glyph glyph-code="E99B" smufl-name="chantQuilisma"/>
             <!--<glyph glyph-code="E99C" smufl-name="chantOriscusAscending"/>-->
             <!--<glyph glyph-code="E99D" smufl-name="chantOriscusDescending"/>-->
-            <!--<glyph glyph-code="E99E" smufl-name="chantOriscusLiquescens"/>-->
-            <!--<glyph glyph-code="E99F" smufl-name="chantStrophicus"/>-->
+            <glyph glyph-code="E99E" smufl-name="chantOriscusLiquescens"/>
+            <glyph glyph-code="E99F" smufl-name="chantStrophicus"/>
             <!--<glyph glyph-code="E9A0" smufl-name="chantStrophicusAuctus"/>-->
             <!--<glyph glyph-code="E9A1" smufl-name="chantPunctumDeminutum"/>-->
             <range_end>U+E9AF</range_end>
