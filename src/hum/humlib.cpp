@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed May 30 00:19:07 PDT 2018
+// Last Modified: Wed May 30 06:31:03 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -41870,7 +41870,7 @@ string Tool_mei2hum::getHumdrumPitch(xml_node note, vector<xml_node>& children) 
 			output += "y";
 		}
 	} else if (accidvis != "") {
-		string acc = accidToKern(accidges);
+		string acc = accidToKern(accidvis);
 		output += acc;
 	} else if (accidvischild != "") {
 		string acc = accidToKern(accidvischild);
