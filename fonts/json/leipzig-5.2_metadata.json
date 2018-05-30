@@ -30,7 +30,7 @@
         "tupletBracketThickness": "0.16"
     },
     "fontName": "Leipzig-5.2",
-    "fontVersion": "5.2.33",
+    "fontVersion": "5.2.34",
     "glyphBBoxes": {
         "uniE003": {
             "bBoxNE": [
@@ -2452,6 +2452,126 @@
                 -3.04
             ]
         },
+        "uniE990": {
+            "bBoxNE": [
+                0.64,
+                0.408
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.404
+            ]
+        },
+        "uniE991": {
+            "bBoxNE": [
+                0.6,
+                0.452
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.452
+            ]
+        },
+        "uniE996": {
+            "bBoxNE": [
+                0.64,
+                0.408
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.604
+            ]
+        },
+        "uniE9B4": {
+            "bBoxNE": [
+                0.056,
+                0.6
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
+            ]
+        },
+        "uniE9B5": {
+            "bBoxNE": [
+                0.056,
+                1.2
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
+            ]
+        },
+        "uniE9B6": {
+            "bBoxNE": [
+                0.056,
+                1.8
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
+            ]
+        },
+        "uniE9B7": {
+            "bBoxNE": [
+                0.056,
+                2.4
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
+            ]
+        },
+        "uniE9B8": {
+            "bBoxNE": [
+                0.056,
+                3.0
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.6
+            ]
+        },
+        "uniE9B9": {
+            "bBoxNE": [
+                1.86,
+                0.416
+            ],
+            "bBoxSW": [
+                0.0,
+                -0.912
+            ]
+        },
+        "uniE9BA": {
+            "bBoxNE": [
+                2.316,
+                0.416
+            ],
+            "bBoxSW": [
+                0.0,
+                -1.6
+            ]
+        },
+        "uniE9BB": {
+            "bBoxNE": [
+                2.316,
+                0.416
+            ],
+            "bBoxSW": [
+                0.0,
+                -2.212
+            ]
+        },
+        "uniE9BC": {
+            "bBoxNE": [
+                2.316,
+                0.416
+            ],
+            "bBoxSW": [
+                0.0,
+                -2.812
+            ]
+        },
         "uniE9F0": {
             "bBoxNE": [
                 0.52,
@@ -3319,6 +3439,42 @@
         },
         "uniE94C": {
             "codepoint": "0XE94C"
+        },
+        "uniE990": {
+            "codepoint": "0XE990"
+        },
+        "uniE991": {
+            "codepoint": "0XE991"
+        },
+        "uniE996": {
+            "codepoint": "0XE996"
+        },
+        "uniE9B4": {
+            "codepoint": "0XE9B4"
+        },
+        "uniE9B5": {
+            "codepoint": "0XE9B5"
+        },
+        "uniE9B6": {
+            "codepoint": "0XE9B6"
+        },
+        "uniE9B7": {
+            "codepoint": "0XE9B7"
+        },
+        "uniE9B8": {
+            "codepoint": "0XE9B8"
+        },
+        "uniE9B9": {
+            "codepoint": "0XE9B9"
+        },
+        "uniE9BA": {
+            "codepoint": "0XE9BA"
+        },
+        "uniE9BB": {
+            "codepoint": "0XE9BB"
+        },
+        "uniE9BC": {
+            "codepoint": "0XE9BC"
         },
         "uniE9F0": {
             "codepoint": "0XE9F0"

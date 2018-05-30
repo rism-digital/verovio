@@ -93,6 +93,12 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     int yValue = clefYPosition + pitchOffset + octaveOffset;
 
+    // If the nc is supposed to be a virga and currently is being rendered as a punctum
+    // change it to a virga
+    if (nc->HasAttribute("diagonalright", "u") && fontNo == SMUFL_E990_chantPunctum) {
+        fontNo = SMUFL_E996_chantPunctumVirga;
+    }
+
     DrawSmuflCode(dc, noteX + xOffset, yValue + yOffset, fontNo, staff->m_drawingStaffSize, false, true);
 
     dc->EndGraphic(element, this);
