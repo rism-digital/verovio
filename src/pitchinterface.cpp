@@ -133,6 +133,7 @@ int PitchInterface::CalcLoc(LayerElement *layerElement, Layer *layer, bool topCh
     }
     else {
         assert(false);
+        return 0;
     }
 }
     
