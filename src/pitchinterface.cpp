@@ -13,6 +13,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "chord.h"
+#include "layer.h"
+#include "note.h"
+#include "rest.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -50,12 +54,6 @@ bool PitchInterface::HasIdenticalPitchInterface(PitchInterface *otherPitchInterf
         return false;
     }
     */
-}
-
-int PitchInterface::CalcLoc(data_PITCHNAME pname, int oct, int clefLocOffset)
-{
-    // E.g., C4 with clef C1: (4 - 4 * 7) + (1 - 1) + 0;
-    return ((oct - OCTAVE_OFFSET) * 7 + (pname - 1) + clefLocOffset);
 }
 
 void PitchInterface::AdjustPname(int &pname, int &oct)
@@ -108,6 +106,40 @@ int PitchInterface::PitchDifferenceTo(PitchInterface *pi)
     pitchDifference += 7 * (this->GetOct() - pi->GetOct());
 
     return pitchDifference;
+}
+
+//----------------------------------------------------------------------------
+// Static methods
+//----------------------------------------------------------------------------
+    
+    
+int PitchInterface::CalcLoc(LayerElement *layerElement, Layer *layer, bool topChordNote)
+{
+    assert(layerElement);
+    
+    if (layerElement->Is(CHORD)) {
+        Chord *chord = dynamic_cast<Chord *>(layerElement);
+        assert(chord);
+        Note *note = (topChordNote) ? chord->GetTopNote() : chord->GetBottomNote();
+        return CalcLoc(note, layer);
+    }
+    else if (layerElement->Is(NOTE)) {
+        Note *note = dynamic_cast<Note *>(layerElement);
+        assert(note);
+        if (note->HasLoc()) {
+            return note->GetLoc();
+        }
+        return PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layer->GetClefLocOffset(layerElement));
+    }
+    else {
+        assert(false);
+    }
+}
+    
+int PitchInterface::CalcLoc(data_PITCHNAME pname, int oct, int clefLocOffset)
+{
+    // E.g., C4 with clef C1: (4 - 4 * 7) + (1 - 1) + 0;
+    return ((oct - OCTAVE_OFFSET) * 7 + (pname - 1) + clefLocOffset);
 }
 
 } // namespace vrv

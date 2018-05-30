@@ -781,14 +781,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     }
     else if (this->Is(CHORD)) {
         // The y position is set to the top note one
-        Chord *chord = dynamic_cast<Chord *>(this);
-        assert(chord);
-        Note *note = chord->GetTopNote();
-        assert(note);
-        int loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
-        if (note->HasLoc()) {
-            loc = note->GetLoc();
-        }
+        int loc = PitchInterface::CalcLoc(this, layerY, true);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
     else if (this->Is({ CUSTOS, DOT })) {
@@ -802,11 +795,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         Chord *chord = note->IsChordTone();
         int loc = 0;
         if (note->HasPname()) {
-            loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
-        }
-        // should this override pname/oct ?
-        if (note->HasLoc()) {
-            loc = note->GetLoc();
+            loc = PitchInterface::CalcLoc(note, layerY);
         }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
         // Make it relative to the top note one (see above) but not for cross-staff notes in chords
@@ -886,32 +875,15 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 // iterate through the elements from the rest to the beginning of the beam
                 // until we hit a note or chord, which we will use to determine where the rest should be placed
                 for (; rit != beamList->rend(); ++rit) {
-                    if ((*rit)->Is(NOTE)) {
-                        Note *leftNote = dynamic_cast<Note *>(*rit);
-                        if (leftNote->HasPname()) {
-                            leftLoc = PitchInterface::CalcLoc(leftNote->GetPname(), leftNote->GetOct(),
-                                                              layerY->GetClefLocOffset(layerElementY));
-                        }
+                    LayerElement *layerElement = dynamic_cast<LayerElement *>(*rit);
+                    assert(layerElement);
+                    if (layerElement->Is(NOTE)) {
+                        leftLoc = PitchInterface::CalcLoc(layerElement, layerY);
                         break;
                     }
-                    else if ((*rit)->Is(CHORD)) {
-                        Chord *leftChord = dynamic_cast<Chord *>(*rit);
-
-                        int topChordLoc = loc;
-                        Note *topChordNote = leftChord->GetTopNote();
-                        if (topChordNote->HasPname()) {
-                            topChordLoc = PitchInterface::CalcLoc(topChordNote->GetPname(), topChordNote->GetOct(),
-                                                                  layerY->GetClefLocOffset(layerElementY));
-                        }
-
-                        int bottomChordLoc = loc;
-                        Note *bottomChordNote = leftChord->GetBottomNote();
-                        if (bottomChordNote->HasPname()) {
-                            bottomChordLoc = PitchInterface::CalcLoc(bottomChordNote->GetPname(),
-                                                                     bottomChordNote->GetOct(),
-                                                                     layerY->GetClefLocOffset(layerElementY));
-                        }
-
+                    else if (layerElement->Is(CHORD)) {
+                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, true);
+                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, false);
                         // if it's a rest, use the middle of the chord as the rest's location
                         leftLoc = (topChordLoc + bottomChordLoc) / 2;
                         break;
@@ -924,32 +896,16 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 // iterate through the elements from the rest to the end of the beam
                 // until we hit a note or chord, which we will use to determine where the rest should be placed
                 for (; it != beamList->end(); ++it) {
-                    if ((*it)->Is(NOTE)) {
-                        Note *rightNote = dynamic_cast<Note *>(*it);
-                        if (rightNote->HasPname()) {
-                            rightLoc = PitchInterface::CalcLoc(rightNote->GetPname(), rightNote->GetOct(),
-                                                               layerY->GetClefLocOffset(layerElementY));
-                        }
+                    LayerElement *layerElement = dynamic_cast<LayerElement *>(*it);
+                    assert(layerElement);
+                    if (layerElement->Is(NOTE)) {
+                        rightLoc = PitchInterface::CalcLoc(layerElement, layerY);
+                        break;
                         break;
                     }
-                    else if ((*it)->Is(CHORD)) {
-                        Chord *rightChord = dynamic_cast<Chord *>(*it);
-
-                        int topChordLoc = loc;
-                        Note *topChordNote = rightChord->GetTopNote();
-                        if (topChordNote->HasPname()) {
-                            topChordLoc = PitchInterface::CalcLoc(topChordNote->GetPname(), topChordNote->GetOct(),
-                                                                  layerY->GetClefLocOffset(layerElementY));
-                        }
-
-                        int bottomChordLoc = loc;
-                        Note *bottomChordNote = rightChord->GetBottomNote();
-                        if (bottomChordNote->HasPname()) {
-                            bottomChordLoc = PitchInterface::CalcLoc(bottomChordNote->GetPname(),
-                                                                     bottomChordNote->GetOct(),
-                                                                     layerY->GetClefLocOffset(layerElementY));
-                        }
-
+                    else if (layerElement->Is(CHORD)) {
+                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, true);
+                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, false);
                         // if it's a rest, use the middle of the chord as the rest's location
                         rightLoc = (topChordLoc + bottomChordLoc) / 2;
                         break;
@@ -998,26 +954,19 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 const bool restBelowStaff = topAlignedLoc <= bottomOfStaffLoc;
                 if (restAboveStaff) {
                     loc--;
-                    bottomAlignedLoc--;
                 }
                 else if (restBelowStaff) {
                     loc++;
-                    topAlignedLoc++;
                 }
 
-                // use the newly aligned bottomAlignedLoc and topAlignedLoc values to check if it's within the staff
-                // because it might have changed since we assigned restAboveStaff and restBelowStaff
-                const bool isInStaff = bottomAlignedLoc < topOfStaffLoc && topAlignedLoc > bottomOfStaffLoc;
-                if (isInStaff) {
-                    // if loc is within the staff and odd, 
-                    // we need to offset it to be even
-                    // so that the dots do not collide with the staff lines
-                    if (loc % 2 != 0) {
-                        // if it's above the staff, offset downwards
-                        // if below the staff, offset upwards
-                        if (loc > 4) loc--;
-                        else loc++;
-                    }
+                // if loc is odd, we need to offset it to be even
+                // so that the dots do not collide with the staff lines
+                // or on ledger lines
+                if (loc % 2 != 0) {
+                    // if it's above the staff, offset downwards
+                    // if below the staff, offset upwards
+                    if (loc > 4) loc--;
+                    else loc++;
                 }
             }
             else if (hasMultipleLayer) {

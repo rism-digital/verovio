@@ -6,7 +6,7 @@ var verovio = verovio || {};
 init = function (memory, createInstance = false) {
 	
 	// If we ask for creating an instance are already have one, just call the contructor
-	if (createInstance) {
+	if (createInstance && verovio.ptr != undefined) {
 		return new verovio.toolkit();
 	}
 	

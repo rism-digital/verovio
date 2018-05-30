@@ -721,7 +721,7 @@ Options::Options()
     this->Register(&m_leftMarginKeySig, "leftMarginKeySig", &m_elementMargins);
 
     m_leftMarginLeftBarLine.SetInfo("Left margin left barLine", "The margin for left barLine in MEI units");
-    m_leftMarginLeftBarLine.Init(0.0, 0.0, 2.0);
+    m_leftMarginLeftBarLine.Init(1.0, 0.0, 2.0);
     this->Register(&m_leftMarginLeftBarLine, "leftMarginLeftBarLine", &m_elementMargins);
 
     m_leftMarginMensur.SetInfo("Left margin mensur", "The margin for mensur in MEI units");
