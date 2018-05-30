@@ -99,6 +99,18 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         fontNo = SMUFL_E996_chantPunctumVirga;
     }
 
+    if (fontNo == SMUFL_E990_chantPunctum) {
+        if (nc->HasAttribute("ncsign", "oriscus")) {
+            fontNo = SMUFL_E99E_chantOriscusLiquescens;
+        }
+        if (nc->HasAttribute("ncsign", "quilisma")) {
+            fontNo = SMUFL_E99B_chantQuilisma;
+        }
+        if(nc->HasAttribute("ncsign", "strophicus")) {
+            fontNo = SMUFL_E99F_chantStrophicus;
+        }
+    }
+
     DrawSmuflCode(dc, noteX + xOffset, yValue + yOffset, fontNo, staff->m_drawingStaffSize, false, true);
 
     dc->EndGraphic(element, this);
