@@ -2383,7 +2383,6 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     if (abbreviation.size() > 0) {
-        // 300: m_staffdef.back()->SetLabelAbbr(abbreviation);
         setInstrumentAbbreviation(m_staffdef.back(), abbreviation);
     }
 
@@ -3195,11 +3194,9 @@ void HumdrumInput::addFiguredBassForMeasure(int startline, int endline)
             Fb *fb = new Fb;
             string datatype = token->getDataType();
             if (token->isDataType("**fba")) {
-                // 300: harm->SetPlace(STAFFREL_above);
                 setPlace(harm, "above");
             }
             else {
-                // 300: harm->SetPlace(STAFFREL_below);
                 setPlace(harm, "below");
             }
             harm->AddChild(fb);
@@ -3453,7 +3450,6 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             }
             std::wstring content;
             if (token->isDataType("**harm")) {
-                // 300: harm->SetPlace(STAFFREL_below);
                 setPlace(harm, "below");
                 content = cleanHarmString2(*token);
             }
@@ -5415,7 +5411,7 @@ void HumdrumInput::processGlobalDirections(hum::HTp token, int staffindex)
         m_measure->AddChild(dir);
     }
     else {
-        m_measure->AddChildBack(dir);
+        m_measure->AddChild(dir);
     }
     if ((!italic) || bold) {
         Rend *rend = new Rend;
@@ -5682,6 +5678,7 @@ void HumdrumInput::addDirection(
     const string &text, const string &placement, bool bold, bool italic, hum::HTp token, int staffindex)
 {
 
+cerr << "GOT HERE BBB" << text << endl;
     Dir *dir = new Dir;
     setStaff(dir, m_currentstaff);
     setLocationId(dir, token);
@@ -5689,17 +5686,18 @@ void HumdrumInput::addDirection(
     dir->SetTstamp(tstamp.getFloat());
 
     if (placement == "above") {
-        // 300: dir->SetPlace(STAFFREL_above);
         setPlace(dir, "above");
-        m_measure->AddChildBack(dir);
+        // m_measure->AddChildBack(dir);
+        m_measure->AddChild(dir);
     }
     else if (placement == "below") {
-        // 300: dir->SetPlace(STAFFREL_below);
         setPlace(dir, "below");
+        // m_measure->AddChildBack(dir);
         m_measure->AddChild(dir);
     }
     else {
-        m_measure->AddChildBack(dir);
+        // m_measure->AddChildBack(dir);
+        m_measure->AddChild(dir);
     }
     if ((!italic) || bold) {
         Rend *rend = new Rend;
@@ -6006,15 +6004,12 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
 
                 if (aboveQ) {
-                    // 300: hairpin->SetPlace(STAFFREL_above);
                     setPlace(hairpin, "above");
                 }
                 else if (belowQ) {
-                    // 300: hairpin->SetPlace(STAFFREL_below);
                     setPlace(hairpin, "below");
                 }
                 else if (forceAboveQ) {
-                    // 300: hairpin->SetPlace(STAFFREL_above);
                     setPlace(hairpin, "above");
                 }
             }
@@ -9278,8 +9273,6 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
         }
 
         if (fermata2) {
-            // 300: fermata->SetPlace(STAFFREL_above);
-            // 300: fermata2->SetPlace(STAFFREL_below);
             setPlace(fermata, "above");
             setPlace(fermata2, "below");
             return;
@@ -9287,19 +9280,15 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
 
         int direction = getDirection(*token, ";");
         if (direction < 0) {
-            // 300: fermata->SetPlace(STAFFREL_below);
             setPlace(fermata, "below");
         }
         else if (direction > 0) {
-            // 300: fermata->SetPlace(STAFFREL_above);
             setPlace(fermata, "above");
         }
         else if (layer == 1) {
-            // 300: fermata->SetPlace(STAFFREL_above);
             setPlace(fermata, "above");
         }
         else if (layer == 2) {
-            // 300: fermata->SetPlace(STAFFREL_below);
             setPlace(fermata, "below");
         }
     }
@@ -9542,7 +9531,6 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
     if (m_signifiers.above) {
         if (tpos < token->size() - 1) {
             if ((*token)[tpos + 1] == m_signifiers.above) {
-                // 300: turn->SetPlace(STAFFREL_above);
                 setPlace(turn, "above");
             }
         }
@@ -9550,7 +9538,6 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
     if (m_signifiers.below) {
         if (tpos < token->size() - 1) {
             if ((*token)[tpos + 1] == m_signifiers.below) {
-                // 300: turn->SetPlace(STAFFREL_below);
                 setPlace(turn, "below");
             }
         }
@@ -9669,7 +9656,6 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
     if (m_signifiers.above) {
         if (tpos < token->size() - 1) {
             if ((*token)[tpos + 1] == m_signifiers.above) {
-                // 300: mordent->SetPlace(STAFFREL_above);
                 setPlace(mordent, "above");
             }
         }
@@ -9677,7 +9663,6 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
     if (m_signifiers.below) {
         if (tpos < token->size() - 1) {
             if ((*token)[tpos + 1] == m_signifiers.below) {
-                // 300: mordent->SetPlace(STAFFREL_below);
                 setPlace(mordent, "below");
             }
         }
@@ -9793,7 +9778,6 @@ void HumdrumInput::addTrill(hum::HTp token)
     if (m_signifiers.above) {
         if (tpos < token->size() - 1) {
             if ((*token)[tpos + 1] == m_signifiers.above) {
-                // 300: trill->SetPlace(STAFFREL_above);
                 setPlace(trill, "above");
             }
         }
@@ -9801,7 +9785,6 @@ void HumdrumInput::addTrill(hum::HTp token)
     if (m_signifiers.below) {
         if (tpos < token->size() - 1) {
             if ((*token)[tpos + 1] == m_signifiers.below) {
-                // 300: trill->SetPlace(STAFFREL_below);
                 setPlace(trill, "below");
             }
         }
@@ -10165,7 +10148,6 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 
     int measurenumber = getMeasureNumber(startline, endline);
     if (measurenumber >= 0) {
-        // 300: m_measure->SetN(measurenumber);
         setN(m_measure, measurenumber);
     }
 
