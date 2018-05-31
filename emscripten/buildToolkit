@@ -42,6 +42,7 @@ $FLAGS .= " -s ASM_JS=1";
 $FLAGS .= " -s OUTLINING_LIMIT=10000";
 $FLAGS .= " -s TOTAL_MEMORY=192*1024*1024";
 $FLAGS .= " -s TOTAL_STACK=96*1024*1024";
+$FLAGS .= " -s WASM=0";
 
 my ($FLAGS_NAME, $VERSION, $CHATTY);
 
@@ -102,7 +103,7 @@ if ($wasmQ) {
 
 if ($lightQ) {
 	print "Creating low-memory (light) toolkit version\n";
-	$FLAGS = "-O3 -DNDEBUG --memory-init-file 0 -std=c++11 -s ASM_JS=1";
+	$FLAGS = "-O3 -DNDEBUG --memory-init-file 0 -std=c++11 -s ASM_JS=1 -s WASM=0";
 	$FLAGS_NAME = "-light";
 }
 
