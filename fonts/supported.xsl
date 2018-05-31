@@ -2281,7 +2281,7 @@
             <!--<glyph glyph-code="E993" smufl-name="chantPunctumInclinatumDeminutum"/>-->
             <!--<glyph glyph-code="E994" smufl-name="chantAuctumAsc"/>-->
             <!--<glyph glyph-code="E995" smufl-name="chantAuctumDesc"/>-->
-            <!--<glyph glyph-code="E996" smufl-name="chantPunctumVirga"/>-->
+            <glyph glyph-code="E996" smufl-name="chantPunctumVirga"/>
             <!--<glyph glyph-code="E997" smufl-name="chantPunctumVirgaReversed"/>-->
             <!--<glyph glyph-code="E998" smufl-name="chantPunctumCavum"/>-->
             <!--<glyph glyph-code="E999" smufl-name="chantPunctumLinea"/>-->

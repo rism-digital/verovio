@@ -93,6 +93,12 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     int yValue = clefYPosition + pitchOffset + octaveOffset;
 
+    // If the nc is supposed to be a virga and currently is being rendered as a punctum
+    // change it to a virga
+    if (nc->HasAttribute("diagonalright", "u") && fontNo == SMUFL_E990_chantPunctum) {
+        fontNo = SMUFL_E996_chantPunctumVirga;
+    }
+
     DrawSmuflCode(dc, noteX + xOffset, yValue + yOffset, fontNo, staff->m_drawingStaffSize, false, true);
 
     dc->EndGraphic(element, this);
@@ -111,10 +117,6 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /******************************************************************/
     // Initialization
 
-    // Generate intm attribute for all nc children except the first
-    // This is necessary to properly render the neume
-    neume->GenerateChildMelodic();
-
     // Obtaining list of NC to extract intm data
     // Format of *neumechildren, first object is <neume>, all objects after are <nc>
     const ListOfObjects neumeChildren = neume->GetList(neume)[0];
@@ -122,17 +124,12 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         return;
     }
 
-    // Loading the contour of the neume shape from the nc children
     std::vector<Nc *> ncVector;
     std::vector<int> pitchDifferences;
-    std::string contour = "";
     for (int i = 1; i < (int)neumeChildren.size(); i++) {
         Nc *nc = dynamic_cast<Nc *>(neumeChildren[i]);
         ncVector.push_back(nc);
         if (i >= 2) {
-            // Adding to the countour from intm attribuets of nc
-            contour.append(nc->GetIntm());
-
             // Calculate the pitch differences between each nc pair
             Nc *prev_nc = dynamic_cast<Nc *>(neumeChildren[i - 1]);
             int pitchDifference = nc->GetPname() - prev_nc->GetPname();
@@ -142,7 +139,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     // Obtaining the NeumeGroup enum name from the map
-    NeumeGroup neumeName = Neume::s_neumes[contour];
+    NeumeGroup neumeName = neume->GetNeumeGroup();
 
     // If the shape cannot be found in the map, NeumeGroup::ERROR will be returned since its
     // value is 0 and std::map returns 0 by default for missing keys.
@@ -163,7 +160,9 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
     int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
     switch (neumeName) {
-        case PES: {
+        case PES:
+        case PES_SUBPUNCTIS: 
+        {
             int xOffset = 0;
             if (pitchDifferences.at(0) > 1) {
                 xOffset = -1;
@@ -171,9 +170,17 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(0)), layer, staff, measure, SMUFL_E990_chantPunctum);
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(1)), layer, staff, measure, SMUFL_E990_chantPunctum,
                 xOffset * noteWidth);
+
+            if (neumeName == PES_SUBPUNCTIS) {
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(2)), layer, staff, measure, SMUFL_E991_chantPunctumInclinatum);
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(3)), layer, staff, measure, SMUFL_E991_chantPunctumInclinatum);
+            }
             break;
         }
-        case PORRECTUS: {
+        case PORRECTUS:
+        case PORRECTUS_FLEXUS:
+        case PORRECTUS_SUBPUNCTIS:
+        {   
             wchar_t lineCode;
             wchar_t ligatureCode;
             switch (pitchDifferences.at(0)) {
@@ -203,6 +210,13 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                 noteHeight * pitchDifferences.at(0));
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(0)), layer, staff, measure, ligatureCode);
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(2)), layer, staff, measure);
+            if (neumeName == PORRECTUS_FLEXUS) {
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(3)), layer, staff, measure);
+            }
+            else if (neumeName == PORRECTUS_SUBPUNCTIS) {
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(3)), layer, staff, measure, SMUFL_E991_chantPunctumInclinatum);
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(4)), layer, staff, measure, SMUFL_E991_chantPunctumInclinatum);
+            }
             break;
         }
         case CLIVIS: {
@@ -223,15 +237,26 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(1)), layer, staff, measure);
             break;
         }
-        case CLIMACUS: {
+        case CLIMACUS:
+        case CLIMACUS_RESUPINUS:
+        {
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector[0]), layer, staff, measure);
-            for (int i = 1; i < (int)ncVector.size(); i++) {
+            int lastInclinatumIndex = (neumeName == CLIMACUS_RESUPINUS) ? ncVector.size() - 1 : ncVector.size();
+            for (int i = 1; i < lastInclinatumIndex; i++)
+            {
                 DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(i)), layer, staff, measure,
                     SMUFL_E991_chantPunctumInclinatum);
             }
+            
+            if (neumeName == CLIMACUS_RESUPINUS) {
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(3)), layer, staff, measure);
+            }
             break;
         }
-        case SCANDICUS: {
+        case SCANDICUS:
+        case SCANDICUS_FLEXUS:
+        case SCANDICUS_SUBPUNCTIS:
+        {
             int xOffset = 0;
             wchar_t lineCode;
             switch (pitchDifferences.at(1)) {
@@ -252,6 +277,60 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(1)), layer, staff, measure, SMUFL_E990_chantPunctum);
             DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(2)), layer, staff, measure, SMUFL_E990_chantPunctum,
                 xOffset * noteWidth);
+            
+            if (neumeName == SCANDICUS_FLEXUS) {
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(3)), layer, staff, measure);
+            }
+            else if (neumeName == SCANDICUS_SUBPUNCTIS) {
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(3)), layer, staff, measure, SMUFL_E991_chantPunctumInclinatum);
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(4)), layer, staff, measure, SMUFL_E991_chantPunctumInclinatum);
+            }
+
+            break;
+        }
+        case TORCULUS_RESUPINUS:
+        {
+            // For difference of 1 or 2 draw a ligature
+            // For a greater difference render separate punctums with a connecting line
+            // The first and last neume components will always be rendered as punctums.
+            wchar_t lineCode;
+            switch (pitchDifferences.at(1)) {
+                case -1:
+                    lineCode = SMUFL_E9B9_chantLigaturaDesc2nd;
+                    break;
+                case -2:
+                    lineCode = SMUFL_E9BA_chantLigaturaDesc3rd;
+                    break;
+                case -3:
+                    lineCode = SMUFL_E9BF_chantConnectingLineAsc4th;
+                    break;
+                default:
+                    lineCode = SMUFL_E9B7_chantEntryLineAsc5th;
+                    break;
+            }
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(0)), layer, staff, measure);
+
+            if (lineCode == SMUFL_E9B9_chantLigaturaDesc2nd || lineCode == SMUFL_E9BA_chantLigaturaDesc3rd) {
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(1)), layer, staff, measure, lineCode, -noteHeight / 4, 0);
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(3)), layer, staff, measure, SMUFL_E990_chantPunctum, noteWidth, 0);
+            }
+            else {
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(1)), layer, staff, measure, SMUFL_E990_chantPunctum, noteHeight/4, 0);
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(2)), layer, staff, measure, lineCode);
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(2)), layer, staff, measure, SMUFL_E990_chantPunctum);
+                DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(3)), layer, staff, measure);
+            }
+            break;
+        }
+        case PRESSUS:
+        {
+            // Two punctums followed by a punctum inclinatum
+            // No additional logic required
+            
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(0)), layer, staff, measure);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(1)), layer, staff, measure);
+            DrawNc(dc, dynamic_cast<LayerElement *>(ncVector.at(2)), layer, staff, measure,
+                    SMUFL_E991_chantPunctumInclinatum);
             break;
         }
         default: DrawLayerChildren(dc, neume, layer, staff, measure);
