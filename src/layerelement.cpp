@@ -954,26 +954,19 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 const bool restBelowStaff = topAlignedLoc <= bottomOfStaffLoc;
                 if (restAboveStaff) {
                     loc--;
-                    bottomAlignedLoc--;
                 }
                 else if (restBelowStaff) {
                     loc++;
-                    topAlignedLoc++;
                 }
 
-                // use the newly aligned bottomAlignedLoc and topAlignedLoc values to check if it's within the staff
-                // because it might have changed since we assigned restAboveStaff and restBelowStaff
-                const bool isInStaff = bottomAlignedLoc < topOfStaffLoc && topAlignedLoc > bottomOfStaffLoc;
-                if (isInStaff) {
-                    // if loc is within the staff and odd, 
-                    // we need to offset it to be even
-                    // so that the dots do not collide with the staff lines
-                    if (loc % 2 != 0) {
-                        // if it's above the staff, offset downwards
-                        // if below the staff, offset upwards
-                        if (loc > 4) loc--;
-                        else loc++;
-                    }
+                // if loc is odd, we need to offset it to be even
+                // so that the dots do not collide with the staff lines
+                // or on ledger lines
+                if (loc % 2 != 0) {
+                    // if it's above the staff, offset downwards
+                    // if below the staff, offset upwards
+                    if (loc > 4) loc--;
+                    else loc++;
                 }
             }
             else if (hasMultipleLayer) {
