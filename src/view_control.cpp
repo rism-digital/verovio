@@ -2170,25 +2170,32 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     if (pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
+    
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
 
     int code = SMUFL_E655_keyboardPedalUp;
     std::wstring str;
     if (pedal->GetDir() == pedalLog_DIR_bounce) {
         str.push_back(code);
+        // Get the staff size of the first staff
+        int staffSize = (staffList.begin() != staffList.end()) ? (*staffList.begin())->m_drawingStaffSize : 100;
         TextExtend bounceOffset;
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
         dc->GetSmuflTextExtent(str, &bounceOffset);
+        dc->ResetFont();
         x -= bounceOffset.m_width;
     }
     if (pedal->GetDir() != pedalLog_DIR_up) {
-        if (pedal->GetFunc() == "sostenuto")
+        if (pedal->GetFunc() == "sostenuto") {
             code = SMUFL_E659_keyboardPedalSost;
-        else
+        }
+        else {
             code = SMUFL_E650_keyboardPedalPed;
+        }
     }
     str.push_back(code);
 
-    std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, pedal->GetStart(), *staffIter)) {
             continue;
