@@ -5678,7 +5678,6 @@ void HumdrumInput::addDirection(
     const string &text, const string &placement, bool bold, bool italic, hum::HTp token, int staffindex)
 {
 
-cerr << "GOT HERE BBB" << text << endl;
     Dir *dir = new Dir;
     setStaff(dir, m_currentstaff);
     setLocationId(dir, token);
@@ -6775,12 +6774,12 @@ void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<
         tuplet->SetNumVisible(BOOLEAN_false);
     }
     hum::HumNum base = tg.numbase;
-    if (!base.isPowerOfTwo()) {
-        tuplet->SetNumFormat(tupletVis_NUMFORMAT_ratio);
-    }
-    else {
-        tuplet->SetNumFormat(tupletVis_NUMFORMAT_count);
-    }
+    // if (!base.isPowerOfTwo()) {
+    //     tuplet->SetNumFormat(tupletVis_NUMFORMAT_ratio);
+    // }
+    // else {
+    tuplet->SetNumFormat(tupletVis_NUMFORMAT_count);
+    // }
     m_tupletscaling = tg.num;
     m_tupletscaling /= tg.numbase;
 }
@@ -7237,9 +7236,11 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             tupbot[i] = nextLowerPowerOfTwo(tuptop[i]);
         }
         else {
-            // this still needs to be fixed: dotted tuplets.
+            // this may still need to be fixed: dotted tuplets.
             tuptop[i] = dotlessdur[i].getDenominator();
             tupbot[i] = dotlessdur[i].getNumerator();
+            int nextpow = nextLowerPowerOfTwo((double)tuptop[i] / tupbot[i]);
+            tupbot[i] *= nextpow;
         }
         if ((tuptop[i] == 1) && (tupbot[i] == 1)) {
             tuptop[i] = 0;
