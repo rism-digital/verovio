@@ -101,6 +101,9 @@ namespace vrv {
 
 #ifndef NO_HUMDRUM_SUPPORT
 
+#define VGRP_DYNAM_DEFAULT 100
+#define VGRP_PEDAL_DEFAULT 200
+
 //----------------------------------------------------------------------------
 // namespace for local IoHumdrum classes
 //----------------------------------------------------------------------------
@@ -5900,8 +5903,8 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 
             std::string verticalgroup = getLayoutParameter(line->token(i), "DY", "vg");
             if (verticalgroup.empty()) {
-                // 100 is the default group:
-                dynam->SetVgrp(100);
+                // 100 is the default group for dynamics:
+                dynam->SetVgrp(VGRP_DYNAM_DEFAULT);
             }
             else if (std::isdigit(verticalgroup[0])) {
                 dynam->SetVgrp(stoi(verticalgroup));
@@ -5948,8 +5951,8 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 
                 std::string verticalgroup = getLayoutParameter(line->token(i), "HP", "vg");
                 if (verticalgroup.empty()) {
-                    // 100 is the default group:
-                    hairpin->SetVgrp(100);
+                    // 100 is the default group for dynamics:
+                    hairpin->SetVgrp(VGRP_DYNAM_DEFAULT);
                 }
                 else if (std::isdigit(verticalgroup[0])) {
                     hairpin->SetVgrp(stoi(verticalgroup));
@@ -6000,8 +6003,8 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 
                 std::string verticalgroup = getLayoutParameter(line->token(i), "HP", "vg");
                 if (verticalgroup.empty()) {
-                    // 100 is the default group:
-                    hairpin->SetVgrp(100);
+                    // 100 is the default group for dynamics:
+                    hairpin->SetVgrp(VGRP_DYNAM_DEFAULT);
                 }
                 else if (std::isdigit(verticalgroup[0])) {
                     hairpin->SetVgrp(stoi(verticalgroup));
@@ -7810,6 +7813,7 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
         pedal->SetTstamp(tstamp.getFloat());
         pedal->SetDir(pedalLog_DIR_down);
+        pedal->SetVgrp(VGRP_PEDAL_DEFAULT);
         setStaff(pedal, m_currentstaff);
     }
     else if (*token == "*Xped") {
@@ -7821,6 +7825,7 @@ void HumdrumInput::handlePedalMark(hum::HTp token)
         hum::HumNum tstamp = getMeasureTstamp(token, staffindex, hum::HumNum(1, 1));
         pedal->SetTstamp(tstamp.getFloat());
         pedal->SetDir(pedalLog_DIR_up);
+        pedal->SetVgrp(VGRP_PEDAL_DEFAULT);
         setStaff(pedal, m_currentstaff);
         // }
     }
