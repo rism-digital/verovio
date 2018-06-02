@@ -2272,13 +2272,18 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     pair<int, hum::HTp> oclef;
     pair<int, hum::HTp> omet;
 
+    hum::HumRegex hre;
     hum::HTp part = partstart;
     while (part && !part->getLine()->isData()) {
         if (part->compare(0, 5, "*clef") == 0) {
-            clef = *part;
+            if (hre.search(part, 5, "\\d")) {
+                clef = *part;
+            }
         }
         else if (part->compare(0, 6, "*oclef") == 0) {
-            m_oclef.emplace_back(partnumber, part);
+            if (hre.search(part, 6, "\\d")) {
+                m_oclef.emplace_back(partnumber, part);
+            }
         }
         else if (part->compare(0, 5, "*omet") == 0) {
             m_omet.emplace_back(partnumber, part);
@@ -2453,7 +2458,7 @@ void HumdrumInput::setInstrumentAbbreviation(vrv::StaffDef *staffdef, const stri
 //////////////////////////////
 //
 // HumdrumInput::getAutoClef -- estimate a clef for a part
-//     which does not have a specified clef.  Choice will be
+//     that does not have a specified clef.  Choice will be
 //     treble or bass.
 //
 
@@ -2463,10 +2468,13 @@ string HumdrumInput::getAutoClef(hum::HTp partstart, int partnumber)
     int ptrack = partstart->getTrack();
     std::vector<int> dhist(100, 0);
     int diatonic;
+    hum::HumRegex hre;
     while (tok) {
         if (tok->isInterpretation()) {
             if (tok->compare(0, 5, "*clef") == 0) {
-                break;
+                if (hre.search(tok, 5, "\\d")) {
+                    break;
+                }
             }
         }
         if (!tok->isData()) {
