@@ -16,6 +16,7 @@
 
 #include "attcomparison.h"
 #include "beam.h"
+#include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
@@ -811,6 +812,14 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             // ppq
             pugi::xpath_node divisions = it->select_single_node("divisions");
             if (divisions) m_ppq = divisions.node().text().as_int();
+            // measure style
+            pugi::xpath_node measureSlash = it->select_single_node("measure-style/slash");
+            if (measureSlash) {
+                if (HasAttributeWithValue(measureSlash.node(), "type", "start"))
+                    m_slash = true;
+                else
+                    m_slash = false;
+            }
         }
     }
 
@@ -1013,11 +1022,18 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     }
 
     pugi::xpath_node measureRepeat = node.select_single_node("measure-style/measure-repeat");
+    pugi::xpath_node measureSlash = node.select_single_node("measure-style/slash");
     if (measureRepeat) {
         if (HasAttributeWithValue(measureRepeat.node(), "type", "start"))
             m_mRpt = true;
         else
             m_mRpt = false;
+    }
+    if (measureSlash) {
+        if (HasAttributeWithValue(measureSlash.node(), "type", "start"))
+            m_slash = true;
+        else
+            m_slash = false;
     }
 }
 
@@ -1422,13 +1438,23 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         }
         // we assume /note without /type to be mRest
         else if (typeStr.empty() || HasAttributeWithValue(rest.node(), "measure", "yes")) {
-            MRest *mRest = new MRest();
-            element = mRest;
-            // FIXME MEI 4.0.0
-            // if (cue) mRest->SetSize(SIZE_cue);
-            if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
-            if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
-            AddLayerElement(layer, mRest);
+            if (m_slash) {
+              for (int i = m_meterCount; i > 0; --i) {
+                BeatRpt *slash = new BeatRpt;
+                AddLayerElement(layer, slash);
+              }
+              return;
+            }
+            else {
+              MRest *mRest = new MRest();
+              element = mRest;
+              // FIXME MEI 4.0.0
+              // if (cue) mRest->SetSize(SIZE_cue);
+              if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
+              if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
+              AddLayerElement(layer, mRest);
+            }
+
         }
         else {
             Rest *rest = new Rest();

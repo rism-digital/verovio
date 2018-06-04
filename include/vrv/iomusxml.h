@@ -257,6 +257,8 @@ private:
     std::vector<int> m_octDis;
     /* measure repeats */
     bool m_mRpt = false;
+    /* measure repeats */
+    bool m_slash = false;
     /* measure rests */
     int m_multiRest = 0;
     /* MIDI ticks */
