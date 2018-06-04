@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jun  3 13:13:46 PDT 2018
+// Last Modified: Sun Jun  3 20:59:48 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5156,25 +5156,30 @@ class Tool_myank : public HumTool {
 
 class Tool_phrase : public HumTool {
 	public:
-		      Tool_phrase      (void);
-		     ~Tool_phrase      () {};
+		     Tool_phrase          (void);
+		    ~Tool_phrase          () {};
 
-		bool  run              (HumdrumFile& infile);
-		bool  run              (const string& indata, ostream& out);
-		bool  run              (HumdrumFile& infile, ostream& out);
+		bool  run                 (HumdrumFile& infile);
+		bool  run                 (const string& indata, ostream& out);
+		bool  run                 (HumdrumFile& infile, ostream& out);
 
 	protected:
-		void  analyzeSpine     (int index);
-		void  initialize       (HumdrumFile& infile);
-		void  prepareAnalysis  (HumdrumFile& infile);
-		void  addAverageLines  (HumdrumFile& infile);
+		void  analyzeSpineByRests (int index);
+		void  analyzeSpineByPhrase(int index);
+		void  initialize          (HumdrumFile& infile);
+		void  prepareAnalysis     (HumdrumFile& infile);
+		void  addAverageLines     (HumdrumFile& infile);
+		bool  hasPhraseMarks      (HTp start);
+		void  removePhraseMarks   (HTp start);
 
 	private:
-		vector<vector<string>> m_results;
-		vector<HTp>            m_starts;
-		HumdrumFile            m_infile;
-		vector<int>            m_pcount;
-		vector<HumNum>         m_psum;
+		vector<vector<string>>    m_results;
+		vector<HTp>               m_starts;
+		HumdrumFile               m_infile;
+		vector<int>               m_pcount;
+		vector<HumNum>            m_psum;
+		bool                      m_markQ;
+      bool                      m_removeQ;
 
 };
 

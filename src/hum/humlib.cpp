@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jun  3 13:13:46 PDT 2018
+// Last Modified: Sun Jun  3 20:59:48 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -49346,7 +49346,8 @@ void Tool_myank::usage(const string& ommand) {
 //
 
 Tool_phrase::Tool_phrase(void) {
-	// do nothing
+	define("m|mark=b", "mark phrase boundaries based on rests");
+	define("r|remove=b", "remove phrase boundaries in data");
 }
 
 
@@ -49371,7 +49372,14 @@ bool Tool_phrase::run(HumdrumFile& infile, ostream& out) {
 bool Tool_phrase::run(HumdrumFile& infile) {
 	initialize(infile);
 	for (int i=0; i<(int)m_starts.size(); i++) {
-		analyzeSpine(i);
+		if (m_removeQ) {
+			removePhraseMarks(m_starts[i]);
+		}
+		if (hasPhraseMarks(m_starts[i])) {
+			analyzeSpineByPhrase(i);
+		} else {
+			analyzeSpineByRests(i);
+		}
 	}
 	prepareAnalysis(infile);
 	cout << m_free_text.str();
@@ -49452,16 +49460,18 @@ void Tool_phrase::initialize(HumdrumFile& infile) {
 	m_psum.resize(m_starts.size());
 	std::fill(m_pcount.begin(), m_pcount.end(), 0);
 	std::fill(m_psum.begin(), m_psum.end(), 0);
+	m_markQ = getBoolean("mark");
+	m_removeQ = getBoolean("remove");
 }
 
 
 
 ///////////////////////////////
 //
-// Tool_phrase::analyzeSpine --
+// Tool_phrase::analyzeSpineByRests --
 //
 
-void Tool_phrase::analyzeSpine(int index) {
+void Tool_phrase::analyzeSpineByRests(int index) {
 	HTp start    = m_starts[index];
 	HTp current  = start;
 	HTp lastnote = NULL;   // last note to be processed
@@ -49480,10 +49490,10 @@ void Tool_phrase::analyzeSpine(int index) {
 					m_psum[index] += dur;
 					m_pcount[index]++;
 					m_results[index][pstart->getLineIndex()] = ss.str();
-					if (dur > 0) {
-						m_free_text << dur.getFloat() << "\n";
-					}
 					pstart = NULL;
+					if (m_markQ && lastnote) {
+						lastnote->setText(lastnote->getText() + "}");
+					}
 				}
 			}
 		}
@@ -49499,12 +49509,15 @@ void Tool_phrase::analyzeSpine(int index) {
 			if (lastnote) {
 				dur = current->getDurationFromStart()
 						- pstart->getDurationFromStart();
-					ss.str("");
+				ss.str("");
 				ss.clear();
 				ss << dur.getFloat();
 				m_psum[index] += dur;
 				m_pcount[index]++;
 				m_results[index][pstart->getLineIndex()] = ss.str();
+				if (m_markQ) {
+					lastnote->setText(lastnote->getText() + "}");
+				}
 			}
 			pstart = NULL;
 			lastnote = NULL;
@@ -49518,8 +49531,27 @@ void Tool_phrase::analyzeSpine(int index) {
 		if (current->isNote()) {
 			lastnote = current;
 		}
+		if (pstart && current->isNote() && (current->find(";") != std::string::npos)) {
+			// fermata at end of phrase.
+			dur = current->getDurationFromStart()
+					- pstart->getDurationFromStart();
+			ss.str("");
+			ss.clear();
+			ss << dur.getFloat();
+			m_psum[index] += dur;
+			m_pcount[index]++;
+			m_results[index][pstart->getLineIndex()] = ss.str();
+			if (m_markQ) {
+				current->setText(current->getText() + "}");
+			}
+			current = current->getNextToken();
+			continue;
+		}
 		if (current->isNote() && pstart == NULL) {
 			pstart = current;
+			if (m_markQ) {
+				current->setText("{" + current->getText());
+			}
 		}
 		current = current->getNextToken();
 	}
@@ -49532,7 +49564,111 @@ void Tool_phrase::analyzeSpine(int index) {
 		m_psum[index] += dur;
 		m_pcount[index]++;
 		m_results[index][pstart->getLineIndex()] = ss.str();
+		if (m_markQ && lastnote) {
+			lastnote->setText(lastnote->getText() + "}");
+		}
 	}
+}
+
+
+
+///////////////////////////////
+//
+// Tool_phrase::analyzeSpineByPhrase --
+//
+
+void Tool_phrase::analyzeSpineByPhrase(int index) {
+	HTp start    = m_starts[index];
+	HTp current  = start;
+	HTp pstart   = NULL;   // phrase start;
+	HumNum dur;
+	stringstream ss;
+	while (current) {
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->find("{") != std::string::npos) {
+			pstart = current;
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->find("}") != std::string::npos) {
+			if (pstart) {
+				dur = current->getDurationFromStart() + current->getDuration()
+						- pstart->getDurationFromStart();
+				ss.str("");
+				ss.clear();
+				ss << dur.getFloat();
+				m_psum[index] += dur;
+				m_pcount[index]++;
+				m_results[index][pstart->getLineIndex()] = ss.str();
+			}
+			current = current->getNextToken();
+			continue;
+		}
+		current = current->getNextToken();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_phrase::removePhraseMarks -- Remvoe { and } characters from **kern data.
+//
+
+void Tool_phrase::removePhraseMarks(HTp start) {
+	HTp current = start;
+	HumRegex hre;
+	while (current) {
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->isNull()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->find("{") != std::string::npos) {
+			string data = *current;
+			hre.replaceDestructive(data, "", "\\{", "g");
+			current->setText(data);
+		} 
+		if (current->find("}") != std::string::npos) {
+			string data = *current;
+			hre.replaceDestructive(data, "", "\\}", "g");
+			current->setText(data);
+		} 
+		current = current->getNextToken();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_phrase::hasPhraseMarks -- True if **kern data spine (primary layer), has
+//   "{" (or "}", but this is not checked) characters (phrase markers).
+//
+
+bool Tool_phrase::hasPhraseMarks(HTp start) {
+	HTp current = start;
+	while (current) {
+		if (!current->isData()) {
+			current = current->getNextToken();
+			continue;
+		}
+		if (current->find("{") != std::string::npos) {
+			return true;
+		}
+		current = current->getNextToken();
+	}
+	return false;
 }
 
 
