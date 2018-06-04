@@ -2143,28 +2143,28 @@
         </medievalAndRenaissanceClefs>
         <medievalAndRenaissanceProlations>
             <description>Medieval and Renaissance prolations</description>
-            <!--<glyph glyph-code="E910" smufl-name="mensuralProlation1"/>-->
-            <!--<glyph glyph-code="E911" smufl-name="mensuralProlation2"/>-->
-            <!--<glyph glyph-code="E912" smufl-name="mensuralProlation3"/>-->
-            <!--<glyph glyph-code="E913" smufl-name="mensuralProlation4"/>-->
-            <!--<glyph glyph-code="E914" smufl-name="mensuralProlation5"/>-->
-            <!--<glyph glyph-code="E915" smufl-name="mensuralProlation6"/>-->
-            <!--<glyph glyph-code="E916" smufl-name="mensuralProlation7"/>-->
-            <!--<glyph glyph-code="E917" smufl-name="mensuralProlation8"/>-->
-            <!--<glyph glyph-code="E918" smufl-name="mensuralProlation9"/>-->
-            <!--<glyph glyph-code="E919" smufl-name="mensuralProlation10"/>-->
-            <!--<glyph glyph-code="E91A" smufl-name="mensuralProlation11"/>-->
-            <!--<glyph glyph-code="E91B" smufl-name="mensuralProportionTempusPerfectum"/>-->
-            <!--<glyph glyph-code="E91C" smufl-name="mensuralProportionProportioDupla1"/>-->
-            <!--<glyph glyph-code="E91D" smufl-name="mensuralProportionProportioDupla2"/>-->
-            <!--<glyph glyph-code="E91E" smufl-name="mensuralProportionProportioTripla"/>-->
-            <!--<glyph glyph-code="E91F" smufl-name="mensuralProportionProportioQuadrupla"/>-->
-            <!--<glyph glyph-code="E920" smufl-name="mensuralProlationCombiningDot"/>-->
-            <!--<glyph glyph-code="E921" smufl-name="mensuralProlationCombiningTwoDots"/>-->
-            <!--<glyph glyph-code="E922" smufl-name="mensuralProlationCombiningThreeDots"/>-->
-            <!--<glyph glyph-code="E923" smufl-name="mensuralProlationCombiningThreeDotsTri"/>-->
-            <!--<glyph glyph-code="E924" smufl-name="mensuralProlationCombiningDotVoid"/>-->
-            <!--<glyph glyph-code="E925" smufl-name="mensuralProlationCombiningStroke"/>-->
+            <glyph glyph-code="E910" smufl-name="mensuralProlation1"/>
+            <glyph glyph-code="E911" smufl-name="mensuralProlation2"/>
+            <glyph glyph-code="E912" smufl-name="mensuralProlation3"/>
+            <glyph glyph-code="E913" smufl-name="mensuralProlation4"/>
+            <glyph glyph-code="E914" smufl-name="mensuralProlation5"/>
+            <glyph glyph-code="E915" smufl-name="mensuralProlation6"/>
+            <glyph glyph-code="E916" smufl-name="mensuralProlation7"/>
+            <glyph glyph-code="E917" smufl-name="mensuralProlation8"/>
+            <glyph glyph-code="E918" smufl-name="mensuralProlation9"/>
+            <glyph glyph-code="E919" smufl-name="mensuralProlation10"/>
+            <glyph glyph-code="E91A" smufl-name="mensuralProlation11"/>
+            <glyph glyph-code="E91B" smufl-name="mensuralProportionTempusPerfectum"/>
+            <glyph glyph-code="E91C" smufl-name="mensuralProportionProportioDupla1"/>
+            <glyph glyph-code="E91D" smufl-name="mensuralProportionProportioDupla2"/>
+            <glyph glyph-code="E91E" smufl-name="mensuralProportionProportioTripla"/>
+            <glyph glyph-code="E91F" smufl-name="mensuralProportionProportioQuadrupla"/>
+            <glyph glyph-code="E920" smufl-name="mensuralProlationCombiningDot"/>
+            <glyph glyph-code="E921" smufl-name="mensuralProlationCombiningTwoDots"/>
+            <glyph glyph-code="E922" smufl-name="mensuralProlationCombiningThreeDots"/>
+            <glyph glyph-code="E923" smufl-name="mensuralProlationCombiningThreeDotsTri"/>
+            <glyph glyph-code="E924" smufl-name="mensuralProlationCombiningDotVoid"/>
+            <glyph glyph-code="E925" smufl-name="mensuralProlationCombiningStroke"/>
             <!--<glyph glyph-code="E926" smufl-name="mensuralProportion1"/>-->
             <!--<glyph glyph-code="E927" smufl-name="mensuralProportion2"/>-->
             <!--<glyph glyph-code="E928" smufl-name="mensuralProportion3"/>-->
@@ -2275,8 +2275,8 @@
         </medievalAndRenaissanceObliqueForms>
         <medievalAndRenaissancePlainchantSingleNoteForms>
             <description>Medieval and Renaissance plainchant single-note forms</description>
-            <!--<glyph glyph-code="E990" smufl-name="chantPunctum"/>-->
-            <!--<glyph glyph-code="E991" smufl-name="chantPunctumInclinatum"/>-->
+            <glyph glyph-code="E990" smufl-name="chantPunctum"/>
+            <glyph glyph-code="E991" smufl-name="chantPunctumInclinatum"/>
             <!--<glyph glyph-code="E992" smufl-name="chantPunctumInclinatumAuctum"/>-->
             <!--<glyph glyph-code="E993" smufl-name="chantPunctumInclinatumDeminutum"/>-->
             <!--<glyph glyph-code="E994" smufl-name="chantAuctumAsc"/>-->
@@ -2302,19 +2302,19 @@
             <!--<glyph glyph-code="E9B1" smufl-name="chantPodatusUpper"/>-->
             <!--<glyph glyph-code="E9B2" smufl-name="chantDeminutumUpper"/>-->
             <!--<glyph glyph-code="E9B3" smufl-name="chantDeminutumLower"/>-->
-            <!--<glyph glyph-code="E9B4" smufl-name="chantEntryLineAsc2nd"/>-->
-            <!--<glyph glyph-code="E9B5" smufl-name="chantEntryLineAsc3rd"/>-->
-            <!--<glyph glyph-code="E9B6" smufl-name="chantEntryLineAsc4th"/>-->
-            <!--<glyph glyph-code="E9B7" smufl-name="chantEntryLineAsc5th"/>-->
+            <glyph glyph-code="E9B4" smufl-name="chantEntryLineAsc2nd"/>
+            <glyph glyph-code="E9B5" smufl-name="chantEntryLineAsc3rd"/>
+            <glyph glyph-code="E9B6" smufl-name="chantEntryLineAsc4th"/>
+            <glyph glyph-code="E9B7" smufl-name="chantEntryLineAsc5th"/>
             <!--<glyph glyph-code="E9B8" smufl-name="chantEntryLineAsc6th"/>-->
-            <!--<glyph glyph-code="E9B9" smufl-name="chantLigaturaDesc2nd"/>-->
-            <!--<glyph glyph-code="E9BA" smufl-name="chantLigaturaDesc3rd"/>-->
-            <!--<glyph glyph-code="E9BB" smufl-name="chantLigaturaDesc4th"/>-->
-            <!--<glyph glyph-code="E9BC" smufl-name="chantLigaturaDesc5th"/>-->
-            <!--<glyph glyph-code="E9BD" smufl-name="chantConnectingLineAsc2nd"/>-->
-            <!--<glyph glyph-code="E9BE" smufl-name="chantConnectingLineAsc3rd"/>-->
-            <!--<glyph glyph-code="E9BF" smufl-name="chantConnectingLineAsc4th"/>-->
-            <!--<glyph glyph-code="E9C0" smufl-name="chantConnectingLineAsc5th"/>-->
+            <glyph glyph-code="E9B9" smufl-name="chantLigaturaDesc2nd"/>
+            <glyph glyph-code="E9BA" smufl-name="chantLigaturaDesc3rd"/>
+            <glyph glyph-code="E9BB" smufl-name="chantLigaturaDesc4th"/>
+            <glyph glyph-code="E9BC" smufl-name="chantLigaturaDesc5th"/>
+            <glyph glyph-code="E9BD" smufl-name="chantConnectingLineAsc2nd"/>
+            <glyph glyph-code="E9BE" smufl-name="chantConnectingLineAsc3rd"/>
+            <glyph glyph-code="E9BF" smufl-name="chantConnectingLineAsc4th"/>
+            <glyph glyph-code="E9C0" smufl-name="chantConnectingLineAsc5th"/>
             <!--<glyph glyph-code="E9C1" smufl-name="chantConnectingLineAsc6th"/>-->
             <!--<glyph glyph-code="E9C2" smufl-name="chantStrophicusLiquescens2nd"/>-->
             <!--<glyph glyph-code="E9C3" smufl-name="chantStrophicusLiquescens3rd"/>-->
@@ -2367,11 +2367,11 @@
             <description>Medieval and Renaissance miscellany</description>
             <!--<glyph glyph-code="EA00" smufl-name="mensuralSignumUp"/>-->
             <!--<glyph glyph-code="EA01" smufl-name="mensuralSignumDown"/>-->
-            <!--<glyph glyph-code="EA02" smufl-name="mensuralCustosUp"/>-->
+            <glyph glyph-code="EA02" smufl-name="mensuralCustosUp"/>
             <!--<glyph glyph-code="EA03" smufl-name="mensuralCustosDown"/>-->
             <!--<glyph glyph-code="EA04" smufl-name="chantCustosStemUpPosLowest"/>-->
             <!--<glyph glyph-code="EA05" smufl-name="chantCustosStemUpPosLow"/>-->
-            <!--<glyph glyph-code="EA06" smufl-name="chantCustosStemUpPosMiddle"/>-->
+            <glyph glyph-code="EA06" smufl-name="chantCustosStemUpPosMiddle"/>
             <!--<glyph glyph-code="EA07" smufl-name="chantCustosStemDownPosMiddle"/>-->
             <!--<glyph glyph-code="EA08" smufl-name="chantCustosStemDownPosHigh"/>-->
             <!--<glyph glyph-code="EA09" smufl-name="chantCustosStemDownPosHighest"/>-->

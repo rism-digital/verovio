@@ -34,6 +34,7 @@ Mensur::Mensur()
     , AttMensurLog()
     , AttMensurVis()
     , AttSlashCount()
+    , AttStaffLoc()
 {
     Init();
 }
@@ -42,8 +43,9 @@ Mensur::Mensur(const ScoreDefInterface *mensurAttr) : LayerElement("mensur-")
 {
     Init();
 
-    // this->SetColor(mensurAttr->GetMensurColor());
+    this->SetColor(mensurAttr->GetMensurColor());
     this->SetDot(mensurAttr->GetMensurDot());
+    this->SetOrient(mensurAttr->GetMensurOrient());
     this->SetSign(mensurAttr->GetMensurSign());
     this->SetSlash(mensurAttr->GetMensurSlash());
     //
@@ -65,8 +67,9 @@ void Mensur::Init()
     RegisterAttClass(ATT_DURATIONRATIO);
     RegisterAttClass(ATT_MENSURALSHARED);
     RegisterAttClass(ATT_MENSURLOG);
-    RegisterAttClass(ATT_METERSIGVIS);
+    RegisterAttClass(ATT_MENSURVIS);
     RegisterAttClass(ATT_SLASHCOUNT);
+    RegisterAttClass(ATT_STAFFLOC);
 
     Reset();
 }
@@ -83,6 +86,7 @@ void Mensur::Reset()
     ResetMensurLog();
     ResetMensurVis();
     ResetSlashCount();
+    ResetStaffLoc();
 }
 
 //----------------------------------------------------------------------------

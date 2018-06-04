@@ -54,7 +54,12 @@ public:
     /**
      * See Object::PrepareFloatingGrps
      */
-    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+    virtual int PrepareFloatingGrps(FunctorParams *);
+
+    /**
+     * See Object::GenerateMIDI
+     */
+    virtual int GenerateMIDI(FunctorParams *functorParams);
 
 protected:
     //

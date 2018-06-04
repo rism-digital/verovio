@@ -58,6 +58,8 @@
 #include "mrpt2.h"
 #include "multirest.h"
 #include "multirpt.h"
+#include "nc.h"
+#include "neume.h"
 #include "note.h"
 #include "num.h"
 #include "octave.h"
@@ -83,6 +85,7 @@
 #include "staffgrp.h"
 #include "svg.h"
 #include "syl.h"
+#include "syllable.h"
 #include "system.h"
 #include "tempo.h"
 #include "text.h"
@@ -487,6 +490,14 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("multiRpt");
         WriteMultiRpt(m_currentNode, dynamic_cast<MultiRpt *>(object));
     }
+    else if (object->Is(NC)) {
+        m_currentNode = m_currentNode.append_child("nc");
+        WriteNc(m_currentNode, dynamic_cast<Nc *>(object));
+    }
+    else if (object->Is(NEUME)) {
+        m_currentNode = m_currentNode.append_child("neume");
+        WriteNeume(m_currentNode, dynamic_cast<Neume *>(object));
+    }
     else if (object->Is(NOTE)) {
         m_currentNode = m_currentNode.append_child("note");
         WriteNote(m_currentNode, dynamic_cast<Note *>(object));
@@ -506,6 +517,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(SYL)) {
         m_currentNode = m_currentNode.append_child("syl");
         WriteSyl(m_currentNode, dynamic_cast<Syl *>(object));
+    }
+    else if (object->Is(SYLLABLE)) {
+        m_currentNode = m_currentNode.append_child("syllable");
+        WriteSyllable(m_currentNode, dynamic_cast<Syllable *>(object));
     }
     else if (object->Is(TUPLET)) {
         m_currentNode = m_currentNode.append_child("tuplet");
@@ -1241,7 +1256,7 @@ void MeiOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *elem
     element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
     if (element->m_xAbs != VRV_UNSET) {
-        currentNode.append_attribute("ulx") = StringFormat("%d", element->m_xAbs / DEFINITION_FACTOR).c_str();
+        currentNode.attribute("ulx") = StringFormat("%d", element->m_xAbs / DEFINITION_FACTOR).c_str();
     }
 }
 
@@ -1346,8 +1361,9 @@ void MeiOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
 {
     assert(custos);
 
-    WriteLayerElement(currentNode, custos);
+    WritePitchInterface(currentNode, custos);
     WritePositionInterface(currentNode, custos);
+    WriteLayerElement(currentNode, custos);
     custos->WriteColor(currentNode);
 }
 
@@ -1399,6 +1415,7 @@ void MeiOutput::WriteMensur(pugi::xml_node currentNode, Mensur *mensur)
     mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
     mensur->WriteSlashCount(currentNode);
+    mensur->WriteStaffLoc(currentNode);
 }
 
 void MeiOutput::WriteMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
@@ -1450,6 +1467,26 @@ void MeiOutput::WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt)
 
     WriteLayerElement(currentNode, multiRpt);
     multiRpt->WriteNumbered(currentNode);
+}
+
+void MeiOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
+{
+    assert(nc);
+
+    WriteLayerElement(currentNode, nc);
+    WriteDurationInterface(currentNode, nc);
+    WritePitchInterface(currentNode, nc);
+    WritePositionInterface(currentNode, nc);
+    nc->WriteColor(currentNode);
+    nc->WriteIntervalMelodic(currentNode);
+}
+
+void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
+{
+    assert(neume);
+    
+    WriteLayerElement(currentNode, neume);
+    neume->WriteColor(currentNode);
 }
 
 void MeiOutput::WriteNote(pugi::xml_node currentNode, Note *note)
@@ -1528,6 +1565,15 @@ void MeiOutput::WriteSyl(pugi::xml_node currentNode, Syl *syl)
     syl->WriteLang(currentNode);
     syl->WriteTypography(currentNode);
     syl->WriteSylLog(currentNode);
+}
+
+void MeiOutput::WriteSyllable(pugi::xml_node currentNode, Syllable *syllable)
+{
+    assert(syllable);
+
+    WriteLayerElement(currentNode, syllable);
+    syllable->WriteColor(currentNode);
+    syllable->WriteSlashCount(currentNode);
 }
 
 void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textElement)
@@ -1662,6 +1708,7 @@ void MeiOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     interface->WriteLyricStyle(element);
     interface->WriteMensuralLog(element);
     interface->WriteMensuralShared(element);
+    interface->WriteMensuralVis(element);
     interface->WriteMeterSigDefaultLog(element);
     interface->WriteMeterSigDefaultVis(element);
     interface->WriteMidiTempo(element);
@@ -3688,6 +3735,12 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "meterSig") {
             success = ReadMeterSig(parent, xmlElement);
         }
+        else if (elementName == "nc") {
+            success = ReadNc(parent, xmlElement);
+        }
+        else if (elementName == "neume") {
+            success = ReadNeume(parent, xmlElement);
+        }
         else if (elementName == "note") {
             success = ReadNote(parent, xmlElement);
         }
@@ -3717,6 +3770,9 @@ bool MeiInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         else if (elementName == "syl") {
             success = ReadSyl(parent, xmlElement);
+        }
+        else if (elementName == "syllable") {
+            success = ReadSyllable(parent, xmlElement);
         }
         else if (elementName == "tuplet") {
             success = ReadTuplet(parent, xmlElement);
@@ -3880,6 +3936,7 @@ bool MeiInput::ReadCustos(Object *parent, pugi::xml_node custos)
     Custos *vrvCustos = new Custos();
     ReadLayerElement(custos, vrvCustos);
 
+    ReadPitchInterface(custos, vrvCustos);
     ReadPositionInterface(custos, vrvCustos);
     vrvCustos->ReadColor(custos);
 
@@ -3955,6 +4012,7 @@ bool MeiInput::ReadMensur(Object *parent, pugi::xml_node mensur)
     vrvMensur->ReadMensurLog(mensur);
     vrvMensur->ReadMensurVis(mensur);
     vrvMensur->ReadSlashCount(mensur);
+    vrvMensur->ReadStaffLoc(mensur);
 
     parent->AddChild(vrvMensur);
     ReadUnsupportedAttr(mensur, vrvMensur);
@@ -4036,6 +4094,32 @@ bool MeiInput::ReadMultiRpt(Object *parent, pugi::xml_node multiRpt)
     parent->AddChild(vrvMultiRpt);
     ReadUnsupportedAttr(multiRpt, vrvMultiRpt);
     return true;
+}
+
+bool MeiInput::ReadNc(Object *parent, pugi::xml_node nc)
+{
+    Nc *vrvNc = new Nc();
+    ReadLayerElement(nc, vrvNc);
+
+    ReadDurationInterface(nc, vrvNc);
+    ReadPitchInterface(nc, vrvNc);
+    ReadPositionInterface(nc, vrvNc);
+    vrvNc->ReadColor(nc);
+    vrvNc->ReadIntervalMelodic(nc);
+
+    parent->AddChild(vrvNc);
+    return ReadLayerChildren(vrvNc, nc, vrvNc);
+}
+
+bool MeiInput::ReadNeume(Object *parent, pugi::xml_node neume)
+{
+    Neume *vrvNeume = new Neume();
+    ReadLayerElement(neume, vrvNeume);
+
+    vrvNeume->ReadColor(neume);
+
+    parent->AddChild(vrvNeume);
+    return ReadLayerChildren(vrvNeume, neume, vrvNeume);
 }
 
 bool MeiInput::ReadNote(Object *parent, pugi::xml_node note)
@@ -4138,6 +4222,19 @@ bool MeiInput::ReadSyl(Object *parent, pugi::xml_node syl)
     parent->AddChild(vrvSyl);
     ReadUnsupportedAttr(syl, vrvSyl);
     return ReadTextChildren(vrvSyl, syl, vrvSyl);
+}
+
+bool MeiInput::ReadSyllable(Object *parent, pugi::xml_node syllable)
+{
+    Syllable *vrvSyllable = new Syllable();
+    ReadLayerElement(syllable, vrvSyllable);
+
+    vrvSyllable->ReadColor(syllable);
+    vrvSyllable->ReadSlashCount(syllable);
+
+    parent->AddChild(vrvSyllable);
+
+    return ReadLayerChildren(vrvSyllable, syllable, vrvSyllable);
 }
 
 bool MeiInput::ReadTuplet(Object *parent, pugi::xml_node tuplet)
@@ -4387,6 +4484,7 @@ bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadKeySigDefaultVis(element);
     interface->ReadLyricStyle(element);
     interface->ReadMensuralLog(element);
+    interface->ReadMensuralVis(element);
     interface->ReadMensuralShared(element);
     interface->ReadMeterSigDefaultLog(element);
     interface->ReadMeterSigDefaultVis(element);

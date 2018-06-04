@@ -14,8 +14,13 @@
 //----------------------------------------------------------------------------
 
 #include "functorparams.h"
-#include "verticalaligner.h"
+#include "horizontalaligner.h"
+#include "layerelement.h"
 #include "vrv.h"
+
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
 
 namespace vrv {
 
@@ -51,11 +56,33 @@ void Pedal::Reset()
 // Pedal functor methods
 //----------------------------------------------------------------------------
 
-int Pedal::PrepareFloatingGrps(FunctorParams *functorParams)
+int Pedal::GenerateMIDI(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
+    if (!HasDir()) return FUNCTOR_CONTINUE;
+
+    double pedalTime = GetStart()->GetAlignment()->GetTime() * DURATION_4 / DUR_MAX;
+    double starttime = params->m_totalTime + pedalTime;
+    int tpq = params->m_midiFile->getTPQ();
+
+    // todo: check pedal @func to switch between sustain/soften/damper pedals?
+    switch (GetDir()) {
+        case pedalLog_DIR_down:
+            params->m_midiFile->addSustainPedalOn(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
+            break;
+        case pedalLog_DIR_up:
+            params->m_midiFile->addSustainPedalOff(params->m_midiTrack, (starttime * tpq), params->m_midiChannel);
+            break;
+        default: return FUNCTOR_CONTINUE;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Pedal::PrepareFloatingGrps(FunctorParams *)
+{
     if (this->HasVgrp()) {
         this->SetDrawingGrpId(-this->GetVgrp());
     }

@@ -416,45 +416,45 @@ Object *Object::FindChildByUuid(std::string uuid, int deepness, bool direction)
 
 Object *Object::FindChildByType(ClassId classId, int deepness, bool direction)
 {
-    AttComparison attComparison(classId);
-    return FindChildByAttComparison(&attComparison, deepness, direction);
+    AttComparison comparison(classId);
+    return FindChildByComparison(&comparison, deepness, direction);
 }
 
-Object *Object::FindChildByAttComparison(AttComparison *attComparison, int deepness, bool direction)
+Object *Object::FindChildByComparison(Comparison *comparison, int deepness, bool direction)
 {
-    Functor findByAttComparison(&Object::FindByAttComparison);
-    FindByAttComparisonParams findByAttComparisonParams(attComparison);
-    this->Process(&findByAttComparison, &findByAttComparisonParams, NULL, NULL, deepness, direction);
-    return findByAttComparisonParams.m_element;
+    Functor findByComparison(&Object::FindByComparison);
+    FindByComparisonParams findByComparisonParams(comparison);
+    this->Process(&findByComparison, &findByComparisonParams, NULL, NULL, deepness, direction);
+    return findByComparisonParams.m_element;
 }
 
-Object *Object::FindChildExtremeByAttComparison(AttComparison *attComparison, int deepness, bool direction)
+Object *Object::FindChildExtremeByComparison(Comparison *comparison, int deepness, bool direction)
 {
-    Functor findExtremeByAttComparison(&Object::FindExtremeByAttComparison);
-    FindExtremeByAttComparisonParams findExtremeByAttComparisonParams(attComparison);
-    this->Process(&findExtremeByAttComparison, &findExtremeByAttComparisonParams, NULL, NULL, deepness, direction);
-    return findExtremeByAttComparisonParams.m_element;
+    Functor findExtremeByComparison(&Object::FindExtremeByComparison);
+    FindExtremeByComparisonParams findExtremeByComparisonParams(comparison);
+    this->Process(&findExtremeByComparison, &findExtremeByComparisonParams, NULL, NULL, deepness, direction);
+    return findExtremeByComparisonParams.m_element;
 }
 
-void Object::FindAllChildByAttComparison(
-    ArrayOfObjects *objects, AttComparison *attComparison, int deepness, bool direction, bool clear)
+void Object::FindAllChildByComparison(
+    ArrayOfObjects *objects, Comparison *comparison, int deepness, bool direction, bool clear)
 {
     assert(objects);
     if (clear) objects->clear();
 
-    Functor findAllByAttComparison(&Object::FindAllByAttComparison);
-    FindAllByAttComparisonParams findAllByAttComparisonParams(attComparison, objects);
-    this->Process(&findAllByAttComparison, &findAllByAttComparisonParams, NULL, NULL, deepness, direction);
+    Functor findAllByComparison(&Object::FindAllByComparison);
+    FindAllByComparisonParams findAllByComparisonParams(comparison, objects);
+    this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction);
 }
 
 void Object::FindAllChildBetween(
-    ArrayOfObjects *objects, AttComparison *attComparison, Object *start, Object *end, bool clear)
+    ArrayOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear)
 {
     assert(objects);
     if (clear) objects->clear();
 
     Functor findAllBetween(&Object::FindAllBetween);
-    FindAllBetweenParams findAllBetweenParams(attComparison, objects, start, end);
+    FindAllBetweenParams findAllBetweenParams(comparison, objects, start, end);
     this->Process(&findAllBetween, &findAllBetweenParams);
 }
 
@@ -622,8 +622,8 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
     }
 }
 
-void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor,
-    ArrayOfAttComparisons *filters, int deepness, bool direction)
+void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
+    int deepness, bool direction)
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
@@ -678,21 +678,23 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         }
         for (iter = children->begin(); iter != children->end(); ++iter) {
             if (filters && !filters->empty()) {
-                bool hasAttComparison = false;
+                bool hasComparison = false;
                 // first we look if there is a comparison object for the object type (e.g., a Staff)
-                ArrayOfAttComparisons::iterator attComparisonIter;
-                for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); ++attComparisonIter) {
-                    // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
+                ArrayOfComparisons::iterator comparisonIter;
+                for (comparisonIter = filters->begin(); comparisonIter != filters->end(); ++comparisonIter) {
+                    // if yes, we will use it (*comparisonIter) for evaluating if the object matches
                     // the attribute (see below)
                     Object *o = *iter;
-                    if (o->GetClassId() == (*attComparisonIter)->GetType()) {
-                        hasAttComparison = true;
+                    AttComparison *attComparison = dynamic_cast<AttComparison *>(*comparisonIter);
+                    assert(attComparison);
+                    if (o->GetClassId() == attComparison->GetType()) {
+                        hasComparison = true;
                         break;
                     }
                 }
-                if (hasAttComparison) {
-                    // use the operator of the AttComparison object to evaluate the attribute
-                    if ((**attComparisonIter)(*iter)) {
+                if (hasComparison) {
+                    // use the operator of the Comparison object to evaluate the attribute
+                    if ((**comparisonIter)(*iter)) {
                         // the attribute value matches, process the object
                         // LogDebug("%s ", (*iter)->GetClassName().c_str());
                         (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
@@ -917,9 +919,9 @@ int Object::FindByUuid(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindByAttComparison(FunctorParams *functorParams)
+int Object::FindByComparison(FunctorParams *functorParams)
 {
-    FindByAttComparisonParams *params = dynamic_cast<FindByAttComparisonParams *>(functorParams);
+    FindByComparisonParams *params = dynamic_cast<FindByComparisonParams *>(functorParams);
     assert(params);
 
     if (params->m_element) {
@@ -927,36 +929,36 @@ int Object::FindByAttComparison(FunctorParams *functorParams)
         return FUNCTOR_STOP;
     }
 
-    // evaluate by applying the AttComparison operator()
-    if ((*params->m_attComparison)(this)) {
+    // evaluate by applying the Comparison operator()
+    if ((*params->m_comparison)(this)) {
         params->m_element = this;
         // LogDebug("Found it!");
         return FUNCTOR_STOP;
     }
-    // LogDebug("Still looking for the object matching the AttComparison...");
+    // LogDebug("Still looking for the object matching the Comparison...");
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindExtremeByAttComparison(FunctorParams *functorParams)
+int Object::FindExtremeByComparison(FunctorParams *functorParams)
 {
-    FindExtremeByAttComparisonParams *params = dynamic_cast<FindExtremeByAttComparisonParams *>(functorParams);
+    FindExtremeByComparisonParams *params = dynamic_cast<FindExtremeByComparisonParams *>(functorParams);
     assert(params);
 
-    // evaluate by applying the AttComparison operator()
-    if ((*params->m_attComparison)(this)) {
+    // evaluate by applying the Comparison operator()
+    if ((*params->m_comparison)(this)) {
         params->m_element = this;
     }
     // continue until the end
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindAllByAttComparison(FunctorParams *functorParams)
+int Object::FindAllByComparison(FunctorParams *functorParams)
 {
-    FindAllByAttComparisonParams *params = dynamic_cast<FindAllByAttComparisonParams *>(functorParams);
+    FindAllByComparisonParams *params = dynamic_cast<FindAllByComparisonParams *>(functorParams);
     assert(params);
 
-    // evaluate by applying the AttComparison operator()
-    if ((*params->m_attComparison)(this)) {
+    // evaluate by applying the Comparison operator()
+    if ((*params->m_comparison)(this)) {
         params->m_elements->push_back(this);
     }
     // continue until the end
@@ -978,8 +980,8 @@ int Object::FindAllBetween(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    // evaluate by applying the AttComparison operator()
-    if ((*params->m_attComparison)(this)) {
+    // evaluate by applying the Comparison operator()
+    if ((*params->m_comparison)(this)) {
         params->m_elements->push_back(this);
     }
 
