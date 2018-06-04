@@ -500,6 +500,7 @@ bool HumdrumInput::convertHumdrum()
     parseSignifiers(infile);
     checkForColorSpine(infile);
     infile.analyzeRScale();
+    m_spine_color.resize(infile.getMaxTrack() + 1);
 
     bool status = true; // for keeping track of problems in conversion process.
 
@@ -3415,6 +3416,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
     if (!m_measure) {
         return;
     }
+    // int ctrack;
     int xstaffindex;
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
     hum::HumdrumFile &infile = m_infile;
@@ -3437,6 +3439,11 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             }
             Harm *harm = new Harm;
             Text *text = new Text;
+
+            // ctrack = token->getTrack();
+            // if (!m_spine_color[ctrack].empty()) {
+            //  harm->SetColor(m_spine_color[ctrack]);
+            //}
 
             int staffindex = m_rkern[track];
 
@@ -4276,6 +4283,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     Note *note = NULL;
 
+    hum::HumRegex hre;
     // ggg	processGlobalDirections(token, staffindex);
 
     for (int i = 0; i < (int)layerdata.size(); ++i) {
@@ -4293,6 +4301,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             handlePedalMark(layerdata[i]);
             handleStaffStateVariables(layerdata[i]);
             handleStaffDynamStateVariables(layerdata[i]);
+            if (hre.search(layerdata[i], "^\\*color:(.*)")) {
+                int track = layerdata[i]->getTrack();
+                m_spine_color[track] = hre.getMatch(1);
+            }
             if (layerdata[i]->getDurationFromStart() != 0) {
                 if (layerdata[i]->isClef()) {
                     Clef *clef = insertClefElement(elements, pointers, layerdata[i]);
@@ -4961,10 +4973,7 @@ void HumdrumInput::embedTieInformation(Note *note, const std::string &token)
 
 void HumdrumInput::colorNote(Note *note, const std::string &token, int line, int field)
 {
-    std::string spinecolor;
-    if (m_has_color_spine) {
-        spinecolor = getSpineColor(line, field);
-    }
+    std::string spinecolor = getSpineColor(line, field);
     if (spinecolor != "") {
         note->SetColor(spinecolor);
     }
@@ -5073,7 +5082,7 @@ template <class ELEMENT> void HumdrumInput::verticalRest(ELEMENT element, const 
 void HumdrumInput::colorRest(Rest *rest, const std::string &token, int line, int field)
 {
     std::string spinecolor;
-    if (m_has_color_spine && (line >= 0) && (field >= 0)) {
+    if ((line >= 0) && (field >= 0)) {
         spinecolor = getSpineColor(line, field);
     }
     if (spinecolor != "") {
@@ -5125,6 +5134,16 @@ string HumdrumInput::getSpineColor(int line, int field)
 {
     hum::HumdrumFile &infile = m_infile;
     std::string output;
+    int track = m_infile.token(line, field)->getTrack();
+    if (!m_spine_color[track].empty()) {
+        if ((m_spine_color[track] != "black") && (m_spine_color[track] != "#000000")
+            && (m_spine_color[track] != "#000")) {
+            output = m_spine_color[track];
+        }
+    }
+    if (!m_has_color_spine) {
+        return output;
+    }
     for (int i = field + 1; i < infile[line].getFieldCount(); ++i) {
         if (!infile.token(line, i)->isDataType("**color")) {
             continue;
