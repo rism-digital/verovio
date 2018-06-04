@@ -753,7 +753,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 staffDef->SetLines(5);
             std::string scaleStr = staffDetails.node().select_single_node("staff-size").node().text().as_string();
             if (!scaleStr.empty()) {
-                staffDef->SetScale(staffDef->AttScalable::StrToPercent(scaleStr));
+                staffDef->SetScale(staffDef->AttScalable::StrToPercent(scaleStr + "%"));
             }
             pugi::xpath_node staffTuning = staffDetails.node().select_single_node("staff-tuning");
             if (staffTuning) {
