@@ -859,6 +859,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         // the staff @n must take into account the staffOffset
         Staff *staff = new Staff();
         staff->SetN(i + 1 + staffOffset);
+        staff->SetVisible(ConvertWordToBool(node.child("attributes").child("staff-details").attribute("print-object").value()));
         measure->AddChild(staff);
         // layers will be added in SelectLayer
     }
