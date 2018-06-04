@@ -549,6 +549,11 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
         m_mdiv->SetN(std::to_string(mdivNum));
     }
     m_doc->AddChild(m_mdiv);
+
+    // reset information fields
+    m_title.clear();
+    m_composer.clear();
+    m_history.clear();
 }
 
 void AbcInput::printInformationFields()
@@ -623,6 +628,7 @@ void AbcInput::createHeader()
     for (auto it = m_title.begin(); it != m_title.end(); ++it) {
         pugi::xml_node workTitle = work.append_child("title");
         workTitle.text().set((*it).c_str());
+        workTitle.append_attribute("analog").set_value("abc:T");
         if (it == m_title.begin()) {
             workTitle.append_attribute("type").set_value("main");
         }
@@ -634,6 +640,7 @@ void AbcInput::createHeader()
         for (auto it = m_composer.begin(); it != m_composer.end(); ++it) {
             pugi::xml_node composer = work.append_child("composer");
             composer.text().set((*it).c_str());
+            composer.append_attribute("analog").set_value("abc:C");
         }
     }
     if (!m_history.empty()) {
@@ -641,6 +648,7 @@ void AbcInput::createHeader()
         for (auto it = m_history.begin(); it != m_history.end(); ++it) {
             pugi::xml_node histLine = workHistory.append_child("p");
             histLine.text().set((*it).c_str());
+            histLine.append_attribute("analog").set_value("abc:H");
         }
     }
 }
