@@ -501,6 +501,7 @@ bool HumdrumInput::convertHumdrum()
     checkForColorSpine(infile);
     infile.analyzeRScale();
     m_spine_color.resize(infile.getMaxTrack() + 1);
+    initializeSpineColor(infile);
 
     bool status = true; // for keeping track of problems in conversion process.
 
@@ -596,6 +597,29 @@ bool HumdrumInput::convertHumdrum()
     // section->AddChild(pb);
 
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::initializeSpineColor -- Look for *color: interpretations before data.
+//
+
+void HumdrumInput::initializeSpineColor(hum::HumdrumFile &infile)
+{
+    hum::HumRegex hre;
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (infile[i].isData()) {
+            break;
+        }
+        if (infile[i].isInterpretation()) {
+            for (int j = 0; j < infile[i].getFieldCount(); j++) {
+                if (hre.search(infile.token(i, j), "^\\*color:(.*)")) {
+                    int ctrack = infile.token(i, j)->getTrack();
+                    m_spine_color[ctrack] = hre.getMatch(1);
+                }
+            }
+        }
+    }
 }
 
 //////////////////////////////
@@ -3416,11 +3440,19 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
     if (!m_measure) {
         return;
     }
-    // int ctrack;
+    hum::HumRegex hre;
     int xstaffindex;
     const std::vector<hum::HTp> &staffstarts = m_staffstarts;
     hum::HumdrumFile &infile = m_infile;
     for (int i = startline; i < endline; ++i) {
+        if (infile[i].isInterpretation()) {
+            for (int j = 0; j < infile[i].getFieldCount(); j++) {
+                if (hre.search(infile.token(i, j), "^\\*color:(.*)")) {
+                    int ctrack = infile.token(i, j)->getTrack();
+                    m_spine_color[ctrack] = hre.getMatch(1);
+                }
+            }
+        }
         if (!infile[i].isData()) {
             continue;
         }
@@ -3440,10 +3472,20 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             Harm *harm = new Harm;
             Text *text = new Text;
 
-            // ctrack = token->getTrack();
-            // if (!m_spine_color[ctrack].empty()) {
-            //  harm->SetColor(m_spine_color[ctrack]);
-            //}
+            m_measure->AddChild(harm);
+
+            int line = token->getLineIndex();
+            int field = token->getFieldIndex();
+            string ccolor = getSpineColor(line, field);
+            if (!ccolor.empty()) {
+                Rend *rend = new Rend;
+                rend->SetColor(ccolor);
+                harm->AddChild(rend);
+                rend->AddChild(text);
+            }
+            else {
+                harm->AddChild(text);
+            }
 
             int staffindex = m_rkern[track];
 
@@ -3466,6 +3508,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                     appendTypeTag(harm, subdatatype);
                 }
             }
+
             std::wstring content;
             if (token->isDataType("**harm")) {
                 setPlace(harm, "below");
@@ -3479,8 +3522,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
                 content = cleanHarmString(*token);
             }
             text->SetText(content);
-            harm->AddChild(text);
-            m_measure->AddChild(harm);
+
             hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
             harm->SetTstamp(tstamp.getFloat());
 

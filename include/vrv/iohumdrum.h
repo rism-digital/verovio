@@ -427,6 +427,7 @@ protected:
     std::string getLayoutParameter(hum::HTp token, const std::string &category, const std::string &keyname);
     void convertMensuralToken(
         std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token, int staffindex);
+    void initializeSpineColor(hum::HumdrumFile &infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -611,8 +612,8 @@ private:
     // m_has_color_spine == true if a color spine is present.
     bool m_has_color_spine = false;
 
-	// m_spine_color == list of colors to apply to spine data
-	std::vector<string> m_spine_color;
+    // m_spine_color == list of colors to apply to spine data
+    std::vector<string> m_spine_color;
 
     // m_traspose == transposition to go from sounding to written pitch.
     vector<int> m_transpose;
