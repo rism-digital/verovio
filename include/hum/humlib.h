@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jun  3 20:59:48 PDT 2018
+// Last Modified: Mon Jun  4 01:40:10 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5180,6 +5180,9 @@ class Tool_phrase : public HumTool {
 		vector<HumNum>            m_psum;
 		bool                      m_markQ;
       bool                      m_removeQ;
+      bool                      m_remove2Q;
+      bool                      m_averageQ;
+		string                    m_color;
 
 };
 

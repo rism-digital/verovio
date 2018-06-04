@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jun  3 20:59:48 PDT 2018
+// Last Modified: Mon Jun  4 01:40:10 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -49346,8 +49346,11 @@ void Tool_myank::usage(const string& ommand) {
 //
 
 Tool_phrase::Tool_phrase(void) {
+	define("A|no-average=b", "do not do average phrase-length analysis");
+	define("R|remove2=b", "remove phrase boundaries in data and do not do analysis");
 	define("m|mark=b", "mark phrase boundaries based on rests");
 	define("r|remove=b", "remove phrase boundaries in data");
+	define("c|color=s", "display color of analysis data");
 }
 
 
@@ -49375,14 +49378,19 @@ bool Tool_phrase::run(HumdrumFile& infile) {
 		if (m_removeQ) {
 			removePhraseMarks(m_starts[i]);
 		}
+		if (m_remove2Q) {
+			continue;
+		}
 		if (hasPhraseMarks(m_starts[i])) {
 			analyzeSpineByPhrase(i);
 		} else {
 			analyzeSpineByRests(i);
 		}
 	}
-	prepareAnalysis(infile);
-	cout << m_free_text.str();
+	if (!m_remove2Q) {
+		prepareAnalysis(infile);
+	}
+	infile.createLinesFromTokens();
 	return true;
 }
 
@@ -49400,8 +49408,35 @@ void Tool_phrase::prepareAnalysis(HumdrumFile& infile) {
 		int track = m_starts[i]->getTrack();
 		infile.insertDataSpineBefore(track, m_results[i-1], "", exinterp);
 	}
-	addAverageLines(infile);
-	infile.createLinesFromTokens();
+	if (m_averageQ) {
+		addAverageLines(infile);
+	}
+	if (!m_color.empty()) {
+		int insertline = -1;
+		for (int i=0; i<infile.getLineCount(); i++) {
+			if (infile[i].isData() || infile[i].isBarline()) {
+				insertline = i;
+				break;
+			}
+		}
+		if (insertline > 0) {
+			stringstream ss;
+			int fsize = infile[insertline].getFieldCount();
+			for (int j=0; j<fsize; j++) {
+				ss << "*";
+				HTp token = infile.token(insertline, j);
+				string dt = token->getDataType();
+				if (dt.empty() || (dt == "**cdata")) {
+					ss << "color:" << m_color;
+				}
+				if (j < fsize  - 1) {
+					ss << "\t";
+				}
+			}
+			string output = ss.str();
+			infile.insertLine(insertline, output);
+		}
+	}
 }
 
 
@@ -49462,6 +49497,11 @@ void Tool_phrase::initialize(HumdrumFile& infile) {
 	std::fill(m_psum.begin(), m_psum.end(), 0);
 	m_markQ = getBoolean("mark");
 	m_removeQ = getBoolean("remove");
+	m_averageQ = !getBoolean("no-average");
+	m_remove2Q = getBoolean("remove2");
+	if (getBoolean("color")) {
+		m_color = getString("color");
+	}
 }
 
 
@@ -49533,7 +49573,7 @@ void Tool_phrase::analyzeSpineByRests(int index) {
 		}
 		if (pstart && current->isNote() && (current->find(";") != std::string::npos)) {
 			// fermata at end of phrase.
-			dur = current->getDurationFromStart()
+			dur = current->getDurationFromStart() + current->getDuration()
 					- pstart->getDurationFromStart();
 			ss.str("");
 			ss.clear();
@@ -49545,6 +49585,7 @@ void Tool_phrase::analyzeSpineByRests(int index) {
 				current->setText(current->getText() + "}");
 			}
 			current = current->getNextToken();
+			pstart = NULL;
 			continue;
 		}
 		if (current->isNote() && pstart == NULL) {
