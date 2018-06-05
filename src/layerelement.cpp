@@ -1408,7 +1408,7 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         assert(note);
 
         // For now just ignore grace notes
-        if (note->HasGrace()) return FUNCTOR_CONTINUE;
+        if (note->IsGraceNote()) return FUNCTOR_CONTINUE;
 
         Chord *chord = note->IsChordTone();
 
