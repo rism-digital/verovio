@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1527702517
+ModificationTime: 1527689705
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -50,12 +50,12 @@ NameList: Adobe Glyph List
 DisplaySize: -128
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 59752 11 6
+WinInfo: 59807 11 6
 BeginPrivate: 0
 EndPrivate
 TeXData: 1 0 0 346030 173015 115343 0 1048576 115343 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
 AnchorClass2: "cutOutNW"""  "cutOutSW"""  "cutOutSE"""  "cutOutNE""" 
-BeginChars: 1114115 274
+BeginChars: 1114115 271
 
 StartChar: uniE0A3
 Encoding: 57507 57507 0
@@ -1879,7 +1879,7 @@ SplineSet
  105 104 l 1
  90 106 l 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE266
@@ -2438,7 +2438,7 @@ SplineSet
  161 -679 l 6
  162.172413793 -676.068965517 174.764380825 -654.188863739 179 -646 c 4
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE241
@@ -2467,7 +2467,7 @@ SplineSet
  161 679 l 6
  162.172851562 676.069335938 174.764648438 654.188476562 179 646 c 4
 EndSplineSet
-Validated: 9
+Validated: 524297
 EndChar
 
 StartChar: uniE08B
@@ -3503,7 +3503,7 @@ SplineSet
  62 -112 0 -111 0 -111 c 5
  0 -74 0 -37 0 0 c 5
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE003
@@ -3523,7 +3523,7 @@ SplineSet
  62 112 0 111 0 111 c 5
  -0 74 0 37 0 -0 c 5
 EndSplineSet
-Validated: 41
+Validated: 524329
 EndChar
 
 StartChar: uniE88A
@@ -3619,7 +3619,7 @@ SplineSet
  -70.6641 -150.667 -75.3301 -157.667 -80 -165 c 4
  -84.6641 -172.333 -88.3301 -177 -91 -179 c 5
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE521
@@ -3672,7 +3672,7 @@ SplineSet
  238 262 249 243 252 221 c 5
  274 238 301 262 337 262 c 4
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE520
@@ -3737,7 +3737,7 @@ SplineSet
  248.667 210.333 239.333 215 226 215 c 4xe8
  212 215 202.333 210.333 197 201 c 4
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE523
@@ -3982,7 +3982,7 @@ SplineSet
  646.333 13.333 644 19.667 644 27 c 0
  644 42.333 653 50 671 50 c 0x9f0a
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE655
@@ -4080,7 +4080,7 @@ SplineSet
  151.3 262.65 136 273.7 104.55 273.7 c 0
  68 273.7 48.4502 288.15 44.2002 317.9 c 1xfc20
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE046
@@ -4174,7 +4174,7 @@ SplineSet
  894 -1 886.667 2 882 8 c 1
  876 12.6667 872.333 19.3333 871 28 c 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE045
@@ -4547,7 +4547,7 @@ SplineSet
  397 -166 385.333 -162 376 -154 c 0
  366.667 -146 361.667 -135 361 -121 c 0
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE220
@@ -4788,7 +4788,7 @@ SplineSet
  319 -159 317 -148 317 -136 c 1
  321 -99 332 -79 363 -69 c 1xbf80
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE52F
@@ -4861,7 +4861,7 @@ SplineSet
  342.448 343.061 407.109 442 506 442 c 0
  541.726 442 552.923 411.294 555 376 c 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE531
@@ -4984,7 +4984,7 @@ SplineSet
  110 -223 87 -183 87 -136 c 0
  87 -97 105 -83 132 -69 c 1xbfc0
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE532
@@ -5135,7 +5135,7 @@ SplineSet
  866 -99.9207 852.382 -69 831 -69 c 4
  797.321 -69 782 -108.183 782 -140 c 4
 EndSplineSet
-Validated: 41
+Validated: 524329
 EndChar
 
 StartChar: NameMe.58897
@@ -5260,7 +5260,7 @@ SplineSet
  76 0 l 1
  153 224 l 5
 EndSplineSet
-Validated: 9
+Validated: 524297
 EndChar
 
 StartChar: uniE4A9
@@ -5283,7 +5283,7 @@ SplineSet
  76 0 l 1
  153 -224 l 5
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE4AA
@@ -5374,7 +5374,7 @@ SplineSet
  414.494 1 440.733 32.4674 456 63 c 4
  464.667 80.333 468.667 101.333 468 126 c 4xd8
 EndSplineSet
-Validated: 41
+Validated: 524329
 EndChar
 
 StartChar: uniE567
@@ -5427,7 +5427,7 @@ SplineSet
  414.493 243 440.732 211.532 456 181 c 4
  464.667 163.667 468.667 142.667 468 118 c 4xb8
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE56E
@@ -5485,7 +5485,7 @@ SplineSet
  710 181 l 1
  710 134 l 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE56A
@@ -5538,7 +5538,7 @@ SplineSet
  1 414.493 32.4678 440.732 63 456 c 4
  80.333 464.667 101.333 468.667 126 468 c 4xf0
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE569
@@ -5643,7 +5643,7 @@ SplineSet
  243 414.493 211.532 440.732 181 456 c 4
  163.667 464.667 142.667 468.667 118 468 c 4xe8
 EndSplineSet
-Validated: 41
+Validated: 524329
 EndChar
 
 StartChar: uniE938
@@ -5784,7 +5784,7 @@ SplineSet
  639 -166 627.333 -162 618 -154 c 0
  608.667 -146 603.667 -135 603 -121 c 0
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE502
@@ -5836,7 +5836,7 @@ SplineSet
  1123 -166 1111.33 -162 1102 -154 c 0
  1092.67 -146 1087.67 -135 1087 -121 c 0
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE901
@@ -5895,7 +5895,7 @@ SplineSet
  105.211914062 538.384765625 126 509.099609375 144 487.5 c 1
  170.099609375 511.799804688 220.774519488 591.440419402 226 645 c 0
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE904
@@ -5949,7 +5949,7 @@ SplineSet
  266 209 l 1
  266 -808 l 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE909
@@ -6001,7 +6001,7 @@ SplineSet
  6.37943217472 -391.144544189 4.400390625 -375.099609375 4.400390625 -375.099609375 c 1xd8
  3.7236328125 -348.99609375 0.1025390625 -117.15625 1.6025390625 206.19921875 c 2xe0
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE526
@@ -6046,7 +6046,7 @@ SplineSet
  33 209 -9 130 -17 115 c 1
  -39 115 l 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE527
@@ -6278,7 +6278,7 @@ SplineSet
  252 91 254 90 258 130 c 0
  260 148 261 161 262 169 c 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE52B
@@ -6392,7 +6392,7 @@ SplineSet
  36 151 l 5
  23 124 l 5
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE52A
@@ -6516,7 +6516,7 @@ SplineSet
  507 31 521 42 532 58 c 1
  552 91 554 90 558 130 c 0
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE529
@@ -6676,7 +6676,7 @@ SplineSet
  252 91 254 90 258 130 c 0
  260 148 261 161 262 169 c 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE528
@@ -6872,7 +6872,7 @@ SplineSet
  252 91 254 90 258 130 c 0
  260 148 261 161 262 169 c 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE533
@@ -7053,7 +7053,7 @@ SplineSet
  1098 -99.9207 1084.38 -69 1063 -69 c 0
  1029.32 -69 1014 -108.183 1014 -140 c 0
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE52C
@@ -7142,7 +7142,7 @@ SplineSet
  656.524 90.5408 658.559 90.0317 663 130 c 0
  665 148 666.333 161 667 169 c 0
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE52D
@@ -7229,7 +7229,7 @@ SplineSet
  238 262 249 243 252 221 c 1
  274 238 301 262 337 262 c 0xdc
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE52E
@@ -7314,7 +7314,7 @@ SplineSet
  251.524 90.5412 253.559 90.0315 258 130 c 0
  260 148 261.333 161 262 169 c 0xe5
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE534
@@ -7399,7 +7399,7 @@ SplineSet
  -116.617 -223 -143 -186.317 -143 -140 c 0
  -143 -108.178 -127.689 -69 -94 -69 c 0
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE535
@@ -7470,7 +7470,7 @@ SplineSet
  -116.617 -223 -143 -186.317 -143 -140 c 4
  -143 -108.178 -127.689 -69 -94 -69 c 4
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE536
@@ -7546,7 +7546,7 @@ SplineSet
  45 41 56 33 68 33 c 6
  81 33 l 6
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE537
@@ -7660,7 +7660,7 @@ SplineSet
  45 41 56 33 68 33 c 2
  81 33 l 2
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE538
@@ -7942,7 +7942,7 @@ SplineSet
  45 41 56 33 68 33 c 2
  81 33 l 2xa28080
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE539
@@ -8042,7 +8042,7 @@ SplineSet
  45 41 56 33 68 33 c 6
  81 33 l 6xa106
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE53A
@@ -8180,7 +8180,7 @@ SplineSet
  45 41 56 33 68 33 c 2
  81 33 l 2xd041c0
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE53C
@@ -8249,7 +8249,7 @@ SplineSet
  206 259 225 240 225 219 c 0
  225 189 215 174 194 174 c 0
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE53D
@@ -8342,7 +8342,7 @@ SplineSet
  206 259 225 240 225 219 c 0
  225 189 215 174 194 174 c 0
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE510
@@ -8387,7 +8387,7 @@ SplineSet
  123 259 l 5
  130.333 237 151.667 210.667 187 180 c 5
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE514
@@ -8544,7 +8544,7 @@ SplineSet
  322 191 310 204 310 219 c 4
  310 267 362 311 410 311 c 4
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE515
@@ -8699,7 +8699,7 @@ SplineSet
  265 179 258 174 245 162 c 1x8cbfe0
  242 149 238 137 224 137 c 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE516
@@ -8854,7 +8854,7 @@ SplineSet
  265 179 258 174 245 162 c 1x843fe0
  242 149 238 137 224 137 c 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE518
@@ -9037,7 +9037,7 @@ SplineSet
  322 191 310 204 310 219 c 0
  310 267 362 311 410 311 c 0
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE519
@@ -9220,7 +9220,7 @@ SplineSet
  322 191 310 204 310 219 c 0
  310 267 362 311 410 311 c 0
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE511
@@ -9367,7 +9367,7 @@ SplineSet
  123 259 l 1
  130.333 237 151.667 210.667 187 180 c 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE512
@@ -9514,7 +9514,7 @@ SplineSet
  123 259 l 1
  130.333 237 151.667 210.667 187 180 c 1x177e
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE513
@@ -9640,7 +9640,7 @@ SplineSet
  123 259 l 1
  130.333 237 151.667 210.667 187 180 c 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE504
@@ -9755,7 +9755,7 @@ SplineSet
  123.333333333 -61 142 -64.6666666667 154 -72 c 0
  172 -82.6666666667 181 -102.333333333 181 -131 c 0
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE906
@@ -9794,7 +9794,7 @@ SplineSet
  123.333333333 -61 142 -64.6666666667 154 -72 c 4
  172 -82.6666666667 181 -102.333333333 181 -131 c 4
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE4A2
@@ -9817,7 +9817,7 @@ SplineSet
  36 0 24.3330078125 4 15 12 c 4
  5.6669921875 20 0.6669921875 31 0 45 c 4
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE4A3
@@ -9840,7 +9840,7 @@ SplineSet
  36 0 24.3330078125 -4 15 -12 c 0
  5.6669921875 -20 0.6669921875 -31 0 -45 c 0
 EndSplineSet
-Validated: 9
+Validated: 524297
 EndChar
 
 StartChar: uniE4A4
@@ -9897,7 +9897,7 @@ SplineSet
  55 0 l 1
  110 224 l 5
 EndSplineSet
-Validated: 9
+Validated: 524297
 EndChar
 
 StartChar: uniE4A7
@@ -9920,7 +9920,7 @@ SplineSet
  55 0 l 1
  110 -224 l 5
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE4AE
@@ -9950,7 +9950,7 @@ SplineSet
  123 0 111.333007812 4 102 12 c 0
  92.6669921875 20 87.6669921875 31 87 45 c 0
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE4AF
@@ -9980,7 +9980,7 @@ SplineSet
  137 -375 l 1
  1 -110 l 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE4B0
@@ -10010,7 +10010,7 @@ SplineSet
  0 313 l 1
  0 346 l 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE4B1
@@ -10040,7 +10040,7 @@ SplineSet
  0 -313 l 1
  0 -346 l 1
 EndSplineSet
-Validated: 9
+Validated: 524297
 EndChar
 
 StartChar: uniE4B2
@@ -10068,7 +10068,7 @@ SplineSet
  347 140 l 25
  0 140 l 25
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE4B3
@@ -10096,7 +10096,7 @@ SplineSet
  347 -140 l 25
  0 -140 l 25
 EndSplineSet
-Validated: 9
+Validated: 524297
 EndChar
 
 StartChar: uniE4B4
@@ -10166,7 +10166,7 @@ SplineSet
  0 0 l 5
  190.211914062 112.4296875 l 5
 EndSplineSet
-Validated: 9
+Validated: 524297
 EndChar
 
 StartChar: uniE4B7
@@ -10189,7 +10189,7 @@ SplineSet
  0 0 l 1
  190.211914062 -112.4296875 l 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE4B8
@@ -10216,7 +10216,7 @@ SplineSet
  0 157.666992188 0.6669921875 164.333007812 2 167 c 5
  3.3330078125 166.333007812 4.3330078125 166 5 166 c 4
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE4B9
@@ -10243,7 +10243,7 @@ SplineSet
  0 -157.666992188 0.6669921875 -164.333007812 2 -167 c 5
  3.3330078125 -166.333007812 4.3330078125 -166 5 -166 c 4
 EndSplineSet
-Validated: 9
+Validated: 524297
 EndChar
 
 StartChar: uniE4BA
@@ -10270,7 +10270,7 @@ SplineSet
  1.2626953125 79.6328125 -1.3330078125 93.3330078125 0 96 c 5
  1.3330078125 95.3330078125 14.5673828125 77.5078125 15 77 c 4
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE4BB
@@ -10297,7 +10297,7 @@ SplineSet
  1.2626953125 -79.6328125 -1.3330078125 -93.3330078125 0 -96 c 1
  1.3330078125 -95.3330078125 14.5673828125 -77.5078125 15 -77 c 0
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE4C6
@@ -10345,7 +10345,7 @@ SplineSet
  411 204 426.666992188 198.333007812 438 187 c 4
  449.333007812 175.666992188 455.333007812 162.666992188 456 148 c 4
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE4C7
@@ -10393,7 +10393,7 @@ SplineSet
  411 -204 426.666992188 -198.333007812 438 -187 c 0
  449.333007812 -175.666992188 455.333007812 -162.666992188 456 -148 c 0
 EndSplineSet
-Validated: 9
+Validated: 524297
 EndChar
 
 StartChar: uniE4BC
@@ -10624,7 +10624,7 @@ SplineSet
  411 204 426.666992188 198.333007812 438 187 c 4
  449.333007812 175.666992188 455.333007812 162.666992188 456 148 c 4
 EndSplineSet
-Validated: 9
+Validated: 524297
 EndChar
 
 StartChar: uniE4C9
@@ -10695,7 +10695,7 @@ SplineSet
  411 -204 426.666992188 -198.333007812 438 -187 c 0
  449.333007812 -175.666992188 455.333007812 -162.666992188 456 -148 c 0
 EndSplineSet
-Validated: 9
+Validated: 524297
 EndChar
 
 StartChar: uniE4C4
@@ -10732,7 +10732,7 @@ SplineSet
  410 160 426.666992188 154.333007812 438 143 c 4
  449.333007812 131.666992188 455.333007812 118.666992188 456 104 c 4
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE4C2
@@ -10783,7 +10783,7 @@ SplineSet
  410 160 426.666992188 154.333007812 438 143 c 4
  449.333007812 131.666992188 455.333007812 118.666992188 456 104 c 4
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE4C3
@@ -10834,7 +10834,7 @@ SplineSet
  410 -160 426.666992188 -154.333007812 438 -143 c 4
  449.333007812 -131.666992188 455.333007812 -118.666992188 456 -104 c 4
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE4C5
@@ -10871,7 +10871,7 @@ SplineSet
  410 -160 426.666992188 -154.333007812 438 -143 c 4
  449.333007812 -131.666992188 455.333007812 -118.666992188 456 -104 c 4
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE4CE
@@ -10901,7 +10901,7 @@ SplineSet
  100.333333333 81 107 101.666666667 107 123 c 4
  107 143 101.333333333 157.333333333 90 166 c 5
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE93E
@@ -11094,7 +11094,7 @@ SplineSet
  0 -500 l 5
  0 -333.333007812 0 333.333333333 0 500 c 5
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE9F0
@@ -11117,7 +11117,7 @@ SplineSet
  90 -500 l 1
  90 -333.333007812 90 333.333007812 90 500 c 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE9F4
@@ -11327,7 +11327,7 @@ SplineSet
  146 81 145.333333333 86.3333333333 144 91 c 0
  142.666666667 95.6666666667 139.666666667 100.666666667 135 106 c 1
 EndSplineSet
-Validated: 5
+Validated: 524293
 EndChar
 
 StartChar: uniE271
@@ -11380,7 +11380,7 @@ SplineSet
  146 81 145.333333333 86.3333333333 144 91 c 0,61,-1
  142.666666667 95.6666666667 139.666666667 100.666666667 135 106 c 1,40,-1
 EndSplineSet
-Validated: 5
+Validated: 524293
 EndChar
 
 StartChar: uniE272
@@ -11809,7 +11809,7 @@ SplineSet
  97 -288 91 -282 154 -341 c 0
  189.626291689 -374.327821258 224.592212588 -414.589535817 247.893402859 -462.544065045 c 1
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE244
@@ -11855,7 +11855,7 @@ SplineSet
  97 -98 91 -92 154 -151 c 0
  188.98736519 -183.730115823 223.337833542 -223.147648447 246.628551416 -269.971415363 c 1
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE246
@@ -11911,7 +11911,7 @@ SplineSet
  97 -98 91 -92 154 -151 c 4
  188.98736519 -183.730115823 223.337833542 -223.147648447 246.628551416 -269.971415363 c 5
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE248
@@ -11977,7 +11977,7 @@ SplineSet
  255 -111 175 -43 87 -16 c 4
  75.6068756864 -12.8352432462 59.8068498362 -10.0711139049 39.5999224482 -6.69330133545 c 5
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE24A
@@ -12053,7 +12053,7 @@ SplineSet
  97 -98 91 -92 154 -151 c 4
  188.98736519 -183.730115823 223.337833542 -223.147648447 246.628551416 -269.971415363 c 5
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE243
@@ -12089,7 +12089,7 @@ SplineSet
  97 288 91 282 154 341 c 0
  189.625976562 374.328125 224.591796875 414.58984375 247.893554688 462.543945312 c 1
 EndSplineSet
-Validated: 41
+Validated: 524329
 EndChar
 
 StartChar: uniE245
@@ -12135,7 +12135,7 @@ SplineSet
  97 98 91 92 154 151 c 0
  188.987304688 183.73046875 223.337890625 223.147460938 246.62890625 269.971679688 c 1
 EndSplineSet
-Validated: 41
+Validated: 524329
 EndChar
 
 StartChar: uniE247
@@ -12191,7 +12191,7 @@ SplineSet
  97 98 91 92 154 151 c 0
  188.987304688 183.73046875 223.337890625 223.147460938 246.62890625 269.971679688 c 1
 EndSplineSet
-Validated: 41
+Validated: 524329
 EndChar
 
 StartChar: uniE249
@@ -12257,7 +12257,7 @@ SplineSet
  255 111 175 43 87 16 c 0
  75.6064453125 12.8349609375 59.806640625 10.0712890625 39.599609375 6.693359375 c 1
 EndSplineSet
-Validated: 41
+Validated: 524329
 EndChar
 
 StartChar: uniE24B
@@ -12333,7 +12333,7 @@ SplineSet
  97 98 91 92 154 151 c 0
  188.987304688 183.73046875 223.337890625 223.147460938 246.62890625 269.971679688 c 1
 EndSplineSet
-Validated: 41
+Validated: 524329
 EndChar
 
 StartChar: uniE4EB
@@ -12413,7 +12413,7 @@ SplineSet
  97 -633 89 -632 79 -629 c 5
  110 -624 131 -607 131 -574 c 5xbf04
 EndSplineSet
-Validated: 41
+Validated: 524329
 EndChar
 
 StartChar: uniE4EC
@@ -12460,7 +12460,7 @@ SplineSet
  252.799804688 28.7998046875 l 5
  252.799804688 -28 l 5
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE08C
@@ -12487,7 +12487,7 @@ SplineSet
  341.279296875 38.87890625 l 1
  341.279296875 -37.7998046875 l 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE59E
@@ -12517,7 +12517,7 @@ SplineSet
  77 84 71 80 68 77.599609375 c 2
  0 16.7998046875 l 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE59D
@@ -12545,7 +12545,7 @@ SplineSet
  77 84 71 80 68 77.599609375 c 2
  0 16.7998046875 l 1
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniEAAA
@@ -12841,7 +12841,7 @@ SplineSet
  664.240234375 108.299804688 l 2
  658.825195312 114.618164062 653.01953125 116.421875 651.21484375 116.421875 c 0
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE910
@@ -12988,7 +12988,7 @@ SplineSet
  480 -132 372 -240 240 -240 c 0
  108 -240 0 -132 0 0 c 0
 EndSplineSet
-Validated: 5
+Validated: 524293
 EndChar
 
 StartChar: uniE91C
@@ -13018,7 +13018,7 @@ SplineSet
  480 -132 372 -240 240 -240 c 0
  108 -240 0 -132 0 0 c 0
 EndSplineSet
-Validated: 5
+Validated: 524293
 EndChar
 
 StartChar: uniE914
@@ -13049,7 +13049,7 @@ SplineSet
  303 -35 275 -63 240 -63 c 0
  205 -63 177 -35 177 0 c 0
 EndSplineSet
-Validated: 41
+Validated: 524329
 EndChar
 
 StartChar: uniE917
@@ -13085,7 +13085,7 @@ SplineSet
  303 -35 275 -63 240 -63 c 0
  205 -63 177 -35 177 0 c 0xf8
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE91E
@@ -13121,7 +13121,7 @@ SplineSet
  303 35 275 63 240 63 c 0
  205 63 177 35 177 0 c 0
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE920
@@ -13163,7 +13163,7 @@ SplineSet
  129.25 25.5 150.25 46.5 175.75 46.5 c 0
  202 46.5 223 25.5 223 0 c 0
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE922
@@ -13244,7 +13244,7 @@ SplineSet
  263.6796875 -72.3203125 204.799804688 -130.560546875 131.83984375 -130.560546875 c 0
  58.8798828125 -130.560546875 0 -72.3203125 0 0 c 0
 EndSplineSet
-Validated: 1
+Validated: 524289
 EndChar
 
 StartChar: uniE925
@@ -13292,7 +13292,7 @@ SplineSet
  258 408 l 5
  222 408 l 5
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE915
@@ -13317,7 +13317,7 @@ SplineSet
  36 113 127 204 240 204 c 4
  319.931994365 204 375 173 421 96 c 5
 EndSplineSet
-Validated: 41
+Validated: 524329
 EndChar
 
 StartChar: uniE916
@@ -13342,7 +13342,7 @@ SplineSet
  444 113 353 204 240 204 c 4
  160.068359375 204 105 173 59 96 c 5
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE919
@@ -13372,7 +13372,7 @@ SplineSet
  444 113 353 204 240 204 c 0
  160.068359375 204 105 173 59 96 c 1
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE91A
@@ -13403,7 +13403,7 @@ SplineSet
  444 113 353 204 240 204 c 0
  160.068359375 204 105 173 59 96 c 1
 EndSplineSet
-Validated: 33
+Validated: 524321
 EndChar
 
 StartChar: uniE91F
@@ -13433,7 +13433,7 @@ SplineSet
  150.620117188 240 77 195 30.9501953125 117.528320312 c 1
  47 105 40 110 59 96 c 1
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE91D
@@ -13463,7 +13463,7 @@ SplineSet
  -25.8720703125 -240.416015625 l 5
  480.416015625 265.872070312 l 5
 EndSplineSet
-Validated: 37
+Validated: 524325
 EndChar
 
 StartChar: uniE990
@@ -13717,92 +13717,6 @@ SplineSet
  0 750 l 1
 EndSplineSet
 Validated: 1
-EndChar
-
-StartChar: uniE99E
-Encoding: 59806 59806 271
-Width: 153
-Flags: HW
-LayerCount: 2
-Fore
-SplineSet
-153 49 m 2
- 153 -74 l 2
- 153 -119 153 -155 141 -185 c 0
- 130 -213 102 -235 56 -246 c 0
- 52 -246 48 -243 46 -236 c 0
- 46 -230 49 -226 54 -223 c 0
- 67 -219 81 -213 93 -206 c 0
- 108 -198 119 -184 123 -167 c 0
- 129 -146 128 -121 129 -99 c 0
- 129 -87 129 -66 111 -66 c 0
- 106 -66 96 -71 76 -81 c 0
- 56 -92 42 -97 35 -97 c 0
- 12 -97 0 -81 0 -50 c 2
- 0 113 l 2
- 0 114 1 114 3 114 c 0
- 4 114 6 114 6 113 c 0
- 7 86 14 66 35 66 c 0
- 42 66 56 70 76 81 c 0
- 96 90 109 95 117 95 c 0
- 141 95 153 80 153 49 c 2
-EndSplineSet
-EndChar
-
-StartChar: uniE99B
-Encoding: 59803 59803 272
-Width: 154
-Flags: HW
-LayerCount: 2
-Fore
-SplineSet
-0 -76 m 2
- 0 56 l 1
- 9 24 21 8 34 8 c 0
- 46 8 53 32 55 80 c 1
- 61 61 66 48 70 41 c 0
- 75 32 81 29 89 29 c 0
- 97 29 103 50 108 95 c 1
- 117 60 125 42 131 42 c 0
- 139 42 148 66 154 115 c 1
- 154 -38 l 2
- 154 -66 149 -79 139 -79 c 0
- 132 -79 125 -70 119 -52 c 1
- 115 -85 107 -102 91 -102 c 0
- 79 -102 66 -91 53 -68 c 1
- 46 -100 36 -115 25 -115 c 0
- 10 -115 0 -96 0 -76 c 2
-EndSplineSet
-EndChar
-
-StartChar: uniE99F
-Encoding: 59807 59807 273
-Width: 124
-Flags: HW
-LayerCount: 2
-Fore
-SplineSet
-2 4 m 2
- 58 90 l 2
- 59 92 60 93 62 93 c 0
- 63 93 65 92 67 90 c 2
- 67 90 74 66 88 45 c 0
- 95 34 104 24 113 15 c 0
- 118 10 124 5 124 -2 c 0
- 124 -4 123 -6 122 -8 c 0
- 114 -25 107 -42 95 -57 c 0
- 90 -64 85 -70 79 -76 c 0
- 74 -81 69 -86 63 -89 c 0
- 62 -90 56 -92 53 -92 c 0
- 52 -92 50 -92 50 -91 c 0
- 50 -90 51 -89 52 -88 c 0
- 56 -84 57 -80 57 -76 c 0
- 57 -67 50 -58 44 -51 c 2
- 12 -17 l 2
- 8 -13 4 -10 1 -6 c 0
- 0 -4 0 -2 0 -1 c 0
- 0 1 0 2 2 4 c 2
-EndSplineSet
 EndChar
 EndChars
 EndSplineFont
