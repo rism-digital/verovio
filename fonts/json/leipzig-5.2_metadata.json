@@ -2482,36 +2482,6 @@
                 -1.604
             ]
         },
-        "uniE99B": {
-            "bBoxNE": [
-                0.616,
-                0.46
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.46
-            ]
-        },
-        "uniE99E": {
-            "bBoxNE": [
-                0.612,
-                0.456
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.984
-            ]
-        },
-        "uniE99F": {
-            "bBoxNE": [
-                0.496,
-                0.372
-            ],
-            "bBoxSW": [
-                0.0,
-                -0.368
-            ]
-        },
         "uniE9B4": {
             "bBoxNE": [
                 0.056,
@@ -3478,15 +3448,6 @@
         },
         "uniE996": {
             "codepoint": "0XE996"
-        },
-        "uniE99B": {
-            "codepoint": "0XE99B"
-        },
-        "uniE99E": {
-            "codepoint": "0XE99E"
-        },
-        "uniE99F": {
-            "codepoint": "0XE99F"
         },
         "uniE9B4": {
             "codepoint": "0XE9B4"
