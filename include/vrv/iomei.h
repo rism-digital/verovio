@@ -626,6 +626,7 @@ private:
      */
     ///@{
     // to MEI 4.0.0
+    void UpgradeScoreDefTo_4_0_0(pugi::xml_node scoreDef, ScoreDef *vrvScoreDef);
     void UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef);
     void UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvStaffGrp);
     // to MEI 3.0.0 (Page-Based MEI only)

@@ -1484,7 +1484,7 @@ void MeiOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
 void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
 {
     assert(neume);
-    
+
     WriteLayerElement(currentNode, neume);
     neume->WriteColor(currentNode);
 }
@@ -2913,6 +2913,10 @@ bool MeiInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
         vrvScoreDef = new ScoreDef();
     }
     ReadScoreDefElement(scoreDef, vrvScoreDef);
+
+    if (m_version < MEI_4_0_0) {
+        UpgradeScoreDefTo_4_0_0(scoreDef, vrvScoreDef);
+    }
 
     ReadScoreDefInterface(scoreDef, vrvScoreDef);
     vrvScoreDef->ReadEndings(scoreDef);
@@ -5102,8 +5106,32 @@ bool MeiInput::IsEditorialElementName(std::string elementName)
     return false;
 }
 
+void MeiInput::UpgradeScoreDefTo_4_0_0(pugi::xml_node scoreDef, ScoreDef *vrvScoreDef)
+{
+    if (scoreDef.attribute("key.sig.show")) {
+        vrvScoreDef->SetKeysigShow(
+            vrvScoreDef->AttKeySigDefaultVis::StrToBoolean(scoreDef.attribute("key.sig.show").value()));
+        scoreDef.remove_attribute("key.sig.show");
+    }
+    if (scoreDef.attribute("key.sig.showchange")) {
+        vrvScoreDef->SetKeysigShowchange(
+            vrvScoreDef->AttKeySigDefaultVis::StrToBoolean(scoreDef.attribute("key.sig.showchange").value()));
+        scoreDef.remove_attribute("key.sig.showchange");
+    }
+}
+
 void MeiInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef)
 {
+    if (staffDef.attribute("key.sig.show")) {
+        vrvStaffDef->SetKeysigShow(
+            vrvStaffDef->AttKeySigDefaultVis::StrToBoolean(staffDef.attribute("key.sig.show").value()));
+        staffDef.remove_attribute("key.sig.show");
+    }
+    if (staffDef.attribute("key.sig.showchange")) {
+        vrvStaffDef->SetKeysigShowchange(
+            vrvStaffDef->AttKeySigDefaultVis::StrToBoolean(staffDef.attribute("key.sig.showchange").value()));
+        staffDef.remove_attribute("key.sig.showchange");
+    }
     if (staffDef.attribute("label")) {
         Text *text = new Text();
         text->SetText(UTF8to16(staffDef.attribute("label").value()));
