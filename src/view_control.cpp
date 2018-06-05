@@ -898,7 +898,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         }
     }
     // normal case or end
-    if ((spanningType == SPANNING_START_END) || (SPANNING_END)) {
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
         end->FindAllChildByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
         for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
