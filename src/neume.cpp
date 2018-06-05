@@ -126,6 +126,30 @@ NeumeGroup Neume::GetNeumeGroup()
     return s_neumes[key]; 
 }
 
+std::vector<int> Neume::GetPitchDifferences()
+{
+    std::vector<int> pitchDifferences;
+    ArrayOfObjects ncChildren;
+    AttComparison ac(NC);
+    this->FindAllChildByComparison(&ncChildren, &ac);
+
+    pitchDifferences.reserve(ncChildren.size() - 1);
+
+    // Iterate through children and calculate pitch differences
+    auto iter = ncChildren.begin();
+    Nc *previous = dynamic_cast<Nc *>(*iter);
+    if (previous == nullptr) return pitchDifferences;
+    iter ++;
+
+    for (; iter != ncChildren.end(); iter++) {
+        Nc *current = dynamic_cast<Nc *>(*iter);
+        assert(current);
+        pitchDifferences.push_back(current->PitchDifferenceTo(previous));
+        previous = current;
+    }
+    return pitchDifferences;
+}
+
 bool Neume::GenerateChildMelodic()
 {
     ArrayOfObjects children;
