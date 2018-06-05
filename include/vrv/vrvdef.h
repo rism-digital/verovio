@@ -161,13 +161,16 @@ enum ClassId {
     MRPT2,
     MULTIREST,
     MULTIRPT,
+    NC,
     NOTE,
+    NEUME,
     TUPLET_NUM,
     PROPORT,
     REST,
     SPACE,
     STEM,
     SYL,
+    SYLLABLE,
     TIMESTAMP_ATTR,
     TUPLET,
     VERSE,
@@ -221,11 +224,15 @@ class Arpeg;
 class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
+class Comparison;
 class FloatingPositioner;
 class GraceAligner;
+class InterfaceComparison;
 class LayerElement;
 class LedgerLine;
+class Nc;
 class Note;
+class Neume;
 class Object;
 class PlistInterface;
 class Point;
@@ -239,7 +246,7 @@ typedef std::vector<Object *> ArrayOfObjects;
 
 typedef std::vector<Object *> ListOfObjects;
 
-typedef std::vector<AttComparison *> ArrayOfAttComparisons;
+typedef std::vector<Comparison *> ArrayOfComparisons;
 
 typedef std::vector<Note *> ChordCluster;
 

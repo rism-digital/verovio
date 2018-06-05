@@ -16,6 +16,7 @@
 
 #include "attcomparison.h"
 #include "beam.h"
+#include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
@@ -36,6 +37,7 @@
 #include "mordent.h"
 #include "mrest.h"
 #include "mrpt.h"
+#include "multirest.h"
 #include "note.h"
 #include "octave.h"
 #include "pb.h"
@@ -166,13 +168,13 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     assert(i >= 0);
 
     // we just need to add a measure
-    if (i == section->GetChildCount(MEASURE)) {
+    if (section->GetChildCount(MEASURE) <= i) {
         section->AddChild(measure);
     }
     // otherwise copy the content to the corresponding existing measure
     else if (section->GetChildCount(MEASURE) > i) {
         AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
-        Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByAttComparison(&comparisonMeasure, 1));
+        Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
         Object *current;
         for (current = measure->GetFirst(); current; current = measure->GetNext()) {
@@ -248,7 +250,7 @@ Layer *MusicXmlInput::SelectLayer(int layerNum, Staff *staff)
     }
     else {
         AttNIntegerComparison comparisonLayer(LAYER, layerNum);
-        layer = dynamic_cast<Layer *>(staff->FindChildByAttComparison(&comparisonLayer, 1));
+        layer = dynamic_cast<Layer *>(staff->FindChildByComparison(&comparisonLayer, 1));
     }
     if (layer) return layer;
     // else add it
@@ -572,7 +574,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     for (iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
         if (!measure || (measure->GetN() != iter->first)) {
             AttNNumberLikeComparison comparisonMeasure(MEASURE, iter->first);
-            measure = dynamic_cast<Measure *>(section->FindChildByAttComparison(&comparisonMeasure, 1));
+            measure = dynamic_cast<Measure *>(section->FindChildByComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
             LogWarning("Element '%s' could not be added to measure '%s'", iter->second->GetClassName().c_str(),
@@ -661,7 +663,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
         for (i = 0; i < nbStaves; i++) {
             // Find or create the staffDef
             AttNIntegerComparison comparisonStaffDef(STAFFDEF, i + 1 + staffOffset);
-            StaffDef *staffDef = dynamic_cast<StaffDef *>(staffGrp->FindChildByAttComparison(&comparisonStaffDef, 1));
+            StaffDef *staffDef = dynamic_cast<StaffDef *>(staffGrp->FindChildByComparison(&comparisonStaffDef, 1));
             if (!staffDef) {
                 staffDef = new StaffDef();
                 staffDef->SetN(i + 1 + staffOffset);
@@ -752,7 +754,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 staffDef->SetLines(5);
             std::string scaleStr = staffDetails.node().select_single_node("staff-size").node().text().as_string();
             if (!scaleStr.empty()) {
-                staffDef->SetScale(staffDef->AttScalable::StrToPercent(scaleStr));
+                staffDef->SetScale(staffDef->AttScalable::StrToPercent(scaleStr + "%"));
             }
             pugi::xpath_node staffTuning = staffDetails.node().select_single_node("staff-tuning");
             if (staffTuning) {
@@ -810,6 +812,14 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             // ppq
             pugi::xpath_node divisions = it->select_single_node("divisions");
             if (divisions) m_ppq = divisions.node().text().as_int();
+            // measure style
+            pugi::xpath_node measureSlash = it->select_single_node("measure-style/slash");
+            if (measureSlash) {
+                if (HasAttributeWithValue(measureSlash.node(), "type", "start"))
+                    m_slash = true;
+                else
+                    m_slash = false;
+            }
         }
     }
 
@@ -830,10 +840,15 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     int i = 0;
     for (pugi::xpath_node_set::const_iterator it = measures.begin(); it != measures.end(); ++it) {
         pugi::xpath_node xmlMeasure = *it;
-        Measure *measure = new Measure();
-        ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset);
-        // Add the measure to the system - if already there from a previous part we'll just merge the content
-        AddMeasure(section, measure, i);
+        if (m_multiRest != 0) {
+          m_multiRest--;
+        }
+        else {
+          Measure *measure = new Measure();
+          ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset);
+          // Add the measure to the system - if already there from a previous part we'll just merge the content
+          AddMeasure(section, measure, i);
+        }
         i++;
     }
     return false;
@@ -853,6 +868,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         // the staff @n must take into account the staffOffset
         Staff *staff = new Staff();
         staff->SetN(i + 1 + staffOffset);
+        staff->SetVisible(ConvertWordToBool(node.child("attributes").child("staff-details").attribute("print-object").value()));
         measure->AddChild(staff);
         // layers will be added in SelectLayer
     }
@@ -867,6 +883,16 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
 
     // read the content of the measure
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
+        // first check if there is a multi measure rest
+        if (it->select_single_node(".//multiple-rest")) {
+            m_multiRest = it->select_single_node(".//multiple-rest").node().text().as_int();
+            MultiRest * multiRest = new MultiRest;
+            multiRest->SetNum(m_multiRest);
+            Layer *layer = SelectLayer(1, measure);
+            AddLayerElement(layer, multiRest);
+            --m_multiRest;
+            break;
+        }
         if (IsElement(*it, "attributes")) {
             ReadMusicXmlAttributes(*it, section, measure, measureNum);
         }
@@ -996,11 +1022,18 @@ void MusicXmlInput::ReadMusicXmlAttributes(
     }
 
     pugi::xpath_node measureRepeat = node.select_single_node("measure-style/measure-repeat");
+    pugi::xpath_node measureSlash = node.select_single_node("measure-style/slash");
     if (measureRepeat) {
         if (HasAttributeWithValue(measureRepeat.node(), "type", "start"))
             m_mRpt = true;
         else
             m_mRpt = false;
+    }
+    if (measureSlash) {
+        if (HasAttributeWithValue(measureSlash.node(), "type", "start"))
+            m_slash = true;
+        else
+            m_slash = false;
     }
 }
 
@@ -1405,13 +1438,23 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         }
         // we assume /note without /type to be mRest
         else if (typeStr.empty() || HasAttributeWithValue(rest.node(), "measure", "yes")) {
-            MRest *mRest = new MRest();
-            element = mRest;
-            // FIXME MEI 4.0.0
-            // if (cue) mRest->SetSize(SIZE_cue);
-            if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
-            if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
-            AddLayerElement(layer, mRest);
+            if (m_slash) {
+              for (int i = m_meterCount; i > 0; --i) {
+                BeatRpt *slash = new BeatRpt;
+                AddLayerElement(layer, slash);
+              }
+              return;
+            }
+            else {
+              MRest *mRest = new MRest();
+              element = mRest;
+              // FIXME MEI 4.0.0
+              // if (cue) mRest->SetSize(SIZE_cue);
+              if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
+              if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
+              AddLayerElement(layer, mRest);
+            }
+
         }
         else {
             Rest *rest = new Rest();

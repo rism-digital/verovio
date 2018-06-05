@@ -43,7 +43,7 @@ Mensur::Mensur(const ScoreDefInterface *mensurAttr) : LayerElement("mensur-")
 {
     Init();
 
-    // this->SetColor(mensurAttr->GetMensurColor());
+    this->SetColor(mensurAttr->GetMensurColor());
     this->SetDot(mensurAttr->GetMensurDot());
     this->SetOrient(mensurAttr->GetMensurOrient());
     this->SetSign(mensurAttr->GetMensurSign());

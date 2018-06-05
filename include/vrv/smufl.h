@@ -260,6 +260,20 @@ enum {
     SMUFL_E94A_mensuralCombStemDownFlagSemiminima = 0xE94A,
     SMUFL_E94B_mensuralCombStemUpFlagFusa = 0xE94B,
     SMUFL_E94C_mensuralCombStemDownFlagFusa = 0xE94C,
+    SMUFL_E990_chantPunctum = 0xE990,
+    SMUFL_E991_chantPunctumInclinatum = 0xE991,
+    SMUFL_E9B4_chantEntryLineAsc2nd = 0xE9B4,
+    SMUFL_E9B5_chantEntryLineAsc3rd = 0xE9B5,
+    SMUFL_E9B6_chantEntryLineAsc4th = 0xE9B6,
+    SMUFL_E9B7_chantEntryLineAsc5th = 0xE9B7,
+    SMUFL_E9B9_chantLigaturaDesc2nd = 0xE9B9,
+    SMUFL_E9BA_chantLigaturaDesc3rd = 0xE9BA,
+    SMUFL_E9BB_chantLigaturaDesc4th = 0xE9BB,
+    SMUFL_E9BC_chantLigaturaDesc5th = 0xE9BC,
+    SMUFL_E9BD_chantConnectingLineAsc2nd = 0xE9BD,
+    SMUFL_E9BE_chantConnectingLineAsc3rd = 0xE9BE,
+    SMUFL_E9BF_chantConnectingLineAsc4th = 0xE9BF,
+    SMUFL_E9C0_chantConnectingLineAsc5th = 0xE9C0,
     SMUFL_E9F0_mensuralRestMaxima = 0xE9F0,
     SMUFL_E9F1_mensuralRestLongaPerfecta = 0xE9F1,
     SMUFL_E9F2_mensuralRestLongaImperfecta = 0xE9F2,
@@ -269,6 +283,8 @@ enum {
     SMUFL_E9F6_mensuralRestSemiminima = 0xE9F6,
     SMUFL_E9F7_mensuralRestFusa = 0xE9F7,
     SMUFL_E9F8_mensuralRestSemifusa = 0xE9F8,
+    SMUFL_EA02_mensuralCustosUp = 0xEA02,
+    SMUFL_EA06_chantCustosStemUpPosMiddle = 0xEA06,
     SMUFL_EAA9_wiggleArpeggiatoUp = 0xEAA9,
     SMUFL_EAAA_wiggleArpeggiatoDown = 0xEAAA,
     SMUFL_EAAD_wiggleArpeggiatoUpArrow = 0xEAAD,
@@ -276,7 +292,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 251
+#define SMUFL_COUNT 267
 
 } // namespace vrv
 

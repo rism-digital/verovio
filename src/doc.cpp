@@ -136,7 +136,7 @@ bool Doc::GenerateDocumentScoreDef()
 
     ArrayOfObjects staves;
     AttComparison matchType(STAFF);
-    measure->FindAllChildByAttComparison(&staves, &matchType);
+    measure->FindAllChildByComparison(&staves, &matchType);
 
     if (staves.empty()) {
         LogError("No staff found for generating a scoreDef");
@@ -203,7 +203,7 @@ bool Doc::GenerateMeasureNumbers()
     AttComparison matchType(MEASURE);
     ArrayOfObjects measures;
     ArrayOfObjects::iterator measureIter;
-    this->FindAllChildByAttComparison(&measures, &matchType);
+    this->FindAllChildByComparison(&measures, &matchType);
 
     // run through all measures and generate missing mNum from attribute
     for (measureIter = measures.begin(); measureIter != measures.end(); ++measureIter) {
@@ -307,7 +307,7 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
     // track 0 (included by default) is reserved for meta messages common to all tracks
     int midiChannel = 0;
     int midiTrack = 1;
-    std::vector<AttComparison *> filters;
+    ArrayOfComparisons filters;
     for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
          staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
 
@@ -316,7 +316,11 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             // get the transposition (semi-tone) value for the staff
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
             midiTrack = staffDef->GetN();
-            midiFile->addTrack();
+            int trackCount = midiFile->getTrackCount();
+            int addCount = midiTrack + 1 - trackCount;
+            if (addCount > 0) {            
+                 midiFile->addTracks(addCount);
+            }
             // set MIDI channel and instrument
             InstrDef *instrdef = dynamic_cast<InstrDef *>(staffDef->FindChildByType(INSTRDEF, 1));
             if (!instrdef) {
@@ -560,7 +564,7 @@ void Doc::PrepareDrawing()
 
     /************ Resolve some pointers by layer ************/
 
-    std::vector<AttComparison *> filters;
+    ArrayOfComparisons filters;
     for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
          staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
@@ -987,7 +991,7 @@ void Doc::ConvertToUnCastOffMensuralDoc()
 
     ConvertToUnCastOffMensuralParams convertToUnCastOffMensuralParams;
 
-    std::vector<AttComparison *> filters;
+    ArrayOfComparisons filters;
     // Now we can process by layer and move their content to (measure) segments
     for (auto const &staves : prepareProcessingListsParams.m_layerTree.child) {
         for (auto const &layers : staves.second.child) {
@@ -1047,7 +1051,7 @@ void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
 
     // Process by layer for matching @tie attribute - we process notes and chords, looking at
     // GetTie values and pitch and oct for matching notes
-    std::vector<AttComparison *> filters;
+    ArrayOfComparisons filters;
     for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
          staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {

@@ -44,9 +44,11 @@ class Measure;
 class ScoreDef;
 class Note;
 class Hairpin;
+class MRest;
 class Rest;
 class Score;
 class Section;
+class Space;
 class Staff;
 class StaffDef;
 class StaffGrp;
@@ -272,7 +274,8 @@ protected:
     void setClef(StaffDef *part, const std::string &clef);
     void setTransposition(StaffDef *part, const std::string &transpose);
     void setDynamicTransposition(int partindex, StaffDef *part, const std::string &itranspose);
-    void setTimeSig(StaffDef *part, const std::string &timesig);
+    void setTimeSig(
+        StaffDef *part, const std::string &timesig, const std::string &metersig = "", hum::HTp partstart = NULL);
     void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
     void calculateReverseKernIndex();
@@ -290,6 +293,7 @@ protected:
     void processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex);
     void processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex);
     void addFermata(hum::HTp token, vrv::Object *parent = NULL);
+    void addBreath(hum::HTp token, vrv::Object *parent = NULL);
     void addTrill(hum::HTp token);
     void addTurn(vrv::Object *linked, hum::HTp token);
     void addMordent(vrv::Object *linked, hum::HTp token);
@@ -345,6 +349,7 @@ protected:
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum frac = 0);
     hum::HumNum getMeasureTstampPlusDur(hum::HTp token, int staffindex, hum::HumNum fract = 0);
     hum::HumNum getMeasureEndTstamp(int staffindex);
+    hum::HumNum getMeasureFactor(int staffindex);
     hum::HTp getPreviousDataToken(hum::HTp token);
     hum::HTp getHairpinEnd(hum::HTp token, const std::string &endchar);
     hum::HTp getDecrescendoEnd(hum::HTp token);
@@ -383,7 +388,11 @@ protected:
     void resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void resolveTupletBeamStartTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
     void resolveTupletBeamEndTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
+    void mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void embedQstampInClass(vrv::Note *note, hum::HTp token, const std::string &tstring);
+    void embedQstampInClass(vrv::Rest *note, hum::HTp token, const std::string &tstring);
+    void embedQstampInClass(vrv::MRest *mrest, hum::HTp token, const std::string &tstring);
+    void embedQstampInClass(vrv::Space *irest, hum::HTp token, const std::string &tstring);
     void embedPitchInformationInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
     void splitSyllableBySpaces(vector<string> &vtext, char spacer = ' ');
@@ -418,6 +427,7 @@ protected:
     std::string getLayoutParameter(hum::HTp token, const std::string &category, const std::string &keyname);
     void convertMensuralToken(
         std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token, int staffindex);
+    void initializeSpineColor(hum::HumdrumFile &infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -430,7 +440,7 @@ protected:
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class ELEMENT> void verticalRest(ELEMENT rest, const std::string &token);
-    template <class ELEMENT> void setKeySig(int partindex, ELEMENT element, const std::string &keysig);
+    template <class ELEMENT> void setKeySig(int partindex, ELEMENT element, const std::string &keysig, bool secondary);
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
     template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
@@ -441,12 +451,15 @@ protected:
 
     template <class CHILD>
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
+    void popElementStack(std::vector<string> &elements, std::vector<void *> &pointers);
 
     template <class ELEMENT> void addTextElement(ELEMENT *element, const std::string &content);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
     template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place);
-    template <class ELEMENT> void setMeterSymbol(ELEMENT *element, const std::string &metersig);
+    template <class ELEMENT>
+    void setMeterSymbol(ELEMENT *element, const std::string &metersig, hum::HTp partstart = NULL);
+    template <class ELEMENT> void setMensurationSymbol(ELEMENT *element, const std::string &metersig);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
@@ -598,6 +611,9 @@ private:
 
     // m_has_color_spine == true if a color spine is present.
     bool m_has_color_spine = false;
+
+    // m_spine_color == list of colors to apply to spine data
+    std::vector<string> m_spine_color;
 
     // m_traspose == transposition to go from sounding to written pitch.
     vector<int> m_transpose;

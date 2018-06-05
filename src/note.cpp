@@ -120,12 +120,12 @@ void Note::AddChild(Object *child)
     // additional verification for accid and artic - this will no be raised with editorial markup, though
     if (child->Is(ACCID)) {
         IsAttributeComparison isAttributeComparison(ACCID);
-        if (this->FindChildByAttComparison(&isAttributeComparison))
+        if (this->FindChildByComparison(&isAttributeComparison))
             LogWarning("Having both @accid or @accid.ges and <accid> child will cause problems");
     }
     else if (child->Is(ARTIC)) {
         IsAttributeComparison isAttributeComparison(ARTIC);
-        if (this->FindChildByAttComparison(&isAttributeComparison))
+        if (this->FindChildByComparison(&isAttributeComparison))
             LogWarning("Having both @artic and <artic> child will cause problems");
     }
 
@@ -860,7 +860,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     }
 
     // For now just ignore grace notes
-    if (this->HasGrace()) {
+    if (this->IsGraceNote()) {
         return FUNCTOR_SIBLINGS;
     }
 
