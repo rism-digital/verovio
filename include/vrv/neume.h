@@ -88,6 +88,8 @@ public:
     
     NeumeGroup GetNeumeGroup();
 
+    std::vector<int> GetPitchDifferences(); 
+
 private:
     //
 public:
