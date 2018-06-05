@@ -99,7 +99,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     wchar_t fontNo = SMUFL_E990_chantPunctum, secondaryFontNo = 0;
 
-    float xOffset = 0, yOffset = 0;
+    float xOffset = 0, yOffset = 0, xOffset2 = 0, yOffset2 = 0;
     bool secondaryGlyph = false;
 
     std::vector<int> pitchDifferences = neume->GetPitchDifferences();
@@ -145,7 +145,6 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
                     if (position == 0)
                         yOffset = pitchDifferences.at(0);
                     else {
-                        // TODO set x and y position to use first nc
                         xOffset = -1;
                         yOffset = -pitchDifferences.at(0);
                     }
@@ -162,6 +161,22 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         case CLIVIS:
         {
             // TODO add connecting lie
+            if (pitchDifferences.at(0) < -1 && position == 1) {
+                secondaryGlyph = true;
+                switch (pitchDifferences.at(0)) {
+                    case -2:
+                        secondaryFontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                        break;
+                    case -3:
+                        secondaryFontNo = SMUFL_E9BF_chantConnectingLineAsc4th;
+                        break;
+                    case -4:
+                        secondaryFontNo = SMUFL_E9C0_chantConnectingLineAsc5th;
+                        break;
+                    default:
+                        break;
+                }
+            }
             if (position == 0) {
                 xOffset = 0.25;
             }
@@ -221,7 +236,12 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
     DrawSmuflCode(dc, noteX + xOffset * noteWidth, yValue + yOffset * noteHeight,
             fontNo, staff->m_drawingStaffSize, false, true);
-    
+   
+    if (secondaryGlyph) {
+        DrawSmuflCode(dc, noteX + xOffset2 * noteWidth, yValue + yOffset2 * noteHeight,
+            secondaryFontNo, staff->m_drawingStaffSize, false, true);
+    }
+
     // Draw the children
     DrawLayerChildren(dc, nc, layer, staff, measure);
 
