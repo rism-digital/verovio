@@ -2420,7 +2420,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
     }
 
     if (keysig.size() > 0) {
-        setKeySig(partnumber - 1, m_staffdef.back(), keysig);
+        setKeySig(partnumber - 1, m_staffdef.back(), keysig, false);
     }
 
     if (primarymensuration.empty()) {
@@ -2790,7 +2790,8 @@ void HumdrumInput::setTimeSig(
 // HumdrumInput::setKeySig -- Convert a Humdrum keysig to an MEI keysig.
 //
 
-template <class ELEMENT> void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &keysig)
+template <class ELEMENT>
+void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &keysig, bool secondary)
 {
     bool fs = keysig.find("f#") != string::npos;
     bool cs = keysig.find("c#") != string::npos;
@@ -2882,6 +2883,11 @@ template <class ELEMENT> void HumdrumInput::setKeySig(int partindex, ELEMENT ele
         case +7: element->SetKeySig(KEYSIGNATURE_7s); break;
         case -7: element->SetKeySig(KEYSIGNATURE_7f); break;
         default: element->SetKeySig(KEYSIGNATURE_NONE);
+    }
+
+    if (secondary && (keyvalue == 0)) {
+        // force cancellation keysignature.
+        element->SetKeysigShowchange(BOOLEAN_true);
     }
 }
 
@@ -6639,7 +6645,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
     }
     if (keysig) {
         // cerr << "KEYSIG = " << keysig << endl;
-        setKeySig(-1, scoreDef, *((string *)keysig));
+        setKeySig(-1, scoreDef, *((string *)keysig), true);
     }
 }
 
