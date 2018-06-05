@@ -951,11 +951,6 @@ public:
     data_BOOLEAN GetWavy() const { return m_wavy; }
     bool HasWavy() const;
     ///@}
-    //
-    void SetNcSign(ncVis_NCSIGN ncsign_) { m_ncsign = ncsign_; } 
-    ncVis_NCSIGN GetNcSign() const { return m_ncsign; }
-    bool HasNcSign() const;
-
 
 private:
     /** The shape of the neume component is angled or has a bend. **/
@@ -987,8 +982,7 @@ private:
     data_BOOLEAN m_strophicus;
     /** The shape of the neume component is wavy. **/
     data_BOOLEAN m_wavy;
-    /** --- **/
-    ncVis_NCSIGN m_ncsign;
+
     /* include <attwavy> */
 };
 
