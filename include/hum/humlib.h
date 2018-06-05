@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat May  5 00:28:09 PDT 2018
+// Last Modified: Mon Jun  4 01:40:10 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1175,6 +1175,8 @@ class HumdrumToken : public string, public HumHash {
 		bool     hasSlurEnd                (void);
 		int      hasVisibleAccidental      (int subtokenIndex) const;
 		int      hasCautionaryAccidental   (int subtokenIndex) const;
+		bool     hasLigatureBegin          (void);
+		bool     hasLigatureEnd            (void);
 
 		HumNum   getDuration               (void) const;
 		HumNum   getDuration               (HumNum scale) const;
@@ -1212,7 +1214,7 @@ class HumdrumToken : public string, public HumHash {
 		int      getTokenIndex             (void) const;
 		int      getTokenNumber            (void) const;
 		const string& getDataType          (void) const;
-		bool     isDataType                (string dtype) const;
+		bool     isDataType                (const string& dtype) const;
 		bool     isKern                    (void) const;
 		bool     isMens                    (void) const;
 		string   getSpineInfo              (void) const;
@@ -1518,6 +1520,7 @@ class HumdrumFileBase : public HumHash {
 		void          example                  (void);
 
 		HTp           getTrackStart            (int track) const;
+		void          getSpineStopList         (vector<HTp>& spinestops);
 		HTp           getSpineStart            (int spine) const
 		                                       { return getTrackStart(spine+1); }
 		void          getSpineStartList        (vector<HTp>& spinestarts);
@@ -1525,6 +1528,7 @@ class HumdrumFileBase : public HumHash {
 		                                        const string& exinterp);
 		void          getKernSpineStartList    (vector<HTp>& spinestarts);
 		vector<HTp>   getKernSpineStartList    ();
+		int           getExinterpCount         (const string& exinterp);
 		void          getSpineStartList        (vector<HTp>& spinestarts,
 		                                        const vector<string>& exinterps);
 		void          getTrackStartList        (vector<HTp>& spinestarts)
@@ -2511,7 +2515,7 @@ class Convert {
 		// **mens, white mensual notation, defiend in Convert-mens.cpp
 		static bool    isMensRest           (const string& mensdata);
 		static bool    isMensNote           (const string& mensdata);
-		static bool    hasLigatureStart     (const string& mensdata);
+		static bool    hasLigatureBegin     (const string& mensdata);
 		static bool    hasLigatureEnd       (const string& mensdata);
 		static bool    getMensStemDirection (const string& mensdata);
 		static HumNum  mensToDuration       (const string& mensdata,
@@ -2666,6 +2670,7 @@ class MxmlPart {
 		int           getStaffCount        (void) const;
 		int           getVerseCount        (void) const;
 		int           getVerseCount        (int staffindex) const;
+		string        getCaesura           (void) const;
 		int           getHarmonyCount      (void) const;
 		void          trackStaffVoices     (int staffnum, int voicenum);
 		void          printStaffVoiceInfo  (void);
@@ -2687,6 +2692,7 @@ class MxmlPart {
 		void          receiveHarmonyCount         (int count);
 		void          receiveEditorialAccidental  (void);
 		void          receiveDynamic              (void);
+		void          receiveCaesura              (const string& letter);
 
 	protected:
 		vector<MxmlMeasure*> m_measures;
@@ -2700,6 +2706,7 @@ class MxmlPart {
 		bool                 m_has_dynamics = false;
 		string               m_partname;
 		string               m_partabbr;
+		string               m_caesura;
 
 		// m_staffvoicehist: counts of staff and voice numbers.  
 		// staff=0 is used for items such as measures.
@@ -3150,12 +3157,13 @@ class MxmlEvent {
 		string             getElementName     (void);
 		void               addNotations       (stringstream& ss, 
 		                                       xml_node notations) const;
-		void               reportVerseCountToOwner         (int count);
-		void               reportVerseCountToOwner         (int staffnum, int count);
-		void               reportHarmonyCountToOwner       (int count);
-		void               reportMeasureStyleToOwner       (MeasureStyle style);
+		void               reportVerseCountToOwner    (int count);
+		void               reportVerseCountToOwner    (int staffnum, int count);
+		void               reportHarmonyCountToOwner  (int count);
+		void               reportMeasureStyleToOwner  (MeasureStyle style);
 		void               reportEditorialAccidentalToOwner(void);
-		void               reportDynamicToOwner            (void);
+		void               reportDynamicToOwner       (void);
+		void               reportCaesuraToOwner       (const string& letter = "Z") const;
       void               makeDummyRest      (MxmlMeasure* owner, 
 		                                       HumNum startime,
 		                                       HumNum duration,
@@ -3286,6 +3294,7 @@ class MxmlMeasure {
 		void  reportHarmonyCountToOwner           (int count);
 		void  reportEditorialAccidentalToOwner    (void);
 		void  reportDynamicToOwner                (void);
+		void  reportCaesuraToOwner                (const string& letter);
 
 	protected:
 		HumNum             m_starttime; // start time of measure in quarter notes
@@ -4407,6 +4416,30 @@ class Tool_imitation : public HumTool {
 };
 
 
+class Tool_kern2mens : public HumTool {
+	public:
+		         Tool_kern2mens           (void);
+		        ~Tool_kern2mens           () {};
+
+		bool     run                      (HumdrumFile& infile);
+		bool     run                      (const string& indata, ostream& out);
+		bool     run                      (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     convertToMens            (HumdrumFile& infile);
+		string   convertKernTokenToMens   (HTp token);
+		void     printBarline             (HumdrumFile& infile, int line);
+
+	private:
+		bool     m_numbersQ   = true;      // used with -N option
+		bool     m_measuresQ  = true;      // used with -M option
+		bool     m_invisibleQ = true;      // used with -I option
+		bool     m_doublebarQ = true;      // used with -D option
+		string   m_clef;                   // used with -c option
+
+};
+
+
 class mei_staffDef {
 	public:
 		HumNum timestamp;
@@ -4540,7 +4573,7 @@ class Tool_mei2hum : public HumTool {
 		void   parseTempo           (xml_node tempo, HumNum starttime);
 		void   parseDir             (xml_node dir, HumNum starttime);
 		HumNum getDuration          (xml_node element);
-		string getHumdrumPitch      (xml_node note);
+		string getHumdrumPitch      (xml_node note, vector<xml_node>& children);
 		string getHumdrumRecip      (HumNum duration, int dotcount);
 		void   buildIdLinkMap       (xml_document& doc);
 		void   processNodeStartLinks(string& output, xml_node node,
@@ -4596,6 +4629,11 @@ class Tool_mei2hum : public HumTool {
 		string prepareSystemDecoration(xml_node scoreDef);
 		void   getRecursiveSDString  (string& output, xml_node current);
 		void   parseBareSyl          (xml_node syl, GridStaff* staff);
+		string getChildAccidGes      (vector<xml_node>& children);
+		string getChildAccidVis      (vector<xml_node>& children);
+
+		// static functions
+		static string accidToKern(const string& accid);
 
 	private:
 		Options        m_options;
@@ -4931,6 +4969,9 @@ class Tool_musicxml2hum : public HumTool {
 		void getChildrenVector (vector<xml_node>& children, xml_node parent);
 		void insertPartTranspositions(xml_node transposition, GridPart& part);
 		xml_node convertTranspositionToHumdrum(xml_node transpose, HTp& token, int& staffindex);
+		void prepareRdfs       (vector<MxmlPart>& partdata);
+		void printRdfs         (ostream& out);
+		void printResult       (ostream& out, HumdrumFile& outfile);
 
 	public:
 
@@ -4940,12 +4981,15 @@ class Tool_musicxml2hum : public HumTool {
 		Options m_options;
 		bool DebugQ;
 		bool VoiceDebugQ;
-		bool m_recipQ = false;
-		bool m_stemsQ = false;
-		int m_slurabove = 0;
-		int m_slurbelow = 0;
+		bool m_recipQ       = false;
+		bool m_stemsQ       = false;
+		int  m_slurabove    = 0;
+		int  m_slurbelow    = 0;
 		char m_hasEditorial = '\0';
 		vector<vector<string>> m_last_ottava_direction;
+
+		// RDF indications in **kern data:
+		string  m_caesura_rdf;
 
 		string m_software;
 		string m_systemDecoration;
@@ -5110,6 +5154,40 @@ class Tool_myank : public HumTool {
 };
 
 
+class Tool_phrase : public HumTool {
+	public:
+		     Tool_phrase          (void);
+		    ~Tool_phrase          () {};
+
+		bool  run                 (HumdrumFile& infile);
+		bool  run                 (const string& indata, ostream& out);
+		bool  run                 (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void  analyzeSpineByRests (int index);
+		void  analyzeSpineByPhrase(int index);
+		void  initialize          (HumdrumFile& infile);
+		void  prepareAnalysis     (HumdrumFile& infile);
+		void  addAverageLines     (HumdrumFile& infile);
+		bool  hasPhraseMarks      (HTp start);
+		void  removePhraseMarks   (HTp start);
+
+	private:
+		vector<vector<string>>    m_results;
+		vector<HTp>               m_starts;
+		HumdrumFile               m_infile;
+		vector<int>               m_pcount;
+		vector<HumNum>            m_psum;
+		bool                      m_markQ;
+      bool                      m_removeQ;
+      bool                      m_remove2Q;
+      bool                      m_averageQ;
+		string                    m_color;
+
+};
+
+
+
 class Tool_recip : public HumTool {
 	public:
 		      Tool_recip               (void);
@@ -5230,6 +5308,8 @@ class Tool_transpose : public HumTool {
 		                                 int index, int transval);
 		int      hasTrMarkers           (HumdrumFile& infile, int line);
 		void     printHumdrumKernToken  (HumdrumLine& record, int index,
+		                                 int transval);
+		void     printHumdrumMxhmToken(HumdrumLine& record, int index,
 		                                 int transval);
 		int      checkForDeletedLine    (HumdrumFile& infile, int line);
 		int      getBase40ValueFromInterval(const string& string);
