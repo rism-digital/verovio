@@ -290,9 +290,6 @@ public:
     std::string NcVisQuilismaToStr(ncVis_QUILISMA data) const;
     ncVis_QUILISMA StrToNcVisQuilisma(std::string value, bool logWarning = true) const;
 
-    std::string NcVisNcSignToStr(ncVis_NCSIGN data) const;
-    ncVis_NCSIGN StrToNcVisNcSign(std::string value, bool logWarning = true) const;
-
     std::string NoteAnlMensuralLigToStr(noteAnlMensural_LIG data) const;
     noteAnlMensural_LIG StrToNoteAnlMensuralLig(std::string value, bool logWarning = true) const;
 

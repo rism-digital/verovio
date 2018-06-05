@@ -951,11 +951,6 @@ public:
     data_BOOLEAN GetWavy() const { return m_wavy; }
     bool HasWavy() const;
     ///@}
-    //
-    void SetNcSign(ncVis_NCSIGN ncsign_) { m_ncsign = ncsign_; } 
-    ncVis_NCSIGN GetNcSign() const { return m_ncsign; }
-    bool HasNcSign() const;
-
 
 private:
     /** --- **/
@@ -990,8 +985,7 @@ private:
     ncVis_QUILISMA m_quilisma;
     /** --- **/
     data_BOOLEAN m_wavy;
-    /** --- **/
-    ncVis_NCSIGN m_ncsign;
+
     /* include <attwavy> */
 };
 
