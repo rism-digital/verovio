@@ -63,6 +63,13 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     Nc *nc = dynamic_cast<Nc *>(element);
     assert(nc);
 
+    struct drawingParams {
+        wchar_t fontNo = SMUFL_E990_chantPunctum;
+        float xOffset = 0;
+        float yOffset = 0;
+    };
+    std::vector<drawingParams> params;
+    params.push_back(drawingParams());
     dc->StartGraphic(element, "", element->GetUuid());
 
     /******************************************************************/
@@ -95,12 +102,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     assert(neume);
 
     NeumeGroup group = neume->GetNeumeGroup();
-    int position = neume->GetChildIndex(element); 
-
-    wchar_t fontNo = SMUFL_E990_chantPunctum, secondaryFontNo = 0;
-
-    float xOffset = 0, yOffset = 0, xOffset2 = 0, yOffset2 = 0;
-    bool secondaryGlyph = false;
+    int position = neume->GetChildIndex(element);     
 
     std::vector<int> pitchDifferences = neume->GetPitchDifferences();
 
@@ -109,10 +111,10 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         case PES_SUBPUNCTIS:
         {
             if (position == 1 && pitchDifferences.at(0) > 0) {
-                xOffset = -0.25;
+                params.at(0).xOffset = -0.25;
             }
             else if (position >= 2) {
-                fontNo = SMUFL_E991_chantPunctumInclinatum;
+                params.at(0).fontNo = SMUFL_E991_chantPunctumInclinatum;
             }
             break;
         }
@@ -125,35 +127,35 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
                 case 1:
                     switch (pitchDifferences.at(0)) {
                         case -1:
-                            fontNo = (position == 0) ?
+                            params.at(0).fontNo = (position == 0) ?
                                 SMUFL_E9B4_chantEntryLineAsc2nd : SMUFL_E9B9_chantLigaturaDesc2nd;
                             break;
                         case -2:
-                            fontNo = (position == 0) ?
+                            params.at(0).fontNo = (position == 0) ?
                                 SMUFL_E9B5_chantEntryLineAsc3rd : SMUFL_E9BA_chantLigaturaDesc3rd;
                             break;
                         case -3:
-                            fontNo = (position == 0) ?
+                            params.at(0).fontNo = (position == 0) ?
                                 SMUFL_E9B6_chantEntryLineAsc4th : SMUFL_E9BB_chantLigaturaDesc4th;
                             break;
                         case -4:
-                            fontNo = (position == 0) ?
+                            params.at(0).fontNo = (position == 0) ?
                                 SMUFL_E9B7_chantEntryLineAsc5th : SMUFL_E9BC_chantLigaturaDesc5th;
                             break;
                         default: break;
                     }
                     if (position == 0)
-                        yOffset = pitchDifferences.at(0);
+                        params.at(0).yOffset = pitchDifferences.at(0);
                     else {
-                        xOffset = -1;
-                        yOffset = -pitchDifferences.at(0);
+                        params.at(0).xOffset = -1;
+                        params.at(0).yOffset = -pitchDifferences.at(0);
                     }
                     break;
                 case 2:
                     break;
                 default:
                     if (group == PORRECTUS_SUBPUNCTIS)
-                        fontNo = SMUFL_E991_chantPunctumInclinatum;
+                        params.at(0).fontNo = SMUFL_E991_chantPunctumInclinatum;
                     break;
             }
             break;
@@ -162,23 +164,25 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         {
             // TODO add connecting lie
             if (pitchDifferences.at(0) < -1 && position == 1) {
-                secondaryGlyph = true;
+                drawingParams p;
                 switch (pitchDifferences.at(0)) {
                     case -2:
-                        secondaryFontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
+                        p.fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
                         break;
                     case -3:
-                        secondaryFontNo = SMUFL_E9BF_chantConnectingLineAsc4th;
+                        p.fontNo = SMUFL_E9BF_chantConnectingLineAsc4th;
                         break;
                     case -4:
-                        secondaryFontNo = SMUFL_E9C0_chantConnectingLineAsc5th;
+                        p.fontNo = SMUFL_E9C0_chantConnectingLineAsc5th;
                         break;
                     default:
+                        p.fontNo = SMUFL_E9BD_chantConnectingLineAsc2nd;
                         break;
                 }
+                params.push_back(p);
             }
             if (position == 0) {
-                xOffset = 0.25;
+                params.at(0).xOffset = 0.25;
             }
             break;
         }
@@ -186,7 +190,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         case CLIMACUS_RESUPINUS:
         {
             if (position != 0) {
-                fontNo = SMUFL_E991_chantPunctumInclinatum;
+                params.at(0).fontNo = SMUFL_E991_chantPunctumInclinatum;
             }
             break;
         }
@@ -195,7 +199,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         case SCANDICUS_SUBPUNCTIS:
         {
             if (position > 2) {
-                fontNo = SMUFL_E991_chantPunctumInclinatum; 
+                params.at(0).fontNo = SMUFL_E991_chantPunctumInclinatum; 
             }
             break;
         }
@@ -203,45 +207,43 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         {
             if (pitchDifferences.at(1) == 1) {
                 if (position == 1) {
-                    fontNo = SMUFL_E9B9_chantLigaturaDesc2nd;
+                    params.at(0).fontNo = SMUFL_E9B9_chantLigaturaDesc2nd;
                 }
                 else if (position == 2) {
-                    fontNo = SMUFL_E9BD_chantConnectingLineAsc2nd;
+                    params.at(0).fontNo = SMUFL_E9BD_chantConnectingLineAsc2nd;
                 }
             }
             else if (pitchDifferences.at(1) == 2) {
                 if (position == 1) {
-                    fontNo = SMUFL_E9BA_chantLigaturaDesc3rd;
+                    params.at(0).fontNo = SMUFL_E9BA_chantLigaturaDesc3rd;
                 }
                 else if (position == 2) {
-                    fontNo = SMUFL_E9BD_chantConnectingLineAsc2nd;
+                    params.at(0).fontNo = SMUFL_E9BD_chantConnectingLineAsc2nd;
                 }
             }
             break;
         }
         case PRESSUS:
         {
-            fontNo = (position == 2) ? SMUFL_E991_chantPunctumInclinatum : SMUFL_E990_chantPunctum;
+            params.at(0).fontNo = (position == 2) ? SMUFL_E991_chantPunctumInclinatum : SMUFL_E990_chantPunctum;
             break;
         }
         default: break;
     } 
     // If the nc is supposed to be a virga and currently is being rendered as a punctum
     // change it to a virga
-    if (nc->HasAttribute("diagonalright", "u") && fontNo == SMUFL_E990_chantPunctum) {
-        fontNo = SMUFL_E996_chantPunctumVirga;
+    if (nc->HasAttribute("diagonalright", "u") && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
+        params.at(0).fontNo = SMUFL_E996_chantPunctumVirga;
     }
 
     const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
-    DrawSmuflCode(dc, noteX + xOffset * noteWidth, yValue + yOffset * noteHeight,
-            fontNo, staff->m_drawingStaffSize, false, true);
-   
-    if (secondaryGlyph) {
-        DrawSmuflCode(dc, noteX + xOffset2 * noteWidth, yValue + yOffset2 * noteHeight,
-            secondaryFontNo, staff->m_drawingStaffSize, false, true);
-    }
-
+    
+    for (auto it = params.begin(); it != params.end(); it++) {
+        DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight,
+               it->fontNo, staff->m_drawingStaffSize, false, true);
+    } 
+    
     // Draw the children
     DrawLayerChildren(dc, nc, layer, staff, measure);
 
