@@ -860,7 +860,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     }
 
     // For now just ignore grace notes
-    if (this->HasGrace()) {
+    if (this->IsGraceNote()) {
         return FUNCTOR_SIBLINGS;
     }
 

@@ -316,7 +316,11 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             // get the transposition (semi-tone) value for the staff
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
             midiTrack = staffDef->GetN();
-            midiFile->addTrack();
+            int trackCount = midiFile->getTrackCount();
+            int addCount = midiTrack + 1 - trackCount;
+            if (addCount > 0) {            
+                 midiFile->addTracks(addCount);
+            }
             // set MIDI channel and instrument
             InstrDef *instrdef = dynamic_cast<InstrDef *>(staffDef->FindChildByType(INSTRDEF, 1));
             if (!instrdef) {
