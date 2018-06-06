@@ -98,7 +98,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     int yValue = clefYPosition + pitchOffset + octaveOffset;
 
     // Determine grouping component is a part of and its position
-    Neume *neume = dynamic_cast<Neume *>(nc->GetParent());
+    Neume *neume = dynamic_cast<Neume *>(nc->GetFirstParent(NEUME));
     assert(neume);
 
     NeumeGroup group = neume->GetNeumeGroup();
@@ -232,7 +232,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     } 
     // If the nc is supposed to be a virga and currently is being rendered as a punctum
     // change it to a virga
-    if (nc->HasAttribute("diagonalright", "u") && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
+    if (nc->GetDiagonalright() == ncVis_DIAGONALRIGHT_u && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
         params.at(0).fontNo = SMUFL_E996_chantPunctumVirga;
     }
 
