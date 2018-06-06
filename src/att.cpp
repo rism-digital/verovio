@@ -326,6 +326,54 @@ data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool logWarning) const
     return std::make_pair(measure, timePoint);
 }
 
+std::string Att::MidivalueNameToStr(data_MIDIVALUE_NAME data) const
+{
+    std::string value;
+    if (data.GetType() == MIDIVALUENAMETYPE_midivalue)
+        value = MidivalueToStr(data.GetMidivalue());
+    else if (data.GetType() == MIDIVALUENAMETYPE_mcname)
+        value = NcnameToStr(data.GetNcname());
+
+    return value;
+}
+
+data_MIDIVALUE_NAME Att::StrToMidivalueName(std::string value, bool logWarning) const
+{
+    data_MIDIVALUE_NAME data;
+    data.SetMidivalue(StrToMidivalue(value));
+    if (data.HasValue()) return data;
+    data.SetNcname(StrToNcname(value));
+    if (data.HasValue()) return data;
+
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.MIDIVALUE_NAME '%s'", value.c_str());
+
+    return data;
+}
+    
+std::string Att::MidivaluePanToStr(data_MIDIVALUE_PAN data) const
+{
+    std::string value;
+    if (data.GetType() == MIDIVALUEPANTYPE_midivalue)
+        value = MidivalueToStr(data.GetMidivalue());
+    else if (data.GetType() == MIDIVALUEPANTYPE_percentLimitedSigned)
+        value = PercentLimitedSignedToStr(data.GetPercentLimitedSigned());
+
+    return value;
+}
+
+data_MIDIVALUE_PAN Att::StrToMidivaluePan(std::string value, bool logWarning) const
+{
+    data_MIDIVALUE_PAN data;
+    data.SetMidivalue(StrToMidivalue(value));
+    if (data.HasValue()) return data;
+    data.SetPercentLimitedSigned(StrToPercentLimitedSigned(value));
+    if (data.HasValue()) return data;
+
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.MIDIVALUE_PAN '%s'", value.c_str());
+
+    return data;
+}
+    
 std::string Att::ModusmaiorToStr(data_MODUSMAIOR data) const
 {
     std::string value;

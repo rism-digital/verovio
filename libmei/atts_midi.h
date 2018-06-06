@@ -162,8 +162,8 @@ public:
     data_MIDIVALUE GetMidiPatchnum() const { return m_midiPatchnum; }
     bool HasMidiPatchnum() const;
     //
-    void SetMidiVolume(data_MIDIVALUE_PERCENT midiVolume_) { m_midiVolume = midiVolume_; }
-    data_MIDIVALUE_PERCENT GetMidiVolume() const { return m_midiVolume; }
+    void SetMidiVolume(data_PERCENT midiVolume_) { m_midiVolume = midiVolume_; }
+    data_PERCENT GetMidiVolume() const { return m_midiVolume; }
     bool HasMidiVolume() const;
     ///@}
 
@@ -188,7 +188,7 @@ private:
     /** Records a non-General MIDI patch/instrument number. **/
     data_MIDIVALUE m_midiPatchnum;
     /** Sets the instrument's volume. **/
-    data_MIDIVALUE_PERCENT m_midiVolume;
+    data_PERCENT m_midiVolume;
 
     /* include <attmidi.volume> */
 };

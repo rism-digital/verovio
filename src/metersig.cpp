@@ -33,7 +33,7 @@ MeterSig::MeterSig(const ScoreDefInterface *meterSigAttr) : LayerElement("msig-"
     Init();
 
     this->SetCount(meterSigAttr->GetMeterCount());
-    this->SetForm(meterSigDefaultVisToMeterSigVis(meterSigAttr->GetMeterRend()));
+    this->SetForm(meterSigDefaultVisToMeterSigVis(meterSigAttr->GetMeterForm()));
     this->SetSym(meterSigAttr->GetMeterSym());
     this->SetUnit(meterSigAttr->GetMeterUnit());
 }

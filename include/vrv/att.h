@@ -147,6 +147,9 @@ public:
 
     std::string MidivalueToStr(data_MIDIVALUE data) const { return IntToStr(data); }
     data_MIDIVALUE StrToMidivalue(std::string value) const { return StrToInt(value); }
+    
+    std::string NcnameToStr(data_NCNAME data) const { return StrToStr(data); }
+    data_NCNAME StrToNcname(std::string value) const { return StrToStr(value); }
 
     std::string OctaveToStr(data_OCTAVE data) const { return IntToStr(data); }
     data_OCTAVE StrToOctave(std::string value) const { return StrToInt(value); }
@@ -193,6 +196,12 @@ public:
     std::string FontsizeToStr(data_FONTSIZE data) const;
     data_FONTSIZE StrToFontsize(std::string value, bool logWarning = true) const;
 
+    std::string MidivalueNameToStr(data_MIDIVALUE_NAME data) const;
+    data_MIDIVALUE_NAME StrToMidivalueName(std::string value, bool logWarning = true) const;
+    
+    std::string MidivaluePanToStr(data_MIDIVALUE_PAN data) const;
+    data_MIDIVALUE_PAN StrToMidivaluePan(std::string value, bool logWarning = true) const;
+    
     std::string StaffitemToStr(data_STAFFITEM data) const;
     data_STAFFITEM StrToStaffitem(std::string value, bool logWarning = true) const;
 

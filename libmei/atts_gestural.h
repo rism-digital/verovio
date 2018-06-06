@@ -377,20 +377,20 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetAzimuth(data_DEGREES azimuth_) { m_azimuth = azimuth_; }
-    data_DEGREES GetAzimuth() const { return m_azimuth; }
+    void SetAzimuth(double azimuth_) { m_azimuth = azimuth_; }
+    double GetAzimuth() const { return m_azimuth; }
     bool HasAzimuth() const;
     //
-    void SetElevation(data_DEGREES elevation_) { m_elevation = elevation_; }
-    data_DEGREES GetElevation() const { return m_elevation; }
+    void SetElevation(double elevation_) { m_elevation = elevation_; }
+    double GetElevation() const { return m_elevation; }
     bool HasElevation() const;
     ///@}
 
 private:
     /** The lateral or left-to-right plane. **/
-    data_DEGREES m_azimuth;
+    double m_azimuth;
     /** The above-to-below axis. **/
-    data_DEGREES m_elevation;
+    double m_elevation;
 
     /* include <attelevation> */
 };

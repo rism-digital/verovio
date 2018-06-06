@@ -42,8 +42,8 @@ AttChannelized::~AttChannelized()
 void AttChannelized::ResetChannelized()
 {
     m_midiChannel = -1;
-    m_midiDuty = PERCENT_LIMITED_NONE;
-    m_midiPort = MIDIVALUE_NAME_NONE;
+    m_midiDuty = -1.0;
+    m_midiPort = data_MIDIVALUE_NAME();
     m_midiTrack = 0;
 }
 
@@ -102,12 +102,12 @@ bool AttChannelized::HasMidiChannel() const
 
 bool AttChannelized::HasMidiDuty() const
 {
-    return (m_midiDuty != PERCENT_LIMITED_NONE);
+    return (m_midiDuty != -1.0);
 }
 
 bool AttChannelized::HasMidiPort() const
 {
-    return (m_midiPort != MIDIVALUE_NAME_NONE);
+    return (m_midiPort != data_MIDIVALUE_NAME());
 }
 
 bool AttChannelized::HasMidiTrack() const
@@ -180,10 +180,10 @@ void AttMidiInstrument::ResetMidiInstrument()
 {
     m_midiInstrnum = -1;
     m_midiInstrname = MIDINAMES_NONE;
-    m_midiPan = MIDIVALUE_PAN_NONE;
+    m_midiPan = data_MIDIVALUE_PAN();
     m_midiPatchname = "";
     m_midiPatchnum = -1;
-    m_midiVolume = MIDIVALUE_PERCENT_NONE;
+    m_midiVolume = -1.0;
 }
 
 bool AttMidiInstrument::ReadMidiInstrument(pugi::xml_node element)
@@ -215,7 +215,7 @@ bool AttMidiInstrument::ReadMidiInstrument(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("midi.volume")) {
-        this->SetMidiVolume(StrToMidivaluePercent(element.attribute("midi.volume").value()));
+        this->SetMidiVolume(StrToPercent(element.attribute("midi.volume").value()));
         element.remove_attribute("midi.volume");
         hasAttribute = true;
     }
@@ -246,7 +246,7 @@ bool AttMidiInstrument::WriteMidiInstrument(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasMidiVolume()) {
-        element.append_attribute("midi.volume") = MidivaluePercentToStr(this->GetMidiVolume()).c_str();
+        element.append_attribute("midi.volume") = PercentToStr(this->GetMidiVolume()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -264,7 +264,7 @@ bool AttMidiInstrument::HasMidiInstrname() const
 
 bool AttMidiInstrument::HasMidiPan() const
 {
-    return (m_midiPan != MIDIVALUE_PAN_NONE);
+    return (m_midiPan != data_MIDIVALUE_PAN());
 }
 
 bool AttMidiInstrument::HasMidiPatchname() const
@@ -279,7 +279,7 @@ bool AttMidiInstrument::HasMidiPatchnum() const
 
 bool AttMidiInstrument::HasMidiVolume() const
 {
-    return (m_midiVolume != MIDIVALUE_PERCENT_NONE);
+    return (m_midiVolume != -1.0);
 }
 
 /* include <attmidi.volume> */
@@ -629,7 +629,7 @@ bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
         if (attrType == "midi.volume") {
-            att->SetMidiVolume(att->StrToMidivaluePercent(attrValue));
+            att->SetMidiVolume(att->StrToPercent(attrValue));
             return true;
         }
     }
@@ -733,7 +733,7 @@ void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("midi.patchnum", att->MidivalueToStr(att->GetMidiPatchnum())));
         }
         if (att->HasMidiVolume()) {
-            attributes->push_back(std::make_pair("midi.volume", att->MidivaluePercentToStr(att->GetMidiVolume())));
+            attributes->push_back(std::make_pair("midi.volume", att->PercentToStr(att->GetMidiVolume())));
         }
     }
     if (element->HasAttClass(ATT_MIDINUMBER)) {
