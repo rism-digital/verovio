@@ -499,6 +499,67 @@ bool AttSectionGes::HasAttacca() const
 /* include <attattacca> */
 
 //----------------------------------------------------------------------------
+// AttSoundLocation
+//----------------------------------------------------------------------------
+
+AttSoundLocation::AttSoundLocation() : Att()
+{
+    ResetSoundLocation();
+}
+
+AttSoundLocation::~AttSoundLocation()
+{
+}
+
+void AttSoundLocation::ResetSoundLocation()
+{
+    m_azimuth = 0.0;
+    m_elevation = 0.0;
+}
+
+bool AttSoundLocation::ReadSoundLocation(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("azimuth")) {
+        this->SetAzimuth(StrToDbl(element.attribute("azimuth").value()));
+        element.remove_attribute("azimuth");
+        hasAttribute = true;
+    }
+    if (element.attribute("elevation")) {
+        this->SetElevation(StrToDbl(element.attribute("elevation").value()));
+        element.remove_attribute("elevation");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttSoundLocation::WriteSoundLocation(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasAzimuth()) {
+        element.append_attribute("azimuth") = DblToStr(this->GetAzimuth()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasElevation()) {
+        element.append_attribute("elevation") = DblToStr(this->GetElevation()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttSoundLocation::HasAzimuth() const
+{
+    return (m_azimuth != 0.0);
+}
+
+bool AttSoundLocation::HasElevation() const
+{
+    return (m_elevation != 0.0);
+}
+
+/* include <attelevation> */
+
+//----------------------------------------------------------------------------
 // AttTimestampGestural
 //----------------------------------------------------------------------------
 
@@ -718,6 +779,18 @@ bool Att::SetGestural(Object *element, std::string attrType, std::string attrVal
             return true;
         }
     }
+    if (element->HasAttClass(ATT_SOUNDLOCATION)) {
+        AttSoundLocation *att = dynamic_cast<AttSoundLocation *>(element);
+        assert(att);
+        if (attrType == "azimuth") {
+            att->SetAzimuth(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "elevation") {
+            att->SetElevation(att->StrToDbl(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_TIMESTAMPGESTURAL)) {
         AttTimestampGestural *att = dynamic_cast<AttTimestampGestural *>(element);
         assert(att);
@@ -825,6 +898,16 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasAttacca()) {
             attributes->push_back(std::make_pair("attacca", att->BooleanToStr(att->GetAttacca())));
+        }
+    }
+    if (element->HasAttClass(ATT_SOUNDLOCATION)) {
+        const AttSoundLocation *att = dynamic_cast<const AttSoundLocation *>(element);
+        assert(att);
+        if (att->HasAzimuth()) {
+            attributes->push_back(std::make_pair("azimuth", att->DblToStr(att->GetAzimuth())));
+        }
+        if (att->HasElevation()) {
+            attributes->push_back(std::make_pair("elevation", att->DblToStr(att->GetElevation())));
         }
     }
     if (element->HasAttClass(ATT_TIMESTAMPGESTURAL)) {
