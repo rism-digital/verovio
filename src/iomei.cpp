@@ -1482,6 +1482,7 @@ void MeiOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
     WritePositionInterface(currentNode, nc);
     nc->WriteColor(currentNode);
     nc->WriteIntervalMelodic(currentNode);
+    nc->WriteNcVis(currentNode);
 }
 
 void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
