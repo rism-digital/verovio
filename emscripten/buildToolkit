@@ -34,7 +34,7 @@ my $VEROVIO_ROOT  = "..";
 # Memory is increased (TOTAL_STACK) for processing large files (tested up to 7MB)
 # Empirically, the memory amount required is roughly 5 times the file size.
 # This can be disabled in the light version, which uses the default memory settings.
-my $FLAGS = "-O3";
+my $FLAGS .= "-O2";
 $FLAGS .= " -DNDEBUG";
 $FLAGS .= " --memory-init-file 0";
 $FLAGS .= " -std=c++11";
