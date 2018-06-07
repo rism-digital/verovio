@@ -77,15 +77,20 @@ Object::Object(const Object &object) : BoundingBox(object)
 {
     ClearChildren();
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
-    m_parent = NULL;
+    
     m_classid = object.m_classid;
+    m_parent = NULL;
+    // Flags
+    m_isAttribute = object.m_isAttribute;
+    m_isModified = true;
+    m_isReferencObject = object.m_isReferencObject;
+    
+    // Also copy attribute classes
     m_attClasses = object.m_attClasses;
     m_interfaces = object.m_interfaces;
-    m_isReferencObject = object.m_isReferencObject;
-    m_isModified = true;
+    // New uuid
     this->GenerateUuid();
     // For now do not copy them
-    // m_uuid = object.m_uuid;
     // m_unsupported = object.m_unsupported;
 
     if (!object.CopyChildren()) {
@@ -110,15 +115,20 @@ Object &Object::operator=(const Object &object)
     if (this != &object) {
         ClearChildren();
         ResetBoundingBox(); // It does not make sense to keep the values of the BBox
-        m_parent = NULL;
+        
         m_classid = object.m_classid;
+        m_parent = NULL;
+        // Flags
+        m_isAttribute = object.m_isAttribute;
+        m_isModified = true;
+        m_isReferencObject = object.m_isReferencObject;
+        
+        // Also copy attribute classes
         m_attClasses = object.m_attClasses;
         m_interfaces = object.m_interfaces;
-        m_isReferencObject = object.m_isReferencObject;
-        m_isModified = true;
+        // New uuid
         this->GenerateUuid();
         // For now do now copy them
-        // m_uuid = object.m_uuid;
         // m_unsupported = object.m_unsupported;
 
         if (object.CopyChildren()) {
@@ -142,11 +152,13 @@ Object::~Object()
 
 void Object::Init(std::string classid)
 {
+    m_classid = classid;
     m_parent = NULL;
+    // Flags
     m_isAttribute = false;
     m_isModified = true;
-    m_classid = classid;
     m_isReferencObject = false;
+    
     this->GenerateUuid();
 
     Reset();
