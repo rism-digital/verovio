@@ -5228,12 +5228,6 @@ void HumdrumInput::addOrnamentMarkers(hum::HTp token)
         return;
     }
 
-    // arpeggios are now implemented, so no need for text marking:
-    // if (strchr(token->c_str(), ':') != NULL) { // arpeggio
-    //     token->setValue("LO", "TX", "t", "arp.");
-    //     token->setValue("LO", "TX", "a", "true");
-    // }
-
     if (strchr(token->c_str(), 'O') != NULL) { // generic ornament
         token->setValue("LO", "TX", "t", "*");
         token->setValue("LO", "TX", "a", "true");
@@ -9378,7 +9372,7 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
 //////////////////////////////
 //
 // HumdrumInput::addArpeggio --
-//   : = arpeggio which may cross layers on a single staff.
+//   : = arpeggio which may cross between layers on a staff.
 //   :: = arpeggio which crosses staves on a single system.
 //
 
@@ -9386,6 +9380,7 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
 {
 
     bool systemQ = false;
+    bool staffQ = false;
     hum::HTp earp = NULL;
     if (token->find("::") != string::npos) {
         if (!leftmostSystemArpeggio(token)) {
@@ -9399,16 +9394,24 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
         }
     }
     else if (token->find(":") != string::npos) {
-        // only consider on local chord for now (not cross-layer)
+        if (!leftmostStaffArpeggio(token)) {
+            return;
+        }
+        staffQ = true;
+        earp = getRightmostStaffArpeggio(token);
+        if (earp == NULL) {
+            // no system arpeggio actually found
+            return;
+        }
     }
     else {
         return; // no arpeggio on this note/chord
     }
 
     // int layer = m_currentlayer;
-    int staff = m_currentstaff;
+    // int staff = m_currentstaff;
 
-    if (systemQ) {
+    if (systemQ || staffQ) {
         Arpeg *arpeg = new Arpeg;
         appendElement(m_measure, arpeg);
         // no staff attachment, or list both endpoint staves or all staves involved?
@@ -9416,7 +9419,7 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
         // arpeg->SetStartid("#" + object->GetUuid());
         string firstid = object->GetUuid();
         string secondid;
-        if (earp->find(" ") != string::npos) {
+        if (earp->find(" ") != std::string::npos) {
             secondid = getLocationId("chord", earp);
         }
         else {
@@ -9426,13 +9429,75 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
         arpeg->AddRef("#" + firstid);
         arpeg->AddRef("#" + secondid);
     }
-    else {
-        Arpeg *arpeg = new Arpeg;
-        appendElement(m_measure, arpeg);
-        setStaff(arpeg, staff);
-        arpeg->SetStartid("#" + object->GetUuid());
-        setLocationId(arpeg, token);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getRightmostStaffArpeggio -- Assuming a single contiguous
+//     arpeggio across all layers from first to last marker.
+//
+
+hum::HTp HumdrumInput::getRightmostStaffArpeggio(hum::HTp token)
+{
+    hum::HTp output = NULL;
+    if ((token->find(":") != std::string::npos) && (token->find("::") == std::string::npos)) {
+        output = token;
     }
+    int track = token->getTrack();
+    token = token->getNextFieldToken();
+    int ntrack;
+    if (token) {
+        ntrack = token->getTrack();
+    }
+    while (token != NULL) {
+        if (ntrack != track) {
+            break;
+        }
+        if (!token->isKern()) {
+            token = token->getNextFieldToken();
+            continue;
+        }
+        if ((token->find(":") != std::string::npos) && (token->find("::") == std::string::npos)) {
+            output = token;
+        }
+        token = token->getNextFieldToken();
+        if (token) {
+            ntrack = token->getTrack();
+        }
+    }
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::leftmostStaffArpeggio --
+//
+
+bool HumdrumInput::leftmostStaffArpeggio(hum::HTp token)
+{
+    int track = token->getTrack();
+    token = token->getPreviousFieldToken();
+    int ntrack;
+    if (token) {
+        ntrack = token->getTrack();
+    }
+    while (token != NULL) {
+        if (track != ntrack) {
+            break;
+        }
+        if (!token->isKern()) {
+            token = token->getPreviousFieldToken();
+            if (token) {
+                ntrack = token->getTrack();
+            }
+            continue;
+        }
+        if (token->find(":") != std::string::npos) {
+            return false;
+        }
+        token = token->getPreviousFieldToken();
+    }
+    return true;
 }
 
 //////////////////////////////
@@ -9445,7 +9510,7 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
 hum::HTp HumdrumInput::getRightmostSystemArpeggio(hum::HTp token)
 {
     hum::HTp output = NULL;
-    if (token->find("::") != string::npos) {
+    if (token->find("::") != std::string::npos) {
         output = token;
     }
     token = token->getNextFieldToken();
@@ -9454,7 +9519,7 @@ hum::HTp HumdrumInput::getRightmostSystemArpeggio(hum::HTp token)
             token = token->getNextFieldToken();
             continue;
         }
-        if (token->find("::") != string::npos) {
+        if (token->find("::") != std::string::npos) {
             output = token;
         }
         token = token->getNextFieldToken();
@@ -9477,7 +9542,7 @@ bool HumdrumInput::leftmostSystemArpeggio(hum::HTp token)
             token = token->getPreviousFieldToken();
             continue;
         }
-        if (token->find("::") != string::npos) {
+        if (token->find("::") != std::string::npos) {
             return false;
         }
         token = token->getPreviousFieldToken();
