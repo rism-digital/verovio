@@ -98,6 +98,9 @@ KeySig::KeySig(const ScoreDefInterface *keySigAttr) : LayerElement("keysig-"), A
     else if (key < 0) {
         m_alterationType = ACCIDENTAL_WRITTEN_f;
     }
+    else {
+        m_alterationType = ACCIDENTAL_WRITTEN_n;
+    }
     m_alterationNumber = abs(key);
 
     if (keySigAttr->GetKeysigShow() == BOOLEAN_false) {
