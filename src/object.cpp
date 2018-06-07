@@ -78,9 +78,10 @@ Object::Object(const Object &object) : BoundingBox(object)
 {
     ClearChildren();
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
-
+    
     m_classid = object.m_classid;
     m_parent = NULL;
+
     // Flags
     m_isAttribute = object.m_isAttribute;
     m_isModified = true;
