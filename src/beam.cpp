@@ -106,6 +106,7 @@ void BeamDrawingParams::CalcBeam(
 
     int yMax = 0, yMin = 0;
     int curY;
+    int nbRests = 0;
     // elementCount holds the last one
     for (i = 0; i < elementCount; ++i) {
 
@@ -140,6 +141,7 @@ void BeamDrawingParams::CalcBeam(
             curY = (*beamElementCoords).at(i)->m_element->GetDrawingY();
             (*beamElementCoords).at(i)->m_yTop = curY;
             (*beamElementCoords).at(i)->m_yBottom = curY;
+            nbRests++;
         }
     }
 
@@ -147,7 +149,7 @@ void BeamDrawingParams::CalcBeam(
     // Set the stem direction
 
     // yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
-    avgY /= elementCount;
+    avgY /= (elementCount - nbRests);
 
     // If we have one stem direction in the beam, then don't look at the layer
     // We probably do not want to call this if we have a cross-staff situation
