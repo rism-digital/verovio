@@ -42,9 +42,10 @@ std::map<std::string, NeumeGroup> Neume::s_neumes = { { "", PUNCTUM }, { "u", PE
 // Neume
 //----------------------------------------------------------------------------
 
-Neume::Neume() : LayerElement("neume-"), ObjectListInterface(), AttColor()
+Neume::Neume() : LayerElement("neume-"), ObjectListInterface(), AttColor(), AttCoordinated()
 {
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_COORDINATED);
     Reset();
 }
 

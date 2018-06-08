@@ -57,7 +57,7 @@ enum NeumeGroup {
  * This class models the MEI <neume> element.
  */
 
-class Neume : public LayerElement, public ObjectListInterface, public AttColor {
+class Neume : public LayerElement, public ObjectListInterface, public AttColor, public AttCoordinated {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

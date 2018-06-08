@@ -1491,6 +1491,7 @@ void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
 
     WriteLayerElement(currentNode, neume);
     neume->WriteColor(currentNode);
+    neume->WriteCoordinated(currentNode);
 }
 
 void MeiOutput::WriteNote(pugi::xml_node currentNode, Note *note)
@@ -2335,6 +2336,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     // music
     pugi::xml_node music;
     pugi::xml_node body;
+    pugi::xml_node facsimile;
     pugi::xml_node pages;
 
     if (std::string(root.name()) == "music") {
@@ -2346,6 +2348,12 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     if (music.empty()) {
         LogError("No <music> element found in the MEI data");
         return false;
+    }
+
+    facsimile = music.child("facsimile");
+    if (!facsimile.empty()) {
+        m_doc->SetType(Transcription);
+        ParseZones(facsimile, m_doc);
     }
 
     body = music.child("body");
@@ -3811,7 +3819,25 @@ bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     if (element.attribute("ulx") && (this->m_doc->GetType() == Transcription)) {
         object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITION_FACTOR;
         element.remove_attribute("ulx");
-    }
+    } else if (element.attribute("facs") && this->m_doc->HasZones() && object->HasAttClass(ATT_COORDINATED)) {
+        Zone zone = this->m_doc->GetZone(element.attribute("facs").value());
+        AttCoordinated *att = dynamic_cast<AttCoordinated *>(object); 
+        assert(att);
+        LogMessage("%d, %d, %d, %d", zone.ulx, zone.uly, zone.lrx, zone.lry);
+        if (zone.ulx > 0) {
+            att->SetUlx(zone.ulx);
+        }
+        if (zone.uly > 0) {
+            att->SetUly(zone.uly);
+        }
+        if (zone.lrx > 0) {
+            att->SetLrx(zone.lrx);
+        }
+        if (zone.lry > 0) {
+            att->SetLry(zone.lry);
+        }
+        LogMessage("Set att_coordinated based on zone %s", zone.xmlId.c_str());
+    } 
 
     SetMeiUuid(element, object);
     object->ReadLabelled(element);
@@ -5217,6 +5243,36 @@ void MeiInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
 
     page->m_PPUFactor = (25.0 / 2.0 / doc->GetOptions()->m_unit.GetDefault());
     // LogDebug("PPUFactor: %f", m_PPUFactor);
+}
+
+void MeiInput::ParseZones(pugi::xml_node facsimile, Doc *doc)
+{
+    assert(doc);
+    pugi::xml_node element;
+    for (element = facsimile.first_child().first_child(); element; element = element.next_sibling()) {
+        if (strcmp(element.name(), "zone") == 0) {
+            Zone newZone;
+            pugi::xml_attribute att = element.first_attribute();
+            for (; att; att = att.next_attribute()) {
+                if (strcmp(att.name(), "ulx") == 0) {
+                    newZone.ulx = att.as_int();
+                }
+                else if (strcmp(att.name(), "uly") == 0) {
+                    newZone.uly = att.as_int();
+                }
+                else if (strcmp(att.name(), "lrx") == 0) {
+                    newZone.lrx = att.as_int();
+                }
+                else if (strcmp(att.name(), "lry") == 0) {
+                    newZone.lry = att.as_int();
+                }
+                else if (strcmp(att.name(), "xml:id") == 0) {
+                    newZone.xmlId = att.as_string();
+                }
+            }
+            doc->AddZone(newZone);
+        }
+    }
 }
 
 } // namespace vrv

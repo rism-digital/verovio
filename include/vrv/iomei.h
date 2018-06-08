@@ -133,6 +133,7 @@ class Tuplet;
 class Unclear;
 class Verse;
 
+
 //----------------------------------------------------------------------------
 // MeiOutput
 //----------------------------------------------------------------------------
@@ -174,6 +175,8 @@ public:
      * Setter for score-based MEI output (not implemented)
      */
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
+
+    
 
 private:
     bool WriteDoc(Doc *doc);
@@ -636,6 +639,8 @@ private:
     void UpgradeMeasureTo_3_0_0(Measure *measure, System *system);
     void UpgradePageTo_3_0_0(Page *page, Doc *doc);
     ///@}
+    
+    void ParseZones(pugi::xml_node facsimile, Doc *doc);
 
 public:
     //

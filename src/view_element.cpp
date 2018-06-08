@@ -651,7 +651,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     bool cueSize = false;
     if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
-        if (m_doc->GetType() != Transcription) {
+        if (m_doc->GetType() != Transcription && !m_doc->HasZones()) {
             cueSize = true;
             // HARDCODED
             x -= m_doc->GetGlyphWidth(sym, staff->m_drawingStaffSize, cueSize) * 1.35;
@@ -737,7 +737,7 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
-    if (m_doc->GetType() != Transcription) {
+    if (m_doc->GetType() != Transcription && !m_doc->HasZones()) {
         // Use the note to which the points to for position
         if (dot->m_drawingNote && !dot->m_drawingNextElement) {
             x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 7 / 2;
