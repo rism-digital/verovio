@@ -8502,6 +8502,15 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     // int accidCount = hum::Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
     bool showInAccidGes = !showInAccid;
+    string loaccid = getLayoutAccidental(token, subtoken);
+    if (!loaccid.empty()) {
+        // show the performance accidental in @accid.ges, and the
+        // loaccid will be shown in @accid (the following false
+        // will be used to set disable normal visual accid display system)
+        showInAccid = false;
+        showInAccidGes = true;
+    }
+
     Accid *accid = new Accid;
     appendElement(note, accid);
     setLocationId(accid, token, subtoken);
@@ -8529,6 +8538,48 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
                 case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
                 default: std::cerr << "Do not know how to convert accidental: " << accidCount << endl;
             }
+        }
+        else if (!loaccid.empty()) {
+            if (loaccid == "n#") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_ns);
+            }
+            else if (loaccid == "#") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_s);
+            }
+            else if (loaccid == "n") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_n);
+            }
+            else if (loaccid == "##") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_ss);
+            }
+            else if (loaccid == "x") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_x);
+            }
+            else if (loaccid == "-") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_f);
+            }
+            else if (loaccid == "--") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_ff);
+            }
+            else if (loaccid == "#x") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_sx);
+            }
+            else if (loaccid == "###") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_ts);
+            }
+            else if (loaccid == "n-") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_nf);
+            }
+            else if (loaccid == "---") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_tf);
+            }
+            else {
+                std::cerr << "Warning: unknown accidental type " << std::endl;
+            }
+            // add more accidentals here as necessary.  Mostly left are quarter tones
+            // which are not dealt with directly in **kern data: su, sd, fu, fd, nu,
+            // nd, 1qf, 3qf, 1qs, 3qs
+            // http://music-encoding.org/guidelines/v3/data-types/data.accidental.explicit.html
         }
     }
     else {
@@ -8666,6 +8717,40 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     }
     else if (phraseStop) {
         note->SetType("phraseStop");
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getLayoutAccidental -- Search for a visual accidental layout code
+//   for the given note.  Such as:
+//       !LO:N:acc=n#
+//
+
+std::string HumdrumInput::getLayoutAccidental(hum::HTp token, int subtoken)
+{
+    if (subtoken < 0) {
+        subtoken = 0;
+    }
+    std::string output = getLayoutParameter(token, "N", "acc");
+    if (output.empty()) {
+        return "";
+    }
+    int index = 0;
+    if (token->isChord()) {
+        std::string nstr = getLayoutParameter(token, "N", "n");
+        if (nstr.empty()) {
+            index = 0;
+        }
+        else {
+            index = stoi(nstr) - 1;
+        }
+    }
+    if (index == subtoken) {
+        return output;
+    }
+    else {
+        return "";
     }
 }
 

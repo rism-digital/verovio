@@ -430,6 +430,7 @@ protected:
     void convertMensuralToken(
         std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token, int staffindex);
     void initializeSpineColor(hum::HumdrumFile &infile);
+    std::string getLayoutAccidental(hum::HTp token, int subtoken);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
