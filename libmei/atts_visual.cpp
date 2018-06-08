@@ -1168,16 +1168,16 @@ AttMeterSigDefaultVis::~AttMeterSigDefaultVis()
 
 void AttMeterSigDefaultVis::ResetMeterSigDefaultVis()
 {
-    m_meterRend = meterSigDefaultVis_METERREND_NONE;
+    m_meterForm = meterSigDefaultVis_METERFORM_NONE;
     m_meterShowchange = BOOLEAN_NONE;
 }
 
 bool AttMeterSigDefaultVis::ReadMeterSigDefaultVis(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("meter.rend")) {
-        this->SetMeterRend(StrToMeterSigDefaultVisMeterrend(element.attribute("meter.rend").value()));
-        element.remove_attribute("meter.rend");
+    if (element.attribute("meter.form")) {
+        this->SetMeterForm(StrToMeterSigDefaultVisMeterform(element.attribute("meter.form").value()));
+        element.remove_attribute("meter.form");
         hasAttribute = true;
     }
     if (element.attribute("meter.showchange")) {
@@ -1191,8 +1191,8 @@ bool AttMeterSigDefaultVis::ReadMeterSigDefaultVis(pugi::xml_node element)
 bool AttMeterSigDefaultVis::WriteMeterSigDefaultVis(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasMeterRend()) {
-        element.append_attribute("meter.rend") = MeterSigDefaultVisMeterrendToStr(this->GetMeterRend()).c_str();
+    if (this->HasMeterForm()) {
+        element.append_attribute("meter.form") = MeterSigDefaultVisMeterformToStr(this->GetMeterForm()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMeterShowchange()) {
@@ -1202,9 +1202,9 @@ bool AttMeterSigDefaultVis::WriteMeterSigDefaultVis(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttMeterSigDefaultVis::HasMeterRend() const
+bool AttMeterSigDefaultVis::HasMeterForm() const
 {
-    return (m_meterRend != meterSigDefaultVis_METERREND_NONE);
+    return (m_meterForm != meterSigDefaultVis_METERFORM_NONE);
 }
 
 bool AttMeterSigDefaultVis::HasMeterShowchange() const
@@ -1284,9 +1284,9 @@ void AttNcVis::ResetNcVis()
     m_flat = BOOLEAN_NONE;
     m_jagged = BOOLEAN_NONE;
     m_liquescent = BOOLEAN_NONE;
-    m_long = BOOLEAN_NONE;
     m_oriscus = ncVis_ORISCUS_NONE;
     m_quilisma = ncVis_QUILISMA_NONE;
+    m_strophicus = BOOLEAN_NONE;
     m_wavy = BOOLEAN_NONE;
 }
 
@@ -1338,11 +1338,6 @@ bool AttNcVis::ReadNcVis(pugi::xml_node element)
         element.remove_attribute("liquescent");
         hasAttribute = true;
     }
-    if (element.attribute("long")) {
-        this->SetLong(StrToBoolean(element.attribute("long").value()));
-        element.remove_attribute("long");
-        hasAttribute = true;
-    }
     if (element.attribute("oriscus")) {
         this->SetOriscus(StrToNcVisOriscus(element.attribute("oriscus").value()));
         element.remove_attribute("oriscus");
@@ -1351,6 +1346,11 @@ bool AttNcVis::ReadNcVis(pugi::xml_node element)
     if (element.attribute("quilisma")) {
         this->SetQuilisma(StrToNcVisQuilisma(element.attribute("quilisma").value()));
         element.remove_attribute("quilisma");
+        hasAttribute = true;
+    }
+    if (element.attribute("strophicus")) {
+        this->SetStrophicus(StrToBoolean(element.attribute("strophicus").value()));
+        element.remove_attribute("strophicus");
         hasAttribute = true;
     }
     if (element.attribute("wavy")) {
@@ -1400,16 +1400,16 @@ bool AttNcVis::WriteNcVis(pugi::xml_node element)
         element.append_attribute("liquescent") = BooleanToStr(this->GetLiquescent()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasLong()) {
-        element.append_attribute("long") = BooleanToStr(this->GetLong()).c_str();
-        wroteAttribute = true;
-    }
     if (this->HasOriscus()) {
         element.append_attribute("oriscus") = NcVisOriscusToStr(this->GetOriscus()).c_str();
         wroteAttribute = true;
     }
     if (this->HasQuilisma()) {
         element.append_attribute("quilisma") = NcVisQuilismaToStr(this->GetQuilisma()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasStrophicus()) {
+        element.append_attribute("strophicus") = BooleanToStr(this->GetStrophicus()).c_str();
         wroteAttribute = true;
     }
     if (this->HasWavy()) {
@@ -1464,11 +1464,6 @@ bool AttNcVis::HasLiquescent() const
     return (m_liquescent != BOOLEAN_NONE);
 }
 
-bool AttNcVis::HasLong() const
-{
-    return (m_long != BOOLEAN_NONE);
-}
-
 bool AttNcVis::HasOriscus() const
 {
     return (m_oriscus != ncVis_ORISCUS_NONE);
@@ -1477,6 +1472,11 @@ bool AttNcVis::HasOriscus() const
 bool AttNcVis::HasQuilisma() const
 {
     return (m_quilisma != ncVis_QUILISMA_NONE);
+}
+
+bool AttNcVis::HasStrophicus() const
+{
+    return (m_strophicus != BOOLEAN_NONE);
 }
 
 bool AttNcVis::HasWavy() const
@@ -2299,8 +2299,8 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
     if (element->HasAttClass(ATT_METERSIGDEFAULTVIS)) {
         AttMeterSigDefaultVis *att = dynamic_cast<AttMeterSigDefaultVis *>(element);
         assert(att);
-        if (attrType == "meter.rend") {
-            att->SetMeterRend(att->StrToMeterSigDefaultVisMeterrend(attrValue));
+        if (attrType == "meter.form") {
+            att->SetMeterForm(att->StrToMeterSigDefaultVisMeterform(attrValue));
             return true;
         }
         if (attrType == "meter.showchange") {
@@ -2355,16 +2355,16 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             att->SetLiquescent(att->StrToBoolean(attrValue));
             return true;
         }
-        if (attrType == "long") {
-            att->SetLong(att->StrToBoolean(attrValue));
-            return true;
-        }
         if (attrType == "oriscus") {
             att->SetOriscus(att->StrToNcVisOriscus(attrValue));
             return true;
         }
         if (attrType == "quilisma") {
             att->SetQuilisma(att->StrToNcVisQuilisma(attrValue));
+            return true;
+        }
+        if (attrType == "strophicus") {
+            att->SetStrophicus(att->StrToBoolean(attrValue));
             return true;
         }
         if (attrType == "wavy") {
@@ -2681,8 +2681,8 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_METERSIGDEFAULTVIS)) {
         const AttMeterSigDefaultVis *att = dynamic_cast<const AttMeterSigDefaultVis *>(element);
         assert(att);
-        if (att->HasMeterRend()) {
-            attributes->push_back(std::make_pair("meter.rend", att->MeterSigDefaultVisMeterrendToStr(att->GetMeterRend())));
+        if (att->HasMeterForm()) {
+            attributes->push_back(std::make_pair("meter.form", att->MeterSigDefaultVisMeterformToStr(att->GetMeterForm())));
         }
         if (att->HasMeterShowchange()) {
             attributes->push_back(std::make_pair("meter.showchange", att->BooleanToStr(att->GetMeterShowchange())));
@@ -2725,14 +2725,14 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         if (att->HasLiquescent()) {
             attributes->push_back(std::make_pair("liquescent", att->BooleanToStr(att->GetLiquescent())));
         }
-        if (att->HasLong()) {
-            attributes->push_back(std::make_pair("long", att->BooleanToStr(att->GetLong())));
-        }
         if (att->HasOriscus()) {
             attributes->push_back(std::make_pair("oriscus", att->NcVisOriscusToStr(att->GetOriscus())));
         }
         if (att->HasQuilisma()) {
             attributes->push_back(std::make_pair("quilisma", att->NcVisQuilismaToStr(att->GetQuilisma())));
+        }
+        if (att->HasStrophicus()) {
+            attributes->push_back(std::make_pair("strophicus", att->BooleanToStr(att->GetStrophicus())));
         }
         if (att->HasWavy()) {
             attributes->push_back(std::make_pair("wavy", att->BooleanToStr(att->GetWavy())));

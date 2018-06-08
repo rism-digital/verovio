@@ -869,8 +869,6 @@ int BoundingBox::RectBottomOverlap(const Point rect1[2], const Point rect2[2], i
 
 SegmentedLine::SegmentedLine(int start, int end)
 {
-    assert(start != end);
-
     if (start > end) {
         BoundingBox::Swap(start, end);
     }

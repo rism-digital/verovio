@@ -326,6 +326,54 @@ data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool logWarning) const
     return std::make_pair(measure, timePoint);
 }
 
+std::string Att::MidivalueNameToStr(data_MIDIVALUE_NAME data) const
+{
+    std::string value;
+    if (data.GetType() == MIDIVALUENAMETYPE_midivalue)
+        value = MidivalueToStr(data.GetMidivalue());
+    else if (data.GetType() == MIDIVALUENAMETYPE_mcname)
+        value = NcnameToStr(data.GetNcname());
+
+    return value;
+}
+
+data_MIDIVALUE_NAME Att::StrToMidivalueName(std::string value, bool logWarning) const
+{
+    data_MIDIVALUE_NAME data;
+    data.SetMidivalue(StrToMidivalue(value));
+    if (data.HasValue()) return data;
+    data.SetNcname(StrToNcname(value));
+    if (data.HasValue()) return data;
+
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.MIDIVALUE_NAME '%s'", value.c_str());
+
+    return data;
+}
+    
+std::string Att::MidivaluePanToStr(data_MIDIVALUE_PAN data) const
+{
+    std::string value;
+    if (data.GetType() == MIDIVALUEPANTYPE_midivalue)
+        value = MidivalueToStr(data.GetMidivalue());
+    else if (data.GetType() == MIDIVALUEPANTYPE_percentLimitedSigned)
+        value = PercentLimitedSignedToStr(data.GetPercentLimitedSigned());
+
+    return value;
+}
+
+data_MIDIVALUE_PAN Att::StrToMidivaluePan(std::string value, bool logWarning) const
+{
+    data_MIDIVALUE_PAN data;
+    data.SetMidivalue(StrToMidivalue(value));
+    if (data.HasValue()) return data;
+    data.SetPercentLimitedSigned(StrToPercentLimitedSigned(value));
+    if (data.HasValue()) return data;
+
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.MIDIVALUE_PAN '%s'", value.c_str());
+
+    return data;
+}
+    
 std::string Att::ModusmaiorToStr(data_MODUSMAIOR data) const
 {
     std::string value;
@@ -428,6 +476,36 @@ data_PERCENT Att::StrToPercent(std::string value, bool logWarning) const
     std::regex test("[0-9]+(\\.?[0-9]*)?%");
     if (!std::regex_match(value, test)) {
         if (logWarning) LogWarning("Unsupported data.PERCENT '%s'", value.c_str());
+        return 0;
+    }
+    return atof(value.substr(0, value.find("%")).c_str());
+}
+    
+std::string Att::PercentLimitedToStr(data_PERCENT_LIMITED data) const
+{
+    return StringFormat("%.2f%%", data);
+}
+
+data_PERCENT_LIMITED Att::StrToPercentLimited(std::string value, bool logWarning) const
+{
+    std::regex test("[0-9]+(\\.?[0-9]*)?%");
+    if (!std::regex_match(value, test)) {
+        if (logWarning) LogWarning("Unsupported data.PERCENT.LIMITED '%s'", value.c_str());
+        return 0;
+    }
+    return atof(value.substr(0, value.find("%")).c_str());
+}
+    
+std::string Att::PercentLimitedSignedToStr(data_PERCENT_LIMITED_SIGNED data) const
+{
+    return StringFormat("%.2f%%", data);
+}
+
+data_PERCENT_LIMITED_SIGNED Att::StrToPercentLimitedSigned(std::string value, bool logWarning) const
+{
+    std::regex test("(+|-)?[0-9]+(\\.?[0-9]*)?%");
+    if (!std::regex_match(value, test)) {
+        if (logWarning) LogWarning("Unsupported data.PERCENT.LIMITED.SIGNEd '%s'", value.c_str());
         return 0;
     }
     return atof(value.substr(0, value.find("%")).c_str());

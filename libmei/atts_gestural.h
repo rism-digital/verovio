@@ -354,6 +354,48 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttSoundLocation
+//----------------------------------------------------------------------------
+
+class AttSoundLocation : public Att {
+public:
+    AttSoundLocation();
+    virtual ~AttSoundLocation();
+
+    /** Reset the default values for the attribute class **/
+    void ResetSoundLocation();
+
+    /** Read the values for the attribute class **/
+    bool ReadSoundLocation(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteSoundLocation(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetAzimuth(double azimuth_) { m_azimuth = azimuth_; }
+    double GetAzimuth() const { return m_azimuth; }
+    bool HasAzimuth() const;
+    //
+    void SetElevation(double elevation_) { m_elevation = elevation_; }
+    double GetElevation() const { return m_elevation; }
+    bool HasElevation() const;
+    ///@}
+
+private:
+    /** The lateral or left-to-right plane. **/
+    double m_azimuth;
+    /** The above-to-below axis. **/
+    double m_elevation;
+
+    /* include <attelevation> */
+};
+
+//----------------------------------------------------------------------------
 // AttTimestampGestural
 //----------------------------------------------------------------------------
 

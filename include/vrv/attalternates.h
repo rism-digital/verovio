@@ -90,6 +90,122 @@ protected:
 };
 
 /**
+ * MEI data.MIDIVALUE_NAME
+ * Since it can contain different subtype we need a dedicated class for it.
+ */
+
+enum MidivalueNameType { MIDIVALUENAMETYPE_NONE = 0, MIDIVALUENAMETYPE_midivalue, MIDIVALUENAMETYPE_mcname };
+
+class data_MIDIVALUE_NAME {
+public:
+    data_MIDIVALUE_NAME() { Reset(MIDIVALUENAMETYPE_NONE); }
+    virtual ~data_MIDIVALUE_NAME() {}
+
+    void Reset(MidivalueNameType type)
+    {
+        m_type = type;
+        m_midivalue = -1;
+        m_ncname = "";
+    }
+
+    MidivalueNameType GetType() const { return m_type; }
+
+    data_MIDIVALUE GetMidivalue() const { return m_midivalue; }
+    void SetMidivalue(data_MIDIVALUE value)
+    {
+        Reset(MIDIVALUENAMETYPE_midivalue);
+        m_midivalue = value;
+    }
+    
+    data_NCNAME GetNcname() const { return m_ncname; }
+    void SetNcname(data_NCNAME value)
+    {
+        Reset(MIDIVALUENAMETYPE_mcname);
+        m_ncname = value;
+    }
+
+    bool HasValue() const
+    {
+        if (m_midivalue != -1) return true;
+        if (m_ncname != "") return true;
+        return false;
+    }
+
+    // comparison
+    bool operator==(const data_MIDIVALUE_NAME &val) const
+    {
+        if (m_type != val.GetType()) return false;
+        if (m_midivalue != val.GetMidivalue()) return false;
+        if (m_ncname != val.GetNcname()) return false;
+        return true;
+    }
+    bool operator!=(const data_MIDIVALUE_NAME &val) const { return !(*this == val); }
+
+protected:
+    MidivalueNameType m_type;
+    data_MIDIVALUE m_midivalue;
+    data_NCNAME m_ncname;
+};
+    
+/**
+ * MEI data.MIDIVALUE_PAN
+ * Since it can contain different subtype we need a dedicated class for it.
+ */
+
+enum MidivaluePanType { MIDIVALUEPANTYPE_NONE = 0, MIDIVALUEPANTYPE_midivalue, MIDIVALUEPANTYPE_percentLimitedSigned };
+
+class data_MIDIVALUE_PAN {
+public:
+    data_MIDIVALUE_PAN() { Reset(MIDIVALUEPANTYPE_NONE); }
+    virtual ~data_MIDIVALUE_PAN() {}
+
+    void Reset(MidivaluePanType type)
+    {
+        m_type = type;
+        m_midivalue = -1;
+        m_percentLimitedSigned = VRV_UNSET;
+    }
+
+    MidivaluePanType GetType() const { return m_type; }
+
+    data_MIDIVALUE GetMidivalue() const { return m_midivalue; }
+    void SetMidivalue(data_MIDIVALUE value)
+    {
+        Reset(MIDIVALUEPANTYPE_midivalue);
+        m_midivalue = value;
+    }
+    
+    data_PERCENT_LIMITED_SIGNED GetPercentLimitedSigned() const { return m_percentLimitedSigned; }
+    void SetPercentLimitedSigned(data_PERCENT_LIMITED_SIGNED value)
+    {
+        Reset(MIDIVALUEPANTYPE_percentLimitedSigned);
+        m_percentLimitedSigned = value;
+    }
+
+    bool HasValue() const
+    {
+        if (m_midivalue != -1) return true;
+        if (m_percentLimitedSigned != VRV_UNSET) return true;
+        return false;
+    }
+
+    // comparison
+    bool operator==(const data_MIDIVALUE_PAN &val) const
+    {
+        if (m_type != val.GetType()) return false;
+        if (m_midivalue != val.GetMidivalue()) return false;
+        if (m_percentLimitedSigned != val.GetPercentLimitedSigned()) return false;
+        return true;
+    }
+    bool operator!=(const data_MIDIVALUE_PAN &val) const { return !(*this == val); }
+
+protected:
+    MidivaluePanType m_type;
+    data_MIDIVALUE m_midivalue;
+    data_PERCENT_LIMITED_SIGNED m_percentLimitedSigned;
+};
+    
+/**
  * MEI data.STAFFITEM
  * Since it can contain different subtype we need a dedicated class for it.
  */
