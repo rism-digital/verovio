@@ -22,11 +22,13 @@ class AttComparison;
 class BoundaryStartInterface;
 class Chord;
 class Clef;
+class Doc;
 class Dot;
 class Dots;
 class Dynam;
 class Ending;
 class FileOutputStream;
+class Functor;
 class Hairpin;
 class Harm;
 class KeySig;
@@ -43,6 +45,7 @@ class ScoreDef;
 class Staff;
 class StaffAlignment;
 class StaffDef;
+class StemmedDrawingInterface;
 class Syl;
 class System;
 class SystemAligner;
@@ -1265,6 +1268,22 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// PrepareLinkingParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: ArrayOfInterfaceUuidPairs holds the interface / uuid pairs to match
+ * member 1: bool* fillList for indicating whether the pairs have to be stacked or not
+ **/
+
+class PrepareLinkingParams : public FunctorParams {
+public:
+    PrepareLinkingParams() { m_fillList = true; }
+    ArrayOfLinkingInterfaceUuidPairs m_nextUuidPairs;
+    bool m_fillList;
+};
+    
+//----------------------------------------------------------------------------
 // PreparePlistParams
 //----------------------------------------------------------------------------
 
@@ -1276,7 +1295,7 @@ public:
 class PreparePlistParams : public FunctorParams {
 public:
     PreparePlistParams() { m_fillList = true; }
-    ArrayOfInterfaceUuidPairs m_interfaceUuidPairs;
+    ArrayOfPlistInterfaceUuidPairs m_interfaceUuidPairs;
     bool m_fillList;
 };
 

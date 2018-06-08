@@ -1030,6 +1030,7 @@ void MeiOutput::WriteControlElement(pugi::xml_node currentNode, ControlElement *
     assert(controlElement);
 
     WriteXmlId(currentNode, controlElement);
+    WriteLinkingInterface(currentNode, controlElement);
     controlElement->WriteLabelled(currentNode);
     controlElement->WriteTyped(currentNode);
 }
@@ -1672,6 +1673,13 @@ void MeiOutput::WriteDurationInterface(pugi::xml_node element, DurationInterface
     interface->WriteStaffIdent(element);
 }
 
+void MeiOutput::WriteLinkingInterface(pugi::xml_node element, LinkingInterface *interface)
+{
+    assert(interface);
+
+    interface->WriteLinking(element);
+}
+    
 void MeiOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *interface)
 {
     assert(interface);
@@ -3309,6 +3317,7 @@ bool MeiInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
 bool MeiInput::ReadControlElement(pugi::xml_node element, ControlElement *object)
 {
     SetMeiUuid(element, object);
+    ReadLinkingInterface(element, object);
     object->ReadLabelled(element);
     object->ReadTyped(element);
 
@@ -4455,6 +4464,12 @@ bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
         m_doc->SetAnalyticalMarkup(true);
     }
 
+    return true;
+}
+    
+bool MeiInput::ReadLinkingInterface(pugi::xml_node element, LinkingInterface *interface)
+{
+    interface->ReadLinking(element);
     return true;
 }
 

@@ -28,6 +28,7 @@ class EditorialElement;
 class FileOutputStream;
 class Functor;
 class FunctorParams;
+class LinkingInterface;
 class PitchInterface;
 class PositionInterface;
 class ScoreDefInterface;
@@ -35,31 +36,6 @@ class StemmedDrawingInterface;
 class TextDirInterface;
 class TimePointInterface;
 class TimeSpanningInterface;
-
-/**
- * Generic int map recursive structure for storing hierachy of values
- * For example, we want to process all staves one by one, and within each staff
- * all layer one by one, and so one (lyrics, etc.). In IntTree, we can store
- * @n with all existing values (1 => 1 => 1; 2 => 1 => 1)
- * The stucture must be filled first and can then be used by instanciating a vector
- * of corresponding Comparison (typically AttNIntegerComparison for @n attribute).
- * See Doc::PrepareDrawing for an example.
- */
-struct IntTree {
-    std::map<int, IntTree> child;
-};
-
-typedef std::map<int, IntTree> IntTree_t;
-
-/**
- * This is the alternate way for representing map of maps. With this solution,
- * we can easily have different types of key (attribute) at each level. We could
- * mix int, string, or even MEI data_* types. The drawback is that a type has to
- * be defined at each level. Also see Doc::PrepareDrawing for an example.
- */
-typedef std::map<int, bool> VerseN_t;
-typedef std::map<int, VerseN_t> LayerN_VerserN_t;
-typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 
 #define UNLIMITED_DEPTH -10000
 #define FORWARD true
@@ -155,6 +131,7 @@ public:
     ///@}
 
     virtual DurationInterface *GetDurationInterface() { return NULL; }
+    virtual LinkingInterface *GetLinkingInterface() { return NULL; }
     virtual PitchInterface *GetPitchInterface() { return NULL; }
     virtual PlistInterface *GetPlistInterface() { return NULL; }
     virtual PositionInterface *GetPositionInterface() { return NULL; }
@@ -823,6 +800,13 @@ public:
     ///@{
     virtual int PrepareCrossStaff(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int PrepareCrossStaffEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+    
+    /**
+     * Match linking element (e.g, @next).
+     */
+    ///@{
+    virtual int PrepareLinking(FunctorParams *functorParams);
     ///@}
 
     /**

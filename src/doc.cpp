@@ -513,6 +513,28 @@ void Doc::PrepareDrawing()
             prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
 
+    /************ Resolve linking (@next) ************/
+
+    // Try to match all pointing elements using @next
+    PrepareLinkingParams prepareLinkingParams;
+    Functor prepareLinking(&Object::PrepareLinking);
+    this->Process(&prepareLinking, &prepareLinkingParams);
+
+    // If we have some left process again backward
+    // But not now because we match only @next
+    /*
+    if (!prepareLinkingParams.m_interfaceUuidPairs.empty()) {
+        prepareLinkingParams.m_interfaceUuidPairs.empty = false;
+        this->Process(&prepareLinking, &prepareLinkingParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+    }
+    */
+
+    // If some are still there, then it is probably an issue in the encoding
+    if (!prepareLinkingParams.m_nextUuidPairs.empty()) {
+        LogWarning(
+            "%d element(s) with a @next could match the target", prepareLinkingParams.m_nextUuidPairs.size());
+    }
+    
     /************ Resolve @plist ************/
 
     // Try to match all pointing elements using @plist

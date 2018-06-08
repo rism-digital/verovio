@@ -59,6 +59,7 @@ class FloatingElement;
 class FTrem;
 class Hairpin;
 class Harm;
+class LinkingInterface;
 class InstrDef;
 class Label;
 class LabelAbbr;
@@ -348,6 +349,7 @@ private:
     //
     void WriteAreaPosInterface(pugi::xml_node currentNode, AreaPosInterface *interface);
     void WriteDurationInterface(pugi::xml_node currentNode, DurationInterface *interface);
+    void WriteLinkingInterface(pugi::xml_node currentNode, LinkingInterface *interface);
     void WritePitchInterface(pugi::xml_node currentNode, PitchInterface *interface);
     void WritePlistInterface(pugi::xml_node currentNode, PlistInterface *interface);
     void WritePositionInterface(pugi::xml_node currentNode, PositionInterface *interface);
@@ -578,6 +580,7 @@ private:
 
     bool ReadAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface);
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
+    bool ReadLinkingInterface(pugi::xml_node element, LinkingInterface *interface);
     bool ReadPitchInterface(pugi::xml_node element, PitchInterface *interface);
     bool ReadPlistInterface(pugi::xml_node element, PlistInterface *interface);
     bool ReadPositionInterface(pugi::xml_node element, PositionInterface *interface);
