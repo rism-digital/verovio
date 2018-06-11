@@ -2391,7 +2391,6 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
 
     facsimile = music.child("facsimile");
     if (!facsimile.empty()) {
-        LogMessage("Test");
         ParseFacsimile(facsimile, m_doc);
     }
 
@@ -5316,7 +5315,6 @@ void MeiInput::ParseZone(pugi::xml_node element, Surface *surface)
             }
         }
         surface->AddChild(zone);
-        LogMessage("Added zone %s (%d, %d) (%d, %d)", zone->GetUuid().c_str(), zone->GetUlx(), zone->GetUly(), zone->GetLrx(), zone->GetLry());
     }
     else {
         LogWarning("Unsupported element '%s' in <surface>", element.name());
@@ -5327,16 +5325,16 @@ void MeiInput::ParseFacsimile(pugi::xml_node facsimile, Doc *doc)
 {
     assert(doc);
     Facsimile *facs = new Facsimile();
+    // Read xmlId (if present)
+    SetMeiUuid(facsimile, facs);
     pugi::xml_node element;
     // Process surface
     element = facsimile.first_child();
     Surface *surface = ParseSurface(element);
+    SetMeiUuid(element, surface);
     facs->AddChild(surface);
-    int i = 1;
     for (element = element.first_child(); element; element = element.next_sibling()) {
-        LogMessage("Element: %d", i);
         ParseZone(element, surface);
-        i++;
     }
     doc->SetFacsimile(facs);
 }
