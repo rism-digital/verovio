@@ -701,13 +701,11 @@ public:
         m_currentPage = currentPage;
         m_currentSystem = currentSystem;
         m_contentSystem = contentSystem;
-        m_firstPbProcessed = false;
     }
     Doc *m_doc;
     Page *m_currentPage;
     System *m_contentSystem;
     System *m_currentSystem;
-    bool m_firstPbProcessed;
 };
 
 //----------------------------------------------------------------------------
