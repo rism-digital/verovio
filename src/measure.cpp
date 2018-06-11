@@ -884,9 +884,24 @@ int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
 
     std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
     while (iter != params->m_timeSpanningElements.end()) {
-        TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
-        assert(interface);
-        Measure *endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstParent(MEASURE));
+        Measure *endParent = NULL;
+        if ((*iter)->HasInterface(INTERFACE_TIME_SPANNING)) {
+            TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
+            assert(interface);
+            if (interface->GetEnd()) {
+                endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstParent(MEASURE));
+            }
+        }
+        if (!endParent && (*iter)->HasInterface(INTERFACE_LINKING)) {
+            LinkingInterface *interface = (*iter)->GetLinkingInterface();
+            assert(interface);
+            if (interface->GetNextLink()) {
+                // We should have one because we allow only control Event (dir and dynam) to be linked as target
+                TimePointInterface *nextInterface = interface->GetNextLink()->GetTimePointInterface();
+                assert(nextInterface);
+                endParent = dynamic_cast<Measure *>(nextInterface->GetStart()->GetFirstParent(MEASURE));
+            }
+        }
         assert(endParent);
         // We have reached the end of the spanning - remove it from the list of running elements
         if (endParent == this) {

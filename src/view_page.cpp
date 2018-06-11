@@ -157,6 +157,8 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     DrawSystemChildren(dc, system, system);
 
     DrawSystemList(dc, system, SYL);
+    DrawSystemList(dc, system, DYNAM);
+    DrawSystemList(dc, system, DIR);
     DrawSystemList(dc, system, HAIRPIN);
     DrawSystemList(dc, system, TRILL);
     DrawSystemList(dc, system, OCTAVE);
@@ -176,6 +178,12 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     ListOfObjects::iterator iter;
 
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
+        if ((*iter)->Is(classId) && (classId == DIR)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
+        if ((*iter)->Is(classId) && (classId == DYNAM)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
         if ((*iter)->Is(classId) && (classId == HAIRPIN)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }

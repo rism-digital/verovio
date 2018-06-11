@@ -151,16 +151,28 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
 
-    if (!interface->HasStartAndEnd()) return;
 
     LayerElement *start = dynamic_cast<LayerElement *>(interface->GetStart());
     assert(start);
-    LayerElement *end = dynamic_cast<LayerElement *>(interface->GetEnd());
-    assert(end);
+    LayerElement *end = NULL;
+    if (interface->GetEnd()) {
+        end = dynamic_cast<LayerElement *>(interface->GetEnd());
+    }
+    else if (element->HasInterface(INTERFACE_LINKING)) {
+        LinkingInterface *linkingInterface = element->GetLinkingInterface();
+        assert(linkingInterface);
+        if (linkingInterface->GetNextLink()) {
+            // The end link has to have a TimePointInterface becase we ensure it is a ControlElement
+            TimePointInterface *nextInterface = linkingInterface->GetNextLink()->GetTimePointInterface();
+            assert(nextInterface);
+            end = nextInterface->GetStart();
+        }
+    }
+    if (!start || !end) return;
 
     // Get the parent system of the first and last note
-    System *parentSystem1 = dynamic_cast<System *>(interface->GetStart()->GetFirstParent(SYSTEM));
-    System *parentSystem2 = dynamic_cast<System *>(interface->GetEnd()->GetFirstParent(SYSTEM));
+    System *parentSystem1 = dynamic_cast<System *>(start->GetFirstParent(SYSTEM));
+    System *parentSystem2 = dynamic_cast<System *>(end->GetFirstParent(SYSTEM));
 
     int x1, x2;
     Object *objectX = NULL;
@@ -173,9 +185,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // we use the start measure
         measure = interface->GetStartMeasure();
         if (!Check(measure)) return;
-        x1 = interface->GetStart()->GetDrawingX();
-        objectX = interface->GetStart();
-        x2 = interface->GetEnd()->GetDrawingX();
+        x1 = start->GetDrawingX();
+        objectX = start;
+        x2 = end->GetDrawingX();
         graphic = element;
     }
     // Only the first parent is the same, this means that the element is "open" at the end of the system
@@ -183,8 +195,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // We need the last measure of the system for x2 - we also use it for getting the staves later
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
-        x1 = interface->GetStart()->GetDrawingX();
-        objectX = interface->GetStart();
+        x1 = start->GetDrawingX();
+        objectX = start;
         x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         graphic = element;
         spanningType = SPANNING_START;
@@ -197,7 +209,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // We need the position of the first default in the first measure for x1
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
-        x2 = interface->GetEnd()->GetDrawingX();
+        x2 = end->GetDrawingX();
         spanningType = SPANNING_END;
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
@@ -250,7 +262,15 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
                 continue;
             }
 
-        if (element->Is(HAIRPIN)) {
+        if (element->Is(DIR)) {
+            // cast to Dir check in DrawDirConnector
+            DrawDirConnector(dc, dynamic_cast<Dir *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        if (element->Is(DYNAM)) {
+            // cast to Dynam check in DrawDynamConnector
+            DrawDynamConnector(dc, dynamic_cast<Dynam *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is(HAIRPIN)) {
             // cast to Harprin check in DrawHairpin
             DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
@@ -1543,6 +1563,71 @@ void View::DrawTrillExtension(
         dc->EndResumedGraphic(graphic, this);
     else
         dc->EndGraphic(trill, this);
+}
+    
+void View::DrawDirConnector(
+    DeviceContext *dc, Dir *dir, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    /*
+    assert(syl);
+    assert(syl->GetStart() && syl->GetEnd());
+    if (!syl->GetStart() || !syl->GetEnd()) return;
+
+    int y = staff->GetDrawingY() + GetSylYRel(syl, staff);
+    TextExtend extend;
+
+    // The both correspond to the current system, which means no system break in-between (simple case)
+    if (spanningType == SPANNING_START_END) {
+        dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
+        dc->GetTextExtent(syl->GetText(syl), &extend, true);
+        dc->ResetFont();
+        // x position of the syl is two units back
+        x1 += extend.m_width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+    }
+    // Only the first parent is the same, this means that the syl is "open" at the end of the system
+    else if (spanningType == SPANNING_START) {
+        dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
+        dc->GetTextExtent(syl->GetText(syl), &extend, true);
+        dc->ResetFont();
+        // idem
+        x1 += extend.m_width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+    }
+    // We are in the system of the last note - draw the connector from the beginning of the system
+    else if (spanningType == SPANNING_END) {
+        // nothing to adjust
+    }
+    // Rare case where neither the first note nor the last note are in the current system - draw the connector
+    // throughout the system
+    else {
+        // nothing to adjust
+    }
+
+    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instanciate a temporary
+    // object
+    // in order not to reset the Syl bounding box.
+    Syl sylConnector;
+    if (graphic) {
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    }
+    else
+        dc->StartGraphic(&sylConnector, "spanning-connector", "");
+
+    dc->DeactivateGraphic();
+
+    DrawSylConnectorLines(dc, x1, x2, y, syl, staff);
+
+    dc->ReactivateGraphic();
+    if (graphic) {
+        dc->EndResumedGraphic(graphic, this);
+    }
+    else
+        dc->EndGraphic(&sylConnector, this);
+    */
+}
+    
+void View::DrawDynamConnector(
+    DeviceContext *dc, Dynam *dynam, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
 }
 
 void View::DrawSylConnector(
