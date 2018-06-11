@@ -9,6 +9,7 @@
 #ifndef __VRV_IOHUMDRUM_H__
 #define __VRV_IOHUMDRUM_H__
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -209,13 +210,13 @@ public:
     bool empty = true;
 
     // boolean switches:
-    char nostem = '\0'; // !!!RDF**kern: i = no stem
-    char cuesize = '\0'; // !!!RDF**kern: i = cue size
-    char terminallong = '\0'; // !!!RDF**kern: i = terminal long
+    char nostem = '\0'; // !!!RDF**kern: N = no stem
+    char cuesize = '\0'; // !!!RDF**kern: @ = cue size
+    char terminallong = '\0'; // !!!RDF**kern: l = terminal long
     vector<char> editacc; // !!!RDF**kern: i = editorial accidental
-    vector<string> edittype; // !!!RDF**kern: i= editoral accidental, brack[ets]/paren[theses]
-    char below = '\0'; // !!!RDF**kern: i = below (previous signifier is "below")
-    char above = '\0'; // !!!RDF**kern: i = above (previous signifier is "above")
+    vector<string> edittype; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
+    char below = '\0'; // !!!RDF**kern: < = below (previous signifier is "below")
+    char above = '\0'; // !!!RDF**kern: > = above (previous signifier is "above")
 
     std::string space_color; // !!!RDF**kern: show spaces color=hotpink
     std::string ispace_color; // !!!RDF**kern: show invisible rests color=chartreuse
