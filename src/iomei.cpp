@@ -706,6 +706,37 @@ void MeiOutput::WriteXmlId(pugi::xml_node currentNode, Object *object)
     currentNode.append_attribute("xml:id") = UuidToMeiStr(object).c_str();
 }
 
+void MeiOutput::WriteZone(pugi::xml_node currentNode, Zone *zone)
+{
+    assert(zone);
+    WriteXmlId(currentNode, zone);
+    zone->WriteCoordinated(currentNode);
+}
+
+
+void MeiOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
+{
+    assert(facsimile);
+    WriteXmlId(currentNode, facsimile);
+
+    // Write Surface(s)
+    ArrayOfObjects surfaces;
+    AttComparison ac(SURFACE);
+    facsimile->FindAllChildByComparison(&surfaces, &ac);
+    for (auto it = surfaces.begin(); it != surfaces.end(); it++) {
+        Surface *surface = dynamic_cast<Surface *>(*it);
+        assert(surface);
+        pugi::xml_node surfaceNode = currentNode.append_child("surface");
+        WriteXmlId(surfaceNode, surface);
+        for (auto zoneIter = surface->GetZoneBegin(); zoneIter != surface->GetZoneEnd(); zoneIter++) {
+            Zone *zone = dynamic_cast<Zone *>(zoneIter->second);
+            assert(zone);
+            pugi::xml_node zoneNode = surfaceNode.append_child("zone");
+            WriteZone(zoneNode, zone);
+        }
+    }
+}
+
 bool MeiOutput::WriteDoc(Doc *doc)
 {
     assert(doc);
@@ -741,6 +772,12 @@ bool MeiOutput::WriteDoc(Doc *doc)
     // ---- music ----
 
     pugi::xml_node music = m_mei.append_child("music");
+    Facsimile *facs = doc->GetFacsimile();
+    if (facs != nullptr && facs->GetChildCount() > 0) {
+        pugi::xml_node facsimile = music.append_child("facsimile");
+        WriteFacsimile(facsimile, facs);
+        m_nodeStack.push_back(facsimile); 
+    }
     m_currentNode = music.append_child("body");
     m_nodeStack.push_back(m_currentNode);
 
@@ -5287,19 +5324,19 @@ void MeiInput::ParseZone(pugi::xml_node element, Surface *surface)
 void MeiInput::ParseFacsimile(pugi::xml_node facsimile, Doc *doc)
 {
     assert(doc);
-    Facsimile facs;
+    Facsimile *facs = new Facsimile();
     pugi::xml_node element;
     // Process surface
     element = facsimile.first_child();
     Surface *surface = ParseSurface(element);
-    facs.AddChild(surface);
+    facs->AddChild(surface);
     int i = 1;
     for (element = element.first_child(); element; element = element.next_sibling()) {
         LogMessage("Element: %d", i);
         ParseZone(element, surface);
         i++;
     }
-    doc->SetFacsimile(&facs);
+    doc->SetFacsimile(facs);
 }
 
 } // namespace vrv
