@@ -395,10 +395,8 @@ protected:
      * Called fomr DrawTimeSpanningElement
      */
     ///@{
-    void DrawDirConnector(
-                          DeviceContext *dc, Dir *dir, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
-    void DrawDynamConnector(
-                            DeviceContext *dc, Dynam *dynam, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawControlElementConnector(
+                            DeviceContext *dc, ControlElement *dynam, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawHairpin(
                      DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawOctave(

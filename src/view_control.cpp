@@ -270,11 +270,11 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 
         if (element->Is(DIR)) {
             // cast to Dir check in DrawDirConnector
-            DrawDirConnector(dc, dynamic_cast<Dir *>(element), x1, x2, *staffIter, spanningType, graphic);
+            DrawControlElementConnector(dc, dynamic_cast<Dir *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         if (element->Is(DYNAM)) {
             // cast to Dynam check in DrawDynamConnector
-            DrawDynamConnector(dc, dynamic_cast<Dynam *>(element), x1, x2, *staffIter, spanningType, graphic);
+            DrawControlElementConnector(dc, dynamic_cast<Dynam *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is(HAIRPIN)) {
             // cast to Harprin check in DrawHairpin
@@ -1571,69 +1571,77 @@ void View::DrawTrillExtension(
         dc->EndGraphic(trill, this);
 }
     
-void View::DrawDirConnector(
-    DeviceContext *dc, Dir *dir, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+void View::DrawControlElementConnector(
+    DeviceContext *dc, ControlElement *dynam, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
-    /*
-    assert(syl);
-    assert(syl->GetStart() && syl->GetEnd());
-    if (!syl->GetStart() || !syl->GetEnd()) return;
-
-    int y = staff->GetDrawingY() + GetSylYRel(syl, staff);
-    TextExtend extend;
-
-    // The both correspond to the current system, which means no system break in-between (simple case)
-    if (spanningType == SPANNING_START_END) {
-        dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
-        dc->GetTextExtent(syl->GetText(syl), &extend, true);
-        dc->ResetFont();
-        // x position of the syl is two units back
-        x1 += extend.m_width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
-    }
-    // Only the first parent is the same, this means that the syl is "open" at the end of the system
-    else if (spanningType == SPANNING_START) {
-        dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
-        dc->GetTextExtent(syl->GetText(syl), &extend, true);
-        dc->ResetFont();
-        // idem
-        x1 += extend.m_width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
-    }
-    // We are in the system of the last note - draw the connector from the beginning of the system
-    else if (spanningType == SPANNING_END) {
-        // nothing to adjust
-    }
-    // Rare case where neither the first note nor the last note are in the current system - draw the connector
-    // throughout the system
-    else {
-        // nothing to adjust
-    }
-
-    // Because Syl is not a ControlElement (FloatingElement) with FloatingPositioner we need to instanciate a temporary
-    // object
-    // in order not to reset the Syl bounding box.
-    Syl sylConnector;
-    if (graphic) {
-        dc->ResumeGraphic(graphic, graphic->GetUuid());
-    }
-    else
-        dc->StartGraphic(&sylConnector, "spanning-connector", "");
-
-    dc->DeactivateGraphic();
-
-    DrawSylConnectorLines(dc, x1, x2, y, syl, staff);
-
-    dc->ReactivateGraphic();
-    if (graphic) {
-        dc->EndResumedGraphic(graphic, this);
-    }
-    else
-        dc->EndGraphic(&sylConnector, this);
-    */
-}
+    assert(dynam);
+    assert(dynam->GetNextLink());
+    if (!dynam->GetNextLink()) return;
     
-void View::DrawDynamConnector(
-    DeviceContext *dc, Dynam *dynam, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
-{
+    int y = dynam->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+
+    // Adjust the x1
+    if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
+        if (dynam->GetCurrentFloatingPositioner() && dynam->GetCurrentFloatingPositioner()->HasContentBB()) {
+            x1 = dynam->GetCurrentFloatingPositioner()->GetContentRight();
+        }
+    }
+    
+    // Adjust the x2 for extensions with @endid
+    if ((spanningType == SPANNING_END) || (spanningType == SPANNING_START_END)) {
+        FloatingPositioner *nextLink = dynam->GetCorrespFloatingPositioner(dynamic_cast<ControlElement *>(dynam->GetNextLink()));
+        if (nextLink && nextLink->HasContentBB()) {
+            x2 = nextLink->GetContentLeft();
+        }
+    }
+    
+    int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    
+    // the length of the dash and the space between them - can be made a parameter
+    int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
+    int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
+    int halfDashLength = dashLength / 2;
+    
+    int dist = x2 - x1;
+    int nbDashes = dist / dashSpace;
+    
+    int margin = dist / 2;
+    // no dash if the distance is smaller than a dash length
+    if (dist < dashLength) {
+        nbDashes = 0;
+    }
+    // at least one dash
+    else if (nbDashes < 2) {
+        nbDashes = 1;
+    }
+    else {
+        margin = (dist - ((nbDashes - 1) * dashSpace)) / 2;
+    }
+    
+    /************** draw it **************/
+    
+    if (graphic)
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    else
+        dc->StartGraphic(dynam, "spanning-trill", "");
+    
+    dc->DeactivateGraphic();
+    
+    int i;
+    for (i = 0; i < nbDashes; ++i) {
+        int x = x1 + margin + (i * dashSpace);
+        x = std::max(x, x1);
+        
+        DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
+    }
+    
+    dc->ReactivateGraphic();
+    
+    if (graphic)
+        dc->EndResumedGraphic(graphic, this);
+    else
+        dc->EndGraphic(dynam, this);
+    
 }
 
 void View::DrawSylConnector(
