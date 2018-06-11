@@ -1009,15 +1009,12 @@ int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
         // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
         // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
         // midi output
-        /*
-        if ((iter->second == DIR) || (iter->second == DYNAM) || (iter->second == HARM)) {
+        if ((iter->second == DIR) || (iter->second == DYNAM) || (iter->second == HARM) || (iter->second == TRILL)) {
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }
         else {
             ++iter;
         }
-        */
-        ++iter;
     }
 
     return FUNCTOR_CONTINUE;

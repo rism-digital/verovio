@@ -157,9 +157,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
 
-
+    // The start is given by the TimePointInterface
     LayerElement *start = dynamic_cast<LayerElement *>(interface->GetStart());
-    assert(start);
+    // The end is given either by the TimeSpanningInterface (end) or by the LinkingInterface (next)
     LayerElement *end = NULL;
     if (interface->GetEnd()) {
         end = dynamic_cast<LayerElement *>(interface->GetEnd());
