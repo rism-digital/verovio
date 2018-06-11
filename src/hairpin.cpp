@@ -53,7 +53,7 @@ void Hairpin::Reset()
     ResetColor();
     ResetHairpinLog();
     ResetPlacement();
-    AttVerticalGroup::ResetVerticalGroup();
+    ResetVerticalGroup();
 
     m_leftLink = NULL;
     m_rightLink = NULL;

@@ -88,11 +88,17 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Dir *dir = dynamic_cast<Dir *>(element);
         assert(dir);
         DrawDir(dc, dir, measure, system);
+        if (dir->GetNextLink() && (dir->GetExtender() == BOOLEAN_true)) {
+            system->AddToDrawingList(element);
+        }
     }
     else if (element->Is(DYNAM)) {
         Dynam *dynam = dynamic_cast<Dynam *>(element);
         assert(dynam);
         DrawDynam(dc, dynam, measure, system);
+        if (dynam->GetNextLink() && (dynam->GetExtender() == BOOLEAN_true)) {
+            system->AddToDrawingList(element);
+        }
     }
     else if (element->Is(FERMATA)) {
         Fermata *fermata = dynamic_cast<Fermata *>(element);

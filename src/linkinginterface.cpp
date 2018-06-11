@@ -98,6 +98,13 @@ int LinkingInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *funct
     if (!this->GetNextLink() || !this->GetNextLink()->IsControlElement()) {
         return FUNCTOR_CONTINUE;
     }
+    
+    // if @extender is available, the explicit "true" is required
+    if (object->HasAttClass(ATT_EXTENDER)) {
+        AttExtender *att = dynamic_cast<AttExtender *>(object);
+        assert(att);
+        if (att->GetExtender() != BOOLEAN_true) return FUNCTOR_CONTINUE;
+    }
 
     params->m_timeSpanningElements.push_back(object);
 

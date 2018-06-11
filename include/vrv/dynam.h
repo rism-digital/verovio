@@ -24,6 +24,7 @@ class Dynam : public ControlElement,
               public TextListInterface,
               public TextDirInterface,
               public TimeSpanningInterface,
+              public AttExtender,
               public AttVerticalGroup {
 public:
     /**

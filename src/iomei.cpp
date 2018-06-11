@@ -1073,6 +1073,7 @@ void MeiOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
     WriteTextDirInterface(currentNode, dir);
     WriteTimeSpanningInterface(currentNode, dir);
     dir->WriteLang(currentNode);
+    dir->WriteExtender(currentNode);
     dir->WriteVerticalGroup(currentNode);
 }
 
@@ -1083,6 +1084,7 @@ void MeiOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteControlElement(currentNode, dynam);
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
+    dynam->WriteExtender(currentNode);
     dynam->WriteVerticalGroup(currentNode);
 }
 
@@ -3374,6 +3376,7 @@ bool MeiInput::ReadDir(Object *parent, pugi::xml_node dir)
     ReadTextDirInterface(dir, vrvDir);
     ReadTimeSpanningInterface(dir, vrvDir);
     vrvDir->ReadLang(dir);
+    vrvDir->ReadExtender(dir);
     vrvDir->ReadVerticalGroup(dir);
 
     parent->AddChild(vrvDir);
@@ -3388,6 +3391,7 @@ bool MeiInput::ReadDynam(Object *parent, pugi::xml_node dynam)
 
     ReadTextDirInterface(dynam, vrvDynam);
     ReadTimeSpanningInterface(dynam, vrvDynam);
+    vrvDynam->ReadExtender(dynam);
     vrvDynam->ReadVerticalGroup(dynam);
 
     parent->AddChild(vrvDynam);

@@ -28,6 +28,7 @@ class Dir : public ControlElement,
             public TextDirInterface,
             public TimeSpanningInterface,
             public AttLang,
+            public AttExtender,
             public AttVerticalGroup {
 public:
     /**
