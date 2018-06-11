@@ -84,12 +84,7 @@ public:
     virtual void Reset();
     ClassId GetClassId() const { return SURFACE; }
     ///@}
-    
-    void AddZone(Zone *zone) { m_zones.emplace(zone->GetUuid(), zone); }
-    std::map<std::string, Zone*>::iterator GetZoneBegin() { return m_zones.begin(); }
-    std::map<std::string, Zone*>::iterator GetZoneEnd() { return m_zones.end(); } 
-protected:
-    std::map<std::string, Zone*> m_zones;
+    virtual void AddChild(Object *object); 
 private:
 };
 

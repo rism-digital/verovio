@@ -713,7 +713,6 @@ void MeiOutput::WriteZone(pugi::xml_node currentNode, Zone *zone)
     zone->WriteCoordinated(currentNode);
 }
 
-
 void MeiOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
 {
     assert(facsimile);
@@ -728,8 +727,11 @@ void MeiOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
         assert(surface);
         pugi::xml_node surfaceNode = currentNode.append_child("surface");
         WriteXmlId(surfaceNode, surface);
-        for (auto zoneIter = surface->GetZoneBegin(); zoneIter != surface->GetZoneEnd(); zoneIter++) {
-            Zone *zone = dynamic_cast<Zone *>(zoneIter->second);
+        ArrayOfObjects zones;
+        AttComparison aczone(ZONE);
+        surface->FindAllChildByComparison(&zones, &aczone);
+        for (auto zoneIter = zones.begin(); zoneIter != zones.end(); zoneIter++) {
+            Zone *zone = dynamic_cast<Zone *>(*zoneIter);
             assert(zone);
             pugi::xml_node zoneNode = surfaceNode.append_child("zone");
             WriteZone(zoneNode, zone);
@@ -5313,7 +5315,7 @@ void MeiInput::ParseZone(pugi::xml_node element, Surface *surface)
                 LogWarning("Unsupported attribute '%s' for <zone>", iter->name());
             }
         }
-        surface->AddZone(zone);
+        surface->AddChild(zone);
         LogMessage("Added zone %s (%d, %d) (%d, %d)", zone->GetUuid().c_str(), zone->GetUlx(), zone->GetUly(), zone->GetLrx(), zone->GetLry());
     }
     else {

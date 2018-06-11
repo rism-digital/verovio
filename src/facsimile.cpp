@@ -32,7 +32,7 @@ void Facsimile::AddChild(Object *object)
         this->m_children.push_back(object);
     }
     else {
-        LogError("Unsupported child '%s' for facsimile", object->GetClassName().c_str());
+        LogError("Unsupported child '%s' of facsimile", object->GetClassName().c_str());
     }
 }
 //----------------------------------------------------------------------------
@@ -51,10 +51,21 @@ void Surface::Reset()
     ResetCoordinated();
 }
 
+void Surface::AddChild(Object *object)
+{
+    //TODO Add support for graphic tag
+    if (object->Is(ZONE)) {
+        this->m_children.push_back(object);
+    }
+    else {
+        LogError("Unsupported child '%s' of surface", object->GetClassName().c_str());
+    }
+}
+
 //----------------------------------------------------------------------------
 // Zone 
 //----------------------------------------------------------------------------
-Zone::Zone() : Object(), AttTyped(), AttCoordinated() 
+Zone::Zone() : Object("zone-"), AttTyped(), AttCoordinated() 
 {
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_COORDINATED);
