@@ -2352,8 +2352,8 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
 
     facsimile = music.child("facsimile");
     if (!facsimile.empty()) {
-        m_doc->SetType(Transcription);
-        ParseZones(facsimile, m_doc);
+        LogMessage("Test");
+        ParseFacsimile(facsimile, m_doc);
     }
 
     body = music.child("body");
@@ -3819,7 +3819,7 @@ bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     if (element.attribute("ulx") && (this->m_doc->GetType() == Transcription)) {
         object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITION_FACTOR;
         element.remove_attribute("ulx");
-    } else if (element.attribute("facs") && this->m_doc->HasZones() && object->HasAttClass(ATT_COORDINATED)) {
+    } /*else if (element.attribute("facs") && this->m_doc->HasZones() && object->HasAttClass(ATT_COORDINATED)) {
         Zone zone = this->m_doc->GetZone(element.attribute("facs").value());
         AttCoordinated *att = dynamic_cast<AttCoordinated *>(object); 
         assert(att);
@@ -3837,7 +3837,7 @@ bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
             att->SetLry(zone.lry);
         }
         LogMessage("Set att_coordinated based on zone %s", zone.xmlId.c_str());
-    } 
+    }*/ 
 
     SetMeiUuid(element, object);
     object->ReadLabelled(element);
@@ -5245,34 +5245,61 @@ void MeiInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
     // LogDebug("PPUFactor: %f", m_PPUFactor);
 }
 
-void MeiInput::ParseZones(pugi::xml_node facsimile, Doc *doc)
+Surface *MeiInput::ParseSurface(pugi::xml_node surface)
+{
+    return (strcmp(surface.name(), "surface") == 0) ? new Surface() : nullptr;
+}
+
+void MeiInput::ParseZone(pugi::xml_node element, Surface *surface)
+{
+    assert(surface);
+    if (strcmp(element.name(), "zone") == 0) {
+        Zone *zone = new Zone();
+        auto iter = element.attributes_begin();
+        for (; iter != element.attributes_end(); iter++) {
+            if (strcmp(iter->name(), "ulx") == 0) {
+                zone->SetUlx(iter->as_int());
+            }
+            else if (strcmp(iter->name(), "uly") == 0) {
+                zone->SetUly(iter->as_int());
+            }
+            else if (strcmp(iter->name(), "lrx") == 0) {
+                zone->SetLrx(iter->as_int());
+            }
+            else if (strcmp(iter->name(), "lry") == 0) {
+                zone->SetLry(iter->as_int());
+            }
+            else if (strcmp(iter->name(), "xml:id") == 0) {
+                zone->SetUuid(iter->as_string());
+            }
+            else {
+                LogWarning("Unsupported attribute '%s' for <zone>", iter->name());
+            }
+        }
+        surface->AddZone(zone);
+        LogMessage("Added zone %s (%d, %d) (%d, %d)", zone->GetUuid().c_str(), zone->GetUlx(), zone->GetUly(), zone->GetLrx(), zone->GetLry());
+    }
+    else {
+        LogWarning("Unsupported element '%s' in <surface>", element.name());
+    }
+}
+
+void MeiInput::ParseFacsimile(pugi::xml_node facsimile, Doc *doc)
 {
     assert(doc);
+    Facsimile facs;
     pugi::xml_node element;
-    for (element = facsimile.first_child().first_child(); element; element = element.next_sibling()) {
-        if (strcmp(element.name(), "zone") == 0) {
-            Zone newZone;
-            pugi::xml_attribute att = element.first_attribute();
-            for (; att; att = att.next_attribute()) {
-                if (strcmp(att.name(), "ulx") == 0) {
-                    newZone.ulx = att.as_int();
-                }
-                else if (strcmp(att.name(), "uly") == 0) {
-                    newZone.uly = att.as_int();
-                }
-                else if (strcmp(att.name(), "lrx") == 0) {
-                    newZone.lrx = att.as_int();
-                }
-                else if (strcmp(att.name(), "lry") == 0) {
-                    newZone.lry = att.as_int();
-                }
-                else if (strcmp(att.name(), "xml:id") == 0) {
-                    newZone.xmlId = att.as_string();
-                }
-            }
-            doc->AddZone(newZone);
-        }
+    // Process surface
+    element = facsimile.first_child();
+    Surface *surface = ParseSurface(element);
+    facs.AddChild(surface);
+    int i = 1;
+    for (element = element.first_child(); element; element = element.next_sibling()) {
+        LogMessage("Element: %d", i);
+        ParseZone(element, surface);
+        i++;
     }
+    doc->SetFacsimile(&facs);
 }
 
 } // namespace vrv

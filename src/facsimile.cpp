@@ -24,7 +24,17 @@ namespace vrv {
 //----------------------------------------------------------------------------
 Facsimile::Facsimile() : Object("facsimile-") {}
 Facsimile::~Facsimile() {}
-void Reset() {}
+void Facsimile::Reset() {}
+
+void Facsimile::AddChild(Object *object)
+{
+    if (object->Is(SURFACE)) {
+        this->m_children.push_back(object);
+    }
+    else {
+        LogError("Unsupported child '%s' for facsimile", object->GetClassName().c_str());
+    }
+}
 //----------------------------------------------------------------------------
 // Surface 
 //----------------------------------------------------------------------------

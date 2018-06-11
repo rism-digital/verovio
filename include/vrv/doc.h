@@ -9,6 +9,7 @@
 #define __VRV_DOC_H__
 
 #include "devicecontextbase.h"
+#include "facsimile.h"
 #include "options.h"
 #include "scoredef.h"
 
@@ -26,11 +27,6 @@ class Page;
 class Score;
 
 enum DocType { Raw = 0, Rendering, Transcription };
-
-struct Zone {
-    int ulx=-1,uly=-1,lrx=-1,lry=-1;
-    std::string xmlId;
-};
 
 //----------------------------------------------------------------------------
 // Doc
@@ -330,16 +326,11 @@ public:
     ///@}
 
     /**
-     * Setter and getter for facsimile zones
+     * @name Setter and getter for facsimile
      */
     ///@{
-    void SetZones(std::map<std::string, Zone> zones) { m_zones = zones; }
-    void AddZone(Zone zone) { m_zones.emplace(zone.xmlId, zone); }
-    Zone GetZone(std::string xmlId) { return m_zones.at(xmlId); }
-    std::map<std::string, Zone> GetZones() { return m_zones; }
-    ///@}
-
-    bool HasZones() { return !m_zones.empty(); }
+    void SetFacsimile(Facsimile *facsimile) { m_facsimile = facsimile; }
+    Facsimile *GetFacsimile() { return m_facsimile; }
 
     //----------//
     // Functors //
@@ -474,8 +465,8 @@ private:
     /** Page top margin (MEI scoredef@page.topmar) - currently not saved */
     int m_pageMarginTop;
 
-    /** Zones from facsimile tag */
-    std::map<std::string, Zone> m_zones;
+    /** Facsimile information */
+    Facsimile *m_facsimile = nullptr;
 };
 
 } // namespace vrv

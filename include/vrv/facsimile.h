@@ -14,6 +14,7 @@
 
 #include "atts_analytical.h"
 #include "atts_shared.h"
+#include "object.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -36,30 +37,10 @@ public:
     Facsimile(); 
     virtual ~Facsimile();
     virtual void Reset();
-    ClassId GetClassId const { return FACSIMILE; }
+    virtual ClassId GetClassId() const { return FACSIMILE; }
+    virtual std::string GetClassName() const { return "facsimile"; }
     ///@}
-};
-
-//----------------------------------------------------------------------------
-// Surface 
-//----------------------------------------------------------------------------
-/**
- * Implements the surface element
- * in MEI
- */
-
-class Surface : public Object, public AttTyped, public AttCoordinated {
-public:
-    /**
-     * @name Constructors, destructors, reset, and class name methods
-     */
-    ///@{
-    Surface();
-    virtual ~Surface();
-    virtual void Reset();
-    ClassId GetClassId const { return SURFACE; }
-    ///@}
-private:
+    virtual void AddChild(Object *object);
 };
 
 //----------------------------------------------------------------------------
@@ -79,9 +60,36 @@ public:
     Zone();
     virtual ~Zone();
     virtual void Reset();
-    ClassId GetClassId const { return ZONE; }
+    ClassId GetClassId() const { return ZONE; }
     ///@}
 private:
 };
+
+//----------------------------------------------------------------------------
+// Surface 
+//----------------------------------------------------------------------------
+/**
+ * Implements the surface element
+ * in MEI
+ */
+
+class Surface : public Object, public AttTyped, public AttCoordinated {
+public:
+    /**
+     * @name Constructors, destructors, reset, and class name methods
+     */
+    ///@{
+    Surface();
+    virtual ~Surface();
+    virtual void Reset();
+    ClassId GetClassId() const { return SURFACE; }
+    ///@}
+    
+    void AddZone(Zone *zone) { m_zones.emplace(zone->GetUuid(), zone); }
+protected:
+    std::map<std::string, Zone*> m_zones;
+private:
+};
+
 }
 #endif

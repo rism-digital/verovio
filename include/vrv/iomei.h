@@ -640,7 +640,9 @@ private:
     void UpgradePageTo_3_0_0(Page *page, Doc *doc);
     ///@}
     
-    void ParseZones(pugi::xml_node facsimile, Doc *doc);
+    void ParseFacsimile(pugi::xml_node facsimile, Doc *doc);
+    Surface *ParseSurface(pugi::xml_node surface);
+    void ParseZone(pugi::xml_node zone, Surface *surface);
 
 public:
     //
