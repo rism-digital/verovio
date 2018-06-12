@@ -32,6 +32,7 @@ namespace vrv {
 class Glyph;
 class Object;
 class View;
+class Zone;
 
 extern "C" {
 static inline double DegToRad(double deg)
@@ -281,6 +282,8 @@ protected:
     /** flag for indicating if the graphic is deactivated */
     bool m_isDeactivatedX;
     bool m_isDeactivatedY;
+
+    Zone *m_facsimile = nullptr;
 
 private:
     /** stores the width and height of the device context */

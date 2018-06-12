@@ -660,7 +660,13 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, cueSize);
+    Zone *zone = m_doc->GetFacsimile()->FindZoneByUuid(clef->GetFacs());
+    if (zone == nullptr) {
+        DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, cueSize);
+    }
+    else {
+        DrawSmuflCode(dc, ToLogicalX(zone->m_facsScale * zone->GetUlx()), ToLogicalY(zone->m_facsScale * zone->GetUly()), sym, staff->m_drawingStaffSize, cueSize);
+    }
 
     dc->EndGraphic(element, this);
 }
@@ -716,7 +722,13 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     int actualY = clefY + pitchOffset + octaveOffset;
 
-    DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false, true);
+    Zone *zone = m_doc->GetFacsimile()->FindZoneByUuid(custos->GetFacs());
+    if (zone == nullptr) {
+        DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false, true);
+    }
+    else {
+        DrawSmuflCode(dc, ToLogicalX(zone->m_facsScale * zone->GetUlx()), ToLogicalY(zone->m_facsScale * zone->GetUly()), sym, staff->m_drawingStaffSize, false, true);
+    }
 
     dc->EndGraphic(element, this);
 }

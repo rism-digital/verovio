@@ -8,6 +8,7 @@
 #ifndef __VRV_STAFF_H__
 #define __VRV_STAFF_H__
 
+#include "atts_facsimile.h"
 #include "atts_shared.h"
 #include "object.h"
 
@@ -31,7 +32,7 @@ class TimeSpanningInterface;
  * It contains Measure objects.
  * For unmeasured music, one single Measure is added for simplifying internal processing
  */
-class Staff : public Object, public AttNInteger, public AttTyped, public AttVisibility {
+class Staff : public Object, public AttFacsimile, public AttNInteger, public AttTyped, public AttVisibility {
 
 public:
     /**
@@ -163,6 +164,13 @@ public:
     ///@{
     virtual int CalcOnsetOffset(FunctorParams *functorParams);
     ///@}
+
+    /**
+     * Set staff parameters based on
+     * facsimile information (if it
+     * exists).
+     */
+    virtual void SetFromFacsimile(Doc *doc);
 
 private:
     /**

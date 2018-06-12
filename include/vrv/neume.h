@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "atts_facsimile.h"
 #include "atts_mensural.h"
 #include "atts_shared.h"
 #include "beam.h"
@@ -57,7 +58,7 @@ enum NeumeGroup {
  * This class models the MEI <neume> element.
  */
 
-class Neume : public LayerElement, public ObjectListInterface, public AttColor, public AttCoordinated {
+class Neume : public LayerElement, public ObjectListInterface, public AttColor, public AttFacsimile {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -88,7 +89,10 @@ public:
     
     NeumeGroup GetNeumeGroup();
 
-    std::vector<int> GetPitchDifferences(); 
+    std::vector<int> GetPitchDifferences();
+
+    PitchInterface *GetHighestPitch();
+    PitchInterface *GetLowestPitch();
 
 private:
     //
@@ -97,8 +101,6 @@ public:
      * String keys come from the contours of neume groupings as defined in MEI4
      */
     static std::map<std::string, NeumeGroup> s_neumes;
-
-    static std::string NeumeGroupToString(NeumeGroup group);
 
 private:
 };

@@ -9,6 +9,7 @@
 #define __VRV_CUSTOS_H__
 
 #include "atts_analytical.h"
+#include "atts_facsimile.h"
 #include "atts_shared.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
@@ -20,7 +21,7 @@ namespace vrv {
 // Custos
 //----------------------------------------------------------------------------
 
-class Custos : public LayerElement, public PitchInterface, public PositionInterface, public AttColor {
+class Custos : public LayerElement, public PitchInterface, public PositionInterface, public AttColor, public AttFacsimile {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

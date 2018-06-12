@@ -1225,6 +1225,7 @@ void MeiOutput::WriteStaff(pugi::xml_node currentNode, Staff *staff)
     assert(staff);
 
     WriteXmlId(currentNode, staff);
+    staff->WriteFacsimile(currentNode);
     staff->WriteNInteger(currentNode);
     staff->WriteTyped(currentNode);
     staff->WriteVisibility(currentNode);
@@ -1395,6 +1396,7 @@ void MeiOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     WriteLayerElement(currentNode, clef);
     clef->WriteClefShape(currentNode);
     clef->WriteColor(currentNode);
+    clef->WriteFacsimile(currentNode);
     clef->WriteLineLoc(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
 }
@@ -1407,6 +1409,7 @@ void MeiOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
     WritePositionInterface(currentNode, custos);
     WriteLayerElement(currentNode, custos);
     custos->WriteColor(currentNode);
+    custos->WriteFacsimile(currentNode);
 }
 
 void MeiOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
@@ -1530,7 +1533,7 @@ void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
 
     WriteLayerElement(currentNode, neume);
     neume->WriteColor(currentNode);
-    neume->WriteCoordinated(currentNode);
+    neume->WriteFacsimile(currentNode);
 }
 
 void MeiOutput::WriteNote(pugi::xml_node currentNode, Note *note)
@@ -3669,6 +3672,7 @@ bool MeiInput::ReadStaff(Object *parent, pugi::xml_node staff)
     Staff *vrvStaff = new Staff();
     SetMeiUuid(staff, vrvStaff);
 
+    vrvStaff->ReadFacsimile(staff);
     vrvStaff->ReadNInteger(staff);
     vrvStaff->ReadTyped(staff);
     vrvStaff->ReadVisibility(staff);
@@ -4005,6 +4009,7 @@ bool MeiInput::ReadClef(Object *parent, pugi::xml_node clef)
 
     vrvClef->ReadClefShape(clef);
     vrvClef->ReadColor(clef);
+    vrvClef->ReadFacsimile(clef);
     vrvClef->ReadLineLoc(clef);
     vrvClef->ReadOctaveDisplacement(clef);
 
@@ -4021,6 +4026,7 @@ bool MeiInput::ReadCustos(Object *parent, pugi::xml_node custos)
     ReadPitchInterface(custos, vrvCustos);
     ReadPositionInterface(custos, vrvCustos);
     vrvCustos->ReadColor(custos);
+    vrvCustos->ReadFacsimile(custos);
 
     parent->AddChild(vrvCustos);
     ReadUnsupportedAttr(custos, vrvCustos);
@@ -4200,6 +4206,7 @@ bool MeiInput::ReadNeume(Object *parent, pugi::xml_node neume)
     ReadLayerElement(neume, vrvNeume);
 
     vrvNeume->ReadColor(neume);
+    vrvNeume->ReadFacsimile(neume);
 
     parent->AddChild(vrvNeume);
     return ReadLayerChildren(vrvNeume, neume, vrvNeume);

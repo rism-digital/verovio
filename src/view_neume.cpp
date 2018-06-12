@@ -79,28 +79,10 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     int staffLineNumber = staff->m_drawingLines;
     int clefLine = clef->GetLine();
-
-    int noteY = element->GetDrawingY();
-    int noteX = element->GetDrawingX();
-
-    // Calculating proper y offset based on pname, clef, and staff
-    int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
-    int pitchOffset = 0;
-    int octaveOffset = (nc->GetOct() - 3) * ((staffSize / 2) * 7);
-
-    if (clef->GetShape() == CLEFSHAPE_C) {
-        pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
-    }
-    else if (clef->GetShape() == CLEFSHAPE_F) {
-        pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
-    }
-
-    int yValue = clefYPosition + pitchOffset + octaveOffset;
-
-    // Determine grouping component is a part of and its position
     Neume *neume = dynamic_cast<Neume *>(nc->GetFirstParent(NEUME));
     assert(neume);
-
+    
+    // Determine grouping component is a part of and its position
     NeumeGroup group = neume->GetNeumeGroup();
     int position = neume->GetChildIndex(element);     
 
@@ -238,10 +220,47 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
     const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+    int noteY, noteX;
+    int yValue;
+    if (neume->HasFacs()) {
+        Zone *zone = m_doc->GetFacsimile()->FindZoneByUuid(neume->GetFacs());
+        assert(zone);
+        noteY = zone->m_facsScale * zone->GetUly();
+        noteX = ToLogicalX(zone->m_facsScale * zone->GetUlx()) + position*noteWidth;
+
+        int pitchDifference = neume->GetHighestPitch()->PitchDifferenceTo(nc);
+        yValue = ToLogicalY(noteY + pitchDifference * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
+    }
+    else {
+        noteY = element->GetDrawingY();
+        noteX = element->GetDrawingX();
+        
+        // Calculating proper y offset based on pname, clef, and staff
+        int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
+        int pitchOffset = 0;
+        int octaveOffset = (nc->GetOct() - 3) * ((staffSize / 2) * 7);
+
+        if (clef->GetShape() == CLEFSHAPE_C) {
+            pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
+        }
+        else if (clef->GetShape() == CLEFSHAPE_F) {
+            pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
+        }
+
+        yValue = clefYPosition + pitchOffset + octaveOffset;
+    }
+
+   
+    Zone *zone = m_doc->GetFacsimile()->FindZoneByUuid(neume->GetFacs());
     
     for (auto it = params.begin(); it != params.end(); it++) {
-        DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight,
-               it->fontNo, staff->m_drawingStaffSize, false, true);
+        if (true) {
+            DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight,
+                   it->fontNo, staff->m_drawingStaffSize, false, true);
+        }
+        else {
+            DrawSmuflCode(dc, ToLogicalX(zone->m_facsScale * zone->GetUlx() /*+ it->xOffset * noteWidth*/), ToLogicalY(zone->m_facsScale * zone->GetUly() /*+ it->yOffset * noteHeight*/), it->fontNo, staff->m_drawingStaffSize, false, true);
+        }
     } 
     
     // Draw the children
@@ -264,9 +283,7 @@ void View::DrawNeume(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // Start the Neume graphic and draw the children
 
     dc->StartGraphic(element, "", element->GetUuid());
-
     DrawLayerChildren(dc, neume, layer, staff, measure);
-
     dc->EndGraphic(element, this);
 }
 

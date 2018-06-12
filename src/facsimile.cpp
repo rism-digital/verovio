@@ -33,8 +33,15 @@ void Facsimile::AddChild(Object *object)
     }
     else {
         LogError("Unsupported child '%s' of facsimile", object->GetClassName().c_str());
+        assert(false);
     }
 }
+
+Zone *Facsimile::FindZoneByUuid(std::string zoneId)
+{
+    return dynamic_cast<Zone *>(this->FindChildByUuid(zoneId));
+}
+
 //----------------------------------------------------------------------------
 // Surface 
 //----------------------------------------------------------------------------
@@ -57,8 +64,12 @@ void Surface::AddChild(Object *object)
     if (object->Is(ZONE)) {
         this->m_children.push_back(object);
     }
+    else if (object->GetClassName() == "graphic") {
+        LogWarning("The graphic element is currently not supported.");
+    }
     else {
         LogError("Unsupported child '%s' of surface", object->GetClassName().c_str());
+        assert(false);
     }
 }
 

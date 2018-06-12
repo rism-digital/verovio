@@ -20,6 +20,30 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// Zone
+//----------------------------------------------------------------------------
+/**
+ * Implements the zone element
+ * in MEI
+ */
+
+class Zone : public Object, public AttTyped, public AttCoordinated {
+public:
+    /**
+     * @name Constructors, destructors, reset, and class name methods
+     */
+    ///@{
+    Zone();
+    virtual ~Zone();
+    virtual void Reset();
+    ClassId GetClassId() const { return ZONE; }
+    ///@}
+    
+    int m_facsScale = 4;
+private:
+};
+
+//----------------------------------------------------------------------------
 // Facsimile
 //----------------------------------------------------------------------------
 /**
@@ -41,28 +65,8 @@ public:
     virtual std::string GetClassName() const { return "facsimile"; }
     ///@}
     virtual void AddChild(Object *object);
-};
 
-//----------------------------------------------------------------------------
-// Zone
-//----------------------------------------------------------------------------
-/**
- * Implements the zone element
- * in MEI
- */
-
-class Zone : public Object, public AttTyped, public AttCoordinated {
-public:
-    /**
-     * @name Constructors, destructors, reset, and class name methods
-     */
-    ///@{
-    Zone();
-    virtual ~Zone();
-    virtual void Reset();
-    ClassId GetClassId() const { return ZONE; }
-    ///@}
-private:
+    Zone *FindZoneByUuid(std::string zoneId);
 };
 
 //----------------------------------------------------------------------------

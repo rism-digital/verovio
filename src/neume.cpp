@@ -42,10 +42,10 @@ std::map<std::string, NeumeGroup> Neume::s_neumes = { { "", PUNCTUM }, { "u", PE
 // Neume
 //----------------------------------------------------------------------------
 
-Neume::Neume() : LayerElement("neume-"), ObjectListInterface(), AttColor(), AttCoordinated()
+Neume::Neume() : LayerElement("neume-"), ObjectListInterface(), AttColor(), AttFacsimile()
 {
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_COORDINATED);
+    RegisterAttClass(ATT_FACSIMILE);
     Reset();
 }
 
@@ -55,6 +55,7 @@ void Neume::Reset()
 {
     LayerElement::Reset();
     ResetColor();
+    ResetFacsimile();
 }
 
 void Neume::AddChild(Object *child)
@@ -187,43 +188,42 @@ bool Neume::GenerateChildMelodic()
     return true;
 }
 
-std::string Neume::NeumeGroupToString(NeumeGroup group)
+PitchInterface *Neume::GetHighestPitch()
 {
-    switch (group)
-    {
-        case PUNCTUM:
-            return "Punctum";
-        case CLIVIS:
-            return "Clivis";
-        case PES:
-            return "Pes";
-        case PRESSUS:
-            return "Pressus";
-        case CLIMACUS:
-            return "Climacus";
-        case PORRECTUS:
-            return "Porrectus";
-        case SCANDICUS:
-            return "Scandicus";
-        case TORCULUS:
-            return "TORCULUS";
-        case SCANDICUS_FLEXUS:
-            return "Scandicus flexus";
-        case PORRECTUS_FLEXUS:
-            return "Porrectus flexus";
-        case TORCULUS_RESUPINUS:
-            return "Torculus resupinus";
-        case CLIMACUS_RESUPINUS:
-            return "Climacus resupinus";
-        case PES_SUBPUNCTIS:
-            return "Pes subpunctis";
-        case PORRECTUS_SUBPUNCTIS:
-            return "Porrectus subpunctis";
-        case SCANDICUS_SUBPUNCTIS:
-            return "Scandicus subpunctis"; 
-        default:
-            return "";
+    ArrayOfObjects pitchChildren;
+    InterfaceComparison ic(INTERFACE_PITCH);
+    this->FindAllChildByComparison(&pitchChildren, &ic);
+
+    auto it = pitchChildren.begin();
+    PitchInterface *max = (*it)->GetPitchInterface();
+    if (!max) return nullptr;
+    for (it++; it != pitchChildren.end(); it++) {
+        PitchInterface *pi = dynamic_cast<PitchInterface *>((*it)->GetPitchInterface());
+        assert(pi);
+        if (pi->PitchDifferenceTo(max) > 0) {
+           max = pi;
+        } 
     }
+    return max;
+}
+
+PitchInterface *Neume::GetLowestPitch()
+{
+    ArrayOfObjects pitchChildren;
+    InterfaceComparison ic(INTERFACE_PITCH);
+    this->FindAllChildByComparison(&pitchChildren, &ic);
+
+    auto it = pitchChildren.begin();
+    PitchInterface *min = (*it)->GetPitchInterface();
+    if (!min) return nullptr;
+    for (it++; it != pitchChildren.end(); it++) {
+        PitchInterface *pi = dynamic_cast<PitchInterface *>((*it)->GetPitchInterface());
+        assert(pi);
+        if (pi->PitchDifferenceTo(min) < 0) {
+           min = pi;
+        } 
+    }
+    return min;
 }
 
 } // namespace vrv

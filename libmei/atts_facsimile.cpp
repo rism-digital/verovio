@@ -41,14 +41,14 @@ AttFacsimile::~AttFacsimile()
 
 void AttFacsimile::ResetFacsimile()
 {
-    m_facs = URIS_NONE;
+    m_facs = "";
 }
 
 bool AttFacsimile::ReadFacsimile(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("facs")) {
-        this->SetFacs(StrToUris(element.attribute("facs").value()));
+        this->SetFacs(StrToStr(element.attribute("facs").value()));
         element.remove_attribute("facs");
         hasAttribute = true;
     }
@@ -59,7 +59,7 @@ bool AttFacsimile::WriteFacsimile(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasFacs()) {
-        element.append_attribute("facs") = UrisToStr(this->GetFacs()).c_str();
+        element.append_attribute("facs") = StrToStr(this->GetFacs()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -67,34 +67,9 @@ bool AttFacsimile::WriteFacsimile(pugi::xml_node element)
 
 bool AttFacsimile::HasFacs() const
 {
-    return (m_facs != URIS_NONE);
+    return (m_facs != "");
 }
 
 /* include <attfacs> */
-
-bool Att::SetFacsimile(Object *element, std::string attrType, std::string attrValue)
-{
-    if (element->HasAttClass(ATT_FACSIMILE)) {
-        AttFacsimile *att = dynamic_cast<AttFacsimile *>(element);
-        assert(att);
-        if (attrType == "facs") {
-            att->SetFacs(att->StrToUris(attrValue));
-            return true;
-        }
-    }
-
-    return false;
-}
-
-void Att::GetFacsimile(const Object *element, ArrayOfStrAttr *attributes)
-{
-    if (element->HasAttClass(ATT_FACSIMILE)) {
-        const AttFacsimile *att = dynamic_cast<const AttFacsimile *>(element);
-        assert(att);
-        if (att->HasFacs()) {
-            attributes->push_back(std::make_pair("facs", att->UrisToStr(att->GetFacs())));
-        }
-    }
-}
 
 } // vrv namespace

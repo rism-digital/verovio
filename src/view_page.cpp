@@ -879,6 +879,8 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
     assert(system);
 
     dc->StartGraphic(staff, "", staff->GetUuid());
+    
+    staff->SetFromFacsimile(m_doc);
 
     DrawStaffLines(dc, staff, measure, system);
 
@@ -918,7 +920,9 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
 
     int j, x1, x2, y;
 
-    y = staff->GetDrawingY();
+    Zone *zone = m_doc->GetFacsimile()->FindZoneByUuid(staff->GetFacs());
+
+    y = zone != nullptr ? zone->m_facsScale * zone->GetUly() : staff->GetDrawingY();
 
     x1 = measure->GetDrawingX();
     x2 = x1 + measure->GetWidth();
@@ -928,9 +932,15 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     dc->SetBrush(m_currentColour, AxSOLID);
 
     for (j = 0; j < staff->m_drawingLines; ++j) {
-        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
-        // For drawing rectangles instead of lines
-        y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        if (zone == nullptr) {
+            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
+            // For drawing rectangles instead of lines
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        }
+        else {
+            dc->DrawLine(zone->m_facsScale * zone->GetUlx(), y, zone->m_facsScale * zone->GetLrx(), y);
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        }
     }
 
     dc->ResetPen();

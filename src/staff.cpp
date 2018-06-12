@@ -36,8 +36,9 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
-Staff::Staff(int n) : Object("staff-"), AttNInteger(), AttTyped(), AttVisibility()
+Staff::Staff(int n) : Object("staff-"), AttFacsimile(), AttNInteger(), AttTyped(), AttVisibility()
 {
+    RegisterAttClass(ATT_FACSIMILE);
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_VISIBILITY);
@@ -60,6 +61,7 @@ Staff::~Staff()
 void Staff::Reset()
 {
     Object::Reset();
+    ResetFacsimile();
     ResetNInteger();
     ResetTyped();
     ResetVisibility();
@@ -192,6 +194,15 @@ void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, int left, int ri
     for (i = 0; i < count; ++i) {
         lines->at(i).AddDash(left, right);
     }
+}
+
+void Staff::SetFromFacsimile(Doc *doc)
+{
+    if(!this->HasFacs()) return;
+    assert(doc);
+    Zone *zone = doc->GetFacsimile()->FindZoneByUuid(this->GetFacs());
+    assert(zone);
+    m_drawingStaffSize = zone->m_facsScale * (zone->GetLry() - zone->GetUly()) / (2 * m_drawingLines);
 }
 
 //----------------------------------------------------------------------------

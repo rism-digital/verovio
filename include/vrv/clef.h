@@ -8,6 +8,7 @@
 #ifndef __VRV_CLEF_H__
 #define __VRV_CLEF_H__
 
+#include "atts_facsimile.h"
 #include "atts_shared.h"
 #include "layerelement.h"
 
@@ -25,6 +26,7 @@ class ScoreDefInterface;
 class Clef : public LayerElement,
              public AttClefShape,
              public AttColor,
+             public AttFacsimile,
              public AttLineLoc,
              public AttOctaveDisplacement {
 public:

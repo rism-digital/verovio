@@ -15,11 +15,12 @@ namespace vrv {
 // Custos
 //----------------------------------------------------------------------------
 
-Custos::Custos() : LayerElement("custos-"), PitchInterface(), PositionInterface(), AttColor()
+Custos::Custos() : LayerElement("custos-"), PitchInterface(), PositionInterface(), AttColor(), AttFacsimile()
 {
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_FACSIMILE);
 
     Reset();
 }
@@ -32,6 +33,7 @@ void Custos::Reset()
     PitchInterface::Reset();
     PositionInterface::Reset();
     ResetColor();
+    ResetFacsimile();
 }
 
 //----------------------------------------------------------------------------
