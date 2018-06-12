@@ -229,7 +229,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
         noteX = ToLogicalX(zone->m_facsScale * zone->GetUlx()) + position*noteWidth;
 
         int pitchDifference = neume->GetHighestPitch()->PitchDifferenceTo(nc);
-        yValue = ToLogicalY(noteY + pitchDifference * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize));
+        yValue = ToLogicalY(noteY + pitchDifference * noteWidth);
     }
     else {
         noteY = element->GetDrawingY();
@@ -249,18 +249,10 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
 
         yValue = clefYPosition + pitchOffset + octaveOffset;
     }
-
    
-    Zone *zone = m_doc->GetFacsimile()->FindZoneByUuid(neume->GetFacs());
-    
     for (auto it = params.begin(); it != params.end(); it++) {
-        if (true) {
-            DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight,
-                   it->fontNo, staff->m_drawingStaffSize, false, true);
-        }
-        else {
-            DrawSmuflCode(dc, ToLogicalX(zone->m_facsScale * zone->GetUlx() /*+ it->xOffset * noteWidth*/), ToLogicalY(zone->m_facsScale * zone->GetUly() /*+ it->yOffset * noteHeight*/), it->fontNo, staff->m_drawingStaffSize, false, true);
-        }
+        DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight,
+               it->fontNo, staff->m_drawingStaffSize, false, true);
     } 
     
     // Draw the children
