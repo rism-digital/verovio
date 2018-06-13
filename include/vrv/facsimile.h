@@ -41,7 +41,7 @@ public:
     ///@}
     int GetLogicalUly();
     int GetLogicalLry();    
-    int m_facsScale = 4;
+    int m_facsScale = 1;
 private:
 };
 
@@ -69,6 +69,7 @@ public:
     virtual void AddChild(Object *object);
 
     Zone *FindZoneByUuid(std::string zoneId);
+    int GetMaxY();
 };
 
 //----------------------------------------------------------------------------
@@ -91,6 +92,8 @@ public:
     ClassId GetClassId() const { return SURFACE; }
     ///@}
     virtual void AddChild(Object *object); 
+
+    int GetMaxY();
 private:
 };
 

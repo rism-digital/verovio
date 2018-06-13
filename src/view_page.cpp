@@ -923,13 +923,13 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     if (staff->HasFacs()) {
         x1 = staff->GetDrawingX();
         x2 = x1 + staff->GetWidth();
+        y = ToLogicalY(staff->GetDrawingY());
     }
     else {
         x1 = measure->GetDrawingX();
         x2 = x1 + measure->GetWidth();
+        y = staff->GetDrawingY();
     }
-    
-    y = staff->GetDrawingY();
 
     int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
     dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);

@@ -569,7 +569,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(clef);
     int x,y;
     if (clef->HasFacs()) {
-        y = staff->GetDrawingY();
+        y = ToLogicalY(staff->GetDrawingY());
         x = clef->GetDrawingX();
     }
     else {
@@ -652,7 +652,6 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         clef->SetEmptyBB();
         return;
     }
-
     y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine());
 
     bool cueSize = false;
@@ -705,11 +704,12 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int x,y;
     if (custos->HasFacs()) {
         x = custos->GetDrawingX();
+        y = ToLogicalY(staff->GetDrawingY());
     }
     else {
-       x = element->GetDrawingX();
+        x = element->GetDrawingX();
+        y = staff->GetDrawingY();
     }
-    y = staff->GetDrawingY();
 
     int clefY = y - (staffSize * (staffLineNumber - clefLine));
     int pitchOffset;

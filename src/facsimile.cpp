@@ -44,6 +44,20 @@ Zone *Facsimile::FindZoneByUuid(std::string zoneId)
     return dynamic_cast<Zone *>(this->FindChildByUuid(zoneId));
 }
 
+int Facsimile::GetMaxY()
+{
+    AttComparison ac(SURFACE);
+    ArrayOfObjects surfaces;
+    this->FindAllChildByComparison(&surfaces, &ac);
+
+    int max = 0;
+    for (auto iter = surfaces.begin(); iter != surfaces.end(); iter++) {
+        Surface *surface = dynamic_cast<Surface *>(*iter);
+        assert(surface);
+        max = (surface->GetMaxY() > max) ? surface->GetMaxY() : max;
+    }
+    return max;
+}
 //----------------------------------------------------------------------------
 // Surface 
 //----------------------------------------------------------------------------
@@ -75,6 +89,21 @@ void Surface::AddChild(Object *object)
         LogError("Unsupported child '%s' of surface", object->GetClassName().c_str());
         assert(false);
     }
+}
+
+int Surface::GetMaxY() 
+{
+    if (HasLry()) return GetLry();
+    int max = 0;
+    AttComparison ac(ZONE);
+    ArrayOfObjects zones;
+    FindAllChildByComparison(&zones, &ac);
+    for (auto iter = zones.begin(); iter!= zones.end(); iter++) {
+        Zone *zone = dynamic_cast<Zone *>(*iter);
+        assert(zone);
+        max = (zone->GetLry() > max) ? zone->GetLry() : max;
+    }
+    return max;
 }
 
 //----------------------------------------------------------------------------

@@ -42,7 +42,7 @@ int FacsimileInterface::GetDrawingX() const
 int FacsimileInterface::GetDrawingY() const
 {
     assert(m_zone);
-    int y = (GetSurfaceY() - m_zone->GetLogicalUly()) * m_zone->m_facsScale;
+    int y = ( m_zone->GetLogicalUly()) * m_zone->m_facsScale;
     return y;
 }
 
@@ -61,15 +61,7 @@ int FacsimileInterface::GetSurfaceY() const
         return surface->GetLry();
     }
     else {
-        int max = 0;
-        AttComparison ac(ZONE);
-        ArrayOfObjects zones;
-        surface->FindAllChildByComparison(&zones, &ac);
-        for (auto iter = zones.begin(); iter != zones.end(); iter++) {
-            Zone *zone = dynamic_cast<Zone *>(*iter);
-            max = (zone->GetLry() > max) ? zone->GetLry() : max;
-        }
-        return max; 
+        return surface->GetMaxY();
     }
 }
 }

@@ -550,7 +550,7 @@ public:
     Staff *m_currentStaff;
     System *m_currentSystem;
     Page *m_currentPage;
-    ///@}m
+    ///@}
 
 protected:
     /**
