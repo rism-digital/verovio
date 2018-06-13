@@ -15,6 +15,7 @@
 #include "atts_analytical.h"
 #include "atts_shared.h"
 #include "object.h"
+#include "view.h"
 #include "vrvdef.h"
 
 namespace vrv {

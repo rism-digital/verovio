@@ -33,20 +33,43 @@ void FacsimileInterface::Reset()
     this->SetZone(nullptr);
 }
 
-int FacsimileInterface::GetDrawingX() const {
+int FacsimileInterface::GetDrawingX() const
+{
     assert(m_zone);
     return m_zone->GetUlx() * m_zone->m_facsScale;
 }
 
-int FacsimileInterface::GetDrawingY() const {
+int FacsimileInterface::GetDrawingY() const
+{
     assert(m_zone);
-    int y = m_zone->GetLogicalUly() * m_zone->m_facsScale;
-    LogMessage("%d", y);
+    int y = (GetSurfaceY() - m_zone->GetLogicalUly()) * m_zone->m_facsScale;
     return y;
 }
 
-int FacsimileInterface::GetWidth() const {
+int FacsimileInterface::GetWidth() const
+{
     assert(m_zone);
     return m_zone->m_facsScale * (m_zone->GetLrx() - m_zone->GetUlx());
+}
+
+int FacsimileInterface::GetSurfaceY() const
+{
+    assert(m_zone);
+    Surface *surface = dynamic_cast<Surface *>(m_zone->GetFirstParent(SURFACE));
+    assert(surface);
+    if (surface->HasLry()) {
+        return surface->GetLry();
+    }
+    else {
+        int max = 0;
+        AttComparison ac(ZONE);
+        ArrayOfObjects zones;
+        surface->FindAllChildByComparison(&zones, &ac);
+        for (auto iter = zones.begin(); iter != zones.end(); iter++) {
+            Zone *zone = dynamic_cast<Zone *>(*iter);
+            max = (zone->GetLry() > max) ? zone->GetLry() : max;
+        }
+        return max; 
+    }
 }
 }

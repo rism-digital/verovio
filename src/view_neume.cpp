@@ -222,8 +222,14 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
     int noteY, noteX;
     int yValue;
-    noteX = (neume->HasFacs()) ? neume->GetDrawingX() + position * noteWidth : element->GetDrawingX();
-    noteY = element->GetDrawingY(); 
+    if (neume->HasFacs()) {
+        noteY = staff->GetDrawingY();
+        noteX = neume->GetDrawingX() + position * noteWidth;
+    }
+    else {
+        noteX = element->GetDrawingX();
+        noteY = element->GetDrawingY();
+    }
     // Calculating proper y offset based on pname, clef, and staff
     int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
     int pitchOffset = 0;

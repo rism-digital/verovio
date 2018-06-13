@@ -95,15 +95,13 @@ void Zone::Reset()
 
 int Zone::GetLogicalUly()
 {
-    Surface *surface = dynamic_cast<Surface *>(this->GetFirstParent(SURFACE));
-    assert(surface);
-    return abs(surface->GetLry() - this->GetUly());
+    assert(view);
+    return (this->GetUly());
 }
 
 int Zone::GetLogicalLry()
 {
-    Surface *surface = dynamic_cast<Surface *>(this->GetFirstParent(SURFACE));
-    assert(surface);
-    return abs(surface->GetLry() - this->GetLry());
+    assert(view);
+    return (this->GetLry());
 }
 }

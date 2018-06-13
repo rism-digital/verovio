@@ -13,6 +13,7 @@
 
 namespace vrv {
 class Zone;
+class View;
 
 //----------------------------------------------------------------------------
 // FacsimileInterface 
@@ -43,6 +44,8 @@ public:
     ///@{
     void SetZone(Zone *zone) { m_zone = zone; }
     ///@}
+    
+    int GetSurfaceY() const;
     
     /** Get the zone */
     Zone *GetZone() { return m_zone; }

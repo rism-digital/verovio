@@ -920,8 +920,6 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
 
     int j, x1, x2, y;
 
-    y = staff->GetDrawingY();
-
     if (staff->HasFacs()) {
         x1 = staff->GetDrawingX();
         x2 = x1 + staff->GetWidth();
@@ -930,6 +928,8 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
         x1 = measure->GetDrawingX();
         x2 = x1 + measure->GetWidth();
     }
+    
+    y = staff->GetDrawingY();
 
     int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
     dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
