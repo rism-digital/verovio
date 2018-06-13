@@ -13,12 +13,12 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "atts_facsimile.h"
 #include "atts_mensural.h"
 #include "atts_shared.h"
 #include "beam.h"
 #include "chord.h"
 #include "durationinterface.h"
+#include "facsimileinterface.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
 
@@ -58,7 +58,7 @@ enum NeumeGroup {
  * This class models the MEI <neume> element.
  */
 
-class Neume : public LayerElement, public ObjectListInterface, public AttColor, public AttFacsimile {
+class Neume : public LayerElement, public FacsimileInterface, public ObjectListInterface, public AttColor {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -76,6 +76,8 @@ public:
     virtual ClassId GetClassId() const { return NEUME; }
     ///@}
 
+    virtual FacsimileInterface *GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); } 
+
     /**
      * Add an element (a note or a rest) to a syllable.
      * Only syl or neume will be added.
@@ -90,6 +92,9 @@ public:
     NeumeGroup GetNeumeGroup();
 
     std::vector<int> GetPitchDifferences();
+
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
 
     PitchInterface *GetHighestPitch();
     PitchInterface *GetLowestPitch();

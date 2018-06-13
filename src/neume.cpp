@@ -42,10 +42,10 @@ std::map<std::string, NeumeGroup> Neume::s_neumes = { { "", PUNCTUM }, { "u", PE
 // Neume
 //----------------------------------------------------------------------------
 
-Neume::Neume() : LayerElement("neume-"), ObjectListInterface(), AttColor(), AttFacsimile()
+Neume::Neume() : LayerElement("neume-"), FacsimileInterface(), ObjectListInterface(), AttColor() 
 {
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_FACSIMILE);
+    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     Reset();
 }
 
@@ -54,8 +54,8 @@ Neume::~Neume() {}
 void Neume::Reset()
 {
     LayerElement::Reset();
+    FacsimileInterface::Reset();
     ResetColor();
-    ResetFacsimile();
 }
 
 void Neume::AddChild(Object *child)
@@ -224,6 +224,26 @@ PitchInterface *Neume::GetLowestPitch()
         } 
     }
     return min;
+}
+
+int Neume::GetDrawingX() const
+{
+    if (this->HasFacs()) {
+        return FacsimileInterface::GetDrawingX();
+    }
+    else {
+        return LayerElement::GetDrawingX();
+    }
+}
+
+int Neume::GetDrawingY() const
+{
+    if (this->HasFacs()) {
+        return FacsimileInterface::GetDrawingY();
+    }
+    else {
+        return LayerElement::GetDrawingY();
+    }
 }
 
 } // namespace vrv

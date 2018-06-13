@@ -331,6 +331,9 @@ public:
     ///@{
     void SetFacsimile(Facsimile *facsimile) { m_facsimile = facsimile; }
     Facsimile *GetFacsimile() { return m_facsimile; }
+    ///@}
+    
+    void SetChildZones(); 
 
     //----------//
     // Functors //

@@ -8,8 +8,8 @@
 #ifndef __VRV_STAFF_H__
 #define __VRV_STAFF_H__
 
-#include "atts_facsimile.h"
 #include "atts_shared.h"
+#include "facsimileinterface.h"
 #include "object.h"
 
 namespace vrv {
@@ -32,7 +32,7 @@ class TimeSpanningInterface;
  * It contains Measure objects.
  * For unmeasured music, one single Measure is added for simplifying internal processing
  */
-class Staff : public Object, public AttFacsimile, public AttNInteger, public AttTyped, public AttVisibility {
+class Staff : public Object, public FacsimileInterface, public AttNInteger, public AttTyped, public AttVisibility {
 
 public:
     /**
@@ -56,6 +56,8 @@ public:
      * Overriding CopyReset() method to be called after copy / assignment calls.
      */
     virtual void CopyReset();
+    
+    virtual FacsimileInterface *GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); }
 
     /**
      * Delete all the legder line arrays.
@@ -74,7 +76,7 @@ public:
      */
     ///@{
     virtual int GetDrawingY() const;
-
+    virtual int GetDrawingX() const;
     /**
      * Return the index position of the staff in its measure parent
      */

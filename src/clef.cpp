@@ -14,12 +14,12 @@ namespace vrv {
 // Clef
 //----------------------------------------------------------------------------
 
-Clef::Clef() : LayerElement("clef-"), AttClefShape(), AttColor(), AttFacsimile(), AttLineLoc(), AttOctaveDisplacement()
+Clef::Clef() : LayerElement("clef-"), FacsimileInterface(), AttClefShape(), AttColor(), AttLineLoc(), AttOctaveDisplacement()
 {
     Init();
 }
 
-Clef::Clef(const ScoreDefInterface *clefAttr) : LayerElement("clef-"), AttFacsimile()
+Clef::Clef(const ScoreDefInterface *clefAttr) : LayerElement("clef-"), FacsimileInterface()
 {
     Init();
 
@@ -32,9 +32,9 @@ Clef::Clef(const ScoreDefInterface *clefAttr) : LayerElement("clef-"), AttFacsim
 
 void Clef::Init()
 {
+    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterAttClass(ATT_CLEFSHAPE);
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_FACSIMILE);
     RegisterAttClass(ATT_LINELOC);
     RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
 
@@ -46,9 +46,9 @@ Clef::~Clef() {}
 void Clef::Reset()
 {
     LayerElement::Reset();
+    FacsimileInterface::Reset();
     ResetClefShape();
     ResetColor();
-    ResetFacsimile();
     ResetLineLoc();
     ResetOctaveDisplacement();
 }
@@ -79,4 +79,23 @@ int Clef::ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, dat
     return place << 24 | octaveDis << 16 | line << 8 | shape;
 }
 
+int Clef::GetDrawingX() const
+{
+    if (this->HasFacs()) {
+        return FacsimileInterface::GetDrawingX();
+    }
+    else {
+        return LayerElement::GetDrawingX();
+    }
+}
+
+int Clef::GetDrawingY() const
+{
+    if (this->HasFacs()) {
+        return FacsimileInterface::GetDrawingY();
+    }
+    else {
+        return LayerElement::GetDrawingY();
+    }
+}
 } // namespace vrv

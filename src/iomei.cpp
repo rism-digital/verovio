@@ -1394,9 +1394,9 @@ void MeiOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
     assert(clef);
 
     WriteLayerElement(currentNode, clef);
+    WriteFacsimileInterface(currentNode, clef);
     clef->WriteClefShape(currentNode);
     clef->WriteColor(currentNode);
-    clef->WriteFacsimile(currentNode);
     clef->WriteLineLoc(currentNode);
     clef->WriteOctaveDisplacement(currentNode);
 }
@@ -1404,12 +1404,12 @@ void MeiOutput::WriteClef(pugi::xml_node currentNode, Clef *clef)
 void MeiOutput::WriteCustos(pugi::xml_node currentNode, Custos *custos)
 {
     assert(custos);
-
+    
+    WriteFacsimileInterface(currentNode, custos);
     WritePitchInterface(currentNode, custos);
     WritePositionInterface(currentNode, custos);
     WriteLayerElement(currentNode, custos);
     custos->WriteColor(currentNode);
-    custos->WriteFacsimile(currentNode);
 }
 
 void MeiOutput::WriteDot(pugi::xml_node currentNode, Dot *dot)
@@ -1532,8 +1532,8 @@ void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
     assert(neume);
 
     WriteLayerElement(currentNode, neume);
+    WriteFacsimileInterface(currentNode, neume);
     neume->WriteColor(currentNode);
-    neume->WriteFacsimile(currentNode);
 }
 
 void MeiOutput::WriteNote(pugi::xml_node currentNode, Note *note)
@@ -1726,6 +1726,13 @@ void MeiOutput::WriteLinkingInterface(pugi::xml_node element, LinkingInterface *
     interface->WriteLinking(element);
 }
     
+void MeiOutput::WriteFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface)
+{
+    assert(interface);
+
+    interface->WriteFacsimile(element);
+}
+
 void MeiOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *interface)
 {
     assert(interface);
@@ -4010,10 +4017,10 @@ bool MeiInput::ReadClef(Object *parent, pugi::xml_node clef)
 {
     Clef *vrvClef = new Clef();
     ReadLayerElement(clef, vrvClef);
+    ReadFacsimileInterface(clef, vrvClef);
 
     vrvClef->ReadClefShape(clef);
     vrvClef->ReadColor(clef);
-    vrvClef->ReadFacsimile(clef);
     vrvClef->ReadLineLoc(clef);
     vrvClef->ReadOctaveDisplacement(clef);
 
@@ -4027,10 +4034,10 @@ bool MeiInput::ReadCustos(Object *parent, pugi::xml_node custos)
     Custos *vrvCustos = new Custos();
     ReadLayerElement(custos, vrvCustos);
 
+    ReadFacsimileInterface(custos, vrvCustos);
     ReadPitchInterface(custos, vrvCustos);
     ReadPositionInterface(custos, vrvCustos);
     vrvCustos->ReadColor(custos);
-    vrvCustos->ReadFacsimile(custos);
 
     parent->AddChild(vrvCustos);
     ReadUnsupportedAttr(custos, vrvCustos);
@@ -4208,9 +4215,9 @@ bool MeiInput::ReadNeume(Object *parent, pugi::xml_node neume)
 {
     Neume *vrvNeume = new Neume();
     ReadLayerElement(neume, vrvNeume);
+    ReadFacsimileInterface(neume, vrvNeume);
 
     vrvNeume->ReadColor(neume);
-    vrvNeume->ReadFacsimile(neume);
 
     parent->AddChild(vrvNeume);
     return ReadLayerChildren(vrvNeume, neume, vrvNeume);
@@ -4551,6 +4558,12 @@ bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
 bool MeiInput::ReadLinkingInterface(pugi::xml_node element, LinkingInterface *interface)
 {
     interface->ReadLinking(element);
+    return true;
+}
+
+bool MeiInput::ReadFacsimileInterface(pugi::xml_node element, FacsimileInterface *interface)
+{
+    interface->ReadFacsimile(element);
     return true;
 }
 

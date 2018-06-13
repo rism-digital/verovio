@@ -567,9 +567,15 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Clef *clef = dynamic_cast<Clef *>(element);
     assert(clef);
-
-    int y = staff->GetDrawingY();
-    int x = element->GetDrawingX();
+    int x,y;
+    if (clef->HasFacs()) {
+        y = staff->GetDrawingY();
+        x = clef->GetDrawingX();
+    }
+    else {
+        y = staff->GetDrawingY();
+        x = element->GetDrawingX();
+    }
     int sym = 0;
     bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
         || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
@@ -660,13 +666,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    Zone *zone = m_doc->GetFacsimile()->FindZoneByUuid(clef->GetFacs());
-    if (zone == nullptr) {
-        DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, cueSize);
-    }
-    else {
-        DrawSmuflCode(dc, ToLogicalX(zone->m_facsScale * zone->GetUlx()), ToLogicalY(zone->m_facsScale * zone->GetUly()), sym, staff->m_drawingStaffSize, cueSize);
-    }
+    DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, cueSize);
 
     dc->EndGraphic(element, this);
 }
@@ -702,8 +702,14 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int staffLineNumber = staff->m_drawingLines;
     int clefLine = clef->GetLine();
 
-    int x = element->GetDrawingX();
-    int y = staff->GetDrawingY();
+    int x,y;
+    if (custos->HasFacs()) {
+        x = custos->GetDrawingX();
+    }
+    else {
+       x = element->GetDrawingX();
+    }
+    y = staff->GetDrawingY();
 
     int clefY = y - (staffSize * (staffLineNumber - clefLine));
     int pitchOffset;
@@ -722,13 +728,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     int actualY = clefY + pitchOffset + octaveOffset;
 
-    Zone *zone = m_doc->GetFacsimile()->FindZoneByUuid(custos->GetFacs());
-    if (zone == nullptr) {
-        DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false, true);
-    }
-    else {
-        DrawSmuflCode(dc, ToLogicalX(zone->m_facsScale * zone->GetUlx()), ToLogicalY(zone->m_facsScale * zone->GetUly()), sym, staff->m_drawingStaffSize, false, true);
-    }
+    DrawSmuflCode(dc, x, actualY, sym, staff->m_drawingStaffSize, false, true);
 
     dc->EndGraphic(element, this);
 }

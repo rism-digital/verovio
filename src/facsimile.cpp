@@ -29,7 +29,9 @@ void Facsimile::Reset() {}
 void Facsimile::AddChild(Object *object)
 {
     if (object->Is(SURFACE)) {
+        object->SetParent(this);
         this->m_children.push_back(object);
+        Modify();
     }
     else {
         LogError("Unsupported child '%s' of facsimile", object->GetClassName().c_str());
@@ -62,7 +64,9 @@ void Surface::AddChild(Object *object)
 {
     //TODO Add support for graphic tag
     if (object->Is(ZONE)) {
+        object->SetParent(this);
         this->m_children.push_back(object);
+        Modify();
     }
     else if (object->GetClassName() == "graphic") {
         LogWarning("The graphic element is currently not supported.");
@@ -87,5 +91,19 @@ void Zone::Reset()
 {
     ResetTyped();
     ResetCoordinated();
+}
+
+int Zone::GetLogicalUly()
+{
+    Surface *surface = dynamic_cast<Surface *>(this->GetFirstParent(SURFACE));
+    assert(surface);
+    return abs(surface->GetLry() - this->GetUly());
+}
+
+int Zone::GetLogicalLry()
+{
+    Surface *surface = dynamic_cast<Surface *>(this->GetFirstParent(SURFACE));
+    assert(surface);
+    return abs(surface->GetLry() - this->GetLry());
 }
 }

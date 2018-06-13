@@ -222,33 +222,21 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
     int noteY, noteX;
     int yValue;
-    if (neume->HasFacs()) {
-        Zone *zone = m_doc->GetFacsimile()->FindZoneByUuid(neume->GetFacs());
-        assert(zone);
-        noteY = zone->m_facsScale * zone->GetUly();
-        noteX = ToLogicalX(zone->m_facsScale * zone->GetUlx()) + position*noteWidth;
+    noteX = (neume->HasFacs()) ? neume->GetDrawingX() + position * noteWidth : element->GetDrawingX();
+    noteY = element->GetDrawingY(); 
+    // Calculating proper y offset based on pname, clef, and staff
+    int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
+    int pitchOffset = 0;
+    int octaveOffset = (nc->GetOct() - 3) * ((staffSize / 2) * 7);
 
-        int pitchDifference = neume->GetHighestPitch()->PitchDifferenceTo(nc);
-        yValue = ToLogicalY(noteY + pitchDifference * noteWidth);
+    if (clef->GetShape() == CLEFSHAPE_C) {
+        pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
     }
-    else {
-        noteY = element->GetDrawingY();
-        noteX = element->GetDrawingX();
-        
-        // Calculating proper y offset based on pname, clef, and staff
-        int clefYPosition = noteY - (staffSize * (staffLineNumber - clefLine));
-        int pitchOffset = 0;
-        int octaveOffset = (nc->GetOct() - 3) * ((staffSize / 2) * 7);
-
-        if (clef->GetShape() == CLEFSHAPE_C) {
-            pitchOffset = (nc->GetPname() - 1) * (staffSize / 2);
-        }
-        else if (clef->GetShape() == CLEFSHAPE_F) {
-            pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
-        }
-
-        yValue = clefYPosition + pitchOffset + octaveOffset;
+    else if (clef->GetShape() == CLEFSHAPE_F) {
+        pitchOffset = (nc->GetPname() - 4) * (staffSize / 2);
     }
+
+    yValue = clefYPosition + pitchOffset + octaveOffset;
    
     for (auto it = params.begin(); it != params.end(); it++) {
         DrawSmuflCode(dc, noteX + it->xOffset * noteWidth, yValue + it->yOffset * noteHeight,

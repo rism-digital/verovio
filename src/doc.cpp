@@ -1511,4 +1511,24 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
     return FUNCTOR_STOP;
 }
 
+void Doc::SetChildZones() {
+    if (!m_facsimile) return;
+    
+    InterfaceComparison ic(INTERFACE_FACSIMILE);
+    ArrayOfObjects children;
+
+    this->FindAllChildByComparison(&children, &ic);
+
+    for (auto iter = children.begin(); iter != children.end(); iter++) {
+        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>((*iter)->GetFacsimileInterface());
+        assert(fi);
+        if (fi->HasFacs()) {
+            fi->SetZone(m_facsimile->FindZoneByUuid(fi->GetFacs()));
+        }
+        else {
+            LogWarning("If facsimiles are present then element %s should have it.", (*iter)->GetClassName().c_str());
+        }
+    }
+}
+
 } // namespace vrv

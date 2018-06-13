@@ -36,13 +36,12 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
-Staff::Staff(int n) : Object("staff-"), AttFacsimile(), AttNInteger(), AttTyped(), AttVisibility()
+Staff::Staff(int n) : Object("staff-"), FacsimileInterface(), AttNInteger(), AttTyped(), AttVisibility()
 {
-    RegisterAttClass(ATT_FACSIMILE);
     RegisterAttClass(ATT_NINTEGER);
     RegisterAttClass(ATT_TYPED);
     RegisterAttClass(ATT_VISIBILITY);
-
+    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     // owned pointers need to be set to NULL;
     m_ledgerLinesAbove = NULL;
     m_ledgerLinesBelow = NULL;
@@ -61,7 +60,7 @@ Staff::~Staff()
 void Staff::Reset()
 {
     Object::Reset();
-    ResetFacsimile();
+    FacsimileInterface::Reset();
     ResetNInteger();
     ResetTyped();
     ResetVisibility();
@@ -137,8 +136,16 @@ void Staff::AddChild(Object *child)
     Modify();
 }
 
+int Staff::GetDrawingX() const
+{
+    if (this->HasFacs()) return FacsimileInterface::GetDrawingX();
+    return Object::GetDrawingX();
+}
+
 int Staff::GetDrawingY() const
 {
+    if (this->HasFacs()) return FacsimileInterface::GetDrawingY();
+
     if (m_yAbs != VRV_UNSET) return m_yAbs;
 
     if (!m_staffAlignment) return 0;
@@ -203,6 +210,7 @@ void Staff::SetFromFacsimile(Doc *doc)
     Zone *zone = doc->GetFacsimile()->FindZoneByUuid(this->GetFacs());
     assert(zone);
     m_drawingStaffSize = zone->m_facsScale * (zone->GetLry() - zone->GetUly()) / (2 * m_drawingLines);
+
 }
 
 //----------------------------------------------------------------------------

@@ -8,8 +8,8 @@
 #ifndef __VRV_CLEF_H__
 #define __VRV_CLEF_H__
 
-#include "atts_facsimile.h"
 #include "atts_shared.h"
+#include "facsimileinterface.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -24,9 +24,9 @@ class ScoreDefInterface;
  * This class models the MEI <clef> element.
  */
 class Clef : public LayerElement,
+             public FacsimileInterface,
              public AttClefShape,
              public AttColor,
-             public AttFacsimile,
              public AttLineLoc,
              public AttOctaveDisplacement {
 public:
@@ -48,6 +48,9 @@ public:
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
+    virtual FacsimileInterface* GetFacsimileInterface() { return dynamic_cast<FacsimileInterface *>(this); }
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
     /**
      * Return the offset of the clef
      */

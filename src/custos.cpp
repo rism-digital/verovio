@@ -15,12 +15,12 @@ namespace vrv {
 // Custos
 //----------------------------------------------------------------------------
 
-Custos::Custos() : LayerElement("custos-"), PitchInterface(), PositionInterface(), AttColor(), AttFacsimile()
+Custos::Custos() : LayerElement("custos-"), FacsimileInterface(), PitchInterface(), PositionInterface(), AttColor() 
 {
+    RegisterInterface(FacsimileInterface::GetAttClasses(), FacsimileInterface::IsInterface());
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_FACSIMILE);
 
     Reset();
 }
@@ -30,10 +30,30 @@ Custos::~Custos() {}
 void Custos::Reset()
 {
     LayerElement::Reset();
+    FacsimileInterface::Reset();
     PitchInterface::Reset();
     PositionInterface::Reset();
     ResetColor();
-    ResetFacsimile();
+}
+
+int Custos::GetDrawingX() const
+{
+    if (this->HasFacs()) {
+        return FacsimileInterface::GetDrawingX();
+    }
+    else {
+        return LayerElement::GetDrawingX();
+    }
+}
+
+int Custos::GetDrawingY() const
+{
+    if (this->HasFacs()) {
+        return FacsimileInterface::GetDrawingY();
+    }
+    else {
+        return LayerElement::GetDrawingY();
+    }
 }
 
 //----------------------------------------------------------------------------

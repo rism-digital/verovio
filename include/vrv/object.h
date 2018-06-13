@@ -29,6 +29,7 @@ class FileOutputStream;
 class Functor;
 class FunctorParams;
 class LinkingInterface;
+class FacsimileInterface;
 class PitchInterface;
 class PositionInterface;
 class ScoreDefInterface;
@@ -132,6 +133,7 @@ public:
 
     virtual DurationInterface *GetDurationInterface() { return NULL; }
     virtual LinkingInterface *GetLinkingInterface() { return NULL; }
+    virtual FacsimileInterface *GetFacsimileInterface() { return NULL; }
     virtual PitchInterface *GetPitchInterface() { return NULL; }
     virtual PlistInterface *GetPlistInterface() { return NULL; }
     virtual PositionInterface *GetPositionInterface() { return NULL; }
