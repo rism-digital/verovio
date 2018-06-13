@@ -2394,7 +2394,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
 
     facsimile = music.child("facsimile");
     if (!facsimile.empty()) {
-        ParseFacsimile(facsimile, m_doc);
+        ReadFacsimile(m_doc, facsimile);
     }
 
     body = music.child("body");
@@ -2454,6 +2454,10 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     if (success && !m_hasScoreDef) {
         LogWarning("No scoreDef provided, trying to generate one...");
         success = m_doc->GenerateDocumentScoreDef();
+    }
+
+    if (success && m_doc->GetFacsimile() != nullptr) {
+        m_doc->SetChildZones();
     }
 
     return success;
@@ -5290,60 +5294,51 @@ void MeiInput::UpgradePageTo_3_0_0(Page *page, Doc *doc)
     // LogDebug("PPUFactor: %f", m_PPUFactor);
 }
 
-Surface *MeiInput::ParseSurface(pugi::xml_node surface)
+void MeiInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
 {
-    return (strcmp(surface.name(), "surface") == 0) ? new Surface() : nullptr;
+    assert(parent);
+    Surface *vrvSurface = new Surface();
+    SetMeiUuid(surface, vrvSurface);
+    vrvSurface->ReadCoordinated(surface);
+    vrvSurface->ReadTyped(surface);
+
+    for (pugi::xml_node child = surface.first_child(); child; child = child.next_sibling()) {
+        if (strcmp(child.name(), "zone") == 0) {
+            ReadZone(vrvSurface, child);
+        }
+        else {
+            LogWarning("Unsupported element '%s' in <surface>", child.name());
+        }
+    }
+    parent->AddChild(vrvSurface);
 }
 
-void MeiInput::ParseZone(pugi::xml_node element, Surface *surface)
+void MeiInput::ReadZone(Surface *parent, pugi::xml_node zone)
 {
     assert(surface);
-    if (strcmp(element.name(), "zone") == 0) {
-        Zone *zone = new Zone();
-        auto iter = element.attributes_begin();
-        for (; iter != element.attributes_end(); iter++) {
-            if (strcmp(iter->name(), "ulx") == 0) {
-                zone->SetUlx(iter->as_int());
-            }
-            else if (strcmp(iter->name(), "uly") == 0) {
-                zone->SetUly(iter->as_int());
-            }
-            else if (strcmp(iter->name(), "lrx") == 0) {
-                zone->SetLrx(iter->as_int());
-            }
-            else if (strcmp(iter->name(), "lry") == 0) {
-                zone->SetLry(iter->as_int());
-            }
-            else if (strcmp(iter->name(), "xml:id") == 0) {
-                zone->SetUuid(iter->as_string());
-            }
-            else {
-                LogWarning("Unsupported attribute '%s' for <zone>", iter->name());
-            }
-        }
-        surface->AddChild(zone);
-    }
-    else {
-        LogWarning("Unsupported element '%s' in <surface>", element.name());
-    }
+    Zone *vrvZone = new Zone();
+    SetMeiUuid(zone, vrvZone);
+    vrvZone->ReadCoordinated(zone);
+    vrvZone->ReadTyped(zone);
+    parent->AddChild(vrvZone);
 }
 
-void MeiInput::ParseFacsimile(pugi::xml_node facsimile, Doc *doc)
+void MeiInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
 {
     assert(doc);
-    Facsimile *facs = new Facsimile();
+    Facsimile *vrvFacsimile = new Facsimile();
     // Read xmlId (if present)
-    SetMeiUuid(facsimile, facs);
-    pugi::xml_node element;
-    // Process surface
-    element = facsimile.first_child();
-    Surface *surface = ParseSurface(element);
-    SetMeiUuid(element, surface);
-    facs->AddChild(surface);
-    for (element = element.first_child(); element; element = element.next_sibling()) {
-        ParseZone(element, surface);
+    SetMeiUuid(facsimile, vrvFacsimile);
+    // Read children
+    for (pugi::xml_node child = facsimile.first_child(); child; child = child.next_sibling()) {
+        if (strcmp(child.name(), "surface") == 0) {
+            ReadSurface(vrvFacsimile, child);
+        }
+        else {
+            LogWarning("Unsupported element '%s' in <facsimile>", child.name());
+        }
     }
-    doc->SetFacsimile(facs);
+    doc->SetFacsimile(vrvFacsimile);
 }
 
 } // namespace vrv
