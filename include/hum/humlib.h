@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jun 10 23:34:53 PDT 2018
+// Last Modified: Wed Jun 13 22:18:02 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1261,17 +1261,17 @@ class HumdrumToken : public std::string, public HumHash {
 		int      getFieldNumber            (void) const;
 		int      getTokenIndex             (void) const;
 		int      getTokenNumber            (void) const;
-		const std::string& getDataType          (void) const;
+		const std::string& getDataType     (void) const;
 		bool     isDataType                (const std::string& dtype) const;
 		bool     isKern                    (void) const;
 		bool     isMens                    (void) const;
-		std::string   getSpineInfo              (void) const;
+		std::string   getSpineInfo         (void) const;
 		int      getTrack                  (void) const;
 		int      getSubtrack               (void) const;
 		bool     noteInLowerSubtrack       (void);
-		std::string   getTrackString            (void) const;
+		std::string   getTrackString       (void) const;
 		int      getSubtokenCount          (const std::string& separator = " ") const;
-		std::string   getSubtoken               (int index,
+		std::string   getSubtoken          (int index,
 		                                    const std::string& separator = " ") const;
 		void     setParameters             (HTp ptok);
 		void     setParameters             (const std::string& pdata, HTp ptok = NULL);
@@ -1282,15 +1282,15 @@ class HumdrumToken : public std::string, public HumHash {
 		HTp      getSlurEndToken           (int number = 0);
 		void     storeLinkedParameters     (void);
 		bool     linkedParameterIsGlobal   (int index);
-		std::ostream& printCsv                  (std::ostream& out = std::cout);
-		std::ostream& printXml                  (std::ostream& out = std::cout, int level = 0,
+		std::ostream& printCsv             (std::ostream& out = std::cout);
+		std::ostream& printXml             (std::ostream& out = std::cout, int level = 0,
 		                                    const std::string& indent = "\t");
 		std::ostream& printGlobalXmlParameterInfo(std::ostream& out = std::cout, int level = 0,
 		                                   const std::string& indent = "\t");
-		std::string   getXmlId                  (const std::string& prefix = "") const;
-		std::string   getXmlIdPrefix            (void) const;
+		std::string   getXmlId             (const std::string& prefix = "") const;
+		std::string   getXmlIdPrefix       (void) const;
 		void     setText                   (const std::string& text);
-		std::string   getText                   (void) const;
+		std::string   getText              (void) const;
 		int      addLinkedParameter        (HTp token);
 		int      getLinkedParameterCount   (void);
 		HumParamSet* getLinkedParameter    (int index);
@@ -1298,7 +1298,7 @@ class HumdrumToken : public std::string, public HumHash {
 		std::ostream& printXmlLinkedParameterInfo(std::ostream& out, int level, const std::string& indent);
 
 		// layout parameter accessors
-		std::string   getVisualDuration         (void);
+		std::string   getVisualDuration    (void);
 
 		HumdrumToken& operator=            (HumdrumToken& aToken);
 		HumdrumToken& operator=            (const std::string& aToken);
@@ -1313,8 +1313,8 @@ class HumdrumToken : public std::string, public HumHash {
 		std::vector<HTp> getPreviousTokens (void) const;
 
 		// next/previous token on line:
-		HTp      getNextFieldToken           (void) const;
-		HTp      getPreviousFieldToken       (void) const;
+		HTp      getNextFieldToken         (void) const;
+		HTp      getPreviousFieldToken     (void) const;
 
 		int      getPreviousNonNullDataTokenCount(void);
 		int      getPreviousNNDTCount      (void)
@@ -1323,7 +1323,7 @@ class HumdrumToken : public std::string, public HumHash {
 		HTp      getPreviousNNDT           (int index = 0)
 		                           { return getPreviousNonNullDataToken(index); }
 		int      getNextNonNullDataTokenCount(void);
-		int      getNextNNDTCount          (void)
+		int      getNextNNDTCount           (void)
 		                               { return getNextNonNullDataTokenCount(); }
 		HTp      getNextNonNullDataToken   (int index = 0);
 		HTp      getNextNNDT               (int index = 0)
@@ -1575,7 +1575,7 @@ class HumdrumFileBase : public HumHash {
 		void          getSpineStartList        (std::vector<HTp>& spinestarts,
 		                                        const std::string& exinterp);
 		void          getKernSpineStartList    (std::vector<HTp>& spinestarts);
-		std::vector<HTp>   getKernSpineStartList    ();
+		std::vector<HTp> getKernSpineStartList (void);
 		int           getExinterpCount         (const std::string& exinterp);
 		void          getSpineStartList        (std::vector<HTp>& spinestarts,
 		                                        const std::vector<std::string>& exinterps);
@@ -1910,6 +1910,10 @@ class HumdrumFileContent : public HumdrumFileStructure {
 
 		bool   analyzeRScale              (void);
 
+		// in HumdrumFileContent-rest.cpp
+		void  analyzeRestPositions        (void);
+		void  analyzeRestPositions        (HTp kernstart);
+
 		// in HumdrumFileContent-metlev.cpp
 		void  getMetricLevels             (std::vector<double>& output, int track = 0,
 		                                   double undefined = NAN);
@@ -1956,6 +1960,11 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		bool    isLinkedSlurBegin         (HTp token, int index, const std::string& pattern);
 		bool    isLinkedSlurEnd           (HTp token, int index, const std::string& pattern);
 		void    createLinkedSlurs         (std::vector<HTp>& linkstarts, std::vector<HTp>& linkends);
+		void    assignVerticalRestPosition(HTp first, HTp second, int baseline);
+		int     getRestPositionAboveNotes (HTp rest, std::vector<int>& vpos);
+		int     getRestPositionBelowNotes (HTp rest, std::vector<int>& vpos);
+		void    setRestOnCenterStaffLine  (HTp rest, int baseline);
+		bool    processRestPitch          (HTp rest, int baseline);
 };
 
 
@@ -2499,7 +2508,7 @@ class Convert {
 		                                     HumNum scale = HumNum(1,4));
 
 		// Pitch processing, defined in Convert-pitch.cpp
-		static std::string  base40ToKern         (int b40);
+		static std::string  base40ToKern    (int b40);
 		static int     base40ToAccidental   (int b40);
 		static int     base40ToDiatonic     (int b40);
 		static int     base40ToMidiNoteNumber(int b40);
@@ -2545,12 +2554,12 @@ class Convert {
 		                                     std::string flat = "b",
 		                                     std::string sharp = "#",
 		                                     std::string separator = "");
-		static std::string  kernToSciPitch       (const std::string& kerndata,
+		static std::string  kernToSciPitch  (const std::string& kerndata,
 		      										 std::string flat = "b",
 		                                     std::string sharp = "#",
 		                                     std::string separator = "")
 	       { return kernToScientificPitch(kerndata, flat, sharp, separator); }
-		static std::string  kernToSP             (const std::string& kerndata,
+		static std::string  kernToSP        (const std::string& kerndata,
 		                                     std::string flat = "b",
 		                                     std::string sharp = "#",
 		                                     std::string separator = "")
@@ -2560,10 +2569,11 @@ class Convert {
 		static void    wbhToPitch           (int& dpc, int& acc, int& octave,
 		                                     int maxacc, int wbh);
 		static int     kernClefToBaseline   (const std::string& input);
-		static std::string  base40ToTrans        (int base40);
+		static int     kernClefToBaseline   (HTp input);
+		static std::string  base40ToTrans   (int base40);
 		static int     transToBase40        (const std::string& input);
 		static int     base40IntervalToLineOfFifths(int trans);
-		static std::string  keyNumberToKern      (int number);
+		static std::string  keyNumberToKern (int number);
 		static int     base7ToBase40        (int base7);
 		static int     base40IntervalToDiatonic(int base40interval);
 

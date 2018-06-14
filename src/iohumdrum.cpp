@@ -497,6 +497,7 @@ bool HumdrumInput::convertHumdrum()
     m_multirest = analyzeMultiRest(infile);
 
     infile.analyzeKernSlurs();
+	infile.analyzeRestPositions();
     parseSignifiers(infile);
     checkForColorSpine(infile);
     infile.analyzeRScale();
@@ -5100,6 +5101,8 @@ template <class ELEMENT> void HumdrumInput::setPlace(ELEMENT *element, const std
 
 template <class ELEMENT> void HumdrumInput::verticalRest(ELEMENT element, const std::string &token)
 {
+	return; // calculating this in humlib now.
+/*
     hum::HumRegex hre;
     if (!hre.search(token, "([A-Ga-g]+)")) {
         return;
@@ -5120,6 +5123,7 @@ template <class ELEMENT> void HumdrumInput::verticalRest(ELEMENT element, const 
     }
 
     element->SetOloc(oct);
+*/
 }
 
 //////////////////////////////
@@ -8190,6 +8194,21 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
     // Also full-measure rests are handled elsewhere.
     convertRhythm(rest, token, subtoken);
 
+	string oloc = token->getValue("auto", "oloc");
+	string ploc = token->getValue("auto", "ploc");
+
+	if ((!oloc.empty()) && (!ploc.empty())) {
+		int olocint = stoi(oloc);
+		rest->SetOloc(olocint);
+		if      (ploc == "C") { rest->SetPloc(PITCHNAME_c); }
+		else if (ploc == "D") { rest->SetPloc(PITCHNAME_d); }
+		else if (ploc == "E") { rest->SetPloc(PITCHNAME_e); }
+		else if (ploc == "F") { rest->SetPloc(PITCHNAME_f); }
+		else if (ploc == "G") { rest->SetPloc(PITCHNAME_g); }
+		else if (ploc == "A") { rest->SetPloc(PITCHNAME_a); }
+		else if (ploc == "B") { rest->SetPloc(PITCHNAME_b); }
+	}
+
     std::string tstring;
     if (subtoken < 0) {
         tstring = *token;
@@ -8645,6 +8664,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     }
 
     // handle ties
+// ggg
     if ((tstring.find("[") != string::npos) || (tstring.find("_") != string::npos)) {
         processTieStart(note, token, tstring, subtoken);
     }
