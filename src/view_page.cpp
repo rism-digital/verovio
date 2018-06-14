@@ -278,12 +278,12 @@ void View::DrawStaffGrp(
     // for the bottom position we need to take into account the number of lines and the staff size
     int yBottom
         = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
-    int barLineWidth = m_doc->GetDrawingBarLineWidth(100);
+    int barLineWidth = m_doc->GetDrawingBarLineWidth(last->m_drawingStaffSize);
 
     // adjust the top and bottom according to staffline width
     x += barLineWidth / 2;
-    // yTop += m_doc->GetDrawingStaffLineWidth(100) / 1;
-    // yBottom -= m_doc->GetDrawingStaffLineWidth(100) / 4;
+    // yTop += m_doc->GetDrawingStaffLineWidth(last->m_drawingStaffSize) / 1;
+    // yBottom -= m_doc->GetDrawingStaffLineWidth(last->m_drawingStaffSize) / 4;
 
     Label *label = dynamic_cast<Label *>(staffGrp->FindChildByType(LABEL, 1));
     LabelAbbr *labelAbbr = dynamic_cast<LabelAbbr *>(staffGrp->FindChildByType(LABELABBR, 1));
@@ -299,9 +299,9 @@ void View::DrawStaffGrp(
 
     if (graphic && (labelStr.length() != 0)) {
         // HARDCODED
-        int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
+        int space = 4 * m_doc->GetDrawingBeamWidth(last->m_drawingStaffSize, false);
         int xLabel = x - space;
-        int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(100);
+        int yLabel = yBottom - (yBottom - yTop) / 2 - m_doc->GetDrawingUnit(last->m_drawingStaffSize);
 
         dc->SetBrush(m_currentColour, AxSOLID);
 
@@ -313,7 +313,7 @@ void View::DrawStaffGrp(
         TextDrawingParams params;
         params.m_x = xLabel;
         params.m_y = yLabel;
-        params.m_pointSize = m_doc->GetDrawingLyricFont(100)->GetPointSize();
+        params.m_pointSize = m_doc->GetDrawingLyricFont(last->m_drawingStaffSize)->GetPointSize();
 
         grpTxt.SetPointSize(params.m_pointSize);
         dc->SetFont(&grpTxt);
@@ -357,7 +357,7 @@ void View::DrawStaffGrp(
     }
     else if (staffGrp->GetSymbol() == staffGroupingSym_SYMBOL_bracket) {
         DrawBracket(dc, x, yTop, yBottom, last->m_drawingStaffSize);
-        x -= 2 * m_doc->GetDrawingBeamWidth(100, false) - m_doc->GetDrawingBeamWhiteWidth(100, false);
+        x -= 2 * m_doc->GetDrawingBeamWidth(last->m_drawingStaffSize, false) - m_doc->GetDrawingBeamWhiteWidth(last->m_drawingStaffSize, false);
     }
 
     // recursively draw the children
@@ -418,7 +418,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         }
 
         // HARDCODED
-        int space = 3 * m_doc->GetDrawingBeamWidth(100, false);
+        int space = 3 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false);
         int x = system->GetDrawingX() - space;
         int y = staff->GetDrawingY()
             - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
@@ -469,16 +469,16 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 
     int x1, x2;
 
-    x2 = x - m_doc->GetDrawingBeamWidth(100, false);
-    x1 = x2 - m_doc->GetDrawingBeamWidth(100, false);
+    x2 = x - m_doc->GetDrawingBeamWidth(staffSize, false);
+    x1 = x2 - m_doc->GetDrawingBeamWidth(staffSize, false);
 
     DrawSmuflCode(dc, x1, y1, SMUFL_E003_bracketTop, staffSize, false);
     DrawSmuflCode(dc, x1, y2, SMUFL_E004_bracketBottom, staffSize, false);
 
     // adjust to top and bottom position so we make sure there is no white space between
     // the glyphs and the line
-    y1 += m_doc->GetDrawingStemWidth(100);
-    y2 -= m_doc->GetDrawingStemWidth(100);
+    y1 += m_doc->GetDrawingStemWidth(staffSize);
+    y2 -= m_doc->GetDrawingStemWidth(staffSize);
     DrawFilledRectangle(dc, x1, y1, x2, y2);
 
     return;
@@ -493,7 +493,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     Point bez1[4];
     Point bez2[4];
 
-    int penWidth = m_doc->GetDrawingStemWidth(100);
+    int penWidth = m_doc->GetDrawingStemWidth(staffSize);
     y1 -= penWidth;
     y2 += penWidth;
     BoundingBox::Swap(y1, y2);
@@ -503,7 +503,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     x -= m_doc->GetDrawingBeamWhiteWidth(staffSize, false); // distance entre barre et debut accolade
 
     ymed = (y1 + y2) / 2;
-    fact = m_doc->GetDrawingBeamWhiteWidth(staffSize, false) + m_doc->GetDrawingStemWidth(100);
+    fact = m_doc->GetDrawingBeamWhiteWidth(staffSize, false) + m_doc->GetDrawingStemWidth(staffSize);
     xdec = ToDeviceContextX(fact);
 
     points[0].x = ToDeviceContextX(x);
@@ -662,13 +662,16 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     assert(dc);
     assert(barLine);
 
+    Staff *staff = dynamic_cast<Staff *>(barLine->GetFirstParent(STAFF));
+    assert(staff);
+
     int x = barLine->GetDrawingX();
-    int barLineWidth = m_doc->GetDrawingBarLineWidth(100);
-    int barLineThickWidth = m_doc->GetDrawingBeamWidth(100, false);
-    int x1 = x - m_doc->GetDrawingBeamWidth(100, false) - barLineWidth;
-    int x2 = x + m_doc->GetDrawingBeamWidth(100, false) + barLineWidth;
+    int barLineWidth = m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+    int barLineThickWidth = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false);
+    int x1 = x - m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) - barLineWidth;
+    int x2 = x + m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) + barLineWidth;
     // optimized for five line staves
-    int dashLength = m_doc->GetDrawingUnit(100) * 8 / 13;
+    int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 8 / 13;
 
     SegmentedLine line(yTop, yBottom);
     // We do not need to do this during layout calculation
@@ -695,7 +698,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
             lines.SetParent(system);
             lines.UpdateContentBBoxX(minX, maxX);
             lines.UpdateContentBBoxY(yTop, yBottom);
-            int margin = m_doc->GetDrawingUnit(100) / 2;
+            int margin = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
             system->m_systemAligner.FindAllIntersectionPoints(line, lines, { DIR, DYNAM, TEMPO }, margin);
         }
     }
@@ -752,8 +755,8 @@ void View::DrawBarLineDots(DeviceContext *dc, StaffDef *staffDef, Staff *staff, 
     assert(barLine);
 
     int x = barLine->GetDrawingX();
-    int x1 = x - 2 * m_doc->GetDrawingBeamWidth(100, false) - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
-    int x2 = x + 2 * m_doc->GetDrawingBeamWidth(100, false) + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+    int x1 = x - 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+    int x2 = x + 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
 
     int yBottom = staff->GetDrawingY() - staffDef->GetLines() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int yTop = yBottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);

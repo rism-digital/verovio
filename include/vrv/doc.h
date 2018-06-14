@@ -331,6 +331,7 @@ public:
     ///@{
     void SetFacsimile(Facsimile *facsimile) { m_facsimile = facsimile; }
     Facsimile *GetFacsimile() { return m_facsimile; }
+    bool HasFacsimile() const { return m_facsimile != nullptr; }
     ///@}
     
     void SetChildZones(); 

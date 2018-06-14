@@ -1479,7 +1479,7 @@ int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
 
-    if (this->GetType() == Transcription) return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
+    if (this->GetType() == Transcription || this->HasFacsimile()) return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
 
     int contentHeight = m_drawingPage->GetContentHeight();
     return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBot) / DEFINITION_FACTOR;
@@ -1489,7 +1489,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
 
-    if (this->GetType() == Transcription) return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
+    if (this->GetType() == Transcription || this->HasFacsimile()) return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
 
     int contentWidth = m_drawingPage->GetContentWidth();
     return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;
@@ -1526,7 +1526,8 @@ void Doc::SetChildZones() {
             fi->SetZone(m_facsimile->FindZoneByUuid(fi->GetFacs()));
         }
         else {
-            LogWarning("If facsimiles are present then element %s should have it.", (*iter)->GetClassName().c_str());
+            LogError("If facsimilies are present then element %s should have it.", (*iter)->GetClassName().c_str());
+            assert(false);
         }
     }
 }
