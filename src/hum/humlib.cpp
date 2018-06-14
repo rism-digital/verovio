@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jun 13 22:18:02 PDT 2018
+// Last Modified: Thu Jun 14 15:43:38 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -15318,7 +15318,7 @@ void HumdrumFileContent::analyzeRestPositions(HTp kernstart) {
 
 //////////////////////////////
 //
-// HumdrumFileContent::processRestPitch -- Read any pitch information attached to 
+// HumdrumFileContent::processRestPitch -- Read any pitch information attached to
 //     a rest and convert to ploc/oloc values.
 //
 
@@ -15342,7 +15342,7 @@ bool HumdrumFileContent::processRestPitch(HTp rest, int baseline) {
 	}
 
 	int pc = b7 % 7;
-	int oct = b7 / 7; 
+	int oct = b7 / 7;
 
 	string dname;
 	switch (pc) {
@@ -23903,6 +23903,7 @@ string MxmlEvent::getKernPitch(void) {
 	for (int i=0; i<count; i++) {
 		output += pc;
 	}
+
 	if (alter > 0) {  // sharps
 		for (int i=0; i<alter; i++) {
 			output += '#';
@@ -24278,6 +24279,65 @@ int MxmlEvent::getDotCount(void) const {
 	} else {
 		return -1;
 	}
+}
+
+
+
+//////////////////////////////
+//
+//  MxmlEvent::getRestPitch -- return the vertical position of a rest
+//     as a kern pitch.
+//   Example:
+//    <note>
+//       <rest>
+//          <display-step>G</display-step>
+//          <display-octave>4</display-octave>
+//       </rest>
+//       <duration>2</duration>
+//       <voice>1</voice>
+//       <type>quarter</type>
+//    </note>
+//
+
+string MxmlEvent::getRestPitch(void) const {
+	xpath_node rest = m_node.select_single_node("./rest");
+	if (rest.node().empty()) {
+		// not a rest, so no pitch information.
+		return "";
+	}
+	xpath_node step = rest.node().select_single_node("./display-step");
+	if (step.node().empty()) {
+		// no vertical positioning information
+	}
+	string steptext = step.node().child_value();
+	if (steptext.empty()) {
+		return "";
+	}
+	xpath_node octave = rest.node().select_single_node("./display-octave");
+	if (octave.node().empty()) {
+		// not enough vertical positioning information
+	}
+	string octavetext = octave.node().child_value();
+	if (octavetext.empty()) {
+		return "";
+	}
+
+	int octaveval = stoi(octavetext);
+	int count = 1;
+	char pc = steptext[0];
+	if (octaveval > 3) {
+		pc = tolower(pc);
+		count = octaveval - 3;
+	} else {
+		pc = toupper(pc);
+		count = 4 - octaveval;
+	}
+	string output;
+	for (int i=0; i<count; i++) {
+		output += pc;
+	}
+
+	return output;
 }
 
 
@@ -41476,7 +41536,8 @@ HumNum Tool_mei2hum::parseLayer(xml_node layer, HumNum starttime, vector<bool>& 
 	int nnum = 0;
 	xml_attribute nattr = layer.attribute("n");
 	if (!nattr) {
-		cerr << "Warning: no number on layer element, assigning it " << ++m_currentLayer << endl;
+		// No number on layer, assuming next available number should be used.
+		m_currentLayer++;
 		nnum = m_currentLayer;
 	} else {
 		nnum = nattr.as_int();
@@ -45850,6 +45911,11 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 		bool grace     = event->isGrace();
 		bool slurstart = event->hasSlurStart(slurdir);
 		bool slurstop  = event->hasSlurStop();
+
+		if (pitch.find('r') != std::string::npos) {
+			string restpitch =  event->getRestPitch();
+			pitch += restpitch;
+		}
 
 		if (slurstart) {
 			prefix.insert(0, "(");
@@ -52666,9 +52732,19 @@ void Tool_transpose::printHumdrumMxhmToken(HumdrumLine& record, int index,
 //
 
 void Tool_transpose::printNewKernString(const string& input, int transval) {
+	HumRegex hre;
 	if (input.rfind('r') != string::npos) {
+		string output = input;
+		if (hre.search(input, "([A-Ga-g]+[#n-]*)")) {
+			// transpose pitch portion of rest (indicating vertical position)
+			string pitch = hre.getMatch(1);
+			int base40 = Convert::kernToBase40(pitch);
+			string newpitch = Convert::base40ToKern(base40 + transval);
+			hre.replaceDestructive(newpitch, "", "[-#n]+");
+			hre.replaceDestructive(output, newpitch, "([A-Ga-g]+[#n-]*)");
+		}
 		// don't transpose rests...
-		m_humdrum_text << input;
+		m_humdrum_text << output;
 		return;
 	}
 	if (input == ".") {
@@ -52681,7 +52757,6 @@ void Tool_transpose::printNewKernString(const string& input, int transval) {
 	string newpitch = Convert::base40ToKern(base40 + transval);
 
 	// consider interaction of #X -X n interaction vs. nX.
-	HumRegex hre;
 	string output;
 	if (hre.search(input, "([A-Ga-g#n-]+)")) {
 		string oldpitch = hre.getMatch(1);

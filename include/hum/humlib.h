@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jun 13 22:18:02 PDT 2018
+// Last Modified: Thu Jun 14 15:43:38 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -3243,6 +3243,7 @@ class MxmlEvent {
 		std::vector<xml_node>&  getTexts           (void);
 		void               setDynamics        (xml_node node);
 		xml_node           getDynamics        (void);
+		std::string        getRestPitch       (void) const;
 
 	protected:
 		HumNum             m_starttime;  // start time in quarter notes of event
