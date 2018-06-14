@@ -498,7 +498,7 @@ bool Toolkit::LoadData(const std::string &data)
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --breaks auto option.
     // Regardless, we won't do layout if the --breaks none option was set.
-    if (m_options->m_breaks.GetValue() != BREAKS_none) {
+    if ((m_doc.GetType() != Transcription) && (m_options->m_breaks.GetValue() != BREAKS_none)) {
         if (input->HasLayoutInformation() && (m_options->m_breaks.GetValue() == BREAKS_encoded)) {
             // LogElapsedTimeStart();
             m_doc.CastOffEncodingDoc();
@@ -989,6 +989,11 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     if (m_options->m_breaks.GetValue() == BREAKS_none) width = m_doc.GetAdjustedDrawingPageWidth();
     if (m_options->m_adjustPageHeight.GetValue() || (m_options->m_breaks.GetValue() == BREAKS_none))
         height = m_doc.GetAdjustedDrawingPageHeight();
+    
+    if (m_doc.GetType() == Transcription) {
+        width = m_doc.GetAdjustedDrawingPageWidth();
+        height = m_doc.GetAdjustedDrawingPageHeight();
+    }
 
     // set dimensions
     deviceContext->SetWidth(width);

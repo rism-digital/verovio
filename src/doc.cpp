@@ -940,6 +940,9 @@ void Doc::ConvertToPageBasedDoc()
 void Doc::ConvertToCastOffMensuralDoc()
 {
     if (!m_isMensuralMusicOnly) return;
+    
+    // Do not convert transcription files
+    if (this->GetType() == Transcription) return;
 
     // We are converting to measure music in a definitiv way
     if (this->GetOptions()->m_mensuralToMeasure.GetValue()) {
@@ -995,6 +998,9 @@ void Doc::ConvertToCastOffMensuralDoc()
 void Doc::ConvertToUnCastOffMensuralDoc()
 {
     if (!m_isMensuralMusicOnly) return;
+    
+    // Do not convert transcription files
+    if (this->GetType() == Transcription) return;
 
     Pages *pages = this->GetPages();
     assert(pages);
