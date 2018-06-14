@@ -72,4 +72,29 @@ bool AttFacsimile::HasFacs() const
 
 /* include <attfacs> */
 
+bool Att::SetFacsimile(Object *element, std::string attrType, std::string attrValue)
+{
+    if (element->HasAttClass(ATT_FACSIMILE)) {
+        AttFacsimile *att = dynamic_cast<AttFacsimile *>(element);
+        assert(att);
+        if (attrType == "facs") {
+            att->SetFacs(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void Att::GetFacsimile(const Object *element, ArrayOfStrAttr *attributes)
+{
+    if (element->HasAttClass(ATT_FACSIMILE)) {
+        const AttFacsimile *att = dynamic_cast<const AttFacsimile *>(element);
+        assert(att);
+        if (att->HasFacs()) {
+            attributes->push_back(std::make_pair("facs", att->StrToStr(att->GetFacs())));
+        }
+    }
+}
+
 } // vrv namespace
