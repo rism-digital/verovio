@@ -183,6 +183,14 @@ void Measure::AddChildBack(Object *child)
 
 int Measure::GetDrawingX() const
 {
+    if (!this->IsMeasuredMusic()) {
+        System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
+        assert(system);
+        if (system->m_yAbs != VRV_UNSET) {
+            return (system->m_systemLeftMar);
+        }
+    }
+    
     if (m_xAbs != VRV_UNSET) return m_xAbs;
 
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
@@ -254,6 +262,17 @@ int Measure::GetRightBarLineRight() const
 
 int Measure::GetWidth() const
 {
+    if (!this->IsMeasuredMusic()) {
+        System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
+        assert(system);
+        Page *page = dynamic_cast<Page *>(system->GetFirstParent(PAGE));
+        assert(page);
+        if (system->m_yAbs != VRV_UNSET) {
+            // xAbs2 =  page->m_pageWidth - system->m_systemRightMar;
+            return page->m_pageWidth - system->m_systemLeftMar - system->m_systemRightMar;
+        }
+    }
+    
     if (this->m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
 
     assert(m_measureAligner.GetRightAlignment());

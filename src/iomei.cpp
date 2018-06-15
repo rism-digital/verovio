@@ -2748,7 +2748,7 @@ bool MeiInput::ReadPage(Object *parent, pugi::xml_node page)
         page.remove_attribute("surface");
     }
     if (page.attribute("ppu")) {
-        // vrvPage->m_PPUFactor = 12.5; //atof(page.attribute("ppu").value());
+        vrvPage->m_PPUFactor = atof(page.attribute("ppu").value());
     }
 
     parent->AddChild(vrvPage);
