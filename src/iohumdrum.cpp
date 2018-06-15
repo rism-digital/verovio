@@ -4339,6 +4339,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     Note *note = NULL;
 
+    // Used for splitting an invisible rest across a clef:
+    hum::HTp spaceSplitToken = NULL;
+    hum::HumNum remainingSplitDur;
+
     hum::HumRegex hre;
     // ggg	processGlobalDirections(token, staffindex);
 
@@ -4365,27 +4369,52 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 if (layerdata[i]->isClef()) {
                     Clef *clef = insertClefElement(elements, pointers, layerdata[i]);
                     setLocationId(clef, layerdata[i]);
+                    if (spaceSplitToken != NULL) {
+                        // Add the second part of a split invisible rest:
+                        Space *irest = new Space;
+                        if (m_doc->GetOptions()->m_humType.GetValue()) {
+                            embedQstampInClass(irest, spaceSplitToken, *spaceSplitToken);
+                        }
+                        setLocationId(irest, spaceSplitToken);
+                        std::string uid = irest->GetUuid();
+                        uid += "b";
+                        irest->SetUuid(uid);
+                        appendElement(elements, pointers, irest);
+                        // convertRhythm(irest, spaceSplitToken);
+                        setRhythmFromDuration(irest, remainingSplitDur);
+                        // processSlurs(spaceSplitToken);
+                        // processDynamics(spaceSplitToken, staffindex);
+                        // processDirections(spaceSplitToken, staffindex);
+                        // Store rest here to complete the split after the clef change.
+                        spaceSplitToken = NULL;
+                        remainingSplitDur = 0;
+                    }
                 }
                 else if (layerdata[i]->isNull()) {
-                    // duplicate clef changes in secondary layers
-                    int xtrack = layerdata[i]->getTrack();
-                    hum::HTp tok = layerdata[i]->getPreviousFieldToken();
-                    while (tok) {
-                        int ttrack = tok->getTrack();
-                        if (ttrack == xtrack) {
-                            if (tok->isClef()) {
-                                Clef *clef = insertClefElement(elements, pointers, tok);
-                                setLocationId(clef, layerdata[i]);
-                                // Uncomment when clef->SetSameas() is available:
-                                // std::string sameas = "#clef-L";
-                                // sameas += to_string(tok->getLineNumber());
-                                // sameas += "F";
-                                // sameas += to_string(tok->getFieldNumber());
-                                // clef->SetSameas(sameas);
-                                break;
+                    if ((i > 0) && (layerdata[i]->getLineIndex() == layerdata[i - 1]->getLineIndex())) {
+                        // do nothing: duplicate layer clefs are handled elsewhere
+                    }
+                    else {
+                        // duplicate clef changes in secondary layers
+                        int xtrack = layerdata[i]->getTrack();
+                        hum::HTp tok = layerdata[i]->getPreviousFieldToken();
+                        while (tok) {
+                            int ttrack = tok->getTrack();
+                            if (ttrack == xtrack) {
+                                if (tok->isClef()) {
+                                    Clef *clef = insertClefElement(elements, pointers, tok);
+                                    setLocationId(clef, layerdata[i]);
+                                    // Uncomment when clef->SetSameas() is available:
+                                    // std::string sameas = "#clef-L";
+                                    // sameas += to_string(tok->getLineNumber());
+                                    // sameas += "F";
+                                    // sameas += to_string(tok->getFieldNumber());
+                                    // clef->SetSameas(sameas);
+                                    break;
+                                }
                             }
+                            tok = tok->getPreviousFieldToken();
                         }
-                        tok = tok->getPreviousFieldToken();
                     }
                 }
             }
@@ -4451,20 +4480,60 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
         }
         else if (layerdata[i]->isRest()) {
-
             if ((layerdata[i]->find("yy") != string::npos) && m_signifiers.irest_color.empty()
                 && m_signifiers.space_color.empty()) {
                 // Invisible rest (or note which should be invisible.
-                Space *irest = new Space;
-                if (m_doc->GetOptions()->m_humType.GetValue()) {
-                    embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                if ((i < (int)layerdata.size() - 1) && layerdata[i + 1]->isClef()) {
+                    hum::HumNum dur = layerdata[i]->getDuration();
+                    hum::HumNum ndur = layerdata[i + 1]->getDurationFromStart() - layerdata[i]->getDurationFromStart();
+
+                    if (ndur < dur) {
+                        // create a split invisible rest so that an intervening clef
+                        // can be positioned properly.
+                        // split the space into two pieces, this is the firsthalf.
+                        hum::HumNum splitdur = dur - ndur;
+                        Space *irest = new Space;
+                        if (m_doc->GetOptions()->m_humType.GetValue()) {
+                            embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                        }
+                        setLocationId(irest, layerdata[i]);
+                        appendElement(elements, pointers, irest);
+                        // convertRhythm(irest, layerdata[i]);
+                        setRhythmFromDuration(irest, splitdur);
+                        processSlurs(layerdata[i]);
+                        processDynamics(layerdata[i], staffindex);
+                        processDirections(layerdata[i], staffindex);
+                        // Store rest here to complete the split after the clef change.
+                        spaceSplitToken = layerdata[i];
+                        remainingSplitDur = ndur;
+                    }
+                    else {
+                        // normal space
+
+                        Space *irest = new Space;
+                        if (m_doc->GetOptions()->m_humType.GetValue()) {
+                            embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                        }
+                        setLocationId(irest, layerdata[i]);
+                        appendElement(elements, pointers, irest);
+                        convertRhythm(irest, layerdata[i]);
+                        processSlurs(layerdata[i]);
+                        processDynamics(layerdata[i], staffindex);
+                        processDirections(layerdata[i], staffindex);
+                    }
                 }
-                setLocationId(irest, layerdata[i]);
-                appendElement(elements, pointers, irest);
-                convertRhythm(irest, layerdata[i]);
-                processSlurs(layerdata[i]);
-                processDynamics(layerdata[i], staffindex);
-                processDirections(layerdata[i], staffindex);
+                else {
+                    Space *irest = new Space;
+                    if (m_doc->GetOptions()->m_humType.GetValue()) {
+                        embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                    }
+                    setLocationId(irest, layerdata[i]);
+                    appendElement(elements, pointers, irest);
+                    convertRhythm(irest, layerdata[i]);
+                    processSlurs(layerdata[i]);
+                    processDynamics(layerdata[i], staffindex);
+                    processDirections(layerdata[i], staffindex);
+                }
             }
             else {
                 Rest *rest = new Rest;
@@ -9190,6 +9259,42 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertMensuralRhythm(ELEMENT
     }
 
     return dur;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setRhythmFromDuration -- Used for splitting invisible rests across
+//    clef changes, so a simple algorithm.  Currently does not allow for tuplets or
+//    dotted rhythms.
+//
+
+template <class ELEMENT> void HumdrumInput::setRhythmFromDuration(ELEMENT element, hum::HumNum dur)
+{
+    dur /= 4; // convert to whole-note units
+
+    if (dur.isInteger()) {
+        switch (dur.getNumerator()) {
+            case 1: element->SetDur(DURATION_1); break;
+            case 2: element->SetDur(DURATION_breve); break;
+            case 4: element->SetDur(DURATION_long); break;
+            case 8: element->SetDur(DURATION_maxima); break;
+        }
+    }
+    else if (dur.getNumerator() == 1) {
+        switch (dur.getDenominator()) {
+            case 2: element->SetDur(DURATION_2); break;
+            case 4: element->SetDur(DURATION_4); break;
+            case 8: element->SetDur(DURATION_8); break;
+            case 16: element->SetDur(DURATION_16); break;
+            case 32: element->SetDur(DURATION_32); break;
+            case 64: element->SetDur(DURATION_64); break;
+            case 128: element->SetDur(DURATION_128); break;
+            case 256: element->SetDur(DURATION_256); break;
+            case 512: element->SetDur(DURATION_512); break;
+            case 1024: element->SetDur(DURATION_1024); break;
+            case 2048: element->SetDur(DURATION_2048); break;
+        }
+    }
 }
 
 //////////////////////////////
