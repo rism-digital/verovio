@@ -27,6 +27,7 @@
 #include "io.h"
 #include "keysig.h"
 #include "layer.h"
+#include "linkinginterface.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
@@ -1018,6 +1019,28 @@ int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
         this->MoveItselfTo(params->m_targetLayer);
         // Do not precess children because we move the full sub-tree
         return FUNCTOR_SIBLINGS;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+    
+int Object::PrepareLinking(FunctorParams *functorParams)
+{    
+    PrepareLinkingParams *params = dynamic_cast<PrepareLinkingParams *>(functorParams);
+    assert(params);
+
+    if (params->m_fillList && this->HasInterface(INTERFACE_LINKING)) {
+        LinkingInterface *interface = this->GetLinkingInterface();
+        assert(interface);
+        interface->InterfacePrepareLinking(functorParams, this);
+    }
+
+    std::string uuid = this->GetUuid();
+    auto i = std::find_if(params->m_nextUuidPairs.begin(), params->m_nextUuidPairs.end(),
+        [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
+    if (i != params->m_nextUuidPairs.end()) {
+        i->first->SetNextLink(this);
+        params->m_nextUuidPairs.erase(i);
     }
 
     return FUNCTOR_CONTINUE;

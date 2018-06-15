@@ -342,7 +342,8 @@ bool OptionArray::SetValue(std::vector<std::string> const &values)
 OptionIntMap::OptionIntMap()
 {
     m_values = NULL;
-    m_value = 0, m_defaultValue = 0;
+    m_value = 0,
+    m_defaultValue = 0;
 }
 
 void OptionIntMap::CopyTo(Option *option)

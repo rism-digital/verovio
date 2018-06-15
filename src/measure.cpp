@@ -183,6 +183,14 @@ void Measure::AddChildBack(Object *child)
 
 int Measure::GetDrawingX() const
 {
+    if (!this->IsMeasuredMusic()) {
+        System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
+        assert(system);
+        if (system->m_yAbs != VRV_UNSET) {
+            return (system->m_systemLeftMar);
+        }
+    }
+    
     if (m_xAbs != VRV_UNSET) return m_xAbs;
 
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
@@ -254,6 +262,17 @@ int Measure::GetRightBarLineRight() const
 
 int Measure::GetWidth() const
 {
+    if (!this->IsMeasuredMusic()) {
+        System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
+        assert(system);
+        Page *page = dynamic_cast<Page *>(system->GetFirstParent(PAGE));
+        assert(page);
+        if (system->m_yAbs != VRV_UNSET) {
+            // xAbs2 =  page->m_pageWidth - system->m_systemRightMar;
+            return page->m_pageWidth - system->m_systemLeftMar - system->m_systemRightMar;
+        }
+    }
+    
     if (this->m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
 
     assert(m_measureAligner.GetRightAlignment());
@@ -884,9 +903,24 @@ int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
 
     std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
     while (iter != params->m_timeSpanningElements.end()) {
-        TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
-        assert(interface);
-        Measure *endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstParent(MEASURE));
+        Measure *endParent = NULL;
+        if ((*iter)->HasInterface(INTERFACE_TIME_SPANNING)) {
+            TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
+            assert(interface);
+            if (interface->GetEnd()) {
+                endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstParent(MEASURE));
+            }
+        }
+        if (!endParent && (*iter)->HasInterface(INTERFACE_LINKING)) {
+            LinkingInterface *interface = (*iter)->GetLinkingInterface();
+            assert(interface);
+            if (interface->GetNextLink()) {
+                // We should have one because we allow only control Event (dir and dynam) to be linked as target
+                TimePointInterface *nextInterface = interface->GetNextLink()->GetTimePointInterface();
+                assert(nextInterface);
+                endParent = dynamic_cast<Measure *>(nextInterface->GetStart()->GetFirstParent(MEASURE));
+            }
+        }
         assert(endParent);
         // We have reached the end of the spanning - remove it from the list of running elements
         if (endParent == this) {
@@ -994,7 +1028,7 @@ int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
         // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
         // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
         // midi output
-        if ((iter->second == DIR) || (iter->second == DYNAM) || (iter->second == HARM)) {
+        if ((iter->second == DIR) || (iter->second == DYNAM) || (iter->second == HARM) || (iter->second == TRILL)) {
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }
         else {

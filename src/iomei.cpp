@@ -1030,6 +1030,7 @@ void MeiOutput::WriteControlElement(pugi::xml_node currentNode, ControlElement *
     assert(controlElement);
 
     WriteXmlId(currentNode, controlElement);
+    WriteLinkingInterface(currentNode, controlElement);
     controlElement->WriteLabelled(currentNode);
     controlElement->WriteTyped(currentNode);
 }
@@ -1072,6 +1073,7 @@ void MeiOutput::WriteDir(pugi::xml_node currentNode, Dir *dir)
     WriteTextDirInterface(currentNode, dir);
     WriteTimeSpanningInterface(currentNode, dir);
     dir->WriteLang(currentNode);
+    dir->WriteExtender(currentNode);
     dir->WriteVerticalGroup(currentNode);
 }
 
@@ -1082,6 +1084,7 @@ void MeiOutput::WriteDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteControlElement(currentNode, dynam);
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
+    dynam->WriteExtender(currentNode);
     dynam->WriteVerticalGroup(currentNode);
 }
 
@@ -1672,6 +1675,13 @@ void MeiOutput::WriteDurationInterface(pugi::xml_node element, DurationInterface
     interface->WriteStaffIdent(element);
 }
 
+void MeiOutput::WriteLinkingInterface(pugi::xml_node element, LinkingInterface *interface)
+{
+    assert(interface);
+
+    interface->WriteLinking(element);
+}
+    
 void MeiOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *interface)
 {
     assert(interface);
@@ -2738,7 +2748,7 @@ bool MeiInput::ReadPage(Object *parent, pugi::xml_node page)
         page.remove_attribute("surface");
     }
     if (page.attribute("ppu")) {
-        // vrvPage->m_PPUFactor = 12.5; //atof(page.attribute("ppu").value());
+        vrvPage->m_PPUFactor = atof(page.attribute("ppu").value());
     }
 
     parent->AddChild(vrvPage);
@@ -3309,6 +3319,7 @@ bool MeiInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
 bool MeiInput::ReadControlElement(pugi::xml_node element, ControlElement *object)
 {
     SetMeiUuid(element, object);
+    ReadLinkingInterface(element, object);
     object->ReadLabelled(element);
     object->ReadTyped(element);
 
@@ -3365,6 +3376,7 @@ bool MeiInput::ReadDir(Object *parent, pugi::xml_node dir)
     ReadTextDirInterface(dir, vrvDir);
     ReadTimeSpanningInterface(dir, vrvDir);
     vrvDir->ReadLang(dir);
+    vrvDir->ReadExtender(dir);
     vrvDir->ReadVerticalGroup(dir);
 
     parent->AddChild(vrvDir);
@@ -3379,6 +3391,7 @@ bool MeiInput::ReadDynam(Object *parent, pugi::xml_node dynam)
 
     ReadTextDirInterface(dynam, vrvDynam);
     ReadTimeSpanningInterface(dynam, vrvDynam);
+    vrvDynam->ReadExtender(dynam);
     vrvDynam->ReadVerticalGroup(dynam);
 
     parent->AddChild(vrvDynam);
@@ -4455,6 +4468,12 @@ bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
         m_doc->SetAnalyticalMarkup(true);
     }
 
+    return true;
+}
+    
+bool MeiInput::ReadLinkingInterface(pugi::xml_node element, LinkingInterface *interface)
+{
+    interface->ReadLinking(element);
     return true;
 }
 
