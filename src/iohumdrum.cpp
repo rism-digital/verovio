@@ -10155,18 +10155,17 @@ void HumdrumInput::addTrill(hum::HTp token)
     appendElement(m_measure, trill);
     setStaff(trill, staff);
 
-    int staffindex = m_currentstaff - 1;
+    // int staffindex = m_currentstaff - 1;
     int layer = m_currentlayer;
 
     if (layer == 2) {
         setPlace(trill, "below");
     }
 
-    // hum::HumNum tstamp = getMeasureTstamp(token, staffindex)
-    // trill->SetStartid("#" + getLocationId("note", token, subtok));
-
-    hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
-    trill->SetTstamp(tstamp.getFloat());
+    trill->SetStartid("#" + getLocationId("note", token, subtok));
+    // Setting trill@tstamp:
+    // hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+    // trill->SetTstamp(tstamp.getFloat());
 
     setLocationId(trill, token, subtok);
     if (m_signifiers.above) {
@@ -10226,14 +10225,18 @@ void HumdrumInput::addTrill(hum::HTp token)
         lasttok = endtok;
         endtok = endtok->getNextToken();
     }
-    if (!lasttok) {
+    if (!endtok) {
         return;
     }
 
-    hum::HumNum tstamp2 = getMeasureTstampPlusDur(lasttok, staffindex);
-    int measures = getMeasureDifference(token, lasttok);
-    std::pair<int, double> ts2(measures, tstamp2.getFloat());
-    trill->SetTstamp2(ts2);
+    // assuming last note is not in a chord.  Might be a problem if a rest.
+    trill->SetEndid("#" + getLocationId("note", endtok, -1));
+
+    // For setting trill@tstamp2:
+    // hum::HumNum tstamp2 = getMeasureTstampPlusDur(lasttok, staffindex);
+    // int measures = getMeasureDifference(token, lasttok);
+    // std::pair<int, double> ts2(measures, tstamp2.getFloat());
+    // trill->SetTstamp2(ts2);
 }
 
 //////////////////////////////
