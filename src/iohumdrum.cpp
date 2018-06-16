@@ -4367,8 +4367,25 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             if (layerdata[i]->getDurationFromStart() != 0) {
                 if (layerdata[i]->isClef()) {
+                    int subtrack = layerdata[i]->getSubtrack();
+                    if (subtrack) {
+                        subtrack--;
+                    }
+                    if (subtrack) {
+                        // ignore clef changes in subtracks and only
+                        // use the one in the primary track
+                        continue;
+                    }
                     Clef *clef = insertClefElement(elements, pointers, layerdata[i]);
                     setLocationId(clef, layerdata[i]);
+                    int diff = layerindex - subtrack;
+                    if (diff > 0) {
+                        std::string letter;
+                        letter.push_back('a' + diff);
+                        std::string uid = clef->GetUuid();
+                        uid += letter;
+                        clef->SetUuid(uid);
+                    }
                     if (spaceSplitToken != NULL) {
                         // Add the second part of a split invisible rest:
                         Space *irest = new Space;
