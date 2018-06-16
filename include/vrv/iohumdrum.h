@@ -432,6 +432,7 @@ protected:
         std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token, int staffindex);
     void initializeSpineColor(hum::HumdrumFile &infile);
     std::string getLayoutAccidental(hum::HTp token, int subtoken);
+    void setStemLength(Note *note, hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

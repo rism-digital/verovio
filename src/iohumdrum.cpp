@@ -497,6 +497,7 @@ bool HumdrumInput::convertHumdrum()
     m_multirest = analyzeMultiRest(infile);
 
     infile.analyzeKernSlurs();
+    infile.analyzeKernStems();
     infile.analyzeRestPositions();
     parseSignifiers(infile);
     checkForColorSpine(infile);
@@ -4600,6 +4601,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         else {
             // should be a note
             note = new Note;
+            setStemLength(note, layerdata[i]);
             setLocationId(note, layerdata[i]);
             appendElement(elements, pointers, note);
             convertNote(note, layerdata[i], staffindex);
@@ -8424,6 +8426,21 @@ template <class ELEMENT> void HumdrumInput::checkForAutoStem(ELEMENT element, hu
     }
 }
 
+//////////////////////////////
+//
+// HumdrumInput::setStemLength --
+//
+
+void HumdrumInput::setStemLength(Note *note, hum::HTp token)
+{
+    string stemlen = token->getValue("auto", "stemlen");
+    if (stemlen.empty()) {
+        return;
+    }
+    double value = std::stof(stemlen);
+    note->SetStemLen(value);
+}
+
 /////////////////////////////
 //
 // HumdrumInput::convertNote --
@@ -8446,6 +8463,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     }
 
     bool chordQ = token->isChord();
+
+    if (!chordQ) {
+        setStemLength(note, token);
+    }
 
     processTerminalLong(token); // do this before assigning rhythmic value.
 

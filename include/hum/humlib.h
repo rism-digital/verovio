@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jun 14 23:29:26 PDT 2018
+// Last Modified: Sat Jun 16 09:24:00 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1914,6 +1914,9 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		void  analyzeRestPositions        (void);
 		void  analyzeRestPositions        (HTp kernstart);
 
+		// in HumdrumFileContent-stem.cpp
+		bool analyzeKernStems             (void);
+
 		// in HumdrumFileContent-metlev.cpp
 		void  getMetricLevels             (std::vector<double>& output, int track = 0,
 		                                   double undefined = NAN);
@@ -1965,6 +1968,8 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		int     getRestPositionBelowNotes (HTp rest, std::vector<int>& vpos);
 		void    setRestOnCenterStaffLine  (HTp rest, int baseline);
 		bool    processRestPitch          (HTp rest, int baseline);
+		bool    analyzeKernStems          (HTp stok, HTp etok, std::vector<std::vector<int>>& centerlines);
+		void    getBaselines              (std::vector<std::vector<int>>& centerlines);
 };
 
 
