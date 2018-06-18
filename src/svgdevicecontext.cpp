@@ -385,8 +385,14 @@ void SvgDeviceContext::StartPage()
     m_currentNode = m_currentNode.append_child("svg");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = "definition-scale";
-    m_currentNode.append_attribute("viewBox")
-        = StringFormat("0 0 %d %d", GetWidth() * DEFINITION_FACTOR, GetHeight() * DEFINITION_FACTOR).c_str();
+    if (this->GetFacsimile()) {
+        m_currentNode.append_attribute("viewBox")
+            = StringFormat("0 0 %d %d", GetWidth(), GetHeight()).c_str();
+    }
+    else {
+        m_currentNode.append_attribute("viewBox")
+            = StringFormat("0 0 %d %d", GetWidth() * DEFINITION_FACTOR, GetHeight() * DEFINITION_FACTOR).c_str();
+    }
 
     // a graphic for the origin
     m_currentNode = m_currentNode.append_child("g");

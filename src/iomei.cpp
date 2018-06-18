@@ -2403,6 +2403,8 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     if (!facsimile.empty()) {
         ReadFacsimile(m_doc, facsimile);
         m_doc->SetType(Facs);
+        m_doc->m_drawingPageHeight = m_doc->GetFacsimile()->GetMaxY();
+        m_doc->m_drawingPageWidth = m_doc->GetFacsimile()->GetMaxX();
     }
 
     body = music.child("body");

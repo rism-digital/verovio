@@ -971,6 +971,11 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     double userScale = m_view.GetPPUFactor() * m_scale / 100;
     deviceContext->SetUserScale(userScale, userScale);
 
+    if (m_doc.HasFacsimile()) {
+        deviceContext->SetWidth(m_doc.GetFacsimile()->GetMaxX());
+        deviceContext->SetHeight(m_doc.GetFacsimile()->GetMaxY());
+    }
+
     // render the page
     m_view.DrawCurrentPage(deviceContext, false);
 
@@ -985,6 +990,10 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
 
     if (m_options->m_mmOutput.GetValue()) {
         svg.SetMMOutput(true);
+    }
+
+    if (m_doc.HasFacsimile()) {
+        svg.SetFacsimile(true);
     }
 
     // render the page

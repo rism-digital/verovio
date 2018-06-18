@@ -70,6 +70,7 @@ public:
 
     Zone *FindZoneByUuid(std::string zoneId);
     int GetMaxY();
+    int GetMaxX();
 };
 
 //----------------------------------------------------------------------------
@@ -93,6 +94,7 @@ public:
     ///@}
     virtual void AddChild(Object *object); 
 
+    int GetMaxX();
     int GetMaxY();
 private:
 };
