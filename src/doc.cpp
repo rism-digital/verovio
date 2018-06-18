@@ -944,6 +944,9 @@ void Doc::ConvertToCastOffMensuralDoc()
     // Do not convert transcription files
     if (this->GetType() == Transcription) return;
 
+    // Do not convert facs files
+    if (this->GetType() == Facs) return;
+
     // We are converting to measure music in a definitiv way
     if (this->GetOptions()->m_mensuralToMeasure.GetValue()) {
         m_isMensuralMusicOnly = false;
@@ -1000,7 +1003,7 @@ void Doc::ConvertToUnCastOffMensuralDoc()
     if (!m_isMensuralMusicOnly) return;
     
     // Do not convert transcription files
-    if (this->GetType() == Transcription) return;
+    if (this->GetType() == Transcription || this->GetType() == Facs) return;
 
     Pages *pages = this->GetPages();
     assert(pages);
@@ -1479,7 +1482,7 @@ int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
 
-    if (this->GetType() == Transcription || this->HasFacsimile()) return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
+    if (this->GetType() == Transcription || this->GetType() == Facs) return m_drawingPage->m_pageHeight / DEFINITION_FACTOR;
 
     int contentHeight = m_drawingPage->GetContentHeight();
     return (contentHeight + m_drawingPageMarginTop + m_drawingPageMarginBot) / DEFINITION_FACTOR;
@@ -1489,7 +1492,7 @@ int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
 
-    if (this->GetType() == Transcription || this->HasFacsimile()) return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
+    if (this->GetType() == Transcription || this->GetType() == Facs) return m_drawingPage->m_pageWidth / DEFINITION_FACTOR;
 
     int contentWidth = m_drawingPage->GetContentWidth();
     return (contentWidth + m_drawingPageMarginLeft + m_drawingPageMarginRight) / DEFINITION_FACTOR;

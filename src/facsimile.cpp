@@ -124,13 +124,11 @@ void Zone::Reset()
 
 int Zone::GetLogicalUly()
 {
-    assert(view);
     return (this->GetUly());
 }
 
 int Zone::GetLogicalLry()
 {
-    assert(view);
     return (this->GetLry());
 }
 }

@@ -2402,6 +2402,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
     facsimile = music.child("facsimile");
     if (!facsimile.empty()) {
         ReadFacsimile(m_doc, facsimile);
+        m_doc->SetType(Facs);
     }
 
     body = music.child("body");
@@ -5328,7 +5329,7 @@ void MeiInput::ReadSurface(Facsimile *parent, pugi::xml_node surface)
 
 void MeiInput::ReadZone(Surface *parent, pugi::xml_node zone)
 {
-    assert(surface);
+    assert(parent);
     Zone *vrvZone = new Zone();
     SetMeiUuid(zone, vrvZone);
     vrvZone->ReadCoordinated(zone);

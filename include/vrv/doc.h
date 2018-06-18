@@ -26,7 +26,7 @@ class Pages;
 class Page;
 class Score;
 
-enum DocType { Raw = 0, Rendering, Transcription };
+enum DocType { Raw = 0, Rendering, Transcription, Facs };
 
 //----------------------------------------------------------------------------
 // Doc
