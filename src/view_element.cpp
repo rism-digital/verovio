@@ -1176,8 +1176,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             fontNo = SMUFL_E0FA_noteheadWholeFilled;
         else
             fontNo = SMUFL_E0A2_noteheadWhole;
-
-        DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
+        DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true, "notehead");
     }
     // Other values
     else {
@@ -1186,7 +1185,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         else
             fontNo = SMUFL_E0A4_noteheadBlack;
 
-        DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true);
+        DrawSmuflCode(dc, noteX, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize, true, "notehead");
     }
 
     /************ Draw children (accidentals, etc) ************/
