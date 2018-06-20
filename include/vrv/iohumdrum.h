@@ -384,7 +384,7 @@ protected:
     void checkForColorSpine(hum::HumdrumFile &infile);
     std::vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
     void addSystemKeyTimeChange(int startline, int endline);
-    void prepareEndings();
+    void prepareSections();
     int getDirection(const std::string &token, const std::string &target);
     void resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void resolveTupletBeamStartTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
@@ -606,10 +606,10 @@ private:
     // m_multirest == boolean states to keep track of muti-rest cases.
     std::vector<int> m_multirest;
 
-    // m_ending == keep track of 1st/second endings.
-    std::vector<int> m_ending;
+    // m_sections == keep track of thru sections and 1st/second endings.
+    std::vector<std::string> m_sectionlabels;
 
-    // m_currentending == keep track of current ending.
+    // m_endingnum == keep track of current ending.
     int m_endingnum = 0;
 
     // m_currentending == keep track of current ending.

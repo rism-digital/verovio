@@ -568,7 +568,7 @@ bool HumdrumInput::convertHumdrum()
     std::fill(m_transpose.begin(), m_transpose.end(), 0);
 
     prepareVerses();
-    prepareEndings();
+    prepareSections();
 
     prepareStaffGroups();
     prepareHeaderFooter();
@@ -10538,15 +10538,29 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
 
     m_measure = new Measure();
-    if ((m_ending[startline] != 0) && (m_endingnum != m_ending[startline])) {
+
+    int endnum = 0;
+    bool ending = false;
+    if (isdigit(m_sectionlabels[startline].back())) {
+        ending = true;
+        std::smatch matches;
+        if (regex_search(m_sectionlabels[startline], matches, regex("(\\d+)$"))) {
+            endnum = stoi(matches[1]);
+        }
+        else {
+            endnum = 0;
+        }
+    }
+    if (ending && (m_endingnum != endnum)) {
         // create a new ending
         m_currentending = new Ending;
-        setN(m_currentending, m_ending[startline]);
-        // 300: m_currentending->SetN(m_ending[startline]);
+        setN(m_currentending, endnum);
+        // sanitize id if not valid:
+        m_currentending->SetUuid(m_sectionlabels[startline]);
         m_sections.back()->AddChild(m_currentending);
         m_currentending->AddChild(m_measure);
     }
-    else if (m_ending[startline]) {
+    else if (isdigit(m_sectionlabels[startline].back())) {
         // inside a current ending
         m_currentending->AddChild(m_measure);
     }
@@ -10554,7 +10568,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         // outside of an ending
         m_sections.back()->AddChild(m_measure);
     }
-    m_endingnum = m_ending[startline];
+    m_endingnum = endnum;
     m_measures.push_back(m_measure);
 
     if (m_leftbarstyle != BARRENDITION_NONE) {
@@ -11699,20 +11713,19 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
 
 //////////////////////////////
 //
-// HumdrumInput::prepareEndings --
+// HumdrumInput::prepareSections --
 //
 
-void HumdrumInput::prepareEndings()
+void HumdrumInput::prepareSections()
 {
-    std::vector<int> &ending = m_ending;
+    std::vector<string> &sectionlabels = m_sectionlabels;
     hum::HumdrumFile &infile = m_infile;
 
-    ending.resize(infile.getLineCount());
-    std::fill(ending.begin(), ending.end(), 0);
-    int endnum = 0;
+    sectionlabels.resize(infile.getLineCount());
+    string secname;
 
     for (int i = 0; i < infile.getLineCount(); ++i) {
-        ending[i] = endnum;
+        sectionlabels[i] = secname;
         if (!infile[i].isInterpretation()) {
             continue;
         }
@@ -11723,20 +11736,24 @@ void HumdrumInput::prepareEndings()
             // ignore expansion lists
             continue;
         }
-        std::smatch matches;
-        if (regex_search(*((string *)infile.token(i, 0)), matches, regex("(\\d+)$"))) {
-            endnum = stoi(matches[1]);
-            ending[i] = endnum;
-        }
-        else {
-            endnum = 0;
-            ending[i] = endnum;
-        }
+
+        //        std::smatch matches;
+        //        if (regex_search(*((string *)infile.token(i, 0)), matches, regex("(\\d+)$"))) {
+        //            endnum = stoi(matches[1]);
+        //            ending[i] = endnum;
+        //        }
+        //        else {
+        //            endnum = 0;
+        //            ending[i] = endnum;
+        //        }
+
+        secname = infile.token(i, 0)->substr(2);
+        sectionlabels[i] = secname;
         for (int j = i - 1; j >= 0; j--) {
             if (infile[j].isData()) {
                 break;
             }
-            ending[j] = ending[i];
+            sectionlabels[j] = sectionlabels[i];
         }
     }
 }
