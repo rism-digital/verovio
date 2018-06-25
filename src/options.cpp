@@ -675,6 +675,12 @@ Options::Options()
     m_mdivXPathQuery.Init("");
     this->Register(&m_mdivXPathQuery, "mdivXPathQuery", &m_selectors);
 
+    m_substXPathQuery.SetInfo("Subst xPath query",
+        "Set the xPath query for selecting <subst> child elements, for "
+        "example: \"./del\"; by default the first child is selected");
+    m_substXPathQuery.Init();
+    this->Register(&m_substXPathQuery, "substXPathQuery", &m_selectors);
+
     /********* The layout left margin by element *********/
 
     m_elementMargins.SetLabel("Element margins", "4-elementMargins");

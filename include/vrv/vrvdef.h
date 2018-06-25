@@ -94,6 +94,7 @@ enum ClassId {
     REG,
     RESTORE,
     SIC,
+    SUBST,
     SUPPLIED,
     UNCLEAR,
     EDITORIAL_ELEMENT_max,
