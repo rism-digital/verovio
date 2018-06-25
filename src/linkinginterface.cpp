@@ -74,31 +74,29 @@ int LinkingInterface::InterfacePrepareLinking(FunctorParams *functorParams, Obje
     }
 
     this->SetUuidStr();
-    
+
     if (!m_nextUuid.empty()) {
         params->m_nextUuidPairs.push_back(std::make_pair(this, m_nextUuid));
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
 
 int LinkingInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
 {
     FillStaffCurrentTimeSpanningParams *params = dynamic_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
     assert(params);
-    
-    
+
     // Only Dir and Dynam can be spanning with @next (extender)
-    if (!object->Is({DIR, DYNAM})) {
+    if (!object->Is({ DIR, DYNAM })) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     // Only target control events are supported
     if (!this->GetNextLink() || !this->GetNextLink()->IsControlElement()) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     // if @extender is available, the explicit "true" is required
     if (object->HasAttClass(ATT_EXTENDER)) {
         AttExtender *att = dynamic_cast<AttExtender *>(object);
@@ -110,7 +108,6 @@ int LinkingInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *funct
 
     return FUNCTOR_CONTINUE;
 }
-
 
 int LinkingInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
 {

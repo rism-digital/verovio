@@ -150,13 +150,9 @@ wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_WRITTEN accid)
         case ACCIDENTAL_WRITTEN_ss: symc = SMUFL_E269_accidentalSharpSharp; break;
         case ACCIDENTAL_WRITTEN_x: symc = SMUFL_E263_accidentalDoubleSharp; break;
         case ACCIDENTAL_WRITTEN_ff: symc = SMUFL_E264_accidentalDoubleFlat; break;
-        case ACCIDENTAL_WRITTEN_sx:
-            symc = SMUFL_E265_accidentalTripleSharp;
-            break; // Missing in SMuFL
+        case ACCIDENTAL_WRITTEN_sx: symc = SMUFL_E265_accidentalTripleSharp; break; // Missing in SMuFL
         case ACCIDENTAL_WRITTEN_xs: symc = SMUFL_E265_accidentalTripleSharp; break;
-        case ACCIDENTAL_WRITTEN_ts:
-            symc = SMUFL_E265_accidentalTripleSharp;
-            break; // Missing in SMuFL
+        case ACCIDENTAL_WRITTEN_ts: symc = SMUFL_E265_accidentalTripleSharp; break; // Missing in SMuFL
         case ACCIDENTAL_WRITTEN_tf: symc = SMUFL_E266_accidentalTripleFlat; break;
         case ACCIDENTAL_WRITTEN_n: symc = SMUFL_E261_accidentalNatural; break;
         case ACCIDENTAL_WRITTEN_nf: symc = SMUFL_E267_accidentalNaturalFlat; break;

@@ -918,30 +918,28 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                     loc = locAvg;
                 }
 
-                // note: bottomAlignedLoc and topAlignedLoc are only accouting for discrepencies 
+                // note: bottomAlignedLoc and topAlignedLoc are only accouting for discrepencies
                 // between 8th, 16th and 32nd notes, not 64th's and on
                 // I've described how to implement 64ths and beyond below
 
-                // we need to check for bottom and top alignment because a 32nd rest that's top is in the space 
+                // we need to check for bottom and top alignment because a 32nd rest that's top is in the space
                 // under the staff (d4 on treble) can not be moved any closer to center by an incriment of 1
                 // because the dots will collide with the staff
                 // whereas a 16th rest that is in the same "loc" as the 32nd is actually below the 32nd
                 // (the top of the 16th will be in note b3 on treble clef) so can be moved closer to the staff
                 // than the 32nd without fear of the dots colliding with the staff lines
 
-                //bottomAlignedLoc is the location where all of the rest's stems align to form a straight line
+                // bottomAlignedLoc is the location where all of the rest's stems align to form a straight line
                 int bottomAlignedLoc = loc;
-                // 8th note rests are aligned with the top of a 16th note rest, so to bottom align we have to push it down 2
-                if (rest->GetActualDur() == DURATION_8)
-                    bottomAlignedLoc -= 2;
-                // for durations smaller than 32nd, bottomAlignedLoc will need to decrease by 2 every iteration greater than from 32
-                // so 32 will be -0, 64 is -2, 128 is -4
-                // (currently not implemented)
+                // 8th note rests are aligned with the top of a 16th note rest, so to bottom align we have to push it
+                // down 2
+                if (rest->GetActualDur() == DURATION_8) bottomAlignedLoc -= 2;
+                // for durations smaller than 32nd, bottomAlignedLoc will need to decrease by 2 every iteration greater
+                // than from 32 so 32 will be -0, 64 is -2, 128 is -4 (currently not implemented)
 
-                //topAlignedLoc is the location where all of the top of the rests align to form a straight line
+                // topAlignedLoc is the location where all of the top of the rests align to form a straight line
                 int topAlignedLoc = loc;
-                if (rest->GetActualDur() == DURATION_32)
-                    topAlignedLoc += 2;
+                if (rest->GetActualDur() == DURATION_32) topAlignedLoc += 2;
                 // for smaller durations, topAlignedLoc offset will increase by 2 every iteration greater than from 32
                 // so 32 will need to be +2, 64 is +4, 128 is +6, etc.
                 // (currently only implemented for 32nds)
@@ -965,8 +963,10 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
                 if (loc % 2 != 0) {
                     // if it's above the staff, offset downwards
                     // if below the staff, offset upwards
-                    if (loc > 4) loc--;
-                    else loc++;
+                    if (loc > 4)
+                        loc--;
+                    else
+                        loc++;
                 }
             }
             else if (hasMultipleLayer) {

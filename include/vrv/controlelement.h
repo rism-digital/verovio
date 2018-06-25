@@ -36,7 +36,7 @@ public:
     virtual void Reset();
     virtual ClassId GetClassId() const { return CONTROL_ELEMENT; }
     ///@}
-    
+
     /**
      * @name Getter to interfaces
      */
@@ -57,12 +57,11 @@ public:
      * See Object::AdjustXOverflow
      */
     virtual int AdjustXOverflow(FunctorParams *functorParams);
-    
+
     /**
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
-
 
 private:
     //

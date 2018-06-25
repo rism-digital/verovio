@@ -38,8 +38,7 @@ void DeviceContext::SetPen(int colour, int width, int opacity, int dashLength)
     switch (opacity) {
         case AxSOLID: opacityValue = 1.0; break;
         case AxTRANSPARENT: opacityValue = 0.0; break;
-        default:
-            opacityValue = 1.0; // solid brush by default
+        default: opacityValue = 1.0; // solid brush by default
     }
 
     m_penStack.push(Pen(colour, width, opacityValue, dashLength));
@@ -52,8 +51,7 @@ void DeviceContext::SetBrush(int colour, int opacity)
     switch (opacity) {
         case AxSOLID: opacityValue = 1.0; break;
         case AxTRANSPARENT: opacityValue = 0.0; break;
-        default:
-            opacityValue = 1.0; // solid brush by default
+        default: opacityValue = 1.0; // solid brush by default
     }
 
     m_brushStack.push(Brush(colour, opacityValue));

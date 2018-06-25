@@ -801,7 +801,7 @@ public:
     virtual int PrepareCrossStaff(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int PrepareCrossStaffEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
-    
+
     /**
      * Match linking element (e.g, @next).
      */

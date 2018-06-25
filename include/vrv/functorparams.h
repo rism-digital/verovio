@@ -1280,7 +1280,7 @@ public:
     ArrayOfLinkingInterfaceUuidPairs m_nextUuidPairs;
     bool m_fillList;
 };
-    
+
 //----------------------------------------------------------------------------
 // PreparePlistParams
 //----------------------------------------------------------------------------

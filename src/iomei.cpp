@@ -1681,7 +1681,7 @@ void MeiOutput::WriteLinkingInterface(pugi::xml_node element, LinkingInterface *
 
     interface->WriteLinking(element);
 }
-    
+
 void MeiOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *interface)
 {
     assert(interface);
@@ -4470,7 +4470,7 @@ bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
 
     return true;
 }
-    
+
 bool MeiInput::ReadLinkingInterface(pugi::xml_node element, LinkingInterface *interface)
 {
     interface->ReadLinking(element);

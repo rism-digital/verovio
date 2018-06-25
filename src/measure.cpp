@@ -190,7 +190,7 @@ int Measure::GetDrawingX() const
             return (system->m_systemLeftMar);
         }
     }
-    
+
     if (m_xAbs != VRV_UNSET) return m_xAbs;
 
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
@@ -272,7 +272,7 @@ int Measure::GetWidth() const
             return page->m_pageWidth - system->m_systemLeftMar - system->m_systemRightMar;
         }
     }
-    
+
     if (this->m_xAbs2 != VRV_UNSET) return (m_xAbs2 - m_xAbs);
 
     assert(m_measureAligner.GetRightAlignment());
