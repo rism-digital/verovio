@@ -222,7 +222,11 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
     int noteY, noteX;
     int yValue;
-    if (neume->HasFacs()) {
+    if (nc->HasFacs()) {
+        noteY = ToLogicalY(staff->GetDrawingY());
+        noteX = nc->GetDrawingX();
+    }
+    else if (neume->HasFacs()) {
         noteY = ToLogicalY(staff->GetDrawingY());
         noteX = neume->GetDrawingX() + position * noteWidth;
     }

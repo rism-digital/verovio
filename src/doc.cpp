@@ -1527,10 +1527,12 @@ void Doc::SetChildZones() {
         if (fi->HasFacs()) {
             fi->SetZone(m_facsimile->FindZoneByUuid(fi->GetFacs()));
         }
+        /*
         else {
             LogError("If facsimilies are present then element %s should have it.", (*iter)->GetClassName().c_str());
             assert(false);
         }
+        */
     }
 }
 

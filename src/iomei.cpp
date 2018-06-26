@@ -1535,6 +1535,7 @@ void MeiOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
 
     WriteLayerElement(currentNode, nc);
     WriteDurationInterface(currentNode, nc);
+    WriteFacsimileInterface(currentNode, nc);
     WritePitchInterface(currentNode, nc);
     WritePositionInterface(currentNode, nc);
     nc->WriteColor(currentNode);
@@ -4226,6 +4227,7 @@ bool MeiInput::ReadNc(Object *parent, pugi::xml_node nc)
     ReadLayerElement(nc, vrvNc);
 
     ReadDurationInterface(nc, vrvNc);
+    ReadFacsimileInterface(nc, vrvNc);
     ReadPitchInterface(nc, vrvNc);
     ReadPositionInterface(nc, vrvNc);
     vrvNc->ReadColor(nc);
