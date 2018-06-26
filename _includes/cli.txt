@@ -1,4 +1,4 @@
-Verovio 2.0.0-dev-d4328a2
+Verovio 2.0.0-dev-8f84231
 
 Example usage:
 
@@ -66,6 +66,7 @@ Element selectors
  --app-x-path-query* <s>           Set the xPath query for selecting <app> child elements, for example: "./rdg[contains(@source, 'source-id')]"; by default the <lem> or the first <rdg> is selected
  --choice-x-path-query* <s>        Set the xPath query for selecting <choice> child elements, for example: "./orig"; by default the first child is selected
  --mdiv-x-path-query <s>           Set the xPath query for selecting the <mdiv> to be rendered; only one <mdiv> can be rendered (default: "")
+ --subst-x-path-query* <s>         Set the xPath query for selecting <subst> child elements, for example: "./del"; by default the first child is selected
 
 Element margins
  --default-bottom-margin <f>       The default bottom margin (default: 0.50; min: 0.00; max: 5.00)
