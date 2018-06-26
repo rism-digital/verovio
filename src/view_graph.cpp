@@ -175,7 +175,7 @@ void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize)
     dc->ResetBrush();
 }
 
-void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph)
+void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph, std::string className)
 {
     assert(dc);
 
@@ -187,7 +187,7 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staf
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
 
-    dc->DrawMusicText(str, ToDeviceContextX(x), ToDeviceContextY(y), setBBGlyph);
+    dc->DrawMusicText(str, ToDeviceContextX(x), ToDeviceContextY(y), setBBGlyph, className);
 
     dc->ResetFont();
     dc->ResetBrush();

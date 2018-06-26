@@ -81,7 +81,7 @@ public:
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius);
     virtual void DrawText(
         const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET);
-    virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false);
+    virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false, std::string className = "");
     virtual void DrawSpline(int n, Point points[]);
     virtual void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg);
     virtual void DrawBackgroundImage(int x = 0, int y = 0){};

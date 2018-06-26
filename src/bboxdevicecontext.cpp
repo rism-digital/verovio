@@ -294,7 +294,7 @@ void BBoxDeviceContext::DrawRotatedText(const std::string &text, int x, int y, d
     // TODO
 }
 
-void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph)
+void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph, std::string className)
 {
     assert(m_fontStack.top());
 

@@ -26,7 +26,7 @@ The simplest way to fullfil the Verovio coding style is to use a clang-format to
 
 ### Downloading clang-format for OS X
 
-An easy way to install clang-format on OS X computers is to use [Hombrew](http://brew.sh).  Type this command in the terminal to install:
+An easy way to install clang-format on OS X computers is to use [Homebrew](http://brew.sh).  Type this command in the terminal to install:
 
 ```
 brew install clang-format

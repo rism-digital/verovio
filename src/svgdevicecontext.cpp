@@ -762,7 +762,7 @@ void SvgDeviceContext::DrawRotatedText(const std::string &text, int x, int y, do
     // TODO
 }
 
-void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph)
+void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph, std::string className)
 {
     assert(m_fontStack.top());
 
@@ -791,6 +791,10 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         useChild.append_attribute("y") = y;
         useChild.append_attribute("height") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
         useChild.append_attribute("width") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
+        
+        // If a custom class was provided for this element, add it
+        if (className.length() > 0)
+            useChild.append_attribute("class") = className.c_str();
 
         // Get the bounds of the char
         if (glyph->GetHorizAdvX() > 0)
