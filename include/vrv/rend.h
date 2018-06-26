@@ -19,7 +19,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
- * This class models the MEI <rend>
+ * This class models the MEI <rend> element.
  */
 class Rend : public TextElement,
              public AreaPosInterface,

@@ -486,7 +486,12 @@ int FloatingObject::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
         assert(interface);
-        return interface->InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
+        interface->InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
+    }
+    if (this->HasInterface(INTERFACE_LINKING)) {
+        LinkingInterface *interface = this->GetLinkingInterface();
+        assert(interface);
+        interface->InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
     }
     return FUNCTOR_CONTINUE;
 }

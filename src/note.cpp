@@ -120,12 +120,12 @@ void Note::AddChild(Object *child)
     // additional verification for accid and artic - this will no be raised with editorial markup, though
     if (child->Is(ACCID)) {
         IsAttributeComparison isAttributeComparison(ACCID);
-        if (this->FindChildByAttComparison(&isAttributeComparison))
+        if (this->FindChildByComparison(&isAttributeComparison))
             LogWarning("Having both @accid or @accid.ges and <accid> child will cause problems");
     }
     else if (child->Is(ARTIC)) {
         IsAttributeComparison isAttributeComparison(ARTIC);
-        if (this->FindChildByAttComparison(&isAttributeComparison))
+        if (this->FindChildByComparison(&isAttributeComparison))
             LogWarning("Having both @artic and <artic> child will cause problems");
     }
 
@@ -299,6 +299,13 @@ wchar_t Note::GetMensuralSmuflNoteHead()
 {
     assert(this->IsMensural());
 
+    int drawingDur = this->GetDrawingDur();
+
+    // No SMuFL code used for these values
+    if (drawingDur < DUR_1) {
+        return 0;
+    }
+
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
     bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
@@ -308,18 +315,21 @@ wchar_t Note::GetMensuralSmuflNoteHead()
         code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
     }
     else {
-        int drawingDur = this->GetDrawingDur();
-        if (this->GetColored()) {
-            if (drawingDur == DUR_2)
-                code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
-            else
+        if (this->GetColored() == BOOLEAN_true) {
+            if (drawingDur > DUR_2) {
                 code = SMUFL_E93C_mensuralNoteheadMinimaWhite;
+            }
+            else {
+                code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+            }
         }
         else {
-            if (drawingDur == DUR_2)
-                code = SMUFL_E93C_mensuralNoteheadMinimaWhite;
-            else
+            if (drawingDur > DUR_2) {
                 code = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+            }
+            else {
+                code = SMUFL_E93C_mensuralNoteheadMinimaWhite;
+            }
         }
     }
     return code;
@@ -459,7 +469,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    if (!this->IsVisible()) {
+    if (!this->IsVisible() || (this->GetStemVisible() == BOOLEAN_false)) {
         return FUNCTOR_SIBLINGS;
     }
 
@@ -805,6 +815,9 @@ int Note::PrepareLyrics(FunctorParams *functorParams)
 
 int Note::PreparePointersByLayer(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::PreparePointersByLayer(functorParams);
+
     PreparePointersByLayerParams *params = dynamic_cast<PreparePointersByLayerParams *>(functorParams);
     assert(params);
 
@@ -847,7 +860,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     }
 
     // For now just ignore grace notes
-    if (this->HasGrace()) {
+    if (this->IsGraceNote()) {
         return FUNCTOR_SIBLINGS;
     }
 

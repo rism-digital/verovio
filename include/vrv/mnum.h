@@ -20,6 +20,9 @@ class TextElement;
 // MNum
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <mNum> element.
+ */
 class MNum : public ControlElement,
              public TextListInterface,
              public TextDirInterface,

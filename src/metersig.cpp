@@ -33,7 +33,7 @@ MeterSig::MeterSig(const ScoreDefInterface *meterSigAttr) : LayerElement("msig-"
     Init();
 
     this->SetCount(meterSigAttr->GetMeterCount());
-    this->SetForm(meterSigDefaultVisToMeterSigVis(meterSigAttr->GetMeterRend()));
+    this->SetForm(meterSigDefaultVisToMeterSigVis(meterSigAttr->GetMeterForm()));
     this->SetSym(meterSigAttr->GetMeterSym());
     this->SetUnit(meterSigAttr->GetMeterUnit());
 }
@@ -55,14 +55,14 @@ void MeterSig::Reset()
     ResetMeterSigVis();
 }
 
-meterSigVis_FORM MeterSig::meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_METERREND rend)
+meterSigVis_FORM MeterSig::meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_METERFORM form)
 {
-    switch (rend) {
-        case meterSigDefaultVis_METERREND_NONE: return meterSigVis_FORM_NONE;
-        case meterSigDefaultVis_METERREND_num: return meterSigVis_FORM_num;
-        case meterSigDefaultVis_METERREND_denomsym: return meterSigVis_FORM_denomsym;
-        case meterSigDefaultVis_METERREND_norm: return meterSigVis_FORM_norm;
-        case meterSigDefaultVis_METERREND_invis: return meterSigVis_FORM_invis;
+    switch (form) {
+        case meterSigDefaultVis_METERFORM_NONE: return meterSigVis_FORM_NONE;
+        case meterSigDefaultVis_METERFORM_num: return meterSigVis_FORM_num;
+        case meterSigDefaultVis_METERFORM_denomsym: return meterSigVis_FORM_denomsym;
+        case meterSigDefaultVis_METERFORM_norm: return meterSigVis_FORM_norm;
+        case meterSigDefaultVis_METERFORM_invis: return meterSigVis_FORM_invis;
         default: return meterSigVis_FORM_NONE;
     }
 }

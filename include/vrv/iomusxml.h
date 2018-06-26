@@ -253,18 +253,22 @@ private:
 private:
     /* The filename */
     std::string m_filename;
-    /* octave offset **/
+    /* octave offset */
     std::vector<int> m_octDis;
-    /* measure repeats **/
+    /* measure repeats */
     bool m_mRpt = false;
+    /* measure repeats */
+    bool m_slash = false;
+    /* measure rests */
+    int m_multiRest = 0;
     /* MIDI ticks */
     int m_ppq;
-    /* meaure time */
+    /* measure time */
     int m_durTotal = 0;
     /* meter signature */
     int m_meterCount = 0;
     int m_meterUnit = 0;
-    /* LastElementID **/
+    /* LastElementID */
     std::string m_ID;
     /* The stack for piling open LayerElements (beams, tuplets, chords, etc.)  */
     std::vector<LayerElement *> m_elementStack;

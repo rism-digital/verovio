@@ -149,6 +149,7 @@ void View::DrawLb(DeviceContext *dc, Lb *lb, TextDrawingParams &params)
 
     params.m_y -= ((descender + height) * 1.1);
     params.m_newLine = true;
+    params.m_laidOut = true;
 
     dc->EndTextGraphic(lb, this);
 }
@@ -211,7 +212,9 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, TextDrawingParams &params)
                     case (FONTSIZETERM_xx_large): percent = 200; break;
                     case (FONTSIZETERM_x_large): percent = 150; break;
                     case (FONTSIZETERM_large): percent = 110; break;
+                    case (FONTSIZETERM_larger): percent = 110; break;
                     case (FONTSIZETERM_small): percent = 80; break;
+                    case (FONTSIZETERM_smaller): percent = 80; break;
                     case (FONTSIZETERM_x_small): percent = 60; break;
                     case (FONTSIZETERM_xx_small): percent = 50; break;
                     default: break;

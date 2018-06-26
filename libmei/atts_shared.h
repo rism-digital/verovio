@@ -2245,6 +2245,10 @@ public:
     data_LINEFORM GetLform() const { return m_lform; }
     bool HasLform() const;
     //
+    void SetLsegs(int lsegs_) { m_lsegs = lsegs_; }
+    int GetLsegs() const { return m_lsegs; }
+    bool HasLsegs() const;
+    //
     void SetLwidth(std::string lwidth_) { m_lwidth = lwidth_; }
     std::string GetLwidth() const { return m_lwidth; }
     bool HasLwidth() const;
@@ -2253,6 +2257,14 @@ public:
 private:
     /** Describes the line style of a curve. **/
     data_LINEFORM m_lform;
+    /**
+     * Describes the number of segments into which a dashed, dotted, or wavy line may
+     * be divided; a pair of space-separated values (minimum and maximum, respectively)
+     * provides a range between which a rendering system-supplied value may fall, while
+     * a single value indicates a fixed amount of space; that is, the minimum and
+     * maximum values are equal.
+     **/
+    int m_lsegs;
     /** Width of a curved line. **/
     std::string m_lwidth;
 
@@ -3271,14 +3283,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOct(char oct_) { m_oct = oct_; }
-    char GetOct() const { return m_oct; }
+    void SetOct(data_OCTAVE oct_) { m_oct = oct_; }
+    data_OCTAVE GetOct() const { return m_oct; }
     bool HasOct() const;
     ///@}
 
 private:
     /** Captures written octave information. **/
-    char m_oct;
+    data_OCTAVE m_oct;
 
     /* include <attoct> */
 };
@@ -3307,8 +3319,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOctDefault(char octDefault_) { m_octDefault = octDefault_; }
-    char GetOctDefault() const { return m_octDefault; }
+    void SetOctDefault(data_OCTAVE octDefault_) { m_octDefault = octDefault_; }
+    data_OCTAVE GetOctDefault() const { return m_octDefault; }
     bool HasOctDefault() const;
     ///@}
 
@@ -3318,7 +3330,7 @@ private:
      * chord, etc.
      * in a measure does not have an octave value specified.
      **/
-    char m_octDefault;
+    data_OCTAVE m_octDefault;
 
     /* include <attoct.default> */
 };
@@ -4558,8 +4570,8 @@ public:
     data_PITCHNAME GetPloc() const { return m_ploc; }
     bool HasPloc() const;
     //
-    void SetOloc(char oloc_) { m_oloc = oloc_; }
-    char GetOloc() const { return m_oloc; }
+    void SetOloc(data_OCTAVE oloc_) { m_oloc = oloc_; }
+    data_OCTAVE GetOloc() const { return m_oloc; }
     bool HasOloc() const;
     ///@}
 
@@ -4567,7 +4579,7 @@ private:
     /** Captures staff location in terms of written pitch name. **/
     data_PITCHNAME m_ploc;
     /** Records staff location in terms of written octave. **/
-    char m_oloc;
+    data_OCTAVE m_oloc;
 
     /* include <attoloc> */
 };
@@ -4678,8 +4690,8 @@ public:
     data_STEMDIRECTION GetStemDir() const { return m_stemDir; }
     bool HasStemDir() const;
     //
-    void SetStemLen(int stemLen_) { m_stemLen = stemLen_; }
-    int GetStemLen() const { return m_stemLen; }
+    void SetStemLen(double stemLen_) { m_stemLen = stemLen_; }
+    double GetStemLen() const { return m_stemLen; }
     bool HasStemLen() const;
     //
     void SetStemMod(data_STEMMODIFIER stemMod_) { m_stemMod = stemMod_; }
@@ -4707,7 +4719,7 @@ private:
     /** Describes the direction of a stem. **/
     data_STEMDIRECTION m_stemDir;
     /** Encodes the stem length. **/
-    int m_stemLen;
+    double m_stemLen;
     /**
      * Encodes any stem "modifiers"; that is, symbols rendered on the stem, such as
      * tremolo or Sprechstimme indicators.

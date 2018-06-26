@@ -19,6 +19,9 @@ namespace vrv {
 // Trill
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <trill> element.
+ */
 class Trill : public ControlElement,
               public TimeSpanningInterface,
               public AttColor,

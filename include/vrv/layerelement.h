@@ -226,6 +226,11 @@ public:
     ///@}
 
     /**
+     * See Object::PreparePointersByLayer
+     */
+    virtual int PreparePointersByLayer(FunctorParams *functorParams);
+
+    /**
      * See Object::PrepareTimePointing
      */
     virtual int PrepareTimePointing(FunctorParams *functorParams);

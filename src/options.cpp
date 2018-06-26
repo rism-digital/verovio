@@ -571,22 +571,18 @@ Options::Options()
     m_font.SetInfo("Font", "Set the music font");
     m_font.Init("Leipzig");
     this->Register(&m_font, "font", &m_generalLayout);
-    
-    m_graceFactor.SetInfo("Grace factor", "The grace size ratio numerator");
-    m_graceFactor.Init(0.75, 0.5, 1.0);
-    this->Register(&m_graceFactor, "graceFactor", &m_generalLayout);
-    
-    m_graceRhythmAlign.SetInfo("Grace rhythmic alignment", "Align grace notes rhythmically with all staves");
-    m_graceRhythmAlign.Init(false);
-    this->Register(&m_graceRhythmAlign, "graceRhythmAlign", &m_generalLayout);
-    
-    m_graceRightAlign.SetInfo("Grace right alignment", "Align the right position of a grace group with all staves");
-    m_graceRightAlign.Init(false);
-    this->Register(&m_graceRightAlign, "graceRightAlign", &m_generalLayout);
 
     m_graceFactor.SetInfo("Grace factor", "The grace size ratio numerator");
     m_graceFactor.Init(0.75, 0.5, 1.0);
     this->Register(&m_graceFactor, "graceFactor", &m_generalLayout);
+
+    m_graceRhythmAlign.SetInfo("Grace rhythmic alignment", "Align grace notes rhythmically with all staves");
+    m_graceRhythmAlign.Init(false);
+    this->Register(&m_graceRhythmAlign, "graceRhythmAlign", &m_generalLayout);
+
+    m_graceRightAlign.SetInfo("Grace right alignment", "Align the right position of a grace group with all staves");
+    m_graceRightAlign.Init(false);
+    this->Register(&m_graceRightAlign, "graceRightAlign", &m_generalLayout);
 
     m_hairpinSize.SetInfo("Hairpin size", "The haripin size in MEI units");
     m_hairpinSize.Init(3.0, 1.0, 8.0);
@@ -691,6 +687,12 @@ Options::Options()
     m_mdivXPathQuery.Init("");
     this->Register(&m_mdivXPathQuery, "mdivXPathQuery", &m_selectors);
 
+    m_substXPathQuery.SetInfo("Subst xPath query",
+        "Set the xPath query for selecting <subst> child elements, for "
+        "example: \"./del\"; by default the first child is selected");
+    m_substXPathQuery.Init();
+    this->Register(&m_substXPathQuery, "substXPathQuery", &m_selectors);
+
     /********* The layout left margin by element *********/
 
     m_elementMargins.SetLabel("Element margins", "4-elementMargins");
@@ -737,7 +739,7 @@ Options::Options()
     this->Register(&m_leftMarginKeySig, "leftMarginKeySig", &m_elementMargins);
 
     m_leftMarginLeftBarLine.SetInfo("Left margin left barLine", "The margin for left barLine in MEI units");
-    m_leftMarginLeftBarLine.Init(0.0, 0.0, 2.0);
+    m_leftMarginLeftBarLine.Init(1.0, 0.0, 2.0);
     this->Register(&m_leftMarginLeftBarLine, "leftMarginLeftBarLine", &m_elementMargins);
 
     m_leftMarginMensur.SetInfo("Left margin mensur", "The margin for mensur in MEI units");

@@ -162,9 +162,13 @@ public:
     virtual void ResetCachedDrawingY() const;
 
     /**
-     * Setter for the objectX and Y
+     * @name Setter and getters for the objectX and Y
      */
+    ///@{
     void SetObjectXY(Object *objectX, Object *objectY);
+    Object *GetObjectX() const { return m_objectX; }
+    Object *GetObjectY() const { return m_objectY; }
+    ///@}
 
     /**
      * Getter for the FloatingObject (asserted, cannot be NULL)

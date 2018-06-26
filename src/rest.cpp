@@ -177,10 +177,8 @@ int Rest::CalcDots(FunctorParams *functorParams)
     bool drawingCueSize = this->GetDrawingCueSize();
     int staffSize = staff->m_drawingStaffSize;
 
-    Dots *dots = NULL;
-
-    // For single notes we need here to set the dot loc
-    dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
+    // For single rests we need here to set the dot loc
+    Dots *dots = dynamic_cast<Dots *>(this->FindChildByType(DOTS, 1));
     assert(dots);
 
     std::list<int> *dotLocs = dots->GetDotLocsForStaff(staff);

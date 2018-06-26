@@ -17,6 +17,9 @@ namespace vrv {
 // Ref
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <ref> element.
+ */
 class Ref : public EditorialElement {
 public:
     /**

@@ -17,7 +17,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
- * This class represent a <labelAbbr> in MEI.
+ * This class models the MEI <labelAbbr> element.
  */
 class LabelAbbr : public Object, public TextListInterface {
 

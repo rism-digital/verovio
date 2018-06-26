@@ -29,10 +29,11 @@ namespace vrv {
 // BarLine
 //----------------------------------------------------------------------------
 
-BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor()
+BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog(), AttColor(), AttVisibility()
 {
     RegisterAttClass(ATT_BARLINELOG);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_VISIBILITY);
 
     Reset();
 }
@@ -45,6 +46,7 @@ void BarLine::Reset()
 
     ResetBarLineLog();
     ResetColor();
+    ResetVisibility();
 }
 
 bool BarLine::SetAlignment(Alignment *alignment)
@@ -137,7 +139,7 @@ int BarLine::ConvertToCastOffMensural(FunctorParams *functorParams)
 
         // Look if we already have the staff (e.g., with more than one layer)
         AttNIntegerComparison comparisonStaffN(STAFF, params->m_targetStaff->GetN());
-        Staff *staff = dynamic_cast<Staff *>(params->m_targetMeasure->FindChildByAttComparison(&comparisonStaffN));
+        Staff *staff = dynamic_cast<Staff *>(params->m_targetMeasure->FindChildByComparison(&comparisonStaffN));
         if (!staff) {
             staff = new Staff(*params->m_targetStaff);
             staff->CopyReset();

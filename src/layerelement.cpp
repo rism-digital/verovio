@@ -16,6 +16,7 @@
 #include "attcomparison.h"
 #include "barline.h"
 #include "beam.h"
+#include "beatrpt.h"
 #include "btrem.h"
 #include "chord.h"
 #include "clef.h"
@@ -31,11 +32,14 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
+#include "mrpt.h"
+#include "mrpt2.h"
 #include "multirest.h"
+#include "multirpt.h"
+#include "neume.h"
 #include "note.h"
 #include "page.h"
 #include "rest.h"
-#include "rpt.h"
 #include "smufl.h"
 #include "space.h"
 #include "staff.h"
@@ -132,7 +136,7 @@ bool LayerElement::IsGraceNote()
     else if (this->Is(TUPLET)) {
         AttComparisonAny matchType({ NOTE, CHORD });
         ArrayOfObjects children;
-        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByAttComparison(&matchType));
+        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByComparison(&matchType));
         if (child) return child->IsGraceNote();
     }
     // For accid, artic, etc.. look at the parent note / chord
@@ -416,11 +420,16 @@ int LayerElement::GetDrawingRadius(Doc *doc)
 
     if (!this->Is({ CHORD, NOTE, REST })) return 0;
 
+    wchar_t code = 0;
+
     int dur = DUR_4;
     if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
         dur = note->GetDrawingDur();
+        if (note->IsMensural()) {
+            code = note->GetMensuralSmuflNoteHead();
+        }
     }
     else if (this->Is(CHORD)) {
         Chord *chord = dynamic_cast<Chord *>(this);
@@ -430,18 +439,27 @@ int LayerElement::GetDrawingRadius(Doc *doc)
 
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
-
-    if (dur <= DUR_BR) {
-        return doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+    // Mensural note shorter than DUR_BR
+    if (code) {
+        return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
     }
-
-    wchar_t code = SMUFL_E0A3_noteheadHalf;
-
-    if (dur <= DUR_1) {
-        code = SMUFL_E0A2_noteheadWhole;
+    else if (dur <= DUR_BR) {
+        if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
+            return doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize) * 0.8;
+        }
+        else {
+            return doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
+        }
     }
-
-    return doc->GetGlyphWidth(code, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
+    else if (dur == DUR_1) {
+        return doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
+    }
+    else if (dur == DUR_2) {
+        return doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
+    }
+    else {
+        return doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, staff->m_drawingStaffSize, this->GetDrawingCueSize()) / 2;
+    }
 }
 
 double LayerElement::GetAlignmentDuration(
@@ -467,6 +485,15 @@ double LayerElement::GetAlignmentDuration(
         if (duration->IsMensural() && (notationType != NOTATIONTYPE_cmn)) {
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
+        if (this->Is(NC)) {
+            Neume *neume = dynamic_cast<Neume *>(this->GetFirstParent(NEUME));
+            if (neume->IsLastInNeume(this)) {
+                return 128;
+            }
+            else {
+                return 16;
+            }
+        }
         double durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
         // With fTrem we need to divide the duration by two
         FTrem *fTrem = dynamic_cast<FTrem *>(this->GetFirstParent(FTREM, MAX_FTREM_DEPTH));
@@ -479,7 +506,7 @@ double LayerElement::GetAlignmentDuration(
         BeatRpt *beatRpt = dynamic_cast<BeatRpt *>(this);
         assert(beatRpt);
         int meterUnit = 4;
-        if (meterSig && meterSig->HasUnit()) meterSig->GetUnit();
+        if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
         return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
     else if (this->Is(TIMESTAMP_ATTR)) {
@@ -490,7 +517,7 @@ double LayerElement::GetAlignmentDuration(
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     // We align all full measure element to the current time signature, even the ones that last longer than one measure
-    else if (this->Is({ MREST, MULTIREST, MRPT, MRPT2, MULTIREST })) {
+    else if (this->Is({ MREST, MULTIREST, MRPT, MRPT2, MULTIRPT })) {
         int meterUnit = 4;
         int meterCount = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
@@ -627,17 +654,38 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         type = ALIGNMENT_FULLMEASURE2;
     }
     else if (this->Is(DOT)) {
-        type = ALIGNMENT_DOT;
+        Dot *dot = dynamic_cast<Dot *>(this);
+        assert(dot);
+        if (dot->m_drawingNote) {
+            m_alignment = dot->m_drawingNote->GetAlignment();
+        }
+        else {
+            // Create an alignment only if the dot has no resolved preceeding note
+            type = ALIGNMENT_DOT;
+        }
     }
     else if (this->Is(ACCID)) {
         // accid within note was already taken into account by noteParent
         type = ALIGNMENT_ACCID;
     }
-    else if (this->Is({ ARTIC, ARTIC_PART, SYL })) {
+    else if (this->Is({ ARTIC, ARTIC_PART })) {
         // Refer to the note parent
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
         m_alignment = note->GetAlignment();
+    }
+    else if (this->Is(SYL)) {
+        Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+        assert(staff);
+
+        if (staff->m_drawingNotationType == NOTATIONTYPE_neume) {
+            type = ALIGNMENT_DEFAULT;
+        }
+        else {
+            Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+            assert(note);
+            m_alignment = note->GetAlignment();
+        }
     }
     else if (this->Is(VERSE)) {
         // Idem
@@ -733,14 +781,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     }
     else if (this->Is(CHORD)) {
         // The y position is set to the top note one
-        Chord *chord = dynamic_cast<Chord *>(this);
-        assert(chord);
-        Note *note = chord->GetTopNote();
-        assert(note);
-        int loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
-        if (note->HasLoc()) {
-            loc = note->GetLoc();
-        }
+        int loc = PitchInterface::CalcLoc(this, layerY, true);
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
     else if (this->Is({ CUSTOS, DOT })) {
@@ -754,11 +795,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         Chord *chord = note->IsChordTone();
         int loc = 0;
         if (note->HasPname()) {
-            loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
-        }
-        // should this override pname/oct ?
-        if (note->HasLoc()) {
-            loc = note->GetLoc();
+            loc = PitchInterface::CalcLoc(note, layerY);
         }
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
         // Make it relative to the top note one (see above) but not for cross-staff notes in chords
@@ -794,7 +831,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             }
 
             // add offset
-            else if (staff->m_drawingLines > 1)
+            else if (staff->m_drawingLines > 3)
                 loc += 2;
         }
 
@@ -818,10 +855,121 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
             assert(staff);
             loc = staff->m_drawingLines - 1;
+
+            Beam *beam = dynamic_cast<Beam *>(this->GetFirstParent(BEAM, 1));
             // Limitation: GetLayerCount does not take into account editorial markup
             // should be refined later
             bool hasMultipleLayer = (staffY->GetChildCount(LAYER) > 1);
-            if (hasMultipleLayer) {
+
+            // If within a beam, calculate the rest's height based on it's relationship to the notes that surround it
+            if (beam) {
+                beam->ResetList(beam);
+
+                const ListOfObjects *beamList = beam->GetList(beam);
+                int restIndex = beam->GetChildIndex(rest);
+
+                int leftLoc = loc;
+                ListOfObjects::const_iterator it = beamList->begin();
+                std::advance(it, restIndex);
+                ListOfObjects::const_reverse_iterator rit(it);
+                // iterate through the elements from the rest to the beginning of the beam
+                // until we hit a note or chord, which we will use to determine where the rest should be placed
+                for (; rit != beamList->rend(); ++rit) {
+                    LayerElement *layerElement = dynamic_cast<LayerElement *>(*rit);
+                    assert(layerElement);
+                    if (layerElement->Is(NOTE)) {
+                        leftLoc = PitchInterface::CalcLoc(layerElement, layerY);
+                        break;
+                    }
+                    else if (layerElement->Is(CHORD)) {
+                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, true);
+                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, false);
+                        // if it's a rest, use the middle of the chord as the rest's location
+                        leftLoc = (topChordLoc + bottomChordLoc) / 2;
+                        break;
+                    }
+                }
+
+                int rightLoc = loc;
+                it = beamList->begin();
+                std::advance(it, restIndex);
+                // iterate through the elements from the rest to the end of the beam
+                // until we hit a note or chord, which we will use to determine where the rest should be placed
+                for (; it != beamList->end(); ++it) {
+                    LayerElement *layerElement = dynamic_cast<LayerElement *>(*it);
+                    assert(layerElement);
+                    if (layerElement->Is(NOTE)) {
+                        rightLoc = PitchInterface::CalcLoc(layerElement, layerY);
+                        break;
+                        break;
+                    }
+                    else if (layerElement->Is(CHORD)) {
+                        int topChordLoc = PitchInterface::CalcLoc(layerElement, layerY, true);
+                        int bottomChordLoc = PitchInterface::CalcLoc(layerElement, layerY, false);
+                        // if it's a rest, use the middle of the chord as the rest's location
+                        rightLoc = (topChordLoc + bottomChordLoc) / 2;
+                        break;
+                    }
+                }
+
+                // average the left note and right note's locations together to get our rest location
+                const int locAvg = (rightLoc + leftLoc) / 2;
+                if (abs(locAvg - loc) > 3) {
+                    loc = locAvg;
+                }
+
+                // note: bottomAlignedLoc and topAlignedLoc are only accouting for discrepencies
+                // between 8th, 16th and 32nd notes, not 64th's and on
+                // I've described how to implement 64ths and beyond below
+
+                // we need to check for bottom and top alignment because a 32nd rest that's top is in the space
+                // under the staff (d4 on treble) can not be moved any closer to center by an incriment of 1
+                // because the dots will collide with the staff
+                // whereas a 16th rest that is in the same "loc" as the 32nd is actually below the 32nd
+                // (the top of the 16th will be in note b3 on treble clef) so can be moved closer to the staff
+                // than the 32nd without fear of the dots colliding with the staff lines
+
+                // bottomAlignedLoc is the location where all of the rest's stems align to form a straight line
+                int bottomAlignedLoc = loc;
+                // 8th note rests are aligned with the top of a 16th note rest, so to bottom align we have to push it
+                // down 2
+                if (rest->GetActualDur() == DURATION_8) bottomAlignedLoc -= 2;
+                // for durations smaller than 32nd, bottomAlignedLoc will need to decrease by 2 every iteration greater
+                // than from 32 so 32 will be -0, 64 is -2, 128 is -4 (currently not implemented)
+
+                // topAlignedLoc is the location where all of the top of the rests align to form a straight line
+                int topAlignedLoc = loc;
+                if (rest->GetActualDur() == DURATION_32) topAlignedLoc += 2;
+                // for smaller durations, topAlignedLoc offset will increase by 2 every iteration greater than from 32
+                // so 32 will need to be +2, 64 is +4, 128 is +6, etc.
+                // (currently only implemented for 32nds)
+
+                const int topOfStaffLoc = 10;
+                const int bottomOfStaffLoc = -4;
+
+                // move the extrema towards center a little for aesthetic reasons
+                const bool restAboveStaff = bottomAlignedLoc >= topOfStaffLoc;
+                const bool restBelowStaff = topAlignedLoc <= bottomOfStaffLoc;
+                if (restAboveStaff) {
+                    loc--;
+                }
+                else if (restBelowStaff) {
+                    loc++;
+                }
+
+                // if loc is odd, we need to offset it to be even
+                // so that the dots do not collide with the staff lines
+                // or on ledger lines
+                if (loc % 2 != 0) {
+                    // if it's above the staff, offset downwards
+                    // if below the staff, offset upwards
+                    if (loc > 4)
+                        loc--;
+                    else
+                        loc++;
+                }
+            }
+            else if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
                 if (firstLayer->GetN() == layerY->GetN())
@@ -901,6 +1049,10 @@ int LayerElement::AdjustLayers(FunctorParams *functorParams)
                 }
                 else if (abs(previousNote->GetDrawingLoc() - params->m_currentNote->GetDrawingLoc()) > 1)
                     continue;
+            }
+
+            if (this->Is(DOTS) && (*iter)->Is(DOTS)) {
+                continue;
             }
 
             // Nothing to do if we have no vertical overlap
@@ -1048,7 +1200,7 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
     else if (this->Is(TUPLET)) {
         AttComparisonAny matchType({ NOTE, CHORD });
         ArrayOfObjects children;
-        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByAttComparison(&matchType));
+        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByComparison(&matchType));
         if (child) m_drawingCueSize = child->GetDrawingCueSize();
     }
     // For accid, look at the parent if @func="edit" or otherwise to the parent note
@@ -1100,7 +1252,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     params->m_currentCrossLayer = NULL;
 
     AttNIntegerComparison comparisonFirst(STAFF, durElement->GetStaff().at(0));
-    m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindChildByAttComparison(&comparisonFirst, 1));
+    m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindChildByComparison(&comparisonFirst, 1));
     if (!m_crossStaff) {
         LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff().at(0),
             this->GetUuid().c_str());
@@ -1124,7 +1276,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     // When we will have allowed @layer in <note>, we will have to do:
     // int layerN = durElement->HasLayer() ? durElement->GetLayer() : (*currentLayer)->GetN();
     AttNIntegerComparison comparisonFirstLayer(LAYER, layerN);
-    m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByAttComparison(&comparisonFirstLayer, 1));
+    m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByComparison(&comparisonFirstLayer, 1));
     if (!m_crossLayer) {
         // Just try to pick the first one...
         m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByType(LAYER));
@@ -1156,6 +1308,23 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
     if (durElement->HasStaff()) {
         params->m_currentCrossStaff = NULL;
         params->m_currentCrossLayer = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::PreparePointersByLayer(FunctorParams *functorParams)
+{
+    PreparePointersByLayerParams *params = dynamic_cast<PreparePointersByLayerParams *>(functorParams);
+    assert(params);
+
+    if (params->m_lastDot) {
+        params->m_lastDot->m_drawingNextElement = this;
+        params->m_lastDot = NULL;
+    }
+    if (this->Is(BARLINE)) {
+        // Do not attach a note when a barline is passed
+        params->m_currentNote = NULL;
     }
 
     return FUNCTOR_CONTINUE;
@@ -1225,14 +1394,12 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
     CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
     assert(params);
 
-    // Here we need to check if the LayerElement has a duration, otherwise we can continue
-    if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
-
     double incrementScoreTime;
 
-    // Now deal with the different elements
     if (this->Is(REST) || this->Is(SPACE)) {
-        double incrementScoreTime = GetAlignmentDuration() / (DUR_MAX / DURATION_4);
+        incrementScoreTime = this->GetAlignmentDuration(
+            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         params->m_currentScoreTime += incrementScoreTime;
         params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
@@ -1241,17 +1408,19 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
         assert(note);
 
         // For now just ignore grace notes
-        if (note->HasGrace()) return FUNCTOR_CONTINUE;
+        if (note->IsGraceNote()) return FUNCTOR_CONTINUE;
 
         Chord *chord = note->IsChordTone();
 
         // If the note has a @dur or a @dur.ges, take it into account
         // This means that overwriting only @dots or @dots.ges will not be taken into account
         if (chord && !note->HasDur() && !note->HasDurGes()) {
-            incrementScoreTime = chord->GetAlignmentDuration();
+            incrementScoreTime = chord->GetAlignmentDuration(
+                params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         }
         else {
-            incrementScoreTime = note->GetAlignmentDuration();
+            incrementScoreTime = note->GetAlignmentDuration(
+                params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
         }
         incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
         double realTimeIncrementSeconds = incrementScoreTime * 60.0 / params->m_currentTempo;
@@ -1270,6 +1439,17 @@ int LayerElement::CalcOnsetOffset(FunctorParams *functorParams)
             params->m_currentScoreTime += incrementScoreTime;
             params->m_currentRealTimeSeconds += realTimeIncrementSeconds;
         }
+    }
+    else if (this->Is(BEATRPT)) {
+        BeatRpt *rpt = dynamic_cast<BeatRpt *>(this);
+        assert(rpt);
+
+        incrementScoreTime = rpt->GetAlignmentDuration(
+            params->m_currentMensur, params->m_currentMeterSig, true, params->m_notationType);
+        incrementScoreTime = incrementScoreTime / (DUR_MAX / DURATION_4);
+        rpt->SetScoreTimeOnset(params->m_currentScoreTime);
+        params->m_currentScoreTime += incrementScoreTime;
+        params->m_currentRealTimeSeconds += incrementScoreTime * 60.0 / params->m_currentTempo;
     }
     return FUNCTOR_CONTINUE;
 }

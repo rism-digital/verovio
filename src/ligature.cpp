@@ -85,7 +85,7 @@ void Ligature::FilterList(ListOfObjects *childList)
             Note *n = dynamic_cast<Note *>(currentElement);
 
             if (n) {
-                iter++;
+                ++iter;
             }
             else {
                 // if it is not a note, drop it

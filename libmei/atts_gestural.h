@@ -240,8 +240,8 @@ public:
     noteGes_EXTREMIS GetExtremis() const { return m_extremis; }
     bool HasExtremis() const;
     //
-    void SetOctGes(char octGes_) { m_octGes = octGes_; }
-    char GetOctGes() const { return m_octGes; }
+    void SetOctGes(data_OCTAVE octGes_) { m_octGes = octGes_; }
+    data_OCTAVE GetOctGes() const { return m_octGes; }
     bool HasOctGes() const;
     //
     void SetPnameGes(data_PITCHNAME pnameGes_) { m_pnameGes = pnameGes_; }
@@ -257,7 +257,7 @@ private:
     /** Indicates an extreme, indefinite performed pitch. **/
     noteGes_EXTREMIS m_extremis;
     /** Records performed octave information that differs from the written value. **/
-    char m_octGes;
+    data_OCTAVE m_octGes;
     /** Contains a performed pitch name that differs from the written value. **/
     data_PITCHNAME m_pnameGes;
     /** Holds a pitch-to-number mapping, a base-40 or MIDI note number, for example. **/
@@ -351,6 +351,48 @@ private:
     data_BOOLEAN m_attacca;
 
     /* include <attattacca> */
+};
+
+//----------------------------------------------------------------------------
+// AttSoundLocation
+//----------------------------------------------------------------------------
+
+class AttSoundLocation : public Att {
+public:
+    AttSoundLocation();
+    virtual ~AttSoundLocation();
+
+    /** Reset the default values for the attribute class **/
+    void ResetSoundLocation();
+
+    /** Read the values for the attribute class **/
+    bool ReadSoundLocation(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteSoundLocation(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetAzimuth(double azimuth_) { m_azimuth = azimuth_; }
+    double GetAzimuth() const { return m_azimuth; }
+    bool HasAzimuth() const;
+    //
+    void SetElevation(double elevation_) { m_elevation = elevation_; }
+    double GetElevation() const { return m_elevation; }
+    bool HasElevation() const;
+    ///@}
+
+private:
+    /** The lateral or left-to-right plane. **/
+    double m_azimuth;
+    /** The above-to-below axis. **/
+    double m_elevation;
+
+    /* include <attelevation> */
 };
 
 //----------------------------------------------------------------------------

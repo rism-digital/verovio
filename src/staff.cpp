@@ -380,4 +380,21 @@ int Staff::PrepareRpt(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Staff::CalcOnsetOffset(FunctorParams *functorParams)
+{
+    CalcOnsetOffsetParams *params = dynamic_cast<CalcOnsetOffsetParams *>(functorParams);
+    assert(params);
+
+    assert(this->m_drawingStaffDef);
+
+    if (this->m_drawingStaffDef->HasNotationtype()) {
+        params->m_notationType = this->m_drawingStaffDef->GetNotationtype();
+    }
+    else {
+        params->m_notationType = NOTATIONTYPE_cmn;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

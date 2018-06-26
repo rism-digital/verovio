@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 ### Added
+* Support for `<subst>` with child (`<add>`, `<del>` or `<subst>`) to be selected with `substXPathQuery`
+* Support for `<dir>` and `<dynam>` connectors (triggered with `@next` and `@extender`)
+* Sutomatic positioning of rests within beam (@CCInc)
+* Fix for Plaine & Easie mensur changes in mensural notation
+* Use SMuFL glyphs for mensural signs (@rettinghaus)
+* Barline segmentation with text and dynamic indications overlapping measures
+* Improved layout with text (dir, tempo, etc.) at the end of a system
+* Support for dashed bar lines
+* Improvement of MIDI output for mensural notation
+* Support for `@stem.visible` on `<note>` and `<chord>`
+* Fix for Plaine & Easie chords and ties
+* Fix for Plaine & Easie dots in mensural notation
+* Support for MIDI playback of `<beatRpt>`
 * Additional options for controlling grace notes alignment
 * Support for `<instrDef>` (@rettinghaus)
 * Support for `mnum.visible` on `<scoreDef>` (@rettinghaus)

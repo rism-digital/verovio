@@ -88,11 +88,17 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Dir *dir = dynamic_cast<Dir *>(element);
         assert(dir);
         DrawDir(dc, dir, measure, system);
+        if (dir->GetNextLink() && (dir->GetExtender() == BOOLEAN_true)) {
+            system->AddToDrawingList(element);
+        }
     }
     else if (element->Is(DYNAM)) {
         Dynam *dynam = dynamic_cast<Dynam *>(element);
         assert(dynam);
         DrawDynam(dc, dynam, measure, system);
+        if (dynam->GetNextLink() && (dynam->GetExtender() == BOOLEAN_true)) {
+            system->AddToDrawingList(element);
+        }
     }
     else if (element->Is(FERMATA)) {
         Fermata *fermata = dynamic_cast<Fermata *>(element);
@@ -151,16 +157,28 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
 
-    if (!interface->HasStartAndEnd()) return;
-
+    // The start is given by the TimePointInterface
     LayerElement *start = dynamic_cast<LayerElement *>(interface->GetStart());
-    assert(start);
-    LayerElement *end = dynamic_cast<LayerElement *>(interface->GetEnd());
-    assert(end);
+    // The end is given either by the TimeSpanningInterface (end) or by the LinkingInterface (next)
+    LayerElement *end = NULL;
+    if (interface->GetEnd()) {
+        end = dynamic_cast<LayerElement *>(interface->GetEnd());
+    }
+    else if (element->HasInterface(INTERFACE_LINKING)) {
+        LinkingInterface *linkingInterface = element->GetLinkingInterface();
+        assert(linkingInterface);
+        if (linkingInterface->GetNextLink()) {
+            // The end link has to have a TimePointInterface becase we ensure it is a ControlElement
+            TimePointInterface *nextInterface = linkingInterface->GetNextLink()->GetTimePointInterface();
+            assert(nextInterface);
+            end = nextInterface->GetStart();
+        }
+    }
+    if (!start || !end) return;
 
     // Get the parent system of the first and last note
-    System *parentSystem1 = dynamic_cast<System *>(interface->GetStart()->GetFirstParent(SYSTEM));
-    System *parentSystem2 = dynamic_cast<System *>(interface->GetEnd()->GetFirstParent(SYSTEM));
+    System *parentSystem1 = dynamic_cast<System *>(start->GetFirstParent(SYSTEM));
+    System *parentSystem2 = dynamic_cast<System *>(end->GetFirstParent(SYSTEM));
 
     int x1, x2;
     Object *objectX = NULL;
@@ -173,9 +191,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // we use the start measure
         measure = interface->GetStartMeasure();
         if (!Check(measure)) return;
-        x1 = interface->GetStart()->GetDrawingX();
-        objectX = interface->GetStart();
-        x2 = interface->GetEnd()->GetDrawingX();
+        x1 = start->GetDrawingX();
+        objectX = start;
+        x2 = end->GetDrawingX();
         graphic = element;
     }
     // Only the first parent is the same, this means that the element is "open" at the end of the system
@@ -183,8 +201,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // We need the last measure of the system for x2 - we also use it for getting the staves later
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
-        x1 = interface->GetStart()->GetDrawingX();
-        objectX = interface->GetStart();
+        x1 = start->GetDrawingX();
+        objectX = start;
         x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         graphic = element;
         spanningType = SPANNING_START;
@@ -197,7 +215,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // We need the position of the first default in the first measure for x1
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
-        x2 = interface->GetEnd()->GetDrawingX();
+        x2 = end->GetDrawingX();
         spanningType = SPANNING_END;
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
@@ -250,7 +268,15 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
                 continue;
             }
 
-        if (element->Is(HAIRPIN)) {
+        if (element->Is(DIR)) {
+            // cast to Dir check in DrawDirConnector
+            DrawControlElementConnector(dc, dynamic_cast<Dir *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        if (element->Is(DYNAM)) {
+            // cast to Dynam check in DrawDynamConnector
+            DrawControlElementConnector(dc, dynamic_cast<Dynam *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is(HAIRPIN)) {
             // cast to Harprin check in DrawHairpin
             DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
@@ -424,7 +450,7 @@ void View::DrawOctave(
 
     /************** parent layers **************/
 
-    LayerElement *start  = dynamic_cast<LayerElement *>(octave->GetStart());
+    LayerElement *start = dynamic_cast<LayerElement *>(octave->GetStart());
     LayerElement *end = dynamic_cast<LayerElement *>(octave->GetEnd());
 
     if (!start || !end) {
@@ -432,11 +458,16 @@ void View::DrawOctave(
         return;
     }
 
-    /********** adjust the end position ***********/
+    /********** adjust the start / end positions ***********/
+
+    if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) {
+        x1 += (m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2);
+    }
 
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
-        if (octave->HasEndid())
+        if (octave->HasEndid()) {
             x2 += (m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2);
+        }
     }
 
     /************** draw it **************/
@@ -534,6 +565,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
     data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+    bool isGraceToNoteSlur = false;
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
 
@@ -575,20 +607,21 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         endStemDir = endChord->GetDrawingStemDir();
     }
 
-    Layer *layer1 = NULL;
-    Layer *layer2 = NULL;
+    if (startNote && endNote && startNote->IsGraceNote() && !endNote->IsGraceNote()) {
+        isGraceToNoteSlur = true;
+    }
 
     // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
     // if (start->Is(TIMESTAMP_ATTR))
     //    layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
     // else
-    layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+    Layer *layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
 
     // idem
     // if (end->Is(TIMESTAMP_ATTR))
     //    layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
     // else
-    layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
+    Layer *layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
 
     assert(layer1 && layer2);
 
@@ -644,6 +677,10 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     if (slur->HasCurvedir()) {
         drawingCurveDir
             = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+    }
+    // grace notes - always below unless we have a drawing stem direction on the layer
+    else if (isGraceToNoteSlur && (layer1->GetDrawingStemDir(startNote) == STEMDIRECTION_NONE)) {
+        drawingCurveDir = curvature_CURVEDIR_below;
     }
     // the normal case
     else if (slur->HasDrawingCurvedir()) {
@@ -767,8 +804,19 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             }
         }
         else {
+            if (isGraceToNoteSlur) {
+                if (endNote) {
+                    y2 = endNote->GetDrawingY();
+                    x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                    isShortSlur = true;
+                }
+                else {
+                    y2 = y1;
+                }
+            }
             // (_)d
-            if (endStemDir == STEMDIRECTION_up) y2 = end->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+            else if (endStemDir == STEMDIRECTION_up)
+                y2 = end->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
             // P(_)P
             else if (isShortSlur) {
                 y2 = end->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
@@ -857,7 +905,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     // the normal case or start
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        start->FindAllChildByAttComparison(&artics, &matchType);
+        start->FindAllChildByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
         for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
             Artic *artic = dynamic_cast<Artic *>(*articIter);
@@ -876,8 +924,8 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         }
     }
     // normal case or end
-    if ((spanningType == SPANNING_START_END) || (SPANNING_END)) {
-        end->FindAllChildByAttComparison(&artics, &matchType);
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        end->FindAllChildByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
         for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
             Artic *artic = dynamic_cast<Artic *>(*articIter);
@@ -962,7 +1010,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     FindTimeSpanningLayerElementsParams findTimeSpanningLayerElementsParams;
     findTimeSpanningLayerElementsParams.m_minPos = p1->x;
     findTimeSpanningLayerElementsParams.m_maxPos = p2->x;
-    std::vector<AttComparison *> filters;
+    ArrayOfComparisons filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
     AttNIntegerComparison matchStaff(STAFF, staff->GetN());
@@ -1229,7 +1277,7 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
 
     int dist = abs(p2->x - p1->x);
     float posXRatio = 1.0;
-    
+
     ArrayOfLayerElementPointPairs::iterator itPoint;
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
         int y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
@@ -1523,6 +1571,79 @@ void View::DrawTrillExtension(
         dc->EndGraphic(trill, this);
 }
 
+void View::DrawControlElementConnector(
+    DeviceContext *dc, ControlElement *dynam, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    assert(dynam);
+    assert(dynam->GetNextLink());
+    if (!dynam->GetNextLink()) return;
+
+    int y = dynam->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+
+    // Adjust the x1
+    if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
+        if (dynam->GetCurrentFloatingPositioner() && dynam->GetCurrentFloatingPositioner()->HasContentBB()) {
+            x1 = dynam->GetCurrentFloatingPositioner()->GetContentRight();
+        }
+    }
+
+    // Adjust the x2 for extensions with @endid
+    if ((spanningType == SPANNING_END) || (spanningType == SPANNING_START_END)) {
+        FloatingPositioner *nextLink
+            = dynam->GetCorrespFloatingPositioner(dynamic_cast<ControlElement *>(dynam->GetNextLink()));
+        if (nextLink && nextLink->HasContentBB()) {
+            x2 = nextLink->GetContentLeft();
+        }
+    }
+
+    int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+
+    // the length of the dash and the space between them - can be made a parameter
+    int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
+    int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
+    int halfDashLength = dashLength / 2;
+
+    int dist = x2 - x1;
+    int nbDashes = dist / dashSpace;
+
+    int margin = dist / 2;
+    // no dash if the distance is smaller than a dash length
+    if (dist < dashLength) {
+        nbDashes = 0;
+    }
+    // at least one dash
+    else if (nbDashes < 2) {
+        nbDashes = 1;
+    }
+    else {
+        margin = (dist - ((nbDashes - 1) * dashSpace)) / 2;
+    }
+
+    /************** draw it **************/
+
+    if (graphic)
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    else
+        dc->StartGraphic(dynam, "spanning-trill", "");
+
+    dc->DeactivateGraphic();
+
+    int i;
+    for (i = 0; i < nbDashes; ++i) {
+        int x = x1 + margin + (i * dashSpace);
+        x = std::max(x, x1);
+
+        DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
+    }
+
+    dc->ReactivateGraphic();
+
+    if (graphic)
+        dc->EndResumedGraphic(graphic, this);
+    else
+        dc->EndGraphic(dynam, this);
+}
+
 void View::DrawSylConnector(
     DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
@@ -1620,9 +1741,9 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
             margin = (dist - ((nbDashes - 1) * dashSpace)) / 2;
         }
 
-        int i, x;
+        int i;
         for (i = 0; i < nbDashes; ++i) {
-            x = x1 + margin + (i * dashSpace);
+            int x = x1 + margin + (i * dashSpace);
             x = std::max(x, x1);
 
             DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
@@ -2138,7 +2259,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
 
     // just as without a dir attribute
     if (!pedal->HasDir()) return;
-    
+
     dc->StartGraphic(pedal, "", pedal->GetUuid());
 
     int x = pedal->GetStart()->GetDrawingX() + pedal->GetStart()->GetDrawingRadius(m_doc);
@@ -2149,23 +2270,31 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
         centered = false;
     }
 
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
+
     int code = SMUFL_E655_keyboardPedalUp;
     std::wstring str;
     if (pedal->GetDir() == pedalLog_DIR_bounce) {
         str.push_back(code);
+        // Get the staff size of the first staff
+        int staffSize = (staffList.begin() != staffList.end()) ? (*staffList.begin())->m_drawingStaffSize : 100;
         TextExtend bounceOffset;
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
         dc->GetSmuflTextExtent(str, &bounceOffset);
+        dc->ResetFont();
         x -= bounceOffset.m_width;
     }
     if (pedal->GetDir() != pedalLog_DIR_up) {
-        if (pedal->GetFunc() == "sostenuto") code = SMUFL_E659_keyboardPedalSost;
-        else code = SMUFL_E650_keyboardPedalPed;
+        if (pedal->GetFunc() == "sostenuto") {
+            code = SMUFL_E659_keyboardPedalSost;
+        }
+        else {
+            code = SMUFL_E650_keyboardPedalPed;
+        }
     }
     str.push_back(code);
-    
 
-    std::vector<Staff *>::iterator staffIter;
-    std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); ++staffIter) {
         if (!system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, pedal->GetStart(), *staffIter)) {
             continue;
@@ -2206,11 +2335,11 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     // First try to see if we have a meter sig attribute for this measure
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
     Alignment *pos
-        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByComparison(&alignmentComparison, 1));
     if (!pos) {
         // if not, try to get the first beat element
         alignmentComparison.SetType(ALIGNMENT_DEFAULT);
-        pos = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+        pos = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByComparison(&alignmentComparison, 1));
     }
     // if we found one, use it
     if (pos) {

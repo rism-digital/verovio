@@ -38,7 +38,6 @@ typedef std::vector<Note *> ChordCluster;
 /**
  * This class models the MEI <note> element.
  */
-
 class Note : public LayerElement,
              public StemmedDrawingInterface,
              public DurationInterface,

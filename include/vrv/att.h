@@ -148,6 +148,12 @@ public:
     std::string MidivalueToStr(data_MIDIVALUE data) const { return IntToStr(data); }
     data_MIDIVALUE StrToMidivalue(std::string value) const { return StrToInt(value); }
 
+    std::string NcnameToStr(data_NCNAME data) const { return StrToStr(data); }
+    data_NCNAME StrToNcname(std::string value) const { return StrToStr(value); }
+
+    std::string OctaveToStr(data_OCTAVE data) const { return IntToStr(data); }
+    data_OCTAVE StrToOctave(std::string value) const { return StrToInt(value); }
+
     std::string OctaveDisToStr(data_OCTAVE_DIS data) const;
     data_OCTAVE_DIS StrToOctaveDis(std::string value, bool logWarning = true) const;
 
@@ -156,6 +162,12 @@ public:
 
     std::string PercentToStr(data_PERCENT data) const;
     data_PERCENT StrToPercent(std::string value, bool logWarning = true) const;
+
+    std::string PercentLimitedToStr(data_PERCENT_LIMITED_SIGNED data) const;
+    data_PERCENT_LIMITED StrToPercentLimited(std::string value, bool logWarning = true) const;
+
+    std::string PercentLimitedSignedToStr(data_PERCENT_LIMITED data) const;
+    data_PERCENT_LIMITED_SIGNED StrToPercentLimitedSigned(std::string value, bool logWarning = true) const;
 
     std::string PitchnameToStr(data_PITCHNAME data) const;
     data_PITCHNAME StrToPitchname(std::string value, bool logWarning = true) const;
@@ -183,6 +195,12 @@ public:
     ///@{
     std::string FontsizeToStr(data_FONTSIZE data) const;
     data_FONTSIZE StrToFontsize(std::string value, bool logWarning = true) const;
+
+    std::string MidivalueNameToStr(data_MIDIVALUE_NAME data) const;
+    data_MIDIVALUE_NAME StrToMidivalueName(std::string value, bool logWarning = true) const;
+
+    std::string MidivaluePanToStr(data_MIDIVALUE_PAN data) const;
+    data_MIDIVALUE_PAN StrToMidivaluePan(std::string value, bool logWarning = true) const;
 
     std::string StaffitemToStr(data_STAFFITEM data) const;
     data_STAFFITEM StrToStaffitem(std::string value, bool logWarning = true) const;
@@ -245,10 +263,21 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// Comparison
+//----------------------------------------------------------------------------
+
+class Comparison {
+
+public:
+    virtual bool operator()(Object *object) = 0;
+    virtual bool MatchesType(Object *object) = 0;
+};
+
+//----------------------------------------------------------------------------
 // AttComparison
 //----------------------------------------------------------------------------
 
-class AttComparison {
+class AttComparison : public Comparison {
 
 public:
     AttComparison(ClassId classId) { m_classId = classId; }
@@ -261,6 +290,25 @@ public:
 
 protected:
     ClassId m_classId;
+};
+
+//----------------------------------------------------------------------------
+// InterfaceComparison
+//----------------------------------------------------------------------------
+
+class InterfaceComparison : public Comparison {
+
+public:
+    InterfaceComparison(InterfaceId interfaceId) { m_interfaceId = interfaceId; }
+
+    virtual bool operator()(Object *object);
+
+    InterfaceId GetInterface() { return m_interfaceId; }
+
+    bool MatchesType(Object *object);
+
+protected:
+    InterfaceId m_interfaceId;
 };
 
 } // namespace vrv

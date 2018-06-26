@@ -2870,6 +2870,7 @@ AttLineRendBase::~AttLineRendBase()
 void AttLineRendBase::ResetLineRendBase()
 {
     m_lform = LINEFORM_NONE;
+    m_lsegs = 0;
     m_lwidth = "";
 }
 
@@ -2879,6 +2880,11 @@ bool AttLineRendBase::ReadLineRendBase(pugi::xml_node element)
     if (element.attribute("lform")) {
         this->SetLform(StrToLineform(element.attribute("lform").value()));
         element.remove_attribute("lform");
+        hasAttribute = true;
+    }
+    if (element.attribute("lsegs")) {
+        this->SetLsegs(StrToInt(element.attribute("lsegs").value()));
+        element.remove_attribute("lsegs");
         hasAttribute = true;
     }
     if (element.attribute("lwidth")) {
@@ -2896,6 +2902,10 @@ bool AttLineRendBase::WriteLineRendBase(pugi::xml_node element)
         element.append_attribute("lform") = LineformToStr(this->GetLform()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasLsegs()) {
+        element.append_attribute("lsegs") = IntToStr(this->GetLsegs()).c_str();
+        wroteAttribute = true;
+    }
     if (this->HasLwidth()) {
         element.append_attribute("lwidth") = StrToStr(this->GetLwidth()).c_str();
         wroteAttribute = true;
@@ -2906,6 +2916,11 @@ bool AttLineRendBase::WriteLineRendBase(pugi::xml_node element)
 bool AttLineRendBase::HasLform() const
 {
     return (m_lform != LINEFORM_NONE);
+}
+
+bool AttLineRendBase::HasLsegs() const
+{
+    return (m_lsegs != 0);
 }
 
 bool AttLineRendBase::HasLwidth() const
@@ -4300,14 +4315,14 @@ AttOctave::~AttOctave()
 
 void AttOctave::ResetOctave()
 {
-    m_oct = 0;
+    m_oct = -127;
 }
 
 bool AttOctave::ReadOctave(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("oct")) {
-        this->SetOct(StrToInt(element.attribute("oct").value()));
+        this->SetOct(StrToOctave(element.attribute("oct").value()));
         element.remove_attribute("oct");
         hasAttribute = true;
     }
@@ -4318,7 +4333,7 @@ bool AttOctave::WriteOctave(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasOct()) {
-        element.append_attribute("oct") = IntToStr(this->GetOct()).c_str();
+        element.append_attribute("oct") = OctaveToStr(this->GetOct()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -4326,7 +4341,7 @@ bool AttOctave::WriteOctave(pugi::xml_node element)
 
 bool AttOctave::HasOct() const
 {
-    return (m_oct != 0);
+    return (m_oct != -127);
 }
 
 /* include <attoct> */
@@ -4346,14 +4361,14 @@ AttOctaveDefault::~AttOctaveDefault()
 
 void AttOctaveDefault::ResetOctaveDefault()
 {
-    m_octDefault = 0;
+    m_octDefault = -127;
 }
 
 bool AttOctaveDefault::ReadOctaveDefault(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("oct.default")) {
-        this->SetOctDefault(StrToInt(element.attribute("oct.default").value()));
+        this->SetOctDefault(StrToOctave(element.attribute("oct.default").value()));
         element.remove_attribute("oct.default");
         hasAttribute = true;
     }
@@ -4364,7 +4379,7 @@ bool AttOctaveDefault::WriteOctaveDefault(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasOctDefault()) {
-        element.append_attribute("oct.default") = IntToStr(this->GetOctDefault()).c_str();
+        element.append_attribute("oct.default") = OctaveToStr(this->GetOctDefault()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -4372,7 +4387,7 @@ bool AttOctaveDefault::WriteOctaveDefault(pugi::xml_node element)
 
 bool AttOctaveDefault::HasOctDefault() const
 {
-    return (m_octDefault != 0);
+    return (m_octDefault != -127);
 }
 
 /* include <attoct.default> */
@@ -5995,7 +6010,7 @@ AttStaffLocPitched::~AttStaffLocPitched()
 void AttStaffLocPitched::ResetStaffLocPitched()
 {
     m_ploc = PITCHNAME_NONE;
-    m_oloc = 0;
+    m_oloc = -127;
 }
 
 bool AttStaffLocPitched::ReadStaffLocPitched(pugi::xml_node element)
@@ -6007,7 +6022,7 @@ bool AttStaffLocPitched::ReadStaffLocPitched(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("oloc")) {
-        this->SetOloc(StrToInt(element.attribute("oloc").value()));
+        this->SetOloc(StrToOctave(element.attribute("oloc").value()));
         element.remove_attribute("oloc");
         hasAttribute = true;
     }
@@ -6022,7 +6037,7 @@ bool AttStaffLocPitched::WriteStaffLocPitched(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasOloc()) {
-        element.append_attribute("oloc") = IntToStr(this->GetOloc()).c_str();
+        element.append_attribute("oloc") = OctaveToStr(this->GetOloc()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -6035,7 +6050,7 @@ bool AttStaffLocPitched::HasPloc() const
 
 bool AttStaffLocPitched::HasOloc() const
 {
-    return (m_oloc != 0);
+    return (m_oloc != -127);
 }
 
 /* include <attoloc> */
@@ -6165,7 +6180,7 @@ bool AttStems::ReadStems(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("stem.len")) {
-        this->SetStemLen(StrToInt(element.attribute("stem.len").value()));
+        this->SetStemLen(StrToDbl(element.attribute("stem.len").value()));
         element.remove_attribute("stem.len");
         hasAttribute = true;
     }
@@ -6205,7 +6220,7 @@ bool AttStems::WriteStems(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasStemLen()) {
-        element.append_attribute("stem.len") = IntToStr(this->GetStemLen()).c_str();
+        element.append_attribute("stem.len") = DblToStr(this->GetStemLen()).c_str();
         wroteAttribute = true;
     }
     if (this->HasStemMod()) {
@@ -8378,6 +8393,10 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             att->SetLform(att->StrToLineform(attrValue));
             return true;
         }
+        if (attrType == "lsegs") {
+            att->SetLsegs(att->StrToInt(attrValue));
+            return true;
+        }
         if (attrType == "lwidth") {
             att->SetLwidth(att->StrToStr(attrValue));
             return true;
@@ -8667,7 +8686,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttOctave *att = dynamic_cast<AttOctave *>(element);
         assert(att);
         if (attrType == "oct") {
-            att->SetOct(att->StrToInt(attrValue));
+            att->SetOct(att->StrToOctave(attrValue));
             return true;
         }
     }
@@ -8675,7 +8694,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttOctaveDefault *att = dynamic_cast<AttOctaveDefault *>(element);
         assert(att);
         if (attrType == "oct.default") {
-            att->SetOctDefault(att->StrToInt(attrValue));
+            att->SetOctDefault(att->StrToOctave(attrValue));
             return true;
         }
     }
@@ -8999,7 +9018,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "oloc") {
-            att->SetOloc(att->StrToInt(attrValue));
+            att->SetOloc(att->StrToOctave(attrValue));
             return true;
         }
     }
@@ -9027,7 +9046,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "stem.len") {
-            att->SetStemLen(att->StrToInt(attrValue));
+            att->SetStemLen(att->StrToDbl(attrValue));
             return true;
         }
         if (attrType == "stem.mod") {
@@ -9812,6 +9831,9 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         if (att->HasLform()) {
             attributes->push_back(std::make_pair("lform", att->LineformToStr(att->GetLform())));
         }
+        if (att->HasLsegs()) {
+            attributes->push_back(std::make_pair("lsegs", att->IntToStr(att->GetLsegs())));
+        }
         if (att->HasLwidth()) {
             attributes->push_back(std::make_pair("lwidth", att->StrToStr(att->GetLwidth())));
         }
@@ -10050,14 +10072,14 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttOctave *att = dynamic_cast<const AttOctave *>(element);
         assert(att);
         if (att->HasOct()) {
-            attributes->push_back(std::make_pair("oct", att->IntToStr(att->GetOct())));
+            attributes->push_back(std::make_pair("oct", att->OctaveToStr(att->GetOct())));
         }
     }
     if (element->HasAttClass(ATT_OCTAVEDEFAULT)) {
         const AttOctaveDefault *att = dynamic_cast<const AttOctaveDefault *>(element);
         assert(att);
         if (att->HasOctDefault()) {
-            attributes->push_back(std::make_pair("oct.default", att->IntToStr(att->GetOctDefault())));
+            attributes->push_back(std::make_pair("oct.default", att->OctaveToStr(att->GetOctDefault())));
         }
     }
     if (element->HasAttClass(ATT_OCTAVEDISPLACEMENT)) {
@@ -10328,7 +10350,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("ploc", att->PitchnameToStr(att->GetPloc())));
         }
         if (att->HasOloc()) {
-            attributes->push_back(std::make_pair("oloc", att->IntToStr(att->GetOloc())));
+            attributes->push_back(std::make_pair("oloc", att->OctaveToStr(att->GetOloc())));
         }
     }
     if (element->HasAttClass(ATT_STARTENDID)) {
@@ -10352,7 +10374,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("stem.dir", att->StemdirectionToStr(att->GetStemDir())));
         }
         if (att->HasStemLen()) {
-            attributes->push_back(std::make_pair("stem.len", att->IntToStr(att->GetStemLen())));
+            attributes->push_back(std::make_pair("stem.len", att->DblToStr(att->GetStemLen())));
         }
         if (att->HasStemMod()) {
             attributes->push_back(std::make_pair("stem.mod", att->StemmodifierToStr(att->GetStemMod())));

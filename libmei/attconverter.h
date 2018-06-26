@@ -266,8 +266,8 @@ public:
     std::string MeterSigVisFormToStr(meterSigVis_FORM data) const;
     meterSigVis_FORM StrToMeterSigVisForm(std::string value, bool logWarning = true) const;
 
-    std::string MeterSigDefaultVisMeterrendToStr(meterSigDefaultVis_METERREND data) const;
-    meterSigDefaultVis_METERREND StrToMeterSigDefaultVisMeterrend(std::string value, bool logWarning = true) const;
+    std::string MeterSigDefaultVisMeterformToStr(meterSigDefaultVis_METERFORM data) const;
+    meterSigDefaultVis_METERFORM StrToMeterSigDefaultVisMeterform(std::string value, bool logWarning = true) const;
 
     std::string MeterSigGrpLogFuncToStr(meterSigGrpLog_FUNC data) const;
     meterSigGrpLog_FUNC StrToMeterSigGrpLogFunc(std::string value, bool logWarning = true) const;

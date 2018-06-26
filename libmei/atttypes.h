@@ -1451,15 +1451,15 @@ enum meterSigVis_FORM {
 };
 
 /**
- * MEI att.meterSigDefault.vis@meter.rend
+ * MEI att.meterSigDefault.vis@meter.form
  */
-enum meterSigDefaultVis_METERREND {
-    meterSigDefaultVis_METERREND_NONE = 0,
-    meterSigDefaultVis_METERREND_num,
-    meterSigDefaultVis_METERREND_denomsym,
-    meterSigDefaultVis_METERREND_norm,
-    meterSigDefaultVis_METERREND_invis,
-    meterSigDefaultVis_METERREND_MAX
+enum meterSigDefaultVis_METERFORM {
+    meterSigDefaultVis_METERFORM_NONE = 0,
+    meterSigDefaultVis_METERFORM_num,
+    meterSigDefaultVis_METERFORM_denomsym,
+    meterSigDefaultVis_METERFORM_norm,
+    meterSigDefaultVis_METERFORM_invis,
+    meterSigDefaultVis_METERFORM_MAX
 };
 
 /**
@@ -1521,6 +1521,7 @@ enum ncVis_ORISCUS {
     ncVis_ORISCUS_c,
     ncVis_ORISCUS_f,
     ncVis_ORISCUS_j,
+    ncVis_ORISCUS_unknown,
     ncVis_ORISCUS_MAX
 };
 
@@ -1531,6 +1532,7 @@ enum ncVis_QUILISMA {
     ncVis_QUILISMA_NONE = 0,
     ncVis_QUILISMA_2,
     ncVis_QUILISMA_3,
+    ncVis_QUILISMA_unknown,
     ncVis_QUILISMA_MAX
 };
 

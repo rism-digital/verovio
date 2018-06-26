@@ -8,8 +8,8 @@
 #ifndef __VRV_INSTRDEF_H__
 #define __VRV_INSTRDEF_H__
 
-#include "atts_shared.h"
 #include "atts_midi.h"
+#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
@@ -18,7 +18,14 @@ namespace vrv {
 // InstrDef
 //----------------------------------------------------------------------------
 
-class InstrDef : public Object, public AttChannelized, public AttLabelled, public AttMidiInstrument, public AttNNumberLike {
+/**
+ * This class models the MEI <instrDef> element.
+ */
+class InstrDef : public Object,
+                 public AttChannelized,
+                 public AttLabelled,
+                 public AttMidiInstrument,
+                 public AttNNumberLike {
 
 public:
     /**

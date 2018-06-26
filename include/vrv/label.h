@@ -17,7 +17,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
- * This class represent a <label> in MEI.
+ * This class models the MEI <label> element.
  */
 class Label : public Object, public TextListInterface {
 

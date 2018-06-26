@@ -228,7 +228,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
     assert(doc);
     assert(alignment);
     assert(alignment->GetType() == ALIGNMENT_GRACENOTE);
-    
+
     int graceAlignerId = doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : staffN;
     assert(alignment->HasGraceAligner(graceAlignerId));
 
@@ -345,12 +345,12 @@ void GraceAligner::AlignStack()
         AttComparisonAny matchType({ ACCID, FLAG, NOTE, STEM });
         ArrayOfObjects children;
         ArrayOfObjects::iterator childrenIter;
-        element->FindAllChildByAttComparison(&children, &matchType);
+        element->FindAllChildByComparison(&children, &matchType);
         alignment->AddLayerElementRef(element);
 
         // Set the grace alignmnet to all children
         for (childrenIter = children.begin(); childrenIter != children.end(); ++childrenIter) {
-            // Trick : FindAllChildByAttComparison include the element, which is probably a problem.
+            // Trick : FindAllChildByComparison include the element, which is probably a problem.
             // With note, we want to set only accid, so make sure we do not set it twice
             if (*childrenIter == element) continue;
             LayerElement *childElement = dynamic_cast<LayerElement *>(*childrenIter);
@@ -368,7 +368,7 @@ int GraceAligner::GetGraceGroupLeft(int staffN)
     Alignment *leftAlignment = NULL;
     if (staffN != VRV_UNSET) {
         AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-        Object *reference = this->FindChildByAttComparison(&matchStaff);
+        Object *reference = this->FindChildByComparison(&matchStaff);
         if (!reference) return -VRV_UNSET;
         // The alignment is its parent
         leftAlignment = dynamic_cast<Alignment *>(reference->GetParent());
@@ -439,7 +439,7 @@ void Alignment::Reset()
     m_xRel = 0;
     m_time = 0.0;
     m_type = ALIGNMENT_DEFAULT;
-    
+
     ClearGraceAligners();
 }
 
@@ -456,7 +456,7 @@ void Alignment::ClearGraceAligners()
     }
     m_graceAligners.clear();
 }
-    
+
 void Alignment::AddChild(Object *child)
 {
     assert(dynamic_cast<AlignmentReference *>(child));
@@ -469,14 +469,13 @@ void Alignment::AddChild(Object *child)
 bool Alignment::HasAlignmentReference(int staffN)
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    return (this->FindChildByAttComparison(&matchStaff, 1) != NULL);
+    return (this->FindChildByComparison(&matchStaff, 1) != NULL);
 }
 
 AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
     AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    AlignmentReference *alignmentRef
-        = dynamic_cast<AlignmentReference *>(this->FindChildByAttComparison(&matchStaff, 1));
+    AlignmentReference *alignmentRef = dynamic_cast<AlignmentReference *>(this->FindChildByComparison(&matchStaff, 1));
     if (!alignmentRef) {
         alignmentRef = new AlignmentReference(staffN);
         this->AddChild(alignmentRef);
@@ -544,7 +543,7 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
     GetAlignmentLeftRightParams getAlignmentLeftRightParams(&getAlignmentLeftRight);
 
     if (staffN != VRV_UNSET) {
-        std::vector<AttComparison *> filters;
+        ArrayOfComparisons filters;
         AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
         filters.push_back(&matchStaff);
         this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
@@ -563,7 +562,7 @@ GraceAligner *Alignment::GetGraceAligner(int id)
     }
     return m_graceAligners[id];
 }
-    
+
 bool Alignment::HasGraceAligner(int id) const
 {
     return (m_graceAligners.count(id) == 1);
@@ -826,7 +825,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
         assert(measureAligner);
 
         std::vector<int>::iterator iter;
-        std::vector<AttComparison *> filters;
+        ArrayOfComparisons filters;
         for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); ++iter) {
 
             // Rescue value, used at the end of a measure without a barline
@@ -856,12 +855,12 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             // Create ad comparison object for each type / @n
             AttNIntegerComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
             filters.push_back(&matchStaff);
-            
+
             int graceAlignerId = params->m_doc->GetOptions()->m_graceRhythmAlign.GetValue() ? 0 : *iter;
 
             if (HasGraceAligner(graceAlignerId)) {
-                GetGraceAligner(graceAlignerId)->Process(
-                    params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
+                GetGraceAligner(graceAlignerId)
+                    ->Process(params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
 
                 // There was not grace notes for that staff
                 if (params->m_graceCumulatedXShift == VRV_UNSET) continue;

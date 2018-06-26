@@ -19,6 +19,9 @@ namespace vrv {
 // Octave
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <octave> element.
+ */
 class Octave : public ControlElement,
                public TimeSpanningInterface,
                public AttColor,

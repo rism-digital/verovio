@@ -59,6 +59,7 @@ class FloatingElement;
 class FTrem;
 class Hairpin;
 class Harm;
+class LinkingInterface;
 class InstrDef;
 class Label;
 class LabelAbbr;
@@ -78,6 +79,8 @@ class MRpt;
 class MRpt2;
 class MultiRest;
 class MultiRpt;
+class Nc;
+class Neume;
 class Note;
 class Num;
 class Octave;
@@ -111,9 +114,11 @@ class Sic;
 class Slur;
 class Space;
 class Staff;
+class Subst;
 class Supplied;
 class Svg;
 class Syl;
+class Syllable;
 class System;
 class SystemElement;
 class Tempo;
@@ -247,10 +252,13 @@ private:
     void WriteMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2);
     void WriteMultiRest(pugi::xml_node currentNode, MultiRest *multiRest);
     void WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt);
+    void WriteNc(pugi::xml_node currentNode, Nc *nc);
+    void WriteNeume(pugi::xml_node currentNode, Neume *neume);
     void WriteNote(pugi::xml_node currentNode, Note *note);
     void WriteProport(pugi::xml_node currentNode, Proport *proport);
     void WriteRest(pugi::xml_node currentNode, Rest *rest);
     void WriteSpace(pugi::xml_node currentNode, Space *space);
+    void WriteSyllable(pugi::xml_node currentNode, Syllable *syllable);
     void WriteTuplet(pugi::xml_node currentNode, Tuplet *tuplet);
     ///@}
 
@@ -310,6 +318,7 @@ private:
     void WriteReg(pugi::xml_node currentNode, Reg *Reg);
     void WriteRestore(pugi::xml_node currentNode, Restore *restore);
     void WriteSic(pugi::xml_node currentNode, Sic *sic);
+    void WriteSubst(pugi::xml_node currentNode, Subst *subst);
     void WriteSupplied(pugi::xml_node currentNode, Supplied *supplied);
     void WriteUnclear(pugi::xml_node currentNode, Unclear *unclear);
     ///@}
@@ -342,6 +351,7 @@ private:
     //
     void WriteAreaPosInterface(pugi::xml_node currentNode, AreaPosInterface *interface);
     void WriteDurationInterface(pugi::xml_node currentNode, DurationInterface *interface);
+    void WriteLinkingInterface(pugi::xml_node currentNode, LinkingInterface *interface);
     void WritePitchInterface(pugi::xml_node currentNode, PitchInterface *interface);
     void WritePlistInterface(pugi::xml_node currentNode, PlistInterface *interface);
     void WritePositionInterface(pugi::xml_node currentNode, PositionInterface *interface);
@@ -482,11 +492,14 @@ private:
     bool ReadMRpt2(Object *parent, pugi::xml_node mRpt2);
     bool ReadMultiRest(Object *parent, pugi::xml_node multiRest);
     bool ReadMultiRpt(Object *parent, pugi::xml_node multiRpt);
+    bool ReadNc(Object *parent, pugi::xml_node nc);
+    bool ReadNeume(Object *parent, pugi::xml_node note);
     bool ReadNote(Object *parent, pugi::xml_node note);
     bool ReadProport(Object *parent, pugi::xml_node proport);
     bool ReadRest(Object *parent, pugi::xml_node rest);
     bool ReadSpace(Object *parent, pugi::xml_node space);
     bool ReadSyl(Object *parent, pugi::xml_node syl);
+    bool ReadSyllable(Object *parent, pugi::xml_node syllable);
     bool ReadTuplet(Object *parent, pugi::xml_node tuplet);
     bool ReadVerse(Object *parent, pugi::xml_node verse);
     ///@}
@@ -550,6 +563,8 @@ private:
     bool ReadReg(Object *parent, pugi::xml_node reg, EditorialLevel level, Object *filter = NULL);
     bool ReadRestore(Object *parent, pugi::xml_node restore, EditorialLevel level, Object *filter = NULL);
     bool ReadSic(Object *parent, pugi::xml_node sic, EditorialLevel level, Object *filter = NULL);
+    bool ReadSubst(Object *parent, pugi::xml_node subst, EditorialLevel level, Object *filter = NULL);
+    bool ReadSubstChildren(Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL);
     bool ReadSupplied(Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL);
     bool ReadUnclear(Object *parent, pugi::xml_node unclear, EditorialLevel level, Object *filter = NULL);
     bool ReadEditorialChildren(Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL);
@@ -569,6 +584,7 @@ private:
 
     bool ReadAreaPosInterface(pugi::xml_node element, AreaPosInterface *interface);
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
+    bool ReadLinkingInterface(pugi::xml_node element, LinkingInterface *interface);
     bool ReadPitchInterface(pugi::xml_node element, PitchInterface *interface);
     bool ReadPlistInterface(pugi::xml_node element, PlistInterface *interface);
     bool ReadPositionInterface(pugi::xml_node element, PositionInterface *interface);
@@ -617,6 +633,7 @@ private:
      */
     ///@{
     // to MEI 4.0.0
+    void UpgradeScoreDefTo_4_0_0(pugi::xml_node scoreDef, ScoreDef *vrvScoreDef);
     void UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvStaffDef);
     void UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvStaffGrp);
     // to MEI 3.0.0 (Page-Based MEI only)

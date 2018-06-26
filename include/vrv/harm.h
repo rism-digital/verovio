@@ -17,9 +17,12 @@ namespace vrv {
 class TextElement;
 
 //----------------------------------------------------------------------------
-// Dynam
+// Harm (harmony)
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <harm> element.
+ */
 class Harm : public ControlElement,
              public TextListInterface,
              public TextDirInterface,

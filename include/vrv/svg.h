@@ -17,9 +17,6 @@ namespace vrv {
 // Svg
 //----------------------------------------------------------------------------
 
-/**
- * This class models the MEI <fig>
- */
 class Svg : public Object {
 public:
     /**

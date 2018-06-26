@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "attcomparison.h"
+#include "custos.h"
 #include "functorparams.h"
 #include "iodarms.h"
 #include "iohumdrum.h"
@@ -22,10 +23,13 @@
 #include "iopae.h"
 #include "layer.h"
 #include "measure.h"
+#include "nc.h"
+#include "neume.h"
 #include "note.h"
 #include "options.h"
 #include "page.h"
 #include "slur.h"
+#include "staff.h"
 #include "svgdevicecontext.h"
 #include "vrv.h"
 
@@ -151,7 +155,7 @@ bool Toolkit::SetFormat(std::string const &informat)
     return true;
 }
 
-FileFormat Toolkit::IdentifyInputFormat(const string &data)
+FileFormat Toolkit::IdentifyInputFormat(const std::string &data)
 {
 #ifdef MUSICXML_DEFAULT_HUMDRUM
     FileFormat musicxmlDefault = MUSICXMLHUM;
@@ -174,7 +178,7 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
     }
     if ((unsigned char)data[0] == 0xff || (unsigned char)data[0] == 0xfe) {
         // Handle UTF-16 content here later.
-        cerr << "Warning: Cannot yet auto-detect format of UTF-16 data files." << endl;
+        std::cerr << "Warning: Cannot yet auto-detect format of UTF-16 data files." << std::endl;
         return UNKNOWN;
     }
     if (data[0] == '<') {
@@ -183,46 +187,46 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
         // <score-partwise> == root node for part-wise organization of MusicXML data
         // <score-timewise> == root node for time-wise organization of MusicXML data
         // <opus> == root node for multi-movement/work organization of MusicXML data
-        string initial = data.substr(0, searchLimit);
+        std::string initial = data.substr(0, searchLimit);
 
-        if (initial.find("<mei ") != string::npos) {
+        if (initial.find("<mei ") != std::string::npos) {
             return MEI;
         }
-        if (initial.find("<mei>") != string::npos) {
+        if (initial.find("<mei>") != std::string::npos) {
             return MEI;
         }
-        if (initial.find("<music>") != string::npos) {
+        if (initial.find("<music>") != std::string::npos) {
             return MEI;
         }
-        if (initial.find("<music ") != string::npos) {
+        if (initial.find("<music ") != std::string::npos) {
             return MEI;
         }
-        if (initial.find("<pages>") != string::npos) {
+        if (initial.find("<pages>") != std::string::npos) {
             return MEI;
         }
-        if (initial.find("<pages ") != string::npos) {
+        if (initial.find("<pages ") != std::string::npos) {
             return MEI;
         }
-        if (initial.find("<score-partwise>") != string::npos) {
+        if (initial.find("<score-partwise>") != std::string::npos) {
             return musicxmlDefault;
         }
-        if (initial.find("<score-timewise>") != string::npos) {
+        if (initial.find("<score-timewise>") != std::string::npos) {
             return musicxmlDefault;
         }
-        if (initial.find("<opus>") != string::npos) {
+        if (initial.find("<opus>") != std::string::npos) {
             return musicxmlDefault;
         }
-        if (initial.find("<score-partwise ") != string::npos) {
+        if (initial.find("<score-partwise ") != std::string::npos) {
             return musicxmlDefault;
         }
-        if (initial.find("<score-timewise ") != string::npos) {
+        if (initial.find("<score-timewise ") != std::string::npos) {
             return musicxmlDefault;
         }
-        if (initial.find("<opus ") != string::npos) {
+        if (initial.find("<opus ") != std::string::npos) {
             return musicxmlDefault;
         }
 
-        cerr << "Warning: Trying to load unknown XML data which cannot be identified." << endl;
+        std::cerr << "Warning: Trying to load unknown XML data which cannot be identified." << std::endl;
         return UNKNOWN;
     }
 
@@ -247,7 +251,7 @@ bool Toolkit::LoadFile(const std::string &filename)
     in.clear();
     in.seekg(0, std::ios::beg);
 
-    // read the file into the string:
+    // read the file into the std::string:
     std::string content(fileSize, 0);
     in.read(&content[0], fileSize);
 
@@ -306,7 +310,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
 
 bool Toolkit::LoadData(const std::string &data)
 {
-    string newData;
+    std::string newData;
     FileInputStream *input = NULL;
 
     auto inputFormat = m_format;
@@ -494,7 +498,7 @@ bool Toolkit::LoadData(const std::string &data)
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --breaks auto option.
     // Regardless, we won't do layout if the --breaks none option was set.
-    if (m_options->m_breaks.GetValue() != BREAKS_none) {
+    if ((m_doc.GetType() != Transcription) && (m_options->m_breaks.GetValue() != BREAKS_none)) {
         if (input->HasLayoutInformation() && (m_options->m_breaks.GetValue() == BREAKS_encoded)) {
             // LogElapsedTimeStart();
             m_doc.CastOffEncodingDoc();
@@ -564,8 +568,8 @@ std::string Toolkit::GetOptions(bool defaultValues) const
             o << iter->first << boolValue;
         }
         else if (optArray) {
-            vector<string> strValues = (defaultValues) ? optArray->GetDefault() : optArray->GetValue();
-            vector<string>::iterator strIter;
+            std::vector<std::string> strValues = (defaultValues) ? optArray->GetDefault() : optArray->GetValue();
+            std::vector<std::string>::iterator strIter;
             jsonxx::Array values;
             for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
                 values << (*strIter);
@@ -640,14 +644,14 @@ std::string Toolkit::GetAvailableOptions() const
             }
             else if (optString) {
                 opt << "type"
-                    << "string";
+                    << "std::string";
                 opt << "default" << optString->GetDefault();
             }
             else if (optArray) {
                 opt << "type"
                     << "array";
-                vector<string> strValues = optArray->GetDefault();
-                vector<string>::iterator strIter;
+                std::vector<std::string> strValues = optArray->GetDefault();
+                std::vector<std::string>::iterator strIter;
                 jsonxx::Array values;
                 for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
                     values << (*strIter);
@@ -656,10 +660,10 @@ std::string Toolkit::GetAvailableOptions() const
             }
             else if (optIntMap) {
                 opt << "type"
-                    << "string-list";
+                    << "std::string-list";
                 opt << "default" << optIntMap->GetDefaultStrValue();
-                vector<string> strValues = optIntMap->GetStrValues(false);
-                vector<string>::iterator strIter;
+                std::vector<std::string> strValues = optIntMap->GetStrValues(false);
+                std::vector<std::string>::iterator strIter;
                 jsonxx::Array values;
                 for (strIter = strValues.begin(); strIter != strValues.end(); ++strIter) {
                     values << (*strIter);
@@ -685,7 +689,7 @@ bool Toolkit::SetOptions(const std::string &json_options)
 
     // Read JSON options
     if (!json.parse(json_options)) {
-        LogError("Can not parse JSON string.");
+        LogError("Can not parse JSON std::string.");
         return false;
     }
 
@@ -820,6 +824,12 @@ bool Toolkit::SetOptions(const std::string &json_options)
         }
     }
 
+    // Forcing font to be reset. Warning: SetOption("font") as a single option will not work.
+    // This needs to be fixed
+    if (!Resources::SetFont(m_options->m_font.GetValue())) {
+        LogWarning("Font '%s' could not be loaded", m_options->m_font.GetValue().c_str());
+    }
+
     return true;
 }
 
@@ -856,7 +866,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
         return o.json();
     }
 
-    // Fill the attribute array (pair of string) by looking at attributes for all available MEI modules
+    // Fill the attribute array (pair of std::string) by looking at attributes for all available MEI modules
     ArrayOfStrAttr attributes;
     element->GetAttributes(&attributes);
 
@@ -877,7 +887,7 @@ bool Toolkit::Edit(const std::string &json_editorAction)
 
     // Read JSON actions
     if (!json.parse(json_editorAction)) {
-        LogError("Can not parse JSON string.");
+        LogError("Can not parse JSON std::string.");
         return false;
     }
 
@@ -980,6 +990,11 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     if (m_options->m_adjustPageHeight.GetValue() || (m_options->m_breaks.GetValue() == BREAKS_none))
         height = m_doc.GetAdjustedDrawingPageHeight();
 
+    if (m_doc.GetType() == Transcription) {
+        width = m_doc.GetAdjustedDrawingPageWidth();
+        height = m_doc.GetAdjustedDrawingPageHeight();
+    }
+
     // set dimensions
     deviceContext->SetWidth(width);
     deviceContext->SetHeight(height);
@@ -1046,19 +1061,19 @@ bool Toolkit::GetHumdrumFile(const std::string &filename)
     return true;
 }
 
-void Toolkit::GetHumdrum(ostream &output)
+void Toolkit::GetHumdrum(std::ostream &output)
 {
     output << GetHumdrumBuffer();
 }
 
 std::string Toolkit::RenderToMIDI()
 {
-    MidiFile outputfile;
+    smf::MidiFile outputfile;
     outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
     outputfile.sortTracks();
 
-    stringstream strstrem;
+    std::stringstream strstrem;
     outputfile.write(strstrem);
     std::string outputstr = Base64Encode(
         reinterpret_cast<const unsigned char *>(strstrem.str().c_str()), (unsigned int)strstrem.str().length());
@@ -1084,7 +1099,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     }
 
     MeasureOnsetOffsetComparison matchMeasureTime(millisec);
-    Measure *measure = dynamic_cast<Measure *>(m_doc.FindChildByAttComparison(&matchMeasureTime));
+    Measure *measure = dynamic_cast<Measure *>(m_doc.FindChildByComparison(&matchMeasureTime));
 
     if (!measure) {
         return o.json();
@@ -1101,7 +1116,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     NoteOnsetOffsetComparison matchNoteTime(millisec - measureTimeOffset);
     ArrayOfObjects notes;
 
-    measure->FindAllChildByAttComparison(&notes, &matchNoteTime);
+    measure->FindAllChildByComparison(&notes, &matchNoteTime);
 
     // Fill the JSON object
     ArrayOfObjects::iterator iter;
@@ -1116,7 +1131,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
 bool Toolkit::RenderToMIDIFile(const std::string &filename)
 {
-    MidiFile outputfile;
+    smf::MidiFile outputfile;
     outputfile.absoluteTicks();
     m_doc.ExportMIDI(&outputfile);
     outputfile.sortTracks();
@@ -1192,7 +1207,7 @@ void Toolkit::SetHumdrumBuffer(const char *data)
     file.readString(data);
     // apply Humdrum tools if there are any filters in the file.
     if (file.hasFilters()) {
-        string output;
+        std::string output;
         hum::Tool_filter filter;
         filter.run(file);
         if (filter.hasHumdrumText()) {
@@ -1220,6 +1235,12 @@ void Toolkit::SetHumdrumBuffer(const char *data)
             return;
         }
         strcpy(m_humdrumBuffer, data);
+    }
+    if (file.getExinterpCount("mens")) {
+        m_options->m_evenNoteSpacing.SetValue(true);
+    }
+    else {
+        m_options->m_evenNoteSpacing.SetValue(false);
     }
 
 #else
@@ -1253,16 +1274,79 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
     if (!element) {
         element = m_doc.FindChildByUuid(elementId);
     }
-    if (element->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(element);
-        assert(note);
-        Layer *layer = dynamic_cast<Layer *>(note->GetFirstParent(LAYER));
+    // For elements whose y-position corresponds to a certain pitch
+    if (element->HasInterface(INTERFACE_PITCH)) {
+        Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
         if (!layer) return false;
         int oct;
         data_PITCHNAME pname
-            = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), note->GetDrawingX(), &oct);
-        note->SetPname(pname);
-        note->SetOct(oct);
+            = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), element->GetDrawingX(), &oct);
+        element->GetPitchInterface()->SetPname(pname);
+        element->GetPitchInterface()->SetOct(oct);
+        if (element->HasAttClass(ATT_COORDINATED)) {
+            AttCoordinated *att = dynamic_cast<AttCoordinated *>(element);
+            att->SetUlx(x);
+        }
+        return true;
+    }
+    if (element->Is(NEUME)) {
+        // Requires a relative x and y
+        Neume *neume = dynamic_cast<Neume *>(element);
+        assert(neume);
+        Layer *layer = dynamic_cast<Layer *>(neume->GetFirstParent(LAYER));
+        if (!layer) return false;
+        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+        assert(staff);
+        // Calculate difference in pitch based on y difference
+        int pitchDifference = round((double)y / (double)staff->m_drawingStaffSize);
+
+        // Get components of neume
+        AttComparison ac(NC);
+        ArrayOfObjects objects;
+        neume->FindAllChildByComparison(&objects, &ac);
+
+        for (auto it = objects.begin(); it != objects.end(); ++it) {
+            Nc *nc = dynamic_cast<Nc *>(*it);
+            // Update the neume component
+            nc->AdjustPitchByOffset(pitchDifference);
+            //// Temporarily removing ULX attributes for coordinate refactor
+            // nc->SetUlx(nc->GetUlx() - x);
+        }
+        return true;
+    }
+    if (element->Is(CLEF)) {
+        Clef *clef = dynamic_cast<Clef *>(element);
+        assert(clef);
+        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
+        if (!layer) return false;
+
+        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+        assert(staff);
+        // Note that y param is relative to initial position for clefs
+        int initialClefLine = clef->GetLine();
+        int clefLine
+            = round((double)y / (double)m_doc.GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
+        clef->SetLine(clefLine);
+        //// Temporarily removing ULX attributes for coordinate refactor
+        // clef->SetUlx(x);
+
+        if (initialClefLine != clefLine) { // adjust notes so they stay in the same position
+            int lineDiff = clefLine - initialClefLine;
+            ArrayOfObjects objects;
+            InterfaceComparison ic(INTERFACE_PITCH);
+
+            layer->FindAllChildByComparison(&objects, &ic);
+
+            // Adjust all elements who are positioned relative to clef by pitch
+            for (auto it = objects.begin(); it != objects.end(); ++it) {
+                Object *child = dynamic_cast<Object *>(*it);
+                if (child == nullptr) continue;
+                PitchInterface *pi = child->GetPitchInterface();
+                assert(pi);
+                pi->AdjustPitchByOffset(-2 * lineDiff); // One line -> 2 pitches
+            }
+        }
+
         return true;
     }
     return false;

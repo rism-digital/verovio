@@ -85,6 +85,34 @@ StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) const
     return NULL;
 }
 
+void SystemAligner::FindAllPositionerPointingTo(ArrayOfFloatingPositioners *positioners, FloatingObject *object)
+{
+    assert(positioners);
+
+    positioners->clear();
+
+    StaffAlignment *alignment = NULL;
+    for (auto &child : m_children) {
+        alignment = dynamic_cast<StaffAlignment *>(child);
+        assert(alignment);
+        FloatingPositioner *positioner = alignment->GetCorrespFloatingPositioner(object);
+        if (positioner && (positioner->GetObject() == object)) {
+            positioners->push_back(positioner);
+        }
+    }
+}
+
+void SystemAligner::FindAllIntersectionPoints(
+    SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin)
+{
+    StaffAlignment *alignment = NULL;
+    for (auto &child : m_children) {
+        alignment = dynamic_cast<StaffAlignment *>(child);
+        assert(alignment);
+        alignment->FindAllIntersectionPoints(line, boundingBox, classIds, margin);
+    }
+}
+
 //----------------------------------------------------------------------------
 // StaffAlignment
 //----------------------------------------------------------------------------
@@ -206,6 +234,20 @@ FloatingPositioner *StaffAlignment::GetCorrespFloatingPositioner(FloatingObject 
         return *item;
     }
     return NULL;
+}
+
+void StaffAlignment::FindAllIntersectionPoints(
+    SegmentedLine &line, BoundingBox &boundingBox, const std::vector<ClassId> &classIds, int margin)
+{
+    for (auto &positioner : m_floatingPositioners) {
+        assert(positioner->GetObject());
+        if (!positioner->GetObject()->Is(classIds)) {
+            continue;
+        }
+        if (positioner->HorizontalContentOverlap(&boundingBox, margin / 2)) {
+            line.AddGap(positioner->GetContentTop() + margin, positioner->GetContentBottom() - margin);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------

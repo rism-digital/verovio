@@ -20,7 +20,7 @@ namespace vrv {
 /**
  * This class models the MEI <barLine> element.
  */
-class BarLine : public LayerElement, public AttBarLineLog, public AttColor {
+class BarLine : public LayerElement, public AttBarLineLog, public AttColor, public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

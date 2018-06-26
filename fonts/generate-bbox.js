@@ -42,9 +42,9 @@ function serialize(glyphAnchors) {
 
     var i;
     for (i = 0; i < items.length; i++) {
-        item = items[i];
+        var item = items[i];
         impl += "\t<g c=\"" + item.getAttribute("id").toUpperCase() + "\" ";
-        r = item.getBBox();
+        var r = item.getBBox();
 
         // add the bb value to the implementation
         impl += "x=\"" + r.x.toFixed(1) + "\" ";
@@ -58,7 +58,7 @@ function serialize(glyphAnchors) {
 
 
         if (glyphAnchors) {
-            var anchor = undefined;
+            var anchor = null;
             var testId = "uni" + item.getAttribute("id");
             var testName  = item.getAttribute("name");
             if (glyphAnchors.hasOwnProperty(testId)) {
@@ -74,11 +74,13 @@ function serialize(glyphAnchors) {
                 });
                 impl += "\n\t</g>\n";
             }
-            else
-                impl += "/>\n";
+            else {
+              impl += "/>\n";
+            }
         }
-        else
-            impl += "/>\n";
+        else {
+          impl += "/>\n";
+        }
     }
 
     impl += "</bounding-boxes>\n";
@@ -90,7 +92,8 @@ function extract() {
     return function (status) {
         if (status !== "success") {
             console.log("Failed to open the page.");
-        } else {
+        }
+        else {
             var code = page.evaluate(serialize, glyphAnchors);
             //console.log(code);
             try {
