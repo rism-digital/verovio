@@ -152,6 +152,14 @@ void Zone::Reset()
     ResetCoordinated();
 }
 
+void Zone::ShiftByXY(int xDiff, int yDiff)
+{
+    this->SetUlx(this->GetUlx() + xDiff);
+    this->SetLrx(this->GetLrx() + xDiff);
+    this->SetUly(this->GetUly() + yDiff);
+    this->SetLry(this->GetLry() + yDiff);
+}
+
 int Zone::GetLogicalUly()
 {
     return (this->GetUly());

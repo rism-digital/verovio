@@ -180,6 +180,14 @@ public:
     void ReplaceChild(Object *currentChild, Object *replacingChild);
 
     /**
+     * Sort children by a function that takes two arguments and
+     * returns true if the first argument is less than the second.
+     * If the order of children changes, this returns true.
+     */
+    typedef bool (*binaryComp)(Object *, Object *);
+    void SortChildren(binaryComp comp);
+
+    /**
      * Move an object to another parent.
      * The object is relinquished from its current parent - see Object::Relinquish
      */

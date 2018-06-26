@@ -39,6 +39,7 @@ public:
     virtual void Reset();
     ClassId GetClassId() const { return ZONE; }
     ///@}
+    void ShiftByXY(int xDiff, int yDiff);
     int GetLogicalUly();
     int GetLogicalLry();    
     int m_facsScale = 1;

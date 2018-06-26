@@ -76,6 +76,12 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
     return false;
 }
 
+bool SortByUlx(Object *a, Object *b)
+{
+    if (!a->GetFacsimileInterface() || !b->GetFacsimileInterface()) return true;
+    return (a->GetFacsimileInterface()->GetZone()->GetUlx() < b->GetFacsimileInterface()->GetZone()->GetUlx());
+}
+
 bool EditorToolkit::Drag(std::string elementId, int x, int y)
 {
     if (!m_doc->GetDrawingPage()) {
@@ -130,9 +136,15 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             Nc *nc = dynamic_cast<Nc *>(*it);
             // Update the neume component
             nc->AdjustPitchByOffset(pitchDifference); 
-            //// Temporarily removing ULX attributes for coordinate refactor
-            // nc->SetUlx(nc->GetUlx() - x);
         }
+
+        if (neume->HasFacs()) {
+            Zone *zone = neume->GetZone();
+            assert(zone);
+            zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+        }
+
+        neume->GetParent()->SortChildren(&SortByUlx);
         return true;
     }
     if (element->Is(CLEF)) {

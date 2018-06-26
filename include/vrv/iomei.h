@@ -333,6 +333,7 @@ private:
     void WriteVerse(pugi::xml_node currentNode, Verse *verse);
     void WriteSyl(pugi::xml_node currentNode, Syl *syl);
     void WriteZone(pugi::xml_node currentNode, Zone *zone);
+    void WriteSurface(pugi::xml_node currentNode, Surface *surface);
     void WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile);
     ///@}
 

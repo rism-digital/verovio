@@ -716,6 +716,24 @@ void MeiOutput::WriteZone(pugi::xml_node currentNode, Zone *zone)
     assert(zone);
     WriteXmlId(currentNode, zone);
     zone->WriteCoordinated(currentNode);
+    zone->WriteTyped(currentNode);
+}
+
+void MeiOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
+{
+    assert(surface);
+    WriteXmlId(currentNode, surface);
+    surface->WriteCoordinated(currentNode);
+    surface->WriteTyped(currentNode);
+    AttComparison ac(ZONE);
+    ArrayOfObjects zones;
+    surface->FindAllChildByComparison(&zones, &ac);
+    for (auto it = zones.begin(); it != zones.end(); it++) {
+        Zone *zone = dynamic_cast<Zone *>(*it);
+        assert(zone);
+        pugi::xml_node zoneNode = currentNode.append_child("zone");
+        WriteZone(zoneNode, zone);
+    }
 }
 
 void MeiOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
@@ -731,16 +749,7 @@ void MeiOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
         Surface *surface = dynamic_cast<Surface *>(*it);
         assert(surface);
         pugi::xml_node surfaceNode = currentNode.append_child("surface");
-        WriteXmlId(surfaceNode, surface);
-        ArrayOfObjects zones;
-        AttComparison aczone(ZONE);
-        surface->FindAllChildByComparison(&zones, &aczone);
-        for (auto zoneIter = zones.begin(); zoneIter != zones.end(); zoneIter++) {
-            Zone *zone = dynamic_cast<Zone *>(*zoneIter);
-            assert(zone);
-            pugi::xml_node zoneNode = surfaceNode.append_child("zone");
-            WriteZone(zoneNode, zone);
-        }
+        WriteSurface(surfaceNode, surface);
     }
 }
 

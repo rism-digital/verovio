@@ -237,6 +237,12 @@ void Object::ReplaceChild(Object *currentChild, Object *replacingChild)
     this->Modify();
 }
 
+void Object::SortChildren(Object::binaryComp comp)
+{
+    std::stable_sort(m_children.begin(), m_children.end(), comp);
+    this->Modify(); 
+}
+
 void Object::MoveItselfTo(Object *targetParent)
 {
     assert(targetParent);
