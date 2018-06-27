@@ -34,7 +34,8 @@ ControlElement::ControlElement() : FloatingObject("ce"), LinkingInterface(), Att
     Reset();
 }
 
-ControlElement::ControlElement(std::string classid) : FloatingObject(classid), LinkingInterface(), AttLabelled(), AttTyped()
+ControlElement::ControlElement(std::string classid)
+    : FloatingObject(classid), LinkingInterface(), AttLabelled(), AttTyped()
 {
     RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);
@@ -101,14 +102,14 @@ int ControlElement::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     FloatingObject::ResetDrawing(functorParams);
-    
+
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_LINKING)) {
         LinkingInterface *interface = this->GetLinkingInterface();
         assert(interface);
         return interface->InterfaceResetDrawing(functorParams, this);
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 

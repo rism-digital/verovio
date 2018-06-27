@@ -116,7 +116,7 @@ public:
         Reset(MIDIVALUENAMETYPE_midivalue);
         m_midivalue = value;
     }
-    
+
     data_NCNAME GetNcname() const { return m_ncname; }
     void SetNcname(data_NCNAME value)
     {
@@ -146,7 +146,7 @@ protected:
     data_MIDIVALUE m_midivalue;
     data_NCNAME m_ncname;
 };
-    
+
 /**
  * MEI data.MIDIVALUE_PAN
  * Since it can contain different subtype we need a dedicated class for it.
@@ -174,7 +174,7 @@ public:
         Reset(MIDIVALUEPANTYPE_midivalue);
         m_midivalue = value;
     }
-    
+
     data_PERCENT_LIMITED_SIGNED GetPercentLimitedSigned() const { return m_percentLimitedSigned; }
     void SetPercentLimitedSigned(data_PERCENT_LIMITED_SIGNED value)
     {
@@ -204,7 +204,7 @@ protected:
     data_MIDIVALUE m_midivalue;
     data_PERCENT_LIMITED_SIGNED m_percentLimitedSigned;
 };
-    
+
 /**
  * MEI data.STAFFITEM
  * Since it can contain different subtype we need a dedicated class for it.

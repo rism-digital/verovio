@@ -94,6 +94,7 @@ enum ClassId {
     REG,
     RESTORE,
     SIC,
+    SUBST,
     SUPPLIED,
     UNCLEAR,
     EDITORIAL_ELEMENT_max,
@@ -259,7 +260,7 @@ typedef std::vector<std::tuple<Alignment *, Arpeg *, int, bool> > ArrayOfAligmen
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
 typedef std::vector<std::pair<LinkingInterface *, std::string> > ArrayOfLinkingInterfaceUuidPairs;
-    
+
 typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfPlistInterfaceUuidPairs;
 
 typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
@@ -283,7 +284,7 @@ typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
 typedef std::map<std::string, Option *> MapOfStrOptions;
 
 typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
-    
+
 /**
  * Generic int map recursive structure for storing hierachy of values
  * For example, we want to process all staves one by one, and within each staff

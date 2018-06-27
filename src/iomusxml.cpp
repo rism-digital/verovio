@@ -841,13 +841,13 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     for (pugi::xpath_node_set::const_iterator it = measures.begin(); it != measures.end(); ++it) {
         pugi::xpath_node xmlMeasure = *it;
         if (m_multiRest != 0) {
-          m_multiRest--;
+            m_multiRest--;
         }
         else {
-          Measure *measure = new Measure();
-          ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset);
-          // Add the measure to the system - if already there from a previous part we'll just merge the content
-          AddMeasure(section, measure, i);
+            Measure *measure = new Measure();
+            ReadMusicXmlMeasure(xmlMeasure.node(), section, measure, nbStaves, staffOffset);
+            // Add the measure to the system - if already there from a previous part we'll just merge the content
+            AddMeasure(section, measure, i);
         }
         i++;
     }
@@ -868,7 +868,8 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         // the staff @n must take into account the staffOffset
         Staff *staff = new Staff();
         staff->SetN(i + 1 + staffOffset);
-        staff->SetVisible(ConvertWordToBool(node.child("attributes").child("staff-details").attribute("print-object").value()));
+        staff->SetVisible(
+            ConvertWordToBool(node.child("attributes").child("staff-details").attribute("print-object").value()));
         measure->AddChild(staff);
         // layers will be added in SelectLayer
     }
@@ -886,7 +887,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         // first check if there is a multi measure rest
         if (it->select_single_node(".//multiple-rest")) {
             m_multiRest = it->select_single_node(".//multiple-rest").node().text().as_int();
-            MultiRest * multiRest = new MultiRest;
+            MultiRest *multiRest = new MultiRest;
             multiRest->SetNum(m_multiRest);
             Layer *layer = SelectLayer(1, measure);
             AddLayerElement(layer, multiRest);
@@ -1439,22 +1440,21 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
         // we assume /note without /type to be mRest
         else if (typeStr.empty() || HasAttributeWithValue(rest.node(), "measure", "yes")) {
             if (m_slash) {
-              for (int i = m_meterCount; i > 0; --i) {
-                BeatRpt *slash = new BeatRpt;
-                AddLayerElement(layer, slash);
-              }
-              return;
+                for (int i = m_meterCount; i > 0; --i) {
+                    BeatRpt *slash = new BeatRpt;
+                    AddLayerElement(layer, slash);
+                }
+                return;
             }
             else {
-              MRest *mRest = new MRest();
-              element = mRest;
-              // FIXME MEI 4.0.0
-              // if (cue) mRest->SetSize(SIZE_cue);
-              if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
-              if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
-              AddLayerElement(layer, mRest);
+                MRest *mRest = new MRest();
+                element = mRest;
+                // FIXME MEI 4.0.0
+                // if (cue) mRest->SetSize(SIZE_cue);
+                if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
+                if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
+                AddLayerElement(layer, mRest);
             }
-
         }
         else {
             Rest *rest = new Rest();

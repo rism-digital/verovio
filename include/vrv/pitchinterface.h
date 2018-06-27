@@ -14,7 +14,7 @@
 namespace vrv {
 
 class Layer;
-    
+
 //----------------------------------------------------------------------------
 // PitchInterface
 //----------------------------------------------------------------------------
@@ -58,14 +58,14 @@ public:
      * Returns calling pitch minus parameter pitch.
      */
     int PitchDifferenceTo(PitchInterface *pi);
-    
+
     /**
      * Calculate the loc for a note, rest or chord considering its position in the layer.
      * By default for chord takes the top note, but the bottom note otherwise.
      * E.g., return 0 for and C4 with clef C1, -2 with clef G2.
      */
     static int CalcLoc(LayerElement *element, Layer *layer, bool topChordNote = true);
-    
+
     /**
      * Calculate the loc for a pitch and octave and considerting the clef loc offset.
      * E.g., return 0 for and C4 with clef C1, -2 with clef G2.

@@ -32,7 +32,12 @@ std::wstring dynamSmufl[] = { L"\uE520", L"\uE521", L"\uE522", L"\uE523", L"\uE5
 //----------------------------------------------------------------------------
 
 Dynam::Dynam()
-    : ControlElement("dynam-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface(), AttExtender(), AttVerticalGroup()
+    : ControlElement("dynam-")
+    , TextListInterface()
+    , TextDirInterface()
+    , TimeSpanningInterface()
+    , AttExtender()
+    , AttVerticalGroup()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
