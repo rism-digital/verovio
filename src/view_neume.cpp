@@ -88,21 +88,53 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     if (nc->HasName() && nc->GetName() == ncVis_NAME_inclinatum) {
         params.at(0).fontNo = SMUFL_E991_chantPunctumInclinatum;
     }
-    /*
-    else if (nc->HasLigature() && nc->GetLigature() == BOOLEAN_true) {
+    else if (nc->GetLigature() == BOOLEAN_true) {
+        int pitchDifference;
+        bool isFirst;
         // Check if this is the first or second part of a ligature
-        Neume *neume = dynamic_cast<Neume *>(nc->GetFirstParent(NEUME));
-        assert(neume);
-        int currentPosition = neume->GetChildIndex(element);
-        Nc *nextNc = dynamic_cast<Nc *>(neume->GetChild(currentPosition + 1));
-        // Is the second part
-        if (nextNc == nullptr || !nextNc->HasLigature() || nextNc->GetLigature() == BOOLEAN_false) {
-            fontNo = SMUFL_E9BD_chantConnectingLineAsc2nd;
+        Object *nextSibling = neume->GetChild(position + 1);
+        if (nextSibling != nullptr) {
+            Nc *nextNc = dynamic_cast<Nc*>(nextSibling);
+            assert(nextNc);
+            if (nextNc->GetLigature() == BOOLEAN_true) { //first part of the ligature
+                isFirst = true;
+                pitchDifference = nextNc->PitchDifferenceTo(nc);
+                params.at(0).yOffset = pitchDifference;
+            }
+            else {
+                isFirst = false;
+            }
         }
         else {
+            isFirst = false;
+        }
 
+        if (!isFirst) { // still need to get pitchDifference
+            Nc *lastnc = dynamic_cast<Nc *>(neume->GetChild(position > 0 ? position - 1 : 0));
+            assert(lastnc);
+            pitchDifference = nc->PitchDifferenceTo(lastnc);
+            params.at(0).xOffset = -1;
+            params.at(0).yOffset = -pitchDifference;
+        }
 
-    }*/
+        // set the glyph
+        switch (pitchDifference) {
+            case -1:
+                params.at(0).fontNo = isFirst ? SMUFL_E9B4_chantEntryLineAsc2nd : SMUFL_E9B9_chantLigaturaDesc2nd;
+                break;
+            case -2:
+                params.at(0).fontNo = isFirst ? SMUFL_E9B5_chantEntryLineAsc3rd : SMUFL_E9BA_chantLigaturaDesc3rd;
+                break;
+            case -3:
+                params.at(0).fontNo = isFirst ? SMUFL_E9B6_chantEntryLineAsc4th : SMUFL_E9BB_chantLigaturaDesc4th;
+                break;
+            case -4:
+                params.at(0).fontNo = isFirst ? SMUFL_E9B7_chantEntryLineAsc5th : SMUFL_E9BC_chantLigaturaDesc5th;
+                break;
+            default: break;
+        }
+    }
+
     // If the nc is supposed to be a virga and currently is being rendered as a punctum
     // change it to a virga
     if (nc->GetDiagonalright() == ncVis_DIAGONALRIGHT_u && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
@@ -116,6 +148,7 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     if (nc->HasFacs()) {
         noteY = ToLogicalY(staff->GetDrawingY());
         noteX = nc->GetDrawingX();
+        params.at(0).xOffset = 0;
     }
     else if (neume->HasFacs()) {
         noteY = ToLogicalY(staff->GetDrawingY());
