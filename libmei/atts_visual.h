@@ -931,9 +931,17 @@ public:
     data_BOOLEAN GetJagged() const { return m_jagged; }
     bool HasJagged() const;
     //
+    void SetLigature(data_BOOLEAN ligature_) { m_ligature = ligature_; }
+    data_BOOLEAN GetLigature() const { return m_ligature; }
+    bool HasLigature() const;
+    //
     void SetLiquescent(data_BOOLEAN liquescent_) { m_liquescent = liquescent_; }
     data_BOOLEAN GetLiquescent() const { return m_liquescent; }
     bool HasLiquescent() const;
+    //
+    void SetName(ncVis_NAME name_) { m_name = name_; }
+    ncVis_NAME GetName() const { return m_name; }
+    bool HasName() const;
     //
     void SetOriscus(ncVis_ORISCUS oriscus_) { m_oriscus = oriscus_; }
     ncVis_ORISCUS GetOriscus() const { return m_oriscus; }
@@ -972,8 +980,12 @@ private:
     data_BOOLEAN m_flat;
     /** The shape of the neume component is jagged. **/
     data_BOOLEAN m_jagged;
+    /** The neume component is part of a ligature. **/
+    data_BOOLEAN m_ligature;
     /** The neume component is a liquescent. **/
     data_BOOLEAN m_liquescent;
+    /** Name of the attribute. **/
+    ncVis_NAME m_name;
     /** The neume component is an oriscus. **/
     ncVis_ORISCUS m_oriscus;
     /** The neume component is a quilisma. **/

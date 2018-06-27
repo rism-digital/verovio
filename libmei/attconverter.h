@@ -284,6 +284,9 @@ public:
     std::string NcVisDiagonalrightToStr(ncVis_DIAGONALRIGHT data) const;
     ncVis_DIAGONALRIGHT StrToNcVisDiagonalright(std::string value, bool logWarning = true) const;
 
+    std::string NcVisNameToStr(ncVis_NAME data) const;
+    ncVis_NAME StrToNcVisName(std::string value, bool logWarning = true) const;
+
     std::string NcVisOriscusToStr(ncVis_ORISCUS data) const;
     ncVis_ORISCUS StrToNcVisOriscus(std::string value, bool logWarning = true) const;
 

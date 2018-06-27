@@ -3271,6 +3271,27 @@ ncVis_DIAGONALRIGHT AttConverter::StrToNcVisDiagonalright(std::string value, boo
     return ncVis_DIAGONALRIGHT_NONE;
 }
 
+std::string AttConverter::NcVisNameToStr(ncVis_NAME data) const
+{
+    std::string value;
+    switch (data) {
+        case ncVis_NAME_inclinatum: value = "inclinatum"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.nc.vis@name", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+ncVis_NAME AttConverter::StrToNcVisName(std::string value, bool logWarning) const
+{
+    if (value == "inclinatum") return ncVis_NAME_inclinatum;
+    if (logWarning && !value.empty())
+        LogWarning("Unsupported value '%s' for att.nc.vis@name", value.c_str());
+    return ncVis_NAME_NONE;
+}
+
 std::string AttConverter::NcVisOriscusToStr(ncVis_ORISCUS data) const
 {
     std::string value;

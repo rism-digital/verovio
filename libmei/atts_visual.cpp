@@ -1283,7 +1283,9 @@ void AttNcVis::ResetNcVis()
     m_extended = BOOLEAN_NONE;
     m_flat = BOOLEAN_NONE;
     m_jagged = BOOLEAN_NONE;
+    m_ligature = BOOLEAN_NONE;
     m_liquescent = BOOLEAN_NONE;
+    m_name = ncVis_NAME_NONE;
     m_oriscus = ncVis_ORISCUS_NONE;
     m_quilisma = ncVis_QUILISMA_NONE;
     m_strophicus = BOOLEAN_NONE;
@@ -1333,9 +1335,19 @@ bool AttNcVis::ReadNcVis(pugi::xml_node element)
         element.remove_attribute("jagged");
         hasAttribute = true;
     }
+    if (element.attribute("ligature")) {
+        this->SetLigature(StrToBoolean(element.attribute("ligature").value()));
+        element.remove_attribute("ligature");
+        hasAttribute = true;
+    }
     if (element.attribute("liquescent")) {
         this->SetLiquescent(StrToBoolean(element.attribute("liquescent").value()));
         element.remove_attribute("liquescent");
+        hasAttribute = true;
+    }
+    if (element.attribute("name")) {
+        this->SetName(StrToNcVisName(element.attribute("name").value()));
+        element.remove_attribute("name");
         hasAttribute = true;
     }
     if (element.attribute("oriscus")) {
@@ -1396,8 +1408,16 @@ bool AttNcVis::WriteNcVis(pugi::xml_node element)
         element.append_attribute("jagged") = BooleanToStr(this->GetJagged()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasLigature()) {
+        element.append_attribute("ligature") = BooleanToStr(this->GetLigature()).c_str();
+        wroteAttribute = true;
+    }
     if (this->HasLiquescent()) {
         element.append_attribute("liquescent") = BooleanToStr(this->GetLiquescent()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasName()) {
+        element.append_attribute("name") = NcVisNameToStr(this->GetName()).c_str();
         wroteAttribute = true;
     }
     if (this->HasOriscus()) {
@@ -1459,9 +1479,19 @@ bool AttNcVis::HasJagged() const
     return (m_jagged != BOOLEAN_NONE);
 }
 
+bool AttNcVis::HasLigature() const
+{
+    return (m_ligature != BOOLEAN_NONE);
+}
+
 bool AttNcVis::HasLiquescent() const
 {
     return (m_liquescent != BOOLEAN_NONE);
+}
+
+bool AttNcVis::HasName() const
+{
+    return (m_name != ncVis_NAME_NONE);
 }
 
 bool AttNcVis::HasOriscus() const
@@ -2351,8 +2381,16 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             att->SetJagged(att->StrToBoolean(attrValue));
             return true;
         }
+        if (attrType == "ligature") {
+            att->SetLigature(att->StrToBoolean(attrValue));
+            return true;
+        }
         if (attrType == "liquescent") {
             att->SetLiquescent(att->StrToBoolean(attrValue));
+            return true;
+        }
+        if (attrType == "name") {
+            att->SetName(att->StrToNcVisName(attrValue));
             return true;
         }
         if (attrType == "oriscus") {
@@ -2722,8 +2760,14 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         if (att->HasJagged()) {
             attributes->push_back(std::make_pair("jagged", att->BooleanToStr(att->GetJagged())));
         }
+        if (att->HasLigature()) {
+            attributes->push_back(std::make_pair("ligature", att->BooleanToStr(att->GetLigature())));
+        }
         if (att->HasLiquescent()) {
             attributes->push_back(std::make_pair("liquescent", att->BooleanToStr(att->GetLiquescent())));
+        }
+        if (att->HasName()) {
+            attributes->push_back(std::make_pair("name", att->NcVisNameToStr(att->GetName())));
         }
         if (att->HasOriscus()) {
             attributes->push_back(std::make_pair("oriscus", att->NcVisOriscusToStr(att->GetOriscus())));

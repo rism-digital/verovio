@@ -1514,6 +1514,15 @@ enum ncVis_DIAGONALRIGHT {
 };
 
 /**
+ * MEI att.nc.vis@name
+ */
+enum ncVis_NAME {
+    ncVis_NAME_NONE = 0,
+    ncVis_NAME_inclinatum,
+    ncVis_NAME_MAX
+};
+
+/**
  * MEI att.nc.vis@oriscus
  */
 enum ncVis_ORISCUS {
