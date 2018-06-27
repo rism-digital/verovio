@@ -10,6 +10,7 @@
 //-------------------------------------------------------------------------------- 
 
 #include <cmath>
+#include <set>
 
 //--------------------------------------------------------------------------------
 
@@ -142,6 +143,18 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             Zone *zone = neume->GetZone();
             assert(zone);
             zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+        }
+        else if (dynamic_cast<Nc*>(neume->FindChildByType(NC))->HasFacs()) {
+            std::set<Zone *> childZones;
+            for (Object *child = neume->GetFirst(); child != nullptr; child = neume->GetNext()) {
+                FacsimileInterface *fi = child->GetFacsimileInterface();
+                if (fi != nullptr) {
+                    childZones.insert(fi->GetZone());
+                }
+            }
+            for (auto it = childZones.begin(); it != childZones.end(); it++) {
+                (*it)->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+            }
         }
 
         neume->GetParent()->SortChildren(&SortByUlx);
