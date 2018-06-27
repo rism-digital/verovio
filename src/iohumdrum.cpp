@@ -6136,6 +6136,16 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     setPlace(hairpin, "below");
                 }
             }
+            else {
+                // no endpoint so print as the word "cresc."
+                Dir *dir = new Dir;
+                m_measure->AddChild(dir);
+                setStaff(dir, m_currentstaff);
+                setLocationId(dir, line->token(i));
+                hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
+                dir->SetTstamp(tstamp.getFloat());
+                addTextElement(dir, "cresc.");
+            }
         }
         else if (hairpins.find(">") != string::npos) {
             hum::HTp endtok = NULL;
@@ -6182,6 +6192,16 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 else if (forceAboveQ) {
                     setPlace(hairpin, "above");
                 }
+            }
+            else {
+                // no endpoint so print as the word "dim."
+                Dir *dir = new Dir;
+                m_measure->AddChild(dir);
+                setStaff(dir, m_currentstaff);
+                setLocationId(dir, line->token(i));
+                hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
+                dir->SetTstamp(tstamp.getFloat());
+                addTextElement(dir, "dim.");
             }
         }
     }
