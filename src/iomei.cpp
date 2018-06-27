@@ -725,14 +725,15 @@ void MeiOutput::WriteSurface(pugi::xml_node currentNode, Surface *surface)
     WriteXmlId(currentNode, surface);
     surface->WriteCoordinated(currentNode);
     surface->WriteTyped(currentNode);
-    AttComparison ac(ZONE);
-    ArrayOfObjects zones;
-    surface->FindAllChildByComparison(&zones, &ac);
-    for (auto it = zones.begin(); it != zones.end(); it++) {
-        Zone *zone = dynamic_cast<Zone *>(*it);
-        assert(zone);
-        pugi::xml_node zoneNode = currentNode.append_child("zone");
-        WriteZone(zoneNode, zone);
+    
+    for (Object *child = surface->GetFirst(); child != nullptr; child = surface->GetNext()) {
+        if (child->GetClassId() == ZONE) {
+            pugi::xml_node childNode = currentNode.append_child("zone");
+            WriteZone(childNode, dynamic_cast<Zone *>(child));
+        }
+        else {
+            LogWarning("Unable to write child '%s' of surface", child->GetClassName().c_str());
+        }
     }
 }
 
@@ -742,14 +743,14 @@ void MeiOutput::WriteFacsimile(pugi::xml_node currentNode, Facsimile *facsimile)
     WriteXmlId(currentNode, facsimile);
 
     // Write Surface(s)
-    ArrayOfObjects surfaces;
-    AttComparison ac(SURFACE);
-    facsimile->FindAllChildByComparison(&surfaces, &ac);
-    for (auto it = surfaces.begin(); it != surfaces.end(); it++) {
-        Surface *surface = dynamic_cast<Surface *>(*it);
-        assert(surface);
-        pugi::xml_node surfaceNode = currentNode.append_child("surface");
-        WriteSurface(surfaceNode, surface);
+    for (Object *child = facsimile->GetFirst(); child != nullptr; child = facsimile->GetNext()) {
+        if (child->GetClassId() == SURFACE) {
+            pugi::xml_node childNode = currentNode.append_child("surface");
+            WriteSurface(childNode, dynamic_cast<Surface *>(child));
+        }
+        else {
+            LogWarning("Unable to write child '%s' of facsimile", child->GetClassName().c_str());
+        }
     }
 }
 
