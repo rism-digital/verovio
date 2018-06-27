@@ -526,14 +526,15 @@ bool Toolkit::LoadData(const std::string &data)
 
 std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
 {
-    int initialPageNo = m_doc.GetDrawingPage()->GetIdx();
+    int initialPageNo = (m_doc.GetDrawingPage() == nullptr) ? -1 : m_doc.GetDrawingPage()->GetIdx();
     // Page number is one-based - correct it to 0-based first
     pageNo--;
 
     MeiOutput meioutput(&m_doc, "");
     meioutput.SetScoreBasedMEI(scoreBased);
     std::string output = meioutput.GetOutput(pageNo);
-    m_doc.SetDrawingPage(initialPageNo);
+    if (initialPageNo >= 0)
+        m_doc.SetDrawingPage(initialPageNo);
     return output;
 }
 
@@ -987,7 +988,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
 
 std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
 {
-    int initialPageNo = m_doc.GetDrawingPage()->GetIdx();
+    int initialPageNo = (m_doc.GetDrawingPage() == nullptr) ? -1 : m_doc.GetDrawingPage()->GetIdx();
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
     SvgDeviceContext svg;
@@ -1004,7 +1005,8 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
     RenderToDeviceContext(pageNo, &svg);
 
     std::string out_str = svg.GetStringSVG(xml_declaration);
-    m_doc.SetDrawingPage(initialPageNo);
+    if (initialPageNo >= 0)
+        m_doc.SetDrawingPage(initialPageNo);
     return out_str;
 }
 

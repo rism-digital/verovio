@@ -79,139 +79,30 @@ void View::DrawNc(DeviceContext *dc, LayerElement *element, Layer *layer, Staff 
     int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     int staffLineNumber = staff->m_drawingLines;
     int clefLine = clef->GetLine();
-    Neume *neume = dynamic_cast<Neume *>(nc->GetFirstParent(NEUME));
+   
+    Neume *neume = dynamic_cast<Neume*>(nc->GetFirstParent(NEUME));
     assert(neume);
-    
-    // Determine grouping component is a part of and its position
-    NeumeGroup group = neume->GetNeumeGroup();
-    int position = neume->GetChildIndex(element);     
+    int position = neume->GetChildIndex(element);
 
-    std::vector<int> pitchDifferences = neume->GetPitchDifferences();
+    // Check if nc is part of a ligature or is an inclinatum
+    if (nc->HasName() && nc->GetName() == ncVis_NAME_inclinatum) {
+        params.at(0).fontNo = SMUFL_E991_chantPunctumInclinatum;
+    }
+    /*
+    else if (nc->HasLigature() && nc->GetLigature() == BOOLEAN_true) {
+        // Check if this is the first or second part of a ligature
+        Neume *neume = dynamic_cast<Neume *>(nc->GetFirstParent(NEUME));
+        assert(neume);
+        int currentPosition = neume->GetChildIndex(element);
+        Nc *nextNc = dynamic_cast<Nc *>(neume->GetChild(currentPosition + 1));
+        // Is the second part
+        if (nextNc == nullptr || !nextNc->HasLigature() || nextNc->GetLigature() == BOOLEAN_false) {
+            fontNo = SMUFL_E9BD_chantConnectingLineAsc2nd;
+        }
+        else {
 
-    switch (group) {
-        case PES:
-        case PES_SUBPUNCTIS:
-        {
-            if (position == 1 && pitchDifferences.at(0) > 0) {
-                params.at(0).xOffset = -0.25;
-            }
-            else if (position >= 2) {
-                params.at(0).fontNo = SMUFL_E991_chantPunctumInclinatum;
-            }
-            break;
-        }
-        case PORRECTUS:
-        case PORRECTUS_FLEXUS:
-        case PORRECTUS_SUBPUNCTIS:
-        {
-            switch (position) {
-                case 0:
-                case 1:
-                    switch (pitchDifferences.at(0)) {
-                        case -1:
-                            params.at(0).fontNo = (position == 0) ?
-                                SMUFL_E9B4_chantEntryLineAsc2nd : SMUFL_E9B9_chantLigaturaDesc2nd;
-                            break;
-                        case -2:
-                            params.at(0).fontNo = (position == 0) ?
-                                SMUFL_E9B5_chantEntryLineAsc3rd : SMUFL_E9BA_chantLigaturaDesc3rd;
-                            break;
-                        case -3:
-                            params.at(0).fontNo = (position == 0) ?
-                                SMUFL_E9B6_chantEntryLineAsc4th : SMUFL_E9BB_chantLigaturaDesc4th;
-                            break;
-                        case -4:
-                            params.at(0).fontNo = (position == 0) ?
-                                SMUFL_E9B7_chantEntryLineAsc5th : SMUFL_E9BC_chantLigaturaDesc5th;
-                            break;
-                        default: break;
-                    }
-                    if (position == 0)
-                        params.at(0).yOffset = pitchDifferences.at(0);
-                    else {
-                        params.at(0).xOffset = -1;
-                        params.at(0).yOffset = -pitchDifferences.at(0);
-                    }
-                    break;
-                case 2:
-                    break;
-                default:
-                    if (group == PORRECTUS_SUBPUNCTIS)
-                        params.at(0).fontNo = SMUFL_E991_chantPunctumInclinatum;
-                    break;
-            }
-            break;
-        }
-        case CLIVIS:
-        {
-            // TODO add connecting lie
-            if (pitchDifferences.at(0) < -1 && position == 1) {
-                drawingParams p;
-                switch (pitchDifferences.at(0)) {
-                    case -2:
-                        p.fontNo = SMUFL_E9BE_chantConnectingLineAsc3rd;
-                        break;
-                    case -3:
-                        p.fontNo = SMUFL_E9BF_chantConnectingLineAsc4th;
-                        break;
-                    case -4:
-                        p.fontNo = SMUFL_E9C0_chantConnectingLineAsc5th;
-                        break;
-                    default:
-                        p.fontNo = SMUFL_E9BD_chantConnectingLineAsc2nd;
-                        break;
-                }
-                params.push_back(p);
-            }
-            if (position == 0) {
-                params.at(0).xOffset = 0.25;
-            }
-            break;
-        }
-        case CLIMACUS:
-        case CLIMACUS_RESUPINUS:
-        {
-            if (position != 0) {
-                params.at(0).fontNo = SMUFL_E991_chantPunctumInclinatum;
-            }
-            break;
-        }
-        //case SCANDICUS:
-        //case SCANDICUS_FLEXUS:
-        case SCANDICUS_SUBPUNCTIS:
-        {
-            if (position > 2) {
-                params.at(0).fontNo = SMUFL_E991_chantPunctumInclinatum; 
-            }
-            break;
-        }
-        case TORCULUS_RESUPINUS:
-        {
-            if (pitchDifferences.at(1) == 1) {
-                if (position == 1) {
-                    params.at(0).fontNo = SMUFL_E9B9_chantLigaturaDesc2nd;
-                }
-                else if (position == 2) {
-                    params.at(0).fontNo = SMUFL_E9BD_chantConnectingLineAsc2nd;
-                }
-            }
-            else if (pitchDifferences.at(1) == 2) {
-                if (position == 1) {
-                    params.at(0).fontNo = SMUFL_E9BA_chantLigaturaDesc3rd;
-                }
-                else if (position == 2) {
-                    params.at(0).fontNo = SMUFL_E9BD_chantConnectingLineAsc2nd;
-                }
-            }
-            break;
-        }
-        case PRESSUS:
-        {
-            params.at(0).fontNo = (position == 2) ? SMUFL_E991_chantPunctumInclinatum : SMUFL_E990_chantPunctum;
-            break;
-        }
-        default: break;
-    } 
+
+    }*/
     // If the nc is supposed to be a virga and currently is being rendered as a punctum
     // change it to a virga
     if (nc->GetDiagonalright() == ncVis_DIAGONALRIGHT_u && params.at(0).fontNo == SMUFL_E990_chantPunctum) {
