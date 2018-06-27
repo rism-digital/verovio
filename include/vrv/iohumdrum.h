@@ -9,6 +9,7 @@
 #ifndef __VRV_IOHUMDRUM_H__
 #define __VRV_IOHUMDRUM_H__
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -209,13 +210,13 @@ public:
     bool empty = true;
 
     // boolean switches:
-    char nostem = '\0'; // !!!RDF**kern: i = no stem
-    char cuesize = '\0'; // !!!RDF**kern: i = cue size
-    char terminallong = '\0'; // !!!RDF**kern: i = terminal long
+    char nostem = '\0'; // !!!RDF**kern: N = no stem
+    char cuesize = '\0'; // !!!RDF**kern: @ = cue size
+    char terminallong = '\0'; // !!!RDF**kern: l = terminal long
     vector<char> editacc; // !!!RDF**kern: i = editorial accidental
-    vector<string> edittype; // !!!RDF**kern: i= editoral accidental, brack[ets]/paren[theses]
-    char below = '\0'; // !!!RDF**kern: i = below (previous signifier is "below")
-    char above = '\0'; // !!!RDF**kern: i = above (previous signifier is "above")
+    vector<string> edittype; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
+    char below = '\0'; // !!!RDF**kern: < = below (previous signifier is "below")
+    char above = '\0'; // !!!RDF**kern: > = above (previous signifier is "above")
 
     std::string space_color; // !!!RDF**kern: show spaces color=hotpink
     std::string ispace_color; // !!!RDF**kern: show invisible rests color=chartreuse
@@ -401,7 +402,9 @@ protected:
     void addDefaultTempo(ScoreDef &m_scoreDef);
     int getChordNoteCount(hum::HTp token);
     bool leftmostSystemArpeggio(hum::HTp token);
+    bool leftmostStaffArpeggio(hum::HTp token);
     hum::HTp getRightmostSystemArpeggio(hum::HTp token);
+    hum::HTp getRightmostStaffArpeggio(hum::HTp token);
     void addDirection(
         const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token, int staffindex);
     void processTerminalLong(hum::HTp token);
@@ -428,6 +431,8 @@ protected:
     void convertMensuralToken(
         std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token, int staffindex);
     void initializeSpineColor(hum::HumdrumFile &infile);
+    std::string getLayoutAccidental(hum::HTp token, int subtoken);
+    void setStemLength(Note *note, hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -444,6 +449,7 @@ protected:
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
     template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
+    template <class ELEMENT> void setRhythmFromDuration(ELEMENT element, hum::HumNum dur);
     template <class ELEMENT> hum::HumNum convertMensuralRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);

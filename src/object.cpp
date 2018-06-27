@@ -81,11 +81,12 @@ Object::Object(const Object &object) : BoundingBox(object)
     
     m_classid = object.m_classid;
     m_parent = NULL;
+
     // Flags
     m_isAttribute = object.m_isAttribute;
     m_isModified = true;
     m_isReferencObject = object.m_isReferencObject;
-    
+
     // Also copy attribute classes
     m_attClasses = object.m_attClasses;
     m_interfaces = object.m_interfaces;
@@ -116,14 +117,14 @@ Object &Object::operator=(const Object &object)
     if (this != &object) {
         ClearChildren();
         ResetBoundingBox(); // It does not make sense to keep the values of the BBox
-        
+
         m_classid = object.m_classid;
         m_parent = NULL;
         // Flags
         m_isAttribute = object.m_isAttribute;
         m_isModified = true;
         m_isReferencObject = object.m_isReferencObject;
-        
+
         // Also copy attribute classes
         m_attClasses = object.m_attClasses;
         m_interfaces = object.m_interfaces;
@@ -159,7 +160,7 @@ void Object::Init(std::string classid)
     m_isAttribute = false;
     m_isModified = true;
     m_isReferencObject = false;
-    
+
     this->GenerateUuid();
 
     Reset();
@@ -1023,9 +1024,9 @@ int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Object::PrepareLinking(FunctorParams *functorParams)
-{    
+{
     PrepareLinkingParams *params = dynamic_cast<PrepareLinkingParams *>(functorParams);
     assert(params);
 

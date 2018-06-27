@@ -342,8 +342,7 @@ bool OptionArray::SetValue(std::vector<std::string> const &values)
 OptionIntMap::OptionIntMap()
 {
     m_values = NULL;
-    m_value = 0,
-    m_defaultValue = 0;
+    m_value = 0, m_defaultValue = 0;
 }
 
 void OptionIntMap::CopyTo(Option *option)
@@ -675,6 +674,12 @@ Options::Options()
         "Set the xPath query for selecting the <mdiv> to be rendered; only one <mdiv> can be rendered");
     m_mdivXPathQuery.Init("");
     this->Register(&m_mdivXPathQuery, "mdivXPathQuery", &m_selectors);
+
+    m_substXPathQuery.SetInfo("Subst xPath query",
+        "Set the xPath query for selecting <subst> child elements, for "
+        "example: \"./del\"; by default the first child is selected");
+    m_substXPathQuery.Init();
+    this->Register(&m_substXPathQuery, "substXPathQuery", &m_selectors);
 
     /********* The layout left margin by element *********/
 

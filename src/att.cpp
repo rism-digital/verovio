@@ -349,7 +349,7 @@ data_MIDIVALUE_NAME Att::StrToMidivalueName(std::string value, bool logWarning) 
 
     return data;
 }
-    
+
 std::string Att::MidivaluePanToStr(data_MIDIVALUE_PAN data) const
 {
     std::string value;
@@ -373,7 +373,7 @@ data_MIDIVALUE_PAN Att::StrToMidivaluePan(std::string value, bool logWarning) co
 
     return data;
 }
-    
+
 std::string Att::ModusmaiorToStr(data_MODUSMAIOR data) const
 {
     std::string value;
@@ -480,7 +480,7 @@ data_PERCENT Att::StrToPercent(std::string value, bool logWarning) const
     }
     return atof(value.substr(0, value.find("%")).c_str());
 }
-    
+
 std::string Att::PercentLimitedToStr(data_PERCENT_LIMITED data) const
 {
     return StringFormat("%.2f%%", data);
@@ -495,7 +495,7 @@ data_PERCENT_LIMITED Att::StrToPercentLimited(std::string value, bool logWarning
     }
     return atof(value.substr(0, value.find("%")).c_str());
 }
-    
+
 std::string Att::PercentLimitedSignedToStr(data_PERCENT_LIMITED_SIGNED data) const
 {
     return StringFormat("%.2f%%", data);

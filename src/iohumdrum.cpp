@@ -497,6 +497,8 @@ bool HumdrumInput::convertHumdrum()
     m_multirest = analyzeMultiRest(infile);
 
     infile.analyzeKernSlurs();
+    infile.analyzeKernStems();
+    infile.analyzeRestPositions();
     parseSignifiers(infile);
     checkForColorSpine(infile);
     infile.analyzeRScale();
@@ -3145,6 +3147,13 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
                 lt[staffindex].back().clear(); // probably not necessary
             }
             lt[staffindex][layerindex].push_back(infile[i].token(j));
+            if ((layerindex == 0) && (infile[i].token(j)->isClef())) {
+                // Duplicate clef in all layers (needed for cases when
+                // a secondary layer ends before the end of a measure.
+                for (int k = 1; k < (int)lt[staffindex].size(); k++) {
+                    lt[staffindex][k].push_back(infile[i].token(j));
+                }
+            }
         }
     }
 
@@ -4331,6 +4340,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     Note *note = NULL;
 
+    // Used for splitting an invisible rest across a clef:
+    hum::HTp spaceSplitToken = NULL;
+    hum::HumNum remainingSplitDur;
+
     hum::HumRegex hre;
     // ggg	processGlobalDirections(token, staffindex);
 
@@ -4355,29 +4368,71 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             if (layerdata[i]->getDurationFromStart() != 0) {
                 if (layerdata[i]->isClef()) {
+                    int subtrack = layerdata[i]->getSubtrack();
+                    if (subtrack) {
+                        subtrack--;
+                    }
+                    if (subtrack) {
+                        // ignore clef changes in subtracks and only
+                        // use the one in the primary track
+                        continue;
+                    }
                     Clef *clef = insertClefElement(elements, pointers, layerdata[i]);
                     setLocationId(clef, layerdata[i]);
+                    int diff = layerindex - subtrack;
+                    if (diff > 0) {
+                        std::string letter;
+                        letter.push_back('a' + diff);
+                        std::string uid = clef->GetUuid();
+                        uid += letter;
+                        clef->SetUuid(uid);
+                    }
+                    if (spaceSplitToken != NULL) {
+                        // Add the second part of a split invisible rest:
+                        Space *irest = new Space;
+                        if (m_doc->GetOptions()->m_humType.GetValue()) {
+                            embedQstampInClass(irest, spaceSplitToken, *spaceSplitToken);
+                        }
+                        setLocationId(irest, spaceSplitToken);
+                        std::string uid = irest->GetUuid();
+                        uid += "b";
+                        irest->SetUuid(uid);
+                        appendElement(elements, pointers, irest);
+                        // convertRhythm(irest, spaceSplitToken);
+                        setRhythmFromDuration(irest, remainingSplitDur);
+                        // processSlurs(spaceSplitToken);
+                        // processDynamics(spaceSplitToken, staffindex);
+                        // processDirections(spaceSplitToken, staffindex);
+                        // Store rest here to complete the split after the clef change.
+                        spaceSplitToken = NULL;
+                        remainingSplitDur = 0;
+                    }
                 }
                 else if (layerdata[i]->isNull()) {
-                    // duplicate clef changes in secondary layers
-                    int xtrack = layerdata[i]->getTrack();
-                    hum::HTp tok = layerdata[i]->getPreviousFieldToken();
-                    while (tok) {
-                        int ttrack = tok->getTrack();
-                        if (ttrack == xtrack) {
-                            if (tok->isClef()) {
-                                Clef *clef = insertClefElement(elements, pointers, tok);
-                                setLocationId(clef, layerdata[i]);
-                                // Uncomment when clef->SetSameas() is available:
-                                // std::string sameas = "#clef-L";
-                                // sameas += to_string(tok->getLineNumber());
-                                // sameas += "F";
-                                // sameas += to_string(tok->getFieldNumber());
-                                // clef->SetSameas(sameas);
-                                break;
+                    if ((i > 0) && (layerdata[i]->getLineIndex() == layerdata[i - 1]->getLineIndex())) {
+                        // do nothing: duplicate layer clefs are handled elsewhere
+                    }
+                    else {
+                        // duplicate clef changes in secondary layers
+                        int xtrack = layerdata[i]->getTrack();
+                        hum::HTp tok = layerdata[i]->getPreviousFieldToken();
+                        while (tok) {
+                            int ttrack = tok->getTrack();
+                            if (ttrack == xtrack) {
+                                if (tok->isClef()) {
+                                    Clef *clef = insertClefElement(elements, pointers, tok);
+                                    setLocationId(clef, layerdata[i]);
+                                    // Uncomment when clef->SetSameas() is available:
+                                    // std::string sameas = "#clef-L";
+                                    // sameas += to_string(tok->getLineNumber());
+                                    // sameas += "F";
+                                    // sameas += to_string(tok->getFieldNumber());
+                                    // clef->SetSameas(sameas);
+                                    break;
+                                }
                             }
+                            tok = tok->getPreviousFieldToken();
                         }
-                        tok = tok->getPreviousFieldToken();
                     }
                 }
             }
@@ -4443,20 +4498,60 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
         }
         else if (layerdata[i]->isRest()) {
-
             if ((layerdata[i]->find("yy") != string::npos) && m_signifiers.irest_color.empty()
                 && m_signifiers.space_color.empty()) {
                 // Invisible rest (or note which should be invisible.
-                Space *irest = new Space;
-                if (m_doc->GetOptions()->m_humType.GetValue()) {
-                    embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                if ((i < (int)layerdata.size() - 1) && layerdata[i + 1]->isClef()) {
+                    hum::HumNum dur = layerdata[i]->getDuration();
+                    hum::HumNum ndur = layerdata[i + 1]->getDurationFromStart() - layerdata[i]->getDurationFromStart();
+
+                    if (ndur < dur) {
+                        // create a split invisible rest so that an intervening clef
+                        // can be positioned properly.
+                        // split the space into two pieces, this is the firsthalf.
+                        hum::HumNum splitdur = dur - ndur;
+                        Space *irest = new Space;
+                        if (m_doc->GetOptions()->m_humType.GetValue()) {
+                            embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                        }
+                        setLocationId(irest, layerdata[i]);
+                        appendElement(elements, pointers, irest);
+                        // convertRhythm(irest, layerdata[i]);
+                        setRhythmFromDuration(irest, splitdur);
+                        processSlurs(layerdata[i]);
+                        processDynamics(layerdata[i], staffindex);
+                        processDirections(layerdata[i], staffindex);
+                        // Store rest here to complete the split after the clef change.
+                        spaceSplitToken = layerdata[i];
+                        remainingSplitDur = ndur;
+                    }
+                    else {
+                        // normal space
+
+                        Space *irest = new Space;
+                        if (m_doc->GetOptions()->m_humType.GetValue()) {
+                            embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                        }
+                        setLocationId(irest, layerdata[i]);
+                        appendElement(elements, pointers, irest);
+                        convertRhythm(irest, layerdata[i]);
+                        processSlurs(layerdata[i]);
+                        processDynamics(layerdata[i], staffindex);
+                        processDirections(layerdata[i], staffindex);
+                    }
                 }
-                setLocationId(irest, layerdata[i]);
-                appendElement(elements, pointers, irest);
-                convertRhythm(irest, layerdata[i]);
-                processSlurs(layerdata[i]);
-                processDynamics(layerdata[i], staffindex);
-                processDirections(layerdata[i], staffindex);
+                else {
+                    Space *irest = new Space;
+                    if (m_doc->GetOptions()->m_humType.GetValue()) {
+                        embedQstampInClass(irest, layerdata[i], *layerdata[i]);
+                    }
+                    setLocationId(irest, layerdata[i]);
+                    appendElement(elements, pointers, irest);
+                    convertRhythm(irest, layerdata[i]);
+                    processSlurs(layerdata[i]);
+                    processDynamics(layerdata[i], staffindex);
+                    processDirections(layerdata[i], staffindex);
+                }
             }
             else {
                 Rest *rest = new Rest;
@@ -4506,6 +4601,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         else {
             // should be a note
             note = new Note;
+            setStemLength(note, layerdata[i]);
             setLocationId(note, layerdata[i]);
             appendElement(elements, pointers, note);
             convertNote(note, layerdata[i], staffindex);
@@ -5100,26 +5196,29 @@ template <class ELEMENT> void HumdrumInput::setPlace(ELEMENT *element, const std
 
 template <class ELEMENT> void HumdrumInput::verticalRest(ELEMENT element, const std::string &token)
 {
-    hum::HumRegex hre;
-    if (!hre.search(token, "([A-Ga-g]+)")) {
-        return;
-    }
-    string result = hre.getMatch(1);
+    return; // calculating this in humlib now.
+    /*
+        hum::HumRegex hre;
+        if (!hre.search(token, "([A-Ga-g]+)")) {
+            return;
+        }
+        string result = hre.getMatch(1);
 
-    int base40 = hum::Convert::kernToBase40(result);
-    int oct = base40 / 40;
-    int base7chroma = hum::Convert::base40ToDiatonic(base40) % 7;
-    switch (base7chroma) {
-        case 0: element->SetPloc(PITCHNAME_c); break;
-        case 1: element->SetPloc(PITCHNAME_d); break;
-        case 2: element->SetPloc(PITCHNAME_e); break;
-        case 3: element->SetPloc(PITCHNAME_f); break;
-        case 4: element->SetPloc(PITCHNAME_g); break;
-        case 5: element->SetPloc(PITCHNAME_a); break;
-        case 6: element->SetPloc(PITCHNAME_b); break;
-    }
+        int base40 = hum::Convert::kernToBase40(result);
+        int oct = base40 / 40;
+        int base7chroma = hum::Convert::base40ToDiatonic(base40) % 7;
+        switch (base7chroma) {
+            case 0: element->SetPloc(PITCHNAME_c); break;
+            case 1: element->SetPloc(PITCHNAME_d); break;
+            case 2: element->SetPloc(PITCHNAME_e); break;
+            case 3: element->SetPloc(PITCHNAME_f); break;
+            case 4: element->SetPloc(PITCHNAME_g); break;
+            case 5: element->SetPloc(PITCHNAME_a); break;
+            case 6: element->SetPloc(PITCHNAME_b); break;
+        }
 
-    element->SetOloc(oct);
+        element->SetOloc(oct);
+    */
 }
 
 //////////////////////////////
@@ -5227,12 +5326,6 @@ void HumdrumInput::addOrnamentMarkers(hum::HTp token)
     if (!token) {
         return;
     }
-
-    // arpeggios are now implemented, so no need for text marking:
-    // if (strchr(token->c_str(), ':') != NULL) { // arpeggio
-    //     token->setValue("LO", "TX", "t", "arp.");
-    //     token->setValue("LO", "TX", "a", "true");
-    // }
 
     if (strchr(token->c_str(), 'O') != NULL) { // generic ornament
         token->setValue("LO", "TX", "t", "*");
@@ -8196,6 +8289,35 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
     // Also full-measure rests are handled elsewhere.
     convertRhythm(rest, token, subtoken);
 
+    string oloc = token->getValue("auto", "oloc");
+    string ploc = token->getValue("auto", "ploc");
+
+    if ((!oloc.empty()) && (!ploc.empty())) {
+        int olocint = stoi(oloc);
+        rest->SetOloc(olocint);
+        if (ploc == "C") {
+            rest->SetPloc(PITCHNAME_c);
+        }
+        else if (ploc == "D") {
+            rest->SetPloc(PITCHNAME_d);
+        }
+        else if (ploc == "E") {
+            rest->SetPloc(PITCHNAME_e);
+        }
+        else if (ploc == "F") {
+            rest->SetPloc(PITCHNAME_f);
+        }
+        else if (ploc == "G") {
+            rest->SetPloc(PITCHNAME_g);
+        }
+        else if (ploc == "A") {
+            rest->SetPloc(PITCHNAME_a);
+        }
+        else if (ploc == "B") {
+            rest->SetPloc(PITCHNAME_b);
+        }
+    }
+
     std::string tstring;
     if (subtoken < 0) {
         tstring = *token;
@@ -8304,6 +8426,21 @@ template <class ELEMENT> void HumdrumInput::checkForAutoStem(ELEMENT element, hu
     }
 }
 
+//////////////////////////////
+//
+// HumdrumInput::setStemLength --
+//
+
+void HumdrumInput::setStemLength(Note *note, hum::HTp token)
+{
+    string stemlen = token->getValue("auto", "stemlen");
+    if (stemlen.empty()) {
+        return;
+    }
+    double value = std::stof(stemlen);
+    note->SetStemLen(value);
+}
+
 /////////////////////////////
 //
 // HumdrumInput::convertNote --
@@ -8326,6 +8463,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     }
 
     bool chordQ = token->isChord();
+
+    if (!chordQ) {
+        setStemLength(note, token);
+    }
 
     processTerminalLong(token); // do this before assigning rhythmic value.
 
@@ -8508,6 +8649,15 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     // int accidCount = hum::Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
     bool showInAccidGes = !showInAccid;
+    string loaccid = getLayoutAccidental(token, subtoken);
+    if (!loaccid.empty()) {
+        // show the performance accidental in @accid.ges, and the
+        // loaccid will be shown in @accid (the following false
+        // will be used to set disable normal visual accid display system)
+        showInAccid = false;
+        showInAccidGes = true;
+    }
+
     Accid *accid = new Accid;
     appendElement(note, accid);
     setLocationId(accid, token, subtoken);
@@ -8535,6 +8685,48 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
                 case -3: accid->SetAccid(ACCIDENTAL_WRITTEN_tf); break;
                 default: std::cerr << "Do not know how to convert accidental: " << accidCount << endl;
             }
+        }
+        else if (!loaccid.empty()) {
+            if (loaccid == "n#") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_ns);
+            }
+            else if (loaccid == "#") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_s);
+            }
+            else if (loaccid == "n") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_n);
+            }
+            else if (loaccid == "##") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_ss);
+            }
+            else if (loaccid == "x") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_x);
+            }
+            else if (loaccid == "-") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_f);
+            }
+            else if (loaccid == "--") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_ff);
+            }
+            else if (loaccid == "#x") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_sx);
+            }
+            else if (loaccid == "###") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_ts);
+            }
+            else if (loaccid == "n-") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_nf);
+            }
+            else if (loaccid == "---") {
+                accid->SetAccid(ACCIDENTAL_WRITTEN_tf);
+            }
+            else {
+                std::cerr << "Warning: unknown accidental type " << std::endl;
+            }
+            // add more accidentals here as necessary.  Mostly left are quarter tones
+            // which are not dealt with directly in **kern data: su, sd, fu, fd, nu,
+            // nd, 1qf, 3qf, 1qs, 3qs
+            // http://music-encoding.org/guidelines/v3/data-types/data.accidental.explicit.html
         }
     }
     else {
@@ -8600,6 +8792,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     }
 
     // handle ties
+    // ggg
     if ((tstring.find("[") != string::npos) || (tstring.find("_") != string::npos)) {
         processTieStart(note, token, tstring, subtoken);
     }
@@ -8672,6 +8865,40 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     }
     else if (phraseStop) {
         note->SetType("phraseStop");
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getLayoutAccidental -- Search for a visual accidental layout code
+//   for the given note.  Such as:
+//       !LO:N:acc=n#
+//
+
+std::string HumdrumInput::getLayoutAccidental(hum::HTp token, int subtoken)
+{
+    if (subtoken < 0) {
+        subtoken = 0;
+    }
+    std::string output = getLayoutParameter(token, "N", "acc");
+    if (output.empty()) {
+        return "";
+    }
+    int index = 0;
+    if (token->isChord()) {
+        std::string nstr = getLayoutParameter(token, "N", "n");
+        if (nstr.empty()) {
+            index = 0;
+        }
+        else {
+            index = stoi(nstr) - 1;
+        }
+    }
+    if (index == subtoken) {
+        return output;
+    }
+    else {
+        return "";
     }
 }
 
@@ -9074,6 +9301,42 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertMensuralRhythm(ELEMENT
 
 //////////////////////////////
 //
+// HumdrumInput::setRhythmFromDuration -- Used for splitting invisible rests across
+//    clef changes, so a simple algorithm.  Currently does not allow for tuplets or
+//    dotted rhythms.
+//
+
+template <class ELEMENT> void HumdrumInput::setRhythmFromDuration(ELEMENT element, hum::HumNum dur)
+{
+    dur /= 4; // convert to whole-note units
+
+    if (dur.isInteger()) {
+        switch (dur.getNumerator()) {
+            case 1: element->SetDur(DURATION_1); break;
+            case 2: element->SetDur(DURATION_breve); break;
+            case 4: element->SetDur(DURATION_long); break;
+            case 8: element->SetDur(DURATION_maxima); break;
+        }
+    }
+    else if (dur.getNumerator() == 1) {
+        switch (dur.getDenominator()) {
+            case 2: element->SetDur(DURATION_2); break;
+            case 4: element->SetDur(DURATION_4); break;
+            case 8: element->SetDur(DURATION_8); break;
+            case 16: element->SetDur(DURATION_16); break;
+            case 32: element->SetDur(DURATION_32); break;
+            case 64: element->SetDur(DURATION_64); break;
+            case 128: element->SetDur(DURATION_128); break;
+            case 256: element->SetDur(DURATION_256); break;
+            case 512: element->SetDur(DURATION_512); break;
+            case 1024: element->SetDur(DURATION_1024); break;
+            case 2048: element->SetDur(DURATION_2048); break;
+        }
+    }
+}
+
+//////////////////////////////
+//
 // HumdrumInput::convertRhythm --
 //     default value:
 //         subtoken = -1;
@@ -9378,7 +9641,7 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
 //////////////////////////////
 //
 // HumdrumInput::addArpeggio --
-//   : = arpeggio which may cross layers on a single staff.
+//   : = arpeggio which may cross between layers on a staff.
 //   :: = arpeggio which crosses staves on a single system.
 //
 
@@ -9386,6 +9649,7 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
 {
 
     bool systemQ = false;
+    bool staffQ = false;
     hum::HTp earp = NULL;
     if (token->find("::") != string::npos) {
         if (!leftmostSystemArpeggio(token)) {
@@ -9399,16 +9663,24 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
         }
     }
     else if (token->find(":") != string::npos) {
-        // only consider on local chord for now (not cross-layer)
+        if (!leftmostStaffArpeggio(token)) {
+            return;
+        }
+        staffQ = true;
+        earp = getRightmostStaffArpeggio(token);
+        if (earp == NULL) {
+            // no system arpeggio actually found
+            return;
+        }
     }
     else {
         return; // no arpeggio on this note/chord
     }
 
     // int layer = m_currentlayer;
-    int staff = m_currentstaff;
+    // int staff = m_currentstaff;
 
-    if (systemQ) {
+    if (systemQ || staffQ) {
         Arpeg *arpeg = new Arpeg;
         appendElement(m_measure, arpeg);
         // no staff attachment, or list both endpoint staves or all staves involved?
@@ -9416,7 +9688,7 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
         // arpeg->SetStartid("#" + object->GetUuid());
         string firstid = object->GetUuid();
         string secondid;
-        if (earp->find(" ") != string::npos) {
+        if (earp->find(" ") != std::string::npos) {
             secondid = getLocationId("chord", earp);
         }
         else {
@@ -9426,13 +9698,75 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
         arpeg->AddRef("#" + firstid);
         arpeg->AddRef("#" + secondid);
     }
-    else {
-        Arpeg *arpeg = new Arpeg;
-        appendElement(m_measure, arpeg);
-        setStaff(arpeg, staff);
-        arpeg->SetStartid("#" + object->GetUuid());
-        setLocationId(arpeg, token);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getRightmostStaffArpeggio -- Assuming a single contiguous
+//     arpeggio across all layers from first to last marker.
+//
+
+hum::HTp HumdrumInput::getRightmostStaffArpeggio(hum::HTp token)
+{
+    hum::HTp output = NULL;
+    if ((token->find(":") != std::string::npos) && (token->find("::") == std::string::npos)) {
+        output = token;
     }
+    int track = token->getTrack();
+    token = token->getNextFieldToken();
+    int ntrack;
+    if (token) {
+        ntrack = token->getTrack();
+    }
+    while (token != NULL) {
+        if (ntrack != track) {
+            break;
+        }
+        if (!token->isKern()) {
+            token = token->getNextFieldToken();
+            continue;
+        }
+        if ((token->find(":") != std::string::npos) && (token->find("::") == std::string::npos)) {
+            output = token;
+        }
+        token = token->getNextFieldToken();
+        if (token) {
+            ntrack = token->getTrack();
+        }
+    }
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::leftmostStaffArpeggio --
+//
+
+bool HumdrumInput::leftmostStaffArpeggio(hum::HTp token)
+{
+    int track = token->getTrack();
+    token = token->getPreviousFieldToken();
+    int ntrack;
+    if (token) {
+        ntrack = token->getTrack();
+    }
+    while (token != NULL) {
+        if (track != ntrack) {
+            break;
+        }
+        if (!token->isKern()) {
+            token = token->getPreviousFieldToken();
+            if (token) {
+                ntrack = token->getTrack();
+            }
+            continue;
+        }
+        if (token->find(":") != std::string::npos) {
+            return false;
+        }
+        token = token->getPreviousFieldToken();
+    }
+    return true;
 }
 
 //////////////////////////////
@@ -9445,7 +9779,7 @@ void HumdrumInput::addArpeggio(Object *object, hum::HTp token)
 hum::HTp HumdrumInput::getRightmostSystemArpeggio(hum::HTp token)
 {
     hum::HTp output = NULL;
-    if (token->find("::") != string::npos) {
+    if (token->find("::") != std::string::npos) {
         output = token;
     }
     token = token->getNextFieldToken();
@@ -9454,7 +9788,7 @@ hum::HTp HumdrumInput::getRightmostSystemArpeggio(hum::HTp token)
             token = token->getNextFieldToken();
             continue;
         }
-        if (token->find("::") != string::npos) {
+        if (token->find("::") != std::string::npos) {
             output = token;
         }
         token = token->getNextFieldToken();
@@ -9477,7 +9811,7 @@ bool HumdrumInput::leftmostSystemArpeggio(hum::HTp token)
             token = token->getPreviousFieldToken();
             continue;
         }
-        if (token->find("::") != string::npos) {
+        if (token->find("::") != std::string::npos) {
             return false;
         }
         token = token->getPreviousFieldToken();
@@ -9842,18 +10176,17 @@ void HumdrumInput::addTrill(hum::HTp token)
     appendElement(m_measure, trill);
     setStaff(trill, staff);
 
-    int staffindex = m_currentstaff - 1;
+    // int staffindex = m_currentstaff - 1;
     int layer = m_currentlayer;
 
     if (layer == 2) {
         setPlace(trill, "below");
     }
 
-    // hum::HumNum tstamp = getMeasureTstamp(token, staffindex)
-    // trill->SetStartid("#" + getLocationId("note", token, subtok));
-
-    hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
-    trill->SetTstamp(tstamp.getFloat());
+    trill->SetStartid("#" + getLocationId("note", token, subtok));
+    // Setting trill@tstamp:
+    // hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+    // trill->SetTstamp(tstamp.getFloat());
 
     setLocationId(trill, token, subtok);
     if (m_signifiers.above) {
@@ -9913,14 +10246,18 @@ void HumdrumInput::addTrill(hum::HTp token)
         lasttok = endtok;
         endtok = endtok->getNextToken();
     }
-    if (!lasttok) {
+    if (!endtok) {
         return;
     }
 
-    hum::HumNum tstamp2 = getMeasureTstampPlusDur(lasttok, staffindex);
-    int measures = getMeasureDifference(token, lasttok);
-    std::pair<int, double> ts2(measures, tstamp2.getFloat());
-    trill->SetTstamp2(ts2);
+    // assuming last note is not in a chord.  Might be a problem if a rest.
+    trill->SetEndid("#" + getLocationId("note", endtok, -1));
+
+    // For setting trill@tstamp2:
+    // hum::HumNum tstamp2 = getMeasureTstampPlusDur(lasttok, staffindex);
+    // int measures = getMeasureDifference(token, lasttok);
+    // std::pair<int, double> ts2(measures, tstamp2.getFloat());
+    // trill->SetTstamp2(ts2);
 }
 
 //////////////////////////////

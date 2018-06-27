@@ -1570,14 +1570,14 @@ void View::DrawTrillExtension(
     else
         dc->EndGraphic(trill, this);
 }
-    
+
 void View::DrawControlElementConnector(
     DeviceContext *dc, ControlElement *dynam, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
     assert(dynam);
     assert(dynam->GetNextLink());
     if (!dynam->GetNextLink()) return;
-    
+
     int y = dynam->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
 
     // Adjust the x1
@@ -1586,25 +1586,26 @@ void View::DrawControlElementConnector(
             x1 = dynam->GetCurrentFloatingPositioner()->GetContentRight();
         }
     }
-    
+
     // Adjust the x2 for extensions with @endid
     if ((spanningType == SPANNING_END) || (spanningType == SPANNING_START_END)) {
-        FloatingPositioner *nextLink = dynam->GetCorrespFloatingPositioner(dynamic_cast<ControlElement *>(dynam->GetNextLink()));
+        FloatingPositioner *nextLink
+            = dynam->GetCorrespFloatingPositioner(dynamic_cast<ControlElement *>(dynam->GetNextLink()));
         if (nextLink && nextLink->HasContentBB()) {
             x2 = nextLink->GetContentLeft();
         }
     }
-    
+
     int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    
+
     // the length of the dash and the space between them - can be made a parameter
     int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
     int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
     int halfDashLength = dashLength / 2;
-    
+
     int dist = x2 - x1;
     int nbDashes = dist / dashSpace;
-    
+
     int margin = dist / 2;
     // no dash if the distance is smaller than a dash length
     if (dist < dashLength) {
@@ -1617,31 +1618,30 @@ void View::DrawControlElementConnector(
     else {
         margin = (dist - ((nbDashes - 1) * dashSpace)) / 2;
     }
-    
+
     /************** draw it **************/
-    
+
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(dynam, "spanning-trill", "");
-    
+
     dc->DeactivateGraphic();
-    
+
     int i;
     for (i = 0; i < nbDashes; ++i) {
         int x = x1 + margin + (i * dashSpace);
         x = std::max(x, x1);
-        
+
         DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
     }
-    
+
     dc->ReactivateGraphic();
-    
+
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
         dc->EndGraphic(dynam, this);
-    
 }
 
 void View::DrawSylConnector(
@@ -2269,7 +2269,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     if (pedal->GetStart()->Is(TIMESTAMP_ATTR)) {
         centered = false;
     }
-    
+
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
 

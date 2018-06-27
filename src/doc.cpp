@@ -318,8 +318,8 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
             midiTrack = staffDef->GetN();
             int trackCount = midiFile->getTrackCount();
             int addCount = midiTrack + 1 - trackCount;
-            if (addCount > 0) {            
-                 midiFile->addTracks(addCount);
+            if (addCount > 0) {
+                midiFile->addTracks(addCount);
             }
             // set MIDI channel and instrument
             InstrDef *instrdef = dynamic_cast<InstrDef *>(staffDef->FindChildByType(INSTRDEF, 1));
@@ -531,10 +531,9 @@ void Doc::PrepareDrawing()
 
     // If some are still there, then it is probably an issue in the encoding
     if (!prepareLinkingParams.m_nextUuidPairs.empty()) {
-        LogWarning(
-            "%d element(s) with a @next could match the target", prepareLinkingParams.m_nextUuidPairs.size());
+        LogWarning("%d element(s) with a @next could match the target", prepareLinkingParams.m_nextUuidPairs.size());
     }
-    
+
     /************ Resolve @plist ************/
 
     // Try to match all pointing elements using @plist
@@ -940,7 +939,7 @@ void Doc::ConvertToPageBasedDoc()
 void Doc::ConvertToCastOffMensuralDoc()
 {
     if (!m_isMensuralMusicOnly) return;
-    
+
     // Do not convert transcription files
     if (this->GetType() == Transcription) return;
 
@@ -1001,7 +1000,7 @@ void Doc::ConvertToCastOffMensuralDoc()
 void Doc::ConvertToUnCastOffMensuralDoc()
 {
     if (!m_isMensuralMusicOnly) return;
-    
+
     // Do not convert transcription files
     if (this->GetType() == Transcription || this->GetType() == Facs) return;
 

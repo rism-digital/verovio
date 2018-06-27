@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 ### Added
+* Support for `<subst>` with child (`<add>`, `<del>` or `<subst>`) to be selected with `substXPathQuery`
 * Support for `<dir>` and `<dynam>` connectors (triggered with `@next` and `@extender`)
 * Sutomatic positioning of rests within beam (@CCInc)
 * Fix for Plaine & Easie mensur changes in mensural notation

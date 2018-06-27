@@ -67,7 +67,7 @@ public:
      * the functor method. These not called by the Process/Call loop but by the implementaion
      * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
      */
-    
+
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */

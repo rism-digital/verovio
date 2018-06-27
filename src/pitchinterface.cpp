@@ -111,12 +111,11 @@ int PitchInterface::PitchDifferenceTo(PitchInterface *pi)
 //----------------------------------------------------------------------------
 // Static methods
 //----------------------------------------------------------------------------
-    
-    
+
 int PitchInterface::CalcLoc(LayerElement *layerElement, Layer *layer, bool topChordNote)
 {
     assert(layerElement);
-    
+
     if (layerElement->Is(CHORD)) {
         Chord *chord = dynamic_cast<Chord *>(layerElement);
         assert(chord);
@@ -136,7 +135,7 @@ int PitchInterface::CalcLoc(LayerElement *layerElement, Layer *layer, bool topCh
         return 0;
     }
 }
-    
+
 int PitchInterface::CalcLoc(data_PITCHNAME pname, int oct, int clefLocOffset)
 {
     // E.g., C4 with clef C1: (4 - 4 * 7) + (1 - 1) + 0;

@@ -107,6 +107,8 @@ public:
      */
     static std::map<std::string, NeumeGroup> s_neumes;
 
+    static std::string NeumeGroupToString(NeumeGroup group);
+
 private:
 };
 } // namespace vrv

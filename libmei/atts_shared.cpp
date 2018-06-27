@@ -6180,7 +6180,7 @@ bool AttStems::ReadStems(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("stem.len")) {
-        this->SetStemLen(StrToInt(element.attribute("stem.len").value()));
+        this->SetStemLen(StrToDbl(element.attribute("stem.len").value()));
         element.remove_attribute("stem.len");
         hasAttribute = true;
     }
@@ -6220,7 +6220,7 @@ bool AttStems::WriteStems(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasStemLen()) {
-        element.append_attribute("stem.len") = IntToStr(this->GetStemLen()).c_str();
+        element.append_attribute("stem.len") = DblToStr(this->GetStemLen()).c_str();
         wroteAttribute = true;
     }
     if (this->HasStemMod()) {
@@ -9046,7 +9046,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "stem.len") {
-            att->SetStemLen(att->StrToInt(attrValue));
+            att->SetStemLen(att->StrToDbl(attrValue));
             return true;
         }
         if (attrType == "stem.mod") {
@@ -10374,7 +10374,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("stem.dir", att->StemdirectionToStr(att->GetStemDir())));
         }
         if (att->HasStemLen()) {
-            attributes->push_back(std::make_pair("stem.len", att->IntToStr(att->GetStemLen())));
+            attributes->push_back(std::make_pair("stem.len", att->DblToStr(att->GetStemLen())));
         }
         if (att->HasStemMod()) {
             attributes->push_back(std::make_pair("stem.mod", att->StemmodifierToStr(att->GetStemMod())));

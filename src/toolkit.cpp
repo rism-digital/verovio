@@ -827,7 +827,7 @@ bool Toolkit::SetOptions(const std::string &json_options)
             LogError("Unsupported type for option '%s'", iter->first.c_str());
         }
     }
-    
+
     // Forcing font to be reset. Warning: SetOption("font") as a single option will not work.
     // This needs to be fixed
     if (!Resources::SetFont(m_options->m_font.GetValue())) {
@@ -959,7 +959,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     if (m_options->m_breaks.GetValue() == BREAKS_none) width = m_doc.GetAdjustedDrawingPageWidth();
     if (m_options->m_adjustPageHeight.GetValue() || (m_options->m_breaks.GetValue() == BREAKS_none))
         height = m_doc.GetAdjustedDrawingPageHeight();
-    
+
     if (m_doc.GetType() == Transcription) {
         width = m_doc.GetAdjustedDrawingPageWidth();
         height = m_doc.GetAdjustedDrawingPageHeight();
@@ -1217,7 +1217,8 @@ void Toolkit::SetHumdrumBuffer(const char *data)
     }
     if (file.getExinterpCount("mens")) {
         m_options->m_evenNoteSpacing.SetValue(true);
-    } else {
+    }
+    else {
         m_options->m_evenNoteSpacing.SetValue(false);
     }
 
