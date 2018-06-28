@@ -21,6 +21,7 @@
 #include "ending.h"
 #include "io.h"
 #include "runningelement.h"
+#include "section.h"
 #include "verse.h"
 #include "vrvdef.h"
 
@@ -433,6 +434,8 @@ protected:
     void initializeSpineColor(hum::HumdrumFile &infile);
     std::string getLayoutAccidental(hum::HTp token, int subtoken);
     void setStemLength(Note *note, hum::HTp token);
+    void storeExpansionLists(Section *section, hum::HTp starting);
+    void storeExpansionList(Section *section, hum::HTp etok);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -501,6 +504,9 @@ private:
 
     // m_sections stores segments of the music
     std::vector<Section *> m_sections;
+
+    // m_lastsection == The section label of the previous measure
+    string m_lastsection;
 
     //////////////////////////////
     //
@@ -614,6 +620,9 @@ private:
 
     // m_currentending == keep track of current ending.
     vrv::Ending *m_currentending = NULL;
+
+    // m_currentsection == keep track of current section.
+    vrv::Section *m_currentsection = NULL;
 
     // m_has_color_spine == true if a color spine is present.
     bool m_has_color_spine = false;

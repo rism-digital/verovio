@@ -51,6 +51,7 @@
 #include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
+#include "expansion.h"
 #include "fb.h"
 #include "fermata.h"
 #include "fig.h"
@@ -10602,10 +10603,14 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         addSystemKeyTimeChange(startline, endline);
     }
 
+    string previoussection = m_lastsection;
+    string currentsection = m_sectionlabels[startline];
+
     m_measure = new Measure();
 
     int endnum = 0;
     bool ending = false;
+    bool newsection = false;
     if (isdigit(m_sectionlabels[startline].back())) {
         ending = true;
         std::smatch matches;
@@ -10616,18 +10621,42 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
             endnum = 0;
         }
     }
+    else if (m_sectionlabels[startline] != m_lastsection) {
+        newsection = true;
+        if (m_lastsection != m_sectionlabels[startline]) {
+            if (m_sections.size() > 1) {
+                // keep movement-level section in stack.
+                m_sections.pop_back();
+            }
+        }
+        m_lastsection = m_sectionlabels[startline];
+    }
+
     if (ending && (m_endingnum != endnum)) {
         // create a new ending
         m_currentending = new Ending;
         setN(m_currentending, endnum);
         // sanitize id if not valid:
         m_currentending->SetUuid(m_sectionlabels[startline]);
+        if (m_sections.size() > 1) {
+            // assuming the ending does not start at beginning
+            // of music.
+            m_sections.pop_back();
+        }
         m_sections.back()->AddChild(m_currentending);
         m_currentending->AddChild(m_measure);
     }
     else if (isdigit(m_sectionlabels[startline].back())) {
         // inside a current ending
         m_currentending->AddChild(m_measure);
+    }
+    else if (newsection) {
+        // start a new section
+        m_currentsection = new Section;
+        m_currentsection->AddChild(m_measure);
+        m_currentsection->SetUuid(m_lastsection);
+        m_sections.back()->AddChild(m_currentsection);
+        m_sections.push_back(m_currentsection);
     }
     else {
         // outside of an ending
@@ -10884,6 +10913,11 @@ void HumdrumInput::setupMeiDocument()
     mdiv->AddChild(m_score);
     // the section
     Section *section = new Section();
+    hum::HTp starting = m_infile.getTrackStart(1);
+    if (starting) {
+        section->SetUuid(getLocationId(section, starting, -1));
+        storeExpansionLists(section, starting);
+    }
     m_sections.push_back(section);
     m_score->AddChild(m_sections.back());
     m_leftbarstyle = BARRENDITION_NONE;
@@ -11834,6 +11868,103 @@ void HumdrumInput::checkForColorSpine(hum::HumdrumFile &infile)
     std::vector<hum::HTp> colorspines;
     infile.getSpineStartList(colorspines, "**color");
     m_has_color_spine = colorspines.empty() ? false : true;
+}
+
+//////////////////////////////
+//
+// storeExpansionLists --
+//
+
+void HumdrumInput::storeExpansionLists(Section *section, hum::HTp starting)
+{
+    hum::HTp current = starting;
+    while (current) {
+        if (current->isData()) {
+            // only look for expansion lists before first data line
+            break;
+        }
+        if (!current->isInterpretation()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (current->compare(0, 2, "*>") != 0) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (current->find("[") == std::string::npos) {
+            current = current->getNextToken();
+            continue;
+        }
+        storeExpansionList(section, current);
+        current = current->getNextToken();
+    }
+}
+
+//////////////////////////////
+//
+// storeExpansionList --
+//
+
+void HumdrumInput::storeExpansionList(Section *section, hum::HTp etok)
+{
+    string expansion = *etok;
+    string variant;
+    int startindex = -1;
+    for (int i = 2; i < (int)expansion.size(); i++) {
+        if (expansion[i] == '[') {
+            startindex = i + 1;
+            break;
+        }
+        variant += expansion[i];
+    }
+    if (startindex < 0) {
+        return;
+    }
+    std::vector<std::string> labels(1);
+    for (int i = startindex; i < (int)expansion.size(); i++) {
+        if (isspace(expansion[i])) {
+            continue;
+        }
+        else if (expansion[i] == '"') {
+            // invalid character
+            continue;
+        }
+        else if (expansion[i] == '\'') {
+            // invalid character
+            continue;
+        }
+        else if (expansion[i] == ',') {
+            if (!labels.back().empty()) {
+                // avoid syntax error from a null label.
+                labels.push_back("");
+            }
+        }
+        else if (expansion[i] == ']') {
+            break;
+        }
+        else {
+            labels.back() += expansion[i];
+        }
+    }
+
+    if (labels.empty()) {
+        return;
+    }
+    if ((labels.size() == 1) && labels[0].empty()) {
+        return;
+    }
+
+    Expansion *exp = new Expansion;
+    exp->SetUuid(getLocationId(exp, etok, -1));
+    section->AddChild(exp);
+    if (!variant.empty()) {
+        exp->SetType(variant);
+    }
+
+    for (int i = 0; i < (int)labels.size(); i++) {
+        string ref = "#" + labels[i];
+        exp->AddRefAllowDuplicate(ref);
+    }
 }
 
 #endif /* NO_HUMDRUM_SUPPORT */
