@@ -4772,8 +4772,11 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
     // store artics in random access grid, along with their staff positions:
     vector<int> articloc(256, 0);
     vector<int> articpos(256, 0);
+    vector<int> articges(256, 0); // is it a gestural articulation?
     char ch;
     char posch;
+    char pos2ch;
+    char pos3ch;
     int tsize = (int)((string *)token)->size();
     for (int i = 0; i < tsize; ++i) {
         ch = token->at(i);
@@ -4788,12 +4791,27 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             i++;
         }
         else if ((ch == '\'') && (posch == '\'')) {
-            // staccatissimo alternate
+            // staccatissimo alternate (eventually remove)
             ch = '`';
             posch = i < tsize - 2 ? token->at(i + 2) : 'g';
             i++;
         }
         articloc.at(ch) = i + 1;
+
+        if (posch) {
+            // check for gestural articulations
+            pos2ch = i < tsize - 2 ? token->at(i + 2) : 0;
+            pos3ch = i < tsize - 3 ? token->at(i + 3) : 0;
+            if ((posch == 'y') && (pos2ch != 'y')) {
+                articges[ch] = 1;
+            }
+            else if ((posch == m_signifiers.above) && (pos2ch == 'y') && (pos3ch != 'y')) {
+                articges[ch] = 1;
+            }
+            else if ((posch == m_signifiers.below) && (pos2ch == 'y') && (pos3ch != 'y')) {
+                articges[ch] = 1;
+            }
+        }
 
         if ((posch != 0) && (posch == m_signifiers.above)) {
             articpos.at(ch) = 1;
@@ -4809,51 +4827,68 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
     // second position is the staff position (-1=below, 0=undefined, 1=above)
     std::vector<data_ARTICULATION> artics;
     std::vector<int> positions;
+    std::vector<int> gestural;
 
     // place articulations in stacking order (nearest to furthest from note):
     if (articloc['\'']) {
         artics.push_back(ARTICULATION_stacc);
         positions.push_back(articpos['\'']);
+        gestural.push_back(articges['\'']);
     }
     if (articloc['`']) {
         artics.push_back(ARTICULATION_stacciss);
         positions.push_back(articpos['`']);
+        gestural.push_back(articges['`']);
     }
     if (articloc['~']) {
         artics.push_back(ARTICULATION_ten);
         positions.push_back(articpos['~']);
+        gestural.push_back(articges['~']);
     }
     if (articloc[6]) {
         artics.push_back(ARTICULATION_marc);
         positions.push_back(articpos[6]);
+        gestural.push_back(articges['6']);
     }
     if (articloc['^']) {
         artics.push_back(ARTICULATION_acc);
         positions.push_back(articpos['^']);
+        gestural.push_back(articges['^']);
     }
     if (articloc['o']) {
         artics.push_back(ARTICULATION_harm);
         positions.push_back(articpos['o']);
+        gestural.push_back(articges['o']);
     }
     if (articloc['v']) {
         artics.push_back(ARTICULATION_upbow);
         positions.push_back(articpos['v']);
+        gestural.push_back(articges['v']);
     }
     if (articloc['u']) {
         artics.push_back(ARTICULATION_dnbow);
         positions.push_back(articpos['u']);
+        gestural.push_back(articges['u']);
     }
 
     if (artics.empty()) {
         return;
     }
 
+    Artic *artic = NULL;
     if (artics.size() == 1) {
         // single articulation, so no problem
-
-        Artic *artic = new Artic;
-        appendElement(element, artic);
-        artic->SetArtic(artics);
+        if (gestural.at(0)) {
+            // When enabled in artic, set gestrual articulation.
+            // For now do not store gestural articulation in MEI:
+            // artic->SetArticGes(artics);
+            return;
+        }
+        else {
+            artic = new Artic;
+            appendElement(element, artic);
+            artic->SetArtic(artics);
+        }
         if (positions.at(0) > 0) {
             setPlace(artic, "above");
         }
@@ -4863,6 +4898,13 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         setLocationId(artic, token);
         return;
     }
+
+    if (artic == NULL) {
+        artic = new Artic;
+        appendElement(element, artic);
+    }
+
+    // Handle gestural articulations below when there are multiple articulations.
 
     // more than one articulation, so categorize them by placement.
 
