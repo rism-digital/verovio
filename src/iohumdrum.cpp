@@ -4263,6 +4263,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
             }
             if (trest) {
+                processDynamics(trest, staffindex);
                 setLocationId(mrest, trest);
                 if (m_doc->GetOptions()->m_humType.GetValue()) {
                     embedQstampInClass(mrest, trest, *trest);
@@ -6236,14 +6237,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 }
             }
             else {
-                // no endpoint so print as the word "dim."
+                // no endpoint so print as the word "decresc."
                 Dir *dir = new Dir;
                 m_measure->AddChild(dir);
                 setStaff(dir, m_currentstaff);
                 setLocationId(dir, line->token(i));
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 dir->SetTstamp(tstamp.getFloat());
-                addTextElement(dir, "dim.");
+                addTextElement(dir, "decresc.");
             }
         }
     }
@@ -7875,7 +7876,9 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
 //
 // Controls that this function deals with:
 //    *above = Force all dynamics above staff.
-//    *below = Force all dynamics above staff.
+//    *above2 = Force all dynamics above staff below top one
+//    *below = Force all dynamics below the staff.
+//    *below2 = Force all dynamics below staff below top one
 //    *center = Force all dynamics to be centered between this staff and the one below.
 //
 
