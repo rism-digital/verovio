@@ -192,6 +192,12 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             } 
         }
 
+        if (clef->HasFacs()) { // adjust facsimile for clef (if it exists)
+            Zone *zone = clef->GetZone();
+            assert(zone);
+            zone->ShiftByXY(x, (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize);
+        }
+
         return true;
     }
     LogWarning("Unsupported element for dragging.");
