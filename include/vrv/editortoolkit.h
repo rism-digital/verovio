@@ -36,6 +36,7 @@ public:
     ///@{
     bool Drag(std::string elementId, int x, int y);
     bool Insert(std::string elementType, std::string startId, std::string endId);
+    bool Insert(std::string elementType, std::string staffId, int ulx, int uly);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     ///@}
 #endif
@@ -49,6 +50,7 @@ protected:
     ///@{
     bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
+    bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
     ///@}
 #endif

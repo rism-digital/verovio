@@ -24,6 +24,7 @@
 #include "slur.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "syllable.h"
 #include "vrv.h"
 
 //--------------------------------------------------------------------------------
@@ -58,11 +59,14 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         }    
     }
     else if (action == "insert") {
-        std::string elementType, startId, endId;
+        std::string elementType, startId, endId, staffId;
+        int ulx, uly;
         if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &startId, &endId)) {
             return this->Insert(elementType, startId, endId);
         }
-
+        else if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly)) {
+            return this->Insert(elementType, staffId, ulx, uly);
+        }
     }
     else if (action == "set") {
         std::string elementId, attrType, attrValue;
@@ -238,6 +242,89 @@ bool EditorToolkit::Insert(std::string elementType, std::string startid, std::st
     return false;
 }
 
+bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx, int uly)
+{
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get drawing page");
+        return false;
+    }
+    if (m_doc->GetFacsimile() == nullptr) {
+        LogError("Drawing page without facsimile");
+        return false;
+    }
+
+    Staff *staff = dynamic_cast<Staff *>(m_doc->FindChildByUuid(staffId));
+    assert(staff);
+    Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    assert(layer);
+    Facsimile *facsimile = m_doc->GetFacsimile();
+    Zone *zone = new Zone();
+
+    if (elementType == "nc") {
+        Syllable *syllable = new Syllable();
+        Neume *neume = new Neume();
+        Nc *nc = new Nc();
+
+        // Find closest valid clef
+        ArrayOfObjects clefs;
+        AttComparison ac(CLEF);
+        layer->FindAllChildByComparison(&clefs, &ac);
+        Clef *clef = nullptr;
+
+        for (auto it = clefs.begin(); it != clefs.end(); it++) {
+            Clef *current = dynamic_cast<Clef *>(*it);
+            assert(current);
+            if (current->GetZone()->GetUlx() < ulx) {
+                if (clef == nullptr || clef->GetZone()->GetUlx() < current->GetZone()->GetUlx())
+                    clef = current;
+            }
+        }
+
+        if (clef == nullptr) {
+            LogError("There is no valid clef available.");
+            delete syllable;
+            delete neume;
+            delete nc;
+            return false;
+        }
+    
+        nc->SetOct(3);
+        if (clef->GetShape() == CLEFSHAPE_C) {
+            nc->SetPname(PITCHNAME_c);
+        }
+        else if (clef->GetShape() == CLEFSHAPE_F) {
+            nc->SetPname(PITCHNAME_f);
+        }
+
+        const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        const int pitchDifference = round((double) (clef->GetZone()->GetUly() - uly) / (double) staffSize);
+        nc->AdjustPitchByOffset(pitchDifference);
+
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+
+        // Set up facsimile
+        zone->SetUlx(ulx);
+        zone->SetUly(uly);
+        zone->SetLrx(ulx + noteWidth);
+        zone->SetLry(uly + noteHeight);
+        nc->SetZone(zone);
+        nc->SetFacs(zone->GetUuid());
+        Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
+        assert(surface);
+        surface->AddChild(zone);
+
+        neume->AddChild(nc);
+        syllable->AddChild(neume);
+        layer->AddChild(syllable);
+        return true;
+    }
+    else {
+        LogError("Unsupported type '%s' for insertion", elementType.c_str());
+        return false;
+    }
+}
+
 bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string attrValue)
 {
     if (!m_doc->GetDrawingPage()) return false;
@@ -295,6 +382,20 @@ bool EditorToolkit::ParseInsertAction(
     (*startId) = param.get<jsonxx::String>("startid");
     if (!param.has<jsonxx::String>("endid")) return false;
     (*endId) = param.get<jsonxx::String>("endid");
+    return true;
+}
+
+bool EditorToolkit::ParseInsertAction(
+    jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly)
+{
+    if (!param.has<jsonxx::String>("elementType")) return false;
+    (*elementType) = param.get<jsonxx::String>("elementType");
+    if (!param.has<jsonxx::String>("staffId")) return false;
+    (*staffId) = param.get<jsonxx::String>("staffId");
+    if (!param.has<jsonxx::Number>("ulx")) return false;
+    (*ulx) = param.get<jsonxx::Number>("ulx");
+    if (!param.has<jsonxx::Number>("uly")) return false;
+    (*uly) = param.get<jsonxx::Number>("uly");
     return true;
 }
 
