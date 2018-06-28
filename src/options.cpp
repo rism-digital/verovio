@@ -621,7 +621,7 @@ Options::Options()
     this->Register(&m_slurCurveFactor, "slurCurveFactor", &m_generalLayout);
     
     m_slurHeightFactor.SetInfo("Slur height factor", "Slur height factor -  high value means flatter slurs");
-    m_slurHeightFactor.Init(8,1,100);
+    m_slurHeightFactor.Init(5,1,100);
     this->Register(&m_slurHeightFactor, "slurHeightFactor", &m_generalLayout);
     
     m_slurMinHeight.SetInfo("Slur min height", "The minimum slur height in MEI units");
