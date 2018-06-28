@@ -10242,7 +10242,7 @@ void HumdrumInput::addTrill(hum::HTp token)
     appendElement(m_measure, trill);
     setStaff(trill, staff);
 
-    // int staffindex = m_currentstaff - 1;
+    int staffindex = m_currentstaff - 1;
     int layer = m_currentlayer;
 
     if (layer == 2) {
@@ -10293,13 +10293,25 @@ void HumdrumInput::addTrill(hum::HTp token)
         return;
     }
 
-    // find the ending note after the trill line.  Multiple trill line extensions for chord notes
-    // are not handled by this algorithm, but these should be rare in notation.
+    // Find the ending note after the trill line.  Multiple trill line extensions for chord notes
+    // are not handled by this algorithm, but these should be rare in notation.  Trills that cross
+    // barlines require @tstamp2 rather than @endid to display (possibly a bug in verovio).
     hum::HTp endtok = token->getNextToken();
     hum::HTp lasttok = token;
+    hum::HTp bartok = NULL;
+    int barlinecount = 0;
+    bool foundbarline = false;
+    bool nextnoteafterbarline = false;
     while (endtok) {
+        if (endtok->isBarline()) {
+            foundbarline = true;
+            nextnoteafterbarline = true;
+            bartok = endtok;
+            barlinecount++;
+        }
         if (!endtok->isData()) {
             endtok = endtok->getNextToken();
+            nextnoteafterbarline = false;
             continue;
         }
         if (endtok->isNull()) {
@@ -10316,14 +10328,38 @@ void HumdrumInput::addTrill(hum::HTp token)
         return;
     }
 
-    // assuming last note is not in a chord.  Might be a problem if a rest.
-    trill->SetEndid("#" + getLocationId("note", endtok, -1));
+    bool isgracenote = endtok->find('q') == std::string::npos ? false : true;
+    bool isrest = endtok->isRest();
 
-    // For setting trill@tstamp2:
-    // hum::HumNum tstamp2 = getMeasureTstampPlusDur(lasttok, staffindex);
-    // int measures = getMeasureDifference(token, lasttok);
-    // std::pair<int, double> ts2(measures, tstamp2.getFloat());
-    // trill->SetTstamp2(ts2);
+    if (isgracenote && (!foundbarline) && (!isrest)) {
+        // assuming last note is not in a chord.
+        trill->SetEndid("#" + getLocationId("note", endtok, -1));
+    }
+    else if (isrest && !foundbarline) {
+        // use @tstamp2 because @endid does not work in verovio for rests.
+        hum::HumNum tstamp2 = getMeasureTstampPlusDur(lasttok, staffindex);
+        int measures = getMeasureDifference(token, lasttok);
+        std::pair<int, double> ts2(measures, tstamp2.getFloat());
+        trill->SetTstamp2(ts2);
+    }
+    else if (foundbarline && (barlinecount == 1) && nextnoteafterbarline) {
+        // end trill extender before barline
+        hum::HumNum tstamp2 = getMeasureTstampPlusDur(bartok->getPreviousToken(), staffindex);
+        int measures = 0;
+        std::pair<int, double> ts2(measures, tstamp2.getFloat());
+        trill->SetTstamp2(ts2);
+    }
+    else {
+        // The line extension crosses a barline, so need to use @tstamp2;
+        // otherwise verovio will not display the line extension.
+        hum::HumNum tstamp2 = getMeasureTstampPlusDur(lasttok, staffindex);
+        int measures = getMeasureDifference(token, lasttok);
+        std::pair<int, double> ts2(measures, tstamp2.getFloat());
+        trill->SetTstamp2(ts2);
+    }
+    // Need to add another case when extender crosses a barline and ends before
+    // a grace note.  This requires @endid since @tstamp2 will not work, as that
+    // will extend to the note after the grace note(s) at the same tstamp.
 }
 
 //////////////////////////////
