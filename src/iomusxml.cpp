@@ -639,11 +639,13 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
     int nbStaves = 1;
 
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
+        
         // We read all attribute elements until we reach something else
-        // barline, print, and sound elements may be present
-        if (!IsElement(*it, "attributes") && !IsElement(*it, "barline") && !IsElement(*it, "print")
-            && !IsElement(*it, "sound"))
+        // barline, direction, print, and sound elements may be present
+        if (!IsElement(*it, "attributes") && !IsElement(*it, "barline") && !IsElement(*it, "direction") && !IsElement(*it, "print")
+            && !IsElement(*it, "sound")) {
             break;
+        }
 
         // we do not want to read it again, just change the name
         if (IsElement(*it, "attributes")) it->set_name("mei-read");
