@@ -242,6 +242,34 @@ bool EditorToolkit::Insert(std::string elementType, std::string startid, std::st
     return false;
 }
 
+int distanceToBB(int x, int y, int ulx, int uly, int lrx, int lry)
+{
+    int xDiff = std::max(
+            (ulx > x ? ulx - x : 0),
+            (x > lrx ? x - lrx : 0)
+    );
+    int yDiff = std::max(
+            (uly > y ? uly - y : 0),
+            (y > lry ? y - lry : 0)
+    );
+
+    return sqrt(xDiff * xDiff + yDiff * yDiff);
+}
+
+struct closestBB {
+    int x;
+    int y;
+    bool operator() (Object *a, Object *b) {
+        if (!a->GetFacsimileInterface() || !b->GetFacsimileInterface()) return true;
+        Zone *zoneA = a->GetFacsimileInterface()->GetZone();
+        Zone *zoneB = b->GetFacsimileInterface()->GetZone();
+
+        int distA = distanceToBB(x, y, zoneA->GetUlx(), zoneA->GetUly(), zoneA->GetLrx(), zoneA->GetLry());
+        int distB = distanceToBB(x, y, zoneB->GetUlx(), zoneB->GetUly(), zoneB->GetLrx(), zoneB->GetLry());
+        return (distA < distB);
+    }
+};
+
 bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx, int uly)
 {
     if (!m_doc->GetDrawingPage()) {
@@ -253,7 +281,25 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         return false;
     }
 
-    Staff *staff = dynamic_cast<Staff *>(m_doc->FindChildByUuid(staffId));
+    Staff *staff;
+
+    // Find closest valid staff
+    if (staffId == "auto") {
+        ArrayOfObjects staves;
+        AttComparison ac(STAFF);
+        m_doc->FindAllChildByComparison(&staves, &ac);
+
+        closestBB comp;
+        comp.x = ulx;
+        comp.y = uly;
+
+        std::sort(staves.begin(), staves.end(), comp);
+        staff = dynamic_cast<Staff *>(staves.at(0));
+    }
+    else {
+        staff = dynamic_cast<Staff *>(m_doc->FindChildByUuid(staffId));
+    }
+
     assert(staff);
     Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
     assert(layer);
