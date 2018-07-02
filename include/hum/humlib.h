@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jun 28 23:29:33 PDT 2018
+// Last Modified: Mon Jul  2 12:02:51 CEST 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -409,30 +409,30 @@ class HumRegex {
 
 		// searching
 		// http://www.cplusplus.com/reference/regex/regex_search
-		bool        search             (const std::string& input, const std::string& exp);
-		bool        search             (const std::string& input, const std::string& exp,
+		int         search             (const std::string& input, const std::string& exp);
+		int         search             (const std::string& input, const std::string& exp,
 		                                const std::string& options);
-		bool        search             (const std::string& input, int startindex,
+		int         search             (const std::string& input, int startindex,
 		                                const std::string& exp);
-		bool        search             (const std::string& input, int startindex,
+		int         search             (const std::string& input, int startindex,
 		                                const std::string& exp,
 		                                const std::string& options);
 
-		bool        search             (std::string* input, const std::string& exp);
-		bool        search             (std::string* input, const std::string& exp,
+		int         search             (std::string* input, const std::string& exp);
+		int         search             (std::string* input, const std::string& exp,
 		                                const std::string& options);
-		bool        search             (std::string* input, int startindex,
+		int         search             (std::string* input, int startindex,
 		                                const std::string& exp);
-		bool        search             (std::string* input, int startindex,
+		int         search             (std::string* input, int startindex,
 		                                const std::string& exp,
 		                                const std::string& options);
 
 		int         getMatchCount      (void);
-		std::string      getMatch           (int index);
+		std::string getMatch           (int index);
 		int         getMatchInt        (int index);
 		double      getMatchDouble     (int index);
-		std::string      getPrefix          (void);
-		std::string      getSuffix          (void);
+		std::string getPrefix          (void);
+		std::string getSuffix          (void);
 		int         getMatchStartIndex (int index = 0);
 		int         getMatchEndIndex   (int index = 0);
 		int         getMatchLength     (int index = 0);

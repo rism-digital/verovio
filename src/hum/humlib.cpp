@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jun 28 23:29:33 PDT 2018
+// Last Modified: Mon Jul  2 12:02:51 CEST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -11088,31 +11088,46 @@ void HumRegex::unsetGlobal(void) {
 //////////////////////////////
 //
 // HumRegex::search -- Search for the regular expression in the
-//    input string.  Returns true if any matches were found.  Search
-//    results can be accessed with .getSubmatchCount() and .getSubmatch(index).
+//    input string.  Returns the character position + 1 of the first match if any found.
+//    Search results can be accessed with .getSubmatchCount() and .getSubmatch(index).
 //
 
-bool HumRegex::search(const string& input, const string& exp) {
+int HumRegex::search(const string& input, const string& exp) {
 	m_regex = regex(exp, m_regexflags);
-	return regex_search(input, m_matches, m_regex, m_searchflags);
+	bool result = regex_search(input, m_matches, m_regex, m_searchflags);
+	if (!result) {
+		return 0;
+	} else if (m_matches.size() < 1) {
+		return 0;
+	} else {
+		// return the char+1 position of the first match
+		return m_matches.position(0) + 1;
+	}
 }
 
 
-bool HumRegex::search(const string& input, int startindex,
+int HumRegex::search(const string& input, int startindex,
 		const string& exp) {
 	m_regex = regex(exp, m_regexflags);
 	auto startit = input.begin() + startindex;
 	auto endit   = input.end();
-	return regex_search(startit, endit, m_matches, m_regex, m_searchflags);
+	bool result = regex_search(startit, endit, m_matches, m_regex, m_searchflags);
+	if (!result) {
+		return 0;
+	} else if (m_matches.size() < 1) {
+		return 0;
+	} else {
+		return m_matches.position(0) + 1;
+	}
 }
 
 
-bool HumRegex::search(string* input, const string& exp) {
+int HumRegex::search(string* input, const string& exp) {
 	return HumRegex::search(*input, exp);
 }
 
 
-bool HumRegex::search(string* input, int startindex, const string& exp) {
+int HumRegex::search(string* input, int startindex, const string& exp) {
 	return HumRegex::search(*input, startindex, exp);
 }
 
@@ -11120,29 +11135,43 @@ bool HumRegex::search(string* input, int startindex, const string& exp) {
 // This version of HumRegex allows for setting the options temporarily.
 //
 
-bool HumRegex::search(const string& input, const string& exp,
+int HumRegex::search(const string& input, const string& exp,
 		const string& options) {
 	m_regex = regex(exp, getTemporaryRegexFlags(options));
-	return regex_search(input, m_matches, m_regex, getTemporarySearchFlags(options));
+	bool result = regex_search(input, m_matches, m_regex, getTemporarySearchFlags(options));
+	if (!result) {
+		return 0;
+	} else if (m_matches.size() < 1) {
+		return 0;
+	} else {
+		return m_matches.position(0) + 1;
+	}
 }
 
 
-bool HumRegex::search(const string& input, int startindex, const string& exp,
+int HumRegex::search(const string& input, int startindex, const string& exp,
 		const string& options) {
 	m_regex = regex(exp, getTemporaryRegexFlags(options));
 	auto startit = input.begin() + startindex;
 	auto endit   = input.end();
-	return regex_search(startit, endit, m_matches, m_regex, getTemporarySearchFlags(options));
+	bool result = regex_search(startit, endit, m_matches, m_regex, getTemporarySearchFlags(options));
+	if (!result) {
+		return 0;
+	} else if (m_matches.size() < 1) {
+		return 0;
+	} else {
+		return m_matches.position(0) + 1;
+	}
 }
 
 
-bool HumRegex::search(string* input, const string& exp,
+int HumRegex::search(string* input, const string& exp,
 		const string& options) {
 	return HumRegex::search(*input, exp, options);
 }
 
 
-bool HumRegex::search(string* input, int startindex, const string& exp,
+int HumRegex::search(string* input, int startindex, const string& exp,
 		const string& options) {
 	return HumRegex::search(*input, startindex, exp, options);
 }
@@ -49415,7 +49444,7 @@ void Tool_myank::printInvisibleMeasure(HumdrumFile& infile, int line) {
 		}
 		if (hre.search(infile.token(line, j), "(=\\d*)(.*)", "")) {
 			m_humdrum_text << hre.getMatch(1);
-			m_humdrum_text << "-";
+			// m_humdrum_text << "-";
 			m_humdrum_text << hre.getMatch(2);
 		} else {
 			m_humdrum_text << infile.token(line, j);
@@ -49962,8 +49991,7 @@ void Tool_myank::expandMeasureOutList(vector<MeasureInfo>& measureout,
 	// find the largest measure number in the score
 	int maxmeasure = -1;
 	int minmeasure = -1;
-	int i;
-	for (i=0; i<(int)measurein.size(); i++) {
+	for (int i=0; i<(int)measurein.size(); i++) {
 		if (maxmeasure < measurein[i].num) {
 			maxmeasure = measurein[i].num;
 		}
@@ -49987,8 +50015,7 @@ void Tool_myank::expandMeasureOutList(vector<MeasureInfo>& measureout,
 		}
 		exit(0);
 	} else if (minQ) {
-		int ii;
-		for (ii=0; ii<infile.getLineCount(); ii++) {
+		for (int ii=0; ii<infile.getLineCount(); ii++) {
 			if (infile[ii].isBarline()) {
 				if (hre.search(infile.token(ii, 0), "=\\d", "")) {
 					break;
@@ -50013,7 +50040,7 @@ void Tool_myank::expandMeasureOutList(vector<MeasureInfo>& measureout,
 	// create reverse-lookup list
 	vector<int> inmap(maxmeasure+1);
 	fill(inmap.begin(), inmap.end(), -1);
-	for (i=0; i<(int)measurein.size(); i++) {
+	for (int i=0; i<(int)measurein.size(); i++) {
 		inmap[measurein[i].num] = i;
 	}
 
@@ -50037,7 +50064,7 @@ void Tool_myank::expandMeasureOutList(vector<MeasureInfo>& measureout,
 		start += (int)hre.getMatch(1).size();
 		processFieldEntry(range, hre.getMatch(1), infile, maxmeasure,
 			 measurein, inmap);
-		value = hre.search(ostring.c_str() + start, "^([^,]+,?)");
+		value = hre.search(ostring, start, "^([^,]+,?)");
 	}
 }
 

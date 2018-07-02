@@ -6020,6 +6020,8 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         }
         line->token(i)->setValue("auto", "DY", "processed", "true");
 
+        // int pcount = line->token(i)->getLinkedParameterCount();
+
         std::string hairpins;
         std::string letters;
         for (int i = 0; i < (int)tok.size(); ++i) {
@@ -6097,11 +6099,21 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             bool aboveQ = hasAboveParameter(line->token(i), "DY");
             bool belowQ = hasBelowParameter(line->token(i), "DY");
 
+            // if pcount > 0, then search for prefix and postfix text
+            // to add to the dynamic.
+            // string prefix = "aaa ";
+            // string postfix = " bbb";
+            // See https://github.com/music-encoding/music-encoding/issues/540
+
             Dynam *dynam = new Dynam;
             m_measure->AddChild(dynam);
             setStaff(dynam, m_currentstaff);
             setLocationId(dynam, line->token(i), -1);
+
+            // addTextElement(dynam, prefix);
             addTextElement(dynam, dynamic);
+            // addTextElement(dynam, postfix);
+
             hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
             dynam->SetTstamp(barstamp.getFloat());
 
