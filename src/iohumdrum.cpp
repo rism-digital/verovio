@@ -10502,6 +10502,7 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
     int track = token->getTrack();
     int staffnum = m_rkern[track];
     std::string noteuuid = note->GetUuid();
+    bool disjunct = token->find("]]") != std::string::npos;
 
     int pitch = hum::Convert::kernToMidiNoteNumber(tstring);
     int layer = m_currentlayer;
@@ -10515,7 +10516,11 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
         if (it->getPitch() != pitch) {
             continue;
         }
-        if (it->getEndTime() == timestamp) {
+        if (disjunct && (it->getStartTokenPointer()->find("[[") != std::string::npos)) {
+            found = it;
+            break;
+        }
+        else if (it->getEndTime() == timestamp) {
             found = it;
             break;
         }
@@ -10527,7 +10532,11 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
             if (it->getPitch() != pitch) {
                 continue;
             }
-            if (it->getEndTime() == timestamp) {
+            if (disjunct && (it->getStartTokenPointer()->find("[[") != std::string::npos)) {
+                found = it;
+                break;
+            }
+            else if (it->getEndTime() == timestamp) {
                 found = it;
                 break;
             }
