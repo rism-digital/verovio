@@ -49,6 +49,13 @@ void PlistInterface::AddRef(std::string ref)
     }
 }
 
+void PlistInterface::AddRefAllowDuplicate(const std::string &ref)
+{
+    xsdAnyURI_List references = this->GetPlist();
+    references.push_back(ref);
+    this->SetPlist(references);
+}
+
 void PlistInterface::SetRef(Object *ref)
 {
     if (!IsValidRef(ref)) {

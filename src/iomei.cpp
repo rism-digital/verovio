@@ -930,6 +930,7 @@ void MeiOutput::WriteExpansion(pugi::xml_node currentNode, Expansion *expansion)
 {
     assert(expansion);
 
+    WritePlistInterface(currentNode, expansion);
     WriteSystemElement(currentNode, expansion);
 }
 

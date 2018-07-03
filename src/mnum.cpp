@@ -52,6 +52,8 @@ void MNum::Reset()
     ResetColor();
     ResetLang();
     ResetTypography();
+
+    m_isGenerated = false;
 }
 
 void MNum::AddChild(Object *child)
