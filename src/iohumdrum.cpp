@@ -5385,7 +5385,6 @@ void HumdrumInput::addOrnamentMarkers(hum::HTp token)
 
 void HumdrumInput::addSpace(std::vector<string> &elements, std::vector<void *> &pointers, hum::HumNum duration)
 {
-
     bool visible = false;
     if ((!m_signifiers.ispace_color.empty()) || (!m_signifiers.space_color.empty())) {
         visible = true;
@@ -8272,6 +8271,18 @@ void HumdrumInput::getTimingInformation(std::vector<hum::HumNum> &prespace, std:
     if (layerdata.size() > 0) {
         prespace.resize(prespace.size() + 1);
         prespace.back() = layerendtime - startdur.back() - duration.back();
+    }
+
+    // See https://github.com/humdrum-tools/verovio-humdrum-viewer/issues/124
+    // This solution may need to be changed for a more general solution.
+    for (int i = 0; i < (int)prespace.size() - 1; i++) {
+        if (prespace[i] == 0) {
+            continue;
+        }
+        if ((prespace[i] + prespace[i + 1]) == 0) {
+            prespace[i] = 0;
+            prespace[i + 1] = 0;
+        }
     }
 }
 
