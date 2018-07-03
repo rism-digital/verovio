@@ -948,16 +948,15 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(slur, "spanning-slur", "");
+    
     DrawThickBezierCurve(dc, points, thickness, staff->m_drawingStaffSize, angle);
 
     /* drawing debug points */
     /*
     int i;
-    int dist = (points[3].x - points[0].x) / 10;
-    for (i = 0; i < 10; ++i) {
-        int x = points[0].x + (i * dist);
-        int y = BoundingBox::CalcBezierAtPosition(points, x);
-        DrawDot(dc, x, y, staff->m_drawingStaffSize);
+    for (i = 0; i <= 10; ++i) {
+        Point p = BoundingBox::CalcDeCasteljau(points, (double)i / 10.0);
+        DrawDot(dc, p.x, p.y, staff->m_drawingStaffSize);
     }
     */
 

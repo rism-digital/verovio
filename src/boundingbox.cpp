@@ -24,8 +24,6 @@
 
 namespace vrv {
 
-int BoundingBox::s_deCasteljau[4][4];
-
 //----------------------------------------------------------------------------
 // BoundingBox
 //----------------------------------------------------------------------------
@@ -719,21 +717,24 @@ pow (t, 3)* bezier[3].y;
 
 int BoundingBox::CalcBezierAtPosition(const Point bezier[4], int x)
 {
-    int i, j;
     double t = 0.0;
     // avoid division by 0
     if (bezier[3].x != bezier[0].x) t = (double)(x - bezier[0].x) / (double)(bezier[3].x - bezier[0].x);
     t = std::min(1.0, std::max(0.0, t));
-    int n = 4;
-
-    for (i = 0; i < n; ++i) BoundingBox::s_deCasteljau[0][i] = bezier[i].y;
-    for (j = 1; j < n; ++j) {
-        for (int i = 0; i < 4 - j; ++i) {
-            BoundingBox::s_deCasteljau[j][i]
-                = BoundingBox::s_deCasteljau[j - 1][i] * (1 - t) + BoundingBox::s_deCasteljau[j - 1][i + 1] * t;
-        }
-    }
-    return BoundingBox::s_deCasteljau[n - 1][0];
+    
+    Point p = BoundingBox::CalcDeCasteljau(bezier, t);
+    
+    return p.y;
+}
+    
+Point BoundingBox::CalcDeCasteljau(const Point bezier[4], double t)
+{
+    Point p;
+    
+    p.x = pow((1 - t), 3) * bezier[0].x + 3 * t * pow((1 - t), 2) * bezier[1].x + 3 * (1 - t) * pow(t, 2) * bezier[2].x + pow (t, 3) * bezier[3].x;
+    p.y = pow((1 - t), 3) * bezier[0].y + 3 * t * pow((1 - t), 2) * bezier[1].y + 3 * (1 - t) * pow(t, 2) * bezier[2].y + pow (t, 3) * bezier[3].y;
+    
+    return p;
 }
 
 void BoundingBox::CalcThickBezier(
