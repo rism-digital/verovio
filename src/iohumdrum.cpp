@@ -5959,35 +5959,69 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         forceAboveQ = true;
     }
 
-    // Handle "z" for sforzando (sf). Could also be rendered as (sfz), but deal
-    // with that later, such as maybe make "zz" mean (sfz).
+    // Handle "z" for sforzando (sf), or "zz" for sfz:
 
-    if (token->find("z") != string::npos) {
-        if (token->find("zy") == string::npos) { // don't show invisible sfz.
+    bool aboveQ = false;
+    bool belowQ = false;
 
-            bool aboveQ = hasAboveParameter(token, "DY");
-            bool belowQ = hasBelowParameter(token, "DY");
+    auto loc = token->rfind("z");
+    if (token->find("zy") != string::npos) {
+        // don't show invisible sfz.
+        // do nothing
+    }
+    else if (loc != string::npos) {
+        int subtrack = token->getSubtrack();
+        switch (subtrack) {
+            case 1:
+                aboveQ = true;
+                belowQ = false;
+                break;
+            case 2:
+                belowQ = true;
+                aboveQ = false;
+                break;
+        }
+        if (hasAboveParameter(token, "DY")) {
+            aboveQ = true;
+            belowQ = false;
+        }
+        if (hasBelowParameter(token, "DY")) {
+            aboveQ = false;
+            belowQ = true;
+        }
+        if (m_signifiers.below && (loc < token->size() - 1) && (token->at(loc + 1) == m_signifiers.below)) {
+            aboveQ = false;
+            belowQ = true;
+        }
+        if (m_signifiers.above && (loc < token->size() - 1) && (token->at(loc + 1) == m_signifiers.above)) {
+            aboveQ = true;
+            belowQ = false;
+        }
 
-            Dynam *dynam = new Dynam;
-            m_measure->AddChild(dynam);
-            setStaff(dynam, m_currentstaff);
+        Dynam *dynam = new Dynam;
+        m_measure->AddChild(dynam);
+        setStaff(dynam, m_currentstaff);
+        if (token->find("zz") != string::npos) {
+            addTextElement(dynam, "sfz");
+        }
+        else {
             addTextElement(dynam, "sf");
-            setLocationId(dynam, token, -1);
-            hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
-            dynam->SetTstamp(barstamp.getFloat());
+        }
+        setLocationId(dynam, token, -1);
+        hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
+        dynam->SetTstamp(barstamp.getFloat());
 
-            if (aboveQ) {
-                setPlace(dynam, "above");
-            }
-            else if (belowQ) {
-                setPlace(dynam, "below");
-            }
-            else if (forceAboveQ) {
-                setPlace(dynam, "above");
-            }
-            else if (forceBelowQ) {
-                setPlace(dynam, "below");
-            }
+        if (aboveQ) {
+            setPlace(dynam, "above");
+        }
+        else if (belowQ) {
+            setPlace(dynam, "below");
+        }
+        else if (forceAboveQ) {
+            setPlace(dynam, "above");
+        }
+        else if (forceBelowQ) {
+            setPlace(dynam, "below");
         }
     }
 
@@ -9038,6 +9072,7 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
 
     hum::HumRegex hre;
     vector<string> vtexts;
+    string vcolor;
     std::string content;
     hum::HumdrumLine &line = *token->getLine();
     int track = token->getTrack();
@@ -9089,6 +9124,8 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
         }
 
         vtexts.clear();
+        vcolor.clear();
+        int track = line.token(i)->getTrack();
         if (line.token(i)->isDataType("**silbe")) {
             string value = line.token(i)->getText();
             hre.replaceDestructive(value, "", "\\|", "g");
@@ -9096,9 +9133,11 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             hre.replaceDestructive(value, "&auml;", "a2", "g");
             hre.replaceDestructive(value, "&ouml;", "o2", "g");
             vtexts.push_back(value);
+            vcolor = m_spine_color[track];
         }
         else {
             vtexts.push_back(*line.token(i));
+            vcolor = m_spine_color[track];
         }
         if (vvdataQ) {
             splitSyllableBySpaces(vtexts);
@@ -9112,6 +9151,9 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             }
 
             Verse *verse = new Verse;
+            if (!vcolor.empty() && (vcolor != "black") && (vcolor != "#000") && (vcolor != "#000000")) {
+                verse->SetColor(vcolor);
+            }
             if (vvdataQ) {
                 setLocationId(verse, line.token(i), j + 1);
             }
