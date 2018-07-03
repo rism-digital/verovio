@@ -10341,6 +10341,28 @@ void HumdrumInput::addTrill(hum::HTp token)
             endtok = endtok->getNextToken();
             continue;
         }
+        if (endtok->isGrace()) {
+            // check to see if the next non-grace note/rest has a TTT or ttt on it.
+            // if so, then do not terminate the trill extension line at this
+            // grace notes.
+            hum::HTp ntok = endtok->getNextToken();
+            while (ntok) {
+                if (!ntok->isData()) {
+                    ntok = ntok->getNextToken();
+                    continue;
+                }
+                if (ntok->isGrace()) {
+                    ntok = ntok->getNextToken();
+                    continue;
+                }
+                // at this point ntok is a durational note or rest
+                if ((ntok->find("TTT") != std::string::npos) || (ntok->find("ttt") != std::string::npos)) {
+                    endtok = ntok;
+                    break;
+                }
+                ntok = ntok->getNextToken();
+            }
+        }
         if ((endtok->find("TTT") == std::string::npos) && (endtok->find("ttt") == std::string::npos)) {
             break;
         }
