@@ -78,15 +78,9 @@ public:
     virtual int SaveEnd(FunctorParams *functorParams);
     ///@}
 
-protected:
-    //
-private:
-    //
-public:
-    //
 private:
     /**
-     * Flag indicating whereas if the element was generated or not
+     * Flag indicating whether or not the element was generated
      */
     bool m_isGenerated;
 };
