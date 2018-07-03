@@ -536,9 +536,8 @@ int BoundingBox::Intersects(FloatingPositioner *curve, int margin) const
             // The curve is already below the content
             if ((curve->GetContentTop() + margin) < this->GetContentBottom()) return 0;
             int xMaxY = curve->CalcXMinMaxY(topBezier);
-            // Check if the box is below (should be + margin, but because of de Casteljau different it is ommitted)
-            int leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentLeft());
-            int rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentRight());
+            int leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentLeft()) + margin;
+            int rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentRight() + margin);
             // Everything is underneath
             if ((leftY >= this->GetContentTop()) && (rightY >= this->GetContentTop())) return 0;
             // Recalculate for above
@@ -558,9 +557,8 @@ int BoundingBox::Intersects(FloatingPositioner *curve, int margin) const
             if ((curve->GetContentBottom() - margin) > this->GetContentTop()) return 0;
             int xMinY = curve->CalcXMinMaxY(bottomBezier);
             // Check if the box is above
-            int leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentLeft());
-            int rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentRight());
-            // Everything is above (should be - margin, but because of de Casteljau different it is ommitted)
+            int leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentLeft()) - margin;
+            int rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentRight()) - margin;
             if ((leftY <= this->GetContentBottom()) && (rightY <= this->GetContentBottom())) return 0;
             // Recalculate for below
             leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentLeft()) - margin;
