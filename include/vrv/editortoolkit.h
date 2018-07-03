@@ -8,6 +8,7 @@
 #ifndef __VRV_EDITOR_TOOLKIT_H__
 #define __VRV_EDITOR_TOOLKIT_H__
 
+#include <cmath>
 #include <string>
 
 //--------------------------------------------------------------------------------
@@ -57,6 +58,41 @@ protected:
 
     Doc *m_doc;
     View *m_view;
+};
+
+//--------------------------------------------------------------------------------
+// ClosestBB Comparator struct
+//--------------------------------------------------------------------------------
+// To be used with std::sort to find the object with a closest bounding
+// box to a point defined by the x and y parameters of ClosestBB
+
+struct ClosestBB {
+    int x;
+    int y;
+    
+    int distanceToBB(int ulx, int uly, int lrx, int lry)
+    {
+        int xDiff = std::max(
+                (ulx > x ? ulx - x : 0),
+                (x > lrx ? x - lrx : 0)
+        );
+        int yDiff = std::max(
+                (uly > y ? uly - y : 0),
+                (y > lry ? y - lry : 0)
+        );
+
+        return sqrt(xDiff * xDiff + yDiff * yDiff);
+    }
+    
+    bool operator() (Object *a, Object *b) {
+        if (!a->GetFacsimileInterface() || !b->GetFacsimileInterface()) return true;
+        Zone *zoneA = a->GetFacsimileInterface()->GetZone();
+        Zone *zoneB = b->GetFacsimileInterface()->GetZone();
+
+        int distA = distanceToBB(zoneA->GetUlx(), zoneA->GetUly(), zoneA->GetLrx(), zoneA->GetLry());
+        int distB = distanceToBB(zoneB->GetUlx(), zoneB->GetUly(), zoneB->GetLrx(), zoneB->GetLry());
+        return (distA < distB);
+    }
 };
 
 } // namespace vrv
