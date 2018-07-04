@@ -1,4 +1,4 @@
-Verovio 2.0.0-dev-8f84231
+Verovio 2.0.0-dev-d732eb7
 
 Example usage:
 
@@ -51,6 +51,9 @@ General layout options
  --lyric-top-min-margin <f>        The minmal margin above the lyrics in MEI units (default: 2.00; min: 0.00; max: 8.00)
  --min-measure-width <i>           The minimal measure width in MEI units (default: 15; min: 1; max: 30)
  --measure-number <s>              The measure numbering rule (unused) (default: "system"; other values: "interval")
+ --slur-control-pointsr <i>        Slur control points - higher value means more curved at the end (default: 5; min: 1; max: 10)
+ --slur-curve-factor <i>           Slur curve factor - high value means rounder slurs (default: 10; min: 1; max: 100)
+ --slur-height-factor <i>          Slur height factor -  high value means flatter slurs (default: 5; min: 1; max: 100)
  --slur-min-height <f>             The minimum slur height in MEI units (default: 1.20; min: 0.30; max: 2.00)
  --slur-max-height <f>             The maximum slur height in MEI units (default: 3.00; min: 2.00; max: 4.00)
  --slur-thickness <f>              The slur thickness in MEI units (default: 0.60; min: 0.20; max: 1.20)
