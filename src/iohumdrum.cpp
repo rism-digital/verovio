@@ -6898,6 +6898,62 @@ Clef *HumdrumInput::insertClefElement(std::vector<string> &elements, std::vector
 
 //////////////////////////////
 //
+// HumdrumInput::storeBreaksec -- Look for cases where sub-beams are broken.
+//
+
+void HumdrumInput::storeBreaksec(
+    std::vector<int> &beamstate, std::vector<int> &beamnum, const std::vector<hum::HTp> &layerdata, bool grace)
+{
+
+    std::vector<std::vector<int> > beamednotes;
+    int bnum = 0;
+    for (int i = 0; i < (int)layerdata.size(); i++) {
+        if (!beamnum[i]) {
+            // not in a beam
+            continue;
+        }
+        if (!layerdata[i]->isData()) {
+            // not a note or rest in the beam
+            continue;
+        }
+        if (layerdata[i]->isNull()) {
+            // shouldn't happen, but just in case.
+            continue;
+        }
+        if ((!grace) && layerdata[i]->isGrace()) {
+            // ignore grace notes in this analysis
+            continue;
+        }
+        if (grace && !layerdata[i]->isGrace()) {
+            // ignore grace notes in this analysis
+            continue;
+        }
+        if (bnum != beamnum[i]) {
+            // create a new list of notes.
+            beamednotes.resize(beamednotes.size() + 1);
+            bnum = beamnum[i];
+        }
+        beamednotes.back().push_back(i);
+    }
+
+    for (int i = 0; i < (int)beamednotes.size(); i++) {
+        for (int j = 1; j < (int)beamednotes[i].size() - 1; j++) {
+            int index1 = beamednotes[i][j - 1];
+            int index2 = beamednotes[i][j];
+            int index3 = beamednotes[i][j + 1];
+            int bcount1 = beamstate[index1];
+            int bcount2 = beamstate[index2];
+            int bcount3 = beamstate[index3];
+            if ((bcount2 < bcount1) && (bcount2 < bcount3)) {
+                // mark a breaksec for the given note/chord/rest.
+                layerdata[index2]->setValue("", "auto", "breaksec", to_string(bcount2));
+            }
+        }
+    }
+}
+
+//////////////////////////////
+//
 // HumdrumInput::analyzeLayerBeams --
 //
 
@@ -7003,6 +7059,9 @@ void HumdrumInput::analyzeLayerBeams(
         std::fill(gbeamstate.begin(), gbeamstate.end(), 0);
         std::fill(gbeamnum.begin(), gbeamnum.end(), 0);
     }
+
+    storeBreaksec(beamstate, beamnum, layerdata);
+    storeBreaksec(gbeamstate, gbeamnum, layerdata, true);
 }
 
 //////////////////////////////
@@ -8589,6 +8648,14 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
 
     if (!chordQ) {
         setStemLength(note, token);
+    }
+
+    // Add beam break information:
+    if (subtoken <= 0) {
+        int breaksec = token->getValueInt("", "auto", "breaksec");
+        if (breaksec) {
+            note->SetBreaksec(breaksec);
+        }
     }
 
     processTerminalLong(token); // do this before assigning rhythmic value.
