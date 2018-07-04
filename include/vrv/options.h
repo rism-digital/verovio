@@ -45,12 +45,6 @@ class OptionGrp;
 // the key signature spacing factor
 #define TEMP_KEYSIG_STEP 1.3
 
-// the maximum angle of a slur
-#define TEMP_SLUR_MAX_SLOPE (25 * M_PI / 180)
-#define TEMP_SLUR_CURVE_FACTOR 10 // a factor to allow more (0) or less (100) curved slurs
-#define TEMP_SLUR_HEIGHT_FACTOR 8 // high value means flatter slurs
-#define TEMP_SLUR_CONTROL_POINT_FACTOR 5 // higher value means more curved at the end
-
 /* Options parameters for mensural notation */
 // Ratios of mensural notehead, accidental, aug. dot size to CMN for the same staff size
 #define TEMP_MNOTEHEAD_SIZE_FACTOR 1.0
@@ -497,6 +491,7 @@ public:
     OptionInt m_slurCurveFactor;
     OptionInt m_slurHeightFactor;
     OptionDbl m_slurMaxHeight;
+    OptionInt m_slurMaxSlope;
     OptionDbl m_slurMinHeight;
     OptionDbl m_slurThickness;
     OptionDbl m_spacingLinear;
