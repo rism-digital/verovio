@@ -279,6 +279,9 @@
 		4D766F0620ACAD74006875D8 /* nc.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D766EF320ACAD40006875D8 /* nc.h */; };
 		4D766F0720ACAD74006875D8 /* neume.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D766EF420ACAD41006875D8 /* neume.h */; };
 		4D766F0820ACAD74006875D8 /* syllable.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D766EF220ACAD3F006875D8 /* syllable.h */; };
+		4D7927D020ECCC6D0002A45D /* view_slur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7927CF20ECCC6D0002A45D /* view_slur.cpp */; };
+		4D7927D120ECCC6D0002A45D /* view_slur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7927CF20ECCC6D0002A45D /* view_slur.cpp */; };
+		4D7927D220ECCC6D0002A45D /* view_slur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7927CF20ECCC6D0002A45D /* view_slur.cpp */; };
 		4D796B5E1D78641900A15238 /* harm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D796B5D1D78641900A15238 /* harm.cpp */; };
 		4D798CBD1B8AEDBA007281CA /* drawinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */; };
 		4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */; };
@@ -760,6 +763,7 @@
 		4D766EF720ACAD62006875D8 /* nc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = nc.cpp; path = src/nc.cpp; sourceTree = "<group>"; };
 		4D766EF820ACAD62006875D8 /* view_neume.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_neume.cpp; path = src/view_neume.cpp; sourceTree = "<group>"; };
 		4D766EF920ACAD63006875D8 /* neume.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = neume.cpp; path = src/neume.cpp; sourceTree = "<group>"; };
+		4D7927CF20ECCC6D0002A45D /* view_slur.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_slur.cpp; path = src/view_slur.cpp; sourceTree = "<group>"; };
 		4D796B5C1D78641200A15238 /* harm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = harm.h; path = include/vrv/harm.h; sourceTree = "<group>"; };
 		4D796B5D1D78641900A15238 /* harm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = harm.cpp; path = src/harm.cpp; sourceTree = "<group>"; };
 		4D797B041A67C55F007637BD /* devicecontextbase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = devicecontextbase.h; path = include/vrv/devicecontextbase.h; sourceTree = "<group>"; };
@@ -1407,6 +1411,7 @@
 				4D766EF820ACAD62006875D8 /* view_neume.cpp */,
 				8F086EDE188539540037FD8E /* view_page.cpp */,
 				4DC12A7B1F740FB9000440E9 /* view_running.cpp */,
+				4D7927CF20ECCC6D0002A45D /* view_slur.cpp */,
 				4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */,
 				8F086EDF188539540037FD8E /* view_tuplet.cpp */,
 			);
@@ -1798,6 +1803,7 @@
 				4DB3D8E31F83D16300B5FC2B /* elementpart.cpp in Sources */,
 				4D1694061E3A44F300569BF4 /* iomei.cpp in Sources */,
 				4D1694071E3A44F300569BF4 /* iomusxml.cpp in Sources */,
+				4D7927D120ECCC6D0002A45D /* view_slur.cpp in Sources */,
 				4D1694081E3A44F300569BF4 /* iopae.cpp in Sources */,
 				4D1694091E3A44F300569BF4 /* atts_critapp.cpp in Sources */,
 				4D16940A1E3A44F300569BF4 /* fermata.cpp in Sources */,
@@ -2076,6 +2082,7 @@
 				4DB351131C8040B1002DD057 /* anchoredtext.cpp in Sources */,
 				4DC34BA819BC4A83006175CD /* accid.cpp in Sources */,
 				4DC34BAA19BC4A83006175CD /* custos.cpp in Sources */,
+				4D7927D020ECCC6D0002A45D /* view_slur.cpp in Sources */,
 				4DC34BAC19BC4A83006175CD /* dot.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2234,6 +2241,7 @@
 				4D4335D11ED4502C003BE1A9 /* atts_visual.cpp in Sources */,
 				4D6331FD1F46DD3A00A0D6BF /* plistinterface.cpp in Sources */,
 				4DC34BAD19BC4A83006175CD /* dot.cpp in Sources */,
+				4D7927D220ECCC6D0002A45D /* view_slur.cpp in Sources */,
 				4DB3D8B91F83D0C600B5FC2B /* boundary.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
