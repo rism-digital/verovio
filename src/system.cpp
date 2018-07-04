@@ -321,7 +321,7 @@ int System::AdjustXOverflowEnd(FunctorParams *functorParams)
 
     // Continue if the right position of the measure is larger than the widest element right
     int measureRightX
-        = params->m_lastMeasure->GetDrawingX() + params->m_lastMeasure->GetInnerWidth() - params->m_margin;
+        = params->m_lastMeasure->GetDrawingX() + params->m_lastMeasure->GetRightBarLineLeft() - params->m_margin;
     if (measureRightX > params->m_currentWidest->GetContentRight()) {
         return FUNCTOR_CONTINUE;
     }

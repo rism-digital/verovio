@@ -715,7 +715,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     /************** adjusting y position **************/
 
     bool isShortSlur = false;
-    if (x2 - x1 < 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) isShortSlur = true;
+    if (x2 - x1 < 1 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) isShortSlur = true;
 
     int yChordMax, yChordMin;
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
@@ -948,16 +948,15 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(slur, "spanning-slur", "");
+    
     DrawThickBezierCurve(dc, points, thickness, staff->m_drawingStaffSize, angle);
 
     /* drawing debug points */
     /*
     int i;
-    int dist = (points[3].x - points[0].x) / 10;
-    for (i = 0; i < 10; ++i) {
-        int x = points[0].x + (i * dist);
-        int y = BoundingBox::CalcBezierAtPosition(points, x);
-        DrawDot(dc, x, y, staff->m_drawingStaffSize);
+    for (i = 0; i <= 10; ++i) {
+        Point p = BoundingBox::CalcDeCasteljau(points, (double)i / 10.0);
+        DrawDot(dc, p.x, p.y, staff->m_drawingStaffSize);
     }
     */
 
@@ -990,7 +989,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     else {
         int dist = abs(p2->x - p1->x);
         height = std::max(int(m_options->m_slurMinHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)),
-            dist / TEMP_SLUR_HEIGHT_FACTOR);
+            dist / m_options->m_slurHeightFactor.GetValue());
         height = std::min(
             int(m_options->m_slurMaxHeight.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)), height);
     }
@@ -1047,12 +1046,14 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     if (!spanningContentPoints.empty()) {
         AdjustSlurCurve(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, curveDir,
             slurAngle, true);
+        
         // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
         AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2,
             curveDir, &slurAngle, false);
         // Now readjust the curvature with the new p1 and p2 with the original control points
         GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, height, staff->m_drawingStaffSize);
 
+        
         GetSpanningPointPositions(&spanningContentPoints, *p1, slurAngle, curveDir, staff->m_drawingStaffSize);
         int maxHeight = AdjustSlurCurve(
             slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, slurAngle, false);
@@ -1063,10 +1064,11 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
             // slur->GetUuid().c_str());
             // Use the normal control points for adjusting the position (p1, p2 and angle will be updated)
             // Move it and force both sides to move
-            AdjustSlurPosition(
-                slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, true);
-            GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, maxHeight, staff->m_drawingStaffSize);
+            //AdjustSlurPosition(
+            //    slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, true);
+            //GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, maxHeight, staff->m_drawingStaffSize);
         }
+
     }
     else {
         rotatedC1 = adjustedRotatedC1;
@@ -1110,7 +1112,7 @@ void View::GetControlPoints(
     Point *p1, Point *p2, Point *c1, Point *c2, curvature_CURVEDIR curveDir, int height, int staffSize)
 {
     // Set the x position of the control points
-    int cPos = std::min((p2->x - p1->x) / TEMP_SLUR_CONTROL_POINT_FACTOR, m_doc->GetDrawingStaffSize(staffSize));
+    int cPos = std::min((p2->x - p1->x) / m_options->m_slurControlPoints.GetValue(), m_doc->GetDrawingStaffSize(staffSize));
     c1->x = p1->x + cPos;
     c2->x = p2->x - cPos;
 
@@ -1143,10 +1145,10 @@ void View::GetSpanningPointPositions(
         itPoint->second = BoundingBox::CalcPositionAfterRotation(p, -angle, p1);
         // This would add it after
         if (curveDir == curvature_CURVEDIR_above) {
-            itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 2;
+           itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 2;
         }
         else {
-            itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * 2;
+           itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * 2;
         }
     }
 }
@@ -1171,7 +1173,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
     float maxHeightFactor = std::max(0.2f, fabsf(angle));
     maxHeight = dist
         / (maxHeightFactor
-              * (TEMP_SLUR_CURVE_FACTOR + 5)); // 5 is the minimum - can be increased for limiting curvature
+              * (m_options->m_slurCurveFactor.GetValue() + 5)); // 5 is the minimum - can be increased for limiting curvature
 
     maxHeight = std::max(maxHeight, currentHeight);
 
