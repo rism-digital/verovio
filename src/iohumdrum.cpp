@@ -8316,6 +8316,12 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
     token->setValue("MEI", "xml:id", chord->GetUuid());
     int index = (int)m_measures.size() - 1;
     token->setValue("MEI", "measureIndex", index);
+
+    // Add beam break information:
+    int breaksec = token->getValueInt("", "auto", "breaksec");
+    if (breaksec) {
+        chord->SetBreaksec(breaksec);
+    }
 }
 
 //////////////////////////////
@@ -8651,7 +8657,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     }
 
     // Add beam break information:
-    if (subtoken <= 0) {
+    if (!token->isChord()) {
         int breaksec = token->getValueInt("", "auto", "breaksec");
         if (breaksec) {
             note->SetBreaksec(breaksec);
