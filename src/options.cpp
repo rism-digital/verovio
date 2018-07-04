@@ -629,7 +629,7 @@ Options::Options()
     this->Register(&m_slurMinHeight, "slurMinHeight", &m_generalLayout);
 
     m_slurMaxHeight.SetInfo("Slur max height", "The maximum slur height in MEI units");
-    m_slurMaxHeight.Init(3.0, 2.0, 4.0);
+    m_slurMaxHeight.Init(3.0, 2.0, 6.0);
     this->Register(&m_slurMaxHeight, "slurMaxHeight", &m_generalLayout);
     
     m_slurMaxSlope.SetInfo("Slur max slope", "The maximum slur slope in degrees");
