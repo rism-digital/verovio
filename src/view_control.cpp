@@ -715,7 +715,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     /************** adjusting y position **************/
 
     bool isShortSlur = false;
-    if (x2 - x1 < 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) isShortSlur = true;
+    if (x2 - x1 < 1 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) isShortSlur = true;
 
     int yChordMax, yChordMin;
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
@@ -1145,10 +1145,10 @@ void View::GetSpanningPointPositions(
         itPoint->second = BoundingBox::CalcPositionAfterRotation(p, -angle, p1);
         // This would add it after
         if (curveDir == curvature_CURVEDIR_above) {
-           itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 1;
+           itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 2;
         }
         else {
-           itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * 1;
+           itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * 2;
         }
     }
 }
