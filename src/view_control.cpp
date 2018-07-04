@@ -1046,12 +1046,14 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     if (!spanningContentPoints.empty()) {
         AdjustSlurCurve(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, curveDir,
             slurAngle, true);
+        
         // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
         AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2,
             curveDir, &slurAngle, false);
         // Now readjust the curvature with the new p1 and p2 with the original control points
         GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, height, staff->m_drawingStaffSize);
 
+        
         GetSpanningPointPositions(&spanningContentPoints, *p1, slurAngle, curveDir, staff->m_drawingStaffSize);
         int maxHeight = AdjustSlurCurve(
             slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, slurAngle, false);
@@ -1062,10 +1064,11 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
             // slur->GetUuid().c_str());
             // Use the normal control points for adjusting the position (p1, p2 and angle will be updated)
             // Move it and force both sides to move
-            AdjustSlurPosition(
-                slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, true);
-            GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, maxHeight, staff->m_drawingStaffSize);
+            //AdjustSlurPosition(
+            //    slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, true);
+            //GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, maxHeight, staff->m_drawingStaffSize);
         }
+
     }
     else {
         rotatedC1 = adjustedRotatedC1;
@@ -1142,10 +1145,10 @@ void View::GetSpanningPointPositions(
         itPoint->second = BoundingBox::CalcPositionAfterRotation(p, -angle, p1);
         // This would add it after
         if (curveDir == curvature_CURVEDIR_above) {
-            itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 2;
+           itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 1;
         }
         else {
-            itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * 2;
+           itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * 1;
         }
     }
 }
