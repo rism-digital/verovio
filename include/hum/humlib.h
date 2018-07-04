@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jun 16 09:24:00 PDT 2018
+// Last Modified: Thu Jun 28 23:29:33 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5442,8 +5442,8 @@ class Tool_transpose : public HumTool {
 
 	private:
 		int      transval     = 0;   // used with -b option
-		int      ssetkeyQ     = 0;   // used with -k option
-		int      ssetkey      = 0;   // used with -k option
+		int      ssettonicQ   = 0;   // used with -k option
+		int      ssettonic    = 0;   // used with -k option
 		int      currentkey   = 0;
 		int      autoQ        = 0;   // used with --auto option
 		int      debugQ       = 0;   // used with --debug option

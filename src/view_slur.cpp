@@ -577,26 +577,27 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
 float View::GetAdjustedSlurAngle(Point *p1, Point *p2, curvature_CURVEDIR curveDir)
 {
     float slurAngle = atan2(p2->y - p1->y, p2->x - p1->x);
-
+    float maxSlope =  (float)m_options->m_slurMaxSlope.GetValue() * M_PI / 180.0;
+    
     // the slope of the slur is high and needs to be corrected
-    if (fabs(slurAngle) > TEMP_SLUR_MAX_SLOPE) {
-        int side = (p2->x - p1->x) * sin(TEMP_SLUR_MAX_SLOPE) / sin(M_PI / 2 - TEMP_SLUR_MAX_SLOPE);
+    if (fabs(slurAngle) > maxSlope) {
+        int side = (p2->x - p1->x) * sin(maxSlope) / sin(M_PI / 2 - maxSlope);
         if (p2->y > p1->y) {
             if (curveDir == curvature_CURVEDIR_above)
                 p1->y = p2->y - side;
             else
                 p2->y = p1->y + side;
-            slurAngle = (float)TEMP_SLUR_MAX_SLOPE;
+            slurAngle = maxSlope;
         }
         else {
             if (curveDir == curvature_CURVEDIR_above)
                 p2->y = p1->y - side;
             else
                 p1->y = p2->y + side;
-            slurAngle = (float)-TEMP_SLUR_MAX_SLOPE;
+            slurAngle = -maxSlope;
         }
     }
-
+    
     return slurAngle;
 }
 

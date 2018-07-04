@@ -43,6 +43,11 @@ public:
     void AddRef(std::string ref);
 
     /**
+     * Add a references, not checking if it is already in the list (for expansion@plist).
+     */
+    void AddRefAllowDuplicate(const std::string &ref);
+
+    /**
      * Set a reference object when the uuid is found in the m_uuids.
      * Calls IsValidRef to check that the type of object is valid.
      */

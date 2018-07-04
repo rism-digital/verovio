@@ -51,6 +51,7 @@
 #include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
+#include "expansion.h"
 #include "fb.h"
 #include "fermata.h"
 #include "fig.h"
@@ -568,7 +569,7 @@ bool HumdrumInput::convertHumdrum()
     std::fill(m_transpose.begin(), m_transpose.end(), 0);
 
     prepareVerses();
-    prepareEndings();
+    prepareSections();
 
     prepareStaffGroups();
     prepareHeaderFooter();
@@ -4263,6 +4264,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
             }
             if (trest) {
+                processDynamics(trest, staffindex);
                 setLocationId(mrest, trest);
                 if (m_doc->GetOptions()->m_humType.GetValue()) {
                     embedQstampInClass(mrest, trest, *trest);
@@ -4772,8 +4774,11 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
     // store artics in random access grid, along with their staff positions:
     vector<int> articloc(256, 0);
     vector<int> articpos(256, 0);
+    vector<int> articges(256, 0); // is it a gestural articulation?
     char ch;
     char posch;
+    char pos2ch;
+    char pos3ch;
     int tsize = (int)((string *)token)->size();
     for (int i = 0; i < tsize; ++i) {
         ch = token->at(i);
@@ -4788,12 +4793,27 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             i++;
         }
         else if ((ch == '\'') && (posch == '\'')) {
-            // staccatissimo alternate
+            // staccatissimo alternate (eventually remove)
             ch = '`';
             posch = i < tsize - 2 ? token->at(i + 2) : 'g';
             i++;
         }
         articloc.at(ch) = i + 1;
+
+        if (posch) {
+            // check for gestural articulations
+            pos2ch = i < tsize - 2 ? token->at(i + 2) : 0;
+            pos3ch = i < tsize - 3 ? token->at(i + 3) : 0;
+            if ((posch == 'y') && (pos2ch != 'y')) {
+                articges[ch] = 1;
+            }
+            else if ((posch == m_signifiers.above) && (pos2ch == 'y') && (pos3ch != 'y')) {
+                articges[ch] = 1;
+            }
+            else if ((posch == m_signifiers.below) && (pos2ch == 'y') && (pos3ch != 'y')) {
+                articges[ch] = 1;
+            }
+        }
 
         if ((posch != 0) && (posch == m_signifiers.above)) {
             articpos.at(ch) = 1;
@@ -4809,51 +4829,68 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
     // second position is the staff position (-1=below, 0=undefined, 1=above)
     std::vector<data_ARTICULATION> artics;
     std::vector<int> positions;
+    std::vector<int> gestural;
 
     // place articulations in stacking order (nearest to furthest from note):
     if (articloc['\'']) {
         artics.push_back(ARTICULATION_stacc);
         positions.push_back(articpos['\'']);
+        gestural.push_back(articges['\'']);
     }
     if (articloc['`']) {
         artics.push_back(ARTICULATION_stacciss);
         positions.push_back(articpos['`']);
+        gestural.push_back(articges['`']);
     }
     if (articloc['~']) {
         artics.push_back(ARTICULATION_ten);
         positions.push_back(articpos['~']);
+        gestural.push_back(articges['~']);
     }
     if (articloc[6]) {
         artics.push_back(ARTICULATION_marc);
         positions.push_back(articpos[6]);
+        gestural.push_back(articges['6']);
     }
     if (articloc['^']) {
         artics.push_back(ARTICULATION_acc);
         positions.push_back(articpos['^']);
+        gestural.push_back(articges['^']);
     }
     if (articloc['o']) {
         artics.push_back(ARTICULATION_harm);
         positions.push_back(articpos['o']);
+        gestural.push_back(articges['o']);
     }
     if (articloc['v']) {
         artics.push_back(ARTICULATION_upbow);
         positions.push_back(articpos['v']);
+        gestural.push_back(articges['v']);
     }
     if (articloc['u']) {
         artics.push_back(ARTICULATION_dnbow);
         positions.push_back(articpos['u']);
+        gestural.push_back(articges['u']);
     }
 
     if (artics.empty()) {
         return;
     }
 
+    Artic *artic = NULL;
     if (artics.size() == 1) {
         // single articulation, so no problem
-
-        Artic *artic = new Artic;
-        appendElement(element, artic);
-        artic->SetArtic(artics);
+        if (gestural.at(0)) {
+            // When enabled in artic, set gestrual articulation.
+            // For now do not store gestural articulation in MEI:
+            // artic->SetArticGes(artics);
+            return;
+        }
+        else {
+            artic = new Artic;
+            appendElement(element, artic);
+            artic->SetArtic(artics);
+        }
         if (positions.at(0) > 0) {
             setPlace(artic, "above");
         }
@@ -4863,6 +4900,13 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         setLocationId(artic, token);
         return;
     }
+
+    if (artic == NULL) {
+        artic = new Artic;
+        appendElement(element, artic);
+    }
+
+    // Handle gestural articulations below when there are multiple articulations.
 
     // more than one articulation, so categorize them by placement.
 
@@ -6136,6 +6180,16 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                     setPlace(hairpin, "below");
                 }
             }
+            else {
+                // no endpoint so print as the word "cresc."
+                Dir *dir = new Dir;
+                m_measure->AddChild(dir);
+                setStaff(dir, m_currentstaff);
+                setLocationId(dir, line->token(i));
+                hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
+                dir->SetTstamp(tstamp.getFloat());
+                addTextElement(dir, "cresc.");
+            }
         }
         else if (hairpins.find(">") != string::npos) {
             hum::HTp endtok = NULL;
@@ -6182,6 +6236,16 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 else if (forceAboveQ) {
                     setPlace(hairpin, "above");
                 }
+            }
+            else {
+                // no endpoint so print as the word "decresc."
+                Dir *dir = new Dir;
+                m_measure->AddChild(dir);
+                setStaff(dir, m_currentstaff);
+                setLocationId(dir, line->token(i));
+                hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
+                dir->SetTstamp(tstamp.getFloat());
+                addTextElement(dir, "decresc.");
             }
         }
     }
@@ -7813,7 +7877,9 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
 //
 // Controls that this function deals with:
 //    *above = Force all dynamics above staff.
-//    *below = Force all dynamics above staff.
+//    *above2 = Force all dynamics above staff below top one
+//    *below = Force all dynamics below the staff.
+//    *below2 = Force all dynamics below staff below top one
 //    *center = Force all dynamics to be centered between this staff and the one below.
 //
 
@@ -10176,7 +10242,7 @@ void HumdrumInput::addTrill(hum::HTp token)
     appendElement(m_measure, trill);
     setStaff(trill, staff);
 
-    // int staffindex = m_currentstaff - 1;
+    int staffindex = m_currentstaff - 1;
     int layer = m_currentlayer;
 
     if (layer == 2) {
@@ -10227,13 +10293,25 @@ void HumdrumInput::addTrill(hum::HTp token)
         return;
     }
 
-    // find the ending note after the trill line.  Multiple trill line extensions for chord notes
-    // are not handled by this algorithm, but these should be rare in notation.
+    // Find the ending note after the trill line.  Multiple trill line extensions for chord notes
+    // are not handled by this algorithm, but these should be rare in notation.  Trills that cross
+    // barlines require @tstamp2 rather than @endid to display (possibly a bug in verovio).
     hum::HTp endtok = token->getNextToken();
     hum::HTp lasttok = token;
+    hum::HTp bartok = NULL;
+    int barlinecount = 0;
+    bool foundbarline = false;
+    bool nextnoteafterbarline = false;
     while (endtok) {
+        if (endtok->isBarline()) {
+            foundbarline = true;
+            nextnoteafterbarline = true;
+            bartok = endtok;
+            barlinecount++;
+        }
         if (!endtok->isData()) {
             endtok = endtok->getNextToken();
+            nextnoteafterbarline = false;
             continue;
         }
         if (endtok->isNull()) {
@@ -10250,14 +10328,38 @@ void HumdrumInput::addTrill(hum::HTp token)
         return;
     }
 
-    // assuming last note is not in a chord.  Might be a problem if a rest.
-    trill->SetEndid("#" + getLocationId("note", endtok, -1));
+    bool isgracenote = endtok->find('q') == std::string::npos ? false : true;
+    bool isrest = endtok->isRest();
 
-    // For setting trill@tstamp2:
-    // hum::HumNum tstamp2 = getMeasureTstampPlusDur(lasttok, staffindex);
-    // int measures = getMeasureDifference(token, lasttok);
-    // std::pair<int, double> ts2(measures, tstamp2.getFloat());
-    // trill->SetTstamp2(ts2);
+    if (isgracenote && (!foundbarline) && (!isrest)) {
+        // assuming last note is not in a chord.
+        trill->SetEndid("#" + getLocationId("note", endtok, -1));
+    }
+    else if (isrest && !foundbarline) {
+        // use @tstamp2 because @endid does not work in verovio for rests.
+        hum::HumNum tstamp2 = getMeasureTstampPlusDur(lasttok, staffindex);
+        int measures = getMeasureDifference(token, lasttok);
+        std::pair<int, double> ts2(measures, tstamp2.getFloat());
+        trill->SetTstamp2(ts2);
+    }
+    else if (foundbarline && (barlinecount == 1) && nextnoteafterbarline) {
+        // end trill extender before barline
+        hum::HumNum tstamp2 = getMeasureTstampPlusDur(bartok->getPreviousToken(), staffindex);
+        int measures = 0;
+        std::pair<int, double> ts2(measures, tstamp2.getFloat());
+        trill->SetTstamp2(ts2);
+    }
+    else {
+        // The line extension crosses a barline, so need to use @tstamp2;
+        // otherwise verovio will not display the line extension.
+        hum::HumNum tstamp2 = getMeasureTstampPlusDur(lasttok, staffindex);
+        int measures = getMeasureDifference(token, lasttok);
+        std::pair<int, double> ts2(measures, tstamp2.getFloat());
+        trill->SetTstamp2(ts2);
+    }
+    // Need to add another case when extender crosses a barline and ends before
+    // a grace note.  This requires @endid since @tstamp2 will not work, as that
+    // will extend to the note after the grace note(s) at the same tstamp.
 }
 
 //////////////////////////////
@@ -10537,24 +10639,66 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         addSystemKeyTimeChange(startline, endline);
     }
 
+    string previoussection = m_lastsection;
+    string currentsection = m_sectionlabels[startline];
+
     m_measure = new Measure();
-    if ((m_ending[startline] != 0) && (m_endingnum != m_ending[startline])) {
+
+    int endnum = 0;
+    bool ending = false;
+    bool newsection = false;
+    if (isdigit(m_sectionlabels[startline].back())) {
+        ending = true;
+        std::smatch matches;
+        if (regex_search(m_sectionlabels[startline], matches, regex("(\\d+)$"))) {
+            endnum = stoi(matches[1]);
+        }
+        else {
+            endnum = 0;
+        }
+    }
+    else if (m_sectionlabels[startline] != m_lastsection) {
+        newsection = true;
+        if (m_lastsection != m_sectionlabels[startline]) {
+            if (m_sections.size() > 1) {
+                // keep movement-level section in stack.
+                m_sections.pop_back();
+            }
+        }
+        m_lastsection = m_sectionlabels[startline];
+    }
+
+    if (ending && (m_endingnum != endnum)) {
         // create a new ending
         m_currentending = new Ending;
-        setN(m_currentending, m_ending[startline]);
-        // 300: m_currentending->SetN(m_ending[startline]);
+        setN(m_currentending, endnum);
+        // sanitize id if not valid:
+        m_currentending->SetUuid(m_sectionlabels[startline]);
+        if (m_sections.size() > 1) {
+            // assuming the ending does not start at beginning
+            // of music.
+            m_sections.pop_back();
+        }
         m_sections.back()->AddChild(m_currentending);
         m_currentending->AddChild(m_measure);
     }
-    else if (m_ending[startline]) {
+    else if (isdigit(m_sectionlabels[startline].back())) {
         // inside a current ending
         m_currentending->AddChild(m_measure);
+    }
+    else if (newsection) {
+        // start a new section
+        m_currentsection = new Section;
+        m_currentsection->AddChild(m_measure);
+        m_currentsection->SetUuid(m_lastsection);
+        m_sections.back()->AddChild(m_currentsection);
+        m_sections.push_back(m_currentsection);
     }
     else {
         // outside of an ending
         m_sections.back()->AddChild(m_measure);
     }
-    m_endingnum = m_ending[startline];
+    m_endingnum = endnum;
     m_measures.push_back(m_measure);
 
     if (m_leftbarstyle != BARRENDITION_NONE) {
@@ -10805,6 +10949,11 @@ void HumdrumInput::setupMeiDocument()
     mdiv->AddChild(m_score);
     // the section
     Section *section = new Section();
+    hum::HTp starting = m_infile.getTrackStart(1);
+    if (starting) {
+        section->SetUuid(getLocationId(section, starting, -1));
+        storeExpansionLists(section, starting);
+    }
     m_sections.push_back(section);
     m_score->AddChild(m_sections.back());
     m_leftbarstyle = BARRENDITION_NONE;
@@ -11699,20 +11848,19 @@ std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
 
 //////////////////////////////
 //
-// HumdrumInput::prepareEndings --
+// HumdrumInput::prepareSections --
 //
 
-void HumdrumInput::prepareEndings()
+void HumdrumInput::prepareSections()
 {
-    std::vector<int> &ending = m_ending;
+    std::vector<string> &sectionlabels = m_sectionlabels;
     hum::HumdrumFile &infile = m_infile;
 
-    ending.resize(infile.getLineCount());
-    std::fill(ending.begin(), ending.end(), 0);
-    int endnum = 0;
+    sectionlabels.resize(infile.getLineCount());
+    string secname;
 
     for (int i = 0; i < infile.getLineCount(); ++i) {
-        ending[i] = endnum;
+        sectionlabels[i] = secname;
         if (!infile[i].isInterpretation()) {
             continue;
         }
@@ -11723,20 +11871,24 @@ void HumdrumInput::prepareEndings()
             // ignore expansion lists
             continue;
         }
-        std::smatch matches;
-        if (regex_search(*((string *)infile.token(i, 0)), matches, regex("(\\d+)$"))) {
-            endnum = stoi(matches[1]);
-            ending[i] = endnum;
-        }
-        else {
-            endnum = 0;
-            ending[i] = endnum;
-        }
+
+        //        std::smatch matches;
+        //        if (regex_search(*((string *)infile.token(i, 0)), matches, regex("(\\d+)$"))) {
+        //            endnum = stoi(matches[1]);
+        //            ending[i] = endnum;
+        //        }
+        //        else {
+        //            endnum = 0;
+        //            ending[i] = endnum;
+        //        }
+
+        secname = infile.token(i, 0)->substr(2);
+        sectionlabels[i] = secname;
         for (int j = i - 1; j >= 0; j--) {
             if (infile[j].isData()) {
                 break;
             }
-            ending[j] = ending[i];
+            sectionlabels[j] = sectionlabels[i];
         }
     }
 }
@@ -11752,6 +11904,103 @@ void HumdrumInput::checkForColorSpine(hum::HumdrumFile &infile)
     std::vector<hum::HTp> colorspines;
     infile.getSpineStartList(colorspines, "**color");
     m_has_color_spine = colorspines.empty() ? false : true;
+}
+
+//////////////////////////////
+//
+// storeExpansionLists --
+//
+
+void HumdrumInput::storeExpansionLists(Section *section, hum::HTp starting)
+{
+    hum::HTp current = starting;
+    while (current) {
+        if (current->isData()) {
+            // only look for expansion lists before first data line
+            break;
+        }
+        if (!current->isInterpretation()) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (current->compare(0, 2, "*>") != 0) {
+            current = current->getNextToken();
+            continue;
+        }
+        if (current->find("[") == std::string::npos) {
+            current = current->getNextToken();
+            continue;
+        }
+        storeExpansionList(section, current);
+        current = current->getNextToken();
+    }
+}
+
+//////////////////////////////
+//
+// storeExpansionList --
+//
+
+void HumdrumInput::storeExpansionList(Section *section, hum::HTp etok)
+{
+    string expansion = *etok;
+    string variant;
+    int startindex = -1;
+    for (int i = 2; i < (int)expansion.size(); i++) {
+        if (expansion[i] == '[') {
+            startindex = i + 1;
+            break;
+        }
+        variant += expansion[i];
+    }
+    if (startindex < 0) {
+        return;
+    }
+    std::vector<std::string> labels(1);
+    for (int i = startindex; i < (int)expansion.size(); i++) {
+        if (isspace(expansion[i])) {
+            continue;
+        }
+        else if (expansion[i] == '"') {
+            // invalid character
+            continue;
+        }
+        else if (expansion[i] == '\'') {
+            // invalid character
+            continue;
+        }
+        else if (expansion[i] == ',') {
+            if (!labels.back().empty()) {
+                // avoid syntax error from a null label.
+                labels.push_back("");
+            }
+        }
+        else if (expansion[i] == ']') {
+            break;
+        }
+        else {
+            labels.back() += expansion[i];
+        }
+    }
+
+    if (labels.empty()) {
+        return;
+    }
+    if ((labels.size() == 1) && labels[0].empty()) {
+        return;
+    }
+
+    Expansion *exp = new Expansion;
+    exp->SetUuid(getLocationId(exp, etok, -1));
+    section->AddChild(exp);
+    if (!variant.empty()) {
+        exp->SetType(variant);
+    }
+
+    for (int i = 0; i < (int)labels.size(); i++) {
+        string ref = "#" + labels[i];
+        exp->AddRefAllowDuplicate(ref);
+    }
 }
 
 #endif /* NO_HUMDRUM_SUPPORT */

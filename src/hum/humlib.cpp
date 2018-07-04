@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jun 16 09:24:00 PDT 2018
+// Last Modified: Thu Jun 28 23:29:33 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -3427,7 +3427,14 @@ GridSlice* GridMeasure::addGlobalComment(const string& tok, HumNum timestamp) {
 			// if (((*iterator)->getTimestamp() == timestamp) && (*iterator)->isDataSlice()) {
 			if ((*iterator)->getTimestamp() == timestamp) {
 				// found the correct timestamp on a data slice, so add the global comment
-				// before the data slice.
+				// before the data slice.  But don't add if the previous
+				// grid slice is a global comment with the same text.
+				if ((iterator != this->end()) && (*iterator)->isGlobalComment()) {
+					if (tok == *(*iterator)->at(0)->at(0)->at(0)->getToken()) {
+						// do not insert duplicate global comment
+						break;
+					}
+				}
 				gs = new GridSlice(this, timestamp, SliceType::GlobalComments, 1);
 				gs->addToken(tok, 0, 0, 0);
 				this->insert(iterator, gs);
@@ -23676,6 +23683,13 @@ bool MxmlEvent::parseEvent(xml_node el, xml_node nextel, HumNum starttime) {
 			tempvoice = atoi(el.child_value());
 		} else if (nodeType(el, "duration")) {
 			tempduration = atoi(el.child_value());
+			// Duration must be set to 0 for figured bass.  But maybe need
+			// duration to create line extensions.  Probably other elements
+			// which are not notes should also have their durations set
+			// to zero.
+			if (nodeType(m_node, "figured-bass")) {
+				tempduration = 0;
+			}
 		}
 	}
 
@@ -23767,11 +23781,11 @@ bool MxmlEvent::parseEvent(xml_node el, xml_node nextel, HumNum starttime) {
 			}
 			break;
 
+		case mevent_figured_bass:
 		case mevent_harmony:
 		case mevent_barline:
 		case mevent_bookmark:
 		case mevent_direction:
-		case mevent_figured_bass:
 		case mevent_grouping:
 		case mevent_link:
 		case mevent_print:
@@ -46826,6 +46840,7 @@ int Tool_musicxml2hum::addLyrics(GridStaff* staff, MxmlEvent* event) {
 				} else {
 					finaltext += text;
 				}
+				syllabic.clear();
 			}
 		}
 
@@ -46888,6 +46903,13 @@ string Tool_musicxml2hum::cleanSpaces(const string& input) {
 		}
 		i--;
 	}
+	if ((output.size() == 3) && ((unsigned char)output[0] == 0xee) && 
+			((unsigned char)output[1] == 0x95) && ((unsigned char)output[2] == 0x91)) {
+		// MuseScore elision character:
+		// <text font-family="MScore Text"></text>
+		output = " ";
+	}
+
 	return output;
 }
 
@@ -52054,11 +52076,13 @@ Tool_transpose::Tool_transpose(void) {
 	define("c|chromatic=i:0", "the chromatic transposition value");
 	define("o|octave=i:0",    "the octave addition to tranpose value");
 	define("t|transpose=s",   "musical interval transposition value");
-	define("k|setkey=s",      "transpose to the given key");
+	define("k|settonic=s",    "transpose to the given key/tonic (mode will not change)");
 	define("auto=b",          "auto. trans. inst. parts to concert pitch");
 	define("debug=b",         "print debugging statements");
 	define("s|spines=s:",     "transpose only specified spines");
-	define("q|quiet=b",       "suppress *Tr interpretations in output");
+	// quiet reversed with -T option (actively need to request transposition code now)
+	// define("q|quiet=b",       "suppress *Tr interpretations in output");
+	define("T|transcode=b",   "include transposition code to reverse transposition");
 	define("I|instrument=b",  "insert instrument code (*ITr) as well");
 	define("C|concert=b",     "transpose written score to concert pitch");
 	define("W|written=b",     "trans. concert pitch score to written score");
@@ -52107,8 +52131,8 @@ bool Tool_transpose::run(HumdrumFile& infile, ostream& out) {
 bool Tool_transpose::run(HumdrumFile& infile) {
 	initialize(infile);
 
-	if (ssetkeyQ) {
-		transval = calculateTranspositionFromKey(ssetkey, infile);
+	if (ssettonicQ) {
+		transval = calculateTranspositionFromKey(ssettonic, infile);
 		transval = transval + octave * 40;
 		if (debugQ) {
 			m_humdrum_text << "!!Key TRANSVAL = " << transval;
@@ -53564,18 +53588,18 @@ void Tool_transpose::initialize(HumdrumFile& infile) {
 		exit(0);
 	}
 
-	transval     = getInteger("base40");
-	ssetkeyQ     = getBoolean("setkey");
-	ssetkey      = Convert::kernToBase40(getString("setkey").data());
-	autoQ        = getBoolean("auto");
-	debugQ       = getBoolean("debug");
-	spineQ       = getBoolean("spines");
-	spinestring  = getString("spines");
-	octave       = getInteger("octave");
-	concertQ     = getBoolean("concert");
-	writtenQ     = getBoolean("written");
-	quietQ       = getBoolean("quiet");
-	instrumentQ  = getBoolean("instrument");
+	transval     =  getInteger("base40");
+	ssettonicQ   =  getBoolean("settonic");
+	ssettonic    =  Convert::kernToBase40(getString("settonic").data());
+	autoQ        =  getBoolean("auto");
+	debugQ       =  getBoolean("debug");
+	spineQ       =  getBoolean("spines");
+	spinestring  =  getString("spines");
+	octave       =  getInteger("octave");
+	concertQ     =  getBoolean("concert");
+	writtenQ     =  getBoolean("written");
+	quietQ       = !getBoolean("transcode");
+	instrumentQ  =  getBoolean("instrument");
 
 	switch (getBoolean("diatonic") + getBoolean("chromatic")) {
 		case 1:
@@ -53591,7 +53615,7 @@ void Tool_transpose::initialize(HumdrumFile& infile) {
 			break;
 	}
 
-	ssetkey = ssetkey % 40;
+	ssettonic = ssettonic % 40;
 
 	if (getBoolean("transpose")) {
 		transval = getBase40ValueFromInterval(getString("transpose").data());
