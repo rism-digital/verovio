@@ -60,11 +60,12 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
     else if (action == "insert") {
         std::string elementType, startId, endId, staffId;
         int ulx, uly;
+        std::vector<std::pair<std::string, std::string>> attributes;
         if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &startId, &endId)) {
             return this->Insert(elementType, startId, endId);
         }
-        else if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly)) {
-            return this->Insert(elementType, staffId, ulx, uly);
+        else if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly, &attributes)) {
+            return this->Insert(elementType, staffId, ulx, uly, attributes);
         }
     }
     else if (action == "set") {
@@ -241,7 +242,8 @@ bool EditorToolkit::Insert(std::string elementType, std::string startid, std::st
     return false;
 }
 
-bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx, int uly)
+bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx, int uly,
+        std::vector<std::pair<std::string, std::string>> attributes)
 {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page");
@@ -336,6 +338,47 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         layer->AddChild(syllable);
         return true;
     }
+    else if (elementType == "clef") {
+        Clef *clef = new Clef();
+        data_CLEFSHAPE clefShape = CLEFSHAPE_NONE;
+
+        for (auto it = attributes.begin(); it != attributes.end(); ++it) {
+            if (it->first == "shape") {
+                if (it->second == "C") {
+                    clefShape = CLEFSHAPE_C;
+                    break;
+                }
+                else if (it->second == "F") {
+                    clefShape = CLEFSHAPE_F;
+                    break;
+                }
+            }
+        }
+        if (clefShape == CLEFSHAPE_NONE) {
+            LogError("A clef shape must be specified.");
+            delete clef;
+            return false;
+        }
+        clef->SetShape(clefShape);
+        const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        int yDiff = staff->GetZone()->GetUly() - uly;
+        int clefLine = staff->m_drawingLines - round((double) yDiff / (double) staffSize);
+        LogMessage("Line %d", clefLine);
+        clef->SetLine(clefLine);
+
+        Zone *zone = new Zone();
+        zone->SetUlx(ulx);
+        zone->SetUly(uly);
+        zone->SetLrx(ulx + staffSize / 1.4);
+        zone->SetLry(uly + staffSize / 2);
+        clef->SetZone(zone);
+        clef->SetFacs(zone->GetUuid());
+        Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
+        assert(surface);
+        surface->AddChild(zone);
+        layer->AddChild(clef);
+        return true;
+    }
     else {
         LogError("Unsupported type '%s' for insertion", elementType.c_str());
         return false;
@@ -403,7 +446,8 @@ bool EditorToolkit::ParseInsertAction(
 }
 
 bool EditorToolkit::ParseInsertAction(
-    jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly)
+    jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly,
+    std::vector<std::pair<std::string, std::string>> *attributes)
 {
     if (!param.has<jsonxx::String>("elementType")) return false;
     (*elementType) = param.get<jsonxx::String>("elementType");
@@ -413,6 +457,15 @@ bool EditorToolkit::ParseInsertAction(
     (*ulx) = param.get<jsonxx::Number>("ulx");
     if (!param.has<jsonxx::Number>("uly")) return false;
     (*uly) = param.get<jsonxx::Number>("uly");
+    if (param.has<jsonxx::Object>("attributes")) {
+        jsonxx::Object o = param.get<jsonxx::Object>("attributes");
+        auto m = o.kv_map();
+        for (auto it = m.begin(); it != m.end(); it++) {
+            if (o.has<jsonxx::String>(it->first)) {
+                attributes->emplace(attributes->end(), it->first, o.get<jsonxx::String>(it->first));
+            }
+        }
+    }
     return true;
 }
 
