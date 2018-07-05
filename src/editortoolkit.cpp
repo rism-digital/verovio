@@ -189,7 +189,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             // Adjust all elements who are positioned relative to clef by pitch
             for (auto it = objects.begin(); it != objects.end(); ++it) {
                 Object *child = dynamic_cast<Object *>(*it);
-                if (child == nullptr) continue;
+                if (child == nullptr || layer->GetClef(dynamic_cast<LayerElement *>(child)) != clef) continue;
                 PitchInterface *pi = child->GetPitchInterface();
                 assert(pi);
                 pi->AdjustPitchByOffset(-2 * lineDiff); // One line -> 2 pitches
@@ -361,9 +361,8 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         }
         clef->SetShape(clefShape);
         const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        int yDiff = staff->GetZone()->GetUly() - uly;
+        int yDiff = -staff->GetZone()->GetUly() + uly;
         int clefLine = staff->m_drawingLines - round((double) yDiff / (double) staffSize);
-        LogMessage("Line %d", clefLine);
         clef->SetLine(clefLine);
 
         Zone *zone = new Zone();
