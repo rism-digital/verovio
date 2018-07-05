@@ -444,6 +444,7 @@ public:
      */
     virtual int Save(FileOutputStream *output);
 
+    virtual void ReorderByXPos();
     /**
      * Main method that processes functors.
      * For each object, it will call the functor.
@@ -1007,6 +1008,11 @@ public:
     virtual int CalcMaxMeasureDuration(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
+    
+    /**
+     * Reorder elements by x-position.
+     */
+    virtual int ReorderByXPos(FunctorParams *);
 
 protected:
     //

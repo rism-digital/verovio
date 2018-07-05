@@ -746,6 +746,13 @@ int Object::Save(FileOutputStream *output)
     return true;
 }
 
+void Object::ReorderByXPos()
+{
+    ReorderByXPosParams params;
+    Functor reorder(&Object::ReorderByXPos);
+    this->Process(&reorder, &params);
+}
+
 //----------------------------------------------------------------------------
 // ObjectListInterface
 //----------------------------------------------------------------------------
@@ -1399,6 +1406,53 @@ int Object::SaveEnd(FunctorParams *functorParams)
     if (!params->m_output->WriteObjectEnd(this)) {
         return FUNCTOR_STOP;
     }
+    return FUNCTOR_CONTINUE;
+}
+
+bool sortByUlx(Object *a, Object *b)
+{
+    FacsimileInterface *fa = nullptr, *fb = nullptr;
+    InterfaceComparison comp(INTERFACE_FACSIMILE);
+    if (a->GetFacsimileInterface())
+        fa = a->GetFacsimileInterface();
+    else {
+        ArrayOfObjects children;
+        a->FindAllChildByComparison(&children, &comp);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            fa = dynamic_cast<FacsimileInterface *>(*it);
+            assert(fa);
+            if (fa->HasFacs()) break;
+            fa = nullptr;
+        }
+    }
+    if (b->GetFacsimileInterface())
+        fb = b->GetFacsimileInterface();
+    else {
+        ArrayOfObjects children;
+        b->FindAllChildByComparison(&children, &comp);
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            fb = dynamic_cast<FacsimileInterface *>(*it);
+            assert(fb);
+            if (fb->HasFacs()) break;
+            fb = nullptr;
+        }
+    }
+
+    if (fa == nullptr || fb == nullptr) return false;
+
+    return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
+}
+
+int Object::ReorderByXPos(FunctorParams *functorParams)
+{
+    if (this->GetFacsimileInterface() != nullptr) {
+        if (this->GetFacsimileInterface()->HasFacs()) {
+            return FUNCTOR_SIBLINGS; // This would have already been reordered.
+        }
+    }
+    
+    std::stable_sort(this->m_children.begin(), this->m_children.end(), sortByUlx);
+    this->Modify();
     return FUNCTOR_CONTINUE;
 }
 

@@ -81,12 +81,6 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
     return false;
 }
 
-bool SortByUlx(Object *a, Object *b)
-{
-    if (!a->GetFacsimileInterface() || !b->GetFacsimileInterface()) return true;
-    return (a->GetFacsimileInterface()->GetZone()->GetUlx() < b->GetFacsimileInterface()->GetZone()->GetUlx());
-}
-
 bool EditorToolkit::Drag(std::string elementId, int x, int y)
 {
     m_editInfo = "";
@@ -123,10 +117,8 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             assert(zone);
             zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
         }
-
-        return true;
     }
-    if (element->Is(NEUME)) {
+    else if (element->Is(NEUME)) {
         Neume *neume = dynamic_cast<Neume *>(element);
         assert(neume);
         Layer *layer = dynamic_cast<Layer *>(neume->GetFirstParent(LAYER));
@@ -166,11 +158,8 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
                 (*it)->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
             }
         }
-
-        neume->GetParent()->SortChildren(&SortByUlx);
-        return true;
     }
-    if (element->Is(CLEF)) {
+    else if (element->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(element);
         assert(clef);
         Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
@@ -210,8 +199,13 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
 
         return true;
     }
-    LogWarning("Unsupported element for dragging.");
-    return false;
+    else {
+        LogWarning("Unsupported element for dragging.");
+        return false;
+    }
+    Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
+    layer->ReorderByXPos();
+    return true;
 }
 
 bool EditorToolkit::Insert(std::string elementType, std::string startid, std::string endid)
@@ -343,7 +337,6 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         syllable->AddChild(neume);
         layer->AddChild(syllable);
         m_editInfo = nc->GetUuid();
-        return true;
     }
     else if (elementType == "clef") {
         Clef *clef = new Clef();
@@ -384,7 +377,6 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         surface->AddChild(zone);
         layer->AddChild(clef);
         m_editInfo = clef->GetUuid();
-        return true;
     }
     else if (elementType == "custos") {
         Custos *custos = new Custos();
@@ -433,12 +425,13 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         surface->AddChild(zone);
         layer->AddChild(custos);
         m_editInfo = custos->GetUuid();
-        return true;
     }
     else {
         LogError("Unsupported type '%s' for insertion", elementType.c_str());
         return false;
     }
+    layer->ReorderByXPos();
+    return true;
 }
 
 bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string attrValue)

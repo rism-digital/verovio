@@ -1603,6 +1603,18 @@ public:
     System *m_currentSystem;
 };
 
+//----------------------------------------------------------------------------
+// ReorderByXPosParams 
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the current object whose children we (may) reorder 
+ **/
+class ReorderByXPosParams : public FunctorParams {
+public:
+    int modifications = 0;
+};
+
 } // namespace vrv
 
 #endif
