@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jul  2 12:02:51 CEST 2018
+// Last Modified: Wed Jul  4 19:00:23 CEST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -15291,6 +15291,9 @@ void HumdrumFileContent::analyzeRestPositions(HTp kernstart) {
 			strack = second->getTrack();
 		}
 		if (track != strack) {
+         if (current->isRest()) {
+				processRestPitch(current, baseline);
+			}
 			// only one layer in current spine.
 			current = current->getNextToken();
 			continue;
