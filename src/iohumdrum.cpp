@@ -6192,6 +6192,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 setLocationId(hairpin, line->token(i), -1);
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 hum::HumNum tstamp2 = getMeasureTstamp(endtok, staffindex);
+                if (endtok->find("[[") != std::string::npos) {
+                    tstamp2 += endtok->getLine()->getDuration();
+                }
                 int measures = getMeasureDifference(line->token(i), endtok);
                 hairpin->SetTstamp(tstamp.getFloat());
                 pair<int, double> ts2(measures, tstamp2.getFloat());
@@ -6253,6 +6256,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 setLocationId(hairpin, line->token(i), -1);
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 hum::HumNum tstamp2 = getMeasureTstamp(endtok, staffindex);
+                if (endtok->find("]]") != std::string::npos) {
+                    tstamp2 += endtok->getLine()->getDuration();
+                }
                 int measures = getMeasureDifference(line->token(i), endtok);
                 hairpin->SetTstamp(tstamp.getFloat());
                 pair<int, double> ts2(measures, tstamp2.getFloat());
