@@ -6176,9 +6176,11 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             }
         }
         if (hairpins.find("<") != string::npos) {
+            int endline = false;
             hum::HTp endtok = NULL;
             if (hairpins.find("<[") != string::npos) {
                 endtok = token;
+                endline = true;
             }
             else {
                 endtok = getCrescendoEnd(line->token(i));
@@ -6192,7 +6194,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 setLocationId(hairpin, line->token(i), -1);
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 hum::HumNum tstamp2 = getMeasureTstamp(endtok, staffindex);
-                if (endtok->find("[[") != std::string::npos) {
+                if (endline || (endtok->find("[[") != std::string::npos)) {
                     tstamp2 += endtok->getLine()->getDuration();
                 }
                 int measures = getMeasureDifference(line->token(i), endtok);
@@ -6240,9 +6242,11 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             }
         }
         else if (hairpins.find(">") != string::npos) {
+            int endline = false;
             hum::HTp endtok = NULL;
             if (hairpins.find(">]") != string::npos) {
                 endtok = token;
+                endline = true;
             }
             else {
                 endtok = getDecrescendoEnd(line->token(i));
@@ -6256,7 +6260,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 setLocationId(hairpin, line->token(i), -1);
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 hum::HumNum tstamp2 = getMeasureTstamp(endtok, staffindex);
-                if (endtok->find("]]") != std::string::npos) {
+                if (endline || (endtok->find("]]") != std::string::npos)) {
                     tstamp2 += endtok->getLine()->getDuration();
                 }
                 int measures = getMeasureDifference(line->token(i), endtok);
