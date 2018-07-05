@@ -315,6 +315,20 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
             nc->SetPname(PITCHNAME_f);
         }
 
+        // Set as inclinatum or virga (if necessary)
+        for (auto it = attributes.begin(); it != attributes.end(); ++it) {
+            if (it->first == "diagonalright") {
+                if (it->second == "u") {
+                    nc->SetDiagonalright(ncVis_DIAGONALRIGHT_u);
+                }
+            }
+            else if (it->first == "name") {
+                if (it->second == "inclinatum") {
+                    nc->SetName(ncVis_NAME_inclinatum);
+                }
+            }
+        }
+
         const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         const int pitchDifference = round((double) (clef->GetZone()->GetUly() - uly) / (double) staffSize);
         nc->AdjustPitchByOffset(pitchDifference);
