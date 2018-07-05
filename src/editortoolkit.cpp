@@ -89,6 +89,7 @@ bool SortByUlx(Object *a, Object *b)
 
 bool EditorToolkit::Drag(std::string elementId, int x, int y)
 {
+    m_editInfo = "";
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page.");
         return false;
@@ -336,6 +337,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         neume->AddChild(nc);
         syllable->AddChild(neume);
         layer->AddChild(syllable);
+        m_editInfo = nc->GetUuid();
         return true;
     }
     else if (elementType == "clef") {
@@ -376,6 +378,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         assert(surface);
         surface->AddChild(zone);
         layer->AddChild(clef);
+        m_editInfo = clef->GetUuid();
         return true;
     }
     else {
@@ -419,6 +422,11 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
         return true;
     }
     return false;
+}
+
+std::string EditorToolkit::EditInfo()
+{
+    return m_editInfo;
 }
 
 bool EditorToolkit::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)

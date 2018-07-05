@@ -22,6 +22,7 @@ extern "C" {
 void *vrvToolkit_constructor();
 void vrvToolkit_destructor(Toolkit *tk);
 bool vrvToolkit_edit(Toolkit *tk, const char *editorAction);
+const char *vrvToolkit_editInfo(Toolkit *tk);
 const char *vrvToolkit_getAvailableOptions(Toolkit *tk);
 const char *vrvToolkit_getElementAttr(Toolkit *tk, const char *xmlId);
 const char *vrvToolkit_getElementsAtTime(Toolkit *tk, int millisec);
@@ -64,6 +65,12 @@ bool vrvToolkit_edit(Toolkit *tk, const char *editorAction)
         return false;
     }
     return true;
+}
+
+const char *vrvToolkit_editInfo(Toolkit *tk)
+{
+    tk->SetCString(tk->EditInfo());
+    return tk->GetCString();
 }
 
 const char *vrvToolkit_getAvailableOptions(Toolkit *tk)

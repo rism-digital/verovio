@@ -12,6 +12,9 @@ verovio.vrvToolkit.destructor = Module.cwrap('vrvToolkit_destructor', null, ['nu
 // bool edit(Toolkit *ic, const char *editorAction) 
 verovio.vrvToolkit.edit = Module.cwrap('vrvToolkit_edit', 'number', ['number', 'string']);
 
+// char *editInfo(Toolkit *ic)
+verovio.vrvToolkit.editInfo = Module.cwrap('vrvToolkit_editInfo', 'string', ['number']);
+
 // char *getAvailableOptions(Toolkit *ic)
 verovio.vrvToolkit.getAvailableOptions = Module.cwrap('vrvToolkit_getAvailableOptions', 'string', ['number']);
 
@@ -88,6 +91,10 @@ verovio.toolkit.prototype.destroy = function () {
 
 verovio.toolkit.prototype.edit = function (editorAction) {
 	return verovio.vrvToolkit.edit(this.ptr, JSON.stringify(editorAction));
+};
+
+verovio.toolkit.prototype.editInfo = function () {
+        return verovio.vrvToolkit.editInfo(this.ptr);
 };
 
 verovio.toolkit.prototype.getAvailableOptions = function () {

@@ -71,6 +71,10 @@ Toolkit::Toolkit(bool initFont)
     }
 
     m_options = m_doc.GetOptions();
+
+#ifdef USE_EMSCRIPTEN
+    m_editorToolkit = new EditorToolkit(&m_doc, &m_view);
+#endif
 }
 
 Toolkit::~Toolkit()
@@ -890,12 +894,22 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 bool Toolkit::Edit(const std::string &json_editorAction)
 {
 #ifdef USE_EMSCRIPTEN
-    EditorToolkit editorToolkit(&m_doc, &m_view);
-    return editorToolkit.ParseEditorAction(json_editorAction);
+    return m_editorToolkit->ParseEditorAction(json_editorAction);
 #else
     // The non-js version of the app should not use this function.
     LogError("This function should not be accessed through the non-js version of the app.");
     return false;
+#endif
+}
+
+std::string Toolkit::EditInfo()
+{
+#ifdef USE_EMSCRIPTEN
+    return m_editorToolkit->EditInfo();
+#else
+    // The non-js version of the app should not use this function.
+    LogError("This function should not be accessed through the non-js version of the app.");
+    return "";
 #endif
 }
 

@@ -27,7 +27,7 @@ namespace vrv {
 
 class EditorToolkit {
 public:
-    EditorToolkit(Doc *doc, View *view) { m_doc = doc; m_view = view; }
+    EditorToolkit(Doc *doc, View *view) { m_doc = doc; m_view = view; m_editInfo = ""; }
 
 #ifdef USE_EMSCRIPTEN
     bool ParseEditorAction(const std::string &json_editorAction);
@@ -42,6 +42,12 @@ public:
         std::vector<std::pair<std::string, std::string>> attributes);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     ///@}
+    
+    /**
+     * Get information on the last editor function used
+     */
+    std::string EditInfo();
+
 #endif
 
 protected:
@@ -61,6 +67,7 @@ protected:
 
     Doc *m_doc;
     View *m_view;
+    std::string m_editInfo;
 };
 
 //--------------------------------------------------------------------------------

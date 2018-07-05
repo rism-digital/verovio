@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "editortoolkit.h"
 #include "view.h"
 
 //----------------------------------------------------------------------------
@@ -89,6 +90,8 @@ public:
      * Only available for Emscripten-based compiles
      **/
     bool Edit(const std::string &json_editorAction);
+
+    std::string EditInfo();
 
     /**
      * Concatenates the vrv::logBuffer into a string an returns it.
@@ -278,6 +281,10 @@ private:
      * The C buffer string.
      */
     char *m_cString;
+
+#ifdef USE_EMSCRIPTEN
+    EditorToolkit *m_editorToolkit;
+#endif
 };
 
 } // namespace vrv
