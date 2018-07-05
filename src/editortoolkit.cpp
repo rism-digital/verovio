@@ -115,10 +115,15 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
         // Calculate pitch difference based on y difference
         int pitchDifference = round((double) y / (double) staff->m_drawingStaffSize);
         element->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
-        /*if (element->HasAttClass(ATT_COORDINATED)) {
-            AttCoordinated *att = dynamic_cast<AttCoordinated *>(element);
-            att->SetUlx(x);
-        }*/
+        
+        if (element->HasInterface(INTERFACE_FACSIMILE)) {
+            FacsimileInterface *fi = element->GetFacsimileInterface();
+            assert(fi);
+            Zone *zone = fi->GetZone();
+            assert(zone);
+            zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+        }
+
         return true;
     }
     if (element->Is(NEUME)) {
@@ -379,6 +384,55 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         surface->AddChild(zone);
         layer->AddChild(clef);
         m_editInfo = clef->GetUuid();
+        return true;
+    }
+    else if (elementType == "custos") {
+        Custos *custos = new Custos();
+        
+        // Find closest valid clef
+        ArrayOfObjects clefs;
+        AttComparison ac(CLEF);
+        layer->FindAllChildByComparison(&clefs, &ac);
+        Clef *clef = nullptr;
+
+        for (auto it = clefs.begin(); it != clefs.end(); it++) {
+            Clef *current = dynamic_cast<Clef *>(*it);
+            assert(current);
+            if (current->GetZone()->GetUlx() < ulx) {
+                if (clef == nullptr || clef->GetZone()->GetUlx() < current->GetZone()->GetUlx())
+                    clef = current;
+            }
+        }
+
+        if (clef == nullptr) {
+            LogError("There is no valid clef available.");
+            delete custos;
+            return false;
+        }
+
+        custos->SetOct(3);
+        if (clef->GetShape() == CLEFSHAPE_C)
+            custos->SetPname(PITCHNAME_c);
+        else if (clef->GetShape() == CLEFSHAPE_F)
+            custos->SetPname(PITCHNAME_f);
+
+        const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        const int pitchDifference = round((double) (clef->GetZone()->GetUly() - uly) / (double) staffSize);
+        custos->AdjustPitchByOffset(pitchDifference);
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+        
+        zone->SetUlx(ulx);
+        zone->SetUly(uly);
+        zone->SetLrx(ulx + noteWidth);
+        zone->SetLry(uly + noteHeight);
+        custos->SetZone(zone);
+        custos->SetFacs(zone->GetUuid());
+        Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
+        assert(surface);
+        surface->AddChild(zone);
+        layer->AddChild(custos);
+        m_editInfo = custos->GetUuid();
         return true;
     }
     else {
