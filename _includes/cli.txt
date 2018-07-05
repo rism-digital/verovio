@@ -1,4 +1,4 @@
-Verovio 2.0.0-dev-d732eb7
+Verovio 2.0.0-dev-1eb08e6
 
 Example usage:
 
@@ -55,7 +55,8 @@ General layout options
  --slur-curve-factor <i>           Slur curve factor - high value means rounder slurs (default: 10; min: 1; max: 100)
  --slur-height-factor <i>          Slur height factor -  high value means flatter slurs (default: 5; min: 1; max: 100)
  --slur-min-height <f>             The minimum slur height in MEI units (default: 1.20; min: 0.30; max: 2.00)
- --slur-max-height <f>             The maximum slur height in MEI units (default: 3.00; min: 2.00; max: 4.00)
+ --slur-max-height <f>             The maximum slur height in MEI units (default: 3.00; min: 2.00; max: 6.00)
+ --slur-max-slope <i>              The maximum slur slope in degrees (default: 20; min: 0; max: 45)
  --slur-thickness <f>              The slur thickness in MEI units (default: 0.60; min: 0.20; max: 1.20)
  --spacing-linear <f>              Specify the linear spacing factor (default: 0.25; min: 0.00; max: 1.00)
  --spacing-non-linear <f>          Specify the non-linear spacing factor (default: 0.60; min: 0.00; max: 1.00)
