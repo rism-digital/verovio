@@ -74,6 +74,12 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
             return this->Set(elementId, attrType, attrValue);
         }
     }
+    else if (action == "remove") {
+        std::string elementId;
+        if (this->ParseRemoveAction(json.get<jsonxx::Object>("param"), &elementId)) {
+            return this->Remove(elementId);
+        }
+    }
     else {
 
     }
@@ -485,6 +491,19 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
     return false;
 }
 
+bool EditorToolkit::Remove(std::string elementId)
+{
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        return false;
+    }
+    Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    assert(obj);
+    Object *parent = obj->GetParent();
+    assert(parent);
+    return parent->DeleteChild(obj);
+}
+
 std::string EditorToolkit::EditInfo()
 {
     return m_editInfo;
@@ -546,6 +565,14 @@ bool EditorToolkit::ParseSetAction(
     (*attrType) = param.get<jsonxx::String>("attrType");
     if (!param.has<jsonxx::String>("attrValue")) return false;
     (*attrValue) = param.get<jsonxx::String>("attrValue");
+    return true;
+}
+
+bool EditorToolkit::ParseRemoveAction(
+    jsonxx::Object param, std::string *elementId)
+{
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    (*elementId) = param.get<jsonxx::String>("elementId");
     return true;
 }
 
