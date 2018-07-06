@@ -233,6 +233,8 @@ public:
     // !!!RDF**kern: i = marked note
     std::vector<char> mark;
     std::vector<std::string> mcolor;
+    std::vector<std::string> markdir;
+
     std::vector<char> textmark;
     std::vector<std::string> textcolor;
 };
@@ -380,7 +382,7 @@ protected:
     void setNextLeftBarStyle(data_BARRENDITION style);
     void parseSignifiers(hum::HumdrumFile &infile);
     std::string getAutoClef(hum::HTp partstart, int partnumber);
-    void colorNote(vrv::Note *note, const std::string &token, int line, int field);
+    void colorNote(vrv::Note *note, hum::HTp token, const std::string &subtoken, int line, int field);
     void colorRest(vrv::Rest *rest, const std::string &token, int line, int field);
     void colorVerse(Verse *verse, std::string &token);
     std::string getSpineColor(int line, int field);
@@ -409,7 +411,7 @@ protected:
     hum::HTp getRightmostSystemArpeggio(hum::HTp token);
     hum::HTp getRightmostStaffArpeggio(hum::HTp token);
     void addDirection(
-        const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token, int staffindex);
+        const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token, int staffindex, const std::string &color = "");
     void processTerminalLong(hum::HTp token);
     void removeCharacter(hum::HTp token, char removechar);
     std::string getSystemDecoration(const std::string &tag);

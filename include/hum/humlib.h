@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul  4 19:00:23 CEST 2018
+// Last Modified: Fri Jul  6 03:49:41 CEST 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5327,6 +5327,24 @@ class Tool_satb2gs : public HumTool {
 		int    debugQ    = 0;             // used with --debug option
 };
 
+
+
+class Tool_slur : public HumTool {
+	public:
+		         Tool_slur         (void);
+		        ~Tool_slur         () {};
+
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     processFile       (HumdrumFile& infile);
+		void     initialize        (void);
+
+	private:
+
+};
 
 
 class Tool_tassoize : public HumTool {

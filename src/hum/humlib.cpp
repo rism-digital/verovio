@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jul  4 19:00:23 CEST 2018
+// Last Modified: Fri Jul  6 03:49:41 CEST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -16002,6 +16002,8 @@ bool HumdrumFileContent::analyzeKernSlurs(HTp spinestart,
 					}
 					if (!found) {
 						token->setValue("auto", "hangingSlur", "true");
+						token->setValue("auto", "slurSide", "stop");
+						token->setValue("auto", "slurOpenIndex", to_string(i));
 						token->setValue("auto", "slurDration",
 							token->getDurationToEnd());
 					}
@@ -16026,10 +16028,11 @@ bool HumdrumFileContent::analyzeKernSlurs(HTp spinestart,
 	// Mark un-closed slur starts:
 	for (int i=0; i<(int)sluropens.size(); i++) {
 		for (int j=0; j<(int)sluropens[i].size(); j++) {
-			for (int k=0; k<(int)sluropens[i][j].size(); j++) {
+			for (int k=0; k<(int)sluropens[i][j].size(); k++) {
 				sluropens[i][j][k]->setValue("", "auto", "hangingSlur", "true");
+				sluropens[i][j][k]->setValue("", "auto", "slurSide", "start");
 				sluropens[i][j][k]->setValue("", "auto", "slurDuration",
-					sluropens[i][j][k]->getDurationFromStart());
+						sluropens[i][j][k]->getDurationFromStart());
 			}
 		}
 	}
@@ -39303,6 +39306,8 @@ bool Tool_filter::run(HumdrumFile& infile) {
 			RUNTOOL(kern2mens, infile, commands[i].second, status);
 		} else if (commands[i].first == "recip") {
 			RUNTOOL(recip, infile, commands[i].second, status);
+		} else if (commands[i].first == "slur") {
+			RUNTOOL(slur, infile, commands[i].second, status);
 		} else if (commands[i].first == "transpose") {
 			RUNTOOL(transpose, infile, commands[i].second, status);
 		} else if (commands[i].first == "binroll") {
@@ -51783,6 +51788,129 @@ void Tool_satb2gs::example(void) {
 
 void Tool_satb2gs::usage(const string& command) {
 
+}
+
+
+
+
+
+/////////////////////////////////
+//
+// Tool_slur::Tool_slur -- Set the recognized options for the tool.
+//
+
+Tool_slur::Tool_slur(void) {
+	// add options here
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_slur::run -- Do the main work of the tool.
+//
+
+bool Tool_slur::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_slur::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_slur::run(HumdrumFile& infile) {
+	initialize();
+	processFile(infile);
+	infile.createLinesFromTokens();
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_slur::initialize --
+//
+
+void Tool_slur::initialize(void) {
+}
+
+
+
+//////////////////////////////
+//
+// Tool_slur::processFile --
+//
+
+void Tool_slur::processFile(HumdrumFile& infile) {
+	infile.analyzeKernSlurs();
+	int opencount = 0;
+	int closecount = 0;
+	for (int i=0; i<infile.getStrandCount(); i++) {
+		HTp stok = infile.getStrandStart(i);
+		if (!stok->isKern()) {
+			continue;
+		}
+		HTp etok = infile.getStrandEnd(i);
+		HTp tok = stok;
+		while (tok && (tok != etok)) {
+			if (!tok->isData()) {
+				tok = tok->getNextToken();
+				continue;
+			}
+			if (tok->isNull()) {
+				tok = tok->getNextToken();
+				continue;
+			}
+			string value = tok->getValue("auto", "hangingSlur");
+			if (value == "true") {
+				string side = tok->getValue("auto", "slurSide");
+				if (side == "start") {
+					opencount++;
+					string data = *tok;
+					data += "i";
+					tok->setText(data);
+					// cerr << "TOK " << tok << " has an unclosed slur opening" << endl;
+				} else if (side == "stop") {
+					closecount++;
+					string data = *tok;
+					data += "j";
+					tok->setText(data);
+					// cerr << "TOK " << tok << " has an unopened slur closing" << endl;
+				}
+			}
+			tok = tok->getNextToken();
+		}
+	}
+
+	if (opencount + closecount == 0) {
+		return;
+	}
+
+	if (opencount) {
+		infile.appendLine("!!!RDF**kern: i = marked note, color=\"hotpink\", text=\"extra(\"");
+	}
+
+	if (closecount) {
+		infile.appendLine("!!!RDF**kern: j = marked note, color=\"magenta\", text=\"extra)\"");
+	}
+
+	infile.createLinesFromTokens();
 }
 
 

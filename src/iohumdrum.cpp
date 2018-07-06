@@ -5159,7 +5159,7 @@ void HumdrumInput::embedTieInformation(Note *note, const std::string &token)
 // HumdrumInput::colorNote --
 //
 
-void HumdrumInput::colorNote(Note *note, const std::string &token, int line, int field)
+void HumdrumInput::colorNote(Note *note, hum::HTp token, const std::string &subtoken, int line, int field)
 {
     std::string spinecolor = getSpineColor(line, field);
     if (spinecolor != "") {
@@ -5167,9 +5167,15 @@ void HumdrumInput::colorNote(Note *note, const std::string &token, int line, int
     }
 
     for (int i = 0; i < (int)m_signifiers.mark.size(); ++i) {
-        if (token.find(m_signifiers.mark[i]) != std::string::npos) {
+        if (subtoken.find(m_signifiers.mark[i]) != std::string::npos) {
             note->SetColor(m_signifiers.mcolor[i]);
             appendTypeTag(note, "marked");
+			if (!m_signifiers.markdir[i].empty()) {
+				bool bold = true;
+				bool italic = false;
+    			int staffindex = m_rkern[token->getTrack()];
+    			addDirection(m_signifiers.markdir[i], "above", bold, italic, token, staffindex, m_signifiers.mcolor[i]);
+			}
             break;
         }
     }
@@ -5886,10 +5892,11 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 //////////////////////////////
 //
 // HumdrumInput::addDirection --
+//     default value: color = "";
 //
 
 void HumdrumInput::addDirection(
-    const string &text, const string &placement, bool bold, bool italic, hum::HTp token, int staffindex)
+    const string &text, const string &placement, bool bold, bool italic, hum::HTp token, int staffindex, const std::string &color)
 {
 
     Dir *dir = new Dir;
@@ -5897,23 +5904,18 @@ void HumdrumInput::addDirection(
     setLocationId(dir, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
     dir->SetTstamp(tstamp.getFloat());
-
+    m_measure->AddChild(dir);
     if (placement == "above") {
         setPlace(dir, "above");
-        // m_measure->AddChildBack(dir);
-        m_measure->AddChild(dir);
     }
     else if (placement == "below") {
         setPlace(dir, "below");
-        // m_measure->AddChildBack(dir);
-        m_measure->AddChild(dir);
-    }
-    else {
-        // m_measure->AddChildBack(dir);
-        m_measure->AddChild(dir);
     }
     if ((!italic) || bold) {
         Rend *rend = new Rend;
+		if (!color.empty()) {
+			rend->SetColor(color);
+		}
         dir->AddChild(rend);
         addTextElement(rend, text);
         if (!italic) {
@@ -8684,7 +8686,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
 
     int line = token->getLineIndex();
     int field = token->getFieldIndex();
-    colorNote(note, tstring, line, field);
+    colorNote(note, token, tstring, line, field);
     if (m_doc->GetOptions()->m_humType.GetValue()) {
         embedQstampInClass(note, token, tstring);
         embedPitchInformationInClass(note, tstring);
@@ -11902,6 +11904,11 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             m_signifiers.mark.push_back(signifier);
             m_signifiers.mcolor.push_back("red");
         }
+		if (hre.search(value, "text\\s*=\\s*\"?([^\"]+)\"?")) {
+            m_signifiers.markdir.push_back(hre.getMatch(1));
+		} else {
+            m_signifiers.markdir.push_back("");
+		}
     }
 }
 
