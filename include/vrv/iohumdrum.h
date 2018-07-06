@@ -323,8 +323,8 @@ protected:
         std::vector<std::string> &elements, std::vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
     void analyzeLayerBeams(
         std::vector<int> &beamnum, std::vector<int> &gbeamnum, const std::vector<hum::HTp> &layerdata);
-    void storeBreaksec(
-        std::vector<int> &beamstate, std::vector<int> &gbeamstate, const std::vector<hum::HTp> &layerdata, bool grace = false);
+    void storeBreaksec(std::vector<int> &beamstate, std::vector<int> &gbeamstate,
+        const std::vector<hum::HTp> &layerdata, bool grace = false);
     void setBeamDirection(int direction, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
         std::vector<hum::HTp> &layerdata, int layerindex, bool grace);
     void handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<std::string> &elements,
@@ -410,8 +410,8 @@ protected:
     bool leftmostStaffArpeggio(hum::HTp token);
     hum::HTp getRightmostSystemArpeggio(hum::HTp token);
     hum::HTp getRightmostStaffArpeggio(hum::HTp token);
-    void addDirection(
-        const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token, int staffindex, const std::string &color = "");
+    void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
+        int staffindex, const std::string &color = "");
     void processTerminalLong(hum::HTp token);
     void removeCharacter(hum::HTp token, char removechar);
     std::string getSystemDecoration(const std::string &tag);

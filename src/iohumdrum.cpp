@@ -5170,12 +5170,12 @@ void HumdrumInput::colorNote(Note *note, hum::HTp token, const std::string &subt
         if (subtoken.find(m_signifiers.mark[i]) != std::string::npos) {
             note->SetColor(m_signifiers.mcolor[i]);
             appendTypeTag(note, "marked");
-			if (!m_signifiers.markdir[i].empty()) {
-				bool bold = true;
-				bool italic = false;
-    			int staffindex = m_rkern[token->getTrack()];
-    			addDirection(m_signifiers.markdir[i], "above", bold, italic, token, staffindex, m_signifiers.mcolor[i]);
-			}
+            if (!m_signifiers.markdir[i].empty()) {
+                bool bold = true;
+                bool italic = false;
+                int staffindex = m_rkern[token->getTrack()];
+                addDirection(m_signifiers.markdir[i], "above", bold, italic, token, staffindex, m_signifiers.mcolor[i]);
+            }
             break;
         }
     }
@@ -5895,8 +5895,8 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 //     default value: color = "";
 //
 
-void HumdrumInput::addDirection(
-    const string &text, const string &placement, bool bold, bool italic, hum::HTp token, int staffindex, const std::string &color)
+void HumdrumInput::addDirection(const string &text, const string &placement, bool bold, bool italic, hum::HTp token,
+    int staffindex, const std::string &color)
 {
 
     Dir *dir = new Dir;
@@ -5913,9 +5913,9 @@ void HumdrumInput::addDirection(
     }
     if ((!italic) || bold) {
         Rend *rend = new Rend;
-		if (!color.empty()) {
-			rend->SetColor(color);
-		}
+        if (!color.empty()) {
+            rend->SetColor(color);
+        }
         dir->AddChild(rend);
         addTextElement(rend, text);
         if (!italic) {
@@ -11904,11 +11904,12 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             m_signifiers.mark.push_back(signifier);
             m_signifiers.mcolor.push_back("red");
         }
-		if (hre.search(value, "text\\s*=\\s*\"?([^\"]+)\"?")) {
+        if (hre.search(value, "text\\s*=\\s*\"?([^\"]+)\"?")) {
             m_signifiers.markdir.push_back(hre.getMatch(1));
-		} else {
+        }
+        else {
             m_signifiers.markdir.push_back("");
-		}
+        }
     }
 }
 
