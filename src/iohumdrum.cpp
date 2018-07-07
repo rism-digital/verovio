@@ -10492,7 +10492,6 @@ void HumdrumInput::addTrill(hum::HTp token)
                 lastnote = ntok;
                 // at this point ntok is a durational note or rest
                 if ((ntok->find("TTT") == std::string::npos) && (ntok->find("ttt") == std::string::npos)) {
-                    endtok = ntok;
                     break;
                 }
                 ntok = ntok->getNextToken();
@@ -10536,8 +10535,7 @@ void HumdrumInput::addTrill(hum::HTp token)
     bool isgracenote = endtok->find('q') == std::string::npos ? false : true;
     bool isrest = endtok->isRest();
 
-    if (isgracenote && (!foundbarline) && (!isrest)) {
-        // assuming last note is not in a chord.
+    if (isgracenote) {
         trill->SetEndid("#" + getLocationId("note", endtok, -1));
     }
     else if (isrest && !foundbarline) {
