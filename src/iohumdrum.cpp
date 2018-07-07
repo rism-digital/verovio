@@ -10448,6 +10448,8 @@ void HumdrumInput::addTrill(hum::HTp token)
     // barlines require @tstamp2 rather than @endid to display (possibly a bug in verovio).
     hum::HTp endtok = token->getNextToken();
     hum::HTp lasttok = token;
+    hum::HTp lastnote = token;
+    hum::HTp lastnoteorbar = token;
     hum::HTp bartok = NULL;
     int barlinecount = 0;
     bool foundbarline = false;
@@ -10458,6 +10460,7 @@ void HumdrumInput::addTrill(hum::HTp token)
             nextnoteafterbarline = true;
             bartok = endtok;
             barlinecount++;
+            lastnoteorbar = endtok;
         }
         if (!endtok->isData()) {
             endtok = endtok->getNextToken();
@@ -10474,6 +10477,9 @@ void HumdrumInput::addTrill(hum::HTp token)
             // grace notes.
             hum::HTp ntok = endtok->getNextToken();
             while (ntok) {
+                if (ntok->isBarline()) {
+                    lastnoteorbar = ntok;
+                }
                 if (!ntok->isData()) {
                     ntok = ntok->getNextToken();
                     continue;
@@ -10482,21 +10488,48 @@ void HumdrumInput::addTrill(hum::HTp token)
                     ntok = ntok->getNextToken();
                     continue;
                 }
+                lastnoteorbar = ntok;
+                lastnote = ntok;
                 // at this point ntok is a durational note or rest
-                if ((ntok->find("TTT") != std::string::npos) || (ntok->find("ttt") != std::string::npos)) {
+                if ((ntok->find("TTT") == std::string::npos) && (ntok->find("ttt") == std::string::npos)) {
                     endtok = ntok;
                     break;
                 }
                 ntok = ntok->getNextToken();
             }
         }
+        lastnoteorbar = endtok;
+        lastnote = endtok;
         if ((endtok->find("TTT") == std::string::npos) && (endtok->find("ttt") == std::string::npos)) {
             break;
         }
         lasttok = endtok;
         endtok = endtok->getNextToken();
     }
-    if (!endtok) {
+
+    if ((!endtok) && lastnoteorbar && lastnoteorbar->isBarline()) {
+        // reached the end of the music, so calculate the duration
+        // of the trill extension line from the position of the last
+        // barline.
+        hum::HumNum tstamp2 = getMeasureTstampPlusDur(bartok, staffindex);
+        std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+        hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
+        tstamp2 += mfactor;
+        int measures = getMeasureDifference(token, bartok);
+        measures--;
+        std::pair<int, double> ts2(measures, tstamp2.getFloat());
+        trill->SetTstamp2(ts2);
+        return;
+    }
+
+    if ((!endtok) && lastnoteorbar && lastnoteorbar->isData()) {
+        // reached the end of the music, so calculate the duration
+        // of the trill extension line from the position of the last
+        // note.
+        hum::HumNum tstamp2 = getMeasureTstampPlusDur(lastnote, staffindex);
+        int measures = getMeasureDifference(token, bartok);
+        std::pair<int, double> ts2(measures, tstamp2.getFloat());
+        trill->SetTstamp2(ts2);
         return;
     }
 
