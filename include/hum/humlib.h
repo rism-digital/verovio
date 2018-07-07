@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jul  6 03:49:41 CEST 2018
+// Last Modified: Fri Jul  6 22:29:27 CEST 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -3562,6 +3562,7 @@ class HumTool : public Options {
 		bool          hasHumdrumText  (void);
 		std::string   getHumdrumText  (void);
 		ostream&      getHumdrumText  (ostream& out);
+		void          suppressHumdrumFileOutput(void);
 
 		bool          hasJsonText     (void);
 		std::string   getJsonText     (void);
@@ -3585,6 +3586,8 @@ class HumTool : public Options {
 		std::stringstream m_free_text;     // output for plain text content.
 	  	std::stringstream m_warning_text;  // output for warning messages;
 	  	std::stringstream m_error_text;    // output for error messages;
+
+		bool m_suppress = false;
 
 };
 
@@ -5329,10 +5332,10 @@ class Tool_satb2gs : public HumTool {
 
 
 
-class Tool_slur : public HumTool {
+class Tool_slurcheck : public HumTool {
 	public:
-		         Tool_slur         (void);
-		        ~Tool_slur         () {};
+		         Tool_slurcheck    (void);
+		        ~Tool_slurcheck    () {};
 
 		bool     run               (HumdrumFile& infile);
 		bool     run               (const string& indata, ostream& out);
