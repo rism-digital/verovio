@@ -103,13 +103,19 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
 bool EditorToolkit::Chain(jsonxx::Array actions)
 {
     bool status = true;
+    std::string info = "[";
     for (int i = 0; i < actions.size(); i++) {
         if (!actions.has<jsonxx::Object>(i)) {
             LogError("Action %d was not an object", i);
             return false;
         }
         status |= this->ParseEditorAction(actions.get<jsonxx::Object>(i).json());
+        if (i != 0)
+            info += ", ";
+        info += "\"" + m_editInfo + "\"";
     }
+    info += "]";
+    m_editInfo = info; 
     return status;
 }
 
@@ -527,6 +533,7 @@ bool EditorToolkit::Remove(std::string elementId)
     assert(obj);
     Object *parent = obj->GetParent();
     assert(parent);
+    m_editInfo = elementId;
     return parent->DeleteChild(obj);
 }
 
