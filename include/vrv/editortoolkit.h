@@ -36,6 +36,7 @@ public:
      * Experimental editor functions.
      */
     ///@{
+    bool Chain(jsonxx::Array actions);
     bool Drag(std::string elementId, int x, int y);
     bool Insert(std::string elementType, std::string startId, std::string endId);
     bool Insert(std::string elementType, std::string staffId, int ulx, int uly,

@@ -43,12 +43,18 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         return false;
     }
 
-    if (!json.has<jsonxx::String>("action") || !json.has<jsonxx::Object>("param")) {
+    if (!json.has<jsonxx::String>("action") ||
+            (!json.has<jsonxx::Object>("param") && !json.has<jsonxx::Array>("param"))) {
         LogWarning("Incorrectly formatted JSON action");
         return false;
     }
 
     std::string action = json.get<jsonxx::String>("action");
+
+    if (action != "chain" && json.has<jsonxx::Array>("param")) {
+        LogWarning("Only 'chain' uses 'param' as an array.");
+        return false;
+    }
 
     if (action == "drag") {
         std::string elementId;
@@ -80,11 +86,31 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
             return this->Remove(elementId);
         }
     }
+    else if (action == "chain") {
+        if (!json.has<jsonxx::Array>("param")) {
+            LogError("Incorrectly formatted JSON action");
+            return false;
+        }
+        return this->Chain(json.get<jsonxx::Array>("param"));
+    }
     else {
 
     }
     LogWarning("Unknown action type.");
     return false;
+}
+
+bool EditorToolkit::Chain(jsonxx::Array actions)
+{
+    bool status = true;
+    for (int i = 0; i < actions.size(); i++) {
+        if (!actions.has<jsonxx::Object>(i)) {
+            LogError("Action %d was not an object", i);
+            return false;
+        }
+        status |= this->ParseEditorAction(actions.get<jsonxx::Object>(i).json());
+    }
+    return status;
 }
 
 bool EditorToolkit::Drag(std::string elementId, int x, int y)
