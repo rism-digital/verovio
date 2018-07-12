@@ -942,7 +942,7 @@ void Toolkit::ResetLogBuffer()
 
 void Toolkit::RedoLayout()
 {
-    if (m_doc.GetType() == Transcription) {
+    if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) {
         return;
     }
 

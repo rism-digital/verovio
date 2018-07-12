@@ -297,7 +297,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         LogError("Could not get drawing page");
         return false;
     }
-    if (m_doc->GetFacsimile() == nullptr) {
+    if (m_doc->GetType() != Facs) {
         LogError("Drawing page without facsimile");
         return false;
     }
