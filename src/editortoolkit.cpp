@@ -93,6 +93,12 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         }
         return this->Chain(json.get<jsonxx::Array>("param"));
     }
+    else if (action == "group") {
+        std::vector<std::string> elementIds; 
+        if (this->ParseGroupingAction(json.get<jsonxx::Object>("param"), &elementIds)){
+            return this->Group(elementIds);
+        }
+    }
     else {
 
     }
@@ -542,6 +548,45 @@ std::string EditorToolkit::EditInfo()
     return m_editInfo;
 }
 
+bool EditorToolkit::Group(std::vector<std::string> elementIds)
+{
+    Object *newParent, *neumeParent, *sylParent;
+    std::set<Object *> parents;
+
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        return false;
+    }
+    for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
+        Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
+        auto position = it - elementIds.begin();
+        if (position == 0){
+            newParent = el->GetParent();
+            assert(newParent);
+        }
+        else {
+            assert(newParent);
+            neumeParent = el->GetParent();
+            assert(neumeParent);
+
+            el->MoveItselfTo(newParent);
+
+            sylParent = neumeParent->GetParent();
+            assert(sylParent);
+        
+            std::string className = sylParent->GetClassName();
+            if(className.compare("Syllable") != 0) return false;
+
+            parents.insert(sylParent);
+        }
+    }
+    for (auto it = parents.begin(); it != parents.end(); ++it) {
+        Object *p = (*it)->GetParent();
+        if(!p->DeleteChild(*it)) return false;
+    }
+    return true;
+}
+
 bool EditorToolkit::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
@@ -606,6 +651,18 @@ bool EditorToolkit::ParseRemoveAction(
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
+    return true;
+}
+
+bool EditorToolkit::ParseGroupingAction(
+    jsonxx::Object param, std::vector<std::string> *elementIds)
+{
+    if(!param.has<jsonxx::Array>("elementIds")) return false;
+    jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
+    for (int i = 0; i < array.size(); i++) {
+        elementIds->push_back(array.get<jsonxx::String>(i));
+    }
+    
     return true;
 }
 

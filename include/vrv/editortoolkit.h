@@ -43,6 +43,7 @@ public:
         std::vector<std::pair<std::string, std::string>> attributes);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     bool Remove(std::string elementId);
+    bool Group(std::vector<std::string> elementIds);
     ///@}
     
     /**
@@ -65,6 +66,7 @@ protected:
         std::vector<std::pair<std::string, std::string>> *attributes);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
     bool ParseRemoveAction(jsonxx::Object param, std::string *elementId);
+    bool ParseGroupingAction(jsonxx::Object param, std::vector<std::string> *elementIds); 
     ///@}
 #endif
 
