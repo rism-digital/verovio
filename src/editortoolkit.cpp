@@ -145,17 +145,31 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
         Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
         assert(staff);
         // Calculate pitch difference based on y difference
-        int pitchDifference = round((double) y / (double) staff->m_drawingStaffSize);
+        int pitchDifference = round(2 * (double) y / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
         element->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
         
         if (element->HasInterface(INTERFACE_FACSIMILE)) {
-            FacsimileInterface *fi = element->GetFacsimileInterface();
-            assert(fi);
-            Zone *zone = fi->GetZone();
-            assert(zone);
-            zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+            bool ignoreFacs = false;
+            // Dont adjust the same facsimile twice. NCs in a ligature share a single zone.
+            if (element->Is(NC)) {
+                Nc *nc = dynamic_cast<Nc *>(element);
+                if (nc->GetLigature() == BOOLEAN_true) {
+                    Neume *neume = dynamic_cast<Neume *>(nc->GetFirstParent(NEUME));
+                    Nc *nextNc = dynamic_cast<Nc *>(neume->GetChild(1 + neume->GetChildIndex(element)));
+                    if (nextNc != nullptr && nextNc->GetLigature() == BOOLEAN_true && nextNc->GetZone() == nc->GetZone())
+                        ignoreFacs = true;
+                }
+            }
+            if (!ignoreFacs) {
+                FacsimileInterface *fi = element->GetFacsimileInterface();
+                assert(fi);
+                Zone *zone = fi->GetZone();
+                assert(zone);
+                zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+            }
         }
     }
+    // TODO Make more generic
     else if (element->Is(NEUME)) {
         Neume *neume = dynamic_cast<Neume *>(element);
         assert(neume);
@@ -167,7 +181,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
         Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
         assert(staff);
         // Calculate difference in pitch based on y difference
-        int pitchDifference = round((double)y / (double)staff->m_drawingStaffSize);
+        int pitchDifference = round(2 * (double)y / (double)m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
 
         // Get components of neume
         AttComparison ac(NC);
@@ -185,7 +199,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
         }
         else if (dynamic_cast<Nc*>(neume->FindChildByType(NC))->HasFacs()) {
-            std::set<Zone *> childZones;
+            std::set<Zone *> childZones;    // Sets do not contain duplicate entries
             for (Object *child = neume->GetFirst(); child != nullptr; child = neume->GetNext()) {
                 FacsimileInterface *fi = child->GetFacsimileInterface();
                 if (fi != nullptr) {
@@ -209,8 +223,6 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
         int initialClefLine = clef->GetLine();
         int clefLine = round((double) y / (double) m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
         clef->SetLine(clefLine);
-        //// Temporarily removing ULX attributes for coordinate refactor
-        // clef->SetUlx(x);
 
         if (initialClefLine != clefLine) {  // adjust notes so they stay in the same position
             int lineDiff = clefLine - initialClefLine;
@@ -234,15 +246,13 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             assert(zone);
             zone->ShiftByXY(x, (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize);
         }
-
-        return true;
     }
     else {
         LogWarning("Unsupported element for dragging.");
         return false;
     }
     Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
-    layer->ReorderByXPos();
+    layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
     return true;
 }
 
