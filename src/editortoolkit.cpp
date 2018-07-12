@@ -145,7 +145,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
         Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
         assert(staff);
         // Calculate pitch difference based on y difference
-        int pitchDifference = round(2 * (double) y / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+        int pitchDifference = round( (double) y / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
         element->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
         
         if (element->HasInterface(INTERFACE_FACSIMILE)) {
@@ -181,7 +181,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
         Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
         assert(staff);
         // Calculate difference in pitch based on y difference
-        int pitchDifference = round(2 * (double)y / (double)m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+        int pitchDifference = round( (double)y / (double)m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
 
         // Get components of neume
         AttComparison ac(NC);
