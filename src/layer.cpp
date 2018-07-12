@@ -201,7 +201,7 @@ Clef *Layer::GetClef(LayerElement *test)
     }
     Doc *doc = dynamic_cast<Doc *>(this->GetFirstParent(DOC));
     assert(doc);
-    if (doc->HasFacsimile()) {
+    if (doc->GetType() == Facs) {
         ArrayOfObjects clefs;
         AttComparison ac(CLEF);
         doc->FindAllChildBetween(&clefs, &ac, doc->GetFirst(CLEF), test);

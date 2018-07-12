@@ -2490,7 +2490,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         success = m_doc->GenerateDocumentScoreDef();
     }
 
-    if (success && m_doc->HasFacsimile()) {
+    if (success && m_doc->GetType() == Facs) {
         m_doc->SetChildZones();
     }
 

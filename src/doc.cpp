@@ -1514,7 +1514,7 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
 }
 
 void Doc::SetChildZones() {
-    if (!m_facsimile) return;
+    if (this->GetType() != Facs) return;
     
     InterfaceComparison ic(INTERFACE_FACSIMILE);
     ArrayOfObjects children;
