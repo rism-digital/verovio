@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jul 13 12:48:32 CEST 2018
+// Last Modified: Fri Jul 13 13:15:13 CEST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -13314,9 +13314,9 @@ void HumdrumFileBase::insertLine(int index, HumdrumLine* line) {
 
 //////////////////////////////
 //
-// HumdrumFileBase::deleteLine -- remove a line from the Humdrum file.  
+// HumdrumFileBase::deleteLine -- remove a line from the Humdrum file.
 //    Is best used for global comments and reference records for now.
-//    Other line types will cause parsing problems untill further 
+//    Other line types will cause parsing problems untill further
 //    generalized to stitch previous next lines together.
 //
 
@@ -52216,7 +52216,7 @@ void Tool_tassoize::deleteDummyTranspositions(HumdrumFile& infile) {
 //        is displayed above the note.
 //    This algorithm makes adjustments to the input data because
 //    Sibelius will drop editorial information after the frist
-//    editorial accidental on that pitch in the measure.  
+//    editorial accidental on that pitch in the measure.
 //    (3) If a note is the same pitch as a previous note in the
 //        measure and the previous note has an editorial accidental,
 //        then make the note an editorial note.  However, if the
@@ -52396,26 +52396,26 @@ void Tool_tassoize::deleteBreaks(HumdrumFile& infile) {
 ////////////////////////////////
 //
 // Tool_tassoize::addBibliographicRecords --
-// 
-// !!!COM: 
-// !!!CDT: 
-// !!!PTL: 
-// !!!PPP: 
-// !!!PPR: 
-// !!!PDT: 
-// !!!RISM: 
-// !!!rime: 
-// !!!OTL: 
+//
+// !!!COM:
+// !!!CDT:
+// !!!PTL:
+// !!!PPP:
+// !!!PPR:
+// !!!PDT:
+// !!!RISM:
+// !!!rime:
+// !!!OTL:
 // !!!AGN: Madrigal
-// !!!SCT: 
-// !!!SCA: 
-// !!!voices: 
+// !!!SCT:
+// !!!SCA:
+// !!!voices:
 //
 // At end:
 // !!!RDF**kern: l = terminal long
 // !!!RDF**kern: i = editorial accidental
 // !!!ENC: Emiliano Ricciardi
-// !!!END: 
+// !!!END:
 // !!!EED: Emiliano Ricciardi
 // !!!EEV: $DATE
 // !!!YEC: Copyright 2018 Emiliano Ricciardi, All Rights Reserved
@@ -52425,7 +52425,7 @@ void Tool_tassoize::deleteBreaks(HumdrumFile& infile) {
 void Tool_tassoize::addBibliographicRecords(HumdrumFile& infile) {
 	std::vector<HumdrumLine*> refinfo = infile.getReferenceRecords();
 	std::map<string, HumdrumLine*> refs;
-	for (int i=0; i<refinfo.size(); i++) {
+	for (int i=0; i<(int)refinfo.size(); i++) {
 		string key = refinfo[i]->getReferenceKey();
 		refs[key] = refinfo[i];
 	}
@@ -52631,7 +52631,7 @@ void Tool_tassoize::checkDataLine(HumdrumFile& infile, int lineindex) {
 			// 	!m_estates.at(track).at(base7)) {
 			// add !m_estates.at(track).at(base) as a condition if
 			// you want editorial accidentals to be added to return the
-			// note to the accidental in the key.  
+			// note to the accidental in the key.
 			//
 			// The accidental matches the key-signature state,
 			// so it should not be made editorial eventhough
@@ -52667,7 +52667,7 @@ void Tool_tassoize::checkDataLine(HumdrumFile& infile, int lineindex) {
 		// had an editorial accidental, and this note also has the
 		// same accidental, or there was a previous visual accidental
 		// outside of the key signature that will cause this note to have
-		// an editorial accidental mark applied (Sibelius will drop 
+		// an editorial accidental mark applied (Sibelius will drop
 		// secondary editorial accidentals in a measure when exporting,
 		// MusicXML, which is why this function is needed).
 
