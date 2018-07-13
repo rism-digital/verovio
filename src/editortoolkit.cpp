@@ -62,6 +62,7 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         if (this->ParseDragAction(json.get<jsonxx::Object>("param"), &elementId, &x, &y)) {
             return this->Drag(elementId, x, y);
         }    
+        LogWarning("Could not parse the drag action");
     }
     else if (action == "insert") {
         std::string elementType, startId, endId, staffId;
@@ -73,18 +74,21 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         else if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly, &attributes)) {
             return this->Insert(elementType, staffId, ulx, uly, attributes);
         }
+        LogWarning("Could not parse the insert action");
     }
     else if (action == "set") {
         std::string elementId, attrType, attrValue;
         if (this->ParseSetAction(json.get<jsonxx::Object>("param"), &elementId, &attrType, &attrValue)) {
             return this->Set(elementId, attrType, attrValue);
         }
+        LogWarning("Could not parse the set action");
     }
     else if (action == "remove") {
         std::string elementId;
         if (this->ParseRemoveAction(json.get<jsonxx::Object>("param"), &elementId)) {
             return this->Remove(elementId);
         }
+        LogWarning("Could not parse the remove action");
     }
     else if (action == "chain") {
         if (!json.has<jsonxx::Array>("param")) {
@@ -94,9 +98,8 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         return this->Chain(json.get<jsonxx::Array>("param"));
     }
     else {
-
+        LogWarning("Unknown action type.");
     }
-    LogWarning("Unknown action type.");
     return false;
 }
 
@@ -602,11 +605,20 @@ bool EditorToolkit::ParseInsertAction(
 bool EditorToolkit::ParseSetAction(
     jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
+    if (!param.has<jsonxx::String>("elementId")) {
+        LogWarning("Could not parse 'elementId'");
+        return false;
+    }
     (*elementId) = param.get<jsonxx::String>("elementId");
-    if (!param.has<jsonxx::String>("attrType")) return false;
+    if (!param.has<jsonxx::String>("attrType")) {
+        LogWarning("Could not parse 'attrType'");
+        return false;
+    }
     (*attrType) = param.get<jsonxx::String>("attrType");
-    if (!param.has<jsonxx::String>("attrValue")) return false;
+    if (!param.has<jsonxx::String>("attrValue")) {
+        LogWarning("Could not parse 'attrValue'");
+        return false;
+    }
     (*attrValue) = param.get<jsonxx::String>("attrValue");
     return true;
 }
