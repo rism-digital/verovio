@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jul  6 22:29:27 CEST 2018
+// Last Modified: Fri Jul 13 12:48:32 CEST 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1605,6 +1605,8 @@ class HumdrumFileBase : public HumHash {
 		void          insertLine               (int index, const char* line);
 		void          insertLine               (int index, const std::string& line);
 		void          insertLine               (int index, HumdrumLine* line);
+
+		void          deleteLine               (int index);
 //		void          adjustMergeSpineLines    (void);
 
 		HumdrumLine*  back                     (void);
@@ -5365,9 +5367,17 @@ class Tool_tassoize : public HumTool {
 		void     updateKeySignatures(HumdrumFile& infile, int lineindex);
 		void     checkDataLine      (HumdrumFile& infile, int lineindex);
 		void     clearStates        (void);
+		void     addBibliographicRecords(HumdrumFile& infile);
+		void     deleteBreaks       (HumdrumFile& infile);
+		void     fixEditorialAccidentals(HumdrumFile& infile);
+		void     fixInstrumentAbbreviations(HumdrumFile& infile);
+		void     addTerminalLongs   (HumdrumFile& infile);
+		void     deleteDummyTranspositions(HumdrumFile& infile);
+		string   getDate            (void);
 
 	private:
 		vector<vector<int>> m_pstates;
+		vector<vector<int>> m_kstates;
 		vector<vector<bool>> m_estates;
 
 };
