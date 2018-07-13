@@ -528,12 +528,11 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
         success = true;
     else if (Att::SetVisual(element, attrType, attrValue))
         success = true;
-    if (success) {
+    if (success && m_doc->GetType() != Facs) {
         m_doc->PrepareDrawing();
         m_doc->GetDrawingPage()->LayOut(true);
-        return true;
     }
-    return false;
+    return success;
 }
 
 bool EditorToolkit::Remove(std::string elementId)
