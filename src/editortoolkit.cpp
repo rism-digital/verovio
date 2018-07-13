@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        editortoolkit.cpp
-// Author:      Laurent Pugin, Juliette Regimbal
+// Author:      Laurent Pugin, Juliette Regimbal, Zoe McLennan
 // Created:     16/05/2018
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
@@ -97,6 +97,12 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         std::vector<std::string> elementIds; 
         if (this->ParseGroupingAction(json.get<jsonxx::Object>("param"), &elementIds)){
             return this->Group(elementIds);
+        }
+    }
+    else if (action == "ungroup") {
+        std::vector<std::string> elementIds;
+        if(this->ParseUngroupingAction(json.get<jsonxx::Object>("param"), &elementIds)){
+            return this->Ungroup(elementIds);
         }
     }
     else {
@@ -559,8 +565,7 @@ bool EditorToolkit::Group(std::vector<std::string> elementIds)
     }
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
         Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
-        auto position = it - elementIds.begin();
-        if (position == 0){
+        if (elementIds.begin() == it){
             newParent = el->GetParent();
             assert(newParent);
         }
@@ -583,6 +588,37 @@ bool EditorToolkit::Group(std::vector<std::string> elementIds)
     for (auto it = parents.begin(); it != parents.end(); ++it) {
         Object *p = (*it)->GetParent();
         if(!p->DeleteChild(*it)) return false;
+    }
+    return true;
+}
+
+bool EditorToolkit::Ungroup(std::vector<std::string> elementIds)
+{
+    Object *fparent, *sparent;
+
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        return false;
+    }
+    for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
+        Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
+        if (elementIds.begin() == it){
+            fparent = el->GetFirstParent(NEUME);
+            assert(fparent);
+            sparent = fparent->GetFirstParent(SYLLABLE);
+            assert(sparent);
+        }
+        else{
+            Neume *currentParent = dynamic_cast<Neume *>(fparent);
+            assert(currentParent);
+            Object *newParent = currentParent->Clone();
+            assert(newParent);
+            newParent->ResetUuid();
+
+            el->MoveItselfTo(newParent);
+            fparent->ClearRelinquishedChildren();
+            sparent->AddChild(newParent);
+        }
     }
     return true;
 }
@@ -666,6 +702,18 @@ bool EditorToolkit::ParseGroupingAction(
     return true;
 }
 
+bool EditorToolkit::ParseUngroupingAction(
+    jsonxx::Object param, std::vector<std::string> *elementIds)
+{
+    if(!param.has<jsonxx::Array>("elementIds")) return false;
+    jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
+    for (int i = 0; i < array.size(); i++) {
+        elementIds->push_back(array.get<jsonxx::String>(i));
+    }
+   
+    return true;
+}
+
 #endif
 // USE_EMSCRIPTEN
-} // namespace vrv
+}// namespace vrv
