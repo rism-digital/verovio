@@ -250,6 +250,33 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             zone->ShiftByXY(x, (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize);
         }
     }
+    else if (element->Is(STAFF)) {
+        Staff *staff = dynamic_cast<Staff *>(element);
+        if (!staff->HasFacs()) {
+            LogError("Staff dragging is only supported for staves with facsimiles!");
+            return false;
+        }
+        // Move staff facsimile
+        Zone *zone = staff->GetZone();
+        assert(zone);
+        zone->ShiftByXY(x, y);
+
+        // Move all staff children with facsimiles
+        ArrayOfObjects children;
+        InterfaceComparison ic(INTERFACE_FACSIMILE);
+        staff->FindAllChildByComparison(&children, &ic);
+        std::set<Zone *> zones;
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            FacsimileInterface *fi = (*it)->GetFacsimileInterface();
+            assert(fi);
+            if (fi->GetZone() != nullptr)
+                zones.insert(fi->GetZone());
+        }
+        for (auto it = zones.begin(); it != zones.end(); ++it) {
+            (*it)->ShiftByXY(x, y);
+        }
+        return true; // Can't reorder by layer since staves contain layers
+    }
     else {
         LogWarning("Unsupported element for dragging.");
         return false;
