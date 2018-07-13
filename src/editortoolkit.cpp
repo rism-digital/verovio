@@ -556,7 +556,7 @@ std::string EditorToolkit::EditInfo()
 
 bool EditorToolkit::Group(std::vector<std::string> elementIds)
 {
-    Object *newParent, *neumeParent, *sylParent;
+    Object *newParent, *neumeParent, *newSylParent, *sylParent;
     std::set<Object *> parents;
 
     if (!m_doc->GetDrawingPage()) {
@@ -568,21 +568,26 @@ bool EditorToolkit::Group(std::vector<std::string> elementIds)
         if (elementIds.begin() == it){
             newParent = el->GetParent();
             assert(newParent);
+            newSylParent = newParent->GetParent();
+            assert(newSylParent);
         }
         else {
-            assert(newParent);
-            neumeParent = el->GetParent();
-            assert(neumeParent);
+            if(newParent && newSylParent){
+                neumeParent = el->GetParent();
+                assert(neumeParent);
 
-            el->MoveItselfTo(newParent);
+                el->MoveItselfTo(newParent);
 
-            sylParent = neumeParent->GetParent();
-            assert(sylParent);
-        
-            std::string className = sylParent->GetClassName();
-            if(className.compare("Syllable") != 0) return false;
+                sylParent = neumeParent->GetParent();
+                assert(sylParent);
+            
+                std::string className = sylParent->GetClassName();
+                if(className.compare("Syllable") != 0) return false;
 
-            parents.insert(sylParent);
+                if(sylParent != newSylParent){
+                    parents.insert(sylParent);
+                }   
+            } 
         }
     }
     for (auto it = parents.begin(); it != parents.end(); ++it) {
@@ -614,7 +619,6 @@ bool EditorToolkit::Ungroup(std::vector<std::string> elementIds)
             Object *newParent = currentParent->Clone();
             assert(newParent);
             newParent->ResetUuid();
-
             el->MoveItselfTo(newParent);
             fparent->ClearRelinquishedChildren();
             sparent->AddChild(newParent);
