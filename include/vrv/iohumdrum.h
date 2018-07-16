@@ -159,9 +159,6 @@ namespace humaux {
         // layers.
         vector<bool> cue_size;
 
-        // show_cautionary_keysig == display cautionary key signatures.
-        bool show_cautionary_keysig;
-
         // ottavanote == keep track of ottava marks: stores the starting note of
         // an ottava line which will be turned off later.  ottavameasure == the
         // starting measure of the ottava mark.

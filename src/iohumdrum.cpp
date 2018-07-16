@@ -301,8 +301,6 @@ namespace humaux {
         ottava2downnotestart = ottava2downnoteend = NULL;
         ottava2downmeasure = NULL;
 
-        show_cautionary_keysig = false;
-
         ties.clear();
         meter_bottom = 4;
         meter_top = 4;
