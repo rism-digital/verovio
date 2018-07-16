@@ -94,9 +94,18 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         return this->Chain(json.get<jsonxx::Array>("param"));
     }
     else if (action == "group") {
+        std::string groupType;
         std::vector<std::string> elementIds; 
-        if (this->ParseGroupingAction(json.get<jsonxx::Object>("param"), &elementIds)){
-            return this->Group(elementIds);
+        if (this->ParseGroupingAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)){
+            if(groupType.compare("nc") == 0){
+                return this->GroupNc(elementIds);
+            }
+            else if (groupType.compare("neume") == 0){
+                return this->GroupNeume(elementIds);
+            }
+            else {
+                return false;
+            }
         }
     }
     else if (action == "ungroup") {
@@ -554,7 +563,7 @@ std::string EditorToolkit::EditInfo()
     return m_editInfo;
 }
 
-bool EditorToolkit::Group(std::vector<std::string> elementIds)
+bool EditorToolkit::GroupNc(std::vector<std::string> elementIds)
 {
     Object *newParent, *neumeParent, *newSylParent, *sylParent;
     std::set<Object *> parents;
@@ -592,6 +601,49 @@ bool EditorToolkit::Group(std::vector<std::string> elementIds)
     }
     for (auto it = parents.begin(); it != parents.end(); ++it) {
         Object *p = (*it)->GetParent();
+        if(!p->DeleteChild(*it)) return false;
+    }
+    return true;
+}
+bool EditorToolkit::GroupNeume(std::vector<std::string> elementIds)
+{
+    LogMessage("HI");
+    Object *newParent, *sylParent;
+    std::set<Object *> parents;
+
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        return false;
+    }
+    for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
+        Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
+        LogMessage("Neume is : %s", (*el).GetUuid().c_str());
+        if (elementIds.begin() == it){
+            newParent = el->GetParent();
+            LogMessage("NewParent is : %s", (*newParent).GetUuid().c_str());
+            assert(newParent);
+        }
+        else {
+            if(newParent){
+                sylParent = el->GetParent();
+                assert(sylParent);
+                LogMessage("SylParent is : %s", (*sylParent).GetUuid().c_str());
+
+                el->MoveItselfTo(newParent);
+            
+                std::string className = sylParent->GetClassName();
+                if(className.compare("Syllable") != 0) return false;
+
+                if(sylParent != newParent){
+                    parents.insert(sylParent);
+                }   
+            } 
+        }
+    }
+    for (auto it = parents.begin(); it != parents.end(); ++it) {
+        LogMessage("current parent is : %s", (*it)->GetUuid().c_str());
+        Object *p = (*it)->GetParent();
+        LogMessage("parents parent is : %s", (*p).GetUuid().c_str());
         if(!p->DeleteChild(*it)) return false;
     }
     return true;
@@ -695,8 +747,10 @@ bool EditorToolkit::ParseRemoveAction(
 }
 
 bool EditorToolkit::ParseGroupingAction(
-    jsonxx::Object param, std::vector<std::string> *elementIds)
+    jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds)
 {
+    if(!param.has<jsonxx::String>("groupType")) return false;
+    (*groupType) = param.get<jsonxx::String>("groupType");
     if(!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
     for (int i = 0; i < array.size(); i++) {
