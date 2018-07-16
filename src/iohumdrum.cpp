@@ -8422,7 +8422,9 @@ void HumdrumInput::getTimingInformation(std::vector<hum::HumNum> &prespace, std:
         }
         else if (prespace[i] > 0) {
             prespace[i] += correction;
-            correction = 0;
+            if (*layerdata[i] != "*") {
+                correction = 0;
+            }
         }
     }
     if (layerdata.size() > 0) {
