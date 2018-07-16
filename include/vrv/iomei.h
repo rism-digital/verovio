@@ -679,6 +679,12 @@ private:
      * If not specified by --mdiv-x-path query, then it is the first <mdiv> in the body
      */
     pugi::xml_node m_selectedMdiv;
+    
+    /**
+     * A flag indicating if the first scoreDef has to be used as Doc scoreDef.
+     * This is not the case when selecting a mDiv that is not the first one with a score in the tree.
+     */
+    bool m_useScoreDefForDoc;
 };
 
 } // namespace vrv
