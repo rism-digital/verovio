@@ -301,6 +301,8 @@ namespace humaux {
         ottava2downnotestart = ottava2downnoteend = NULL;
         ottava2downmeasure = NULL;
 
+        show_cautionary_keysig = false;
+
         ties.clear();
         meter_bottom = 4;
         meter_top = 4;
@@ -2890,6 +2892,9 @@ void HumdrumInput::setKeySig(int partindex, ELEMENT element, const std::string &
 
     if (secondary && (keyvalue == 0)) {
         // force cancellation keysignature.
+        element->SetKeysigShowchange(BOOLEAN_true);
+    }
+    else if (m_show_cautionary_keysig) {
         element->SetKeysigShowchange(BOOLEAN_true);
     }
 }
@@ -7980,6 +7985,8 @@ hum::HumNum HumdrumInput::removeFactorsOfTwo(hum::HumNum value, int &tcount, int
 //    *brackettup  = display tuplet brackets
 //    *Xcue        = notes back to regular size (operates at layer level rather than staff level).
 //    *cue         = display notes in cue size (operates at layer level rather than staff level).
+//    *kcancel     = display cancellation key signatures
+//    *Xkcancel    = do not display cancellation key signatures (default)
 //
 
 void HumdrumInput::handleStaffStateVariables(hum::HTp token)
@@ -8008,11 +8015,20 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
         ss[staffindex].suppress_beam_tuplet = false;
         ss[staffindex].suppress_bracket_tuplet = false;
     }
+
     if (value == "*Xcue") {
         ss[staffindex].cue_size.at(layernum) = false;
     }
     else if (value == "*cue") {
         ss[staffindex].cue_size.at(layernum) = true;
+    }
+
+    // Key cancellation option is currently global to all staves:
+    if (value == "*Xkcancel") {
+        m_show_cautionary_keysig = false;
+    }
+    else if (value == "*kcancel") {
+        m_show_cautionary_keysig = true;
     }
 }
 

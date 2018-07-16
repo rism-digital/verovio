@@ -159,6 +159,9 @@ namespace humaux {
         // layers.
         vector<bool> cue_size;
 
+        // show_cautionary_keysig == display cautionary key signatures.
+        bool show_cautionary_keysig;
+
         // ottavanote == keep track of ottava marks: stores the starting note of
         // an ottava line which will be turned off later.  ottavameasure == the
         // starting measure of the ottava mark.
@@ -637,6 +640,10 @@ private:
 
     // m_traspose == transposition to go from sounding to written pitch.
     vector<int> m_transpose;
+
+	//    *kcancel     = display cancellation key signatures
+	//    *Xkcancel    = do not display cancellation key signatures (default)
+	bool m_show_cautionary_keysig = false;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
