@@ -59,6 +59,8 @@ void StaffDef::Reset()
     ResetScalable();
     ResetStaffDefLog();
     ResetTransposition();
+    
+    m_drawingIsVisible = false;
 }
 
 void StaffDef::AddChild(Object *child)

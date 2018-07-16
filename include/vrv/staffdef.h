@@ -49,6 +49,16 @@ public:
      */
     ///@{
     virtual void AddChild(Object *object);
+                     
+                     
+    /**
+     * @name Setter and getter of the drawing visible flag
+     */
+    ///@{
+    bool GetDrawingIsVisible() const { return m_drawingIsVisible; }
+    void SetDrawingIsVisible(bool drawingIsVisible) { m_drawingIsVisible = drawingIsVisible; }
+    ///@}
+
 
     //----------//
     // Functors //
@@ -69,6 +79,12 @@ private:
 public:
     //
 private:
+    /**
+     * A flag indicating is the staffDef is visible or not.
+     * staffDef is not visible when scoreDef is optimized with dynamic rendering and
+     * when the corresponding staves contain only mRest elements.
+     */
+    bool m_drawingIsVisible;
 };
 
 } // namespace vrv

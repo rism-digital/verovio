@@ -231,6 +231,17 @@ int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+    
+int System::OptimizeScoreDef(FunctorParams *functorParams)
+{
+    OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
+    assert(params);
+
+    params->m_currentScoreDef = this->GetDrawingScoreDef();
+    assert(params->m_currentScoreDef);
+    
+    return FUNCTOR_CONTINUE;
+}
 
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

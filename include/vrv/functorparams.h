@@ -1179,6 +1179,34 @@ public:
     int m_systemFullWidth;
     Functor *m_functor;
 };
+    
+    
+//----------------------------------------------------------------------------
+// OptimizeScoreDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current scoreDef
+ * member 1: the current staffDef
+ * member 2: the flag indicating if we are optimizing encoded layout
+ * member 3: the doc
+ **/
+
+class OptimizeScoreDefParams : public FunctorParams {
+public:
+    OptimizeScoreDefParams(Doc *doc)
+    {
+        m_currentScoreDef = NULL;
+        m_currentStaffDef = NULL;
+        m_encoded = false;
+        m_doc = doc;
+    }
+    ScoreDef *m_currentScoreDef;
+    StaffDef *m_currentStaffDef;
+    bool m_encoded;
+    Doc *m_doc;
+};
+
 
 //----------------------------------------------------------------------------
 // PrepareBoundariesParams

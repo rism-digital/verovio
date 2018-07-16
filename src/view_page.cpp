@@ -803,13 +803,15 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     // Draw the barlines only with measured music
     if (measure->IsMeasuredMusic()) {
+        System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+        assert(system);
         if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
             DrawScoreDef(
-                dc, &m_drawingScoreDef, measure, measure->GetLeftBarLine()->GetDrawingX(), measure->GetLeftBarLine());
+                dc, system->GetDrawingScoreDef(), measure, measure->GetLeftBarLine()->GetDrawingX(), measure->GetLeftBarLine());
         }
         if (measure->GetDrawingRightBarLine() != BARRENDITION_NONE) {
             bool isLast = (measure == system->FindChildByType(MEASURE, 1, BACKWARD)) ? true : false;
-            DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetRightBarLine()->GetDrawingX(),
+            DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, measure->GetRightBarLine()->GetDrawingX(),
                 measure->GetRightBarLine(), isLast);
         }
     }
@@ -877,6 +879,12 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
     assert(staff);
     assert(measure);
     assert(system);
+    
+    assert(system->GetDrawingScoreDef());
+    StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(staff->GetN());
+    if (staffDef && (!staffDef->GetDrawingIsVisible())) {
+        return;
+    }
 
     dc->StartGraphic(staff, "", staff->GetUuid());
 

@@ -118,6 +118,11 @@ public:
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
+     * See Object::OptimizeScoreDef
+     */
+    virtual int OptimizeScoreDef(FunctorParams *functorParams);
+
+    /**
      * See Object::ResetHorizontalAlignment
      */
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);

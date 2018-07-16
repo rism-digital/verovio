@@ -263,6 +263,39 @@ int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+    
+    
+int Staff::OptimizeScoreDef(FunctorParams *functorParams)
+{
+    OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
+    assert(params);
+
+    assert(params->m_currentScoreDef);
+    StaffDef *staffDef = params->m_currentScoreDef->GetStaffDef(this->GetN());
+    
+    if (!staffDef) {
+        LogDebug("Could not find staffDef for staff (%d) when optimizing scoreDef in Staff::OptimizeScoreDef", this->GetN());
+        return FUNCTOR_SIBLINGS;
+    }
+    
+    if (staffDef->GetDrawingIsVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
+    
+    ArrayOfObjects layers;
+    AttComparison matchTypeLayer(LAYER);
+    this->FindAllChildByComparison(&layers, &matchTypeLayer);
+
+    ArrayOfObjects mRests;
+    AttComparison matchTypeMRest(MREST);
+    this->FindAllChildByComparison(&mRests, &matchTypeMRest);
+    
+    if (mRests.size() != layers.size()) {
+        staffDef->SetDrawingIsVisible(true);
+    }
+    
+    return FUNCTOR_SIBLINGS;
+}
 
 int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
 {

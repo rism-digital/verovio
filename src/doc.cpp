@@ -237,7 +237,7 @@ void Doc::CalculateMidiTimemap()
         if (!page) {
             return;
         }
-        this->CollectScoreDefs();
+        this->SetCurrentScoreDefDoc();
         page->LayOutHorizontally();
     }
 
@@ -722,7 +722,7 @@ void Doc::PrepareDrawing()
     m_drawingPreparationDone = true;
 }
 
-void Doc::CollectScoreDefs(bool force)
+void Doc::SetCurrentScoreDefDoc(bool force)
 {
     if (m_currentScoreDefDone && !force) {
         return;
@@ -747,6 +747,20 @@ void Doc::CollectScoreDefs(bool force)
 
     m_currentScoreDefDone = true;
 }
+    
+void Doc::OptimizeScoreDefDoc(bool encoded)
+{
+    if (encoded) {
+        return;
+    }
+
+    OptimizeScoreDefParams optimizeScoreDefParams(this);
+    Functor optimizeScoreDef(&Object::OptimizeScoreDef);
+
+    // LogElapsedTimeStart();
+    this->Process(&optimizeScoreDef, &optimizeScoreDefParams);
+    // LogElapsedTimeEnd ("Setting scoreDefs");
+}
 
 void Doc::CastOffDoc()
 {
@@ -758,7 +772,7 @@ void Doc::CastOffDoc()
         return;
     }
 
-    this->CollectScoreDefs();
+    this->SetCurrentScoreDefDoc();
 
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
@@ -782,7 +796,9 @@ void Doc::CastOffDoc()
     delete contentSystem;
 
     // Reset the scoreDef at the beginning of each system
-    this->CollectScoreDefs(true);
+    this->SetCurrentScoreDefDoc(true);
+    
+    this->OptimizeScoreDefDoc(false);
 
     // Here we redo the alignment because of the new scoreDefs
     // We can actually optimise this and have a custom version that does not redo all the calculation
@@ -806,7 +822,7 @@ void Doc::CastOffDoc()
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
-    this->CollectScoreDefs(true);
+    //this->SetCurrentScoreDefDoc(true);
 }
 
 void Doc::CastOffRunningElements(CastOffPagesParams *params)
@@ -868,12 +884,12 @@ void Doc::UnCastOffDoc()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->CollectScoreDefs(true);
+    this->SetCurrentScoreDefDoc(true);
 }
 
 void Doc::CastOffEncodingDoc()
 {
-    this->CollectScoreDefs();
+    this->SetCurrentScoreDefDoc();
 
     Pages *pages = this->GetPages();
     assert(pages);
@@ -904,7 +920,7 @@ void Doc::CastOffEncodingDoc()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->CollectScoreDefs(true);
+    this->SetCurrentScoreDefDoc(true);
 }
 
 void Doc::ConvertToPageBasedDoc()
@@ -948,7 +964,7 @@ void Doc::ConvertToCastOffMensuralDoc()
         m_isMensuralMusicOnly = false;
     }
 
-    this->CollectScoreDefs();
+    this->SetCurrentScoreDefDoc();
 
     Pages *pages = this->GetPages();
     assert(pages);
@@ -991,7 +1007,7 @@ void Doc::ConvertToCastOffMensuralDoc()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->CollectScoreDefs(true);
+    this->SetCurrentScoreDefDoc(true);
 }
 
 void Doc::ConvertToUnCastOffMensuralDoc()
@@ -1052,7 +1068,7 @@ void Doc::ConvertToUnCastOffMensuralDoc()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->CollectScoreDefs(true);
+    this->SetCurrentScoreDefDoc(true);
 }
 
 void Doc::ConvertAnalyticalMarkupDoc(bool permanent)
