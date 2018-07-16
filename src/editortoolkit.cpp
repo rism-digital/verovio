@@ -361,7 +361,14 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
 
 
     if (elementType == "staff") {
-        Staff *newStaff = new Staff();
+        Object *parent = staff->GetParent();
+        assert(parent);
+        int n = parent->GetChildCount() + 1;
+        Staff *newStaff = new Staff(n);
+        newStaff->m_drawingStaffDef = staff->m_drawingStaffDef;
+        newStaff->m_drawingNotationType = staff->m_drawingNotationType;
+        newStaff->m_drawingLines = staff->m_drawingLines;
+        newStaff->m_drawingStaffSize = (uly - lry) / (newStaff->m_drawingLines - 1);
         zone->SetUlx(ulx);
         zone->SetUly(uly);
         zone->SetLrx(lrx);
@@ -371,9 +378,8 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         surface->AddChild(zone);
         newStaff->SetZone(zone);
         newStaff->SetFacs(zone->GetUuid());
-        Layer *newlayer = new Layer();
-        Object *parent = staff->GetParent();
-        assert(parent);
+        Layer *newLayer = new Layer();
+        newStaff->AddChild(newLayer);
         parent->AddChild(newStaff);
         return true;
     }
