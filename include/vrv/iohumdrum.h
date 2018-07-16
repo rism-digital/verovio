@@ -440,6 +440,7 @@ protected:
     void setStemLength(Note *note, hum::HTp token);
     void storeExpansionLists(Section *section, hum::HTp starting);
     void storeExpansionList(Section *section, hum::HTp etok);
+    std::string replaceNoteShapes(const std::string input);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

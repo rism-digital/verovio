@@ -6601,8 +6601,40 @@ template <class ELEMENT> void HumdrumInput::addTextElement(ELEMENT *element, con
 {
     Text *text = new Text;
     element->AddChild(text);
-    std::string data = unescapeHtmlEntities(content);
+    std::string data = content;
+    if (data.find("[") != std::string::npos) {
+        data = replaceNoteShapes(data);
+    }
+    data = unescapeHtmlEntities(data);
     text->SetText(UTF8to16(data));
+}
+
+//////////////////////////////
+//
+// HumdrumInput::replaceNoteShapes --
+//    [thirtysecond] => &#X1d162;
+//    [sixteenth]    => &#X1d161;
+//    [eighth]       => &#x266a; or &#x1d160;
+//    [quarter]      => &#x2669; or &#x1d15f; (\xF0\x9D\x85\xBD)
+//    [half]         =>  or &#x1d15e;
+//    [whole]        =>  or &#x1d15d;
+//    [breve]        =>  or &#x1d15c; ?
+// long values do not work, so only quarter and eight at the moment.
+//
+
+std::string HumdrumInput::replaceNoteShapes(const std::string input)
+{
+    std::string output = input;
+    hum::HumRegex hre;
+    // SMUFL: hre.replaceDestructive(output, "&#xe1d5;", "\\[quarter\\]", "g");
+    // hre.replaceDestructive(output, "&#x1d15d;", "\\[whole\\]", "g");
+    // hre.replaceDestructive(output, "&#x1d15e;", "\\[half\\]", "g");
+    hre.replaceDestructive(output, "&#x2669;.", "\\[quarter-dot\\]", "g");
+    hre.replaceDestructive(output, "&#x266a;.", "\\[eighth-dot\\]", "g");
+    hre.replaceDestructive(output, "&#x2669;", "\\[quarter\\]", "g");
+    hre.replaceDestructive(output, "&#x266a;", "\\[eighth\\]", "g");
+    // hre.replaceDestructive(output, "&#x1d161;", "\\[sixteenth\\]", "g");
+    return output;
 }
 
 /////////////////////////////
