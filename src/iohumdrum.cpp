@@ -6606,7 +6606,7 @@ template <class ELEMENT> void HumdrumInput::addTextElement(ELEMENT *element, con
     element->AddChild(text);
     std::string data = content;
     if (data.find("[") != std::string::npos) {
-        data = replaceNoteShapes(data);
+        data = replaceMusicShapes(data);
     }
     data = unescapeHtmlEntities(data);
     text->SetText(UTF8to16(data));
@@ -6614,18 +6614,21 @@ template <class ELEMENT> void HumdrumInput::addTextElement(ELEMENT *element, con
 
 //////////////////////////////
 //
-// HumdrumInput::replaceNoteShapes --
+// HumdrumInput::replaceMusicShapes --
 //    [thirtysecond] => &#X1d162;
 //    [sixteenth]    => &#X1d161;
 //    [eighth]       => &#x266a; or &#x1d160;
 //    [quarter]      => &#x2669; or &#x1d15f; (\xF0\x9D\x85\xBD)
 //    [half]         =>  or &#x1d15e;
 //    [whole]        =>  or &#x1d15d;
-//    [breve]        =>  or &#x1d15c; ?
+//    [breve]        =>  or &#x1d15c;
+//    [ped]          => &#x1d1ae; (\xF0\x9D\x86\xAE)
+//    [segno]        => &#x1d10b; (\xF0\x9D\x84\x8B)
+//    [coda]         => &#x1d10c; (\xF0\x9D\x84\x8C)
 // long values do not work, so only quarter and eight at the moment.
 //
 
-std::string HumdrumInput::replaceNoteShapes(const std::string input)
+std::string HumdrumInput::replaceMusicShapes(const std::string input)
 {
     std::string output = input;
     hum::HumRegex hre;
@@ -6636,6 +6639,9 @@ std::string HumdrumInput::replaceNoteShapes(const std::string input)
     hre.replaceDestructive(output, "&#x266a;.", "\\[eighth-dot\\]", "g");
     hre.replaceDestructive(output, "&#x2669;", "\\[quarter\\]", "g");
     hre.replaceDestructive(output, "&#x266a;", "\\[eighth\\]", "g");
+    hre.replaceDestructive(output, "\xF0\x9D\x86\xAE", "\\[[Pp]ed\\.?\\]", "g");
+    hre.replaceDestructive(output, "\xF0\x9D\x84\x8B", "\\[[Ss]egno\\]", "g");
+    hre.replaceDestructive(output, "\xF0\x9D\x84\x8C", "\\[[Cc]oda\\]", "g");
     // hre.replaceDestructive(output, "&#x1d161;", "\\[sixteenth\\]", "g");
     return output;
 }

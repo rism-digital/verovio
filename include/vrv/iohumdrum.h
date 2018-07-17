@@ -440,7 +440,7 @@ protected:
     void setStemLength(Note *note, hum::HTp token);
     void storeExpansionLists(Section *section, hum::HTp starting);
     void storeExpansionList(Section *section, hum::HTp etok);
-    std::string replaceNoteShapes(const std::string input);
+    std::string replaceMusicShapes(const std::string input);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -638,9 +638,9 @@ private:
     // m_traspose == transposition to go from sounding to written pitch.
     vector<int> m_transpose;
 
-	//    *kcancel     = display cancellation key signatures
-	//    *Xkcancel    = do not display cancellation key signatures (default)
-	bool m_show_cautionary_keysig = false;
+    //    *kcancel     = display cancellation key signatures
+    //    *Xkcancel    = do not display cancellation key signatures (default)
+    bool m_show_cautionary_keysig = false;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
