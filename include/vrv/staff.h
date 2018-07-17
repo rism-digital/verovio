@@ -78,7 +78,7 @@ public:
      * Check if the staff is currently visible.
      * Looks for the parent system and its current drawing scoreDef
      */
-    bool IsDrawingVisible();
+    bool DrawingIsVisible();
 
     /**
      * Return the index position of the staff in its measure parent

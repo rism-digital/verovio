@@ -258,7 +258,7 @@ void View::DrawStaffGrp(
     for (iter = staffDefs->begin(); iter != staffDefs->end(); iter++) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
         assert(staffDef);
-        if (staffDef->GetDrawingIsVisible()) {
+        if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
             firstDef = staffDef;
             break;
         }
@@ -269,7 +269,7 @@ void View::DrawStaffGrp(
     for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); riter++) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
         assert(staffDef);
-        if (staffDef->GetDrawingIsVisible()) {
+        if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
             lastDef = staffDef;
             break;
         }
@@ -415,6 +415,11 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
 
         if (!staff || !system) {
             LogDebug("Staff or System missing in View::DrawStaffDefLabels");
+            ++iter;
+            continue;
+        }
+        
+        if (!staff->DrawingIsVisible()) {
             ++iter;
             continue;
         }
@@ -901,7 +906,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
     
     assert(system->GetDrawingScoreDef());
     StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(staff->GetN());
-    if (staffDef && (!staffDef->GetDrawingIsVisible())) {
+    if (staffDef && (staffDef->GetDrawingVisibility() == OPTIMIZATION_HIDDEN)) {
         return;
     }
 

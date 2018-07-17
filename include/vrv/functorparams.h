@@ -433,7 +433,7 @@ public:
         m_currentMeterSig = NULL;
         m_notationType = NOTATIONTYPE_cmn;
         m_functor = functor;
-        m_scoreDefRole = NONE;
+        m_scoreDefRole = SCOREDEF_NONE;
         m_isFirstMeasure = false;
         m_hasMultipleLayer = false;
         m_doc = doc;

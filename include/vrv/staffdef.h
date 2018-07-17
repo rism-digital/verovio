@@ -50,15 +50,13 @@ public:
     ///@{
     virtual void AddChild(Object *object);
                      
-                     
     /**
      * @name Setter and getter of the drawing visible flag
      */
     ///@{
-    bool GetDrawingIsVisible() const { return m_drawingIsVisible; }
-    void SetDrawingIsVisible(bool drawingIsVisible) { m_drawingIsVisible = drawingIsVisible; }
+    VisibilityOptimization GetDrawingVisibility() const { return m_drawingIsVisible; }
+    void SetDrawingVisibility(VisibilityOptimization drawingIsVisible) { m_drawingIsVisible = drawingIsVisible; }
     ///@}
-
 
     //----------//
     // Functors //
@@ -83,8 +81,9 @@ private:
      * A flag indicating is the staffDef is visible or not.
      * staffDef is not visible when scoreDef is optimized with dynamic rendering and
      * when the corresponding staves contain only mRest elements.
+     * By default the value is OPTIMIZATION_NONE
      */
-    bool m_drawingIsVisible;
+    VisibilityOptimization m_drawingIsVisible;
 };
 
 } // namespace vrv

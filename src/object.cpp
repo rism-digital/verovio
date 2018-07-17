@@ -1255,7 +1255,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         Staff *currentStaff = dynamic_cast<Staff *>(this);
         assert(currentStaff);
         
-        if (!currentStaff->IsDrawingVisible()) {
+        if (!currentStaff->DrawingIsVisible()) {
             return FUNCTOR_SIBLINGS;
         }
 
@@ -1270,7 +1270,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         // set scoreDef attr
         if (currentLayer->GetStaffDefClef()) {
             // Ignore system scoreDef clefs - clefs changes withing a staff are still taken into account
-            if (currentLayer->GetStaffDefClef()->GetScoreDefRole() != SYSTEM_SCOREDEF) {
+            if (currentLayer->GetStaffDefClef()->GetScoreDefRole() != SCOREDEF_SYSTEM) {
                 currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
             }
         }

@@ -60,7 +60,7 @@ void StaffDef::Reset()
     ResetStaffDefLog();
     ResetTransposition();
     
-    m_drawingIsVisible = false;
+    m_drawingIsVisible = OPTIMIZATION_NONE;
 }
 
 void StaffDef::AddChild(Object *child)

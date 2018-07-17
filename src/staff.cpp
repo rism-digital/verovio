@@ -150,7 +150,7 @@ int Staff::GetDrawingY() const
     return m_cachedDrawingY;
 }
     
-bool Staff::IsDrawingVisible()
+bool Staff::DrawingIsVisible()
 {
     System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
     assert(system);
@@ -158,7 +158,7 @@ bool Staff::IsDrawingVisible()
     
     StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(this->GetN());
     assert(staffDef);
-    return staffDef->GetDrawingIsVisible();
+    return (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN);
 }
 
 int Staff::CalcPitchPosYRel(Doc *doc, int loc)
@@ -289,9 +289,11 @@ int Staff::OptimizeScoreDef(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
     
-    if (staffDef->GetDrawingIsVisible()) {
+    if (staffDef->GetDrawingVisibility() == OPTIMIZATION_SHOW) {
         return FUNCTOR_SIBLINGS;
     }
+
+    staffDef->SetDrawingVisibility(OPTIMIZATION_HIDDEN);
     
     ArrayOfObjects layers;
     AttComparison matchTypeLayer(LAYER);
@@ -302,7 +304,7 @@ int Staff::OptimizeScoreDef(FunctorParams *functorParams)
     this->FindAllChildByComparison(&mRests, &matchTypeMRest);
     
     if (mRests.size() != layers.size()) {
-        staffDef->SetDrawingIsVisible(true);
+        staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
     }
     
     return FUNCTOR_SIBLINGS;
@@ -349,7 +351,7 @@ int Staff::AlignVertically(FunctorParams *functorParams)
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
     
-    if (!this->IsDrawingVisible()) {
+    if (!this->DrawingIsVisible()) {
         return FUNCTOR_SIBLINGS;
     }
 
