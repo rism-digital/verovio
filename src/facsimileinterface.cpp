@@ -36,20 +36,20 @@ void FacsimileInterface::Reset()
 int FacsimileInterface::GetDrawingX() const
 {
     assert(m_zone);
-    return m_zone->GetUlx() * m_zone->m_facsScale;
+    return m_zone->GetUlx();
 }
 
 int FacsimileInterface::GetDrawingY() const
 {
     assert(m_zone);
-    int y = ( m_zone->GetLogicalUly()) * m_zone->m_facsScale;
+    int y = ( m_zone->GetLogicalUly());
     return y;
 }
 
 int FacsimileInterface::GetWidth() const
 {
     assert(m_zone);
-    return m_zone->m_facsScale * (m_zone->GetLrx() - m_zone->GetUlx());
+    return m_zone->GetLrx() - m_zone->GetUlx();
 }
 
 int FacsimileInterface::GetSurfaceY() const

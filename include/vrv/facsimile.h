@@ -41,8 +41,7 @@ public:
     ///@}
     void ShiftByXY(int xDiff, int yDiff);
     int GetLogicalUly();
-    int GetLogicalLry();    
-    int m_facsScale = 1;
+    int GetLogicalLry();
 private:
 };
 
