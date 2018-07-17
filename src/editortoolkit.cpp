@@ -256,16 +256,13 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             LogError("Staff dragging is only supported for staves with facsimiles!");
             return false;
         }
-        // Move staff facsimile
-        Zone *zone = staff->GetZone();
-        assert(zone);
-        zone->ShiftByXY(x, y);
-
-        // Move all staff children with facsimiles
+        
+        // Move staff and all staff children with facsimiles
         ArrayOfObjects children;
         InterfaceComparison ic(INTERFACE_FACSIMILE);
         staff->FindAllChildByComparison(&children, &ic);
         std::set<Zone *> zones;
+        zones.insert(staff->GetZone());
         for (auto it = children.begin(); it != children.end(); ++it) {
             FacsimileInterface *fi = (*it)->GetFacsimileInterface();
             assert(fi);
@@ -273,8 +270,12 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
                 zones.insert(fi->GetZone());
         }
         for (auto it = zones.begin(); it != zones.end(); ++it) {
-            (*it)->ShiftByXY(x, y);
+            // Transform y to device context
+            (*it)->ShiftByXY(x, -y);
         }
+
+        //TODO Reorder by left-to-right, top-to-bottom
+        
         return true; // Can't reorder by layer since staves contain layers
     }
     else {
