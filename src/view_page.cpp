@@ -939,15 +939,9 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     dc->SetBrush(m_currentColour, AxSOLID);
 
     for (j = 0; j < staff->m_drawingLines; ++j) {
-        if (true) {
-            dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
-            // For drawing rectangles instead of lines
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        }
-        else {
-            //dc->DrawLine(zone->m_facsScale * zone->GetUlx(), y, zone->m_facsScale * zone->GetLrx(), y);
-            y += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        }
+        dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y), ToDeviceContextX(x2), ToDeviceContextY(y));
+        // For drawing rectangles instead of lines
+        y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     }
 
     dc->ResetPen();

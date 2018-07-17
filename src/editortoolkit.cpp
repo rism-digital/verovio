@@ -66,13 +66,14 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
     }
     else if (action == "insert") {
         std::string elementType, startId, endId, staffId;
-        int ulx, uly;
+        int ulx, uly, lrx, lry;
         std::vector<std::pair<std::string, std::string>> attributes;
         if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &startId, &endId)) {
             return this->Insert(elementType, startId, endId);
         }
-        else if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly, &attributes)) {
-            return this->Insert(elementType, staffId, ulx, uly, attributes);
+        else if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly,
+                    &lrx, &lry, &attributes)) {
+            return this->Insert(elementType, staffId, ulx, uly, lrx, lry, attributes);
         }
         LogWarning("Could not parse the insert action");
     }
@@ -322,7 +323,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string startid, std::st
 }
 
 bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx, int uly,
-        std::vector<std::pair<std::string, std::string>> attributes)
+        int lrx, int lry, std::vector<std::pair<std::string, std::string>> attributes)
 {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page");
@@ -334,6 +335,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
     }
 
     Staff *staff;
+
 
     // Find closest valid staff
     if (staffId == "auto") {
@@ -357,6 +359,47 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
     assert(layer);
     Facsimile *facsimile = m_doc->GetFacsimile();
     Zone *zone = new Zone();
+
+
+    if (elementType == "staff") {
+        Object *parent = staff->GetParent();
+        assert(parent);
+        int n = parent->GetChildCount() + 1;
+        Staff *newStaff = new Staff(n);
+        newStaff->m_drawingStaffDef = staff->m_drawingStaffDef;
+        newStaff->m_drawingNotationType = staff->m_drawingNotationType;
+        newStaff->m_drawingLines = staff->m_drawingLines;
+        newStaff->m_drawingStaffSize = (uly - lry) / (newStaff->m_drawingLines - 1);
+        zone->SetUlx(ulx);
+        zone->SetUly(uly);
+        zone->SetLrx(lrx);
+        zone->SetLry(lry);
+        Surface *surface = dynamic_cast<Surface *>(m_doc->GetFacsimile()->FindChildByType(SURFACE));
+        assert(surface);
+        surface->AddChild(zone);
+        newStaff->SetZone(zone);
+        newStaff->SetFacs(zone->GetUuid());
+        Layer *newLayer = new Layer();
+        newStaff->AddChild(newLayer);
+
+        // Find index to insert new staff
+        ArrayOfObjects staves;
+        AttComparison ac(STAFF);
+        parent->FindAllChildByComparison(&staves, &ac);
+        staves.push_back(newStaff);
+        StaffSort staffSort;
+        std::stable_sort(staves.begin(), staves.end(), staffSort);
+        for (int i = 0; i < staves.size(); i++) {
+            if (staves.at(i) == newStaff) {
+                newStaff->SetParent(parent);
+                parent->InsertChild(newStaff, i);
+                return true;
+            }
+        }
+        LogMessage("Failed to insert newStaff into staff");
+        parent->AddChild(newStaff);
+        return true;
+    }
 
     if (elementType == "nc") {
         Syllable *syllable = new Syllable();
@@ -607,7 +650,7 @@ bool EditorToolkit::ParseInsertAction(
 
 bool EditorToolkit::ParseInsertAction(
     jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly,
-    std::vector<std::pair<std::string, std::string>> *attributes)
+    int *lrx, int *lry, std::vector<std::pair<std::string, std::string>> *attributes)
 {
     if (!param.has<jsonxx::String>("elementType")) return false;
     (*elementType) = param.get<jsonxx::String>("elementType");
@@ -626,6 +669,19 @@ bool EditorToolkit::ParseInsertAction(
             }
         }
     }
+    
+    if (*elementType != "staff") {
+        if (!param.has<jsonxx::Number>("lrx") || !param.has<jsonxx::Number>("lry")) {
+            *lrx = -1;
+            *lry = -1;
+        }
+    }
+    else {
+        if (!param.has<jsonxx::Number>("lrx")) return false;
+        *lrx = param.get<jsonxx::Number>("lrx");
+        if (!param.has<jsonxx::Number>("lry")) return false;
+        *lry = param.get<jsonxx::Number>("lry");
+    } 
     return true;
 }
 
