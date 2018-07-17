@@ -1254,10 +1254,12 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     if (this->Is(STAFF)) {
         Staff *currentStaff = dynamic_cast<Staff *>(this);
         assert(currentStaff);
-        assert(currentStaff->GetAlignment());
+        
+        if (!currentStaff->IsDrawingVisible()) {
+            return FUNCTOR_SIBLINGS;
+        }
 
         params->m_staffAlignment = currentStaff->GetAlignment();
-
         return FUNCTOR_CONTINUE;
     }
 
@@ -1309,6 +1311,8 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         // if nothing was drawn, do not take it into account
         return FUNCTOR_CONTINUE;
     }
+    
+    assert(params->m_staffAlignment);
 
     LayerElement *current = dynamic_cast<LayerElement *>(this);
     assert(current);
@@ -1316,16 +1320,15 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     bool skipAbove = false;
     bool skipBelow = false;
     Chord *chord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
-    if (chord) {
+    if (chord && params->m_staffAlignment) {
         chord->GetCrossStaffOverflows(current, params->m_staffAlignment, skipAbove, skipBelow);
     }
 
     StaffAlignment *alignment = params->m_staffAlignment;
     Layer *crossLayer = NULL;
     Staff *crossStaff = current->GetCrossStaff(crossLayer);
-    if (crossStaff) {
+    if (crossStaff && crossStaff->GetAlignment()) {
         alignment = crossStaff->GetAlignment();
-        assert(alignment);
     }
 
     int staffSize = alignment->GetStaffSize();

@@ -125,9 +125,11 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
             continue;
         }
+        if (!staff->IsDrawingVisible()) {
+            continue;
+        }
         staves.push_back(staff);
     }
-    if (staves.empty()) LogDebug("Empty @staff array");
     return staves;
 }
 

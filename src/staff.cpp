@@ -149,6 +149,17 @@ int Staff::GetDrawingY() const
     m_cachedDrawingY = system->GetDrawingY() + m_staffAlignment->GetYRel();
     return m_cachedDrawingY;
 }
+    
+bool Staff::IsDrawingVisible()
+{
+    System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
+    assert(system);
+    assert(system->GetDrawingScoreDef());
+    
+    StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(this->GetN());
+    assert(staffDef);
+    return staffDef->GetDrawingIsVisible();
+}
 
 int Staff::CalcPitchPosYRel(Doc *doc, int loc)
 {
@@ -337,6 +348,10 @@ int Staff::AlignVertically(FunctorParams *functorParams)
 {
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
+    
+    if (!this->IsDrawingVisible()) {
+        return FUNCTOR_SIBLINGS;
+    }
 
     params->m_staffN = this->GetN();
 

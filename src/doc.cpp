@@ -797,7 +797,6 @@ void Doc::CastOffDoc()
 
     // Reset the scoreDef at the beginning of each system
     this->SetCurrentScoreDefDoc(true);
-    
     this->OptimizeScoreDefDoc(false);
 
     // Here we redo the alignment because of the new scoreDefs
@@ -818,11 +817,8 @@ void Doc::CastOffDoc()
     contentPage->Process(&castOffPages, &castOffPagesParams);
     delete contentPage;
 
-    // LogDebug("Layout: %d pages", this->GetChildCount());
-
-    // We need to reset the drawing page to NULL
-    // because idx will still be 0 but contentPage is dead!
-    //this->SetCurrentScoreDefDoc(true);
+    this->SetCurrentScoreDefDoc(true);
+    this->OptimizeScoreDefDoc(false);
 }
 
 void Doc::CastOffRunningElements(CastOffPagesParams *params)

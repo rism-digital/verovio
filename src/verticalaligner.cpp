@@ -357,7 +357,7 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
 {
     AdjustFloatingPostionerGrpsParams *params = dynamic_cast<AdjustFloatingPostionerGrpsParams *>(functorParams);
     assert(params);
-
+    
     ArrayOfFloatingPositioners positioners;
     // make a temporary copy of positionners with a classId desired and that have a drawing grpId
     std::copy_if(m_floatingPositioners.begin(), m_floatingPositioners.end(), std::back_inserter(positioners),

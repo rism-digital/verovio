@@ -252,11 +252,30 @@ void View::DrawStaffGrp(
     if (staffDefs->empty()) {
         return;
     }
+    
+    StaffDef *firstDef = NULL;
+    ListOfObjects::const_iterator iter;
+    for (iter = staffDefs->begin(); iter != staffDefs->end(); iter++) {
+        StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
+        assert(staffDef);
+        if (staffDef->GetDrawingIsVisible()) {
+            firstDef = staffDef;
+            break;
+        }
+    }
+    
+    StaffDef *lastDef = NULL;
+    ListOfObjects::const_reverse_iterator riter;
+    for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); riter++) {
+        StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
+        assert(staffDef);
+        if (staffDef->GetDrawingIsVisible()) {
+            lastDef = staffDef;
+            break;
+        }
+    }
 
     // Get the first and last staffDef of the staffGrp
-    StaffDef *firstDef = dynamic_cast<StaffDef *>(staffDefs->front());
-    StaffDef *lastDef = dynamic_cast<StaffDef *>(staffDefs->back());
-
     if (!firstDef || !lastDef) {
         LogDebug("Could not get staffDef while drawing staffGrp - DrawStaffGrp");
         return;
