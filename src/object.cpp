@@ -1254,7 +1254,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     if (this->Is(STAFF)) {
         Staff *currentStaff = dynamic_cast<Staff *>(this);
         assert(currentStaff);
-        
+
         if (!currentStaff->DrawingIsVisible()) {
             return FUNCTOR_SIBLINGS;
         }
@@ -1311,7 +1311,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         // if nothing was drawn, do not take it into account
         return FUNCTOR_CONTINUE;
     }
-    
+
     assert(params->m_staffAlignment);
 
     LayerElement *current = dynamic_cast<LayerElement *>(this);

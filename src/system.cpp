@@ -231,15 +231,30 @@ int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int System::OptimizeScoreDef(FunctorParams *functorParams)
 {
     OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
     assert(params);
 
+    if (params->m_firstScoreDef) {
+        params->m_firstScoreDef = false;
+        return FUNCTOR_SIBLINGS;
+    }
+
     params->m_currentScoreDef = this->GetDrawingScoreDef();
     assert(params->m_currentScoreDef);
-    
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::OptimizeScoreDefEnd(FunctorParams *functorParams)
+{
+    OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
+    assert(params);
+
+    params->m_currentScoreDef->Process(params->m_functor, params, params->m_functorEnd);
+
     return FUNCTOR_CONTINUE;
 }
 

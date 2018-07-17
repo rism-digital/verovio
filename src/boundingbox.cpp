@@ -719,19 +719,21 @@ int BoundingBox::CalcBezierAtPosition(const Point bezier[4], int x)
     // avoid division by 0
     if (bezier[3].x != bezier[0].x) t = (double)(x - bezier[0].x) / (double)(bezier[3].x - bezier[0].x);
     t = std::min(1.0, std::max(0.0, t));
-    
+
     Point p = BoundingBox::CalcDeCasteljau(bezier, t);
-    
+
     return p.y;
 }
-    
+
 Point BoundingBox::CalcDeCasteljau(const Point bezier[4], double t)
 {
     Point p;
-    
-    p.x = pow((1 - t), 3) * bezier[0].x + 3 * t * pow((1 - t), 2) * bezier[1].x + 3 * (1 - t) * pow(t, 2) * bezier[2].x + pow (t, 3) * bezier[3].x;
-    p.y = pow((1 - t), 3) * bezier[0].y + 3 * t * pow((1 - t), 2) * bezier[1].y + 3 * (1 - t) * pow(t, 2) * bezier[2].y + pow (t, 3) * bezier[3].y;
-    
+
+    p.x = pow((1 - t), 3) * bezier[0].x + 3 * t * pow((1 - t), 2) * bezier[1].x + 3 * (1 - t) * pow(t, 2) * bezier[2].x
+        + pow(t, 3) * bezier[3].x;
+    p.y = pow((1 - t), 3) * bezier[0].y + 3 * t * pow((1 - t), 2) * bezier[1].y + 3 * (1 - t) * pow(t, 2) * bezier[2].y
+        + pow(t, 3) * bezier[3].y;
+
     return p;
 }
 

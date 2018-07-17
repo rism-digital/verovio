@@ -212,7 +212,7 @@ public:
      * This will be done only if m_currentScoreDefDone is false or force is true.
      */
     void SetCurrentScoreDefDoc(bool force = false);
-    
+
     /**
      * Optimize the scoreDef once the document is cast-off.
      */

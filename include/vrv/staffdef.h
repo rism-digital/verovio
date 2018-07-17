@@ -49,7 +49,7 @@ public:
      */
     ///@{
     virtual void AddChild(Object *object);
-                     
+
     /**
      * @name Setter and getter of the drawing visible flag
      */

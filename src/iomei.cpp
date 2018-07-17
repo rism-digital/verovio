@@ -917,6 +917,7 @@ void MeiOutput::WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
     WriteScoreDefElement(currentNode, scoreDef);
     WriteScoreDefInterface(currentNode, scoreDef);
     scoreDef->WriteEndings(currentNode);
+    scoreDef->WriteOptimization(currentNode);
 }
 
 void MeiOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *runningElement)
@@ -2946,6 +2947,7 @@ bool MeiInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
 
     ReadScoreDefInterface(scoreDef, vrvScoreDef);
     vrvScoreDef->ReadEndings(scoreDef);
+    vrvScoreDef->ReadOptimization(scoreDef);
 
     if (!m_hasScoreDef && m_useScoreDefForDoc) {
         m_hasScoreDef = true;

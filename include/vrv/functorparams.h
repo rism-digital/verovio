@@ -1179,8 +1179,7 @@ public:
     int m_systemFullWidth;
     Functor *m_functor;
 };
-    
-    
+
 //----------------------------------------------------------------------------
 // OptimizeScoreDefParams
 //----------------------------------------------------------------------------
@@ -1194,19 +1193,22 @@ public:
 
 class OptimizeScoreDefParams : public FunctorParams {
 public:
-    OptimizeScoreDefParams(Doc *doc)
+    OptimizeScoreDefParams(Doc *doc, Functor *functor, Functor *functorEnd)
     {
         m_currentScoreDef = NULL;
-        m_currentStaffDef = NULL;
         m_encoded = false;
+        m_firstScoreDef = true;
         m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
     }
     ScoreDef *m_currentScoreDef;
-    StaffDef *m_currentStaffDef;
     bool m_encoded;
+    bool m_firstScoreDef;
     Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
 };
-
 
 //----------------------------------------------------------------------------
 // PrepareBoundariesParams

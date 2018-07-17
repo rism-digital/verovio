@@ -432,7 +432,6 @@ enum ElementScoreDefRole { SCOREDEF_NONE = 0, SCOREDEF_SYSTEM, SCOREDEF_INTERMED
 //----------------------------------------------------------------------------
 
 enum ArticPartType { ARTIC_PART_INSIDE = 0, ARTIC_PART_OUTSIDE };
-    
 
 //----------------------------------------------------------------------------
 // Visibility optimization

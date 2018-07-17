@@ -73,7 +73,7 @@ public:
      */
     ///@{
     virtual int GetDrawingY() const;
-    
+
     /**
      * Check if the staff is currently visible.
      * Looks for the parent system and its current drawing scoreDef
@@ -127,7 +127,7 @@ public:
      * See Object::UnsetCurrentScoreDef
      */
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
-    
+
     /**
      * See Object::OptimizeScoreDef
      */

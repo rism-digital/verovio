@@ -741,25 +741,22 @@ void Doc::SetCurrentScoreDefDoc(bool force)
     // the appropriate drawing values
     upcomingScoreDef.Process(&setCurrentScoreDef, &setCurrentScoreDefParams);
 
-    // LogElapsedTimeStart();
     this->Process(&setCurrentScoreDef, &setCurrentScoreDefParams);
-    // LogElapsedTimeEnd ("Setting scoreDefs");
 
     m_currentScoreDefDone = true;
 }
-    
+
 void Doc::OptimizeScoreDefDoc(bool encoded)
 {
     if (encoded) {
         return;
     }
 
-    OptimizeScoreDefParams optimizeScoreDefParams(this);
     Functor optimizeScoreDef(&Object::OptimizeScoreDef);
+    Functor optimizeScoreDefEnd(&Object::OptimizeScoreDefEnd);
+    OptimizeScoreDefParams optimizeScoreDefParams(this, &optimizeScoreDef, &optimizeScoreDefEnd);
 
-    // LogElapsedTimeStart();
-    this->Process(&optimizeScoreDef, &optimizeScoreDefParams);
-    // LogElapsedTimeEnd ("Setting scoreDefs");
+    this->Process(&optimizeScoreDef, &optimizeScoreDefParams, &optimizeScoreDefEnd);
 }
 
 void Doc::CastOffDoc()
@@ -797,7 +794,9 @@ void Doc::CastOffDoc()
 
     // Reset the scoreDef at the beginning of each system
     this->SetCurrentScoreDefDoc(true);
-    this->OptimizeScoreDefDoc(false);
+    if (m_scoreDef.GetOptimize() != BOOLEAN_false) {
+        this->OptimizeScoreDefDoc(false);
+    }
 
     // Here we redo the alignment because of the new scoreDefs
     // We can actually optimise this and have a custom version that does not redo all the calculation
@@ -818,7 +817,9 @@ void Doc::CastOffDoc()
     delete contentPage;
 
     this->SetCurrentScoreDefDoc(true);
-    this->OptimizeScoreDefDoc(false);
+    if (m_scoreDef.GetOptimize() != BOOLEAN_false) {
+        this->OptimizeScoreDefDoc(false);
+    }
 }
 
 void Doc::CastOffRunningElements(CastOffPagesParams *params)

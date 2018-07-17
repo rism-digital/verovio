@@ -763,7 +763,7 @@ public:
      * A change can be either a scoreDef before or a clef, meterSig, etc. within the previous measure.
      */
     virtual int SetCurrentScoreDef(FunctorParams *functorParams);
-    
+
     /**
      * Optimize the scoreDef for each system.
      * For automatic breaks, looks for staves with only mRests.

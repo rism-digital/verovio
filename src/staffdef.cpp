@@ -59,7 +59,7 @@ void StaffDef::Reset()
     ResetScalable();
     ResetStaffDefLog();
     ResetTransposition();
-    
+
     m_drawingIsVisible = OPTIMIZATION_NONE;
 }
 
