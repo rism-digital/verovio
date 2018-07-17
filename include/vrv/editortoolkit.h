@@ -74,7 +74,7 @@ protected:
 };
 
 //--------------------------------------------------------------------------------
-// ClosestBB Comparator struct
+// Comparator structs
 //--------------------------------------------------------------------------------
 // To be used with std::sort to find the object with a closest bounding
 // box to a point defined by the x and y parameters of ClosestBB
@@ -105,6 +105,28 @@ struct ClosestBB {
         int distA = distanceToBB(zoneA->GetUlx(), zoneA->GetUly(), zoneA->GetLrx(), zoneA->GetLry());
         int distB = distanceToBB(zoneB->GetUlx(), zoneB->GetUly(), zoneB->GetLrx(), zoneB->GetLry());
         return (distA < distB);
+    }
+};
+
+// To be used with std::stable_sort to find the position to insert a new staff
+
+struct StaffSort {
+    // Sort staves left-to-right and top-to-bottom
+    // Sort by y if there is no intersection, by x if there is
+    bool operator() (Object *a, Object *b) {
+        if (!a->GetFacsimileInterface() || !b->GetFacsimileInterface()) return true;
+        Zone *zoneA = a->GetFacsimileInterface()->GetZone();
+        Zone *zoneB = b->GetFacsimileInterface()->GetZone();
+
+        // Check for y intersection
+        if ((zoneA->GetUly() < zoneB->GetLry() && zoneA->GetLry() > zoneB->GetLry()) ||
+            (zoneA->GetUly() < zoneB->GetUly() && zoneA->GetLry() > zoneB->GetUly())) {
+            // y intersection, so sort by ulx
+            return (zoneA->GetUlx() < zoneB->GetUlx());
+        }
+        else { // no intersection
+            return (zoneA->GetUly() < zoneB->GetUly());
+        }
     }
 };
 

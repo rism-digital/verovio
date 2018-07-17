@@ -380,6 +380,22 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         newStaff->SetFacs(zone->GetUuid());
         Layer *newLayer = new Layer();
         newStaff->AddChild(newLayer);
+
+        // Find index to insert new staff
+        ArrayOfObjects staves;
+        AttComparison ac(STAFF);
+        parent->FindAllChildByComparison(&staves, &ac);
+        staves.push_back(newStaff);
+        StaffSort staffSort;
+        std::stable_sort(staves.begin(), staves.end(), staffSort);
+        for (int i = 0; i < staves.size(); i++) {
+            if (staves.at(i) == newStaff) {
+                newStaff->SetParent(parent);
+                parent->InsertChild(newStaff, i);
+                return true;
+            }
+        }
+        LogMessage("Failed to insert newStaff into staff");
         parent->AddChild(newStaff);
         return true;
     }
