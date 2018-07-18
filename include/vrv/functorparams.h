@@ -1198,6 +1198,7 @@ public:
         m_currentScoreDef = NULL;
         m_encoded = false;
         m_firstScoreDef = true;
+        m_hasFermata = false;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
@@ -1205,6 +1206,7 @@ public:
     ScoreDef *m_currentScoreDef;
     bool m_encoded;
     bool m_firstScoreDef;
+    bool m_hasFermata;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;

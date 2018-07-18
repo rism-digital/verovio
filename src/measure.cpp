@@ -543,6 +543,16 @@ int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+    
+int Measure::OptimizeScoreDef(FunctorParams *functorParams)
+{
+    OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
+    assert(params);
+    
+    params->m_hasFermata = (this->FindChildByType(FERMATA));
+    
+    return FUNCTOR_CONTINUE;
+}
 
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

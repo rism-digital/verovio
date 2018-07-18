@@ -288,7 +288,13 @@ int Staff::OptimizeScoreDef(FunctorParams *functorParams)
             "Could not find staffDef for staff (%d) when optimizing scoreDef in Staff::OptimizeScoreDef", this->GetN());
         return FUNCTOR_SIBLINGS;
     }
-
+    
+    // Always show all staves when there is a fermata
+    // (without checking if the fermata is actually on that staff)
+    if (params->m_hasFermata) {
+        staffDef->SetDrawingVisibility(OPTIMIZATION_SHOW);
+    }
+    
     if (staffDef->GetDrawingVisibility() == OPTIMIZATION_SHOW) {
         return FUNCTOR_SIBLINGS;
     }
