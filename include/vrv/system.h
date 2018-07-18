@@ -108,6 +108,14 @@ public:
      */
     bool HasMixedDrawingStemDir(LayerElement *start, LayerElement *end);
 
+    /**
+     * @name Setter and getter of the drawing visible flag
+     */
+    ///@{
+    bool IsDrawingOptimized() const { return m_drawingIsOptimized; }
+    void IsDrawingOptimized(bool drawingIsOptimized) { m_drawingIsOptimized = drawingIsOptimized; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -254,7 +262,16 @@ protected:
     int m_drawingYRel;
 
 private:
+    /**
+     * The drawing scoreDef at the beginning of the system.
+     */
     ScoreDef *m_drawingScoreDef;
+
+    /**
+     * A flag indicating if the system is optimized.
+     * This does not mean that a staff is hidden, but only that it can be optimized.
+     */
+    bool m_drawingIsOptimized;
 };
 
 } // namespace vrv

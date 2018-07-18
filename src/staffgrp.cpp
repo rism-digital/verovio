@@ -56,7 +56,7 @@ void StaffGrp::Reset()
     ResetStaffGrpVis();
     ResetTyped();
 
-    m_drawingIsVisible = OPTIMIZATION_NONE;
+    m_drawingVisibility = OPTIMIZATION_NONE;
 }
 
 void StaffGrp::AddChild(Object *child)

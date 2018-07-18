@@ -769,6 +769,13 @@ void Doc::CastOffDoc()
         return;
     }
 
+    // By default, optimize scores
+    bool optimize = (m_scoreDef.GetOptimize() != BOOLEAN_false);
+    // However, if nothing specified, do not if there is only one staffGrp
+    if ((m_scoreDef.GetOptimize() == BOOLEAN_NONE) && (m_scoreDef.GetChildCount(STAFFGRP, UNLIMITED_DEPTH) < 2)) {
+        optimize = false;
+    }
+
     this->SetCurrentScoreDefDoc();
 
     Page *contentPage = this->SetDrawingPage(0);
@@ -794,7 +801,7 @@ void Doc::CastOffDoc()
 
     // Reset the scoreDef at the beginning of each system
     this->SetCurrentScoreDefDoc(true);
-    if (m_scoreDef.GetOptimize() != BOOLEAN_false) {
+    if (optimize) {
         this->OptimizeScoreDefDoc(false);
     }
 
@@ -817,7 +824,7 @@ void Doc::CastOffDoc()
     delete contentPage;
 
     this->SetCurrentScoreDefDoc(true);
-    if (m_scoreDef.GetOptimize() != BOOLEAN_false) {
+    if (optimize) {
         this->OptimizeScoreDefDoc(false);
     }
 }

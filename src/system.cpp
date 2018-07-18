@@ -73,6 +73,7 @@ void System::Reset()
     m_drawingJustifiableWidth = 0;
     m_drawingLabelsWidth = 0;
     m_drawingAbbrLabelsWidth = 0;
+    m_drawingIsOptimized = false;
 }
 
 void System::AddChild(Object *child)
@@ -229,6 +230,8 @@ int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
         m_drawingScoreDef = NULL;
     }
 
+    m_drawingIsOptimized = false;
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -236,6 +239,8 @@ int System::OptimizeScoreDef(FunctorParams *functorParams)
 {
     OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
     assert(params);
+
+    this->IsDrawingOptimized(true);
 
     if (params->m_firstScoreDef) {
         params->m_firstScoreDef = false;

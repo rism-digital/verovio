@@ -55,8 +55,8 @@ public:
      * @name Setter and getter of the drawing visible flag
      */
     ///@{
-    VisibilityOptimization GetDrawingVisibility() const { return m_drawingIsVisible; }
-    void SetDrawingVisibility(VisibilityOptimization drawingIsVisible) { m_drawingIsVisible = drawingIsVisible; }
+    VisibilityOptimization GetDrawingVisibility() const { return m_drawingVisibility; }
+    void SetDrawingVisibility(VisibilityOptimization drawingIsVisible) { m_drawingVisibility = drawingIsVisible; }
     ///@}
 
     //----------//
@@ -85,7 +85,7 @@ private:
      * when all its content is not visible.
      * By default the value is OPTIMIZATION_NONE
      */
-    VisibilityOptimization m_drawingIsVisible;
+    VisibilityOptimization m_drawingVisibility;
 };
 
 } // namespace vrv
