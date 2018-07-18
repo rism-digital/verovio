@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jul 13 13:15:13 CEST 2018
+// Last Modified: Tue Jul 17 16:24:17 CEST 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2657,7 +2657,7 @@ class Convert {
 		                                    double delta = 0.00001);
 		static double  significantDigits    (double value, int digits);
 		static bool    isNaN                (double value);
-		static double  pearsonCorrelation   (std::vector<double> x, std::vector<double> y);
+		static double  pearsonCorrelation   (const std::vector<double> &x, const std::vector<double> &y);
 		static int     romanNumeralToInteger(const std::string& roman);
 
 };
@@ -3679,6 +3679,53 @@ int main(int argc, char** argv) {                                \
 		}                                                          \
 		interface.clearOutput();                                   \
 	}                                                             \
+	return !status;                                               \
+}
+
+
+
+//////////////////////////////
+//
+// STREAM_INTERFACE2 -- Expects two Humdurm files, either from the
+//    first two command-line arguments (left over after options have
+//    been parsed out), or from standard input.
+//
+// function call that the interface must implement:
+//  .run(HumdrumFile& infile1, HumdrumFile& infile2, ostream& out)
+//
+//
+
+#define STREAM_INTERFACE2(CLASS)                                 \
+using namespace std;                                             \
+using namespace hum;                                             \
+int main(int argc, char** argv) {                                \
+	CLASS interface;                                              \
+	if (!interface.process(argc, argv)) {                         \
+		interface.getError(cerr);                                  \
+		return -1;                                                 \
+	}                                                             \
+	HumdrumFileStream streamer(static_cast<Options&>(interface)); \
+	HumdrumFile infile1;                                          \
+	HumdrumFile infile2;                                          \
+	bool status = true;                                           \
+	streamer.read(infile1);                                       \
+	streamer.read(infile2);                                       \
+	status &= interface.run(infile1, infile2);                    \
+	if (interface.hasWarning()) {                                 \
+		interface.getWarning(cerr);                                \
+	}                                                             \
+	if (interface.hasAnyText()) {                                 \
+	   interface.getAllText(cout);                                \
+	}                                                             \
+	if (interface.hasError()) {                                   \
+		interface.getError(cerr);                                  \
+        return -1;                                               \
+	}                                                             \
+	if (!interface.hasAnyText()) {                                \
+		cout << infile1;                                           \
+		cout << infile2;                                           \
+	}                                                             \
+	interface.clearOutput();                                      \
 	return !status;                                               \
 }
 
@@ -5332,6 +5379,140 @@ class Tool_satb2gs : public HumTool {
 		int    debugQ    = 0;             // used with --debug option
 };
 
+
+
+class MeasureData {
+	public:
+		            MeasureData               (void);
+		            MeasureData               (HumdrumFile& infile,
+		                                       int startline,int stopline);
+		            MeasureData               (HumdrumFile* infile,
+		                                      int startline,int stopline);
+		           ~MeasureData               ();
+		void        setOwner                  (HumdrumFile* infile);
+		void        setOwner                  (HumdrumFile& infile);
+		void        setStartLine              (int startline);
+		void        setStopLine               (int stopline);
+		int         getStartLine              (void);
+		int         getStopLine               (void);
+		void        clear                     (void);
+		std::vector<double>& getHistogram7pc (void);
+		void        generateNoteHistogram     (void);
+		double      getSum7pc                 (void);
+		double      getStartTime              (void);
+		double      getStopTime               (void);
+		double      getDuration               (void);
+		int         getMeasure                (void);
+		std::string getQoff                   (void);
+		std::string getQon                    (void);
+		double      getScoreDuration          (void);
+
+	private:
+		HumdrumFile*        m_owner       = NULL;
+		int                 m_startline   = -1;
+		int                 m_stopline    = -1;
+		std::vector<double> m_hist7pc;
+		double              m_sum7pc      = 0.0;
+};
+
+
+
+class MeasureDataSet {
+	public:
+		             MeasureDataSet   (void);
+		             MeasureDataSet   (HumdrumFile& infile);
+		            ~MeasureDataSet   ();
+
+		void         clear            (void);
+		int          parse            (HumdrumFile& infile);
+		MeasureData& operator[]       (int index);
+		int          size             (void) { return (int)m_data.size(); }
+		double       getScoreDuration (void);
+
+	private:
+		std::vector<MeasureData*> m_data;
+};
+
+
+
+class MeasureComparison {
+	public:
+		MeasureComparison();
+		MeasureComparison(MeasureData& data1, MeasureData& data2);
+		MeasureComparison(MeasureData* data1, MeasureData* data2);
+		~MeasureComparison();
+
+		void clear(void);
+		void compare(MeasureData& data1, MeasureData& data2);
+		void compare(MeasureData* data1, MeasureData* data2);
+
+		double getCorrelation7pc(void);
+
+	protected:
+		double correlation7pc = 0.0;
+};
+
+
+
+class MeasureComparisonGrid {
+	public:
+		             MeasureComparisonGrid     (void);
+		             MeasureComparisonGrid     (MeasureDataSet& set1, MeasureDataSet& set2);
+		             MeasureComparisonGrid     (MeasureDataSet* set1, MeasureDataSet* set2);
+		            ~MeasureComparisonGrid     ();
+
+		void         clear                     (void);
+		void         analyze                   (MeasureDataSet& set1, MeasureDataSet& set2);
+		void         analyze                   (MeasureDataSet* set1, MeasureDataSet* set2);
+
+		double       getStartTime1             (int index);
+		double       getStopTime1              (int index);
+		double       getDuration1              (int index);
+		int          getMeasure1               (int index);
+		std::string  getQon1                   (int index);
+		std::string  getQoff1                  (int index);
+		double       getScoreDuration1         (void);
+		double       getStartTime2             (int index);
+		double       getStopTime2              (int index);
+		double       getDuration2              (int index);
+		int          getMeasure2               (int index);
+		std::string  getQon2                   (int index);
+		std::string  getQoff2                  (int index);
+		double       getScoreDuration2         (void);
+
+		ostream&     printCorrelationGrid      (ostream& out = std::cout);
+		ostream&     printCorrelationDiagonal  (ostream& out = std::cout);
+		ostream&     printSvgGrid              (ostream& out = std::cout);
+		void         getColorMapping           (double input, double& hue, double& saturation,
+				 double& lightness);
+
+	private:
+		std::vector<std::vector<MeasureComparison>> m_grid;
+		MeasureDataSet* m_set1 = NULL;
+		MeasureDataSet* m_set2 = NULL;
+};
+
+
+
+class Tool_simat : public HumTool {
+	public:
+		         Tool_simat         (void);
+		        ~Tool_simat         () {};
+
+		bool     run                (HumdrumFile& infile1, HumdrumFile& infile2);
+		bool     run                (const string& indata1, const string& indata2, ostream& out);
+		bool     run                (HumdrumFile& infile1, HumdrumFile& infile2, ostream& out);
+
+	protected:
+		void     initialize         (HumdrumFile& infile1, HumdrumFile& infile2);
+		void     processFile        (HumdrumFile& infile1, HumdrumFile& infile2);
+
+	private:
+		MeasureDataSet        m_data1;
+		MeasureDataSet        m_data2;
+		MeasureComparisonGrid m_grid;
+
+};
 
 
 class Tool_slurcheck : public HumTool {
