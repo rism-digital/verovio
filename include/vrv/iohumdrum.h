@@ -291,7 +291,7 @@ protected:
     int characterCountInSubtoken(const std::string &text, char symbol);
     bool emptyMeasures();
     bool hasFullMeasureRest(std::vector<hum::HTp> &layerdata, hum::HumNum timesigdur, hum::HumNum measuredur);
-    void convertNote(vrv::Note *note, hum::HTp token, int staffindex, int subtoken = -1);
+    void convertNote(vrv::Note *note, hum::HTp token, int staffadj, int staffindex, int subtoken = -1);
     void addCautionaryAccidental(Accid *accid, hum::HTp token, int acount);
     void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
     void processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex);
@@ -441,6 +441,7 @@ protected:
     void storeExpansionLists(Section *section, hum::HTp starting);
     void storeExpansionList(Section *section, hum::HTp etok);
     std::string replaceMusicShapes(const std::string input);
+    int getStaffAdjustment(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

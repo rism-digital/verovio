@@ -4609,7 +4609,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             setStemLength(note, layerdata[i]);
             setLocationId(note, layerdata[i]);
             appendElement(elements, pointers, note);
-            convertNote(note, layerdata[i], staffindex);
+            convertNote(note, layerdata[i], 0, staffindex);
             processSlurs(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
@@ -4709,7 +4709,7 @@ void HumdrumInput::convertMensuralToken(
         Note *note = new Note;
         setLocationId(note, token);
         appendElement(elements, pointers, note);
-        convertNote(note, token, staffindex);
+        convertNote(note, token, 0, staffindex);
 
         if (token->find(':') != std::string::npos) {
             Dot *dot = new Dot();
@@ -8292,6 +8292,11 @@ int HumdrumInput::getChordNoteCount(hum::HTp token)
 void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
 {
     int scount = token->getSubtokenCount();
+    int staffadj = getStaffAdjustment(token);
+    if (staffadj != 0) {
+        int staffnum = staffindex + 1 + staffadj;
+        setStaff(chord, staffnum);
+    }
     string tstring;
     int k;
     bool isnote = false;
@@ -8342,7 +8347,7 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
         Note *note = new Note;
         setLocationId(note, token, j);
         appendElement(chord, note);
-        convertNote(note, token, staffindex, j);
+        convertNote(note, token, staffadj, staffindex, j);
     }
 
     if (allinvis) {
@@ -8702,7 +8707,7 @@ void HumdrumInput::setStemLength(Note *note, hum::HTp token)
 //       subtoken = -1 (use the first subtoken);
 //
 
-void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int subtoken)
+void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int staffindex, int subtoken)
 {
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
@@ -9068,7 +9073,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
         pattern.push_back(m_signifiers.above);
         if (regex_search(tstring, regex(pattern))) {
             int newstaff = m_currentstaff - 1;
-            if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
+            if ((staffadj == 0) && (newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
                 setStaff(note, newstaff);
             }
         }
@@ -9078,23 +9083,9 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
         pattern.push_back(m_signifiers.below);
         if (regex_search(tstring, regex(pattern))) {
             int newstaff = m_currentstaff + 1;
-            if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
+            if ((staffadj == 0) && (newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
                 setStaff(note, newstaff);
             }
-        }
-    }
-
-    // Delete these temporary staff position methods later:
-    if (tstring.find("jj") != string::npos) {
-        int newstaff = m_currentstaff - 1;
-        if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
-            setStaff(note, newstaff);
-        }
-    }
-    else if (tstring.find("j") != string::npos) {
-        int newstaff = m_currentstaff + 1;
-        if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
-            setStaff(note, newstaff);
         }
     }
 
@@ -9808,6 +9799,60 @@ void HumdrumInput::addBreath(hum::HTp token, Object *parent)
 
 //////////////////////////////
 //
+// HumdrumInput::getStaffAdjustment -- +1 if all notes are staff below
+//     and -1 if all notes are staff above.
+//
+
+int HumdrumInput::getStaffAdjustment(hum::HTp token)
+{
+    hum::HumRegex hre;
+    // Check for notes in chords that are all on a different staff.  If so,
+    // then move the fermata to the different staff.
+    std::vector<string> subtokens;
+    int scount = token->getSubtokenCount();
+    for (int i = 0; i < scount; i++) {
+        subtokens.emplace_back(token->getSubtoken(i));
+    }
+    int allabove = true;
+    int allbelow = true;
+    std::string upquery = "[A-Ga-gr][#n-]*";
+    upquery += m_signifiers.above;
+    std::string downquery = "[A-Ga-gr][#n-]*";
+    downquery += m_signifiers.below;
+    if (m_signifiers.above) {
+        for (int i = 0; i < scount; i++) {
+            if (!hre.search(subtokens[i], upquery)) {
+                allabove = false;
+                break;
+            }
+        }
+    }
+    else {
+        allabove = false;
+    }
+    if (m_signifiers.below && !allabove) {
+        for (int i = 0; i < scount; i++) {
+            if (!hre.search(subtokens[i], downquery)) {
+                allbelow = false;
+                break;
+            }
+        }
+    }
+    else {
+        allbelow = false;
+    }
+    int staffadj = 0;
+    if (allabove) {
+        staffadj = -1; // -1 means up
+    }
+    else if (allbelow) {
+        staffadj = +1; // +1 means down
+    }
+    return staffadj;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::addFermata -- Add floating fermatas for note/chord.
 //     default value: parent = NULL
 //
@@ -9821,54 +9866,7 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
         return;
     }
 
-    hum::HumRegex hre;
-
-    // Check for notes in chords that are all on a different staff.  If so,
-    // then move the fermata to the different staff.
-    std::vector<string> subtokens;
-    int scount = token->getSubtokenCount();
-    for (int i = 0; i < scount; i++) {
-        subtokens.emplace_back(token->getSubtoken(i));
-    }
-    int allabove = true;
-    int allbelow = true;
-
-    std::string upquery = "[A-Ga-gr][#n-]*";
-    upquery += m_signifiers.above;
-    std::string downquery = "[A-Ga-gr][#n-]*";
-    downquery += m_signifiers.below;
-
-    if (m_signifiers.above) {
-        for (int i = 0; i < scount; i++) {
-            if (!hre.search(subtokens[i], upquery)) {
-                allabove = false;
-                break;
-            }
-        }
-    }
-    else {
-        allabove = false;
-    }
-
-    if (m_signifiers.below && !allabove) {
-        for (int i = 0; i < scount; i++) {
-            if (!hre.search(subtokens[i], downquery)) {
-                allbelow = false;
-                break;
-            }
-        }
-    }
-    else {
-        allbelow = false;
-    }
-
-    int staffadj = 0;
-    if (allabove) {
-        staffadj = -1; // -1 means up
-    }
-    else if (allbelow) {
-        staffadj = +1; // +1 means down
-    }
+    int staffadj = getStaffAdjustment(token);
 
     if ((token->find("yy") == std::string::npos) && (token->find(";y") == std::string::npos)) {
         Fermata *fermata = new Fermata;
