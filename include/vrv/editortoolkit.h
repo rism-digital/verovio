@@ -41,6 +41,7 @@ public:
     bool Insert(std::string elementType, std::string startId, std::string endId);
     bool Insert(std::string elementType, std::string staffId, int ulx, int uly,
         int lrx, int lry, std::vector<std::pair<std::string, std::string>> attributes);
+    bool Merge(std::vector<std::string> elementIds);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     bool Remove(std::string elementId);
     ///@}
@@ -63,6 +64,7 @@ protected:
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startId, std::string *endId);
     bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly,
         int *lrx, int *lry, std::vector<std::pair<std::string, std::string>> *attributes);
+    bool ParseMergeAction(jsonxx::Object param, std::vector<std::string> *elementIds);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
     bool ParseRemoveAction(jsonxx::Object param, std::string *elementId);
     ///@}
