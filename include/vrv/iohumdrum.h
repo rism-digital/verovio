@@ -159,6 +159,10 @@ namespace humaux {
         // layers.
         vector<bool> cue_size;
 
+        // righthalfstem == true means to place half-note stems always on right side
+        // of noteheads.  False is standard modern style.
+        bool righthalfstem;
+
         // ottavanote == keep track of ottava marks: stores the starting note of
         // an ottava line which will be turned off later.  ottavameasure == the
         // starting measure of the ottava mark.
@@ -604,6 +608,9 @@ private:
     // the file to convert contains **Bnum spines that should be
     // converted into <harm> element in the MEI conversion.
     bool m_fb = false;
+
+    // m_setrightstem == used for setting right-side stem of half notes
+    bool m_setrightstem = false;
 
     // m_leftbarstyle is a barline left-hand style to store in the next measure.
     // When processing a measure, this variable should be checked and used

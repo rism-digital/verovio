@@ -288,6 +288,7 @@ namespace humaux {
         verse = false;
         suppress_beam_tuplet = false;
         suppress_bracket_tuplet = false;
+        righthalfstem = false;
 
         ottavanotestart = ottavanoteend = NULL;
         ottavameasure = NULL;
@@ -7991,6 +7992,8 @@ hum::HumNum HumdrumInput::removeFactorsOfTwo(hum::HumNum value, int &tcount, int
 //    *cue         = display notes in cue size (operates at layer level rather than staff level).
 //    *kcancel     = display cancellation key signatures
 //    *Xkcancel    = do not display cancellation key signatures (default)
+//    *2\right     = place stems on right side of half notes when stem is down.
+//    *2\left      = place stems on left side of half notes when stem is down.
 //
 
 void HumdrumInput::handleStaffStateVariables(hum::HTp token)
@@ -8025,6 +8028,13 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
     }
     else if (value == "*cue") {
         ss[staffindex].cue_size.at(layernum) = true;
+    }
+
+    if (value == "*2\\left") {
+        ss[staffindex].righthalfstem = false;
+    }
+    else if (value == "*2\\right") {
+        ss[staffindex].righthalfstem = true;
     }
 
     // Key cancellation option is currently global to all staves:
@@ -8372,6 +8382,10 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
     }
 
     convertRhythm(chord, token);
+    if (m_setrightstem) {
+        m_setrightstem = false;
+        chord->SetStemPos(STEMPOSITION_right);
+    }
 
     // Stem direction of the chord.  If both up and down, then show up.
     if (token->find("/") != string::npos) {
@@ -9036,6 +9050,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
 
     if (!chordQ) {
         hum::HumNum dur = convertRhythm(note, token, subtoken);
+        if (m_setrightstem) {
+            m_setrightstem = false;
+            note->SetStemPos(STEMPOSITION_right);
+        }
         if (dur == 0) {
             note->SetDur(DURATION_4);
             note->SetStemLen(0);
@@ -9690,7 +9708,17 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
     }
     else if (dur.getNumerator() == 1) {
         switch (dur.getDenominator()) {
-            case 2: element->SetDur(DURATION_2); break;
+            case 2: {
+                element->SetDur(DURATION_2);
+                // handle stem position tandem insterpretations
+                int staff = m_currentstaff;
+                int staffindex = staff - 1;
+                std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+                if (ss[staffindex].righthalfstem
+                    && ((element->GetClassName() == "Note") || (element->GetClassName() == "Chord"))) {
+                    m_setrightstem = true;
+                }
+            } break;
             case 4: element->SetDur(DURATION_4); break;
             case 8: element->SetDur(DURATION_8); break;
             case 16: element->SetDur(DURATION_16); break;
