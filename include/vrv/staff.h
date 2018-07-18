@@ -75,6 +75,12 @@ public:
     virtual int GetDrawingY() const;
 
     /**
+     * Check if the staff is currently visible.
+     * Looks for the parent system and its current drawing scoreDef
+     */
+    bool DrawingIsVisible();
+
+    /**
      * Return the index position of the staff in its measure parent
      */
     int GetStaffIdx() const { return Object::GetIdx(); }
@@ -121,6 +127,11 @@ public:
      * See Object::UnsetCurrentScoreDef
      */
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+
+    /**
+     * See Object::OptimizeScoreDef
+     */
+    virtual int OptimizeScoreDef(FunctorParams *functorParams);
 
     /**
      * See Object::ResetVerticalAlignment

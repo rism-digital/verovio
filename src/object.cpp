@@ -283,6 +283,14 @@ int Object::GetChildCount(const ClassId classId) const
     return (int)count_if(m_children.begin(), m_children.end(), ObjectComparison(classId));
 }
 
+int Object::GetChildCount(const ClassId classId, int deepth)
+{
+    ArrayOfObjects objects;
+    AttComparison matchClassId(classId);
+    this->FindAllChildByComparison(&objects, &matchClassId);
+    return (int)objects.size();
+}
+
 int Object::GetAttributes(ArrayOfStrAttr *attributes) const
 {
     assert(attributes);
@@ -1254,10 +1262,12 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     if (this->Is(STAFF)) {
         Staff *currentStaff = dynamic_cast<Staff *>(this);
         assert(currentStaff);
-        assert(currentStaff->GetAlignment());
+
+        if (!currentStaff->DrawingIsVisible()) {
+            return FUNCTOR_SIBLINGS;
+        }
 
         params->m_staffAlignment = currentStaff->GetAlignment();
-
         return FUNCTOR_CONTINUE;
     }
 
@@ -1268,7 +1278,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         // set scoreDef attr
         if (currentLayer->GetStaffDefClef()) {
             // Ignore system scoreDef clefs - clefs changes withing a staff are still taken into account
-            if (currentLayer->GetStaffDefClef()->GetScoreDefRole() != SYSTEM_SCOREDEF) {
+            if (currentLayer->GetStaffDefClef()->GetScoreDefRole() != SCOREDEF_SYSTEM) {
                 currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
             }
         }
@@ -1310,22 +1320,23 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    assert(params->m_staffAlignment);
+
     LayerElement *current = dynamic_cast<LayerElement *>(this);
     assert(current);
 
     bool skipAbove = false;
     bool skipBelow = false;
     Chord *chord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
-    if (chord) {
+    if (chord && params->m_staffAlignment) {
         chord->GetCrossStaffOverflows(current, params->m_staffAlignment, skipAbove, skipBelow);
     }
 
     StaffAlignment *alignment = params->m_staffAlignment;
     Layer *crossLayer = NULL;
     Staff *crossStaff = current->GetCrossStaff(crossLayer);
-    if (crossStaff) {
+    if (crossStaff && crossStaff->GetAlignment()) {
         alignment = crossStaff->GetAlignment();
-        assert(alignment);
     }
 
     int staffSize = alignment->GetStaffSize();

@@ -917,6 +917,7 @@ void MeiOutput::WriteScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
     WriteScoreDefElement(currentNode, scoreDef);
     WriteScoreDefInterface(currentNode, scoreDef);
     scoreDef->WriteEndings(currentNode);
+    scoreDef->WriteOptimization(currentNode);
 }
 
 void MeiOutput::WriteRunningElement(pugi::xml_node currentNode, RunningElement *runningElement)
@@ -1990,6 +1991,7 @@ MeiInput::MeiInput(Doc *doc, std::string filename) : FileInputStream(doc)
     m_filename = filename;
     //
     m_hasScoreDef = false;
+    m_useScoreDefForDoc = false;
     m_readingScoreBased = false;
     m_version = MEI_UNDEFINED;
 }
@@ -2449,6 +2451,7 @@ bool MeiInput::ReadMdivChildren(Object *parent, pugi::xml_node parentNode, bool 
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
         // We make the mdiv visible if already set or if matching the desired selection
         bool makeVisible = (isVisible || (m_selectedMdiv == current));
+        m_useScoreDefForDoc = makeVisible;
         if (!success) break;
         if (std::string(current.name()) == "mdiv") {
             success = ReadMdiv(parent, current, makeVisible);
@@ -2929,7 +2932,8 @@ bool MeiInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
     // assert(dynamic_cast<Pages *>(parent));
 
     ScoreDef *vrvScoreDef;
-    if (!m_hasScoreDef) {
+    // We have not reached the first scoreDef and we have to use if for the doc
+    if (!m_hasScoreDef && m_useScoreDefForDoc) {
         vrvScoreDef = &m_doc->m_scoreDef;
     }
     else {
@@ -2943,8 +2947,9 @@ bool MeiInput::ReadScoreDef(Object *parent, pugi::xml_node scoreDef)
 
     ReadScoreDefInterface(scoreDef, vrvScoreDef);
     vrvScoreDef->ReadEndings(scoreDef);
+    vrvScoreDef->ReadOptimization(scoreDef);
 
-    if (!m_hasScoreDef) {
+    if (!m_hasScoreDef && m_useScoreDefForDoc) {
         m_hasScoreDef = true;
     }
     else {
