@@ -9821,16 +9821,65 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
         return;
     }
 
+    hum::HumRegex hre;
+
+    // Check for notes in chords that are all on a different staff.  If so,
+    // then move the fermata to the different staff.
+    std::vector<string> subtokens;
+    int scount = token->getSubtokenCount();
+    for (int i = 0; i < scount; i++) {
+        subtokens.emplace_back(token->getSubtoken(i));
+    }
+    int allabove = true;
+    int allbelow = true;
+
+    std::string upquery = "[A-Ga-gr][#n-]*";
+    upquery += m_signifiers.above;
+    std::string downquery = "[A-Ga-gr][#n-]*";
+    downquery += m_signifiers.below;
+
+    if (m_signifiers.above) {
+        for (int i = 0; i < scount; i++) {
+            if (!hre.search(subtokens[i], upquery)) {
+                allabove = false;
+                break;
+            }
+        }
+    }
+    else {
+        allabove = false;
+    }
+
+    if (m_signifiers.below && !allabove) {
+        for (int i = 0; i < scount; i++) {
+            if (!hre.search(subtokens[i], downquery)) {
+                allbelow = false;
+                break;
+            }
+        }
+    }
+    else {
+        allbelow = false;
+    }
+
+    int staffadj = 0;
+    if (allabove) {
+        staffadj = -1; // -1 means up
+    }
+    else if (allbelow) {
+        staffadj = +1; // +1 means down
+    }
+
     if ((token->find("yy") == std::string::npos) && (token->find(";y") == std::string::npos)) {
         Fermata *fermata = new Fermata;
         appendElement(m_measure, fermata);
-        setStaff(fermata, staff);
+        setStaff(fermata, staff + staffadj);
 
         Fermata *fermata2 = NULL;
         if (token->find(";;") != std::string::npos) {
             fermata2 = new Fermata;
             appendElement(m_measure, fermata2);
-            setStaff(fermata2, staff);
+            setStaff(fermata2, staff + staffadj);
         }
 
         if (parent && (token->find("q") != std::string::npos)) {
