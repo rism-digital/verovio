@@ -893,7 +893,18 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
     assert(measure);
     assert(mnum);
 
-    Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
+    Staff *staff = NULL;
+    ArrayOfObjects staves;
+    AttComparison matchType(STAFF);
+    measure->FindAllChildByComparison(&staves, &matchType, 1);
+    for (auto &child : staves) {
+        staff = dynamic_cast<Staff *>(child);
+        assert(staff);
+        if (staff->DrawingIsVisible()) {
+            break;
+        }
+        staff = NULL;
+    }
     if (staff) {
 
         dc->StartGraphic(mnum, "", mnum->GetUuid());
