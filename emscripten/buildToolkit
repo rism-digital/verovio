@@ -204,7 +204,7 @@ if ($? == 0) {
 
 	# wrap the npm package (but not with wasm build for now)
 	if (!$wasmQ) {
-		print "Building $NPM package";
+		print "Building $NPM package\n";
 		# the cat order is different for the npm package because we want to wrap the Module in the init function
 		`cat verovio-npm-start.js $BUILD_DIR/verovio.js verovio-proxy.js verovio-npm-end.js > $NPM/index.js`;
 	}

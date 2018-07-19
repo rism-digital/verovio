@@ -506,7 +506,7 @@ bool Toolkit::LoadData(const std::string &data)
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --breaks auto option.
     // Regardless, we won't do layout if the --breaks none option was set.
-    if ((m_doc.GetType() != Transcription) && (m_options->m_breaks.GetValue() != BREAKS_none)) {
+    if ((m_doc.GetType() != Transcription || m_doc.GetType() != Facs) && (m_options->m_breaks.GetValue() != BREAKS_none)) {
         if (input->HasLayoutInformation() && (m_options->m_breaks.GetValue() == BREAKS_encoded)) {
             // LogElapsedTimeStart();
             m_doc.CastOffEncodingDoc();
@@ -942,7 +942,7 @@ void Toolkit::ResetLogBuffer()
 
 void Toolkit::RedoLayout()
 {
-    if (m_doc.GetType() == Transcription) {
+    if (m_doc.GetType() == Transcription || m_doc.GetType() == Facs) {
         return;
     }
 
@@ -989,7 +989,7 @@ bool Toolkit::RenderToDeviceContext(int pageNo, DeviceContext *deviceContext)
     double userScale = m_view.GetPPUFactor() * m_scale / 100;
     deviceContext->SetUserScale(userScale, userScale);
 
-    if (m_doc.HasFacsimile()) {
+    if (m_doc.GetType() == Facs) {
         deviceContext->SetWidth(m_doc.GetFacsimile()->GetMaxX());
         deviceContext->SetHeight(m_doc.GetFacsimile()->GetMaxY());
     }
@@ -1011,7 +1011,7 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xml_declaration)
         svg.SetMMOutput(true);
     }
 
-    if (m_doc.HasFacsimile()) {
+    if (m_doc.GetType() == Facs) {
         svg.SetFacsimile(true);
     }
 

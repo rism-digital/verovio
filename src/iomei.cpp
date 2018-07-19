@@ -2034,6 +2034,7 @@ std::string MeiOutput::DocTypeToStr(DocType type)
         case Raw: value = "raw"; break;
         case Rendering: value = "rendering"; break;
         case Transcription: value = "transcription"; break;
+        case Facs: value = "facsimile"; break;
         default:
             LogWarning("Unknown document type '%d'", type);
             value = "";
@@ -2490,7 +2491,7 @@ bool MeiInput::ReadDoc(pugi::xml_node root)
         success = m_doc->GenerateDocumentScoreDef();
     }
 
-    if (success && m_doc->HasFacsimile()) {
+    if (success && m_doc->GetType() == Facs) {
         m_doc->SetChildZones();
     }
 
@@ -5292,6 +5293,7 @@ DocType MeiInput::StrToDocType(std::string type)
     if (type == "raw") return Raw;
     if (type == "rendering") return Rendering;
     if (type == "transcription") return Transcription;
+    if (type == "facsimile") return Facs;
     LogWarning("Unknown layout type '%s'", type.c_str());
     return Raw;
 }

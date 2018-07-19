@@ -62,29 +62,34 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         if (this->ParseDragAction(json.get<jsonxx::Object>("param"), &elementId, &x, &y)) {
             return this->Drag(elementId, x, y);
         }    
+        LogWarning("Could not parse the drag action");
     }
     else if (action == "insert") {
         std::string elementType, startId, endId, staffId;
-        int ulx, uly;
+        int ulx, uly, lrx, lry;
         std::vector<std::pair<std::string, std::string>> attributes;
         if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &startId, &endId)) {
             return this->Insert(elementType, startId, endId);
         }
-        else if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly, &attributes)) {
-            return this->Insert(elementType, staffId, ulx, uly, attributes);
+        else if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &staffId, &ulx, &uly,
+                    &lrx, &lry, &attributes)) {
+            return this->Insert(elementType, staffId, ulx, uly, lrx, lry, attributes);
         }
+        LogWarning("Could not parse the insert action");
     }
     else if (action == "set") {
         std::string elementId, attrType, attrValue;
         if (this->ParseSetAction(json.get<jsonxx::Object>("param"), &elementId, &attrType, &attrValue)) {
             return this->Set(elementId, attrType, attrValue);
         }
+        LogWarning("Could not parse the set action");
     }
     else if (action == "remove") {
         std::string elementId;
         if (this->ParseRemoveAction(json.get<jsonxx::Object>("param"), &elementId)) {
             return this->Remove(elementId);
         }
+        LogWarning("Could not parse the remove action");
     }
     else if (action == "chain") {
         if (!json.has<jsonxx::Array>("param")) {
@@ -108,9 +113,8 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         }
     }
     else {
-
+        LogWarning("Unknown action type.");
     }
-    LogWarning("Unknown action type.");
     return false;
 }
 
@@ -159,17 +163,31 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
         Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
         assert(staff);
         // Calculate pitch difference based on y difference
-        int pitchDifference = round((double) y / (double) staff->m_drawingStaffSize);
+        int pitchDifference = round( (double) y / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
         element->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
         
         if (element->HasInterface(INTERFACE_FACSIMILE)) {
-            FacsimileInterface *fi = element->GetFacsimileInterface();
-            assert(fi);
-            Zone *zone = fi->GetZone();
-            assert(zone);
-            zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+            bool ignoreFacs = false;
+            // Dont adjust the same facsimile twice. NCs in a ligature share a single zone.
+            if (element->Is(NC)) {
+                Nc *nc = dynamic_cast<Nc *>(element);
+                if (nc->GetLigature() == BOOLEAN_true) {
+                    Neume *neume = dynamic_cast<Neume *>(nc->GetFirstParent(NEUME));
+                    Nc *nextNc = dynamic_cast<Nc *>(neume->GetChild(1 + neume->GetChildIndex(element)));
+                    if (nextNc != nullptr && nextNc->GetLigature() == BOOLEAN_true && nextNc->GetZone() == nc->GetZone())
+                        ignoreFacs = true;
+                }
+            }
+            if (!ignoreFacs) {
+                FacsimileInterface *fi = element->GetFacsimileInterface();
+                assert(fi);
+                Zone *zone = fi->GetZone();
+                assert(zone);
+                zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+            }
         }
     }
+    // TODO Make more generic
     else if (element->Is(NEUME)) {
         Neume *neume = dynamic_cast<Neume *>(element);
         assert(neume);
@@ -181,7 +199,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
         Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
         assert(staff);
         // Calculate difference in pitch based on y difference
-        int pitchDifference = round((double)y / (double)staff->m_drawingStaffSize);
+        int pitchDifference = round( (double)y / (double)m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
 
         // Get components of neume
         AttComparison ac(NC);
@@ -199,7 +217,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
         }
         else if (dynamic_cast<Nc*>(neume->FindChildByType(NC))->HasFacs()) {
-            std::set<Zone *> childZones;
+            std::set<Zone *> childZones;    // Sets do not contain duplicate entries
             for (Object *child = neume->GetFirst(); child != nullptr; child = neume->GetNext()) {
                 FacsimileInterface *fi = child->GetFacsimileInterface();
                 if (fi != nullptr) {
@@ -223,8 +241,6 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
         int initialClefLine = clef->GetLine();
         int clefLine = round((double) y / (double) m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) + initialClefLine);
         clef->SetLine(clefLine);
-        //// Temporarily removing ULX attributes for coordinate refactor
-        // clef->SetUlx(x);
 
         if (initialClefLine != clefLine) {  // adjust notes so they stay in the same position
             int lineDiff = clefLine - initialClefLine;
@@ -248,15 +264,41 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             assert(zone);
             zone->ShiftByXY(x, (clefLine - initialClefLine) * 2 * staff->m_drawingStaffSize);
         }
+    }
+    else if (element->Is(STAFF)) {
+        Staff *staff = dynamic_cast<Staff *>(element);
+        if (!staff->HasFacs()) {
+            LogError("Staff dragging is only supported for staves with facsimiles!");
+            return false;
+        }
+        
+        // Move staff and all staff children with facsimiles
+        ArrayOfObjects children;
+        InterfaceComparison ic(INTERFACE_FACSIMILE);
+        staff->FindAllChildByComparison(&children, &ic);
+        std::set<Zone *> zones;
+        zones.insert(staff->GetZone());
+        for (auto it = children.begin(); it != children.end(); ++it) {
+            FacsimileInterface *fi = (*it)->GetFacsimileInterface();
+            assert(fi);
+            if (fi->GetZone() != nullptr)
+                zones.insert(fi->GetZone());
+        }
+        for (auto it = zones.begin(); it != zones.end(); ++it) {
+            // Transform y to device context
+            (*it)->ShiftByXY(x, -y);
+        }
 
-        return true;
+        //TODO Reorder by left-to-right, top-to-bottom
+        
+        return true; // Can't reorder by layer since staves contain layers
     }
     else {
         LogWarning("Unsupported element for dragging.");
         return false;
     }
     Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
-    layer->ReorderByXPos();
+    layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
     return true;
 }
 
@@ -295,18 +337,19 @@ bool EditorToolkit::Insert(std::string elementType, std::string startid, std::st
 }
 
 bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx, int uly,
-        std::vector<std::pair<std::string, std::string>> attributes)
+        int lrx, int lry, std::vector<std::pair<std::string, std::string>> attributes)
 {
     if (!m_doc->GetDrawingPage()) {
         LogError("Could not get drawing page");
         return false;
     }
-    if (m_doc->GetFacsimile() == nullptr) {
+    if (m_doc->GetType() != Facs) {
         LogError("Drawing page without facsimile");
         return false;
     }
 
     Staff *staff;
+
 
     // Find closest valid staff
     if (staffId == "auto") {
@@ -330,6 +373,47 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
     assert(layer);
     Facsimile *facsimile = m_doc->GetFacsimile();
     Zone *zone = new Zone();
+
+
+    if (elementType == "staff") {
+        Object *parent = staff->GetParent();
+        assert(parent);
+        int n = parent->GetChildCount() + 1;
+        Staff *newStaff = new Staff(n);
+        newStaff->m_drawingStaffDef = staff->m_drawingStaffDef;
+        newStaff->m_drawingNotationType = staff->m_drawingNotationType;
+        newStaff->m_drawingLines = staff->m_drawingLines;
+        newStaff->m_drawingStaffSize = (uly - lry) / (newStaff->m_drawingLines - 1);
+        zone->SetUlx(ulx);
+        zone->SetUly(uly);
+        zone->SetLrx(lrx);
+        zone->SetLry(lry);
+        Surface *surface = dynamic_cast<Surface *>(m_doc->GetFacsimile()->FindChildByType(SURFACE));
+        assert(surface);
+        surface->AddChild(zone);
+        newStaff->SetZone(zone);
+        newStaff->SetFacs(zone->GetUuid());
+        Layer *newLayer = new Layer();
+        newStaff->AddChild(newLayer);
+
+        // Find index to insert new staff
+        ArrayOfObjects staves;
+        AttComparison ac(STAFF);
+        parent->FindAllChildByComparison(&staves, &ac);
+        staves.push_back(newStaff);
+        StaffSort staffSort;
+        std::stable_sort(staves.begin(), staves.end(), staffSort);
+        for (int i = 0; i < staves.size(); i++) {
+            if (staves.at(i) == newStaff) {
+                newStaff->SetParent(parent);
+                parent->InsertChild(newStaff, i);
+                return true;
+            }
+        }
+        LogMessage("Failed to insert newStaff into staff");
+        parent->AddChild(newStaff);
+        return true;
+    }
 
     if (elementType == "nc") {
         Syllable *syllable = new Syllable();
@@ -529,12 +613,11 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
         success = true;
     else if (Att::SetVisual(element, attrType, attrValue))
         success = true;
-    if (success) {
+    if (success && m_doc->GetType() != Facs) {
         m_doc->PrepareDrawing();
         m_doc->GetDrawingPage()->LayOut(true);
-        return true;
     }
-    return false;
+    return success;
 }
 
 bool EditorToolkit::Remove(std::string elementId)
@@ -714,7 +797,7 @@ bool EditorToolkit::ParseInsertAction(
 
 bool EditorToolkit::ParseInsertAction(
     jsonxx::Object param, std::string *elementType, std::string *staffId, int *ulx, int *uly,
-    std::vector<std::pair<std::string, std::string>> *attributes)
+    int *lrx, int *lry, std::vector<std::pair<std::string, std::string>> *attributes)
 {
     if (!param.has<jsonxx::String>("elementType")) return false;
     (*elementType) = param.get<jsonxx::String>("elementType");
@@ -733,17 +816,39 @@ bool EditorToolkit::ParseInsertAction(
             }
         }
     }
+    
+    if (*elementType != "staff") {
+        if (!param.has<jsonxx::Number>("lrx") || !param.has<jsonxx::Number>("lry")) {
+            *lrx = -1;
+            *lry = -1;
+        }
+    }
+    else {
+        if (!param.has<jsonxx::Number>("lrx")) return false;
+        *lrx = param.get<jsonxx::Number>("lrx");
+        if (!param.has<jsonxx::Number>("lry")) return false;
+        *lry = param.get<jsonxx::Number>("lry");
+    } 
     return true;
 }
 
 bool EditorToolkit::ParseSetAction(
     jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
+    if (!param.has<jsonxx::String>("elementId")) {
+        LogWarning("Could not parse 'elementId'");
+        return false;
+    }
     (*elementId) = param.get<jsonxx::String>("elementId");
-    if (!param.has<jsonxx::String>("attrType")) return false;
+    if (!param.has<jsonxx::String>("attrType")) {
+        LogWarning("Could not parse 'attrType'");
+        return false;
+    }
     (*attrType) = param.get<jsonxx::String>("attrType");
-    if (!param.has<jsonxx::String>("attrValue")) return false;
+    if (!param.has<jsonxx::String>("attrValue")) {
+        LogWarning("Could not parse 'attrValue'");
+        return false;
+    }
     (*attrValue) = param.get<jsonxx::String>("attrValue");
     return true;
 }
