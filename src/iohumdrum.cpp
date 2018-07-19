@@ -5954,12 +5954,21 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 
     bool forceAboveQ = false;
     bool forceBelowQ = false;
+    int forcebelowadj = 0;
+    int forceaboveadj = 0;
+    int belowadj = 0;
+    // int aboveadj = 0;
+    int forceQ = false;
 
     if (ss[staffindex].m_dynampos > 0) {
+        forceQ = true;
         forceAboveQ = true;
+        forceaboveadj = -(ss[staffindex].m_dynampos - 1);
     }
     else if (ss[staffindex].m_dynampos < 0) {
+        forceQ = true;
         forceBelowQ = true;
+        forcebelowadj = -(ss[staffindex].m_dynampos + 1);
     }
     else if (ss[staffindex].verse) {
         forceAboveQ = true;
@@ -5991,9 +6000,18 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             aboveQ = true;
             belowQ = false;
         }
-        if (hasBelowParameter(token, "DY")) {
+        if (hasBelowParameter(token, "DY", belowadj)) {
             aboveQ = false;
             belowQ = true;
+            if (belowQ && belowadj) {
+                belowadj--;
+            }
+            else if (forceQ && forceBelowQ) {
+                belowadj = forcebelowadj;
+            }
+        }
+        else if (forceQ && forceBelowQ) {
+            belowadj = forcebelowadj;
         }
         if (m_signifiers.below && (loc < token->size() - 1) && (token->at(loc + 1) == m_signifiers.below)) {
             aboveQ = false;
@@ -6006,7 +6024,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 
         Dynam *dynam = new Dynam;
         m_measure->AddChild(dynam);
-        setStaff(dynam, m_currentstaff);
+        setStaff(dynam, m_currentstaff + belowadj);
         if (token->find("zz") != string::npos) {
             addTextElement(dynam, "sfz");
         }
@@ -6032,6 +6050,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     }
 
     for (int i = startfield; i < line->getFieldCount(); ++i) {
+        belowadj = 0;
         if (line->token(i)->isKern()) {
             ttrack = line->token(i)->getTrack();
             if (ttrack != track) {
@@ -6135,8 +6154,15 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         }
 
         if (!dynamic.empty()) {
+            belowadj = 0;
             bool aboveQ = hasAboveParameter(line->token(i), "DY");
-            bool belowQ = hasBelowParameter(line->token(i), "DY");
+            bool belowQ = hasBelowParameter(line->token(i), "DY", belowadj);
+            if (belowQ && belowadj) {
+                belowadj--;
+            }
+            else if (forceQ && forceBelowQ && !aboveQ) {
+                belowadj = forcebelowadj;
+            }
 
             // if pcount > 0, then search for prefix and postfix text
             // to add to the dynamic.
@@ -6146,7 +6172,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 
             Dynam *dynam = new Dynam;
             m_measure->AddChild(dynam);
-            setStaff(dynam, m_currentstaff);
+            setStaff(dynam, m_currentstaff + belowadj);
             setLocationId(dynam, line->token(i), -1);
 
             // addTextElement(dynam, prefix);
@@ -6191,12 +6217,21 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             else {
                 endtok = getCrescendoEnd(line->token(i));
             }
+
+            belowadj = 0;
+            bool aboveQ = hasAboveParameter(line->token(i), "HP");
+            bool belowQ = hasBelowParameter(line->token(i), "HP", belowadj);
+            if (belowQ && belowadj) {
+                belowadj--;
+            }
+            else if (forceQ && forceBelowQ) {
+                belowadj = forcebelowadj;
+            }
+
             if (endtok != NULL) {
-                bool aboveQ = hasAboveParameter(line->token(i), "HP");
-                bool belowQ = hasBelowParameter(line->token(i), "HP");
 
                 Hairpin *hairpin = new Hairpin;
-                setStaff(hairpin, m_currentstaff);
+                setStaff(hairpin, m_currentstaff + belowadj);
                 setLocationId(hairpin, line->token(i), -1);
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 hum::HumNum tstamp2 = getMeasureTstamp(endtok, staffindex);
@@ -6240,7 +6275,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 // no endpoint so print as the word "cresc."
                 Dir *dir = new Dir;
                 m_measure->AddChild(dir);
-                setStaff(dir, m_currentstaff);
+                setStaff(dir, m_currentstaff + belowadj);
                 setLocationId(dir, line->token(i));
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 dir->SetTstamp(tstamp.getFloat());
@@ -6257,12 +6292,20 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             else {
                 endtok = getDecrescendoEnd(line->token(i));
             }
+
+            belowadj = 0;
+            bool aboveQ = hasAboveParameter(line->token(i), "HP");
+            bool belowQ = hasBelowParameter(line->token(i), "HP", belowadj);
+            if (belowQ && belowadj) {
+                belowadj--;
+            }
+            else if (forceQ && forceBelowQ) {
+                belowadj = forcebelowadj;
+            }
             if (endtok != NULL) {
-                bool aboveQ = hasAboveParameter(token, "HP");
-                bool belowQ = hasBelowParameter(token, "HP");
 
                 Hairpin *hairpin = new Hairpin;
-                setStaff(hairpin, m_currentstaff);
+                setStaff(hairpin, m_currentstaff + belowadj);
                 setLocationId(hairpin, line->token(i), -1);
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 hum::HumNum tstamp2 = getMeasureTstamp(endtok, staffindex);
@@ -6302,7 +6345,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 // no endpoint so print as the word "decresc."
                 Dir *dir = new Dir;
                 m_measure->AddChild(dir);
-                setStaff(dir, m_currentstaff);
+                setStaff(dir, m_currentstaff + belowadj);
                 setLocationId(dir, line->token(i));
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 dir->SetTstamp(tstamp.getFloat());
@@ -6429,6 +6472,47 @@ bool HumdrumInput::hasBelowParameter(hum::HTp token, const string &category)
             string key = hps->getParameterName(q);
             string value = hps->getParameterValue(q);
             if (key == "b") {
+                return true;
+            }
+            if (key == "Y") {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool HumdrumInput::hasBelowParameter(hum::HTp token, const string &category, int &output)
+{
+    output = 0;
+    int lcount = token->getLinkedParameterCount();
+    if (lcount == 0) {
+        return 0;
+    }
+
+    for (int p = 0; p < token->getLinkedParameterCount(); ++p) {
+        hum::HumParamSet *hps = token->getLinkedParameter(p);
+        if (hps == NULL) {
+            continue;
+        }
+        if (hps->getNamespace1() != "LO") {
+            continue;
+        }
+        if (hps->getNamespace2() != category) {
+            continue;
+        }
+        for (int q = 0; q < hps->getCount(); ++q) {
+            string key = hps->getParameterName(q);
+            string value = hps->getParameterValue(q);
+            if (key == "b") {
+                if (value == "true") {
+                    output = 1;
+                }
+                else if (!value.empty()) {
+                    if (isdigit(value[0])) {
+                        output = stoi(value);
+                    }
+                }
                 return true;
             }
             if (key == "Y") {
@@ -8054,11 +8138,11 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
 // NB: need to set to part level rather than staff level?
 //
 // Controls that this function deals with:
-//    *above = Force all dynamics above staff.
-//    *above2 = Force all dynamics above staff below top one
-//    *below = Force all dynamics below the staff.
-//    *below2 = Force all dynamics below staff below top one
-//    *center = Force all dynamics to be centered between this staff and the one below.
+//    *above   = Force all dynamics above staff.
+//    *above:2 = Force all dynamics above staff below top one
+//    *below   = Force all dynamics below the staff.
+//    *below:2 = Force all dynamics below staff below top one
+//    *center  = Force all dynamics to be centered between this staff and the one below.
 //
 
 void HumdrumInput::handleStaffDynamStateVariables(hum::HTp token)
@@ -8075,6 +8159,12 @@ void HumdrumInput::handleStaffDynamStateVariables(hum::HTp token)
         }
         if (*tok == "*above") {
             ss[staffindex].m_dynampos = +1;
+        }
+        else if (*tok == "*above:2") {
+            ss[staffindex].m_dynampos = +2;
+        }
+        else if (*tok == "*below:2") {
+            ss[staffindex].m_dynampos = -2;
         }
         else if (*tok == "*below") {
             ss[staffindex].m_dynampos = -1;

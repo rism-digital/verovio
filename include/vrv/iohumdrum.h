@@ -424,6 +424,7 @@ protected:
     bool isFirstTokenOnStaff(hum::HTp token);
     bool hasAboveParameter(hum::HTp token, const string &category);
     bool hasBelowParameter(hum::HTp token, const string &category);
+    bool hasBelowParameter(hum::HTp token, const string &category, int &output);
     void prepareHeaderFooter();
     bool prepareHeader(std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
     bool prepareFooter(std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
