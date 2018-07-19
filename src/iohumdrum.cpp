@@ -9964,9 +9964,9 @@ int HumdrumInput::getStaffAdjustment(hum::HTp token)
     }
     int allabove = true;
     int allbelow = true;
-    std::string upquery = "[A-Ga-gr][#n-]*";
+    std::string upquery = "[A-Ga-gr][#n-]*[xXyY]*)";
     upquery += m_signifiers.above;
-    std::string downquery = "[A-Ga-gr][#n-]*";
+    std::string downquery = "[A-Ga-gr][#n-]*[xXyY]*";
     downquery += m_signifiers.below;
     if (m_signifiers.above) {
         for (int i = 0; i < scount; i++) {
