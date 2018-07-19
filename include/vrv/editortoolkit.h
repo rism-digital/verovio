@@ -43,9 +43,8 @@ public:
         std::vector<std::pair<std::string, std::string>> attributes);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     bool Remove(std::string elementId);
-    bool GroupNc(std::vector<std::string> elementIds);
-    bool GroupNeume(std::vector<std::string> elementIds);
-    bool Ungroup(std::vector<std::string> elementIds);
+    bool Group(std::string groupType, std::vector<std::string> elementIds);
+    bool Ungroup(std::string groupType, std::vector<std::string> elementIds);
     ///@}
     
     /**
@@ -69,7 +68,7 @@ protected:
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
     bool ParseRemoveAction(jsonxx::Object param, std::string *elementId);
     bool ParseGroupingAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds); 
-    bool ParseUngroupingAction(jsonxx::Object param, std::vector<std::string> *elementIds); 
+    bool ParseUngroupingAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds); 
     ///@}
 #endif
 

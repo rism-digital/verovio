@@ -97,21 +97,14 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         std::string groupType;
         std::vector<std::string> elementIds; 
         if (this->ParseGroupingAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)){
-            if(groupType.compare("nc") == 0){
-                return this->GroupNc(elementIds);
-            }
-            else if (groupType.compare("neume") == 0){
-                return this->GroupNeume(elementIds);
-            }
-            else {
-                return false;
-            }
+            return this->Group(groupType, elementIds);
         }
     }
     else if (action == "ungroup") {
+        std::string groupType;
         std::vector<std::string> elementIds;
-        if(this->ParseUngroupingAction(json.get<jsonxx::Object>("param"), &elementIds)){
-            return this->Ungroup(elementIds);
+        if(this->ParseUngroupingAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)){
+            return this->Ungroup(groupType, elementIds);
         }
     }
     else {
@@ -563,7 +556,7 @@ std::string EditorToolkit::EditInfo()
     return m_editInfo;
 }
 
-bool EditorToolkit::GroupNc(std::vector<std::string> elementIds)
+bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elementIds)
 {
     Object *newParent, *neumeParent, *newSylParent, *sylParent;
     std::set<Object *> parents;
@@ -572,109 +565,126 @@ bool EditorToolkit::GroupNc(std::vector<std::string> elementIds)
         LogError("Could not get the drawing page.");
         return false;
     }
-    for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
-        Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
-        if (elementIds.begin() == it){
-            newParent = el->GetParent();
-            assert(newParent);
-            newSylParent = newParent->GetParent();
-            assert(newSylParent);
-        }
-        else {
-            if(newParent && newSylParent){
-                neumeParent = el->GetParent();
-                assert(neumeParent);
 
-                el->MoveItselfTo(newParent);
+    if(groupType.compare("nc") == 0){
+        for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
+            Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
+            if (elementIds.begin() == it){
+                newParent = el->GetFirstParent(NEUME);
+                assert(newParent);
+                newSylParent = newParent->GetFirstParent(SYLLABLE);
+                assert(newSylParent);
+            }
+            else {
+                if(newParent && newSylParent){
+                    neumeParent = el->GetFirstParent(NEUME);
+                    assert(neumeParent);
 
-                sylParent = neumeParent->GetParent();
-                assert(sylParent);
-            
-                std::string className = sylParent->GetClassName();
-                if(className.compare("Syllable") != 0) return false;
+                    el->MoveItselfTo(newParent);
 
-                if(sylParent != newSylParent){
-                    parents.insert(sylParent);
-                }   
-            } 
+                    sylParent = neumeParent->GetFirstParent(SYLLABLE);
+                    assert(sylParent);
+                
+                    std::string className = sylParent->GetClassName();
+                    if(className.compare("Syllable") != 0) return false;
+
+                    if(sylParent != newSylParent){
+                        parents.insert(sylParent);
+                    }   
+                } 
+            }
         }
     }
-    for (auto it = parents.begin(); it != parents.end(); ++it) {
-        Object *p = (*it)->GetParent();
-        if(!p->DeleteChild(*it)) return false;
-    }
-    return true;
-}
-bool EditorToolkit::GroupNeume(std::vector<std::string> elementIds)
-{
-    LogMessage("HI");
-    Object *newParent, *sylParent;
-    std::set<Object *> parents;
+    else if (groupType.compare("neume") == 0){
+        for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
+            Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
+            if (elementIds.begin() == it){
+                newParent = el->GetFirstParent(SYLLABLE);
+                assert(newParent);
+            }
+            else {
+                if(newParent){
+                    sylParent = el->GetFirstParent(SYLLABLE);
+                    assert(sylParent);
 
-    if (!m_doc->GetDrawingPage()) {
-        LogError("Could not get the drawing page.");
+                    el->MoveItselfTo(newParent);
+                
+                    std::string className = sylParent->GetClassName();
+                    if(className.compare("Syllable") != 0) return false;
+
+                    if(sylParent != newParent){
+                        parents.insert(sylParent);
+                    }   
+                } 
+            }
+        }
+    }
+    else{
         return false;
     }
-    for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
-        Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
-        LogMessage("Neume is : %s", (*el).GetUuid().c_str());
-        if (elementIds.begin() == it){
-            newParent = el->GetParent();
-            LogMessage("NewParent is : %s", (*newParent).GetUuid().c_str());
-            assert(newParent);
-        }
-        else {
-            if(newParent){
-                sylParent = el->GetParent();
-                assert(sylParent);
-                LogMessage("SylParent is : %s", (*sylParent).GetUuid().c_str());
-
-                el->MoveItselfTo(newParent);
-            
-                std::string className = sylParent->GetClassName();
-                if(className.compare("Syllable") != 0) return false;
-
-                if(sylParent != newParent){
-                    parents.insert(sylParent);
-                }   
-            } 
-        }
-    }
     for (auto it = parents.begin(); it != parents.end(); ++it) {
-        LogMessage("current parent is : %s", (*it)->GetUuid().c_str());
         Object *p = (*it)->GetParent();
-        LogMessage("parents parent is : %s", (*p).GetUuid().c_str());
         if(!p->DeleteChild(*it)) return false;
     }
     return true;
 }
 
-bool EditorToolkit::Ungroup(std::vector<std::string> elementIds)
+bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elementIds)
 {
     Object *fparent, *sparent;
 
-    if (!m_doc->GetDrawingPage()) {
+    if(!m_doc->GetDrawingPage()) {
         LogError("Could not get the drawing page.");
         return false;
     }
-    for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
-        Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
-        if (elementIds.begin() == it){
-            fparent = el->GetFirstParent(NEUME);
-            assert(fparent);
-            sparent = fparent->GetFirstParent(SYLLABLE);
-            assert(sparent);
+
+    if(groupType.compare("nc") == 0){
+        for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
+            Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
+            if (elementIds.begin() == it){
+                fparent = el->GetFirstParent(NEUME);
+                assert(fparent);
+                sparent = fparent->GetFirstParent(SYLLABLE);
+                assert(sparent);
+            }
+            else{
+                Neume *currentParent = dynamic_cast<Neume *>(fparent);
+                assert(currentParent);
+                Object *newParent = currentParent->Clone();
+                assert(newParent);
+                newParent->ClearChildren();
+                el->MoveItselfTo(newParent);
+                fparent->ClearRelinquishedChildren();  
+                sparent->AddChild(newParent);
+                sparent->ReorderByXPos();
+            }
         }
-        else{
-            Neume *currentParent = dynamic_cast<Neume *>(fparent);
-            assert(currentParent);
-            Object *newParent = currentParent->Clone();
-            assert(newParent);
-            newParent->ResetUuid();
-            el->MoveItselfTo(newParent);
-            fparent->ClearRelinquishedChildren();
-            sparent->AddChild(newParent);
+    }
+    else if(groupType.compare("neume") == 0){
+        for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
+            Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
+            if (elementIds.begin() == it){
+
+                fparent = el->GetFirstParent(SYLLABLE);
+                assert(fparent);
+                sparent = fparent->GetFirstParent(LAYER);
+                assert(sparent);
+            }
+            else{
+                Syllable *currentParent = dynamic_cast<Syllable *>(fparent);
+                assert(currentParent);
+                Object *newParent = currentParent->Clone();
+                assert(newParent);
+                newParent->ClearChildren();
+                el->MoveItselfTo(newParent);
+                fparent->ClearRelinquishedChildren();
+                sparent->AddChild(newParent);
+                sparent->ReorderByXPos();
+            }
         }
+    }
+    else{
+        return false;
     }
     return true;
 }
@@ -761,8 +771,10 @@ bool EditorToolkit::ParseGroupingAction(
 }
 
 bool EditorToolkit::ParseUngroupingAction(
-    jsonxx::Object param, std::vector<std::string> *elementIds)
+    jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds)
 {
+    if(!param.has<jsonxx::String>("groupType")) return false;
+    (*groupType) = param.get<jsonxx::String>("groupType");
     if(!param.has<jsonxx::Array>("elementIds")) return false;
     jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
     for (int i = 0; i < array.size(); i++) {
