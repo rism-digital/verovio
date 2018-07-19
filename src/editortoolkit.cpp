@@ -98,6 +98,13 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         }
         return this->Chain(json.get<jsonxx::Array>("param"));
     }
+    else if (action == "merge") {
+        std::vector<std::string> elementIds;
+        if (this->ParseMergeAction(json.get<jsonxx::Object>("param"), &elementIds)) {
+            return this->Merge(elementIds);
+        }
+        LogWarning("Could not parse merge action");
+    }
     else {
         LogWarning("Unknown action type.");
     }
@@ -570,6 +577,69 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
     return true;
 }
 
+bool EditorToolkit::Merge(std::vector<std::string> elementIds)
+{
+    m_editInfo = "";
+    if (!m_doc->GetDrawingPage()) return false;
+    ArrayOfObjects staves;
+    int ulx = INT_MAX, uly = 0, lrx = 0, lry = 0;
+
+    // Get the staves by element ID and fail if a staff does not exist.
+    for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
+        Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(*it);
+        if (obj != nullptr && obj->Is(STAFF)) {
+            staves.push_back(obj);
+            Zone *zone = obj->GetFacsimileInterface()->GetZone();
+            ulx = ulx < zone->GetUlx() ? ulx : zone->GetUlx();
+            lrx = lrx > zone->GetLrx() ? lrx : zone->GetLrx();
+            uly += zone->GetUly();
+            lry += zone->GetLry();
+        }
+        else {
+            LogWarning("Staff with ID '%s' does not exist!", it->c_str());
+            return false;
+        }
+    }
+    if (staves.size() < 2) {
+        LogWarning("At least two staves must be provided.");
+        return false;
+    }
+
+    uly /= staves.size();
+    lry /= staves.size();
+    StaffSort staffSort; 
+    std::sort(staves.begin(), staves.end(), staffSort);
+    
+    // Move children to the first staff (in order)
+    auto stavesIt = staves.begin();
+    Staff *fillStaff = dynamic_cast<Staff *>(*stavesIt);
+    Layer *fillLayer = dynamic_cast<Layer *>(fillStaff->GetFirst(LAYER));
+    assert(fillLayer);
+    stavesIt++;
+    for (; stavesIt != staves.end(); ++stavesIt) {
+        Staff *sourceStaff = dynamic_cast<Staff *>(*stavesIt);
+        Layer *sourceLayer = dynamic_cast<Layer *>(sourceStaff->GetFirst(LAYER));
+        fillLayer->MoveChildrenFrom(sourceLayer);
+        assert(sourceLayer->GetChildCount() == 0);
+        Object *parent = sourceStaff->GetParent();
+        parent->DeleteChild(sourceStaff);
+    }
+    // Set the bounding box for the staff to the new bounds
+    Zone *staffZone = fillStaff->GetZone();
+    staffZone->SetUlx(ulx);
+    staffZone->SetUly(uly);
+    staffZone->SetLrx(lrx);
+    staffZone->SetLry(lry);
+
+    fillLayer->ReorderByXPos();
+
+    m_editInfo = fillStaff->GetUuid();
+
+    // TODO change zones for staff children
+
+    return true;
+}
+
 bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string attrValue)
 {
     if (!m_doc->GetDrawingPage()) return false;
@@ -682,6 +752,17 @@ bool EditorToolkit::ParseInsertAction(
         if (!param.has<jsonxx::Number>("lry")) return false;
         *lry = param.get<jsonxx::Number>("lry");
     } 
+    return true;
+}
+
+bool EditorToolkit::ParseMergeAction(
+    jsonxx::Object param, std::vector<std::string> *elementIds)
+{
+    if (!param.has<jsonxx::Array>("elementIds")) return false;
+    jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
+    for (int i = 0; i < array.size(); i++) {
+        elementIds->push_back(array.get<jsonxx::String>(i));
+    }
     return true;
 }
 
