@@ -6229,7 +6229,6 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             }
 
             if (endtok != NULL) {
-
                 Hairpin *hairpin = new Hairpin;
                 setStaff(hairpin, m_currentstaff + belowadj);
                 setLocationId(hairpin, line->token(i), -1);
@@ -6279,7 +6278,13 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 setLocationId(dir, line->token(i));
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 dir->SetTstamp(tstamp.getFloat());
-                addTextElement(dir, "cresc.");
+                std::string fontstyle;
+                std::string content = "cresc.";
+                if (!m_signifiers.cresctext.empty()) {
+                    content = m_signifiers.cresctext;
+                    fontstyle = m_signifiers.crescfontstyle;
+                }
+                addTextElement(dir, content, fontstyle);
             }
         }
         else if (hairpins.find(">") != string::npos) {
@@ -6349,7 +6354,13 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 setLocationId(dir, line->token(i));
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 dir->SetTstamp(tstamp.getFloat());
-                addTextElement(dir, "decresc.");
+                std::string fontstyle = "";
+                std::string content = "decresc.";
+                if (!m_signifiers.decresctext.empty()) {
+                    content = m_signifiers.decresctext;
+                    fontstyle = m_signifiers.decrescfontstyle;
+                }
+                addTextElement(dir, content, fontstyle);
             }
         }
     }
@@ -6683,18 +6694,38 @@ hum::HumNum HumdrumInput::getMeasureEndTstamp(int staffindex)
 /////////////////////////////
 //
 // HumdumInput::addTextElement -- Append text to a regular element.
+//   default value: fontstyle == ""
 //
 
-template <class ELEMENT> void HumdrumInput::addTextElement(ELEMENT *element, const std::string &content)
+template <class ELEMENT>
+void HumdrumInput::addTextElement(ELEMENT *element, const std::string &content, const std::string &fontstyle)
 {
     Text *text = new Text;
-    element->AddChild(text);
     std::string data = content;
     if (data.find("[") != std::string::npos) {
         data = replaceMusicShapes(data);
     }
     data = unescapeHtmlEntities(data);
     text->SetText(UTF8to16(data));
+
+    if (fontstyle.empty()) {
+        element->AddChild(text);
+    }
+    else {
+        Rend *rend = new Rend;
+        element->AddChild(rend);
+        rend->AddChild(text);
+        if (fontstyle == "normal") {
+            rend->SetFontstyle(rend->AttTypography::StrToFontstyle("normal"));
+        }
+        else if (fontstyle == "bold") {
+            rend->SetFontweight(rend->AttTypography::StrToFontweight("bold"));
+            rend->SetFontstyle(rend->AttTypography::StrToFontstyle("normal"));
+        }
+        else if (fontstyle == "bold-italic") {
+            rend->SetFontweight(rend->AttTypography::StrToFontweight("bold"));
+        }
+    }
 }
 
 //////////////////////////////
@@ -12028,6 +12059,13 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
         std::string key = refs[i]->getReferenceKey();
         std::string value = refs[i]->getReferenceValue();
         auto equals = value.substr(0, 8).find('=');
+        std::string afterequals;
+        if (equals != std::string::npos) {
+            afterequals = value.substr(equals + 1);
+        }
+        else {
+            afterequals = value;
+        }
 
         if ((equals == string::npos) && (key == "RDF**kern")) {
             // meta signifiers (no actual signifier)
@@ -12072,6 +12110,7 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
 
             continue;
         }
+
         char signifier = 0;
         for (int j = 0; j < (int)equals; ++j) {
             if (isspace(value[j])) {
@@ -12093,6 +12132,38 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             }
             else {
                 m_signifiers.textcolor.push_back("red");
+            }
+        }
+        else if (key == "RDF**dynam") {
+            if (signifier == '>') {
+                if (hre.search(afterequals, "^\\s*\"\\s*([^\"]+)\\s*\"")) {
+                    m_signifiers.decresctext = hre.getMatch(1);
+                }
+                else if (hre.search(afterequals, "^\\s*([^\\s]+)")) {
+                    m_signifiers.decresctext = hre.getMatch(1);
+                }
+                if (hre.search(afterequals, "fontstyle\\s*=\\s*\"?\\s*([^\"\\s]+)\\s*\"?")) {
+                    m_signifiers.decrescfontstyle = hre.getMatch(1);
+                    if (m_signifiers.crescfontstyle == "italic") {
+                        // default is italic for verovio, so suppress:
+                        m_signifiers.crescfontstyle = "";
+                    }
+                }
+            }
+            else if (signifier == '<') {
+                if (hre.search(afterequals, "^\\s*\"\\s*([^\"]+)\\s*\"")) {
+                    m_signifiers.cresctext = hre.getMatch(1);
+                }
+                else if (hre.search(afterequals, "^\\s*([^\\s]+)")) {
+                    m_signifiers.cresctext = hre.getMatch(1);
+                }
+                if (hre.search(afterequals, "fontstyle\\s*=\\s*\"?\\s*([^\"\\s]+)\\s*\"?")) {
+                    m_signifiers.crescfontstyle = hre.getMatch(1);
+                    if (m_signifiers.crescfontstyle == "italic") {
+                        // default is italic for verovio, so suppress:
+                        m_signifiers.crescfontstyle = "";
+                    }
+                }
             }
         }
 
