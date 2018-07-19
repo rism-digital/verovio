@@ -613,21 +613,25 @@ bool EditorToolkit::Merge(std::vector<std::string> elementIds)
     // Move children to the first staff (in order)
     auto stavesIt = staves.begin();
     Staff *fillStaff = dynamic_cast<Staff *>(*stavesIt);
+    Layer *fillLayer = dynamic_cast<Layer *>(fillStaff->GetFirst(LAYER));
+    assert(fillLayer);
     stavesIt++;
     for (; stavesIt != staves.end(); ++stavesIt) {
         Staff *sourceStaff = dynamic_cast<Staff *>(*stavesIt);
-        fillStaff->MoveChildrenFrom(sourceStaff);
-        assert(sourceStaff->GetChildCount() == 0);
+        Layer *sourceLayer = dynamic_cast<Layer *>(sourceStaff->GetFirst(LAYER));
+        fillLayer->MoveChildrenFrom(sourceLayer);
+        assert(sourceLayer->GetChildCount() == 0);
         Object *parent = sourceStaff->GetParent();
         parent->DeleteChild(sourceStaff);
     }
-
     // Set the bounding box for the staff to the new bounds
     Zone *staffZone = fillStaff->GetZone();
     staffZone->SetUlx(ulx);
     staffZone->SetUly(uly);
     staffZone->SetLrx(lrx);
     staffZone->SetLry(lry);
+
+    fillLayer->ReorderByXPos();
 
     m_editInfo = fillStaff->GetUuid();
 
