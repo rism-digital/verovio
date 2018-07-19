@@ -44,6 +44,8 @@ public:
     bool Merge(std::vector<std::string> elementIds);
     bool Set(std::string elementId, std::string attrType, std::string attrValue);
     bool Remove(std::string elementId);
+    bool Group(std::string groupType, std::vector<std::string> elementIds);
+    bool Ungroup(std::string groupType, std::vector<std::string> elementIds);
     ///@}
     
     /**
@@ -67,6 +69,8 @@ protected:
     bool ParseMergeAction(jsonxx::Object param, std::vector<std::string> *elementIds);
     bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
     bool ParseRemoveAction(jsonxx::Object param, std::string *elementId);
+    bool ParseGroupingAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds); 
+    bool ParseUngroupingAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds); 
     ///@}
 #endif
 
