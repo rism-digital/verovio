@@ -146,6 +146,18 @@ void View::DrawSystem(DeviceContext *dc, System *system)
 
     dc->StartGraphic(system, "", system->GetUuid());
 
+    // Draw system divider (from the second one) if scoreDef is optimized
+    if ((system->GetIdx() > 0) && system->IsDrawingOptimized()) {
+        int x1 = system->GetDrawingX() - m_doc->GetDrawingUnit(100) * 3;
+        int y1 = system->GetDrawingY() - m_doc->GetDrawingUnit(100) * 1;
+        int x2 = system->GetDrawingX() + m_doc->GetDrawingUnit(100) * 3;
+        int y2 = system->GetDrawingY() + m_doc->GetDrawingUnit(100) * 3;
+        DrawObliquePolygon(dc, x1, y1, x2, y2, m_doc->GetDrawingUnit(100) * 1.5);
+        y1 += m_doc->GetDrawingUnit(100) * 2;
+        y2 += m_doc->GetDrawingUnit(100) * 2;
+        DrawObliquePolygon(dc, x1, y1, x2, y2, m_doc->GetDrawingUnit(100) * 1.5);
+    }
+
     // first we need to clear the drawing list of postponed elements
     system->ResetDrawingList();
 
@@ -246,6 +258,10 @@ void View::DrawStaffGrp(
     assert(measure);
     assert(staffGrp);
 
+    if (staffGrp->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
+        return;
+    }
+
     TextExtend extend;
 
     const ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
@@ -253,10 +269,29 @@ void View::DrawStaffGrp(
         return;
     }
 
-    // Get the first and last staffDef of the staffGrp
-    StaffDef *firstDef = dynamic_cast<StaffDef *>(staffDefs->front());
-    StaffDef *lastDef = dynamic_cast<StaffDef *>(staffDefs->back());
+    StaffDef *firstDef = NULL;
+    ListOfObjects::const_iterator iter;
+    for (iter = staffDefs->begin(); iter != staffDefs->end(); iter++) {
+        StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
+        assert(staffDef);
+        if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+            firstDef = staffDef;
+            break;
+        }
+    }
 
+    StaffDef *lastDef = NULL;
+    ListOfObjects::const_reverse_iterator riter;
+    for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); riter++) {
+        StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
+        assert(staffDef);
+        if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+            lastDef = staffDef;
+            break;
+        }
+    }
+
+    // Get the first and last staffDef of the staffGrp
     if (!firstDef || !lastDef) {
         LogDebug("Could not get staffDef while drawing staffGrp - DrawStaffGrp");
         return;
@@ -396,6 +431,11 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
 
         if (!staff || !system) {
             LogDebug("Staff or System missing in View::DrawStaffDefLabels");
+            ++iter;
+            continue;
+        }
+
+        if (!staff->DrawingIsVisible()) {
             ++iter;
             continue;
         }
@@ -567,6 +607,10 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
     assert(staffGrp);
     assert(barLine);
 
+    if (staffGrp->GetDrawingVisibility() == OPTIMIZATION_HIDDEN) {
+        return;
+    }
+
     if (staffGrp->GetBarthru() != BOOLEAN_true) {
         // recursively draw the children (staffDef or staffGrp) - we assume @barthru is false by default
         int i;
@@ -602,9 +646,27 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
             return;
         }
 
-        // Get the first and last staffDef of the staffGrp
-        StaffDef *firstDef = dynamic_cast<StaffDef *>(staffDefs->front());
-        StaffDef *lastDef = dynamic_cast<StaffDef *>(staffDefs->back());
+        StaffDef *firstDef = NULL;
+        ListOfObjects::const_iterator iter;
+        for (iter = staffDefs->begin(); iter != staffDefs->end(); iter++) {
+            StaffDef *staffDef = dynamic_cast<StaffDef *>(*iter);
+            assert(staffDef);
+            if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+                firstDef = staffDef;
+                break;
+            }
+        }
+
+        StaffDef *lastDef = NULL;
+        ListOfObjects::const_reverse_iterator riter;
+        for (riter = staffDefs->rbegin(); riter != staffDefs->rend(); riter++) {
+            StaffDef *staffDef = dynamic_cast<StaffDef *>(*riter);
+            assert(staffDef);
+            if (staffDef->GetDrawingVisibility() != OPTIMIZATION_HIDDEN) {
+                lastDef = staffDef;
+                break;
+            }
+        }
 
         if (!firstDef || !lastDef) {
             LogDebug("Could not get staffDef while drawing staffGrp - DrawStaffGrp");
@@ -806,13 +868,15 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     // Draw the barlines only with measured music
     if (measure->IsMeasuredMusic()) {
+        System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+        assert(system);
         if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
-            DrawScoreDef(
-                dc, &m_drawingScoreDef, measure, measure->GetLeftBarLine()->GetDrawingX(), measure->GetLeftBarLine());
+            DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, measure->GetLeftBarLine()->GetDrawingX(),
+                measure->GetLeftBarLine());
         }
         if (measure->GetDrawingRightBarLine() != BARRENDITION_NONE) {
             bool isLast = (measure == system->FindChildByType(MEASURE, 1, BACKWARD)) ? true : false;
-            DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetRightBarLine()->GetDrawingX(),
+            DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, measure->GetRightBarLine()->GetDrawingX(),
                 measure->GetRightBarLine(), isLast);
         }
     }
@@ -832,7 +896,18 @@ void View::DrawMNum(DeviceContext *dc, MNum *mnum, Measure *measure)
     assert(measure);
     assert(mnum);
 
-    Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
+    Staff *staff = NULL;
+    ArrayOfObjects staves;
+    AttComparison matchType(STAFF);
+    measure->FindAllChildByComparison(&staves, &matchType, 1);
+    for (auto &child : staves) {
+        staff = dynamic_cast<Staff *>(child);
+        assert(staff);
+        if (staff->DrawingIsVisible()) {
+            break;
+        }
+        staff = NULL;
+    }
     if (staff) {
 
         dc->StartGraphic(mnum, "", mnum->GetUuid());
@@ -880,6 +955,12 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
     assert(staff);
     assert(measure);
     assert(system);
+
+    assert(system->GetDrawingScoreDef());
+    StaffDef *staffDef = system->GetDrawingScoreDef()->GetStaffDef(staff->GetN());
+    if (staffDef && (staffDef->GetDrawingVisibility() == OPTIMIZATION_HIDDEN)) {
+        return;
+    }
 
     dc->StartGraphic(staff, "", staff->GetUuid());
     

@@ -85,7 +85,7 @@ void LayerElement::Reset()
     m_drawingXRel = 0;
     m_drawingCueSize = false;
 
-    m_scoreDefRole = NONE;
+    m_scoreDefRole = SCOREDEF_NONE;
     m_alignment = NULL;
     m_graceAlignment = NULL;
     m_alignmentLayerN = VRV_UNSET;
@@ -600,18 +600,18 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         type = ALIGNMENT_BARLINE;
     }
     else if (this->Is(CLEF)) {
-        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
+        if ((this->GetScoreDefRole() == SCOREDEF_SYSTEM) || (this->GetScoreDefRole() == SCOREDEF_INTERMEDIATE))
             type = ALIGNMENT_SCOREDEF_CLEF;
-        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+        else if (this->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_CLEF;
         else {
             type = ALIGNMENT_CLEF;
         }
     }
     else if (this->Is(KEYSIG)) {
-        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
+        if ((this->GetScoreDefRole() == SCOREDEF_SYSTEM) || (this->GetScoreDefRole() == SCOREDEF_INTERMEDIATE))
             type = ALIGNMENT_SCOREDEF_KEYSIG;
-        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+        else if (this->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_KEYSIG;
         else {
             // type = ALIGNMENT_KEYSIG;
@@ -621,9 +621,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         }
     }
     else if (this->Is(MENSUR)) {
-        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
+        if ((this->GetScoreDefRole() == SCOREDEF_SYSTEM) || (this->GetScoreDefRole() == SCOREDEF_INTERMEDIATE))
             type = ALIGNMENT_SCOREDEF_MENSUR;
-        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+        else if (this->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_MENSUR;
         else {
             // replace the current mensur
@@ -633,9 +633,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         }
     }
     else if (this->Is(METERSIG)) {
-        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
+        if ((this->GetScoreDefRole() == SCOREDEF_SYSTEM) || (this->GetScoreDefRole() == SCOREDEF_INTERMEDIATE))
             type = ALIGNMENT_SCOREDEF_METERSIG;
-        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+        else if (this->GetScoreDefRole() == SCOREDEF_CAUTIONARY)
             type = ALIGNMENT_SCOREDEF_CAUTION_METERSIG;
         else {
             // replace the current meter signature

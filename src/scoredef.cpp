@@ -185,9 +185,10 @@ MeterSig *ScoreDefElement::GetMeterSigCopy() const
 // ScoreDef
 //----------------------------------------------------------------------------
 
-ScoreDef::ScoreDef() : ScoreDefElement("scoredef-"), ObjectListInterface(), AttEndings()
+ScoreDef::ScoreDef() : ScoreDefElement("scoredef-"), ObjectListInterface(), AttEndings(), AttOptimization()
 {
     RegisterAttClass(ATT_ENDINGS);
+    RegisterAttClass(ATT_OPTIMIZATION);
 
     Reset();
 }
@@ -198,6 +199,7 @@ void ScoreDef::Reset()
 {
     ScoreDefElement::Reset();
     ResetEndings();
+    ResetOptimization();
 
     m_drawLabels = false;
     m_drawingWidth = 0;

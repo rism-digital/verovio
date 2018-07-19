@@ -170,7 +170,7 @@ public:
      * Calculate the point bezier point position for a t between 0.0 and 1.0
      */
     static Point CalcDeCasteljau(const Point bezier[4], double t);
-    
+
     /**
      * Calculate the position of the bezier above and below for a thick bezier
      */

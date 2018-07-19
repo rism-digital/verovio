@@ -230,6 +230,7 @@ public:
     ///@{
     int GetChildCount() const { return (int)m_children.size(); }
     int GetChildCount(const ClassId classId) const;
+    int GetChildCount(const ClassId, int deepth);
     ///@}
 
     /**
@@ -774,6 +775,15 @@ public:
      * A change can be either a scoreDef before or a clef, meterSig, etc. within the previous measure.
      */
     virtual int SetCurrentScoreDef(FunctorParams *functorParams);
+
+    /**
+     * Optimize the scoreDef for each system.
+     * For automatic breaks, looks for staves with only mRests.
+     */
+    ///@{
+    virtual int OptimizeScoreDef(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int OptimizeScoreDefEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Set the cautionnary scoreDef wherever need.

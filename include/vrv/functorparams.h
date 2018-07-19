@@ -433,7 +433,7 @@ public:
         m_currentMeterSig = NULL;
         m_notationType = NOTATIONTYPE_cmn;
         m_functor = functor;
-        m_scoreDefRole = NONE;
+        m_scoreDefRole = SCOREDEF_NONE;
         m_isFirstMeasure = false;
         m_hasMultipleLayer = false;
         m_doc = doc;
@@ -1178,6 +1178,38 @@ public:
     int m_rightBarLineX;
     int m_systemFullWidth;
     Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// OptimizeScoreDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current scoreDef
+ * member 1: the current staffDef
+ * member 2: the flag indicating if we are optimizing encoded layout
+ * member 3: the doc
+ **/
+
+class OptimizeScoreDefParams : public FunctorParams {
+public:
+    OptimizeScoreDefParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    {
+        m_currentScoreDef = NULL;
+        m_encoded = false;
+        m_firstScoreDef = true;
+        m_hasFermata = false;
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+    }
+    ScoreDef *m_currentScoreDef;
+    bool m_encoded;
+    bool m_firstScoreDef;
+    bool m_hasFermata;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
 };
 
 //----------------------------------------------------------------------------

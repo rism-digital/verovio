@@ -70,7 +70,7 @@ void View::SetPage(int pageIdx, bool doLayout)
     m_currentPage = m_doc->SetDrawingPage(pageIdx);
 
     if (doLayout) {
-        m_doc->CollectScoreDefs();
+        m_doc->SetCurrentScoreDefDoc();
         // if we once deal with multiple views, it would be better
         // to redo the layout only when necessary?
         if (m_doc->GetType() == Transcription || m_doc->GetType() == Facs)

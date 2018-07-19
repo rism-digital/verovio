@@ -212,7 +212,12 @@ public:
      * It uses the MusObject::SetPageScoreDef functor method for parsing the file.
      * This will be done only if m_currentScoreDefDone is false or force is true.
      */
-    void CollectScoreDefs(bool force = false);
+    void SetCurrentScoreDefDoc(bool force = false);
+
+    /**
+     * Optimize the scoreDef once the document is cast-off.
+     */
+    void OptimizeScoreDefDoc(bool encoded = false);
 
     /**
      * Prepare the document for drawing.
