@@ -101,14 +101,14 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
     else if (action == "group") {
         std::string groupType;
         std::vector<std::string> elementIds; 
-        if (this->ParseGroupingAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)){
+        if (this->ParseGroupAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)){
             return this->Group(groupType, elementIds);
         }
     }
     else if (action == "ungroup") {
         std::string groupType;
         std::vector<std::string> elementIds;
-        if(this->ParseUngroupingAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)){
+        if(this->ParseUngroupAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)){
             return this->Ungroup(groupType, elementIds);
         }
     }
@@ -233,6 +233,51 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             }
             for (auto it = childZones.begin(); it != childZones.end(); it++) {
                 (*it)->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+            }
+        }
+    }
+    else if(element->Is(SYLLABLE)) {
+        Syllable *syllable = dynamic_cast<Syllable *>(element);
+        assert(syllable);
+        Layer *layer = dynamic_cast<Layer *>(syllable->GetFirstParent(LAYER));
+        if (!layer) return false;
+
+        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+        assert(staff);
+
+        int pitchDifference = round( (double)y / (double)m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+
+        //Get components of syllable
+        AttComparison ac(NEUME);
+        ArrayOfObjects neumes;
+        syllable->FindAllChildByComparison(&neumes, &ac);
+        for (auto it = neumes.begin(); it != neumes.end(); ++it) {
+            Neume *neume = dynamic_cast<Neume *>(*it);
+            assert(neume);
+            AttComparison ac(NC);
+            ArrayOfObjects ncs;
+            neume->FindAllChildByComparison(&ncs, &ac);
+            for (auto it = ncs.begin(); it != ncs.end(); ++it) {
+                Nc *nc = dynamic_cast<Nc *>(*it);
+                // Update the neume component
+                nc->AdjustPitchByOffset(pitchDifference); 
+            }
+            if (neume->HasFacs()) {
+            Zone *zone = neume->GetZone();
+            assert(zone);
+            zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+            }
+            else if (dynamic_cast<Nc*>(neume->FindChildByType(NC))->HasFacs()) {
+                std::set<Zone *> childZones; 
+                for (Object *child = neume->GetFirst(); child != nullptr; child = neume->GetNext()) {
+                    FacsimileInterface *fi = child->GetFacsimileInterface();
+                    if (fi != nullptr) {
+                        childZones.insert(fi->GetZone());
+                    }
+                }
+                for (auto it = childZones.begin(); it != childZones.end(); it++) {
+                    (*it)->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+                }
             }
         }
     }
@@ -739,7 +784,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
                     assert(sylParent);
                 
                     std::string className = sylParent->GetClassName();
-                    if(className.compare("Syllable") != 0) return false;
+                    if(className != "Syllable") return false;
 
                     if(sylParent != newSylParent){
                         parents.insert(sylParent);
@@ -763,7 +808,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
                     el->MoveItselfTo(newParent);
                 
                     std::string className = sylParent->GetClassName();
-                    if(className.compare("Syllable") != 0) return false;
+                    if(className != "Syllable") return false;
 
                     if(sylParent != newParent){
                         parents.insert(sylParent);
@@ -913,6 +958,7 @@ bool EditorToolkit::ParseMergeAction(
     return true;
 }
 
+
 bool EditorToolkit::ParseSetAction(
     jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue)
 {
@@ -942,7 +988,7 @@ bool EditorToolkit::ParseRemoveAction(
     return true;
 }
 
-bool EditorToolkit::ParseGroupingAction(
+bool EditorToolkit::ParseGroupAction(
     jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds)
 {
     if(!param.has<jsonxx::String>("groupType")) return false;
@@ -956,7 +1002,7 @@ bool EditorToolkit::ParseGroupingAction(
     return true;
 }
 
-bool EditorToolkit::ParseUngroupingAction(
+bool EditorToolkit::ParseUngroupAction(
     jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds)
 {
     if(!param.has<jsonxx::String>("groupType")) return false;
