@@ -101,23 +101,16 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
     else if (action == "group") {
         std::string groupType;
         std::vector<std::string> elementIds; 
-        if (this->ParseGroupingAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)){
+        if (this->ParseGroupAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)){
             return this->Group(groupType, elementIds);
         }
     }
     else if (action == "ungroup") {
         std::string groupType;
         std::vector<std::string> elementIds;
-        if(this->ParseUngroupingAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)){
+        if(this->ParseUngroupAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)){
             return this->Ungroup(groupType, elementIds);
         }
-    }
-    else if (action == "merge") {
-        std::vector<std::string> elementIds;
-        if (this->ParseMergeAction(json.get<jsonxx::Object>("param"), &elementIds)) {
-            return this->Merge(elementIds);
-        }
-        LogWarning("Could not parse merge action");
     }
     else {
         LogWarning("Unknown action type.");
@@ -233,6 +226,51 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
             }
             for (auto it = childZones.begin(); it != childZones.end(); it++) {
                 (*it)->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+            }
+        }
+    }
+    else if(element->Is(SYLLABLE)) {
+        Syllable *syllable = dynamic_cast<Syllable *>(element);
+        assert(syllable);
+        Layer *layer = dynamic_cast<Layer *>(syllable->GetFirstParent(LAYER));
+        if (!layer) return false;
+
+        Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+        assert(staff);
+
+        int pitchDifference = round( (double)y / (double)m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+
+        //Get components of syllable
+        AttComparison ac(NEUME);
+        ArrayOfObjects neumes;
+        syllable->FindAllChildByComparison(&neumes, &ac);
+        for (auto it = neumes.begin(); it != neumes.end(); ++it) {
+            Neume *neume = dynamic_cast<Neume *>(*it);
+            assert(neume);
+            AttComparison ac(NC);
+            ArrayOfObjects ncs;
+            neume->FindAllChildByComparison(&ncs, &ac);
+            for (auto it = ncs.begin(); it != ncs.end(); ++it) {
+                Nc *nc = dynamic_cast<Nc *>(*it);
+                // Update the neume component
+                nc->AdjustPitchByOffset(pitchDifference); 
+            }
+            if (neume->HasFacs()) {
+            Zone *zone = neume->GetZone();
+            assert(zone);
+            zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+            }
+            else if (dynamic_cast<Nc*>(neume->FindChildByType(NC))->HasFacs()) {
+                std::set<Zone *> childZones; 
+                for (Object *child = neume->GetFirst(); child != nullptr; child = neume->GetNext()) {
+                    FacsimileInterface *fi = child->GetFacsimileInterface();
+                    if (fi != nullptr) {
+                        childZones.insert(fi->GetZone());
+                    }
+                }
+                for (auto it = childZones.begin(); it != childZones.end(); it++) {
+                    (*it)->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
+                }
             }
         }
     }
@@ -591,69 +629,6 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
     return true;
 }
 
-bool EditorToolkit::Merge(std::vector<std::string> elementIds)
-{
-    m_editInfo = "";
-    if (!m_doc->GetDrawingPage()) return false;
-    ArrayOfObjects staves;
-    int ulx = INT_MAX, uly = 0, lrx = 0, lry = 0;
-
-    // Get the staves by element ID and fail if a staff does not exist.
-    for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
-        Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(*it);
-        if (obj != nullptr && obj->Is(STAFF)) {
-            staves.push_back(obj);
-            Zone *zone = obj->GetFacsimileInterface()->GetZone();
-            ulx = ulx < zone->GetUlx() ? ulx : zone->GetUlx();
-            lrx = lrx > zone->GetLrx() ? lrx : zone->GetLrx();
-            uly += zone->GetUly();
-            lry += zone->GetLry();
-        }
-        else {
-            LogWarning("Staff with ID '%s' does not exist!", it->c_str());
-            return false;
-        }
-    }
-    if (staves.size() < 2) {
-        LogWarning("At least two staves must be provided.");
-        return false;
-    }
-
-    uly /= staves.size();
-    lry /= staves.size();
-    StaffSort staffSort; 
-    std::sort(staves.begin(), staves.end(), staffSort);
-    
-    // Move children to the first staff (in order)
-    auto stavesIt = staves.begin();
-    Staff *fillStaff = dynamic_cast<Staff *>(*stavesIt);
-    Layer *fillLayer = dynamic_cast<Layer *>(fillStaff->GetFirst(LAYER));
-    assert(fillLayer);
-    stavesIt++;
-    for (; stavesIt != staves.end(); ++stavesIt) {
-        Staff *sourceStaff = dynamic_cast<Staff *>(*stavesIt);
-        Layer *sourceLayer = dynamic_cast<Layer *>(sourceStaff->GetFirst(LAYER));
-        fillLayer->MoveChildrenFrom(sourceLayer);
-        assert(sourceLayer->GetChildCount() == 0);
-        Object *parent = sourceStaff->GetParent();
-        parent->DeleteChild(sourceStaff);
-    }
-    // Set the bounding box for the staff to the new bounds
-    Zone *staffZone = fillStaff->GetZone();
-    staffZone->SetUlx(ulx);
-    staffZone->SetUly(uly);
-    staffZone->SetLrx(lrx);
-    staffZone->SetLry(lry);
-
-    fillLayer->ReorderByXPos();
-
-    m_editInfo = fillStaff->GetUuid();
-
-    // TODO change zones for staff children
-
-    return true;
-}
-
 bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string attrValue)
 {
     if (!m_doc->GetDrawingPage()) return false;
@@ -719,7 +694,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
         return false;
     }
 
-    if(groupType.compare("nc") == 0){
+    if(groupType == "nc"){
         for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
             Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
             if (elementIds.begin() == it){
@@ -739,7 +714,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
                     assert(sylParent);
                 
                     std::string className = sylParent->GetClassName();
-                    if(className.compare("Syllable") != 0) return false;
+                    if(className != "syllable") return false;
 
                     if(sylParent != newSylParent){
                         parents.insert(sylParent);
@@ -748,7 +723,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
             }
         }
     }
-    else if (groupType.compare("neume") == 0){
+    else if (groupType== "neume"){
         for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
             Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
             if (elementIds.begin() == it){
@@ -763,7 +738,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
                     el->MoveItselfTo(newParent);
                 
                     std::string className = sylParent->GetClassName();
-                    if(className.compare("Syllable") != 0) return false;
+                    if(className != "syllable") return false;
 
                     if(sylParent != newParent){
                         parents.insert(sylParent);
@@ -791,7 +766,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
         return false;
     }
 
-    if(groupType.compare("nc") == 0){
+    if(groupType == "nc"){
         for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
             Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
             if (elementIds.begin() == it){
@@ -813,7 +788,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             }
         }
     }
-    else if(groupType.compare("neume") == 0){
+    else if(groupType == "neume"){
         for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
             Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
             if (elementIds.begin() == it){
@@ -902,17 +877,6 @@ bool EditorToolkit::ParseInsertAction(
     return true;
 }
 
-bool EditorToolkit::ParseMergeAction(
-    jsonxx::Object param, std::vector<std::string> *elementIds)
-{
-    if (!param.has<jsonxx::Array>("elementIds")) return false;
-    jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
-    for (int i = 0; i < array.size(); i++) {
-        elementIds->push_back(array.get<jsonxx::String>(i));
-    }
-    return true;
-}
-
 bool EditorToolkit::ParseSetAction(
     jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue)
 {
@@ -942,7 +906,7 @@ bool EditorToolkit::ParseRemoveAction(
     return true;
 }
 
-bool EditorToolkit::ParseGroupingAction(
+bool EditorToolkit::ParseGroupAction(
     jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds)
 {
     if(!param.has<jsonxx::String>("groupType")) return false;
@@ -956,7 +920,7 @@ bool EditorToolkit::ParseGroupingAction(
     return true;
 }
 
-bool EditorToolkit::ParseUngroupingAction(
+bool EditorToolkit::ParseUngroupAction(
     jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds)
 {
     if(!param.has<jsonxx::String>("groupType")) return false;
