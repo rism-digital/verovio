@@ -263,20 +263,29 @@ int Stem::CalcStem(FunctorParams *functorParams)
     if (!this->HasStemLen() || (this->GetStemLen() != 0)) {
         baseStem += params->m_chordStemLength;
 
+        Point p;
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-            Point p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+            if (this->GetStemPos() == STEMPOSITION_left) {
+              p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+            }
+            else {
+              p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+            }
             baseStem += p.y;
-            this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
-            this->SetDrawingXRel(p.x);
             this->SetDrawingStemLen(baseStem);
         }
         else {
-            Point p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+          if (this->GetStemPos() == STEMPOSITION_right) {
+            p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+          }
+          else {
+            p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+          }
             baseStem -= p.y;
-            this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
-            this->SetDrawingXRel(p.x);
             this->SetDrawingStemLen(-baseStem);
         }
+        this->SetDrawingYRel(this->GetDrawingYRel() + p.y);
+        this->SetDrawingXRel(p.x);
     }
 
     /************ Set the flag (if necessary) and adjust the length ************/
