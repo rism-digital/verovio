@@ -764,7 +764,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
         return false;
     }
 
-    if(groupType == "nc"){
+    if(groupType.compare("nc") == 0){
         for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
             Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
             if (elementIds.begin() == it){
@@ -784,7 +784,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
                     assert(sylParent);
                 
                     std::string className = sylParent->GetClassName();
-                    if(className != "syllable") return false;
+                    if(className != "Syllable") return false;
 
                     if(sylParent != newSylParent){
                         parents.insert(sylParent);
@@ -793,7 +793,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
             }
         }
     }
-    else if (groupType== "neume"){
+    else if (groupType.compare("neume") == 0){
         for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
             Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
             if (elementIds.begin() == it){
@@ -808,7 +808,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
                     el->MoveItselfTo(newParent);
                 
                     std::string className = sylParent->GetClassName();
-                    if(className != "syllable") return false;
+                    if(className != "Syllable") return false;
 
                     if(sylParent != newParent){
                         parents.insert(sylParent);
@@ -836,7 +836,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
         return false;
     }
 
-    if(groupType == "nc"){
+    if(groupType.compare("nc") == 0){
         for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
             Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
             if (elementIds.begin() == it){
@@ -858,7 +858,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             }
         }
     }
-    else if(groupType == "neume"){
+    else if(groupType.compare("neume") == 0){
         for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
             Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
             if (elementIds.begin() == it){
