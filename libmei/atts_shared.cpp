@@ -2870,6 +2870,7 @@ AttLineRendBase::~AttLineRendBase()
 void AttLineRendBase::ResetLineRendBase()
 {
     m_lform = LINEFORM_NONE;
+    m_lsegs = 0;
     m_lwidth = "";
 }
 
@@ -2879,6 +2880,11 @@ bool AttLineRendBase::ReadLineRendBase(pugi::xml_node element)
     if (element.attribute("lform")) {
         this->SetLform(StrToLineform(element.attribute("lform").value()));
         element.remove_attribute("lform");
+        hasAttribute = true;
+    }
+    if (element.attribute("lsegs")) {
+        this->SetLsegs(StrToInt(element.attribute("lsegs").value()));
+        element.remove_attribute("lsegs");
         hasAttribute = true;
     }
     if (element.attribute("lwidth")) {
@@ -2896,6 +2902,10 @@ bool AttLineRendBase::WriteLineRendBase(pugi::xml_node element)
         element.append_attribute("lform") = LineformToStr(this->GetLform()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasLsegs()) {
+        element.append_attribute("lsegs") = IntToStr(this->GetLsegs()).c_str();
+        wroteAttribute = true;
+    }
     if (this->HasLwidth()) {
         element.append_attribute("lwidth") = StrToStr(this->GetLwidth()).c_str();
         wroteAttribute = true;
@@ -2906,6 +2916,11 @@ bool AttLineRendBase::WriteLineRendBase(pugi::xml_node element)
 bool AttLineRendBase::HasLform() const
 {
     return (m_lform != LINEFORM_NONE);
+}
+
+bool AttLineRendBase::HasLsegs() const
+{
+    return (m_lsegs != 0);
 }
 
 bool AttLineRendBase::HasLwidth() const
@@ -8378,6 +8393,10 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             att->SetLform(att->StrToLineform(attrValue));
             return true;
         }
+        if (attrType == "lsegs") {
+            att->SetLsegs(att->StrToInt(attrValue));
+            return true;
+        }
         if (attrType == "lwidth") {
             att->SetLwidth(att->StrToStr(attrValue));
             return true;
@@ -9811,6 +9830,9 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasLform()) {
             attributes->push_back(std::make_pair("lform", att->LineformToStr(att->GetLform())));
+        }
+        if (att->HasLsegs()) {
+            attributes->push_back(std::make_pair("lsegs", att->IntToStr(att->GetLsegs())));
         }
         if (att->HasLwidth()) {
             attributes->push_back(std::make_pair("lwidth", att->StrToStr(att->GetLwidth())));

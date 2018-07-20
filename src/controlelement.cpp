@@ -25,16 +25,18 @@ namespace vrv {
 // ControlElement
 //----------------------------------------------------------------------------
 
-ControlElement::ControlElement() : FloatingObject("me"), AttLabelled(), AttTyped()
+ControlElement::ControlElement() : FloatingObject("ce"), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
 
-ControlElement::ControlElement(std::string classid) : FloatingObject(classid), AttLabelled(), AttTyped()
+ControlElement::ControlElement(std::string classid) : FloatingObject(classid), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
@@ -46,6 +48,7 @@ ControlElement::~ControlElement() {}
 void ControlElement::Reset()
 {
     FloatingObject::Reset();
+    LinkingInterface::Reset();
     ResetLabelled();
     ResetTyped();
 }
@@ -91,6 +94,21 @@ int ControlElement::AdjustXOverflow(FunctorParams *functorParams)
         }
     }
 
+    return FUNCTOR_CONTINUE;
+}
+
+int ControlElement::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    FloatingObject::ResetDrawing(functorParams);
+    
+    // Pass it to the pseudo functor of the interface
+    if (this->HasInterface(INTERFACE_LINKING)) {
+        LinkingInterface *interface = this->GetLinkingInterface();
+        assert(interface);
+        return interface->InterfaceResetDrawing(functorParams, this);
+    }
+    
     return FUNCTOR_CONTINUE;
 }
 

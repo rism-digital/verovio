@@ -3127,31 +3127,31 @@ meterSigVis_FORM AttConverter::StrToMeterSigVisForm(std::string value, bool logW
     return meterSigVis_FORM_NONE;
 }
 
-std::string AttConverter::MeterSigDefaultVisMeterrendToStr(meterSigDefaultVis_METERREND data) const
+std::string AttConverter::MeterSigDefaultVisMeterformToStr(meterSigDefaultVis_METERFORM data) const
 {
     std::string value;
     switch (data) {
-        case meterSigDefaultVis_METERREND_num: value = "num"; break;
-        case meterSigDefaultVis_METERREND_denomsym: value = "denomsym"; break;
-        case meterSigDefaultVis_METERREND_norm: value = "norm"; break;
-        case meterSigDefaultVis_METERREND_invis: value = "invis"; break;
+        case meterSigDefaultVis_METERFORM_num: value = "num"; break;
+        case meterSigDefaultVis_METERFORM_denomsym: value = "denomsym"; break;
+        case meterSigDefaultVis_METERFORM_norm: value = "norm"; break;
+        case meterSigDefaultVis_METERFORM_invis: value = "invis"; break;
         default:
-            LogWarning("Unknown value '%d' for att.meterSigDefault.vis@meter.rend", data);
+            LogWarning("Unknown value '%d' for att.meterSigDefault.vis@meter.form", data);
             value = "";
             break;
     }
     return value;
 }
 
-meterSigDefaultVis_METERREND AttConverter::StrToMeterSigDefaultVisMeterrend(std::string value, bool logWarning) const
+meterSigDefaultVis_METERFORM AttConverter::StrToMeterSigDefaultVisMeterform(std::string value, bool logWarning) const
 {
-    if (value == "num") return meterSigDefaultVis_METERREND_num;
-    if (value == "denomsym") return meterSigDefaultVis_METERREND_denomsym;
-    if (value == "norm") return meterSigDefaultVis_METERREND_norm;
-    if (value == "invis") return meterSigDefaultVis_METERREND_invis;
+    if (value == "num") return meterSigDefaultVis_METERFORM_num;
+    if (value == "denomsym") return meterSigDefaultVis_METERFORM_denomsym;
+    if (value == "norm") return meterSigDefaultVis_METERFORM_norm;
+    if (value == "invis") return meterSigDefaultVis_METERFORM_invis;
     if (logWarning && !value.empty())
-        LogWarning("Unsupported value '%s' for att.meterSigDefault.vis@meter.rend", value.c_str());
-    return meterSigDefaultVis_METERREND_NONE;
+        LogWarning("Unsupported value '%s' for att.meterSigDefault.vis@meter.form", value.c_str());
+    return meterSigDefaultVis_METERFORM_NONE;
 }
 
 std::string AttConverter::MeterSigGrpLogFuncToStr(meterSigGrpLog_FUNC data) const
@@ -3278,6 +3278,7 @@ std::string AttConverter::NcVisOriscusToStr(ncVis_ORISCUS data) const
         case ncVis_ORISCUS_c: value = "c"; break;
         case ncVis_ORISCUS_f: value = "f"; break;
         case ncVis_ORISCUS_j: value = "j"; break;
+        case ncVis_ORISCUS_unknown: value = "unknown"; break;
         default:
             LogWarning("Unknown value '%d' for att.nc.vis@oriscus", data);
             value = "";
@@ -3291,6 +3292,7 @@ ncVis_ORISCUS AttConverter::StrToNcVisOriscus(std::string value, bool logWarning
     if (value == "c") return ncVis_ORISCUS_c;
     if (value == "f") return ncVis_ORISCUS_f;
     if (value == "j") return ncVis_ORISCUS_j;
+    if (value == "unknown") return ncVis_ORISCUS_unknown;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.nc.vis@oriscus", value.c_str());
     return ncVis_ORISCUS_NONE;
@@ -3302,6 +3304,7 @@ std::string AttConverter::NcVisQuilismaToStr(ncVis_QUILISMA data) const
     switch (data) {
         case ncVis_QUILISMA_2: value = "2"; break;
         case ncVis_QUILISMA_3: value = "3"; break;
+        case ncVis_QUILISMA_unknown: value = "unknown"; break;
         default:
             LogWarning("Unknown value '%d' for att.nc.vis@quilisma", data);
             value = "";
@@ -3314,6 +3317,7 @@ ncVis_QUILISMA AttConverter::StrToNcVisQuilisma(std::string value, bool logWarni
 {
     if (value == "2") return ncVis_QUILISMA_2;
     if (value == "3") return ncVis_QUILISMA_3;
+    if (value == "unknown") return ncVis_QUILISMA_unknown;
     if (logWarning && !value.empty())
         LogWarning("Unsupported value '%s' for att.nc.vis@quilisma", value.c_str());
     return ncVis_QUILISMA_NONE;

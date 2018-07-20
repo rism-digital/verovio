@@ -2245,6 +2245,10 @@ public:
     data_LINEFORM GetLform() const { return m_lform; }
     bool HasLform() const;
     //
+    void SetLsegs(int lsegs_) { m_lsegs = lsegs_; }
+    int GetLsegs() const { return m_lsegs; }
+    bool HasLsegs() const;
+    //
     void SetLwidth(std::string lwidth_) { m_lwidth = lwidth_; }
     std::string GetLwidth() const { return m_lwidth; }
     bool HasLwidth() const;
@@ -2253,6 +2257,14 @@ public:
 private:
     /** Describes the line style of a curve. **/
     data_LINEFORM m_lform;
+    /**
+     * Describes the number of segments into which a dashed, dotted, or wavy line may
+     * be divided; a pair of space-separated values (minimum and maximum, respectively)
+     * provides a range between which a rendering system-supplied value may fall, while
+     * a single value indicates a fixed amount of space; that is, the minimum and
+     * maximum values are equal.
+     **/
+    int m_lsegs;
     /** Width of a curved line. **/
     std::string m_lwidth;
 

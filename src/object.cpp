@@ -27,6 +27,7 @@
 #include "io.h"
 #include "keysig.h"
 #include "layer.h"
+#include "linkinginterface.h"
 #include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
@@ -77,15 +78,20 @@ Object::Object(const Object &object) : BoundingBox(object)
 {
     ClearChildren();
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
-    m_parent = NULL;
+    
     m_classid = object.m_classid;
+    m_parent = NULL;
+    // Flags
+    m_isAttribute = object.m_isAttribute;
+    m_isModified = true;
+    m_isReferencObject = object.m_isReferencObject;
+    
+    // Also copy attribute classes
     m_attClasses = object.m_attClasses;
     m_interfaces = object.m_interfaces;
-    m_isReferencObject = object.m_isReferencObject;
-    m_isModified = true;
+    // New uuid
     this->GenerateUuid();
     // For now do not copy them
-    // m_uuid = object.m_uuid;
     // m_unsupported = object.m_unsupported;
 
     if (!object.CopyChildren()) {
@@ -110,15 +116,20 @@ Object &Object::operator=(const Object &object)
     if (this != &object) {
         ClearChildren();
         ResetBoundingBox(); // It does not make sense to keep the values of the BBox
-        m_parent = NULL;
+        
         m_classid = object.m_classid;
+        m_parent = NULL;
+        // Flags
+        m_isAttribute = object.m_isAttribute;
+        m_isModified = true;
+        m_isReferencObject = object.m_isReferencObject;
+        
+        // Also copy attribute classes
         m_attClasses = object.m_attClasses;
         m_interfaces = object.m_interfaces;
-        m_isReferencObject = object.m_isReferencObject;
-        m_isModified = true;
+        // New uuid
         this->GenerateUuid();
         // For now do now copy them
-        // m_uuid = object.m_uuid;
         // m_unsupported = object.m_unsupported;
 
         if (object.CopyChildren()) {
@@ -142,11 +153,13 @@ Object::~Object()
 
 void Object::Init(std::string classid)
 {
+    m_classid = classid;
     m_parent = NULL;
+    // Flags
     m_isAttribute = false;
     m_isModified = true;
-    m_classid = classid;
     m_isReferencObject = false;
+    
     this->GenerateUuid();
 
     Reset();
@@ -1006,6 +1019,28 @@ int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
         this->MoveItselfTo(params->m_targetLayer);
         // Do not precess children because we move the full sub-tree
         return FUNCTOR_SIBLINGS;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+    
+int Object::PrepareLinking(FunctorParams *functorParams)
+{    
+    PrepareLinkingParams *params = dynamic_cast<PrepareLinkingParams *>(functorParams);
+    assert(params);
+
+    if (params->m_fillList && this->HasInterface(INTERFACE_LINKING)) {
+        LinkingInterface *interface = this->GetLinkingInterface();
+        assert(interface);
+        interface->InterfacePrepareLinking(functorParams, this);
+    }
+
+    std::string uuid = this->GetUuid();
+    auto i = std::find_if(params->m_nextUuidPairs.begin(), params->m_nextUuidPairs.end(),
+        [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
+    if (i != params->m_nextUuidPairs.end()) {
+        i->first->SetNextLink(this);
+        params->m_nextUuidPairs.erase(i);
     }
 
     return FUNCTOR_CONTINUE;

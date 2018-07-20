@@ -88,11 +88,17 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Dir *dir = dynamic_cast<Dir *>(element);
         assert(dir);
         DrawDir(dc, dir, measure, system);
+        if (dir->GetNextLink() && (dir->GetExtender() == BOOLEAN_true)) {
+            system->AddToDrawingList(element);
+        }
     }
     else if (element->Is(DYNAM)) {
         Dynam *dynam = dynamic_cast<Dynam *>(element);
         assert(dynam);
         DrawDynam(dc, dynam, measure, system);
+        if (dynam->GetNextLink() && (dynam->GetExtender() == BOOLEAN_true)) {
+            system->AddToDrawingList(element);
+        }
     }
     else if (element->Is(FERMATA)) {
         Fermata *fermata = dynamic_cast<Fermata *>(element);
@@ -151,16 +157,28 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
 
-    if (!interface->HasStartAndEnd()) return;
-
+    // The start is given by the TimePointInterface
     LayerElement *start = dynamic_cast<LayerElement *>(interface->GetStart());
-    assert(start);
-    LayerElement *end = dynamic_cast<LayerElement *>(interface->GetEnd());
-    assert(end);
+    // The end is given either by the TimeSpanningInterface (end) or by the LinkingInterface (next)
+    LayerElement *end = NULL;
+    if (interface->GetEnd()) {
+        end = dynamic_cast<LayerElement *>(interface->GetEnd());
+    }
+    else if (element->HasInterface(INTERFACE_LINKING)) {
+        LinkingInterface *linkingInterface = element->GetLinkingInterface();
+        assert(linkingInterface);
+        if (linkingInterface->GetNextLink()) {
+            // The end link has to have a TimePointInterface becase we ensure it is a ControlElement
+            TimePointInterface *nextInterface = linkingInterface->GetNextLink()->GetTimePointInterface();
+            assert(nextInterface);
+            end = nextInterface->GetStart();
+        }
+    }
+    if (!start || !end) return;
 
     // Get the parent system of the first and last note
-    System *parentSystem1 = dynamic_cast<System *>(interface->GetStart()->GetFirstParent(SYSTEM));
-    System *parentSystem2 = dynamic_cast<System *>(interface->GetEnd()->GetFirstParent(SYSTEM));
+    System *parentSystem1 = dynamic_cast<System *>(start->GetFirstParent(SYSTEM));
+    System *parentSystem2 = dynamic_cast<System *>(end->GetFirstParent(SYSTEM));
 
     int x1, x2;
     Object *objectX = NULL;
@@ -173,9 +191,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // we use the start measure
         measure = interface->GetStartMeasure();
         if (!Check(measure)) return;
-        x1 = interface->GetStart()->GetDrawingX();
-        objectX = interface->GetStart();
-        x2 = interface->GetEnd()->GetDrawingX();
+        x1 = start->GetDrawingX();
+        objectX = start;
+        x2 = end->GetDrawingX();
         graphic = element;
     }
     // Only the first parent is the same, this means that the element is "open" at the end of the system
@@ -183,8 +201,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // We need the last measure of the system for x2 - we also use it for getting the staves later
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
-        x1 = interface->GetStart()->GetDrawingX();
-        objectX = interface->GetStart();
+        x1 = start->GetDrawingX();
+        objectX = start;
         x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         graphic = element;
         spanningType = SPANNING_START;
@@ -197,7 +215,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // We need the position of the first default in the first measure for x1
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
         objectX = measure->GetLeftBarLine();
-        x2 = interface->GetEnd()->GetDrawingX();
+        x2 = end->GetDrawingX();
         spanningType = SPANNING_END;
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
@@ -250,7 +268,15 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
                 continue;
             }
 
-        if (element->Is(HAIRPIN)) {
+        if (element->Is(DIR)) {
+            // cast to Dir check in DrawDirConnector
+            DrawControlElementConnector(dc, dynamic_cast<Dir *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        if (element->Is(DYNAM)) {
+            // cast to Dynam check in DrawDynamConnector
+            DrawControlElementConnector(dc, dynamic_cast<Dynam *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is(HAIRPIN)) {
             // cast to Harprin check in DrawHairpin
             DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
@@ -898,7 +924,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         }
     }
     // normal case or end
-    if ((spanningType == SPANNING_START_END) || (SPANNING_END)) {
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
         end->FindAllChildByComparison(&artics, &matchType);
         // Then the @n of each first staffDef
         for (articIter = artics.begin(); articIter != artics.end(); ++articIter) {
@@ -1543,6 +1569,79 @@ void View::DrawTrillExtension(
         dc->EndResumedGraphic(graphic, this);
     else
         dc->EndGraphic(trill, this);
+}
+    
+void View::DrawControlElementConnector(
+    DeviceContext *dc, ControlElement *dynam, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    assert(dynam);
+    assert(dynam->GetNextLink());
+    if (!dynam->GetNextLink()) return;
+    
+    int y = dynam->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+
+    // Adjust the x1
+    if ((spanningType == SPANNING_START) || (spanningType == SPANNING_START_END)) {
+        if (dynam->GetCurrentFloatingPositioner() && dynam->GetCurrentFloatingPositioner()->HasContentBB()) {
+            x1 = dynam->GetCurrentFloatingPositioner()->GetContentRight();
+        }
+    }
+    
+    // Adjust the x2 for extensions with @endid
+    if ((spanningType == SPANNING_END) || (spanningType == SPANNING_START_END)) {
+        FloatingPositioner *nextLink = dynam->GetCorrespFloatingPositioner(dynamic_cast<ControlElement *>(dynam->GetNextLink()));
+        if (nextLink && nextLink->HasContentBB()) {
+            x2 = nextLink->GetContentLeft();
+        }
+    }
+    
+    int width = m_options->m_lyricHyphenWidth.GetValue() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    
+    // the length of the dash and the space between them - can be made a parameter
+    int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
+    int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
+    int halfDashLength = dashLength / 2;
+    
+    int dist = x2 - x1;
+    int nbDashes = dist / dashSpace;
+    
+    int margin = dist / 2;
+    // no dash if the distance is smaller than a dash length
+    if (dist < dashLength) {
+        nbDashes = 0;
+    }
+    // at least one dash
+    else if (nbDashes < 2) {
+        nbDashes = 1;
+    }
+    else {
+        margin = (dist - ((nbDashes - 1) * dashSpace)) / 2;
+    }
+    
+    /************** draw it **************/
+    
+    if (graphic)
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    else
+        dc->StartGraphic(dynam, "spanning-trill", "");
+    
+    dc->DeactivateGraphic();
+    
+    int i;
+    for (i = 0; i < nbDashes; ++i) {
+        int x = x1 + margin + (i * dashSpace);
+        x = std::max(x, x1);
+        
+        DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + width);
+    }
+    
+    dc->ReactivateGraphic();
+    
+    if (graphic)
+        dc->EndResumedGraphic(graphic, this);
+    else
+        dc->EndGraphic(dynam, this);
+    
 }
 
 void View::DrawSylConnector(

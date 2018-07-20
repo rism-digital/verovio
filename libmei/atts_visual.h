@@ -814,9 +814,9 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMeterRend(meterSigDefaultVis_METERREND meterRend_) { m_meterRend = meterRend_; }
-    meterSigDefaultVis_METERREND GetMeterRend() const { return m_meterRend; }
-    bool HasMeterRend() const;
+    void SetMeterForm(meterSigDefaultVis_METERFORM meterForm_) { m_meterForm = meterForm_; }
+    meterSigDefaultVis_METERFORM GetMeterForm() const { return m_meterForm; }
+    bool HasMeterForm() const;
     //
     void SetMeterShowchange(data_BOOLEAN meterShowchange_) { m_meterShowchange = meterShowchange_; }
     data_BOOLEAN GetMeterShowchange() const { return m_meterShowchange; }
@@ -825,9 +825,9 @@ public:
 
 private:
     /** Contains an indication of how the meter signature should be rendered. **/
-    meterSigDefaultVis_METERREND m_meterRend;
+    meterSigDefaultVis_METERFORM m_meterForm;
     /**
-     * Determines whether a new meter signature should be displayed when the meter
+     * Determines whether the old meter signature should be displayed when the meter
      * signature changes.
      **/
     data_BOOLEAN m_meterShowchange;
@@ -935,10 +935,6 @@ public:
     data_BOOLEAN GetLiquescent() const { return m_liquescent; }
     bool HasLiquescent() const;
     //
-    void SetLong(data_BOOLEAN long_) { m_long = long_; }
-    data_BOOLEAN GetLong() const { return m_long; }
-    bool HasLong() const;
-    //
     void SetOriscus(ncVis_ORISCUS oriscus_) { m_oriscus = oriscus_; }
     ncVis_ORISCUS GetOriscus() const { return m_oriscus; }
     bool HasOriscus() const;
@@ -947,43 +943,44 @@ public:
     ncVis_QUILISMA GetQuilisma() const { return m_quilisma; }
     bool HasQuilisma() const;
     //
+    void SetStrophicus(data_BOOLEAN strophicus_) { m_strophicus = strophicus_; }
+    data_BOOLEAN GetStrophicus() const { return m_strophicus; }
+    bool HasStrophicus() const;
+    //
     void SetWavy(data_BOOLEAN wavy_) { m_wavy = wavy_; }
     data_BOOLEAN GetWavy() const { return m_wavy; }
     bool HasWavy() const;
     ///@}
 
 private:
-    /** --- **/
+    /** The shape of the neume component is angled or has a bend. **/
     data_BOOLEAN m_angled;
     /**
      * Describes the symbols typically used to indicate breaks between syllables and
      * their functions.
      **/
     ncVis_CON m_con;
-    /** --- **/
+    /** The shape of the neume component is curved, often a half circle. **/
     ncVis_CURVED m_curved;
-    /** --- **/
+    /** The shape of the neume component is a diagonal line either going up or down. **/
     ncVis_DIAGONALRIGHT m_diagonalright;
-    /** --- **/
+    /** A line segment attached. **/
     data_BOOLEAN m_episema;
-    /** --- **/
+    /** The shape of the neume component is longer than normal. **/
     data_BOOLEAN m_extended;
-    /** --- **/
+    /** The shape of the neume component is a horizontal line segment. **/
     data_BOOLEAN m_flat;
-    /** --- **/
+    /** The shape of the neume component is jagged. **/
     data_BOOLEAN m_jagged;
-    /** --- **/
+    /** The neume component is a liquescent. **/
     data_BOOLEAN m_liquescent;
-    /**
-     * When set to 'true', a double or long mordent, sometimes called a "pincé double",
-     * consisting of 5 notes, is indicated.
-     **/
-    data_BOOLEAN m_long;
-    /** --- **/
+    /** The neume component is an oriscus. **/
     ncVis_ORISCUS m_oriscus;
-    /** --- **/
+    /** The neume component is a quilisma. **/
     ncVis_QUILISMA m_quilisma;
-    /** --- **/
+    /** The neueme component is a strophicus. **/
+    data_BOOLEAN m_strophicus;
+    /** The shape of the neume component is wavy. **/
     data_BOOLEAN m_wavy;
 
     /* include <attwavy> */

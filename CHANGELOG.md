@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 ### Added
+* Support for `<dir>` and `<dynam>` connectors (triggered with `@next` and `@extender`)
+* Sutomatic positioning of rests within beam (@CCInc)
 * Fix for Plaine & Easie mensur changes in mensural notation
 * Use SMuFL glyphs for mensural signs (@rettinghaus)
 * Barline segmentation with text and dynamic indications overlapping measures
