@@ -6541,6 +6541,9 @@ bool HumdrumInput::hasBelowParameter(hum::HTp token, const string &category, int
 
 int HumdrumInput::getMeasureDifference(hum::HTp starttok, hum::HTp endtok)
 {
+    if (endtok == NULL) {
+        return 0;
+    }
     hum::HumdrumLine *line = starttok->getOwner();
     if (line == NULL) {
         return 0;
@@ -10712,11 +10715,6 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
 //
 // HumdrumInput::addTrill -- Add trill for note.
 //
-// Todo: check the interval of the trill to see
-// if an accidental needs to be placed above it.
-//    t = minor second trill
-//    T = major second trill
-//
 
 void HumdrumInput::addTrill(hum::HTp token)
 {
@@ -10805,6 +10803,60 @@ void HumdrumInput::addTrill(hum::HTp token)
             case 1: trill->SetAccidupper(ACCIDENTAL_WRITTEN_s); break;
             case -2: trill->SetAccidupper(ACCIDENTAL_WRITTEN_ff); break;
             case 2: trill->SetAccidupper(ACCIDENTAL_WRITTEN_x); break;
+        }
+    }
+
+    // replace the trill accidental if different in layout parameters, such as:
+    //    !LO:TR:acc=##
+    // for a double sharp, or
+    //    !LO:TR:acc=none
+    // for no accidental
+    int lcount = token->getLinkedParameterCount();
+    bool foundQ = false;
+    std::string value;
+    for (int p = 0; p < lcount; ++p) {
+        hum::HumParamSet *hps = token->getLinkedParameter(p);
+        if (hps == NULL) {
+            continue;
+        }
+        if (hps->getNamespace1() != "LO") {
+            continue;
+        }
+        if (hps->getNamespace2() != "TR") {
+            continue;
+        }
+        for (int q = 0; q < hps->getCount(); ++q) {
+            string key = hps->getParameterName(q);
+            if (key == "acc") {
+                value = hps->getParameterValue(q);
+                foundQ = true;
+                break;
+            }
+        }
+    }
+    if (foundQ) {
+        if (value == "none") {
+            trill->SetAccidupper(ACCIDENTAL_WRITTEN_NONE);
+        }
+        else if (value == "#") {
+            trill->SetAccidupper(ACCIDENTAL_WRITTEN_s);
+        }
+        else if (value == "-") {
+            trill->SetAccidupper(ACCIDENTAL_WRITTEN_f);
+        }
+        else if (value == "n") {
+            trill->SetAccidupper(ACCIDENTAL_WRITTEN_n);
+        }
+        else if (value == "--") {
+            trill->SetAccidupper(ACCIDENTAL_WRITTEN_ff);
+        }
+        else if (value == "##") {
+            trill->SetAccidupper(ACCIDENTAL_WRITTEN_x);
+        }
+        else {
+            // other trills are possible to add here; otherwise,
+            // the invalid trill will be ignored (not replaced
+            // with an empty accidental, for example).
         }
     }
 
