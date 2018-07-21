@@ -7715,6 +7715,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         bool ingroup = false;
         if (beampowdot[i] >= 0) {
             for (int j = beamstarts[i]; j <= beamends[i]; ++j) {
+
                 // may have to deal with dotted triplets (which appear to be powers of
                 // two)
                 if (poweroftwo[j]) {
@@ -7878,6 +7879,23 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             tupbot[i] = 0;
             cerr << "NOT A TUPLET " << endl;
         }
+    }
+
+    // adjust tupletgroups based on tuptop and tupbot changes
+    int correction = 0;
+    for (int i = 1; i < (int)tuptop.size(); i++) {
+        if ((tuptop[i] == 1) && (tupbot[i] == 1)) {
+            continue;
+        }
+        if ((tuptop[i - 1] == 1) && (tupbot[i - 1] == 1)) {
+            continue;
+        }
+        if ((tuptop[i] != tuptop[i - 1]) || (tupbot[i] != tupbot[i - 1])) {
+            correction++;
+            tupletstartboolean[i] = true;
+            tupletendboolean[i - 1] = true;
+        }
+        tupletgroups[i] += correction;
     }
 
     // tupletscale == 3 for three triplets, 6 for six sextuplets.
