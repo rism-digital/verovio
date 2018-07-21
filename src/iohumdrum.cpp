@@ -6885,10 +6885,10 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
 
             if (slurindex[i].size() > 1) {
                 if (endpitches.size() > 1) {
-                    calculateNoteIdForSlur(endid, endchordsorted, j, (int)slurindex[i].size());
+                    calculateNoteIdForSlur(endid, endchordsorted, j);
                 }
                 if (startpitches.size() > 1) {
-                    calculateNoteIdForSlur(startid, startchordsorted, j, (int)slurindex[i].size());
+                    calculateNoteIdForSlur(startid, startchordsorted, j);
                 }
             }
 
@@ -6951,9 +6951,9 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
 // HumdrumInput::calculateNoteIdForSlur --
 //
 
-void HumdrumInput::calculateNoteIdForSlur(
-    std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index, int notecount)
+void HumdrumInput::calculateNoteIdForSlur(std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index)
 {
+    int notecount = sortednotes.size();
     hum::HumRegex hre;
     hre.replaceDestructive(idstring, "note-", "chord-");
     int position = 0;

@@ -455,7 +455,7 @@ protected:
     std::string replaceMusicShapes(const std::string input);
     int getStaffAdjustment(hum::HTp token);
     void calculateNoteIdForSlur(
-        std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index, int notecount);
+        std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
