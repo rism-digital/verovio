@@ -221,11 +221,11 @@ public:
     vector<char> editacc; // !!!RDF**kern: i = editorial accidental
     vector<string> edittype; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
 
-	// for **dynam:
-	string cresctext;        // !!!RDF**kern: > = "cresc."
-	string crescfontstyle;   // !!!RDF**kern: < = "cresc." fontstyle="normal|italic|bold|bold-italic"
-	string decresctext;      // !!!RDF**kern: > = "decresc."
-	string decrescfontstyle; // !!!RDF**kern: < = "decresc." fontstyle="normal|italic|bold|bold-italic"
+    // for **dynam:
+    string cresctext; // !!!RDF**kern: > = "cresc."
+    string crescfontstyle; // !!!RDF**kern: < = "cresc." fontstyle="normal|italic|bold|bold-italic"
+    string decresctext; // !!!RDF**kern: > = "decresc."
+    string decrescfontstyle; // !!!RDF**kern: < = "decresc." fontstyle="normal|italic|bold|bold-italic"
 
     char below = '\0'; // !!!RDF**kern: < = below (previous signifier is "below")
     char above = '\0'; // !!!RDF**kern: > = above (previous signifier is "above")
@@ -454,6 +454,8 @@ protected:
     void storeExpansionList(Section *section, hum::HTp etok);
     std::string replaceMusicShapes(const std::string input);
     int getStaffAdjustment(hum::HTp token);
+    void calculateNoteIdForSlur(
+        std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index, int notecount);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -480,7 +482,8 @@ protected:
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
     void popElementStack(std::vector<string> &elements, std::vector<void *> &pointers);
 
-    template <class ELEMENT> void addTextElement(ELEMENT *element, const std::string &content, const std::string& fontstyle = "");
+    template <class ELEMENT>
+    void addTextElement(ELEMENT *element, const std::string &content, const std::string &fontstyle = "");
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
     template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place);
