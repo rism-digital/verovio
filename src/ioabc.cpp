@@ -175,6 +175,8 @@ void AbcInput::parseABC(std::istream &infile)
             LogDebug("ABC input: Reading only first tune in file");
             break;
         }
+        else if (abcLine[0] == '%')
+            ;
         else if (abcLine[1] == ':' && abcLine[0] != '|') {
             LogWarning("ABC input: Information fields in music code not supported");
         }
@@ -826,6 +828,11 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             AddBeam();
         }
 
+        // comments
+        else if (musicCode[i] == '%') {
+            break;
+        }
+
         // endings
         else if (musicCode[i] == '[' && isdigit(musicCode[i + 1])) {
             ++i;
@@ -989,6 +996,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 num = num - num / 3;
             }
             if ((numbase & (numbase - 1)) != 0) LogError("ABC input: note length divider must be power of 2");
+            int dur = (num == 0) ? 4 : m_unitDur * numbase / num;
 
             // set grace
             if (grace != GRACE_NONE) {
@@ -1012,12 +1020,13 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 chord->AddChild(note);
                 if (!chord->HasDur()) {
                     if (dots > 0) chord->SetDots(dots);
-                    chord->SetDur(note->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
+                    if (num == 0) chord->SetStemVisible(BOOLEAN_false);
+                    chord->SetDur(note->AttDurationLogical::StrToDuration(std::to_string(dur)));
                 }
             }
             else {
                 if (dots > 0) note->SetDots(dots);
-                int dur = m_unitDur * numbase / num;
+                if (num == 0) note->SetStemVisible(BOOLEAN_false);
                 if ((m_broken < 0) && (grace == GRACE_NONE)) {
                     for (int i = 0; i != -m_broken; ++i) dur = dur * 2;
                 }
@@ -1160,11 +1169,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         // suppressing score line-breaks
         else if (musicCode[i] == '\\') {
             sysBreak = false;
-        }
-
-        // comments
-        else if (musicCode[i] == '%') {
-            break;
         }
 
         // remarks
