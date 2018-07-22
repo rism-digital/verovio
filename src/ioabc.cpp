@@ -128,8 +128,8 @@ void AbcInput::parseABC(std::istream &infile)
         ++m_lineNum;
         readInformationField(abcLine[0], &abcLine[2]);
         if (infile.eof()) {
-          LogWarning("ABC input: No music found");
-          break;
+            LogWarning("ABC input: No music found");
+            break;
         }
     }
     // create page head
@@ -183,8 +183,8 @@ void AbcInput::parseABC(std::istream &infile)
             measure = dynamic_cast<Measure *>(section->FindChildByUuid(iter->first));
         }
         if (!measure) {
-            LogWarning("ABC input: Element '%s' could not be added to measure '%s'", iter->second->GetClassName().c_str(),
-                iter->first.c_str());
+            LogWarning("ABC input: Element '%s' could not be added to measure '%s'",
+                iter->second->GetClassName().c_str(), iter->first.c_str());
             continue;
         }
         measure->AddChild(iter->second);
@@ -279,8 +279,8 @@ void AbcInput::endSlur()
 void AbcInput::addTie(std::string measureId)
 {
     if (!m_tieStack.empty()) {
-      LogWarning("ABC input: '%s' already tied", m_ID.c_str());
-      return;
+        LogWarning("ABC input: '%s' already tied", m_ID.c_str());
+        return;
     }
     Tie *tie = new Tie();
     tie->SetStartid(m_ID);
@@ -790,17 +790,17 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // inline fields
-        else if (musicCode[i] == '[' && musicCode[i+2] == ':') {
-          ++i;
-          char dataKey = musicCode[i];
-          ++i;
-          ++i;
-          std::string information;
-          while (musicCode[i] != ']') {
-              information.push_back(musicCode[i]);
-              ++i;
-          }
-          readInformationField(dataKey, information);
+        else if (musicCode[i] == '[' && musicCode[i + 2] == ':') {
+            ++i;
+            char dataKey = musicCode[i];
+            ++i;
+            ++i;
+            std::string information;
+            while (musicCode[i] != ']') {
+                information.push_back(musicCode[i]);
+                ++i;
+            }
+            readInformationField(dataKey, information);
         }
 
         // linebreaks
@@ -826,13 +826,13 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         else if (musicCode[i] == '-') {
-          addTie(measure->GetUuid());
+            addTie(measure->GetUuid());
         }
         else if (musicCode[i] == '(') {
-          startSlur(measure->GetUuid());
+            startSlur(measure->GetUuid());
         }
         else if (musicCode[i] == ')') {
-          endSlur();
+            endSlur();
         }
 
         // chords
@@ -951,8 +951,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 // "The unit duration to use for gracenotes is not specified by the abc file"
                 // setting it to an eighth by default for now
                 note->SetDur(DURATION_8);
-                if (grace == GRACE_unacc)
-                  note->SetStemMod(STEMMODIFIER_1slash);
+                if (grace == GRACE_unacc) note->SetStemMod(STEMMODIFIER_1slash);
             }
 
             // add articulation
@@ -1001,7 +1000,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                     (*it)->SetStartid("#" + m_ID);
                 }
             }
-
         }
 
         // spaces
@@ -1149,12 +1147,11 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             // add stacked elements to layer
             AddBeam();
             if (!m_layer->FindChildByType(NOTE)) {
-                if (musicCode[i + 1] == ':')
-                      measure->SetLeft(BARRENDITION_rptstart);
+                if (musicCode[i + 1] == ':') measure->SetLeft(BARRENDITION_rptstart);
             }
             else {
                 if (musicCode[i + 1] == ':')
-                      measure->SetRight(BARRENDITION_rptstart);
+                    measure->SetRight(BARRENDITION_rptstart);
                 else if (musicCode[i - 1] == ':')
                     measure->SetRight(BARRENDITION_rptend);
                 else if (musicCode[i + 1] == '|') {
