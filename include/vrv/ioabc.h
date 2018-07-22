@@ -18,19 +18,20 @@
 
 namespace vrv {
 
+class BarLine;
 class Beam;
 class ControlElement;
+class Harm;
+class KeySig;
 class Layer;
 class LayerElement;
-class Harm;
 class Mdiv;
 class Measure;
 class MeterSig;
 class Section;
 class Slur;
 class Staff;
-class KeySig;
-class BarLine;
+class Tie;
 
 //----------------------------------------------------------------------------
 // AbcInput
@@ -72,6 +73,9 @@ private:
     void readMusicCode(const char *musicCode, Section *section);
 
     void parseDecoration(std::string decorationString);
+    void startSlur(std::string measureId);
+    void endSlur();
+    void addTie(std::string measureId);
 
     // additional functions
     void printInformationFields();
@@ -89,6 +93,7 @@ private:
 
     std::vector<data_ARTICULATION> m_artic;
     data_DURATION m_durDefault = DURATION_NONE; // todo: switch to MEI
+    std::string m_ID;
     int m_unitDur;
     char m_decoration = '!';
     char m_linebreak = '$';
@@ -100,11 +105,18 @@ private:
     std::vector<std::string> m_history;
     std::vector<std::string> m_origin;
 
-    std::vector<ControlElement *> m_controlElements;
+    std::vector<ControlElement *> m_tempoStack;
+    std::vector<Harm *> m_harmStack;
+    std::vector<Slur *> m_slurStack;
+    std::vector<Tie *> m_tieStack;
 
     std::vector<LayerElement *> m_layerElements;
     std::vector<LayerElement *> m_noteStack;
-    std::vector<Harm *> m_harmStack;
+    /*
+     * The stack of floating elements (tie, slur, etc.) to be added at the
+     * end of each measure
+     */
+    std::vector<std::pair<std::string, ControlElement *> > m_controlElements;
 };
 
 } // namespace vrv

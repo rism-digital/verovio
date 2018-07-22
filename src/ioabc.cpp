@@ -43,6 +43,7 @@
 #include "staffgrp.h"
 #include "tempo.h"
 #include "text.h"
+#include "tie.h"
 #include "trill.h"
 #include "tuplet.h"
 #include "vrv.h"
@@ -148,7 +149,6 @@ void AbcInput::parseABC(std::istream &infile)
     }
     // create section
     Section *section = new Section();
-    score->AddChild(section);
     // start with a new page
     if (m_linebreak != '\0') {
         Pb *pb = new Pb();
@@ -175,6 +175,22 @@ void AbcInput::parseABC(std::istream &infile)
             readMusicCode(abcLine, section);
         }
     }
+
+    // add ties and slurs
+    Measure *measure = NULL;
+    for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
+        if (!measure || (measure->GetUuid() != iter->first)) {
+            measure = dynamic_cast<Measure *>(section->FindChildByUuid(iter->first));
+        }
+        if (!measure) {
+            LogWarning("ABC input: Element '%s' could not be added to measure '%s'", iter->second->GetClassName().c_str(),
+                iter->first.c_str());
+            continue;
+        }
+        measure->AddChild(iter->second);
+    }
+
+    score->AddChild(section);
 
     createHeader();
     m_doc->ConvertToPageBasedDoc();
@@ -241,6 +257,35 @@ int AbcInput::getBarLine(const char *music, data_BARRENDITION *output, int index
         i = 0;
     }
     return i;
+}
+
+void AbcInput::startSlur(std::string measureId)
+{
+    Slur *openSlur = new Slur();
+    m_slurStack.push_back(openSlur);
+    m_controlElements.push_back(std::make_pair(measureId, openSlur));
+}
+
+void AbcInput::endSlur()
+{
+    if (!m_slurStack.empty()) {
+        m_slurStack.back()->SetEndid("#" + m_ID);
+        m_slurStack.pop_back();
+        return;
+    }
+    LogWarning("ABC input: Closing slur for element '%s' could not be matched", m_ID.c_str());
+}
+
+void AbcInput::addTie(std::string measureId)
+{
+    if (!m_tieStack.empty()) {
+      LogWarning("ABC input: '%s' already tied", m_ID.c_str());
+      return;
+    }
+    Tie *tie = new Tie();
+    tie->SetStartid(m_ID);
+    m_tieStack.push_back(tie);
+    m_controlElements.push_back(std::make_pair(measureId, tie));
 }
 
 void AbcInput::calcUnitNoteLength()
@@ -521,7 +566,7 @@ void AbcInput::parseMeter(std::string meterString)
 
 void AbcInput::parseTempo(std::string tempoString)
 {
-    Tempo *tempo = new Tempo;
+    Tempo *tempo = new Tempo();
     if (tempoString.find('\"') != std::string::npos) {
         std::string tempoWord = tempoString.substr(tempoString.find('\"') + 1);
         tempoWord = tempoWord.substr(0, tempoWord.find('\"'));
@@ -531,7 +576,7 @@ void AbcInput::parseTempo(std::string tempoString)
         // this has to be fixed
         tempo->SetTstamp(1);
     }
-    m_controlElements.push_back(tempo);
+    m_tempoStack.push_back(tempo);
     LogWarning("ABC input: tempo definitions are not fully supported yet");
 }
 
@@ -766,8 +811,14 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             parseDecoration(decorationString);
         }
 
-        // slurs are read when adding the note
-        else if (musicCode[i] == '(' || musicCode[i] == ')') {
+        else if (musicCode[i] == '-') {
+          addTie(measure->GetUuid());
+        }
+        else if (musicCode[i] == '(') {
+          startSlur(measure->GetUuid());
+        }
+        else if (musicCode[i] == ')') {
+          endSlur();
         }
 
         // chords
@@ -810,6 +861,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         else if (pitch.find(toupper(musicCode[i])) != std::string::npos) {
             int oct = 0;
             Note *note = new Note;
+            m_ID = note->GetUuid();
 
             // accidentals
             if (musicCode[i - 1] == '^' || musicCode[i - 1] == '=' || musicCode[i - 1] == '_') {
@@ -922,14 +974,26 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 else
                     m_noteStack.push_back(note);
             }
+            // there should always only be one element in the harmony stack
             if (!m_harmStack.empty() && !m_harmStack.back()->HasStartid()) {
-                m_harmStack.back()->SetStartid("#" + note->GetUuid());
+                m_harmStack.back()->SetStartid("#" + m_ID);
             }
+            if (!m_tieStack.empty()) {
+                m_tieStack.back()->SetEndid("#" + m_ID);
+                m_tieStack.clear();
+            }
+            for (auto it = m_slurStack.begin(); it != m_slurStack.end(); ++it) {
+                if (!((*it)->HasStartid())) {
+                    (*it)->SetStartid("#" + m_ID);
+                }
+            }
+
         }
 
         // spaces
         else if (musicCode[i] == 'x') {
             Space *space = new Space();
+            m_ID = space->GetUuid();
 
             // set duration
             std::string numStr, numbaseStr;
@@ -973,6 +1037,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         // rests
         else if (musicCode[i] == 'z') {
             Rest *rest = new Rest();
+            m_ID = rest->GetUuid();
 
             // set duration
             std::string numStr, numbaseStr;
@@ -1096,10 +1161,10 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                     }
                     m_harmStack.clear();
                 }
-                for (auto it = m_controlElements.begin(); it != m_controlElements.end(); ++it) {
+                for (auto it = m_tempoStack.begin(); it != m_tempoStack.end(); ++it) {
                     measure->AddChild(*it);
                 }
-                m_controlElements.clear();
+                m_tempoStack.clear();
                 section->AddChild(measure);
                 measure = new Measure();
                 staff = new Staff();
