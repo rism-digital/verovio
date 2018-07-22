@@ -789,6 +789,20 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             AddBeam();
         }
 
+        // inline fields
+        else if (musicCode[i] == '[' && musicCode[i+2] == ':') {
+          ++i;
+          char dataKey = musicCode[i];
+          ++i;
+          ++i;
+          std::string information;
+          while (musicCode[i] != ']') {
+              information.push_back(musicCode[i]);
+              ++i;
+          }
+          readInformationField(dataKey, information);
+        }
+
         // linebreaks
         else if (musicCode[i] == m_linebreak) {
             Sb *sb = new Sb();
