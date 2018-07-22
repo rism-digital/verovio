@@ -789,6 +789,14 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             AddBeam();
         }
 
+        // endings
+        else if (musicCode[i] == '[' && isdigit(musicCode[i + 1])) {
+            ++i;
+            // Ending *ending = new Ending;
+            // ending->SetN(musicCode[i]);
+            ++i;
+        }
+
         // inline fields
         else if (musicCode[i] == '[' && musicCode[i + 2] == ':') {
             ++i;
@@ -825,18 +833,19 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             parseDecoration(decorationString);
         }
 
-        else if (musicCode[i] == '-') {
-            addTie(measure->GetUuid());
-        }
-        else if (musicCode[i] == '(') {
+        // slurs and ties
+        else if (musicCode[i] == '(' && !isdigit(musicCode[i + 1])) {
             startSlur(measure->GetUuid());
         }
         else if (musicCode[i] == ')') {
             endSlur();
         }
+        else if (musicCode[i] == '-') {
+            addTie(measure->GetUuid());
+        }
 
         // chords
-        else if (musicCode[i] == '[' && pitch.find(toupper(musicCode[i + 1])) != std::string::npos) {
+        else if (musicCode[i] == '[') {
             // start chord
             chord = new Chord();
         }
