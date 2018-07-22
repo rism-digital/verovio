@@ -111,9 +111,9 @@ void AbcInput::parseABC(std::istream &infile)
         infile.getline(abcLine, 10000);
         ++m_lineNum;
         if (abcLine[0] == 'X') break;
-        if (abcLine[1] == '%')
+        if ((abcLine[0] == '%') && (abcLine[1] == '%'))
             LogWarning("ABC input: Stylesheet directives are ignored");
-        else
+        else if (abcLine[1] == ':')
             readInformationField(abcLine[0], &abcLine[2]);
     }
 
@@ -164,6 +164,7 @@ void AbcInput::parseABC(std::istream &infile)
     while (!infile.eof()) {
         infile.getline(abcLine, 10000);
         ++m_lineNum;
+        if (abcLine[0] == '\0') break;
         if (abcLine[0] == 'X') {
             LogDebug("ABC input: Reading only first tune in file");
             break;
