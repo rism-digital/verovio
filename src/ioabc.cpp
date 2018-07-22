@@ -116,6 +116,7 @@ void AbcInput::parseABC(std::istream &infile)
         else if (abcLine[1] == ':')
             readInformationField(abcLine[0], &abcLine[2]);
     }
+    createHeader();
 
     // read tune header
     readInformationField('X', &abcLine[2]);
@@ -132,6 +133,11 @@ void AbcInput::parseABC(std::istream &infile)
             break;
         }
     }
+    // add work entry to meiHead
+    pugi::xpath_node meiHead = m_doc->m_header.select_single_node("meiHead");
+    m_workDesc = meiHead.node().append_child("workDesc");
+    createWorkEntry();
+
     // create page head
     printInformationFields();
     StaffGrp *staffGrp = new StaffGrp();
@@ -193,7 +199,6 @@ void AbcInput::parseABC(std::istream &infile)
 
     score->AddChild(section);
 
-    createHeader();
     m_doc->ConvertToPageBasedDoc();
     m_composer.clear();
     m_title.clear();
@@ -665,10 +670,12 @@ void AbcInput::createHeader()
         now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
     app.append_attribute("isodate").set_value(dateStr.c_str());
     app.append_attribute("version").set_value(GetVersion().c_str());
+}
 
-    // <workDesc> //
-    pugi::xml_node workDesc = meiHead.append_child("workDesc");
-    pugi::xml_node work = workDesc.append_child("work");
+void AbcInput::createWorkEntry()
+{
+    // <work> //
+    pugi::xml_node work = m_workDesc.append_child("work");
     work.append_attribute("n").set_value(m_mdiv->GetN().c_str());
     work.append_attribute("data").set_value(StringFormat("#%s", m_mdiv->GetUuid().c_str()).c_str());
     for (auto it = m_title.begin(); it != m_title.end(); ++it) {
@@ -709,7 +716,7 @@ void AbcInput::createHeader()
 
 void AbcInput::readInformationField(char dataKey, std::string value)
 {
-    // remove comments and trailing whitespace
+    // remove comments and trim
     if (dataKey == '%' || dataKey == '\0')
         return;
     else if (value.find('%') != std::string::npos) {
@@ -717,6 +724,7 @@ void AbcInput::readInformationField(char dataKey, std::string value)
     }
     while (isspace(value[value.length() - 1])) value.pop_back();
     if (value.empty()) return;
+    while (isspace(value[0])) value = value.substr(1);
 
     if (dataKey == 'C') {
         m_composer.push_back(value);

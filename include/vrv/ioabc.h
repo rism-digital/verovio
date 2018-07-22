@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "io.h"
+#include "pugixml.hpp"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -80,6 +81,7 @@ private:
     // additional functions
     void printInformationFields();
     void createHeader();
+    void createWorkEntry();
 
 #endif // NO_ABC_SUPPORT
 
@@ -117,6 +119,10 @@ private:
      * end of each measure
      */
     std::vector<std::pair<std::string, ControlElement *> > m_controlElements;
+    /*
+     * container for work entries
+     */
+    pugi::xml_node m_workDesc;
 };
 
 } // namespace vrv
