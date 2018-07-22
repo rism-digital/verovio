@@ -745,7 +745,7 @@ void AbcInput::readInformationField(char dataKey, std::string value)
         m_title.push_back(value);
     }
     else if (dataKey == 'V') {
-        LogWarning("ABC input: Multi-voice music is not supported");
+        LogError("ABC input: Multi-voice music is not supported");
     }
     else if (dataKey == 'X') {
         parseReferenceNumber(value);
@@ -845,7 +845,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         // chords
-        else if (musicCode[i] == '[') {
+        else if (musicCode[i] == '[' && musicCode[i + 1] != '|') {
             // start chord
             chord = new Chord();
         }
