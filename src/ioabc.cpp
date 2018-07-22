@@ -26,6 +26,7 @@
 #include "mdiv.h"
 #include "measure.h"
 #include "metersig.h"
+#include "mordent.h"
 #include "multirest.h"
 #include "note.h"
 #include "pb.h"
@@ -46,6 +47,7 @@
 #include "tie.h"
 #include "trill.h"
 #include "tuplet.h"
+#include "turn.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -185,7 +187,7 @@ void AbcInput::parseABC(std::istream &infile)
         }
     }
 
-    // add ties and slurs
+    // add ornaments, ties, and slur
     Measure *measure = NULL;
     for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
         if (!measure || (measure->GetUuid() != iter->first)) {
@@ -354,6 +356,18 @@ void AbcInput::parseDecoration(std::string decorationString)
     }
     if (!strcmp(decorationString.c_str(), "."))
         m_artic.push_back(ARTICULATION_stacc);
+    else if (!strcmp(decorationString.c_str(), "trill") || !strcmp(decorationString.c_str(), "T"))
+        m_ornam.push_back('T');
+    else if (!strcmp(decorationString.c_str(), "mordent") || !strcmp(decorationString.c_str(), "lowermordent")
+        || !strcmp(decorationString.c_str(), "M"))
+        m_ornam.push_back('m');
+    else if (!strcmp(decorationString.c_str(), "pralltriller") || !strcmp(decorationString.c_str(), "uppermordent")
+        || !strcmp(decorationString.c_str(), "P"))
+        m_ornam.push_back('M');
+    else if (!strcmp(decorationString.c_str(), "turn"))
+        m_ornam.push_back('S');
+    else if (!strcmp(decorationString.c_str(), "invertedturn"))
+        m_ornam.push_back('s');
     else if (!strcmp(decorationString.c_str(), ">"))
         m_artic.push_back(ARTICULATION_acc);
     else if (!strcmp(decorationString.c_str(), "accent"))
@@ -654,6 +668,14 @@ void AbcInput::createHeader()
     pugi::xml_node fileTitleStmt = fileDesc.append_child("titleStmt");
     pugi::xml_node fileTitle = fileTitleStmt.append_child("title");
     fileTitle.text().set(m_filename.c_str());
+    if (!m_composer.empty()) {
+        for (auto it = m_composer.begin(); it != m_composer.end(); ++it) {
+            pugi::xml_node composer = fileTitleStmt.append_child("composer");
+            composer.text().set((it->first).c_str());
+            composer.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
+            composer.append_attribute("analog").set_value("abc:C");
+        }
+    }
 
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pubStmt.append_child(pugi::node_pcdata);
@@ -1014,6 +1036,40 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 artic->SetArtic(m_artic);
                 note->AddChild(artic);
                 m_artic.clear();
+            }
+
+            // add ornaments
+            if (!m_ornam.empty()) {
+                note->SetOrnam(m_ornam);
+                if (m_ornam.find("m") != std::string::npos) {
+                    Mordent *mordent = new Mordent();
+                    mordent->SetStartid("#" + note->GetUuid());
+                    mordent->SetForm(mordentLog_FORM_lower);
+                    m_controlElements.push_back(std::make_pair(measure->GetUuid(), mordent));
+                }
+                if (m_ornam.find("M") != std::string::npos) {
+                    Mordent *mordent = new Mordent();
+                    mordent->SetStartid("#" + note->GetUuid());
+                    mordent->SetForm(mordentLog_FORM_upper);
+                    m_controlElements.push_back(std::make_pair(measure->GetUuid(), mordent));
+                }
+                if (m_ornam.find("s") != std::string::npos) {
+                    Turn *turn = new Turn();
+                    turn->SetStartid("#" + note->GetUuid());
+                    turn->SetForm(turnLog_FORM_lower);
+                    m_controlElements.push_back(std::make_pair(measure->GetUuid(), turn));
+                }
+                if (m_ornam.find("S") != std::string::npos) {
+                    Turn *turn = new Turn();
+                    turn->SetStartid("#" + note->GetUuid());
+                    turn->SetForm(turnLog_FORM_upper);
+                    m_controlElements.push_back(std::make_pair(measure->GetUuid(), turn));
+                }
+                if (m_ornam.find("T") != std::string::npos) {
+                    Trill *trill = new Trill();
+                    trill->SetStartid("#" + note->GetUuid());
+                    m_controlElements.push_back(std::make_pair(measure->GetUuid(), trill));
+                }
             }
 
             if (chord) {

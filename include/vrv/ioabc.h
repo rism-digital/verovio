@@ -94,6 +94,7 @@ private:
     Layer *m_layer = NULL;
 
     std::vector<data_ARTICULATION> m_artic;
+    std::string m_ornam;
     data_DURATION m_durDefault = DURATION_NONE; // todo: switch to MEI
     std::string m_ID;
     int m_unitDur;
