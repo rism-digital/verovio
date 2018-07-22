@@ -7887,7 +7887,13 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         if ((tuptop[i] == 1) && (tupbot[i] == 1)) {
             continue;
         }
+        if ((tuptop[i] == -1) && (tupbot[i] == -1)) {
+            continue;
+        }
         if ((tuptop[i - 1] == 1) && (tupbot[i - 1] == 1)) {
+            continue;
+        }
+        if ((tuptop[i - 1] == -1) && (tupbot[i - 1] == -1)) {
             continue;
         }
         if ((tuptop[i] != tuptop[i - 1]) || (tupbot[i] != tupbot[i - 1])) {
@@ -7905,7 +7911,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     int starti = -1;
     hum::HumNum vdur;
     hum::HumNum val2;
-    std::vector<int> tupletscale;
+    std::vector<int> tupletscale(tupletstartboolean.size(), 1);
     for (int i = 0; i < (int)tupletstartboolean.size(); ++i) {
         if (tupletstartboolean[i]) {
             state = 1;
@@ -7919,17 +7925,17 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                 if (vdur < 1) {
                     val2 = vdur * value;
                     if (val2.isInteger()) {
-                        tupletscale.push_back(val2.getNumerator());
+                        tupletscale[i] = val2.getNumerator();
                     }
                     else {
-                        tupletscale.push_back(value);
+                        tupletscale[i] = value;
                     }
                 }
                 else if (vdur / 3 * 2 == 1) {
-                    tupletscale.push_back(1);
+                    tupletscale[i] = 1;
                 }
                 else {
-                    tupletscale.push_back(value);
+                    tupletscale[i] = value;
                 }
             }
             continue;
@@ -7948,17 +7954,17 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             if (vdur < 1) {
                 val2 = vdur * value;
                 if (val2.isInteger()) {
-                    tupletscale.push_back(val2.getNumerator());
+                    tupletscale[i] = val2.getNumerator();
                 }
                 else {
-                    tupletscale.push_back(value);
+                    tupletscale[i] = value;
                 }
             }
             else if (vdur / 3 * 2 == 1) {
-                tupletscale.push_back(1);
+                tupletscale[i] = 1;
             }
             else {
-                tupletscale.push_back(value);
+                tupletscale[i] = value;
             }
         }
     }
