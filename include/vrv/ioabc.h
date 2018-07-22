@@ -102,10 +102,11 @@ private:
     int m_lineNum = 0;
     int m_broken = 0;
     int m_gracecount = 0;
-    std::vector<std::string> m_title;
-    std::vector<std::string> m_composer;
-    std::vector<std::string> m_history;
-    std::vector<std::string> m_origin;
+    std::vector<std::pair<std::string, int> > m_composer; // C:
+    std::vector<std::pair<std::string, int> > m_history; // H:
+    std::vector<std::pair<std::string, int> > m_notes; // N:
+    std::vector<std::pair<std::string, int> > m_origin; // O:
+    std::vector<std::pair<std::string, int> > m_title; // T:
 
     std::vector<ControlElement *> m_tempoStack;
     std::vector<Harm *> m_harmStack;

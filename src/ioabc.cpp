@@ -602,9 +602,11 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
     m_doc->AddChild(m_mdiv);
 
     // reset information fields
-    m_title.clear();
     m_composer.clear();
     m_history.clear();
+    m_notes.clear();
+    m_origin.clear();
+    m_title.clear();
 }
 
 void AbcInput::printInformationFields()
@@ -620,7 +622,7 @@ void AbcInput::printInformationFields()
             titleRend->SetFontsize(fontsize);
         }
         Text *text = new Text();
-        text->SetText(UTF8to16(*it));
+        text->SetText(UTF8to16(it->first));
         titleRend->AddChild(text);
         pgHead->AddChild(titleRend);
     }
@@ -629,11 +631,11 @@ void AbcInput::printInformationFields()
         compRend->SetHalign(HORIZONTALALIGNMENT_right);
         compRend->SetValign(VERTICALALIGNMENT_bottom);
         Text *composer = new Text();
-        composer->SetText(UTF8to16(*it));
+        composer->SetText(UTF8to16(it->first));
         compRend->AddChild(composer);
         if (!m_origin.empty()) {
             Text *origin = new Text();
-            origin->SetText(UTF8to16(" (" + m_origin.front() + ")"));
+            origin->SetText(UTF8to16(" (" + m_origin.front().first + ")"));
             compRend->AddChild(origin);
         }
         pgHead->AddChild(compRend);
@@ -653,6 +655,17 @@ void AbcInput::createHeader()
 
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pubStmt.append_child(pugi::node_pcdata);
+
+    // <notesStmt> //
+    if (!m_notes.empty()) {
+        pugi::xml_node notes = fileDesc.append_child("notesStmt");
+        notes.append_attribute("analog").set_value("abc:N");
+        for (auto it = m_notes.begin(); it != m_notes.end(); ++it) {
+            pugi::xml_node annot = notes.append_child("annot");
+            annot.text().set((it->first).c_str());
+            annot.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
+        }
+    }
 
     // <encodingDesc> //
     pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
@@ -679,29 +692,41 @@ void AbcInput::createWorkEntry()
     work.append_attribute("n").set_value(m_mdiv->GetN().c_str());
     work.append_attribute("data").set_value(StringFormat("#%s", m_mdiv->GetUuid().c_str()).c_str());
     for (auto it = m_title.begin(); it != m_title.end(); ++it) {
-        pugi::xml_node workTitle = work.append_child("title");
-        workTitle.text().set((*it).c_str());
-        workTitle.append_attribute("analog").set_value("abc:T");
+        pugi::xml_node title = work.append_child("title");
+        title.text().set((it->first).c_str());
+        title.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
+        title.append_attribute("analog").set_value("abc:T");
         if (it == m_title.begin()) {
-            workTitle.append_attribute("type").set_value("main");
+            title.append_attribute("type").set_value("main");
         }
         else {
-            workTitle.append_attribute("type").set_value("alternative");
+            title.append_attribute("type").set_value("alternative");
         }
     }
     if (!m_composer.empty()) {
         for (auto it = m_composer.begin(); it != m_composer.end(); ++it) {
             pugi::xml_node composer = work.append_child("composer");
-            composer.text().set((*it).c_str());
+            composer.text().set((it->first).c_str());
+            composer.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
             composer.append_attribute("analog").set_value("abc:C");
         }
     }
     if (!m_history.empty()) {
-        pugi::xml_node workHistory = work.append_child("history");
+        pugi::xml_node history = work.append_child("history");
+        history.append_attribute("analog").set_value("abc:H");
         for (auto it = m_history.begin(); it != m_history.end(); ++it) {
-            pugi::xml_node histLine = workHistory.append_child("p");
-            histLine.text().set((*it).c_str());
-            histLine.append_attribute("analog").set_value("abc:H");
+            pugi::xml_node histLine = history.append_child("p");
+            histLine.text().set((it->first).c_str());
+            histLine.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
+        }
+    }
+    if (!m_notes.empty()) {
+        pugi::xml_node notes = work.append_child("notesStmt");
+        notes.append_attribute("analog").set_value("abc:N");
+        for (auto it = m_notes.begin(); it != m_notes.end(); ++it) {
+            pugi::xml_node annot = notes.append_child("annot");
+            annot.text().set((it->first).c_str());
+            annot.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
         }
     }
 }
@@ -727,10 +752,10 @@ void AbcInput::readInformationField(char dataKey, std::string value)
     while (isspace(value[0])) value = value.substr(1);
 
     if (dataKey == 'C') {
-        m_composer.push_back(value);
+        m_composer.push_back(std::make_pair(value, m_lineNum));
     }
     else if (dataKey == 'H') {
-        m_history.push_back(value);
+        m_history.push_back(std::make_pair(value, m_lineNum));
     }
     else if (dataKey == 'I') {
         parseInstruction(value);
@@ -744,14 +769,17 @@ void AbcInput::readInformationField(char dataKey, std::string value)
     else if (dataKey == 'M') {
         parseMeter(value);
     }
+    else if (dataKey == 'N') {
+        m_notes.push_back(std::make_pair(value, m_lineNum));
+    }
     else if (dataKey == 'O') {
-        m_origin.push_back(value);
+        m_origin.push_back(std::make_pair(value, m_lineNum));
     }
     else if (dataKey == 'Q') {
         parseTempo(value);
     }
     else if (dataKey == 'T') {
-        m_title.push_back(value);
+        m_title.push_back(std::make_pair(value, m_lineNum));
     }
     else if (dataKey == 'V') {
         LogError("ABC input: Multi-voice music is not supported");
