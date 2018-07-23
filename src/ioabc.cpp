@@ -415,7 +415,7 @@ void AbcInput::AddOrnaments(LayerElement *element, Measure *measure)
 
 void AbcInput::parseDecoration(std::string decorationString)
 {
-    if (atoi(decorationString.c_str())) {
+    if (isdigit(decorationString[0])) {
         LogWarning("ABC input: Fingering not supported", decorationString.c_str());
         return;
     }
