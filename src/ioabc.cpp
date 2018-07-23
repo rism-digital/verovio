@@ -874,6 +874,9 @@ void AbcInput::readInformationField(char dataKey, std::string value)
     else if (dataKey == 'T') {
         m_title.push_back(std::make_pair(value, m_lineNum));
     }
+    else if (dataKey == 'U') {
+        LogError("ABC input: User defined sympols are not supported");
+    }
     else if (dataKey == 'V') {
         LogError("ABC input: Multi-voice music is not supported");
     }
