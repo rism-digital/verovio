@@ -266,21 +266,21 @@ int Stem::CalcStem(FunctorParams *functorParams)
         Point p;
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
             if (this->GetStemPos() == STEMPOSITION_left) {
-              p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+                p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
             }
             else {
-              p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+                p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
             }
             baseStem += p.y;
             this->SetDrawingStemLen(baseStem);
         }
         else {
-          if (this->GetStemPos() == STEMPOSITION_right) {
-            p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
-          }
-          else {
-            p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
-          }
+            if (this->GetStemPos() == STEMPOSITION_right) {
+                p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+            }
+            else {
+                p = params->m_interface->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+            }
             baseStem -= p.y;
             this->SetDrawingStemLen(-baseStem);
         }

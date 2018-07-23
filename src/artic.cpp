@@ -330,6 +330,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
 
     Staff *staffAbove = NULL;
     Staff *staffBelow = NULL;
+    Layer *crossLayer = NULL;
 
     // Cross-staff handling of articulation will need to be re-thought. We can look at assiging a cross-staff to the
     // appropriate ArticPart
@@ -338,6 +339,7 @@ int Artic::CalcArtic(FunctorParams *functorParams)
         staff = parent->m_crossStaff;
         staffAbove = staff;
         staffBelow = staff;
+        crossLayer = parent->m_crossLayer;
     }
     else if (parentChord) {
         parentChord->GetCrossStaffExtremes(staffAbove, staffBelow);
@@ -358,22 +360,34 @@ int Artic::CalcArtic(FunctorParams *functorParams)
     if (insidePart) {
         if (insidePart->GetPlace().GetBasic() == STAFFREL_basic_above) {
             insidePart->SetDrawingYRel(yInAbove);
-            insidePart->m_crossStaff = staffAbove;
+            if (parent->m_crossStaff) {
+                insidePart->m_crossStaff = staffAbove;
+                insidePart->m_crossLayer = crossLayer;
+            }
         }
         else {
             insidePart->SetDrawingYRel(yInBelow);
-            insidePart->m_crossStaff = staffBelow;
+            if (parent->m_crossStaff) {
+                insidePart->m_crossStaff = staffBelow;
+                insidePart->m_crossLayer = crossLayer;
+            }
         }
     }
 
     if (outsidePart) {
         if (outsidePart->GetPlace().GetBasic() == STAFFREL_basic_above) {
             outsidePart->SetDrawingYRel(yOutAbove);
-            outsidePart->m_crossStaff = staffAbove;
+            if (parent->m_crossStaff) {
+                outsidePart->m_crossStaff = staffAbove;
+                outsidePart->m_crossLayer = crossLayer;
+            }
         }
         else {
             outsidePart->SetDrawingYRel(yOutBelow);
-            outsidePart->m_crossStaff = staffBelow;
+            if (parent->m_crossStaff) {
+                outsidePart->m_crossStaff = staffBelow;
+                outsidePart->m_crossLayer = crossLayer;
+            }
         }
     }
 
