@@ -29,6 +29,7 @@ class LayerElement;
 class Mdiv;
 class Measure;
 class MeterSig;
+class Note;
 class Section;
 class Slur;
 class Staff;
@@ -59,6 +60,9 @@ private:
 
     void calcUnitNoteLength();
     void AddBeam();
+    void AddArticulation(LayerElement *element, Measure *measure);
+    void AddFermata(LayerElement *element, Measure *measure);
+    void AddOrnaments(LayerElement *element, Measure *measure);
     void AddTuplet();
 
     // parse information fields
@@ -93,8 +97,6 @@ private:
     MeterSig *m_meter = NULL;
     Layer *m_layer = NULL;
 
-    std::vector<data_ARTICULATION> m_artic;
-    std::string m_ornam;
     data_DURATION m_durDefault = DURATION_NONE; // todo: switch to MEI
     std::string m_ID;
     int m_unitDur;
@@ -117,8 +119,13 @@ private:
     std::vector<LayerElement *> m_layerElements;
     std::vector<LayerElement *> m_noteStack;
     /*
-     * The stack of floating elements (tie, slur, etc.) to be added at the
-     * end of each measure
+     * ABC decoration stacks
+     */
+    std::vector<data_ARTICULATION> m_artic;
+    std::string m_ornam;
+    data_STAFFREL_basic m_fermata = STAFFREL_basic_NONE;
+    /*
+     * The stack of control elements to be added at the end of each measure
      */
     std::vector<std::pair<std::string, ControlElement *> > m_controlElements;
     /*

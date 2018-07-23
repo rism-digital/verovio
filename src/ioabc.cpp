@@ -21,6 +21,7 @@
 #include "chord.h"
 #include "doc.h"
 #include "editorial.h"
+#include "fermata.h"
 #include "harm.h"
 #include "layer.h"
 #include "mdiv.h"
@@ -339,13 +340,77 @@ void AbcInput::AddTuplet()
     }
     else {
         Tuplet *tuplet = new Tuplet();
-        std::vector<LayerElement *>::iterator iter;
-        for (iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
+        for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
             tuplet->AddChild(*iter);
         }
         m_layer->AddChild(tuplet);
     }
     m_noteStack.clear();
+}
+
+void AbcInput::AddArticulation(LayerElement *element, Measure *measure)
+{
+    assert(element);
+    assert(measure);
+
+    Artic *artic = new Artic();
+    artic->SetArtic(m_artic);
+    element->AddChild(artic);
+
+    m_artic.clear();
+}
+
+void AbcInput::AddFermata(LayerElement *element, Measure *measure)
+{
+    assert(element);
+    assert(measure);
+
+    Fermata *fermata = new Fermata();
+    fermata->SetStartid("#" + element->GetUuid());
+    fermata->GetPlaceAlternate()->SetBasic(m_fermata);
+    m_controlElements.push_back(std::make_pair(measure->GetUuid(), fermata));
+
+    m_fermata = STAFFREL_basic_NONE;
+}
+
+void AbcInput::AddOrnaments(LayerElement *element, Measure *measure)
+{
+    assert(element);
+    assert(measure);
+
+    std::string refId = "#" + element->GetUuid();
+    // note->SetOrnam(m_ornam);
+    if (m_ornam.find("m") != std::string::npos) {
+        Mordent *mordent = new Mordent();
+        mordent->SetStartid(refId);
+        mordent->SetForm(mordentLog_FORM_lower);
+        m_controlElements.push_back(std::make_pair(measure->GetUuid(), mordent));
+    }
+    if (m_ornam.find("M") != std::string::npos) {
+        Mordent *mordent = new Mordent();
+        mordent->SetStartid(refId);
+        mordent->SetForm(mordentLog_FORM_upper);
+        m_controlElements.push_back(std::make_pair(measure->GetUuid(), mordent));
+    }
+    if (m_ornam.find("s") != std::string::npos) {
+        Turn *turn = new Turn();
+        turn->SetStartid(refId);
+        turn->SetForm(turnLog_FORM_lower);
+        m_controlElements.push_back(std::make_pair(measure->GetUuid(), turn));
+    }
+    if (m_ornam.find("S") != std::string::npos) {
+        Turn *turn = new Turn();
+        turn->SetStartid(refId);
+        turn->SetForm(turnLog_FORM_upper);
+        m_controlElements.push_back(std::make_pair(measure->GetUuid(), turn));
+    }
+    if (m_ornam.find("T") != std::string::npos) {
+        Trill *trill = new Trill();
+        trill->SetStartid(refId);
+        m_controlElements.push_back(std::make_pair(measure->GetUuid(), trill));
+    }
+
+    m_ornam.clear();
 }
 
 void AbcInput::parseDecoration(std::string decorationString)
@@ -374,6 +439,10 @@ void AbcInput::parseDecoration(std::string decorationString)
         m_artic.push_back(ARTICULATION_acc);
     else if (!strcmp(decorationString.c_str(), "emphasis"))
         m_artic.push_back(ARTICULATION_acc);
+    else if (!strcmp(decorationString.c_str(), "fermata") || !strcmp(decorationString.c_str(), "H"))
+        m_fermata = STAFFREL_basic_above;
+    else if (!strcmp(decorationString.c_str(), "invertedfermata"))
+        m_fermata = STAFFREL_basic_below;
     else if (!strcmp(decorationString.c_str(), "tenuto"))
         m_artic.push_back(ARTICULATION_ten);
     else if (!strcmp(decorationString.c_str(), "+"))
@@ -891,12 +960,14 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
         else if (musicCode[i] == m_decoration) {
             ++i;
-            std::string decorationString;
-            while (musicCode[i] != m_decoration) {
-                decorationString.push_back(musicCode[i]);
-                ++i;
+            if (!isspace(musicCode[i])) {
+                std::string decorationString;
+                while (musicCode[i] != m_decoration) {
+                    decorationString.push_back(musicCode[i]);
+                    ++i;
+                }
+                parseDecoration(decorationString);
             }
-            parseDecoration(decorationString);
         }
 
         // slurs and ties
@@ -914,6 +985,16 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         else if (musicCode[i] == '[' && musicCode[i + 1] != '|') {
             // start chord
             chord = new Chord();
+
+            // add articulation
+            if (!m_artic.empty()) {
+                AddArticulation(chord, measure);
+            }
+
+            // add fermata
+            if (m_fermata != STAFFREL_basic_NONE) {
+                AddFermata(chord, measure);
+            }
         }
         else if (musicCode[i] == ']' && musicCode[i - 1] != '|') {
             // end chord
@@ -1032,44 +1113,17 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
             // add articulation
             if (!m_artic.empty()) {
-                Artic *artic = new Artic();
-                artic->SetArtic(m_artic);
-                note->AddChild(artic);
-                m_artic.clear();
+                AddArticulation(note, measure);
+            }
+
+            // add Fermata
+            if (m_fermata != STAFFREL_basic_NONE) {
+                AddFermata(note, measure);
             }
 
             // add ornaments
             if (!m_ornam.empty()) {
-                note->SetOrnam(m_ornam);
-                if (m_ornam.find("m") != std::string::npos) {
-                    Mordent *mordent = new Mordent();
-                    mordent->SetStartid("#" + note->GetUuid());
-                    mordent->SetForm(mordentLog_FORM_lower);
-                    m_controlElements.push_back(std::make_pair(measure->GetUuid(), mordent));
-                }
-                if (m_ornam.find("M") != std::string::npos) {
-                    Mordent *mordent = new Mordent();
-                    mordent->SetStartid("#" + note->GetUuid());
-                    mordent->SetForm(mordentLog_FORM_upper);
-                    m_controlElements.push_back(std::make_pair(measure->GetUuid(), mordent));
-                }
-                if (m_ornam.find("s") != std::string::npos) {
-                    Turn *turn = new Turn();
-                    turn->SetStartid("#" + note->GetUuid());
-                    turn->SetForm(turnLog_FORM_lower);
-                    m_controlElements.push_back(std::make_pair(measure->GetUuid(), turn));
-                }
-                if (m_ornam.find("S") != std::string::npos) {
-                    Turn *turn = new Turn();
-                    turn->SetStartid("#" + note->GetUuid());
-                    turn->SetForm(turnLog_FORM_upper);
-                    m_controlElements.push_back(std::make_pair(measure->GetUuid(), turn));
-                }
-                if (m_ornam.find("T") != std::string::npos) {
-                    Trill *trill = new Trill();
-                    trill->SetStartid("#" + note->GetUuid());
-                    m_controlElements.push_back(std::make_pair(measure->GetUuid(), trill));
-                }
+                AddOrnaments(note, measure);
             }
 
             if (chord) {
@@ -1161,6 +1215,11 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         else if (musicCode[i] == 'z') {
             Rest *rest = new Rest();
             m_ID = rest->GetUuid();
+
+            // add Fermata
+            if (m_fermata != STAFFREL_basic_NONE) {
+                AddFermata(rest, measure);
+            }
 
             // set duration
             std::string numStr, numbaseStr;
