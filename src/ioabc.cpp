@@ -229,9 +229,18 @@ int AbcInput::setBarLine(const char *musicCode, Measure *measure, int i)
         barLine = BARRENDITION_rptend;
     else {
         switch (musicCode[i + 1]) {
-            case ':': barLine = BARRENDITION_rptstart; ++i; break;
-            case '|': barLine = BARRENDITION_dbl; ++i; break;
-            case ']': barLine = BARRENDITION_end; ++i; break;
+            case ':':
+                barLine = BARRENDITION_rptstart;
+                ++i;
+                break;
+            case '|':
+                barLine = BARRENDITION_dbl;
+                ++i;
+                break;
+            case ']':
+                barLine = BARRENDITION_end;
+                ++i;
+                break;
             default: barLine = BARRENDITION_single; break;
         }
     }
@@ -1306,25 +1315,25 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             AddBeam();
             i = setBarLine(musicCode, measure, i);
             if (m_layer->GetChildCount()) {
-              staff->AddChild(m_layer);
-              measure->AddChild(staff);
-              if (!m_harmStack.empty()) {
-                for (auto it = m_harmStack.begin(); it != m_harmStack.end(); ++it) {
-                  measure->AddChild(*it);
+                staff->AddChild(m_layer);
+                measure->AddChild(staff);
+                if (!m_harmStack.empty()) {
+                    for (auto it = m_harmStack.begin(); it != m_harmStack.end(); ++it) {
+                        measure->AddChild(*it);
+                    }
+                    m_harmStack.clear();
                 }
-                m_harmStack.clear();
-              }
-              for (auto it = m_tempoStack.begin(); it != m_tempoStack.end(); ++it) {
-                measure->AddChild(*it);
-              }
-              m_tempoStack.clear();
-              section->AddChild(measure);
-              measure = new Measure();
-              staff = new Staff();
-              m_layer = new Layer();
+                for (auto it = m_tempoStack.begin(); it != m_tempoStack.end(); ++it) {
+                    measure->AddChild(*it);
+                }
+                m_tempoStack.clear();
+                section->AddChild(measure);
+                measure = new Measure();
+                staff = new Staff();
+                m_layer = new Layer();
             }
             else {
-              if (musicCode[i + 1] == ':') measure->SetLeft(BARRENDITION_rptstart);
+                if (musicCode[i + 1] == ':') measure->SetLeft(BARRENDITION_rptstart);
             }
         }
 
