@@ -1626,9 +1626,8 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-            DrawSmuflString(dc, x + accidXShift, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
-            // Adjust the y position
-            y += m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
+            int accidY = y - m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
+            DrawSmuflString(dc, x + accidXShift, accidY, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
         }
         else if (trill->HasAccidupper()) {
             int accidXShift = (centered) ? 0 : m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
@@ -1637,10 +1636,8 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-            DrawSmuflString(dc, x + accidXShift, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
-            // Adjust the y position
-            double factor = 1.5;
-            y -= factor * trillHeight;
+            int accidY = y + trillHeight * 1.5;
+            DrawSmuflString(dc, x + accidXShift, accidY, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
         }
 
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
