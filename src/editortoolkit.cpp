@@ -517,13 +517,15 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
             }
         }
 
-        const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        const int pitchDifference = round((double) (clef->GetZone()->GetUly() - uly) / (double) staffSize);
-        nc->AdjustPitchByOffset(pitchDifference);
+        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
+        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (staffSize * (staff->m_drawingLines - clef->GetLine())) - (uly + noteWidth / 2)) / (double) (staffSize));
+
+        nc->AdjustPitchByOffset(pitchDifference);
+        
         // Set up facsimile
         zone->SetUlx(ulx);
         zone->SetUly(uly);
