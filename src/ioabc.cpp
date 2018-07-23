@@ -1201,20 +1201,30 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             std::string numStr, numbaseStr;
             int dots = 0;
             int numbase = 1;
-            if (musicCode[i + 1] == '>') {
+            if ((m_broken < 0) && (grace == GRACE_NONE)) {
+                dots = -m_broken;
+                m_broken = 0;
+            }
+            while (musicCode[i + 1] == '>') {
                 ++i;
-                LogWarning("ABC input: Broken rhythms not supported");
+                ++m_broken;
+                ++dots;
+            }
+            while (musicCode[i + 1] == '<') {
+                ++i;
+                --m_broken;
             }
             while (isdigit(musicCode[i + 1])) {
                 ++i;
                 numStr.push_back(musicCode[i]);
             }
-            if (musicCode[i + 1] == '/') {
+            while (musicCode[i + 1] == '/') {
                 ++i;
-                while (isdigit(musicCode[i + 1])) {
-                    ++i;
-                    numbaseStr.push_back(musicCode[i]);
-                }
+                numbase *= 2;
+            }
+            while (isdigit(musicCode[i + 1])) {
+                ++i;
+                numbaseStr.push_back(musicCode[i]);
             }
             int num = (numStr.empty()) ? 1 : std::atoi(numStr.c_str());
             numbase = (numbaseStr.empty()) ? numbase : std::atoi(numbaseStr.c_str());
@@ -1224,8 +1234,16 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 num = num - num / 3;
             }
             if ((numbase & (numbase - 1)) != 0) LogError("ABC input: note length divider must be power of 2");
-            rest->SetDots(dots);
-            rest->SetDur(rest->AttDurationLogical::StrToDuration(std::to_string(m_unitDur * numbase / num)));
+            int dur = m_unitDur * numbase / num;
+
+            if (dots > 0) rest->SetDots(dots);
+            if ((m_broken < 0) && (grace == GRACE_NONE)) {
+                for (int i = 0; i != -m_broken; ++i) dur = dur * 2;
+            }
+            else if (!rest->HasDots() && (m_broken > 0) && (grace == GRACE_NONE)) {
+                for (; m_broken != 0; --m_broken) dur = dur * 2;
+            }
+            rest->SetDur(rest->AttDurationLogical::StrToDuration(std::to_string(dur)));
 
             m_noteStack.push_back(rest);
         }
