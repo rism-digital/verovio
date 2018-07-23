@@ -1360,6 +1360,12 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         measure->AddChild(staff);
         section->AddChild(measure);
     }
+    else {
+        delete staff;
+        delete measure;
+        delete m_layer;
+        m_layer = NULL;
+    }
 
     // by default, line-breaks in the code generate line-breaks in the typeset score
     // has to be refined later
