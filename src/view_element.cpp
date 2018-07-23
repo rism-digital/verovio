@@ -874,8 +874,6 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         return;
     }
 
-    dc->StartGraphic(element, "", element->GetUuid());
-
     x = element->GetDrawingX();
     // HARDCODED
     int step = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_KEYSIG_STEP;
@@ -883,25 +881,31 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     int clefLocOffset = layer->GetClefLocOffset(element);
     int loc;
 
-    // Show cancellation if C major (0) or if any cancellation and show cancellation (showchange) is true (false by
-    // default)
-    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM)
-        && ((keySig->GetAlterationNumber() == 0) || keySig->m_drawingShowchange)) {
+    // Show cancellation if C major (0)
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->GetAlterationNumber() == 0)) {
+        dc->StartGraphic(element, "", element->GetUuid());
+
+        for (i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
+            data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
+            loc = PitchInterface::CalcLoc(
+                pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
+            y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
+
+            DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+            x += step;
+        }
+
+        dc->EndGraphic(element, this);
+        return;
+    }
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    // Show cancellation if show cancellation (showchange) is true (false by default)
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->m_drawingShowchange)) {
         // The type of alteration is different (f/s or f/n or s/n) - cancel all accid in the normal order
         if (keySig->GetAlterationType() != keySig->m_drawingCancelAccidType) {
             for (i = 0; i < keySig->m_drawingCancelAccidCount; ++i) {
-                data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
-                loc = PitchInterface::CalcLoc(
-                    pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
-                y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
-
-                DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
-                x += step;
-            }
-        }
-        // Cancel some of them if more accid before
-        else if (keySig->GetAlterationNumber() < keySig->m_drawingCancelAccidCount) {
-            for (i = keySig->GetAlterationNumber(); i < keySig->m_drawingCancelAccidCount; ++i) {
                 data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
                 loc = PitchInterface::CalcLoc(
                     pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
@@ -925,6 +929,23 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
         DrawSmuflCode(dc, x, y, symb, staff->m_drawingStaffSize, false);
         x += step;
+    }
+
+    // Show cancellation if show cancellation (showchange) is true (false by default)
+    if ((keySig->GetScoreDefRole() != SCOREDEF_SYSTEM) && (keySig->m_drawingShowchange)) {
+        // Same time of alteration, but smaller number - cancellation is displayed afterwards
+        if ((keySig->GetAlterationType() == keySig->m_drawingCancelAccidType)
+            && (keySig->GetAlterationNumber() < keySig->m_drawingCancelAccidCount)) {
+            for (i = keySig->GetAlterationNumber(); i < keySig->m_drawingCancelAccidCount; ++i) {
+                data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
+                loc = PitchInterface::CalcLoc(
+                    pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
+                y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
+
+                DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
+                x += step;
+            }
+        }
     }
 
     dc->EndGraphic(element, this);
