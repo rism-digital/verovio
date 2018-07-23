@@ -56,7 +56,7 @@ private:
     void parseABC(std::istream &infile);
 
     // parsing functions
-    int getBarLine(const char *incipit, data_BARRENDITION *output, int index);
+    int setBarLine(const char *musicCode, Measure *measure, int index);
 
     void calcUnitNoteLength();
     void AddBeam();

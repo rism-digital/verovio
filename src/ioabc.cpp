@@ -211,7 +211,7 @@ void AbcInput::parseABC(std::istream &infile)
 
 /**********************************
  *
- * getBarLine -- read the barLine.
+ * setBarLine
  * Translation from ABC to verovio representaion:
  *
  BARRENDITION_single     |
@@ -222,51 +222,25 @@ void AbcInput::parseABC(std::istream &infile)
  BARRENDITION_dbl        ||
  */
 
-int AbcInput::getBarLine(const char *music, data_BARRENDITION *output, int index)
+int AbcInput::setBarLine(const char *musicCode, Measure *measure, int i)
 {
-
-    bool is_barline_rptboth = false;
-    bool is_barline_rptend = false;
-    bool is_barline_rptstart = false;
-    bool is_barline_dbl = false;
-
-    if (strncmp(music + index, ":||:", 4) == 0) {
-        is_barline_rptboth = true;
-    }
-
-    if (strncmp(music + index, ":|", 2) == 0) {
-        is_barline_rptend = true;
-    }
-
-    if (strncmp(music + index, "|:", 2) == 0) {
-        is_barline_rptstart = true;
-    }
-
-    if (strncmp(music + index, "||", 2) == 0) {
-        is_barline_dbl = true;
-    }
-
-    int i = 0; // number of characters
-    if (is_barline_rptboth) {
-        *output = BARRENDITION_rptboth;
-        i = 3;
-    }
-    else if (is_barline_rptstart) {
-        *output = BARRENDITION_rptstart;
-        i = 2;
-    }
-    else if (is_barline_rptend) {
-        *output = BARRENDITION_rptend;
-        i = 2;
-    }
-    else if (is_barline_dbl) {
-        *output = BARRENDITION_dbl;
-        i = 1;
-    }
+    data_BARRENDITION barLine;
+    if (musicCode[i - 1] == ':')
+        barLine = BARRENDITION_rptend;
     else {
-        *output = BARRENDITION_single;
-        i = 0;
+        switch (musicCode[i + 1]) {
+            case ':': barLine = BARRENDITION_rptstart; break;
+            case '|': barLine = BARRENDITION_dbl; break;
+            case ']': barLine = BARRENDITION_end; break;
+            default: barLine = BARRENDITION_single; break;
+        }
+        ++i;
     }
+    // if the measure is still empty, put the bar line on the left
+    if (!m_layer->GetChildCount())
+        measure->SetLeft(barLine);
+    else
+        measure->SetRight(barLine);
     return i;
 }
 
