@@ -301,7 +301,7 @@ data_KEYSIGNATURE Att::StrToKeysignature(std::string value, bool logWarning) con
 
 std::string Att::MeasurebeatToStr(data_MEASUREBEAT data) const
 {
-    return StringFormat("%dm+%.1f", data.first, data.second);
+    return StringFormat("%dm+%.4f", data.first, data.second);
 }
 
 data_MEASUREBEAT Att::StrToMeasurebeat(std::string value, bool logWarning) const
