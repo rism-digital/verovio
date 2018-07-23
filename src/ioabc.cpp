@@ -654,7 +654,6 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
         int mdivNum = atoi(referenceNumberString.c_str());
         if (mdivNum < 1) {
             LogError("ABC input: reference number should be a positive integer");
-            return;
         }
         m_mdiv->SetN(std::to_string(mdivNum));
     }
