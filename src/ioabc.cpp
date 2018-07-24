@@ -436,9 +436,9 @@ void AbcInput::parseDecoration(std::string decorationString)
         m_artic.push_back(ARTICULATION_stop);
     else if (!strcmp(decorationString.c_str(), "snap"))
         m_artic.push_back(ARTICULATION_snap);
-    else if (!strcmp(decorationString.c_str(), "upbow"))
+    else if (!strcmp(decorationString.c_str(), "upbow") || !strcmp(decorationString.c_str(), "u"))
         m_artic.push_back(ARTICULATION_upbow);
-    else if (!strcmp(decorationString.c_str(), "downbow"))
+    else if (!strcmp(decorationString.c_str(), "downbow") || !strcmp(decorationString.c_str(), "v"))
         m_artic.push_back(ARTICULATION_dnbow);
     else if (!strcmp(decorationString.c_str(), "open"))
         m_artic.push_back(ARTICULATION_open);
