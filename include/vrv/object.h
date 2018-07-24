@@ -254,7 +254,15 @@ public:
     ///@{
     Object *GetFirst(const ClassId classId = UNSPECIFIED);
     Object *GetNext();
+    ///@}
+
+    /**
+     * @name Retrieving next or previous sibling of a certain type.
+     * Returns NULL is not found
+     */
+    ///@{
     Object *GetNext(Object *child, const ClassId classId = UNSPECIFIED);
+    Object *GetPrevious(Object *child, const ClassId classId = UNSPECIFIED);
     ///@}
 
     /**
