@@ -9,6 +9,8 @@
 
 //-------------------------------------------------------------------------------- 
 
+#include <locale>
+#include <codecvt>
 #include <set>
 
 //--------------------------------------------------------------------------------
@@ -20,10 +22,13 @@
 #include "nc.h"
 #include "neume.h"
 #include "page.h"
+#include "rend.h"
 #include "slur.h"
 #include "staff.h"
 #include "staffdef.h"
+#include "syl.h"
 #include "syllable.h"
+#include "text.h"
 #include "vrv.h"
 
 //--------------------------------------------------------------------------------
@@ -83,6 +88,13 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
             return this->Set(elementId, attrType, attrValue);
         }
         LogWarning("Could not parse the set action");
+    }
+    else if (action == "setText") {
+        std::string elementId, text;
+        if (this->ParseSetTextAction(json.get<jsonxx::Object>("param"), &elementId, &text)) {
+            return this->SetText(elementId, text);
+        }
+        LogWarning("Could not parse the set text action");
     }
     else if (action == "remove") {
         std::string elementId;
@@ -737,6 +749,50 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
     return success;
 }
 
+// Update the text of a TextElement by its syl
+bool EditorToolkit::SetText(std::string elementId, std::string text)
+{
+    m_editInfo = "";
+    std::wstring wtext;
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> conv;
+    wtext = conv.from_bytes(text);
+
+    if (!m_doc->GetDrawingPage()) return false;
+    Object *element = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    if (element == nullptr) {
+        LogWarning("No element with ID '%s' exists", elementId.c_str());
+        return false;
+    }
+
+    bool success = false;
+    if (element->Is(SYL)) {
+        Syl *syl = dynamic_cast<Syl *>(element);
+        assert(syl);
+        for (Object *child = syl->GetFirst(); child != nullptr; child = syl->GetNext()) {
+            if (child->Is(TEXT)) {
+                Text *text = dynamic_cast<Text *>(child);
+                text->SetText(wtext);
+                success = true;
+                break;
+            }
+            else if (child->Is(REND)) {
+                Rend *rend = dynamic_cast<Rend *>(child);
+                Object *rendChild = rend->GetFirst();
+                if (rendChild->Is(TEXT)) {
+                    Text *rendText = dynamic_cast<Text *>(rendChild);
+                    rendText->SetText(wtext);
+                    success = true;
+                }
+            }
+        }
+    }
+    else {
+        LogWarning("Element type '%s' is unsupported for SetText", element->GetClassName().c_str());
+        return false;
+    }
+    return success;
+}
+
 bool EditorToolkit::Remove(std::string elementId)
 {
     if (!m_doc->GetDrawingPage()) {
@@ -958,6 +1014,22 @@ bool EditorToolkit::ParseSetAction(
         return false;
     }
     (*attrValue) = param.get<jsonxx::String>("attrValue");
+    return true;
+}
+
+bool EditorToolkit::ParseSetTextAction(
+    jsonxx::Object param, std::string *elementId, std::string *text)
+{
+    if (!param.has<jsonxx::String>("elementId")) {
+        LogWarning("Could not parse 'elementId'");
+        return false;
+    }
+    *elementId = param.get<jsonxx::String>("elementId");
+    if(!param.has<jsonxx::String>("text")) {
+        LogWarning("Could not parse 'text'");
+        return false;
+    }
+    *text = param.get<jsonxx::String>("text");
     return true;
 }
 
