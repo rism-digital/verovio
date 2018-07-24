@@ -283,6 +283,7 @@ void BeamDrawingParams::CalcBeam(
 
     // then check that the stem length reaches the center for the staff
     double minDistToCenter = -VRV_UNSET;
+    
     for (i = 0; i < elementCount; ++i) {
         if ((this->m_stemDir == STEMDIRECTION_up)
             && ((*beamElementCoords).at(i)->m_yBeam - verticalCenter < minDistToCenter)) {
@@ -337,9 +338,10 @@ void BeamDrawingParams::CalcBeam(
 // Beam
 //----------------------------------------------------------------------------
 
-Beam::Beam() : LayerElement("beam-"), ObjectListInterface(), AttColor()
+Beam::Beam() : LayerElement("beam-"), ObjectListInterface(), AttColor(), AttBeamedWith()
 {
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_BEAMEDWITH);
 
     Reset();
 }
@@ -353,6 +355,7 @@ void Beam::Reset()
 {
     LayerElement::Reset();
     ResetColor();
+    ResetBeamedWith();
 
     ClearCoords();
 }
