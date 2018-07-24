@@ -227,6 +227,11 @@ public:
      * Child access (generic)
      */
     Object *GetChild(int idx) const;
+    
+    /**
+     * Return a cont pointer to the children
+     */
+    const ArrayOfObjects *GetChildren() { return &m_children; }
 
     /**
      * Fill an array of pairs with all attributes and their values.

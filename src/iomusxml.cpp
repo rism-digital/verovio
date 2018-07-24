@@ -176,8 +176,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
         AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
         Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
-        Object *current;
-        for (current = measure->GetFirst(); current; current = measure->GetNext()) {
+        for (auto current : *measure->GetChildren()) {
             Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
             assert(staff);
             existingMeasure->AddChild(staff);
