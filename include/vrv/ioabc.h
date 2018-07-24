@@ -56,14 +56,9 @@ private:
     void parseABC(std::istream &infile);
 
     // parsing functions
-    int setBarLine(const char *musicCode, Measure *measure, int index);
-
-    void calcUnitNoteLength();
+    int SetBarLine(const char *musicCode, Measure *measure, int index);
+    void CalcUnitNoteLength();
     void AddBeam();
-    void AddArticulation(LayerElement *element, Measure *measure);
-    void AddFermata(LayerElement *element, Measure *measure);
-    void AddOrnaments(LayerElement *element, Measure *measure);
-    void AddTuplet();
 
     // parse information fields
     void parseInstruction(std::string keyString); // I:
@@ -77,15 +72,20 @@ private:
     void readInformationField(char dataKey, std::string dataValue);
     void readMusicCode(const char *musicCode, Section *section);
 
+    // decoration functions
     void parseDecoration(std::string decorationString);
-    void startSlur(std::string measureId);
-    void endSlur();
-    void addTie(std::string measureId);
+    void AddArticulation(LayerElement *element, Measure *measure);
+    void AddFermata(LayerElement *element, Measure *measure);
+    void AddOrnaments(LayerElement *element, Measure *measure);
+    void AddTie(Measure *measure);
+    void AddTuplet();
+    void StartSlur(std::string measureId);
+    void EndSlur();
 
     // additional functions
-    void printInformationFields();
-    void createHeader();
-    void createWorkEntry();
+    void PrintInformationFields();
+    void CreateHeader();
+    void CreateWorkEntry();
 
 #endif // NO_ABC_SUPPORT
 

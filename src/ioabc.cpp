@@ -119,7 +119,7 @@ void AbcInput::parseABC(std::istream &infile)
         else if (abcLine[1] == ':')
             readInformationField(abcLine[0], &abcLine[2]);
     }
-    createHeader();
+    CreateHeader();
 
     // read tune header
     readInformationField('X', &abcLine[2]);
@@ -139,10 +139,10 @@ void AbcInput::parseABC(std::istream &infile)
     // add work entry to meiHead
     pugi::xpath_node meiHead = m_doc->m_header.select_single_node("meiHead");
     m_workDesc = meiHead.node().append_child("workDesc");
-    createWorkEntry();
+    CreateWorkEntry();
 
     // create page head
-    printInformationFields();
+    PrintInformationFields();
     StaffGrp *staffGrp = new StaffGrp();
     m_doc->m_scoreDef.AddChild(staffGrp);
     StaffDef *staffDef = new StaffDef();
@@ -166,7 +166,7 @@ void AbcInput::parseABC(std::istream &infile)
     }
     // calculate default unit note length
     if (m_durDefault == DURATION_NONE) {
-        calcUnitNoteLength();
+        CalcUnitNoteLength();
     }
 
     // read music code
@@ -211,7 +211,7 @@ void AbcInput::parseABC(std::istream &infile)
 
 /**********************************
  *
- * setBarLine
+ * SetBarLine
  * Translation from ABC to verovio representaion:
  *
  BARRENDITION_single     |
@@ -222,7 +222,7 @@ void AbcInput::parseABC(std::istream &infile)
  BARRENDITION_dbl        ||
  */
 
-int AbcInput::setBarLine(const char *musicCode, Measure *measure, int i)
+int AbcInput::SetBarLine(const char *musicCode, Measure *measure, int i)
 {
     data_BARRENDITION barLine;
     if (musicCode[i - 1] == ':')
@@ -252,36 +252,7 @@ int AbcInput::setBarLine(const char *musicCode, Measure *measure, int i)
     return i;
 }
 
-void AbcInput::startSlur(std::string measureId)
-{
-    Slur *openSlur = new Slur();
-    m_slurStack.push_back(openSlur);
-    m_controlElements.push_back(std::make_pair(measureId, openSlur));
-}
-
-void AbcInput::endSlur()
-{
-    if (!m_slurStack.empty()) {
-        m_slurStack.back()->SetEndid("#" + m_ID);
-        m_slurStack.pop_back();
-        return;
-    }
-    LogWarning("ABC input: Closing slur for element '%s' could not be matched", m_ID.c_str());
-}
-
-void AbcInput::addTie(std::string measureId)
-{
-    if (!m_tieStack.empty()) {
-        LogWarning("ABC input: '%s' already tied", m_ID.c_str());
-        return;
-    }
-    Tie *tie = new Tie();
-    tie->SetStartid(m_ID);
-    m_tieStack.push_back(tie);
-    m_controlElements.push_back(std::make_pair(measureId, tie));
-}
-
-void AbcInput::calcUnitNoteLength()
+void AbcInput::CalcUnitNoteLength()
 {
     if (!m_doc->m_scoreDef.HasMeterUnit()
         || double(m_doc->m_scoreDef.GetMeterCount()) / double(m_doc->m_scoreDef.GetMeterUnit()) >= 0.75) {
@@ -395,8 +366,40 @@ void AbcInput::AddOrnaments(LayerElement *element, Measure *measure)
     m_ornam.clear();
 }
 
+void AbcInput::AddTie(Measure *measure)
+{
+    assert(measure);
+
+    if (!m_tieStack.empty()) {
+        LogWarning("ABC input: '%s' already tied", m_ID.c_str());
+        return;
+    }
+    Tie *tie = new Tie();
+    tie->SetStartid(m_ID);
+    m_tieStack.push_back(tie);
+    m_controlElements.push_back(std::make_pair(measure->GetUuid(), tie));
+}
+
+void AbcInput::StartSlur(std::string measureId)
+{
+    Slur *openSlur = new Slur();
+    m_slurStack.push_back(openSlur);
+    m_controlElements.push_back(std::make_pair(measureId, openSlur));
+}
+
+void AbcInput::EndSlur()
+{
+    if (!m_slurStack.empty()) {
+        m_slurStack.back()->SetEndid("#" + m_ID);
+        m_slurStack.pop_back();
+        return;
+    }
+    LogWarning("ABC input: Closing slur for element '%s' could not be matched", m_ID.c_str());
+}
+
 void AbcInput::parseDecoration(std::string decorationString)
 {
+    // shorthand decorations hard-coded !
     if (isdigit(decorationString[0])) {
         LogWarning("ABC input: Fingering not supported", decorationString.c_str());
         return;
@@ -675,7 +678,7 @@ void AbcInput::parseReferenceNumber(std::string referenceNumberString)
     m_title.clear();
 }
 
-void AbcInput::printInformationFields()
+void AbcInput::PrintInformationFields()
 {
     PgHead *pgHead = new PgHead();
     for (auto it = m_title.begin(); it != m_title.end(); ++it) {
@@ -709,7 +712,7 @@ void AbcInput::printInformationFields()
     m_doc->m_scoreDef.AddChild(pgHead);
 }
 
-void AbcInput::createHeader()
+void AbcInput::CreateHeader()
 {
     pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
 
@@ -759,7 +762,7 @@ void AbcInput::createHeader()
     app.append_attribute("version").set_value(GetVersion().c_str());
 }
 
-void AbcInput::createWorkEntry()
+void AbcInput::CreateWorkEntry()
 {
     // <work> //
     pugi::xml_node work = m_workDesc.append_child("work");
@@ -956,13 +959,13 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
         // slurs and ties
         else if (musicCode[i] == '(' && !isdigit(musicCode[i + 1])) {
-            startSlur(measure->GetUuid());
+            StartSlur(measure->GetUuid());
         }
         else if (musicCode[i] == ')') {
-            endSlur();
+            EndSlur();
         }
         else if (musicCode[i] == '-') {
-            addTie(measure->GetUuid());
+            AddTie(measure);
         }
 
         // chords
@@ -1313,7 +1316,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         else if (musicCode[i] == '|') {
             // add stacked elements to layer
             AddBeam();
-            i = setBarLine(musicCode, measure, i);
+            i = SetBarLine(musicCode, measure, i);
             if (m_layer->GetChildCount()) {
                 staff->AddChild(m_layer);
                 measure->AddChild(staff);
