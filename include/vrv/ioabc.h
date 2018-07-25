@@ -62,7 +62,7 @@ private:
     void AddBeam();
     void AddTuplet();
     void AddTie(Measure *measure);
-    void StartSlur(std::string measureId);
+    void StartSlur(Measure *measure);
     void EndSlur();
 
     // parse information fields

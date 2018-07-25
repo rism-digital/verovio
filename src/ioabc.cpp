@@ -395,11 +395,13 @@ void AbcInput::AddTie(Measure *measure)
     m_controlElements.push_back(std::make_pair(measure->GetUuid(), tie));
 }
 
-void AbcInput::StartSlur(std::string measureId)
+void AbcInput::StartSlur(Measure *measure)
 {
+    assert(measure);
+
     Slur *openSlur = new Slur();
     m_slurStack.push_back(openSlur);
-    m_controlElements.push_back(std::make_pair(measureId, openSlur));
+    m_controlElements.push_back(std::make_pair(measure->GetUuid(), openSlur));
 }
 
 void AbcInput::EndSlur()
@@ -981,7 +983,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
         // slurs and ties
         else if (musicCode[i] == '(' && !isdigit(musicCode[i + 1])) {
-            StartSlur(measure->GetUuid());
+            StartSlur(measure);
         }
         else if (musicCode[i] == ')') {
             EndSlur();
