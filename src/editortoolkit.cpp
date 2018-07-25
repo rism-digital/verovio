@@ -119,6 +119,14 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse merge action");
     }
+    else if (action == "changeGroup"){
+        std::string elementId;
+        std::string contour;
+        if(this->ParseChangeGroupAction(json.get<jsonxx::Object>("param"), &elementId, &contour)) {
+            return this->ChangeGroup(elementId, contour);
+        }
+        LogWarning("Could not parse change group action");
+    }
     else {
         LogWarning("Unknown action type.");
     }
@@ -866,9 +874,101 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
     return true;
 }
 
+bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
+{
+    m_editInfo = "";
+    //Check if you can get drawing page
+    if(!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        return false;
+    }
+    Neume *el = dynamic_cast<Neume *> (m_doc->GetDrawingPage()->FindChildByUuid(elementId));
+    Nc *firstChild, *prevNc;
+
+    //Get children of neume. Keep the first child and delete the others.
+    AttComparison ac(NC); 
+    ArrayOfObjects children;
+    el->FindAllChildByComparison(&children, &ac);
+    for (auto it = children.begin(); it != children.end(); ++it) {
+        if(children.begin() == it){
+            firstChild = dynamic_cast<Nc *> (*it);     
+        }
+        else{
+            el->DeleteChild(*it);
+        }
+    }
+
+    //Get the coordinates of the remaining child.
+    int initialUlx = firstChild->GetZone()->GetUlx();
+    int initialUly = firstChild->GetZone()->GetUly();
+    int initialLrx = firstChild->GetZone()->GetLrx();
+    int initialLry = firstChild->GetZone()->GetLry();
+
+    Staff *staff = dynamic_cast<Staff *> (el->GetFirstParent(STAFF));
+    assert(staff);
+    Facsimile *facsimile = m_doc->GetFacsimile();
+
+    const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+    const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+    prevNc = firstChild;
+
+    //Iterate throught the contour and build the new grouping.
+    for(auto it = contour.begin(); it != contour.end(); ++it) {
+        Nc *newNc = new Nc();
+        Zone *zone = new Zone();
+        int newUlx = initialUlx + noteWidth;
+        int newLrx = initialLrx + noteWidth;
+        int newUly, newLry;
+
+        newNc->SetPname(prevNc->GetPname());
+        newNc->SetOct(prevNc->GetOct());  
+
+        if((*it) == 'u'){
+            newUly = initialUly - noteHeight;
+            newLry = initialLry - noteHeight;
+            newNc->AdjustPitchByOffset(1);
+        }
+        else if((*it) == 'd'){
+            newUly = initialUly + noteHeight;
+            newLry = initialLry + noteHeight;
+            newNc->AdjustPitchByOffset(-1);
+        }
+        else if((*it) == 's'){
+            newUly = initialUly;
+            newLry = initialLry;
+        }
+        else{
+            LogMessage("Unsupported character in contour.");
+            return false;
+        }
+        zone->SetUlx(newUlx);
+        zone->SetUly(newUly);;
+        zone->SetLrx(newLrx);
+        zone->SetLry(newLry);
+
+        newNc->SetZone(zone);
+        newNc->SetFacs(zone->GetUuid());
+
+        Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
+        assert(surface);
+        surface->AddChild(zone);
+
+        el->AddChild(newNc);
+
+        initialUlx = newUlx;
+        initialUly = newUly;
+        initialLrx = newLrx;
+        initialLry = newLry;
+        prevNc = newNc;
+
+    }
+    m_editInfo = firstChild.GetUuid();
+    return true;
+}
+
 bool EditorToolkit::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
+    if (!param.has<jsonxx::String>("elementId")) return false; 
     (*elementId) = param.get<jsonxx::String>("elementId");
     if (!param.has<jsonxx::Number>("x")) return false;
     (*x) = param.get<jsonxx::Number>("x");
@@ -937,7 +1037,6 @@ bool EditorToolkit::ParseMergeAction(
     return true;
 }
 
-
 bool EditorToolkit::ParseSetAction(
     jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue)
 {
@@ -992,6 +1091,16 @@ bool EditorToolkit::ParseUngroupAction(
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
    
+    return true;
+}
+
+bool EditorToolkit::ParseChangeGroupAction(
+    jsonxx::Object param, std::string *elementId, std::string *contour)
+{
+    if(!param.has<jsonxx::String>("elementId")) return false;
+    (*elementId) = param.get<jsonxx::String>("elementId");
+    if(!param.has<jsonxx::String>("contour")) return false;
+    (*contour) = param.get<jsonxx::String>("contour");
     return true;
 }
 

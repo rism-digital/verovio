@@ -46,6 +46,7 @@ public:
     bool Remove(std::string elementId);
     bool Group(std::string groupType, std::vector<std::string> elementIds);
     bool Ungroup(std::string groupType, std::vector<std::string> elementIds);
+    bool ChangeGroup(std::string elementId, std::string contour);
     ///@}
     
     /**
@@ -71,6 +72,7 @@ protected:
     bool ParseRemoveAction(jsonxx::Object param, std::string *elementId);
     bool ParseGroupAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds); 
     bool ParseUngroupAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds); 
+    bool ParseChangeGroupAction(jsonxx::Object param, std::string *elementId, std::string *contour);
     ///@}
 #endif
 
