@@ -1355,6 +1355,14 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         ++i;
     }
 
+    // by default, line-breaks in the code generate line-breaks in the typeset score
+    // has to be refined later
+    if (sysBreak && (m_linebreak != '\0')) {
+        Sb *sb = new Sb();
+        sb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
+        section->AddChild(sb);
+    }
+
     // in case of not empty layer
     if (m_layer->GetChildCount()) {
         staff->AddChild(m_layer);
@@ -1366,14 +1374,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         delete measure;
         delete m_layer;
         m_layer = NULL;
-    }
-
-    // by default, line-breaks in the code generate line-breaks in the typeset score
-    // has to be refined later
-    if (sysBreak && (m_linebreak != '\0')) {
-        Sb *sb = new Sb();
-        sb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
-        section->AddChild(sb);
     }
 }
 
