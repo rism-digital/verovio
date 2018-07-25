@@ -282,8 +282,7 @@ void AbcInput::AddBeam()
     }
     else {
         Beam *beam = new Beam();
-        std::vector<LayerElement *>::iterator iter;
-        for (iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
+        for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
             beam->AddChild(*iter);
         }
         m_layer->AddChild(beam);
@@ -395,8 +394,13 @@ void AbcInput::StartSlur(std::string measureId)
 void AbcInput::EndSlur()
 {
     if (!m_slurStack.empty()) {
-        m_slurStack.back()->SetEndid("#" + m_ID);
-        m_slurStack.pop_back();
+        for (auto riter = m_slurStack.rbegin(); riter != m_slurStack.rend(); ++riter) {
+            if (((*riter)->GetStartid()).find(m_ID) == std::string::npos) {
+                (*riter)->SetEndid("#" + m_ID);
+                m_slurStack.erase((riter + 1).base());
+                break;
+            }
+        }
         return;
     }
     LogWarning("ABC input: Closing slur for element '%s' could not be matched", m_ID.c_str());
