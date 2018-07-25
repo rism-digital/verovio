@@ -881,21 +881,18 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 {
     assert(section);
 
-    int length = int(strlen(musicCode));
     int i = 0;
     bool sysBreak = true;
 
     data_GRACE grace = GRACE_NONE;
     Chord *chord = NULL;
 
-    if (length == 0) return;
-
     Measure *measure = new Measure();
     Staff *staff = new Staff();
     m_layer = new Layer();
     m_layer->SetN(1);
 
-    while (i < length) {
+    while (i < int(strlen(musicCode))) {
         // eat the input...
 
         if (musicCode[i] == '`') {
