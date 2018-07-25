@@ -181,7 +181,12 @@ void AbcInput::parseABC(std::istream &infile)
         else if (abcLine[0] == '%')
             ;
         else if (abcLine[1] == ':' && abcLine[0] != '|') {
-            LogWarning("ABC input: Information fields in music code not supported");
+            if (abcLine[0] == 'L') {
+                readInformationField(abcLine[0], &abcLine[2]);
+            }
+            else {
+                LogWarning("ABC input: Information field %c in music code is not supported", abcLine[0]);
+            }
         }
         else {
             readMusicCode(abcLine, section);
