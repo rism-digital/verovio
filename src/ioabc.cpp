@@ -173,19 +173,19 @@ void AbcInput::parseABC(std::istream &infile)
     while (!infile.eof()) {
         infile.getline(abcLine, 10000);
         ++m_lineNum;
-        if (abcLine[0] == '\0') break;
+        // if (abcLine[0] == '\0') break;
         if (abcLine[0] == 'X') {
             LogDebug("ABC input: Reading only first tune in file");
             break;
         }
         else if (abcLine[0] == '%')
-            ;
+            continue;
         else if (abcLine[1] == ':' && abcLine[0] != '|') {
-            if (abcLine[0] == 'L') {
+            if (abcLine[0] != 'K') {
                 readInformationField(abcLine[0], &abcLine[2]);
             }
             else {
-                LogWarning("ABC input: Information field %c in music code is not supported", abcLine[0]);
+                LogWarning("ABC input: Key changes not supported", abcLine[0]);
             }
         }
         else {
@@ -448,7 +448,7 @@ void AbcInput::parseDecoration(std::string decorationString)
     else if (!strcmp(decorationString.c_str(), "open"))
         m_artic.push_back(ARTICULATION_open);
     else
-        LogWarning("ABC input: Decoration '%s' not supported", decorationString.c_str());
+        LogWarning("ABC input: Decoration %s not supported", decorationString.c_str());
 }
 
 //////////////////////////////
@@ -1332,6 +1332,17 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                     measure->AddChild(*it);
                 }
                 m_tempoStack.clear();
+                // before adding the measure, check if there's a change in meter
+                if (m_meter) {
+                    // todo: apply meter changes to staves
+                    ScoreDef *scoreDef = new ScoreDef();
+                    scoreDef->SetMeterCount(m_meter->GetCount());
+                    scoreDef->SetMeterUnit(m_meter->GetUnit());
+                    scoreDef->SetMeterSym(m_meter->GetSym());
+                    section->AddChild(scoreDef);
+                    delete m_meter;
+                    m_meter = NULL;
+                }
                 section->AddChild(measure);
                 measure = new Measure();
                 staff = new Staff();
