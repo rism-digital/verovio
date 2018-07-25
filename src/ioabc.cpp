@@ -907,6 +907,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
     data_GRACE grace = GRACE_NONE;
     Chord *chord = NULL;
 
+    if (strlen(musicCode) < 1) return;
+
     Measure *measure = new Measure();
     Staff *staff = new Staff();
     m_layer = new Layer();
