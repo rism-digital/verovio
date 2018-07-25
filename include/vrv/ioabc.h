@@ -80,6 +80,7 @@ private:
     // decoration functions
     void parseDecoration(std::string decorationString);
     void AddArticulation(LayerElement *element, Measure *measure);
+    void AddDynamic(LayerElement *element, Measure *measure);
     void AddFermata(LayerElement *element, Measure *measure);
     void AddOrnaments(LayerElement *element, Measure *measure);
 
@@ -123,6 +124,7 @@ private:
      * ABC decoration stacks
      */
     std::vector<data_ARTICULATION> m_artic;
+    std::vector<std::string> m_dynam;
     std::string m_ornam;
     data_STAFFREL_basic m_fermata = STAFFREL_basic_NONE;
     /*

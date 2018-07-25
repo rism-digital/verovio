@@ -20,6 +20,7 @@
 #include "beam.h"
 #include "chord.h"
 #include "doc.h"
+#include "dynam.h"
 #include "editorial.h"
 #include "fermata.h"
 #include "harm.h"
@@ -328,6 +329,23 @@ void AbcInput::AddArticulation(LayerElement *element, Measure *measure)
     m_artic.clear();
 }
 
+void AbcInput::AddDynamic(LayerElement *element, Measure *measure)
+{
+    assert(element);
+    assert(measure);
+
+    for (auto it = m_dynam.begin(); it != m_dynam.end(); ++it) {
+        Dynam *dynam = new Dynam();
+        dynam->SetStartid("#" + element->GetUuid());
+        Text *text = new Text();
+        text->SetText(UTF8to16(*it));
+        dynam->AddChild(text);
+        m_controlElements.push_back(std::make_pair(measure->GetUuid(), dynam));
+    }
+
+    m_dynam.clear();
+}
+
 void AbcInput::AddFermata(LayerElement *element, Measure *measure)
 {
     assert(element);
@@ -464,6 +482,13 @@ void AbcInput::parseDecoration(std::string decorationString)
         m_artic.push_back(ARTICULATION_dnbow);
     else if (!strcmp(decorationString.c_str(), "open"))
         m_artic.push_back(ARTICULATION_open);
+    else if (!strcmp(decorationString.c_str(), "pppp") || !strcmp(decorationString.c_str(), "ppp")
+        || !strcmp(decorationString.c_str(), "pp") || !strcmp(decorationString.c_str(), "p")
+        || !strcmp(decorationString.c_str(), "mp") || !strcmp(decorationString.c_str(), "mf")
+        || !strcmp(decorationString.c_str(), "f") || !strcmp(decorationString.c_str(), "ff")
+        || !strcmp(decorationString.c_str(), "ffff") || !strcmp(decorationString.c_str(), "ffff")
+        || !strcmp(decorationString.c_str(), "sfz"))
+        m_dynam.push_back(decorationString);
     else
         LogWarning("ABC input: Decoration %s not supported", decorationString.c_str());
 }
@@ -1002,6 +1027,11 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 AddArticulation(chord, measure);
             }
 
+            // add dynamics
+            if (!m_dynam.empty()) {
+                AddDynamic(chord, measure);
+            }
+
             // add fermata
             if (m_fermata != STAFFREL_basic_NONE) {
                 AddFermata(chord, measure);
@@ -1127,7 +1157,12 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 AddArticulation(note, measure);
             }
 
-            // add Fermata
+            // add dynamics
+            if (!m_dynam.empty()) {
+                AddDynamic(note, measure);
+            }
+
+            // add fermata
             if (m_fermata != STAFFREL_basic_NONE) {
                 AddFermata(note, measure);
             }
