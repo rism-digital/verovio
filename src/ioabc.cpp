@@ -745,11 +745,11 @@ void AbcInput::CreateHeader()
     // <notesStmt> //
     if (!m_notes.empty()) {
         pugi::xml_node notes = fileDesc.append_child("notesStmt");
-        notes.append_attribute("analog").set_value("abc:N");
         for (auto it = m_notes.begin(); it != m_notes.end(); ++it) {
             pugi::xml_node annot = notes.append_child("annot");
             annot.text().set((it->first).c_str());
             annot.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
+            annot.append_attribute("analog").set_value("abc:N");
         }
     }
 
@@ -808,11 +808,11 @@ void AbcInput::CreateWorkEntry()
     }
     if (!m_notes.empty()) {
         pugi::xml_node notes = work.append_child("notesStmt");
-        notes.append_attribute("analog").set_value("abc:N");
         for (auto it = m_notes.begin(); it != m_notes.end(); ++it) {
             pugi::xml_node annot = notes.append_child("annot");
             annot.text().set((it->first).c_str());
             annot.append_attribute("xml:id").set_value(StringFormat("abcLine%02d", it->second).c_str());
+            annot.append_attribute("analog").set_value("abc:N");
         }
     }
 }
