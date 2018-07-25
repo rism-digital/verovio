@@ -941,6 +941,10 @@ bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
         return false;
     }
     Neume *el = dynamic_cast<Neume *> (m_doc->GetDrawingPage()->FindChildByUuid(elementId));
+    if(el == nullptr){
+        LogError("Unable to find neume with id %s", elementId.c_str());
+        return false;
+    }
     Nc *firstChild, *prevNc;
 
     //Get children of neume. Keep the first child and delete the others.
@@ -955,7 +959,6 @@ bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
             el->DeleteChild(*it);
         }
     }
-
     //Get the coordinates of the remaining child.
     int initialUlx = firstChild->GetZone()->GetUlx();
     int initialUly = firstChild->GetZone()->GetUly();
@@ -1020,7 +1023,7 @@ bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
         prevNc = newNc;
 
     }
-    m_editInfo = firstChild->GetUuid();
+    m_editInfo = el->GetUuid();
     return true;
 }
 
