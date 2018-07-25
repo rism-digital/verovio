@@ -962,7 +962,7 @@ bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
         prevNc = newNc;
 
     }
-    m_editInfo = firstChild.GetUuid();
+    m_editInfo = firstChild->GetUuid();
     return true;
 }
 
