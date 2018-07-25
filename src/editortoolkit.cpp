@@ -471,6 +471,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
             if (staves.at(i) == newStaff) {
                 newStaff->SetParent(parent);
                 parent->InsertChild(newStaff, i);
+                parent->Modify();
                 return true;
             }
         }
@@ -483,22 +484,19 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         Syllable *syllable = new Syllable();
         Neume *neume = new Neume();
         Nc *nc = new Nc();
+        nc->SetZone(zone);
+        nc->SetFacs(zone->GetUuid());
+        Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
+        surface->AddChild(zone);       
+        zone->SetUlx(ulx);
 
+        neume->AddChild(nc);
+        syllable->AddChild(neume);
+        layer->AddChild(syllable);
+        
         // Find closest valid clef
-        ArrayOfObjects clefs;
-        AttComparison ac(CLEF);
-        layer->FindAllChildByComparison(&clefs, &ac);
         Clef *clef = nullptr;
-
-        for (auto it = clefs.begin(); it != clefs.end(); it++) {
-            Clef *current = dynamic_cast<Clef *>(*it);
-            assert(current);
-            if (current->GetZone()->GetUlx() < ulx) {
-                if (clef == nullptr || clef->GetZone()->GetUlx() < current->GetZone()->GetUlx())
-                    clef = current;
-            }
-        }
-
+        clef = layer->GetClef(nc); 
         if (clef == nullptr) {
             LogError("There is no valid clef available.");
             delete syllable;
@@ -543,15 +541,6 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         zone->SetUly(uly);
         zone->SetLrx(ulx + noteWidth);
         zone->SetLry(uly + noteHeight);
-        nc->SetZone(zone);
-        nc->SetFacs(zone->GetUuid());
-        Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
-        assert(surface);
-        surface->AddChild(zone);
-
-        neume->AddChild(nc);
-        syllable->AddChild(neume);
-        layer->AddChild(syllable);
         m_editInfo = nc->GetUuid();
     }
     else if (elementType == "clef") {
@@ -596,22 +585,15 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
     }
     else if (elementType == "custos") {
         Custos *custos = new Custos();
-        
+        zone->SetUlx(ulx);
+        Surface *surface = dynamic_cast<Surface *>(facsimile->GetFirst(SURFACE));
+        surface->AddChild(zone);
+        custos->SetZone(zone);
+        custos->SetFacs(zone->GetUuid());
+        layer->AddChild(custos); 
         // Find closest valid clef
-        ArrayOfObjects clefs;
-        AttComparison ac(CLEF);
-        layer->FindAllChildByComparison(&clefs, &ac);
         Clef *clef = nullptr;
-
-        for (auto it = clefs.begin(); it != clefs.end(); it++) {
-            Clef *current = dynamic_cast<Clef *>(*it);
-            assert(current);
-            if (current->GetZone()->GetUlx() < ulx) {
-                if (clef == nullptr || clef->GetZone()->GetUlx() < current->GetZone()->GetUlx())
-                    clef = current;
-            }
-        }
-
+        clef = layer->GetClef(custos);
         if (clef == nullptr) {
             LogError("There is no valid clef available.");
             delete custos;
@@ -634,12 +616,6 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         zone->SetUly(uly);
         zone->SetLrx(ulx + noteWidth);
         zone->SetLry(uly + noteHeight);
-        custos->SetZone(zone);
-        custos->SetFacs(zone->GetUuid());
-        Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
-        assert(surface);
-        surface->AddChild(zone);
-        layer->AddChild(custos);
         m_editInfo = custos->GetUuid();
     }
     else {
