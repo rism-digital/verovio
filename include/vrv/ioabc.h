@@ -58,7 +58,12 @@ private:
     // parsing functions
     int SetBarLine(const char *musicCode, Measure *measure, int index);
     void CalcUnitNoteLength();
+    void AddAnnot(std::string remark);
     void AddBeam();
+    void AddTuplet();
+    void AddTie(Measure *measure);
+    void StartSlur(std::string measureId);
+    void EndSlur();
 
     // parse information fields
     void parseInstruction(std::string keyString); // I:
@@ -77,10 +82,6 @@ private:
     void AddArticulation(LayerElement *element, Measure *measure);
     void AddFermata(LayerElement *element, Measure *measure);
     void AddOrnaments(LayerElement *element, Measure *measure);
-    void AddTie(Measure *measure);
-    void AddTuplet();
-    void StartSlur(std::string measureId);
-    void EndSlur();
 
     // additional functions
     void PrintInformationFields();
