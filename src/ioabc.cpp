@@ -305,6 +305,17 @@ void AbcInput::AddTuplet()
     m_noteStack.clear();
 }
 
+void AbcInput::AddAnnot(std::string remark)
+{
+    // remarks
+    Annot *annot = new Annot();
+    Text *text = new Text();
+    text->SetText(UTF8to16(remark));
+    annot->AddChild(text);
+    // todo: add to correct place
+    m_layer->AddChild(annot);
+}
+
 void AbcInput::AddArticulation(LayerElement *element, Measure *measure)
 {
     assert(element);
@@ -936,7 +947,10 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 information.push_back(musicCode[i]);
                 ++i;
             }
-            readInformationField(dataKey, information);
+            if (dataKey == 'r')
+                AddAnnot(information);
+            else
+                readInformationField(dataKey, information);
         }
 
         // linebreaks
@@ -1295,27 +1309,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         // suppressing score line-breaks
         else if (musicCode[i] == '\\') {
             sysBreak = false;
-        }
-
-        // remarks
-        else if (musicCode[i] == 'r') {
-            i += 2;
-            Annot *annot = new Annot();
-            std::string remark;
-            while (musicCode[i] != ']') {
-                remark.push_back(musicCode[i]);
-                ++i;
-            }
-            Text *text = new Text();
-            text->SetText(UTF8to16(remark));
-            annot->AddChild(text);
-            if (chord) {
-                chord->AddChild(annot);
-            }
-            else {
-                // will not work within beams
-                m_layer->AddChild(annot);
-            }
         }
 
         // barLine
