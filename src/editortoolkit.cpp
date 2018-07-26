@@ -770,6 +770,22 @@ bool EditorToolkit::SetText(std::string elementId, std::string text)
             }
         }
     }
+    else if (element->Is(SYLLABLE)) {
+        Syllable *syllable = dynamic_cast<Syllable *>(element);
+        assert(syllable);
+        Object *syl = syllable->GetFirst(SYL);
+        if (syl == nullptr) {
+            syl = new Syl();
+            syllable->AddChild(syl);
+            Text *textChild = new Text();
+            textChild->SetText(wtext);
+            syl->AddChild(textChild);
+            success = true;
+        }
+        else {
+            success = SetText(syl->GetUuid(), text);
+        }
+    }
     else {
         LogWarning("Element type '%s' is unsupported for SetText", element->GetClassName().c_str());
         return false;
