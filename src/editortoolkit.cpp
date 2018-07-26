@@ -488,10 +488,11 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         return true;
     }
 
-    if (elementType == "nc") {
+    if (elementType == "nc" || elementType == "grouping") {
         Syllable *syllable = new Syllable();
         Neume *neume = new Neume();
         Nc *nc = new Nc();
+        std::string contour = "";
         nc->SetZone(zone);
         nc->SetFacs(zone->GetUuid());
         Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
@@ -501,7 +502,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         neume->AddChild(nc);
         syllable->AddChild(neume);
         layer->AddChild(syllable);
-        
+
         // Find closest valid clef
         Clef *clef = nullptr;
         clef = layer->GetClef(nc); 
@@ -520,8 +521,8 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         else if (clef->GetShape() == CLEFSHAPE_F) {
             nc->SetPname(PITCHNAME_f);
         }
-
-        // Set as inclinatum or virga (if necessary)
+    
+        // Set as inclinatum or virga (if necessary), or get contour for grouping
         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
             if (it->first == "diagonalright") {
                 if (it->second == "u") {
@@ -533,6 +534,9 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
                     nc->SetName(ncVis_NAME_inclinatum);
                 }
             }
+            else if (it->first == "contour") {
+                contour = it->second;
+            }
         }
 
         const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -540,7 +544,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
-        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (staffSize * (staff->m_drawingLines - clef->GetLine())) - (uly + noteWidth / 2)) / (double) (staffSize));
+        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (staffSize * (staff->m_drawingLines - clef->GetLine())) - (uly + noteHeight / 2)) / (double) (staffSize));
 
         nc->AdjustPitchByOffset(pitchDifference);
         
@@ -549,7 +553,58 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         zone->SetUly(uly);
         zone->SetLrx(ulx + noteWidth);
         zone->SetLry(uly + noteHeight);
-        m_editInfo = nc->GetUuid();
+
+        //If inserting grouping, add the remaining nc children to the neume.
+        if(contour != ""){
+            Nc *prevNc = nc;
+            for(auto it = contour.begin(); it != contour.end(); ++it) {
+                Nc *newNc = new Nc();
+                Zone *newZone = new Zone();
+                int newUlx = ulx + noteWidth;
+                int newUly;
+
+                newNc->SetPname(prevNc->GetPname());
+                newNc->SetOct(prevNc->GetOct());  
+
+                if((*it) == 'u'){
+                    newUly = uly - noteHeight;
+                    newNc->AdjustPitchByOffset(1);
+                }
+                else if((*it) == 'd'){
+                    newUly = uly + noteHeight;
+                    newNc->AdjustPitchByOffset(-1);
+                }
+                else if((*it) == 's'){
+                    newUly = uly;
+                }
+                else{
+                    LogMessage("Unsupported character in contour.");
+                    return false;
+                }
+                newZone->SetUlx(newUlx);
+                newZone->SetUly(newUly);;
+                newZone->SetLrx(newUlx + noteWidth);
+                newZone->SetLry(newUly + noteHeight);
+
+                newNc->SetZone(newZone);
+                newNc->SetFacs(newZone->GetUuid());
+
+                assert(surface);
+                surface->AddChild(newZone);
+
+                neume->AddChild(newNc);
+
+                ulx = newUlx;
+                uly = newUly;
+                prevNc = newNc;
+            }
+        }
+        if(elementType == "nc"){
+            m_editInfo = nc->GetUuid();
+        }
+        else{
+            m_editInfo = neume->GetUuid();
+        }
     }
     else if (elementType == "clef") {
         Clef *clef = new Clef();
@@ -1013,7 +1068,6 @@ bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
         initialLrx = newLrx;
         initialLry = newLry;
         prevNc = newNc;
-
     }
     m_editInfo = el->GetUuid();
     return true;
