@@ -1201,6 +1201,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             // there should always only be one element in the harmony stack
             if (!m_harmStack.empty() && !m_harmStack.back()->HasStartid()) {
                 m_harmStack.back()->SetStartid("#" + m_ID);
+                m_harmStack.clear();
             }
             if (!m_tieStack.empty()) {
                 m_tieStack.back()->SetEndid("#" + m_ID);
@@ -1333,16 +1334,17 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         // text elements
         else if (musicCode[i] == '\"') {
             ++i;
-            Harm *harm = new Harm();
             std::string chordSymbol;
             while (musicCode[i] != '\"') {
                 chordSymbol.push_back(musicCode[i]);
                 ++i;
             }
+            Harm *harm = new Harm();
             Text *text = new Text();
             text->SetText(UTF8to16(chordSymbol));
             harm->AddChild(text);
             m_harmStack.push_back(harm);
+            m_controlElements.push_back(std::make_pair(measure->GetUuid(), harm));
         }
 
         // suppressing score line-breaks
@@ -1358,12 +1360,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             if (m_layer->GetChildCount()) {
                 staff->AddChild(m_layer);
                 measure->AddChild(staff);
-                if (!m_harmStack.empty()) {
-                    for (auto it = m_harmStack.begin(); it != m_harmStack.end(); ++it) {
-                        measure->AddChild(*it);
-                    }
-                    m_harmStack.clear();
-                }
                 for (auto it = m_tempoStack.begin(); it != m_tempoStack.end(); ++it) {
                     measure->AddChild(*it);
                 }
