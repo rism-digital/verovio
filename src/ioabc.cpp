@@ -1364,17 +1364,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                     measure->AddChild(*it);
                 }
                 m_tempoStack.clear();
-                // before adding the measure, check if there's a change in meter
-                if (m_meter) {
-                    // todo: apply meter changes to staves
-                    ScoreDef *scoreDef = new ScoreDef();
-                    scoreDef->SetMeterCount(m_meter->GetCount());
-                    scoreDef->SetMeterUnit(m_meter->GetUnit());
-                    scoreDef->SetMeterSym(m_meter->GetSym());
-                    section->AddChild(scoreDef);
-                    delete m_meter;
-                    m_meter = NULL;
-                }
                 section->AddChild(measure);
                 measure = new Measure();
                 staff = new Staff();
@@ -1386,6 +1375,18 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         }
 
         ++i;
+
+        // check if there is a change in meter
+        if (m_meter) {
+            // todo: apply meter changes to staves
+            ScoreDef *scoreDef = new ScoreDef();
+            scoreDef->SetMeterCount(m_meter->GetCount());
+            scoreDef->SetMeterUnit(m_meter->GetUnit());
+            scoreDef->SetMeterSym(m_meter->GetSym());
+            section->AddChild(scoreDef);
+            delete m_meter;
+            m_meter = NULL;
+        }
     }
 
     // by default, line-breaks in the code generate line-breaks in the typeset score
