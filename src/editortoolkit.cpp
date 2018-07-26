@@ -668,12 +668,15 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         else if (clef->GetShape() == CLEFSHAPE_F)
             custos->SetPname(PITCHNAME_f);
 
-        const int staffSize = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        const int pitchDifference = round((double) (clef->GetZone()->GetUly() - uly) / (double) staffSize);
-        custos->AdjustPitchByOffset(pitchDifference);
+        const int staffSize = staff->m_drawingStaffSize;
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
-        
+        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (2 * staffSize * (staff->m_drawingLines - clef->GetLine())) - (uly)) / (double) (staffSize));
+
+        custos->AdjustPitchByOffset(pitchDifference);
+        ulx -= noteWidth / 2;
+        uly -= noteHeight / 2;
+
         zone->SetUlx(ulx);
         zone->SetUly(uly);
         zone->SetLrx(ulx + noteWidth);
