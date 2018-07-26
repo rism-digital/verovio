@@ -535,12 +535,11 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
             }
         }
 
-        const int staffSize = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-
+        const int staffSize = staff->m_drawingStaffSize;
         const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
 
-        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (staffSize * (staff->m_drawingLines - clef->GetLine())) - (uly + noteWidth / 2)) / (double) (staffSize));
+        const int pitchDifference = round((double) (staff->GetZone()->GetUly() + (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine())) - (uly + noteHeight / 2)) / (double) (m_doc->GetDrawingUnit(staffSize)));
 
         nc->AdjustPitchByOffset(pitchDifference);
         
