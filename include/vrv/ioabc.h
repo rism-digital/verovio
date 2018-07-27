@@ -61,8 +61,8 @@ private:
     void AddAnnot(std::string remark);
     void AddBeam();
     void AddTuplet();
-    void AddTie(Measure *measure);
-    void StartSlur(Measure *measure);
+    void AddTie();
+    void StartSlur();
     void EndSlur();
 
     // parse information fields

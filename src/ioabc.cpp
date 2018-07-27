@@ -195,16 +195,18 @@ void AbcInput::parseABC(std::istream &infile)
     }
 
     // add ornaments, ties, and slur
+    Layer *layer = NULL;
     Measure *measure = NULL;
     for (auto iter = m_controlElements.begin(); iter != m_controlElements.end(); ++iter) {
-        if (!measure || (measure->GetUuid() != iter->first)) {
-            measure = dynamic_cast<Measure *>(section->FindChildByUuid(iter->first));
+        if (!measure || (layer->GetUuid() != iter->first)) {
+            layer = dynamic_cast<Layer *>(section->FindChildByUuid(iter->first));
         }
-        if (!measure) {
-            LogWarning("ABC input: Element '%s' could not be added to measure '%s'",
+        if (!layer) {
+            LogWarning("ABC input: Element '%s' could not be assigned to layer '%s'",
                 iter->second->GetClassName().c_str(), iter->first.c_str());
             continue;
         }
+        measure = dynamic_cast<Measure *>(layer->GetFirstParent(MEASURE));
         measure->AddChild(iter->second);
     }
 
@@ -317,10 +319,9 @@ void AbcInput::AddAnnot(std::string remark)
     m_layer->AddChild(annot);
 }
 
-void AbcInput::AddArticulation(LayerElement *element, Measure *measure)
+void AbcInput::AddArticulation(LayerElement *element)
 {
     assert(element);
-    assert(measure);
 
     Artic *artic = new Artic();
     artic->SetArtic(m_artic);
@@ -329,7 +330,7 @@ void AbcInput::AddArticulation(LayerElement *element, Measure *measure)
     m_artic.clear();
 }
 
-void AbcInput::AddDynamic(LayerElement *element, Measure *measure)
+void AbcInput::AddDynamic(LayerElement *element)
 {
     assert(element);
     assert(measure);
@@ -340,13 +341,13 @@ void AbcInput::AddDynamic(LayerElement *element, Measure *measure)
         Text *text = new Text();
         text->SetText(UTF8to16(*it));
         dynam->AddChild(text);
-        m_controlElements.push_back(std::make_pair(measure->GetUuid(), dynam));
+        m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), dynam));
     }
 
     m_dynam.clear();
 }
 
-void AbcInput::AddFermata(LayerElement *element, Measure *measure)
+void AbcInput::AddFermata(LayerElement *element)
 {
     assert(element);
     assert(measure);
@@ -354,12 +355,12 @@ void AbcInput::AddFermata(LayerElement *element, Measure *measure)
     Fermata *fermata = new Fermata();
     fermata->SetStartid("#" + element->GetUuid());
     fermata->GetPlaceAlternate()->SetBasic(m_fermata);
-    m_controlElements.push_back(std::make_pair(measure->GetUuid(), fermata));
+    m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), fermata));
 
     m_fermata = STAFFREL_basic_NONE;
 }
 
-void AbcInput::AddOrnaments(LayerElement *element, Measure *measure)
+void AbcInput::AddOrnaments(LayerElement *element)
 {
     assert(element);
     assert(measure);
@@ -370,56 +371,54 @@ void AbcInput::AddOrnaments(LayerElement *element, Measure *measure)
         Mordent *mordent = new Mordent();
         mordent->SetStartid(refId);
         mordent->SetForm(mordentLog_FORM_lower);
-        m_controlElements.push_back(std::make_pair(measure->GetUuid(), mordent));
+        m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), mordent));
     }
     if (m_ornam.find("M") != std::string::npos) {
         Mordent *mordent = new Mordent();
         mordent->SetStartid(refId);
         mordent->SetForm(mordentLog_FORM_upper);
-        m_controlElements.push_back(std::make_pair(measure->GetUuid(), mordent));
+        m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), mordent));
     }
     if (m_ornam.find("s") != std::string::npos) {
         Turn *turn = new Turn();
         turn->SetStartid(refId);
         turn->SetForm(turnLog_FORM_lower);
-        m_controlElements.push_back(std::make_pair(measure->GetUuid(), turn));
+        m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), turn));
     }
     if (m_ornam.find("S") != std::string::npos) {
         Turn *turn = new Turn();
         turn->SetStartid(refId);
         turn->SetForm(turnLog_FORM_upper);
-        m_controlElements.push_back(std::make_pair(measure->GetUuid(), turn));
+        m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), turn));
     }
     if (m_ornam.find("T") != std::string::npos) {
         Trill *trill = new Trill();
         trill->SetStartid(refId);
-        m_controlElements.push_back(std::make_pair(measure->GetUuid(), trill));
+        m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), trill));
     }
 
     m_ornam.clear();
 }
 
-void AbcInput::AddTie(Measure *measure)
+void AbcInput::AddTie()
 {
-    assert(measure);
-
     if (!m_tieStack.empty()) {
         LogWarning("ABC input: '%s' already tied", m_ID.c_str());
         return;
     }
-    Tie *tie = new Tie();
-    tie->SetStartid(m_ID);
-    m_tieStack.push_back(tie);
-    m_controlElements.push_back(std::make_pair(measure->GetUuid(), tie));
+    if (!m_ID.empty()) {
+      Tie *tie = new Tie();
+      tie->SetStartid(m_ID);
+      m_tieStack.push_back(tie);
+      m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), tie));
+    }
 }
 
-void AbcInput::StartSlur(Measure *measure)
+void AbcInput::StartSlur()
 {
-    assert(measure);
-
     Slur *openSlur = new Slur();
     m_slurStack.push_back(openSlur);
-    m_controlElements.push_back(std::make_pair(measure->GetUuid(), openSlur));
+    m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), openSlur));
 }
 
 void AbcInput::EndSlur()
@@ -527,6 +526,7 @@ void AbcInput::parseInstruction(std::string instruction)
 void AbcInput::parseKey(std::string keyString)
 {
     int i = 0;
+    m_ID = "";
     short int accidNum = 0;
     data_MODE mode = MODE_NONE;
     while (isspace(keyString[i])) ++i;
@@ -1024,13 +1024,13 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
         // slurs and ties
         else if (musicCode[i] == '(') {
-            StartSlur(measure);
+            StartSlur();
         }
         else if (musicCode[i] == ')') {
             EndSlur();
         }
         else if (musicCode[i] == '-') {
-            AddTie(measure);
+            AddTie();
         }
 
         // chords
@@ -1040,17 +1040,17 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
             // add articulation
             if (!m_artic.empty()) {
-                AddArticulation(chord, measure);
+                AddArticulation(chord);
             }
 
             // add dynamics
             if (!m_dynam.empty()) {
-                AddDynamic(chord, measure);
+                AddDynamic(chord);
             }
 
             // add fermata
             if (m_fermata != STAFFREL_basic_NONE) {
-                AddFermata(chord, measure);
+                AddFermata(chord);
             }
         }
         else if (musicCode[i] == ']' && musicCode[i - 1] != '|') {
@@ -1173,22 +1173,22 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
             // add articulation
             if (!m_artic.empty()) {
-                AddArticulation(note, measure);
+                AddArticulation(note);
             }
 
             // add dynamics
             if (!m_dynam.empty()) {
-                AddDynamic(note, measure);
+                AddDynamic(note);
             }
 
             // add fermata
             if (m_fermata != STAFFREL_basic_NONE) {
-                AddFermata(note, measure);
+                AddFermata(note);
             }
 
             // add ornaments
             if (!m_ornam.empty()) {
-                AddOrnaments(note, measure);
+                AddOrnaments(note);
             }
 
             if (chord) {
@@ -1284,7 +1284,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
             // add Fermata
             if (m_fermata != STAFFREL_basic_NONE) {
-                AddFermata(rest, measure);
+                AddFermata(rest);
             }
 
             // set duration
@@ -1370,7 +1370,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             text->SetText(UTF8to16(chordSymbol));
             harm->AddChild(text);
             m_harmStack.push_back(harm);
-            m_controlElements.push_back(std::make_pair(measure->GetUuid(), harm));
+            m_controlElements.push_back(std::make_pair(m_layer->GetUuid(), harm));
         }
 
         // suppressing score line-breaks
