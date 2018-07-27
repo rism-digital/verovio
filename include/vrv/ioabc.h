@@ -107,6 +107,7 @@ private:
     int m_lineNum = 0;
     int m_broken = 0;
     int m_gracecount = 0;
+    int m_stafflines = 5;
     std::vector<std::pair<std::string, int> > m_composer; // C:
     std::vector<std::pair<std::string, int> > m_history; // H:
     std::vector<std::pair<std::string, int> > m_notes; // N:
