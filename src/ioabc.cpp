@@ -707,7 +707,7 @@ void AbcInput::parseTempo(std::string tempoString)
         tempo->SetTstamp(1);
     }
     m_tempoStack.push_back(tempo);
-    LogWarning("ABC input: tempo definitions are not fully supported yet");
+    LogWarning("ABC input: Tempo definitions are not fully supported yet");
 }
 
 void AbcInput::parseReferenceNumber(std::string referenceNumberString)
@@ -1083,6 +1083,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
             // accidentals
             if (musicCode[i - 1] == '^' || musicCode[i - 1] == '=' || musicCode[i - 1] == '_') {
+                // todo: double sharps and double flats
                 Accid *accid = new Accid();
                 switch (musicCode[i - 1]) {
                     case '^': accid->SetAccid(ACCIDENTAL_WRITTEN_s); break;
@@ -1341,6 +1342,11 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         // text elements
         else if (musicCode[i] == '\"') {
             ++i;
+            if (musicCode[i] == '^' || musicCode[i] == '_' || musicCode[i] == '<' || musicCode[i] == '>'
+                || musicCode[i] == '@') {
+                LogWarning("ABC input: Annotations are not fully support yet");
+                ++i;
+            }
             std::string chordSymbol;
             while (musicCode[i] != '\"') {
                 chordSymbol.push_back(musicCode[i]);
