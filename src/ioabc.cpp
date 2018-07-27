@@ -1152,6 +1152,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             }
             if ((numbase & (numbase - 1)) != 0) LogError("ABC input: note length divider must be power of 2");
             int dur = (num == 0) ? 4 : m_unitDur * numbase / num;
+            data_DURATION meiDur
+                = (dur == 0) ? DURATION_breve : note->AttDurationLogical::StrToDuration(std::to_string(dur));
 
             // set grace
             if (grace != GRACE_NONE) {
@@ -1188,7 +1190,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 if (!chord->HasDur()) {
                     if (dots > 0) chord->SetDots(dots);
                     if (num == 0) chord->SetStemVisible(BOOLEAN_false);
-                    chord->SetDur(note->AttDurationLogical::StrToDuration(std::to_string(dur)));
+                    chord->SetDur(meiDur);
                 }
             }
             else {
@@ -1200,7 +1202,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
                 else if (!note->HasDots() && (m_broken > 0) && (grace == GRACE_NONE)) {
                     for (; m_broken != 0; --m_broken) dur = dur * 2;
                 }
-                note->SetDur(note->AttDurationLogical::StrToDuration(std::to_string(dur)));
+                note->SetDur(meiDur);
                 if (note->GetDur() < DURATION_8) {
                     // if note cannot be beamed, write it directly to the layer
                     if (m_noteStack.size() > 0) AddBeam();
@@ -1317,6 +1319,8 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             }
             if ((numbase & (numbase - 1)) != 0) LogError("ABC input: note length divider must be power of 2");
             int dur = m_unitDur * numbase / num;
+            data_DURATION meiDur
+                = (dur == 0) ? DURATION_breve : rest->AttDurationLogical::StrToDuration(std::to_string(dur));
 
             if (dots > 0) rest->SetDots(dots);
             if ((m_broken < 0) && (grace == GRACE_NONE)) {
@@ -1325,7 +1329,7 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             else if (!rest->HasDots() && (m_broken > 0) && (grace == GRACE_NONE)) {
                 for (; m_broken != 0; --m_broken) dur = dur * 2;
             }
-            rest->SetDur(rest->AttDurationLogical::StrToDuration(std::to_string(dur)));
+            rest->SetDur(meiDur);
 
             m_noteStack.push_back(rest);
         }
