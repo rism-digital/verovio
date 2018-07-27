@@ -913,10 +913,13 @@ void AbcInput::readInformationField(char dataKey, std::string value)
         m_title.push_back(std::make_pair(value, m_lineNum));
     }
     else if (dataKey == 'U') {
-        LogError("ABC input: User defined sympols are not supported");
+        LogWarning("ABC input: User defined sympols are not supported");
     }
     else if (dataKey == 'V') {
-        LogError("ABC input: Multi-voice music is not supported");
+        LogWarning("ABC input: Multi-voice music is not supported");
+    }
+    else if (dataKey == 'W') {
+        LogWarning("ABC input: Lyrics are not supported yet");
     }
     else if (dataKey == 'X') {
         parseReferenceNumber(value);
