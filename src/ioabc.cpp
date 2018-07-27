@@ -148,7 +148,7 @@ void AbcInput::parseABC(std::istream &infile)
     m_doc->m_scoreDef.AddChild(staffGrp);
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN(1);
-    staffDef->SetLines(5);
+    staffDef->SetLines(m_stafflines);
     staffGrp->AddChild(staffDef);
     if (m_meter) {
         m_doc->m_scoreDef.SetMeterCount(m_meter->GetCount());
@@ -636,8 +636,10 @@ void AbcInput::parseKey(std::string keyString)
         trans = trans * atoi(transStr.c_str());
     }
 
+    // stafflines
     if (keyString.find("stafflines=", i) != std::string::npos) {
-        LogWarning("ABC input: 'stafflines' is not supported yet.");
+        int pos = keyString.find("stafflines=", i) + 11;
+        m_stafflines = atoi(keyString.substr(pos, keyString.find_first_not_of("0123456789", pos)).c_str());
     }
 }
 
