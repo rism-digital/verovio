@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jul 17 16:24:17 CEST 2018
+// Last Modified: Fri Jul 27 10:43:04 CEST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -23343,8 +23343,7 @@ bool MxmlEvent::isChord(void) const {
 
 //////////////////////////////
 //
-// MxmlEvent::isGrace -- Returns true if the event is the primary note
-//    in a chord.
+// MxmlEvent::isGrace -- Returns true if the event is a grace note.
 //
 
 bool MxmlEvent::isGrace(void) {
@@ -23364,6 +23363,39 @@ bool MxmlEvent::isGrace(void) {
 	}
 	return false;
 }
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::hasGraceSlash -- Returns true if the note is a grace note
+//    with a slash.
+//
+
+bool MxmlEvent::hasGraceSlash(void) {
+	xml_node child = this->getNode();
+	if (!nodeType(child, "note")) {
+		return false;
+	}
+	child = child.first_child();
+	while (child) {
+		if (nodeType(child, "grace")) {
+			string slash = child.attribute("slash").value();
+			if (slash == "yes") {
+				return true;
+			} else {
+				return false;
+			}
+		} else if (nodeType(child, "pitch")) {
+			// grace element has to come before pitch
+			return false;
+		}
+		child = child.next_sibling();
+	}
+	return false;
+}
+
+
 
 
 
@@ -46213,6 +46245,9 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 				recip = to_string(dur.getDenominator()) + "q";
 			} else {
 				recip = "q";
+			}
+			if (!event->hasGraceSlash()) {
+				recip += "q";
 			}
 		}
 	}
