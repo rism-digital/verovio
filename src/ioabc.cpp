@@ -1016,8 +1016,14 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
             }
         }
 
+        // tuplets
+        else if (musicCode[i] == '(' && isdigit(musicCode[i + 1])) {
+            LogWarning("ABC input: Tuplets not supported yet");
+            // AddTuplet();
+        }
+
         // slurs and ties
-        else if (musicCode[i] == '(' && !isdigit(musicCode[i + 1])) {
+        else if (musicCode[i] == '(') {
             StartSlur(measure);
         }
         else if (musicCode[i] == ')') {
