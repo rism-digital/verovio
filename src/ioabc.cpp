@@ -425,6 +425,11 @@ void AbcInput::StartSlur(Measure *measure)
 void AbcInput::EndSlur()
 {
     if (!m_slurStack.empty()) {
+        if (!m_slurStack.back()->HasStartid()) {
+            LogError("ABC input: Empty slur found");
+            m_slurStack.pop_back();
+            return;
+        }
         for (auto riter = m_slurStack.rbegin(); riter != m_slurStack.rend(); ++riter) {
             if (((*riter)->GetStartid()).find(m_ID) == std::string::npos) {
                 (*riter)->SetEndid("#" + m_ID);
