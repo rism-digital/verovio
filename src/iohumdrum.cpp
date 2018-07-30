@@ -7847,6 +7847,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             tstart[tupletgroups[i] - 1] = true;
         }
     }
+
     for (int i = (int)tupletgroups.size() - 1; i >= 0; i--) {
         if (!tupletgroups[i]) {
             continue;
@@ -8014,6 +8015,18 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         }
     }
 
+    // Renumber tuplet groups in sequence (otherwise the mergeTupletCuttingBeam()
+    // function will delete the 1st group if it is not the first tuplet.
+    int tcounter = 0;
+    for (int i = 0; i < (int)tg.size(); i++) {
+        if (tg[i].tupletstart) {
+            tg[i].tupletstart = ++tcounter;
+        }
+        else if (tg[i].tupletend) {
+            tg[i].tupletend = tcounter;
+        }
+    }
+
     mergeTupletsCuttingBeam(tg);
     resolveTupletBeamTie(tg);
 }
@@ -8028,7 +8041,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
 
 void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTuplet> &tg)
 {
-    vector<int> inbeam(tg.size(), 0);
+    std::vector<int> inbeam(tg.size(), 0);
     for (int i = 0; i < (int)inbeam.size(); i++) {
         if (tg[i].beamstart) {
             inbeam[i] = tg[i].beamstart;
@@ -8044,6 +8057,7 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
         }
     }
 
+    std::vector<int> scaleadj(tg.size(), 1);
     for (int i = 0; i < (int)tg.size(); i++) {
         if (!(inbeam[i] && tg[i].tupletend)) {
             continue;
@@ -8060,7 +8074,35 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
         if (tg[i].numbase != tg[i + 1].numbase) {
             continue;
         }
-        // need to merge adjacent tuplets
+        // Need to merge adjacent tuplets (only can merge one pair at a time
+        // properly with scaleadj at the moment).
+        int target = tg[i].tupletend;
+        for (int j = i; j >= 0; j--) {
+            if (!tg[j].tupletstart) {
+                scaleadj[j] = 2;
+                continue;
+            }
+            if (target == tg[j].tupletstart) {
+                scaleadj[j] = 2;
+                break;
+            }
+            cerr << "SOMETHING STANGE HAPPENED HERE" << endl;
+        }
+        target = tg[i + 1].tupletstart;
+        scaleadj[i] = 2;
+        scaleadj[i + 1] = 2;
+        for (int j = i + 1; j < (int)tg.size(); j++) {
+            if (!tg[j].tupletend) {
+                scaleadj[j] = 2;
+                continue;
+            }
+            if (target == tg[j].tupletend) {
+                scaleadj[j] = 2;
+                break;
+            }
+            cerr << "SOMETHING STANGE HAPPENED HERE2" << endl;
+        }
+
         tg[i].tupletend = 0;
         tg[i + 1].tupletstart = 0;
         for (int j = i + 2; j < (int)tg.size(); j++) {
@@ -8077,8 +8119,12 @@ void HumdrumInput::mergeTupletsCuttingBeam(std::vector<humaux::HumdrumBeamAndTup
         cerr << "INDEX\tBEAM\tTSTART\tTEND\tNUM\tNUMBASE\n";
         for (int i = 0; i < (int)tg.size(); i++) {
             cerr << "I " << i << ":\t" << inbeam[i] << "\t" << tg[i].tupletstart << "\t" << tg[i].tupletend << "\t"
-                 << tg[i].num << "\t" << tg[i].numbase << endl;
+                 << tg[i].num << "\t" << tg[i].numbase << "\tSA=" << scaleadj[i] << endl;
         }
+    }
+
+    for (int i = 0; i < (int)tg.size(); i++) {
+        tg[i].numscale *= scaleadj[i];
     }
 }
 
