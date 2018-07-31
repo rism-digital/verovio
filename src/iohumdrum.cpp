@@ -6974,6 +6974,10 @@ void HumdrumInput::calculateNoteIdForSlur(std::string &idstring, std::vector<pai
     else {
         position = (notecount - index) * 2 - 1;
     }
+    if (position < 0) {
+        position += 100 * notecount;
+        position %= notecount;
+    }
     int subtoken = sortednotes.at(position).second;
     // collapse cases where there are more slurs than notes:
     subtoken = subtoken % notecount;
