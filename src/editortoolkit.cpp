@@ -858,10 +858,27 @@ bool EditorToolkit::Remove(std::string elementId)
     }
     Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
     assert(obj);
+    bool result, isNeume;
+    isNeume = (obj->Is(NC) || obj->Is(NEUME) || obj->Is(SYLLABLE));
+    LogMessage("isNeume is %s", isNeume ? "true" : "false");
     Object *parent = obj->GetParent();
     assert(parent);
     m_editInfo = elementId;
-    return parent->DeleteChild(obj);
+    result = parent->DeleteChild(obj);
+    if (isNeume && result) {
+        if (!parent->Is(SYLLABLE)) {
+            parent = parent->GetFirstParent(SYLLABLE);
+            if (parent == nullptr) { LogMessage("Failed to get syllable parent!"); return false; }
+        }
+        assert(parent->Is(SYLLABLE));
+        if (parent->FindChildByType(NC) == nullptr) {
+            obj = parent;
+            parent = parent->GetParent();
+            if (parent == nullptr) { LogMessage("Null parent!"); return false; }
+            result &= parent->DeleteChild(obj);
+        }
+    }
+    return result;
 }
 
 std::string EditorToolkit::EditInfo()
