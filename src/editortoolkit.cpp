@@ -873,7 +873,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
 {
     m_editInfo = "";
     Object *newParent, *neumeParent, *newSylParent, *sylParent;
-    std::set<Object *> parents;
+    std::set<Object *> sylParents, neumeParents;
 
     //Get the current drawing page
     if (!m_doc->GetDrawingPage()) {
@@ -907,23 +907,36 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
                 assert(neumeParent);
                 sylParent = neumeParent->GetFirstParent(SYLLABLE);
                 assert(sylParent);
+                if(newParent != neumeParent){
+                    el->MoveItselfTo(newParent);
+                    neumeParents.insert(neumeParent);
+                }
             }
             else if(groupType == "neume"){
                 sylParent = el->GetFirstParent(SYLLABLE);
                 assert(sylParent);
+                if(newParent != sylParent){
+                    el->MoveItselfTo(newParent);
+                } 
             }
-            el->MoveItselfTo(newParent);
 
             std::string className = sylParent->GetClassName();
             if(className != "Syllable") return false;
 
             if(sylParent != newSylParent){
-                parents.insert(sylParent);
+                sylParents.insert(sylParent);
             }    
         }
     }
     //delete previous parents
-    for (auto it = parents.begin(); it != parents.end(); ++it) {
+    for (auto it = neumeParents.begin(); it != neumeParents.end(); ++it) {
+        Object *p = (*it)->GetParent();
+        if(!p->DeleteChild(*it)){
+            LogError("Unable to delete child during grouping.");
+            return false;
+        }
+    }
+    for (auto it = sylParents.begin(); it != sylParents.end(); ++it) {
         Object *p = (*it)->GetParent();
         if(!p->DeleteChild(*it)){
             LogError("Unable to delete child during grouping.");
