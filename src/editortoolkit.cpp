@@ -139,6 +139,14 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         }
         LogWarning("Could not parse change group action");
     }
+    else if (action == "toggleLigature"){
+        std::vector<std::string> elementIds;
+        std::string isLigature;
+        if(this->ParseToggleLigatureAction(json.get<jsonxx::Object>("param"), &elementIds, &isLigature)){
+            return this->ToggleLigature(elementIds, isLigature);
+        }
+        LogWarning("Could not parse toggle ligature action");
+    }
     else {
         LogWarning("Unknown action type.");
     }
@@ -1105,6 +1113,79 @@ bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
     return true;
 }
 
+bool EditorToolkit::ToggleLigature(std::vector<std::string> elementIds, std::string isLigature)
+{
+    m_editInfo = "";
+    bool success1 = false;
+    bool success2 = false;
+    std::string firstNcId = elementIds[0];
+    std::string secondNcId = elementIds[1];
+    //Check if you can get drawing page
+    if(!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        return false;
+    }
+
+    Nc *firstNc = dynamic_cast<Nc *> (m_doc->GetDrawingPage()->FindChildByUuid(firstNcId));
+    assert(firstNc);
+    Nc *secondNc = dynamic_cast<Nc *> (m_doc->GetDrawingPage()->FindChildByUuid(secondNcId));
+    assert(secondNc);
+    Zone *zone = new Zone();
+    //set ligature to false and update zone of second Nc
+    if(isLigature == "true"){
+        if (Att::SetVisual(firstNc, "ligature", "false")) success1 = true;
+
+        int ligUlx = firstNc->GetZone()->GetUlx();
+        int ligUly = firstNc->GetZone()->GetUly();
+        int ligLrx = firstNc->GetZone()->GetLrx();
+        int ligLry = firstNc->GetZone()->GetLry();
+
+        Staff *staff = dynamic_cast<Staff *> (firstNc->GetFirstParent(STAFF));
+        assert(staff);
+
+        const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+
+        zone->SetUlx(ligUlx + noteWidth);
+        zone->SetUly(ligUly + noteHeight);
+        zone->SetLrx(ligLrx + noteWidth);
+        zone->SetLry(ligLry + noteHeight);
+
+        secondNc->SetZone(zone);
+        secondNc->ResetFacsimile();
+        secondNc->SetFacs(zone->GetUuid());
+
+        if (Att::SetVisual(secondNc, "ligature", "false")) success2 = true;
+    }
+    //set ligature to true and update zones to be the same
+    else if (isLigature == "false"){
+        if (Att::SetVisual(firstNc, "ligature", "true")) success1 = true;
+
+        zone->SetUlx(firstNc->GetZone()->GetUlx());
+        zone->SetUly(firstNc->GetZone()->GetUly());
+        zone->SetLrx(firstNc->GetZone()->GetLrx());
+        zone->SetLry(firstNc->GetZone()->GetLry());
+
+        secondNc->SetZone(zone);
+        secondNc->ResetFacsimile();
+        secondNc->SetFacs(zone->GetUuid());
+
+        if (Att::SetVisual(secondNc, "ligature", "true")) success2 = true;
+    }
+    else {
+        LogWarning("isLigature is invalid!");
+        return false;
+    }
+    if (success1 && success2 && m_doc->GetType() != Facs) {
+        m_doc->PrepareDrawing();
+        m_doc->GetDrawingPage()->LayOut(true);
+    }
+    if(!(success1 && success2)){
+        LogWarning("Unable to update ligature attribute");
+    }
+    return success1 && success2;
+}
+
 bool EditorToolkit::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
 {
     if (!param.has<jsonxx::String>("elementId")) return false; 
@@ -1256,6 +1337,20 @@ bool EditorToolkit::ParseChangeGroupAction(
     (*elementId) = param.get<jsonxx::String>("elementId");
     if(!param.has<jsonxx::String>("contour")) return false;
     (*contour) = param.get<jsonxx::String>("contour");
+    return true;
+} 
+
+bool EditorToolkit::ParseToggleLigatureAction(
+    jsonxx::Object param, std::vector<std::string> *elementIds, std::string *isLigature)
+{
+    if(!param.has<jsonxx::Array>("elementIds")) return false;
+    jsonxx::Array array = param.get<jsonxx::Array>("elementIds");
+    for (int i = 0; i < array.size(); i++) {
+        elementIds->push_back(array.get<jsonxx::String>(i));
+    }
+    if(!param.has<jsonxx::String>("isLigature")) return false;
+    (*isLigature) = param.get<jsonxx::String>("isLigature");
+
     return true;
 }
 
