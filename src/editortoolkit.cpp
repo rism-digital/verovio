@@ -38,7 +38,7 @@
 namespace vrv {
 
 #ifdef USE_EMSCRIPTEN
-bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
+bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction, bool isChain)
 {
     jsonxx::Object json;
 
@@ -65,7 +65,7 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction)
         std::string elementId;
         int x,y;
         if (this->ParseDragAction(json.get<jsonxx::Object>("param"), &elementId, &x, &y)) {
-            return this->Drag(elementId, x, y);
+            return this->Drag(elementId, x, y, isChain);
         }    
         LogWarning("Could not parse the drag action");
     }
@@ -157,22 +157,33 @@ bool EditorToolkit::Chain(jsonxx::Array actions)
 {
     bool status = true;
     std::string info = "[";
+    bool runReorder = false;
+    std::string id = "";
     for (int i = 0; i < actions.size(); i++) {
         if (!actions.has<jsonxx::Object>(i)) {
             LogError("Action %d was not an object", i);
             return false;
         }
-        status |= this->ParseEditorAction(actions.get<jsonxx::Object>(i).json());
+        if (actions.get<jsonxx::Object>(i).get<jsonxx::String>("action") == "drag") {
+            runReorder = true;
+            id = actions.get<jsonxx::Object>(i).get<jsonxx::Object>("param").get<jsonxx::String>("elementId");
+        }
+        status |= this->ParseEditorAction(actions.get<jsonxx::Object>(i).json(), true);
         if (i != 0)
             info += ", ";
         info += "\"" + m_editInfo + "\"";
     }
     info += "]";
-    m_editInfo = info; 
+    m_editInfo = info;
+    if (status && runReorder) {
+        Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(id);
+        Layer *layer = dynamic_cast<Layer *>(obj->GetFirstParent(LAYER));
+        layer->ReorderByXPos();
+    }
     return status;
 }
 
-bool EditorToolkit::Drag(std::string elementId, int x, int y)
+bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
 {
     m_editInfo = "";
     if (!m_doc->GetDrawingPage()) {
@@ -377,8 +388,10 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y)
         LogWarning("Unsupported element for dragging.");
         return false;
     }
-    Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
-    layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
+    if (!isChain) {
+        Layer *layer = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
+        layer->ReorderByXPos(); // Reflect position order of elements internally (and in the resulting output file)
+    }
     return true;
 }
 

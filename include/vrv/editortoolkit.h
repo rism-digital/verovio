@@ -30,14 +30,14 @@ public:
     EditorToolkit(Doc *doc, View *view) { m_doc = doc; m_view = view; m_editInfo = ""; }
 
 #ifdef USE_EMSCRIPTEN
-    bool ParseEditorAction(const std::string &json_editorAction);
+    bool ParseEditorAction(const std::string &json_editorAction, bool isChain=false);
 
     /**
      * Experimental editor functions.
      */
     ///@{
     bool Chain(jsonxx::Array actions);
-    bool Drag(std::string elementId, int x, int y);
+    bool Drag(std::string elementId, int x, int y, bool isChain=false);
     bool Insert(std::string elementType, std::string startId, std::string endId);
     bool Insert(std::string elementType, std::string staffId, int ulx, int uly,
         int lrx, int lry, std::vector<std::pair<std::string, std::string>> attributes);
