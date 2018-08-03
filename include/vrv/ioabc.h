@@ -79,10 +79,10 @@ private:
 
     // decoration functions
     void parseDecoration(std::string decorationString);
-    void AddArticulation(LayerElement *element, Measure *measure);
-    void AddDynamic(LayerElement *element, Measure *measure);
-    void AddFermata(LayerElement *element, Measure *measure);
-    void AddOrnaments(LayerElement *element, Measure *measure);
+    void AddArticulation(LayerElement *element);
+    void AddDynamic(LayerElement *element);
+    void AddFermata(LayerElement *element);
+    void AddOrnaments(LayerElement *element);
 
     // additional functions
     void PrintInformationFields();
