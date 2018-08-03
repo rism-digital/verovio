@@ -1430,10 +1430,11 @@ bool sortByUlx(Object *a, Object *b)
         ArrayOfObjects children;
         a->FindAllChildByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
-            fa = dynamic_cast<FacsimileInterface *>(*it);
-            assert(fa);
-            if (fa->HasFacs()) break;
-            fa = nullptr;
+            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            assert(temp);
+            if (temp->HasFacs() && (fa == nullptr || temp->GetZone()->GetUlx() < fa->GetZone()->GetUlx())) {
+                fa = temp;
+            }
         }
     }
     if (b->GetFacsimileInterface())
@@ -1442,14 +1443,18 @@ bool sortByUlx(Object *a, Object *b)
         ArrayOfObjects children;
         b->FindAllChildByComparison(&children, &comp);
         for (auto it = children.begin(); it != children.end(); ++it) {
-            fb = dynamic_cast<FacsimileInterface *>(*it);
-            assert(fb);
-            if (fb->HasFacs()) break;
-            fb = nullptr;
+            FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+            assert(temp);
+            if (temp->HasFacs() && (fb == nullptr || temp->GetZone()->GetUlx() < fb->GetZone()->GetUlx())) {
+                fb = temp;
+            }
         }
     }
 
-    if (fa == nullptr || fb == nullptr) return false;
+    if (fa == nullptr || fb == nullptr) {
+        LogMessage("Null pointer(s) for '%s' and '%s'", a->GetUuid().c_str(), b->GetUuid().c_str());
+        return false;
+    }
 
     return (fa->GetZone()->GetUlx() < fb->GetZone()->GetUlx());
 }
