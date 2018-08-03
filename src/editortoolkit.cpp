@@ -646,7 +646,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         zone->SetLrx(ulx + staffSize / 1.4);
         zone->SetLry(uly + staffSize / 2);
         clef->SetZone(zone);
-        clef->SetFacs(zone->GetUuid());
+        clef->SetFacs(zone->GetUuid()); 
         Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
         assert(surface);
         surface->AddChild(zone);
@@ -1118,6 +1118,10 @@ bool EditorToolkit::ToggleLigature(std::vector<std::string> elementIds, std::str
     m_editInfo = "";
     bool success1 = false;
     bool success2 = false;
+    Facsimile *facsimile = m_doc->GetFacsimile();
+    assert(facsimile);
+    Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
+    assert(surface);
     std::string firstNcId = elementIds[0];
     std::string secondNcId = elementIds[1];
     //Check if you can get drawing page
@@ -1151,6 +1155,9 @@ bool EditorToolkit::ToggleLigature(std::vector<std::string> elementIds, std::str
         zone->SetLrx(ligLrx + noteWidth);
         zone->SetLry(ligLry + noteHeight);
 
+        Zone *origZoneUuid = secondNc->GetZone();
+        surface->DeleteChild(origZoneUuid);
+
         secondNc->SetZone(zone);
         secondNc->ResetFacsimile();
         secondNc->SetFacs(zone->GetUuid());
@@ -1165,6 +1172,9 @@ bool EditorToolkit::ToggleLigature(std::vector<std::string> elementIds, std::str
         zone->SetUly(firstNc->GetZone()->GetUly());
         zone->SetLrx(firstNc->GetZone()->GetLrx());
         zone->SetLry(firstNc->GetZone()->GetLry());
+
+        Zone *origZoneUuid = secondNc->GetZone();
+        surface->DeleteChild(origZoneUuid);
 
         secondNc->SetZone(zone);
         secondNc->ResetFacsimile();
@@ -1183,6 +1193,8 @@ bool EditorToolkit::ToggleLigature(std::vector<std::string> elementIds, std::str
     if(!(success1 && success2)){
         LogWarning("Unable to update ligature attribute");
     }
+    
+    surface->AddChild(zone);
     return success1 && success2;
 }
 
