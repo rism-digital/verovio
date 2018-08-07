@@ -220,7 +220,7 @@ void Staff::SetFromFacsimile(Doc *doc)
     assert(doc);
     Zone *zone = doc->GetFacsimile()->FindZoneByUuid(this->GetFacs());
     assert(zone);
-    m_drawingStaffSize = 100 * (zone->GetLry() - zone->GetUly()) / (doc->GetOptions()->m_unit.GetValue() * 2 * (m_drawingLines - 1));
+    m_drawingStaffSize = (zone->GetLry() - zone->GetUly()) / (2 * (m_drawingLines - 1));
 }
 
 //----------------------------------------------------------------------------
