@@ -7,7 +7,7 @@
 
 #include "editortoolkit.h"
 
-//-------------------------------------------------------------------------------- 
+//--------------------------------------------------------------------------------
 
 #include <locale>
 #include <codecvt>
@@ -66,7 +66,7 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction, bool
         int x,y;
         if (this->ParseDragAction(json.get<jsonxx::Object>("param"), &elementId, &x, &y)) {
             return this->Drag(elementId, x, y, isChain);
-        }    
+        }
         LogWarning("Could not parse the drag action");
     }
     else if (action == "insert") {
@@ -112,7 +112,7 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction, bool
     }
     else if (action == "group") {
         std::string groupType;
-        std::vector<std::string> elementIds; 
+        std::vector<std::string> elementIds;
         if (this->ParseGroupAction(json.get<jsonxx::Object>("param"), &groupType, &elementIds)){
             return this->Group(groupType, elementIds);
         }
@@ -211,7 +211,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
         // Calculate pitch difference based on y difference
         int pitchDifference = round( (double) y / (double) m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
         element->GetPitchInterface()->AdjustPitchByOffset(pitchDifference);
-        
+
         if (element->HasInterface(INTERFACE_FACSIMILE)) {
             bool ignoreFacs = false;
             // Dont adjust the same facsimile twice. NCs in a ligature share a single zone.
@@ -254,7 +254,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
         for (auto it = objects.begin(); it != objects.end(); ++it) {
             Nc *nc = dynamic_cast<Nc *>(*it);
             // Update the neume component
-            nc->AdjustPitchByOffset(pitchDifference); 
+            nc->AdjustPitchByOffset(pitchDifference);
         }
 
         if (neume->HasFacs()) {
@@ -299,7 +299,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
             for (auto it = ncs.begin(); it != ncs.end(); ++it) {
                 Nc *nc = dynamic_cast<Nc *>(*it);
                 // Update the neume component
-                nc->AdjustPitchByOffset(pitchDifference); 
+                nc->AdjustPitchByOffset(pitchDifference);
             }
             if (neume->HasFacs()) {
             Zone *zone = neume->GetZone();
@@ -307,7 +307,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
             zone->ShiftByXY(x, pitchDifference * staff->m_drawingStaffSize);
             }
             else if (dynamic_cast<Nc*>(neume->FindChildByType(NC))->HasFacs()) {
-                std::set<Zone *> childZones; 
+                std::set<Zone *> childZones;
                 for (Object *child = neume->GetFirst(); child != nullptr; child = neume->GetNext()) {
                     FacsimileInterface *fi = child->GetFacsimileInterface();
                     if (fi != nullptr) {
@@ -325,7 +325,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
         assert(clef);
         Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
         if (!layer) return false;
-        
+
         Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
         assert(staff);
         // Note that y param is relative to initial position for clefs
@@ -338,7 +338,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
             ArrayOfObjects objects;
             InterfaceComparison ic(INTERFACE_PITCH);
 
-            layer->FindAllChildByComparison(&objects, &ic); 
+            layer->FindAllChildByComparison(&objects, &ic);
 
             // Adjust all elements who are positioned relative to clef by pitch
             for (auto it = objects.begin(); it != objects.end(); ++it) {
@@ -347,7 +347,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
                 PitchInterface *pi = child->GetPitchInterface();
                 assert(pi);
                 pi->AdjustPitchByOffset(-2 * lineDiff); // One line -> 2 pitches
-            } 
+            }
         }
 
         if (clef->HasFacs()) { // adjust facsimile for clef (if it exists)
@@ -362,7 +362,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
             LogError("Staff dragging is only supported for staves with facsimiles!");
             return false;
         }
-        
+
         // Move staff and all staff children with facsimiles
         ArrayOfObjects children;
         InterfaceComparison ic(INTERFACE_FACSIMILE);
@@ -381,7 +381,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
         }
 
         //TODO Reorder by left-to-right, top-to-bottom
-        
+
         return true; // Can't reorder by layer since staves contain layers
     }
     else {
@@ -517,7 +517,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         nc->SetZone(zone);
         nc->SetFacs(zone->GetUuid());
         Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
-        surface->AddChild(zone);       
+        surface->AddChild(zone);
         zone->SetUlx(ulx);
 
         neume->AddChild(nc);
@@ -526,7 +526,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
 
         // Find closest valid clef
         Clef *clef = nullptr;
-        clef = layer->GetClef(nc); 
+        clef = layer->GetClef(nc);
         if (clef == nullptr) {
             LogError("There is no valid clef available.");
             delete syllable;
@@ -534,7 +534,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
             delete nc;
             return false;
         }
-    
+
         nc->SetOct(3);
         if (clef->GetShape() == CLEFSHAPE_C) {
             nc->SetPname(PITCHNAME_c);
@@ -542,7 +542,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         else if (clef->GetShape() == CLEFSHAPE_F) {
             nc->SetPname(PITCHNAME_f);
         }
-    
+
         // Set as inclinatum or virga (if necessary), or get contour for grouping
         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
             if (it->first == "diagonalright") {
@@ -567,7 +567,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
 
         nc->AdjustPitchByOffset(pitchDifference);
         ulx -= noteWidth / 2;
-        uly -= noteHeight / 2; 
+        uly -= noteHeight / 2;
         // Set up facsimile
         zone->SetUlx(ulx);
         zone->SetUly(uly);
@@ -584,7 +584,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
                 int newUly;
 
                 newNc->SetPname(prevNc->GetPname());
-                newNc->SetOct(prevNc->GetOct());  
+                newNc->SetOct(prevNc->GetOct());
 
                 if((*it) == 'u'){
                     newUly = uly - noteHeight;
@@ -659,7 +659,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         zone->SetLrx(ulx + staffSize / 1.4);
         zone->SetLry(uly + staffSize / 2);
         clef->SetZone(zone);
-        clef->SetFacs(zone->GetUuid()); 
+        clef->SetFacs(zone->GetUuid());
         Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
         assert(surface);
         surface->AddChild(zone);
@@ -673,7 +673,7 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         surface->AddChild(zone);
         custos->SetZone(zone);
         custos->SetFacs(zone->GetUuid());
-        layer->AddChild(custos); 
+        layer->AddChild(custos);
         // Find closest valid clef
         Clef *clef = nullptr;
         clef = layer->GetClef(custos);
@@ -742,9 +742,9 @@ bool EditorToolkit::Merge(std::vector<std::string> elementIds)
 
     uly /= staves.size();
     lry /= staves.size();
-    StaffSort staffSort; 
+    StaffSort staffSort;
     std::sort(staves.begin(), staves.end(), staffSort);
-    
+
     // Move children to the first staff (in order)
     auto stavesIt = staves.begin();
     Staff *fillStaff = dynamic_cast<Staff *>(*stavesIt);
@@ -955,7 +955,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
                 assert(sylParent);
                 if(newParent != sylParent){
                     el->MoveItselfTo(newParent);
-                } 
+                }
             }
 
             std::string className = sylParent->GetClassName();
@@ -963,7 +963,7 @@ bool EditorToolkit::Group(std::string groupType, std::vector<std::string> elemen
 
             if(sylParent != newSylParent){
                 sylParents.insert(sylParent);
-            }    
+            }
         }
     }
     //delete previous parents
@@ -1013,18 +1013,18 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
                 assert(sparent);
                 currentParent = dynamic_cast<Syllable *>(fparent);
                 assert(currentParent);
-            }  
+            }
             else{
                 LogError("Invalid groupType for ungrouping");
                 return false;
-            } 
+            }
         }
-        else{  
+        else{
             Object *newParent = currentParent->Clone();
             assert(newParent);
             newParent->ClearChildren();
             el->MoveItselfTo(newParent);
-            fparent->ClearRelinquishedChildren();  
+            fparent->ClearRelinquishedChildren();
             sparent->AddChild(newParent);
             sparent->ReorderByXPos();
         }
@@ -1048,12 +1048,12 @@ bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
     Nc *firstChild, *prevNc;
 
     //Get children of neume. Keep the first child and delete the others.
-    AttComparison ac(NC); 
+    AttComparison ac(NC);
     ArrayOfObjects children;
     el->FindAllChildByComparison(&children, &ac);
     for (auto it = children.begin(); it != children.end(); ++it) {
         if(children.begin() == it){
-            firstChild = dynamic_cast<Nc *> (*it);     
+            firstChild = dynamic_cast<Nc *> (*it);
         }
         else{
             el->DeleteChild(*it);
@@ -1082,7 +1082,7 @@ bool EditorToolkit::ChangeGroup(std::string elementId, std::string contour)
         int newUly, newLry;
 
         newNc->SetPname(prevNc->GetPname());
-        newNc->SetOct(prevNc->GetOct());  
+        newNc->SetOct(prevNc->GetOct());
 
         if((*it) == 'u'){
             newUly = initialUly - noteHeight;
@@ -1206,14 +1206,14 @@ bool EditorToolkit::ToggleLigature(std::vector<std::string> elementIds, std::str
     if(!(success1 && success2)){
         LogWarning("Unable to update ligature attribute");
     }
-    
+
     surface->AddChild(zone);
     return success1 && success2;
 }
 
 bool EditorToolkit::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false; 
+    if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
     if (!param.has<jsonxx::Number>("x")) return false;
     (*x) = param.get<jsonxx::Number>("x");
@@ -1255,7 +1255,7 @@ bool EditorToolkit::ParseInsertAction(
             }
         }
     }
-    
+
     if (*elementType != "staff") {
         if (!param.has<jsonxx::Number>("lrx") || !param.has<jsonxx::Number>("lry")) {
             *lrx = -1;
@@ -1267,7 +1267,7 @@ bool EditorToolkit::ParseInsertAction(
         *lrx = param.get<jsonxx::Number>("lrx");
         if (!param.has<jsonxx::Number>("lry")) return false;
         *lry = param.get<jsonxx::Number>("lry");
-    } 
+    }
     return true;
 }
 
@@ -1337,7 +1337,7 @@ bool EditorToolkit::ParseGroupAction(
     for (int i = 0; i < array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
-    
+
     return true;
 }
 
@@ -1351,7 +1351,7 @@ bool EditorToolkit::ParseUngroupAction(
     for (int i = 0; i < array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
-   
+
     return true;
 }
 
@@ -1363,7 +1363,7 @@ bool EditorToolkit::ParseChangeGroupAction(
     if(!param.has<jsonxx::String>("contour")) return false;
     (*contour) = param.get<jsonxx::String>("contour");
     return true;
-} 
+}
 
 bool EditorToolkit::ParseToggleLigatureAction(
     jsonxx::Object param, std::vector<std::string> *elementIds, std::string *isLigature)
