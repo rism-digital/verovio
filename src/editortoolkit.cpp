@@ -177,7 +177,14 @@ bool EditorToolkit::Chain(jsonxx::Array actions)
     m_editInfo = info;
     if (status && runReorder) {
         Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(id);
-        Layer *layer = dynamic_cast<Layer *>(obj->GetFirstParent(LAYER));
+        Layer *layer = nullptr;
+        assert(obj);
+        if (obj->Is(STAFF)) {
+            layer = dynamic_cast<Layer *>(obj->GetFirst(LAYER));
+        } else {
+            layer = dynamic_cast<Layer *>(obj->GetFirstParent(LAYER));
+        }
+        assert(layer);
         layer->ReorderByXPos();
     }
     return status;
