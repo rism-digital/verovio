@@ -345,7 +345,9 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
             ArrayOfObjects objects;
             InterfaceComparison ic(INTERFACE_PITCH);
 
-            layer->FindAllChildByComparison(&objects, &ic);
+            Object *nextClef = m_doc->GetDrawingPage()->GetNext(clef, CLEF);
+            m_doc->GetDrawingPage()->FindAllChildBetween(&objects, &ic, clef,
+                    (nextClef != nullptr) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
             // Adjust all elements who are positioned relative to clef by pitch
             for (auto it = objects.begin(); it != objects.end(); ++it) {
