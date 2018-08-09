@@ -998,6 +998,9 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
 {
     m_editInfo = "";
     Object *fparent, *sparent, *currentParent;
+    Nc *firstNc, *secondNc;
+    bool success1, success2;
+    int ligCount = 0;
 
     //Check if you can get drawing page
     if(!m_doc->GetDrawingPage()) {
@@ -1006,6 +1009,63 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
     }
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
         Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
+        //Check for ligatures and toggle them before ungrouping
+        if(groupType == "nc"){
+            Nc *nc = dynamic_cast<Nc *> (el);
+            if(nc->HasLigature() && nc->GetLigature() == BOOLEAN_true){
+                nc->SetLigature(BOOLEAN_false);
+                ligCount++;
+                if(ligCount == 1){
+                    firstNc = nc;
+                    assert(firstNc);
+                }
+                else if(ligCount == 2){
+                    secondNc = nc;
+                    assert(secondNc);
+                    Zone *zone = new Zone();
+
+                    Staff *staff = dynamic_cast<Staff *> (firstNc->GetFirstParent(STAFF));
+                    assert(staff);
+                    Facsimile *facsimile = m_doc->GetFacsimile();
+                    assert(facsimile);
+                    Surface *surface = dynamic_cast<Surface *>(facsimile->FindChildByType(SURFACE));
+                    assert(surface);
+
+                    const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+                    const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
+    
+                    if (Att::SetVisual(firstNc, "ligature", "false")) success1 = true;
+
+                    int ligUlx = firstNc->GetZone()->GetUlx();
+                    int ligUly = firstNc->GetZone()->GetUly();
+                    int ligLrx = firstNc->GetZone()->GetLrx();
+                    int ligLry = firstNc->GetZone()->GetLry();
+
+                    zone->SetUlx(ligUlx + noteWidth);
+                    zone->SetUly(ligUly + noteHeight);
+                    zone->SetLrx(ligLrx + noteWidth);
+                    zone->SetLry(ligLry + noteHeight);
+
+                    Zone *origZoneUuid = secondNc->GetZone();
+                    surface->DeleteChild(origZoneUuid);
+
+                    secondNc->SetZone(zone);
+                    secondNc->ResetFacsimile();
+                    secondNc->SetFacs(zone->GetUuid());
+
+                    if (Att::SetVisual(secondNc, "ligature", "false")) success2 = true;  
+                    if(success1 && success2){
+                        ligCount = 0;
+                        firstNc = nullptr;
+                        secondNc = nullptr;
+                    }
+                    else{
+                        LogWarning("Unable to toggle ligature within ungroup ncs!");
+                        return false;
+                    }
+                }
+            }   
+        }
         if (elementIds.begin() == it){
             if(groupType == "nc"){
                 fparent = el->GetFirstParent(NEUME);
