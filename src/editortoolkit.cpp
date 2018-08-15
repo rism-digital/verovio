@@ -96,6 +96,13 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction, bool
         }
         LogWarning("Could not parse the set text action");
     }
+    else if (action == "setClef") {
+        std::string elementId, shape;
+        if(this->ParseSetClefAction(json.get<jsonxx::Object>("param"), &elementId, &shape)) {
+            return this->SetClef(elementId, shape);
+        }
+        LogWarning("Could not parse the set clef action");
+    }
     else if (action == "remove") {
         std::string elementId;
         if (this->ParseRemoveAction(json.get<jsonxx::Object>("param"), &elementId)) {
@@ -880,6 +887,61 @@ bool EditorToolkit::SetText(std::string elementId, std::string text)
     return success;
 }
 
+bool EditorToolkit::SetClef(std::string elementId, std::string shape)
+{
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        return false;
+    }
+    ArrayOfObjects objects;
+    bool success = false;
+    data_CLEFSHAPE clefShape = CLEFSHAPE_NONE;
+    int shift = 0;
+    Clef *clef = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->FindChildByUuid(elementId));
+    assert(clef);
+
+    if (shape == "C") {
+        clefShape = CLEFSHAPE_C;
+        shift = -3;
+    }
+    else if (shape== "F") {
+        clefShape = CLEFSHAPE_F;
+        shift = 3;
+    }
+
+    if(clef->GetShape() != clefShape){
+        success = Att::SetShared(clef, "shape", shape);
+        if(!success){
+            LogWarning("Unable to set clef shape");
+            return false;
+        }
+
+        Layer *layer = dynamic_cast<Layer *>(clef->GetFirstParent(LAYER));
+        assert(layer);
+
+        Object *nextClef = m_doc->GetDrawingPage()->GetNext(clef, CLEF);
+        assert(nextClef); 
+        InterfaceComparison ic(INTERFACE_PITCH);
+            
+        m_doc->GetDrawingPage()->FindAllChildBetween(&objects, &ic, clef,
+            (nextClef != nullptr) ? nextClef : m_doc->GetDrawingPage()->GetLast());
+
+        // Adjust all elements who are positioned relative to clef by pitch
+        for (auto it = objects.begin(); it != objects.end(); ++it) {
+            Object *child = dynamic_cast<Object *>(*it);
+            if (child == nullptr || layer->GetClef(dynamic_cast<LayerElement *>(child)) != clef) continue;
+            PitchInterface *pi = child->GetPitchInterface();
+            assert(pi);
+            pi->AdjustPitchByOffset(shift);
+        }
+    }
+    if (success && m_doc->GetType() != Facs) {
+        m_doc->PrepareDrawing();
+        m_doc->GetDrawingPage()->LayOut(true);
+    }
+    return true;
+}
+
 bool EditorToolkit::Remove(std::string elementId)
 {
     if (!m_doc->GetDrawingPage()) {
@@ -1385,6 +1447,22 @@ bool EditorToolkit::ParseSetTextAction(
         return false;
     }
     *text = param.get<jsonxx::String>("text");
+    return true;
+}
+
+bool EditorToolkit::ParseSetClefAction(
+    jsonxx::Object param, std::string *elementId, std::string *shape)
+{
+    if(!param.has<jsonxx::String>("elementId")) {
+        LogWarning("Could not parse 'elementId'");
+        return false;
+    }
+    *elementId = param.get<jsonxx::String>("elementId");
+    if(!param.has<jsonxx::String>("shape")) {
+        LogWarning("Could not parse 'shape'");
+        return false;
+    }
+    *shape = param.get<jsonxx::String>("shape");
     return true;
 }
 
