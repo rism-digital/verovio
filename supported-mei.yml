@@ -403,6 +403,7 @@ classes:
   - id: "tie"
     att-classes:
       - color
+      - curvedir
       - staffident
       - startendid
       - startid
