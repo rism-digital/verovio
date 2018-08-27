@@ -681,6 +681,42 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         surface->AddChild(zone);
         layer->AddChild(clef);
         m_editInfo = clef->GetUuid();
+
+        // Ensure children of this clef keep their position if it is the second clef of a layer
+        if (layer->GetChildCount(CLEF) == 0) {
+            LogError("Something went wrong. Clef does not appear to be inserted.");
+        } else if (layer->GetChildCount(CLEF) > 1) {
+            // There are multiple clefs on this layer: keep position
+            // Update order of elements with layer as parent
+            layer->ReorderByXPos();
+
+            Clef *previousClef = dynamic_cast<Clef *>(layer->GetFirst(CLEF));
+            if (previousClef != clef) { // if the new clef is the first clef we do nothing
+                Clef *temp = nullptr;
+                do {
+                    temp = dynamic_cast<Clef *>(layer->GetNext());
+                    if (temp != clef) {
+                        previousClef = temp;
+                    }
+                } while (temp != clef);
+
+                // get difference to shift pitches by
+                int pitchDifference = (previousClef->GetLine() - clefLine) * 2;
+
+                // Adjust elements with a relative position to clef by pitch in this layer
+                ArrayOfObjects elements;
+                InterfaceComparison ic(INTERFACE_PITCH);
+                temp = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->GetNext(clef, CLEF));
+                m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef, (temp != nullptr) ? temp : m_doc->GetDrawingPage()->GetLast());
+
+                for (auto it = elements.begin(); it != elements.end(); ++it) {
+                    assert(clef == layer->GetClef(dynamic_cast<LayerElement *>(*it)));
+                    PitchInterface *pi = (*it)->GetPitchInterface();
+                    assert(pi);
+                    pi->AdjustPitchByOffset(pitchDifference);
+                }
+            }
+        }
     }
     else if (elementType == "custos") {
         Custos *custos = new Custos();
@@ -920,9 +956,9 @@ bool EditorToolkit::SetClef(std::string elementId, std::string shape)
         assert(layer);
 
         Object *nextClef = m_doc->GetDrawingPage()->GetNext(clef, CLEF);
-        assert(nextClef); 
+        assert(nextClef);
         InterfaceComparison ic(INTERFACE_PITCH);
-            
+
         m_doc->GetDrawingPage()->FindAllChildBetween(&objects, &ic, clef,
             (nextClef != nullptr) ? nextClef : m_doc->GetDrawingPage()->GetLast());
 
@@ -1095,7 +1131,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
 
                     const int noteHeight = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
                     const int noteWidth = (int)(m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 1.4);
-    
+
                     if (Att::SetVisual(firstNc, "ligature", "false")) success1 = true;
 
                     int ligUlx = firstNc->GetZone()->GetUlx();
@@ -1115,7 +1151,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
                     secondNc->ResetFacsimile();
                     secondNc->SetFacs(zone->GetUuid());
 
-                    if (Att::SetVisual(secondNc, "ligature", "false")) success2 = true;  
+                    if (Att::SetVisual(secondNc, "ligature", "false")) success2 = true;
                     if(success1 && success2){
                         ligCount = 0;
                         firstNc = nullptr;
@@ -1126,7 +1162,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
                         return false;
                     }
                 }
-            }   
+            }
         }
         if (elementIds.begin() == it){
             if(groupType == "nc"){
