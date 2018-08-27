@@ -138,6 +138,14 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction, bool
         }
         LogWarning("Could not parse merge action");
     }
+    else if (action == "split") {
+        std::string elementId;
+        int x;
+        if (this->ParseSplitAction(json.get<jsonxx::Object>("param"), &elementId, &x)) {
+            return this->Split(elementId, x);
+        }
+        LogWarning("Could not parse split action");
+    }
     else if (action == "changeGroup"){
         std::string elementId;
         std::string contour;
@@ -517,11 +525,13 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
                 newStaff->SetParent(parent);
                 parent->InsertChild(newStaff, i);
                 parent->Modify();
+                m_editInfo = newStaff->GetUuid();
                 return true;
             }
         }
         LogMessage("Failed to insert newStaff into staff");
         parent->AddChild(newStaff);
+        m_editInfo = newStaff->GetUuid();
         return true;
     }
 
@@ -975,6 +985,75 @@ bool EditorToolkit::SetClef(std::string elementId, std::string shape)
         m_doc->PrepareDrawing();
         m_doc->GetDrawingPage()->LayOut(true);
     }
+    return true;
+}
+
+bool EditorToolkit::Split(std::string elementId, int x)
+{
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page");
+        return false;
+    }
+    Staff *staff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(elementId));
+    // Validate parameters
+    if (staff == nullptr) {
+        LogError("Either no element exists with ID '%s' or it is not a staff.", elementId.c_str());
+        return false;
+    }
+
+    if (staff->GetZone()->GetUlx() > x || staff->GetZone()->GetLrx() < x) {
+        LogError("The 'x' parameter is not within the bounds of the original staff.");
+        return false;
+    }
+
+    // Resize current staff and insert new one filling remaining area.
+    int newUlx = x;
+    int newLrx = staff->GetZone()->GetLrx();
+    std::vector<std::pair<std::string, std::string>> v;
+
+    if (!this->Insert("staff", "auto", newUlx, staff->GetZone()->GetUly(), newLrx, staff->GetZone()->GetLry(), v)) {
+        LogError("Failed to create a second staff.");
+        return false;
+    }
+    Staff *splitStaff = dynamic_cast<Staff *>(m_doc->GetDrawingPage()->FindChildByUuid(m_editInfo));
+    assert(splitStaff);
+    if (splitStaff == nullptr) {
+        LogMessage("Split staff is null");
+    }
+
+    staff->GetZone()->SetLrx(x);
+    Layer *layer = dynamic_cast<Layer *>(staff->GetFirst(LAYER));
+    Layer *splitLayer = dynamic_cast<Layer *>(splitStaff->GetFirst(LAYER));
+
+    // Move any elements that should be on the second staff there.
+    for (Object *child = layer->GetFirst(); child != nullptr; child = layer->GetNext()) {
+        assert(child);
+        FacsimileInterface *fi = dynamic_cast<FacsimileInterface *>(child);
+        if (fi == nullptr || !fi->HasFacs()) {
+            fi = nullptr;
+            ArrayOfObjects facsimileInterfaces;
+            InterfaceComparison ic(INTERFACE_FACSIMILE);
+            child->FindAllChildByComparison(&facsimileInterfaces, &ic);
+
+            for (auto it = facsimileInterfaces.begin(); it != facsimileInterfaces.end(); ++it) {
+                FacsimileInterface *temp = dynamic_cast<FacsimileInterface *>(*it);
+                assert(temp);
+                if (temp->HasFacs() && (fi == nullptr || temp->GetZone()->GetUlx() < fi->GetZone()->GetUlx())) {
+                    fi = temp;
+                }
+            }
+        }
+
+        if (fi == nullptr) {
+            continue;
+        }
+        else if (fi->GetZone()->GetUlx() > x) {
+            child->MoveItselfTo(splitLayer);
+        }
+    }
+    layer->ClearRelinquishedChildren();
+    LogMessage("Loop done");
+    m_editInfo = splitStaff->GetUuid();
     return true;
 }
 
@@ -1446,6 +1525,18 @@ bool EditorToolkit::ParseMergeAction(
     for (int i = 0; i < array.size(); i++) {
         elementIds->push_back(array.get<jsonxx::String>(i));
     }
+    return true;
+}
+
+bool EditorToolkit::ParseSplitAction(
+    jsonxx::Object param, std::string *elementId, int *x)
+{
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    (*elementId) = param.get<jsonxx::String>("elementId");
+
+    if (!param.has<jsonxx::Number>("x")) return false;
+    (*x) = param.get<jsonxx::Number>("x");
+
     return true;
 }
 
