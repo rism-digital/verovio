@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jul 27 10:43:04 CEST 2018
+// Last Modified: Mon Aug 27 08:23:22 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -10074,6 +10074,17 @@ void HumNum::setValue(const char* ratstring) {
 	setValue(realstring);
 }
 
+
+//////////////////////////////
+//
+// HumNum::invert --
+//
+
+void HumNum::invert(void) {
+	int temp = top;
+	top = bot;
+	bot = temp;
+}
 
 
 //////////////////////////////
@@ -22068,6 +22079,51 @@ string HumdrumToken::getSubtoken(int index, const string& separator) const {
 		}
 	}
 	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getSubtokens -- Return the list of subtokens as an array
+//     of strings.
+//     default value: separator = " "
+//
+
+std::vector<std::string> HumdrumToken::getSubtokens (const std::string& separator) const {
+	std::vector<std::string> output;
+	const string& token = *this;
+	HumRegex hre;
+	hre.split(output, token, separator);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::replaceSubtoken --
+//     default value: separator = " "
+//
+
+void HumdrumToken::replaceSubtoken(int index, const std::string& newsubtok,
+		const std::string& separator) {
+	if (index < 0) {
+		return;
+	}
+	std::vector<std::string> subtokens = getSubtokens(separator);
+	if (index >= (int)subtokens.size()) {
+		return;
+	}
+	subtokens[index] = newsubtok;
+	string output;
+	for (int i=0; i<(int)subtokens.size(); i++) {
+		output += subtokens[i];
+		if (i < (int)subtokens.size() - 1) {
+			output += separator;
+		}
+	}
+	this->setText(output);
 }
 
 
@@ -39406,8 +39462,14 @@ bool Tool_filter::run(HumdrumFile& infile) {
 			RUNTOOL(slurcheck, infile, commands[i].second, status);
 		} else if (commands[i].first == "slur") {
 			RUNTOOL(slurcheck, infile, commands[i].second, status);
+		} else if (commands[i].first == "tassoize") {
+			RUNTOOL(tassoize, infile, commands[i].second, status);
+		} else if (commands[i].first == "tasso") {
+			RUNTOOL(tassoize, infile, commands[i].second, status);
 		} else if (commands[i].first == "transpose") {
 			RUNTOOL(transpose, infile, commands[i].second, status);
+		} else if (commands[i].first == "trillspell") {
+			RUNTOOL(trillspell, infile, commands[i].second, status);
 		} else if (commands[i].first == "binroll") {
 			RUNTOOL(binroll, infile, commands[i].second, status);
 		} else if (commands[i].first == "myank") {
@@ -50747,6 +50809,385 @@ void Tool_myank::usage(const string& ommand) {
 
 
 
+
+/////////////////////////////////
+//
+// Tool_periodicity::Tool_periodicity -- Set the recognized options for the tool.
+//
+
+Tool_periodicity::Tool_periodicity(void) {
+	define("m|min=b", "minimum time unit (other than grace notes)");
+	define("t|track=i:0", "track to analyze");
+	define("attacks=b", "extract attack grid)");
+	define("raw=b", "show only raw period data");
+	define("s|svg=b", "output svg image");
+	define("p|power=d:2.0", "scaling power for visual display");
+	define("1|one=b", "composite rhythms are not weighted by attack");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_periodicity::run -- Primary interfaces to the tool.
+//
+
+bool Tool_periodicity::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status;
+	status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_periodicity::run(HumdrumFile& infile, ostream& out) {
+	bool status;
+	status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+//
+// In-place processing of file:
+//
+
+bool Tool_periodicity::run(HumdrumFile& infile) {
+	processFile(infile);
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_periodicity::processFile --
+//
+
+void Tool_periodicity::processFile(HumdrumFile& infile) {
+	HumNum minrhy = infile.tpq() * 4;
+	if (getBoolean("min")) {
+		m_free_text << minrhy << endl;
+		return;
+	}
+
+	vector<vector<double>> attackgrids;
+	attackgrids.resize(infile.getTrackCount()+1);
+	fillAttackGrids(infile, attackgrids, minrhy);
+	if (getBoolean("attacks")) {
+		printAttackGrid(m_free_text, infile, attackgrids, minrhy);
+		return;
+	}
+
+	int atrack = getInteger("track");
+	vector<vector<double>> analysis;
+	doPeriodicityAnalysis(analysis, attackgrids[atrack], minrhy);
+
+	if (getBoolean("raw")) {
+		printPeriodicityAnalysis(m_free_text, analysis);
+		return;
+	}
+
+	printSvgAnalysis(m_free_text, analysis, minrhy);
+
+// Tool_periodicity::printSvgGrid --
+}
+
+
+
+//////////////////////////////
+//
+// Tool_periodicity::printPeriodicityAnalysis --
+//
+
+void Tool_periodicity::printPeriodicityAnalysis(ostream& out, vector<vector<double>>& analysis) {
+	for (int i=0; i<(int)analysis.size(); i++) {
+		for (int j=0; j<(int)analysis[i].size(); j++) {
+			out << analysis[i][j];
+			if (j < (int)analysis[i].size() - 1) {
+				out << "\t";
+			}
+		}
+		out << "\n";
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_periodicity::doPeriodicAnalysis --
+//
+
+void Tool_periodicity::doPeriodicityAnalysis(vector<vector<double>> &analysis, vector<double>& grid, HumNum minrhy) {
+	analysis.resize(minrhy.getNumerator());
+	for (int i=0; i<(int)analysis.size(); i++) {
+		doAnalysis(analysis, i, grid);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_periodicity::doAnalysis --
+//
+
+void Tool_periodicity::doAnalysis(vector<vector<double>>& analysis, int level, vector<double>& grid) {
+	int period = level + 1;
+	analysis[level].resize(period);
+	std::fill(analysis[level].begin(), analysis[level].end(), 0.0);
+	for (int i=0; i<period; i++) {
+		int j = i;
+		while (j < (int)grid.size()) {
+			analysis[level][i] += grid[j];
+			j += period;
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_periodicity::printAttackGrid --
+//
+
+void Tool_periodicity::printAttackGrid(ostream& out, HumdrumFile& infile, vector<vector<double>>& grids, HumNum minrhy) {
+	out << "!!!minrhy: " << minrhy << endl;
+	out << "**all";
+	for (int i=1; i<(int)grids.size(); i++) {
+		out << "\t**track";
+	}
+	out << "\n";
+	for (int j=0; j<(int)grids[0].size(); j++) {
+		for (int i=0; i<(int)grids.size(); i++) {
+			out << grids[i][j];
+			if (i < (int)grids.size() - 1) {
+				out << "\t";
+			}
+		}
+		out << "\n";
+	}
+	for (int i=0; i<(int)grids.size(); i++) {
+		out << "*-";
+		if (i < (int)grids.size() - 1) {
+			out << "\t";
+		}
+	}
+	out << "\n";
+	
+}
+
+
+
+//////////////////////////////
+//
+// Tool_periodicity::fillAttackGrids -- 
+//
+
+void Tool_periodicity::fillAttackGrids(HumdrumFile& infile, vector<vector<double>>& grids, HumNum minrhy) {
+	HumNum elements = minrhy * infile.getScoreDuration() / 4;
+
+	for (int t=0; t<(int)grids.size(); t++) {
+		grids[t].resize(elements.getNumerator());
+	}
+
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		HumNum position = infile[i].getDurationFromStart() / 4 * minrhy;
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			HTp token = infile.token(i, j);
+			if (!token->isKern()) {
+				continue;
+			}
+			if (token->isNull()) {
+				continue;
+			}
+			if (!token->isNoteAttack()) {
+				continue;
+			}
+			int track = token->getTrack();
+			grids.at(track).at(position.getNumerator()) += 1;
+		}
+	}
+
+	bool oneQ = getBoolean("one");
+	for (int j=0; j<(int)grids.at(0).size(); j++) {
+		grids.at(0).at(j) = 0;
+		for (int i=0; i<(int)grids.size(); i++) {
+			if (!grids.at(i).at(j)) {
+				continue;
+			}
+			if (oneQ) {
+				grids.at(0).at(j) = 1;
+			} else {
+				grids.at(0).at(j) += grids.at(i).at(j);
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_periodicity::printSvgAnalysis --
+//
+
+void Tool_periodicity::printSvgAnalysis(ostream& out, vector<vector<double>>& analysis, HumNum minrhy) {
+	pugi::xml_document image;
+	auto declaration = image.prepend_child(pugi::node_declaration);
+	declaration.append_attribute("version") = "1.0";
+	declaration.append_attribute("encoding") = "UTF-8";
+	declaration.append_attribute("standalone") = "no";
+
+	auto svgnode = image.append_child("svg");
+	svgnode.append_attribute("version") = "1.1";
+	svgnode.append_attribute("xmlns") = "http://www.w3.org/2000/svg";
+	svgnode.append_attribute("xmlns:xlink") = "http://www.w3.org/1999/xlink";
+	svgnode.append_attribute("overflow") = "visible";
+	svgnode.append_attribute("viewBox") = "0 0 1000 1000";
+	svgnode.append_attribute("width") = "1000px";
+	svgnode.append_attribute("height") = "1000px";
+
+	auto style = svgnode.append_child("style");
+	style.text().set(".label { font: 14px sans-serif; alignment-baseline: middle; text-anchor: middle; }");
+
+	auto grid = svgnode.append_child("g");
+	grid.append_attribute("id") = "grid";
+
+	auto labels = svgnode.append_child("g");
+
+	double hue = 0.0;
+	double saturation = 100;
+	double lightness = 75;
+
+	pugi::xml_node crect;
+	double width;
+	double height;
+
+	stringstream ss;
+	stringstream ssl;
+	//stringstream css;
+	double x;
+	double y;
+
+	double imagewidth = 1000.0;
+	double imageheight = 1000.0;
+
+	double sdur = (double)analysis.back().size();
+
+	double maxscore = 0.0;
+	for (int i=0; i<(int)analysis.size(); i++) {
+		for (int j=0; j<(int)analysis[i].size(); j++) {
+			if (maxscore < analysis[i][j]) {
+				maxscore = analysis[i][j];
+			}
+		}
+	}
+
+	double power = getDouble("power");
+	for (int i=0; i<(int)analysis.size(); i++) {
+		for (int j=0; j<(int)analysis[i].size(); j++) {
+			width = 1 / sdur * imagewidth;
+			height = 1 / sdur * imageheight;
+
+			x = j/sdur * imageheight;
+			y = i/sdur * imagewidth;
+
+			double value = analysis[i][j]/maxscore;
+			value = pow(value, 1.0/power);
+
+			getColorMapping(value, hue, saturation, lightness);
+			ss << "hsl(" << hue << "," << saturation << "%," << lightness << "%)";
+			crect = grid.append_child("rect");
+			crect.append_attribute("x") = to_string(x).c_str();
+			crect.append_attribute("y") = to_string(y).c_str();
+			crect.append_attribute("width") = to_string(width*0.99).c_str();
+			crect.append_attribute("height") = to_string(height*0.99).c_str();
+			crect.append_attribute("fill") = ss.str().c_str();
+			//css << "Xm" << getMeasure1(i) << " Ym" << getMeasure2(j);
+			//css << " X" << getQon1(i)     << " Y" << getQon2(j);
+			//css << " X" << getQoff1(i)    << " Y" << getQoff2(j);
+			//crect.append_attribute("class") = css.str().c_str();
+			ss.str("");
+			//css.str("");
+		}
+
+		pugi::xml_node label = labels.append_child("text");
+		label.append_attribute("class") = "label";
+
+		HumNum rval = (i+1);
+		rval /= minrhy;
+		rval *= 4;
+	
+
+		std::string rhythm = Convert::durationToRecip(rval);
+cerr << "MINRHY " << minrhy << " analysize=" << analysis.size() << " i = " << i << " rval=> " << rval  << " rhythm => " << rhythm << endl;
+		label.text().set(rhythm.c_str());
+		x = (i+1+0.5)/sdur * imageheight;
+		y = (i+0.5)/sdur * imagewidth;
+		label.append_attribute("x") = to_string(x).c_str();
+		label.append_attribute("y") = to_string(y).c_str();
+	}
+
+	image.save(out);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_periodicity::getColorMapping --
+//
+
+void Tool_periodicity::getColorMapping(double input, double& hue,
+		double& saturation, double& lightness) {
+	double maxhue = 0.75 * 360.0;
+	hue = input;
+	if (hue < 0.0) {
+		hue = 0.0;
+	}
+	hue = hue * hue;
+	if (hue != 1.0) {
+		hue *= 0.95;
+	}
+
+	hue = (1.0 - hue) * 360.0;
+	if (hue == 0.0) {
+		// avoid -0.0;
+		hue = 0.0;
+	}
+
+	if (hue > maxhue) {
+		hue = maxhue;
+	}
+	if (hue < 0.0) {
+		hue = maxhue;
+	}
+
+	saturation = 100.0;
+	lightness = 50.0;
+
+	if (hue > 60) {
+		lightness = lightness - (hue-60) / (maxhue-60) * lightness / 1.5;
+	}
+}
+
+
+
+
 /////////////////////////////////
 //
 // Tool_gridtest::Tool_phrase -- Set the recognized options for the tool.
@@ -51137,7 +51578,9 @@ Tool_recip::Tool_recip(void) {
 	define("G|ignore-grace-notes=b", "ignore grace notes");
 	define("k|kern-spine=i:1",       "analyze only given kern spine");
 	define("K|all-spines=b",         "analyze each kern spine separately");
-	define("e|exinterp=s:**recip",   "analyze each kern spine separately");
+	define("e|exinterp=s:**recip",   "use the given exinterp for data output");
+	define("n|kern-pitch=s:e",       "note to add for '-e kern' option");
+	define("kern=b",                 "equivalent to '-e kern' option");
 }
 
 
@@ -51239,6 +51682,12 @@ void Tool_recip::doCompositeAnalysis(HumdrumFile& infile) {
 		composite[i] = infile[i].getDuration();
 	}
 
+	int kernQ = false;
+	if (m_exinterp.find("kern") != std::string::npos) {
+		kernQ = true;
+// cerr << "KERN ON" << endl;
+	}
+
 	// convert durations to **recip strings
 	vector<string> recips(composite.size());
 	for (int i=0; i<(int)recips.size(); i++) {
@@ -51246,6 +51695,10 @@ void Tool_recip::doCompositeAnalysis(HumdrumFile& infile) {
 			continue;
 		}
 		recips[i] = Convert::durationToRecip(composite[i]);
+		if (kernQ) {
+			recips[i] += m_kernpitch;
+// cerr << "ADDING PITCH " << m_kernpitch << endl;
+		}
 	}
 
 	if (getBoolean("append")) {
@@ -51329,6 +51782,13 @@ void Tool_recip::initialize(HumdrumFile& infile) {
 	if (m_exinterp[1] != '*') {
 		m_exinterp.insert(0, "*");
 	}
+
+	m_kernpitch = getString("kern-pitch");
+
+	if (getBoolean("kern")) {
+		m_exinterp = "**kern";
+	}
+
 }
 
 
@@ -55527,6 +55987,287 @@ void Tool_transpose::initialize(HumdrumFile& infile) {
 	}
 
 	transval += 40 * octave;
+}
+
+
+
+
+/////////////////////////////////
+//
+// Tool_trillspell::Tool_trillspell -- Set the recognized options for the tool.
+//
+
+Tool_trillspell::Tool_trillspell(void) {
+	// define options here
+}
+
+
+
+///////////////////////////////
+//
+// Tool_trillspell::run -- Primary interfaces to the tool.
+//
+
+bool Tool_trillspell::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	return run(infile, out);
+}
+
+
+bool Tool_trillspell::run(HumdrumFile& infile, ostream& out) {
+	bool status = run(infile);
+	return status;
+}
+
+
+bool Tool_trillspell::run(HumdrumFile& infile) {
+	processFile(infile);
+	infile.createLinesFromTokens();
+	return true;
+}
+
+
+
+///////////////////////////////
+//
+// Tool_trillspell::processFile -- Adjust intervals of ornaments.
+//
+
+void Tool_trillspell::processFile(HumdrumFile& infile) {
+	analyzeOrnamentAccidentals(infile);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_trillspell::analyzeOrnamentAccidentals --
+//
+
+bool Tool_trillspell::analyzeOrnamentAccidentals(HumdrumFile& infile) {
+	int i, j, k;
+	int kindex;
+	int track;
+
+	// ktracks == List of **kern spines in data.
+	// rtracks == Reverse mapping from track to ktrack index (part/staff index).
+	vector<HTp> ktracks = infile.getKernSpineStartList();
+	vector<int> rtracks(infile.getMaxTrack()+1, -1);
+	for (i=0; i<(int)ktracks.size(); i++) {
+		track = ktracks[i]->getTrack();
+		rtracks[track] = i;
+	}
+	int kcount = (int)ktracks.size();
+
+	// keysigs == key signature spellings of diatonic pitch classes.  This array
+	// is duplicated into dstates after each barline.
+	vector<vector<int> > keysigs;
+	keysigs.resize(kcount);
+	for (i=0; i<kcount; i++) {
+		keysigs[i].resize(7);
+		std::fill(keysigs[i].begin(), keysigs[i].end(), 0);
+	}
+
+	// dstates == diatonic states for every pitch in a spine.
+	// sub-spines are considered as a single unit, although there are
+	// score conventions which would keep a separate voices on a staff
+	// with different accidental states (i.e., two parts superimposed
+	// on the same staff, but treated as if on separate staves).
+	// Eventually this algorithm should be adjusted for dealing with
+	// cross-staff notes, where the cross-staff notes should be following
+	// the accidentals of a different spine...
+	vector<vector<int> > dstates; // diatonic states
+	dstates.resize(kcount);
+	for (i=0; i<kcount; i++) {
+		dstates[i].resize(70);     // 10 octave limit for analysis
+			                        // may cause problems; maybe fix later.
+		std::fill(dstates[i].begin(), dstates[i].end(), 0);
+	}
+
+	for (i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		if (infile[i].isInterpretation()) {
+			for (j=0; j<infile[i].getFieldCount(); j++) {
+				if (!infile[i].token(j)->isKern()) {
+					continue;
+				}
+				if (infile[i].token(j)->compare(0, 3, "*k[") == 0) {
+					track = infile[i].token(j)->getTrack();
+					kindex = rtracks[track];
+					fillKeySignature(keysigs[kindex], *infile[i].token(j));
+					// resetting key states of current measure.  What to do if this
+					// key signature is in the middle of a measure?
+					resetDiatonicStatesWithKeySignature(dstates[kindex],
+							keysigs[kindex]);
+				}
+			}
+		} else if (infile[i].isBarline()) {
+			for (j=0; j<infile[i].getFieldCount(); j++) {
+				if (!infile[i].token(j)->isKern()) {
+					continue;
+				}
+				if (infile[i].token(j)->isInvisible()) {
+					continue;
+				}
+				track = infile[i].token(j)->getTrack();
+				kindex = rtracks[track];
+				// reset the accidental states in dstates to match keysigs.
+				resetDiatonicStatesWithKeySignature(dstates[kindex],
+						keysigs[kindex]);
+			}
+		}
+
+		if (!infile[i].isData()) {
+			continue;
+		}
+
+		for (j=0; j<infile[i].getFieldCount(); j++) {
+			if (!infile[i].token(j)->isKern()) {
+				continue;
+			}
+			if (infile[i].token(j)->isNull()) {
+				continue;
+			}
+			if (infile[i].token(j)->isRest()) {
+				continue;
+			}
+
+			int subcount = infile[i].token(j)->getSubtokenCount();
+			track = infile[i].token(j)->getTrack();
+
+			HumRegex hre;
+			int rindex = rtracks[track];
+			for (k=0; k<subcount; k++) {
+				string subtok = infile[i].token(j)->getSubtoken(k);
+				int b40 = Convert::kernToBase40(subtok);
+				int diatonic = Convert::kernToBase7(subtok);
+				if (diatonic < 0) {
+					// Deal with extra-low notes later.
+					continue;
+				}
+				int accid = Convert::kernToAccidentalCount(subtok);
+				dstates.at(rindex).at(diatonic) = accid;
+
+				// check for accidentals on trills, mordents and turns.
+				// N.B.: augmented-second intervals are not considered.
+
+				if (subtok.find("t") != string::npos) {
+					int nextup = getBase40(diatonic + 1, dstates[rindex][diatonic+1]);
+					int interval = nextup - b40;
+					if (interval == 6) {
+						// Set to major-second trill
+						hre.replaceDestructive(subtok, "T", "t", "g");
+						infile[i].token(j)->replaceSubtoken(k, subtok);
+					}
+				} else if (subtok.find("T") != string::npos) {
+					int nextup = getBase40(diatonic + 1, dstates[rindex][diatonic+1]);
+					int interval = nextup - b40;
+					if (interval == 5) {
+						// Set to minor-second trill
+						hre.replaceDestructive(subtok, "t", "T", "g");
+						infile[i].token(j)->replaceSubtoken(k, subtok);
+					}
+				} else if (subtok.find("M") != string::npos) {
+					// major-second upper mordent
+					int nextup = getBase40(diatonic + 1, dstates[rindex][diatonic+1]);
+					int interval = nextup - b40;
+					if (interval == 5) {
+						// Set to minor-second trill
+						hre.replaceDestructive(subtok, "m", "M", "g");
+						infile[i].token(j)->replaceSubtoken(k, subtok);
+					}
+				} else if (subtok.find("m") != string::npos) {
+					// minor-second upper mordent
+					int nextup = getBase40(diatonic + 1, dstates[rindex][diatonic+1]);
+					int interval = nextup - b40;
+					if (interval == 6) {
+						// Set to major-second trill
+						hre.replaceDestructive(subtok, "M", "m", "g");
+						infile[i].token(j)->replaceSubtoken(k, subtok);
+					}
+				} else if (subtok.find("W") != string::npos) {
+					// major-second lower mordent
+					int nextdn = getBase40(diatonic - 1, dstates[rindex][diatonic-1]);
+					int interval = b40 - nextdn;
+					if (interval == 6) {
+						// Set to minor-second trill
+						hre.replaceDestructive(subtok, "w", "W", "g");
+						infile[i].token(j)->replaceSubtoken(k, subtok);
+					}
+				} else if (subtok.find("w") != string::npos) {
+					// minor-second lower mordent
+					int nextdn = getBase40(diatonic - 1, dstates[rindex][diatonic-1]);
+					int interval = b40 - nextdn;
+					if (interval == 6) {
+						// Set to major-second trill
+						hre.replaceDestructive(subtok, "W", "w", "g");
+						infile[i].token(j)->replaceSubtoken(k, subtok);
+					}
+				}
+				// deal with turns and inverted turns here.
+
+			}
+		}
+	}
+
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_trillspell::resetDiatonicStatesWithKeySignature -- Only used in
+//     Tool_trillspell::analyzeKernAccidentals().  Resets the accidental
+//     states for notes
+//
+
+void Tool_trillspell::resetDiatonicStatesWithKeySignature(vector<int>&
+		states, vector<int>& signature) {
+	for (int i=0; i<(int)states.size(); i++) {
+		states[i] = signature[i % 7];
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_trillspell::fillKeySignature -- Read key signature notes and
+//    assign +1 to sharps, -1 to flats in the diatonic input array.  Used
+//    only by Tool_trillspell::analyzeOrnamentAccidentals().
+//
+
+void Tool_trillspell::fillKeySignature(vector<int>& states,
+		const string& keysig) {
+	std::fill(states.begin(), states.end(), 0);
+	if (keysig.find("f#") != string::npos) { states[3] = +1; }
+	if (keysig.find("c#") != string::npos) { states[0] = +1; }
+	if (keysig.find("g#") != string::npos) { states[4] = +1; }
+	if (keysig.find("d#") != string::npos) { states[1] = +1; }
+	if (keysig.find("a#") != string::npos) { states[5] = +1; }
+	if (keysig.find("e#") != string::npos) { states[2] = +1; }
+	if (keysig.find("b#") != string::npos) { states[6] = +1; }
+	if (keysig.find("b-") != string::npos) { states[6] = -1; }
+	if (keysig.find("e-") != string::npos) { states[2] = -1; }
+	if (keysig.find("a-") != string::npos) { states[5] = -1; }
+	if (keysig.find("d-") != string::npos) { states[1] = -1; }
+	if (keysig.find("g-") != string::npos) { states[4] = -1; }
+	if (keysig.find("c-") != string::npos) { states[0] = -1; }
+	if (keysig.find("f-") != string::npos) { states[3] = -1; }
+}
+
+
+
+//////////////////////////////
+//
+// Tool_trillspell::getBase40 --
+//
+
+int Tool_trillspell::getBase40(int diatonic, int accidental) {
+	return Convert::base7ToBase40(diatonic) + accidental;
 }
 
 

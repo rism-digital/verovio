@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Jul 27 10:43:04 CEST 2018
+// Last Modified: Mon Aug 27 08:23:22 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -292,6 +292,7 @@ class HumNum {
 		void     setValue           (int numerator, int denominator);
 		void     setValue           (const std::string& ratstring);
 		void     setValue           (const char* ratstring);
+		void     invert             (void);
 		HumNum   getAbs             (void) const;
 		HumNum&  makeAbs            (void);
 		HumNum&  operator=          (const HumNum& value);
@@ -1273,6 +1274,9 @@ class HumdrumToken : public std::string, public HumHash {
 		int      getSubtokenCount          (const std::string& separator = " ") const;
 		std::string   getSubtoken          (int index,
 		                                    const std::string& separator = " ") const;
+		std::vector<std::string> getSubtokens (const std::string& separator = " ") const;
+		void     replaceSubtoken           (int index, const std::string& newsubtok,
+		                                    const std::string& separator = " ");
 		void     setParameters             (HTp ptok);
 		void     setParameters             (const std::string& pdata, HTp ptok = NULL);
 		int      getStrandIndex            (void) const;
@@ -5279,6 +5283,33 @@ class Tool_myank : public HumTool {
 };
 
 
+
+
+class Tool_periodicity : public HumTool {
+	public:
+		         Tool_periodicity   (void);
+		        ~Tool_periodicity   () {};
+
+		bool     run                (HumdrumFile& infile);
+		bool     run                (const string& indata, ostream& out);
+		bool     run                (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     initialize         (HumdrumFile& infile);
+		void     processFile        (HumdrumFile& infile);
+		void     fillAttackGrids    (HumdrumFile& infile, vector<vector<double>>& grids, HumNum minrhy);
+		void     printAttackGrid    (ostream& out, HumdrumFile& infile, vector<vector<double>>& grids, HumNum minrhy);
+		void     doAnalysis         (vector<vector<double>>& analysis, int level, vector<double>& grid);
+		void     doPeriodicityAnalysis(vector<vector<double>> & analysis, vector<double>& grid, HumNum minrhy);
+		void     printPeriodicityAnalysis(ostream& out, vector<vector<double>>& analysis);
+		void     printSvgAnalysis(ostream& out, vector<vector<double>>& analysis, HumNum minrhy);
+		void     getColorMapping(double input, double& hue, double& saturation, double& lightness);
+
+	private:
+
+};
+
+
 class Tool_phrase : public HumTool {
 	public:
 		     Tool_phrase          (void);
@@ -5332,6 +5363,7 @@ class Tool_recip : public HumTool {
 		vector<HTp> m_kernspines;
 		bool        m_graceQ = true;
 		string      m_exinterp = "**recip";
+		string      m_kernpitch = "e";
 
 };
 
@@ -5667,6 +5699,29 @@ class Tool_transpose : public HumTool {
 		int      writtenQ     = 0;   // used with -W option
 		int      quietQ       = 0;   // used with -q option
 		int      instrumentQ  = 0;   // used with -I option
+};
+
+
+
+class Tool_trillspell : public HumTool {
+	public:
+		      Tool_trillspell     (void);
+		     ~Tool_trillspell     () {};
+
+		bool  run                 (HumdrumFile& infile);
+		bool  run                 (const string& indata, ostream& out);
+		bool  run                 (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void  processFile         (HumdrumFile& infile);
+		bool  analyzeOrnamentAccidentals(HumdrumFile& infile);
+		void  resetDiatonicStatesWithKeySignature(vector<int>& states,
+		                                          vector<int>& signature);
+		void  fillKeySignature    (vector<int>& states, const string& keysig);
+		int   getBase40           (int diatonic, int accidental);
+
+	private:
+
 };
 
 
