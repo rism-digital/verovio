@@ -110,6 +110,14 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction, bool
         }
         LogWarning("Could not parse the remove action");
     }
+    else if (action == "resize") {
+        std::string elementId;
+        int ulx, uly, lrx, lry;
+        if (this->ParseResizeAction(json.get<jsonxx::Object>("param"), &elementId, &ulx, &uly, &lrx, &lry)) {
+            return this->Resize(elementId, ulx, uly, lrx, lry);
+        }
+        LogWarning("Could not parse the resize action");
+    }
     else if (action == "chain") {
         if (!json.has<jsonxx::Array>("param")) {
             LogError("Incorrectly formatted JSON action");
@@ -1087,6 +1095,43 @@ bool EditorToolkit::Remove(std::string elementId)
     return result;
 }
 
+bool EditorToolkit::Resize(std::string elementId, int ulx, int uly, int lrx, int lry)
+{
+    if (!m_doc->GetDrawingPage()) {
+        LogError("Could not get the drawing page.");
+        return false;
+    }
+    if (m_doc->GetType() != Facs) {
+        LogWarning("Resizing is only available in facsimile mode.");
+        return false;
+    }
+
+    Object *obj = m_doc->GetDrawingPage()->FindChildByUuid(elementId);
+    if (obj == nullptr) {
+        LogError("Object with ID '%s' not found.", elementId.c_str());
+        return false;
+    }
+    if (obj->Is(STAFF)) {
+        Staff *staff = dynamic_cast<Staff *>(obj);
+        assert(staff);
+        if (!staff->HasFacs()) {
+            LogError("This staff does not have a facsimile.");
+            return false;
+        }
+        Zone *zone = staff->GetZone();
+        zone->SetUlx(ulx);
+        zone->SetUly(uly);
+        zone->SetLrx(lrx);
+        zone->SetLry(lry);
+        zone->Modify();
+    }
+    else {
+        LogMessage("Element of type '%s' is unsupported.", obj->GetClassName().c_str());
+        return false;
+    }
+    return true;
+}
+
 std::string EditorToolkit::EditInfo()
 {
     return m_editInfo;
@@ -1603,6 +1648,22 @@ bool EditorToolkit::ParseRemoveAction(
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
+    return true;
+}
+
+bool EditorToolkit::ParseResizeAction(
+    jsonxx::Object param, std::string *elementId, int *ulx, int *uly, int *lrx, int *lry)
+{
+    if(!param.has<jsonxx::String>("elementId")) return false;
+    *elementId = param.get<jsonxx::String>("elementId");
+    if(!param.has<jsonxx::Number>("ulx")) return false;
+    *ulx = param.get<jsonxx::Number>("ulx");
+    if(!param.has<jsonxx::Number>("uly")) return false;
+    *uly = param.get<jsonxx::Number>("uly");
+    if(!param.has<jsonxx::Number>("lrx")) return false;
+    *lrx = param.get<jsonxx::Number>("lrx");
+    if(!param.has<jsonxx::Number>("lry")) return false;
+    *lry = param.get<jsonxx::Number>("lry");
     return true;
 }
 

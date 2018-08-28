@@ -23,7 +23,7 @@ namespace vrv {
 
 //--------------------------------------------------------------------------------
 // EditorToolkit
-//-------------------------------------------------------------------------------- 
+//--------------------------------------------------------------------------------
 
 class EditorToolkit {
 public:
@@ -47,12 +47,13 @@ public:
     bool SetClef(std::string elementId, std::string shape);
     bool Split(std::string elementId, int x);
     bool Remove(std::string elementId);
+    bool Resize(std::string elementId, int ulx, int uly, int lrx, int lry);
     bool Group(std::string groupType, std::vector<std::string> elementIds);
     bool Ungroup(std::string groupType, std::vector<std::string> elementIds);
     bool ChangeGroup(std::string elementId, std::string contour);
     bool ToggleLigature(std::vector<std::string> elementIds, std::string isLigature);
     ///@}
-    
+
     /**
      * Get information on the last editor function used
      */
@@ -77,8 +78,9 @@ protected:
     bool ParseSetClefAction(jsonxx::Object param, std::string *elementId, std::string *shape);
     bool ParseSplitAction(jsonxx::Object param, std::string *elementId, int *x);
     bool ParseRemoveAction(jsonxx::Object param, std::string *elementId);
-    bool ParseGroupAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds); 
-    bool ParseUngroupAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds); 
+    bool ParseResizeAction(jsonxx::Object param, std::string *elementId, int *ulx, int *uly, int *lrx, int *lry);
+    bool ParseGroupAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds);
+    bool ParseUngroupAction(jsonxx::Object param, std::string *groupType, std::vector<std::string> *elementIds);
     bool ParseChangeGroupAction(jsonxx::Object param, std::string *elementId, std::string *contour);
     bool ParseToggleLigatureAction(jsonxx::Object param, std::vector<std::string> *elementIds, std::string *isLigature);
     ///@}
@@ -98,7 +100,7 @@ protected:
 struct ClosestBB {
     int x;
     int y;
-    
+
     int distanceToBB(int ulx, int uly, int lrx, int lry)
     {
         int xDiff = std::max(
@@ -112,7 +114,7 @@ struct ClosestBB {
 
         return sqrt(xDiff * xDiff + yDiff * yDiff);
     }
-    
+
     bool operator() (Object *a, Object *b) {
         if (!a->GetFacsimileInterface() || !b->GetFacsimileInterface()) return true;
         Zone *zoneA = a->GetFacsimileInterface()->GetZone();
