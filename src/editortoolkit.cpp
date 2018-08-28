@@ -1052,7 +1052,6 @@ bool EditorToolkit::Split(std::string elementId, int x)
         }
     }
     layer->ClearRelinquishedChildren();
-    LogMessage("Loop done");
     m_editInfo = splitStaff->GetUuid();
     return true;
 }
@@ -1531,10 +1530,16 @@ bool EditorToolkit::ParseMergeAction(
 bool EditorToolkit::ParseSplitAction(
     jsonxx::Object param, std::string *elementId, int *x)
 {
-    if (!param.has<jsonxx::String>("elementId")) return false;
+    if (!param.has<jsonxx::String>("elementId")) {
+        LogWarning("Could not parse 'elementId'.");
+        return false;
+    }
     (*elementId) = param.get<jsonxx::String>("elementId");
 
-    if (!param.has<jsonxx::Number>("x")) return false;
+    if (!param.has<jsonxx::Number>("x")) {
+        LogWarning("Could not parse 'x'.");
+        return false;
+    }
     (*x) = param.get<jsonxx::Number>("x");
 
     return true;
