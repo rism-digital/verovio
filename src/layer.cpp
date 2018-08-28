@@ -205,7 +205,9 @@ Clef *Layer::GetClef(LayerElement *test)
         ArrayOfObjects clefs;
         AttComparison ac(CLEF);
         doc->FindAllChildBetween(&clefs, &ac, doc->GetFirst(CLEF), test);
-        return dynamic_cast<Clef *>(*clefs.rbegin());
+        if (clefs.size() > 0) {
+            return dynamic_cast<Clef *>(*clefs.rbegin());
+        }
     }
     return GetCurrentClef();
 }
