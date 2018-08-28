@@ -171,7 +171,7 @@ bool EditorToolkit::ParseEditorAction(const std::string &json_editorAction, bool
         LogWarning("Could not parse toggle ligature action");
     }
     else {
-        LogWarning("Unknown action type.");
+        LogWarning("Unknown action type '%s'.", action.c_str());
     }
     return false;
 }
