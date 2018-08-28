@@ -589,6 +589,7 @@ bool HumdrumInput::convertHumdrum()
 
     m_doc->ConvertToPageBasedDoc();
     promoteInstrumentNamesToGroup();
+    promoteInstrumentAbbreviationsToGroup();
 
     if (m_debug) {
         cout << GetMeiString();
@@ -1284,9 +1285,6 @@ void HumdrumInput::prepareStaffGroups()
 
 void HumdrumInput::promoteInstrumentNamesToGroup()
 {
-    // Object *pgfoot = tempdoc.m_scoreDef.FindChildByType(ClassId::PGFOOT);
-    // Object *detached = pgfoot->GetParent()->DetachChild(index);
-
     ScoreDef &sdf = m_doc->m_scoreDef;
     int count = sdf.GetChildCount();
     std::vector<std::vector<std::string> > names(count);
@@ -1316,16 +1314,81 @@ void HumdrumInput::promoteInstrumentNamesToGroup()
         if (names[i].size() <= 1) {
             allsame = false;
         }
+        string nonempty = names[i][0];
         for (int j = 1; j < (int)names[i].size(); j++) {
-            if (names[i][j] != names[i][0]) {
+            if (names[i][j] == "") {
+                continue;
+            }
+            if (nonempty.empty()) {
+                nonempty = names[i][j];
+            }
+            if (names[i][j] != nonempty) {
                 allsame = false;
                 break;
             }
         }
         if (allsame) {
-            setInstrumentName(sg, names[i][0]);
+            setInstrumentName(sg, nonempty);
             for (int j = 0; j < (int)sds.size(); j++) {
                 removeInstrumentName(sds[j]);
+            }
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::promoteInstrumentAbbreviationsToGroup --
+//
+
+void HumdrumInput::promoteInstrumentAbbreviationsToGroup()
+{
+    ScoreDef &sdf = m_doc->m_scoreDef;
+    int count = sdf.GetChildCount();
+    std::vector<std::vector<std::string> > names(count);
+
+    for (int i = 0; i < count; i++) {
+        Object *obj = sdf.GetChild(i);
+        std::string name = obj->GetClassName();
+        if (name != "StaffGrp") {
+            continue;
+        }
+        StaffGrp *sg = (StaffGrp *)obj;
+        int ccount = sg->GetChildCount();
+        vector<StaffDef *> sds;
+        sds.clear();
+        for (int j = 0; j < ccount; j++) {
+            Object *obj2 = sg->GetChild(j);
+            name = obj2->GetClassName();
+            if (name != "StaffDef") {
+                continue;
+            }
+            StaffDef *sd = (StaffDef *)obj2;
+            sds.push_back(sd);
+            std::string label = getInstrumentAbbreviation(sd);
+            names[i].push_back(label);
+        }
+        bool allsame = true;
+        if (names[i].size() <= 1) {
+            allsame = false;
+        }
+        string nonempty = names[i][0];
+        for (int j = 1; j < (int)names[i].size(); j++) {
+            if (names[i][j] == "") {
+                continue;
+            }
+            if (nonempty.empty()) {
+                nonempty = names[i][j];
+            }
+            if (names[i][j] != nonempty) {
+                allsame = false;
+                break;
+            }
+        }
+        if (allsame) {
+            setInstrumentAbbreviation(sg, nonempty);
+            for (int j = 0; j < (int)sds.size(); j++) {
+                removeInstrumentAbbreviation(sds[j]);
             }
         }
     }
@@ -1347,12 +1410,46 @@ void HumdrumInput::removeInstrumentName(StaffDef *sd)
 
 //////////////////////////////
 //
+// HumdrumInput::removeInstrumentAbbreviation -- Assuming only one abbreviation for staffDef.
+//
+
+void HumdrumInput::removeInstrumentAbbreviation(StaffDef *sd)
+{
+    Object *obj = sd->FindChildByType(ClassId::LABELABBR);
+    if (!obj) {
+        return;
+    }
+    sd->DeleteChild(obj);
+}
+
+//////////////////////////////
+//
 // HumdrumInput::getInstrumentName --
 //
 
 std::string HumdrumInput::getInstrumentName(StaffDef *sd)
 {
     Object *label = sd->FindChildByType(ClassId::LABEL);
+    if (!label) {
+        return "";
+    }
+    Object *obj = label->FindChildByType(ClassId::TEXT);
+    if (!obj) {
+        return "";
+    }
+    Text *text = (Text *)obj;
+    std::string name = UTF16to8(text->GetText());
+    return name;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getInstrumentAbbreviation --
+//
+
+std::string HumdrumInput::getInstrumentAbbreviation(StaffDef *sd)
+{
+    Object *label = sd->FindChildByType(ClassId::LABELABBR);
     if (!label) {
         return "";
     }
