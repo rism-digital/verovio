@@ -588,8 +588,8 @@ bool HumdrumInput::convertHumdrum()
     // calculateLayout();
 
     m_doc->ConvertToPageBasedDoc();
-    promoteInstrumentNamesToGroup();
     promoteInstrumentAbbreviationsToGroup();
+    promoteInstrumentNamesToGroup();
 
     if (m_debug) {
         cout << GetMeiString();
@@ -1319,8 +1319,9 @@ void HumdrumInput::promoteInstrumentNamesToGroup()
             if (names[i][j] == "") {
                 continue;
             }
-            if (nonempty.empty()) {
+            if (nonempty == "") {
                 nonempty = names[i][j];
+                continue;
             }
             if (names[i][j] != nonempty) {
                 allsame = false;
@@ -1377,8 +1378,9 @@ void HumdrumInput::promoteInstrumentAbbreviationsToGroup()
             if (names[i][j] == "") {
                 continue;
             }
-            if (nonempty.empty()) {
+            if (nonempty == "") {
                 nonempty = names[i][j];
+                continue;
             }
             if (names[i][j] != nonempty) {
                 allsame = false;
@@ -1439,6 +1441,9 @@ std::string HumdrumInput::getInstrumentName(StaffDef *sd)
     }
     Text *text = (Text *)obj;
     std::string name = UTF16to8(text->GetText());
+    if (name == "    ") {
+        name = "";
+    }
     return name;
 }
 
@@ -2597,16 +2602,16 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
         setDynamicTransposition(partnumber - 1, m_staffdef.back(), itranspose);
     }
 
+    if (abbreviation.size() > 0) {
+        setInstrumentAbbreviation(m_staffdef.back(), abbreviation);
+    }
+
     if (haslabel) {
         setInstrumentName(m_staffdef.back(), label);
     }
     else if (partnumber == 1) {
         // setInstrumentName(m_staffdef.back(), "&#160;&#160;&#160;&#160;");
         setInstrumentName(m_staffdef.back(), "\xc2\xa0\xc2\xa0\xc2\xa0\xc2\xa0");
-    }
-
-    if (abbreviation.size() > 0) {
-        setInstrumentAbbreviation(m_staffdef.back(), abbreviation);
     }
 
     if (keysig.size() > 0) {
@@ -2657,7 +2662,7 @@ template <class ELEMENT> void HumdrumInput::setInstrumentName(ELEMENT *element, 
     Text *text = new Text;
     text->SetText(UTF8to16(newname));
     label->AddChild(text);
-    element->AddChild(label);
+    element->InsertChild(label, 0);
 }
 
 //////////////////////////////
@@ -2671,7 +2676,7 @@ template <class ELEMENT> void HumdrumInput::setInstrumentAbbreviation(ELEMENT *e
     Text *text = new Text;
     text->SetText(UTF8to16(name));
     label->AddChild(text);
-    element->AddChild(label);
+    element->InsertChild(label, 0);
 }
 
 //////////////////////////////
