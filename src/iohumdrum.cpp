@@ -588,6 +588,7 @@ bool HumdrumInput::convertHumdrum()
     // calculateLayout();
 
     m_doc->ConvertToPageBasedDoc();
+    promoteInstrumentNamesToGroup();
 
     if (m_debug) {
         cout << GetMeiString();
@@ -1274,6 +1275,94 @@ void HumdrumInput::prepareStaffGroups()
     else {
         processStaffDecoration(decoration);
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::promoteInstrumentNamesToGroup --
+//
+
+void HumdrumInput::promoteInstrumentNamesToGroup()
+{
+    // Object *pgfoot = tempdoc.m_scoreDef.FindChildByType(ClassId::PGFOOT);
+    // Object *detached = pgfoot->GetParent()->DetachChild(index);
+
+    ScoreDef &sdf = m_doc->m_scoreDef;
+    int count = sdf.GetChildCount();
+    std::vector<std::vector<std::string> > names(count);
+
+    for (int i = 0; i < count; i++) {
+        Object *obj = sdf.GetChild(i);
+        std::string name = obj->GetClassName();
+        if (name != "StaffGrp") {
+            continue;
+        }
+        StaffGrp *sg = (StaffGrp *)obj;
+        int ccount = sg->GetChildCount();
+        vector<StaffDef *> sds;
+        sds.clear();
+        for (int j = 0; j < ccount; j++) {
+            Object *obj2 = sg->GetChild(j);
+            name = obj2->GetClassName();
+            if (name != "StaffDef") {
+                continue;
+            }
+            StaffDef *sd = (StaffDef *)obj2;
+            sds.push_back(sd);
+            std::string label = getInstrumentName(sd);
+            names[i].push_back(label);
+        }
+        bool allsame = true;
+        if (names[i].size() <= 1) {
+            allsame = false;
+        }
+        for (int j = 1; j < (int)names[i].size(); j++) {
+            if (names[i][j] != names[i][0]) {
+                allsame = false;
+                break;
+            }
+        }
+        if (allsame) {
+            setInstrumentName(sg, names[i][0]);
+            for (int j = 0; j < (int)sds.size(); j++) {
+                removeInstrumentName(sds[j]);
+            }
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::removeInstrumentName -- Assuming only one label for staffDef.
+//
+
+void HumdrumInput::removeInstrumentName(StaffDef *sd)
+{
+    Object *obj = sd->FindChildByType(ClassId::LABEL);
+    if (!obj) {
+        return;
+    }
+    sd->DeleteChild(obj);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getInstrumentName --
+//
+
+std::string HumdrumInput::getInstrumentName(StaffDef *sd)
+{
+    Object *label = sd->FindChildByType(ClassId::LABEL);
+    if (!label) {
+        return "";
+    }
+    Object *obj = label->FindChildByType(ClassId::TEXT);
+    if (!obj) {
+        return "";
+    }
+    Text *text = (Text *)obj;
+    std::string name = UTF16to8(text->GetText());
+    return name;
 }
 
 //////////////////////////////
@@ -2459,32 +2548,33 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcoun
 
 //////////////////////////////
 //
-// HumdrumInput::setInstrumentName --
+// HumdrumInput::setInstrumentName -- for staffDef or staffGrp.
 //
 
-void HumdrumInput::setInstrumentName(vrv::StaffDef *staffdef, const string &name)
+template <class ELEMENT> void HumdrumInput::setInstrumentName(ELEMENT *element, const string &name)
 {
     hum::HumRegex hre;
+    // "\xc2\xa0" is a non-breaking space
     string newname = hre.replaceCopy(name, "\xc2\xa0", " ", "g");
     Label *label = new Label();
     Text *text = new Text;
     text->SetText(UTF8to16(newname));
     label->AddChild(text);
-    staffdef->AddChild(label);
+    element->AddChild(label);
 }
 
 //////////////////////////////
 //
-// HumdrumInput::setInstrumentAbbreviation --
+// HumdrumInput::setInstrumentAbbreviation -- for staffDef or staffGrp.
 //
 
-void HumdrumInput::setInstrumentAbbreviation(vrv::StaffDef *staffdef, const string &name)
+template <class ELEMENT> void HumdrumInput::setInstrumentAbbreviation(ELEMENT *element, const string &name)
 {
     LabelAbbr *label = new LabelAbbr();
     Text *text = new Text;
     text->SetText(UTF8to16(name));
     label->AddChild(text);
-    staffdef->AddChild(label);
+    element->AddChild(label);
 }
 
 //////////////////////////////
@@ -9395,7 +9485,6 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     // handle ties
-    // ggg
     if ((tstring.find("[") != string::npos) || (tstring.find("_") != string::npos)) {
         processTieStart(note, token, tstring, subtoken);
     }

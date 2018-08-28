@@ -413,8 +413,6 @@ protected:
     void embedPitchInformationInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
     void splitSyllableBySpaces(vector<string> &vtext, char spacer = ' ');
-    void setInstrumentName(vrv::StaffDef *staffdef, const std::string &name);
-    void setInstrumentAbbreviation(vrv::StaffDef *staffdef, const std::string &name);
     void addDefaultTempo(ScoreDef &m_scoreDef);
     int getChordNoteCount(hum::HTp token);
     bool leftmostSystemArpeggio(hum::HTp token);
@@ -454,8 +452,10 @@ protected:
     void storeExpansionList(Section *section, hum::HTp etok);
     std::string replaceMusicShapes(const std::string input);
     int getStaffAdjustment(hum::HTp token);
-    void calculateNoteIdForSlur(
-        std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index);
+    void calculateNoteIdForSlur(std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index);
+    void promoteInstrumentNamesToGroup();
+    std::string getInstrumentName(StaffDef *sd);
+    void removeInstrumentName(StaffDef *sd);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -490,6 +490,8 @@ protected:
     template <class ELEMENT>
     void setMeterSymbol(ELEMENT *element, const std::string &metersig, hum::HTp partstart = NULL);
     template <class ELEMENT> void setMensurationSymbol(ELEMENT *element, const std::string &metersig);
+    template <class ELEMENT> void setInstrumentName(ELEMENT *staffdef, const std::string &name);
+    template <class ELEMENT> void setInstrumentAbbreviation(ELEMENT *staffdef, const std::string &name);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
