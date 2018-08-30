@@ -699,36 +699,50 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
         surface->AddChild(zone);
         layer->AddChild(clef);
         m_editInfo = clef->GetUuid();
+        layer->ReorderByXPos();
 
-        // Ensure children of this clef keep their position if it is the second clef of a layer
-        if (layer->GetChildCount(CLEF) == 0) {
+        // Ensure children of this clef keep their position if it is NOT the first clef in the file.
+        ArrayOfObjects clefs;
+        AttComparison ac(CLEF);
+        m_doc->GetDrawingPage()->FindAllChildByComparison(&clefs, &ac);
+        if (clefs.size() == 0) {
             LogError("Something went wrong. Clef does not appear to be inserted.");
-        } else if (layer->GetChildCount(CLEF) > 1) {
-            // There are multiple clefs on this layer: keep position
-            // Update order of elements with layer as parent
-            layer->ReorderByXPos();
-
-            Clef *previousClef = dynamic_cast<Clef *>(layer->GetFirst(CLEF));
+        } else if (clefs.size() > 1) {
+            Clef *previousClef = dynamic_cast<Clef *>(clefs.at(0));
+            Clef *temp = nullptr;
+            for (auto it = clefs.begin(); it != clefs.end(); ++it) {
+                temp = dynamic_cast<Clef *>(*it);
+                if (temp == nullptr) {
+                    LogWarning("Null clef!");
+                    continue;
+                }
+                if (temp != clef) {
+                    previousClef = temp;
+                } else {
+                    temp = dynamic_cast<Clef *>(*(it+1));
+                    break;
+                }
+            }
             if (previousClef != clef) { // if the new clef is the first clef we do nothing
-                Clef *temp = nullptr;
-                do {
-                    temp = dynamic_cast<Clef *>(layer->GetNext());
-                    if (temp != clef) {
-                        previousClef = temp;
-                    }
-                } while (temp != clef);
-
-                // get difference to shift pitches by
+                // Get difference to shift pitches by
                 int pitchDifference = (previousClef->GetLine() - clefLine) * 2;
+                // Account for clef shape
+                if (previousClef->GetShape() != clefShape) {
+                    if (previousClef->GetShape() == CLEFSHAPE_F) {
+                        // Assume this clef is C
+                        pitchDifference -= 3;
+                    }
+                    else if (previousClef->GetShape() ==CLEFSHAPE_C) {
+                        // Assume this clef is F
+                        pitchDifference += 3;
+                    }
+                }
 
-                // Adjust elements with a relative position to clef by pitch in this layer
+                // Adjust elements with a relative position to clef by pitch
                 ArrayOfObjects elements;
                 InterfaceComparison ic(INTERFACE_PITCH);
-                temp = dynamic_cast<Clef *>(m_doc->GetDrawingPage()->GetNext(clef, CLEF));
-                m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef, (temp != nullptr) ? temp : m_doc->GetDrawingPage()->GetLast());
-
+                m_doc->GetDrawingPage()->FindAllChildBetween(&elements, &ic, clef, (temp != clefs.back()) ? temp : m_doc->GetDrawingPage()->GetLast());
                 for (auto it = elements.begin(); it != elements.end(); ++it) {
-                    assert(clef == layer->GetClef(dynamic_cast<LayerElement *>(*it)));
                     PitchInterface *pi = (*it)->GetPitchInterface();
                     assert(pi);
                     pi->AdjustPitchByOffset(pitchDifference);
