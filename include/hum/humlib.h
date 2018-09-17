@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Aug 27 08:23:22 PDT 2018
+// Last Modified: Sun Sep 16 23:21:56 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2760,6 +2760,7 @@ class MxmlPart {
 		string        getPartName          (void) const;
 		string        getPartAbbr          (void) const;
 		string        cleanSpaces          (const string& input);
+		bool          hasOrnaments         (void) const;
 
 
 	private:
@@ -2770,6 +2771,7 @@ class MxmlPart {
 		void          receiveEditorialAccidental  (void);
 		void          receiveDynamic              (void);
 		void          receiveCaesura              (const string& letter);
+		void          receiveOrnament             (void);
 
 	protected:
 		vector<MxmlMeasure*> m_measures;
@@ -2784,6 +2786,7 @@ class MxmlPart {
 		string               m_partname;
 		string               m_partabbr;
 		string               m_caesura;
+		bool                 m_hasOrnaments = false;
 
 		// m_staffvoicehist: counts of staff and voice numbers.
 		// staff=0 is used for items such as measures.
@@ -3118,6 +3121,7 @@ class HumGrid : public std::vector<GridMeasure*> {
 		                                    GridStaff* oldlaststaff,
 		                                    GridStaff* newstaff,
 		                                    GridStaff* newlaststaff);
+		void transferOtherParts            (GridSlice* oldline, GridSlice* newline, int maxpart);
 		void insertExInterpSides           (HumdrumLine* line, int part,
 		                                    int staff);
 		void insertSideTerminals           (HumdrumLine* line, int part,
@@ -3242,6 +3246,7 @@ class MxmlEvent {
 		void               reportEditorialAccidentalToOwner(void);
 		void               reportDynamicToOwner       (void);
 		void               reportCaesuraToOwner       (const std::string& letter = "Z") const;
+		void               reportOrnamentToOwner      (void) const;
       void               makeDummyRest      (MxmlMeasure* owner,
 		                                       HumNum startime,
 		                                       HumNum duration,
@@ -3367,6 +3372,7 @@ class MxmlMeasure {
 		void  receiveTimeSigDurFromChild          (HumNum duration);
 		void  receiveMeasureStyleFromChild        (MeasureStyle style);
 		void  receiveEditorialAccidentalFromChild (void);
+		void  receiveOrnamentFromChild            (void);
    	void  reportStaffNumberToOwner            (int staffnum, int voicenum);
 		void  reportVerseCountToOwner             (int count);
 		void  reportVerseCountToOwner             (int staffindex, int count);
@@ -3374,6 +3380,7 @@ class MxmlMeasure {
 		void  reportEditorialAccidentalToOwner    (void);
 		void  reportDynamicToOwner                (void);
 		void  reportCaesuraToOwner                (const string& letter);
+		void  reportOrnamentToOwner               (void);
 
 	protected:
 		HumNum             m_starttime; // start time of measure in quarter notes
@@ -3742,6 +3749,7 @@ class HumdrumFileStream {
 		                HumdrumFileStream  (char** list);
 		                HumdrumFileStream  (const std::vector<std::string>& list);
 		                HumdrumFileStream  (Options& options);
+		                HumdrumFileStream  (const string& datastream);
 
 		int             setFileList        (char** list);
 		int             setFileList        (const std::vector<std::string>& list);
@@ -3753,8 +3761,9 @@ class HumdrumFileStream {
 		int             read               (HumdrumFile& infile);
 
 	protected:
-		std::ifstream     m_instream;       // used to read from list of files.
-		std::stringstream m_urlbuffer;      // used to read data over internet.
+		std::stringstream m_stringbuffer;   // used to read files from a string
+		std::ifstream     m_instream;       // used to read from list of files
+		std::stringstream m_urlbuffer;      // used to read data over internet
 		std::string       m_newfilebuffer;  // used to keep track of !!!!segment:
 		                                    // records.
 
@@ -5115,6 +5124,7 @@ class Tool_musicxml2hum : public HumTool {
 		int  m_slurabove    = 0;
 		int  m_slurbelow    = 0;
 		char m_hasEditorial = '\0';
+		bool m_hasOrnamentsQ = false;
 		std::vector<std::vector<std::string>> m_last_ottava_direction;
 
 		// RDF indications in **kern data:
@@ -5721,6 +5731,7 @@ class Tool_trillspell : public HumTool {
 		int   getBase40           (int diatonic, int accidental);
 
 	private:
+		bool m_xmark = false;
 
 };
 
