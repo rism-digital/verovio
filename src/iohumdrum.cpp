@@ -588,8 +588,8 @@ bool HumdrumInput::convertHumdrum()
     // calculateLayout();
 
     m_doc->ConvertToPageBasedDoc();
-    promoteInstrumentAbbreviationsToGroup();
     promoteInstrumentNamesToGroup();
+    promoteInstrumentAbbreviationsToGroup();
 
     if (m_debug) {
         cout << GetMeiString();
@@ -1280,14 +1280,23 @@ void HumdrumInput::prepareStaffGroups()
 
 //////////////////////////////
 //
-// HumdrumInput::promoteInstrumentNamesToGroup --
+// HumdrumInput::promoteInstrumentNamesToGroup -- If two staves are in a staff group and only one
+//    has an instrument label (or both have identical labels), then move the label to the group
+//    level, so that the instrument name/abbreviation is centered between the staves.
+//
+// scoreDef
+//    staffDef
+//    staffGrp
+//       staffDef
+//       staffGrp
+//          staffDef
+//          staffDef
 //
 
 void HumdrumInput::promoteInstrumentNamesToGroup()
 {
     ScoreDef &sdf = m_doc->m_scoreDef;
     int count = sdf.GetChildCount();
-    std::vector<std::vector<std::string> > names(count);
 
     for (int i = 0; i < count; i++) {
         Object *obj = sdf.GetChild(i);
@@ -1296,43 +1305,62 @@ void HumdrumInput::promoteInstrumentNamesToGroup()
             continue;
         }
         StaffGrp *sg = (StaffGrp *)obj;
-        int ccount = sg->GetChildCount();
-        vector<StaffDef *> sds;
-        sds.clear();
-        for (int j = 0; j < ccount; j++) {
-            Object *obj2 = sg->GetChild(j);
-            name = obj2->GetClassName();
-            if (name != "StaffDef") {
-                continue;
-            }
-            StaffDef *sd = (StaffDef *)obj2;
-            sds.push_back(sd);
-            std::string label = getInstrumentName(sd);
-            names[i].push_back(label);
+        promoteInstrumentsForStaffGroup(sg);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::promoteInstrumentsForStaffGroup --
+//
+//
+
+void HumdrumInput::promoteInstrumentsForStaffGroup(StaffGrp *group)
+{
+    int count = group->GetChildCount();
+    std::vector<std::string> names(count);
+    string name;
+    vector<StaffDef *> sds;
+    sds.clear();
+    for (int i = 0; i < count; i++) {
+        Object *obj = group->GetChild(i);
+        name = obj->GetClassName();
+        if (name == "StaffGrp") {
+            promoteInstrumentsForStaffGroup((StaffGrp *)obj);
         }
-        bool allsame = true;
-        if (names[i].size() <= 1) {
+        if (name != "StaffDef") {
+            continue;
+        }
+        StaffDef *sd = (StaffDef *)obj;
+        sds.push_back(sd);
+        std::string label = getInstrumentName(sd);
+        names[i] = label;
+    }
+    bool allsame = true;
+    if (names.size() <= 1) {
+        allsame = false;
+    }
+    if (sds.size() != 2) {
+        return;
+    }
+    string nonempty = names[0];
+    for (int i = 1; i < (int)names[i].size(); i++) {
+        if (names[i] == "") {
+            continue;
+        }
+        if (nonempty == "") {
+            nonempty = names[i];
+            continue;
+        }
+        if (names[i] != nonempty) {
             allsame = false;
+            break;
         }
-        string nonempty = names[i][0];
-        for (int j = 1; j < (int)names[i].size(); j++) {
-            if (names[i][j] == "") {
-                continue;
-            }
-            if (nonempty == "") {
-                nonempty = names[i][j];
-                continue;
-            }
-            if (names[i][j] != nonempty) {
-                allsame = false;
-                break;
-            }
-        }
-        if (allsame) {
-            setInstrumentName(sg, nonempty);
-            for (int j = 0; j < (int)sds.size(); j++) {
-                removeInstrumentName(sds[j]);
-            }
+    }
+    if (allsame) {
+        setInstrumentName(group, nonempty);
+        for (int i = 0; i < (int)sds.size(); i++) {
+            removeInstrumentName(sds[i]);
         }
     }
 }
@@ -1346,7 +1374,6 @@ void HumdrumInput::promoteInstrumentAbbreviationsToGroup()
 {
     ScoreDef &sdf = m_doc->m_scoreDef;
     int count = sdf.GetChildCount();
-    std::vector<std::vector<std::string> > names(count);
 
     for (int i = 0; i < count; i++) {
         Object *obj = sdf.GetChild(i);
@@ -1355,43 +1382,68 @@ void HumdrumInput::promoteInstrumentAbbreviationsToGroup()
             continue;
         }
         StaffGrp *sg = (StaffGrp *)obj;
-        int ccount = sg->GetChildCount();
-        vector<StaffDef *> sds;
-        sds.clear();
-        for (int j = 0; j < ccount; j++) {
-            Object *obj2 = sg->GetChild(j);
-            name = obj2->GetClassName();
-            if (name != "StaffDef") {
-                continue;
-            }
-            StaffDef *sd = (StaffDef *)obj2;
-            sds.push_back(sd);
-            std::string label = getInstrumentAbbreviation(sd);
-            names[i].push_back(label);
+        promoteInstrumentAbbreviationsForStaffGroup(sg);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::promoteInstrumentAbbreviationsForStaffGroup --
+//
+//
+
+void HumdrumInput::promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group)
+{
+    int count = group->GetChildCount();
+    std::vector<std::string> names(count);
+    string name;
+    vector<StaffDef *> sds;
+    sds.clear();
+    for (int i = 0; i < count; i++) {
+        Object *obj = group->GetChild(i);
+        name = obj->GetClassName();
+        if (name == "StaffGrp") {
+            promoteInstrumentAbbreviationsForStaffGroup((StaffGrp *)obj);
         }
-        bool allsame = true;
-        if (names[i].size() <= 1) {
+        if (name != "StaffDef") {
+            continue;
+        }
+        StaffDef *sd = (StaffDef *)obj;
+        sds.push_back(sd);
+        std::string label = getInstrumentAbbreviation(sd);
+        names[i] = label;
+    }
+    bool allsame = true;
+    if (names.size() <= 1) {
+        allsame = false;
+    }
+    if (sds.size() != 2) {
+        return;
+    }
+    string nonempty = names[0];
+    for (int i = 1; i < (int)names[i].size(); i++) {
+        if (names[i] == "") {
+            continue;
+        }
+        if (nonempty == "") {
+            nonempty = names[i];
+            continue;
+        }
+        if (names[i] != nonempty) {
             allsame = false;
+            break;
         }
-        string nonempty = names[i][0];
-        for (int j = 1; j < (int)names[i].size(); j++) {
-            if (names[i][j] == "") {
+    }
+    // An irrational bug prevents moving the instrument abbreviation for now.
+    // After adding/removing the abbreviation, the full name dissappears for some
+    // unknown reason.
+    if (allsame) {
+        // setInstrumentAbbreviation(group, nonempty);
+        for (int i = 0; i < (int)sds.size(); i++) {
+            if (names[i].empty()) {
                 continue;
             }
-            if (nonempty == "") {
-                nonempty = names[i][j];
-                continue;
-            }
-            if (names[i][j] != nonempty) {
-                allsame = false;
-                break;
-            }
-        }
-        if (allsame) {
-            setInstrumentAbbreviation(sg, nonempty);
-            for (int j = 0; j < (int)sds.size(); j++) {
-                removeInstrumentAbbreviation(sds[j]);
-            }
+            // removeInstrumentAbbreviation(sds[i]);
         }
     }
 }

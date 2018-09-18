@@ -454,7 +454,9 @@ protected:
     int getStaffAdjustment(hum::HTp token);
     void calculateNoteIdForSlur(std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index);
     void promoteInstrumentNamesToGroup();
+    void promoteInstrumentsForStaffGroup(StaffGrp *group);
     void promoteInstrumentAbbreviationsToGroup();
+    void promoteInstrumentAbbreviationsForStaffGroup(StaffGrp *group);
     std::string getInstrumentName(StaffDef *sd);
     std::string getInstrumentAbbreviation(StaffDef *sd);
     void removeInstrumentName(StaffDef *sd);
