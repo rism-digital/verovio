@@ -707,14 +707,19 @@ void AbcInput::parseMeter(std::string meterString)
 void AbcInput::parseTempo(std::string tempoString)
 {
     Tempo *tempo = new Tempo();
+    if (tempoString.find('=') != std::string::npos) {
+      // tempo->SetMm();
+    }
     if (tempoString.find('\"') != std::string::npos) {
         std::string tempoWord = tempoString.substr(tempoString.find('\"') + 1);
         tempoWord = tempoWord.substr(0, tempoWord.find('\"'));
-        Text *text = new Text();
-        text->SetText(UTF8to16(tempoWord));
-        tempo->AddChild(text);
-        // this has to be fixed
-        tempo->SetTstamp(1);
+        if (!tempoWord.empty()) {
+          Text *text = new Text();
+          text->SetText(UTF8to16(tempoWord));
+          tempo->AddChild(text);
+          // this has to be fixed
+          tempo->SetTstamp(1);
+        }
     }
     m_tempoStack.push_back(tempo);
     LogWarning("ABC input: Tempo definitions are not fully supported yet");
