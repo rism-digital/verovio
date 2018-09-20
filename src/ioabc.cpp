@@ -291,7 +291,14 @@ void AbcInput::AddBeam()
         for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
             beam->AddChild(*iter);
         }
-        m_layer->AddChild(beam);
+        if (beam->FindChildByType(NOTE)) {
+          m_layer->AddChild(beam);
+        }
+        else {
+          for (auto iter = m_noteStack.begin(); iter != m_noteStack.end(); ++iter) {
+              m_layer->AddChild(*iter);
+          }
+        }
     }
     m_noteStack.clear();
 }
