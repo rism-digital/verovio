@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Sep 16 23:21:56 PDT 2018
+// Last Modified: Thu Sep 20 11:43:22 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -12901,7 +12901,7 @@ bool HumdrumFileBase::read(const char* filename) {
 	} else {
 		infile.open(filename);
 		if (!infile.is_open()) {
-			return setParseError("Cannot open file %s for reading.", filename);
+			return setParseError("Cannot open file %s for reading. A", filename);
 		}
 	}
 	HumdrumFileBase::read(infile);
@@ -12952,7 +12952,7 @@ bool HumdrumFileBase::readCsv(const char* filename, const string& separator) {
 	} else {
 		infile.open(filename);
 		if (!infile.is_open()) {
-			return setParseError("Cannot open file %s for reading.", filename);
+			return setParseError("Cannot open file %s for reading. B", filename);
 		}
 	}
 	HumdrumFileBase::readCsv(infile, separator);
@@ -15323,6 +15323,80 @@ void HumdrumFileContent::getMetricLevels(vector<double>& output,
 			}
 		} else {
 			output[i] = Convert::nearIntQuantize(log(denominator) / log(2.0));
+		}
+	}
+}
+
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::analyzeOttavas -- 
+//
+
+void HumdrumFileContent::analyzeOttavas(void) {
+	int tcount = getTrackCount();
+	int activeOttava = 0;
+	vector<int> octavestate(tcount+1, 0);
+	for (int i=0; i<getLineCount(); i++) {
+		HumdrumLine* line = getLine(i);
+		if (line->isInterpretation()) {
+			int fcount = getLine(i)->getFieldCount();
+			for (int j=0; j<fcount; j++) {
+				HTp token = line->token(j);
+				if (!token->isKern()) {
+					continue;
+				}
+				int track = token->getTrack();
+				if (*token == "*8va") {
+					octavestate[track] = +1;
+					activeOttava++;
+				} else if (*token == "*X8va") {
+					octavestate[track] = 0;
+					activeOttava--;
+				} else if (*token == "*8ba") {
+					octavestate[track] = -1;
+					activeOttava++;
+				} else if (*token == "*X8ba") {
+					octavestate[track] = 0;
+					activeOttava--;
+				} else if (*token == "*15ma") {
+					octavestate[track] = +2;
+					activeOttava++;
+				} else if (*token == "*X15ma") {
+					octavestate[track] = 0;
+					activeOttava--;
+				} else if (*token == "*15ba") {
+					octavestate[track] = -2;
+					activeOttava++;
+				} else if (*token == "*X15ba") {
+					octavestate[track] = 0;
+					activeOttava--;
+				}
+			}
+		}
+		else if (activeOttava && line->isData()) {
+			int fcount = getLine(i)->getFieldCount();
+			for (int j=0; j<fcount; j++) {
+				HTp token = line->token(j);
+				if (!token->isKern()) {
+					continue;
+				}
+				int track = token->getTrack();
+				if (octavestate[track] == 0) {
+					continue;
+				}
+				if (token->isNull()) {
+					continue;
+				}
+				if (token->isRest()) {
+					// maybe not exclude rests?  This might be important when
+					// there are more than two voices/layers on a staff.
+					continue;
+				}
+				token->setValue("auto", "ottava", to_string(octavestate[track]));
+			}
 		}
 	}
 }

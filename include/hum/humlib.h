@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Sep 16 23:21:56 PDT 2018
+// Last Modified: Thu Sep 20 11:43:22 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1955,6 +1955,10 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		                                   const std::string& null = ".",
 		                                   const std::string& exinterp = "**data",
 		                                   bool recalcLine = true);
+
+		// in HumdrumFileContent-ottava.cpp
+		void   analyzeOttavas             (void);
+
 
 	protected:
 		bool   analyzeKernSlurs           (HTp spinestart, std::vector<HTp>& slurstarts,

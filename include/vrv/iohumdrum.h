@@ -168,6 +168,7 @@ namespace humaux {
         // starting measure of the ottava mark.
         Note *ottavanotestart;
         Note *ottavanoteend;
+        hum::HumNum ottavaendtimestamp;
         Measure *ottavameasure;
 
         // ottavadownnote == keep track of ottava down marks: stores the starting note of
@@ -175,6 +176,7 @@ namespace humaux {
         // starting measure of the ottava down mark.
         Note *ottavadownnotestart;
         Note *ottavadownnoteend;
+        hum::HumNum ottavadownendtimestamp;
         Measure *ottavadownmeasure;
 
         // ottava2note == keep track of ottava2 marks: stores the starting note of
@@ -182,6 +184,7 @@ namespace humaux {
         // starting measure of the ottava2 mark.
         Note *ottava2notestart;
         Note *ottava2noteend;
+        hum::HumNum ottava2endtimestamp;
         Measure *ottava2measure;
 
         // ottava2downnote == keep track of ottava2 down marks: stores the starting note of
@@ -189,6 +192,7 @@ namespace humaux {
         // starting measure of the ottava2 down mark.
         Note *ottava2downnotestart;
         Note *ottava2downnoteend;
+        hum::HumNum ottava2downendtimestamp;
         Measure *ottava2downmeasure;
 
         // meter_bottom == Used to keep track of bottom value of time signature.
@@ -461,6 +465,7 @@ protected:
     std::string getInstrumentAbbreviation(StaffDef *sd);
     void removeInstrumentName(StaffDef *sd);
     void removeInstrumentAbbreviation(StaffDef *sd);
+    std::string getEndIdForOttava(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
