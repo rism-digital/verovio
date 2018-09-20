@@ -23,6 +23,7 @@
 #include "dynam.h"
 #include "editorial.h"
 #include "fermata.h"
+#include "hairpin.h"
 #include "harm.h"
 #include "layer.h"
 #include "mdiv.h"
@@ -171,6 +172,8 @@ void AbcInput::parseABC(std::istream &infile)
     }
 
     // read music code
+    m_layer = new Layer();
+    m_layer->SetN(1);
     while (!infile.eof()) {
         infile.getline(abcLine, 10000);
         ++m_lineNum;
@@ -230,7 +233,7 @@ void AbcInput::parseABC(std::istream &infile)
  BARRENDITION_dbl        ||
  */
 
-int AbcInput::SetBarLine(const char *musicCode, Measure *measure, int i)
+int AbcInput::SetBarLine(const char *musicCode, int i)
 {
     data_BARRENDITION barLine;
     if (musicCode[i - 1] == ':')
@@ -254,9 +257,9 @@ int AbcInput::SetBarLine(const char *musicCode, Measure *measure, int i)
     }
     // if the measure is still empty, put the bar line on the left
     if (!m_layer->GetChildCount())
-        measure->SetLeft(barLine);
+        m_barLines.first = barLine;
     else
-        measure->SetRight(barLine);
+        m_barLines.second = barLine;
     return i;
 }
 
@@ -946,11 +949,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
 
     if (strlen(musicCode) < 1) return;
 
-    Measure *measure = new Measure();
-    Staff *staff = new Staff();
-    m_layer = new Layer();
-    m_layer->SetN(1);
-
     while (i < int(strlen(musicCode))) {
         // eat the input...
 
@@ -1382,21 +1380,24 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         else if (musicCode[i] == '|') {
             // add stacked elements to layer
             AddBeam();
-            i = SetBarLine(musicCode, measure, i);
-            if (m_layer->GetChildCount()) {
-                staff->AddChild(m_layer);
-                measure->AddChild(staff);
-                for (auto it = m_tempoStack.begin(); it != m_tempoStack.end(); ++it) {
-                    measure->AddChild(*it);
-                }
-                m_tempoStack.clear();
-                section->AddChild(measure);
-                measure = new Measure();
-                staff = new Staff();
-                m_layer = new Layer();
-            }
-            else {
-                if (musicCode[i + 1] == ':') measure->SetLeft(BARRENDITION_rptstart);
+            i = SetBarLine(musicCode, i);
+
+            if (m_barLines.second != BARRENDITION_NONE) {
+              Measure *measure = new Measure();
+              measure->SetLeft(m_barLines.first);
+              measure->SetRight(m_barLines.second);
+              m_barLines = std::make_pair(BARRENDITION_NONE, BARRENDITION_NONE);
+              Staff *staff = new Staff();
+
+              staff->AddChild(m_layer);
+              measure->AddChild(staff);
+              section->AddChild(measure);
+              m_layer = new Layer();
+              m_layer->SetN(1);
+              for (auto it = m_tempoStack.begin(); it != m_tempoStack.end(); ++it) {
+                measure->AddChild(*it);
+              }
+              m_tempoStack.clear();
             }
         }
 
@@ -1421,19 +1422,6 @@ void AbcInput::readMusicCode(const char *musicCode, Section *section)
         Sb *sb = new Sb();
         sb->SetUuid(StringFormat("abcLine%02d", m_lineNum + 1));
         section->AddChild(sb);
-    }
-
-    // in case of not empty layer
-    if (m_layer->GetChildCount()) {
-        staff->AddChild(m_layer);
-        measure->AddChild(staff);
-        section->AddChild(measure);
-    }
-    else {
-        delete staff;
-        delete measure;
-        delete m_layer;
-        m_layer = NULL;
     }
 }
 

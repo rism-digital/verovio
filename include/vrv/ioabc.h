@@ -56,7 +56,7 @@ private:
     void parseABC(std::istream &infile);
 
     // parsing functions
-    int SetBarLine(const char *musicCode, Measure *measure, int index);
+    int SetBarLine(const char *musicCode, int index);
     void CalcUnitNoteLength();
     void AddAnnot(std::string remark);
     void AddBeam();
@@ -102,12 +102,19 @@ private:
     data_DURATION m_durDefault = DURATION_NONE; // todo: switch to MEI
     std::string m_ID;
     int m_unitDur;
+    std::pair<data_BARRENDITION, data_BARRENDITION> m_barLines; //
+    /*
+     * ABC variables with default values
+     */
     char m_decoration = '!';
     char m_linebreak = '$';
     int m_lineNum = 0;
     int m_broken = 0;
     int m_gracecount = 0;
     int m_stafflines = 5;
+    /*
+     * ABC metadata stacks
+     */
     std::vector<std::pair<std::string, int> > m_composer; // C:
     std::vector<std::pair<std::string, int> > m_history; // H:
     std::vector<std::pair<std::string, int> > m_notes; // N:
