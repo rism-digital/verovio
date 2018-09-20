@@ -1088,7 +1088,6 @@ bool EditorToolkit::Remove(std::string elementId)
     assert(obj);
     bool result, isNeume;
     isNeume = (obj->Is(NC) || obj->Is(NEUME) || obj->Is(SYLLABLE));
-    LogMessage("isNeume is %s", isNeume ? "true" : "false");
     Object *parent = obj->GetParent();
     assert(parent);
     m_editInfo = elementId;
@@ -1245,7 +1244,8 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
     for (auto it = elementIds.begin(); it != elementIds.end(); ++it) {
         Object *el = m_doc->GetDrawingPage()->FindChildByUuid(*it);
         //Check for ligatures and toggle them before ungrouping
-        if(groupType == "nc"){
+        //only if the ligature is the entire selection
+        if(groupType == "nc" && elementIds.size() == 2){
             Nc *nc = dynamic_cast<Nc *> (el);
             if(nc->HasLigature() && nc->GetLigature() == BOOLEAN_true){
                 nc->SetLigature(BOOLEAN_false);
@@ -1323,7 +1323,12 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
                 return false;
             }
         }
-        else{
+        else {
+            if (groupType == "nc") {
+                Nc *nc = dynamic_cast<Nc*>(el);
+                assert(nc);
+                if (nc->HasLigature()) continue;
+            }
             Object *newParent = currentParent->Clone();
             assert(newParent);
             newParent->ClearChildren();
