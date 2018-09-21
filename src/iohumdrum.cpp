@@ -4446,6 +4446,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         return true;
     }
 
+    prepareInitialOttavas(layerdata[0]);
+
     hum::HumNum starttime = infile[startline].getDurationFromStart();
     hum::HumNum endtime = infile[endline].getDurationFromStart() + infile[endline].getDuration();
     hum::HumNum duration = endtime - starttime;
@@ -4914,6 +4916,52 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::prepareInitialOttavas -- Check for an ottava mark start.
+//
+//
+
+void HumdrumInput::prepareInitialOttavas(hum::HTp token)
+{
+    if (!token) {
+        return;
+    }
+    hum::HumNum starttime = token->getDurationFromStart();
+    if (starttime > 0) {
+        return;
+    }
+    int subtrack = token->getSubtrack();
+    if (subtrack > 1) {
+        // only check for ottavas in the first layer.
+        return;
+    }
+
+    hum::HTp tok = token->getPreviousToken();
+    while (tok) {
+        if (!tok->isInterpretation()) {
+            tok = tok->getPreviousToken();
+        }
+        if (*tok == "*8va") {
+            handleOttavaMark(tok, NULL);
+            break;
+        }
+        else if (*tok == "*8ba") {
+            handleOttavaMark(tok, NULL);
+            break;
+        }
+        else if (*tok == "*15ma") {
+            handleOttavaMark(tok, NULL);
+            break;
+        }
+        else if (*tok == "*15ba") {
+            handleOttavaMark(tok, NULL);
+            break;
+        }
+        tok = tok->getPreviousToken();
+    }
 }
 
 /////////////////////////////
@@ -9241,9 +9289,11 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
 
     string oloc = token->getValue("auto", "oloc");
     string ploc = token->getValue("auto", "ploc");
+    int ottava = token->getValueInt("auto", "ottava");
 
     if ((!oloc.empty()) && (!ploc.empty())) {
         int olocint = stoi(oloc);
+        olocint -= ottava;
         rest->SetOloc(olocint);
         if (ploc == "C") {
             rest->SetPloc(PITCHNAME_c);

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Sep 20 11:43:22 PDT 2018
+// Last Modified: Fri Sep 21 12:49:20 PDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -3159,6 +3159,8 @@ class HumGrid : public std::vector<GridMeasure*> {
 
 };
 
+ostream& operator<<(ostream& out, HumGrid& grid);
+
 
 
 class MxmlMeasure;
@@ -5063,10 +5065,10 @@ class Tool_musicxml2hum : public HumTool {
 		void addOttavaLine     (GridMeasure* outdata, std::vector<std::vector<pugi::xml_node> >& ottavas,
 		                        std::vector<MxmlPart>& partdata, HumNum nowtime);
 		void insertPartClefs   (pugi::xml_node clef, GridPart& part);
-		void insertPartOttavas (pugi::xml_node ottava, GridPart& part, int partindex, int partstaffindex);
+		void insertPartOttavas (pugi::xml_node ottava, GridPart& part, int partindex, int partstaffindex, int staffcount);
 		pugi::xml_node convertClefToHumdrum(pugi::xml_node clef, HTp& token, int& staffindex);
 		pugi::xml_node convertOttavaToHumdrum(pugi::xml_node ottava, HTp& token, int& staffindex,
-		                        int partindex, int partstaffindex);
+		                        int partindex, int partstaffindex, int staffcount);
 
 		void addTranspositionLine(GridMeasure* outdata, std::vector<std::vector<pugi::xml_node> >& transpositions,
 		                       std::vector<MxmlPart>& partdata, HumNum nowtime);

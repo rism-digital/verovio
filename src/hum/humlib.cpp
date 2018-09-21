@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Sep 20 11:43:22 PDT 2018
+// Last Modified: Fri Sep 21 12:49:20 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -8218,6 +8218,20 @@ void HumGrid::deleteMeasure(int index) {
 
 
 
+//////////////////////////////
+//
+// operator<< -- Debugging printing of Humgrid Contents.
+//
+
+ostream& operator<<(ostream& out, HumGrid& grid) {
+	for (int i=0; i<(int)grid.size(); i++) {
+		out << "\nMEASURE " << i << " =========================" << endl;
+		out << grid[i];
+	}
+	return out;
+}
+
+
 
 
 ////////////////////////////////
@@ -15391,9 +15405,8 @@ void HumdrumFileContent::analyzeOttavas(void) {
 					continue;
 				}
 				if (token->isRest()) {
-					// maybe not exclude rests?  This might be important when
-					// there are more than two voices/layers on a staff.
-					continue;
+					// do not exclude rests, since the vertical placement
+					// of the staff may need to be updated by the ottava mark.
 				}
 				token->setValue("auto", "ottava", to_string(octavestate[track]));
 			}
@@ -45435,7 +45448,6 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	// set the duration of the last slice
 
 	HumdrumFile outfile;
-
 	outdata.transferTokens(outfile);
 
 	addHeaderRecords(outfile, doc);
@@ -45911,7 +45923,10 @@ bool Tool_musicxml2hum::fillPartData(MxmlPart& partdata,
 	}
 
 	partdata.parsePartInfo(partdeclaration);
-	m_last_ottava_direction.at(partdata.getPartIndex()).resize(partdata.getStaffCount());
+	// m_last_ottava_direction.at(partdata.getPartIndex()).resize(partdata.getStaffCount());
+	// staff count is incorrect at this point? Just assume 32 staves in the part, which should
+	// be 28-30 staffs too many.
+	m_last_ottava_direction.at(partdata.getPartIndex()).resize(32);
 
 	int count;
 	auto measures = partcontent.select_nodes("./measure");
@@ -47677,7 +47692,7 @@ void Tool_musicxml2hum::addOttavaLine(GridMeasure* outdata,
 	for (int i=0; i<(int)partdata.size(); i++) {
 		for (int j=0; j<(int)ottavas[i].size(); j++) {
 			if (ottavas[i][j]) {
-				insertPartOttavas(ottavas[i][j], *slice->at(i), i, j);
+				insertPartOttavas(ottavas[i][j], *slice->at(i), i, j, partdata[i].getStaffCount());
 			}
 		}
 	}
@@ -47767,7 +47782,7 @@ void Tool_musicxml2hum::insertPartClefs(xml_node clef, GridPart& part) {
 //
 
 void Tool_musicxml2hum::insertPartOttavas(xml_node ottava, GridPart& part, int partindex,
-		int partstaffindex) {
+		int partstaffindex, int staffcount) {
 	if (!ottava) {
 		// no ottava for some reason.
 		return;
@@ -47776,7 +47791,7 @@ void Tool_musicxml2hum::insertPartOttavas(xml_node ottava, GridPart& part, int p
 	HTp token;
 	int staffnum = 0;
 	while (ottava) {
-		ottava = convertOttavaToHumdrum(ottava, token, staffnum, partindex, partstaffindex);
+		ottava = convertOttavaToHumdrum(ottava, token, staffnum, partindex, partstaffindex, staffcount);
 		part[staffnum]->setTokenLayer(0, token, 0);
 	}
 
@@ -48294,7 +48309,10 @@ xml_node Tool_musicxml2hum::convertClefToHumdrum(xml_node clef,
 //
 
 xml_node Tool_musicxml2hum::convertOttavaToHumdrum(xml_node ottava,
-		HTp& token, int& staffindex, int partindex, int partstaffindex) {
+		HTp& token, int& staffindex, int partindex, int partstaffindex, int staffcount) {
+
+	// partstaffindex is useless or incorrect? At least for grand staff parts.
+	// The staffindex calculated below is the one to used.
 
 	if (!ottava) {
 		// no clef for some reason.
@@ -48306,18 +48324,20 @@ xml_node Tool_musicxml2hum::convertOttavaToHumdrum(xml_node ottava,
 	if (sn) {
 		staffindex = atoi(sn.value()) - 1;
 	}
+	staffindex = staffcount - staffindex - 1;
 
 	int interval = 0;
 
 	interval = ottava.attribute("size").as_int();
 	string otype = ottava.attribute("type").as_string();
+	string lastotype = m_last_ottava_direction.at(partindex).at(staffindex);
 
 	string ss;
 	ss = "*";
 	if (otype == "stop") {
 		ss += "X";
 	} else {
-	   m_last_ottava_direction.at(partindex).at(partstaffindex) = otype;
+	   m_last_ottava_direction.at(partindex).at(staffindex) = otype;
    }
 	if (interval == 15) {
 		ss += "15";
@@ -48326,9 +48346,9 @@ xml_node Tool_musicxml2hum::convertOttavaToHumdrum(xml_node ottava,
 		} else if (otype == "up") {
 			ss += "ba";
 		} else if (otype == "stop") {
-			if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "up") {
+			if (m_last_ottava_direction.at(partindex).at(staffindex) == "up") {
 				ss += "ba";
-			} else if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "down") {
+			} else if (m_last_ottava_direction.at(partindex).at(staffindex) == "down") {
 				ss += "ma";
 			}
 		}
@@ -48339,9 +48359,9 @@ xml_node Tool_musicxml2hum::convertOttavaToHumdrum(xml_node ottava,
 		} else if (otype == "up") {
 			ss += "ba";
 		} else if (otype == "stop") {
-			if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "up") {
+			if (m_last_ottava_direction.at(partindex).at(staffindex) == "up") {
 				ss += "ba";
-			} else if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "down") {
+			} else if (m_last_ottava_direction.at(partindex).at(staffindex) == "down") {
 				ss += "va";
 			}
 		}
@@ -48352,9 +48372,9 @@ xml_node Tool_musicxml2hum::convertOttavaToHumdrum(xml_node ottava,
 		} else if (otype == "up") {
 			ss += "ba";
 		} else if (otype == "stop") {
-			if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "up") {
+			if (m_last_ottava_direction.at(partindex).at(staffindex) == "up") {
 				ss += "ba";
-			} else if (m_last_ottava_direction.at(partindex).at(partstaffindex) == "down") {
+			} else if (m_last_ottava_direction.at(partindex).at(staffindex) == "down") {
 				ss += "va";
 			}
 		}

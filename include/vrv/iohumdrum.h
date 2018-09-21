@@ -466,6 +466,7 @@ protected:
     void removeInstrumentName(StaffDef *sd);
     void removeInstrumentAbbreviation(StaffDef *sd);
     std::string getEndIdForOttava(hum::HTp token);
+    void prepareInitialOttavas(hum::HTp measure);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
