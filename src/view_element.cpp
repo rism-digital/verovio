@@ -65,6 +65,13 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(layer);
     assert(staff);
     assert(measure);
+    
+    if (element->HasSameas()) {
+        dc->StartGraphic(element, "", element->GetUuid());
+        element->SetEmptyBB();
+        dc->EndGraphic(element, this);
+        return;
+    }
 
     int previousColor = m_currentColour;
 

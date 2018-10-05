@@ -38,6 +38,8 @@ void LinkingInterface::Reset()
 
     m_next = NULL;
     m_nextUuid = "";
+    m_sameas = NULL;
+    m_sameasUuid = "";
 }
 
 void LinkingInterface::SetNextLink(Object *next)
@@ -45,11 +47,20 @@ void LinkingInterface::SetNextLink(Object *next)
     assert(!m_next);
     m_next = next;
 }
+    
+void LinkingInterface::SetSameasLink(Object *sameas)
+{
+    assert(!m_sameas);
+    m_sameas = sameas;
+}
 
 void LinkingInterface::SetUuidStr()
 {
     if (this->HasNext()) {
         m_nextUuid = ExtractUuidFragment(this->GetNext());
+    }
+    if (this->HasSameas()) {
+        m_sameasUuid = ExtractUuidFragment(this->GetSameas());
     }
 }
 
@@ -78,6 +89,10 @@ int LinkingInterface::InterfacePrepareLinking(FunctorParams *functorParams, Obje
     if (!m_nextUuid.empty()) {
         params->m_nextUuidPairs.push_back(std::make_pair(this, m_nextUuid));
     }
+    if (!m_sameasUuid.empty()) {
+        params->m_sameasUuidPairs.push_back(std::make_pair(this, m_sameasUuid));
+    }
+    
 
     return FUNCTOR_CONTINUE;
 }
