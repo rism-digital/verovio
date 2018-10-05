@@ -60,7 +60,7 @@ void Clef::Reset()
 
 int Clef::GetClefLocOffset() const
 {
-    if (this->HasSameasLink()) {
+    if (this->HasSameasLink() && this->GetSameasLink()->Is(CLEF)) {
         Clef *sameas = dynamic_cast<Clef *>(this->GetSameasLink());
         assert(sameas);
         return sameas->GetClefLocOffset();

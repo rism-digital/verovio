@@ -128,6 +128,8 @@ int LinkingInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object
 {
     m_next = NULL;
     m_nextUuid = "";
+    m_sameas = NULL;
+    m_sameasUuid = "";
     return FUNCTOR_CONTINUE;
 }
 

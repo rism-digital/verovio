@@ -472,7 +472,7 @@ double LayerElement::GetAlignmentDuration(
         return 0.0;
     }
     
-    if (this->HasSameasLink()) {
+    if (this->HasSameasLink() && this->GetSameasLink()->IsLayerElement()) {
         LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
         assert(sameas);
         return sameas->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
