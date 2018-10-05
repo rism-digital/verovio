@@ -44,17 +44,17 @@ public:
      */
     ///@{
     void SetNextLink(Object *next);
-    Object *GetNextLink() { return m_next; }
+    Object *GetNextLink() const { return m_next; }
     void SetSameasLink(Object *sameas);
-    Object *GetSameasLink() { return m_sameas; }
+    Object *GetSameasLink() const { return m_sameas; }
     ///@}
 
     /**
      * Return true if a object is given and resolved
      */
     ///@{
-    bool HasNextLink() { return (m_next); }
-    bool HasSameasLink() { return (m_sameas); }
+    bool HasNextLink() const { return (m_next); }
+    bool HasSameasLink() const { return (m_sameas); }
     ///@}
 
     /**
