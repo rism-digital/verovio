@@ -1059,12 +1059,22 @@ int Object::PrepareLinking(FunctorParams *functorParams)
         interface->InterfacePrepareLinking(functorParams, this);
     }
 
+    // @next
     std::string uuid = this->GetUuid();
     auto i = std::find_if(params->m_nextUuidPairs.begin(), params->m_nextUuidPairs.end(),
         [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
     if (i != params->m_nextUuidPairs.end()) {
         i->first->SetNextLink(this);
         params->m_nextUuidPairs.erase(i);
+    }
+    
+    // @sameas
+    std::string sameas = this->GetUuid();
+    auto j = std::find_if(params->m_sameasUuidPairs.begin(), params->m_sameasUuidPairs.end(),
+                          [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
+    if (j != params->m_sameasUuidPairs.end()) {
+        j->first->SetSameasLink(this);
+        params->m_sameasUuidPairs.erase(j);
     }
 
     return FUNCTOR_CONTINUE;
