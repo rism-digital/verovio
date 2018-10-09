@@ -180,7 +180,7 @@ AttDurationGestural::~AttDurationGestural()
 void AttDurationGestural::ResetDurationGestural()
 {
     m_durGes = DURATION_NONE;
-    m_dotsGes = 0;
+    m_dotsGes = -1;
     m_durMetrical = 0.0;
     m_durPpq = 0;
     m_durReal = 0.0;
@@ -260,7 +260,7 @@ bool AttDurationGestural::HasDurGes() const
 
 bool AttDurationGestural::HasDotsGes() const
 {
-    return (m_dotsGes != 0);
+    return (m_dotsGes != -1);
 }
 
 bool AttDurationGestural::HasDurMetrical() const
