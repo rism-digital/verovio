@@ -10390,14 +10390,14 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
 
     string vstring = token->getVisualDuration();
     if (!vstring.empty()) {
-        int dotcount = characterCountInSubtoken(vstring, '.');
-        if (dotcount > 0) {
-            element->SetDots(dotcount);
+        int visualdotcount = characterCountInSubtoken(vstring, '.');
+        if (visualdotcount > 0) {
+            element->SetDots(visualdotcount);
         }
-        // dotcount = characterCountInSubtoken(tstring, '.');
-        // if (dotcount > 0) {
-        //    element->SetDotsGes(dotcount);
-        //}
+        int gesturaldotcount = characterCountInSubtoken(tstring, '.');
+        if (gesturaldotcount != visualdotcount) {
+            element->SetDotsGes(gesturaldotcount);
+        }
     }
     else {
         int dotcount = characterCountInSubtoken(tstring, '.');
