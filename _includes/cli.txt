@@ -1,4 +1,4 @@
-Verovio 2.0.0-dev-1fca2b8-dirty
+Verovio 2.0.0-dev-c0ae726
 
 Example usage:
 
