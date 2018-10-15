@@ -502,7 +502,7 @@ bool HumdrumInput::convertHumdrum()
 
     m_multirest = analyzeMultiRest(infile);
 
-    infile.analyzeKernSlurs();
+    infile.analyzeSlurs();
     infile.analyzeKernStems();
     infile.analyzeRestPositions();
     infile.analyzeOttavas();
@@ -5008,6 +5008,7 @@ void HumdrumInput::convertMensuralToken(
         setLocationId(note, token);
         appendElement(elements, pointers, note);
         convertNote(note, token, 0, staffindex);
+        processSlurs(token);
 
         if (token->find(':') != std::string::npos) {
             Dot *dot = new Dot();

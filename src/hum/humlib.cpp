@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Oct  8 23:42:57 PDT 2018
+// Last Modified: Fri Oct 12 19:17:49 PDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -956,15 +956,15 @@ HumNum Convert::mensToDuration(const string& mensdata, HumNum scale,
 		const string& separator) {
 	HumNum output(0);
    bool perfect = false;
-   bool imperfect = true;
+   // bool imperfect = true;
 	for (int i=0; i<(int)mensdata.size(); i++) {
 		if (mensdata[i] == 'p') {
 			perfect = true;
-			imperfect = false;
+			// imperfect = false;
 		}
 		if (mensdata[i] == 'i') {
 			perfect = false;
-			imperfect = true;
+			// imperfect = true;
 		}
 
 		// units are in whole notes, but scaling will probably
@@ -16078,6 +16078,46 @@ int HumdrumFileContent::getRestPositionAboveNotes(HTp rest, vector<int>& vpos) {
 
 //////////////////////////////
 //
+// HumdrumFileContent::analyzeSlurs -- Link start and ends of
+//    slurs to each other.
+//
+
+
+bool HumdrumFileContent::analyzeSlurs(void) {
+	bool output = true;
+	output &= analyzeKernSlurs();
+	output &= analyzeMensSlurs();
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::analyzeMensSlurs -- Link start and ends of
+//    slurs to each other.  They are the same as **kern, so borrowing
+//    analyzeKernSlurs to do the analysis.
+//
+
+bool HumdrumFileContent::analyzeMensSlurs(void) {
+	vector<HTp> slurstarts;
+	vector<HTp> slurends;
+
+	vector<HTp> mensspines;
+	getSpineStartList(mensspines, "**mens");
+	bool output = true;
+	string linkSignifier = m_signifiers.getKernLinkSignifier();
+	for (int i=0; i<(int)mensspines.size(); i++) {
+		output = output && analyzeKernSlurs(mensspines[i], slurstarts, slurends, linkSignifier);
+	}
+	createLinkedSlurs(slurstarts, slurends);
+	return output;
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumFileContent::analyzeKernSlurs -- Link start and ends of
 //    slurs to each other.
 //
@@ -16748,7 +16788,8 @@ void HumdrumFileStream::clear(void) {
 	m_filelist.resize(0);
 	m_universals.resize(0);
 	m_newfilebuffer.resize(0);
-	m_stringbuffer.clear(0);
+	// m_stringbuffer.clear(0);
+	m_stringbuffer.str("");
 }
 
 
@@ -22534,7 +22575,7 @@ int  HumdrumToken::getStrandIndex(void) const {
 //
 
 int HumdrumToken::getSlurStartElisionLevel(int index) const {
-	if (isDataType("**kern")) {
+	if (isDataType("**kern") || isDataType("**mens")) {
 		return Convert::getKernSlurStartElisionLevel((string)(*this), index);
 	} else {
 		return -1;
@@ -22552,7 +22593,7 @@ int HumdrumToken::getSlurStartElisionLevel(int index) const {
 //
 
 int HumdrumToken::getSlurEndElisionLevel(int index) const {
-	if (isDataType("**kern")) {
+	if (isDataType("**kern") || isDataType("**mens")) {
 		return Convert::getKernSlurEndElisionLevel((string)(*this), index);
 	} else {
 		return -1;
@@ -40474,8 +40515,9 @@ string Tool_kern2mens::convertKernTokenToMens(HTp token) {
 		return ".";
 	}
 	data = *token;
-	// remove uninteresting characters (beams, articulations, slurs, etc).
-	hre.replaceDestructive(data, "", "[^A-Gnra-g#\\[\\]0-9%.-]", "g");
+	// remove uninteresting characters (beams, articulations, etc).
+	// keeping pitches, accidentals, rests, slurs, durations, ties
+	hre.replaceDestructive(data, "", "[^A-Gnra-g#\\(\\)\\[\\]0-9%.-]", "g");
 	// but keep editorial accidental (probably i)
 	HumNum dur;
 	if (token->find("[") != std::string::npos) {
