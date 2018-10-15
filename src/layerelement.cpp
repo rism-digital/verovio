@@ -1136,6 +1136,11 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
+    if (this->HasSameasLink()) {
+        // nothing to do when the element has a @sameas attribute
+        return FUNCTOR_SIBLINGS;
+    }
+    
     int selfLeft;
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
