@@ -3636,9 +3636,69 @@ void HumdrumInput::insertFingerNumberInMeasure(
         setPlace(dir, "below");
     }
     m_measure->AddChild(dir);
-    hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
-    dir->SetTstamp(tstamp.getFloat());
     setLocationId(dir, token);
+
+    // Previously used @tstamp, now use @startid of note/chord;
+    // hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
+    // dir->SetTstamp(tstamp.getFloat());
+    linkFingeringToNote(dir, token, xstaffindex);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::linkFingeringToNote -- link to the note/chord in the highest layer
+//    (left-most spine) that is not a null data token. If no notes/chords at
+//    the position of the finger (such as perhaps due to a finger-change, then
+//    use a @tstamp rather than a @startid to place the fingering.
+//
+
+void HumdrumInput::linkFingeringToNote(Dir *dir, hum::HTp token, int xstaffindex)
+{
+    // token should be a **fing, so search for the **kern that it
+    // matches to the left, and then search for the last non-null
+    // kern token to link to the fingering (figure out later how to link
+    // to notes in secondary layers which will probably be done by
+    // placing fingerings in subspines of the	**fing spine.
+
+    hum::HTp linkednote = NULL;
+    int linktrack = -1;
+
+    hum::HumdrumLine &line = *token->getLine();
+    int startfield = token->getFieldIndex();
+
+    for (int i = startfield - 1; i >= 0; i--) {
+        hum::HTp testtok = line.token(i);
+        if (!testtok->isKern()) {
+            continue;
+        }
+        linktrack = testtok->getTrack();
+        for (int j = i; j >= 0; j--) {
+            testtok = line.token(j);
+            int ttrack = testtok->getTrack();
+            if (ttrack != linktrack) {
+                break;
+            }
+            if (!testtok->isNull()) {
+                linkednote = testtok;
+            }
+        }
+        break;
+    }
+    if (!linkednote) {
+        // use a timestamp to place the fingering
+        hum::HumNum tstamp = getMeasureTstamp(token, xstaffindex);
+        dir->SetTstamp(tstamp.getFloat());
+    }
+    else {
+        std::string startid;
+        if (linkednote->find(" ") != std::string::npos) {
+            startid = getLocationId("chord", linkednote);
+        }
+        else {
+            startid = getLocationId("note", linkednote);
+        }
+        dir->SetStartid("#" + startid);
+    }
 }
 
 //////////////////////////////

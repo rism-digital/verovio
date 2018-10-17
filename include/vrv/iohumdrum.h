@@ -18,6 +18,7 @@
 #include "accid.h"
 #include "attdef.h"
 #include "clef.h"
+#include "dir.h"
 #include "ending.h"
 #include "io.h"
 #include "runningelement.h"
@@ -467,6 +468,7 @@ protected:
     void removeInstrumentAbbreviation(StaffDef *sd);
     std::string getEndIdForOttava(hum::HTp token);
     void prepareInitialOttavas(hum::HTp measure);
+	void linkFingeringToNote(Dir* dir, hum::HTp token, int xstaffindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
