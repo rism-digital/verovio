@@ -4783,6 +4783,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                     setLocationId(irest, layerdata[i]);
                     appendElement(elements, pointers, irest);
+                    cerr << "GOT HERE AAA" << endl;
                     convertRhythm(irest, layerdata[i]);
                 }
                 else {
@@ -4851,6 +4852,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         }
                         setLocationId(irest, layerdata[i]);
                         appendElement(elements, pointers, irest);
+                        cerr << "GOT HERE BBB" << endl;
                         convertRhythm(irest, layerdata[i]);
                         processSlurs(layerdata[i]);
                         processDynamics(layerdata[i], staffindex);
@@ -4864,6 +4866,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                     setLocationId(irest, layerdata[i]);
                     appendElement(elements, pointers, irest);
+                    cerr << "GOT HERE CCC" << endl;
                     convertRhythm(irest, layerdata[i]);
                     processSlurs(layerdata[i]);
                     processDynamics(layerdata[i], staffindex);
@@ -4909,6 +4912,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
                 setLocationId(irest, layerdata[i]);
                 appendElement(elements, pointers, irest);
+                cerr << "GOT HERE DDD" << endl;
                 convertRhythm(irest, layerdata[i]);
                 processSlurs(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
@@ -6540,7 +6544,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
             dynam->SetTstamp(barstamp.getFloat());
 
-            std::string verticalgroup = getLayoutParameter(line->token(i), "DY", "vg");
+            std::string verticalgroup = line->token(i)->getLayoutParameter("DY", "vg");
             if (verticalgroup.empty()) {
                 // 100 is the default group for dynamics:
                 dynam->SetVgrp(VGRP_DYNAM_DEFAULT);
@@ -6601,7 +6605,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_cres);
 
-                std::string verticalgroup = getLayoutParameter(line->token(i), "HP", "vg");
+                std::string verticalgroup = line->token(i)->getLayoutParameter("HP", "vg");
                 if (verticalgroup.empty()) {
                     // 100 is the default group for dynamics:
                     hairpin->SetVgrp(VGRP_DYNAM_DEFAULT);
@@ -6682,7 +6686,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hairpin->SetForm(hairpinLog_FORM_dim);
                 m_measure->AddChild(hairpin);
 
-                std::string verticalgroup = getLayoutParameter(line->token(i), "HP", "vg");
+                std::string verticalgroup = line->token(i)->getLayoutParameter("HP", "vg");
                 if (verticalgroup.empty()) {
                     // 100 is the default group for dynamics:
                     hairpin->SetVgrp(VGRP_DYNAM_DEFAULT);
@@ -6741,40 +6745,6 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     // legitimate reasons).  Maybe make this more efficient later, such as
     // do a separate parse of dynamics data in a different loop.
     processDynamics(token, staffindex);
-}
-
-//////////////////////////////
-//
-// HumdrumInput::getLayoutParameter -- returns empty string if no given layout parameter, or
-//      the non-empty parameter as a string.
-//
-
-std::string HumdrumInput::getLayoutParameter(hum::HTp token, const std::string &category, const std::string &keyname)
-{
-    int lcount = token->getLinkedParameterCount();
-    if (lcount == 0) {
-        return "";
-    }
-
-    for (int p = 0; p < token->getLinkedParameterCount(); ++p) {
-        hum::HumParamSet *hps = token->getLinkedParameter(p);
-        if (hps == NULL) {
-            continue;
-        }
-        if (hps->getNamespace1() != "LO") {
-            continue;
-        }
-        if (hps->getNamespace2() != category) {
-            continue;
-        }
-        for (int q = 0; q < hps->getCount(); ++q) {
-            string key = hps->getParameterName(q);
-            if (key == keyname) {
-                return hps->getParameterValue(q);
-            }
-        }
-    }
-    return "";
 }
 
 //////////////////////////////
@@ -9167,6 +9137,7 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
         chord->SetDur(DURATION_8);
     }
 
+    cerr << "GOT HERE EEE" << endl;
     convertRhythm(chord, token);
     if (m_setrightstem) {
         m_setrightstem = false;
@@ -9346,6 +9317,7 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
 
     // Shouldn't be in a chord, so add rest duration here.
     // Also full-measure rests are handled elsewhere.
+    cerr << "GOT HERE FFF" << endl;
     convertRhythm(rest, token, subtoken);
 
     string oloc = token->getValue("auto", "oloc");
@@ -9732,7 +9704,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     // int accidCount = hum::Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
     bool showInAccidGes = !showInAccid;
-    string loaccid = getLayoutAccidental(token, subtoken);
+    string loaccid = token->getLayoutParameter("N", "acc", subtoken);
     if (!loaccid.empty()) {
         // show the performance accidental in @accid.ges, and the
         // loaccid will be shown in @accid (the following false
@@ -9851,6 +9823,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     if (!chordQ) {
+        cerr << "GOT HERE GGG" << endl;
         hum::HumNum dur = convertRhythm(note, token, subtoken);
         if (m_setrightstem) {
             m_setrightstem = false;
@@ -9861,6 +9834,16 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
             note->SetStemLen(0);
             // if you want a stemless grace note, then set the
             // stemlength to zero explicitly.
+        }
+    }
+    else {
+        // deal with visual rhythms on a note that are different from the chord
+        std::string chordvis = token->getVisualDurationChord();
+        if (chordvis.empty()) {
+            std::string notevis = token->getVisualDuration(subtoken);
+            if (!notevis.empty()) {
+                convertRhythm(note, token, subtoken);
+            }
         }
     }
 
@@ -9937,40 +9920,6 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
     else if (phraseStop) {
         note->SetType("phraseStop");
-    }
-}
-
-//////////////////////////////
-//
-// HumdrumInput::getLayoutAccidental -- Search for a visual accidental layout code
-//   for the given note.  Such as:
-//       !LO:N:acc=n#
-//
-
-std::string HumdrumInput::getLayoutAccidental(hum::HTp token, int subtoken)
-{
-    if (subtoken < 0) {
-        subtoken = 0;
-    }
-    std::string output = getLayoutParameter(token, "N", "acc");
-    if (output.empty()) {
-        return "";
-    }
-    int index = 0;
-    if (token->isChord()) {
-        std::string nstr = getLayoutParameter(token, "N", "n");
-        if (nstr.empty()) {
-            index = 0;
-        }
-        else {
-            index = stoi(nstr) - 1;
-        }
-    }
-    if (index == subtoken) {
-        return output;
-    }
-    else {
-        return "";
     }
 }
 
@@ -10259,7 +10208,9 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertMensuralRhythm(ELEMENT
         tstring = token->getSubtoken(subtoken);
     }
 
-    string vstring = token->getVisualDuration();
+    string vstring = token->getVisualDuration(subtoken);
+    cerr << "XVISUAL DURATION FOR NOTE " << subtoken << " IS " << vstring << endl;
+
     if (!vstring.empty()) {
         int dotcount = characterCountInSubtoken(vstring, '.');
         if (dotcount > 0) {
@@ -10449,7 +10400,15 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         tstring.erase(std::remove(tstring.begin(), tstring.end(), 'q'), tstring.end());
     }
 
-    string vstring = token->getVisualDuration();
+    std::string vstring;
+    if (subtoken < 0) {
+        vstring = token->getVisualDurationChord();
+        cerr << "YVISUAL DURATION FOR CHORD " << subtoken << " IS " << vstring << endl;
+    }
+    else {
+        vstring = token->getVisualDuration(subtoken);
+        cerr << "YVISUAL DURATION FOR NOTE " << subtoken << " IS " << vstring << endl;
+    }
     if (!vstring.empty()) {
         int visualdotcount = characterCountInSubtoken(vstring, '.');
         if (visualdotcount > 0) {

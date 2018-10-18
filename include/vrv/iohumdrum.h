@@ -447,11 +447,9 @@ protected:
         std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
     std::string automaticHeaderRight(
         std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap, int &linecount);
-    std::string getLayoutParameter(hum::HTp token, const std::string &category, const std::string &keyname);
     void convertMensuralToken(
         std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token, int staffindex);
     void initializeSpineColor(hum::HumdrumFile &infile);
-    std::string getLayoutAccidental(hum::HTp token, int subtoken);
     void setStemLength(Note *note, hum::HTp token);
     void storeExpansionLists(Section *section, hum::HTp starting);
     void storeExpansionList(Section *section, hum::HTp etok);
