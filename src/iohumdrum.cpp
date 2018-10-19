@@ -4573,47 +4573,21 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             appendElement(layer, mrest);
             hum::HTp trest = NULL;
             for (int i = 0; i < (int)layerdata.size(); i++) {
+                if (!layerdata[i]->isData()) {
+                    continue;
+                }
                 if (layerdata[i]->isRest()) {
                     trest = layerdata[i];
                     break;
                 }
             }
             if (trest) {
-                processDynamics(trest, staffindex);
-                setLocationId(mrest, trest);
-                if (m_doc->GetOptions()->m_humType.GetValue()) {
-                    embedQstampInClass(mrest, trest, *trest);
-                }
+                convertMRest(mrest, trest, -1, staffindex);
             }
-            int layer = m_currentlayer;
             for (int z = 0; z < (int)layerdata.size(); ++z) {
                 processDirections(layerdata[z], staffindex);
                 if (layerdata[z]->isInterpretation()) {
                     handlePedalMark(layerdata[z]);
-                }
-                if (!layerdata[z]->isData()) {
-                    continue;
-                }
-                if (!layerdata[z]->isRest()) {
-                    continue;
-                }
-                if (layerdata[z]->find(";") != string::npos) {
-                    int direction = getDirection(*layerdata[z], ";");
-                    if (direction < 0) {
-                        mrest->SetFermata(STAFFREL_basic_below);
-                    }
-                    else if (direction > 0) {
-                        mrest->SetFermata(STAFFREL_basic_above);
-                    }
-                    else if (layer == 2) {
-                        mrest->SetFermata(STAFFREL_basic_below);
-                    }
-                    else {
-                        mrest->SetFermata(STAFFREL_basic_above);
-                    }
-                }
-                if (layerdata[z]->find("yy") != string::npos) {
-                    mrest->SetVisible(BOOLEAN_false);
                 }
             }
         }
@@ -9304,6 +9278,90 @@ void HumdrumInput::appendElement(const std::vector<string> &name, const std::vec
 
 /////////////////////////////
 //
+// HumdrumInput::convertMRest --
+//
+
+void HumdrumInput::convertMRest(MRest *rest, hum::HTp token, int subtoken, int staffindex)
+{
+
+    string oloc = token->getValue("auto", "oloc");
+    string ploc = token->getValue("auto", "ploc");
+    int ottava = token->getValueInt("auto", "ottava");
+
+    if ((!oloc.empty()) && (!ploc.empty())) {
+        int olocint = stoi(oloc);
+        olocint -= ottava;
+        rest->SetOloc(olocint);
+        if (ploc == "C") {
+            rest->SetPloc(PITCHNAME_c);
+        }
+        else if (ploc == "D") {
+            rest->SetPloc(PITCHNAME_d);
+        }
+        else if (ploc == "E") {
+            rest->SetPloc(PITCHNAME_e);
+        }
+        else if (ploc == "F") {
+            rest->SetPloc(PITCHNAME_f);
+        }
+        else if (ploc == "G") {
+            rest->SetPloc(PITCHNAME_g);
+        }
+        else if (ploc == "A") {
+            rest->SetPloc(PITCHNAME_a);
+        }
+        else if (ploc == "B") {
+            rest->SetPloc(PITCHNAME_b);
+        }
+    }
+
+    std::string tstring;
+    if (subtoken < 0) {
+        tstring = *token;
+    }
+    else {
+        tstring = token->getSubtoken(subtoken);
+    }
+
+    int layer = m_currentlayer;
+
+    if (tstring.find(";") != string::npos) {
+        if ((tstring.find("yy") == string::npos) && (tstring.find(";y") == string::npos)) {
+            int direction = getDirection(tstring, ";");
+            if (direction < 0) {
+                rest->SetFermata(STAFFREL_basic_below);
+            }
+            else if (direction > 0) {
+                rest->SetFermata(STAFFREL_basic_above);
+            }
+            else if (layer == 1) {
+                rest->SetFermata(STAFFREL_basic_above);
+            }
+            else if (layer == 2) {
+                rest->SetFermata(STAFFREL_basic_below);
+            }
+            else {
+                // who knows, maybe check the stem direction or see
+                // if another note/rest in a different layer already
+                // has a fermata (so you would not want to overwrite them).
+                rest->SetFermata(STAFFREL_basic_above);
+            }
+        }
+    }
+
+    processDynamics(token, staffindex);
+    setLocationId(rest, token);
+    if (m_doc->GetOptions()->m_humType.GetValue()) {
+        embedQstampInClass(rest, token, *token);
+    }
+
+    if (token->find("yy") != string::npos) {
+        rest->SetVisible(BOOLEAN_false);
+    }
+}
+
+/////////////////////////////
+//
 // HumdrumInput::convertRest --
 //
 
@@ -9373,20 +9431,6 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
             if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
                 setStaff(rest, newstaff);
             }
-        }
-    }
-
-    // Delete these temporary staff position methods later:
-    if (tstring.find("jj") != string::npos) {
-        int newstaff = m_currentstaff - 1;
-        if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
-            setStaff(rest, newstaff);
-        }
-    }
-    else if (tstring.find("j") != string::npos) {
-        int newstaff = m_currentstaff + 1;
-        if ((newstaff > 0) && (newstaff <= (int)m_staffstarts.size())) {
-            setStaff(rest, newstaff);
         }
     }
 
