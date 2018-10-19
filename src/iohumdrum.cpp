@@ -4783,7 +4783,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                     setLocationId(irest, layerdata[i]);
                     appendElement(elements, pointers, irest);
-                    cerr << "GOT HERE AAA" << endl;
                     convertRhythm(irest, layerdata[i]);
                 }
                 else {
@@ -4852,7 +4851,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         }
                         setLocationId(irest, layerdata[i]);
                         appendElement(elements, pointers, irest);
-                        cerr << "GOT HERE BBB" << endl;
                         convertRhythm(irest, layerdata[i]);
                         processSlurs(layerdata[i]);
                         processDynamics(layerdata[i], staffindex);
@@ -4866,7 +4864,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     }
                     setLocationId(irest, layerdata[i]);
                     appendElement(elements, pointers, irest);
-                    cerr << "GOT HERE CCC" << endl;
                     convertRhythm(irest, layerdata[i]);
                     processSlurs(layerdata[i]);
                     processDynamics(layerdata[i], staffindex);
@@ -4912,7 +4909,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
                 setLocationId(irest, layerdata[i]);
                 appendElement(elements, pointers, irest);
-                cerr << "GOT HERE DDD" << endl;
                 convertRhythm(irest, layerdata[i]);
                 processSlurs(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
@@ -9137,7 +9133,6 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
         chord->SetDur(DURATION_8);
     }
 
-    cerr << "GOT HERE EEE" << endl;
     convertRhythm(chord, token);
     if (m_setrightstem) {
         m_setrightstem = false;
@@ -9317,7 +9312,6 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
 
     // Shouldn't be in a chord, so add rest duration here.
     // Also full-measure rests are handled elsewhere.
-    cerr << "GOT HERE FFF" << endl;
     convertRhythm(rest, token, subtoken);
 
     string oloc = token->getValue("auto", "oloc");
@@ -9823,7 +9817,6 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     }
 
     if (!chordQ) {
-        cerr << "GOT HERE GGG" << endl;
         hum::HumNum dur = convertRhythm(note, token, subtoken);
         if (m_setrightstem) {
             m_setrightstem = false;
@@ -10209,7 +10202,6 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertMensuralRhythm(ELEMENT
     }
 
     string vstring = token->getVisualDuration(subtoken);
-    cerr << "XVISUAL DURATION FOR NOTE " << subtoken << " IS " << vstring << endl;
 
     if (!vstring.empty()) {
         int dotcount = characterCountInSubtoken(vstring, '.');
@@ -10403,11 +10395,9 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
     std::string vstring;
     if (subtoken < 0) {
         vstring = token->getVisualDurationChord();
-        cerr << "YVISUAL DURATION FOR CHORD " << subtoken << " IS " << vstring << endl;
     }
     else {
         vstring = token->getVisualDuration(subtoken);
-        cerr << "YVISUAL DURATION FOR NOTE " << subtoken << " IS " << vstring << endl;
     }
     if (!vstring.empty()) {
         int visualdotcount = characterCountInSubtoken(vstring, '.');
