@@ -58,16 +58,18 @@ namespace vrv {
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() : Object("le-"), AttLabelled(), AttTyped()
+LayerElement::LayerElement() : Object("le-"), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid) : Object(classid), AttLabelled(), AttTyped()
+LayerElement::LayerElement(std::string classid) : Object(classid), LinkingInterface(), AttLabelled(), AttTyped()
 {
+    RegisterInterface(LinkingInterface::GetAttClasses(), LinkingInterface::IsInterface());
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
 
@@ -77,6 +79,7 @@ LayerElement::LayerElement(std::string classid) : Object(classid), AttLabelled()
 void LayerElement::Reset()
 {
     Object::Reset();
+    LinkingInterface::Reset();
     ResetLabelled();
     ResetTyped();
 
@@ -467,6 +470,12 @@ double LayerElement::GetAlignmentDuration(
 {
     if (this->IsGraceNote() && notGraceOnly) {
         return 0.0;
+    }
+    
+    if (this->HasSameasLink() && this->GetSameasLink()->IsLayerElement()) {
+        LayerElement *sameas = dynamic_cast<LayerElement *>(this->GetSameasLink());
+        assert(sameas);
+        return sameas->GetAlignmentDuration(mensur, meterSig, notGraceOnly, notationType);
     }
 
     if (this->HasInterface(INTERFACE_DURATION)) {
@@ -1127,6 +1136,11 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
+    if (this->HasSameasLink()) {
+        // nothing to do when the element has a @sameas attribute
+        return FUNCTOR_SIBLINGS;
+    }
+    
     int selfLeft;
     if (!this->HasSelfBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
