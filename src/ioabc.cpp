@@ -343,7 +343,6 @@ void AbcInput::AddArticulation(LayerElement *element)
 void AbcInput::AddDynamic(LayerElement *element)
 {
     assert(element);
-    assert(measure);
 
     for (auto it = m_dynam.begin(); it != m_dynam.end(); ++it) {
         Dynam *dynam = new Dynam();
@@ -360,7 +359,6 @@ void AbcInput::AddDynamic(LayerElement *element)
 void AbcInput::AddFermata(LayerElement *element)
 {
     assert(element);
-    assert(measure);
 
     Fermata *fermata = new Fermata();
     fermata->SetStartid("#" + element->GetUuid());
@@ -373,7 +371,6 @@ void AbcInput::AddFermata(LayerElement *element)
 void AbcInput::AddOrnaments(LayerElement *element)
 {
     assert(element);
-    assert(measure);
 
     std::string refId = "#" + element->GetUuid();
     // note->SetOrnam(m_ornam);
@@ -653,7 +650,7 @@ void AbcInput::parseKey(std::string keyString)
 
     // stafflines
     if (keyString.find("stafflines=", i) != std::string::npos) {
-        int pos = keyString.find("stafflines=", i) + 11;
+        int pos = int(keyString.find("stafflines=", i)) + 11;
         m_stafflines = atoi(keyString.substr(pos, keyString.find_first_not_of("0123456789", pos)).c_str());
     }
 }
