@@ -818,7 +818,10 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         MRest *mRest = dynamic_cast<MRest *>(this);
         assert(mRest);
         int loc = 0;
-        if (mRest->HasLoc()) {
+        if (mRest->HasPloc() && mRest->HasOloc()) {
+            loc = PitchInterface::CalcLoc(mRest->GetPloc(), mRest->GetOloc(), layerY->GetClefLocOffset(layerElementY));
+        }
+        else if (mRest->HasLoc()) {
             loc = mRest->GetLoc();
         }
         // Automatically calculate rest position
