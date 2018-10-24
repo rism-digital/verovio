@@ -10999,7 +10999,7 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
     if (chartable['W'] || chartable['w'] || chartable['M'] || chartable['m']) {
         addMordent(object, token);
     }
-    if (chartable['S'] || chartable['$']) {
+    if (chartable['s'] || chartable['S'] || chartable['$']) {
         addTurn(object, token);
     }
 
@@ -11010,8 +11010,10 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
 //
 // HumdrumInput::addTurn -- Add turn for note.
 //  only one of these four possibilities:
-//      S[Ss]?[Ss]? = turn
-//      $[Ss]?[Ss]? = inverted turn
+//      S([Ss][Ss])?  = delayed turn
+//      sS([Ss][Ss])? = undelayed turn
+//      $([Ss][Ss])?  = delayed inverted turn
+//      s$([Ss][Ss])? = undelayed inverted turn
 //
 //  Not used anymore:
 //      SS = turn, centered between two notes
@@ -11022,23 +11024,36 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
 
 void HumdrumInput::addTurn(Object *linked, hum::HTp token)
 {
-    int subtok = 0;
-    bool invertedQ = false;
-    bool centeredQ = true; // always assuming centered for now
+    std::string &tok = *token;
+    int turnstart = -1;
+    int turnend = -1;
 
-    size_t tpos;
+    for (int i = 0; i < (int)tok.size(); i++) {
+        if ((tok[i] == 's') || (tok[i] == 'S') || (tok[i] == '$')) {
+            turnstart = i;
+            turnend = i;
+            for (int j = i + 1; j < (int)tok.size(); j++) {
+                if (!((tok[i] == 's') || (tok[i] == 'S') || (tok[i] == '$'))) {
+                    break;
+                }
+                turnend = j;
+            }
+            break;
+        }
+    }
 
-    tpos = token->find("$");
-    if (tpos != std::string::npos) {
-        invertedQ = true;
-    }
-    else {
-        tpos = token->find("S");
-        invertedQ = false;
-    }
-    if (tpos == std::string::npos) {
-        // no turn on note
+    std::string turnstr = tok.substr(turnstart, turnend - turnstart + 1);
+
+    bool delayedQ = turnstr[0] == 's' ? false : true;
+
+    if ((!delayedQ) && turnstr.size() == 1) {
+        // not an invalid turn indication
         return;
+    }
+
+    bool invertedQ = false;
+    if (((!delayedQ) && turnstr[1] == '$') || (turnstr[0] == '$')) {
+        invertedQ = true;
     }
 
     // int layer = m_currentlayer; // maybe place below if in layer 2
@@ -11051,7 +11066,7 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
     setStaff(turn, staff);
 
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
-    if (centeredQ) {
+    if (delayedQ) {
         hum::HumNum duration = token->getDuration();
         // if (ss[staffindex].meter_bottom == 0) {
         // 	duration /= 2;
@@ -11070,33 +11085,31 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
         turn->SetStartid("#" + linked->GetUuid());
     }
 
-    // 400: could be reversed
     if (invertedQ) {
-        // 300: turn->SetForm(turnLog_FORM_upper);
         turn->SetForm(turnLog_FORM_upper);
     }
     else {
-        // 300: turn->SetForm(turnLog_FORM_norm);
         turn->SetForm(turnLog_FORM_lower);
     }
 
     setLocationId(turn, token);
 
     if (m_signifiers.above) {
-        if (tpos < token->size() - 1) {
-            if ((*token)[tpos + 1] == m_signifiers.above) {
+        if (turnend < (int)token->size() - 1) {
+            if ((*token)[turnend + 1] == m_signifiers.above) {
                 setPlace(turn, "above");
             }
         }
     }
     if (m_signifiers.below) {
-        if (tpos < token->size() - 1) {
-            if ((*token)[tpos + 1] == m_signifiers.below) {
+        if (turnend < (int)token->size() - 1) {
+            if ((*token)[turnend + 1] == m_signifiers.below) {
                 setPlace(turn, "below");
             }
         }
     }
 
+    int subtok = 0;
     int tokindex = subtok;
     if (subtok < 0) {
         tokindex = 0;
