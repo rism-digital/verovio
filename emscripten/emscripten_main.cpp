@@ -14,11 +14,11 @@ using namespace vrv;
 extern "C" {
 
 /****************************************************************
-* Methods exported to use the Toolkit class from js
-****************************************************************/
+ * Methods exported to use the Toolkit class from js
+ ****************************************************************/
 
 /** declarations */
-    
+
 void *vrvToolkit_constructor();
 void vrvToolkit_destructor(Toolkit *tk);
 bool vrvToolkit_edit(Toolkit *tk, const char *editorAction);
@@ -32,6 +32,7 @@ const char *vrvToolkit_getOptions(Toolkit *tk, bool default_values);
 int vrvToolkit_getPageCount(Toolkit *tk);
 int vrvToolkit_getPageWithElement(Toolkit *tk, const char *xmlId);
 double vrvToolkit_getTimeForElement(Toolkit *tk, const char *xmlId);
+int vrvToolkit_getMIDIPitchForElement(Toolkit *tk, const char *xmlId);
 const char *vrvToolkit_getVersion(Toolkit *tk);
 bool vrvToolkit_loadData(Toolkit *tk, const char *data);
 const char *vrvToolkit_renderToMIDI(Toolkit *tk, const char *c_options);
@@ -41,9 +42,9 @@ void vrvToolkit_redoLayout(Toolkit *tk);
 void vrvToolkit_redoPagePitchPosLayout(Toolkit *tk);
 const char *vrvToolkit_renderData(Toolkit *tk, const char *data, const char *options);
 void vrvToolkit_setOptions(Toolkit *tk, const char *options);
-   
+
 /** implementations */
-    
+
 void *vrvToolkit_constructor()
 {
     // set the resource path in the js blob
@@ -123,6 +124,11 @@ double vrvToolkit_getTimeForElement(Toolkit *tk, const char *xmlId)
     return tk->GetTimeForElement(xmlId);
 }
 
+int vrvToolkit_getMIDIPitchForElement(Toolkit *tk, const char *xmlId)
+{
+    return tk->GetMIDIPitchForElement(xmlId);
+}
+
 const char *vrvToolkit_getVersion(Toolkit *tk)
 {
     tk->SetCString(tk->GetVersion());
@@ -148,7 +154,7 @@ const char *vrvToolkit_renderToSVG(Toolkit *tk, int page_no, const char *c_optio
     tk->SetCString(tk->RenderToSVG(page_no, false));
     return tk->GetCString();
 }
-    
+
 const char *vrvToolkit_renderToTimemap(Toolkit *tk)
 {
     tk->ResetLogBuffer();

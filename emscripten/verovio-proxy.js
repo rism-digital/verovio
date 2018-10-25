@@ -42,6 +42,9 @@ verovio.vrvToolkit.getPageWithElement = Module.cwrap('vrvToolkit_getPageWithElem
 // double getTimeForElement(Toolkit *ic, const char *xmlId)
 verovio.vrvToolkit.getTimeForElement = Module.cwrap('vrvToolkit_getTimeForElement', 'number', ['number', 'string']);
 
+// int getMIDIPitchForElement(Toolkit *ic, const char *xmlId)
+verovio.vrvToolkit.getMIDIPitchForElement = Module.cwrap('vrvToolkit_getMIDIPitchForElement', 'number', ['number', 'string']);
+
 // char *getVersion(Toolkit *ic)
 verovio.vrvToolkit.getVersion = Module.cwrap('vrvToolkit_getVersion', 'string', ['number']);
 
@@ -74,14 +77,14 @@ verovio.instances = [];
 
 /***************************************************************************************************************************/
 
-verovio.toolkit = function() {
+verovio.toolkit = function () {
 	this.ptr = verovio.vrvToolkit.constructor();
 	console.debug("Creating toolkit instance");
 	verovio.instances.push(this.ptr);
 }
 
 verovio.toolkit.prototype.destroy = function () {
-  verovio.instances.splice(verovio.instances.indexOf(this.ptr), 1);
+	verovio.instances.splice(verovio.instances.indexOf(this.ptr), 1);
 	console.debug("Deleting toolkit instance");
 	verovio.vrvToolkit.destructor(this.ptr);
 };
@@ -130,6 +133,10 @@ verovio.toolkit.prototype.getTimeForElement = function (xmlId) {
 	return verovio.vrvToolkit.getTimeForElement(this.ptr, xmlId);
 };
 
+verovio.toolkit.prototype.getMIDIPitchForElement = function (xmlId) {
+	return verovio.vrvToolkit.getMIDIPitchForElement(this.ptr, xmlId);
+};
+
 verovio.toolkit.prototype.getVersion = function () {
 	return verovio.vrvToolkit.getVersion(this.ptr);
 };
@@ -147,29 +154,29 @@ verovio.toolkit.prototype.redoPagePitchPosLayout = function () {
 }
 
 verovio.toolkit.prototype.renderData = function (data, options) {
-    return verovio.vrvToolkit.renderData(this.ptr, data, JSON.stringify(options));
+	return verovio.vrvToolkit.renderData(this.ptr, data, JSON.stringify(options));
 };
 
 verovio.toolkit.prototype.renderPage = function (pageNo, options) {
-    console.warn("Method renderPage is deprecated; use renderToSVG instead");
-    return verovio.vrvToolkit.renderToSVG(this.ptr, pageNo, JSON.stringify(options));
+	console.warn("Method renderPage is deprecated; use renderToSVG instead");
+	return verovio.vrvToolkit.renderToSVG(this.ptr, pageNo, JSON.stringify(options));
 };
 
 verovio.toolkit.prototype.renderToMIDI = function (options) {
-    return verovio.vrvToolkit.renderToMIDI(this.ptr, JSON.stringify(options));
+	return verovio.vrvToolkit.renderToMIDI(this.ptr, JSON.stringify(options));
 };
 
 verovio.toolkit.prototype.renderToMidi = function (options) {
-    console.warn("Method renderToMidi is deprecated; use renderToMIDI instead");
-    return verovio.vrvToolkit.renderToMIDI(this.ptr, JSON.stringify(options));
+	console.warn("Method renderToMidi is deprecated; use renderToMIDI instead");
+	return verovio.vrvToolkit.renderToMIDI(this.ptr, JSON.stringify(options));
 };
 
 verovio.toolkit.prototype.renderToSVG = function (pageNo, options) {
-    return verovio.vrvToolkit.renderToSVG(this.ptr, pageNo, JSON.stringify(options));
+	return verovio.vrvToolkit.renderToSVG(this.ptr, pageNo, JSON.stringify(options));
 };
 
 verovio.toolkit.prototype.renderToTimemap = function () {
-    return verovio.vrvToolkit.renderToTimemap(this.ptr);
+	return verovio.vrvToolkit.renderToTimemap(this.ptr);
 };
 
 verovio.toolkit.prototype.setOptions = function (options) {
@@ -179,12 +186,11 @@ verovio.toolkit.prototype.setOptions = function (options) {
 /***************************************************************************************************************************/
 
 // If the window object is defined (if we are not within a WebWorker)...
-if ((typeof window !== "undefined") && (window.addEventListener))
-{
+if ((typeof window !== "undefined") && (window.addEventListener)) {
 	// Add a listener that will delete the object (if necessary) when the page is closed
-	window.addEventListener ("unload", function () {
+	window.addEventListener("unload", function () {
 		for (var i = 0; i < verovio.instances.length; i++) {
-		  verovio.vrvToolkit.destructor(verovio.instances[i]);
+			verovio.vrvToolkit.destructor(verovio.instances[i]);
 		}
 	});
 }

@@ -1195,6 +1195,17 @@ int Toolkit::GetTimeForElement(const std::string &xmlId)
     return timeofElement;
 }
 
+int Toolkit::GetMIDIPitchForElement(const std::string &xmlId)
+{
+    Object *element = m_doc.FindChildByUuid(xmlId);
+    int pitchofElement = -1;
+    if (element->Is(NOTE)) {
+        Note *note = dynamic_cast<Note *>(element);
+        pitchofElement = note->GetMIDIPitch();
+    }
+    return pitchofElement;
+}
+
 void Toolkit::SetHumdrumBuffer(const char *data)
 {
     if (m_humdrumBuffer) {

@@ -196,6 +196,13 @@ public:
     int GetTimeForElement(const std::string &xmlId);
 
     /**
+     * Return the MIDI pitch of the element with the ID (xml:id).
+     * RenderToMidi() must be called prior to using this method.
+     * Returns -1 if no element is found.
+     */
+    int GetMIDIPitchForElement(const std::string &xmlId);
+
+    /**
      * @name Set and get the scale
      */
     ///@{
