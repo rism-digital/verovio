@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Oct 17 17:59:55 PDT 2018
+// Last Modified: Thu Oct 25 16:03:24 EDT 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1927,8 +1927,9 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		bool   analyzeRScale              (void);
 
 		// in HumdrumFileContent-rest.cpp
-		void  analyzeRestPositions        (void);
-		void  analyzeRestPositions        (HTp kernstart);
+		void  analyzeRestPositions                  (void);
+		void  assignImplicitVerticalRestPositions   (HTp kernstart);
+		void  checkForExplicitVerticalRestPositions (void);
 
 		// in HumdrumFileContent-stem.cpp
 		bool analyzeKernStems             (void);
@@ -1987,7 +1988,7 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		int     getRestPositionAboveNotes (HTp rest, std::vector<int>& vpos);
 		int     getRestPositionBelowNotes (HTp rest, std::vector<int>& vpos);
 		void    setRestOnCenterStaffLine  (HTp rest, int baseline);
-		bool    processRestPitch          (HTp rest, int baseline);
+		bool    checkRestForVerticalPositioning(HTp rest, int baseline);
 		bool    analyzeKernStems          (HTp stok, HTp etok, std::vector<std::vector<int>>& centerlines);
 		void    getBaselines              (std::vector<std::vector<int>>& centerlines);
 };
