@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Oct 25 16:03:24 EDT 2018
+// Last Modified: Sun Oct 28 17:40:07 EDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -22577,25 +22577,39 @@ string HumdrumToken::getVisualDurationNote(int subtokenindex) {
 }
 
 
+
 //////////////////////////////
 //
-// HumdrumToken::getLayoutParameter -- Returns requested layout parameter if it is attached
-//    to a token directly or indirectly through a linked parameter.  Returns empty string
-//    if no explicit visual durtation (so the visual duration is same as the logical duration).
-//    If subtokenindex is less than -1 (the default value for the paramter), then ignore
-//    the @n parameter control for indexing the layout parameter to chord notes.  The
-//    subtokenindex (0 indexed) is converted to note number (1 indexed) for checking @n.
-//    @n is currently only allowed to be a single integer (eventually allow ranges and multiple values).
+// HumdrumToken::getLayoutParameter -- Returns requested layout parameter
+//     if it is attached to a token directly or indirectly through a linked
+//     parameter.  Returns empty string if no explicit visual durtation (so
+//     the visual duration is same as the logical duration).  If subtokenindex
+//     is less than -1 (the default value for the paramter), then ignore the
+//     @n parameter control for indexing the layout parameter to chord notes.
+//     The subtokenindex (0 indexed) is converted to note number (1 indexed)
+//     for checking @n.  @n is currently only allowed to be a single integer
+//     (eventually allow ranges and multiple values).
 //
 
 std::string HumdrumToken::getLayoutParameter(const std::string& category,
 		const std::string& keyname, int subtokenindex) {
-
-	// maybe also check for any local layout parameter 
-	// (which are currently not possible)
 	std::string output;
-		int lcount = this->getLinkedParameterCount();
-		if (lcount == 0) {
+
+	// First check for any local layout parameter:
+	std::string testoutput = this->getValue("LO", category, keyname);
+	if (!testoutput.empty()) {
+		if (subtokenindex >= 0) {
+			int n = this->getValueInt("LO", category, "n");
+			if (n == subtokenindex + 1) {
+				return testoutput;
+			}
+		} else {
+			return testoutput;
+		}
+	}
+
+	int lcount = this->getLinkedParameterCount();
+	if (lcount == 0) {
 		return output;
 	}
 
@@ -22643,19 +22657,27 @@ std::string HumdrumToken::getLayoutParameter(const std::string& category,
 
 //////////////////////////////
 //
-// HumdrumToken::getLayoutParameterChord -- Returns requested layout parameter if it is attached
-//    to a token directly or indirectly through a linked parameter.  The parameter must
-//    apply to the entire chord, so no @n qualification parameters can be given (even if they
-//    include all notes in the chord).
+// HumdrumToken::getLayoutParameterChord -- Returns requested layout
+// parameter if it is attached to a token directly or indirectly through
+// a linked parameter.  The parameter must apply to the entire chord, so
+// no @n qualification parameters can be given (even if they include all
+// notes in the chord).
 
 std::string HumdrumToken::getLayoutParameterChord(const std::string& category,
 		const std::string& keyname) {
 
-	// maybe also check for any local layout parameter 
-	// (which are currently not possible)
+	// First check for any local layout parameter:
+	std::string testoutput = this->getValue("LO", category, keyname);
+	if (!testoutput.empty()) {
+		std::string n = this->getValue("LO", category, "n");
+		if (n.empty()) {
+			return testoutput;
+		}
+	}
+
 	std::string output;
-		int lcount = this->getLinkedParameterCount();
-		if (lcount == 0) {
+	int lcount = this->getLinkedParameterCount();
+	if (lcount == 0) {
 		return output;
 	}
 
@@ -22694,19 +22716,29 @@ std::string HumdrumToken::getLayoutParameterChord(const std::string& category,
 
 //////////////////////////////
 //
-// HumdrumToken::getLayoutParameterNote -- Returns requested layout parameter if it is attached
-//    to a token directly or indirectly through a linked parameter.  The parameter must
-//    apply to a single note or specific note in a chord.
-//
+// HumdrumToken::getLayoutParameterNote -- Returns requested layout
+//     parameter if it is attached to a token directly or indirectly through a
+//     linked parameter.  The parameter must apply to a single note or specific
+//     note in a chord.
+
 
 std::string HumdrumToken::getLayoutParameterNote(const std::string& category,
 		const std::string& keyname, int subtokenindex) {
 
-	// maybe also check for any local layout parameter 
-	// (which are currently not possible)
+	// First check for any local layout parameter:
+	std::string testoutput = this->getValue("LO", category, keyname);
+	if (!testoutput.empty()) {
+		if (subtokenindex >= 0) {
+			int n = this->getValueInt("LO", category, "n");
+			if (n == subtokenindex + 1) {
+				return testoutput;
+			}
+		}
+	}
+
 	std::string output;
-		int lcount = this->getLinkedParameterCount();
-		if (lcount == 0) {
+	int lcount = this->getLinkedParameterCount();
+	if (lcount == 0) {
 		return output;
 	}
 
