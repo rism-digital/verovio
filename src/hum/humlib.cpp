@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Oct 28 17:40:07 EDT 2018
+// Last Modified: Mon Oct 29 11:41:25 EDT 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -45289,6 +45289,8 @@ void Tool_msearch::markMatch(HumdrumFile& infile, vector<NoteCell*>& match) {
 	HTp mend = NULL;
 	if (match.back() != NULL) {
 		mend = match.back()->getToken();
+	} else {
+		cerr << "GOT TO THIS STRANGE PLACE start=" << mstart << endl;
 	}
 	HTp tok = mstart;
 	string text;
@@ -45299,6 +45301,10 @@ void Tool_msearch::markMatch(HumdrumFile& infile, vector<NoteCell*>& match) {
 		text = tok->getText() + m_marker;
 		tok->setText(text);
 		tok = tok->getNextNNDT();
+		if (tok && !tok->isKern()) {
+			cerr << "STRANGE LINKING WITH TETX SPINE IN getNextNNDT()" << endl;
+			break;
+		}
 	}
 }
 
