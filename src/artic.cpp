@@ -24,8 +24,7 @@
 
 namespace vrv {
 
-std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc,
-    ARTICULATION_marc_stacc, ARTICULATION_upbow, ARTICULATION_harm };
+std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm };
 
 std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic
     = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm };
@@ -108,7 +107,7 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             case ARTICULATION_ten: return SMUFL_E4A4_articTenutoAbove;
             case ARTICULATION_stacciss: return SMUFL_E4A8_articStaccatissimoWedgeAbove;
             case ARTICULATION_marc: return SMUFL_E4AC_articMarcatoAbove;
-            case ARTICULATION_marc_stacc: return SMUFL_E4AE_articMarcatoStaccatoAbove;
+            // case ARTICULATION_marc_stacc: return SMUFL_E4AE_articMarcatoStaccatoAbove;
             case ARTICULATION_spicc: return SMUFL_E4A6_articStaccatissimoAbove;
             // case ARTICULATION_doit;
             // case ARTICULATION_scoop;
@@ -125,7 +124,7 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             case ARTICULATION_harm: return SMUFL_E614_stringsHarmonic;
             // case ARTICULATION_snap;
             // case ARTICULATION_fingernail;
-            case ARTICULATION_ten_stacc: return SMUFL_E4B2_articTenutoStaccatoAbove;
+            // case ARTICULATION_ten_stacc: return SMUFL_E4B2_articTenutoStaccatoAbove;
             // case ARTICULATION_damp;
             // case ARTICULATION_dampall;
             // case ARTICULATION_open;
@@ -148,14 +147,16 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, const data_STAFFREL &place)
             case ARTICULATION_ten: return SMUFL_E4A5_articTenutoBelow;
             case ARTICULATION_stacciss: return SMUFL_E4A9_articStaccatissimoWedgeBelow;
             case ARTICULATION_marc: return SMUFL_E4AD_articMarcatoBelow;
-            case ARTICULATION_marc_stacc: return SMUFL_E4AF_articMarcatoStaccatoBelow;
+            // Removed in MEI 4.0
+            //case ARTICULATION_marc_stacc: return SMUFL_E4AF_articMarcatoStaccatoBelow;
             case ARTICULATION_spicc: return SMUFL_E4A7_articStaccatissimoBelow;
             //
             case ARTICULATION_dnbow: return SMUFL_E611_stringsDownBowTurned;
             case ARTICULATION_upbow: return SMUFL_E613_stringsUpBowTurned;
             case ARTICULATION_harm: return SMUFL_E614_stringsHarmonic;
             //
-            case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
+            // Removed in MEI 4.0
+            //case ARTICULATION_ten_stacc: return SMUFL_E4B3_articTenutoStaccatoBelow;
             //
             default: return 0; break;
         }

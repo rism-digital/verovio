@@ -611,7 +611,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         return;
     }
 
-    if (staffGrp->GetBarthru() != BOOLEAN_true) {
+    if (staffGrp->GetBarThru() != BOOLEAN_true) {
         // recursively draw the children (staffDef or staffGrp) - we assume @barthru is false by default
         int i;
         StaffGrp *childStaffGrp = NULL;

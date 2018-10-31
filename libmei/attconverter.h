@@ -38,8 +38,8 @@ public:
     std::string ArticulationToStr(data_ARTICULATION data) const;
     data_ARTICULATION StrToArticulation(std::string value, bool logWarning = true) const;
 
-    std::string BarplaceToStr(data_BARPLACE data) const;
-    data_BARPLACE StrToBarplace(std::string value, bool logWarning = true) const;
+    std::string BarmethodToStr(data_BARMETHOD data) const;
+    data_BARMETHOD StrToBarmethod(std::string value, bool logWarning = true) const;
 
     std::string BarrenditionToStr(data_BARRENDITION data) const;
     data_BARRENDITION StrToBarrendition(std::string value, bool logWarning = true) const;
@@ -65,8 +65,20 @@ public:
     std::string ColornamesToStr(data_COLORNAMES data) const;
     data_COLORNAMES StrToColornames(std::string value, bool logWarning = true) const;
 
+    std::string CompassdirectionBasicToStr(data_COMPASSDIRECTION_basic data) const;
+    data_COMPASSDIRECTION_basic StrToCompassdirectionBasic(std::string value, bool logWarning = true) const;
+
+    std::string CompassdirectionExtendedToStr(data_COMPASSDIRECTION_extended data) const;
+    data_COMPASSDIRECTION_extended StrToCompassdirectionExtended(std::string value, bool logWarning = true) const;
+
     std::string EnclosureToStr(data_ENCLOSURE data) const;
     data_ENCLOSURE StrToEnclosure(std::string value, bool logWarning = true) const;
+
+    std::string EventrelBasicToStr(data_EVENTREL_basic data) const;
+    data_EVENTREL_basic StrToEventrelBasic(std::string value, bool logWarning = true) const;
+
+    std::string EventrelExtendedToStr(data_EVENTREL_extended data) const;
+    data_EVENTREL_extended StrToEventrelExtended(std::string value, bool logWarning = true) const;
 
     std::string FillToStr(data_FILL data) const;
     data_FILL StrToFill(std::string value, bool logWarning = true) const;
@@ -203,6 +215,9 @@ public:
     std::string EndingsEndingrendToStr(endings_ENDINGREND data) const;
     endings_ENDINGREND StrToEndingsEndingrend(std::string value, bool logWarning = true) const;
 
+    std::string EpisemaVisFormToStr(episemaVis_FORM data) const;
+    episemaVis_FORM StrToEpisemaVisForm(std::string value, bool logWarning = true) const;
+
     std::string FTremLogFormToStr(fTremLog_FORM data) const;
     fTremLog_FORM StrToFTremLogForm(std::string value, bool logWarning = true) const;
 
@@ -251,6 +266,9 @@ public:
     std::string HarpPedalLogGToStr(harpPedalLog_G data) const;
     harpPedalLog_G StrToHarpPedalLogG(std::string value, bool logWarning = true) const;
 
+    std::string LiquescentVisCurveToStr(liquescentVis_CURVE data) const;
+    liquescentVis_CURVE StrToLiquescentVisCurve(std::string value, bool logWarning = true) const;
+
     std::string MeiVersionMeiversionToStr(meiVersion_MEIVERSION data) const;
     meiVersion_MEIVERSION StrToMeiVersionMeiversion(std::string value, bool logWarning = true) const;
 
@@ -275,20 +293,14 @@ public:
     std::string MordentLogFormToStr(mordentLog_FORM data) const;
     mordentLog_FORM StrToMordentLogForm(std::string value, bool logWarning = true) const;
 
-    std::string NcVisConToStr(ncVis_CON data) const;
-    ncVis_CON StrToNcVisCon(std::string value, bool logWarning = true) const;
+    std::string NcFormConToStr(ncForm_CON data) const;
+    ncForm_CON StrToNcFormCon(std::string value, bool logWarning = true) const;
 
-    std::string NcVisCurvedToStr(ncVis_CURVED data) const;
-    ncVis_CURVED StrToNcVisCurved(std::string value, bool logWarning = true) const;
+    std::string NcFormCurveToStr(ncForm_CURVE data) const;
+    ncForm_CURVE StrToNcFormCurve(std::string value, bool logWarning = true) const;
 
-    std::string NcVisDiagonalrightToStr(ncVis_DIAGONALRIGHT data) const;
-    ncVis_DIAGONALRIGHT StrToNcVisDiagonalright(std::string value, bool logWarning = true) const;
-
-    std::string NcVisOriscusToStr(ncVis_ORISCUS data) const;
-    ncVis_ORISCUS StrToNcVisOriscus(std::string value, bool logWarning = true) const;
-
-    std::string NcVisQuilismaToStr(ncVis_QUILISMA data) const;
-    ncVis_QUILISMA StrToNcVisQuilisma(std::string value, bool logWarning = true) const;
+    std::string NcFormRellenToStr(ncForm_RELLEN data) const;
+    ncForm_RELLEN StrToNcFormRellen(std::string value, bool logWarning = true) const;
 
     std::string NoteAnlMensuralLigToStr(noteAnlMensural_LIG data) const;
     noteAnlMensural_LIG StrToNoteAnlMensuralLig(std::string value, bool logWarning = true) const;
