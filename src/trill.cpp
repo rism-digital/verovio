@@ -31,9 +31,7 @@ Trill::Trill() : ControlElement("trill-"), TimeSpanningInterface(), AttColor(), 
     Reset();
 }
 
-Trill::~Trill()
-{
-}
+Trill::~Trill() {}
 
 void Trill::Reset()
 {

@@ -46,9 +46,14 @@ public:
     virtual void UpdateContentBBoxY(int y1, int y2);
     virtual void UpdateSelfBBoxX(int x1, int x2);
     virtual void UpdateSelfBBoxY(int y1, int y2);
-    bool HasContentBB() const;
+    void SetEmptyBB();
+    //
     bool HasSelfBB() const;
-    void SetEmptyBB(bool onlyIfUnset = false);
+    bool HasSelfHorizontalBB() const;
+    bool HasSelfVerticalBB() const;
+    bool HasContentBB() const;
+    bool HasContentHorizontalBB() const;
+    bool HasContentVerticalBB() const;
     bool HasEmptyBB() const;
     ///@}
 
@@ -108,16 +113,6 @@ public:
     ///@}
 
     /**
-     * @name Is true if the bounding box (self or content) has been updated at least once.
-     * We need this to avoid not updating bounding boxes to screw up the layout with their initial values.
-     */
-    ///@{
-    bool HasUpdatedBB() const { return (m_updatedBBoxX && m_updatedBBoxY); }
-    bool HasUpdatedHorizontalBB() const { return (m_updatedBBoxX); }
-    bool HasUpdatedVerticalBB() const { return (m_updatedBBoxY); }
-    ///@}
-
-    /**
      * @name Return true if the bounding box has a horizontal / vertical overlap with the other one.
      * Makes an overal bounding box overlap calculation without looking at anchor points
      */
@@ -167,9 +162,14 @@ public:
     static Point CalcPositionAfterRotation(Point point, float alpha, Point center);
 
     /**
-     * Calculate the position of a point after a rotation of alpha around the center
+     * Calculate the y position of a bezier at position x
      */
     static int CalcBezierAtPosition(const Point bezier[4], int x);
+
+    /**
+     * Calculate the point bezier point position for a t between 0.0 and 1.0
+     */
+    static Point CalcDeCasteljau(const Point bezier[4], double t);
 
     /**
      * Calculate the position of the bezier above and below for a thick bezier
@@ -230,14 +230,6 @@ protected:
     ///@}
 private:
     /**
-     * Flags for indicating whereas the bouding box was updated or not
-     */
-    ///@{
-    bool m_updatedBBoxX;
-    bool m_updatedBBoxY;
-    ///@}
-
-    /**
      * Bounding box positions
      */
     ///@{
@@ -255,11 +247,63 @@ private:
      * The font size for the smufl glyph used for calculating the bounding box rectangles.
      */
     int m_smuflGlyphFontSize;
+};
+
+//----------------------------------------------------------------------------
+// SegmentedLine
+//----------------------------------------------------------------------------
+
+/**
+ */
+class SegmentedLine {
+public:
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    SegmentedLine(int start, int end);
+    virtual ~SegmentedLine(){};
+    ///@}
 
     /**
-     * Buffer for De-Casteljau algorithm
+     * Check if the segmented line is empty
      */
-    static int s_deCasteljau[4][4];
+    bool IsEmpty() { return (m_segments.empty()); }
+
+    /**
+     * Check if the line is one single segment
+     */
+    bool IsUnsegmented() { return (m_segments.size() == 1); }
+
+    /**
+     * The number of segments
+     */
+    int GetSegmentCount() { return (int)m_segments.size(); }
+
+    /**
+     * Get the start and end of a segment
+     */
+    void GetStartEnd(int &start, int &end, int idx);
+
+    /**
+     * Add a gap in the line
+     */
+    void AddGap(int start, int end);
+
+protected:
+    //
+private:
+    //
+public:
+    //
+protected:
+    //
+private:
+    /**
+     * An vector of line segments
+     */
+    std::vector<std::pair<int, int> > m_segments;
 };
 
 } // namespace vrv

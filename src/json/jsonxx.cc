@@ -47,6 +47,7 @@ bool parse_null(std::istream& input);
 bool parse_number(std::istream& input, Number& value);
 bool parse_object(std::istream& input, Object& object);
 bool parse_string(std::istream& input, String& value);
+bool parse_identifier(std::istream& input, String& value);
 bool parse_value(std::istream& input, Value& value);
 
 // Try to consume characters from the input stream and match the
@@ -76,7 +77,7 @@ bool match(const char* pattern, std::istream& input) {
 bool parse_string(std::istream& input, String& value) {
     char ch = '\0', delimiter = '"';
     if (!match("\"", input))  {
-        if (Parser == Strict) {
+        if (parser_is_strict()) {
             return false;
         }
         delimiter = '\'';
@@ -117,10 +118,10 @@ bool parse_string(std::istream& input, String& value) {
                         std::stringstream ss;
                         for( i = 0; (!input.eof() && input.good()) && i < 4; ++i ) {
                             input.get(ch);
-                            ss << ch;
+                            ss << std::hex << ch;
                         }
                         if( input.good() && (ss >> i) )
-                            value.push_back(i);
+                            value.push_back(static_cast<char>(i));
                     }
                     break;
                 default:
@@ -141,11 +142,52 @@ bool parse_string(std::istream& input, String& value) {
     }
 }
 
+bool parse_identifier(std::istream& input, String& value) {
+    input >> std::ws;
+
+    char ch = '\0', delimiter = ':';
+    bool first = true;
+
+    while(!input.eof() && input.good()) {
+        input.get(ch);
+
+        if (ch == delimiter) {
+            input.unget();
+            break;
+        }
+
+        if(first) {
+            if ((ch != '_' && ch != '$') &&
+                    (ch < 'a' || ch > 'z') &&
+                    (ch < 'A' || ch > 'Z')) {
+                return false;
+            }
+            first = false;
+        }
+        if(ch == '_' || ch == '$' ||
+            (ch >= 'a' && ch <= 'z') ||
+            (ch >= 'A' && ch <= 'Z') ||
+            (ch >= '0' && ch <= '9')) {
+            value.push_back(ch);
+        }
+        else if(ch == '\t' || ch == ' ') {
+            input >> std::ws;
+        }
+    }
+    if (input && ch == delimiter) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool parse_number(std::istream& input, Number& value) {
     input >> std::ws;
+    std::streampos rollback = input.tellg();
     input >> value;
     if (input.fail()) {
         input.clear();
+        input.seekg(rollback);
         return false;
     }
     return true;
@@ -167,7 +209,7 @@ bool parse_null(std::istream& input) {
     if (match("null", input))  {
         return true;
     }
-    if (Parser == Strict) {
+    if (parser_is_strict()) {
         return false;
     }
     return (input.peek()==',');
@@ -182,8 +224,8 @@ bool parse_object(std::istream& input, Object& object) {
 }
 
 bool parse_comment(std::istream &input) {
-    if( Parser == Permissive )
-    if( !input.eof() )
+    if( parser_is_permissive() )
+    if( !input.eof() && input.peek() == '/' )
     {
         char ch0(0);
         input.get(ch0);
@@ -239,12 +281,23 @@ bool Object::parse(std::istream& input, Object& object) {
 
     do {
         std::string key;
-        if (!parse_string(input, key)) {
-            if (Parser == Permissive) {
-                if (input.peek() == '}')
-                    break;
+        if (unquoted_keys_are_enabled()) {
+            if (!parse_identifier(input, key)) {
+                if (parser_is_permissive()) {
+                    if (input.peek() == '}')
+                        break;
+                }
+                return false;
             }
-            return false;
+        }
+        else {
+            if (!parse_string(input, key)) {
+                if (parser_is_permissive()) {
+                    if (input.peek() == '}')
+                        break;
+                }
+                return false;
+            }
         }
         if (!match(":", input)) {
             return false;
@@ -254,7 +307,18 @@ bool Object::parse(std::istream& input, Object& object) {
             delete v;
             break;
         }
-        object.value_map_[key] = v;
+        // TODO(hjiang): Add an option to allow duplicated keys?
+        if (object.value_map_.find(key) == object.value_map_.end()) {
+          object.value_map_[key] = v;
+        } else {
+          if (parser_is_permissive()) {
+            delete object.value_map_[key];
+            object.value_map_[key] = v;
+          } else {
+            delete v;
+            return false;
+          }
+        }
     } while (match(",", input));
 
 
@@ -265,7 +329,7 @@ bool Object::parse(std::istream& input, Object& object) {
     return true;
 }
 
-Value::Value() : type_(INVALID_) {}
+Value::Value() : type_(INVALID_) { precision_ = -1; }
 
 void Value::reset() {
     if (type_ == STRING_) {
@@ -280,6 +344,7 @@ void Value::reset() {
         delete array_value_;
         array_value_ = 0;
     }
+    precision_ = -1;
 }
 
 bool Value::parse(std::istream& input, Value& value) {
@@ -333,6 +398,9 @@ bool Array::parse(std::istream& input, Array& array) {
 
     if (!match("[", input)) {
         return false;
+    }
+    if (match("]", input)) {
+        return true;
     }
 
     do {
@@ -542,8 +610,13 @@ namespace json {
                 return remove_last_comma( ss.str() ) + tab + "}" ",\n";
 
             case jsonxx::Value::NUMBER_:
-                // max precision
-                ss << std::setprecision(std::numeric_limits<long double>::digits10 + 1);
+                // controlled (lpugin) precision
+                if (t.precision_ != -1) {
+                    ss << std::setprecision(t.precision_) << std::fixed;
+                }
+                else {
+                    ss << std::setprecision(std::numeric_limits<long double>::digits10 + 1);
+                }
                 ss << t.number_value_;
                 return ss.str() + ",\n";
         }
@@ -557,11 +630,11 @@ std::string escape_attrib( const std::string &input ) {
     if( !once ) {
         for( int i = 0; i < 256; ++i )
             map[ i ] = "_";
-        for( int i = int('a'); i < int('z'); ++i )
+        for( int i = int('a'); i <= int('z'); ++i )
             map[ i ] = std::string() + char(i);
-        for( int i = int('A'); i < int('Z'); ++i )
+        for( int i = int('A'); i <= int('Z'); ++i )
             map[ i ] = std::string() + char(i);
-        for( int i = int('0'); i < int('9'); ++i )
+        for( int i = int('0'); i <= int('9'); ++i )
             map[ i ] = std::string() + char(i);
         once = map;
     }
@@ -730,8 +803,13 @@ std::string tag( unsigned format, unsigned depth, const std::string &name, const
                  + tab + close_tag( format, 'o', name ) + '\n';
 
         case jsonxx::Value::NUMBER_:
-            // max precision
-            ss << std::setprecision(std::numeric_limits<long double>::digits10 + 1);
+            // controlled precision (lpugin)
+            if (t.precision_ != -1) {
+                ss << std::setprecision(t.precision_) << std::fixed;
+            }
+            else {
+                ss << std::setprecision(std::numeric_limits<long double>::digits10 + 1);
+            }
             ss << t.number_value_;
             return tab + open_tag( format, 'n', name, std::string(), format == jsonxx::JXMLex ? ss.str() : std::string() )
                        + ss.str()
@@ -859,6 +937,36 @@ bool validate( const std::string &input ) {
     return jsonxx::validate( is );
 }
 
+std::string reformat( std::istream &input ) {
+
+    // trim non-printable chars
+    for( char ch(0); !input.eof() && input.peek() <= 32; )
+        input.get(ch);
+
+    // validate json
+    if( input.peek() == '{' )
+    {
+        jsonxx::Object o;
+        if( parse_object( input, o ) )
+            return o.json();
+    }
+    else
+    if( input.peek() == '[' )
+    {
+        jsonxx::Array a;
+        if( parse_array( input, a ) )
+            return a.json();
+    }
+
+    // bad json input
+    return std::string();
+}
+
+std::string reformat( const std::string &input ) {
+    std::istringstream is( input );
+    return jsonxx::reformat( is );
+}
+
 std::string xml( std::istream &input, unsigned format ) {
     using namespace xml;
     JSONXX_ASSERT( format == jsonxx::JSONx || format == jsonxx::JXML || format == jsonxx::JXMLex || format == jsonxx::TaggedXML );
@@ -980,6 +1088,13 @@ Array::Array(const Array &other) {
 }
 Array::Array(const Value &value) {
   import(value);
+}
+void Array::append(const Array &other) {
+    if (this != &other) {
+        values_.push_back( new Value(other) );
+    } else {
+        append( Array(*this) );
+    }
 }
 void Array::import(const Array &other) {
   if (this != &other) {

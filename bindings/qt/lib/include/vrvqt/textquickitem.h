@@ -39,9 +39,10 @@ public:
     void appendText(QString text, QFont font);
 
     /**
-     * Sets the text alignment to the given value.
+     * Setter and Getter for the text alignment.
      */
     void setAlignment(Qt::Alignment alignment) { m_alignment = alignment; }
+    Qt::Alignment getAlignment() { return m_alignment; }
 
     /**
      * This function calculates the correct position (x and y) and the bounding box. This is done by evaluating the
@@ -53,6 +54,11 @@ public:
      * Sets the text color to the given value.
      */
     void setColor(QColor color);
+
+    /**
+      * Returns if the text item is empty, i.e. it has no text elements.
+      */
+    bool isEmpty();
 
     /**
      * Overrides the paint function from QQuickPaintedItem. This function is called for drawing the text.

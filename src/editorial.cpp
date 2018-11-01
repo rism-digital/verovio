@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "controlelement.h"
+#include "fig.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
@@ -40,7 +41,7 @@ EditorialElement::EditorialElement() : Object("ee-"), BoundaryStartInterface(), 
 }
 
 EditorialElement::EditorialElement(std::string classid)
-    : Object(classid), vrv::BoundaryStartInterface(), AttLabelled(), AttTyped()
+    : Object(classid), BoundaryStartInterface(), AttLabelled(), AttTyped()
 {
     RegisterAttClass(ATT_LABELLED);
     RegisterAttClass(ATT_TYPED);
@@ -58,9 +59,7 @@ void EditorialElement::Reset()
     m_visibility = Visible;
 }
 
-EditorialElement::~EditorialElement()
-{
-}
+EditorialElement::~EditorialElement() {}
 
 void EditorialElement::AddChild(Object *child)
 {
@@ -118,9 +117,7 @@ Abbr::Abbr() : EditorialElement("abbr-"), AttSource()
     Reset();
 }
 
-Abbr::~Abbr()
-{
-}
+Abbr::~Abbr() {}
 
 void Abbr::Reset()
 {
@@ -139,55 +136,12 @@ Add::Add() : EditorialElement("add-"), AttSource()
     Reset();
 }
 
-Add::~Add()
-{
-}
+Add::~Add() {}
 
 void Add::Reset()
 {
     EditorialElement::Reset();
     ResetSource();
-}
-
-//----------------------------------------------------------------------------
-// Annot
-//----------------------------------------------------------------------------
-
-Annot::Annot() : EditorialElement("annot-"), TextListInterface(), AttPlist(), AttSource()
-{
-    RegisterAttClass(ATT_PLIST);
-    RegisterAttClass(ATT_SOURCE);
-
-    Reset();
-}
-
-Annot::~Annot()
-{
-}
-
-void Annot::Reset()
-{
-    EditorialElement::Reset();
-    ResetPlist();
-    ResetSource();
-}
-
-void Annot::AddChild(Object *child)
-{
-    if (child->IsTextElement()) {
-        assert(dynamic_cast<TextElement *>(child));
-    }
-    else if (child->Is(ANNOT)) {
-        assert(dynamic_cast<Annot *>(child));
-    }
-    else {
-        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
-        assert(false);
-    }
-
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
 }
 
 //----------------------------------------------------------------------------
@@ -213,9 +167,7 @@ void App::Reset()
     EditorialElement::Reset();
 }
 
-App::~App()
-{
-}
+App::~App() {}
 
 void App::AddChild(Object *child)
 {
@@ -258,9 +210,7 @@ void Choice::Reset()
     EditorialElement::Reset();
 }
 
-Choice::~Choice()
-{
-}
+Choice::~Choice() {}
 
 void Choice::AddChild(Object *child)
 {
@@ -309,9 +259,7 @@ Corr::Corr() : EditorialElement("corr-"), AttSource()
     Reset();
 }
 
-Corr::~Corr()
-{
-}
+Corr::~Corr() {}
 
 void Corr::Reset()
 {
@@ -330,9 +278,7 @@ Damage::Damage() : EditorialElement("lem-"), AttSource()
     Reset();
 }
 
-Damage::~Damage()
-{
-}
+Damage::~Damage() {}
 
 void Damage::Reset()
 {
@@ -351,9 +297,7 @@ Del::Del() : EditorialElement("del-"), AttSource()
     Reset();
 }
 
-Del::~Del()
-{
-}
+Del::~Del() {}
 
 void Del::Reset()
 {
@@ -372,9 +316,7 @@ Expan::Expan() : EditorialElement("expan-"), AttSource()
     Reset();
 }
 
-Expan::~Expan()
-{
-}
+Expan::~Expan() {}
 
 void Expan::Reset()
 {
@@ -393,9 +335,7 @@ Lem::Lem() : EditorialElement("lem-"), AttSource()
     Reset();
 }
 
-Lem::~Lem()
-{
-}
+Lem::~Lem() {}
 
 void Lem::Reset()
 {
@@ -414,9 +354,7 @@ Orig::Orig() : EditorialElement("orig-"), AttSource()
     Reset();
 }
 
-Orig::~Orig()
-{
-}
+Orig::~Orig() {}
 
 void Orig::Reset()
 {
@@ -435,9 +373,7 @@ Rdg::Rdg() : EditorialElement("rdg-"), AttSource()
     Reset();
 }
 
-Rdg::~Rdg()
-{
-}
+Rdg::~Rdg() {}
 
 void Rdg::Reset()
 {
@@ -456,9 +392,7 @@ Reg::Reg() : EditorialElement("reg-"), AttSource()
     Reset();
 }
 
-Reg::~Reg()
-{
-}
+Reg::~Reg() {}
 
 void Reg::Reset()
 {
@@ -477,9 +411,7 @@ Restore::Restore() : EditorialElement("restore-"), AttSource()
     Reset();
 }
 
-Restore::~Restore()
-{
-}
+Restore::~Restore() {}
 
 void Restore::Reset()
 {
@@ -498,9 +430,7 @@ Sic::Sic() : EditorialElement("sic-"), AttSource()
     Reset();
 }
 
-Sic::~Sic()
-{
-}
+Sic::~Sic() {}
 
 void Sic::Reset()
 {
@@ -519,9 +449,7 @@ Supplied::Supplied() : EditorialElement("supplied-"), AttSource()
     Reset();
 }
 
-Supplied::~Supplied()
-{
-}
+Supplied::~Supplied() {}
 
 void Supplied::Reset()
 {
@@ -540,9 +468,7 @@ Unclear::Unclear() : EditorialElement("unclear-"), AttSource()
     Reset();
 }
 
-Unclear::~Unclear()
-{
-}
+Unclear::~Unclear() {}
 
 void Unclear::Reset()
 {
@@ -590,7 +516,7 @@ int EditorialElement::ResetDrawing(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int EditorialElement::CastOffSystems(FunctorParams *functorParams)
 {

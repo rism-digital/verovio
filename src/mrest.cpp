@@ -32,9 +32,7 @@ MRest::MRest() : LayerElement("mrest-"), PositionInterface(), AttCue(), AttFerma
     Reset();
 }
 
-MRest::~MRest()
-{
-}
+MRest::~MRest() {}
 
 void MRest::Reset()
 {
@@ -69,7 +67,7 @@ int MRest::ResetDrawing(FunctorParams *functorParams)
     PositionInterface::InterfaceResetDrawing(functorParams, this);
 
     return FUNCTOR_CONTINUE;
-};
+}
 
 int MRest::ResetHorizontalAlignment(FunctorParams *functorParams)
 {

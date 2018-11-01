@@ -24,9 +24,7 @@ Expansion::Expansion() : SystemElement("expansion-")
     Reset();
 }
 
-Expansion::~Expansion()
-{
-}
+Expansion::~Expansion() {}
 
 void Expansion::Reset()
 {

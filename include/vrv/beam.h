@@ -8,6 +8,7 @@
 #ifndef __VRV_BEAM_H__
 #define __VRV_BEAM_H__
 
+#include "atts_cmn.h"
 #include "drawinginterface.h"
 #include "layerelement.h"
 
@@ -55,16 +56,16 @@ public:
     int m_beamWidth;
     int m_beamWidthBlack;
     int m_beamWidthWhite;
-    double m_startingY; // the initial position of the beam
+    int m_startingX; // the initial X position of the beam
+    int m_startingY; // the initial Y position of the beam
     double m_beamSlope; // the slope of the beam
-    double m_verticalBoost; // extra height to ensure the beam clears all the noteheads
 };
 
 //----------------------------------------------------------------------------
 // Beam
 //----------------------------------------------------------------------------
 
-class Beam : public LayerElement, public ObjectListInterface, public DrawingListInterface, public AttColor {
+class Beam : public LayerElement, public ObjectListInterface, public DrawingListInterface, public AttColor, public AttBeamedWith {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -108,6 +109,11 @@ public:
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 protected:
     /**

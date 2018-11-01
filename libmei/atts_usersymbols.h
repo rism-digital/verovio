@@ -64,6 +64,114 @@ private:
     /* include <attaltsym> */
 };
 
+//----------------------------------------------------------------------------
+// AttAnchoredTextLog
+//----------------------------------------------------------------------------
+
+class AttAnchoredTextLog : public Att {
+public:
+    AttAnchoredTextLog();
+    virtual ~AttAnchoredTextLog();
+
+    /** Reset the default values for the attribute class **/
+    void ResetAnchoredTextLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadAnchoredTextLog(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteAnchoredTextLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFunc(std::string func_) { m_func = func_; }
+    std::string GetFunc() const { return m_func; }
+    bool HasFunc() const;
+    ///@}
+
+private:
+    /** Function of the meter signature group. **/
+    std::string m_func;
+
+    /* include <attfunc> */
+};
+
+//----------------------------------------------------------------------------
+// AttCurveLog
+//----------------------------------------------------------------------------
+
+class AttCurveLog : public Att {
+public:
+    AttCurveLog();
+    virtual ~AttCurveLog();
+
+    /** Reset the default values for the attribute class **/
+    void ResetCurveLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadCurveLog(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteCurveLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFunc(std::string func_) { m_func = func_; }
+    std::string GetFunc() const { return m_func; }
+    bool HasFunc() const;
+    ///@}
+
+private:
+    /** Function of the meter signature group. **/
+    std::string m_func;
+
+    /* include <attfunc> */
+};
+
+//----------------------------------------------------------------------------
+// AttLineLog
+//----------------------------------------------------------------------------
+
+class AttLineLog : public Att {
+public:
+    AttLineLog();
+    virtual ~AttLineLog();
+
+    /** Reset the default values for the attribute class **/
+    void ResetLineLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadLineLog(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteLineLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFunc(std::string func_) { m_func = func_; }
+    std::string GetFunc() const { return m_func; }
+    bool HasFunc() const;
+    ///@}
+
+private:
+    /** Function of the meter signature group. **/
+    std::string m_func;
+
+    /* include <attfunc> */
+};
+
 } // vrv namespace
 
 #endif // __VRV_ATTS_USERSYMBOLS_H__

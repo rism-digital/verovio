@@ -22,6 +22,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "page.h"
+#include "pages.h"
 #include "section.h"
 #include "staff.h"
 #include "vrv.h"
@@ -72,6 +73,7 @@ void System::Reset()
     m_drawingJustifiableWidth = 0;
     m_drawingLabelsWidth = 0;
     m_drawingAbbrLabelsWidth = 0;
+    m_drawingIsOptimized = false;
 }
 
 void System::AddChild(Object *child)
@@ -148,15 +150,21 @@ void System::SetDrawingAbbrLabelsWidth(int width)
     }
 }
 
-void System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY)
+bool System::SetCurrentFloatingPositioner(
+    int staffN, FloatingObject *object, Object *objectX, Object *objectY, char spanningType)
 {
     assert(object);
 
     // If we have only the bottom alignment, then nothing to do (yet)
-    if (m_systemAligner.GetChildCount() == 1) return;
+    if (m_systemAligner.GetChildCount() == 1) return false;
     StaffAlignment *alignment = m_systemAligner.GetStaffAlignmentForStaffN(staffN);
-    assert(alignment);
-    alignment->SetCurrentFloatingPositioner(object, objectX, objectY);
+    if (!alignment) {
+        LogError("Staff @n='%d' for rendering control event %s %s not found", staffN, object->GetClassName().c_str(),
+            object->GetUuid().c_str());
+        return false;
+    }
+    alignment->SetCurrentFloatingPositioner(object, objectX, objectY, spanningType);
+    return true;
 }
 
 void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
@@ -182,7 +190,7 @@ bool System::HasMixedDrawingStemDir(LayerElement *start, LayerElement *end)
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
 
-    for (childrenIter = children.begin(); childrenIter != children.end(); childrenIter++) {
+    for (childrenIter = children.begin(); childrenIter != children.end(); ++childrenIter) {
         Layer *layer = dynamic_cast<Layer *>((*childrenIter)->GetFirstParent(LAYER));
         assert(layer);
         Staff *staff = dynamic_cast<Staff *>((*childrenIter)->GetFirstParent(STAFF));
@@ -222,8 +230,38 @@ int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
         m_drawingScoreDef = NULL;
     }
 
+    m_drawingIsOptimized = false;
+
     return FUNCTOR_CONTINUE;
-};
+}
+
+int System::OptimizeScoreDef(FunctorParams *functorParams)
+{
+    OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
+    assert(params);
+
+    this->IsDrawingOptimized(true);
+
+    if (params->m_firstScoreDef) {
+        params->m_firstScoreDef = false;
+        return FUNCTOR_SIBLINGS;
+    }
+
+    params->m_currentScoreDef = this->GetDrawingScoreDef();
+    assert(params->m_currentScoreDef);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::OptimizeScoreDefEnd(FunctorParams *functorParams)
+{
+    OptimizeScoreDefParams *params = dynamic_cast<OptimizeScoreDefParams *>(functorParams);
+    assert(params);
+
+    params->m_currentScoreDef->Process(params->m_functor, params, params->m_functorEnd);
+
+    return FUNCTOR_CONTINUE;
+}
 
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
@@ -282,11 +320,61 @@ int System::AlignVerticallyEnd(FunctorParams *functorParams)
     AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
     assert(params);
 
-    params->m_cumulatedShift = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
+    params->m_cumulatedShift
+        = params->m_doc->GetOptions()->m_spacingStaff.GetValue() * params->m_doc->GetDrawingUnit(100);
 
     m_systemAligner.Process(params->m_functorEnd, params);
 
     return FUNCTOR_SIBLINGS;
+}
+
+int System::AdjustXOverflow(FunctorParams *functorParams)
+{
+    AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
+    assert(params);
+
+    params->m_currentSystem = this;
+    params->m_lastMeasure = NULL;
+    params->m_currentWidest = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::AdjustXOverflowEnd(FunctorParams *functorParams)
+{
+    AdjustXOverflowParams *params = dynamic_cast<AdjustXOverflowParams *>(functorParams);
+    assert(params);
+
+    // Continue if no measure of not widest element
+    if (!params->m_lastMeasure || !params->m_currentWidest) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    // Continue if the right position of the measure is larger than the widest element right
+    int measureRightX
+        = params->m_lastMeasure->GetDrawingX() + params->m_lastMeasure->GetRightBarLineLeft() - params->m_margin;
+    if (measureRightX > params->m_currentWidest->GetContentRight()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    LayerElement *objectX = dynamic_cast<LayerElement *>(params->m_currentWidest->GetObjectX());
+    if (!objectX) {
+        return FUNCTOR_CONTINUE;
+    }
+    Alignment *left = objectX->GetAlignment();
+    Measure *objectXMeasure = dynamic_cast<Measure *>(objectX->GetFirstParent(MEASURE));
+    if (objectXMeasure != params->m_lastMeasure) {
+        left = params->m_lastMeasure->GetLeftBarLine()->GetAlignment();
+    }
+
+    int overflow = params->m_currentWidest->GetContentRight() - measureRightX;
+    if (overflow > 0) {
+        ArrayOfAdjustmentTuples boundaries{ std::make_tuple(
+            left, params->m_lastMeasure->GetRightBarLine()->GetAlignment(), overflow) };
+        params->m_lastMeasure->m_measureAligner.AdjustProportionally(boundaries);
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 int System::AdjustYPos(FunctorParams *functorParams)
@@ -359,7 +447,7 @@ int System::JustifyX(FunctorParams *functorParams)
 
     if (params->m_justifiableRatio < 0.8) {
         // Arbitrary value for avoiding over-compressed justification
-        LogWarning("Justification stop because of a ratio smaller than 0.8: %lf", params->m_justifiableRatio);
+        LogWarning("Justification is highly compressed (ratio smaller than 0.8: %lf)", params->m_justifiableRatio);
         LogWarning("\tSystem full width: %d", params->m_systemFullWidth);
         LogWarning("\tNon-justifiable width: %d", nonJustifiableWidth);
         LogWarning("\tDrawing justifiable width: %d", m_drawingJustifiableWidth);
@@ -399,39 +487,66 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
 
     params->m_classId = TIE;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = SLUR;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = MORDENT;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = TURN;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = TRILL;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = DYNAM;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = HAIRPIN;
     m_systemAligner.Process(params->m_functor, params);
+
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(DYNAM);
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(HAIRPIN);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+
     params->m_classId = OCTAVE;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = BREATH;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = FERMATA;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = DIR;
     m_systemAligner.Process(params->m_functor, params);
+
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(DIR);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+
     params->m_classId = TEMPO;
     m_systemAligner.Process(params->m_functor, params);
+
     params->m_classId = PEDAL;
     m_systemAligner.Process(params->m_functor, params);
 
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(PEDAL);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+
     params->m_classId = HARM;
     m_systemAligner.Process(params->m_functor, params);
+
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(HARM);
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
 
     params->m_classId = ENDING;
     m_systemAligner.Process(params->m_functor, params);
+
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(ENDING);
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
@@ -448,10 +563,21 @@ int System::CastOffPages(FunctorParams *functorParams)
     CastOffPagesParams *params = dynamic_cast<CastOffPagesParams *>(functorParams);
     assert(params);
 
-    if ((params->m_currentPage->GetChildCount() > 0)
-        && (this->m_drawingYRel - this->GetHeight() - params->m_shift < 0)) {
+    int currentShift = params->m_shift;
+    // We use params->m_pageHeadHeight to check if we have passed the first page already
+    if (params->m_pgHeadHeight != VRV_UNSET) {
+        currentShift += params->m_pgHeadHeight + params->m_pgFootHeight;
+    }
+    else {
+        currentShift += params->m_pgHead2Height + params->m_pgFoot2Height;
+    }
+
+    if ((params->m_currentPage->GetChildCount() > 0) && (this->m_drawingYRel - this->GetHeight() - currentShift < 0)) {
         params->m_currentPage = new Page();
-        params->m_doc->AddChild(params->m_currentPage);
+        // Use VRV_UNSET value as a flag
+        params->m_pgHeadHeight = VRV_UNSET;
+        assert(params->m_doc->GetPages());
+        params->m_doc->GetPages()->AddChild(params->m_currentPage);
         params->m_shift = this->m_drawingYRel - params->m_pageHeight;
     }
 
@@ -488,7 +614,7 @@ int System::CastOffSystemsEnd(FunctorParams *functorParams)
 
     // Otherwise add all pendings objects
     ArrayOfObjects::iterator iter;
-    for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); iter++) {
+    for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); ++iter) {
         params->m_currentSystem->AddChild(*iter);
     }
 

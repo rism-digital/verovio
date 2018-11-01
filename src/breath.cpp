@@ -30,9 +30,7 @@ Breath::Breath() : ControlElement("breath-"), TimePointInterface(), AttColor(), 
     Reset();
 }
 
-Breath::~Breath()
-{
-}
+Breath::~Breath() {}
 
 void Breath::Reset()
 {

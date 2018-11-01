@@ -12,6 +12,7 @@
 #include "editorial.h"
 #include "object.h"
 #include "verticalaligner.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -90,7 +91,8 @@ public:
      */
     int GetSystemIdx() const { return Object::GetIdx(); }
 
-    void SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY);
+    bool SetCurrentFloatingPositioner(
+        int staffN, FloatingObject *object, Object *objectX, Object *objectY, char spanningType = SPANNING_START_END);
 
     /**
      * @name Setter and getter of the drawing scoreDef
@@ -106,6 +108,14 @@ public:
      */
     bool HasMixedDrawingStemDir(LayerElement *start, LayerElement *end);
 
+    /**
+     * @name Setter and getter of the drawing visible flag
+     */
+    ///@{
+    bool IsDrawingOptimized() const { return m_drawingIsOptimized; }
+    void IsDrawingOptimized(bool drawingIsOptimized) { m_drawingIsOptimized = drawingIsOptimized; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -114,6 +124,14 @@ public:
      * See Object::UnsetCurrentScoreDef
      */
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+
+    /**
+     * See Object::OptimizeScoreDef
+     */
+    ///@{
+    virtual int OptimizeScoreDef(FunctorParams *functorParams);
+    virtual int OptimizeScoreDefEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::ResetHorizontalAlignment
@@ -134,6 +152,14 @@ public:
      * See Object::AlignHorizontally
      */
     virtual int AlignHorizontally(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustXOverflow
+     */
+    ///@{
+    virtual int AdjustXOverflow(FunctorParams *functorParams);
+    virtual int AdjustXOverflowEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::AlignVertically
@@ -236,7 +262,16 @@ protected:
     int m_drawingYRel;
 
 private:
+    /**
+     * The drawing scoreDef at the beginning of the system.
+     */
     ScoreDef *m_drawingScoreDef;
+
+    /**
+     * A flag indicating if the system is optimized.
+     * This does not mean that a staff is hidden, but only that it can be optimized.
+     */
+    bool m_drawingIsOptimized;
 };
 
 } // namespace vrv

@@ -56,6 +56,11 @@ public:
     ///@}
 
     /**
+     * See Object::ConvertToUnCastOffMensural
+     */
+    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
+
+    /**
      * See Object::PrepareBoundaries
      */
     virtual int PrepareBoundaries(FunctorParams *functorParams);
@@ -64,84 +69,6 @@ public:
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
-
-private:
-    //
-public:
-    //
-private:
-    //
-};
-
-//----------------------------------------------------------------------------
-// Pb
-//----------------------------------------------------------------------------
-
-/**
- * This class represents a MEI pb in score-based MEI.
- * In page-based MEI, it remains as is as. Actuall pages are represented by Page objects.
- */
-class Pb : public SystemElement, public AttNNumberLike {
-public:
-    /**
-     * @name Constructors, destructors, and other standard methods
-     * Reset method resets all attribute classes
-     */
-    ///@{
-    Pb();
-    virtual ~Pb();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Pb"; }
-    virtual ClassId GetClassId() const { return PB; }
-    ///@}
-
-    //----------//
-    // Functors //
-    //----------//
-
-    /**
-     * See Object::CastOffEncoding
-     */
-    virtual int CastOffEncoding(FunctorParams *functorParams);
-
-private:
-    //
-public:
-    //
-private:
-    //
-};
-
-//----------------------------------------------------------------------------
-// Sb
-//----------------------------------------------------------------------------
-
-/**
- * This class represents a MEI sb in score-based MEI.
- * In page-based MEI, it remains as is as. Actuall systems are represented by System objects.
- */
-class Sb : public SystemElement, public AttNNumberLike {
-public:
-    /**
-     * @name Constructors, destructors, and other standard methods
-     * Reset method resets all attribute classes
-     */
-    ///@{
-    Sb();
-    virtual ~Sb();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "Sb"; }
-    virtual ClassId GetClassId() const { return SB; }
-    ///@}
-
-    //----------//
-    // Functors //
-    //----------//
-
-    /**
-     * See Object::CastOffEncoding
-     */
-    virtual int CastOffEncoding(FunctorParams *functorParams);
 
 private:
     //

@@ -21,8 +21,10 @@ namespace vrv {
 // Element
 //----------------------------------------------------------------------------
 
-Element::Element() : DocObject("element-"), AttCommon()
+Element::Element() : LayerElement("element-"), AttNNumberLike()
 {
+    RegisterAttClass(ATT_NNUMBERLIKE);
+
     Reset();
 }
 
@@ -30,17 +32,17 @@ Element::~Element()
 {
 }
 
-void Element::AddChildElement(ChildElement *child)
+void Element::Reset()
+{
+    LayerElement::Reset();
+    ResetNNumberLike();
+}
+
+void Element::AddChild(Object *child)
 {
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
-}
-
-void Element::Reset()
-{
-    LayerElement::Reset();
-    ResetCommon();
 }
 
 } // namespace vrv

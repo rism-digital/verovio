@@ -20,6 +20,10 @@
 #include "label.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "pgfoot.h"
+#include "pgfoot2.h"
+#include "pghead.h"
+#include "pghead2.h"
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "system.h"
@@ -39,9 +43,7 @@ ScoreDefElement::ScoreDefElement(std::string classid) : Object(classid), ScoreDe
     Reset();
 }
 
-ScoreDefElement::~ScoreDefElement()
-{
-}
+ScoreDefElement::~ScoreDefElement() {}
 
 void ScoreDefElement::Reset()
 {
@@ -183,21 +185,21 @@ MeterSig *ScoreDefElement::GetMeterSigCopy() const
 // ScoreDef
 //----------------------------------------------------------------------------
 
-ScoreDef::ScoreDef() : ScoreDefElement("scoredef-"), ObjectListInterface(), AttEndings()
+ScoreDef::ScoreDef() : ScoreDefElement("scoredef-"), ObjectListInterface(), AttEndings(), AttOptimization()
 {
     RegisterAttClass(ATT_ENDINGS);
+    RegisterAttClass(ATT_OPTIMIZATION);
 
     Reset();
 }
 
-ScoreDef::~ScoreDef()
-{
-}
+ScoreDef::~ScoreDef() {}
 
 void ScoreDef::Reset()
 {
     ScoreDefElement::Reset();
     ResetEndings();
+    ResetOptimization();
 
     m_drawLabels = false;
     m_drawingWidth = 0;
@@ -211,6 +213,9 @@ void ScoreDef::AddChild(Object *child)
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else if (child->IsRunningElement()) {
+        assert(dynamic_cast<RunningElement *>(child));
     }
     else {
         LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
@@ -319,7 +324,7 @@ void ScoreDef::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
         }
         else {
-            iter++;
+            ++iter;
         }
     }
 }
@@ -378,6 +383,26 @@ void ScoreDef::SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig
 void ScoreDef::SetDrawingWidth(int drawingWidth)
 {
     m_drawingWidth = drawingWidth;
+}
+
+PgFoot *ScoreDef::GetPgFoot()
+{
+    return dynamic_cast<PgFoot *>(this->FindChildByType(PGFOOT));
+}
+
+PgFoot2 *ScoreDef::GetPgFoot2()
+{
+    return dynamic_cast<PgFoot2 *>(this->FindChildByType(PGFOOT2));
+}
+
+PgHead *ScoreDef::GetPgHead()
+{
+    return dynamic_cast<PgHead *>(this->FindChildByType(PGHEAD));
+}
+
+PgHead2 *ScoreDef::GetPgHead2()
+{
+    return dynamic_cast<PgHead2 *>(this->FindChildByType(PGHEAD2));
 }
 
 //----------------------------------------------------------------------------

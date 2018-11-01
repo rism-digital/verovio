@@ -48,26 +48,30 @@ enum ClassId {
     DEVICE_CONTEXT, // Should not be instanciated as is,
     FLOATING_OBJECT,
     FLOATING_POSITIONER,
-    //
+    // Ids for ungrouped objects
     ALIGNMENT,
     ALIGNMENT_REFERENCE,
     CLEF_ATTR,
     DOC,
     FB,
     GRACE_ALIGNER,
+    INSTRDEF,
     KEYSIG_ATTR,
     LABEL,
     LABELABBR,
     LAYER,
+    MDIV,
     MEASURE,
     MEASURE_ALIGNER,
     MENSUR_ATTR,
     METERSIG_ATTR,
     PAGE,
+    PAGES,
     SCORE,
     STAFF,
     STAFF_ALIGNMENT,
     STAFFGRP,
+    SVG,
     SYSTEM,
     SYSTEM_ALIGNER,
     SYSTEM_ALIGNMENT,
@@ -86,12 +90,21 @@ enum ClassId {
     LEM,
     ORIG,
     RDG,
+    REF,
     REG,
     RESTORE,
     SIC,
+    SUBST,
     SUPPLIED,
     UNCLEAR,
     EDITORIAL_ELEMENT_max,
+    // Ids for RunningElement child classes
+    RUNNING_ELEMENT,
+    PGFOOT,
+    PGFOOT2,
+    PGHEAD,
+    PGHEAD2,
+    RUNNING_ELEMENT_max,
     // Ids for SystemElement child classes
     SYSTEM_ELEMENT,
     BOUNDARY_END,
@@ -112,6 +125,7 @@ enum ClassId {
     HAIRPIN,
     HARM,
     MORDENT,
+    MNUM,
     OCTAVE,
     PEDAL,
     SLUR,
@@ -148,13 +162,16 @@ enum ClassId {
     MRPT2,
     MULTIREST,
     MULTIRPT,
+    NC,
     NOTE,
-    NUM,
+    NEUME,
+    TUPLET_NUM,
     PROPORT,
     REST,
     SPACE,
     STEM,
     SYL,
+    SYLLABLE,
     TIMESTAMP_ATTR,
     TUPLET,
     VERSE,
@@ -166,7 +183,10 @@ enum ClassId {
     SCOREDEF_ELEMENT_max,
     // Ids for TextElement child classes
     TEXT_ELEMENT,
+    FIG,
     FIGURE,
+    LB,
+    NUM,
     REND,
     TEXT,
     TEXT_ELEMENT_max,
@@ -184,8 +204,10 @@ enum ClassId {
  */
 enum InterfaceId {
     INTERFACE,
+    INTERFACE_AREA_POS,
     INTERFACE_BOUNDARY,
     INTERFACE_DURATION,
+    INTERFACE_LINKING,
     INTERFACE_PITCH,
     INTERFACE_PLIST,
     INTERFACE_POSITION,
@@ -204,14 +226,22 @@ class Arpeg;
 class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
+class Comparison;
 class FloatingPositioner;
+class GraceAligner;
+class InterfaceComparison;
 class LayerElement;
 class LedgerLine;
+class LinkingInterface;
+class Nc;
 class Note;
+class Neume;
 class Object;
 class PlistInterface;
 class Point;
 class Staff;
+class Option;
+class TextElement;
 class TimePointInterface;
 class TimeSpanningInterface;
 
@@ -219,7 +249,7 @@ typedef std::vector<Object *> ArrayOfObjects;
 
 typedef std::vector<Object *> ListOfObjects;
 
-typedef std::vector<AttComparison *> ArrayOfAttComparisons;
+typedef std::vector<Comparison *> ArrayOfComparisons;
 
 typedef std::vector<Note *> ChordCluster;
 
@@ -229,7 +259,9 @@ typedef std::vector<std::tuple<Alignment *, Arpeg *, int, bool> > ArrayOfAligmen
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
-typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfInterfaceUuidPairs;
+typedef std::vector<std::pair<LinkingInterface *, std::string> > ArrayOfLinkingInterfaceUuidPairs;
+
+typedef std::vector<std::pair<PlistInterface *, std::string> > ArrayOfPlistInterfaceUuidPairs;
 
 typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
 
@@ -245,14 +277,44 @@ typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
 
 typedef std::vector<LedgerLine> ArrayOfLedgerLines;
 
+typedef std::vector<TextElement *> ArrayOfTextElements;
+
 typedef std::map<Staff *, std::list<int> > MapOfDotLocs;
+
+typedef std::map<std::string, Option *> MapOfStrOptions;
+
+typedef std::map<int, GraceAligner *> MapOfIntGraceAligners;
+
+/**
+ * Generic int map recursive structure for storing hierachy of values
+ * For example, we want to process all staves one by one, and within each staff
+ * all layer one by one, and so one (lyrics, etc.). In IntTree, we can store
+ * @n with all existing values (1 => 1 => 1; 2 => 1 => 1)
+ * The stucture must be filled first and can then be used by instanciating a vector
+ * of corresponding Comparison (typically AttNIntegerComparison for @n attribute).
+ * See Doc::PrepareDrawing for an example.
+ */
+struct IntTree {
+    std::map<int, IntTree> child;
+};
+
+typedef std::map<int, IntTree> IntTree_t;
+
+/**
+ * This is the alternate way for representing map of maps. With this solution,
+ * we can easily have different types of key (attribute) at each level. We could
+ * mix int, string, or even MEI data_* types. The drawback is that a type has to
+ * be defined at each level. Also see Doc::PrepareDrawing for an example.
+ */
+typedef std::map<int, bool> VerseN_t;
+typedef std::map<int, VerseN_t> LayerN_VerserN_t;
+typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 
 //----------------------------------------------------------------------------
 // Global defines
 //----------------------------------------------------------------------------
 
 #define DEFINITION_FACTOR 10
-#define PARAM_DENOMINATOR 10
 
 #define isIn(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
 
@@ -325,8 +387,15 @@ enum EditorialLevel {
     EDITORIAL_LAYER,
     EDITORIAL_NOTE,
     EDITORIAL_TEXT,
-    EDITORIAL_FB
+    EDITORIAL_FB,
+    EDITORIAL_RUNNING,
 };
+
+//----------------------------------------------------------------------------
+// Visibility for editorial and mdiv elements
+//----------------------------------------------------------------------------
+
+enum VisibilityType { Hidden = 0, Visible };
 
 //----------------------------------------------------------------------------
 // The used SMuFL glyph anchors
@@ -342,6 +411,12 @@ enum SMuFLGlyphAnchor {
 };
 
 //----------------------------------------------------------------------------
+// Spanning types for control events
+//----------------------------------------------------------------------------
+
+enum { SPANNING_START_END = 0, SPANNING_START, SPANNING_END, SPANNING_MIDDLE };
+
+//----------------------------------------------------------------------------
 // Types for layer element
 //----------------------------------------------------------------------------
 
@@ -350,23 +425,35 @@ enum SMuFLGlyphAnchor {
  * scoreDef layer elements and cautionary scoreDef layer elements
  */
 
-enum ElementScoreDefRole { NONE = 0, SYSTEM_SCOREDEF, INTERMEDIATE_SCOREDEF, CAUTIONARY_SCOREDEF };
-
-//----------------------------------------------------------------------------
-// Drawing groups (reserved values)
-//----------------------------------------------------------------------------
-
-/**
- * We need fix values for types that are all groupes together
- */
-
-enum { DRAWING_GRP_NONE = 0, DRAWING_GRP_VERSE, DRAWING_GRP_HARM, DRAWING_GRP_OTHER };
+enum ElementScoreDefRole { SCOREDEF_NONE = 0, SCOREDEF_SYSTEM, SCOREDEF_INTERMEDIATE, SCOREDEF_CAUTIONARY };
 
 //----------------------------------------------------------------------------
 // Artic part types
 //----------------------------------------------------------------------------
 
 enum ArticPartType { ARTIC_PART_INSIDE = 0, ARTIC_PART_OUTSIDE };
+
+//----------------------------------------------------------------------------
+// Visibility optimization
+//----------------------------------------------------------------------------
+
+enum VisibilityOptimization { OPTIMIZATION_NONE = 0, OPTIMIZATION_HIDDEN, OPTIMIZATION_SHOW };
+
+//----------------------------------------------------------------------------
+// Layout positions (3 x 3 grid)
+//----------------------------------------------------------------------------
+
+enum {
+    POSITION_LEFT = 0,
+    POSITION_CENTER,
+    POSITION_RIGHT,
+};
+
+enum {
+    POSITION_TOP = 0,
+    POSITION_MIDDLE = 3,
+    POSITION_BOTTOM = 6,
+};
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines

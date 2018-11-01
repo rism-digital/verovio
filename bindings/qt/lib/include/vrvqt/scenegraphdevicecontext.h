@@ -95,9 +95,11 @@ public:
     void DrawRectangle(int x, int y, int width, int height) override;
     void DrawRotatedText(const std::string &text, int x, int y, double angle) override;
     void DrawRoundedRectangle(int x, int y, int width, int height, double radius) override;
-    void DrawText(const std::string &text, const std::wstring wtext = L"") override;
+    void DrawText(
+        const std::string &text, const std::wstring wtext = L"", int x = VRV_UNSET, int y = VRV_UNSET) override;
     void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph) override;
     void DrawSpline(int n, vrv::Point points[]) override;
+    void DrawSvgShape(int x, int y, int width, int height, pugi::xml_node svg) override;
     void DrawBackgroundImage(int x = 0, int y = 0) override;
     ///@}
 
@@ -105,9 +107,9 @@ public:
      * @name Method for starting, ending and moving a text
      */
     ///@{
-    void StartText(int x, int y, char alignment = vrv::LEFT) override;
+    void StartText(int x, int y, vrv::data_HORIZONTALALIGNMENT alignment = vrv::HORIZONTALALIGNMENT_left) override;
     void EndText() override;
-    void MoveTextTo(int x, int y) override;
+    void MoveTextTo(int x, int y, vrv::data_HORIZONTALALIGNMENT alignment) override;
     ///@}
 
     /**
@@ -136,6 +138,11 @@ public:
     ///@}
 
 private:
+    /**
+     * Helper function that sets the position and alignment of the current text item.
+     */
+    void SetTextPositionAndAlignment(int x, int y, vrv::data_HORIZONTALALIGNMENT alignment);
+
     /**
      * Helper function that allows converting a pixel size to a point size, as used for the font size.
      */

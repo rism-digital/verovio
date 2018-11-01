@@ -18,8 +18,8 @@
 namespace vrvQt {
 Toolkit::Toolkit()
     : m_verovioToolkit(false)
-    , m_displayWidth(m_verovioToolkit.GetPageWidth())
-    , m_displayHeight(m_verovioToolkit.GetPageHeight())
+    , m_displayWidth(std::stoi(m_verovioToolkit.GetOption("pageWidth")))
+    , m_displayHeight(std::stoi(m_verovioToolkit.GetOption("pageHeight")))
 {
     connect(this, SIGNAL(documentLayoutInvalidated()), this, SLOT(documentRelayout()), Qt::QueuedConnection);
     connect(this, SIGNAL(fileNameInvalidated()), this, SLOT(readFile()), Qt::QueuedConnection);
@@ -28,7 +28,7 @@ Toolkit::Toolkit()
 
 int Toolkit::adjustedDisplayHeightForPage(int page)
 {
-    if (!m_verovioToolkit.GetAdjustPageHeight()) return m_displayHeight;
+    if (!getAdjustPageHeight()) return m_displayHeight;
 
     Q_ASSERT(page <= m_adjustedDisplayHeights.count());
 
@@ -53,7 +53,7 @@ int Toolkit::adjustedDisplayHeightForPage(int page)
 
 void Toolkit::setAdjustedDisplayHeightForPage(int pageNumber, int pageHeight)
 {
-    if (m_verovioToolkit.GetAdjustPageHeight()) {
+    if (getAdjustPageHeight()) {
         Q_ASSERT(pageNumber <= m_adjustedDisplayHeights.count());
         m_adjustedDisplayHeights[pageNumber - 1] = pageHeight;
     }
@@ -151,36 +151,19 @@ void Toolkit::setScale(int scale)
     }
 }
 
-void Toolkit::setBorder(int border)
-{
-    if (m_verovioToolkit.GetBorder() != border) {
-        m_verovioToolkit.SetAdjustPageHeight(border);
-        requestDocumentRelayout();
-    }
-}
-
 void Toolkit::setAdjustPageHeight(bool adjustPageHeight)
 {
-    if (m_verovioToolkit.GetAdjustPageHeight() != adjustPageHeight) {
-        m_verovioToolkit.SetAdjustPageHeight(adjustPageHeight);
+    if (getAdjustPageHeight() != adjustPageHeight) {
+        m_verovioToolkit.SetOption("adjustPageHeight", adjustPageHeight ? "true" : "false");
         requestDocumentRelayout();
     }
 }
 
-void Toolkit::setNoLayout(bool noLayout)
+void Toolkit::setBreaks(QString breaks)
 {
-    if (m_verovioToolkit.GetNoLayout() != noLayout) {
-        m_verovioToolkit.SetNoLayout(noLayout);
-        // "no layout" is used in LoadData
-        requestReloadData();
-    }
-}
-
-void Toolkit::setIgnoreLayout(bool ignoreLayout)
-{
-    if (m_verovioToolkit.GetIgnoreLayout() != ignoreLayout) {
-        m_verovioToolkit.SetIgnoreLayout(ignoreLayout);
-        // "ignore layout" is used in LoadData
+    if (getBreaks() != breaks) {
+        m_verovioToolkit.SetOption("breaks", breaks.toStdString());
+        // "breaks" is used in LoadData
         requestReloadData();
     }
 }
@@ -211,18 +194,43 @@ void Toolkit::setResourcesDataPath(QString resourcesDataPath)
 
 void Toolkit::setSpacingStaff(int spacingStaff)
 {
-    if (m_verovioToolkit.GetSpacingStaff() != spacingStaff) {
-        m_verovioToolkit.SetSpacingStaff(spacingStaff);
+    if (getSpacingStaff() != spacingStaff) {
+        m_verovioToolkit.SetOption("spacingStaff", std::to_string(spacingStaff));
         requestDocumentRelayout();
     }
 }
 
 void Toolkit::setSpacingSystem(int spacingSystem)
 {
-    if (m_verovioToolkit.GetSpacingSystem() != spacingSystem) {
-        m_verovioToolkit.SetSpacingSystem(spacingSystem);
+    if (getSpacingSystem() != spacingSystem) {
+        m_verovioToolkit.SetOption("spacingSystem", std::to_string(spacingSystem));
         requestDocumentRelayout();
     }
+}
+
+bool Toolkit::getAdjustPageHeight() const
+{
+    return m_verovioToolkit.GetOption("adjustPageHeight") == "true";
+}
+
+int Toolkit::getScale()
+{
+    return m_verovioToolkit.GetScale();
+}
+
+int Toolkit::getSpacingSystem() const
+{
+    return std::stoi(m_verovioToolkit.GetOption("spacingSystem"));
+}
+
+int Toolkit::getSpacingStaff() const
+{
+    return std::stoi(m_verovioToolkit.GetOption("spacingStaff"));
+}
+
+QString Toolkit::getBreaks() const
+{
+    return QString::fromStdString(m_verovioToolkit.GetOption("spacingStaff"));
 }
 
 bool Toolkit::addFont(QString fontFilePath)
@@ -250,7 +258,7 @@ bool Toolkit::initFont()
     if (m_fontInitDone) return true;
     m_fontInitDone = true;
 
-    m_verovioToolkit.SetFont(m_musicFontName.toStdString());
+    m_verovioToolkit.SetOption("font", m_musicFontName.toStdString());
 
     addFont(m_musicFontPath);
     addFont(m_verovioTextFontPath);
@@ -329,8 +337,10 @@ void Toolkit::documentRelayout()
         return;
     }
 
-    m_verovioToolkit.SetPageWidth(static_cast<int>(m_displayWidth * 100.0 / m_verovioToolkit.GetScale()));
-    m_verovioToolkit.SetPageHeight(static_cast<int>(m_displayHeight * 100.0 / m_verovioToolkit.GetScale()));
+    m_verovioToolkit.SetOption(
+        "pageWidth", std::to_string(static_cast<int>(m_displayWidth * 100.0 / m_verovioToolkit.GetScale())));
+    m_verovioToolkit.SetOption(
+        "pageHeight", std::to_string(static_cast<int>(m_displayHeight * 100.0 / m_verovioToolkit.GetScale())));
 
     m_verovioToolkit.RedoLayout();
 
@@ -338,4 +348,5 @@ void Toolkit::documentRelayout()
 
     emit documentLayoutChanged();
 }
+
 } // namespace vrvQt

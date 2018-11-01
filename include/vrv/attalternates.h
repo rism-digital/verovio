@@ -21,6 +21,122 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /**
+ * MEI data.COMPASSDIRECTION
+ * Since it can contain different subtype we need a dedicated class for it.
+ */
+
+enum CompassDirectionType { COMPASSDIRECTION_NONE = 0, COMPASSDIRECTION_basic, COMPASSDIRECTION_extended };
+
+class data_COMPASSDIRECTION {
+public:
+    data_COMPASSDIRECTION() { Reset(COMPASSDIRECTION_NONE); }
+    virtual ~data_COMPASSDIRECTION() {}
+
+    void Reset(CompassDirectionType type)
+    {
+        m_type = type;
+        m_basic = COMPASSDIRECTION_basic_NONE;
+        m_extended = COMPASSDIRECTION_extended_NONE;
+    }
+
+    CompassDirectionType GetType() const { return m_type; }
+
+    data_COMPASSDIRECTION_basic GetBasic() const { return m_basic; }
+    void SetBasic(data_COMPASSDIRECTION_basic value)
+    {
+        Reset(COMPASSDIRECTION_basic);
+        m_basic = value;
+    }
+
+    data_COMPASSDIRECTION_extended GetExtended() const { return m_extended; }
+    void SetExtended(data_COMPASSDIRECTION_extended value)
+    {
+        Reset(COMPASSDIRECTION_extended);
+        m_extended = value;
+    }
+
+    bool HasValue() const
+    {
+        if (m_basic != COMPASSDIRECTION_basic_NONE) return true;
+        if (m_extended != COMPASSDIRECTION_extended_NONE) return true;
+        return false;
+    }
+
+    // comparison
+    bool operator==(const data_COMPASSDIRECTION &val) const
+    {
+        if (m_type != val.GetType()) return false;
+        if (m_basic != val.GetBasic()) return false;
+        if (m_extended != val.GetExtended()) return false;
+        return true;
+    }
+    bool operator!=(const data_COMPASSDIRECTION &val) const { return !(*this == val); }
+
+protected:
+    CompassDirectionType m_type;
+    data_COMPASSDIRECTION_basic m_basic;
+    data_COMPASSDIRECTION_extended m_extended;
+};
+    
+/**
+ * MEI data.EVENTREL
+ * Since it can contain different subtype we need a dedicated class for it.
+ */
+
+enum EventRelType { EVENTREL_NONE = 0, EVENTREL_basic, EVENTREL_extended };
+
+class data_EVENTREL {
+public:
+    data_EVENTREL() { Reset(EVENTREL_NONE); }
+    virtual ~data_EVENTREL() {}
+
+    void Reset(EventRelType type)
+    {
+        m_type = type;
+        m_basic = EVENTREL_basic_NONE;
+        m_extended = EVENTREL_extended_NONE;
+    }
+
+    EventRelType GetType() const { return m_type; }
+
+    data_EVENTREL_basic GetBasic() const { return m_basic; }
+    void SetBasic(data_EVENTREL_basic value)
+    {
+        Reset(EVENTREL_basic);
+        m_basic = value;
+    }
+
+    data_EVENTREL_extended GetExtended() const { return m_extended; }
+    void SetExtended(data_EVENTREL_extended value)
+    {
+        Reset(EVENTREL_extended);
+        m_extended = value;
+    }
+
+    bool HasValue() const
+    {
+        if (m_basic != EVENTREL_basic_NONE) return true;
+        if (m_extended != EVENTREL_extended_NONE) return true;
+        return false;
+    }
+
+    // comparison
+    bool operator==(const data_EVENTREL &val) const
+    {
+        if (m_type != val.GetType()) return false;
+        if (m_basic != val.GetBasic()) return false;
+        if (m_extended != val.GetExtended()) return false;
+        return true;
+    }
+    bool operator!=(const data_EVENTREL &val) const { return !(*this == val); }
+
+protected:
+    EventRelType m_type;
+    data_EVENTREL_basic m_basic;
+    data_EVENTREL_extended m_extended;
+};
+
+/**
  * MEI data.FONTSIZE
  * Since it can contain different subtype we need a dedicated class for it.
  */
@@ -87,6 +203,122 @@ protected:
     data_FONTSIZENUMERIC m_fontSizeNumeric;
     data_FONTSIZETERM m_term;
     data_PERCENT m_percent;
+};
+
+/**
+ * MEI data.MIDIVALUE_NAME
+ * Since it can contain different subtype we need a dedicated class for it.
+ */
+
+enum MidivalueNameType { MIDIVALUENAMETYPE_NONE = 0, MIDIVALUENAMETYPE_midivalue, MIDIVALUENAMETYPE_mcname };
+
+class data_MIDIVALUE_NAME {
+public:
+    data_MIDIVALUE_NAME() { Reset(MIDIVALUENAMETYPE_NONE); }
+    virtual ~data_MIDIVALUE_NAME() {}
+
+    void Reset(MidivalueNameType type)
+    {
+        m_type = type;
+        m_midivalue = -1;
+        m_ncname = "";
+    }
+
+    MidivalueNameType GetType() const { return m_type; }
+
+    data_MIDIVALUE GetMidivalue() const { return m_midivalue; }
+    void SetMidivalue(data_MIDIVALUE value)
+    {
+        Reset(MIDIVALUENAMETYPE_midivalue);
+        m_midivalue = value;
+    }
+
+    data_NCNAME GetNcname() const { return m_ncname; }
+    void SetNcname(data_NCNAME value)
+    {
+        Reset(MIDIVALUENAMETYPE_mcname);
+        m_ncname = value;
+    }
+
+    bool HasValue() const
+    {
+        if (m_midivalue != -1) return true;
+        if (m_ncname != "") return true;
+        return false;
+    }
+
+    // comparison
+    bool operator==(const data_MIDIVALUE_NAME &val) const
+    {
+        if (m_type != val.GetType()) return false;
+        if (m_midivalue != val.GetMidivalue()) return false;
+        if (m_ncname != val.GetNcname()) return false;
+        return true;
+    }
+    bool operator!=(const data_MIDIVALUE_NAME &val) const { return !(*this == val); }
+
+protected:
+    MidivalueNameType m_type;
+    data_MIDIVALUE m_midivalue;
+    data_NCNAME m_ncname;
+};
+
+/**
+ * MEI data.MIDIVALUE_PAN
+ * Since it can contain different subtype we need a dedicated class for it.
+ */
+
+enum MidivaluePanType { MIDIVALUEPANTYPE_NONE = 0, MIDIVALUEPANTYPE_midivalue, MIDIVALUEPANTYPE_percentLimitedSigned };
+
+class data_MIDIVALUE_PAN {
+public:
+    data_MIDIVALUE_PAN() { Reset(MIDIVALUEPANTYPE_NONE); }
+    virtual ~data_MIDIVALUE_PAN() {}
+
+    void Reset(MidivaluePanType type)
+    {
+        m_type = type;
+        m_midivalue = -1;
+        m_percentLimitedSigned = VRV_UNSET;
+    }
+
+    MidivaluePanType GetType() const { return m_type; }
+
+    data_MIDIVALUE GetMidivalue() const { return m_midivalue; }
+    void SetMidivalue(data_MIDIVALUE value)
+    {
+        Reset(MIDIVALUEPANTYPE_midivalue);
+        m_midivalue = value;
+    }
+
+    data_PERCENT_LIMITED_SIGNED GetPercentLimitedSigned() const { return m_percentLimitedSigned; }
+    void SetPercentLimitedSigned(data_PERCENT_LIMITED_SIGNED value)
+    {
+        Reset(MIDIVALUEPANTYPE_percentLimitedSigned);
+        m_percentLimitedSigned = value;
+    }
+
+    bool HasValue() const
+    {
+        if (m_midivalue != -1) return true;
+        if (m_percentLimitedSigned != VRV_UNSET) return true;
+        return false;
+    }
+
+    // comparison
+    bool operator==(const data_MIDIVALUE_PAN &val) const
+    {
+        if (m_type != val.GetType()) return false;
+        if (m_midivalue != val.GetMidivalue()) return false;
+        if (m_percentLimitedSigned != val.GetPercentLimitedSigned()) return false;
+        return true;
+    }
+    bool operator!=(const data_MIDIVALUE_PAN &val) const { return !(*this == val); }
+
+protected:
+    MidivaluePanType m_type;
+    data_MIDIVALUE m_midivalue;
+    data_PERCENT_LIMITED_SIGNED m_percentLimitedSigned;
 };
 
 /**

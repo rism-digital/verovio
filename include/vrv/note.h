@@ -38,7 +38,6 @@ typedef std::vector<Note *> ChordCluster;
 /**
  * This class models the MEI <note> element.
  */
-
 class Note : public LayerElement,
              public StemmedDrawingInterface,
              public DurationInterface,
@@ -155,6 +154,11 @@ public:
      * Return the SMuFL code for a mensural note looking at the staff notation type, the coloration and the duration
      */
     wchar_t GetMensuralSmuflNoteHead();
+
+    /**
+     * Check if a note or its parent chord are visible
+     */
+    bool IsVisible();
 
     /**
      * MIDI timing information

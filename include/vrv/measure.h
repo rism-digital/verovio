@@ -8,6 +8,7 @@
 #ifndef __VRV_MEASURE_H__
 #define __VRV_MEASURE_H__
 
+#include "atts_cmn.h"
 #include "atts_shared.h"
 #include "barline.h"
 #include "horizontalaligner.h"
@@ -31,7 +32,12 @@ class TimestampAttr;
  * It contains Layer objects.
  * For internally simplication of processing, unmeasured music is contained in one single measure object
  */
-class Measure : public Object, public AttMeasureLog, public AttNNumberLike, public AttPointing, public AttTyped {
+class Measure : public Object,
+                public AttMeasureLog,
+                public AttMeterConformanceBar,
+                public AttNNumberLike,
+                public AttPointing,
+                public AttTyped {
 
 public:
     /**
@@ -56,6 +62,7 @@ public:
      */
     ///@{
     virtual void AddChild(Object *object);
+    void AddChildBack(Object *object);
     ///@}
 
     /**
@@ -85,8 +92,8 @@ public:
     /**
      * @name Set and get the left and right barline types
      * This somehow conflicts with AttMeasureLog, which is transfered from and to the
-     * Barline object when reading and writing MEI. See MeiInput::ReadMeiMeasure and
-     * MeiOutput::ReadMeiMeasure
+     * Barline object when reading and writing MEI. See MeiInput::ReadMeasure and
+     * MeiOutput::WriteMeasure
      * Alternatively, we could keep them in sync here:
      * data_BARRENDITION GetDrawingLeftBarLine() { m_leftBarLine.SetRend(GetRight()); return m_leftBarLine.GetRend(); }
      * void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetRend(type); SetLeft(type); }
@@ -111,8 +118,8 @@ public:
      * not for creating other measure objects.
      */
     ///@{
-    BarLine *const GetLeftBarLine() { return &m_leftBarLine; }
-    BarLine *const GetRightBarLine() { return &m_rightBarLine; }
+    BarLine *GetLeftBarLine() { return &m_leftBarLine; }
+    BarLine *GetRightBarLine() { return &m_rightBarLine; }
     ///@}
 
     /**
@@ -146,6 +153,12 @@ public:
      * Return the center x of the inner of the measure
      */
     int GetInnerCenterX() const;
+
+    /**
+     * Return the right overlow of the control events in the measure.
+     * Takes into account Dir, Dynam, and Tempo.
+     */
+    int GetDrawingOverflow();
 
     /**
      * @name Setter and getter of the drawing scoreDef
@@ -194,6 +207,16 @@ public:
     virtual int ConvertToPageBased(FunctorParams *functorParams);
 
     /**
+     * See Object::ConvertToCastOffMensural
+     */
+    virtual int ConvertToCastOffMensural(FunctorParams *params);
+
+    /**
+     * See Object::ConvertToUnCastOffMensural
+     */
+    virtual int ConvertToUnCastOffMensural(FunctorParams *params);
+
+    /**
      * See Object::Save
      */
     ///@{
@@ -205,6 +228,11 @@ public:
      * See Object::UnsetCurrentScoreDef
      */
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+
+    /**
+     * See Object::OptimizeScoreDef
+     */
+    virtual int OptimizeScoreDef(FunctorParams *functorParams);
 
     /**
      * See Object::ResetHorizontalAlignment
@@ -253,6 +281,11 @@ public:
     virtual int AdjustGraceXPos(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustXOverflow
+     */
+    virtual int AdjustXOverflow(FunctorParams *functorParams);
+
+    /**
      * See Object::AdjustXPos
      */
     virtual int AdjustXPos(FunctorParams *functorParams);
@@ -298,9 +331,12 @@ public:
     virtual int PrepareCrossStaff(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareFloatingGrps
+     * @name See Object::PrepareFloatingGrps
      */
+    ///@{
     virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+    virtual int PrepareFloatingGrpsEnd(FunctorParams *functoParams);
+    ///@}
 
     /**
      * See Object::PrepareTimePointingEnd

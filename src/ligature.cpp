@@ -24,11 +24,10 @@ namespace vrv {
 // Ligature
 //----------------------------------------------------------------------------
 
-Ligature::Ligature()
-    : LayerElement("ligature-"), ObjectListInterface(), AttLigatureLog()
+Ligature::Ligature() : LayerElement("ligature-"), ObjectListInterface(), AttLigatureLog()
 {
     RegisterAttClass(ATT_LIGATURELOG);
-    
+
     Reset();
 }
 
@@ -45,9 +44,7 @@ void Ligature::Reset()
     ClearClusters();
 }
 
-void Ligature::ClearClusters()
-{
-}
+void Ligature::ClearClusters() {}
 
 void Ligature::AddChild(Object *child)
 {
@@ -88,7 +85,7 @@ void Ligature::FilterList(ListOfObjects *childList)
             Note *n = dynamic_cast<Note *>(currentElement);
 
             if (n) {
-                iter++;
+                ++iter;
             }
             else {
                 // if it is not a note, drop it
@@ -100,26 +97,6 @@ void Ligature::FilterList(ListOfObjects *childList)
     iter = childList->begin();
 
     this->ClearClusters();
-
-    Note *curNote, *lastNote = dynamic_cast<Note *>(*iter);
-    assert(lastNote);
-    int curPitch, lastPitch = lastNote->GetDiatonicPitch();
-
-    iter++;
-
-    while (iter != childList->end()) {
-        curNote = dynamic_cast<Note *>(*iter);
-        assert(curNote);
-        curPitch = curNote->GetDiatonicPitch();
-
-        if (curPitch - lastPitch == 1) {
-        }
-
-        lastNote = curNote;
-        lastPitch = curPitch;
-
-        iter++;
-    }
 }
 
 int Ligature::PositionInLigature(Note *note)
@@ -129,26 +106,34 @@ int Ligature::PositionInLigature(Note *note)
     assert(position != -1);
     return position;
 }
-    
+
 Note *Ligature::GetFirstNote()
 {
     const ListOfObjects *list = this->GetList(this);
-    if  (list->empty()) {
+    if (list->empty()) {
         return NULL;
     }
-    return dynamic_cast<Note*>(list->front());
+    return dynamic_cast<Note *>(list->front());
 }
-    
+
 Note *Ligature::GetLastNote()
 {
     const ListOfObjects *list = this->GetList(this);
-    if  (list->empty()) {
+    if (list->empty()) {
         return NULL;
     }
-    return dynamic_cast<Note*>(list->back());
+    return dynamic_cast<Note *>(list->back());
 }
-    
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int Ligature::ResetDrawing(FunctorParams *functorParams)
+{
+    // We want the list of the ObjectListInterface to be re-generated
+    this->Modify();
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

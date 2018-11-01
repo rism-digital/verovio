@@ -34,3 +34,5 @@ clean:
 	-rm -rf verovio.egg-info
 	-rm -rf build
 	-rm -rf dist
+	-rm -rf libmei
+	-rm -rf src

@@ -20,6 +20,10 @@ class Clef;
 class KeySig;
 class Mensur;
 class MeterSig;
+class PgFoot;
+class PgFoot2;
+class PgHead;
+class PgHead2;
 class StaffGrp;
 class StaffDef;
 
@@ -111,7 +115,7 @@ private:
  * This class represents a MEI scoreDef.
  * It contains StaffGrp objects.
  */
-class ScoreDef : public ScoreDefElement, public ObjectListInterface, public AttEndings {
+class ScoreDef : public ScoreDefElement, public ObjectListInterface, public AttEndings, public AttOptimization {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -170,6 +174,16 @@ public:
     ///@{
     int GetDrawingWidth() const { return m_drawingWidth; }
     void SetDrawingWidth(int drawingWidth);
+    ///@}
+
+    /**
+     * @name Getters for running elements
+     */
+    ///@{
+    PgFoot *GetPgFoot();
+    PgFoot2 *GetPgFoot2();
+    PgHead *GetPgHead();
+    PgHead2 *GetPgHead2();
     ///@}
 
     //----------//

@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "keysig.h"
 #include "layer.h"
+#include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
 #include "note.h"
@@ -39,22 +40,62 @@ namespace vrv {
 
 // Ok, this is ugly, but since this is static data, why not?
 pitchmap DarmsInput::PitchMap[] = {
-    /* 00 */ { 1, PITCHNAME_c }, { 1, PITCHNAME_d }, { 1, PITCHNAME_e }, { 1, PITCHNAME_f }, { 1, PITCHNAME_g },
-    { 1, PITCHNAME_a }, { 1, PITCHNAME_b },
-    /* 07 */ { 2, PITCHNAME_c }, { 2, PITCHNAME_d }, { 2, PITCHNAME_e }, { 2, PITCHNAME_f }, { 2, PITCHNAME_g },
-    { 2, PITCHNAME_a }, { 2, PITCHNAME_b },
-    /* 14 */ { 3, PITCHNAME_c }, { 3, PITCHNAME_d }, { 3, PITCHNAME_e }, { 3, PITCHNAME_f }, { 3, PITCHNAME_g },
-    { 3, PITCHNAME_a }, { 3, PITCHNAME_b },
-    /* 21 */ { 4, PITCHNAME_c }, { 4, PITCHNAME_d }, { 4, PITCHNAME_e }, { 4, PITCHNAME_f }, { 4, PITCHNAME_g },
-    { 4, PITCHNAME_a }, { 4, PITCHNAME_b },
-    /* 28 */ { 5, PITCHNAME_c }, { 5, PITCHNAME_d }, { 5, PITCHNAME_e }, { 5, PITCHNAME_f }, { 5, PITCHNAME_g },
-    { 5, PITCHNAME_a }, { 5, PITCHNAME_b },
-    /* 35 */ { 6, PITCHNAME_c }, { 6, PITCHNAME_d }, { 6, PITCHNAME_e }, { 6, PITCHNAME_f }, { 6, PITCHNAME_g },
-    { 6, PITCHNAME_a }, { 6, PITCHNAME_b },
-    /* 42 */ { 7, PITCHNAME_c }, { 7, PITCHNAME_d }, { 7, PITCHNAME_e }, { 7, PITCHNAME_f }, { 7, PITCHNAME_g },
-    { 7, PITCHNAME_a }, { 7, PITCHNAME_b },
-    /* 49 */ { 8, PITCHNAME_c }, { 8, PITCHNAME_d }, { 8, PITCHNAME_e }, { 8, PITCHNAME_f }, { 8, PITCHNAME_g },
-    { 8, PITCHNAME_a }, { 8, PITCHNAME_b },
+    /* 00 */ { 1, PITCHNAME_c },
+    { 1, PITCHNAME_d },
+    { 1, PITCHNAME_e },
+    { 1, PITCHNAME_f },
+    { 1, PITCHNAME_g },
+    { 1, PITCHNAME_a },
+    { 1, PITCHNAME_b },
+    /* 07 */ { 2, PITCHNAME_c },
+    { 2, PITCHNAME_d },
+    { 2, PITCHNAME_e },
+    { 2, PITCHNAME_f },
+    { 2, PITCHNAME_g },
+    { 2, PITCHNAME_a },
+    { 2, PITCHNAME_b },
+    /* 14 */ { 3, PITCHNAME_c },
+    { 3, PITCHNAME_d },
+    { 3, PITCHNAME_e },
+    { 3, PITCHNAME_f },
+    { 3, PITCHNAME_g },
+    { 3, PITCHNAME_a },
+    { 3, PITCHNAME_b },
+    /* 21 */ { 4, PITCHNAME_c },
+    { 4, PITCHNAME_d },
+    { 4, PITCHNAME_e },
+    { 4, PITCHNAME_f },
+    { 4, PITCHNAME_g },
+    { 4, PITCHNAME_a },
+    { 4, PITCHNAME_b },
+    /* 28 */ { 5, PITCHNAME_c },
+    { 5, PITCHNAME_d },
+    { 5, PITCHNAME_e },
+    { 5, PITCHNAME_f },
+    { 5, PITCHNAME_g },
+    { 5, PITCHNAME_a },
+    { 5, PITCHNAME_b },
+    /* 35 */ { 6, PITCHNAME_c },
+    { 6, PITCHNAME_d },
+    { 6, PITCHNAME_e },
+    { 6, PITCHNAME_f },
+    { 6, PITCHNAME_g },
+    { 6, PITCHNAME_a },
+    { 6, PITCHNAME_b },
+    /* 42 */ { 7, PITCHNAME_c },
+    { 7, PITCHNAME_d },
+    { 7, PITCHNAME_e },
+    { 7, PITCHNAME_f },
+    { 7, PITCHNAME_g },
+    { 7, PITCHNAME_a },
+    { 7, PITCHNAME_b },
+    /* 49 */ { 8, PITCHNAME_c },
+    { 8, PITCHNAME_d },
+    { 8, PITCHNAME_e },
+    { 8, PITCHNAME_f },
+    { 8, PITCHNAME_g },
+    { 8, PITCHNAME_a },
+    { 8, PITCHNAME_b },
 };
 
 DarmsInput::DarmsInput(Doc *doc, std::string filename) : FileInputStream(doc)
@@ -66,9 +107,7 @@ DarmsInput::DarmsInput(Doc *doc, std::string filename) : FileInputStream(doc)
     m_filename = filename;
 }
 
-DarmsInput::~DarmsInput()
-{
-}
+DarmsInput::~DarmsInput() {}
 
 void DarmsInput::UnrollKeysig(int quantity, char alter)
 {
@@ -95,7 +134,7 @@ void DarmsInput::UnrollKeysig(int quantity, char alter)
     return;
     //////
     /*
-    for (int i = 0; i < quantity; i++) {
+    for (int i = 0; i < quantity; ++i) {
         Accid *alter = new Accid();
         alter->SetOloc(4);
         alter->SetPloc(alteration_set[i]);
@@ -440,8 +479,15 @@ bool DarmsInput::ImportString(std::string const &data_str)
     const char *data = data_str.c_str();
     len = (int)data_str.length();
 
+    m_doc->Reset();
     m_doc->SetType(Raw);
-    Score *score = m_doc->CreateScoreBuffer();
+    // The mdiv
+    Mdiv *mdiv = new Mdiv();
+    mdiv->m_visibility = Visible;
+    m_doc->AddChild(mdiv);
+    // The score
+    Score *score = new Score();
+    mdiv->AddChild(score);
     // the section
     Section *section = new Section();
     score->AddChild(section);

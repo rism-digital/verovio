@@ -1,3 +1,7 @@
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![Build Status](https://travis-ci.org/rism-ch/verovio.svg?branch=develop)](https://travis-ci.org/rism-ch/verovio)
+[![Build status](https://ci.appveyor.com/api/projects/status/121cxhmtwurxffh0?svg=true)](https://ci.appveyor.com/project/LaurentPugin/verovio-r1t6l)
+
 Verovio is a fast, portable and lightweight library for engraving [Music Encoding Initiative (MEI)](http://www.music-encoding.org) music scores into SVG. Verovio can be used as a standalone command-line tool for converting a MEI files, as the music rendering library for applications, or it can be compiled to Javascript using the Emscripten LLVM-to-JavaScript compiler.
 
 See the JavaScript toolkit running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) and check out the [tutorial](http://www.verovio.org/tutorial.xhtml) for its web integration and for enabling user interaction.
@@ -9,6 +13,14 @@ Verovio can also render Plain and Easy (PAE) code and DARMS code and has a basic
 Verovio follows the [Standard Music Font Layout (SMuFL)](http://www.smufl.org) specification and the font can be changed for personalizing the output.
 
 The project page is http://www.verovio.org. Verovio is available under the LGPL license (see LICENSE.txt).
+
+
+NPM
+---
+
+The development version is available via [NPM](https://www.npmjs.com/package/verovio-dev)
+
+    $ npm install verovio-dev
 
 LibMEI
 ------

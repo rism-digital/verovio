@@ -14,7 +14,9 @@
 //----------------------------------------------------------------------------
 
 #include "functorparams.h"
+#include "instrdef.h"
 #include "label.h"
+#include "labelabbr.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -44,9 +46,7 @@ StaffDef::StaffDef()
     Reset();
 }
 
-StaffDef::~StaffDef()
-{
-}
+StaffDef::~StaffDef() {}
 
 void StaffDef::Reset()
 {
@@ -59,11 +59,16 @@ void StaffDef::Reset()
     ResetScalable();
     ResetStaffDefLog();
     ResetTransposition();
+
+    m_drawingVisibility = OPTIMIZATION_NONE;
 }
 
 void StaffDef::AddChild(Object *child)
 {
-    if (child->Is(LABEL)) {
+    if (child->Is(INSTRDEF)) {
+        assert(dynamic_cast<InstrDef *>(child));
+    }
+    else if (child->Is(LABEL)) {
         assert(dynamic_cast<Label *>(child));
     }
     else if (child->Is(LABELABBR)) {

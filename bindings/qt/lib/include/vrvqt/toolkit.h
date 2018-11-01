@@ -35,16 +35,14 @@ class Toolkit : public QObject {
     Q_PROPERTY(QString musicFontName MEMBER m_musicFontName WRITE setMusicFontName)
     Q_PROPERTY(QString musicFontPath MEMBER m_musicFontPath WRITE setMusicFontPath)
     Q_PROPERTY(QString verovioTextFontPath MEMBER m_verovioTextFontPath WRITE setVerovioTextFontPath)
+    Q_PROPERTY(QString breaks WRITE setBreaks READ getBreaks)
     Q_PROPERTY(int pageCount MEMBER m_pageCount READ pageCount NOTIFY pageCountChanged)
     Q_PROPERTY(int displayWidth MEMBER m_displayWidth WRITE setDisplayWidth)
     Q_PROPERTY(int displayHeight MEMBER m_displayHeight WRITE setDisplayHeight)
     Q_PROPERTY(int scale WRITE setScale READ getScale)
-    Q_PROPERTY(int border WRITE setBorder)
-    Q_PROPERTY(int spacingStaff WRITE setSpacingStaff)
-    Q_PROPERTY(int spacingSystem WRITE setSpacingSystem)
-    Q_PROPERTY(bool adjustPageHeight WRITE setAdjustPageHeight)
-    Q_PROPERTY(bool noLayout WRITE setNoLayout)
-    Q_PROPERTY(bool ignoreLayout WRITE setIgnoreLayout)
+    Q_PROPERTY(int spacingStaff WRITE setSpacingStaff READ getSpacingStaff)
+    Q_PROPERTY(int spacingSystem WRITE setSpacingSystem READ getSpacingSystem)
+    Q_PROPERTY(bool adjustPageHeight WRITE setAdjustPageHeight READ getAdjustPageHeight)
     Q_PROPERTY(bool hasValidData MEMBER m_hasValidData READ hasValidData NOTIFY hasValidDataChanged)
 
 public:
@@ -81,9 +79,15 @@ public:
     bool hasValidData() const { return m_hasValidData; }
 
     /**
-     * @name Returns the current scale of the toolkit.
+     * @name Getters for public properties.
      */
-    int getScale() { return m_verovioToolkit.GetScale(); }
+    ///@{
+    int getScale();
+    bool getAdjustPageHeight() const;
+    int getSpacingSystem() const;
+    int getSpacingStaff() const;
+    QString getBreaks() const;
+    ///@}
 
 public slots:
     /**
@@ -96,15 +100,13 @@ public slots:
     void setMusicFontName(QString musicFontName);
     void setMusicFontPath(QString musicFontPath);
     void setVerovioTextFontPath(QString verovioTextFontPath);
+    void setBreaks(QString breaks);
     void setDisplayWidth(int displayWidth);
     void setDisplayHeight(int displayHeight);
     void setScale(int scale);
-    void setBorder(int border);
     void setSpacingStaff(int spacingStaff);
     void setSpacingSystem(int spacingSystem);
     void setAdjustPageHeight(bool adjustPageHeight);
-    void setNoLayout(bool noLayout);
-    void setIgnoreLayout(bool ignoreLayout);
     ///@}
 
 signals:

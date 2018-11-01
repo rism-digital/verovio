@@ -20,9 +20,7 @@ MultiRest::MultiRest() : LayerElement("multirest-"), AttMultiRestVis(), AttNumbe
     Reset();
 }
 
-MultiRest::~MultiRest()
-{
-}
+MultiRest::~MultiRest() {}
 
 void MultiRest::Reset()
 {

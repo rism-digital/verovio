@@ -39,9 +39,7 @@ Arpeg::Arpeg()
     Reset();
 }
 
-Arpeg::~Arpeg()
-{
-}
+Arpeg::~Arpeg() {}
 
 void Arpeg::Reset()
 {
@@ -95,7 +93,7 @@ void Arpeg::SetDrawingXRel(int drawingXRel)
     if (GetCurrentFloatingPositioner()) {
         GetCurrentFloatingPositioner()->SetDrawingXRel(m_drawingXRel);
     }
-};
+}
 
 void Arpeg::GetDrawingTopBottomNotes(Note *&top, Note *&bottom)
 {

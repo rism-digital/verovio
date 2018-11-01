@@ -27,6 +27,8 @@
 #include "io.h"
 #include "keysig.h"
 #include "layer.h"
+#include "linkinginterface.h"
+#include "mdiv.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -76,23 +78,35 @@ Object::Object(const Object &object) : BoundingBox(object)
 {
     ClearChildren();
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
-    m_parent = NULL;
+
     m_classid = object.m_classid;
+    m_parent = NULL;
+    // Flags
+    m_isAttribute = object.m_isAttribute;
+    m_isModified = true;
+    m_isReferencObject = object.m_isReferencObject;
+
+    // Also copy attribute classes
     m_attClasses = object.m_attClasses;
     m_interfaces = object.m_interfaces;
-    m_isReferencObject = object.m_isReferencObject;
-    m_isModified = true;
-    // For now do now copy them
-    // m_uuid = object.m_uuid;
+    // New uuid
+    this->GenerateUuid();
+    // For now do not copy them
     // m_unsupported = object.m_unsupported;
 
+    if (!object.CopyChildren()) {
+        return;
+    }
+
     int i;
-    for (i = 0; i < (int)object.m_children.size(); i++) {
+    for (i = 0; i < (int)object.m_children.size(); ++i) {
         Object *current = object.m_children.at(i);
         Object *copy = current->Clone();
-        copy->Modify();
-        copy->SetParent(this);
-        m_children.push_back(copy);
+        if (copy) {
+            copy->Modify();
+            copy->SetParent(this);
+            m_children.push_back(copy);
+        }
     }
 }
 
@@ -102,23 +116,31 @@ Object &Object::operator=(const Object &object)
     if (this != &object) {
         ClearChildren();
         ResetBoundingBox(); // It does not make sense to keep the values of the BBox
-        m_parent = NULL;
+
         m_classid = object.m_classid;
+        m_parent = NULL;
+        // Flags
+        m_isAttribute = object.m_isAttribute;
+        m_isModified = true;
+        m_isReferencObject = object.m_isReferencObject;
+
+        // Also copy attribute classes
         m_attClasses = object.m_attClasses;
         m_interfaces = object.m_interfaces;
-        m_isReferencObject = object.m_isReferencObject;
-        m_isModified = true;
+        // New uuid
+        this->GenerateUuid();
         // For now do now copy them
-        // m_uuid = object.m_uuid;
         // m_unsupported = object.m_unsupported;
 
-        int i;
-        for (i = 0; i < (int)object.m_children.size(); i++) {
-            Object *current = object.m_children.at(i);
-            Object *copy = current->Clone();
-            copy->Modify();
-            copy->SetParent(this);
-            m_children.push_back(copy);
+        if (object.CopyChildren()) {
+            int i;
+            for (i = 0; i < (int)object.m_children.size(); ++i) {
+                Object *current = object.m_children.at(i);
+                Object *copy = current->Clone();
+                copy->Modify();
+                copy->SetParent(this);
+                m_children.push_back(copy);
+            }
         }
     }
     return *this;
@@ -131,11 +153,13 @@ Object::~Object()
 
 void Object::Init(std::string classid)
 {
+    m_classid = classid;
     m_parent = NULL;
+    // Flags
     m_isAttribute = false;
     m_isModified = true;
-    m_classid = classid;
     m_isReferencObject = false;
+
     this->GenerateUuid();
 
     Reset();
@@ -146,7 +170,7 @@ ClassId Object::GetClassId() const
     // we should always have the method overridden
     assert(false);
     return OBJECT;
-};
+}
 
 void Object::SetAsReferenceObject()
 {
@@ -159,7 +183,7 @@ void Object::Reset()
 {
     ClearChildren();
     ResetBoundingBox();
-};
+}
 
 void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId interfaceId)
 {
@@ -187,7 +211,7 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
     }
 
     int i;
-    for (i = 0; i < (int)sourceParent->m_children.size(); i++) {
+    for (i = 0; i < (int)sourceParent->m_children.size(); ++i) {
         Object *child = sourceParent->Relinquish(i);
         child->SetParent(this);
         if (idx != -1) {
@@ -198,6 +222,18 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
             this->m_children.push_back(child);
         }
     }
+}
+
+void Object::ReplaceChild(Object *currentChild, Object *replacingChild)
+{
+    assert(this->GetChildIndex(currentChild) != -1);
+    assert(this->GetChildIndex(replacingChild) == -1);
+
+    int idx = this->GetChildIndex(currentChild);
+    currentChild->ResetParent();
+    m_children.at(idx) = replacingChild;
+    replacingChild->SetParent(this);
+    this->Modify();
 }
 
 void Object::MoveItselfTo(Object *targetParent)
@@ -214,7 +250,15 @@ void Object::MoveItselfTo(Object *targetParent)
 void Object::SetUuid(std::string uuid)
 {
     m_uuid = uuid;
-};
+}
+
+void Object::SwapUuid(Object *other)
+{
+    assert(other);
+    std::string swapUuid = this->GetUuid();
+    this->SetUuid(other->GetUuid());
+    other->SetUuid(swapUuid);
+}
 
 void Object::ClearChildren()
 {
@@ -239,6 +283,14 @@ int Object::GetChildCount(const ClassId classId) const
     return (int)count_if(m_children.begin(), m_children.end(), ObjectComparison(classId));
 }
 
+int Object::GetChildCount(const ClassId classId, int deepth)
+{
+    ArrayOfObjects objects;
+    AttComparison matchClassId(classId);
+    this->FindAllChildByComparison(&objects, &matchClassId);
+    return (int)objects.size();
+}
+
 int Object::GetAttributes(ArrayOfStrAttr *attributes) const
 {
     assert(attributes);
@@ -257,6 +309,10 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     Att::GetShared(this, attributes);
     Att::GetVisual(this, attributes);
 
+    for (auto &pair : m_unsupported) {
+        attributes->push_back(std::make_pair(pair.first, pair.second));
+    }
+
     return (int)attributes->size();
 }
 
@@ -265,7 +321,7 @@ bool Object::HasAttribute(std::string attribute, std::string value) const
     ArrayOfStrAttr attributes;
     this->GetAttributes(&attributes);
     ArrayOfStrAttr::iterator iter;
-    for (iter = attributes.begin(); iter != attributes.end(); iter++) {
+    for (iter = attributes.begin(); iter != attributes.end(); ++iter) {
         if (((*iter).first == attribute) && ((*iter).second == value)) return true;
     }
     return false;
@@ -284,6 +340,30 @@ Object *Object::GetNext()
     m_iteratorCurrent++;
     m_iteratorCurrent = std::find_if(m_iteratorCurrent, m_iteratorEnd, ObjectComparison(m_iteratorElementType));
     return (m_iteratorCurrent == m_iteratorEnd) ? NULL : *m_iteratorCurrent;
+}
+
+Object *Object::GetNext(Object *child, const ClassId classId)
+{
+    ArrayOfObjects::iterator iteratorEnd, iteratorCurrent;
+    iteratorEnd = m_children.end();
+    iteratorCurrent = std::find(m_children.begin(), iteratorEnd, child);
+    if (iteratorCurrent != iteratorEnd) {
+        iteratorCurrent++;
+        iteratorCurrent = std::find_if(iteratorCurrent, iteratorEnd, ObjectComparison(classId));
+    }
+    return (iteratorCurrent == iteratorEnd) ? NULL : *iteratorCurrent;
+}
+    
+Object *Object::GetPrevious(Object *child, const ClassId classId)
+{
+    ArrayOfObjects::reverse_iterator riteratorEnd, riteratorCurrent;
+    riteratorEnd = m_children.rend();
+    riteratorCurrent = std::find(m_children.rbegin(), riteratorEnd, child);
+    if (riteratorCurrent != riteratorEnd) {
+        riteratorCurrent++;
+        riteratorCurrent = std::find_if(riteratorCurrent, riteratorEnd, ObjectComparison(classId));
+    }
+    return (riteratorCurrent == riteratorEnd) ? NULL : *riteratorCurrent;
 }
 
 Object *Object::GetLast() const
@@ -328,7 +408,7 @@ bool Object::HasChild(Object *child, int deepness) const
 {
     ArrayOfObjects::const_iterator iter;
 
-    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+    for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         if (child == (*iter))
             return true;
         else if (deepness == 0)
@@ -358,7 +438,7 @@ void Object::ClearRelinquishedChildren()
             iter = m_children.erase(iter);
         }
         else
-            iter++;
+            ++iter;
     }
 }
 
@@ -373,45 +453,45 @@ Object *Object::FindChildByUuid(std::string uuid, int deepness, bool direction)
 
 Object *Object::FindChildByType(ClassId classId, int deepness, bool direction)
 {
-    AttComparison attComparison(classId);
-    return FindChildByAttComparison(&attComparison, deepness, direction);
+    AttComparison comparison(classId);
+    return FindChildByComparison(&comparison, deepness, direction);
 }
 
-Object *Object::FindChildByAttComparison(AttComparison *attComparison, int deepness, bool direction)
+Object *Object::FindChildByComparison(Comparison *comparison, int deepness, bool direction)
 {
-    Functor findByAttComparison(&Object::FindByAttComparison);
-    FindByAttComparisonParams findByAttComparisonParams(attComparison);
-    this->Process(&findByAttComparison, &findByAttComparisonParams, NULL, NULL, deepness, direction);
-    return findByAttComparisonParams.m_element;
+    Functor findByComparison(&Object::FindByComparison);
+    FindByComparisonParams findByComparisonParams(comparison);
+    this->Process(&findByComparison, &findByComparisonParams, NULL, NULL, deepness, direction);
+    return findByComparisonParams.m_element;
 }
 
-Object *Object::FindChildExtremeByAttComparison(AttComparison *attComparison, int deepness, bool direction)
+Object *Object::FindChildExtremeByComparison(Comparison *comparison, int deepness, bool direction)
 {
-    Functor findExtremeByAttComparison(&Object::FindExtremeByAttComparison);
-    FindExtremeByAttComparisonParams findExtremeByAttComparisonParams(attComparison);
-    this->Process(&findExtremeByAttComparison, &findExtremeByAttComparisonParams, NULL, NULL, deepness, direction);
-    return findExtremeByAttComparisonParams.m_element;
+    Functor findExtremeByComparison(&Object::FindExtremeByComparison);
+    FindExtremeByComparisonParams findExtremeByComparisonParams(comparison);
+    this->Process(&findExtremeByComparison, &findExtremeByComparisonParams, NULL, NULL, deepness, direction);
+    return findExtremeByComparisonParams.m_element;
 }
 
-void Object::FindAllChildByAttComparison(
-    ArrayOfObjects *objects, AttComparison *attComparison, int deepness, bool direction, bool clear)
+void Object::FindAllChildByComparison(
+    ArrayOfObjects *objects, Comparison *comparison, int deepness, bool direction, bool clear)
 {
     assert(objects);
     if (clear) objects->clear();
 
-    Functor findAllByAttComparison(&Object::FindAllByAttComparison);
-    FindAllByAttComparisonParams findAllByAttComparisonParams(attComparison, objects);
-    this->Process(&findAllByAttComparison, &findAllByAttComparisonParams, NULL, NULL, deepness, direction);
+    Functor findAllByComparison(&Object::FindAllByComparison);
+    FindAllByComparisonParams findAllByComparisonParams(comparison, objects);
+    this->Process(&findAllByComparison, &findAllByComparisonParams, NULL, NULL, deepness, direction);
 }
 
 void Object::FindAllChildBetween(
-    ArrayOfObjects *objects, AttComparison *attComparison, Object *start, Object *end, bool clear)
+    ArrayOfObjects *objects, Comparison *comparison, Object *start, Object *end, bool clear)
 {
     assert(objects);
     if (clear) objects->clear();
 
     Functor findAllBetween(&Object::FindAllBetween);
-    FindAllBetweenParams findAllBetweenParams(attComparison, objects, start, end);
+    FindAllBetweenParams findAllBetweenParams(comparison, objects, start, end);
     this->Process(&findAllBetween, &findAllBetweenParams);
 }
 
@@ -494,7 +574,7 @@ void Object::ResetCachedDrawingX() const
     // if (m_cachedDrawingX == VRV_UNSET) return;
     m_cachedDrawingX = VRV_UNSET;
     ArrayOfObjects::const_iterator iter;
-    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+    for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         (*iter)->ResetCachedDrawingX();
     }
 }
@@ -504,7 +584,7 @@ void Object::ResetCachedDrawingY() const
     // if (m_cachedDrawingY == VRV_UNSET) return;
     m_cachedDrawingY = VRV_UNSET;
     ArrayOfObjects::const_iterator iter;
-    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+    for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         (*iter)->ResetCachedDrawingY();
     }
 }
@@ -513,7 +593,7 @@ int Object::GetChildIndex(const Object *child)
 {
     ArrayOfObjects::iterator iter;
     int i;
-    for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, i++) {
+    for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, ++i) {
         if (child == *iter) {
             return i;
         }
@@ -579,19 +659,28 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
     }
 }
 
-void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor,
-    ArrayOfAttComparisons *filters, int deepness, bool direction)
+void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor, ArrayOfComparisons *filters,
+    int deepness, bool direction)
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
     }
 
     bool processChildren = true;
-    if (functor->m_visibleOnly && this->IsEditorialElement()) {
-        EditorialElement *editorialElement = dynamic_cast<EditorialElement *>(this);
-        assert(editorialElement);
-        if (editorialElement->m_visibility == Hidden) {
-            processChildren = false;
+    if (functor->m_visibleOnly) {
+        if (this->IsEditorialElement()) {
+            EditorialElement *editorialElement = dynamic_cast<EditorialElement *>(this);
+            assert(editorialElement);
+            if (editorialElement->m_visibility == Hidden) {
+                processChildren = false;
+            }
+        }
+        else if (this->Is(MDIV)) {
+            Mdiv *mdiv = dynamic_cast<Mdiv *>(this);
+            assert(mdiv);
+            if (mdiv->m_visibility == Hidden) {
+                processChildren = false;
+            }
         }
     }
 
@@ -626,21 +715,23 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         }
         for (iter = children->begin(); iter != children->end(); ++iter) {
             if (filters && !filters->empty()) {
-                bool hasAttComparison = false;
+                bool hasComparison = false;
                 // first we look if there is a comparison object for the object type (e.g., a Staff)
-                ArrayOfAttComparisons::iterator attComparisonIter;
-                for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); attComparisonIter++) {
-                    // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
+                ArrayOfComparisons::iterator comparisonIter;
+                for (comparisonIter = filters->begin(); comparisonIter != filters->end(); ++comparisonIter) {
+                    // if yes, we will use it (*comparisonIter) for evaluating if the object matches
                     // the attribute (see below)
                     Object *o = *iter;
-                    if (o->GetClassId() == (*attComparisonIter)->GetType()) {
-                        hasAttComparison = true;
+                    AttComparison *attComparison = dynamic_cast<AttComparison *>(*comparisonIter);
+                    assert(attComparison);
+                    if (o->GetClassId() == attComparison->GetType()) {
+                        hasComparison = true;
                         break;
                     }
                 }
-                if (hasAttComparison) {
-                    // use the operator of the AttComparison object to evaluate the attribute
-                    if ((**attComparisonIter)(*iter)) {
+                if (hasComparison) {
+                    // use the operator of the Comparison object to evaluate the attribute
+                    if ((**comparisonIter)(*iter)) {
                         // the attribute value matches, process the object
                         // LogDebug("%s ", (*iter)->GetClassName().c_str());
                         (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
@@ -714,7 +805,7 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
 {
     ListOfObjects::iterator iter;
     int i;
-    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, i++) {
+    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
             return i;
         }
@@ -747,7 +838,7 @@ Object *ObjectListInterface::GetListPrevious(Object *listElement)
 {
     ListOfObjects::iterator iter;
     int i;
-    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, i++) {
+    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, ++i) {
         if (listElement == *iter) {
             if (i > 0) {
                 return *(--iter);
@@ -764,7 +855,7 @@ Object *ObjectListInterface::GetListNext(Object *listElement)
 {
     ListOfObjects::reverse_iterator iter;
     int i;
-    for (iter = m_list.rbegin(), i = 0; iter != m_list.rend(); ++iter, i++) {
+    for (iter = m_list.rbegin(), i = 0; iter != m_list.rend(); ++iter, ++i) {
         if (listElement == *iter) {
             if (i > 0) {
                 return *(--iter);
@@ -786,7 +877,7 @@ std::wstring TextListInterface::GetText(Object *node)
     // alternatively we could cache the concatString in the interface and instantiate it in FilterList
     std::wstring concatText;
     const ListOfObjects *childList = this->GetList(node); // make sure it's initialized
-    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); it++) {
+    for (ListOfObjects::const_iterator it = childList->begin(); it != childList->end(); ++it) {
         Text *text = dynamic_cast<Text *>(*it);
         assert(text);
         concatText += text->GetText();
@@ -803,7 +894,7 @@ void TextListInterface::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
-        iter++;
+        ++iter;
     }
 }
 
@@ -865,9 +956,9 @@ int Object::FindByUuid(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindByAttComparison(FunctorParams *functorParams)
+int Object::FindByComparison(FunctorParams *functorParams)
 {
-    FindByAttComparisonParams *params = dynamic_cast<FindByAttComparisonParams *>(functorParams);
+    FindByComparisonParams *params = dynamic_cast<FindByComparisonParams *>(functorParams);
     assert(params);
 
     if (params->m_element) {
@@ -875,36 +966,36 @@ int Object::FindByAttComparison(FunctorParams *functorParams)
         return FUNCTOR_STOP;
     }
 
-    // evaluate by applying the AttComparison operator()
-    if ((*params->m_attComparison)(this)) {
+    // evaluate by applying the Comparison operator()
+    if ((*params->m_comparison)(this)) {
         params->m_element = this;
         // LogDebug("Found it!");
         return FUNCTOR_STOP;
     }
-    // LogDebug("Still looking for the object matching the AttComparison...");
+    // LogDebug("Still looking for the object matching the Comparison...");
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindExtremeByAttComparison(FunctorParams *functorParams)
+int Object::FindExtremeByComparison(FunctorParams *functorParams)
 {
-    FindExtremeByAttComparisonParams *params = dynamic_cast<FindExtremeByAttComparisonParams *>(functorParams);
+    FindExtremeByComparisonParams *params = dynamic_cast<FindExtremeByComparisonParams *>(functorParams);
     assert(params);
 
-    // evaluate by applying the AttComparison operator()
-    if ((*params->m_attComparison)(this)) {
+    // evaluate by applying the Comparison operator()
+    if ((*params->m_comparison)(this)) {
         params->m_element = this;
     }
     // continue until the end
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindAllByAttComparison(FunctorParams *functorParams)
+int Object::FindAllByComparison(FunctorParams *functorParams)
 {
-    FindAllByAttComparisonParams *params = dynamic_cast<FindAllByAttComparisonParams *>(functorParams);
+    FindAllByComparisonParams *params = dynamic_cast<FindAllByComparisonParams *>(functorParams);
     assert(params);
 
-    // evaluate by applying the AttComparison operator()
-    if ((*params->m_attComparison)(this)) {
+    // evaluate by applying the Comparison operator()
+    if ((*params->m_comparison)(this)) {
         params->m_elements->push_back(this);
     }
     // continue until the end
@@ -926,8 +1017,8 @@ int Object::FindAllBetween(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    // evaluate by applying the AttComparison operator()
-    if ((*params->m_attComparison)(this)) {
+    // evaluate by applying the Comparison operator()
+    if ((*params->m_comparison)(this)) {
         params->m_elements->push_back(this);
     }
 
@@ -937,6 +1028,55 @@ int Object::FindAllBetween(FunctorParams *functorParams)
     }
 
     // continue until the end
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::ConvertToCastOffMensural(FunctorParams *functorParams)
+{
+    ConvertToCastOffMensuralParams *params = dynamic_cast<ConvertToCastOffMensuralParams *>(functorParams);
+    assert(params);
+
+    assert(m_parent);
+    // We want to move only the children of the layer of any type (notes, editorial elements, etc)
+    if (this->m_parent->Is(LAYER)) {
+        assert(params->m_targetLayer);
+        this->MoveItselfTo(params->m_targetLayer);
+        // Do not precess children because we move the full sub-tree
+        return FUNCTOR_SIBLINGS;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::PrepareLinking(FunctorParams *functorParams)
+{
+    PrepareLinkingParams *params = dynamic_cast<PrepareLinkingParams *>(functorParams);
+    assert(params);
+
+    if (params->m_fillList && this->HasInterface(INTERFACE_LINKING)) {
+        LinkingInterface *interface = this->GetLinkingInterface();
+        assert(interface);
+        interface->InterfacePrepareLinking(functorParams, this);
+    }
+
+    // @next
+    std::string uuid = this->GetUuid();
+    auto i = std::find_if(params->m_nextUuidPairs.begin(), params->m_nextUuidPairs.end(),
+        [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
+    if (i != params->m_nextUuidPairs.end()) {
+        i->first->SetNextLink(this);
+        params->m_nextUuidPairs.erase(i);
+    }
+    
+    // @sameas
+    std::string sameas = this->GetUuid();
+    auto j = std::find_if(params->m_sameasUuidPairs.begin(), params->m_sameasUuidPairs.end(),
+                          [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
+    if (j != params->m_sameasUuidPairs.end()) {
+        j->first->SetSameasLink(this);
+        params->m_sameasUuidPairs.erase(j);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -1128,7 +1268,7 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 
     if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
 
-    if (!this->HasUpdatedBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
+    if (!this->HasSelfBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
 
     int refLeft = this->GetSelfLeft();
     if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
@@ -1148,10 +1288,12 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     if (this->Is(STAFF)) {
         Staff *currentStaff = dynamic_cast<Staff *>(this);
         assert(currentStaff);
-        assert(currentStaff->GetAlignment());
+
+        if (!currentStaff->DrawingIsVisible()) {
+            return FUNCTOR_SIBLINGS;
+        }
 
         params->m_staffAlignment = currentStaff->GetAlignment();
-
         return FUNCTOR_CONTINUE;
     }
 
@@ -1161,7 +1303,10 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         assert(currentLayer);
         // set scoreDef attr
         if (currentLayer->GetStaffDefClef()) {
-            currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
+            // Ignore system scoreDef clefs - clefs changes withing a staff are still taken into account
+            if (currentLayer->GetStaffDefClef()->GetScoreDefRole() != SCOREDEF_SYSTEM) {
+                currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
+            }
         }
         if (currentLayer->GetStaffDefKeySig()) {
             currentLayer->GetStaffDefKeySig()->SetOverflowBBoxes(params);
@@ -1196,10 +1341,12 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (!this->HasUpdatedBB()) {
+    if (!this->HasSelfBB()) {
         // if nothing was drawn, do not take it into account
         return FUNCTOR_CONTINUE;
     }
+
+    assert(params->m_staffAlignment);
 
     LayerElement *current = dynamic_cast<LayerElement *>(this);
     assert(current);
@@ -1207,16 +1354,15 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     bool skipAbove = false;
     bool skipBelow = false;
     Chord *chord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
-    if (chord) {
+    if (chord && params->m_staffAlignment) {
         chord->GetCrossStaffOverflows(current, params->m_staffAlignment, skipAbove, skipBelow);
     }
 
     StaffAlignment *alignment = params->m_staffAlignment;
     Layer *crossLayer = NULL;
     Staff *crossStaff = current->GetCrossStaff(crossLayer);
-    if (crossStaff) {
+    if (crossStaff && crossStaff->GetAlignment()) {
         alignment = crossStaff->GetAlignment();
-        assert(alignment);
     }
 
     int staffSize = alignment->GetStaffSize();

@@ -30,8 +30,8 @@ void TextQuickItem::appendText(QString text, QFont font)
 void TextQuickItem::calcPos()
 {
     int textWidth = 0;
-    int textHeight = 0;
     int textAscent = 0;
+    int textDescent = 0;
     int textXShift = 0;
 
     bool firstLoop = true;
@@ -45,16 +45,16 @@ void TextQuickItem::calcPos()
         // for ascent, descent, height, width
         QFontMetrics fm(textWithFont.font);
 
-        // Note: tightBoundingRect is not recommended on Windows due to performance reasons
-        auto boundingRect = fm.tightBoundingRect(textWithFont.text);
+        auto boundingRect = fm.boundingRect(textWithFont.text);
 
         textWithFont.offset = textWidth;
-        textWidth += boundingRect.width();
-        textHeight = std::max(textHeight, boundingRect.height());
+        textWidth += fm.width(textWithFont.text);
         textAscent = std::max(textAscent, boundingRect.top() * -1);
+        textDescent = std::max(textDescent, boundingRect.bottom());
         if (firstLoop) {
             // Note that the bounding rect can start at a negative x (e.g. italic font)
             textXShift = boundingRect.left();
+            textWidth -= textXShift;
             firstLoop = false;
         }
     }
@@ -73,6 +73,8 @@ void TextQuickItem::calcPos()
     m_paintOffsetY += textAscent;
     m_paintOffsetX += textXShift * -1;
 
+    int textHeight = textDescent + textAscent + 1;
+
     setImplicitWidth(textWidth);
     setImplicitHeight(textHeight);
 }
@@ -81,6 +83,11 @@ void TextQuickItem::setColor(QColor color)
 {
     m_color = color;
     update();
+}
+
+bool TextQuickItem::isEmpty()
+{
+    return m_textParts.empty();
 }
 
 void TextQuickItem::paint(QPainter *painter)

@@ -44,7 +44,7 @@ public:
     virtual bool HasToBeAligned() const { return true; }
 
     /** Convert rendition to form */
-    meterSigVis_FORM meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_METERREND rend);
+    meterSigVis_FORM meterSigDefaultVisToMeterSigVis(meterSigDefaultVis_METERFORM form);
 
     //----------//
     // Functors //

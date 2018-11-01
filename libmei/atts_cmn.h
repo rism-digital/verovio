@@ -340,14 +340,17 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBeatdef(data_DURATION beatdef_) { m_beatdef = beatdef_; }
-    data_DURATION GetBeatdef() const { return m_beatdef; }
+    void SetBeatdef(double beatdef_) { m_beatdef = beatdef_; }
+    double GetBeatdef() const { return m_beatdef; }
     bool HasBeatdef() const;
     ///@}
 
 private:
-    /** Indicates the performed duration represented by the beatRpt symbol. **/
-    data_DURATION m_beatdef;
+    /**
+     * Indicates the performed duration represented by the beatRpt symbol; expressed in
+     * time signature denominator units.
+     **/
+    double m_beatdef;
 
     /* include <attbeatdef> */
 };
@@ -382,7 +385,7 @@ public:
     ///@}
 
 private:
-    /** "Cut-out" style indicated for this measure. **/
+    /** "Cut-out" style. **/
     cutout_CUTOUT m_cutout;
 
     /* include <attcutout> */
@@ -744,6 +747,52 @@ private:
     data_BOOLEAN m_lv;
 
     /* include <attlv> */
+};
+
+//----------------------------------------------------------------------------
+// AttMeasureLog
+//----------------------------------------------------------------------------
+
+class AttMeasureLog : public Att {
+public:
+    AttMeasureLog();
+    virtual ~AttMeasureLog();
+
+    /** Reset the default values for the attribute class **/
+    void ResetMeasureLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadMeasureLog(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteMeasureLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetLeft(data_BARRENDITION left_) { m_left = left_; }
+    data_BARRENDITION GetLeft() const { return m_left; }
+    bool HasLeft() const;
+    //
+    void SetRight(data_BARRENDITION right_) { m_right = right_; }
+    data_BARRENDITION GetRight() const { return m_right; }
+    bool HasRight() const;
+    ///@}
+
+private:
+    /**
+     * Indicates the visual rendition of the left bar line.
+     * It is present here only for facilitation of translation from legacy encodings
+     * which use it. Usually, it can be safely ignored.
+     **/
+    data_BARRENDITION m_left;
+    /** Indicates the function of the right bar line and is structurally important. **/
+    data_BARRENDITION m_right;
+
+    /* include <attright> */
 };
 
 //----------------------------------------------------------------------------
