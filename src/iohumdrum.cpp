@@ -1250,7 +1250,7 @@ void HumdrumInput::prepareStaffGroups()
             StaffGrp *sg = new StaffGrp();
             m_doc->m_scoreDef.AddChild(sg);
             sg->SetSymbol(staffGroupingSym_SYMBOL_brace);
-            sg->SetBarthru(BOOLEAN_true);
+            sg->SetBarThru(BOOLEAN_true);
             sg->AddChild(m_staffdef[0]);
             sg->AddChild(m_staffdef[1]);
         }
@@ -1429,7 +1429,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         StaffGrp *sg = new StaffGrp();
         m_doc->m_scoreDef.AddChild(sg);
         // currently required to be barred:
-        sg->SetBarthru(BOOLEAN_true);
+        sg->SetBarThru(BOOLEAN_true);
         if (newstyles[0] == '[') {
             sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
         }
@@ -1448,7 +1448,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
         // If there is only one staff in a group, it will be given as a bare
         // staffDef in the root_sg group.
         StaffGrp *root_sg = new StaffGrp();
-        root_sg->SetBarthru(BOOLEAN_false);
+        root_sg->SetBarThru(BOOLEAN_false);
         m_doc->m_scoreDef.AddChild(root_sg);
         for (int i = 0; i < (int)newgroups.size(); ++i) {
             if (newgroups[i].size() == 1) {
@@ -1459,7 +1459,7 @@ void HumdrumInput::processStaffDecoration(const string &decoration)
                 // create staffGrp and then insert staffDefs for group
                 StaffGrp *sg = new StaffGrp();
                 root_sg->AddChild(sg);
-                sg->SetBarthru(BOOLEAN_true);
+                sg->SetBarThru(BOOLEAN_true);
                 if (newstyles[i] == '[') {
                     sg->SetSymbol(staffGroupingSym_SYMBOL_bracket);
                 }
