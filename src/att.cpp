@@ -205,6 +205,54 @@ data_HEXNUM Att::StrToHexnum(std::string value, bool logWarning) const
         LogWarning("Value '%s' is not in the SMuFL (private area) range", value.c_str());
     return 0;
 }
+    
+std::string Att::CompassdirectionToStr(data_COMPASSDIRECTION data) const
+{
+    std::string value;
+    if (data.GetType() == COMPASSDIRECTION_basic)
+        value = CompassdirectionBasicToStr(data.GetBasic());
+    else if (data.GetType() == COMPASSDIRECTION_extended)
+        value = CompassdirectionExtendedToStr(data.GetExtended());
+    
+    return value;
+}
+
+data_COMPASSDIRECTION Att::StrToCompassdirection(std::string value, bool logWarning) const
+{
+    data_COMPASSDIRECTION data;
+    data.SetBasic(StrToCompassdirectionBasic(value, false));
+    if (data.HasValue()) return data;
+    data.SetExtended(StrToCompassdirectionExtended(value, false));
+    if (data.HasValue()) return data;
+    
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.COMPASSDIRECTION '%s'", value.c_str());
+    
+    return data;
+}
+    
+std::string Att::EventrelToStr(data_EVENTREL data) const
+{
+    std::string value;
+    if (data.GetType() == EVENTREL_basic)
+        value = EventrelBasicToStr(data.GetBasic());
+    else if (data.GetType() == EVENTREL_extended)
+        value = EventrelExtendedToStr(data.GetExtended());
+    
+    return value;
+}
+
+data_EVENTREL Att::StrToEventrel(std::string value, bool logWarning) const
+{
+    data_EVENTREL data;
+    data.SetBasic(StrToEventrelBasic(value, false));
+    if (data.HasValue()) return data;
+    data.SetExtended(StrToEventrelExtended(value, false));
+    if (data.HasValue()) return data;
+    
+    if (logWarning && !value.empty()) LogWarning("Unsupported data.EVENTREL '%s'", value.c_str());
+    
+    return data;
+}
 
 std::string Att::FontsizeToStr(data_FONTSIZE data) const
 {
