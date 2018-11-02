@@ -10451,6 +10451,7 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
         int gesturaldotcount = characterCountInSubtoken(tstring, '.');
         if (gesturaldotcount != visualdotcount) {
             element->SetDotsGes(gesturaldotcount);
+            element->SetDots(visualdotcount);
         }
     }
     else {
