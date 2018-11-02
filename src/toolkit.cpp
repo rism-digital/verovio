@@ -1201,6 +1201,7 @@ int Toolkit::GetMIDIPitchForElement(const std::string &xmlId)
     int pitchofElement = -1;
     if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
+        assert(note);
         pitchofElement = note->GetMIDIPitch();
     }
     return pitchofElement;
