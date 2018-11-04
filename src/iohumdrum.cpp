@@ -503,6 +503,7 @@ bool HumdrumInput::convertHumdrum()
     m_multirest = analyzeMultiRest(infile);
 
     infile.analyzeSlurs();
+    infile.analyzeKernTies();
     infile.analyzeKernStems();
     infile.analyzeRestPositions();
     infile.analyzeOttavas();
@@ -11553,11 +11554,82 @@ void HumdrumInput::addTrill(hum::HTp token)
 
 //////////////////////////////
 //
-// HumdrumInput::processTieStart --
+// HumdrumInput::processTieStart -- linked slurs not allowed in chords yet.
 //
 
 void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
+    std::string endtag = "tieEnd";
+    if (subindex >= 0) {
+        endtag += to_string(subindex + 1);
+    }
+    hum::HTp tieend = token->getValueHTp("auto", endtag);
+    if (tieend) {
+        // A linked tie which can be inserted immediately (and
+        // not stored in the list of tie starts for later processing).
+
+        std::string endnumtag = "tieEndSubtokenNumber";
+        int endn = subindex + 1;
+        if (token->isChord()) {
+            if (endn > 0) {
+                endnumtag += to_string(endn);
+            }
+        }
+        int endnumber = token->getValueInt("auto", endnumtag);
+        if (endnumber <= 0) {
+            endnumber = 1;
+        }
+
+        vrv::Tie *tie = new Tie;
+        m_measure->AddChild(tie);
+        int endsubindex = endnumber - 1;
+        if (endsubindex < 0) {
+            endsubindex = 0;
+        }
+        setTieLocationId(tie, token, subindex, tieend, endsubindex);
+        std::string startid = getLocationId("note", token);
+        std::string endid = getLocationId("note", tieend);
+        if (token->isChord()) {
+            startid += "S" + to_string(subindex + 1);
+        }
+        if (tieend->isChord()) {
+            if (endnumber > 0) {
+                endid += "S" + to_string(endnumber);
+            }
+        }
+        tie->SetStartid("#" + startid);
+        tie->SetEndid("#" + endid);
+
+        std::string marker1 = "[";
+        std::string marker2 = "[";
+        std::string marker3 = "_";
+        std::string marker4 = "_";
+
+        if (m_signifiers.above) {
+            marker1 += m_signifiers.above;
+            marker3 += m_signifiers.above;
+        }
+        if (m_signifiers.below) {
+            marker2 += m_signifiers.below;
+            marker4 += m_signifiers.below;
+        }
+
+        if (m_signifiers.above && tstring.find(marker1) != std::string::npos) {
+            tie->SetCurvedir(curvature_CURVEDIR_above);
+        }
+        else if (m_signifiers.below && tstring.find(marker2) != std::string::npos) {
+            tie->SetCurvedir(curvature_CURVEDIR_below);
+        }
+        else if (m_signifiers.above && tstring.find(marker3) != std::string::npos) {
+            tie->SetCurvedir(curvature_CURVEDIR_above);
+        }
+        else if (m_signifiers.below && tstring.find(marker4) != std::string::npos) {
+            tie->SetCurvedir(curvature_CURVEDIR_below);
+        }
+
+        return;
+    }
+
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumNum timestamp = token->getDurationFromStart();
     hum::HumNum endtime = timestamp + token->getDuration();
@@ -11599,6 +11671,16 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
 
 void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
+    std::string starttag = "tieStart";
+    if (token->isChord()) {
+        starttag += to_string(subindex + 1);
+    }
+    hum::HTp tiestart = token->getValueHTp("auto", starttag);
+    if (tiestart) {
+        // linked ties are handled in processTieStart().
+        return;
+    }
+
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumNum timestamp = token->getDurationFromStart();
     int track = token->getTrack();
