@@ -468,6 +468,7 @@ protected:
     std::string getEndIdForOttava(hum::HTp token);
     void prepareInitialOttavas(hum::HTp measure);
     void linkFingeringToNote(Dir *dir, hum::HTp token, int xstaffindex);
+    bool checkForTupletForcedBreak(const std::vector<hum::HTp> &duritems, int index);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();

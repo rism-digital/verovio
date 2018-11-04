@@ -8011,6 +8011,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     hum::HumNum tupletdur = 0;
     int tupletcount = 0;
     int samedurtup = true;
+
     for (int i = 0; i < (int)beampowdot.size(); ++i) {
         if (binarybeams[i]) {
             continue;
@@ -8019,8 +8020,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         if (beampowdot[i] >= 0) {
             for (int j = beamstarts[i]; j <= beamends[i]; ++j) {
 
-                // may have to deal with dotted triplets (which appear to be powers of
-                // two)
+                // may have to deal with dotted triplets (which appear to be powers of two)
                 if (poweroftwo[j]) {
                     if (ingroup) {
                         ingroup = false;
@@ -8054,6 +8054,22 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             }
             tupletnum++;
             tupletcount = 0;
+        }
+    }
+
+    int tcorrection = 0;
+    for (int i = 0; i < (int)tupletgroups.size(); i++) {
+        if (checkForTupletForcedBreak(duritems, i)) {
+            tcorrection++;
+        }
+        if (tupletgroups[i]) {
+            tupletgroups[i] += tcorrection;
+        }
+    }
+    if (tcorrection) {
+        // invalidate adjustcount
+        for (int i = 0; i < (int)adjustcount.size(); i++) {
+            adjustcount[i] = 0;
         }
     }
 
@@ -8332,6 +8348,38 @@ void HumdrumInput::prepareBeamAndTupletGroups(
 
     mergeTupletsCuttingBeam(tg);
     resolveTupletBeamTie(tg);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForTupletForcedBreak --
+//
+
+bool HumdrumInput::checkForTupletForcedBreak(const std::vector<hum::HTp> &duritems, int index)
+{
+    if (index == 0) {
+        return false;
+    }
+    if (index > (int)duritems.size()) {
+        return false;
+    }
+
+    hum::HTp starttok = duritems[index];
+    hum::HTp endtok = duritems[index - 1];
+    int stopline = endtok->getLineIndex();
+    int curline = starttok->getLineIndex();
+    hum::HTp cur = starttok->getPreviousToken();
+    while (cur && (curline > stopline)) {
+        if (cur->isInterpretation() && (*cur == "*tupbreak")) {
+            return true;
+        }
+        cur = cur->getPreviousToken();
+        curline = cur->getLineIndex();
+        if (cur == endtok) {
+            break;
+        }
+    }
+    return false;
 }
 
 //////////////////////////////
