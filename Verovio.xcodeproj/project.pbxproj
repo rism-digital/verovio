@@ -159,6 +159,10 @@
 		4D16947A1E41DCE000569BF4 /* atts_cmnornaments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28F11940BCC100C76319 /* atts_cmnornaments.cpp */; };
 		4D16947B1E41DCE100569BF4 /* atts_cmnornaments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28F11940BCC100C76319 /* atts_cmnornaments.cpp */; };
 		4D16947C1E41DE7200569BF4 /* atts_cmnornaments.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DEE28F21940BCC100C76319 /* atts_cmnornaments.h */; };
+		4D1BD1B521908D6B000D35B2 /* halfmrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */; };
+		4D1BD1B621908D6B000D35B2 /* halfmrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */; };
+		4D1BD1B721908D6B000D35B2 /* halfmrpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */; };
+		4D1BD1B921908D78000D35B2 /* halfmrpt.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1BD1B821908D78000D35B2 /* halfmrpt.h */; };
 		4D1BE76B1C688F5A0086DC0E /* Binasc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7661C688F5A0086DC0E /* Binasc.cpp */; };
 		4D1BE76C1C688F5A0086DC0E /* Binasc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7661C688F5A0086DC0E /* Binasc.cpp */; };
 		4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */; };
@@ -689,6 +693,8 @@
 		4D1031851DECB83E0098EA1C /* atts_externalsymbols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_externalsymbols.h; path = libmei/atts_externalsymbols.h; sourceTree = "<group>"; };
 		4D14600F1EA8A913007DB90C /* horizontalaligner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = horizontalaligner.h; path = include/vrv/horizontalaligner.h; sourceTree = "<group>"; };
 		4D1694601E3A44F300569BF4 /* Verovio-Humdrum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Verovio-Humdrum"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = halfmrpt.cpp; path = src/halfmrpt.cpp; sourceTree = "<group>"; };
+		4D1BD1B821908D78000D35B2 /* halfmrpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = halfmrpt.h; path = include/vrv/halfmrpt.h; sourceTree = "<group>"; };
 		4D1BE7661C688F5A0086DC0E /* Binasc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Binasc.cpp; path = src/midi/Binasc.cpp; sourceTree = "<group>"; };
 		4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEvent.cpp; path = src/midi/MidiEvent.cpp; sourceTree = "<group>"; };
 		4D1BE7681C688F5A0086DC0E /* MidiEventList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEventList.cpp; path = src/midi/MidiEventList.cpp; sourceTree = "<group>"; };
@@ -1445,6 +1451,8 @@
 				4DEEDE621E617C880087E8BC /* elementpart.h */,
 				409B3DD81F2D1C2A0098A265 /* ftrem.cpp */,
 				409B3DD71F2D1C0C0098A265 /* ftrem.h */,
+				4D1BD1B421908D6B000D35B2 /* halfmrpt.cpp */,
+				4D1BD1B821908D78000D35B2 /* halfmrpt.h */,
 				8F086EC5188539540037FD8E /* keysig.cpp */,
 				8F59291C18854BF800FE51AD /* keysig.h */,
 				8F086EC7188539540037FD8E /* layerelement.cpp */,
@@ -1635,6 +1643,7 @@
 				4DB3D8D01F83D11800B5FC2B /* mordent.h in Headers */,
 				4D1BE7821C69434C0086DC0E /* MidiFile.h in Headers */,
 				4D9C53121B52E4AE0003C6EC /* core.h in Headers */,
+				4D1BD1B921908D78000D35B2 /* halfmrpt.h in Headers */,
 				4DF4407A1D3D085600152B7E /* functorparams.h in Headers */,
 				4D763EC91987D067003FCAB5 /* metersig.h in Headers */,
 				4DB3D8CD1F83D11100B5FC2B /* harm.h in Headers */,
@@ -1837,6 +1846,7 @@
 				4D72A5DE208A37D5009DEC1E /* mrpt2.cpp in Sources */,
 				4D16941C1E3A44F300569BF4 /* ending.cpp in Sources */,
 				4D16941D1E3A44F300569BF4 /* dir.cpp in Sources */,
+				4D1BD1B621908D6B000D35B2 /* halfmrpt.cpp in Sources */,
 				4D16941E1E3A44F300569BF4 /* note.cpp in Sources */,
 				4D16941F1E3A44F300569BF4 /* boundingbox.cpp in Sources */,
 				4D1694211E3A44F300569BF4 /* object.cpp in Sources */,
@@ -2064,6 +2074,7 @@
 				4D422104199805F800963292 /* att.cpp in Sources */,
 				4D4221061998A8CE00963292 /* atts_mensural.cpp in Sources */,
 				4D4FCD0C1F5455FF0009C455 /* staffgrp.cpp in Sources */,
+				4D1BD1B521908D6B000D35B2 /* halfmrpt.cpp in Sources */,
 				4D09D3ED1EA8AD8500A420E6 /* horizontalaligner.cpp in Sources */,
 				4D9A9C19199F561200028D93 /* verse.cpp in Sources */,
 				4DF289FF1A7545E500BA9F7D /* timeinterface.cpp in Sources */,
@@ -2223,6 +2234,7 @@
 				4D422105199805F800963292 /* att.cpp in Sources */,
 				4D4221071998A8CE00963292 /* atts_mensural.cpp in Sources */,
 				4D50B53B1C1B47540081D56E /* atts_pagebased.cpp in Sources */,
+				4D1BD1B721908D6B000D35B2 /* halfmrpt.cpp in Sources */,
 				4D766F0520ACAD6E006875D8 /* view_neume.cpp in Sources */,
 				4D1BE76C1C688F5A0086DC0E /* Binasc.cpp in Sources */,
 				4D9A9C1A199F561200028D93 /* verse.cpp in Sources */,
