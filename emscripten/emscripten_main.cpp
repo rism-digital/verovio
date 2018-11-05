@@ -28,11 +28,11 @@ const char *vrvToolkit_getElementsAtTime(Toolkit *tk, int millisec);
 const char *vrvToolkit_getHumdrum(Toolkit *tk);
 const char *vrvToolkit_getLog(Toolkit *tk);
 const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool score_based);
+const char *vrvToolkit_getMIDIValuesForElement(Toolkit *tk, const char *xmlId);
 const char *vrvToolkit_getOptions(Toolkit *tk, bool default_values);
 int vrvToolkit_getPageCount(Toolkit *tk);
 int vrvToolkit_getPageWithElement(Toolkit *tk, const char *xmlId);
 double vrvToolkit_getTimeForElement(Toolkit *tk, const char *xmlId);
-int vrvToolkit_getMIDIPitchForElement(Toolkit *tk, const char *xmlId);
 const char *vrvToolkit_getVersion(Toolkit *tk);
 bool vrvToolkit_loadData(Toolkit *tk, const char *data);
 const char *vrvToolkit_renderToMIDI(Toolkit *tk, const char *c_options);
@@ -103,6 +103,11 @@ const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool score_based)
     return tk->GetCString();
 }
 
+const char *vrvToolkit_getMIDIValuesForElement(Toolkit *tk, const char *xmlId)
+{
+    return tk->GetMIDIValuesForElement(xmlId);
+}
+
 const char *vrvToolkit_getOptions(Toolkit *tk, bool default_values)
 {
     tk->SetCString(tk->GetOptions(default_values));
@@ -122,11 +127,6 @@ int vrvToolkit_getPageWithElement(Toolkit *tk, const char *xmlId)
 double vrvToolkit_getTimeForElement(Toolkit *tk, const char *xmlId)
 {
     return tk->GetTimeForElement(xmlId);
-}
-
-int vrvToolkit_getMIDIPitchForElement(Toolkit *tk, const char *xmlId)
-{
-    return tk->GetMIDIPitchForElement(xmlId);
 }
 
 const char *vrvToolkit_getVersion(Toolkit *tk)

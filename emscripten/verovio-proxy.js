@@ -42,8 +42,8 @@ verovio.vrvToolkit.getPageWithElement = Module.cwrap('vrvToolkit_getPageWithElem
 // double getTimeForElement(Toolkit *ic, const char *xmlId)
 verovio.vrvToolkit.getTimeForElement = Module.cwrap('vrvToolkit_getTimeForElement', 'number', ['number', 'string']);
 
-// int getMIDIPitchForElement(Toolkit *ic, const char *xmlId)
-verovio.vrvToolkit.getMIDIPitchForElement = Module.cwrap('vrvToolkit_getMIDIPitchForElement', 'number', ['number', 'string']);
+// char *getMIDIValuesForElement(Toolkit *ic, const char *xmlId)
+verovio.vrvToolkit.getMIDIValuesForElement = Module.cwrap('vrvToolkit_getMIDIValuesForElement', 'string', ['number', 'string']);
 
 // char *getVersion(Toolkit *ic)
 verovio.vrvToolkit.getVersion = Module.cwrap('vrvToolkit_getVersion', 'string', ['number']);
@@ -117,6 +117,10 @@ verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {
 	return verovio.vrvToolkit.getMEI(this.ptr, pageNo, scoreBased);
 };
 
+verovio.toolkit.prototype.getMIDIValuesForElement = function (xmlId) {
+	return verovio.vrvToolkit.getMIDIValuesForElement(this.ptr, xmlId);
+};
+
 verovio.toolkit.prototype.getOptions = function (defaultValues) {
 	return JSON.parse(verovio.vrvToolkit.getOptions(this.ptr, defaultValues));
 };
@@ -131,10 +135,6 @@ verovio.toolkit.prototype.getPageWithElement = function (xmlId) {
 
 verovio.toolkit.prototype.getTimeForElement = function (xmlId) {
 	return verovio.vrvToolkit.getTimeForElement(this.ptr, xmlId);
-};
-
-verovio.toolkit.prototype.getMIDIPitchForElement = function (xmlId) {
-	return verovio.vrvToolkit.getMIDIPitchForElement(this.ptr, xmlId);
 };
 
 verovio.toolkit.prototype.getVersion = function () {
