@@ -104,6 +104,8 @@ void Note::Reset()
     m_realTimeOnsetMilliseconds = 0;
     m_realTimeOffsetMilliseconds = 0;
     m_scoreTimeTiedDuration = 0.0;
+
+    m_MIDIPitch = -1;
 }
 
 bool Note::HasToBeAligned() const
@@ -374,6 +376,11 @@ void Note::SetScoreTimeTiedDuration(double scoreTime)
     m_scoreTimeTiedDuration = scoreTime;
 }
 
+void Note::SetMIDIPitch(int pitch)
+{
+    m_MIDIPitch = pitch;
+}
+
 double Note::GetScoreTimeOnset()
 {
     return m_scoreTimeOnset;
@@ -402,6 +409,11 @@ double Note::GetScoreTimeTiedDuration()
 double Note::GetScoreTimeDuration()
 {
     return GetScoreTimeOffset() - GetScoreTimeOnset();
+}
+
+int Note::GetMIDIPitch()
+{
+    return m_MIDIPitch;
 }
 
 //----------------------------------------------------------------------------
@@ -914,6 +926,7 @@ int Note::GenerateMIDI(FunctorParams *functorParams)
     if (this->HasOctGes()) oct = this->GetOctGes();
 
     int pitch = midiBase + (oct + 1) * 12;
+    this->SetMIDIPitch(pitch);
     int channel = params->m_midiChannel;
     int velocity = 64;
 
