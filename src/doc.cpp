@@ -515,23 +515,23 @@ void Doc::PrepareDrawing()
 
     /************ Resolve linking (@next) ************/
 
-    // Try to match all pointing elements using @next
+    // Try to match all pointing elements using @next and @sameas
     PrepareLinkingParams prepareLinkingParams;
     Functor prepareLinking(&Object::PrepareLinking);
     this->Process(&prepareLinking, &prepareLinkingParams);
 
     // If we have some left process again backward
-    // But not now because we match only @next
-    /*
-    if (!prepareLinkingParams.m_interfaceUuidPairs.empty()) {
-        prepareLinkingParams.m_interfaceUuidPairs.empty = false;
+    if (!prepareLinkingParams.m_sameasUuidPairs.empty()) {
+        prepareLinkingParams.m_fillList = false;
         this->Process(&prepareLinking, &prepareLinkingParams, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
     }
-    */
 
     // If some are still there, then it is probably an issue in the encoding
     if (!prepareLinkingParams.m_nextUuidPairs.empty()) {
         LogWarning("%d element(s) with a @next could match the target", prepareLinkingParams.m_nextUuidPairs.size());
+    }
+    if (!prepareLinkingParams.m_sameasUuidPairs.empty()) {
+        LogWarning("%d element(s) with a @sameas could match the target", prepareLinkingParams.m_sameasUuidPairs.size());
     }
 
     /************ Resolve @plist ************/

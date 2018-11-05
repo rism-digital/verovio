@@ -180,7 +180,7 @@ AttDurationGestural::~AttDurationGestural()
 void AttDurationGestural::ResetDurationGestural()
 {
     m_durGes = DURATION_NONE;
-    m_dotsGes = 0;
+    m_dotsGes = -1;
     m_durMetrical = 0.0;
     m_durPpq = 0;
     m_durReal = 0.0;
@@ -260,7 +260,7 @@ bool AttDurationGestural::HasDurGes() const
 
 bool AttDurationGestural::HasDotsGes() const
 {
-    return (m_dotsGes != 0);
+    return (m_dotsGes != -1);
 }
 
 bool AttDurationGestural::HasDurMetrical() const
@@ -284,6 +284,82 @@ bool AttDurationGestural::HasDurRecip() const
 }
 
 /* include <attdur.recip> */
+
+//----------------------------------------------------------------------------
+// AttNcGes
+//----------------------------------------------------------------------------
+
+AttNcGes::AttNcGes() : Att()
+{
+    ResetNcGes();
+}
+
+AttNcGes::~AttNcGes()
+{
+}
+
+void AttNcGes::ResetNcGes()
+{
+    m_octGes = -127;
+    m_pnameGes = PITCHNAME_NONE;
+    m_pnum = 0;
+}
+
+bool AttNcGes::ReadNcGes(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("oct.ges")) {
+        this->SetOctGes(StrToOctave(element.attribute("oct.ges").value()));
+        element.remove_attribute("oct.ges");
+        hasAttribute = true;
+    }
+    if (element.attribute("pname.ges")) {
+        this->SetPnameGes(StrToPitchname(element.attribute("pname.ges").value()));
+        element.remove_attribute("pname.ges");
+        hasAttribute = true;
+    }
+    if (element.attribute("pnum")) {
+        this->SetPnum(StrToInt(element.attribute("pnum").value()));
+        element.remove_attribute("pnum");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttNcGes::WriteNcGes(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasOctGes()) {
+        element.append_attribute("oct.ges") = OctaveToStr(this->GetOctGes()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPnameGes()) {
+        element.append_attribute("pname.ges") = PitchnameToStr(this->GetPnameGes()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPnum()) {
+        element.append_attribute("pnum") = IntToStr(this->GetPnum()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttNcGes::HasOctGes() const
+{
+    return (m_octGes != -127);
+}
+
+bool AttNcGes::HasPnameGes() const
+{
+    return (m_pnameGes != PITCHNAME_NONE);
+}
+
+bool AttNcGes::HasPnum() const
+{
+    return (m_pnum != 0);
+}
+
+/* include <attpnum> */
 
 //----------------------------------------------------------------------------
 // AttNoteGes
@@ -735,6 +811,22 @@ bool Att::SetGestural(Object *element, std::string attrType, std::string attrVal
             return true;
         }
     }
+    if (element->HasAttClass(ATT_NCGES)) {
+        AttNcGes *att = dynamic_cast<AttNcGes *>(element);
+        assert(att);
+        if (attrType == "oct.ges") {
+            att->SetOctGes(att->StrToOctave(attrValue));
+            return true;
+        }
+        if (attrType == "pname.ges") {
+            att->SetPnameGes(att->StrToPitchname(attrValue));
+            return true;
+        }
+        if (attrType == "pnum") {
+            att->SetPnum(att->StrToInt(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_NOTEGES)) {
         AttNoteGes *att = dynamic_cast<AttNoteGes *>(element);
         assert(att);
@@ -862,6 +954,19 @@ void Att::GetGestural(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasDurRecip()) {
             attributes->push_back(std::make_pair("dur.recip", att->StrToStr(att->GetDurRecip())));
+        }
+    }
+    if (element->HasAttClass(ATT_NCGES)) {
+        const AttNcGes *att = dynamic_cast<const AttNcGes *>(element);
+        assert(att);
+        if (att->HasOctGes()) {
+            attributes->push_back(std::make_pair("oct.ges", att->OctaveToStr(att->GetOctGes())));
+        }
+        if (att->HasPnameGes()) {
+            attributes->push_back(std::make_pair("pname.ges", att->PitchnameToStr(att->GetPnameGes())));
+        }
+        if (att->HasPnum()) {
+            attributes->push_back(std::make_pair("pnum", att->IntToStr(att->GetPnum())));
         }
     }
     if (element->HasAttClass(ATT_NOTEGES)) {

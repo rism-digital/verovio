@@ -213,6 +213,54 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttNcGes
+//----------------------------------------------------------------------------
+
+class AttNcGes : public Att {
+public:
+    AttNcGes();
+    virtual ~AttNcGes();
+
+    /** Reset the default values for the attribute class **/
+    void ResetNcGes();
+
+    /** Read the values for the attribute class **/
+    bool ReadNcGes(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteNcGes(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetOctGes(data_OCTAVE octGes_) { m_octGes = octGes_; }
+    data_OCTAVE GetOctGes() const { return m_octGes; }
+    bool HasOctGes() const;
+    //
+    void SetPnameGes(data_PITCHNAME pnameGes_) { m_pnameGes = pnameGes_; }
+    data_PITCHNAME GetPnameGes() const { return m_pnameGes; }
+    bool HasPnameGes() const;
+    //
+    void SetPnum(int pnum_) { m_pnum = pnum_; }
+    int GetPnum() const { return m_pnum; }
+    bool HasPnum() const;
+    ///@}
+
+private:
+    /** Records performed octave information that differs from the written value. **/
+    data_OCTAVE m_octGes;
+    /** Contains a performed pitch name that differs from the written value. **/
+    data_PITCHNAME m_pnameGes;
+    /** Holds a pitch-to-number mapping, a base-40 or MIDI note number, for example. **/
+    int m_pnum;
+
+    /* include <attpnum> */
+};
+
+//----------------------------------------------------------------------------
 // AttNoteGes
 //----------------------------------------------------------------------------
 

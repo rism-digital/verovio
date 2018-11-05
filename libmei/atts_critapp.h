@@ -64,46 +64,6 @@ private:
     /* include <attcause> */
 };
 
-//----------------------------------------------------------------------------
-// AttSource
-//----------------------------------------------------------------------------
-
-class AttSource : public Att {
-public:
-    AttSource();
-    virtual ~AttSource();
-
-    /** Reset the default values for the attribute class **/
-    void ResetSource();
-
-    /** Read the values for the attribute class **/
-    bool ReadSource(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteSource(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetSource(std::string source_) { m_source = source_; }
-    std::string GetSource() const { return m_source; }
-    bool HasSource() const;
-    ///@}
-
-private:
-    /**
-     * Contains a list of one or more pointers indicating the sources which attest to a
-     * given reading.
-     * Each value should correspond to the ID of a
-     **/
-    std::string m_source;
-
-    /* include <attsource> */
-};
-
 } // vrv namespace
 
 #endif // __VRV_ATTS_CRITAPP_H__
