@@ -106,7 +106,7 @@ const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool score_based)
 const char *vrvToolkit_getMIDIValuesForElement(Toolkit *tk, const char *xmlId)
 {
     tk->SetCString(tk->GetMIDIValuesForElement(xmlId));
-    return tk->getCString();
+    return tk->GetCString();
 }
 
 const char *vrvToolkit_getOptions(Toolkit *tk, bool default_values)
