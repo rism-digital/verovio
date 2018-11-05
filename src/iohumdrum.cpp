@@ -11735,6 +11735,9 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
     int staffnum = m_rkern[track];
     std::string noteuuid = note->GetUuid();
     bool disjunct = token->find("]]") != std::string::npos;
+    if (token->find("__") != std::string::npos) {
+        disjunct = true;
+    }
 
     int pitch = hum::Convert::kernToMidiNoteNumber(tstring);
     int layer = m_currentlayer;
