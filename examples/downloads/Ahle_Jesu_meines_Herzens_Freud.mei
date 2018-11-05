@@ -302,6 +302,18 @@
                      <staffDef n="1" lines="5" clef.line="2" clef.shape="G"/>
                      <staffDef n="2" lines="5" clef.line="4" clef.shape="F"/>
                   </staffGrp>
+                  <pgHead>
+                     <rend halign="center" valign="top">
+                        <rend fontsize="x-large">Jesu, meines Herzens Freud</rend>
+                     </rend>
+                     <rend halign="left" valign="bottom" fontfam="Times New Roman" fontsize="12" fontweight="bold">
+                        <rend>Johann Filtner</rend>
+                     </rend>
+                     <rend halign="right" valign="bottom" fontfam="Times New Roman" fontsize="12" fontweight="bold">
+                        <rend>Johann R. Ahle</rend><lb />
+                        <rend>Satz: J. Knuth</rend>
+                     </rend>
+                  </pgHead>
                </scoreDef>
                <section>
                   <measure n="1" xml:id="d23378e68">
@@ -432,14 +444,6 @@
                            <note xml:id="d23378e674" pname="e" oct="3" dur="2" stem.dir="down"/>
                         </layer>
                      </staff>
-                     <dir tstamp="3" place="above" staff="1">
-                        <rend fontfam="PlainBlackWide" fontsize="18">Jesu, meines Herzens
-                           Freud</rend>
-                     </dir>
-                     <dir tstamp="3" place="above" staff="1">
-                        <rend fontfam="Times New Roman" fontsize="11" fontweight="bold">Johann
-                           Flitner</rend>
-                     </dir>
                   </measure>
                   <measure n="3" xml:id="d23378e688">
                      <staff n="1">
@@ -506,15 +510,7 @@
                            <note xml:id="d23378e1027" pname="e" oct="3" dur="2" stem.dir="down"/>
                         </layer>
                      </staff>
-                     <dir tstamp="1" place="above" staff="1">
-                        <rend fontfam="Times New Roman" fontsize="11" fontweight="bold">Johann R.
-                           Ahle</rend>
-                     </dir>
                      <slur tstamp="3" curvedir="below" startid="#d23378e835" endid="#d23378e917" staff="1" tstamp2="0m+4"/>
-                     <dir tstamp="4" place="above" staff="1">
-                        <rend fontfam="Times New Roman" fontsize="10" fontweight="bold">Satz: J.
-                           Knuth</rend>
-                     </dir>
                      <slur tstamp="3" curvedir="above" startid="#d23378e964" endid="#d23378e980" staff="2" tstamp2="0m+4"/>
                   </measure>
                   <measure n="4" xml:id="d23378e1041">
