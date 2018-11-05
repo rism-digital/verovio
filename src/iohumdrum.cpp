@@ -510,6 +510,7 @@ bool HumdrumInput::convertHumdrum()
     parseSignifiers(infile);
     checkForColorSpine(infile);
     infile.analyzeRScale();
+    infile.analyzeCrossStaffStemDirections();
     m_spine_color.resize(infile.getMaxTrack() + 1);
     initializeSpineColor(infile);
 
@@ -4375,7 +4376,7 @@ void HumdrumInput::setBeamDirection(int direction, const std::vector<humaux::Hum
             // ignore non-grace note beams
             continue;
         }
-        layerdata[i]->setValue("", "auto", "stem.dir", to_string(direction));
+        layerdata[i]->setValue("auto", "stem.dir", to_string(direction));
         if (beamend == beamstart) {
             // last note of beam so exit
             break;
@@ -9163,12 +9164,21 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
     }
 
     // Stem direction of the chord.  If both up and down, then show up.
+    int crossdir = token->getValueInt("auto", "stem.dir");
+    if (crossdir == 1) {
+        chord->SetStemDir(STEMDIRECTION_up);
+    }
+    else if (crossdir == -1) {
+        chord->SetStemDir(STEMDIRECTION_down);
+    }
+    // Overwrite cross-stem direction if there is an explicit stem direction.
     if (token->find("/") != string::npos) {
         chord->SetStemDir(STEMDIRECTION_up);
     }
     else if (token->find("\\") != string::npos) {
         chord->SetStemDir(STEMDIRECTION_down);
     }
+
     checkForAutoStem(chord, token);
 
     token->setValue("MEI", "xml:id", chord->GetUuid());
@@ -9537,11 +9547,11 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
 
 template <class ELEMENT> void HumdrumInput::checkForAutoStem(ELEMENT element, hum::HTp token)
 {
-    std::string stemdir = token->getValue("", "auto", "stem.dir");
-    if (stemdir == "1") {
+    int stemdir = token->getValueInt("auto", "stem.dir");
+    if (stemdir == 1) {
         element->SetStemDir(STEMDIRECTION_up);
     }
-    else if (stemdir == "-1") {
+    else if (stemdir == -1) {
         element->SetStemDir(STEMDIRECTION_down);
     }
 }

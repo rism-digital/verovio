@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Nov  4 09:50:09 CET 2018
+// Last Modified: Mon Nov  5 16:32:23 CET 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -11659,9 +11659,14 @@ bool HumSignifier::parseSignifier(const string& rdfline) {
 	m_definition = hre.getMatch(2);
 
 	// identify signifier category
+
 	if (m_exinterp == "**kern") {
 		if (m_definition.find("link") != std::string::npos) {
 			m_sigtype = signifier_type::signifier_link;
+		} else if (m_definition.find("above") != std::string::npos) {
+			m_sigtype = signifier_type::signifier_above;
+		} else if (m_definition.find("below") != std::string::npos) {
+			m_sigtype = signifier_type::signifier_below;
 		}
 	}
 
@@ -11721,6 +11726,28 @@ bool HumSignifier::isKernLink(void) {
 
 
 
+//////////////////////////////
+//
+// HumSignifier::isKernAbove -- Is an above signifier.
+//
+
+bool HumSignifier::isKernAbove(void) {
+	return (m_sigtype == signifier_type::signifier_above);
+}
+
+
+
+//////////////////////////////
+//
+// HumSignifier::isKernBelow -- Is a below signifier.
+//
+
+bool HumSignifier::isKernBelow(void) {
+	return (m_sigtype == signifier_type::signifier_below);
+}
+
+
+
 
 //////////////////////////////
 //
@@ -11776,6 +11803,10 @@ bool HumSignifiers::addSignifier(const std::string& rdfline) {
 
 	if (m_signifiers.back()->isKernLink()) {
 		m_kernLinkIndex = (int)m_signifiers.size() - 1;
+	} else if (m_signifiers.back()->isKernAbove()) {
+		m_kernAboveIndex = (int)m_signifiers.size() - 1;
+	} else if (m_signifiers.back()->isKernBelow()) {
+		m_kernBelowIndex = (int)m_signifiers.size() - 1;
 	}
 	return true;
 }
@@ -11803,6 +11834,56 @@ std::string HumSignifiers::getKernLinkSignifier(void) {
 		return "";
 	}
 	return m_signifiers[m_kernLinkIndex]->getSignifier();
+}
+
+
+
+//////////////////////////////
+//
+// HumSignifiers::hasKernAboveSignifier --
+//
+
+bool HumSignifiers::hasKernAboveSignifier(void) {
+	return (m_kernAboveIndex >= 0);
+}
+
+
+
+//////////////////////////////
+//
+// HumSignifiers::getKernAboveSignifier --
+//
+
+std::string HumSignifiers::getKernAboveSignifier(void) {
+	if (m_kernAboveIndex < 0) {
+		return "";
+	}
+	return m_signifiers[m_kernAboveIndex]->getSignifier();
+}
+
+
+
+//////////////////////////////
+//
+// HumSignifiers::hasKernBelowSignifier --
+//
+
+bool HumSignifiers::hasKernBelowSignifier(void) {
+	return (m_kernBelowIndex >= 0);
+}
+
+
+
+//////////////////////////////
+//
+// HumSignifiers::getKernBelowSignifier --
+//
+
+std::string HumSignifiers::getKernBelowSignifier(void) {
+	if (m_kernBelowIndex < 0) {
+		return "";
+	}
+	return m_signifiers[m_kernBelowIndex]->getSignifier();
 }
 
 
@@ -15340,6 +15421,325 @@ void HumdrumFileContent::getMetricLevels(vector<double>& output,
 		}
 	}
 }
+
+
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::analyzeCrossStaffStemDirections -- Calculate stem directions
+//    for notes that are cross-staff, and the notes in the presence of cross-staff
+//    notes.
+//
+
+void HumdrumFileContent::analyzeCrossStaffStemDirections(void) {
+	string above = this->getKernAboveSignifier();
+	string below = this->getKernBelowSignifier();
+
+	if (above.empty() && below.empty()) {
+		// no cross staff notes present in data
+		return;
+	}
+
+	vector<HTp> kernstarts = getKernSpineStartList();
+	for (int i=0; i<(int)kernstarts.size(); i++) {
+		analyzeCrossStaffStemDirections(kernstarts[i]);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::analyzeCrossStaffStemDirections -- Check for cross-staff
+//     notes, and assign stems if they do not have any.  Also assign stems to
+//     notes in the target directory if there is only one layer active on that staff.
+//
+
+void HumdrumFileContent::analyzeCrossStaffStemDirections(HTp kernstart) {
+	if (!kernstart) {
+		return;
+	}
+	if (!kernstart->isKern()) {
+		return;
+	}
+	string above = this->getKernAboveSignifier();
+	string below = this->getKernBelowSignifier();
+	if (above.empty() && below.empty()) {
+		// no cross staff notes present in data
+		return;
+	}
+
+	HTp current = kernstart;
+	while (current) {
+		if (current->isData()) {
+			checkCrossStaffStems(current, above, below);
+		}
+		current = current->getNextToken();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::checkCrossStaffStems -- Check all notes in all
+//     sub-spines of the current token (which should be in the top layer)
+//     for cross-staff assignment.
+//
+
+void HumdrumFileContent::checkCrossStaffStems(HTp token, string& above, string& below) {
+	int track = token->getTrack();
+
+	HTp current = token;
+	while (current) {
+		int ttrack = current->getTrack();
+		if (ttrack != track) {
+			break;
+		}
+		checkDataForCrossStaffStems(current, above, below);
+		current = current->getNextFieldToken();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::checkDataForCrossStaffStems -- Check a note or chord for
+//    cross staff
+//
+
+void HumdrumFileContent::checkDataForCrossStaffStems(HTp token, string& above, string& below) {
+	if (token->isNull()) {
+		return;
+	}
+	if (token->isRest()) {
+		// deal with cross-staff rests later
+		return;
+	}
+
+	if (token->find('/') != std::string::npos) {
+		// has a stem-up marker, so do not try to adjust stems;
+		return;
+	}
+
+	if (token->find('\\') != std::string::npos) {
+		// has a stem-down marker, so do not try to adjust stems;
+		return;
+	}
+
+
+	HumRegex hre;
+	bool hasaboveQ = false;
+	bool hasbelowQ = false;
+
+	if (!above.empty()) {
+		string searchstring = "[A-Ga-g]+[#n-]*" + above;
+		if (hre.search(*token, searchstring)) {
+			// note/chord has staff-above signifier
+			hasaboveQ = true;
+		}
+	}
+
+	if (!below.empty()) {
+		string searchstring = "[A-Ga-g]+[#n-]*" + below;
+		if (hre.search(*token, searchstring)) {
+			// note/chord has staff-below signifier
+			hasbelowQ = true;
+		}
+	}
+
+	if (!(hasaboveQ || hasbelowQ)) {
+		// no above/below signifier, so nothing to do
+		return;
+	}
+	if (hasaboveQ && hasbelowQ) {
+		// strange complication of above and below, so ignore
+		return;
+	}
+
+	if (hasaboveQ) {
+		prepareStaffAboveNoteStems(token);
+	} else if (hasbelowQ) {
+		prepareStaffBelowNoteStems(token);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::prepareStaffAboveNoteStems --
+//
+
+void HumdrumFileContent::prepareStaffAboveNoteStems(HTp token) {
+	token->setValue("auto", "stem.dir", "-1");
+	int track = token->getTrack();
+	HTp curr = token->getNextFieldToken();
+	int ttrack;
+
+	// Find the next higher **kern spine (if any):
+	while (curr) {
+		ttrack = curr->getTrack();
+		if (!curr->isKern()) {
+			curr = curr->getNextFieldToken();
+			continue;
+		}
+		if (ttrack == track) {
+			curr = curr->getNextFieldToken();
+			continue;
+		}
+		// is kern data and in a different spine
+		break;
+	}
+	if (!curr) {
+		// no higher staff of **kern data.
+		return;
+	}
+	if (!curr->isKern()) {
+		// something strange happened
+		return;
+	}
+	HumNum endtime = token->getDurationFromStart() + token->getDuration();
+	HTp curr2 = curr;
+	while (curr2) {
+		if (curr2->getDurationFromStart() <= endtime) {
+			// exceeded the duration of the cross-staff note, so stop looking
+			break;
+		}
+		if (!curr2->isData()) {
+			// ignore non-data tokens
+			curr2 = curr2->getNextToken();
+			continue;
+		}
+		if (curr2->isNull()) {
+			curr2 = curr2->getNextToken();
+			continue;
+		}
+		if (curr2->isRest()) {
+			// ignore rests
+			curr2 = curr2->getNextToken();
+			continue;
+		}
+		if (!curr2->isNote()) {
+			curr2 = curr2->getNextToken();
+			continue;
+		}
+		if ((curr2->find('/') != std::string::npos) || (curr2->find('\\') != std::string::npos)) {
+			// the note/chord has a stem direction, so ignore it
+			curr2 = curr2->getNextToken();
+			continue;
+		}
+		int layer = curr2->getSubtrack();
+		// layer != 0 means there is more than one active layer at this point in the
+		// above staff.  If so, then do not assign any stem directions.
+		if (layer != 0) {
+			curr2 = curr2->getNextToken();
+			continue;
+		}
+		// set the stem to up for the current note/chord
+		curr2->setValue("auto", "stem.dir", "1");
+		curr2 = curr2->getNextToken();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::prepareStaffAboveNoteStems --
+//
+
+void HumdrumFileContent::prepareStaffBelowNoteStems(HTp token) {
+	token->setValue("auto", "stem.dir", "1");
+	int track = token->getTrack();
+	HTp curr = token->getPreviousFieldToken();
+	int ttrack;
+
+	// Find the next lower **kern spine (if any):
+	while (curr) {
+		ttrack = curr->getTrack();
+		if (!curr->isKern()) {
+			curr = curr->getPreviousFieldToken();
+			continue;
+		}
+		if (ttrack == track) {
+			curr = curr->getPreviousFieldToken();
+			continue;
+		}
+		// is kern data and in a different spine
+		break;
+	}
+	if (!curr) {
+		// no lower staff of **kern data.
+		return;
+	}
+	if (!curr->isKern()) {
+		// something strange happened
+		return;
+	}
+
+	// Find the first subtrack of the identified spine
+	int targettrack = curr->getTrack();
+	while (curr) {
+		HTp ptok = curr->getPreviousToken();
+		if (!ptok) {
+			break;
+		}
+		ttrack = ptok->getTrack();
+		if (targettrack != ttrack) {
+			break;
+		}
+		curr = ptok;
+		ptok = curr->getPreviousToken();
+	}
+	// Should now be at the first subtrack of the target staff.
+
+	HumNum endtime = token->getDurationFromStart() + token->getDuration();
+	HTp curr2 = curr;
+	while (curr2) {
+		if (curr2->getDurationFromStart() <= endtime) {
+			// exceeded the duration of the cross-staff note, so stop looking
+			break;
+		}
+		if (!curr2->isData()) {
+			// ignore non-data tokens
+			curr2 = curr2->getNextToken();
+			continue;
+		}
+		if (curr2->isNull()) {
+			curr2 = curr2->getNextToken();
+			continue;
+		}
+		if (curr2->isRest()) {
+			// ignore rests
+			curr2 = curr2->getNextToken();
+			continue;
+		}
+		if (!curr2->isNote()) {
+			curr2 = curr2->getNextToken();
+			continue;
+		}
+		if ((curr2->find('/') != std::string::npos) || (curr2->find('\\') != std::string::npos)) {
+			// the note/chord has a stem direction, so ignore it
+			curr2 = curr2->getNextToken();
+			continue;
+		}
+		int layer = curr2->getSubtrack();
+		// layer != 0 means there is more than one active layer at this point in the
+		// above staff.  If so, then do not assign any stem directions.
+		if (layer != 0) {
+			curr2 = curr2->getNextToken();
+			continue;
+		}
+		// set the stem to up for the current note/chord
+		curr2->setValue("auto", "stem.dir", "-1");
+		curr2 = curr2->getNextToken();
+	}
+}
+
 
 
 
@@ -18917,6 +19317,32 @@ void HumdrumFileStructure::analyzeSignifiers(void) {
 
 std::string HumdrumFileStructure::getKernLinkSignifier(void) {
 	return m_signifiers.getKernLinkSignifier();
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileStructure::getKernAboveSignifier -- used to place things
+//     "above" (note on staff above, slurs/ties with an "above" orientation,
+//     etc.
+//
+
+std::string HumdrumFileStructure::getKernAboveSignifier(void) {
+	return m_signifiers.getKernAboveSignifier();
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileStructure::getKernBelowSignifier -- used to place things
+//     "below" (note on staff above, slurs/ties with an "below" orientation,
+//     etc.
+//
+
+std::string HumdrumFileStructure::getKernBelowSignifier(void) {
+	return m_signifiers.getKernBelowSignifier();
 }
 
 
