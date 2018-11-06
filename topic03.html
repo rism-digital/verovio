@@ -16,7 +16,10 @@ $(".dynam" ).attr("fill", "#d00").attr("stroke", "#d00");
 
 <p>This one colors the second staff completely with color <var>Blue 2</var>.</p>
 {% highlight javascript %}
-$(".measure .staff:nth-child(2)" ).attr("fill", "#00e").attr("stroke", "#00e");
+// apply attributes to staffs that are siblings of first staff
+$(".measure .staff ~ .staff " ).attr("fill", "#00e").attr("stroke", "#00e");
+// remove attributes from staffs that are siblings to second staff
+$(".measure .staff ~ .staff ~ .staff " ).attr("fill", "#000").attr("stroke", "#000");
 {% endhighlight %}
 
 <p>In the fourth staff this will color only the staffDef glyphs, i.e. clefs, keys and meter signatures at the beginning of each line.</p>
@@ -26,7 +29,10 @@ $(".measure .staff:nth-child(4) .staffDef" ).attr("fill", "#0c0").attr("stroke",
 
 <p>Finally in the fourth staff this greys out all measures following the fourth.</p>
 {% highlight javascript %}
-$(".system .measure:gt(4) .staff:nth-child(4)").attr("fill", "#ccc").attr("stroke", "#ccc");
+// apply attributes to staffs that are siblings of third staff
+$(".system .measure:gt(4) .staff ~ .staff ~ .staff ~.staff ").attr("fill", "#ccc").attr("stroke", "#ccc");
+// remove attributes from staffs that are siblings to fourth staff
+$(".system .measure:gt(4) .staff ~ .staff ~ .staff ~ .staff ~ .staff").attr("fill", "#000").attr("stroke", "#000");
 {% endhighlight %}
 
 <p>
