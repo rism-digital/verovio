@@ -136,6 +136,58 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttBarLineVis
+//----------------------------------------------------------------------------
+
+class AttBarLineVis : public Att {
+public:
+    AttBarLineVis();
+    virtual ~AttBarLineVis();
+
+    /** Reset the default values for the attribute class **/
+    void ResetBarLineVis();
+
+    /** Read the values for the attribute class **/
+    bool ReadBarLineVis(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteBarLineVis(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetLen(double len_) { m_len = len_; }
+    double GetLen() const { return m_len; }
+    bool HasLen() const;
+    //
+    void SetMethod(data_BARMETHOD method_) { m_method = method_; }
+    data_BARMETHOD GetMethod() const { return m_method; }
+    bool HasMethod() const;
+    //
+    void SetPlace(int place_) { m_place = place_; }
+    int GetPlace() const { return m_place; }
+    bool HasPlace() const;
+    ///@}
+
+private:
+    /**
+     * States the length of barlines in virtual units.
+     * The value must be greater than 0 and is typically equal to 2 times (the number
+     * of staff lines - 1); e.g., a value of '8' for a 5-line staff.
+     **/
+    double m_len;
+    /** Indicates the method employed to mark corrections and normalizations. **/
+    data_BARMETHOD m_method;
+    /** Records the placement of the beam relative to the events it affects. **/
+    int m_place;
+
+    /* include <attplace> */
+};
+
+//----------------------------------------------------------------------------
 // AttBeamingVis
 //----------------------------------------------------------------------------
 
@@ -300,6 +352,50 @@ private:
     data_BOOLEAN m_clefVisible;
 
     /* include <attclef.visible> */
+};
+
+//----------------------------------------------------------------------------
+// AttEpisemaVis
+//----------------------------------------------------------------------------
+
+class AttEpisemaVis : public Att {
+public:
+    AttEpisemaVis();
+    virtual ~AttEpisemaVis();
+
+    /** Reset the default values for the attribute class **/
+    void ResetEpisemaVis();
+
+    /** Read the values for the attribute class **/
+    bool ReadEpisemaVis(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteEpisemaVis(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetForm(episemaVis_FORM form_) { m_form = form_; }
+    episemaVis_FORM GetForm() const { return m_form; }
+    bool HasForm() const;
+    //
+    void SetPlace(data_EVENTREL place_) { m_place = place_; }
+    data_EVENTREL GetPlace() const { return m_place; }
+    bool HasPlace() const;
+    /** Getter for reference (for alternate type only) */
+    data_EVENTREL *GetPlaceAlternate() { return &m_place; }
+    ///@}
+
+private:
+    /** Indicates to what degree the harmonic label is supported by the notation. **/
+    episemaVis_FORM m_form;
+    /** Records the placement of the beam relative to the events it affects. **/
+    data_EVENTREL m_place;
+
+    /* include <attplace> */
 };
 
 //----------------------------------------------------------------------------
@@ -504,6 +600,52 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttHispanTickVis
+//----------------------------------------------------------------------------
+
+class AttHispanTickVis : public Att {
+public:
+    AttHispanTickVis();
+    virtual ~AttHispanTickVis();
+
+    /** Reset the default values for the attribute class **/
+    void ResetHispanTickVis();
+
+    /** Read the values for the attribute class **/
+    bool ReadHispanTickVis(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteHispanTickVis(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetPlace(data_EVENTREL place_) { m_place = place_; }
+    data_EVENTREL GetPlace() const { return m_place; }
+    bool HasPlace() const;
+    /** Getter for reference (for alternate type only) */
+    data_EVENTREL *GetPlaceAlternate() { return &m_place; }
+    //
+    void SetTilt(data_COMPASSDIRECTION tilt_) { m_tilt = tilt_; }
+    data_COMPASSDIRECTION GetTilt() const { return m_tilt; }
+    bool HasTilt() const;
+    /** Getter for reference (for alternate type only) */
+    data_COMPASSDIRECTION *GetTiltAlternate() { return &m_tilt; }
+    ///@}
+
+private:
+    /** Records the placement of the beam relative to the events it affects. **/
+    data_EVENTREL m_place;
+    /** Direction of the pen stroke. **/
+    data_COMPASSDIRECTION m_tilt;
+
+    /* include <atttilt> */
+};
+
+//----------------------------------------------------------------------------
 // AttKeySigVis
 //----------------------------------------------------------------------------
 
@@ -645,6 +787,48 @@ private:
     int m_startsymSize;
 
     /* include <attstartsym.size> */
+};
+
+//----------------------------------------------------------------------------
+// AttLiquescentVis
+//----------------------------------------------------------------------------
+
+class AttLiquescentVis : public Att {
+public:
+    AttLiquescentVis();
+    virtual ~AttLiquescentVis();
+
+    /** Reset the default values for the attribute class **/
+    void ResetLiquescentVis();
+
+    /** Read the values for the attribute class **/
+    bool ReadLiquescentVis(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteLiquescentVis(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetCurve(liquescentVis_CURVE curve_) { m_curve = curve_; }
+    liquescentVis_CURVE GetCurve() const { return m_curve; }
+    bool HasCurve() const;
+    //
+    void SetLooped(data_BOOLEAN looped_) { m_looped = looped_; }
+    data_BOOLEAN GetLooped() const { return m_looped; }
+    bool HasLooped() const;
+    ///@}
+
+private:
+    /** Records direction of curvature. **/
+    liquescentVis_CURVE m_curve;
+    /** Indicates whether curve is closed. **/
+    data_BOOLEAN m_looped;
+
+    /* include <attlooped> */
 };
 
 //----------------------------------------------------------------------------
@@ -876,171 +1060,6 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttNcVis
-//----------------------------------------------------------------------------
-
-class AttNcVis : public Att {
-public:
-    AttNcVis();
-    virtual ~AttNcVis();
-
-    /** Reset the default values for the attribute class **/
-    void ResetNcVis();
-
-    /** Read the values for the attribute class **/
-    bool ReadNcVis(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteNcVis(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetAngled(data_BOOLEAN angled_) { m_angled = angled_; }
-    data_BOOLEAN GetAngled() const { return m_angled; }
-    bool HasAngled() const;
-    //
-    void SetCon(ncVis_CON con_) { m_con = con_; }
-    ncVis_CON GetCon() const { return m_con; }
-    bool HasCon() const;
-    //
-    void SetCurved(ncVis_CURVED curved_) { m_curved = curved_; }
-    ncVis_CURVED GetCurved() const { return m_curved; }
-    bool HasCurved() const;
-    //
-    void SetDiagonalright(ncVis_DIAGONALRIGHT diagonalright_) { m_diagonalright = diagonalright_; }
-    ncVis_DIAGONALRIGHT GetDiagonalright() const { return m_diagonalright; }
-    bool HasDiagonalright() const;
-    //
-    void SetEpisema(data_BOOLEAN episema_) { m_episema = episema_; }
-    data_BOOLEAN GetEpisema() const { return m_episema; }
-    bool HasEpisema() const;
-    //
-    void SetExtended(data_BOOLEAN extended_) { m_extended = extended_; }
-    data_BOOLEAN GetExtended() const { return m_extended; }
-    bool HasExtended() const;
-    //
-    void SetFlat(data_BOOLEAN flat_) { m_flat = flat_; }
-    data_BOOLEAN GetFlat() const { return m_flat; }
-    bool HasFlat() const;
-    //
-    void SetJagged(data_BOOLEAN jagged_) { m_jagged = jagged_; }
-    data_BOOLEAN GetJagged() const { return m_jagged; }
-    bool HasJagged() const;
-    //
-    void SetLigature(data_BOOLEAN ligature_) { m_ligature = ligature_; }
-    data_BOOLEAN GetLigature() const { return m_ligature; }
-    bool HasLigature() const;
-    //
-    void SetLiquescent(data_BOOLEAN liquescent_) { m_liquescent = liquescent_; }
-    data_BOOLEAN GetLiquescent() const { return m_liquescent; }
-    bool HasLiquescent() const;
-    //
-    void SetName(ncVis_NAME name_) { m_name = name_; }
-    ncVis_NAME GetName() const { return m_name; }
-    bool HasName() const;
-    //
-    void SetOriscus(ncVis_ORISCUS oriscus_) { m_oriscus = oriscus_; }
-    ncVis_ORISCUS GetOriscus() const { return m_oriscus; }
-    bool HasOriscus() const;
-    //
-    void SetQuilisma(ncVis_QUILISMA quilisma_) { m_quilisma = quilisma_; }
-    ncVis_QUILISMA GetQuilisma() const { return m_quilisma; }
-    bool HasQuilisma() const;
-    //
-    void SetStrophicus(data_BOOLEAN strophicus_) { m_strophicus = strophicus_; }
-    data_BOOLEAN GetStrophicus() const { return m_strophicus; }
-    bool HasStrophicus() const;
-    //
-    void SetWavy(data_BOOLEAN wavy_) { m_wavy = wavy_; }
-    data_BOOLEAN GetWavy() const { return m_wavy; }
-    bool HasWavy() const;
-    ///@}
-
-private:
-    /** The shape of the neume component is angled or has a bend. **/
-    data_BOOLEAN m_angled;
-    /**
-     * Describes the symbols typically used to indicate breaks between syllables and
-     * their functions.
-     **/
-    ncVis_CON m_con;
-    /** The shape of the neume component is curved, often a half circle. **/
-    ncVis_CURVED m_curved;
-    /** The shape of the neume component is a diagonal line either going up or down. **/
-    ncVis_DIAGONALRIGHT m_diagonalright;
-    /** A line segment attached. **/
-    data_BOOLEAN m_episema;
-    /** The shape of the neume component is longer than normal. **/
-    data_BOOLEAN m_extended;
-    /** The shape of the neume component is a horizontal line segment. **/
-    data_BOOLEAN m_flat;
-    /** The shape of the neume component is jagged. **/
-    data_BOOLEAN m_jagged;
-    /** The neume component is part of a ligature. **/
-    data_BOOLEAN m_ligature;
-    /** The neume component is a liquescent. **/
-    data_BOOLEAN m_liquescent;
-    /** Name of the attribute. **/
-    ncVis_NAME m_name;
-    /** The neume component is an oriscus. **/
-    ncVis_ORISCUS m_oriscus;
-    /** The neume component is a quilisma. **/
-    ncVis_QUILISMA m_quilisma;
-    /** The neueme component is a strophicus. **/
-    data_BOOLEAN m_strophicus;
-    /** The shape of the neume component is wavy. **/
-    data_BOOLEAN m_wavy;
-
-    /* include <attwavy> */
-};
-
-//----------------------------------------------------------------------------
-// AttNeumeVis
-//----------------------------------------------------------------------------
-
-class AttNeumeVis : public Att {
-public:
-    AttNeumeVis();
-    virtual ~AttNeumeVis();
-
-    /** Reset the default values for the attribute class **/
-    void ResetNeumeVis();
-
-    /** Read the values for the attribute class **/
-    bool ReadNeumeVis(pugi::xml_node element);
-
-    /** Write the values for the attribute class **/
-    bool WriteNeumeVis(pugi::xml_node element);
-
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal
-     * to the default value)
-     **/
-    ///@{
-    void SetHispanicloop(data_BOOLEAN hispanicloop_) { m_hispanicloop = hispanicloop_; }
-    data_BOOLEAN GetHispanicloop() const { return m_hispanicloop; }
-    bool HasHispanicloop() const;
-    //
-    void SetSignificativeletters(data_BOOLEAN significativeletters_) { m_significativeletters = significativeletters_; }
-    data_BOOLEAN GetSignificativeletters() const { return m_significativeletters; }
-    bool HasSignificativeletters() const;
-    ///@}
-
-private:
-    /** --- **/
-    data_BOOLEAN m_hispanicloop;
-    /** --- **/
-    data_BOOLEAN m_significativeletters;
-
-    /* include <attsignificativeletters> */
-};
-
-//----------------------------------------------------------------------------
 // AttPbVis
 //----------------------------------------------------------------------------
 
@@ -1113,6 +1132,42 @@ private:
     pedalVis_FORM m_form;
 
     /* include <attform> */
+};
+
+//----------------------------------------------------------------------------
+// AttQuilismaVis
+//----------------------------------------------------------------------------
+
+class AttQuilismaVis : public Att {
+public:
+    AttQuilismaVis();
+    virtual ~AttQuilismaVis();
+
+    /** Reset the default values for the attribute class **/
+    void ResetQuilismaVis();
+
+    /** Read the values for the attribute class **/
+    bool ReadQuilismaVis(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteQuilismaVis(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetWaves(int waves_) { m_waves = waves_; }
+    int GetWaves() const { return m_waves; }
+    bool HasWaves() const;
+    ///@}
+
+private:
+    /** Number of "crests" of a wavy line. **/
+    int m_waves;
+
+    /* include <attwaves> */
 };
 
 //----------------------------------------------------------------------------
@@ -1225,6 +1280,44 @@ private:
     data_BOOLEAN m_restart;
 
     /* include <attrestart> */
+};
+
+//----------------------------------------------------------------------------
+// AttSignifLetVis
+//----------------------------------------------------------------------------
+
+class AttSignifLetVis : public Att {
+public:
+    AttSignifLetVis();
+    virtual ~AttSignifLetVis();
+
+    /** Reset the default values for the attribute class **/
+    void ResetSignifLetVis();
+
+    /** Read the values for the attribute class **/
+    bool ReadSignifLetVis(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteSignifLetVis(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetPlace(data_EVENTREL place_) { m_place = place_; }
+    data_EVENTREL GetPlace() const { return m_place; }
+    bool HasPlace() const;
+    /** Getter for reference (for alternate type only) */
+    data_EVENTREL *GetPlaceAlternate() { return &m_place; }
+    ///@}
+
+private:
+    /** Records the placement of the beam relative to the events it affects. **/
+    data_EVENTREL m_place;
+
+    /* include <attplace> */
 };
 
 //----------------------------------------------------------------------------
@@ -1356,9 +1449,9 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBarthru(data_BOOLEAN barthru_) { m_barthru = barthru_; }
-    data_BOOLEAN GetBarthru() const { return m_barthru; }
-    bool HasBarthru() const;
+    void SetBarThru(data_BOOLEAN barThru_) { m_barThru = barThru_; }
+    data_BOOLEAN GetBarThru() const { return m_barThru; }
+    bool HasBarThru() const;
     ///@}
 
 private:
@@ -1366,9 +1459,9 @@ private:
      * Indicates whether bar lines go across the space between staves (true) or are
      * only drawn across the lines of each staff (false).
      **/
-    data_BOOLEAN m_barthru;
+    data_BOOLEAN m_barThru;
 
-    /* include <attbarthru> */
+    /* include <attbar.thru> */
 };
 
 //----------------------------------------------------------------------------

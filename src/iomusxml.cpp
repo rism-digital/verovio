@@ -176,8 +176,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
         AttNNumberLikeComparison comparisonMeasure(MEASURE, measure->GetN());
         Measure *existingMeasure = dynamic_cast<Measure *>(section->FindChildByComparison(&comparisonMeasure, 1));
         assert(existingMeasure);
-        Object *current;
-        for (current = measure->GetFirst(); current; current = measure->GetNext()) {
+        for (auto current : *measure->GetChildren()) {
             Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
             assert(staff);
             existingMeasure->AddChild(staff);
@@ -520,7 +519,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     partStaffGrp->AddChild(instrdef);
                 }
                 partStaffGrp->SetSymbol(staffGroupingSym_SYMBOL_brace);
-                partStaffGrp->SetBarthru(BOOLEAN_true);
+                partStaffGrp->SetBarThru(BOOLEAN_true);
                 m_staffGrpStack.back()->AddChild(partStaffGrp);
             }
             else {
@@ -1652,7 +1651,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, std:
              articulations = articulations.next_sibling("articulations")) {
             Artic *artic = new Artic();
             if (articulations.select_single_node("accent")) artics.push_back(ARTICULATION_acc);
-            if (articulations.select_single_node("detached-legato")) artics.push_back(ARTICULATION_ten_stacc);
+            // Removed in MEI 4.0
+            //if (articulations.select_single_node("detached-legato")) artics.push_back(ARTICULATION_ten_stacc);
             if (articulations.select_single_node("spiccato")) artics.push_back(ARTICULATION_spicc);
             if (articulations.select_single_node("staccatissimo")) artics.push_back(ARTICULATION_stacciss);
             if (articulations.select_single_node("staccato")) artics.push_back(ARTICULATION_stacc);

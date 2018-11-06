@@ -22,6 +22,7 @@
 #include "ftrem.h"
 #include "layer.h"
 #include "layerelement.h"
+#include "measure.h"
 #include "note.h"
 #include "options.h"
 #include "smufl.h"
@@ -39,6 +40,22 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Beam *beam = dynamic_cast<Beam *>(element);
     assert(beam);
+    
+    Staff *beamStaff = staff;
+    if (beam->GetBeamWith() == OTHERSTAFF_below) {
+        beamStaff = dynamic_cast<Staff*>(measure->GetNext(staff, STAFF));
+        if (beamStaff == NULL) {
+            LogError("Cannot access staff below for beam '%s'", beam->GetUuid().c_str());
+            beamStaff = staff;
+        }
+    }
+    else if (beam->GetBeamWith() == OTHERSTAFF_above) {
+        beamStaff = dynamic_cast<Staff*>(measure->GetPrevious(staff, STAFF));
+        if (beamStaff == NULL) {
+            LogError("Cannot access staff above for beam '%s'", beam->GetUuid().c_str());
+            beamStaff = staff;
+        }
+    }
 
     // temporary coordinates
     int x1, x2, y1, y2;
@@ -68,7 +85,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /******************************************************************/
     // Calculate the beam slope and position
 
-    beam->m_drawingParams.CalcBeam(layer, staff, m_doc, beamElementCoords, elementCount);
+    beam->m_drawingParams.CalcBeam(layer, beamStaff, m_doc, beamElementCoords, elementCount);
 
     /******************************************************************/
     // Start the Beam graphic and draw the children

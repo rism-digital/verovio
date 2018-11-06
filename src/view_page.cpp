@@ -611,7 +611,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         return;
     }
 
-    if (staffGrp->GetBarthru() != BOOLEAN_true) {
+    if (staffGrp->GetBarThru() != BOOLEAN_true) {
         // recursively draw the children (staffDef or staffGrp) - we assume @barthru is false by default
         int i;
         StaffGrp *childStaffGrp = NULL;
@@ -1251,8 +1251,7 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
     assert(parent);
     assert(system);
 
-    Object *current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+    for (auto current : *parent->GetChildren()) {
         if (current->Is(MEASURE)) {
             // cast to Measure check in DrawMeasure
             DrawMeasure(dc, dynamic_cast<Measure *>(current), system);
@@ -1284,9 +1283,8 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
     assert(parent);
     assert(measure);
     assert(system);
-
-    Object *current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+    
+    for (auto current : *parent->GetChildren()) {
         if (current->Is(STAFF)) {
             // cast to Staff check in DrawStaff
             DrawStaff(dc, dynamic_cast<Staff *>(current), measure, system);
@@ -1313,8 +1311,7 @@ void View::DrawStaffChildren(DeviceContext *dc, Object *parent, Staff *staff, Me
     assert(staff);
     assert(measure);
 
-    Object *current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+    for (auto current : *parent->GetChildren()) {
         if (current->Is(LAYER)) {
             // cast to Layer check in DrawLayer
             DrawLayer(dc, dynamic_cast<Layer *>(current), staff, measure);
@@ -1337,8 +1334,7 @@ void View::DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    Object *current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+    for (auto current : *parent->GetChildren()) {
         if (current->IsLayerElement()) {
             DrawLayerElement(dc, dynamic_cast<LayerElement *>(current), layer, staff, measure);
         }
@@ -1357,8 +1353,7 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, TextDrawingParams
     assert(dc);
     assert(parent);
 
-    Object *current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+    for (auto current : *parent->GetChildren()) {
         if (current->IsTextElement()) {
             DrawTextElement(dc, dynamic_cast<TextElement *>(current), params);
         }
@@ -1377,8 +1372,7 @@ void View::DrawFbChildren(DeviceContext *dc, Object *parent, TextDrawingParams &
     assert(dc);
     assert(parent);
 
-    Object *current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+    for (auto current : *parent->GetChildren()) {
         if (current->IsTextElement()) {
             DrawTextElement(dc, dynamic_cast<TextElement *>(current), params);
         }
@@ -1397,8 +1391,7 @@ void View::DrawRunningChildren(DeviceContext *dc, Object *parent, TextDrawingPar
     assert(dc);
     assert(parent);
 
-    Object *current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
+    for (auto current : *parent->GetChildren()) {
         if (current->Is(FIG)) {
             DrawFig(dc, dynamic_cast<Fig *>(current), params);
         }

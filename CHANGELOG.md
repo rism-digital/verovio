@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 ### Added
+* Support for `@beam.with` on `<beam>`
+* Support for `@stem.pos` values "left" and "right" (@rettinghaus)
 * Support for dynamic silent staff hiding (implements `@optimize` on `<scoreDef>`)
 * Support for `<subst>` with child (`<add>`, `<del>` or `<subst>`) to be selected with `substXPathQuery`
 * Support for `<dir>` and `<dynam>` connectors (triggered with `@next` and `@extender`)

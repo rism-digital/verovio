@@ -233,7 +233,7 @@ public:
      * See Object::OptimizeScoreDef
      */
     virtual int OptimizeScoreDef(FunctorParams *functorParams);
-                    
+
     /**
      * See Object::ResetHorizontalAlignment
      */

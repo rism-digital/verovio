@@ -1310,6 +1310,7 @@ class PrepareLinkingParams : public FunctorParams {
 public:
     PrepareLinkingParams() { m_fillList = true; }
     ArrayOfLinkingInterfaceUuidPairs m_nextUuidPairs;
+    ArrayOfLinkingInterfaceUuidPairs m_sameasUuidPairs;
     bool m_fillList;
 };
 

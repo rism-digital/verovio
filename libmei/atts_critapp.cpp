@@ -72,52 +72,6 @@ bool AttCrit::HasCause() const
 
 /* include <attcause> */
 
-//----------------------------------------------------------------------------
-// AttSource
-//----------------------------------------------------------------------------
-
-AttSource::AttSource() : Att()
-{
-    ResetSource();
-}
-
-AttSource::~AttSource()
-{
-}
-
-void AttSource::ResetSource()
-{
-    m_source = "";
-}
-
-bool AttSource::ReadSource(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("source")) {
-        this->SetSource(StrToStr(element.attribute("source").value()));
-        element.remove_attribute("source");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttSource::WriteSource(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasSource()) {
-        element.append_attribute("source") = StrToStr(this->GetSource()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttSource::HasSource() const
-{
-    return (m_source != "");
-}
-
-/* include <attsource> */
-
 bool Att::SetCritapp(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_CRIT)) {
@@ -125,14 +79,6 @@ bool Att::SetCritapp(Object *element, std::string attrType, std::string attrValu
         assert(att);
         if (attrType == "cause") {
             att->SetCause(att->StrToStr(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_SOURCE)) {
-        AttSource *att = dynamic_cast<AttSource *>(element);
-        assert(att);
-        if (attrType == "source") {
-            att->SetSource(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -147,13 +93,6 @@ void Att::GetCritapp(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasCause()) {
             attributes->push_back(std::make_pair("cause", att->StrToStr(att->GetCause())));
-        }
-    }
-    if (element->HasAttClass(ATT_SOURCE)) {
-        const AttSource *att = dynamic_cast<const AttSource *>(element);
-        assert(att);
-        if (att->HasSource()) {
-            attributes->push_back(std::make_pair("source", att->StrToStr(att->GetSource())));
         }
     }
 }

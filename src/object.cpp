@@ -351,10 +351,26 @@ Object *Object::GetNext()
 
 Object *Object::GetNext(Object *child, const ClassId classId)
 {
-    m_iteratorElementType = classId;
-    m_iteratorEnd = m_children.end();
-    m_iteratorCurrent = std::find(m_children.begin(), m_iteratorEnd, child);
-    return (m_iteratorCurrent == m_iteratorEnd) ? NULL : this->GetNext();
+    ArrayOfObjects::iterator iteratorEnd, iteratorCurrent;
+    iteratorEnd = m_children.end();
+    iteratorCurrent = std::find(m_children.begin(), iteratorEnd, child);
+    if (iteratorCurrent != iteratorEnd) {
+        iteratorCurrent++;
+        iteratorCurrent = std::find_if(iteratorCurrent, iteratorEnd, ObjectComparison(classId));
+    }
+    return (iteratorCurrent == iteratorEnd) ? NULL : *iteratorCurrent;
+}
+    
+Object *Object::GetPrevious(Object *child, const ClassId classId)
+{
+    ArrayOfObjects::reverse_iterator riteratorEnd, riteratorCurrent;
+    riteratorEnd = m_children.rend();
+    riteratorCurrent = std::find(m_children.rbegin(), riteratorEnd, child);
+    if (riteratorCurrent != riteratorEnd) {
+        riteratorCurrent++;
+        riteratorCurrent = std::find_if(riteratorCurrent, riteratorEnd, ObjectComparison(classId));
+    }
+    return (riteratorCurrent == riteratorEnd) ? NULL : *riteratorCurrent;
 }
 
 Object *Object::GetLast() const
@@ -1057,12 +1073,22 @@ int Object::PrepareLinking(FunctorParams *functorParams)
         interface->InterfacePrepareLinking(functorParams, this);
     }
 
+    // @next
     std::string uuid = this->GetUuid();
     auto i = std::find_if(params->m_nextUuidPairs.begin(), params->m_nextUuidPairs.end(),
         [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
     if (i != params->m_nextUuidPairs.end()) {
         i->first->SetNextLink(this);
         params->m_nextUuidPairs.erase(i);
+    }
+    
+    // @sameas
+    std::string sameas = this->GetUuid();
+    auto j = std::find_if(params->m_sameasUuidPairs.begin(), params->m_sameasUuidPairs.end(),
+                          [uuid](std::pair<LinkingInterface *, std::string> pair) { return (pair.second == uuid); });
+    if (j != params->m_sameasUuidPairs.end()) {
+        j->first->SetSameasLink(this);
+        params->m_sameasUuidPairs.erase(j);
     }
 
     return FUNCTOR_CONTINUE;

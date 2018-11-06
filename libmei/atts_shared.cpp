@@ -410,80 +410,80 @@ bool AttBarLineLog::HasForm() const
 /* include <attform> */
 
 //----------------------------------------------------------------------------
-// AttBarPlacement
+// AttBarring
 //----------------------------------------------------------------------------
 
-AttBarPlacement::AttBarPlacement() : Att()
+AttBarring::AttBarring() : Att()
 {
-    ResetBarPlacement();
+    ResetBarring();
 }
 
-AttBarPlacement::~AttBarPlacement()
+AttBarring::~AttBarring()
 {
 }
 
-void AttBarPlacement::ResetBarPlacement()
+void AttBarring::ResetBarring()
 {
-    m_barlinelen = 0.0;
-    m_barplace = BARPLACE_NONE;
-    m_taktplace = 0;
+    m_barLen = 0.0;
+    m_barMethod = BARMETHOD_NONE;
+    m_barPlace = 0;
 }
 
-bool AttBarPlacement::ReadBarPlacement(pugi::xml_node element)
+bool AttBarring::ReadBarring(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("barlinelen")) {
-        this->SetBarlinelen(StrToDbl(element.attribute("barlinelen").value()));
-        element.remove_attribute("barlinelen");
+    if (element.attribute("bar.len")) {
+        this->SetBarLen(StrToDbl(element.attribute("bar.len").value()));
+        element.remove_attribute("bar.len");
         hasAttribute = true;
     }
-    if (element.attribute("barplace")) {
-        this->SetBarplace(StrToBarplace(element.attribute("barplace").value()));
-        element.remove_attribute("barplace");
+    if (element.attribute("bar.method")) {
+        this->SetBarMethod(StrToBarmethod(element.attribute("bar.method").value()));
+        element.remove_attribute("bar.method");
         hasAttribute = true;
     }
-    if (element.attribute("taktplace")) {
-        this->SetTaktplace(StrToInt(element.attribute("taktplace").value()));
-        element.remove_attribute("taktplace");
+    if (element.attribute("bar.place")) {
+        this->SetBarPlace(StrToInt(element.attribute("bar.place").value()));
+        element.remove_attribute("bar.place");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttBarPlacement::WriteBarPlacement(pugi::xml_node element)
+bool AttBarring::WriteBarring(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasBarlinelen()) {
-        element.append_attribute("barlinelen") = DblToStr(this->GetBarlinelen()).c_str();
+    if (this->HasBarLen()) {
+        element.append_attribute("bar.len") = DblToStr(this->GetBarLen()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasBarplace()) {
-        element.append_attribute("barplace") = BarplaceToStr(this->GetBarplace()).c_str();
+    if (this->HasBarMethod()) {
+        element.append_attribute("bar.method") = BarmethodToStr(this->GetBarMethod()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasTaktplace()) {
-        element.append_attribute("taktplace") = IntToStr(this->GetTaktplace()).c_str();
+    if (this->HasBarPlace()) {
+        element.append_attribute("bar.place") = IntToStr(this->GetBarPlace()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttBarPlacement::HasBarlinelen() const
+bool AttBarring::HasBarLen() const
 {
-    return (m_barlinelen != 0.0);
+    return (m_barLen != 0.0);
 }
 
-bool AttBarPlacement::HasBarplace() const
+bool AttBarring::HasBarMethod() const
 {
-    return (m_barplace != BARPLACE_NONE);
+    return (m_barMethod != BARMETHOD_NONE);
 }
 
-bool AttBarPlacement::HasTaktplace() const
+bool AttBarring::HasBarPlace() const
 {
-    return (m_taktplace != 0);
+    return (m_barPlace != 0);
 }
 
-/* include <atttaktplace> */
+/* include <attbar.place> */
 
 //----------------------------------------------------------------------------
 // AttBasic
@@ -2947,7 +2947,9 @@ void AttLinking::ResetLinking()
 {
     m_copyof = "";
     m_corresp = "";
+    m_follows = "";
     m_next = "";
+    m_precedes = "";
     m_prev = "";
     m_sameas = "";
     m_synch = "";
@@ -2966,9 +2968,19 @@ bool AttLinking::ReadLinking(pugi::xml_node element)
         element.remove_attribute("corresp");
         hasAttribute = true;
     }
+    if (element.attribute("follows")) {
+        this->SetFollows(StrToStr(element.attribute("follows").value()));
+        element.remove_attribute("follows");
+        hasAttribute = true;
+    }
     if (element.attribute("next")) {
         this->SetNext(StrToStr(element.attribute("next").value()));
         element.remove_attribute("next");
+        hasAttribute = true;
+    }
+    if (element.attribute("precedes")) {
+        this->SetPrecedes(StrToStr(element.attribute("precedes").value()));
+        element.remove_attribute("precedes");
         hasAttribute = true;
     }
     if (element.attribute("prev")) {
@@ -3000,8 +3012,16 @@ bool AttLinking::WriteLinking(pugi::xml_node element)
         element.append_attribute("corresp") = StrToStr(this->GetCorresp()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasFollows()) {
+        element.append_attribute("follows") = StrToStr(this->GetFollows()).c_str();
+        wroteAttribute = true;
+    }
     if (this->HasNext()) {
         element.append_attribute("next") = StrToStr(this->GetNext()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPrecedes()) {
+        element.append_attribute("precedes") = StrToStr(this->GetPrecedes()).c_str();
         wroteAttribute = true;
     }
     if (this->HasPrev()) {
@@ -3029,9 +3049,19 @@ bool AttLinking::HasCorresp() const
     return (m_corresp != "");
 }
 
+bool AttLinking::HasFollows() const
+{
+    return (m_follows != "");
+}
+
 bool AttLinking::HasNext() const
 {
     return (m_next != "");
+}
+
+bool AttLinking::HasPrecedes() const
+{
+    return (m_precedes != "");
 }
 
 bool AttLinking::HasPrev() const
@@ -5598,6 +5628,52 @@ bool AttSlurPresent::HasSlur() const
 /* include <attslur> */
 
 //----------------------------------------------------------------------------
+// AttSource
+//----------------------------------------------------------------------------
+
+AttSource::AttSource() : Att()
+{
+    ResetSource();
+}
+
+AttSource::~AttSource()
+{
+}
+
+void AttSource::ResetSource()
+{
+    m_source = "";
+}
+
+bool AttSource::ReadSource(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("source")) {
+        this->SetSource(StrToStr(element.attribute("source").value()));
+        element.remove_attribute("source");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttSource::WriteSource(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasSource()) {
+        element.append_attribute("source") = StrToStr(this->GetSource()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttSource::HasSource() const
+{
+    return (m_source != "");
+}
+
+/* include <attsource> */
+
+//----------------------------------------------------------------------------
 // AttSpacing
 //----------------------------------------------------------------------------
 
@@ -7926,19 +8002,19 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
     }
-    if (element->HasAttClass(ATT_BARPLACEMENT)) {
-        AttBarPlacement *att = dynamic_cast<AttBarPlacement *>(element);
+    if (element->HasAttClass(ATT_BARRING)) {
+        AttBarring *att = dynamic_cast<AttBarring *>(element);
         assert(att);
-        if (attrType == "barlinelen") {
-            att->SetBarlinelen(att->StrToDbl(attrValue));
+        if (attrType == "bar.len") {
+            att->SetBarLen(att->StrToDbl(attrValue));
             return true;
         }
-        if (attrType == "barplace") {
-            att->SetBarplace(att->StrToBarplace(attrValue));
+        if (attrType == "bar.method") {
+            att->SetBarMethod(att->StrToBarmethod(attrValue));
             return true;
         }
-        if (attrType == "taktplace") {
-            att->SetTaktplace(att->StrToInt(attrValue));
+        if (attrType == "bar.place") {
+            att->SetBarPlace(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -8413,8 +8489,16 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             att->SetCorresp(att->StrToStr(attrValue));
             return true;
         }
+        if (attrType == "follows") {
+            att->SetFollows(att->StrToStr(attrValue));
+            return true;
+        }
         if (attrType == "next") {
             att->SetNext(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "precedes") {
+            att->SetPrecedes(att->StrToStr(attrValue));
             return true;
         }
         if (attrType == "prev") {
@@ -8934,6 +9018,14 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
     }
+    if (element->HasAttClass(ATT_SOURCE)) {
+        AttSource *att = dynamic_cast<AttSource *>(element);
+        assert(att);
+        if (attrType == "source") {
+            att->SetSource(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_SPACING)) {
         AttSpacing *att = dynamic_cast<AttSpacing *>(element);
         assert(att);
@@ -9435,17 +9527,17 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("form", att->BarrenditionToStr(att->GetForm())));
         }
     }
-    if (element->HasAttClass(ATT_BARPLACEMENT)) {
-        const AttBarPlacement *att = dynamic_cast<const AttBarPlacement *>(element);
+    if (element->HasAttClass(ATT_BARRING)) {
+        const AttBarring *att = dynamic_cast<const AttBarring *>(element);
         assert(att);
-        if (att->HasBarlinelen()) {
-            attributes->push_back(std::make_pair("barlinelen", att->DblToStr(att->GetBarlinelen())));
+        if (att->HasBarLen()) {
+            attributes->push_back(std::make_pair("bar.len", att->DblToStr(att->GetBarLen())));
         }
-        if (att->HasBarplace()) {
-            attributes->push_back(std::make_pair("barplace", att->BarplaceToStr(att->GetBarplace())));
+        if (att->HasBarMethod()) {
+            attributes->push_back(std::make_pair("bar.method", att->BarmethodToStr(att->GetBarMethod())));
         }
-        if (att->HasTaktplace()) {
-            attributes->push_back(std::make_pair("taktplace", att->IntToStr(att->GetTaktplace())));
+        if (att->HasBarPlace()) {
+            attributes->push_back(std::make_pair("bar.place", att->IntToStr(att->GetBarPlace())));
         }
     }
     if (element->HasAttClass(ATT_BASIC)) {
@@ -9847,8 +9939,14 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         if (att->HasCorresp()) {
             attributes->push_back(std::make_pair("corresp", att->StrToStr(att->GetCorresp())));
         }
+        if (att->HasFollows()) {
+            attributes->push_back(std::make_pair("follows", att->StrToStr(att->GetFollows())));
+        }
         if (att->HasNext()) {
             attributes->push_back(std::make_pair("next", att->StrToStr(att->GetNext())));
+        }
+        if (att->HasPrecedes()) {
+            attributes->push_back(std::make_pair("precedes", att->StrToStr(att->GetPrecedes())));
         }
         if (att->HasPrev()) {
             attributes->push_back(std::make_pair("prev", att->StrToStr(att->GetPrev())));
@@ -10277,6 +10375,13 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasSlur()) {
             attributes->push_back(std::make_pair("slur", att->StrToStr(att->GetSlur())));
+        }
+    }
+    if (element->HasAttClass(ATT_SOURCE)) {
+        const AttSource *att = dynamic_cast<const AttSource *>(element);
+        assert(att);
+        if (att->HasSource()) {
+            attributes->push_back(std::make_pair("source", att->StrToStr(att->GetSource())));
         }
     }
     if (element->HasAttClass(ATT_SPACING)) {

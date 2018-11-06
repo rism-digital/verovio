@@ -209,6 +209,82 @@ bool AttArpegVis::HasLineWidth() const
 /* include <attline.width> */
 
 //----------------------------------------------------------------------------
+// AttBarLineVis
+//----------------------------------------------------------------------------
+
+AttBarLineVis::AttBarLineVis() : Att()
+{
+    ResetBarLineVis();
+}
+
+AttBarLineVis::~AttBarLineVis()
+{
+}
+
+void AttBarLineVis::ResetBarLineVis()
+{
+    m_len = 0.0;
+    m_method = BARMETHOD_NONE;
+    m_place = 0;
+}
+
+bool AttBarLineVis::ReadBarLineVis(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("len")) {
+        this->SetLen(StrToDbl(element.attribute("len").value()));
+        element.remove_attribute("len");
+        hasAttribute = true;
+    }
+    if (element.attribute("method")) {
+        this->SetMethod(StrToBarmethod(element.attribute("method").value()));
+        element.remove_attribute("method");
+        hasAttribute = true;
+    }
+    if (element.attribute("place")) {
+        this->SetPlace(StrToInt(element.attribute("place").value()));
+        element.remove_attribute("place");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttBarLineVis::WriteBarLineVis(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasLen()) {
+        element.append_attribute("len") = DblToStr(this->GetLen()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasMethod()) {
+        element.append_attribute("method") = BarmethodToStr(this->GetMethod()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPlace()) {
+        element.append_attribute("place") = IntToStr(this->GetPlace()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttBarLineVis::HasLen() const
+{
+    return (m_len != 0.0);
+}
+
+bool AttBarLineVis::HasMethod() const
+{
+    return (m_method != BARMETHOD_NONE);
+}
+
+bool AttBarLineVis::HasPlace() const
+{
+    return (m_place != 0);
+}
+
+/* include <attplace> */
+
+//----------------------------------------------------------------------------
 // AttBeamingVis
 //----------------------------------------------------------------------------
 
@@ -436,6 +512,67 @@ bool AttCleffingVis::HasClefVisible() const
 }
 
 /* include <attclef.visible> */
+
+//----------------------------------------------------------------------------
+// AttEpisemaVis
+//----------------------------------------------------------------------------
+
+AttEpisemaVis::AttEpisemaVis() : Att()
+{
+    ResetEpisemaVis();
+}
+
+AttEpisemaVis::~AttEpisemaVis()
+{
+}
+
+void AttEpisemaVis::ResetEpisemaVis()
+{
+    m_form = episemaVis_FORM_NONE;
+    m_place = data_EVENTREL();
+}
+
+bool AttEpisemaVis::ReadEpisemaVis(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("form")) {
+        this->SetForm(StrToEpisemaVisForm(element.attribute("form").value()));
+        element.remove_attribute("form");
+        hasAttribute = true;
+    }
+    if (element.attribute("place")) {
+        this->SetPlace(StrToEventrel(element.attribute("place").value()));
+        element.remove_attribute("place");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttEpisemaVis::WriteEpisemaVis(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasForm()) {
+        element.append_attribute("form") = EpisemaVisFormToStr(this->GetForm()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPlace()) {
+        element.append_attribute("place") = EventrelToStr(this->GetPlace()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttEpisemaVis::HasForm() const
+{
+    return (m_form != episemaVis_FORM_NONE);
+}
+
+bool AttEpisemaVis::HasPlace() const
+{
+    return (m_place.HasValue());
+}
+
+/* include <attplace> */
 
 //----------------------------------------------------------------------------
 // AttFTremVis
@@ -713,6 +850,67 @@ bool AttHarmVis::HasRendgrid() const
 /* include <attrendgrid> */
 
 //----------------------------------------------------------------------------
+// AttHispanTickVis
+//----------------------------------------------------------------------------
+
+AttHispanTickVis::AttHispanTickVis() : Att()
+{
+    ResetHispanTickVis();
+}
+
+AttHispanTickVis::~AttHispanTickVis()
+{
+}
+
+void AttHispanTickVis::ResetHispanTickVis()
+{
+    m_place = data_EVENTREL();
+    m_tilt = data_COMPASSDIRECTION();
+}
+
+bool AttHispanTickVis::ReadHispanTickVis(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("place")) {
+        this->SetPlace(StrToEventrel(element.attribute("place").value()));
+        element.remove_attribute("place");
+        hasAttribute = true;
+    }
+    if (element.attribute("tilt")) {
+        this->SetTilt(StrToCompassdirection(element.attribute("tilt").value()));
+        element.remove_attribute("tilt");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttHispanTickVis::WriteHispanTickVis(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasPlace()) {
+        element.append_attribute("place") = EventrelToStr(this->GetPlace()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasTilt()) {
+        element.append_attribute("tilt") = CompassdirectionToStr(this->GetTilt()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttHispanTickVis::HasPlace() const
+{
+    return (m_place.HasValue());
+}
+
+bool AttHispanTickVis::HasTilt() const
+{
+    return (m_tilt.HasValue());
+}
+
+/* include <atttilt> */
+
+//----------------------------------------------------------------------------
 // AttKeySigVis
 //----------------------------------------------------------------------------
 
@@ -939,6 +1137,67 @@ bool AttLineVis::HasStartsymSize() const
 }
 
 /* include <attstartsym.size> */
+
+//----------------------------------------------------------------------------
+// AttLiquescentVis
+//----------------------------------------------------------------------------
+
+AttLiquescentVis::AttLiquescentVis() : Att()
+{
+    ResetLiquescentVis();
+}
+
+AttLiquescentVis::~AttLiquescentVis()
+{
+}
+
+void AttLiquescentVis::ResetLiquescentVis()
+{
+    m_curve = liquescentVis_CURVE_NONE;
+    m_looped = BOOLEAN_NONE;
+}
+
+bool AttLiquescentVis::ReadLiquescentVis(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("curve")) {
+        this->SetCurve(StrToLiquescentVisCurve(element.attribute("curve").value()));
+        element.remove_attribute("curve");
+        hasAttribute = true;
+    }
+    if (element.attribute("looped")) {
+        this->SetLooped(StrToBoolean(element.attribute("looped").value()));
+        element.remove_attribute("looped");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttLiquescentVis::WriteLiquescentVis(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasCurve()) {
+        element.append_attribute("curve") = LiquescentVisCurveToStr(this->GetCurve()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasLooped()) {
+        element.append_attribute("looped") = BooleanToStr(this->GetLooped()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttLiquescentVis::HasCurve() const
+{
+    return (m_curve != liquescentVis_CURVE_NONE);
+}
+
+bool AttLiquescentVis::HasLooped() const
+{
+    return (m_looped != BOOLEAN_NONE);
+}
+
+/* include <attlooped> */
 
 //----------------------------------------------------------------------------
 // AttMensurVis
@@ -1261,323 +1520,6 @@ bool AttMultiRestVis::HasBlock() const
 /* include <attblock> */
 
 //----------------------------------------------------------------------------
-// AttNcVis
-//----------------------------------------------------------------------------
-
-AttNcVis::AttNcVis() : Att()
-{
-    ResetNcVis();
-}
-
-AttNcVis::~AttNcVis()
-{
-}
-
-void AttNcVis::ResetNcVis()
-{
-    m_angled = BOOLEAN_NONE;
-    m_con = ncVis_CON_NONE;
-    m_curved = ncVis_CURVED_NONE;
-    m_diagonalright = ncVis_DIAGONALRIGHT_NONE;
-    m_episema = BOOLEAN_NONE;
-    m_extended = BOOLEAN_NONE;
-    m_flat = BOOLEAN_NONE;
-    m_jagged = BOOLEAN_NONE;
-    m_ligature = BOOLEAN_NONE;
-    m_liquescent = BOOLEAN_NONE;
-    m_name = ncVis_NAME_NONE;
-    m_oriscus = ncVis_ORISCUS_NONE;
-    m_quilisma = ncVis_QUILISMA_NONE;
-    m_strophicus = BOOLEAN_NONE;
-    m_wavy = BOOLEAN_NONE;
-}
-
-bool AttNcVis::ReadNcVis(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("angled")) {
-        this->SetAngled(StrToBoolean(element.attribute("angled").value()));
-        element.remove_attribute("angled");
-        hasAttribute = true;
-    }
-    if (element.attribute("con")) {
-        this->SetCon(StrToNcVisCon(element.attribute("con").value()));
-        element.remove_attribute("con");
-        hasAttribute = true;
-    }
-    if (element.attribute("curved")) {
-        this->SetCurved(StrToNcVisCurved(element.attribute("curved").value()));
-        element.remove_attribute("curved");
-        hasAttribute = true;
-    }
-    if (element.attribute("diagonalright")) {
-        this->SetDiagonalright(StrToNcVisDiagonalright(element.attribute("diagonalright").value()));
-        element.remove_attribute("diagonalright");
-        hasAttribute = true;
-    }
-    if (element.attribute("episema")) {
-        this->SetEpisema(StrToBoolean(element.attribute("episema").value()));
-        element.remove_attribute("episema");
-        hasAttribute = true;
-    }
-    if (element.attribute("extended")) {
-        this->SetExtended(StrToBoolean(element.attribute("extended").value()));
-        element.remove_attribute("extended");
-        hasAttribute = true;
-    }
-    if (element.attribute("flat")) {
-        this->SetFlat(StrToBoolean(element.attribute("flat").value()));
-        element.remove_attribute("flat");
-        hasAttribute = true;
-    }
-    if (element.attribute("jagged")) {
-        this->SetJagged(StrToBoolean(element.attribute("jagged").value()));
-        element.remove_attribute("jagged");
-        hasAttribute = true;
-    }
-    if (element.attribute("ligature")) {
-        this->SetLigature(StrToBoolean(element.attribute("ligature").value()));
-        element.remove_attribute("ligature");
-        hasAttribute = true;
-    }
-    if (element.attribute("liquescent")) {
-        this->SetLiquescent(StrToBoolean(element.attribute("liquescent").value()));
-        element.remove_attribute("liquescent");
-        hasAttribute = true;
-    }
-    if (element.attribute("name")) {
-        this->SetName(StrToNcVisName(element.attribute("name").value()));
-        element.remove_attribute("name");
-        hasAttribute = true;
-    }
-    if (element.attribute("oriscus")) {
-        this->SetOriscus(StrToNcVisOriscus(element.attribute("oriscus").value()));
-        element.remove_attribute("oriscus");
-        hasAttribute = true;
-    }
-    if (element.attribute("quilisma")) {
-        this->SetQuilisma(StrToNcVisQuilisma(element.attribute("quilisma").value()));
-        element.remove_attribute("quilisma");
-        hasAttribute = true;
-    }
-    if (element.attribute("strophicus")) {
-        this->SetStrophicus(StrToBoolean(element.attribute("strophicus").value()));
-        element.remove_attribute("strophicus");
-        hasAttribute = true;
-    }
-    if (element.attribute("wavy")) {
-        this->SetWavy(StrToBoolean(element.attribute("wavy").value()));
-        element.remove_attribute("wavy");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttNcVis::WriteNcVis(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasAngled()) {
-        element.append_attribute("angled") = BooleanToStr(this->GetAngled()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasCon()) {
-        element.append_attribute("con") = NcVisConToStr(this->GetCon()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasCurved()) {
-        element.append_attribute("curved") = NcVisCurvedToStr(this->GetCurved()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasDiagonalright()) {
-        element.append_attribute("diagonalright") = NcVisDiagonalrightToStr(this->GetDiagonalright()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasEpisema()) {
-        element.append_attribute("episema") = BooleanToStr(this->GetEpisema()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasExtended()) {
-        element.append_attribute("extended") = BooleanToStr(this->GetExtended()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasFlat()) {
-        element.append_attribute("flat") = BooleanToStr(this->GetFlat()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasJagged()) {
-        element.append_attribute("jagged") = BooleanToStr(this->GetJagged()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasLigature()) {
-        element.append_attribute("ligature") = BooleanToStr(this->GetLigature()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasLiquescent()) {
-        element.append_attribute("liquescent") = BooleanToStr(this->GetLiquescent()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasName()) {
-        element.append_attribute("name") = NcVisNameToStr(this->GetName()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasOriscus()) {
-        element.append_attribute("oriscus") = NcVisOriscusToStr(this->GetOriscus()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasQuilisma()) {
-        element.append_attribute("quilisma") = NcVisQuilismaToStr(this->GetQuilisma()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasStrophicus()) {
-        element.append_attribute("strophicus") = BooleanToStr(this->GetStrophicus()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasWavy()) {
-        element.append_attribute("wavy") = BooleanToStr(this->GetWavy()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttNcVis::HasAngled() const
-{
-    return (m_angled != BOOLEAN_NONE);
-}
-
-bool AttNcVis::HasCon() const
-{
-    return (m_con != ncVis_CON_NONE);
-}
-
-bool AttNcVis::HasCurved() const
-{
-    return (m_curved != ncVis_CURVED_NONE);
-}
-
-bool AttNcVis::HasDiagonalright() const
-{
-    return (m_diagonalright != ncVis_DIAGONALRIGHT_NONE);
-}
-
-bool AttNcVis::HasEpisema() const
-{
-    return (m_episema != BOOLEAN_NONE);
-}
-
-bool AttNcVis::HasExtended() const
-{
-    return (m_extended != BOOLEAN_NONE);
-}
-
-bool AttNcVis::HasFlat() const
-{
-    return (m_flat != BOOLEAN_NONE);
-}
-
-bool AttNcVis::HasJagged() const
-{
-    return (m_jagged != BOOLEAN_NONE);
-}
-
-bool AttNcVis::HasLigature() const
-{
-    return (m_ligature != BOOLEAN_NONE);
-}
-
-bool AttNcVis::HasLiquescent() const
-{
-    return (m_liquescent != BOOLEAN_NONE);
-}
-
-bool AttNcVis::HasName() const
-{
-    return (m_name != ncVis_NAME_NONE);
-}
-
-bool AttNcVis::HasOriscus() const
-{
-    return (m_oriscus != ncVis_ORISCUS_NONE);
-}
-
-bool AttNcVis::HasQuilisma() const
-{
-    return (m_quilisma != ncVis_QUILISMA_NONE);
-}
-
-bool AttNcVis::HasStrophicus() const
-{
-    return (m_strophicus != BOOLEAN_NONE);
-}
-
-bool AttNcVis::HasWavy() const
-{
-    return (m_wavy != BOOLEAN_NONE);
-}
-
-/* include <attwavy> */
-
-//----------------------------------------------------------------------------
-// AttNeumeVis
-//----------------------------------------------------------------------------
-
-AttNeumeVis::AttNeumeVis() : Att()
-{
-    ResetNeumeVis();
-}
-
-AttNeumeVis::~AttNeumeVis()
-{
-}
-
-void AttNeumeVis::ResetNeumeVis()
-{
-    m_hispanicloop = BOOLEAN_NONE;
-    m_significativeletters = BOOLEAN_NONE;
-}
-
-bool AttNeumeVis::ReadNeumeVis(pugi::xml_node element)
-{
-    bool hasAttribute = false;
-    if (element.attribute("hispanicloop")) {
-        this->SetHispanicloop(StrToBoolean(element.attribute("hispanicloop").value()));
-        element.remove_attribute("hispanicloop");
-        hasAttribute = true;
-    }
-    if (element.attribute("significativeletters")) {
-        this->SetSignificativeletters(StrToBoolean(element.attribute("significativeletters").value()));
-        element.remove_attribute("significativeletters");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttNeumeVis::WriteNeumeVis(pugi::xml_node element)
-{
-    bool wroteAttribute = false;
-    if (this->HasHispanicloop()) {
-        element.append_attribute("hispanicloop") = BooleanToStr(this->GetHispanicloop()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasSignificativeletters()) {
-        element.append_attribute("significativeletters") = BooleanToStr(this->GetSignificativeletters()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttNeumeVis::HasHispanicloop() const
-{
-    return (m_hispanicloop != BOOLEAN_NONE);
-}
-
-bool AttNeumeVis::HasSignificativeletters() const
-{
-    return (m_significativeletters != BOOLEAN_NONE);
-}
-
-/* include <attsignificativeletters> */
-
-//----------------------------------------------------------------------------
 // AttPbVis
 //----------------------------------------------------------------------------
 
@@ -1668,6 +1610,52 @@ bool AttPedalVis::HasForm() const
 }
 
 /* include <attform> */
+
+//----------------------------------------------------------------------------
+// AttQuilismaVis
+//----------------------------------------------------------------------------
+
+AttQuilismaVis::AttQuilismaVis() : Att()
+{
+    ResetQuilismaVis();
+}
+
+AttQuilismaVis::~AttQuilismaVis()
+{
+}
+
+void AttQuilismaVis::ResetQuilismaVis()
+{
+    m_waves = 0;
+}
+
+bool AttQuilismaVis::ReadQuilismaVis(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("waves")) {
+        this->SetWaves(StrToInt(element.attribute("waves").value()));
+        element.remove_attribute("waves");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttQuilismaVis::WriteQuilismaVis(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasWaves()) {
+        element.append_attribute("waves") = IntToStr(this->GetWaves()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttQuilismaVis::HasWaves() const
+{
+    return (m_waves != 0);
+}
+
+/* include <attwaves> */
 
 //----------------------------------------------------------------------------
 // AttSbVis
@@ -1806,6 +1794,52 @@ bool AttSectionVis::HasRestart() const
 }
 
 /* include <attrestart> */
+
+//----------------------------------------------------------------------------
+// AttSignifLetVis
+//----------------------------------------------------------------------------
+
+AttSignifLetVis::AttSignifLetVis() : Att()
+{
+    ResetSignifLetVis();
+}
+
+AttSignifLetVis::~AttSignifLetVis()
+{
+}
+
+void AttSignifLetVis::ResetSignifLetVis()
+{
+    m_place = data_EVENTREL();
+}
+
+bool AttSignifLetVis::ReadSignifLetVis(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("place")) {
+        this->SetPlace(StrToEventrel(element.attribute("place").value()));
+        element.remove_attribute("place");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttSignifLetVis::WriteSignifLetVis(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasPlace()) {
+        element.append_attribute("place") = EventrelToStr(this->GetPlace()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttSignifLetVis::HasPlace() const
+{
+    return (m_place.HasValue());
+}
+
+/* include <attplace> */
 
 //----------------------------------------------------------------------------
 // AttSpaceVis
@@ -1974,15 +2008,15 @@ AttStaffGrpVis::~AttStaffGrpVis()
 
 void AttStaffGrpVis::ResetStaffGrpVis()
 {
-    m_barthru = BOOLEAN_NONE;
+    m_barThru = BOOLEAN_NONE;
 }
 
 bool AttStaffGrpVis::ReadStaffGrpVis(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("barthru")) {
-        this->SetBarthru(StrToBoolean(element.attribute("barthru").value()));
-        element.remove_attribute("barthru");
+    if (element.attribute("bar.thru")) {
+        this->SetBarThru(StrToBoolean(element.attribute("bar.thru").value()));
+        element.remove_attribute("bar.thru");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1991,19 +2025,19 @@ bool AttStaffGrpVis::ReadStaffGrpVis(pugi::xml_node element)
 bool AttStaffGrpVis::WriteStaffGrpVis(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasBarthru()) {
-        element.append_attribute("barthru") = BooleanToStr(this->GetBarthru()).c_str();
+    if (this->HasBarThru()) {
+        element.append_attribute("bar.thru") = BooleanToStr(this->GetBarThru()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttStaffGrpVis::HasBarthru() const
+bool AttStaffGrpVis::HasBarThru() const
 {
-    return (m_barthru != BOOLEAN_NONE);
+    return (m_barThru != BOOLEAN_NONE);
 }
 
-/* include <attbarthru> */
+/* include <attbar.thru> */
 
 //----------------------------------------------------------------------------
 // AttTupletVis
@@ -2138,6 +2172,22 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             return true;
         }
     }
+    if (element->HasAttClass(ATT_BARLINEVIS)) {
+        AttBarLineVis *att = dynamic_cast<AttBarLineVis *>(element);
+        assert(att);
+        if (attrType == "len") {
+            att->SetLen(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "method") {
+            att->SetMethod(att->StrToBarmethod(attrValue));
+            return true;
+        }
+        if (attrType == "place") {
+            att->SetPlace(att->StrToInt(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_BEAMINGVIS)) {
         AttBeamingVis *att = dynamic_cast<AttBeamingVis *>(element);
         assert(att);
@@ -2179,6 +2229,18 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
         }
         if (attrType == "clef.visible") {
             att->SetClefVisible(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_EPISEMAVIS)) {
+        AttEpisemaVis *att = dynamic_cast<AttEpisemaVis *>(element);
+        assert(att);
+        if (attrType == "form") {
+            att->SetForm(att->StrToEpisemaVisForm(attrValue));
+            return true;
+        }
+        if (attrType == "place") {
+            att->SetPlace(att->StrToEventrel(attrValue));
             return true;
         }
     }
@@ -2234,6 +2296,18 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             return true;
         }
     }
+    if (element->HasAttClass(ATT_HISPANTICKVIS)) {
+        AttHispanTickVis *att = dynamic_cast<AttHispanTickVis *>(element);
+        assert(att);
+        if (attrType == "place") {
+            att->SetPlace(att->StrToEventrel(attrValue));
+            return true;
+        }
+        if (attrType == "tilt") {
+            att->SetTilt(att->StrToCompassdirection(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass(ATT_KEYSIGVIS)) {
         AttKeySigVis *att = dynamic_cast<AttKeySigVis *>(element);
         assert(att);
@@ -2279,6 +2353,18 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
         }
         if (attrType == "startsym.size") {
             att->SetStartsymSize(att->StrToInt(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_LIQUESCENTVIS)) {
+        AttLiquescentVis *att = dynamic_cast<AttLiquescentVis *>(element);
+        assert(att);
+        if (attrType == "curve") {
+            att->SetCurve(att->StrToLiquescentVisCurve(attrValue));
+            return true;
+        }
+        if (attrType == "looped") {
+            att->SetLooped(att->StrToBoolean(attrValue));
             return true;
         }
     }
@@ -2346,82 +2432,6 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
             return true;
         }
     }
-    if (element->HasAttClass(ATT_NCVIS)) {
-        AttNcVis *att = dynamic_cast<AttNcVis *>(element);
-        assert(att);
-        if (attrType == "angled") {
-            att->SetAngled(att->StrToBoolean(attrValue));
-            return true;
-        }
-        if (attrType == "con") {
-            att->SetCon(att->StrToNcVisCon(attrValue));
-            return true;
-        }
-        if (attrType == "curved") {
-            att->SetCurved(att->StrToNcVisCurved(attrValue));
-            return true;
-        }
-        if (attrType == "diagonalright") {
-            att->SetDiagonalright(att->StrToNcVisDiagonalright(attrValue));
-            return true;
-        }
-        if (attrType == "episema") {
-            att->SetEpisema(att->StrToBoolean(attrValue));
-            return true;
-        }
-        if (attrType == "extended") {
-            att->SetExtended(att->StrToBoolean(attrValue));
-            return true;
-        }
-        if (attrType == "flat") {
-            att->SetFlat(att->StrToBoolean(attrValue));
-            return true;
-        }
-        if (attrType == "jagged") {
-            att->SetJagged(att->StrToBoolean(attrValue));
-            return true;
-        }
-        if (attrType == "ligature") {
-            att->SetLigature(att->StrToBoolean(attrValue));
-            return true;
-        }
-        if (attrType == "liquescent") {
-            att->SetLiquescent(att->StrToBoolean(attrValue));
-            return true;
-        }
-        if (attrType == "name") {
-            att->SetName(att->StrToNcVisName(attrValue));
-            return true;
-        }
-        if (attrType == "oriscus") {
-            att->SetOriscus(att->StrToNcVisOriscus(attrValue));
-            return true;
-        }
-        if (attrType == "quilisma") {
-            att->SetQuilisma(att->StrToNcVisQuilisma(attrValue));
-            return true;
-        }
-        if (attrType == "strophicus") {
-            att->SetStrophicus(att->StrToBoolean(attrValue));
-            return true;
-        }
-        if (attrType == "wavy") {
-            att->SetWavy(att->StrToBoolean(attrValue));
-            return true;
-        }
-    }
-    if (element->HasAttClass(ATT_NEUMEVIS)) {
-        AttNeumeVis *att = dynamic_cast<AttNeumeVis *>(element);
-        assert(att);
-        if (attrType == "hispanicloop") {
-            att->SetHispanicloop(att->StrToBoolean(attrValue));
-            return true;
-        }
-        if (attrType == "significativeletters") {
-            att->SetSignificativeletters(att->StrToBoolean(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass(ATT_PBVIS)) {
         AttPbVis *att = dynamic_cast<AttPbVis *>(element);
         assert(att);
@@ -2435,6 +2445,14 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToPedalVisForm(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_QUILISMAVIS)) {
+        AttQuilismaVis *att = dynamic_cast<AttQuilismaVis *>(element);
+        assert(att);
+        if (attrType == "waves") {
+            att->SetWaves(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -2459,6 +2477,14 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
         assert(att);
         if (attrType == "restart") {
             att->SetRestart(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_SIGNIFLETVIS)) {
+        AttSignifLetVis *att = dynamic_cast<AttSignifLetVis *>(element);
+        assert(att);
+        if (attrType == "place") {
+            att->SetPlace(att->StrToEventrel(attrValue));
             return true;
         }
     }
@@ -2497,8 +2523,8 @@ bool Att::SetVisual(Object *element, std::string attrType, std::string attrValue
     if (element->HasAttClass(ATT_STAFFGRPVIS)) {
         AttStaffGrpVis *att = dynamic_cast<AttStaffGrpVis *>(element);
         assert(att);
-        if (attrType == "barthru") {
-            att->SetBarthru(att->StrToBoolean(attrValue));
+        if (attrType == "bar.thru") {
+            att->SetBarThru(att->StrToBoolean(attrValue));
             return true;
         }
     }
@@ -2560,6 +2586,19 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("line.width", att->StrToStr(att->GetLineWidth())));
         }
     }
+    if (element->HasAttClass(ATT_BARLINEVIS)) {
+        const AttBarLineVis *att = dynamic_cast<const AttBarLineVis *>(element);
+        assert(att);
+        if (att->HasLen()) {
+            attributes->push_back(std::make_pair("len", att->DblToStr(att->GetLen())));
+        }
+        if (att->HasMethod()) {
+            attributes->push_back(std::make_pair("method", att->BarmethodToStr(att->GetMethod())));
+        }
+        if (att->HasPlace()) {
+            attributes->push_back(std::make_pair("place", att->IntToStr(att->GetPlace())));
+        }
+    }
     if (element->HasAttClass(ATT_BEAMINGVIS)) {
         const AttBeamingVis *att = dynamic_cast<const AttBeamingVis *>(element);
         assert(att);
@@ -2595,6 +2634,16 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasClefVisible()) {
             attributes->push_back(std::make_pair("clef.visible", att->BooleanToStr(att->GetClefVisible())));
+        }
+    }
+    if (element->HasAttClass(ATT_EPISEMAVIS)) {
+        const AttEpisemaVis *att = dynamic_cast<const AttEpisemaVis *>(element);
+        assert(att);
+        if (att->HasForm()) {
+            attributes->push_back(std::make_pair("form", att->EpisemaVisFormToStr(att->GetForm())));
+        }
+        if (att->HasPlace()) {
+            attributes->push_back(std::make_pair("place", att->EventrelToStr(att->GetPlace())));
         }
     }
     if (element->HasAttClass(ATT_FTREMVIS)) {
@@ -2641,6 +2690,16 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("rendgrid", att->HarmVisRendgridToStr(att->GetRendgrid())));
         }
     }
+    if (element->HasAttClass(ATT_HISPANTICKVIS)) {
+        const AttHispanTickVis *att = dynamic_cast<const AttHispanTickVis *>(element);
+        assert(att);
+        if (att->HasPlace()) {
+            attributes->push_back(std::make_pair("place", att->EventrelToStr(att->GetPlace())));
+        }
+        if (att->HasTilt()) {
+            attributes->push_back(std::make_pair("tilt", att->CompassdirectionToStr(att->GetTilt())));
+        }
+    }
     if (element->HasAttClass(ATT_KEYSIGVIS)) {
         const AttKeySigVis *att = dynamic_cast<const AttKeySigVis *>(element);
         assert(att);
@@ -2678,6 +2737,16 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         }
         if (att->HasStartsymSize()) {
             attributes->push_back(std::make_pair("startsym.size", att->IntToStr(att->GetStartsymSize())));
+        }
+    }
+    if (element->HasAttClass(ATT_LIQUESCENTVIS)) {
+        const AttLiquescentVis *att = dynamic_cast<const AttLiquescentVis *>(element);
+        assert(att);
+        if (att->HasCurve()) {
+            attributes->push_back(std::make_pair("curve", att->LiquescentVisCurveToStr(att->GetCurve())));
+        }
+        if (att->HasLooped()) {
+            attributes->push_back(std::make_pair("looped", att->BooleanToStr(att->GetLooped())));
         }
     }
     if (element->HasAttClass(ATT_MENSURVIS)) {
@@ -2733,65 +2802,6 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("block", att->BooleanToStr(att->GetBlock())));
         }
     }
-    if (element->HasAttClass(ATT_NCVIS)) {
-        const AttNcVis *att = dynamic_cast<const AttNcVis *>(element);
-        assert(att);
-        if (att->HasAngled()) {
-            attributes->push_back(std::make_pair("angled", att->BooleanToStr(att->GetAngled())));
-        }
-        if (att->HasCon()) {
-            attributes->push_back(std::make_pair("con", att->NcVisConToStr(att->GetCon())));
-        }
-        if (att->HasCurved()) {
-            attributes->push_back(std::make_pair("curved", att->NcVisCurvedToStr(att->GetCurved())));
-        }
-        if (att->HasDiagonalright()) {
-            attributes->push_back(std::make_pair("diagonalright", att->NcVisDiagonalrightToStr(att->GetDiagonalright())));
-        }
-        if (att->HasEpisema()) {
-            attributes->push_back(std::make_pair("episema", att->BooleanToStr(att->GetEpisema())));
-        }
-        if (att->HasExtended()) {
-            attributes->push_back(std::make_pair("extended", att->BooleanToStr(att->GetExtended())));
-        }
-        if (att->HasFlat()) {
-            attributes->push_back(std::make_pair("flat", att->BooleanToStr(att->GetFlat())));
-        }
-        if (att->HasJagged()) {
-            attributes->push_back(std::make_pair("jagged", att->BooleanToStr(att->GetJagged())));
-        }
-        if (att->HasLigature()) {
-            attributes->push_back(std::make_pair("ligature", att->BooleanToStr(att->GetLigature())));
-        }
-        if (att->HasLiquescent()) {
-            attributes->push_back(std::make_pair("liquescent", att->BooleanToStr(att->GetLiquescent())));
-        }
-        if (att->HasName()) {
-            attributes->push_back(std::make_pair("name", att->NcVisNameToStr(att->GetName())));
-        }
-        if (att->HasOriscus()) {
-            attributes->push_back(std::make_pair("oriscus", att->NcVisOriscusToStr(att->GetOriscus())));
-        }
-        if (att->HasQuilisma()) {
-            attributes->push_back(std::make_pair("quilisma", att->NcVisQuilismaToStr(att->GetQuilisma())));
-        }
-        if (att->HasStrophicus()) {
-            attributes->push_back(std::make_pair("strophicus", att->BooleanToStr(att->GetStrophicus())));
-        }
-        if (att->HasWavy()) {
-            attributes->push_back(std::make_pair("wavy", att->BooleanToStr(att->GetWavy())));
-        }
-    }
-    if (element->HasAttClass(ATT_NEUMEVIS)) {
-        const AttNeumeVis *att = dynamic_cast<const AttNeumeVis *>(element);
-        assert(att);
-        if (att->HasHispanicloop()) {
-            attributes->push_back(std::make_pair("hispanicloop", att->BooleanToStr(att->GetHispanicloop())));
-        }
-        if (att->HasSignificativeletters()) {
-            attributes->push_back(std::make_pair("significativeletters", att->BooleanToStr(att->GetSignificativeletters())));
-        }
-    }
     if (element->HasAttClass(ATT_PBVIS)) {
         const AttPbVis *att = dynamic_cast<const AttPbVis *>(element);
         assert(att);
@@ -2804,6 +2814,13 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->PedalVisFormToStr(att->GetForm())));
+        }
+    }
+    if (element->HasAttClass(ATT_QUILISMAVIS)) {
+        const AttQuilismaVis *att = dynamic_cast<const AttQuilismaVis *>(element);
+        assert(att);
+        if (att->HasWaves()) {
+            attributes->push_back(std::make_pair("waves", att->IntToStr(att->GetWaves())));
         }
     }
     if (element->HasAttClass(ATT_SBVIS)) {
@@ -2825,6 +2842,13 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasRestart()) {
             attributes->push_back(std::make_pair("restart", att->BooleanToStr(att->GetRestart())));
+        }
+    }
+    if (element->HasAttClass(ATT_SIGNIFLETVIS)) {
+        const AttSignifLetVis *att = dynamic_cast<const AttSignifLetVis *>(element);
+        assert(att);
+        if (att->HasPlace()) {
+            attributes->push_back(std::make_pair("place", att->EventrelToStr(att->GetPlace())));
         }
     }
     if (element->HasAttClass(ATT_SPACEVIS)) {
@@ -2856,8 +2880,8 @@ void Att::GetVisual(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_STAFFGRPVIS)) {
         const AttStaffGrpVis *att = dynamic_cast<const AttStaffGrpVis *>(element);
         assert(att);
-        if (att->HasBarthru()) {
-            attributes->push_back(std::make_pair("barthru", att->BooleanToStr(att->GetBarthru())));
+        if (att->HasBarThru()) {
+            attributes->push_back(std::make_pair("bar.thru", att->BooleanToStr(att->GetBarThru())));
         }
     }
     if (element->HasAttClass(ATT_TUPLETVIS)) {
