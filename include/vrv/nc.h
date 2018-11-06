@@ -13,8 +13,8 @@
 //----------------------------------------------------------------------------
 
 #include "atts_analytical.h"
+#include "atts_neumes.h"
 #include "atts_shared.h"
-#include "atts_visual.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "facsimileinterface.h"
@@ -38,7 +38,7 @@ class Nc : public LayerElement,
            public PositionInterface,
            public AttColor,
            public AttIntervalMelodic,
-           public AttNcVis {
+           public AttNcForm {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

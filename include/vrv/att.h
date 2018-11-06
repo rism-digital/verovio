@@ -60,6 +60,7 @@ public:
     static bool SetMei(Object *element, std::string attrType, std::string attrValue);
     static bool SetMensural(Object *element, std::string attrType, std::string attrValue);
     static bool SetMidi(Object *element, std::string attrType, std::string attrValue);
+    static bool SetNeumes(Object *element, std::string attrType, std::string attrValue);
     static bool SetPagebased(Object *element, std::string attrType, std::string attrValue);
     // static bool SetPerformance(Object *element, std::string attrType, std::string attrValue);
     static bool SetShared(Object *element, std::string attrType, std::string attrValue);
@@ -84,6 +85,7 @@ public:
     static void GetMei(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMensural(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMidi(const Object *element, ArrayOfStrAttr *attributes);
+    static void GetNeumes(const Object *element, ArrayOfStrAttr *attributes);
     static void GetPagebased(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetPerformance(const Object *element, ArrayOfStrAttr *attributes);
     static void GetShared(const Object *element, ArrayOfStrAttr *attributes);
