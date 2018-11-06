@@ -312,6 +312,7 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     Att::GetMei(this, attributes);
     Att::GetMensural(this, attributes);
     Att::GetMidi(this, attributes);
+    Att::GetNeumes(this, attributes);
     Att::GetPagebased(this, attributes);
     Att::GetShared(this, attributes);
     Att::GetVisual(this, attributes);

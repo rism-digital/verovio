@@ -579,15 +579,13 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
 
         // Set as inclinatum or virga (if necessary), or get contour for grouping
         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
-            if (it->first == "diagonalright") {
-                if (it->second == "u") {
+            if (it->first == "tilt") {
+                if (it->second == "n") {
                     data_COMPASSDIRECTION direction;
                     direction.SetBasic(COMPASSDIRECTION_basic_n);
                     nc->SetTilt(direction);
                 }
-            }
-            else if (it->first == "name") {
-                if (it->second == "inclinatum") {
+                else if (it->second == "se") {
                     data_COMPASSDIRECTION direction;
                     direction.SetExtended(COMPASSDIRECTION_extended_se);
                     nc->SetTilt(direction);
@@ -885,6 +883,8 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
     else if (Att::SetMensural(element, attrType, attrValue))
         success = true;
     else if (Att::SetMidi(element, attrType, attrValue))
+        success = true;
+    else if (Att::SetNeumes(element, attrType, attrValue))
         success = true;
     else if (Att::SetPagebased(element, attrType, attrValue))
         success = true;
