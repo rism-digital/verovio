@@ -35,6 +35,9 @@ public:
     virtual std::string GetClassName() const { return "HalfmRpt"; }
     virtual ClassId GetClassId() const { return HALFMRPT; }
     ///@}
+    
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() const { return true; }
 
     //----------//
     // Functors //
