@@ -288,7 +288,9 @@ private:
     std::string m_auth;
     /**
      * A web-accessible location of the controlled vocabulary or other authoritative
-     * source for this element or its content.
+     * source of identification or definition for this element or its content.
+     * This attribute may contain a complete URI or a partial URI which is completed by
+     * the value of the codedval attribute.
      **/
     std::string m_authUri;
 
@@ -332,22 +334,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttBarPlacement
+// AttBarring
 //----------------------------------------------------------------------------
 
-class AttBarPlacement : public Att {
+class AttBarring : public Att {
 public:
-    AttBarPlacement();
-    virtual ~AttBarPlacement();
+    AttBarring();
+    virtual ~AttBarring();
 
     /** Reset the default values for the attribute class **/
-    void ResetBarPlacement();
+    void ResetBarring();
 
     /** Read the values for the attribute class **/
-    bool ReadBarPlacement(pugi::xml_node element);
+    bool ReadBarring(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteBarPlacement(pugi::xml_node element);
+    bool WriteBarring(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -355,41 +357,35 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBarlinelen(double barlinelen_) { m_barlinelen = barlinelen_; }
-    double GetBarlinelen() const { return m_barlinelen; }
-    bool HasBarlinelen() const;
+    void SetBarLen(double barLen_) { m_barLen = barLen_; }
+    double GetBarLen() const { return m_barLen; }
+    bool HasBarLen() const;
     //
-    void SetBarplace(data_BARPLACE barplace_) { m_barplace = barplace_; }
-    data_BARPLACE GetBarplace() const { return m_barplace; }
-    bool HasBarplace() const;
+    void SetBarMethod(data_BARMETHOD barMethod_) { m_barMethod = barMethod_; }
+    data_BARMETHOD GetBarMethod() const { return m_barMethod; }
+    bool HasBarMethod() const;
     //
-    void SetTaktplace(int taktplace_) { m_taktplace = taktplace_; }
-    int GetTaktplace() const { return m_taktplace; }
-    bool HasTaktplace() const;
+    void SetBarPlace(int barPlace_) { m_barPlace = barPlace_; }
+    int GetBarPlace() const { return m_barPlace; }
+    bool HasBarPlace() const;
     ///@}
 
 private:
     /**
-     * States the length of a barline.
-     * Must be greater than 0 and less than or equal to (2 times number of staff lines)
-     * + 2, e.g., between 0 and 12 for a 5-line staff.
+     * States the length of barlines in virtual units.
+     * The value must be greater than 0 and is typically equal to 2 times (the number
+     * of staff lines - 1); e.g., a value of '8' for a 5-line staff.
      **/
-    double m_barlinelen;
-    /** Records the location of a bar line. **/
-    data_BARPLACE m_barplace;
+    double m_barLen;
+    /** Records the method of barring. **/
+    data_BARMETHOD m_barMethod;
     /**
-     * If takt bar lines are to be used, then the taktplace attribute may be used to
-     * denote the staff location of the shortened bar line.
-     * The location may include staff lines, spaces, and the spaces directly above and
-     * below the staff. The value ranges between 0 (just below the staff) to 2 * number
-     * of staff lines (directly above the staff). For example, on a 5-line staff the
-     * lines would be numbered 1,3,5,7, and 9 while the spaces would be numbered
-     * 0,2,4,6,8,10. For example, a value of '9' puts the bar line through the top line
-     * of a 5-line staff.
+     * Denotes the staff location of bar lines, if the length is non-standard; that is,
+     * not equal to 2 times (the number of staff lines - 1).
      **/
-    int m_taktplace;
+    int m_barPlace;
 
-    /* include <atttaktplace> */
+    /* include <attbar.place> */
 };
 
 //----------------------------------------------------------------------------
@@ -2258,11 +2254,11 @@ private:
     /** Describes the line style of a curve. **/
     data_LINEFORM m_lform;
     /**
-     * Describes the number of segments into which a dashed, dotted, or wavy line may
-     * be divided; a pair of space-separated values (minimum and maximum, respectively)
-     * provides a range between which a rendering system-supplied value may fall, while
-     * a single value indicates a fixed amount of space; that is, the minimum and
-     * maximum values are equal.
+     * Describes the number of segments into which a dashed or dotted line may be
+     * divided, or the number of "peaks" of a wavy line; a pair of space-separated
+     * values (minimum and maximum, respectively) provides a range between which a
+     * rendering system-supplied value may fall, while a single value indicates a fixed
+     * amount of space; that is, the minimum and maximum values are equal.
      **/
     int m_lsegs;
     /** Width of a curved line. **/
@@ -2303,9 +2299,17 @@ public:
     std::string GetCorresp() const { return m_corresp; }
     bool HasCorresp() const;
     //
+    void SetFollows(std::string follows_) { m_follows = follows_; }
+    std::string GetFollows() const { return m_follows; }
+    bool HasFollows() const;
+    //
     void SetNext(std::string next_) { m_next = next_; }
     std::string GetNext() const { return m_next; }
     bool HasNext() const;
+    //
+    void SetPrecedes(std::string precedes_) { m_precedes = precedes_; }
+    std::string GetPrecedes() const { return m_precedes; }
+    bool HasPrecedes() const;
     //
     void SetPrev(std::string prev_) { m_prev = prev_; }
     std::string GetPrev() const { return m_prev; }
@@ -2328,8 +2332,18 @@ private:
      * fashion.
      **/
     std::string m_corresp;
+    /**
+     * Points to one or more events in a user-defined collection that are known to be
+     * predecessors of the current element.
+     **/
+    std::string m_follows;
     /** Used to point to the next event(s) in a user-defined collection. **/
     std::string m_next;
+    /**
+     * Points to one or more events in a user-defined collection that are known to be
+     * successors of the current element.
+     **/
+    std::string m_precedes;
     /** Points to the previous event(s) in a user-defined collection. **/
     std::string m_prev;
     /**
@@ -4076,8 +4090,8 @@ public:
 
 private:
     /**
-     * Indicates the agent(s) responsible for some aspect of the text's creation,
-     * transcription, editing, or encoding.
+     * Indicates the agent(s) responsible for some aspect of the text's transcription,
+     * editing, or encoding.
      * Its value must point to one or more identifiers declared in the document header.
      **/
     std::string m_resp;
@@ -4233,6 +4247,46 @@ private:
     std::string m_slur;
 
     /* include <attslur> */
+};
+
+//----------------------------------------------------------------------------
+// AttSource
+//----------------------------------------------------------------------------
+
+class AttSource : public Att {
+public:
+    AttSource();
+    virtual ~AttSource();
+
+    /** Reset the default values for the attribute class **/
+    void ResetSource();
+
+    /** Read the values for the attribute class **/
+    bool ReadSource(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteSource(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetSource(std::string source_) { m_source = source_; }
+    std::string GetSource() const { return m_source; }
+    bool HasSource() const;
+    ///@}
+
+private:
+    /**
+     * Contains a list of one or more pointers indicating the sources which attest to a
+     * given reading.
+     * Each value should correspond to the ID of a
+     **/
+    std::string m_source;
+
+    /* include <attsource> */
 };
 
 //----------------------------------------------------------------------------
@@ -4772,8 +4826,8 @@ public:
 
 private:
     /**
-     * Describes the symbols typically used to indicate breaks between syllables and
-     * their functions.
+     * Connection to the previous component within the same neume; this attribute
+     * should not be used for the first component of a neume.
      **/
     sylLog_CON m_con;
     /** Records the position of a syllable within a word. **/

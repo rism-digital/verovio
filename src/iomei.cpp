@@ -1313,6 +1313,7 @@ void MeiOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *elem
     assert(element);
 
     WriteXmlId(currentNode, element);
+    WriteLinkingInterface(currentNode, element);
     element->WriteLabelled(currentNode);
     element->WriteTyped(currentNode);
     if (element->m_xAbs != VRV_UNSET) {
@@ -1372,6 +1373,7 @@ void MeiOutput::WriteBeam(pugi::xml_node currentNode, Beam *beam)
 
     WriteLayerElement(currentNode, beam);
     beam->WriteColor(currentNode);
+    beam->WriteBeamedWith(currentNode);
 }
 
 void MeiOutput::WriteBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt)
@@ -1542,7 +1544,7 @@ void MeiOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
     WritePositionInterface(currentNode, nc);
     nc->WriteColor(currentNode);
     nc->WriteIntervalMelodic(currentNode);
-    nc->WriteNcVis(currentNode);
+    nc->WriteNcForm(currentNode);
 }
 
 void MeiOutput::WriteNeume(pugi::xml_node currentNode, Neume *neume)
@@ -3926,6 +3928,7 @@ bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
     }*/ 
 
     SetMeiUuid(element, object);
+    ReadLinkingInterface(element, object);
     object->ReadLabelled(element);
     object->ReadTyped(element);
 
@@ -3983,6 +3986,7 @@ bool MeiInput::ReadBeam(Object *parent, pugi::xml_node beam)
     ReadLayerElement(beam, vrvBeam);
 
     vrvBeam->ReadColor(beam);
+    vrvBeam->ReadBeamedWith(beam);
 
     parent->AddChild(vrvBeam);
     ReadUnsupportedAttr(beam, vrvBeam);
@@ -4239,7 +4243,7 @@ bool MeiInput::ReadNc(Object *parent, pugi::xml_node nc)
     ReadPositionInterface(nc, vrvNc);
     vrvNc->ReadColor(nc);
     vrvNc->ReadIntervalMelodic(nc);
-    vrvNc->ReadNcVis(nc);
+    vrvNc->ReadNcForm(nc);
 
     parent->AddChild(vrvNc);
     return ReadLayerChildren(vrvNc, nc, vrvNc);

@@ -237,6 +237,11 @@ public:
      * Child access (generic)
      */
     Object *GetChild(int idx) const;
+    
+    /**
+     * Return a cont pointer to the children
+     */
+    const ArrayOfObjects *GetChildren() { return &m_children; }
 
     /**
      * Fill an array of pairs with all attributes and their values.
@@ -259,7 +264,15 @@ public:
     ///@{
     Object *GetFirst(const ClassId classId = UNSPECIFIED);
     Object *GetNext();
+    ///@}
+
+    /**
+     * @name Retrieving next or previous sibling of a certain type.
+     * Returns NULL is not found
+     */
+    ///@{
     Object *GetNext(Object *child, const ClassId classId = UNSPECIFIED);
+    Object *GetPrevious(Object *child, const ClassId classId = UNSPECIFIED);
     ///@}
 
     /**

@@ -8,6 +8,7 @@
 #ifndef __VRV_BEAM_H__
 #define __VRV_BEAM_H__
 
+#include "atts_cmn.h"
 #include "drawinginterface.h"
 #include "layerelement.h"
 
@@ -64,7 +65,7 @@ public:
 // Beam
 //----------------------------------------------------------------------------
 
-class Beam : public LayerElement, public ObjectListInterface, public DrawingListInterface, public AttColor {
+class Beam : public LayerElement, public ObjectListInterface, public DrawingListInterface, public AttColor, public AttBeamedWith {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

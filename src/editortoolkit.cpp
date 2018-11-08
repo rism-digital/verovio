@@ -247,10 +247,10 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
             // Dont adjust the same facsimile twice. NCs in a ligature share a single zone.
             if (element->Is(NC)) {
                 Nc *nc = dynamic_cast<Nc *>(element);
-                if (nc->GetLigature() == BOOLEAN_true) {
+                if (nc->GetLigated() == BOOLEAN_true) {
                     Neume *neume = dynamic_cast<Neume *>(nc->GetFirstParent(NEUME));
                     Nc *nextNc = dynamic_cast<Nc *>(neume->GetChild(1 + neume->GetChildIndex(element)));
-                    if (nextNc != nullptr && nextNc->GetLigature() == BOOLEAN_true && nextNc->GetZone() == nc->GetZone())
+                    if (nextNc != nullptr && nextNc->GetLigated() == BOOLEAN_true && nextNc->GetZone() == nc->GetZone())
                         ignoreFacs = true;
                 }
             }
@@ -294,7 +294,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
         }
         else if (dynamic_cast<Nc*>(neume->FindChildByType(NC))->HasFacs()) {
             std::set<Zone *> childZones;    // Sets do not contain duplicate entries
-            for (Object *child = neume->GetFirst(); child != nullptr; child = neume->GetNext()) {
+            for (Object *child = neume->GetFirst(); child != nullptr; child = neume->Object::GetNext()) {
                 FacsimileInterface *fi = child->GetFacsimileInterface();
                 if (fi != nullptr) {
                     childZones.insert(fi->GetZone());
@@ -338,7 +338,7 @@ bool EditorToolkit::Drag(std::string elementId, int x, int y, bool isChain)
             }
             else if (dynamic_cast<Nc*>(neume->FindChildByType(NC))->HasFacs()) {
                 std::set<Zone *> childZones;
-                for (Object *child = neume->GetFirst(); child != nullptr; child = neume->GetNext()) {
+                for (Object *child = neume->GetFirst(); child != nullptr; child = neume->Object::GetNext()) {
                     FacsimileInterface *fi = child->GetFacsimileInterface();
                     if (fi != nullptr) {
                         childZones.insert(fi->GetZone());
@@ -579,14 +579,16 @@ bool EditorToolkit::Insert(std::string elementType, std::string staffId, int ulx
 
         // Set as inclinatum or virga (if necessary), or get contour for grouping
         for (auto it = attributes.begin(); it != attributes.end(); ++it) {
-            if (it->first == "diagonalright") {
-                if (it->second == "u") {
-                    nc->SetDiagonalright(ncVis_DIAGONALRIGHT_u);
+            if (it->first == "tilt") {
+                if (it->second == "n") {
+                    data_COMPASSDIRECTION direction;
+                    direction.SetBasic(COMPASSDIRECTION_basic_n);
+                    nc->SetTilt(direction);
                 }
-            }
-            else if (it->first == "name") {
-                if (it->second == "inclinatum") {
-                    nc->SetName(ncVis_NAME_inclinatum);
+                else if (it->second == "se") {
+                    data_COMPASSDIRECTION direction;
+                    direction.SetExtended(COMPASSDIRECTION_extended_se);
+                    nc->SetTilt(direction);
                 }
             }
             else if (it->first == "contour") {
@@ -882,6 +884,8 @@ bool EditorToolkit::Set(std::string elementId, std::string attrType, std::string
         success = true;
     else if (Att::SetMidi(element, attrType, attrValue))
         success = true;
+    else if (Att::SetNeumes(element, attrType, attrValue))
+        success = true;
     else if (Att::SetPagebased(element, attrType, attrValue))
         success = true;
     else if (Att::SetShared(element, attrType, attrValue))
@@ -914,7 +918,7 @@ bool EditorToolkit::SetText(std::string elementId, std::string text)
     if (element->Is(SYL)) {
         Syl *syl = dynamic_cast<Syl *>(element);
         assert(syl);
-        for (Object *child = syl->GetFirst(); child != nullptr; child = syl->GetNext()) {
+        for (Object *child = syl->GetFirst(); child != nullptr; child = syl->Object::GetNext()) {
             if (child->Is(TEXT)) {
                 Text *text = dynamic_cast<Text *>(child);
                 text->SetText(wtext);
@@ -1247,8 +1251,8 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
         //only if the ligature is the entire selection
         if(groupType == "nc" && elementIds.size() == 2){
             Nc *nc = dynamic_cast<Nc *> (el);
-            if(nc->HasLigature() && nc->GetLigature() == BOOLEAN_true){
-                nc->SetLigature(BOOLEAN_false);
+            if(nc->HasLigated() && nc->GetLigated() == BOOLEAN_true){
+                nc->SetLigated(BOOLEAN_false);
                 ligCount++;
                 if(ligCount == 1){
                     firstNc = nc;
@@ -1327,7 +1331,7 @@ bool EditorToolkit::Ungroup(std::string groupType, std::vector<std::string> elem
             if (groupType == "nc") {
                 Nc *nc = dynamic_cast<Nc*>(el);
                 assert(nc);
-                if (nc->HasLigature()) continue;
+                if (nc->HasLigated()) continue;
             }
             Object *newParent = currentParent->Clone();
             assert(newParent);

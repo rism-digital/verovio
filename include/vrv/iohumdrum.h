@@ -159,6 +159,10 @@ namespace humaux {
         // layers.
         vector<bool> cue_size;
 
+        // righthalfstem == true means to place half-note stems always on right side
+        // of noteheads.  False is standard modern style.
+        bool righthalfstem;
+
         // ottavanote == keep track of ottava marks: stores the starting note of
         // an ottava line which will be turned off later.  ottavameasure == the
         // starting measure of the ottava mark.
@@ -216,6 +220,13 @@ public:
     char terminallong = '\0'; // !!!RDF**kern: l = terminal long
     vector<char> editacc; // !!!RDF**kern: i = editorial accidental
     vector<string> edittype; // !!!RDF**kern: i = editoral accidental, brack[ets]/paren[theses]
+
+    // for **dynam:
+    string cresctext; // !!!RDF**kern: > = "cresc."
+    string crescfontstyle; // !!!RDF**kern: < = "cresc." fontstyle="normal|italic|bold|bold-italic"
+    string decresctext; // !!!RDF**kern: > = "decresc."
+    string decrescfontstyle; // !!!RDF**kern: < = "decresc." fontstyle="normal|italic|bold|bold-italic"
+
     char below = '\0'; // !!!RDF**kern: < = below (previous signifier is "below")
     char above = '\0'; // !!!RDF**kern: > = above (previous signifier is "above")
 
@@ -233,6 +244,8 @@ public:
     // !!!RDF**kern: i = marked note
     std::vector<char> mark;
     std::vector<std::string> mcolor;
+    std::vector<std::string> markdir;
+
     std::vector<char> textmark;
     std::vector<std::string> textcolor;
 };
@@ -289,7 +302,7 @@ protected:
     int characterCountInSubtoken(const std::string &text, char symbol);
     bool emptyMeasures();
     bool hasFullMeasureRest(std::vector<hum::HTp> &layerdata, hum::HumNum timesigdur, hum::HumNum measuredur);
-    void convertNote(vrv::Note *note, hum::HTp token, int staffindex, int subtoken = -1);
+    void convertNote(vrv::Note *note, hum::HTp token, int staffadj, int staffindex, int subtoken = -1);
     void addCautionaryAccidental(Accid *accid, hum::HTp token, int acount);
     void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
     void processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex);
@@ -321,6 +334,8 @@ protected:
         std::vector<std::string> &elements, std::vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
     void analyzeLayerBeams(
         std::vector<int> &beamnum, std::vector<int> &gbeamnum, const std::vector<hum::HTp> &layerdata);
+    void storeBreaksec(std::vector<int> &beamstate, std::vector<int> &gbeamstate,
+        const std::vector<hum::HTp> &layerdata, bool grace = false);
     void setBeamDirection(int direction, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
         std::vector<hum::HTp> &layerdata, int layerindex, bool grace);
     void handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<std::string> &elements,
@@ -378,7 +393,7 @@ protected:
     void setNextLeftBarStyle(data_BARRENDITION style);
     void parseSignifiers(hum::HumdrumFile &infile);
     std::string getAutoClef(hum::HTp partstart, int partnumber);
-    void colorNote(vrv::Note *note, const std::string &token, int line, int field);
+    void colorNote(vrv::Note *note, hum::HTp token, const std::string &subtoken, int line, int field);
     void colorRest(vrv::Rest *rest, const std::string &token, int line, int field);
     void colorVerse(Verse *verse, std::string &token);
     std::string getSpineColor(int line, int field);
@@ -406,8 +421,8 @@ protected:
     bool leftmostStaffArpeggio(hum::HTp token);
     hum::HTp getRightmostSystemArpeggio(hum::HTp token);
     hum::HTp getRightmostStaffArpeggio(hum::HTp token);
-    void addDirection(
-        const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token, int staffindex);
+    void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
+        int staffindex, const std::string &color = "");
     void processTerminalLong(hum::HTp token);
     void removeCharacter(hum::HTp token, char removechar);
     std::string getSystemDecoration(const std::string &tag);
@@ -416,6 +431,7 @@ protected:
     bool isFirstTokenOnStaff(hum::HTp token);
     bool hasAboveParameter(hum::HTp token, const string &category);
     bool hasBelowParameter(hum::HTp token, const string &category);
+    bool hasBelowParameter(hum::HTp token, const string &category, int &output);
     void prepareHeaderFooter();
     bool prepareHeader(std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
     bool prepareFooter(std::vector<std::pair<string, string> > &biblist, std::map<std::string, std::string> &refmap);
@@ -436,6 +452,10 @@ protected:
     void setStemLength(Note *note, hum::HTp token);
     void storeExpansionLists(Section *section, hum::HTp starting);
     void storeExpansionList(Section *section, hum::HTp etok);
+    std::string replaceMusicShapes(const std::string input);
+    int getStaffAdjustment(hum::HTp token);
+    void calculateNoteIdForSlur(
+        std::string &idstring, std::vector<pair<int, int> > &sortednotes, int index);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
@@ -462,7 +482,8 @@ protected:
     void appendElement(const std::vector<std::string> &name, const std::vector<void *> &pointers, CHILD child);
     void popElementStack(std::vector<string> &elements, std::vector<void *> &pointers);
 
-    template <class ELEMENT> void addTextElement(ELEMENT *element, const std::string &content);
+    template <class ELEMENT>
+    void addTextElement(ELEMENT *element, const std::string &content, const std::string &fontstyle = "");
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
     template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
     template <class ELEMENT> void setPlace(ELEMENT *element, const std::string &place);
@@ -599,6 +620,9 @@ private:
     // converted into <harm> element in the MEI conversion.
     bool m_fb = false;
 
+    // m_setrightstem == used for setting right-side stem of half notes
+    bool m_setrightstem = false;
+
     // m_leftbarstyle is a barline left-hand style to store in the next measure.
     // When processing a measure, this variable should be checked and used
     // in @left="style" for the measure.
@@ -632,6 +656,10 @@ private:
 
     // m_traspose == transposition to go from sounding to written pitch.
     vector<int> m_transpose;
+
+    //    *kcancel     = display cancellation key signatures
+    //    *Xkcancel    = do not display cancellation key signatures (default)
+    bool m_show_cautionary_keysig = false;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
