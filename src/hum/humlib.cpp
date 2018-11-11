@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Nov  6 18:04:57 CET 2018
+// Last Modified: Sun Nov 11 23:45:12 CET 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -23247,6 +23247,70 @@ std::string HumdrumToken::getLayoutParameter(const std::string& category,
 	// also not checking validity of string first (needs to start with a digit);
 	int n = stoi(nparam);
 	if (n == subtokenindex + 1) {
+		return output;
+	} else {
+		return "";
+	}
+}
+
+
+std::string HumdrumToken::getSlurLayoutParameter(const std::string& keyname,
+		int subtokenindex) {
+	std::string category = "S";
+	std::string output;
+
+	// First check for any local layout parameter:
+	std::string testoutput = this->getValue("LO", category, keyname);
+	if (!testoutput.empty()) {
+		if (subtokenindex >= 0) {
+			int s = this->getValueInt("LO", category, "s");
+			if (s == subtokenindex + 1) {
+				return testoutput;
+			}
+		} else {
+			return testoutput;
+		}
+	}
+
+	int lcount = this->getLinkedParameterCount();
+	if (lcount == 0) {
+		return output;
+	}
+
+	std::string sparam;
+	for (int p = 0; p < this->getLinkedParameterCount(); ++p) {
+		hum::HumParamSet *hps = this->getLinkedParameter(p);
+		if (hps == NULL) {
+			continue;
+		}
+		if (hps->getNamespace1() != "LO") {
+			continue;
+		}
+		if (hps->getNamespace2() != category) {
+			continue;
+		}
+		for (int q = 0; q < hps->getCount(); ++q) {
+			string key = hps->getParameterName(q);
+			if (key == "s") {
+				sparam = hps->getParameterValue(q);
+			}
+			if (key == keyname) {
+				output = hps->getParameterValue(q);
+			}
+		}
+	}
+	if (subtokenindex < 0) {
+		// do not filter by s parameter
+		return output;
+	} else if (sparam.empty()) {
+		// parameter is not qualified by a note number, so applies to whole token
+		return output;
+	}
+
+	// currently @s requires a single value (should allow a range or multiple values later)
+	// also not checking validity of string first (needs to start with a digit);
+	int s = stoi(sparam);
+	if (s == subtokenindex + 1) {
 		return output;
 	} else {
 		return "";

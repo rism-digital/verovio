@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Nov  6 18:04:57 CET 2018
+// Last Modified: Sun Nov 11 23:45:12 CET 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1310,6 +1310,7 @@ class HumdrumToken : public std::string, public HumHash {
 		int      getLinkedParameterCount   (void);
 		HumParamSet* getLinkedParameter    (int index);
 		HumParamSet* getLinkedParameter    (void);
+		std::string getSlurLayoutParameter (const std::string& keyname, int subtokenindex = -1);
 		std::string getLayoutParameter     (const std::string& category, const std::string& keyname,
 		                                    int subtokenindex = -1);
 		std::string getLayoutParameterChord(const std::string& category,

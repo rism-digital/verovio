@@ -7229,7 +7229,12 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             setSlurLocationId(slur, slurstart, slurend, i);
 
             startmeasure->AddChild(slur);
-            setStaff(slur, m_currentstaff);
+            if (slurstart->getTrack() == slurend->getTrack()) {
+                // If the slur starts and ends on different staves,
+                // do not specify the staff attribute, but later
+                // add a list of the two staves involved.
+                setStaff(slur, m_currentstaff);
+            }
 
             if (hasAboveParameter(slurstart, "S")) {
                 slur->SetCurvedir(curvature_CURVEDIR_above);
@@ -7323,7 +7328,7 @@ void HumdrumInput::extractSlurNoteAttachmentInformation(
 
 bool HumdrumInput::getNoteState(hum::HTp token, int slurnumber)
 {
-    std::string data = token->getLayoutParameter("S", "note", slurnumber - 1);
+    std::string data = token->getSlurLayoutParameter("note", slurnumber - 1);
     if (data == "true") {
         return true;
     }
