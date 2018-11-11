@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Nov  5 16:32:23 CET 2018
+// Last Modified: Tue Nov  6 18:04:57 CET 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -15605,7 +15605,7 @@ void HumdrumFileContent::prepareStaffAboveNoteStems(HTp token) {
 	HumNum endtime = token->getDurationFromStart() + token->getDuration();
 	HTp curr2 = curr;
 	while (curr2) {
-		if (curr2->getDurationFromStart() <= endtime) {
+		if (curr2->getDurationFromStart() >= endtime) {
 			// exceeded the duration of the cross-staff note, so stop looking
 			break;
 		}
@@ -15649,7 +15649,7 @@ void HumdrumFileContent::prepareStaffAboveNoteStems(HTp token) {
 
 //////////////////////////////
 //
-// HumdrumFileContent::prepareStaffAboveNoteStems --
+// HumdrumFileContent::prepareStaffBelowNoteStems --
 //
 
 void HumdrumFileContent::prepareStaffBelowNoteStems(HTp token) {
@@ -15684,7 +15684,7 @@ void HumdrumFileContent::prepareStaffBelowNoteStems(HTp token) {
 	// Find the first subtrack of the identified spine
 	int targettrack = curr->getTrack();
 	while (curr) {
-		HTp ptok = curr->getPreviousToken();
+		HTp ptok = curr->getPreviousFieldToken();
 		if (!ptok) {
 			break;
 		}
@@ -15700,7 +15700,7 @@ void HumdrumFileContent::prepareStaffBelowNoteStems(HTp token) {
 	HumNum endtime = token->getDurationFromStart() + token->getDuration();
 	HTp curr2 = curr;
 	while (curr2) {
-		if (curr2->getDurationFromStart() <= endtime) {
+		if (curr2->getDurationFromStart() >= endtime) {
 			// exceeded the duration of the cross-staff note, so stop looking
 			break;
 		}
@@ -16586,6 +16586,7 @@ bool HumdrumFileContent::analyzeKernSlurs(void) {
 	for (int i=0; i<(int)kernspines.size(); i++) {
 		output = output && analyzeKernSlurs(kernspines[i], slurstarts, slurends, linkSignifier);
 	}
+
 	createLinkedSlurs(slurstarts, slurends);
 	return output;
 }
@@ -16738,12 +16739,16 @@ bool HumdrumFileContent::isLinkedSlurEnd(HTp token, int index, const string& pat
 			counter++;
 		}
 		if (i == 0) {
+			// Can't have linked slur at starting index in string.
 			continue;
 		}
 		if (counter != index) {
 			continue;
 		}
-		if (token->find(pattern, i - (int)pattern.size() + 1) != std::string::npos) {
+
+		int startindex = i - (int)pattern.size() + 1;
+		auto loc = token->find(pattern, startindex);
+		if ((loc != std::string::npos) && ((int)loc == startindex)) {
 			return true;
 		}
 		return false;
@@ -16790,7 +16795,6 @@ bool HumdrumFileContent::isLinkedSlurBegin(HTp token, int index, const string& p
 //
 
 void HumdrumFileContent::linkSlurEndpoints(HTp slurstart, HTp slurend) {
-cerr << "LINKING " << slurstart << " TO " << slurend << endl;
 	string durtag = "slurDuration";
 	string endtag = "slurEnd";
 	int slurEndCount = slurstart->getValueInt("auto", "slurEndCount");

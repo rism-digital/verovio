@@ -7106,6 +7106,9 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
 
     std::vector<bool> indexused(32, false);
 
+    std::vector<pair<int, bool> > slurendnoteinfo;
+    extractSlurNoteAttachmentInformation(slurendnoteinfo, slurend, ')');
+
     int endsubtokcount = slurend->getSubtokenCount();
     std::vector<int> endpitches;
     for (int i = 0; i < endsubtokcount; i++) {
@@ -7131,6 +7134,9 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
     std::vector<int> startpitches;
 
     for (int i = 0; i < (int)slurindex.size(); i++) {
+        std::vector<pair<int, bool> > slurstartnoteinfo;
+        extractSlurNoteAttachmentInformation(slurstartnoteinfo, slurstarts.at(i), '(');
+
         startsubtokcount = slurstarts[i]->getSubtokenCount();
         startpitches.clear();
         for (int j = 0; j < startsubtokcount; j++) {
@@ -7142,8 +7148,9 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
                 startpitches.push_back(hum::Convert::kernToBase7(subtok));
             }
         }
-        std::vector<pair<int, int> > startchordsorted;
+        std::vector<std::pair<int, int> > startchordsorted;
         startchordsorted.reserve(startsubtokcount);
+
         pair<int, int> v;
         for (int i = 0; i < startsubtokcount; i++) {
             v.first = startpitches[i];
@@ -7154,6 +7161,10 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
 
         for (int j = 0; j < (int)slurindex[i].size(); j++) {
             hum::HTp slurstart = slurstarts[slurindex[i][j]];
+
+            std::vector<pair<int, bool> > slurstartnoteinfo;
+            extractSlurNoteAttachmentInformation(slurstartnoteinfo, slurstart, '(');
+
             if (!slurstart) {
                 // should never occur...
                 return;
@@ -7195,9 +7206,27 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
                 }
             }
 
+            if (slurendnoteinfo.at(i).second) {
+                if (endid.find("chord") != std::string::npos) {
+                    hum::HumRegex hre;
+                    hre.replaceDestructive(endid, "note", "chord");
+                    endid += "S";
+                    endid += to_string(slurendnoteinfo[i].first + 1);
+                }
+            }
+
+            if (slurstartnoteinfo.at(j).second) {
+                if (startid.find("chord") != std::string::npos) {
+                    hum::HumRegex hre;
+                    hre.replaceDestructive(startid, "note", "chord");
+                    startid += "S";
+                    startid += to_string(slurstartnoteinfo[i].first + 1);
+                }
+            }
+
             slur->SetEndid("#" + endid);
             slur->SetStartid("#" + startid);
-            setSlurLocationId(slur, slurstart, slurend, j);
+            setSlurLocationId(slur, slurstart, slurend, i);
 
             startmeasure->AddChild(slur);
             setStaff(slur, m_currentstaff);
@@ -7246,6 +7275,60 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
                 }
             }
         }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::extractSlurNoteAttachmentInformation --
+//   Vector indexed by slur (open or close depending on slurtype) with data being the subtoken number and
+//   boolean for attached to note instead of chord.
+//
+
+void HumdrumInput::extractSlurNoteAttachmentInformation(
+    std::vector<std::pair<int, bool> > &data, hum::HTp token, char slurtype)
+{
+    // slurtype == '(' for slur start
+    // slurtype == ')' for slur end
+    data.clear();
+    int subtokindex = 0;
+    int slurnumber = 0;
+    int toksize = (int)token->size();
+    bool notestate;
+    for (int i = 0; i < toksize; i++) {
+        if (token->at(i) == ' ') {
+            subtokindex++;
+        }
+        else if (token->at(i) == ')') {
+            slurnumber++;
+            if (slurtype == ')') {
+                notestate = getNoteState(token, slurnumber);
+                data.emplace_back(std::make_pair(subtokindex, notestate));
+            }
+        }
+        else if (token->at(i) == '(') {
+            slurnumber++;
+            if (slurtype == '(') {
+                notestate = getNoteState(token, slurnumber);
+                data.emplace_back(std::make_pair(subtokindex, notestate));
+            }
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getNoteState -- Return any slur attachment to a note parameter in a layout command for slurs.
+//
+
+bool HumdrumInput::getNoteState(hum::HTp token, int slurnumber)
+{
+    std::string data = token->getLayoutParameter("S", "note", slurnumber - 1);
+    if (data == "true") {
+        return true;
+    }
+    else {
+        return false;
     }
 }
 
@@ -12865,7 +12948,7 @@ void HumdrumInput::setSlurLocationId(Object *object, hum::HTp slurstart, hum::HT
         std::vector<int> index2(count2, 0);
         int counter;
 
-        if (count1 > 0) {
+        if (count1 > 1) {
             counter = 0;
             for (int i = 0; i < count1; ++i) {
                 std::string param = "slurEnd";
@@ -12879,7 +12962,7 @@ void HumdrumInput::setSlurLocationId(Object *object, hum::HTp slurstart, hum::HT
             }
         }
 
-        if (count2 > 0) {
+        if (count2 > 1) {
             counter = 0;
             for (int i = 0; i < count2; ++i) {
                 std::string param = "slurStart";
@@ -12900,9 +12983,11 @@ void HumdrumInput::setSlurLocationId(Object *object, hum::HTp slurstart, hum::HT
         }
     }
 
-    if (num1 > 0) {
-        id += "N";
-        id += to_string(num1);
+    if (count1 > 1) {
+        if (num1 > 0) {
+            id += "N";
+            id += to_string(num1);
+        }
     }
 
     int endline = slurend->getLineNumber();
@@ -12913,9 +12998,11 @@ void HumdrumInput::setSlurLocationId(Object *object, hum::HTp slurstart, hum::HT
     id += "F";
     id += to_string(endfield);
 
-    if (num2 > 0) {
-        id += "N";
-        id += to_string(num2);
+    if (count2 > 1) {
+        if (num2 > 0) {
+            id += "N";
+            id += to_string(num2);
+        }
     }
 
     object->SetUuid(id);
