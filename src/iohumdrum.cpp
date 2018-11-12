@@ -7205,8 +7205,6 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             if (slurindex[i].size() > 1) {
                 if (endpitches.size() > 1) {
                     calculateNoteIdForSlur(endid, endchordsorted, j);
-                    if (endchordsorted.size() >= 2) {
-                    }
                 }
                 if (startpitches.size() > 1) {
                     calculateNoteIdForSlur(startid, startchordsorted, j);
