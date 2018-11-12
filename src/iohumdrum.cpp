@@ -13191,16 +13191,24 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
         if (hre.search(value, "color\\s*=\\s*\"?([^\"\\s]+)\"?")) {
             m_signifiers.mark.push_back(signifier);
             m_signifiers.mcolor.push_back(hre.getMatch(1));
+
+            if (hre.search(value, "text\\s*=\\s*\"?([^\"]+)\"?")) {
+                m_signifiers.markdir.push_back(hre.getMatch(1));
+            }
+            else {
+                m_signifiers.markdir.push_back("");
+            }
         }
         else if (hre.search(value, "marked note|matched note")) {
             m_signifiers.mark.push_back(signifier);
             m_signifiers.mcolor.push_back("red");
-        }
-        if (hre.search(value, "text\\s*=\\s*\"?([^\"]+)\"?")) {
-            m_signifiers.markdir.push_back(hre.getMatch(1));
-        }
-        else {
-            m_signifiers.markdir.push_back("");
+
+            if (hre.search(value, "text\\s*=\\s*\"?([^\"]+)\"?")) {
+                m_signifiers.markdir.push_back(hre.getMatch(1));
+            }
+            else {
+                m_signifiers.markdir.push_back("");
+            }
         }
     }
 }
