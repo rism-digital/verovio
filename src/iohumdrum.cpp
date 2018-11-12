@@ -7077,13 +7077,11 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
         return;
     }
 
-    std::vector<hum::HTp> slurstarts;
-    std::vector<std::vector<int> > slurindex;
-
     // slurstarts contains a list of the correctly paired slurs
     // attached to the note/chord.  Deal with unopened slurs
     // here later (such as an excerpt of music where the opening
     // of the slur is not present in the data).
+    std::vector<hum::HTp> slurstarts;
     for (int i = 0; i < startcount; i++) {
         hum::HTp tok;
         tok = slurend->getSlurStartToken(i + 1);
@@ -7091,9 +7089,11 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             slurstarts.push_back(tok);
         }
     }
+
     // slurindex contains a list of the indexes into slurstarts,
     // with all identical slur starts placed on the first
     // position that the note/chord is found in the slurstarts list.
+    std::vector<std::vector<int> > slurindex;
     slurindex.resize(slurstarts.size());
     for (int i = 0; i < (int)slurstarts.size(); i++) {
         for (int j = 0; j <= i; j++) {
@@ -7189,7 +7189,12 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             std::string endid = slurend->getValue("MEI", "xml:id");
 
             if (startid == "") {
-                startid = "note-L";
+                if (slurstart->isChord()) {
+                    startid = "chord-L";
+                }
+                else {
+                    startid = "note-L";
+                }
                 startid += to_string(slurstart->getLineNumber());
                 startid += "F";
                 startid += to_string(slurstart->getFieldNumber());
@@ -7200,6 +7205,8 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             if (slurindex[i].size() > 1) {
                 if (endpitches.size() > 1) {
                     calculateNoteIdForSlur(endid, endchordsorted, j);
+                    if (endchordsorted.size() >= 2) {
+                    }
                 }
                 if (startpitches.size() > 1) {
                     calculateNoteIdForSlur(startid, startchordsorted, j);
@@ -7226,7 +7233,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
 
             slur->SetEndid("#" + endid);
             slur->SetStartid("#" + startid);
-            setSlurLocationId(slur, slurstart, slurend, i);
+            setSlurLocationId(slur, slurstart, slurend, j);
 
             startmeasure->AddChild(slur);
             if (slurstart->getTrack() == slurend->getTrack()) {
@@ -7244,11 +7251,28 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
             }
 
             std::string eid = slurend->getValue("auto", "id");
-            int slurindex = getSlurEndIndex(slurstart, eid, indexused);
-            if (slurindex < 0) {
+            int sluridx = getSlurEndIndex(slurstart, eid, indexused);
+            if (sluridx < 0) {
                 continue;
             }
-            indexused.at(slurindex) = true;
+            indexused.at(sluridx) = true;
+
+            // Calculate if the slur should be forced above or below
+            // this is the case for doubly slured chords.  Only the first
+            // two slurs between a pair of notes/chords will be oriented
+            // (other slurs will need to be manually adjusted and probably
+            // linked to individual notes to avoid overstriking the first
+            // two slurs.
+            if (slurindex[i].size() >= 2) {
+                if (slurstarts[slurindex[i][0]] == slurstarts[slurindex[i][1]]) {
+                    if (j == 0) {
+                        slur->SetCurvedir(curvature_CURVEDIR_above);
+                    }
+                    else {
+                        slur->SetCurvedir(curvature_CURVEDIR_below);
+                    }
+                }
+            }
 
             if (m_signifiers.above) {
                 int count = -1;
@@ -7256,7 +7280,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
                     if (slurstart->at(k) == '(') {
                         count++;
                     }
-                    if (count == slurindex) {
+                    if (count == sluridx) {
                         if (slurstart->at(k + 1) == m_signifiers.above) {
                             slur->SetCurvedir(curvature_CURVEDIR_above);
                         }
@@ -7271,7 +7295,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
                     if (slurstart->at(k) == '(') {
                         count++;
                     }
-                    if (count == slurindex) {
+                    if (count == sluridx) {
                         if (slurstart->at(k + 1) == m_signifiers.below) {
                             slur->SetCurvedir(curvature_CURVEDIR_below);
                         }
@@ -7346,32 +7370,39 @@ void HumdrumInput::calculateNoteIdForSlur(std::string &idstring, std::vector<pai
 {
     int notecount = sortednotes.size();
     hum::HumRegex hre;
-    hre.replaceDestructive(idstring, "note-", "chord-");
-    int position = 0;
+    if (notecount == 1) {
+        hre.replaceDestructive(idstring, "note-", "chord-");
+    }
 
-    // odd:
-    // input (index):    0 1 2 3 4
-    // output       :    0 2 4 3 1
-    // even:
-    // input (index):    0 1 2 3
-    // output       :    0 2 3 1
+    /* Not attaching multiple slurs to note anymore, but leaving code
+            here in case there is a later need for it:
 
-    if (index < (notecount + 1) / 2) {
-        position = index * 2;
-    }
-    else {
-        position = (notecount - index) * 2 - 1;
-    }
-    if (position < 0) {
-        position += 100 * notecount;
-        position %= notecount;
-    }
-    int subtoken = sortednotes.at(position).second;
-    // collapse cases where there are more slurs than notes:
-    subtoken = subtoken % notecount;
-    // offset from 1 instead of 0:
-    subtoken++;
-    idstring += "S" + to_string(subtoken);
+        int position = 0;
+
+        // odd:
+        // input (index):    0 1 2 3 4
+        // output       :    0 2 4 3 1
+        // even:
+        // input (index):    0 1 2 3
+        // output       :    0 2 3 1
+
+        if (index < (notecount + 1) / 2) {
+            position = index * 2;
+        }
+        else {
+            position = (notecount - index) * 2 - 1;
+        }
+        if (position < 0) {
+            position += 100 * notecount;
+            position %= notecount;
+        }
+        int subtoken = sortednotes.at(position).second;
+        // collapse cases where there are more slurs than notes:
+        subtoken = subtoken % notecount;
+        // offset from 1 instead of 0:
+        subtoken++;
+        idstring += "S" + to_string(subtoken);
+    */
 }
 
 /////////////////////////////
