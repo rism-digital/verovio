@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Nov 14 00:12:09 CET 2018
+// Last Modified: Wed Nov 14 17:32:44 CET 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2465,7 +2465,7 @@ string Convert::durationToRecip(HumNum duration, HumNum scale) {
 	// so assume that it is not simple:
 	string output = to_string(duration.getDenominator());
 	output += "%";
-	output = to_string(duration.getNumerator());
+	output += to_string(duration.getNumerator());
 	return output;
 }
 
