@@ -6242,6 +6242,21 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
     setLocationId(dir, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
     dir->SetTstamp(tstamp.getFloat());
+
+    bool problemQ = false;
+    std::string problem = token->getLayoutParameter("TX", "problem");
+    if (problem == "true") {
+        problemQ = true;
+        dir->SetType("problem");
+    }
+
+    std::string typevalue = token->getLayoutParameter("TX", "type");
+    if (!typevalue.empty()) {
+        dir->SetType(typevalue);
+    }
+
+    std::string tcolor = token->getLayoutParameter("TX", "color");
+
     m_measure->AddChild(dir);
     if (placement == "above") {
         setPlace(dir, "above");
@@ -6251,8 +6266,14 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
     }
     if ((!italic) || bold) {
         Rend *rend = new Rend;
-        if (!color.empty()) {
+        if (!tcolor.empty()) {
+            rend->SetColor(tcolor);
+        }
+        else if (!color.empty()) {
             rend->SetColor(color);
+        }
+        else if (problemQ) {
+            rend->SetColor("red");
         }
         dir->AddChild(rend);
         addTextElement(rend, text);
