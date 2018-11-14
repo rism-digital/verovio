@@ -6569,7 +6569,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 hum::HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
                 hum::HumNum tstamp2 = getMeasureTstamp(endtok, staffindex);
                 if (endline || (endtok->find("[[") != std::string::npos)) {
-                    tstamp2 += endtok->getLine()->getDuration();
+                    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+                    hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
+                    tstamp2 += endtok->getLine()->getDuration() * mfactor;
                 }
                 int measures = getMeasureDifference(line->token(i), endtok);
                 hairpin->SetTstamp(tstamp.getFloat());
