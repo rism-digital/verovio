@@ -2,3 +2,7 @@ name: Verovio music engraving library
 markdown: kramdown
 baseurl: "https://www.verovio.org"
 exclude: []
+
+webrick:
+  headers:
+    Access-Control-Allow-Origin: "*"
