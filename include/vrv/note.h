@@ -169,14 +169,14 @@ public:
     void SetScoreTimeOffset(double scoreTime);
     void SetRealTimeOffsetSeconds(double timeInSeconds);
     void SetScoreTimeTiedDuration(double timeInSeconds);
-    void SetMIDIPitch(int pitch);
+    void SetMIDIPitch(char pitch);
     double GetScoreTimeOnset();
     int GetRealTimeOnsetMilliseconds();
     double GetScoreTimeOffset();
     double GetScoreTimeTiedDuration();
     int GetRealTimeOffsetMilliseconds();
     double GetScoreTimeDuration();
-    int GetMIDIPitch();
+    char GetMIDIPitch();
     ///@}
 
     //----------//
@@ -307,7 +307,7 @@ private:
     /**
      * The MIDI pitch of the note.
      */
-    int m_MIDIPitch;
+    char m_MIDIPitch;
 };
 
 //----------------------------------------------------------------------------
