@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Nov 11 23:45:12 CET 2018
+// Last Modified: Wed Nov 14 00:12:09 CET 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -16998,6 +16998,12 @@ bool HumdrumFileContent::analyzeKernTies(
 	// Use this in the future to limit to grand-staff search (or 3 staves for organ):
 	// vector<vector<HTp> > tracktokens;
 	// this->getTrackSeq(tracktokens, spinestart, OPT_DATA | OPT_NOEMPTY);
+
+	// Only analyzing linked ties for now (others ties are handled without analysis in 
+	// the hum2mei converter, for example.
+	if (linkSignifier.empty()) {
+		return true;
+	}
 
 	string lstart  = linkSignifier + "[";
 	string lmiddle = linkSignifier + "_";
