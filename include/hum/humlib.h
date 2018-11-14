@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Oct 29 11:41:25 EDT 2018
+// Last Modified: Wed Nov 14 00:12:09 CET 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -517,7 +517,9 @@ class HumRegex {
 
 enum signifier_type {
 	signifier_unknown,
-	signifier_link
+	signifier_link,
+	signifier_above,
+	signifier_below
 };
 
 class HumSignifier {
@@ -532,6 +534,8 @@ class HumSignifier {
 		std::string getDefinition    (void);
 		std::string getParameter     (const std::string& key);
 		bool        isKernLink       (void);
+		bool        isKernAbove      (void);
+		bool        isKernBelow      (void);
 
 	private:
 		std::string m_exinterp;
@@ -552,12 +556,19 @@ class HumSignifiers {
 		bool          addSignifier     (const std::string& rdfline);
 		bool          hasKernLinkSignifier (void);
 		std::string   getKernLinkSignifier (void);
+		bool          hasKernAboveSignifier (void);
+		std::string   getKernAboveSignifier (void);
+		bool          hasKernBelowSignifier (void);
+		std::string   getKernBelowSignifier (void);
 		int           getSignifierCount(void);
 		HumSignifier* getSignifier(int index);
 
 	private:
 		std::vector<HumSignifier*> m_signifiers;
 		int  m_kernLinkIndex = -1;
+		int  m_kernAboveIndex = -1;
+		int  m_kernBelowIndex = -1;
+
 };
 
 
@@ -1299,6 +1310,7 @@ class HumdrumToken : public std::string, public HumHash {
 		int      getLinkedParameterCount   (void);
 		HumParamSet* getLinkedParameter    (int index);
 		HumParamSet* getLinkedParameter    (void);
+		std::string getSlurLayoutParameter (const std::string& keyname, int subtokenindex = -1);
 		std::string getLayoutParameter     (const std::string& category, const std::string& keyname,
 		                                    int subtokenindex = -1);
 		std::string getLayoutParameterChord(const std::string& category,
@@ -1872,6 +1884,11 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		bool          analyzeStructure             (void);
 		bool          analyzeStrands               (void);
 
+		// signifier access
+		std::string   getKernLinkSignifier         (void);
+		std::string   getKernAboveSignifier        (void);
+		std::string   getKernBelowSignifier        (void);
+
 	protected:
 		bool          analyzeRhythm                (void);
 		bool          assignRhythmFromRecip        (HTp spinestart);
@@ -1970,17 +1987,25 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		// in HumdrumFileContent-ottava.cpp
 		void   analyzeOttavas             (void);
 
+		// in HumdrumFileContent-note.cpp
+		void   analyzeCrossStaffStemDirections (void);
+		void   analyzeCrossStaffStemDirections (HTp kernstart);
+
 
 	protected:
 		bool   analyzeKernSlurs           (HTp spinestart, std::vector<HTp>& slurstarts,
 		                                   std::vector<HTp>& slurends,
 		                                   const std::string& linksig = "");
-		bool   analyzeKernTies            (HTp spinestart);
+		bool   analyzeKernTies            (std::vector<std::pair<HTp, int>>& linkedtiestarts,
+		                                   std::vector<std::pair<HTp, int>>& linkedtieends,
+		                                   std::string& linkSignifier);
 		void   fillKeySignature           (std::vector<int>& states,
 		                                   const std::string& keysig);
 		void   resetDiatonicStatesWithKeySignature(std::vector<int>& states,
 				                             std::vector<int>& signature);
 		void    linkSlurEndpoints         (HTp slurstart, HTp slurend);
+		void    linkTieEndpoints          (HTp tiestart, int startindex,
+		                                   HTp tieend, int endindex);
 		bool    isLinkedSlurBegin         (HTp token, int index, const std::string& pattern);
 		bool    isLinkedSlurEnd           (HTp token, int index, const std::string& pattern);
 		void    createLinkedSlurs         (std::vector<HTp>& linkstarts, std::vector<HTp>& linkends);
@@ -1991,6 +2016,12 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		bool    checkRestForVerticalPositioning(HTp rest, int baseline);
 		bool    analyzeKernStems          (HTp stok, HTp etok, std::vector<std::vector<int>>& centerlines);
 		void    getBaselines              (std::vector<std::vector<int>>& centerlines);
+		void    createLinkedTies          (std::vector<std::pair<HTp, int>>& starts, 
+		                                   std::vector<std::pair<HTp, int>>& ends);
+		void    checkCrossStaffStems      (HTp token, std::string& above, std::string& below);
+		void    checkDataForCrossStaffStems(HTp token, std::string& above, std::string& below);
+		void    prepareStaffAboveNoteStems (HTp token);
+		void    prepareStaffBelowNoteStems (HTp token);
 };
 
 

@@ -468,6 +468,9 @@ protected:
     std::string getEndIdForOttava(hum::HTp token);
     void prepareInitialOttavas(hum::HTp measure);
     void linkFingeringToNote(Dir *dir, hum::HTp token, int xstaffindex);
+    bool checkForTupletForcedBreak(const std::vector<hum::HTp> &duritems, int index);
+    void extractSlurNoteAttachmentInformation(std::vector<std::pair<int, bool> > &data, hum::HTp token, char slurtype);
+    bool getNoteState(hum::HTp token, int slurnumber);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader();
