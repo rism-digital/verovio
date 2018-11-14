@@ -5294,6 +5294,10 @@ void MeiInput::UpgradeStaffDefTo_4_0_0(pugi::xml_node staffDef, StaffDef *vrvSta
 
 void MeiInput::UpgradeStaffGrpTo_4_0_0(pugi::xml_node staffGrp, StaffGrp *vrvStaffGrp)
 {
+    if (staffGrp.attribute("barthru")) {
+        vrvStaffGrp->SetBarThru(vrvStaffGrp->AttStaffGrpVis::StrToBoolean(staffGrp.attribute("barthru").value()));
+        staffGrp.remove_attribute("barthru");
+    }
     if (staffGrp.attribute("label")) {
         Text *text = new Text();
         text->SetText(UTF8to16(staffGrp.attribute("label").value()));
