@@ -153,6 +153,7 @@ enum ClassId {
     DOTS,
     FLAG,
     FTREM,
+    HALFMRPT,
     KEYSIG,
     LIGATURE,
     MENSUR,

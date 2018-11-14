@@ -30,6 +30,7 @@
 #include "elementpart.h"
 #include "ftrem.h"
 #include "functorparams.h"
+#include "halfmrpt.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -123,6 +124,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(FLAG)) {
         DrawFlag(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(HALFMRPT)) {
+        DrawHalfmRpt(dc, element, layer, staff, measure);
     }
     else if (element->Is(KEYSIG)) {
         DrawKeySig(dc, element, layer, staff, measure);
@@ -839,6 +843,27 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     wchar_t code = flag->GetSmuflCode(stem->GetDrawingStemDir());
     DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, flag->GetDrawingCueSize());
+
+    dc->EndGraphic(element, this);
+}
+    
+void View::DrawHalfmRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    HalfmRpt *halfmRpt = dynamic_cast<HalfmRpt *>(element);
+    assert(halfmRpt);
+
+    int x = halfmRpt->GetDrawingX();
+    x += m_doc->GetGlyphWidth(SMUFL_E500_repeat1Bar, staff->m_drawingStaffSize, false) / 2;
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    DrawMRptPart(dc, x, SMUFL_E500_repeat1Bar, 0, false, staff);
 
     dc->EndGraphic(element, this);
 }

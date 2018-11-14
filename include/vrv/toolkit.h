@@ -196,6 +196,12 @@ public:
     int GetTimeForElement(const std::string &xmlId);
 
     /**
+     * Return MIDI values of the element with the ID (xml:id).
+     * RenderToMidi() must be called prior to using this method.
+     */
+    std::string GetMIDIValuesForElement(const std::string &xmlId);
+
+    /**
      * @name Set and get the scale
      */
     ///@{
