@@ -6298,12 +6298,14 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
 {
     std::string tok;
     std::string dynamic;
+    bool graceQ = token->isGrace();
     hum::HumdrumLine *line = token->getLine();
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     if (line == NULL) {
         return;
     }
     int track = token->getTrack();
+    int lasttrack = track;
     int ttrack;
     int startfield = token->getFieldIndex() + 1;
 
@@ -6311,6 +6313,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     bool forceBelowQ = false;
     int forcebelowadj = 0;
     int forceaboveadj = 0;
+    int trackdiff = 0;
     int belowadj = 0;
     // int aboveadj = 0;
     int forceQ = false;
@@ -6409,7 +6412,16 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         if (line->token(i)->isKern()) {
             ttrack = line->token(i)->getTrack();
             if (ttrack != track) {
-                break;
+                if (ttrack != lasttrack) {
+                    trackdiff++;
+                    lasttrack = ttrack;
+                }
+                if (graceQ) {
+                    continue;
+                }
+                else {
+                    break;
+                }
             }
             // Break if this is not the last layer for the current spine
             if (!line->token(i)->isNull()) {
@@ -6427,7 +6439,6 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         // }
 
         std::string tok = *line->token(i);
-
         if (line->token(i)->getValueBool("auto", "DY", "processed")) {
             return;
         }
@@ -6534,8 +6545,22 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
             addTextElement(dynam, dynamic);
             // addTextElement(dynam, postfix);
 
-            hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
-            dynam->SetTstamp(barstamp.getFloat());
+            hum::HumNum linedur = line->getDuration();
+            if (linedur == 0) {
+                // Grace note line, so attach to the note rather than
+                // the timestamp.
+                if (token->isChord()) {
+                    dynam->SetStartid("#" + getLocationId("chord", token));
+                }
+                else {
+                    // maybe check if a null token instead of a note here.
+                    dynam->SetStartid("#" + getLocationId("note", token));
+                }
+            }
+            else {
+                hum::HumNum barstamp = getMeasureTstamp(token, staffindex);
+                dynam->SetTstamp(barstamp.getFloat());
+            }
 
             std::string verticalgroup = line->token(i)->getLayoutParameter("DY", "vg");
             if (verticalgroup.empty()) {
@@ -6549,6 +6574,10 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
                 // don't set a vertical group for this token
             }
 
+            if (trackdiff == 1) {
+                // case needed for grace notes in the bottom staff of a grand staff.
+                setPlace(dynam, "above");
+            }
             if (aboveQ) {
                 setPlace(dynam, "above");
             }
@@ -7977,7 +8006,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // durbeamnum == beam numbers for durational items only.
     std::vector<int> durbeamnum;
 
-    // Extract a list of the layer items which have duration:
+    // Extract a list of the layer items that have duration:
     for (int i = 0; i < (int)layerdata.size(); ++i) {
         if (!layerdata[i]->isData()) {
             indexmapping2.push_back(-1);
