@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Nov 14 17:32:44 CET 2018
+// Last Modified: Sun Nov 18 18:15:20 CET 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -46386,9 +46386,6 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 	reindexVoices(partdata);
 
 	HumGrid outdata;
-	if (m_recipQ) {
-		outdata.enableRecipSpine();
-	}
 	status &= stitchParts(outdata, partids, partinfo, partcontent, partdata);
 
 	if (outdata.size() > 2) {
@@ -46432,6 +46429,11 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 			outdata.setDynamicsPresent(p);
 			break;
 		}
+	}
+
+
+	if (m_recipQ || m_forceRecipQ) {
+		outdata.enableRecipSpine();
 	}
 
 	// set the duration of the last slice
@@ -47281,7 +47283,71 @@ bool Tool_musicxml2hum::insertMeasure(HumGrid& outdata, int mnum,
 				nowevents, nowparts, processtime, partdata, partstaves);
 	}
 
+	if (offsetHarmony.size() > 0) {
+		insertOffsetHarmonyIntoMeasure(outdata.back());
+	}
 	return status;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::insertOffsetHarmonyIntoMeasure --
+//
+
+void Tool_musicxml2hum::insertOffsetHarmonyIntoMeasure(GridMeasure* gm) {
+	if (offsetHarmony.empty()) {
+		return;
+	}
+	// the offsetHarmony list should probably be time sorted first, and then
+	// iterate through the slices once.  But there should not be many offset
+	bool beginQ = true;
+	for (auto it = gm->begin(); it != gm->end(); ++it) {
+		GridSlice* gs = *it;
+		if (!gs->isNoteSlice()) {
+			// Only attached harmony to data lines.
+			continue;
+		}
+		HumNum timestamp = gs->getTimestamp();
+		for (int i=0; i<(int)offsetHarmony.size(); i++) {
+			if (offsetHarmony[i].token == NULL) {
+				continue;
+ 			}
+			if (offsetHarmony[i].timestamp == timestamp) {
+				// this is the slice to insert the harmony
+				gs->at(offsetHarmony[i].partindex)->setHarmony(offsetHarmony[i].token);
+				offsetHarmony[i].token = NULL;
+			} else if (offsetHarmony[i].timestamp < timestamp) {
+				if (beginQ) {
+					cerr << "Error: Cannot insert harmony " << offsetHarmony[i].token
+					     << " at timestamp " << offsetHarmony[i].timestamp
+					     << " since first timestamp in measure is " << timestamp << endl;
+				} else {
+					m_forceRecipQ = true;
+					// go back to previous note line and insert new slice to stor
+					// the harmony token
+					auto tempit = it;
+					tempit--;
+					while (tempit != gm->end()) {
+						if ((*tempit)->getTimestamp() == (*it)->getTimestamp()) {
+							tempit--;
+							continue;
+						}
+						int partcount = (int)(*tempit)->size();
+						tempit++;
+						GridSlice* newgs = new GridSlice(gm, offsetHarmony[i].timestamp,
+								SliceType::Notes, partcount);
+						newgs->at(offsetHarmony[i].partindex)->setHarmony(offsetHarmony[i].token);
+						gm->insert(tempit, newgs);
+						offsetHarmony[i].token = NULL;
+						break;
+					}
+				}
+			}
+		}
+		beginQ = false;
+	}
 }
 
 
@@ -47411,7 +47477,7 @@ void Tool_musicxml2hum::appendNonZeroEvents(GridMeasure* outdata,
 	for (int i=0; i<(int)nowevents.size(); i++) {
 		vector<MxmlEvent*>& events = nowevents[i]->nonzerodur;
 		for (int j=0; j<(int)events.size(); j++) {
-			addEvent(slice, outdata, events[j]);
+			addEvent(slice, outdata, events[j], nowtime);
 		}
 	}
 }
@@ -47423,7 +47489,8 @@ void Tool_musicxml2hum::appendNonZeroEvents(GridMeasure* outdata,
 // Tool_musicxml2hum::addEvent -- Add a note or rest.
 //
 
-void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEvent* event) {
+void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEvent* event,
+		HumNum nowtime) {
 
 	int partindex;  // which part the event occurs in
 	int staffindex; // which staff the event occurs in (need to fix)
@@ -47543,7 +47610,7 @@ void Tool_musicxml2hum::addEvent(GridSlice* slice, GridMeasure* outdata, MxmlEve
 		event->reportVerseCountToOwner(staffindex, vcount);
 	}
 
-	int hcount = addHarmony(slice->at(partindex), event);
+	int hcount = addHarmony(slice->at(partindex), event, nowtime, partindex);
 	if (hcount > 0) {
 		event->reportHarmonyCountToOwner(hcount);
 	}
@@ -48017,7 +48084,8 @@ string Tool_musicxml2hum::getDynamicString(xml_node element) {
 // Tool_musicxml2hum::addHarmony --
 //
 
-int Tool_musicxml2hum::addHarmony(GridPart* part, MxmlEvent* event) {
+int Tool_musicxml2hum::addHarmony(GridPart* part, MxmlEvent* event, HumNum nowtime,
+		int partindex) {
 	xml_node hnode = event->getHNode();
 	if (!hnode) {
 		return 0;
@@ -48025,10 +48093,56 @@ int Tool_musicxml2hum::addHarmony(GridPart* part, MxmlEvent* event) {
 
 	// fill in X with the harmony values from the <harmony> node
 	string hstring = getHarmonyString(hnode);
+	int offset = getHarmonyOffset(hnode);
 	HTp htok = new HumdrumToken(hstring);
-	part->setHarmony(htok);
+	if (offset == 0) {
+		part->setHarmony(htok);
+	} else {
+		MusicXmlHarmonyInfo hinfo;
+		hinfo.timestamp = offset;
+		hinfo.timestamp /= event->getQTicks();
+		hinfo.timestamp += nowtime;
+		hinfo.partindex = partindex;
+		hinfo.token = htok;
+		offsetHarmony.push_back(hinfo);
+	}
 
 	return 1;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_musicxml2hum::getHarmonyOffset --
+//   <harmony default-y="40">
+//       <root>
+//           <root-step>C</root-step>
+//       </root>
+//       <kind>major-ninth</kind>
+//       <bass>
+//           <bass-step>E</bass-step>
+//       </bass>
+//       <offset>-8</offset>
+//   </harmony>
+//
+
+int Tool_musicxml2hum::getHarmonyOffset(xml_node hnode) {
+	if (!hnode) {
+		return 0;
+	}
+	xml_node child = hnode.first_child();
+	if (!child) {
+		return 0;
+	}
+	while (child) {
+		if (nodeType(child, "offset")) {
+			return atoi(child.child_value());
+		}
+		child = child.next_sibling();
+	}
+
+	return 0;
 }
 
 
@@ -48044,6 +48158,7 @@ int Tool_musicxml2hum::addHarmony(GridPart* part, MxmlEvent* event) {
 //       <bass>
 //           <bass-step>E</bass-step>
 //       </bass>
+//       <offset>-8</offset>
 //   </harmony>
 //
 
@@ -48290,7 +48405,7 @@ string Tool_musicxml2hum::cleanSpaces(const string& input) {
 		}
 		i--;
 	}
-	if ((output.size() == 3) && ((unsigned char)output[0] == 0xee) && 
+	if ((output.size() == 3) && ((unsigned char)output[0] == 0xee) &&
 			((unsigned char)output[1] == 0x95) && ((unsigned char)output[2] == 0x91)) {
 		// MuseScore elision character:
 		// <text font-family="MScore Text"></text>
@@ -48583,7 +48698,7 @@ void Tool_musicxml2hum::addGraceLines(GridMeasure* outdata,
 			for (int k=0; k<(int)notes[i][j].size(); k++) {
 				int startm = maxcount - (int)notes[i][j][k].size();
 				for (int m=0; m<(int)notes[i][j][k].size(); m++) {
-					addEvent(slices.at(startm+m), outdata, notes[i][j][k][m]);
+					addEvent(slices.at(startm+m), outdata, notes[i][j][k][m], nowtime);
 				}
 			}
 		}

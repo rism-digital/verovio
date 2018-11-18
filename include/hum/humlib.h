@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Nov 14 17:32:44 CET 2018
+// Last Modified: Sun Nov 18 18:15:20 CET 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5019,6 +5019,14 @@ class Tool_msearch : public HumTool {
 };
 
 
+class MusicXmlHarmonyInfo {
+	public:
+		HTp    token;
+		HumNum timestamp;
+		int    partindex;
+};
+
+
 class Tool_musicxml2hum : public HumTool {
 	public:
 		        Tool_musicxml2hum    (void);
@@ -5101,6 +5109,7 @@ class Tool_musicxml2hum : public HumTool {
 		void cleanupMeasures   (HumdrumFile& outfile,
 		                        std::vector<HumdrumLine*> measures);
 		void processPrintElement(GridMeasure* outdata, pugi::xml_node element, HumNum timestamp);
+		void insertOffsetHarmonyIntoMeasure(GridMeasure* gm);
 
 		void addClefLine       (GridMeasure* outdata, std::vector<std::vector<pugi::xml_node> >& clefs,
 		                        std::vector<MxmlPart>& partdata, HumNum nowtime);
@@ -5131,17 +5140,18 @@ class Tool_musicxml2hum : public HumTool {
 		pugi::xml_node convertMensurationToHumdrum(pugi::xml_node timesig,
 		                        HTp& token, int& staffindex);
 
-		void addEvent          (GridSlice* slice, GridMeasure* outdata, MxmlEvent* event);
+		void addEvent          (GridSlice* slice, GridMeasure* outdata, MxmlEvent* event, HumNum nowtime);
 		void fillEmpties       (GridPart* part, const char* string);
 		void addSecondaryChordNotes (ostream& output, MxmlEvent* head, const std::string& recip);
 		bool isInvisible       (MxmlEvent* event);
 		int  addLyrics         (GridStaff* staff, MxmlEvent* event);
-		int  addHarmony        (GridPart* oart, MxmlEvent* event);
+		int  addHarmony        (GridPart* oart, MxmlEvent* event, HumNum nowtime, int partindex);
 		void addDynamic        (GridPart* part, MxmlEvent* event);
 		void addTexts          (GridSlice* slice, GridMeasure* measure, int partindex,
 		                        int staffindex, int voiceindex, MxmlEvent* event);
 		void addText           (GridSlice* slice, GridMeasure* measure, int partindex,
 		                        int staffindex, int voiceindex, pugi::xml_node node);
+		int         getHarmonyOffset(pugi::xml_node hnode);
 		std::string getHarmonyString(pugi::xml_node hnode);
 		std::string getDynamicString(pugi::xml_node element);
 		std::string getDynamicsParameters(pugi::xml_node element);
@@ -5174,6 +5184,7 @@ class Tool_musicxml2hum : public HumTool {
 		char m_hasEditorial = '\0';
 		bool m_hasOrnamentsQ = false;
 		std::vector<std::vector<std::string>> m_last_ottava_direction;
+		std::vector<MusicXmlHarmonyInfo> offsetHarmony;
 
 		// RDF indications in **kern data:
 		std::string  m_caesura_rdf;
@@ -5184,6 +5195,11 @@ class Tool_musicxml2hum : public HumTool {
 		pugi::xml_node m_current_dynamic = pugi::xml_node(NULL);
 		std::vector<pugi::xml_node> m_current_text;
 		bool m_hasTransposition = false;
+
+		// m_forceRecipQ is used to force the display of the **recip spint
+		// when a data line contains no notes or rests.  This is used for
+		// harmony/dynamics side spines.
+		bool m_forceRecipQ = false;
 
 };
 
