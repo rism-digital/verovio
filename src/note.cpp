@@ -376,7 +376,7 @@ void Note::SetScoreTimeTiedDuration(double scoreTime)
     m_scoreTimeTiedDuration = scoreTime;
 }
 
-void Note::SetMIDIPitch(int pitch)
+void Note::SetMIDIPitch(char pitch)
 {
     m_MIDIPitch = pitch;
 }
@@ -411,7 +411,7 @@ double Note::GetScoreTimeDuration()
     return GetScoreTimeOffset() - GetScoreTimeOnset();
 }
 
-int Note::GetMIDIPitch()
+char Note::GetMIDIPitch()
 {
     return m_MIDIPitch;
 }
