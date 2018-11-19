@@ -20,3 +20,5 @@ Please use the "Pull Request" mechanism for proposing contributions to the code 
  6. Once the changes have gone through our review process, we will merge your changes into our repository. You may then delete your dedicated branch.
  
 For proposing changes to the `verovio:gh-pages` branch of Verovio (e.g., its website), follow the same workflow but make the pull request to the `rism-ch/verovio:gh-pages-develop` branch.
+
+For updating the tutorial fork the submodule [verovio-tutorial](https://github.com/rism-ch/verovio-tutorial), make a PR there and wait for a merge to point to the latest commit from the parent module (i.e. `verovio:gh-pages`) afterwards.
