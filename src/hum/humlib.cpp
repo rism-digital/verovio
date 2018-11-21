@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Nov 18 18:15:20 CET 2018
+// Last Modified: Wed Nov 21 11:59:22 EST 2018
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -19006,6 +19006,12 @@ void HumdrumFileStructure::processLocalParametersForStrand(int index) {
 	HTp dtok = NULL;
 	while (tok) {
 		if (tok->isData()) {
+			dtok = tok;
+		} else if (tok->isBarline()) {
+			// layout parameters allowed for barlines
+			dtok = tok;
+		} else if (tok->isInterpretation() && (*tok != "*")) {
+			// layout parameters allowed for non-null interpretations
 			dtok = tok;
 		} else if (tok->isCommentLocal()) {
 			if (tok->find("!LO:") == 0) {
@@ -46578,14 +46584,20 @@ void Tool_musicxml2hum::setSoftwareInfo(xml_document& doc) {
 
 //////////////////////////////
 //
-// Tool_musicxml2hum::cleanSpaces --
+// Tool_musicxml2hum::cleanSpaces -- Converts newlines and tabs to spaces, and removes
+//     trailing spaces from the string.  Does not remove leading spaces, but this could
+//     be added.  Another variation would be to use \n to encode newlines if they need
+//     to be preserved, but for now converting them to spaces.
 //
 
-string Tool_musicxml2hum::cleanSpaces(string& input) {
+string& Tool_musicxml2hum::cleanSpaces(string& input) {
 	for (int i=0; i<(int)input.size(); i++) {
 		if (std::isspace(input[i])) {
 			input[i] = ' ';
 		}
+	}
+	while ((!input.empty()) && std::isspace(input.back())) {
+		input.resize(input.size() - 1);
 	}
 	return input;
 }
@@ -47743,7 +47755,12 @@ void Tool_musicxml2hum::addText(GridSlice* slice, GridMeasure* measure, int part
 		stylestring = ":B";
 	}
 
-	// maybe check for text only containing spaces and exclude here
+	text = cleanSpaces(text);
+	if (text.empty()) {
+		// no text to display after removing whitespace
+		return;
+	}
+
 	string output = "!LO:TX";
 	output += placementstring;
 	output += stylestring;

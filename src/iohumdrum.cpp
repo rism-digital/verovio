@@ -4951,6 +4951,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
     }
 
+    if ((layerdata.size() > 0) && layerdata.back()->isBarline()) {
+        processDirections(layerdata.back(), staffindex);
+    }
+
     return true;
 }
 
@@ -5504,6 +5508,7 @@ void HumdrumInput::colorNote(Note *note, hum::HTp token, const std::string &subt
         note->SetColor(spinecolor);
     }
 
+    int justification = 0;
     for (int i = 0; i < (int)m_signifiers.mark.size(); ++i) {
         if (subtoken.find(m_signifiers.mark[i]) != std::string::npos) {
             note->SetColor(m_signifiers.mcolor[i]);
@@ -5512,7 +5517,8 @@ void HumdrumInput::colorNote(Note *note, hum::HTp token, const std::string &subt
                 bool bold = true;
                 bool italic = false;
                 int staffindex = m_rkern[token->getTrack()];
-                addDirection(m_signifiers.markdir[i], "above", bold, italic, token, staffindex, m_signifiers.mcolor[i]);
+                addDirection(m_signifiers.markdir[i], "above", bold, italic, token, staffindex, justification,
+                    m_signifiers.mcolor[i]);
             }
             break;
         }
@@ -6005,6 +6011,14 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
         return;
     }
 
+    // maybe add center justification as an option later
+    // justification == 0 means no explicit justification (mostly left justified)
+    // justification == 1 means right justified
+    int justification = 0;
+    if (token->isDefined("LO", "TX", "rj")) {
+        justification = 1;
+    }
+
     bool zparam = token->isDefined("LO", "TX", "Z");
     bool yparam = token->isDefined("LO", "TX", "Y");
 
@@ -6066,7 +6080,7 @@ void HumdrumInput::processDirections(hum::HTp token, int staffindex)
         }
     }
 
-    addDirection(text, placement, bold, italic, token, staffindex);
+    addDirection(text, placement, bold, italic, token, staffindex, justification);
 }
 
 //////////////////////////////
@@ -6134,6 +6148,11 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
     bool aparam = false;
     bool bparam = false;
 
+    // maybe add center justification as an option later
+    // justification == 0 means no explicit justification (mostly left justified)
+    // justification == 1 means right justified
+    int justification = 0;
+
     string text;
 
     string key;
@@ -6182,6 +6201,10 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
             italic = true;
             bold = true;
         }
+
+        if (key == "rj") {
+            justification = 1;
+        }
     }
 
     double Y = 0.0;
@@ -6216,14 +6239,14 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
         int maxstaff = (int)m_staffstarts.size() - 1;
 
         if ((placement == "below") && (staffindex == maxstaff)) {
-            addDirection(text, placement, bold, italic, token, staffindex);
+            addDirection(text, placement, bold, italic, token, staffindex, justification);
         }
         else if ((placement == "above") && (staffindex == 0)) {
-            addDirection(text, placement, bold, italic, token, staffindex);
+            addDirection(text, placement, bold, italic, token, staffindex, justification);
         }
     }
     else {
-        addDirection(text, placement, bold, italic, token, staffindex);
+        addDirection(text, placement, bold, italic, token, staffindex, justification);
     }
 }
 
@@ -6234,7 +6257,7 @@ void HumdrumInput::processLinkedDirection(int index, hum::HTp token, int staffin
 //
 
 void HumdrumInput::addDirection(const string &text, const string &placement, bool bold, bool italic, hum::HTp token,
-    int staffindex, const std::string &color)
+    int staffindex, int justification, const std::string &color)
 {
 
     Dir *dir = new Dir;
@@ -6264,7 +6287,7 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
     else if (placement == "below") {
         setPlace(dir, "below");
     }
-    if ((!italic) || bold) {
+    if ((!italic) || bold || justification) {
         Rend *rend = new Rend;
         if (!tcolor.empty()) {
             rend->SetColor(tcolor);
@@ -6282,6 +6305,9 @@ void HumdrumInput::addDirection(const string &text, const string &placement, boo
         }
         if (bold) {
             rend->SetFontweight(FONTWEIGHT_bold);
+        }
+        if (justification == 1) {
+            rend->SetHalign(HORIZONTALALIGNMENT_right);
         }
     }
     else {

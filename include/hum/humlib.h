@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Nov 18 18:15:20 CET 2018
+// Last Modified: Wed Nov 21 11:59:22 EST 2018
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -5083,7 +5083,7 @@ class Tool_musicxml2hum : public HumTool {
 		                              MxmlEvent* event);
 		void   addHeaderRecords      (HumdrumFile& outfile, pugi::xml_document& doc);
 		void   addFooterRecords      (HumdrumFile& outfile, pugi::xml_document& doc);
-		std::string cleanSpaces           (std::string& input);
+		std::string& cleanSpaces     (std::string& input);
 		void setEditorialAccidental  (int accidental, GridSlice* slice,
 		                              int partindex, int staffindex, int voiceindex);
 

@@ -426,7 +426,7 @@ protected:
     hum::HTp getRightmostSystemArpeggio(hum::HTp token);
     hum::HTp getRightmostStaffArpeggio(hum::HTp token);
     void addDirection(const std::string &text, const std::string &placement, bool bold, bool italic, hum::HTp token,
-        int staffindex, const std::string &color = "");
+        int staffindex, int justification = 0, const std::string &color = "");
     void processTerminalLong(hum::HTp token);
     void removeCharacter(hum::HTp token, char removechar);
     std::string getSystemDecoration(const std::string &tag);
